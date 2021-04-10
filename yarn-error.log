@@ -1,0 +1,56 @@
+Arguments: 
+  /usr/bin/node /usr/share/yarn/bin/yarn.js add -D tailwindcss@latest postcss@latest autoprefixer@latest
+
+PATH: 
+  /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/Program Files/AdoptOpenJDK/jdk-11.0.10.9-hotspot/bin:/mnt/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/nodejs/:/mnt/c/Users/sacha/AppData/Local/Programs/Python/Python39/Scripts/:/mnt/c/Users/sacha/AppData/Local/Programs/Python/Python39/:/mnt/c/Users/sacha/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/sacha/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/sacha/AppData/Roaming/npm:/home/sachaw/.yarn/bin
+
+Yarn version: 
+  1.22.5
+
+Node version: 
+  15.12.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: getaddrinfo EAI_AGAIN registry.yarnpkg.com
+      at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:69:26)
+
+npm manifest: 
+  {
+    "scripts": {
+      "start": "snowpack dev",
+      "build": "snowpack build",
+      "test": "web-test-runner \"src/**/*.test.tsx\"",
+      "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
+      "lint": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\""
+    },
+    "dependencies": {
+      "react": "^17.0.0",
+      "react-dom": "^17.0.0"
+    },
+    "devDependencies": {
+      "@snowpack/plugin-dotenv": "^2.0.5",
+      "@snowpack/plugin-react-refresh": "^2.4.0",
+      "@snowpack/plugin-typescript": "^1.2.0",
+      "@snowpack/web-test-runner-plugin": "^0.2.0",
+      "@testing-library/react": "^11.0.0",
+      "@types/chai": "^4.2.13",
+      "@types/mocha": "^8.2.0",
+      "@types/react": "^17.0.0",
+      "@types/react-dom": "^17.0.0",
+      "@types/snowpack-env": "^2.3.2",
+      "@web/test-runner": "^0.12.0",
+      "chai": "^4.2.0",
+      "prettier": "^2.0.5",
+      "snowpack": "^3.0.1",
+      "typescript": "^4.0.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
