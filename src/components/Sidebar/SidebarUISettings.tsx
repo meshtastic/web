@@ -1,6 +1,6 @@
 import React from 'react';
 
-// import Flags from 'country-flag-icons/react/3x2';
+import { Jp, Us } from 'react-flags-select';
 import { FaCog, FaLaptop, FaMoon, FaSun } from 'react-icons/fa';
 
 import type { languageTemplate } from '../../App';
@@ -57,14 +57,14 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
             open={false}
             titleContent={
               <div className="flex my-auto">
-                {/* {props.Translations.language_title}
-                {props.Language === LanguageEnum.ENGLISH ? (
-                  <Flags.US className="ml-2 w-8 shadow-md" />
-                ) : props.Language === LanguageEnum.JAPANESE ? (
-                  <Flags.JP className="ml-2 w-8 shadow-md" />
-                ) : (
-                  ''
-                )} */}
+                {props.Translations.language_title}
+                <div className="my-auto">
+                  {props.Language === LanguageEnum.ENGLISH ? (
+                    <Us className="ml-2 w-8 shadow-md" />
+                  ) : props.Language === LanguageEnum.JAPANESE ? (
+                    <Jp className="ml-2 w-8 shadow-md" />
+                  ) : null}
+                </div>
               </div>
             }
             dropdownContent={
@@ -77,7 +77,9 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
                   isDropdown={false}
                   isNested={true}
                   titleContent={
-                    <>{/* English <Flags.US className="w-8 shadow-md" /> */}</>
+                    <>
+                      English <Us className="w-8 shadow-md" />
+                    </>
                   }
                 />
                 <NavItem
@@ -88,7 +90,9 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
                   isDropdown={false}
                   isNested={true}
                   titleContent={
-                    <>{/* 日本語 <Flags.JP className="w-8 shadow-md" /> */}</>
+                    <>
+                      日本語 <Jp className="w-8 shadow-md" />
+                    </>
                   }
                 />
               </>

@@ -9,10 +9,12 @@
   "dependencies": {
     "@meshtastic/meshtasticjs": "^0.6.5",
     "@snowpack/plugin-webpack": "^2.3.1",
-    "country-flag-icons": "^1.2.9",
+    "add": "^2.0.6",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
-    "react-icons": "^4.2.0"
+    "react-flags-select": "^2.1.2",
+    "react-icons": "^4.2.0",
+    "yarn": "^1.22.10"
   },
   "devDependencies": {
     "@snowpack/plugin-dotenv": "^2.0.5",
@@ -22,7 +24,6 @@
     "@snowpack/web-test-runner-plugin": "^0.2.0",
     "@testing-library/react": "^11.0.0",
     "@types/chai": "^4.2.13",
-    "@types/country-flag-icons": "^1.2.0",
     "@types/mocha": "^8.2.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
