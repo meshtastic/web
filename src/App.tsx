@@ -135,20 +135,21 @@ const App = () => {
 
     connection.onRoutingPacketEvent.subscribe((routingPacket) => {
       console.log(routingPacket);
+      // console.log(messages);
 
-      messages.map((message) => {
-        console.log(
-          `${
-            routingPacket.payloadVariant.oneofKind === 'decoded'
-              ? routingPacket.payloadVariant.decoded.requestId
-              : null
-          } === ${message.message.packet.id}: ${
-            routingPacket.payloadVariant.oneofKind === 'decoded'
-              ? routingPacket.payloadVariant.decoded.requestId
-              : null === message.message.packet.id
-          }`,
-        );
-      });
+      // messages.map((message) => {
+      //   console.log(
+      //     `${
+      //       routingPacket.payloadVariant.oneofKind === 'decoded'
+      //         ? routingPacket.payloadVariant.decoded.requestId
+      //         : null
+      //     } === ${message.message.packet.id}: ${
+      //       routingPacket.payloadVariant.oneofKind === 'decoded'
+      //         ? routingPacket.payloadVariant.decoded.requestId
+      //         : null === message.message.packet.id
+      //     }`,
+      //   );
+      // });
       // messages.find((message) => {
       //   message.message.packet.id === routingPacket.decoded.requestId;
       // });
@@ -156,32 +157,6 @@ const App = () => {
   }, []);
   return (
     <div className="flex flex-col h-screen w-screen">
-      {/* <Head>
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/design/web/apple-touch-icon.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/design/web/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/design/web/favicon-16x16.png"
-        />
-        <link rel="manifest" href="/design/web/site.webmanifest" />
-        <link
-          rel="mask-icon"
-          href="/design/web/safari-pinned-tab.svg"
-          color="#67ea94"
-        />
-        <meta name="theme-color" content="#67ea94" />
-      </Head> */}
       <Header
         status={deviceStatus}
         IsReady={isReady}

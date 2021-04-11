@@ -4,7 +4,7 @@ import { FaCaretDown, FaCaretRight, FaSpinner } from 'react-icons/fa';
 
 interface NavItemProps {
   isDropdown: boolean;
-  open?: boolean;
+  open: boolean;
   isNested: boolean;
   titleContent: ReactNode;
   dropdownContent?: ReactNode;

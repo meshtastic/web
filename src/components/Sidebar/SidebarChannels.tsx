@@ -35,6 +35,7 @@ const SidebarChannels = (props: SidebarChannelsProps) => {
                   key={index}
                   isDropdown={true}
                   isNested={true}
+                  open={false}
                   titleContent={
                     <div className="flex">
                       {channel.index} - {Protobuf.Channel_Role[channel.role]}
@@ -44,6 +45,7 @@ const SidebarChannels = (props: SidebarChannelsProps) => {
                     <NavItem
                       isDropdown={false}
                       isNested={false}
+                      open={false}
                       titleContent={
                         <div className="w-full">
                           <div className="flex justify-between border-b hover:bg-gray-200">

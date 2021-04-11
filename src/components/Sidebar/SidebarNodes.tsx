@@ -1,6 +1,14 @@
 import React from 'react';
 
-import { FaDesktop, FaUsers } from 'react-icons/fa';
+import {
+  FaBatteryHalf,
+  FaClock,
+  FaCrown,
+  FaDesktop,
+  FaMapMarkerAlt,
+  FaMountain,
+  FaUsers,
+} from 'react-icons/fa';
 
 import type { Types } from '@meshtastic/meshtasticjs';
 
@@ -11,6 +19,7 @@ interface sidebarNodesProps {
   IsReady: boolean;
   Nodes: Types.NodeInfoPacket[];
   Translations: languageTemplate;
+  myId: number;
 }
 
 const SidebarNodes = (props: sidebarNodesProps) => {
@@ -39,7 +48,11 @@ const SidebarNodes = (props: sidebarNodesProps) => {
               open={false}
               titleContent={
                 <div key={index} className="flex">
-                  <FaDesktop className="my-auto mr-2" />
+                  {node.data.num === props.myId ? (
+                    <FaCrown className="text-yellow-500 my-auto mr-2" />
+                  ) : (
+                    <FaDesktop className="my-auto mr-2" />
+                  )}
                   <div className="m-auto">{node.data.user?.longName}</div>
                 </div>
               }
@@ -47,6 +60,7 @@ const SidebarNodes = (props: sidebarNodesProps) => {
                 <NavItem
                   isDropdown={false}
                   isNested={true}
+                  open={false}
                   titleContent={
                     <div>
                       <p>
@@ -58,15 +72,34 @@ const SidebarNodes = (props: sidebarNodesProps) => {
                         {node.packet?.rxRssi ? node.packet.rxRssi : 'Unknown'}
                       </p>
                       <p>
-                        Last heard:{' '}
-                        {node.data?.lastHeard ? node.data.lastHeard : 'Unknown'}
+                        {`Last heard: ${
+                          node.data?.lastHeard
+                            ? new Date(node.data.lastHeard).toLocaleString()
+                            : 'Unknown'
+                        }`}{' '}
+                        {}
                       </p>
-                      <p>
-                        Loc:{' '}
-                        {node.data?.position
-                          ? `alt: ${node.data?.position.altitude}, lat: ${node.data?.position.latitudeI}, lng: ${node.data?.position.longitudeI}, time: ${node.data?.position.time}, batt: ${node.data?.position.batteryLevel}`
-                          : 'Unknown'}
-                      </p>
+                      <div className="flex">
+                        <FaMapMarkerAlt className="my-auto mr-2" />
+                        <p>
+                          {node.data.position?.latitudeI},
+                          {node.data.position?.longitudeI}
+                        </p>
+                      </div>
+
+                      <div className="flex">
+                        <FaMountain className="my-auto mr-2" />
+                        <p>{node.data.position?.altitude}</p>
+                      </div>
+
+                      <div className="flex">
+                        <FaClock className="my-auto mr-2" />
+                        <p>{node.data.position?.time}</p>
+                      </div>
+                      <div className="flex">
+                        <FaBatteryHalf className="my-auto mr-2" />
+                        <p>{node.data.position?.batteryLevel}</p>
+                      </div>
                     </div>
                   }
                 />

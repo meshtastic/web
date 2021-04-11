@@ -22,6 +22,7 @@ interface SidebarProps {
   Language: LanguageEnum;
   SetLanguage: Function;
   Translations: languageTemplate;
+  myId: number;
 }
 
 const Sidebar = (props: SidebarProps) => {
@@ -37,6 +38,7 @@ const Sidebar = (props: SidebarProps) => {
         IsReady={props.IsReady}
         Nodes={props.Nodes}
         Translations={props.Translations}
+        myId={props.myId}
       />
       <SidebarDeviceSettings
         IsReady={props.IsReady}

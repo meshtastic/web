@@ -19,6 +19,7 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
     <NavItem
       isDropdown={true}
       isNested={false}
+      open={false}
       titleContent={
         <div className="flex">
           <FaCog className="my-auto mr-2" />
@@ -30,6 +31,7 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
           <NavItem
             isDropdown={false}
             isNested={true}
+            open={false}
             titleContent={
               <>
                 <div className="my-auto">
@@ -71,6 +73,7 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
                   onClick={() => {
                     props.SetLanguage(LanguageEnum.ENGLISH);
                   }}
+                  open={false}
                   isDropdown={false}
                   isNested={true}
                   titleContent={
@@ -81,6 +84,7 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
                   onClick={() => {
                     props.SetLanguage(LanguageEnum.JAPANESE);
                   }}
+                  open={false}
                   isDropdown={false}
                   isNested={true}
                   titleContent={

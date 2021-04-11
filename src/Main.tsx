@@ -105,6 +105,7 @@ const Main = (props: MainProps) => {
         Language={props.Language}
         SetLanguage={props.SetLanguage}
         Translations={props.Translations}
+        myId={props.MyNodeInfo.myNodeNum}
       />
     </div>
   );
