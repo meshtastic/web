@@ -12,10 +12,12 @@ import Header from './components/Header';
 import Main from './Main';
 import Translations_English from './translations/en';
 import Translations_Japanese from './translations/jp';
+import Translations_Portuguese from './translations/pt';
 
 export enum LanguageEnum {
   ENGLISH,
   JAPANESE,
+  PORTUGUESE,
 }
 
 export interface languageTemplate {
@@ -57,6 +59,9 @@ const App = () => {
     switch (language) {
       case LanguageEnum.ENGLISH:
         setTranslations(Translations_English);
+        break;
+      case LanguageEnum.PORTUGUESE:
+        setTranslations(Translations_Portuguese);
         break;
       case LanguageEnum.JAPANESE:
         setTranslations(Translations_Japanese);
