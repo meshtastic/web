@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React from 'react';
 
 import { FaCaretDown, FaCaretRight, FaSpinner } from 'react-icons/fa';
 
@@ -6,19 +6,19 @@ interface NavItemProps {
   isDropdown: boolean;
   open: boolean;
   isNested: boolean;
-  titleContent: ReactNode;
-  dropdownContent?: ReactNode;
+  titleContent: React.ReactNode;
+  dropdownContent?: React.ReactNode;
   onClick?: Function;
   isLoading?: boolean;
 }
 
 const NavItem = (props: NavItemProps) => {
-  useEffect(() => {
+  React.useEffect(() => {
     if (props.open) {
       setNavItemOpen(props.open);
     }
   }, []);
-  const [navItemOpen, setNavItemOpen] = useState(false);
+  const [navItemOpen, setNavItemOpen] = React.useState(false);
   return (
     <>
       <div

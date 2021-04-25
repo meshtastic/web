@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 interface ToggleSwitchProps {
   active: boolean;
@@ -6,9 +6,9 @@ interface ToggleSwitchProps {
 }
 
 const ToggleSwitch = (props: ToggleSwitchProps) => {
-  const [active, setActive] = useState(false);
+  const [active, setActive] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     setActive(props.active);
   }, []);
 

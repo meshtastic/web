@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { FaBars, FaPaperPlane } from 'react-icons/fa';
 
@@ -21,13 +21,13 @@ interface MainProps {
   IsReady: boolean;
   Preferences: Protobuf.RadioConfig_UserPreferences;
   Language: LanguageEnum;
-  SetLanguage: Function;
+  SetLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
   Translations: languageTemplate;
 }
 
 const Main = (props: MainProps) => {
-  const [currentMessage, setCurrentMessage] = useState('');
-  const [mobileNavOpen, setMobileNavOpen] = useState(true);
+  const [currentMessage, setCurrentMessage] = React.useState('');
+  const [mobileNavOpen, setMobileNavOpen] = React.useState(true);
 
   const sendMessage = () => {
     if (props.IsReady) {

@@ -5,9 +5,9 @@ module.exports = {
     src: { url: '/dist' },
   },
   plugins: [
+    '@snowpack/plugin-postcss',
     '@snowpack/plugin-react-refresh',
     '@snowpack/plugin-dotenv',
-    '@snowpack/plugin-postcss',
     [
       '@snowpack/plugin-typescript',
       {
@@ -15,23 +15,19 @@ module.exports = {
         ...(process.versions.pnp ? { tsc: 'yarn pnpify tsc' } : {}),
       },
     ],
-    // [
-    //   '@snowpack/plugin-webpack',
-    //   {
-    //     outputPattern: {
-    //       js: 'index.js',
-    //       css: 'index.css',
-    //     },
-    //   },
-    // ],
   ],
   routes: [
     /* Enable an SPA Fallback in development: */
     // {"match": "routes", "src": ".*", "dest": "/index.html"},
   ],
   optimize: {
-    /* Example: Bundle your final build: */
-    // "bundle": true,
+    bundle: true,
+    sourcemap: false,
+    splitting: true,
+    treeshake: true,
+    manifest: false,
+    minify: true,
+    target: 'es2020',
   },
   packageOptions: {
     /* ... */

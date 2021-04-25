@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import {
   Client,
@@ -35,25 +35,25 @@ export interface languageTemplate {
 }
 
 const App = () => {
-  const [deviceStatus, setDeviceStatus] = useState(
+  const [deviceStatus, setDeviceStatus] = React.useState(
     {} as Types.DeviceStatusEnum,
   );
-  const [myNodeInfo, setMyNodeInfo] = useState({} as Protobuf.MyNodeInfo);
-  const [messages, setMessages] = useState(
+  const [myNodeInfo, setMyNodeInfo] = React.useState({} as Protobuf.MyNodeInfo);
+  const [messages, setMessages] = React.useState(
     [] as { message: Types.TextPacket; ack: false }[],
   );
-  const [channels, setChannels] = useState([] as Protobuf.Channel[]);
-  const [nodes, setNodes] = useState([] as Types.NodeInfoPacket[]);
-  const [connection, setConnection] = useState({} as IHTTPConnection);
-  const [isReady, setIsReady] = useState(false);
-  const [lastMeshInterraction, setLastMeshInterraction] = useState(0);
-  const [preferences, setPreferences] = useState(
+  const [channels, setChannels] = React.useState([] as Protobuf.Channel[]);
+  const [nodes, setNodes] = React.useState([] as Types.NodeInfoPacket[]);
+  const [connection, setConnection] = React.useState({} as IHTTPConnection);
+  const [isReady, setIsReady] = React.useState(false);
+  const [lastMeshInterraction, setLastMeshInterraction] = React.useState(0);
+  const [preferences, setPreferences] = React.useState(
     {} as Protobuf.RadioConfig_UserPreferences,
   );
-  const [language, setLanguage] = useState(LanguageEnum.ENGLISH);
-  const [translations, setTranslations] = useState(Translations_English);
+  const [language, setLanguage] = React.useState(LanguageEnum.ENGLISH);
+  const [translations, setTranslations] = React.useState(Translations_English);
 
-  useEffect(() => {
+  React.useEffect(() => {
     switch (language) {
       case LanguageEnum.ENGLISH:
         setTranslations(Translations_English);
@@ -67,12 +67,13 @@ const App = () => {
     }
   }, [language]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const client = new Client();
     const connection = client.createHTTPConnection();
+    setConnection(connection);
     // connection.connect(window.location.hostname, undefined, true);
     connection.connect({
-      address: '192.168.105.71',
+      address: '192.168.13.71',
       receiveBatchRequests: false,
       tls: false,
       fetchInterval: 2000,

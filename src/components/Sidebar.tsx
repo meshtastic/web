@@ -20,7 +20,7 @@ interface SidebarProps {
   Connection: IHTTPConnection;
   MobileNavOpen: boolean;
   Language: LanguageEnum;
-  SetLanguage: Function;
+  SetLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
   Translations: languageTemplate;
   myId: number;
 }

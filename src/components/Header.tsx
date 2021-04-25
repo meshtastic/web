@@ -4,6 +4,8 @@ import { FaBroadcastTower, FaMobileAlt } from 'react-icons/fa';
 
 import { Types } from '@meshtastic/meshtasticjs';
 
+import typelogo from '../../public/typelogo.svg';
+
 interface HeaderProps {
   status: Types.DeviceStatusEnum;
   IsReady: boolean;
@@ -14,7 +16,8 @@ const Header = (props: HeaderProps) => {
   return (
     <nav className="w-full shadow-md">
       <div className="flex w-full container mx-auto justify-between px-6 py-4">
-        <img src="/typelogo.svg" height="30" width="200" />
+        <img src={typelogo} height="30" width="200" />
+        <div></div>
 
         <div className="flex items-center">
           <div className="flex pl-4">

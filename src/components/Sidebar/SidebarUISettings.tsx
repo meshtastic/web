@@ -10,7 +10,7 @@ import NavItem from '../NavItem';
 
 interface SidebarUISettingsProps {
   Language: LanguageEnum;
-  SetLanguage: Function;
+  SetLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
   Translations: languageTemplate;
 }
 
