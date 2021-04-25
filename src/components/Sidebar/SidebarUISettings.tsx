@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Jp, Us } from 'react-flags-select';
+import { Jp, Us, Br } from 'react-flags-select';
 import { FaCog, FaLaptop, FaMoon, FaSun } from 'react-icons/fa';
 
 import type { languageTemplate } from '../../App';
@@ -79,6 +79,19 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
                   titleContent={
                     <>
                       English <Us className="w-8 shadow-md" />
+                    </>
+                  }
+                />
+                <NavItem
+                  onClick={() => {
+                    props.SetLanguage(LanguageEnum.PORTUGUESE);
+                  }}
+                  open={false}
+                  isDropdown={false}
+                  isNested={true}
+                  titleContent={
+                    <>
+                      Português <Br className="w-8 shadow-md" />
                     </>
                   }
                 />
