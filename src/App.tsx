@@ -78,7 +78,7 @@ const App = () => {
     setConnection(connection);
     // connection.connect(window.location.hostname, undefined, true);
     connection.connect({
-      address: '192.168.13.71',
+      address: '192.168.1.103',
       receiveBatchRequests: false,
       tls: false,
       fetchInterval: 2000,
@@ -124,13 +124,11 @@ const App = () => {
           }
 
           break;
-        // case 'getChannelResponse':
-        //   if (adminMessage.data.variant.getChannelResponse) {
-        //     setChannels((channels) => [
-        //       ...channels,
-        //       adminMessage.data.variant.getChannelResponse,
-        //     ]);
-        //   }
+        case 'getChannelResponse':
+          if (adminMessage.data.variant.getChannelResponse) {
+            let message = adminMessage.data.variant.getChannelResponse;
+            setChannels((channels) => [...channels, message]);
+          }
 
         default:
           break;

@@ -7,7 +7,7 @@
     "lint": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
-    "@meshtastic/meshtasticjs": "^0.6.6",
+    "@meshtastic/meshtasticjs": "^0.6.9",
     "add": "^2.0.6",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
