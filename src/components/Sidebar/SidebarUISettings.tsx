@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Jp, Us, Br } from 'react-flags-select';
-import { FaCog, FaLaptop, FaMoon, FaSun } from 'react-icons/fa';
+import { Br, Jp, Us } from 'react-flags-select';
+
+import { CogIcon } from '@heroicons/react/outline';
 
 import type { languageTemplate } from '../../App';
 import { LanguageEnum } from '../../App';
@@ -22,7 +23,7 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
       open={false}
       titleContent={
         <div className="flex">
-          <FaCog className="my-auto mr-2" />
+          <CogIcon className="my-auto mr-2 w-5 h-5" />
           {props.Translations.ui_settings_title}
         </div>
       }
@@ -38,7 +39,7 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
                   {props.Translations.color_scheme_title}
                 </div>
                 <div className="flex shadow-md rounded-md ml-2">
-                  <div className="bg-gray-200 flex group p-2 rounded-l-md border border-gray-300 hover:bg-gray-200 cursor-pointer">
+                  {/* <div className="bg-gray-200 flex group p-2 rounded-l-md border border-gray-300 hover:bg-gray-200 cursor-pointer">
                     <FaSun className="m-auto group-hover:text-gray-700" />
                   </div>
                   <div className="flex group p-2 border border-gray-300 hover:bg-gray-200 cursor-pointer">
@@ -46,7 +47,7 @@ const SidebarUISettings = (props: SidebarUISettingsProps) => {
                   </div>
                   <div className="flex group p-2 rounded-r-md border border-gray-300 hover:bg-gray-200 cursor-pointer">
                     <FaLaptop className="m-auto group-hover:text-gray-700" />
-                  </div>
+                  </div> */}
                 </div>
               </>
             }

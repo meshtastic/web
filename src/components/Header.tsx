@@ -1,7 +1,10 @@
 import React from 'react';
 
-import { FaBroadcastTower, FaMobileAlt } from 'react-icons/fa';
-
+import {
+  DeviceMobileIcon,
+  StatusOfflineIcon,
+  StatusOnlineIcon,
+} from '@heroicons/react/outline';
 import { Types } from '@meshtastic/meshtasticjs';
 
 import typelogo from '../../public/typelogo.svg';
@@ -32,7 +35,12 @@ const Header = (props: HeaderProps) => {
                   : 'bg-green-400'
               }`}
             ></div>
-            <FaBroadcastTower className="m-auto ml-1 text-xl" />
+            {new Date(props.LastMeshInterraction) >
+            new Date(Date.now() - 40000) ? (
+              <StatusOnlineIcon className="m-auto ml-1 h-5 w-5" />
+            ) : (
+              <StatusOfflineIcon className="m-auto ml-1 h-5 w-5" />
+            )}
           </div>
 
           <div className="flex pl-4">
@@ -48,7 +56,7 @@ const Header = (props: HeaderProps) => {
                   : 'bg-gray-400'
               }`}
             ></div>
-            <FaMobileAlt className="m-auto ml-1 text-xl" />
+            <DeviceMobileIcon className="m-auto ml-1 w-5 h-5" />
           </div>
         </div>
       </div>

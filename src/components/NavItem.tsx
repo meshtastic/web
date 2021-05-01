@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FaCaretDown, FaCaretRight, FaSpinner } from 'react-icons/fa';
+import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/outline';
 
 interface NavItemProps {
   isDropdown: boolean;
@@ -41,13 +41,14 @@ const NavItem = (props: NavItemProps) => {
         {props.titleContent}
         {props.isDropdown && !props.isLoading ? (
           navItemOpen ? (
-            <FaCaretDown className="my-auto group-hover:text-gray-700" />
+            <ChevronDownIcon className="my-auto group-hover:text-gray-700 w-5 h-5" />
           ) : (
-            <FaCaretRight className="my-auto group-hover:text-gray-700" />
+            <ChevronRightIcon className="my-auto group-hover:text-gray-700 w-5 h-5" />
           )
         ) : null}
         {props.isLoading ? (
-          <FaSpinner className="animate-spin my-auto" />
+          // <FaSpinner className="animate-spin my-auto" />
+          <div>loading</div>
         ) : null}
       </div>
       {props.isDropdown ? (

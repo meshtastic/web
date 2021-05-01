@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { FaBars, FaPaperPlane } from 'react-icons/fa';
-
+import { MenuIcon, PaperAirplaneIcon } from '@heroicons/react/outline';
 import type {
   IHTTPConnection,
   Protobuf,
@@ -76,10 +75,10 @@ const Main = (props: MainProps) => {
                 props.IsReady ? 'cursor-text' : 'cursor-not-allowed'
               }`}
             />
-            <span className="z-10 h-full text-gray-400 absolute w-8 right-0 py-4">
-              <FaPaperPlane
+            <span className="flex z-10 h-full text-gray-400 absolute w-8 right-0">
+              <PaperAirplaneIcon
                 onClick={sendMessage}
-                className={`text-xl hover:text-gray-500  ${
+                className={`text-xl hover:text-gray-500 h-6 w-6 my-auto ${
                   props.IsReady ? 'cursor-pointer' : 'cursor-not-allowed'
                 }`}
               />
@@ -91,7 +90,7 @@ const Main = (props: MainProps) => {
               setMobileNavOpen(!mobileNavOpen);
             }}
           >
-            <FaBars className="m-auto" />
+            <MenuIcon className="m-auto h-6 2-6" />
           </div>
         </div>
       </div>

@@ -1,7 +1,10 @@
 import React from 'react';
 
-import { FaCheckCircle, FaCircle, FaUser } from 'react-icons/fa';
-
+import {
+  CheckCircleIcon,
+  DotsCircleHorizontalIcon,
+  UserIcon,
+} from '@heroicons/react/outline';
 import type { Types } from '@meshtastic/meshtasticjs';
 
 interface ChatMessageProps {
@@ -20,7 +23,7 @@ const ChatMessage = (props: ChatMessageProps) => {
             : 'bg-green-200'
         }`}
       >
-        <FaUser className="m-auto" />
+        <UserIcon className="m-auto w-5 h-5" />
       </div>
       <div className="flex flex-col container px-2 items-start">
         <div
@@ -50,9 +53,9 @@ const ChatMessage = (props: ChatMessageProps) => {
           <div className="flex justify-between text-gray-600">
             <span className="inline-block">{props.message.message.data}</span>
             {props.message.ack ? (
-              <FaCheckCircle className="my-auto" />
+              <CheckCircleIcon className="my-auto w-5 h-5" />
             ) : (
-              <FaCircle className=" text-lg my-auto animate-pulse" />
+              <DotsCircleHorizontalIcon className="my-auto animate-pulse w-5 h-5" />
             )}
           </div>
         </div>

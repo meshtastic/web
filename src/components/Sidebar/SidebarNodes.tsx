@@ -1,15 +1,13 @@
 import React from 'react';
 
 import {
-  FaBatteryHalf,
-  FaClock,
-  FaCrown,
-  FaDesktop,
-  FaMapMarkerAlt,
-  FaMountain,
-  FaUsers,
-} from 'react-icons/fa';
-
+  ClockIcon,
+  DesktopComputerIcon,
+  FlagIcon,
+  GlobeIcon,
+  LightningBoltIcon,
+  UsersIcon,
+} from '@heroicons/react/outline';
 import type { Types } from '@meshtastic/meshtasticjs';
 
 import type { languageTemplate } from '../../App';
@@ -30,7 +28,7 @@ const SidebarNodes = (props: sidebarNodesProps) => {
       isNested={false}
       titleContent={
         <div className="flex">
-          <FaUsers className="my-auto mr-2" />
+          <UsersIcon className="my-auto mr-2 w-5 h-5" />
           {props.Translations.nodes_title}
           <div className="flex m-auto rounded-full bg-gray-300 w-6 h-6 text-sm ml-2">
             <div className="m-auto">{props.Nodes.length ?? 0}</div>
@@ -49,9 +47,9 @@ const SidebarNodes = (props: sidebarNodesProps) => {
               titleContent={
                 <div key={index} className="flex">
                   {node.data.num === props.myId ? (
-                    <FaCrown className="text-yellow-500 my-auto mr-2" />
+                    <FlagIcon className="text-yellow-500 my-auto mr-2 w-5 h-5" />
                   ) : (
-                    <FaDesktop className="my-auto mr-2" />
+                    <DesktopComputerIcon className="my-auto mr-2 w-5 h-5" />
                   )}
                   <div className="m-auto">{node.data.user?.longName}</div>
                 </div>
@@ -80,7 +78,7 @@ const SidebarNodes = (props: sidebarNodesProps) => {
                         {}
                       </p>
                       <div className="flex">
-                        <FaMapMarkerAlt className="my-auto mr-2" />
+                        <GlobeIcon className="my-auto mr-2 w-5 h-5" />
                         <p>
                           {node.data.position?.latitudeI},
                           {node.data.position?.longitudeI}
@@ -88,16 +86,16 @@ const SidebarNodes = (props: sidebarNodesProps) => {
                       </div>
 
                       <div className="flex">
-                        <FaMountain className="my-auto mr-2" />
+                        <GlobeIcon className="my-auto mr-2 w-5 h-5" />
                         <p>{node.data.position?.altitude}</p>
                       </div>
 
                       <div className="flex">
-                        <FaClock className="my-auto mr-2" />
+                        <ClockIcon className="my-auto mr-2 w-5 h-5" />
                         <p>{node.data.position?.time}</p>
                       </div>
                       <div className="flex">
-                        <FaBatteryHalf className="my-auto mr-2" />
+                        <LightningBoltIcon className="my-auto mr-2 w-5 h-5" />
                         <p>{node.data.position?.batteryLevel}</p>
                       </div>
                     </div>

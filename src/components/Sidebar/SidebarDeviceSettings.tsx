@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { FaSave, FaUserCog } from 'react-icons/fa';
-
+import { AdjustmentsIcon, SaveIcon } from '@heroicons/react/outline';
 import { IHTTPConnection, Protobuf } from '@meshtastic/meshtasticjs';
 
 import type { languageTemplate } from '../../App';
@@ -22,7 +21,7 @@ const SidebarDeviceSettings = (props: SidebarDeviceSettingsProps) => {
       isNested={false}
       titleContent={
         <div className="flex">
-          <FaUserCog className="my-auto mr-2" />
+          <AdjustmentsIcon className="my-auto mr-2 w-5 h-5" />
           {props.Translations.device_settings_title}
         </div>
       }
@@ -93,7 +92,7 @@ const SidebarDeviceSettings = (props: SidebarDeviceSettingsProps) => {
                 props.Connection.setPreferences(props.Preferences);
               }}
             >
-              <FaSave className="m-auto mr-2 group-hover:text-gray-700" />
+              <SaveIcon className="m-auto mr-2 group-hover:text-gray-700 w-5 h-5" />
               {props.Translations.save_changes_button}
             </div>
           </div>

@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { FaStream } from 'react-icons/fa';
-
+import { HashtagIcon } from '@heroicons/react/outline';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import type { languageTemplate } from '../../App';
@@ -21,7 +20,7 @@ const SidebarChannels = (props: SidebarChannelsProps) => {
       isNested={false}
       titleContent={
         <div className="flex">
-          <FaStream className="my-auto mr-2" />
+          <HashtagIcon className="my-auto mr-2 2-5 h-5" />
           {props.Translations.device_channels_title}
         </div>
       }
