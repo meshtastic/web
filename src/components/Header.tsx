@@ -7,7 +7,7 @@ import {
 } from '@heroicons/react/outline';
 import { Types } from '@meshtastic/meshtasticjs';
 
-import typelogo from '../../public/typelogo.svg';
+import Logo from './logo';
 
 interface HeaderProps {
   status: Types.DeviceStatusEnum;
@@ -19,7 +19,7 @@ const Header = (props: HeaderProps) => {
   return (
     <nav className="w-full shadow-md">
       <div className="flex w-full container mx-auto justify-between px-6 py-4">
-        <img src={typelogo} height="30" width="200" />
+        <Logo />
         <div></div>
 
         <div className="flex items-center">

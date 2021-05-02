@@ -223,10 +223,10 @@
   resolved "https://registry.yarnpkg.com/@heroicons/react/-/react-1.0.1.tgz#66d25f6441920bd5c2146ea27fd33995885452dd"
   integrity sha512-uikw2gKCmqnvjVxitecWfFLMOKyL9BTFcU4VM3hHj9OMwpkCr5Ke+MRMyY2/aQVmsYs4VTq7NCFX05MYwAHi3g==
 
-"@meshtastic/meshtasticjs@^0.6.9":
-  version "0.6.9"
-  resolved "https://registry.yarnpkg.com/@meshtastic/meshtasticjs/-/meshtasticjs-0.6.9.tgz#41b3bad1fba2b1f0b1a2c86ed1f1db4907271a0b"
-  integrity sha512-o62NzVMLejs5thdbu8YXXdZ523aOxPX6FWfw6noWTVbnLhYxvpltOtcOveI4iPMRk9JGid4KcwehBUvbQi4Sag==
+"@meshtastic/meshtasticjs@^0.6.10":
+  version "0.6.10"
+  resolved "https://registry.yarnpkg.com/@meshtastic/meshtasticjs/-/meshtasticjs-0.6.10.tgz#ef8de850fb37e808302f5e6535e9f5963448c3b5"
+  integrity sha512-WFGHmTr4L4PFPQzzpqamialLMX79zbX90jalHSCzVG/5wkZfd+6dqe5v+b3cvCTyhDiVmf6DKmRhmAS3iCLLpA==
   dependencies:
     "@protobuf-ts/runtime" "^2.0.0-alpha.21"
     rxjs "^6.6.7"
