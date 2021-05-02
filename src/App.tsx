@@ -76,9 +76,11 @@ const App = () => {
     const client = new Client();
     const connection = client.createHTTPConnection();
     setConnection(connection);
-    // connection.connect(window.location.hostname, undefined, true);
     connection.connect({
-      address: '192.168.1.103',
+      address:
+        import.meta.env.NODE_ENV === 'production'
+          ? window.location.hostname
+          : import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP,
       receiveBatchRequests: false,
       tls: false,
       fetchInterval: 2000,
