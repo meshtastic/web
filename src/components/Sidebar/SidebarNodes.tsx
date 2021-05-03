@@ -80,8 +80,13 @@ const SidebarNodes = (props: sidebarNodesProps) => {
                       <div className="flex">
                         <GlobeIcon className="my-auto mr-2 w-5 h-5" />
                         <p>
-                          {node.data.position?.latitudeI},
-                          {node.data.position?.longitudeI}
+                          {
+                            node.data.position?.latitudeI &&
+                            node.data.position?.longitudeI
+                              ? `${node.data.position.latitudeI / 1e7}, 
+                                ${node.data.position.longitudeI / 1e7}` 
+                                : 'Unknown'
+                          }
                         </p>
                       </div>
 
