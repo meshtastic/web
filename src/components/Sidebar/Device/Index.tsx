@@ -25,18 +25,18 @@ const Device = (props: DeviceProps) => {
         <>
           <Disclosure.Button className="flex w-full text-lg font-medium justify-between p-3 border-b hover:bg-gray-200 cursor-pointer">
             <div className="flex">
-              <AdjustmentsIcon className="my-auto mr-2 w-5 h-5" />
+              {open ? (
+                <ChevronDownIcon className="my-auto w-5 h-5 mr-2" />
+              ) : (
+                <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
+              )}
+              <AdjustmentsIcon className="text-gray-600 my-auto mr-2 w-5 h-5" />
               {props.translations.device_settings_title}
             </div>
-            {open ? (
-              <ChevronDownIcon className="my-auto group-hover:text-gray-700 w-5 h-5" />
-            ) : (
-              <ChevronRightIcon className="my-auto group-hover:text-gray-700 w-5 h-5" />
-            )}
           </Disclosure.Button>
           <Disclosure.Panel>
             <>
-              <div className="flex whitespace-nowrap p-3 justify-between border-b">
+              <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
                 <div className="my-auto">
                   {props.translations.device_region_title}
                 </div>
@@ -79,7 +79,7 @@ const Device = (props: DeviceProps) => {
                   </select>
                 </div>
               </div>
-              <div className="flex whitespace-nowrap p-3 justify-between border-b">
+              <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
                 <div className="my-auto">
                   {props.translations.device_wifi_ssid}
                 </div>
@@ -91,7 +91,7 @@ const Device = (props: DeviceProps) => {
                   />
                 </div>
               </div>
-              <div className="flex whitespace-nowrap p-3 justify-between border-b">
+              <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
                 <div className="my-auto">
                   {props.translations.device_wifi_psk}
                 </div>
@@ -102,7 +102,7 @@ const Device = (props: DeviceProps) => {
                   />
                 </div>
               </div>
-              <div className="flex group p-1 bg-gray-100 cursor-pointer hover:bg-gray-200 border-b">
+              <div className="flex bg-gray-100 group p-1 cursor-pointer hover:bg-gray-200 border-b">
                 <div
                   className="flex m-auto font-medium group-hover:text-gray-700"
                   onClick={() => {

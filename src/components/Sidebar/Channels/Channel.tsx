@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Disclosure } from '@headlessui/react';
+import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/outline';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface ChannelProps {
@@ -12,14 +13,19 @@ const Channel = (props: ChannelProps) => {
     <Disclosure>
       {({ open }) => (
         <>
-          <Disclosure.Button className="flex w-full text-lg font-medium justify-between p-3 border-b hover:bg-gray-200 cursor-pointer">
-            <div className="flex">
+          <Disclosure.Button className="flex bg-gray-50 w-full text-lg font-medium justify-between p-3 border-b hover:bg-gray-200 cursor-pointer">
+            <div className="flex ml-4">
+              {open ? (
+                <ChevronDownIcon className="my-auto w-5 h-5 mr-2" />
+              ) : (
+                <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
+              )}
               {props.channel.index} -{' '}
               {Protobuf.Channel_Role[props.channel.role]}
             </div>
           </Disclosure.Button>
           <Disclosure.Panel>
-            <div className="w-full">
+            <div className="w-full bg-gray-100 px-2">
               <div className="flex justify-between border-b hover:bg-gray-200">
                 <p>Bandwidth:</p>
                 <code className="bg-gray-200 rounded-full px-2">

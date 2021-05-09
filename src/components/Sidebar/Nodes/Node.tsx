@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Disclosure } from '@headlessui/react';
 import {
+  ChevronDownIcon,
+  ChevronRightIcon,
   ClockIcon,
   DesktopComputerIcon,
   FlagIcon,
@@ -20,18 +22,23 @@ const Node = (props: NodeProps) => {
     <Disclosure>
       {({ open }) => (
         <>
-          <Disclosure.Button className="flex w-full text-lg font-medium justify-between p-3 border-b hover:bg-gray-200 cursor-pointer">
-            <div className="flex">
+          <Disclosure.Button className="flex bg-gray-50 w-full text-lg font-medium justify-between p-3 border-b hover:bg-gray-200 cursor-pointer">
+            <div className="flex ml-4">
+              {open ? (
+                <ChevronDownIcon className="my-auto w-5 h-5 mr-2" />
+              ) : (
+                <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
+              )}
               {props.node.data.num === props.myId ? (
                 <FlagIcon className="text-yellow-500 my-auto mr-2 w-5 h-5" />
               ) : (
-                <DesktopComputerIcon className="my-auto mr-2 w-5 h-5" />
+                <DesktopComputerIcon className="text-gray-600 my-auto mr-2 w-5 h-5" />
               )}
-              <div className="m-auto">{props.node.data.user?.longName}</div>
+              {props.node.data.user?.longName}
             </div>
           </Disclosure.Button>
           <Disclosure.Panel>
-            <div>
+            <div className="border-b bg-gray-100 px-2">
               <p>
                 SNR:{' '}
                 {props.node.packet?.rxSnr ? props.node.packet.rxSnr : 'Unknown'}
