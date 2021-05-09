@@ -53,14 +53,14 @@ const Node = (props: NodeProps) => {
               <div className="flex">
                 <GlobeIcon className="my-auto mr-2 w-5 h-5" />
                 <p>
-                  {props.node.data.position?.latitudeI},
-                  {props.node.data.position?.longitudeI}
+                  {props.node.data.position?.latitudeI &&
+                  props.node.data.position?.longitudeI
+                    ? `${props.node.data.position.latitudeI / 1e7}, 
+                                ${props.node.data.position.longitudeI / 1e7}`
+                    : 'Unknown'}
+                  , El:
+                  {props.node.data.position?.altitude}
                 </p>
-              </div>
-
-              <div className="flex">
-                <GlobeIcon className="my-auto mr-2 w-5 h-5" />
-                <p>{props.node.data.position?.altitude}</p>
               </div>
 
               <div className="flex">
