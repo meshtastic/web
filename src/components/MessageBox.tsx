@@ -7,7 +7,8 @@ import type { languageTemplate } from '../App';
 
 export interface MessageBoxProps {
   translations: languageTemplate;
-  setSettingsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  sidebarOpen: boolean;
+  setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   connection: IHTTPConnection;
   isReady: boolean;
 }
@@ -21,11 +22,11 @@ const MessageBox = (props: MessageBoxProps) => {
     }
   };
   return (
-    <div className="flex text-lg font-medium border rounded-md space-x-2 md:space-x-0 w-full">
+    <div className="flex text-lg font-medium space-x-2 md:space-x-0 w-full">
       <div
-        className="flex p-3 text-xl hover:text-gray-500 text-gray-400 rounded-md shadow-md focus:outline-none cursor-pointer md:hidden"
+        className="flex p-3 text-xl hover:text-gray-500 text-gray-400 rounded-md border shadow-md focus:outline-none cursor-pointer md:hidden"
         onClick={() => {
-          props.setSettingsModalOpen(true);
+          props.setSidebarOpen(!props.sidebarOpen);
         }}
       >
         <MenuIcon className="m-auto h-6 2-6" />
@@ -46,7 +47,7 @@ const MessageBox = (props: MessageBoxProps) => {
           onChange={(e) => {
             setCurrentMessage(e.target.value);
           }}
-          className={`p-3 placeholder-gray-400 text-gray-700 relative rounded-md shadow-md focus:outline-none w-full pr-10 ${
+          className={`p-3 placeholder-gray-400 text-gray-700 relative rounded-md border shadow-md focus:outline-none w-full pr-10 ${
             props.isReady ? 'cursor-text' : 'cursor-not-allowed'
           }`}
         />

@@ -22,13 +22,18 @@ interface SidebarProps {
   setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
   translations: languageTemplate;
   myId: number;
+  sidebarOpen: boolean;
   darkmode: boolean;
   setDarkmode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Sidebar = (props: SidebarProps) => {
   return (
-    <div className="flex flex-col rounded-md md:ml-0 shadow-md border w-full max-w-sm">
+    <div
+      className={`${
+        props.sidebarOpen ? 'flex' : 'hidden md:flex'
+      } flex-col rounded-md md:ml-0 shadow-md border w-full max-w-sm`}
+    >
       <Nodes
         isReady={props.isReady}
         nodes={props.nodes}

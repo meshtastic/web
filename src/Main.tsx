@@ -29,7 +29,7 @@ const Main = (props: MainProps) => {
   const [messages, setMessages] = React.useState<
     { message: Types.TextPacket; ack: boolean }[]
   >([]);
-  const [settingsModalOpen, setSettingsModalOpen] = useState<boolean>(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   React.useEffect(() => {
     const textPacketEvent = props.connection.onTextPacketEvent.subscribe(
@@ -86,7 +86,8 @@ const Main = (props: MainProps) => {
         <MessageBox
           connection={props.connection}
           isReady={props.isReady}
-          setSettingsModalOpen={setSettingsModalOpen}
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
           translations={props.translations}
         />
       </div>
@@ -100,6 +101,7 @@ const Main = (props: MainProps) => {
         setLanguage={props.setLanguage}
         translations={props.translations}
         myId={props.myNodeInfo.myNodeNum}
+        sidebarOpen={sidebarOpen}
         darkmode={props.darkmode}
         setDarkmode={props.setDarkmode}
       />
