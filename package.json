@@ -9,10 +9,11 @@
   "dependencies": {
     "@headlessui/react": "^1.1.1",
     "@heroicons/react": "^1.0.1",
-    "@meshtastic/meshtasticjs": "^0.6.10",
+    "@meshtastic/meshtasticjs": "^0.6.12",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-flags-select": "^2.1.2",
+    "rxjs": "^7.0.0",
     "yarn": "^1.22.10"
   },
   "devDependencies": {
@@ -20,12 +21,12 @@
     "@snowpack/plugin-postcss": "^1.2.2",
     "@snowpack/plugin-react-refresh": "^2.5.0",
     "@snowpack/plugin-typescript": "^1.2.0",
-    "@types/react": "^17.0.4",
+    "@types/react": "^17.0.5",
     "@types/react-dom": "^17.0.0",
     "@types/snowpack-env": "^2.3.2",
     "autoprefixer": "^10.2.5",
     "gzipper": "^4.5.0",
-    "postcss": "^8.2.13",
+    "postcss": "^8.2.14",
     "postcss-cli": "^8.3.1",
     "prettier": "^2.0.5",
     "snowpack": "^3.3.7",

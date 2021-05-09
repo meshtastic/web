@@ -7,55 +7,52 @@ import type {
 } from '@meshtastic/meshtasticjs';
 
 import type { LanguageEnum, languageTemplate } from '../App';
-import SidebarChannels from './Sidebar/SidebarChannels';
-import SidebarDeviceSettings from './Sidebar/SidebarDeviceSettings';
-import SidebarNodes from './Sidebar/SidebarNodes';
-import SidebarUISettings from './Sidebar/SidebarUISettings';
+import Channels from './Sidebar/Channels/Index';
+import Device from './Sidebar/Device/Index';
+import Nodes from './Sidebar/Nodes/Index';
+import UI from './Sidebar/UI/Index';
 
 interface SidebarProps {
-  IsReady: boolean;
-  Nodes: Types.NodeInfoPacket[];
-  Channels: Protobuf.Channel[];
-  Preferences: Protobuf.RadioConfig_UserPreferences;
-  Connection: IHTTPConnection;
-  MobileNavOpen: boolean;
-  Language: LanguageEnum;
-  SetLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
-  Translations: languageTemplate;
+  isReady: boolean;
+  nodes: Types.NodeInfoPacket[];
+  channels: Protobuf.Channel[];
+  preferences: Protobuf.RadioConfig_UserPreferences;
+  connection: IHTTPConnection;
+  language: LanguageEnum;
+  setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
+  translations: languageTemplate;
   myId: number;
+  darkmode: boolean;
+  setDarkmode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Sidebar = (props: SidebarProps) => {
-  const updatePreferences = () => {};
-
   return (
-    <div
-      className={`flex flex-col rounded-md m-3 md:ml-0 shadow-md w-full max-w-sm ${
-        !props.MobileNavOpen ? 'hidden' : 'visible'
-      }`}
-    >
-      <SidebarNodes
-        IsReady={props.IsReady}
-        Nodes={props.Nodes}
-        Translations={props.Translations}
+    <div className="flex flex-col rounded-md md:ml-0 shadow-md border w-full max-w-sm">
+      <Nodes
+        isReady={props.isReady}
+        nodes={props.nodes}
+        translations={props.translations}
         myId={props.myId}
       />
-      <SidebarDeviceSettings
-        IsReady={props.IsReady}
-        Preferences={props.Preferences}
-        Connection={props.Connection}
-        Translations={props.Translations}
+      <Device
+        isReady={props.isReady}
+        preferences={props.preferences}
+        connection={props.connection}
+        translations={props.translations}
       />
-      <SidebarChannels
-        IsReady={props.IsReady}
-        Channels={props.Channels}
-        Translations={props.Translations}
+      <Channels
+        isReady={props.isReady}
+        channels={props.channels}
+        translations={props.translations}
       />
       <div className="flex-grow border-b"></div>
-      <SidebarUISettings
-        Language={props.Language}
-        SetLanguage={props.SetLanguage}
-        Translations={props.Translations}
+      <UI
+        language={props.language}
+        setLanguage={props.setLanguage}
+        translations={props.translations}
+        darkmode={props.darkmode}
+        setDarkmode={props.setDarkmode}
       />
     </div>
   );

@@ -37,23 +37,38 @@ export interface languageTemplate {
 }
 
 const App = () => {
-  const [deviceStatus, setDeviceStatus] = React.useState(
-    {} as Types.DeviceStatusEnum,
+  const [
+    deviceStatus,
+    setDeviceStatus,
+  ] = React.useState<Types.DeviceStatusEnum>(
+    Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
   );
-  const [myNodeInfo, setMyNodeInfo] = React.useState({} as Protobuf.MyNodeInfo);
-  const [messages, setMessages] = React.useState(
-    [] as { message: Types.TextPacket; ack: false }[],
+  const [myNodeInfo, setMyNodeInfo] = React.useState<Protobuf.MyNodeInfo>(
+    Protobuf.MyNodeInfo.create(),
   );
   const [channels, setChannels] = React.useState([] as Protobuf.Channel[]);
-  const [nodes, setNodes] = React.useState([] as Types.NodeInfoPacket[]);
-  const [connection, setConnection] = React.useState({} as IHTTPConnection);
-  const [isReady, setIsReady] = React.useState(false);
-  const [lastMeshInterraction, setLastMeshInterraction] = React.useState(0);
-  const [preferences, setPreferences] = React.useState(
-    {} as Protobuf.RadioConfig_UserPreferences,
+  const [nodes, setNodes] = React.useState<Types.NodeInfoPacket[]>([]);
+  const [connection, setConnection] = React.useState<IHTTPConnection>(
+    new IHTTPConnection(),
   );
-  const [language, setLanguage] = React.useState(LanguageEnum.ENGLISH);
-  const [translations, setTranslations] = React.useState(Translations_English);
+  const [isReady, setIsReady] = React.useState<boolean>(false);
+  const [
+    lastMeshInterraction,
+    setLastMeshInterraction,
+  ] = React.useState<number>(0);
+  const [
+    preferences,
+    setPreferences,
+  ] = React.useState<Protobuf.RadioConfig_UserPreferences>(
+    Protobuf.RadioConfig_UserPreferences.create(),
+  );
+  const [language, setLanguage] = React.useState<LanguageEnum>(
+    LanguageEnum.ENGLISH,
+  );
+  const [translations, setTranslations] = React.useState<languageTemplate>(
+    Translations_English,
+  );
+  const [darkmode, setDarkmode] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     switch (language) {
@@ -75,7 +90,7 @@ const App = () => {
   React.useEffect(() => {
     const client = new Client();
     const connection = client.createHTTPConnection();
-    setConnection(connection);
+
     connection.connect({
       address:
         import.meta.env.NODE_ENV === 'production'
@@ -87,80 +102,74 @@ const App = () => {
     });
     setConnection(connection);
     SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
-    connection.onDeviceStatusEvent.subscribe((status) => {
-      setDeviceStatus(status);
-      if (status === Types.DeviceStatusEnum.DEVICE_CONFIGURED) {
-        setIsReady(true);
-      }
-    });
-    connection.onMyNodeInfoEvent.subscribe(setMyNodeInfo);
-    connection.onTextPacketEvent.subscribe((message) => {
-      setMessages((messages) => [
-        ...messages,
-        { message: message, ack: false },
-      ]);
-    });
-    connection.onNodeInfoPacketEvent.subscribe((node) => {
-      if (
-        nodes.findIndex(
-          (currentNode) => currentNode.data.num === node.data.num,
-        ) >= 0
-      ) {
-        setNodes(
-          nodes.map((currentNode) =>
-            currentNode.data.num === node.data.num ? node : currentNode,
-          ),
-        );
-      } else {
-        setNodes((nodes) => [...nodes, node]);
-      }
-    });
 
-    connection.onAdminPacketEvent.subscribe((adminMessage) => {
-      switch (adminMessage.data.variant.oneofKind) {
-        case 'getRadioResponse':
-          if (adminMessage.data.variant.getRadioResponse.preferences) {
-            setPreferences(
-              adminMessage.data.variant.getRadioResponse.preferences,
-            );
-          }
+    const deviceStatusEvent = connection.onDeviceStatusEvent.subscribe(
+      (status) => {
+        setDeviceStatus(status);
+        if (status === Types.DeviceStatusEnum.DEVICE_CONFIGURED) {
+          setIsReady(true);
+        }
+      },
+    );
+    const myNodeInfoEvent = connection.onMyNodeInfoEvent.subscribe(
+      setMyNodeInfo,
+    );
 
-          break;
-        case 'getChannelResponse':
-          if (adminMessage.data.variant.getChannelResponse) {
-            let message = adminMessage.data.variant.getChannelResponse;
-            setChannels((channels) => [...channels, message]);
-          }
+    const nodeInfoPacketEvent = connection.onNodeInfoPacketEvent.subscribe(
+      (node) => {
+        if (
+          nodes.findIndex(
+            (currentNode) => currentNode.data.num === node.data.num,
+          ) >= 0
+        ) {
+          setNodes(
+            nodes.map((currentNode) =>
+              currentNode.data.num === node.data.num ? node : currentNode,
+            ),
+          );
+        } else {
+          setNodes((nodes) => [...nodes, node]);
+        }
+      },
+    );
 
-        default:
-          break;
-      }
-    });
+    const adminPacketEvent = connection.onAdminPacketEvent.subscribe(
+      (adminMessage) => {
+        switch (adminMessage.data.variant.oneofKind) {
+          case 'getRadioResponse':
+            if (adminMessage.data.variant.getRadioResponse.preferences) {
+              setPreferences(
+                adminMessage.data.variant.getRadioResponse.preferences,
+              );
+            }
 
-    connection.onMeshHeartbeat.subscribe(setLastMeshInterraction);
+            break;
+          case 'getChannelResponse':
+            if (adminMessage.data.variant.getChannelResponse) {
+              let message = adminMessage.data.variant.getChannelResponse;
+              setChannels((channels) => [...channels, message]);
+            }
 
-    connection.onRoutingPacketEvent.subscribe((routingPacket) => {
-      console.log(routingPacket);
-      // console.log(messages);
+          default:
+            break;
+        }
+      },
+    );
 
-      // messages.map((message) => {
-      //   console.log(
-      //     `${
-      //       routingPacket.payloadVariant.oneofKind === 'decoded'
-      //         ? routingPacket.payloadVariant.decoded.requestId
-      //         : null
-      //     } === ${message.message.packet.id}: ${
-      //       routingPacket.payloadVariant.oneofKind === 'decoded'
-      //         ? routingPacket.payloadVariant.decoded.requestId
-      //         : null === message.message.packet.id
-      //     }`,
-      //   );
-      // });
-      // messages.find((message) => {
-      //   message.message.packet.id === routingPacket.decoded.requestId;
-      // });
-    });
+    const meshHeartbeat = connection.onMeshHeartbeat.subscribe(
+      setLastMeshInterraction,
+    );
+
+    return () => {
+      deviceStatusEvent.unsubscribe();
+      myNodeInfoEvent.unsubscribe();
+      nodeInfoPacketEvent.unsubscribe();
+      adminPacketEvent.unsubscribe();
+      meshHeartbeat.unsubscribe();
+      connection.disconnect();
+    };
   }, []);
+
   return (
     <div className="flex flex-col h-screen w-screen">
       <Header
@@ -169,16 +178,17 @@ const App = () => {
         LastMeshInterraction={lastMeshInterraction}
       />
       <Main
-        IsReady={isReady}
-        Messages={messages}
-        MyNodeInfo={myNodeInfo}
-        Connection={connection}
-        Nodes={nodes}
-        Channels={channels}
-        Preferences={preferences}
-        Language={language}
-        SetLanguage={setLanguage}
-        Translations={translations}
+        isReady={isReady}
+        myNodeInfo={myNodeInfo}
+        connection={connection}
+        nodes={nodes}
+        channels={channels}
+        preferences={preferences}
+        language={language}
+        setLanguage={setLanguage}
+        translations={translations}
+        darkmode={darkmode}
+        setDarkmode={setDarkmode}
       />
     </div>
   );

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Switch } from '@headlessui/react';
+
 interface ToggleSwitchProps {
   active: boolean;
   toggle?: Function;
@@ -13,20 +15,19 @@ const ToggleSwitch = (props: ToggleSwitchProps) => {
   }, []);
 
   return (
-    <div
-      onClick={() => {
-        setActive(!active);
-      }}
+    <Switch
+      checked={active}
+      onChange={setActive}
       className={`w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 duration-300 ease-in-out my-auto ${
         active ? 'bg-green-400' : null
       }`}
     >
-      <div
+      <span
         className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${
           active ? 'translate-x-6' : null
         }`}
-      ></div>
-    </div>
+      ></span>
+    </Switch>
   );
 };
 
