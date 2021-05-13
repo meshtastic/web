@@ -56,12 +56,7 @@ const App = () => {
     lastMeshInterraction,
     setLastMeshInterraction,
   ] = React.useState<number>(0);
-  const [
-    preferences,
-    setPreferences,
-  ] = React.useState<Protobuf.RadioConfig_UserPreferences>(
-    Protobuf.RadioConfig_UserPreferences.create(),
-  );
+
   const [language, setLanguage] = React.useState<LanguageEnum>(
     LanguageEnum.ENGLISH,
   );
@@ -136,14 +131,6 @@ const App = () => {
     const adminPacketEvent = connection.onAdminPacketEvent.subscribe(
       (adminMessage) => {
         switch (adminMessage.data.variant.oneofKind) {
-          case 'getRadioResponse':
-            if (adminMessage.data.variant.getRadioResponse.preferences) {
-              setPreferences(
-                adminMessage.data.variant.getRadioResponse.preferences,
-              );
-            }
-
-            break;
           case 'getChannelResponse':
             if (adminMessage.data.variant.getChannelResponse) {
               let message = adminMessage.data.variant.getChannelResponse;
@@ -183,7 +170,6 @@ const App = () => {
         connection={connection}
         nodes={nodes}
         channels={channels}
-        preferences={preferences}
         language={language}
         setLanguage={setLanguage}
         translations={translations}

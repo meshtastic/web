@@ -37,7 +37,7 @@ const Channels = (props: ChannelsProps) => {
             <>
               {props.channels.map((channel, index) => {
                 if (channel.role !== Protobuf.Channel_Role.DISABLED)
-                  return <Channel channel={channel} />;
+                  return <Channel key={index} channel={channel} />;
               })}
             </>
           </Disclosure.Panel>

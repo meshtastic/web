@@ -17,7 +17,6 @@ interface MainProps {
   nodes: Types.NodeInfoPacket[];
   channels: Protobuf.Channel[];
   isReady: boolean;
-  preferences: Protobuf.RadioConfig_UserPreferences;
   language: LanguageEnum;
   setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
   translations: languageTemplate;
@@ -95,7 +94,6 @@ const Main = (props: MainProps) => {
         isReady={props.isReady}
         nodes={props.nodes}
         channels={props.channels}
-        preferences={props.preferences}
         connection={props.connection}
         language={props.language}
         setLanguage={props.setLanguage}

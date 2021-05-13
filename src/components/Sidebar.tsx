@@ -16,7 +16,6 @@ interface SidebarProps {
   isReady: boolean;
   nodes: Types.NodeInfoPacket[];
   channels: Protobuf.Channel[];
-  preferences: Protobuf.RadioConfig_UserPreferences;
   connection: IHTTPConnection;
   language: LanguageEnum;
   setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
@@ -42,7 +41,6 @@ const Sidebar = (props: SidebarProps) => {
       />
       <Device
         isReady={props.isReady}
-        preferences={props.preferences}
         connection={props.connection}
         translations={props.translations}
       />
