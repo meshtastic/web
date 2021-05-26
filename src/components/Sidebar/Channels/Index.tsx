@@ -17,7 +17,7 @@ export interface ChannelsProps {
   translations: languageTemplate;
 }
 
-const Channels = (props: ChannelsProps) => {
+const Channels = (props: ChannelsProps): JSX.Element => {
   return (
     <Disclosure>
       {({ open }) => (

@@ -17,7 +17,7 @@ export interface NodeProps {
   myId: number;
 }
 
-const Node = (props: NodeProps) => {
+const Node = (props: NodeProps): JSX.Element => {
   return (
     <Disclosure>
       {({ open }) => (

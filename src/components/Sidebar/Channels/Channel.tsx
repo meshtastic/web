@@ -8,7 +8,7 @@ export interface ChannelProps {
   channel: Protobuf.Channel;
 }
 
-const Channel = (props: ChannelProps) => {
+const Channel = (props: ChannelProps): JSX.Element => {
   return (
     <Disclosure>
       {({ open }) => (

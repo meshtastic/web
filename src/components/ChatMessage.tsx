@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   CheckCircleIcon,
@@ -13,7 +13,16 @@ interface ChatMessageProps {
   nodes: Types.NodeInfoPacket[];
 }
 
-const ChatMessage = (props: ChatMessageProps) => {
+const ChatMessage = (props: ChatMessageProps): JSX.Element => {
+  const [node, setNode] = useState<Types.NodeInfoPacket>();
+
+  React.useEffect(() => {
+    setNode(
+      props.nodes.find(
+        (node) => node.data.num === props.message.message.packet.from,
+      ),
+    );
+  }, [props.nodes, props.message]);
   return (
     <div className="flex items-end">
       <div
@@ -35,11 +44,7 @@ const ChatMessage = (props: ChatMessageProps) => {
         >
           <div className="flex text-xs text-gray-500 space-x-1">
             <div className="font-medium">
-              {/* {
-                props.nodes.find(
-                  (node) => node.data.num === props.message.message.packet.from,
-                ).data.user.longName
-              } */}
+              {node?.data.user?.longName ?? 'UNK'}
             </div>
             <p>-</p>
             <div className="underline">

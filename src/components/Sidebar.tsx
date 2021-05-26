@@ -1,7 +1,9 @@
 import React from 'react';
 
 import type {
+  IBLEConnection,
   IHTTPConnection,
+  ISerialConnection,
   Protobuf,
   Types,
 } from '@meshtastic/meshtasticjs';
@@ -16,7 +18,7 @@ interface SidebarProps {
   isReady: boolean;
   nodes: Types.NodeInfoPacket[];
   channels: Protobuf.Channel[];
-  connection: IHTTPConnection;
+  connection?: ISerialConnection | IHTTPConnection | IBLEConnection;
   language: LanguageEnum;
   setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
   translations: languageTemplate;
@@ -26,7 +28,7 @@ interface SidebarProps {
   setDarkmode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Sidebar = (props: SidebarProps) => {
+const Sidebar = (props: SidebarProps): JSX.Element => {
   return (
     <div
       className={`${

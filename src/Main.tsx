@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 
 import type {
+  IBLEConnection,
   IHTTPConnection,
+  ISerialConnection,
   Protobuf,
   Types,
 } from '@meshtastic/meshtasticjs';
@@ -12,7 +14,7 @@ import MessageBox from './components/MessageBox';
 import Sidebar from './components/Sidebar';
 
 interface MainProps {
-  connection: IHTTPConnection;
+  connection?: ISerialConnection | IHTTPConnection | IBLEConnection;
   myNodeInfo: Protobuf.MyNodeInfo;
   nodes: Types.NodeInfoPacket[];
   channels: Protobuf.Channel[];
@@ -24,14 +26,14 @@ interface MainProps {
   setDarkmode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Main = (props: MainProps) => {
+const Main = (props: MainProps): JSX.Element => {
   const [messages, setMessages] = React.useState<
     { message: Types.TextPacket; ack: boolean }[]
   >([]);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   React.useEffect(() => {
-    const textPacketEvent = props.connection.onTextPacketEvent.subscribe(
+    const textPacketEvent = props.connection?.onTextPacketEvent.subscribe(
       (message) => {
         setMessages((messages) => [
           ...messages,
@@ -39,11 +41,11 @@ const Main = (props: MainProps) => {
         ]);
       },
     );
-    return () => textPacketEvent.unsubscribe();
+    return () => textPacketEvent?.unsubscribe();
   }, [props.connection]);
 
   React.useEffect(() => {
-    const routingPacketEvent = props.connection.onRoutingPacketEvent.subscribe(
+    const routingPacketEvent = props.connection?.onRoutingPacketEvent.subscribe(
       (routingPacket) => {
         setMessages(
           messages.map((message) => {
@@ -60,7 +62,7 @@ const Main = (props: MainProps) => {
         );
       },
     );
-    return () => routingPacketEvent.unsubscribe();
+    return () => routingPacketEvent?.unsubscribe();
   }, [props.connection, messages]);
 
   return (

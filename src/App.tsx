@@ -1,8 +1,12 @@
 import React from 'react';
 
+import type {
+  IBLEConnection,
+  IHTTPConnection,
+  ISerialConnection,
+} from '@meshtastic/meshtasticjs';
 import {
   Client,
-  IHTTPConnection,
   Protobuf,
   SettingsManager,
   Types,
@@ -36,33 +40,27 @@ export interface languageTemplate {
   no_message_placeholder: string;
 }
 
-const App = () => {
-  const [
-    deviceStatus,
-    setDeviceStatus,
-  ] = React.useState<Types.DeviceStatusEnum>(
-    Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
-  );
+const App = (): JSX.Element => {
+  const [deviceStatus, setDeviceStatus] =
+    React.useState<Types.DeviceStatusEnum>(
+      Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
+    );
   const [myNodeInfo, setMyNodeInfo] = React.useState<Protobuf.MyNodeInfo>(
     Protobuf.MyNodeInfo.create(),
   );
   const [channels, setChannels] = React.useState([] as Protobuf.Channel[]);
   const [nodes, setNodes] = React.useState<Types.NodeInfoPacket[]>([]);
-  const [connection, setConnection] = React.useState<IHTTPConnection>(
-    new IHTTPConnection(),
-  );
+  const [connection, setConnection] =
+    React.useState<ISerialConnection | IHTTPConnection | IBLEConnection>();
   const [isReady, setIsReady] = React.useState<boolean>(false);
-  const [
-    lastMeshInterraction,
-    setLastMeshInterraction,
-  ] = React.useState<number>(0);
+  const [lastMeshInterraction, setLastMeshInterraction] =
+    React.useState<number>(0);
 
   const [language, setLanguage] = React.useState<LanguageEnum>(
     LanguageEnum.ENGLISH,
   );
-  const [translations, setTranslations] = React.useState<languageTemplate>(
-    Translations_English,
-  );
+  const [translations, setTranslations] =
+    React.useState<languageTemplate>(Translations_English);
   const [darkmode, setDarkmode] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -97,8 +95,12 @@ const App = () => {
     });
     setConnection(connection);
     SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
+  }, []);
 
-    const deviceStatusEvent = connection.onDeviceStatusEvent.subscribe(
+  React.useEffect(() => {
+    console.log('UPDATING');
+
+    const deviceStatusEvent = connection?.onDeviceStatusEvent.subscribe(
       (status) => {
         setDeviceStatus(status);
         if (status === Types.DeviceStatusEnum.DEVICE_CONFIGURED) {
@@ -106,11 +108,10 @@ const App = () => {
         }
       },
     );
-    const myNodeInfoEvent = connection.onMyNodeInfoEvent.subscribe(
-      setMyNodeInfo,
-    );
+    const myNodeInfoEvent =
+      connection?.onMyNodeInfoEvent.subscribe(setMyNodeInfo);
 
-    const nodeInfoPacketEvent = connection.onNodeInfoPacketEvent.subscribe(
+    const nodeInfoPacketEvent = connection?.onNodeInfoPacketEvent.subscribe(
       (node) => {
         if (
           nodes.findIndex(
@@ -128,34 +129,34 @@ const App = () => {
       },
     );
 
-    const adminPacketEvent = connection.onAdminPacketEvent.subscribe(
+    const adminPacketEvent = connection?.onAdminPacketEvent.subscribe(
       (adminMessage) => {
         switch (adminMessage.data.variant.oneofKind) {
           case 'getChannelResponse':
             if (adminMessage.data.variant.getChannelResponse) {
-              let message = adminMessage.data.variant.getChannelResponse;
+              const message = adminMessage.data.variant.getChannelResponse;
               setChannels((channels) => [...channels, message]);
             }
-
+            break;
           default:
             break;
         }
       },
     );
 
-    const meshHeartbeat = connection.onMeshHeartbeat.subscribe(
+    const meshHeartbeat = connection?.onMeshHeartbeat.subscribe(
       setLastMeshInterraction,
     );
 
     return () => {
-      deviceStatusEvent.unsubscribe();
-      myNodeInfoEvent.unsubscribe();
-      nodeInfoPacketEvent.unsubscribe();
-      adminPacketEvent.unsubscribe();
-      meshHeartbeat.unsubscribe();
-      connection.disconnect();
+      deviceStatusEvent?.unsubscribe();
+      myNodeInfoEvent?.unsubscribe();
+      nodeInfoPacketEvent?.unsubscribe();
+      adminPacketEvent?.unsubscribe();
+      meshHeartbeat?.unsubscribe();
+      connection?.disconnect();
     };
-  }, []);
+  }, [connection, nodes]);
 
   return (
     <div className="flex flex-col h-screen w-screen">
@@ -163,6 +164,8 @@ const App = () => {
         status={deviceStatus}
         IsReady={isReady}
         LastMeshInterraction={lastMeshInterraction}
+        connection={connection}
+        setConnection={setConnection}
       />
       <Main
         isReady={isReady}

@@ -1,27 +1,27 @@
 import React from 'react';
 
-import { ObservableResource, useObservableSuspense } from 'observable-hooks';
 import { useForm } from 'react-hook-form';
 import JSONPretty from 'react-json-pretty';
-import type { languageTemplate } from 'src/App';
 
 import { SaveIcon } from '@heroicons/react/outline';
-import { IHTTPConnection, Protobuf } from '@meshtastic/meshtasticjs';
+import type {
+  IBLEConnection,
+  IHTTPConnection,
+  ISerialConnection,
+} from '@meshtastic/meshtasticjs';
+import { Protobuf } from '@meshtastic/meshtasticjs';
+
+import type { languageTemplate } from '../../../../src/App';
 
 export interface SettingsProps {
   isReady: boolean;
-  connection: IHTTPConnection;
+  connection?: ISerialConnection | IHTTPConnection | IBLEConnection;
   translations: languageTemplate;
 }
 
-const Settings = (props: SettingsProps) => {
+const Settings = (props: SettingsProps): JSX.Element => {
   React.useEffect(() => {
-    const a = useObservableSuspense(
-      new ObservableResource(
-        props.connection.onAdminPacketEvent.asObservable(),
-      ),
-    );
-    const adminPacketEvent = props.connection.onAdminPacketEvent.subscribe(
+    const adminPacketEvent = props.connection?.onAdminPacketEvent.subscribe(
       (adminMessage) => {
         switch (adminMessage.data.variant.oneofKind) {
           case 'getRadioResponse':
@@ -34,35 +34,23 @@ const Settings = (props: SettingsProps) => {
       },
     );
 
-    return () => adminPacketEvent.unsubscribe();
+    return () => adminPacketEvent?.unsubscribe();
   }, []);
 
-  const [
-    preferences,
-    setPreferences,
-  ] = React.useState<Protobuf.RadioConfig_UserPreferences>();
-  const {
-    register,
-    setValue,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Protobuf.RadioConfig_UserPreferences>({
-    defaultValues: preferences,
-  });
+  const [preferences, setPreferences] =
+    React.useState<Protobuf.RadioConfig_UserPreferences>();
+  const { register, handleSubmit } =
+    useForm<Protobuf.RadioConfig_UserPreferences>({
+      defaultValues: preferences,
+    });
 
   const onSubmit = handleSubmit((data) => console.log(data));
-
   return (
     <form onSubmit={onSubmit}>
       <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
         <div className="my-auto">{props.translations.device_region_title}</div>
         <div className="flex shadow-md rounded-md ml-2">
-          <select
-            value={preferences.region ?? Protobuf.RegionCode.Unset}
-            // onChange={(e) => {
-            //   preferences.region = parseInt(e.target.value);
-            // }}
-          >
+          <select value={preferences?.region ?? Protobuf.RegionCode.Unset}>
             <option value={Protobuf.RegionCode.ANZ}>
               {Protobuf.RegionCode[Protobuf.RegionCode.ANZ]}
             </option>

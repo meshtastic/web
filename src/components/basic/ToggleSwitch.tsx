@@ -4,10 +4,9 @@ import { Switch } from '@headlessui/react';
 
 interface ToggleSwitchProps {
   active: boolean;
-  toggle?: Function;
 }
 
-const ToggleSwitch = (props: ToggleSwitchProps) => {
+const ToggleSwitch = (props: ToggleSwitchProps): JSX.Element => {
   const [active, setActive] = React.useState(false);
 
   React.useEffect(() => {

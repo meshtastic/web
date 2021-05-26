@@ -6,18 +6,22 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
 } from '@heroicons/react/outline';
-import type { IHTTPConnection } from '@meshtastic/meshtasticjs';
+import type {
+  IBLEConnection,
+  IHTTPConnection,
+  ISerialConnection,
+} from '@meshtastic/meshtasticjs';
 
 import type { languageTemplate } from '../../../App';
 import Settings from './Settings';
 
 interface DeviceProps {
   isReady: boolean;
-  connection: IHTTPConnection;
+  connection?: ISerialConnection | IHTTPConnection | IBLEConnection;
   translations: languageTemplate;
 }
 
-const Device = (props: DeviceProps) => {
+const Device = (props: DeviceProps): JSX.Element => {
   return (
     <Disclosure>
       {({ open }) => (

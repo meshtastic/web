@@ -18,7 +18,7 @@ interface NodesProps {
   myId: number;
 }
 
-const Nodes = (props: NodesProps) => {
+const Nodes = (props: NodesProps): JSX.Element => {
   return (
     <Disclosure>
       {({ open }) => (

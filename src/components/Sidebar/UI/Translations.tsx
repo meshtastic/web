@@ -5,7 +5,8 @@ import { Br, Jp, Us } from 'react-flags-select';
 import { Disclosure } from '@headlessui/react';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/outline';
 
-import { LanguageEnum, languageTemplate } from '../../../App';
+import type { languageTemplate } from '../../../App';
+import { LanguageEnum } from '../../../App';
 
 export interface TranslationsProps {
   language: LanguageEnum;
@@ -13,7 +14,7 @@ export interface TranslationsProps {
   translations: languageTemplate;
 }
 
-const Translations = (props: TranslationsProps) => {
+const Translations = (props: TranslationsProps): JSX.Element => {
   return (
     <Disclosure>
       {({ open }) => (

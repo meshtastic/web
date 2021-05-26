@@ -18,7 +18,7 @@ interface UIProps {
   setDarkmode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const UI = (props: UIProps) => {
+const UI = (props: UIProps): JSX.Element => {
   return (
     <Disclosure>
       {({ open }) => (

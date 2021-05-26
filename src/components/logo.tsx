@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Logo = () => {
+const Logo = (): JSX.Element => {
   return (
     <svg
       height="30"

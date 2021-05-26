@@ -1,7 +1,11 @@
 import React from 'react';
 
 import { MenuIcon, PaperAirplaneIcon } from '@heroicons/react/outline';
-import type { IHTTPConnection } from '@meshtastic/meshtasticjs';
+import type {
+  IBLEConnection,
+  IHTTPConnection,
+  ISerialConnection,
+} from '@meshtastic/meshtasticjs';
 
 import type { languageTemplate } from '../App';
 
@@ -9,15 +13,15 @@ export interface MessageBoxProps {
   translations: languageTemplate;
   sidebarOpen: boolean;
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  connection: IHTTPConnection;
+  connection?: ISerialConnection | IHTTPConnection | IBLEConnection;
   isReady: boolean;
 }
 
-const MessageBox = (props: MessageBoxProps) => {
+const MessageBox = (props: MessageBoxProps): JSX.Element => {
   const [currentMessage, setCurrentMessage] = React.useState('');
   const sendMessage = () => {
     if (props.isReady) {
-      props.connection.sendText(currentMessage, undefined, true);
+      props.connection?.sendText(currentMessage, undefined, true);
       setCurrentMessage('');
     }
   };
