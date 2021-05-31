@@ -1,5 +1,8 @@
 import React from 'react';
 
+import { ObservableResource } from 'observable-hooks';
+import { Subject } from 'rxjs';
+
 import type {
   IBLEConnection,
   ISerialConnection,
@@ -39,6 +42,18 @@ export interface languageTemplate {
   no_nodes_message: string;
   no_message_placeholder: string;
 }
+
+// const adminPacketResource = useSuspense(props.connection.onAdminPacketEvent);
+// const tmp$ = new Subject<Types.AdminPacket>().pipe(
+//   filter(
+//     (adminPacket) =>
+//       adminPacket.data.variant.oneofKind === 'getRadioResponse',
+//   ),
+// );
+// const tmp$ = props.connection.onAdminPacketEvent;
+const tmpSubject = new Subject<Protobuf.RadioConfig_UserPreferences>();
+
+export const adminPacketResource = new ObservableResource(tmpSubject);
 
 const App = (): JSX.Element => {
   const [deviceStatus, setDeviceStatus] =
@@ -134,10 +149,13 @@ const App = (): JSX.Element => {
       (adminMessage) => {
         switch (adminMessage.data.variant.oneofKind) {
           case 'getChannelResponse':
-            if (adminMessage.data.variant.getChannelResponse) {
-              const message = adminMessage.data.variant.getChannelResponse;
-              setChannels((channels) => [...channels, message]);
-            }
+            setChannels((channels) => [
+              ...channels,
+              adminMessage.data.variant.getChannelResponse,
+            ]);
+            break;
+          case 'getRadioResponse':
+            tmpSubject.next(adminMessage.data.variant.getRadioResponse);
             break;
           default:
             break;

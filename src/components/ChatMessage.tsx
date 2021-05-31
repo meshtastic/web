@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
+import Avatar from 'boring-avatars';
+
 import {
   CheckCircleIcon,
   DotsCircleHorizontalIcon,
-  UserIcon,
 } from '@heroicons/react/outline';
 import type { Types } from '@meshtastic/meshtasticjs';
 
@@ -25,15 +26,12 @@ const ChatMessage = (props: ChatMessageProps): JSX.Element => {
   }, [props.nodes, props.message]);
   return (
     <div className="flex items-end">
-      <div
-        className={`flex p-3 rounded-full shadow-md ${
-          props.message.message.packet.from !== props.myId
-            ? 'bg-gray-300'
-            : 'bg-green-200'
-        }`}
-      >
-        <UserIcon className="m-auto w-5 h-5" />
-      </div>
+      <Avatar
+        size={40}
+        name={node?.data.user?.longName ?? 'UNK'}
+        variant="beam"
+        colors={['#213435', '#46685B', '#648A64', '#A6B985', '#E1E3AC']}
+      />
       <div className="flex flex-col container px-2 items-start">
         <div
           className={`px-4 py-2 rounded-md shadow-md ${

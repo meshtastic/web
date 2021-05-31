@@ -1,11 +1,12 @@
 import React from 'react';
 
+import Avatar from 'boring-avatars';
+
 import { Disclosure } from '@headlessui/react';
 import {
   ChevronDownIcon,
   ChevronRightIcon,
   ClockIcon,
-  DesktopComputerIcon,
   FlagIcon,
   GlobeIcon,
   LightningBoltIcon,
@@ -29,11 +30,23 @@ const Node = (props: NodeProps): JSX.Element => {
               ) : (
                 <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
               )}
-              {props.node.data.num === props.myId ? (
-                <FlagIcon className="text-yellow-500 my-auto mr-2 w-5 h-5" />
-              ) : (
-                <DesktopComputerIcon className="text-gray-600 my-auto mr-2 w-5 h-5" />
-              )}
+              <div className="relative">
+                {props.node.data.num === props.myId ? (
+                  <FlagIcon className="absolute -right-1 -top-2 text-yellow-500 my-auto w-4 h-4" />
+                ) : null}
+                <Avatar
+                  size={30}
+                  name={props.node.data.user?.longName}
+                  variant="beam"
+                  colors={[
+                    '#213435',
+                    '#46685B',
+                    '#648A64',
+                    '#A6B985',
+                    '#E1E3AC',
+                  ]}
+                />
+              </div>
               {props.node.data.user?.longName}
             </div>
           </Disclosure.Button>
