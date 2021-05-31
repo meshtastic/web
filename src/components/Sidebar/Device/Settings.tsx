@@ -1,13 +1,17 @@
 import React from 'react';
 
+import { ObservableResource, useObservableSuspense } from 'observable-hooks';
 import { useForm } from 'react-hook-form';
 import JSONPretty from 'react-json-pretty';
+import { Subject } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import { SaveIcon } from '@heroicons/react/outline';
 import type {
   IBLEConnection,
   IHTTPConnection,
   ISerialConnection,
+  Types,
 } from '@meshtastic/meshtasticjs';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
@@ -15,27 +19,44 @@ import type { languageTemplate } from '../../../../src/App';
 
 export interface SettingsProps {
   isReady: boolean;
-  connection?: ISerialConnection | IHTTPConnection | IBLEConnection;
+  connection: ISerialConnection | IHTTPConnection | IBLEConnection;
   translations: languageTemplate;
 }
 
-const Settings = (props: SettingsProps): JSX.Element => {
-  React.useEffect(() => {
-    const adminPacketEvent = props.connection?.onAdminPacketEvent.subscribe(
-      (adminMessage) => {
-        switch (adminMessage.data.variant.oneofKind) {
-          case 'getRadioResponse':
-            if (adminMessage.data.variant.getRadioResponse.preferences) {
-              setPreferences(
-                adminMessage.data.variant.getRadioResponse.preferences,
-              );
-            }
-        }
-      },
-    );
+export interface SettingsPropsNew {
+  isReady: boolean;
+  connection: ISerialConnection | IHTTPConnection | IBLEConnection;
+  translations: languageTemplate;
+  adminPacketResource: ObservableResource<Types.AdminPacket, Types.AdminPacket>;
+}
 
-    return () => adminPacketEvent?.unsubscribe();
-  }, []);
+const Settings = (props: SettingsProps): JSX.Element => {
+  // const adminPacketResource = useSuspense(props.connection.onAdminPacketEvent);
+  const tmp$ = new Subject<Types.AdminPacket>().pipe(
+    filter(
+      (adminPacket) =>
+        adminPacket.data.variant.oneofKind === 'getRadioResponse',
+    ),
+  );
+  // const tmp$ = props.connection.onAdminPacketEvent;
+
+  const adminPacketResource = new ObservableResource(tmp$);
+
+  return (
+    <React.Suspense fallback={<div>Loading....</div>}>
+      <SettingsForm
+        connection={props.connection}
+        isReady={props.isReady}
+        translations={props.translations}
+        adminPacketResource={adminPacketResource}
+      />
+    </React.Suspense>
+  );
+};
+
+const SettingsForm = (props: SettingsPropsNew): JSX.Element => {
+  // const adminPacket: Types.AdminPacket = props.adminPacketResource.data.read();
+  const adminPacket = useObservableSuspense(props.adminPacketResource);
 
   const [preferences, setPreferences] =
     React.useState<Protobuf.RadioConfig_UserPreferences>();
@@ -47,6 +68,7 @@ const Settings = (props: SettingsProps): JSX.Element => {
   const onSubmit = handleSubmit((data) => console.log(data));
   return (
     <form onSubmit={onSubmit}>
+      <div>{JSON.stringify(adminPacket)}</div>
       <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
         <div className="my-auto">{props.translations.device_region_title}</div>
         <div className="flex shadow-md rounded-md ml-2">

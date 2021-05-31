@@ -17,7 +17,7 @@ import Settings from './Settings';
 
 interface DeviceProps {
   isReady: boolean;
-  connection?: ISerialConnection | IHTTPConnection | IBLEConnection;
+  connection: ISerialConnection | IHTTPConnection | IBLEConnection;
   translations: languageTemplate;
 }
 

@@ -2,11 +2,11 @@ import React from 'react';
 
 import type {
   IBLEConnection,
-  IHTTPConnection,
   ISerialConnection,
 } from '@meshtastic/meshtasticjs';
 import {
   Client,
+  IHTTPConnection,
   Protobuf,
   SettingsManager,
   Types,
@@ -50,8 +50,9 @@ const App = (): JSX.Element => {
   );
   const [channels, setChannels] = React.useState([] as Protobuf.Channel[]);
   const [nodes, setNodes] = React.useState<Types.NodeInfoPacket[]>([]);
-  const [connection, setConnection] =
-    React.useState<ISerialConnection | IHTTPConnection | IBLEConnection>();
+  const [connection, setConnection] = React.useState<
+    ISerialConnection | IHTTPConnection | IBLEConnection
+  >(new IHTTPConnection());
   const [isReady, setIsReady] = React.useState<boolean>(false);
   const [lastMeshInterraction, setLastMeshInterraction] =
     React.useState<number>(0);
@@ -100,7 +101,7 @@ const App = (): JSX.Element => {
   React.useEffect(() => {
     console.log('UPDATING');
 
-    const deviceStatusEvent = connection?.onDeviceStatusEvent.subscribe(
+    const deviceStatusEvent = connection.onDeviceStatusEvent.subscribe(
       (status) => {
         setDeviceStatus(status);
         if (status === Types.DeviceStatusEnum.DEVICE_CONFIGURED) {
@@ -109,9 +110,9 @@ const App = (): JSX.Element => {
       },
     );
     const myNodeInfoEvent =
-      connection?.onMyNodeInfoEvent.subscribe(setMyNodeInfo);
+      connection.onMyNodeInfoEvent.subscribe(setMyNodeInfo);
 
-    const nodeInfoPacketEvent = connection?.onNodeInfoPacketEvent.subscribe(
+    const nodeInfoPacketEvent = connection.onNodeInfoPacketEvent.subscribe(
       (node) => {
         if (
           nodes.findIndex(
@@ -129,7 +130,7 @@ const App = (): JSX.Element => {
       },
     );
 
-    const adminPacketEvent = connection?.onAdminPacketEvent.subscribe(
+    const adminPacketEvent = connection.onAdminPacketEvent.subscribe(
       (adminMessage) => {
         switch (adminMessage.data.variant.oneofKind) {
           case 'getChannelResponse':
@@ -144,7 +145,7 @@ const App = (): JSX.Element => {
       },
     );
 
-    const meshHeartbeat = connection?.onMeshHeartbeat.subscribe(
+    const meshHeartbeat = connection.onMeshHeartbeat.subscribe(
       setLastMeshInterraction,
     );
 
@@ -154,7 +155,7 @@ const App = (): JSX.Element => {
       nodeInfoPacketEvent?.unsubscribe();
       adminPacketEvent?.unsubscribe();
       meshHeartbeat?.unsubscribe();
-      connection?.disconnect();
+      connection.disconnect();
     };
   }, [connection, nodes]);
 

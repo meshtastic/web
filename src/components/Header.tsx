@@ -21,11 +21,9 @@ interface HeaderProps {
   status: Types.DeviceStatusEnum;
   IsReady: boolean;
   LastMeshInterraction: number;
-  connection?: IHTTPConnection | ISerialConnection | IBLEConnection;
+  connection: IHTTPConnection | ISerialConnection | IBLEConnection;
   setConnection: React.Dispatch<
-    React.SetStateAction<
-      IHTTPConnection | ISerialConnection | IBLEConnection | undefined
-    >
+    React.SetStateAction<IHTTPConnection | ISerialConnection | IBLEConnection>
   >;
 }
 
@@ -44,7 +42,7 @@ const Header = (props: HeaderProps): JSX.Element => {
               activeConnection === 'serial' ? 'bg-green-300' : 'bg-gray-300'
             }`}
             onClick={() => {
-              props.connection?.disconnect();
+              props.connection.disconnect();
               const connection = new ISerialConnection();
               connection.connect({});
               setActiveConnection('serial');
@@ -58,7 +56,7 @@ const Header = (props: HeaderProps): JSX.Element => {
               activeConnection === 'http' ? 'bg-green-300' : 'bg-gray-300'
             }`}
             onClick={() => {
-              props.connection?.disconnect();
+              props.connection.disconnect();
               const connection = new IHTTPConnection();
               connection.connect({
                 address:
@@ -80,7 +78,7 @@ const Header = (props: HeaderProps): JSX.Element => {
               activeConnection === 'ble' ? 'bg-green-300' : 'bg-gray-300'
             }`}
             onClick={() => {
-              props.connection?.disconnect();
+              props.connection.disconnect();
               const connection = new IBLEConnection();
               connection.connect({});
               setActiveConnection('ble');

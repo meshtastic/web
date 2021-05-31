@@ -14,7 +14,7 @@ import MessageBox from './components/MessageBox';
 import Sidebar from './components/Sidebar';
 
 interface MainProps {
-  connection?: ISerialConnection | IHTTPConnection | IBLEConnection;
+  connection: ISerialConnection | IHTTPConnection | IBLEConnection;
   myNodeInfo: Protobuf.MyNodeInfo;
   nodes: Types.NodeInfoPacket[];
   channels: Protobuf.Channel[];
@@ -33,7 +33,7 @@ const Main = (props: MainProps): JSX.Element => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   React.useEffect(() => {
-    const textPacketEvent = props.connection?.onTextPacketEvent.subscribe(
+    const textPacketEvent = props.connection.onTextPacketEvent.subscribe(
       (message) => {
         setMessages((messages) => [
           ...messages,
@@ -45,7 +45,7 @@ const Main = (props: MainProps): JSX.Element => {
   }, [props.connection]);
 
   React.useEffect(() => {
-    const routingPacketEvent = props.connection?.onRoutingPacketEvent.subscribe(
+    const routingPacketEvent = props.connection.onRoutingPacketEvent.subscribe(
       (routingPacket) => {
         setMessages(
           messages.map((message) => {

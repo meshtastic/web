@@ -18,7 +18,7 @@ interface SidebarProps {
   isReady: boolean;
   nodes: Types.NodeInfoPacket[];
   channels: Protobuf.Channel[];
-  connection?: ISerialConnection | IHTTPConnection | IBLEConnection;
+  connection: ISerialConnection | IHTTPConnection | IBLEConnection;
   language: LanguageEnum;
   setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
   translations: languageTemplate;
