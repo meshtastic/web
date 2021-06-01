@@ -1,8 +1,5 @@
 import React from 'react';
 
-import { ObservableResource } from 'observable-hooks';
-import { Subject } from 'rxjs';
-
 import type {
   IBLEConnection,
   ISerialConnection,
@@ -17,43 +14,12 @@ import {
 
 import Header from './components/Header';
 import Main from './Main';
+import { channelSubject$, nodeSubject$, preferencesSubject$ } from './streams';
 import Translations_English from './translations/en';
 import Translations_Japanese from './translations/jp';
 import Translations_Portuguese from './translations/pt';
-
-export enum LanguageEnum {
-  ENGLISH,
-  JAPANESE,
-  PORTUGUESE,
-}
-
-export interface languageTemplate {
-  no_messages_message: string;
-  ui_settings_title: string;
-  nodes_title: string;
-  color_scheme_title: string;
-  language_title: string;
-  device_settings_title: string;
-  device_channels_title: string;
-  device_region_title: string;
-  device_wifi_ssid: string;
-  device_wifi_psk: string;
-  save_changes_button: string;
-  no_nodes_message: string;
-  no_message_placeholder: string;
-}
-
-// const adminPacketResource = useSuspense(props.connection.onAdminPacketEvent);
-// const tmp$ = new Subject<Types.AdminPacket>().pipe(
-//   filter(
-//     (adminPacket) =>
-//       adminPacket.data.variant.oneofKind === 'getRadioResponse',
-//   ),
-// );
-// const tmp$ = props.connection.onAdminPacketEvent;
-const tmpSubject = new Subject<Protobuf.RadioConfig_UserPreferences>();
-
-export const adminPacketResource = new ObservableResource(tmpSubject);
+import type { languageTemplate } from './translations/TranslationContext';
+import { LanguageEnum } from './translations/TranslationContext';
 
 const App = (): JSX.Element => {
   const [deviceStatus, setDeviceStatus] =
@@ -63,7 +29,7 @@ const App = (): JSX.Element => {
   const [myNodeInfo, setMyNodeInfo] = React.useState<Protobuf.MyNodeInfo>(
     Protobuf.MyNodeInfo.create(),
   );
-  const [channels, setChannels] = React.useState([] as Protobuf.Channel[]);
+  // const [channels, setChannels] = React.useState([] as Protobuf.Channel[]);
   const [nodes, setNodes] = React.useState<Types.NodeInfoPacket[]>([]);
   const [connection, setConnection] = React.useState<
     ISerialConnection | IHTTPConnection | IBLEConnection
@@ -98,9 +64,9 @@ const App = (): JSX.Element => {
 
   React.useEffect(() => {
     const client = new Client();
-    const connection = client.createHTTPConnection();
+    const tmpConnection = client.createHTTPConnection();
 
-    connection.connect({
+    tmpConnection.connect({
       address:
         import.meta.env.NODE_ENV === 'production'
           ? window.location.hostname
@@ -109,13 +75,11 @@ const App = (): JSX.Element => {
       tls: false,
       fetchInterval: 2000,
     });
-    setConnection(connection);
+    setConnection(tmpConnection);
     SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
   }, []);
 
   React.useEffect(() => {
-    console.log('UPDATING');
-
     const deviceStatusEvent = connection.onDeviceStatusEvent.subscribe(
       (status) => {
         setDeviceStatus(status);
@@ -128,34 +92,21 @@ const App = (): JSX.Element => {
       connection.onMyNodeInfoEvent.subscribe(setMyNodeInfo);
 
     const nodeInfoPacketEvent = connection.onNodeInfoPacketEvent.subscribe(
-      (node) => {
-        if (
-          nodes.findIndex(
-            (currentNode) => currentNode.data.num === node.data.num,
-          ) >= 0
-        ) {
-          setNodes(
-            nodes.map((currentNode) =>
-              currentNode.data.num === node.data.num ? node : currentNode,
-            ),
-          );
-        } else {
-          setNodes((nodes) => [...nodes, node]);
-        }
-      },
+      (node) => nodeSubject$.next(node),
     );
 
     const adminPacketEvent = connection.onAdminPacketEvent.subscribe(
       (adminMessage) => {
         switch (adminMessage.data.variant.oneofKind) {
           case 'getChannelResponse':
-            setChannels((channels) => [
-              ...channels,
-              adminMessage.data.variant.getChannelResponse,
-            ]);
+            channelSubject$.next(adminMessage.data.variant.getChannelResponse);
             break;
           case 'getRadioResponse':
-            tmpSubject.next(adminMessage.data.variant.getRadioResponse);
+            if (adminMessage.data.variant.getRadioResponse.preferences) {
+              preferencesSubject$.next(
+                adminMessage.data.variant.getRadioResponse.preferences,
+              );
+            }
             break;
           default:
             break;
@@ -190,11 +141,8 @@ const App = (): JSX.Element => {
         isReady={isReady}
         myNodeInfo={myNodeInfo}
         connection={connection}
-        nodes={nodes}
-        channels={channels}
         language={language}
         setLanguage={setLanguage}
-        translations={translations}
         darkmode={darkmode}
         setDarkmode={setDarkmode}
       />

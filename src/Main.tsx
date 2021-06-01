@@ -8,25 +8,24 @@ import type {
   Types,
 } from '@meshtastic/meshtasticjs';
 
-import type { LanguageEnum, languageTemplate } from './App';
 import ChatMessage from './components/ChatMessage';
 import MessageBox from './components/MessageBox';
 import Sidebar from './components/Sidebar';
+import type { LanguageEnum } from './translations/TranslationContext';
+import { TranslationContext } from './translations/TranslationContext';
 
 interface MainProps {
   connection: ISerialConnection | IHTTPConnection | IBLEConnection;
   myNodeInfo: Protobuf.MyNodeInfo;
-  nodes: Types.NodeInfoPacket[];
-  channels: Protobuf.Channel[];
   isReady: boolean;
   language: LanguageEnum;
   setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
-  translations: languageTemplate;
   darkmode: boolean;
   setDarkmode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Main = (props: MainProps): JSX.Element => {
+  const { translations } = React.useContext(TranslationContext);
   const [messages, setMessages] = React.useState<
     { message: Types.TextPacket; ack: boolean }[]
   >([]);
@@ -72,7 +71,6 @@ const Main = (props: MainProps): JSX.Element => {
           {messages.length ? (
             messages.map((message, Main) => (
               <ChatMessage
-                nodes={props.nodes}
                 key={Main}
                 message={message}
                 myId={props.myNodeInfo.myNodeNum}
@@ -80,7 +78,7 @@ const Main = (props: MainProps): JSX.Element => {
             ))
           ) : (
             <div className="m-auto text-2xl text-gray-500">
-              {props.translations.no_messages_message}
+              {translations.no_messages_message}
             </div>
           )}
         </div>
@@ -89,17 +87,13 @@ const Main = (props: MainProps): JSX.Element => {
           isReady={props.isReady}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
-          translations={props.translations}
         />
       </div>
       <Sidebar
         isReady={props.isReady}
-        nodes={props.nodes}
-        channels={props.channels}
         connection={props.connection}
         language={props.language}
         setLanguage={props.setLanguage}
-        translations={props.translations}
         myId={props.myNodeInfo.myNodeNum}
         sidebarOpen={sidebarOpen}
         darkmode={props.darkmode}

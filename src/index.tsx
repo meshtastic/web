@@ -7,13 +7,27 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './App';
+import Translations_English from './translations/en';
+import {
+  LanguageEnum,
+  TranslationContext,
+} from './translations/TranslationContext';
 
 const element = document.getElementById('root');
 
 if (element) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   ReactDOM.createRoot(element).render(
     <React.StrictMode>
-      <App />
+      <TranslationContext.Provider
+        value={{
+          language: LanguageEnum.ENGLISH,
+          translations: Translations_English,
+        }}
+      >
+        <App />
+      </TranslationContext.Provider>
     </React.StrictMode>,
   );
 }

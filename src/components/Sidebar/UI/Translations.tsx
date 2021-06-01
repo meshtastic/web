@@ -5,16 +5,18 @@ import { Br, Jp, Us } from 'react-flags-select';
 import { Disclosure } from '@headlessui/react';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/outline';
 
-import type { languageTemplate } from '../../../App';
-import { LanguageEnum } from '../../../App';
+import {
+  LanguageEnum,
+  TranslationContext,
+} from '../../../translations/TranslationContext';
 
 export interface TranslationsProps {
   language: LanguageEnum;
   setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
-  translations: languageTemplate;
 }
 
 const Translations = (props: TranslationsProps): JSX.Element => {
+  const { translations } = React.useContext(TranslationContext);
   return (
     <Disclosure>
       {({ open }) => (
@@ -26,7 +28,7 @@ const Translations = (props: TranslationsProps): JSX.Element => {
               ) : (
                 <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
               )}
-              {props.translations.language_title}
+              {translations.language_title}
               <div className="my-auto">
                 {props.language === LanguageEnum.ENGLISH ? (
                   <Us className="ml-2 w-8" />

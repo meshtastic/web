@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import Avatar from 'boring-avatars';
+import { useObservableSuspense } from 'observable-hooks';
 
 import {
   CheckCircleIcon,
@@ -8,22 +9,42 @@ import {
 } from '@heroicons/react/outline';
 import type { Types } from '@meshtastic/meshtasticjs';
 
+import { nodeResource } from '../streams';
+
 interface ChatMessageProps {
   message: { message: Types.TextPacket; ack: boolean };
   myId: number;
-  nodes: Types.NodeInfoPacket[];
 }
 
 const ChatMessage = (props: ChatMessageProps): JSX.Element => {
+  const nodeSource = useObservableSuspense(nodeResource);
+
+  const [nodes, setNodes] = React.useState<Types.NodeInfoPacket[]>([]);
+
+  React.useEffect(() => {
+    if (
+      nodes.findIndex(
+        (currentNode) => currentNode.data.num === nodeSource.data.num,
+      ) >= 0
+    ) {
+      setNodes(
+        nodes.map((currentNode) =>
+          currentNode.data.num === nodeSource.data.num
+            ? nodeSource
+            : currentNode,
+        ),
+      );
+    } else {
+      setNodes((nodes) => [...nodes, nodeSource]);
+    }
+  }, [nodeSource, nodes]);
   const [node, setNode] = useState<Types.NodeInfoPacket>();
 
   React.useEffect(() => {
     setNode(
-      props.nodes.find(
-        (node) => node.data.num === props.message.message.packet.from,
-      ),
+      nodes.find((node) => node.data.num === props.message.message.packet.from),
     );
-  }, [props.nodes, props.message]);
+  }, [nodes, props.message]);
   return (
     <div className="flex items-end">
       <Avatar

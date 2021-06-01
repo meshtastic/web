@@ -7,10 +7,9 @@ import type {
   ISerialConnection,
 } from '@meshtastic/meshtasticjs';
 
-import type { languageTemplate } from '../App';
+import { TranslationContext } from '../translations/TranslationContext';
 
 export interface MessageBoxProps {
-  translations: languageTemplate;
   sidebarOpen: boolean;
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   connection: ISerialConnection | IHTTPConnection | IBLEConnection;
@@ -18,6 +17,7 @@ export interface MessageBoxProps {
 }
 
 const MessageBox = (props: MessageBoxProps): JSX.Element => {
+  const { translations } = React.useContext(TranslationContext);
   const [currentMessage, setCurrentMessage] = React.useState('');
   const sendMessage = () => {
     if (props.isReady) {
@@ -45,7 +45,7 @@ const MessageBox = (props: MessageBoxProps): JSX.Element => {
         {props.isReady}
         <input
           type="text"
-          placeholder={`${props.translations.no_message_placeholder}...`}
+          placeholder={`${translations.no_message_placeholder}...`}
           disabled={!props.isReady}
           value={currentMessage}
           onChange={(e) => {

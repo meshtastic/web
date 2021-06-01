@@ -6,18 +6,12 @@ import {
   ChevronRightIcon,
   HashtagIcon,
 } from '@heroicons/react/outline';
-import { Protobuf } from '@meshtastic/meshtasticjs';
 
-import type { languageTemplate } from '../../../App';
-import Channel from './Channel';
+import { TranslationContext } from '../../../translations/TranslationContext';
+import ChannelList from './ChannelList';
 
-export interface ChannelsProps {
-  isReady: boolean;
-  channels: Protobuf.Channel[];
-  translations: languageTemplate;
-}
-
-const Channels = (props: ChannelsProps): JSX.Element => {
+const Channels = (): JSX.Element => {
+  const { translations } = React.useContext(TranslationContext);
   return (
     <Disclosure>
       {({ open }) => (
@@ -30,16 +24,19 @@ const Channels = (props: ChannelsProps): JSX.Element => {
                 <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
               )}
               <HashtagIcon className="my-auto text-gray-600 mr-2 2-5 h-5" />
-              {props.translations.device_channels_title}
+              {translations.device_channels_title}
             </div>
           </Disclosure.Button>
           <Disclosure.Panel>
-            <>
-              {props.channels.map((channel, index) => {
-                if (channel.role !== Protobuf.Channel_Role.DISABLED)
-                  return <Channel key={index} channel={channel} />;
-              })}
-            </>
+            <React.Suspense
+              fallback={
+                <div className="flex border-b border-gray-300">
+                  <div className="m-auto p-3 text-gray-500">Loading...</div>
+                </div>
+              }
+            >
+              <ChannelList />
+            </React.Suspense>
           </Disclosure.Panel>
         </>
       )}

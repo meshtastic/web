@@ -7,18 +7,19 @@ import {
   CogIcon,
 } from '@heroicons/react/outline';
 
-import type { LanguageEnum, languageTemplate } from '../../../App';
+import type { LanguageEnum } from '../../../translations/TranslationContext';
+import { TranslationContext } from '../../../translations/TranslationContext';
 import Translations from './Translations';
 
 interface UIProps {
   language: LanguageEnum;
   setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
-  translations: languageTemplate;
   darkmode: boolean;
   setDarkmode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const UI = (props: UIProps): JSX.Element => {
+  const { translations } = React.useContext(TranslationContext);
   return (
     <Disclosure>
       {({ open }) => (
@@ -31,14 +32,13 @@ const UI = (props: UIProps): JSX.Element => {
                 <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
               )}
               <CogIcon className="my-auto text-gray-600 mr-2 w-5 h-5" />
-              {props.translations.ui_settings_title}
+              {translations.ui_settings_title}
             </div>
           </Disclosure.Button>
           <Disclosure.Panel>
             <Translations
               language={props.language}
               setLanguage={props.setLanguage}
-              translations={props.translations}
             />
           </Disclosure.Panel>
         </>

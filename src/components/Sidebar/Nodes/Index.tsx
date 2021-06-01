@@ -6,19 +6,16 @@ import {
   ChevronRightIcon,
   UsersIcon,
 } from '@heroicons/react/outline';
-import type { Types } from '@meshtastic/meshtasticjs';
 
-import type { languageTemplate } from '../../../App';
-import Node from './Node';
+import { TranslationContext } from '../../../translations/TranslationContext';
+import NodeList from './NodeList';
 
 interface NodesProps {
-  isReady: boolean;
-  nodes: Types.NodeInfoPacket[];
-  translations: languageTemplate;
   myId: number;
 }
 
 const Nodes = (props: NodesProps): JSX.Element => {
+  const { translations } = React.useContext(TranslationContext);
   return (
     <Disclosure>
       {({ open }) => (
@@ -31,21 +28,21 @@ const Nodes = (props: NodesProps): JSX.Element => {
                 <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
               )}
               <UsersIcon className="my-auto text-gray-600 mr-2 w-5 h-5" />
-              {props.translations.nodes_title}
+              {translations.nodes_title}
             </div>
           </Disclosure.Button>
           <Disclosure.Panel className="shadow-inner">
-            {props.nodes.length ? (
-              props.nodes.map((node, index) => (
-                <Node key={index} node={node} myId={props.myId} />
-              ))
-            ) : (
-              <div className="flex border-b border-gray-300">
-                <div className="m-auto p-3 text-gray-500">
-                  {props.translations.no_nodes_message}
+            <React.Suspense
+              fallback={
+                <div className="flex border-b border-gray-300">
+                  <div className="m-auto p-3 text-gray-500">
+                    {translations.no_nodes_message}
+                  </div>
                 </div>
-              </div>
-            )}
+              }
+            >
+              <NodeList myId={props.myId} />
+            </React.Suspense>
           </Disclosure.Panel>
         </>
       )}

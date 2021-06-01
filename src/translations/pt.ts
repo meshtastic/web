@@ -1,4 +1,4 @@
-import type { languageTemplate } from '../App';
+import type { languageTemplate } from './TranslationContext';
 
 export default {
   no_messages_message: 'Não a mensagens ainda',
