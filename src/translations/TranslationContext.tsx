@@ -1,6 +1,8 @@
 import React from 'react';
 
-import Translations_English from './en';
+import Translations_EN from './en';
+import Translations_JP from './jp';
+import Translations_PT from './pt';
 
 export interface languageTemplate {
   no_messages_message: string;
@@ -24,16 +26,48 @@ export enum LanguageEnum {
   PORTUGUESE,
 }
 
-export const TranslationContext = React.createContext({
+const Context = React.createContext<{
+  language: LanguageEnum;
+  setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
+  translations: languageTemplate;
+}>({
   language: LanguageEnum.ENGLISH,
-  translations: Translations_English,
+  setLanguage: () => {},
+  translations: Translations_EN,
 });
 
-// const TranslationProvider: React.FC = ({ children }) => {
-//   const [language, setLanguage] = React.useState<LanguageEnum>(
-//     LanguageEnum.ENGLISH,
-//   );
-//   return { children };
-// };
-
-// export default TranslationProvider;
+export const TranslationContext = ({
+  children,
+}: {
+  children: React.ReactNode;
+}): JSX.Element => {
+  const [language, setLanguage] = React.useState<LanguageEnum>(
+    LanguageEnum.ENGLISH,
+  );
+  const [translation, setTranslation] =
+    React.useState<languageTemplate>(Translations_EN);
+  React.useEffect(() => {
+    switch (language) {
+      case LanguageEnum.ENGLISH:
+        setTranslation(Translations_EN);
+        break;
+      case LanguageEnum.JAPANESE:
+        setTranslation(Translations_JP);
+        break;
+      case LanguageEnum.PORTUGUESE:
+        setTranslation(Translations_PT);
+        break;
+    }
+  }, [language]);
+  return (
+    <Context.Provider
+      value={{
+        language: language,
+        setLanguage: setLanguage,
+        translations: translation,
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
+};

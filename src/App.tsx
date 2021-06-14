@@ -15,10 +15,6 @@ import {
 import Header from './components/Header';
 import Main from './Main';
 import { channelSubject$, nodeSubject$, preferencesSubject$ } from './streams';
-import Translations_English from './translations/en';
-import Translations_Japanese from './translations/jp';
-import Translations_Portuguese from './translations/pt';
-import type { languageTemplate } from './translations/TranslationContext';
 import { LanguageEnum } from './translations/TranslationContext';
 
 const App = (): JSX.Element => {
@@ -29,8 +25,6 @@ const App = (): JSX.Element => {
   const [myNodeInfo, setMyNodeInfo] = React.useState<Protobuf.MyNodeInfo>(
     Protobuf.MyNodeInfo.create(),
   );
-  // const [channels, setChannels] = React.useState([] as Protobuf.Channel[]);
-  const [nodes, setNodes] = React.useState<Types.NodeInfoPacket[]>([]);
   const [connection, setConnection] = React.useState<
     ISerialConnection | IHTTPConnection | IBLEConnection
   >(new IHTTPConnection());
@@ -41,26 +35,7 @@ const App = (): JSX.Element => {
   const [language, setLanguage] = React.useState<LanguageEnum>(
     LanguageEnum.ENGLISH,
   );
-  const [translations, setTranslations] =
-    React.useState<languageTemplate>(Translations_English);
   const [darkmode, setDarkmode] = React.useState<boolean>(false);
-
-  React.useEffect(() => {
-    switch (language) {
-      case LanguageEnum.ENGLISH:
-        setTranslations(Translations_English);
-        break;
-      case LanguageEnum.PORTUGUESE:
-        setTranslations(Translations_Portuguese);
-        break;
-      case LanguageEnum.JAPANESE:
-        setTranslations(Translations_Japanese);
-        break;
-
-      default:
-        break;
-    }
-  }, [language]);
 
   React.useEffect(() => {
     const client = new Client();
@@ -126,7 +101,7 @@ const App = (): JSX.Element => {
       meshHeartbeat?.unsubscribe();
       connection.disconnect();
     };
-  }, [connection, nodes]);
+  }, [connection]);
 
   return (
     <div className="flex flex-col h-screen w-screen">
@@ -135,7 +110,6 @@ const App = (): JSX.Element => {
         IsReady={isReady}
         LastMeshInterraction={lastMeshInterraction}
         connection={connection}
-        setConnection={setConnection}
       />
       <Main
         isReady={isReady}
