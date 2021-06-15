@@ -7,7 +7,7 @@ import {
   UsersIcon,
 } from '@heroicons/react/outline';
 
-import { TranslationContext } from '../../../translations/TranslationContext';
+import { TranslationsContext } from '../../../translations/TranslationsContext';
 import NodeList from './NodeList';
 
 interface NodesProps {
@@ -15,7 +15,7 @@ interface NodesProps {
 }
 
 const Nodes = (props: NodesProps): JSX.Element => {
-  const { translations } = React.useContext(TranslationContext);
+  const { translations } = React.useContext(TranslationsContext);
   return (
     <Disclosure>
       {({ open }) => (

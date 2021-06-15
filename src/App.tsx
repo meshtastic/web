@@ -15,7 +15,6 @@ import {
 import Header from './components/Header';
 import Main from './Main';
 import { channelSubject$, nodeSubject$, preferencesSubject$ } from './streams';
-import { LanguageEnum } from './translations/TranslationContext';
 
 const App = (): JSX.Element => {
   const [deviceStatus, setDeviceStatus] =
@@ -31,10 +30,6 @@ const App = (): JSX.Element => {
   const [isReady, setIsReady] = React.useState<boolean>(false);
   const [lastMeshInterraction, setLastMeshInterraction] =
     React.useState<number>(0);
-
-  const [language, setLanguage] = React.useState<LanguageEnum>(
-    LanguageEnum.ENGLISH,
-  );
   const [darkmode, setDarkmode] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -115,8 +110,6 @@ const App = (): JSX.Element => {
         isReady={isReady}
         myNodeInfo={myNodeInfo}
         connection={connection}
-        language={language}
-        setLanguage={setLanguage}
         darkmode={darkmode}
         setDarkmode={setDarkmode}
       />

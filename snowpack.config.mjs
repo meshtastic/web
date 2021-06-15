@@ -1,13 +1,13 @@
 /** @type {import("snowpack").SnowpackUserConfig } */
-module.exports = {
+export default {
   mount: {
     public: { url: '/', static: true },
     src: { url: '/static' },
   },
   plugins: [
-    '@snowpack/plugin-postcss',
     '@snowpack/plugin-react-refresh',
     '@snowpack/plugin-dotenv',
+    '@snowpack/plugin-postcss',
     [
       '@snowpack/plugin-typescript',
       {
@@ -21,6 +21,7 @@ module.exports = {
     // {"match": "routes", "src": ".*", "dest": "/index.html"},
   ],
   optimize: {
+    /* Example: Bundle your final build: */
     bundle: true,
     sourcemap: false,
     splitting: true,

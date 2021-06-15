@@ -7,7 +7,7 @@ import type {
   ISerialConnection,
 } from '@meshtastic/meshtasticjs';
 
-import { TranslationContext } from '../translations/TranslationContext';
+import { TranslationsContext } from '../translations/TranslationsContext';
 
 export interface MessageBoxProps {
   sidebarOpen: boolean;
@@ -17,7 +17,7 @@ export interface MessageBoxProps {
 }
 
 const MessageBox = (props: MessageBoxProps): JSX.Element => {
-  const { translations } = React.useContext(TranslationContext);
+  const { translations } = React.useContext(TranslationsContext);
   const [currentMessage, setCurrentMessage] = React.useState('');
   const sendMessage = () => {
     if (props.isReady) {

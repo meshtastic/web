@@ -19,10 +19,9 @@
     "react": "^18.0.0-alpha-dbe3363cc",
     "react-dom": "^18.0.0-alpha-dbe3363cc",
     "react-flags-select": "^2.1.2",
-    "react-hook-form": "^7.8.4",
+    "react-hook-form": "^7.8.6",
     "react-json-pretty": "^2.2.0",
-    "rxjs": "^7.1.0",
-    "yarn": "^1.22.10"
+    "rxjs": "^7.1.0"
   },
   "devDependencies": {
     "@snowpack/plugin-dotenv": "^2.0.5",

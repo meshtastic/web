@@ -7,11 +7,11 @@ import {
   HashtagIcon,
 } from '@heroicons/react/outline';
 
-import { TranslationContext } from '../../../translations/TranslationContext';
+import { TranslationsContext } from '../../../translations/TranslationsContext';
 import ChannelList from './ChannelList';
 
 const Channels = (): JSX.Element => {
-  const { translations } = React.useContext(TranslationContext);
+  const { translations } = React.useContext(TranslationsContext);
   return (
     <Disclosure>
       {({ open }) => (

@@ -6,7 +6,6 @@
     "moduleResolution": "node",
     "jsx": "preserve",
     "baseUrl": "./",
-    "types": ["react/next", "react-dom/next"],
     /* paths - import rewriting/resolving */
     "paths": {
       // If you configured any Snowpack aliases, add them here.
@@ -20,6 +19,7 @@
     "strict": true,
     "strictNullChecks": true,
     "skipLibCheck": true,
+    "types": ["react/next", "react-dom/next", "snowpack-env"],
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,

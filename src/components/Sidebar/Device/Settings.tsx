@@ -5,23 +5,13 @@ import { useForm } from 'react-hook-form';
 import JSONPretty from 'react-json-pretty';
 
 import { SaveIcon } from '@heroicons/react/outline';
-import type {
-  IBLEConnection,
-  IHTTPConnection,
-  ISerialConnection,
-} from '@meshtastic/meshtasticjs';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { preferencesResource } from '../../../streams';
-import { TranslationContext } from '../../../translations/TranslationContext';
+import { TranslationsContext } from '../../../translations/TranslationsContext';
 
-export interface SettingsProps {
-  isReady: boolean;
-  connection: ISerialConnection | IHTTPConnection | IBLEConnection;
-}
-
-const Settings = (props: SettingsProps): JSX.Element => {
-  const { translations } = React.useContext(TranslationContext);
+const Settings = (): JSX.Element => {
+  const { translations } = React.useContext(TranslationsContext);
   const preferences = useObservableSuspense(preferencesResource);
 
   const { register, handleSubmit } =

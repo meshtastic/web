@@ -4,7 +4,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './App';
-import { TranslationContext } from './translations/TranslationContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
@@ -12,9 +11,7 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <TranslationContext>
-      <App />
-    </TranslationContext>
+    <App />
   </React.StrictMode>,
 );
 

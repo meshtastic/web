@@ -36,7 +36,7 @@ const Node = (props: NodeProps): JSX.Element => {
                 ) : null}
                 <Avatar
                   size={30}
-                  name={props.node.data.user?.longName}
+                  name={props.node.data.user?.longName ?? 'Unknown'}
                   variant="beam"
                   colors={[
                     '#213435',

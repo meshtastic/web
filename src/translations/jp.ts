@@ -1,4 +1,4 @@
-import type { languageTemplate } from './TranslationContext';
+import type { languageTemplate } from './TranslationsContext';
 
 export default {
   no_messages_message: 'まだメッセージはありません',

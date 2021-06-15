@@ -7,19 +7,16 @@ import {
   CogIcon,
 } from '@heroicons/react/outline';
 
-import type { LanguageEnum } from '../../../translations/TranslationContext';
-import { TranslationContext } from '../../../translations/TranslationContext';
+import { TranslationsContext } from '../../../translations/TranslationsContext';
 import Translations from './Translations';
 
 interface UIProps {
-  language: LanguageEnum;
-  setLanguage: React.Dispatch<React.SetStateAction<LanguageEnum>>;
   darkmode: boolean;
   setDarkmode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const UI = (props: UIProps): JSX.Element => {
-  const { translations } = React.useContext(TranslationContext);
+  const { translations } = React.useContext(TranslationsContext);
   return (
     <Disclosure>
       {({ open }) => (
@@ -36,10 +33,7 @@ const UI = (props: UIProps): JSX.Element => {
             </div>
           </Disclosure.Button>
           <Disclosure.Panel>
-            <Translations
-              language={props.language}
-              setLanguage={props.setLanguage}
-            />
+            <Translations />
           </Disclosure.Panel>
         </>
       )}
