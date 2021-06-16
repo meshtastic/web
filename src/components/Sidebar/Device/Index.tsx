@@ -6,11 +6,20 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
 } from '@heroicons/react/outline';
+import type {
+  IBLEConnection,
+  IHTTPConnection,
+  ISerialConnection,
+} from '@meshtastic/meshtasticjs';
 
 import { TranslationsContext } from '../../../translations/TranslationsContext';
 import Settings from './Settings';
 
-const Device = (): JSX.Element => {
+interface DeviceProps {
+  connection: ISerialConnection | IHTTPConnection | IBLEConnection;
+}
+
+const Device = (props: DeviceProps): JSX.Element => {
   const { translations } = React.useContext(TranslationsContext);
   return (
     <Disclosure>
@@ -36,7 +45,7 @@ const Device = (): JSX.Element => {
                   </div>
                 }
               >
-                <Settings />
+                <Settings connection={props.connection} />
               </React.Suspense>
             </>
           </Disclosure.Panel>

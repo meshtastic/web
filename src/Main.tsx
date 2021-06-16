@@ -95,6 +95,7 @@ const Main = (props: MainProps): JSX.Element => {
           sidebarOpen={sidebarOpen}
           darkmode={props.darkmode}
           setDarkmode={props.setDarkmode}
+          connection={props.connection}
         />
       </div>
     </TranslationsContext.Provider>

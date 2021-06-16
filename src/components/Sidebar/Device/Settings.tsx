@@ -2,15 +2,23 @@ import React from 'react';
 
 import { useObservableSuspense } from 'observable-hooks';
 import { useForm } from 'react-hook-form';
-import JSONPretty from 'react-json-pretty';
 
 import { SaveIcon } from '@heroicons/react/outline';
+import type {
+  IBLEConnection,
+  IHTTPConnection,
+  ISerialConnection,
+} from '@meshtastic/meshtasticjs';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { preferencesResource } from '../../../streams';
 import { TranslationsContext } from '../../../translations/TranslationsContext';
 
-const Settings = (): JSX.Element => {
+interface SettingsProps {
+  connection: ISerialConnection | IHTTPConnection | IBLEConnection;
+}
+
+const Settings = (props: SettingsProps): JSX.Element => {
   const { translations } = React.useContext(TranslationsContext);
   const preferences = useObservableSuspense(preferencesResource);
 
@@ -19,13 +27,19 @@ const Settings = (): JSX.Element => {
       defaultValues: preferences,
     });
 
-  const onSubmit = handleSubmit((data) => console.log(data));
+  const onSubmit = handleSubmit((data) =>
+    props.connection.setPreferences(data),
+  );
   return (
     <form onSubmit={onSubmit}>
       <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
         <div className="my-auto">{translations.device_region_title}</div>
         <div className="flex shadow-md rounded-md ml-2">
-          <select value={preferences?.region ?? Protobuf.RegionCode.Unset}>
+          <select
+            {...register('region', {
+              valueAsNumber: true,
+            })}
+          >
             <option value={Protobuf.RegionCode.ANZ}>
               {Protobuf.RegionCode[Protobuf.RegionCode.ANZ]}
             </option>
@@ -77,7 +91,6 @@ const Settings = (): JSX.Element => {
           {translations.save_changes_button}
         </button>
       </div>
-      <JSONPretty data={preferences} />
     </form>
   );
 };
