@@ -34,9 +34,10 @@ const App = (): JSX.Element => {
 
   React.useEffect(() => {
     const client = new Client();
-    const tmpConnection = client.createHTTPConnection();
+    const httpConnection = client.createHTTPConnection();
+    SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
 
-    tmpConnection.connect({
+    httpConnection.connect({
       address:
         import.meta.env.NODE_ENV === 'production'
           ? window.location.hostname
@@ -45,8 +46,7 @@ const App = (): JSX.Element => {
       tls: false,
       fetchInterval: 2000,
     });
-    setConnection(tmpConnection);
-    SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
+    setConnection(httpConnection);
   }, []);
 
   React.useEffect(() => {
