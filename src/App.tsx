@@ -12,18 +12,19 @@ import {
   Types,
 } from '@meshtastic/meshtasticjs';
 
-import Header from './components/Header';
-import Main from './Main';
+import { Header } from './components/Header';
+import { useAppDispatch } from './hooks/redux';
+import { Main } from './Main';
+import { setMyId } from './slices/meshtasticSlice';
 import { channelSubject$, nodeSubject$, preferencesSubject$ } from './streams';
 
 const App = (): JSX.Element => {
+  const dispatch = useAppDispatch();
+
   const [deviceStatus, setDeviceStatus] =
     React.useState<Types.DeviceStatusEnum>(
       Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
     );
-  const [myNodeInfo, setMyNodeInfo] = React.useState<Protobuf.MyNodeInfo>(
-    Protobuf.MyNodeInfo.create(),
-  );
   const [connection, setConnection] = React.useState<
     ISerialConnection | IHTTPConnection | IBLEConnection
   >(new IHTTPConnection());
@@ -58,8 +59,13 @@ const App = (): JSX.Element => {
         }
       },
     );
-    const myNodeInfoEvent =
-      connection.onMyNodeInfoEvent.subscribe(setMyNodeInfo);
+    // const myNodeInfoEvent = connection.onMyNodeInfoEvent.subscribe(setMyNodeInfo);
+
+    const myNodeInfoEvent = connection.onMyNodeInfoEvent.subscribe(
+      (nodeInfo) => {
+        dispatch(setMyId(nodeInfo.myNodeNum));
+      },
+    );
 
     const nodeInfoPacketEvent = connection.onNodeInfoPacketEvent.subscribe(
       (node) => nodeSubject$.next(node),
@@ -108,7 +114,6 @@ const App = (): JSX.Element => {
       />
       <Main
         isReady={isReady}
-        myNodeInfo={myNodeInfo}
         connection={connection}
         darkmode={darkmode}
         setDarkmode={setDarkmode}

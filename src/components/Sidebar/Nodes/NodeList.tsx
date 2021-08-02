@@ -5,13 +5,9 @@ import { useObservableSuspense } from 'observable-hooks';
 import type { Types } from '@meshtastic/meshtasticjs';
 
 import { nodeResource } from '../../../streams';
-import Node from './Node';
+import { Node } from './Node';
 
-export interface NodeListProps {
-  myId: number;
-}
-
-const NodeList = (props: NodeListProps): JSX.Element => {
+export const NodeList = (): JSX.Element => {
   const nodeSource = useObservableSuspense(nodeResource);
 
   const [nodes, setNodes] = React.useState<Types.NodeInfoPacket[]>([]);
@@ -37,10 +33,8 @@ const NodeList = (props: NodeListProps): JSX.Element => {
   return (
     <>
       {nodes.map((node, index) => (
-        <Node key={index} node={node} myId={props.myId} />
+        <Node key={index} node={node} />
       ))}
     </>
   );
 };
-
-export default NodeList;

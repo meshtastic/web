@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useTranslation } from 'react-i18next';
+
 import { MenuIcon, PaperAirplaneIcon } from '@heroicons/react/outline';
 import type {
   IBLEConnection,
@@ -7,17 +9,15 @@ import type {
   ISerialConnection,
 } from '@meshtastic/meshtasticjs';
 
-import { TranslationsContext } from '../translations/TranslationsContext';
+import { useAppDispatch } from '../hooks/redux';
+import { toggleSidebar } from '../slices/appSlice';
 
 export interface MessageBoxProps {
-  sidebarOpen: boolean;
-  setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   connection: ISerialConnection | IHTTPConnection | IBLEConnection;
   isReady: boolean;
 }
 
-const MessageBox = (props: MessageBoxProps): JSX.Element => {
-  const { translations } = React.useContext(TranslationsContext);
+export const MessageBox = (props: MessageBoxProps): JSX.Element => {
   const [currentMessage, setCurrentMessage] = React.useState('');
   const sendMessage = () => {
     if (props.isReady) {
@@ -25,12 +25,15 @@ const MessageBox = (props: MessageBoxProps): JSX.Element => {
       setCurrentMessage('');
     }
   };
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+
   return (
     <div className="flex text-lg font-medium space-x-2 md:space-x-0 w-full">
       <div
         className="flex p-3 text-xl hover:text-gray-500 text-gray-400 rounded-md border shadow-md focus:outline-none cursor-pointer md:hidden"
         onClick={() => {
-          props.setSidebarOpen(!props.sidebarOpen);
+          dispatch(toggleSidebar());
         }}
       >
         <MenuIcon className="m-auto h-6 2-6" />
@@ -45,7 +48,7 @@ const MessageBox = (props: MessageBoxProps): JSX.Element => {
         {props.isReady}
         <input
           type="text"
-          placeholder={`${translations.no_message_placeholder}...`}
+          placeholder={`${t('placeholder.no_messages')}...`}
           disabled={!props.isReady}
           value={currentMessage}
           onChange={(e) => {
@@ -67,5 +70,3 @@ const MessageBox = (props: MessageBoxProps): JSX.Element => {
     </div>
   );
 };
-
-export default MessageBox;

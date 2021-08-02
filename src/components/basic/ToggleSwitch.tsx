@@ -6,7 +6,7 @@ interface ToggleSwitchProps {
   active: boolean;
 }
 
-const ToggleSwitch = (props: ToggleSwitchProps): JSX.Element => {
+export const ToggleSwitch = (props: ToggleSwitchProps): JSX.Element => {
   const [active, setActive] = React.useState(false);
 
   React.useEffect(() => {
@@ -29,5 +29,3 @@ const ToggleSwitch = (props: ToggleSwitchProps): JSX.Element => {
     </Switch>
   );
 };
-
-export default ToggleSwitch;

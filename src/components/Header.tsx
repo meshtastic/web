@@ -12,7 +12,7 @@ import type {
 } from '@meshtastic/meshtasticjs';
 import { Types } from '@meshtastic/meshtasticjs';
 
-import Logo from './logo';
+import { Logo } from './Logo';
 
 interface HeaderProps {
   status: Types.DeviceStatusEnum;
@@ -21,9 +21,9 @@ interface HeaderProps {
   connection: IHTTPConnection | ISerialConnection | IBLEConnection;
 }
 
-const Header = (props: HeaderProps): JSX.Element => {
+export const Header = (props: HeaderProps): JSX.Element => {
   return (
-    <nav className="w-full shadow-md">
+    <nav className="select-none w-full shadow-md">
       <div className="flex w-full container mx-auto justify-between px-6 py-4">
         <Logo />
         <div></div>
@@ -34,10 +34,10 @@ const Header = (props: HeaderProps): JSX.Element => {
               className={`w-5 h-5 rounded-full ${
                 new Date(props.LastMeshInterraction) <
                 new Date(Date.now() - 40000)
-                  ? 'bg-red-400'
+                  ? 'bg-red-400 animate-pulse'
                   : new Date(props.LastMeshInterraction) <
                     new Date(Date.now() - 20000)
-                  ? 'bg-yellow-400'
+                  ? 'bg-yellow-400 animate-pulse'
                   : 'bg-green-400'
               }`}
             ></div>
@@ -53,10 +53,10 @@ const Header = (props: HeaderProps): JSX.Element => {
             <div
               className={`w-5 h-5 rounded-full ${
                 props.status <= Types.DeviceStatusEnum.DEVICE_DISCONNECTED
-                  ? 'bg-red-400'
+                  ? 'bg-red-400 animate-pulse'
                   : props.status <= Types.DeviceStatusEnum.DEVICE_CONFIGURING &&
                     !props.IsReady
-                  ? 'bg-yellow-400'
+                  ? 'bg-yellow-400 animate-pulse'
                   : props.IsReady
                   ? 'bg-green-400'
                   : 'bg-gray-400'
@@ -69,5 +69,3 @@ const Header = (props: HeaderProps): JSX.Element => {
     </nav>
   );
 };
-
-export default Header;

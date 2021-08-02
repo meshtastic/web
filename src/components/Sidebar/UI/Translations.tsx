@@ -1,18 +1,14 @@
 import React from 'react';
 
 import { Br, Jp, Us } from 'react-flags-select';
+import { useTranslation } from 'react-i18next';
 
 import { Disclosure } from '@headlessui/react';
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/outline';
 
-import {
-  LanguageEnum,
-  TranslationsContext,
-} from '../../../translations/TranslationsContext';
+export const Translations = (): JSX.Element => {
+  const { t } = useTranslation();
 
-const Translations = (): JSX.Element => {
-  const { translations, language, setLanguage } =
-    React.useContext(TranslationsContext);
   return (
     <Disclosure>
       {({ open }) => (
@@ -24,8 +20,8 @@ const Translations = (): JSX.Element => {
               ) : (
                 <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
               )}
-              {translations.language_title}
-              <div className="my-auto">
+              {t('strings.language')}
+              {/* <div className="my-auto">
                 {language === LanguageEnum.ENGLISH ? (
                   <Us className="ml-2 w-8" />
                 ) : language === LanguageEnum.JAPANESE ? (
@@ -33,14 +29,14 @@ const Translations = (): JSX.Element => {
                 ) : language === LanguageEnum.PORTUGUESE ? (
                   <Br className="ml-2 w-8" />
                 ) : null}
-              </div>
+              </div> */}
             </div>
           </Disclosure.Button>
           <Disclosure.Panel>
             <div
               className="flex bg-gray-100 hover:bg-gray-200 cursor-pointer justify-between p-2"
               onClick={() => {
-                setLanguage(LanguageEnum.ENGLISH);
+                // setLanguage(LanguageEnum.ENGLISH);
               }}
             >
               English <Us className="w-8 my-auto" />
@@ -48,7 +44,7 @@ const Translations = (): JSX.Element => {
             <div
               className="flex bg-gray-100 hover:bg-gray-200 cursor-pointer justify-between p-2"
               onClick={() => {
-                setLanguage(LanguageEnum.PORTUGUESE);
+                // setLanguage(LanguageEnum.PORTUGUESE);
               }}
             >
               Português <Br className="w-8 my-auto" />
@@ -56,7 +52,7 @@ const Translations = (): JSX.Element => {
             <div
               className="flex bg-gray-100 hover:bg-gray-200 cursor-pointer justify-between p-2"
               onClick={() => {
-                setLanguage(LanguageEnum.JAPANESE);
+                // setLanguage(LanguageEnum.JAPANESE);
               }}
             >
               日本語 <Jp className="w-8 my-auto" />
@@ -67,5 +63,3 @@ const Translations = (): JSX.Element => {
     </Disclosure>
   );
 };
-
-export default Translations;

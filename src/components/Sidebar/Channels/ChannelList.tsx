@@ -5,9 +5,9 @@ import { useObservableSuspense } from 'observable-hooks';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { channelResource } from '../../../streams';
-import Channel from './Channel';
+import { Channel } from './Channel';
 
-const ChannelList = (): JSX.Element => {
+export const ChannelList = (): JSX.Element => {
   const channelSource = useObservableSuspense(channelResource);
 
   const [channels, setChannels] = React.useState<Protobuf.Channel[]>([]);
@@ -39,5 +39,3 @@ const ChannelList = (): JSX.Element => {
     </>
   );
 };
-
-export default ChannelList;

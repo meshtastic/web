@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useObservableSuspense } from 'observable-hooks';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { SaveIcon } from '@heroicons/react/outline';
 import type {
@@ -12,14 +13,13 @@ import type {
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { preferencesResource } from '../../../streams';
-import { TranslationsContext } from '../../../translations/TranslationsContext';
 
 interface SettingsProps {
   connection: ISerialConnection | IHTTPConnection | IBLEConnection;
 }
 
-const Settings = (props: SettingsProps): JSX.Element => {
-  const { translations } = React.useContext(TranslationsContext);
+export const Settings = (props: SettingsProps): JSX.Element => {
+  const { t } = useTranslation();
   const preferences = useObservableSuspense(preferencesResource);
 
   const { register, handleSubmit } =
@@ -33,7 +33,7 @@ const Settings = (props: SettingsProps): JSX.Element => {
   return (
     <form onSubmit={onSubmit}>
       <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
-        <div className="my-auto">{translations.device_region_title}</div>
+        <div className="my-auto">{t('strings.device_region')}</div>
         <div className="flex shadow-md rounded-md ml-2">
           <select
             {...register('region', {
@@ -71,13 +71,13 @@ const Settings = (props: SettingsProps): JSX.Element => {
         </div>
       </div>
       <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
-        <div className="my-auto">{translations.device_wifi_ssid}</div>
+        <div className="my-auto">{t('strings.wifi_ssid')}</div>
         <div className="flex shadow-md rounded-md ml-2">
           <input {...register('wifiSsid', {})} type="text" />
         </div>
       </div>
       <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
-        <div className="my-auto">{translations.device_wifi_psk}</div>
+        <div className="my-auto">{t('strings.wifi_psk')}</div>
         <div className="flex shadow-md rounded-md ml-2">
           <input {...register('wifiPassword', {})} type="password" />
         </div>
@@ -88,11 +88,9 @@ const Settings = (props: SettingsProps): JSX.Element => {
           className="flex m-auto font-medium group-hover:text-gray-700"
         >
           <SaveIcon className="m-auto mr-2 group-hover:text-gray-700 w-5 h-5" />
-          {translations.save_changes_button}
+          {t('strings.save_changes')}
         </button>
       </div>
     </form>
   );
 };
-
-export default Settings;
