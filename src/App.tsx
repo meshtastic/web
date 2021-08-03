@@ -11,7 +11,6 @@ import {
   addNode,
   setDeviceStatus,
   setLastMeshInterraction,
-  setMyId,
   setMyNodeInfo,
   setPreferences,
   setReady,
@@ -45,7 +44,6 @@ const App = (): JSX.Element => {
 
     connection.onMyNodeInfo.subscribe((nodeInfo) => {
       dispatch(setMyNodeInfo(nodeInfo));
-      dispatch(setMyId(nodeInfo.myNodeNum));
     });
 
     connection.onNodeInfoPacket.subscribe((nodeInfoPacket) =>

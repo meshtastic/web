@@ -12,7 +12,7 @@ export const Nodes = (): JSX.Element => {
   return (
     <Dropdown
       icon={<UsersIcon className="my-auto text-gray-600 mr-2 w-5 h-5" />}
-      title={t('placeholder.no_nodes')}
+      title={t('strings.nodes')}
       content={<NodeList />}
       fallbackMessage={t('placeholder.no_messages')}
     />

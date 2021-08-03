@@ -19,7 +19,7 @@
     "strict": true,
     "strictNullChecks": true,
     "skipLibCheck": true,
-    "types": ["react/next", "react-dom/next", "snowpack-env"],
+    "types": ["snowpack-env"],
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,

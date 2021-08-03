@@ -4,7 +4,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 interface AppState {
   deviceStatus: Types.DeviceStatusEnum;
-  myId: number;
   lastMeshInterraction: number;
   ready: boolean;
   fromRaioPackets: Protobuf.FromRadio[];
@@ -23,7 +22,6 @@ interface AppState {
 
 const initialState: AppState = {
   deviceStatus: Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
-  myId: 0,
   lastMeshInterraction: 0,
   ready: false,
   fromRaioPackets: [],
@@ -46,9 +44,6 @@ export const meshtasticSlice = createSlice({
   reducers: {
     setDeviceStatus: (state, action: PayloadAction<Types.DeviceStatusEnum>) => {
       state.deviceStatus = action.payload;
-    },
-    setMyId: (state, action: PayloadAction<number>) => {
-      state.myId = action.payload;
     },
     setLastMeshInterraction: (state, action: PayloadAction<number>) => {
       state.lastMeshInterraction = action.payload;
@@ -119,7 +114,6 @@ export const meshtasticSlice = createSlice({
 
 export const {
   setDeviceStatus,
-  setMyId,
   setLastMeshInterraction,
   setReady,
   addFromRadioPacket,

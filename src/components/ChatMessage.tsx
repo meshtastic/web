@@ -15,11 +15,11 @@ interface ChatMessageProps {
 }
 
 export const ChatMessage = (props: ChatMessageProps): JSX.Element => {
-  const myId = useAppSelector((state) => state.meshtastic.myId);
+  const myNodeInfo = useAppSelector((state) => state.meshtastic.myNodeInfo);
   const nodes = useAppSelector((state) => state.meshtastic.nodes);
 
   const node = nodes.find((node) => {
-    node.num === props.message.message.packet.from;
+    return node.num === props.message.message.packet.from;
   });
 
   return (
@@ -39,8 +39,8 @@ export const ChatMessage = (props: ChatMessageProps): JSX.Element => {
           }
         >
           <div
-            className={`px-4 py-2 rounded-md shadow-md ${
-              props.message.message.packet.from !== myId
+            className={`px-4 py-2 rounded-3xl shadow-md ${
+              props.message.message.packet.from !== myNodeInfo.myNodeNum
                 ? 'bg-gray-300'
                 : 'bg-green-200'
             }`}
@@ -58,11 +58,12 @@ export const ChatMessage = (props: ChatMessageProps): JSX.Element => {
             </div>
             <div className="flex justify-between text-gray-600">
               <span className="inline-block">{props.message.message.data}</span>
-              {props.message.ack ? (
-                <CheckCircleIcon className="my-auto w-5 h-5" />
-              ) : (
-                <DotsCircleHorizontalIcon className="my-auto animate-pulse w-5 h-5" />
-              )}
+              {node?.num === myNodeInfo.myNodeNum &&
+                (props.message.ack ? (
+                  <CheckCircleIcon className="my-auto w-5 h-5" />
+                ) : (
+                  <DotsCircleHorizontalIcon className="my-auto animate-pulse w-5 h-5" />
+                ))}
             </div>
           </div>
         </React.Suspense>

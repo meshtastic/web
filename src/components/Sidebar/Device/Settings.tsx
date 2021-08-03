@@ -23,7 +23,7 @@ export const Settings = (): JSX.Element => {
     <form onSubmit={onSubmit}>
       <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
         <div className="my-auto">{t('strings.device_region')}</div>
-        <div className="flex shadow-md rounded-md ml-2">
+        <div className="flex shadow-md rounded-3xl ml-2">
           <select
             {...register('region', {
               valueAsNumber: true,
@@ -61,13 +61,13 @@ export const Settings = (): JSX.Element => {
       </div>
       <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
         <div className="my-auto">{t('strings.wifi_ssid')}</div>
-        <div className="flex shadow-md rounded-md ml-2">
+        <div className="flex shadow-md rounded-3xl ml-2">
           <input {...register('wifiSsid', {})} type="text" />
         </div>
       </div>
       <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">
         <div className="my-auto">{t('strings.wifi_psk')}</div>
-        <div className="flex shadow-md rounded-md ml-2">
+        <div className="flex shadow-md rounded-3xl ml-2">
           <input {...register('wifiPassword', {})} type="password" />
         </div>
       </div>

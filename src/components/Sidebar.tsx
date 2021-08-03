@@ -15,9 +15,16 @@ export const Sidebar = (): JSX.Element => {
     <AnimatePresence>
       {sidebarOpen && (
         <motion.div
-          className={`${
-            sidebarOpen ? 'flex' : 'hidden md:flex'
-          } flex-col rounded-md md:ml-0 shadow-md border w-full max-w-sm`}
+          initial={{
+            height: 0,
+          }}
+          animate={{
+            height: 'auto',
+          }}
+          exit={{
+            height: 0,
+          }}
+          className="flex flex-col rounded-3xl md:ml-0 shadow-md border w-full md:max-w-sm"
         >
           <Nodes />
           <Device />

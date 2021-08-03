@@ -1,7 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import type { RootState } from '../store';
-
 interface AppState {
   sidebarOpen: boolean;
   darkMode: boolean;
@@ -13,7 +11,7 @@ const initialState: AppState = {
 };
 
 export const appSlice = createSlice({
-  name: 'auth',
+  name: 'app',
   initialState,
   reducers: {
     openSidebar(state) {
@@ -29,6 +27,5 @@ export const appSlice = createSlice({
 });
 
 export const { openSidebar, closeSidebar, toggleSidebar } = appSlice.actions;
-export const selectOpenState = (state: RootState): boolean =>
-  state.app.sidebarOpen;
+
 export default appSlice.reducer;

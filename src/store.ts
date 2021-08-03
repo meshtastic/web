@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import appSlice from './slices/appSlice';
-import meshtasticSlice from './slices/meshtasticSlice';
+import appReducer from './slices/appSlice';
+import meshtasticReducer from './slices/meshtasticSlice';
 
 export const store = configureStore({
   reducer: {
-    app: appSlice,
-    meshtastic: meshtasticSlice,
+    app: appReducer,
+    meshtastic: meshtasticReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

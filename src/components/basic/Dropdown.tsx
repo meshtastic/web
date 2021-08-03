@@ -17,7 +17,7 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
     <Disclosure>
       {({ open }) => (
         <>
-          <Disclosure.Button className="bg-white flex w-full text-lg font-medium justify-between p-3 border-b hover:bg-gray-200 cursor-pointer">
+          <Disclosure.Button className="flex w-full text-lg font-medium justify-between p-3 border-b hover:bg-gray-200 cursor-pointer first:rounded-t-3xl last:rounded-b-3xl">
             <div className="flex">
               <motion.div
                 className="my-auto mr-2"
@@ -41,7 +41,6 @@ export const Dropdown = (props: DropdownProps): JSX.Element => {
             {open && (
               <Disclosure.Panel
                 as={motion.div}
-                static
                 initial={{
                   height: 0,
                 }}

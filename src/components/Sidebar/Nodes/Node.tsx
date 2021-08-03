@@ -20,7 +20,7 @@ export interface NodeProps {
 }
 
 export const Node = (props: NodeProps): JSX.Element => {
-  const myId = useAppSelector((state) => state.meshtastic.myId);
+  const myNodeInfo = useAppSelector((state) => state.meshtastic.myNodeInfo);
 
   return (
     <Disclosure>
@@ -34,7 +34,7 @@ export const Node = (props: NodeProps): JSX.Element => {
                 <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
               )}
               <div className="relative">
-                {props.node.num === myId ? (
+                {props.node.num === myNodeInfo.myNodeNum ? (
                   <FlagIcon className="absolute -right-1 -top-2 text-yellow-500 my-auto w-4 h-4" />
                 ) : null}
                 <Avatar
