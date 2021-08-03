@@ -1,25 +1,21 @@
-# New Project
+# Meshtastic.js
 
-> ✨ Bootstrapped with Create Snowpack App (CSA).
+[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/meshtastic/meshtastic-web)
 
-## Available Scripts
+## Overview
 
-### npm start
+Official [Meshtastic](https://meshtastic.org) web interface, that can be run independently or on a node
 
-Runs the app in the development mode.
-Open http://localhost:8080 to view it in the browser.
+## Development & Building
 
-The page will reload if you make edits.
-You will also see any lint errors in the console.
+Build the project:
 
-### npm run build
+```bash
+yarn build
+```
 
-Builds a static copy of your site to the `build/` folder.
-Your app is ready to be deployed!
+GZip the output:
 
-**For the best production performance:** Add a build bundler plugin like "@snowpack/plugin-webpack" to your `snowpack.config.js` config file.
-
-### npm test
-
-Launches the application test runner.
-Run with the `--watch` flag (`npm test -- --watch`) to run in interactive watch mode.
+```bash
+yarn package
+```

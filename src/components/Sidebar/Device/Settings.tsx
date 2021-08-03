@@ -1,35 +1,24 @@
 import React from 'react';
 
-import { useObservableSuspense } from 'observable-hooks';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { SaveIcon } from '@heroicons/react/outline';
-import type {
-  IBLEConnection,
-  IHTTPConnection,
-  ISerialConnection,
-} from '@meshtastic/meshtasticjs';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
-import { preferencesResource } from '../../../streams';
+import { connection } from '../../../connection';
+import { useAppSelector } from '../../../hooks/redux';
 
-interface SettingsProps {
-  connection: ISerialConnection | IHTTPConnection | IBLEConnection;
-}
-
-export const Settings = (props: SettingsProps): JSX.Element => {
+export const Settings = (): JSX.Element => {
   const { t } = useTranslation();
-  const preferences = useObservableSuspense(preferencesResource);
+  const preferences = useAppSelector((state) => state.meshtastic.preferences);
 
   const { register, handleSubmit } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: preferences,
     });
 
-  const onSubmit = handleSubmit((data) =>
-    props.connection.setPreferences(data),
-  );
+  const onSubmit = handleSubmit((data) => connection.setPreferences(data));
   return (
     <form onSubmit={onSubmit}>
       <div className="flex bg-gray-50 whitespace-nowrap p-3 justify-between border-b">

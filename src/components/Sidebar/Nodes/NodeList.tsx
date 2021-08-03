@@ -1,34 +1,10 @@
 import React from 'react';
 
-import { useObservableSuspense } from 'observable-hooks';
-
-import type { Types } from '@meshtastic/meshtasticjs';
-
-import { nodeResource } from '../../../streams';
+import { useAppSelector } from '../../../hooks/redux';
 import { Node } from './Node';
 
 export const NodeList = (): JSX.Element => {
-  const nodeSource = useObservableSuspense(nodeResource);
-
-  const [nodes, setNodes] = React.useState<Types.NodeInfoPacket[]>([]);
-
-  React.useEffect(() => {
-    if (
-      nodes.findIndex(
-        (currentNode) => currentNode.data.num === nodeSource.data.num,
-      ) >= 0
-    ) {
-      setNodes(
-        nodes.map((currentNode) =>
-          currentNode.data.num === nodeSource.data.num
-            ? nodeSource
-            : currentNode,
-        ),
-      );
-    } else {
-      setNodes((nodes) => [...nodes, nodeSource]);
-    }
-  }, [nodeSource, nodes]);
+  const nodes = useAppSelector((state) => state.meshtastic.nodes);
 
   return (
     <>

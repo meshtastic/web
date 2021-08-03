@@ -3,25 +3,17 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MenuIcon, PaperAirplaneIcon } from '@heroicons/react/outline';
-import type {
-  IBLEConnection,
-  IHTTPConnection,
-  ISerialConnection,
-} from '@meshtastic/meshtasticjs';
 
-import { useAppDispatch } from '../hooks/redux';
+import { connection } from '../connection';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { toggleSidebar } from '../slices/appSlice';
 
-export interface MessageBoxProps {
-  connection: ISerialConnection | IHTTPConnection | IBLEConnection;
-  isReady: boolean;
-}
-
-export const MessageBox = (props: MessageBoxProps): JSX.Element => {
+export const MessageBox = (): JSX.Element => {
+  const ready = useAppSelector((state) => state.meshtastic.ready);
   const [currentMessage, setCurrentMessage] = React.useState('');
   const sendMessage = () => {
-    if (props.isReady) {
-      props.connection.sendText(currentMessage, undefined, true);
+    if (ready) {
+      connection.sendText(currentMessage, undefined, true);
       setCurrentMessage('');
     }
   };
@@ -45,24 +37,24 @@ export const MessageBox = (props: MessageBoxProps): JSX.Element => {
           sendMessage();
         }}
       >
-        {props.isReady}
+        {ready}
         <input
           type="text"
           placeholder={`${t('placeholder.no_messages')}...`}
-          disabled={!props.isReady}
+          disabled={!ready}
           value={currentMessage}
           onChange={(e) => {
             setCurrentMessage(e.target.value);
           }}
           className={`p-3 placeholder-gray-400 text-gray-700 relative rounded-md border shadow-md focus:outline-none w-full pr-10 ${
-            props.isReady ? 'cursor-text' : 'cursor-not-allowed'
+            ready ? 'cursor-text' : 'cursor-not-allowed'
           }`}
         />
         <span className="flex z-10 h-full text-gray-400 absolute w-8 right-0">
           <PaperAirplaneIcon
             onClick={sendMessage}
             className={`text-xl hover:text-gray-500 h-6 w-6 my-auto ${
-              props.isReady ? 'cursor-pointer' : 'cursor-not-allowed'
+              ready ? 'cursor-pointer' : 'cursor-not-allowed'
             }`}
           />
         </span>

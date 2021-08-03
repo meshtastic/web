@@ -11,12 +11,12 @@ import {
   GlobeIcon,
   LightningBoltIcon,
 } from '@heroicons/react/outline';
-import type { Types } from '@meshtastic/meshtasticjs';
+import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { useAppSelector } from '../../../hooks/redux';
 
 export interface NodeProps {
-  node: Types.NodeInfoPacket;
+  node: Protobuf.NodeInfo;
 }
 
 export const Node = (props: NodeProps): JSX.Element => {
@@ -34,12 +34,12 @@ export const Node = (props: NodeProps): JSX.Element => {
                 <ChevronRightIcon className="my-auto w-5 h-5 mr-2" />
               )}
               <div className="relative">
-                {props.node.data.num === myId ? (
+                {props.node.num === myId ? (
                   <FlagIcon className="absolute -right-1 -top-2 text-yellow-500 my-auto w-4 h-4" />
                 ) : null}
                 <Avatar
                   size={30}
-                  name={props.node.data.user?.longName ?? 'Unknown'}
+                  name={props.node.user?.longName ?? 'Unknown'}
                   variant="beam"
                   colors={[
                     '#213435',
@@ -50,25 +50,16 @@ export const Node = (props: NodeProps): JSX.Element => {
                   ]}
                 />
               </div>
-              {props.node.data.user?.longName}
+              {props.node.user?.longName}
             </div>
           </Disclosure.Button>
           <Disclosure.Panel>
             <div className="border-b bg-gray-100 px-2">
-              <p>
-                SNR:{' '}
-                {props.node.packet?.rxSnr ? props.node.packet.rxSnr : 'Unknown'}
-              </p>
-              <p>
-                RSSI:{' '}
-                {props.node.packet?.rxRssi
-                  ? props.node.packet.rxRssi
-                  : 'Unknown'}
-              </p>
+              <p>{props.node.snr}</p>
               <p>
                 {`Last heard: ${
-                  props.node.data?.lastHeard
-                    ? new Date(props.node.data.lastHeard).toLocaleString()
+                  props.node?.lastHeard
+                    ? new Date(props.node.lastHeard).toLocaleString()
                     : 'Unknown'
                 }`}{' '}
                 {}
@@ -76,23 +67,23 @@ export const Node = (props: NodeProps): JSX.Element => {
               <div className="flex">
                 <GlobeIcon className="my-auto mr-2 w-5 h-5" />
                 <p>
-                  {props.node.data.position?.latitudeI &&
-                  props.node.data.position?.longitudeI
-                    ? `${props.node.data.position.latitudeI / 1e7}, 
-                                ${props.node.data.position.longitudeI / 1e7}`
+                  {props.node.position?.latitudeI &&
+                  props.node.position?.longitudeI
+                    ? `${props.node.position.latitudeI / 1e7}, 
+                                ${props.node.position.longitudeI / 1e7}`
                     : 'Unknown'}
                   , El:
-                  {props.node.data.position?.altitude}
+                  {props.node.position?.altitude}
                 </p>
               </div>
 
               <div className="flex">
                 <ClockIcon className="my-auto mr-2 w-5 h-5" />
-                <p>{props.node.data.position?.time}</p>
+                <p>{props.node.position?.time}</p>
               </div>
               <div className="flex">
                 <LightningBoltIcon className="my-auto mr-2 w-5 h-5" />
-                <p>{props.node.data.position?.batteryLevel}</p>
+                <p>{props.node.position?.batteryLevel}</p>
               </div>
             </div>
           </Disclosure.Panel>

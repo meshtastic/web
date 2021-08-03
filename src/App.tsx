@@ -1,44 +1,29 @@
 import React from 'react';
 
-import type {
-  IBLEConnection,
-  ISerialConnection,
-} from '@meshtastic/meshtasticjs';
-import {
-  Client,
-  IHTTPConnection,
-  Protobuf,
-  SettingsManager,
-  Types,
-} from '@meshtastic/meshtasticjs';
+import { Protobuf, SettingsManager, Types } from '@meshtastic/meshtasticjs';
 
 import { Header } from './components/Header';
+import { connection } from './connection';
 import { useAppDispatch } from './hooks/redux';
 import { Main } from './Main';
-import { setMyId } from './slices/meshtasticSlice';
-import { channelSubject$, nodeSubject$, preferencesSubject$ } from './streams';
+import {
+  addChannel,
+  addNode,
+  setDeviceStatus,
+  setLastMeshInterraction,
+  setMyId,
+  setMyNodeInfo,
+  setPreferences,
+  setReady,
+} from './slices/meshtasticSlice';
 
 const App = (): JSX.Element => {
   const dispatch = useAppDispatch();
 
-  const [deviceStatus, setDeviceStatus] =
-    React.useState<Types.DeviceStatusEnum>(
-      Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
-    );
-  const [connection, setConnection] = React.useState<
-    ISerialConnection | IHTTPConnection | IBLEConnection
-  >(new IHTTPConnection());
-  const [isReady, setIsReady] = React.useState<boolean>(false);
-  const [lastMeshInterraction, setLastMeshInterraction] =
-    React.useState<number>(0);
-  const [darkmode, setDarkmode] = React.useState<boolean>(false);
-
   React.useEffect(() => {
-    const client = new Client();
-    const httpConnection = client.createHTTPConnection();
     SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
 
-    httpConnection.connect({
+    connection.connect({
       address:
         import.meta.env.NODE_ENV === 'production'
           ? window.location.hostname
@@ -47,77 +32,52 @@ const App = (): JSX.Element => {
       tls: false,
       fetchInterval: 2000,
     });
-    setConnection(httpConnection);
   }, []);
 
   React.useEffect(() => {
-    const deviceStatusEvent = connection.onDeviceStatusEvent.subscribe(
-      (status) => {
-        setDeviceStatus(status);
-        if (status === Types.DeviceStatusEnum.DEVICE_CONFIGURED) {
-          setIsReady(true);
-        }
-      },
-    );
-    // const myNodeInfoEvent = connection.onMyNodeInfoEvent.subscribe(setMyNodeInfo);
+    connection.onDeviceStatus.subscribe((status) => {
+      dispatch(setDeviceStatus(status));
 
-    const myNodeInfoEvent = connection.onMyNodeInfoEvent.subscribe(
-      (nodeInfo) => {
-        dispatch(setMyId(nodeInfo.myNodeNum));
-      },
-    );
+      if (status === Types.DeviceStatusEnum.DEVICE_CONFIGURED) {
+        dispatch(setReady(true));
+      }
+    });
 
-    const nodeInfoPacketEvent = connection.onNodeInfoPacketEvent.subscribe(
-      (node) => nodeSubject$.next(node),
+    connection.onMyNodeInfo.subscribe((nodeInfo) => {
+      dispatch(setMyNodeInfo(nodeInfo));
+      dispatch(setMyId(nodeInfo.myNodeNum));
+    });
+
+    connection.onNodeInfoPacket.subscribe((nodeInfoPacket) =>
+      dispatch(addNode(nodeInfoPacket.data)),
     );
 
-    const adminPacketEvent = connection.onAdminPacketEvent.subscribe(
-      (adminMessage) => {
-        switch (adminMessage.data.variant.oneofKind) {
-          case 'getChannelResponse':
-            channelSubject$.next(adminMessage.data.variant.getChannelResponse);
-            break;
-          case 'getRadioResponse':
-            if (adminMessage.data.variant.getRadioResponse.preferences) {
-              preferencesSubject$.next(
-                adminMessage.data.variant.getRadioResponse.preferences,
-              );
-            }
-            break;
-          default:
-            break;
-        }
-      },
-    );
+    connection.onAdminPacket.subscribe((adminPacket) => {
+      switch (adminPacket.data.variant.oneofKind) {
+        case 'getChannelResponse':
+          dispatch(addChannel(adminPacket.data.variant.getChannelResponse));
+          break;
+        case 'getRadioResponse':
+          if (adminPacket.data.variant.getRadioResponse.preferences) {
+            dispatch(
+              setPreferences(
+                adminPacket.data.variant.getRadioResponse.preferences,
+              ),
+            );
+          }
+          break;
+      }
+    });
 
-    const meshHeartbeat = connection.onMeshHeartbeat.subscribe(
-      setLastMeshInterraction,
+    connection.onMeshHeartbeat.subscribe((date) =>
+      dispatch(setLastMeshInterraction(date.getTime())),
     );
-
-    return () => {
-      deviceStatusEvent?.unsubscribe();
-      myNodeInfoEvent?.unsubscribe();
-      nodeInfoPacketEvent?.unsubscribe();
-      adminPacketEvent?.unsubscribe();
-      meshHeartbeat?.unsubscribe();
-      connection.disconnect();
-    };
-  }, [connection]);
+  }, [dispatch]);
 
   return (
     <div className="flex flex-col h-screen w-screen">
-      <Header
-        status={deviceStatus}
-        IsReady={isReady}
-        LastMeshInterraction={lastMeshInterraction}
-        connection={connection}
-      />
-      <Main
-        isReady={isReady}
-        connection={connection}
-        darkmode={darkmode}
-        setDarkmode={setDarkmode}
-      />
+      <Header />
+      <Main />
     </div>
   );
 };

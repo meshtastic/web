@@ -8,6 +8,10 @@ export const store = configureStore({
     app: appSlice,
     meshtastic: meshtasticSlice,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

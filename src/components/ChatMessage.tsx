@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import Avatar from 'boring-avatars';
-import { useObservableSuspense } from 'observable-hooks';
 
 import {
   CheckCircleIcon,
@@ -10,47 +9,24 @@ import {
 import type { Types } from '@meshtastic/meshtasticjs';
 
 import { useAppSelector } from '../hooks/redux';
-import { nodeResource } from '../streams';
 
 interface ChatMessageProps {
   message: { message: Types.TextPacket; ack: boolean };
 }
 
 export const ChatMessage = (props: ChatMessageProps): JSX.Element => {
-  const nodeSource = useObservableSuspense(nodeResource);
   const myId = useAppSelector((state) => state.meshtastic.myId);
+  const nodes = useAppSelector((state) => state.meshtastic.nodes);
 
-  const [nodes, setNodes] = React.useState<Types.NodeInfoPacket[]>([]);
+  const node = nodes.find((node) => {
+    node.num === props.message.message.packet.from;
+  });
 
-  React.useEffect(() => {
-    if (
-      nodes.findIndex(
-        (currentNode) => currentNode.data.num === nodeSource.data.num,
-      ) >= 0
-    ) {
-      setNodes(
-        nodes.map((currentNode) =>
-          currentNode.data.num === nodeSource.data.num
-            ? nodeSource
-            : currentNode,
-        ),
-      );
-    } else {
-      setNodes((nodes) => [...nodes, nodeSource]);
-    }
-  }, [nodeSource, nodes]);
-  const [node, setNode] = useState<Types.NodeInfoPacket>();
-
-  React.useEffect(() => {
-    setNode(
-      nodes.find((node) => node.data.num === props.message.message.packet.from),
-    );
-  }, [nodes, props.message]);
   return (
     <div className="flex items-end">
       <Avatar
         size={40}
-        name={node?.data.user?.longName ?? 'UNK'}
+        name={node?.user?.longName ?? 'UNK'}
         variant="beam"
         colors={['#213435', '#46685B', '#648A64', '#A6B985', '#E1E3AC']}
       />
@@ -70,9 +46,7 @@ export const ChatMessage = (props: ChatMessageProps): JSX.Element => {
             }`}
           >
             <div className="flex text-xs text-gray-500 space-x-1">
-              <div className="font-medium">
-                {node?.data.user?.longName ?? 'UNK'}
-              </div>
+              <div className="font-medium">{node?.user?.longName ?? 'UNK'}</div>
               <p>-</p>
               <div className="underline">
                 {new Date(
