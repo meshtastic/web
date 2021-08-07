@@ -42,7 +42,7 @@ export const Settings = (): JSX.Element => {
             name={t('strings.wifi_psk')}
             value={radioConfig.wifiPassword}
             onChange={(event) => {}}
-            type="text"
+            type="password"
             valid={true}
           />
         </div>
