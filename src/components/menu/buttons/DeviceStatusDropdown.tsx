@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Types } from '@meshtastic/meshtasticjs';
+import { SwitchVerticalIcon } from '@heroicons/react/outline';
 
 import { useAppSelector } from '../../../hooks/redux';
 import { Button } from '../../generic/Button';
@@ -11,7 +11,8 @@ export const DeviceStatusDropdown = (): JSX.Element => {
 
   return (
     <Button>
-      <div
+      <SwitchVerticalIcon className={`h-6 w-6 ${!ready && 'animate-pulse'}`} />
+      {/* <div
         className={`flex w-6 h-6 rounded-full animate-pulse shadow-md ${
           deviceStatus <= Types.DeviceStatusEnum.DEVICE_DISCONNECTED
             ? 'bg-red-400 animate-pulse'
@@ -22,7 +23,7 @@ export const DeviceStatusDropdown = (): JSX.Element => {
             ? 'bg-green-400'
             : 'bg-gray-400'
         }`}
-      ></div>
+      ></div> */}
     </Button>
   );
 };
