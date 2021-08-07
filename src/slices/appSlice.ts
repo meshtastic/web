@@ -1,31 +1,44 @@
+import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
+export type currentPageName = 'messages' | 'settings';
+
 interface AppState {
-  sidebarOpen: boolean;
+  mobileNavOpen: boolean;
   darkMode: boolean;
+  currentPage: currentPageName;
 }
 
 const initialState: AppState = {
-  sidebarOpen: true,
+  mobileNavOpen: false,
   darkMode: false,
+  currentPage: 'messages',
 };
 
 export const appSlice = createSlice({
   name: 'app',
   initialState,
   reducers: {
-    openSidebar(state) {
-      state.sidebarOpen = true;
+    openMobileNav(state) {
+      state.mobileNavOpen = true;
     },
-    closeSidebar(state) {
-      state.sidebarOpen = false;
+    closeMobileNav(state) {
+      state.mobileNavOpen = false;
     },
-    toggleSidebar(state) {
-      state.sidebarOpen = !state.sidebarOpen;
+    setDarkModeEnabled(state, action: PayloadAction<boolean>) {
+      state.darkMode = action.payload;
+    },
+    setCurrentPage(state, action: PayloadAction<currentPageName>) {
+      state.currentPage = action.payload;
     },
   },
 });
 
-export const { openSidebar, closeSidebar, toggleSidebar } = appSlice.actions;
+export const {
+  openMobileNav,
+  closeMobileNav,
+  setDarkModeEnabled,
+  setCurrentPage,
+} = appSlice.actions;
 
 export default appSlice.reducer;

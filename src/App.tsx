@@ -1,13 +1,25 @@
 import React from 'react';
 
-import { HomeIcon, MenuIcon, MoonIcon } from '@heroicons/react/outline';
 import { Protobuf, SettingsManager, Types } from '@meshtastic/meshtasticjs';
 
-import { NavItem } from './components/nav/NavItem';
+import { DeviceStatusDropdown } from './components/menu/buttons/DeviceStatusDropdown';
+import { LanguageDropdown } from './components/menu/buttons/LanguageDropdown';
+import { MobileNavToggle } from './components/menu/buttons/MobileNavToggle';
+import { ThemeToggle } from './components/menu/buttons/ThemeToggle';
+import { Logo } from './components/menu/Logo';
+import { MobileNav } from './components/menu/MobileNav';
+import { Navigation } from './components/menu/Navigation';
 import { connection } from './connection';
-import { useAppDispatch } from './hooks/redux';
+import { useAppDispatch, useAppSelector } from './hooks/redux';
+import { About } from './pages/About';
+import { Messages } from './pages/Messages';
+import { Nodes } from './pages/Nodes';
+import { Settings } from './pages/Settings';
+import { useRoute } from './router';
 import {
+  ackMessage,
   addChannel,
+  addMessage,
   addNode,
   setDeviceStatus,
   setLastMeshInterraction,
@@ -18,6 +30,10 @@ import {
 
 const App = (): JSX.Element => {
   const dispatch = useAppDispatch();
+  const route = useRoute();
+
+  const myNodeInfo = useAppSelector((state) => state.meshtastic.myNodeInfo);
+  const darkMode = useAppSelector((state) => state.app.darkMode);
 
   React.useEffect(() => {
     SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
@@ -70,77 +86,67 @@ const App = (): JSX.Element => {
     connection.onMeshHeartbeat.subscribe((date) =>
       dispatch(setLastMeshInterraction(date.getTime())),
     );
-  }, [dispatch]);
+
+    connection.onTextPacket.subscribe((message) => {
+      console.log(message.packet.from, '===', myNodeInfo.myNodeNum);
+
+      dispatch(
+        addMessage({
+          message: message,
+          ack: message.packet.from !== myNodeInfo.myNodeNum,
+          isSender: message.packet.from === myNodeInfo.myNodeNum,
+          received: new Date(message.packet.rxTime),
+        }),
+      );
+    });
+
+    connection.onRoutingPacket.subscribe((routingPacket) => {
+      if (routingPacket.packet.payloadVariant.oneofKind === 'decoded') {
+        dispatch(
+          ackMessage(routingPacket.packet.payloadVariant.decoded.requestId),
+        );
+      }
+    });
+
+    return () => {
+      connection.onDeviceStatus.cancelAll();
+      connection.onMyNodeInfo.cancelAll();
+      connection.onNodeInfoPacket.cancelAll();
+      connection.onAdminPacket.cancelAll();
+      connection.onMeshHeartbeat.cancelAll();
+      connection.onTextPacket.cancelAll();
+      connection.onRoutingPacket.cancelAll();
+    };
+  }, [dispatch, myNodeInfo.myNodeNum]);
 
   return (
-    // <div className="flex flex-col h-screen w-screen">
-    //   <Header />
-    //   <Main />
-    // </div>
-    <div className="h-screen flex flex-col flex-auto items-center w-full min-w-0 bg-gray-200 ">
-      <div className="relative flex justify-center w-full overflow-hidden z-50 bg-primary">
-        <div className="max-w-360 w-full sm:py-3 sm:m-8 sm:mb-0 md:mt-12 md:mx-8 md:pt-4 md:pb-3 sm:rounded-t-xl border-b sm:shadow-2xl overflow-hidden bg-white">
-          <div className="relative flex flex-auto flex-0 items-center h-16 px-4 md:px-6">
-            {/* NORMAL NAV ICON */}
-            <div className="hidden md:flex items-center mx-2">
-              <img
-                className="w-16 dark:hidden"
-                src="Mesh_Logo_Black.svg"
-                alt="Logo image"
-              />
-              <img
-                className="hidden dark:flexw-16"
-                src="Mesh_Logo_White.svg"
-                alt="Logo image"
-              />
+    <div className={`h-screen w-screen  ${darkMode ? 'dark' : ''}`}>
+      <div className="flex flex-col h-full w-full bg-gray-200 dark:bg-primaryDark">
+        <div className="flex flex-shrink-0 w-full overflow-hidden bg-primary dark:bg-primary">
+          <div className="w-full sm:py-3 sm:m-8 sm:mb-0 md:mt-12 md:mx-8 md:pt-4 md:pb-3 sm:rounded-t-xl border-b dark:border-gray-600 sm:shadow-md overflow-hidden bg-white dark:bg-primaryDark">
+            <div className="flex items-center justify-between h-16 px-4 md:px-6">
+              <Logo />
+              <MobileNavToggle />
+              <div className="flex items-center space-x-2">
+                <DeviceStatusDropdown />
+                <LanguageDropdown />
+                <ThemeToggle />
+              </div>
             </div>
-            {/* END NORMAL NAV ICON */}
-            {/* MOBILE NAV BUTTON */}
-            <button className="md:hidden w-10 h-10 rounded-full hover:bg-gray-200 hover:shadow-inner text-gray-500">
-              <span className="flex justify-center ">
-                <MenuIcon className="h-6 w-6" />
-              </span>
-            </button>
-            {/* END MOBILE NAV BUTTON */}
-            <div className="flex items-center pl-2 ml-auto space-x-1 sm:space-x-2">
-              {/* HEADER BUTTON */}
-              <button className="w-10 h-10 rounded-full hover:bg-gray-200 hover:shadow-inner">
-                <span className="flex justify-center ">
-                  <span className="w-6 shadow rounded-sm">
-                    <img
-                      className="w-full"
-                      src="assets/images/flags/US.svg"
-                      alt="Flag image for en"
-                    />
-                  </span>
-                </span>
-              </button>
-              {/* END HEADER BUTTON */}
-              {/* THEME BUTTON */}
-              <button className="w-10 h-10 rounded-full hover:bg-gray-200 hover:shadow-inner text-gray-500">
-                <span className="flex justify-center ">
-                  <MoonIcon className="h-6 w-6" />
-                </span>
-              </button>
-              {/* END THEME BUTTON */}
-            </div>
-          </div>
-          <div className="hidden md:flex flex-auto flex-0 relative items-center h-16 px-4 ">
-            <div className="flex items-center">
-              {/* NAV ITEM */}
-              <NavItem
-                icon={<HomeIcon className="h-6 w-6 mr-3 text-gray-500" />}
-                text={'Dashboard'}
-              />
-              {/* END NAV ITEM */}
-            </div>
+            <Navigation />
           </div>
         </div>
-      </div>
 
-      <div className="flex flex-auto justify-center w-full sm:px-8 sm:mb-8">
-        <div className="flex flex-col flex-auto w-full sm:max-w-360 sm:shadow-xl sm:overflow-hidden bg-gray-100 sm:rounded-b-xl">
-          <div className="flex flex-col flex-auto min-w-0 ">content</div>
+        <MobileNav />
+
+        <div className="flex flex-grow min-h-0 w-full sm:px-8 sm:mb-8">
+          <div className="flex w-full sm:shadow-xl sm:overflow-hidden bg-gray-100  dark:bg-secondaryDark sm:rounded-b-xl">
+            {route.name === 'messages' && <Messages />}
+            {route.name === 'nodes' && <Nodes />}
+            {route.name === 'settings' && <Settings />}
+            {route.name === 'about' && <About />}
+            {route.name === false && 'Not Found'}
+          </div>
         </div>
       </div>
     </div>
