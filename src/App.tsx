@@ -131,7 +131,10 @@ const App = (): JSX.Element => {
         <div className="flex flex-shrink-0 w-full overflow-hidden bg-primary dark:bg-primary">
           <div className="w-full sm:py-3 sm:m-8 sm:mb-0 md:mt-12 md:mx-8 md:pt-4 md:pb-3 sm:rounded-t-xl border-b dark:border-gray-600 sm:shadow-md overflow-hidden bg-white dark:bg-primaryDark">
             <div className="flex items-center justify-between h-16 px-4 md:px-6">
-              <Logo />
+              <div className="hidden md:flex">
+                <Logo />
+              </div>
+
               <MobileNavToggle />
               <div className="flex items-center space-x-2">
                 <DeviceStatusDropdown />

@@ -19,14 +19,14 @@ export const Drawer = ({
           onClick={onClose}
         >
           <div
-            className="absolute inset-0 bg-black opacity-50"
+            className="absolute inset-0 backdrop-filter backdrop-blur"
             tabIndex={0}
           ></div>
         </div>
       )}
 
       <aside
-        className={`transform top-0 left-0 w-64 bg-white dark:bg-secondaryDark fixed h-full overflow-auto ease-in-out transition-all duration-300 z-30 ${
+        className={`transform top-0 left-0 w-64 bg-white dark:bg-secondaryDark shadow-md border-r dark:border-gray-600 fixed h-full overflow-auto ease-in-out transition-all duration-300 z-30 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

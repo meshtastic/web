@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { routes } from '../../router';
 import { closeMobileNav } from '../../slices/appSlice';
 import { Drawer } from '../generic/Drawer';
+import { Logo } from './Logo';
 import { MenuButton } from './MenuButton';
 
 export const MobileNav = (): JSX.Element => {
@@ -25,7 +26,10 @@ export const MobileNav = (): JSX.Element => {
         dispatch(closeMobileNav());
       }}
     >
-      <div>
+      <div className="flex flex-col">
+        <div className="m-auto my-6">
+          <Logo />
+        </div>
         <MenuButton
           icon={<AnnotationIcon />}
           text={'Messages'}
