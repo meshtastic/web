@@ -34,20 +34,25 @@ const App = (): JSX.Element => {
 
   const myNodeInfo = useAppSelector((state) => state.meshtastic.myNodeInfo);
   const darkMode = useAppSelector((state) => state.app.darkMode);
+  const hostOverrideEnabled = useAppSelector(
+    (state) => state.meshtastic.hostOverrideEnabled,
+  );
+  const hostOverride = useAppSelector((state) => state.meshtastic.hostOverride);
 
   React.useEffect(() => {
     SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
 
     connection.connect({
-      address:
-        import.meta.env.NODE_ENV === 'production'
-          ? window.location.hostname
-          : import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP,
+      address: hostOverrideEnabled
+        ? hostOverride
+        : import.meta.env.NODE_ENV === 'production'
+        ? window.location.hostname
+        : import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP,
       receiveBatchRequests: false,
       tls: false,
       fetchInterval: 2000,
     });
-  }, []);
+  }, [hostOverrideEnabled, hostOverride]);
 
   React.useEffect(() => {
     connection.onDeviceStatus.subscribe((status) => {
@@ -55,6 +60,9 @@ const App = (): JSX.Element => {
 
       if (status === Types.DeviceStatusEnum.DEVICE_CONFIGURED) {
         dispatch(setReady(true));
+      }
+      if (status === Types.DeviceStatusEnum.DEVICE_DISCONNECTED) {
+        dispatch(setReady(false));
       }
     });
 
@@ -88,8 +96,6 @@ const App = (): JSX.Element => {
     );
 
     connection.onTextPacket.subscribe((message) => {
-      console.log(message.packet.from, '===', myNodeInfo.myNodeNum);
-
       dispatch(
         addMessage({
           message: message,

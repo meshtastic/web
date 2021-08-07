@@ -2,6 +2,8 @@ import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
+import { connection } from '../connection';
+
 export interface MessageWithAck {
   message: Types.TextPacket;
   ack: boolean;
@@ -19,6 +21,8 @@ interface AppState {
   channels: Protobuf.Channel[];
   preferences: Protobuf.RadioConfig_UserPreferences;
   messages: MessageWithAck[];
+  hostOverrideEnabled: boolean;
+  hostOverride: string;
 }
 
 const initialState: AppState = {
@@ -31,6 +35,9 @@ const initialState: AppState = {
   channels: [],
   preferences: Protobuf.RadioConfig_UserPreferences.create(),
   messages: [],
+  hostOverrideEnabled:
+    localStorage.getItem('hostOverrideEnabled') === 'true' ?? false,
+  hostOverride: localStorage.getItem('hostOverride') ?? '',
 };
 
 export const meshtasticSlice = createSlice({
@@ -95,6 +102,20 @@ export const meshtasticSlice = createSlice({
         }
       });
     },
+    setHostOverrideEnabled: (state, action: PayloadAction<boolean>) => {
+      state.hostOverrideEnabled = action.payload;
+      localStorage.setItem('hostOverrideEnabled', String(action.payload));
+      if (state.hostOverrideEnabled !== action.payload) {
+        connection.disconnect();
+      }
+    },
+    setHostOverride: (state, action: PayloadAction<string>) => {
+      state.hostOverride = action.payload;
+      localStorage.setItem('hostOverride', action.payload);
+      if (state.hostOverride !== action.payload) {
+        connection.disconnect();
+      }
+    },
   },
 });
 
@@ -109,6 +130,8 @@ export const {
   setPreferences,
   addMessage,
   ackMessage,
+  setHostOverrideEnabled,
+  setHostOverride,
 } = meshtasticSlice.actions;
 
 export default meshtasticSlice.reducer;

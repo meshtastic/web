@@ -11,7 +11,7 @@ interface AppState {
 
 const initialState: AppState = {
   mobileNavOpen: false,
-  darkMode: false,
+  darkMode: localStorage.getItem('darkMode') === 'true' ?? false,
   currentPage: 'messages',
 };
 
@@ -26,6 +26,7 @@ export const appSlice = createSlice({
       state.mobileNavOpen = false;
     },
     setDarkModeEnabled(state, action: PayloadAction<boolean>) {
+      localStorage.setItem('darkMode', String(action.payload));
       state.darkMode = action.payload;
     },
     setCurrentPage(state, action: PayloadAction<currentPageName>) {

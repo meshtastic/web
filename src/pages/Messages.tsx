@@ -6,6 +6,7 @@ import { useAppSelector } from '../hooks/redux';
 
 export const Messages = (): JSX.Element => {
   const messages = useAppSelector((state) => state.meshtastic.messages);
+  const nodes = useAppSelector((state) => state.meshtastic.nodes);
 
   return (
     <div className="flex flex-col w-full">
@@ -17,6 +18,10 @@ export const Messages = (): JSX.Element => {
             message={message.message.data}
             ack={message.ack}
             rxTime={new Date()}
+            senderName={
+              nodes.find((node) => node.num === message.message.packet.from)
+                ?.user?.longName ?? 'UNK'
+            }
           />
         ))}
       </div>

@@ -8,6 +8,8 @@ export interface InputProps {
   type: string;
   name: string;
   value?: string;
+  disabled?: boolean;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const Input = ({
@@ -18,6 +20,8 @@ export const Input = ({
   type,
   name,
   value,
+  disabled,
+  onChange,
 }: InputProps): JSX.Element => {
   return (
     <div className="space-y-1">
@@ -40,10 +44,12 @@ export const Input = ({
           name={name}
           id={name}
           value={value}
+          onChange={onChange}
           className={`block w-full h-11 rounded-md border shadow-sm focus:outline-none focus:border-primary dark:focus:border-primary dark:bg-secondaryDark dark:border-gray-600 dark:text-white ${
             icon ? 'pl-9' : 'pl-2'
           }`}
           placeholder={placeholder}
+          disabled={disabled}
         />
       </div>
       {!valid && (
