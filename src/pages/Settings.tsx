@@ -34,12 +34,14 @@ export const Settings = (): JSX.Element => {
           <Input
             name={t('strings.wifi_ssid')}
             value={radioConfig.wifiSsid}
+            onChange={(event) => {}}
             type="text"
             valid={true}
           />
           <Input
             name={t('strings.wifi_psk')}
             value={radioConfig.wifiPassword}
+            onChange={(event) => {}}
             type="text"
             valid={true}
           />

@@ -24,7 +24,7 @@ export const Message = ({
       <div className={`shadow-md rounded-full mt-auto ${!isSender && 'ml-2'}`}>
         <Avatar
           size={30}
-          name={'UNK'}
+          name={senderName ?? 'UNK'}
           variant="beam"
           colors={['#213435', '#46685B', '#648A64', '#A6B985', '#E1E3AC']}
         />
@@ -42,7 +42,10 @@ export const Message = ({
         <div className="text-xs text-gray-600">{senderName}</div>
       </div>
       <div className="mt-auto mb-4 text-xs font-medium text-secondary mr-3 dark:text-gray-200">
-        {rxTime.getHours()}:{rxTime.getMinutes()}
+        {rxTime.toLocaleTimeString(undefined, {
+          hour: '2-digit',
+          minute: '2-digit',
+        })}
       </div>
     </div>
   );
