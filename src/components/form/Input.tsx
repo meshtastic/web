@@ -1,35 +1,32 @@
 import React from 'react';
 
+type DefaultInputProps = JSX.IntrinsicElements['input'];
+
 export interface InputProps {
   valid?: boolean;
-  placeholder?: string;
   validationMessage?: string;
   icon?: JSX.Element;
-  type: string;
-  name: string;
-  value?: string;
-  disabled?: boolean;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  label: string;
 }
 
-export const Input = ({
-  valid,
-  placeholder,
-  validationMessage,
-  icon,
-  type,
-  name,
-  value,
-  disabled,
-  onChange,
-}: InputProps): JSX.Element => {
+export const Input = React.forwardRef<
+  HTMLInputElement,
+  InputProps & DefaultInputProps
+>(function Input(
+  {
+    valid,
+    validationMessage,
+    icon,
+    label,
+    id,
+    ...props
+  }: InputProps & DefaultInputProps,
+  ref,
+) {
   return (
     <div className="space-y-1">
-      <label
-        htmlFor={name}
-        className="block text-sm font-medium dark:text-white"
-      >
-        {name}
+      <label htmlFor={id} className="block text-sm font-medium dark:text-white">
+        {label}
       </label>
       <div className="relative">
         {icon && (
@@ -40,16 +37,11 @@ export const Input = ({
           </div>
         )}
         <input
-          type={type}
-          name={name}
-          id={name}
-          value={value}
-          onChange={onChange}
+          ref={ref}
+          {...props}
           className={`block w-full h-11 rounded-md border shadow-sm focus:outline-none focus:border-primary dark:focus:border-primary dark:bg-secondaryDark dark:border-gray-600 dark:text-white ${
             icon ? 'pl-9' : 'pl-2'
           }`}
-          placeholder={placeholder}
-          disabled={disabled}
         />
       </div>
       {!valid && (
@@ -57,4 +49,4 @@ export const Input = ({
       )}
     </div>
   );
-};
+});

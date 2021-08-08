@@ -1,26 +1,33 @@
 import React from 'react';
 
-import { Switch } from '@headlessui/react';
+type DefaultInputProps = JSX.IntrinsicElements['input'];
 
 export interface ToggleProps {
-  enabled: boolean;
-  setEnabled: (state: boolean) => void;
+  label: string;
 }
 
-export const Toggle = ({ enabled, setEnabled }: ToggleProps): JSX.Element => {
+export const Toggle = React.forwardRef<
+  HTMLInputElement,
+  ToggleProps & DefaultInputProps
+>(function Input(
+  { label, id, checked, ...props }: ToggleProps & DefaultInputProps,
+  ref,
+) {
   return (
-    <Switch
-      checked={enabled}
-      onChange={setEnabled}
-      className={`${enabled ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-700'}
-          relative inline-flex flex-shrink-0 h-[38px] w-[74px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
-    >
-      <span className="sr-only">Use setting</span>
-      <span
-        aria-hidden="true"
-        className={`${enabled ? 'translate-x-9' : 'translate-x-0'}
-            pointer-events-none inline-block h-[34px] w-[34px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200`}
-      />
-    </Switch>
+    <div className="flex flex-col">
+      <span className="block text-sm font-medium dark:text-white">{label}</span>
+      <div className="relative w-14 mr-2 ml-auto select-none">
+        <input
+          ref={ref}
+          {...props}
+          type="checkbox"
+          className="peer checked:right-0 absolute w-7 h-7 rounded-full bg-white appearance-none cursor-pointer"
+        />
+        <label
+          htmlFor={id}
+          className="block overflow-hidden h-7 rounded-full peer-checked:bg-primary shadow-sm bg-gray-300 dark:bg-gray-700 cursor-pointer"
+        ></label>
+      </div>
+    </div>
   );
-};
+});
