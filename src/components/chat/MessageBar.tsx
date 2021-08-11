@@ -8,9 +8,9 @@ import {
   PaperClipIcon,
 } from '@heroicons/react/outline';
 
-import { connection } from '../../connection';
+import { connection } from '../../core/connection';
 import { useAppSelector } from '../../hooks/redux';
-import { Button } from '../generic/Button';
+import { IconButton } from '../generic/IconButton';
 
 export const MessageBar = (): JSX.Element => {
   const ready = useAppSelector((state) => state.meshtastic.ready);
@@ -25,13 +25,13 @@ export const MessageBar = (): JSX.Element => {
   return (
     <div className="flex p-4 bg-gray-50 dark:bg-transparent space-x-2 text-gray-500 dark:text-gray-400">
       <div className="flex">
-        <Button>
+        <IconButton>
           <EmojiHappyIcon className="w-6 h-6" />
-        </Button>
+        </IconButton>
 
-        <Button>
+        <IconButton>
           <PaperClipIcon className="w-6 h-6" />
-        </Button>
+        </IconButton>
       </div>
       <form
         className="flex w-full space-x-2"
@@ -51,9 +51,9 @@ export const MessageBar = (): JSX.Element => {
           }}
           className="focus:outline-none h-10 w-full resize-none rounded-full border border-gray-300 dark:bg-gray-900 px-4"
         />
-        <Button type="submit">
+        <IconButton type="submit">
           <PaperAirplaneIcon className="w-6 h-6 rotate-90" />
-        </Button>
+        </IconButton>
       </form>
     </div>
   );

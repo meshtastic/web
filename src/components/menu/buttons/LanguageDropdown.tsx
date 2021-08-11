@@ -4,9 +4,9 @@ import { Jp, Pt, Us } from 'react-flags-select';
 
 import { Menu } from '@headlessui/react';
 
+import i18n from '../../../core/translation';
 import { useAppDispatch } from '../../../hooks/redux';
-import i18n from '../../../translation';
-import { Button } from '../../generic/Button';
+import { IconButton } from '../../generic/IconButton';
 
 export const LanguageDropdown = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -32,11 +32,11 @@ export const LanguageDropdown = (): JSX.Element => {
   return (
     <Menu as="div" className="w-10 h-10">
       <div className="absolute">
-        <Button>
+        <IconButton>
           <Menu.Button as="div">
             <Us className="w-6 shadow rounded-sm" />
           </Menu.Button>
-        </Button>
+        </IconButton>
 
         <Menu.Items className="z-20 absolute right-0 bg-white dark:bg-secondaryDark border dark:border-gray-600 divide-y divide-gray-200 dark:divide-gray-600 rounded-md shadow-md focus:outline-none">
           {languages.map((language, index) => (

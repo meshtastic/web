@@ -27,11 +27,7 @@ export const PrimaryTemplate = ({
           </div>
         </div>
       </div>
-      <div className="flex-auto p-6 sm:p-10 ">
-        <div className="max-w-3xl">
-          <div className="max-w-3xl">{children}</div>
-        </div>
-      </div>
+      <div className="flex-auto p-6 sm:p-10 ">{children}</div>
     </div>
   );
 };

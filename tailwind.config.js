@@ -4,8 +4,7 @@ module.exports = {
   darkMode: 'class', // or 'media' or 'class'
   theme: {
     fontFamily: {
-      sans: 'Inter var',
-      mono: 'IBM Plex Mono',
+      sans: 'Roboto',
     },
     extend: {
       colors: {

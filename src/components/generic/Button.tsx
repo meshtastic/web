@@ -1,31 +1,28 @@
 import React from 'react';
 
-export interface ButtonProps {
-  children: React.ReactNode;
-  className?: string;
-  clickAction?: () => void;
-  type?: 'button' | 'submit' | 'reset' | undefined;
+import MaterialButton from '@material-ui/core/Button';
+import type { ButtonProps as MaterialButtonProps } from '@material-ui/core/Button/Button';
+
+interface LocalButtonProps {
+  text: string;
+  icon?: JSX.Element;
 }
 
-export const Button = ({
-  children,
-  className,
-  clickAction,
-  type,
-}: ButtonProps): JSX.Element => {
+export type ButtonProps = MaterialButtonProps & LocalButtonProps;
+
+export const Button = ({ text, icon, ...props }: ButtonProps): JSX.Element => {
   return (
-    <button
-      className={`w-10 h-10 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 active:bg-gray-300 dark:active:bg-gray-800 hover:shadow-inner text-gray-500 dark:text-gray-400 ${
-        className ?? ''
-      }`}
-      onClick={() => {
-        if (clickAction) {
-          clickAction();
-        }
-      }}
-      type={type}
+    <MaterialButton
+      {...props}
+      className="dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
     >
-      <span className="flex justify-center">{children}</span>
-    </button>
+      <div className="flex p-3">
+        {icon &&
+          React.cloneElement(icon, {
+            className: 'h-6 w-6 mr-3 text-gray-500 dark:text-gray-400',
+          })}
+        <span>{text}</span>
+      </div>
+    </MaterialButton>
   );
 };

@@ -5,7 +5,7 @@ import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { Message } from '../components/chat/Message';
 import { MessageBar } from '../components/chat/MessageBar';
-import { Button } from '../components/generic/Button';
+import { IconButton } from '../components/generic/IconButton';
 import { useAppSelector } from '../hooks/redux';
 
 export const Messages = (): JSX.Element => {
@@ -29,12 +29,12 @@ export const Messages = (): JSX.Element => {
           {channelName()}
         </div>
         <div className="flex">
-          <Button>
+          <IconButton>
             <MapIcon className="w-6 h-6" />
-          </Button>
-          <Button>
+          </IconButton>
+          <IconButton>
             <UsersIcon className="w-6 h-6" />
-          </Button>
+          </IconButton>
         </div>
       </div>
       <div className="flex flex-col p-6 sm:py-8 sm:px-10 border-b dark:border-gray-600 bg-white dark:bg-secondaryDark flex-grow overflow-y-auto space-y-2">
@@ -56,6 +56,6 @@ export const Messages = (): JSX.Element => {
     </div>
   );
 };
-<Button>
+<IconButton>
   <UsersIcon className="w-6 h-6" />
-</Button>;
+</IconButton>;

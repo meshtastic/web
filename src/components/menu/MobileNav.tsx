@@ -6,13 +6,13 @@ import {
   InformationCircleIcon,
   ViewGridIcon,
 } from '@heroicons/react/outline';
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer/SwipeableDrawer';
 
+import { routes } from '../../core/router';
+import { closeMobileNav, openMobileNav } from '../../core/slices/appSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { routes } from '../../router';
-import { closeMobileNav } from '../../slices/appSlice';
-import { Drawer } from '../generic/Drawer';
+import { Button } from '../generic/Button';
 import { Logo } from './Logo';
-import { MenuButton } from './MenuButton';
 
 export const MobileNav = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -20,49 +20,41 @@ export const MobileNav = (): JSX.Element => {
   const mobileNavOpen = useAppSelector((state) => state.app.mobileNavOpen);
 
   return (
-    <Drawer
+    <SwipeableDrawer
       open={mobileNavOpen}
+      anchor="left"
       onClose={() => {
         dispatch(closeMobileNav());
       }}
+      onOpen={() => {
+        dispatch(openMobileNav());
+      }}
     >
-      <div className="flex flex-col">
+      <div className="flex flex-col dark:bg-secondaryDark h-full">
         <div className="m-auto my-6">
           <Logo />
         </div>
-        <MenuButton
+        <Button
           icon={<AnnotationIcon />}
           text={'Messages'}
-          link={routes.messages().link}
-          clickAction={() => {
-            dispatch(closeMobileNav());
-          }}
+          {...routes.messages().link}
         />
-        <MenuButton
+        <Button
           icon={<ViewGridIcon />}
           text={'Nodes'}
-          link={routes.nodes().link}
-          clickAction={() => {
-            dispatch(closeMobileNav());
-          }}
+          {...routes.nodes().link}
         />
-        <MenuButton
+        <Button
           icon={<CogIcon />}
           text={'Settings'}
-          link={routes.settings().link}
-          clickAction={() => {
-            dispatch(closeMobileNav());
-          }}
+          {...routes.settings().link}
         />
-        <MenuButton
+        <Button
           icon={<InformationCircleIcon />}
           text={'About'}
-          link={routes.about().link}
-          clickAction={() => {
-            dispatch(closeMobileNav());
-          }}
+          {...routes.about().link}
         />
       </div>
-    </Drawer>
+    </SwipeableDrawer>
   );
 };

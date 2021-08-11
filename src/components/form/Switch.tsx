@@ -2,22 +2,18 @@ import React from 'react';
 
 import type { FieldValues, UseControllerProps } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import ReactSelect from 'react-select';
 
-interface SelectProps<T> extends UseControllerProps<T> {
+import MaterialSwitch from '@material-ui/core/Switch';
+
+interface SwitchProps<T> extends UseControllerProps<T> {
   label: string;
-  options: {
-    value: string;
-    label: string;
-  }[];
 }
 
-export const Select = <T extends FieldValues>({
+export const Switch = <T extends FieldValues>({
   name,
   control,
   label,
-  options,
-}: SelectProps<T>): JSX.Element => {
+}: SwitchProps<T>): JSX.Element => {
   return (
     <Controller
       name={name}
@@ -26,11 +22,17 @@ export const Select = <T extends FieldValues>({
         required: 'This is required',
       }}
       render={({ field: { onChange, value, name } }) => (
-        <div className="space-y-1">
+        <div className="flex flex-col">
           <span className="block text-sm font-medium dark:text-white">
             {label}
           </span>
-          <ReactSelect options={options} />
+          <div className="relative w-14 mr-2 ml-auto select-none">
+            <MaterialSwitch
+              id={name}
+              checked={value}
+              onChange={(ev) => onChange(ev.target.checked)}
+            />
+          </div>
         </div>
       )}
     />

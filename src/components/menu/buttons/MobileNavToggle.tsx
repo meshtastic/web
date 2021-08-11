@@ -2,21 +2,22 @@ import React from 'react';
 
 import { MenuIcon } from '@heroicons/react/outline';
 
+import { openMobileNav } from '../../../core/slices/appSlice';
 import { useAppDispatch } from '../../../hooks/redux';
-import { openMobileNav } from '../../../slices/appSlice';
-import { Button } from '../../generic/Button';
+import { IconButton } from '../../generic/IconButton';
 
 export const MobileNavToggle = (): JSX.Element => {
   const dispatch = useAppDispatch();
 
   return (
-    <Button
-      clickAction={() => {
-        dispatch(openMobileNav());
-      }}
-      className="md:hidden"
-    >
-      <MenuIcon className="h-6 w-6" />
-    </Button>
+    <div className="md:hidden">
+      <IconButton
+        onClick={() => {
+          dispatch(openMobileNav());
+        }}
+      >
+        <MenuIcon className="h-6 w-6" />
+      </IconButton>
+    </div>
   );
 };

@@ -3,14 +3,14 @@ import React from 'react';
 import { SwitchVerticalIcon } from '@heroicons/react/outline';
 
 import { useAppSelector } from '../../../hooks/redux';
-import { Button } from '../../generic/Button';
+import { IconButton } from '../../generic/IconButton';
 
 export const DeviceStatusDropdown = (): JSX.Element => {
   const ready = useAppSelector((state) => state.meshtastic.ready);
   const deviceStatus = useAppSelector((state) => state.meshtastic.deviceStatus);
 
   return (
-    <Button>
+    <IconButton>
       <SwitchVerticalIcon className={`h-6 w-6 ${!ready && 'animate-pulse'}`} />
       {/* <div
         className={`flex w-6 h-6 rounded-full animate-pulse shadow-md ${
@@ -24,6 +24,6 @@ export const DeviceStatusDropdown = (): JSX.Element => {
             : 'bg-gray-400'
         }`}
       ></div> */}
-    </Button>
+    </IconButton>
   );
 };

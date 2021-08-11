@@ -11,12 +11,15 @@
     "lint": "eslint 'src/**/*.{ts,tsx}'"
   },
   "dependencies": {
+    "@emotion/react": "^11.4.1",
+    "@emotion/styled": "^11.3.0",
     "@headlessui/react": "^1.3.0",
     "@heroicons/react": "^1.0.1",
+    "@material-ui/core": "^5.0.0-beta.3",
     "@meshtastic/meshtasticjs": "^0.6.16",
     "@reduxjs/toolkit": "^1.6.0",
+    "add": "^2.0.6",
     "boring-avatars": "^1.5.8",
-    "framer-motion": "^4.1.17",
     "i18next": "^20.3.5",
     "i18next-browser-languagedetector": "^6.1.2",
     "react": "^17.0.2",
@@ -25,7 +28,9 @@
     "react-hook-form": "^7.9.0",
     "react-i18next": "^11.11.4",
     "react-redux": "^7.2.4",
-    "type-route": "^0.6.0"
+    "react-select": "^5.0.0-beta.0",
+    "type-route": "^0.6.0",
+    "yarn": "^1.22.11"
   },
   "devDependencies": {
     "@snowpack/plugin-dotenv": "^2.0.5",
