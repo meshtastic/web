@@ -29,10 +29,21 @@ jobs:
       - run: yarn lint
       - run: yarn build
       - run: yarn package
+      - run: tree build/output
+      
+      # Create a zip file from the output folder
+      - name: Create output zip file
+        uses: papeloto/action-zip@v1
+        with:
+          files: build/output/
+          dest: output.zip
     
       # Upload Artifact
       - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          name: meshtastic-web
-          path: build/output
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          files: |
+            output.zip
