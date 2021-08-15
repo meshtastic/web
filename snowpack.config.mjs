@@ -16,6 +16,16 @@ export default {
       },
     ],
   ],
+  alias: {
+    // Type 1: Package Import Alias
+    // "lodash": "lodash-es",
+    // Type 2: Local Directory Import Alias (relative to cwd)
+    '@app': './src',
+    '@pages': './src/pages',
+    '@components': './src/components',
+    '@core': './src/core',
+    '@static': './src/static',
+  },
   routes: [
     /* Enable an SPA Fallback in development: */
     // {"match": "routes", "src": ".*", "dest": "/index.html"},

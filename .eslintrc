@@ -1,22 +1,3 @@
 {
-  "root": true,
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react-hooks/recommended",
-    "plugin:react/recommended",
-    "plugin:import/recommended",
-    "plugin:import/typescript",
-    "plugin:prettier/recommended"
-  ],
-  "rules": {
-    "@typescript-eslint/consistent-type-imports": "error"
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
-  }
+  "extends": ["@verypossible/eslint-config/react"]
 }

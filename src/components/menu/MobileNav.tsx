@@ -1,18 +1,11 @@
 import React from 'react';
 
-import {
-  AnnotationIcon,
-  CogIcon,
-  InformationCircleIcon,
-  ViewGridIcon,
-} from '@heroicons/react/outline';
-import SwipeableDrawer from '@material-ui/core/SwipeableDrawer/SwipeableDrawer';
+import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
+import { Drawer } from '@components/generic/Drawer';
+import { closeMobileNav } from '@core/slices/appSlice';
 
-import { routes } from '../../core/router';
-import { closeMobileNav, openMobileNav } from '../../core/slices/appSlice';
-import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { Button } from '../generic/Button';
 import { Logo } from './Logo';
+import { Navigation } from './Navigation';
 
 export const MobileNav = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -20,41 +13,22 @@ export const MobileNav = (): JSX.Element => {
   const mobileNavOpen = useAppSelector((state) => state.app.mobileNavOpen);
 
   return (
-    <SwipeableDrawer
+    <Drawer
       open={mobileNavOpen}
-      anchor="left"
-      onClose={() => {
+      onClose={(): void => {
         dispatch(closeMobileNav());
       }}
-      onOpen={() => {
-        dispatch(openMobileNav());
-      }}
     >
-      <div className="flex flex-col dark:bg-secondaryDark h-full">
+      <div className="flex flex-col w-64">
         <div className="m-auto my-6">
           <Logo />
         </div>
-        <Button
-          icon={<AnnotationIcon />}
-          text={'Messages'}
-          {...routes.messages().link}
-        />
-        <Button
-          icon={<ViewGridIcon />}
-          text={'Nodes'}
-          {...routes.nodes().link}
-        />
-        <Button
-          icon={<CogIcon />}
-          text={'Settings'}
-          {...routes.settings().link}
-        />
-        <Button
-          icon={<InformationCircleIcon />}
-          text={'About'}
-          {...routes.about().link}
+        <Navigation
+          onClick={(): void => {
+            dispatch(closeMobileNav());
+          }}
         />
       </div>
-    </SwipeableDrawer>
+    </Drawer>
   );
 };

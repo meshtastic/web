@@ -19,9 +19,13 @@ export const Message = ({
 }: MessageProps): JSX.Element => {
   return (
     <div
-      className={`flex space-x-2 ${!isSender && 'ml-auto flex-row-reverse'}`}
+      className={`flex space-x-2 ${
+        !isSender ? 'ml-auto flex-row-reverse' : ''
+      }`}
     >
-      <div className={`shadow-md rounded-full mt-auto ${!isSender && 'ml-2'}`}>
+      <div
+        className={`shadow-md rounded-full mt-auto ${!isSender ? 'ml-2' : ''}`}
+      >
         <Avatar
           size={30}
           name={senderName ?? 'UNK'}
@@ -37,11 +41,11 @@ export const Message = ({
               : 'bg-primary text-blue-50 rounded-bl-lg'
           } ${ack ? 'animate-none' : 'animate-pulse'}`}
         >
-          <div className="min-w-4 leading-5">{message}</div>
+          <div className="leading-5 min-w-4">{message}</div>
         </div>
         <div className="text-xs text-gray-600">{senderName}</div>
       </div>
-      <div className="mt-auto mb-4 text-xs font-medium text-secondary mr-3 dark:text-gray-200">
+      <div className="mt-auto mb-4 mr-3 text-xs font-medium text-secondary dark:text-gray-200">
         {rxTime.toLocaleTimeString(undefined, {
           hour: '2-digit',
           minute: '2-digit',

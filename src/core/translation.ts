@@ -6,7 +6,7 @@ import { en } from '../translations/en';
 import { jp } from '../translations/jp';
 import { pt } from '../translations/pt';
 
-i18n
+void i18n
   .use(detector)
   .use(initReactI18next)
   .init({

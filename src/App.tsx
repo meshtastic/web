@@ -1,17 +1,14 @@
 import React from 'react';
 
-import { ThemeProvider } from '@material-ui/system';
-import { Protobuf, SettingsManager, Types } from '@meshtastic/meshtasticjs';
-
-import { DeviceStatusDropdown } from './components/menu/buttons/DeviceStatusDropdown';
-import { LanguageDropdown } from './components/menu/buttons/LanguageDropdown';
-import { MobileNavToggle } from './components/menu/buttons/MobileNavToggle';
-import { ThemeToggle } from './components/menu/buttons/ThemeToggle';
-import { Logo } from './components/menu/Logo';
-import { MobileNav } from './components/menu/MobileNav';
-import { Navigation } from './components/menu/Navigation';
-import { connection } from './core/connection';
-import { useRoute } from './core/router';
+import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
+import { DeviceStatusDropdown } from '@components/menu/buttons/DeviceStatusDropdown';
+import { MobileNavToggle } from '@components/menu/buttons/MobileNavToggle';
+import { ThemeToggle } from '@components/menu/buttons/ThemeToggle';
+import { Logo } from '@components/menu/Logo';
+import { MobileNav } from '@components/menu/MobileNav';
+import { Navigation } from '@components/menu/Navigation';
+import { connection } from '@core/connection';
+import { useRoute } from '@core/router';
 import {
   ackMessage,
   addChannel,
@@ -22,13 +19,12 @@ import {
   setMyNodeInfo,
   setPreferences,
   setReady,
-} from './core/slices/meshtasticSlice';
-import { theme } from './core/theme';
-import { useAppDispatch, useAppSelector } from './hooks/redux';
-import { About } from './pages/About';
-import { Messages } from './pages/Messages';
-import { Nodes } from './pages/Nodes';
-import { Settings } from './pages/Settings';
+} from '@core/slices/meshtasticSlice';
+import { Protobuf, SettingsManager, Types } from '@meshtastic/meshtasticjs';
+import { About } from '@pages/About';
+import { Messages } from '@pages/Messages';
+import { Nodes } from '@pages/Nodes/Index';
+import { Settings } from '@pages/settings/Index';
 
 const App = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -44,12 +40,14 @@ const App = (): JSX.Element => {
   React.useEffect(() => {
     SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
 
-    connection.connect({
+    void connection.connect({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       address: hostOverrideEnabled
         ? hostOverride
         : import.meta.env.NODE_ENV === 'production'
         ? window.location.hostname
-        : import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP,
+        : import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP ??
+          'http://meshtastic.local',
       receiveBatchRequests: false,
       tls: false,
       fetchInterval: 2000,
@@ -116,7 +114,7 @@ const App = (): JSX.Element => {
       }
     });
 
-    return () => {
+    return (): void => {
       connection.onDeviceStatus.cancelAll();
       connection.onMyNodeInfo.cancelAll();
       connection.onNodeInfoPacket.cancelAll();
@@ -128,41 +126,40 @@ const App = (): JSX.Element => {
   }, [dispatch, myNodeInfo.myNodeNum]);
 
   return (
-    <ThemeProvider theme={theme(darkMode)}>
-      <div className={`h-screen w-screen  ${darkMode ? 'dark' : ''}`}>
-        <div className="flex flex-col h-full w-full bg-gray-200 dark:bg-primaryDark">
-          <div className="flex flex-shrink-0 w-full overflow-hidden bg-primary dark:bg-primary">
-            <div className="w-full sm:py-3 sm:m-8 sm:mb-0 md:mt-12 md:mx-8 md:pt-4 md:pb-3 sm:rounded-t-xl border-b dark:border-gray-600 sm:shadow-md overflow-hidden bg-white dark:bg-primaryDark">
-              <div className="flex items-center justify-between h-16 px-4 md:px-6">
-                <div className="hidden md:flex">
-                  <Logo />
-                </div>
-
-                <MobileNavToggle />
-                <div className="flex items-center space-x-2">
-                  <DeviceStatusDropdown />
-                  <LanguageDropdown />
-                  <ThemeToggle />
-                </div>
+    <div
+      className={`h-screen w-screen ${darkMode ? 'dark rs-theme-dark' : ''}`}
+    >
+      <div className="flex flex-col h-full bg-gray-200 dark:bg-primaryDark">
+        <div className="flex flex-shrink-0 overflow-hidden bg-primary dark:bg-primary">
+          <div className="w-full overflow-hidden bg-white border-b md:mt-12 md:mx-8 md:pt-4 md:pb-3 md:rounded-t-xl dark:border-gray-600 md:shadow-md dark:bg-primaryDark">
+            <div className="flex items-center justify-between h-16 px-4 md:px-6">
+              <div className="hidden md:flex">
+                <Logo />
               </div>
-              <Navigation />
+
+              <MobileNavToggle />
+              <div className="flex items-center space-x-2">
+                <DeviceStatusDropdown />
+                {/* <LanguageDropdown /> */}
+                <ThemeToggle />
+              </div>
             </div>
+            <Navigation className="hidden md:flex" />
           </div>
+        </div>
+        <MobileNav />
 
-          <MobileNav />
-
-          <div className="flex flex-grow min-h-0 w-full sm:px-8 sm:mb-8">
-            <div className="flex w-full sm:shadow-xl sm:overflow-hidden bg-gray-100  dark:bg-secondaryDark sm:rounded-b-xl">
-              {route.name === 'messages' && <Messages />}
-              {route.name === 'nodes' && <Nodes />}
-              {route.name === 'settings' && <Settings />}
-              {route.name === 'about' && <About />}
-              {route.name === false && 'Not Found'}
-            </div>
+        <div className="flex flex-grow w-full min-h-0 md:px-8 md:mb-8">
+          <div className="flex w-full bg-gray-100 md:shadow-xl md:overflow-hidden dark:bg-secondaryDark md:rounded-b-xl">
+            {route.name === 'messages' && <Messages />}
+            {route.name === 'nodes' && <Nodes />}
+            {route.name === 'settings' && <Settings />}
+            {route.name === 'about' && <About />}
+            {route.name === false && 'Not Found'}
           </div>
         </div>
       </div>
-    </ThemeProvider>
+    </div>
   );
 };
 

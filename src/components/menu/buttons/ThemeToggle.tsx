@@ -1,26 +1,27 @@
 import React from 'react';
 
+import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
+import { Button } from '@components/generic/Button';
+import { setDarkModeEnabled } from '@core/slices/appSlice';
 import { MoonIcon, SunIcon } from '@heroicons/react/outline';
-
-import { setDarkModeEnabled } from '../../../core/slices/appSlice';
-import { useAppDispatch, useAppSelector } from '../../../hooks/redux';
-import { IconButton } from '../../generic/IconButton';
 
 export const ThemeToggle = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const darkMode = useAppSelector((state) => state.app.darkMode);
 
   return (
-    <IconButton
-      onClick={() => {
+    <Button
+      icon={
+        darkMode ? (
+          <SunIcon className="w-5 h-5" />
+        ) : (
+          <MoonIcon className="w-5 h-5" />
+        )
+      }
+      circle
+      onClick={(): void => {
         dispatch(setDarkModeEnabled(!darkMode));
       }}
-    >
-      {darkMode ? (
-        <SunIcon className="h-6 w-6" />
-      ) : (
-        <MoonIcon className="h-6 w-6" />
-      )}
-    </IconButton>
+    />
   );
 };
