@@ -18,15 +18,14 @@ export interface DeviceProps {
 
 export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
   const { t } = useTranslation();
-  const radioConfig = useAppSelector((state) => state.meshtastic.preferences);
+  const user = useAppSelector((state) => state.meshtastic.user);
 
-  const { register, handleSubmit, formState } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: radioConfig,
-    });
+  const { register, handleSubmit, formState } = useForm<Protobuf.User>({
+    defaultValues: user,
+  });
 
   const onSubmit = handleSubmit((data) => {
-    void connection.setPreferences(data);
+    void connection.setOwner(data);
   });
 
   return (
@@ -54,14 +53,9 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
         </Button>
       }
     >
-      <div className="w-full max-w-3xl space-y-2 md:max-w-xl">
-        <form onSubmit={onSubmit}>
-          <Input label={t('strings.wifi_ssid')} {...register('wifiSsid')} />
-          <Input
-            type="password"
-            label={t('strings.wifi_psk')}
-            {...register('wifiPassword')}
-          />
+      <div className="w-full max-w-3xl md:max-w-xl">
+        <form className="space-y-2" onSubmit={onSubmit}>
+          <Input label={'Device Name'} {...register('longName')} />
         </form>
       </div>
     </PrimaryTemplate>

@@ -267,11 +267,11 @@
   integrity sha512-wdppn25U8z/2yiaT6YGquE6X8sSv7hNMWSXYSSU1jGv/yd6XqjXgTDJ8KP4NgjTXfJ3GbRjeeb8RTV7a/VpM+w==
 
 "@meshtastic/meshtasticjs@^0.6.16":
-  version "0.6.16"
-  resolved "https://registry.yarnpkg.com/@meshtastic/meshtasticjs/-/meshtasticjs-0.6.16.tgz#aa2fe3808af90b4c4aa43d2e2223dbf420977c65"
-  integrity sha512-nozIJJYdxouDBCWTJtF3oKPqkuJbL8lA9xTuzpSCVz4MRzlNPiSxc0O4C4lwwBrDEi9uymn+DJbub/lWv8m+wA==
+  version "0.6.17"
+  resolved "https://registry.yarnpkg.com/@meshtastic/meshtasticjs/-/meshtasticjs-0.6.17.tgz#e53dc051a9f8fa94162658dc53c8c4fad80fa627"
+  integrity sha512-//1Opyv8IM9FiONGJ52w2TLvv6Gs3d0zaInqw73SzFZl9eRv8ZqiVhZA91wqleVilwPmsudyT+XAljKrrTn9VQ==
   dependencies:
-    "@protobuf-ts/runtime" "^1.0.13"
+    "@protobuf-ts/runtime" "^2.0.1"
     sub-events "^1.8.9"
 
 "@nodelib/fs.scandir@2.1.5":
@@ -417,10 +417,10 @@
     node-gyp "^7.1.0"
     read-package-json-fast "^2.0.1"
 
-"@protobuf-ts/runtime@^1.0.13":
-  version "1.0.13"
-  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime/-/runtime-1.0.13.tgz#42d6d84ea6f0ded68d6642ab64ca49f7c17f6e71"
-  integrity sha512-uvYYBUtG4eCYMxo+mzxN8SHvpL/l7PbHEmOpXEnDCwBj/wJ+Ezj8+TlEFjjRWpnFidka+SMdDOXPWSyJv2iNAw==
+"@protobuf-ts/runtime@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime/-/runtime-2.0.1.tgz#850ed3b66873a9d503be2f835ee43e8937939fe0"
+  integrity sha512-iYsRGdr35Bta2ZxgyLyL7YWVnzn/gYZ4cv+CxIZnfz27XJ9hxOsx8e/4kQjcAopyw/lGzI9uGJXocXIUVhDK5Q==
 
 "@reduxjs/toolkit@^1.6.0":
   version "1.6.1"
