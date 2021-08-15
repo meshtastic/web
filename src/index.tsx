@@ -1,19 +1,23 @@
-import './index.css';
-import './translation';
+import '@app/index.css';
+import '@core/translation';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { Provider } from 'react-redux';
 
+import { RouteProvider } from '@core/router';
+import { store } from '@core/store';
+
 import App from './App';
-import { store } from './store';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <RouteProvider>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </RouteProvider>
   </React.StrictMode>,
   document.getElementById('root'),
 );

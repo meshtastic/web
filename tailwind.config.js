@@ -1,12 +1,19 @@
 module.exports = {
   mode: 'jit',
   purge: ['./public/**/*.html', './src/**/*.tsx'],
-  darkMode: false, // or 'media' or 'class'
+  darkMode: 'class', // or 'media' or 'class'
   theme: {
-    extend: {},
+    fontFamily: {
+      sans: 'Roboto',
+    },
+    extend: {
+      colors: {
+        primary: '#67ea94',
+        primaryDark: '#1E293B',
+        secondaryDark: '#0F172A',
+      },
+    },
   },
-  variants: {
-    extend: {},
-  },
+  variants: {},
   plugins: [],
 };
