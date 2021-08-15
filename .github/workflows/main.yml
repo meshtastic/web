@@ -1,0 +1,38 @@
+name: meshtastic-web build
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out repository
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # Build project
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'yarn'
+      - run: yarn install --ignore-optional
+      - run: yarn lint
+      - run: yarn build
+      - run: yarn package
+    
+      # Upload Artifact
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: meshtastic-web
+          path: build/output
