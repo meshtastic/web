@@ -28,7 +28,6 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     void connection.setPreferences(data);
   });
-
   return (
     <PrimaryTemplate
       title="Radio"

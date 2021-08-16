@@ -57,7 +57,7 @@ export const meshtasticSlice = createSlice({
     },
     setMyNodeInfo: (state, action: PayloadAction<Protobuf.MyNodeInfo>) => {
       state.myNodeInfo = action.payload;
-    },
+    }, 
     setUser: (state, action: PayloadAction<Protobuf.User>) => {
       state.user = action.payload;
     },
