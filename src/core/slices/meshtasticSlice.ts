@@ -16,6 +16,7 @@ interface AppState {
   lastMeshInterraction: number;
   ready: boolean;
   myNodeInfo: Protobuf.MyNodeInfo;
+  user: Protobuf.User;
   positionPackets: Types.PositionPacket[];
   nodes: Protobuf.NodeInfo[];
   channels: Protobuf.Channel[];
@@ -30,6 +31,7 @@ const initialState: AppState = {
   lastMeshInterraction: 0,
   ready: false,
   myNodeInfo: Protobuf.MyNodeInfo.create(),
+  user: Protobuf.User.create(),
   positionPackets: [],
   nodes: [],
   channels: [],
@@ -55,6 +57,9 @@ export const meshtasticSlice = createSlice({
     },
     setMyNodeInfo: (state, action: PayloadAction<Protobuf.MyNodeInfo>) => {
       state.myNodeInfo = action.payload;
+    }, 
+    setUser: (state, action: PayloadAction<Protobuf.User>) => {
+      state.user = action.payload;
     },
     addPositionPacket: (state, action: PayloadAction<Types.PositionPacket>) => {
       state.positionPackets.push(action.payload);
@@ -124,6 +129,7 @@ export const {
   setLastMeshInterraction,
   setReady,
   setMyNodeInfo,
+  setUser,
   addPositionPacket,
   addNode,
   addChannel,

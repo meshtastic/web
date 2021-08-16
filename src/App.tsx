@@ -19,6 +19,7 @@ import {
   setMyNodeInfo,
   setPreferences,
   setReady,
+  setUser,
 } from '@core/slices/meshtasticSlice';
 import { Protobuf, SettingsManager, Types } from '@meshtastic/meshtasticjs';
 import { About } from '@pages/About';
@@ -70,6 +71,10 @@ const App = (): JSX.Element => {
       dispatch(setMyNodeInfo(nodeInfo));
     });
 
+    connection.onUserDataPacket.subscribe((user) => {
+      dispatch(setUser(user));
+    });
+
     connection.onNodeInfoPacket.subscribe((nodeInfoPacket) =>
       dispatch(addNode(nodeInfoPacket.data)),
     );
@@ -117,6 +122,7 @@ const App = (): JSX.Element => {
     return (): void => {
       connection.onDeviceStatus.cancelAll();
       connection.onMyNodeInfo.cancelAll();
+      connection.onUserDataPacket.cancelAll();
       connection.onNodeInfoPacket.cancelAll();
       connection.onAdminPacket.cancelAll();
       connection.onMeshHeartbeat.cancelAll();

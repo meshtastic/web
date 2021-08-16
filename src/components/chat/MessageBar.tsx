@@ -24,7 +24,7 @@ export const MessageBar = (): JSX.Element => {
   const { t } = useTranslation();
   return (
     <div className="flex w-full p-4 mx-auto space-x-2 text-gray-500 bg-gray-50 dark:bg-transparent dark:text-gray-400">
-      <div className="flex w-full max-w-4xl">
+      <div className="flex w-full max-w-4xl mx-auto">
         <div className="flex">
           <Button icon={<EmojiHappyIcon className="w-5 h-5" />} circle />
           <Button icon={<PaperClipIcon className="w-5 h-5" />} circle />

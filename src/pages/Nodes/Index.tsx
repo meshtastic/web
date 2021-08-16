@@ -9,6 +9,7 @@ import { Drawer } from '@components/generic/Drawer';
 import { SidebarItem } from '@components/generic/SidebarItem';
 import { Tab } from '@headlessui/react';
 import { XCircleIcon } from '@heroicons/react/outline';
+import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { Node } from './Node';
 
@@ -55,7 +56,11 @@ export const Nodes = (): JSX.Element => {
                 {({ selected }): JSX.Element => (
                   <SidebarItem
                     title={node.user?.longName ?? node.num.toString()}
-                    description="Node info"
+                    description={
+                      node.user?.hwModel
+                        ? Protobuf.HardwareModel[node.user.hwModel]
+                        : 'Unknown Hardware'
+                    }
                     selected={selected}
                     icon={
                       <Avatar
