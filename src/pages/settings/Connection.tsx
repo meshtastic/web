@@ -3,34 +3,37 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { Tabs } from '@app/components/generic/Tabs';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
-import { Input } from '@components/generic/Input';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { MenuIcon, SaveIcon } from '@heroicons/react/outline';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
-export interface RadioProps {
+export interface ConnectionProps {
   navOpen: boolean;
   setNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
+export const Connection = ({
+  navOpen,
+  setNavOpen,
+}: ConnectionProps): JSX.Element => {
   const { t } = useTranslation();
-  const radioConfig = useAppSelector((state) => state.meshtastic.preferences);
+  const user = useAppSelector((state) => state.meshtastic.user);
 
-  const { register, handleSubmit, formState } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: radioConfig,
-    });
+  const { register, handleSubmit, formState } = useForm<Protobuf.User>({
+    defaultValues: user,
+  });
 
   const onSubmit = handleSubmit((data) => {
-    void connection.setPreferences(data);
+    void connection.setOwner(data);
   });
+
   return (
     <PrimaryTemplate
-      title="Radio"
+      title="Connection"
       tagline="Settings"
       button={
         <Button
@@ -55,21 +58,12 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
     >
       <div className="w-full max-w-3xl md:max-w-xl">
         <form className="space-y-2" onSubmit={onSubmit}>
-          <Input label={t('strings.wifi_ssid')} {...register('wifiSsid')} />
-          <Input
-            type="password"
-            label={t('strings.wifi_psk')}
-            {...register('wifiPassword')}
-          />
-          <Input
-            label={'Charge current'}
-            disabled
-            {...register('chargeCurrent')}
-          />
-          <Input
-            label={'Last GPS Attempt'}
-            disabled
-            {...register('gpsAttemptTime')}
+          <Tabs
+            tabs={[
+              { name: 'HTTP', body: <div>HTTP</div> },
+              { name: 'Bluetooth', body: <div>BLE</div> },
+              { name: 'Serial', body: <div>SERIAL</div> },
+            ]}
           />
         </form>
       </div>

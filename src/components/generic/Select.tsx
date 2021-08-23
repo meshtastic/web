@@ -11,7 +11,11 @@ export interface SelectProps {
     icon: JSX.Element;
   }[];
   id: string;
-  value: string;
+  active: {
+    name: string;
+    value: string;
+    icon: JSX.Element;
+  };
   onChange: (value: string) => void;
 }
 
@@ -19,7 +23,7 @@ export const Select = ({
   label,
   options,
   id,
-  value,
+  active,
   onChange,
 }: SelectProps): JSX.Element => {
   return (
@@ -28,10 +32,11 @@ export const Select = ({
         {label}
       </label>
 
-      <Listbox value={value} onChange={onChange}>
+      <Listbox value={active.value} onChange={onChange}>
         <div className="relative mt-1">
-          <Listbox.Button className="relative w-full text-left bg-white border rounded-md shadow-sm h-11 focus:outline-none focus:border-primary dark:focus:border-primary dark:bg-secondaryDark dark:border-gray-600 dark:text-white">
-            <span className="block truncate">{value}</span>
+          <Listbox.Button className="flex w-full text-left bg-white border rounded-md shadow-sm h-11 focus:outline-none focus:border-primary dark:focus:border-primary dark:bg-secondaryDark dark:border-gray-600 dark:text-white">
+            <div className="">{active.icon}</div>
+            <span className="block truncate">{active.name}</span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
               <SelectorIcon
                 className="w-5 h-5 text-gray-400"

@@ -4,12 +4,11 @@ import { Blur } from '@components/generic/Blur';
 
 type DefaultAsideProps = JSX.IntrinsicElements['aside'];
 
-interface LocalDrawerProps {
+interface DrawerProps extends DefaultAsideProps {
   open: boolean;
   permenant?: boolean;
   onClose: () => void;
 }
-export type DrawerProps = LocalDrawerProps & DefaultAsideProps;
 
 export const Drawer = ({
   open,

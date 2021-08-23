@@ -2,11 +2,9 @@ import React from 'react';
 
 type DefaultDivProps = JSX.IntrinsicElements['div'];
 
-interface LocalBlurProps {
+interface BlurProps extends DefaultDivProps {
   disableOnMd?: boolean;
 }
-
-export type BlurProps = LocalBlurProps & DefaultDivProps;
 
 export const Blur = ({
   disableOnMd,

@@ -8,10 +8,12 @@ import { Tab } from '@headlessui/react';
 import {
   CollectionIcon,
   DeviceMobileIcon,
+  LinkIcon,
   WifiIcon,
   XCircleIcon,
 } from '@heroicons/react/outline';
 
+import { Connection } from './Connection';
 import { Device } from './Device';
 import { Interface } from './Interface';
 import { Radio } from './Radio';
@@ -53,6 +55,20 @@ export const Settings = (): JSX.Element => {
             >
               {({ selected }): JSX.Element => (
                 <SidebarItem
+                  title="Connection"
+                  description="Method and peramaters for connecting to the device"
+                  selected={selected}
+                  icon={<LinkIcon className="flex-shrink-0 w-6 h-6" />}
+                />
+              )}
+            </Tab>
+            <Tab
+              onClick={(): void => {
+                setNavOpen(false);
+              }}
+            >
+              {({ selected }): JSX.Element => (
+                <SidebarItem
                   title="Device"
                   description="Device settings, such as device name and wifi settings"
                   selected={selected}
@@ -84,6 +100,9 @@ export const Settings = (): JSX.Element => {
         </Drawer>
         <div className="flex w-full">
           <Tab.Panels className="flex w-full">
+            <Tab.Panel className="flex w-full">
+              <Connection navOpen={navOpen} setNavOpen={setNavOpen} />
+            </Tab.Panel>
             <Tab.Panel className="flex w-full">
               <Device navOpen={navOpen} setNavOpen={setNavOpen} />
             </Tab.Panel>

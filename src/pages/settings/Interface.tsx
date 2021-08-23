@@ -47,7 +47,11 @@ export const Interface = ({
       <div className="w-full max-w-3xl space-y-2 md:max-w-xl">
         <Select
           label="Language"
-          value={i18n.language}
+          active={{
+            name: '',
+            value: '',
+            icon: <Us />,
+          }}
           onChange={(value): void => {
             void i18n.changeLanguage(value);
           }}

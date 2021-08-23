@@ -3,6 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { Toggle } from '@app/components/generic/Toggle';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
@@ -56,6 +57,12 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
       <div className="w-full max-w-3xl md:max-w-xl">
         <form className="space-y-2" onSubmit={onSubmit}>
           <Input label={'Device Name'} {...register('longName')} />
+          <Input
+            label={'Short Name'}
+            maxLength={3}
+            {...register('shortName')}
+          />
+          <Toggle label="Licenced Operator?" {...register('isLicensed')} />
         </form>
       </div>
     </PrimaryTemplate>
