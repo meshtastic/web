@@ -3,7 +3,7 @@
 import useBreakpointHook from 'use-breakpoint';
 
 const BREAKPOINTS = {
-  sm: 640,
+  sm: 0,
   // => @media (min-width: 640px) { ... }
 
   md: 768,

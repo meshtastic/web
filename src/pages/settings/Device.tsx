@@ -3,13 +3,14 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { Toggle } from '@app/components/generic/Toggle';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { Input } from '@components/generic/Input';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { MenuIcon, SaveIcon } from '@heroicons/react/outline';
-import type { Protobuf } from '@meshtastic/meshtasticjs';
+import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface DeviceProps {
   navOpen: boolean;
@@ -19,13 +20,21 @@ export interface DeviceProps {
 export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.meshtastic.user);
-
-  const { register, handleSubmit, formState } = useForm<Protobuf.User>({
-    defaultValues: user,
+  const { register, handleSubmit, formState } = useForm<{
+    isLicensed: boolean;
+    shortName: string;
+    longName: string;
+  }>({
+    defaultValues: {
+      isLicensed: user.isLicensed,
+      shortName: user.shortName,
+      longName: user.longName,
+    },
   });
 
   const onSubmit = handleSubmit((data) => {
-    void connection.setOwner(data);
+    Protobuf.User.mergePartial(user, data);
+    void connection.setOwner(user);
   });
 
   return (
@@ -56,6 +65,12 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
       <div className="w-full max-w-3xl md:max-w-xl">
         <form className="space-y-2" onSubmit={onSubmit}>
           <Input label={'Device Name'} {...register('longName')} />
+          <Input
+            label={'Short Name'}
+            maxLength={3}
+            {...register('shortName')}
+          />
+          <Toggle label="Licenced Operator?" {...register('isLicensed')} />
         </form>
       </div>
     </PrimaryTemplate>

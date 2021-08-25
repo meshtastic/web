@@ -11,11 +11,11 @@ Official [Meshtastic](https://meshtastic.org) web interface, that can be run ind
 Build the project:
 
 ```bash
-yarn build
+pnpm build
 ```
 
 GZip the output:
 
 ```bash
-yarn package
+pnpm package
 ```

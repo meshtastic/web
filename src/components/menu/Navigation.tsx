@@ -21,7 +21,7 @@ export const Navigation = ({
   const route = useRoute();
   return (
     <div
-      className={`h-16 px-4 md:space-x-2 space-y-2 md:space-y-0 ${className}`}
+      className={`px-4 md:space-x-2 space-y-2 md:space-y-0 ${className}`}
       {...props}
     >
       <div onClick={onClick}>

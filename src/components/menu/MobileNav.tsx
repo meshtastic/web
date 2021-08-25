@@ -19,7 +19,7 @@ export const MobileNav = (): JSX.Element => {
         dispatch(closeMobileNav());
       }}
     >
-      <div className="flex flex-col w-64">
+      <div className="flex flex-col">
         <div className="m-auto my-6">
           <Logo />
         </div>

@@ -2,14 +2,12 @@ import React from 'react';
 
 type DefaultButtonProps = JSX.IntrinsicElements['button'];
 
-interface LocalButtonProps {
+interface ButtonProps extends DefaultButtonProps {
   icon?: JSX.Element;
   circle?: boolean;
   active?: boolean;
   border?: boolean;
 }
-
-export type ButtonProps = LocalButtonProps & DefaultButtonProps;
 
 export const Button = ({
   icon,

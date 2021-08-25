@@ -61,6 +61,16 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
             label={t('strings.wifi_psk')}
             {...register('wifiPassword')}
           />
+          <Input
+            label={'Charge current'}
+            disabled
+            {...register('chargeCurrent')}
+          />
+          <Input
+            label={'Last GPS Attempt'}
+            disabled
+            {...register('gpsAttemptTime')}
+          />
         </form>
       </div>
     </PrimaryTemplate>
