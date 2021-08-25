@@ -18,6 +18,7 @@ export const MobileNav = (): JSX.Element => {
       onClose={(): void => {
         dispatch(closeMobileNav());
       }}
+      className="z-50"
     >
       <div className="flex flex-col">
         <div className="m-auto my-6">
