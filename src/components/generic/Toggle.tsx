@@ -20,18 +20,21 @@ export const Toggle = ({
   const [enabled, setEnabled] = React.useState(false);
 
   return (
-    <div className="w-full">
-      <label htmlFor={id} className="block text-sm font-medium dark:text-white">
+    <div className="flex flex-col w-full">
+      <label
+        htmlFor={id}
+        className="block text-sm font-medium text-black dark:text-white"
+      >
         {label}
       </label>
-      <div className="float-right">
+      <div className="ml-auto">
         <Switch
           id={id}
           {...props}
           checked={enabled}
           onChange={setEnabled}
           className={`${
-            enabled ? 'bg-primary' : 'bg-gray-200 dark:bg-primaryDark'
+            enabled ? 'bg-primary' : 'bg-gray-200 dark:bg-secondaryDark'
           }
           relative inline-flex flex-shrink-0 h-[38px] w-[74px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
         >

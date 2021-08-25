@@ -89,9 +89,9 @@ export const Nodes = (): JSX.Element => {
           </Tab.List>
         </Drawer>
         <div className="w-full">
-          <Tab.Panels>
+          <Tab.Panels className="h-full">
             {nodes.map((node) => (
-              <Tab.Panel key={node.num}>
+              <Tab.Panel className="h-full" key={node.num}>
                 <Node navOpen={navOpen} setNavOpen={setNavOpen} node={node} />
               </Tab.Panel>
             ))}

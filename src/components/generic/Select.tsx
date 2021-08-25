@@ -28,7 +28,10 @@ export const Select = ({
 }: SelectProps): JSX.Element => {
   return (
     <div className="w-full">
-      <label htmlFor={id} className="block text-sm font-medium dark:text-white">
+      <label
+        htmlFor={id}
+        className="block text-sm font-medium text-black dark:text-white"
+      >
         {label}
       </label>
 

@@ -2,10 +2,13 @@ import React from 'react';
 
 import moment from 'moment';
 
+import { Card } from '@app/components/generic/Card';
 import { Chart } from '@app/components/generic/Chart';
+import { Input } from '@app/components/generic/Input';
+import { Toggle } from '@app/components/generic/Toggle';
 import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
-import { MenuIcon } from '@heroicons/react/outline';
+import { MenuIcon, PuzzleIcon } from '@heroicons/react/outline';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface NodeProps {
@@ -29,7 +32,7 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
         />
       }
     >
-      <div className="w-full space-y-2">
+      <div className="w-full space-y-4">
         <Chart
           title="Visitors Overview"
           description="Number of unique visitors"
@@ -143,6 +146,24 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
             },
           ]}
         />
+        <Card
+          title="Settings"
+          description="Remote node settings"
+          lgPlaceholder={
+            <div className="w-full h-full text-black dark:text-white">
+              <PuzzleIcon className="w-24 h-24 m-auto" />
+              <div className="text-center">Placeholder</div>
+            </div>
+          }
+        >
+          <div className="p-10">
+            <form className="space-y-4">
+              <Input label={'Device Name'} />
+              <Input label={'Short Name'} maxLength={3} />
+              <Toggle label="Licenced Operator?" />
+            </form>
+          </div>
+        </Card>
       </div>
     </PrimaryTemplate>
   );
