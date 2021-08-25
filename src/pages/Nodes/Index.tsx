@@ -46,6 +46,12 @@ export const Nodes = (): JSX.Element => {
               </div>
             </div>
 
+            {!nodes.length && (
+              <span className="p-4 text-sm text-gray-400 dark:text-gray-600">
+                No nodes discovered yet...
+              </span>
+            )}
+
             {nodes.map((node) => (
               <Tab
                 onClick={(): void => {

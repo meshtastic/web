@@ -137,20 +137,18 @@ const App = (): JSX.Element => {
     >
       <div className="flex flex-col h-full bg-gray-200 dark:bg-primaryDark">
         <div className="flex flex-shrink-0 overflow-hidden bg-primary dark:bg-primary">
-          <div className="w-full overflow-hidden bg-white border-b md:mt-12 md:mx-8 md:pt-4 md:pb-3 md:rounded-t-3xl dark:border-gray-600 md:shadow-md dark:bg-primaryDark">
+          <div className="w-full overflow-hidden bg-white border-b md:mt-8 md:mx-8 md:pt-4 md:pb-3 md:rounded-t-3xl dark:border-gray-600 md:shadow-md dark:bg-primaryDark">
             <div className="flex items-center justify-between h-16 px-4 md:px-6">
               <div className="hidden md:flex">
                 <Logo />
               </div>
-
+              <Navigation className="hidden md:flex" />
               <MobileNavToggle />
               <div className="flex items-center space-x-2">
                 <DeviceStatusDropdown />
-                {/* <LanguageDropdown /> */}
                 <ThemeToggle />
               </div>
             </div>
-            <Navigation className="hidden md:flex" />
           </div>
         </div>
         <MobileNav />

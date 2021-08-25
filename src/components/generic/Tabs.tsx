@@ -11,76 +11,31 @@ interface TabProps extends DefaultDivProps {
   }[];
 }
 
-export const Tabs = ({ tabs }: TabProps) => {
-  //   let [categories] = useState({
-  //     Recent: [
-  //       {
-  //         id: 1,
-  //         title: 'Does drinking coffee make you smarter?',
-  //         date: '5h ago',
-  //         commentCount: 5,
-  //         shareCount: 2,
-  //       },
-  //       {
-  //         id: 2,
-  //         title: "So you've bought coffee... now what?",
-  //         date: '2h ago',
-  //         commentCount: 3,
-  //         shareCount: 2,
-  //       },
-  //     ],
-  //     Popular: [
-  //       {
-  //         id: 1,
-  //         title: 'Is tech making coffee better or worse?',
-  //         date: 'Jan 7',
-  //         commentCount: 29,
-  //         shareCount: 16,
-  //       },
-  //       {
-  //         id: 2,
-  //         title: 'The most innovative things happening in coffee',
-  //         date: 'Mar 19',
-  //         commentCount: 24,
-  //         shareCount: 12,
-  //       },
-  //     ],
-  //     Trending: [
-  //       {
-  //         id: 1,
-  //         title: 'Ask Me Anything: 10 answers to your questions about coffee',
-  //         date: '2d ago',
-  //         commentCount: 9,
-  //         shareCount: 5,
-  //       },
-  //       {
-  //         id: 2,
-  //         title: "The worst advice we've ever heard about coffee",
-  //         date: '4d ago',
-  //         commentCount: 1,
-  //         shareCount: 2,
-  //       },
-  //     ],
-  //   })
-
+export const Tabs = ({ tabs, className, ...props }: TabProps): JSX.Element => {
   return (
-    <Tab.Group as="div">
-      <Tab.List className="flex p-2 space-x-2 border shadow-md rounded-t-3xl dark:border-gray-600">
+    <Tab.Group as="div" className={className}>
+      <Tab.List className="flex border-l border-r border-t shadow-md rounded-t-3xl dark:border-gray-600">
         {tabs.map((tab) => (
           <Tab
             key={tab.name}
-            className={({ selected }) => `w-full text-lg font-medium`}
+            className={({ selected }): string =>
+              `w-full text-lg font-medium p-2 border-b-2 ${
+                selected
+                  ? 'dark:border-gray-200 border-gray-600'
+                  : 'border-transparent dark:border-transparent'
+              }`
+            }
           >
             {tab.name}
           </Tab>
         ))}
       </Tab.List>
-      <Tab.Panels>
+      <Tab.Panels className="h-full">
         {tabs.map((tab, index) => (
           <Tab.Panel
             key={index}
             className={
-              'border dark:border-gray-600 rounded-b-3xl p-2 h-80 shadow-md'
+              'border dark:border-gray-600 rounded-b-3xl p-4 h-full shadow-md'
             }
           >
             {tab.body}
