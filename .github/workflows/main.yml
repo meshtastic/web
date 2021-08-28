@@ -30,21 +30,13 @@ jobs:
       - run: pnpm lint
       - run: pnpm build
       - run: pnpm package
-      - run: tree build/output
-
-      # Create a zip file from the output folder
-      - name: Create output zip file
-        uses: papeloto/action-zip@v1
-        with:
-          files: build/output/
-          dest: output.zip
 
       # Upload Artifact
-      - name: Upload a Build Artifact
+      - name: Upload Artifact
         uses: 'marvinpinto/action-automatic-releases@latest'
         with:
           repo_token: '${{ secrets.GITHUB_TOKEN }}'
           automatic_release_tag: 'latest'
           prerelease: false
           files: |
-            output.zip
+            build.tar
