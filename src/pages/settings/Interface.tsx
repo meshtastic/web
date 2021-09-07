@@ -47,11 +47,19 @@ export const Interface = ({
       <div className="w-full max-w-3xl space-y-2 md:max-w-xl">
         <Select
           label="Language"
-          active={{
-            name: '',
-            value: '',
-            icon: <Us />,
-          }}
+          active={
+            i18n.language === 'en'
+              ? {
+                  name: 'English',
+                  value: 'en',
+                  icon: <Us />,
+                }
+              : i18n.language === 'pt'
+              ? { name: 'Português', value: 'pt', icon: <Pt /> }
+              : i18n.language === 'jp'
+              ? { name: '日本', value: 'jp', icon: <Jp /> }
+              : { name: 'English', value: 'en', icon: <Us /> }
+          }
           onChange={(value): void => {
             void i18n.changeLanguage(value);
           }}
@@ -68,7 +76,7 @@ export const Interface = ({
               icon: <Pt className="w-6" />,
             },
             {
-              name: 'Japanese',
+              name: '日本',
               value: 'jp',
               icon: <Jp className="w-6" />,
             },
