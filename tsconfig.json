@@ -15,8 +15,7 @@
       "@app/*": ["./src/*"],
       "@pages/*": ["./src/pages/*"],
       "@components/*": ["./src/components/*"],
-      "@core/*": ["./src/core/*"],
-      "@static/*": ["./src/static/*"]
+      "@core/*": ["./src/core/*"]
     },
     /* noEmit - Snowpack builds (emits) files, not tsc. */
     "noEmit": true,

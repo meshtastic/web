@@ -6,11 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Input } from '@app/components/generic/Input';
 import { Tabs } from '@app/components/generic/Tabs';
 import { Toggle } from '@app/components/generic/Toggle';
-import {
-  bleConnection,
-  connection,
-  serialConnection,
-} from '@app/core/connection';
+import { bleConnection, serialConnection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
@@ -34,7 +30,7 @@ export const Connection = ({
   });
 
   const onSubmit = handleSubmit((data) => {
-    void connection.setOwner(data);
+    // void connection.setOwner(data);
   });
 
   return (
@@ -63,9 +59,9 @@ export const Connection = ({
       }
     >
       <div className="w-full max-w-3xl md:max-w-xl">
-        <div className="mb-2 flex w-full border dark:border-gray-600 rounded-3xl p-2">
+        <div className="flex w-full p-2 mb-2 border dark:border-gray-600 rounded-3xl">
           Current connection method:
-          <div className="ml-2 rounded-full bg-gray-400 dark:bg-primaryDark text-sm px-1 my-auto">
+          <div className="px-1 my-auto ml-2 text-sm bg-gray-400 rounded-full dark:bg-primaryDark">
             BLE
           </div>
         </div>
@@ -94,13 +90,13 @@ export const Connection = ({
                     >
                       Get Devices
                     </Button>
-                    <div className="flex justify-between rounded-3xl border dark:border-600 p-2">
+                    <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
                       Device Name
-                      <LinkIcon className="my-auto mr-2 w-5 h-5 text-gray-300" />
+                      <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-300" />
                     </div>
-                    <div className="flex justify-between rounded-3xl border dark:border-600 p-2">
+                    <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
                       Device Name
-                      <LinkIcon className="my-auto mr-2 w-5 h-5 text-gray-600" />
+                      <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-600" />
                     </div>
                   </div>
                 ),
@@ -117,13 +113,13 @@ export const Connection = ({
                     >
                       Get Devices
                     </Button>
-                    <div className="flex justify-between rounded-3xl border dark:border-600 p-2">
+                    <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
                       Device Name
-                      <LinkIcon className="my-auto mr-2 w-5 h-5 text-gray-300" />
+                      <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-300" />
                     </div>
-                    <div className="flex justify-between rounded-3xl border dark:border-600 p-2">
+                    <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
                       Device Name
-                      <LinkIcon className="my-auto mr-2 w-5 h-5 text-gray-600" />
+                      <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-600" />
                     </div>
                   </div>
                 ),

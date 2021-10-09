@@ -1,7 +1,7 @@
 /** @type {import("snowpack").SnowpackUserConfig } */
 export default {
   mount: {
-    public: { url: '/', static: true },
+    public: { url: '/static' },
     src: { url: '/static' },
   },
   plugins: [
@@ -24,7 +24,6 @@ export default {
     '@pages': './src/pages',
     '@components': './src/components',
     '@core': './src/core',
-    '@static': './src/static',
   },
   routes: [
     /* Enable an SPA Fallback in development: */
