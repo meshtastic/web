@@ -39,4 +39,4 @@ jobs:
           automatic_release_tag: 'latest'
           prerelease: false
           files: |
-            ./build/output/build.tar
+            ./build/build.tar
