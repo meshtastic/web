@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=development snowpack dev",
     "build": "snowpack build",
-    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest build build/output && tar -cvf build/build.tar -C ./build/output/static/ $(ls ./build/output/static)",
+    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest build build/output && tar -cvf build/build.tar -C ./build/output/ $(ls ./build/output/)",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "lint": "eslint 'src/**/*.{ts,tsx}'"
   },
@@ -17,7 +17,7 @@
     "@reduxjs/toolkit": "^1.6.2",
     "apexcharts": "^3.28.3",
     "boring-avatars": "^1.5.8",
-    "i18next": "^21.2.4",
+    "i18next": "^21.2.6",
     "i18next-browser-languagedetector": "^6.1.2",
     "moment": "^2.29.1",
     "react": "^17.0.2",
@@ -44,7 +44,7 @@
     "@verypossible/eslint-config": "^1.6.1",
     "autoprefixer": "^10.3.7",
     "babel-plugin-module-resolver": "^4.1.0",
-    "eslint": "^7.32.0",
+    "eslint": "^8.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-babel-module": "^5.3.1",
     "eslint-import-resolver-typescript": "^2.5.0",

@@ -3,6 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { Card } from '@app/components/generic/Card';
 import { Input } from '@app/components/generic/Input';
 import { Tabs } from '@app/components/generic/Tabs';
 import { Toggle } from '@app/components/generic/Toggle';
@@ -58,76 +59,81 @@ export const Connection = ({
         </Button>
       }
     >
-      <div className="w-full max-w-3xl md:max-w-xl">
-        <div className="flex w-full p-2 mb-2 border dark:border-gray-600 rounded-3xl">
-          Current connection method:
-          <div className="px-1 my-auto ml-2 text-sm bg-gray-400 rounded-full dark:bg-primaryDark">
-            BLE
+      <Card
+        title="Basic settings"
+        description="Device name and user parameters"
+      >
+        <div className="w-full max-w-3xl p-10 md:max-w-xl">
+          <div className="flex w-full p-2 mb-2 border dark:border-gray-600 rounded-3xl">
+            Current connection method:
+            <div className="px-1 my-auto ml-2 text-sm bg-gray-400 rounded-full dark:bg-primaryDark">
+              BLE
+            </div>
           </div>
+          <form className="space-y-2" onSubmit={onSubmit}>
+            <Tabs
+              className="mb-10 h-60"
+              tabs={[
+                {
+                  name: 'HTTP',
+                  body: (
+                    <div className="space-y-2">
+                      <Input label={'Device URL'} />
+                      <Toggle label="Use TLS?" />
+                    </div>
+                  ),
+                },
+                {
+                  name: 'Bluetooth',
+                  body: (
+                    <div className="space-y-2">
+                      Devices:
+                      <Button
+                        onClick={async (): Promise<void> => {
+                          console.log(await bleConnection.getDevices());
+                        }}
+                      >
+                        Get Devices
+                      </Button>
+                      <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
+                        Device Name
+                        <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-300" />
+                      </div>
+                      <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
+                        Device Name
+                        <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-600" />
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  name: 'Serial',
+                  body: (
+                    <div className="space-y-2">
+                      Devices:
+                      <Button
+                        onClick={async (): Promise<void> => {
+                          console.log(await serialConnection.getPorts());
+                        }}
+                      >
+                        Get Devices
+                      </Button>
+                      <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
+                        Device Name
+                        <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-300" />
+                      </div>
+                      <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
+                        Device Name
+                        <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-600" />
+                      </div>
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          </form>
         </div>
-        <form className="space-y-2" onSubmit={onSubmit}>
-          <Tabs
-            className="h-60"
-            tabs={[
-              {
-                name: 'HTTP',
-                body: (
-                  <div className="space-y-2">
-                    <Input label={'Device URL'} />
-                    <Toggle label="Use TLS?" />
-                  </div>
-                ),
-              },
-              {
-                name: 'Bluetooth',
-                body: (
-                  <div className="space-y-2">
-                    Devices:
-                    <Button
-                      onClick={async (): Promise<void> => {
-                        console.log(await bleConnection.getDevices());
-                      }}
-                    >
-                      Get Devices
-                    </Button>
-                    <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
-                      Device Name
-                      <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-300" />
-                    </div>
-                    <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
-                      Device Name
-                      <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-600" />
-                    </div>
-                  </div>
-                ),
-              },
-              {
-                name: 'Serial',
-                body: (
-                  <div className="space-y-2">
-                    Devices:
-                    <Button
-                      onClick={async (): Promise<void> => {
-                        console.log(await serialConnection.getPorts());
-                      }}
-                    >
-                      Get Devices
-                    </Button>
-                    <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
-                      Device Name
-                      <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-300" />
-                    </div>
-                    <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
-                      Device Name
-                      <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-600" />
-                    </div>
-                  </div>
-                ),
-              },
-            ]}
-          />
-        </form>
-      </div>
+      </Card>
     </PrimaryTemplate>
   );
 };

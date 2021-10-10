@@ -27,6 +27,8 @@ import { Messages } from '@pages/Messages';
 import { Nodes } from '@pages/Nodes/Index';
 import { Settings } from '@pages/settings/Index';
 
+import { NotFound } from './pages/NotFound';
+
 const App = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const route = useRoute();
@@ -159,7 +161,7 @@ const App = (): JSX.Element => {
             {route.name === 'nodes' && <Nodes />}
             {route.name === 'settings' && <Settings />}
             {route.name === 'about' && <About />}
-            {route.name === false && 'Not Found'}
+            {route.name === false && <NotFound />}
           </div>
         </div>
       </div>

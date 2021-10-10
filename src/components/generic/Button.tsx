@@ -21,7 +21,7 @@ export const Button = ({
 }: ButtonProps): JSX.Element => {
   return (
     <button
-      className={`items-center  select-none flex dark:text-white ${
+      className={`items-center  select-none flex dark:text-white active:scale-95 ${
         active && !disabled ? 'bg-gray-100 dark:bg-gray-700' : ''
       } ${
         circle ? 'rounded-full h-10 w-10' : 'rounded-md p-3 space-x-3 text-sm'

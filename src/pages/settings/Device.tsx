@@ -67,7 +67,7 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
         title="Basic settings"
         description="Device name and user parameters"
       >
-        <div className="p-10">
+        <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
             <Input label={'Device Name'} {...register('longName')} />
             <Input

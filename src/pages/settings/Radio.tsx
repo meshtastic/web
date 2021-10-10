@@ -3,6 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { Card } from '@app/components/generic/Card';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
@@ -53,26 +54,31 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
         </Button>
       }
     >
-      <div className="w-full max-w-3xl md:max-w-xl">
-        <form className="space-y-2" onSubmit={onSubmit}>
-          <Input label={t('strings.wifi_ssid')} {...register('wifiSsid')} />
-          <Input
-            type="password"
-            label={t('strings.wifi_psk')}
-            {...register('wifiPassword')}
-          />
-          <Input
-            label={'Charge current'}
-            disabled
-            {...register('chargeCurrent')}
-          />
-          <Input
-            label={'Last GPS Attempt'}
-            disabled
-            {...register('gpsAttemptTime')}
-          />
-        </form>
-      </div>
+      <Card
+        title="Basic settings"
+        description="Device name and user parameters"
+      >
+        <div className="w-full max-w-3xl p-10 md:max-w-xl">
+          <form className="space-y-2" onSubmit={onSubmit}>
+            <Input label={t('strings.wifi_ssid')} {...register('wifiSsid')} />
+            <Input
+              type="password"
+              label={t('strings.wifi_psk')}
+              {...register('wifiPassword')}
+            />
+            <Input
+              label={'Charge current'}
+              disabled
+              {...register('chargeCurrent')}
+            />
+            <Input
+              label={'Last GPS Attempt'}
+              disabled
+              {...register('gpsAttemptTime')}
+            />
+          </form>
+        </div>
+      </Card>
     </PrimaryTemplate>
   );
 };
