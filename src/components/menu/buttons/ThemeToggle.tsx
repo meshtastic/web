@@ -1,9 +1,10 @@
 import React from 'react';
 
+import { FiMoon, FiSun } from 'react-icons/fi';
+
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { setDarkModeEnabled } from '@core/slices/appSlice';
-import { MoonIcon, SunIcon } from '@heroicons/react/outline';
 
 export const ThemeToggle = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -13,9 +14,9 @@ export const ThemeToggle = (): JSX.Element => {
     <Button
       icon={
         darkMode ? (
-          <SunIcon className="w-5 h-5" />
+          <FiSun className="w-5 h-5" />
         ) : (
-          <MoonIcon className="w-5 h-5" />
+          <FiMoon className="w-5 h-5" />
         )
       }
       circle

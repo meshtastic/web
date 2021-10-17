@@ -1,16 +1,12 @@
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
+import { FiPaperclip, FiSend, FiSmile } from 'react-icons/fi';
 
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { Input } from '@components/generic/Input';
 import { connection } from '@core/connection';
-import {
-  EmojiHappyIcon,
-  PaperAirplaneIcon,
-  PaperClipIcon,
-} from '@heroicons/react/outline';
 
 export const MessageBar = (): JSX.Element => {
   const ready = useAppSelector((state) => state.meshtastic.ready);
@@ -26,8 +22,8 @@ export const MessageBar = (): JSX.Element => {
     <div className="flex w-full p-4 mx-auto space-x-2 text-gray-500 bg-gray-50 dark:bg-transparent dark:text-gray-400">
       <div className="flex w-full max-w-4xl mx-auto">
         <div className="flex">
-          <Button icon={<EmojiHappyIcon className="w-5 h-5" />} circle />
-          <Button icon={<PaperClipIcon className="w-5 h-5" />} circle />
+          <Button icon={<FiSmile className="w-5 h-5" />} circle />
+          <Button icon={<FiPaperclip className="w-5 h-5" />} circle />
         </div>
         <form
           className="flex w-full space-x-2"
@@ -46,11 +42,7 @@ export const MessageBar = (): JSX.Element => {
               setCurrentMessage(e.target.value);
             }}
           />
-          <Button
-            icon={<PaperAirplaneIcon className="w-5 h-5" />}
-            type="submit"
-            circle
-          />
+          <Button icon={<FiSend className="w-5 h-5" />} type="submit" circle />
         </form>
       </div>
     </div>

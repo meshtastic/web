@@ -1,13 +1,15 @@
 import React from 'react';
 
+import {
+  FiGrid,
+  FiInfo,
+  FiMessageSquare,
+  FiPackage,
+  FiSettings,
+} from 'react-icons/fi';
+
 import { Button } from '@components/generic/Button';
 import { routes, useRoute } from '@core/router';
-import {
-  AnnotationIcon,
-  CogIcon,
-  InformationCircleIcon,
-  ViewGridIcon,
-} from '@heroicons/react/outline';
 
 type DefaultDivProps = JSX.IntrinsicElements['div'];
 
@@ -26,7 +28,7 @@ export const Navigation = ({
     >
       <div onClick={onClick}>
         <Button
-          icon={<AnnotationIcon className="w-6 h-6" />}
+          icon={<FiMessageSquare className="w-6 h-6" />}
           active={route.name === 'messages'}
           className="w-full md:w-auto"
           {...routes.messages().link}
@@ -36,7 +38,7 @@ export const Navigation = ({
       </div>
       <div onClick={onClick}>
         <Button
-          icon={<ViewGridIcon className="w-6 h-6" />}
+          icon={<FiGrid className="w-6 h-6" />}
           className="w-full md:w-auto"
           active={route.name === 'nodes'}
           {...routes.nodes().link}
@@ -46,7 +48,17 @@ export const Navigation = ({
       </div>
       <div onClick={onClick}>
         <Button
-          icon={<CogIcon className="w-6 h-6" />}
+          icon={<FiPackage className="w-6 h-6" />}
+          className="w-full md:w-auto"
+          active={route.name === 'plugins'}
+          {...routes.plugins().link}
+        >
+          Plugins
+        </Button>
+      </div>
+      <div onClick={onClick}>
+        <Button
+          icon={<FiSettings className="w-6 h-6" />}
           className="w-full md:w-auto"
           active={route.name === 'settings'}
           {...routes.settings().link}
@@ -56,7 +68,7 @@ export const Navigation = ({
       </div>
       <div onClick={onClick}>
         <Button
-          icon={<InformationCircleIcon className="w-6 h-6" />}
+          icon={<FiInfo className="w-6 h-6" />}
           className="w-full md:w-auto"
           active={route.name === 'about'}
           {...routes.about().link}

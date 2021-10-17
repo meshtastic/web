@@ -1,6 +1,5 @@
 module.exports = {
-  mode: 'jit',
-  purge: ['./public/**/*.html', './src/**/*.tsx'],
+  content: ['./public/**/*.html', './src/**/*.tsx'],
   darkMode: 'class', // or 'media' or 'class'
   theme: {
     fontFamily: {

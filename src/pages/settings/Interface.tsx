@@ -2,13 +2,13 @@ import React from 'react';
 
 import { Jp, Pt, Us } from 'react-flags-select';
 import { useTranslation } from 'react-i18next';
+import { FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
 import { Select } from '@app/components/generic/Select';
 import i18n from '@app/core/translation';
 import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
-import { MenuIcon, SaveIcon } from '@heroicons/react/outline';
 
 export interface InterfaceProps {
   navOpen: boolean;
@@ -27,7 +27,7 @@ export const Interface = ({
       tagline="Settings"
       button={
         <Button
-          icon={<MenuIcon className="w-5 h-5" />}
+          icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
@@ -37,7 +37,7 @@ export const Interface = ({
       footer={
         <Button
           className="px-10 ml-auto"
-          icon={<SaveIcon className="w-5 h-5" />}
+          icon={<FiSave className="w-5 h-5" />}
           active
           border
         >
@@ -49,7 +49,7 @@ export const Interface = ({
         title="Basic settings"
         description="Device name and user parameters"
       >
-        <div className="w-full max-w-3xl space-y-2 md:max-w-xl p-10">
+        <div className="w-full max-w-3xl p-10 space-y-2 md:max-w-xl">
           <Select
             label="Language"
             active={

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { FiLink2, FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
 import { Input } from '@app/components/generic/Input';
@@ -11,7 +12,6 @@ import { bleConnection, serialConnection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
-import { LinkIcon, MenuIcon, SaveIcon } from '@heroicons/react/outline';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface ConnectionProps {
@@ -40,7 +40,7 @@ export const Connection = ({
       tagline="Settings"
       button={
         <Button
-          icon={<MenuIcon className="w-5 h-5" />}
+          icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
@@ -50,7 +50,7 @@ export const Connection = ({
       footer={
         <Button
           className="px-10 ml-auto"
-          icon={<SaveIcon className="w-5 h-5" />}
+          icon={<FiSave className="w-5 h-5" />}
           disabled={!formState.isDirty}
           active
           border
@@ -97,11 +97,11 @@ export const Connection = ({
                       </Button>
                       <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
                         Device Name
-                        <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-300" />
+                        <FiLink2 className="w-5 h-5 my-auto mr-2 text-gray-300" />
                       </div>
                       <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
                         Device Name
-                        <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-600" />
+                        <FiLink2 className="w-5 h-5 my-auto mr-2 text-gray-600" />
                       </div>
                     </div>
                   ),
@@ -120,11 +120,11 @@ export const Connection = ({
                       </Button>
                       <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
                         Device Name
-                        <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-300" />
+                        <FiLink2 className="w-5 h-5 my-auto mr-2 text-gray-300" />
                       </div>
                       <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
                         Device Name
-                        <LinkIcon className="w-5 h-5 my-auto mr-2 text-gray-600" />
+                        <FiLink2 className="w-5 h-5 my-auto mr-2 text-gray-600" />
                       </div>
                     </div>
                   ),

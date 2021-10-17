@@ -1,9 +1,10 @@
 import React from 'react';
 
+import { FiHash, FiMap, FiUsers } from 'react-icons/fi';
+
 import { Message } from '@components/chat/Message';
 import { MessageBar } from '@components/chat/MessageBar';
 import { Button } from '@components/generic/Button';
-import { HashtagIcon, MapIcon, UsersIcon } from '@heroicons/react/outline';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { useAppSelector } from '../hooks/redux';
@@ -25,13 +26,13 @@ export const Messages = (): JSX.Element => {
     <div className="flex flex-col w-full">
       <div className="flex justify-between w-full px-2 border-b dark:border-gray-600 dark:text-gray-300">
         <div className="flex my-auto text-sm">
-          <HashtagIcon className="w-4 h-4 my-auto" />
+          <FiHash className="w-4 h-4 my-auto" />
           {channelName()}
         </div>
         <div className="flex">
-          <Button icon={<MapIcon className="w-5 h-5" />} circle />
+          <Button icon={<FiMap className="w-5 h-5" />} circle />
 
-          <Button icon={<UsersIcon className="w-5 h-5" />} circle />
+          <Button icon={<FiUsers className="w-5 h-5" />} circle />
         </div>
       </div>
       <div className="flex flex-col flex-grow p-6 space-y-2 overflow-y-auto bg-white border-b md:py-8 md:px-10 dark:border-gray-600 dark:bg-secondaryDark">

@@ -5,19 +5,35 @@ import { Switch } from '@headlessui/react';
 type DefaultButtonProps = JSX.IntrinsicElements['button'];
 
 interface ToggleProps extends DefaultButtonProps {
+  action?: (enabled: boolean) => void;
   label?: string;
   valid?: boolean;
   validationMessage?: string;
+  checked?: boolean;
 }
 
 export const Toggle = ({
+  action,
   label,
   valid,
   validationMessage,
+  checked,
   id,
   ...props
 }: ToggleProps): JSX.Element => {
   const [enabled, setEnabled] = React.useState(false);
+  React.useEffect(() => {
+    if (checked !== undefined) {
+      setEnabled(checked);
+    }
+  }, [checked]);
+
+  const handleToggle = (enabled: boolean) => {
+    setEnabled(enabled);
+    if (action) {
+      action(enabled);
+    }
+  };
 
   return (
     <div className="flex flex-col w-full">
@@ -32,7 +48,7 @@ export const Toggle = ({
           id={id}
           {...props}
           checked={enabled}
-          onChange={setEnabled}
+          onChange={handleToggle}
           className={`${
             enabled ? 'bg-primary' : 'bg-gray-200 dark:bg-secondaryDark'
           }

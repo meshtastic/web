@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
 import { Toggle } from '@app/components/generic/Toggle';
@@ -10,7 +11,6 @@ import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { Input } from '@components/generic/Input';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
-import { MenuIcon, SaveIcon } from '@heroicons/react/outline';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface DeviceProps {
@@ -44,7 +44,7 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
       tagline="Settings"
       button={
         <Button
-          icon={<MenuIcon className="w-5 h-5" />}
+          icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
@@ -54,7 +54,7 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
       footer={
         <Button
           className="px-10 ml-auto"
-          icon={<SaveIcon className="w-5 h-5" />}
+          icon={<FiSave className="w-5 h-5" />}
           disabled={!formState.isDirty}
           active
           border

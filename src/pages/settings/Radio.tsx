@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
 import { connection } from '@app/core/connection';
@@ -9,7 +10,6 @@ import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { Input } from '@components/generic/Input';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
-import { MenuIcon, SaveIcon } from '@heroicons/react/outline';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface RadioProps {
@@ -35,7 +35,7 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
       tagline="Settings"
       button={
         <Button
-          icon={<MenuIcon className="w-5 h-5" />}
+          icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
@@ -45,7 +45,7 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
       footer={
         <Button
           className="px-10 ml-auto"
-          icon={<SaveIcon className="w-5 h-5" />}
+          icon={<FiSave className="w-5 h-5" />}
           disabled={!formState.isDirty}
           active
           border

@@ -1,7 +1,8 @@
 import React from 'react';
 
+import { FiChevronDown } from 'react-icons/fi';
+
 import { Listbox } from '@headlessui/react';
-import { SelectorIcon } from '@heroicons/react/solid';
 
 export interface SelectProps {
   label: string;
@@ -41,7 +42,7 @@ export const Select = ({
             <div className="mx-2 my-auto">{active.icon}</div>
             <span className="block my-auto truncate">{active.name}</span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-              <SelectorIcon
+              <FiChevronDown
                 className="w-5 h-5 text-gray-400"
                 aria-hidden="true"
               />

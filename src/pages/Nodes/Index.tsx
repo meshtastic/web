@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Avatar from 'boring-avatars';
+import { FiXCircle } from 'react-icons/fi';
 
 import { useBreakpoint } from '@app/hooks/breakpoint';
 import { useAppSelector } from '@app/hooks/redux';
@@ -8,7 +9,6 @@ import { Button } from '@components/generic/Button';
 import { Drawer } from '@components/generic/Drawer';
 import { SidebarItem } from '@components/generic/SidebarItem';
 import { Tab } from '@headlessui/react';
-import { XCircleIcon } from '@heroicons/react/outline';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { Node } from './Node';
@@ -37,7 +37,7 @@ export const Nodes = (): JSX.Element => {
               </div>
               <div className="md:hidden">
                 <Button
-                  icon={<XCircleIcon className="w-5 h-5" />}
+                  icon={<FiXCircle className="w-5 h-5" />}
                   circle
                   onClick={(): void => {
                     setNavOpen(false);

@@ -1,12 +1,6 @@
 import React from 'react';
 
-import {
-  FiLayout,
-  FiLink2,
-  FiRss,
-  FiSmartphone,
-  FiXCircle,
-} from 'react-icons/fi';
+import { FiFileText, FiRss, FiXCircle } from 'react-icons/fi';
 
 import { useBreakpoint } from '@app/hooks/breakpoint';
 import { Button } from '@components/generic/Button';
@@ -14,12 +8,10 @@ import { Drawer } from '@components/generic/Drawer';
 import { SidebarItem } from '@components/generic/SidebarItem';
 import { Tab } from '@headlessui/react';
 
-import { Connection } from './Connection';
-import { Device } from './Device';
-import { Interface } from './Interface';
-import { Radio } from './Radio';
+import { Files } from './Files';
+import { RangeTest } from './RangeTest';
 
-export const Settings = (): JSX.Element => {
+export const Plugins = (): JSX.Element => {
   const [navOpen, setNavOpen] = React.useState(false);
 
   const { breakpoint } = useBreakpoint();
@@ -37,7 +29,7 @@ export const Settings = (): JSX.Element => {
           <Tab.List className="flex flex-col border-b divide-y divide-gray-300 dark:divide-gray-600 dark:border-gray-600">
             <div className="flex items-center justify-between m-8 mr-6 md:my-10">
               <div className="text-4xl font-extrabold leading-none tracking-tight">
-                Settings
+                Plugins
               </div>
               <div className="md:hidden">
                 <Button
@@ -56,10 +48,10 @@ export const Settings = (): JSX.Element => {
             >
               {({ selected }): JSX.Element => (
                 <SidebarItem
-                  title="Connection"
-                  description="Method and peramaters for connecting to the device"
+                  title="Range Test"
+                  description="Test the range of your Meshtastic node"
                   selected={selected}
-                  icon={<FiLink2 className="flex-shrink-0 w-6 h-6" />}
+                  icon={<FiRss className="flex-shrink-0 w-6 h-6" />}
                 />
               )}
             </Tab>
@@ -70,30 +62,10 @@ export const Settings = (): JSX.Element => {
             >
               {({ selected }): JSX.Element => (
                 <SidebarItem
-                  title="Device"
-                  description="Device settings, such as device name and wifi settings"
+                  title="File Browser"
+                  description="HTTP only file browser"
                   selected={selected}
-                  icon={<FiSmartphone className="flex-shrink-0 w-6 h-6" />}
-                />
-              )}
-            </Tab>
-            <Tab>
-              {({ selected }): JSX.Element => (
-                <SidebarItem
-                  title="Radio"
-                  description="Adjust radio power and frequency settings"
-                  selected={selected}
-                  icon={<FiRss className="flex-shrink-0 w-6 h-6" />}
-                />
-              )}
-            </Tab>
-            <Tab>
-              {({ selected }): JSX.Element => (
-                <SidebarItem
-                  title="Interface"
-                  description="Change language and other UI settings"
-                  selected={selected}
-                  icon={<FiLayout className="flex-shrink-0 w-6 h-6" />}
+                  icon={<FiFileText className="flex-shrink-0 w-6 h-6" />}
                 />
               )}
             </Tab>
@@ -102,16 +74,10 @@ export const Settings = (): JSX.Element => {
         <div className="flex w-full">
           <Tab.Panels className="flex w-full">
             <Tab.Panel className="flex w-full">
-              <Connection navOpen={navOpen} setNavOpen={setNavOpen} />
+              <RangeTest navOpen={navOpen} setNavOpen={setNavOpen} />
             </Tab.Panel>
             <Tab.Panel className="flex w-full">
-              <Device navOpen={navOpen} setNavOpen={setNavOpen} />
-            </Tab.Panel>
-            <Tab.Panel className="flex w-full">
-              <Radio navOpen={navOpen} setNavOpen={setNavOpen} />
-            </Tab.Panel>
-            <Tab.Panel className="flex w-full">
-              <Interface navOpen={navOpen} setNavOpen={setNavOpen} />
+              <Files navOpen={navOpen} setNavOpen={setNavOpen} />
             </Tab.Panel>
           </Tab.Panels>
         </div>

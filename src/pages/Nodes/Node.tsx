@@ -1,6 +1,7 @@
 import React from 'react';
 
 import moment from 'moment';
+import { FiMenu, FiTerminal } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
 import { Chart } from '@app/components/generic/Chart';
@@ -8,7 +9,6 @@ import { Input } from '@app/components/generic/Input';
 import { Toggle } from '@app/components/generic/Toggle';
 import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
-import { MenuIcon, PuzzleIcon } from '@heroicons/react/outline';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface NodeProps {
@@ -24,7 +24,7 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
       tagline="Node"
       button={
         <Button
-          icon={<MenuIcon className="w-5 h-5" />}
+          icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
@@ -34,8 +34,8 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
     >
       <div className="w-full space-y-4">
         <Chart
-          title="Visitors Overview"
-          description="Number of unique visitors"
+          title={`${node.user?.longName ?? 'UNK'}`}
+          description="Airtime"
           hasMultipleSeries={true}
           series={[
             {
@@ -151,7 +151,7 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
           description="Remote node settings"
           lgPlaceholder={
             <div className="w-full h-full text-black dark:text-white">
-              <PuzzleIcon className="w-24 h-24 m-auto" />
+              <FiTerminal className="w-24 h-24 m-auto" />
               <div className="text-center">Placeholder</div>
             </div>
           }

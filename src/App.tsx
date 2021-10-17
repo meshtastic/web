@@ -28,6 +28,7 @@ import { Nodes } from '@pages/Nodes/Index';
 import { Settings } from '@pages/settings/Index';
 
 import { NotFound } from './pages/NotFound';
+import { Plugins } from './pages/Plugins/Index.jsx';
 
 const App = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -40,22 +41,24 @@ const App = (): JSX.Element => {
   );
   const hostOverride = useAppSelector((state) => state.meshtastic.hostOverride);
 
+  const connectionURL = hostOverrideEnabled
+    ? hostOverride
+    : import.meta.env.NODE_ENV === 'production'
+    ? window.location.hostname
+    : (import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP as string) ??
+      'http://meshtastic.local';
+
   React.useEffect(() => {
     SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
 
     void connection.connect({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      address: hostOverrideEnabled
-        ? hostOverride
-        : import.meta.env.NODE_ENV === 'production'
-        ? window.location.hostname
-        : import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP ??
-          'http://meshtastic.local',
+      address: connectionURL,
       receiveBatchRequests: false,
       tls: false,
       fetchInterval: 2000,
     });
-  }, [hostOverrideEnabled, hostOverride]);
+  }, [hostOverrideEnabled, hostOverride, connectionURL]);
 
   React.useEffect(() => {
     connection.onDeviceStatus.subscribe((status) => {
@@ -159,6 +162,7 @@ const App = (): JSX.Element => {
           <div className="flex w-full bg-gray-100 md:shadow-xl md:overflow-hidden dark:bg-secondaryDark md:rounded-b-3xl">
             {route.name === 'messages' && <Messages />}
             {route.name === 'nodes' && <Nodes />}
+            {route.name === 'plugins' && <Plugins />}
             {route.name === 'settings' && <Settings />}
             {route.name === 'about' && <About />}
             {route.name === false && <NotFound />}
