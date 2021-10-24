@@ -10,7 +10,6 @@ import { Navigation } from '@components/menu/Navigation';
 import { connection } from '@core/connection';
 import { useRoute } from '@core/router';
 import {
-  ackMessage,
   addChannel,
   addMessage,
   addNode,
@@ -52,10 +51,9 @@ const App = (): JSX.Element => {
     SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
 
     void connection.connect({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       address: connectionURL,
-      receiveBatchRequests: false,
       tls: false,
+      receiveBatchRequests: false,
       fetchInterval: 2000,
     });
   }, [hostOverrideEnabled, hostOverride, connectionURL]);
@@ -114,14 +112,6 @@ const App = (): JSX.Element => {
           received: new Date(message.packet.rxTime),
         }),
       );
-    });
-
-    connection.onRoutingPacket.subscribe((routingPacket) => {
-      if (routingPacket.packet.payloadVariant.oneofKind === 'decoded') {
-        dispatch(
-          ackMessage(routingPacket.packet.payloadVariant.decoded.requestId),
-        );
-      }
     });
 
     return (): void => {

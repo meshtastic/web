@@ -22,20 +22,22 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
   const { t } = useTranslation();
   const user = useAppSelector((state) => state.meshtastic.user);
   const { register, handleSubmit, formState } = useForm<{
-    isLicensed: boolean;
-    shortName: string;
     longName: string;
+    shortName: string;
+    isLicensed: boolean;
   }>({
     defaultValues: {
-      isLicensed: user.isLicensed,
-      shortName: user.shortName,
       longName: user.longName,
+      shortName: user.shortName,
+      isLicensed: user.isLicensed,
     },
   });
 
   const onSubmit = handleSubmit((data) => {
-    Protobuf.User.mergePartial(user, data);
-    void connection.setOwner(user);
+    // Protobuf.User.mergePartial(user, data);
+
+    void connection.setOwner({ ...user, ...data });
+    console.log('submitted');
   });
 
   return (
@@ -56,6 +58,7 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
           className="px-10 ml-auto"
           icon={<FiSave className="w-5 h-5" />}
           disabled={!formState.isDirty}
+          onClick={onSubmit}
           active
           border
         >
@@ -69,6 +72,12 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
       >
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
+            <Input label={'Device ID'} value={user.id} disabled />
+            <Input
+              label={'Hardware'}
+              value={Protobuf.HardwareModel[user.hwModel]}
+              disabled
+            />
             <Input label={'Device Name'} {...register('longName')} />
             <Input
               label={'Short Name'}

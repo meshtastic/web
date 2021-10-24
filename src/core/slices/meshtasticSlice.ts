@@ -11,7 +11,7 @@ export interface MessageWithAck {
   received: Date;
 }
 
-interface AppState {
+interface MeshtasticState {
   deviceStatus: Types.DeviceStatusEnum;
   lastMeshInterraction: number;
   ready: boolean;
@@ -26,7 +26,7 @@ interface AppState {
   hostOverride: string;
 }
 
-const initialState: AppState = {
+const initialState: MeshtasticState = {
   deviceStatus: Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
   lastMeshInterraction: 0,
   ready: false,
@@ -57,7 +57,7 @@ export const meshtasticSlice = createSlice({
     },
     setMyNodeInfo: (state, action: PayloadAction<Protobuf.MyNodeInfo>) => {
       state.myNodeInfo = action.payload;
-    }, 
+    },
     setUser: (state, action: PayloadAction<Protobuf.User>) => {
       state.user = action.payload;
     },
@@ -77,6 +77,8 @@ export const meshtasticSlice = createSlice({
     },
 
     addChannel: (state, action: PayloadAction<Protobuf.Channel>) => {
+      console.log(action);
+
       if (
         state.channels.findIndex(
           (channel) => channel.index === action.payload.index,

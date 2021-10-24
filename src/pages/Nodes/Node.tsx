@@ -146,6 +146,14 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
             },
           ]}
         />
+        <Card title="Position" description={node.num.toString()}>
+          <div className="p-10">
+            <div>
+              <div></div>
+              <div>{node.position?.satsInView}</div>
+            </div>
+          </div>
+        </Card>
         <Card
           title="Settings"
           description="Remote node settings"

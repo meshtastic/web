@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {
+  FiLayers,
   FiLayout,
   FiLink2,
   FiRss,
@@ -14,6 +15,7 @@ import { Drawer } from '@components/generic/Drawer';
 import { SidebarItem } from '@components/generic/SidebarItem';
 import { Tab } from '@headlessui/react';
 
+import { Channels } from './Channels';
 import { Connection } from './Connection';
 import { Device } from './Device';
 import { Interface } from './Interface';
@@ -97,6 +99,16 @@ export const Settings = (): JSX.Element => {
                 />
               )}
             </Tab>
+            <Tab>
+              {({ selected }): JSX.Element => (
+                <SidebarItem
+                  title="Channels"
+                  description="Manage channels"
+                  selected={selected}
+                  icon={<FiLayers className="flex-shrink-0 w-6 h-6" />}
+                />
+              )}
+            </Tab>
           </Tab.List>
         </Drawer>
         <div className="flex w-full">
@@ -112,6 +124,9 @@ export const Settings = (): JSX.Element => {
             </Tab.Panel>
             <Tab.Panel className="flex w-full">
               <Interface navOpen={navOpen} setNavOpen={setNavOpen} />
+            </Tab.Panel>
+            <Tab.Panel className="flex w-full">
+              <Channels navOpen={navOpen} setNavOpen={setNavOpen} />
             </Tab.Panel>
           </Tab.Panels>
         </div>

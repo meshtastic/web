@@ -122,7 +122,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
                     active
                     confirmAction={async (): Promise<void> => {
                       await fetch(
-                        `http://${connectionURL}/json/spiffs/delete`,
+                        `http://${connectionURL}/json/spiffs/delete/static?remove=${file.name}`,
                         {
                           method: 'DELETE',
                         },

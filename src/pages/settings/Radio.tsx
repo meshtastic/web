@@ -10,7 +10,7 @@ import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { Input } from '@components/generic/Input';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
-import type { Protobuf } from '@meshtastic/meshtasticjs';
+import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface RadioProps {
   navOpen: boolean;
@@ -76,6 +76,7 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
               disabled
               {...register('gpsAttemptTime')}
             />
+            {Protobuf.PositionFlags[radioConfig.positionFlags]}
           </form>
         </div>
       </Card>

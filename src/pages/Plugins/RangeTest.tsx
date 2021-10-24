@@ -67,7 +67,7 @@ export const RangeTest = ({
       }
     >
       <div className="w-full space-y-4">
-        <Card title="..." description="...">
+        <Card title="Range Test" description="Settings">
           <div className="w-full max-w-3xl p-10 md:max-w-xl">
             <form onSubmit={onSubmit}>
               <Toggle

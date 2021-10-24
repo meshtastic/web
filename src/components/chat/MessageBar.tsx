@@ -3,17 +3,23 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiPaperclip, FiSend, FiSmile } from 'react-icons/fi';
 
-import { useAppSelector } from '@app/hooks/redux';
+import { ackMessage } from '@app/core/slices/meshtasticSlice.js';
+import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { Input } from '@components/generic/Input';
 import { connection } from '@core/connection';
 
 export const MessageBar = (): JSX.Element => {
+  const dispatch = useAppDispatch();
   const ready = useAppSelector((state) => state.meshtastic.ready);
   const [currentMessage, setCurrentMessage] = React.useState('');
   const sendMessage = (): void => {
     if (ready) {
-      void connection.sendText(currentMessage, undefined, true);
+      void connection.sendText(currentMessage, undefined, true, (id) => {
+        dispatch(ackMessage(id));
+
+        return Promise.resolve();
+      });
       setCurrentMessage('');
     }
   };
