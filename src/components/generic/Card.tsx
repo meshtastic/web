@@ -4,7 +4,7 @@ type DefaultDivProps = JSX.IntrinsicElements['div'];
 
 interface CardProps extends DefaultDivProps {
   title: string;
-  description: string;
+  description: string | JSX.Element;
   buttons?: JSX.Element;
   lgPlaceholder?: JSX.Element;
 }
@@ -20,7 +20,7 @@ export const Card = ({
 }: CardProps): JSX.Element => {
   return (
     <div
-      className={`flex flex-col flex-auto text-white border shadow-md select-none dark:bg-primaryDark dark:border-transparent rounded-3xl  ${className}`}
+      className={`flex flex-col flex-auto dark:text-white border shadow-md select-none dark:bg-primaryDark dark:border-transparent rounded-3xl  ${className}`}
       {...props}
     >
       <div className="flex items-center justify-between mx-10 mt-10">

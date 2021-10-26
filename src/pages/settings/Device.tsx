@@ -5,11 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
+import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { Toggle } from '@app/components/generic/Toggle';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
-import { Input } from '@components/generic/Input';
+import { Input } from '@components/generic/form/Input';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
@@ -34,10 +35,7 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
   });
 
   const onSubmit = handleSubmit((data) => {
-    // Protobuf.User.mergePartial(user, data);
-
     void connection.setOwner({ ...user, ...data });
-    console.log('submitted');
   });
 
   return (
@@ -45,12 +43,11 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
       title="Device"
       tagline="Settings"
       button={
-        <Button
+        <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
-          circle
         />
       }
       footer={

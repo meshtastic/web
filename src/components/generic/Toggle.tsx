@@ -2,11 +2,13 @@ import React from 'react';
 
 import { Switch } from '@headlessui/react';
 
+import { Label } from './form/Label.jsx';
+
 type DefaultButtonProps = JSX.IntrinsicElements['button'];
 
 interface ToggleProps extends DefaultButtonProps {
   action?: (enabled: boolean) => void;
-  label?: string;
+  label: string;
   valid?: boolean;
   validationMessage?: string;
   checked?: boolean;
@@ -37,12 +39,13 @@ export const Toggle = ({
 
   return (
     <div className="flex flex-col w-full">
-      <label
+      <Label label={label} />
+      {/* <label
         htmlFor={id}
         className="block text-sm font-medium text-black dark:text-white"
       >
         {label}
-      </label>
+      </label> */}
       <div className="ml-auto">
         <Switch
           id={id}

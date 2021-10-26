@@ -14,7 +14,7 @@ export const Blur = ({
 }: BlurProps): JSX.Element => {
   return (
     <div
-      className={`absolute inset-0 z-10 w-full h-full transition-opacity ${
+      className={`absolute inset-0 z-20 w-full h-full transition-opacity ${
         disableOnMd ? 'md:hidden' : 'test'
       } ${className}`}
       {...props}

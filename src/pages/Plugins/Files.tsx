@@ -5,9 +5,9 @@ import { FiMenu, FiTrash, FiUploadCloud } from 'react-icons/fi';
 import useSWR from 'swr';
 
 import { Card } from '@app/components/generic/Card';
+import { IconButton } from '@app/components/generic/IconButton.jsx';
 import fetcher from '@app/core/utils/fetcher.js';
 import { useAppSelector } from '@app/hooks/redux';
-import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 
 export interface RangeTestProps {
@@ -55,12 +55,11 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
       title="File Browser"
       tagline="Plugin"
       button={
-        <Button
+        <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
-          circle
         />
       }
     >
@@ -80,11 +79,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
         <Card
           title="Files"
           description="SPIFFS Contents"
-          buttons={
-            <Button active className="font-medium">
-              <FiUploadCloud className="w-8 h-8" />
-            </Button>
-          }
+          buttons={<IconButton icon={<FiUploadCloud className="w-8 h-8" />} />}
           className="md:w-1/3"
         >
           {data ? (
@@ -92,34 +87,37 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
               {data.data.files.map((file: IFile) => (
                 <div
                   key={file.name}
-                  className="flex p-2 mx-4 bg-gray-300 rounded-md max-h-14 dark:bg-gray-600 "
+                  className="flex justify-between mx-4 bg-gray-300 rounded-md dark:bg-gray-600 "
                 >
-                  <div className="flex w-12">
-                    <FileIcon
-                      extension={
-                        (file.nameModified ?? file.name).split('.')[
-                          (file.nameModified ?? file.name).split('.').length - 1
-                        ]
-                      }
-                      {...defaultStyles[
-                        (file.nameModified ?? file.name).split('.')[
-                          (file.nameModified ?? file.name).split('.').length - 1
-                        ] as DefaultExtensionType
-                      ]}
-                    />
+                  <div className="flex p-2 max-h-12">
+                    <div className="flex w-12">
+                      <FileIcon
+                        extension={
+                          (file.nameModified ?? file.name).split('.')[
+                            (file.nameModified ?? file.name).split('.').length -
+                              1
+                          ]
+                        }
+                        {...defaultStyles[
+                          (file.nameModified ?? file.name).split('.')[
+                            (file.nameModified ?? file.name).split('.').length -
+                              1
+                          ] as DefaultExtensionType
+                        ]}
+                      />
+                    </div>
+                    <a
+                      href={`http://${connectionURL}/${file.name.replace(
+                        'static/',
+                        '',
+                      )}`}
+                      className="my-auto font-semibold"
+                    >
+                      {file.nameModified ?? file.name}
+                    </a>
                   </div>
-                  <a
-                    href={`http://${connectionURL}/${file.name.replace(
-                      'static/',
-                      '',
-                    )}`}
-                    className="my-auto font-semibold"
-                  >
-                    {file.nameModified ?? file.name}
-                  </a>
-                  <Button
-                    className="ml-auto space-x-0"
-                    active
+                  <IconButton
+                    className="mx-2 my-auto"
                     confirmAction={async (): Promise<void> => {
                       await fetch(
                         `http://${connectionURL}/json/spiffs/delete/static?remove=${file.name}`,
@@ -128,7 +126,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
                         },
                       );
                     }}
-                    icon={<FiTrash />}
+                    icon={<FiTrash className="w-5 h-5" />}
                   />
                 </div>
               ))}

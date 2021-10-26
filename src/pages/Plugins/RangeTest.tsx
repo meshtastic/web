@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
-import { Input } from '@app/components/generic/Input.jsx';
+import { Input } from '@app/components/generic/form/Input.jsx';
+import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { Toggle } from '@app/components/generic/Toggle';
 import { connection } from '@app/core/connection.js';
 import { useAppSelector } from '@app/hooks/redux';
@@ -45,12 +46,11 @@ export const RangeTest = ({
       title="Range Test"
       tagline="Plugin"
       button={
-        <Button
+        <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
-          circle
         />
       }
       footer={

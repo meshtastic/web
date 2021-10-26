@@ -77,8 +77,6 @@ export const meshtasticSlice = createSlice({
     },
 
     addChannel: (state, action: PayloadAction<Protobuf.Channel>) => {
-      console.log(action);
-
       if (
         state.channels.findIndex(
           (channel) => channel.index === action.payload.index,

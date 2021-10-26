@@ -2,8 +2,8 @@ import React from 'react';
 
 import { FiMoon, FiSun } from 'react-icons/fi';
 
+import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
-import { Button } from '@components/generic/Button';
 import { setDarkModeEnabled } from '@core/slices/appSlice';
 
 export const ThemeToggle = (): JSX.Element => {
@@ -11,7 +11,7 @@ export const ThemeToggle = (): JSX.Element => {
   const darkMode = useAppSelector((state) => state.app.darkMode);
 
   return (
-    <Button
+    <IconButton
       icon={
         darkMode ? (
           <FiSun className="w-5 h-5" />
@@ -19,7 +19,6 @@ export const ThemeToggle = (): JSX.Element => {
           <FiMoon className="w-5 h-5" />
         )
       }
-      circle
       onClick={(): void => {
         dispatch(setDarkModeEnabled(!darkMode));
       }}

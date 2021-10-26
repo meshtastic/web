@@ -2,8 +2,8 @@ import React from 'react';
 
 import { FiWifi, FiWifiOff } from 'react-icons/fi';
 
+import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { useAppSelector } from '@app/hooks/redux';
-import { Button } from '@components/generic/Button';
 import { Types } from '@meshtastic/meshtasticjs';
 
 export const DeviceStatusDropdown = (): JSX.Element => {
@@ -11,8 +11,8 @@ export const DeviceStatusDropdown = (): JSX.Element => {
   const ready = useAppSelector((state) => state.meshtastic.ready);
 
   return (
-    <div className="flex bg-gray-100 rounded-full dark:bg-gray-700">
-      <div className="flex pl-2 my-auto dark:text-white">
+    <div className="flex bg-gray-100 rounded-md dark:bg-gray-700">
+      <div className="flex pl-2 my-auto space-x-2 dark:text-white">
         <div
           className={`
         my-auto mx-2 w-2 h-2 rounded-full min-w-[2] ${
@@ -31,15 +31,14 @@ export const DeviceStatusDropdown = (): JSX.Element => {
         }`}
         ></div>
         <div className="my-auto">{Types.DeviceStatusEnum[deviceStatus]}</div>
-        <Button
+        <IconButton
           icon={
             ready ? (
-              <FiWifi className="w-6 h-6" />
+              <FiWifi className="w-5 h-5" />
             ) : (
-              <FiWifiOff className="w-6 h-6 animate-pulse" />
+              <FiWifiOff className="w-5 h-5 animate-pulse" />
             )
           }
-          circle
         />
       </div>
     </div>

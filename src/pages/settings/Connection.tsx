@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { FiLink2, FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
-import { Input } from '@app/components/generic/Input';
+import { Input } from '@app/components/generic/form/Input';
+import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { Tabs } from '@app/components/generic/Tabs';
 import { Toggle } from '@app/components/generic/Toggle';
 import { bleConnection, serialConnection } from '@app/core/connection';
@@ -39,12 +40,11 @@ export const Connection = ({
       title="Connection"
       tagline="Settings"
       button={
-        <Button
+        <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
-          circle
         />
       }
       footer={

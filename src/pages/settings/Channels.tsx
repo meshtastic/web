@@ -1,16 +1,14 @@
 import React from 'react';
 
-import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { FiMenu, FiSave, FiTrash } from 'react-icons/fi';
+import { FiMenu, FiSave } from 'react-icons/fi';
 
+import { Channel } from '@app/components/Channel.jsx';
 import { Card } from '@app/components/generic/Card';
-import { Input } from '@app/components/generic/Input.jsx';
-import { connection } from '@app/core/connection.js';
+import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { useAppSelector } from '@app/hooks/redux.js';
 import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
-import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface ChannelsProps {
   navOpen: boolean;
@@ -24,33 +22,16 @@ export const Channels = ({
   const { t } = useTranslation();
   const channels = useAppSelector((state) => state.meshtastic.channels);
 
-  const { register, handleSubmit, formState } = useForm<{
-    index: number;
-    name: string;
-  }>();
-
-  const onSubmit = handleSubmit(async (data) => {
-    const adminChannel = Protobuf.Channel.create({
-      role: Protobuf.Channel_Role.SECONDARY,
-      index: data.index,
-      settings: {
-        name: data.name,
-      },
-    });
-    await connection.setChannel(adminChannel);
-  });
-
   return (
     <PrimaryTemplate
-      title="Interface"
+      title="Channels"
       tagline="Settings"
       button={
-        <Button
+        <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
-          circle
         />
       }
       footer={
@@ -60,55 +41,37 @@ export const Channels = ({
           active
           border
         >
-          {t('strings.save_changes')}
+          Confirm
         </Button>
       }
     >
       <div className="space-y-4">
         <Card
-          title="Add Channel"
-          description="Once a channel is changed and confirmed working, click `Confirm Config` to prevent reverting."
+          title="Manage Channels"
+          description={
+            <div className="flex space-x-2 truncate">
+              <div className="w-3 h-3 my-auto bg-green-500 rounded-full" />
+              &nbsp;- Primary
+              <div className="w-3 h-3 my-auto rounded-full bg-cyan-500" />
+              &nbsp;- Secondary
+              <div className="w-3 h-3 my-auto bg-gray-400 rounded-full" />
+              &nbsp;- Disabled
+              <div className="w-3 h-3 my-auto rounded-full bg-amber-400" />
+              &nbsp;- Admin
+            </div>
+          }
         >
-          <div className="w-full max-w-3xl p-10 space-y-2 md:max-w-xl">
-            <form className="space-y-2" onSubmit={onSubmit}>
-              <Input
-                label="Index"
-                type="number"
-                min={1}
-                max={7}
-                {...register('index', { valueAsNumber: true })}
-              />
-              <Input label="Name" {...register('name')} />
-              <div className="flex space-x-2">
-                <Button onClick={onSubmit} border>
-                  Add Channel
-                </Button>
-                <Button onClick={onSubmit} border>
-                  Confirm Config
-                </Button>
-              </div>
-            </form>
-          </div>
-        </Card>
-        <Card
-          title="Basic settings"
-          description="Device name and user parameters"
-        >
-          <div className="w-full max-w-3xl p-10 space-y-2 md:max-w-xl">
+          <div className="w-full max-w-3xl p-4 space-y-2 md:p-10 md:max-w-xl">
             {channels.map((channel) => (
-              <div key={channel.index} className="flex flex-col space-y-2">
-                <div className="flex items-center justify-between p-2 border rounded-3xl">
-                  {Protobuf.Channel_Role[channel.role]}
-                  {channel.settings?.name}
-                  <Button
-                    onClick={async (): Promise<void> => {
-                      await connection.deleteChannel(channel.index);
-                    }}
-                    icon={<FiTrash />}
-                  />
-                </div>
-              </div>
+              <Channel key={channel.index} channel={channel} />
             ))}
+
+            <div className="flex space-x-52">
+              <div className="text-sm font-thin text-gray-400 dark:text-gray-300">
+                Please ensure any changes are working before confirming
+              </div>
+              <Button active>Confirm</Button>
+            </div>
           </div>
         </Card>
       </div>

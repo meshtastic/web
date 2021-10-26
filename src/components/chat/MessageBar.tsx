@@ -1,13 +1,14 @@
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
-import { FiPaperclip, FiSend, FiSmile } from 'react-icons/fi';
+import { FiSend } from 'react-icons/fi';
 
 import { ackMessage } from '@app/core/slices/meshtasticSlice.js';
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
-import { Button } from '@components/generic/Button';
-import { Input } from '@components/generic/Input';
+import { Input } from '@components/generic/form/Input';
 import { connection } from '@core/connection';
+
+import { IconButton } from '../generic/IconButton.jsx';
 
 export const MessageBar = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -27,10 +28,6 @@ export const MessageBar = (): JSX.Element => {
   return (
     <div className="flex w-full p-4 mx-auto space-x-2 text-gray-500 bg-gray-50 dark:bg-transparent dark:text-gray-400">
       <div className="flex w-full max-w-4xl mx-auto">
-        <div className="flex">
-          <Button icon={<FiSmile className="w-5 h-5" />} circle />
-          <Button icon={<FiPaperclip className="w-5 h-5" />} circle />
-        </div>
         <form
           className="flex w-full space-x-2"
           onSubmit={(e): void => {
@@ -48,7 +45,7 @@ export const MessageBar = (): JSX.Element => {
               setCurrentMessage(e.target.value);
             }}
           />
-          <Button icon={<FiSend className="w-5 h-5" />} type="submit" circle />
+          <IconButton icon={<FiSend className="w-5 h-5" />} type="submit" />
         </form>
       </div>
     </div>

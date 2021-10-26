@@ -5,9 +5,9 @@ import { FiMenu, FiTerminal } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
 import { Chart } from '@app/components/generic/Chart';
-import { Input } from '@app/components/generic/Input';
+import { Input } from '@app/components/generic/form/Input';
+import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { Toggle } from '@app/components/generic/Toggle';
-import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
@@ -23,12 +23,11 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
       title={node.user?.longName ?? node.num.toString()}
       tagline="Node"
       button={
-        <Button
+        <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen(!navOpen);
           }}
-          circle
         />
       }
     >

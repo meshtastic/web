@@ -2,8 +2,8 @@ import React from 'react';
 
 import { FiFileText, FiRss, FiXCircle } from 'react-icons/fi';
 
+import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { useBreakpoint } from '@app/hooks/breakpoint';
-import { Button } from '@components/generic/Button';
 import { Drawer } from '@components/generic/Drawer';
 import { SidebarItem } from '@components/generic/SidebarItem';
 import { Tab } from '@headlessui/react';
@@ -32,7 +32,7 @@ export const Plugins = (): JSX.Element => {
                 Plugins
               </div>
               <div className="md:hidden">
-                <Button
+                <IconButton
                   icon={<FiXCircle className="w-5 h-5" />}
                   circle
                   onClick={(): void => {

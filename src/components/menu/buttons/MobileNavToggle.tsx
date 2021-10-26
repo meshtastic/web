@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FiMenu } from 'react-icons/fi';
 
-import { Button } from '@components/generic/Button';
+import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { openMobileNav } from '@core/slices/appSlice';
 
 import { useAppDispatch } from '../../../hooks/redux';
@@ -12,12 +12,11 @@ export const MobileNavToggle = (): JSX.Element => {
 
   return (
     <div className="md:hidden">
-      <Button
+      <IconButton
         icon={<FiMenu className="w-5 h-5" />}
         onClick={(): void => {
           dispatch(openMobileNav());
         }}
-        circle
       />
     </div>
   );
