@@ -78,12 +78,8 @@ export const Connection = ({
       setConnection(new ISerialConnection());
     }
 
-    console.log(params);
-
-    // @ts-ignore
-    connection.connect(params);
-
-    console.log(connection);
+    // @ts-ignore tmp
+    await connection.connect(params);
   };
 
   const updateBleDeviceList = async (): Promise<void> => {
@@ -100,10 +96,10 @@ export const Connection = ({
 
   React.useEffect(() => {
     if (selectedConnType === connType.BLE) {
-      updateBleDeviceList();
+      void updateBleDeviceList();
     }
     if (selectedConnType === connType.SERIAL) {
-      updateSerialDeviceList();
+      void updateSerialDeviceList();
     }
   }, [selectedConnType]);
 
@@ -194,8 +190,8 @@ export const Connection = ({
                   </Button>
                   <Button
                     border
-                    onClick={() => {
-                      ble.getDevice();
+                    onClick={async () => {
+                      await ble.getDevice();
                     }}
                   >
                     New Device
@@ -239,8 +235,8 @@ export const Connection = ({
                   </Button>
                   <Button
                     border
-                    onClick={() => {
-                      serial.getPort();
+                    onClick={async () => {
+                      await serial.getPort();
                     }}
                   >
                     New Device
@@ -260,7 +256,7 @@ export const Connection = ({
                       <IconButton
                         onClick={() => {
                           connect(connType.SERIAL, {
-                            // @ts-ignore
+                            // @ts-ignore tmp
                             device: device,
                           });
                         }}

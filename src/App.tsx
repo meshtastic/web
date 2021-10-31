@@ -90,8 +90,9 @@ const App = (): JSX.Element => {
       );
     });
 
-    connection.onNodeInfoPacket.subscribe((nodeInfoPacket) =>
-      dispatch(addNode(nodeInfoPacket.data)),
+    connection.onNodeInfoPacket.subscribe(
+      (nodeInfoPacket): void | { payload: Protobuf.NodeInfo; type: string } =>
+        dispatch(addNode(nodeInfoPacket.data)),
     );
 
     connection.onAdminPacket.subscribe((adminPacket) => {
@@ -111,8 +112,9 @@ const App = (): JSX.Element => {
       }
     });
 
-    connection.onMeshHeartbeat.subscribe((date) =>
-      dispatch(setLastMeshInterraction(date.getTime())),
+    connection.onMeshHeartbeat.subscribe(
+      (date): void | { payload: number; type: string } =>
+        dispatch(setLastMeshInterraction(date.getTime())),
     );
 
     connection.onTextPacket.subscribe((message) => {
