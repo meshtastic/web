@@ -2,38 +2,124 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { FiLink2, FiMenu, FiSave } from 'react-icons/fi';
+import { FiCheck, FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
+import { EnumSelect } from '@app/components/generic/form/EnumSelect';
 import { Input } from '@app/components/generic/form/Input';
-import { IconButton } from '@app/components/generic/IconButton.jsx';
-import { Tabs } from '@app/components/generic/Tabs';
+import { IconButton } from '@app/components/generic/IconButton';
 import { Toggle } from '@app/components/generic/Toggle';
-import { bleConnection, serialConnection } from '@app/core/connection';
-import { useAppSelector } from '@app/hooks/redux';
+import { connection, setConnection } from '@app/core/connection';
+import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
-import type { Protobuf } from '@meshtastic/meshtasticjs';
+import {
+  IBLEConnection,
+  IHTTPConnection,
+  ISerialConnection,
+} from '@meshtastic/meshtasticjs';
+import type {
+  BLEConnectionParameters,
+  HTTPConnectionParameters,
+  SerialConnectionParameters,
+} from '@meshtastic/meshtasticjs/dist/types';
 
 export interface ConnectionProps {
   navOpen: boolean;
   setNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+enum connType {
+  HTTP,
+  BLE,
+  SERIAL,
+}
+
 export const Connection = ({
   navOpen,
   setNavOpen,
 }: ConnectionProps): JSX.Element => {
+  const dispatch = useAppDispatch();
+  const [selectedConnType, setSelectedConnType] = React.useState(connType.HTTP);
+  const [bleDevices, setBleDevices] = React.useState<BluetoothDevice[]>([]);
+  const [serialDevices, setSerialDevices] = React.useState<SerialPort[]>([]);
+  const [httpIpSource, setHttpIpSource] = React.useState<'local' | 'remote'>(
+    'local',
+  );
   const { t } = useTranslation();
-  const user = useAppSelector((state) => state.meshtastic.user);
+  const hostOverrideEnabled = useAppSelector(
+    (state) => state.meshtastic.hostOverrideEnabled,
+  );
+  const hostOverride = useAppSelector((state) => state.meshtastic.hostOverride);
 
-  const { register, handleSubmit, formState } = useForm<Protobuf.User>({
-    defaultValues: user,
+  const { register, handleSubmit, formState } = useForm<{
+    method: connType;
+  }>({
+    defaultValues: {
+      method: connType.HTTP,
+    },
   });
+
+  const connect = (
+    connectionType: connType,
+    params:
+      | HTTPConnectionParameters
+      | SerialConnectionParameters
+      | BLEConnectionParameters,
+  ): void => {
+    connection.complete();
+    connection.disconnect();
+
+    if (connectionType === connType.BLE) {
+      setConnection(new IBLEConnection());
+    } else if (connectionType === connType.HTTP) {
+      setConnection(new IHTTPConnection());
+    } else {
+      setConnection(new ISerialConnection());
+    }
+
+    console.log(params);
+
+    // @ts-ignore
+    connection.connect(params);
+
+    console.log(connection);
+  };
+
+  const updateBleDeviceList = async (): Promise<void> => {
+    const devices = await ble.getDevices();
+    setBleDevices(devices);
+  };
+
+  const updateSerialDeviceList = async (): Promise<void> => {
+    const devices = await serial.getPorts();
+    console.log(devices);
+
+    setSerialDevices(devices);
+  };
+
+  React.useEffect(() => {
+    if (selectedConnType === connType.BLE) {
+      updateBleDeviceList();
+    }
+    if (selectedConnType === connType.SERIAL) {
+      updateSerialDeviceList();
+    }
+  }, [selectedConnType]);
 
   const onSubmit = handleSubmit((data) => {
     // void connection.setOwner(data);
   });
+
+  const connectionURL: string = hostOverrideEnabled
+    ? hostOverride
+    : import.meta.env.NODE_ENV === 'production'
+    ? window.location.hostname
+    : (import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP as string) ??
+      'http://meshtastic.local';
+
+  const ble = new IBLEConnection();
+  const serial = new ISerialConnection();
 
   return (
     <PrimaryTemplate
@@ -64,73 +150,127 @@ export const Connection = ({
         description="Device name and user parameters"
       >
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
-          <div className="flex w-full p-2 mb-2 border dark:border-gray-600 rounded-3xl">
-            Current connection method:
-            <div className="px-1 my-auto ml-2 text-sm bg-gray-400 rounded-full dark:bg-primaryDark">
-              BLE
-            </div>
-          </div>
           <form className="space-y-2" onSubmit={onSubmit}>
-            <Tabs
-              className="mb-10 h-60"
-              tabs={[
-                {
-                  name: 'HTTP',
-                  body: (
-                    <div className="space-y-2">
-                      <Input label={'Device URL'} />
-                      <Toggle label="Use TLS?" />
-                    </div>
-                  ),
-                },
-                {
-                  name: 'Bluetooth',
-                  body: (
-                    <div className="space-y-2">
-                      Devices:
-                      <Button
-                        onClick={async (): Promise<void> => {
-                          console.log(await bleConnection.getDevices());
-                        }}
-                      >
-                        Get Devices
-                      </Button>
-                      <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
-                        Device Name
-                        <FiLink2 className="w-5 h-5 my-auto mr-2 text-gray-300" />
-                      </div>
-                      <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
-                        Device Name
-                        <FiLink2 className="w-5 h-5 my-auto mr-2 text-gray-600" />
-                      </div>
-                    </div>
-                  ),
-                },
-                {
-                  name: 'Serial',
-                  body: (
-                    <div className="space-y-2">
-                      Devices:
-                      <Button
-                        onClick={async (): Promise<void> => {
-                          console.log(await serialConnection.getPorts());
-                        }}
-                      >
-                        Get Devices
-                      </Button>
-                      <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
-                        Device Name
-                        <FiLink2 className="w-5 h-5 my-auto mr-2 text-gray-300" />
-                      </div>
-                      <div className="flex justify-between p-2 border rounded-3xl dark:border-600">
-                        Device Name
-                        <FiLink2 className="w-5 h-5 my-auto mr-2 text-gray-600" />
-                      </div>
-                    </div>
-                  ),
-                },
-              ]}
+            <EnumSelect
+              label="Method"
+              optionsEnum={connType}
+              value={selectedConnType}
+              onChange={(e): void => {
+                setSelectedConnType(parseInt(e.target.value));
+              }}
             />
+            {selectedConnType === connType.HTTP && (
+              <>
+                <EnumSelect
+                  label="Host Source"
+                  options={[
+                    {
+                      name: 'Local',
+                      value: 'local',
+                    },
+                    {
+                      name: 'Remote',
+                      value: 'remote',
+                    },
+                  ]}
+                  value={httpIpSource}
+                  onChange={(e): void => {
+                    setHttpIpSource(e.target.value as 'local' | 'remote');
+                  }}
+                />
+                {httpIpSource === 'local' ? (
+                  <Input label="Host" value={connectionURL} disabled />
+                ) : (
+                  <Input label="Host" />
+                )}
+                <Toggle label="Use TLS?" />
+              </>
+            )}
+            {selectedConnType === connType.BLE && (
+              <div>
+                <div className="flex space-x-2">
+                  <Button border onClick={updateBleDeviceList}>
+                    Refresh List
+                  </Button>
+                  <Button
+                    border
+                    onClick={() => {
+                      ble.getDevice();
+                    }}
+                  >
+                    New Device
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <div>Previously connected devices</div>
+                  {bleDevices.map((device) => (
+                    <div
+                      onClick={() => {
+                        console.log('clicked');
+
+                        connect(connType.BLE, {
+                          device: device,
+                        });
+                      }}
+                      className="flex justify-between p-2 bg-gray-700 rounded-md"
+                      key={device.id}
+                    >
+                      <div className="my-auto">{device.name}</div>
+                      <IconButton
+                        onClick={() => {
+                          console.log('clicked');
+
+                          connect(connType.BLE, {
+                            device: device,
+                          });
+                        }}
+                        icon={<FiCheck />}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {selectedConnType === connType.SERIAL && (
+              <div>
+                <div className="flex space-x-2">
+                  <Button border onClick={updateBleDeviceList}>
+                    Refresh List
+                  </Button>
+                  <Button
+                    border
+                    onClick={() => {
+                      serial.getPort();
+                    }}
+                  >
+                    New Device
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <div>Previously connected devices</div>
+                  {serialDevices.map((device) => (
+                    <div
+                      className="flex justify-between p-2 bg-gray-700 rounded-md"
+                      key={device.getInfo().usbProductId}
+                    >
+                      <div className="my-auto">
+                        {device.getInfo().usbProductId}
+                        {device.getInfo().usbVendorId}
+                      </div>
+                      <IconButton
+                        onClick={() => {
+                          connect(connType.SERIAL, {
+                            // @ts-ignore
+                            device: device,
+                          });
+                        }}
+                        icon={<FiCheck />}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </form>
         </div>
       </Card>

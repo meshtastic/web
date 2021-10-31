@@ -7,7 +7,7 @@ import { ThemeToggle } from '@components/menu/buttons/ThemeToggle';
 import { Logo } from '@components/menu/Logo';
 import { MobileNav } from '@components/menu/MobileNav';
 import { Navigation } from '@components/menu/Navigation';
-import { connection } from '@core/connection';
+import { connection, setConnection } from '@core/connection';
 import { useRoute } from '@core/router';
 import {
   addChannel,
@@ -20,14 +20,19 @@ import {
   setReady,
   setUser,
 } from '@core/slices/meshtasticSlice';
-import { Protobuf, SettingsManager, Types } from '@meshtastic/meshtasticjs';
+import {
+  IHTTPConnection,
+  Protobuf,
+  SettingsManager,
+  Types,
+} from '@meshtastic/meshtasticjs';
 import { About } from '@pages/About';
 import { Messages } from '@pages/Messages';
 import { Nodes } from '@pages/Nodes/Index';
 import { Settings } from '@pages/settings/Index';
 
 import { NotFound } from './pages/NotFound';
-import { Plugins } from './pages/Plugins/Index.jsx';
+import { Plugins } from './pages/Plugins/Index';
 
 const App = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -38,6 +43,7 @@ const App = (): JSX.Element => {
   const hostOverrideEnabled = useAppSelector(
     (state) => state.meshtastic.hostOverrideEnabled,
   );
+
   const hostOverride = useAppSelector((state) => state.meshtastic.hostOverride);
 
   const connectionURL = hostOverrideEnabled
@@ -50,6 +56,7 @@ const App = (): JSX.Element => {
   React.useEffect(() => {
     SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
 
+    setConnection(new IHTTPConnection());
     void connection.connect({
       address: connectionURL,
       tls: false,
@@ -74,8 +81,13 @@ const App = (): JSX.Element => {
       dispatch(setMyNodeInfo(nodeInfo));
     });
 
-    connection.onUserDataPacket.subscribe((user) => {
-      dispatch(setUser(user));
+    connection.onUserPacket.subscribe((user) => {
+      dispatch(
+        setUser({
+          nodeNum: user.packet.from,
+          user: user.data,
+        }),
+      );
     });
 
     connection.onNodeInfoPacket.subscribe((nodeInfoPacket) =>
@@ -117,7 +129,6 @@ const App = (): JSX.Element => {
     return (): void => {
       connection.onDeviceStatus.cancelAll();
       connection.onMyNodeInfo.cancelAll();
-      connection.onUserDataPacket.cancelAll();
       connection.onNodeInfoPacket.cancelAll();
       connection.onAdminPacket.cancelAll();
       connection.onMeshHeartbeat.cancelAll();

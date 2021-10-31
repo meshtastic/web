@@ -4,6 +4,10 @@ import {
   ISerialConnection,
 } from '@meshtastic/meshtasticjs';
 
-export const connection = new IHTTPConnection();
-export const bleConnection = new IBLEConnection();
-export const serialConnection = new ISerialConnection();
+type connectionType = IBLEConnection | IHTTPConnection | ISerialConnection;
+
+export let connection: connectionType = new IHTTPConnection();
+
+export const setConnection = (conn: connectionType): void => {
+  connection = conn;
+};

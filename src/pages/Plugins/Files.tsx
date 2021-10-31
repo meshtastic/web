@@ -118,14 +118,14 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
                   </div>
                   <IconButton
                     className="mx-2 my-auto"
-                    confirmAction={async (): Promise<void> => {
-                      await fetch(
-                        `http://${connectionURL}/json/spiffs/delete/static?remove=${file.name}`,
-                        {
-                          method: 'DELETE',
-                        },
-                      );
-                    }}
+                    // confirmAction={async (): Promise<void> => {
+                    //   await fetch(
+                    //     `http://${connectionURL}/json/spiffs/delete/static?remove=${file.name}`,
+                    //     {
+                    //       method: 'DELETE',
+                    //     },
+                    //   );
+                    // }}
                     icon={<FiTrash className="w-5 h-5" />}
                   />
                 </div>

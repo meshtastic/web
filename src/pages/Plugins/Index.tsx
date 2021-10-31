@@ -34,7 +34,6 @@ export const Plugins = (): JSX.Element => {
               <div className="md:hidden">
                 <IconButton
                   icon={<FiXCircle className="w-5 h-5" />}
-                  circle
                   onClick={(): void => {
                     setNavOpen(false);
                   }}

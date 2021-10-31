@@ -10,6 +10,11 @@ export interface MessageWithAck {
   isSender: boolean;
   received: Date;
 }
+enum connType {
+  HTTP,
+  BLE,
+  SERIAL,
+}
 
 interface MeshtasticState {
   deviceStatus: Types.DeviceStatusEnum;
@@ -24,6 +29,7 @@ interface MeshtasticState {
   messages: MessageWithAck[];
   hostOverrideEnabled: boolean;
   hostOverride: string;
+  connectionType: connType;
 }
 
 const initialState: MeshtasticState = {
@@ -40,6 +46,7 @@ const initialState: MeshtasticState = {
   hostOverrideEnabled:
     localStorage.getItem('hostOverrideEnabled') === 'true' ?? false,
   hostOverride: localStorage.getItem('hostOverride') ?? '',
+  connectionType: parseInt(localStorage.getItem('connectionType') ?? '0'),
 };
 
 export const meshtasticSlice = createSlice({
@@ -58,8 +65,21 @@ export const meshtasticSlice = createSlice({
     setMyNodeInfo: (state, action: PayloadAction<Protobuf.MyNodeInfo>) => {
       state.myNodeInfo = action.payload;
     },
-    setUser: (state, action: PayloadAction<Protobuf.User>) => {
-      state.user = action.payload;
+    setUser: (
+      state,
+      action: PayloadAction<{
+        nodeNum: number;
+        user: Protobuf.User;
+      }>,
+    ) => {
+      if (action.payload.nodeNum === state.myNodeInfo.myNodeNum) {
+        state.user = action.payload.user;
+      } else {
+        const num = state.nodes.findIndex(
+          (node) => node.num === action.payload.nodeNum,
+        );
+        state.nodes[num].user = action.payload.user;
+      }
     },
     addPositionPacket: (state, action: PayloadAction<Types.PositionPacket>) => {
       state.positionPackets.push(action.payload);
@@ -75,7 +95,6 @@ export const meshtasticSlice = createSlice({
         state.nodes.push(action.payload);
       }
     },
-
     addChannel: (state, action: PayloadAction<Protobuf.Channel>) => {
       if (
         state.channels.findIndex(
@@ -118,6 +137,13 @@ export const meshtasticSlice = createSlice({
       state.hostOverride = action.payload;
       localStorage.setItem('hostOverride', action.payload);
       if (state.hostOverride !== action.payload) {
+        connection.disconnect();
+      }
+    },
+    setConnectionType: (state, action: PayloadAction<connType>) => {
+      state.connectionType = action.payload;
+      localStorage.setItem('connectionType', String(action.payload));
+      if (state.connectionType !== action.payload) {
         connection.disconnect();
       }
     },
