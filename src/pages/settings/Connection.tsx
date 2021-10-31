@@ -60,13 +60,13 @@ export const Connection = ({
     },
   });
 
-  const connect = (
+  const connect = async (
     connectionType: connType,
     params:
       | HTTPConnectionParameters
       | SerialConnectionParameters
       | BLEConnectionParameters,
-  ): void => {
+  ): Promise<void> => {
     connection.complete();
     connection.disconnect();
 
@@ -201,10 +201,10 @@ export const Connection = ({
                   <div>Previously connected devices</div>
                   {bleDevices.map((device) => (
                     <div
-                      onClick={() => {
+                      onClick={async (): Promise<void> => {
                         console.log('clicked');
 
-                        connect(connType.BLE, {
+                        await connect(connType.BLE, {
                           device: device,
                         });
                       }}
@@ -213,10 +213,10 @@ export const Connection = ({
                     >
                       <div className="my-auto">{device.name}</div>
                       <IconButton
-                        onClick={() => {
+                        onClick={async (): Promise<void> => {
                           console.log('clicked');
 
-                          connect(connType.BLE, {
+                          await connect(connType.BLE, {
                             device: device,
                           });
                         }}
@@ -254,8 +254,8 @@ export const Connection = ({
                         {device.getInfo().usbVendorId}
                       </div>
                       <IconButton
-                        onClick={() => {
-                          connect(connType.SERIAL, {
+                        onClick={async (): Promise<void> => {
+                          await connect(connType.SERIAL, {
                             // @ts-ignore tmp
                             device: device,
                           });
