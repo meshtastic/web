@@ -7,8 +7,8 @@ type DefaultSelectProps = JSX.IntrinsicElements['select'];
 
 interface SelectProps extends DefaultSelectProps {
   options?: {
-    name: string;
-    value: number | string;
+    name: string | number;
+    value: string | number;
   }[];
   optionsEnum?: { [s: string]: string | number };
   label?: string;
@@ -32,8 +32,16 @@ export const EnumSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
             className={`w-full  bg-transparent focus:outline-none focus:border-primary ${
               small ? 'py-1 mx-1' : 'h-10 mx-2'
             }`}
+            disabled={
+              props.disabled
+                ? true
+                : !(optionsEnumValues.length || options?.length)
+            }
             {...props}
           >
+            {!(optionsEnumValues.length || options?.length) && (
+              <option className="dark:bg-gray-700">Loading</option>
+            )}
             {optionsEnumValues.length &&
               optionsEnumValues.map(([name, value]) => (
                 <option className="dark:bg-gray-700" key={value} value={value}>

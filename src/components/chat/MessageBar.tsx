@@ -8,15 +8,20 @@ import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Input } from '@components/generic/form/Input';
 import { connection } from '@core/connection';
 
+import { EnumSelect } from '../generic/form/EnumSelect.jsx';
 import { IconButton } from '../generic/IconButton.jsx';
 
 export const MessageBar = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const ready = useAppSelector((state) => state.meshtastic.ready);
+  const nodes = useAppSelector((state) => state.meshtastic.nodes);
+  const myNodeInfo = useAppSelector((state) => state.meshtastic.myNodeInfo);
   const [currentMessage, setCurrentMessage] = React.useState('');
+  const [destinationNode, setDestinationNode] =
+    React.useState<number>(0xffffffff);
   const sendMessage = (): void => {
     if (ready) {
-      void connection.sendText(currentMessage, undefined, true, (id) => {
+      void connection.sendText(currentMessage, destinationNode, true, (id) => {
         dispatch(ackMessage(id));
 
         return Promise.resolve();
@@ -35,6 +40,25 @@ export const MessageBar = (): JSX.Element => {
             sendMessage();
           }}
         >
+          <EnumSelect
+            onChange={(e): void => {
+              setDestinationNode(parseInt(e.target.value));
+            }}
+            options={[
+              {
+                name: 'All',
+                value: 0xffffffff,
+              },
+              ...nodes
+                .filter((node) => node.num !== myNodeInfo.myNodeNum)
+                .map((node) => {
+                  return {
+                    name: node.user?.shortName ?? node.num,
+                    value: node.num,
+                  };
+                }),
+            ]}
+          />
           <Input
             type="text"
             minLength={2}
