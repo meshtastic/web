@@ -11,8 +11,8 @@ import { useAppSelector } from '@app/hooks/redux';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 
 export interface RangeTestProps {
-  navOpen: boolean;
-  setNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  navOpen?: boolean;
+  setNavOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface IFile {
   name: string;
@@ -58,7 +58,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
         <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
-            setNavOpen(!navOpen);
+            setNavOpen && setNavOpen(!navOpen);
           }}
         />
       }

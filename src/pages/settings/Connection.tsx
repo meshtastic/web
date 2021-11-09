@@ -25,8 +25,8 @@ import type {
 } from '@meshtastic/meshtasticjs/dist/types';
 
 export interface ConnectionProps {
-  navOpen: boolean;
-  setNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  navOpen?: boolean;
+  setNavOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 enum connType {
@@ -125,7 +125,7 @@ export const Connection = ({
         <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
-            setNavOpen(!navOpen);
+            setNavOpen && setNavOpen(!navOpen);
           }}
         />
       }
@@ -142,8 +142,8 @@ export const Connection = ({
       }
     >
       <Card
-        title="Basic settings"
-        description="Device name and user parameters"
+        title="Connection Settings"
+        description="HTTP, BLE and Serial Options"
       >
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>

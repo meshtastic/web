@@ -2,11 +2,11 @@ import React from 'react';
 
 type DefaultDivProps = JSX.IntrinsicElements['div'];
 
-interface SidebarItemProps extends DefaultDivProps {
+export interface SidebarItemProps extends DefaultDivProps {
   title: string;
   description: string;
-  selected: boolean;
   icon: JSX.Element;
+  selected?: boolean;
 }
 
 export const SidebarItem = ({

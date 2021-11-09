@@ -11,8 +11,8 @@ import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 
 export interface ChannelsProps {
-  navOpen: boolean;
-  setNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  navOpen?: boolean;
+  setNavOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Channels = ({
@@ -30,7 +30,7 @@ export const Channels = ({
         <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
-            setNavOpen(!navOpen);
+            setNavOpen && setNavOpen(!navOpen);
           }}
         />
       }

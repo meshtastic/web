@@ -15,8 +15,8 @@ import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface DeviceProps {
-  navOpen: boolean;
-  setNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  navOpen?: boolean;
+  setNavOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
@@ -46,7 +46,7 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
         <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
-            setNavOpen(!navOpen);
+            setNavOpen && setNavOpen(!navOpen);
           }}
         />
       }
