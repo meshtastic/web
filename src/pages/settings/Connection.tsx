@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { FiCheck, FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
-import { EnumSelect } from '@app/components/generic/form/EnumSelect';
+import { Checkbox } from '@app/components/generic/form/Checkbox';
 import { Input } from '@app/components/generic/form/Input';
+import { Select } from '@app/components/generic/form/Select';
 import { IconButton } from '@app/components/generic/IconButton';
-import { Toggle } from '@app/components/generic/Toggle';
 import { connection, setConnection } from '@app/core/connection';
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
@@ -147,7 +147,7 @@ export const Connection = ({
       >
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
-            <EnumSelect
+            <Select
               label="Method"
               optionsEnum={connType}
               value={selectedConnType}
@@ -157,7 +157,7 @@ export const Connection = ({
             />
             {selectedConnType === connType.HTTP && (
               <>
-                <EnumSelect
+                <Select
                   label="Host Source"
                   options={[
                     {
@@ -179,7 +179,7 @@ export const Connection = ({
                 ) : (
                   <Input label="Host" />
                 )}
-                <Toggle label="Use TLS?" />
+                <Checkbox label="Use TLS?" />
               </>
             )}
             {selectedConnType === connType.BLE && (

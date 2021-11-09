@@ -6,8 +6,8 @@ import { FiEdit3, FiSave } from 'react-icons/fi';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { connection } from '../core/connection.js';
-import { EnumSelect } from './generic/form/EnumSelect.jsx';
 import { Input } from './generic/form/Input.jsx';
+import { Select } from './generic/form/Select.jsx';
 import { IconButton } from './generic/IconButton.jsx';
 
 export interface ChannelProps {
@@ -77,7 +77,7 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
           <div className="my-auto space-x-2">
             <form>
               <div className="flex space-x-2">
-                <EnumSelect
+                <Select
                   label="Channel Type"
                   optionsEnum={Protobuf.Channel_Role}
                   {...register('role', { valueAsNumber: true })}

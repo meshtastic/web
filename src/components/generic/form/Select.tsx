@@ -16,7 +16,7 @@ interface SelectProps extends DefaultSelectProps {
   small?: boolean;
 }
 
-export const EnumSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
+export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ options, optionsEnum, label, error, small, ...props }, ref) => {
     const optionsEnumValues = optionsEnum
       ? Object.entries(optionsEnum).filter(
@@ -29,7 +29,7 @@ export const EnumSelect = React.forwardRef<HTMLSelectElement, SelectProps>(
         <InputWrapper>
           <select
             ref={ref}
-            className={`w-full  bg-transparent focus:outline-none focus:border-primary ${
+            className={`w-full bg-white dark:bg-transparent focus:outline-none focus:border-primary ${
               small ? 'py-1 mx-1' : 'h-10 mx-2'
             }`}
             disabled={

@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
+import { Checkbox } from '@app/components/generic/form/Checkbox';
 import { IconButton } from '@app/components/generic/IconButton.jsx';
-import { Toggle } from '@app/components/generic/Toggle';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
@@ -81,7 +81,7 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
               maxLength={3}
               {...register('shortName')}
             />
-            <Toggle label="Licenced Operator?" {...register('isLicensed')} />
+            <Checkbox label="Licenced Operator?" {...register('isLicensed')} />
           </form>
         </div>
       </Card>

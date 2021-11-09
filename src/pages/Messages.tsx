@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FiHash } from 'react-icons/fi';
 
-import { EnumSelect } from '@app/components/generic/form/EnumSelect.jsx';
+import { Select } from '@app/components/generic/form/Select.jsx';
 import { Message } from '@components/chat/Message';
 import { MessageBar } from '@components/chat/MessageBar';
 import { Protobuf } from '@meshtastic/meshtasticjs';
@@ -19,7 +19,7 @@ export const Messages = (): JSX.Element => {
       <div className="flex justify-between w-full px-2 border-b dark:border-gray-600 dark:text-gray-300">
         <div className="flex py-2 my-auto text-sm">
           <FiHash className="w-4 h-4 my-auto mr-1" />
-          <EnumSelect
+          <Select
             options={channels
               .filter(
                 (channel) =>

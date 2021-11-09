@@ -19,7 +19,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <InputWrapper error={error} disabled={props.disabled}>
           <input
             ref={ref}
-            className="w-full h-10 px-3 py-2 bg-transparent focus:outline-none focus:border-primary"
+            className="w-full h-10 px-3 py-2 bg-transparent focus:outline-none"
             {...props}
           />
           {action && <div className="flex mr-1">{action}</div>}

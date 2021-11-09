@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { FiMenu, FiSave, FiXCircle } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
-import { EnumSelect } from '@app/components/generic/form/EnumSelect.jsx';
+import { Checkbox } from '@app/components/generic/form/Checkbox';
+import { Select } from '@app/components/generic/form/Select.jsx';
 import { IconButton } from '@app/components/generic/IconButton.jsx';
-import { Toggle } from '@app/components/generic/Toggle.jsx';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
@@ -89,18 +89,21 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
               label={'Broadcast Interval (seconds)'}
               {...register('positionBroadcastSecs', { valueAsNumber: true })}
             />
-            <EnumSelect
+            <Select
               label="Position Type"
               optionsEnum={Protobuf.PositionFlags}
               {...register('positionFlags', { valueAsNumber: true })}
             />
-            <Toggle label="Use Fixed Position" {...register('fixedPosition')} />
-            <EnumSelect
+            <Checkbox
+              label="Use Fixed Position"
+              {...register('fixedPosition')}
+            />
+            <Select
               label="Location Sharing"
               optionsEnum={Protobuf.LocationSharing}
               {...register('locationShare', { valueAsNumber: true })}
             />
-            <EnumSelect
+            <Select
               label="GPS Mode"
               optionsEnum={Protobuf.GpsOperation}
               {...register('gpsOperation', { valueAsNumber: true })}

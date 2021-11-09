@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { FiMenu, FiSave } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
+import { Checkbox } from '@app/components/generic/form/Checkbox';
 import { Input } from '@app/components/generic/form/Input.jsx';
 import { IconButton } from '@app/components/generic/IconButton.jsx';
-import { Toggle } from '@app/components/generic/Toggle';
 import { connection } from '@app/core/connection.js';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
@@ -70,31 +70,13 @@ export const RangeTest = ({
         <Card title="Range Test" description="Settings">
           <div className="w-full max-w-3xl p-10 md:max-w-xl">
             <form onSubmit={onSubmit}>
-              <Toggle
+              <Checkbox
                 label="Range Test Plugin Enabled?"
-                checked={preferences.rangeTestPluginEnabled}
-                action={(checked): void => {
-                  void connection.setPreferences({
-                    ...preferences,
-                    rangeTestPluginEnabled: checked,
-                  });
-                }}
+                {...register('rangeTestPluginEnabled')}
               />
-              <Toggle
+              <Checkbox
                 label="Range Test Plugin Save?"
-                checked={preferences.rangeTestPluginEnabled}
-                action={(checked): void => {
-                  void connection.setPreferences({
-                    ...preferences,
-                    rangeTestPluginSave: checked,
-                  });
-                }}
-              />
-              <Toggle
-                label="Range Test Plugin Save?"
-                {...register('rangeTestPluginEnabled', {
-                  valueAsNumber: true,
-                })}
+                {...register('rangeTestPluginSave')}
               />
               <Input
                 type="number"

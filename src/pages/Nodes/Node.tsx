@@ -5,9 +5,9 @@ import { FiMenu, FiTerminal } from 'react-icons/fi';
 
 import { Card } from '@app/components/generic/Card';
 import { Chart } from '@app/components/generic/Chart';
+import { Checkbox } from '@app/components/generic/form/Checkbox';
 import { Input } from '@app/components/generic/form/Input';
 import { IconButton } from '@app/components/generic/IconButton.jsx';
-import { Toggle } from '@app/components/generic/Toggle';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
@@ -167,7 +167,7 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
             <form className="space-y-4">
               <Input label={'Device Name'} />
               <Input label={'Short Name'} maxLength={3} />
-              <Toggle label="Licenced Operator?" />
+              <Checkbox label="Licenced Operator?" />
             </form>
           </div>
         </Card>

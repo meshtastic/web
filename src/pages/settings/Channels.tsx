@@ -6,6 +6,7 @@ import { FiMenu, FiSave } from 'react-icons/fi';
 import { Channel } from '@app/components/Channel.jsx';
 import { Card } from '@app/components/generic/Card';
 import { IconButton } from '@app/components/generic/IconButton.jsx';
+import { connection } from '@app/core/connection.js';
 import { useAppSelector } from '@app/hooks/redux.js';
 import { Button } from '@components/generic/Button';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
@@ -67,7 +68,12 @@ export const Channels = ({
             ))}
 
             <div className="flex space-x-52">
-              <div className="text-sm font-thin text-gray-400 dark:text-gray-300">
+              <div
+                onClick={(): Promise<void> => {
+                  return connection.confirmSetChannel();
+                }}
+                className="text-sm font-thin text-gray-400 dark:text-gray-300"
+              >
                 Please ensure any changes are working before confirming
               </div>
               <Button active>Confirm</Button>

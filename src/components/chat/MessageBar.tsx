@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Input } from '@components/generic/form/Input';
 import { connection } from '@core/connection';
 
-import { EnumSelect } from '../generic/form/EnumSelect.jsx';
+import { Select } from '../generic/form/Select.jsx';
 import { IconButton } from '../generic/IconButton.jsx';
 
 export const MessageBar = (): JSX.Element => {
@@ -40,7 +40,7 @@ export const MessageBar = (): JSX.Element => {
             sendMessage();
           }}
         >
-          <EnumSelect
+          <Select
             onChange={(e): void => {
               setDestinationNode(parseInt(e.target.value));
             }}

@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@headlessui/react': ^1.4.2
-  '@meshtastic/meshtasticjs': ^0.6.24
+  '@meshtastic/meshtasticjs': ^0.6.25
   '@reduxjs/toolkit': ^1.6.2
   '@snowpack/plugin-dotenv': ^2.2.0
   '@snowpack/plugin-postcss': ^1.4.3
@@ -39,7 +39,6 @@ specifiers:
   react-apexcharts: ^1.3.9
   react-dom: ^17.0.2
   react-file-icon: ^1.1.0
-  react-flags-select: ^2.1.2
   react-hook-form: ^7.19.1
   react-i18next: ^11.13.0
   react-icons: ^4.3.1
@@ -54,7 +53,7 @@ specifiers:
 
 dependencies:
   '@headlessui/react': 1.4.2_react-dom@17.0.2+react@17.0.2
-  '@meshtastic/meshtasticjs': 0.6.24
+  '@meshtastic/meshtasticjs': 0.6.25
   '@reduxjs/toolkit': 1.6.2_react-redux@7.2.6+react@17.0.2
   apexcharts: 3.29.0
   boring-avatars: 1.5.8
@@ -65,7 +64,6 @@ dependencies:
   react-apexcharts: 1.3.9_apexcharts@3.29.0+react@17.0.2
   react-dom: 17.0.2_react@17.0.2
   react-file-icon: 1.1.0_react-dom@17.0.2+react@17.0.2
-  react-flags-select: 2.1.2_react-dom@17.0.2+react@17.0.2
   react-hook-form: 7.19.1_react@17.0.2
   react-i18next: 11.13.0_i18next@21.4.1+react@17.0.2
   react-icons: 4.3.1_react@17.0.2
@@ -426,8 +424,8 @@ packages:
     resolution: {integrity: sha512-SQ7Kzhh9+D+ZW9MA0zkYv3VXhIDNx+LzM6EJ+/65I3QY+enU6Itte7E5XX7EWrqLW2FN4n06GWzBnPoC3th2aQ==}
     dev: true
 
-  /@meshtastic/meshtasticjs/0.6.24:
-    resolution: {integrity: sha512-zdIxyIL6a+UUgZdZvxeRhK/xVhLYB0ZeB5OuA9peRFVE/ICHmAhkmNb58G1hDr0Lq3mPtmlsnh0DiPkI5O4TnQ==}
+  /@meshtastic/meshtasticjs/0.6.25:
+    resolution: {integrity: sha512-/FVmKIFpzSo2xguJ0+HfnpN9/6TS3ReMOXL29U7CsPnqGwePC3JJd3THNn2+ofOa//Iy7xGTYah0nF+LH1znJQ==}
     dependencies:
       '@protobuf-ts/runtime': 2.0.7
       node-fetch: 3.1.0
@@ -1581,10 +1579,6 @@ packages:
   /cjs-module-lexer/1.2.2:
     resolution: {integrity: sha512-cOU9usZw8/dXIXKtwa8pM0OTJQuJkxMN6w30csNRUerHfeQ5R6U3kkU/FtJeIf3M202OHfY2U8ccInBG7/xogA==}
     dev: true
-
-  /classnames/2.3.1:
-    resolution: {integrity: sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==}
-    dev: false
 
   /clean-stack/2.2.0:
     resolution: {integrity: sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==}
@@ -4464,17 +4458,6 @@ packages:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       tinycolor2: 1.4.2
-    dev: false
-
-  /react-flags-select/2.1.2_react-dom@17.0.2+react@17.0.2:
-    resolution: {integrity: sha512-nx/6mY/nKVJB9sVZOylJoSI6idTYZfu0dtUQ0N1L+cD8VAPNl5c/lxL7yyi9vtn66hDRFy6Sr16GzsBj3aoZfQ==}
-    peerDependencies:
-      react: '>=16.8.0'
-      react-dom: '>=16.8.0'
-    dependencies:
-      classnames: 2.3.1
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
     dev: false
 
   /react-hook-form/7.19.1_react@17.0.2:
