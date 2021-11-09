@@ -94,14 +94,14 @@ export const Connection = ({
     setSerialDevices(devices);
   };
 
-  React.useEffect(() => {
-    if (selectedConnType === connType.BLE) {
-      void updateBleDeviceList();
-    }
-    if (selectedConnType === connType.SERIAL) {
-      void updateSerialDeviceList();
-    }
-  }, [selectedConnType]);
+  // React.useEffect(() => {
+  //   if (selectedConnType === connType.BLE) {
+  //     void updateBleDeviceList();
+  //   }
+  //   if (selectedConnType === connType.SERIAL) {
+  //     void updateSerialDeviceList();
+  //   }
+  // }, [selectedConnType]);
 
   const onSubmit = handleSubmit((data) => {
     // void connection.setOwner(data);
