@@ -4,7 +4,7 @@
   "description": "Meshtastic web client",
   "license": "GPL-3.0-only",
   "scripts": {
-    "dev": "NODE_ENV=development vite",
+    "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.4.2",
-    "@meshtastic/meshtasticjs": "^0.6.26",
+    "@meshtastic/meshtasticjs": "^0.6.27",
     "@reduxjs/toolkit": "^1.6.2",
     "boring-avatars": "^1.5.8",
     "i18next": "^21.4.2",

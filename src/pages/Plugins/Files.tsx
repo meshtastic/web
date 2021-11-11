@@ -40,7 +40,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
 
   const connectionURL = hostOverrideEnabled
     ? hostOverride
-    : import.meta.env.NODE_ENV === 'production'
+    : import.meta.env.PROD
     ? window.location.hostname
     : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ??
       'http://meshtastic.local';

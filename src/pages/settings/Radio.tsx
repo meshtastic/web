@@ -88,6 +88,16 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
         <Cover enabled={debug} content={<JSONPretty data={radioConfig} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
+            <div>Power</div>
+            <hr />
+            <Input
+              label={'Charge current'}
+              disabled
+              {...register('chargeCurrent', { valueAsNumber: true })}
+            />
+            <Checkbox label="Always powered" {...register('isAlwaysPowered')} />
+            <Checkbox label="Low Power" {...register('isLowPower')} />
+            <hr />
             <div>WiFi</div>
             <Input label={t('strings.wifi_ssid')} {...register('wifiSsid')} />
             <Input
@@ -95,14 +105,11 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
               label={t('strings.wifi_psk')}
               {...register('wifiPassword')}
             />
-            <Input
-              label={'Charge current'}
-              disabled
-              {...register('chargeCurrent', { valueAsNumber: true })}
-            />
+            <hr />
             <div>Position</div>
             <Input
               label={'Broadcast Interval (seconds)'}
+              type="number"
               {...register('positionBroadcastSecs', { valueAsNumber: true })}
             />
             <Select
@@ -124,13 +131,31 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
               optionsEnum={Protobuf.GpsOperation}
               {...register('gpsOperation', { valueAsNumber: true })}
             />
-
-            <div>Other</div>
+            <Select
+              label="Display Format"
+              optionsEnum={Protobuf.GpsCoordinateFormat}
+              {...register('gpsFormat', { valueAsNumber: true })}
+            />
+            <Checkbox label="Accept 2D Fix" {...register('gpsAccept2D')} />
             <Input
-              label={'Last GPS Attempt'}
+              label="Max DOP"
+              type="number"
+              {...register('gpsMaxDop', { valueAsNumber: true })}
+            />
+            <Input
+              label="Last GPS Attempt"
               disabled
               {...register('gpsAttemptTime', { valueAsNumber: true })}
             />
+            <hr />
+            <div>Other</div>
+            <Select
+              label="Region"
+              optionsEnum={Protobuf.RegionCode}
+              {...register('region', { valueAsNumber: true })}
+            />
+            <Checkbox label="Debug Log" {...register('debugLogEnabled')} />
+            <Checkbox label="Serial Disabled" {...register('serialDisabled')} />
           </form>
         </div>
       </Card>
