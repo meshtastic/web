@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { InputWrapper } from './InputWrapper.jsx';
-import { Label } from './Label.jsx';
+import { InputWrapper } from './InputWrapper';
+import { Label } from './Label';
 
 type DefaultSelectProps = JSX.IntrinsicElements['select'];
 

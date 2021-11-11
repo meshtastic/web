@@ -50,7 +50,7 @@ const App = (): JSX.Element => {
     ? hostOverride
     : import.meta.env.NODE_ENV === 'production'
     ? window.location.hostname
-    : (import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP as string) ??
+    : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ??
       'http://meshtastic.local';
 
   React.useEffect(() => {

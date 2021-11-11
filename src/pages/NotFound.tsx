@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card } from '@app/components/generic/Card';
+import { Card } from '@components/generic/Card';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 
 export const NotFound = (): JSX.Element => {

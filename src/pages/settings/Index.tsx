@@ -8,7 +8,7 @@ import {
   FiSmartphone,
 } from 'react-icons/fi';
 
-import { PageLayout } from '@app/components/templates/PageLayout.jsx';
+import { PageLayout } from '@components/templates/PageLayout';
 
 import { Channels } from './Channels';
 import { Connection } from './Connection';

@@ -3,13 +3,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiSend } from 'react-icons/fi';
 
-import { ackMessage } from '@app/core/slices/meshtasticSlice.js';
+import { ackMessage } from '@app/core/slices/meshtasticSlice';
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Input } from '@components/generic/form/Input';
 import { connection } from '@core/connection';
 
-import { Select } from '../generic/form/Select.jsx';
-import { IconButton } from '../generic/IconButton.jsx';
+import { Select } from '../generic/form/Select';
+import { IconButton } from '../generic/IconButton';
 
 export const MessageBar = (): JSX.Element => {
   const dispatch = useAppDispatch();

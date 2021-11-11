@@ -5,15 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { FiCode, FiMenu, FiSave, FiXCircle } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { Card } from '@app/components/generic/Card';
-import { Cover } from '@app/components/generic/Cover.jsx';
-import { Checkbox } from '@app/components/generic/form/Checkbox';
-import { Select } from '@app/components/generic/form/Select.jsx';
-import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
+import { Card } from '@components/generic/Card';
+import { Cover } from '@components/generic/Cover';
+import { Checkbox } from '@components/generic/form/Checkbox';
 import { Input } from '@components/generic/form/Input';
+import { Select } from '@components/generic/form/Select';
+import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 

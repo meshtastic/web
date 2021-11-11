@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Label } from './Label.jsx';
+import { Label } from './Label';
 
 type DefaultInputProps = JSX.IntrinsicElements['input'];
 

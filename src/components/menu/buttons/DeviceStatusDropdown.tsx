@@ -2,8 +2,8 @@ import React from 'react';
 
 import { FiWifi, FiWifiOff } from 'react-icons/fi';
 
-import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { useAppSelector } from '@app/hooks/redux';
+import { IconButton } from '@components/generic/IconButton';
 import { Types } from '@meshtastic/meshtasticjs';
 
 export const DeviceStatusDropdown = (): JSX.Element => {

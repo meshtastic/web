@@ -2,8 +2,8 @@ import React from 'react';
 
 import { FiMoon, FiSun } from 'react-icons/fi';
 
-import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
+import { IconButton } from '@components/generic/IconButton';
 import { setDarkModeEnabled } from '@core/slices/appSlice';
 
 export const ThemeToggle = (): JSX.Element => {

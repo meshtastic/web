@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FiMenu } from 'react-icons/fi';
 
-import { IconButton } from '@app/components/generic/IconButton.jsx';
+import { IconButton } from '@components/generic/IconButton';
 import { openMobileNav } from '@core/slices/appSlice';
 
 import { useAppDispatch } from '../../../hooks/redux';

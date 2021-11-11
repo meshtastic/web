@@ -3,10 +3,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiMenu, FiSave } from 'react-icons/fi';
 
-import { Card } from '@app/components/generic/Card';
-import { Select } from '@app/components/generic/form/Select';
 import i18n from '@app/core/translation';
 import { Button } from '@components/generic/Button';
+import { Card } from '@components/generic/Card';
+import { Select } from '@components/generic/form/Select';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 
 export interface InterfaceProps {

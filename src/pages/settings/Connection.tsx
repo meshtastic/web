@@ -4,14 +4,14 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { FiCheck, FiMenu, FiSave } from 'react-icons/fi';
 
-import { Card } from '@app/components/generic/Card';
-import { Checkbox } from '@app/components/generic/form/Checkbox';
-import { Input } from '@app/components/generic/form/Input';
-import { Select } from '@app/components/generic/form/Select';
-import { IconButton } from '@app/components/generic/IconButton';
 import { connection, setConnection } from '@app/core/connection';
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
+import { Card } from '@components/generic/Card';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Input } from '@components/generic/form/Input';
+import { Select } from '@components/generic/form/Select';
+import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import {
   IBLEConnection,
@@ -111,7 +111,7 @@ export const Connection = ({
     ? hostOverride
     : import.meta.env.NODE_ENV === 'production'
     ? window.location.hostname
-    : (import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP as string) ??
+    : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ??
       'http://meshtastic.local';
 
   const ble = new IBLEConnection();

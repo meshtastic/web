@@ -2,8 +2,8 @@ import React from 'react';
 
 import Avatar from 'boring-avatars';
 
-import { PageLayout } from '@app/components/templates/PageLayout.jsx';
 import { useAppSelector } from '@app/hooks/redux';
+import { PageLayout } from '@components/templates/PageLayout';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { Node } from './Node';

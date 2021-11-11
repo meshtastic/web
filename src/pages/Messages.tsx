@@ -2,9 +2,9 @@ import React from 'react';
 
 import { FiHash } from 'react-icons/fi';
 
-import { Select } from '@app/components/generic/form/Select.jsx';
 import { Message } from '@components/chat/Message';
 import { MessageBar } from '@components/chat/MessageBar';
+import { Select } from '@components/generic/form/Select';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { useAppSelector } from '../hooks/redux';

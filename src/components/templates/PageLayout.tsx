@@ -2,10 +2,11 @@ import React from 'react';
 
 import { FiXCircle } from 'react-icons/fi';
 
-import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { useBreakpoint } from '@app/hooks/breakpoint';
 import { Drawer } from '@components/generic/Drawer';
-import { SidebarItem, SidebarItemProps } from '@components/generic/SidebarItem';
+import { IconButton } from '@components/generic/IconButton';
+import type { SidebarItemProps } from '@components/generic/SidebarItem';
+import { SidebarItem } from '@components/generic/SidebarItem';
 import { Tab } from '@headlessui/react';
 
 export interface PageLayoutProps {

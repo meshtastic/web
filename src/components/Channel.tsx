@@ -5,10 +5,10 @@ import { FiEdit3, FiSave } from 'react-icons/fi';
 
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
-import { connection } from '../core/connection.js';
-import { Input } from './generic/form/Input.jsx';
-import { Select } from './generic/form/Select.jsx';
-import { IconButton } from './generic/IconButton.jsx';
+import { connection } from '../core/connection';
+import { Input } from './generic/form/Input';
+import { Select } from './generic/form/Select';
+import { IconButton } from './generic/IconButton';
 
 export interface ChannelProps {
   channel: Protobuf.Channel;
@@ -39,7 +39,6 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
     role: Protobuf.Channel_Role;
     settings: {
       name: string;
-      modemConfig: Protobuf.ChannelSettings_ModemConfig;
       bandwidth?: number;
       codingRate?: number;
       spreadFactor?: number;
@@ -99,19 +98,19 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
               <Input
                 label="Bandwidth"
                 type="number"
-                {...register('settings.bandwidth')}
+                {...register('settings.bandwidth', { valueAsNumber: true })}
               />
               <Input
                 label="Spread Factor"
                 type="number"
                 min={7}
                 max={12}
-                {...register('settings.spreadFactor')}
+                {...register('settings.spreadFactor', { valueAsNumber: true })}
               />
               <Input
                 label="Coding Rate"
                 type="number"
-                {...register('settings.codingRate')}
+                {...register('settings.codingRate', { valueAsNumber: true })}
               />
             </form>
           </div>

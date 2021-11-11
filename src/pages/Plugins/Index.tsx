@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FiFileText, FiRss } from 'react-icons/fi';
 
-import { PageLayout } from '@app/components/templates/PageLayout.jsx';
+import { PageLayout } from '@components/templates/PageLayout';
 
 import { Files } from './Files';
 import { RangeTest } from './RangeTest';

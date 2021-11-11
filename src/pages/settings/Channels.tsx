@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { FiCode, FiMenu, FiSave } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { Channel } from '@app/components/Channel.jsx';
-import { Card } from '@app/components/generic/Card';
-import { Cover } from '@app/components/generic/Cover.jsx';
-import { IconButton } from '@app/components/generic/IconButton.jsx';
-import { connection } from '@app/core/connection.js';
-import { useAppSelector } from '@app/hooks/redux.js';
+import { connection } from '@app/core/connection';
+import { useAppSelector } from '@app/hooks/redux';
+import { Channel } from '@components/Channel';
 import { Button } from '@components/generic/Button';
+import { Card } from '@components/generic/Card';
+import { Cover } from '@components/generic/Cover';
+import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 
 export interface ChannelsProps {

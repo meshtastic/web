@@ -4,13 +4,13 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { FiMenu, FiSave } from 'react-icons/fi';
 
-import { Card } from '@app/components/generic/Card';
-import { Checkbox } from '@app/components/generic/form/Checkbox';
-import { Input } from '@app/components/generic/form/Input.jsx';
-import { IconButton } from '@app/components/generic/IconButton.jsx';
-import { connection } from '@app/core/connection.js';
+import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
+import { Card } from '@components/generic/Card';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Input } from '@components/generic/form/Input';
+import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import type { RadioConfig_UserPreferences } from '@meshtastic/meshtasticjs/dist/generated';
 

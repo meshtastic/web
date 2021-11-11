@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { DefaultExtensionType, defaultStyles, FileIcon } from 'react-file-icon';
+// import { DefaultExtensionType, defaultStyles, FileIcon } from 'react-file-icon';
 import { FiMenu, FiTrash, FiUploadCloud } from 'react-icons/fi';
 import useSWR from 'swr';
 
-import { Card } from '@app/components/generic/Card';
-import { IconButton } from '@app/components/generic/IconButton.jsx';
-import fetcher from '@app/core/utils/fetcher.js';
+import fetcher from '@app/core/utils/fetcher';
 import { useAppSelector } from '@app/hooks/redux';
+import { Card } from '@components/generic/Card';
+import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 
 export interface RangeTestProps {
@@ -42,7 +42,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
     ? hostOverride
     : import.meta.env.NODE_ENV === 'production'
     ? window.location.hostname
-    : (import.meta.env.SNOWPACK_PUBLIC_DEVICE_IP as string) ??
+    : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ??
       'http://meshtastic.local';
 
   const { data } = useSWR<IFiles>(
@@ -91,7 +91,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
                 >
                   <div className="flex p-2 max-h-12">
                     <div className="flex w-12">
-                      <FileIcon
+                      {/* <FileIcon
                         extension={
                           (file.nameModified ?? file.name).split('.')[
                             (file.nameModified ?? file.name).split('.').length -
@@ -104,7 +104,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
                               1
                           ] as DefaultExtensionType
                         ]}
-                      />
+                      /> */}
                     </div>
                     <a
                       href={`http://${connectionURL}/${file.name.replace(
