@@ -13,6 +13,7 @@ import {
   addChannel,
   addMessage,
   addNode,
+  addPosition,
   addUser,
   setDeviceStatus,
   setLastMeshInterraction,
@@ -82,9 +83,11 @@ const App = (): JSX.Element => {
     });
 
     connection.onUserPacket.subscribe((user) => {
-      console.log('got user packet');
+      dispatch(addUser(user));
+    });
 
-      dispatch(addUser(user.data));
+    connection.onPositionPacket.subscribe((position) => {
+      dispatch(addPosition(position));
     });
 
     connection.onNodeInfoPacket.subscribe(

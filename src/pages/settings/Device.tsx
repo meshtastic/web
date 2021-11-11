@@ -27,7 +27,10 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
   const { t } = useTranslation();
   const [debug, setDebug] = React.useState(false);
   const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.meshtastic.myUser);
+  const myNodeInfo = useAppSelector((state) => state.meshtastic.myNodeInfo);
+  const user = useAppSelector((state) => state.meshtastic.users).find(
+    (user) => user.packet.from === myNodeInfo.myNodeNum,
+  );
   const { register, handleSubmit, formState } = useForm<{
     longName: string;
     shortName: string;
@@ -35,17 +38,19 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
     team: Protobuf.Team;
   }>({
     defaultValues: {
-      longName: user.longName,
-      shortName: user.shortName,
-      isLicensed: user.isLicensed,
-      team: user.team,
+      longName: user?.data.longName,
+      shortName: user?.data.shortName,
+      isLicensed: user?.data.isLicensed,
+      team: user?.data.team,
     },
   });
 
   const onSubmit = handleSubmit((data) => {
-    void connection.setOwner({ ...user, ...data });
     // TODO: can be remove once getUser is implemented
-    dispatch(addUser({ ...user, ...data }));
+    if (user) {
+      void connection.setOwner({ ...user.data, ...data });
+      dispatch(addUser({ ...user, ...{ data: { ...user.data, ...data } } }));
+    }
   });
 
   return (
@@ -92,10 +97,14 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
         <Cover enabled={debug} content={<JSONPretty data={user} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
-            <Input label={'Device ID'} value={user.id} disabled />
+            <Input label={'Device ID'} value={user?.data.id} disabled />
             <Input
               label={'Hardware'}
-              value={Protobuf.HardwareModel[user.hwModel]}
+              value={
+                Protobuf.HardwareModel[
+                  user?.data.hwModel ?? Protobuf.HardwareModel.UNSET
+                ]
+              }
               disabled
             />
             <Input label={'Device Name'} {...register('longName')} />

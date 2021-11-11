@@ -7,13 +7,13 @@
     "dev": "NODE_ENV=development vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,woff,woff2 dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)",
+    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "lint": "eslint 'src/**/*.{ts,tsx}'"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.2",
-    "@meshtastic/meshtasticjs": "^0.6.25",
+    "@meshtastic/meshtasticjs": "^0.6.26",
     "@reduxjs/toolkit": "^1.6.2",
     "boring-avatars": "^1.5.8",
     "i18next": "^21.4.2",
@@ -22,8 +22,8 @@
     "react-apexcharts": "^1.3.9",
     "react-dom": "^17.0.2",
     "react-file-icon": "^1.1.0",
-    "react-hook-form": "^7.19.1",
-    "react-i18next": "^11.14.0",
+    "react-hook-form": "^7.19.4",
+    "react-i18next": "^11.14.1",
     "react-icons": "^4.3.1",
     "react-json-pretty": "^2.2.0",
     "react-redux": "^7.2.6",
@@ -38,7 +38,6 @@
     "@types/react-file-icon": "^1.0.1",
     "@types/react-redux": "^7.1.20",
     "@types/react-timeago": "^4.1.3",
-    "@types/snowpack-env": "^2.3.4",
     "@types/w3c-web-serial": "^1.0.2",
     "@types/web-bluetooth": "^0.0.11",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
@@ -51,8 +50,8 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-babel-module": "^5.3.1",
     "eslint-import-resolver-typescript": "^2.5.0",
-    "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-react": "^7.26.1",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-react": "^7.27.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "gzipper": "^6.0.0",
     "postcss": "^8.3.11",
@@ -60,6 +59,8 @@
     "tailwindcss": "^3.0.0-alpha.2",
     "tar": "^6.1.11",
     "typescript": "^4.4.4",
-    "vite": "^2.6.14"
+    "vite": "^2.6.14",
+    "vite-plugin-pwa": "^0.11.3",
+    "workbox-window": "^6.3.0"
   }
 }

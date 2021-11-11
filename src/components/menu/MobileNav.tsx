@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Drawer } from '@components/generic/Drawer';

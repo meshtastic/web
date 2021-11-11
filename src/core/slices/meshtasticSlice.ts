@@ -22,8 +22,7 @@ interface MeshtasticState {
   ready: boolean;
   myNodeInfo: Protobuf.MyNodeInfo;
   myNode: Protobuf.NodeInfo;
-  users: Protobuf.User[];
-  myUser: Protobuf.User;
+  users: Types.UserPacket[];
   positionPackets: Types.PositionPacket[];
   nodes: Protobuf.NodeInfo[];
   channels: Protobuf.Channel[];
@@ -41,7 +40,6 @@ const initialState: MeshtasticState = {
   myNodeInfo: Protobuf.MyNodeInfo.create(),
   myNode: Protobuf.NodeInfo.create(),
   users: [],
-  myUser: Protobuf.User.create(),
   positionPackets: [],
   nodes: [],
   channels: [],
@@ -69,21 +67,22 @@ export const meshtasticSlice = createSlice({
     setMyNodeInfo: (state, action: PayloadAction<Protobuf.MyNodeInfo>) => {
       state.myNodeInfo = action.payload;
     },
-    addUser: (state, action: PayloadAction<Protobuf.User>) => {
-      if (action.payload.id === state.myNode.user?.id) {
-        state.myUser = action.payload;
-      }
+    addUser: (state, action: PayloadAction<Types.UserPacket>) => {
       if (
-        state.users.findIndex((user) => user.id === action.payload.id) !== -1
+        state.users.findIndex(
+          (user) => user.data.id === action.payload.data.id,
+        ) !== -1
       ) {
         state.users = state.users.map((user) => {
-          return user.id === action.payload.id ? action.payload : user;
+          return user.data.id === action.payload.data.id
+            ? action.payload
+            : user;
         });
       } else {
         state.users.push(action.payload);
       }
     },
-    addPositionPacket: (state, action: PayloadAction<Types.PositionPacket>) => {
+    addPosition: (state, action: PayloadAction<Types.PositionPacket>) => {
       state.positionPackets.push(action.payload);
     },
     addNode: (state, action: PayloadAction<Protobuf.NodeInfo>) => {
@@ -161,7 +160,7 @@ export const {
   setReady,
   setMyNodeInfo,
   addUser,
-  addPositionPacket,
+  addPosition,
   addNode,
   addChannel,
   setPreferences,

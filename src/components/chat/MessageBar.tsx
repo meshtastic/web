@@ -15,6 +15,7 @@ export const MessageBar = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const ready = useAppSelector((state) => state.meshtastic.ready);
   const nodes = useAppSelector((state) => state.meshtastic.nodes);
+  const users = useAppSelector((state) => state.meshtastic.users);
   const myNodeInfo = useAppSelector((state) => state.meshtastic.myNodeInfo);
   const [currentMessage, setCurrentMessage] = React.useState('');
   const [destinationNode, setDestinationNode] =
@@ -52,8 +53,11 @@ export const MessageBar = (): JSX.Element => {
               ...nodes
                 .filter((node) => node.num !== myNodeInfo.myNodeNum)
                 .map((node) => {
+                  const user = users.filter(
+                    (user) => user.packet.from === node.num,
+                  )[0]?.data;
                   return {
-                    name: node.user?.shortName ?? node.num,
+                    name: user ? user.shortName : node.num,
                     value: node.num,
                   };
                 }),

@@ -1,11 +1,12 @@
 import 'react-json-pretty/themes/acai.css';
 
-import React from 'react';
+import type React from 'react';
 
 import { FiMenu, FiTerminal } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 import TimeAgo from 'react-timeago';
 
+import { useAppSelector } from '@app/hooks/redux';
 import { Card } from '@components/generic/Card';
 import { Checkbox } from '@components/generic/form/Checkbox';
 import { Input } from '@components/generic/form/Input';
@@ -21,9 +22,15 @@ export interface NodeProps {
 }
 
 export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
+  const user = useAppSelector((state) => state.meshtastic.users).find(
+    (user) => user.packet.from === node.num,
+  )?.data;
+  const position = useAppSelector(
+    (state) => state.meshtastic.positionPackets,
+  ).find((position) => position.packet.from === node.num)?.data;
   return (
     <PrimaryTemplate
-      title={node.user?.longName ?? node.num.toString()}
+      title={user ? user.longName : node.num.toString()}
       tagline="Node"
       button={
         <IconButton
@@ -47,7 +54,7 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
           description={new Date(node.lastHeard * 1000).toLocaleString()}
         >
           <div className="p-10">
-            <JSONPretty data={node.position} />
+            <JSONPretty data={position} />
           </div>
         </Card>
         <Card

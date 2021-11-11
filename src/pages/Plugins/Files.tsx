@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 // import { DefaultExtensionType, defaultStyles, FileIcon } from 'react-file-icon';
 import { FiMenu, FiTrash, FiUploadCloud } from 'react-icons/fi';

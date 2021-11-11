@@ -29,8 +29,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <InputWrapper>
           <select
             ref={ref}
-            className={`w-full bg-white dark:bg-transparent focus:outline-none focus:border-primary ${
-              small ? 'py-1 mx-1' : 'h-10 mx-2'
+            className={`w-full rounded-md bg-white dark:bg-transparent focus:outline-none focus:border-primary ${
+              small ? 'p-1' : 'h-10 px-2'
             }`}
             disabled={
               props.disabled

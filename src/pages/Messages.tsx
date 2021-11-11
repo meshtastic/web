@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { FiHash } from 'react-icons/fi';
 
@@ -12,6 +12,7 @@ import { useAppSelector } from '../hooks/redux';
 export const Messages = (): JSX.Element => {
   const messages = useAppSelector((state) => state.meshtastic.messages);
   const nodes = useAppSelector((state) => state.meshtastic.nodes);
+  const users = useAppSelector((state) => state.meshtastic.users);
   const channels = useAppSelector((state) => state.meshtastic.channels);
 
   return (
@@ -49,8 +50,9 @@ export const Messages = (): JSX.Element => {
             ack={message.ack}
             rxTime={new Date()}
             senderName={
-              nodes.find((node) => node.num === message.message.packet.from)
-                ?.user?.longName ?? 'UNK'
+              users.find(
+                (user) => user.packet.from === message.message.packet.from,
+              )?.data.longName ?? 'UNK'
             }
           />
         ))}

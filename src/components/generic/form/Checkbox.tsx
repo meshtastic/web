@@ -34,7 +34,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
                 ? 'border-red-500'
                 : props.disabled
                 ? 'border-gray-200'
-                : ' focus-within:border-primary hover:border-primary'
+                : 'focus-within:border-primary dark:focus-within:border-primary hover:border-primary dark:hover:border-primary'
             }`}
             {...props}
           />

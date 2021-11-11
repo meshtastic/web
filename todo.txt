@@ -1,0 +1,9 @@
+Add desctiptions to form elements (below on mobile, to the right on desktop)
+full width form elements on channel manager, don't use deprecated `modemConfig`
+add default value to undefined protobufs, (omit if default to keep them small (only for ota packets))
+add input validation min,max etc
+change ch type select to disable, make primary and delete buttons
+maybe make channel editor acordion?
+
+meshtastic.js
+- either extrapolate user and position out of nodeInfo, or fire off events for all position and user packets even when contained in a nodeInfo packet, decide how to fire events for nodeInfo, wether we merge it or do something else

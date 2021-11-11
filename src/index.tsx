@@ -10,20 +10,16 @@ import { RouteProvider } from '@core/router';
 import { store } from '@core/store';
 
 import App from './App';
+import ReloadPrompt from './components/pwa/ReloadPrompt';
 
 ReactDOM.render(
   <React.StrictMode>
     <RouteProvider>
       <Provider store={store}>
         <App />
+        <ReloadPrompt />
       </Provider>
     </RouteProvider>
   </React.StrictMode>,
   document.getElementById('root'),
 );
-
-// Hot Module Replacement (HMR) - Remove this snippet to remove HMR.
-// Learn more: https://www.snowpack.dev/#hot-module-replacement
-if (import.meta.hot) {
-  import.meta.hot.accept();
-}

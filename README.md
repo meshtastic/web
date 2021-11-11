@@ -33,7 +33,7 @@ cp ./.env.example ./.env
 And define the device IP address in the `.env` file.
 
 ```
-SNOWPACK_PUBLIC_DEVICE_IP=xxx.xxx.xxx.xxx
+VITE_PUBLIC_DEVICE_IP=xxx.xxx.xxx.xxx
 ```
 
 Install the dependencies.
@@ -45,5 +45,5 @@ pnpm i
 Start the developtment server:
 
 ```bash
-pnpm start
+pnpm dev
 ```
