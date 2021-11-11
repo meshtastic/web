@@ -1,10 +1,12 @@
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
-import { FiMenu, FiSave } from 'react-icons/fi';
+import { FiCode, FiMenu, FiSave } from 'react-icons/fi';
+import JSONPretty from 'react-json-pretty';
 
 import { Channel } from '@app/components/Channel.jsx';
 import { Card } from '@app/components/generic/Card';
+import { Cover } from '@app/components/generic/Cover.jsx';
 import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { connection } from '@app/core/connection.js';
 import { useAppSelector } from '@app/hooks/redux.js';
@@ -22,6 +24,7 @@ export const Channels = ({
 }: ChannelsProps): JSX.Element => {
   const { t } = useTranslation();
   const channels = useAppSelector((state) => state.meshtastic.channels);
+  const [debug, setDebug] = React.useState(false);
 
   return (
     <PrimaryTemplate
@@ -49,20 +52,22 @@ export const Channels = ({
       <div className="space-y-4">
         <Card
           title="Manage Channels"
-          description={
-            <div className="flex space-x-2 truncate">
-              <div className="w-3 h-3 my-auto bg-green-500 rounded-full" />
-              &nbsp;- Primary
-              <div className="w-3 h-3 my-auto rounded-full bg-cyan-500" />
-              &nbsp;- Secondary
-              <div className="w-3 h-3 my-auto bg-gray-400 rounded-full" />
-              &nbsp;- Disabled
-              <div className="w-3 h-3 my-auto rounded-full bg-amber-400" />
-              &nbsp;- Admin
-            </div>
+          description="Edit channel throughput and other settings"
+          buttons={
+            <Button
+              border
+              active={debug}
+              onClick={(): void => {
+                setDebug(!debug);
+              }}
+              icon={<FiCode />}
+            >
+              Debug
+            </Button>
           }
         >
-          <div className="w-full max-w-3xl p-4 space-y-2 md:p-10 md:max-w-xl">
+          <Cover enabled={debug} content={<JSONPretty data={channels} />} />
+          <div className="w-full p-4 space-y-2 md:p-10">
             {channels.map((channel) => (
               <Channel key={channel.index} channel={channel} />
             ))}

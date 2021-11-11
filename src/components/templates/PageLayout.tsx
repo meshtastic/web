@@ -35,7 +35,7 @@ export const PageLayout = ({
             setNavOpen(!navOpen);
           }}
         >
-          <Tab.List className="flex flex-col border-b divide-y divide-gray-300 dark:divide-gray-600 dark:border-gray-600">
+          <Tab.List className="flex flex-col border-b border-gray-300 divide-y divide-gray-300 dark:divide-gray-600 dark:border-gray-600">
             <div className="flex items-center justify-between m-8 mr-6 md:my-10">
               <div className="text-4xl font-extrabold leading-none tracking-tight">
                 {title}

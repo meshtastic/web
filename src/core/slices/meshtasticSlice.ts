@@ -21,7 +21,9 @@ interface MeshtasticState {
   lastMeshInterraction: number;
   ready: boolean;
   myNodeInfo: Protobuf.MyNodeInfo;
-  user: Protobuf.User;
+  myNode: Protobuf.NodeInfo;
+  users: Protobuf.User[];
+  myUser: Protobuf.User;
   positionPackets: Types.PositionPacket[];
   nodes: Protobuf.NodeInfo[];
   channels: Protobuf.Channel[];
@@ -37,7 +39,9 @@ const initialState: MeshtasticState = {
   lastMeshInterraction: 0,
   ready: false,
   myNodeInfo: Protobuf.MyNodeInfo.create(),
-  user: Protobuf.User.create(),
+  myNode: Protobuf.NodeInfo.create(),
+  users: [],
+  myUser: Protobuf.User.create(),
   positionPackets: [],
   nodes: [],
   channels: [],
@@ -65,26 +69,27 @@ export const meshtasticSlice = createSlice({
     setMyNodeInfo: (state, action: PayloadAction<Protobuf.MyNodeInfo>) => {
       state.myNodeInfo = action.payload;
     },
-    setUser: (
-      state,
-      action: PayloadAction<{
-        nodeNum: number;
-        user: Protobuf.User;
-      }>,
-    ) => {
-      if (action.payload.nodeNum === state.myNodeInfo.myNodeNum) {
-        state.user = action.payload.user;
+    addUser: (state, action: PayloadAction<Protobuf.User>) => {
+      if (action.payload.id === state.myNode.user?.id) {
+        state.myUser = action.payload;
+      }
+      if (
+        state.users.findIndex((user) => user.id === action.payload.id) !== -1
+      ) {
+        state.users = state.users.map((user) => {
+          return user.id === action.payload.id ? action.payload : user;
+        });
       } else {
-        const num = state.nodes.findIndex(
-          (node) => node.num === action.payload.nodeNum,
-        );
-        state.nodes[num].user = action.payload.user;
+        state.users.push(action.payload);
       }
     },
     addPositionPacket: (state, action: PayloadAction<Types.PositionPacket>) => {
       state.positionPackets.push(action.payload);
     },
     addNode: (state, action: PayloadAction<Protobuf.NodeInfo>) => {
+      if (action.payload.num === state.myNodeInfo.myNodeNum) {
+        state.myNode = action.payload;
+      }
       if (
         state.nodes.findIndex((node) => node.num === action.payload.num) !== -1
       ) {
@@ -155,7 +160,7 @@ export const {
   setLastMeshInterraction,
   setReady,
   setMyNodeInfo,
-  setUser,
+  addUser,
   addPositionPacket,
   addNode,
   addChannel,

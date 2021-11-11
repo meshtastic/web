@@ -1,13 +1,18 @@
+import 'react-json-pretty/themes/acai.css';
+
 import React from 'react';
 
 import moment from 'moment';
 import { FiMenu, FiTerminal } from 'react-icons/fi';
+import JSONPretty from 'react-json-pretty';
+import TimeAgo from 'react-timeago';
 
 import { Card } from '@app/components/generic/Card';
 import { Chart } from '@app/components/generic/Chart';
 import { Checkbox } from '@app/components/generic/form/Checkbox';
 import { Input } from '@app/components/generic/form/Input';
 import { IconButton } from '@app/components/generic/IconButton.jsx';
+import { StatCard } from '@app/components/generic/StatCard';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
@@ -32,6 +37,13 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
       }
     >
       <div className="w-full space-y-4">
+        <div className="justify-between space-y-2 md:space-y-0 md:space-x-2 md:flex">
+          <StatCard
+            title="Last heard"
+            value={<TimeAgo date={new Date(node.lastHeard * 1000)} />}
+          />
+          <StatCard title="SNR" value={node.snr.toString()} />
+        </div>
         <Chart
           title={`${node.user?.longName ?? 'UNK'}`}
           description="Airtime"
@@ -145,12 +157,12 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
             },
           ]}
         />
-        <Card title="Position" description={node.num.toString()}>
+        <Card
+          title="Position"
+          description={new Date(node.lastHeard * 1000).toLocaleString()}
+        >
           <div className="p-10">
-            <div>
-              <div></div>
-              <div>{node.position?.satsInView}</div>
-            </div>
+            <JSONPretty data={node.position} />
           </div>
         </Card>
         <Card

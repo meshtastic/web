@@ -40,7 +40,7 @@ export const Messages = (): JSX.Element => {
           />
         </div>
       </div>
-      <div className="flex flex-col flex-grow p-6 space-y-2 overflow-y-auto bg-white border-b md:py-8 md:px-10 dark:border-gray-600 dark:bg-secondaryDark">
+      <div className="flex flex-col flex-grow p-6 space-y-2 overflow-y-auto bg-white border-b border-gray-300 md:py-8 md:px-10 dark:border-gray-600 dark:bg-secondaryDark">
         {messages.map((message, index) => (
           <Message
             key={index}

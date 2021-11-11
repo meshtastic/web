@@ -2,9 +2,11 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { FiMenu, FiSave, FiXCircle } from 'react-icons/fi';
+import { FiCode, FiMenu, FiSave, FiXCircle } from 'react-icons/fi';
+import JSONPretty from 'react-json-pretty';
 
 import { Card } from '@app/components/generic/Card';
+import { Cover } from '@app/components/generic/Cover.jsx';
 import { Checkbox } from '@app/components/generic/form/Checkbox';
 import { Select } from '@app/components/generic/form/Select.jsx';
 import { IconButton } from '@app/components/generic/IconButton.jsx';
@@ -23,6 +25,7 @@ export interface RadioProps {
 export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
   const { t } = useTranslation();
   const radioConfig = useAppSelector((state) => state.meshtastic.preferences);
+  const [debug, setDebug] = React.useState(false);
 
   const { register, handleSubmit, formState, reset } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
@@ -69,7 +72,20 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
       <Card
         title="Basic settings"
         description="Device name and user parameters"
+        buttons={
+          <Button
+            border
+            active={debug}
+            onClick={(): void => {
+              setDebug(!debug);
+            }}
+            icon={<FiCode />}
+          >
+            Debug
+          </Button>
+        }
       >
+        <Cover enabled={debug} content={<JSONPretty data={radioConfig} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
             <div>WiFi</div>

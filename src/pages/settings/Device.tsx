@@ -2,13 +2,17 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { FiMenu, FiSave } from 'react-icons/fi';
+import { FiCode, FiMenu, FiSave } from 'react-icons/fi';
+import JSONPretty from 'react-json-pretty';
 
 import { Card } from '@app/components/generic/Card';
+import { Cover } from '@app/components/generic/Cover.jsx';
 import { Checkbox } from '@app/components/generic/form/Checkbox';
+import { Select } from '@app/components/generic/form/Select.jsx';
 import { IconButton } from '@app/components/generic/IconButton.jsx';
 import { connection } from '@app/core/connection';
-import { useAppSelector } from '@app/hooks/redux';
+import { addUser } from '@app/core/slices/meshtasticSlice.js';
+import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { Input } from '@components/generic/form/Input';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
@@ -21,21 +25,27 @@ export interface DeviceProps {
 
 export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
   const { t } = useTranslation();
-  const user = useAppSelector((state) => state.meshtastic.user);
+  const [debug, setDebug] = React.useState(false);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.meshtastic.myUser);
   const { register, handleSubmit, formState } = useForm<{
     longName: string;
     shortName: string;
     isLicensed: boolean;
+    team: Protobuf.Team;
   }>({
     defaultValues: {
       longName: user.longName,
       shortName: user.shortName,
       isLicensed: user.isLicensed,
+      team: user.team,
     },
   });
 
   const onSubmit = handleSubmit((data) => {
     void connection.setOwner({ ...user, ...data });
+    // TODO: can be remove once getUser is implemented
+    dispatch(addUser({ ...user, ...data }));
   });
 
   return (
@@ -66,7 +76,20 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
       <Card
         title="Basic settings"
         description="Device name and user parameters"
+        buttons={
+          <Button
+            border
+            active={debug}
+            onClick={(): void => {
+              setDebug(!debug);
+            }}
+            icon={<FiCode />}
+          >
+            Debug
+          </Button>
+        }
       >
+        <Cover enabled={debug} content={<JSONPretty data={user} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
             <Input label={'Device ID'} value={user.id} disabled />
@@ -82,6 +105,11 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
               {...register('shortName')}
             />
             <Checkbox label="Licenced Operator?" {...register('isLicensed')} />
+            <Select
+              label="Team"
+              optionsEnum={Protobuf.Team}
+              {...register('team')}
+            />
           </form>
         </div>
       </Card>

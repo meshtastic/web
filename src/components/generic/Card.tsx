@@ -20,7 +20,7 @@ export const Card = ({
 }: CardProps): JSX.Element => {
   return (
     <div
-      className={`flex flex-col flex-auto dark:text-white border shadow-md select-none dark:bg-primaryDark dark:border-transparent rounded-3xl  ${className}`}
+      className={`flex flex-col flex-auto dark:text-white border-y md:border shadow-md select-none dark:bg-primaryDark border-gray-300 dark:border-transparent md:rounded-3xl  ${className}`}
       {...props}
     >
       <div className="flex items-center justify-between mx-10 mt-10">

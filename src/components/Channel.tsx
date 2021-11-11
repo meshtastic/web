@@ -39,12 +39,19 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
     role: Protobuf.Channel_Role;
     settings: {
       name: string;
+      modemConfig: Protobuf.ChannelSettings_ModemConfig;
+      bandwidth?: number;
+      codingRate?: number;
+      spreadFactor?: number;
     };
   }>({
     defaultValues: {
       role: channel.role,
       settings: {
         name: channel.settings?.name,
+        bandwidth: channel.settings?.bandwidth,
+        codingRate: channel.settings?.codingRate,
+        spreadFactor: channel.settings?.spreadFactor,
       },
     },
   });
@@ -77,6 +84,7 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
           <div className="my-auto space-x-2">
             <form>
               <div className="flex space-x-2">
+                {/* @todo: change to disable & make primary buttons */}
                 <Select
                   label="Channel Type"
                   optionsEnum={Protobuf.Channel_Role}
@@ -88,6 +96,23 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
                 />
               </div>
               <Input label="Name" {...register('settings.name')} />
+              <Input
+                label="Bandwidth"
+                type="number"
+                {...register('settings.bandwidth')}
+              />
+              <Input
+                label="Spread Factor"
+                type="number"
+                min={7}
+                max={12}
+                {...register('settings.spreadFactor')}
+              />
+              <Input
+                label="Coding Rate"
+                type="number"
+                {...register('settings.codingRate')}
+              />
             </form>
           </div>
           <IconButton

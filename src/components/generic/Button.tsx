@@ -40,7 +40,7 @@ export const Button = ({
   return (
     <button
       onClick={handleConfirm}
-      className={`items-center select-none flex dark:text-white active:scale-95 ${
+      className={`items-center select-none flex dark:text-white active:scale-95 transition duration-200 ease-in-out ${
         active && !disabled ? 'bg-gray-100 dark:bg-gray-700' : ''
       } ${
         circle ? 'rounded-full h-10 w-10' : 'rounded-md p-3 space-x-3 text-sm'
@@ -48,7 +48,9 @@ export const Button = ({
         disabled
           ? 'cursor-not-allowed dark:bg-primaryDark bg-white'
           : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md'
-      } ${border ? 'border dark:border-gray-600' : ''} ${className}`}
+      } ${
+        border ? 'border border-gray-400 dark:border-gray-200' : ''
+      } ${className}`}
       {...props}
     >
       {icon && (
