@@ -3,6 +3,7 @@ import './ReloadPrompt.css';
 // eslint-disable-next-line no-use-before-define
 import type React from 'react';
 
+// eslint-disable-next-line import/no-unresolved
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 const ReloadPrompt = (): JSX.Element => {
