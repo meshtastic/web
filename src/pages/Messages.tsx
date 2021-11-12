@@ -11,7 +11,6 @@ import { useAppSelector } from '../hooks/redux';
 
 export const Messages = (): JSX.Element => {
   const messages = useAppSelector((state) => state.meshtastic.messages);
-  const nodes = useAppSelector((state) => state.meshtastic.nodes);
   const users = useAppSelector((state) => state.meshtastic.users);
   const channels = useAppSelector((state) => state.meshtastic.channels);
 

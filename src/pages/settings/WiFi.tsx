@@ -1,42 +1,48 @@
 import React from 'react';
 
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
 import { FormFooter } from '@app/components/FormFooter';
+import { Checkbox } from '@app/components/generic/form/Checkbox';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
-import { Checkbox } from '@components/generic/form/Checkbox';
-import { Select } from '@components/generic/form/Select';
+import { Input } from '@components/generic/form/Input';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
-import { Protobuf } from '@meshtastic/meshtasticjs';
+import type { Protobuf } from '@meshtastic/meshtasticjs';
 
-export interface RadioProps {
+export interface WiFiProps {
   navOpen?: boolean;
   setNavOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
+export const WiFi = ({ navOpen, setNavOpen }: WiFiProps): JSX.Element => {
   const { t } = useTranslation();
   const radioConfig = useAppSelector((state) => state.meshtastic.preferences);
   const [debug, setDebug] = React.useState(false);
 
-  const { register, handleSubmit, formState, reset } =
+  const { register, handleSubmit, formState, reset, control } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: radioConfig,
     });
+
+  const watchWifiApMode = useWatch({
+    control,
+    name: 'wifiApMode',
+    defaultValue: false,
+  });
 
   const onSubmit = handleSubmit((data) => {
     void connection.setPreferences(data);
   });
   return (
     <PrimaryTemplate
-      title="Radio"
+      title="WiFi"
       tagline="Settings"
       leftButton={
         <IconButton
@@ -67,14 +73,18 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
         <Cover enabled={debug} content={<JSONPretty data={radioConfig} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
-            <Checkbox label="Is Router" {...register('isRouter')} />
-            <Select
-              label="Region"
-              optionsEnum={Protobuf.RegionCode}
-              {...register('region', { valueAsNumber: true })}
+            <Checkbox label="Enable WiFi AP" {...register('wifiApMode')} />
+            <Input
+              label={t('strings.wifi_ssid')}
+              disabled={watchWifiApMode}
+              {...register('wifiSsid')}
             />
-            <Checkbox label="Debug Log" {...register('debugLogEnabled')} />
-            <Checkbox label="Serial Disabled" {...register('serialDisabled')} />
+            <Input
+              type="password"
+              label={t('strings.wifi_psk')}
+              disabled={watchWifiApMode}
+              {...register('wifiPassword')}
+            />
           </form>
         </div>
       </Card>

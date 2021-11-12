@@ -2,8 +2,9 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { FiCheck, FiMenu, FiSave } from 'react-icons/fi';
+import { FiCheck, FiMenu } from 'react-icons/fi';
 
+import { FormFooter } from '@app/components/FormFooter';
 import { connection, setConnection } from '@app/core/connection';
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
@@ -52,7 +53,7 @@ export const Connection = ({
   );
   const hostOverride = useAppSelector((state) => state.meshtastic.hostOverride);
 
-  const { register, handleSubmit, formState } = useForm<{
+  const { register, handleSubmit, formState, reset } = useForm<{
     method: connType;
   }>({
     defaultValues: {
@@ -121,7 +122,7 @@ export const Connection = ({
     <PrimaryTemplate
       title="Connection"
       tagline="Settings"
-      button={
+      leftButton={
         <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
@@ -130,21 +131,14 @@ export const Connection = ({
         />
       }
       footer={
-        <Button
-          className="px-10 ml-auto"
-          icon={<FiSave className="w-5 h-5" />}
-          disabled={!formState.isDirty}
-          active
-          border
-        >
-          {t('strings.save_changes')}
-        </Button>
+        <FormFooter
+          dirty={formState.isDirty}
+          saveAction={onSubmit}
+          clearAction={reset}
+        />
       }
     >
-      <Card
-        title="Connection Settings"
-        description="HTTP, BLE and Serial Options"
-      >
+      <Card>
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
             <Select

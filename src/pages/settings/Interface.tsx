@@ -24,7 +24,7 @@ export const Interface = ({
     <PrimaryTemplate
       title="Interface"
       tagline="Settings"
-      button={
+      leftButton={
         <Button
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {

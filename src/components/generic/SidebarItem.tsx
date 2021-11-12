@@ -18,12 +18,12 @@ export const SidebarItem = ({
 }: SidebarItemProps): JSX.Element => {
   return (
     <div
-      className={`flex p-5 cursor-pointer select-none dark:hover:bg-primaryDark ${
+      className={`flex p-3 cursor-pointer select-none dark:hover:bg-primaryDark ${
         selected ? 'bg-gray-200 dark:bg-primaryDark' : 'dark:bg-secondaryDark'
       }`}
       {...props}
     >
-      <div className="text-gray-500 dark:text-gray-400">{icon}</div>
+      <div className="my-auto text-gray-500 dark:text-gray-400">{icon}</div>
       <div className="ml-3 text-left">
         <div className="font-medium text-left">{title}</div>
         <div className="mt-0.5 text-gray-400 text-sm">{description}</div>

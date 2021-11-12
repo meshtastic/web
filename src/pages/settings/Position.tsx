@@ -11,24 +11,36 @@ import { useAppSelector } from '@app/hooks/redux';
 import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
 import { Checkbox } from '@components/generic/form/Checkbox';
+import { Input } from '@components/generic/form/Input';
 import { Select } from '@components/generic/form/Select';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
-export interface RadioProps {
+export interface PositionProps {
   navOpen?: boolean;
   setNavOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
+export const Position = ({
+  navOpen,
+  setNavOpen,
+}: PositionProps): JSX.Element => {
   const { t } = useTranslation();
   const radioConfig = useAppSelector((state) => state.meshtastic.preferences);
   const [debug, setDebug] = React.useState(false);
 
   const { register, handleSubmit, formState, reset } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: radioConfig,
+      defaultValues: {
+        ...radioConfig,
+        positionBroadcastSecs:
+          radioConfig.positionBroadcastSecs === 0
+            ? radioConfig.isRouter
+              ? 43200
+              : 900
+            : radioConfig.positionBroadcastSecs,
+      },
     });
 
   const onSubmit = handleSubmit((data) => {
@@ -36,7 +48,7 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
   });
   return (
     <PrimaryTemplate
-      title="Radio"
+      title="Position"
       tagline="Settings"
       leftButton={
         <IconButton
@@ -67,14 +79,46 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
         <Cover enabled={debug} content={<JSONPretty data={radioConfig} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
-            <Checkbox label="Is Router" {...register('isRouter')} />
-            <Select
-              label="Region"
-              optionsEnum={Protobuf.RegionCode}
-              {...register('region', { valueAsNumber: true })}
+            <Input
+              label={'Broadcast Interval (seconds)'}
+              type="number"
+              {...register('positionBroadcastSecs', { valueAsNumber: true })}
             />
-            <Checkbox label="Debug Log" {...register('debugLogEnabled')} />
-            <Checkbox label="Serial Disabled" {...register('serialDisabled')} />
+            <Select
+              label="Position Type"
+              optionsEnum={Protobuf.PositionFlags}
+              {...register('positionFlags', { valueAsNumber: true })}
+            />
+            <Checkbox
+              label="Use Fixed Position"
+              {...register('fixedPosition')}
+            />
+            <Select
+              label="Location Sharing"
+              optionsEnum={Protobuf.LocationSharing}
+              {...register('locationShare', { valueAsNumber: true })}
+            />
+            <Select
+              label="GPS Mode"
+              optionsEnum={Protobuf.GpsOperation}
+              {...register('gpsOperation', { valueAsNumber: true })}
+            />
+            <Select
+              label="Display Format"
+              optionsEnum={Protobuf.GpsCoordinateFormat}
+              {...register('gpsFormat', { valueAsNumber: true })}
+            />
+            <Checkbox label="Accept 2D Fix" {...register('gpsAccept2D')} />
+            <Input
+              label="Max DOP"
+              type="number"
+              {...register('gpsMaxDop', { valueAsNumber: true })}
+            />
+            <Input
+              label="Last GPS Attempt"
+              disabled
+              {...register('gpsAttemptTime', { valueAsNumber: true })}
+            />
           </form>
         </div>
       </Card>

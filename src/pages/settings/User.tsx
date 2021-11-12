@@ -2,13 +2,13 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { FiCode, FiMenu, FiSave } from 'react-icons/fi';
+import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
+import { FormFooter } from '@app/components/FormFooter';
 import { connection } from '@app/core/connection';
 import { addUser } from '@app/core/slices/meshtasticSlice';
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
-import { Button } from '@components/generic/Button';
 import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
 import { Checkbox } from '@components/generic/form/Checkbox';
@@ -18,12 +18,12 @@ import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
-export interface DeviceProps {
+export interface UserProps {
   navOpen?: boolean;
   setNavOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
+export const User = ({ navOpen, setNavOpen }: UserProps): JSX.Element => {
   const { t } = useTranslation();
   const [debug, setDebug] = React.useState(false);
   const dispatch = useAppDispatch();
@@ -31,7 +31,7 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
   const user = useAppSelector((state) => state.meshtastic.users).find(
     (user) => user.packet.from === myNodeInfo.myNodeNum,
   );
-  const { register, handleSubmit, formState } = useForm<{
+  const { register, handleSubmit, formState, reset } = useForm<{
     longName: string;
     shortName: string;
     isLicensed: boolean;
@@ -46,7 +46,7 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
   });
 
   const onSubmit = handleSubmit((data) => {
-    // TODO: can be remove once getUser is implemented
+    // TODO: can be removed once getUser is implemented
     if (user) {
       void connection.setOwner({ ...user.data, ...data });
       dispatch(addUser({ ...user, ...{ data: { ...user.data, ...data } } }));
@@ -55,9 +55,9 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
 
   return (
     <PrimaryTemplate
-      title="Device"
+      title="User"
       tagline="Settings"
-      button={
+      leftButton={
         <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
@@ -65,35 +65,24 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
           }}
         />
       }
+      rightButton={
+        <IconButton
+          icon={<FiCode className="w-5 h-5" />}
+          active={debug}
+          onClick={(): void => {
+            setDebug(!debug);
+          }}
+        />
+      }
       footer={
-        <Button
-          className="px-10 ml-auto"
-          icon={<FiSave className="w-5 h-5" />}
-          disabled={!formState.isDirty}
-          onClick={onSubmit}
-          active
-          border
-        >
-          {t('strings.save_changes')}
-        </Button>
+        <FormFooter
+          dirty={formState.isDirty}
+          saveAction={onSubmit}
+          clearAction={reset}
+        />
       }
     >
-      <Card
-        title="Basic settings"
-        description="Device name and user parameters"
-        buttons={
-          <Button
-            border
-            active={debug}
-            onClick={(): void => {
-              setDebug(!debug);
-            }}
-            icon={<FiCode />}
-          >
-            Debug
-          </Button>
-        }
-      >
+      <Card>
         <Cover enabled={debug} content={<JSONPretty data={user} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
@@ -117,7 +106,7 @@ export const Device = ({ navOpen, setNavOpen }: DeviceProps): JSX.Element => {
             <Select
               label="Team"
               optionsEnum={Protobuf.Team}
-              {...register('team')}
+              {...register('team', { valueAsNumber: true })}
             />
           </form>
         </div>

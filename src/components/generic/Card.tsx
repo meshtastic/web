@@ -3,10 +3,11 @@ import type React from 'react';
 type DefaultDivProps = JSX.IntrinsicElements['div'];
 
 interface CardProps extends DefaultDivProps {
-  title: string;
-  description: string | JSX.Element;
+  title?: string;
+  description?: string | JSX.Element;
   buttons?: JSX.Element;
   lgPlaceholder?: JSX.Element;
+  loading?: boolean;
 }
 
 export const Card = ({
@@ -23,15 +24,22 @@ export const Card = ({
       className={`flex flex-col flex-auto dark:text-white border-y md:border shadow-md select-none dark:bg-primaryDark border-gray-300 dark:border-transparent md:rounded-3xl  ${className}`}
       {...props}
     >
-      <div className="flex items-center justify-between mx-10 mt-10">
-        <div className="flex flex-col">
-          <div className="mr-4 text-2xl font-semibold leading-7 tracking-tight text-black md:text-3xl dark:text-white">
-            {title}
+      {(title || description) && (
+        <div className="flex items-center justify-between mx-10 mt-10">
+          <div className="flex flex-col">
+            {title && (
+              <div className="mr-4 text-2xl font-semibold leading-7 tracking-tight text-black md:text-3xl dark:text-white">
+                {title}
+              </div>
+            )}
+
+            {description && (
+              <div className="font-medium text-gray-400">{description}</div>
+            )}
           </div>
-          <div className="font-medium text-gray-400">{description}</div>
+          {buttons}
         </div>
-        {buttons}
-      </div>
+      )}
       <div className="flex">
         <div className={`${lgPlaceholder ? 'w-full xl:w-2/3' : 'w-full'}`}>
           {children}

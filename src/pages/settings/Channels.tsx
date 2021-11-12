@@ -30,11 +30,20 @@ export const Channels = ({
     <PrimaryTemplate
       title="Channels"
       tagline="Settings"
-      button={
+      leftButton={
         <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
             setNavOpen && setNavOpen(!navOpen);
+          }}
+        />
+      }
+      rightButton={
+        <IconButton
+          icon={<FiCode className="w-5 h-5" />}
+          active={debug}
+          onClick={(): void => {
+            setDebug(!debug);
           }}
         />
       }
@@ -50,22 +59,7 @@ export const Channels = ({
       }
     >
       <div className="space-y-4">
-        <Card
-          title="Manage Channels"
-          description="Edit channel throughput and other settings"
-          buttons={
-            <Button
-              border
-              active={debug}
-              onClick={(): void => {
-                setDebug(!debug);
-              }}
-              icon={<FiCode />}
-            >
-              Debug
-            </Button>
-          }
-        >
+        <Card>
           <Cover enabled={debug} content={<JSONPretty data={channels} />} />
           <div className="w-full p-4 space-y-2 md:p-10">
             {channels.map((channel) => (

@@ -54,7 +54,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
     <PrimaryTemplate
       title="File Browser"
       tagline="Plugin"
-      button={
+      leftButton={
         <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {

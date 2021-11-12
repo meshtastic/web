@@ -6,29 +6,32 @@ import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
 import { FormFooter } from '@app/components/FormFooter';
+import { Select } from '@app/components/generic/form/Select';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
 import { Checkbox } from '@components/generic/form/Checkbox';
-import { Select } from '@components/generic/form/Select';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
-export interface RadioProps {
+export interface PowerProps {
   navOpen?: boolean;
   setNavOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
+export const Power = ({ navOpen, setNavOpen }: PowerProps): JSX.Element => {
   const { t } = useTranslation();
   const radioConfig = useAppSelector((state) => state.meshtastic.preferences);
   const [debug, setDebug] = React.useState(false);
 
   const { register, handleSubmit, formState, reset } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: radioConfig,
+      defaultValues: {
+        ...radioConfig,
+        isLowPower: radioConfig.isRouter ? true : radioConfig.isLowPower,
+      },
     });
 
   const onSubmit = handleSubmit((data) => {
@@ -36,7 +39,7 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
   });
   return (
     <PrimaryTemplate
-      title="Radio"
+      title="Power"
       tagline="Settings"
       leftButton={
         <IconButton
@@ -67,14 +70,20 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
         <Cover enabled={debug} content={<JSONPretty data={radioConfig} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
-            <Checkbox label="Is Router" {...register('isRouter')} />
             <Select
-              label="Region"
-              optionsEnum={Protobuf.RegionCode}
-              {...register('region', { valueAsNumber: true })}
+              label={'Charge current'}
+              optionsEnum={Protobuf.ChargeCurrent}
+              {...register('chargeCurrent', { valueAsNumber: true })}
             />
-            <Checkbox label="Debug Log" {...register('debugLogEnabled')} />
-            <Checkbox label="Serial Disabled" {...register('serialDisabled')} />
+            <Checkbox label="Always powered" {...register('isAlwaysPowered')} />
+            <Checkbox
+              label="Powered by low power source (solar)"
+              disabled={radioConfig.isRouter}
+              validationMessage={
+                radioConfig.isRouter ? 'Enabled by default in router mode' : ''
+              }
+              {...register('isLowPower')}
+            />
           </form>
         </div>
       </Card>

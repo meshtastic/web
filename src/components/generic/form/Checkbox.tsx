@@ -27,7 +27,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             id={id}
             className={`appearance-none w-8 h-8 border rounded-md focus:outline-none checked:bg-primary checked:border-transparent transition duration-200 ease-in-out border-gray-400 dark:border-gray-200 ${
               props.disabled
-                ? 'bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400 border-gray-400'
+                ? 'bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400 border-gray-400 dark:border-gray-700'
                 : ''
             } ${
               error

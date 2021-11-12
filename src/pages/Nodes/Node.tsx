@@ -1,11 +1,12 @@
 import 'react-json-pretty/themes/acai.css';
 
-import type React from 'react';
+import React from 'react';
 
-import { FiMenu, FiTerminal } from 'react-icons/fi';
+import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 import TimeAgo from 'react-timeago';
 
+import { Cover } from '@app/components/generic/Cover';
 import { useAppSelector } from '@app/hooks/redux';
 import { Card } from '@components/generic/Card';
 import { Checkbox } from '@components/generic/form/Checkbox';
@@ -28,11 +29,12 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
   const position = useAppSelector(
     (state) => state.meshtastic.positionPackets,
   ).find((position) => position.packet.from === node.num)?.data;
+  const [debug, setDebug] = React.useState(false);
   return (
     <PrimaryTemplate
       title={user ? user.longName : node.num.toString()}
       tagline="Node"
-      button={
+      leftButton={
         <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
@@ -40,12 +42,28 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
           }}
         />
       }
+      rightButton={
+        <IconButton
+          icon={<FiCode className="w-5 h-5" />}
+          active={debug}
+          onClick={(): void => {
+            setDebug(!debug);
+          }}
+        />
+      }
+      footer={<></>}
     >
       <div className="w-full space-y-4">
-        <div className="justify-between space-y-2 md:space-y-0 md:space-x-2 md:flex">
+        <div className="flex flex-col justify-between gap-4 md:flex-row">
           <StatCard
             title="Last heard"
-            value={<TimeAgo date={new Date(node.lastHeard * 1000)} />}
+            value={
+              node.lastHeard ? (
+                <TimeAgo date={new Date(node.lastHeard * 1000)} />
+              ) : (
+                'Never'
+              )
+            }
           />
           <StatCard title="SNR" value={node.snr.toString()} />
         </div>
@@ -53,20 +71,12 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
           title="Position"
           description={new Date(node.lastHeard * 1000).toLocaleString()}
         >
+          <Cover enabled={debug} content={<JSONPretty data={node} />} />
           <div className="p-10">
             <JSONPretty data={position} />
           </div>
         </Card>
-        <Card
-          title="Settings"
-          description="Remote node settings"
-          lgPlaceholder={
-            <div className="w-full h-full text-black dark:text-white">
-              <FiTerminal className="w-24 h-24 m-auto" />
-              <div className="text-center">Placeholder</div>
-            </div>
-          }
-        >
+        <Card title="Settings" description="Remote node settings">
           <div className="p-10">
             <form className="space-y-4">
               <Input label={'Device Name'} />

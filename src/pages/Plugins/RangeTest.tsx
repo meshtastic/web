@@ -1,12 +1,12 @@
 import type React from 'react';
 
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { FiMenu, FiSave } from 'react-icons/fi';
+import { FiMenu } from 'react-icons/fi';
 
+import { FormFooter } from '@app/components/FormFooter';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
-import { Button } from '@components/generic/Button';
 import { Card } from '@components/generic/Card';
 import { Checkbox } from '@components/generic/form/Checkbox';
 import { Input } from '@components/generic/form/Input';
@@ -26,7 +26,7 @@ export const RangeTest = ({
   const { t } = useTranslation();
   const preferences = useAppSelector((state) => state.meshtastic.preferences);
 
-  const { register, handleSubmit, formState } =
+  const { register, handleSubmit, formState, reset, control } =
     useForm<RadioConfig_UserPreferences>({
       defaultValues: {
         rangeTestPluginEnabled: preferences.rangeTestPluginEnabled,
@@ -36,16 +36,20 @@ export const RangeTest = ({
     });
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
-
     void connection.setPreferences(data);
+  });
+
+  const watchRangeTestPluginEnabled = useWatch({
+    control,
+    name: 'rangeTestPluginEnabled',
+    defaultValue: false,
   });
 
   return (
     <PrimaryTemplate
       title="Range Test"
       tagline="Plugin"
-      button={
+      leftButton={
         <IconButton
           icon={<FiMenu className="w-5 h-5" />}
           onClick={(): void => {
@@ -54,16 +58,11 @@ export const RangeTest = ({
         />
       }
       footer={
-        <Button
-          className="px-10 ml-auto"
-          icon={<FiSave className="w-5 h-5" />}
-          disabled={!formState.isDirty}
-          onClick={onSubmit}
-          active
-          border
-        >
-          {t('strings.save_changes')}
-        </Button>
+        <FormFooter
+          dirty={formState.isDirty}
+          saveAction={onSubmit}
+          clearAction={reset}
+        />
       }
     >
       <div className="w-full space-y-4">
@@ -76,11 +75,13 @@ export const RangeTest = ({
               />
               <Checkbox
                 label="Range Test Plugin Save?"
+                disabled={!watchRangeTestPluginEnabled}
                 {...register('rangeTestPluginSave')}
               />
               <Input
                 type="number"
                 label="Message Interval"
+                disabled={!watchRangeTestPluginEnabled}
                 {...register('rangeTestPluginSender', {
                   valueAsNumber: true,
                 })}
