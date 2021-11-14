@@ -1,5 +1,7 @@
 import type React from 'react';
 
+import { Loading } from '@components/generic/Loading';
+
 type DefaultDivProps = JSX.IntrinsicElements['div'];
 
 interface CardProps extends DefaultDivProps {
@@ -17,13 +19,15 @@ export const Card = ({
   children,
   className,
   lgPlaceholder,
+  loading,
   ...props
 }: CardProps): JSX.Element => {
   return (
     <div
-      className={`flex flex-col flex-auto dark:text-white border-y md:border shadow-md select-none dark:bg-primaryDark border-gray-300 dark:border-transparent md:rounded-3xl  ${className}`}
+      className={`relative flex flex-col flex-auto dark:text-white border-y md:border shadow-md select-none dark:bg-primaryDark border-gray-300 dark:border-transparent md:rounded-md  ${className}`}
       {...props}
     >
+      {loading && <Loading />}
       {(title || description) && (
         <div className="flex items-center justify-between mx-10 mt-10">
           <div className="flex flex-col">

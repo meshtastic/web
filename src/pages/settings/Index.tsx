@@ -55,14 +55,14 @@ export const Settings = (): JSX.Element => {
       icon: <FiRadio className="flex-shrink-0 w-6 h-6" />,
     },
     {
-      title: 'Interface',
-      description: 'Language and UI settings',
-      icon: <FiLayout className="flex-shrink-0 w-6 h-6" />,
-    },
-    {
       title: 'Channels',
       description: 'Manage channels',
       icon: <FiLayers className="flex-shrink-0 w-6 h-6" />,
+    },
+    {
+      title: 'Interface',
+      description: 'Language and UI settings',
+      icon: <FiLayout className="flex-shrink-0 w-6 h-6" />,
     },
   ];
   return (
@@ -76,8 +76,8 @@ export const Settings = (): JSX.Element => {
         <User key={4} />,
         <Power key={5} />,
         <Radio key={6} />,
-        <Interface key={7} />,
         <Channels key={8} />,
+        <Interface key={7} />,
       ]}
     />
   );

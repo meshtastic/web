@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
@@ -26,25 +25,28 @@ export const Position = ({
   navOpen,
   setNavOpen,
 }: PositionProps): JSX.Element => {
-  const { t } = useTranslation();
-  const radioConfig = useAppSelector((state) => state.meshtastic.preferences);
+  const preferences = useAppSelector((state) => state.meshtastic.preferences);
   const [debug, setDebug] = React.useState(false);
-
+  const [loading, setLoading] = React.useState(false);
   const { register, handleSubmit, formState, reset } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: {
-        ...radioConfig,
+        ...preferences,
         positionBroadcastSecs:
-          radioConfig.positionBroadcastSecs === 0
-            ? radioConfig.isRouter
+          preferences.positionBroadcastSecs === 0
+            ? preferences.isRouter
               ? 43200
               : 900
-            : radioConfig.positionBroadcastSecs,
+            : preferences.positionBroadcastSecs,
       },
     });
 
   const onSubmit = handleSubmit((data) => {
-    void connection.setPreferences(data);
+    setLoading(true);
+    void connection.setPreferences(data, async () => {
+      await Promise.resolve();
+      setLoading(false);
+    });
   });
   return (
     <PrimaryTemplate
@@ -75,12 +77,12 @@ export const Position = ({
         />
       }
     >
-      <Card>
-        <Cover enabled={debug} content={<JSONPretty data={radioConfig} />} />
+      <Card loading={loading}>
+        <Cover enabled={debug} content={<JSONPretty data={preferences} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
             <Input
-              label={'Broadcast Interval (seconds)'}
+              label="Broadcast Interval (seconds)"
               type="number"
               {...register('positionBroadcastSecs', { valueAsNumber: true })}
             />

@@ -4,7 +4,7 @@ import React from 'react';
 
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
-import TimeAgo from 'react-timeago';
+import TimeAgo from 'timeago-react';
 
 import { Cover } from '@app/components/generic/Cover';
 import { useAppSelector } from '@app/hooks/redux';
@@ -59,7 +59,7 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
             title="Last heard"
             value={
               node.lastHeard ? (
-                <TimeAgo date={new Date(node.lastHeard * 1000)} />
+                <TimeAgo datetime={new Date(node.lastHeard * 1000)} />
               ) : (
                 'Never'
               )
@@ -79,8 +79,8 @@ export const Node = ({ navOpen, setNavOpen, node }: NodeProps): JSX.Element => {
         <Card title="Settings" description="Remote node settings">
           <div className="p-10">
             <form className="space-y-4">
-              <Input label={'Device Name'} />
-              <Input label={'Short Name'} maxLength={3} />
+              <Input label="Device Name" />
+              <Input label="Short Name" maxLength={3} />
               <Checkbox label="Licenced Operator?" />
             </form>
           </div>

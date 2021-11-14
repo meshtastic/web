@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
@@ -22,17 +21,20 @@ export interface RadioProps {
 }
 
 export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
-  const { t } = useTranslation();
-  const radioConfig = useAppSelector((state) => state.meshtastic.preferences);
+  const preferences = useAppSelector((state) => state.meshtastic.preferences);
   const [debug, setDebug] = React.useState(false);
-
+  const [loading, setLoading] = React.useState(false);
   const { register, handleSubmit, formState, reset } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: radioConfig,
+      defaultValues: preferences,
     });
 
   const onSubmit = handleSubmit((data) => {
-    void connection.setPreferences(data);
+    setLoading(true);
+    void connection.setPreferences(data, async () => {
+      await Promise.resolve();
+      setLoading(false);
+    });
   });
   return (
     <PrimaryTemplate
@@ -63,8 +65,8 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
         />
       }
     >
-      <Card>
-        <Cover enabled={debug} content={<JSONPretty data={radioConfig} />} />
+      <Card loading={loading}>
+        <Cover enabled={debug} content={<JSONPretty data={preferences} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
             <Checkbox label="Is Router" {...register('isRouter')} />

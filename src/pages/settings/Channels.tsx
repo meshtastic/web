@@ -23,7 +23,9 @@ export const Channels = ({
   setNavOpen,
 }: ChannelsProps): JSX.Element => {
   const { t } = useTranslation();
-  const channels = useAppSelector((state) => state.meshtastic.channels);
+  const channels = useAppSelector((state) => state.meshtastic.channels).filter(
+    (channel) => channel.index !== 0,
+  );
   const [debug, setDebug] = React.useState(false);
 
   return (
@@ -66,7 +68,7 @@ export const Channels = ({
               <Channel key={channel.index} channel={channel} />
             ))}
 
-            <div className="flex space-x-52">
+            <div className="flex justify-between">
               <div
                 onClick={(): Promise<void> => {
                   return connection.confirmSetChannel();

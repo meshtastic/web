@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
@@ -22,20 +21,23 @@ export interface PowerProps {
 }
 
 export const Power = ({ navOpen, setNavOpen }: PowerProps): JSX.Element => {
-  const { t } = useTranslation();
-  const radioConfig = useAppSelector((state) => state.meshtastic.preferences);
+  const preferences = useAppSelector((state) => state.meshtastic.preferences);
   const [debug, setDebug] = React.useState(false);
-
+  const [loading, setLoading] = React.useState(false);
   const { register, handleSubmit, formState, reset } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: {
-        ...radioConfig,
-        isLowPower: radioConfig.isRouter ? true : radioConfig.isLowPower,
+        ...preferences,
+        isLowPower: preferences.isRouter ? true : preferences.isLowPower,
       },
     });
 
   const onSubmit = handleSubmit((data) => {
-    void connection.setPreferences(data);
+    setLoading(true);
+    void connection.setPreferences(data, async () => {
+      await Promise.resolve();
+      setLoading(false);
+    });
   });
   return (
     <PrimaryTemplate
@@ -66,21 +68,21 @@ export const Power = ({ navOpen, setNavOpen }: PowerProps): JSX.Element => {
         />
       }
     >
-      <Card>
-        <Cover enabled={debug} content={<JSONPretty data={radioConfig} />} />
+      <Card loading={loading}>
+        <Cover enabled={debug} content={<JSONPretty data={preferences} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
             <Select
-              label={'Charge current'}
+              label="Charge current"
               optionsEnum={Protobuf.ChargeCurrent}
               {...register('chargeCurrent', { valueAsNumber: true })}
             />
             <Checkbox label="Always powered" {...register('isAlwaysPowered')} />
             <Checkbox
               label="Powered by low power source (solar)"
-              disabled={radioConfig.isRouter}
+              disabled={preferences.isRouter}
               validationMessage={
-                radioConfig.isRouter ? 'Enabled by default in router mode' : ''
+                preferences.isRouter ? 'Enabled by default in router mode' : ''
               }
               {...register('isLowPower')}
             />
