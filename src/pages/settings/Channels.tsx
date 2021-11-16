@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { useTranslation } from 'react-i18next';
 import { FiCode, FiMenu, FiSave } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
+import { LoraConfig } from '@app/components/LoraConfig';
 import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Channel } from '@components/Channel';
@@ -22,10 +22,7 @@ export const Channels = ({
   navOpen,
   setNavOpen,
 }: ChannelsProps): JSX.Element => {
-  const { t } = useTranslation();
-  const channels = useAppSelector((state) => state.meshtastic.channels).filter(
-    (channel) => channel.index !== 0,
-  );
+  const channels = useAppSelector((state) => state.meshtastic.channels);
   const [debug, setDebug] = React.useState(false);
 
   return (
@@ -61,11 +58,16 @@ export const Channels = ({
       }
     >
       <div className="space-y-4">
+        {channels[0] && <LoraConfig channel={channels[0]} />}
         <Card>
           <Cover enabled={debug} content={<JSONPretty data={channels} />} />
           <div className="w-full p-4 space-y-2 md:p-10">
             {channels.map((channel) => (
-              <Channel key={channel.index} channel={channel} />
+              <Channel
+                key={channel.index}
+                channel={channel}
+                hideEnabled={channel.index === 0}
+              />
             ))}
 
             <div className="flex justify-between">

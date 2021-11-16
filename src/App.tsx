@@ -22,12 +22,13 @@ import {
   setReady,
 } from '@core/slices/meshtasticSlice';
 import {
+  IBLEConnection,
   IHTTPConnection,
+  ISerialConnection,
   Protobuf,
   SettingsManager,
   Types,
 } from '@meshtastic/meshtasticjs';
-import { About } from '@pages/About';
 import { Messages } from '@pages/Messages';
 import { Nodes } from '@pages/Nodes/Index';
 import { Settings } from '@pages/settings/Index';
@@ -55,15 +56,28 @@ const App = (): JSX.Element => {
       'http://meshtastic.local';
 
   React.useEffect(() => {
-    SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
+    const connectionMethod = localStorage.getItem('connectionMethod');
 
-    setConnection(new IHTTPConnection());
-    void connection.connect({
-      address: connectionURL,
-      tls: false,
-      receiveBatchRequests: false,
-      fetchInterval: 2000,
-    });
+    switch (connectionMethod) {
+      case 'serial':
+        setConnection(new ISerialConnection());
+        //show connection dialogue
+        break;
+      case 'bluetooth':
+        setConnection(new IBLEConnection());
+        //show connection dialogue
+        break;
+      default:
+        setConnection(new IHTTPConnection());
+        void connection.connect({
+          address: connectionURL,
+          tls: false,
+          receiveBatchRequests: false,
+          fetchInterval: 2000,
+        });
+        break;
+    }
+    SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
   }, [hostOverrideEnabled, hostOverride, connectionURL]);
 
   React.useEffect(() => {
@@ -168,7 +182,6 @@ const App = (): JSX.Element => {
             {route.name === 'nodes' && <Nodes />}
             {route.name === 'plugins' && <Plugins />}
             {route.name === 'settings' && <Settings />}
-            {route.name === 'about' && <About />}
             {route.name === false && <NotFound />}
           </div>
         </div>

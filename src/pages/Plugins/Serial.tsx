@@ -13,23 +13,23 @@ import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import type { RadioConfig_UserPreferences } from '@meshtastic/meshtasticjs/dist/generated';
 
-export interface RangeTestProps {
+export interface SerialProps {
   navOpen?: boolean;
   setNavOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const RangeTest = ({
-  navOpen,
-  setNavOpen,
-}: RangeTestProps): JSX.Element => {
+export const Serial = ({ navOpen, setNavOpen }: SerialProps): JSX.Element => {
   const preferences = useAppSelector((state) => state.meshtastic.preferences);
 
   const { register, handleSubmit, formState, reset, control } =
     useForm<RadioConfig_UserPreferences>({
       defaultValues: {
-        rangeTestPluginEnabled: preferences.rangeTestPluginEnabled,
-        rangeTestPluginSave: preferences.rangeTestPluginSave,
-        rangeTestPluginSender: preferences.rangeTestPluginSender,
+        serialpluginEnabled: preferences.serialpluginEnabled,
+        serialpluginEcho: preferences.serialpluginEcho,
+        serialpluginMode: preferences.serialpluginMode,
+        serialpluginRxd: preferences.serialpluginRxd,
+        serialpluginTimeout: preferences.serialpluginTimeout,
+        serialpluginTxd: preferences.serialpluginTxd,
       },
     });
 
@@ -37,15 +37,15 @@ export const RangeTest = ({
     void connection.setPreferences(data);
   });
 
-  const watchRangeTestPluginEnabled = useWatch({
+  const watchSerialPluginEnabled = useWatch({
     control,
-    name: 'rangeTestPluginEnabled',
+    name: 'serialpluginEnabled',
     defaultValue: false,
   });
 
   return (
     <PrimaryTemplate
-      title="Range Test"
+      title="Serial"
       tagline="Plugin"
       leftButton={
         <IconButton
@@ -68,19 +68,44 @@ export const RangeTest = ({
           <div className="w-full max-w-3xl p-10 md:max-w-xl">
             <form onSubmit={onSubmit}>
               <Checkbox
-                label="Range Test Plugin Enabled?"
-                {...register('rangeTestPluginEnabled')}
+                label="Plugin Enabled"
+                {...register('serialpluginEnabled')}
               />
               <Checkbox
-                label="Range Test Plugin Save?"
-                disabled={!watchRangeTestPluginEnabled}
-                {...register('rangeTestPluginSave')}
+                label="Echo"
+                disabled={!watchSerialPluginEnabled}
+                {...register('serialpluginEcho')}
+              />
+
+              <Input
+                type="number"
+                label="RX"
+                disabled={!watchSerialPluginEnabled}
+                {...register('serialpluginRxd', {
+                  valueAsNumber: true,
+                })}
               />
               <Input
                 type="number"
-                label="Message Interval"
-                disabled={!watchRangeTestPluginEnabled}
-                {...register('rangeTestPluginSender', {
+                label="TX"
+                disabled={!watchSerialPluginEnabled}
+                {...register('serialpluginTxd', {
+                  valueAsNumber: true,
+                })}
+              />
+              <Input
+                type="number"
+                label="Mode"
+                disabled={!watchSerialPluginEnabled}
+                {...register('serialpluginMode', {
+                  valueAsNumber: true,
+                })}
+              />
+              <Input
+                type="number"
+                label="Timeout"
+                disabled={!watchSerialPluginEnabled}
+                {...register('serialpluginTimeout', {
                   valueAsNumber: true,
                 })}
               />

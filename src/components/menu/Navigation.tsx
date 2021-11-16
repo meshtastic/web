@@ -1,12 +1,6 @@
 import type React from 'react';
 
-import {
-  FiGrid,
-  FiInfo,
-  FiMessageSquare,
-  FiPackage,
-  FiSettings,
-} from 'react-icons/fi';
+import { FiGrid, FiMessageSquare, FiPackage, FiSettings } from 'react-icons/fi';
 
 import { Button } from '@components/generic/Button';
 import { routes, useRoute } from '@core/router';
@@ -64,16 +58,6 @@ export const Navigation = ({
           {...routes.settings().link}
         >
           Settings
-        </Button>
-      </div>
-      <div onClick={onClick}>
-        <Button
-          icon={<FiInfo className="w-6 h-6" />}
-          className="w-full md:w-auto"
-          active={route.name === 'about'}
-          {...routes.about().link}
-        >
-          About
         </Button>
       </div>
     </div>

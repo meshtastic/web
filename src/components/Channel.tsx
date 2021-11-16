@@ -13,13 +13,17 @@ import { IconButton } from './generic/IconButton';
 
 export interface ChannelProps {
   channel: Protobuf.Channel;
+  hideEnabled?: boolean;
 }
 
-export const Channel = ({ channel }: ChannelProps): JSX.Element => {
+export const Channel = ({
+  channel,
+  hideEnabled,
+}: ChannelProps): JSX.Element => {
   const [edit, setEdit] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
-  const { register, handleSubmit, formState } = useForm<{
+  const { register, handleSubmit } = useForm<{
     enabled: boolean;
     settings: {
       name: string;
@@ -33,11 +37,12 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
     };
   }>({
     defaultValues: {
-      enabled:
-        channel.role ===
-        (Protobuf.Channel_Role.PRIMARY || Protobuf.Channel_Role.SECONDARY)
-          ? true
-          : false,
+      enabled: [
+        Protobuf.Channel_Role.SECONDARY,
+        Protobuf.Channel_Role.PRIMARY,
+      ].find((role) => role === channel.role)
+        ? true
+        : false,
       settings: {
         name: channel.settings?.name,
         bandwidth: channel.settings?.bandwidth,
@@ -54,9 +59,12 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
     const adminChannel = Protobuf.Channel.create({
-      role: data.enabled
-        ? Protobuf.Channel_Role.SECONDARY
-        : Protobuf.Channel_Role.DISABLED,
+      role:
+        channel.role === Protobuf.Channel_Role.PRIMARY
+          ? Protobuf.Channel_Role.PRIMARY
+          : data.enabled
+          ? Protobuf.Channel_Role.SECONDARY
+          : Protobuf.Channel_Role.DISABLED,
       index: channel.index,
       settings: {
         ...data.settings,
@@ -75,41 +83,24 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
       {edit ? (
         <>
           {loading && <Loading />}
-          <div className="my-auto space-x-2">
-            <form>
-              <div className="flex space-x-2">
-                {/* @todo: change to disable & make primary buttons */}
+          <div className="flex my-auto">
+            {/* TODO: get gap working */}
+            <form className="gap-3">
+              {/* @todo: change to disable & make primary buttons */}
+              {!hideEnabled && (
                 <Checkbox
                   label="Enabled"
                   {...register('enabled', { valueAsNumber: true })}
                 />
-              </div>
+              )}
               <Input label="Name" {...register('settings.name')} />
-              <Input label="Pre-Shared Key" {...register('settings.psk')} />
               <Input
-                label="Bandwidth"
-                type="number"
-                {...register('settings.bandwidth', { valueAsNumber: true })}
-              />
-              <Input
-                label="Spread Factor"
-                type="number"
-                min={7}
-                max={12}
-                {...register('settings.spreadFactor', { valueAsNumber: true })}
-              />
-              <Input
-                label="Coding Rate"
-                type="number"
-                {...register('settings.codingRate', { valueAsNumber: true })}
-              />
-              <Input
-                label="Transmit Power"
-                type="number"
-                {...register('settings.txPower', { valueAsNumber: true })}
+                label="Pre-Shared Key"
+                type="password"
+                {...register('settings.psk')}
               />
               <Checkbox
-                label="Upling Enabled"
+                label="Uplink Enabled"
                 {...register('settings.uplinkEnabled')}
               />
               <Checkbox
@@ -132,7 +123,10 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
           <div className="flex my-auto space-x-2">
             <div
               className={`h-3 my-auto w-3 rounded-full ${
-                channel.role === Protobuf.Channel_Role.SECONDARY
+                [
+                  Protobuf.Channel_Role.SECONDARY,
+                  Protobuf.Channel_Role.PRIMARY,
+                ].find((role) => role === channel.role)
                   ? 'bg-green-500'
                   : 'bg-gray-400'
               }`}

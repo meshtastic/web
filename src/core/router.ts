@@ -5,5 +5,4 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   nodes: defineRoute('/nodes'),
   plugins: defineRoute('/plugins'),
   settings: defineRoute('/settings'),
-  about: defineRoute('/about'),
 });

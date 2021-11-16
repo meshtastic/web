@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { FiCheck, FiMenu } from 'react-icons/fi';
+import JSONPretty from 'react-json-pretty';
 
 import { FormFooter } from '@app/components/FormFooter';
-import { connection, setConnection } from '@app/core/connection';
-import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
+import { ble, connection, serial, setConnection } from '@app/core/connection';
+import { useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { Card } from '@components/generic/Card';
 import { Checkbox } from '@components/generic/form/Checkbox';
@@ -40,20 +40,18 @@ export const Connection = ({
   navOpen,
   setNavOpen,
 }: ConnectionProps): JSX.Element => {
-  const dispatch = useAppDispatch();
   const [selectedConnType, setSelectedConnType] = React.useState(connType.HTTP);
   const [bleDevices, setBleDevices] = React.useState<BluetoothDevice[]>([]);
   const [serialDevices, setSerialDevices] = React.useState<SerialPort[]>([]);
   const [httpIpSource, setHttpIpSource] = React.useState<'local' | 'remote'>(
     'local',
   );
-  const { t } = useTranslation();
   const hostOverrideEnabled = useAppSelector(
     (state) => state.meshtastic.hostOverrideEnabled,
   );
   const hostOverride = useAppSelector((state) => state.meshtastic.hostOverride);
 
-  const { register, handleSubmit, formState, reset } = useForm<{
+  const { formState, reset } = useForm<{
     method: connType;
   }>({
     defaultValues: {
@@ -83,30 +81,26 @@ export const Connection = ({
     await connection.connect(params);
   };
 
-  const updateBleDeviceList = async (): Promise<void> => {
+  const updateBleDeviceList = React.useCallback(async (): Promise<void> => {
     const devices = await ble.getDevices();
     setBleDevices(devices);
-  };
+  }, []);
 
-  const updateSerialDeviceList = async (): Promise<void> => {
+  const updateSerialDeviceList = React.useCallback(async (): Promise<void> => {
     const devices = await serial.getPorts();
     console.log(devices);
 
     setSerialDevices(devices);
-  };
+  }, []);
 
-  // React.useEffect(() => {
-  //   if (selectedConnType === connType.BLE) {
-  //     void updateBleDeviceList();
-  //   }
-  //   if (selectedConnType === connType.SERIAL) {
-  //     void updateSerialDeviceList();
-  //   }
-  // }, [selectedConnType]);
-
-  const onSubmit = handleSubmit((data) => {
-    // void connection.setOwner(data);
-  });
+  React.useEffect(() => {
+    if (selectedConnType === connType.BLE) {
+      void updateBleDeviceList();
+    }
+    if (selectedConnType === connType.SERIAL) {
+      void updateSerialDeviceList();
+    }
+  }, [selectedConnType, updateBleDeviceList, updateSerialDeviceList]);
 
   const connectionURL: string = hostOverrideEnabled
     ? hostOverride
@@ -114,9 +108,6 @@ export const Connection = ({
     ? window.location.hostname
     : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ??
       'http://meshtastic.local';
-
-  const ble = new IBLEConnection();
-  const serial = new ISerialConnection();
 
   return (
     <PrimaryTemplate
@@ -133,14 +124,16 @@ export const Connection = ({
       footer={
         <FormFooter
           dirty={formState.isDirty}
-          saveAction={onSubmit}
+          saveAction={(): void => {
+            return;
+          }}
           clearAction={reset}
         />
       }
     >
       <Card>
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
-          <form className="space-y-2" onSubmit={onSubmit}>
+          <form className="space-y-2">
             <Select
               label="Method"
               optionsEnum={connType}
@@ -184,7 +177,7 @@ export const Connection = ({
                   </Button>
                   <Button
                     border
-                    onClick={async () => {
+                    onClick={async (): Promise<void> => {
                       await ble.getDevice();
                     }}
                   >
@@ -193,7 +186,7 @@ export const Connection = ({
                 </div>
                 <div className="space-y-2">
                   <div>Previously connected devices</div>
-                  {bleDevices.map((device) => (
+                  {bleDevices.map((device, index) => (
                     <div
                       onClick={async (): Promise<void> => {
                         console.log('clicked');
@@ -203,7 +196,7 @@ export const Connection = ({
                         });
                       }}
                       className="flex justify-between p-2 bg-gray-700 rounded-md"
-                      key={device.id}
+                      key={index}
                     >
                       <div className="my-auto">{device.name}</div>
                       <IconButton
@@ -224,13 +217,13 @@ export const Connection = ({
             {selectedConnType === connType.SERIAL && (
               <div>
                 <div className="flex space-x-2">
-                  <Button border onClick={updateBleDeviceList}>
+                  <Button border onClick={updateSerialDeviceList}>
                     Refresh List
                   </Button>
                   <Button
                     border
-                    onClick={async () => {
-                      await serial.getPort();
+                    onClick={async (): Promise<void> => {
+                      console.log(await serial.getPort());
                     }}
                   >
                     New Device
@@ -238,10 +231,10 @@ export const Connection = ({
                 </div>
                 <div className="space-y-2">
                   <div>Previously connected devices</div>
-                  {serialDevices.map((device) => (
+                  {serialDevices.map((device, index) => (
                     <div
                       className="flex justify-between p-2 bg-gray-700 rounded-md"
-                      key={device.getInfo().usbProductId}
+                      key={index}
                     >
                       <div className="my-auto">
                         {device.getInfo().usbProductId}
@@ -256,12 +249,21 @@ export const Connection = ({
                         }}
                         icon={<FiCheck />}
                       />
+                      <JSONPretty data={device.getInfo()} />
                     </div>
                   ))}
                 </div>
               </div>
             )}
           </form>
+          <Button
+            border
+            onClick={(): void => {
+              connection.disconnect();
+            }}
+          >
+            Disconnect
+          </Button>
         </div>
       </Card>
     </PrimaryTemplate>

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 import { base16 } from 'rfc4648';
@@ -25,7 +24,6 @@ export interface UserProps {
 }
 
 export const User = ({ navOpen, setNavOpen }: UserProps): JSX.Element => {
-  const { t } = useTranslation();
   const [debug, setDebug] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const dispatch = useAppDispatch();

@@ -13,23 +13,29 @@ import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import type { RadioConfig_UserPreferences } from '@meshtastic/meshtasticjs/dist/generated';
 
-export interface RangeTestProps {
+export interface ExternalNotificationProps {
   navOpen?: boolean;
   setNavOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const RangeTest = ({
+export const ExternalNotification = ({
   navOpen,
   setNavOpen,
-}: RangeTestProps): JSX.Element => {
+}: ExternalNotificationProps): JSX.Element => {
   const preferences = useAppSelector((state) => state.meshtastic.preferences);
 
   const { register, handleSubmit, formState, reset, control } =
     useForm<RadioConfig_UserPreferences>({
       defaultValues: {
-        rangeTestPluginEnabled: preferences.rangeTestPluginEnabled,
-        rangeTestPluginSave: preferences.rangeTestPluginSave,
-        rangeTestPluginSender: preferences.rangeTestPluginSender,
+        extNotificationPluginActive: preferences.extNotificationPluginActive,
+        extNotificationPluginAlertBell:
+          preferences.extNotificationPluginAlertBell,
+        extNotificationPluginAlertMessage:
+          preferences.extNotificationPluginAlertMessage,
+        extNotificationPluginEnabled: preferences.extNotificationPluginEnabled,
+        extNotificationPluginOutput: preferences.extNotificationPluginOutput,
+        extNotificationPluginOutputMs:
+          preferences.extNotificationPluginOutputMs,
       },
     });
 
@@ -37,15 +43,15 @@ export const RangeTest = ({
     void connection.setPreferences(data);
   });
 
-  const watchRangeTestPluginEnabled = useWatch({
+  const watchExternalNotificationPluginEnabled = useWatch({
     control,
-    name: 'rangeTestPluginEnabled',
+    name: 'extNotificationPluginEnabled',
     defaultValue: false,
   });
 
   return (
     <PrimaryTemplate
-      title="Range Test"
+      title="External Notification"
       tagline="Plugin"
       leftButton={
         <IconButton
@@ -68,19 +74,37 @@ export const RangeTest = ({
           <div className="w-full max-w-3xl p-10 md:max-w-xl">
             <form onSubmit={onSubmit}>
               <Checkbox
-                label="Range Test Plugin Enabled?"
-                {...register('rangeTestPluginEnabled')}
+                label="Plugin Enabled"
+                {...register('extNotificationPluginEnabled')}
               />
               <Checkbox
-                label="Range Test Plugin Save?"
-                disabled={!watchRangeTestPluginEnabled}
-                {...register('rangeTestPluginSave')}
+                label="Active"
+                disabled={!watchExternalNotificationPluginEnabled}
+                {...register('extNotificationPluginActive')}
+              />
+              <Checkbox
+                label="Bell"
+                disabled={!watchExternalNotificationPluginEnabled}
+                {...register('extNotificationPluginAlertBell')}
+              />
+              <Checkbox
+                label="Message"
+                disabled={!watchExternalNotificationPluginEnabled}
+                {...register('extNotificationPluginAlertMessage')}
               />
               <Input
                 type="number"
-                label="Message Interval"
-                disabled={!watchRangeTestPluginEnabled}
-                {...register('rangeTestPluginSender', {
+                label="Output"
+                disabled={!watchExternalNotificationPluginEnabled}
+                {...register('extNotificationPluginOutput', {
+                  valueAsNumber: true,
+                })}
+              />
+              <Input
+                type="number"
+                label="Output MS"
+                disabled={!watchExternalNotificationPluginEnabled}
+                {...register('extNotificationPluginOutputMs', {
                   valueAsNumber: true,
                 })}
               />

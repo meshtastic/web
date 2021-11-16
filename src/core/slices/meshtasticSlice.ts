@@ -21,7 +21,6 @@ interface MeshtasticState {
   lastMeshInterraction: number;
   ready: boolean;
   myNodeInfo: Protobuf.MyNodeInfo;
-  myNode: Protobuf.NodeInfo;
   users: Types.UserPacket[];
   positionPackets: Types.PositionPacket[];
   nodes: Protobuf.NodeInfo[];
@@ -38,13 +37,14 @@ const initialState: MeshtasticState = {
   lastMeshInterraction: 0,
   ready: false,
   myNodeInfo: Protobuf.MyNodeInfo.create(),
-  myNode: Protobuf.NodeInfo.create(),
   users: [],
   positionPackets: [],
   nodes: [],
   channels: [],
   preferences: Protobuf.RadioConfig_UserPreferences.create(),
   messages: [],
+  //todo implement
+  // connectionMethod: localStorage.getItem('connectionMethod'),
   hostOverrideEnabled:
     localStorage.getItem('hostOverrideEnabled') === 'true' ?? false,
   hostOverride: localStorage.getItem('hostOverride') ?? '',
@@ -83,12 +83,21 @@ export const meshtasticSlice = createSlice({
       }
     },
     addPosition: (state, action: PayloadAction<Types.PositionPacket>) => {
-      state.positionPackets.push(action.payload);
+      if (
+        state.positionPackets.findIndex(
+          (position) => position.packet.from === action.payload.packet.from,
+        ) !== -1
+      ) {
+        state.positionPackets = state.positionPackets.map((position) => {
+          return position.packet.from === action.payload.packet.from
+            ? action.payload
+            : position;
+        });
+      } else {
+        state.positionPackets.push(action.payload);
+      }
     },
     addNode: (state, action: PayloadAction<Protobuf.NodeInfo>) => {
-      if (action.payload.num === state.myNodeInfo.myNodeNum) {
-        state.myNode = action.payload;
-      }
       if (
         state.nodes.findIndex((node) => node.num === action.payload.num) !== -1
       ) {

@@ -82,8 +82,9 @@ export const Position = ({
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
             <Input
-              label="Broadcast Interval (seconds)"
+              label="Broadcast Interval"
               type="number"
+              suffix="Seconds"
               {...register('positionBroadcastSecs', { valueAsNumber: true })}
             />
             <Select
