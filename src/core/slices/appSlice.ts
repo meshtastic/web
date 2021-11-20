@@ -5,12 +5,14 @@ export type currentPageName = 'messages' | 'settings';
 
 interface AppState {
   mobileNavOpen: boolean;
+  connectionModalOpen: boolean;
   darkMode: boolean;
   currentPage: currentPageName;
 }
 
 const initialState: AppState = {
   mobileNavOpen: false,
+  connectionModalOpen: true,
   darkMode: localStorage.getItem('darkMode') === 'true' ?? false,
   currentPage: 'messages',
 };
@@ -25,6 +27,12 @@ export const appSlice = createSlice({
     closeMobileNav(state) {
       state.mobileNavOpen = false;
     },
+    openConnectionModal(state) {
+      state.connectionModalOpen = true;
+    },
+    closeConnectionModal(state) {
+      state.connectionModalOpen = false;
+    },
     setDarkModeEnabled(state, action: PayloadAction<boolean>) {
       localStorage.setItem('darkMode', String(action.payload));
       state.darkMode = action.payload;
@@ -38,6 +46,8 @@ export const appSlice = createSlice({
 export const {
   openMobileNav,
   closeMobileNav,
+  openConnectionModal,
+  closeConnectionModal,
   setDarkModeEnabled,
   setCurrentPage,
 } = appSlice.actions;

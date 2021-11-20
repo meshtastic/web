@@ -9,6 +9,7 @@ interface ButtonProps extends DefaultButtonProps {
   circle?: boolean;
   active?: boolean;
   border?: boolean;
+  padding?: number;
   confirmAction?: () => void;
 }
 
@@ -21,6 +22,7 @@ export const Button = ({
   confirmAction,
   disabled,
   children,
+  padding = 3,
   ...props
 }: ButtonProps): JSX.Element => {
   const [hasConfirmed, setHasConfirmed] = React.useState(false);
@@ -43,7 +45,9 @@ export const Button = ({
       className={`items-center select-none flex dark:text-white active:scale-95 transition duration-200 ease-in-out ${
         active && !disabled ? 'bg-gray-100 dark:bg-gray-700' : ''
       } ${
-        circle ? 'rounded-full h-10 w-10' : 'rounded-md p-3 space-x-3 text-sm'
+        circle
+          ? 'rounded-full h-10 w-10'
+          : `rounded-md p-${padding} space-x-3 text-sm`
       } ${
         disabled
           ? 'cursor-not-allowed dark:bg-primaryDark bg-white'

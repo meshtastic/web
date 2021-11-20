@@ -1,16 +1,16 @@
-import type React from 'react';
+import React from 'react';
 
 import { useForm, useWatch } from 'react-hook-form';
 import { FiMenu } from 'react-icons/fi';
 
-import { FormFooter } from '@app/components/FormFooter';
-import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
+import { FormFooter } from '@components/FormFooter';
 import { Card } from '@components/generic/Card';
 import { Checkbox } from '@components/generic/form/Checkbox';
 import { Input } from '@components/generic/form/Input';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
+import { connection } from '@core/connection';
 import type { RadioConfig_UserPreferences } from '@meshtastic/meshtasticjs/dist/generated';
 
 export interface SerialProps {
@@ -19,7 +19,9 @@ export interface SerialProps {
 }
 
 export const Serial = ({ navOpen, setNavOpen }: SerialProps): JSX.Element => {
-  const preferences = useAppSelector((state) => state.meshtastic.preferences);
+  const preferences = useAppSelector(
+    (state) => state.meshtastic.radio.preferences,
+  );
 
   const { register, handleSubmit, formState, reset, control } =
     useForm<RadioConfig_UserPreferences>({
@@ -32,6 +34,17 @@ export const Serial = ({ navOpen, setNavOpen }: SerialProps): JSX.Element => {
         serialpluginTxd: preferences.serialpluginTxd,
       },
     });
+
+  React.useEffect(() => {
+    reset({
+      serialpluginEnabled: preferences.serialpluginEnabled,
+      serialpluginEcho: preferences.serialpluginEcho,
+      serialpluginMode: preferences.serialpluginMode,
+      serialpluginRxd: preferences.serialpluginRxd,
+      serialpluginTimeout: preferences.serialpluginTimeout,
+      serialpluginTxd: preferences.serialpluginTxd,
+    });
+  }, [reset, preferences]);
 
   const onSubmit = handleSubmit((data) => {
     void connection.setPreferences(data);

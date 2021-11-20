@@ -7,7 +7,7 @@ export interface StatCardProps {
 
 export const StatCard = ({ title, value }: StatCardProps): JSX.Element => {
   return (
-    <div className="w-full border-gray-300 shadow-md border-y md:border h-28 md:rounded-3xl dark:bg-primaryDark dark:border-transparent ">
+    <div className="w-full bg-white border-gray-300 shadow-md select-none dark:text-white border-y md:border dark:bg-primaryDark dark:border-gray-600 md:rounded-md ">
       <div className="m-4">
         <div className="text-lg font-light">{title}</div>
         <div className="text-3xl font-bold">{value}</div>

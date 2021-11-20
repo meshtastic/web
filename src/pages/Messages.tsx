@@ -1,4 +1,4 @@
-import type React from 'react';
+import React from 'react';
 
 import { FiHash } from 'react-icons/fi';
 
@@ -10,9 +10,9 @@ import { Protobuf } from '@meshtastic/meshtasticjs';
 import { useAppSelector } from '../hooks/redux';
 
 export const Messages = (): JSX.Element => {
-  const messages = useAppSelector((state) => state.meshtastic.messages);
-  const users = useAppSelector((state) => state.meshtastic.users);
-  const channels = useAppSelector((state) => state.meshtastic.channels);
+  const nodes = useAppSelector((state) => state.meshtastic.nodes);
+  const channels = useAppSelector((state) => state.meshtastic.radio.channels);
+  const [channelIndex, setChannelIndex] = React.useState(0);
 
   return (
     <div className="flex flex-col w-full">
@@ -23,25 +23,28 @@ export const Messages = (): JSX.Element => {
             options={channels
               .filter(
                 (channel) =>
-                  channel.role !== Protobuf.Channel_Role.DISABLED &&
-                  channel.settings?.name !== 'admin',
+                  channel.channel.role !== Protobuf.Channel_Role.DISABLED &&
+                  channel.channel.settings?.name !== 'admin',
               )
               .map((channel) => {
                 return {
-                  name: channel.settings?.name.length
-                    ? channel.settings.name
-                    : channel.role === Protobuf.Channel_Role.PRIMARY
+                  name: channel.channel.settings?.name.length
+                    ? channel.channel.settings.name
+                    : channel.channel.role === Protobuf.Channel_Role.PRIMARY
                     ? 'Primary'
-                    : `CH: ${channel.index}`,
-                  value: channel.index,
+                    : `CH: ${channel.channel.index}`,
+                  value: channel.channel.index,
                 };
               })}
+            onChange={(e): void => {
+              setChannelIndex(parseInt(e.target.value));
+            }}
             small
           />
         </div>
       </div>
       <div className="flex flex-col flex-grow p-6 space-y-2 overflow-y-auto bg-white border-b border-gray-300 md:py-8 md:px-10 dark:border-gray-600 dark:bg-secondaryDark">
-        {messages.map((message, index) => (
+        {channels[channelIndex]?.messages.map((message, index) => (
           <Message
             key={index}
             isSender={message.isSender}
@@ -49,14 +52,13 @@ export const Messages = (): JSX.Element => {
             ack={message.ack}
             rxTime={new Date()}
             senderName={
-              users.find(
-                (user) => user.packet.from === message.message.packet.from,
-              )?.data.longName ?? 'UNK'
+              nodes.find((node) => node.number === message.message.packet.from)
+                ?.user?.longName ?? 'UNK'
             }
           />
         ))}
       </div>
-      <MessageBar />
+      <MessageBar channelIndex={channelIndex} />
     </div>
   );
 };

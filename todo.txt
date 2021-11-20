@@ -1,17 +1,14 @@
 Add desctiptions to form elements (below on mobile, to the right on desktop)
-full width form elements on channel manager, don't use deprecated `modemConfig`
 add default value to undefined protobufs, (omit if default to keep them small (only for ota packets))
 add input validation min,max etc
-change ch type select to disable, make primary and delete buttons
 maybe make channel editor acordion?
 add url routing for settings tabs
-form not updated if rendered before store populated, populated on remount, also disabled fields will remain disabled even if there disable props provided by redux are true, required toggling
 add loading blur to card (prop)
 form still considered dirty after save
 form prefix should be located in the input (absolute?)
 form suffix should focus input
 reset store on new connection
+redux actions seem to be dispatched twice
 
 meshtastic.js
-- either extrapolate user and position out of nodeInfo, or fire off events for all position and user packets even when contained in a nodeInfo packet, decide how to fire events for nodeInfo, wether we merge it or do something else
 - fix entering device-reconnecting state and not re-connecting despite packets being received

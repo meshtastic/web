@@ -4,15 +4,15 @@ import { useForm } from 'react-hook-form';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { FormFooter } from '@app/components/FormFooter';
-import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
+import { FormFooter } from '@components/FormFooter';
 import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
 import { Checkbox } from '@components/generic/form/Checkbox';
 import { Select } from '@components/generic/form/Select';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
+import { connection } from '@core/connection';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface RadioProps {
@@ -21,13 +21,19 @@ export interface RadioProps {
 }
 
 export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
-  const preferences = useAppSelector((state) => state.meshtastic.preferences);
+  const preferences = useAppSelector(
+    (state) => state.meshtastic.radio.preferences,
+  );
   const [debug, setDebug] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const { register, handleSubmit, formState, reset } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: preferences,
     });
+
+  React.useEffect(() => {
+    reset(preferences);
+  }, [reset, preferences]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);

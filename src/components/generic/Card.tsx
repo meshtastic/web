@@ -24,7 +24,7 @@ export const Card = ({
 }: CardProps): JSX.Element => {
   return (
     <div
-      className={`relative flex flex-col flex-auto dark:text-white border-y md:border shadow-md select-none dark:bg-primaryDark border-gray-300 dark:border-transparent md:rounded-md  ${className}`}
+      className={`relative flex flex-col flex-auto dark:text-white border-y md:border shadow-md select-none bg-white dark:bg-primaryDark border-gray-300 dark:border-gray-600 md:rounded-md  ${className}`}
       {...props}
     >
       {loading && <Loading />}

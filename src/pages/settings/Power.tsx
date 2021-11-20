@@ -4,15 +4,15 @@ import { useForm } from 'react-hook-form';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { FormFooter } from '@app/components/FormFooter';
-import { Select } from '@app/components/generic/form/Select';
-import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
+import { FormFooter } from '@components/FormFooter';
 import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
 import { Checkbox } from '@components/generic/form/Checkbox';
+import { Select } from '@components/generic/form/Select';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
+import { connection } from '@core/connection';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface PowerProps {
@@ -21,7 +21,9 @@ export interface PowerProps {
 }
 
 export const Power = ({ navOpen, setNavOpen }: PowerProps): JSX.Element => {
-  const preferences = useAppSelector((state) => state.meshtastic.preferences);
+  const preferences = useAppSelector(
+    (state) => state.meshtastic.radio.preferences,
+  );
   const [debug, setDebug] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const { register, handleSubmit, formState, reset } =
@@ -31,6 +33,10 @@ export const Power = ({ navOpen, setNavOpen }: PowerProps): JSX.Element => {
         isLowPower: preferences.isRouter ? true : preferences.isLowPower,
       },
     });
+
+  React.useEffect(() => {
+    reset(preferences);
+  }, [reset, preferences]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);

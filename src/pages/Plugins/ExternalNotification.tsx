@@ -1,16 +1,16 @@
-import type React from 'react';
+import React from 'react';
 
 import { useForm, useWatch } from 'react-hook-form';
 import { FiMenu } from 'react-icons/fi';
 
 import { FormFooter } from '@app/components/FormFooter';
-import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Card } from '@components/generic/Card';
 import { Checkbox } from '@components/generic/form/Checkbox';
 import { Input } from '@components/generic/form/Input';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
+import { connection } from '@core/connection';
 import type { RadioConfig_UserPreferences } from '@meshtastic/meshtasticjs/dist/generated';
 
 export interface ExternalNotificationProps {
@@ -22,7 +22,9 @@ export const ExternalNotification = ({
   navOpen,
   setNavOpen,
 }: ExternalNotificationProps): JSX.Element => {
-  const preferences = useAppSelector((state) => state.meshtastic.preferences);
+  const preferences = useAppSelector(
+    (state) => state.meshtastic.radio.preferences,
+  );
 
   const { register, handleSubmit, formState, reset, control } =
     useForm<RadioConfig_UserPreferences>({
@@ -38,6 +40,19 @@ export const ExternalNotification = ({
           preferences.extNotificationPluginOutputMs,
       },
     });
+
+  React.useEffect(() => {
+    reset({
+      extNotificationPluginActive: preferences.extNotificationPluginActive,
+      extNotificationPluginAlertBell:
+        preferences.extNotificationPluginAlertBell,
+      extNotificationPluginAlertMessage:
+        preferences.extNotificationPluginAlertMessage,
+      extNotificationPluginEnabled: preferences.extNotificationPluginEnabled,
+      extNotificationPluginOutput: preferences.extNotificationPluginOutput,
+      extNotificationPluginOutputMs: preferences.extNotificationPluginOutputMs,
+    });
+  }, [reset, preferences]);
 
   const onSubmit = handleSubmit((data) => {
     void connection.setPreferences(data);

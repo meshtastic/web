@@ -3,7 +3,6 @@ import type React from 'react';
 import {
   FiLayers,
   FiLayout,
-  FiLink2,
   FiMapPin,
   FiRadio,
   FiUser,
@@ -14,7 +13,6 @@ import {
 import { PageLayout } from '@components/templates/PageLayout';
 
 import { Channels } from './Channels';
-import { Connection } from './Connection';
 import { Interface } from './Interface';
 import { Position } from './Position';
 import { Power } from './Power';
@@ -24,11 +22,6 @@ import { WiFi } from './WiFi';
 
 export const Settings = (): JSX.Element => {
   const sidebarItems = [
-    {
-      title: 'Connection',
-      description: 'Connection method and parameters',
-      icon: <FiLink2 className="flex-shrink-0 w-6 h-6" />,
-    },
     {
       title: 'WiFi',
       description: 'WiFi credentials and mode',
@@ -70,7 +63,6 @@ export const Settings = (): JSX.Element => {
       title="Settings"
       sidebarItems={sidebarItems}
       panels={[
-        <Connection key={1} />,
         <WiFi key={2} />,
         <Position key={3} />,
         <User key={4} />,

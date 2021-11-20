@@ -2,20 +2,28 @@ import type React from 'react';
 
 import { FiWifi, FiWifiOff } from 'react-icons/fi';
 
-import { useAppSelector } from '@app/hooks/redux';
-import { IconButton } from '@components/generic/IconButton';
+import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
+import { Button } from '@components/generic/Button';
+import { openConnectionModal } from '@core/slices/appSlice';
 import { Types } from '@meshtastic/meshtasticjs';
 
-export const DeviceStatusDropdown = (): JSX.Element => {
+export const DeviceStatus = (): JSX.Element => {
+  const dispatch = useAppDispatch();
   const deviceStatus = useAppSelector((state) => state.meshtastic.deviceStatus);
   const ready = useAppSelector((state) => state.meshtastic.ready);
 
   return (
-    <div className="flex bg-gray-100 rounded-md dark:bg-gray-700">
-      <div className="flex pl-2 my-auto space-x-2 dark:text-white">
+    <Button
+      padding={0}
+      active
+      onClick={(): void => {
+        dispatch(dispatch(openConnectionModal()));
+      }}
+    >
+      <div className="flex gap-2 px-2">
         <div
           className={`
-        my-auto mx-2 w-2 h-2 rounded-full min-w-[2] ${
+        my-auto w-2 h-2 rounded-full min-w-[2] ${
           [
             Types.DeviceStatusEnum.DEVICE_CONNECTED,
             Types.DeviceStatusEnum.DEVICE_CONFIGURED,
@@ -31,16 +39,14 @@ export const DeviceStatusDropdown = (): JSX.Element => {
         }`}
         ></div>
         <div className="my-auto">{Types.DeviceStatusEnum[deviceStatus]}</div>
-        <IconButton
-          icon={
-            ready ? (
-              <FiWifi className="w-5 h-5" />
-            ) : (
-              <FiWifiOff className="w-5 h-5 animate-pulse" />
-            )
-          }
-        />
+        <div className="py-2">
+          {ready ? (
+            <FiWifi className="w-5 h-5" />
+          ) : (
+            <FiWifiOff className="w-5 h-5 animate-pulse" />
+          )}
+        </div>
       </div>
-    </div>
+    </Button>
   );
 };

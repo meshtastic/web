@@ -2,13 +2,12 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 
+import { Card } from '@components/generic/Card';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Input } from '@components/generic/form/Input';
 import { Loading } from '@components/generic/Loading';
+import { connection } from '@core/connection';
 import { Protobuf } from '@meshtastic/meshtasticjs';
-
-import { connection } from '../core/connection';
-import { Card } from './generic/Card';
-import { Checkbox } from './generic/form/Checkbox';
-import { Input } from './generic/form/Input';
 
 export interface LoraConfigProps {
   channel: Protobuf.Channel;

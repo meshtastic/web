@@ -9,23 +9,26 @@ import { Protobuf } from '@meshtastic/meshtasticjs';
 import { Node } from './Node';
 
 export const Nodes = (): JSX.Element => {
-  const nodes = useAppSelector((state) => state.meshtastic.nodes);
-  const users = useAppSelector((state) => state.meshtastic.users);
+  const myNodeNum = useAppSelector(
+    (state) => state.meshtastic.radio.hardware,
+  ).myNodeNum;
+  const nodes = useAppSelector((state) => state.meshtastic.nodes).filter(
+    (node) => node.number !== myNodeNum,
+  );
   return (
     <PageLayout
       title="Nodes"
       emptyMessage="No nodes discovered yet..."
       sidebarItems={nodes.map((node) => {
-        const user = users.find((user) => user.packet.from === node.num)?.data;
         return {
-          title: user ? user.longName : node.num.toString(),
-          description: user
-            ? Protobuf.HardwareModel[user.hwModel]
+          title: node.user?.longName ?? node.number.toString(),
+          description: node.user
+            ? Protobuf.HardwareModel[node.user.hwModel]
             : 'Unknown Hardware',
           icon: (
             <Avatar
               size={30}
-              name={user ? user.longName : node.num.toString()}
+              name={node.user?.longName ?? node.number.toString()}
               variant="beam"
               colors={['#213435', '#46685B', '#648A64', '#A6B985', '#E1E3AC']}
             />

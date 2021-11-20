@@ -2,7 +2,7 @@ import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-import { connection } from '../connection';
+// import { connection } from '../connection';
 
 export interface MessageWithAck {
   message: Types.TextPacket;
@@ -16,17 +16,31 @@ enum connType {
   SERIAL,
 }
 
+export interface ChannelData {
+  channel: Protobuf.Channel;
+  messages: MessageWithAck[];
+}
+
+export interface Node {
+  number: number;
+  lastHeard: Date;
+  snr: number[];
+  positions: Protobuf.Position[];
+  user?: Protobuf.User;
+}
+
+export interface Radio {
+  channels: ChannelData[];
+  preferences: Protobuf.RadioConfig_UserPreferences;
+  hardware: Protobuf.MyNodeInfo;
+}
+
 interface MeshtasticState {
   deviceStatus: Types.DeviceStatusEnum;
   lastMeshInterraction: number;
   ready: boolean;
-  myNodeInfo: Protobuf.MyNodeInfo;
-  users: Types.UserPacket[];
-  positionPackets: Types.PositionPacket[];
-  nodes: Protobuf.NodeInfo[];
-  channels: Protobuf.Channel[];
-  preferences: Protobuf.RadioConfig_UserPreferences;
-  messages: MessageWithAck[];
+  nodes: Node[];
+  radio: Radio;
   hostOverrideEnabled: boolean;
   hostOverride: string;
   connectionType: connType;
@@ -36,13 +50,12 @@ const initialState: MeshtasticState = {
   deviceStatus: Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
   lastMeshInterraction: 0,
   ready: false,
-  myNodeInfo: Protobuf.MyNodeInfo.create(),
-  users: [],
-  positionPackets: [],
   nodes: [],
-  channels: [],
-  preferences: Protobuf.RadioConfig_UserPreferences.create(),
-  messages: [],
+  radio: {
+    channels: [],
+    preferences: Protobuf.RadioConfig_UserPreferences.create(),
+    hardware: Protobuf.MyNodeInfo.create(),
+  },
   //todo implement
   // connectionMethod: localStorage.getItem('connectionMethod'),
   hostOverrideEnabled:
@@ -65,76 +78,94 @@ export const meshtasticSlice = createSlice({
       state.ready = action.payload;
     },
     setMyNodeInfo: (state, action: PayloadAction<Protobuf.MyNodeInfo>) => {
-      state.myNodeInfo = action.payload;
+      state.radio.hardware = action.payload;
     },
     addUser: (state, action: PayloadAction<Types.UserPacket>) => {
-      if (
-        state.users.findIndex(
-          (user) => user.data.id === action.payload.data.id,
-        ) !== -1
-      ) {
-        state.users = state.users.map((user) => {
-          return user.data.id === action.payload.data.id
-            ? action.payload
-            : user;
-        });
-      } else {
-        state.users.push(action.payload);
+      const node = state.nodes.find(
+        (node) => node.number === action.payload.packet.from,
+      );
+      if (node) {
+        node.user = action.payload.data;
+        // todo: use rx time
+        node.lastHeard = new Date();
       }
     },
     addPosition: (state, action: PayloadAction<Types.PositionPacket>) => {
-      if (
-        state.positionPackets.findIndex(
-          (position) => position.packet.from === action.payload.packet.from,
-        ) !== -1
-      ) {
-        state.positionPackets = state.positionPackets.map((position) => {
-          return position.packet.from === action.payload.packet.from
-            ? action.payload
-            : position;
-        });
-      } else {
-        state.positionPackets.push(action.payload);
+      const node = state.nodes.find(
+        (node) => node.number === action.payload.packet.from,
+      );
+
+      node?.positions.push(action.payload.data);
+      if (node) {
+        // todo: use rx time
+        node.lastHeard = new Date();
       }
     },
     addNode: (state, action: PayloadAction<Protobuf.NodeInfo>) => {
-      if (
-        state.nodes.findIndex((node) => node.num === action.payload.num) !== -1
-      ) {
-        state.nodes = state.nodes.map((node) => {
-          return node.num === action.payload.num ? action.payload : node;
-        });
+      const node = state.nodes.find(
+        (node) => node.number === action.payload.num,
+      );
+
+      if (node) {
+        console.log('node exists');
+
+        node.lastHeard = new Date(action.payload.lastHeard * 1000);
+        node.snr.push(action.payload.snr);
       } else {
-        state.nodes.push(action.payload);
+        console.log('node does not exist');
+
+        state.nodes.push({
+          number: action.payload.num,
+          lastHeard: new Date(action.payload.lastHeard * 1000),
+          snr: [action.payload.snr],
+          positions: [],
+        });
       }
     },
     addChannel: (state, action: PayloadAction<Protobuf.Channel>) => {
       if (
-        state.channels.findIndex(
-          (channel) => channel.index === action.payload.index,
+        state.radio.channels.findIndex(
+          (channel) => channel.channel.index === action.payload.index,
         ) !== -1
       ) {
-        state.channels = state.channels.map((channel) => {
-          return channel.index === action.payload.index
-            ? action.payload
+        state.radio.channels = state.radio.channels.map((channel) => {
+          return channel.channel.index === action.payload.index
+            ? {
+                channel: action.payload,
+                messages: channel.messages,
+              }
             : channel;
         });
       } else {
-        state.channels.push(action.payload);
+        state.radio.channels.push({
+          channel: action.payload,
+          messages: [],
+        });
       }
     },
     setPreferences: (
       state,
       action: PayloadAction<Protobuf.RadioConfig_UserPreferences>,
     ) => {
-      state.preferences = action.payload;
+      state.radio.preferences = action.payload;
     },
     addMessage: (state, action: PayloadAction<MessageWithAck>) => {
-      state.messages.push(action.payload);
+      const channelIndex = state.radio.channels.findIndex(
+        (channel) =>
+          channel.channel.index === action.payload.message.packet.channel,
+      );
+      state.radio.channels[channelIndex].messages.push(action.payload);
     },
-    ackMessage: (state, messageId: PayloadAction<number>) => {
-      state.messages.map((message) => {
-        if (message.message.packet.id === messageId.payload) {
+    ackMessage: (
+      state,
+      action: PayloadAction<{ channel: number; messageId: number }>,
+    ) => {
+      const channelIndex = state.radio.channels.findIndex(
+        (channel) => channel.channel.index === action.payload.channel,
+      );
+      // todo: update last mesh/user interraction here
+      state.radio.channels[channelIndex].messages.map((message) => {
+        if (message.message.packet.id === action.payload.messageId) {
           message.ack = true;
         }
       });
@@ -143,21 +174,21 @@ export const meshtasticSlice = createSlice({
       state.hostOverrideEnabled = action.payload;
       localStorage.setItem('hostOverrideEnabled', String(action.payload));
       if (state.hostOverrideEnabled !== action.payload) {
-        connection.disconnect();
+        // connection.disconnect();
       }
     },
     setHostOverride: (state, action: PayloadAction<string>) => {
       state.hostOverride = action.payload;
       localStorage.setItem('hostOverride', action.payload);
       if (state.hostOverride !== action.payload) {
-        connection.disconnect();
+        // connection.disconnect();
       }
     },
     setConnectionType: (state, action: PayloadAction<connType>) => {
       state.connectionType = action.payload;
       localStorage.setItem('connectionType', String(action.payload));
       if (state.connectionType !== action.payload) {
-        connection.disconnect();
+        // connection.disconnect();
       }
     },
   },

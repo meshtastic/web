@@ -6,11 +6,10 @@ import ReactDOM from 'react-dom';
 
 import { Provider } from 'react-redux';
 
+import { App } from '@app/App';
+import { ReloadPrompt } from '@components/pwa/ReloadPrompt';
 import { RouteProvider } from '@core/router';
 import { store } from '@core/store';
-
-import App from './App';
-import ReloadPrompt from './components/pwa/ReloadPrompt';
 
 ReactDOM.render(
   <React.StrictMode>

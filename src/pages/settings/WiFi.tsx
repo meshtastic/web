@@ -5,15 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { FormFooter } from '@app/components/FormFooter';
-import { Checkbox } from '@app/components/generic/form/Checkbox';
-import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
+import { FormFooter } from '@components/FormFooter';
 import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
+import { Checkbox } from '@components/generic/form/Checkbox';
 import { Input } from '@components/generic/form/Input';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
+import { connection } from '@core/connection';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface WiFiProps {
@@ -23,7 +23,9 @@ export interface WiFiProps {
 
 export const WiFi = ({ navOpen, setNavOpen }: WiFiProps): JSX.Element => {
   const { t } = useTranslation();
-  const preferences = useAppSelector((state) => state.meshtastic.preferences);
+  const preferences = useAppSelector(
+    (state) => state.meshtastic.radio.preferences,
+  );
   const [debug, setDebug] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const { register, handleSubmit, formState, reset, control } =
@@ -36,6 +38,10 @@ export const WiFi = ({ navOpen, setNavOpen }: WiFiProps): JSX.Element => {
     name: 'wifiApMode',
     defaultValue: false,
   });
+
+  React.useEffect(() => {
+    reset(preferences);
+  }, [reset, preferences]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);

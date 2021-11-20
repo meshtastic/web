@@ -3,30 +3,42 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiSend } from 'react-icons/fi';
 
-import { ackMessage } from '@app/core/slices/meshtasticSlice';
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Input } from '@components/generic/form/Input';
 import { connection } from '@core/connection';
+import { ackMessage } from '@core/slices/meshtasticSlice';
 
 import { Select } from '../generic/form/Select';
 import { IconButton } from '../generic/IconButton';
 
-export const MessageBar = (): JSX.Element => {
+export interface MessageBarProps {
+  channelIndex: number;
+}
+
+export const MessageBar = ({ channelIndex }: MessageBarProps): JSX.Element => {
   const dispatch = useAppDispatch();
   const ready = useAppSelector((state) => state.meshtastic.ready);
   const nodes = useAppSelector((state) => state.meshtastic.nodes);
-  const users = useAppSelector((state) => state.meshtastic.users);
-  const myNodeInfo = useAppSelector((state) => state.meshtastic.myNodeInfo);
+  const myNodeNum = useAppSelector(
+    (state) => state.meshtastic.radio.hardware,
+  ).myNodeNum;
+
   const [currentMessage, setCurrentMessage] = React.useState('');
   const [destinationNode, setDestinationNode] =
     React.useState<number>(0xffffffff);
   const sendMessage = (): void => {
     if (ready) {
-      void connection.sendText(currentMessage, destinationNode, true, (id) => {
-        dispatch(ackMessage(id));
+      void connection.sendText(
+        currentMessage,
+        destinationNode,
+        true,
+        channelIndex--,
+        (id) => {
+          dispatch(ackMessage({ channel: 0, messageId: id }));
 
-        return Promise.resolve();
-      });
+          return Promise.resolve();
+        },
+      );
       setCurrentMessage('');
     }
   };
@@ -51,14 +63,11 @@ export const MessageBar = (): JSX.Element => {
                 value: 0xffffffff,
               },
               ...nodes
-                .filter((node) => node.num !== myNodeInfo.myNodeNum)
+                .filter((node) => node.number !== myNodeNum)
                 .map((node) => {
-                  const user = users.filter(
-                    (user) => user.packet.from === node.num,
-                  )[0]?.data;
                   return {
-                    name: user ? user.shortName : node.num,
-                    value: node.num,
+                    name: node.user ? node.user.shortName : node.number,
+                    value: node.number,
                   };
                 }),
             ]}

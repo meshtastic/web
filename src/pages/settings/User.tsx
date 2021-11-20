@@ -5,8 +5,8 @@ import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 import { base16 } from 'rfc4648';
 
-import { FormFooter } from '@app/components/FormFooter';
-import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
+import { useAppSelector } from '@app/hooks/redux';
+import { FormFooter } from '@components/FormFooter';
 import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
 import { Checkbox } from '@components/generic/form/Checkbox';
@@ -15,7 +15,6 @@ import { Select } from '@components/generic/form/Select';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connection } from '@core/connection';
-import { addUser } from '@core/slices/meshtasticSlice';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface UserProps {
@@ -26,10 +25,11 @@ export interface UserProps {
 export const User = ({ navOpen, setNavOpen }: UserProps): JSX.Element => {
   const [debug, setDebug] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const dispatch = useAppDispatch();
-  const myNodeInfo = useAppSelector((state) => state.meshtastic.myNodeInfo);
-  const user = useAppSelector((state) => state.meshtastic.users).find(
-    (user) => user.packet.from === myNodeInfo.myNodeNum,
+  const myNodeNum = useAppSelector(
+    (state) => state.meshtastic.radio.hardware,
+  ).myNodeNum;
+  const node = useAppSelector((state) => state.meshtastic.nodes).find(
+    (node) => node.number === myNodeNum,
   );
   const { register, handleSubmit, formState, reset } = useForm<{
     longName: string;
@@ -38,22 +38,34 @@ export const User = ({ navOpen, setNavOpen }: UserProps): JSX.Element => {
     team: Protobuf.Team;
   }>({
     defaultValues: {
-      longName: user?.data.longName,
-      shortName: user?.data.shortName,
-      isLicensed: user?.data.isLicensed,
-      team: user?.data.team,
+      longName: node?.user?.longName,
+      shortName: node?.user?.shortName,
+      isLicensed: node?.user?.isLicensed,
+      team: node?.user?.team,
     },
   });
 
+  React.useEffect(() => {
+    reset({
+      longName: node?.user?.longName,
+      shortName: node?.user?.shortName,
+      isLicensed: node?.user?.isLicensed,
+      team: node?.user?.team,
+    });
+  }, [reset, node]);
+
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
-    // TODO: can be removed once getUser is implemented
-    if (user) {
-      void connection.setOwner({ ...user.data, ...data }, async () => {
+
+    if (node?.user) {
+      void connection.setOwner({ ...node.user, ...data }, async () => {
         await Promise.resolve();
         setLoading(false);
       });
-      dispatch(addUser({ ...user, ...{ data: { ...user.data, ...data } } }));
+      // TODO: can be removed once getUser is implemented
+      // dispatch(
+      //   addUser({ ...node.user, ...{ data: { ...node.user.data, ...data } } }),
+      // );
     }
   });
 
@@ -87,15 +99,15 @@ export const User = ({ navOpen, setNavOpen }: UserProps): JSX.Element => {
       }
     >
       <Card loading={loading}>
-        <Cover enabled={debug} content={<JSONPretty data={user?.data} />} />
+        <Cover enabled={debug} content={<JSONPretty data={node?.user} />} />
         <div className="w-full max-w-3xl p-10 md:max-w-xl">
           <form className="space-y-2" onSubmit={onSubmit}>
-            <Input label="Device ID" value={user?.data.id} disabled />
+            <Input label="Device ID" value={node?.user?.id} disabled />
             <Input
               label="Hardware"
               value={
                 Protobuf.HardwareModel[
-                  user?.data.hwModel ?? Protobuf.HardwareModel.UNSET
+                  node?.user?.hwModel ?? Protobuf.HardwareModel.UNSET
                 ]
               }
               disabled
@@ -104,7 +116,7 @@ export const User = ({ navOpen, setNavOpen }: UserProps): JSX.Element => {
               label="Mac Address"
               defaultValue={
                 base16
-                  .stringify(user?.data.macaddr ?? [])
+                  .stringify(node?.user?.macaddr ?? [])
                   .match(/.{1,2}/g)
                   ?.join(':') ?? ''
               }

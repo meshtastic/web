@@ -6,7 +6,7 @@ import type React from 'react';
 // eslint-disable-next-line import/no-unresolved
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
-const ReloadPrompt = (): JSX.Element => {
+export const ReloadPrompt = (): JSX.Element => {
   const {
     offlineReady: [offlineReady, setOfflineReady],
     needRefresh: [needRefresh, setNeedRefresh],
@@ -58,5 +58,3 @@ const ReloadPrompt = (): JSX.Element => {
     </div>
   );
 };
-
-export default ReloadPrompt;

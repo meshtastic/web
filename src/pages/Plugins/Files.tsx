@@ -4,11 +4,11 @@ import type React from 'react';
 import { FiMenu, FiTrash, FiUploadCloud } from 'react-icons/fi';
 import useSWR from 'swr';
 
-import fetcher from '@app/core/utils/fetcher';
-import { useAppSelector } from '@app/hooks/redux';
 import { Card } from '@components/generic/Card';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
+import { connectionUrl } from '@core/connection';
+import fetcher from '@core/utils/fetcher';
 
 export interface RangeTestProps {
   navOpen?: boolean;
@@ -33,20 +33,8 @@ interface IFiles {
 }
 
 export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
-  const hostOverrideEnabled = useAppSelector(
-    (state) => state.meshtastic.hostOverrideEnabled,
-  );
-  const hostOverride = useAppSelector((state) => state.meshtastic.hostOverride);
-
-  const connectionURL = hostOverrideEnabled
-    ? hostOverride
-    : import.meta.env.PROD
-    ? window.location.hostname
-    : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ??
-      'http://meshtastic.local';
-
   const { data } = useSWR<IFiles>(
-    `http://${connectionURL}/json/spiffs/browse/static`,
+    `http://${connectionUrl}/json/spiffs/browse/static`,
     fetcher,
   );
 
@@ -107,7 +95,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
                       /> */}
                     </div>
                     <a
-                      href={`http://${connectionURL}/${file.name.replace(
+                      href={`http://${connectionUrl}/${file.name.replace(
                         'static/',
                         '',
                       )}`}
@@ -120,7 +108,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
                     className="mx-2 my-auto"
                     // confirmAction={async (): Promise<void> => {
                     //   await fetch(
-                    //     `http://${connectionURL}/json/spiffs/delete/static?remove=${file.name}`,
+                    //     `http://${connectionUrl}/json/spiffs/delete/static?remove=${file.name}`,
                     //     {
                     //       method: 'DELETE',
                     //     },

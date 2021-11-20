@@ -3,15 +3,15 @@ import React from 'react';
 import { FiCode, FiMenu, FiSave } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { LoraConfig } from '@app/components/LoraConfig';
-import { connection } from '@app/core/connection';
 import { useAppSelector } from '@app/hooks/redux';
 import { Channel } from '@components/Channel';
 import { Button } from '@components/generic/Button';
 import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
 import { IconButton } from '@components/generic/IconButton';
+import { LoraConfig } from '@components/LoraConfig';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
+import { connection } from '@core/connection';
 
 export interface ChannelsProps {
   navOpen?: boolean;
@@ -22,7 +22,7 @@ export const Channels = ({
   navOpen,
   setNavOpen,
 }: ChannelsProps): JSX.Element => {
-  const channels = useAppSelector((state) => state.meshtastic.channels);
+  const channels = useAppSelector((state) => state.meshtastic.radio.channels);
   const [debug, setDebug] = React.useState(false);
 
   return (
@@ -58,15 +58,15 @@ export const Channels = ({
       }
     >
       <div className="space-y-4">
-        {channels[0] && <LoraConfig channel={channels[0]} />}
+        {channels[0] && <LoraConfig channel={channels[0].channel} />}
         <Card>
           <Cover enabled={debug} content={<JSONPretty data={channels} />} />
           <div className="w-full p-4 space-y-2 md:p-10">
             {channels.map((channel) => (
               <Channel
-                key={channel.index}
-                channel={channel}
-                hideEnabled={channel.index === 0}
+                key={channel.channel.index}
+                channel={channel.channel}
+                hideEnabled={channel.channel.index === 0}
               />
             ))}
 
