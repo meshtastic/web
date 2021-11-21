@@ -9,7 +9,7 @@ import { Types } from '@meshtastic/meshtasticjs';
 
 export const DeviceStatus = (): JSX.Element => {
   const dispatch = useAppDispatch();
-  const deviceStatus = useAppSelector((state) => state.meshtastic.deviceStatus);
+  const state = useAppSelector((state) => state.meshtastic);
   const ready = useAppSelector((state) => state.meshtastic.ready);
 
   return (
@@ -27,18 +27,22 @@ export const DeviceStatus = (): JSX.Element => {
           [
             Types.DeviceStatusEnum.DEVICE_CONNECTED,
             Types.DeviceStatusEnum.DEVICE_CONFIGURED,
-          ].includes(deviceStatus)
+          ].includes(state.deviceStatus)
             ? 'bg-green-400'
             : [
                 Types.DeviceStatusEnum.DEVICE_CONNECTING,
                 Types.DeviceStatusEnum.DEVICE_RECONNECTING,
                 Types.DeviceStatusEnum.DEVICE_CONFIGURING,
-              ].includes(deviceStatus)
+              ].includes(state.deviceStatus)
             ? 'bg-yellow-400'
             : 'bg-gray-400'
         }`}
         ></div>
-        <div className="my-auto">{Types.DeviceStatusEnum[deviceStatus]}</div>
+        <div className="my-auto">
+          {state.nodes.find(
+            (node) => node.number === state.radio.hardware.myNodeNum,
+          )?.user?.longName ?? 'Unknown'}
+        </div>
         <div className="py-2">
           {ready ? (
             <FiWifi className="w-5 h-5" />

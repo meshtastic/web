@@ -9,6 +9,8 @@ form prefix should be located in the input (absolute?)
 form suffix should focus input
 reset store on new connection
 redux actions seem to be dispatched twice
+add qr generator in channel editor
+no save button for channel config (bw,sf,cr,tx etc)
 
 meshtastic.js
 - fix entering device-reconnecting state and not re-connecting despite packets being received

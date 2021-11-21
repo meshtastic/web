@@ -1,3 +1,4 @@
+import { connType } from '@core/slices/appSlice';
 import {
   addChannel,
   addMessage,
@@ -16,6 +17,7 @@ import {
   IHTTPConnection,
   ISerialConnection,
   Protobuf,
+  SettingsManager,
   Types,
 } from '@meshtastic/meshtasticjs';
 
@@ -34,14 +36,42 @@ export const connectionUrl = state.hostOverrideEnabled
 export const ble = new IBLEConnection();
 export const serial = new ISerialConnection();
 
-export const setConnection = (conn: connectionType): void => {
+export const setConnection = async (conn: connType): Promise<void> => {
+  await connection.disconnect();
   cleanupListeners();
-  connection = conn;
-
+  switch (conn) {
+    case connType.HTTP:
+      connection = new IHTTPConnection();
+      break;
+    case connType.BLE:
+      connection = new IBLEConnection();
+      break;
+    case connType.SERIAL:
+      connection = new ISerialConnection();
+      break;
+  }
   registerListeners();
+  const connectionParams = store.getState().app.connectionParams;
+  switch (conn) {
+    case connType.HTTP:
+      await connection.connect(connectionParams.HTTP);
+      break;
+    case connType.BLE:
+      await connection.connect(
+        // @ts-ignore tmp
+        connectionParams.BLE,
+      );
+      break;
+    case connType.SERIAL:
+      await connection.connect(
+        // @ts-ignore tmp
+        connectionParams.SERIAL,
+      );
+      break;
+  }
 };
 
-const cleanupListeners = (): void => {
+export const cleanupListeners = (): void => {
   connection.onDeviceStatus.cancelAll();
   connection.onMyNodeInfo.cancelAll();
   connection.onUserPacket.cancelAll();
@@ -53,6 +83,8 @@ const cleanupListeners = (): void => {
 };
 
 const registerListeners = (): void => {
+  SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
+
   connection.onDeviceStatus.subscribe((status) => {
     store.dispatch(setDeviceStatus(status));
 

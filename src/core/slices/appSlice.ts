@@ -1,13 +1,26 @@
+import type { Types } from '@meshtastic/meshtasticjs';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
 export type currentPageName = 'messages' | 'settings';
+
+export enum connType {
+  HTTP,
+  BLE,
+  SERIAL,
+}
 
 interface AppState {
   mobileNavOpen: boolean;
   connectionModalOpen: boolean;
   darkMode: boolean;
   currentPage: currentPageName;
+  connType: connType;
+  connectionParams: {
+    BLE: Types.BLEConnectionParameters;
+    HTTP: Types.HTTPConnectionParameters;
+    SERIAL: Types.SerialConnectionParameters;
+  };
 }
 
 const initialState: AppState = {
@@ -15,6 +28,17 @@ const initialState: AppState = {
   connectionModalOpen: true,
   darkMode: localStorage.getItem('darkMode') === 'true' ?? false,
   currentPage: 'messages',
+  connType: connType.HTTP,
+  connectionParams: {
+    BLE: {},
+    HTTP: {
+      address: 'http://meshtastic.local/',
+      tls: false,
+      receiveBatchRequests: false,
+      fetchInterval: 2000,
+    },
+    SERIAL: {},
+  },
 };
 
 export const appSlice = createSlice({
@@ -40,6 +64,28 @@ export const appSlice = createSlice({
     setCurrentPage(state, action: PayloadAction<currentPageName>) {
       state.currentPage = action.payload;
     },
+    setConnType(state, action: PayloadAction<connType>) {
+      state.connType = action.payload;
+    },
+    setConnectionParams(
+      state,
+      action: PayloadAction<{
+        type: connType;
+        params: Types.ConnectionParameters;
+      }>,
+    ) {
+      switch (action.payload.type) {
+        case connType.BLE:
+          state.connectionParams.BLE = action.payload.params;
+          break;
+        case connType.HTTP:
+          state.connectionParams.HTTP = action.payload.params;
+          break;
+        case connType.SERIAL:
+          state.connectionParams.SERIAL = action.payload.params;
+          break;
+      }
+    },
   },
 });
 
@@ -50,6 +96,8 @@ export const {
   closeConnectionModal,
   setDarkModeEnabled,
   setCurrentPage,
+  setConnType,
+  setConnectionParams,
 } = appSlice.actions;
 
 export default appSlice.reducer;

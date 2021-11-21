@@ -1,15 +1,18 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
+import { FaQrcode } from 'react-icons/fa';
 import { FiEdit3, FiSave } from 'react-icons/fi';
+import QRCode from 'react-qr-code';
 
+import { Card } from '@components/generic/Card';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Input } from '@components/generic/form/Input';
+import { IconButton } from '@components/generic/IconButton';
 import { Loading } from '@components/generic/Loading';
+import { Modal } from '@components/generic/Modal';
+import { connection } from '@core/connection';
 import { Protobuf } from '@meshtastic/meshtasticjs';
-
-import { connection } from '../core/connection';
-import { Checkbox } from './generic/form/Checkbox';
-import { Input } from './generic/form/Input';
-import { IconButton } from './generic/IconButton';
 
 export interface ChannelProps {
   channel: Protobuf.Channel;
@@ -22,6 +25,7 @@ export const Channel = ({
 }: ChannelProps): JSX.Element => {
   const [edit, setEdit] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [showQr, setShowQr] = React.useState(false);
 
   const { register, handleSubmit } = useForm<{
     enabled: boolean;
@@ -80,6 +84,16 @@ export const Channel = ({
 
   return (
     <div className="relative flex justify-between p-3 bg-gray-100 rounded-md dark:bg-gray-700">
+      <Modal
+        open={showQr}
+        onClose={(): void => {
+          setShowQr(false);
+        }}
+      >
+        <Card>
+          <QRCode className="rounded-md" value="test" />
+        </Card>
+      </Modal>
       {edit ? (
         <>
           {loading && <Loading />}
@@ -139,12 +153,20 @@ export const Channel = ({
                 : `Channel: ${channel.index}`}
             </div>
           </div>
-          <IconButton
-            onClick={(): void => {
-              setEdit(true);
-            }}
-            icon={<FiEdit3 />}
-          />
+          <div className="flex gap-2">
+            <IconButton
+              onClick={(): void => {
+                setShowQr(true);
+              }}
+              icon={<FaQrcode />}
+            />
+            <IconButton
+              onClick={(): void => {
+                setEdit(true);
+              }}
+              icon={<FiEdit3 />}
+            />
+          </div>
         </>
       )}
     </div>

@@ -36,6 +36,7 @@ specifiers:
   react-i18next: ^11.14.2
   react-icons: ^4.3.1
   react-json-pretty: ^2.2.0
+  react-qr-code: ^2.0.3
   react-redux: ^7.2.6
   rfc4648: ^1.5.0
   swr: ^1.0.1
@@ -63,6 +64,7 @@ dependencies:
   react-i18next: 11.14.2_i18next@21.5.2+react@17.0.2
   react-icons: 4.3.1_react@17.0.2
   react-json-pretty: 2.2.0_react-dom@17.0.2+react@17.0.2
+  react-qr-code: 2.0.3_react@17.0.2
   react-redux: 7.2.6_react-dom@17.0.2+react@17.0.2
   rfc4648: 1.5.0
   swr: 1.0.1_react@17.0.2
@@ -4063,6 +4065,10 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
+  /qr.js/0.0.0:
+    resolution: {integrity: sha1-ys6GOG9ZoNuAUPqQ2baw6IoeNk8=}
+    dev: false
+
   /queue-microtask/1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
     dev: true
@@ -4147,6 +4153,17 @@ packages:
       prop-types: 15.7.2
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
+    dev: false
+
+  /react-qr-code/2.0.3_react@17.0.2:
+    resolution: {integrity: sha512-6GDH0l53lksf2JgZwwcoS0D60a1OAal/GQRyNFkMBW19HjSqvtD5S20scmSQsKl+BgWM85Wd5DCcUYoHd+PZnQ==}
+    peerDependencies:
+      react: ^16.x || ^17.x
+      react-native-svg: '*'
+    dependencies:
+      prop-types: 15.7.2
+      qr.js: 0.0.0
+      react: 17.0.2
     dev: false
 
   /react-redux/7.2.6_react-dom@17.0.2+react@17.0.2:

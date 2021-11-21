@@ -5,9 +5,9 @@ import { FiSave, FiXCircle } from 'react-icons/fi';
 import { IconButton } from './generic/IconButton';
 
 export interface FormFooterProps {
-  dirty: boolean;
-  clearAction: () => void;
-  saveAction: () => void;
+  dirty?: boolean;
+  clearAction?: () => void;
+  saveAction?: () => void;
 }
 
 export const FormFooter = ({
@@ -21,13 +21,13 @@ export const FormFooter = ({
         icon={<FiXCircle className="w-5 h-5" />}
         disabled={!dirty}
         onClick={(): void => {
-          clearAction();
+          clearAction && clearAction();
         }}
       />
       <IconButton
         disabled={!dirty}
         onClick={(): void => {
-          saveAction();
+          saveAction && saveAction();
         }}
         icon={<FiSave className="w-5 h-5" />}
       />
