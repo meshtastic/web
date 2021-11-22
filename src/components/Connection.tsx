@@ -6,6 +6,7 @@ import { Button } from '@components/generic/Button';
 import { Card } from '@components/generic/Card';
 import { Select } from '@components/generic/form/Select';
 import { Modal } from '@components/generic/Modal';
+import { DeviceStatus } from '@components/menu/buttons/DeviceStatus';
 import {
   cleanupListeners,
   connection,
@@ -18,6 +19,7 @@ import {
   setConnectionParams,
   setConnType,
 } from '@core/slices/appSlice';
+import { resetState } from '@core/slices/meshtasticSlice';
 import { Types } from '@meshtastic/meshtasticjs';
 
 import { BLE } from './connection/BLE';
@@ -61,32 +63,28 @@ export const Connection = (): JSX.Element => {
     >
       <Card>
         <div className="w-full max-w-3xl p-10">
-          <div className="flex justify-between w-full bg-gray-100 rounded-md">
+          <div className="flex justify-between w-full border rounded-md">
             <div className="p-2">
-              <h1>
-                {`Connected to: ${
-                  state.nodes.find(
-                    (node) => node.number === state.radio.hardware.myNodeNum,
-                  )?.user?.longName ?? 'Unknown'
-                }`}
-              </h1>
-              <p>{`Via: ${connType[appState.connType]}`}</p>
+              <DeviceStatus />
             </div>
             <div className="p-2 my-auto">
               {state.deviceStatus ===
               Types.DeviceStatusEnum.DEVICE_DISCONNECTED ? (
                 <Button
+                  padding={2}
                   border
                   onClick={async (): Promise<void> => {
-                    await setConnection();
+                    await setConnection(appState.connType);
                   }}
                 >
                   Connect
                 </Button>
               ) : (
                 <Button
+                  padding={2}
                   border
                   onClick={async (): Promise<void> => {
+                    dispatch(resetState());
                     await connection.disconnect();
                     cleanupListeners();
                   }}
@@ -96,19 +94,24 @@ export const Connection = (): JSX.Element => {
               )}
             </div>
           </div>
-          <form className="space-y-2">
-            <Select
-              label="Method"
-              optionsEnum={connType}
-              value={appState.connType}
-              onChange={(e): void => {
-                dispatch(setConnType(e.target.value as unknown as connType));
-              }}
-            />
-            {appState.connType === connType.HTTP && <HTTP />}
-            {appState.connType === connType.BLE && <BLE />}
-            {appState.connType === connType.SERIAL && <Serial />}
-          </form>
+          {state.deviceStatus ===
+            Types.DeviceStatusEnum.DEVICE_DISCONNECTED && (
+            <form className="space-y-2">
+              <Select
+                label="Method"
+                optionsEnum={connType}
+                value={appState.connType}
+                onChange={(e): void => {
+                  console.log(e.target.value);
+
+                  dispatch(setConnType(parseInt(e.target.value)));
+                }}
+              />
+              {appState.connType === connType.HTTP && <HTTP />}
+              {appState.connType === connType.BLE && <BLE />}
+              {appState.connType === connType.SERIAL && <Serial />}
+            </form>
+          )}
         </div>
       </Card>
     </Modal>

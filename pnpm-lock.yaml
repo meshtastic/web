@@ -2,7 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@headlessui/react': ^1.4.2
-  '@meshtastic/meshtasticjs': ^0.6.29
+  '@meshtastic/meshtasticjs': ^0.6.30
   '@reduxjs/toolkit': ^1.6.2
   '@types/react': ^17.0.35
   '@types/react-dom': ^17.0.11
@@ -52,7 +52,7 @@ specifiers:
 
 dependencies:
   '@headlessui/react': 1.4.2_react-dom@17.0.2+react@17.0.2
-  '@meshtastic/meshtasticjs': 0.6.29
+  '@meshtastic/meshtasticjs': 0.6.30
   '@reduxjs/toolkit': 1.6.2_react-redux@7.2.6+react@17.0.2
   boring-avatars: 1.5.8
   i18next: 21.5.2
@@ -1359,8 +1359,8 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: true
 
-  /@meshtastic/meshtasticjs/0.6.29:
-    resolution: {integrity: sha512-XcfHTGlWBLgdfXCK81U/ilDpepyId/OEvXRNiEerg40m9pD7FaNlqPnAKRhvoeOl56VQdKtCpsiWJdeknSI4tw==}
+  /@meshtastic/meshtasticjs/0.6.30:
+    resolution: {integrity: sha512-gxlu4ifju60Dwruz6UbREiZ73uCibtJOQdml28lzvsmTHY2vsEXfRiAoo2AvQFmTpoySJMJWrFzBQvK7RCqbtA==}
     dependencies:
       '@protobuf-ts/runtime': 2.0.7
       sub-events: 1.8.9

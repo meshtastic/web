@@ -1,14 +1,15 @@
 import type React from 'react';
 
-import { FiWifi, FiWifiOff } from 'react-icons/fi';
+import { FiBluetooth, FiCpu, FiWifi } from 'react-icons/fi';
 
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
-import { openConnectionModal } from '@core/slices/appSlice';
+import { connType, openConnectionModal } from '@core/slices/appSlice';
 import { Types } from '@meshtastic/meshtasticjs';
 
 export const DeviceStatus = (): JSX.Element => {
   const dispatch = useAppDispatch();
+  const appState = useAppSelector((state) => state.app);
   const state = useAppSelector((state) => state.meshtastic);
   const ready = useAppSelector((state) => state.meshtastic.ready);
 
@@ -41,13 +42,15 @@ export const DeviceStatus = (): JSX.Element => {
         <div className="my-auto">
           {state.nodes.find(
             (node) => node.number === state.radio.hardware.myNodeNum,
-          )?.user?.longName ?? 'Unknown'}
+          )?.user?.longName ?? 'Disconnected'}
         </div>
         <div className="py-2">
-          {ready ? (
-            <FiWifi className="w-5 h-5" />
+          {appState.connType === connType.BLE ? (
+            <FiBluetooth className="w-5 h-5" />
+          ) : appState.connType === connType.SERIAL ? (
+            <FiCpu className="w-5 h-5" />
           ) : (
-            <FiWifiOff className="w-5 h-5 animate-pulse" />
+            <FiWifi className="w-5 h-5" />
           )}
         </div>
       </div>

@@ -43,7 +43,6 @@ interface MeshtasticState {
   radio: Radio;
   hostOverrideEnabled: boolean;
   hostOverride: string;
-  connectionType: connType;
 }
 
 const initialState: MeshtasticState = {
@@ -61,7 +60,6 @@ const initialState: MeshtasticState = {
   hostOverrideEnabled:
     localStorage.getItem('hostOverrideEnabled') === 'true' ?? false,
   hostOverride: localStorage.getItem('hostOverride') ?? '',
-  connectionType: parseInt(localStorage.getItem('connectionType') ?? '0'),
 };
 
 export const meshtasticSlice = createSlice({
@@ -184,12 +182,12 @@ export const meshtasticSlice = createSlice({
         // connection.disconnect();
       }
     },
-    setConnectionType: (state, action: PayloadAction<connType>) => {
-      state.connectionType = action.payload;
-      localStorage.setItem('connectionType', String(action.payload));
-      if (state.connectionType !== action.payload) {
-        // connection.disconnect();
-      }
+    resetState: (state) => {
+      state.deviceStatus = Types.DeviceStatusEnum.DEVICE_DISCONNECTED;
+      state.nodes = [];
+      state.radio = initialState.radio;
+      state.ready = false;
+      state.lastMeshInterraction = 0;
     },
   },
 });
@@ -208,6 +206,7 @@ export const {
   ackMessage,
   setHostOverrideEnabled,
   setHostOverride,
+  resetState,
 } = meshtasticSlice.actions;
 
 export default meshtasticSlice.reducer;
