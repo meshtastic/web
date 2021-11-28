@@ -38,7 +38,6 @@ export const Serial = (): JSX.Element => {
           </div>
           <IconButton
             onClick={async (): Promise<void> => {
-              dispatch(setConnType(parseInt(e.target.value)));
               await setConnection(connType.SERIAL);
             }}
             icon={<FiCheck />}

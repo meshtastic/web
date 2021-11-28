@@ -74,17 +74,9 @@ export const appSlice = createSlice({
         params: Types.ConnectionParameters;
       }>,
     ) {
-      switch (action.payload.type) {
-        case connType.BLE:
-          state.connectionParams.BLE = action.payload.params;
-          break;
-        case connType.HTTP:
-          state.connectionParams.HTTP = action.payload.params;
-          break;
-        case connType.SERIAL:
-          state.connectionParams.SERIAL = action.payload.params;
-          break;
-      }
+      // @ts-ignore tmp
+      state.connectionParams[connType[action.payload.type]] =
+        action.payload.params;
     },
   },
 });

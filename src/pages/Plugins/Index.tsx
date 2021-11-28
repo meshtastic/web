@@ -1,6 +1,12 @@
 import type React from 'react';
 
-import { FiAlignLeft, FiBell, FiFileText, FiRss } from 'react-icons/fi';
+import {
+  FiAlignLeft,
+  FiBell,
+  FiFastForward,
+  FiFileText,
+  FiRss,
+} from 'react-icons/fi';
 
 import { PageLayout } from '@components/templates/PageLayout';
 
@@ -8,6 +14,7 @@ import { ExternalNotification } from './ExternalNotification';
 import { Files } from './Files';
 import { RangeTest } from './RangeTest';
 import { Serial } from './Serial';
+import { StoreAndForward } from './StoreAndForward';
 
 export const Plugins = (): JSX.Element => {
   return (
@@ -34,12 +41,18 @@ export const Plugins = (): JSX.Element => {
           description: 'Send serial data over the mesh',
           icon: <FiAlignLeft className="flex-shrink-0 w-6 h-6" />,
         },
+        {
+          title: 'Store & Forward',
+          description: 'Retrive message history',
+          icon: <FiFastForward className="flex-shrink-0 w-6 h-6" />,
+        },
       ]}
       panels={[
         <RangeTest key={1} />,
         <Files key={2} />,
         <ExternalNotification key={3} />,
         <Serial key={4} />,
+        <StoreAndForward key={5} />,
       ]}
     />
   );

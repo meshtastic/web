@@ -86,6 +86,8 @@ export const meshtasticSlice = createSlice({
         node.user = action.payload.data;
         // todo: use rx time
         node.lastHeard = new Date();
+      } else {
+        console.log('Node not in DB');
       }
     },
     addPosition: (state, action: PayloadAction<Types.PositionPacket>) => {
@@ -110,8 +112,6 @@ export const meshtasticSlice = createSlice({
         node.lastHeard = new Date(action.payload.lastHeard * 1000);
         node.snr.push(action.payload.snr);
       } else {
-        console.log('node does not exist');
-
         state.nodes.push({
           number: action.payload.num,
           lastHeard: new Date(action.payload.lastHeard * 1000),
