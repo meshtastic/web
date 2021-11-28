@@ -11,7 +11,6 @@ export const DeviceStatus = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const appState = useAppSelector((state) => state.app);
   const state = useAppSelector((state) => state.meshtastic);
-  const ready = useAppSelector((state) => state.meshtastic.ready);
 
   return (
     <Button

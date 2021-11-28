@@ -2,14 +2,11 @@ import React from 'react';
 
 import { FiCheck } from 'react-icons/fi';
 
-import { useAppDispatch } from '@app/hooks/redux';
 import { IconButton } from '@components/generic/IconButton';
 import { serial, setConnection } from '@core/connection';
 import { connType } from '@core/slices/appSlice';
 
 export const Serial = (): JSX.Element => {
-  const dispatch = useAppDispatch();
-
   const [serialDevices, setSerialDevices] = React.useState<SerialPort[]>([]);
 
   const updateSerialDeviceList = React.useCallback(async (): Promise<void> => {

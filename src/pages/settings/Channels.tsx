@@ -140,10 +140,10 @@ export const Channels = ({
 
     console.log(adminChannel);
 
-    // await connection.setChannel(adminChannel, (): Promise<void> => {
-    //   setLoading(false);
-    //   return Promise.resolve();
-    // });
+    await connection.setChannel(adminChannel, (): Promise<void> => {
+      setLoading(false);
+      return Promise.resolve();
+    });
   });
 
   return (

@@ -10,11 +10,6 @@ export interface MessageWithAck {
   isSender: boolean;
   received: Date;
 }
-enum connType {
-  HTTP,
-  BLE,
-  SERIAL,
-}
 
 export interface ChannelData {
   channel: Protobuf.Channel;
