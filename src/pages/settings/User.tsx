@@ -36,12 +36,18 @@ export const User = ({ navOpen, setNavOpen }: UserProps): JSX.Element => {
     shortName: string;
     isLicensed: boolean;
     team: Protobuf.Team;
+    antAzimuth: number;
+    antGainDbi: number;
+    txPowerDbm: number;
   }>({
     defaultValues: {
       longName: node?.user?.longName,
       shortName: node?.user?.shortName,
       isLicensed: node?.user?.isLicensed,
       team: node?.user?.team,
+      antAzimuth: node?.user?.antAzimuth,
+      antGainDbi: node?.user?.antGainDbi,
+      txPowerDbm: node?.user?.txPowerDbm,
     },
   });
 
@@ -133,6 +139,24 @@ export const User = ({ navOpen, setNavOpen }: UserProps): JSX.Element => {
               label="Team"
               optionsEnum={Protobuf.Team}
               {...register('team', { valueAsNumber: true })}
+            />
+            <Input
+              label="Antenna Azimuth"
+              suffix="°"
+              type="number"
+              {...register('antAzimuth', { valueAsNumber: true })}
+            />
+            <Input
+              label="Antenna Gain"
+              suffix="dBi"
+              type="number"
+              {...register('antGainDbi', { valueAsNumber: true })}
+            />
+            <Input
+              label="Transmit Power"
+              suffix="dBm"
+              type="number"
+              {...register('txPowerDbm', { valueAsNumber: true })}
             />
           </form>
         </div>
