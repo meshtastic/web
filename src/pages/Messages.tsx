@@ -50,7 +50,7 @@ export const Messages = (): JSX.Element => {
             isSender={message.isSender}
             message={message.message.data}
             ack={message.ack}
-            rxTime={new Date()}
+            rxTime={message.received}
             senderName={
               nodes.find((node) => node.number === message.message.packet.from)
                 ?.user?.longName ?? 'UNK'

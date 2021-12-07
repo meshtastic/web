@@ -2,8 +2,6 @@ import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-// import { connection } from '../connection';
-
 export interface MessageWithAck {
   message: Types.TextPacket;
   ack: boolean;
@@ -16,11 +14,19 @@ export interface ChannelData {
   messages: MessageWithAck[];
 }
 
+interface CurrentPosition {
+  latitudeI: number;
+  longitudeI: number;
+  altitude: number;
+  posTimestamp: number;
+}
+
 export interface Node {
   number: number;
   lastHeard: Date;
   snr: number[];
   positions: Protobuf.Position[];
+  currentPosition?: CurrentPosition;
   user?: Protobuf.User;
 }
 
@@ -79,8 +85,9 @@ export const meshtasticSlice = createSlice({
       );
       if (node) {
         node.user = action.payload.data;
-        // todo: use rx time
-        node.lastHeard = new Date();
+        if (action.payload.packet.rxTime) {
+          node.lastHeard = new Date(action.payload.packet.rxTime * 1000);
+        }
       } else {
         console.log('Node not in DB');
       }
@@ -90,10 +97,29 @@ export const meshtasticSlice = createSlice({
         (node) => node.number === action.payload.packet.from,
       );
 
-      node?.positions.push(action.payload.data);
       if (node) {
-        // todo: use rx time
-        node.lastHeard = new Date();
+        node.positions.push(action.payload.data);
+
+        if (
+          action.payload.data.latitudeI ||
+          action.payload.data.longitudeI ||
+          action.payload.data.altitude
+        ) {
+          node.currentPosition = {
+            latitudeI:
+              action.payload.data.latitudeI ?? node.currentPosition?.latitudeI,
+            longitudeI:
+              action.payload.data.longitudeI ??
+              node.currentPosition?.longitudeI,
+            altitude:
+              action.payload.data.altitude ?? node.currentPosition?.altitude,
+            posTimestamp: action.payload.data.posTimestamp, //maybe new date?
+          };
+        }
+
+        if (action.payload.packet.rxTime) {
+          node.lastHeard = new Date(action.payload.packet.rxTime * 1000);
+        }
       }
     },
     addNode: (state, action: PayloadAction<Protobuf.NodeInfo>) => {
@@ -156,12 +182,22 @@ export const meshtasticSlice = createSlice({
       const channelIndex = state.radio.channels.findIndex(
         (channel) => channel.channel.index === action.payload.channel,
       );
-      // todo: update last mesh/user interraction here
       state.radio.channels[channelIndex].messages.map((message) => {
         if (message.message.packet.id === action.payload.messageId) {
           message.ack = true;
         }
       });
+    },
+    updateLastInteraction: (
+      state,
+      action: PayloadAction<{ id: number; time: Date }>,
+    ) => {
+      const node = state.nodes.find(
+        (node) => node.number === action.payload.id,
+      );
+      if (node) {
+        node.lastHeard = action.payload.time;
+      }
     },
     setHostOverrideEnabled: (state, action: PayloadAction<boolean>) => {
       state.hostOverrideEnabled = action.payload;
@@ -199,6 +235,7 @@ export const {
   setPreferences,
   addMessage,
   ackMessage,
+  updateLastInteraction,
   setHostOverrideEnabled,
   setHostOverride,
   resetState,

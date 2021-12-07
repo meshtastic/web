@@ -1,43 +1,101 @@
-import type React from 'react';
+import React from 'react';
 
-import Avatar from 'boring-avatars';
+import { FiCode, FiXCircle } from 'react-icons/fi';
+import { MdGpsFixed, MdGpsNotFixed, MdGpsOff } from 'react-icons/md';
+import TimeAgo from 'timeago-react';
 
+import { useBreakpoint } from '@app/hooks/breakpoint';
 import { useAppSelector } from '@app/hooks/redux';
-import { PageLayout } from '@components/templates/PageLayout';
+import { Drawer } from '@components/generic/Drawer';
+import { IconButton } from '@components/generic/IconButton';
+import { Map } from '@components/Map';
 import { Protobuf } from '@meshtastic/meshtasticjs';
-
-import { Node } from './Node';
 
 export const Nodes = (): JSX.Element => {
   const myNodeNum = useAppSelector(
     (state) => state.meshtastic.radio.hardware,
   ).myNodeNum;
-  const nodes = useAppSelector((state) => state.meshtastic.nodes).filter(
-    (node) => node.number !== myNodeNum,
-  );
+  const nodes = useAppSelector((state) => state.meshtastic.nodes);
+  // .filter(
+  //   (node) => node.number !== myNodeNum,
+  // );
+  const [navOpen, setNavOpen] = React.useState(false);
+
+  const { breakpoint } = useBreakpoint();
+
   return (
-    <PageLayout
-      title="Nodes"
-      emptyMessage="No nodes discovered yet..."
-      sidebarItems={nodes.map((node) => {
-        return {
-          title: node.user?.longName ?? node.number.toString(),
-          description: node.user
-            ? Protobuf.HardwareModel[node.user.hwModel]
-            : 'Unknown Hardware',
-          icon: (
-            <Avatar
-              size={30}
-              name={node.user?.longName ?? node.number.toString()}
-              variant="beam"
-              colors={['#213435', '#46685B', '#648A64', '#A6B985', '#E1E3AC']}
+    <div className="relative flex w-full dark:text-white">
+      <Drawer
+        open={breakpoint === 'sm' ? navOpen : true}
+        permenant={breakpoint !== 'sm'}
+        onClose={(): void => {
+          setNavOpen(!navOpen);
+        }}
+      >
+        <div className="flex items-center justify-between m-6 mr-6">
+          <div className="text-4xl font-extrabold leading-none tracking-tight">
+            Nodes
+          </div>
+          <div className="md:hidden">
+            <IconButton
+              icon={<FiXCircle className="w-5 h-5" />}
+              onClick={(): void => {
+                setNavOpen(false);
+              }}
             />
-          ),
-        };
-      })}
-      panels={nodes.map((node, index) => (
-        <Node key={index} node={node} />
-      ))}
-    />
+          </div>
+        </div>
+        {!nodes.length && (
+          <span className="p-4 text-sm text-gray-400 dark:text-gray-600">
+            No nodes found.
+          </span>
+        )}
+        {nodes.map((node) => (
+          <div
+            key={node.number}
+            className="m-2 rounded-md shadow-md bg-gray-50 dark:bg-gray-700"
+          >
+            <div className="flex gap-2 p-2 bg-gray-100 shadow-md rounded-t-md dark:bg-primaryDark">
+              <div
+                className={`my-auto w-3 h-3 rounded-full ${
+                  node.lastHeard > new Date(Date.now() - 1000 * 60 * 15)
+                    ? 'bg-green-500'
+                    : node.lastHeard > new Date(Date.now() - 1000 * 60 * 30)
+                    ? 'bg-yellow-500'
+                    : 'bg-red-500'
+                }`}
+              />
+              <div className="my-auto">{node.user?.longName}</div>
+              <div className="my-auto ml-auto text-xs font-semibold">
+                {node.lastHeard.getTime() ? (
+                  <TimeAgo datetime={node.lastHeard} />
+                ) : (
+                  'Never'
+                )}
+              </div>
+              {node.currentPosition ? (
+                new Date(node.positions[0].posTimestamp * 1000) >
+                new Date(new Date().getTime() - 1000 * 60 * 30) ? (
+                  <IconButton icon={<MdGpsFixed />} />
+                ) : (
+                  <IconButton icon={<MdGpsNotFixed />} />
+                )
+              ) : (
+                <IconButton disabled icon={<MdGpsOff />} />
+              )}
+            </div>
+            <div className="flex p-2">
+              <div className="my-auto">
+                {Protobuf.HardwareModel[node.user?.hwModel ?? 0]}
+              </div>
+              <div className="ml-auto">
+                <IconButton icon={<FiCode className="w-5 h-5" />} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </Drawer>
+      <Map />
+    </div>
   );
 };

@@ -1,5 +1,6 @@
 import path from 'path';
 import { defineConfig } from 'vite';
+import importToCDN from 'vite-plugin-cdn-import';
 import { VitePWA } from 'vite-plugin-pwa';
 
 import react from '@vitejs/plugin-react';
@@ -8,6 +9,16 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [
     react(),
+    importToCDN({
+      modules: [
+        {
+          name: 'mapbox-gl',
+          var: 'mapboxgl',
+          path: `dist/mapbox-gl.js`,
+        },
+      ],
+    }),
+
     VitePWA({
       mode: 'production',
 

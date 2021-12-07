@@ -10,6 +10,7 @@ import {
   setMyNodeInfo,
   setPreferences,
   setReady,
+  updateLastInteraction,
 } from '@core/slices/meshtasticSlice';
 import { store } from '@core/store';
 import {
@@ -135,6 +136,15 @@ const registerListeners = (): void => {
     (date): void | { payload: number; type: string } =>
       store.dispatch(setLastMeshInterraction(date.getTime())),
   );
+
+  connection.onRoutingPacket.subscribe((routingPacket) => {
+    store.dispatch(
+      updateLastInteraction({
+        id: routingPacket.packet.from,
+        time: new Date(routingPacket.packet.rxTime * 1000),
+      }),
+    );
+  });
 
   connection.onTextPacket.subscribe((message) => {
     const myNodeNum = store.getState().meshtastic.radio.hardware.myNodeNum;
