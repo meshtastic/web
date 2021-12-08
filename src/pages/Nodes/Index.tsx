@@ -9,6 +9,7 @@ import { useAppSelector } from '@app/hooks/redux';
 import { Drawer } from '@components/generic/Drawer';
 import { IconButton } from '@components/generic/IconButton';
 import { Map } from '@components/Map';
+import { Disclosure } from '@headlessui/react';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Nodes = (): JSX.Element => {
@@ -51,11 +52,12 @@ export const Nodes = (): JSX.Element => {
           </span>
         )}
         {nodes.map((node) => (
-          <div
-            key={node.number}
+          <Disclosure
+            as="div"
             className="m-2 rounded-md shadow-md bg-gray-50 dark:bg-gray-700"
+            key={node.number}
           >
-            <div className="flex gap-2 p-2 bg-gray-100 shadow-md rounded-t-md dark:bg-primaryDark">
+            <Disclosure.Button className="flex w-full gap-2 p-2 bg-gray-100 rounded-md shadow-md dark:bg-primaryDark">
               <div
                 className={`my-auto w-3 h-3 rounded-full ${
                   node.lastHeard > new Date(Date.now() - 1000 * 60 * 15)
@@ -83,16 +85,18 @@ export const Nodes = (): JSX.Element => {
               ) : (
                 <IconButton disabled icon={<MdGpsOff />} />
               )}
-            </div>
-            <div className="flex p-2">
-              <div className="my-auto">
-                {Protobuf.HardwareModel[node.user?.hwModel ?? 0]}
+            </Disclosure.Button>
+            <Disclosure.Panel className="p-2">
+              <div className="flex">
+                <div className="my-auto">
+                  {Protobuf.HardwareModel[node.user?.hwModel ?? 0]}
+                </div>
+                <div className="ml-auto">
+                  <IconButton icon={<FiCode className="w-5 h-5" />} />
+                </div>
               </div>
-              <div className="ml-auto">
-                <IconButton icon={<FiCode className="w-5 h-5" />} />
-              </div>
-            </div>
-          </div>
+            </Disclosure.Panel>
+          </Disclosure>
         ))}
       </Drawer>
       <Map />
