@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
+import ReactSelect from 'react-select';
 
 import { useAppSelector } from '@app/hooks/redux';
 import { FormFooter } from '@components/FormFooter';
@@ -10,6 +11,7 @@ import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
 import { Checkbox } from '@components/generic/form/Checkbox';
 import { Input } from '@components/generic/form/Input';
+import { Label } from '@components/generic/form/Label';
 import { Select } from '@components/generic/form/Select';
 import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
@@ -30,7 +32,7 @@ export const Position = ({
   );
   const [debug, setDebug] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const { register, handleSubmit, formState, reset } =
+  const { register, handleSubmit, formState, reset, control } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: {
         ...preferences,
@@ -43,6 +45,12 @@ export const Position = ({
       },
     });
 
+  const watchPsk = useWatch({
+    control,
+    name: 'positionFlags',
+    defaultValue: 0,
+  });
+
   React.useEffect(() => {
     reset(preferences);
   }, [reset, preferences]);
@@ -54,6 +62,19 @@ export const Position = ({
       setLoading(false);
     });
   });
+
+  const encode = (enums: Protobuf.PositionFlags[]): number => {
+    return enums.reduce((acc, curr) => acc | curr, 0);
+  };
+
+  const decode = (value: number): Protobuf.PositionFlags[] => {
+    const enumValues = Object.keys(Protobuf.PositionFlags)
+      .map(Number)
+      .filter(Boolean);
+
+    return enumValues.map((b) => value & b).filter(Boolean);
+  };
+
   return (
     <PrimaryTemplate
       title="Position"
@@ -93,9 +114,55 @@ export const Position = ({
               suffix="Seconds"
               {...register('positionBroadcastSecs', { valueAsNumber: true })}
             />
-            <Select
-              label="Position Type"
-              optionsEnum={Protobuf.PositionFlags}
+
+            <Controller
+              name="positionFlags"
+              control={control}
+              render={({ field, fieldState }): JSX.Element => {
+                const { value, onChange, ...rest } = field;
+                const { error } = fieldState;
+                const label = 'Position Flags';
+                return (
+                  <div className="w-full">
+                    {label && <Label label={label} error={error?.message} />}
+                    <ReactSelect
+                      {...rest}
+                      isMulti
+                      value={decode(value).map((flag) => {
+                        return {
+                          value: flag,
+                          label: Protobuf.PositionFlags[flag].replace(
+                            'POS_',
+                            '',
+                          ),
+                        };
+                      })}
+                      options={Object.entries(Protobuf.PositionFlags)
+                        .filter((value) => typeof value[1] !== 'number')
+                        .filter(
+                          (value) =>
+                            parseInt(value[0]) !==
+                            Protobuf.PositionFlags.POS_UNDEFINED,
+                        )
+                        .map((value) => {
+                          return {
+                            value: parseInt(value[0]),
+                            label: value[1].toString().replace('POS_', ''),
+                          };
+                        })}
+                      onChange={(e): void =>
+                        onChange(encode(e.map((v) => v.value)))
+                      }
+                    />
+                  </div>
+                );
+              }}
+            />
+
+            <Input
+              label="Position Type (DEBUG)"
+              type="number"
+              disabled
               {...register('positionFlags', { valueAsNumber: true })}
             />
             <Checkbox

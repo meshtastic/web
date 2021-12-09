@@ -19,6 +19,7 @@ interface CurrentPosition {
   longitudeI: number;
   altitude: number;
   posTimestamp: number;
+  satsInView: number;
 }
 
 export interface Node {
@@ -113,7 +114,10 @@ export const meshtasticSlice = createSlice({
               node.currentPosition?.longitudeI,
             altitude:
               action.payload.data.altitude ?? node.currentPosition?.altitude,
-            posTimestamp: action.payload.data.posTimestamp, //maybe new date?
+            posTimestamp: action.payload.data.posTimestamp,
+            satsInView:
+              action.payload.data.satsInView ??
+              node.currentPosition?.satsInView,
           };
         }
 
