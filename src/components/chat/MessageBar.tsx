@@ -34,7 +34,7 @@ export const MessageBar = ({ channelIndex }: MessageBarProps): JSX.Element => {
         true,
         channelIndex--,
         (id) => {
-          dispatch(ackMessage({ channel: 0, messageId: id }));
+          dispatch(ackMessage({ channel: channelIndex--, messageId: id }));
 
           return Promise.resolve();
         },
