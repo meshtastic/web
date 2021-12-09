@@ -34,7 +34,7 @@ export const PrimaryTemplate = ({
         {children}
       </div>
       {footer && (
-        <div className="flex px-4 py-2 bg-white border-t border-gray-300 md: md:py-4 md:flex-row flex-0 md:items-center md:justify-between md:px-10 dark:border-gray-600 dark:bg-secondaryDark">
+        <div className="flex px-4 py-2 bg-white border-t border-gray-300 md:flex-row flex-0 md:items-center md:justify-between md:px-10 dark:border-gray-600 dark:bg-secondaryDark">
           {leftButton && (
             <div className="pr-2 m-auto md:hidden">{leftButton}</div>
           )}
