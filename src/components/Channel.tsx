@@ -1,13 +1,16 @@
 import React from 'react';
 
-import { useForm } from 'react-hook-form';
+import { fromByteArray, toByteArray } from 'base64-js';
+import { useForm, useWatch } from 'react-hook-form';
 import { FaQrcode } from 'react-icons/fa';
 import { FiEdit3, FiSave } from 'react-icons/fi';
+import { MdRefresh, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import QRCode from 'react-qr-code';
 
 import { Card } from '@components/generic/Card';
 import { Checkbox } from '@components/generic/form/Checkbox';
 import { Input } from '@components/generic/form/Input';
+import { Select } from '@components/generic/form/Select';
 import { IconButton } from '@components/generic/IconButton';
 import { Loading } from '@components/generic/Loading';
 import { Modal } from '@components/generic/Modal';
@@ -16,18 +19,17 @@ import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface ChannelProps {
   channel: Protobuf.Channel;
-  hideEnabled?: boolean;
+  isPrimary?: boolean;
 }
 
-export const Channel = ({
-  channel,
-  hideEnabled,
-}: ChannelProps): JSX.Element => {
+export const Channel = ({ channel, isPrimary }: ChannelProps): JSX.Element => {
   const [edit, setEdit] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [showQr, setShowQr] = React.useState(false);
+  const [keySize, setKeySize] = React.useState<128 | 256>(256);
+  const [pskHidden, setPskHidden] = React.useState(true);
 
-  const { register, handleSubmit } = useForm<{
+  const { register, handleSubmit, setValue, control } = useForm<{
     enabled: boolean;
     settings: {
       name: string;
@@ -55,9 +57,15 @@ export const Channel = ({
         downlinkEnabled: channel.settings?.downlinkEnabled,
         uplinkEnabled: channel.settings?.uplinkEnabled,
         txPower: channel.settings?.txPower,
-        psk: new TextDecoder().decode(channel.settings?.psk),
+        psk: fromByteArray(channel.settings?.psk ?? new Uint8Array(0)),
       },
     },
+  });
+
+  const watchPsk = useWatch({
+    control,
+    name: 'settings.psk',
+    defaultValue: '',
   });
 
   const onSubmit = handleSubmit(async (data) => {
@@ -72,7 +80,7 @@ export const Channel = ({
       index: channel.index,
       settings: {
         ...data.settings,
-        psk: new TextEncoder().encode(data.settings.psk),
+        psk: toByteArray(data.settings.psk ?? ''),
       },
     });
 
@@ -91,26 +99,57 @@ export const Channel = ({
         }}
       >
         <Card>
-          <QRCode className="rounded-md" value="test" />
+          <QRCode
+            className="rounded-md"
+            value={`https://www.meshtastic.org/d/#${watchPsk}`}
+          />
         </Card>
       </Modal>
       {edit ? (
         <>
           {loading && <Loading />}
           <div className="flex my-auto">
-            {/* TODO: get gap working */}
             <form className="gap-3">
-              {/* @todo: change to disable & make primary buttons */}
-              {!hideEnabled && (
+              {!isPrimary && (
                 <Checkbox
                   label="Enabled"
                   {...register('enabled', { valueAsNumber: true })}
                 />
               )}
               <Input label="Name" {...register('settings.name')} />
+              <Select
+                label="Key Size"
+                options={[
+                  { name: '128 Bit', value: 128 },
+                  { name: '256 Bit', value: 256 },
+                ]}
+                value={keySize}
+                onChange={(e): void => {
+                  setKeySize(parseInt(e.target.value) as 128 | 256);
+                }}
+              />
               <Input
                 label="Pre-Shared Key"
-                type="password"
+                type={pskHidden ? 'password' : 'text'}
+                disabled
+                action={
+                  <>
+                    <IconButton
+                      onClick={(): void => {
+                        setPskHidden(!setPskHidden);
+                      }}
+                      icon={pskHidden ? <MdVisibility /> : <MdVisibilityOff />}
+                    />
+                    <IconButton
+                      onClick={(): void => {
+                        const key = new Uint8Array(keySize);
+                        crypto.getRandomValues(key);
+                        setValue('settings.psk', fromByteArray(key));
+                      }}
+                      icon={<MdRefresh />}
+                    />
+                  </>
+                }
                 {...register('settings.psk')}
               />
               <Checkbox

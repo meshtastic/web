@@ -246,7 +246,7 @@ export const Channels = ({
               <Channel
                 key={channel.channel.index}
                 channel={channel.channel}
-                hideEnabled={channel.channel.index === 0}
+                isPrimary={channel.channel.index === 0}
               />
             ))}
 
