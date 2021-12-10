@@ -11,6 +11,8 @@ reset store on new connection
 redux actions seem to be dispatched twice
 add qr generator in channel editor
 no save button for channel config (bw,sf,cr,tx etc)
+should reset store beased on disconnect state, as it can be set by the lirary, not just user interactions
+way to set time for nodes, ntp?
 
 meshtastic.js
 - fix entering device-reconnecting state and not re-connecting despite packets being received
