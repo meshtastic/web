@@ -13,6 +13,9 @@ module.exports = {
         primaryDark: '#1E293B',
         secondaryDark: '#0F172A',
       },
+      boxShadow: {
+        border: '0 0 0 1px #67ea94',
+      },
     },
   },
   variants: {},

@@ -21,7 +21,7 @@ export const InputWrapper = ({
         ? 'border-red-500'
         : disabled
         ? 'border-gray-200'
-        : ' focus-within:border-primary dark:focus-within:border-primary hover:border-primary dark:hover:border-primary'
+        : ' focus-within:border-primary dark:focus-within:border-primary hover:border-primary dark:hover:border-primary focus-within:shadow-border'
     }`}
   >
     {children}
