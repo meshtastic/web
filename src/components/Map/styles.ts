@@ -17,7 +17,10 @@ export const MapStyles = {
     title: 'Light',
     url: 'mapbox://styles/mapbox/light-v10',
   } as MapStyle,
-  Dark: { title: 'Dark', url: 'mapbox://styles/mapbox/dark-v10' } as MapStyle,
+  Dark: {
+    title: 'Dark',
+    url: 'mapbox://styles/sachaw/ckwzwm92e1oep14pjunjqlqbo',
+  } as MapStyle,
   Satellite: {
     title: 'Satellite',
     url: 'mapbox://styles/mapbox/satellite-v9',
