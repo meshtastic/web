@@ -2,6 +2,7 @@ import React from 'react';
 
 import { FaSatellite } from 'react-icons/fa';
 import { FiCode } from 'react-icons/fi';
+import { GiLightningFrequency } from 'react-icons/gi';
 import {
   MdAccountCircle,
   MdArrowDropDown,
@@ -9,6 +10,7 @@ import {
   MdGpsFixed,
   MdGpsNotFixed,
   MdGpsOff,
+  MdSdStorage,
   MdSignalCellularAlt,
 } from 'react-icons/md';
 import TimeAgo from 'timeago-react';
@@ -20,10 +22,10 @@ import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface NodeCardProps {
   node: Node;
-  isMyNode: boolean;
+  myNodeInfo?: Protobuf.MyNodeInfo;
 }
 
-export const NodeCard = ({ node, isMyNode }: NodeCardProps): JSX.Element => {
+export const NodeCard = ({ node, myNodeInfo }: NodeCardProps): JSX.Element => {
   const [snrAverage, setSnrAverage] = React.useState(0);
   const [satsAverage, setSatsAverage] = React.useState(0);
   React.useEffect(() => {
@@ -51,7 +53,7 @@ export const NodeCard = ({ node, isMyNode }: NodeCardProps): JSX.Element => {
       className="m-2 rounded-md shadow-md bg-gray-50 dark:bg-gray-700"
     >
       <Disclosure.Button className="flex w-full gap-2 p-2 bg-gray-100 rounded-md shadow-md dark:bg-primaryDark">
-        {isMyNode ? (
+        {myNodeInfo ? (
           <MdAccountCircle className="my-auto" />
         ) : (
           <div
@@ -69,7 +71,7 @@ export const NodeCard = ({ node, isMyNode }: NodeCardProps): JSX.Element => {
         <div className="my-auto">{node.user?.longName}</div>
 
         <div className="my-auto ml-auto text-xs font-semibold">
-          {!isMyNode && (
+          {!myNodeInfo && (
             <span>
               {node.lastHeard.getTime() ? (
                 <TimeAgo datetime={node.lastHeard} />
@@ -92,6 +94,24 @@ export const NodeCard = ({ node, isMyNode }: NodeCardProps): JSX.Element => {
         )}
       </Disclosure.Button>
       <Disclosure.Panel className="p-2">
+        {myNodeInfo && (
+          <div>
+            <div className="flex justify-between">
+              <span className="flex">
+                <MdSdStorage className="my-auto" />
+                Firmware Ver:
+              </span>
+              <span>{myNodeInfo.firmwareVersion}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="flex">
+                <GiLightningFrequency className="my-auto" />
+                Freq Bands:
+              </span>
+              <span>{myNodeInfo.numBands}</span>
+            </div>
+          </div>
+        )}
         <div className="flex">
           <div className="my-auto">
             {Protobuf.HardwareModel[node.user?.hwModel ?? 0]}

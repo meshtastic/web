@@ -5,6 +5,7 @@ import {
   addNode,
   addPosition,
   addUser,
+  resetState,
   setDeviceStatus,
   setLastMeshInterraction,
   setMyNodeInfo,
@@ -94,6 +95,8 @@ const registerListeners = (): void => {
     }
     if (status === Types.DeviceStatusEnum.DEVICE_DISCONNECTED) {
       store.dispatch(setReady(false));
+      store.dispatch(resetState());
+      cleanupListeners();
     }
   });
 

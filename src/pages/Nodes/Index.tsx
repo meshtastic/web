@@ -11,16 +11,17 @@ import { Map } from '@components/Map';
 import { NodeCard } from './NodeCard';
 
 export const Nodes = (): JSX.Element => {
-  const myNodeNum = useAppSelector(
-    (state) => state.meshtastic.radio.hardware,
-  ).myNodeNum;
+  const myNodeInfo = useAppSelector((state) => state.meshtastic.radio.hardware);
+
   const nodes = useAppSelector((state) => state.meshtastic.nodes)
     .slice()
     .sort((a, b) =>
-      a.number === myNodeNum
+      a.number === myNodeInfo.myNodeNum
         ? 1
         : b?.lastHeard.getTime() - a?.lastHeard.getTime(),
     );
+
+  const myNode = nodes.find((node) => node.number === myNodeInfo.myNodeNum);
   const [navOpen, setNavOpen] = React.useState(false);
 
   const { breakpoint } = useBreakpoint();
@@ -52,13 +53,12 @@ export const Nodes = (): JSX.Element => {
             No nodes found.
           </span>
         )}
-        {nodes.map((node) => (
-          <NodeCard
-            key={node.number}
-            node={node}
-            isMyNode={node.number === myNodeNum}
-          />
-        ))}
+        {myNode && <NodeCard node={myNode} myNodeInfo={myNodeInfo} />}
+        {nodes
+          .filter((node) => node.number !== myNodeInfo.myNodeNum)
+          .map((node) => (
+            <NodeCard key={node.number} node={node} />
+          ))}
       </Drawer>
       <Map />
     </div>

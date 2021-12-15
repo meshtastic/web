@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { DeviceStatus } from '@app/components/menu/buttons/DeviceStatus';
 import { useAppSelector } from '@app/hooks/redux';

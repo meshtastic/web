@@ -7,19 +7,13 @@ import { Card } from '@components/generic/Card';
 import { Select } from '@components/generic/form/Select';
 import { Modal } from '@components/generic/Modal';
 import { DeviceStatus } from '@components/menu/buttons/DeviceStatus';
-import {
-  cleanupListeners,
-  connection,
-  connectionUrl,
-  setConnection,
-} from '@core/connection';
+import { connection, connectionUrl, setConnection } from '@core/connection';
 import {
   closeConnectionModal,
   connType,
   setConnectionParams,
   setConnType,
 } from '@core/slices/appSlice';
-import { resetState } from '@core/slices/meshtasticSlice';
 import { Types } from '@meshtastic/meshtasticjs';
 
 import { BLE } from './connection/BLE';
@@ -32,18 +26,20 @@ export const Connection = (): JSX.Element => {
   const appState = useAppSelector((state) => state.app);
 
   React.useEffect(() => {
-    dispatch(
-      setConnectionParams({
-        type: connType.HTTP,
-        params: {
-          address: connectionUrl,
-          tls: false,
-          receiveBatchRequests: false,
-          fetchInterval: 2000,
-        },
-      }),
-    );
-    void setConnection(connType.HTTP);
+    if (!import.meta.env.VITE_PUBLIC_HOSTED) {
+      dispatch(
+        setConnectionParams({
+          type: connType.HTTP,
+          params: {
+            address: connectionUrl,
+            tls: false,
+            receiveBatchRequests: false,
+            fetchInterval: 2000,
+          },
+        }),
+      );
+      void setConnection(connType.HTTP);
+    }
   }, [dispatch]);
 
   React.useEffect(() => {
@@ -56,7 +52,6 @@ export const Connection = (): JSX.Element => {
     <Modal
       className="w-full max-w-3xl"
       open={appState.connectionModalOpen}
-      // open={true}
       onClose={(): void => {
         dispatch(closeConnectionModal());
       }}
@@ -84,9 +79,7 @@ export const Connection = (): JSX.Element => {
                   padding={2}
                   border
                   onClick={async (): Promise<void> => {
-                    dispatch(resetState());
                     await connection.disconnect();
-                    cleanupListeners();
                   }}
                 >
                   Disconnect
@@ -102,8 +95,6 @@ export const Connection = (): JSX.Element => {
                 optionsEnum={connType}
                 value={appState.connType}
                 onChange={(e): void => {
-                  console.log(e.target.value);
-
                   dispatch(setConnType(parseInt(e.target.value)));
                 }}
               />
