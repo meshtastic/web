@@ -3,7 +3,7 @@ lockfileVersion: 5.3
 specifiers:
   '@headlessui/react': ^1.4.2
   '@meshtastic/meshtasticjs': ^0.6.35
-  '@reduxjs/toolkit': ^1.7.0
+  '@reduxjs/toolkit': ^1.7.1
   '@types/mapbox-gl': ^2.6.0
   '@types/react': ^17.0.37
   '@types/react-dom': ^17.0.11
@@ -43,8 +43,8 @@ specifiers:
   react-redux: ^7.2.6
   react-select: ^5.2.1
   rfc4648: ^1.5.0
-  swr: ^1.1.1
-  tailwindcss: ^3.0.2
+  swr: ^1.1.2-beta.0
+  tailwindcss: ^3.0.5
   tar: ^6.1.11
   timeago-react: ^3.0.4
   type-route: ^0.6.0
@@ -52,13 +52,13 @@ specifiers:
   use-breakpoint: ^3.0.0
   vite: ^2.7.2
   vite-plugin-cdn-import: ^0.3.5
-  vite-plugin-pwa: ^0.11.11
+  vite-plugin-pwa: ^0.11.12
   workbox-window: ^6.4.2
 
 dependencies:
   '@headlessui/react': 1.4.2_react-dom@17.0.2+react@17.0.2
   '@meshtastic/meshtasticjs': 0.6.35
-  '@reduxjs/toolkit': 1.7.0_react-redux@7.2.6+react@17.0.2
+  '@reduxjs/toolkit': 1.7.1_react-redux@7.2.6+react@17.0.2
   base64-js: 1.5.1
   boring-avatars: 1.5.8
   i18next: 21.6.0
@@ -75,7 +75,7 @@ dependencies:
   react-redux: 7.2.6_react-dom@17.0.2+react@17.0.2
   react-select: 5.2.1_5539cae010396b202b015f3568914e95
   rfc4648: 1.5.0
-  swr: 1.1.1_react@17.0.2
+  swr: 1.1.2-beta.0_react@17.0.2
   timeago-react: 3.0.4_react@17.0.2
   type-route: 0.6.0
   use-breakpoint: 3.0.0_react-dom@17.0.2+react@17.0.2
@@ -104,12 +104,12 @@ devDependencies:
   gzipper: 6.0.0
   postcss: 8.4.5
   prettier: 2.5.1
-  tailwindcss: 3.0.2_16a290f6d0e3717bf6d2667234aebd30
+  tailwindcss: 3.0.5_16a290f6d0e3717bf6d2667234aebd30
   tar: 6.1.11
   typescript: 4.5.4
   vite: 2.7.2
   vite-plugin-cdn-import: 0.3.5
-  vite-plugin-pwa: 0.11.11_vite@2.7.2
+  vite-plugin-pwa: 0.11.12_vite@2.7.2
   workbox-window: 6.4.2
 
 packages:
@@ -1249,7 +1249,7 @@ packages:
       babel-plugin-polyfill-corejs2: 0.3.0_@babel+core@7.16.5
       babel-plugin-polyfill-corejs3: 0.4.0_@babel+core@7.16.5
       babel-plugin-polyfill-regenerator: 0.3.0_@babel+core@7.16.5
-      core-js-compat: 3.19.3
+      core-js-compat: 3.20.0
       semver: 6.3.0
     transitivePeerDependencies:
       - supports-color
@@ -1523,8 +1523,8 @@ packages:
     resolution: {integrity: sha512-HZwkgJW9SGiE9+0lWKr1X997tmG01/40j+hr9yBVk+hTQcm7Hsf77XhMNtsDjWUOcspG6GBXu8o3g4i3kD5/zQ==}
     dev: false
 
-  /@reduxjs/toolkit/1.7.0_react-redux@7.2.6+react@17.0.2:
-    resolution: {integrity: sha512-iApo4zS+8kWnIn4xucTDWpqRjDNkXruFIyJQWwThIEIbMj5kwqvbMaQcEgd2a305B68Z+4bvZqAqJSATeddaJA==}
+  /@reduxjs/toolkit/1.7.1_react-redux@7.2.6+react@17.0.2:
+    resolution: {integrity: sha512-wXwXYjBVz/ItxB7SMzEAMmEE/FBiY1ze18N+VVVX7NtVbRUrdOGKhpQMHivIJfkbJvSdLUU923a/yAagJQzY0Q==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || 18.0.0-beta
       react-redux: ^7.2.1 || ^8.0.0-beta
@@ -1646,8 +1646,8 @@ packages:
       '@types/geojson': 7946.0.8
     dev: true
 
-  /@types/node/16.11.13:
-    resolution: {integrity: sha512-eUXZzHLHoZqj1frtUetNkUetYoJ6X55UmrVnFD4DMhVeAmwLjniZhtBmsRiemQh4uq4G3vUra/Ws/hs9vEvL3Q==}
+  /@types/node/17.0.0:
+    resolution: {integrity: sha512-eMhwJXc931Ihh4tkU+Y7GiLzT/y/DBNpNtr4yU9O2w3SYBsr9NaOPhQlLKRmoWtI54uNwuo0IOUFQjVOTZYRvw==}
     dev: true
 
   /@types/parse-json/4.0.0:
@@ -1694,7 +1694,7 @@ packages:
   /@types/resolve/1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 16.11.13
+      '@types/node': 17.0.0
     dev: true
 
   /@types/scheduler/0.16.2:
@@ -2121,7 +2121,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.19.1
-      caniuse-lite: 1.0.30001286
+      caniuse-lite: 1.0.30001287
       fraction.js: 4.1.2
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -2171,7 +2171,7 @@ packages:
     dependencies:
       '@babel/core': 7.16.5
       '@babel/helper-define-polyfill-provider': 0.3.0_@babel+core@7.16.5
-      core-js-compat: 3.19.3
+      core-js-compat: 3.20.0
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -2223,8 +2223,8 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001286
-      electron-to-chromium: 1.4.18
+      caniuse-lite: 1.0.30001287
+      electron-to-chromium: 1.4.20
       escalade: 3.1.1
       node-releases: 2.0.1
       picocolors: 1.0.0
@@ -2256,8 +2256,8 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
-  /caniuse-lite/1.0.30001286:
-    resolution: {integrity: sha512-zaEMRH6xg8ESMi2eQ3R4eZ5qw/hJiVsO/HlLwniIwErij0JDr9P+8V4dtx1l+kLq6j3yy8l8W4fst1lBnat5wQ==}
+  /caniuse-lite/1.0.30001287:
+    resolution: {integrity: sha512-4udbs9bc0hfNrcje++AxBuc6PfLNHwh3PO9kbwnfCQWyqtlzg3py0YgFu8jyRTTo85VAz4U+VLxSlID09vNtWA==}
     dev: true
 
   /chalk/2.4.2:
@@ -2342,8 +2342,8 @@ packages:
       safe-buffer: 5.1.2
     dev: true
 
-  /core-js-compat/3.19.3:
-    resolution: {integrity: sha512-59tYzuWgEEVU9r+SRgceIGXSSUn47JknoiXW6Oq7RW8QHjXWz3/vp8pa7dbtuVu40sewz3OP3JmQEcDdztrLhA==}
+  /core-js-compat/3.20.0:
+    resolution: {integrity: sha512-relrah5h+sslXssTTOkvqcC/6RURifB0W5yhYBdBkaPYa5/2KBMiog3XiD+s3TwEHWxInWVv4Jx2/Lw0vng+IQ==}
     dependencies:
       browserslist: 4.19.1
       semver: 7.0.0
@@ -2509,8 +2509,8 @@ packages:
       jake: 10.8.2
     dev: true
 
-  /electron-to-chromium/1.4.18:
-    resolution: {integrity: sha512-i7nKjGGBE1+YUIbfLObA1EZPmN7J1ITEllbhusDk+KIk6V6gUxN9PFe36v+Sd+8Cg0k3cgUv9lQhQZalr8rggw==}
+  /electron-to-chromium/1.4.20:
+    resolution: {integrity: sha512-N7ZVNrdzX8NE90OXEFBMsBf3fp8P/vVDUER3WCUZjzC7OkNTXHVoF6W9qVhq8+dA8tGnbDajzUpj2ISNVVyj+Q==}
     dev: true
 
   /emoji-regex/8.0.0:
@@ -3730,7 +3730,7 @@ packages:
     resolution: {integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 16.11.13
+      '@types/node': 17.0.0
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: true
@@ -4885,8 +4885,8 @@ packages:
       has-flag: 4.0.0
     dev: true
 
-  /swr/1.1.1_react@17.0.2:
-    resolution: {integrity: sha512-ZpUHyU3N3snj2QGFeE2Fd3BXl1CVS6YQIQGb1ttPAkTmvwZqDyV3GRMNPsaeAYCBM74tfn4XbKx28FVQR0mS7Q==}
+  /swr/1.1.2-beta.0_react@17.0.2:
+    resolution: {integrity: sha512-e7ZcPCrEvGX+s4jDtBwV9c+HKqHzG1secuwU8bYjnnGkSJMneyn7OaabJKtRh922DH5a3k2vvBdhftoSL8bHJQ==}
     peerDependencies:
       react: ^16.11.0 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -4904,8 +4904,8 @@ packages:
       strip-ansi: 6.0.1
     dev: true
 
-  /tailwindcss/3.0.2_16a290f6d0e3717bf6d2667234aebd30:
-    resolution: {integrity: sha512-i1KpjYnGYftjzdAth6jA5iMPjhxpUkk5L6DafhfnQs+KiiWaThYxmk47Weh4oFH1mZqP6MuiQNHxtoRVPOraLg==}
+  /tailwindcss/3.0.5_16a290f6d0e3717bf6d2667234aebd30:
+    resolution: {integrity: sha512-59pNgzx2o+wkAk7IZGIH7H9eNS53gzZGrO3+NPyOEWHDbquHgiLL/c993T5t1vPSAeBxox4X5OgZwNuRvXVf+g==}
     engines: {node: '>=12.13.0'}
     hasBin: true
     peerDependencies:
@@ -5170,8 +5170,8 @@ packages:
       - rollup
     dev: true
 
-  /vite-plugin-pwa/0.11.11_vite@2.7.2:
-    resolution: {integrity: sha512-/nSLS7VfGN5UrL4a1ALGEQAyga/H0hYZjEkwPehiEFW1PM1DTi1A8GkPCsmevKwR6vt10P+5wS1wrvSgwQemzw==}
+  /vite-plugin-pwa/0.11.12_vite@2.7.2:
+    resolution: {integrity: sha512-XqFmA4y9C4RBb5osSsa26GVwOSwbzf2GNVcT5+06KYYdguqLpuI9FW7iV/akZqg0OUNUpH4tHfme8SnHA4PIXA==}
     peerDependencies:
       vite: ^2.0.0
     dependencies:

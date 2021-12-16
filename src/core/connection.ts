@@ -23,6 +23,8 @@ import {
   Types,
 } from '@meshtastic/meshtasticjs';
 
+import { showNotification } from './utils/notifications.js';
+
 type connectionType = IBLEConnection | IHTTPConnection | ISerialConnection;
 
 export let connection: connectionType = new IHTTPConnection();
@@ -151,6 +153,7 @@ const registerListeners = (): void => {
 
   connection.onTextPacket.subscribe((message) => {
     const myNodeNum = store.getState().meshtastic.radio.hardware.myNodeNum;
+    showNotification('New message', message.data);
 
     store.dispatch(
       addMessage({

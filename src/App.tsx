@@ -1,4 +1,4 @@
-import type React from 'react';
+import React from 'react';
 
 import { DeviceStatus } from '@app/components/menu/buttons/DeviceStatus';
 import { useAppSelector } from '@app/hooks/redux';
@@ -9,16 +9,22 @@ import { Logo } from '@components/menu/Logo';
 import { MobileNav } from '@components/menu/MobileNav';
 import { Navigation } from '@components/menu/Navigation';
 import { useRoute } from '@core/router';
+import { requestNotificationPermission } from '@core/utils/notifications';
 import { Messages } from '@pages/Messages';
 import { Nodes } from '@pages/Nodes/Index';
+import { NotFound } from '@pages/NotFound';
+import { Plugins } from '@pages/Plugins/Index';
 import { Settings } from '@pages/settings/Index';
-
-import { NotFound } from './pages/NotFound';
-import { Plugins } from './pages/Plugins/Index';
 
 export const App = (): JSX.Element => {
   const route = useRoute();
   const darkMode = useAppSelector((state) => state.app.darkMode);
+
+  React.useEffect(() => {
+    requestNotificationPermission().catch((e) => {
+      console.log(e);
+    });
+  }, []);
 
   return (
     <div className={`h-screen w-screen ${darkMode ? 'dark' : ''}`}>

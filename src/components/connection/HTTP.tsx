@@ -1,17 +1,52 @@
-import React from 'react';
+import type React from 'react';
 
+import { useForm, useWatch } from 'react-hook-form';
+
+import { useAppDispatch } from '@app/hooks/redux.js';
+import { Button } from '@components/generic/Button';
 import { Checkbox } from '@components/generic/form/Checkbox';
 import { Input } from '@components/generic/form/Input';
 import { Select } from '@components/generic/form/Select';
-import { connectionUrl } from '@core/connection';
+import { connectionUrl, setConnection } from '@core/connection';
+import { connType, setConnectionParams } from '@core/slices/appSlice';
 
 export const HTTP = (): JSX.Element => {
-  const [httpIpSource, setHttpIpSource] = React.useState<'local' | 'remote'>(
-    'local',
-  );
+  const dispatch = useAppDispatch();
+
+  const { register, handleSubmit, control } = useForm<{
+    ipSource: 'local' | 'remote';
+    ip?: string;
+    tls: boolean;
+  }>({
+    defaultValues: {
+      ipSource: 'local',
+      ip: connectionUrl,
+      tls: false,
+    },
+  });
+
+  const watchIpSource = useWatch({
+    control,
+    name: 'ipSource',
+    defaultValue: 'local',
+  });
+
+  const onSubmit = handleSubmit(async (data) => {
+    dispatch(
+      setConnectionParams({
+        type: connType.HTTP,
+        params: {
+          address: data.ip ?? connectionUrl,
+          tls: data.tls,
+          fetchInterval: 2000,
+        },
+      }),
+    );
+    await setConnection(connType.HTTP);
+  });
 
   return (
-    <div>
+    <form onSubmit={onSubmit}>
       <Select
         label="Host Source"
         options={[
@@ -24,17 +59,17 @@ export const HTTP = (): JSX.Element => {
             value: 'remote',
           },
         ]}
-        value={httpIpSource}
-        onChange={(e): void => {
-          setHttpIpSource(e.target.value as 'local' | 'remote');
-        }}
+        {...register('ipSource')}
       />
-      {httpIpSource === 'local' ? (
+      {watchIpSource === 'local' ? (
         <Input label="Host" value={connectionUrl} disabled />
       ) : (
-        <Input label="Host" />
+        <Input label="Host" {...register('ip')} />
       )}
-      <Checkbox label="Use TLS?" />
-    </div>
+      <Checkbox label="Use TLS?" {...register('tls')} />
+      <Button type="submit" className="mt-2 ml-auto" border>
+        Connect
+      </Button>
+    </form>
   );
 };

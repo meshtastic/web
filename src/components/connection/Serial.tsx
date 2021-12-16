@@ -1,13 +1,19 @@
 import React from 'react';
 
+import { useForm } from 'react-hook-form';
 import { FiCheck } from 'react-icons/fi';
 
+import { Button } from '@components/generic/Button';
 import { IconButton } from '@components/generic/IconButton';
 import { serial, setConnection } from '@core/connection';
 import { connType } from '@core/slices/appSlice';
 
 export const Serial = (): JSX.Element => {
   const [serialDevices, setSerialDevices] = React.useState<SerialPort[]>([]);
+
+  const { register, handleSubmit, control } = useForm<{
+    device?: SerialPort;
+  }>();
 
   const updateSerialDeviceList = React.useCallback(async (): Promise<void> => {
     const devices = await serial.getPorts();
@@ -18,8 +24,12 @@ export const Serial = (): JSX.Element => {
     void updateSerialDeviceList();
   }, [updateSerialDeviceList]);
 
+  const onSubmit = handleSubmit(async (data) => {
+    await setConnection(connType.SERIAL);
+  });
+
   return (
-    <div className="space-y-2">
+    <form onSubmit={onSubmit} className="space-y-2">
       {serialDevices.map((device, index) => (
         <div
           className="flex justify-between p-2 bg-gray-700 rounded-md"
@@ -41,6 +51,9 @@ export const Serial = (): JSX.Element => {
           />
         </div>
       ))}
-    </div>
+      <Button type="submit" className="mt-2 ml-auto" border>
+        Connect
+      </Button>
+    </form>
   );
 };
