@@ -3,7 +3,7 @@ lockfileVersion: 5.3
 specifiers:
   '@floating-ui/react-dom': ^0.3.3
   '@headlessui/react': ^1.4.2
-  '@meshtastic/meshtasticjs': ^0.6.35
+  '@meshtastic/meshtasticjs': ^0.6.36
   '@reduxjs/toolkit': ^1.7.1
   '@types/mapbox-gl': ^2.6.0
   '@types/react': ^17.0.37
@@ -59,7 +59,7 @@ specifiers:
 dependencies:
   '@floating-ui/react-dom': 0.3.3_5539cae010396b202b015f3568914e95
   '@headlessui/react': 1.4.2_react-dom@17.0.2+react@17.0.2
-  '@meshtastic/meshtasticjs': link:../meshtastic.js
+  '@meshtastic/meshtasticjs': 0.6.36
   '@reduxjs/toolkit': 1.7.1_react-redux@7.2.6+react@17.0.2
   base64-js: 1.5.1
   boring-avatars: 1.5.8
@@ -1517,6 +1517,13 @@ packages:
     engines: {node: '>=6.0.0'}
     dev: false
 
+  /@meshtastic/meshtasticjs/0.6.36:
+    resolution: {integrity: sha512-Ibd6guVm1qC1P26smIBY+95WdjYFtWIKjDSDTS2Q0xvrvWT3gtL+kuGf+E+XKHqbtxVSAyJQ6RoG1hCEYRByXw==}
+    dependencies:
+      '@protobuf-ts/runtime': 2.1.0
+      sub-events: 1.8.9
+    dev: false
+
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -1537,6 +1544,10 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.13.0
     dev: true
+
+  /@protobuf-ts/runtime/2.1.0:
+    resolution: {integrity: sha512-HZwkgJW9SGiE9+0lWKr1X997tmG01/40j+hr9yBVk+hTQcm7Hsf77XhMNtsDjWUOcspG6GBXu8o3g4i3kD5/zQ==}
+    dev: false
 
   /@reduxjs/toolkit/1.7.1_react-redux@7.2.6+react@17.0.2:
     resolution: {integrity: sha512-wXwXYjBVz/ItxB7SMzEAMmEE/FBiY1ze18N+VVVX7NtVbRUrdOGKhpQMHivIJfkbJvSdLUU923a/yAagJQzY0Q==}
@@ -2239,7 +2250,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001287
-      electron-to-chromium: 1.4.22
+      electron-to-chromium: 1.4.23
       escalade: 3.1.1
       node-releases: 2.0.1
       picocolors: 1.0.0
@@ -2524,8 +2535,8 @@ packages:
       jake: 10.8.2
     dev: true
 
-  /electron-to-chromium/1.4.22:
-    resolution: {integrity: sha512-IiW8cV8eyjMhuWqk9wwHRPOVN+5Fa7NHOTjogrwg2H9TNiLVA8ywjOJnVKoywaqUHryDUOpK7Mg6P1FETisi0g==}
+  /electron-to-chromium/1.4.23:
+    resolution: {integrity: sha512-q3tB59Api3+DMbLnDPkW/UBHBO7KTGcF+rDCeb0GAGyqFj562s6y+c/2tDKTS/y5lbC+JOvT4MSUALJLPqlcSA==}
     dev: true
 
   /emoji-regex/8.0.0:
@@ -4873,6 +4884,11 @@ packages:
 
   /stylis/4.0.13:
     resolution: {integrity: sha512-xGPXiFVl4YED9Jh7Euv2V220mriG9u4B2TA6Ybjc1catrstKD2PpIdU3U0RKpkVBC2EhmL/F0sPCr9vrFTNRag==}
+    dev: false
+
+  /sub-events/1.8.9:
+    resolution: {integrity: sha512-RhhA2amqVzL6nO+aiZOqxBCgcA3ZLfp4W9iHFUELwq8132TS7pUReJV+bcRjtNKdqm/Ep1sD/h01eAcTBtgrBQ==}
+    engines: {node: '>=10.0.0'}
     dev: false
 
   /supercluster/7.1.4:
