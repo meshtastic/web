@@ -76,7 +76,6 @@ export const Connection = (): JSX.Element => {
               {state.deviceStatus ===
                 Types.DeviceStatusEnum.DEVICE_CONNECTED && (
                 <Button
-                  padding={2}
                   border
                   onClick={async (): Promise<void> => {
                     await connection.disconnect();

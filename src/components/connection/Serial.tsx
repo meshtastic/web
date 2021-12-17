@@ -3,13 +3,15 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { FiCheck } from 'react-icons/fi';
 
+import { useAppDispatch } from '@app/hooks/redux';
 import { Button } from '@components/generic/Button';
 import { IconButton } from '@components/generic/IconButton';
 import { serial, setConnection } from '@core/connection';
-import { connType } from '@core/slices/appSlice';
+import { connType, setConnectionParams } from '@core/slices/appSlice';
 
 export const Serial = (): JSX.Element => {
   const [serialDevices, setSerialDevices] = React.useState<SerialPort[]>([]);
+  const dispatch = useAppDispatch();
 
   const { register, handleSubmit, control } = useForm<{
     device?: SerialPort;
@@ -45,6 +47,14 @@ export const Serial = (): JSX.Element => {
           </div>
           <IconButton
             onClick={async (): Promise<void> => {
+              dispatch(
+                setConnectionParams({
+                  type: connType.SERIAL,
+                  params: {
+                    port: device,
+                  },
+                }),
+              );
               await setConnection(connType.SERIAL);
             }}
             icon={<FiCheck />}

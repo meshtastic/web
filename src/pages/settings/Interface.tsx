@@ -30,7 +30,6 @@ export const Interface = ({
           onClick={(): void => {
             setNavOpen && setNavOpen(!navOpen);
           }}
-          circle
         />
       }
       footer={

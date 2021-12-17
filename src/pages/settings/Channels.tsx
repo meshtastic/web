@@ -7,7 +7,6 @@ import JSONPretty from 'react-json-pretty';
 import { useAppSelector } from '@app/hooks/redux';
 import { Channel } from '@components/Channel';
 import { FormFooter } from '@components/FormFooter';
-import { Button } from '@components/generic/Button';
 import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
 import { Checkbox } from '@components/generic/form/Checkbox';
@@ -249,18 +248,6 @@ export const Channels = ({
                 isPrimary={channel.channel.index === 0}
               />
             ))}
-
-            <div className="flex justify-between">
-              <div
-                onClick={(): Promise<void> => {
-                  return connection.confirmSetChannel();
-                }}
-                className="text-sm font-thin text-gray-400 dark:text-gray-300"
-              >
-                Please ensure any changes are working before confirming
-              </div>
-              <Button active>Confirm</Button>
-            </div>
           </div>
         </Card>
       </div>

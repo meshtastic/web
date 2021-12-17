@@ -14,7 +14,7 @@ export const DeviceStatus = (): JSX.Element => {
 
   return (
     <Button
-      padding={0}
+      padding="0"
       active
       onClick={(): void => {
         dispatch(dispatch(openConnectionModal()));

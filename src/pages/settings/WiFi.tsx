@@ -91,6 +91,7 @@ export const WiFi = ({ navOpen, setNavOpen }: WiFiProps): JSX.Element => {
             />
             <Input
               type="password"
+              autoComplete="off"
               label={t('strings.wifi_psk')}
               disabled={watchWifiApMode}
               {...register('wifiPassword')}

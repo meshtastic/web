@@ -22,7 +22,7 @@ export const Navigation = ({
     >
       <div onClick={onClick}>
         <Button
-          icon={<FiMessageSquare className="w-6 h-6" />}
+          icon={<FiMessageSquare className="w-5 h-5" />}
           active={route.name === 'messages'}
           className="w-full md:w-auto"
           {...routes.messages().link}
@@ -32,7 +32,7 @@ export const Navigation = ({
       </div>
       <div onClick={onClick}>
         <Button
-          icon={<FiGrid className="w-6 h-6" />}
+          icon={<FiGrid className="w-5 h-5" />}
           className="w-full md:w-auto"
           active={route.name === 'nodes'}
           {...routes.nodes().link}
@@ -42,7 +42,7 @@ export const Navigation = ({
       </div>
       <div onClick={onClick}>
         <Button
-          icon={<FiPackage className="w-6 h-6" />}
+          icon={<FiPackage className="w-5 h-5" />}
           className="w-full md:w-auto"
           active={route.name === 'plugins'}
           {...routes.plugins().link}
@@ -52,7 +52,7 @@ export const Navigation = ({
       </div>
       <div onClick={onClick}>
         <Button
-          icon={<FiSettings className="w-6 h-6" />}
+          icon={<FiSettings className="w-5 h-5" />}
           className="w-full md:w-auto"
           active={route.name === 'settings'}
           {...routes.settings().link}

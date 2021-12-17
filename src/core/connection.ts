@@ -34,8 +34,7 @@ export const connectionUrl = state.hostOverrideEnabled
   ? state.hostOverride
   : import.meta.env.PROD
   ? window.location.hostname
-  : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ??
-    'http://meshtastic.local';
+  : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ?? 'meshtastic.local';
 
 export const ble = new IBLEConnection();
 export const serial = new ISerialConnection();

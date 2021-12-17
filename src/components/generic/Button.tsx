@@ -6,23 +6,21 @@ type DefaultButtonProps = JSX.IntrinsicElements['button'];
 
 interface ButtonProps extends DefaultButtonProps {
   icon?: JSX.Element;
-  circle?: boolean;
   active?: boolean;
   border?: boolean;
-  padding?: number;
+  padding?: string;
   confirmAction?: () => void;
 }
 
 export const Button = ({
   icon,
-  circle,
   className,
   active,
   border,
   confirmAction,
   disabled,
   children,
-  padding = 3,
+  padding = '2',
   ...props
 }: ButtonProps): JSX.Element => {
   const [hasConfirmed, setHasConfirmed] = React.useState(false);
@@ -42,27 +40,17 @@ export const Button = ({
   return (
     <button
       onClick={handleConfirm}
-      className={`items-center select-none flex dark:text-white active:scale-95 transition duration-200 ease-in-out ${
+      className={`items-center select-none flex border border-transparent dark:text-white active:scale-95 transition duration-200 ease-in-out focus-within:border-primary dark:focus-within:border-primary focus-within:shadow-border rounded-md p-${padding} space-x-3 text-sm ${
         active && !disabled ? 'bg-gray-100 dark:bg-gray-700' : ''
-      } ${
-        circle
-          ? 'rounded-full h-10 w-10'
-          : `rounded-md p-${padding} space-x-3 text-sm`
       } ${
         disabled
           ? 'cursor-not-allowed dark:bg-primaryDark bg-white'
           : 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md'
-      } ${
-        border ? 'border border-gray-400 dark:border-gray-200' : ''
-      } ${className}`}
+      } ${border ? 'border-gray-400 dark:border-gray-200' : ''} ${className}`}
       {...props}
     >
       {icon && (
-        <div
-          className={`text-gray-500 dark:text-gray-400 ${
-            circle ? 'mx-auto' : ''
-          }`}
-        >
+        <div className="text-gray-500 dark:text-gray-400">
           {hasConfirmed ? <FiCheck /> : icon}
         </div>
       )}
