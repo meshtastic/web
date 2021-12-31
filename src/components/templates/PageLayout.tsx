@@ -4,10 +4,10 @@ import { FiXCircle } from 'react-icons/fi';
 
 import { useBreakpoint } from '@app/hooks/breakpoint';
 import { Drawer } from '@components/generic/Drawer';
-import { IconButton } from '@components/generic/IconButton';
 import type { SidebarItemProps } from '@components/generic/SidebarItem';
 import { SidebarItem } from '@components/generic/SidebarItem';
 import { Tab } from '@headlessui/react';
+import { IconButton } from '@meshtastic/components';
 
 export interface PageLayoutProps {
   title: string;

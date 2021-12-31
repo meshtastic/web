@@ -1,21 +1,23 @@
 import React from 'react';
 
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
-import ReactSelect from 'react-select';
+import ReactSelect, { Theme } from 'react-select';
 
 import { useAppSelector } from '@app/hooks/redux';
 import { FormFooter } from '@components/FormFooter';
-import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
-import { Checkbox } from '@components/generic/form/Checkbox';
-import { Input } from '@components/generic/form/Input';
 import { Label } from '@components/generic/form/Label';
-import { Select } from '@components/generic/form/Select';
-import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connection } from '@core/connection';
+import {
+  Card,
+  Checkbox,
+  IconButton,
+  Input,
+  Select,
+} from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface PositionProps {
@@ -30,6 +32,7 @@ export const Position = ({
   const preferences = useAppSelector(
     (state) => state.meshtastic.radio.preferences,
   );
+  const darkMode = useAppSelector((state) => state.app.darkMode);
   const [debug, setDebug] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const { register, handleSubmit, formState, reset, control } =
@@ -45,11 +48,11 @@ export const Position = ({
       },
     });
 
-  const watchPsk = useWatch({
-    control,
-    name: 'positionFlags',
-    defaultValue: 0,
-  });
+  // const watchPsk = useWatch({
+  //   control,
+  //   name: 'positionFlags',
+  //   defaultValue: 0,
+  // });
 
   React.useEffect(() => {
     reset(preferences);
@@ -128,6 +131,34 @@ export const Position = ({
                     <ReactSelect
                       {...rest}
                       isMulti
+                      theme={(theme): Theme => ({
+                        ...theme,
+                        borderRadius: 7,
+                        colors: {
+                          ...theme.colors,
+                          primary: '#67ea94', //focus border color
+                          // primary75: 'red',
+                          // primary50: 'red',
+                          // primary25: 'red',
+                          // danger: 'red',
+                          // dangerLight: 'red',
+                          neutral0: darkMode ? 'rgb(30 41 59)' : 'white', //bg color
+                          // neutral5: 'red',
+                          neutral10: darkMode
+                            ? 'rgb(75 85 99)'
+                            : 'rgb(229 231 235)', //tag bg color
+                          neutral20: darkMode
+                            ? 'rgb(229 231 235)'
+                            : 'rgb(156 163 175)', //border color
+                          neutral30: '#67ea94', //border hover
+                          // neutral40: 'red',
+                          // neutral50: 'red',
+                          // neutral60: 'red',
+                          // neutral70: 'red',
+                          neutral80: darkMode ? 'white' : 'black', //tag text color
+                          // neutral90: 'red',
+                        },
+                      })}
                       value={decode(value).map((flag) => {
                         return {
                           value: flag,

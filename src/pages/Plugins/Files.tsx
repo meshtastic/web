@@ -4,11 +4,10 @@ import type React from 'react';
 import { FiMenu, FiTrash, FiUploadCloud } from 'react-icons/fi';
 import useSWR from 'swr';
 
-import { Card } from '@components/generic/Card';
-import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connectionUrl } from '@core/connection';
 import fetcher from '@core/utils/fetcher';
+import { Card, IconButton } from '@meshtastic/components';
 
 export interface RangeTestProps {
   navOpen?: boolean;

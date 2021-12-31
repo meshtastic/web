@@ -4,7 +4,7 @@ import { FiHash } from 'react-icons/fi';
 
 import { Message } from '@components/chat/Message';
 import { MessageBar } from '@components/chat/MessageBar';
-import { Select } from '@components/generic/form/Select';
+import { Select } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import { useAppSelector } from '../hooks/redux';

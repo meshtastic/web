@@ -3,8 +3,8 @@ import type React from 'react';
 import { FiMoon, FiSun } from 'react-icons/fi';
 
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
-import { IconButton } from '@components/generic/IconButton';
 import { setDarkModeEnabled } from '@core/slices/appSlice';
+import { IconButton } from '@meshtastic/components';
 
 export const ThemeToggle = (): JSX.Element => {
   const dispatch = useAppDispatch();

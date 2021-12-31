@@ -1,7 +1,7 @@
 import type React from 'react';
 
-import { Card } from '@components/generic/Card';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
+import { Card } from '@meshtastic/components';
 
 export const NotFound = (): JSX.Element => {
   return (

@@ -5,12 +5,9 @@ import { FiMenu } from 'react-icons/fi';
 
 import { FormFooter } from '@app/components/FormFooter';
 import { useAppSelector } from '@app/hooks/redux';
-import { Card } from '@components/generic/Card';
-import { Checkbox } from '@components/generic/form/Checkbox';
-import { Input } from '@components/generic/form/Input';
-import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connection } from '@core/connection';
+import { Card, Checkbox, IconButton, Input } from '@meshtastic/components';
 import type { RadioConfig_UserPreferences } from '@meshtastic/meshtasticjs/dist/generated';
 
 export interface ExternalNotificationProps {
@@ -57,6 +54,8 @@ export const ExternalNotification = ({
   const onSubmit = handleSubmit((data) => {
     void connection.setPreferences(data);
   });
+
+  //todo, add loading indicator
 
   const watchExternalNotificationPluginEnabled = useWatch({
     control,

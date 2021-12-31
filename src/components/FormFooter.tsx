@@ -2,7 +2,7 @@ import type React from 'react';
 
 import { FiSave, FiXCircle } from 'react-icons/fi';
 
-import { IconButton } from './generic/IconButton';
+import { IconButton } from '@meshtastic/components';
 
 export interface FormFooterProps {
   dirty?: boolean;

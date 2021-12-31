@@ -4,9 +4,8 @@ import { useForm } from 'react-hook-form';
 import { FiCheck } from 'react-icons/fi';
 
 import { connType } from '@app/core/slices/appSlice';
-import { Button } from '@components/generic/Button';
-import { IconButton } from '@components/generic/IconButton';
 import { ble, setConnection } from '@core/connection';
+import { Button, IconButton } from '@meshtastic/components';
 
 export const BLE = (): JSX.Element => {
   const [bleDevices, setBleDevices] = React.useState<BluetoothDevice[]>([]);

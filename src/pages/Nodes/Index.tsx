@@ -5,8 +5,8 @@ import { FiXCircle } from 'react-icons/fi';
 import { useBreakpoint } from '@app/hooks/breakpoint';
 import { useAppSelector } from '@app/hooks/redux';
 import { Drawer } from '@components/generic/Drawer';
-import { IconButton } from '@components/generic/IconButton';
 import { Map } from '@components/Map';
+import { IconButton } from '@meshtastic/components';
 
 import { NodeCard } from './NodeCard';
 

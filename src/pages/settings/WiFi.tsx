@@ -7,13 +7,10 @@ import JSONPretty from 'react-json-pretty';
 
 import { useAppSelector } from '@app/hooks/redux';
 import { FormFooter } from '@components/FormFooter';
-import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
-import { Checkbox } from '@components/generic/form/Checkbox';
-import { Input } from '@components/generic/form/Input';
-import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connection } from '@core/connection';
+import { Card, Checkbox, IconButton, Input } from '@meshtastic/components';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface WiFiProps {

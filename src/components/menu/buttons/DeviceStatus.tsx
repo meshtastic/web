@@ -3,8 +3,8 @@ import type React from 'react';
 import { FiBluetooth, FiCpu, FiWifi } from 'react-icons/fi';
 
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
-import { Button } from '@components/generic/Button';
 import { connType, openConnectionModal } from '@core/slices/appSlice';
+import { Button } from '@meshtastic/components';
 import { Types } from '@meshtastic/meshtasticjs';
 
 export const DeviceStatus = (): JSX.Element => {
@@ -14,7 +14,6 @@ export const DeviceStatus = (): JSX.Element => {
 
   return (
     <Button
-      padding="0"
       active
       onClick={(): void => {
         dispatch(dispatch(openConnectionModal()));
@@ -43,15 +42,13 @@ export const DeviceStatus = (): JSX.Element => {
             (node) => node.number === state.radio.hardware.myNodeNum,
           )?.user?.longName ?? 'Disconnected'}
         </div>
-        <div className="py-2">
-          {appState.connType === connType.BLE ? (
-            <FiBluetooth className="w-5 h-5" />
-          ) : appState.connType === connType.SERIAL ? (
-            <FiCpu className="w-5 h-5" />
-          ) : (
-            <FiWifi className="w-5 h-5" />
-          )}
-        </div>
+        {appState.connType === connType.BLE ? (
+          <FiBluetooth className="w-5 h-5" />
+        ) : appState.connType === connType.SERIAL ? (
+          <FiCpu className="w-5 h-5" />
+        ) : (
+          <FiWifi className="w-5 h-5" />
+        )}
       </div>
     </Button>
   );

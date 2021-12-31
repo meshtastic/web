@@ -7,14 +7,16 @@ import { FiEdit3, FiSave } from 'react-icons/fi';
 import { MdRefresh, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import QRCode from 'react-qr-code';
 
-import { Card } from '@components/generic/Card';
-import { Checkbox } from '@components/generic/form/Checkbox';
-import { Input } from '@components/generic/form/Input';
-import { Select } from '@components/generic/form/Select';
-import { IconButton } from '@components/generic/IconButton';
 import { Loading } from '@components/generic/Loading';
 import { Modal } from '@components/generic/Modal';
 import { connection } from '@core/connection';
+import {
+  Card,
+  Checkbox,
+  IconButton,
+  Input,
+  Select,
+} from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface ChannelProps {

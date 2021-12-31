@@ -2,8 +2,8 @@ import type React from 'react';
 
 import { FiMenu } from 'react-icons/fi';
 
-import { IconButton } from '@components/generic/IconButton';
 import { openMobileNav } from '@core/slices/appSlice';
+import { IconButton } from '@meshtastic/components';
 
 import { useAppDispatch } from '../../../hooks/redux';
 

@@ -7,14 +7,16 @@ import { base16 } from 'rfc4648';
 
 import { useAppSelector } from '@app/hooks/redux';
 import { FormFooter } from '@components/FormFooter';
-import { Card } from '@components/generic/Card';
 import { Cover } from '@components/generic/Cover';
-import { Checkbox } from '@components/generic/form/Checkbox';
-import { Input } from '@components/generic/form/Input';
-import { Select } from '@components/generic/form/Select';
-import { IconButton } from '@components/generic/IconButton';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connection } from '@core/connection';
+import {
+  Card,
+  Checkbox,
+  IconButton,
+  Input,
+  Select,
+} from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface UserProps {

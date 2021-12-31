@@ -4,9 +4,6 @@ import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { BLE } from '@components/connection/BLE';
 import { HTTP } from '@components/connection/HTTP';
 import { Serial } from '@components/connection/Serial';
-import { Button } from '@components/generic/Button';
-import { Card } from '@components/generic/Card';
-import { Select } from '@components/generic/form/Select';
 import { Modal } from '@components/generic/Modal';
 import { connection, connectionUrl, setConnection } from '@core/connection';
 import {
@@ -15,6 +12,7 @@ import {
   setConnectionParams,
   setConnType,
 } from '@core/slices/appSlice';
+import { Button, Card, Select } from '@meshtastic/components';
 import { Types } from '@meshtastic/meshtasticjs';
 
 export const Connection = (): JSX.Element => {

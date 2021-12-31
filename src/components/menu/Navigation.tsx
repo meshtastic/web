@@ -2,8 +2,8 @@ import type React from 'react';
 
 import { FiGrid, FiMessageSquare, FiPackage, FiSettings } from 'react-icons/fi';
 
-import { Button } from '@components/generic/Button';
 import { routes, useRoute } from '@core/router';
+import { Button } from '@meshtastic/components';
 
 type DefaultDivProps = JSX.IntrinsicElements['div'];
 

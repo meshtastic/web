@@ -8,7 +8,7 @@ import { FaDirections, FaGlobeAfrica, FaMountain } from 'react-icons/fa';
 import { MdFullscreen, MdRadar, MdWbShade } from 'react-icons/md';
 
 import { useAppSelector } from '@app/hooks/redux';
-import { IconButton } from '@components/generic/IconButton';
+import { IconButton } from '@meshtastic/components';
 
 import { MapStyles } from './styles';
 

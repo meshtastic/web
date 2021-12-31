@@ -4,12 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { FiSend } from 'react-icons/fi';
 
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
-import { Input } from '@components/generic/form/Input';
 import { connection } from '@core/connection';
 import { ackMessage } from '@core/slices/meshtasticSlice';
-
-import { Select } from '../generic/form/Select';
-import { IconButton } from '../generic/IconButton';
+import { IconButton, Input, Select } from '@meshtastic/components';
 
 export interface MessageBarProps {
   channelIndex: number;

@@ -3,10 +3,9 @@ import React from 'react';
 import { FiBell, FiX } from 'react-icons/fi';
 
 import { useAppSelector } from '@app/hooks/redux';
-import { Button } from '@components/generic/Button';
-import { IconButton } from '@components/generic/IconButton';
 import { shift, useFloating } from '@floating-ui/react-dom';
 import { Popover } from '@headlessui/react';
+import { Button, IconButton } from '@meshtastic/components';
 
 export const Notifications = (): JSX.Element => {
   const [unreadCount, setUnreadCount] = React.useState(0);
@@ -62,11 +61,7 @@ export const Notifications = (): JSX.Element => {
               <div className="flex space-x-1">
                 {notification.action ? (
                   <div className="my-auto w-18">
-                    <Button
-                      border
-                      padding="0.5"
-                      onClick={notification.action.action}
-                    >
+                    <Button border onClick={notification.action.action}>
                       {notification.action.message}
                     </Button>
                   </div>

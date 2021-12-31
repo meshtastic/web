@@ -15,9 +15,9 @@ import {
 } from 'react-icons/md';
 import TimeAgo from 'timeago-react';
 
-import { IconButton } from '@components/generic/IconButton';
 import type { Node } from '@core/slices/meshtasticSlice';
 import { Disclosure } from '@headlessui/react';
+import { IconButton } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface NodeCardProps {

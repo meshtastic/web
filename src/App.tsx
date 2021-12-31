@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { ErrorBoundary } from 'react-error-boundary';
 import { FiBell } from 'react-icons/fi';
 
 import { DeviceStatus } from '@app/components/menu/buttons/DeviceStatus';
@@ -19,7 +20,8 @@ import { NotFound } from '@pages/NotFound';
 import { Plugins } from '@pages/Plugins/Index';
 import { Settings } from '@pages/settings/Index';
 
-import { addNotification, removeNotification } from './core/slices/appSlice.js';
+import { ErrorFallback } from './components/ErrorFallback';
+import { addNotification, removeNotification } from './core/slices/appSlice';
 
 export const App = (): JSX.Element => {
   const route = useRoute();
@@ -82,11 +84,13 @@ export const App = (): JSX.Element => {
 
         <div className="flex flex-grow w-full min-h-0 md:px-6 md:mb-6">
           <div className="flex w-full bg-gray-100 md:shadow-xl md:overflow-hidden dark:bg-secondaryDark md:rounded-b-3xl">
-            {route.name === 'messages' && <Messages />}
-            {route.name === 'nodes' && <Nodes />}
-            {route.name === 'plugins' && <Plugins />}
-            {route.name === 'settings' && <Settings />}
-            {route.name === false && <NotFound />}
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              {route.name === 'messages' && <Messages />}
+              {route.name === 'nodes' && <Nodes />}
+              {route.name === 'plugins' && <Plugins />}
+              {route.name === 'settings' && <Settings />}
+              {route.name === false && <NotFound />}
+            </ErrorBoundary>
           </div>
         </div>
       </div>

@@ -3,11 +3,9 @@ import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiMenu, FiSave } from 'react-icons/fi';
 
-import { Button } from '@components/generic/Button';
-import { Card } from '@components/generic/Card';
-import { Select } from '@components/generic/form/Select';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import i18n from '@core/translation';
+import { Button, Card, Select } from '@meshtastic/components';
 
 export interface InterfaceProps {
   navOpen?: boolean;
