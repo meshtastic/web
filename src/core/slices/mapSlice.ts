@@ -8,6 +8,8 @@ import { createSlice } from '@reduxjs/toolkit';
 interface MapState {
   latLng: mapboxgl.LngLat;
   zoom: number;
+  bearing: number;
+  pitch: number;
   accessToken: string;
   style: MapStyle;
   hillShade: boolean;
@@ -17,6 +19,8 @@ interface MapState {
 const initialState: MapState = {
   latLng: new mapboxgl.LngLat(-77.0305, 38.8868),
   zoom: 9,
+  bearing: 0,
+  pitch: 0,
   accessToken:
     'pk.eyJ1Ijoic2FjaGF3IiwiYSI6ImNrNW9meXozZjBsdW0zbHBjM2FnNnV6cmsifQ.3E4n8eFGD9ZOFo-XDVeZnQ',
   style:
@@ -37,6 +41,12 @@ export const mapSlice = createSlice({
     setZoom: (state, action: PayloadAction<number>) => {
       state.zoom = action.payload;
     },
+    setBearing: (state, action: PayloadAction<number>) => {
+      state.bearing = action.payload;
+    },
+    setPitch: (state, action: PayloadAction<number>) => {
+      state.pitch = action.payload;
+    },
     setMapStyle(state, action: PayloadAction<MapStyle>) {
       state.style = action.payload;
     },
@@ -52,6 +62,8 @@ export const mapSlice = createSlice({
 export const {
   setLatLng,
   setZoom,
+  setBearing,
+  setPitch,
   setMapStyle,
   setHillShade,
   setExaggeration,

@@ -8,10 +8,12 @@ import { MdFullscreen, MdRadar, MdWbShade } from 'react-icons/md';
 import { useMapbox } from '@app/hooks/mapbox';
 import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import {
+  setBearing,
   setExaggeration,
   setHillShade,
   setLatLng,
   setMapStyle,
+  setPitch,
   setZoom,
 } from '@core/slices/mapSlice';
 import { Card, IconButton } from '@meshtastic/components';
@@ -32,6 +34,8 @@ export const Map = (): JSX.Element => {
   const map = useMapbox(mapRef, mapState.accessToken, {
     center: mapState.latLng,
     zoom: mapState.zoom,
+    bearing: mapState.bearing,
+    pitch: mapState.pitch,
     style: mapState.style.url,
   });
 
@@ -116,6 +120,12 @@ export const Map = (): JSX.Element => {
     });
     map?.on('zoomend', (e) => {
       dispatch(setZoom(e.target.getZoom()));
+    });
+    map?.on('rotate', (e) => {
+      dispatch(setBearing(e.target.getBearing()));
+    });
+    map?.on('pitch', (e) => {
+      dispatch(setPitch(e.target.getPitch()));
     });
   }, [dispatch, map, updateNodes, mapState.exaggeration]);
 
