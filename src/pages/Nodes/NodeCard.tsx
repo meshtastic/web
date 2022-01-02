@@ -1,5 +1,6 @@
 import React from 'react';
 
+import mapboxgl from 'mapbox-gl';
 import { FaSatellite } from 'react-icons/fa';
 import { FiCode } from 'react-icons/fi';
 import { GiLightningFrequency } from 'react-icons/gi';
@@ -15,10 +16,15 @@ import {
 } from 'react-icons/md';
 import TimeAgo from 'timeago-react';
 
+import { setLatLng } from '@app/core/slices/mapSlice.js';
+import { useAppDispatch } from '@app/hooks/redux.js';
 import type { Node } from '@core/slices/meshtasticSlice';
 import { Disclosure } from '@headlessui/react';
 import { IconButton } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
+
+type PositionConfidence = 'high' | 'low' | 'none';
+type NodeAge = 'young' | 'aging' | 'old' | 'dead';
 
 export interface NodeCardProps {
   node: Node;
@@ -26,6 +32,7 @@ export interface NodeCardProps {
 }
 
 export const NodeCard = ({ node, myNodeInfo }: NodeCardProps): JSX.Element => {
+  const dispatch = useAppDispatch();
   const [snrAverage, setSnrAverage] = React.useState(0);
   const [satsAverage, setSatsAverage] = React.useState(0);
   React.useEffect(() => {
@@ -35,6 +42,32 @@ export const NodeCard = ({ node, myNodeInfo }: NodeCardProps): JSX.Element => {
         .reduce((a, b) => a + b) / (node.snr.length > 3 ? 3 : node.snr.length),
     );
   }, [node.snr]);
+  const [PositionConfidence, setPositionConfidence] =
+    React.useState<PositionConfidence>('none');
+  const [age, setAge] = React.useState<NodeAge>('young');
+
+  React.useEffect(() => {
+    setAge(
+      node.lastHeard > new Date(Date.now() - 1000 * 60 * 15)
+        ? 'young'
+        : node.lastHeard > new Date(Date.now() - 1000 * 60 * 30)
+        ? 'aging'
+        : node.lastHeard > new Date(Date.now() - 1000 * 60 * 60)
+        ? 'old'
+        : 'dead',
+    );
+  }, [node.lastHeard]);
+
+  React.useEffect(() => {
+    setPositionConfidence(
+      node.currentPosition
+        ? new Date(node.currentPosition.posTimestamp * 1000) >
+          new Date(new Date().getTime() - 1000 * 60 * 30)
+          ? 'high'
+          : 'low'
+        : 'none',
+    );
+  }, [node.currentPosition]);
 
   // React.useEffect(() => {
   //   setSatsAverage(
@@ -52,17 +85,20 @@ export const NodeCard = ({ node, myNodeInfo }: NodeCardProps): JSX.Element => {
       as="div"
       className="m-2 rounded-md shadow-md bg-gray-50 dark:bg-gray-700"
     >
-      <Disclosure.Button className="flex w-full gap-2 p-2 bg-gray-100 rounded-md shadow-md dark:bg-primaryDark">
+      <Disclosure.Button
+        as="div"
+        className="flex w-full gap-2 p-2 bg-gray-100 rounded-md shadow-md dark:bg-primaryDark"
+      >
         {myNodeInfo ? (
           <MdAccountCircle className="my-auto" />
         ) : (
           <div
             className={`my-auto w-3 h-3 rounded-full ${
-              node.lastHeard > new Date(Date.now() - 1000 * 60 * 15)
+              age === 'young'
                 ? 'bg-green-500'
-                : node.lastHeard > new Date(Date.now() - 1000 * 60 * 30)
+                : age === 'aging'
                 ? 'bg-yellow-500'
-                : node.lastHeard > new Date(Date.now() - 1000 * 60 * 60)
+                : age === 'old'
                 ? 'bg-red-500'
                 : 'bg-gray-500'
             }`}
@@ -81,17 +117,30 @@ export const NodeCard = ({ node, myNodeInfo }: NodeCardProps): JSX.Element => {
             </span>
           )}
         </div>
-
-        {node.currentPosition ? (
-          new Date(node.positions[0].posTimestamp * 1000) >
-          new Date(new Date().getTime() - 1000 * 60 * 30) ? (
-            <IconButton icon={<MdGpsFixed />} />
-          ) : (
-            <IconButton icon={<MdGpsNotFixed />} />
-          )
-        ) : (
-          <IconButton disabled icon={<MdGpsOff />} />
-        )}
+        <IconButton
+          disabled={PositionConfidence === 'none'}
+          onClick={() => {
+            if (PositionConfidence !== 'none' && node.currentPosition) {
+              dispatch(
+                setLatLng(
+                  new mapboxgl.LngLat(
+                    node.currentPosition.longitudeI / 1e7,
+                    node.currentPosition.latitudeI / 1e7,
+                  ),
+                ),
+              );
+            }
+          }}
+          icon={
+            PositionConfidence === 'high' ? (
+              <MdGpsFixed />
+            ) : PositionConfidence === 'low' ? (
+              <MdGpsNotFixed />
+            ) : (
+              <MdGpsOff />
+            )
+          }
+        />
       </Disclosure.Button>
       <Disclosure.Panel className="p-2">
         {myNodeInfo && (

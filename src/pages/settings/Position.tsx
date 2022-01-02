@@ -3,7 +3,8 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
-import ReactSelect, { Theme } from 'react-select';
+import type { Theme } from 'react-select';
+import ReactSelect from 'react-select';
 
 import { useAppSelector } from '@app/hooks/redux';
 import { FormFooter } from '@components/FormFooter';
