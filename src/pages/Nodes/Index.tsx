@@ -2,10 +2,10 @@ import React from 'react';
 
 import { FiXCircle } from 'react-icons/fi';
 
-import { useBreakpoint } from '@app/hooks/breakpoint';
-import { useAppSelector } from '@app/hooks/redux';
 import { Drawer } from '@components/generic/Drawer';
 import { Map } from '@components/Map';
+import { useAppSelector } from '@hooks/useAppSelector';
+import { useBreakpoint } from '@hooks/useBreakpoint';
 import { IconButton } from '@meshtastic/components';
 
 import { NodeCard } from './NodeCard';
@@ -60,6 +60,7 @@ export const Nodes = (): JSX.Element => {
             <NodeCard key={node.number} node={node} />
           ))}
       </Drawer>
+
       <Map />
     </div>
   );

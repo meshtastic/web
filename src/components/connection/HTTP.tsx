@@ -2,9 +2,9 @@ import type React from 'react';
 
 import { useForm, useWatch } from 'react-hook-form';
 
-import { useAppDispatch } from '@app/hooks/redux.js';
 import { connectionUrl, setConnection } from '@core/connection';
 import { connType, setConnectionParams } from '@core/slices/appSlice';
+import { useAppDispatch } from '@hooks/useAppDispatch';
 import { Button, Checkbox, Input, Select } from '@meshtastic/components';
 
 export const HTTP = (): JSX.Element => {

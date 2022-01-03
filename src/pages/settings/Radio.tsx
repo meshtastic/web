@@ -4,11 +4,11 @@ import { useForm } from 'react-hook-form';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { useAppSelector } from '@app/hooks/redux';
 import { FormFooter } from '@components/FormFooter';
 import { Cover } from '@components/generic/Cover';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connection } from '@core/connection';
+import { useAppSelector } from '@hooks/useAppSelector';
 import { Card, Checkbox, IconButton, Select } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 

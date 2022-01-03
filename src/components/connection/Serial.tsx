@@ -3,16 +3,16 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { FiCheck } from 'react-icons/fi';
 
-import { useAppDispatch } from '@app/hooks/redux';
 import { serial, setConnection } from '@core/connection';
 import { connType, setConnectionParams } from '@core/slices/appSlice';
+import { useAppDispatch } from '@hooks/useAppDispatch';
 import { Button, IconButton } from '@meshtastic/components';
 
 export const Serial = (): JSX.Element => {
   const [serialDevices, setSerialDevices] = React.useState<SerialPort[]>([]);
   const dispatch = useAppDispatch();
 
-  const { register, handleSubmit, control } = useForm<{
+  const { handleSubmit } = useForm<{
     device?: SerialPort;
   }>();
 
@@ -25,7 +25,7 @@ export const Serial = (): JSX.Element => {
     void updateSerialDeviceList();
   }, [updateSerialDeviceList]);
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit(async () => {
     await setConnection(connType.SERIAL);
   });
 

@@ -1,7 +1,7 @@
 import type React from 'react';
 
-import { useAppSelector } from '@app/hooks/redux';
 import { Dialog } from '@headlessui/react';
+import { useAppSelector } from '@hooks/useAppSelector';
 
 type DefaultDivProps = JSX.IntrinsicElements['div'];
 

@@ -16,10 +16,9 @@ import {
 } from 'react-icons/md';
 import TimeAgo from 'timeago-react';
 
-import { setLatLng } from '@app/core/slices/mapSlice.js';
-import { useAppDispatch } from '@app/hooks/redux.js';
 import type { Node } from '@core/slices/meshtasticSlice';
 import { Disclosure } from '@headlessui/react';
+import { useMapbox } from '@hooks/useMapbox';
 import { IconButton } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
@@ -32,9 +31,10 @@ export interface NodeCardProps {
 }
 
 export const NodeCard = ({ node, myNodeInfo }: NodeCardProps): JSX.Element => {
-  const dispatch = useAppDispatch();
   const [snrAverage, setSnrAverage] = React.useState(0);
   const [satsAverage, setSatsAverage] = React.useState(0);
+  const { map } = useMapbox();
+
   React.useEffect(() => {
     setSnrAverage(
       node.snr
@@ -119,17 +119,26 @@ export const NodeCard = ({ node, myNodeInfo }: NodeCardProps): JSX.Element => {
         </div>
         <IconButton
           disabled={PositionConfidence === 'none'}
-          onClick={() => {
+          onClick={(): void => {
             if (PositionConfidence !== 'none' && node.currentPosition) {
-              dispatch(
-                setLatLng(
-                  new mapboxgl.LngLat(
-                    node.currentPosition.longitudeI / 1e7,
-                    node.currentPosition.latitudeI / 1e7,
-                  ),
+              map?.flyTo({
+                center: new mapboxgl.LngLat(
+                  node.currentPosition.longitudeI / 1e7,
+                  node.currentPosition.latitudeI / 1e7,
                 ),
-              );
+                zoom: 16,
+              });
             }
+            // if (PositionConfidence !== 'none' && node.currentPosition) {
+            //   dispatch(
+            //     setLatLng(
+            //       new mapboxgl.LngLat(
+            //         node.currentPosition.longitudeI / 1e7,
+            //         node.currentPosition.latitudeI / 1e7,
+            //       ),
+            //     ),
+            //   );
+            // }
           }}
           icon={
             PositionConfidence === 'high' ? (

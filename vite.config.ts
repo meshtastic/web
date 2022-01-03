@@ -67,6 +67,7 @@ export default defineConfig({
       '@app': path.resolve(__dirname, './src'),
       '@pages': path.resolve(__dirname, './src/pages'),
       '@components': path.resolve(__dirname, './src/components'),
+      '@hooks': path.resolve(__dirname, './src/hooks'),
       '@core': path.resolve(__dirname, './src/core'),
     },
   },

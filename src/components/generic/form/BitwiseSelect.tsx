@@ -5,7 +5,7 @@ import type { Theme } from 'react-select';
 import ReactSelect from 'react-select';
 
 import { bitwiseDecode, bitwiseEncode } from '@app/core/utils/bitwise';
-import { useAppSelector } from '@app/hooks/redux.js';
+import { useAppSelector } from '@hooks/useAppSelector';
 
 import { Label } from './Label';
 

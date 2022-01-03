@@ -3,9 +3,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiSend } from 'react-icons/fi';
 
-import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { connection } from '@core/connection';
 import { ackMessage } from '@core/slices/meshtasticSlice';
+import { useAppDispatch } from '@hooks/useAppDispatch';
+import { useAppSelector } from '@hooks/useAppSelector';
 import { IconButton, Input, Select } from '@meshtastic/components';
 
 export interface MessageBarProps {

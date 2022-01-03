@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { useAppSelector } from '@app/hooks/redux';
 import { FormFooter } from '@components/FormFooter';
 import { Cover } from '@components/generic/Cover';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connection } from '@core/connection';
+import { useAppSelector } from '@hooks/useAppSelector';
 import { Card, Checkbox, IconButton, Input } from '@meshtastic/components';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 

@@ -1,8 +1,9 @@
 import type React from 'react';
 
-import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Drawer } from '@components/generic/Drawer';
 import { closeMobileNav } from '@core/slices/appSlice';
+import { useAppDispatch } from '@hooks/useAppDispatch';
+import { useAppSelector } from '@hooks/useAppSelector';
 
 import { Logo } from './Logo';
 import { Navigation } from './Navigation';

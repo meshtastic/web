@@ -2,8 +2,9 @@ import type React from 'react';
 
 import { FiBluetooth, FiCpu, FiWifi } from 'react-icons/fi';
 
-import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { connType, openConnectionModal } from '@core/slices/appSlice';
+import { useAppDispatch } from '@hooks/useAppDispatch';
+import { useAppSelector } from '@hooks/useAppSelector';
 import { Button } from '@meshtastic/components';
 import { Types } from '@meshtastic/meshtasticjs';
 

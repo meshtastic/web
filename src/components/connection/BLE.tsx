@@ -10,7 +10,7 @@ import { Button, IconButton } from '@meshtastic/components';
 export const BLE = (): JSX.Element => {
   const [bleDevices, setBleDevices] = React.useState<BluetoothDevice[]>([]);
 
-  const { register, handleSubmit, control } = useForm<{
+  const { handleSubmit } = useForm<{
     device?: BluetoothDevice;
   }>();
 
@@ -23,7 +23,7 @@ export const BLE = (): JSX.Element => {
     void updateBleDeviceList();
   }, [updateBleDeviceList]);
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit(async () => {
     await setConnection(connType.BLE);
   });
 

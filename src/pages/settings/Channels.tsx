@@ -4,13 +4,13 @@ import { useForm, useWatch } from 'react-hook-form';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { useAppSelector } from '@app/hooks/redux';
 import { Channel } from '@components/Channel';
 import { FormFooter } from '@components/FormFooter';
 import { Cover } from '@components/generic/Cover';
 import { Loading } from '@components/generic/Loading';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connection } from '@core/connection';
+import { useAppSelector } from '@hooks/useAppSelector';
 import {
   Card,
   Checkbox,

@@ -23,7 +23,7 @@ import {
   Types,
 } from '@meshtastic/meshtasticjs';
 
-import { showNotification } from './utils/notifications.js';
+import { showNotification } from './utils/notifications';
 
 type connectionType = IBLEConnection | IHTTPConnection | ISerialConnection;
 

@@ -10,7 +10,7 @@ import {
   FiZap,
 } from 'react-icons/fi';
 
-import type { SidebarItemProps } from '@app/components/generic/SidebarItem.js';
+import type { SidebarItemProps } from '@app/components/generic/SidebarItem';
 import { PageLayout } from '@components/templates/PageLayout';
 
 import { Channels } from './Channels';

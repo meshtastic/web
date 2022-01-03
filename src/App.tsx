@@ -4,7 +4,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { FiBell } from 'react-icons/fi';
 
 import { DeviceStatus } from '@app/components/menu/buttons/DeviceStatus';
-import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { Connection } from '@components/Connection';
 import { MobileNavToggle } from '@components/menu/buttons/MobileNavToggle';
 import { Notifications } from '@components/menu/buttons/Notifications';
@@ -14,6 +13,8 @@ import { MobileNav } from '@components/menu/MobileNav';
 import { Navigation } from '@components/menu/Navigation';
 import { useRoute } from '@core/router';
 import { requestNotificationPermission } from '@core/utils/notifications';
+import { useAppDispatch } from '@hooks/useAppDispatch';
+import { useAppSelector } from '@hooks/useAppSelector';
 import { Messages } from '@pages/Messages';
 import { Nodes } from '@pages/Nodes/Index';
 import { NotFound } from '@pages/NotFound';
@@ -21,6 +22,7 @@ import { Plugins } from '@pages/Plugins/Index';
 import { Settings } from '@pages/settings/Index';
 
 import { ErrorFallback } from './components/ErrorFallback';
+import { MapboxProvider } from './components/MapBox/MapboxProvider';
 import { addNotification, removeNotification } from './core/slices/appSlice';
 
 export const App = (): JSX.Element => {
@@ -86,7 +88,11 @@ export const App = (): JSX.Element => {
           <div className="flex w-full bg-gray-100 md:shadow-xl md:overflow-hidden dark:bg-secondaryDark md:rounded-b-3xl">
             <ErrorBoundary FallbackComponent={ErrorFallback}>
               {route.name === 'messages' && <Messages />}
-              {route.name === 'nodes' && <Nodes />}
+              {route.name === 'nodes' && (
+                <MapboxProvider>
+                  <Nodes />
+                </MapboxProvider>
+              )}
               {route.name === 'plugins' && <Plugins />}
               {route.name === 'settings' && <Settings />}
               {route.name === false && <NotFound />}

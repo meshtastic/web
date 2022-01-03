@@ -3,10 +3,10 @@ import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { FiMenu } from 'react-icons/fi';
 
-import { useAppSelector } from '@app/hooks/redux';
 import { FormFooter } from '@components/FormFooter';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connection } from '@core/connection';
+import { useAppSelector } from '@hooks/useAppSelector';
 import { Card, Checkbox, IconButton, Input } from '@meshtastic/components';
 import type { RadioConfig_UserPreferences } from '@meshtastic/meshtasticjs/dist/generated';
 

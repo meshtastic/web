@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useAppDispatch, useAppSelector } from '@app/hooks/redux';
 import { BLE } from '@components/connection/BLE';
 import { HTTP } from '@components/connection/HTTP';
 import { Serial } from '@components/connection/Serial';
@@ -12,6 +11,8 @@ import {
   setConnectionParams,
   setConnType,
 } from '@core/slices/appSlice';
+import { useAppDispatch } from '@hooks/useAppDispatch';
+import { useAppSelector } from '@hooks/useAppSelector';
 import { Button, Card, Select } from '@meshtastic/components';
 import { Types } from '@meshtastic/meshtasticjs';
 

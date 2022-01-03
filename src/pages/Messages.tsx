@@ -4,10 +4,9 @@ import { FiHash } from 'react-icons/fi';
 
 import { Message } from '@components/chat/Message';
 import { MessageBar } from '@components/chat/MessageBar';
+import { useAppSelector } from '@hooks/useAppSelector';
 import { Select } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
-
-import { useAppSelector } from '../hooks/redux';
 
 export const Messages = (): JSX.Element => {
   const nodes = useAppSelector((state) => state.meshtastic.nodes);

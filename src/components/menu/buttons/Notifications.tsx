@@ -2,9 +2,9 @@ import React from 'react';
 
 import { FiBell, FiX } from 'react-icons/fi';
 
-import { useAppSelector } from '@app/hooks/redux';
 import { shift, useFloating } from '@floating-ui/react-dom';
 import { Popover } from '@headlessui/react';
+import { useAppSelector } from '@hooks/useAppSelector';
 import { Button, IconButton } from '@meshtastic/components';
 
 export const Notifications = (): JSX.Element => {

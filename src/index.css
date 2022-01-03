@@ -21,3 +21,15 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: #a8bbbf;
 }
+
+.mapboxgl-popup-close-button,
+.mapboxgl-popup-tip {
+  display: none;
+}
+
+.mapboxgl-popup-content {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-sizing: unset !important;
+  padding: 0 !important;
+}
