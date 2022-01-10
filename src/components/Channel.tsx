@@ -3,8 +3,15 @@ import React from 'react';
 import { fromByteArray, toByteArray } from 'base64-js';
 import { useForm, useWatch } from 'react-hook-form';
 import { FaQrcode } from 'react-icons/fa';
-import { FiChevronDown, FiChevronUp, FiSave } from 'react-icons/fi';
+import {
+  FiChevronDown,
+  FiChevronUp,
+  FiCode,
+  FiRotateCcw,
+  FiSave,
+} from 'react-icons/fi';
 import { MdRefresh, MdVisibility, MdVisibilityOff } from 'react-icons/md';
+import JSONPretty from 'react-json-pretty';
 import QRCode from 'react-qr-code';
 
 import { Loading } from '@components/generic/Loading';
@@ -29,21 +36,23 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
   const [showQr, setShowQr] = React.useState(false);
   const [keySize, setKeySize] = React.useState<128 | 256>(256);
   const [pskHidden, setPskHidden] = React.useState(true);
+  const [showDebug, setShowDebug] = React.useState(false);
 
-  const { register, handleSubmit, setValue, control, formState } = useForm<
-    Omit<Protobuf.ChannelSettings, 'psk'> & { psk: string; enabled: boolean }
-  >({
-    defaultValues: {
-      enabled: [
-        Protobuf.Channel_Role.SECONDARY,
-        Protobuf.Channel_Role.PRIMARY,
-      ].find((role) => role === channel.role)
-        ? true
-        : false,
-      name: channel.settings?.name,
-      psk: fromByteArray(channel.settings?.psk ?? new Uint8Array(0)),
-    },
-  });
+  const { register, handleSubmit, setValue, control, formState, reset } =
+    useForm<
+      Omit<Protobuf.ChannelSettings, 'psk'> & { psk: string; enabled: boolean }
+    >({
+      defaultValues: {
+        enabled: [
+          Protobuf.Channel_Role.SECONDARY,
+          Protobuf.Channel_Role.PRIMARY,
+        ].find((role) => role === channel.role)
+          ? true
+          : false,
+        name: channel.settings?.name,
+        psk: fromByteArray(channel.settings?.psk ?? new Uint8Array(0)),
+      },
+    });
 
   const watchPsk = useWatch({
     control,
@@ -75,6 +84,18 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
 
   return (
     <>
+      <Modal
+        open={showDebug}
+        onClose={(): void => {
+          setShowDebug(false);
+        }}
+      >
+        <Card>
+          <div className="p-10 overflow-y-auto text-left max-h-96">
+            <JSONPretty data={channel} />
+          </div>
+        </Card>
+      </Modal>
       <Modal
         open={showQr}
         onClose={(): void => {
@@ -120,15 +141,33 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
                 </div>
                 <div className="flex gap-2">
                   {open && (
-                    <IconButton
-                      onClick={async (e): Promise<void> => {
-                        e.stopPropagation();
-                        await onSubmit();
-                      }}
-                      disabled={loading || !formState.isDirty}
-                      icon={<FiSave />}
-                    />
+                    <>
+                      <IconButton
+                        onClick={(e): void => {
+                          e.stopPropagation();
+                          reset();
+                        }}
+                        disabled={loading || !formState.isDirty}
+                        icon={<FiRotateCcw />}
+                      />
+                      <IconButton
+                        onClick={async (e): Promise<void> => {
+                          e.stopPropagation();
+                          await onSubmit();
+                        }}
+                        disabled={loading || !formState.isDirty}
+                        icon={<FiSave />}
+                      />
+                    </>
                   )}
+                  <IconButton
+                    onClick={(e): void => {
+                      e.stopPropagation();
+                      setShowDebug(true);
+                    }}
+                    icon={<FiCode className="w-5 h-5" />}
+                  />
+
                   <IconButton
                     onClick={(e): void => {
                       e.stopPropagation();
@@ -175,7 +214,7 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
                       <>
                         <IconButton
                           onClick={(): void => {
-                            setPskHidden(!setPskHidden);
+                            setPskHidden(!pskHidden);
                           }}
                           icon={
                             pskHidden ? <MdVisibility /> : <MdVisibilityOff />
