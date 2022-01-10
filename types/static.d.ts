@@ -57,3 +57,16 @@ declare module '*.png' {
 }
 
 /* CUSTOM: ADD YOUR OWN HERE */
+
+type Primitive = string | number | boolean | symbol | undefined | null;
+type DeepOmitHelper<T, K extends keyof T> = {
+  [P in K]: T[P] extends infer TP //extra level of indirection needed to trigger homomorhic behavior // distribute over unions
+    ? TP extends Primitive
+      ? TP // leave primitives and functions alone
+      : DeepOmit<TP, K>
+    : never;
+};
+
+type DeepOmit<T, K> = T extends Primitive
+  ? T
+  : DeepOmitHelper<T, Exclude<keyof T, K>>;

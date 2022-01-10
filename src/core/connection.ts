@@ -159,7 +159,9 @@ const registerListeners = (): void => {
         message: message,
         ack: message.packet.from !== myNodeNum,
         isSender: message.packet.from === myNodeNum,
-        received: new Date(message.packet.rxTime),
+        received: message.packet.rxTime
+          ? new Date(message.packet.rxTime * 1000)
+          : new Date(),
       }),
     );
   });

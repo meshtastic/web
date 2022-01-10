@@ -3,13 +3,14 @@ import React from 'react';
 import { fromByteArray, toByteArray } from 'base64-js';
 import { useForm, useWatch } from 'react-hook-form';
 import { FaQrcode } from 'react-icons/fa';
-import { FiEdit3, FiSave } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiSave } from 'react-icons/fi';
 import { MdRefresh, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import QRCode from 'react-qr-code';
 
 import { Loading } from '@components/generic/Loading';
 import { Modal } from '@components/generic/Modal';
 import { connection } from '@core/connection';
+import { Disclosure } from '@headlessui/react';
 import {
   Card,
   Checkbox,
@@ -21,29 +22,17 @@ import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface ChannelProps {
   channel: Protobuf.Channel;
-  isPrimary?: boolean;
 }
 
-export const Channel = ({ channel, isPrimary }: ChannelProps): JSX.Element => {
-  const [edit, setEdit] = React.useState(false);
+export const Channel = ({ channel }: ChannelProps): JSX.Element => {
   const [loading, setLoading] = React.useState(false);
   const [showQr, setShowQr] = React.useState(false);
   const [keySize, setKeySize] = React.useState<128 | 256>(256);
   const [pskHidden, setPskHidden] = React.useState(true);
 
-  const { register, handleSubmit, setValue, control } = useForm<{
-    enabled: boolean;
-    settings: {
-      name: string;
-      bandwidth?: number;
-      codingRate?: number;
-      spreadFactor?: number;
-      downlinkEnabled?: boolean;
-      uplinkEnabled?: boolean;
-      txPower?: number;
-      psk?: string;
-    };
-  }>({
+  const { register, handleSubmit, setValue, control, formState } = useForm<
+    Omit<Protobuf.ChannelSettings, 'psk'> & { psk: string; enabled: boolean }
+  >({
     defaultValues: {
       enabled: [
         Protobuf.Channel_Role.SECONDARY,
@@ -51,28 +40,20 @@ export const Channel = ({ channel, isPrimary }: ChannelProps): JSX.Element => {
       ].find((role) => role === channel.role)
         ? true
         : false,
-      settings: {
-        name: channel.settings?.name,
-        bandwidth: channel.settings?.bandwidth,
-        codingRate: channel.settings?.codingRate,
-        spreadFactor: channel.settings?.spreadFactor,
-        downlinkEnabled: channel.settings?.downlinkEnabled,
-        uplinkEnabled: channel.settings?.uplinkEnabled,
-        txPower: channel.settings?.txPower,
-        psk: fromByteArray(channel.settings?.psk ?? new Uint8Array(0)),
-      },
+      name: channel.settings?.name,
+      psk: fromByteArray(channel.settings?.psk ?? new Uint8Array(0)),
     },
   });
 
   const watchPsk = useWatch({
     control,
-    name: 'settings.psk',
+    name: 'psk',
     defaultValue: '',
   });
 
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
-    const adminChannel = Protobuf.Channel.create({
+    const channelData = Protobuf.Channel.create({
       role:
         channel.role === Protobuf.Channel_Role.PRIMARY
           ? Protobuf.Channel_Role.PRIMARY
@@ -81,19 +62,19 @@ export const Channel = ({ channel, isPrimary }: ChannelProps): JSX.Element => {
           : Protobuf.Channel_Role.DISABLED,
       index: channel.index,
       settings: {
-        ...data.settings,
-        psk: toByteArray(data.settings.psk ?? ''),
+        ...data,
+        psk: toByteArray(data.psk ?? ''),
       },
     });
 
-    await connection.setChannel(adminChannel, (): Promise<void> => {
+    await connection.setChannel(channelData, (): Promise<void> => {
       setLoading(false);
       return Promise.resolve();
     });
   });
 
   return (
-    <div className="relative flex justify-between p-3 bg-gray-100 rounded-md dark:bg-gray-700">
+    <>
       <Modal
         open={showQr}
         onClose={(): void => {
@@ -107,109 +88,125 @@ export const Channel = ({ channel, isPrimary }: ChannelProps): JSX.Element => {
           />
         </Card>
       </Modal>
-      {edit ? (
-        <>
-          {loading && <Loading />}
-          <div className="flex my-auto">
-            <form className="gap-3">
-              {!isPrimary && (
-                <Checkbox
-                  label="Enabled"
-                  {...register('enabled', { valueAsNumber: true })}
-                />
-              )}
-              <Input label="Name" {...register('settings.name')} />
-              <Select
-                label="Key Size"
-                options={[
-                  { name: '128 Bit', value: 128 },
-                  { name: '256 Bit', value: 256 },
-                ]}
-                value={keySize}
-                onChange={(e): void => {
-                  setKeySize(parseInt(e.target.value) as 128 | 256);
-                }}
-              />
-              <Input
-                label="Pre-Shared Key"
-                type={pskHidden ? 'password' : 'text'}
-                disabled
-                action={
-                  <>
+      <Disclosure
+        as="div"
+        className="bg-gray-100 rounded-md dark:bg-secondaryDark"
+      >
+        {({ open }): JSX.Element => (
+          <>
+            <Disclosure.Button
+              as="div"
+              className="relative flex justify-between p-3"
+            >
+              <>
+                <div className="flex my-auto space-x-2">
+                  <div
+                    className={`h-3 my-auto w-3 rounded-full ${
+                      [
+                        Protobuf.Channel_Role.SECONDARY,
+                        Protobuf.Channel_Role.PRIMARY,
+                      ].find((role) => role === channel.role)
+                        ? 'bg-green-500'
+                        : 'bg-gray-400'
+                    }`}
+                  />
+                  <div>
+                    {channel.settings?.name.length
+                      ? channel.settings.name
+                      : channel.role === Protobuf.Channel_Role.PRIMARY
+                      ? 'Primary'
+                      : `Channel: ${channel.index}`}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {open && (
                     <IconButton
-                      onClick={(): void => {
-                        setPskHidden(!setPskHidden);
+                      onClick={async (e): Promise<void> => {
+                        e.stopPropagation();
+                        await onSubmit();
                       }}
-                      icon={pskHidden ? <MdVisibility /> : <MdVisibilityOff />}
+                      disabled={loading || !formState.isDirty}
+                      icon={<FiSave />}
                     />
-                    <IconButton
-                      onClick={(): void => {
-                        const key = new Uint8Array(keySize);
-                        crypto.getRandomValues(key);
-                        setValue('settings.psk', fromByteArray(key));
-                      }}
-                      icon={<MdRefresh />}
-                    />
-                  </>
-                }
-                {...register('settings.psk')}
-              />
-              <Checkbox
-                label="Uplink Enabled"
-                {...register('settings.uplinkEnabled')}
-              />
-              <Checkbox
-                label="Downlink Enabled"
-                {...register('settings.downlinkEnabled')}
-              />
-            </form>
-          </div>
-          <IconButton
-            onClick={async (): Promise<void> => {
-              await onSubmit();
+                  )}
+                  <IconButton
+                    onClick={(e): void => {
+                      e.stopPropagation();
+                      setShowQr(true);
+                    }}
+                    icon={<FaQrcode />}
+                  />
+                  <IconButton
+                    icon={open ? <FiChevronUp /> : <FiChevronDown />}
+                  />
+                </div>
+              </>
+            </Disclosure.Button>
+            <Disclosure.Panel className="p-2 border-t">
+              {loading && <Loading />}
+              <div className="flex px-2 my-auto">
+                <form className="w-full gap-3">
+                  {channel.index !== 0 && (
+                    <>
+                      <Checkbox
+                        label="Enabled"
+                        {...register('enabled', { valueAsNumber: true })}
+                      />
+                      <Input label="Name" {...register('name')} />
+                    </>
+                  )}
 
-              setEdit(false);
-            }}
-            icon={<FiSave />}
-          />
-        </>
-      ) : (
-        <>
-          <div className="flex my-auto space-x-2">
-            <div
-              className={`h-3 my-auto w-3 rounded-full ${
-                [
-                  Protobuf.Channel_Role.SECONDARY,
-                  Protobuf.Channel_Role.PRIMARY,
-                ].find((role) => role === channel.role)
-                  ? 'bg-green-500'
-                  : 'bg-gray-400'
-              }`}
-            />
-            <div>
-              {channel.settings?.name.length
-                ? channel.settings.name
-                : channel.role === Protobuf.Channel_Role.PRIMARY
-                ? 'Primary'
-                : `Channel: ${channel.index}`}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <IconButton
-              onClick={(): void => {
-                setShowQr(true);
-              }}
-              icon={<FaQrcode />}
-            />
-            <IconButton
-              onClick={(): void => {
-                setEdit(true);
-              }}
-              icon={<FiEdit3 />}
-            />
-          </div>
-        </>
-      )}
-    </div>
+                  <Select
+                    label="Key Size"
+                    options={[
+                      { name: '128 Bit', value: 128 },
+                      { name: '256 Bit', value: 256 },
+                    ]}
+                    value={keySize}
+                    onChange={(e): void => {
+                      setKeySize(parseInt(e.target.value) as 128 | 256);
+                    }}
+                  />
+                  <Input
+                    label="Pre-Shared Key"
+                    type={pskHidden ? 'password' : 'text'}
+                    disabled
+                    action={
+                      <>
+                        <IconButton
+                          onClick={(): void => {
+                            setPskHidden(!setPskHidden);
+                          }}
+                          icon={
+                            pskHidden ? <MdVisibility /> : <MdVisibilityOff />
+                          }
+                        />
+                        <IconButton
+                          onClick={(): void => {
+                            const key = new Uint8Array(keySize);
+                            crypto.getRandomValues(key);
+                            setValue('psk', fromByteArray(key));
+                          }}
+                          icon={<MdRefresh />}
+                        />
+                      </>
+                    }
+                    {...register('psk')}
+                  />
+                  <Checkbox
+                    label="Uplink Enabled"
+                    {...register('uplinkEnabled')}
+                  />
+                  <Checkbox
+                    label="Downlink Enabled"
+                    {...register('downlinkEnabled')}
+                  />
+                </form>
+              </div>
+            </Disclosure.Panel>
+          </>
+        )}
+      </Disclosure>
+    </>
   );
 };

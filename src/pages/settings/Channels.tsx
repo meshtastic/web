@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { FiCode, FiMenu } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
@@ -30,69 +30,35 @@ export const Channels = ({
   setNavOpen,
 }: ChannelsProps): JSX.Element => {
   const channels = useAppSelector((state) => state.meshtastic.radio.channels);
-  const channel = channels[0].channel;
+  const adminChannel =
+    channels.find(
+      (channel) => channel.channel.role === Protobuf.Channel_Role.PRIMARY,
+    ) ?? channels[0];
 
+  const [usePreset, setUsePreset] = React.useState(true);
   const [debug, setDebug] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
-  const { register, handleSubmit, reset, formState, control } = useForm<{
-    simple: boolean;
-    preset?: Protobuf.ChannelSettings_ModemConfig;
-    enabled: boolean;
-    settings: {
-      name: string;
-      bandwidth?: number;
-      codingRate?: number;
-      spreadFactor?: number;
-      downlinkEnabled?: boolean;
-      uplinkEnabled?: boolean;
-      txPower?: number;
-      psk?: string;
-    };
-  }>({
+  const { register, handleSubmit, reset, formState } = useForm<
+    DeepOmit<Protobuf.Channel, 'psk'>
+  >({
     defaultValues: {
-      simple: true,
-      enabled:
-        channel.role ===
-        (Protobuf.Channel_Role.PRIMARY || Protobuf.Channel_Role.SECONDARY)
-          ? true
-          : false,
-      settings: {
-        name: channel.settings?.name,
-        bandwidth: channel.settings?.bandwidth,
-        codingRate: channel.settings?.codingRate,
-        spreadFactor: channel.settings?.spreadFactor,
-        downlinkEnabled: channel.settings?.downlinkEnabled,
-        uplinkEnabled: channel.settings?.uplinkEnabled,
-        txPower: channel.settings?.txPower,
-        psk: new TextDecoder().decode(channel.settings?.psk),
-      },
+      ...adminChannel.channel,
     },
-  });
-
-  const watchSimple = useWatch({
-    control,
-    name: 'simple',
-    defaultValue: true,
   });
 
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
 
-    const adminChannel = Protobuf.Channel.create({
-      role: data.enabled
-        ? Protobuf.Channel_Role.SECONDARY
-        : Protobuf.Channel_Role.DISABLED,
-      index: channel.index,
+    const channelData = Protobuf.Channel.create({
+      ...data,
       settings: {
         ...data.settings,
-        psk: new TextEncoder().encode(data.settings.psk),
+        psk: adminChannel.channel.settings?.psk,
       },
     });
 
-    console.log(adminChannel);
-
-    await connection.setChannel(adminChannel, (): Promise<void> => {
+    await connection.setChannel(channelData, (): Promise<void> => {
       setLoading(false);
       return Promise.resolve();
     });
@@ -128,18 +94,24 @@ export const Channels = ({
       }
     >
       <div className="space-y-4">
-        {channel && (
+        {adminChannel && (
           <Card>
             {loading && <Loading />}
             <div className="w-full max-w-3xl p-10 md:max-w-xl">
               {/* TODO: get gap working */}
-              <Checkbox label="Use Presets" {...register('simple')} />
+              <Checkbox
+                checked={usePreset}
+                label="Use Presets"
+                onChange={(e): void => setUsePreset(e.target.checked)}
+              />
               <form onSubmit={onSubmit}>
-                {watchSimple ? (
+                {usePreset ? (
                   <Select
                     label="Preset"
                     optionsEnum={Protobuf.ChannelSettings_ModemConfig}
-                    {...register('simple')}
+                    {...register('settings.modemConfig', {
+                      valueAsNumber: true,
+                    })}
                   />
                 ) : (
                   <>
@@ -192,11 +164,7 @@ export const Channels = ({
           <Cover enabled={debug} content={<JSONPretty data={channels} />} />
           <div className="w-full p-4 space-y-2 md:p-10">
             {channels.map((channel) => (
-              <Channel
-                key={channel.channel.index}
-                channel={channel.channel}
-                isPrimary={channel.channel.index === 0}
-              />
+              <Channel key={channel.channel.index} channel={channel.channel} />
             ))}
           </div>
         </Card>
