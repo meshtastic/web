@@ -1,5 +1,6 @@
 import '@meshtastic/components/dist/style.css';
 import '@app/index.css';
+import 'react-json-pretty/themes/monikai.css';
 import '@core/translation';
 
 import React from 'react';

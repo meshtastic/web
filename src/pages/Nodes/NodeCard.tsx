@@ -14,13 +14,15 @@ import {
   MdSdStorage,
   MdSignalCellularAlt,
 } from 'react-icons/md';
+import JSONPretty from 'react-json-pretty';
 import TimeAgo from 'timeago-react';
 
+import { Modal } from '@components/generic/Modal';
 import { Marker } from '@components/Map/Marker';
 import type { Node } from '@core/slices/meshtasticSlice';
 import { Disclosure } from '@headlessui/react';
 import { useMapbox } from '@hooks/useMapbox';
-import { IconButton } from '@meshtastic/components';
+import { Card, IconButton } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 type PositionConfidence = 'high' | 'low' | 'none';
@@ -34,6 +36,7 @@ export interface NodeCardProps {
 export const NodeCard = ({ node, myNodeInfo }: NodeCardProps): JSX.Element => {
   const [snrAverage, setSnrAverage] = React.useState(0);
   const [satsAverage, setSatsAverage] = React.useState(0);
+  const [showDebug, setShowDebug] = React.useState(false);
   const { map } = useMapbox();
 
   React.useEffect(() => {
@@ -83,6 +86,18 @@ export const NodeCard = ({ node, myNodeInfo }: NodeCardProps): JSX.Element => {
 
   return (
     <>
+      <Modal
+        open={showDebug}
+        onClose={(): void => {
+          setShowDebug(false);
+        }}
+      >
+        <Card>
+          <div className="p-10 overflow-y-auto text-left max-h-96">
+            <JSONPretty data={node} />
+          </div>
+        </Card>
+      </Modal>
       {node.currentPosition && (
         <Marker
           center={
@@ -186,7 +201,12 @@ export const NodeCard = ({ node, myNodeInfo }: NodeCardProps): JSX.Element => {
               {Protobuf.HardwareModel[node.user?.hwModel ?? 0]}
             </div>
             <div className="ml-auto">
-              <IconButton icon={<FiCode className="w-5 h-5" />} />
+              <IconButton
+                onClick={(): void => {
+                  setShowDebug(true);
+                }}
+                icon={<FiCode className="w-5 h-5" />}
+              />
             </div>
           </div>
           <div className="flex">
