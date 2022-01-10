@@ -6,6 +6,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
 interface MapState {
+  firstLoad: boolean;
   latLng: mapboxgl.LngLat;
   zoom: number;
   bearing: number;
@@ -17,8 +18,9 @@ interface MapState {
 }
 
 const initialState: MapState = {
-  latLng: new mapboxgl.LngLat(-77.0305, 38.8868),
-  zoom: 9,
+  firstLoad: true,
+  latLng: new mapboxgl.LngLat(0, 0),
+  zoom: 2,
   bearing: 0,
   pitch: 0,
   accessToken:

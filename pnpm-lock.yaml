@@ -4,7 +4,7 @@ specifiers:
   '@floating-ui/react-dom': ^0.4.3
   '@headlessui/react': ^1.4.2
   '@meshtastic/components': ^1.0.15
-  '@meshtastic/meshtasticjs': ^0.6.36
+  '@meshtastic/meshtasticjs': ^0.6.37
   '@reduxjs/toolkit': ^1.7.1
   '@types/mapbox-gl': ^2.6.0
   '@types/react': ^17.0.38
@@ -62,7 +62,7 @@ dependencies:
   '@floating-ui/react-dom': 0.4.3_b3482aaf5744fc7c2aeb7941b0e0a78f
   '@headlessui/react': 1.4.2_react-dom@17.0.2+react@17.0.2
   '@meshtastic/components': 1.0.15_@types+react@17.0.38
-  '@meshtastic/meshtasticjs': 0.6.36
+  '@meshtastic/meshtasticjs': 0.6.37
   '@reduxjs/toolkit': 1.7.1_react-redux@7.2.6+react@17.0.2
   base64-js: 1.5.1
   boring-avatars: 1.6.1
@@ -1535,8 +1535,8 @@ packages:
       - '@types/react'
     dev: false
 
-  /@meshtastic/meshtasticjs/0.6.36:
-    resolution: {integrity: sha512-Ibd6guVm1qC1P26smIBY+95WdjYFtWIKjDSDTS2Q0xvrvWT3gtL+kuGf+E+XKHqbtxVSAyJQ6RoG1hCEYRByXw==}
+  /@meshtastic/meshtasticjs/0.6.37:
+    resolution: {integrity: sha512-HXl8/eTvZAW9b4MfNxoZa2/qrKP4Y2RlyPP8jQOO+FHy5u/BLuMwAEbA69YqsOZMF9SK5/xNwHlrBnMXwWKHDA==}
     dependencies:
       '@protobuf-ts/runtime': 2.1.0
       sub-events: 1.8.9

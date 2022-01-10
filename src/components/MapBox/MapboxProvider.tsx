@@ -1,9 +1,5 @@
 import React from 'react';
 
-import mapbox from 'mapbox-gl';
-import { renderToString } from 'react-dom/server';
-import { FiAirplay } from 'react-icons/fi';
-
 import {
   setBearing,
   setLatLng,
@@ -14,7 +10,6 @@ import {
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { useCreateMapbox } from '@hooks/useCreateMapbox';
-import { Card } from '@meshtastic/components';
 
 import { MapStyles } from '../Map/styles';
 import { MapboxContext } from './mapboxContext';
@@ -28,16 +23,8 @@ export const MapboxProvider = ({
 }: MapboxProviderProps): JSX.Element => {
   const darkMode = useAppSelector((state) => state.app.darkMode);
   const mapState = useAppSelector((state) => state.map);
-  const nodes = useAppSelector((state) => state.meshtastic.nodes);
   const dispatch = useAppDispatch();
   const ref = React.useRef<HTMLDivElement>(null);
-
-  const [markers, setMarkers] = React.useState<
-    { id: number; marker: mapbox.Marker }[]
-  >([]);
-  const [markerElements, setMarkerElements] = React.useState<
-    { id: number; element: JSX.Element; ref: React.RefObject<HTMLDivElement> }[]
-  >([]);
 
   const map = useCreateMapbox({
     ref,
@@ -52,79 +39,7 @@ export const MapboxProvider = ({
     },
   });
 
-  const updateNodes = React.useCallback(() => {
-    nodes.map((node) => {
-      if (map?.loaded() && node.currentPosition) {
-        const existingMarker = markers.find(
-          (marker) => marker.id === node.number,
-        )?.marker;
-
-        const tmpRef = React.createRef<HTMLDivElement>();
-
-        const markerElement = markerElements.find(
-          (element) => element.id === node.number,
-        ) ?? {
-          element: (
-            <div ref={tmpRef}>
-              Test
-              <FiAirplay />
-            </div>
-          ),
-          id: node.number,
-          ref: tmpRef,
-        };
-
-        console.log(markerElement);
-
-        const marker =
-          existingMarker ??
-          new mapbox.Marker(markerElement.ref.current ?? undefined, {})
-            .setLngLat([0, 0])
-            .addTo(map);
-
-        marker
-          .setLngLat([
-            node.currentPosition.longitudeI / 1e7,
-            node.currentPosition.latitudeI / 1e7,
-          ])
-          .setPopup(
-            new mapbox.Popup().setHTML(
-              renderToString(
-                <Card>
-                  <div className="p-2">
-                    <div className="text-xl font-medium">
-                      {node.user?.longName}
-                    </div>
-                    <ul>
-                      <li>ID: {node.number}</li>
-                    </ul>
-                  </div>
-                </Card>,
-              ),
-            ),
-          );
-
-        if (!existingMarker) {
-          setMarkers((markers) => [
-            ...markers,
-            {
-              id: node.number,
-              marker,
-            },
-          ]);
-          setMarkerElements((markerElements) => [
-            ...markerElements,
-            markerElement,
-          ]);
-        }
-      }
-    });
-  }, [markers, markerElements, map, nodes]);
-
   React.useEffect(() => {
-    map?.on('load', () => {
-      updateNodes();
-    });
     map?.on('styledata', () => {
       if (!map.getSource('mapbox-dem')) {
         map.addSource('mapbox-dem', {
@@ -151,7 +66,7 @@ export const MapboxProvider = ({
     map?.on('pitch', (e) => {
       dispatch(setPitch(e.target.getPitch()));
     });
-  }, [dispatch, map, updateNodes, mapState.exaggeration]);
+  }, [dispatch, map, mapState.exaggeration]);
 
   React.useEffect(() => {
     const center = map?.getCenter();
@@ -208,13 +123,6 @@ export const MapboxProvider = ({
       map.setStyle(mapState.style.url);
     }
   }, [map, mapState.style]);
-
-  /**
-   * Markers
-   */
-  React.useEffect(() => {
-    updateNodes();
-  }, [nodes, updateNodes]);
 
   return (
     <MapboxContext.Provider value={{ map, ref }}>

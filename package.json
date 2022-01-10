@@ -15,7 +15,7 @@
     "@floating-ui/react-dom": "^0.4.3",
     "@headlessui/react": "^1.4.2",
     "@meshtastic/components": "^1.0.15",
-    "@meshtastic/meshtasticjs": "^0.6.36",
+    "@meshtastic/meshtasticjs": "^0.6.37",
     "@reduxjs/toolkit": "^1.7.1",
     "base64-js": "^1.5.1",
     "boring-avatars": "^1.6.1",
