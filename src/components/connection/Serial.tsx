@@ -62,7 +62,7 @@ export const Serial = (): JSX.Element => {
           </div>
         ))
       ) : (
-        <div className="h-40 border rounded-md">
+        <div className="h-40 border border-gray-300 rounded-md dark:border-gray-600">
           <p>No previously connected devices found</p>
         </div>
       )}

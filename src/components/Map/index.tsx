@@ -41,7 +41,7 @@ export const Map = (): JSX.Element => {
 
   return (
     <div className="relative flex w-full h-full">
-      <div className="fixed right-0 z-20 p-2 m-4 space-y-2 bg-white rounded-md shadow-md md:mx-10 dark:bg-primaryDark">
+      <div className="absolute right-0 z-20 p-2 m-4 space-y-2 bg-white border border-gray-300 rounded-md shadow-md dark:bg-primaryDark dark:border-gray-600">
         <IconButton
           active={mapState.style.title === 'Satellite'}
           onClick={(): void => {
@@ -51,7 +51,7 @@ export const Map = (): JSX.Element => {
         />
 
         <div
-          className={`p-1 -m-1 space-y-2 border-gray-400 rounded-md dark:border-gray-200 ${
+          className={`p-1 -m-1 space-y-2 rounded-md border-gray-300 dark:border-gray-600 ${
             mapState.style.title === 'Outdoors' ? 'border' : ''
           }`}
         >
@@ -84,9 +84,7 @@ export const Map = (): JSX.Element => {
         <IconButton icon={<MdFullscreen />} />
         <IconButton icon={<MdRadar />} />
       </div>
-      <div className="flex w-full h-full">
-        <div className="flex-grow w-full h-full" ref={ref} />
-      </div>
+      <div className="flex-grow w-full h-full" ref={ref} />
     </div>
   );
 };
