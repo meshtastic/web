@@ -36,6 +36,12 @@ export const WiFi = ({ navOpen, setNavOpen }: WiFiProps): JSX.Element => {
     defaultValue: false,
   });
 
+  const watchMQTTDisabled = useWatch({
+    control,
+    name: 'mqttDisabled',
+    defaultValue: false,
+  });
+
   React.useEffect(() => {
     reset(preferences);
   }, [reset, preferences]);
@@ -49,7 +55,7 @@ export const WiFi = ({ navOpen, setNavOpen }: WiFiProps): JSX.Element => {
   });
   return (
     <PrimaryTemplate
-      title="WiFi"
+      title="WiFi & MQTT"
       tagline="Settings"
       leftButton={
         <IconButton
@@ -92,6 +98,24 @@ export const WiFi = ({ navOpen, setNavOpen }: WiFiProps): JSX.Element => {
               label={t('strings.wifi_psk')}
               disabled={watchWifiApMode}
               {...register('wifiPassword')}
+            />
+            <Checkbox label="Disable MQTT" {...register('mqttDisabled')} />
+            <Input
+              label="MQTT Server Address"
+              disabled={watchMQTTDisabled}
+              {...register('mqttServer')}
+            />
+            <Input
+              label="MQTT Username"
+              disabled={watchMQTTDisabled}
+              {...register('mqttUsername')}
+            />
+            <Input
+              label="MQTT Password"
+              type="password"
+              autoComplete="off"
+              disabled={watchMQTTDisabled}
+              {...register('mqttPassword')}
             />
           </form>
         </div>

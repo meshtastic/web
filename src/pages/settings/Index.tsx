@@ -75,8 +75,8 @@ export const Settings = (): JSX.Element => {
     if (hasWifi) {
       panels.unshift(<WiFi key={2} />);
       sidebarItems.unshift({
-        title: 'WiFi',
-        description: 'WiFi credentials and mode',
+        title: 'WiFi & MQTT',
+        description: 'WiFi & MQTT settings',
         icon: <FiWifi className="flex-shrink-0 w-6 h-6" />,
       });
     }
