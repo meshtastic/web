@@ -181,7 +181,7 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
                 </div>
               </>
             </Disclosure.Button>
-            <Disclosure.Panel className="p-2 border-t">
+            <Disclosure.Panel className="p-2 border-t border-gray-300 dark:border-gray-600">
               {loading && <Loading />}
               <div className="flex px-2 my-auto">
                 <form className="w-full gap-3">

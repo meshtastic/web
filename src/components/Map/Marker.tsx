@@ -2,20 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import mapbox from 'mapbox-gl';
-import ReactDOMServer from 'react-dom/server';
 
 import { useMapbox } from '@hooks/useMapbox';
 
 export interface MarkerProps extends Omit<mapbox.MarkerOptions, 'element'> {
   children?: React.ReactNode;
   center: mapbox.LngLatLike;
-  popup: JSX.Element;
 }
 
 export const Marker = ({
   children,
   center,
-  popup,
   ...props
 }: MarkerProps): JSX.Element => {
   const { map } = useMapbox();
@@ -23,14 +20,10 @@ export const Marker = ({
 
   const addMarker = React.useCallback((): void => {
     if (map) {
-      const marker = new mapbox.Marker(ref.current, props)
-        .setLngLat(center)
-        .setPopup(
-          new mapbox.Popup().setHTML(ReactDOMServer.renderToString(popup)),
-        );
+      const marker = new mapbox.Marker(ref.current, props).setLngLat(center);
       marker.addTo(map);
     }
-  }, [map, center, props, popup]);
+  }, [map, center, props]);
 
   React.useEffect(() => {
     map?.on('load', () => {

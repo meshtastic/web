@@ -1,7 +1,10 @@
 import React from 'react';
 
-import { FiXCircle } from 'react-icons/fi';
+import mapbox from 'mapbox-gl';
+import { FiMapPin, FiXCircle } from 'react-icons/fi';
 
+import { Marker } from '@app/components/Map/Marker';
+import type { Node } from '@app/core/slices/meshtasticSlice.js';
 import { Drawer } from '@components/generic/Drawer';
 import { Map } from '@components/Map';
 import { useAppSelector } from '@hooks/useAppSelector';
@@ -9,6 +12,7 @@ import { useBreakpoint } from '@hooks/useBreakpoint';
 import { IconButton } from '@meshtastic/components';
 
 import { NodeCard } from './NodeCard';
+import { Sidebar } from './Sidebar';
 
 export const Nodes = (): JSX.Element => {
   const myNodeInfo = useAppSelector((state) => state.meshtastic.radio.hardware);
@@ -25,6 +29,8 @@ export const Nodes = (): JSX.Element => {
   const [navOpen, setNavOpen] = React.useState(false);
 
   const { breakpoint } = useBreakpoint();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [selectedNode, setSelectedNode] = React.useState<Node | undefined>();
 
   return (
     <div className="relative flex w-full dark:text-white">
@@ -36,7 +42,7 @@ export const Nodes = (): JSX.Element => {
         }}
       >
         <div className="flex items-center justify-between m-6 mr-6">
-          <div className="text-4xl font-extrabold leading-none tracking-tight">
+          <div className="text-3xl font-extrabold leading-none tracking-tight">
             Nodes
           </div>
           <div className="md:hidden">
@@ -53,15 +59,67 @@ export const Nodes = (): JSX.Element => {
             No nodes found.
           </span>
         )}
-        {myNode && <NodeCard node={myNode} myNodeInfo={myNodeInfo} />}
+        {myNode && (
+          <NodeCard
+            node={myNode}
+            isMyNode={true}
+            setSelected={(): void => {
+              setSelectedNode(myNode);
+              setSidebarOpen(true);
+            }}
+          />
+        )}
         {nodes
           .filter((node) => node.number !== myNodeInfo.myNodeNum)
           .map((node) => (
-            <NodeCard key={node.number} node={node} />
+            <NodeCard
+              key={node.number}
+              node={node}
+              setSelected={(): void => {
+                setSelectedNode(node);
+                setSidebarOpen(true);
+              }}
+            />
           ))}
       </Drawer>
 
+      {nodes.map((node) => {
+        return (
+          node.currentPosition && (
+            <Marker
+              center={
+                new mapbox.LngLat(
+                  node.currentPosition.longitudeI / 1e7,
+                  node.currentPosition.latitudeI / 1e7,
+                )
+              }
+            >
+              <div
+                onClick={(): void => {
+                  setSelectedNode(node);
+                  setSidebarOpen(true);
+                }}
+                className="z-50 bg-blue-500 border-2 border-blue-500 rounded-full bg-opacity-30"
+              >
+                <div className="m-4 ">
+                  <FiMapPin className="w-5 h-5" />
+                </div>
+              </div>
+            </Marker>
+          )
+        );
+      })}
+
       <Map />
+
+      {sidebarOpen && selectedNode && (
+        <Sidebar
+          closeSidebar={(): void => {
+            setSidebarOpen(false);
+          }}
+          node={selectedNode}
+        />
+      )}
     </div>
   );
 };

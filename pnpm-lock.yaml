@@ -38,13 +38,14 @@ specifiers:
   react-dom: ^17.0.2
   react-error-boundary: ^3.1.4
   react-file-icon: ^1.1.0
-  react-hook-form: ^7.22.5
+  react-hook-form: ^7.23.0
   react-i18next: ^11.15.3
   react-icons: ^4.3.1
   react-json-pretty: ^2.2.0
   react-qr-code: ^2.0.3
   react-redux: ^7.2.6
-  react-select: ^5.2.1
+  react-select: ^5.2.2
+  react-use-clipboard: ^1.0.7
   rfc4648: ^1.5.1
   swr: ^1.1.2
   tailwindcss: ^3.0.13
@@ -53,9 +54,9 @@ specifiers:
   type-route: ^0.6.0
   typescript: ^4.5.4
   use-breakpoint: ^3.0.1
-  vite: ^2.7.10
+  vite: ^2.7.12
   vite-plugin-cdn-import: ^0.3.5
-  vite-plugin-pwa: ^0.11.12
+  vite-plugin-pwa: ^0.11.13
   workbox-window: ^6.4.2
 
 dependencies:
@@ -73,13 +74,14 @@ dependencies:
   react-dom: 17.0.2_react@17.0.2
   react-error-boundary: 3.1.4_react@17.0.2
   react-file-icon: 1.1.0_react-dom@17.0.2+react@17.0.2
-  react-hook-form: 7.22.5_react@17.0.2
+  react-hook-form: 7.23.0_react@17.0.2
   react-i18next: 11.15.3_bc514be083f1f06b28df24d5713fc600
   react-icons: 4.3.1_react@17.0.2
   react-json-pretty: 2.2.0_react-dom@17.0.2+react@17.0.2
   react-qr-code: 2.0.3_react@17.0.2
   react-redux: 7.2.6_react-dom@17.0.2+react@17.0.2
-  react-select: 5.2.1_b3482aaf5744fc7c2aeb7941b0e0a78f
+  react-select: 5.2.2_b3482aaf5744fc7c2aeb7941b0e0a78f
+  react-use-clipboard: 1.0.7_react-dom@17.0.2+react@17.0.2
   rfc4648: 1.5.1
   swr: 1.1.2_react@17.0.2
   timeago-react: 3.0.4_react@17.0.2
@@ -113,9 +115,9 @@ devDependencies:
   tailwindcss: 3.0.13_ef48b3b8837f8a23677bffe8f9cd866d
   tar: 6.1.11
   typescript: 4.5.4
-  vite: 2.7.10
+  vite: 2.7.12
   vite-plugin-cdn-import: 0.3.5
-  vite-plugin-pwa: 0.11.12_vite@2.7.10
+  vite-plugin-pwa: 0.11.13_vite@2.7.12
   workbox-window: 6.4.2
 
 packages:
@@ -1529,7 +1531,7 @@ packages:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-icons: 4.3.1_react@17.0.2
-      react-select: 5.2.1_b3482aaf5744fc7c2aeb7941b0e0a78f
+      react-select: 5.2.2_b3482aaf5744fc7c2aeb7941b0e0a78f
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/react'
@@ -2201,7 +2203,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.19.1
-      caniuse-lite: 1.0.30001298
+      caniuse-lite: 1.0.30001299
       fraction.js: 4.1.2
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -2310,8 +2312,8 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001298
-      electron-to-chromium: 1.4.42
+      caniuse-lite: 1.0.30001299
+      electron-to-chromium: 1.4.45
       escalade: 3.1.1
       node-releases: 2.0.1
       picocolors: 1.0.0
@@ -2350,8 +2352,8 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
-  /caniuse-lite/1.0.30001298:
-    resolution: {integrity: sha512-AcKqikjMLlvghZL/vfTHorlQsLDhGRalYf1+GmWCf5SCMziSGjRYQW/JEksj14NaYHIR6KIhrFAy0HV5C25UzQ==}
+  /caniuse-lite/1.0.30001299:
+    resolution: {integrity: sha512-iujN4+x7QzqA2NCSrS5VUy+4gLmRd4xv6vbBBsmfVqTx8bLAD8097euLqQgKxSVLvxjSDcvF1T/i9ocgnUFexw==}
     dev: true
 
   /chalk/2.4.2:
@@ -2458,6 +2460,12 @@ packages:
       safe-buffer: 5.1.2
     dev: true
 
+  /copy-to-clipboard/3.3.1:
+    resolution: {integrity: sha512-i13qo6kIHTTpCm8/Wup+0b1mVWETvu2kIMzKoK8FpkLkFxlt0znUAHcMzox+T8sPlqtZXq3CulEjQHsYiGFJUw==}
+    dependencies:
+      toggle-selection: 1.0.6
+    dev: false
+
   /core-js-compat/3.20.2:
     resolution: {integrity: sha512-qZEzVQ+5Qh6cROaTPFLNS4lkvQ6mBzE3R6A6EEpssj7Zr2egMHgsy4XapdifqJDGC9CBiNv7s+ejI96rLNQFdg==}
     dependencies:
@@ -2551,7 +2559,7 @@ packages:
       object-is: 1.1.5
       object-keys: 1.1.1
       object.assign: 4.1.2
-      regexp.prototype.flags: 1.3.1
+      regexp.prototype.flags: 1.3.2
       side-channel: 1.0.4
       which-boxed-primitive: 1.0.2
       which-collection: 1.0.1
@@ -2670,8 +2678,8 @@ packages:
       jake: 10.8.2
     dev: true
 
-  /electron-to-chromium/1.4.42:
-    resolution: {integrity: sha512-JJLT8bjdswJzk8sNRnQjee0MGtO4zTn1t7eWwYPr8gPTadQgNRR/wFRKLGD6HZVZby39yHERkvuCVKNm10r7Dg==}
+  /electron-to-chromium/1.4.45:
+    resolution: {integrity: sha512-czF9eYVuOmlY/vxyMQz2rGlNSjZpxNQYBe1gmQv7al171qOIhgyO9k7D5AKlgeTCSPKk+LHhj5ZyIdmEub9oNg==}
     dev: true
 
   /emoji-regex/8.0.0:
@@ -4220,8 +4228,8 @@ packages:
     resolution: {integrity: sha1-sGJ44h/Gw3+lMTcysEEry2rhX1E=}
     dev: false
 
-  /nanoid/3.1.31:
-    resolution: {integrity: sha512-ZivnJm0o9bb13p2Ot5CpgC2rQdzB9Uxm/mFZweqm5eMViqOJe3PV6LU2E30SiLgheesmcPrjquqraoolONSA0A==}
+  /nanoid/3.1.32:
+    resolution: {integrity: sha512-F8mf7R3iT9bvThBoW4tGXhXFHCctyCiUUPrWF8WaTqa3h96d9QybkSeba43XVOOE3oiLfkVDe4bT8MeGmkrTxw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
@@ -4541,7 +4549,7 @@ packages:
     resolution: {integrity: sha512-jBDboWM8qpaqwkMwItqTQTiFikhs/67OYVvblFFTM7MrZjt6yMKd6r2kgXizEbTTljacm4NldIlZnhbjr84QYg==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
-      nanoid: 3.1.31
+      nanoid: 3.1.32
       picocolors: 1.0.0
       source-map-js: 1.0.1
     dev: true
@@ -4699,8 +4707,8 @@ packages:
       tinycolor2: 1.4.2
     dev: false
 
-  /react-hook-form/7.22.5_react@17.0.2:
-    resolution: {integrity: sha512-Q2zaeQFXdVQ8l3hcywhltH+Nzj4vo50wMVujHDVN/1Xy9IOaSZJwYBXA2CYTpK6rq41fnXviw3jTLb04c7Gu9Q==}
+  /react-hook-form/7.23.0_react@17.0.2:
+    resolution: {integrity: sha512-bO1JCkPAjmpuKhfUpFhsjWn2RIPgWUpep8qpMAKCoc8NM8ytBA5nDx5p99wNhZWrblYQFvU+dVy9g1oYo/JKoQ==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       react: ^16.8.0 || ^17
@@ -4793,8 +4801,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /react-select/5.2.1_b3482aaf5744fc7c2aeb7941b0e0a78f:
-    resolution: {integrity: sha512-OOyNzfKrhOcw/BlembyGWgdlJ2ObZRaqmQppPFut1RptJO423j+Y+JIsmxkvsZ4D/3CpOmwIlCvWbbAWEdh12A==}
+  /react-select/5.2.2_b3482aaf5744fc7c2aeb7941b0e0a78f:
+    resolution: {integrity: sha512-miGS2rT1XbFNjduMZT+V73xbJEeMzVkJOz727F6MeAr2hKE0uUSA8Ff7vD44H32x2PD3SRB6OXTY/L+fTV3z9w==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0
       react-dom: ^16.8.0 || ^17.0.0
@@ -4823,6 +4831,17 @@ packages:
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+    dev: false
+
+  /react-use-clipboard/1.0.7_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-blIprqARyITp0uVw/2Rh87mcujqXdH6vZ5NrcuXEhI5EmjBGxcGnwt/79+vdN7rwM6OliGj481lOj6ZCcsiYEQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17
+      react-dom: ^16.8.0 || ^17
+    dependencies:
+      copy-to-clipboard: 3.3.1
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
     dev: false
@@ -4897,8 +4916,8 @@ packages:
       '@babel/runtime': 7.16.7
     dev: true
 
-  /regexp.prototype.flags/1.3.1:
-    resolution: {integrity: sha512-JiBdRBq91WlY7uRJ0ds7R+dU02i6LKi8r3BuQhNXn+kmeLN+EfHhfjqMRis1zJxnlu88hq/4dx0P2OP3APRTOA==}
+  /regexp.prototype.flags/1.3.2:
+    resolution: {integrity: sha512-uaro52GSI5be7+ssxjxxnLlleDBN3VHIWQHvBhfeeSXRQkuV/0Jo/hBU+omYH6NUkM+LYpTHnRRf2W/v+x7LzQ==}
     engines: {node: '>= 0.4'}
     dependencies:
       call-bind: 1.0.2
@@ -5212,7 +5231,7 @@ packages:
       get-intrinsic: 1.1.1
       has-symbols: 1.0.2
       internal-slot: 1.0.3
-      regexp.prototype.flags: 1.3.1
+      regexp.prototype.flags: 1.3.2
       side-channel: 1.0.4
     dev: true
 
@@ -5492,6 +5511,10 @@ packages:
       is-number: 7.0.0
     dev: true
 
+  /toggle-selection/1.0.6:
+    resolution: {integrity: sha1-bkWxJj8gF/oKzH2J14sVuL932jI=}
+    dev: false
+
   /tr46/1.0.1:
     resolution: {integrity: sha1-qLE/1r/SSJUZZ0zN5VujaTtwbQk=}
     dependencies:
@@ -5661,8 +5684,8 @@ packages:
       - rollup
     dev: true
 
-  /vite-plugin-pwa/0.11.12_vite@2.7.10:
-    resolution: {integrity: sha512-XqFmA4y9C4RBb5osSsa26GVwOSwbzf2GNVcT5+06KYYdguqLpuI9FW7iV/akZqg0OUNUpH4tHfme8SnHA4PIXA==}
+  /vite-plugin-pwa/0.11.13_vite@2.7.12:
+    resolution: {integrity: sha512-Ssj14m3TRVLfkFEAWSMcFE2d1cSdEZyrVTzfY2lSL+umHYvcIFHVDAY143sygtBCb44OPczsAOmWwBTxwOvh7g==}
     peerDependencies:
       vite: ^2.0.0
     dependencies:
@@ -5670,7 +5693,7 @@ packages:
       fast-glob: 3.2.10
       pretty-bytes: 5.6.0
       rollup: 2.63.0
-      vite: 2.7.10
+      vite: 2.7.12
       workbox-build: 6.4.2
       workbox-window: 6.4.2
     transitivePeerDependencies:
@@ -5679,8 +5702,8 @@ packages:
       - supports-color
     dev: true
 
-  /vite/2.7.10:
-    resolution: {integrity: sha512-KEY96ntXUid1/xJihJbgmLZx7QSC2D4Tui0FdS0Old5OokYzFclcofhtxtjDdGOk/fFpPbHv9yw88+rB93Tb8w==}
+  /vite/2.7.12:
+    resolution: {integrity: sha512-KvPYToRQWhRfBeVkyhkZ5hASuHQkqZUUdUcE3xyYtq5oYEPIJ0h9LWiWTO6v990glmSac2cEPeYeXzpX5Z6qKQ==}
     engines: {node: '>=12.2.0'}
     hasBin: true
     peerDependencies:
