@@ -30,7 +30,7 @@ export const Sidebar = ({ node, closeSidebar }: SidebarProps): JSX.Element => {
   });
 
   return (
-    <div className="h-full bg-white border-l border-gray-300 dark:border-gray-600 w-96 dark:bg-secondaryDark">
+    <div className="absolute z-50 w-full h-full bg-white border-l border-gray-300 md:z-10 md:max-w-sm md:static min-w-max dark:border-gray-600 dark:bg-secondaryDark">
       <Tab.Group>
         <div className="shadow-md">
           <div className="p-2">
@@ -73,12 +73,33 @@ export const Sidebar = ({ node, closeSidebar }: SidebarProps): JSX.Element => {
           </Tab.List>
         </div>
         <Tab.Panels className="h-full bg-gray-100 dark:bg-primaryDark">
-          <Tab.Panel>Content 1</Tab.Panel>
-          <Tab.Panel>
-            <div></div>
+          <Tab.Panel className="p-2">Content 1</Tab.Panel>
+          <Tab.Panel className="p-2">
+            {node.currentPosition && (
+              <div className="flex justify-between h-10 px-1 bg-transparent border border-gray-300 rounded-md select-none dark:border-gray-600">
+                <div className="my-auto">
+                  {(node.currentPosition.latitudeI / 1e7).toPrecision(6)},
+                  {(node.currentPosition?.longitudeI / 1e7).toPrecision(6)}
+                </div>
+                <IconButton
+                  placeholder={``}
+                  onClick={(): void => {
+                    setToCopy(
+                      node.currentPosition
+                        ? `${node.currentPosition.latitudeI / 1e7},${
+                            node.currentPosition.longitudeI / 1e7
+                          }`
+                        : '',
+                    );
+                    setCopied();
+                  }}
+                  icon={isCopied ? <FiCheck /> : <FiClipboard />}
+                />
+              </div>
+            )}
           </Tab.Panel>
-          <Tab.Panel>Content 3</Tab.Panel>
-          <Tab.Panel>Remote Administration</Tab.Panel>
+          <Tab.Panel className="p-2">Content 3</Tab.Panel>
+          <Tab.Panel className="p-2">Remote Administration</Tab.Panel>
           <Tab.Panel className="relative">
             <div className="absolute right-0 m-2">
               <IconButton
@@ -89,7 +110,7 @@ export const Sidebar = ({ node, closeSidebar }: SidebarProps): JSX.Element => {
                 icon={isCopied ? <FiCheck /> : <FiClipboard />}
               />
             </div>
-            <JSONPretty data={node} />
+            <JSONPretty className="max-w-sm overflow-auto" data={node} />
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
