@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FiXCircle } from 'react-icons/fi';
+import { FiMenu, FiXCircle } from 'react-icons/fi';
 
 import { Drawer } from '@components/generic/Drawer';
 import type { SidebarItemProps } from '@components/generic/SidebarItem';
@@ -37,10 +37,11 @@ export const PageLayout = ({
           }}
         >
           <Tab.List className="flex flex-col border-b border-gray-300 divide-y divide-gray-300 dark:divide-gray-600 dark:border-gray-600">
-            <div className="flex items-center justify-between m-6 mr-6">
-              <div className="text-4xl font-extrabold leading-none tracking-tight">
+            <div className="flex items-center justify-between m-4">
+              <div className="text-2xl font-extrabold leading-none tracking-tight">
                 {title}
               </div>
+              <IconButton icon={<FiMenu />} />
               <div className="md:hidden">
                 <IconButton
                   icon={<FiXCircle className="w-5 h-5" />}

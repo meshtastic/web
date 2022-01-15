@@ -3,13 +3,8 @@ import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FiBell } from 'react-icons/fi';
 
-import { DeviceStatus } from '@app/components/menu/buttons/DeviceStatus';
 import { Connection } from '@components/Connection';
-import { MobileNavToggle } from '@components/menu/buttons/MobileNavToggle';
-import { Notifications } from '@components/menu/buttons/Notifications';
-import { ThemeToggle } from '@components/menu/buttons/ThemeToggle';
 import { Logo } from '@components/menu/Logo';
-import { MobileNav } from '@components/menu/MobileNav';
 import { Navigation } from '@components/menu/Navigation';
 import { useRoute } from '@core/router';
 import { requestNotificationPermission } from '@core/utils/notifications';
@@ -23,6 +18,7 @@ import { Settings } from '@pages/settings/Index';
 
 import { ErrorFallback } from './components/ErrorFallback';
 import { MapboxProvider } from './components/MapBox/MapboxProvider';
+import { BottomNav } from './components/menu/BottomNav';
 import { addNotification, removeNotification } from './core/slices/appSlice';
 
 export const App = (): JSX.Element => {
@@ -65,27 +61,20 @@ export const App = (): JSX.Element => {
   return (
     <div className={`h-screen w-screen ${darkMode ? 'dark' : ''}`}>
       <Connection />
-      <div className="flex flex-col h-full bg-gray-200 dark:bg-primaryDark">
+      <div className="flex flex-col h-full bg-gray-200 dark:bg-secondaryDark">
         <div className="flex flex-shrink-0 overflow-hidden bg-primary dark:bg-primary">
-          <div className="w-full overflow-hidden bg-white border-b border-gray-300 md:mt-6 md:mx-6 md:py-2 md:rounded-t-3xl dark:border-gray-600 md:shadow-md dark:bg-primaryDark">
-            <div className="flex items-center justify-between h-12 px-4 md:px-6">
-              <div className="hidden md:flex">
+          <div className="w-full overflow-hidden bg-white border-b border-gray-300 dark:border-gray-600 md:shadow-md dark:bg-secondaryDark">
+            <div className="flex items-center justify-between h-12 px-4">
+              <div className="flex">
                 <Logo />
               </div>
-              <Navigation className="hidden md:flex" />
-              <MobileNavToggle />
-              <div className="flex items-center space-x-2">
-                <DeviceStatus />
-                <Notifications />
-                <ThemeToggle />
-              </div>
+              <Navigation className="flex" />
             </div>
           </div>
         </div>
-        <MobileNav />
 
-        <div className="flex flex-grow w-full min-h-0 md:px-6 md:mb-6">
-          <div className="flex w-full bg-gray-100 md:shadow-xl md:overflow-hidden dark:bg-secondaryDark md:rounded-b-3xl">
+        <div className="flex flex-grow w-full min-h-0">
+          <div className="flex w-full bg-gray-100 md:shadow-xl md:overflow-hidden dark:bg-secondaryDark">
             <ErrorBoundary FallbackComponent={ErrorFallback}>
               {route.name === 'messages' && <Messages />}
               {route.name === 'nodes' && (
@@ -99,6 +88,7 @@ export const App = (): JSX.Element => {
             </ErrorBoundary>
           </div>
         </div>
+        <BottomNav />
       </div>
     </div>
   );

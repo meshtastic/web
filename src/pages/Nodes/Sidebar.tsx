@@ -76,9 +76,9 @@ export const Sidebar = ({ node, closeSidebar }: SidebarProps): JSX.Element => {
           <Tab.Panel className="p-2">Content 1</Tab.Panel>
           <Tab.Panel className="p-2">
             {node.currentPosition && (
-              <div className="flex justify-between h-10 px-1 bg-transparent border border-gray-300 rounded-md select-none dark:border-gray-600">
-                <div className="my-auto">
-                  {(node.currentPosition.latitudeI / 1e7).toPrecision(6)},
+              <div className="flex justify-between h-10 px-1 text-gray-500 bg-transparent bg-gray-200 border border-gray-300 rounded-md select-none dark:border-gray-600 dark:bg-secondaryDark dark:text-gray-400 ">
+                <div className="px-1 my-auto">
+                  {(node.currentPosition.latitudeI / 1e7).toPrecision(6)},&nbsp;
                   {(node.currentPosition?.longitudeI / 1e7).toPrecision(6)}
                 </div>
                 <IconButton

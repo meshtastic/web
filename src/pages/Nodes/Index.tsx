@@ -14,6 +14,8 @@ import { IconButton } from '@meshtastic/components';
 import { NodeCard } from './NodeCard';
 import { Sidebar } from './Sidebar';
 
+// const getMarkerRadius = ():number => {}
+
 export const Nodes = (): JSX.Element => {
   const myNodeInfo = useAppSelector((state) => state.meshtastic.radio.hardware);
 
@@ -99,7 +101,11 @@ export const Nodes = (): JSX.Element => {
                   setSelectedNode(node);
                   setSidebarOpen(true);
                 }}
-                className="z-50 bg-blue-500 border-2 border-blue-500 rounded-full bg-opacity-30"
+                className={`z-50 border-2  rounded-full bg-opacity-30 ${
+                  node.number === selectedNode?.number
+                    ? 'bg-green-500 border-green-500'
+                    : 'bg-blue-500 border-blue-500'
+                }`}
               >
                 <div className="m-4 ">
                   <FiMapPin className="w-5 h-5" />

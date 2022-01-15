@@ -1,3 +1,4 @@
+import { execSync } from 'child_process';
 import path from 'path';
 import { defineConfig } from 'vite';
 import importToCDN from 'vite-plugin-cdn-import';
@@ -7,6 +8,11 @@ import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    __COMMIT_HASH__: JSON.stringify(
+      execSync('git rev-parse --short HEAD').toString().trim(),
+    ),
+  },
   plugins: [
     react(),
     importToCDN({

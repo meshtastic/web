@@ -10,8 +10,10 @@ module.exports = {
     extend: {
       colors: {
         primary: '#67ea94',
-        primaryDark: '#1E293B',
-        secondaryDark: '#0F172A',
+        // primaryDark: '#1E293B',
+        primaryDark: '#25262C',
+        // secondaryDark: '#0F172A',
+        secondaryDark: '#1C1D23',
       },
       boxShadow: {
         border: '0 0 0 1px #67ea94',

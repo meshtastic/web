@@ -74,7 +74,7 @@ export const Files = ({ navOpen, setNavOpen }: RangeTestProps): JSX.Element => {
               {data.data.files.map((file: IFile) => (
                 <div
                   key={file.name}
-                  className="flex justify-between mx-4 bg-gray-300 rounded-md dark:bg-gray-600 "
+                  className="flex justify-between mx-4 bg-gray-300 rounded-md dark:bg-secondaryDark "
                 >
                   <div className="flex p-2 max-h-12">
                     <div className="flex w-12">
