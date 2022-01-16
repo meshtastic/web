@@ -110,7 +110,10 @@ export const Sidebar = ({ node, closeSidebar }: SidebarProps): JSX.Element => {
                 icon={isCopied ? <FiCheck /> : <FiClipboard />}
               />
             </div>
-            <JSONPretty className="max-w-sm overflow-auto" data={node} />
+            <JSONPretty
+              className="h-screen max-w-sm pb-40 overflow-y-auto"
+              data={node}
+            />
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>

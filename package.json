@@ -17,6 +17,7 @@
     "@meshtastic/components": "^1.0.17",
     "@meshtastic/meshtasticjs": "^0.6.38",
     "@reduxjs/toolkit": "^1.7.1",
+    "@tippyjs/react": "^4.2.6",
     "base64-js": "^1.5.1",
     "boring-avatars": "^1.6.1",
     "i18next": "^21.6.6",
@@ -37,8 +38,10 @@
     "rfc4648": "^1.5.1",
     "swr": "^1.1.2",
     "timeago-react": "^3.0.4",
+    "tippy.js": "^6.3.7",
     "type-route": "^0.6.0",
-    "use-breakpoint": "^3.0.1"
+    "use-breakpoint": "^3.0.1",
+    "vite-plugin-environment": "^1.1.0"
   },
   "devDependencies": {
     "@types/mapbox-gl": "^2.6.0",
@@ -53,7 +56,7 @@
     "@vitejs/plugin-react": "^1.1.4",
     "autoprefixer": "^10.4.2",
     "babel-plugin-module-resolver": "^4.1.0",
-    "eslint": "8.6.0",
+    "eslint": "8.7.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-babel-module": "^5.3.1",
