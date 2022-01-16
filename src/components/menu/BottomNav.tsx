@@ -32,6 +32,7 @@ import { Tooltip } from '../generic/Tooltip';
 // }
 
 export const BottomNav = (): JSX.Element => {
+  const [showVersionInfo, setShowVersionInfo] = React.useState(false);
   const dispatch = useAppDispatch();
   const meshtasticState = useAppSelector((state) => state.meshtastic);
   const appState = useAppSelector((state) => state.app);
@@ -81,11 +82,14 @@ export const BottomNav = (): JSX.Element => {
         <Tooltip contents={`MQTT Status`}>
           <div className="flex p-1 border-r border-gray-300 cursor-pointer select-none group dark:border-gray-600 dark:text-white hover:bg-gray-200 dark:hover:bg-primaryDark">
             {primaryChannelSettings?.uplinkEnabled &&
-            primaryChannelSettings?.downlinkEnabled ? (
+            primaryChannelSettings?.downlinkEnabled &&
+            !meshtasticState.radio.preferences.mqttDisabled ? (
               <RiArrowUpDownLine className="p-0.5 group-active:scale-90" />
-            ) : primaryChannelSettings?.uplinkEnabled ? (
+            ) : primaryChannelSettings?.uplinkEnabled &&
+              !meshtasticState.radio.preferences.mqttDisabled ? (
               <RiArrowUpLine className="p-0.5 group-active:scale-90" />
-            ) : primaryChannelSettings?.downlinkEnabled ? (
+            ) : primaryChannelSettings?.downlinkEnabled &&
+              !meshtasticState.radio.preferences.mqttDisabled ? (
               <RiArrowDownLine className="p-0.5 group-active:scale-90" />
             ) : (
               <FiX className="p-0.5" />
@@ -96,15 +100,15 @@ export const BottomNav = (): JSX.Element => {
 
       <div className="flex">
         <Tooltip contents={`Current Commit`}>
-          <a
-            href={`https://github.com/meshtastic/meshtastic-web/commit/${process.env.COMMIT_HASH}`}
-            target="_blank"
-            rel="noreferrer"
+          <div
+            onClick={(): void => {
+              setShowVersionInfo(true);
+            }}
             className="flex p-1 border-l border-gray-300 cursor-pointer select-none group dark:border-gray-600 dark:text-white hover:bg-gray-200 dark:hover:bg-primaryDark"
           >
             <FiGitBranch className="p-0.5 mr-1 group-active:scale-90" />
             <p className="text-xs opacity-60">{process.env.COMMIT_HASH}</p>
-          </a>
+          </div>
         </Tooltip>
         <Tooltip contents={`Notifications`}>
           <div className="flex p-1 border-l border-gray-300 cursor-pointer select-none group dark:border-gray-600 dark:text-white hover:bg-gray-200 dark:hover:bg-primaryDark">
