@@ -30,7 +30,7 @@ export const Sidebar = ({ node, closeSidebar }: SidebarProps): JSX.Element => {
   });
 
   return (
-    <div className="absolute z-50 w-full h-full bg-white border-l border-gray-300 md:z-10 md:max-w-sm md:static min-w-max dark:border-gray-600 dark:bg-secondaryDark">
+    <div className="absolute z-50 flex flex-col w-full h-full bg-white border-l border-gray-300 md:z-10 md:max-w-sm md:static min-w-max dark:border-gray-600 dark:bg-secondaryDark">
       <Tab.Group>
         <div className="shadow-md">
           <div className="p-2">
@@ -72,7 +72,7 @@ export const Sidebar = ({ node, closeSidebar }: SidebarProps): JSX.Element => {
             </TabButton>
           </Tab.List>
         </div>
-        <Tab.Panels className="h-full bg-gray-100 dark:bg-primaryDark">
+        <Tab.Panels className="flex-grow overflow-y-auto bg-gray-100 dark:bg-primaryDark">
           <Tab.Panel className="p-2">Content 1</Tab.Panel>
           <Tab.Panel className="p-2">
             {node.currentPosition && (
@@ -101,7 +101,7 @@ export const Sidebar = ({ node, closeSidebar }: SidebarProps): JSX.Element => {
           <Tab.Panel className="p-2">Content 3</Tab.Panel>
           <Tab.Panel className="p-2">Remote Administration</Tab.Panel>
           <Tab.Panel className="relative">
-            <div className="absolute right-0 m-2">
+            <div className="fixed right-0 m-2">
               <IconButton
                 onClick={(): void => {
                   setToCopy(JSON.stringify(node));
@@ -110,10 +110,7 @@ export const Sidebar = ({ node, closeSidebar }: SidebarProps): JSX.Element => {
                 icon={isCopied ? <FiCheck /> : <FiClipboard />}
               />
             </div>
-            <JSONPretty
-              className="h-screen max-w-sm pb-40 overflow-y-auto"
-              data={node}
-            />
+            <JSONPretty className="max-w-sm" data={node} />
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
