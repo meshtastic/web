@@ -19,7 +19,7 @@ export const PrimaryTemplate = ({
 }: PrimaryTemplateProps): JSX.Element => {
   return (
     <div className="flex flex-col flex-auto h-full min-w-0">
-      <div className="flex p-4 bg-white border-b border-gray-300 md:flex-row flex-0 md:items-center md:justify-between md:px-10 dark:border-gray-600 dark:bg-secondaryDark">
+      <div className="flex p-2 bg-white border-b border-gray-300 md:flex-row flex-0 md:items-center md:justify-between md:px-10 dark:border-gray-600 dark:bg-secondaryDark">
         <div className="flex-1 min-w-0">
           <a className="font-medium whitespace-nowrap text-primary">
             {tagline}

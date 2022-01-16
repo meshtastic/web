@@ -4,17 +4,15 @@ import mapbox from 'mapbox-gl';
 import { FiMapPin, FiXCircle } from 'react-icons/fi';
 
 import { Marker } from '@app/components/Map/Marker';
-import type { Node } from '@app/core/slices/meshtasticSlice.js';
+import type { Node } from '@app/core/slices/meshtasticSlice';
 import { Drawer } from '@components/generic/Drawer';
 import { Map } from '@components/Map';
+import { NodeSidebar } from '@components/pages/nodes/NodeSidebar';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { useBreakpoint } from '@hooks/useBreakpoint';
 import { IconButton } from '@meshtastic/components';
 
-import { NodeCard } from './NodeCard';
-import { Sidebar } from './Sidebar';
-
-// const getMarkerRadius = ():number => {}
+import { NodeCard } from '../components/pages/nodes/NodeCard';
 
 export const Nodes = (): JSX.Element => {
   const myNodeInfo = useAppSelector((state) => state.meshtastic.radio.hardware);
@@ -28,9 +26,9 @@ export const Nodes = (): JSX.Element => {
     );
 
   const myNode = nodes.find((node) => node.number === myNodeInfo.myNodeNum);
-  const [navOpen, setNavOpen] = React.useState(false);
 
   const { breakpoint } = useBreakpoint();
+  const [navOpen, setNavOpen] = React.useState(false);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [selectedNode, setSelectedNode] = React.useState<Node | undefined>();
 
@@ -119,7 +117,7 @@ export const Nodes = (): JSX.Element => {
       <Map />
 
       {sidebarOpen && selectedNode && (
-        <Sidebar
+        <NodeSidebar
           closeSidebar={(): void => {
             setSidebarOpen(false);
           }}

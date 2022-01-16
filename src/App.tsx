@@ -11,7 +11,7 @@ import { requestNotificationPermission } from '@core/utils/notifications';
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { Messages } from '@pages/Messages';
-import { Nodes } from '@pages/Nodes/Index';
+import { Nodes } from '@pages/Nodes';
 import { NotFound } from '@pages/NotFound';
 import { Plugins } from '@pages/Plugins/Index';
 import { Settings } from '@pages/settings/Index';
@@ -46,7 +46,6 @@ export const App = (): JSX.Element => {
       );
     }
 
-    // Notification.permission === ''
     requestNotificationPermission().catch((e) => {
       console.log(e);
     });
