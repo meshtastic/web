@@ -41,7 +41,11 @@ export const RangeTest = ({
   }, [reset, preferences]);
 
   const onSubmit = handleSubmit((data) => {
-    void connection.setPreferences(data);
+    void connection.setPreferences(data, async (): Promise<void> => {
+      //add loading indicator
+      reset({ ...data });
+      await Promise.resolve();
+    });
   });
 
   //todo, add loading indicator

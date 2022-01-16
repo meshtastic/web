@@ -23,6 +23,7 @@ interface Notification {
 
 interface AppState {
   mobileNavOpen: boolean;
+  navCollapsed: boolean;
   connectionModalOpen: boolean;
   darkMode: boolean;
   currentPage: currentPageName;
@@ -37,6 +38,7 @@ interface AppState {
 
 const initialState: AppState = {
   mobileNavOpen: false,
+  navCollapsed: false,
   connectionModalOpen: true,
   darkMode: localStorage.getItem('darkMode') === 'true' ?? false,
   currentPage: 'messages',

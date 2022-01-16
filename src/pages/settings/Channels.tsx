@@ -59,6 +59,7 @@ export const Channels = ({
     });
 
     await connection.setChannel(channelData, (): Promise<void> => {
+      reset({ ...data });
       setLoading(false);
       return Promise.resolve();
     });

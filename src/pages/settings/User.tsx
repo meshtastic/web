@@ -67,8 +67,9 @@ export const User = ({ navOpen, setNavOpen }: UserProps): JSX.Element => {
 
     if (node?.user) {
       void connection.setOwner({ ...node.user, ...data }, async () => {
-        await Promise.resolve();
+        reset({ ...data });
         setLoading(false);
+        await Promise.resolve();
       });
       // TODO: can be removed once getUser is implemented
       // dispatch(

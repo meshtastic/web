@@ -20,6 +20,7 @@
     "@tippyjs/react": "^4.2.6",
     "base64-js": "^1.5.1",
     "boring-avatars": "^1.6.1",
+    "graphql-request": "^3.7.0",
     "i18next": "^21.6.6",
     "i18next-browser-languagedetector": "^6.1.2",
     "mapbox-gl": "^2.6.1",

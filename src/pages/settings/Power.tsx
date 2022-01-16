@@ -38,8 +38,9 @@ export const Power = ({ navOpen, setNavOpen }: PowerProps): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
     void connection.setPreferences(data, async () => {
-      await Promise.resolve();
+      reset({ ...data });
       setLoading(false);
+      await Promise.resolve();
     });
   });
   return (

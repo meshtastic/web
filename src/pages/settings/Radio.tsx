@@ -35,8 +35,9 @@ export const Radio = ({ navOpen, setNavOpen }: RadioProps): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
     void connection.setPreferences(data, async () => {
-      await Promise.resolve();
+      reset({ ...data });
       setLoading(false);
+      await Promise.resolve();
     });
   });
   return (

@@ -62,8 +62,9 @@ export const Position = ({
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
     void connection.setPreferences(data, async () => {
-      await Promise.resolve();
+      reset({ ...data });
       setLoading(false);
+      await Promise.resolve();
     });
   });
 

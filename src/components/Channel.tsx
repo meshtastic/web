@@ -77,6 +77,7 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
     });
 
     await connection.setChannel(channelData, (): Promise<void> => {
+      reset({ ...data });
       setLoading(false);
       return Promise.resolve();
     });
