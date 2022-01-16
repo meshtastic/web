@@ -149,14 +149,6 @@ export const Channels = ({
                   suffix="dBm"
                   {...register('settings.txPower', { valueAsNumber: true })}
                 />
-                <Checkbox
-                  label="Uplink Enabled"
-                  {...register('settings.uplinkEnabled')}
-                />
-                <Checkbox
-                  label="Downlink Enabled"
-                  {...register('settings.downlinkEnabled')}
-                />
               </form>
             </div>
           </Card>

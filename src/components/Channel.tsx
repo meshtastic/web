@@ -49,7 +49,7 @@ export const Channel = ({ channel }: ChannelProps): JSX.Element => {
         ].find((role) => role === channel.role)
           ? true
           : false,
-        name: channel.settings?.name,
+        ...channel.settings,
         psk: fromByteArray(channel.settings?.psk ?? new Uint8Array(0)),
       },
     });
