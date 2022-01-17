@@ -110,7 +110,10 @@ export const Plugins = ({ navOpen, setNavOpen }: PluginsProps): JSX.Element => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <IconButton active icon={<FiExternalLink />} />
+                  <IconButton
+                    active={plugin.name === selectedPlugin}
+                    icon={<FiExternalLink />}
+                  />
                 </div>
               </div>
             ))}
