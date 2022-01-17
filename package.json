@@ -14,7 +14,7 @@
   "dependencies": {
     "@floating-ui/react-dom": "^0.4.3",
     "@headlessui/react": "^1.4.3",
-    "@meshtastic/components": "^1.0.17",
+    "@meshtastic/components": "^1.0.19",
     "@meshtastic/meshtasticjs": "^0.6.38",
     "@reduxjs/toolkit": "^1.7.1",
     "@tippyjs/react": "^4.2.6",
@@ -65,7 +65,7 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "gzipper": "^6.2.1",
+    "gzipper": "^7.0.0",
     "postcss": "^8.4.5",
     "prettier": "^2.5.1",
     "tailwindcss": "^3.0.15",

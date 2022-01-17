@@ -26,6 +26,7 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 
 import { Tooltip } from '../generic/Tooltip';
+import { VersionInfo } from '../modals/VersionInfo';
 
 // export interface BottomNavProps {
 
@@ -99,6 +100,12 @@ export const BottomNav = (): JSX.Element => {
       </div>
 
       <div className="flex">
+        <VersionInfo
+          visible={showVersionInfo}
+          onclose={(): void => {
+            setShowVersionInfo(false);
+          }}
+        />
         <Tooltip contents={`Current Commit`}>
           <div
             onClick={(): void => {

@@ -11,7 +11,6 @@ import {
 import { Tooltip } from '@app/components/generic/Tooltip';
 import type { ChannelData } from '@app/core/slices/meshtasticSlice';
 import { FormFooter } from '@components/FormFooter';
-import { Loading } from '@components/generic/Loading';
 import { PrimaryTemplate } from '@components/templates/PrimaryTemplate';
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
@@ -21,11 +20,12 @@ import {
   Checkbox,
   IconButton,
   Input,
+  Loading,
   Select,
 } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
-import { ChannelsSidebar } from '../../components/pages/settings/channels/ChannelsSidebar';
+import { ChannelsSidebar } from '../../components/pages/settings/radio/channels/ChannelsSidebar';
 
 export interface ChannelsProps {
   navOpen?: boolean;

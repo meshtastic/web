@@ -1,19 +1,11 @@
 import type React from 'react';
 
-import { FiGrid, FiMessageSquare, FiPackage, FiSettings } from 'react-icons/fi';
+import { FiGrid, FiMessageSquare, FiSettings } from 'react-icons/fi';
 import type { Link } from 'type-route';
 
 import { routes, useRoute } from '@core/router';
 
-type DefaultDivProps = JSX.IntrinsicElements['div'];
-
-export type NavigationProps = DefaultDivProps;
-
-export const Navigation = ({
-  onClick,
-  className,
-  ...props
-}: NavigationProps): JSX.Element => {
+export const Navigation = (): JSX.Element => {
   const route = useRoute();
 
   return (
@@ -32,13 +24,6 @@ export const Navigation = ({
         icon={<FiGrid className="w-5 h-5 my-auto group-active:scale-90" />}
         active={route.name === 'nodes'}
         link={routes.nodes().link}
-      />
-
-      <NavLink
-        name="Plugins"
-        icon={<FiPackage className="w-5 h-5 my-auto group-active:scale-90" />}
-        active={route.name === 'plugins'}
-        link={routes.plugins().link}
       />
 
       <NavLink

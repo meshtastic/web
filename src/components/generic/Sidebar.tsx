@@ -37,7 +37,7 @@ export const Sidebar = ({
         </div>
       </div>
       {children ?? (
-        <div className="flex flex-grow bg-gray-100 dark:bg-primaryDark">
+        <div className="flex flex-grow bg-gray-50 dark:bg-primaryDark">
           <div className="m-auto text-lg font-medium">Please select item</div>
         </div>
       )}

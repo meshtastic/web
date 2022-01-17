@@ -4,6 +4,7 @@ import {
   FiLayers,
   FiLayout,
   FiMapPin,
+  FiPackage,
   FiRadio,
   FiUser,
   FiWifi,
@@ -15,6 +16,7 @@ import { PageLayout } from '@components/templates/PageLayout';
 
 import { Channels } from './Channels';
 import { Interface } from './Interface';
+import { Plugins } from './Plugins';
 import { Position } from './Position';
 import { Power } from './Power';
 import { Radio } from './Radio';
@@ -31,8 +33,9 @@ export const Settings = (): JSX.Element => {
     <User key={4} />,
     <Power key={5} />,
     <Radio key={6} />,
-    <Channels key={8} />,
-    <Interface key={7} />,
+    <Channels key={7} />,
+    <Plugins key={8} />,
+    <Interface key={9} />,
   ];
 
   const sidebarItems: SidebarItemProps[] = [
@@ -55,6 +58,11 @@ export const Settings = (): JSX.Element => {
       title: 'Channels',
       description: 'Manage channels',
       icon: <FiLayers className="flex-shrink-0 w-6 h-6" />,
+    },
+    {
+      title: 'Plugins',
+      description: 'Plugins',
+      icon: <FiPackage className="flex-shrink-0 w-6 h-6" />,
     },
     {
       title: 'Interface',

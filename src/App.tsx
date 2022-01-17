@@ -13,7 +13,6 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import { Messages } from '@pages/Messages';
 import { Nodes } from '@pages/Nodes';
 import { NotFound } from '@pages/NotFound';
-import { Plugins } from '@pages/Plugins/Index';
 import { Settings } from '@pages/settings/Index';
 
 import { ErrorFallback } from './components/ErrorFallback';
@@ -67,7 +66,7 @@ export const App = (): JSX.Element => {
               <div className="flex">
                 <Logo />
               </div>
-              <Navigation className="flex" />
+              <Navigation />
             </div>
           </div>
         </div>
@@ -81,7 +80,6 @@ export const App = (): JSX.Element => {
                   <Nodes />
                 </MapboxProvider>
               )}
-              {route.name === 'plugins' && <Plugins />}
               {route.name === 'settings' && <Settings />}
               {route.name === false && <NotFound />}
             </ErrorBoundary>

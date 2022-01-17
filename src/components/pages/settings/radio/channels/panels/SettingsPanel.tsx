@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
 import { MdRefresh, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
-import { Loading } from '@app/components/generic/Loading';
+import { Form } from '@app/components/generic/form/Form';
 import { connection } from '@app/core/connection';
 import { Tab } from '@headlessui/react';
 import { Checkbox, IconButton, Input, Select } from '@meshtastic/components';
@@ -73,8 +73,7 @@ export const SettingsPanel = ({ channel }: SettingsPanelProps): JSX.Element => {
 
   return (
     <Tab.Panel className="flex flex-col w-full">
-      {loading && <Loading />}
-      <form className="flex-grow gap-3 p-2">
+      <Form loading={loading}>
         {channel?.index !== 0 && (
           <>
             <Checkbox
@@ -122,7 +121,7 @@ export const SettingsPanel = ({ channel }: SettingsPanelProps): JSX.Element => {
         />
         <Checkbox label="Uplink Enabled" {...register('uplinkEnabled')} />
         <Checkbox label="Downlink Enabled" {...register('downlinkEnabled')} />
-      </form>
+      </Form>
       <div className="flex w-full bg-white dark:bg-secondaryDark">
         <div className="p-2 ml-auto">
           <IconButton
