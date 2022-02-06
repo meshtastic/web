@@ -26,7 +26,7 @@ const initialState: MapState = {
   accessToken:
     'pk.eyJ1Ijoic2FjaGF3IiwiYSI6ImNrNW9meXozZjBsdW0zbHBjM2FnNnV6cmsifQ.3E4n8eFGD9ZOFo-XDVeZnQ',
   style:
-    localStorage.getItem('darkMode') === 'true'
+    localStorage.getItem('darkModeDisabled') !== 'true'
       ? MapStyles.Dark
       : MapStyles.Light,
   hillShade: false,

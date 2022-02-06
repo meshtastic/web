@@ -28,7 +28,7 @@ const initialState: AppState = {
   mobileNavOpen: false,
   navCollapsed: false,
   connectionModalOpen: true,
-  darkMode: localStorage.getItem('darkMode') === 'true' ?? false,
+  darkMode: localStorage.getItem('darkModeDisabled') !== 'true' ?? false,
   currentPage: 'messages',
   connType: connType.HTTP,
   connectionParams: {
@@ -57,7 +57,7 @@ export const appSlice = createSlice({
       state.connectionModalOpen = false;
     },
     setDarkModeEnabled(state, action: PayloadAction<boolean>) {
-      localStorage.setItem('darkMode', String(action.payload));
+      localStorage.setItem('darkModeDisabled', String(!action.payload));
       state.darkMode = action.payload;
     },
     setCurrentPage(state, action: PayloadAction<currentPageName>) {
