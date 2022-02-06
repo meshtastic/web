@@ -1,7 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 
-import type { MapStyle } from '@app/components/Map/styles';
-import { MapStyles } from '@app/components/Map/styles';
+import type { MapStyle } from '@app/pages/Map/styles';
+import { MapStyles } from '@app/pages/Map/styles';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 

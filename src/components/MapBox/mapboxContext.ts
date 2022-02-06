@@ -8,5 +8,5 @@ export interface MapboxContextValue {
 }
 
 export const MapboxContext = React.createContext<MapboxContextValue>(
-  {} as MapboxContextValue
+  {} as MapboxContextValue,
 );

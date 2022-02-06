@@ -23,7 +23,7 @@ export const DeviceStatus = (): JSX.Element => {
       <div className="flex gap-2 px-2">
         <div
           className={`
-        my-auto w-2 h-2 rounded-full min-w-[2] ${
+        my-auto h-2 w-2 min-w-[2] rounded-full ${
           [
             Types.DeviceStatusEnum.DEVICE_CONNECTED,
             Types.DeviceStatusEnum.DEVICE_CONFIGURED,
@@ -44,11 +44,11 @@ export const DeviceStatus = (): JSX.Element => {
           )?.user?.longName ?? 'Disconnected'}
         </div>
         {appState.connType === connType.BLE ? (
-          <FiBluetooth className="w-5 h-5" />
+          <FiBluetooth className="h-5 w-5" />
         ) : appState.connType === connType.SERIAL ? (
-          <FiCpu className="w-5 h-5" />
+          <FiCpu className="h-5 w-5" />
         ) : (
-          <FiWifi className="w-5 h-5" />
+          <FiWifi className="h-5 w-5" />
         )}
       </div>
     </Button>

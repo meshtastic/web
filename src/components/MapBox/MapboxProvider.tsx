@@ -11,7 +11,7 @@ import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { useCreateMapbox } from '@hooks/useCreateMapbox';
 
-import { MapStyles } from '../Map/styles';
+import { MapStyles } from '../../pages/Map/styles';
 import { MapboxContext } from './mapboxContext';
 
 export type MapboxProviderProps = {

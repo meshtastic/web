@@ -4,8 +4,9 @@ import { useForm } from 'react-hook-form';
 import { FiCheck } from 'react-icons/fi';
 
 import { connType } from '@app/core/slices/appSlice';
-import { ble, setConnection } from '@core/connection';
+import { setConnection } from '@core/connection';
 import { Button, IconButton } from '@meshtastic/components';
+import { IBLEConnection } from '@meshtastic/meshtasticjs';
 
 export const BLE = (): JSX.Element => {
   const [bleDevices, setBleDevices] = React.useState<BluetoothDevice[]>([]);
@@ -15,6 +16,7 @@ export const BLE = (): JSX.Element => {
   }>();
 
   const updateBleDeviceList = React.useCallback(async (): Promise<void> => {
+    const ble = new IBLEConnection();
     const devices = await ble.getDevices();
     setBleDevices(devices);
   }, []);
@@ -34,7 +36,7 @@ export const BLE = (): JSX.Element => {
           onClick={async (): Promise<void> => {
             await setConnection(connType.BLE);
           }}
-          className="flex justify-between p-2 bg-gray-700 rounded-md"
+          className="flex justify-between rounded-md bg-gray-700 p-2"
           key={index}
         >
           <div className="my-auto">{device.name}</div>

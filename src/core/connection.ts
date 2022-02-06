@@ -4,6 +4,7 @@ import {
   addMessage,
   addNode,
   addPosition,
+  addRoute,
   addUser,
   resetState,
   setDeviceStatus,
@@ -23,8 +24,6 @@ import {
   Types,
 } from '@meshtastic/meshtasticjs';
 
-import { showNotification } from './utils/notifications';
-
 type connectionType = IBLEConnection | IHTTPConnection | ISerialConnection;
 
 export let connection: connectionType = new IHTTPConnection();
@@ -35,9 +34,6 @@ export const connectionUrl = state.hostOverrideEnabled
   : import.meta.env.PROD
   ? window.location.hostname
   : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ?? 'meshtastic.local';
-
-export const ble = new IBLEConnection();
-export const serial = new ISerialConnection();
 
 export const setConnection = async (conn: connType): Promise<void> => {
   await connection.disconnect();
@@ -75,6 +71,7 @@ export const setConnection = async (conn: connType): Promise<void> => {
 };
 
 export const cleanupListeners = (): void => {
+  connection.onMeshPacket.cancelAll();
   connection.onDeviceStatus.cancelAll();
   connection.onMyNodeInfo.cancelAll();
   connection.onUserPacket.cancelAll();
@@ -87,6 +84,20 @@ export const cleanupListeners = (): void => {
 
 const registerListeners = (): void => {
   SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
+
+  connection.onMeshPacket.subscribe((packet) => {
+    console.log(packet);
+    store.dispatch(
+      addRoute({
+        from: packet.from,
+        to:
+          packet.to === 0xffffffff
+            ? store.getState().meshtastic.radio.hardware.myNodeNum
+            : packet.to,
+        hops: packet.hopLimit,
+      }),
+    );
+  });
 
   connection.onDeviceStatus.subscribe((status) => {
     store.dispatch(setDeviceStatus(status));
@@ -142,6 +153,8 @@ const registerListeners = (): void => {
   );
 
   connection.onRoutingPacket.subscribe((routingPacket) => {
+    console.log(routingPacket);
+
     store.dispatch(
       updateLastInteraction({
         id: routingPacket.packet.from,
@@ -152,13 +165,11 @@ const registerListeners = (): void => {
 
   connection.onTextPacket.subscribe((message) => {
     const myNodeNum = store.getState().meshtastic.radio.hardware.myNodeNum;
-    showNotification('New message', message.data);
 
     store.dispatch(
       addMessage({
         message: message,
         ack: message.packet.from !== myNodeNum,
-        isSender: message.packet.from === myNodeNum,
         received: message.packet.rxTime
           ? new Date(message.packet.rxTime * 1000)
           : new Date(),

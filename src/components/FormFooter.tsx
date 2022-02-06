@@ -16,9 +16,9 @@ export const FormFooter = ({
   saveAction,
 }: FormFooterProps): JSX.Element => {
   return (
-    <div className="flex float-right gap-2">
+    <div className="float-right flex gap-2">
       <IconButton
-        icon={<FiXCircle className="w-5 h-5" />}
+        icon={<FiXCircle className="h-5 w-5" />}
         disabled={!dirty}
         onClick={(): void => {
           clearAction && clearAction();
@@ -29,7 +29,7 @@ export const FormFooter = ({
         onClick={(): void => {
           saveAction && saveAction();
         }}
-        icon={<FiSave className="w-5 h-5" />}
+        icon={<FiSave className="h-5 w-5" />}
       />
     </div>
   );

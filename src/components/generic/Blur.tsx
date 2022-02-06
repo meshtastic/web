@@ -14,14 +14,14 @@ export const Blur = ({
 }: BlurProps): JSX.Element => {
   return (
     <div
-      className={`absolute inset-0 z-20 w-full h-full transition-opacity ${
+      className={`absolute inset-0 z-20 h-full w-full transition-opacity ${
         disableOnMd ? 'md:hidden' : ''
       } ${className}`}
       {...props}
     >
       <div
         onClick={onClick}
-        className={`absolute inset-0 w-full h-full backdrop-filter backdrop-blur-sm ${
+        className={`absolute inset-0 h-full w-full backdrop-blur-sm backdrop-filter ${
           disableOnMd ? 'md:hidden' : ''
         }`}
         tabIndex={0}

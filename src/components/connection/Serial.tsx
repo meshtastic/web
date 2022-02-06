@@ -3,10 +3,11 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { FiCheck } from 'react-icons/fi';
 
-import { serial, setConnection } from '@core/connection';
+import { setConnection } from '@core/connection';
 import { connType, setConnectionParams } from '@core/slices/appSlice';
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { Button, IconButton } from '@meshtastic/components';
+import { ISerialConnection } from '@meshtastic/meshtasticjs';
 
 export const Serial = (): JSX.Element => {
   const [serialDevices, setSerialDevices] = React.useState<SerialPort[]>([]);
@@ -17,6 +18,7 @@ export const Serial = (): JSX.Element => {
   }>();
 
   const updateSerialDeviceList = React.useCallback(async (): Promise<void> => {
+    const serial = new ISerialConnection();
     const devices = await serial.getPorts();
     setSerialDevices(devices);
   }, []);
@@ -34,10 +36,10 @@ export const Serial = (): JSX.Element => {
       {serialDevices.length > 0 ? (
         serialDevices.map((device, index) => (
           <div
-            className="flex justify-between p-2 bg-gray-700 rounded-md"
+            className="flex justify-between rounded-md bg-gray-700 p-2"
             key={index}
           >
-            <div className="flex gap-4 my-auto">
+            <div className="my-auto flex gap-4">
               <p>
                 Vendor: <small>{device.getInfo().usbVendorId}</small>
               </p>
@@ -62,7 +64,7 @@ export const Serial = (): JSX.Element => {
           </div>
         ))
       ) : (
-        <div className="h-40 border border-gray-300 rounded-md dark:border-gray-600">
+        <div className="h-40 rounded-md border border-gray-300 dark:border-gray-600">
           <p>No previously connected devices found</p>
         </div>
       )}

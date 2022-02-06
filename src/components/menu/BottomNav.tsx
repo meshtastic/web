@@ -1,10 +1,10 @@
 import React from 'react';
 
 import {
-  FiBell,
   FiBluetooth,
   FiCpu,
   FiGitBranch,
+  FiMenu,
   FiMoon,
   FiSun,
   FiWifi,
@@ -20,17 +20,14 @@ import {
   connType,
   openConnectionModal,
   setDarkModeEnabled,
+  toggleMobileNav,
 } from '@app/core/slices/appSlice';
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
+import { Tooltip } from '@meshtastic/components';
 import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 
-import { Tooltip } from '../generic/Tooltip';
 import { VersionInfo } from '../modals/VersionInfo';
-
-// export interface BottomNavProps {
-
-// }
 
 export const BottomNav = (): JSX.Element => {
   const [showVersionInfo, setShowVersionInfo] = React.useState(false);
@@ -43,11 +40,26 @@ export const BottomNav = (): JSX.Element => {
     ?.channel.settings;
 
   return (
-    <div className="flex justify-between bg-white border-t border-gray-300 dark:bg-secondaryDark dark:border-gray-600">
+    <div className="z-20 flex justify-between border-t border-gray-300 bg-white dark:border-gray-600 dark:bg-secondaryDark">
       <div className="flex">
-        <Tooltip contents={`Connection Status`}>
+        <Tooltip content="Meshtastic WebUI">
+          <div className="group flex cursor-pointer select-none border-r border-gray-300 p-1 hover:bg-gray-200 dark:border-gray-600 dark:text-white dark:hover:bg-primaryDark">
+            <img
+              title="Logo"
+              className="w-5 dark:hidden"
+              src="/Logo_Black.svg"
+            />
+            <img
+              title="Logo"
+              className="hidden w-5 dark:flex"
+              src="/Logo_White.svg"
+            />
+          </div>
+        </Tooltip>
+
+        <Tooltip content={`Connection Status`}>
           <div
-            className={`flex p-1 cursor-pointer group w-min hover:bg-opacity-80 ${
+            className={`group flex w-min cursor-pointer p-1 hover:bg-opacity-80 ${
               [
                 Types.DeviceStatusEnum.DEVICE_CONNECTED,
                 Types.DeviceStatusEnum.DEVICE_CONFIGURED,
@@ -72,7 +84,7 @@ export const BottomNav = (): JSX.Element => {
             ) : (
               <FiWifi className="mr-1 p-0.5 group-active:scale-90" />
             )}
-            <div className="text-xs font-medium truncate group-active:scale-90">
+            <div className="truncate text-xs font-medium group-active:scale-90">
               {meshtasticState.nodes.find(
                 (node) =>
                   node.number === meshtasticState.radio.hardware.myNodeNum,
@@ -80,8 +92,8 @@ export const BottomNav = (): JSX.Element => {
             </div>
           </div>
         </Tooltip>
-        <Tooltip contents={`MQTT Status`}>
-          <div className="flex p-1 border-r border-gray-300 cursor-pointer select-none group dark:border-gray-600 dark:text-white hover:bg-gray-200 dark:hover:bg-primaryDark">
+        <Tooltip content="MQTT Status">
+          <div className="group flex cursor-pointer select-none border-r border-gray-300 p-1 hover:bg-gray-200 dark:border-gray-600 dark:text-white dark:hover:bg-primaryDark">
             {primaryChannelSettings?.uplinkEnabled &&
             primaryChannelSettings?.downlinkEnabled &&
             !meshtasticState.radio.preferences.mqttDisabled ? (
@@ -98,7 +110,18 @@ export const BottomNav = (): JSX.Element => {
           </div>
         </Tooltip>
       </div>
-
+      <div
+        onClick={(): void => {
+          dispatch(toggleMobileNav());
+        }}
+        className="group flex w-full cursor-pointer select-none border-r border-gray-300 p-1 hover:bg-gray-200 dark:border-gray-600 dark:text-white dark:hover:bg-primaryDark md:hidden"
+      >
+        {appState.mobileNavOpen ? (
+          <FiX className="m-auto p-0.5 group-active:scale-90" />
+        ) : (
+          <FiMenu className="m-auto p-0.5 group-active:scale-90" />
+        )}
+      </div>
       <div className="flex">
         <VersionInfo
           visible={showVersionInfo}
@@ -106,26 +129,22 @@ export const BottomNav = (): JSX.Element => {
             setShowVersionInfo(false);
           }}
         />
-        <Tooltip contents={`Current Commit`}>
+
+        <Tooltip content={`Current Commit`}>
           <div
             onClick={(): void => {
               setShowVersionInfo(true);
             }}
-            className="flex p-1 border-l border-gray-300 cursor-pointer select-none group dark:border-gray-600 dark:text-white hover:bg-gray-200 dark:hover:bg-primaryDark"
+            className="group flex cursor-pointer select-none border-l border-gray-300 p-1 hover:bg-gray-200 dark:border-gray-600 dark:text-white dark:hover:bg-primaryDark"
           >
-            <FiGitBranch className="p-0.5 mr-1 group-active:scale-90" />
+            <FiGitBranch className="mr-1 p-0.5 group-active:scale-90" />
             <p className="text-xs opacity-60">{process.env.COMMIT_HASH}</p>
           </div>
         </Tooltip>
-        <Tooltip contents={`Notifications`}>
-          <div className="flex p-1 border-l border-gray-300 cursor-pointer select-none group dark:border-gray-600 dark:text-white hover:bg-gray-200 dark:hover:bg-primaryDark">
-            <FiBell className="p-0.5 mr-1 group-active:scale-90" />
-            <p className="text-xs opacity-60">Example Notification</p>
-          </div>
-        </Tooltip>
-        <Tooltip contents={`Toggle Theme`}>
+
+        <Tooltip content={`Toggle Theme`}>
           <div
-            className="p-1 border-l border-gray-300 cursor-pointer group dark:border-gray-600 dark:text-white hover:bg-gray-200 dark:hover:bg-primaryDark"
+            className="group cursor-pointer border-l border-gray-300 p-1 hover:bg-gray-200 dark:border-gray-600 dark:text-white dark:hover:bg-primaryDark"
             onClick={(): void => {
               dispatch(setDarkModeEnabled(!appState.darkMode));
             }}

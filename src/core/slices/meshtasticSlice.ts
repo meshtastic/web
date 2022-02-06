@@ -5,12 +5,12 @@ import { createSlice } from '@reduxjs/toolkit';
 export interface MessageWithAck {
   message: Types.TextPacket;
   ack: boolean;
-  isSender: boolean;
   received: Date;
 }
 
 export interface ChannelData {
   channel: Protobuf.Channel;
+  lastChatInterraction: Date;
   messages: MessageWithAck[];
 }
 
@@ -22,6 +22,14 @@ interface CurrentPosition {
   satsInView: number;
 }
 
+interface Route {
+  from: number;
+  to: number;
+  hops: number;
+
+  //speed stats?
+}
+
 export interface Node {
   number: number;
   lastHeard: Date;
@@ -29,6 +37,7 @@ export interface Node {
   positions: Protobuf.Position[];
   currentPosition?: CurrentPosition;
   user?: Protobuf.User;
+  routes: Route[];
 }
 
 export interface Radio {
@@ -90,7 +99,9 @@ export const meshtasticSlice = createSlice({
           node.lastHeard = new Date(action.payload.packet.rxTime * 1000);
         }
       } else {
+        // todo: add node
         console.log('Node not in DB');
+        console.log(action.payload);
       }
     },
     addPosition: (state, action: PayloadAction<Types.PositionPacket>) => {
@@ -142,6 +153,7 @@ export const meshtasticSlice = createSlice({
           lastHeard: new Date(action.payload.lastHeard * 1000),
           snr: [action.payload.snr],
           positions: [],
+          routes: [],
         });
       }
     },
@@ -155,6 +167,7 @@ export const meshtasticSlice = createSlice({
           return channel.channel.index === action.payload.index
             ? {
                 channel: action.payload,
+                lastChatInterraction: new Date(),
                 messages: channel.messages,
               }
             : channel;
@@ -162,9 +175,40 @@ export const meshtasticSlice = createSlice({
       } else {
         state.radio.channels.push({
           channel: action.payload,
+          lastChatInterraction: new Date(),
           messages: [],
         });
       }
+    },
+    addRoute: (state, action: PayloadAction<Route>) => {
+      const node = state.nodes.find(
+        (node) => node.number === action.payload.from,
+      );
+      const exists = node?.routes.findIndex(
+        (route) =>
+          route.from === action.payload.from && route.to === action.payload.to,
+      );
+      console.log(exists);
+
+      if (exists === -1) {
+        node?.routes.push(action.payload);
+      }
+      // node?.routes.map((route) => {
+      //   if (
+
+      //   ) {
+      //     node?.routes.push(action.payload);
+      //   }
+      // });
+
+      // if (node) {
+      //   node.routes = node.routes.map((route) => {
+      //     return route.from === action.payload.from &&
+      //       route.to === action.payload.to
+      //       ? action.payload
+      //       : route;
+      //   });
+      // }
     },
     setPreferences: (
       state,
@@ -178,6 +222,7 @@ export const meshtasticSlice = createSlice({
           channel.channel.index === action.payload.message.packet.channel,
       );
       state.radio.channels[channelIndex].messages.push(action.payload);
+      state.radio.channels[channelIndex].lastChatInterraction = new Date();
     },
     ackMessage: (
       state,
@@ -237,6 +282,7 @@ export const {
   addNode,
   addChannel,
   setPreferences,
+  addRoute,
   addMessage,
   ackMessage,
   updateLastInteraction,

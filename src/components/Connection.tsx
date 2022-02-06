@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { AnimatePresence } from 'framer-motion';
+
 import { BLE } from '@components/connection/BLE';
 import { HTTP } from '@components/connection/HTTP';
 import { Serial } from '@components/connection/Serial';
@@ -46,47 +48,51 @@ export const Connection = (): JSX.Element => {
   }, [state.ready, dispatch]);
 
   return (
-    <Modal
-      className="w-full max-w-3xl"
-      open={appState.connectionModalOpen}
-      onClose={(): void => {
-        dispatch(closeConnectionModal());
-      }}
-    >
-      <Card>
-        <div className="w-full max-w-3xl p-10">
-          {state.deviceStatus === Types.DeviceStatusEnum.DEVICE_DISCONNECTED ? (
-            <div className="space-y-2">
-              <Select
-                label="Connection Method"
-                optionsEnum={connType}
-                value={appState.connType}
-                onChange={(e): void => {
-                  dispatch(setConnType(parseInt(e.target.value)));
-                }}
-              />
-              {appState.connType === connType.HTTP && <HTTP />}
-              {appState.connType === connType.BLE && <BLE />}
-              {appState.connType === connType.SERIAL && <Serial />}
-            </div>
-          ) : (
-            <div>
-              <span>Connecting...</span>
+    <AnimatePresence>
+      {appState.connectionModalOpen && (
+        <Modal
+          className="w-full max-w-3xl"
+          onClose={(): void => {
+            dispatch(closeConnectionModal());
+          }}
+        >
+          <Card>
+            <div className="w-full max-w-3xl p-10">
               {state.deviceStatus ===
-                Types.DeviceStatusEnum.DEVICE_CONNECTED && (
-                <Button
-                  border
-                  onClick={async (): Promise<void> => {
-                    await connection.disconnect();
-                  }}
-                >
-                  Disconnect
-                </Button>
+              Types.DeviceStatusEnum.DEVICE_DISCONNECTED ? (
+                <div className="space-y-2">
+                  <Select
+                    label="Connection Method"
+                    optionsEnum={connType}
+                    value={appState.connType}
+                    onChange={(e): void => {
+                      dispatch(setConnType(parseInt(e.target.value)));
+                    }}
+                  />
+                  {appState.connType === connType.HTTP && <HTTP />}
+                  {appState.connType === connType.BLE && <BLE />}
+                  {appState.connType === connType.SERIAL && <Serial />}
+                </div>
+              ) : (
+                <div>
+                  <span>Connecting...</span>
+                  {state.deviceStatus ===
+                    Types.DeviceStatusEnum.DEVICE_CONNECTED && (
+                    <Button
+                      border
+                      onClick={async (): Promise<void> => {
+                        await connection.disconnect();
+                      }}
+                    >
+                      Disconnect
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
-          )}
-        </div>
-      </Card>
-    </Modal>
+          </Card>
+        </Modal>
+      )}
+    </AnimatePresence>
   );
 };

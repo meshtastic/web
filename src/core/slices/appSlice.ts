@@ -10,17 +10,6 @@ export enum connType {
   SERIAL,
 }
 
-interface Notification {
-  id: string;
-  icon: React.ReactNode;
-  title: string;
-  action?: {
-    message: string;
-    action: () => void;
-  };
-  read: boolean;
-}
-
 interface AppState {
   mobileNavOpen: boolean;
   navCollapsed: boolean;
@@ -33,7 +22,6 @@ interface AppState {
     HTTP: Types.HTTPConnectionParameters;
     SERIAL: Types.SerialConnectionParameters;
   };
-  notifications: Notification[];
 }
 
 const initialState: AppState = {
@@ -53,18 +41,14 @@ const initialState: AppState = {
     },
     SERIAL: {},
   },
-  notifications: [],
 };
 
 export const appSlice = createSlice({
   name: 'app',
   initialState,
   reducers: {
-    openMobileNav(state) {
-      state.mobileNavOpen = true;
-    },
-    closeMobileNav(state) {
-      state.mobileNavOpen = false;
+    toggleMobileNav(state) {
+      state.mobileNavOpen = !state.mobileNavOpen;
     },
     openConnectionModal(state) {
       state.connectionModalOpen = true;
@@ -93,31 +77,17 @@ export const appSlice = createSlice({
       state.connectionParams[connType[action.payload.type]] =
         action.payload.params;
     },
-    addNotification(state, action: PayloadAction<Notification>) {
-      state.notifications.push(action.payload);
-    },
-    removeNotification(state, action: PayloadAction<string>) {
-      state.notifications.splice(
-        state.notifications.findIndex(
-          (notification) => notification.id === action.payload,
-        ),
-        1,
-      );
-    },
   },
 });
 
 export const {
-  openMobileNav,
-  closeMobileNav,
+  toggleMobileNav,
   openConnectionModal,
   closeConnectionModal,
   setDarkModeEnabled,
   setCurrentPage,
   setConnType,
   setConnectionParams,
-  addNotification,
-  removeNotification,
 } = appSlice.actions;
 
 export default appSlice.reducer;

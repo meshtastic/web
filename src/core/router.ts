@@ -2,6 +2,7 @@ import { createRouter, defineRoute } from 'type-route';
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   messages: defineRoute('/'),
+  map: defineRoute('/map'),
   nodes: defineRoute('/nodes'),
-  settings: defineRoute('/settings'),
+  extensions: defineRoute('/extensions'),
 });

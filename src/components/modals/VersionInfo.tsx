@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { AnimatePresence } from 'framer-motion';
+
 import { Modal } from '@components/generic/Modal';
 import { Card } from '@meshtastic/components';
 
@@ -41,16 +43,19 @@ export const VersionInfo = ({
   // console.log(data);
 
   return (
-    <Modal
-      open={visible}
-      onClose={(): void => {
-        onclose();
-      }}
-    >
-      <Card>
-        <div className="w-full max-w-3xl p-10">Version Info</div>
-        {/* {data?.sha} */}
-      </Card>
-    </Modal>
+    <AnimatePresence>
+      {visible && (
+        <Modal
+          onClose={(): void => {
+            onclose();
+          }}
+        >
+          <Card>
+            <div className="w-full max-w-3xl p-10">Version Info</div>
+            {/* {data?.sha} */}
+          </Card>
+        </Modal>
+      )}
+    </AnimatePresence>
   );
 };
