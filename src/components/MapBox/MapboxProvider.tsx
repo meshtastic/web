@@ -37,7 +37,7 @@ export const MapboxProvider = ({
       zoom: mapState.zoom,
       bearing: mapState.bearing,
       pitch: mapState.pitch,
-      style: mapState.style.data,
+      style: MapStyles[mapState.style].data,
     },
   });
 
@@ -81,10 +81,10 @@ export const MapboxProvider = ({
   }, [map, mapState.latLng]);
 
   React.useEffect(() => {
-    if (['Light', 'Dark'].includes(mapState.style.title)) {
-      dispatch(setMapStyle(darkMode ? MapStyles.Dark : MapStyles.Light));
+    if (['Light', 'Dark'].includes(mapState.style)) {
+      dispatch(setMapStyle(darkMode ? 'Dark' : 'Light'));
     }
-  }, [dispatch, darkMode, mapState.style.title]);
+  }, [dispatch, darkMode, mapState.style]);
 
   /**
    * Hill Shading
@@ -125,7 +125,7 @@ export const MapboxProvider = ({
    */
   React.useEffect(() => {
     if (map?.loaded()) {
-      map.setStyle(mapState.style.data);
+      map.setStyle(MapStyles[mapState.style].data);
     }
   }, [map, mapState.style]);
 

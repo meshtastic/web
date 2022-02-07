@@ -1,11 +1,22 @@
 import type { Style } from 'mapbox-gl';
 
+export type MapStyleName =
+  | 'Streets'
+  | 'Outdoors'
+  | 'Light'
+  | 'Dark'
+  | 'Satellite';
+
 export interface MapStyle {
-  title: string;
+  title: MapStyleName;
   data: Style | string;
 }
 
-export const MapStyles = {
+type MapStyleType = {
+  [mapStyleType in MapStyleName]: MapStyle;
+};
+
+export const MapStyles: MapStyleType = {
   Streets: {
     title: 'Streets',
     data: 'mapbox://styles/mapbox/streets-v11?optimize=true',

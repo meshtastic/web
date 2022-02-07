@@ -28,22 +28,22 @@ export const MapContainer = (): JSX.Element => {
     (styleName: string, style: MapStyle) => {
       dispatch(
         setMapStyle(
-          mapState.style.title === styleName
+          mapState.style === styleName
             ? darkMode
-              ? MapStyles.Dark
-              : MapStyles.Light
-            : style,
+              ? 'Dark'
+              : 'Light'
+            : style.title,
         ),
       );
     },
-    [dispatch, darkMode, mapState.style.title],
+    [dispatch, darkMode, mapState.style],
   );
 
   return (
     <div className="relative flex h-full w-full">
       <div className="absolute right-0 z-20 m-4 space-y-2 rounded-md border border-gray-300 bg-white p-2 shadow-md dark:border-gray-600 dark:bg-primaryDark">
         <IconButton
-          active={mapState.style.title === 'Satellite'}
+          active={mapState.style === 'Satellite'}
           onClick={(): void => {
             ChangeMapStyle('Satellite', MapStyles.Satellite);
           }}
@@ -52,17 +52,17 @@ export const MapContainer = (): JSX.Element => {
 
         <div
           className={`-m-1 space-y-2 rounded-md border-gray-300 p-1 dark:border-gray-600 ${
-            mapState.style.title === 'Outdoors' ? 'border' : ''
+            mapState.style === 'Outdoors' ? 'border' : ''
           }`}
         >
           <IconButton
-            active={mapState.style.title === 'Outdoors'}
+            active={mapState.style === 'Outdoors'}
             onClick={(): void => {
               ChangeMapStyle('Outdoors', MapStyles.Outdoors);
             }}
             icon={<FaDirections />}
           />
-          {mapState.style.title === 'Outdoors' && (
+          {mapState.style === 'Outdoors' && (
             <IconButton
               active={mapState.hillShade}
               onClick={(): void => {

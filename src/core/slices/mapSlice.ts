@@ -1,7 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 
-import type { MapStyle } from '@app/pages/Map/styles';
-import { MapStyles } from '@app/pages/Map/styles';
+import type { MapStyleName } from '@app/pages/Map/styles';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -12,7 +11,7 @@ interface MapState {
   bearing: number;
   pitch: number;
   accessToken: string;
-  style: MapStyle;
+  style: MapStyleName;
   hillShade: boolean;
   exaggeration: boolean;
 }
@@ -25,10 +24,7 @@ const initialState: MapState = {
   pitch: 0,
   accessToken:
     'pk.eyJ1Ijoic2FjaGF3IiwiYSI6ImNrNW9meXozZjBsdW0zbHBjM2FnNnV6cmsifQ.3E4n8eFGD9ZOFo-XDVeZnQ',
-  style:
-    localStorage.getItem('darkModeDisabled') !== 'true'
-      ? MapStyles.Dark
-      : MapStyles.Light,
+  style: localStorage.getItem('darkModeDisabled') !== 'true' ? 'Dark' : 'Light',
   hillShade: false,
   exaggeration: true,
 };
@@ -49,7 +45,7 @@ export const mapSlice = createSlice({
     setPitch: (state, action: PayloadAction<number>) => {
       state.pitch = action.payload;
     },
-    setMapStyle(state, action: PayloadAction<MapStyle>) {
+    setMapStyle(state, action: PayloadAction<MapStyleName>) {
       state.style = action.payload;
     },
     setHillShade(state, action: PayloadAction<boolean>) {
