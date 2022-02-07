@@ -47,7 +47,7 @@ export const Messages = (): JSX.Element => {
               }}
               actions={<IconButton icon={<FiSettings />} />}
             >
-              <div className="flex w-8 h-8 bg-gray-200 rounded-full dark:bg-primaryDark dark:text-white">
+              <div className="flex h-8 w-8 rounded-full bg-gray-200 dark:bg-primaryDark dark:text-white">
                 <div className="m-auto">
                   {channel.channel.role === Protobuf.Channel_Role.PRIMARY ? (
                     <MdPublic />
@@ -64,7 +64,7 @@ export const Messages = (): JSX.Element => {
               </div>
               {channel.messages.length ? (
                 <>
-                  <div className="flex h-8 mx-2">
+                  <div className="mx-2 flex h-8">
                     {[
                       ...new Set(
                         channel.messages.flatMap(({ message }) => [
@@ -107,11 +107,11 @@ export const Messages = (): JSX.Element => {
         </div>
       }
     >
-      <div className="flex flex-col w-full">
-        <div className="flex justify-between w-full px-2 border-b border-gray-300 dark:border-gray-600 dark:text-gray-300">
-          <div className="flex py-2 my-auto text-sm">
-            <IconButton icon={<FiHash />} />
-            <div>
+      <div className="flex w-full flex-col">
+        <div className="flex w-full justify-between border-b border-gray-300 px-2 dark:border-gray-600 dark:text-gray-300">
+          <div className="my-auto flex gap-2 py-2 text-sm">
+            <IconButton icon={<FiHash className="h-4 w-4" />} />
+            <div className="my-auto">
               {channels[channelIndex]?.channel.settings?.name.length
                 ? channels[channelIndex]?.channel.settings?.name
                 : channels[channelIndex]?.channel.role ===
@@ -123,7 +123,7 @@ export const Messages = (): JSX.Element => {
         </div>
         <div
           ref={chatRef}
-          className="flex flex-col flex-grow pb-6 space-y-2 overflow-y-auto bg-white border-b border-gray-300 dark:border-gray-600 dark:bg-secondaryDark"
+          className="flex flex-grow flex-col space-y-2 overflow-y-auto border-b border-gray-300 bg-white pb-6 dark:border-gray-600 dark:bg-secondaryDark"
         >
           <div className="mt-auto">
             {channels[channelIndex]?.messages.map((message, index) => (

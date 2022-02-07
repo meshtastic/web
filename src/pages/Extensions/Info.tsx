@@ -21,20 +21,20 @@ export const Info = (): JSX.Element => {
   );
 
   return (
-    <div className="flex flex-col flex-grow w-full gap-4 p-4 select-none">
+    <div className="flex w-full flex-grow select-none flex-col gap-4 p-4">
       <m.div
         whileHover={{ scale: 1.01 }}
-        className="flex flex-col w-full gap-4 p-8 rounded-md shadow-md dark:bg-primaryDark"
+        className="flex w-full flex-col gap-4 rounded-md p-8 shadow-md dark:bg-primaryDark"
       >
         <div className="m-auto">
           <Hashicon value={hardwareInfo.myNodeNum.toString()} size={180} />
         </div>
-        <div className="text-lg font-medium text-center dark:text-white">
+        <div className="text-center text-lg font-medium dark:text-white">
           {node?.user?.longName || 'Unknown'}
         </div>
       </m.div>
 
-      <div className="flex-grow p-8 rounded-md shadow-md dark:bg-primaryDark">
+      <div className="flex-grow rounded-md p-8 shadow-md dark:bg-primaryDark">
         <JSONPretty className="overflow-y-auto" data={hardwareInfo} />
       </div>
     </div>

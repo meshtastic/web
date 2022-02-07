@@ -22,7 +22,7 @@ export const Modal = ({
   return (
     <m.div className={`fixed inset-0 z-30 ${darkMode ? 'dark' : ''}`}>
       <m.div
-        className="fixed w-full h-full backdrop-blur-sm backdrop-filter"
+        className="fixed h-full w-full backdrop-blur-sm backdrop-filter"
         onClick={onClose}
       />
       <m.div className="text-center ">

@@ -23,7 +23,7 @@ export const Layout = ({
   return (
     <div className="flex w-full bg-gray-100 dark:bg-secondaryDark md:overflow-hidden md:shadow-xl">
       <Sidebar>
-        <div className="flex gap-2 p-2 border-b border-gray-300 dark:border-gray-600">
+        <div className="flex gap-2 border-b border-gray-300 p-2 dark:border-gray-600">
           <IconButton icon={icon} />
           <div className="my-auto text-lg font-medium dark:text-white">
             {title}

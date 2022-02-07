@@ -32,7 +32,7 @@ export const MessageBar = ({ channelIndex }: MessageBarProps): JSX.Element => {
     }
   };
   return (
-    <div className="mx-auto flex w-full space-x-2 bg-gray-50 p-4 text-gray-500 dark:bg-transparent dark:text-gray-400">
+    <div className="mx-auto flex w-full space-x-2 bg-gray-50 p-3 text-gray-500 dark:bg-transparent dark:text-gray-400">
       <div className="mx-auto flex w-full max-w-4xl">
         <form
           className="flex w-full space-x-2"

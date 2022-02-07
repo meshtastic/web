@@ -52,6 +52,7 @@ export const MapStyles: MapStyleType = {
           tiles: [
             'https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
           ],
+          maxzoom: 17,
         },
       },
     },
