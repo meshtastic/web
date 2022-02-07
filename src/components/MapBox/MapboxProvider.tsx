@@ -1,5 +1,7 @@
 import React from 'react';
 
+import mapboxgl from 'mapbox-gl';
+
 import {
   setBearing,
   setLatLng,
@@ -35,11 +37,14 @@ export const MapboxProvider = ({
       zoom: mapState.zoom,
       bearing: mapState.bearing,
       pitch: mapState.pitch,
-      style: mapState.style.url,
+      style: mapState.style.data,
     },
   });
 
   React.useEffect(() => {
+    map?.on('load', () => {
+      map.addControl(new mapboxgl.ScaleControl());
+    });
     map?.on('styledata', () => {
       if (!map.getSource('mapbox-dem')) {
         map.addSource('mapbox-dem', {
@@ -120,7 +125,7 @@ export const MapboxProvider = ({
    */
   React.useEffect(() => {
     if (map?.loaded()) {
-      map.setStyle(mapState.style.url);
+      map.setStyle(mapState.style.data);
     }
   }, [map, mapState.style]);
 

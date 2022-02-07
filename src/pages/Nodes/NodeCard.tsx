@@ -114,6 +114,7 @@ export const NodeCard = ({
         close={(): void => {
           setInfoOpen(false);
         }}
+        direction="x"
       >
         <CollapsibleSection title="User" icon={<FiUser />}>
           <div>Info</div>

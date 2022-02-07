@@ -18,7 +18,6 @@ import {
 import { CollapsibleSection } from '@app/components/layout/Sidebar/sections/CollapsibleSection';
 import { ExternalSection } from '@app/components/layout/Sidebar/sections/ExternalSection';
 import { SidebarOverlay } from '@app/components/layout/Sidebar/sections/SidebarOverlay';
-import { SidebarPrimary } from '@app/components/layout/Sidebar/sections/SidebarPrimary';
 import { Channels } from '@app/components/layout/Sidebar/Settings/Channels';
 import { ExternalNotificationsSettingsPlanel } from '@app/components/layout/Sidebar/Settings/plugins/panels/ExternalNotifications/SettingsPlanel';
 import { RangeTestSettingsPanel } from '@app/components/layout/Sidebar/Settings/plugins/panels/RangeTest/SettingsPanel';
@@ -48,12 +47,13 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
 
   return (
     <>
-      <SidebarPrimary
+      <SidebarOverlay
         title="Settings"
         open={open}
         close={(): void => {
           setOpen(false);
         }}
+        direction="y"
       >
         <CollapsibleSection icon={<FiWifi />} title="WiFi & MQTT">
           <WiFi />
@@ -90,7 +90,7 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         <CollapsibleSection icon={<FiLayout />} title="Interface">
           <Interface />
         </CollapsibleSection>
-      </SidebarPrimary>
+      </SidebarOverlay>
 
       {/* Plugins */}
       <SidebarOverlay
@@ -99,6 +99,7 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         close={(): void => {
           setPluginsOpen(false);
         }}
+        direction="x"
       >
         <CollapsibleSection title="Range Test" icon={<FiRss />}>
           <RangeTestSettingsPanel />
@@ -122,6 +123,7 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         close={(): void => {
           setChannelsOpen(false);
         }}
+        direction="x"
       >
         <ChannelsGroup />
       </SidebarOverlay>
