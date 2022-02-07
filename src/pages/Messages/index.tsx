@@ -38,6 +38,26 @@ export const Messages = (): JSX.Element => {
       icon={<FiMessageCircle />}
       sidebarContents={
         <div className="flex flex-col gap-2">
+          {nodes.map((node) => (
+            <SidebarItem
+              key={node.number}
+              selected={false}
+              setSelected={(): void => {
+                void Promise.resolve();
+              }}
+              actions={<IconButton icon={<FiSettings />} />}
+            >
+              <div className="flex dark:text-white">
+                <div className="m-auto">
+                  <Hashicon value={node.number.toString()} size={32} />
+                </div>
+              </div>
+              <div className="my-auto mr-auto font-semibold dark:text-white">
+                {node.user?.longName ?? 'Unknown'}
+              </div>
+            </SidebarItem>
+          ))}
+          <div className="mx-2 rounded-md border-2 border-gray-300 dark:border-gray-600" />
           {channels.map((channel) => (
             <SidebarItem
               key={channel.channel.index}
