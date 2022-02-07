@@ -22,14 +22,14 @@ export const SidebarOverlay = ({
     <AnimatePresence>
       {open && (
         <m.div
-          className="absolute z-20 flex h-full w-full flex-col bg-primaryDark"
+          className="absolute z-20 flex flex-col w-full h-full bg-primaryDark"
           animate={{ translateX: 0 }}
           initial={{ translateX: '-100%' }}
           exit={{ translateX: '-100%' }}
           transition={{ type: 'just' }}
         >
           <AnimateSharedLayout>
-            <div className="flex gap-2 p-2">
+            <div className="flex gap-2 p-2 border-b border-gray-300 dark:border-gray-600">
               <IconButton
                 onClick={(): void => {
                   close();
