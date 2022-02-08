@@ -7,16 +7,13 @@ import TimeAgo from 'timeago-react';
 
 import { Layout } from '@app/components/layout';
 import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
+import { Hashicon } from '@emeraldpay/hashicon-react';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { IconButton, Tooltip } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
-// eslint-disable-next-line import/no-unresolved
-import skypack_hashicon from '@skypack/@emeraldpay/hashicon-react';
 
 import { Message } from './Message';
 import { MessageBar } from './MessageBar';
-
-const Hashicon = skypack_hashicon.Hashicon;
 
 export const Messages = (): JSX.Element => {
   const nodes = useAppSelector((state) => state.meshtastic.nodes);

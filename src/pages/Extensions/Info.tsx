@@ -4,11 +4,7 @@ import { m } from 'framer-motion';
 import JSONPretty from 'react-json-pretty';
 
 import { useAppSelector } from '@app/hooks/useAppSelector.js';
-// eslint-disable-next-line import/no-unresolved
-import skypack_hashicon from '@skypack/@emeraldpay/hashicon-react';
-
-const Hashicon = skypack_hashicon.Hashicon;
-// import { Hashicon } from '@emeraldpay/hashicon-react';
+import { Hashicon } from '@emeraldpay/hashicon-react';
 
 export const Info = (): JSX.Element => {
   const hardwareInfo = useAppSelector(

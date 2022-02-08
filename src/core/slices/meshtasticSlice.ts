@@ -8,6 +8,11 @@ export interface MessageWithAck {
   received: Date;
 }
 
+export interface Chat {
+  id: number; //Channel or user id (for dm's)
+  messages: MessageWithAck[];
+}
+
 export interface ChannelData {
   channel: Protobuf.Channel;
   lastChatInterraction: Date;
@@ -54,6 +59,7 @@ interface MeshtasticState {
   radio: Radio;
   hostOverrideEnabled: boolean;
   hostOverride: string;
+  chats: Chat[];
 }
 
 const initialState: MeshtasticState = {
@@ -71,6 +77,7 @@ const initialState: MeshtasticState = {
   hostOverrideEnabled:
     localStorage.getItem('hostOverrideEnabled') === 'true' ?? false,
   hostOverride: localStorage.getItem('hostOverride') ?? '',
+  chats: [],
 };
 
 export const meshtasticSlice = createSlice({
@@ -260,6 +267,11 @@ export const meshtasticSlice = createSlice({
       localStorage.setItem('hostOverride', action.payload);
       if (state.hostOverride !== action.payload) {
         // connection.disconnect();
+      }
+    },
+    addChat: (state, action: PayloadAction<Chat>) => {
+      if (state.chats.findIndex((chat) => chat.id === action.payload.id)) {
+        state.chats.push(action.payload);
       }
     },
     resetState: (state) => {

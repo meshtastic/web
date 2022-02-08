@@ -17,12 +17,9 @@ import { SidebarOverlay } from '@app/components/layout/Sidebar/sections/SidebarO
 import { SidebarItem } from '@app/components/layout/Sidebar/SidebarItem';
 import { CopyButton } from '@app/components/menu/buttons/CopyButton';
 import type { Node } from '@core/slices/meshtasticSlice';
+import { Hashicon } from '@emeraldpay/hashicon-react';
 import { useMapbox } from '@hooks/useMapbox';
 import { IconButton } from '@meshtastic/components';
-// eslint-disable-next-line import/no-unresolved
-import skypack_hashicon from '@skypack/@emeraldpay/hashicon-react';
-
-const Hashicon = skypack_hashicon.Hashicon;
 
 type PositionConfidence = 'high' | 'low' | 'none';
 

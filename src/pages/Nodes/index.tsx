@@ -8,11 +8,8 @@ import { RiMindMap } from 'react-icons/ri';
 import { Layout } from '@app/components/layout';
 import { SidebarItem } from '@app/components/layout/Sidebar/SidebarItem';
 import { useAppSelector } from '@app/hooks/useAppSelector';
+import { Hashicon } from '@emeraldpay/hashicon-react';
 import { IconButton } from '@meshtastic/components';
-// eslint-disable-next-line import/no-unresolved
-import skypack_hashicon from '@skypack/@emeraldpay/hashicon-react';
-
-const Hashicon = skypack_hashicon.Hashicon;
 
 export const Nodes = (): JSX.Element => {
   const [graphNodes, setGraphNodes] = React.useState<Node[]>([]);

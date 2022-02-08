@@ -1,11 +1,8 @@
 import type React from 'react';
 
 import type { Node } from '@app/core/slices/meshtasticSlice';
+import { Hashicon } from '@emeraldpay/hashicon-react';
 import { Tooltip } from '@meshtastic/components';
-// eslint-disable-next-line import/no-unresolved
-import skypack_hashicon from '@skypack/@emeraldpay/hashicon-react';
-
-const Hashicon = skypack_hashicon.Hashicon;
 
 export interface MessageProps {
   lastMsgSameUser: boolean;
