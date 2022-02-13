@@ -68,13 +68,24 @@ export const Messages = (): JSX.Element => {
         <div className="flex w-full justify-between border-b border-gray-300 px-2 dark:border-gray-600 dark:text-gray-300">
           <div className="my-auto flex gap-2 py-2 text-sm">
             <IconButton icon={<FiHash className="h-4 w-4" />} />
-            {/* <div className="my-auto">
-              {channels[channelIndex]?.settings?.name.length
-                ? channels[channelIndex]?.settings?.name
-                : channels[channelIndex]?.role === Protobuf.Channel_Role.PRIMARY
-                ? 'Primary'
-                : `Channel: ${channels[channelIndex]?.index}`}
-            </div> */}
+            <div className="my-auto">
+              {channels.findIndex((ch) => ch.index === selectedChatIndex) !==
+              -1 ? (
+                <span className="text-gray-500 dark:text-gray-400">
+                  {channels[selectedChatIndex]?.settings?.name.length
+                    ? channels[selectedChatIndex]?.settings?.name
+                    : channels[selectedChatIndex]?.role ===
+                      Protobuf.Channel_Role.PRIMARY
+                    ? 'Primary'
+                    : `Channel: ${channels[selectedChatIndex]?.index}`}
+                </span>
+              ) : (
+                <span className="text-gray-500 dark:text-gray-400">
+                  {nodes.find((n) => n.number === selectedChatIndex)?.user
+                    ?.longName ?? 'Unknown'}
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <div
