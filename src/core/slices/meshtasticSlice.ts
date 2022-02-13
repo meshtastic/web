@@ -9,13 +9,7 @@ export interface MessageWithAck {
 }
 
 export interface Chat {
-  id: number; //Channel or user id (for dm's)
-  messages: MessageWithAck[];
-}
-
-export interface ChannelData {
-  channel: Protobuf.Channel;
-  lastChatInterraction: Date;
+  lastInterraction: Date;
   messages: MessageWithAck[];
 }
 
@@ -26,6 +20,10 @@ interface CurrentPosition {
   posTimestamp: number;
   satsInView: number;
 }
+
+type ChatEntries = {
+  [key in number]: Chat;
+};
 
 interface Route {
   from: number;
@@ -46,7 +44,7 @@ export interface Node {
 }
 
 export interface Radio {
-  channels: ChannelData[];
+  channels: Protobuf.Channel[];
   preferences: Protobuf.RadioConfig_UserPreferences;
   hardware: Protobuf.MyNodeInfo;
 }
@@ -59,7 +57,7 @@ interface MeshtasticState {
   radio: Radio;
   hostOverrideEnabled: boolean;
   hostOverride: string;
-  chats: Chat[];
+  chats: ChatEntries;
 }
 
 const initialState: MeshtasticState = {
@@ -77,7 +75,7 @@ const initialState: MeshtasticState = {
   hostOverrideEnabled:
     localStorage.getItem('hostOverrideEnabled') === 'true' ?? false,
   hostOverride: localStorage.getItem('hostOverride') ?? '',
-  chats: [],
+  chats: {},
 };
 
 export const meshtasticSlice = createSlice({
@@ -167,24 +165,16 @@ export const meshtasticSlice = createSlice({
     addChannel: (state, action: PayloadAction<Protobuf.Channel>) => {
       if (
         state.radio.channels.findIndex(
-          (channel) => channel.channel.index === action.payload.index,
+          (channel) => channel.index === action.payload.index,
         ) !== -1
       ) {
         state.radio.channels = state.radio.channels.map((channel) => {
-          return channel.channel.index === action.payload.index
-            ? {
-                channel: action.payload,
-                lastChatInterraction: new Date(),
-                messages: channel.messages,
-              }
+          return channel.index === action.payload.index
+            ? action.payload
             : channel;
         });
       } else {
-        state.radio.channels.push({
-          channel: action.payload,
-          lastChatInterraction: new Date(),
-          messages: [],
-        });
+        state.radio.channels.push(action.payload);
       }
     },
     addRoute: (state, action: PayloadAction<Route>) => {
@@ -195,27 +185,10 @@ export const meshtasticSlice = createSlice({
         (route) =>
           route.from === action.payload.from && route.to === action.payload.to,
       );
-      console.log(exists);
 
       if (exists === -1) {
         node?.routes.push(action.payload);
       }
-      // node?.routes.map((route) => {
-      //   if (
-
-      //   ) {
-      //     node?.routes.push(action.payload);
-      //   }
-      // });
-
-      // if (node) {
-      //   node.routes = node.routes.map((route) => {
-      //     return route.from === action.payload.from &&
-      //       route.to === action.payload.to
-      //       ? action.payload
-      //       : route;
-      //   });
-      // }
     },
     setPreferences: (
       state,
@@ -224,21 +197,38 @@ export const meshtasticSlice = createSlice({
       state.radio.preferences = action.payload;
     },
     addMessage: (state, action: PayloadAction<MessageWithAck>) => {
-      const channelIndex = state.radio.channels.findIndex(
-        (channel) =>
-          channel.channel.index === action.payload.message.packet.channel,
+      console.log(action.payload);
+
+      console.log(
+        `${action.payload.message.packet.from} -> ${action.payload.message.packet.to}`,
       );
-      state.radio.channels[channelIndex].messages.push(action.payload);
-      state.radio.channels[channelIndex].lastChatInterraction = new Date();
+      state.chats[action.payload.message.packet.channel].lastInterraction =
+        new Date();
+
+      if (action.payload.message.packet.to === 0xffffffff) {
+        console.log('boradcast');
+
+        state.chats[action.payload.message.packet.channel].messages.push(
+          action.payload,
+        );
+      } else {
+        console.log('dm');
+
+        const dmIndex =
+          action.payload.message.packet.from === state.radio.hardware.myNodeNum
+            ? action.payload.message.packet.to
+            : action.payload.message.packet.from;
+
+        state.chats[dmIndex].messages.push(action.payload);
+      }
     },
     ackMessage: (
       state,
-      action: PayloadAction<{ channel: number; messageId: number }>,
+      action: PayloadAction<{ chatIndex: number; messageId: number }>,
     ) => {
-      const channelIndex = state.radio.channels.findIndex(
-        (channel) => channel.channel.index === action.payload.channel,
-      );
-      state.radio.channels[channelIndex].messages.map((message) => {
+      console.log(action.payload);
+
+      state.chats[action.payload.chatIndex].messages.map((message) => {
         if (message.message.packet.id === action.payload.messageId) {
           message.ack = true;
         }
@@ -269,10 +259,11 @@ export const meshtasticSlice = createSlice({
         // connection.disconnect();
       }
     },
-    addChat: (state, action: PayloadAction<Chat>) => {
-      if (state.chats.findIndex((chat) => chat.id === action.payload.id)) {
-        state.chats.push(action.payload);
-      }
+    addChat: (state, action: PayloadAction<number>) => {
+      state.chats[action.payload] = {
+        messages: [],
+        lastInterraction: new Date(),
+      };
     },
     resetState: (state) => {
       state.deviceStatus = Types.DeviceStatusEnum.DEVICE_DISCONNECTED;
@@ -300,6 +291,7 @@ export const {
   updateLastInteraction,
   setHostOverrideEnabled,
   setHostOverride,
+  addChat,
   resetState,
 } = meshtasticSlice.actions;
 

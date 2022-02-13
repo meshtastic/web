@@ -36,8 +36,7 @@ export const BottomNav = (): JSX.Element => {
   const appState = useAppSelector((state) => state.app);
   const primaryChannelSettings = useAppSelector(
     (state) => state.meshtastic.radio.channels,
-  ).find((channel) => channel.channel.role === Protobuf.Channel_Role.PRIMARY)
-    ?.channel.settings;
+  ).find((channel) => channel.role === Protobuf.Channel_Role.PRIMARY)?.settings;
 
   return (
     <div className="z-20 flex justify-between border-t border-gray-300 bg-white dark:border-gray-600 dark:bg-secondaryDark">

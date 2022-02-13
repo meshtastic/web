@@ -9,7 +9,6 @@ import {
 } from 'react-icons/ri';
 
 import { ListItem } from '@app/components/generic/ListItem';
-import type { ChannelData } from '@app/core/slices/meshtasticSlice';
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { Checkbox, Input, Select, Tooltip } from '@meshtastic/components';
@@ -19,19 +18,19 @@ export const Channels = (): JSX.Element => {
   const channels = useAppSelector((state) => state.meshtastic.radio.channels);
   const adminChannel =
     channels.find(
-      (channel) => channel.channel.role === Protobuf.Channel_Role.PRIMARY,
+      (channel) => channel.role === Protobuf.Channel_Role.PRIMARY,
     ) ?? channels[0];
   const [usePreset, setUsePreset] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
   const [selectedChannel, setSelectedChannel] = React.useState<
-    ChannelData | undefined
+    Protobuf.Channel | undefined
   >();
 
   const { register, handleSubmit, reset, formState } = useForm<
     DeepOmit<Protobuf.Channel, 'psk'>
   >({
     defaultValues: {
-      ...adminChannel.channel,
+      ...adminChannel,
     },
   });
 
@@ -42,7 +41,7 @@ export const Channels = (): JSX.Element => {
       ...data,
       settings: {
         ...data.settings,
-        psk: adminChannel.channel.settings?.psk,
+        psk: adminChannel.settings?.psk,
       },
     });
 
@@ -111,7 +110,7 @@ export const Channels = (): JSX.Element => {
       )}
       {channels.map((channel) => (
         <ListItem
-          key={channel.channel.index}
+          key={channel.index}
           onClick={(): void => {
             setSelectedChannel(channel);
           }}
@@ -121,23 +120,23 @@ export const Channels = (): JSX.Element => {
                 [
                   Protobuf.Channel_Role.SECONDARY,
                   Protobuf.Channel_Role.PRIMARY,
-                ].find((role) => role === channel.channel.role)
+                ].find((role) => role === channel.role)
                   ? 'bg-green-500'
                   : 'bg-gray-400'
               }`}
             />
           }
-          selected={selectedChannel?.channel.index === channel.channel.index}
+          selected={selectedChannel?.index === channel.index}
           selectedIcon={<FiExternalLink />}
           actions={
             <Tooltip content={`MQTT Status`}>
               <div className="rounded-md p-2">
-                {channel.channel.settings?.uplinkEnabled &&
-                channel.channel.settings?.downlinkEnabled ? (
+                {channel.settings?.uplinkEnabled &&
+                channel.settings?.downlinkEnabled ? (
                   <RiArrowUpDownLine className="p-0.5 group-active:scale-90" />
-                ) : channel.channel.settings?.uplinkEnabled ? (
+                ) : channel.settings?.uplinkEnabled ? (
                   <RiArrowUpLine className="p-0.5 group-active:scale-90" />
-                ) : channel.channel.settings?.downlinkEnabled ? (
+                ) : channel.settings?.downlinkEnabled ? (
                   <RiArrowDownLine className="p-0.5 group-active:scale-90" />
                 ) : (
                   <FiX className="p-0.5" />
@@ -147,11 +146,11 @@ export const Channels = (): JSX.Element => {
           }
         >
           <div>
-            {channel.channel.settings?.name.length
-              ? channel.channel.settings.name
-              : channel.channel.role === Protobuf.Channel_Role.PRIMARY
+            {channel.settings?.name.length
+              ? channel.settings.name
+              : channel.role === Protobuf.Channel_Role.PRIMARY
               ? 'Primary'
-              : `Channel: ${channel.channel.index}`}
+              : `Channel: ${channel.index}`}
           </div>
         </ListItem>
       ))}

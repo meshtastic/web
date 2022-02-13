@@ -17,21 +17,21 @@ export const ChannelsGroup = (): JSX.Element => {
     <>
       {channels.map((channel) => {
         return (
-          <div key={channel.channel.index}>
+          <div key={channel.index}>
             <CollapsibleSection
               title={
-                channel.channel.settings?.name.length
-                  ? channel.channel.settings.name
-                  : channel.channel.role === Protobuf.Channel_Role.PRIMARY
+                channel.settings?.name.length
+                  ? channel.settings.name
+                  : channel.role === Protobuf.Channel_Role.PRIMARY
                   ? 'Primary'
-                  : `Channel: ${channel.channel.index}`
+                  : `Channel: ${channel.index}`
               }
               icon={
                 <div
                   className={`h-3 w-3 rounded-full ${
-                    channel.channel.role === Protobuf.Channel_Role.PRIMARY
+                    channel.role === Protobuf.Channel_Role.PRIMARY
                       ? 'bg-orange-500'
-                      : channel.channel.role === Protobuf.Channel_Role.SECONDARY
+                      : channel.role === Protobuf.Channel_Role.SECONDARY
                       ? 'bg-green-500'
                       : 'bg-gray-500'
                   }`}
@@ -46,9 +46,9 @@ export const ChannelsGroup = (): JSX.Element => {
               }
             >
               <>
-                {/* <DebugPanel channel={channel.channel} /> */}
-                {/* <QRCodePanel channel={channel.channel} /> */}
-                <SettingsPanel channel={channel.channel} />
+                {/* <DebugPanel channel={channel} /> */}
+                {/* <QRCodePanel channel={channel} /> */}
+                <SettingsPanel channel={channel} />
               </>
             </CollapsibleSection>
           </div>

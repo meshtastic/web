@@ -1,6 +1,7 @@
 import { connType } from '@core/slices/appSlice';
 import {
   addChannel,
+  addChat,
   addMessage,
   addNode,
   addPosition,
@@ -86,7 +87,6 @@ const registerListeners = (): void => {
   SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
 
   connection.onMeshPacket.subscribe((packet) => {
-    console.log(packet);
     store.dispatch(
       addRoute({
         from: packet.from,
@@ -127,6 +127,7 @@ const registerListeners = (): void => {
   connection.onNodeInfoPacket.subscribe(
     (nodeInfoPacket): void | { payload: Protobuf.NodeInfo; type: string } => {
       store.dispatch(addNode(nodeInfoPacket.data));
+      store.dispatch(addChat(nodeInfoPacket.data.num));
     },
   );
 
@@ -134,6 +135,9 @@ const registerListeners = (): void => {
     switch (adminPacket.data.variant.oneofKind) {
       case 'getChannelResponse':
         store.dispatch(addChannel(adminPacket.data.variant.getChannelResponse));
+        store.dispatch(
+          addChat(adminPacket.data.variant.getChannelResponse.index),
+        );
         break;
       case 'getRadioResponse':
         if (adminPacket.data.variant.getRadioResponse.preferences) {
@@ -153,8 +157,6 @@ const registerListeners = (): void => {
   );
 
   connection.onRoutingPacket.subscribe((routingPacket) => {
-    console.log(routingPacket);
-
     store.dispatch(
       updateLastInteraction({
         id: routingPacket.packet.from,

@@ -24,7 +24,7 @@ export const SidebarOverlay = ({
     <AnimatePresence>
       {open && (
         <m.div
-          className="absolute z-10 flex h-full w-full flex-col bg-gray-100 dark:bg-primaryDark"
+          className="absolute z-30 flex h-full w-full flex-col bg-gray-100 dark:bg-primaryDark"
           animate={direction === 'x' ? { translateX: 0 } : { translateY: 0 }}
           initial={
             direction === 'x' ? { translateX: '-100%' } : { translateY: '100%' }

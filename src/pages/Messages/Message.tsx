@@ -1,5 +1,7 @@
 import type React from 'react';
 
+import { FiClock } from 'react-icons/fi';
+
 import type { Node } from '@app/core/slices/meshtasticSlice';
 import { Hashicon } from '@emeraldpay/hashicon-react';
 import { Tooltip } from '@meshtastic/components';
@@ -23,9 +25,11 @@ export const Message = ({
     <div className="group mb-3 hover:bg-gray-200 dark:hover:bg-primaryDark">
       {lastMsgSameUser ? (
         <div
-          className={`mx-6 -mt-3 flex gap-2 ${lastMsgSameUser ? '' : 'py-1'}`}
+          className={`mx-6 -mt-3 flex justify-between ${
+            lastMsgSameUser ? '' : 'py-1'
+          }`}
         >
-          <div className="flex">
+          <div className="flex gap-2">
             <Tooltip content={rxTime.toString()}>
               <div className="my-auto ml-auto w-8 pt-1 text-xs text-transparent dark:group-hover:text-gray-400">
                 {rxTime
@@ -37,14 +41,20 @@ export const Message = ({
                   .replace('PM', '')}
               </div>
             </Tooltip>
+            <div
+              className={`my-auto dark:text-gray-300 ${
+                ack ? '' : 'animate-pulse dark:text-gray-500'
+              }`}
+            >
+              {message}
+            </div>
           </div>
-          <div
-            className={`my-auto dark:text-gray-300 ${
-              ack ? '' : 'animate-pulse dark:text-gray-500'
-            }`}
-          >
-            {message}
-          </div>
+          <Tooltip content="Response time">
+            <div className="flex gap-1 pt-1 text-xs text-transparent dark:group-hover:text-gray-400">
+              <FiClock className="mt-0.5" />
+              <div>25s</div>
+            </div>
+          </Tooltip>
         </div>
       ) : (
         <div className="mx-6 flex gap-2">

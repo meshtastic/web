@@ -40,7 +40,6 @@ export const VersionInfo = ({
   //   }`,
   //   fetcher,
   // );
-  // console.log(data);
 
   return (
     <AnimatePresence>

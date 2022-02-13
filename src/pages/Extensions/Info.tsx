@@ -3,7 +3,7 @@ import React from 'react';
 import { m } from 'framer-motion';
 import JSONPretty from 'react-json-pretty';
 
-import { useAppSelector } from '@app/hooks/useAppSelector.js';
+import { useAppSelector } from '@app/hooks/useAppSelector';
 import { Hashicon } from '@emeraldpay/hashicon-react';
 
 export const Info = (): JSX.Element => {

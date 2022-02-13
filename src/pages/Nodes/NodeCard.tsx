@@ -52,59 +52,61 @@ export const NodeCard = ({
     );
   }, [node.currentPosition]);
   return (
-    <SidebarItem
-      selected={selected}
-      setSelected={setSelected}
-      actions={
-        <>
-          <IconButton
-            disabled={PositionConfidence === 'none'}
-            onClick={(e): void => {
-              e.stopPropagation();
-              setSelected();
-              if (PositionConfidence !== 'none' && node.currentPosition) {
-                map?.flyTo({
-                  center: new mapbox.LngLat(
-                    node.currentPosition.longitudeI / 1e7,
-                    node.currentPosition.latitudeI / 1e7,
-                  ),
-                  zoom: 16,
-                });
+    <>
+      <SidebarItem
+        selected={selected}
+        setSelected={setSelected}
+        actions={
+          <>
+            <IconButton
+              disabled={PositionConfidence === 'none'}
+              onClick={(e): void => {
+                e.stopPropagation();
+                setSelected();
+                if (PositionConfidence !== 'none' && node.currentPosition) {
+                  map?.flyTo({
+                    center: new mapbox.LngLat(
+                      node.currentPosition.longitudeI / 1e7,
+                      node.currentPosition.latitudeI / 1e7,
+                    ),
+                    zoom: 16,
+                  });
+                }
+              }}
+              icon={
+                PositionConfidence === 'high' ? (
+                  <MdGpsFixed />
+                ) : PositionConfidence === 'low' ? (
+                  <MdGpsNotFixed />
+                ) : (
+                  <MdGpsOff />
+                )
               }
-            }}
-            icon={
-              PositionConfidence === 'high' ? (
-                <MdGpsFixed />
-              ) : PositionConfidence === 'low' ? (
-                <MdGpsNotFixed />
-              ) : (
-                <MdGpsOff />
-              )
-            }
-          />
-          <IconButton
-            onClick={(e): void => {
-              e.stopPropagation();
-              setInfoOpen(true);
-            }}
-            icon={<FiAlignLeft />}
-          />
-        </>
-      }
-    >
-      <div className="flex dark:text-white">
-        <div className="m-auto">
-          <Hashicon value={node.number.toString()} size={32} />
+            />
+            <IconButton
+              onClick={(e): void => {
+                e.stopPropagation();
+                setInfoOpen(true);
+              }}
+              icon={<FiAlignLeft />}
+            />
+          </>
+        }
+      >
+        <div className="flex dark:text-white">
+          <div className="m-auto">
+            <Hashicon value={node.number.toString()} size={32} />
+          </div>
         </div>
-      </div>
-      <div className="my-auto mr-auto text-xs font-semibold dark:text-gray-400">
-        {node.lastHeard.getTime()
-          ? node.lastHeard.toLocaleTimeString(undefined, {
-              hour: '2-digit',
-              minute: '2-digit',
-            })
-          : 'Never'}
-      </div>
+        <div className="my-auto mr-auto text-xs font-semibold dark:text-gray-400">
+          {node.lastHeard.getTime()
+            ? node.lastHeard.toLocaleTimeString(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+            : 'Never'}
+        </div>
+      </SidebarItem>
       <SidebarOverlay
         title={`Node ${node.user?.longName ?? 'UNK'} `}
         open={infoOpen}
@@ -134,6 +136,6 @@ export const NodeCard = ({
           </>
         </CollapsibleSection>
       </SidebarOverlay>
-    </SidebarItem>
+    </>
   );
 };

@@ -7,23 +7,38 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import { Input } from '@meshtastic/components';
 
 export interface MessageBarProps {
-  channelIndex: number;
+  chatIndex: number;
 }
 
-export const MessageBar = ({ channelIndex }: MessageBarProps): JSX.Element => {
+export const MessageBar = ({ chatIndex }: MessageBarProps): JSX.Element => {
   const dispatch = useAppDispatch();
-  const ready = useAppSelector((state) => state.meshtastic.ready);
+  const meshtasticState = useAppSelector((state) => state.meshtastic);
+
+  const [isChannel, setIsChannel] = React.useState(false);
+
+  React.useState(() => {
+    setIsChannel(
+      meshtasticState.radio.channels.findIndex(
+        (channel) => channel.index === chatIndex,
+      ) !== -1,
+    );
+  });
 
   const [currentMessage, setCurrentMessage] = React.useState('');
   const sendMessage = (): void => {
-    if (ready) {
+    if (meshtasticState.ready) {
       void connection.sendText(
         currentMessage,
-        undefined,
+        isChannel ? undefined : chatIndex,
         true,
-        channelIndex--,
+        isChannel ? chatIndex-- : 0,
         (id) => {
-          dispatch(ackMessage({ channel: channelIndex--, messageId: id }));
+          dispatch(
+            ackMessage({
+              chatIndex: isChannel ? chatIndex-- : chatIndex,
+              messageId: id,
+            }),
+          );
 
           return Promise.resolve();
         },
@@ -45,7 +60,7 @@ export const MessageBar = ({ channelIndex }: MessageBarProps): JSX.Element => {
             type="text"
             minLength={2}
             placeholder="Enter Message"
-            disabled={!ready}
+            disabled={!meshtasticState.ready}
             value={currentMessage}
             onChange={(e): void => {
               setCurrentMessage(e.target.value);

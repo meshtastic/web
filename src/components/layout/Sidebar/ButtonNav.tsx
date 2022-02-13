@@ -4,8 +4,8 @@ import { FiMessageCircle, FiSettings } from 'react-icons/fi';
 import { RiMindMap, RiRoadMapLine } from 'react-icons/ri';
 import { VscExtensions } from 'react-icons/vsc';
 
-import { toggleMobileNav } from '@app/core/slices/appSlice.js';
-import { useAppDispatch } from '@app/hooks/useAppDispatch.js';
+import { toggleMobileNav } from '@app/core/slices/appSlice';
+import { useAppDispatch } from '@app/hooks/useAppDispatch';
 import { routes, useRoute } from '@core/router';
 
 import { NavLinkButton } from './NavLinkButton';
@@ -21,7 +21,7 @@ export const ButtonNav = ({
   const dispatch = useAppDispatch();
 
   return (
-    <div className="z-10 flex justify-between border-t border-gray-300 px-6 py-2 dark:border-gray-600 dark:bg-primaryDark">
+    <div className="z-30 flex justify-between border-t border-gray-300 px-6 py-2 dark:border-gray-600 dark:bg-primaryDark">
       <div
         onClick={(): void => {
           dispatch(toggleMobileNav());
