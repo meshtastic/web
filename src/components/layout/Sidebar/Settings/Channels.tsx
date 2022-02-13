@@ -1,17 +1,11 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
-import { FiExternalLink, FiX } from 'react-icons/fi';
-import {
-  RiArrowDownLine,
-  RiArrowUpDownLine,
-  RiArrowUpLine,
-} from 'react-icons/ri';
+import { FiSave } from 'react-icons/fi';
 
-import { ListItem } from '@app/components/generic/ListItem';
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { Checkbox, Input, Select, Tooltip } from '@meshtastic/components';
+import { Checkbox, IconButton, Input, Select } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Channels = (): JSX.Element => {
@@ -106,54 +100,19 @@ export const Channels = (): JSX.Element => {
               {...register('settings.txPower', { valueAsNumber: true })}
             />
           </form>
+          <div className="flex w-full bg-white dark:bg-secondaryDark">
+            <div className="ml-auto p-2">
+              <IconButton
+                disabled={!formState.isDirty}
+                onClick={async (): Promise<void> => {
+                  await onSubmit();
+                }}
+                icon={<FiSave />}
+              />
+            </div>
+          </div>
         </>
       )}
-      {channels.map((channel) => (
-        <ListItem
-          key={channel.index}
-          onClick={(): void => {
-            setSelectedChannel(channel);
-          }}
-          status={
-            <div
-              className={`my-auto h-3 w-3 rounded-full ${
-                [
-                  Protobuf.Channel_Role.SECONDARY,
-                  Protobuf.Channel_Role.PRIMARY,
-                ].find((role) => role === channel.role)
-                  ? 'bg-green-500'
-                  : 'bg-gray-400'
-              }`}
-            />
-          }
-          selected={selectedChannel?.index === channel.index}
-          selectedIcon={<FiExternalLink />}
-          actions={
-            <Tooltip content={`MQTT Status`}>
-              <div className="rounded-md p-2">
-                {channel.settings?.uplinkEnabled &&
-                channel.settings?.downlinkEnabled ? (
-                  <RiArrowUpDownLine className="p-0.5 group-active:scale-90" />
-                ) : channel.settings?.uplinkEnabled ? (
-                  <RiArrowUpLine className="p-0.5 group-active:scale-90" />
-                ) : channel.settings?.downlinkEnabled ? (
-                  <RiArrowDownLine className="p-0.5 group-active:scale-90" />
-                ) : (
-                  <FiX className="p-0.5" />
-                )}
-              </div>
-            </Tooltip>
-          }
-        >
-          <div>
-            {channel.settings?.name.length
-              ? channel.settings.name
-              : channel.role === Protobuf.Channel_Role.PRIMARY
-              ? 'Primary'
-              : `Channel: ${channel.index}`}
-          </div>
-        </ListItem>
-      ))}
     </>
   );
 };

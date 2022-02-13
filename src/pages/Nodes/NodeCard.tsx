@@ -116,7 +116,14 @@ export const NodeCard = ({
         direction="x"
       >
         <CollapsibleSection title="User" icon={<FiUser />}>
-          <div>Info</div>
+          <div className="flex  p-2">
+            <div className="m-auto flex flex-col gap-2">
+              <Hashicon value={node.number.toString()} size={180} />
+              <div className="text-center text-lg font-medium dark:text-white">
+                {node?.user?.longName || 'Unknown'}
+              </div>
+            </div>
+          </div>
         </CollapsibleSection>
         <CollapsibleSection title="Location" icon={<FiMapPin />}>
           <div>Info</div>

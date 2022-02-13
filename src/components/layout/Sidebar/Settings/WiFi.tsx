@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { useForm, useWatch } from 'react-hook-form';
+import { FiSave } from 'react-icons/fi';
 
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { Checkbox, Input } from '@meshtastic/components';
+import { Checkbox, IconButton, Input } from '@meshtastic/components';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const WiFi = (): JSX.Element => {
@@ -42,38 +43,51 @@ export const WiFi = (): JSX.Element => {
     });
   });
   return (
-    <form className="space-y-2" onSubmit={onSubmit}>
-      <Checkbox label="Enable WiFi AP" {...register('wifiApMode')} />
-      <Input
-        label="WiFi SSID"
-        disabled={watchWifiApMode}
-        {...register('wifiSsid')}
-      />
-      <Input
-        type="password"
-        autoComplete="off"
-        label="WiFi PSK"
-        disabled={watchWifiApMode}
-        {...register('wifiPassword')}
-      />
-      <Checkbox label="Disable MQTT" {...register('mqttDisabled')} />
-      <Input
-        label="MQTT Server Address"
-        disabled={watchMQTTDisabled}
-        {...register('mqttServer')}
-      />
-      <Input
-        label="MQTT Username"
-        disabled={watchMQTTDisabled}
-        {...register('mqttUsername')}
-      />
-      <Input
-        label="MQTT Password"
-        type="password"
-        autoComplete="off"
-        disabled={watchMQTTDisabled}
-        {...register('mqttPassword')}
-      />
-    </form>
+    <>
+      <form className="space-y-2" onSubmit={onSubmit}>
+        <Checkbox label="Enable WiFi AP" {...register('wifiApMode')} />
+        <Input
+          label="WiFi SSID"
+          disabled={watchWifiApMode}
+          {...register('wifiSsid')}
+        />
+        <Input
+          type="password"
+          autoComplete="off"
+          label="WiFi PSK"
+          disabled={watchWifiApMode}
+          {...register('wifiPassword')}
+        />
+        <Checkbox label="Disable MQTT" {...register('mqttDisabled')} />
+        <Input
+          label="MQTT Server Address"
+          disabled={watchMQTTDisabled}
+          {...register('mqttServer')}
+        />
+        <Input
+          label="MQTT Username"
+          disabled={watchMQTTDisabled}
+          {...register('mqttUsername')}
+        />
+        <Input
+          label="MQTT Password"
+          type="password"
+          autoComplete="off"
+          disabled={watchMQTTDisabled}
+          {...register('mqttPassword')}
+        />
+      </form>
+      <div className="flex w-full bg-white dark:bg-secondaryDark">
+        <div className="ml-auto p-2">
+          <IconButton
+            disabled={!formState.isDirty}
+            onClick={async (): Promise<void> => {
+              await onSubmit();
+            }}
+            icon={<FiSave />}
+          />
+        </div>
+      </div>
+    </>
   );
 };

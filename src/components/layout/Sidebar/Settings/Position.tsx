@@ -1,13 +1,14 @@
 import React from 'react';
 
 import { Controller, useForm } from 'react-hook-form';
+import { FiSave } from 'react-icons/fi';
 import { MultiSelect } from 'react-multi-select-component';
 
 import { bitwiseEncode } from '@app/core/utils/bitwise';
 import { Label } from '@components/generic/form/Label';
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { Checkbox, Input, Select } from '@meshtastic/components';
+import { Checkbox, IconButton, Input, Select } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Position = (): JSX.Element => {
@@ -54,87 +55,100 @@ export const Position = (): JSX.Element => {
   };
 
   return (
-    <form className="space-y-2" onSubmit={onSubmit}>
-      <Input
-        label="Broadcast Interval"
-        type="number"
-        suffix="Seconds"
-        {...register('positionBroadcastSecs', { valueAsNumber: true })}
-      />
+    <>
+      <form className="space-y-2" onSubmit={onSubmit}>
+        <Input
+          label="Broadcast Interval"
+          type="number"
+          suffix="Seconds"
+          {...register('positionBroadcastSecs', { valueAsNumber: true })}
+        />
 
-      <Controller
-        name="positionFlags"
-        control={control}
-        render={({ field, fieldState }): JSX.Element => {
-          const { value, onChange, ...rest } = field;
-          const { error } = fieldState;
-          const label = 'Position Flags';
-          return (
-            <div className="w-full">
-              {label && <Label label={label} error={error?.message} />}
-              <MultiSelect
-                options={Object.entries(Protobuf.PositionFlags)
-                  .filter((value) => typeof value[1] !== 'number')
-                  .filter(
-                    (value) =>
-                      parseInt(value[0]) !==
-                      Protobuf.PositionFlags.POS_UNDEFINED,
-                  )
-                  .map((value) => {
+        <Controller
+          name="positionFlags"
+          control={control}
+          render={({ field, fieldState }): JSX.Element => {
+            const { value, onChange, ...rest } = field;
+            const { error } = fieldState;
+            const label = 'Position Flags';
+            return (
+              <div className="w-full">
+                {label && <Label label={label} error={error?.message} />}
+                <MultiSelect
+                  options={Object.entries(Protobuf.PositionFlags)
+                    .filter((value) => typeof value[1] !== 'number')
+                    .filter(
+                      (value) =>
+                        parseInt(value[0]) !==
+                        Protobuf.PositionFlags.POS_UNDEFINED,
+                    )
+                    .map((value) => {
+                      return {
+                        value: parseInt(value[0]),
+                        label: value[1].toString().replace('POS_', ''),
+                      };
+                    })}
+                  value={decode(value).map((flag) => {
                     return {
-                      value: parseInt(value[0]),
-                      label: value[1].toString().replace('POS_', ''),
+                      value: flag,
+                      label: Protobuf.PositionFlags[flag].replace('POS_', ''),
                     };
                   })}
-                value={decode(value).map((flag) => {
-                  return {
-                    value: flag,
-                    label: Protobuf.PositionFlags[flag].replace('POS_', ''),
-                  };
-                })}
-                onChange={(e: { value: number; label: string }[]): void =>
-                  onChange(bitwiseEncode(e.map((v) => v.value)))
-                }
-                labelledBy="Select"
-              />
-            </div>
-          );
-        }}
-      />
+                  onChange={(e: { value: number; label: string }[]): void =>
+                    onChange(bitwiseEncode(e.map((v) => v.value)))
+                  }
+                  labelledBy="Select"
+                />
+              </div>
+            );
+          }}
+        />
 
-      <Input
-        label="Position Type (DEBUG)"
-        type="number"
-        disabled
-        {...register('positionFlags', { valueAsNumber: true })}
-      />
-      <Checkbox label="Use Fixed Position" {...register('fixedPosition')} />
-      <Select
-        label="Location Sharing"
-        optionsEnum={Protobuf.LocationSharing}
-        {...register('locationShare', { valueAsNumber: true })}
-      />
-      <Select
-        label="GPS Mode"
-        optionsEnum={Protobuf.GpsOperation}
-        {...register('gpsOperation', { valueAsNumber: true })}
-      />
-      <Select
-        label="Display Format"
-        optionsEnum={Protobuf.GpsCoordinateFormat}
-        {...register('gpsFormat', { valueAsNumber: true })}
-      />
-      <Checkbox label="Accept 2D Fix" {...register('gpsAccept2D')} />
-      <Input
-        label="Max DOP"
-        type="number"
-        {...register('gpsMaxDop', { valueAsNumber: true })}
-      />
-      <Input
-        label="Last GPS Attempt"
-        disabled
-        {...register('gpsAttemptTime', { valueAsNumber: true })}
-      />
-    </form>
+        <Input
+          label="Position Type (DEBUG)"
+          type="number"
+          disabled
+          {...register('positionFlags', { valueAsNumber: true })}
+        />
+        <Checkbox label="Use Fixed Position" {...register('fixedPosition')} />
+        <Select
+          label="Location Sharing"
+          optionsEnum={Protobuf.LocationSharing}
+          {...register('locationShare', { valueAsNumber: true })}
+        />
+        <Select
+          label="GPS Mode"
+          optionsEnum={Protobuf.GpsOperation}
+          {...register('gpsOperation', { valueAsNumber: true })}
+        />
+        <Select
+          label="Display Format"
+          optionsEnum={Protobuf.GpsCoordinateFormat}
+          {...register('gpsFormat', { valueAsNumber: true })}
+        />
+        <Checkbox label="Accept 2D Fix" {...register('gpsAccept2D')} />
+        <Input
+          label="Max DOP"
+          type="number"
+          {...register('gpsMaxDop', { valueAsNumber: true })}
+        />
+        <Input
+          label="Last GPS Attempt"
+          disabled
+          {...register('gpsAttemptTime', { valueAsNumber: true })}
+        />
+      </form>
+      <div className="flex w-full bg-white dark:bg-secondaryDark">
+        <div className="ml-auto p-2">
+          <IconButton
+            disabled={!formState.isDirty}
+            onClick={async (): Promise<void> => {
+              await onSubmit();
+            }}
+            icon={<FiSave />}
+          />
+        </div>
+      </div>
+    </>
   );
 };

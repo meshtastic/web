@@ -38,12 +38,12 @@ export const Messages = (): JSX.Element => {
       icon={<FiMessageCircle />}
       sidebarContents={
         <div className="flex flex-col gap-2">
-          {nodes
-            .filter((node) => node.number !== myNodeNum)
-            .map((node) => (
-              <DmChat
-                key={node.number}
-                node={node}
+          {channels
+            .filter((channel) => channel.settings?.name !== 'admin')
+            .map((channel) => (
+              <ChannelChat
+                key={channel.index}
+                channel={channel}
                 selectedIndex={selectedChatIndex}
                 setSelectedIndex={setSelectedChatIndex}
               />
@@ -51,12 +51,12 @@ export const Messages = (): JSX.Element => {
           {nodes.length !== 0 && channels.length !== 0 && (
             <div className="mx-2 rounded-md border-2 border-gray-300 dark:border-gray-600" />
           )}
-          {channels
-            .filter((channel) => channel.settings?.name !== 'admin')
-            .map((channel) => (
-              <ChannelChat
-                key={channel.index}
-                channel={channel}
+          {nodes
+            .filter((node) => node.number !== myNodeNum)
+            .map((node) => (
+              <DmChat
+                key={node.number}
+                node={node}
                 selectedIndex={selectedChatIndex}
                 setSelectedIndex={setSelectedChatIndex}
               />

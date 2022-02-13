@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
+import { FiSave } from 'react-icons/fi';
 
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { Checkbox, Select } from '@meshtastic/components';
+import { Checkbox, IconButton, Select } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Radio = (): JSX.Element => {
@@ -30,15 +31,28 @@ export const Radio = (): JSX.Element => {
     });
   });
   return (
-    <form className="space-y-2" onSubmit={onSubmit}>
-      <Checkbox label="Is Router" {...register('isRouter')} />
-      <Select
-        label="Region"
-        optionsEnum={Protobuf.RegionCode}
-        {...register('region', { valueAsNumber: true })}
-      />
-      <Checkbox label="Debug Log" {...register('debugLogEnabled')} />
-      <Checkbox label="Serial Disabled" {...register('serialDisabled')} />
-    </form>
+    <>
+      <form className="space-y-2" onSubmit={onSubmit}>
+        <Checkbox label="Is Router" {...register('isRouter')} />
+        <Select
+          label="Region"
+          optionsEnum={Protobuf.RegionCode}
+          {...register('region', { valueAsNumber: true })}
+        />
+        <Checkbox label="Debug Log" {...register('debugLogEnabled')} />
+        <Checkbox label="Serial Disabled" {...register('serialDisabled')} />
+      </form>
+      <div className="flex w-full bg-white dark:bg-secondaryDark">
+        <div className="ml-auto p-2">
+          <IconButton
+            disabled={!formState.isDirty}
+            onClick={async (): Promise<void> => {
+              await onSubmit();
+            }}
+            icon={<FiSave />}
+          />
+        </div>
+      </div>
+    </>
   );
 };
