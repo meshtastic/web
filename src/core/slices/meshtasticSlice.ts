@@ -58,6 +58,7 @@ interface MeshtasticState {
   hostOverrideEnabled: boolean;
   hostOverride: string;
   chats: ChatEntries;
+  logs: Types.LogEventPacket[];
 }
 
 const initialState: MeshtasticState = {
@@ -76,12 +77,16 @@ const initialState: MeshtasticState = {
     localStorage.getItem('hostOverrideEnabled') === 'true' ?? false,
   hostOverride: localStorage.getItem('hostOverride') ?? '',
   chats: {},
+  logs: [],
 };
 
 export const meshtasticSlice = createSlice({
   name: 'meshtastic',
   initialState,
   reducers: {
+    addLogEvent: (state, action: PayloadAction<Types.LogEventPacket>) => {
+      state.logs.push(action.payload);
+    },
     setDeviceStatus: (state, action: PayloadAction<Types.DeviceStatusEnum>) => {
       state.deviceStatus = action.payload;
     },
@@ -276,6 +281,7 @@ export const meshtasticSlice = createSlice({
 });
 
 export const {
+  addLogEvent,
   setDeviceStatus,
   setLastMeshInterraction,
   setReady,

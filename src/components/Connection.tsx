@@ -57,7 +57,7 @@ export const Connection = (): JSX.Element => {
           }}
         >
           <Card>
-            <div className="w-full max-w-3xl p-10">
+            <div className="flex w-full max-w-3xl justify-between p-10">
               {state.deviceStatus ===
               Types.DeviceStatusEnum.DEVICE_DISCONNECTED ? (
                 <div className="space-y-2">
@@ -89,6 +89,21 @@ export const Connection = (): JSX.Element => {
                   )}
                 </div>
               )}
+              <div className="rounded-md bg-secondaryDark p-2">
+                {state.logs.map((log, index) => (
+                  <div className="flex">
+                    <div>
+                      [
+                      {log.date.toLocaleTimeString(undefined, {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                      ]
+                    </div>
+                    <div key={index}>{log.message}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </Card>
         </Modal>

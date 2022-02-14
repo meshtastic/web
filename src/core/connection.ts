@@ -2,6 +2,7 @@ import { connType } from '@core/slices/appSlice';
 import {
   addChannel,
   addChat,
+  addLogEvent,
   addMessage,
   addNode,
   addPosition,
@@ -85,6 +86,10 @@ export const cleanupListeners = (): void => {
 
 const registerListeners = (): void => {
   SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;
+
+  connection.onLogEvent.subscribe((log) => {
+    store.dispatch(addLogEvent(log));
+  });
 
   connection.onMeshPacket.subscribe((packet) => {
     store.dispatch(
