@@ -40,7 +40,7 @@ specifiers:
   react-hook-form: ^7.27.0
   react-icons: ^4.3.1
   react-json-pretty: ^2.2.0
-  react-multi-select-component: ^4.2.1
+  react-multi-select-component: ^4.2.2
   react-qr-code: ^2.0.3
   react-redux: ^7.2.6
   react-use-clipboard: ^1.0.7
@@ -75,7 +75,7 @@ dependencies:
   react-hook-form: 7.27.0_react@17.0.2
   react-icons: 4.3.1_react@17.0.2
   react-json-pretty: 2.2.0_react-dom@17.0.2+react@17.0.2
-  react-multi-select-component: 4.2.1_react-dom@17.0.2+react@17.0.2
+  react-multi-select-component: 4.2.2_react-dom@17.0.2+react@17.0.2
   react-qr-code: 2.0.3_react@17.0.2
   react-redux: 7.2.6_react-dom@17.0.2+react@17.0.2
   react-use-clipboard: 1.0.7_react-dom@17.0.2+react@17.0.2
@@ -4875,8 +4875,8 @@ packages:
       react-dom: 17.0.2_react@17.0.2
     dev: false
 
-  /react-multi-select-component/4.2.1_react-dom@17.0.2+react@17.0.2:
-    resolution: {integrity: sha512-wRteBq1pqKLlYX/ob8I1aBapPokQiRzOJzVqJDVVTHb0Ap/QWXVE4OXE2xwhVf3qmmYvOguvOKQQbQiEYxhONA==}
+  /react-multi-select-component/4.2.2_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-FvlHp1a4LzwJr121mq4q8NnO4l9HgDo7Z9gk4uCzhRygc78QmqoEcgKEwfcfaQKJp2HAZw4b31P87ex2mLK38A==}
     peerDependencies:
       react: ^16 || ^17
       react-dom: ^16 || ^17

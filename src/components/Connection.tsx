@@ -57,52 +57,50 @@ export const Connection = (): JSX.Element => {
           }}
         >
           <Card>
-            <div className="flex w-full max-w-3xl justify-between p-10">
-              {state.deviceStatus ===
-              Types.DeviceStatusEnum.DEVICE_DISCONNECTED ? (
-                <div className="space-y-2">
-                  <Select
-                    label="Connection Method"
-                    optionsEnum={connType}
-                    value={appState.connType}
-                    onChange={(e): void => {
-                      dispatch(setConnType(parseInt(e.target.value)));
-                    }}
-                  />
-                  {appState.connType === connType.HTTP && <HTTP />}
-                  {appState.connType === connType.BLE && <BLE />}
-                  {appState.connType === connType.SERIAL && <Serial />}
-                </div>
-              ) : (
-                <div>
-                  <span>Connecting...</span>
-                  {state.deviceStatus ===
-                    Types.DeviceStatusEnum.DEVICE_CONNECTED && (
-                    <Button
-                      border
-                      onClick={async (): Promise<void> => {
-                        await connection.disconnect();
+            <div className="flex w-full max-w-3xl gap-2 p-2">
+              <div className="w-1/2">
+                {state.deviceStatus ===
+                Types.DeviceStatusEnum.DEVICE_DISCONNECTED ? (
+                  <div className="space-y-2">
+                    <Select
+                      label="Connection Method"
+                      optionsEnum={connType}
+                      value={appState.connType}
+                      onChange={(e): void => {
+                        dispatch(setConnType(parseInt(e.target.value)));
                       }}
-                    >
-                      Disconnect
-                    </Button>
-                  )}
-                </div>
-              )}
-              <div className="rounded-md bg-secondaryDark p-2">
-                {state.logs.map((log, index) => (
-                  <div className="flex">
-                    <div>
-                      [
-                      {log.date.toLocaleTimeString(undefined, {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                      ]
-                    </div>
-                    <div key={index}>{log.message}</div>
+                    />
+                    {appState.connType === connType.HTTP && <HTTP />}
+                    {appState.connType === connType.BLE && <BLE />}
+                    {appState.connType === connType.SERIAL && <Serial />}
                   </div>
-                ))}
+                ) : (
+                  <div>
+                    <span>Connecting...</span>
+                    {state.deviceStatus ===
+                      Types.DeviceStatusEnum.DEVICE_CONNECTED && (
+                      <Button
+                        border
+                        onClick={async (): Promise<void> => {
+                          await connection.disconnect();
+                        }}
+                      >
+                        Disconnect
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="w-1/2 ">
+                <div className="h-96 overflow-y-auto rounded-md bg-secondaryDark p-2">
+                  {state.logs.map((log, index) => (
+                    <div key={index} className="flex">
+                      <div>[{log.date.toISOString()}]</div>
+                      <div>[{log.emitter}]</div>
+                      <div key={index}>{log.message}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </Card>

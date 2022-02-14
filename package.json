@@ -28,7 +28,7 @@
     "react-hook-form": "^7.27.0",
     "react-icons": "^4.3.1",
     "react-json-pretty": "^2.2.0",
-    "react-multi-select-component": "^4.2.1",
+    "react-multi-select-component": "^4.2.2",
     "react-qr-code": "^2.0.3",
     "react-redux": "^7.2.6",
     "react-use-clipboard": "^1.0.7",

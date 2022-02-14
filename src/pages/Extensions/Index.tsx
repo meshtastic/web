@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { FiFile, FiInfo } from 'react-icons/fi';
+import { MdSubject } from 'react-icons/md';
 import { RiPinDistanceFill } from 'react-icons/ri';
 import { VscExtensions } from 'react-icons/vsc';
 
@@ -9,10 +10,11 @@ import { ExternalSection } from '@app/components/layout/Sidebar/sections/Externa
 
 import { FileBrowser } from './FileBrowser';
 import { Info } from './Info';
+import { Logs } from './Logs';
 
 export const Extensions = (): JSX.Element => {
   const [selectedExtension, setSelectedExtension] = React.useState<
-    'info' | 'fileBrowser' | 'rangeTest'
+    'info' | 'logs' | 'fileBrowser' | 'rangeTest'
   >('info');
 
   return (
@@ -27,6 +29,13 @@ export const Extensions = (): JSX.Element => {
             }}
             icon={<FiInfo />}
             title="Node Info"
+          />
+          <ExternalSection
+            onClick={(): void => {
+              setSelectedExtension('logs');
+            }}
+            icon={<MdSubject />}
+            title="Logs"
           />
           <ExternalSection
             onClick={(): void => {
@@ -47,6 +56,8 @@ export const Extensions = (): JSX.Element => {
     >
       <div className="w-full">
         {selectedExtension === 'info' && <Info />}
+
+        {selectedExtension === 'logs' && <Logs />}
 
         {selectedExtension === 'fileBrowser' && <FileBrowser />}
       </div>
