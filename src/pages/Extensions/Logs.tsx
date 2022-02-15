@@ -1,62 +1,115 @@
-import React from 'react';
+import type React from 'react';
+
+import { m } from 'framer-motion';
+import { FiArrowRight } from 'react-icons/fi';
 
 import { useAppSelector } from '@app/hooks/useAppSelector';
-import { Protobuf } from '@meshtastic/meshtasticjs';
+import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 
 export const Logs = (): JSX.Element => {
   const logs = useAppSelector((state) => state.meshtastic.logs);
 
-  const logColor = (level: Protobuf.LogRecord_Level): string => {
-    switch (level) {
-      case Protobuf.LogRecord_Level.UNSET:
-        return 'text-blue-500';
-      case Protobuf.LogRecord_Level.CRITICAL:
-        return 'text-blue-500';
-      case Protobuf.LogRecord_Level.ERROR:
-        return 'text-blue-500';
-      case Protobuf.LogRecord_Level.WARNING:
-        return 'text-blue-500';
-      case Protobuf.LogRecord_Level.INFO:
-        return 'text-blue-500';
-      case Protobuf.LogRecord_Level.DEBUG:
-        return 'text-blue-500';
-      case Protobuf.LogRecord_Level.TRACE:
-        return 'text-blue-500';
-    }
+  type lookupType = { [key: number]: string };
+
+  const emitterLookup: lookupType = {
+    [Types.Emitter.sendPacket]: 'text-blue-500',
+    [Types.Emitter.sendText]: 'text-blue-500',
+    [Types.Emitter.sendPacket]: 'text-blue-500',
+    [Types.Emitter.sendRaw]: 'text-blue-500',
+    [Types.Emitter.setPreferences]: 'text-blue-500',
+    [Types.Emitter.confirmSetPreferences]: 'text-blue-500',
+    [Types.Emitter.setOwner]: 'text-blue-500',
+    [Types.Emitter.setChannel]: 'text-blue-500',
+    [Types.Emitter.confirmSetChannel]: 'text-blue-500',
+    [Types.Emitter.deleteChannel]: 'text-blue-500',
+    [Types.Emitter.getChannel]: 'text-blue-500',
+    [Types.Emitter.getAllChannels]: 'text-blue-500',
+    [Types.Emitter.getPreferences]: 'text-blue-500',
+    [Types.Emitter.getOwner]: 'text-blue-500',
+    [Types.Emitter.configure]: 'text-blue-500',
+    [Types.Emitter.handleFromRadio]: 'text-blue-500',
+    [Types.Emitter.handleMeshPacket]: 'text-blue-500',
+    [Types.Emitter.connect]: 'text-blue-500',
+    [Types.Emitter.ping]: 'text-blue-500',
+    [Types.Emitter.readFromRadio]: 'text-blue-500',
+    [Types.Emitter.writeToRadio]: 'text-blue-500',
+    [Types.Emitter.setDebugMode]: 'text-blue-500',
   };
 
-  const stringToColour = (str: string) => {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    let colour = '#';
-    for (let i = 0; i < 3; i++) {
-      const value = (hash >> (i * 8)) & 0xff;
-      colour += ('00' + value.toString(16)).substr(-2);
-    }
-    return colour;
+  const levelLookup: lookupType = {
+    [Protobuf.LogRecord_Level.UNSET]: 'text-green-500',
+    [Protobuf.LogRecord_Level.CRITICAL]: 'text-purple-500',
+    [Protobuf.LogRecord_Level.ERROR]: 'text-red-500',
+    [Protobuf.LogRecord_Level.WARNING]: 'text-orange-500',
+    [Protobuf.LogRecord_Level.INFO]: 'text-blue-500',
+    [Protobuf.LogRecord_Level.DEBUG]: 'text-neutral-500',
+    [Protobuf.LogRecord_Level.TRACE]: 'text-slate-500',
   };
 
   return (
-    <div className="flex h-full w-full select-none flex-col gap-4 p-4">
-      <div className="flex w-full select-none flex-col gap-2 overflow-y-auto rounded-md p-4 shadow-md dark:bg-primaryDark">
-        {logs.map((log, index) => (
-          <div key={index} className="flex gap-2">
-            <div className="text-sm font-light dark:text-gray-400">
-              {log.date.toISOString()}
-            </div>
-            <div>[{log.emitter}]</div>
-            <div className={`text-sm font-medium ${logColor(log.level)}`}>
-              [{Protobuf.LogRecord_Level[log.level]}]
-            </div>
-            <div style={{ color: stringToColour(log.emitter) }}>
-              {stringToColour(log.emitter)}
-            </div>
-            <div>{log.message}</div>
-          </div>
-        ))}
-      </div>
+    <div className="flex h-full p-4 ">
+      <table className="table-cell h-full w-full select-none rounded-md dark:bg-primaryDark">
+        {/* \/ flex flex-col gap-2 */}
+        <tbody
+          className="
+          block h-full flex-col overflow-y-auto py-4 px-2 font-mono text-xs dark:text-gray-400"
+        >
+          {logs.map((log, index) => (
+            <tr key={index} className="group hover:bg-secondaryDark">
+              <m.td
+                className="w-6 cursor-pointer"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+              >
+                <div className="m-auto pl-2 dark:text-primaryDark dark:group-hover:text-gray-400">
+                  <FiArrowRight />
+                </div>
+              </m.td>
+              <Wrapper>
+                {log.date
+                  .toLocaleString(undefined, {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                  })
+                  .replaceAll('/', '-')
+                  .replace(',', '')}
+              </Wrapper>
+              <Wrapper>
+                <div className={emitterLookup[log.emitter]}>
+                  [{Types.EmitterScope[log.scope]}.{Types.Emitter[log.emitter]}]
+                </div>
+              </Wrapper>
+              <Wrapper className={levelLookup[log.level]}>
+                [{Protobuf.LogRecord_Level[log.level]}]{/* </div> */}
+              </Wrapper>
+              <td className="truncate pl-1">{log.message}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
+
+const Wrapper = ({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}): JSX.Element => (
+  <td className={className}>
+    <m.div
+      className="-my-0.5 flex max-w-min cursor-pointer truncate rounded-sm px-0.5 hover:bg-gray-700"
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+    >
+      {children}
+    </m.div>
+  </td>
+);

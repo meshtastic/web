@@ -6,6 +6,7 @@ module.exports = {
   theme: {
     fontFamily: {
       sans: ['Inter var', ...defaultTheme.fontFamily.sans],
+      mono: ['Cascadia Code', ...defaultTheme.fontFamily.mono],
     },
     extend: {
       colors: {

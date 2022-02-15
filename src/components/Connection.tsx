@@ -95,9 +95,9 @@ export const Connection = (): JSX.Element => {
                 <div className="h-96 overflow-y-auto rounded-md bg-secondaryDark p-2">
                   {state.logs.map((log, index) => (
                     <div key={index} className="flex">
-                      <div>[{log.date.toISOString()}]</div>
-                      <div>[{log.emitter}]</div>
-                      <div key={index}>{log.message}</div>
+                      <div className="truncate text-sm font-medium">
+                        {log.message}
+                      </div>
                     </div>
                   ))}
                 </div>

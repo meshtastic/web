@@ -4,7 +4,7 @@ specifiers:
   '@emeraldpay/hashicon-react': ^0.5.2
   '@floating-ui/react-dom': ^0.4.3
   '@meshtastic/components': ^1.0.23
-  '@meshtastic/meshtasticjs': ^0.6.42
+  '@meshtastic/meshtasticjs': ^0.6.43
   '@reduxjs/toolkit': ^1.7.2
   '@types/mapbox-gl': ^2.6.1
   '@types/react': ^17.0.39
@@ -62,7 +62,7 @@ dependencies:
   '@emeraldpay/hashicon-react': 0.5.2
   '@floating-ui/react-dom': 0.4.3_b8fdba992ce7d797017dc07106486496
   '@meshtastic/components': 1.0.23_@types+react@17.0.39
-  '@meshtastic/meshtasticjs': 0.6.42
+  '@meshtastic/meshtasticjs': 0.6.43
   '@reduxjs/toolkit': 1.7.2_react-redux@7.2.6+react@17.0.2
   base64-js: 1.5.1
   framer-motion: 6.2.6_react-dom@17.0.2+react@17.0.2
@@ -1587,8 +1587,8 @@ packages:
       - '@types/react'
     dev: false
 
-  /@meshtastic/meshtasticjs/0.6.42:
-    resolution: {integrity: sha512-sZLsOZXyrMUIVk4HSRsOAtk50IcWb9qEeIfq4i92khbXQvb52yRMAXrt4BBjc3HgnFK4F5gb1KUdLnCpM9QN+A==}
+  /@meshtastic/meshtasticjs/0.6.43:
+    resolution: {integrity: sha512-INI9hj3AzjkXzJIp2yq65eV908wTCk6Ih5/5fMknKhwOgx14eC6d5qhlWxjC85kHB6gu8c/2KF3LUCFKHh+1fg==}
     dependencies:
       '@protobuf-ts/runtime': 2.2.2
       sub-events: 1.8.9
