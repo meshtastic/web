@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { AnimatePresence, m } from 'framer-motion';
 import useSWR from 'swr';
 
 import fetcher from '@app/core/utils/fetcher';
@@ -27,6 +28,7 @@ export const FileBrowser = (): JSX.Element => {
   const connectionParams = useAppSelector(
     (state) => state.app.connectionParams,
   );
+  const darkMode = useAppSelector((state) => state.app.darkMode);
 
   const { data } = useSWR<Files>(
     `${connectionParams.HTTP.tls ? 'https' : 'http'}://${
@@ -42,7 +44,22 @@ export const FileBrowser = (): JSX.Element => {
           <div className="my-auto  w-1/3">FileName</div>
           <div className="my-auto  w-1/3">Actions</div>
         </div>
-        <div className="px-4">
+        <div className="h-full px-4">
+          <AnimatePresence>
+            {(!data || data?.data.files.length === 0) && (
+              <div className="flex h-full w-full">
+                <m.img
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="m-auto h-64 w-64 text-green-500"
+                  src={`/placeholders/${
+                    darkMode ? 'Files Dark.svg' : 'Files.svg'
+                  }`}
+                />
+              </div>
+            )}
+          </AnimatePresence>
           {data?.data.files.map((file) => (
             <div
               key={file.name}

@@ -1,13 +1,14 @@
 import type React from 'react';
 
-import { m } from 'framer-motion';
-import { FiArrowRight } from 'react-icons/fi';
+import { AnimatePresence, m } from 'framer-motion';
+import { FiArrowRight, FiPaperclip } from 'react-icons/fi';
 
 import { useAppSelector } from '@app/hooks/useAppSelector';
 import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 
 export const Logs = (): JSX.Element => {
   const logs = useAppSelector((state) => state.meshtastic.logs);
+  const darkMode = useAppSelector((state) => state.app.darkMode);
 
   type lookupType = { [key: number]: string };
 
@@ -54,6 +55,21 @@ export const Logs = (): JSX.Element => {
           className="
           block h-full flex-col overflow-y-auto py-4 px-2 font-mono text-xs dark:text-gray-400"
         >
+          <AnimatePresence>
+            {logs.length === 0 && (
+              <div className="flex h-full w-full">
+                <m.img
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="m-auto h-64 w-64 text-green-500"
+                  src={`/placeholders/${
+                    darkMode ? 'View Code Dark.svg' : 'View Code.svg'
+                  }`}
+                />
+              </div>
+            )}
+          </AnimatePresence>
           {logs.map((log, index) => (
             <tr key={index} className="group hover:bg-secondaryDark">
               <m.td
@@ -87,6 +103,13 @@ export const Logs = (): JSX.Element => {
               <Wrapper className={levelLookup[log.level]}>
                 [{Protobuf.LogRecord_Level[log.level]}]{/* </div> */}
               </Wrapper>
+              <td
+                className={`m-auto ${
+                  log.packet ? '' : 'dark:text-secondaryDark'
+                }`}
+              >
+                <FiPaperclip />
+              </td>
               <td className="truncate pl-1">{log.message}</td>
             </tr>
           ))}
