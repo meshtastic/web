@@ -24,14 +24,14 @@ export const ExternalSection = ({
     >
       <m.div
         layout
-        className="w-full cursor-pointer select-none overflow-hidden shadow-md dark:bg-secondaryDark dark:text-gray-400"
+        className="w-full cursor-pointer select-none overflow-hidden dark:bg-secondaryDark dark:text-gray-400"
       >
         <m.div
           layout
           onClick={toggleOpen}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
-          className="flex justify-between gap-2 border-b border-primaryDark p-2 text-sm font-medium"
+          className="flex justify-between gap-2 border-b border-gray-300 p-2 text-sm font-medium dark:border-primaryDark"
         >
           <m.div className="flex gap-2 ">
             <m.div className="my-auto">{icon}</m.div>

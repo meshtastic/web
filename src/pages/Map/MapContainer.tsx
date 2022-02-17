@@ -40,7 +40,12 @@ export const MapContainer = (): JSX.Element => {
   );
 
   return (
-    <div className="relative flex h-full w-full">
+    <div
+      className="relative flex h-full w-full"
+      onContextMenu={(e): void => {
+        e.stopPropagation();
+      }}
+    >
       <div className="absolute right-0 z-10 m-4 space-y-2 rounded-md border border-gray-300 bg-white p-2 shadow-md dark:border-gray-600 dark:bg-primaryDark">
         <IconButton
           active={mapState.style === 'Satellite'}

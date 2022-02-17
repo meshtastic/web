@@ -34,7 +34,9 @@ export const Layout = ({
         </Sidebar>
       </div>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        {children}
+        <div className="flex h-full w-full bg-gray-300 dark:bg-secondaryDark">
+          {children}
+        </div>
       </ErrorBoundary>
     </div>
   );

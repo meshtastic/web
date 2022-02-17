@@ -39,8 +39,8 @@ export const FileBrowser = (): JSX.Element => {
 
   return (
     <div className="flex h-full w-full select-none flex-col gap-4 p-4">
-      <div className="w-full flex-grow rounded-md bg-gray-200 dark:bg-primaryDark">
-        <div className="flex h-10 w-full rounded-t-md bg-gray-300 px-4 text-lg font-semibold dark:bg-zinc-700 dark:text-white">
+      <div className="w-full flex-grow rounded-md bg-white dark:bg-primaryDark">
+        <div className="flex h-10 w-full rounded-t-md border-b border-gray-300 px-4 text-lg font-semibold shadow-md dark:border-gray-600 dark:bg-zinc-700 dark:text-white">
           <div className="my-auto  w-1/3">FileName</div>
           <div className="my-auto  w-1/3">Actions</div>
         </div>
@@ -63,7 +63,7 @@ export const FileBrowser = (): JSX.Element => {
           {data?.data.files.map((file) => (
             <div
               key={file.name}
-              className="flex h-10 w-full border-b border-gray-500 px-4 font-medium dark:text-white"
+              className="flex h-10 w-full border-b border-gray-300 px-4 font-medium dark:border-gray-600 dark:text-white"
             >
               <div className="my-auto  w-1/3">
                 <a

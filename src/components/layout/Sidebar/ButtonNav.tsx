@@ -21,7 +21,7 @@ export const ButtonNav = ({
   const dispatch = useAppDispatch();
 
   return (
-    <div className="z-30 flex justify-between border-t border-gray-300 px-6 py-2 dark:border-gray-600 dark:bg-primaryDark">
+    <div className="z-30 flex justify-between border-t border-gray-300 bg-white px-6 py-2 dark:border-gray-600 dark:bg-primaryDark">
       <div
         onClick={(): void => {
           dispatch(toggleMobileNav());

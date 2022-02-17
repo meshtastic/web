@@ -48,9 +48,8 @@ export const Logs = (): JSX.Element => {
   };
 
   return (
-    <div className="flex h-full p-4 ">
-      <table className="table-cell h-full w-full select-none rounded-md dark:bg-primaryDark">
-        {/* \/ flex flex-col gap-2 */}
+    <div className="flex h-full p-4">
+      <table className="table-cell h-full w-full select-none rounded-md bg-white dark:bg-primaryDark">
         <tbody
           className="
           block h-full flex-col overflow-y-auto py-4 px-2 font-mono text-xs dark:text-gray-400"
@@ -71,13 +70,24 @@ export const Logs = (): JSX.Element => {
             )}
           </AnimatePresence>
           {logs.map((log, index) => (
-            <tr key={index} className="group hover:bg-secondaryDark">
+            // <ContextMenu
+            //   key={index}
+            //   items={
+            //     <>
+            //       <ContextItem title="Test" icon={<FiGitBranch />} />
+            //     </>
+            //   }
+            // >
+            <tr
+              key={index}
+              className="group hover:bg-gray-200 dark:hover:bg-secondaryDark"
+            >
               <m.td
                 className="w-6 cursor-pointer"
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
               >
-                <div className="m-auto pl-2 dark:text-primaryDark dark:group-hover:text-gray-400">
+                <div className="m-auto pl-2 text-white group-hover:text-black dark:text-primaryDark dark:group-hover:text-gray-400">
                   <FiArrowRight />
                 </div>
               </m.td>
@@ -112,6 +122,7 @@ export const Logs = (): JSX.Element => {
               </td>
               <td className="truncate pl-1">{log.message}</td>
             </tr>
+            // </ContextMenu>
           ))}
         </tbody>
       </table>
@@ -128,7 +139,7 @@ const Wrapper = ({
 }): JSX.Element => (
   <td className={className}>
     <m.div
-      className="-my-0.5 flex max-w-min cursor-pointer truncate rounded-sm px-0.5 hover:bg-gray-700"
+      className="-my-0.5 flex max-w-min cursor-pointer truncate rounded-sm px-0.5 hover:bg-gray-400 dark:hover:bg-gray-700"
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
     >

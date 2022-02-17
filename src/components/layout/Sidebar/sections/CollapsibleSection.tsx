@@ -22,14 +22,14 @@ export const CollapsibleSection = ({
     <m.div>
       <m.div
         layout
-        className="w-full cursor-pointer select-none overflow-hidden shadow-md dark:bg-secondaryDark dark:text-gray-400"
+        className="w-full cursor-pointer select-none overflow-hidden dark:bg-secondaryDark dark:text-gray-400"
       >
         <m.div
           layout
           onClick={toggleOpen}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
-          className="flex justify-between gap-2 border-b border-primaryDark p-2 text-sm font-medium"
+          className="flex justify-between gap-2 border-b border-gray-300 p-2 text-sm font-medium dark:border-primaryDark"
         >
           <m.div className="flex gap-2 ">
             <m.div className="my-auto">{icon}</m.div>
@@ -52,7 +52,7 @@ export const CollapsibleSection = ({
         {open && (
           <>
             {actions && (
-              <m.div className="flex justify-end gap-1 rounded-b-md border-x border-b p-1 shadow-inner dark:border-gray-600">
+              <m.div className="flex justify-end gap-1 rounded-b-md border-x border-b p-1 dark:border-gray-600">
                 {actions}
               </m.div>
             )}
