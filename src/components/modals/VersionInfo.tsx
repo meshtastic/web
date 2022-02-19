@@ -70,6 +70,7 @@ export const VersionInfo = ({
         <Modal
           title="Version Info"
           actions={
+            // TODO: Check if version is hosted, and merge pwa update button here
             appState.updateAvaliable && (
               <a href={`http://${connectionUrl}/admin/spiffs`}>
                 <IconButton tooltip="Update now" icon={<MdUpgrade />} />

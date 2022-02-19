@@ -34,6 +34,7 @@
   padding: 0 !important;
 }
 
+/* JSONPretty */
 .__json-pretty__ {
   line-height: 1.3;
   color: #748096;
@@ -55,4 +56,23 @@
   line-height: 1.3;
   color: #748096;
   overflow: auto;
+}
+
+/* Mobile height fix */
+/* .min-h-fill {
+  min-height: -webkit-fill-available;
+}
+
+.h-fill {
+  height: -webkit-fill-available;
+} */
+
+body {
+  min-height: 100vh;
+  /* mobile viewport bug fix */
+  min-height: -webkit-fill-available;
+}
+
+html {
+  height: -webkit-fill-available;
 }

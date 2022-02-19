@@ -101,7 +101,6 @@ export const BottomNav = (): JSX.Element => {
 
       <div className="flex-grow">
         <BottomNavItem
-          tooltip="Toggle Navigation"
           onClick={(): void => {
             dispatch(toggleMobileNav());
           }}

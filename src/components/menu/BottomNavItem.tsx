@@ -5,7 +5,7 @@ import { m } from 'framer-motion';
 import { Tooltip } from '@components/generic/Tooltip';
 
 export interface BottomNavItemProps {
-  tooltip: string;
+  tooltip?: string;
   onClick?: () => void;
   className?: string;
   children: React.ReactNode;
