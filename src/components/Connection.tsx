@@ -56,8 +56,8 @@ export const Connection = (): JSX.Element => {
             dispatch(closeConnectionModal());
           }}
         >
-          <div className="flex max-w-3xl flex-grow gap-4">
-            <div className="w-1/2">
+          <div className="flex max-w-3xl flex-col gap-4 md:flex-row">
+            <div className="md:w-1/2">
               <div className="space-y-2">
                 <Select
                   label="Connection Method"
@@ -97,7 +97,7 @@ export const Connection = (): JSX.Element => {
                 )}
               </div>
             </div>
-            <div className="w-1/2">
+            <div className="md:w-1/2">
               <div className="h-96 overflow-y-auto rounded-md bg-gray-200 p-2 dark:bg-secondaryDark dark:text-gray-400">
                 {state.logs
                   .filter((log) => {

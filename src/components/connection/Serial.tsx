@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
-import { FiCheck } from 'react-icons/fi';
+import { FiArrowRightCircle } from 'react-icons/fi';
 
 import { Button } from '@components/generic/button/Button';
 import { IconButton } from '@components/generic/button/IconButton';
@@ -41,7 +41,7 @@ export const Serial = ({ connecting }: SerialProps): JSX.Element => {
       {serialDevices.length > 0 ? (
         serialDevices.map((device, index) => (
           <div
-            className="flex justify-between rounded-md bg-secondaryDark p-2"
+            className="flex justify-between rounded-md bg-secondaryDark p-2 dark:text-white"
             key={index}
           >
             <div className="my-auto flex gap-4">
@@ -65,7 +65,7 @@ export const Serial = ({ connecting }: SerialProps): JSX.Element => {
                 await setConnection(connType.SERIAL);
               }}
               disabled={connecting}
-              icon={<FiCheck />}
+              icon={<FiArrowRightCircle />}
             />
           </div>
         ))

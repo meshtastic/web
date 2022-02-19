@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
-import { FiCheck } from 'react-icons/fi';
+import { FiArrowRightCircle } from 'react-icons/fi';
 
 import { Button } from '@components/generic/button/Button';
 import { IconButton } from '@components/generic/button/IconButton';
@@ -41,7 +41,7 @@ export const BLE = ({ connecting }: BLEProps): JSX.Element => {
           onClick={async (): Promise<void> => {
             await setConnection(connType.BLE);
           }}
-          className="flex justify-between rounded-md bg-gray-700 p-2"
+          className="flex justify-between rounded-md bg-gray-700 p-2 dark:text-white"
           key={index}
         >
           <div className="my-auto">{device.name}</div>
@@ -49,7 +49,7 @@ export const BLE = ({ connecting }: BLEProps): JSX.Element => {
             onClick={async (): Promise<void> => {
               await setConnection(connType.BLE);
             }}
-            icon={<FiCheck />}
+            icon={<FiArrowRightCircle />}
             disabled={connecting}
           />
         </div>
