@@ -18,7 +18,11 @@ export interface Commit {
   node_id: string;
   commit: {
     author: string;
-    committer: string;
+    committer: {
+      date: string;
+      email: string;
+      mame: string;
+    };
     message: string;
     tree: {
       sha: string;
@@ -92,6 +96,11 @@ export const VersionInfo = ({
                       : 'dark:bg-secondaryDark'
                   }`}
                 >
+                  <div className="my-auto text-xs dark:text-gray-400">
+                    {new Date(
+                      commit.commit.committer.date,
+                    ).toLocaleDateString()}
+                  </div>
                   <div className="my-auto font-mono text-sm">
                     {commit.sha.substring(0, 7)}
                   </div>
