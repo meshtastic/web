@@ -51,7 +51,6 @@ export const VersionInfo = ({
       const index = data.findIndex(
         (commit) => commit.sha.substring(0, 7) === process.env.COMMIT_HASH,
       );
-      console.log(index);
 
       if (index === -1 || index > 0) {
         dispatch(setUpdateAvaliable(true));

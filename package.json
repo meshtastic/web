@@ -18,7 +18,6 @@
     "@reduxjs/toolkit": "^1.7.2",
     "@tippyjs/react": "^4.2.6",
     "base64-js": "^1.5.1",
-    "cuid": "^2.1.8",
     "framer-motion": "^6.2.6",
     "mapbox-gl": "^2.7.0",
     "react": "^17.0.2",

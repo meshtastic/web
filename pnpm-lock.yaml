@@ -18,7 +18,6 @@ specifiers:
   autoprefixer: ^10.4.2
   babel-plugin-module-resolver: ^4.1.0
   base64-js: ^1.5.1
-  cuid: ^2.1.8
   eslint: 8.9.0
   eslint-config-prettier: ^8.3.0
   eslint-import-resolver-alias: ^1.1.2
@@ -65,7 +64,6 @@ dependencies:
   '@reduxjs/toolkit': 1.7.2_react-redux@7.2.6+react@17.0.2
   '@tippyjs/react': 4.2.6_react-dom@17.0.2+react@17.0.2
   base64-js: 1.5.1
-  cuid: 2.1.8
   framer-motion: 6.2.6_react-dom@17.0.2+react@17.0.2
   mapbox-gl: 2.7.0
   react: 17.0.2
@@ -2661,10 +2659,6 @@ packages:
 
   /csstype/3.0.10:
     resolution: {integrity: sha512-2u44ZG2OcNUO9HDp/Jl8C07x6pU/eTR3ncV91SiK3dhG9TWvRVsCoJw14Ckx5DgWkzGA3waZWO3d7pgqpUI/XA==}
-
-  /cuid/2.1.8:
-    resolution: {integrity: sha512-xiEMER6E7TlTPnDxrM4eRiC6TRgjNX9xzEZ5U/Se2YJKr7Mq4pJn/2XEHjl3STcSh96GmkHPcBXLES8M29wyyg==}
-    dev: false
 
   /d3-color/3.0.1:
     resolution: {integrity: sha512-6/SlHkDOBLyQSJ1j1Ghs82OIUXpKWlR0hCsw0XrLSQhuUPuCSmLQ1QPH98vpnQxMUQM2/gfAkUEWsupVpd9JGw==}
