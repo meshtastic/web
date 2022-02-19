@@ -1,21 +1,23 @@
 import type React from 'react';
 
 import { m } from 'framer-motion';
+import { FiX } from 'react-icons/fi';
 
 import { useAppSelector } from '@hooks/useAppSelector';
 
-type DefaultDivProps = JSX.IntrinsicElements['div'];
+import { IconButton } from './button/IconButton';
+import { Card } from './Card';
 
-export interface ModalProps extends DefaultDivProps {
+export interface ModalProps {
+  title: string;
   onClose: () => void;
   children: React.ReactNode;
 }
 
 export const Modal = ({
+  title,
   onClose,
   children,
-  className,
-  ...props
 }: ModalProps): JSX.Element => {
   const darkMode = useAppSelector((state) => state.app.darkMode);
 
@@ -32,8 +34,19 @@ export const Modal = ({
         >
           &#8203;
         </span>
-        <div className={`inline-block align-middle ${className}`} {...props}>
-          {children}
+        <div className="inline-block w-full max-w-3xl align-middle">
+          <Card
+            className="relative flex-col gap-4
+        "
+          >
+            <div className="flex justify-between">
+              <div className="text-2xl font-medium dark:text-white">
+                {title}
+              </div>
+              <IconButton icon={<FiX />} onClick={onClose} />
+            </div>
+            {children}
+          </Card>
         </div>
       </m.div>
     </m.div>

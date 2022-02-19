@@ -4,7 +4,7 @@ import { AnimatePresence, m } from 'framer-motion';
 import useSWR from 'swr';
 
 import { Card } from '@app/components/generic/Card';
-import fetcher from '@core/utils/fetcher';
+import { fetcher } from '@core/utils/fetcher';
 import { useAppSelector } from '@hooks/useAppSelector';
 
 export interface File {

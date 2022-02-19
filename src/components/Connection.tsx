@@ -2,7 +2,6 @@ import React from 'react';
 
 import { AnimatePresence } from 'framer-motion';
 
-import { Card } from '@app/components/generic/Card';
 import { BLE } from '@components/connection/BLE';
 import { HTTP } from '@components/connection/HTTP';
 import { Serial } from '@components/connection/Serial';
@@ -52,74 +51,72 @@ export const Connection = (): JSX.Element => {
     <AnimatePresence>
       {appState.connectionModalOpen && (
         <Modal
-          className="w-full max-w-3xl"
+          title="Connect to a device"
           onClose={(): void => {
             dispatch(closeConnectionModal());
           }}
         >
-          <Card className="relative">
-            <div className="flex max-w-3xl flex-grow gap-4 p-2">
-              <div className="w-1/2">
-                <div className="space-y-2">
-                  <Select
-                    label="Connection Method"
-                    optionsEnum={connType}
-                    value={appState.connType}
-                    onChange={(e): void => {
-                      dispatch(setConnType(parseInt(e.target.value)));
-                    }}
-                    disabled={
+          <div className="flex max-w-3xl flex-grow gap-4">
+            <div className="w-1/2">
+              <div className="space-y-2">
+                <Select
+                  label="Connection Method"
+                  optionsEnum={connType}
+                  value={appState.connType}
+                  onChange={(e): void => {
+                    dispatch(setConnType(parseInt(e.target.value)));
+                  }}
+                  disabled={
+                    state.deviceStatus ===
+                    Types.DeviceStatusEnum.DEVICE_CONNECTED
+                  }
+                />
+                {appState.connType === connType.HTTP && (
+                  <HTTP
+                    connecting={
                       state.deviceStatus ===
                       Types.DeviceStatusEnum.DEVICE_CONNECTED
                     }
                   />
-                  {appState.connType === connType.HTTP && (
-                    <HTTP
-                      connecting={
-                        state.deviceStatus ===
-                        Types.DeviceStatusEnum.DEVICE_CONNECTED
-                      }
-                    />
-                  )}
-                  {appState.connType === connType.BLE && (
-                    <BLE
-                      connecting={
-                        state.deviceStatus ===
-                        Types.DeviceStatusEnum.DEVICE_CONNECTED
-                      }
-                    />
-                  )}
-                  {appState.connType === connType.SERIAL && (
-                    <Serial
-                      connecting={
-                        state.deviceStatus ===
-                        Types.DeviceStatusEnum.DEVICE_CONNECTED
-                      }
-                    />
-                  )}
-                </div>
-              </div>
-              <div className="w-1/2">
-                <div className="h-96 overflow-y-auto rounded-md bg-gray-200 p-2 dark:bg-secondaryDark dark:text-gray-400">
-                  {state.logs
-                    .filter((log) => {
-                      return ![
-                        Types.Emitter.handleFromRadio,
-                        Types.Emitter.handleMeshPacket,
-                        Types.Emitter.sendPacket,
-                      ].includes(log.emitter);
-                    })
-                    .map((log, index) => (
-                      <div key={index} className="flex">
-                        <div className="truncate font-mono text-sm">
-                          {log.message}
-                        </div>
-                      </div>
-                    ))}
-                </div>
+                )}
+                {appState.connType === connType.BLE && (
+                  <BLE
+                    connecting={
+                      state.deviceStatus ===
+                      Types.DeviceStatusEnum.DEVICE_CONNECTED
+                    }
+                  />
+                )}
+                {appState.connType === connType.SERIAL && (
+                  <Serial
+                    connecting={
+                      state.deviceStatus ===
+                      Types.DeviceStatusEnum.DEVICE_CONNECTED
+                    }
+                  />
+                )}
               </div>
             </div>
-          </Card>
+            <div className="w-1/2">
+              <div className="h-96 overflow-y-auto rounded-md bg-gray-200 dark:bg-secondaryDark dark:text-gray-400">
+                {state.logs
+                  .filter((log) => {
+                    return ![
+                      Types.Emitter.handleFromRadio,
+                      Types.Emitter.handleMeshPacket,
+                      Types.Emitter.sendPacket,
+                    ].includes(log.emitter);
+                  })
+                  .map((log, index) => (
+                    <div key={index} className="flex">
+                      <div className="truncate font-mono text-sm">
+                        {log.message}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
         </Modal>
       )}
     </AnimatePresence>

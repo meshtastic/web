@@ -22,6 +22,7 @@ interface AppState {
     HTTP: Types.HTTPConnectionParameters;
     SERIAL: Types.SerialConnectionParameters;
   };
+  updateAvaliable: boolean;
 }
 
 const initialState: AppState = {
@@ -41,6 +42,7 @@ const initialState: AppState = {
     },
     SERIAL: {},
   },
+  updateAvaliable: false,
 };
 
 export const appSlice = createSlice({
@@ -77,6 +79,9 @@ export const appSlice = createSlice({
       state.connectionParams[connType[action.payload.type]] =
         action.payload.params;
     },
+    setUpdateAvaliable(state, action: PayloadAction<boolean>) {
+      state.updateAvaliable = action.payload;
+    },
   },
 });
 
@@ -88,6 +93,7 @@ export const {
   setCurrentPage,
   setConnType,
   setConnectionParams,
+  setUpdateAvaliable,
 } = appSlice.actions;
 
 export default appSlice.reducer;

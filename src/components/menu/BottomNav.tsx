@@ -10,6 +10,7 @@ import {
   FiWifi,
   FiX,
 } from 'react-icons/fi';
+import { MdUpgrade } from 'react-icons/md';
 import {
   RiArrowDownLine,
   RiArrowUpDownLine,
@@ -124,19 +125,29 @@ export const BottomNav = (): JSX.Element => {
       <div className="flex">
         <VersionInfo
           visible={showVersionInfo}
-          onclose={(): void => {
+          onClose={(): void => {
             setShowVersionInfo(false);
           }}
         />
 
-        <Tooltip content={`Current Commit`}>
+        <Tooltip
+          content={
+            appState.updateAvaliable ? 'Update Avaliable' : 'Current Commit'
+          }
+        >
           <div
             onClick={(): void => {
               setShowVersionInfo(true);
             }}
-            className="group flex cursor-pointer select-none border-l border-gray-300 p-1 hover:bg-gray-200 dark:border-gray-600 dark:text-white dark:hover:bg-primaryDark"
+            className={`group flex cursor-pointer select-none border-l border-gray-300 p-1 hover:bg-gray-200 dark:border-gray-600 dark:text-white dark:hover:bg-primaryDark ${
+              appState.updateAvaliable ? 'animate-pulse' : ''
+            }`}
           >
-            <FiGitBranch className="mr-1 p-0.5 group-active:scale-90" />
+            {appState.updateAvaliable ? (
+              <MdUpgrade className="mr-1 p-0.5 group-active:scale-90" />
+            ) : (
+              <FiGitBranch className="mr-1 p-0.5 group-active:scale-90" />
+            )}
             <p className="text-xs opacity-60">{process.env.COMMIT_HASH}</p>
           </div>
         </Tooltip>
