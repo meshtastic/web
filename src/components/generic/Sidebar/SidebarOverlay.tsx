@@ -3,7 +3,7 @@ import type React from 'react';
 import { AnimatePresence, AnimateSharedLayout, m } from 'framer-motion';
 import { FiArrowLeft } from 'react-icons/fi';
 
-import { IconButton } from '@meshtastic/components';
+import { IconButton } from '@components/generic/button/IconButton';
 
 export interface SidebarOverlayProps {
   title: string;

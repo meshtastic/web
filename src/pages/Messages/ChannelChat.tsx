@@ -5,10 +5,11 @@ import { FiSettings } from 'react-icons/fi';
 import { MdPublic } from 'react-icons/md';
 import TimeAgo from 'timeago-react';
 
+import { IconButton } from '@components/generic/button/IconButton';
+import { Tooltip } from '@components/generic/Tooltip';
 import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
 import { Hashicon } from '@emeraldpay/hashicon-react';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { IconButton, Tooltip } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface ChannelChatProps {

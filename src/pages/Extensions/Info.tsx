@@ -2,8 +2,9 @@ import React from 'react';
 
 import JSONPretty from 'react-json-pretty';
 
-import { useAppSelector } from '@app/hooks/useAppSelector';
+import { Card } from '@app/components/generic/Card';
 import { Hashicon } from '@emeraldpay/hashicon-react';
+import { useAppSelector } from '@hooks/useAppSelector';
 
 export const Info = (): JSX.Element => {
   const hardwareInfo = useAppSelector(
@@ -17,18 +18,18 @@ export const Info = (): JSX.Element => {
 
   return (
     <div className="flex h-full flex-col gap-4 p-4 md:flex-row">
-      <div className="flex w-full flex-col gap-4 rounded-md bg-white p-8 shadow-md dark:bg-primaryDark md:w-1/4">
-        <div className="m-auto">
+      <Card className="md:w-1/4">
+        <div className="m-auto flex flex-col gap-2">
           <Hashicon value={hardwareInfo.myNodeNum.toString()} size={180} />
+          <div className="text-center text-lg font-medium dark:text-white">
+            {node?.user?.longName || 'Unknown'}
+          </div>
         </div>
-        <div className="text-center text-lg font-medium dark:text-white">
-          {node?.user?.longName || 'Unknown'}
-        </div>
-      </div>
+      </Card>
 
-      <div className="flex-grow rounded-md bg-white p-8 shadow-md  dark:bg-primaryDark">
+      <Card className="flex-grow">
         <JSONPretty className="overflow-y-auto" data={hardwareInfo} />
-      </div>
+      </Card>
     </div>
   );
 };

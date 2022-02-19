@@ -1,10 +1,10 @@
 import React from 'react';
 
+import { Input } from '@components/generic/form/Input';
 import { connection } from '@core/connection';
 import { ackMessage } from '@core/slices/meshtasticSlice';
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { Input } from '@meshtastic/components';
 
 export interface MessageBarProps {
   chatIndex: number;

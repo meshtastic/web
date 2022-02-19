@@ -2,15 +2,14 @@ import React from 'react';
 
 import { FiHash, FiMessageCircle } from 'react-icons/fi';
 
-import { Layout } from '@app/components/layout';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Layout } from '@components/layout';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { IconButton } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
-
-import { ChannelChat } from './ChannelChat';
-import { DmChat } from './DmChat';
-import { Message } from './Message';
-import { MessageBar } from './MessageBar';
+import { ChannelChat } from '@pages/Messages/ChannelChat';
+import { DmChat } from '@pages/Messages/DmChat';
+import { Message } from '@pages/Messages/Message';
+import { MessageBar } from '@pages/Messages/MessageBar';
 
 export const Messages = (): JSX.Element => {
   const [selectedChatIndex, setSelectedChatIndex] = React.useState<number>(0);
@@ -105,11 +104,9 @@ export const Messages = (): JSX.Element => {
                     : chats[selectedChatIndex].messages[index - 1].message
                         .packet.from === message.message.packet.from
                 }
-                sender={nodes.find((node) => {
-                  console.log(message);
-
-                  return node.number === message.message.packet.from;
-                })}
+                sender={nodes.find(
+                  (node) => node.number === message.message.packet.from,
+                )}
               />
             ))}
           </div>

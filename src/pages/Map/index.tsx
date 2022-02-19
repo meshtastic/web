@@ -4,14 +4,13 @@ import mapboxgl from 'mapbox-gl';
 import { FiMapPin } from 'react-icons/fi';
 import { RiRoadMapLine } from 'react-icons/ri';
 
-import { Layout } from '@app/components/layout';
-import { MapboxProvider } from '@app/components/MapBox/MapboxProvider';
-import type { Node } from '@app/core/slices/meshtasticSlice';
-import { useAppSelector } from '@app/hooks/useAppSelector';
-
-import { NodeCard } from '../Nodes/NodeCard';
-import { MapContainer } from './MapContainer';
-import { Marker } from './Marker';
+import { Layout } from '@components/layout';
+import { MapboxProvider } from '@components/MapBox/MapboxProvider';
+import type { Node } from '@core/slices/meshtasticSlice';
+import { useAppSelector } from '@hooks/useAppSelector';
+import { MapContainer } from '@pages/Map/MapContainer';
+import { Marker } from '@pages/Map/Marker';
+import { NodeCard } from '@pages/Nodes/NodeCard';
 
 export const Map = (): JSX.Element => {
   const [selectedNode, setSelectedNode] = React.useState<Node>();

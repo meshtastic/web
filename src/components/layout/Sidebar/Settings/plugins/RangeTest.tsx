@@ -3,13 +3,15 @@ import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
 
-import { Form } from '@app/components/generic/form/Form';
-import { connection } from '@app/core/connection';
-import { useAppSelector } from '@app/hooks/useAppSelector';
-import { Checkbox, IconButton, Input } from '@meshtastic/components';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Form } from '@components/generic/form/Form';
+import { Input } from '@components/generic/form/Input';
+import { connection } from '@core/connection';
+import { useAppSelector } from '@hooks/useAppSelector';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
-export const SerialSettingsPanel = (): JSX.Element => {
+export const RangeTestSettingsPanel = (): JSX.Element => {
   const [loading, setLoading] = React.useState(false);
 
   const preferences = useAppSelector(
@@ -36,49 +38,28 @@ export const SerialSettingsPanel = (): JSX.Element => {
 
   const pluginEnabled = useWatch({
     control,
-    name: 'serialpluginEnabled',
+    name: 'rangeTestPluginEnabled',
     defaultValue: false,
   });
 
   return (
     <>
       <Form loading={loading}>
-        <Checkbox label="Plugin Enabled" {...register('serialpluginEnabled')} />
         <Checkbox
-          label="Echo"
-          disabled={!pluginEnabled}
-          {...register('serialpluginEcho')}
+          label="Range Test Plugin Enabled?"
+          {...register('rangeTestPluginEnabled')}
         />
-
-        <Input
-          type="number"
-          label="RX"
+        <Checkbox
+          label="Range Test Plugin Save?"
           disabled={!pluginEnabled}
-          {...register('serialpluginRxd', {
-            valueAsNumber: true,
-          })}
+          {...register('rangeTestPluginSave')}
         />
         <Input
           type="number"
-          label="TX"
+          label="Message Interval"
           disabled={!pluginEnabled}
-          {...register('serialpluginTxd', {
-            valueAsNumber: true,
-          })}
-        />
-        <Input
-          type="number"
-          label="Mode"
-          disabled={!pluginEnabled}
-          {...register('serialpluginMode', {
-            valueAsNumber: true,
-          })}
-        />
-        <Input
-          type="number"
-          label="Timeout"
-          disabled={!pluginEnabled}
-          {...register('serialpluginTimeout', {
+          suffix="Seconds"
+          {...register('rangeTestPluginSender', {
             valueAsNumber: true,
           })}
         />

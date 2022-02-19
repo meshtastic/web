@@ -15,22 +15,21 @@ import {
   FiZap,
 } from 'react-icons/fi';
 
-import { CollapsibleSection } from '@app/components/layout/Sidebar/sections/CollapsibleSection';
-import { ExternalSection } from '@app/components/layout/Sidebar/sections/ExternalSection';
-import { SidebarOverlay } from '@app/components/layout/Sidebar/sections/SidebarOverlay';
-import { Channels } from '@app/components/layout/Sidebar/Settings/Channels';
-import { ExternalNotificationsSettingsPlanel } from '@app/components/layout/Sidebar/Settings/plugins/panels/ExternalNotifications/SettingsPlanel';
-import { RangeTestSettingsPanel } from '@app/components/layout/Sidebar/Settings/plugins/panels/RangeTest/SettingsPanel';
-import { SerialSettingsPanel } from '@app/components/layout/Sidebar/Settings/plugins/panels/Serial/SettingsPanel';
-import { StoreForwardSettingsPanel } from '@app/components/layout/Sidebar/Settings/plugins/panels/StoreForward/SettingsPanel';
-import { Position } from '@app/components/layout/Sidebar/Settings/Position';
-import { Power } from '@app/components/layout/Sidebar/Settings/Power';
-import { Radio } from '@app/components/layout/Sidebar/Settings/Radio';
-import { User } from '@app/components/layout/Sidebar/Settings/User';
-import { WiFi } from '@app/components/layout/Sidebar/Settings/WiFi';
-
-import { Interface } from './Interface';
-import { ChannelsGroup } from './radio/channels/panels/ChannelsGroup';
+import { CollapsibleSection } from '@components/generic/Sidebar/CollapsibleSection';
+import { ExternalSection } from '@components/generic/Sidebar/ExternalSection';
+import { SidebarOverlay } from '@components/generic/Sidebar/SidebarOverlay';
+import { Channels } from '@components/layout/Sidebar/Settings/Channels';
+import { ChannelsGroup } from '@components/layout/Sidebar/Settings/channels/ChannelsGroup';
+import { Interface } from '@components/layout/Sidebar/Settings/Interface';
+import { ExternalNotificationsSettingsPlanel } from '@components/layout/Sidebar/Settings/plugins/ExternalNotifications';
+import { RangeTestSettingsPanel } from '@components/layout/Sidebar/Settings/plugins/RangeTest';
+import { SerialSettingsPanel } from '@components/layout/Sidebar/Settings/plugins/Serial';
+import { StoreForwardSettingsPanel } from '@components/layout/Sidebar/Settings/plugins/StoreForward';
+import { Position } from '@components/layout/Sidebar/Settings/Position';
+import { Power } from '@components/layout/Sidebar/Settings/Power';
+import { Radio } from '@components/layout/Sidebar/Settings/Radio';
+import { User } from '@components/layout/Sidebar/Settings/User';
+import { WiFi } from '@components/layout/Sidebar/Settings/WiFi';
 
 export interface SettingsProps {
   open: boolean;

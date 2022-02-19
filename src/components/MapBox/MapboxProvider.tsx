@@ -2,6 +2,7 @@ import React from 'react';
 
 import mapboxgl from 'mapbox-gl';
 
+import { MapboxContext } from '@components/MapBox/mapboxContext';
 import {
   setBearing,
   setLatLng,
@@ -14,7 +15,6 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import { useCreateMapbox } from '@hooks/useCreateMapbox';
 
 import { MapStyles } from '../../pages/Map/styles';
-import { MapboxContext } from './mapboxContext';
 
 export type MapboxProviderProps = {
   children: React.ReactNode;

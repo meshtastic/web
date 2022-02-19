@@ -5,9 +5,12 @@ import { useForm } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
 import { MdRefresh, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
-import { Form } from '@app/components/generic/form/Form';
-import { connection } from '@app/core/connection';
-import { Checkbox, IconButton, Input, Select } from '@meshtastic/components';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Form } from '@components/generic/form/Form';
+import { Input } from '@components/generic/form/Input';
+import { Select } from '@components/generic/form/Select';
+import { connection } from '@core/connection';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface SettingsPanelProps {

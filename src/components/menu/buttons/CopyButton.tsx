@@ -3,8 +3,8 @@ import type React from 'react';
 import { FiCheck, FiClipboard } from 'react-icons/fi';
 import useCopyClipboard from 'react-use-clipboard';
 
-import type { ButtonProps } from '@meshtastic/components';
-import { IconButton } from '@meshtastic/components';
+import type { ButtonProps } from '@components/generic/button/Button';
+import { IconButton } from '@components/generic/button/IconButton';
 
 export interface CopyButtonProps extends ButtonProps {
   data: string;

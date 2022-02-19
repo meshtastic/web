@@ -5,12 +5,11 @@ import { MdSubject } from 'react-icons/md';
 import { RiPinDistanceFill } from 'react-icons/ri';
 import { VscExtensions } from 'react-icons/vsc';
 
-import { Layout } from '@app/components/layout';
-import { ExternalSection } from '@app/components/layout/Sidebar/sections/ExternalSection';
-
-import { FileBrowser } from './FileBrowser';
-import { Info } from './Info';
-import { Logs } from './Logs';
+import { ExternalSection } from '@components/generic/Sidebar/ExternalSection';
+import { Layout } from '@components/layout';
+import { FileBrowser } from '@pages/Extensions/FileBrowser';
+import { Info } from '@pages/Extensions/Info';
+import { Logs } from '@pages/Extensions/Logs';
 
 export const Extensions = (): JSX.Element => {
   const [selectedExtension, setSelectedExtension] = React.useState<

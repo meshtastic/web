@@ -2,15 +2,14 @@ import React from 'react';
 
 import { Map } from '@app/pages/Map';
 import { Connection } from '@components/Connection';
+import { ContextMenu } from '@components/generic/ContextMenu';
+import { BottomNav } from '@components/menu/BottomNav';
 import { useRoute } from '@core/router';
 import { useAppSelector } from '@hooks/useAppSelector';
-
-import { ContextMenu } from './components/generic/ContextMenu';
-import { BottomNav } from './components/menu/BottomNav';
-import { Extensions } from './pages/Extensions/Index';
-import { Messages } from './pages/Messages';
-import { Nodes } from './pages/Nodes';
-import { NotFound } from './pages/NotFound';
+import { Extensions } from '@pages/Extensions/Index';
+import { Messages } from '@pages/Messages';
+import { Nodes } from '@pages/Nodes';
+import { NotFound } from '@pages/NotFound';
 
 export const App = (): JSX.Element => {
   const route = useRoute();

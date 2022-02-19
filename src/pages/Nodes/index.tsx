@@ -5,11 +5,11 @@ import ReactFlow, { Background, Controls, MiniMap } from 'react-flow-renderer';
 import { FiSettings } from 'react-icons/fi';
 import { RiMindMap } from 'react-icons/ri';
 
-import { Layout } from '@app/components/layout';
-import { SidebarItem } from '@app/components/layout/Sidebar/SidebarItem';
-import { useAppSelector } from '@app/hooks/useAppSelector';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Layout } from '@components/layout';
+import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
 import { Hashicon } from '@emeraldpay/hashicon-react';
-import { IconButton } from '@meshtastic/components';
+import { useAppSelector } from '@hooks/useAppSelector';
 
 export const Nodes = (): JSX.Element => {
   const [graphNodes, setGraphNodes] = React.useState<Node[]>([]);

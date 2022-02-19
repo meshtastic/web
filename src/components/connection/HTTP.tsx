@@ -2,12 +2,19 @@ import type React from 'react';
 
 import { useForm, useWatch } from 'react-hook-form';
 
-import { connectionUrl, setConnection } from '@core/connection';
+import { Button } from '@components/generic/button/Button';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Input } from '@components/generic/form/Input';
+import { Select } from '@components/generic/form/Select';
+import { connection, connectionUrl, setConnection } from '@core/connection';
 import { connType, setConnectionParams } from '@core/slices/appSlice';
 import { useAppDispatch } from '@hooks/useAppDispatch';
-import { Button, Checkbox, Input, Select } from '@meshtastic/components';
 
-export const HTTP = (): JSX.Element => {
+export interface HTTPProps {
+  connecting: boolean;
+}
+
+export const HTTP = ({ connecting }: HTTPProps): JSX.Element => {
   const dispatch = useAppDispatch();
 
   const { register, handleSubmit, control } = useForm<{
@@ -56,16 +63,27 @@ export const HTTP = (): JSX.Element => {
             value: 'remote',
           },
         ]}
+        disabled={connecting}
         {...register('ipSource')}
       />
       {watchIpSource === 'local' ? (
         <Input label="Host" value={connectionUrl} disabled />
       ) : (
-        <Input label="Host" {...register('ip')} />
+        <Input label="Host" disabled={connecting} {...register('ip')} />
       )}
-      <Checkbox label="Use TLS?" {...register('tls')} />
-      <Button type="submit" className="mt-2 ml-auto" border>
-        Connect
+      <Checkbox label="Use TLS?" disabled={connecting} {...register('tls')} />
+      <Button
+        className="mt-2 ml-auto"
+        onClick={async (): Promise<void> => {
+          if (connecting) {
+            await connection.disconnect();
+          } else {
+            await onSubmit();
+          }
+        }}
+        border
+      >
+        {connecting ? 'Disconnect' : 'Connect'}
       </Button>
     </form>
   );

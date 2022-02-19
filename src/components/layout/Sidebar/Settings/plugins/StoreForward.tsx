@@ -3,13 +3,15 @@ import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
 
-import { Form } from '@app/components/generic/form/Form';
-import { connection } from '@app/core/connection';
-import { useAppSelector } from '@app/hooks/useAppSelector';
-import { Checkbox, IconButton, Input } from '@meshtastic/components';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Form } from '@components/generic/form/Form';
+import { Input } from '@components/generic/form/Input';
+import { connection } from '@core/connection';
+import { useAppSelector } from '@hooks/useAppSelector';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
-export const ExternalNotificationsSettingsPlanel = (): JSX.Element => {
+export const StoreForwardSettingsPanel = (): JSX.Element => {
   const [loading, setLoading] = React.useState(false);
 
   const preferences = useAppSelector(
@@ -36,7 +38,7 @@ export const ExternalNotificationsSettingsPlanel = (): JSX.Element => {
 
   const pluginEnabled = useWatch({
     control,
-    name: 'extNotificationPluginEnabled',
+    name: 'storeForwardPluginEnabled',
     defaultValue: false,
   });
 
@@ -45,37 +47,35 @@ export const ExternalNotificationsSettingsPlanel = (): JSX.Element => {
       <Form loading={loading}>
         <Checkbox
           label="Plugin Enabled"
-          {...register('extNotificationPluginEnabled')}
+          {...register('storeForwardPluginEnabled')}
         />
         <Checkbox
-          label="Active"
+          label="Heartbeat Enabled"
           disabled={!pluginEnabled}
-          {...register('extNotificationPluginActive')}
-        />
-        <Checkbox
-          label="Bell"
-          disabled={!pluginEnabled}
-          {...register('extNotificationPluginAlertBell')}
-        />
-        <Checkbox
-          label="Message"
-          disabled={!pluginEnabled}
-          {...register('extNotificationPluginAlertMessage')}
+          {...register('storeForwardPluginHeartbeat')}
         />
         <Input
           type="number"
-          label="Output"
+          label="Number of records"
+          suffix="Records"
           disabled={!pluginEnabled}
-          {...register('extNotificationPluginOutput', {
+          {...register('storeForwardPluginRecords', {
             valueAsNumber: true,
           })}
         />
         <Input
           type="number"
-          label="Output MS"
-          suffix="ms"
+          label="History return max"
           disabled={!pluginEnabled}
-          {...register('extNotificationPluginOutputMs', {
+          {...register('storeForwardPluginHistoryReturnMax', {
+            valueAsNumber: true,
+          })}
+        />
+        <Input
+          type="number"
+          label="History return window"
+          disabled={!pluginEnabled}
+          {...register('storeForwardPluginHistoryReturnWindow', {
             valueAsNumber: true,
           })}
         />

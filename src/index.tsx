@@ -1,4 +1,3 @@
-import '@meshtastic/components/dist/style.css';
 import '@app/index.css';
 
 import React from 'react';
@@ -9,11 +8,10 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { Provider } from 'react-redux';
 
 import { App } from '@app/App';
+import { ErrorFallback } from '@components/ErrorFallback';
 import { ReloadPrompt } from '@components/pwa/ReloadPrompt';
+import { RouteProvider } from '@core/router';
 import { store } from '@core/store';
-
-import { ErrorFallback } from './components/ErrorFallback';
-import { RouteProvider } from './core/router';
 
 ReactDOM.render(
   <React.StrictMode>

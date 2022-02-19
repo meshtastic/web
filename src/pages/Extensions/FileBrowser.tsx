@@ -3,8 +3,9 @@ import React from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import useSWR from 'swr';
 
-import fetcher from '@app/core/utils/fetcher';
-import { useAppSelector } from '@app/hooks/useAppSelector';
+import { Card } from '@app/components/generic/Card';
+import fetcher from '@core/utils/fetcher';
+import { useAppSelector } from '@hooks/useAppSelector';
 
 export interface File {
   nameModified: string;
@@ -38,8 +39,8 @@ export const FileBrowser = (): JSX.Element => {
   );
 
   return (
-    <div className="flex h-full w-full select-none flex-col gap-4 p-4">
-      <div className="w-full flex-grow rounded-md bg-white dark:bg-primaryDark">
+    <div className="flex h-full p-4">
+      <Card className="flex-grow flex-col">
         <div className="flex h-10 w-full rounded-t-md border-b border-gray-300 px-4 text-lg font-semibold shadow-md dark:border-gray-600 dark:bg-zinc-700 dark:text-white">
           <div className="my-auto  w-1/3">FileName</div>
           <div className="my-auto  w-1/3">Actions</div>
@@ -80,7 +81,7 @@ export const FileBrowser = (): JSX.Element => {
             </div>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

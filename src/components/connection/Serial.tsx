@@ -3,13 +3,18 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { FiCheck } from 'react-icons/fi';
 
-import { setConnection } from '@core/connection';
+import { Button } from '@components/generic/button/Button';
+import { IconButton } from '@components/generic/button/IconButton';
+import { connection, setConnection } from '@core/connection';
 import { connType, setConnectionParams } from '@core/slices/appSlice';
 import { useAppDispatch } from '@hooks/useAppDispatch';
-import { Button, IconButton } from '@meshtastic/components';
 import { ISerialConnection } from '@meshtastic/meshtasticjs';
 
-export const Serial = (): JSX.Element => {
+export interface SerialProps {
+  connecting: boolean;
+}
+
+export const Serial = ({ connecting }: SerialProps): JSX.Element => {
   const [serialDevices, setSerialDevices] = React.useState<SerialPort[]>([]);
   const dispatch = useAppDispatch();
 
@@ -36,7 +41,7 @@ export const Serial = (): JSX.Element => {
       {serialDevices.length > 0 ? (
         serialDevices.map((device, index) => (
           <div
-            className="flex justify-between rounded-md bg-gray-700 p-2"
+            className="flex justify-between rounded-md bg-secondaryDark p-2"
             key={index}
           >
             <div className="my-auto flex gap-4">
@@ -59,6 +64,7 @@ export const Serial = (): JSX.Element => {
                 );
                 await setConnection(connType.SERIAL);
               }}
+              disabled={connecting}
               icon={<FiCheck />}
             />
           </div>
@@ -68,8 +74,18 @@ export const Serial = (): JSX.Element => {
           <p>No previously connected devices found</p>
         </div>
       )}
-      <Button type="submit" className="mt-2 ml-auto" border>
-        Connect
+      <Button
+        className="mt-2 ml-auto"
+        onClick={async (): Promise<void> => {
+          if (connecting) {
+            await connection.disconnect();
+          } else {
+            await onSubmit();
+          }
+        }}
+        border
+      >
+        {connecting ? 'Disconnect' : 'Connect'}
       </Button>
     </form>
   );

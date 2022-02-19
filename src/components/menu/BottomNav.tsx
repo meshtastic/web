@@ -16,15 +16,15 @@ import {
   RiArrowUpLine,
 } from 'react-icons/ri';
 
+import { Tooltip } from '@components/generic/Tooltip';
 import {
   connType,
   openConnectionModal,
   setDarkModeEnabled,
   toggleMobileNav,
-} from '@app/core/slices/appSlice';
+} from '@core/slices/appSlice';
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { Tooltip } from '@meshtastic/components';
 import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 
 import { VersionInfo } from '../modals/VersionInfo';

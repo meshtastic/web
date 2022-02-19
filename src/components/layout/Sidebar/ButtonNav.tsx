@@ -4,11 +4,10 @@ import { FiMessageCircle, FiSettings } from 'react-icons/fi';
 import { RiMindMap, RiRoadMapLine } from 'react-icons/ri';
 import { VscExtensions } from 'react-icons/vsc';
 
-import { toggleMobileNav } from '@app/core/slices/appSlice';
-import { useAppDispatch } from '@app/hooks/useAppDispatch';
+import { NavLinkButton } from '@components/layout/Sidebar/NavLinkButton';
 import { routes, useRoute } from '@core/router';
-
-import { NavLinkButton } from './NavLinkButton';
+import { toggleMobileNav } from '@core/slices/appSlice';
+import { useAppDispatch } from '@hooks/useAppDispatch';
 
 export interface ButtonNavProps {
   toggleSettingsOpen: () => void;

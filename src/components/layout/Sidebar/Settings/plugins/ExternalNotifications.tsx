@@ -3,13 +3,15 @@ import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
 
-import { Form } from '@app/components/generic/form/Form';
-import { connection } from '@app/core/connection';
-import { useAppSelector } from '@app/hooks/useAppSelector';
-import { Checkbox, IconButton, Input } from '@meshtastic/components';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Form } from '@components/generic/form/Form';
+import { Input } from '@components/generic/form/Input';
+import { connection } from '@core/connection';
+import { useAppSelector } from '@hooks/useAppSelector';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
-export const RangeTestSettingsPanel = (): JSX.Element => {
+export const ExternalNotificationsSettingsPlanel = (): JSX.Element => {
   const [loading, setLoading] = React.useState(false);
 
   const preferences = useAppSelector(
@@ -36,7 +38,7 @@ export const RangeTestSettingsPanel = (): JSX.Element => {
 
   const pluginEnabled = useWatch({
     control,
-    name: 'rangeTestPluginEnabled',
+    name: 'extNotificationPluginEnabled',
     defaultValue: false,
   });
 
@@ -44,20 +46,38 @@ export const RangeTestSettingsPanel = (): JSX.Element => {
     <>
       <Form loading={loading}>
         <Checkbox
-          label="Range Test Plugin Enabled?"
-          {...register('rangeTestPluginEnabled')}
+          label="Plugin Enabled"
+          {...register('extNotificationPluginEnabled')}
         />
         <Checkbox
-          label="Range Test Plugin Save?"
+          label="Active"
           disabled={!pluginEnabled}
-          {...register('rangeTestPluginSave')}
+          {...register('extNotificationPluginActive')}
+        />
+        <Checkbox
+          label="Bell"
+          disabled={!pluginEnabled}
+          {...register('extNotificationPluginAlertBell')}
+        />
+        <Checkbox
+          label="Message"
+          disabled={!pluginEnabled}
+          {...register('extNotificationPluginAlertMessage')}
         />
         <Input
           type="number"
-          label="Message Interval"
+          label="Output"
           disabled={!pluginEnabled}
-          suffix="Seconds"
-          {...register('rangeTestPluginSender', {
+          {...register('extNotificationPluginOutput', {
+            valueAsNumber: true,
+          })}
+        />
+        <Input
+          type="number"
+          label="Output MS"
+          suffix="ms"
+          disabled={!pluginEnabled}
+          {...register('extNotificationPluginOutputMs', {
             valueAsNumber: true,
           })}
         />

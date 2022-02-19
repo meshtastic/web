@@ -85,8 +85,6 @@ export const meshtasticSlice = createSlice({
   initialState,
   reducers: {
     addLogEvent: (state, action: PayloadAction<Types.LogEventPacket>) => {
-      console.log(action.payload.packet);
-
       state.logs.push(action.payload);
     },
     setDeviceStatus: (state, action: PayloadAction<Types.DeviceStatusEnum>) => {
@@ -155,8 +153,6 @@ export const meshtasticSlice = createSlice({
       );
 
       if (node) {
-        console.log('node exists');
-
         node.lastHeard = new Date(action.payload.lastHeard * 1000);
         node.snr.push(action.payload.snr);
       } else {
@@ -204,23 +200,14 @@ export const meshtasticSlice = createSlice({
       state.radio.preferences = action.payload;
     },
     addMessage: (state, action: PayloadAction<MessageWithAck>) => {
-      console.log(action.payload);
-
-      console.log(
-        `${action.payload.message.packet.from} -> ${action.payload.message.packet.to}`,
-      );
       state.chats[action.payload.message.packet.channel].lastInterraction =
         new Date();
 
       if (action.payload.message.packet.to === 0xffffffff) {
-        console.log('boradcast');
-
         state.chats[action.payload.message.packet.channel].messages.push(
           action.payload,
         );
       } else {
-        console.log('dm');
-
         const dmIndex =
           action.payload.message.packet.from === state.radio.hardware.myNodeNum
             ? action.payload.message.packet.to
@@ -233,8 +220,6 @@ export const meshtasticSlice = createSlice({
       state,
       action: PayloadAction<{ chatIndex: number; messageId: number }>,
     ) => {
-      console.log(action.payload);
-
       state.chats[action.payload.chatIndex].messages.map((message) => {
         if (message.message.packet.id === action.payload.messageId) {
           message.ack = true;

@@ -3,6 +3,7 @@ import React from 'react';
 import { FaDirections, FaGlobeAfrica, FaMountain } from 'react-icons/fa';
 import { MdFullscreen, MdRadar, MdWbShade } from 'react-icons/md';
 
+import { IconButton } from '@components/generic/button/IconButton';
 import {
   setExaggeration,
   setHillShade,
@@ -11,10 +12,8 @@ import {
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { useMapbox } from '@hooks/useMapbox';
-import { IconButton } from '@meshtastic/components';
-
-import type { MapStyle } from './styles';
-import { MapStyles } from './styles';
+import type { MapStyle } from '@pages/Map/styles';
+import { MapStyles } from '@pages/Map/styles';
 
 export const MapContainer = (): JSX.Element => {
   const dispatch = useAppDispatch();

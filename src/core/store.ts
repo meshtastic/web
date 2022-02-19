@@ -1,8 +1,7 @@
+import appReducer from '@core/slices/appSlice';
+import mapReducer from '@core/slices/mapSlice';
+import meshtasticReducer from '@core/slices/meshtasticSlice';
 import { configureStore } from '@reduxjs/toolkit';
-
-import appReducer from './slices/appSlice';
-import mapReducer from './slices/mapSlice';
-import meshtasticReducer from './slices/meshtasticSlice';
 
 export const store = configureStore({
   reducer: {

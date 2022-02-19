@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FiActivity, FiAperture, FiTag } from 'react-icons/fi';
 
-import { ContextItem } from './ContextItem';
+import { ContextItem } from '@components/generic/ContextItem';
 
 export interface ContextMenuProps {
   items?: JSX.Element;

@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { Select } from '@meshtastic/components';
+import { Select } from '@components/generic/form/Select';
 
 export const Interface = (): JSX.Element => {
   return (

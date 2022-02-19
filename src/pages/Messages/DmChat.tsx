@@ -2,10 +2,10 @@ import React from 'react';
 
 import { FiSettings } from 'react-icons/fi';
 
+import { IconButton } from '@components/generic/button/IconButton';
 import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
 import type { Node } from '@core/slices/meshtasticSlice';
 import { Hashicon } from '@emeraldpay/hashicon-react';
-import { IconButton } from '@meshtastic/components';
 
 export interface DmChatProps {
   node: Node;

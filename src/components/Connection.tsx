@@ -2,11 +2,13 @@ import React from 'react';
 
 import { AnimatePresence } from 'framer-motion';
 
+import { Card } from '@app/components/generic/Card';
 import { BLE } from '@components/connection/BLE';
 import { HTTP } from '@components/connection/HTTP';
 import { Serial } from '@components/connection/Serial';
+import { Select } from '@components/generic/form/Select';
 import { Modal } from '@components/generic/Modal';
-import { connection, connectionUrl, setConnection } from '@core/connection';
+import { connectionUrl, setConnection } from '@core/connection';
 import {
   closeConnectionModal,
   connType,
@@ -15,7 +17,6 @@ import {
 } from '@core/slices/appSlice';
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { Button, Card, Select } from '@meshtastic/components';
 import { Types } from '@meshtastic/meshtasticjs';
 
 export const Connection = (): JSX.Element => {
@@ -56,50 +57,65 @@ export const Connection = (): JSX.Element => {
             dispatch(closeConnectionModal());
           }}
         >
-          <Card>
-            <div className="flex w-full max-w-3xl gap-2 p-2">
+          <Card className="relative">
+            <div className="flex max-w-3xl flex-grow gap-4 p-2">
               <div className="w-1/2">
-                {state.deviceStatus ===
-                Types.DeviceStatusEnum.DEVICE_DISCONNECTED ? (
-                  <div className="space-y-2">
-                    <Select
-                      label="Connection Method"
-                      optionsEnum={connType}
-                      value={appState.connType}
-                      onChange={(e): void => {
-                        dispatch(setConnType(parseInt(e.target.value)));
-                      }}
+                <div className="space-y-2">
+                  <Select
+                    label="Connection Method"
+                    optionsEnum={connType}
+                    value={appState.connType}
+                    onChange={(e): void => {
+                      dispatch(setConnType(parseInt(e.target.value)));
+                    }}
+                    disabled={
+                      state.deviceStatus ===
+                      Types.DeviceStatusEnum.DEVICE_CONNECTED
+                    }
+                  />
+                  {appState.connType === connType.HTTP && (
+                    <HTTP
+                      connecting={
+                        state.deviceStatus ===
+                        Types.DeviceStatusEnum.DEVICE_CONNECTED
+                      }
                     />
-                    {appState.connType === connType.HTTP && <HTTP />}
-                    {appState.connType === connType.BLE && <BLE />}
-                    {appState.connType === connType.SERIAL && <Serial />}
-                  </div>
-                ) : (
-                  <div>
-                    <span>Connecting...</span>
-                    {state.deviceStatus ===
-                      Types.DeviceStatusEnum.DEVICE_CONNECTED && (
-                      <Button
-                        border
-                        onClick={async (): Promise<void> => {
-                          await connection.disconnect();
-                        }}
-                      >
-                        Disconnect
-                      </Button>
-                    )}
-                  </div>
-                )}
+                  )}
+                  {appState.connType === connType.BLE && (
+                    <BLE
+                      connecting={
+                        state.deviceStatus ===
+                        Types.DeviceStatusEnum.DEVICE_CONNECTED
+                      }
+                    />
+                  )}
+                  {appState.connType === connType.SERIAL && (
+                    <Serial
+                      connecting={
+                        state.deviceStatus ===
+                        Types.DeviceStatusEnum.DEVICE_CONNECTED
+                      }
+                    />
+                  )}
+                </div>
               </div>
-              <div className="w-1/2 ">
-                <div className="h-96 overflow-y-auto rounded-md bg-secondaryDark p-2">
-                  {state.logs.map((log, index) => (
-                    <div key={index} className="flex">
-                      <div className="truncate font-mono text-sm">
-                        {log.message}
+              <div className="w-1/2">
+                <div className="h-96 overflow-y-auto rounded-md bg-gray-200 p-2 dark:bg-secondaryDark dark:text-gray-400">
+                  {state.logs
+                    .filter((log) => {
+                      return ![
+                        Types.Emitter.handleFromRadio,
+                        Types.Emitter.handleMeshPacket,
+                        Types.Emitter.sendPacket,
+                      ].includes(log.emitter);
+                    })
+                    .map((log, index) => (
+                      <div key={index} className="flex">
+                        <div className="truncate font-mono text-sm">
+                          {log.message}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             </div>

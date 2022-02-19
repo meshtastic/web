@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { useAppSelector } from '@app/hooks/useAppSelector';
-
-import { ButtonNav } from './ButtonNav';
-import { Settings } from './Settings/Index';
+import { ButtonNav } from '@components/layout/Sidebar/ButtonNav';
+import { Settings } from '@components/layout/Sidebar/Settings/Index';
+import { useAppSelector } from '@hooks/useAppSelector';
 
 export interface SidebarProps {
   children: React.ReactNode;

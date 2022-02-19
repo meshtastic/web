@@ -3,13 +3,15 @@ import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
 
-import { Form } from '@app/components/generic/form/Form';
-import { connection } from '@app/core/connection';
-import { useAppSelector } from '@app/hooks/useAppSelector';
-import { Checkbox, IconButton, Input } from '@meshtastic/components';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Form } from '@components/generic/form/Form';
+import { Input } from '@components/generic/form/Input';
+import { connection } from '@core/connection';
+import { useAppSelector } from '@hooks/useAppSelector';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
-export const StoreForwardSettingsPanel = (): JSX.Element => {
+export const SerialSettingsPanel = (): JSX.Element => {
   const [loading, setLoading] = React.useState(false);
 
   const preferences = useAppSelector(
@@ -36,44 +38,49 @@ export const StoreForwardSettingsPanel = (): JSX.Element => {
 
   const pluginEnabled = useWatch({
     control,
-    name: 'storeForwardPluginEnabled',
+    name: 'serialpluginEnabled',
     defaultValue: false,
   });
 
   return (
     <>
       <Form loading={loading}>
+        <Checkbox label="Plugin Enabled" {...register('serialpluginEnabled')} />
         <Checkbox
-          label="Plugin Enabled"
-          {...register('storeForwardPluginEnabled')}
-        />
-        <Checkbox
-          label="Heartbeat Enabled"
+          label="Echo"
           disabled={!pluginEnabled}
-          {...register('storeForwardPluginHeartbeat')}
+          {...register('serialpluginEcho')}
         />
+
         <Input
           type="number"
-          label="Number of records"
-          suffix="Records"
+          label="RX"
           disabled={!pluginEnabled}
-          {...register('storeForwardPluginRecords', {
+          {...register('serialpluginRxd', {
             valueAsNumber: true,
           })}
         />
         <Input
           type="number"
-          label="History return max"
+          label="TX"
           disabled={!pluginEnabled}
-          {...register('storeForwardPluginHistoryReturnMax', {
+          {...register('serialpluginTxd', {
             valueAsNumber: true,
           })}
         />
         <Input
           type="number"
-          label="History return window"
+          label="Mode"
           disabled={!pluginEnabled}
-          {...register('storeForwardPluginHistoryReturnWindow', {
+          {...register('serialpluginMode', {
+            valueAsNumber: true,
+          })}
+        />
+        <Input
+          type="number"
+          label="Timeout"
+          disabled={!pluginEnabled}
+          {...register('serialpluginTimeout', {
             valueAsNumber: true,
           })}
         />

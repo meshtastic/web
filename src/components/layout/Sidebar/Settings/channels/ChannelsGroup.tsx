@@ -3,12 +3,11 @@ import type React from 'react';
 import { FaQrcode } from 'react-icons/fa';
 import { FiCode, FiSave } from 'react-icons/fi';
 
-import { CollapsibleSection } from '@app/components/layout/Sidebar/sections/CollapsibleSection';
-import { useAppSelector } from '@app/hooks/useAppSelector';
-import { IconButton } from '@meshtastic/components';
+import { IconButton } from '@components/generic/button/IconButton';
+import { CollapsibleSection } from '@components/generic/Sidebar/CollapsibleSection';
+import { SettingsPanel } from '@components/layout/Sidebar/Settings/channels/Channels';
+import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf } from '@meshtastic/meshtasticjs';
-
-import { SettingsPanel } from './SettingsPanel';
 
 export const ChannelsGroup = (): JSX.Element => {
   const channels = useAppSelector((state) => state.meshtastic.radio.channels);

@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { Loading } from '@meshtastic/components';
+import { Loading } from '@components/generic/Loading';
 
 export interface FormProps {
   loading?: boolean;

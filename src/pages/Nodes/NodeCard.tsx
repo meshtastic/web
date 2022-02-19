@@ -12,14 +12,14 @@ import { IoTelescope } from 'react-icons/io5';
 import { MdGpsFixed, MdGpsNotFixed, MdGpsOff } from 'react-icons/md';
 import JSONPretty from 'react-json-pretty';
 
-import { CollapsibleSection } from '@app/components/layout/Sidebar/sections/CollapsibleSection';
-import { SidebarOverlay } from '@app/components/layout/Sidebar/sections/SidebarOverlay';
-import { SidebarItem } from '@app/components/layout/Sidebar/SidebarItem';
-import { CopyButton } from '@app/components/menu/buttons/CopyButton';
+import { IconButton } from '@components/generic/button/IconButton';
+import { CollapsibleSection } from '@components/generic/Sidebar/CollapsibleSection';
+import { SidebarOverlay } from '@components/generic/Sidebar/SidebarOverlay';
+import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
+import { CopyButton } from '@components/menu/buttons/CopyButton';
 import type { Node } from '@core/slices/meshtasticSlice';
 import { Hashicon } from '@emeraldpay/hashicon-react';
 import { useMapbox } from '@hooks/useMapbox';
-import { IconButton } from '@meshtastic/components';
 
 type PositionConfidence = 'high' | 'low' | 'none';
 
@@ -126,7 +126,25 @@ export const NodeCard = ({
           </div>
         </CollapsibleSection>
         <CollapsibleSection title="Location" icon={<FiMapPin />}>
-          <div>Info</div>
+          <>
+            {node.currentPosition && (
+              <div className="flex h-10 select-none justify-between rounded-md border border-gray-300 bg-transparent bg-gray-200 px-1 text-gray-500 dark:border-gray-600 dark:bg-secondaryDark dark:text-gray-400 ">
+                <div className="my-auto px-1">
+                  {(node.currentPosition.latitudeI / 1e7).toPrecision(6)},&nbsp;
+                  {(node.currentPosition?.longitudeI / 1e7).toPrecision(6)}
+                </div>
+                <CopyButton
+                  data={
+                    node.currentPosition
+                      ? `${node.currentPosition.latitudeI / 1e7},${
+                          node.currentPosition.longitudeI / 1e7
+                        }`
+                      : ''
+                  }
+                />
+              </div>
+            )}
+          </>
         </CollapsibleSection>
         <CollapsibleSection title="Line of Sight" icon={<IoTelescope />}>
           <div>Info</div>

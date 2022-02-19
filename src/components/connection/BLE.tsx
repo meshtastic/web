@@ -3,12 +3,17 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { FiCheck } from 'react-icons/fi';
 
-import { connType } from '@app/core/slices/appSlice';
-import { setConnection } from '@core/connection';
-import { Button, IconButton } from '@meshtastic/components';
+import { Button } from '@components/generic/button/Button';
+import { IconButton } from '@components/generic/button/IconButton';
+import { connection, setConnection } from '@core/connection';
+import { connType } from '@core/slices/appSlice';
 import { IBLEConnection } from '@meshtastic/meshtasticjs';
 
-export const BLE = (): JSX.Element => {
+export interface BLEProps {
+  connecting: boolean;
+}
+
+export const BLE = ({ connecting }: BLEProps): JSX.Element => {
   const [bleDevices, setBleDevices] = React.useState<BluetoothDevice[]>([]);
 
   const { handleSubmit } = useForm<{
@@ -45,11 +50,22 @@ export const BLE = (): JSX.Element => {
               await setConnection(connType.BLE);
             }}
             icon={<FiCheck />}
+            disabled={connecting}
           />
         </div>
       ))}
-      <Button type="submit" className="mt-2 ml-auto" border>
-        Connect
+      <Button
+        className="mt-2 ml-auto"
+        onClick={async (): Promise<void> => {
+          if (connecting) {
+            await connection.disconnect();
+          } else {
+            await onSubmit();
+          }
+        }}
+        border
+      >
+        {connecting ? 'Disconnect' : 'Connect'}
       </Button>
     </form>
   );

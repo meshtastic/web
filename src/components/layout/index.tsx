@@ -2,10 +2,10 @@ import type React from 'react';
 
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { IconButton } from '@meshtastic/components';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Sidebar } from '@components/layout/Sidebar';
 
 import { ErrorFallback } from '../ErrorFallback';
-import { Sidebar } from './Sidebar';
 
 export interface LayoutProps {
   title: string;

@@ -2,9 +2,9 @@ import type React from 'react';
 
 import { FiClock } from 'react-icons/fi';
 
-import type { Node } from '@app/core/slices/meshtasticSlice';
+import { Tooltip } from '@components/generic/Tooltip';
+import type { Node } from '@core/slices/meshtasticSlice';
 import { Hashicon } from '@emeraldpay/hashicon-react';
-import { Tooltip } from '@meshtastic/components';
 
 export interface MessageProps {
   lastMsgSameUser: boolean;

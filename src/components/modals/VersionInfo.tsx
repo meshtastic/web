@@ -3,7 +3,8 @@ import React from 'react';
 import { AnimatePresence } from 'framer-motion';
 
 import { Modal } from '@components/generic/Modal';
-import { Card } from '@meshtastic/components';
+
+import { Card } from '../generic/Card';
 
 export interface VersionInfoProps {
   visible: boolean;
@@ -49,7 +50,7 @@ export const VersionInfo = ({
             onclose();
           }}
         >
-          <Card>
+          <Card className="relative">
             <div className="w-full max-w-3xl p-10">Version Info</div>
             {/* {data?.sha} */}
           </Card>

@@ -4,11 +4,14 @@ import { Controller, useForm } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
 import { MultiSelect } from 'react-multi-select-component';
 
-import { bitwiseEncode } from '@app/core/utils/bitwise';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Input } from '@components/generic/form/Input';
 import { Label } from '@components/generic/form/Label';
+import { Select } from '@components/generic/form/Select';
 import { connection } from '@core/connection';
+import { bitwiseEncode } from '@core/utils/bitwise';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { Checkbox, IconButton, Input, Select } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Position = (): JSX.Element => {

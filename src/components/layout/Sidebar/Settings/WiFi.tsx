@@ -3,9 +3,11 @@ import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
 
+import { IconButton } from '@components/generic/button/IconButton';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Input } from '@components/generic/form/Input';
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { Checkbox, IconButton, Input } from '@meshtastic/components';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const WiFi = (): JSX.Element => {

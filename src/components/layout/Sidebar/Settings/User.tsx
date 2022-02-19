@@ -4,9 +4,12 @@ import { useForm } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
 import { base16 } from 'rfc4648';
 
+import { IconButton } from '@components/generic/button/IconButton';
+import { Checkbox } from '@components/generic/form/Checkbox';
+import { Input } from '@components/generic/form/Input';
+import { Select } from '@components/generic/form/Select';
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
-import { Checkbox, IconButton, Input, Select } from '@meshtastic/components';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const User = (): JSX.Element => {
