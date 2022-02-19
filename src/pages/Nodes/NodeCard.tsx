@@ -59,6 +59,7 @@ export const NodeCard = ({
         actions={
           <>
             <IconButton
+              tooltip={PositionConfidence !== 'none' ? 'Fly to Node' : ''}
               disabled={PositionConfidence === 'none'}
               onClick={(e): void => {
                 e.stopPropagation();
@@ -84,6 +85,7 @@ export const NodeCard = ({
               }
             />
             <IconButton
+              tooltip="Show Node Info"
               onClick={(e): void => {
                 e.stopPropagation();
                 setInfoOpen(true);

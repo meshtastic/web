@@ -15,6 +15,7 @@ import {
   FiZap,
 } from 'react-icons/fi';
 
+import { useAppSelector } from '@app/hooks/useAppSelector.js';
 import { CollapsibleSection } from '@components/generic/Sidebar/CollapsibleSection';
 import { ExternalSection } from '@components/generic/Sidebar/ExternalSection';
 import { SidebarOverlay } from '@components/generic/Sidebar/SidebarOverlay';
@@ -39,7 +40,12 @@ export interface SettingsProps {
 export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
   const [pluginsOpen, setPluginsOpen] = React.useState(false);
   const [channelsOpen, setChannelsOpen] = React.useState(false);
-  // const { hasGps, hasWifi } = useAppSelector((state) => state.meshtastic.radio.hardware);
+  const {
+    rangeTestPluginEnabled,
+    extNotificationPluginEnabled,
+    serialpluginEnabled,
+    storeForwardPluginEnabled,
+  } = useAppSelector((state) => state.meshtastic.radio.preferences);
 
   const hasGps = true;
   const hasWifi = true;
@@ -100,16 +106,64 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         }}
         direction="x"
       >
-        <CollapsibleSection title="Range Test" icon={<FiRss />}>
+        <CollapsibleSection
+          title="Range Test"
+          icon={
+            <div className="flex gap-2">
+              <FiRss />
+              <div
+                className={`h-3 w-3 rounded-full ${
+                  rangeTestPluginEnabled ? 'bg-green-500' : 'bg-red-500'
+                }`}
+              />
+            </div>
+          }
+        >
           <RangeTestSettingsPanel />
         </CollapsibleSection>
-        <CollapsibleSection title="External Notifications" icon={<FiBell />}>
+        <CollapsibleSection
+          title="External Notifications"
+          icon={
+            <div className="flex gap-2">
+              <FiBell />
+              <div
+                className={`h-3 w-3 rounded-full ${
+                  extNotificationPluginEnabled ? 'bg-green-500' : 'bg-red-500'
+                }`}
+              />
+            </div>
+          }
+        >
           <ExternalNotificationsSettingsPlanel />
         </CollapsibleSection>
-        <CollapsibleSection title="Serial" icon={<FiAlignLeft />}>
+        <CollapsibleSection
+          title="Serial"
+          icon={
+            <div className="flex gap-2">
+              <FiAlignLeft />
+              <div
+                className={`h-3 w-3 rounded-full ${
+                  serialpluginEnabled ? 'bg-green-500' : 'bg-red-500'
+                }`}
+              />
+            </div>
+          }
+        >
           <SerialSettingsPanel />
         </CollapsibleSection>
-        <CollapsibleSection title="Store & Forward" icon={<FiFastForward />}>
+        <CollapsibleSection
+          title="Store & Forward"
+          icon={
+            <div className="flex gap-2">
+              <FiFastForward />
+              <div
+                className={`h-3 w-3 rounded-full ${
+                  storeForwardPluginEnabled ? 'bg-green-500' : 'bg-red-500'
+                }`}
+              />
+            </div>
+          }
+        >
           <StoreForwardSettingsPanel />
         </CollapsibleSection>
       </SidebarOverlay>
