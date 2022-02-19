@@ -66,7 +66,7 @@ export const BottomNav = (): JSX.Element => {
                 Types.DeviceStatusEnum.DEVICE_CONFIGURING,
               ].includes(meshtasticState.deviceStatus)
             ? 'bg-yellow-400 dark:bg-yellow-400'
-            : 'bg-gray-400 dark:bg-secondaryDark dark:text-white'
+            : ''
         }
       >
         {appState.connType === connType.BLE ? (

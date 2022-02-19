@@ -98,7 +98,7 @@ export const Connection = (): JSX.Element => {
               </div>
             </div>
             <div className="w-1/2">
-              <div className="h-96 overflow-y-auto rounded-md bg-gray-200 dark:bg-secondaryDark dark:text-gray-400">
+              <div className="h-96 overflow-y-auto rounded-md bg-gray-200 p-2 dark:bg-secondaryDark dark:text-gray-400">
                 {state.logs
                   .filter((log) => {
                     return ![

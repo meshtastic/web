@@ -1,9 +1,5 @@
 import type React from 'react';
 
-import { FaQrcode } from 'react-icons/fa';
-import { FiCode, FiSave } from 'react-icons/fi';
-
-import { IconButton } from '@components/generic/button/IconButton';
 import { CollapsibleSection } from '@components/generic/Sidebar/CollapsibleSection';
 import { SettingsPanel } from '@components/layout/Sidebar/Settings/channels/Channels';
 import { useAppSelector } from '@hooks/useAppSelector';
@@ -36,19 +32,8 @@ export const ChannelsGroup = (): JSX.Element => {
                   }`}
                 />
               }
-              actions={
-                <>
-                  <IconButton icon={<FiCode />} />
-                  <IconButton icon={<FaQrcode />} />
-                  <IconButton icon={<FiSave />} />
-                </>
-              }
             >
-              <>
-                {/* <DebugPanel channel={channel} /> */}
-                {/* <QRCodePanel channel={channel} /> */}
-                <SettingsPanel channel={channel} />
-              </>
+              <SettingsPanel channel={channel} />
             </CollapsibleSection>
           </div>
         );
