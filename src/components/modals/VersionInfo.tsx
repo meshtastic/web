@@ -1,12 +1,17 @@
 import React from 'react';
 
 import { AnimatePresence } from 'framer-motion';
+import { MdUpgrade } from 'react-icons/md';
 import useSWR from 'swr';
 
-import { setUpdateAvaliable } from '@app/core/slices/appSlice.js';
-import { fetcher } from '@app/core/utils/fetcher.js';
-import { useAppDispatch } from '@app/hooks/useAppDispatch.js';
+import { connectionUrl } from '@app/core/connection.js';
+import { setUpdateAvaliable } from '@app/core/slices/appSlice';
+import { fetcher } from '@app/core/utils/fetcher';
+import { useAppDispatch } from '@app/hooks/useAppDispatch';
+import { useAppSelector } from '@app/hooks/useAppSelector';
 import { Modal } from '@components/generic/Modal';
+
+import { IconButton } from '../generic/button/IconButton';
 
 export interface Commit {
   sha: string;
@@ -36,6 +41,7 @@ export const VersionInfo = ({
   visible,
   onClose,
 }: VersionInfoProps): JSX.Element => {
+  const appState = useAppSelector((state) => state.app);
   const dispatch = useAppDispatch();
 
   const { data } = useSWR<Commit[]>(
@@ -63,6 +69,13 @@ export const VersionInfo = ({
       {visible && (
         <Modal
           title="Version Info"
+          actions={
+            appState.updateAvaliable && (
+              <a href={`http://${connectionUrl}/admin/spiffs`}>
+                <IconButton tooltip="Update now" icon={<MdUpgrade />} />
+              </a>
+            )
+          }
           onClose={(): void => {
             onClose();
           }}

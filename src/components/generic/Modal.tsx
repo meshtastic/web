@@ -11,12 +11,14 @@ import { Card } from './Card';
 export interface ModalProps {
   title: string;
   onClose: () => void;
+  actions?: React.ReactNode;
   children: React.ReactNode;
 }
 
 export const Modal = ({
   title,
   onClose,
+  actions,
   children,
 }: ModalProps): JSX.Element => {
   const darkMode = useAppSelector((state) => state.app.darkMode);
@@ -43,7 +45,10 @@ export const Modal = ({
               <div className="text-2xl font-medium dark:text-white">
                 {title}
               </div>
-              <IconButton icon={<FiX />} onClick={onClose} />
+              <div className="flex gap-2">
+                {actions}
+                <IconButton tooltip="Close" icon={<FiX />} onClick={onClose} />
+              </div>
             </div>
             {children}
           </Card>

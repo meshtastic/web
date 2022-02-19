@@ -18,7 +18,7 @@ export const BottomNavItem = ({
   children,
 }: BottomNavItemProps) => {
   return (
-    <Tooltip content={tooltip}>
+    <Tooltip disabled={!tooltip} content={tooltip}>
       <div
         onClick={onClick}
         className={`group flex h-full cursor-pointer select-none p-1 hover:bg-gray-200 dark:text-white dark:hover:bg-primaryDark ${className}`}
