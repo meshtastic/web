@@ -39,7 +39,7 @@ export const VersionInfo = ({
   const dispatch = useAppDispatch();
 
   const { data } = useSWR<Commit[]>(
-    'https://api.github.com/repos/meshtastic/meshtastic-web/commits?per_page=10',
+    'https://api.github.com/repos/meshtastic/meshtastic-web/commits?per_page=100',
     fetcher,
     {
       revalidateOnFocus: false,
@@ -67,12 +67,12 @@ export const VersionInfo = ({
             onClose();
           }}
         >
-          <div className="flex flex-col gap-1 dark:text-white">
+          <div className="flex h-96 flex-col gap-1 overflow-y-auto dark:text-white">
             {data &&
               data.map((commit) => (
                 <div
                   key={commit.sha}
-                  className={`flex gap-2 rounded-md p-1 ${
+                  className={`flex gap-2 rounded-md py-1 px-2 ${
                     commit.sha.substring(0, 7) === process.env.COMMIT_HASH
                       ? 'bg-primary'
                       : 'dark:bg-secondaryDark'
