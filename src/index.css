@@ -58,15 +58,6 @@
   overflow: auto;
 }
 
-/* Mobile height fix */
-/* .min-h-fill {
-  min-height: -webkit-fill-available;
-}
-
-.h-fill {
-  height: -webkit-fill-available;
-} */
-
 body {
   min-height: 100vh;
   /* mobile viewport bug fix */

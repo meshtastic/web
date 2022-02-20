@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { Map } from '@app/pages/Map';
 import { Connection } from '@components/Connection';

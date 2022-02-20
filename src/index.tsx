@@ -1,7 +1,7 @@
 import '@app/index.css';
 
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
 
 import { domAnimation, LazyMotion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -13,7 +13,7 @@ import { ReloadPrompt } from '@components/pwa/ReloadPrompt';
 import { RouteProvider } from '@core/router';
 import { store } from '@core/store';
 
-ReactDOM.render(
+render(
   <React.StrictMode>
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <RouteProvider>
