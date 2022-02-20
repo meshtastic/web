@@ -1,10 +1,13 @@
 import React from 'react';
 
+import { m } from 'framer-motion';
 import type { Edge, Node } from 'react-flow-renderer';
 import ReactFlow, { Background, Controls, MiniMap } from 'react-flow-renderer';
+import { BiCrown } from 'react-icons/bi';
 import { FiSettings } from 'react-icons/fi';
 import { RiMindMap } from 'react-icons/ri';
 
+import { Tooltip } from '@app/components/generic/Tooltip';
 import { IconButton } from '@components/generic/button/IconButton';
 import { Layout } from '@components/layout';
 import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
@@ -97,7 +100,17 @@ export const Nodes = (): JSX.Element => {
               }
             >
               <div className="flex dark:text-white">
-                <div className="m-auto">
+                <div className="relative m-auto">
+                  {node.number === myNodeNum && (
+                    <Tooltip content="Your Node">
+                      <m.div
+                        whileHover={{ scale: 1.05 }}
+                        className="absolute -right-1 -top-1 rounded-full bg-yellow-500 p-0.5"
+                      >
+                        <BiCrown className="h-3 w-3" />
+                      </m.div>
+                    </Tooltip>
+                  )}
                   <Hashicon value={node.number.toString()} size={32} />
                 </div>
               </div>

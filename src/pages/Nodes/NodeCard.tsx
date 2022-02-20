@@ -1,6 +1,8 @@
 import React from 'react';
 
+import { m } from 'framer-motion';
 import mapbox from 'mapbox-gl';
+import { BiCrown } from 'react-icons/bi';
 import {
   FiAlignLeft,
   FiCode,
@@ -12,6 +14,7 @@ import { IoTelescope } from 'react-icons/io5';
 import { MdGpsFixed, MdGpsNotFixed, MdGpsOff } from 'react-icons/md';
 import JSONPretty from 'react-json-pretty';
 
+import { Tooltip } from '@app/components/generic/Tooltip';
 import { IconButton } from '@components/generic/button/IconButton';
 import { CollapsibleSection } from '@components/generic/Sidebar/CollapsibleSection';
 import { SidebarOverlay } from '@components/generic/Sidebar/SidebarOverlay';
@@ -96,7 +99,17 @@ export const NodeCard = ({
         }
       >
         <div className="flex dark:text-white">
-          <div className="m-auto">
+          <div className="relative m-auto">
+            {isMyNode && (
+              <Tooltip content="Your Node">
+                <m.div
+                  whileHover={{ scale: 1.05 }}
+                  className="absolute -right-1 -top-1 rounded-full bg-yellow-500 p-0.5"
+                >
+                  <BiCrown className="h-3 w-3" />
+                </m.div>
+              </Tooltip>
+            )}
             <Hashicon value={node.number.toString()} size={32} />
           </div>
         </div>

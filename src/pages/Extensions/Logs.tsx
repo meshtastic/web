@@ -49,7 +49,7 @@ export const Logs = (): JSX.Element => {
 
   return (
     <div className="flex h-full flex-col gap-4 p-4">
-      <Card className="flex-grow">
+      <Card className="flex-grow overflow-y-auto">
         <table className="table-cell flex-grow">
           <tbody
             className="
