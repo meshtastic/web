@@ -4,7 +4,7 @@ specifiers:
   '@emeraldpay/hashicon-react': ^0.5.2
   '@hookform/devtools': ^4.0.2
   '@meshtastic/eslint-config': ^1.0.6
-  '@meshtastic/meshtasticjs': ^0.6.47
+  '@meshtastic/meshtasticjs': ^0.6.48
   '@reduxjs/toolkit': ^1.7.2
   '@tippyjs/react': ^4.2.6
   '@types/mapbox-gl': ^2.6.1
@@ -49,7 +49,7 @@ specifiers:
 dependencies:
   '@emeraldpay/hashicon-react': 0.5.2
   '@meshtastic/eslint-config': 1.0.6
-  '@meshtastic/meshtasticjs': 0.6.47
+  '@meshtastic/meshtasticjs': 0.6.48
   '@reduxjs/toolkit': 1.7.2_react-redux@7.2.6+react@17.0.2
   '@tippyjs/react': 4.2.6_react-dom@17.0.2+react@17.0.2
   base64-js: 1.5.1
@@ -1631,8 +1631,8 @@ packages:
       - supports-color
     dev: false
 
-  /@meshtastic/meshtasticjs/0.6.47:
-    resolution: {integrity: sha512-WO/4o8bHFihNY8cPfmIZ8AnLv5XxduQJg2fff4mDAu8X+ydpTzmlgxlDMK5kdhqDGx22ADmK3XTDdivWFjYPVA==}
+  /@meshtastic/meshtasticjs/0.6.48:
+    resolution: {integrity: sha512-ithCXUk57R49bTG+UK2MEpk0K/f0QROV+/fupVWhdJtszMHJor+BZRw9UEBU2QBdv8u2nVJbEwG9RaWnW67eqg==}
     dependencies:
       '@meshtastic/eslint-config': 1.0.6
       '@protobuf-ts/runtime': 2.2.2

@@ -109,9 +109,14 @@ export const meshtasticSlice = createSlice({
           node.lastHeard = new Date(action.payload.packet.rxTime * 1000);
         }
       } else {
-        // todo: add node
-        console.log('Node not in DB');
-        console.log(action.payload);
+        state.nodes.push({
+          number: action.payload.packet.from,
+          lastHeard: new Date(),
+          snr: [action.payload.packet.rxSnr],
+          user: action.payload.data,
+          positions: [],
+          routes: [],
+        });
       }
     },
     addPosition: (state, action: PayloadAction<Types.PositionPacket>) => {
@@ -200,10 +205,12 @@ export const meshtasticSlice = createSlice({
       state.radio.preferences = action.payload;
     },
     addMessage: (state, action: PayloadAction<MessageWithAck>) => {
+      // todo: is last interraction for just channel chats or dm's to?
       state.chats[action.payload.message.packet.channel].lastInterraction =
         new Date();
 
       if (action.payload.message.packet.to === 0xffffffff) {
+        // TODO: use chatIndex
         state.chats[action.payload.message.packet.channel].messages.push(
           action.payload,
         );
@@ -220,8 +227,18 @@ export const meshtasticSlice = createSlice({
       state,
       action: PayloadAction<{ chatIndex: number; messageId: number }>,
     ) => {
+      console.log(action.payload.chatIndex);
+
+      console.log(state.chats);
+
+      console.log(state.chats[action.payload.chatIndex]);
+
       state.chats[action.payload.chatIndex].messages.map((message) => {
+        console.log('ack');
+
         if (message.message.packet.id === action.payload.messageId) {
+          console.log('acked');
+
           message.ack = true;
         }
       });

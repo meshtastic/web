@@ -22,7 +22,7 @@
   "dependencies": {
     "@emeraldpay/hashicon-react": "^0.5.2",
     "@meshtastic/eslint-config": "^1.0.6",
-    "@meshtastic/meshtasticjs": "^0.6.47",
+    "@meshtastic/meshtasticjs": "^0.6.48",
     "@reduxjs/toolkit": "^1.7.2",
     "@tippyjs/react": "^4.2.6",
     "base64-js": "^1.5.1",

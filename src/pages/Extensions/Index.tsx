@@ -3,7 +3,7 @@ import React from 'react';
 import { FiFile, FiInfo } from 'react-icons/fi';
 import { MdSubject } from 'react-icons/md';
 import { RiPinDistanceFill } from 'react-icons/ri';
-import { VscExtensions } from 'react-icons/vsc';
+import { VscDebug, VscExtensions } from 'react-icons/vsc';
 
 import { ExternalSection } from '@components/generic/Sidebar/ExternalSection';
 import { Layout } from '@components/layout';
@@ -11,9 +11,11 @@ import { FileBrowser } from '@pages/Extensions/FileBrowser';
 import { Info } from '@pages/Extensions/Info';
 import { Logs } from '@pages/Extensions/Logs';
 
+import { Debug } from './Debug';
+
 export const Extensions = (): JSX.Element => {
   const [selectedExtension, setSelectedExtension] = React.useState<
-    'info' | 'logs' | 'fileBrowser' | 'rangeTest'
+    'info' | 'logs' | 'fileBrowser' | 'rangeTest' | 'debug'
   >('info');
 
   return (
@@ -50,6 +52,13 @@ export const Extensions = (): JSX.Element => {
             icon={<RiPinDistanceFill />}
             title="Range Test"
           />
+          <ExternalSection
+            onClick={(): void => {
+              setSelectedExtension('debug');
+            }}
+            icon={<VscDebug />}
+            title="Debug"
+          />
         </div>
       }
     >
@@ -59,6 +68,8 @@ export const Extensions = (): JSX.Element => {
         {selectedExtension === 'logs' && <Logs />}
 
         {selectedExtension === 'fileBrowser' && <FileBrowser />}
+
+        {selectedExtension === 'debug' && <Debug />}
       </div>
     </Layout>
   );
