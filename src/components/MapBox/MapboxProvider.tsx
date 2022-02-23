@@ -1,6 +1,7 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect, useRef } from 'react';
 
-import mapboxgl from 'mapbox-gl';
+import { ScaleControl } from 'mapbox-gl';
 
 import { MapboxContext } from '@components/MapBox/mapboxContext';
 import {
@@ -26,7 +27,7 @@ export const MapboxProvider = ({
   const darkMode = useAppSelector((state) => state.app.darkMode);
   const mapState = useAppSelector((state) => state.map);
   const dispatch = useAppDispatch();
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   const map = useCreateMapbox({
     ref,
@@ -41,9 +42,9 @@ export const MapboxProvider = ({
     },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     map?.on('load', () => {
-      map.addControl(new mapboxgl.ScaleControl());
+      map.addControl(new ScaleControl());
     });
     map?.on('styledata', () => {
       if (!map.getSource('mapbox-dem')) {
@@ -73,14 +74,14 @@ export const MapboxProvider = ({
     });
   }, [dispatch, map, mapState.exaggeration]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const center = map?.getCenter();
     if (center !== mapState.latLng) {
       map?.setCenter(mapState.latLng);
     }
   }, [map, mapState.latLng]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (['Light', 'Dark'].includes(mapState.style)) {
       dispatch(setMapStyle(darkMode ? 'Dark' : 'Light'));
     }
@@ -89,7 +90,7 @@ export const MapboxProvider = ({
   /**
    * Hill Shading
    */
-  React.useEffect(() => {
+  useEffect(() => {
     if (map?.loaded()) {
       if (mapState.hillShade) {
         map.addLayer(
@@ -111,7 +112,7 @@ export const MapboxProvider = ({
   /**
    * Exaggeration
    */
-  React.useEffect(() => {
+  useEffect(() => {
     if (map?.loaded()) {
       map.setTerrain({
         source: 'mapbox-dem',
@@ -123,7 +124,7 @@ export const MapboxProvider = ({
   /**
    * Map Style
    */
-  React.useEffect(() => {
+  useEffect(() => {
     if (map?.loaded()) {
       map.setStyle(MapStyles[mapState.style].data);
     }

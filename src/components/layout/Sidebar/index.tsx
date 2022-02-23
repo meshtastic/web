@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import { ButtonNav } from '@components/layout/Sidebar/ButtonNav';
 import { Settings } from '@components/layout/Sidebar/Settings/Index';
@@ -9,7 +10,7 @@ export interface SidebarProps {
 }
 
 export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
-  const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const appState = useAppSelector((state) => state.app);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { FiMessageCircle, FiSettings } from 'react-icons/fi';
 import { RiMindMap, RiRoadMapLine } from 'react-icons/ri';

@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import { useForm, useWatch } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
@@ -12,7 +13,7 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const ExternalNotificationsSettingsPlanel = (): JSX.Element => {
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
 
   const preferences = useAppSelector(
     (state) => state.meshtastic.radio.preferences,
@@ -23,7 +24,7 @@ export const ExternalNotificationsSettingsPlanel = (): JSX.Element => {
       defaultValues: preferences,
     });
 
-  React.useEffect(() => {
+  useEffect(() => {
     reset(preferences);
   }, [reset, preferences]);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { Button } from '@app/components/generic/button/Button';
 import { Card } from '@app/components/generic/Card';

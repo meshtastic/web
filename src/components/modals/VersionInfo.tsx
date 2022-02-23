@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 
 import { AnimatePresence } from 'framer-motion';
 import { MdUpgrade } from 'react-icons/md';
@@ -56,7 +57,7 @@ export const VersionInfo = ({
     },
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (data) {
       const index = data.findIndex(
         (commit) => commit.sha.substring(0, 7) === process.env.COMMIT_HASH,
@@ -90,7 +91,7 @@ export const VersionInfo = ({
               data.map((commit) => (
                 <div
                   key={commit.sha}
-                  className={`flex gap-2 rounded-md py-1 px-2 ${
+                  className={`flex gap-2 rounded-md border border-transparent py-1 px-2 hover:border-primary ${
                     commit.sha.substring(0, 7) === process.env.COMMIT_HASH
                       ? 'bg-primary'
                       : 'dark:bg-secondaryDark'

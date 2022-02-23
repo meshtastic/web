@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import {
   FiBluetooth,
@@ -31,7 +32,7 @@ import { VersionInfo } from '../modals/VersionInfo';
 import { BottomNavItem } from './BottomNavItem';
 
 export const BottomNav = (): JSX.Element => {
-  const [showVersionInfo, setShowVersionInfo] = React.useState(false);
+  const [showVersionInfo, setShowVersionInfo] = useState(false);
   const dispatch = useAppDispatch();
   const meshtasticState = useAppSelector((state) => state.meshtastic);
   const appState = useAppSelector((state) => state.app);

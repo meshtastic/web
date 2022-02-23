@@ -1,20 +1,23 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import { m } from 'framer-motion';
-import { FiExternalLink } from 'react-icons/fi';
+import { FiChevronRight } from 'react-icons/fi';
 
 export interface ExternalSectionProps {
   title: string;
   icon?: JSX.Element;
+  active?: boolean;
   onClick: () => void;
 }
 
 export const ExternalSection = ({
   title,
   icon,
+  active,
   onClick,
 }: ExternalSectionProps): JSX.Element => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const toggleOpen = (): void => setOpen(!open);
   return (
     <m.div
@@ -24,7 +27,9 @@ export const ExternalSection = ({
     >
       <m.div
         layout
-        className="w-full cursor-pointer select-none overflow-hidden dark:bg-secondaryDark dark:text-gray-400"
+        className={`w-full cursor-pointer select-none overflow-hidden border-l-4 dark:bg-secondaryDark dark:text-gray-400 ${
+          active ? 'border-primary' : 'dark:border-secondaryDark'
+        }`}
       >
         <m.div
           layout
@@ -38,7 +43,7 @@ export const ExternalSection = ({
             {title}
           </m.div>
           <m.div className="my-auto">
-            <FiExternalLink />
+            <FiChevronRight />
           </m.div>
         </m.div>
       </m.div>

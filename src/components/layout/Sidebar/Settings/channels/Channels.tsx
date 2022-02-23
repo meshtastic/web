@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import { fromByteArray, toByteArray } from 'base64-js';
 import { useForm } from 'react-hook-form';
@@ -18,9 +19,9 @@ export interface SettingsPanelProps {
 }
 
 export const SettingsPanel = ({ channel }: SettingsPanelProps): JSX.Element => {
-  const [loading, setLoading] = React.useState(false);
-  const [keySize, setKeySize] = React.useState<128 | 256>(256);
-  const [pskHidden, setPskHidden] = React.useState(true);
+  const [loading, setLoading] = useState(false);
+  const [keySize, setKeySize] = useState<128 | 256>(256);
+  const [pskHidden, setPskHidden] = useState(true);
 
   const { register, handleSubmit, setValue, formState, reset } = useForm<
     Omit<Protobuf.ChannelSettings, 'psk'> & { psk: string; enabled: boolean }
@@ -37,7 +38,7 @@ export const SettingsPanel = ({ channel }: SettingsPanelProps): JSX.Element => {
     },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     reset({
       enabled: [
         Protobuf.Channel_Role.SECONDARY,

@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import path from 'path';
+import { resolve } from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 import importToCDN from 'vite-plugin-cdn-import';
@@ -79,11 +79,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@app': path.resolve(__dirname, './src'),
-      '@pages': path.resolve(__dirname, './src/pages'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@core': path.resolve(__dirname, './src/core'),
+      '@app': resolve(__dirname, './src'),
+      '@pages': resolve(__dirname, './src/pages'),
+      '@components': resolve(__dirname, './src/components'),
+      '@hooks': resolve(__dirname, './src/hooks'),
+      '@core': resolve(__dirname, './src/core'),
       '@skypack/': 'https://cdn.skypack.dev/',
     },
   },

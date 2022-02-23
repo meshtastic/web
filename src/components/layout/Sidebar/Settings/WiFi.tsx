@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import { useForm, useWatch } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
@@ -14,7 +15,7 @@ export const WiFi = (): JSX.Element => {
   const preferences = useAppSelector(
     (state) => state.meshtastic.radio.preferences,
   );
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState, reset, control } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: preferences,
@@ -32,7 +33,7 @@ export const WiFi = (): JSX.Element => {
     defaultValue: false,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     reset(preferences);
   }, [reset, preferences]);
 

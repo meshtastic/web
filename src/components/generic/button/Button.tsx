@@ -1,8 +1,8 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
+import { m } from 'framer-motion';
 import { FiCheck } from 'react-icons/fi';
-
-type DefaultButtonProps = JSX.IntrinsicElements['button'];
 
 export enum ButtonSize {
   Small = 'small',
@@ -10,26 +10,28 @@ export enum ButtonSize {
   Large = 'large',
 }
 
-export interface ButtonProps extends DefaultButtonProps {
+export interface ButtonProps {
   icon?: JSX.Element;
-  active?: boolean;
   border?: boolean;
+  className?: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
   size?: ButtonSize;
+  onClick?: () => void;
   confirmAction?: () => void;
 }
 
 export const Button = ({
   icon,
   className,
-  active,
   border,
   size = ButtonSize.Medium,
   confirmAction,
+  onClick,
   disabled,
   children,
-  ...props
 }: ButtonProps): JSX.Element => {
-  const [hasConfirmed, setHasConfirmed] = React.useState(false);
+  const [hasConfirmed, setHasConfirmed] = useState(false);
 
   const handleConfirm = (): void => {
     if (typeof confirmAction == 'function') {
@@ -44,9 +46,11 @@ export const Button = ({
   };
 
   return (
-    <button
+    <m.button
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.97 }}
       onClick={handleConfirm}
-      className={`flex select-none items-center space-x-3 rounded-md border border-transparent text-sm transition duration-200 ease-in-out focus-within:border-primary focus-within:shadow-border active:scale-95 dark:text-white dark:focus-within:border-primary
+      className={`flex select-none items-center space-x-3 rounded-md border border-transparent text-sm focus-within:border-primary focus-within:shadow-border dark:text-white dark:focus-within:border-primary
         ${
           size === ButtonSize.Small
             ? 'p-0'
@@ -58,8 +62,10 @@ export const Button = ({
         disabled
           ? 'cursor-not-allowed bg-white dark:bg-primaryDark'
           : 'cursor-pointer hover:bg-gray-100 hover:shadow-md dark:hover:bg-secondaryDark'
-      } ${border ? 'border-gray-400 dark:border-gray-200' : ''} ${className}`}
-      {...props}
+      } ${border ? 'border-gray-400 dark:border-gray-200' : ''} ${
+        className ?? ''
+      }`}
+      onClickCapture={onClick}
     >
       {icon && (
         <div className="text-gray-500 dark:text-gray-400">
@@ -68,6 +74,6 @@ export const Button = ({
       )}
 
       <span>{children}</span>
-    </button>
+    </m.button>
   );
 };

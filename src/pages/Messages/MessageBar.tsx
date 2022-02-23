@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import { Input } from '@components/generic/form/Input';
 import { connection } from '@core/connection';
@@ -14,9 +15,9 @@ export const MessageBar = ({ chatIndex }: MessageBarProps): JSX.Element => {
   const dispatch = useAppDispatch();
   const meshtasticState = useAppSelector((state) => state.meshtastic);
 
-  const [isChannel, setIsChannel] = React.useState(false);
+  const [isChannel, setIsChannel] = useState(false);
 
-  React.useState(() => {
+  useState(() => {
     setIsChannel(
       meshtasticState.radio.channels.findIndex(
         (channel) => channel.index === chatIndex,
@@ -24,7 +25,7 @@ export const MessageBar = ({ chatIndex }: MessageBarProps): JSX.Element => {
     );
   });
 
-  const [currentMessage, setCurrentMessage] = React.useState('');
+  const [currentMessage, setCurrentMessage] = useState('');
   const sendMessage = (): void => {
     if (meshtasticState.ready) {
       void connection.sendText(
@@ -33,6 +34,13 @@ export const MessageBar = ({ chatIndex }: MessageBarProps): JSX.Element => {
         true,
         isChannel ? chatIndex-- : 0,
         (id) => {
+          console.log(`Chat Index, ${chatIndex}`);
+          console.log(`Chat Index --, ${chatIndex--}`);
+
+          console.log(
+            `Chat Index computed, ${isChannel ? chatIndex-- : chatIndex}`,
+          );
+
           dispatch(
             ackMessage({
               chatIndex: isChannel ? chatIndex-- : chatIndex,

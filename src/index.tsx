@@ -1,6 +1,7 @@
 import '@app/index.css';
 
-import React from 'react';
+import type React from 'react';
+import { StrictMode } from 'react';
 import { render } from 'react-dom';
 
 import { domAnimation, LazyMotion } from 'framer-motion';
@@ -14,7 +15,7 @@ import { RouteProvider } from '@core/router';
 import { store } from '@core/store';
 
 render(
-  <React.StrictMode>
+  <StrictMode>
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <RouteProvider>
         <Provider store={store}>
@@ -25,6 +26,6 @@ render(
         </Provider>
       </RouteProvider>
     </ErrorBoundary>
-  </React.StrictMode>,
+  </StrictMode>,
   document.getElementById('root'),
 );

@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { forwardRef } from 'react';
 
 import { Label } from '@components/generic/form/Label';
 
@@ -12,7 +13,7 @@ export interface CheckboxProps extends DefaultInputProps {
   error?: boolean;
 }
 
-export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   function Input(
     { label, valid, validationMessage, id, error, ...props }: CheckboxProps,
     ref,

@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import { AnimatePresence, m } from 'framer-motion';
 import { FiArrowUp } from 'react-icons/fi';
@@ -14,13 +15,15 @@ export const CollapsibleSection = ({
   icon,
   children,
 }: CollapsibleSectionProps): JSX.Element => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const toggleOpen = (): void => setOpen(!open);
   return (
     <m.div>
       <m.div
         layout
-        className="w-full cursor-pointer select-none overflow-hidden border-b border-gray-300 p-2 text-sm font-medium dark:border-primaryDark dark:bg-secondaryDark dark:text-gray-400"
+        className={`w-full cursor-pointer select-none overflow-hidden border-l-4 border-b border-gray-300 p-2 text-sm font-medium dark:border-primaryDark dark:bg-secondaryDark dark:text-gray-400 ${
+          open ? 'dark:border-l-primary' : 'dark:border-secondaryDark'
+        }`}
       >
         <m.div
           layout

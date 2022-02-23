@@ -37,16 +37,18 @@ export const Modal = ({
           &#8203;
         </span>
         <div className="inline-block w-full max-w-3xl align-middle">
-          <Card className="relative flex-col gap-4 border border-gray-300 dark:border-gray-600">
-            <div className="flex justify-between">
-              <div className="text-2xl font-medium dark:text-white">
-                {title}
-              </div>
-              <div className="flex gap-2">
+          <Card
+            border
+            draggable
+            title={title}
+            actions={
+              <>
                 {actions}
                 <IconButton tooltip="Close" icon={<FiX />} onClick={onClose} />
-              </div>
-            </div>
+              </>
+            }
+            className="relative flex-col gap-4 "
+          >
             {children}
           </Card>
         </div>

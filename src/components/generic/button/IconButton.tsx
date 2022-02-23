@@ -1,5 +1,7 @@
 import type React from 'react';
 
+import { m } from 'framer-motion';
+
 import { Tooltip } from '@components/generic/Tooltip';
 
 type DefaulButtonProps = JSX.IntrinsicElements['button'];
@@ -7,26 +9,32 @@ type DefaulButtonProps = JSX.IntrinsicElements['button'];
 export interface IconButtonProps extends DefaulButtonProps {
   icon: React.ReactNode;
   tooltip?: string;
+  nested?: boolean;
   active?: boolean;
 }
 
 export const IconButton = ({
   icon,
-  active,
   tooltip,
+  nested,
+  active,
   disabled,
   ...props
 }: IconButtonProps): JSX.Element => {
   return (
     <Tooltip disabled={!tooltip} content={tooltip}>
-      <div className="my-auto text-gray-500 dark:text-gray-400">
+      <m.div
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.97 }}
+        className="my-auto text-gray-500 dark:text-gray-400"
+      >
         <button
           type="button"
           disabled={disabled}
-          className={`rounded-md p-2 transition duration-200 ease-in-out active:scale-95 ${
-            active
-              ? 'bg-gray-200 dark:bg-gray-600'
-              : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+          className={`rounded-md p-2 hover:bg-gray-200 ${
+            active ? 'bg-gray-200 dark:bg-secondaryDark' : ''
+          } ${
+            nested ? 'dark:hover:bg-primaryDark' : 'dark:hover:bg-secondaryDark'
           } ${
             disabled
               ? 'cursor-not-allowed text-gray-400 dark:text-gray-700'
@@ -37,7 +45,7 @@ export const IconButton = ({
           {icon}
           <span className="sr-only">Refresh</span>
         </button>
-      </div>
+      </m.div>
     </Tooltip>
   );
 };

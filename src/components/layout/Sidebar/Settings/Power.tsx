@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
@@ -14,7 +15,7 @@ export const Power = (): JSX.Element => {
   const preferences = useAppSelector(
     (state) => state.meshtastic.radio.preferences,
   );
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState, reset } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: {
@@ -23,7 +24,7 @@ export const Power = (): JSX.Element => {
       },
     });
 
-  React.useEffect(() => {
+  useEffect(() => {
     reset(preferences);
   }, [reset, preferences]);
 

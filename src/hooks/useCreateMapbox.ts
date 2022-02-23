@@ -1,30 +1,29 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-import React from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
-import mapboxgl from 'mapbox-gl';
-
-type AccessToken = string;
+import { Map, MapboxOptions } from 'mapbox-gl';
 
 export interface useMapboxProps {
   ref: React.RefObject<HTMLDivElement>;
-  accessToken: AccessToken;
-  options?: Partial<mapboxgl.MapboxOptions>;
+  accessToken: string;
+  options?: Partial<MapboxOptions>;
 }
 
 export function useCreateMapbox({
   ref,
   accessToken,
   options,
-}: useMapboxProps): mapboxgl.Map | undefined {
-  const [mapInstance, setMapInstance] = React.useState<mapboxgl.Map>();
-  React.useEffect(() => {
+}: useMapboxProps): Map | undefined {
+  const [mapInstance, setMapInstance] = useState<Map>();
+  useEffect(() => {
     const container = ref.current as HTMLDivElement;
     if (mapInstance || !container) {
       return;
     }
-    mapboxgl.accessToken = accessToken;
-    const map = new mapboxgl.Map({
+    const map = new Map({
+      accessToken,
       container,
       antialias: true,
       ...options,

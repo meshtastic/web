@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { FiSettings } from 'react-icons/fi';
 
@@ -25,7 +25,7 @@ export const DmChat = ({
       setSelected={(): void => {
         setSelectedIndex(node.number);
       }}
-      actions={<IconButton icon={<FiSettings />} />}
+      actions={<IconButton nested icon={<FiSettings />} />}
     >
       <div className="flex dark:text-white">
         <div className="m-auto">

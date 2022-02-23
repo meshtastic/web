@@ -1,7 +1,8 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import { m } from 'framer-motion';
-import mapbox from 'mapbox-gl';
+import { LngLat } from 'mapbox-gl';
 import { BiCrown } from 'react-icons/bi';
 import {
   FiAlignLeft,
@@ -40,11 +41,11 @@ export const NodeCard = ({
   setSelected,
 }: NodeCardProps): JSX.Element => {
   const { map } = useMapbox();
-  const [infoOpen, setInfoOpen] = React.useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [PositionConfidence, setPositionConfidence] =
-    React.useState<PositionConfidence>('none');
+    useState<PositionConfidence>('none');
 
-  React.useEffect(() => {
+  useEffect(() => {
     setPositionConfidence(
       node.currentPosition
         ? new Date(node.currentPosition.posTimestamp * 1000) >
@@ -62,6 +63,7 @@ export const NodeCard = ({
         actions={
           <>
             <IconButton
+              nested
               tooltip={PositionConfidence !== 'none' ? 'Fly to Node' : ''}
               disabled={PositionConfidence === 'none'}
               onClick={(e): void => {
@@ -69,7 +71,7 @@ export const NodeCard = ({
                 setSelected();
                 if (PositionConfidence !== 'none' && node.currentPosition) {
                   map?.flyTo({
-                    center: new mapbox.LngLat(
+                    center: new LngLat(
                       node.currentPosition.longitudeI / 1e7,
                       node.currentPosition.latitudeI / 1e7,
                     ),
@@ -88,6 +90,7 @@ export const NodeCard = ({
               }
             />
             <IconButton
+              nested
               tooltip="Show Node Info"
               onClick={(e): void => {
                 e.stopPropagation();

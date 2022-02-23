@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { FiArrowRightCircle } from 'react-icons/fi';
@@ -14,19 +15,19 @@ export interface BLEProps {
 }
 
 export const BLE = ({ connecting }: BLEProps): JSX.Element => {
-  const [bleDevices, setBleDevices] = React.useState<BluetoothDevice[]>([]);
+  const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);
 
   const { handleSubmit } = useForm<{
     device?: BluetoothDevice;
   }>();
 
-  const updateBleDeviceList = React.useCallback(async (): Promise<void> => {
+  const updateBleDeviceList = useCallback(async (): Promise<void> => {
     const ble = new IBLEConnection();
     const devices = await ble.getDevices();
     setBleDevices(devices);
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     void updateBleDeviceList();
   }, [updateBleDeviceList]);
 
@@ -46,6 +47,7 @@ export const BLE = ({ connecting }: BLEProps): JSX.Element => {
         >
           <div className="my-auto">{device.name}</div>
           <IconButton
+            nested
             onClick={async (): Promise<void> => {
               await setConnection(connType.BLE);
             }}

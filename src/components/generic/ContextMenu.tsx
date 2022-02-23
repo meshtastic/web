@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import { FiActivity, FiAperture, FiTag } from 'react-icons/fi';
 
@@ -13,8 +14,8 @@ export const ContextMenu = ({
   items,
   children,
 }: ContextMenuProps): JSX.Element => {
-  const [visible, setVisible] = React.useState(false);
-  const [position, setPosition] = React.useState({ x: 0, y: 0 });
+  const [visible, setVisible] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
   return (
     <div

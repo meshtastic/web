@@ -1,13 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import type React from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
-import mapbox from 'mapbox-gl';
+import type { LngLatLike, MarkerOptions } from 'mapbox-gl';
+import { Marker as MapboxMarker } from 'mapbox-gl';
 
 import { useMapbox } from '@hooks/useMapbox';
 
-export interface MarkerProps extends Omit<mapbox.MarkerOptions, 'element'> {
+export interface MarkerProps extends Omit<MarkerOptions, 'element'> {
   children?: React.ReactNode;
-  center: mapbox.LngLatLike;
+  center: LngLatLike;
 }
 
 export const Marker = ({
@@ -16,22 +18,22 @@ export const Marker = ({
   ...props
 }: MarkerProps): JSX.Element => {
   const { map } = useMapbox();
-  const ref = React.useRef<HTMLDivElement>(document.createElement('div'));
+  const ref = useRef<HTMLDivElement>(document.createElement('div'));
 
-  const addMarker = React.useCallback((): void => {
+  const addMarker = useCallback((): void => {
     if (map) {
-      const marker = new mapbox.Marker(ref.current, props).setLngLat(center);
+      const marker = new MapboxMarker(ref.current, props).setLngLat(center);
       marker.addTo(map);
     }
   }, [map, center, props]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     map?.on('load', () => {
       addMarker();
     });
   }, [addMarker, map]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (map?.loaded()) {
       addMarker();
     }
@@ -39,5 +41,5 @@ export const Marker = ({
 
   <div ref={ref}>{children}</div>;
 
-  return ReactDOM.createPortal(children, ref.current);
+  return createPortal(children, ref.current);
 };

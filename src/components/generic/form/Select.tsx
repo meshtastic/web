@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { forwardRef } from 'react';
 
 import { InputWrapper } from '@components/generic/form/InputWrapper';
 import { Label } from '@components/generic/form/Label';
@@ -16,7 +17,7 @@ export interface SelectProps extends DefaultSelectProps {
   small?: boolean;
 }
 
-export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ options, optionsEnum, label, error, small, ...props }, ref) => {
     const optionsEnumValues = optionsEnum
       ? Object.entries(optionsEnum).filter(

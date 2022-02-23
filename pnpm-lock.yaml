@@ -15,13 +15,14 @@ specifiers:
   '@vitejs/plugin-react': ^1.2.0
   autoprefixer: ^10.4.2
   base64-js: ^1.5.1
-  framer-motion: ^6.2.6
+  framer-motion: ^6.2.7
   gzipper: ^7.0.0
   mapbox-gl: ^2.7.0
   postcss: ^8.4.6
   prettier: ^2.5.1
   react: ^17.0.2
   react-dom: ^17.0.2
+  react-draggable: ^4.4.4
   react-error-boundary: ^3.1.4
   react-flow-renderer: ^10.0.0-next.39
   react-hook-form: ^7.27.1
@@ -53,11 +54,12 @@ dependencies:
   '@reduxjs/toolkit': 1.7.2_react-redux@7.2.6+react@17.0.2
   '@tippyjs/react': 4.2.6_react-dom@17.0.2+react@17.0.2
   base64-js: 1.5.1
-  framer-motion: 6.2.6_react-dom@17.0.2+react@17.0.2
+  framer-motion: 6.2.7_react-dom@17.0.2+react@17.0.2
   mapbox-gl: 2.7.0
   prettier: 2.5.1
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
+  react-draggable: 4.4.4_react-dom@17.0.2+react@17.0.2
   react-error-boundary: 3.1.4_react@17.0.2
   react-flow-renderer: 10.0.0-next.39_react-dom@17.0.2+react@17.0.2
   react-hook-form: 7.27.1_react@17.0.2
@@ -3448,8 +3450,8 @@ packages:
     resolution: {integrity: sha512-pUHWWt6vHzZZiQJcM6S/0PXfS+g6FM4BF5rj9wZyreivhQPdsh5PpE25VtSNxq80wHS5RfY51Ii+8Z0Zl/pmzg==}
     dev: true
 
-  /framer-motion/6.2.6_react-dom@17.0.2+react@17.0.2:
-    resolution: {integrity: sha512-7eGav5MxEEzDHozQTDY6+psTIOw2i2kM1QVoJOC3bCp9VOKoo+mKR5n7aT5JPh7ksEKFYJYz0GJDils/9S+oLA==}
+  /framer-motion/6.2.7_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-RExmZCFpJ3OCakoXmZz8iW8ZI5MoaHmVadydetvTSrNaKmZ7ZC/JDQpNyw1NoDG+fchRGP86lXoiTFSQuin+Cg==}
     peerDependencies:
       react: '>=16.8 || ^17.0.0 || ^18.0.0'
       react-dom: '>=16.8 || ^17.0.0 || ^18.0.0'

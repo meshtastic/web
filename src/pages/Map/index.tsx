@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import mapboxgl from 'mapbox-gl';
 import { FiMapPin } from 'react-icons/fi';
@@ -13,7 +14,7 @@ import { Marker } from '@pages/Map/Marker';
 import { NodeCard } from '@pages/Nodes/NodeCard';
 
 export const Map = (): JSX.Element => {
-  const [selectedNode, setSelectedNode] = React.useState<Node>();
+  const [selectedNode, setSelectedNode] = useState<Node>();
 
   const nodes = useAppSelector((state) => state.meshtastic.nodes);
   const myNodeNum = useAppSelector(

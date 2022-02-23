@@ -1,8 +1,10 @@
-import React from 'react';
+import type React from 'react';
 
 import { AnimatePresence, m } from 'framer-motion';
+import { FiFilePlus } from 'react-icons/fi';
 import useSWR from 'swr';
 
+import { Button } from '@app/components/generic/button/Button';
 import { Card } from '@app/components/generic/Card';
 import { fetcher } from '@core/utils/fetcher';
 import { useAppSelector } from '@hooks/useAppSelector';
@@ -29,22 +31,27 @@ export const FileBrowser = (): JSX.Element => {
   const connectionParams = useAppSelector(
     (state) => state.app.connectionParams,
   );
-  const darkMode = useAppSelector((state) => state.app.darkMode);
+  const appState = useAppSelector((state) => state.app);
+  const meshtasticState = useAppSelector((state) => state.meshtastic);
 
   const { data } = useSWR<Files>(
     `${connectionParams.HTTP.tls ? 'https' : 'http'}://${
       connectionParams.HTTP.address
-    }/json/spiffs/browse/static`,
+    }${
+      meshtasticState.radio.hardware.firmwareVersion.includes('1.2')
+        ? '/json/spiffs/browse/static'
+        : '/json/fs/browse/static'
+    }`,
     fetcher,
   );
 
   return (
     <div className="flex h-full p-4">
-      <Card className="flex-grow flex-col">
-        <div className="flex h-10 w-full rounded-t-md border-b border-gray-300 px-4 text-lg font-semibold shadow-md dark:border-gray-600 dark:bg-zinc-700 dark:text-white">
-          <div className="my-auto  w-1/3">FileName</div>
-          <div className="my-auto  w-1/3">Actions</div>
-        </div>
+      <Card
+        title="File Browser"
+        actions={<Button icon={<FiFilePlus />}>Upload File</Button>}
+        className="flex-grow flex-col"
+      >
         <div className="h-full px-4">
           <AnimatePresence>
             {(!data || data?.data.files.length === 0) && (
@@ -55,7 +62,7 @@ export const FileBrowser = (): JSX.Element => {
                   exit={{ opacity: 0 }}
                   className="m-auto h-64 w-64 text-green-500"
                   src={`/placeholders/${
-                    darkMode ? 'Files Dark.svg' : 'Files.svg'
+                    appState.darkMode ? 'Files Dark.svg' : 'Files.svg'
                   }`}
                 />
               </div>

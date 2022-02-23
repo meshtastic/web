@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import {
   FiAlignLeft,
@@ -38,8 +39,8 @@ export interface SettingsProps {
 }
 
 export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
-  const [pluginsOpen, setPluginsOpen] = React.useState(false);
-  const [channelsOpen, setChannelsOpen] = React.useState(false);
+  const [pluginsOpen, setPluginsOpen] = useState(false);
+  const [channelsOpen, setChannelsOpen] = useState(false);
   const {
     rangeTestPluginEnabled,
     extNotificationPluginEnabled,

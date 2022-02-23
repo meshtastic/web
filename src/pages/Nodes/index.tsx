@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import { m } from 'framer-motion';
 import type { Edge, Node } from 'react-flow-renderer';
@@ -15,15 +16,15 @@ import { Hashicon } from '@emeraldpay/hashicon-react';
 import { useAppSelector } from '@hooks/useAppSelector';
 
 export const Nodes = (): JSX.Element => {
-  const [graphNodes, setGraphNodes] = React.useState<Node[]>([]);
-  const [graphEdges, setGraphEdges] = React.useState<Edge[]>([]);
-  const [selected, setSelected] = React.useState<number>(0);
+  const [graphNodes, setGraphNodes] = useState<Node[]>([]);
+  const [graphEdges, setGraphEdges] = useState<Edge[]>([]);
+  const [selected, setSelected] = useState<number>(0);
   const nodes = useAppSelector((state) => state.meshtastic.nodes);
   const myNodeNum = useAppSelector(
     (state) => state.meshtastic.radio.hardware.myNodeNum,
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     const tmpNodes: Node[] = [];
     // User Terminal
     tmpNodes.push({
@@ -45,7 +46,7 @@ export const Nodes = (): JSX.Element => {
     setGraphNodes(tmpNodes);
   }, [nodes, myNodeNum]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const tmpEdges: Edge[] = [];
 
     nodes.map((node, index) => {
@@ -91,6 +92,7 @@ export const Nodes = (): JSX.Element => {
               }}
               actions={
                 <IconButton
+                  nested
                   onClick={(e): void => {
                     e.stopPropagation();
                     setSelected(node.number);

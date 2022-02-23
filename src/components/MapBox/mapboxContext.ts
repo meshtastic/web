@@ -1,12 +1,13 @@
-import React from 'react';
+import type React from 'react';
+import { createContext } from 'react';
 
-import type mapbox from 'mapbox-gl';
+import type { Map } from 'mapbox-gl';
 
 export interface MapboxContextValue {
   ref: React.Ref<HTMLDivElement>;
-  map?: mapbox.Map;
+  map?: Map;
 }
 
-export const MapboxContext = React.createContext<MapboxContextValue>(
+export const MapboxContext = createContext<MapboxContextValue>(
   {} as MapboxContextValue,
 );

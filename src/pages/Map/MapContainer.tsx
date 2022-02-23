@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useCallback } from 'react';
 
 import { FaDirections, FaGlobeAfrica, FaMountain } from 'react-icons/fa';
 import { MdFullscreen, MdRadar, MdWbShade } from 'react-icons/md';
@@ -23,7 +24,7 @@ export const MapContainer = (): JSX.Element => {
 
   const { ref } = useMapbox();
 
-  const ChangeMapStyle = React.useCallback(
+  const ChangeMapStyle = useCallback(
     (styleName: string, style: MapStyle) => {
       dispatch(
         setMapStyle(

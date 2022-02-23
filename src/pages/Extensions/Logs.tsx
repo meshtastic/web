@@ -1,15 +1,16 @@
 import type React from 'react';
 
 import { AnimatePresence, m } from 'framer-motion';
-import { FiArrowRight, FiPaperclip } from 'react-icons/fi';
+import { FiArrowRight, FiPaperclip, FiX } from 'react-icons/fi';
 
+import { Button } from '@app/components/generic/button/Button';
 import { Card } from '@app/components/generic/Card';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 
 export const Logs = (): JSX.Element => {
-  const logs = useAppSelector((state) => state.meshtastic.logs);
-  const darkMode = useAppSelector((state) => state.app.darkMode);
+  const meshtasticState = useAppSelector((state) => state.meshtastic);
+  const appState = useAppSelector((state) => state.app);
 
   type lookupType = { [key: number]: string };
 
@@ -49,14 +50,18 @@ export const Logs = (): JSX.Element => {
 
   return (
     <div className="flex h-full flex-col gap-4 p-4">
-      <Card className="flex-grow overflow-y-auto">
+      <Card
+        title="Device Logs"
+        actions={<Button icon={<FiX />}>Clear Logs</Button>}
+        className="flex-grow overflow-y-auto"
+      >
         <table className="table-cell flex-grow">
           <tbody
             className="
           block h-full flex-col overflow-y-auto font-mono text-xs dark:text-gray-400"
           >
             <AnimatePresence>
-              {logs.length === 0 && (
+              {meshtasticState.logs.length === 0 && (
                 <div className="flex h-full w-full">
                   <m.img
                     initial={{ opacity: 0 }}
@@ -64,13 +69,13 @@ export const Logs = (): JSX.Element => {
                     exit={{ opacity: 0 }}
                     className="m-auto h-64 w-64 text-green-500"
                     src={`/placeholders/${
-                      darkMode ? 'View Code Dark.svg' : 'View Code.svg'
+                      appState.darkMode ? 'View Code Dark.svg' : 'View Code.svg'
                     }`}
                   />
                 </div>
               )}
             </AnimatePresence>
-            {logs.map((log, index) => (
+            {meshtasticState.logs.map((log, index) => (
               // <ContextMenu
               //   key={index}
               //   items={

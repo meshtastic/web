@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
@@ -17,9 +18,9 @@ export const Channels = (): JSX.Element => {
     channels.find(
       (channel) => channel.role === Protobuf.Channel_Role.PRIMARY,
     ) ?? channels[0];
-  const [usePreset, setUsePreset] = React.useState(true);
-  const [loading, setLoading] = React.useState(false);
-  const [selectedChannel, setSelectedChannel] = React.useState<
+  const [usePreset, setUsePreset] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState<
     Protobuf.Channel | undefined
   >();
 

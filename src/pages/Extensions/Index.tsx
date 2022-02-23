@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import { FiFile, FiInfo } from 'react-icons/fi';
 import { MdSubject } from 'react-icons/md';
@@ -14,7 +15,7 @@ import { Logs } from '@pages/Extensions/Logs';
 import { Debug } from './Debug';
 
 export const Extensions = (): JSX.Element => {
-  const [selectedExtension, setSelectedExtension] = React.useState<
+  const [selectedExtension, setSelectedExtension] = useState<
     'info' | 'logs' | 'fileBrowser' | 'rangeTest' | 'debug'
   >('info');
 
@@ -29,6 +30,7 @@ export const Extensions = (): JSX.Element => {
               setSelectedExtension('info');
             }}
             icon={<FiInfo />}
+            active={selectedExtension === 'info'}
             title="Node Info"
           />
           <ExternalSection
@@ -36,6 +38,7 @@ export const Extensions = (): JSX.Element => {
               setSelectedExtension('logs');
             }}
             icon={<MdSubject />}
+            active={selectedExtension === 'logs'}
             title="Logs"
           />
           <ExternalSection
@@ -43,6 +46,7 @@ export const Extensions = (): JSX.Element => {
               setSelectedExtension('fileBrowser');
             }}
             icon={<FiFile />}
+            active={selectedExtension === 'fileBrowser'}
             title="File Browser"
           />
           <ExternalSection
@@ -50,6 +54,7 @@ export const Extensions = (): JSX.Element => {
               setSelectedExtension('rangeTest');
             }}
             icon={<RiPinDistanceFill />}
+            active={selectedExtension === 'rangeTest'}
             title="Range Test"
           />
           <ExternalSection
@@ -57,6 +62,7 @@ export const Extensions = (): JSX.Element => {
               setSelectedExtension('debug');
             }}
             icon={<VscDebug />}
+            active={selectedExtension === 'debug'}
             title="Debug"
           />
         </div>

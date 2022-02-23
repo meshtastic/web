@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { FiHash, FiMessageCircle } from 'react-icons/fi';
 
@@ -12,9 +13,9 @@ import { Message } from '@pages/Messages/Message';
 import { MessageBar } from '@pages/Messages/MessageBar';
 
 export const Messages = (): JSX.Element => {
-  const [selectedChatIndex, setSelectedChatIndex] = React.useState<number>(0);
+  const [selectedChatIndex, setSelectedChatIndex] = useState<number>(0);
 
-  const chatRef = React.useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   const myNodeNum = useAppSelector(
     (state) => state.meshtastic.radio.hardware,
@@ -25,7 +26,7 @@ export const Messages = (): JSX.Element => {
     (state) => state.meshtastic.radio.channels,
   ).filter((ch) => ch.role !== Protobuf.Channel_Role.DISABLED);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
@@ -66,7 +67,7 @@ export const Messages = (): JSX.Element => {
       <div className="flex w-full flex-col">
         <div className="flex w-full justify-between border-b border-gray-300 px-2 dark:border-gray-600 dark:text-gray-300">
           <div className="my-auto flex gap-2 py-2 text-sm">
-            <IconButton icon={<FiHash className="h-4 w-4" />} />
+            <IconButton nested icon={<FiHash className="h-4 w-4" />} />
             <div className="my-auto">
               {channels.findIndex((ch) => ch.index === selectedChatIndex) !==
               -1 ? (

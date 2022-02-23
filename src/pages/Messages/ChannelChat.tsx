@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { m } from 'framer-motion';
 import { FiSettings } from 'react-icons/fi';
@@ -41,7 +41,7 @@ export const ChannelChat = ({
       setSelected={(): void => {
         setSelectedIndex(channel.index);
       }}
-      actions={<IconButton icon={<FiSettings />} />}
+      actions={<IconButton nested icon={<FiSettings />} />}
     >
       <Tooltip
         content={

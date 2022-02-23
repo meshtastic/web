@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { FiArrowRightCircle } from 'react-icons/fi';
@@ -15,20 +16,20 @@ export interface SerialProps {
 }
 
 export const Serial = ({ connecting }: SerialProps): JSX.Element => {
-  const [serialDevices, setSerialDevices] = React.useState<SerialPort[]>([]);
+  const [serialDevices, setSerialDevices] = useState<SerialPort[]>([]);
   const dispatch = useAppDispatch();
 
   const { handleSubmit } = useForm<{
     device?: SerialPort;
   }>();
 
-  const updateSerialDeviceList = React.useCallback(async (): Promise<void> => {
+  const updateSerialDeviceList = useCallback(async (): Promise<void> => {
     const serial = new ISerialConnection();
     const devices = await serial.getPorts();
     setSerialDevices(devices);
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     void updateSerialDeviceList();
   }, [updateSerialDeviceList]);
 
@@ -53,6 +54,7 @@ export const Serial = ({ connecting }: SerialProps): JSX.Element => {
               </p>
             </div>
             <IconButton
+              nested
               onClick={async (): Promise<void> => {
                 dispatch(
                   setConnectionParams({

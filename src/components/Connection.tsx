@@ -1,6 +1,7 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 
 import { BLE } from '@components/connection/BLE';
 import { HTTP } from '@components/connection/HTTP';
@@ -21,10 +22,10 @@ import { Types } from '@meshtastic/meshtasticjs';
 export const Connection = (): JSX.Element => {
   const dispatch = useAppDispatch();
 
-  const state = useAppSelector((state) => state.meshtastic);
+  const meshtasticState = useAppSelector((state) => state.meshtastic);
   const appState = useAppSelector((state) => state.app);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!import.meta.env.VITE_PUBLIC_HOSTED) {
       dispatch(
         setConnectionParams({
@@ -41,11 +42,11 @@ export const Connection = (): JSX.Element => {
     }
   }, [dispatch]);
 
-  React.useEffect(() => {
-    if (state.ready) {
+  useEffect(() => {
+    if (meshtasticState.ready) {
       dispatch(closeConnectionModal());
     }
-  }, [state.ready, dispatch]);
+  }, [meshtasticState.ready, dispatch]);
 
   return (
     <AnimatePresence>
@@ -67,14 +68,14 @@ export const Connection = (): JSX.Element => {
                     dispatch(setConnType(parseInt(e.target.value)));
                   }}
                   disabled={
-                    state.deviceStatus ===
+                    meshtasticState.deviceStatus ===
                     Types.DeviceStatusEnum.DEVICE_CONNECTED
                   }
                 />
                 {appState.connType === connType.HTTP && (
                   <HTTP
                     connecting={
-                      state.deviceStatus ===
+                      meshtasticState.deviceStatus ===
                       Types.DeviceStatusEnum.DEVICE_CONNECTED
                     }
                   />
@@ -82,7 +83,7 @@ export const Connection = (): JSX.Element => {
                 {appState.connType === connType.BLE && (
                   <BLE
                     connecting={
-                      state.deviceStatus ===
+                      meshtasticState.deviceStatus ===
                       Types.DeviceStatusEnum.DEVICE_CONNECTED
                     }
                   />
@@ -90,7 +91,7 @@ export const Connection = (): JSX.Element => {
                 {appState.connType === connType.SERIAL && (
                   <Serial
                     connecting={
-                      state.deviceStatus ===
+                      meshtasticState.deviceStatus ===
                       Types.DeviceStatusEnum.DEVICE_CONNECTED
                     }
                   />
@@ -98,8 +99,23 @@ export const Connection = (): JSX.Element => {
               </div>
             </div>
             <div className="md:w-1/2">
-              <div className="h-96 overflow-y-auto rounded-md bg-gray-200 p-2 dark:bg-secondaryDark dark:text-gray-400">
-                {state.logs
+              <div className="h-96 overflow-y-auto rounded-md border border-gray-300 bg-gray-200 p-2 dark:border-gray-600 dark:bg-secondaryDark dark:text-gray-400">
+                {meshtasticState.logs.length === 0 && (
+                  <div className="flex h-full w-full">
+                    <m.img
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="m-auto h-40 w-40 text-green-500"
+                      src={`/placeholders/${
+                        appState.darkMode
+                          ? 'View Code Dark.svg'
+                          : 'View Code.svg'
+                      }`}
+                    />
+                  </div>
+                )}
+                {meshtasticState.logs
                   .filter((log) => {
                     return ![
                       Types.Emitter.handleFromRadio,

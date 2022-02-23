@@ -13,10 +13,10 @@ import { NotFound } from '@pages/NotFound';
 
 export const App = (): JSX.Element => {
   const route = useRoute();
-  const darkMode = useAppSelector((state) => state.app.darkMode);
+  const appState = useAppSelector((state) => state.app);
 
   return (
-    <div className={`h-screen w-screen ${darkMode ? 'dark' : ''}`}>
+    <div className={`h-screen w-screen ${appState.darkMode ? 'dark' : ''}`}>
       <ContextMenu>
         <Connection />
         <div className="flex h-full flex-col bg-gray-200 dark:bg-secondaryDark">

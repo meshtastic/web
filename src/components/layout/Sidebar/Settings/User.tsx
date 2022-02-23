@@ -1,4 +1,5 @@
-import React from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { FiSave } from 'react-icons/fi';
@@ -13,7 +14,7 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const User = (): JSX.Element => {
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
   const myNodeNum = useAppSelector(
     (state) => state.meshtastic.radio.hardware,
   ).myNodeNum;
@@ -40,7 +41,7 @@ export const User = (): JSX.Element => {
     },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     reset({
       longName: node?.user?.longName,
       shortName: node?.user?.shortName,
