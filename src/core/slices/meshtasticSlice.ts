@@ -87,6 +87,9 @@ export const meshtasticSlice = createSlice({
     addLogEvent: (state, action: PayloadAction<Types.LogEventPacket>) => {
       state.logs.push(action.payload);
     },
+    clearLogs: (state) => {
+      state.logs = [];
+    },
     setDeviceStatus: (state, action: PayloadAction<Types.DeviceStatusEnum>) => {
       state.deviceStatus = action.payload;
     },
@@ -286,6 +289,7 @@ export const meshtasticSlice = createSlice({
 
 export const {
   addLogEvent,
+  clearLogs,
   setDeviceStatus,
   setLastMeshInterraction,
   setReady,

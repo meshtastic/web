@@ -5,10 +5,14 @@ import { FiArrowRight, FiPaperclip, FiX } from 'react-icons/fi';
 
 import { Button } from '@app/components/generic/button/Button';
 import { Card } from '@app/components/generic/Card';
+import { clearLogs } from '@app/core/slices/meshtasticSlice';
+import { useAppDispatch } from '@app/hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 
 export const Logs = (): JSX.Element => {
+  const dispatch = useAppDispatch();
+
   const meshtasticState = useAppSelector((state) => state.meshtastic);
   const appState = useAppSelector((state) => state.app);
 
@@ -52,7 +56,16 @@ export const Logs = (): JSX.Element => {
     <div className="flex h-full flex-col gap-4 p-4">
       <Card
         title="Device Logs"
-        actions={<Button icon={<FiX />}>Clear Logs</Button>}
+        actions={
+          <Button
+            onClick={(): void => {
+              dispatch(clearLogs());
+            }}
+            icon={<FiX />}
+          >
+            Clear Logs
+          </Button>
+        }
         className="flex-grow overflow-y-auto"
       >
         <table className="table-cell flex-grow">
