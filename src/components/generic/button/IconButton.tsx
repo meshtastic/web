@@ -19,6 +19,7 @@ export const IconButton = ({
   nested,
   active,
   disabled,
+  className,
   ...props
 }: IconButtonProps): JSX.Element => {
   return (
@@ -39,7 +40,7 @@ export const IconButton = ({
             disabled
               ? 'cursor-not-allowed text-gray-400 dark:text-gray-700'
               : ''
-          }`}
+          } ${className ?? ''}`}
           {...props}
         >
           {icon}

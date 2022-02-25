@@ -1,17 +1,19 @@
 import type React from 'react';
-import { useState } from 'react';
 
-import { ButtonNav } from '@components/layout/Sidebar/ButtonNav';
 import { Settings } from '@components/layout/Sidebar/Settings/Index';
 import { useAppSelector } from '@hooks/useAppSelector';
 
 export interface SidebarProps {
   children: React.ReactNode;
+  setSettingsOpen: (settingsOpen: boolean) => void;
+  settingsOpen: boolean;
 }
 
-export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
-  const [settingsOpen, setSettingsOpen] = useState(false);
-
+export const Sidebar = ({
+  settingsOpen,
+  setSettingsOpen,
+  children,
+}: SidebarProps): JSX.Element => {
   const appState = useAppSelector((state) => state.app);
 
   return (
@@ -25,11 +27,6 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
           <div className="absolute h-full w-full">{children}</div>
           <Settings open={settingsOpen} setOpen={setSettingsOpen} />
         </div>
-        <ButtonNav
-          toggleSettingsOpen={(): void => {
-            setSettingsOpen(!settingsOpen);
-          }}
-        />
       </div>
     </div>
   );
