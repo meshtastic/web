@@ -30,6 +30,33 @@ export const Layout = ({
 
   const route = useRoute();
 
+  const tabs = [
+    {
+      title: 'Messages',
+      icon: <FiMessageCircle />,
+      link: routes.messages().link,
+      active: route.name === 'messages',
+    },
+    {
+      title: 'Nodes',
+      icon: <RiMindMap />,
+      link: routes.nodes().link,
+      active: route.name === 'nodes',
+    },
+    {
+      title: 'Map',
+      icon: <RiRoadMapLine />,
+      link: routes.map().link,
+      active: route.name === 'map',
+    },
+    {
+      title: 'Extensions',
+      icon: <VscExtensions />,
+      link: routes.extensions().link,
+      active: route.name === 'extensions',
+    },
+  ];
+
   return (
     <div className="relative flex w-full bg-gray-100 dark:bg-secondaryDark md:overflow-hidden md:shadow-xl">
       <div className="flex flex-grow">
@@ -45,42 +72,28 @@ export const Layout = ({
       </div>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <div className="flex h-full w-full flex-col bg-gray-300 dark:bg-secondaryDark">
-          <div className="flex w-full border-b border-gray-300 pr-2 pt-1 dark:border-gray-600">
-            <div className="mx-1">
+          <div className="flex w-full pt-1 dark:bg-primaryDark">
+            <div className="h-8">
               <IconButton
-                className="rounded-b-none"
+                className="mx-1 rounded-b-none p-3"
+                icon={<FiSettings />}
                 onClick={(): void => {
                   setSettingsOpen(!settingsOpen);
                 }}
-                nested
                 active={settingsOpen}
-                icon={<FiSettings />}
               />
             </div>
-            <Tab
-              title="Messages"
-              icon={<FiMessageCircle />}
-              link={routes.messages().link}
-              active={route.name === 'messages'}
-            />
-            <Tab
-              title="Nodes"
-              icon={<RiMindMap />}
-              link={routes.nodes().link}
-              active={route.name === 'nodes'}
-            />
-            <Tab
-              title="Map"
-              icon={<RiRoadMapLine />}
-              link={routes.map().link}
-              active={route.name === 'map'}
-            />
-            <Tab
-              title="Extensions"
-              icon={<VscExtensions />}
-              link={routes.extensions().link}
-              active={route.name === 'extensions'}
-            />
+            {tabs.map((tab, index) => (
+              <Tab
+                key={index}
+                link={tab.link}
+                title={tab.title}
+                icon={tab.icon}
+                active={tab.active}
+                activeLeft={tabs[index - 1]?.active}
+                activeRight={tabs[index + 1]?.active}
+              />
+            ))}
           </div>
           <div className="flex flex-grow">{children}</div>
         </div>
