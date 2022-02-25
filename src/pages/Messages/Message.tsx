@@ -31,7 +31,7 @@ export const Message = ({
         >
           <div className="flex gap-2">
             <Tooltip content={rxTime.toString()}>
-              <div className="my-auto ml-auto w-8 pt-1 text-xs text-transparent dark:group-hover:text-gray-400">
+              <div className="my-auto ml-auto w-8 pt-1 text-xs text-transparent group-hover:text-gray-500 dark:group-hover:text-gray-400">
                 {rxTime
                   .toLocaleTimeString(undefined, {
                     hour: '2-digit',
@@ -50,7 +50,7 @@ export const Message = ({
             </div>
           </div>
           <Tooltip content="Response time">
-            <div className="flex gap-1 pt-1 text-xs text-transparent dark:group-hover:text-gray-400">
+            <div className="flex gap-1 pt-1 text-xs text-transparent group-hover:text-gray-500 dark:group-hover:text-gray-400">
               <FiClock className="mt-0.5" />
               <div>25s</div>
             </div>

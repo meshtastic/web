@@ -85,63 +85,68 @@ export const Logs = (): JSX.Element => {
                   />
                 </div>
               )}
-            </AnimatePresence>
-            {meshtasticState.logs.map((log, index) => (
-              // <ContextMenu
-              //   key={index}
-              //   items={
-              //     <>
-              //       <ContextItem title="Test" icon={<FiGitBranch />} />
-              //     </>
-              //   }
-              // >
-              <tr
-                key={index}
-                className="group hover:bg-gray-200 dark:hover:bg-secondaryDark"
-              >
-                <m.td
-                  className="w-6 cursor-pointer"
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                >
-                  <div className="m-auto pl-2 text-white group-hover:text-black dark:text-primaryDark dark:group-hover:text-gray-400">
-                    <FiArrowRight />
-                  </div>
-                </m.td>
-                <Wrapper>
-                  {log.date
-                    .toLocaleString(undefined, {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
 
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                    })
-                    .replaceAll('/', '-')
-                    .replace(',', '')}
-                </Wrapper>
-                <Wrapper>
-                  <div className={emitterLookup[log.emitter]}>
-                    [{Types.EmitterScope[log.scope]}.
-                    {Types.Emitter[log.emitter]}]
-                  </div>
-                </Wrapper>
-                <Wrapper className={levelLookup[log.level]}>
-                  [{Protobuf.LogRecord_Level[log.level]}]{/* </div> */}
-                </Wrapper>
-                <td
-                  className={`m-auto ${
-                    log.packet ? '' : 'dark:text-secondaryDark'
-                  }`}
+              {meshtasticState.logs.map((log, index) => (
+                // <ContextMenu
+                //   key={index}
+                //   items={
+                //     <>
+                //       <ContextItem title="Test" icon={<FiGitBranch />} />
+                //     </>
+                //   }
+                // >
+                <m.tr
+                  key={index}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="group hover:bg-gray-200 dark:hover:bg-secondaryDark"
                 >
-                  <FiPaperclip />
-                </td>
-                <td className="w-full truncate pl-1">{log.message}</td>
-              </tr>
-              // </ContextMenu>
-            ))}
+                  <m.td
+                    className="w-6 cursor-pointer"
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                  >
+                    <div className="m-auto pl-2 text-white group-hover:text-black dark:text-primaryDark dark:group-hover:text-gray-400">
+                      <FiArrowRight />
+                    </div>
+                  </m.td>
+                  <Wrapper>
+                    {log.date
+                      .toLocaleString(undefined, {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                      })
+                      .replaceAll('/', '-')
+                      .replace(',', '')}
+                  </Wrapper>
+                  <Wrapper>
+                    <div className={emitterLookup[log.emitter]}>
+                      [{Types.EmitterScope[log.scope]}.
+                      {Types.Emitter[log.emitter]}]
+                    </div>
+                  </Wrapper>
+                  <Wrapper className={levelLookup[log.level]}>
+                    [{Protobuf.LogRecord_Level[log.level]}]{/* </div> */}
+                  </Wrapper>
+                  <td
+                    className={`m-auto ${
+                      log.packet ? '' : 'dark:text-secondaryDark'
+                    }`}
+                  >
+                    <FiPaperclip />
+                  </td>
+                  <td className="w-full truncate pl-1">{log.message}</td>
+                </m.tr>
+                // </ContextMenu>
+              ))}
+            </AnimatePresence>
           </tbody>
         </table>
       </Card>
