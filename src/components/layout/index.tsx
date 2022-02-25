@@ -2,7 +2,7 @@ import type React from 'react';
 import { useState } from 'react';
 
 import { ErrorBoundary } from 'react-error-boundary';
-import { FiMessageCircle, FiSettings } from 'react-icons/fi';
+import { FiMessageCircle, FiSettings, FiTag } from 'react-icons/fi';
 import { RiMindMap, RiRoadMapLine } from 'react-icons/ri';
 import { VscExtensions } from 'react-icons/vsc';
 
@@ -55,6 +55,12 @@ export const Layout = ({
       link: routes.extensions().link,
       active: route.name === 'extensions',
     },
+    {
+      title: 'Temp',
+      icon: <FiTag />,
+      link: routes.extensions().link,
+      active: route.name === 'map',
+    },
   ];
 
   return (
@@ -72,7 +78,7 @@ export const Layout = ({
       </div>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <div className="flex h-full w-full flex-col bg-gray-300 dark:bg-secondaryDark">
-          <div className="flex w-full pt-1 dark:bg-primaryDark">
+          <div className="flex w-full bg-gray-100 pt-1 dark:bg-primaryDark">
             <div className="h-8">
               <IconButton
                 className="mx-1 rounded-b-none p-3"
@@ -94,6 +100,7 @@ export const Layout = ({
                 activeRight={tabs[index + 1]?.active}
               />
             ))}
+            <div className="-z-10 flex-grow shadow-md" />
           </div>
           <div className="flex flex-grow">{children}</div>
         </div>

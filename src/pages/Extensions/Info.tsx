@@ -1,9 +1,9 @@
 import type React from 'react';
 
-import { FiRefreshCw } from 'react-icons/fi';
+import { FiClipboard, FiRefreshCw } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { Button } from '@app/components/generic/button/Button';
+import { IconButton } from '@app/components/generic/button/IconButton';
 import { Card } from '@app/components/generic/Card';
 import { Hashicon } from '@emeraldpay/hashicon-react';
 import { useAppSelector } from '@hooks/useAppSelector';
@@ -22,11 +22,7 @@ export const Info = (): JSX.Element => {
     <div className="flex h-full flex-col gap-4 p-4 xl:flex-row">
       <Card
         title="Connected Node Details"
-        actions={
-          <Button className="truncate" icon={<FiRefreshCw />}>
-            Refresh Node info
-          </Button>
-        }
+        actions={<IconButton icon={<FiRefreshCw />} />}
         className="xl:w-3/5"
       >
         <div className="m-auto flex flex-col gap-2">
@@ -35,9 +31,17 @@ export const Info = (): JSX.Element => {
             {node?.user?.longName || 'Unknown'}
           </div>
         </div>
+        {/* <img
+          src="https://docs.rakwireless.com/assets/images/wisblock/rak5005-o/overview/RAK5005-O_buy.png"
+          className="-rotate-90"
+        /> */}
       </Card>
 
-      <Card title="Debug Information" className="flex-grow">
+      <Card
+        title="Debug Information"
+        className="flex-grow"
+        actions={<IconButton icon={<FiClipboard />} />}
+      >
         <JSONPretty className="overflow-y-auto" data={hardwareInfo} />
       </Card>
     </div>

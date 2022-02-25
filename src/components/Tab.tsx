@@ -23,7 +23,9 @@ export const Tab = ({
   return (
     <div
       className={`max-w-[10rem] md:flex-grow ${
-        active ? 'bg-primaryDark' : 'bg-secondaryDark'
+        active
+          ? 'bg-gray-100 dark:bg-primaryDark'
+          : 'bg-gray-300 dark:bg-secondaryDark'
       }`}
     >
       <div

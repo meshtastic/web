@@ -1,9 +1,9 @@
 import type React from 'react';
 
 import { AnimatePresence, m } from 'framer-motion';
-import { FiArrowRight, FiPaperclip, FiX } from 'react-icons/fi';
+import { FiArrowRight, FiPaperclip, FiTrash } from 'react-icons/fi';
 
-import { Button } from '@app/components/generic/button/Button';
+import { IconButton } from '@app/components/generic/button/IconButton';
 import { Card } from '@app/components/generic/Card';
 import { clearLogs } from '@app/core/slices/meshtasticSlice';
 import { useAppDispatch } from '@app/hooks/useAppDispatch';
@@ -57,14 +57,12 @@ export const Logs = (): JSX.Element => {
       <Card
         title="Device Logs"
         actions={
-          <Button
+          <IconButton
+            icon={<FiTrash />}
             onClick={(): void => {
               dispatch(clearLogs());
             }}
-            icon={<FiX />}
-          >
-            Clear Logs
-          </Button>
+          />
         }
         className="flex-grow overflow-y-auto"
       >
