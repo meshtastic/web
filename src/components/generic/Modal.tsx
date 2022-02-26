@@ -1,58 +1,74 @@
 import type React from 'react';
 
-import { m } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { FiX } from 'react-icons/fi';
 
 import { useAppSelector } from '@hooks/useAppSelector';
 
 import { IconButton } from './button/IconButton';
-import { Card } from './Card';
+import { Card, CardProps } from './Card';
 
-export interface ModalProps {
-  title: string;
+export interface ModalProps extends CardProps {
+  open: boolean;
+  bgDismiss?: boolean;
   onClose: () => void;
-  actions?: React.ReactNode;
-  children: React.ReactNode;
 }
 
 export const Modal = ({
-  title,
+  open,
+  bgDismiss,
   onClose,
   actions,
-  children,
+  ...props
 }: ModalProps): JSX.Element => {
   const darkMode = useAppSelector((state) => state.app.darkMode);
 
   return (
-    <m.div className={`fixed inset-0 z-30 ${darkMode ? 'dark' : ''}`}>
-      <m.div
-        className="fixed h-full w-full backdrop-blur-sm backdrop-filter"
-        onClick={onClose}
-      />
-      <m.div className="text-center ">
-        <span
-          className="inline-block h-screen align-middle "
-          aria-hidden="true"
+    <AnimatePresence>
+      {open && (
+        <m.div
+          className={`fixed inset-0  ${darkMode ? 'dark' : ''} ${
+            open ? 'z-30' : 'z-0'
+          }`}
         >
-          &#8203;
-        </span>
-        <div className="inline-block w-full max-w-3xl align-middle">
-          <Card
-            border
-            draggable
-            title={title}
-            actions={
-              <>
-                {actions}
-                <IconButton tooltip="Close" icon={<FiX />} onClick={onClose} />
-              </>
-            }
-            className="relative flex-col gap-4 "
-          >
-            {children}
-          </Card>
-        </div>
-      </m.div>
-    </m.div>
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+            className="fixed h-full w-full backdrop-blur-md backdrop-filter"
+            onClick={(): void => {
+              bgDismiss && onClose();
+            }}
+          />
+          <m.div className="text-center ">
+            <span
+              className="inline-block h-screen align-middle "
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+            <div className="inline-block w-full max-w-3xl align-middle">
+              <Card
+                border
+                draggable
+                actions={
+                  <div className="flex gap-2">
+                    {actions}
+                    <IconButton
+                      tooltip="Close"
+                      icon={<FiX />}
+                      onClick={onClose}
+                    />
+                  </div>
+                }
+                className="relative flex-col gap-4"
+                {...props}
+              />
+            </div>
+          </m.div>
+        </m.div>
+      )}
+    </AnimatePresence>
   );
 };

@@ -146,7 +146,7 @@ export const BottomNav = (): JSX.Element => {
       </BottomNavItem>
 
       <VersionInfo
-        visible={showVersionInfo}
+        modalOpen={showVersionInfo}
         onClose={(): void => {
           setShowVersionInfo(false);
         }}

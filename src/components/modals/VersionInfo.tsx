@@ -1,7 +1,6 @@
 import type React from 'react';
 import { useEffect } from 'react';
 
-import { AnimatePresence } from 'framer-motion';
 import { MdUpgrade } from 'react-icons/md';
 import useSWR from 'swr';
 
@@ -38,12 +37,12 @@ export interface Commit {
 }
 
 export interface VersionInfoProps {
-  visible: boolean;
+  modalOpen: boolean;
   onClose: () => void;
 }
 
 export const VersionInfo = ({
-  visible,
+  modalOpen,
   onClose,
 }: VersionInfoProps): JSX.Element => {
   const appState = useAppSelector((state) => state.app);
@@ -67,50 +66,46 @@ export const VersionInfo = ({
         dispatch(setUpdateAvaliable(true));
       }
     }
-  }, [data]);
+  }, [data, dispatch]);
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <Modal
-          title="Version Info"
-          actions={
-            // TODO: Check if version is hosted, and merge pwa update button here
-            appState.updateAvaliable && (
-              <a href={`http://${connectionUrl}/admin/spiffs`}>
-                <IconButton tooltip="Update now" icon={<MdUpgrade />} />
-              </a>
-            )
-          }
-          onClose={(): void => {
-            onClose();
-          }}
-        >
-          <div className="flex h-96 flex-col gap-1 overflow-y-auto dark:text-white">
-            {data &&
-              data.map((commit) => (
-                <div
-                  key={commit.sha}
-                  className={`flex gap-2 rounded-md border border-transparent py-1 px-2 hover:border-primary ${
-                    commit.sha.substring(0, 7) === process.env.COMMIT_HASH
-                      ? 'bg-primary'
-                      : 'dark:bg-secondaryDark'
-                  }`}
-                >
-                  <div className="my-auto text-xs dark:text-gray-400">
-                    {new Date(
-                      commit.commit.committer.date,
-                    ).toLocaleDateString()}
-                  </div>
-                  <div className="my-auto font-mono text-sm">
-                    {commit.sha.substring(0, 7)}
-                  </div>
-                  <div className="truncate">{commit.commit.message}</div>
-                </div>
-              ))}
-          </div>
-        </Modal>
-      )}
-    </AnimatePresence>
+    <Modal
+      open={modalOpen}
+      title="Version Info"
+      bgDismiss
+      actions={
+        // TODO: Check if version is hosted, and merge pwa update button here
+        appState.updateAvaliable && (
+          <a href={`http://${connectionUrl}/admin/spiffs`}>
+            <IconButton tooltip="Update now" icon={<MdUpgrade />} />
+          </a>
+        )
+      }
+      onClose={(): void => {
+        onClose();
+      }}
+    >
+      <div className="flex h-96 flex-col gap-1 overflow-y-auto dark:text-white">
+        {data &&
+          data.map((commit) => (
+            <div
+              key={commit.sha}
+              className={`flex gap-2 rounded-md border border-transparent py-1 px-2 hover:border-primary ${
+                commit.sha.substring(0, 7) === process.env.COMMIT_HASH
+                  ? 'bg-primary'
+                  : 'dark:bg-secondaryDark'
+              }`}
+            >
+              <div className="my-auto text-xs dark:text-gray-400">
+                {new Date(commit.commit.committer.date).toLocaleDateString()}
+              </div>
+              <div className="my-auto font-mono text-sm">
+                {commit.sha.substring(0, 7)}
+              </div>
+              <div className="truncate">{commit.commit.message}</div>
+            </div>
+          ))}
+      </div>
+    </Modal>
   );
 };

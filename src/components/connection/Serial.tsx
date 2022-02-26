@@ -38,44 +38,45 @@ export const Serial = ({ connecting }: SerialProps): JSX.Element => {
   });
 
   return (
-    <form onSubmit={onSubmit} className="space-y-2">
-      {serialDevices.length > 0 ? (
-        serialDevices.map((device, index) => (
-          <div
-            className="flex justify-between rounded-md bg-secondaryDark p-2 dark:text-white"
-            key={index}
-          >
-            <div className="my-auto flex gap-4">
-              <p>
-                Vendor: <small>{device.getInfo().usbVendorId}</small>
-              </p>
-              <p>
-                Device: <small>{device.getInfo().usbProductId}</small>
-              </p>
+    <form onSubmit={onSubmit} className="flex flex-grow flex-col">
+      <div className="flex flex-grow flex-col gap-2 overflow-y-auto rounded-md border border-gray-300 bg-gray-200 p-2 dark:border-gray-600 dark:bg-secondaryDark dark:text-gray-400">
+        {serialDevices.length > 0 ? (
+          serialDevices.map((device, index) => (
+            <div
+              className="flex justify-between rounded-md bg-white p-2 dark:bg-primaryDark dark:text-white"
+              key={index}
+            >
+              <div className="my-auto flex gap-4">
+                <p>
+                  Vendor: <small>{device.getInfo().usbVendorId}</small>
+                </p>
+                <p>
+                  Device: <small>{device.getInfo().usbProductId}</small>
+                </p>
+              </div>
+              <IconButton
+                onClick={async (): Promise<void> => {
+                  dispatch(
+                    setConnectionParams({
+                      type: connType.SERIAL,
+                      params: {
+                        port: device,
+                      },
+                    }),
+                  );
+                  await setConnection(connType.SERIAL);
+                }}
+                disabled={connecting}
+                icon={<FiArrowRightCircle />}
+              />
             </div>
-            <IconButton
-              nested
-              onClick={async (): Promise<void> => {
-                dispatch(
-                  setConnectionParams({
-                    type: connType.SERIAL,
-                    params: {
-                      port: device,
-                    },
-                  }),
-                );
-                await setConnection(connType.SERIAL);
-              }}
-              disabled={connecting}
-              icon={<FiArrowRightCircle />}
-            />
+          ))
+        ) : (
+          <div className="m-auto">
+            <p>No previously connected devices found</p>
           </div>
-        ))
-      ) : (
-        <div className="h-40 rounded-md border border-gray-300 dark:border-gray-600">
-          <p>No previously connected devices found</p>
-        </div>
-      )}
+        )}
+      </div>
       <Button
         className="mt-2 ml-auto"
         onClick={async (): Promise<void> => {
