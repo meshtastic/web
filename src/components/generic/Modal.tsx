@@ -62,7 +62,7 @@ export const Modal = ({
                     />
                   </div>
                 }
-                className="relative flex-col gap-4"
+                className="relative flex-col"
                 {...props}
               />
             </div>

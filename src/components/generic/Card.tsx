@@ -41,8 +41,8 @@ export const Card = ({
         )}
 
         <m.div
-          className={`flex flex-grow select-none flex-col gap-4  p-4  ${
-            title || actions ? 'rounded-b-md backdrop-blur-xl' : 'rounded-md'
+          className={`flex flex-grow select-none flex-col gap-4 bg-white p-4 dark:bg-secondaryDark  ${
+            title || actions ? 'rounded-b-md' : 'rounded-md'
           } ${draggable ? '' : 'bg-white dark:bg-primaryDark'}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
