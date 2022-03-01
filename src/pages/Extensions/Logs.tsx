@@ -87,21 +87,13 @@ export const Logs = (): JSX.Element => {
               )}
 
               {meshtasticState.logs.map((log, index) => (
-                // <ContextMenu
-                //   key={index}
-                //   items={
-                //     <>
-                //       <ContextItem title="Test" icon={<FiGitBranch />} />
-                //     </>
-                //   }
-                // >
                 <m.tr
                   key={index}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="group hover:bg-gray-200 dark:hover:bg-secondaryDark"
+                  className="group hover:bg-gray-300 dark:hover:bg-secondaryDark"
                 >
                   <m.td
                     className="w-6 cursor-pointer"

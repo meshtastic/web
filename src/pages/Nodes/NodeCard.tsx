@@ -145,7 +145,7 @@ export const NodeCard = ({
         </CollapsibleSection>
         <CollapsibleSection title="Location" icon={<FiMapPin />}>
           <>
-            <div className="flex h-10 select-none justify-between rounded-md border border-gray-300 bg-transparent bg-gray-200 px-1 text-gray-500 dark:border-gray-600 dark:bg-secondaryDark dark:text-gray-400 ">
+            <div className="flex h-10 select-none justify-between rounded-md border border-gray-400 bg-transparent bg-gray-300 px-1 text-gray-500 dark:border-gray-600 dark:bg-secondaryDark dark:text-gray-400 ">
               {node.currentPosition ? (
                 <>
                   <div className="my-auto px-1">

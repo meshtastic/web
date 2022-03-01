@@ -13,7 +13,7 @@ module.exports = {
         primary: '#67ea94',
         primaryDark: '#25262C',
         secondaryDark: '#1C1D23',
-        accentDark: '25262C',
+        tertiaryDark: '#323438',
       },
       boxShadow: {
         border: '0 0 0 1px #67ea94',

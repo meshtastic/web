@@ -21,7 +21,7 @@ export const BottomNavItem = ({
     <Tooltip disabled={!tooltip} content={tooltip}>
       <div
         onClick={onClick}
-        className={`group flex h-full cursor-pointer select-none p-1 hover:bg-gray-200 dark:text-white dark:hover:bg-primaryDark ${className}`}
+        className={`group flex h-full cursor-pointer select-none p-1 hover:bg-gray-300 dark:text-white dark:hover:bg-primaryDark ${className}`}
       >
         <m.div className="flex w-full gap-1" whileTap={{ scale: 0.99 }}>
           {children}

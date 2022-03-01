@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { ScaleControl } from 'mapbox-gl';
 
 import { MapboxContext } from '@components/MapBox/mapboxContext';
+import { MapStyles } from '@core/mapStyles';
 import {
   setBearing,
   setLatLng,
@@ -14,8 +15,6 @@ import {
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { useCreateMapbox } from '@hooks/useCreateMapbox';
-
-import { MapStyles } from '../../pages/Map/styles';
 
 export type MapboxProviderProps = {
   children: React.ReactNode;

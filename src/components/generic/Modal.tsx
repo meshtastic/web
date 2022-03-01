@@ -36,7 +36,7 @@ export const Modal = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.1 }}
-            className="fixed h-full w-full backdrop-blur-md backdrop-filter"
+            className="fixed h-full w-full backdrop-blur-md backdrop-brightness-75 backdrop-filter"
             onClick={(): void => {
               bgDismiss && onClose();
             }}

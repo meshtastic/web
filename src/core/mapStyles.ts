@@ -28,7 +28,7 @@ export const MapStyles: MapStyleType = {
 
   Light: {
     title: 'Light',
-    data: 'mapbox://styles/mapbox/light-v10?optimize=true',
+    data: 'mapbox://styles/sachaw/cl03ij03g001414l20w0w0ivj?optimize=true',
   } as MapStyle,
   Dark: {
     title: 'Dark',

@@ -27,8 +27,10 @@ export const ExternalSection = ({
     >
       <m.div
         layout
-        className={`w-full cursor-pointer select-none overflow-hidden border-l-4 dark:bg-secondaryDark dark:text-gray-400 ${
-          active ? 'border-primary' : 'dark:border-secondaryDark'
+        className={`w-full cursor-pointer select-none overflow-hidden border-l-4 bg-gray-200 dark:bg-tertiaryDark dark:text-gray-400 ${
+          active
+            ? 'border-l-primary dark:border-l-primary'
+            : 'border-gray-400 dark:border-secondaryDark'
         }`}
       >
         <m.div
@@ -36,7 +38,7 @@ export const ExternalSection = ({
           onClick={toggleOpen}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
-          className="flex justify-between gap-2 border-b border-gray-300 p-2 text-sm font-medium dark:border-primaryDark"
+          className="flex justify-between gap-2 border-b border-gray-400 p-2 text-sm font-medium dark:border-primaryDark"
         >
           <m.div className="flex gap-2 ">
             <m.div className="my-auto">{icon}</m.div>

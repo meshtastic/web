@@ -19,7 +19,7 @@ export const App = (): JSX.Element => {
     <div className={`h-screen w-screen ${appState.darkMode ? 'dark' : ''}`}>
       <ContextMenu>
         <Connection />
-        <div className="flex h-full flex-col bg-gray-200 dark:bg-secondaryDark">
+        <div className="flex h-full flex-col">
           <div className="flex min-h-0 w-full flex-grow">
             {route.name === 'messages' && <Messages />}
             {route.name === 'nodes' && <Nodes />}

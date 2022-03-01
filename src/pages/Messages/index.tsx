@@ -49,7 +49,7 @@ export const Messages = (): JSX.Element => {
               />
             ))}
           {nodes.length !== 0 && channels.length !== 0 && (
-            <div className="mx-2 rounded-md border-2 border-gray-300 dark:border-gray-600" />
+            <div className="mx-2 border-b border-gray-400 dark:border-gray-600" />
           )}
           {nodes
             .filter((node) => node.number !== myNodeNum)
@@ -65,7 +65,7 @@ export const Messages = (): JSX.Element => {
       }
     >
       <div className="flex w-full flex-col">
-        <div className="flex w-full justify-between border-b border-gray-300 px-2 dark:border-gray-600 dark:text-gray-300">
+        <div className="flex w-full justify-between border-b border-gray-400 px-2 dark:border-gray-600 dark:text-gray-300">
           <div className="my-auto flex gap-2 py-2 text-sm">
             <IconButton nested icon={<FiHash className="h-4 w-4" />} />
             <div className="my-auto">
@@ -90,7 +90,7 @@ export const Messages = (): JSX.Element => {
         </div>
         <div
           ref={chatRef}
-          className="flex flex-grow flex-col space-y-2 overflow-y-auto border-b border-gray-300 bg-white pb-6 dark:border-gray-600 dark:bg-secondaryDark"
+          className="flex flex-grow flex-col space-y-2 overflow-y-auto border-b border-gray-400 bg-gray-300 pb-6 dark:border-gray-600 dark:bg-secondaryDark"
         >
           <div className="mt-auto">
             {chats[selectedChatIndex]?.messages.map((message, index) => (

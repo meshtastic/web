@@ -41,7 +41,7 @@ export const BottomNav = (): JSX.Element => {
   ).find((channel) => channel.role === Protobuf.Channel_Role.PRIMARY)?.settings;
 
   return (
-    <div className="z-20 flex justify-between divide-x divide-gray-300 border-t border-gray-300 bg-white dark:divide-gray-600 dark:border-gray-600 dark:bg-secondaryDark">
+    <div className="z-20 flex justify-between divide-x divide-gray-400 border-t border-gray-400 bg-white dark:divide-gray-600 dark:border-gray-600 dark:bg-secondaryDark">
       <BottomNavItem tooltip="Meshtastic WebUI">
         <img
           title="Logo"

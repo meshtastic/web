@@ -37,7 +37,7 @@ export const BLE = ({ connecting }: BLEProps): JSX.Element => {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-grow flex-col">
-      <div className="flex flex-grow flex-col gap-2 overflow-y-auto rounded-md border border-gray-300 bg-gray-200 p-2 dark:border-gray-600 dark:bg-secondaryDark dark:text-gray-400">
+      <div className="flex flex-grow flex-col gap-2 overflow-y-auto rounded-md border border-gray-400 bg-gray-200 p-2 dark:border-gray-600 dark:bg-tertiaryDark dark:text-gray-400">
         {bleDevices.length > 0 ? (
           bleDevices.map((device, index) => (
             <div

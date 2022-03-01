@@ -5,6 +5,8 @@ import { FaDirections, FaGlobeAfrica, FaMountain } from 'react-icons/fa';
 import { MdFullscreen, MdRadar, MdWbShade } from 'react-icons/md';
 
 import { IconButton } from '@components/generic/button/IconButton';
+import type { MapStyle } from '@core/mapStyles';
+import { MapStyles } from '@core/mapStyles';
 import {
   setExaggeration,
   setHillShade,
@@ -13,8 +15,6 @@ import {
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { useMapbox } from '@hooks/useMapbox';
-import type { MapStyle } from '@pages/Map/styles';
-import { MapStyles } from '@pages/Map/styles';
 
 export const MapContainer = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -46,7 +46,7 @@ export const MapContainer = (): JSX.Element => {
         e.stopPropagation();
       }}
     >
-      <div className="absolute right-0 z-10 m-4 space-y-2 rounded-md border border-gray-300 bg-white p-2 shadow-md dark:border-gray-600 dark:bg-primaryDark">
+      <div className="absolute right-0 z-10 m-4 space-y-2 rounded-md border border-gray-400 bg-white p-2 shadow-md dark:border-gray-600 dark:bg-primaryDark">
         <IconButton
           active={mapState.style === 'Satellite'}
           onClick={(): void => {
@@ -56,7 +56,7 @@ export const MapContainer = (): JSX.Element => {
         />
 
         <div
-          className={`-m-1 space-y-2 rounded-md border-gray-300 p-1 dark:border-gray-600 ${
+          className={`-m-1 space-y-2 rounded-md border-gray-400 p-1 dark:border-gray-600 ${
             mapState.style === 'Outdoors' ? 'border' : ''
           }`}
         >

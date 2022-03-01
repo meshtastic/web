@@ -22,7 +22,7 @@ export const Sidebar = ({
         appState.mobileNavOpen ? 'flex' : 'hidden'
       }`}
     >
-      <div className="flex h-full w-full flex-col shadow-xl dark:bg-primaryDark">
+      <div className="flex h-full w-full flex-col drop-shadow-xl dark:bg-primaryDark">
         <div className="relative flex-grow gap-1">
           <div className="absolute h-full w-full">{children}</div>
           <Settings open={settingsOpen} setOpen={setSettingsOpen} />

@@ -71,7 +71,7 @@ export const FileBrowser = (): JSX.Element => {
           {data?.data.files.map((file) => (
             <div
               key={file.name}
-              className="flex h-10 w-full border-b border-gray-300 px-4 font-medium dark:border-gray-600 dark:text-white"
+              className="flex h-10 w-full border-b border-gray-400 px-4 font-medium dark:border-gray-600 dark:text-white"
             >
               <div className="my-auto  w-1/3">
                 <a

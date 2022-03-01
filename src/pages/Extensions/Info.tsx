@@ -1,10 +1,11 @@
 import type React from 'react';
 
-import { FiClipboard, FiRefreshCw } from 'react-icons/fi';
+import { FiRefreshCw } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
 import { IconButton } from '@app/components/generic/button/IconButton';
 import { Card } from '@app/components/generic/Card';
+import { CopyButton } from '@app/components/menu/buttons/CopyButton';
 import { Hashicon } from '@emeraldpay/hashicon-react';
 import { useAppSelector } from '@hooks/useAppSelector';
 
@@ -40,7 +41,7 @@ export const Info = (): JSX.Element => {
       <Card
         title="Debug Information"
         className="flex-grow"
-        actions={<IconButton icon={<FiClipboard />} />}
+        actions={<CopyButton data={JSON.stringify(hardwareInfo)} />}
       >
         <JSONPretty className="overflow-y-auto" data={hardwareInfo} />
       </Card>

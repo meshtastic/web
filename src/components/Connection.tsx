@@ -98,7 +98,7 @@ export const Connection = (): JSX.Element => {
           </div>
         </div>
         <div className="md:w-1/2">
-          <div className="h-96 overflow-y-auto rounded-md border border-gray-300 bg-gray-200 p-2 shadow-md dark:border-gray-600 dark:bg-primaryDark dark:text-gray-400">
+          <div className="h-96 overflow-y-auto rounded-md border border-gray-400 bg-gray-200 p-2 drop-shadow-md dark:border-gray-600 dark:bg-tertiaryDark dark:text-gray-400">
             {meshtasticState.logs.length === 0 && (
               <div className="flex h-full w-full">
                 <m.img

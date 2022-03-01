@@ -61,7 +61,7 @@ export const Button = ({
       ${
         disabled
           ? 'cursor-not-allowed bg-white dark:bg-primaryDark'
-          : 'cursor-pointer hover:bg-gray-100 hover:shadow-md dark:hover:bg-secondaryDark'
+          : 'cursor-pointer hover:bg-white hover:drop-shadow-md dark:hover:bg-secondaryDark'
       } ${border ? 'border-gray-400 dark:border-gray-200' : ''} ${
         className ?? ''
       }`}

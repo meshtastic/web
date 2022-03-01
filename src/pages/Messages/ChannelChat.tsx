@@ -50,7 +50,7 @@ export const ChannelChat = ({
             : `CH: ${channel.index}`
         }
       >
-        <div className="flex h-8 w-8 rounded-full bg-gray-200 dark:bg-primaryDark dark:text-white">
+        <div className="flex h-8 w-8 rounded-full bg-gray-300 dark:bg-primaryDark dark:text-white">
           <div className="m-auto">
             {channel.role === Protobuf.Channel_Role.PRIMARY ? (
               <MdPublic />

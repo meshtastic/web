@@ -21,8 +21,10 @@ export const CollapsibleSection = ({
     <m.div>
       <m.div
         layout
-        className={`w-full cursor-pointer select-none overflow-hidden border-l-4 border-b border-gray-300 p-2 text-sm font-medium dark:border-primaryDark dark:bg-secondaryDark dark:text-gray-400 ${
-          open ? 'dark:border-l-primary' : 'dark:border-secondaryDark'
+        className={`w-full cursor-pointer select-none overflow-hidden border-l-4 border-b bg-gray-200 p-2 text-sm font-medium dark:border-primaryDark dark:bg-tertiaryDark dark:text-gray-400 ${
+          open
+            ? 'border-l-primary dark:border-l-primary'
+            : 'border-gray-400 dark:border-secondaryDark'
         }`}
       >
         <m.div

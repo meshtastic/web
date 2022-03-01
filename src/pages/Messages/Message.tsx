@@ -22,7 +22,7 @@ export const Message = ({
   sender,
 }: MessageProps): JSX.Element => {
   return (
-    <div className="group mb-3 hover:bg-gray-200 dark:hover:bg-primaryDark">
+    <div className="group mb-3 hover:bg-gray-200 dark:hover:bg-tertiaryDark">
       {lastMsgSameUser ? (
         <div
           className={`mx-6 -mt-3 flex justify-between ${

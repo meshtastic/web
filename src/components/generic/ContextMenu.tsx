@@ -41,7 +41,7 @@ export const ContextMenu = ({
       {visible && (
         <div
           style={{ top: position.y, left: position.x }}
-          className="fixed z-50 w-60 gap-2 divide-y divide-gray-300 rounded-md border border-gray-300 font-medium shadow-md backdrop-blur-xl dark:divide-gray-600 dark:border-gray-600  dark:text-gray-400"
+          className="fixed z-50 w-60 gap-2 divide-y divide-gray-300 rounded-md border border-gray-400 font-medium drop-shadow-md backdrop-blur-xl dark:divide-gray-600 dark:border-gray-600  dark:text-gray-400"
         >
           {items}
           <ContextItem title="Menu item" icon={<FiActivity />} />

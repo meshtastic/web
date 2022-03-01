@@ -24,7 +24,7 @@ export const Tab = ({
     <div
       className={`max-w-[10rem] md:flex-grow ${
         active
-          ? 'bg-gray-100 dark:bg-primaryDark'
+          ? 'bg-white dark:bg-primaryDark'
           : 'bg-gray-300 dark:bg-secondaryDark'
       }`}
     >
@@ -32,7 +32,7 @@ export const Tab = ({
         className={`group flex flex-grow cursor-pointer select-none py-2 hover:underline dark:text-white ${
           active
             ? 'z-10 rounded-t-lg bg-gray-300 shadow-inner dark:bg-secondaryDark'
-            : 'bg-gray-100 shadow-md dark:bg-primaryDark'
+            : 'bg-white drop-shadow-md dark:bg-primaryDark'
         } ${activeRight ? 'rounded-br-lg' : ''} ${
           activeLeft ? 'rounded-bl-lg' : ''
         }`}
