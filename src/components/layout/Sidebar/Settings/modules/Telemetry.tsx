@@ -52,6 +52,7 @@ export const Telemetry = (): JSX.Element => {
       />
       <Input
         label="Update Interval"
+        suffix="Seconds"
         type="number"
         {...register('telemetryModuleUpdateInterval', {
           valueAsNumber: true,
@@ -59,6 +60,7 @@ export const Telemetry = (): JSX.Element => {
       />
       <Input
         label="Recovery Interval"
+        suffix="Seconds"
         type="number"
         {...register('telemetryModuleRecoveryInterval', {
           valueAsNumber: true,

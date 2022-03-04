@@ -60,7 +60,7 @@ export const SerialSettingsPanel = (): JSX.Element => {
       />
       <Input
         type="number"
-        label="TX"
+        label="TX Pin"
         disabled={!moduleEnabled}
         {...register('serialmoduleTxd', {
           valueAsNumber: true,
@@ -68,7 +68,7 @@ export const SerialSettingsPanel = (): JSX.Element => {
       />
       <Input
         type="number"
-        label="TX"
+        label="Baud Rate"
         disabled={!moduleEnabled}
         {...register('serialmoduleBaud', {
           valueAsNumber: true,
