@@ -16,17 +16,13 @@ export const SidebarItem = ({
   children,
 }: SidebarItemProps): JSX.Element => {
   return (
-    <m.div
+    <div
       onClick={(): void => {
         setSelected();
       }}
-      animate={selected ? 'selected' : 'deselected'}
-      initial={{ borderColor: '#1C1D23' }}
-      variants={{
-        selected: { borderColor: '#67ea94' },
-        deselected: { borderColor: '#1C1D23' },
-      }}
-      className="mx-2 flex cursor-pointer select-none rounded-md border-2 p-2 first:mt-2 last:mb-2 dark:bg-secondaryDark"
+      className={`mx-2 flex cursor-pointer select-none rounded-md border bg-gray-200 p-2 shadow-md first:mt-2 last:mb-2 hover:border-primary dark:bg-tertiaryDark dark:hover:border-primary ${
+        selected ? 'border-primary' : 'border-gray-400 dark:border-gray-600'
+      }`}
     >
       <m.div
         className="flex w-full justify-between"
@@ -37,6 +33,6 @@ export const SidebarItem = ({
 
         <div className="flex gap-1">{actions}</div>
       </m.div>
-    </m.div>
+    </div>
   );
 };
