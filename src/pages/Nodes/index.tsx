@@ -8,8 +8,8 @@ import { BiCrown } from 'react-icons/bi';
 import { FiSettings } from 'react-icons/fi';
 import { RiMindMap } from 'react-icons/ri';
 
-import { Tooltip } from '@app/components/generic/Tooltip';
 import { IconButton } from '@components/generic/button/IconButton';
+import { Tooltip } from '@components/generic/Tooltip';
 import { Layout } from '@components/layout';
 import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
 import { Hashicon } from '@emeraldpay/hashicon-react';

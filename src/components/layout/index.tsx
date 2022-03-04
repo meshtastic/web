@@ -6,13 +6,12 @@ import { FiMessageCircle, FiSettings } from 'react-icons/fi';
 import { RiMindMap, RiRoadMapLine } from 'react-icons/ri';
 import { VscExtensions } from 'react-icons/vsc';
 
-import { routes, useRoute } from '@app/core/router';
+import { ErrorFallback } from '@components/ErrorFallback';
 import { IconButton } from '@components/generic/button/IconButton';
 import { Sidebar } from '@components/layout/Sidebar';
-
-import { ErrorFallback } from '../ErrorFallback';
-import type { TabProps } from '../Tab';
-import { Tabs } from '../Tabs';
+import type { TabProps } from '@components/Tab';
+import { Tabs } from '@components/Tabs';
+import { routes, useRoute } from '@core/router';
 
 export interface LayoutProps {
   title: string;
@@ -59,7 +58,7 @@ export const Layout = ({
   ];
 
   return (
-    <div className="relative flex w-full bg-white dark:bg-secondaryDark ">
+    <div className="relative flex w-full overflow-hidden bg-white dark:bg-secondaryDark">
       <div className="flex flex-grow">
         <Sidebar settingsOpen={settingsOpen} setSettingsOpen={setSettingsOpen}>
           <div className="bg-white px-1 pt-1 drop-shadow-md dark:bg-primaryDark">

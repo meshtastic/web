@@ -1,30 +1,24 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
-import { Checkbox } from '@components/generic/form/Checkbox';
 import { Form } from '@components/generic/form/Form';
 import { Input } from '@components/generic/form/Input';
+import { Select } from '@components/generic/form/Select';
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
-import type { Protobuf } from '@meshtastic/meshtasticjs';
+import { Protobuf } from '@meshtastic/meshtasticjs';
 
-export const WiFi = (): JSX.Element => {
+export const Display = (): JSX.Element => {
   const preferences = useAppSelector(
     (state) => state.meshtastic.radio.preferences,
   );
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState, reset, control } =
+  const { register, handleSubmit, formState, reset } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: preferences,
     });
-
-  const WifiApMode = useWatch({
-    control,
-    name: 'wifiApMode',
-    defaultValue: false,
-  });
 
   useEffect(() => {
     reset(preferences);
@@ -40,18 +34,22 @@ export const WiFi = (): JSX.Element => {
   });
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
-      <Checkbox label="Enable WiFi AP" {...register('wifiApMode')} />
       <Input
-        label="WiFi SSID"
-        disabled={WifiApMode}
-        {...register('wifiSsid')}
+        label="Screen Timeout"
+        type="number"
+        suffix="Seconds"
+        {...register('screenOnSecs', { valueAsNumber: true })}
       />
       <Input
-        type="password"
-        autoComplete="off"
-        label="WiFi PSK"
-        disabled={WifiApMode}
-        {...register('wifiPassword')}
+        label="Carousel Delay"
+        type="number"
+        suffix="Seconds"
+        {...register('autoScreenCarouselSecs', { valueAsNumber: true })}
+      />
+      <Select
+        label="GPS Display Units"
+        optionsEnum={Protobuf.GpsCoordinateFormat}
+        {...register('gpsFormat', { valueAsNumber: true })}
       />
     </Form>
   );

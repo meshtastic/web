@@ -4,14 +4,13 @@ import { useEffect } from 'react';
 import { MdUpgrade } from 'react-icons/md';
 import useSWR from 'swr';
 
-import { connectionUrl } from '@app/core/connection.js';
-import { setUpdateAvaliable } from '@app/core/slices/appSlice';
-import { fetcher } from '@app/core/utils/fetcher';
-import { useAppDispatch } from '@app/hooks/useAppDispatch';
-import { useAppSelector } from '@app/hooks/useAppSelector';
+import { IconButton } from '@components/generic/button/IconButton';
 import { Modal } from '@components/generic/Modal';
-
-import { IconButton } from '../generic/button/IconButton';
+import { connectionUrl } from '@core/connection';
+import { setUpdateAvaliable } from '@core/slices/appSlice';
+import { fetcher } from '@core/utils/fetcher';
+import { useAppDispatch } from '@hooks/useAppDispatch';
+import { useAppSelector } from '@hooks/useAppSelector';
 
 export interface Commit {
   sha: string;

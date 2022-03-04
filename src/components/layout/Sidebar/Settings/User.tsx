@@ -2,11 +2,10 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
-import { FiSave } from 'react-icons/fi';
 import { base16 } from 'rfc4648';
 
-import { IconButton } from '@components/generic/button/IconButton';
 import { Checkbox } from '@components/generic/form/Checkbox';
+import { Form } from '@components/generic/form/Form';
 import { Input } from '@components/generic/form/Input';
 import { Select } from '@components/generic/form/Select';
 import { connection } from '@core/connection';
@@ -67,66 +66,53 @@ export const User = (): JSX.Element => {
   });
 
   return (
-    <>
-      <form className="space-y-2" onSubmit={onSubmit}>
-        <Input label="Device ID" value={node?.user?.id} disabled />
-        <Input
-          label="Hardware"
-          value={
-            Protobuf.HardwareModel[
-              node?.user?.hwModel ?? Protobuf.HardwareModel.UNSET
-            ]
-          }
-          disabled
-        />
-        <Input
-          label="Mac Address"
-          defaultValue={
-            base16
-              .stringify(node?.user?.macaddr ?? [])
-              .match(/.{1,2}/g)
-              ?.join(':') ?? ''
-          }
-          disabled
-        />
-        <Input label="Device Name" {...register('longName')} />
-        <Input label="Short Name" maxLength={3} {...register('shortName')} />
-        <Checkbox label="Licenced Operator?" {...register('isLicensed')} />
-        <Select
-          label="Team"
-          optionsEnum={Protobuf.Team}
-          {...register('team', { valueAsNumber: true })}
-        />
-        <Input
-          label="Antenna Azimuth"
-          suffix="°"
-          type="number"
-          {...register('antAzimuth', { valueAsNumber: true })}
-        />
-        <Input
-          label="Antenna Gain"
-          suffix="dBi"
-          type="number"
-          {...register('antGainDbi', { valueAsNumber: true })}
-        />
-        <Input
-          label="Transmit Power"
-          suffix="dBm"
-          type="number"
-          {...register('txPowerDbm', { valueAsNumber: true })}
-        />
-      </form>
-      <div className="flex w-full bg-white dark:bg-secondaryDark">
-        <div className="ml-auto p-2">
-          <IconButton
-            disabled={!formState.isDirty}
-            onClick={async (): Promise<void> => {
-              await onSubmit();
-            }}
-            icon={<FiSave />}
-          />
-        </div>
-      </div>
-    </>
+    <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
+      <Input label="Device ID" value={node?.user?.id} disabled />
+      <Input label="Device Name" {...register('longName')} />
+      <Input label="Short Name" maxLength={3} {...register('shortName')} />
+      <Input
+        label="Mac Address"
+        defaultValue={
+          base16
+            .stringify(node?.user?.macaddr ?? [])
+            .match(/.{1,2}/g)
+            ?.join(':') ?? ''
+        }
+        disabled
+      />
+      <Input
+        label="Hardware (DEPRECATED)"
+        value={
+          Protobuf.HardwareModel[
+            node?.user?.hwModel ?? Protobuf.HardwareModel.UNSET
+          ]
+        }
+        disabled
+      />
+      <Checkbox label="Licenced Operator?" {...register('isLicensed')} />
+      <Select
+        label="Team (DEPRECATED)"
+        optionsEnum={Protobuf.Team}
+        {...register('team', { valueAsNumber: true })}
+      />
+      <Input
+        label="Transmit Power"
+        suffix="dBm"
+        type="number"
+        {...register('txPowerDbm', { valueAsNumber: true })}
+      />
+      <Input
+        label="Antenna Gain"
+        suffix="dBi"
+        type="number"
+        {...register('antGainDbi', { valueAsNumber: true })}
+      />
+      <Input
+        label="Antenna Azimuth"
+        suffix="°"
+        type="number"
+        {...register('antAzimuth', { valueAsNumber: true })}
+      />
+    </Form>
   );
 };

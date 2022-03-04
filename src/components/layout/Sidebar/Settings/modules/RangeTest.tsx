@@ -2,9 +2,7 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 
 import { useForm, useWatch } from 'react-hook-form';
-import { FiSave } from 'react-icons/fi';
 
-import { IconButton } from '@components/generic/button/IconButton';
 import { Checkbox } from '@components/generic/form/Checkbox';
 import { Form } from '@components/generic/form/Form';
 import { Input } from '@components/generic/form/Input';
@@ -37,45 +35,32 @@ export const RangeTestSettingsPanel = (): JSX.Element => {
     });
   });
 
-  const pluginEnabled = useWatch({
+  const moduleEnabled = useWatch({
     control,
-    name: 'rangeTestPluginEnabled',
+    name: 'rangeTestModuleEnabled',
     defaultValue: false,
   });
 
   return (
-    <>
-      <Form loading={loading}>
-        <Checkbox
-          label="Range Test Plugin Enabled?"
-          {...register('rangeTestPluginEnabled')}
-        />
-        <Checkbox
-          label="Range Test Plugin Save?"
-          disabled={!pluginEnabled}
-          {...register('rangeTestPluginSave')}
-        />
-        <Input
-          type="number"
-          label="Message Interval"
-          disabled={!pluginEnabled}
-          suffix="Seconds"
-          {...register('rangeTestPluginSender', {
-            valueAsNumber: true,
-          })}
-        />
-      </Form>
-      <div className="flex w-full bg-white dark:bg-secondaryDark">
-        <div className="ml-auto p-2">
-          <IconButton
-            disabled={!formState.isDirty}
-            onClick={async (): Promise<void> => {
-              await onSubmit();
-            }}
-            icon={<FiSave />}
-          />
-        </div>
-      </div>
-    </>
+    <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
+      <Checkbox
+        label="Module Enabled"
+        {...register('rangeTestModuleEnabled')}
+      />
+      <Input
+        type="number"
+        label="Message Interval"
+        disabled={!moduleEnabled}
+        suffix="Seconds"
+        {...register('rangeTestModuleSender', {
+          valueAsNumber: true,
+        })}
+      />
+      <Checkbox
+        label="Save CSV to storage"
+        disabled={!moduleEnabled}
+        {...register('rangeTestModuleSave')}
+      />
+    </Form>
   );
 };

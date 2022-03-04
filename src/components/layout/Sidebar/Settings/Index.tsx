@@ -2,36 +2,43 @@ import type React from 'react';
 import { useState } from 'react';
 
 import {
+  FiActivity,
   FiAlignLeft,
   FiBell,
   FiFastForward,
   FiLayers,
   FiLayout,
   FiMapPin,
+  FiMessageSquare,
   FiPackage,
-  FiRadio,
+  FiPower,
   FiRss,
+  FiSmartphone,
+  FiTv,
   FiUser,
   FiWifi,
-  FiZap,
 } from 'react-icons/fi';
 
-import { useAppSelector } from '@app/hooks/useAppSelector.js';
 import { CollapsibleSection } from '@components/generic/Sidebar/CollapsibleSection';
 import { ExternalSection } from '@components/generic/Sidebar/ExternalSection';
 import { SidebarOverlay } from '@components/generic/Sidebar/SidebarOverlay';
 import { Channels } from '@components/layout/Sidebar/Settings/Channels';
 import { ChannelsGroup } from '@components/layout/Sidebar/Settings/channels/ChannelsGroup';
+import { Display } from '@components/layout/Sidebar/Settings/Display';
+import { GPS } from '@components/layout/Sidebar/Settings/GPS';
 import { Interface } from '@components/layout/Sidebar/Settings/Interface';
-import { ExternalNotificationsSettingsPlanel } from '@components/layout/Sidebar/Settings/plugins/ExternalNotifications';
-import { RangeTestSettingsPanel } from '@components/layout/Sidebar/Settings/plugins/RangeTest';
-import { SerialSettingsPanel } from '@components/layout/Sidebar/Settings/plugins/Serial';
-import { StoreForwardSettingsPanel } from '@components/layout/Sidebar/Settings/plugins/StoreForward';
-import { Position } from '@components/layout/Sidebar/Settings/Position';
+import { LoRa } from '@components/layout/Sidebar/Settings/LoRa';
+import { CannedMessage } from '@components/layout/Sidebar/Settings/modules/CannedMessage';
+import { ExternalNotificationsSettingsPlanel } from '@components/layout/Sidebar/Settings/modules/ExternalNotifications';
+import { MQTT } from '@components/layout/Sidebar/Settings/modules/MQTT';
+import { RangeTestSettingsPanel } from '@components/layout/Sidebar/Settings/modules/RangeTest';
+import { SerialSettingsPanel } from '@components/layout/Sidebar/Settings/modules/Serial';
+import { StoreForwardSettingsPanel } from '@components/layout/Sidebar/Settings/modules/StoreForward';
+import { Telemetry } from '@components/layout/Sidebar/Settings/modules/Telemetry';
 import { Power } from '@components/layout/Sidebar/Settings/Power';
-import { Radio } from '@components/layout/Sidebar/Settings/Radio';
 import { User } from '@components/layout/Sidebar/Settings/User';
 import { WiFi } from '@components/layout/Sidebar/Settings/WiFi';
+import { useAppSelector } from '@hooks/useAppSelector';
 
 export interface SettingsProps {
   open: boolean;
@@ -39,13 +46,15 @@ export interface SettingsProps {
 }
 
 export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
-  const [pluginsOpen, setPluginsOpen] = useState(false);
+  const [modulesOpen, setModulesOpen] = useState(false);
   const [channelsOpen, setChannelsOpen] = useState(false);
   const {
-    rangeTestPluginEnabled,
-    extNotificationPluginEnabled,
-    serialpluginEnabled,
-    storeForwardPluginEnabled,
+    rangeTestModuleEnabled,
+    extNotificationModuleEnabled,
+    serialmoduleEnabled,
+    storeForwardModuleEnabled,
+    mqttDisabled,
+    cannedMessageModuleEnabled,
   } = useAppSelector((state) => state.meshtastic.radio.preferences);
 
   const hasGps = true;
@@ -61,20 +70,26 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         }}
         direction="y"
       >
-        <CollapsibleSection icon={<FiWifi />} title="WiFi & MQTT">
-          <WiFi />
-        </CollapsibleSection>
-        <CollapsibleSection icon={<FiMapPin />} title="Position">
-          <Position />
-        </CollapsibleSection>
         <CollapsibleSection icon={<FiUser />} title="User">
           <User />
         </CollapsibleSection>
-        <CollapsibleSection icon={<FiZap />} title="Power">
+        <CollapsibleSection icon={<FiSmartphone />} title="Device">
+          <WiFi />
+        </CollapsibleSection>
+        <CollapsibleSection icon={<FiMapPin />} title="GPS">
+          <GPS />
+        </CollapsibleSection>
+        <CollapsibleSection icon={<FiPower />} title="Power">
           <Power />
         </CollapsibleSection>
-        <CollapsibleSection icon={<FiRadio />} title="Radio">
-          <Radio />
+        <CollapsibleSection icon={<FiWifi />} title="WiFi">
+          <WiFi />
+        </CollapsibleSection>
+        <CollapsibleSection icon={<FiTv />} title="Display">
+          <Display />
+        </CollapsibleSection>
+        <CollapsibleSection icon={<FiRss />} title="LoRa">
+          <LoRa />
         </CollapsibleSection>
         <CollapsibleSection icon={<FiLayers />} title="Primary Channel">
           <Channels />
@@ -88,87 +103,76 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         />
         <ExternalSection
           onClick={(): void => {
-            setPluginsOpen(true);
+            setModulesOpen(true);
           }}
           icon={<FiPackage />}
-          title="Plugins"
+          title="Modules"
         />
         <CollapsibleSection icon={<FiLayout />} title="Interface">
           <Interface />
         </CollapsibleSection>
       </SidebarOverlay>
 
-      {/* Plugins */}
+      {/* Modules */}
       <SidebarOverlay
-        title="Plugins"
-        open={pluginsOpen}
+        title="Modules"
+        open={modulesOpen}
         close={(): void => {
-          setPluginsOpen(false);
+          setModulesOpen(false);
         }}
         direction="x"
       >
         <CollapsibleSection
-          title="Range Test"
-          icon={
-            <div className="flex gap-2">
-              <FiRss />
-              <div
-                className={`h-3 w-3 rounded-full ${
-                  rangeTestPluginEnabled ? 'bg-green-500' : 'bg-red-500'
-                }`}
-              />
-            </div>
-          }
+          icon={<FiWifi />}
+          title="MQTT"
+          status={!mqttDisabled}
         >
-          <RangeTestSettingsPanel />
+          <MQTT />
         </CollapsibleSection>
         <CollapsibleSection
-          title="External Notifications"
-          icon={
-            <div className="flex gap-2">
-              <FiBell />
-              <div
-                className={`h-3 w-3 rounded-full ${
-                  extNotificationPluginEnabled ? 'bg-green-500' : 'bg-red-500'
-                }`}
-              />
-            </div>
-          }
-        >
-          <ExternalNotificationsSettingsPlanel />
-        </CollapsibleSection>
-        <CollapsibleSection
+          icon={<FiAlignLeft />}
           title="Serial"
-          icon={
-            <div className="flex gap-2">
-              <FiAlignLeft />
-              <div
-                className={`h-3 w-3 rounded-full ${
-                  serialpluginEnabled ? 'bg-green-500' : 'bg-red-500'
-                }`}
-              />
-            </div>
-          }
+          status={serialmoduleEnabled}
         >
           <SerialSettingsPanel />
         </CollapsibleSection>
         <CollapsibleSection
+          icon={<FiBell />}
+          title="External Notifications"
+          status={extNotificationModuleEnabled}
+        >
+          <ExternalNotificationsSettingsPlanel />
+        </CollapsibleSection>
+        <CollapsibleSection
+          icon={<FiFastForward />}
           title="Store & Forward"
-          icon={
-            <div className="flex gap-2">
-              <FiFastForward />
-              <div
-                className={`h-3 w-3 rounded-full ${
-                  storeForwardPluginEnabled ? 'bg-green-500' : 'bg-red-500'
-                }`}
-              />
-            </div>
-          }
+          status={storeForwardModuleEnabled}
         >
           <StoreForwardSettingsPanel />
         </CollapsibleSection>
+        <CollapsibleSection
+          icon={<FiRss />}
+          title="Range Test"
+          status={rangeTestModuleEnabled}
+        >
+          <RangeTestSettingsPanel />
+        </CollapsibleSection>
+        <CollapsibleSection
+          icon={<FiActivity />}
+          title="Telemetry"
+          status={true}
+        >
+          <Telemetry />
+        </CollapsibleSection>
+        <CollapsibleSection
+          icon={<FiMessageSquare />}
+          title="Canned Message"
+          status={cannedMessageModuleEnabled}
+        >
+          <CannedMessage />
+        </CollapsibleSection>
       </SidebarOverlay>
-      {/* End Plugins */}
+      {/* End Modules */}
 
       {/* Channels */}
       <SidebarOverlay

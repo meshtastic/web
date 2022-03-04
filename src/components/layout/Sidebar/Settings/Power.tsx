@@ -2,10 +2,10 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
-import { FiSave } from 'react-icons/fi';
 
-import { IconButton } from '@components/generic/button/IconButton';
 import { Checkbox } from '@components/generic/form/Checkbox';
+import { Form } from '@components/generic/form/Form';
+import { Input } from '@components/generic/form/Input';
 import { Select } from '@components/generic/form/Select';
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
@@ -37,34 +37,75 @@ export const Power = (): JSX.Element => {
     });
   });
   return (
-    <>
-      <form className="space-y-2" onSubmit={onSubmit}>
-        <Select
-          label="Charge current"
-          optionsEnum={Protobuf.ChargeCurrent}
-          {...register('chargeCurrent', { valueAsNumber: true })}
-        />
-        <Checkbox label="Always powered" {...register('isAlwaysPowered')} />
-        <Checkbox
-          label="Powered by low power source (solar)"
-          disabled={preferences.isRouter}
-          validationMessage={
-            preferences.isRouter ? 'Enabled by default in router mode' : ''
-          }
-          {...register('isLowPower')}
-        />
-      </form>
-      <div className="flex w-full bg-white dark:bg-secondaryDark">
-        <div className="ml-auto p-2">
-          <IconButton
-            disabled={!formState.isDirty}
-            onClick={async (): Promise<void> => {
-              await onSubmit();
-            }}
-            icon={<FiSave />}
-          />
-        </div>
-      </div>
-    </>
+    <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
+      <Select
+        label="Charge current"
+        optionsEnum={Protobuf.ChargeCurrent}
+        {...register('chargeCurrent', { valueAsNumber: true })}
+      />
+      <Checkbox
+        label="Powered by low power source (solar)"
+        disabled={preferences.isRouter}
+        validationMessage={
+          preferences.isRouter ? 'Enabled by default in router mode' : ''
+        }
+        {...register('isLowPower')}
+      />
+      <Checkbox label="Always Powered" {...register('isAlwaysPowered')} />
+      <Input
+        label="Shutdown on battery delay"
+        type="number"
+        suffix="Seconds"
+        {...register('onBatteryShutdownAfterSecs', { valueAsNumber: true })}
+      />
+      <Checkbox label="Power Saving" {...register('isPowerSaving')} />
+      <Input
+        label="ADC Multiplier Override ratio"
+        type="number"
+        {...register('adcMultiplierOverride', { valueAsNumber: true })}
+      />
+      <Input
+        label="Minumum Wake Time"
+        suffix="Seconds"
+        type="number"
+        {...register('minWakeSecs', { valueAsNumber: true })}
+      />
+      <Input
+        label="Phone Timeout"
+        suffix="Seconds"
+        type="number"
+        {...register('phoneTimeoutSecs', { valueAsNumber: true })}
+      />
+      <Input
+        label="Phone SDS Timeout"
+        suffix="Seconds"
+        type="number"
+        {...register('phoneSdsTimeoutSec', { valueAsNumber: true })}
+      />
+      <Input
+        label="Mesh SDS Timeout"
+        suffix="Seconds"
+        type="number"
+        {...register('meshSdsTimeoutSecs', { valueAsNumber: true })}
+      />
+      <Input
+        label="SDS"
+        suffix="Seconds"
+        type="number"
+        {...register('sdsSecs', { valueAsNumber: true })}
+      />
+      <Input
+        label="LS"
+        suffix="Seconds"
+        type="number"
+        {...register('lsSecs', { valueAsNumber: true })}
+      />
+      <Input
+        label="Wait Bluetooth"
+        suffix="Seconds"
+        type="number"
+        {...register('waitBluetoothSecs', { valueAsNumber: true })}
+      />
+    </Form>
   );
 };

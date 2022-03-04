@@ -2,16 +2,15 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
-import { FiSave } from 'react-icons/fi';
 
-import { IconButton } from '@components/generic/button/IconButton';
 import { Checkbox } from '@components/generic/form/Checkbox';
+import { Form } from '@components/generic/form/Form';
 import { Select } from '@components/generic/form/Select';
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
-export const Radio = (): JSX.Element => {
+export const Device = (): JSX.Element => {
   const preferences = useAppSelector(
     (state) => state.meshtastic.radio.preferences,
   );
@@ -34,28 +33,18 @@ export const Radio = (): JSX.Element => {
     });
   });
   return (
-    <>
-      <form className="space-y-2" onSubmit={onSubmit}>
-        <Checkbox label="Is Router" {...register('isRouter')} />
-        <Select
-          label="Region"
-          optionsEnum={Protobuf.RegionCode}
-          {...register('region', { valueAsNumber: true })}
-        />
-        <Checkbox label="Debug Log" {...register('debugLogEnabled')} />
-        <Checkbox label="Serial Disabled" {...register('serialDisabled')} />
-      </form>
-      <div className="flex w-full bg-white dark:bg-secondaryDark">
-        <div className="ml-auto p-2">
-          <IconButton
-            disabled={!formState.isDirty}
-            onClick={async (): Promise<void> => {
-              await onSubmit();
-            }}
-            icon={<FiSave />}
-          />
-        </div>
-      </div>
-    </>
+    <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
+      <Checkbox
+        label="Serial Console Disabled"
+        {...register('serialDisabled')}
+      />
+      <Checkbox label="Factory Reset Device" {...register('factoryReset')} />
+      <Checkbox label="Debug Log Enabled" {...register('debugLogEnabled')} />
+      <Select
+        label="Role"
+        optionsEnum={Protobuf.Role}
+        {...register('role', { valueAsNumber: true })}
+      />
+    </Form>
   );
 };

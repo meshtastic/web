@@ -1,30 +1,25 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 import { Checkbox } from '@components/generic/form/Checkbox';
 import { Form } from '@components/generic/form/Form';
 import { Input } from '@components/generic/form/Input';
+import { Select } from '@components/generic/form/Select';
 import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
-import type { Protobuf } from '@meshtastic/meshtasticjs';
+import { Protobuf } from '@meshtastic/meshtasticjs';
 
-export const WiFi = (): JSX.Element => {
+export const LoRa = (): JSX.Element => {
   const preferences = useAppSelector(
     (state) => state.meshtastic.radio.preferences,
   );
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState, reset, control } =
+  const { register, handleSubmit, formState, reset } =
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: preferences,
     });
-
-  const WifiApMode = useWatch({
-    control,
-    name: 'wifiApMode',
-    defaultValue: false,
-  });
 
   useEffect(() => {
     reset(preferences);
@@ -40,18 +35,30 @@ export const WiFi = (): JSX.Element => {
   });
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
-      <Checkbox label="Enable WiFi AP" {...register('wifiApMode')} />
       <Input
-        label="WiFi SSID"
-        disabled={WifiApMode}
-        {...register('wifiSsid')}
+        label="Hop Count"
+        type="number"
+        suffix="Hops"
+        {...register('hopLimit', { valueAsNumber: true })}
+      />
+      <Checkbox label="Transmit Disabled" {...register('isLoraTxDisabled')} />
+      <Checkbox label="Router Mode" {...register('isRouter')} />
+      <Input
+        label="Send Owner Interval"
+        type="number"
+        suffix="Seconds"
+        {...register('sendOwnerInterval', { valueAsNumber: true })}
       />
       <Input
-        type="password"
-        autoComplete="off"
-        label="WiFi PSK"
-        disabled={WifiApMode}
-        {...register('wifiPassword')}
+        label="Frequency Offset"
+        type="number"
+        suffix="Hz"
+        {...register('frequencyOffset', { valueAsNumber: true })}
+      />
+      <Select
+        label="Region"
+        optionsEnum={Protobuf.RegionCode}
+        {...register('region', { valueAsNumber: true })}
       />
     </Form>
   );

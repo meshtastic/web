@@ -3,10 +3,9 @@ import type React from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import { FiX } from 'react-icons/fi';
 
+import { IconButton } from '@components/generic/button/IconButton';
+import { Card, CardProps } from '@components/generic/Card';
 import { useAppSelector } from '@hooks/useAppSelector';
-
-import { IconButton } from './button/IconButton';
-import { Card, CardProps } from './Card';
 
 export interface ModalProps extends CardProps {
   open: boolean;
@@ -51,7 +50,6 @@ export const Modal = ({
             <div className="inline-block w-full max-w-3xl align-middle">
               <Card
                 border
-                draggable
                 actions={
                   <div className="flex gap-2">
                     {actions}

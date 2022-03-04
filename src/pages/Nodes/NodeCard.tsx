@@ -15,10 +15,10 @@ import { IoTelescope } from 'react-icons/io5';
 import { MdGpsFixed, MdGpsNotFixed, MdGpsOff } from 'react-icons/md';
 import JSONPretty from 'react-json-pretty';
 
-import { Tooltip } from '@app/components/generic/Tooltip';
 import { IconButton } from '@components/generic/button/IconButton';
 import { CollapsibleSection } from '@components/generic/Sidebar/CollapsibleSection';
 import { SidebarOverlay } from '@components/generic/Sidebar/SidebarOverlay';
+import { Tooltip } from '@components/generic/Tooltip';
 import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
 import { CopyButton } from '@components/menu/buttons/CopyButton';
 import type { Node } from '@core/slices/meshtasticSlice';

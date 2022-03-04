@@ -4,8 +4,8 @@ import { AnimatePresence, m } from 'framer-motion';
 import { FiFilePlus } from 'react-icons/fi';
 import useSWR from 'swr';
 
-import { Button } from '@app/components/generic/button/Button';
-import { Card } from '@app/components/generic/Card';
+import { Button } from '@components/generic/button/Button';
+import { Card } from '@components/generic/Card';
 import { fetcher } from '@core/utils/fetcher';
 import { useAppSelector } from '@hooks/useAppSelector';
 

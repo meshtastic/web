@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 
 import { fromByteArray, toByteArray } from 'base64-js';
 import { useForm } from 'react-hook-form';
-import { FiSave } from 'react-icons/fi';
 import { MdRefresh, MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
 import { IconButton } from '@components/generic/button/IconButton';
@@ -18,7 +17,7 @@ export interface SettingsPanelProps {
   channel: Protobuf.Channel;
 }
 
-export const SettingsPanel = ({ channel }: SettingsPanelProps): JSX.Element => {
+export const Channels = ({ channel }: SettingsPanelProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [keySize, setKeySize] = useState<128 | 256>(256);
   const [pskHidden, setPskHidden] = useState(true);
@@ -75,67 +74,54 @@ export const SettingsPanel = ({ channel }: SettingsPanelProps): JSX.Element => {
   });
 
   return (
-    <div className="flex w-full flex-col">
-      <Form loading={loading}>
-        {channel?.index !== 0 && (
-          <>
-            <Checkbox
-              label="Enabled"
-              {...register('enabled', { valueAsNumber: true })}
-            />
-            <Input label="Name" {...register('name')} />
-          </>
-        )}
-
-        <Select
-          label="Key Size"
-          options={[
-            { name: '128 Bit', value: 128 },
-            { name: '256 Bit', value: 256 },
-          ]}
-          value={keySize}
-          onChange={(e): void => {
-            setKeySize(parseInt(e.target.value) as 128 | 256);
-          }}
-        />
-        <Input
-          label="Pre-Shared Key"
-          type={pskHidden ? 'password' : 'text'}
-          disabled
-          action={
-            <>
-              <IconButton
-                onClick={(): void => {
-                  setPskHidden(!pskHidden);
-                }}
-                icon={pskHidden ? <MdVisibility /> : <MdVisibilityOff />}
-              />
-              <IconButton
-                onClick={(): void => {
-                  const key = new Uint8Array(keySize);
-                  crypto.getRandomValues(key);
-                  setValue('psk', fromByteArray(key));
-                }}
-                icon={<MdRefresh />}
-              />
-            </>
-          }
-          {...register('psk')}
-        />
-        <Checkbox label="Uplink Enabled" {...register('uplinkEnabled')} />
-        <Checkbox label="Downlink Enabled" {...register('downlinkEnabled')} />
-      </Form>
-      <div className="flex w-full bg-white dark:bg-secondaryDark">
-        <div className="ml-auto p-2">
-          <IconButton
-            disabled={!formState.isDirty}
-            onClick={async (): Promise<void> => {
-              await onSubmit();
-            }}
-            icon={<FiSave />}
+    <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
+      {channel?.index !== 0 && (
+        <>
+          <Checkbox
+            label="Enabled"
+            {...register('enabled', { valueAsNumber: true })}
           />
-        </div>
-      </div>
-    </div>
+          <Input label="Name" {...register('name')} />
+        </>
+      )}
+
+      <Select
+        label="Key Size"
+        options={[
+          { name: '128 Bit', value: 128 },
+          { name: '256 Bit', value: 256 },
+        ]}
+        value={keySize}
+        onChange={(e): void => {
+          setKeySize(parseInt(e.target.value) as 128 | 256);
+        }}
+      />
+      <Input
+        label="Pre-Shared Key"
+        type={pskHidden ? 'password' : 'text'}
+        disabled
+        action={
+          <>
+            <IconButton
+              onClick={(): void => {
+                setPskHidden(!pskHidden);
+              }}
+              icon={pskHidden ? <MdVisibility /> : <MdVisibilityOff />}
+            />
+            <IconButton
+              onClick={(): void => {
+                const key = new Uint8Array(keySize);
+                crypto.getRandomValues(key);
+                setValue('psk', fromByteArray(key));
+              }}
+              icon={<MdRefresh />}
+            />
+          </>
+        }
+        {...register('psk')}
+      />
+      <Checkbox label="Uplink Enabled" {...register('uplinkEnabled')} />
+      <Checkbox label="Downlink Enabled" {...register('downlinkEnabled')} />
+    </Form>
   );
 };

@@ -1,7 +1,7 @@
 import type React from 'react';
 
 import { CollapsibleSection } from '@components/generic/Sidebar/CollapsibleSection';
-import { SettingsPanel } from '@components/layout/Sidebar/Settings/channels/Channels';
+import { Channels } from '@components/layout/Sidebar/Settings/channels/Channels';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
@@ -33,7 +33,7 @@ export const ChannelsGroup = (): JSX.Element => {
                 />
               }
             >
-              <SettingsPanel channel={channel} />
+              <Channels channel={channel} />
             </CollapsibleSection>
           </div>
         );

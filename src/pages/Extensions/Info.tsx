@@ -3,9 +3,9 @@ import type React from 'react';
 import { FiRefreshCw } from 'react-icons/fi';
 import JSONPretty from 'react-json-pretty';
 
-import { IconButton } from '@app/components/generic/button/IconButton';
-import { Card } from '@app/components/generic/Card';
-import { CopyButton } from '@app/components/menu/buttons/CopyButton';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Card } from '@components/generic/Card';
+import { CopyButton } from '@components/menu/buttons/CopyButton';
 import { Hashicon } from '@emeraldpay/hashicon-react';
 import { useAppSelector } from '@hooks/useAppSelector';
 

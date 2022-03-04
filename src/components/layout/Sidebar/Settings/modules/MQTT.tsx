@@ -10,7 +10,7 @@ import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
-export const WiFi = (): JSX.Element => {
+export const MQTT = (): JSX.Element => {
   const preferences = useAppSelector(
     (state) => state.meshtastic.radio.preferences,
   );
@@ -20,9 +20,9 @@ export const WiFi = (): JSX.Element => {
       defaultValues: preferences,
     });
 
-  const WifiApMode = useWatch({
+  const moduleEnabled = useWatch({
     control,
-    name: 'wifiApMode',
+    name: 'mqttDisabled',
     defaultValue: false,
   });
 
@@ -40,18 +40,28 @@ export const WiFi = (): JSX.Element => {
   });
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
-      <Checkbox label="Enable WiFi AP" {...register('wifiApMode')} />
+      <Checkbox label="Module Disabled" {...register('mqttDisabled')} />
       <Input
-        label="WiFi SSID"
-        disabled={WifiApMode}
-        {...register('wifiSsid')}
+        label="MQTT Server Address"
+        disabled={moduleEnabled}
+        {...register('mqttServer')}
       />
       <Input
+        label="MQTT Username"
+        disabled={moduleEnabled}
+        {...register('mqttUsername')}
+      />
+      <Input
+        label="MQTT Password"
         type="password"
         autoComplete="off"
-        label="WiFi PSK"
-        disabled={WifiApMode}
-        {...register('wifiPassword')}
+        disabled={moduleEnabled}
+        {...register('mqttPassword')}
+      />
+      <Checkbox
+        label="Encryption Enabled"
+        disabled={moduleEnabled}
+        {...register('mqttEncryptionEnabled')}
       />
     </Form>
   );

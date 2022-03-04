@@ -1,6 +1,6 @@
 import { LngLat } from 'mapbox-gl';
 
-import type { MapStyleName } from '@pages/Map/styles';
+import type { MapStyleName } from '@core/mapStyles';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 

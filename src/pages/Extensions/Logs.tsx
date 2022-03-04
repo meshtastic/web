@@ -3,10 +3,10 @@ import type React from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import { FiArrowRight, FiPaperclip, FiTrash } from 'react-icons/fi';
 
-import { IconButton } from '@app/components/generic/button/IconButton';
-import { Card } from '@app/components/generic/Card';
-import { clearLogs } from '@app/core/slices/meshtasticSlice';
-import { useAppDispatch } from '@app/hooks/useAppDispatch';
+import { IconButton } from '@components/generic/button/IconButton';
+import { Card } from '@components/generic/Card';
+import { clearLogs } from '@core/slices/meshtasticSlice';
+import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf, Types } from '@meshtastic/meshtasticjs';
 

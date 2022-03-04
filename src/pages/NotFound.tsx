@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { Card } from '@app/components/generic/Card';
+import { Card } from '@components/generic/Card';
 
 export const NotFound = (): JSX.Element => {
   return (

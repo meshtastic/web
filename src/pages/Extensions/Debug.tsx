@@ -1,8 +1,8 @@
 import type React from 'react';
 
-import { Button } from '@app/components/generic/button/Button';
-import { Card } from '@app/components/generic/Card';
-import { connection } from '@app/core/connection.js';
+import { Button } from '@components/generic/button/Button';
+import { Card } from '@components/generic/Card';
+import { connection } from '@core/connection';
 import { useAppSelector } from '@hooks/useAppSelector';
 
 export const Debug = (): JSX.Element => {

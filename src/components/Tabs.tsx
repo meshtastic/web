@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { Tab, TabProps } from './Tab';
+import { Tab, TabProps } from '@components/Tab';
 
 export interface TabsProps {
   tabs: Omit<TabProps, 'activeLeft' | 'activeRight'>[];

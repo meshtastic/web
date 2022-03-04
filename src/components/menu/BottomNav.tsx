@@ -18,6 +18,8 @@ import {
   RiArrowUpLine,
 } from 'react-icons/ri';
 
+import { BottomNavItem } from '@components/menu/BottomNavItem';
+import { VersionInfo } from '@components/modals/VersionInfo';
 import {
   connType,
   openConnectionModal,
@@ -27,9 +29,6 @@ import {
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf, Types } from '@meshtastic/meshtasticjs';
-
-import { VersionInfo } from '../modals/VersionInfo';
-import { BottomNavItem } from './BottomNavItem';
 
 export const BottomNav = (): JSX.Element => {
   const [showVersionInfo, setShowVersionInfo] = useState(false);

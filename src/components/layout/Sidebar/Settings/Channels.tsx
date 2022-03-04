@@ -2,10 +2,9 @@ import type React from 'react';
 import { useState } from 'react';
 
 import { useForm } from 'react-hook-form';
-import { FiSave } from 'react-icons/fi';
 
-import { IconButton } from '@components/generic/button/IconButton';
 import { Checkbox } from '@components/generic/form/Checkbox';
+import { Form } from '@components/generic/form/Form';
 import { Input } from '@components/generic/form/Input';
 import { Select } from '@components/generic/form/Select';
 import { connection } from '@core/connection';
@@ -59,7 +58,7 @@ export const Channels = (): JSX.Element => {
             label="Use Presets"
             onChange={(e): void => setUsePreset(e.target.checked)}
           />
-          <form onSubmit={onSubmit}>
+          <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
             {usePreset ? (
               <Select
                 label="Preset"
@@ -103,18 +102,7 @@ export const Channels = (): JSX.Element => {
               suffix="dBm"
               {...register('settings.txPower', { valueAsNumber: true })}
             />
-          </form>
-          <div className="flex w-full bg-white dark:bg-secondaryDark">
-            <div className="ml-auto p-2">
-              <IconButton
-                disabled={!formState.isDirty}
-                onClick={async (): Promise<void> => {
-                  await onSubmit();
-                }}
-                icon={<FiSave />}
-              />
-            </div>
-          </div>
+          </Form>
         </>
       )}
     </>
