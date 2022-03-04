@@ -40,12 +40,12 @@ export const CollapsibleSection = ({
             <m.div className="my-auto flex gap-2">
               {status !== undefined ? (
                 <>
-                  {icon}
                   <div
-                    className={`h-3 w-3 rounded-full ${
+                    className={`my-auto h-2 w-2 rounded-full ${
                       status ? 'bg-green-500' : 'bg-red-500'
                     }`}
                   />
+                  {icon}
                 </>
               ) : (
                 <>{icon}</>
