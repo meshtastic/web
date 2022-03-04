@@ -15,16 +15,18 @@ export interface InputProps extends DefaultInputProps {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { label, error, action, suffix, ...props }: InputProps,
+  { label, error, action, suffix, className, disabled, ...props }: InputProps,
   ref,
 ) {
   return (
     <div className="w-full">
       {label && <Label label={label} error={error} />}
-      <InputWrapper error={error} disabled={props.disabled}>
+      <InputWrapper error={error} disabled={disabled}>
         <input
           ref={ref}
-          className="h-10 w-full bg-transparent px-3 py-2 focus:outline-none disabled:cursor-not-allowed dark:text-white"
+          className={`h-10 w-full bg-transparent px-3 py-2 focus:outline-none disabled:cursor-not-allowed dark:text-white ${
+            className ?? ''
+          }`}
           {...props}
         />
         {suffix && (

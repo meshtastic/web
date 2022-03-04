@@ -58,7 +58,7 @@ export const MessageBar = ({ chatIndex }: MessageBarProps): JSX.Element => {
     <div className="mx-auto flex w-full space-x-2 bg-gray-50 bg-transparent p-3 text-gray-500 dark:text-gray-400">
       <div className="mx-auto flex w-full max-w-4xl">
         <form
-          className="flex w-full space-x-2"
+          className="relative flex w-full space-x-2"
           onSubmit={(e): void => {
             e.preventDefault();
             sendMessage();
@@ -70,10 +70,16 @@ export const MessageBar = ({ chatIndex }: MessageBarProps): JSX.Element => {
             placeholder="Enter Message"
             disabled={!meshtasticState.ready}
             value={currentMessage}
+            className="mr-16"
             onChange={(e): void => {
               setCurrentMessage(e.target.value);
             }}
           />
+          <div className="absolute right-1 flex h-10">
+            <div className="z-10 my-auto mr-0.5 rounded-md border bg-secondaryDark bg-opacity-50 p-1 font-mono text-xs text-white">
+              {currentMessage.length}/255
+            </div>
+          </div>
         </form>
       </div>
     </div>
