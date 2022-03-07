@@ -30,12 +30,9 @@ type connectionType = IBLEConnection | IHTTPConnection | ISerialConnection;
 
 export let connection: connectionType = new IHTTPConnection();
 
-const state = store.getState().meshtastic;
-export const connectionUrl = state.hostOverrideEnabled
-  ? state.hostOverride
-  : import.meta.env.PROD
-  ? window.location.hostname
-  : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ?? 'meshtastic.local';
+const appState = store.getState().app;
+
+export const connectionUrl = appState.connectionParams.HTTP.address;
 
 export const setConnection = async (conn: connType): Promise<void> => {
   await connection.disconnect();
@@ -53,6 +50,8 @@ export const setConnection = async (conn: connType): Promise<void> => {
   }
   registerListeners();
   const connectionParams = store.getState().app.connectionParams;
+  console.log(connectionParams);
+
   switch (conn) {
     case connType.HTTP:
       await connection.connect(connectionParams.HTTP);

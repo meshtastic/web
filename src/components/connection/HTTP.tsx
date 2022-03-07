@@ -36,6 +36,9 @@ export const HTTP = ({ connecting }: HTTPProps): JSX.Element => {
   });
 
   const onSubmit = handleSubmit(async (data) => {
+    if (data.ip) {
+      localStorage.setItem('connectionUrl', data.ip);
+    }
     dispatch(
       setConnectionParams({
         type: connType.HTTP,

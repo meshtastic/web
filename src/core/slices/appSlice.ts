@@ -35,7 +35,11 @@ const initialState: AppState = {
   connectionParams: {
     BLE: {},
     HTTP: {
-      address: 'http://meshtastic.local/',
+      address:
+        localStorage.getItem('connectionUrl') ?? import.meta.env.PROD
+          ? window.location.hostname
+          : (import.meta.env.VITE_PUBLIC_DEVICE_IP as string) ??
+            'meshtastic.local',
       tls: false,
       receiveBatchRequests: false,
       fetchInterval: 2000,

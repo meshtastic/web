@@ -55,8 +55,6 @@ interface MeshtasticState {
   ready: boolean;
   nodes: Node[];
   radio: Radio;
-  hostOverrideEnabled: boolean;
-  hostOverride: string;
   chats: ChatEntries;
   logs: Types.LogEventPacket[];
 }
@@ -71,11 +69,6 @@ const initialState: MeshtasticState = {
     preferences: Protobuf.RadioConfig_UserPreferences.create(),
     hardware: Protobuf.MyNodeInfo.create(),
   },
-  //todo implement
-  // connectionMethod: localStorage.getItem('connectionMethod'),
-  hostOverrideEnabled:
-    localStorage.getItem('hostOverrideEnabled') === 'true' ?? false,
-  hostOverride: localStorage.getItem('hostOverride') ?? '',
   chats: {},
   logs: [],
 };
@@ -257,20 +250,6 @@ export const meshtasticSlice = createSlice({
         node.lastHeard = action.payload.time;
       }
     },
-    setHostOverrideEnabled: (state, action: PayloadAction<boolean>) => {
-      state.hostOverrideEnabled = action.payload;
-      localStorage.setItem('hostOverrideEnabled', String(action.payload));
-      if (state.hostOverrideEnabled !== action.payload) {
-        // connection.disconnect();
-      }
-    },
-    setHostOverride: (state, action: PayloadAction<string>) => {
-      state.hostOverride = action.payload;
-      localStorage.setItem('hostOverride', action.payload);
-      if (state.hostOverride !== action.payload) {
-        // connection.disconnect();
-      }
-    },
     addChat: (state, action: PayloadAction<number>) => {
       state.chats[action.payload] = {
         messages: [],
@@ -303,8 +282,6 @@ export const {
   addMessage,
   ackMessage,
   updateLastInteraction,
-  setHostOverrideEnabled,
-  setHostOverride,
   addChat,
   resetState,
 } = meshtasticSlice.actions;
