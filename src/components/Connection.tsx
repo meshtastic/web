@@ -106,9 +106,9 @@ export const Connection = (): JSX.Element => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="m-auto h-40 w-40 text-green-500"
-                  src={`/placeholders/${
-                    appState.darkMode ? 'View Code Dark.svg' : 'View Code.svg'
-                  }`}
+                  src={
+                    appState.darkMode ? '/View Code Dark.svg' : '/View Code.svg'
+                  }
                 />
               </div>
             )}

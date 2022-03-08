@@ -61,9 +61,7 @@ export const FileBrowser = (): JSX.Element => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="m-auto h-64 w-64 text-green-500"
-                  src={`/placeholders/${
-                    appState.darkMode ? 'Files Dark.svg' : 'Files.svg'
-                  }`}
+                  src={appState.darkMode ? '/Files Dark.svg' : '/Files.svg'}
                 />
               </div>
             )}
