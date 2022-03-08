@@ -107,7 +107,7 @@ export const Connection = (): JSX.Element => {
                   exit={{ opacity: 0 }}
                   className="m-auto h-40 w-40 text-green-500"
                   src={
-                    appState.darkMode ? '/View Code Dark.svg' : '/View Code.svg'
+                    appState.darkMode ? '/View_Code_Dark.svg' : '/View_Code.svg'
                   }
                 />
               </div>

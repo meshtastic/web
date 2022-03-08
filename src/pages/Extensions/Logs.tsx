@@ -81,8 +81,8 @@ export const Logs = (): JSX.Element => {
                     className="m-auto h-64 w-64 text-green-500"
                     src={
                       appState.darkMode
-                        ? '/View Code Dark.svg'
-                        : '/View Code.svg'
+                        ? '/View_Code_Dark.svg'
+                        : '/View_Code.svg'
                     }
                   />
                 </div>
