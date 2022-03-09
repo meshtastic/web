@@ -21,7 +21,7 @@
   "homepage": "https://meshtastic.org",
   "dependencies": {
     "@emeraldpay/hashicon-react": "^0.5.2",
-    "@meshtastic/eslint-config": "^1.0.6",
+    "@meshtastic/eslint-config": "^1.0.7",
     "@meshtastic/meshtasticjs": "^0.6.51",
     "@reduxjs/toolkit": "^1.8.0",
     "@tippyjs/react": "^4.2.6",

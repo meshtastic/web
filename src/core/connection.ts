@@ -152,6 +152,13 @@ const registerListeners = (): void => {
           );
         }
         break;
+      case 'getOwnerResponse':
+        store.dispatch(
+          addUser({
+            data: adminPacket.data.variant.getOwnerResponse,
+            packet: adminPacket.packet,
+          }),
+        );
     }
   });
 
