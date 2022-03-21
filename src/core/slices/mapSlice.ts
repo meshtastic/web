@@ -6,7 +6,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 interface MapState {
   firstLoad: boolean;
-  latLng: LngLat;
+  latLng: LngLat | undefined;
   zoom: number;
   bearing: number;
   pitch: number;
@@ -18,7 +18,7 @@ interface MapState {
 
 const initialState: MapState = {
   firstLoad: true,
-  latLng: new LngLat(0, 0),
+  latLng: LngLat ? new LngLat(0, 0) : undefined,
   zoom: 2,
   bearing: 0,
   pitch: 0,

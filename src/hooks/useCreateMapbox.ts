@@ -19,7 +19,7 @@ export function useCreateMapbox({
   const [mapInstance, setMapInstance] = useState<Map>();
   useEffect(() => {
     const container = ref.current as HTMLDivElement;
-    if (mapInstance || !container) {
+    if (mapInstance || !container || !Map) {
       return;
     }
     const map = new Map({
