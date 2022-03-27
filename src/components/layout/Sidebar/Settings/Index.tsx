@@ -51,7 +51,7 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
   const {
     rangeTestModuleEnabled,
     extNotificationModuleEnabled,
-    serialmoduleEnabled,
+    serialModuleEnabled,
     storeForwardModuleEnabled,
     mqttDisabled,
     cannedMessageModuleEnabled,
@@ -132,7 +132,7 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         <CollapsibleSection
           icon={<FiAlignLeft />}
           title="Serial"
-          status={serialmoduleEnabled}
+          status={serialModuleEnabled}
         >
           <SerialSettingsPanel />
         </CollapsibleSection>

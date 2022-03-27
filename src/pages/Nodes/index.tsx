@@ -37,8 +37,8 @@ export const Nodes = (): JSX.Element => {
 
     nodes.map((node, index) => {
       tmpNodes.push({
-        id: node.number.toString(),
-        data: { label: node.user?.longName ?? `Unknown ${node.number}` },
+        id: node.num.toString(),
+        data: { label: node.user?.longName ?? `Unknown ${node.num}` },
         position: { x: index * 160 + 500, y: 100 + 500 },
       });
     });
@@ -50,7 +50,7 @@ export const Nodes = (): JSX.Element => {
     const tmpEdges: Edge[] = [];
 
     nodes.map((node, index) => {
-      if (node.number === myNodeNum) {
+      if (node.num === myNodeNum) {
         tmpEdges.push({
           id: `e${1}-${myNodeNum}`,
           source: '1',
@@ -63,15 +63,15 @@ export const Nodes = (): JSX.Element => {
         });
       }
 
-      node.routes.map((route) => {
-        tmpEdges.push({
-          id: `e${route.from}-${route.to}`,
-          source: node.number.toString(),
-          target: route.to.toString(),
-          type: 'smoothstep',
-          animated: true,
-        });
-      });
+      // node.routes.map((route) => {
+      //   tmpEdges.push({
+      //     id: `e${route.from}-${route.to}`,
+      //     source: node.num.toString(),
+      //     target: route.to.toString(),
+      //     type: 'smoothstep',
+      //     animated: true,
+      //   });
+      // });
     });
 
     setGraphEdges(tmpEdges);
@@ -85,17 +85,17 @@ export const Nodes = (): JSX.Element => {
         <>
           {nodes.map((node) => (
             <SidebarItem
-              key={node.number}
-              selected={node.number === selected}
+              key={node.num}
+              selected={node.num === selected}
               setSelected={(): void => {
-                setSelected(node.number);
+                setSelected(node.num);
               }}
               actions={
                 <IconButton
                   nested
                   onClick={(e): void => {
                     e.stopPropagation();
-                    setSelected(node.number);
+                    setSelected(node.num);
                   }}
                   icon={<FiSettings />}
                 />
@@ -103,7 +103,7 @@ export const Nodes = (): JSX.Element => {
             >
               <div className="flex dark:text-white">
                 <div className="relative m-auto">
-                  {node.number === myNodeNum && (
+                  {node.num === myNodeNum && (
                     <Tooltip content="Your Node">
                       <m.div
                         whileHover={{ scale: 1.05 }}
@@ -113,12 +113,12 @@ export const Nodes = (): JSX.Element => {
                       </m.div>
                     </Tooltip>
                   )}
-                  <Hashicon value={node.number.toString()} size={32} />
+                  <Hashicon value={node.num.toString()} size={32} />
                 </div>
               </div>
               <div className="my-auto mr-auto text-xs font-semibold dark:text-gray-400">
-                {node.lastHeard.getTime()
-                  ? node.lastHeard.toLocaleTimeString(undefined, {
+                {node.lastHeard
+                  ? new Date(node.lastHeard).toLocaleTimeString(undefined, {
                       hour: '2-digit',
                       minute: '2-digit',
                     })

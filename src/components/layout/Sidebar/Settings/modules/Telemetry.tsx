@@ -68,7 +68,7 @@ export const Telemetry = (): JSX.Element => {
       />
       <Checkbox
         label="Display Farenheit"
-        {...register('telemetryModuleDisplayFarenheit')}
+        {...register('telemetryModuleDisplayFahrenheit')}
       />
       <Select
         label="Sensor Type"

@@ -33,16 +33,6 @@ interface Route {
   //speed stats?
 }
 
-export interface Node {
-  number: number;
-  lastHeard: Date;
-  snr: number[];
-  positions: Protobuf.Position[];
-  currentPosition?: CurrentPosition;
-  user?: Protobuf.User;
-  routes: Route[];
-}
-
 export interface Radio {
   channels: Protobuf.Channel[];
   preferences: Protobuf.RadioConfig_UserPreferences;
@@ -53,7 +43,7 @@ interface MeshtasticState {
   deviceStatus: Types.DeviceStatusEnum;
   lastMeshInterraction: number;
   ready: boolean;
-  nodes: Node[];
+  nodes: Protobuf.NodeInfo[];
   radio: Radio;
   chats: ChatEntries;
   logs: Types.LogEventPacket[];
@@ -97,73 +87,46 @@ export const meshtasticSlice = createSlice({
     },
     addUser: (state, action: PayloadAction<Types.UserPacket>) => {
       const node = state.nodes.find(
-        (node) => node.number === action.payload.packet.from,
+        (node) => node.num === action.payload.packet.from,
       );
       if (node) {
         node.user = action.payload.data;
         if (action.payload.packet.rxTime) {
-          node.lastHeard = new Date(action.payload.packet.rxTime * 1000);
+          node.lastHeard = new Date(
+            action.payload.packet.rxTime * 1000,
+          ).getTime();
         }
       } else {
         state.nodes.push({
-          number: action.payload.packet.from,
-          lastHeard: new Date(),
-          snr: [action.payload.packet.rxSnr],
-          user: action.payload.data,
-          positions: [],
-          routes: [],
+          num: action.payload.packet.from,
+          snr: action.payload.packet.rxSnr,
+          lastHeard: new Date().getTime(),
+          ...action.payload.packet,
         });
       }
     },
     addPosition: (state, action: PayloadAction<Types.PositionPacket>) => {
       const node = state.nodes.find(
-        (node) => node.number === action.payload.packet.from,
+        (node) => node.num === action.payload.packet.from,
       );
 
       if (node) {
-        node.positions.push(action.payload.data);
-
-        if (
-          action.payload.data.latitudeI ||
-          action.payload.data.longitudeI ||
-          action.payload.data.altitude
-        ) {
-          node.currentPosition = {
-            latitudeI:
-              action.payload.data.latitudeI ?? node.currentPosition?.latitudeI,
-            longitudeI:
-              action.payload.data.longitudeI ??
-              node.currentPosition?.longitudeI,
-            altitude:
-              action.payload.data.altitude ?? node.currentPosition?.altitude,
-            posTimestamp: action.payload.data.posTimestamp,
-            satsInView:
-              action.payload.data.satsInView ??
-              node.currentPosition?.satsInView,
-          };
-        }
-
+        node.position = action.payload.data;
         if (action.payload.packet.rxTime) {
-          node.lastHeard = new Date(action.payload.packet.rxTime * 1000);
+          node.lastHeard = new Date(
+            action.payload.packet.rxTime * 1000,
+          ).getTime();
         }
       }
     },
     addNode: (state, action: PayloadAction<Protobuf.NodeInfo>) => {
-      const node = state.nodes.find(
-        (node) => node.number === action.payload.num,
-      );
+      const node = state.nodes.find((node) => node.num === action.payload.num);
 
       if (node) {
-        node.lastHeard = new Date(action.payload.lastHeard * 1000);
-        node.snr.push(action.payload.snr);
+        node.lastHeard = new Date(action.payload.lastHeard * 1000).getTime();
+        node.snr = action.payload.snr;
       } else {
-        state.nodes.push({
-          number: action.payload.num,
-          lastHeard: new Date(action.payload.lastHeard * 1000),
-          snr: [action.payload.snr],
-          positions: [],
-          routes: [],
-        });
+        state.nodes.push(action.payload);
       }
     },
     addChannel: (state, action: PayloadAction<Protobuf.Channel>) => {
@@ -182,17 +145,16 @@ export const meshtasticSlice = createSlice({
       }
     },
     addRoute: (state, action: PayloadAction<Route>) => {
-      const node = state.nodes.find(
-        (node) => node.number === action.payload.from,
-      );
-      const exists = node?.routes.findIndex(
-        (route) =>
-          route.from === action.payload.from && route.to === action.payload.to,
-      );
-
-      if (exists === -1) {
-        node?.routes.push(action.payload);
-      }
+      // const node = state.nodes.find(
+      //   (node) => node.num === action.payload.from,
+      // );
+      // const exists = node?.routes.findIndex(
+      //   (route) =>
+      //     route.from === action.payload.from && route.to === action.payload.to,
+      // );
+      // if (exists === -1) {
+      //   node?.routes.push(action.payload);
+      // }
     },
     setPreferences: (
       state,
@@ -243,11 +205,9 @@ export const meshtasticSlice = createSlice({
       state,
       action: PayloadAction<{ id: number; time: Date }>,
     ) => {
-      const node = state.nodes.find(
-        (node) => node.number === action.payload.id,
-      );
+      const node = state.nodes.find((node) => node.num === action.payload.id);
       if (node) {
-        node.lastHeard = action.payload.time;
+        node.lastHeard = action.payload.time.getTime();
       }
     },
     addChat: (state, action: PayloadAction<number>) => {

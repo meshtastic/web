@@ -37,24 +37,24 @@ export const SerialSettingsPanel = (): JSX.Element => {
 
   const moduleEnabled = useWatch({
     control,
-    name: 'serialmoduleEnabled',
+    name: 'serialModuleEnabled',
     defaultValue: false,
   });
 
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
-      <Checkbox label="Module Enabled" {...register('serialmoduleEnabled')} />
+      <Checkbox label="Module Enabled" {...register('serialModuleEnabled')} />
       <Checkbox
         label="Echo"
         disabled={!moduleEnabled}
-        {...register('serialmoduleEcho')}
+        {...register('serialModuleEcho')}
       />
 
       <Input
         type="number"
         label="RX"
         disabled={!moduleEnabled}
-        {...register('serialmoduleRxd', {
+        {...register('serialModuleRxd', {
           valueAsNumber: true,
         })}
       />
@@ -62,7 +62,7 @@ export const SerialSettingsPanel = (): JSX.Element => {
         type="number"
         label="TX Pin"
         disabled={!moduleEnabled}
-        {...register('serialmoduleTxd', {
+        {...register('serialModuleTxd', {
           valueAsNumber: true,
         })}
       />
@@ -70,7 +70,7 @@ export const SerialSettingsPanel = (): JSX.Element => {
         type="number"
         label="Baud Rate"
         disabled={!moduleEnabled}
-        {...register('serialmoduleBaud', {
+        {...register('serialModuleBaud', {
           valueAsNumber: true,
         })}
       />
@@ -78,7 +78,7 @@ export const SerialSettingsPanel = (): JSX.Element => {
         type="number"
         label="Timeout"
         disabled={!moduleEnabled}
-        {...register('serialmoduleTimeout', {
+        {...register('serialModuleTimeout', {
           valueAsNumber: true,
         })}
       />
@@ -86,7 +86,7 @@ export const SerialSettingsPanel = (): JSX.Element => {
         type="number"
         label="Mode"
         disabled={!moduleEnabled}
-        {...register('serialmoduleMode', {
+        {...register('serialModuleMode', {
           valueAsNumber: true,
         })}
       />

@@ -3,15 +3,15 @@ import type React from 'react';
 import { FiClock } from 'react-icons/fi';
 
 import { Tooltip } from '@components/generic/Tooltip';
-import type { Node } from '@core/slices/meshtasticSlice';
 import { Hashicon } from '@emeraldpay/hashicon-react';
+import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface MessageProps {
   lastMsgSameUser: boolean;
   message: string;
   ack: boolean;
   rxTime: Date;
-  sender?: Node;
+  sender?: Protobuf.NodeInfo;
 }
 
 export const Message = ({
@@ -59,7 +59,7 @@ export const Message = ({
       ) : (
         <div className="mx-6 flex gap-2">
           <div className="my-auto w-8">
-            <Hashicon value={(sender?.number ?? 0).toString()} size={32} />
+            <Hashicon value={(sender?.num ?? 0).toString()} size={32} />
           </div>
           <div>
             <div className="flex gap-2">

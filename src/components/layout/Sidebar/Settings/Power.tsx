@@ -20,7 +20,10 @@ export const Power = (): JSX.Element => {
     useForm<Protobuf.RadioConfig_UserPreferences>({
       defaultValues: {
         ...preferences,
-        isLowPower: preferences.isRouter ? true : preferences.isLowPower,
+        isLowPower:
+          preferences.role === Protobuf.Role.Router
+            ? true
+            : preferences.isLowPower,
       },
     });
 
@@ -45,9 +48,11 @@ export const Power = (): JSX.Element => {
       />
       <Checkbox
         label="Powered by low power source (solar)"
-        disabled={preferences.isRouter}
+        disabled={preferences.role === Protobuf.Role.Router}
         validationMessage={
-          preferences.isRouter ? 'Enabled by default in router mode' : ''
+          preferences.role === Protobuf.Role.Router
+            ? 'Enabled by default in router mode'
+            : ''
         }
         {...register('isLowPower')}
       />

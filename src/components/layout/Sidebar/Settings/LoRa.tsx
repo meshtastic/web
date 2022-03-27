@@ -42,7 +42,11 @@ export const LoRa = (): JSX.Element => {
         {...register('hopLimit', { valueAsNumber: true })}
       />
       <Checkbox label="Transmit Disabled" {...register('isLoraTxDisabled')} />
-      <Checkbox label="Router Mode" {...register('isRouter')} />
+      <Select
+        label="Operating Role"
+        optionsEnum={Protobuf.Role}
+        {...register('role')}
+      />
       <Input
         label="Send Owner Interval"
         type="number"

@@ -18,7 +18,7 @@ export const User = (): JSX.Element => {
     (state) => state.meshtastic.radio.hardware,
   ).myNodeNum;
   const node = useAppSelector((state) => state.meshtastic.nodes).find(
-    (node) => node.number === myNodeNum,
+    (node) => node.num === myNodeNum,
   );
   const { register, handleSubmit, formState, reset } = useForm<{
     longName: string;

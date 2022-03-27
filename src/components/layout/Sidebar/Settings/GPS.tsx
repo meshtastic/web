@@ -8,7 +8,6 @@ import { Checkbox } from '@components/generic/form/Checkbox';
 import { Form } from '@components/generic/form/Form';
 import { Input } from '@components/generic/form/Input';
 import { Label } from '@components/generic/form/Label';
-import { Select } from '@components/generic/form/Select';
 import { connection } from '@core/connection';
 import { bitwiseDecode, bitwiseEncode } from '@core/utils/bitwise';
 import { useAppSelector } from '@hooks/useAppSelector';
@@ -25,7 +24,7 @@ export const GPS = (): JSX.Element => {
         ...preferences,
         positionBroadcastSecs:
           preferences.positionBroadcastSecs === 0
-            ? preferences.isRouter
+            ? preferences.role === Protobuf.Role.Router
               ? 43200
               : 900
             : preferences.positionBroadcastSecs,
@@ -54,20 +53,15 @@ export const GPS = (): JSX.Element => {
         {...register('positionBroadcastSecs', { valueAsNumber: true })}
       />
       <Checkbox
-        label="Use Smart Position"
-        {...register('positionBroadcastSmart')}
+        label="Disable Smart Position"
+        {...register('positionBroadcastSmartDisabled')}
       />
       <Checkbox label="Use Fixed Position" {...register('fixedPosition')} />
-      <Select
-        label="Location Sharing"
-        optionsEnum={Protobuf.LocationSharing}
-        {...register('locationShare', { valueAsNumber: true })}
+      <Checkbox
+        label="Disable Location Sharing"
+        {...register('locationShareDisabled')}
       />
-      <Select
-        label="GPS Mode"
-        optionsEnum={Protobuf.GpsOperation}
-        {...register('gpsOperation', { valueAsNumber: true })}
-      />
+      <Checkbox label="Disable GPS" {...register('gpsDisabled')} />
       <Input
         label="GPS Update Interval"
         type="number"

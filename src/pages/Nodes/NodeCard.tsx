@@ -21,14 +21,14 @@ import { SidebarOverlay } from '@components/generic/Sidebar/SidebarOverlay';
 import { Tooltip } from '@components/generic/Tooltip';
 import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
 import { CopyButton } from '@components/menu/buttons/CopyButton';
-import type { Node } from '@core/slices/meshtasticSlice';
 import { Hashicon } from '@emeraldpay/hashicon-react';
 import { useMapbox } from '@hooks/useMapbox';
+import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 type PositionConfidence = 'high' | 'low' | 'none';
 
 export interface NodeCardProps {
-  node: Node;
+  node: Protobuf.NodeInfo;
   isMyNode: boolean;
   selected: boolean;
   setSelected: () => void;
@@ -47,14 +47,14 @@ export const NodeCard = ({
 
   useEffect(() => {
     setPositionConfidence(
-      node.currentPosition
-        ? new Date(node.currentPosition.posTimestamp * 1000) >
+      node.position
+        ? new Date(node.position.posTimestamp * 1000) >
           new Date(new Date().getTime() - 1000 * 60 * 30)
           ? 'high'
           : 'low'
         : 'none',
     );
-  }, [node.currentPosition]);
+  }, [node.position]);
   return (
     <>
       <SidebarItem
@@ -69,11 +69,11 @@ export const NodeCard = ({
               onClick={(e): void => {
                 e.stopPropagation();
                 setSelected();
-                if (PositionConfidence !== 'none' && node.currentPosition) {
+                if (PositionConfidence !== 'none' && node.position) {
                   map?.flyTo({
                     center: new LngLat(
-                      node.currentPosition.longitudeI / 1e7,
-                      node.currentPosition.latitudeI / 1e7,
+                      node.position.longitudeI / 1e7,
+                      node.position.latitudeI / 1e7,
                     ),
                     zoom: 16,
                   });
@@ -113,12 +113,12 @@ export const NodeCard = ({
                 </m.div>
               </Tooltip>
             )}
-            <Hashicon value={node.number.toString()} size={32} />
+            <Hashicon value={node.num.toString()} size={32} />
           </div>
         </div>
         <div className="my-auto mr-auto text-xs font-semibold dark:text-gray-400">
-          {node.lastHeard.getTime()
-            ? node.lastHeard.toLocaleTimeString(undefined, {
+          {node.lastHeard
+            ? new Date(node.lastHeard).toLocaleTimeString(undefined, {
                 hour: '2-digit',
                 minute: '2-digit',
               })
@@ -136,7 +136,7 @@ export const NodeCard = ({
         <CollapsibleSection title="User" icon={<FiUser />}>
           <div className="flex  p-2">
             <div className="m-auto flex flex-col gap-2">
-              <Hashicon value={node.number.toString()} size={180} />
+              <Hashicon value={node.num.toString()} size={180} />
               <div className="text-center text-lg font-medium dark:text-white">
                 {node?.user?.longName || 'Unknown'}
               </div>
@@ -146,18 +146,18 @@ export const NodeCard = ({
         <CollapsibleSection title="Location" icon={<FiMapPin />}>
           <>
             <div className="flex h-10 select-none justify-between rounded-md border border-gray-400 bg-transparent bg-gray-300 px-1 text-gray-500 dark:border-gray-600 dark:bg-secondaryDark dark:text-gray-400 ">
-              {node.currentPosition ? (
+              {node.position ? (
                 <>
                   <div className="my-auto px-1">
-                    {(node.currentPosition.latitudeI / 1e7).toPrecision(6)}
+                    {(node.position.latitudeI / 1e7).toPrecision(6)}
                     ,&nbsp;
-                    {(node.currentPosition?.longitudeI / 1e7).toPrecision(6)}
+                    {(node.position?.longitudeI / 1e7).toPrecision(6)}
                   </div>
                   <CopyButton
                     data={
-                      node.currentPosition
-                        ? `${node.currentPosition.latitudeI / 1e7},${
-                            node.currentPosition.longitudeI / 1e7
+                      node.position
+                        ? `${node.position.latitudeI / 1e7},${
+                            node.position.longitudeI / 1e7
                           }`
                         : ''
                     }

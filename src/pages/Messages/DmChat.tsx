@@ -4,11 +4,11 @@ import { FiSettings } from 'react-icons/fi';
 
 import { IconButton } from '@components/generic/button/IconButton';
 import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
-import type { Node } from '@core/slices/meshtasticSlice';
 import { Hashicon } from '@emeraldpay/hashicon-react';
+import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export interface DmChatProps {
-  node: Node;
+  node: Protobuf.NodeInfo;
   selectedIndex: number;
   setSelectedIndex: (index: number) => void;
 }
@@ -20,16 +20,16 @@ export const DmChat = ({
 }: DmChatProps): JSX.Element => {
   return (
     <SidebarItem
-      key={node.number}
-      selected={node.number === selectedIndex}
+      key={node.num}
+      selected={node.num === selectedIndex}
       setSelected={(): void => {
-        setSelectedIndex(node.number);
+        setSelectedIndex(node.num);
       }}
       actions={<IconButton nested icon={<FiSettings />} />}
     >
       <div className="flex dark:text-white">
         <div className="m-auto">
-          <Hashicon value={node.number.toString()} size={32} />
+          <Hashicon value={node.num.toString()} size={32} />
         </div>
       </div>
       <div className="my-auto mr-auto font-semibold dark:text-white">

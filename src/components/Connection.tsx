@@ -24,6 +24,7 @@ export const Connection = (): JSX.Element => {
 
   const meshtasticState = useAppSelector((state) => state.meshtastic);
   const appState = useAppSelector((state) => state.app);
+  const chromiunm = !!window.chrome;
 
   useEffect(() => {
     if (!import.meta.env.VITE_PUBLIC_HOSTED) {
@@ -79,22 +80,36 @@ export const Connection = (): JSX.Element => {
                 }
               />
             )}
-            {appState.connType === connType.BLE && (
-              <BLE
-                connecting={
-                  meshtasticState.deviceStatus ===
-                  Types.DeviceStatusEnum.DEVICE_CONNECTED
-                }
-              />
-            )}
-            {appState.connType === connType.SERIAL && (
-              <Serial
-                connecting={
-                  meshtasticState.deviceStatus ===
-                  Types.DeviceStatusEnum.DEVICE_CONNECTED
-                }
-              />
-            )}
+
+            {appState.connType === connType.BLE &&
+              (chromiunm ? (
+                <BLE
+                  connecting={
+                    meshtasticState.deviceStatus ===
+                    Types.DeviceStatusEnum.DEVICE_CONNECTED
+                  }
+                />
+              ) : (
+                <div className="rounded-md border border-red-500 bg-red-500 bg-opacity-10 p-8 dark:text-white">
+                  <p>Unsupported.</p>
+                  <p>Please use a Chromium based browser.</p>
+                </div>
+              ))}
+
+            {appState.connType === connType.SERIAL &&
+              (chromiunm ? (
+                <Serial
+                  connecting={
+                    meshtasticState.deviceStatus ===
+                    Types.DeviceStatusEnum.DEVICE_CONNECTED
+                  }
+                />
+              ) : (
+                <div className="rounded-md border border-red-500 bg-red-500 bg-opacity-10 p-8 dark:text-white">
+                  <p>Unsupported.</p>
+                  <p>Please use a Chromium based browser.</p>
+                </div>
+              ))}
           </div>
         </div>
         <div className="md:w-1/2">
