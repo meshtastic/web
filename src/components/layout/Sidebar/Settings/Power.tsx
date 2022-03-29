@@ -70,7 +70,7 @@ export const Power = (): JSX.Element => {
         {...register('adcMultiplierOverride', { valueAsNumber: true })}
       />
       <Input
-        label="Minumum Wake Time"
+        label="Minimum Wake Time"
         suffix="Seconds"
         type="number"
         {...register('minWakeSecs', { valueAsNumber: true })}
