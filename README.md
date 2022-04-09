@@ -1,6 +1,7 @@
 # Meshtastic Web
 
 [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/meshtastic/meshtastic-web)
+[![CLA assistant](https://cla-assistant.io/readme/badge/meshtastic/meshtastic-web)](https://cla-assistant.io/meshtastic/meshtastic-web)
 
 ## Overview
 
