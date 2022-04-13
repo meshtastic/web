@@ -48,12 +48,6 @@ export const LoRa = (): JSX.Element => {
         {...register('role')}
       />
       <Input
-        label="Send Owner Interval"
-        type="number"
-        suffix="Seconds"
-        {...register('sendOwnerInterval', { valueAsNumber: true })}
-      />
-      <Input
         label="Frequency Offset"
         type="number"
         suffix="Hz"

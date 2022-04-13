@@ -34,6 +34,7 @@ export const SidebarOverlay = ({
           }
           transition={{ type: 'just' }}
         >
+          {/* @ts-expect-error */}
           <AnimateSharedLayout>
             {/* <div className="flex gap-2 border-b border-gray-400 p-2 dark:border-gray-600"> */}
             <div className="bg-white px-1 pt-1 drop-shadow-md dark:bg-primaryDark">

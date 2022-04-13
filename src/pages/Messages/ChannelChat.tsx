@@ -27,7 +27,7 @@ export const ChannelChat = ({
     (state) => state.meshtastic.radio.hardware,
   ).myNodeNum;
   const nodes = useAppSelector((state) => state.meshtastic.nodes).filter(
-    (node) => node.num !== myNodeNum,
+    (node) => node.data.num !== myNodeNum,
   );
   const chats = useAppSelector((state) => state.meshtastic.chats);
   const channels = useAppSelector(
@@ -80,7 +80,7 @@ export const ChannelChat = ({
                   <Tooltip
                     key={nodeId}
                     content={
-                      nodes.find((node) => node.num === nodeId)?.user
+                      nodes.find((node) => node.data.num === nodeId)?.data.user
                         ?.longName ?? 'UNK'
                     }
                   >

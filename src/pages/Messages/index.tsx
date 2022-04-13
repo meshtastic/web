@@ -52,11 +52,11 @@ export const Messages = (): JSX.Element => {
             <div className="mx-2 border-b border-gray-400 dark:border-gray-600" />
           )}
           {nodes
-            .filter((node) => node.num !== myNodeNum)
+            .filter((node) => node.data.num !== myNodeNum)
             .map((node) => (
               <DmChat
-                key={node.num}
-                node={node}
+                key={node.data.num}
+                node={node.data}
                 selectedIndex={selectedChatIndex}
                 setSelectedIndex={setSelectedChatIndex}
               />
@@ -81,8 +81,8 @@ export const Messages = (): JSX.Element => {
                 </span>
               ) : (
                 <span className="text-gray-500 dark:text-gray-400">
-                  {nodes.find((node) => node.num === selectedChatIndex)?.user
-                    ?.longName ?? 'Unknown'}
+                  {nodes.find((node) => node.data.num === selectedChatIndex)
+                    ?.data.user?.longName ?? 'Unknown'}
                 </span>
               )}
             </div>
@@ -105,9 +105,11 @@ export const Messages = (): JSX.Element => {
                     : chats[selectedChatIndex].messages[index - 1].message
                         .packet.from === message.message.packet.from
                 }
-                sender={nodes.find(
-                  (node) => node.num === message.message.packet.from,
-                )}
+                sender={
+                  nodes.find(
+                    (node) => node.data.num === message.message.packet.from,
+                  )?.data
+                }
               />
             ))}
           </div>

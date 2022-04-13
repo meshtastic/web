@@ -50,41 +50,42 @@ export const CannedMessage = (): JSX.Element => {
         {...register('rotary1Enabled')}
       />
       <Input
-        label="Encoder #1 Pin A"
+        label="Encoder Pin A"
         type="number"
         disabled={moduleEnabled}
-        {...register('rotary1PinA', { valueAsNumber: true })}
+        {...register('inputbrokerPinA', { valueAsNumber: true })}
       />
       <Input
-        label="Encoder #1 Pin B"
+        label="Encoder Pin B"
         type="number"
         disabled={moduleEnabled}
-        {...register('rotary1PinB', { valueAsNumber: true })}
+        {...register('inputbrokerPinB', { valueAsNumber: true })}
       />
       <Input
-        label="Endoer #1 Pin Press"
+        label="Endoer Pin Press"
         type="number"
         disabled={moduleEnabled}
-        {...register('rotary1PinPress', { valueAsNumber: true })}
+        {...register('inputbrokerPinPress', { valueAsNumber: true })}
       />
       <Select
         label="Clockwise event"
         disabled={moduleEnabled}
         optionsEnum={Protobuf.InputEventChar}
-        {...register('rotary1EventCw', { valueAsNumber: true })}
+        {...register('inputbrokerEventCw', { valueAsNumber: true })}
       />
       <Select
         label="Counter Clockwise event"
         disabled={moduleEnabled}
         optionsEnum={Protobuf.InputEventChar}
-        {...register('rotary1EventCcw', { valueAsNumber: true })}
+        {...register('inputbrokerEventCcw', { valueAsNumber: true })}
       />
       <Select
         label="Press event"
         disabled={moduleEnabled}
         optionsEnum={Protobuf.InputEventChar}
-        {...register('rotary1EventPress', { valueAsNumber: true })}
+        {...register('inputbrokerEventPress', { valueAsNumber: true })}
       />
+      <Checkbox label="Up Down enabled" {...register('updown1Enabled')} />
       <Input
         label="Allow Input Source"
         disabled={moduleEnabled}

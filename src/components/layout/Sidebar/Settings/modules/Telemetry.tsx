@@ -37,16 +37,16 @@ export const Telemetry = (): JSX.Element => {
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
       <Checkbox
         label="Measurement Enabled"
-        {...register('telemetryModuleMeasurementEnabled')}
+        {...register('telemetryModuleEnvironmentMeasurementEnabled')}
       />
       <Checkbox
         label="Displayed on Screen"
-        {...register('telemetryModuleScreenEnabled')}
+        {...register('telemetryModuleEnvironmentScreenEnabled')}
       />
       <Input
         label="Read Error Count Threshold"
         type="number"
-        {...register('telemetryModuleReadErrorCountThreshold', {
+        {...register('telemetryModuleEnvironmentReadErrorCountThreshold', {
           valueAsNumber: true,
         })}
       />
@@ -54,7 +54,7 @@ export const Telemetry = (): JSX.Element => {
         label="Update Interval"
         suffix="Seconds"
         type="number"
-        {...register('telemetryModuleUpdateInterval', {
+        {...register('telemetryModuleEnvironmentUpdateInterval', {
           valueAsNumber: true,
         })}
       />
@@ -62,23 +62,27 @@ export const Telemetry = (): JSX.Element => {
         label="Recovery Interval"
         suffix="Seconds"
         type="number"
-        {...register('telemetryModuleRecoveryInterval', {
+        {...register('telemetryModuleEnvironmentRecoveryInterval', {
           valueAsNumber: true,
         })}
       />
       <Checkbox
         label="Display Farenheit"
-        {...register('telemetryModuleDisplayFahrenheit')}
+        {...register('telemetryModuleEnvironmentDisplayFahrenheit')}
       />
       <Select
         label="Sensor Type"
         optionsEnum={Protobuf.RadioConfig_UserPreferences_TelemetrySensorType}
-        {...register('telemetryModuleSensorType', { valueAsNumber: true })}
+        {...register('telemetryModuleEnvironmentSensorType', {
+          valueAsNumber: true,
+        })}
       />
       <Input
         label="Sensor Pin"
         type="number"
-        {...register('telemetryModuleSensorPin', { valueAsNumber: true })}
+        {...register('telemetryModuleEnvironmentSensorPin', {
+          valueAsNumber: true,
+        })}
       />
     </Form>
   );

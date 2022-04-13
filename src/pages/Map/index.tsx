@@ -8,10 +8,10 @@ import { RiRoadMapLine } from 'react-icons/ri';
 import { Layout } from '@components/layout';
 import { MapboxProvider } from '@components/MapBox/MapboxProvider';
 import { useAppSelector } from '@hooks/useAppSelector';
+import type { Protobuf } from '@meshtastic/meshtasticjs';
 import { MapContainer } from '@pages/Map/MapContainer';
 import { Marker } from '@pages/Map/Marker';
 import { NodeCard } from '@pages/Nodes/NodeCard';
-import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Map = (): JSX.Element => {
   const [selectedNode, setSelectedNode] = useState<Protobuf.NodeInfo>();
@@ -25,22 +25,22 @@ export const Map = (): JSX.Element => {
     <MapboxProvider>
       {nodes.map((node) => {
         return (
-          node.position && (
+          node.data.position && (
             <Marker
-              key={node.num}
+              key={node.data.num}
               center={
                 new mapboxgl.LngLat(
-                  node.position.longitudeI / 1e7,
-                  node.position.latitudeI / 1e7,
+                  node.data.position.longitudeI / 1e7,
+                  node.data.position.latitudeI / 1e7,
                 )
               }
             >
               <div
                 onClick={(): void => {
-                  setSelectedNode(node);
+                  setSelectedNode(node.data);
                 }}
                 className={`z-50 rounded-full  border-2 bg-opacity-30 ${
-                  node.num === selectedNode?.num
+                  node.data.num === selectedNode?.num
                     ? 'border-green-500 bg-green-500'
                     : 'border-blue-500 bg-blue-500'
                 }`}
@@ -66,12 +66,12 @@ export const Map = (): JSX.Element => {
 
             {nodes.map((node) => (
               <NodeCard
-                key={node.num}
-                node={node}
-                isMyNode={node.num === myNodeNum}
-                selected={selectedNode?.num === node.num}
+                key={node.data.num}
+                node={node.data}
+                isMyNode={node.data.num === myNodeNum}
+                selected={selectedNode?.num === node.data.num}
                 setSelected={(): void => {
-                  setSelectedNode(node);
+                  setSelectedNode(node.data);
                 }}
               />
             ))}

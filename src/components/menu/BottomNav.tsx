@@ -5,15 +5,18 @@ import {
   FiBluetooth,
   FiCpu,
   FiGitBranch,
-  FiHexagon,
   FiMenu,
   FiMoon,
   FiSun,
   FiWifi,
   FiX,
 } from 'react-icons/fi';
+import {
+  IoBatteryChargingOutline,
+  IoBatteryDeadOutline,
+  IoBatteryFullOutline,
+} from 'react-icons/io5';
 import { MdUpgrade } from 'react-icons/md';
-import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import {
   RiArrowDownLine,
   RiArrowUpDownLine,
@@ -31,13 +34,6 @@ import {
 import { useAppDispatch } from '@hooks/useAppDispatch';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf, Types } from '@meshtastic/meshtasticjs';
-import {
-  IoBatteryChargingOutline,
-  IoBatteryDeadOutline,
-  IoBatteryFullOutline,
-  IoBatteryHalfOutline,
-} from 'react-icons/io5';
-import { FaTrafficLight } from 'react-icons/fa';
 
 export const BottomNav = (): JSX.Element => {
   const [showVersionInfo, setShowVersionInfo] = useState(false);
@@ -47,8 +43,8 @@ export const BottomNav = (): JSX.Element => {
   const primaryChannelSettings = useAppSelector(
     (state) => state.meshtastic.radio.channels,
   ).find((channel) => channel.role === Protobuf.Channel_Role.PRIMARY)?.settings;
-  const telemetry =
-    meshtasticState.nodes[meshtasticState.radio.hardware.myNodeNum]?.telemetry;
+  const metrics =
+    meshtasticState.nodes[meshtasticState.radio.hardware.myNodeNum]?.metrics;
 
   return (
     <div className="z-20 flex justify-between divide-x divide-gray-400 border-t border-gray-400 bg-white dark:divide-gray-600 dark:border-gray-600 dark:bg-secondaryDark">
@@ -89,32 +85,26 @@ export const BottomNav = (): JSX.Element => {
         )}
         <div className="truncate text-xs font-medium">
           {meshtasticState.nodes.find(
-            (node) => node.num === meshtasticState.radio.hardware.myNodeNum,
-          )?.user?.longName ?? 'Disconnected'}
+            (node) =>
+              node.data.num === meshtasticState.radio.hardware.myNodeNum,
+          )?.data.user?.longName ?? 'Disconnected'}
         </div>
-      </BottomNavItem>
-      <BottomNavItem tooltip="Router Heartbeat">
-        {telemetry?.routerHeartbeat ? (
-          <AiFillHeart className="h-4" />
-        ) : (
-          <AiOutlineHeart className="h-4" />
-        )}
       </BottomNavItem>
 
       <BottomNavItem tooltip="Battery Level">
-        {!telemetry?.batteryLevel ? (
+        {!metrics?.batteryLevel ? (
           <IoBatteryDeadOutline className="h-4" />
-        ) : telemetry?.batteryLevel > 50 ? (
+        ) : metrics?.batteryLevel > 50 ? (
           <IoBatteryFullOutline className="h-4" />
-        ) : telemetry?.batteryLevel > 0 ? (
+        ) : metrics?.batteryLevel > 0 ? (
           <IoBatteryFullOutline className="h-4" />
         ) : (
           <IoBatteryChargingOutline className="h-4" />
         )}
 
         <div className="truncate text-xs font-medium">
-          {telemetry?.batteryLevel
-            ? `${telemetry?.batteryLevel}% - ${telemetry?.voltage}v`
+          {metrics?.batteryLevel
+            ? `${metrics?.batteryLevel}% - ${metrics?.voltage}v`
             : 'No Battery'}
         </div>
       </BottomNavItem>
@@ -122,22 +112,22 @@ export const BottomNav = (): JSX.Element => {
       <BottomNavItem tooltip="Network Utilization">
         <div className="m-auto h-3 w-3 rounded-full bg-primary" />
         <div className="truncate text-xs font-medium">
-          {`${telemetry?.airUtilTx ?? 0}% - Air`} |
+          {`${metrics?.airUtilTx ?? 0}% - Air`} |
         </div>
 
         <div
           className={`m-auto h-3 w-3 rounded-full ${
-            !telemetry?.channelUtilization
+            !metrics?.channelUtilization
               ? 'bg-primary'
-              : telemetry?.channelUtilization > 50
+              : metrics?.channelUtilization > 50
               ? 'bg-red-400'
-              : telemetry?.channelUtilization > 24
+              : metrics?.channelUtilization > 24
               ? 'bg-yellow-400'
               : 'bg-primary'
           }`}
         />
         <div className="truncate text-xs font-medium">
-          {`${telemetry?.channelUtilization ?? 0}% - Ch`}
+          {`${metrics?.channelUtilization ?? 0}% - Ch`}
         </div>
       </BottomNavItem>
 

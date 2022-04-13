@@ -10,7 +10,9 @@ export const Debug = (): JSX.Element => {
     (state) => state.meshtastic.radio.hardware,
   );
   const node = useAppSelector((state) =>
-    state.meshtastic.nodes.find((node) => node.num === hardwareInfo.myNodeNum),
+    state.meshtastic.nodes.find(
+      (node) => node.data.num === hardwareInfo.myNodeNum,
+    ),
   );
 
   return (

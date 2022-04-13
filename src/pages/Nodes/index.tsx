@@ -37,8 +37,8 @@ export const Nodes = (): JSX.Element => {
 
     nodes.map((node, index) => {
       tmpNodes.push({
-        id: node.num.toString(),
-        data: { label: node.user?.longName ?? `Unknown ${node.num}` },
+        id: node.data.num.toString(),
+        data: { label: node.data.user?.longName ?? `Unknown ${node.data.num}` },
         position: { x: index * 160 + 500, y: 100 + 500 },
       });
     });
@@ -50,7 +50,7 @@ export const Nodes = (): JSX.Element => {
     const tmpEdges: Edge[] = [];
 
     nodes.map((node, index) => {
-      if (node.num === myNodeNum) {
+      if (node.data.num === myNodeNum) {
         tmpEdges.push({
           id: `e${1}-${myNodeNum}`,
           source: '1',
@@ -85,17 +85,17 @@ export const Nodes = (): JSX.Element => {
         <>
           {nodes.map((node) => (
             <SidebarItem
-              key={node.num}
-              selected={node.num === selected}
+              key={node.data.num}
+              selected={node.data.num === selected}
               setSelected={(): void => {
-                setSelected(node.num);
+                setSelected(node.data.num);
               }}
               actions={
                 <IconButton
                   nested
                   onClick={(e): void => {
                     e.stopPropagation();
-                    setSelected(node.num);
+                    setSelected(node.data.num);
                   }}
                   icon={<FiSettings />}
                 />
@@ -103,7 +103,7 @@ export const Nodes = (): JSX.Element => {
             >
               <div className="flex dark:text-white">
                 <div className="relative m-auto">
-                  {node.num === myNodeNum && (
+                  {node.data.num === myNodeNum && (
                     <Tooltip content="Your Node">
                       <m.div
                         whileHover={{ scale: 1.05 }}
@@ -113,15 +113,18 @@ export const Nodes = (): JSX.Element => {
                       </m.div>
                     </Tooltip>
                   )}
-                  <Hashicon value={node.num.toString()} size={32} />
+                  <Hashicon value={node.data.num.toString()} size={32} />
                 </div>
               </div>
               <div className="my-auto mr-auto text-xs font-semibold dark:text-gray-400">
-                {node.lastHeard
-                  ? new Date(node.lastHeard).toLocaleTimeString(undefined, {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
+                {node.data.lastHeard
+                  ? new Date(node.data.lastHeard).toLocaleTimeString(
+                      undefined,
+                      {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      },
+                    )
                   : 'Never'}
               </div>
             </SidebarItem>

@@ -14,7 +14,9 @@ export const Info = (): JSX.Element => {
     (state) => state.meshtastic.radio.hardware,
   );
   const node = useAppSelector((state) =>
-    state.meshtastic.nodes.find((node) => node.num === hardwareInfo.myNodeNum),
+    state.meshtastic.nodes.find(
+      (node) => node.data.num === hardwareInfo.myNodeNum,
+    ),
   );
 
   return (
@@ -27,7 +29,7 @@ export const Info = (): JSX.Element => {
         <div className="m-auto flex flex-col gap-2">
           <Hashicon value={hardwareInfo.myNodeNum.toString()} size={180} />
           <div className="text-center text-lg font-medium dark:text-white">
-            {node?.user?.longName || 'Unknown'}
+            {node?.data.user?.longName || 'Unknown'}
           </div>
         </div>
         {/* <img

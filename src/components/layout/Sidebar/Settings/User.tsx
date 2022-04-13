@@ -18,7 +18,7 @@ export const User = (): JSX.Element => {
     (state) => state.meshtastic.radio.hardware,
   ).myNodeNum;
   const node = useAppSelector((state) => state.meshtastic.nodes).find(
-    (node) => node.num === myNodeNum,
+    (node) => node.data.num === myNodeNum,
   );
   const { register, handleSubmit, formState, reset } = useForm<{
     longName: string;
@@ -30,51 +30,47 @@ export const User = (): JSX.Element => {
     txPowerDbm: number;
   }>({
     defaultValues: {
-      longName: node?.user?.longName,
-      shortName: node?.user?.shortName,
-      isLicensed: node?.user?.isLicensed,
-      team: node?.user?.team,
-      antAzimuth: node?.user?.antAzimuth,
-      antGainDbi: node?.user?.antGainDbi,
-      txPowerDbm: node?.user?.txPowerDbm,
+      longName: node?.data.user?.longName,
+      shortName: node?.data.user?.shortName,
+      isLicensed: node?.data.user?.isLicensed,
+      team: node?.data.user?.team,
+      antAzimuth: node?.data.user?.antAzimuth,
+      antGainDbi: node?.data.user?.antGainDbi,
+      txPowerDbm: node?.data.user?.txPowerDbm,
     },
   });
 
   useEffect(() => {
     reset({
-      longName: node?.user?.longName,
-      shortName: node?.user?.shortName,
-      isLicensed: node?.user?.isLicensed,
-      team: node?.user?.team,
+      longName: node?.data.user?.longName,
+      shortName: node?.data.user?.shortName,
+      isLicensed: node?.data.user?.isLicensed,
+      team: node?.data.user?.team,
     });
   }, [reset, node]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
 
-    if (node?.user) {
-      void connection.setOwner({ ...node.user, ...data }, async () => {
+    if (node?.data.user) {
+      void connection.setOwner({ ...node.data.user, ...data }, async () => {
         reset({ ...data });
         setLoading(false);
         await Promise.resolve();
       });
-      // TODO: can be removed once getUser is implemented
-      // dispatch(
-      //   addUser({ ...node.user, ...{ data: { ...node.user.data, ...data } } }),
-      // );
     }
   });
 
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
-      <Input label="Device ID" value={node?.user?.id} disabled />
+      <Input label="Device ID" value={node?.data.user?.id} disabled />
       <Input label="Device Name" {...register('longName')} />
       <Input label="Short Name" maxLength={3} {...register('shortName')} />
       <Input
         label="Mac Address"
         defaultValue={
           base16
-            .stringify(node?.user?.macaddr ?? [])
+            .stringify(node?.data.user?.macaddr ?? [])
             .match(/.{1,2}/g)
             ?.join(':') ?? ''
         }
@@ -84,7 +80,7 @@ export const User = (): JSX.Element => {
         label="Hardware (DEPRECATED)"
         value={
           Protobuf.HardwareModel[
-            node?.user?.hwModel ?? Protobuf.HardwareModel.UNSET
+            node?.data.user?.hwModel ?? Protobuf.HardwareModel.UNSET
           ]
         }
         disabled
