@@ -13,53 +13,58 @@ import type { Protobuf } from '@meshtastic/meshtasticjs';
 export const RangeTestSettingsPanel = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
 
-  const preferences = useAppSelector(
-    (state) => state.meshtastic.radio.preferences,
+  const rangeTestConfig = useAppSelector(
+    (state) => state.meshtastic.radio.moduleConfig.rangeTest,
   );
 
   const { register, handleSubmit, formState, reset, control } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: preferences,
+    useForm<Protobuf.ModuleConfig_RangeTestConfig>({
+      defaultValues: rangeTestConfig,
     });
 
   useEffect(() => {
-    reset(preferences);
-  }, [reset, preferences]);
+    reset(rangeTestConfig);
+  }, [reset, rangeTestConfig]);
 
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
-    await connection.setPreferences(data, async (): Promise<void> => {
-      reset({ ...data });
-      setLoading(false);
-      await Promise.resolve();
-    });
+    await connection.setModuleConfig(
+      {
+        payloadVariant: {
+          oneofKind: 'rangeTest',
+          rangeTest: data,
+        },
+      },
+      async (): Promise<void> => {
+        reset({ ...data });
+        setLoading(false);
+        await Promise.resolve();
+      },
+    );
   });
 
   const moduleEnabled = useWatch({
     control,
-    name: 'rangeTestModuleEnabled',
+    name: 'enabled',
     defaultValue: false,
   });
 
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
-      <Checkbox
-        label="Module Enabled"
-        {...register('rangeTestModuleEnabled')}
-      />
+      <Checkbox label="Module Enabled" {...register('enabled')} />
       <Input
         type="number"
         label="Message Interval"
         disabled={!moduleEnabled}
         suffix="Seconds"
-        {...register('rangeTestModuleSender', {
+        {...register('sender', {
           valueAsNumber: true,
         })}
       />
       <Checkbox
         label="Save CSV to storage"
         disabled={!moduleEnabled}
-        {...register('rangeTestModuleSave')}
+        {...register('save')}
       />
     </Form>
   );

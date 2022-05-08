@@ -12,13 +12,13 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const CannedMessage = (): JSX.Element => {
-  const preferences = useAppSelector(
-    (state) => state.meshtastic.radio.preferences,
+  const cannedMessageConfig = useAppSelector(
+    (state) => state.meshtastic.radio.moduleConfig.cannedMessage,
   );
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState, reset, control } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: preferences,
+    useForm<Protobuf.ModuleConfig_CannedMessageConfig>({
+      defaultValues: cannedMessageConfig,
     });
 
   const moduleEnabled = useWatch({
@@ -28,23 +28,28 @@ export const CannedMessage = (): JSX.Element => {
   });
 
   useEffect(() => {
-    reset(preferences);
-  }, [reset, preferences]);
+    reset(cannedMessageConfig);
+  }, [reset, cannedMessageConfig]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
-    void connection.setPreferences(data, async () => {
-      reset({ ...data });
-      setLoading(false);
-      await Promise.resolve();
-    });
+    void connection.setModuleConfig(
+      {
+        payloadVariant: {
+          oneofKind: 'cannedMessage',
+          cannedMessage: data,
+        },
+      },
+      async () => {
+        reset({ ...data });
+        setLoading(false);
+        await Promise.resolve();
+      },
+    );
   });
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
-      <Checkbox
-        label="Module Enabled"
-        {...register('cannedMessageModuleEnabled')}
-      />
+      <Checkbox label="Module Enabled" {...register('enabled')} />
       <Checkbox
         label="Rotary Encoder #1 Enabled"
         {...register('rotary1Enabled')}
@@ -70,31 +75,28 @@ export const CannedMessage = (): JSX.Element => {
       <Select
         label="Clockwise event"
         disabled={moduleEnabled}
-        optionsEnum={Protobuf.InputEventChar}
+        optionsEnum={Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar}
         {...register('inputbrokerEventCw', { valueAsNumber: true })}
       />
       <Select
         label="Counter Clockwise event"
         disabled={moduleEnabled}
-        optionsEnum={Protobuf.InputEventChar}
+        optionsEnum={Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar}
         {...register('inputbrokerEventCcw', { valueAsNumber: true })}
       />
       <Select
         label="Press event"
         disabled={moduleEnabled}
-        optionsEnum={Protobuf.InputEventChar}
+        optionsEnum={Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar}
         {...register('inputbrokerEventPress', { valueAsNumber: true })}
       />
       <Checkbox label="Up Down enabled" {...register('updown1Enabled')} />
       <Input
         label="Allow Input Source"
         disabled={moduleEnabled}
-        {...register('cannedMessageModuleAllowInputSource')}
+        {...register('allowInputSource')}
       />
-      <Checkbox
-        label="Send Bell"
-        {...register('cannedMessageModuleSendBell')}
-      />
+      <Checkbox label="Send Bell" {...register('sendBell')} />
     </Form>
   );
 };

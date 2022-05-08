@@ -13,35 +13,44 @@ import { bitwiseDecode, bitwiseEncode } from '@core/utils/bitwise';
 import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
-export const GPS = (): JSX.Element => {
-  const preferences = useAppSelector(
-    (state) => state.meshtastic.radio.preferences,
+export const Position = (): JSX.Element => {
+  const positionConfig = useAppSelector(
+    (state) => state.meshtastic.radio.config.position,
   );
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState, reset, control } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: {
-        ...preferences,
-        positionBroadcastSecs:
-          preferences.positionBroadcastSecs === 0
-            ? preferences.role === Protobuf.Role.Router
-              ? 43200
-              : 900
-            : preferences.positionBroadcastSecs,
-      },
+    useForm<Protobuf.Config_PositionConfig>({
+      defaultValues: positionConfig,
+      // defaultValues: {
+      //   ...preferences,
+      //   positionBroadcastSecs:
+      //     preferences.positionBroadcastSecs === 0
+      //       ? preferences.role === Protobuf.Role.Router
+      //         ? 43200
+      //         : 900
+      //       : preferences.positionBroadcastSecs,
+      // },
     });
 
   useEffect(() => {
-    reset(preferences);
-  }, [reset, preferences]);
+    reset(positionConfig);
+  }, [reset, positionConfig]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
-    void connection.setPreferences(data, async () => {
-      reset({ ...data });
-      setLoading(false);
-      await Promise.resolve();
-    });
+    void connection.setConfig(
+      {
+        payloadVariant: {
+          oneofKind: 'position',
+          position: data,
+        },
+      },
+      async () => {
+        reset({ ...data });
+        setLoading(false);
+        await Promise.resolve();
+      },
+    );
   });
 
   return (
@@ -90,12 +99,15 @@ export const GPS = (): JSX.Element => {
             <div className="w-full">
               {label && <Label label={label} error={error?.message} />}
               <MultiSelect
-                options={Object.entries(Protobuf.PositionFlags)
+                options={Object.entries(
+                  Protobuf.Config_PositionConfig_PositionFlags,
+                )
                   .filter((value) => typeof value[1] !== 'number')
                   .filter(
                     (value) =>
                       parseInt(value[0]) !==
-                      Protobuf.PositionFlags.POS_UNDEFINED,
+                      Protobuf.Config_PositionConfig_PositionFlags
+                        .POS_UNDEFINED,
                   )
                   .map((value) => {
                     return {
@@ -103,14 +115,17 @@ export const GPS = (): JSX.Element => {
                       label: value[1].toString().replace('POS_', ''),
                     };
                   })}
-                value={bitwiseDecode(value, Protobuf.PositionFlags).map(
-                  (flag) => {
-                    return {
-                      value: flag,
-                      label: Protobuf.PositionFlags[flag].replace('POS_', ''),
-                    };
-                  },
-                )}
+                value={bitwiseDecode(
+                  value,
+                  Protobuf.Config_PositionConfig_PositionFlags,
+                ).map((flag) => {
+                  return {
+                    value: flag,
+                    label: Protobuf.Config_PositionConfig_PositionFlags[
+                      flag
+                    ].replace('POS_', ''),
+                  };
+                })}
                 onChange={(e: { value: number; label: string }[]): void =>
                   onChange(bitwiseEncode(e.map((v) => v.value)))
                 }

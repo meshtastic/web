@@ -6,13 +6,13 @@ import {
   addMessage,
   addNode,
   addPosition,
-  addRoute,
   addUser,
   resetState,
+  setConfig,
   setDeviceStatus,
   setLastMeshInterraction,
+  setModuleConfig,
   setMyNodeInfo,
-  setPreferences,
   setReady,
   updateLastInteraction,
 } from '@core/slices/meshtasticSlice';
@@ -90,24 +90,21 @@ const registerListeners = (): void => {
     store.dispatch(addLogEvent(log));
   });
 
-  connection.onMeshPacket.subscribe((packet) => {
-    store.dispatch(
-      addRoute({
-        from: packet.from,
-        to:
-          packet.to === 0xffffffff
-            ? store.getState().meshtastic.radio.hardware.myNodeNum
-            : packet.to,
-        hops: packet.hopLimit,
-      }),
-    );
-  });
-
   connection.onDeviceStatus.subscribe((status) => {
     store.dispatch(setDeviceStatus(status));
 
     if (status === Types.DeviceStatusEnum.DEVICE_CONFIGURED) {
       store.dispatch(setReady(true));
+      void connection.getConfig(Protobuf.AdminMessage_ConfigType.DEVICE_CONFIG);
+      void connection.getConfig(Protobuf.AdminMessage_ConfigType.WIFI_CONFIG);
+      void connection.getConfig(
+        Protobuf.AdminMessage_ConfigType.POSITION_CONFIG,
+      );
+      void connection.getConfig(
+        Protobuf.AdminMessage_ConfigType.DISPLAY_CONFIG,
+      );
+      void connection.getConfig(Protobuf.AdminMessage_ConfigType.LORA_CONFIG);
+      void connection.getConfig(Protobuf.AdminMessage_ConfigType.POWER_CONFIG);
     }
     if (status === Types.DeviceStatusEnum.DEVICE_DISCONNECTED) {
       store.dispatch(setReady(false));
@@ -136,21 +133,14 @@ const registerListeners = (): void => {
   );
 
   connection.onAdminPacket.subscribe((adminPacket) => {
+    console.log(adminPacket.data.variant.oneofKind);
+
     switch (adminPacket.data.variant.oneofKind) {
       case 'getChannelResponse':
         store.dispatch(addChannel(adminPacket.data.variant.getChannelResponse));
         store.dispatch(
           addChat(adminPacket.data.variant.getChannelResponse.index),
         );
-        break;
-      case 'getRadioResponse':
-        if (adminPacket.data.variant.getRadioResponse.preferences) {
-          store.dispatch(
-            setPreferences(
-              adminPacket.data.variant.getRadioResponse.preferences,
-            ),
-          );
-        }
         break;
       case 'getOwnerResponse':
         store.dispatch(
@@ -159,6 +149,15 @@ const registerListeners = (): void => {
             packet: adminPacket.packet,
           }),
         );
+        break;
+      case 'getConfigResponse':
+        store.dispatch(setConfig(adminPacket.data.variant.getConfigResponse));
+        break;
+      case 'getModuleConfigResponse':
+        store.dispatch(
+          setModuleConfig(adminPacket.data.variant.getModuleConfigResponse),
+        );
+        break;
     }
   });
 
@@ -168,6 +167,20 @@ const registerListeners = (): void => {
   );
 
   connection.onRoutingPacket.subscribe((routingPacket) => {
+    console.log(routingPacket.data.variant.oneofKind);
+
+    switch (routingPacket.data.variant.oneofKind) {
+      case 'errorReason':
+        console.log(
+          Protobuf.Routing_Error[routingPacket.data.variant.errorReason],
+        );
+
+        break;
+
+      default:
+        break;
+    }
+
     store.dispatch(
       updateLastInteraction({
         id: routingPacket.packet.from,

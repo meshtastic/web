@@ -11,47 +11,51 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import type { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const WiFi = (): JSX.Element => {
-  const preferences = useAppSelector(
-    (state) => state.meshtastic.radio.preferences,
+  const wifiConfig = useAppSelector(
+    (state) => state.meshtastic.radio.config.wifi,
   );
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState, reset, control } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: preferences,
+    useForm<Protobuf.Config_WiFiConfig>({
+      defaultValues: wifiConfig,
     });
 
   const WifiApMode = useWatch({
     control,
-    name: 'wifiApMode',
+    name: 'apMode',
     defaultValue: false,
   });
 
   useEffect(() => {
-    reset(preferences);
-  }, [reset, preferences]);
+    reset(wifiConfig);
+  }, [reset, wifiConfig]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
-    void connection.setPreferences(data, async () => {
-      reset({ ...data });
-      setLoading(false);
-      await Promise.resolve();
-    });
+    void connection.setConfig(
+      {
+        payloadVariant: {
+          oneofKind: 'wifi',
+          wifi: data,
+        },
+      },
+      async () => {
+        reset({ ...data });
+        setLoading(false);
+        await Promise.resolve();
+      },
+    );
   });
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
-      <Checkbox label="Enable WiFi AP" {...register('wifiApMode')} />
-      <Input
-        label="WiFi SSID"
-        disabled={WifiApMode}
-        {...register('wifiSsid')}
-      />
+      <Checkbox label="Enable WiFi AP" {...register('apMode')} />
+      <Input label="WiFi SSID" disabled={WifiApMode} {...register('ssid')} />
       <Input
         type="password"
         autoComplete="off"
         label="WiFi PSK"
         disabled={WifiApMode}
-        {...register('wifiPassword')}
+        {...register('psk')}
       />
     </Form>
   );

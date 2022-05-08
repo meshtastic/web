@@ -134,13 +134,13 @@ export const BottomNav = (): JSX.Element => {
       <BottomNavItem tooltip="MQTT Status">
         {primaryChannelSettings?.uplinkEnabled &&
         primaryChannelSettings?.downlinkEnabled &&
-        !meshtasticState.radio.preferences.mqttDisabled ? (
+        !meshtasticState.radio.moduleConfig.mqtt.disabled ? (
           <RiArrowUpDownLine className="h-4" />
         ) : primaryChannelSettings?.uplinkEnabled &&
-          !meshtasticState.radio.preferences.mqttDisabled ? (
+          !meshtasticState.radio.moduleConfig.mqtt.disabled ? (
           <RiArrowUpLine className="h-4" />
         ) : primaryChannelSettings?.downlinkEnabled &&
-          !meshtasticState.radio.preferences.mqttDisabled ? (
+          !meshtasticState.radio.moduleConfig.mqtt.disabled ? (
           <RiArrowDownLine className="h-4" />
         ) : (
           <FiX className="h-4" />

@@ -13,51 +13,56 @@ import type { Protobuf } from '@meshtastic/meshtasticjs';
 export const StoreForwardSettingsPanel = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
 
-  const preferences = useAppSelector(
-    (state) => state.meshtastic.radio.preferences,
+  const storeForwardConfig = useAppSelector(
+    (state) => state.meshtastic.radio.moduleConfig.storeForward,
   );
 
   const { register, handleSubmit, formState, reset, control } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: preferences,
+    useForm<Protobuf.ModuleConfig_StoreForwardConfig>({
+      defaultValues: storeForwardConfig,
     });
 
   useEffect(() => {
-    reset(preferences);
-  }, [reset, preferences]);
+    reset(storeForwardConfig);
+  }, [reset, storeForwardConfig]);
 
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
-    await connection.setPreferences(data, async (): Promise<void> => {
-      reset({ ...data });
-      setLoading(false);
-      await Promise.resolve();
-    });
+    await connection.setModuleConfig(
+      {
+        payloadVariant: {
+          oneofKind: 'storeForward',
+          storeForward: data,
+        },
+      },
+      async (): Promise<void> => {
+        reset({ ...data });
+        setLoading(false);
+        await Promise.resolve();
+      },
+    );
   });
 
   const moduleEnabled = useWatch({
     control,
-    name: 'storeForwardModuleEnabled',
+    name: 'enabled',
     defaultValue: false,
   });
 
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
-      <Checkbox
-        label="Module Enabled"
-        {...register('storeForwardModuleEnabled')}
-      />
+      <Checkbox label="Module Enabled" {...register('enabled')} />
       <Checkbox
         label="Heartbeat Enabled"
         disabled={!moduleEnabled}
-        {...register('storeForwardModuleHeartbeat')}
+        {...register('heartbeat')}
       />
       <Input
         type="number"
         label="Number of records"
         suffix="Records"
         disabled={!moduleEnabled}
-        {...register('storeForwardModuleRecords', {
+        {...register('records', {
           valueAsNumber: true,
         })}
       />
@@ -65,7 +70,7 @@ export const StoreForwardSettingsPanel = (): JSX.Element => {
         type="number"
         label="History return max"
         disabled={!moduleEnabled}
-        {...register('storeForwardModuleHistoryReturnMax', {
+        {...register('historyReturnMax', {
           valueAsNumber: true,
         })}
       />
@@ -73,7 +78,7 @@ export const StoreForwardSettingsPanel = (): JSX.Element => {
         type="number"
         label="History return window"
         disabled={!moduleEnabled}
-        {...register('storeForwardModuleHistoryReturnWindow', {
+        {...register('historyReturnWindow', {
           valueAsNumber: true,
         })}
       />

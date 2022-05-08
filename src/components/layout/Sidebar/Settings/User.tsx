@@ -24,7 +24,6 @@ export const User = (): JSX.Element => {
     longName: string;
     shortName: string;
     isLicensed: boolean;
-    team: Protobuf.Team;
     antAzimuth: number;
     antGainDbi: number;
     txPowerDbm: number;
@@ -33,7 +32,6 @@ export const User = (): JSX.Element => {
       longName: node?.data.user?.longName,
       shortName: node?.data.user?.shortName,
       isLicensed: node?.data.user?.isLicensed,
-      team: node?.data.user?.team,
       antAzimuth: node?.data.user?.antAzimuth,
       antGainDbi: node?.data.user?.antGainDbi,
       txPowerDbm: node?.data.user?.txPowerDbm,
@@ -45,7 +43,6 @@ export const User = (): JSX.Element => {
       longName: node?.data.user?.longName,
       shortName: node?.data.user?.shortName,
       isLicensed: node?.data.user?.isLicensed,
-      team: node?.data.user?.team,
     });
   }, [reset, node]);
 
@@ -86,11 +83,6 @@ export const User = (): JSX.Element => {
         disabled
       />
       <Checkbox label="Licenced Operator?" {...register('isLicensed')} />
-      <Select
-        label="Team (DEPRECATED)"
-        optionsEnum={Protobuf.Team}
-        {...register('team', { valueAsNumber: true })}
-      />
       <Input
         label="Transmit Power"
         suffix="dBm"

@@ -32,8 +32,28 @@ export interface Node {
 
 export interface Radio {
   channels: Protobuf.Channel[];
-  preferences: Protobuf.RadioConfig_UserPreferences;
+  config: Config;
+  moduleConfig: ModuleConfig;
   hardware: Protobuf.MyNodeInfo;
+}
+
+export interface Config {
+  device: Protobuf.Config_DeviceConfig;
+  position: Protobuf.Config_PositionConfig;
+  power: Protobuf.Config_PowerConfig;
+  wifi: Protobuf.Config_WiFiConfig;
+  display: Protobuf.Config_DisplayConfig;
+  lora: Protobuf.Config_LoRaConfig;
+}
+
+export interface ModuleConfig {
+  mqtt: Protobuf.ModuleConfig_MQTTConfig;
+  serial: Protobuf.ModuleConfig_SerialConfig;
+  extNotification: Protobuf.ModuleConfig_ExternalNotificationConfig;
+  storeForward: Protobuf.ModuleConfig_StoreForwardConfig;
+  rangeTest: Protobuf.ModuleConfig_RangeTestConfig;
+  telemetry: Protobuf.ModuleConfig_TelemetryConfig;
+  cannedMessage: Protobuf.ModuleConfig_CannedMessageConfig;
 }
 
 interface MeshtasticState {
@@ -53,7 +73,24 @@ const initialState: MeshtasticState = {
   nodes: [],
   radio: {
     channels: [],
-    preferences: Protobuf.RadioConfig_UserPreferences.create(),
+    config: {
+      device: Protobuf.Config_DeviceConfig.create(),
+      position: Protobuf.Config_PositionConfig.create(),
+      power: Protobuf.Config_PowerConfig.create(),
+      wifi: Protobuf.Config_WiFiConfig.create(),
+      display: Protobuf.Config_DisplayConfig.create(),
+      lora: Protobuf.Config_LoRaConfig.create(),
+    },
+    moduleConfig: {
+      mqtt: Protobuf.ModuleConfig_MQTTConfig.create(),
+      serial: Protobuf.ModuleConfig_SerialConfig.create(),
+      extNotification:
+        Protobuf.ModuleConfig_ExternalNotificationConfig.create(),
+      storeForward: Protobuf.ModuleConfig_StoreForwardConfig.create(),
+      rangeTest: Protobuf.ModuleConfig_RangeTestConfig.create(),
+      telemetry: Protobuf.ModuleConfig_TelemetryConfig.create(),
+      cannedMessage: Protobuf.ModuleConfig_CannedMessageConfig.create(),
+    },
     hardware: Protobuf.MyNodeInfo.create(),
   },
   chats: {},
@@ -151,23 +188,71 @@ export const meshtasticSlice = createSlice({
         state.radio.channels.push(action.payload);
       }
     },
-    addRoute: (state, action: PayloadAction<Route>) => {
-      // const node = state.nodes.find(
-      //   (node) => node.num === action.payload.from,
-      // );
-      // const exists = node?.routes.findIndex(
-      //   (route) =>
-      //     route.from === action.payload.from && route.to === action.payload.to,
-      // );
-      // if (exists === -1) {
-      //   node?.routes.push(action.payload);
-      // }
+    setConfig: (state, action: PayloadAction<Protobuf.Config>) => {
+      switch (action.payload.payloadVariant.oneofKind) {
+        case 'device': {
+          state.radio.config.device = action.payload.payloadVariant.device;
+          break;
+        }
+        case 'position': {
+          state.radio.config.position = action.payload.payloadVariant.position;
+          break;
+        }
+        case 'power': {
+          state.radio.config.power = action.payload.payloadVariant.power;
+          break;
+        }
+        case 'wifi': {
+          state.radio.config.wifi = action.payload.payloadVariant.wifi;
+          break;
+        }
+        case 'display': {
+          state.radio.config.display = action.payload.payloadVariant.display;
+          break;
+        }
+        case 'lora': {
+          state.radio.config.lora = action.payload.payloadVariant.lora;
+          break;
+        }
+      }
     },
-    setPreferences: (
-      state,
-      action: PayloadAction<Protobuf.RadioConfig_UserPreferences>,
-    ) => {
-      state.radio.preferences = action.payload;
+    setModuleConfig: (state, action: PayloadAction<Protobuf.ModuleConfig>) => {
+      switch (action.payload.payloadVariant.oneofKind) {
+        case 'cannedMessage': {
+          state.radio.moduleConfig.cannedMessage =
+            action.payload.payloadVariant.cannedMessage;
+          break;
+        }
+        case 'externalNotification': {
+          state.radio.moduleConfig.extNotification =
+            action.payload.payloadVariant.externalNotification;
+          break;
+        }
+        case 'mqtt': {
+          state.radio.moduleConfig.mqtt = action.payload.payloadVariant.mqtt;
+          break;
+        }
+        case 'rangeTest': {
+          state.radio.moduleConfig.rangeTest =
+            action.payload.payloadVariant.rangeTest;
+          break;
+        }
+        case 'serial': {
+          state.radio.moduleConfig.serial =
+            action.payload.payloadVariant.serial;
+          break;
+        }
+        case 'storeForward': {
+          state.radio.moduleConfig.storeForward =
+            action.payload.payloadVariant.storeForward;
+          break;
+        }
+        case 'telemetry': {
+          state.radio.moduleConfig.telemetry =
+            action.payload.payloadVariant.telemetry;
+          break;
+        }
+      }
     },
     addMessage: (state, action: PayloadAction<MessageWithAck>) => {
       // todo: is last interraction for just channel chats or dm's to?
@@ -246,8 +331,8 @@ export const {
   addPosition,
   addNode,
   addChannel,
-  setPreferences,
-  addRoute,
+  setConfig,
+  setModuleConfig,
   addMessage,
   ackMessage,
   updateLastInteraction,

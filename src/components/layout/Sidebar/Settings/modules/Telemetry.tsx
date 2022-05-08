@@ -12,41 +12,49 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Telemetry = (): JSX.Element => {
-  const preferences = useAppSelector(
-    (state) => state.meshtastic.radio.preferences,
+  const telemetryConfig = useAppSelector(
+    (state) => state.meshtastic.radio.moduleConfig.telemetry,
   );
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState, reset, control } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: preferences,
+    useForm<Protobuf.ModuleConfig_TelemetryConfig>({
+      defaultValues: telemetryConfig,
     });
 
   useEffect(() => {
-    reset(preferences);
-  }, [reset, preferences]);
+    reset(telemetryConfig);
+  }, [reset, telemetryConfig]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
-    void connection.setPreferences(data, async () => {
-      reset({ ...data });
-      setLoading(false);
-      await Promise.resolve();
-    });
+    void connection.setModuleConfig(
+      {
+        payloadVariant: {
+          oneofKind: 'telemetry',
+          telemetry: data,
+        },
+      },
+      async () => {
+        reset({ ...data });
+        setLoading(false);
+        await Promise.resolve();
+      },
+    );
   });
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
       <Checkbox
         label="Measurement Enabled"
-        {...register('telemetryModuleEnvironmentMeasurementEnabled')}
+        {...register('environmentMeasurementEnabled')}
       />
       <Checkbox
         label="Displayed on Screen"
-        {...register('telemetryModuleEnvironmentScreenEnabled')}
+        {...register('environmentScreenEnabled')}
       />
       <Input
         label="Read Error Count Threshold"
         type="number"
-        {...register('telemetryModuleEnvironmentReadErrorCountThreshold', {
+        {...register('environmentReadErrorCountThreshold', {
           valueAsNumber: true,
         })}
       />
@@ -54,7 +62,7 @@ export const Telemetry = (): JSX.Element => {
         label="Update Interval"
         suffix="Seconds"
         type="number"
-        {...register('telemetryModuleEnvironmentUpdateInterval', {
+        {...register('environmentUpdateInterval', {
           valueAsNumber: true,
         })}
       />
@@ -62,25 +70,25 @@ export const Telemetry = (): JSX.Element => {
         label="Recovery Interval"
         suffix="Seconds"
         type="number"
-        {...register('telemetryModuleEnvironmentRecoveryInterval', {
+        {...register('environmentRecoveryInterval', {
           valueAsNumber: true,
         })}
       />
       <Checkbox
         label="Display Farenheit"
-        {...register('telemetryModuleEnvironmentDisplayFahrenheit')}
+        {...register('environmentDisplayFahrenheit')}
       />
       <Select
         label="Sensor Type"
-        optionsEnum={Protobuf.RadioConfig_UserPreferences_TelemetrySensorType}
-        {...register('telemetryModuleEnvironmentSensorType', {
+        optionsEnum={Protobuf.TelemetrySensorType}
+        {...register('environmentSensorType', {
           valueAsNumber: true,
         })}
       />
       <Input
         label="Sensor Pin"
         type="number"
-        {...register('telemetryModuleEnvironmentSensorPin', {
+        {...register('environmentSensorPin', {
           valueAsNumber: true,
         })}
       />

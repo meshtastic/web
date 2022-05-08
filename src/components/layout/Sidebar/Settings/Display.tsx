@@ -11,26 +11,34 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Display = (): JSX.Element => {
-  const preferences = useAppSelector(
-    (state) => state.meshtastic.radio.preferences,
+  const displayConfig = useAppSelector(
+    (state) => state.meshtastic.radio.config.display,
   );
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState, reset } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: preferences,
+    useForm<Protobuf.Config_DisplayConfig>({
+      defaultValues: displayConfig,
     });
 
   useEffect(() => {
-    reset(preferences);
-  }, [reset, preferences]);
+    reset(displayConfig);
+  }, [reset, displayConfig]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
-    void connection.setPreferences(data, async () => {
-      reset({ ...data });
-      setLoading(false);
-      await Promise.resolve();
-    });
+    void connection.setConfig(
+      {
+        payloadVariant: {
+          oneofKind: 'display',
+          display: data,
+        },
+      },
+      async () => {
+        reset({ ...data });
+        setLoading(false);
+        await Promise.resolve();
+      },
+    );
   });
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
@@ -48,7 +56,7 @@ export const Display = (): JSX.Element => {
       />
       <Select
         label="GPS Display Units"
-        optionsEnum={Protobuf.GpsCoordinateFormat}
+        optionsEnum={Protobuf.Config_DisplayConfig_GpsCoordinateFormat}
         {...register('gpsFormat', { valueAsNumber: true })}
       />
     </Form>

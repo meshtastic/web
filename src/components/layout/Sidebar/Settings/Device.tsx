@@ -11,26 +11,34 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Device = (): JSX.Element => {
-  const preferences = useAppSelector(
-    (state) => state.meshtastic.radio.preferences,
+  const deviceConfig = useAppSelector(
+    (state) => state.meshtastic.radio.config.device,
   );
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState, reset } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: preferences,
+    useForm<Protobuf.Config_DeviceConfig>({
+      defaultValues: deviceConfig,
     });
 
   useEffect(() => {
-    reset(preferences);
-  }, [reset, preferences]);
+    reset(deviceConfig);
+  }, [reset, deviceConfig]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
-    void connection.setPreferences(data, async () => {
-      reset({ ...data });
-      setLoading(false);
-      await Promise.resolve();
-    });
+    void connection.setConfig(
+      {
+        payloadVariant: {
+          oneofKind: 'device',
+          device: data,
+        },
+      },
+      async () => {
+        reset({ ...data });
+        setLoading(false);
+        await Promise.resolve();
+      },
+    );
   });
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
@@ -39,10 +47,14 @@ export const Device = (): JSX.Element => {
         {...register('serialDisabled')}
       />
       <Checkbox label="Factory Reset Device" {...register('factoryReset')} />
-      <Checkbox label="Debug Log Enabled" {...register('debugLogEnabled')} />
+      <Checkbox label="Enabled Debug Log" {...register('debugLogEnabled')} />
+      <Checkbox
+        label="Disable Serial COnsole"
+        {...register('serialDisabled')}
+      />
       <Select
         label="Role"
-        optionsEnum={Protobuf.Role}
+        optionsEnum={Protobuf.Config_DeviceConfig_Role}
         {...register('role', { valueAsNumber: true })}
       />
     </Form>

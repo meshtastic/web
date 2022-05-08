@@ -13,48 +13,52 @@ import type { Protobuf } from '@meshtastic/meshtasticjs';
 export const SerialSettingsPanel = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
 
-  const preferences = useAppSelector(
-    (state) => state.meshtastic.radio.preferences,
+  const serialConfig = useAppSelector(
+    (state) => state.meshtastic.radio.moduleConfig.serial,
   );
 
   const { register, handleSubmit, formState, reset, control } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: preferences,
+    useForm<Protobuf.ModuleConfig_SerialConfig>({
+      defaultValues: serialConfig,
     });
 
   useEffect(() => {
-    reset(preferences);
-  }, [reset, preferences]);
+    reset(serialConfig);
+  }, [reset, serialConfig]);
 
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
-    await connection.setPreferences(data, async (): Promise<void> => {
-      reset({ ...data });
-      setLoading(false);
-      await Promise.resolve();
-    });
+    await connection.setModuleConfig(
+      {
+        payloadVariant: {
+          oneofKind: 'serial',
+          serial: data,
+        },
+      },
+      async (): Promise<void> => {
+        reset({ ...data });
+        setLoading(false);
+        await Promise.resolve();
+      },
+    );
   });
 
   const moduleEnabled = useWatch({
     control,
-    name: 'serialModuleEnabled',
+    name: 'enabled',
     defaultValue: false,
   });
 
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
-      <Checkbox label="Module Enabled" {...register('serialModuleEnabled')} />
-      <Checkbox
-        label="Echo"
-        disabled={!moduleEnabled}
-        {...register('serialModuleEcho')}
-      />
+      <Checkbox label="Module Enabled" {...register('enabled')} />
+      <Checkbox label="Echo" disabled={!moduleEnabled} {...register('echo')} />
 
       <Input
         type="number"
         label="RX"
         disabled={!moduleEnabled}
-        {...register('serialModuleRxd', {
+        {...register('rxd', {
           valueAsNumber: true,
         })}
       />
@@ -62,7 +66,7 @@ export const SerialSettingsPanel = (): JSX.Element => {
         type="number"
         label="TX Pin"
         disabled={!moduleEnabled}
-        {...register('serialModuleTxd', {
+        {...register('txd', {
           valueAsNumber: true,
         })}
       />
@@ -70,7 +74,7 @@ export const SerialSettingsPanel = (): JSX.Element => {
         type="number"
         label="Baud Rate"
         disabled={!moduleEnabled}
-        {...register('serialModuleBaud', {
+        {...register('baud', {
           valueAsNumber: true,
         })}
       />
@@ -78,7 +82,7 @@ export const SerialSettingsPanel = (): JSX.Element => {
         type="number"
         label="Timeout"
         disabled={!moduleEnabled}
-        {...register('serialModuleTimeout', {
+        {...register('timeout', {
           valueAsNumber: true,
         })}
       />
@@ -86,7 +90,7 @@ export const SerialSettingsPanel = (): JSX.Element => {
         type="number"
         label="Mode"
         disabled={!moduleEnabled}
-        {...register('serialModuleMode', {
+        {...register('mode', {
           valueAsNumber: true,
         })}
       />

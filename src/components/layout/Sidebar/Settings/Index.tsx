@@ -22,10 +22,9 @@ import {
 import { CollapsibleSection } from '@components/generic/Sidebar/CollapsibleSection';
 import { ExternalSection } from '@components/generic/Sidebar/ExternalSection';
 import { SidebarOverlay } from '@components/generic/Sidebar/SidebarOverlay';
-import { Channels } from '@components/layout/Sidebar/Settings/Channels';
 import { ChannelsGroup } from '@components/layout/Sidebar/Settings/channels/ChannelsGroup';
 import { Display } from '@components/layout/Sidebar/Settings/Display';
-import { GPS } from '@components/layout/Sidebar/Settings/GPS';
+import { Position } from '@app/components/layout/Sidebar/Settings/Position';
 import { Interface } from '@components/layout/Sidebar/Settings/Interface';
 import { LoRa } from '@components/layout/Sidebar/Settings/LoRa';
 import { CannedMessage } from '@components/layout/Sidebar/Settings/modules/CannedMessage';
@@ -48,14 +47,9 @@ export interface SettingsProps {
 export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
   const [modulesOpen, setModulesOpen] = useState(false);
   const [channelsOpen, setChannelsOpen] = useState(false);
-  const {
-    rangeTestModuleEnabled,
-    extNotificationModuleEnabled,
-    serialModuleEnabled,
-    storeForwardModuleEnabled,
-    mqttDisabled,
-    cannedMessageModuleEnabled,
-  } = useAppSelector((state) => state.meshtastic.radio.preferences);
+  const moduleConfig = useAppSelector(
+    (state) => state.meshtastic.radio.moduleConfig,
+  );
 
   const hasGps = true;
   const hasWifi = true;
@@ -76,8 +70,8 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         <CollapsibleSection icon={<FiSmartphone />} title="Device">
           <WiFi />
         </CollapsibleSection>
-        <CollapsibleSection icon={<FiMapPin />} title="GPS">
-          <GPS />
+        <CollapsibleSection icon={<FiMapPin />} title="Position">
+          <Position />
         </CollapsibleSection>
         <CollapsibleSection icon={<FiPower />} title="Power">
           <Power />
@@ -90,9 +84,6 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         </CollapsibleSection>
         <CollapsibleSection icon={<FiRss />} title="LoRa">
           <LoRa />
-        </CollapsibleSection>
-        <CollapsibleSection icon={<FiLayers />} title="Primary Channel">
-          <Channels />
         </CollapsibleSection>
         <ExternalSection
           onClick={(): void => {
@@ -125,35 +116,35 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         <CollapsibleSection
           icon={<FiWifi />}
           title="MQTT"
-          status={!mqttDisabled}
+          status={!moduleConfig.mqtt.disabled}
         >
           <MQTT />
         </CollapsibleSection>
         <CollapsibleSection
           icon={<FiAlignLeft />}
           title="Serial"
-          status={serialModuleEnabled}
+          status={moduleConfig.serial.enabled}
         >
           <SerialSettingsPanel />
         </CollapsibleSection>
         <CollapsibleSection
           icon={<FiBell />}
           title="External Notifications"
-          status={extNotificationModuleEnabled}
+          status={moduleConfig.extNotification.enabled}
         >
           <ExternalNotificationsSettingsPlanel />
         </CollapsibleSection>
         <CollapsibleSection
           icon={<FiFastForward />}
           title="Store & Forward"
-          status={storeForwardModuleEnabled}
+          status={moduleConfig.storeForward.enabled}
         >
           <StoreForwardSettingsPanel />
         </CollapsibleSection>
         <CollapsibleSection
           icon={<FiRss />}
           title="Range Test"
-          status={rangeTestModuleEnabled}
+          status={moduleConfig.rangeTest.enabled}
         >
           <RangeTestSettingsPanel />
         </CollapsibleSection>
@@ -167,7 +158,7 @@ export const Settings = ({ open, setOpen }: SettingsProps): JSX.Element => {
         <CollapsibleSection
           icon={<FiMessageSquare />}
           title="Canned Message"
-          status={cannedMessageModuleEnabled}
+          status={moduleConfig.cannedMessage.enabled}
         >
           <CannedMessage />
         </CollapsibleSection>

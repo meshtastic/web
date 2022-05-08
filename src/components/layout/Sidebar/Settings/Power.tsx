@@ -12,45 +12,59 @@ import { useAppSelector } from '@hooks/useAppSelector';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Power = (): JSX.Element => {
-  const preferences = useAppSelector(
-    (state) => state.meshtastic.radio.preferences,
+  const powerConfig = useAppSelector(
+    (state) => state.meshtastic.radio.config.power,
+  );
+  const deviceConfig = useAppSelector(
+    (state) => state.meshtastic.radio.config.device,
   );
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState, reset } =
-    useForm<Protobuf.RadioConfig_UserPreferences>({
-      defaultValues: {
-        ...preferences,
-        isLowPower:
-          preferences.role === Protobuf.Role.Router
-            ? true
-            : preferences.isLowPower,
-      },
+    useForm<Protobuf.Config_PowerConfig>({
+      defaultValues: powerConfig,
+      // defaultValues: {
+      //   ...preferences,
+      //   isLowPower:
+      //     preferences.role === Protobuf.Role.Router
+      //       ? true
+      //       : preferences.isLowPower,
+      // },
     });
 
   useEffect(() => {
-    reset(preferences);
-  }, [reset, preferences]);
+    reset(powerConfig);
+  }, [reset, powerConfig]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
-    void connection.setPreferences(data, async () => {
-      reset({ ...data });
-      setLoading(false);
-      await Promise.resolve();
-    });
+    void connection.setConfig(
+      {
+        payloadVariant: {
+          oneofKind: 'power',
+          power: data,
+        },
+      },
+      async () => {
+        reset({ ...data });
+        setLoading(false);
+        await Promise.resolve();
+      },
+    );
   });
   return (
     <Form loading={loading} dirty={!formState.isDirty} submit={onSubmit}>
       <Select
         label="Charge current"
-        optionsEnum={Protobuf.ChargeCurrent}
+        optionsEnum={Protobuf.Config_PowerConfig_ChargeCurrent}
         {...register('chargeCurrent', { valueAsNumber: true })}
       />
       <Checkbox
         label="Powered by low power source (solar)"
-        disabled={preferences.role === Protobuf.Role.Router}
+        disabled={
+          deviceConfig.role === Protobuf.Config_DeviceConfig_Role.Router
+        }
         validationMessage={
-          preferences.role === Protobuf.Role.Router
+          deviceConfig.role === Protobuf.Config_DeviceConfig_Role.Router
             ? 'Enabled by default in router mode'
             : ''
         }
@@ -80,12 +94,6 @@ export const Power = (): JSX.Element => {
         suffix="Seconds"
         type="number"
         {...register('phoneTimeoutSecs', { valueAsNumber: true })}
-      />
-      <Input
-        label="Phone SDS Timeout"
-        suffix="Seconds"
-        type="number"
-        {...register('phoneSdsTimeoutSec', { valueAsNumber: true })}
       />
       <Input
         label="Mesh SDS Timeout"
