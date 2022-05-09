@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { ErrorBoundary } from 'react-error-boundary';
 import { FiMessageCircle, FiSettings } from 'react-icons/fi';
-import { RiMindMap, RiRoadMapLine } from 'react-icons/ri';
+import { RiRoadMapLine } from 'react-icons/ri';
 import { VscExtensions } from 'react-icons/vsc';
 
 import { ErrorFallback } from '@components/ErrorFallback';
@@ -36,12 +36,6 @@ export const Layout = ({
       icon: <FiMessageCircle />,
       link: routes.messages().link,
       active: route.name === 'messages',
-    },
-    {
-      title: 'Nodes',
-      icon: <RiMindMap />,
-      link: routes.nodes().link,
-      active: route.name === 'nodes',
     },
     {
       title: 'Map',
