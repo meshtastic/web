@@ -24,11 +24,11 @@ export default defineConfig({
     }),
     importToCDN({
       modules: [
-        {
-          name: 'mapbox-gl',
-          var: 'mapboxgl',
-          path: `dist/mapbox-gl.js`,
-        },
+        // {
+        //   name: 'mapbox-gl',
+        //   var: 'mapboxgl',
+        //   path: `dist/mapbox-gl.js`,
+        // },
       ],
     }),
 

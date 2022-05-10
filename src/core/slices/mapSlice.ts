@@ -1,4 +1,4 @@
-import { LngLat } from 'mapbox-gl';
+import Point from '@arcgis/core/geometry/Point';
 
 import type { MapStyleName } from '@core/mapStyles';
 import type { PayloadAction } from '@reduxjs/toolkit';
@@ -6,7 +6,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 interface MapState {
   firstLoad: boolean;
-  latLng: LngLat;
+  latLng: Point;
   zoom: number;
   bearing: number;
   pitch: number;
@@ -18,7 +18,7 @@ interface MapState {
 
 const initialState: MapState = {
   firstLoad: true,
-  latLng: new LngLat(0, 0),
+  latLng: new Point(),
   zoom: 2,
   bearing: 0,
   pitch: 0,
@@ -33,7 +33,7 @@ export const mapSlice = createSlice({
   name: 'map',
   initialState,
   reducers: {
-    setLatLng: (state, action: PayloadAction<LngLat>) => {
+    setLatLng: (state, action: PayloadAction<Point>) => {
       state.latLng = action.payload;
     },
     setZoom: (state, action: PayloadAction<number>) => {
