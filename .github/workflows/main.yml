@@ -1,4 +1,4 @@
-name: meshtastic-web build
+name: CI
 
 # Controls when the workflow will run
 on:
