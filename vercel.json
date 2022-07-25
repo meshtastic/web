@@ -1,5 +1,6 @@
 {
-    "github": {
-        "silent": true
-    }
+  "github": {
+    "silent": true
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }

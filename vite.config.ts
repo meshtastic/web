@@ -4,7 +4,6 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 import importToCDN from 'vite-plugin-cdn-import';
 import EnvironmentPlugin from 'vite-plugin-environment';
-import { VitePWA } from 'vite-plugin-pwa';
 
 import react from '@vitejs/plugin-react';
 
@@ -29,46 +28,47 @@ export default defineConfig({
         //   var: 'mapboxgl',
         //   path: `dist/mapbox-gl.js`,
         // },
+        // autoComplete('@arcgis/core'),
       ],
     }),
 
-    VitePWA({
-      mode: 'production',
+    // VitePWA({
+    //   mode: 'production',
 
-      includeAssets: [
-        'favicon.svg',
-        'favicon.ico',
-        'robots.txt',
-        'touch-icon.png',
-      ],
-      manifest: {
-        name: 'Meshtastic Web',
-        short_name: 'Meshtastic',
-        description: 'Meshtastic Web App',
-        theme_color: '#67ea94',
-        icons: [
-          {
-            src: 'android-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-          },
-          {
-            src: 'android-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-          },
-          {
-            src: 'android-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable',
-          },
-        ],
-      },
-      workbox: {
-        sourcemap: true,
-      },
-    }),
+    //   includeAssets: [
+    //     'favicon.svg',
+    //     'favicon.ico',
+    //     'robots.txt',
+    //     'touch-icon.png',
+    //   ],
+    //   manifest: {
+    //     name: 'Meshtastic Web',
+    //     short_name: 'Meshtastic',
+    //     description: 'Meshtastic Web App',
+    //     theme_color: '#67ea94',
+    //     icons: [
+    //       {
+    //         src: 'android-192.png',
+    //         sizes: '192x192',
+    //         type: 'image/png',
+    //       },
+    //       {
+    //         src: 'android-512.png',
+    //         sizes: '512x512',
+    //         type: 'image/png',
+    //       },
+    //       {
+    //         src: 'android-512.png',
+    //         sizes: '512x512',
+    //         type: 'image/png',
+    //         purpose: 'any maskable',
+    //       },
+    //     ],
+    //   },
+    //   workbox: {
+    //     sourcemap: true,
+    //   },
+    // }),
   ],
   build: {
     target: 'esnext',
@@ -82,9 +82,8 @@ export default defineConfig({
       '@app': resolve(__dirname, './src'),
       '@pages': resolve(__dirname, './src/pages'),
       '@components': resolve(__dirname, './src/components'),
-      '@hooks': resolve(__dirname, './src/hooks'),
       '@core': resolve(__dirname, './src/core'),
-      '@skypack/': 'https://cdn.skypack.dev/',
+      '@layouts': resolve(__dirname, './src/layouts'),
     },
   },
 });

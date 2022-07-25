@@ -21,13 +21,15 @@
       "@app/*": ["./src/*"],
       "@pages/*": ["./src/pages/*"],
       "@components/*": ["./src/components/*"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@core/*": ["./src/core/*"]
+      "@core/*": ["./src/core/*"],
+      "@layouts/*": ["./src/layouts/*"]
     },
     "importHelpers": true,
     "removeComments": true,
     "strictNullChecks": true,
-    "types": ["vite/client", "vite-plugin-pwa/client", "node"],
-    "importsNotUsedAsValues": "error"
+    "types": ["vite/client", "node"],
+    "importsNotUsedAsValues": "error",
+    "strictPropertyInitialization": false,
+    "experimentalDecorators": true
   }
 }

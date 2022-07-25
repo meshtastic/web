@@ -72,7 +72,3 @@ type DeepOmitHelper<T, K extends keyof T> = {
 type DeepOmit<T, K> = T extends Primitive
   ? T
   : DeepOmitHelper<T, Exclude<keyof T, K>>;
-
-declare module '@skypack/@emeraldpay/hashicon-react' {
-  export * from '@emeraldpay/hashicon-react';
-}

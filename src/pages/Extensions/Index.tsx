@@ -1,81 +1,46 @@
-import type React from 'react';
-import { useState } from 'react';
+import type React from "react";
+import { useState } from "react";
 
-import { FiFile, FiInfo } from 'react-icons/fi';
-import { MdSubject } from 'react-icons/md';
-import { RiPinDistanceFill } from 'react-icons/ri';
-import { VscDebug, VscExtensions } from 'react-icons/vsc';
+import { DocumentIcon, GanttChartIcon, RainIcon } from "evergreen-ui";
 
-import { ExternalSection } from '@components/generic/Sidebar/ExternalSection';
-import { Layout } from '@components/layout';
-import { Debug } from '@pages/Extensions/Debug';
-import { FileBrowser } from '@pages/Extensions/FileBrowser';
-import { Info } from '@pages/Extensions/Info';
-import { Logs } from '@pages/Extensions/Logs';
+import { useDevice } from "@app/core/stores/deviceStore.js";
+import { Tab, TabbedContent } from "@components/layout/page/TabbedContent";
+import { FileBrowser } from "@pages/Extensions/FileBrowser";
 
-export const Extensions = (): JSX.Element => {
-  const [selectedExtension, setSelectedExtension] = useState<
-    'info' | 'logs' | 'fileBrowser' | 'rangeTest' | 'debug'
-  >('info');
+import { Environment } from "./Environment.js";
+
+export const ExtensionsPage = (): JSX.Element => {
+  const [activeExtension, setActiveExtension] = useState(0);
+  const { hardware } = useDevice();
+
+  const tabs: Tab[] = [
+    {
+      key: 0,
+      name: "File Browser",
+      icon: DocumentIcon,
+      element: FileBrowser,
+      disabled: !hardware.hasWifi,
+    },
+    {
+      key: 1,
+      name: "Range Test",
+      icon: GanttChartIcon,
+      element: FileBrowser,
+      disabled: !hardware.hasWifi,
+    },
+    {
+      key: 2,
+      name: "Environment",
+      icon: RainIcon,
+      element: Environment,
+    },
+  ];
 
   return (
-    <Layout
-      title="Extensions"
-      icon={<VscExtensions />}
-      sidebarContents={
-        <div className="absolute flex w-full flex-col dark:bg-primaryDark">
-          <ExternalSection
-            onClick={(): void => {
-              setSelectedExtension('info');
-            }}
-            icon={<FiInfo />}
-            active={selectedExtension === 'info'}
-            title="Node Info"
-          />
-          <ExternalSection
-            onClick={(): void => {
-              setSelectedExtension('logs');
-            }}
-            icon={<MdSubject />}
-            active={selectedExtension === 'logs'}
-            title="Logs"
-          />
-          <ExternalSection
-            onClick={(): void => {
-              setSelectedExtension('fileBrowser');
-            }}
-            icon={<FiFile />}
-            active={selectedExtension === 'fileBrowser'}
-            title="File Browser"
-          />
-          <ExternalSection
-            onClick={(): void => {
-              setSelectedExtension('rangeTest');
-            }}
-            icon={<RiPinDistanceFill />}
-            active={selectedExtension === 'rangeTest'}
-            title="Range Test"
-          />
-          <ExternalSection
-            onClick={(): void => {
-              setSelectedExtension('debug');
-            }}
-            icon={<VscDebug />}
-            active={selectedExtension === 'debug'}
-            title="Debug"
-          />
-        </div>
-      }
-    >
-      <div className="w-full">
-        {selectedExtension === 'info' && <Info />}
-
-        {selectedExtension === 'logs' && <Logs />}
-
-        {selectedExtension === 'fileBrowser' && <FileBrowser />}
-
-        {selectedExtension === 'debug' && <Debug />}
-      </div>
-    </Layout>
+    <TabbedContent
+      active={activeExtension}
+      setActive={setActiveExtension}
+      tabs={tabs}
+    />
   );
 };

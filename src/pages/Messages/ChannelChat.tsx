@@ -1,112 +1,110 @@
-import type React from 'react';
+import type React from "react";
+import { ChangeEvent, useState } from "react";
 
-import { m } from 'framer-motion';
-import { FiSettings } from 'react-icons/fi';
-import { MdPublic } from 'react-icons/md';
-import TimeAgo from 'timeago-react';
+import {
+  IconButton,
+  majorScale,
+  Pane,
+  SendMessageIcon,
+  TextInputField,
+  Tooltip,
+} from "evergreen-ui";
 
-import { IconButton } from '@components/generic/button/IconButton';
-import { Tooltip } from '@components/generic/Tooltip';
-import { SidebarItem } from '@components/layout/Sidebar/SidebarItem';
-import { Hashicon } from '@emeraldpay/hashicon-react';
-import { useAppSelector } from '@hooks/useAppSelector';
-import { Protobuf } from '@meshtastic/meshtasticjs';
+import type { Channel } from "@core/stores/deviceStore.js";
+import { useDevice } from "@core/stores/deviceStore.js";
+
+import { Message } from "./Message.js";
 
 export interface ChannelChatProps {
-  channel: Protobuf.Channel;
-  selectedIndex: number;
-  setSelectedIndex: (index: number) => void;
+  channel: Channel;
 }
 
-export const ChannelChat = ({
-  channel,
-  selectedIndex,
-  setSelectedIndex,
-}: ChannelChatProps): JSX.Element => {
-  const myNodeNum = useAppSelector(
-    (state) => state.meshtastic.radio.hardware,
-  ).myNodeNum;
-  const nodes = useAppSelector((state) => state.meshtastic.nodes).filter(
-    (node) => node.data.num !== myNodeNum,
-  );
-  const chats = useAppSelector((state) => state.meshtastic.chats);
-  const channels = useAppSelector(
-    (state) => state.meshtastic.radio.channels,
-  ).filter((ch) => ch.role !== Protobuf.Channel_Role.DISABLED);
+export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
+  const { nodes, connection } = useDevice();
+  const [currentMessage, setCurrentMessage] = useState("");
+
+  const sendMessage = (): void => {
+    console.log("SENDING TEXT");
+
+    void connection?.sendText(
+      currentMessage,
+      undefined,
+      true,
+      channel.config.index, //maybe channel.config.index--
+      (id) => {
+        // console.log(`Chat Index, ${chatIndex}`);
+        // console.log(`Chat Index --, ${chatIndex--}`);
+
+        // console.log(
+        //   `Chat Index computed, ${isChannel ? chatIndex-- : chatIndex}`,
+        // );
+
+        // dispatch(
+        //   ackMessage({
+        //     chatIndex: channel.config.index,
+        //     messageId: id,
+        //   }),
+        // );
+
+        console.log("Message Sent");
+
+        return Promise.resolve();
+      }
+    );
+    setCurrentMessage("");
+  };
 
   return (
-    <SidebarItem
-      key={channel.index}
-      selected={channel.index === selectedIndex}
-      setSelected={(): void => {
-        setSelectedIndex(channel.index);
-      }}
-      actions={<IconButton nested icon={<FiSettings />} />}
-    >
-      <Tooltip
-        content={
-          channel.settings?.name.length
-            ? channel.settings.name
-            : `CH: ${channel.index}`
-        }
+    <Pane display="flex" flexDirection="column" flexGrow={1}>
+      <Pane display="flex" flexDirection="column" flexGrow={1}>
+        {channel.messages.map((message, index) => (
+          <Message
+            key={index}
+            message={message.message.data}
+            ack={message.ack}
+            rxTime={message.received}
+            lastMsgSameUser={
+              index === 0
+                ? false
+                : channel.messages[index - 1].message.packet.from ===
+                  message.message.packet.from
+            }
+            sender={
+              nodes.find(
+                (node) => node.data.num === message.message.packet.from
+              )?.data
+            }
+          />
+        ))}
+      </Pane>
+      <form
+        onSubmit={(e): void => {
+          e.preventDefault();
+          sendMessage();
+        }}
       >
-        <div className="flex h-8 w-8 rounded-full bg-gray-300 dark:bg-primaryDark dark:text-white">
-          <div className="m-auto">
-            {channel.role === Protobuf.Channel_Role.PRIMARY ? (
-              <MdPublic />
-            ) : (
-              <p>
-                {channel.settings?.name.length
-                  ? channel.settings.name.substring(0, 3).toUpperCase()
-                  : `CH: ${channel.index}`}
-              </p>
-            )}
-          </div>
-        </div>
-      </Tooltip>
-      {chats[channel.index]?.messages.length ? (
-        <>
-          <div className="mx-2 flex h-8">
-            {[
-              ...new Set(
-                chats[channel.index]?.messages.flatMap(({ message }) => [
-                  message.packet.from,
-                ]),
-              ),
-            ]
-              .sort()
-              .map((nodeId) => {
-                return (
-                  <Tooltip
-                    key={nodeId}
-                    content={
-                      nodes.find((node) => node.data.num === nodeId)?.data.user
-                        ?.longName ?? 'UNK'
-                    }
-                  >
-                    <div className="flex h-full">
-                      <m.div
-                        whileHover={{ scale: 1.1 }}
-                        className="my-auto -ml-2"
-                      >
-                        <Hashicon value={nodeId.toString()} size={20} />
-                      </m.div>
-                    </div>
-                  </Tooltip>
-                );
-              })}
-          </div>
-          <div className="my-auto ml-auto text-xs font-semibold dark:text-gray-400">
-            {chats[channel.index].messages.length ? (
-              <TimeAgo datetime={chats[channel.index].lastInterraction} />
-            ) : (
-              <div>No messages</div>
-            )}
-          </div>
-        </>
-      ) : (
-        <div className="my-auto dark:text-white">No messages</div>
-      )}
-    </SidebarItem>
+        <Pane display="flex" gap={majorScale(1)}>
+          <TextInputField
+            marginTop="auto"
+            minLength={2}
+            width="100%"
+            label=""
+            placeholder="Enter Message"
+            marginBottom={0}
+            value={currentMessage}
+            onChange={(e: ChangeEvent<HTMLInputElement>): void => {
+              setCurrentMessage(e.target.value);
+            }}
+          />
+          <Tooltip content="Send">
+            <IconButton
+              icon={SendMessageIcon}
+              marginTop={majorScale(2)}
+              width={majorScale(8)}
+            />
+          </Tooltip>
+        </Pane>
+      </form>
+    </Pane>
   );
 };

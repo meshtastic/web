@@ -1,10 +1,17 @@
-import type React from 'react';
+import type React from "react";
 
-import { FiClock } from 'react-icons/fi';
+import {
+  majorScale,
+  Pane,
+  Pulsar,
+  Small,
+  Strong,
+  Text,
+  TimeIcon,
+} from "evergreen-ui";
 
-import { Tooltip } from '@components/generic/Tooltip';
-import { Hashicon } from '@emeraldpay/hashicon-react';
-import type { Protobuf } from '@meshtastic/meshtasticjs';
+import { Hashicon } from "@emeraldpay/hashicon-react";
+import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export interface MessageProps {
   lastMsgSameUser: boolean;
@@ -22,67 +29,72 @@ export const Message = ({
   sender,
 }: MessageProps): JSX.Element => {
   return (
-    <div className="group mb-3 hover:bg-gray-200 dark:hover:bg-tertiaryDark">
+    <Pane marginBottom={majorScale(1)} className="group hover:bg-gray-200">
       {lastMsgSameUser ? (
-        <div
-          className={`mx-6 -mt-3 flex justify-between ${
-            lastMsgSameUser ? '' : 'py-1'
-          }`}
+        <Pane
+          marginX={majorScale(2)}
+          display="flex"
+          justifyContent="space-between"
+          marginTop={-majorScale(1)}
+          className={`${lastMsgSameUser ? "" : "py-1"}`}
         >
-          <div className="flex gap-2">
-            <Tooltip content={rxTime.toString()}>
-              <div className="my-auto ml-auto w-8 pt-1 text-xs text-transparent group-hover:text-gray-500 dark:group-hover:text-gray-400">
-                {rxTime
-                  .toLocaleTimeString(undefined, {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })
-                  .replace('AM', '')
-                  .replace('PM', '')}
-              </div>
-            </Tooltip>
-            <div
-              className={`my-auto dark:text-gray-300 ${
-                ack ? '' : 'animate-pulse dark:text-gray-500'
-              }`}
+          <Pane
+            display="flex"
+            position="relative"
+            gap={majorScale(1)}
+            className="gap-2"
+          >
+            <Small
+              marginY="auto"
+              marginLeft="auto"
+              width={majorScale(3)}
+              paddingTop={majorScale(1)}
+              className="pt-1 text-transparent group-hover:text-gray-500"
             >
+              {rxTime
+                .toLocaleTimeString(undefined, {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+                .replace("AM", "")
+                .replace("PM", "")}
+            </Small>
+            <Text marginY="auto" className={`${ack ? "" : "animate-pulse"}`}>
               {message}
-            </div>
-          </div>
-          <Tooltip content="Response time">
-            <div className="flex gap-1 pt-1 text-xs text-transparent group-hover:text-gray-500 dark:group-hover:text-gray-400">
-              <FiClock className="mt-0.5" />
-              <div>25s</div>
-            </div>
-          </Tooltip>
-        </div>
+            </Text>
+            <Pulsar />
+          </Pane>
+          <Pane
+            display="flex"
+            gap={majorScale(1)}
+            paddingTop={majorScale(1)}
+            className="text-transparent group-hover:text-gray-500"
+          >
+            <TimeIcon />
+            <Small>25s</Small>
+          </Pane>
+        </Pane>
       ) : (
-        <div className="mx-6 flex gap-2">
-          <div className="my-auto w-8">
+        <Pane display="flex" marginX={majorScale(2)} gap={majorScale(1)}>
+          <Pane marginY="auto" width={majorScale(3)}>
             <Hashicon value={(sender?.num ?? 0).toString()} size={32} />
-          </div>
-          <div>
-            <div className="flex gap-2">
-              <div className="cursor-default text-sm font-semibold hover:underline dark:text-white">
-                {sender?.user?.longName ?? 'UNK'}
-              </div>
-              <div className="my-auto text-xs dark:text-gray-400">
+          </Pane>
+          <Pane>
+            <Pane display="flex" gap={majorScale(1)}>
+              <Strong cursor="default" size={500} className="hover:underline">
+                {sender?.user?.longName ?? "UNK"}
+              </Strong>
+              <Small marginY="auto">
                 {rxTime.toLocaleTimeString(undefined, {
-                  hour: '2-digit',
-                  minute: '2-digit',
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
-              </div>
-            </div>
-            <div
-              className={`dark:text-gray-300 ${
-                ack ? '' : 'animate-pulse dark:text-gray-400'
-              }`}
-            >
-              {message}
-            </div>
-          </div>
-        </div>
+              </Small>
+            </Pane>
+            <Text className={`${ack ? "" : "animate-pulse"}`}>{message}</Text>
+          </Pane>
+        </Pane>
       )}
-    </div>
+    </Pane>
   );
 };

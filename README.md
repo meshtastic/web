@@ -1,6 +1,7 @@
 # Meshtastic Web
 
 <!--Project specific badges here-->
+
 [![CI](https://img.shields.io/github/workflow/status/meshtastic/meshtastic-web/CI?label=actions&logo=github&color=yellow)](https://github.com/meshtastic/meshtastic-web/actions/workflows/main.yml)
 [![CLA assistant](https://cla-assistant.io/readme/badge/meshtastic/meshtastic-web)](https://cla-assistant.io/meshtastic/meshtastic-web)
 [![Fiscal Contributors](https://opencollective.com/meshtastic/tiers/badge.svg?label=Fiscal%20Contributors&color=deeppink)](https://opencollective.com/meshtastic/)
@@ -14,7 +15,7 @@ Official [Meshtastic](https://meshtastic.org) web interface, that can be hosted 
 
 ## Stats
 
-![Alt](https://repobeats.axiom.co/api/embed/1299935eef158e8156c956ba399ecda43585d86e.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/1299935eef158e8156c956ba399ecda43585d86e.svg 'Repobeats analytics image')
 
 ## Development & Building
 
@@ -33,18 +34,6 @@ pnpm package
 ```
 
 ### Development
-
-Create a `.env` file:
-
-```bash
-cp ./.env.example ./.env
-```
-
-And define the device IP address in the `.env` file.
-
-```
-VITE_PUBLIC_DEVICE_IP=xxx.xxx.xxx.xxx
-```
 
 Install the dependencies.
 
