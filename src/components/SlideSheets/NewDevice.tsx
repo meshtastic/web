@@ -33,6 +33,7 @@ export interface Tab {
   icon: IconType;
   displayName: string;
   element: ({ close }: CloseProps) => JSX.Element;
+  disabled?: boolean;
 }
 
 export const NewDevice = ({ open, onClose }: NewDeviceProps) => {
@@ -44,6 +45,7 @@ export const NewDevice = ({ open, onClose }: NewDeviceProps) => {
       icon: FiBluetooth,
       displayName: "BLE",
       element: BLE,
+      disabled: !navigator.bluetooth,
     },
     {
       name: "http",
@@ -56,6 +58,7 @@ export const NewDevice = ({ open, onClose }: NewDeviceProps) => {
       icon: FiTerminal,
       displayName: "Serial",
       element: Serial,
+      disabled: !navigator.serial,
     },
   ];
 
@@ -84,6 +87,7 @@ export const NewDevice = ({ open, onClose }: NewDeviceProps) => {
                 gap={5}
                 isSelected={selectedConnType === TabData.name}
                 onSelect={() => setSelectedConnType(TabData.name)}
+                disabled={TabData.disabled}
               >
                 <>
                   <TabData.icon />
@@ -104,7 +108,7 @@ export const NewDevice = ({ open, onClose }: NewDeviceProps) => {
             flexGrow={1}
             display={selectedConnType === TabData.name ? "block" : "none"}
           >
-            <TabData.element close={onClose} />
+            {!TabData.disabled && <TabData.element close={onClose} />}
           </Pane>
         ))}
       </Pane>
