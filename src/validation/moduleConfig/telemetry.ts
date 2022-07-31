@@ -1,6 +1,6 @@
-import { IsBoolean, IsEnum, IsInt } from "class-validator";
+import { IsBoolean, IsInt } from "class-validator";
 
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class TelemetryValidation
   implements Protobuf.ModuleConfig_TelemetryConfig
@@ -17,18 +17,6 @@ export class TelemetryValidation
   @IsBoolean()
   environmentScreenEnabled: boolean;
 
-  @IsInt()
-  environmentReadErrorCountThreshold: number;
-
-  @IsInt()
-  environmentRecoveryInterval: number;
-
   @IsBoolean()
   environmentDisplayFahrenheit: boolean;
-
-  @IsEnum(Protobuf.TelemetrySensorType)
-  environmentSensorType: Protobuf.TelemetrySensorType;
-
-  @IsInt()
-  environmentSensorPin: number;
 }

@@ -119,7 +119,7 @@ export const Header = (): JSX.Element => {
         {getDevices().length !== 0 && (
           <Tooltip content="Disconnect active device">
             <Button
-              iconAfter={CrossIcon}
+              iconBefore={CrossIcon}
               onClick={() => {
                 removeDevice(selectedDevice ?? 0);
               }}
@@ -133,7 +133,9 @@ export const Header = (): JSX.Element => {
             target="_blank"
             href="https://github.com/meshtastic/meshtastic-web"
           >
-            <IconButton icon={FiGithub} />
+            <Button iconBefore={FiGithub}>
+              {import.meta.env.COMMIT_HASH ?? "DEVELOPMENT"}
+            </Button>
           </Link>
         </Tooltip>
         <Tooltip content="Visit Meshtastic.org">

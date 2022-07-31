@@ -1,12 +1,26 @@
 import React, { useEffect } from "react";
 
-import { majorScale, Pane, Spinner, StatusIndicator } from "evergreen-ui";
+import {
+  Button,
+  majorScale,
+  Pane,
+  ResetIcon,
+  Spinner,
+  StatusIndicator,
+} from "evergreen-ui";
 
 import { useDevice } from "@app/core/stores/deviceStore.js";
 
 export const Progress = (): JSX.Element => {
-  const { hardware, channels, config, moduleConfig, setReady, nodes } =
-    useDevice();
+  const {
+    hardware,
+    channels,
+    config,
+    moduleConfig,
+    setReady,
+    nodes,
+    connection,
+  } = useDevice();
 
   useEffect(() => {
     if (
@@ -80,6 +94,14 @@ export const Progress = (): JSX.Element => {
               {hardware.myNodeNum !== 0 &&
                 `(${channels.length} / ${hardware.maxChannels})`}
             </StatusIndicator>
+            <Button
+              onClick={() => {
+                void connection?.configure();
+              }}
+              iconBefore={ResetIcon}
+            >
+              Retry
+            </Button>
           </Pane>
         </Pane>
       </Pane>

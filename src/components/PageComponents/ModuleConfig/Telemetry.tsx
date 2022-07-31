@@ -1,15 +1,13 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, SelectField, Switch, TextInputField } from "evergreen-ui";
+import { FormField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm } from "react-hook-form";
 
 import { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
-import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Telemetry = (): JSX.Element => {
   const { moduleConfig, connection } = useDevice();
@@ -76,28 +74,11 @@ export const Telemetry = (): JSX.Element => {
         />
       </FormField>
       <TextInputField
-        label="Read Error Count Threshold"
-        description="Max transmit power in dBm"
-        type="number"
-        {...register("environmentReadErrorCountThreshold", {
-          valueAsNumber: true,
-        })}
-      />
-      <TextInputField
         label="Update Interval"
         description="Max transmit power in dBm"
         hint="Seconds"
         type="number"
         {...register("environmentUpdateInterval", {
-          valueAsNumber: true,
-        })}
-      />
-      <TextInputField
-        label="Recovery Interval"
-        description="Max transmit power in dBm"
-        hint="Seconds"
-        type="number"
-        {...register("environmentRecoveryInterval", {
           valueAsNumber: true,
         })}
       />
@@ -115,21 +96,6 @@ export const Telemetry = (): JSX.Element => {
           )}
         />
       </FormField>
-      <SelectField
-        label="Sensor Type"
-        description="This is a description."
-        {...register("environmentSensorType", { valueAsNumber: true })}
-      >
-        {renderOptions(Protobuf.TelemetrySensorType)}
-      </SelectField>
-      <TextInputField
-        label="Sensor Pin"
-        description="Max transmit power in dBm"
-        type="number"
-        {...register("environmentSensorPin", {
-          valueAsNumber: true,
-        })}
-      />
     </Form>
   );
 };
