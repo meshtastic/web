@@ -5,7 +5,7 @@ specifiers:
   '@emeraldpay/hashicon-react': ^0.5.2
   '@hookform/resolvers': ^2.9.7
   '@meshtastic/eslint-config': ^1.0.8
-  '@meshtastic/meshtasticjs': ^0.6.83
+  '@meshtastic/meshtasticjs': ^0.6.84
   '@types/chrome': ^0.0.193
   '@types/geodesy': ^2.2.3
   '@types/node': ^18.6.3
@@ -47,7 +47,7 @@ dependencies:
   '@emeraldpay/hashicon-react': 0.5.2
   '@hookform/resolvers': 2.9.7_react-hook-form@7.34.0
   '@meshtastic/eslint-config': 1.0.8
-  '@meshtastic/meshtasticjs': 0.6.83
+  '@meshtastic/meshtasticjs': 0.6.84
   base64-js: 1.5.1
   class-transformer: 0.5.1
   class-validator: 0.13.2
@@ -566,8 +566,8 @@ packages:
       - supports-color
     dev: false
 
-  /@meshtastic/meshtasticjs/0.6.83:
-    resolution: {integrity: sha512-udZZbNTwPXkyKsxFO334aaU26h9p8lCSz+371oNkMi90JpyRrylGPrZ35GOmY+oWE4kYQTpdqW3WZFfP8aa1pQ==}
+  /@meshtastic/meshtasticjs/0.6.84:
+    resolution: {integrity: sha512-ydylXdjfTzxLh1sapDpSlkpkFR2izq9bOLP8KH4eV/4bmogk+Uc/bizLR6qJ0jQyUVcl2wFJcnOHyYwKz0jCzA==}
     dependencies:
       '@meshtastic/eslint-config': 1.0.8
       '@protobuf-ts/runtime': 2.7.0

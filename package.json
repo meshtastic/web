@@ -24,7 +24,7 @@
     "@emeraldpay/hashicon-react": "^0.5.2",
     "@hookform/resolvers": "^2.9.7",
     "@meshtastic/eslint-config": "^1.0.8",
-    "@meshtastic/meshtasticjs": "^0.6.83",
+    "@meshtastic/meshtasticjs": "^0.6.84",
     "base64-js": "^1.5.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
