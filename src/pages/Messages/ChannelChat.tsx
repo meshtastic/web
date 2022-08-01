@@ -20,33 +20,17 @@ export interface ChannelChatProps {
 }
 
 export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
-  const { nodes, connection } = useDevice();
+  const { nodes, connection, ackMessage } = useDevice();
   const [currentMessage, setCurrentMessage] = useState("");
 
   const sendMessage = (): void => {
-    console.log("SENDING TEXT");
-
     void connection?.sendText(
       currentMessage,
       undefined,
       true,
       channel.config.index, //maybe channel.config.index--
       (id) => {
-        // console.log(`Chat Index, ${chatIndex}`);
-        // console.log(`Chat Index --, ${chatIndex--}`);
-
-        // console.log(
-        //   `Chat Index computed, ${isChannel ? chatIndex-- : chatIndex}`,
-        // );
-
-        // dispatch(
-        //   ackMessage({
-        //     chatIndex: channel.config.index,
-        //     messageId: id,
-        //   }),
-        // );
-
-        console.log("Message Sent");
+        ackMessage(channel.config.index, id), console.log("Got Ack");
 
         return Promise.resolve();
       }

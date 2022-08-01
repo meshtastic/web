@@ -331,7 +331,6 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     //   ).getTime();
                     // }
                   } else {
-                    console.log("PUSH333333333333333333333");
                     device.nodes.push({
                       data: Protobuf.NodeInfo.create({
                         num: position.packet.from,
