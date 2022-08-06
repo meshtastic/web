@@ -51,14 +51,6 @@ export const User = (): JSX.Element => {
 
   return (
     <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      {JSON.stringify(errors.antAzimuth?.message)}
-      {JSON.stringify(errors.antGainDbi?.message)}
-      {JSON.stringify(errors.hwModel?.message)}
-      {JSON.stringify(errors.id?.message)}
-      {JSON.stringify(errors.isLicensed?.message)}
-      {JSON.stringify(errors.longName?.message)}
-      {JSON.stringify(errors.shortName?.message)}
-      {JSON.stringify(errors.txPowerDbm?.message)}
       <TextInputField
         label="Device ID"
         description="Preset unique identifier for this device."
@@ -88,16 +80,12 @@ export const User = (): JSX.Element => {
             .match(/.{1,2}/g)
             ?.join(":") ?? ""
         }
-        readOnly
       />
       <SelectField
         label="Hardware"
         description="This is a description."
         disabled
-        isInvalid={!!errors.hwModel?.message}
-        validationMessage={errors.hwModel?.message}
-        {...register("hwModel", { valueAsNumber: true })}
-        // readOnly
+        value={myNode?.data.user?.hwModel}
       >
         {renderOptions(Protobuf.HardwareModel)}
       </SelectField>

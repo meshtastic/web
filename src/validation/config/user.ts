@@ -1,8 +1,10 @@
-import { IsBoolean, IsEnum, IsInt, Length } from "class-validator";
+import { IsBoolean, IsInt, Length } from "class-validator";
 
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import type { Protobuf } from "@meshtastic/meshtasticjs";
 
-export class UserValidation implements Omit<Protobuf.User, "macaddr"> {
+export class UserValidation
+  implements Omit<Protobuf.User, "macaddr" | "hwModel">
+{
   @Length(2, 30)
   id: string;
 
@@ -11,9 +13,6 @@ export class UserValidation implements Omit<Protobuf.User, "macaddr"> {
 
   @Length(1, 4)
   shortName: string;
-
-  @IsEnum(Protobuf.HardwareModel)
-  hwModel: Protobuf.HardwareModel;
 
   @IsBoolean()
   isLicensed: boolean;
