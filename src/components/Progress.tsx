@@ -68,6 +68,9 @@ export const Progress = (): JSX.Element => {
             >
               Device Info
             </StatusIndicator>
+            <StatusIndicator color={nodes.length ? "success" : "disabled"}>
+              Peers ({nodes.length})
+            </StatusIndicator>
             <StatusIndicator
               color={Object.keys(config).length === 7 ? "success" : "disabled"}
             >
@@ -79,9 +82,6 @@ export const Progress = (): JSX.Element => {
               }
             >
               Module Config {`(${Object.keys(moduleConfig).length - 1} / 6)`}
-            </StatusIndicator>
-            <StatusIndicator color={nodes.length ? "success" : "disabled"}>
-              Peers ({nodes.length})
             </StatusIndicator>
             <StatusIndicator
               color={
