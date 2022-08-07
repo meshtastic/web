@@ -134,7 +134,7 @@ export const Header = (): JSX.Element => {
             href="https://github.com/meshtastic/meshtastic-web"
           >
             <Button iconBefore={FiGithub}>
-              {import.meta.env.COMMIT_HASH ?? "DEVELOPMENT"}
+              {process.env.COMMIT_HASH ?? "DEVELOPMENT"}
             </Button>
           </Link>
         </Tooltip>
