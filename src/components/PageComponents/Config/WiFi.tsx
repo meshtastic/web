@@ -1,13 +1,21 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, Switch, TextInputField, toaster } from "evergreen-ui";
-import { Controller, useForm } from "react-hook-form";
+import {
+  FormField,
+  SelectField,
+  Switch,
+  TextInputField,
+  toaster,
+} from "evergreen-ui";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
+import { renderOptions } from "@app/core/utils/selectEnumOptions.js";
 import { WiFiValidation } from "@app/validation/config/wifi.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const WiFi = (): JSX.Element => {
   const { config, connection } = useDevice();
@@ -21,6 +29,12 @@ export const WiFi = (): JSX.Element => {
   } = useForm<WiFiValidation>({
     defaultValues: config.wifi,
     resolver: classValidatorResolver(WiFiValidation),
+  });
+
+  const wifiEnabled = useWatch({
+    control,
+    name: "enabled",
+    defaultValue: false,
   });
 
   useEffect(() => {
@@ -46,6 +60,27 @@ export const WiFi = (): JSX.Element => {
   });
   return (
     <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
+      <FormField
+        label="WiFi Enabled"
+        description="Description"
+        isInvalid={!!errors.enabled?.message}
+        validationMessage={errors.enabled?.message}
+      >
+        <Controller
+          name="enabled"
+          control={control}
+          render={({ field: { value, ...field } }) => (
+            <Switch height={24} marginLeft="auto" checked={value} {...field} />
+          )}
+        />
+      </FormField>
+      <SelectField
+        label="WiFi Mode"
+        description="This is a description."
+        {...register("mode", { valueAsNumber: true })}
+      >
+        {renderOptions(Protobuf.Config_WiFiConfig_WiFiMode)}
+      </SelectField>
       <TextInputField
         label="SSID"
         description="This is a description."
@@ -53,7 +88,6 @@ export const WiFi = (): JSX.Element => {
         validationMessage={errors.ssid?.message}
         {...register("ssid")}
       />
-
       <TextInputField
         label="PSK"
         type="password"
@@ -62,35 +96,6 @@ export const WiFi = (): JSX.Element => {
         validationMessage={errors.psk?.message}
         {...register("psk")}
       />
-      <FormField
-        label="Enable WiFi AP"
-        description="Description"
-        isInvalid={!!errors.apMode?.message}
-        validationMessage={errors.apMode?.message}
-      >
-        <Controller
-          name="apMode"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-
-      <FormField
-        label="Don't broadcast SSID"
-        description="Description"
-        isInvalid={!!errors.apHidden?.message}
-        validationMessage={errors.apHidden?.message}
-      >
-        <Controller
-          name="apHidden"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
     </Form>
   );
 };

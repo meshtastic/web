@@ -5,11 +5,11 @@ specifiers:
   '@emeraldpay/hashicon-react': ^0.5.2
   '@hookform/resolvers': ^2.9.7
   '@meshtastic/eslint-config': ^1.0.8
-  '@meshtastic/meshtasticjs': ^0.6.84
+  '@meshtastic/meshtasticjs': ^0.6.87
   '@types/chrome': ^0.0.193
   '@types/geodesy': ^2.2.3
   '@types/node': ^18.6.4
-  '@types/react': ^18.0.15
+  '@types/react': ^18.0.16
   '@types/react-dom': ^18.0.6
   '@types/w3c-web-serial': ^1.0.2
   '@types/web-bluetooth': ^0.0.15
@@ -47,7 +47,7 @@ dependencies:
   '@emeraldpay/hashicon-react': 0.5.2
   '@hookform/resolvers': 2.9.7_react-hook-form@7.34.0
   '@meshtastic/eslint-config': 1.0.8
-  '@meshtastic/meshtasticjs': 0.6.84
+  '@meshtastic/meshtasticjs': 0.6.87
   base64-js: 1.5.1
   class-transformer: 0.5.1
   class-validator: 0.13.2
@@ -72,7 +72,7 @@ devDependencies:
   '@types/chrome': 0.0.193
   '@types/geodesy': 2.2.3
   '@types/node': 18.6.4
-  '@types/react': 18.0.15
+  '@types/react': 18.0.16
   '@types/react-dom': 18.0.6
   '@types/w3c-web-serial': 1.0.2
   '@types/web-bluetooth': 0.0.15
@@ -584,8 +584,8 @@ packages:
       - supports-color
     dev: false
 
-  /@meshtastic/meshtasticjs/0.6.84:
-    resolution: {integrity: sha512-ydylXdjfTzxLh1sapDpSlkpkFR2izq9bOLP8KH4eV/4bmogk+Uc/bizLR6qJ0jQyUVcl2wFJcnOHyYwKz0jCzA==}
+  /@meshtastic/meshtasticjs/0.6.87:
+    resolution: {integrity: sha512-vehcqwhHMlUm9C/UnhmmhwVZzBjFTkYSrerwbAzJrvLC4E6tRIHCgeyPYtJZaqJoZ90gE+PD+haH2sc86mLgZQ==}
     dependencies:
       '@meshtastic/eslint-config': 1.0.8
       '@protobuf-ts/runtime': 2.7.0
@@ -836,25 +836,25 @@ packages:
   /@types/react-dom/18.0.6:
     resolution: {integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==}
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 18.0.16
     dev: true
 
   /@types/react-transition-group/4.4.5:
     resolution: {integrity: sha512-juKD/eiSM3/xZYzjuzH6ZwpP+/lejltmiS3QEzV/vmb/Q8+HfDmxu+Baga8UEMGBqV88Nbg4l2hY/K2DkyaLLA==}
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 18.0.16
     dev: false
 
-  /@types/react/16.14.29:
-    resolution: {integrity: sha512-I5IwEaefGZbpmmK1J7zHwZe3JkGxcRkc5WJUDWmNySVVovueViRTEUWV7spTvpe96l3nbKD/K6+GxoN69CYb/w==}
+  /@types/react/16.14.30:
+    resolution: {integrity: sha512-tG+xGtDDSuIl1l63mN0LnaROAc99knkYyN4YTheE80iPzYvSy0U8LVie+OBZkrgjVrpkQV6bMCkSphPBnVNk6g==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
       csstype: 3.1.0
     dev: false
 
-  /@types/react/18.0.15:
-    resolution: {integrity: sha512-iz3BtLuIYH1uWdsv6wXYdhozhqj20oD4/Hk2DNXIn1kFsmp9x8d9QB6FnPhfkbhd2PgEONt9Q1x/ebkwjfFLow==}
+  /@types/react/18.0.16:
+    resolution: {integrity: sha512-3vX1dzVucqc2nhXtzyaParTIIRZeNbisRqLE7QdeLomVybEyeiuAouzZXgz71P+2kbJOqj3dy0fzoATg2I06GQ==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
@@ -1421,7 +1421,7 @@ packages:
       isarray: 2.0.5
       object-is: 1.1.5
       object-keys: 1.1.1
-      object.assign: 4.1.2
+      object.assign: 4.1.3
       regexp.prototype.flags: 1.4.3
       side-channel: 1.0.4
       which-boxed-primitive: 1.0.2
@@ -1556,7 +1556,7 @@ packages:
       is-weakref: 1.0.2
       object-inspect: 1.12.2
       object-keys: 1.1.1
-      object.assign: 4.1.2
+      object.assign: 4.1.3
       regexp.prototype.flags: 1.4.3
       string.prototype.trimend: 1.0.5
       string.prototype.trimstart: 1.0.5
@@ -2131,7 +2131,7 @@ packages:
     dependencies:
       '@babel/runtime': 7.18.9
       '@segment/react-tiny-virtual-list': 2.2.1_react@18.2.0
-      '@types/react': 16.14.29
+      '@types/react': 16.14.30
       '@types/react-transition-group': 4.4.5
       arrify: 1.0.1
       classnames: 2.3.1
@@ -2768,7 +2768,7 @@ packages:
     engines: {node: '>=4.0'}
     dependencies:
       array-includes: 3.1.5
-      object.assign: 4.1.2
+      object.assign: 4.1.3
     dev: false
 
   /levn/0.4.1:
@@ -3009,8 +3009,8 @@ packages:
     resolution: {integrity: sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==}
     engines: {node: '>= 0.4'}
 
-  /object.assign/4.1.2:
-    resolution: {integrity: sha512-ixT2L5THXsApyiUPYKmW+2EHpXXe5Ii3M+f4e+aJFAHao5amFRW6J0OO6c/LU8Be47utCx2GL89hxGB6XSmKuQ==}
+  /object.assign/4.1.3:
+    resolution: {integrity: sha512-ZFJnX3zltyjcYJL0RoCJuzb+11zWGyaDbjgxZbdV7rFEcHQuYxrZqhow67aA7xpes6LhojyFDaBKAFfogQrikA==}
     engines: {node: '>= 0.4'}
     dependencies:
       call-bind: 1.0.2
@@ -3218,8 +3218,8 @@ packages:
       node-modules-regexp: 1.0.0
     dev: true
 
-  /postcss/8.4.14:
-    resolution: {integrity: sha512-E398TUmfAYFPBSdzgeieK2Y1+1cpdxJx8yXbK/m57nRhKSmk1GB2tO4lbLBtlkfPQTDKfe4Xqv1ASWPpayPEig==}
+  /postcss/8.4.16:
+    resolution: {integrity: sha512-ipHE1XBvKzm5xI7hiHCZJCSugxvsdq2mPnsq5+UF+VHCjiBvtDrlxJfMBToWaP9D5XlgNmcFGqoHmUn0EYEaRQ==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
       nanoid: 3.3.4
@@ -4055,7 +4055,7 @@ packages:
         optional: true
     dependencies:
       esbuild: 0.14.53
-      postcss: 8.4.14
+      postcss: 8.4.16
       resolve: 1.22.1
       rollup: 2.77.2
     optionalDependencies:

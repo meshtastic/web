@@ -1,6 +1,7 @@
 import type React from "react";
 
 import { Pane } from "evergreen-ui";
+import JSONPretty from "react-json-pretty";
 
 import { useDevice } from "@app/core/stores/deviceStore.js";
 
@@ -11,8 +12,8 @@ export const InfoPage = (): JSX.Element => {
 
   return (
     <Pane>
-      {JSON.stringify(myNode)}
-      {JSON.stringify(hardware)}
+      <JSONPretty data={myNode} />
+      <JSONPretty data={hardware} />
     </Pane>
   );
 };

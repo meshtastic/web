@@ -82,6 +82,7 @@ export const Sidebar = (): JSX.Element => {
         {navLinks.map((Link) => (
           <Tab
             key={Link.name}
+            userSelect="none"
             gap={majorScale(2)}
             disabled={Link.disabled}
             direction="vertical"
@@ -95,6 +96,7 @@ export const Sidebar = (): JSX.Element => {
           </Tab>
         ))}
         <Tab
+          userSelect="none"
           gap={5}
           direction="vertical"
           isSelected={PeersDialogOpen}

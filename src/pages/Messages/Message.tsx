@@ -1,21 +1,23 @@
 import type React from "react";
 
 import {
+  CircleIcon,
+  FullCircleIcon,
   majorScale,
   Pane,
-  Pulsar,
   Small,
   Strong,
   Text,
-  TimeIcon,
 } from "evergreen-ui";
 
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import type { Protobuf } from "@meshtastic/meshtasticjs";
+import type { Protobuf, Types } from "@meshtastic/meshtasticjs";
+
+import { LocationMessage } from "./LocationMessage.js";
 
 export interface MessageProps {
   lastMsgSameUser: boolean;
-  message: string;
+  messagePacket: Types.MessagePacket;
   ack: boolean;
   rxTime: Date;
   sender?: Protobuf.NodeInfo;
@@ -23,78 +25,66 @@ export interface MessageProps {
 
 export const Message = ({
   lastMsgSameUser,
-  message,
+  messagePacket,
   ack,
   rxTime,
   sender,
 }: MessageProps): JSX.Element => {
-  return (
-    <Pane marginBottom={majorScale(1)} className="group hover:bg-gray-200">
-      {lastMsgSameUser ? (
-        <Pane
-          marginX={majorScale(2)}
-          display="flex"
-          justifyContent="space-between"
-          marginTop={-majorScale(1)}
-          className={`${lastMsgSameUser ? "" : "py-1"}`}
-        >
-          <Pane
-            display="flex"
-            position="relative"
-            gap={majorScale(1)}
-            className="gap-2"
-          >
-            <Small
-              marginY="auto"
-              marginLeft="auto"
-              width={majorScale(3)}
-              paddingTop={majorScale(1)}
-              className="pt-1 text-transparent group-hover:text-gray-500"
-            >
-              {rxTime
-                .toLocaleTimeString(undefined, {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-                .replace("AM", "")
-                .replace("PM", "")}
-            </Small>
-            <Text marginY="auto" className={`${ack ? "" : "animate-pulse"}`}>
-              {message}
-            </Text>
-            <Pulsar />
-          </Pane>
-          <Pane
-            display="flex"
-            gap={majorScale(1)}
-            paddingTop={majorScale(1)}
-            className="text-transparent group-hover:text-gray-500"
-          >
-            <TimeIcon />
-            <Small>25s</Small>
-          </Pane>
-        </Pane>
+  return lastMsgSameUser ? (
+    <Pane display="flex" marginLeft={majorScale(3)}>
+      {ack ? (
+        <FullCircleIcon color="#9c9fab" marginY="auto" size={8} />
       ) : (
-        <Pane display="flex" marginX={majorScale(2)} gap={majorScale(1)}>
-          <Pane marginY="auto" width={majorScale(3)}>
-            <Hashicon value={(sender?.num ?? 0).toString()} size={32} />
-          </Pane>
-          <Pane>
-            <Pane display="flex" gap={majorScale(1)}>
-              <Strong cursor="default" size={500} className="hover:underline">
-                {sender?.user?.longName ?? "UNK"}
-              </Strong>
-              <Small marginY="auto">
-                {rxTime.toLocaleTimeString(undefined, {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </Small>
-            </Pane>
-            <Text className={`${ack ? "" : "animate-pulse"}`}>{message}</Text>
-          </Pane>
-        </Pane>
+        <CircleIcon color="#9c9fab" marginY="auto" size={8} />
       )}
+      {messagePacket.location ? (
+        <LocationMessage location={messagePacket.location} />
+      ) : (
+        <Text
+          color={ack ? "#474d66" : "#9c9fab"}
+          marginLeft={majorScale(2)}
+          paddingLeft={majorScale(1)}
+          borderLeft="3px solid #e6e6e6"
+        >
+          {messagePacket.text}
+        </Text>
+      )}
+    </Pane>
+  ) : (
+    <Pane marginX={majorScale(2)} gap={majorScale(1)} marginTop={majorScale(1)}>
+      <Pane display="flex" gap={majorScale(1)}>
+        <Pane width={majorScale(3)}>
+          <Hashicon value={(sender?.num ?? 0).toString()} size={32} />
+        </Pane>
+        <Strong cursor="default" size={500}>
+          {sender?.user?.longName ?? "UNK"}
+        </Strong>
+        <Small>
+          {rxTime.toLocaleTimeString(undefined, {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </Small>
+      </Pane>
+      <Pane display="flex" marginLeft={majorScale(1)}>
+        {ack ? (
+          <FullCircleIcon color="#9c9fab" marginY="auto" size={8} />
+        ) : (
+          <CircleIcon color="#9c9fab" marginY="auto" size={8} />
+        )}
+        {messagePacket.location ? (
+          <LocationMessage location={messagePacket.location} />
+        ) : (
+          <Text
+            color={ack ? "#474d66" : "#9c9fab"}
+            marginLeft={majorScale(2)}
+            paddingLeft={majorScale(1)}
+            borderLeft="3px solid #e6e6e6"
+          >
+            {messagePacket.text}
+          </Text>
+        )}
+      </Pane>
     </Pane>
   );
 };

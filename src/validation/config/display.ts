@@ -1,4 +1,4 @@
-import { IsEnum, IsInt } from "class-validator";
+import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -11,4 +11,7 @@ export class DisplayValidation implements Protobuf.Config_DisplayConfig {
 
   @IsInt()
   autoScreenCarouselSecs: number;
+
+  @IsBoolean()
+  compassNorthTop: boolean;
 }

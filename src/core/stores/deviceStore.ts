@@ -14,7 +14,7 @@ export type Page =
   | "info";
 
 export interface MessageWithAck {
-  message: Types.TextPacket;
+  message: Types.MessagePacket;
   ack: boolean;
   received: Date;
 }
@@ -26,8 +26,8 @@ export interface Channel {
 }
 
 export interface Node {
-  deviceMetrics: Protobuf.DeviceMetrics;
-  environmentMetrics: Protobuf.EnvironmentMetrics;
+  deviceMetrics: Protobuf.DeviceMetrics[];
+  environmentMetrics: Protobuf.EnvironmentMetrics[];
   data: Protobuf.NodeInfo;
 }
 
@@ -40,8 +40,9 @@ export interface Device {
   hardware: Protobuf.MyNodeInfo;
   nodes: Node[];
   connection?: IConnection;
-  activeChat: number;
   activePage: Page;
+  peerInfoOpen: boolean;
+  activePeer: number;
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -50,8 +51,9 @@ export interface Device {
   setModuleConfig: (config: Protobuf.ModuleConfig) => void;
   setHardware: (hardware: Protobuf.MyNodeInfo) => void;
   setMetrics: (metrics: Types.TelemetryPacket) => void;
-  setActiveChat: (chatIndex: number) => void;
   setActivePage: (page: Page) => void;
+  setPeerInfoOpen: (open: boolean) => void;
+  setActivePeer: (peer: number) => void;
   addNodeInfo: (nodeInfo: Types.NodeInfoPacket) => void;
   addUser: (user: Types.UserPacket) => void;
   addPosition: (position: Types.PositionPacket) => void;
@@ -85,8 +87,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           hardware: Protobuf.MyNodeInfo.create(),
           nodes: [],
           connection: undefined,
-          activeChat: 0,
           activePage: "messages",
+          peerInfoOpen: false,
+          activePeer: 0,
 
           setReady: (ready: boolean) => {
             set(
@@ -219,8 +222,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       snr: metrics.packet.rxSnr,
                       lastHeard: new Date().getSeconds(),
                     }),
-                    deviceMetrics: Protobuf.DeviceMetrics.create(),
-                    environmentMetrics: Protobuf.EnvironmentMetrics.create(),
+                    deviceMetrics: [],
+                    environmentMetrics: [],
                   };
 
                   device.nodes.push(node);
@@ -228,23 +231,16 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 if (node) {
                   switch (metrics.data.variant.oneofKind) {
                     case "deviceMetrics":
-                      node.deviceMetrics = metrics.data.variant.deviceMetrics;
+                      node.deviceMetrics.push(
+                        metrics.data.variant.deviceMetrics
+                      );
                       break;
                     case "environmentMetrics":
-                      node.environmentMetrics =
-                        metrics.data.variant.environmentMetrics;
+                      node.environmentMetrics.push(
+                        metrics.data.variant.environmentMetrics
+                      );
                       break;
                   }
-                }
-              })
-            );
-          },
-          setActiveChat: (chatIndex) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.activeChat = chatIndex;
                 }
               })
             );
@@ -277,10 +273,30 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   } else {
                     device.nodes.push({
                       data: Protobuf.NodeInfo.create(nodeInfo.data),
-                      deviceMetrics: Protobuf.DeviceMetrics.create(),
-                      environmentMetrics: Protobuf.EnvironmentMetrics.create(),
+                      deviceMetrics: [],
+                      environmentMetrics: [],
                     });
                   }
+                }
+              })
+            );
+          },
+          setPeerInfoOpen: (open) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.peerInfoOpen = open;
+                }
+              })
+            );
+          },
+          setActivePeer: (peer) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.activePeer = peer;
                 }
               })
             );
@@ -307,8 +323,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                         snr: user.packet.rxSnr,
                         user: user.data,
                       }),
-                      deviceMetrics: Protobuf.DeviceMetrics.create(),
-                      environmentMetrics: Protobuf.EnvironmentMetrics.create(),
+                      deviceMetrics: [],
+                      environmentMetrics: [],
                     });
                   }
                 }
@@ -336,8 +352,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                         num: position.packet.from,
                         position: position.data,
                       }),
-                      deviceMetrics: Protobuf.DeviceMetrics.create(),
-                      environmentMetrics: Protobuf.EnvironmentMetrics.create(),
+                      deviceMetrics: [],
+                      environmentMetrics: [],
                     });
                   }
                 }
@@ -369,6 +385,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             );
           },
           ackMessage: (channelIndex: number, messageId: number) => {
+            console.log("ack called");
+
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);

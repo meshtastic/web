@@ -12,14 +12,14 @@ export const subscribeAll = (device: Device, connection: IConnection) => {
 
   // onLogEvent
   // onMeshHeartbeat
-  // onRoutingPacket
-  // onTelemetryPacket
 
   connection.onRoutingPacket.subscribe((routingPacket) => {
     console.log(routingPacket);
   });
 
   connection.onTelemetryPacket.subscribe((telemetryPacket) => {
+    console.log(telemetryPacket.data.variant);
+
     device.setMetrics(telemetryPacket);
   });
 
@@ -63,12 +63,12 @@ export const subscribeAll = (device: Device, connection: IConnection) => {
     device.setModuleConfig(moduleConfig.data);
   });
 
-  connection.onTextPacket.subscribe((message) => {
+  connection.onMessagePacket.subscribe((messagePacket) => {
     device.addMessage({
-      message: message,
-      ack: message.packet.from !== device.hardware.myNodeNum,
-      received: message.packet.rxTime
-        ? new Date(message.packet.rxTime * 1000)
+      message: messagePacket,
+      ack: messagePacket.packet.from !== device.hardware.myNodeNum,
+      received: messagePacket.packet.rxTime
+        ? new Date(messagePacket.packet.rxTime * 1000)
         : new Date(),
     });
   });

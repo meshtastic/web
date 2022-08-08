@@ -1,8 +1,8 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { SelectField, TextInputField } from "evergreen-ui";
-import { useForm } from "react-hook-form";
+import { FormField, SelectField, Switch, TextInputField } from "evergreen-ui";
+import { Controller, useForm } from "react-hook-form";
 
 import { DisplayValidation } from "@app/validation/config/display.js";
 import { Form } from "@components/form/Form";
@@ -19,6 +19,7 @@ export const Display = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
+    control,
   } = useForm<Protobuf.Config_DisplayConfig>({
     defaultValues: config.display,
     resolver: classValidatorResolver(DisplayValidation),
@@ -67,6 +68,20 @@ export const Display = (): JSX.Element => {
       >
         {renderOptions(Protobuf.Config_DisplayConfig_GpsCoordinateFormat)}
       </SelectField>
+      <FormField
+        label="Compass North Top"
+        description="Description"
+        isInvalid={!!errors.compassNorthTop?.message}
+        validationMessage={errors.compassNorthTop?.message}
+      >
+        <Controller
+          name="compassNorthTop"
+          control={control}
+          render={({ field: { value, ...field } }) => (
+            <Switch height={24} marginLeft="auto" checked={value} {...field} />
+          )}
+        />
+      </FormField>
     </Form>
   );
 };
