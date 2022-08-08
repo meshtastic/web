@@ -10,12 +10,12 @@ import {
   Tab,
   Tablist,
 } from "evergreen-ui";
-import type { IconType } from "react-icons";
 import { FiBluetooth, FiTerminal, FiWifi } from "react-icons/fi";
 
 import { BLE } from "../connect/BLE.js";
 import { HTTP } from "../connect/HTTP.js";
 import { Serial } from "../connect/Serial.js";
+import type { TabType } from "../layout/page/TabbedContent.js";
 
 export interface NewDeviceProps {
   open: boolean;
@@ -28,35 +28,32 @@ export interface CloseProps {
 
 export type connType = "http" | "ble" | "serial";
 
-export interface Tab {
-  name: connType;
-  icon: IconType;
-  displayName: string;
+export interface ConnTab extends Omit<TabType, "element"> {
+  connType: connType;
   element: ({ close }: CloseProps) => JSX.Element;
-  disabled?: boolean;
 }
 
 export const NewDevice = ({ open, onClose }: NewDeviceProps) => {
   const [selectedConnType, setSelectedConnType] = useState<connType>("ble");
 
-  const tabs: Tab[] = [
+  const tabs: ConnTab[] = [
     {
-      name: "ble",
+      connType: "ble",
       icon: FiBluetooth,
-      displayName: "BLE",
+      name: "BLE",
       element: BLE,
       disabled: !navigator.bluetooth,
     },
     {
-      name: "http",
+      connType: "http",
       icon: FiWifi,
-      displayName: "HTTP",
+      name: "HTTP",
       element: HTTP,
     },
     {
-      name: "serial",
+      connType: "serial",
       icon: FiTerminal,
-      displayName: "Serial",
+      name: "Serial",
       element: Serial,
       disabled: !navigator.serial,
     },
@@ -85,13 +82,13 @@ export const NewDevice = ({ open, onClose }: NewDeviceProps) => {
               <Tab
                 key={index}
                 gap={5}
-                isSelected={selectedConnType === TabData.name}
-                onSelect={() => setSelectedConnType(TabData.name)}
+                isSelected={selectedConnType === TabData.connType}
+                onSelect={() => setSelectedConnType(TabData.connType)}
                 disabled={TabData.disabled}
               >
                 <>
                   <TabData.icon />
-                  {TabData.displayName}
+                  {TabData.name}
                 </>
               </Tab>
             ))}
@@ -106,7 +103,7 @@ export const NewDevice = ({ open, onClose }: NewDeviceProps) => {
             backgroundColor="white"
             elevation={1}
             flexGrow={1}
-            display={selectedConnType === TabData.name ? "block" : "none"}
+            display={selectedConnType === TabData.connType ? "block" : "none"}
           >
             {!TabData.disabled && <TabData.element close={onClose} />}
           </Pane>

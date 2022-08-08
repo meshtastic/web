@@ -36,10 +36,7 @@ export const FileBrowser = (): JSX.Element => {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href={`http://meshtastic.local/json/fs/browse/static/${file.name.replace(
-              "static/",
-              ""
-            )}`}
+            href={`http://meshtastic.local/${file.name.replace("static/", "")}`}
           >
             {file.name.replace("static/", "").replace(".gz", "")}
           </a>

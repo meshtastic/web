@@ -28,10 +28,9 @@ export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
       currentMessage,
       undefined,
       true,
-      channel.config.index, //maybe channel.config.index--
+      channel.config.index,
       (id) => {
-        ackMessage(channel.config.index, id), console.log("Got Ack");
-
+        ackMessage(channel.config.index, id);
         return Promise.resolve();
       }
     );
@@ -44,7 +43,7 @@ export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
         {channel.messages.map((message, index) => (
           <Message
             key={index}
-            message={message.message.data}
+            messagePacket={message.message}
             ack={message.ack}
             rxTime={message.received}
             lastMsgSameUser={

@@ -9,18 +9,20 @@ import {
   Tooltip,
 } from "evergreen-ui";
 
-import { Tab, TabbedContent } from "@components/layout/page/TabbedContent.js";
+import {
+  TabbedContent,
+  TabType,
+} from "@components/layout/page/TabbedContent.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 import { ChannelChat } from "./ChannelChat.js";
 
 export const MessagesPage = (): JSX.Element => {
-  const { channels, activeChat, setActiveChat, setActivePage } = useDevice();
+  const { channels, setActivePage } = useDevice();
 
-  const tabs: Tab[] = channels.map((channel) => {
+  const tabs: TabType[] = channels.map((channel) => {
     return {
-      key: channel.config.index,
       name: channel.config.settings?.name.length
         ? channel.config.settings?.name
         : channel.config.index === 0
@@ -35,8 +37,6 @@ export const MessagesPage = (): JSX.Element => {
   return (
     <Pane display="flex" flexDirection="column" width="100%">
       <TabbedContent
-        active={activeChat}
-        setActive={setActiveChat}
         tabs={tabs}
         actions={[
           () => (

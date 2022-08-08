@@ -1,28 +1,27 @@
 import type React from "react";
+import { useState } from "react";
 
 import { IconComponent, majorScale, Pane, Tab, Tablist } from "evergreen-ui";
+import type { IconType } from "react-icons";
 
-export interface Tab {
-  key: number;
+export interface TabType {
   name: string;
-  icon: IconComponent;
+  icon: IconComponent | IconType;
   element: () => JSX.Element;
   disabled?: boolean;
 }
 
 export interface TabbedContentProps {
-  active: number;
-  setActive: (index: number) => void;
-  tabs: Tab[];
+  tabs: TabType[];
   actions?: (() => JSX.Element)[];
 }
 
 export const TabbedContent = ({
-  active,
-  setActive,
   tabs,
   actions,
 }: TabbedContentProps): JSX.Element => {
+  const [selectedTab, setSelectedTab] = useState(0);
+
   return (
     <Pane
       margin={majorScale(3)}
@@ -38,13 +37,14 @@ export const TabbedContent = ({
       <Pane borderBottom="muted" paddingBottom={majorScale(2)}>
         <Pane display="flex">
           <Tablist>
-            {tabs.map((Entry) => (
+            {tabs.map((Entry, index) => (
               <Tab
-                key={Entry.key}
+                key={index}
+                userSelect="none"
                 disabled={Entry.disabled}
                 gap={5}
-                onSelect={() => setActive(Entry.key)}
-                isSelected={active === Entry.key}
+                onSelect={() => setSelectedTab(index)}
+                isSelected={selectedTab === index}
               >
                 <Entry.icon />
                 {Entry.name}
@@ -59,14 +59,14 @@ export const TabbedContent = ({
           </Pane>
         </Pane>
       </Pane>
-      {tabs.map((Entry) => (
+      {tabs.map((Entry, index) => (
         <Pane
-          key={Entry.key}
-          display={active === Entry.key ? "flex" : "none"}
+          key={index}
+          display={selectedTab === index ? "flex" : "none"}
           flexDirection="column"
           flexGrow={1}
         >
-          <Entry.element />
+          {!Entry.disabled && <Entry.element />}
         </Pane>
       ))}
     </Pane>
