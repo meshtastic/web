@@ -11,7 +11,7 @@ export interface OverviewProps {
 export const Overview = ({ node }: OverviewProps): JSX.Element => {
   return (
     <Pane>
-      <JSONPretty data={node.data.user} />
+      <JSONPretty data={node?.data.user} />
     </Pane>
   );
 };

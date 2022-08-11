@@ -12,7 +12,7 @@ export interface LocationProps {
 export const Location = ({ node }: LocationProps): JSX.Element => {
   return (
     <Pane>
-      <JSONPretty data={node.data.position} />
+      <JSONPretty data={node?.data.position} />
     </Pane>
   );
 };
