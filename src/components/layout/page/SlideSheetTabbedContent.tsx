@@ -23,23 +23,33 @@ export interface SlideSheetTabbedContentProps {
   heading: string;
   description: string;
   tabs: TabType[];
+  tabIcon?: React.ReactNode;
 }
 
 export const SlideSheetTabbedContent = ({
   heading,
   description,
   tabs,
+  tabIcon,
 }: SlideSheetTabbedContentProps): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState(0);
 
   return (
     <>
       <Pane zIndex={1} flexShrink={0} elevation={1} backgroundColor="white">
-        <Pane padding={16} borderBottom="muted">
-          <Heading size={600}>{heading}</Heading>
-          <Paragraph size={400} color="muted">
-            {description}
-          </Paragraph>
+        <Pane
+          display="flex"
+          padding={16}
+          borderBottom="muted"
+          gap={majorScale(1)}
+        >
+          {tabIcon}
+          <Pane>
+            <Heading size={600}>{heading}</Heading>
+            <Paragraph size={400} color="muted">
+              {description}
+            </Paragraph>
+          </Pane>
         </Pane>
         <Pane display="flex" padding={8}>
           <Tablist>

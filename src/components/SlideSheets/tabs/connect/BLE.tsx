@@ -4,28 +4,22 @@ import { useCallback, useEffect, useState } from "react";
 import { Button, majorScale, Pane } from "evergreen-ui";
 import { FiPlusCircle } from "react-icons/fi";
 
+import { useAppStore } from "@app/core/stores/appStore.js";
 import { useDeviceStore } from "@app/core/stores/deviceStore.js";
 import { subscribeAll } from "@app/core/subscriptions.js";
 import { randId } from "@app/core/utils/randId.js";
 import { Constants, IBLEConnection } from "@meshtastic/meshtasticjs";
 
-import type { CloseProps } from "../SlideSheets/NewDevice.js";
+import type { CloseProps } from "../../NewDevice.js";
 
 export const BLE = ({ close }: CloseProps): JSX.Element => {
   const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);
   const { addDevice } = useDeviceStore();
+  const { setSelectedDevice } = useAppStore();
 
   const updateBleDeviceList = useCallback(async (): Promise<void> => {
     setBleDevices(await navigator.bluetooth.getDevices());
   }, []);
-
-  navigator.bluetooth.addEventListener("advertisementreceived", (e) => {
-    console.log(e);
-  });
-
-  navigator.bluetooth.addEventListener("availabilitychanged", (e) => {
-    console.log(e);
-  });
 
   useEffect(() => {
     void updateBleDeviceList();
@@ -34,6 +28,7 @@ export const BLE = ({ close }: CloseProps): JSX.Element => {
   const onConnect = async (BLEDevice: BluetoothDevice) => {
     const id = randId();
     const device = addDevice(id);
+    setSelectedDevice(id);
     const connection = new IBLEConnection(id);
     await connection.connect({
       device: BLEDevice,

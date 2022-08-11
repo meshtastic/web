@@ -32,6 +32,7 @@ export interface Node {
 }
 
 export interface Device {
+  id: number;
   ready: boolean;
   status: Types.DeviceStatusEnum;
   channels: Channel[];
@@ -79,6 +80,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     set(
       produce<DeviceState>((draft) => {
         draft.devices.set(id, {
+          id,
           ready: false,
           status: Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
           channels: [],
@@ -417,10 +419,14 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     }
     return device;
   },
-  removeDevice: (id) =>
-    produce<DeviceState>((draft) => {
-      draft.devices.delete(id);
-    }),
+  removeDevice: (id) => {
+    set(
+      produce<DeviceState>((draft) => {
+        draft.devices.delete(id);
+      })
+    );
+  },
+
   getDevices: () => Array.from(get().devices.values()),
 }));
 

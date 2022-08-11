@@ -5,6 +5,7 @@ import {
   Button,
   CrossIcon,
   GlobeIcon,
+  HelpIcon,
   IconButton,
   Link,
   majorScale,
@@ -65,13 +66,13 @@ export const Header = (): JSX.Element => {
         </Link>
       </Pane>
       <Tablist display="flex" marginX={majorScale(4)}>
-        {getDevices().map((device, index) => (
+        {getDevices().map((device) => (
           <Tab
-            key={index}
+            key={device.id}
             gap={majorScale(1)}
-            isSelected={index === selectedDevice}
+            isSelected={device.id === selectedDevice}
             onSelect={() => {
-              setSelectedDevice(index);
+              setSelectedDevice(device.id);
             }}
           >
             <Hashicon value={device.hardware.myNodeNum.toString()} size={20} />
@@ -121,6 +122,9 @@ export const Header = (): JSX.Element => {
             <Button
               iconBefore={CrossIcon}
               onClick={() => {
+                void getDevices()
+                  .find((d) => d.id === selectedDevice)
+                  ?.connection?.disconnect();
                 removeDevice(selectedDevice ?? 0);
               }}
             >
@@ -138,6 +142,7 @@ export const Header = (): JSX.Element => {
             </Button>
           </Link>
         </Tooltip>
+        <IconButton icon={HelpIcon} />
         <Tooltip content="Visit Meshtastic.org">
           <Link target="_blank" href="https://meshtastic.org/">
             <IconButton icon={GlobeIcon} />

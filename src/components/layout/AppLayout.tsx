@@ -8,6 +8,7 @@ import { useDeviceStore } from "@core/stores/deviceStore.js";
 
 import { NoDevice } from "../misc/NoDevice.js";
 import { Progress } from "../Progress.js";
+import { PeerInfo } from "../SlideSheets/PeerInfo.js";
 import { Header } from "./Header.js";
 import { Sidebar } from "./Sidebar/index.js";
 
@@ -32,12 +33,12 @@ export const AppLayout = ({ children }: AppLayoutProps): JSX.Element => {
       <Header />
       <Pane display="flex" flex={1} height="100%" width="100%">
         {devices.length ? (
-          devices.map((device, index) => (
+          devices.map((device) => (
             <Pane
-              key={index}
+              key={device.id}
               width="100%"
               height="100%"
-              display={index === selectedDevice ? "grid" : "none"}
+              display={device.id === selectedDevice ? "grid" : "none"}
               gap={majorScale(3)}
               gridTemplateColumns="16rem 1fr"
             >
@@ -45,6 +46,7 @@ export const AppLayout = ({ children }: AppLayoutProps): JSX.Element => {
                 {device && device.ready ? (
                   <>
                     <Sidebar />
+                    <PeerInfo />
                     <Pane height="100%" display="flex">
                       {children}
                     </Pane>

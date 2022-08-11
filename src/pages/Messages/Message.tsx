@@ -10,6 +10,7 @@ import {
   Text,
 } from "evergreen-ui";
 
+import { useDevice } from "@app/core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import type { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
@@ -30,6 +31,13 @@ export const Message = ({
   rxTime,
   sender,
 }: MessageProps): JSX.Element => {
+  const { setPeerInfoOpen, setActivePeer } = useDevice();
+
+  const openPeer = (): void => {
+    setActivePeer(messagePacket.packet.from);
+    setPeerInfoOpen(true);
+  };
+
   return lastMsgSameUser ? (
     <Pane display="flex" marginLeft={majorScale(3)}>
       {ack ? (
@@ -53,10 +61,10 @@ export const Message = ({
   ) : (
     <Pane marginX={majorScale(2)} gap={majorScale(1)} marginTop={majorScale(1)}>
       <Pane display="flex" gap={majorScale(1)}>
-        <Pane width={majorScale(3)}>
+        <Pane onClick={openPeer} cursor="pointer" width={majorScale(3)}>
           <Hashicon value={(sender?.num ?? 0).toString()} size={32} />
         </Pane>
-        <Strong cursor="default" size={500}>
+        <Strong onClick={openPeer} cursor="pointer" size={500}>
           {sender?.user?.longName ?? "UNK"}
         </Strong>
         <Small>

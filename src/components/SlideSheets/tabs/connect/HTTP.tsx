@@ -4,6 +4,7 @@ import { Button, majorScale, Pane, TextInputField } from "evergreen-ui";
 import { useForm } from "react-hook-form";
 import { FiPlusCircle } from "react-icons/fi";
 
+import { useAppStore } from "@app/core/stores/appStore.js";
 import { useDeviceStore } from "@app/core/stores/deviceStore.js";
 import { subscribeAll } from "@app/core/subscriptions.js";
 import { randId } from "@app/core/utils/randId.js";
@@ -15,6 +16,7 @@ export interface HTTPProps {
 
 export const HTTP = ({ close }: HTTPProps): JSX.Element => {
   const { addDevice } = useDeviceStore();
+  const { setSelectedDevice } = useAppStore();
   const { register, handleSubmit } = useForm<{
     ip: string;
     tls: boolean;
@@ -25,9 +27,10 @@ export const HTTP = ({ close }: HTTPProps): JSX.Element => {
     },
   });
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit((data) => {
     const id = randId();
     const device = addDevice(id);
+    setSelectedDevice(id);
     const connection = new IHTTPConnection(id);
     // TODO: Promise never resolves
     void connection.connect({

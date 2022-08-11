@@ -25,7 +25,8 @@ export const PeersDialog = ({
   isOpen,
   close,
 }: PeersDialogProps): JSX.Element => {
-  const { hardware, nodes, connection } = useDevice();
+  const { hardware, nodes, connection, setPeerInfoOpen, setActivePeer } =
+    useDevice();
 
   return (
     <Dialog
@@ -48,6 +49,7 @@ export const PeersDialog = ({
             SNR
           </Table.TextHeaderCell>
           <Table.TextHeaderCell>Location</Table.TextHeaderCell>
+          <Table.TextHeaderCell>Telemetry</Table.TextHeaderCell>
           <Table.TextHeaderCell>Last Heard</Table.TextHeaderCell>
           <Table.TextHeaderCell>Actions</Table.TextHeaderCell>
         </Table.Head>
@@ -58,7 +60,10 @@ export const PeersDialog = ({
               <Table.Row
                 key={node.data.num}
                 isSelectable
-                onSelect={() => alert(node.data.num)}
+                onSelect={() => {
+                  setActivePeer(node.data.num);
+                  setPeerInfoOpen(true);
+                }}
               >
                 <Table.Cell flexBasis={48} flexShrink={0} flexGrow={0}>
                   <Hashicon
@@ -81,6 +86,7 @@ export const PeersDialog = ({
                     node.data.position?.longitudeI
                   )}
                 </Table.TextCell>
+                <Table.TextCell>Tmp</Table.TextCell>
                 <Table.TextCell>
                   {new Date(node.data.lastHeard * 1000).toLocaleString()}
                 </Table.TextCell>

@@ -4,12 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import { Button, majorScale, Pane } from "evergreen-ui";
 import { FiPlusCircle } from "react-icons/fi";
 
+import { useAppStore } from "@app/core/stores/appStore.js";
 import { subscribeAll } from "@app/core/subscriptions.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { randId } from "@core/utils/randId.js";
 import { ISerialConnection } from "@meshtastic/meshtasticjs";
 
-import type { CloseProps } from "../SlideSheets/NewDevice.js";
+import type { CloseProps } from "../../NewDevice.js";
 
 interface USBID {
   id: number;
@@ -19,6 +20,7 @@ interface USBID {
 export const Serial = ({ close }: CloseProps): JSX.Element => {
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
   const { addDevice } = useDeviceStore();
+  const { setSelectedDevice } = useAppStore();
 
   const updateSerialPortList = useCallback(async () => {
     setSerialPorts(await navigator.serial.getPorts());
@@ -37,6 +39,7 @@ export const Serial = ({ close }: CloseProps): JSX.Element => {
   const onConnect = async (port: SerialPort) => {
     const id = randId();
     const device = addDevice(id);
+    setSelectedDevice(id);
     const connection = new ISerialConnection(id);
     await connection.connect({
       port,
