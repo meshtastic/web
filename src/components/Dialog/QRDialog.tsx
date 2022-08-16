@@ -44,11 +44,14 @@ export const QRDialog = ({
         settings: channelsToEncode,
       })
     );
-    const base64 = fromByteArray(encoded);
+    const base64 = fromByteArray(encoded)
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
 
     setQRCodeURL(`https://www.meshtastic.org/e/#${base64}`);
   }, [channels, selectedChannels, loraConfig]);
-
+  
   return (
     <Dialog
       isShown={isOpen}
