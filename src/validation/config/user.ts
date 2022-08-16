@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, Length } from "class-validator";
+import { IsBoolean, Length } from "class-validator";
 
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -16,13 +16,4 @@ export class UserValidation
 
   @IsBoolean()
   isLicensed: boolean;
-
-  @IsInt()
-  txPowerDbm: number;
-
-  @IsInt()
-  antGainDbi: number;
-
-  @IsInt()
-  antAzimuth: number;
 }

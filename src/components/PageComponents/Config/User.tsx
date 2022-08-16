@@ -103,27 +103,6 @@ export const User = (): JSX.Element => {
           )}
         />
       </FormField>
-      <TextInputField
-        label="Transmit Power"
-        description="This is a description."
-        hint="dBm"
-        type="number"
-        {...register("txPowerDbm", { valueAsNumber: true })}
-      />
-      <TextInputField
-        label="Antenna Gain"
-        description="This is a description."
-        hint="dBi"
-        type="number"
-        {...register("antGainDbi", { valueAsNumber: true })}
-      />
-      <TextInputField
-        label="Antenna Azimuth"
-        description="This is a description."
-        hint="°"
-        type="number"
-        {...register("antAzimuth", { valueAsNumber: true })}
-      />
     </Form>
   );
 };
