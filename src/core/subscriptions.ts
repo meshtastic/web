@@ -71,5 +71,8 @@ export const subscribeAll = (device: Device, connection: IConnection) => {
         ? new Date(messagePacket.packet.rxTime * 1000)
         : new Date(),
     });
+    if (messagePacket.location) {
+      device.addWaypoint(messagePacket.location);
+    }
   });
 };

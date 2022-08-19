@@ -20,6 +20,7 @@ specifiers:
   geodesy: ^2.4.0
   gzipper: ^7.1.0
   immer: ^9.0.15
+  mapbox-gl: npm:empty-npm-package@1.0.0
   maplibre-gl: ^2.3.0
   modern-css-reset: ^1.4.0
   prettier: ^2.7.1
@@ -28,6 +29,7 @@ specifiers:
   react-hook-form: ^7.34.2
   react-icons: ^4.4.0
   react-json-pretty: ^2.2.0
+  react-map-gl: ^7.0.19
   react-qrcode-logo: ^2.8.0
   rfc4648: ^1.5.2
   rollup-plugin-visualizer: ^5.7.1
@@ -49,6 +51,7 @@ dependencies:
   evergreen-ui: 6.10.3_biqbaboplfbrettd7655fr4n2y
   geodesy: 2.4.0
   immer: 9.0.15
+  mapbox-gl: /empty-npm-package/1.0.0
   maplibre-gl: 2.3.0
   modern-css-reset: 1.4.0
   prettier: 2.7.1
@@ -57,6 +60,7 @@ dependencies:
   react-hook-form: 7.34.2_react@18.2.0
   react-icons: 4.4.0_react@18.2.0
   react-json-pretty: 2.2.0_biqbaboplfbrettd7655fr4n2y
+  react-map-gl: 7.0.19_6eczaga5xxiwzxtfiyk6fioasq
   react-qrcode-logo: 2.8.0_biqbaboplfbrettd7655fr4n2y
   rfc4648: 1.5.2
   zustand: 4.1.0_immer@9.0.15+react@18.2.0
@@ -739,6 +743,12 @@ packages:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: false
 
+  /@types/mapbox-gl/2.7.5:
+    resolution: {integrity: sha512-T8gACm3oGKMlBo2l/9vnKEAxgCc0g2mr8g6dI1d3ZO6EzRe7JALBONlWRmc7SOHV79kiarkcdLdDVEnfd+jilA==}
+    dependencies:
+      '@types/geojson': 7946.0.10
+    dev: false
+
   /@types/mapbox__point-geometry/0.1.2:
     resolution: {integrity: sha512-D0lgCq+3VWV85ey1MZVkE8ZveyuvW5VAfuahVTQRpXFQTxw03SuIf1/K4UQ87MMIXVKzpFjXFiFMZzLj2kU+iA==}
     dev: false
@@ -1341,6 +1351,10 @@ packages:
   /emoji-regex/8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
     dev: true
+
+  /empty-npm-package/1.0.0:
+    resolution: {integrity: sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==}
+    dev: false
 
   /encoding/0.1.13:
     resolution: {integrity: sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==}
@@ -2980,6 +2994,17 @@ packages:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /react-map-gl/7.0.19_6eczaga5xxiwzxtfiyk6fioasq:
+    resolution: {integrity: sha512-s3E8aU6BursSDVwzQZbzdDzDRUX4kdfRqZODYvkdDbInr3RzaNdlbhJ5tojXKWOonsxV6wt+Acv9JCaOMKaf0A==}
+    peerDependencies:
+      mapbox-gl: '*'
+      react: '>=16.3.0'
+    dependencies:
+      '@types/mapbox-gl': 2.7.5
+      mapbox-gl: /empty-npm-package/1.0.0
+      react: 18.2.0
     dev: false
 
   /react-qrcode-logo/2.8.0_biqbaboplfbrettd7655fr4n2y:

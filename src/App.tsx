@@ -1,6 +1,7 @@
 import type React from "react";
 
 import { Pane } from "evergreen-ui";
+import { MapProvider } from "react-map-gl";
 
 import { AppLayout } from "@components/layout/AppLayout.js";
 
@@ -10,7 +11,9 @@ export const App = (): JSX.Element => {
   return (
     <Pane display="flex">
       <AppLayout>
-        <PageRouter />
+        <MapProvider>
+          <PageRouter />
+        </MapProvider>
       </AppLayout>
     </Pane>
   );
