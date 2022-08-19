@@ -2,8 +2,8 @@ import type React from "react";
 
 import { DocumentIcon, GanttChartIcon, RainIcon } from "evergreen-ui";
 
-import { useDevice } from "@app/core/stores/deviceStore.js";
 import { TabbedContent, TabType } from "@components/layout/page/TabbedContent";
+import { useDevice } from "@core/providers/useDevice.js";
 import { FileBrowser } from "@pages/Extensions/FileBrowser";
 
 import { Environment } from "./Environment.js";

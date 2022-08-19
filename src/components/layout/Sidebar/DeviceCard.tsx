@@ -11,7 +11,7 @@ import {
 import { FiBluetooth, FiTerminal, FiWifi } from "react-icons/fi";
 
 import { toMGRS } from "@app/core/utils/toMGRS.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Types } from "@meshtastic/meshtasticjs";
 
@@ -33,7 +33,7 @@ export const DeviceCard = (): JSX.Element => {
           <Heading>{myNode?.data.user?.longName}</Heading>
           <Link
             target="_blank"
-            href="https://github.com/meshtastic/meshtastic-web/releases/"
+            href="https://github.com/meshtastic/meshtastic-device/releases/"
           >
             <Badge
               color="green"

@@ -12,8 +12,8 @@ import {
   Tooltip,
 } from "evergreen-ui";
 
+import { useDevice } from "@core/providers/useDevice.js";
 import type { Channel } from "@core/stores/deviceStore.js";
-import { useDevice } from "@core/stores/deviceStore.js";
 
 import { Message } from "./Message.js";
 import { NewLocationMessage } from "./NewLocationMessage.js";

@@ -13,7 +13,7 @@ import {
   TabbedContent,
   TabType,
 } from "@components/layout/page/TabbedContent.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 import { ChannelChat } from "./ChannelChat.js";

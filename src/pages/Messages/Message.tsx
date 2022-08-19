@@ -10,7 +10,7 @@ import {
   Text,
 } from "evergreen-ui";
 
-import { useDevice } from "@app/core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import type { Protobuf, Types } from "@meshtastic/meshtasticjs";
 

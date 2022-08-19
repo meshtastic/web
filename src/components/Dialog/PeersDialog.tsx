@@ -11,8 +11,8 @@ import {
   Tooltip,
 } from "evergreen-ui";
 
-import { useDevice } from "@app/core/stores/deviceStore.js";
 import { toMGRS } from "@app/core/utils/toMGRS.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 

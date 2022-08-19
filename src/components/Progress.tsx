@@ -9,7 +9,7 @@ import {
   StatusIndicator,
 } from "evergreen-ui";
 
-import { useDevice } from "@app/core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
 
 export const Progress = (): JSX.Element => {
   const {

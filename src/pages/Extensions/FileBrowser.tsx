@@ -1,9 +1,7 @@
 import type React from "react";
+import { useEffect, useState } from "react";
 
 import { Pane } from "evergreen-ui";
-import useSWR from "swr";
-
-import { fetcher } from "@core/utils/fetcher";
 
 export interface File {
   nameModified: string;
@@ -24,10 +22,15 @@ export interface Files {
 }
 
 export const FileBrowser = (): JSX.Element => {
-  const { data } = useSWR<Files>(
-    "http://meshtastic.local/json/fs/browse/static",
-    fetcher
-  );
+  const [data, setData] = useState<Files>();
+
+  useEffect(() => {
+    void fetch("http://meshtastic.local/json/fs/browse/static").then(
+      async (res) => {
+        setData((await res.json()) as Files);
+      }
+    );
+  });
 
   return (
     <Pane>

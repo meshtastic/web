@@ -1,6 +1,7 @@
 import type React from "react";
 
-import { Device, DeviceContext } from "./core/stores/deviceStore.js";
+import { DeviceContext } from "./core/providers/useDevice.js";
+import type { Device } from "./core/stores/deviceStore.js";
 
 export interface DeviceProps {
   children: React.ReactNode;

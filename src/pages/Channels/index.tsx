@@ -6,7 +6,7 @@ import { IoQrCodeOutline } from "react-icons/io5";
 
 import { QRDialog } from "@app/components/Dialog/QRDialog.js";
 import { TabbedContent, TabType } from "@components/layout/page/TabbedContent";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 import { Channel } from "./Channel.js";
