@@ -8,8 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)",
-    "format": "prettier --write 'src/**/*.{ts,tsx}' && eslint src/*.{ts,tsx}",
-    "check": "unimported"
+    "format": "prettier --write 'src/**/*.{ts,tsx}' && eslint src/*.{ts,tsx}"
   },
   "repository": {
     "type": "git",

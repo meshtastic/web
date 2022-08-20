@@ -43,8 +43,6 @@ export const ModuleConfig = (): JSX.Element => {
       label: "Canned Message",
       element: CannedMessage,
     },
-    // Channels
-    // Interface
   ];
 
   return (

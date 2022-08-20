@@ -45,13 +45,13 @@ export const QRDialog = ({
       })
     );
     const base64 = fromByteArray(encoded)
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
+      .replace(/=/g, "")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
 
     setQRCodeURL(`https://www.meshtastic.org/e/#${base64}`);
   }, [channels, selectedChannels, loraConfig]);
-  
+
   return (
     <Dialog
       isShown={isOpen}
