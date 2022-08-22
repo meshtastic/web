@@ -1,8 +1,7 @@
 import type React from "react";
 import type { HTMLProps } from "react";
 
-import { Button, majorScale, Pane, Spinner } from "evergreen-ui";
-import { FiSave } from "react-icons/fi";
+import { Button, majorScale, Pane, SavedIcon, Spinner } from "evergreen-ui";
 
 export interface FormProps extends HTMLProps<HTMLFormElement> {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
@@ -39,7 +38,7 @@ export const Form = ({
           type="submit"
           marginLeft="auto"
           disabled={!dirty}
-          iconBefore={<FiSave />}
+          iconBefore={<SavedIcon />}
         >
           Save
         </Button>

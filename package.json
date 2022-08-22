@@ -8,8 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)",
-    "format": "prettier --write 'src/**/*.{ts,tsx}' && eslint src/*.{ts,tsx}",
-    "check": "unimported"
+    "format": "prettier --write 'src/**/*.{ts,tsx}' && eslint src/*.{ts,tsx}"
   },
   "repository": {
     "type": "git",
@@ -20,35 +19,34 @@
   },
   "homepage": "https://meshtastic.org",
   "dependencies": {
-    "@arcgis/core": "^4.24.7",
     "@emeraldpay/hashicon-react": "^0.5.2",
     "@hookform/resolvers": "^2.9.7",
     "@meshtastic/eslint-config": "^1.0.8",
-    "@meshtastic/meshtasticjs": "^0.6.88",
+    "@meshtastic/meshtasticjs": "^0.6.92",
     "base64-js": "^1.5.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "evergreen-ui": "^6.10.3",
     "geodesy": "^2.4.0",
     "immer": "^9.0.15",
+    "mapbox-gl": "npm:empty-npm-package@1.0.0",
+    "maplibre-gl": "^2.3.0",
     "modern-css-reset": "^1.4.0",
     "prettier": "^2.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.34.0",
+    "react-hook-form": "^7.34.2",
     "react-icons": "^4.4.0",
     "react-json-pretty": "^2.2.0",
-    "react-qrcode-logo": "^2.7.0",
+    "react-map-gl": "^7.0.19",
+    "react-qrcode-logo": "^2.8.0",
     "rfc4648": "^1.5.2",
-    "snarkdown": "^2.0.0",
-    "swr": "^1.3.0",
-    "vite-plugin-environment": "^1.1.2",
-    "zustand": "4.0.0"
+    "zustand": "4.1.0"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.193",
     "@types/geodesy": "^2.2.3",
-    "@types/node": "^18.7.1",
+    "@types/node": "^18.7.6",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@types/w3c-web-serial": "^1.0.2",
@@ -59,8 +57,7 @@
     "tar": "^6.1.11",
     "tslib": "^2.4.0",
     "typescript": "^4.7.4",
-    "unimported": "^1.21.0",
-    "vite": "^3.0.6",
-    "vite-plugin-cdn-import": "^0.3.5"
+    "vite": "^3.0.8",
+    "vite-plugin-environment": "^1.1.2"
   }
 }

@@ -6,7 +6,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.js";
 import { Form } from "@components/form/Form";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const ExternalNotification = (): JSX.Element => {

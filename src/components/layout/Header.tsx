@@ -55,12 +55,12 @@ export const Header = (): JSX.Element => {
         width={majorScale(12)}
         marginRight={majorScale(22)}
       >
-        <Link href="/">
+        <Link href=".">
           <Pane
             is="img"
             width={100}
             height={28}
-            src="/Logo_Black.svg"
+            src="Logo_Black.svg"
             cursor="pointer"
           />
         </Link>

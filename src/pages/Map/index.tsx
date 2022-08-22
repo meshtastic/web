@@ -1,137 +1,112 @@
 import type React from "react";
-import { useEffect, useMemo, useRef } from "react";
 
-import { Pane } from "evergreen-ui";
+import {
+  Heading,
+  IconButton,
+  LocateIcon,
+  majorScale,
+  MapMarkerIcon,
+  Pane,
+  Text,
+} from "evergreen-ui";
+import maplibregl from "maplibre-gl";
+import { Map, Marker, useMap } from "react-map-gl";
 
-import { useDevice } from "@app/core/stores/deviceStore.js";
-import Point from "@arcgis/core/geometry/Point";
-import Graphic from "@arcgis/core/Graphic";
-import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
-import LabelClass from "@arcgis/core/layers/support/LabelClass";
-import Map from "@arcgis/core/Map";
-import LineCallout3D from "@arcgis/core/symbols/callouts/LineCallout3D";
-import LabelSymbol3D from "@arcgis/core/symbols/LabelSymbol3D";
-import TextSymbol3DLayer from "@arcgis/core/symbols/TextSymbol3DLayer";
-import SceneView from "@arcgis/core/views/SceneView";
+import { useDevice } from "@core/providers/useDevice.js";
+import { Hashicon } from "@emeraldpay/hashicon-react";
 
 export const MapPage = (): JSX.Element => {
-  const { nodes } = useDevice();
+  const { nodes, waypoints } = useDevice();
+  const { current: map } = useMap();
 
-  const nodesWithPosition = nodes.filter((node) => node.data.position);
-  const ref = useRef<HTMLDivElement>(null);
+  return (
+    <Pane
+      margin={majorScale(3)}
+      borderRadius={majorScale(1)}
+      elevation={1}
+      display="flex"
+      flexGrow={1}
+      flexDirection="column"
+      gap={majorScale(2)}
+      overflow="hidden"
+      position="relative"
+    >
+      <Pane
+        position="absolute"
+        zIndex={10}
+        right={0}
+        top={0}
+        borderRadius={majorScale(1)}
+        padding={majorScale(1)}
+        margin={majorScale(1)}
+        background="tint1"
+        width={majorScale(28)}
+        elevation={1}
+        overflow="hidden"
+      >
+        <Pane padding={majorScale(1)} background="tint2">
+          <Heading>Title</Heading>
+        </Pane>
+        <Pane display="flex" flexDirection="column" gap={majorScale(1)}>
+          {nodes.map((n) => (
+            <Pane key={n.data.num} display="flex" gap={majorScale(1)}>
+              <Hashicon value={n.data.num.toString()} size={24} />
+              <Text>{n.data.user?.longName}</Text>
+              <IconButton
+                icon={LocateIcon}
+                marginLeft="auto"
+                size="small"
+                onClick={() => {
+                  console.log("clicked");
+                  console.log(map);
 
-  useEffect(() => {
-    console.log(nodesWithPosition);
-  }, [nodesWithPosition]);
-
-  const labelClass = useMemo(
-    () =>
-      new LabelClass({
-        labelExpressionInfo: {
-          expression: "$feature.name",
-        },
-        symbol: new LabelSymbol3D({
-          symbolLayers: [
-            new TextSymbol3DLayer({
-              text: "{name}",
-              material: {
-                color: "black",
-              },
-              halo: {
-                color: [255, 255, 255, 0.7],
-                size: 2,
-              },
-              font: {
-                size: 12,
-                weight: "bold",
-              },
-              size: 10,
-            }),
-          ],
-          verticalOffset: {
-            screenLength: 150,
-            maxWorldLength: 2000,
-            minWorldLength: 30,
-          },
-          callout: new LineCallout3D({
-            size: 0.5,
-            color: [0, 0, 0],
-            border: {
-              color: [255, 255, 255],
-            },
-          }),
-        }),
-      }),
-    []
+                  map?.flyTo({
+                    center: [
+                      n.data.position?.latitudeI / 1e7,
+                      n.data.position?.longitudeI / 1e7,
+                    ],
+                    zoom: 10,
+                  });
+                }}
+              />
+            </Pane>
+          ))}
+        </Pane>
+      </Pane>
+      <Map
+        mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
+        mapLib={maplibregl}
+        attributionControl={false}
+      >
+        {waypoints.map((wp) => (
+          <Marker
+            key={wp.id}
+            longitude={wp.longitudeI / 1e7}
+            latitude={wp.latitudeI / 1e7}
+            anchor="bottom"
+          >
+            <Pane>
+              <MapMarkerIcon />
+            </Pane>
+          </Marker>
+        ))}
+        {nodes
+          .filter((n) => n.data.position?.latitudeI)
+          .map((n) => {
+            if (n.data.position?.latitudeI) {
+              return (
+                <Marker
+                  key={n.data.num}
+                  longitude={n.data.position.longitudeI / 1e7}
+                  latitude={n.data.position.latitudeI / 1e7}
+                  anchor="bottom"
+                >
+                  <Hashicon value={n.data.num.toString()} size={32} />
+                </Marker>
+              );
+            }
+          })}
+      </Map>
+    </Pane>
   );
-
-  const points: Graphic[] = nodesWithPosition.map(
-    (node, index) =>
-      node.data.position
-        ? new Graphic({
-            geometry: new Point({
-              latitude: node.data.position.latitudeI / 1e7,
-              longitude: node.data.position.longitudeI / 1e7,
-            }),
-            attributes: {
-              ObjectID: index,
-              name: node.data.user?.longName,
-            },
-          })
-        : new Graphic() //should be undefined/removed from array
-  );
-
-  useEffect(() => {
-    if (ref.current) {
-      const layer = new FeatureLayer({
-        labelsVisible: true,
-        labelingInfo: [labelClass],
-        source: points,
-        fields: [
-          {
-            name: "ObjectID",
-            alias: "ObjectID",
-            type: "oid",
-          },
-          {
-            name: "name",
-            alias: "Name",
-            type: "string",
-          },
-        ],
-      });
-
-      const map = new Map({
-        basemap: "satellite",
-        ground: "world-elevation",
-        layers: [layer],
-      });
-
-      const scene = new SceneView({
-        container: ref.current,
-        map: map,
-        camera: {
-          position: nodesWithPosition[0]
-            ? {
-                x: nodesWithPosition[0].data.position?.longitudeI ?? 0 / 1e7,
-                y: nodesWithPosition[0].data.position?.latitudeI ?? 0 / 1e7,
-                z: nodesWithPosition[0].data.position?.altitude ?? 0 / 1e7,
-              }
-            : {
-                y: -35.59, //Longitude
-                x: 148, //Latitude
-                z: 200, //Meters
-              },
-          tilt: 75,
-        },
-      });
-      scene.on("click", (event) => {
-        void scene.hitTest(event).then((point) => {
-          console.log(point);
-        });
-      });
-    }
-  }, [labelClass, points]);
-
-  return <Pane width="100%" height="100%" ref={ref} />;
 };

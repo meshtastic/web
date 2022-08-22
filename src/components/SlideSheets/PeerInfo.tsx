@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 
 import { GeolocationIcon, Pane, PropertyIcon, SideSheet } from "evergreen-ui";
 
-import { Node, useDevice } from "@app/core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
+import type { Node } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -14,7 +15,6 @@ import { Overview } from "./tabs/nodes/Overview.js";
 
 export const PeerInfo = () => {
   const { peerInfoOpen, activePeer, setPeerInfoOpen, nodes } = useDevice();
-  const [selectedTab, setSelectedTab] = useState(0);
   const [node, setNode] = useState<Node | undefined>();
 
   useEffect(() => {

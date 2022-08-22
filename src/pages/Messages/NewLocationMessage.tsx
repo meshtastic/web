@@ -8,8 +8,8 @@ import {
   TextInputField,
 } from "evergreen-ui";
 
-import { useDevice } from "@app/core/stores/deviceStore.js";
 import { renderOptions } from "@app/core/utils/selectEnumOptions.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 enum LocationType {

@@ -19,7 +19,7 @@ import {
 import { Controller, useForm } from "react-hook-form";
 
 import { Form } from "@components/form/Form";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export interface SettingsPanelProps {

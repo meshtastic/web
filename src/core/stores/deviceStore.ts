@@ -44,10 +44,10 @@ export interface Device {
   activePage: Page;
   peerInfoOpen: boolean;
   activePeer: number;
+  waypoints: Protobuf.Location[];
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
-  addChannel: (channel: Channel) => void;
   setConfig: (config: Protobuf.Config) => void;
   setModuleConfig: (config: Protobuf.ModuleConfig) => void;
   setHardware: (hardware: Protobuf.MyNodeInfo) => void;
@@ -55,6 +55,8 @@ export interface Device {
   setActivePage: (page: Page) => void;
   setPeerInfoOpen: (open: boolean) => void;
   setActivePeer: (peer: number) => void;
+  addChannel: (channel: Channel) => void;
+  addWaypoint: (waypoint: Protobuf.Location) => void;
   addNodeInfo: (nodeInfo: Types.NodeInfoPacket) => void;
   addUser: (user: Types.UserPacket) => void;
   addPosition: (position: Types.PositionPacket) => void;
@@ -92,6 +94,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           activePage: "messages",
           peerInfoOpen: false,
           activePeer: 0,
+          waypoints: [],
 
           setReady: (ready: boolean) => {
             set(
@@ -109,25 +112,6 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.status = status;
-                }
-              })
-            );
-          },
-          addChannel: (channel: Channel) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  const channelIndex = device.channels.findIndex(
-                    (c) => c.config.index === channel.config.index
-                  );
-                  if (channelIndex !== -1) {
-                    const messages = device.channels[channelIndex].messages;
-                    device.channels[channelIndex] = channel;
-                    device.channels[channelIndex].messages = messages;
-                  } else {
-                    device.channels.push(channel);
-                  }
                 }
               })
             );
@@ -253,6 +237,43 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.activePage = page;
+                }
+              })
+            );
+          },
+          addChannel: (channel: Channel) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  const channelIndex = device.channels.findIndex(
+                    (c) => c.config.index === channel.config.index
+                  );
+                  if (channelIndex !== -1) {
+                    const messages = device.channels[channelIndex].messages;
+                    device.channels[channelIndex] = channel;
+                    device.channels[channelIndex].messages = messages;
+                  } else {
+                    device.channels.push(channel);
+                  }
+                }
+              })
+            );
+          },
+          addWaypoint: (waypoint: Protobuf.Location) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  const waypointIndex = device.waypoints.findIndex(
+                    (wp) => wp.id === waypoint.id
+                  );
+
+                  if (waypointIndex !== -1) {
+                    device.waypoints[waypointIndex] = waypoint;
+                  } else {
+                    device.waypoints.push(waypoint);
+                  }
                 }
               })
             );

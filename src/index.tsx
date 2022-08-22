@@ -1,4 +1,5 @@
 import "modern-css-reset/dist/reset.min.css";
+import "maplibre-gl/dist/maplibre-gl.css";
 
 import type React from "react";
 import { StrictMode } from "react";

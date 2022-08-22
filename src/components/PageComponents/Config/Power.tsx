@@ -6,7 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 
 import { PowerValidation } from "@app/validation/config/power.js";
 import { Form } from "@components/form/Form";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";

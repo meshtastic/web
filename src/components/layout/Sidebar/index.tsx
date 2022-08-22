@@ -17,7 +17,8 @@ import {
 } from "evergreen-ui";
 
 import { PeersDialog } from "@app/components/Dialog/PeersDialog.js";
-import { Page, useDevice } from "@app/core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
+import type { Page } from "@core/stores/deviceStore.js";
 
 import { DeviceCard } from "./DeviceCard.js";
 
@@ -42,7 +43,6 @@ export const Sidebar = (): JSX.Element => {
       name: "Map",
       icon: GlobeIcon,
       page: "map",
-      disabled: true,
     },
     {
       name: "Extensions",
