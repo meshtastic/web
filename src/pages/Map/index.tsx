@@ -57,16 +57,15 @@ export const MapPage = (): JSX.Element => {
                 marginLeft="auto"
                 size="small"
                 onClick={() => {
-                  console.log("clicked");
-                  console.log(map);
-
-                  map?.flyTo({
-                    center: [
-                      n.data.position?.latitudeI / 1e7,
-                      n.data.position?.longitudeI / 1e7,
-                    ],
-                    zoom: 10,
-                  });
+                  if (n.data.position?.latitudeI) {
+                    map?.flyTo({
+                      center: [
+                        n.data.position.longitudeI / 1e7,
+                        n.data.position.latitudeI / 1e7,
+                      ],
+                      zoom: 10,
+                    });
+                  }
                 }}
               />
             </Pane>
@@ -90,22 +89,20 @@ export const MapPage = (): JSX.Element => {
             </Pane>
           </Marker>
         ))}
-        {nodes
-          .filter((n) => n.data.position?.latitudeI)
-          .map((n) => {
-            if (n.data.position?.latitudeI) {
-              return (
-                <Marker
-                  key={n.data.num}
-                  longitude={n.data.position.longitudeI / 1e7}
-                  latitude={n.data.position.latitudeI / 1e7}
-                  anchor="bottom"
-                >
-                  <Hashicon value={n.data.num.toString()} size={32} />
-                </Marker>
-              );
-            }
-          })}
+        {nodes.map((n) => {
+          if (n.data.position?.latitudeI) {
+            return (
+              <Marker
+                key={n.data.num}
+                longitude={n.data.position.longitudeI / 1e7}
+                latitude={n.data.position.latitudeI / 1e7}
+                anchor="bottom"
+              >
+                <Hashicon value={n.data.num.toString()} size={32} />
+              </Marker>
+            );
+          }
+        })}
       </Map>
     </Pane>
   );
