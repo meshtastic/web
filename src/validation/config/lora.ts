@@ -15,7 +15,7 @@ export class LoRaValidation implements Protobuf.Config_LoRaConfig {
   bandwidth: number;
 
   @IsInt()
-  // @Min(7)
+  @Min(7)
   @Max(12)
   spreadFactor: number;
 
@@ -31,7 +31,7 @@ export class LoRaValidation implements Protobuf.Config_LoRaConfig {
   region: Protobuf.Config_LoRaConfig_RegionCode;
 
   @IsInt()
-  @Min(0)
+  @Min(1)
   @Max(7)
   hopLimit: number;
 

@@ -118,7 +118,7 @@ export const LoRa = (): JSX.Element => {
         {...register("txPower", { valueAsNumber: true })}
       />
       <TextInputField
-        label="Hop Count"
+        label="Hop Limit"
         description="This is a description."
         hint="Hops"
         type="number"
