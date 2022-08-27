@@ -1,7 +1,14 @@
 import type React from "react";
 
-import { Button, majorScale, Pane, TextInputField } from "evergreen-ui";
-import { useForm } from "react-hook-form";
+import {
+  Button,
+  FormField,
+  majorScale,
+  Pane,
+  Switch,
+  TextInputField,
+} from "evergreen-ui";
+import { Controller, useForm } from "react-hook-form";
 import { FiPlusCircle } from "react-icons/fi";
 
 import { useAppStore } from "@core/stores/appStore.js";
@@ -17,12 +24,12 @@ export interface HTTPProps {
 export const HTTP = ({ close }: HTTPProps): JSX.Element => {
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
-  const { register, handleSubmit } = useForm<{
+  const { register, handleSubmit, control } = useForm<{
     ip: string;
     tls: boolean;
   }>({
     defaultValues: {
-      ip: "meshtastic.local",
+      ip: "",
       tls: false,
     },
   });
@@ -52,7 +59,25 @@ export const HTTP = ({ close }: HTTPProps): JSX.Element => {
         padding={majorScale(2)}
         gap={majorScale(2)}
       >
-        <TextInputField label="IP Address/Hostname" {...register("ip")} />
+        <TextInputField
+          label="IP Address/Hostname"
+          placeholder="000.000.000.000 / meshtastic.local"
+          {...register("ip")}
+        />
+        <FormField label="Use TLS">
+          <Controller
+            name="tls"
+            control={control}
+            render={({ field: { value, ...field } }) => (
+              <Switch
+                height={24}
+                marginLeft="auto"
+                checked={value}
+                {...field}
+              />
+            )}
+          />
+        </FormField>
         <Button appearance="primary" gap={majorScale(1)} type="submit">
           Connect
           <FiPlusCircle />
