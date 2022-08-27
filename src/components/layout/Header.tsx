@@ -18,8 +18,9 @@ import {
 } from "evergreen-ui";
 import { FiGithub } from "react-icons/fi";
 
-import { useAppStore } from "@app/core/stores/appStore.js";
+import { HelpDialog } from "@components/Dialog/HelpDialog.js";
 import { NewDevice } from "@components/SlideSheets/NewDevice.js";
+import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Types } from "@meshtastic/meshtasticjs";
@@ -27,6 +28,7 @@ import { Types } from "@meshtastic/meshtasticjs";
 export const Header = (): JSX.Element => {
   const { getDevices, removeDevice } = useDeviceStore();
   const [newConnectionOpen, setNewConnectionOpen] = useState(false);
+  const [helpDialogOpen, setHelpDialogOpen] = useState(false);
   const { selectedDevice, setSelectedDevice } = useAppStore();
 
   return (
@@ -142,7 +144,18 @@ export const Header = (): JSX.Element => {
             </Button>
           </Link>
         </Tooltip>
-        <IconButton icon={HelpIcon} />
+        <IconButton
+          icon={HelpIcon}
+          onClick={() => {
+            setHelpDialogOpen(true);
+          }}
+        />
+        <HelpDialog
+          isOpen={helpDialogOpen}
+          close={() => {
+            setHelpDialogOpen(false);
+          }}
+        />
         <Tooltip content="Visit Meshtastic.org">
           <Link target="_blank" href="https://meshtastic.org/">
             <IconButton icon={GlobeIcon} />
