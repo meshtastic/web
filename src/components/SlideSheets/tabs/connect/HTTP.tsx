@@ -4,10 +4,10 @@ import { Button, majorScale, Pane, TextInputField } from "evergreen-ui";
 import { useForm } from "react-hook-form";
 import { FiPlusCircle } from "react-icons/fi";
 
-import { useAppStore } from "@app/core/stores/appStore.js";
-import { useDeviceStore } from "@app/core/stores/deviceStore.js";
-import { subscribeAll } from "@app/core/subscriptions.js";
-import { randId } from "@app/core/utils/randId.js";
+import { useAppStore } from "@core/stores/appStore.js";
+import { useDeviceStore } from "@core/stores/deviceStore.js";
+import { subscribeAll } from "@core/subscriptions.js";
+import { randId } from "@core/utils/randId.js";
 import { IHTTPConnection } from "@meshtastic/meshtasticjs";
 
 export interface HTTPProps {

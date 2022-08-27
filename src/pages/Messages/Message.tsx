@@ -13,8 +13,7 @@ import {
 import { useDevice } from "@core/providers/useDevice.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import type { Protobuf, Types } from "@meshtastic/meshtasticjs";
-
-import { LocationMessage } from "./LocationMessage.js";
+import { LocationMessage } from "@pages/Messages/LocationMessage.js";
 
 export interface MessageProps {
   lastMsgSameUser: boolean;

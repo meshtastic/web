@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-import type { Device } from "../stores/deviceStore.js";
+import type { Device } from "@core/stores/deviceStore.js";
 
 export const DeviceContext = createContext<Device | undefined>(undefined);
 

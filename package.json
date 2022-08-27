@@ -29,7 +29,7 @@
     "evergreen-ui": "^6.10.3",
     "geodesy": "^2.4.0",
     "immer": "^9.0.15",
-    "mapbox-gl": "npm:empty-npm-package@1.0.0",
+    "mapbox-gl": "npm:empty-npm-package@^1.0.0",
     "maplibre-gl": "^2.3.0",
     "modern-css-reset": "^1.4.0",
     "prettier": "^2.7.1",
@@ -41,23 +41,23 @@
     "react-map-gl": "^7.0.19",
     "react-qrcode-logo": "^2.8.0",
     "rfc4648": "^1.5.2",
-    "zustand": "4.1.0"
+    "zustand": "4.1.1"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.193",
+    "@types/chrome": "^0.0.195",
     "@types/geodesy": "^2.2.3",
-    "@types/node": "^18.7.6",
+    "@types/node": "^18.7.13",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@types/w3c-web-serial": "^1.0.2",
     "@types/web-bluetooth": "^0.0.15",
     "@vitejs/plugin-react": "^2.0.1",
     "gzipper": "^7.1.0",
-    "rollup-plugin-visualizer": "^5.7.1",
+    "rollup-plugin-visualizer": "^5.8.0",
     "tar": "^6.1.11",
     "tslib": "^2.4.0",
-    "typescript": "^4.7.4",
-    "vite": "^3.0.8",
+    "typescript": "^4.8.2",
+    "vite": "^3.0.9",
     "vite-plugin-environment": "^1.1.2"
   }
 }

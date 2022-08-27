@@ -12,10 +12,10 @@ import {
 } from "evergreen-ui";
 import { FiBluetooth, FiTerminal, FiWifi } from "react-icons/fi";
 
-import type { TabType } from "../layout/page/TabbedContent.js";
-import { BLE } from "./tabs/connect/BLE.js";
-import { HTTP } from "./tabs/connect/HTTP.js";
-import { Serial } from "./tabs/connect/Serial.js";
+import type { TabType } from "@components/layout/page/TabbedContent.js";
+import { BLE } from "@components/SlideSheets/tabs/connect/BLE.js";
+import { HTTP } from "@components/SlideSheets/tabs/connect/HTTP.js";
+import { Serial } from "@components/SlideSheets/tabs/connect/Serial.js";
 
 export interface NewDeviceProps {
   open: boolean;

@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { Pane, Tab, Tablist } from "evergreen-ui";
 
-import { ExternalNotification } from "@app/components/PageComponents/ModuleConfig/ExternalNotification.js";
+import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.js";
 import { MQTT } from "@components/PageComponents/ModuleConfig/MQTT.js";
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.js";
 

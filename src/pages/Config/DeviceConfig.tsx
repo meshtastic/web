@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { Pane, Tab, Tablist } from "evergreen-ui";
 
-import { Bluetooth } from "@app/components/PageComponents/Config/Bluetooth.js";
+import { Bluetooth } from "@components/PageComponents/Config/Bluetooth.js";
 import { Device } from "@components/PageComponents/Config/Device.js";
 import { Display } from "@components/PageComponents/Config/Display.js";
 import { LoRa } from "@components/PageComponents/Config/LoRa.js";

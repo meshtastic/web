@@ -14,9 +14,8 @@ import {
 
 import { useDevice } from "@core/providers/useDevice.js";
 import type { Channel } from "@core/stores/deviceStore.js";
-
-import { Message } from "./Message.js";
-import { NewLocationMessage } from "./NewLocationMessage.js";
+import { Message } from "@pages/Messages/Message.js";
+import { NewLocationMessage } from "@pages/Messages/NewLocationMessage.js";
 
 export interface ChannelChatProps {
   channel: Channel;

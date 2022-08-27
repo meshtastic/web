@@ -3,15 +3,14 @@ import { useEffect, useState } from "react";
 
 import { GeolocationIcon, Pane, PropertyIcon, SideSheet } from "evergreen-ui";
 
+import { SlideSheetTabbedContent } from "@components/layout/page/SlideSheetTabbedContent.js";
+import type { TabType } from "@components/layout/page/TabbedContent.js";
+import { Location } from "@components/SlideSheets/tabs/nodes/Location.js";
+import { Overview } from "@components/SlideSheets/tabs/nodes/Overview.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import type { Node } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-
-import { SlideSheetTabbedContent } from "../layout/page/SlideSheetTabbedContent.js";
-import type { TabType } from "../layout/page/TabbedContent.js";
-import { Location } from "./tabs/nodes/Location.js";
-import { Overview } from "./tabs/nodes/Overview.js";
 
 export const PeerInfo = () => {
   const { peerInfoOpen, activePeer, setPeerInfoOpen, nodes } = useDevice();

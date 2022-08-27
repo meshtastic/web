@@ -10,8 +10,8 @@ import {
 } from "evergreen-ui";
 import { FiBluetooth, FiTerminal, FiWifi } from "react-icons/fi";
 
-import { toMGRS } from "@app/core/utils/toMGRS.js";
 import { useDevice } from "@core/providers/useDevice.js";
+import { toMGRS } from "@core/utils/toMGRS.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Types } from "@meshtastic/meshtasticjs";
 

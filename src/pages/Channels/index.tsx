@@ -4,12 +4,11 @@ import { useState } from "react";
 import { Button, LayerIcon, LayerOutlineIcon, Tooltip } from "evergreen-ui";
 import { IoQrCodeOutline } from "react-icons/io5";
 
-import { QRDialog } from "@app/components/Dialog/QRDialog.js";
+import { QRDialog } from "@components/Dialog/QRDialog.js";
 import { TabbedContent, TabType } from "@components/layout/page/TabbedContent";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-
-import { Channel } from "./Channel.js";
+import { Channel } from "@pages/Channels/Channel.js";
 
 export const ChannelsPage = (): JSX.Element => {
   const { channels, config } = useDevice();

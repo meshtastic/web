@@ -1,11 +1,10 @@
+import type { Device } from "@core/stores/deviceStore.js";
 import {
   IConnection,
   Protobuf,
   SettingsManager,
   Types,
 } from "@meshtastic/meshtasticjs";
-
-import type { Device } from "./stores/deviceStore.js";
 
 export const subscribeAll = (device: Device, connection: IConnection) => {
   SettingsManager.debugMode = Protobuf.LogRecord_Level.TRACE;

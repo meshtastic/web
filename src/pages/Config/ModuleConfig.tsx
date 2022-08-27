@@ -3,8 +3,8 @@ import { useState } from "react";
 
 import { Pane, Tab, Tablist } from "evergreen-ui";
 
-import { ExternalNotification } from "@app/components/PageComponents/ModuleConfig/ExternalNotification.js";
 import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage";
+import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.js";
 import { MQTT } from "@components/PageComponents/ModuleConfig/MQTT.js";
 import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.js";
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.js";

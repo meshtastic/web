@@ -4,13 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { Button, majorScale, Pane } from "evergreen-ui";
 import { FiPlusCircle } from "react-icons/fi";
 
-import { useAppStore } from "@app/core/stores/appStore.js";
-import { subscribeAll } from "@app/core/subscriptions.js";
+import type { CloseProps } from "@components/SlideSheets/NewDevice.js";
+import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
+import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
 import { ISerialConnection } from "@meshtastic/meshtasticjs";
-
-import type { CloseProps } from "../../NewDevice.js";
 
 interface USBID {
   id: number;

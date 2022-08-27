@@ -4,9 +4,8 @@ import { DocumentIcon, GanttChartIcon, RainIcon } from "evergreen-ui";
 
 import { TabbedContent, TabType } from "@components/layout/page/TabbedContent";
 import { useDevice } from "@core/providers/useDevice.js";
+import { Environment } from "@pages/Extensions/Environment.js";
 import { FileBrowser } from "@pages/Extensions/FileBrowser";
-
-import { Environment } from "./Environment.js";
 
 export const ExtensionsPage = (): JSX.Element => {
   const { hardware } = useDevice();

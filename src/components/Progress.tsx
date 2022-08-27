@@ -39,7 +39,6 @@ export const Progress = (): JSX.Element => {
     hardware.myNodeNum,
     setReady,
   ]);
-
   return (
     <Pane
       display="flex"

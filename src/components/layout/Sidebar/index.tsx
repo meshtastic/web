@@ -16,7 +16,7 @@ import {
   Tablist,
 } from "evergreen-ui";
 
-import { PeersDialog } from "@app/components/Dialog/PeersDialog.js";
+import { PeersDialog } from "@components/Dialog/PeersDialog.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import type { Page } from "@core/stores/deviceStore.js";
 

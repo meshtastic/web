@@ -10,7 +10,7 @@ import {
   Text,
 } from "evergreen-ui";
 
-import { toMGRS } from "@app/core/utils/toMGRS.js";
+import { toMGRS } from "@core/utils/toMGRS.js";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export interface LocationMessageProps {
