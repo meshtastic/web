@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext } from "react";
 
 import { produce } from "immer";
 import create from "zustand";
@@ -45,6 +45,7 @@ export interface Device {
   peerInfoOpen: boolean;
   activePeer: number;
   waypoints: Protobuf.Location[];
+  regionUnset: boolean;
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -95,6 +96,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           peerInfoOpen: false,
           activePeer: 0,
           waypoints: [],
+          regionUnset: false,
 
           setReady: (ready: boolean) => {
             set(
@@ -140,6 +142,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       break;
                     case "lora":
                       device.config.lora = config.payloadVariant.lora;
+                      device.regionUnset =
+                        config.payloadVariant.lora.region ===
+                        Protobuf.Config_LoRaConfig_RegionCode.Unset;
                       break;
                   }
                 }
@@ -452,11 +457,3 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 }));
 
 export const DeviceContext = createContext<Device | undefined>(undefined);
-
-export const useDevice = (): Device => {
-  const context = useContext(DeviceContext);
-  if (context === undefined) {
-    throw new Error("useDevice must be used within a ConnectionProvider");
-  }
-  return context;
-};
