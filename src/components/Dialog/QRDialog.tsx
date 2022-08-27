@@ -5,7 +5,6 @@ import { fromByteArray } from "base64-js";
 import {
   Checkbox,
   ClipboardIcon,
-  Dialog,
   FormField,
   IconButton,
   majorScale,
@@ -16,6 +15,8 @@ import {
 import { QRCode } from "react-qrcode-logo";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";
+
+import { Dialog } from "./index.js";
 
 export interface QRDialogProps {
   isOpen: boolean;
@@ -53,12 +54,13 @@ export const QRDialog = ({
   }, [channels, selectedChannels, loraConfig]);
 
   return (
-    <Dialog
-      isShown={isOpen}
-      title="Generate QR Code"
-      onCloseComplete={close}
-      hasFooter={false}
-    >
+    // <Dialog
+    //   isShown={isOpen}
+    //
+    //   onCloseComplete={close}
+    //   hasFooter={false}
+    // >
+    <Dialog isOpen={isOpen} close={close} title="Generate QR Code" background>
       <Pane display="flex">
         <FormField
           width="12rem"

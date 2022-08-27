@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { Dialog, SelectField } from "evergreen-ui";
+import { SelectField } from "evergreen-ui";
 import { useForm } from "react-hook-form";
 
 import { LoRaValidation } from "@app/validation/config/lora.js";
@@ -11,6 +11,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 import { Form } from "../form/Form.js";
+import { Dialog } from "./index.js";
 
 export interface RegionDialogProps {
   isOpen: boolean;
@@ -51,7 +52,7 @@ export const RegionDialog = ({ isOpen }: RegionDialogProps): JSX.Element => {
   });
 
   return (
-    <Dialog isShown={isOpen} title="Generate QR Code" hasFooter={false}>
+    <Dialog isOpen={isOpen} close={close} title="Set Device Region" background>
       <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
         <SelectField
           label="Region"

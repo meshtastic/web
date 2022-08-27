@@ -1,8 +1,9 @@
 import type React from "react";
 
-import { CogIcon, Dialog, Text } from "evergreen-ui";
+import { CogIcon, CrossIcon, IconButton, Text } from "evergreen-ui";
 
 import { TabbedContent, TabType } from "../layout/page/TabbedContent.js";
+import { Dialog } from "./index.js";
 
 export interface HelpDialogProps {
   isOpen: boolean;
@@ -32,13 +33,11 @@ export const HelpDialog = ({ isOpen, close }: HelpDialogProps): JSX.Element => {
   ];
 
   return (
-    <Dialog
-      isShown={isOpen}
-      onCloseComplete={close}
-      title="Meshtastic Web Help"
-      hasFooter={true}
-    >
-      <TabbedContent direction="vertical" tabs={tabs} />
+    <Dialog isOpen={isOpen} close={close} title="Help">
+      <TabbedContent
+        tabs={tabs}
+        actions={[() => <IconButton icon={CrossIcon} onClick={close} />]}
+      />
     </Dialog>
   );
 };

@@ -31,7 +31,7 @@ export const AppLayout = ({ children }: AppLayoutProps): JSX.Element => {
       minHeight="100vh"
     >
       <Header />
-      <Pane display="flex" flex={1} height="100%" width="100%">
+      <Pane display="flex" height="100%" width="100%">
         {devices.length ? (
           devices.map((device) => (
             <Pane

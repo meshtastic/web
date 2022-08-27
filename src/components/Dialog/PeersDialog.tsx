@@ -1,7 +1,6 @@
 import type React from "react";
 
 import {
-  Dialog,
   HelperManagementIcon,
   IconButton,
   majorScale,
@@ -16,6 +15,8 @@ import { useDevice } from "@core/providers/useDevice.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
+import { Dialog } from "./index.js";
+
 export interface PeersDialogProps {
   isOpen: boolean;
   close: () => void;
@@ -29,13 +30,7 @@ export const PeersDialog = ({
     useDevice();
 
   return (
-    <Dialog
-      isShown={isOpen}
-      title="Peers"
-      onCloseComplete={close}
-      hasFooter={false}
-      width={majorScale(120)}
-    >
+    <Dialog isOpen={isOpen} close={close} width={majorScale(120)}>
       <Table>
         <Table.Head>
           <Table.HeaderCell flexBasis={48} flexShrink={0} flexGrow={0} />
@@ -126,22 +121,6 @@ export const PeersDialog = ({
             ))}
         </Table.Body>
       </Table>
-      {/* <Pane
-                key={node.data.num}
-                display="flex"
-                borderRadius={majorScale(1)}
-                elevation={1}
-                gap={majorScale(1)}
-                padding={majorScale(1)}
-              >
-                
-                <Heading>{node.data.user?.longName}</Heading>
-                {node.metrics.airUtilTx}
-                {node.metrics.}
-                {node.metrics.channelUtilization}
-                {node.metrics.}
-                {node.data.}
-              </Pane> */}
     </Dialog>
   );
 };
