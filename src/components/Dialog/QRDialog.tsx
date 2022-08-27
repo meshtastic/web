@@ -96,7 +96,7 @@ export const QRDialog = ({
           margin={majorScale(1)}
         >
           <Pane display="flex" margin="auto">
-            <QRCode value={QRCodeURL} qrStyle="dots" />
+            <QRCode value={QRCodeURL} size={250} qrStyle="dots" />
           </Pane>
           <Pane display="flex" gap={majorScale(1)}>
             <TextInputField
