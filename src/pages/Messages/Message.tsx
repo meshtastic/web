@@ -10,50 +10,47 @@ import {
   Text,
 } from "evergreen-ui";
 
+import type { AllMessageTypes } from "@app/core/stores/deviceStore.js";
+import { WaypointMessage } from "@app/pages/Messages/WaypointMessage.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import type { Protobuf, Types } from "@meshtastic/meshtasticjs";
-import { LocationMessage } from "@pages/Messages/LocationMessage.js";
+import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export interface MessageProps {
   lastMsgSameUser: boolean;
-  messagePacket: Types.MessagePacket;
-  ack: boolean;
-  rxTime: Date;
+  message: AllMessageTypes;
   sender?: Protobuf.NodeInfo;
 }
 
 export const Message = ({
   lastMsgSameUser,
-  messagePacket,
-  ack,
-  rxTime,
+  message,
   sender,
 }: MessageProps): JSX.Element => {
   const { setPeerInfoOpen, setActivePeer } = useDevice();
 
   const openPeer = (): void => {
-    setActivePeer(messagePacket.packet.from);
+    setActivePeer(message.packet.from);
     setPeerInfoOpen(true);
   };
 
   return lastMsgSameUser ? (
     <Pane display="flex" marginLeft={majorScale(3)}>
-      {ack ? (
+      {message.ack ? (
         <FullCircleIcon color="#9c9fab" marginY="auto" size={8} />
       ) : (
         <CircleIcon color="#9c9fab" marginY="auto" size={8} />
       )}
-      {messagePacket.location ? (
-        <LocationMessage location={messagePacket.location} />
+      {"waypointID" in message ? (
+        <WaypointMessage waypointID={message.waypointID} />
       ) : (
         <Text
-          color={ack ? "#474d66" : "#9c9fab"}
+          color={message.ack ? "#474d66" : "#9c9fab"}
           marginLeft={majorScale(2)}
           paddingLeft={majorScale(1)}
           borderLeft="3px solid #e6e6e6"
         >
-          {messagePacket.text}
+          {message.text}
         </Text>
       )}
     </Pane>
@@ -67,28 +64,28 @@ export const Message = ({
           {sender?.user?.longName ?? "UNK"}
         </Strong>
         <Small>
-          {rxTime.toLocaleTimeString(undefined, {
+          {new Date(message.packet.rxTime).toLocaleTimeString(undefined, {
             hour: "2-digit",
             minute: "2-digit",
           })}
         </Small>
       </Pane>
       <Pane display="flex" marginLeft={majorScale(1)}>
-        {ack ? (
+        {message.ack ? (
           <FullCircleIcon color="#9c9fab" marginY="auto" size={8} />
         ) : (
           <CircleIcon color="#9c9fab" marginY="auto" size={8} />
         )}
-        {messagePacket.location ? (
-          <LocationMessage location={messagePacket.location} />
+        {"waypointID" in message ? (
+          <WaypointMessage waypointID={message.waypointID} />
         ) : (
           <Text
-            color={ack ? "#474d66" : "#9c9fab"}
+            color={message.ack ? "#474d66" : "#9c9fab"}
             marginLeft={majorScale(2)}
             paddingLeft={majorScale(1)}
             borderLeft="3px solid #e6e6e6"
           >
-            {messagePacket.text}
+            {message.text}
           </Text>
         )}
       </Pane>

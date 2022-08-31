@@ -37,8 +37,8 @@ export const NewLocationMessage = (): JSX.Element => {
         <Button
           width="100%"
           onClick={() => {
-            void connection?.sendLocation(
-              Protobuf.Location.create({
+            void connection?.sendWaypoint(
+              Protobuf.Waypoint.create({
                 latitudeI: Math.floor(3.89103 * 1e7),
                 longitudeI: Math.floor(105.87005 * 1e7),
                 name: "TEST",

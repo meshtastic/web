@@ -32,6 +32,16 @@ export const subscribeAll = (device: Device, connection: IConnection) => {
     }
   });
 
+  connection.onWaypointPacket.subscribe((waypoint) => {
+    const { data, ...rest } = waypoint;
+    device.addWaypoint(data);
+    device.addWaypointMessage({
+      waypointID: data.id,
+      ack: rest.packet.from !== device.hardware.myNodeNum,
+      ...rest,
+    });
+  });
+
   connection.onMyNodeInfo.subscribe((nodeInfo) => {
     device.setHardware(nodeInfo);
   });
@@ -64,14 +74,8 @@ export const subscribeAll = (device: Device, connection: IConnection) => {
 
   connection.onMessagePacket.subscribe((messagePacket) => {
     device.addMessage({
-      message: messagePacket,
+      ...messagePacket,
       ack: messagePacket.packet.from !== device.hardware.myNodeNum,
-      received: messagePacket.packet.rxTime
-        ? new Date(messagePacket.packet.rxTime * 1000)
-        : new Date(),
     });
-    if (messagePacket.location) {
-      device.addWaypoint(messagePacket.location);
-    }
   });
 };

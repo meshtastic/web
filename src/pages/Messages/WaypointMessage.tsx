@@ -10,16 +10,19 @@ import {
   Text,
 } from "evergreen-ui";
 
+import { useDevice } from "@app/core/providers/useDevice.js";
 import { toMGRS } from "@core/utils/toMGRS.js";
-import type { Protobuf } from "@meshtastic/meshtasticjs";
 
-export interface LocationMessageProps {
-  location: Protobuf.Location;
+export interface WaypointMessageProps {
+  waypointID: number;
 }
 
-export const LocationMessage = ({
-  location,
-}: LocationMessageProps): JSX.Element => {
+export const WaypointMessage = ({
+  waypointID,
+}: WaypointMessageProps): JSX.Element => {
+  const { waypoints } = useDevice();
+  const waypoint = waypoints.find((wp) => wp.id === waypointID);
+
   return (
     <Pane
       marginLeft={majorScale(2)}
@@ -36,12 +39,12 @@ export const LocationMessage = ({
         <LocateIcon color="#474d66" marginY="auto" />
         <Pane>
           <Pane display="flex" gap={majorScale(1)}>
-            <Heading>{location.name}</Heading>
+            <Heading>{waypoint?.name}</Heading>
             <Text color="orange">
-              {toMGRS(location.latitudeI, location.longitudeI)}
+              {toMGRS(waypoint?.latitudeI, waypoint?.longitudeI)}
             </Text>
           </Pane>
-          <Small>{location.description}</Small>
+          <Small>{waypoint?.description}</Small>
         </Pane>
       </Pane>
     </Pane>

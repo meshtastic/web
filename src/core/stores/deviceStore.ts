@@ -13,16 +13,21 @@ export type Page =
   | "channels"
   | "info";
 
-export interface MessageWithAck {
-  message: Types.MessagePacket;
+export interface MessageWithAck extends Types.MessagePacket {
   ack: boolean;
-  received: Date;
 }
+
+export interface WaypointIDWithAck extends Omit<Types.WaypointPacket, "data"> {
+  waypointID: number;
+  ack: boolean;
+}
+
+export type AllMessageTypes = MessageWithAck | WaypointIDWithAck;
 
 export interface Channel {
   config: Protobuf.Channel;
   lastInterraction: Date;
-  messages: MessageWithAck[];
+  messages: AllMessageTypes[];
 }
 
 export interface Node {
@@ -44,7 +49,7 @@ export interface Device {
   activePage: Page;
   peerInfoOpen: boolean;
   activePeer: number;
-  waypoints: Protobuf.Location[];
+  waypoints: Protobuf.Waypoint[];
   regionUnset: boolean;
 
   setReady(ready: boolean): void;
@@ -57,12 +62,13 @@ export interface Device {
   setPeerInfoOpen: (open: boolean) => void;
   setActivePeer: (peer: number) => void;
   addChannel: (channel: Channel) => void;
-  addWaypoint: (waypoint: Protobuf.Location) => void;
+  addWaypoint: (waypoint: Protobuf.Waypoint) => void;
   addNodeInfo: (nodeInfo: Types.NodeInfoPacket) => void;
   addUser: (user: Types.UserPacket) => void;
   addPosition: (position: Types.PositionPacket) => void;
   addConnection: (connection: IConnection) => void;
   addMessage: (message: MessageWithAck) => void;
+  addWaypointMessage: (message: WaypointIDWithAck) => void;
   ackMessage: (channelIndex: number, messageId: number) => void;
 }
 
@@ -265,7 +271,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               })
             );
           },
-          addWaypoint: (waypoint: Protobuf.Location) => {
+          addWaypoint: (waypoint: Protobuf.Waypoint) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -404,10 +410,20 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.channels
-                    .find(
-                      (ch) => ch.config.index === message.message.packet.channel
-                    )
+                    .find((ch) => ch.config.index === message.packet.channel)
                     ?.messages.push(message);
+                }
+              })
+            );
+          },
+          addWaypointMessage: (waypointID) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.channels
+                    .find((ch) => ch.config.index === waypointID.packet.channel)
+                    ?.messages.push(waypointID);
                 }
               })
             );
@@ -424,7 +440,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   );
                   if (channel) {
                     const message = channel.messages.find(
-                      (msg) => msg.message.packet.id === messageId
+                      (msg) => msg.packet.id === messageId
                     );
                     if (message) {
                       message.ack = true;

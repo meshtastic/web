@@ -45,19 +45,15 @@ export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
         {channel.messages.map((message, index) => (
           <Message
             key={index}
-            messagePacket={message.message}
-            ack={message.ack}
-            rxTime={message.received}
+            message={message}
             lastMsgSameUser={
               index === 0
                 ? false
-                : channel.messages[index - 1].message.packet.from ===
-                  message.message.packet.from
+                : channel.messages[index - 1].packet.from ===
+                  message.packet.from
             }
             sender={
-              nodes.find(
-                (node) => node.data.num === message.message.packet.from
-              )?.data
+              nodes.find((node) => node.data.num === message.packet.from)?.data
             }
           />
         ))}
