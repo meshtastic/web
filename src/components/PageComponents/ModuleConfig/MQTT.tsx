@@ -52,7 +52,7 @@ export const MQTT = (): JSX.Element => {
   return (
     <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
       <FormField
-        label="Module Disabled"
+        label="Module Enabled"
         description="Description"
         isInvalid={!!errors.enabled?.message}
         validationMessage={errors.enabled?.message}
@@ -67,19 +67,19 @@ export const MQTT = (): JSX.Element => {
       </FormField>
       <TextInputField
         label="MQTT Server Address"
-        description="Max transmit power in dBm"
+        description="Description"
         disabled={!moduleEnabled}
         {...register("address")}
       />
       <TextInputField
         label="MQTT Username"
-        description="Max transmit power in dBm"
+        description="Description"
         disabled={!moduleEnabled}
         {...register("username")}
       />
       <TextInputField
         label="MQTT Password"
-        description="Max transmit power in dBm"
+        description="Description"
         type="password"
         autoComplete="off"
         disabled={!moduleEnabled}
