@@ -25,7 +25,7 @@ export const MQTT = (): JSX.Element => {
 
   const moduleEnabled = useWatch({
     control,
-    name: "disabled",
+    name: "enabled",
     defaultValue: false,
   });
 
@@ -54,11 +54,11 @@ export const MQTT = (): JSX.Element => {
       <FormField
         label="Module Disabled"
         description="Description"
-        isInvalid={!!errors.disabled?.message}
-        validationMessage={errors.disabled?.message}
+        isInvalid={!!errors.enabled?.message}
+        validationMessage={errors.enabled?.message}
       >
         <Controller
-          name="disabled"
+          name="enabled"
           control={control}
           render={({ field: { value, ...field } }) => (
             <Switch height={24} marginLeft="auto" checked={value} {...field} />
@@ -68,13 +68,13 @@ export const MQTT = (): JSX.Element => {
       <TextInputField
         label="MQTT Server Address"
         description="Max transmit power in dBm"
-        disabled={moduleEnabled}
+        disabled={!moduleEnabled}
         {...register("address")}
       />
       <TextInputField
         label="MQTT Username"
         description="Max transmit power in dBm"
-        disabled={moduleEnabled}
+        disabled={!moduleEnabled}
         {...register("username")}
       />
       <TextInputField
@@ -82,13 +82,13 @@ export const MQTT = (): JSX.Element => {
         description="Max transmit power in dBm"
         type="password"
         autoComplete="off"
-        disabled={moduleEnabled}
+        disabled={!moduleEnabled}
         {...register("password")}
       />
       <FormField
         label="Encryption Enabled"
         description="Description"
-        disabled={moduleEnabled}
+        disabled={!moduleEnabled}
         isInvalid={!!errors.encryptionEnabled?.message}
         validationMessage={errors.encryptionEnabled?.message}
       >
