@@ -29,7 +29,7 @@ export const HTTP = ({ close }: HTTPProps): JSX.Element => {
     tls: boolean;
   }>({
     defaultValues: {
-      ip: "",
+      ip: "meshtastic.local",
       tls: false,
     },
   });
