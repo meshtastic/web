@@ -22,7 +22,7 @@
     "@emeraldpay/hashicon-react": "^0.5.2",
     "@hookform/resolvers": "^2.9.7",
     "@meshtastic/eslint-config": "^1.0.8",
-    "@meshtastic/meshtasticjs": "^0.6.95",
+    "@meshtastic/meshtasticjs": "^0.6.97",
     "base64-js": "^1.5.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
@@ -44,20 +44,20 @@
     "zustand": "4.1.1"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.195",
+    "@types/chrome": "^0.0.196",
     "@types/geodesy": "^2.2.3",
-    "@types/node": "^18.7.14",
+    "@types/node": "^18.7.15",
     "@types/react": "^18.0.18",
     "@types/react-dom": "^18.0.6",
     "@types/w3c-web-serial": "^1.0.2",
     "@types/web-bluetooth": "^0.0.15",
-    "@vitejs/plugin-react": "^2.0.1",
+    "@vitejs/plugin-react": "^2.1.0",
     "gzipper": "^7.1.0",
-    "rollup-plugin-visualizer": "^5.8.0",
+    "rollup-plugin-visualizer": "^5.8.1",
     "tar": "^6.1.11",
     "tslib": "^2.4.0",
     "typescript": "^4.8.2",
-    "vite": "^3.0.9",
+    "vite": "^3.1.0",
     "vite-plugin-environment": "^1.1.2"
   }
 }

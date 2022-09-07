@@ -17,4 +17,7 @@ export class MQTTValidation implements Protobuf.ModuleConfig_MQTTConfig {
 
   @IsBoolean()
   encryptionEnabled: boolean;
+
+  @IsBoolean()
+  jsonEnabled: boolean;
 }

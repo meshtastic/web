@@ -100,6 +100,21 @@ export const MQTT = (): JSX.Element => {
           )}
         />
       </FormField>
+      <FormField
+        label="JSON Output Enabled"
+        description="Description"
+        disabled={!moduleEnabled}
+        isInvalid={!!errors.jsonEnabled?.message}
+        validationMessage={errors.jsonEnabled?.message}
+      >
+        <Controller
+          name="jsonEnabled"
+          control={control}
+          render={({ field: { value, ...field } }) => (
+            <Switch height={24} marginLeft="auto" checked={value} {...field} />
+          )}
+        />
+      </FormField>
     </Form>
   );
 };

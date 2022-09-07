@@ -42,7 +42,6 @@ export const Serial = ({ close }: CloseProps): JSX.Element => {
     const connection = new ISerialConnection(id);
     await connection.connect({
       port,
-      baudRate: 115200,
     });
     device.addConnection(connection);
     subscribeAll(device, connection);
