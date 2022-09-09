@@ -15,7 +15,7 @@ export class LoRaValidation implements Protobuf.Config_LoRaConfig {
   bandwidth: number;
 
   @IsInt()
-  @Min(7)
+  // @Min(7)
   @Max(12)
   spreadFactor: number;
 

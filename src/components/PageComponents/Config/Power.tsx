@@ -1,15 +1,13 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, SelectField, Switch, TextInputField } from "evergreen-ui";
+import { FormField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm } from "react-hook-form";
 
 import { PowerValidation } from "@app/validation/config/power.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
-import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
-import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Power = (): JSX.Element => {
   const { config, connection } = useDevice();
@@ -47,15 +45,6 @@ export const Power = (): JSX.Element => {
   });
   return (
     <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <SelectField
-        label="Charge current"
-        description="This is a description."
-        isInvalid={!!errors.chargeCurrent?.message}
-        validationMessage={errors.chargeCurrent?.message}
-        {...register("chargeCurrent", { valueAsNumber: true })}
-      >
-        {renderOptions(Protobuf.Config_PowerConfig_ChargeCurrent)}
-      </SelectField>
       <TextInputField
         label="Shutdown on battery delay"
         description="This is a description."

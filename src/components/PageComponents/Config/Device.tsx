@@ -1,13 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import {
-  FormField,
-  SelectField,
-  Switch,
-  TextInputField,
-  toaster,
-} from "evergreen-ui";
+import { FormField, SelectField, Switch, toaster } from "evergreen-ui";
 import { Controller, useForm } from "react-hook-form";
 
 import { DeviceValidation } from "@app/validation/config/device.js";
@@ -105,13 +99,6 @@ export const Device = (): JSX.Element => {
           )}
         />
       </FormField>
-      <TextInputField
-        label="NTP Server"
-        description="This is a description."
-        isInvalid={!!errors.ntpServer?.message}
-        validationMessage={errors.ntpServer?.message}
-        {...register("ntpServer")}
-      />
     </Form>
   );
 };

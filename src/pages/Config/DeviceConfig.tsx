@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { Pane, Tab, Tablist } from "evergreen-ui";
 
+import { Network } from "@app/components/PageComponents/Config/Network.js";
 import { Bluetooth } from "@components/PageComponents/Config/Bluetooth.js";
 import { Device } from "@components/PageComponents/Config/Device.js";
 import { Display } from "@components/PageComponents/Config/Display.js";
@@ -10,7 +11,6 @@ import { LoRa } from "@components/PageComponents/Config/LoRa.js";
 import { Position } from "@components/PageComponents/Config/Position.js";
 import { Power } from "@components/PageComponents/Config/Power.js";
 import { User } from "@components/PageComponents/Config/User.js";
-import { WiFi } from "@components/PageComponents/Config/WiFi.js";
 import { useDevice } from "@core/providers/useDevice.js";
 
 export const DeviceConfig = (): JSX.Element => {
@@ -35,8 +35,8 @@ export const DeviceConfig = (): JSX.Element => {
       element: Power,
     },
     {
-      label: "WiFi",
-      element: WiFi,
+      label: "Network",
+      element: Network,
       disabled: !hardware.hasWifi,
     },
     {

@@ -1,11 +1,8 @@
-import { IsBoolean, IsEnum, IsInt, Max, Min } from "class-validator";
+import { IsBoolean, IsInt, Max, Min } from "class-validator";
 
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class PowerValidation implements Protobuf.Config_PowerConfig {
-  @IsEnum(Protobuf.Config_PowerConfig_ChargeCurrent)
-  chargeCurrent: Protobuf.Config_PowerConfig_ChargeCurrent;
-
   @IsBoolean()
   isPowerSaving: boolean;
 

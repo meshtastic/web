@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, Length } from "class-validator";
+import { IsBoolean, IsEnum } from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -14,7 +14,4 @@ export class DeviceValidation implements Protobuf.Config_DeviceConfig {
 
   @IsBoolean()
   debugLogEnabled: boolean;
-
-  @Length(2, 30)
-  ntpServer: string;
 }

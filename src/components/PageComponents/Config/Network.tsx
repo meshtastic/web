@@ -11,13 +11,13 @@ import {
 import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { renderOptions } from "@app/core/utils/selectEnumOptions.js";
-import { WiFiValidation } from "@app/validation/config/wifi.js";
+import { NetworkValidation } from "@app/validation/config/network.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
-export const WiFi = (): JSX.Element => {
+export const Network = (): JSX.Element => {
   const { config, connection } = useDevice();
   const [loading, setLoading] = useState(false);
   const {
@@ -26,32 +26,32 @@ export const WiFi = (): JSX.Element => {
     formState: { errors, isDirty },
     control,
     reset,
-  } = useForm<WiFiValidation>({
-    defaultValues: config.wifi,
-    resolver: classValidatorResolver(WiFiValidation),
+  } = useForm<NetworkValidation>({
+    defaultValues: config.network,
+    resolver: classValidatorResolver(NetworkValidation),
   });
 
   const wifiEnabled = useWatch({
     control,
-    name: "enabled",
+    name: "wifiEnabled",
     defaultValue: false,
   });
 
   useEffect(() => {
-    reset(config.wifi);
-  }, [reset, config.wifi]);
+    reset(config.network);
+  }, [reset, config.network]);
 
   const onSubmit = handleSubmit((data) => {
     setLoading(true);
     void connection?.setConfig(
       {
         payloadVariant: {
-          oneofKind: "wifi",
-          wifi: data,
+          oneofKind: "network",
+          network: data,
         },
       },
       async () => {
-        toaster.success("Successfully updated WiFi config");
+        toaster.success("Successfully updated Network config");
         reset({ ...data });
         setLoading(false);
         await Promise.resolve();
@@ -63,11 +63,11 @@ export const WiFi = (): JSX.Element => {
       <FormField
         label="WiFi Enabled"
         description="Description"
-        isInvalid={!!errors.enabled?.message}
-        validationMessage={errors.enabled?.message}
+        isInvalid={!!errors.wifiEnabled?.message}
+        validationMessage={errors.wifiEnabled?.message}
       >
         <Controller
-          name="enabled"
+          name="wifiEnabled"
           control={control}
           render={({ field: { value, ...field } }) => (
             <Switch height={24} marginLeft="auto" checked={value} {...field} />
@@ -77,24 +77,31 @@ export const WiFi = (): JSX.Element => {
       <SelectField
         label="WiFi Mode"
         description="This is a description."
-        {...register("mode", { valueAsNumber: true })}
+        {...register("wifiMode", { valueAsNumber: true })}
       >
-        {renderOptions(Protobuf.Config_WiFiConfig_WiFiMode)}
+        {renderOptions(Protobuf.Config_NetworkConfig_WiFiMode)}
       </SelectField>
       <TextInputField
         label="SSID"
         description="This is a description."
-        isInvalid={!!errors.ssid?.message}
-        validationMessage={errors.ssid?.message}
-        {...register("ssid")}
+        isInvalid={!!errors.wifiSsid?.message}
+        validationMessage={errors.wifiSsid?.message}
+        {...register("wifiSsid")}
       />
       <TextInputField
         label="PSK"
         type="password"
         description="This is a description."
-        isInvalid={!!errors.psk?.message}
-        validationMessage={errors.psk?.message}
-        {...register("psk")}
+        isInvalid={!!errors.wifiPsk?.message}
+        validationMessage={errors.wifiPsk?.message}
+        {...register("wifiPsk")}
+      />
+      <TextInputField
+        label="NTP Server"
+        description="This is a description."
+        isInvalid={!!errors.ntpServer?.message}
+        validationMessage={errors.ntpServer?.message}
+        {...register("ntpServer")}
       />
     </Form>
   );

@@ -140,8 +140,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     case "power":
                       device.config.power = config.payloadVariant.power;
                       break;
-                    case "wifi":
-                      device.config.wifi = config.payloadVariant.wifi;
+                    case "network":
+                      device.config.network = config.payloadVariant.network;
                       break;
                     case "display":
                       device.config.display = config.payloadVariant.display;
@@ -150,7 +150,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       device.config.lora = config.payloadVariant.lora;
                       device.regionUnset =
                         config.payloadVariant.lora.region ===
-                        Protobuf.Config_LoRaConfig_RegionCode.Unset;
+                        Protobuf.Config_LoRaConfig_RegionCode.UNSET;
                       break;
                   }
                 }

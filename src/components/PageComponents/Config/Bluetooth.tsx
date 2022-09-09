@@ -50,7 +50,7 @@ export const Bluetooth = (): JSX.Element => {
   const pairingMode = useWatch({
     control,
     name: "mode",
-    defaultValue: Protobuf.Config_BluetoothConfig_PairingMode.RandomPin,
+    defaultValue: Protobuf.Config_BluetoothConfig_PairingMode.RANDOM_PIN,
   });
 
   return (
@@ -82,7 +82,7 @@ export const Bluetooth = (): JSX.Element => {
 
       <TextInputField
         display={
-          pairingMode !== Protobuf.Config_BluetoothConfig_PairingMode.FixedPin
+          pairingMode !== Protobuf.Config_BluetoothConfig_PairingMode.FIXED_PIN
             ? "none"
             : "block"
         }

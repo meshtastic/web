@@ -94,7 +94,7 @@ export const PeersDialog = ({
                     onClick={() => {
                       void connection?.sendPacket(
                         Protobuf.AdminMessage.toBinary({
-                          variant: {
+                          payloadVariant: {
                             oneofKind: "getConfigRequest",
                             getConfigRequest:
                               Protobuf.AdminMessage_ConfigType.LORA_CONFIG,

@@ -144,7 +144,7 @@ export const Position = (): JSX.Element => {
             .filter(
               (value) =>
                 parseInt(value[0]) !==
-                Protobuf.Config_PositionConfig_PositionFlags.POS_UNDEFINED
+                Protobuf.Config_PositionConfig_PositionFlags.UNSET
             )
             .map((value) => {
               return {
