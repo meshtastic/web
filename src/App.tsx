@@ -19,7 +19,7 @@ export const App = (): JSX.Element => {
   const device = getDevice(selectedDevice);
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-screen w-full">
       <DeviceSelector />
 
       {device && (

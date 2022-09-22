@@ -10,7 +10,7 @@ export const InfoPage = (): JSX.Element => {
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
   return (
-    <div>
+    <div className="w-full overflow-y-auto">
       <JSONPretty data={myNode} />
       <JSONPretty data={hardware} />
     </div>
