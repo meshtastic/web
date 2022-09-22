@@ -73,7 +73,11 @@ export const Sidebar = (): JSX.Element => {
           batteryLevel={telemtery?.batteryLevel ?? 0}
           voltage={telemtery?.voltage ?? 0}
         />
-        <PeersWidget peers={nodes.map((n) => n.data)} />
+        <PeersWidget
+          peers={nodes
+            .map((n) => n.data)
+            .filter((n) => n.num !== hardware.myNodeNum)}
+        />
         <PositionWidget grid={grid} />
 
         <ConfiguringWidget />
