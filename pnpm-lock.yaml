@@ -6,7 +6,7 @@ specifiers:
   '@heroicons/react': ^2.0.11
   '@hookform/resolvers': ^2.9.8
   '@meshtastic/eslint-config': ^1.0.8
-  '@meshtastic/meshtasticjs': ^0.6.99
+  '@meshtastic/meshtasticjs': ^0.6.101
   '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.7
   '@types/chrome': ^0.0.197
@@ -52,7 +52,7 @@ dependencies:
   '@heroicons/react': 2.0.11_react@18.2.0
   '@hookform/resolvers': 2.9.8_react-hook-form@7.36.0
   '@meshtastic/eslint-config': 1.0.8
-  '@meshtastic/meshtasticjs': 0.6.99
+  '@meshtastic/meshtasticjs': 0.6.101
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.1.8
   '@tailwindcss/typography': 0.5.7_tailwindcss@3.1.8
   base64-js: 1.5.1
@@ -572,8 +572,8 @@ packages:
       - supports-color
     dev: false
 
-  /@meshtastic/meshtasticjs/0.6.99:
-    resolution: {integrity: sha512-iex27pv4BFqKj//zm30zlD2drDtHqcvKYcHwJChDk2SP3M0w+apZBRbFKAsyftvlJOdg/rxM5LhoBIXVpuEDjw==}
+  /@meshtastic/meshtasticjs/0.6.101:
+    resolution: {integrity: sha512-PNnLZsmYoNdwf5pWYxQZm21wUgQYndSrLZSG0duE47ug6LNdTP5XptX1eJYcnOSNMbBM8oIzjRuX4yPaf/Jm5Q==}
     dependencies:
       '@meshtastic/eslint-config': 1.0.8
       '@protobuf-ts/runtime': 2.8.1
@@ -980,7 +980,7 @@ packages:
       '@babel/plugin-transform-react-jsx-development': 7.18.6_@babel+core@7.19.1
       '@babel/plugin-transform-react-jsx-self': 7.18.6_@babel+core@7.19.1
       '@babel/plugin-transform-react-jsx-source': 7.18.6_@babel+core@7.19.1
-      magic-string: 0.26.3
+      magic-string: 0.26.4
       react-refresh: 0.14.0
       vite: 3.1.3
     transitivePeerDependencies:
@@ -2553,8 +2553,8 @@ packages:
       yallist: 4.0.0
     dev: false
 
-  /magic-string/0.26.3:
-    resolution: {integrity: sha512-u1Po0NDyFcwdg2nzHT88wSK0+Rih0N1M+Ph1Sp08k8yvFFU3KR72wryS7e1qMPJypt99WB7fIFVCA92mQrMjrg==}
+  /magic-string/0.26.4:
+    resolution: {integrity: sha512-e5uXtVJ22aEpK9u1+eQf0fSxHeqwyV19K+uGnlROCxUhzwRip9tBsaMViK/0vC3viyPd5Gtucp3UmEp/Q2cPTQ==}
     engines: {node: '>=12'}
     dependencies:
       sourcemap-codec: 1.4.8
