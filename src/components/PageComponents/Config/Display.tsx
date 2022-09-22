@@ -1,9 +1,11 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, SelectField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Select } from "@app/components/form/Select.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { DisplayValidation } from "@app/validation/config/display.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -46,42 +48,47 @@ export const Display = (): JSX.Element => {
     );
   });
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <TextInputField
+    <Form
+      title="Display Config"
+      breadcrumbs={["Config", "Display"]}
+      reset={() => reset(config.display)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Input
         label="Screen Timeout"
         description="This is a description."
-        hint="Seconds"
+        suffix="Seconds"
         type="number"
         {...register("screenOnSecs", { valueAsNumber: true })}
       />
-      <TextInputField
+      <Input
         label="Carousel Delay"
         description="This is a description."
-        hint="Seconds"
+        suffix="Seconds"
         type="number"
         {...register("autoScreenCarouselSecs", { valueAsNumber: true })}
       />
-      <SelectField
+      <Select
         label="GPS Display Units"
         description="This is a description."
         {...register("gpsFormat", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.Config_DisplayConfig_GpsCoordinateFormat)}
-      </SelectField>
-      <FormField
-        label="Compass North Top"
-        description="Description"
-        isInvalid={!!errors.compassNorthTop?.message}
-        validationMessage={errors.compassNorthTop?.message}
-      >
-        <Controller
-          name="compassNorthTop"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
+      </Select>
+      <Controller
+        name="compassNorthTop"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Compass North Top"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
     </Form>
   );
 };

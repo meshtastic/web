@@ -1,7 +1,5 @@
 import type React from "react";
-import { useState } from "react";
-
-import { Pane, Tab, Tablist } from "evergreen-ui";
+import { Fragment } from "react";
 
 import { Network } from "@app/components/PageComponents/Config/Network.js";
 import { Bluetooth } from "@components/PageComponents/Config/Bluetooth.js";
@@ -12,9 +10,9 @@ import { Position } from "@components/PageComponents/Config/Position.js";
 import { Power } from "@components/PageComponents/Config/Power.js";
 import { User } from "@components/PageComponents/Config/User.js";
 import { useDevice } from "@core/providers/useDevice.js";
+import { Tab } from "@headlessui/react";
 
 export const DeviceConfig = (): JSX.Element => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const { hardware } = useDevice();
 
   const configSections = [
@@ -54,32 +52,31 @@ export const DeviceConfig = (): JSX.Element => {
   ];
 
   return (
-    <Pane display="flex">
-      <Pane flexBasis={150} marginRight={24}>
-        <Tablist>
-          {configSections.map((Config, index) => (
-            <Tab
-              key={index}
-              direction="vertical"
-              isSelected={index === selectedIndex}
-              onSelect={() => setSelectedIndex(index)}
-              disabled={Config.disabled}
-            >
-              {Config.label}
-            </Tab>
-          ))}
-        </Tablist>
-      </Pane>
-      <Pane flex="1">
+    <Tab.Group as="div" className="flex gap-3 w-full">
+      <Tab.List className="flex flex-col w-44 gap-1">
         {configSections.map((Config, index) => (
-          <Pane
-            key={index}
-            display={index === selectedIndex ? "block" : "none"}
-          >
-            <Config.element />
-          </Pane>
+          <Tab key={index} as={Fragment}>
+            {({ selected }) => (
+              <div
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer ${
+                  selected
+                    ? "bg-gray-100 text-gray-900"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                }`}
+              >
+                {Config.label}
+              </div>
+            )}
+          </Tab>
         ))}
-      </Pane>
-    </Pane>
+      </Tab.List>
+      <Tab.Panels as={Fragment}>
+        {configSections.map((Config, index) => (
+          <Tab.Panel key={index} as={Fragment}>
+            <Config.element />
+          </Tab.Panel>
+        ))}
+      </Tab.Panels>
+    </Tab.Group>
   );
 };

@@ -2,21 +2,14 @@ import type React from "react";
 import { useEffect, useState } from "react";
 
 import { fromByteArray } from "base64-js";
-import {
-  Checkbox,
-  ClipboardIcon,
-  FormField,
-  IconButton,
-  majorScale,
-  Pane,
-  TextInputField,
-  Tooltip,
-} from "evergreen-ui";
 import { QRCode } from "react-qrcode-logo";
 
+import { Dialog } from "@headlessui/react";
+import { ClipboardIcon } from "@heroicons/react/24/outline";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
-import { Dialog } from "./index.js";
+import { Checkbox } from "../form/Checkbox.js";
+import { Input } from "../form/Input.js";
 
 export interface QRDialogProps {
   isOpen: boolean;
@@ -54,64 +47,65 @@ export const QRDialog = ({
   }, [channels, selectedChannels, loraConfig]);
 
   return (
-    // <Dialog
-    //   isShown={isOpen}
-    //
-    //   onCloseComplete={close}
-    //   hasFooter={false}
-    // >
-    <Dialog isOpen={isOpen} close={close} title="Generate QR Code" background>
-      <Pane display="flex">
-        <FormField
-          width="12rem"
-          label="Channels to include"
-          description="The current LoRa configuration will also be shared."
-        >
-          {channels.map((channel) => (
-            <Checkbox
-              key={channel.index}
-              disabled={channel.role === Protobuf.Channel_Role.DISABLED}
-              label={
-                channel.settings?.name.length
-                  ? channel.settings.name
-                  : channel.role === Protobuf.Channel_Role.PRIMARY
-                  ? "Primary"
-                  : `Channel: ${channel.index}`
-              }
-              checked={selectedChannels.includes(channel.index)}
-              onChange={() => {
-                if (selectedChannels.includes(channel.index)) {
-                  setSelectedChannels(
-                    selectedChannels.filter((c) => c !== channel.index)
-                  );
-                } else {
-                  setSelectedChannels([...selectedChannels, channel.index]);
-                }
-              }}
-            />
-          ))}
-        </FormField>
-        <Pane
-          display="flex"
-          flexDirection="column"
-          flexGrow={1}
-          margin={majorScale(1)}
-        >
-          <Pane display="flex" margin="auto">
-            <QRCode value={QRCodeURL} size={250} qrStyle="dots" />
-          </Pane>
-          <Pane display="flex" gap={majorScale(1)}>
-            <TextInputField
-              label="Sharable URL"
-              value={QRCodeURL}
-              width="100%"
-            />
-            <Tooltip content="Copy to Clipboard">
-              <IconButton icon={ClipboardIcon} marginTop="1.6rem" />
-            </Tooltip>
-          </Pane>
-        </Pane>
-      </Pane>
+    <Dialog open={isOpen} onClose={close}>
+      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <Dialog.Panel className="mx-auto max-w-sm rounded bg-white p-3">
+          <Dialog.Title>Generate QR Code</Dialog.Title>
+
+          <Dialog.Description>
+            This will permanently deactivate your account
+          </Dialog.Description>
+          <div className="flex">
+            <div className="flex flex-col">
+              <span className="font-medium text-lg">Channels to include</span>
+              <span className="text-sm text-slate-600">
+                The current LoRa configuration will also be shared.
+              </span>
+              {channels.map((channel) => (
+                <Checkbox
+                  key={channel.index}
+                  disabled={channel.role === Protobuf.Channel_Role.DISABLED}
+                  label={
+                    channel.settings?.name.length
+                      ? channel.settings.name
+                      : channel.role === Protobuf.Channel_Role.PRIMARY
+                      ? "Primary"
+                      : `Channel: ${channel.index}`
+                  }
+                  checked={selectedChannels.includes(channel.index)}
+                  onChange={() => {
+                    if (selectedChannels.includes(channel.index)) {
+                      setSelectedChannels(
+                        selectedChannels.filter((c) => c !== channel.index)
+                      );
+                    } else {
+                      setSelectedChannels([...selectedChannels, channel.index]);
+                    }
+                  }}
+                />
+              ))}
+            </div>
+            <div className="flex flex-col flex-grow m-2">
+              <div className="flex m-auto">
+                <QRCode value={QRCodeURL} size={250} qrStyle="dots" />
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  label="Sharable URL"
+                  value={QRCodeURL}
+                  action={{
+                    icon: <ClipboardIcon className="h-4" />,
+                    action: () => {
+                      console.log("");
+                    },
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </Dialog.Panel>
+      </div>
     </Dialog>
   );
 };

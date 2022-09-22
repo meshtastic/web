@@ -1,10 +1,12 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, SelectField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm } from "react-hook-form";
 import { base16 } from "rfc4648";
 
+import { Input } from "@app/components/form/Input.js";
+import { Select } from "@app/components/form/Select.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { UserValidation } from "@app/validation/config/user.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -50,27 +52,39 @@ export const User = (): JSX.Element => {
   });
 
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <TextInputField
+    <Form
+      title="User Config"
+      breadcrumbs={["Config", "User"]}
+      reset={() => {
+        reset({
+          longName: myNode?.data.user?.longName,
+          shortName: myNode?.data.user?.shortName,
+          isLicensed: myNode?.data.user?.isLicensed,
+        });
+      }}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Input
         label="Device ID"
         description="Preset unique identifier for this device."
-        isInvalid={!!errors.id?.message}
-        validationMessage={errors.id?.message}
+        error={errors.id?.message}
         {...register("id")}
         readOnly
       />
-      <TextInputField
+      <Input
         label="Device Name"
         description="Personalised name for this device."
         {...register("longName")}
       />
-      <TextInputField
+      <Input
         label="Short Name"
         description="This is a description."
         maxLength={3}
         {...register("shortName")}
       />
-      <TextInputField
+      <Input
         label="Mac Address"
         description="This is a description."
         disabled
@@ -81,28 +95,26 @@ export const User = (): JSX.Element => {
             ?.join(":") ?? ""
         }
       />
-      <SelectField
+      <Select
         label="Hardware"
         description="This is a description."
         disabled
         value={myNode?.data.user?.hwModel}
       >
         {renderOptions(Protobuf.HardwareModel)}
-      </SelectField>
-      <FormField
-        label="Licenced Operator?"
-        description="Description"
-        isInvalid={!!errors.isLicensed?.message}
-        validationMessage={errors.isLicensed?.message}
-      >
-        <Controller
-          name="isLicensed"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
+      </Select>
+      <Controller
+        name="isLicensed"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Licenced Operator?"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
     </Form>
   );
 };

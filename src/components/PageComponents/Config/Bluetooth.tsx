@@ -1,9 +1,11 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, SelectField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Select } from "@app/components/form/Select.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { BluetoothValidation } from "@app/validation/config/bluetooth.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -54,43 +56,41 @@ export const Bluetooth = (): JSX.Element => {
   });
 
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <FormField
-        label="Bluetooth Enabled"
-        description="Description"
-        isInvalid={!!errors.enabled?.message}
-        validationMessage={errors.enabled?.message}
-      >
-        <Controller
-          name="enabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-
-      <SelectField
+    <Form
+      title="Bluetooth Config"
+      breadcrumbs={["Config", "Bluetooth"]}
+      reset={() => reset(config.bluetooth)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Controller
+        name="enabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Select
         label="Pairing mode"
         description="This is a description."
-        isInvalid={!!errors.mode?.message}
-        validationMessage={errors.mode?.message}
         {...register("mode", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.Config_BluetoothConfig_PairingMode)}
-      </SelectField>
+      </Select>
 
-      <TextInputField
-        display={
+      <Input
+        disabled={
           pairingMode !== Protobuf.Config_BluetoothConfig_PairingMode.FIXED_PIN
-            ? "none"
-            : "block"
         }
         label="Pin"
         description="This is a description."
         type="number"
-        isInvalid={!!errors.fixedPin?.message}
-        validationMessage={errors.fixedPin?.message}
         {...register("fixedPin", {
           valueAsNumber: true,
         })}

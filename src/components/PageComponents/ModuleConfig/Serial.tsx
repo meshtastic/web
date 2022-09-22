@@ -1,9 +1,10 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { SerialValidation } from "@app/validation/moduleConfig/serial.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -51,37 +52,39 @@ export const Serial = (): JSX.Element => {
   });
 
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <FormField
-        label="Module Enabled"
-        description="Description"
-        isInvalid={!!errors.enabled?.message}
-        validationMessage={errors.enabled?.message}
-      >
-        <Controller
-          name="enabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <FormField
-        label="Echo"
-        description="Description"
-        disabled={!moduleEnabled}
-        isInvalid={!!errors.echo?.message}
-        validationMessage={errors.echo?.message}
-      >
-        <Controller
-          name="echo"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <TextInputField
+    <Form
+      title="Serial Config"
+      breadcrumbs={["Module Config", "Serial"]}
+      reset={() => reset(moduleConfig.serial)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Controller
+        name="enabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Module Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="echo"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Echo"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Input
         type="number"
         label="RX"
         description="Max transmit power in dBm"
@@ -90,7 +93,7 @@ export const Serial = (): JSX.Element => {
           valueAsNumber: true,
         })}
       />
-      <TextInputField
+      <Input
         type="number"
         label="TX Pin"
         description="Max transmit power in dBm"
@@ -99,7 +102,7 @@ export const Serial = (): JSX.Element => {
           valueAsNumber: true,
         })}
       />
-      <TextInputField
+      <Input
         type="number"
         label="Baud Rate"
         description="Max transmit power in dBm"
@@ -108,7 +111,7 @@ export const Serial = (): JSX.Element => {
           valueAsNumber: true,
         })}
       />
-      <TextInputField
+      <Input
         type="number"
         label="Timeout"
         description="Max transmit power in dBm"
@@ -117,7 +120,7 @@ export const Serial = (): JSX.Element => {
           valueAsNumber: true,
         })}
       />
-      <TextInputField
+      <Input
         type="number"
         label="Mode"
         description="Max transmit power in dBm"

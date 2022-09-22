@@ -1,8 +1,6 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { Pane } from "evergreen-ui";
-
 export interface File {
   nameModified: string;
   name: string;
@@ -33,9 +31,9 @@ export const FileBrowser = (): JSX.Element => {
   });
 
   return (
-    <Pane>
+    <div>
       {data?.data.files.map((file) => (
-        <Pane key={file.name}>
+        <div key={file.name}>
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -43,8 +41,8 @@ export const FileBrowser = (): JSX.Element => {
           >
             {file.name.replace("static/", "").replace(".gz", "")}
           </a>
-        </Pane>
+        </div>
       ))}
-    </Pane>
+    </div>
   );
 };

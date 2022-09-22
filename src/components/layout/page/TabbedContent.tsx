@@ -1,12 +1,11 @@
 import type React from "react";
-import { useState } from "react";
+import { Fragment } from "react";
 
-import { IconComponent, majorScale, Pane, Tab, Tablist } from "evergreen-ui";
-import type { IconType } from "react-icons";
+import { Tab } from "@headlessui/react";
 
 export interface TabType {
   name: string;
-  icon: IconComponent | IconType;
+  icon?: JSX.Element;
   element: () => JSX.Element;
   disabled?: boolean;
 }
@@ -20,55 +19,41 @@ export const TabbedContent = ({
   tabs,
   actions,
 }: TabbedContentProps): JSX.Element => {
-  const [selectedTab, setSelectedTab] = useState(0);
-
   return (
-    <Pane
-      margin={majorScale(3)}
-      borderRadius={majorScale(1)}
-      background="white"
-      elevation={1}
-      display="flex"
-      flexGrow={1}
-      flexDirection="column"
-      padding={majorScale(2)}
-      gap={majorScale(2)}
-    >
-      <Pane borderBottom="muted" paddingBottom={majorScale(2)}>
-        <Pane display="flex">
-          <Tablist>
-            {tabs.map((Entry, index) => (
-              <Tab
-                key={index}
-                userSelect="none"
-                disabled={Entry.disabled}
-                gap={5}
-                onSelect={() => setSelectedTab(index)}
-                isSelected={selectedTab === index}
+    <Tab.Group as="div" className="flex flex-col gap-2 p-4 flex-grow">
+      <Tab.List className="flex gap-4 border-b pb-3">
+        {tabs.map((entry, index) => (
+          <Tab key={index}>
+            {({ selected }) => (
+              <div
+                className={`flex gap-3 h-10 font-medium text-sm rounded-md cursor-pointer px-3 ${
+                  selected
+                    ? "bg-gray-100 text-gray-700"
+                    : "text-gray-500 hover:text-gray-700"
+                }
+                   `}
               >
-                <Entry.icon />
-                {Entry.name}
-              </Tab>
-            ))}
-          </Tablist>
-
-          <Pane marginLeft="auto">
-            {actions?.map((Action, index) => (
-              <Action key={index} />
-            ))}
-          </Pane>
-        </Pane>
-      </Pane>
-      {tabs.map((Entry, index) => (
-        <Pane
-          key={index}
-          display={selectedTab === index ? "flex" : "none"}
-          flexDirection="column"
-          flexGrow={1}
-        >
-          {!Entry.disabled && <Entry.element />}
-        </Pane>
-      ))}
-    </Pane>
+                {entry.icon && (
+                  <div className="m-auto text-slate-500">{entry.icon}</div>
+                )}
+                <span className="m-auto">{entry.name}</span>
+              </div>
+            )}
+          </Tab>
+        ))}
+        <div className="ml-auto">
+          {actions?.map((Action, index) => (
+            <Action key={index} />
+          ))}
+        </div>
+      </Tab.List>
+      <Tab.Panels as={Fragment}>
+        {tabs.map((entry, index) => (
+          <Tab.Panel key={index} className="flex flex-grow">
+            <entry.element />
+          </Tab.Panel>
+        ))}
+      </Tab.Panels>
+    </Tab.Group>
   );
 };

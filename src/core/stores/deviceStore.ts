@@ -79,6 +79,7 @@ export interface DeviceState {
   addDevice: (id: number) => Device;
   removeDevice: (id: number) => void;
   getDevices: () => Device[];
+  getDevice: (id: number) => Device | undefined;
 }
 
 export const useDeviceStore = create<DeviceState>((set, get) => ({
@@ -470,6 +471,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   },
 
   getDevices: () => Array.from(get().devices.values()),
+
+  getDevice: (id) => get().devices.get(id),
 }));
 
 export const DeviceContext = createContext<Device | undefined>(undefined);

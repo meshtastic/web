@@ -1,8 +1,11 @@
 import type React from "react";
 
-import { ApplicationsIcon, CogIcon, CubeIcon } from "evergreen-ui";
-
 import { TabbedContent, TabType } from "@components/layout/page/TabbedContent";
+import {
+  Cog8ToothIcon,
+  CubeTransparentIcon,
+  WindowIcon,
+} from "@heroicons/react/24/outline";
 import { AppConfig } from "@pages/Config/AppConfig.js";
 import { DeviceConfig } from "@pages/Config/DeviceConfig.js";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.js";
@@ -11,17 +14,17 @@ export const ConfigPage = (): JSX.Element => {
   const tabs: TabType[] = [
     {
       name: "Device Config",
-      icon: CogIcon,
+      icon: <Cog8ToothIcon className="h-4" />,
       element: DeviceConfig,
     },
     {
       name: "Module Config",
-      icon: CubeIcon,
+      icon: <CubeTransparentIcon className="h-4" />,
       element: ModuleConfig,
     },
     {
       name: "App Config",
-      icon: ApplicationsIcon,
+      icon: <WindowIcon className="h-4" />,
       element: AppConfig,
     },
   ];

@@ -1,4 +1,4 @@
-import "modern-css-reset/dist/reset.min.css";
+import "./index.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import type React from "react";

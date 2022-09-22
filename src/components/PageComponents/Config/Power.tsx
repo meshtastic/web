@@ -1,9 +1,10 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { PowerValidation } from "@app/validation/config/power.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -44,81 +45,79 @@ export const Power = (): JSX.Element => {
     );
   });
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <TextInputField
+    <Form
+      title="Power Config"
+      breadcrumbs={["Config", "Power"]}
+      reset={() => reset(config.power)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Input
         label="Shutdown on battery delay"
         description="This is a description."
-        hint="Seconds"
+        suffix="Seconds"
         type="number"
-        isInvalid={!!errors.onBatteryShutdownAfterSecs?.message}
-        validationMessage={errors.onBatteryShutdownAfterSecs?.message}
+        error={errors.onBatteryShutdownAfterSecs?.message}
         {...register("onBatteryShutdownAfterSecs", { valueAsNumber: true })}
       />
-      <FormField
-        label="Power Saving"
-        description="Description"
-        isInvalid={!!errors.isPowerSaving?.message}
-        validationMessage={errors.isPowerSaving?.message}
-      >
-        <Controller
-          name="isPowerSaving"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <TextInputField
+      <Controller
+        name="isPowerSaving"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Power Saving"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Input
         label="ADC Multiplier Override ratio"
         description="This is a description."
         type="number"
-        isInvalid={!!errors.adcMultiplierOverride?.message}
-        validationMessage={errors.adcMultiplierOverride?.message}
+        error={errors.adcMultiplierOverride?.message}
         {...register("adcMultiplierOverride", { valueAsNumber: true })}
       />
-      <TextInputField
+      <Input
         label="Minimum Wake Time"
         description="This is a description."
-        hint="Seconds"
+        suffix="Seconds"
         type="number"
-        isInvalid={!!errors.minWakeSecs?.message}
-        validationMessage={errors.minWakeSecs?.message}
+        error={errors.minWakeSecs?.message}
         {...register("minWakeSecs", { valueAsNumber: true })}
       />
-      <TextInputField
+      <Input
         label="Mesh SDS Timeout"
         description="This is a description."
-        hint="Seconds"
+        suffix="Seconds"
         type="number"
-        isInvalid={!!errors.meshSdsTimeoutSecs?.message}
-        validationMessage={errors.meshSdsTimeoutSecs?.message}
+        error={errors.meshSdsTimeoutSecs?.message}
         {...register("meshSdsTimeoutSecs", { valueAsNumber: true })}
       />
-      <TextInputField
+      <Input
         label="SDS"
         description="This is a description."
-        hint="Seconds"
+        suffix="Seconds"
         type="number"
-        isInvalid={!!errors.sdsSecs?.message}
-        validationMessage={errors.sdsSecs?.message}
+        error={errors.sdsSecs?.message}
         {...register("sdsSecs", { valueAsNumber: true })}
       />
-      <TextInputField
+      <Input
         label="LS"
         description="This is a description."
-        hint="Seconds"
+        suffix="Seconds"
         type="number"
-        isInvalid={!!errors.lsSecs?.message}
-        validationMessage={errors.lsSecs?.message}
+        error={errors.lsSecs?.message}
         {...register("lsSecs", { valueAsNumber: true })}
       />
-      <TextInputField
+      <Input
         label="Wait Bluetooth"
         description="This is a description."
-        hint="Seconds"
+        suffix="Seconds"
         type="number"
-        isInvalid={!!errors.waitBluetoothSecs?.message}
-        validationMessage={errors.waitBluetoothSecs?.message}
+        error={errors.waitBluetoothSecs?.message}
         {...register("waitBluetoothSecs", { valueAsNumber: true })}
       />
     </Form>

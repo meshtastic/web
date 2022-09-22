@@ -1,9 +1,10 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -44,58 +45,59 @@ export const Telemetry = (): JSX.Element => {
     );
   });
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <FormField
-        label="Measurement Enabled"
-        description="Description"
-        isInvalid={!!errors.environmentMeasurementEnabled?.message}
-        validationMessage={errors.environmentMeasurementEnabled?.message}
-      >
-        <Controller
-          name="environmentMeasurementEnabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <FormField
-        label="Displayed on Screen"
-        description="Description"
-        isInvalid={!!errors.environmentScreenEnabled?.message}
-        validationMessage={errors.environmentScreenEnabled?.message}
-      >
-        <Controller
-          name="environmentScreenEnabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <TextInputField
+    <Form
+      title="Telemetry Config"
+      breadcrumbs={["Module Config", "Telemetry"]}
+      reset={() => reset(moduleConfig.telemetry)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Controller
+        name="environmentMeasurementEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Module Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="environmentScreenEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Displayed on Screen"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Input
         label="Update Interval"
         description="Max transmit power in dBm"
-        hint="Seconds"
+        suffix="Seconds"
         type="number"
         {...register("environmentUpdateInterval", {
           valueAsNumber: true,
         })}
       />
-      <FormField
-        label="Display Farenheit"
-        description="Description"
-        isInvalid={!!errors.environmentDisplayFahrenheit?.message}
-        validationMessage={errors.environmentDisplayFahrenheit?.message}
-      >
-        <Controller
-          name="environmentDisplayFahrenheit"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
+      <Controller
+        name="environmentDisplayFahrenheit"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Display Farenheit"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
     </Form>
   );
 };

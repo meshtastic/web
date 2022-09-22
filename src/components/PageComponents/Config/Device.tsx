@@ -1,9 +1,10 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, SelectField, Switch, toaster } from "evergreen-ui";
 import { Controller, useForm } from "react-hook-form";
 
+import { Select } from "@app/components/form/Select.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { DeviceValidation } from "@app/validation/config/device.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -39,7 +40,7 @@ export const Device = (): JSX.Element => {
         },
       },
       async () => {
-        toaster.success("Successfully updated device config");
+        // toaster.success("Successfully updated device config");
         reset({ ...data });
         setLoading(false);
         await Promise.resolve();
@@ -47,58 +48,45 @@ export const Device = (): JSX.Element => {
     );
   });
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <SelectField
+    <Form
+      title="Device Config"
+      breadcrumbs={["Config", "Device"]}
+      reset={() => reset(config.device)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Select
         label="Role"
         description="This is a description."
-        isInvalid={!!errors.role?.message}
-        validationMessage={errors.role?.message}
         {...register("role", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.Config_DeviceConfig_Role)}
-      </SelectField>
-      <FormField
-        label="Serial Console Disabled"
-        description="Description"
-        isInvalid={!!errors.serialDisabled?.message}
-        validationMessage={errors.serialDisabled?.message}
-      >
-        <Controller
-          name="serialDisabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <FormField
-        label="Factory Reset Device"
-        description="Description"
-        isInvalid={!!errors.factoryReset?.message}
-        validationMessage={errors.factoryReset?.message}
-      >
-        <Controller
-          name="factoryReset"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <FormField
-        label="Enabled Debug Log"
-        description="Description"
-        isInvalid={!!errors.debugLogEnabled?.message}
-        validationMessage={errors.debugLogEnabled?.message}
-      >
-        <Controller
-          name="debugLogEnabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
+      </Select>
+      <Controller
+        name="serialEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Serial Output Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="debugLogEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Enabled Debug Log"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
     </Form>
   );
 };

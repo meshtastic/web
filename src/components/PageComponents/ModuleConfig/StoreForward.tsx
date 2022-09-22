@@ -1,9 +1,10 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { StoreForwardValidation } from "@app/validation/moduleConfig/storeForward.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -51,47 +52,49 @@ export const StoreForward = (): JSX.Element => {
   });
 
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <FormField
-        label="Module Enabled"
-        description="Description"
-        isInvalid={!!errors.enabled?.message}
-        validationMessage={errors.enabled?.message}
-      >
-        <Controller
-          name="enabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <FormField
-        label="Heartbeat Enabled"
-        description="Description"
-        disabled={!moduleEnabled}
-        isInvalid={!!errors.heartbeat?.message}
-        validationMessage={errors.heartbeat?.message}
-      >
-        <Controller
-          name="heartbeat"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <TextInputField
+    <Form
+      title="Store & Forward Config"
+      breadcrumbs={["Module Config", "Store & Forward"]}
+      reset={() => reset(moduleConfig.storeForward)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Controller
+        name="enabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Module Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="heartbeat"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Heartbeat Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Input
         type="number"
         label="Number of records"
         description="Max transmit power in dBm"
-        hint="Records"
+        suffix="Records"
         disabled={!moduleEnabled}
         {...register("records", {
           valueAsNumber: true,
         })}
       />
-      <TextInputField
+      <Input
         type="number"
         label="History return max"
         description="Max transmit power in dBm"
@@ -100,7 +103,7 @@ export const StoreForward = (): JSX.Element => {
           valueAsNumber: true,
         })}
       />
-      <TextInputField
+      <Input
         type="number"
         label="History return window"
         description="Max transmit power in dBm"

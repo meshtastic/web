@@ -1,7 +1,7 @@
-import create from "zustand";
+import create from 'zustand';
 
 interface AppState {
-  selectedDevice?: number;
+  selectedDevice: number;
   devices: {
     id: number;
     num: number;

@@ -1,15 +1,11 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import {
-  FormField,
-  SelectField,
-  Switch,
-  TextInputField,
-  toaster,
-} from "evergreen-ui";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Select } from "@app/components/form/Select.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { renderOptions } from "@app/core/utils/selectEnumOptions.js";
 import { NetworkValidation } from "@app/validation/config/network.js";
 import { Form } from "@components/form/Form";
@@ -51,7 +47,7 @@ export const Network = (): JSX.Element => {
         },
       },
       async () => {
-        toaster.success("Successfully updated Network config");
+        // toaster.success("Successfully updated Network config");
         reset({ ...data });
         setLoading(false);
         await Promise.resolve();
@@ -59,48 +55,53 @@ export const Network = (): JSX.Element => {
     );
   });
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <FormField
-        label="WiFi Enabled"
-        description="Description"
-        isInvalid={!!errors.wifiEnabled?.message}
-        validationMessage={errors.wifiEnabled?.message}
-      >
-        <Controller
-          name="wifiEnabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <SelectField
+    <Form
+      title="Network Config"
+      breadcrumbs={["Config", "Network"]}
+      reset={() => reset(config.network)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Controller
+        name="wifiEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="WiFi Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Select
         label="WiFi Mode"
         description="This is a description."
+        disabled={!wifiEnabled}
         {...register("wifiMode", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.Config_NetworkConfig_WiFiMode)}
-      </SelectField>
-      <TextInputField
+      </Select>
+      <Input
         label="SSID"
         description="This is a description."
-        isInvalid={!!errors.wifiSsid?.message}
-        validationMessage={errors.wifiSsid?.message}
+        error={errors.wifiSsid?.message}
+        disabled={!wifiEnabled}
         {...register("wifiSsid")}
       />
-      <TextInputField
+      <Input
         label="PSK"
         type="password"
         description="This is a description."
-        isInvalid={!!errors.wifiPsk?.message}
-        validationMessage={errors.wifiPsk?.message}
+        error={errors.wifiPsk?.message}
+        disabled={!wifiEnabled}
         {...register("wifiPsk")}
       />
-      <TextInputField
+      <Input
         label="NTP Server"
         description="This is a description."
-        isInvalid={!!errors.ntpServer?.message}
-        validationMessage={errors.ntpServer?.message}
+        error={errors.ntpServer?.message}
         {...register("ntpServer")}
       />
     </Form>

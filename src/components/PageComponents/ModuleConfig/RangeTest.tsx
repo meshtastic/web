@@ -1,9 +1,10 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -51,46 +52,48 @@ export const RangeTest = (): JSX.Element => {
   });
 
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <FormField
-        label="Module Enabled"
-        description="Description"
-        isInvalid={!!errors.enabled?.message}
-        validationMessage={errors.enabled?.message}
-      >
-        <Controller
-          name="enabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <TextInputField
+    <Form
+      title="Range Test Config"
+      breadcrumbs={["Module Config", "Range Test"]}
+      reset={() => reset(moduleConfig.rangeTest)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Controller
+        name="enabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Module Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Input
         type="number"
         label="Message Interval"
         description="Max transmit power in dBm"
         disabled={!moduleEnabled}
-        hint="Seconds"
+        suffix="Seconds"
         {...register("sender", {
           valueAsNumber: true,
         })}
       />
-      <FormField
-        label="Save CSV to storage"
-        description="Description"
-        disabled={!moduleEnabled}
-        isInvalid={!!errors.save?.message}
-        validationMessage={errors.save?.message}
-      >
-        <Controller
-          name="save"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
+      <Controller
+        name="save"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Save CSV to storage"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
     </Form>
   );
 };

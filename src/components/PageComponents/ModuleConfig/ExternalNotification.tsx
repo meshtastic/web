@@ -1,9 +1,10 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -50,32 +51,37 @@ export const ExternalNotification = (): JSX.Element => {
   });
 
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <FormField
-        label="Module Enabled"
-        description="Description"
-        isInvalid={!!errors.enabled?.message}
-        validationMessage={errors.enabled?.message}
-      >
-        <Controller
-          name="enabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <TextInputField
+    <Form
+      title="External Notification Config"
+      breadcrumbs={["Module Config", "External Notification"]}
+      reset={() => reset(moduleConfig.externalNotification)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Controller
+        name="enabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Module Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Input
         type="number"
         label="Output MS"
         description="Max transmit power in dBm"
-        hint="ms"
+        suffix="ms"
         disabled={!moduleEnabled}
         {...register("outputMs", {
           valueAsNumber: true,
         })}
       />
-      <TextInputField
+      <Input
         type="number"
         label="Output"
         description="Max transmit power in dBm"
@@ -84,51 +90,42 @@ export const ExternalNotification = (): JSX.Element => {
           valueAsNumber: true,
         })}
       />
-      <FormField
-        label="Active"
-        description="Description"
-        disabled={!moduleEnabled}
-        isInvalid={!!errors.active?.message}
-        validationMessage={errors.active?.message}
-      >
-        <Controller
-          name="active"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <FormField
-        label="Message"
-        description="Description"
-        disabled={!moduleEnabled}
-        isInvalid={!!errors.alertMessage?.message}
-        validationMessage={errors.alertMessage?.message}
-      >
-        <Controller
-          name="alertMessage"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <FormField
-        label="Bell"
-        description="Description"
-        disabled={!moduleEnabled}
-        isInvalid={!!errors.alertBell?.message}
-        validationMessage={errors.alertBell?.message}
-      >
-        <Controller
-          name="alertBell"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
+      <Controller
+        name="active"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Active"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="alertMessage"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Message"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="alertBell"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Bell"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
     </Form>
   );
 };

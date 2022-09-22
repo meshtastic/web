@@ -1,9 +1,12 @@
 import type React from "react";
 
-import { DocumentIcon, GanttChartIcon, RainIcon } from "evergreen-ui";
-
 import { TabbedContent, TabType } from "@components/layout/page/TabbedContent";
 import { useDevice } from "@core/providers/useDevice.js";
+import {
+  CloudIcon,
+  DocumentIcon,
+  SignalIcon,
+} from "@heroicons/react/24/outline";
 import { Environment } from "@pages/Extensions/Environment.js";
 import { FileBrowser } from "@pages/Extensions/FileBrowser";
 
@@ -13,19 +16,19 @@ export const ExtensionsPage = (): JSX.Element => {
   const tabs: TabType[] = [
     {
       name: "File Browser",
-      icon: DocumentIcon,
+      icon: <DocumentIcon className="h-4" />,
       element: FileBrowser,
       disabled: !hardware.hasWifi,
     },
     {
       name: "Range Test",
-      icon: GanttChartIcon,
+      icon: <SignalIcon className="h-4" />,
       element: FileBrowser,
       disabled: !hardware.hasWifi,
     },
     {
       name: "Environment",
-      icon: RainIcon,
+      icon: <CloudIcon className="h-4" />,
       element: Environment,
     },
   ];

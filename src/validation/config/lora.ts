@@ -3,10 +3,8 @@ import { IsArray, IsBoolean, IsEnum, IsInt, Max, Min } from "class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class LoRaValidation implements Protobuf.Config_LoRaConfig {
-  @IsInt()
-  @Min(0)
-  @Max(10)
-  txPower: number;
+  @IsBoolean()
+  usePreset: boolean;
 
   @IsEnum(Protobuf.Config_LoRaConfig_ModemPreset)
   modemPreset: Protobuf.Config_LoRaConfig_ModemPreset;
@@ -36,7 +34,11 @@ export class LoRaValidation implements Protobuf.Config_LoRaConfig {
   hopLimit: number;
 
   @IsBoolean()
-  txDisabled: boolean;
+  txEnabled: boolean;
+
+  @IsInt()
+  @Min(0)
+  txPower: number;
 
   @IsArray()
   ignoreIncoming: number[];

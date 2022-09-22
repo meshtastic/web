@@ -1,21 +1,14 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import {
-  Button,
-  FormField,
-  SelectMenu,
-  Switch,
-  TextInputField,
-} from "evergreen-ui";
 import { Controller, useForm } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { PositionValidation } from "@app/validation/config/position.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
-import { bitwiseDecode } from "@core/utils/bitwise";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
-import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Position = (): JSX.Element => {
   const { config, connection } = useDevice();
@@ -29,15 +22,6 @@ export const Position = (): JSX.Element => {
   } = useForm<PositionValidation>({
     defaultValues: config.position,
     resolver: classValidatorResolver(PositionValidation),
-    // defaultValues: {
-    //   ...preferences,
-    //   positionBroadcastSecs:
-    //     preferences.positionBroadcastSecs === 0
-    //       ? preferences.role === Protobuf.Role.Router
-    //         ? 43200
-    //         : 900
-    //       : preferences.positionBroadcastSecs,
-    // },
   });
 
   useEffect(() => {
@@ -62,76 +46,74 @@ export const Position = (): JSX.Element => {
   });
 
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <TextInputField
-        hint="Seconds"
+    <Form
+      title="Position Config"
+      breadcrumbs={["Config", "Position"]}
+      reset={() => reset(config.position)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Input
+        suffix="Seconds"
         label="Broadcast Interval"
         description="This is a description."
         type="number"
-        isInvalid={!!errors.positionBroadcastSecs?.message}
-        validationMessage={errors.positionBroadcastSecs?.message}
+        error={errors.positionBroadcastSecs?.message}
         {...register("positionBroadcastSecs", { valueAsNumber: true })}
       />
-      <FormField
-        label="Disable Smart Position"
-        description="Description"
-        isInvalid={!!errors.positionBroadcastSmartDisabled?.message}
-        validationMessage={errors.positionBroadcastSmartDisabled?.message}
-      >
-        <Controller
-          name="positionBroadcastSmartDisabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <FormField
-        label="Use Fixed Position"
-        description="Description"
-        isInvalid={!!errors.fixedPosition?.message}
-        validationMessage={errors.fixedPosition?.message}
-      >
-        <Controller
-          name="fixedPosition"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <FormField
-        label="Disable GPS"
-        description="Description"
-        isInvalid={!!errors.gpsDisabled?.message}
-        validationMessage={errors.gpsDisabled?.message}
-      >
-        <Controller
-          name="gpsDisabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <TextInputField
-        hint="Seconds"
+      <Controller
+        name="positionBroadcastSmartEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Enable Smart Position"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="fixedPosition"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Use Fixed Position"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="gpsEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="GPS Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Input
+        suffix="Seconds"
         label="GPS Update Interval"
         description="This is a description."
         type="number"
-        isInvalid={!!errors.gpsUpdateInterval?.message}
-        validationMessage={errors.gpsUpdateInterval?.message}
+        error={errors.gpsUpdateInterval?.message}
         {...register("gpsUpdateInterval", { valueAsNumber: true })}
       />
-      <TextInputField
+      <Input
         label="Last GPS Attempt"
         description="This is a description."
         type="number"
-        isInvalid={!!errors.gpsAttemptTime?.message}
-        validationMessage={errors.gpsAttemptTime?.message}
+        error={errors.gpsAttemptTime?.message}
         {...register("gpsAttemptTime", { valueAsNumber: true })}
       />
-      <Controller
+      {/* <Controller
         name="positionFlags"
         control={control}
         render={({ field, fieldState }): JSX.Element => {
@@ -218,7 +200,7 @@ export const Position = (): JSX.Element => {
             </FormField>
           );
         }}
-      />
+      /> */}
     </Form>
   );
 };

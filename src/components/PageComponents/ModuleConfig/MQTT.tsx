@@ -1,9 +1,10 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { FormField, Switch, TextInputField } from "evergreen-ui";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
+import { Input } from "@app/components/form/Input.js";
+import { Toggle } from "@app/components/form/Toggle.js";
 import { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -50,34 +51,39 @@ export const MQTT = (): JSX.Element => {
     );
   });
   return (
-    <Form loading={loading} dirty={isDirty} onSubmit={onSubmit}>
-      <FormField
-        label="Module Enabled"
-        description="Description"
-        isInvalid={!!errors.enabled?.message}
-        validationMessage={errors.enabled?.message}
-      >
-        <Controller
-          name="enabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <TextInputField
+    <Form
+      title="MQTT Config"
+      breadcrumbs={["Module Config", "MQTT"]}
+      reset={() => reset(moduleConfig.mqtt)}
+      loading={loading}
+      dirty={isDirty}
+      onSubmit={onSubmit}
+    >
+      <Controller
+        name="enabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Module Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Input
         label="MQTT Server Address"
         description="Description"
         disabled={!moduleEnabled}
         {...register("address")}
       />
-      <TextInputField
+      <Input
         label="MQTT Username"
         description="Description"
         disabled={!moduleEnabled}
         {...register("username")}
       />
-      <TextInputField
+      <Input
         label="MQTT Password"
         description="Description"
         type="password"
@@ -85,36 +91,30 @@ export const MQTT = (): JSX.Element => {
         disabled={!moduleEnabled}
         {...register("password")}
       />
-      <FormField
-        label="Encryption Enabled"
-        description="Description"
-        disabled={!moduleEnabled}
-        isInvalid={!!errors.encryptionEnabled?.message}
-        validationMessage={errors.encryptionEnabled?.message}
-      >
-        <Controller
-          name="encryptionEnabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
-      <FormField
-        label="JSON Output Enabled"
-        description="Description"
-        disabled={!moduleEnabled}
-        isInvalid={!!errors.jsonEnabled?.message}
-        validationMessage={errors.jsonEnabled?.message}
-      >
-        <Controller
-          name="jsonEnabled"
-          control={control}
-          render={({ field: { value, ...field } }) => (
-            <Switch height={24} marginLeft="auto" checked={value} {...field} />
-          )}
-        />
-      </FormField>
+      <Controller
+        name="encryptionEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Encryption Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="jsonEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="JSON Output Enabled"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
     </Form>
   );
 };
