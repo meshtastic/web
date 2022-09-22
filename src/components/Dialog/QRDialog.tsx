@@ -1,5 +1,5 @@
 import type React from "react";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { fromByteArray } from "base64-js";
 import { QRCode } from "react-qrcode-logo";
@@ -51,7 +51,7 @@ export const QRDialog = ({
     <Dialog open={isOpen} onClose={close}>
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel as={Fragment}>
+        <Dialog.Panel>
           <Card className="max-w-md flex-col">
             <div className="flex h-8 bg-slate-100">
               <span className="m-auto text-lg font-medium">
