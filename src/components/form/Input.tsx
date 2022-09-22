@@ -32,7 +32,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         )}
         <input
           ref={ref}
-          className={`block w-full min-w-0 flex-1 rounded-md border border-gray-300 px-3 h-10 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+          className={`block h-10 w-full min-w-0 flex-1 rounded-md border border-gray-300 px-3 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
             prefix ? "rounded-l-none" : ""
           } ${action ? "rounded-r-none" : ""}`}
           {...rest}

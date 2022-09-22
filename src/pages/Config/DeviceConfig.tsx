@@ -52,13 +52,13 @@ export const DeviceConfig = (): JSX.Element => {
   ];
 
   return (
-    <Tab.Group as="div" className="flex gap-3 w-full">
-      <Tab.List className="flex flex-col w-44 gap-1">
+    <Tab.Group as="div" className="flex w-full gap-3">
+      <Tab.List className="flex w-44 flex-col gap-1">
         {configSections.map((Config, index) => (
           <Tab key={index} as={Fragment}>
             {({ selected }) => (
               <div
-                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer ${
+                className={`flex cursor-pointer items-center rounded-md px-3 py-2 text-sm font-medium ${
                   selected
                     ? "bg-gray-100 text-gray-900"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"

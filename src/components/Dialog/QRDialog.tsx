@@ -58,7 +58,7 @@ export const QRDialog = ({
           </Dialog.Description>
           <div className="flex">
             <div className="flex flex-col">
-              <span className="font-medium text-lg">Channels to include</span>
+              <span className="text-lg font-medium">Channels to include</span>
               <span className="text-sm text-slate-600">
                 The current LoRa configuration will also be shared.
               </span>
@@ -86,8 +86,8 @@ export const QRDialog = ({
                 />
               ))}
             </div>
-            <div className="flex flex-col flex-grow m-2">
-              <div className="flex m-auto">
+            <div className="m-2 flex flex-grow flex-col">
+              <div className="m-auto flex">
                 <QRCode value={QRCodeURL} size={250} qrStyle="dots" />
               </div>
               <div className="flex gap-2">

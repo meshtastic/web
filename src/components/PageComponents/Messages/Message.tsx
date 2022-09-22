@@ -29,17 +29,17 @@ export const Message = ({
   };
 
   return lastMsgSameUser ? (
-    <div className="flex ml-4">
+    <div className="ml-4 flex">
       {message.ack ? (
-        <CheckCircleIcon className="my-auto text-slate-200 h-4" />
+        <CheckCircleIcon className="my-auto h-4 text-slate-200" />
       ) : (
-        <EllipsisHorizontalCircleIcon className="my-auto text-slate-200 h-4" />
+        <EllipsisHorizontalCircleIcon className="my-auto h-4 text-slate-200" />
       )}
       {"waypointID" in message ? (
         <WaypointMessage waypointID={message.waypointID} />
       ) : (
         <span
-          className={`ml-4 pl-2 border-l-2 border-l-slate-200 ${
+          className={`ml-4 border-l-2 border-l-slate-200 pl-2 ${
             message.ack ? "text-black" : "text-slate-500"
           }`}
         >
@@ -48,9 +48,9 @@ export const Message = ({
       )}
     </div>
   ) : (
-    <div className="mx-4 gap-2 mt-2">
+    <div className="mx-4 mt-2 gap-2">
       <div className="flex gap-2">
-        <div className="cursor-pointer w-6" onClick={openPeer}>
+        <div className="w-6 cursor-pointer" onClick={openPeer}>
           <Hashicon value={(sender?.num ?? 0).toString()} size={32} />
         </div>
         <span
@@ -68,15 +68,15 @@ export const Message = ({
       </div>
       <div className="flex">
         {message.ack ? (
-          <CheckCircleIcon className="my-auto text-slate-200 h-4" />
+          <CheckCircleIcon className="my-auto h-4 text-slate-200" />
         ) : (
-          <EllipsisHorizontalCircleIcon className="my-auto text-slate-200 h-4" />
+          <EllipsisHorizontalCircleIcon className="my-auto h-4 text-slate-200" />
         )}
         {"waypointID" in message ? (
           <WaypointMessage waypointID={message.waypointID} />
         ) : (
           <span
-            className={`ml-4 pl-2 border-l-2 border-l-slate-200 ${
+            className={`ml-4 border-l-2 border-l-slate-200 pl-2 ${
               message.ack ? "text-black" : "text-slate-500"
             }`}
           >

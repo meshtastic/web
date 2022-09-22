@@ -54,7 +54,7 @@ export const PageNav = (): JSX.Element => {
   ];
 
   return (
-    <div className="flex bg-slate-50 w-12 items-center whitespace-nowrap py-4 text-sm [writing-mode:vertical-rl] h-full border-r border-slate-200 flex-shrink-0">
+    <div className="flex h-full w-12 flex-shrink-0 items-center whitespace-nowrap border-r border-slate-200 bg-slate-50 py-4 text-sm [writing-mode:vertical-rl]">
       <span className="mt-6 flex gap-4 font-bold text-slate-500">
         {pages.map((Link) => (
           <div
@@ -62,7 +62,7 @@ export const PageNav = (): JSX.Element => {
             onClick={() => {
               setActivePage(Link.page);
             }}
-            className={`w-8 h-8 p-1 border-2 rounded-md hover:border-orange-300 cursor-pointer ${
+            className={`h-8 w-8 cursor-pointer rounded-md border-2 p-1 hover:border-orange-300 ${
               Link.page === activePage
                 ? "border-orange-400"
                 : "border-slate-200"

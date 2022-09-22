@@ -27,7 +27,7 @@ export const NewDevice = () => {
   ];
 
   return (
-    <div className="w-96 h-96 m-auto">
+    <div className="m-auto h-96 w-96">
       <TabbedContent tabs={tabs} />
     </div>
   );

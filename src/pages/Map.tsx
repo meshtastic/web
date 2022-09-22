@@ -14,8 +14,8 @@ export const MapPage = (): JSX.Element => {
 
   return (
     <div className="flex-grow">
-      <div className="absolute z-10 right-0 top-0 m-2 rounded-md p-2 shadow-md bg-white">
-        <div className="font-medium text-lg p-1">Title</div>
+      <div className="absolute right-0 top-0 z-10 m-2 rounded-md bg-white p-2 shadow-md">
+        <div className="p-1 text-lg font-medium">Title</div>
         <div className="flex flex-col gap-2">
           {nodes.map((n) => (
             <div key={n.data.num} className="flex gap-2">

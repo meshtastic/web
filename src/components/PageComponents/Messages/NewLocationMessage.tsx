@@ -17,7 +17,7 @@ export const NewLocationMessage = (): JSX.Element => {
   const { connection } = useDevice();
 
   return (
-    <div className="w-96 m-4">
+    <div className="m-4 w-96">
       <form
         onSubmit={(e): void => {
           e.preventDefault();

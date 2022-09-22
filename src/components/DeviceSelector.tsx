@@ -10,7 +10,7 @@ export const DeviceSelector = (): JSX.Element => {
   const { selectedDevice, setSelectedDevice } = useAppStore();
 
   return (
-    <div className="flex bg-slate-50 w-16 items-center whitespace-nowrap py-12 text-sm [writing-mode:vertical-rl] h-full">
+    <div className="flex h-full w-16 items-center whitespace-nowrap bg-slate-50 py-12 text-sm [writing-mode:vertical-rl]">
       <span className="font-mono text-slate-500">Connected Devices</span>
       <span className="mt-6 flex gap-4 font-bold text-slate-900">
         {getDevices().map((device) => (
@@ -19,11 +19,11 @@ export const DeviceSelector = (): JSX.Element => {
             onClick={() => {
               setSelectedDevice(device.id);
             }}
-            className="group flex w-8 h-8 p-0.5 cursor-pointer drop-shadow-md"
+            className="group flex h-8 w-8 cursor-pointer p-0.5 drop-shadow-md"
           >
             <Hashicon size={32} value={device.hardware.myNodeNum.toString()} />
             <div
-              className={`absolute -left-1.5 w-0.5 h-7 rounded-full group-hover:bg-orange-300 ${
+              className={`absolute -left-1.5 h-7 w-0.5 rounded-full group-hover:bg-orange-300 ${
                 device.id === selectedDevice
                   ? "bg-orange-400"
                   : "bg-transparent"
@@ -35,14 +35,14 @@ export const DeviceSelector = (): JSX.Element => {
           onClick={() => {
             setSelectedDevice(0);
           }}
-          className={`w-8 h-8 p-2 border-dashed border-2 rounded-md hover:border-orange-300 cursor-pointer ${
+          className={`h-8 w-8 cursor-pointer rounded-md border-2 border-dashed p-2 hover:border-orange-300 ${
             selectedDevice === 0 ? "border-orange-400" : "border-slate-200"
           }`}
         >
           <PlusIcon />
         </div>
       </span>
-      <img src="Logo_Black.svg" className="px-3 mt-auto" />
+      <img src="Logo_Black.svg" className="mt-auto px-3" />
     </div>
   );
 };

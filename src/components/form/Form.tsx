@@ -34,29 +34,29 @@ export const Form = ({
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     <form className="w-full" onSubmit={onSubmit} {...props}>
       {loading && (
-        <div className="absolute flex w-full h-full bg-slate-600 rounded-md z-10">
-          <ArrowPathIcon className="h-8 animate-spin m-auto" />
+        <div className="absolute z-10 flex h-full w-full rounded-md bg-slate-600">
+          <ArrowPathIcon className="m-auto h-8 animate-spin" />
         </div>
       )}
-      <div className="select-none rounded-md p-4 bg-gray-700">
+      <div className="select-none rounded-md bg-gray-700 p-4">
         <ol className="flex gap-4">
-          <li className="text-gray-400 hover:text-gray-200 cursor-pointer">
+          <li className="cursor-pointer text-gray-400 hover:text-gray-200">
             <HomeIcon className="h-5 w-5 flex-shrink-0 text-gray-400" />
           </li>
           {breadcrumbs.map((breadcrumb, index) => (
             <li key={index} className="flex gap-4">
               <ChevronRightIcon className="h-5 w-5 flex-shrink-0 text-gray-500" />
-              <span className="text-sm font-medium text-gray-400 hover:text-gray-200 cursor-pointer">
+              <span className="cursor-pointer text-sm font-medium text-gray-400 hover:text-gray-200">
                 {breadcrumb}
               </span>
             </li>
           ))}
         </ol>
         <div className="mt-2 flex items-center">
-          <h2 className="font-bold text-white truncate text-3xl tracking-tight">
+          <h2 className="truncate text-3xl font-bold tracking-tight text-white">
             {title}
           </h2>
-          <div className="flex gap-2 ml-auto">
+          <div className="ml-auto flex gap-2">
             <Button
               type="button"
               onClick={() => {
@@ -73,7 +73,7 @@ export const Form = ({
           </div>
         </div>
       </div>
-      <div className="flex flex-col p-2 gap-3">{children}</div>
+      <div className="flex flex-col gap-3 p-2">{children}</div>
     </form>
   );
 };

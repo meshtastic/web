@@ -19,7 +19,7 @@ export const Button = ({
 }: ButtonProps): JSX.Element => {
   return (
     <button
-      className={`px-3 w-full rounded-md flex border border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
+      className={`flex w-full rounded-md border border-transparent px-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
         variant === "primary"
           ? "bg-orange-600 text-white shadow-sm hover:bg-orange-700"
           : "bg-orange-100 text-orange-700 hover:bg-orange-200"
@@ -33,7 +33,7 @@ export const Button = ({
       disabled={disabled}
       {...rest}
     >
-      <div className="flex items-center m-auto gap-2 font-medium">
+      <div className="m-auto flex items-center gap-2 font-medium">
         {iconBefore}
         {children}
         {iconAfter}

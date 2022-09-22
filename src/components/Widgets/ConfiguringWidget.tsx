@@ -32,9 +32,9 @@ export const ConfiguringWidget = (): JSX.Element => {
   ]);
 
   return (
-    <div className="p-6 flex flex-col rounded-2xl mb-4 text-sm space-y-3 bg-[#f9e3aa] text-black">
+    <div className="mb-4 flex flex-col space-y-3 rounded-2xl bg-[#f9e3aa] p-6 text-sm text-black">
       <p className="text-xl font-bold">Connecting to device</p>
-      <ol className="flex flex-col overflow-hidden gap-3">
+      <ol className="flex flex-col gap-3 overflow-hidden">
         <StatusIndicator
           title="Device Info"
           current={hardware.myNodeNum ? 1 : 0}
@@ -58,7 +58,7 @@ export const ConfiguringWidget = (): JSX.Element => {
         />
       </ol>
       <div
-        className="mt-2 rounded-md bg-[#dabb6b] p-1 ring-[#f9e3aa]  cursor-pointer text-center"
+        className="mt-2 cursor-pointer rounded-md bg-[#dabb6b] p-1  text-center ring-[#f9e3aa]"
         onClick={() => {
           void connection?.configure();
         }}
@@ -89,12 +89,12 @@ const StatusIndicator = ({
       />
       <div className="flex">
         <div
-          className={`flex relative z-10 h-5 w-5 rounded-full border-2  ${
+          className={`relative z-10 flex h-5 w-5 rounded-full border-2  ${
             current === 0
               ? "border-[#dabb6b] bg-[#f9e3aa]"
               : current >= total
-              ? "bg-green-500 border-green-500"
-              : "bg-[#f9e3aa] border-green-500"
+              ? "border-green-500 bg-green-500"
+              : "border-green-500 bg-[#f9e3aa]"
           }`}
         >
           <span
@@ -104,7 +104,7 @@ const StatusIndicator = ({
           />
         </div>
 
-        <span className="flex text-sm ml-4 gap-1">
+        <span className="ml-4 flex gap-1 text-sm">
           <span className="font-medium">{title}</span>
           <span className="font-mono text-slate-500">
             ({current}

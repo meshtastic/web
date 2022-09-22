@@ -46,8 +46,8 @@ export const Serial = (): JSX.Element => {
   };
 
   return (
-    <div className="flex flex-col p-4 gap-2 w-full">
-      <div className="flex gap-2 flex-col h-48 overflow-y-auto">
+    <div className="flex w-full flex-col gap-2 p-4">
+      <div className="flex h-48 flex-col gap-2 overflow-y-auto">
         {serialPorts.map((port, index) => (
           <Button
             key={index}

@@ -48,8 +48,8 @@ export const HTTP = (): JSX.Element => {
 
   return (
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    <form className="w-full p-4 gap-2 flex flex-col" onSubmit={onSubmit}>
-      <div className="h-48 flex flex-col gap-2">
+    <form className="flex w-full flex-col gap-2 p-4" onSubmit={onSubmit}>
+      <div className="flex h-48 flex-col gap-2">
         <Input
           label="IP Address/Hostname"
           prefix={TLSEnabled ? "https://" : "http://"}

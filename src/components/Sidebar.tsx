@@ -17,7 +17,7 @@ export const Sidebar = (): JSX.Element => {
   const { selectedDevice, setSelectedDevice } = useAppStore();
 
   return (
-    <div className="flex flex-col relative bg-slate-50 w-80 p-2 border-x border-slate-200 gap-2 flex-shrink-0">
+    <div className="relative flex w-80 flex-shrink-0 flex-col gap-2 border-x border-slate-200 bg-slate-50 p-2">
       <DeviceWidget
         name={
           nodes.find((n) => n.data.num === hardware.myNodeNum)?.data.user
@@ -55,7 +55,7 @@ export const Sidebar = (): JSX.Element => {
           <dl className="mt-2 divide-y divide-gray-200 border-t border-b border-gray-200">
             <div className="flex justify-between py-3 text-sm font-medium">
               <dt className="text-gray-500">Firmware version</dt>
-              <dd className="whitespace-nowrap text-gray-900 hover:underline hover:text-orange-400 cursor-pointer">
+              <dd className="cursor-pointer whitespace-nowrap text-gray-900 hover:text-orange-400 hover:underline">
                 {hardware.firmwareVersion}
               </dd>
             </div>
@@ -64,7 +64,7 @@ export const Sidebar = (): JSX.Element => {
             <dt className="text-gray-500">Bitrate</dt>
             <dd className="whitespace-nowrap text-gray-900">
               {hardware.bitrate.toFixed(2)}
-              <span className="font-mono text-slate-500 text-sm ">bps</span>
+              <span className="font-mono text-sm text-slate-500 ">bps</span>
             </dd>
           </div>
         </div>

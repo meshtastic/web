@@ -31,8 +31,8 @@ export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
   };
 
   return (
-    <div className="flex flex-col flex-grow">
-      <div className="flex flex-col flex-grow">
+    <div className="flex flex-grow flex-col">
+      <div className="flex flex-grow flex-col">
         {channel.messages.map((message, index) => (
           <Message
             key={index}

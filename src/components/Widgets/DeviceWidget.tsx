@@ -21,19 +21,19 @@ export const DeviceWidget = ({
   reconnect,
 }: DeviceWidgetProps): JSX.Element => {
   return (
-    <div className="relative rounded-xl bg-emerald-400 overflow-hidden">
-      <div className="absolute w-full h-full bottom-20">
+    <div className="relative overflow-hidden rounded-xl bg-emerald-400">
+      <div className="absolute bottom-20 h-full w-full">
         <Hashicon size={350} value={nodeNum} />
       </div>
-      <div className="flex backdrop-blur-md backdrop-brightness-50 backdrop-hue-rotate-30 p-3">
+      <div className="flex p-3 backdrop-blur-md backdrop-brightness-50 backdrop-hue-rotate-30">
         <div className="drop-shadow-md">
           <Hashicon size={96} value={nodeNum} />
         </div>
-        <div className="w-full flex flex-col">
-          <span className="font-bold text-slate-200 ml-auto text-xl whitespace-nowrap">
+        <div className="flex w-full flex-col">
+          <span className="ml-auto whitespace-nowrap text-xl font-bold text-slate-200">
             {name}
           </span>
-          <div className="ml-auto my-auto">
+          <div className="my-auto ml-auto">
             <Button
               onClick={disconnected ? reconnect : disconnect}
               variant={disconnected ? "secondary" : "primary"}
