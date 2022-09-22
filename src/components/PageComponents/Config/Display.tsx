@@ -89,6 +89,25 @@ export const Display = (): JSX.Element => {
           />
         )}
       />
+      <Controller
+        name="flipScreen"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Flip Screen"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Select
+        label="Display Units"
+        description="This is a description."
+        {...register("units", { valueAsNumber: true })}
+      >
+        {renderOptions(Protobuf.Config_DisplayConfig_DisplayUnits)}
+      </Select>
     </Form>
   );
 };

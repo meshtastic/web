@@ -14,4 +14,10 @@ export class DisplayValidation implements Protobuf.Config_DisplayConfig {
 
   @IsBoolean()
   compassNorthTop: boolean;
+
+  @IsBoolean()
+  flipScreen: boolean;
+
+  @IsEnum(Protobuf.Config_DisplayConfig_DisplayUnits)
+  units: Protobuf.Config_DisplayConfig_DisplayUnits;
 }
