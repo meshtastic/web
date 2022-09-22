@@ -13,6 +13,7 @@ export const IconButton = ({
   variant = "primary",
   icon,
   disabled,
+  className,
   ...rest
 }: IconButtonProps): JSX.Element => {
   return (
@@ -23,7 +24,9 @@ export const IconButton = ({
           : "bg-orange-100 text-orange-700 hover:bg-orange-200"
       } ${
         size === "sm" ? "h-8 w-8" : size === "md" ? "h-10 w-10" : "h-12 w-12"
-      } ${disabled ? "cursor-not-allowed bg-red-400 focus:ring-red-500" : ""}`}
+      } ${disabled ? "cursor-not-allowed bg-red-400 focus:ring-red-500" : ""} ${
+        className ?? ""
+      }`}
       disabled={disabled}
       {...rest}
     >

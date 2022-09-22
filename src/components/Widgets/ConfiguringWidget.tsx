@@ -2,6 +2,9 @@ import React, { useEffect } from "react";
 
 import { useDevice } from "@core/providers/useDevice.js";
 
+import { Button } from "../Button.js";
+import { Card } from "../Card.js";
+
 export const ConfiguringWidget = (): JSX.Element => {
   const {
     hardware,
@@ -32,40 +35,45 @@ export const ConfiguringWidget = (): JSX.Element => {
   ]);
 
   return (
-    <div className="mb-4 flex flex-col space-y-3 rounded-2xl bg-[#f9e3aa] p-6 text-sm text-black">
-      <p className="text-xl font-bold">Connecting to device</p>
-      <ol className="flex flex-col gap-3 overflow-hidden">
-        <StatusIndicator
-          title="Device Info"
-          current={hardware.myNodeNum ? 1 : 0}
-          total={0}
-        />
-        <StatusIndicator title="Peers" current={nodes.length} total={0} />
-        <StatusIndicator
-          title="Device Config"
-          current={Object.keys(config).length - 1}
-          total={6}
-        />
-        <StatusIndicator
-          title="Module Config"
-          current={Object.keys(moduleConfig).length - 1}
-          total={6}
-        />
-        <StatusIndicator
-          title="Channels"
-          current={channels.length}
-          total={hardware.maxChannels ?? 0}
-        />
-      </ol>
-      <div
-        className="mt-2 cursor-pointer rounded-md bg-[#dabb6b] p-1  text-center ring-[#f9e3aa]"
-        onClick={() => {
-          void connection?.configure();
-        }}
-      >
-        Retry
+    <Card className="flex-col">
+      <div className="flex h-8 bg-slate-100">
+        <span className="m-auto text-lg font-medium">Power</span>
       </div>
-    </div>
+      <div className="flex flex-col gap-2 p-3">
+        <ol className="flex flex-col gap-3 overflow-hidden">
+          <StatusIndicator
+            title="Device Info"
+            current={hardware.myNodeNum ? 1 : 0}
+            total={0}
+          />
+          <StatusIndicator title="Peers" current={nodes.length} total={0} />
+          <StatusIndicator
+            title="Device Config"
+            current={Object.keys(config).length - 1}
+            total={6}
+          />
+          <StatusIndicator
+            title="Module Config"
+            current={Object.keys(moduleConfig).length - 1}
+            total={6}
+          />
+          <StatusIndicator
+            title="Channels"
+            current={channels.length}
+            total={hardware.maxChannels ?? 0}
+          />
+        </ol>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            void connection?.configure();
+          }}
+        >
+          Retry
+        </Button>
+      </div>
+    </Card>
   );
 };
 

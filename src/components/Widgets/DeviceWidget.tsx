@@ -4,6 +4,7 @@ import { Hashicon } from "@emeraldpay/hashicon-react";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 
 import { Button } from "../Button.js";
+import { Card } from "../Card.js";
 
 export interface DeviceWidgetProps {
   name: string;
@@ -21,7 +22,7 @@ export const DeviceWidget = ({
   reconnect,
 }: DeviceWidgetProps): JSX.Element => {
   return (
-    <div className="relative overflow-hidden rounded-xl bg-emerald-400">
+    <Card className="relative flex-col">
       <div className="absolute bottom-20 h-full w-full">
         <Hashicon size={350} value={nodeNum} />
       </div>
@@ -45,6 +46,6 @@ export const DeviceWidget = ({
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };

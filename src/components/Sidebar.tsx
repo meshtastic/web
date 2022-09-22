@@ -1,10 +1,13 @@
 import type React from "react";
+import { useEffect, useState } from "react";
 
 import { useDevice } from "@app/core/providers/useDevice.js";
+import { toMGRS } from "@app/core/utils/toMGRS.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
-import { Types } from "@meshtastic/meshtasticjs";
+import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
+import { BatteryWidget } from "./Widgets/BatteryWidget.js";
 import { ConfiguringWidget } from "./Widgets/ConfiguringWidget.js";
 import { DeviceWidget } from "./Widgets/DeviceWidget.js";
 import { NodeInfoWidget } from "./Widgets/NodeInfoWidget.js";
@@ -15,6 +18,21 @@ export const Sidebar = (): JSX.Element => {
   const { removeDevice } = useDeviceStore();
   const { connection, hardware, nodes, status } = useDevice();
   const { selectedDevice, setSelectedDevice } = useAppStore();
+  const [telemtery, setTelemetry] = useState<Protobuf.DeviceMetrics>();
+  const [grid, setGrid] = useState<string>("");
+  const [batteryHistory, setBatteryHistory] = useState<number[]>([]);
+
+  useEffect(() => {
+    const device = nodes.find((n) => n.data.num === hardware.myNodeNum);
+    if (device?.deviceMetrics?.length) {
+      setTelemetry(device.deviceMetrics[device.deviceMetrics?.length]);
+    }
+    if (device?.data.position) {
+      setGrid(
+        toMGRS(device.data.position.latitudeI, device.data.position.longitudeI)
+      );
+    }
+  }, [nodes, hardware.myNodeNum]);
 
   return (
     <div className="relative flex w-80 flex-shrink-0 flex-col gap-2 border-x border-slate-200 bg-slate-50 p-2">
@@ -49,29 +67,14 @@ export const Sidebar = (): JSX.Element => {
       {/*  */}
       {/*  */}
       {/*  */}
-      <div className="space-y-6">
-        <div>
-          <h3 className="font-medium text-gray-900">Information</h3>
-          <dl className="mt-2 divide-y divide-gray-200 border-t border-b border-gray-200">
-            <div className="flex justify-between py-3 text-sm font-medium">
-              <dt className="text-gray-500">Firmware version</dt>
-              <dd className="cursor-pointer whitespace-nowrap text-gray-900 hover:text-orange-400 hover:underline">
-                {hardware.firmwareVersion}
-              </dd>
-            </div>
-          </dl>
-          <div className="flex justify-between py-3 text-sm font-medium">
-            <dt className="text-gray-500">Bitrate</dt>
-            <dd className="whitespace-nowrap text-gray-900">
-              {hardware.bitrate.toFixed(2)}
-              <span className="font-mono text-sm text-slate-500 ">bps</span>
-            </dd>
-          </div>
-        </div>
-        <NodeInfoWidget />
-        {/* <BatteryWidget /> */}
-        <PeersWidget />
-        <PositionWidget />
+      <div className="flex flex-col gap-3">
+        <NodeInfoWidget hardware={hardware} />
+        <BatteryWidget
+          batteryLevel={telemtery?.batteryLevel ?? 0}
+          voltage={telemtery?.voltage ?? 0}
+        />
+        <PeersWidget peers={nodes.map((n) => n.data)} />
+        <PositionWidget grid={grid} />
 
         <ConfiguringWidget />
       </div>

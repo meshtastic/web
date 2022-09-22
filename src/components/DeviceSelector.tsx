@@ -5,13 +5,15 @@ import { useDeviceStore } from "@app/core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
+import { Mono } from "./Mono.js";
+
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
   const { selectedDevice, setSelectedDevice } = useAppStore();
 
   return (
-    <div className="flex h-full w-16 items-center whitespace-nowrap bg-slate-50 py-12 text-sm [writing-mode:vertical-rl]">
-      <span className="font-mono text-slate-500">Connected Devices</span>
+    <div className="flex h-full w-16 items-center whitespace-nowrap bg-slate-50 py-12 [writing-mode:vertical-rl]">
+      <Mono>Connected Devices</Mono>
       <span className="mt-6 flex gap-4 font-bold text-slate-900">
         {getDevices().map((device) => (
           <div
