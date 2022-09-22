@@ -1,8 +1,10 @@
 import type React from "react";
 
-import { BoltIcon } from "@heroicons/react/24/outline";
+import { Battery100Icon, BoltIcon } from "@heroicons/react/24/outline";
 
 import { Card } from "../Card.js";
+import { Dropdown } from "../Dropdown.js";
+import { Mono } from "../Mono.js";
 
 export interface BatteryWidgetProps {
   batteryLevel: number;
@@ -14,17 +16,22 @@ export const BatteryWidget = ({
   voltage,
 }: BatteryWidgetProps): JSX.Element => {
   return (
-    <Card>
-      <div className="flex w-20 bg-slate-700 p-3">
-        <BoltIcon className="m-auto h-12 text-white" />
-      </div>
-      <div className="w-full">
-        <div className="flex h-8 bg-slate-100">
-          <span className="m-auto text-lg font-medium">Power</span>
+    <Card className="flex-col">
+      <Dropdown title="Position" icon={<BoltIcon className="h-4" />}>
+        <div className="flex">
+          <div className="flex w-20 bg-slate-700 p-3">
+            <Battery100Icon className="m-auto h-12 text-white" />
+          </div>
+          <span className="m-auto text-lg">
+            {batteryLevel}
+            <Mono>%</Mono>
+          </span>
+          <span className="m-auto text-lg">
+            {voltage}
+            <Mono>v</Mono>
+          </span>
         </div>
-        <span>{batteryLevel}</span>
-        <span>{voltage}</span>
-      </div>
+      </Dropdown>
     </Card>
   );
 };

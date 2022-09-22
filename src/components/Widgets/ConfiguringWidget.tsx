@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 
 import { useDevice } from "@core/providers/useDevice.js";
+import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 
 import { Button } from "../Button.js";
 import { Card } from "../Card.js";
+import { Dropdown } from "../Dropdown.js";
 
 export const ConfiguringWidget = (): JSX.Element => {
   const {
@@ -36,43 +38,45 @@ export const ConfiguringWidget = (): JSX.Element => {
 
   return (
     <Card className="flex-col">
-      <div className="flex h-8 bg-slate-100">
-        <span className="m-auto text-lg font-medium">Power</span>
-      </div>
-      <div className="flex flex-col gap-2 p-3">
-        <ol className="flex flex-col gap-3 overflow-hidden">
-          <StatusIndicator
-            title="Device Info"
-            current={hardware.myNodeNum ? 1 : 0}
-            total={0}
-          />
-          <StatusIndicator title="Peers" current={nodes.length} total={0} />
-          <StatusIndicator
-            title="Device Config"
-            current={Object.keys(config).length - 1}
-            total={6}
-          />
-          <StatusIndicator
-            title="Module Config"
-            current={Object.keys(moduleConfig).length - 1}
-            total={6}
-          />
-          <StatusIndicator
-            title="Channels"
-            current={channels.length}
-            total={hardware.maxChannels ?? 0}
-          />
-        </ol>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => {
-            void connection?.configure();
-          }}
-        >
-          Retry
-        </Button>
-      </div>
+      <Dropdown
+        title="Config Status"
+        icon={<AdjustmentsHorizontalIcon className="h-4" />}
+      >
+        <div className="flex flex-col gap-2 p-3">
+          <ol className="flex flex-col gap-3 overflow-hidden">
+            <StatusIndicator
+              title="Device Info"
+              current={hardware.myNodeNum ? 1 : 0}
+              total={0}
+            />
+            <StatusIndicator title="Peers" current={nodes.length} total={0} />
+            <StatusIndicator
+              title="Device Config"
+              current={Object.keys(config).length - 1}
+              total={6}
+            />
+            <StatusIndicator
+              title="Module Config"
+              current={Object.keys(moduleConfig).length - 1}
+              total={6}
+            />
+            <StatusIndicator
+              title="Channels"
+              current={channels.length}
+              total={hardware.maxChannels ?? 0}
+            />
+          </ol>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              void connection?.configure();
+            }}
+          >
+            Retry
+          </Button>
+        </div>
+      </Dropdown>
     </Card>
   );
 };

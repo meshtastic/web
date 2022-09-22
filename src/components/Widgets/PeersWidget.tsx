@@ -3,10 +3,14 @@ import type React from "react";
 import { base16 } from "rfc4648";
 
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { EllipsisHorizontalCircleIcon } from "@heroicons/react/24/outline";
+import {
+  EllipsisHorizontalCircleIcon,
+  UserGroupIcon,
+} from "@heroicons/react/24/outline";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 import { Card } from "../Card.js";
+import { Dropdown } from "../Dropdown.js";
 import { IconButton } from "../IconButton.js";
 import { Mono } from "../Mono.js";
 
@@ -16,12 +20,9 @@ export interface PeersWidgetProps {
 
 export const PeersWidget = ({ peers }: PeersWidgetProps): JSX.Element => {
   return (
-    <Card>
-      <div className="flex w-full flex-col gap-1">
-        <div className="flex h-8 bg-slate-100">
-          <span className="m-auto text-lg font-medium">Peers</span>
-        </div>
-        <div className="p-4">
+    <Card className="flex-col">
+      <Dropdown title="Peers" icon={<UserGroupIcon className="h-4" />}>
+        <div className="p-3">
           {peers.map((peer) => (
             <div
               className="flex gap-2 rounded-md p-2 hover:bg-slate-100"
@@ -49,7 +50,7 @@ export const PeersWidget = ({ peers }: PeersWidgetProps): JSX.Element => {
             </div>
           ))}
         </div>
-      </div>
+      </Dropdown>
     </Card>
   );
 };

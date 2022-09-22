@@ -7,7 +7,7 @@ export const Card = ({
 }: JSX.IntrinsicElements["div"]): JSX.Element => {
   return (
     <div
-      className={`flex overflow-hidden rounded-2xl bg-white text-sm text-black shadow-md ${
+      className={`flex overflow-hidden rounded-md bg-white text-sm text-black shadow-md ${
         className ?? ""
       }`}
       {...rest}
