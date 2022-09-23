@@ -6,6 +6,7 @@ export interface ToggleProps {
   label: string;
   description: string;
   checked: boolean;
+  disabled?: boolean;
   onChange?: (checked: boolean) => void;
 }
 
@@ -13,6 +14,7 @@ export const Toggle = ({
   label,
   description,
   checked,
+  disabled,
   onChange,
 }: ToggleProps): JSX.Element => {
   return (
@@ -31,6 +33,7 @@ export const Toggle = ({
       </span>
       <Switch
         checked={checked}
+        disabled={disabled}
         onChange={onChange}
         className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
           checked ? "bg-indigo-600" : "bg-gray-200"

@@ -21,14 +21,14 @@ export const HTTP = (): JSX.Element => {
   }>({
     defaultValues: {
       ip: "meshtastic.local",
-      tls: false,
+      tls: location.protocol === "https:",
     },
   });
 
   const TLSEnabled = useWatch({
     control,
     name: "tls",
-    defaultValue: false,
+    defaultValue: location.protocol === "https:",
   });
 
   const onSubmit = handleSubmit((data) => {
@@ -63,6 +63,7 @@ export const HTTP = (): JSX.Element => {
             <Toggle
               label="Use TLS"
               description="Description"
+              disabled={location.protocol === "https:"}
               checked={value}
               {...rest}
             />
