@@ -35,9 +35,9 @@ export const Toggle = ({
         checked={checked}
         disabled={disabled}
         onChange={onChange}
-        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-          checked ? "bg-indigo-600" : "bg-gray-200"
-        }`}
+        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
+          checked ? "bg-orange-600" : "bg-orange-100"
+        } ${disabled ? "cursor-not-allowed bg-orange-400" : ""}`}
       >
         <span
           aria-hidden="true"
