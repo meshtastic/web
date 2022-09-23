@@ -39,7 +39,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Input(
       <div className="flex">
         <select
           ref={ref}
-          className={`block w-full min-w-0 flex-1 rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+          className={`flex h-10 w-full rounded-md bg-orange-100 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 ${
             prefix ? "rounded-l-none" : ""
           } ${action ? "rounded-r-none" : ""}`}
           {...rest}
@@ -54,7 +54,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Input(
           <button
             type="button"
             onClick={action.action}
-            className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md bg-orange-200 px-4 py-2 text-sm font-medium hover:bg-orange-300 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
             {action.icon}
           </button>
