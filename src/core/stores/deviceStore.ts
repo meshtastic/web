@@ -51,6 +51,7 @@ export interface Device {
   activePeer: number;
   waypoints: Protobuf.Waypoint[];
   regionUnset: boolean;
+  currentMetrics: Protobuf.DeviceMetrics;
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -104,6 +105,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           activePeer: 0,
           waypoints: [],
           regionUnset: false,
+          currentMetrics: Protobuf.DeviceMetrics.create(),
 
           setReady: (ready: boolean) => {
             set(
@@ -229,6 +231,27 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 if (node) {
                   switch (metrics.data.variant.oneofKind) {
                     case "deviceMetrics":
+                      if (device) {
+                        if (metrics.data.variant.deviceMetrics.batteryLevel) {
+                          device.currentMetrics.batteryLevel =
+                            metrics.data.variant.deviceMetrics.batteryLevel;
+                        }
+                        if (metrics.data.variant.deviceMetrics.voltage) {
+                          device.currentMetrics.voltage =
+                            metrics.data.variant.deviceMetrics.voltage;
+                        }
+                        if (metrics.data.variant.deviceMetrics.airUtilTx) {
+                          device.currentMetrics.airUtilTx =
+                            metrics.data.variant.deviceMetrics.airUtilTx;
+                        }
+                        if (
+                          metrics.data.variant.deviceMetrics.channelUtilization
+                        ) {
+                          device.currentMetrics.channelUtilization =
+                            metrics.data.variant.deviceMetrics.channelUtilization;
+                        }
+                      }
+
                       node.deviceMetrics.push(
                         metrics.data.variant.deviceMetrics
                       );
