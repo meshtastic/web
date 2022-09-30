@@ -58,9 +58,6 @@ export const Sidebar = (): JSX.Element => {
           batteryLevel={currentMetrics.batteryLevel}
           voltage={currentMetrics.voltage}
         />
-        {JSON.stringify(
-          nodes.find((n) => n.data.num === hardware.myNodeNum)?.deviceMetrics
-        )}
         <PeersWidget
           peers={nodes
             .map((n) => n.data)
