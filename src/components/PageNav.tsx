@@ -54,15 +54,15 @@ export const PageNav = (): JSX.Element => {
   ];
 
   return (
-    <div className="flex h-full w-12 flex-shrink-0 items-center whitespace-nowrap border-r border-slate-200 bg-slate-50 py-4 text-sm [writing-mode:vertical-rl]">
-      <span className="mt-6 flex gap-4 font-bold text-slate-500">
+    <div className="t-4 flex h-full w-12 flex-shrink-0 items-center whitespace-nowrap border-r border-slate-200 bg-slate-50 text-sm [writing-mode:vertical-rl]">
+      <span className="mt-2 flex gap-4 font-bold text-slate-500">
         {pages.map((Link) => (
           <div
             key={Link.name}
             onClick={() => {
               setActivePage(Link.page);
             }}
-            className={`h-8 w-8 cursor-pointer rounded-md border-2 p-1 hover:border-orange-300 ${
+            className={`h-9 w-9 cursor-pointer rounded-md border-2 p-1.5 hover:border-orange-300 ${
               Link.page === activePage
                 ? "border-orange-400"
                 : "border-slate-200"

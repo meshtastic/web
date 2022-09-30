@@ -38,20 +38,6 @@ export const Sidebar = (): JSX.Element => {
         }}
       />
 
-      {/* <div className="text-left">
-        <p className="text-xl font-bold text-slate-900">
-          <a href="/">Their Side</a>
-        </p>
-        <p className="mt-3 text-font-medium leading-8 text-slate-700">
-          Conversations with the most tragically misunderstood people of our
-          time.
-        </p>
-      </div> */}
-
-      {/*  */}
-      {/*  */}
-      {/*  */}
-      {/*  */}
       <div className="flex flex-col gap-3">
         <NodeInfoWidget hardware={hardware} />
         <BatteryWidget
