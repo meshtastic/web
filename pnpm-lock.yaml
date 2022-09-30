@@ -6,7 +6,7 @@ specifiers:
   '@heroicons/react': ^2.0.11
   '@hookform/resolvers': ^2.9.8
   '@meshtastic/eslint-config': ^1.0.8
-  '@meshtastic/meshtasticjs': ^0.6.102
+  '@meshtastic/meshtasticjs': ^0.6.103
   '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.7
   '@types/chrome': ^0.0.197
@@ -52,7 +52,7 @@ dependencies:
   '@heroicons/react': 2.0.11_react@18.2.0
   '@hookform/resolvers': 2.9.8_react-hook-form@7.36.1
   '@meshtastic/eslint-config': 1.0.8
-  '@meshtastic/meshtasticjs': 0.6.102
+  '@meshtastic/meshtasticjs': 0.6.103
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.1.8
   '@tailwindcss/typography': 0.5.7_tailwindcss@3.1.8
   base64-js: 1.5.1
@@ -570,8 +570,8 @@ packages:
       - supports-color
     dev: false
 
-  /@meshtastic/meshtasticjs/0.6.102:
-    resolution: {integrity: sha512-mX4VhTxlyZ2T8Y15AWv59a7dkBxVMurPmeTflPd9gJKTfF8gpq8BKl/mmn3R0MhPdfpblGN1UkUlNx+GaCTQyw==}
+  /@meshtastic/meshtasticjs/0.6.103:
+    resolution: {integrity: sha512-jSLdkAYPp72vtuKJTYCxbng9ZDcbJ0hv6whdBL18rvhIxTXyaaFPDIC8IBYYTtgk7X4IR0CYGjycoiKChlBIeg==}
     dependencies:
       '@protobuf-ts/runtime': 2.8.1
       '@serialport/stream': 10.3.0
