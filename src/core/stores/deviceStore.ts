@@ -3,7 +3,7 @@ import { createContext } from "react";
 import { produce } from "immer";
 import create from "zustand";
 
-import { IConnection, Protobuf, Types } from "@meshtastic/meshtasticjs";
+import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
 export type Page =
   | "messages"
@@ -45,7 +45,7 @@ export interface Device {
   moduleConfig: Protobuf.LocalModuleConfig;
   hardware: Protobuf.MyNodeInfo;
   nodes: Node[];
-  connection?: IConnection;
+  connection?: Types.ConnectionType;
   activePage: Page;
   peerInfoOpen: boolean;
   activePeer: number;
@@ -67,7 +67,7 @@ export interface Device {
   addNodeInfo: (nodeInfo: Types.NodeInfoPacket) => void;
   addUser: (user: Types.UserPacket) => void;
   addPosition: (position: Types.PositionPacket) => void;
-  addConnection: (connection: IConnection) => void;
+  addConnection: (connection: Types.ConnectionType) => void;
   addMessage: (message: MessageWithAck) => void;
   addWaypointMessage: (message: WaypointIDWithAck) => void;
   ackMessage: (channelIndex: number, messageId: number) => void;

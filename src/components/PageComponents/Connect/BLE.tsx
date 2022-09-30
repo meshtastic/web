@@ -54,7 +54,7 @@ export const BLE = (): JSX.Element => {
         onClick={() => {
           void navigator.bluetooth
             .requestDevice({
-              filters: [{ services: [Constants.SERVICE_UUID] }],
+              filters: [{ services: [Constants.serviceUUID] }],
             })
             .then((device) => {
               const exists = bleDevices.findIndex((d) => d.id === device.id);

@@ -7,6 +7,7 @@ import { Message } from "@components/PageComponents/Messages/Message.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import type { Channel } from "@core/stores/deviceStore.js";
 import { MapPinIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import type { Types } from "@meshtastic/meshtasticjs";
 
 export interface ChannelChatProps {
   channel: Channel;
@@ -21,7 +22,7 @@ export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
       currentMessage,
       undefined,
       true,
-      channel.config.index,
+      channel.config.index as Types.ChannelNumber,
       (id) => {
         ackMessage(channel.config.index, id);
         return Promise.resolve();
