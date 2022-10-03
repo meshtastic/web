@@ -58,7 +58,7 @@ export const Device = (): JSX.Element => {
     >
       <Select
         label="Role"
-        description="This is a description."
+        description="What role the device performs on the mesh"
         {...register("role", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.Config_DeviceConfig_Role)}
@@ -69,7 +69,7 @@ export const Device = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Serial Output Enabled"
-            description="Description"
+            description="Disable the device's serial console"
             checked={value}
             {...rest}
           />
@@ -81,7 +81,7 @@ export const Device = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Enabled Debug Log"
-            description="Description"
+            description="Output debugging information to the device's serial port (auto disables when serial client is connected)"
             checked={value}
             {...rest}
           />

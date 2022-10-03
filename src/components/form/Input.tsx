@@ -39,9 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         />
         {suffix && (
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 font-mono">
-            <span className="text-gray-500 sm:text-sm" id="price-currency">
-              {suffix}
-            </span>
+            <span className="text-gray-500 sm:text-sm">{suffix}</span>
           </div>
         )}
         {action && (
@@ -60,15 +58,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         )}
       </div>
       {description && (
-        <p className="mt-2 text-sm text-gray-500" id="email-description">
-          {description}
-        </p>
+        <p className="mt-2 text-sm text-gray-500">{description}</p>
       )}
-      {error && (
-        <p className="mt-2 text-sm text-red-600" id="email-error">
-          {error}
-        </p>
-      )}
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>
   );
 });

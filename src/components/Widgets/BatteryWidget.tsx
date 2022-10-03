@@ -17,7 +17,7 @@ export const BatteryWidget = ({
 }: BatteryWidgetProps): JSX.Element => {
   return (
     <Card className="flex-col">
-      <Dropdown title="Position" icon={<BoltIcon className="h-4" />}>
+      <Dropdown title="Battery" icon={<BoltIcon className="h-4" />}>
         <div className="flex">
           <div className="flex w-20 bg-slate-700 p-3">
             <Battery100Icon className="m-auto h-12 text-white" />
@@ -27,7 +27,7 @@ export const BatteryWidget = ({
             <Mono>%</Mono>
           </span>
           <span className="m-auto text-lg">
-            {voltage}
+            {voltage.toPrecision(2)}
             <Mono>v</Mono>
           </span>
         </div>

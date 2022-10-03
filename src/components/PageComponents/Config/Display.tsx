@@ -58,21 +58,21 @@ export const Display = (): JSX.Element => {
     >
       <Input
         label="Screen Timeout"
-        description="This is a description."
+        description="Turn off the display after this long"
         suffix="Seconds"
         type="number"
         {...register("screenOnSecs", { valueAsNumber: true })}
       />
       <Input
         label="Carousel Delay"
-        description="This is a description."
+        description="How fast to cycle through windows"
         suffix="Seconds"
         type="number"
         {...register("autoScreenCarouselSecs", { valueAsNumber: true })}
       />
       <Select
         label="GPS Display Units"
-        description="This is a description."
+        description="Coordinate display format"
         {...register("gpsFormat", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.Config_DisplayConfig_GpsCoordinateFormat)}
@@ -83,7 +83,7 @@ export const Display = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Compass North Top"
-            description="Description"
+            description="Fix north to the top of compass"
             checked={value}
             {...rest}
           />
@@ -95,7 +95,7 @@ export const Display = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Flip Screen"
-            description="Description"
+            description="Flip display 180 degrees"
             checked={value}
             {...rest}
           />
@@ -103,7 +103,7 @@ export const Display = (): JSX.Element => {
       />
       <Select
         label="Display Units"
-        description="This is a description."
+        description="Display metric or imperial units"
         {...register("units", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.Config_DisplayConfig_DisplayUnits)}

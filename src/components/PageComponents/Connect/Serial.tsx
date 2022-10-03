@@ -1,6 +1,7 @@
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 
+import { Mono } from "@app/components/Mono.js";
 import { Button } from "@components/Button.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
@@ -59,6 +60,9 @@ export const Serial = (): JSX.Element => {
             {port.getInfo().usbVendorId} - {port.getInfo().usbProductId}
           </Button>
         ))}
+        {serialPorts.length === 0 && (
+          <Mono className="m-auto">No devices paired yet.</Mono>
+        )}
       </div>
       <Button
         iconBefore={<PlusCircleIcon className="w-4" />}

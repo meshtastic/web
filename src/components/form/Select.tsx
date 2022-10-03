@@ -23,6 +23,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Input(
     suffix,
     action,
     error,
+    disabled,
     children,
     ...rest
   }: SelectProps,
@@ -41,7 +42,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Input(
           ref={ref}
           className={`flex h-10 w-full rounded-md bg-orange-100 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 ${
             prefix ? "rounded-l-none" : ""
-          } ${action ? "rounded-r-none" : ""}`}
+          } ${action ? "rounded-r-none" : ""} ${
+            disabled ? "cursor-not-allowed" : ""
+          }`}
+          disabled={disabled}
           {...rest}
         >
           {options &&
@@ -60,6 +64,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Input(
           </button>
         )}
       </div>
+      {description && (
+        <p className="mt-2 text-sm text-gray-500">{description}</p>
+      )}
     </div>
   );
 });

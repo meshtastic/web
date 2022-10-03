@@ -21,8 +21,12 @@ export interface PeersWidgetProps {
 export const PeersWidget = ({ peers }: PeersWidgetProps): JSX.Element => {
   return (
     <Card className="flex-col">
-      <Dropdown title="Peers" icon={<UserGroupIcon className="h-4" />}>
-        <div className="p-3">
+      <Dropdown
+        title="Peers"
+        stat={peers.length}
+        icon={<UserGroupIcon className="h-4" />}
+      >
+        <div className="flex flex-col p-3">
           {peers.map((peer) => (
             <div
               className="flex gap-2 rounded-md p-2 hover:bg-slate-100"
@@ -49,6 +53,9 @@ export const PeersWidget = ({ peers }: PeersWidgetProps): JSX.Element => {
               </div>
             </div>
           ))}
+          {peers.length === 0 && (
+            <Mono className="m-auto">No devices discovered yet.</Mono>
+          )}
         </div>
       </Dropdown>
     </Card>

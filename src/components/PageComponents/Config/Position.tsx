@@ -57,7 +57,7 @@ export const Position = (): JSX.Element => {
       <Input
         suffix="Seconds"
         label="Broadcast Interval"
-        description="This is a description."
+        description="How often your position is sent out over the mesh"
         type="number"
         error={errors.positionBroadcastSecs?.message}
         {...register("positionBroadcastSecs", { valueAsNumber: true })}
@@ -68,7 +68,7 @@ export const Position = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Enable Smart Position"
-            description="Description"
+            description="Only send position when there has been a meaningfull change in location"
             checked={value}
             {...rest}
           />
@@ -80,7 +80,7 @@ export const Position = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Use Fixed Position"
-            description="Description"
+            description="Don't report GPS position, but a manually specified one"
             checked={value}
             {...rest}
           />
@@ -92,7 +92,7 @@ export const Position = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="GPS Enabled"
-            description="Description"
+            description="Enable the internal GPS module"
             checked={value}
             {...rest}
           />
@@ -101,14 +101,14 @@ export const Position = (): JSX.Element => {
       <Input
         suffix="Seconds"
         label="GPS Update Interval"
-        description="This is a description."
+        description="How often a GPS fix should be acquired"
         type="number"
         error={errors.gpsUpdateInterval?.message}
         {...register("gpsUpdateInterval", { valueAsNumber: true })}
       />
       <Input
-        label="Last GPS Attempt"
-        description="This is a description."
+        label="Fix Attempt Duration"
+        description="How long the device will try to get a fix for"
         type="number"
         error={errors.gpsAttemptTime?.message}
         {...register("gpsAttemptTime", { valueAsNumber: true })}

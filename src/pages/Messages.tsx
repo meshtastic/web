@@ -7,11 +7,7 @@ import {
 } from "@components/layout/page/TabbedContent.js";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.js";
 import { useDevice } from "@core/providers/useDevice.js";
-import {
-  EllipsisHorizontalCircleIcon,
-  PencilIcon,
-  XCircleIcon,
-} from "@heroicons/react/24/outline";
+import { PencilIcon } from "@heroicons/react/24/outline";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const MessagesPage = (): JSX.Element => {
@@ -24,11 +20,6 @@ export const MessagesPage = (): JSX.Element => {
         : channel.config.index === 0
         ? "Primary"
         : `Ch ${channel.config.index}`,
-      icon: channel.messages.length ? (
-        <EllipsisHorizontalCircleIcon className="h-4" />
-      ) : (
-        <XCircleIcon className="h-4" />
-      ),
       element: () => <ChannelChat channel={channel} />,
       disabled: channel.config.role === Protobuf.Channel_Role.DISABLED,
     };

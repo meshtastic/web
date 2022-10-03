@@ -40,6 +40,9 @@ export class LoRaValidation implements Protobuf.Config_LoRaConfig {
   @Min(0)
   txPower: number;
 
+  @IsInt()
+  channelNum: number;
+
   @IsArray()
   ignoreIncoming: number[];
 }

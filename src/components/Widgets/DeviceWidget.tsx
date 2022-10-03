@@ -22,7 +22,7 @@ export const DeviceWidget = ({
   reconnect,
 }: DeviceWidgetProps): JSX.Element => {
   return (
-    <Card className="relative flex-col">
+    <Card className="relative shrink-0 flex-col">
       <div className="absolute bottom-20 h-full w-full">
         <Hashicon size={350} value={nodeNum} />
       </div>

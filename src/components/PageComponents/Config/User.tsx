@@ -80,13 +80,13 @@ export const User = (): JSX.Element => {
       />
       <Input
         label="Short Name"
-        description="This is a description."
+        description="Shown on small screens."
         maxLength={3}
         {...register("shortName")}
       />
       <Input
         label="Mac Address"
-        description="This is a description."
+        description="Hardware address for this node."
         disabled
         value={
           base16
@@ -97,7 +97,7 @@ export const User = (): JSX.Element => {
       />
       <Select
         label="Hardware"
-        description="This is a description."
+        description="Hardware model of this device."
         disabled
         value={myNode?.data.user?.hwModel}
       >
@@ -109,7 +109,7 @@ export const User = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Licenced Operator?"
-            description="Description"
+            description="Remove bandwidth restrictions in certain regions (HAM license required)"
             checked={value}
             {...rest}
           />

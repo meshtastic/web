@@ -69,7 +69,7 @@ export const Network = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="WiFi Enabled"
-            description="Description"
+            description="Enable or disbale the WiFi radio"
             checked={value}
             {...rest}
           />
@@ -77,7 +77,7 @@ export const Network = (): JSX.Element => {
       />
       <Select
         label="WiFi Mode"
-        description="This is a description."
+        description="How the WiFi radio should be used"
         disabled={!wifiEnabled}
         {...register("wifiMode", { valueAsNumber: true })}
       >
@@ -85,7 +85,7 @@ export const Network = (): JSX.Element => {
       </Select>
       <Input
         label="SSID"
-        description="This is a description."
+        description="Network name"
         error={errors.wifiSsid?.message}
         disabled={!wifiEnabled}
         {...register("wifiSsid")}
@@ -93,14 +93,14 @@ export const Network = (): JSX.Element => {
       <Input
         label="PSK"
         type="password"
-        description="This is a description."
+        description="Network password"
         error={errors.wifiPsk?.message}
         disabled={!wifiEnabled}
         {...register("wifiPsk")}
       />
       <Input
         label="NTP Server"
-        description="This is a description."
+        description="NTP server for time synchronization"
         error={errors.ntpServer?.message}
         {...register("ntpServer")}
       />

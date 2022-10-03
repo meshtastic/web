@@ -70,7 +70,7 @@ export const LoRa = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Use Preset"
-            description="Description"
+            description="Use one of the predefined modem presets"
             checked={value}
             {...rest}
           />
@@ -78,7 +78,7 @@ export const LoRa = (): JSX.Element => {
       />
       <Select
         label="Preset"
-        description="This is a description."
+        description="Modem preset to use"
         disabled={!usePreset}
         {...register("modemPreset", { valueAsNumber: true })}
       >
@@ -158,6 +158,13 @@ export const LoRa = (): JSX.Element => {
         type="number"
         error={errors.txPower?.message}
         {...register("txPower", { valueAsNumber: true })}
+      />
+      <Input
+        label="Channel Number"
+        description="LoRa channel number"
+        type="number"
+        error={errors.channelNum?.message}
+        {...register("channelNum", { valueAsNumber: true })}
       />
     </Form>
   );

@@ -43,9 +43,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           <label htmlFor="comments" className="font-medium text-gray-700">
             {label}
           </label>
-          <p id="comments-description" className="text-gray-500">
-            {description}
-          </p>
+          <p className="text-gray-500">{description}</p>
         </div>
       </div>
     );

@@ -55,7 +55,7 @@ export const Power = (): JSX.Element => {
     >
       <Input
         label="Shutdown on battery delay"
-        description="This is a description."
+        description="Automatically shutdown node after this long when on battery, 0 for indefinite"
         suffix="Seconds"
         type="number"
         error={errors.onBatteryShutdownAfterSecs?.message}
@@ -66,7 +66,7 @@ export const Power = (): JSX.Element => {
         control={control}
         render={({ field: { value, ...rest } }) => (
           <Toggle
-            label="Power Saving"
+            label="Enable power saving mode"
             description="Description"
             checked={value}
             {...rest}
@@ -75,14 +75,14 @@ export const Power = (): JSX.Element => {
       />
       <Input
         label="ADC Multiplier Override ratio"
-        description="This is a description."
+        description="Used for tweaking battery voltage reading"
         type="number"
         error={errors.adcMultiplierOverride?.message}
         {...register("adcMultiplierOverride", { valueAsNumber: true })}
       />
       <Input
         label="Minimum Wake Time"
-        description="This is a description."
+        description="Minimum amount of time the device will stay away for after recieving a packet"
         suffix="Seconds"
         type="number"
         error={errors.minWakeSecs?.message}
@@ -90,31 +90,31 @@ export const Power = (): JSX.Element => {
       />
       <Input
         label="Mesh SDS Timeout"
-        description="This is a description."
+        description="The device will enter super deep sleep after this time"
         suffix="Seconds"
         type="number"
         error={errors.meshSdsTimeoutSecs?.message}
         {...register("meshSdsTimeoutSecs", { valueAsNumber: true })}
       />
       <Input
-        label="SDS"
-        description="This is a description."
+        label="Super Deep Sleep Duration"
+        description="How long the device will be in super deep sleep for"
         suffix="Seconds"
         type="number"
         error={errors.sdsSecs?.message}
         {...register("sdsSecs", { valueAsNumber: true })}
       />
       <Input
-        label="LS"
-        description="This is a description."
+        label="Light Sleep Duration"
+        description="How long the device will be in light sleep for"
         suffix="Seconds"
         type="number"
         error={errors.lsSecs?.message}
         {...register("lsSecs", { valueAsNumber: true })}
       />
       <Input
-        label="Wait Bluetooth"
-        description="This is a description."
+        label="No Connection Bluetooth Disabled"
+        description="If the device does not revieve a bluetooth connection, the BLE radio will be disabled after this long"
         suffix="Seconds"
         type="number"
         error={errors.waitBluetoothSecs?.message}
