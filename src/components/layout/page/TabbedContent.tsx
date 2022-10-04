@@ -2,6 +2,7 @@ import type React from "react";
 import { Fragment } from "react";
 
 import { Tab } from "@headlessui/react";
+import { Mono } from "@app/components/Mono";
 
 export interface TabType {
   name: string;
@@ -50,7 +51,11 @@ export const TabbedContent = ({
       <Tab.Panels as={Fragment}>
         {tabs.map((entry, index) => (
           <Tab.Panel key={index} className="flex flex-grow">
-            <entry.element />
+            {!entry.disabled ? <entry.element /> : (
+              <Mono>
+                This functionality is not supported in your browser.
+              </Mono>
+            )}
           </Tab.Panel>
         ))}
       </Tab.Panels>
