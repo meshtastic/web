@@ -9,7 +9,6 @@ import { HTTP } from "./PageComponents/Connect/HTTP.js";
 import { Serial } from "./PageComponents/Connect/Serial.js";
 
 export const NewDevice = () => {
-
   const [tabs, _setTabs] = useState<TabType[]>([
     {
       name: "BLE",
