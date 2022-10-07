@@ -1,8 +1,8 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Controller, useForm, useWatch } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Select } from "@app/components/form/Select.js";
@@ -16,7 +16,6 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const CannedMessage = (): JSX.Element => {
   const { moduleConfig, connection } = useDevice();
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -39,28 +38,34 @@ export const CannedMessage = (): JSX.Element => {
   }, [reset, moduleConfig.cannedMessage]);
 
   const onSubmit = handleSubmit((data) => {
-    setLoading(true);
-    void connection?.setModuleConfig(
-      {
-        payloadVariant: {
-          oneofKind: "cannedMessage",
-          cannedMessage: data,
-        },
-      },
-      async () => {
-        reset({ ...data });
-        setLoading(false);
-        toast.success("Saved Canned Message Config, Restarting Node");
-        await Promise.resolve();
-      }
-    );
+    if (connection) {
+      void toast.promise(
+        connection.setModuleConfig(
+          {
+            payloadVariant: {
+              oneofKind: "cannedMessage",
+              cannedMessage: data,
+            },
+          },
+          async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved Canned Message Config, Restarting Node",
+          error: "No response received",
+        }
+      );
+    }
   });
+
   return (
     <Form
       title="Canned Message Config"
       breadcrumbs={["Module Config", "Canned Message"]}
       reset={() => reset(moduleConfig.cannedMessage)}
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >

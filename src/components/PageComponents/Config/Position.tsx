@@ -1,8 +1,8 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Controller, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -13,7 +13,6 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const Position = (): JSX.Element => {
   const { config, connection } = useDevice();
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -30,21 +29,27 @@ export const Position = (): JSX.Element => {
   }, [reset, config.position]);
 
   const onSubmit = handleSubmit((data) => {
-    setLoading(true);
-    void connection?.setConfig(
-      {
-        payloadVariant: {
-          oneofKind: "position",
-          position: data,
-        },
-      },
-      async () => {
-        reset({ ...data });
-        setLoading(false);
-        toast.success("Saved Position Config, Restarting Node");
-        await Promise.resolve();
-      }
-    );
+    if (connection) {
+      void toast.promise(
+        connection.setConfig(
+          {
+            payloadVariant: {
+              oneofKind: "position",
+              position: data,
+            },
+          },
+          async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved Position Config, Restarting Node",
+          error: "No response received",
+        }
+      );
+    }
   });
 
   return (
@@ -52,7 +57,6 @@ export const Position = (): JSX.Element => {
       title="Position Config"
       breadcrumbs={["Config", "Position"]}
       reset={() => reset(config.position)}
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >

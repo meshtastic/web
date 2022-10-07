@@ -1,8 +1,8 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Controller, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Select } from "@app/components/form/Select.js";
@@ -16,7 +16,6 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Display = (): JSX.Element => {
   const { config, connection } = useDevice();
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -33,28 +32,34 @@ export const Display = (): JSX.Element => {
   }, [reset, config.display]);
 
   const onSubmit = handleSubmit((data) => {
-    setLoading(true);
-    void connection?.setConfig(
-      {
-        payloadVariant: {
-          oneofKind: "display",
-          display: data,
-        },
-      },
-      async () => {
-        reset({ ...data });
-        setLoading(false);
-        toast.success("Saved Display Config, Restarting Node");
-        await Promise.resolve();
-      }
-    );
+    if (connection) {
+      void toast.promise(
+        connection.setConfig(
+          {
+            payloadVariant: {
+              oneofKind: "display",
+              display: data,
+            },
+          },
+          async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved Display Config, Restarting Node",
+          error: "No response received",
+        }
+      );
+    }
   });
+
   return (
     <Form
       title="Display Config"
       breadcrumbs={["Config", "Display"]}
       reset={() => reset(config.display)}
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >

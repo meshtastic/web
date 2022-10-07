@@ -1,8 +1,8 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Controller, useForm, useWatch } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -13,7 +13,6 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const ExternalNotification = (): JSX.Element => {
   const { moduleConfig, connection } = useDevice();
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -28,22 +27,28 @@ export const ExternalNotification = (): JSX.Element => {
     reset(moduleConfig.externalNotification);
   }, [reset, moduleConfig.externalNotification]);
 
-  const onSubmit = handleSubmit(async (data) => {
-    setLoading(true);
-    await connection?.setModuleConfig(
-      {
-        payloadVariant: {
-          oneofKind: "externalNotification",
-          externalNotification: data,
-        },
-      },
-      async (): Promise<void> => {
-        reset({ ...data });
-        setLoading(false);
-        toast.success("Saved External Notification Config, Restarting Node");
-        await Promise.resolve();
-      }
-    );
+  const onSubmit = handleSubmit((data) => {
+    if (connection) {
+      void toast.promise(
+        connection.setModuleConfig(
+          {
+            payloadVariant: {
+              oneofKind: "externalNotification",
+              externalNotification: data,
+            },
+          },
+          async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved External Notification Config, Restarting Node",
+          error: "No response received",
+        }
+      );
+    }
   });
 
   const moduleEnabled = useWatch({
@@ -57,7 +62,6 @@ export const ExternalNotification = (): JSX.Element => {
       title="External Notification Config"
       breadcrumbs={["Module Config", "External Notification"]}
       reset={() => reset(moduleConfig.externalNotification)}
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >

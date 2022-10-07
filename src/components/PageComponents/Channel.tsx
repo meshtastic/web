@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import { fromByteArray, toByteArray } from "base64-js";
 import { Controller, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Form } from "@components/form/Form";
@@ -23,7 +24,6 @@ export interface SettingsPanelProps {
 
 export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   const { connection } = useDevice();
-  const [loading, setLoading] = useState(false);
   const [keySize, setKeySize] = useState<128 | 256>(256);
   const [pskHidden, setPskHidden] = useState(true);
 
@@ -62,27 +62,35 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
     });
   }, [channel, reset]);
 
-  const onSubmit = handleSubmit(async (data) => {
-    setLoading(true);
-    const channelData = Protobuf.Channel.create({
-      role:
-        channel?.role === Protobuf.Channel_Role.PRIMARY
-          ? Protobuf.Channel_Role.PRIMARY
-          : data.enabled
-          ? Protobuf.Channel_Role.SECONDARY
-          : Protobuf.Channel_Role.DISABLED,
-      index: channel?.index,
-      settings: {
-        ...data,
-        psk: toByteArray(data.psk ?? ""),
-      },
-    });
-
-    await connection?.setChannel(channelData, (): Promise<void> => {
-      reset({ ...data });
-      setLoading(false);
-      return Promise.resolve();
-    });
+  const onSubmit = handleSubmit((data) => {
+    if (connection) {
+      void toast.promise(
+        connection.setChannel(
+          {
+            role:
+              channel?.role === Protobuf.Channel_Role.PRIMARY
+                ? Protobuf.Channel_Role.PRIMARY
+                : data.enabled
+                ? Protobuf.Channel_Role.SECONDARY
+                : Protobuf.Channel_Role.DISABLED,
+            index: channel?.index,
+            settings: {
+              ...data,
+              psk: toByteArray(data.psk ?? ""),
+            },
+          },
+          (): Promise<void> => {
+            reset({ ...data });
+            return Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved Channel",
+          error: "No response received",
+        }
+      );
+    }
   });
 
   return (
@@ -108,7 +116,6 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
           psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
         })
       }
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >

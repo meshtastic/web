@@ -5,7 +5,6 @@ import { FiSave } from "react-icons/fi";
 
 import { Button } from "@components/Button.js";
 import {
-  ArrowPathIcon,
   ArrowUturnLeftIcon,
   ChevronRightIcon,
   HomeIcon,
@@ -16,7 +15,6 @@ export interface FormProps extends HTMLProps<HTMLFormElement> {
   breadcrumbs: string[];
   reset: () => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
-  loading: boolean;
   dirty: boolean;
 }
 
@@ -24,7 +22,6 @@ export const Form = ({
   title,
   breadcrumbs,
   reset,
-  loading,
   dirty,
   children,
   onSubmit,
@@ -33,11 +30,6 @@ export const Form = ({
   return (
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     <form className="w-full" onSubmit={onSubmit} {...props}>
-      {loading && (
-        <div className="absolute z-10 flex h-full w-full rounded-md bg-slate-600">
-          <ArrowPathIcon className="m-auto h-8 animate-spin" />
-        </div>
-      )}
       <div className="select-none rounded-md bg-gray-700 p-4">
         <ol className="flex gap-4">
           <li className="cursor-pointer text-gray-400 hover:text-gray-200">

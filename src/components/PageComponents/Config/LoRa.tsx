@@ -1,8 +1,8 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Controller, useForm, useWatch } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Select } from "@app/components/form/Select.js";
@@ -16,7 +16,6 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const LoRa = (): JSX.Element => {
   const { config, connection } = useDevice();
-  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -40,21 +39,27 @@ export const LoRa = (): JSX.Element => {
   }, [reset, config.lora]);
 
   const onSubmit = handleSubmit((data) => {
-    setLoading(true);
-    void connection?.setConfig(
-      {
-        payloadVariant: {
-          oneofKind: "lora",
-          lora: data,
-        },
-      },
-      async () => {
-        reset({ ...data });
-        setLoading(false);
-        toast.success("Saved LoRa Config, Restarting Node");
-        await Promise.resolve();
-      }
-    );
+    if (connection) {
+      void toast.promise(
+        connection.setConfig(
+          {
+            payloadVariant: {
+              oneofKind: "lora",
+              lora: data,
+            },
+          },
+          async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved LoRa Config, Restarting Node",
+          error: "No response received",
+        }
+      );
+    }
   });
 
   return (
@@ -62,7 +67,6 @@ export const LoRa = (): JSX.Element => {
       title="LoRa Config"
       breadcrumbs={["Config", "LoRa"]}
       reset={() => reset(config.lora)}
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >

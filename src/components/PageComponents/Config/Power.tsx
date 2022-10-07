@@ -1,8 +1,8 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Controller, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -13,7 +13,6 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const Power = (): JSX.Element => {
   const { config, connection } = useDevice();
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -30,28 +29,34 @@ export const Power = (): JSX.Element => {
   }, [reset, config.power]);
 
   const onSubmit = handleSubmit((data) => {
-    setLoading(true);
-    void connection?.setConfig(
-      {
-        payloadVariant: {
-          oneofKind: "power",
-          power: data,
-        },
-      },
-      async () => {
-        reset({ ...data });
-        setLoading(false);
-        toast.success("Saved Power Config, Restarting Node");
-        await Promise.resolve();
-      }
-    );
+    if (connection) {
+      void toast.promise(
+        connection.setConfig(
+          {
+            payloadVariant: {
+              oneofKind: "power",
+              power: data,
+            },
+          },
+          async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved Power Config, Restarting Node",
+          error: "No response received",
+        }
+      );
+    }
   });
+
   return (
     <Form
       title="Power Config"
       breadcrumbs={["Config", "Power"]}
       reset={() => reset(config.power)}
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >

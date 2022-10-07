@@ -1,8 +1,8 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Controller, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { base16 } from "rfc4648";
 
 import { Input } from "@app/components/form/Input.js";
@@ -17,7 +17,6 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const User = (): JSX.Element => {
   const { hardware, nodes, connection } = useDevice();
-  const [loading, setLoading] = useState(false);
 
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
@@ -41,15 +40,18 @@ export const User = (): JSX.Element => {
   }, [reset, myNode]);
 
   const onSubmit = handleSubmit((data) => {
-    setLoading(true);
-
-    if (myNode?.data.user) {
-      void connection?.setOwner({ ...myNode.data.user, ...data }, async () => {
-        reset({ ...data });
-        setLoading(false);
-        toast.success("Saved User Config, Restarting Node");
-        await Promise.resolve();
-      });
+    if (connection && myNode?.data.user) {
+      void toast.promise(
+        connection.setOwner({ ...myNode.data.user, ...data }, async () => {
+          reset({ ...data });
+          await Promise.resolve();
+        }),
+        {
+          loading: "Saving...",
+          success: "Saved User, Restarting Node",
+          error: "No response received",
+        }
+      );
     }
   });
 
@@ -64,7 +66,6 @@ export const User = (): JSX.Element => {
           isLicensed: myNode?.data.user?.isLicensed,
         });
       }}
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >

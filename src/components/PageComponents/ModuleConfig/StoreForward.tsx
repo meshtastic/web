@@ -1,8 +1,8 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Controller, useForm, useWatch } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -13,7 +13,6 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const StoreForward = (): JSX.Element => {
   const { moduleConfig, connection } = useDevice();
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -29,22 +28,28 @@ export const StoreForward = (): JSX.Element => {
     reset(moduleConfig.storeForward);
   }, [reset, moduleConfig.storeForward]);
 
-  const onSubmit = handleSubmit(async (data) => {
-    setLoading(true);
-    await connection?.setModuleConfig(
-      {
-        payloadVariant: {
-          oneofKind: "storeForward",
-          storeForward: data,
-        },
-      },
-      async (): Promise<void> => {
-        reset({ ...data });
-        setLoading(false);
-        toast.success("Saved Stora & Forward Config, Restarting Node");
-        await Promise.resolve();
-      }
-    );
+  const onSubmit = handleSubmit((data) => {
+    if (connection) {
+      void toast.promise(
+        connection.setModuleConfig(
+          {
+            payloadVariant: {
+              oneofKind: "storeForward",
+              storeForward: data,
+            },
+          },
+          async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved Store & Forward Config, Restarting Node",
+          error: "No response received",
+        }
+      );
+    }
   });
 
   const moduleEnabled = useWatch({
@@ -58,7 +63,6 @@ export const StoreForward = (): JSX.Element => {
       title="Store & Forward Config"
       breadcrumbs={["Module Config", "Store & Forward"]}
       reset={() => reset(moduleConfig.storeForward)}
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >

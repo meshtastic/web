@@ -1,8 +1,8 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Controller, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Select } from "@app/components/form/Select.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -15,7 +15,6 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Device = (): JSX.Element => {
   const { config, connection } = useDevice();
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -32,28 +31,34 @@ export const Device = (): JSX.Element => {
   }, [reset, config.device]);
 
   const onSubmit = handleSubmit((data) => {
-    setLoading(true);
-    void connection?.setConfig(
-      {
-        payloadVariant: {
-          oneofKind: "device",
-          device: data,
-        },
-      },
-      async () => {
-        reset({ ...data });
-        setLoading(false);
-        toast.success("Saved Device Config, Restarting Node");
-        await Promise.resolve();
-      }
-    );
+    if (connection) {
+      void toast.promise(
+        connection.setConfig(
+          {
+            payloadVariant: {
+              oneofKind: "device",
+              device: data,
+            },
+          },
+          async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved Device Config, Restarting Node",
+          error: "No response received",
+        }
+      );
+    }
   });
+
   return (
     <Form
       title="Device Config"
       breadcrumbs={["Config", "Device"]}
       reset={() => reset(config.device)}
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >

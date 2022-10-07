@@ -1,8 +1,8 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Controller, useForm, useWatch } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -13,7 +13,6 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const MQTT = (): JSX.Element => {
   const { moduleConfig, connection } = useDevice();
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -36,28 +35,34 @@ export const MQTT = (): JSX.Element => {
   }, [reset, moduleConfig.mqtt]);
 
   const onSubmit = handleSubmit((data) => {
-    setLoading(true);
-    void connection?.setModuleConfig(
-      {
-        payloadVariant: {
-          oneofKind: "mqtt",
-          mqtt: data,
-        },
-      },
-      async () => {
-        reset({ ...data });
-        setLoading(false);
-        toast.success("Saved MQTT Config, Restarting Node");
-        await Promise.resolve();
-      }
-    );
+    if (connection) {
+      void toast.promise(
+        connection.setModuleConfig(
+          {
+            payloadVariant: {
+              oneofKind: "mqtt",
+              mqtt: data,
+            },
+          },
+          async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved MQTT Config, Restarting Node",
+          error: "No response received",
+        }
+      );
+    }
   });
+
   return (
     <Form
       title="MQTT Config"
       breadcrumbs={["Module Config", "MQTT"]}
       reset={() => reset(moduleConfig.mqtt)}
-      loading={loading}
       dirty={isDirty}
       onSubmit={onSubmit}
     >
