@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 
 import { Controller, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -40,6 +41,7 @@ export const Telemetry = (): JSX.Element => {
       async () => {
         reset({ ...data });
         setLoading(false);
+        toast.success("Saved Telemetry Config, Restarting Node");
         await Promise.resolve();
       }
     );

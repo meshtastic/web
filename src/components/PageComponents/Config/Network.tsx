@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 
 import { Controller, useForm, useWatch } from "react-hook-form";
+import toast from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Select } from "@app/components/form/Select.js";
@@ -47,9 +48,9 @@ export const Network = (): JSX.Element => {
         },
       },
       async () => {
-        // toaster.success("Successfully updated Network config");
         reset({ ...data });
         setLoading(false);
+        toast.success("Saved Network Config, Restarting Node");
         await Promise.resolve();
       }
     );

@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+
 import type { Device } from "@core/stores/deviceStore.js";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
@@ -53,6 +55,9 @@ export const subscribeAll = (
   });
 
   connection.onNodeInfoPacket.subscribe((nodeInfo) => {
+    toast(`New Node Discovered: ${nodeInfo.data.user?.shortName ?? "UNK"}`, {
+      icon: "🔎",
+    });
     device.addNodeInfo(nodeInfo);
   });
 

@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 
 import { Controller, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { base16 } from "rfc4648";
 
 import { Input } from "@app/components/form/Input.js";
@@ -46,6 +47,7 @@ export const User = (): JSX.Element => {
       void connection?.setOwner({ ...myNode.data.user, ...data }, async () => {
         reset({ ...data });
         setLoading(false);
+        toast.success("Saved User Config, Restarting Node");
         await Promise.resolve();
       });
     }

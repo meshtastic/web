@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 
 import { Controller, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 import { Select } from "@app/components/form/Select.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -40,9 +41,9 @@ export const Device = (): JSX.Element => {
         },
       },
       async () => {
-        // toaster.success("Successfully updated device config");
         reset({ ...data });
         setLoading(false);
+        toast.success("Saved Device Config, Restarting Node");
         await Promise.resolve();
       }
     );

@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 
 import { Controller, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Select } from "@app/components/form/Select.js";
@@ -43,6 +44,7 @@ export const Display = (): JSX.Element => {
       async () => {
         reset({ ...data });
         setLoading(false);
+        toast.success("Saved Display Config, Restarting Node");
         await Promise.resolve();
       }
     );

@@ -1,5 +1,6 @@
 import type React from "react";
 
+import { Toaster } from "react-hot-toast";
 import { MapProvider } from "react-map-gl";
 
 import { useAppStore } from "@app/core/stores/appStore.js";
@@ -24,6 +25,11 @@ export const App = (): JSX.Element => {
 
       {device && (
         <DeviceWrapper device={device}>
+          <Toaster
+            toastOptions={{
+              duration: 2000,
+            }}
+          />
           <Sidebar />
           <PageNav />
           <MapProvider>
