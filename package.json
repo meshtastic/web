@@ -22,7 +22,7 @@
   "dependencies": {
     "@emeraldpay/hashicon-react": "^0.5.2",
     "@headlessui/react": "^1.7.3",
-    "@heroicons/react": "^2.0.11",
+    "@heroicons/react": "^2.0.12",
     "@hookform/resolvers": "^2.9.8",
     "@meshtastic/eslint-config": "^1.0.8",
     "@meshtastic/meshtasticjs": "^0.6.104",
@@ -37,7 +37,7 @@
     "maplibre-gl": "^2.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.36.1",
+    "react-hook-form": "^7.37.0",
     "react-icons": "^4.4.0",
     "react-json-pretty": "^2.2.0",
     "react-map-gl": "^7.0.19",
@@ -48,10 +48,10 @@
   "devDependencies": {
     "@types/chrome": "^0.0.197",
     "@types/geodesy": "^2.2.3",
-    "@types/node": "^18.8.0",
+    "@types/node": "^18.8.3",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
-    "@types/w3c-web-serial": "^1.0.2",
+    "@types/w3c-web-serial": "^1.0.3",
     "@types/web-bluetooth": "^0.0.15",
     "@vitejs/plugin-react": "^2.1.0",
     "autoprefixer": "^10.4.12",
@@ -65,7 +65,7 @@
     "tslib": "^2.4.0",
     "typescript": "^4.8.4",
     "unimported": "^1.22.0",
-    "vite": "^3.1.4",
+    "vite": "^3.1.6",
     "vite-plugin-environment": "^1.1.2"
   }
 }

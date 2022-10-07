@@ -11,6 +11,7 @@ export type Page =
   | "extensions"
   | "config"
   | "channels"
+  | "peers"
   | "info";
 
 export interface MessageWithAck extends Types.MessagePacket {
