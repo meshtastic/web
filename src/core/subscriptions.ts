@@ -13,6 +13,10 @@ export const subscribeAll = (
   // onLogEvent
   // onMeshHeartbeat
 
+  connection.onDeviceMetadataPacket.subscribe((metadataPacket) => {
+    device.addDeviceMetadataMessage(metadataPacket);
+  });
+
   connection.onRoutingPacket.subscribe((routingPacket) => {
     console.log(routingPacket);
   });

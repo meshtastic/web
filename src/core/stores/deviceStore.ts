@@ -32,8 +32,9 @@ export interface Channel {
 }
 
 export interface Node {
-  deviceMetrics: Protobuf.DeviceMetrics[];
-  environmentMetrics: Protobuf.EnvironmentMetrics[];
+  deviceMetrics: (Protobuf.DeviceMetrics & { timestamp: Date })[];
+  environmentMetrics: (Protobuf.EnvironmentMetrics & { timestamp: Date })[];
+  metadata?: Protobuf.DeviceMetadata;
   data: Protobuf.NodeInfo;
 }
 
@@ -72,6 +73,7 @@ export interface Device {
   addConnection: (connection: Types.ConnectionType) => void;
   addMessage: (message: MessageWithAck) => void;
   addWaypointMessage: (message: WaypointIDWithAck) => void;
+  addDeviceMetadataMessage: (metadata: Types.DeviceMetadataPacket) => void;
   ackMessage: (channelIndex: number, messageId: number) => void;
   setQRDialogOpen: (open: boolean) => void;
 }
@@ -226,6 +228,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       snr: metrics.packet.rxSnr,
                       lastHeard: new Date().getSeconds(),
                     }),
+                    metadata: undefined,
                     deviceMetrics: [],
                     environmentMetrics: [],
                   };
@@ -256,14 +259,16 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                         }
                       }
 
-                      node.deviceMetrics.push(
-                        metrics.data.variant.deviceMetrics
-                      );
+                      node.deviceMetrics.push({
+                        ...metrics.data.variant.deviceMetrics,
+                        timestamp: new Date(metrics.packet.rxTime),
+                      });
                       break;
                     case "environmentMetrics":
-                      node.environmentMetrics.push(
-                        metrics.data.variant.environmentMetrics
-                      );
+                      node.environmentMetrics.push({
+                        ...metrics.data.variant.environmentMetrics,
+                        timestamp: new Date(metrics.packet.rxTime),
+                      });
                       break;
                   }
                 }
@@ -335,6 +340,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   } else {
                     device.nodes.push({
                       data: Protobuf.NodeInfo.create(nodeInfo.data),
+                      metadata: undefined,
                       deviceMetrics: [],
                       environmentMetrics: [],
                     });
@@ -385,6 +391,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                         snr: user.packet.rxSnr,
                         user: user.data,
                       }),
+                      metadata: undefined,
                       deviceMetrics: [],
                       environmentMetrics: [],
                     });
@@ -414,6 +421,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                         num: position.packet.from,
                         position: position.data,
                       }),
+                      metadata: undefined,
                       deviceMetrics: [],
                       environmentMetrics: [],
                     });
@@ -452,6 +460,23 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   device.channels
                     .find((ch) => ch.config.index === waypointID.packet.channel)
                     ?.messages.push(waypointID);
+                }
+              })
+            );
+          },
+          addDeviceMetadataMessage: (metadata) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  const node = device.nodes.find(
+                    (n) => n.data.num === metadata.packet.from
+                  );
+                  if (node) {
+                    node.metadata = metadata.data;
+                  } else {
+                    console.log("Node not found!");
+                  }
                 }
               })
             );
