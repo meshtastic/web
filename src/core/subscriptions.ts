@@ -1,4 +1,4 @@
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import type { Device } from "@core/stores/deviceStore.js";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
@@ -7,6 +7,7 @@ export const subscribeAll = (
   device: Device,
   connection: Types.ConnectionType
 ) => {
+  let myNodeNum = 0;
   connection.setLogLevel(Protobuf.LogRecord_Level.TRACE);
 
   // onLogEvent
@@ -37,13 +38,14 @@ export const subscribeAll = (
     device.addWaypoint(data);
     device.addWaypointMessage({
       waypointID: data.id,
-      ack: rest.packet.from !== device.hardware.myNodeNum,
+      ack: rest.packet.from !== myNodeNum,
       ...rest,
     });
   });
 
   connection.onMyNodeInfo.subscribe((nodeInfo) => {
     device.setHardware(nodeInfo);
+    myNodeNum = nodeInfo.myNodeNum;
   });
 
   connection.onUserPacket.subscribe((user) => {
@@ -78,7 +80,7 @@ export const subscribeAll = (
   connection.onMessagePacket.subscribe((messagePacket) => {
     device.addMessage({
       ...messagePacket,
-      ack: messagePacket.packet.from !== device.hardware.myNodeNum,
+      ack: messagePacket.packet.from !== myNodeNum,
     });
   });
 };

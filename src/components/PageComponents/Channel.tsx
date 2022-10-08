@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import { fromByteArray, toByteArray } from "base64-js";
 import { Controller, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
 import { Form } from "@components/form/Form";

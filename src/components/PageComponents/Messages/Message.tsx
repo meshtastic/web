@@ -31,7 +31,7 @@ export const Message = ({
   return lastMsgSameUser ? (
     <div className="ml-4 flex">
       {message.ack ? (
-        <CheckCircleIcon className="my-auto h-4 text-slate-200" />
+        <CheckCircleIcon className="my-auto h-4 text-slate-400" />
       ) : (
         <EllipsisHorizontalCircleIcon className="my-auto h-4 text-slate-200" />
       )}
@@ -68,7 +68,7 @@ export const Message = ({
       </div>
       <div className="flex">
         {message.ack ? (
-          <CheckCircleIcon className="my-auto h-4 text-slate-200" />
+          <CheckCircleIcon className="my-auto h-4 text-slate-400" />
         ) : (
           <EllipsisHorizontalCircleIcon className="my-auto h-4 text-slate-200" />
         )}
