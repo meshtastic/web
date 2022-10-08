@@ -237,7 +237,7 @@ export const CommandPalette = (): JSX.Element => {
     >
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
         <PaletteTransition>
-          <Dialog.Panel className="mx-auto max-w-2xl transform divide-y divide-gray-500 divide-opacity-10 overflow-hidden rounded-xl bg-white bg-opacity-80 shadow-2xl ring-1 ring-black ring-opacity-5 backdrop-blur backdrop-filter transition-all">
+          <Dialog.Panel className="mx-auto max-w-2xl transform divide-y divide-gray-500 divide-opacity-10 overflow-hidden rounded-xl bg-white  shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
             <Combobox<Command | string>
               onChange={(input) => {
                 if (typeof input === "string") {
