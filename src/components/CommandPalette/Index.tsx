@@ -14,6 +14,8 @@
 import type React from "react";
 import { Fragment, useState } from "react";
 
+import { toast } from "react-hot-toast";
+
 import { useDevice } from "@app/core/providers/useDevice.js";
 import { useAppStore } from "@app/core/stores/appStore.js";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
@@ -151,6 +153,15 @@ export const CommandPalette = (): JSX.Element => {
         {
           name: "Reset Peers",
           icon: TrashIcon,
+          action() {
+            if (connection) {
+              void toast.promise(connection.resetPeers(), {
+                loading: "Resetting...",
+                success: "Succesfully reset peers",
+                error: "No response received",
+              });
+            }
+          },
         },
         {
           name: "Disconnect",
