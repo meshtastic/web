@@ -2,24 +2,24 @@ import type React from "react";
 
 import { MapPinIcon } from "@heroicons/react/24/outline";
 
-import { Card } from "../Card.js";
-import { Dropdown } from "../Dropdown.js";
-
 export interface PositionWidgetProps {
   grid: string;
 }
 
 export const PositionWidget = ({ grid }: PositionWidgetProps): JSX.Element => {
   return (
-    <Card className="flex-col">
-      <Dropdown title="Position" icon={<MapPinIcon className="h-4" />}>
-        <div className="flex">
-          <div className="flex w-20 bg-teal-600 p-3">
-            <MapPinIcon className="m-auto h-12 text-white" />
-          </div>
-          <span className="m-auto text-lg">{grid}</span>
+    <div className="relative overflow-hidden rounded-lg bg-white p-4 shadow">
+      <dt>
+        <div className="absolute rounded-md bg-rose-500 p-3">
+          <MapPinIcon className="h-6 text-white" aria-hidden="true" />
         </div>
-      </Dropdown>
-    </Card>
+        <p className="ml-16 truncate text-sm font-medium text-gray-500">
+          Current Location
+        </p>
+      </dt>
+      <dd className="ml-16 flex items-baseline">
+        <p className="text-2xl font-semibold text-gray-900">{grid}</p>
+      </dd>
+    </div>
   );
 };

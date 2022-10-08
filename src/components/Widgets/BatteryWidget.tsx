@@ -79,7 +79,7 @@ export const BatteryWidget = ({
             className="text-Orange-500 h-5 w-5 flex-shrink-0 self-center"
             aria-hidden="true"
           />
-          Unknown
+          {timeRemaining}
         </p>
       </dd>
     </div>
