@@ -3,39 +3,20 @@ import { forwardRef, InputHTMLAttributes } from "react";
 
 export interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  description?: string;
-  options?: string[];
-  prefix?: string;
-  suffix?: string;
-  action?: {
-    icon: JSX.Element;
-    action: () => void;
-  };
-  error?: string;
 }
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  function Input(
-    {
-      label,
-      description,
-      options,
-      prefix,
-      suffix,
-      action,
-      error,
-      children,
-      ...rest
-    }: CheckboxProps,
-    ref
-  ) {
+  function Input({ label, disabled, ...rest }: CheckboxProps, ref) {
     return (
       <div className="relative flex items-start">
         <div className="flex h-5 items-center">
           <input
             ref={ref}
             type="checkbox"
-            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            className={`h-4 w-4 rounded border-transparent bg-orange-100 text-orange-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+              disabled ? "cursor-not-allowed text-orange-200" : ""
+            }`}
+            disabled={disabled}
             {...rest}
           />
         </div>
@@ -43,7 +24,6 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           <label htmlFor="comments" className="font-medium text-gray-700">
             {label}
           </label>
-          <p className="text-gray-500">{description}</p>
         </div>
       </div>
     );

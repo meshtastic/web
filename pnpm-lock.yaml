@@ -7,6 +7,7 @@ specifiers:
   '@hookform/resolvers': ^2.9.8
   '@meshtastic/eslint-config': ^1.0.8
   '@meshtastic/meshtasticjs': ^0.6.104
+  '@tailwindcss/forms': ^0.5.3
   '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.7
   '@types/chrome': ^0.0.197
@@ -76,6 +77,7 @@ dependencies:
   zustand: 4.1.1_immer@9.0.15+react@18.2.0
 
 devDependencies:
+  '@tailwindcss/forms': 0.5.3_tailwindcss@3.1.8
   '@types/chrome': 0.0.197
   '@types/geodesy': 2.2.3
   '@types/node': 18.8.3
@@ -773,6 +775,15 @@ packages:
   /@stablelib/wipe/1.0.1:
     resolution: {integrity: sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==}
     dev: false
+
+  /@tailwindcss/forms/0.5.3_tailwindcss@3.1.8:
+    resolution: {integrity: sha512-y5mb86JUoiUgBjY/o6FJSFZSEttfb3Q5gllE4xoKjAAD+vBrnIhE4dViwUuow3va8mpH4s9jyUbUbrRGoRdc2Q==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
+    dependencies:
+      mini-svg-data-uri: 1.4.4
+      tailwindcss: 3.1.8_postcss@8.4.17
+    dev: true
 
   /@tailwindcss/line-clamp/0.4.2_tailwindcss@3.1.8:
     resolution: {integrity: sha512-HFzAQuqYCjyy/SX9sLGB1lroPzmcnWv1FHkIpmypte10hptf4oPUfucryMKovZh2u0uiS9U5Ty3GghWfEJGwVw==}
@@ -2881,6 +2892,11 @@ packages:
   /mimic-fn/2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
     engines: {node: '>=6'}
+    dev: true
+
+  /mini-svg-data-uri/1.4.4:
+    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
+    hasBin: true
     dev: true
 
   /minimatch/3.1.2:

@@ -3,7 +3,7 @@ import type React from "react";
 import { useAppStore } from "@app/core/stores/appStore.js";
 import { useDeviceStore } from "@app/core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { CommandLineIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 import { Mono } from "./Mono.js";
 
@@ -12,7 +12,7 @@ export const DeviceSelector = (): JSX.Element => {
   const { selectedDevice, setSelectedDevice } = useAppStore();
 
   return (
-    <div className="flex h-full w-16 items-center whitespace-nowrap bg-slate-50 py-12 [writing-mode:vertical-rl]">
+    <div className="flex h-full w-16 items-center whitespace-nowrap bg-slate-50 pt-12 [writing-mode:vertical-rl]">
       <Mono>Connected Devices</Mono>
       <span className="mt-6 flex gap-4 font-bold text-slate-900">
         {getDevices().map((device) => (
@@ -45,6 +45,13 @@ export const DeviceSelector = (): JSX.Element => {
         </div>
       </span>
       <img src="Logo_Black.svg" className="mt-auto px-3" />
+      <div className="my-4 flex flex-col gap-2 [writing-mode:horizontal-tb]">
+        <CommandLineIcon className="h-6 text-slate-400" />
+        <Mono className="text-xs">
+          <kbd className="rounded-md bg-slate-200 p-0.5 pr-1 italic">Ctrl</kbd>+
+          <kbd className="rounded-md bg-slate-200 p-0.5 pr-1 italic">K</kbd>
+        </Mono>
+      </div>
     </div>
   );
 };

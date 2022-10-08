@@ -64,38 +64,40 @@ export const QRDialog = ({
                 <span className="text-sm text-slate-600">
                   The current LoRa configuration will also be shared.
                 </span>
-                {channels.map((channel) => (
-                  <Checkbox
-                    key={channel.index}
-                    disabled={
-                      channel.index === 0 ||
-                      channel.role === Protobuf.Channel_Role.DISABLED
-                    }
-                    label={
-                      channel.settings?.name.length
-                        ? channel.settings.name
-                        : channel.role === Protobuf.Channel_Role.PRIMARY
-                        ? "Primary"
-                        : `Channel: ${channel.index}`
-                    }
-                    checked={
-                      channel.index === 0 ||
-                      selectedChannels.includes(channel.index)
-                    }
-                    onChange={() => {
-                      if (selectedChannels.includes(channel.index)) {
-                        setSelectedChannels(
-                          selectedChannels.filter((c) => c !== channel.index)
-                        );
-                      } else {
-                        setSelectedChannels([
-                          ...selectedChannels,
-                          channel.index,
-                        ]);
+                <div className="flex flex-col gap-1">
+                  {channels.map((channel) => (
+                    <Checkbox
+                      key={channel.index}
+                      disabled={
+                        channel.index === 0 ||
+                        channel.role === Protobuf.Channel_Role.DISABLED
                       }
-                    }}
-                  />
-                ))}
+                      label={
+                        channel.settings?.name.length
+                          ? channel.settings.name
+                          : channel.role === Protobuf.Channel_Role.PRIMARY
+                          ? "Primary"
+                          : `Channel: ${channel.index}`
+                      }
+                      checked={
+                        channel.index === 0 ||
+                        selectedChannels.includes(channel.index)
+                      }
+                      onChange={() => {
+                        if (selectedChannels.includes(channel.index)) {
+                          setSelectedChannels(
+                            selectedChannels.filter((c) => c !== channel.index)
+                          );
+                        } else {
+                          setSelectedChannels([
+                            ...selectedChannels,
+                            channel.index,
+                          ]);
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
               <div className="flex flex-grow flex-col">
                 <div className="m-auto flex">
@@ -107,7 +109,7 @@ export const QRDialog = ({
                     value={QRCodeURL}
                     action={{
                       icon: <ClipboardIcon className="h-4" />,
-                      action: () => {
+                      action() {
                         console.log("");
                       },
                     }}

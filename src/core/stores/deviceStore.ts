@@ -53,6 +53,7 @@ export interface Device {
   waypoints: Protobuf.Waypoint[];
   regionUnset: boolean;
   currentMetrics: Protobuf.DeviceMetrics;
+  QRDialogOpen: boolean;
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -72,6 +73,7 @@ export interface Device {
   addMessage: (message: MessageWithAck) => void;
   addWaypointMessage: (message: WaypointIDWithAck) => void;
   ackMessage: (channelIndex: number, messageId: number) => void;
+  setQRDialogOpen: (open: boolean) => void;
 }
 
 export interface DeviceState {
@@ -107,6 +109,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           waypoints: [],
           regionUnset: false,
           currentMetrics: Protobuf.DeviceMetrics.create(),
+          QRDialogOpen: false,
 
           setReady: (ready: boolean) => {
             set(
@@ -471,6 +474,16 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       message.ack = true;
                     }
                   }
+                }
+              })
+            );
+          },
+          setQRDialogOpen: (open: boolean) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.QRDialogOpen = open;
                 }
               })
             );
