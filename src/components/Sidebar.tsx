@@ -20,7 +20,7 @@ export const Sidebar = (): JSX.Element => {
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
   return (
-    <div className="relative flex w-80 flex-shrink-0 flex-col gap-2 border-x border-slate-200 bg-slate-50 p-2">
+    <div className="relative flex w-72 flex-shrink-0 flex-col gap-2 border-x border-slate-200 bg-slate-50 p-2">
       <DeviceWidget
         name={
           nodes.find((n) => n.data.num === hardware.myNodeNum)?.data.user
