@@ -10,8 +10,15 @@ import { useDevice } from "@core/providers/useDevice.js";
 import { EyeIcon } from "@heroicons/react/24/outline";
 
 export const InfoPage = (): JSX.Element => {
-  const { channels, config, moduleConfig, hardware, nodes, waypoints } =
-    useDevice();
+  const {
+    channels,
+    config,
+    moduleConfig,
+    hardware,
+    nodes,
+    waypoints,
+    connection,
+  } = useDevice();
 
   const tabs: TabType[] = [
     {
@@ -43,6 +50,11 @@ export const InfoPage = (): JSX.Element => {
       name: "Waypoints",
       icon: <EyeIcon className="h-4" />,
       element: () => <JSONTree theme="monokai" data={waypoints} />,
+    },
+    {
+      name: "Connection",
+      icon: <EyeIcon className="h-4" />,
+      element: () => <JSONTree theme="monokai" data={connection} />,
     },
   ];
 

@@ -28,6 +28,7 @@ import {
   Cog8ToothIcon,
   CubeTransparentIcon,
   DevicePhoneMobileIcon,
+  DocumentTextIcon,
   IdentificationIcon,
   InboxIcon,
   LinkIcon,
@@ -118,6 +119,13 @@ export const CommandPalette = (): JSX.Element => {
           icon: IdentificationIcon,
           action() {
             setActivePage("info");
+          },
+        },
+        {
+          name: "Logs",
+          icon: DocumentTextIcon,
+          action() {
+            setActivePage("logs");
           },
         },
       ],

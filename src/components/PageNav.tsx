@@ -5,6 +5,7 @@ import type { Page } from "@app/core/stores/deviceStore.js";
 import {
   BeakerIcon,
   Cog8ToothIcon,
+  DocumentTextIcon,
   IdentificationIcon,
   InboxIcon,
   MapIcon,
@@ -56,6 +57,11 @@ export const PageNav = (): JSX.Element => {
       name: "Info",
       icon: <IdentificationIcon />,
       page: "info",
+    },
+    {
+      name: "Logs",
+      icon: <DocumentTextIcon />,
+      page: "logs",
     },
   ];
 

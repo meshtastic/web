@@ -12,7 +12,8 @@ export type Page =
   | "config"
   | "channels"
   | "peers"
-  | "info";
+  | "info"
+  | "logs";
 
 export interface MessageWithAck extends Types.MessagePacket {
   ack: boolean;
