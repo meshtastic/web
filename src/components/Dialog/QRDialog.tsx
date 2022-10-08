@@ -2,15 +2,16 @@ import type React from "react";
 import { useEffect, useState } from "react";
 
 import { fromByteArray } from "base64-js";
+import toast from "react-hot-toast";
 import { QRCode } from "react-qrcode-logo";
 
 import { Dialog } from "@headlessui/react";
-import { ClipboardIcon } from "@heroicons/react/24/outline";
+import { ClipboardIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
-import { Card } from "../Card.js";
 import { Checkbox } from "../form/Checkbox.js";
 import { Input } from "../form/Input.js";
+import { IconButton } from "../IconButton.js";
 
 export interface QRDialogProps {
   isOpen: boolean;
@@ -52,72 +53,76 @@ export const QRDialog = ({
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <Dialog.Panel>
-          <Card className="max-w-md flex-col">
-            <div className="flex h-8 bg-slate-100">
-              <span className="m-auto text-lg font-medium">
-                Generate QR Code
-              </span>
-            </div>
-            <div className="flex gap-2 p-2">
-              <div className="flex flex-col">
-                <span className="text-lg font-medium">Channels to include</span>
-                <span className="text-sm text-slate-600">
+          <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow">
+            <div className="flex px-4 py-5 sm:px-6">
+              <div>
+                <h1 className="text-lg font-bold">Generate QR Code</h1>
+                <h5 className="text-sm text-slate-600">
                   The current LoRa configuration will also be shared.
-                </span>
-                <div className="flex flex-col gap-1">
-                  {channels.map((channel) => (
-                    <Checkbox
-                      key={channel.index}
-                      disabled={
-                        channel.index === 0 ||
-                        channel.role === Protobuf.Channel_Role.DISABLED
-                      }
-                      label={
-                        channel.settings?.name.length
-                          ? channel.settings.name
-                          : channel.role === Protobuf.Channel_Role.PRIMARY
-                          ? "Primary"
-                          : `Channel: ${channel.index}`
-                      }
-                      checked={
-                        channel.index === 0 ||
-                        selectedChannels.includes(channel.index)
-                      }
-                      onChange={() => {
-                        if (selectedChannels.includes(channel.index)) {
-                          setSelectedChannels(
-                            selectedChannels.filter((c) => c !== channel.index)
-                          );
-                        } else {
-                          setSelectedChannels([
-                            ...selectedChannels,
-                            channel.index,
-                          ]);
-                        }
-                      }}
-                    />
-                  ))}
-                </div>
+                </h5>
               </div>
-              <div className="flex flex-grow flex-col">
-                <div className="m-auto flex">
-                  <QRCode value={QRCodeURL} size={200} qrStyle="dots" />
-                </div>
-                <div className="flex gap-2">
-                  <Input
-                    label="Sharable URL"
-                    value={QRCodeURL}
-                    action={{
-                      icon: <ClipboardIcon className="h-4" />,
-                      action() {
-                        console.log("");
-                      },
+              <IconButton
+                onClick={close}
+                className="my-auto ml-auto"
+                size="sm"
+                variant="secondary"
+                icon={<XMarkIcon className="h-4" />}
+              />
+            </div>
+            <div className="flex gap-3 px-4 py-5 sm:p-6">
+              <div className="flex w-40 flex-col gap-1">
+                {channels.map((channel) => (
+                  <Checkbox
+                    key={channel.index}
+                    disabled={
+                      channel.index === 0 ||
+                      channel.role === Protobuf.Channel_Role.DISABLED
+                    }
+                    label={
+                      channel.settings?.name.length
+                        ? channel.settings.name
+                        : channel.role === Protobuf.Channel_Role.PRIMARY
+                        ? "Primary"
+                        : `Channel: ${channel.index}`
+                    }
+                    checked={
+                      channel.index === 0 ||
+                      selectedChannels.includes(channel.index)
+                    }
+                    onChange={() => {
+                      if (selectedChannels.includes(channel.index)) {
+                        setSelectedChannels(
+                          selectedChannels.filter((c) => c !== channel.index)
+                        );
+                      } else {
+                        setSelectedChannels([
+                          ...selectedChannels,
+                          channel.index,
+                        ]);
+                      }
                     }}
                   />
-                </div>
+                ))}
               </div>
+              <QRCode value={QRCodeURL} size={200} qrStyle="dots" />
             </div>
-          </Card>
+
+            <div className="px-4 py-4 sm:px-6">
+              <Input
+                label="Sharable URL"
+                value={QRCodeURL}
+                action={{
+                  icon: <ClipboardIcon className="h-4" />,
+                  action() {
+                    void navigator.clipboard.writeText(QRCodeURL);
+                    toast.success("Copied URL to Clipboard");
+                  },
+                }}
+              />
+            </div>
+
+            {/* </Card> */}
+          </div>
         </Dialog.Panel>
       </div>
     </Dialog>
