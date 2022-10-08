@@ -1,16 +1,20 @@
 import type React from "react";
 
+import toast from "react-hot-toast";
 import { base16 } from "rfc4648";
 
 import { IconButton } from "@app/components/IconButton.js";
 import { Mono } from "@app/components/Mono.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathRoundedSquareIcon,
+  EllipsisHorizontalIcon,
+} from "@heroicons/react/24/outline";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const PeersPage = (): JSX.Element => {
-  const { hardware, nodes } = useDevice();
+  const { connection, nodes } = useDevice();
 
   return (
     <div className="w-full overflow-y-auto">
@@ -35,6 +39,12 @@ export const PeersPage = (): JSX.Element => {
                 className="py-3.5 text-left text-sm font-semibold text-gray-900"
               >
                 MAC Address
+              </th>
+              <th
+                scope="col"
+                className="py-3.5 text-left text-sm font-semibold text-gray-900"
+              >
+                Versions
               </th>
               <th
                 scope="col"
@@ -77,6 +87,33 @@ export const PeersPage = (): JSX.Element => {
                       .match(/.{1,2}/g)
                       ?.join(":") ?? ""}
                   </Mono>
+                </td>
+                <td className="whitespace-nowrap py-2 text-sm text-gray-500">
+                  {node.metadata ? (
+                    <>
+                      <Mono>{node.metadata.firmwareVersion}</Mono>
+                      <span className="text-black">/</span>
+                      <Mono>{node.metadata.deviceStateVersion}</Mono>
+                    </>
+                  ) : (
+                    <IconButton
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        if (connection) {
+                          void toast.promise(
+                            connection.getMetadata(node.data.num),
+                            {
+                              loading: "Requesting Metadata...",
+                              success: "Recieved Metadata",
+                              error: "No response received",
+                            }
+                          );
+                        }
+                      }}
+                      icon={<ArrowPathRoundedSquareIcon className="h-4" />}
+                    />
+                  )}
                 </td>
                 <td className="whitespace-nowrap py-2 text-sm text-gray-500">
                   {new Date(node.data.lastHeard).toLocaleTimeString()}
