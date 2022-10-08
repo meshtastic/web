@@ -18,7 +18,7 @@ export const PositionWidget = ({ grid }: PositionWidgetProps): JSX.Element => {
         </p>
       </dt>
       <dd className="ml-16 flex items-baseline">
-        <p className="text-2xl font-semibold text-gray-900">{grid}</p>
+        <p className="text-lg font-semibold text-gray-900">{grid}</p>
       </dd>
     </div>
   );
