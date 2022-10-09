@@ -259,16 +259,21 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                             metrics.data.variant.deviceMetrics.channelUtilization;
                         }
                       }
-
                       node.deviceMetrics.push({
                         ...metrics.data.variant.deviceMetrics,
-                        timestamp: new Date(metrics.packet.rxTime),
+                        timestamp:
+                          metrics.packet.rxTime === 0
+                            ? new Date()
+                            : new Date(metrics.packet.rxTime * 1000),
                       });
                       break;
                     case "environmentMetrics":
                       node.environmentMetrics.push({
                         ...metrics.data.variant.environmentMetrics,
-                        timestamp: new Date(metrics.packet.rxTime),
+                        timestamp:
+                          metrics.packet.rxTime === 0
+                            ? new Date()
+                            : new Date(metrics.packet.rxTime * 1000),
                       });
                       break;
                   }
