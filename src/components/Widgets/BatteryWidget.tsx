@@ -37,21 +37,16 @@ export const BatteryWidget = ({
           } else {
             previousStat = stat.batteryLevel;
             previousTime = stat.timestamp;
+            break;
           }
-          break;
         }
       }
 
       if (currentStat && previousStat) {
         const timeDiff = currentTime.getTime() - previousTime.getTime();
         const statDiff = Math.abs(currentStat - previousStat);
-        //
-        console.log(`timeDiff: ${timeDiff}`);
-        console.log(`statDiff: ${statDiff}`);
-
         //convert to ms/%
         const msPerPercent = timeDiff / statDiff;
-        console.log(`msPerPercent: ${msPerPercent}`);
         const formatted = prettyMilliseconds(
           (100 - currentStat) * msPerPercent
         );
