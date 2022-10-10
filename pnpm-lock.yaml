@@ -6,7 +6,7 @@ specifiers:
   '@heroicons/react': ^2.0.12
   '@hookform/resolvers': ^2.9.8
   '@meshtastic/eslint-config': ^1.0.8
-  '@meshtastic/meshtasticjs': ^0.6.105
+  '@meshtastic/meshtasticjs': ^0.6.107
   '@tailwindcss/forms': ^0.5.3
   '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.7
@@ -20,8 +20,11 @@ specifiers:
   '@vitejs/plugin-react': ^2.1.0
   autoprefixer: ^10.4.12
   base64-js: ^1.5.1
+  chart.js: ^3.9.1
+  chartjs-adapter-date-fns: ^2.0.0
   class-transformer: ^0.5.1
   class-validator: ^0.13.2
+  date-fns: ^2.29.3
   geodesy: ^2.4.0
   gzipper: ^7.1.0
   immer: ^9.0.15
@@ -32,6 +35,7 @@ specifiers:
   prettier-plugin-tailwindcss: ^0.1.13
   pretty-ms: ^8.0.0
   react: ^18.2.0
+  react-chartjs-2: ^4.3.1
   react-dom: ^18.2.0
   react-hook-form: ^7.37.0
   react-hot-toast: ^2.4.0
@@ -49,7 +53,7 @@ specifiers:
   unimported: ^1.22.0
   vite: ^3.1.6
   vite-plugin-environment: ^1.1.2
-  zustand: 4.1.1
+  zustand: 4.1.2
 
 dependencies:
   '@emeraldpay/hashicon-react': 0.5.2
@@ -57,18 +61,22 @@ dependencies:
   '@heroicons/react': 2.0.12_react@18.2.0
   '@hookform/resolvers': 2.9.8_react-hook-form@7.37.0
   '@meshtastic/eslint-config': 1.0.8
-  '@meshtastic/meshtasticjs': 0.6.105
+  '@meshtastic/meshtasticjs': 0.6.107
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.1.8
   '@tailwindcss/typography': 0.5.7_tailwindcss@3.1.8
   base64-js: 1.5.1
+  chart.js: 3.9.1
+  chartjs-adapter-date-fns: 2.0.0_chart.js@3.9.1
   class-transformer: 0.5.1
   class-validator: 0.13.2
+  date-fns: 2.29.3
   geodesy: 2.4.0
   immer: 9.0.15
   mapbox-gl: /empty-npm-package/1.0.0
   maplibre-gl: 2.4.0
   pretty-ms: 8.0.0
   react: 18.2.0
+  react-chartjs-2: 4.3.1_2unjvz6v6rskedwoxtmbfw2rje
   react-dom: 18.2.0_react@18.2.0
   react-hook-form: 7.37.0_react@18.2.0
   react-hot-toast: 2.4.0_biqbaboplfbrettd7655fr4n2y
@@ -78,7 +86,7 @@ dependencies:
   react-map-gl: 7.0.19_6eczaga5xxiwzxtfiyk6fioasq
   react-qrcode-logo: 2.8.0_biqbaboplfbrettd7655fr4n2y
   rfc4648: 1.5.2
-  zustand: 4.1.1_immer@9.0.15+react@18.2.0
+  zustand: 4.1.2_immer@9.0.15+react@18.2.0
 
 devDependencies:
   '@tailwindcss/forms': 0.5.3_tailwindcss@3.1.8
@@ -618,7 +626,7 @@ packages:
       eslint-import-resolver-typescript: 2.7.1_fyln4uq2tv75svthy6prqvt6lm
       eslint-plugin-eslint-comments: 3.2.0_eslint@8.25.0
       eslint-plugin-import: 2.26.0_o6xilsqumo6pzva4ttrd3yb4lm
-      eslint-plugin-react: 7.31.8_eslint@8.25.0
+      eslint-plugin-react: 7.31.9_eslint@8.25.0
       eslint-plugin-react-hooks: 4.6.0_eslint@8.25.0
       prettier: 2.7.1
       prettier-plugin-tailwindcss: 0.1.13_prettier@2.7.1
@@ -628,8 +636,8 @@ packages:
       - supports-color
     dev: false
 
-  /@meshtastic/meshtasticjs/0.6.105:
-    resolution: {integrity: sha512-A9e3aNGA5XiKmOt3QhnKINT5s1sUcUta9C7VhfYdXThHbpaEZheQLFaITDDWU+NUcGRzE0J9eZBw6mZdbcw82Q==}
+  /@meshtastic/meshtasticjs/0.6.107:
+    resolution: {integrity: sha512-hBZZih2DrHnhBUtvLer+oKUtrthHykcsDHgcHwUBHzMTVfRjflpkaNFIvE3VYUfDhucR8LO+wiqIQZiA+qHZzA==}
     dependencies:
       '@protobuf-ts/runtime': 2.8.1
       '@serialport/stream': 10.3.0
@@ -1067,7 +1075,7 @@ packages:
       '@babel/plugin-transform-react-jsx-development': 7.18.6_@babel+core@7.19.3
       '@babel/plugin-transform-react-jsx-self': 7.18.6_@babel+core@7.19.3
       '@babel/plugin-transform-react-jsx-source': 7.18.6_@babel+core@7.19.3
-      magic-string: 0.26.6
+      magic-string: 0.26.7
       react-refresh: 0.14.0
       vite: 3.1.6
     transitivePeerDependencies:
@@ -1322,6 +1330,18 @@ packages:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
 
+  /chart.js/3.9.1:
+    resolution: {integrity: sha512-Ro2JbLmvg83gXF5F4sniaQ+lTbSv18E+TIf2cOeiH1Iqd2PGFOtem+DUufMZsCJwFE7ywPOpfXFBwRTGq7dh6w==}
+    dev: false
+
+  /chartjs-adapter-date-fns/2.0.0_chart.js@3.9.1:
+    resolution: {integrity: sha512-rmZINGLe+9IiiEB0kb57vH3UugAtYw33anRiw5kS2Tu87agpetDDoouquycWc9pRsKtQo5j+vLsYHyr8etAvFw==}
+    peerDependencies:
+      chart.js: ^3.0.0
+    dependencies:
+      chart.js: 3.9.1
+    dev: false
+
   /chokidar/3.5.3:
     resolution: {integrity: sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==}
     engines: {node: '>= 8.10.0'}
@@ -1454,6 +1474,11 @@ packages:
 
   /csstype/3.1.1:
     resolution: {integrity: sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==}
+
+  /date-fns/2.29.3:
+    resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
+    engines: {node: '>=0.11'}
+    dev: false
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -2010,8 +2035,8 @@ packages:
       eslint: 8.25.0
     dev: false
 
-  /eslint-plugin-react/7.31.8_eslint@8.25.0:
-    resolution: {integrity: sha512-5lBTZmgQmARLLSYiwI71tiGVTLUuqXantZM6vlSY39OaDSV0M7+32K5DnLkmFrwTe+Ksz0ffuLUC91RUviVZfw==}
+  /eslint-plugin-react/7.31.9_eslint@8.25.0:
+    resolution: {integrity: sha512-vrVJwusIw4L99lyfXjtCw8HWdloajsiYslMavogrBe2Gl8gr95TJsJnOMRasN4b4N24I3XuJf6aAV6MhyGmjqw==}
     engines: {node: '>=4'}
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8
@@ -2875,8 +2900,8 @@ packages:
     dependencies:
       yallist: 4.0.0
 
-  /magic-string/0.26.6:
-    resolution: {integrity: sha512-6d+3bFybzyQFJYSoRsl9ZC0wheze8M1LrQC7tNMRqXR4izUTDOLMd9BtSuExK9iAukFh+s5K0WAhc/dlQ+HKYA==}
+  /magic-string/0.26.7:
+    resolution: {integrity: sha512-hX9XH3ziStPoPhJxLq1syWuZMxbDvGNbVchfrdCtanC7D13888bMFow61x8axrx+GfHLtVeAx2kxL7tTGRl+Ow==}
     engines: {node: '>=12'}
     dependencies:
       sourcemap-codec: 1.4.8
@@ -3400,6 +3425,16 @@ packages:
       color: 3.2.1
       csstype: 3.1.1
       lodash.curry: 4.1.1
+    dev: false
+
+  /react-chartjs-2/4.3.1_2unjvz6v6rskedwoxtmbfw2rje:
+    resolution: {integrity: sha512-5i3mjP6tU7QSn0jvb8I4hudTzHJqS8l00ORJnVwI2sYu0ihpj83Lv2YzfxunfxTZkscKvZu2F2w9LkwNBhj6xA==}
+    peerDependencies:
+      chart.js: ^3.5.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      chart.js: 3.9.1
+      react: 18.2.0
     dev: false
 
   /react-dom/18.2.0_react@18.2.0:
@@ -4328,8 +4363,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /zustand/4.1.1_immer@9.0.15+react@18.2.0:
-    resolution: {integrity: sha512-h4F3WMqsZgvvaE0n3lThx4MM81Ls9xebjvrABNzf5+jb3/03YjNTSgZXeyrvXDArMeV9untvWXRw1tY+ntPYbA==}
+  /zustand/4.1.2_immer@9.0.15+react@18.2.0:
+    resolution: {integrity: sha512-gcRaKchcxFPbImrBb/BKgujOhHhik9YhVpIeP87ETT7uokEe2Szu7KkuZ9ghjtD+/KKkcrRNktR2AiLXPIbKIQ==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
       immer: '>=9.0'
