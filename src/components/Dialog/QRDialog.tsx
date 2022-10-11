@@ -2,7 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 
 import { fromByteArray } from "base64-js";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { QRCode } from "react-qrcode-logo";
 
 import { Dialog } from "@headlessui/react";
@@ -26,7 +26,7 @@ export const QRDialog = ({
   loraConfig,
   channels,
 }: QRDialogProps): JSX.Element => {
-  const [selectedChannels, setSelectedChannels] = useState<number[]>([]);
+  const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [QRCodeURL, setQRCodeURL] = useState<string>("");
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export const QRDialog = ({
       .replace(/\+/g, "-")
       .replace(/\//g, "_");
 
-    setQRCodeURL(`https://www.meshtastic.org/e/#${base64}`);
+    setQRCodeURL(`https://meshtastic.org/e/#${base64}`);
   }, [channels, selectedChannels, loraConfig]);
 
   return (
@@ -85,10 +85,7 @@ export const QRDialog = ({
                         ? "Primary"
                         : `Channel: ${channel.index}`
                     }
-                    checked={
-                      channel.index === 0 ||
-                      selectedChannels.includes(channel.index)
-                    }
+                    checked={selectedChannels.includes(channel.index)}
                     onChange={() => {
                       if (selectedChannels.includes(channel.index)) {
                         setSelectedChannels(
