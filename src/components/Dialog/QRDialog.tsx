@@ -108,6 +108,7 @@ export const QRDialog = ({
               <Input
                 label="Sharable URL"
                 value={QRCodeURL}
+                disabled
                 action={{
                   icon: <ClipboardIcon className="h-4" />,
                   action() {

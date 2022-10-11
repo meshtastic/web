@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import { useDevice } from "@core/providers/useDevice.js";
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 
-import { Button } from "../Button.js";
 import { Card } from "../Card.js";
 import { Dropdown } from "../Dropdown.js";
 
@@ -66,15 +65,6 @@ export const ConfiguringWidget = (): JSX.Element => {
               total={hardware.maxChannels ?? 0}
             />
           </ol>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              void connection?.configure();
-            }}
-          >
-            Retry
-          </Button>
         </div>
       </Dropdown>
     </Card>
