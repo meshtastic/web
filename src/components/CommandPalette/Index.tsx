@@ -12,7 +12,7 @@
  */
 
 import type React from "react";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import { toast } from "react-hot-toast";
 
@@ -211,14 +211,17 @@ export const CommandPalette = (): JSX.Element => {
     },
   ];
 
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "k") {
-      e.preventDefault();
-    }
+  const handleKeydown = (e: KeyboardEvent) => {
     if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
       setOpen(true);
     }
-  });
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeydown);
+    return () => window.removeEventListener("keydown", handleKeydown);
+  }, []);
 
   const filtered =
     query === ""
