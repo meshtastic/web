@@ -89,7 +89,7 @@ export const Power = (): JSX.Element => {
       />
       <Input
         label="Minimum Wake Time"
-        description="Minimum amount of time the device will stay away for after recieving a packet"
+        description="Minimum amount of time the device will stay awake for after receiving a packet"
         suffix="Seconds"
         type="number"
         error={errors.minWakeSecs?.message}
