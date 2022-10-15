@@ -1,4 +1,5 @@
 import type React from "react";
+import { useState } from "react";
 
 import { JSONTree } from "react-json-tree";
 
@@ -10,22 +11,16 @@ import { useDevice } from "@core/providers/useDevice.js";
 import { EyeIcon } from "@heroicons/react/24/outline";
 
 export const InfoPage = (): JSX.Element => {
-  const {
-    channels,
-    config,
-    moduleConfig,
-    hardware,
-    nodes,
-    waypoints,
-    connection,
-  } = useDevice();
+  const { config, moduleConfig, hardware, nodes, waypoints, connection } =
+    useDevice();
+
+  const [serialLogs, setSerialLogs] = useState<string>("");
+
+  connection?.onDeviceDebugLog.subscribe((packet) => {
+    setSerialLogs(serialLogs + new TextDecoder().decode(packet));
+  });
 
   const tabs: TabType[] = [
-    {
-      name: "Channels",
-      icon: <EyeIcon className="h-4" />,
-      element: () => <JSONTree theme="monokai" data={channels} />,
-    },
     {
       name: "Config",
       icon: <EyeIcon className="h-4" />,
@@ -55,6 +50,19 @@ export const InfoPage = (): JSX.Element => {
       name: "Connection",
       icon: <EyeIcon className="h-4" />,
       element: () => <JSONTree theme="monokai" data={connection} />,
+    },
+    {
+      name: "Serial Logs",
+      icon: <EyeIcon className="h-4" />,
+      element: () => (
+        <div>
+          {serialLogs.split("\n").map((line, index) => (
+            <div key={index} className="text-sm">
+              {line}
+            </div>
+          ))}
+        </div>
+      ),
     },
   ];
 

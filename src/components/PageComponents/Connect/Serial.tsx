@@ -41,6 +41,8 @@ export const Serial = (): JSX.Element => {
     const connection = new ISerialConnection(id);
     await connection.connect({
       port,
+      baudRate: undefined,
+      concurrentLogOutput: true,
     });
     device.addConnection(connection);
     subscribeAll(device, connection);
