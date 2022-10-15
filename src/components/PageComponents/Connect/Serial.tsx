@@ -59,7 +59,9 @@ export const Serial = (): JSX.Element => {
               void onConnect(port);
             }}
           >
-            # {index} - {port.getInfo().usbVendorId} - {port.getInfo().usbProductId}
+            {`# ${index} - ${port.getInfo().usbVendorId} - ${
+              port.getInfo().usbProductId
+            }`}
           </Button>
         ))}
         {serialPorts.length === 0 && (
