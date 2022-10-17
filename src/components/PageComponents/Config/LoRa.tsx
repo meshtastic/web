@@ -93,7 +93,7 @@ export const LoRa = (): JSX.Element => {
 
       <Input
         label="Bandwidth"
-        description="Max transmit power in dBm"
+        description="Channel bandwidth in MHz"
         type="number"
         suffix="MHz"
         error={errors.bandwidth?.message}
@@ -104,7 +104,7 @@ export const LoRa = (): JSX.Element => {
       />
       <Input
         label="Spread Factor"
-        description="Max transmit power in dBm"
+        description="Indicates the number of chirps per symbol"
         type="number"
         suffix="CPS"
         error={errors.spreadFactor?.message}
@@ -115,7 +115,7 @@ export const LoRa = (): JSX.Element => {
       />
       <Input
         label="Coding Rate"
-        description="Max transmit power in dBm"
+        description="The denominator of the coding rate"
         type="number"
         error={errors.codingRate?.message}
         {...register("codingRate", {
@@ -125,7 +125,7 @@ export const LoRa = (): JSX.Element => {
       />
       <Input
         label="Frequency Offset"
-        description="This is a description."
+        description="Frequency offset to correct for crystal calibration errors"
         suffix="Hz"
         type="number"
         error={errors.frequencyOffset?.message}
@@ -133,14 +133,14 @@ export const LoRa = (): JSX.Element => {
       />
       <Select
         label="Region"
-        description="This is a description."
+        description="Sets the region for your node"
         {...register("region", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.Config_LoRaConfig_RegionCode)}
       </Select>
       <Input
         label="Hop Limit"
-        description="This is a description."
+        description="Maximum number of hops"
         suffix="Hops"
         type="number"
         error={errors.hopLimit?.message}
