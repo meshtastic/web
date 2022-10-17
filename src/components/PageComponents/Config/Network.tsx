@@ -75,7 +75,7 @@ export const Network = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="WiFi Enabled"
-            description="Enable or disbale the WiFi radio"
+            description="Enable or disable the WiFi radio"
             checked={value}
             {...rest}
           />
