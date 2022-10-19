@@ -57,7 +57,7 @@ export interface Group {
 export interface Command {
   name: string;
   icon: (props: React.ComponentProps<"svg">) => JSX.Element;
-  action?: () => void;
+  action: () => void;
 }
 
 export const CommandPalette = (): JSX.Element => {
@@ -135,8 +135,11 @@ export const CommandPalette = (): JSX.Element => {
       icon: DevicePhoneMobileIcon,
       commands: [
         {
-          name: "Switch Node",
+          name: "[WIP] Switch Node",
           icon: ArrowsRightLeftIcon,
+          action() {
+            alert('This feature is not implemented');
+          },
         },
         {
           name: "Connect New Node",
@@ -194,8 +197,11 @@ export const CommandPalette = (): JSX.Element => {
           },
         },
         {
-          name: "Clear Messages",
+          name: "[WIP] Clear Messages",
           icon: ArchiveBoxXMarkIcon,
+          action() {
+            alert('This feature is not implemented');
+          },
         },
       ],
     },
@@ -204,8 +210,11 @@ export const CommandPalette = (): JSX.Element => {
       icon: WindowIcon,
       commands: [
         {
-          name: "Toggle Dark Mode",
+          name: "[WIP] Toggle Dark Mode",
           icon: MoonIcon,
+          action() {
+            alert('This feature is not implemented');
+          },
         },
       ],
     },
