@@ -28,7 +28,7 @@ export const FileBrowser = (): JSX.Element => {
         setData((await res.json()) as Files);
       }
     );
-  });
+  }, []);
 
   return (
     <div>

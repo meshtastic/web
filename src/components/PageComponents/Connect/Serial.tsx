@@ -10,11 +10,6 @@ import { randId } from "@core/utils/randId.js";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { ISerialConnection } from "@meshtastic/meshtasticjs";
 
-interface USBID {
-  id: number;
-  name: string;
-}
-
 export const Serial = (): JSX.Element => {
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
   const { addDevice } = useDeviceStore();
@@ -39,11 +34,13 @@ export const Serial = (): JSX.Element => {
     const device = addDevice(id);
     setSelectedDevice(id);
     const connection = new ISerialConnection(id);
-    await connection.connect({
-      port,
-      baudRate: undefined,
-      concurrentLogOutput: true,
-    });
+    await connection
+      .connect({
+        port,
+        baudRate: undefined,
+        concurrentLogOutput: true,
+      })
+      .catch((e: Error) => console.log(`Unable to Connect: ${e.message}`));
     device.addConnection(connection);
     subscribeAll(device, connection);
   };
@@ -59,8 +56,8 @@ export const Serial = (): JSX.Element => {
               void onConnect(port);
             }}
           >
-            {`# ${index} - ${port.getInfo().usbVendorId} - ${
-              port.getInfo().usbProductId
+            {`# ${index} - ${port.getInfo().usbVendorId ?? "UNK"} - ${
+              port.getInfo().usbProductId ?? "UNK"
             }`}
           </Button>
         ))}
