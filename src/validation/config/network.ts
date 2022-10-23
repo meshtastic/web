@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, Length } from "class-validator";
+import { IsBoolean, IsEnum, IsIP, Length } from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -17,4 +17,28 @@ export class NetworkValidation implements Protobuf.Config_NetworkConfig {
 
   @Length(2, 30)
   ntpServer: string;
+
+  @IsBoolean()
+  ethEnabled: boolean;
+
+  @IsEnum(Protobuf.Config_NetworkConfig_EthMode)
+  ethMode: Protobuf.Config_NetworkConfig_EthMode;
+
+  ethConfig: NetworkValidation_ethConfig;
+}
+
+export class NetworkValidation_ethConfig
+  implements Protobuf.Config_NetworkConfig_NetworkConfig
+{
+  @IsIP()
+  ip: number;
+
+  @IsIP()
+  gateway: number;
+
+  @IsIP()
+  subnet: number;
+
+  @IsIP()
+  dns: number;
 }

@@ -16,7 +16,16 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { label, description, prefix, suffix, action, error, ...rest }: InputProps,
+  {
+    label,
+    description,
+    prefix,
+    suffix,
+    action,
+    error,
+    disabled,
+    ...rest
+  }: InputProps,
   ref
 ) {
   return (
@@ -34,7 +43,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           ref={ref}
           className={`flex h-10 w-full rounded-md border-transparent bg-orange-100 px-3 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500 ${
             prefix ? "rounded-l-none" : ""
-          } ${action ? "rounded-r-none" : ""}`}
+          } ${action ? "rounded-r-none" : ""} ${
+            disabled ? "cursor-not-allowed bg-orange-50 text-orange-200" : ""
+          }`}
+          disabled={disabled}
           {...rest}
         />
         {suffix && (

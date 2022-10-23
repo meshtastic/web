@@ -33,6 +33,12 @@ export const Network = (): JSX.Element => {
     defaultValue: false,
   });
 
+  const ethEnabled = useWatch({
+    control,
+    name: "ethEnabled",
+    defaultValue: false,
+  });
+
   useEffect(() => {
     reset(config.network);
   }, [reset, config.network]);
@@ -108,7 +114,56 @@ export const Network = (): JSX.Element => {
         label="NTP Server"
         description="NTP server for time synchronization"
         error={errors.ntpServer?.message}
+        disabled={!wifiEnabled && !ethEnabled}
         {...register("ntpServer")}
+      />
+      <Controller
+        name="ethEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Ethernet Enabled"
+            description="Enable or disbale the Ethernet port"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Select
+        label="Ethernet Mode"
+        description="Address assignment selection"
+        disabled={!ethEnabled}
+        {...register("ethMode", { valueAsNumber: true })}
+      >
+        {renderOptions(Protobuf.Config_NetworkConfig_WiFiMode)}
+      </Select>
+      <Input
+        label="Ethernet IP"
+        description="IP Address"
+        error={errors.wifiSsid?.message}
+        disabled={!ethEnabled}
+        {...register("ethConfig.ip")}
+      />
+      <Input
+        label="Ethernet Gateway"
+        description="Default Gatewat"
+        error={errors.wifiSsid?.message}
+        disabled={!ethEnabled}
+        {...register("ethConfig.gateway")}
+      />
+      <Input
+        label="Ethernet Subnet"
+        description="Subnet Mask"
+        error={errors.wifiSsid?.message}
+        disabled={!ethEnabled}
+        {...register("ethConfig.subnet")}
+      />
+      <Input
+        label="Ethernet DNS"
+        description="DNS Server"
+        error={errors.wifiSsid?.message}
+        disabled={!ethEnabled}
+        {...register("ethConfig.dns")}
       />
     </Form>
   );

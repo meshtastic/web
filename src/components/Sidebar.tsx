@@ -34,7 +34,7 @@ export const Sidebar = (): JSX.Element => {
           removeDevice(selectedDevice ?? 0);
         }}
         reconnect={() => {
-          console.log("");
+          void connection?.disconnect();
         }}
       />
 
