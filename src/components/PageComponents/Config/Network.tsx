@@ -132,32 +132,32 @@ export const Network = (): JSX.Element => {
           disabled={!ethEnabled}
           {...register("ethMode", { valueAsNumber: true })}
         >
-          {renderOptions(Protobuf.Config_NetworkConfig_WiFiMode)}
+          {renderOptions(Protobuf.Config_NetworkConfig_EthMode)}
         </Select>
       </FormSection>
       <FormSection title="IP Config">
         <Input
           label="IP"
           description="IP Address"
-          error={errors.wifiSsid?.message}
+          error={errors.ethConfig?.ip?.message}
           {...register("ethConfig.ip")}
         />
         <Input
           label="Gateway"
           description="Default Gateway"
-          error={errors.wifiSsid?.message}
+          error={errors.ethConfig?.gateway?.message}
           {...register("ethConfig.gateway")}
         />
         <Input
           label="Subnet"
           description="Subnet Mask"
-          error={errors.wifiSsid?.message}
+          error={errors.ethConfig?.subnet?.message}
           {...register("ethConfig.subnet")}
         />
         <Input
           label="DNS"
           description="DNS Server"
-          error={errors.wifiSsid?.message}
+          error={errors.ethConfig?.dns?.message}
           {...register("ethConfig.dns")}
         />
       </FormSection>
@@ -165,7 +165,6 @@ export const Network = (): JSX.Element => {
         label="NTP Server"
         description="NTP server for time synchronization"
         error={errors.ntpServer?.message}
-        disabled={!wifiEnabled && !ethEnabled}
         {...register("ntpServer")}
       />
     </Form>
