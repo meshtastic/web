@@ -37,7 +37,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Input(
       >
         {label}
       </label>
-      <div className="flex">
+      <div className="flex rounded-md shadow-sm">
         <select
           ref={ref}
           className={`flex h-10 w-full rounded-md border-transparent bg-orange-100 px-3 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500 ${
