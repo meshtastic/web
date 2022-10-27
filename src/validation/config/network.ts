@@ -24,11 +24,11 @@ export class NetworkValidation implements Protobuf.Config_NetworkConfig {
   @IsEnum(Protobuf.Config_NetworkConfig_EthMode)
   ethMode: Protobuf.Config_NetworkConfig_EthMode;
 
-  ethConfig: NetworkValidation_ethConfig;
+  ethConfig: NetworkValidation_IpV4Config;
 }
 
-export class NetworkValidation_ethConfig
-  implements Protobuf.Config_NetworkConfig_NetworkConfig
+export class NetworkValidation_IpV4Config
+  implements Protobuf.Config_NetworkConfig_IpV4Config
 {
   @IsIP()
   ip: number;

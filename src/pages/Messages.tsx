@@ -26,7 +26,7 @@ export const MessagesPage = (): JSX.Element => {
   });
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex h-full w-full flex-col">
       <TabbedContent
         tabs={tabs}
         actions={[

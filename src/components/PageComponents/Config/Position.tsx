@@ -1,15 +1,17 @@
 import type React from "react";
 import { useEffect } from "react";
 
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
+import { FormSection } from "@app/components/form/FormSection.js";
 import { Input } from "@app/components/form/Input.js";
 import { Toggle } from "@app/components/form/Toggle.js";
 import { PositionValidation } from "@app/validation/config/position.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Position = (): JSX.Element => {
   const { config, connection } = useDevice();
@@ -24,18 +26,52 @@ export const Position = (): JSX.Element => {
     resolver: classValidatorResolver(PositionValidation),
   });
 
+  const fixedPositionEnabled = useWatch({
+    control,
+    name: "fixedPosition",
+    defaultValue: false,
+  });
+
   useEffect(() => {
     reset(config.position);
   }, [reset, config.position]);
 
   const onSubmit = handleSubmit((data) => {
+    const { fixedAlt, fixedLat, fixedLng, ...rest } = data;
+
     if (connection) {
+      void toast.promise(
+        connection.sendPacket(
+          Protobuf.Position.toBinary(
+            Protobuf.Position.create({
+              altitude: fixedAlt,
+              latitudeI: fixedLat * 1e7,
+              longitudeI: fixedLng * 1e7,
+            })
+          ),
+          Protobuf.PortNum.POSITION_APP,
+          undefined,
+          true,
+          undefined,
+          true,
+          false,
+          async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
+        ),
+        {
+          loading: "Saving...",
+          success: "Saved Channel",
+          error: "No response received",
+        }
+      );
       void toast.promise(
         connection.setConfig(
           {
             payloadVariant: {
               oneofKind: "position",
-              position: data,
+              position: rest,
             },
           },
           async () => {
@@ -92,6 +128,32 @@ export const Position = (): JSX.Element => {
           />
         )}
       />
+      <FormSection title="Fixed Position">
+        <Input
+          suffix="m"
+          label="Altitude"
+          type="number"
+          error={errors.fixedAlt?.message}
+          disabled={!fixedPositionEnabled}
+          {...register("fixedAlt", { valueAsNumber: true })}
+        />
+        <Input
+          suffix="°"
+          label="Latitude"
+          type="number"
+          error={errors.fixedLat?.message}
+          disabled={!fixedPositionEnabled}
+          {...register("fixedLat", { valueAsNumber: true })}
+        />
+        <Input
+          suffix="°"
+          label="Longitude"
+          type="number"
+          error={errors.fixedLng?.message}
+          disabled={!fixedPositionEnabled}
+          {...register("fixedLng", { valueAsNumber: true })}
+        />
+      </FormSection>
       <Controller
         name="gpsEnabled"
         control={control}

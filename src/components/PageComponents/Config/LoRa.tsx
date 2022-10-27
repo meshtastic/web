@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
+import { FormSection } from "@app/components/form/FormSection.js";
 import { Input } from "@app/components/form/Input.js";
 import { Select } from "@app/components/form/Select.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -70,74 +71,103 @@ export const LoRa = (): JSX.Element => {
       dirty={isDirty}
       onSubmit={onSubmit}
     >
-      <Controller
-        name="usePreset"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Use Preset"
-            description="Use one of the predefined modem presets"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Select
-        label="Preset"
-        description="Modem preset to use"
-        disabled={!usePreset}
-        {...register("modemPreset", { valueAsNumber: true })}
-      >
-        {renderOptions(Protobuf.Config_LoRaConfig_ModemPreset)}
-      </Select>
-
-      <Input
-        label="Bandwidth"
-        description="Max transmit power in dBm"
-        type="number"
-        suffix="MHz"
-        error={errors.bandwidth?.message}
-        {...register("bandwidth", {
-          valueAsNumber: true,
-        })}
-        disabled={usePreset}
-      />
-      <Input
-        label="Spread Factor"
-        description="Max transmit power in dBm"
-        type="number"
-        suffix="CPS"
-        error={errors.spreadFactor?.message}
-        {...register("spreadFactor", {
-          valueAsNumber: true,
-        })}
-        disabled={usePreset}
-      />
-      <Input
-        label="Coding Rate"
-        description="Max transmit power in dBm"
-        type="number"
-        error={errors.codingRate?.message}
-        {...register("codingRate", {
-          valueAsNumber: true,
-        })}
-        disabled={usePreset}
-      />
-      <Input
-        label="Frequency Offset"
-        description="This is a description."
-        suffix="Hz"
-        type="number"
-        error={errors.frequencyOffset?.message}
-        {...register("frequencyOffset", { valueAsNumber: true })}
-      />
-      <Select
-        label="Region"
-        description="This is a description."
-        {...register("region", { valueAsNumber: true })}
-      >
-        {renderOptions(Protobuf.Config_LoRaConfig_RegionCode)}
-      </Select>
+      <FormSection title="Modem Settings">
+        <Controller
+          name="usePreset"
+          control={control}
+          render={({ field: { value, ...rest } }) => (
+            <Toggle
+              label="Use Preset"
+              description="Use one of the predefined modem presets"
+              checked={value}
+              {...rest}
+            />
+          )}
+        />
+        <Select
+          label="Preset"
+          description="Modem preset to use"
+          disabled={!usePreset}
+          {...register("modemPreset", { valueAsNumber: true })}
+        >
+          {renderOptions(Protobuf.Config_LoRaConfig_ModemPreset)}
+        </Select>
+        <Input
+          label="Bandwidth"
+          description="Max transmit power in dBm"
+          type="number"
+          suffix="MHz"
+          error={errors.bandwidth?.message}
+          {...register("bandwidth", {
+            valueAsNumber: true,
+          })}
+          disabled={usePreset}
+        />
+        <Input
+          label="Spread Factor"
+          description="Max transmit power in dBm"
+          type="number"
+          suffix="CPS"
+          error={errors.spreadFactor?.message}
+          {...register("spreadFactor", {
+            valueAsNumber: true,
+          })}
+          disabled={usePreset}
+        />
+        <Input
+          label="Coding Rate"
+          description="Max transmit power in dBm"
+          type="number"
+          error={errors.codingRate?.message}
+          {...register("codingRate", {
+            valueAsNumber: true,
+          })}
+          disabled={usePreset}
+        />
+      </FormSection>
+      <FormSection title="Radio Settings">
+        <Controller
+          name="txEnabled"
+          control={control}
+          render={({ field: { value, ...rest } }) => (
+            <Toggle
+              label="Transmit Enabled"
+              description="Description"
+              checked={value}
+              {...rest}
+            />
+          )}
+        />
+        <Select
+          label="Region"
+          description="This is a description."
+          {...register("region", { valueAsNumber: true })}
+        >
+          {renderOptions(Protobuf.Config_LoRaConfig_RegionCode)}
+        </Select>
+        <Input
+          label="Transmit Power"
+          description="Max transmit power in dBm"
+          type="number"
+          error={errors.txPower?.message}
+          {...register("txPower", { valueAsNumber: true })}
+        />
+        <Input
+          label="Channel Number"
+          description="LoRa channel number"
+          type="number"
+          error={errors.channelNum?.message}
+          {...register("channelNum", { valueAsNumber: true })}
+        />
+        <Input
+          label="Frequency Offset"
+          description="This is a description."
+          suffix="Hz"
+          type="number"
+          error={errors.frequencyOffset?.message}
+          {...register("frequencyOffset", { valueAsNumber: true })}
+        />
+      </FormSection>
       <Input
         label="Hop Limit"
         description="This is a description."
@@ -145,32 +175,6 @@ export const LoRa = (): JSX.Element => {
         type="number"
         error={errors.hopLimit?.message}
         {...register("hopLimit", { valueAsNumber: true })}
-      />
-      <Controller
-        name="txEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Transmit Enabled"
-            description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Input
-        label="Transmit Power"
-        description="Max transmit power in dBm"
-        type="number"
-        error={errors.txPower?.message}
-        {...register("txPower", { valueAsNumber: true })}
-      />
-      <Input
-        label="Channel Number"
-        description="LoRa channel number"
-        type="number"
-        error={errors.channelNum?.message}
-        {...register("channelNum", { valueAsNumber: true })}
       />
     </Form>
   );

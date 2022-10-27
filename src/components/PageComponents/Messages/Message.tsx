@@ -21,7 +21,7 @@ export const Message = ({
   message,
   sender,
 }: MessageProps): JSX.Element => {
-  const { setPeerInfoOpen, setActivePeer } = useDevice();
+  const { setPeerInfoOpen, setActivePeer, connection } = useDevice();
 
   const openPeer = (): void => {
     setActivePeer(message.packet.from);

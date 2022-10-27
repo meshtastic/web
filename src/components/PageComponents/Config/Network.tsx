@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
+import { FormSection } from "@app/components/form/FormSection.js";
 import { Input } from "@app/components/form/Input.js";
 import { Select } from "@app/components/form/Select.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -75,95 +76,97 @@ export const Network = (): JSX.Element => {
       dirty={isDirty}
       onSubmit={onSubmit}
     >
-      <Controller
-        name="wifiEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="WiFi Enabled"
-            description="Enable or disbale the WiFi radio"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Select
-        label="WiFi Mode"
-        description="How the WiFi radio should be used"
-        disabled={!wifiEnabled}
-        {...register("wifiMode", { valueAsNumber: true })}
-      >
-        {renderOptions(Protobuf.Config_NetworkConfig_WiFiMode)}
-      </Select>
-      <Input
-        label="SSID"
-        description="Network name"
-        error={errors.wifiSsid?.message}
-        disabled={!wifiEnabled}
-        {...register("wifiSsid")}
-      />
-      <Input
-        label="PSK"
-        type="password"
-        description="Network password"
-        error={errors.wifiPsk?.message}
-        disabled={!wifiEnabled}
-        {...register("wifiPsk")}
-      />
+      <FormSection title="WiFi Config">
+        <Controller
+          name="wifiEnabled"
+          control={control}
+          render={({ field: { value, ...rest } }) => (
+            <Toggle
+              label="WiFi Enabled"
+              description="Enable or disbale the WiFi radio"
+              checked={value}
+              {...rest}
+            />
+          )}
+        />
+        <Select
+          label="WiFi Mode"
+          description="How the WiFi radio should be used"
+          disabled={!wifiEnabled}
+          {...register("wifiMode", { valueAsNumber: true })}
+        >
+          {renderOptions(Protobuf.Config_NetworkConfig_WiFiMode)}
+        </Select>
+        <Input
+          label="SSID"
+          description="Network name"
+          error={errors.wifiSsid?.message}
+          disabled={!wifiEnabled}
+          {...register("wifiSsid")}
+        />
+        <Input
+          label="PSK"
+          type="password"
+          description="Network password"
+          error={errors.wifiPsk?.message}
+          disabled={!wifiEnabled}
+          {...register("wifiPsk")}
+        />
+      </FormSection>
+      <FormSection title="Ethernet Config">
+        <Controller
+          name="ethEnabled"
+          control={control}
+          render={({ field: { value, ...rest } }) => (
+            <Toggle
+              label="Ethernet Enabled"
+              description="Enable or disbale the Ethernet port"
+              checked={value}
+              {...rest}
+            />
+          )}
+        />
+        <Select
+          label="Ethernet Mode"
+          description="Address assignment selection"
+          disabled={!ethEnabled}
+          {...register("ethMode", { valueAsNumber: true })}
+        >
+          {renderOptions(Protobuf.Config_NetworkConfig_WiFiMode)}
+        </Select>
+      </FormSection>
+      <FormSection title="IP Config">
+        <Input
+          label="IP"
+          description="IP Address"
+          error={errors.wifiSsid?.message}
+          {...register("ethConfig.ip")}
+        />
+        <Input
+          label="Gateway"
+          description="Default Gateway"
+          error={errors.wifiSsid?.message}
+          {...register("ethConfig.gateway")}
+        />
+        <Input
+          label="Subnet"
+          description="Subnet Mask"
+          error={errors.wifiSsid?.message}
+          {...register("ethConfig.subnet")}
+        />
+        <Input
+          label="DNS"
+          description="DNS Server"
+          error={errors.wifiSsid?.message}
+          {...register("ethConfig.dns")}
+        />
+      </FormSection>
       <Input
         label="NTP Server"
         description="NTP server for time synchronization"
         error={errors.ntpServer?.message}
         disabled={!wifiEnabled && !ethEnabled}
         {...register("ntpServer")}
-      />
-      <Controller
-        name="ethEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Ethernet Enabled"
-            description="Enable or disbale the Ethernet port"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Select
-        label="Ethernet Mode"
-        description="Address assignment selection"
-        disabled={!ethEnabled}
-        {...register("ethMode", { valueAsNumber: true })}
-      >
-        {renderOptions(Protobuf.Config_NetworkConfig_WiFiMode)}
-      </Select>
-      <Input
-        label="Ethernet IP"
-        description="IP Address"
-        error={errors.wifiSsid?.message}
-        disabled={!ethEnabled}
-        {...register("ethConfig.ip")}
-      />
-      <Input
-        label="Ethernet Gateway"
-        description="Default Gatewat"
-        error={errors.wifiSsid?.message}
-        disabled={!ethEnabled}
-        {...register("ethConfig.gateway")}
-      />
-      <Input
-        label="Ethernet Subnet"
-        description="Subnet Mask"
-        error={errors.wifiSsid?.message}
-        disabled={!ethEnabled}
-        {...register("ethConfig.subnet")}
-      />
-      <Input
-        label="Ethernet DNS"
-        description="DNS Server"
-        error={errors.wifiSsid?.message}
-        disabled={!ethEnabled}
-        {...register("ethConfig.dns")}
       />
     </Form>
   );
