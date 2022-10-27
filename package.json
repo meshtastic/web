@@ -1,6 +1,7 @@
 {
   "name": "meshtastic-web",
   "version": "1.0.0",
+  "type": "module",
   "description": "Meshtastic web client",
   "license": "GPL-3.0-only",
   "scripts": {
@@ -25,7 +26,7 @@
     "@heroicons/react": "^2.0.12",
     "@hookform/resolvers": "^2.9.10",
     "@meshtastic/eslint-config": "^1.0.8",
-    "@meshtastic/meshtasticjs": "^0.6.110",
+    "@meshtastic/meshtasticjs": "^0.6.112",
     "@tailwindcss/line-clamp": "^0.4.2",
     "@tailwindcss/typography": "^0.5.7",
     "base64-js": "^1.5.1",
@@ -54,14 +55,14 @@
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.3",
-    "@types/chrome": "^0.0.199",
+    "@types/chrome": "^0.0.200",
     "@types/geodesy": "^2.2.3",
-    "@types/node": "^18.11.3",
-    "@types/react": "^18.0.21",
-    "@types/react-dom": "^18.0.6",
+    "@types/node": "^18.11.7",
+    "@types/react": "^18.0.23",
+    "@types/react-dom": "^18.0.7",
     "@types/w3c-web-serial": "^1.0.3",
     "@types/web-bluetooth": "^0.0.16",
-    "@vitejs/plugin-react": "^2.1.0",
+    "@vitejs/plugin-react": "^2.2.0",
     "autoprefixer": "^10.4.12",
     "gzipper": "^7.1.0",
     "postcss": "^8.4.18",
@@ -73,7 +74,7 @@
     "tslib": "^2.4.0",
     "typescript": "^4.8.4",
     "unimported": "^1.22.0",
-    "vite": "^3.1.8",
+    "vite": "^3.2.0",
     "vite-plugin-environment": "^1.1.3"
   }
 }
