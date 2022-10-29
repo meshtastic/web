@@ -1,13 +1,20 @@
-import { IsBoolean, IsInt, Length } from "class-validator";
+import { IsBoolean, IsInt, IsNumber, IsString, Length } from "class-validator";
 
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class ChannelSettingsValidation
-  implements Omit<Protobuf.ChannelSettings, "channelNum">
+  implements Omit<Protobuf.ChannelSettings, "psk">
 {
-  psk: Uint8Array;
+  @IsBoolean()
+  enabled: boolean;
 
-  @Length(1, 30)
+  @IsString()
+  psk: string;
+
+  @IsNumber()
+  channelNum: number;
+
+  @Length(1, 11)
   name: string;
 
   @IsInt()

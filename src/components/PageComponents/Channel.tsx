@@ -6,17 +6,18 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import { Input } from "@app/components/form/Input.js";
+import { ChannelSettingsValidation } from "@app/validation/channelSettings.js";
 import { Form } from "@components/form/Form";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import {
   ArrowPathIcon,
   EyeIcon,
   EyeSlashIcon,
 } from "@heroicons/react/24/outline";
+import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-
-import { Select } from "../form/Select.js";
-import { Toggle } from "../form/Toggle.js";
 
 export interface SettingsPanelProps {
   channel: Protobuf.Channel;
@@ -34,9 +35,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
     reset,
     control,
     setValue,
-  } = useForm<
-    Omit<Protobuf.ChannelSettings, "psk"> & { psk: string; enabled: boolean }
-  >({
+  } = useForm<ChannelSettingsValidation>({
     defaultValues: {
       enabled: [
         Protobuf.Channel_Role.SECONDARY,
@@ -47,6 +46,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
       ...channel?.settings,
       psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
     },
+    resolver: classValidatorResolver(ChannelSettingsValidation),
   });
 
   useEffect(() => {
@@ -136,6 +136,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
           <Input
             label="Name"
             description="Max transmit power in dBm"
+            error={errors.name?.message}
             {...register("name")}
           />
         </>
@@ -162,7 +163,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
       <Input
         width="100%"
         label="Pre-Shared Key"
-        description="Max transmit power in dBm"
+        description="Channel key to encrypt data"
         type={pskHidden ? "password" : "text"}
         action={{
           icon: pskHidden ? (
@@ -174,6 +175,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
             setPskHidden(!pskHidden);
           },
         }}
+        error={errors.psk?.message}
         {...register("psk")}
       />
       <Controller
@@ -182,7 +184,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Uplink Enabled"
-            description="Description"
+            description="Send packets to designated MQTT server"
             checked={value}
             {...rest}
           />
@@ -194,7 +196,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Downlink Enabled"
-            description="Description"
+            description="Recieve packets to designated MQTT server"
             checked={value}
             {...rest}
           />
