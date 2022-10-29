@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt } from "class-validator";
+import { IsBoolean, IsInt, IsNumber } from "class-validator";
 
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -25,12 +25,12 @@ export class PositionValidation implements Protobuf.Config_PositionConfig {
   positionFlags: number;
 
   // fixed position fields
-  @IsInt()
+  @IsNumber()
   fixedAlt: number;
 
-  @IsInt()
+  @IsNumber()
   fixedLat: number;
 
-  @IsInt()
+  @IsNumber()
   fixedLng: number;
 }

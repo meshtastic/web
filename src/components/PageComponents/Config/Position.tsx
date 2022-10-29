@@ -14,7 +14,10 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Position = (): JSX.Element => {
-  const { config, connection } = useDevice();
+  const { config, connection, nodes, hardware } = useDevice();
+
+  const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
+
   const {
     register,
     handleSubmit,
@@ -22,7 +25,12 @@ export const Position = (): JSX.Element => {
     reset,
     control,
   } = useForm<PositionValidation>({
-    defaultValues: config.position,
+    defaultValues: {
+      fixedAlt: myNode?.data.position?.altitude,
+      fixedLat: (myNode?.data.position?.latitudeI ?? 0) / 1e7,
+      fixedLng: (myNode?.data.position?.longitudeI ?? 0) / 1e7,
+      ...config.position,
+    },
     resolver: classValidatorResolver(PositionValidation),
   });
 
@@ -33,11 +41,21 @@ export const Position = (): JSX.Element => {
   });
 
   useEffect(() => {
-    reset(config.position);
-  }, [reset, config.position]);
+    reset({
+      fixedAlt: myNode?.data.position?.altitude,
+      fixedLat: (myNode?.data.position?.latitudeI ?? 0) / 1e7,
+      fixedLng: (myNode?.data.position?.longitudeI ?? 0) / 1e7,
+      ...config.position,
+    });
+  }, [reset, config.position, myNode?.data.position]);
 
   const onSubmit = handleSubmit((data) => {
     const { fixedAlt, fixedLat, fixedLng, ...rest } = data;
+
+    const configHasChanged = !Protobuf.Config_PositionConfig.equals(
+      config.position,
+      Protobuf.Config_PositionConfig.create(rest)
+    );
 
     if (connection) {
       void toast.promise(
@@ -66,25 +84,27 @@ export const Position = (): JSX.Element => {
           error: "No response received",
         }
       );
-      void toast.promise(
-        connection.setConfig(
-          {
-            payloadVariant: {
-              oneofKind: "position",
-              position: rest,
+      if (configHasChanged) {
+        void toast.promise(
+          connection.setConfig(
+            {
+              payloadVariant: {
+                oneofKind: "position",
+                position: rest,
+              },
             },
-          },
-          async () => {
-            reset({ ...data });
-            await Promise.resolve();
+            async () => {
+              reset({ ...data });
+              await Promise.resolve();
+            }
+          ),
+          {
+            loading: "Saving...",
+            success: "Saved Position Config, Restarting Node",
+            error: "No response received",
           }
-        ),
-        {
-          loading: "Saving...",
-          success: "Saved Position Config, Restarting Node",
-          error: "No response received",
-        }
-      );
+        );
+      }
     }
   });
 

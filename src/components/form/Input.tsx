@@ -47,6 +47,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             disabled ? "cursor-not-allowed bg-orange-50 text-orange-200" : ""
           }`}
           disabled={disabled}
+          step="any"
           {...rest}
         />
         {suffix && (
