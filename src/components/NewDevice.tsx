@@ -22,6 +22,7 @@ export const NewDevice = () => {
       icon: <FiWifi className="h-4" />,
       element: HTTP,
       disabled: false,
+      disabledMessage: "Unsuported connection method"
     },
     {
       name: "Serial",

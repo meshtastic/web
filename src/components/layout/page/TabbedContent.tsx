@@ -8,8 +8,8 @@ export interface TabType {
   name: string;
   icon?: JSX.Element;
   element: () => JSX.Element;
-  disabled?: boolean;
-  disabledMessage?: string;
+  disabled: boolean;
+  disabledMessage: string;
   disabledLink?: string;
 }
 
@@ -56,24 +56,26 @@ export const TabbedContent = ({
               <entry.element />
             ) : (
               <div>
-                {entry.disabledMessage && (
-                  <Mono>
-                    {entry.disabledMessage}.
-                    {' '}
-                    Click
-                    {' '}
-                    <a
-                      className="underline"
-                      target="_blank"
-                      rel="noreferrer"
-                      href={entry.disabledLink}
-                    >
-                      here
-                    </a>
-                    {' '}
-                    for more information.
-                  </Mono>
-                )}
+                <Mono>
+                  {entry.disabledMessage}.
+                  {' '}
+                  {entry.disabledLink && (
+                    <>
+                      Click
+                      {' '}
+                      <a
+                        className="underline"
+                        target="_blank"
+                        rel="noreferrer"
+                        href={entry.disabledLink}
+                      >
+                        here
+                      </a>
+                      {' '}
+                      for more information.
+                    </>
+                  )}
+                </Mono>
               </div>
             )}
           </Tab.Panel>
