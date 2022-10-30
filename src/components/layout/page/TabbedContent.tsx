@@ -10,6 +10,7 @@ export interface TabType {
   element: () => JSX.Element;
   disabled?: boolean;
   disabledMessage?: string;
+  disabledLink?: string;
 }
 
 export interface TabbedContentProps {
@@ -28,11 +29,10 @@ export const TabbedContent = ({
           <Tab key={index}>
             {({ selected }) => (
               <div
-                className={`flex h-10 cursor-pointer gap-3 rounded-md px-3 text-sm font-medium ${
-                  selected
-                    ? "bg-gray-100 text-gray-700"
-                    : "text-gray-500 hover:text-gray-700"
-                }
+                className={`flex h-10 cursor-pointer gap-3 rounded-md px-3 text-sm font-medium ${selected
+                  ? "bg-gray-100 text-gray-700"
+                  : "text-gray-500 hover:text-gray-700"
+                  }
                    `}
               >
                 {entry.icon && (
@@ -55,7 +55,26 @@ export const TabbedContent = ({
             {!entry.disabled ? (
               <entry.element />
             ) : (
-              <Mono>{entry.disabledMessage}</Mono>
+              <div>
+                {entry.disabledMessage && (
+                  <Mono>
+                    {entry.disabledMessage}.
+                    {' '}
+                    Click
+                    {' '}
+                    <a
+                      className="underline"
+                      target="_blank"
+                      rel="noreferrer"
+                      href={entry.disabledLink}
+                    >
+                      here
+                    </a>
+                    {' '}
+                    for more information.
+                  </Mono>
+                )}
+              </div>
             )}
           </Tab.Panel>
         ))}
