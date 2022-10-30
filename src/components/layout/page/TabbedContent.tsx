@@ -1,14 +1,15 @@
 import type React from "react";
 import { Fragment } from "react";
 
-import { Tab } from "@headlessui/react";
 import { Mono } from "@app/components/Mono";
+import { Tab } from "@headlessui/react";
 
 export interface TabType {
   name: string;
   icon?: JSX.Element;
   element: () => JSX.Element;
   disabled?: boolean;
+  disabledMessage?: string;
 }
 
 export interface TabbedContentProps {
@@ -42,7 +43,7 @@ export const TabbedContent = ({
             )}
           </Tab>
         ))}
-        <div className="ml-auto">
+        <div className="ml-auto flex gap-2">
           {actions?.map((Action, index) => (
             <Action key={index} />
           ))}
@@ -51,10 +52,10 @@ export const TabbedContent = ({
       <Tab.Panels as={Fragment}>
         {tabs.map((entry, index) => (
           <Tab.Panel key={index} className="flex flex-grow">
-            {!entry.disabled ? <entry.element /> : (
-              <Mono>
-                This functionality is not supported in your browser.
-              </Mono>
+            {!entry.disabled ? (
+              <entry.element />
+            ) : (
+              <Mono>{entry.disabledMessage}</Mono>
             )}
           </Tab.Panel>
         ))}

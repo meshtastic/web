@@ -33,7 +33,7 @@ export const Button = ({
       disabled={disabled}
       {...rest}
     >
-      <div className="m-auto flex items-center gap-2 font-medium">
+      <div className="m-auto flex shrink-0 items-center gap-2 font-medium">
         {iconBefore}
         {children}
         {iconAfter}

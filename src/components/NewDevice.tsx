@@ -13,20 +13,24 @@ export const NewDevice = () => {
       name: "BLE",
       icon: <FiBluetooth className="h-4" />,
       element: BLE,
-      disabled: !navigator.bluetooth
+      disabled: !navigator.bluetooth,
+      disabledMessage:
+        "WebBluetooth is currently only supported by Chromium based browsers: https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
     },
     {
       name: "HTTP",
       icon: <FiWifi className="h-4" />,
       element: HTTP,
-      disabled: false
+      disabled: false,
     },
     {
       name: "Serial",
       icon: <FiTerminal className="h-4" />,
       element: Serial,
-      disabled: !navigator.serial
-    }
+      disabled: !navigator.serial,
+      disabledMessage:
+        "WebSerial is currently only supported by Chromium based browsers: https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility",
+    },
   ]);
 
   return (
