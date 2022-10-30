@@ -76,7 +76,7 @@ export const Bluetooth = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Enabled"
-            description="Description"
+            description="Enable or disbale Bluetooth"
             checked={value}
             {...rest}
           />
@@ -84,7 +84,7 @@ export const Bluetooth = (): JSX.Element => {
       />
       <Select
         label="Pairing mode"
-        description="This is a description."
+        description="Pin selection behaviour."
         {...register("mode", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.Config_BluetoothConfig_PairingMode)}
@@ -95,7 +95,7 @@ export const Bluetooth = (): JSX.Element => {
           pairingMode !== Protobuf.Config_BluetoothConfig_PairingMode.FIXED_PIN
         }
         label="Pin"
-        description="This is a description."
+        description="Pin to use when pairing"
         type="number"
         {...register("fixedPin", {
           valueAsNumber: true,
