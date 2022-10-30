@@ -8,8 +8,8 @@ export interface TabType {
   name: string;
   icon?: JSX.Element;
   element: () => JSX.Element;
-  disabled: boolean;
-  disabledMessage: string;
+  disabled?: boolean;
+  disabledMessage?: string;
   disabledLink?: string;
 }
 
@@ -57,7 +57,7 @@ export const TabbedContent = ({
             ) : (
               <div>
                 <Mono>
-                  {entry.disabledMessage}.
+                  {entry.disabledMessage || "This tab is disabled"}.
                   {' '}
                   {entry.disabledLink && (
                     <>
