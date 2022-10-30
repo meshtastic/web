@@ -130,7 +130,7 @@ export const Position = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Enable Smart Position"
-            description="Only send position when there has been a meaningfull change in location"
+            description="Only send position when there has been a meaningful change in location"
             checked={value}
             {...rest}
           />
@@ -142,7 +142,7 @@ export const Position = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Use Fixed Position"
-            description="Don't report GPS position, but a manually specified one"
+            description="Don't report GPS position, but a manually-specified one"
             checked={value}
             {...rest}
           />
