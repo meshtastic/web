@@ -72,7 +72,11 @@ export const PeersPage = (): JSX.Element => {
                 <td className="flex gap-2 whitespace-nowrap py-2 pr-3 pl-6 text-sm font-medium text-gray-900">
                   <Hashicon size={24} value={node.data.num.toString()} />
                   <span className="my-auto">
-                    {node.data.user?.longName ?? "Unknown"}
+                    {/* node.data.user?.longName */}
+                    {undefined ??
+                      `Meshtastic_${base16
+                        .stringify(node.data.user?.macaddr.subarray(4, 6) ?? [])
+                        .toLowerCase()}`}
                   </span>
                 </td>
                 <td className="whitespace-nowrap py-2 text-sm text-gray-500">
