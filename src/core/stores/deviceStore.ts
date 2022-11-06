@@ -227,11 +227,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     data: Protobuf.NodeInfo.create({
                       num: metrics.packet.from,
                       snr: metrics.packet.rxSnr,
-                      lastHeard: new Date().getSeconds(),
+                      lastHeard: Date.now()
                     }),
                     metadata: undefined,
                     deviceMetrics: [],
-                    environmentMetrics: [],
+                    environmentMetrics: []
                   };
 
                   device.nodes.push(node);
@@ -264,7 +264,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                         timestamp:
                           metrics.packet.rxTime === 0
                             ? new Date()
-                            : new Date(metrics.packet.rxTime * 1000),
+                            : new Date(metrics.packet.rxTime * 1000)
                       });
                       break;
                     case "environmentMetrics":
@@ -273,7 +273,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                         timestamp:
                           metrics.packet.rxTime === 0
                             ? new Date()
-                            : new Date(metrics.packet.rxTime * 1000),
+                            : new Date(metrics.packet.rxTime * 1000)
                       });
                       break;
                   }
@@ -338,17 +338,22 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   );
                   if (node) {
                     node.data = nodeInfo.data;
-                    // if (action.payload.packet.rxTime) {
-                    //   node.data.lastHeard = new Date(
-                    //     action.payload.packet.rxTime * 1000,
-                    //   ).getTime();
-                    // }
+                    node.data.lastHeard =
+                      nodeInfo.packet.rxTime !== 0
+                        ? nodeInfo.packet.rxTime * 1000
+                        : Date.now();
                   } else {
                     device.nodes.push({
-                      data: Protobuf.NodeInfo.create(nodeInfo.data),
+                      data: Protobuf.NodeInfo.create({
+                        ...nodeInfo.data,
+                        lastHeard:
+                          nodeInfo.packet.rxTime !== 0
+                            ? nodeInfo.packet.rxTime * 1000
+                            : Date.now()
+                      }),
                       metadata: undefined,
                       deviceMetrics: [],
-                      environmentMetrics: [],
+                      environmentMetrics: []
                     });
                   }
                 }
@@ -395,11 +400,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       data: Protobuf.NodeInfo.create({
                         num: user.packet.from,
                         snr: user.packet.rxSnr,
-                        user: user.data,
+                        user: user.data
                       }),
                       metadata: undefined,
                       deviceMetrics: [],
-                      environmentMetrics: [],
+                      environmentMetrics: []
                     });
                   }
                 }
@@ -425,11 +430,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     device.nodes.push({
                       data: Protobuf.NodeInfo.create({
                         num: position.packet.from,
-                        position: position.data,
+                        position: position.data
                       }),
                       metadata: undefined,
                       deviceMetrics: [],
-                      environmentMetrics: [],
+                      environmentMetrics: []
                     });
                   }
                 }
@@ -518,7 +523,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 }
               })
             );
-          },
+          }
         });
       })
     );
@@ -540,7 +545,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 
   getDevices: () => Array.from(get().devices.values()),
 
-  getDevice: (id) => get().devices.get(id),
+  getDevice: (id) => get().devices.get(id)
 }));
 
 export const DeviceContext = createContext<Device | undefined>(undefined);
