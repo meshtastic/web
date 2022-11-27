@@ -15,13 +15,16 @@ export const NewDevice = () => {
       element: BLE,
       disabled: !navigator.bluetooth,
       disabledMessage:
-        "WebBluetooth is currently only supported by Chromium based browsers: https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility"
+        "Web Bluetooth is currently only supported by Chromium-based browsers",
+      disabledLink:
+        "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility"
     },
     {
       name: "HTTP",
       icon: <FiWifi className="h-4" />,
       element: HTTP,
-      disabled: false
+      disabled: false,
+      disabledMessage: "Unsuported connection method"
     },
     {
       name: "Serial",
