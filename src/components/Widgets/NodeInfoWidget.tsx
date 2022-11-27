@@ -11,7 +11,7 @@ export interface NodeInfoWidgetProps {
 }
 
 export const NodeInfoWidget = ({
-  hardware,
+  hardware
 }: NodeInfoWidgetProps): JSX.Element => {
   return (
     <Card className="flex-col">

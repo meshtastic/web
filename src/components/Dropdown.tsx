@@ -18,7 +18,7 @@ export const Dropdown = ({
   stat,
   icon,
   defaultOpen,
-  children,
+  children
 }: DropdownProps): JSX.Element => {
   return (
     <Disclosure defaultOpen={defaultOpen}>

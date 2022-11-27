@@ -38,7 +38,7 @@ export const Serial = (): JSX.Element => {
       .connect({
         port,
         baudRate: undefined,
-        concurrentLogOutput: true,
+        concurrentLogOutput: true
       })
       .catch((e: Error) => console.log(`Unable to Connect: ${e.message}`));
     device.addConnection(connection);

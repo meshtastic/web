@@ -21,14 +21,14 @@ export const HTTP = (): JSX.Element => {
   }>({
     defaultValues: {
       ip: "meshtastic.local",
-      tls: location.protocol === "https:",
-    },
+      tls: location.protocol === "https:"
+    }
   });
 
   const TLSEnabled = useWatch({
     control,
     name: "tls",
-    defaultValue: location.protocol === "https:",
+    defaultValue: location.protocol === "https:"
   });
 
   const onSubmit = handleSubmit((data) => {
@@ -40,7 +40,7 @@ export const HTTP = (): JSX.Element => {
     void connection.connect({
       address: data.ip,
       fetchInterval: 2000,
-      tls: data.tls,
+      tls: data.tls
     });
     device.addConnection(connection);
     subscribeAll(device, connection);

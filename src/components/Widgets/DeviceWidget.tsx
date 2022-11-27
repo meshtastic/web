@@ -19,7 +19,7 @@ export const DeviceWidget = ({
   nodeNum,
   disconnected,
   disconnect,
-  reconnect,
+  reconnect
 }: DeviceWidgetProps): JSX.Element => {
   return (
     <Card className="relative shrink-0 flex-col">

@@ -20,21 +20,20 @@ export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
     message: string;
   }>({
     defaultValues: {
-      message: "",
-    },
+      message: ""
+    }
   });
 
   const onSubmit = handleSubmit((data) => {
-    void connection?.sendText(
-      data.message,
-      undefined,
-      true,
-      channel.config.index as Types.ChannelNumber,
-      (id) => {
+    void connection?.sendText({
+      text: data.message,
+      wantAck: true,
+      channel: channel.config.index as Types.ChannelNumber,
+      callback: (id) => {
         ackMessage(channel.config.index, id);
         return Promise.resolve();
       }
-    );
+    });
   });
 
   return (

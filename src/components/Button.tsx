@@ -22,14 +22,18 @@ export const Button = ({
       className={`flex w-full rounded-md border border-transparent px-3 focus:outline-none focus:ring-2 focus:ring-orange-500  ${
         variant === "primary"
           ? "bg-orange-600 text-white shadow-sm hover:bg-orange-700"
-          : "bg-orange-100 text-orange-700 hover:bg-orange-200"
+          : "bg-orange-200 text-orange-700 hover:bg-orange-200"
       } ${
         size === "sm"
           ? "h-8 text-sm"
           : size === "md"
           ? "h-10 text-sm"
           : "h-10 text-base"
-      } ${disabled ? "cursor-not-allowed bg-red-400 focus:ring-red-500" : ""}`}
+      } ${
+        disabled
+          ? "cursor-not-allowed bg-gray-400 hover:bg-gray-400 focus:ring-gray-500"
+          : ""
+      }`}
       disabled={disabled}
       {...rest}
     >

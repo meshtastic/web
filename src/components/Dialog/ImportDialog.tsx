@@ -13,19 +13,19 @@ import { Checkbox } from "../form/Checkbox.js";
 import { Input } from "../form/Input.js";
 import { IconButton } from "../IconButton.js";
 
-export interface QRDialogProps {
+export interface ImportDialogProps {
   isOpen: boolean;
   close: () => void;
   loraConfig?: Protobuf.Config_LoRaConfig;
   channels: Protobuf.Channel[];
 }
 
-export const QRDialog = ({
+export const ImportDialog = ({
   isOpen,
   close,
   loraConfig,
   channels
-}: QRDialogProps): JSX.Element => {
+}: ImportDialogProps): JSX.Element => {
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [QRCodeURL, setQRCodeURL] = useState<string>("");
 
@@ -34,12 +34,10 @@ export const QRDialog = ({
       .filter((channel) => selectedChannels.includes(channel.index))
       .map((channel) => channel.settings)
       .filter((ch): ch is Protobuf.ChannelSettings => !!ch);
-    const encoded = Protobuf.ChannelSet.toBinary(
-      Protobuf.ChannelSet.create({
-        loraConfig,
-        settings: channelsToEncode
-      })
-    );
+    const encoded = Protobuf.ChannelSet.toBinary({
+      loraConfig,
+      settings: channelsToEncode
+    });
     const base64 = fromByteArray(encoded)
       .replace(/=/g, "")
       .replace(/\+/g, "-")

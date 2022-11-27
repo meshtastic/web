@@ -14,7 +14,7 @@ import { useDevice } from "@core/providers/useDevice.js";
 import {
   ArrowPathIcon,
   EyeIcon,
-  EyeSlashIcon,
+  EyeSlashIcon
 } from "@heroicons/react/24/outline";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
@@ -34,39 +34,39 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
     formState: { errors, isDirty },
     reset,
     control,
-    setValue,
+    setValue
   } = useForm<ChannelSettingsValidation>({
     defaultValues: {
       enabled: [
         Protobuf.Channel_Role.SECONDARY,
-        Protobuf.Channel_Role.PRIMARY,
+        Protobuf.Channel_Role.PRIMARY
       ].find((role) => role === channel?.role)
         ? true
         : false,
       ...channel?.settings,
-      psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+      psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0))
     },
-    resolver: classValidatorResolver(ChannelSettingsValidation),
+    resolver: classValidatorResolver(ChannelSettingsValidation)
   });
 
   useEffect(() => {
     reset({
       enabled: [
         Protobuf.Channel_Role.SECONDARY,
-        Protobuf.Channel_Role.PRIMARY,
+        Protobuf.Channel_Role.PRIMARY
       ].find((role) => role === channel?.role)
         ? true
         : false,
       ...channel?.settings,
-      psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+      psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0))
     });
   }, [channel, reset]);
 
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setChannel(
-          {
+        connection.setChannel({
+          channel: {
             role:
               channel?.role === Protobuf.Channel_Role.PRIMARY
                 ? Protobuf.Channel_Role.PRIMARY
@@ -76,18 +76,18 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
             index: channel?.index,
             settings: {
               ...data,
-              psk: toByteArray(data.psk ?? ""),
-            },
+              psk: toByteArray(data.psk ?? "")
+            }
           },
-          (): Promise<void> => {
+          callback: (): Promise<void> => {
             reset({ ...data });
             return Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Channel",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -102,18 +102,18 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
           ? channel.settings.name
           : channel.role === Protobuf.Channel_Role.PRIMARY
           ? "Primary"
-          : `Channel: ${channel.index}`,
+          : `Channel: ${channel.index}`
       ]}
       reset={() =>
         reset({
           enabled: [
             Protobuf.Channel_Role.SECONDARY,
-            Protobuf.Channel_Role.PRIMARY,
+            Protobuf.Channel_Role.PRIMARY
           ].find((role) => role === channel?.role)
             ? true
             : false,
           ...channel?.settings,
-          psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+          psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0))
         })
       }
       dirty={isDirty}
@@ -153,8 +153,10 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
           action: () => {
             const key = new Uint8Array(keySize / 8);
             crypto.getRandomValues(key);
-            setValue("psk", fromByteArray(key));
-          },
+            setValue("psk", fromByteArray(key), {
+              shouldDirty: true
+            });
+          }
         }}
       >
         <option value={128}>128 Bit</option>
@@ -173,7 +175,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
           ),
           action: () => {
             setPskHidden(!pskHidden);
-          },
+          }
         }}
         error={errors.psk?.message}
         {...register("psk")}

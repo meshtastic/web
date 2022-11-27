@@ -3,16 +3,17 @@ import { forwardRef, InputHTMLAttributes } from "react";
 
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  description?: string;
+import { InfoWrapper, InfoWrapperProps } from "./InfoWrapper.js";
+
+export interface InputProps
+  extends InputHTMLAttributes<HTMLInputElement>,
+    Omit<InfoWrapperProps, "children"> {
   prefix?: string;
   suffix?: string;
   action?: {
     icon: JSX.Element;
     action: () => void;
   };
-  error?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
@@ -29,10 +30,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   ref
 ) {
   return (
-    <div>
-      {/* Label */}
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
-      {/*  */}
+    <InfoWrapper label={label} description={description} error={error}>
       <div className="relative flex rounded-md shadow-sm">
         {prefix && (
           <span className="inline-flex items-center rounded-l-md border-gray-300 bg-orange-200 px-3 font-mono text-sm">
@@ -70,10 +68,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           </div>
         )}
       </div>
-      {description && (
-        <p className="mt-2 text-sm text-gray-500">{description}</p>
-      )}
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-    </div>
+    </InfoWrapper>
   );
 });

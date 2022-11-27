@@ -5,7 +5,7 @@ import { useDevice } from "@core/providers/useDevice.js";
 import {
   CloudIcon,
   DocumentIcon,
-  SignalIcon,
+  SignalIcon
 } from "@heroicons/react/24/outline";
 import { Environment } from "@pages/Extensions/Environment.js";
 import { FileBrowser } from "@pages/Extensions/FileBrowser";
@@ -18,19 +18,19 @@ export const ExtensionsPage = (): JSX.Element => {
       name: "File Browser",
       icon: <DocumentIcon className="h-4" />,
       element: FileBrowser,
-      disabled: !hardware.hasWifi,
+      disabled: !hardware.hasWifi
     },
     {
       name: "Range Test",
       icon: <SignalIcon className="h-4" />,
       element: FileBrowser,
-      disabled: !hardware.hasWifi,
+      disabled: !hardware.hasWifi
     },
     {
       name: "Environment",
       icon: <CloudIcon className="h-4" />,
-      element: Environment,
-    },
+      element: Environment
+    }
   ];
 
   return <TabbedContent tabs={tabs} />;

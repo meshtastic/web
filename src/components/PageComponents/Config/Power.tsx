@@ -19,10 +19,10 @@ export const Power = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<PowerValidation>({
     defaultValues: config.power,
-    resolver: classValidatorResolver(PowerValidation),
+    resolver: classValidatorResolver(PowerValidation)
   });
 
   useEffect(() => {
@@ -32,22 +32,22 @@ export const Power = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setConfig(
-          {
+        connection.setConfig({
+          config: {
             payloadVariant: {
               oneofKind: "power",
-              power: data,
-            },
+              power: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Power Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }

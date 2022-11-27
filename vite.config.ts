@@ -18,15 +18,15 @@ export default defineConfig({
   plugins: [
     react(),
     EnvironmentPlugin({
-      COMMIT_HASH: hash,
-    }),
+      COMMIT_HASH: hash
+    })
   ],
   build: {
     target: "esnext",
     assetsDir: "",
     rollupOptions: {
-      plugins: [visualizer()],
-    },
+      plugins: [visualizer()]
+    }
   },
   resolve: {
     alias: {
@@ -34,7 +34,7 @@ export default defineConfig({
       "@pages": resolve(__dirname, "./src/pages"),
       "@components": resolve(__dirname, "./src/components"),
       "@core": resolve(__dirname, "./src/core"),
-      "@layouts": resolve(__dirname, "./src/layouts"),
-    },
-  },
+      "@layouts": resolve(__dirname, "./src/layouts")
+    }
+  }
 });

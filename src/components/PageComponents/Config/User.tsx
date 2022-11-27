@@ -25,31 +25,34 @@ export const User = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<UserValidation>({
     defaultValues: myNode?.data.user,
-    resolver: classValidatorResolver(UserValidation),
+    resolver: classValidatorResolver(UserValidation)
   });
 
   useEffect(() => {
     reset({
       longName: myNode?.data.user?.longName,
       shortName: myNode?.data.user?.shortName,
-      isLicensed: myNode?.data.user?.isLicensed,
+      isLicensed: myNode?.data.user?.isLicensed
     });
   }, [reset, myNode]);
 
   const onSubmit = handleSubmit((data) => {
     if (connection && myNode?.data.user) {
       void toast.promise(
-        connection.setOwner({ ...myNode.data.user, ...data }, async () => {
-          reset({ ...data });
-          await Promise.resolve();
+        connection.setOwner({
+          owner: { ...myNode.data.user, ...data },
+          callback: async () => {
+            reset({ ...data });
+            await Promise.resolve();
+          }
         }),
         {
           loading: "Saving...",
           success: "Saved User, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -63,7 +66,7 @@ export const User = (): JSX.Element => {
         reset({
           longName: myNode?.data.user?.longName,
           shortName: myNode?.data.user?.shortName,
-          isLicensed: myNode?.data.user?.isLicensed,
+          isLicensed: myNode?.data.user?.isLicensed
         });
       }}
       dirty={isDirty}

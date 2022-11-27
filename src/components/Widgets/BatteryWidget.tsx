@@ -13,7 +13,7 @@ export interface BatteryWidgetProps {
 
 export const BatteryWidget = ({
   batteryLevel,
-  voltage,
+  voltage
 }: BatteryWidgetProps): JSX.Element => {
   const { nodes, hardware } = useDevice();
 

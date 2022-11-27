@@ -1,17 +1,16 @@
 import type React from "react";
 import { forwardRef, SelectHTMLAttributes } from "react";
 
-export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  label: string;
-  description?: string;
+import { InfoWrapper, InfoWrapperProps } from "./InfoWrapper.js";
+
+export interface SelectProps
+  extends SelectHTMLAttributes<HTMLSelectElement>,
+    Omit<InfoWrapperProps, "children"> {
   options?: string[];
-  prefix?: string;
-  suffix?: string;
   action?: {
     icon: JSX.Element;
     action: () => void;
   };
-  error?: string;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Input(
@@ -19,30 +18,22 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Input(
     label,
     description,
     options,
-    prefix,
-    suffix,
     action,
-    error,
     disabled,
+    error,
     children,
     ...rest
   }: SelectProps,
   ref
 ) {
   return (
-    <div>
-      <label
-        htmlFor="location"
-        className="block text-sm font-medium text-gray-700"
-      >
-        {label}
-      </label>
+    <InfoWrapper label={label} description={description} error={error}>
       <div className="flex rounded-md shadow-sm">
         <select
           ref={ref}
           className={`flex h-10 w-full rounded-md border-transparent bg-orange-100 px-3 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-            prefix ? "rounded-l-none" : ""
-          } ${action ? "rounded-r-none" : ""} ${
+            action ? "rounded-r-none" : ""
+          } ${
             disabled ? "cursor-not-allowed bg-orange-50 text-orange-200" : ""
           }`}
           disabled={disabled}
@@ -64,9 +55,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Input(
           </button>
         )}
       </div>
-      {description && (
-        <p className="mt-2 text-sm text-gray-500">{description}</p>
-      )}
-    </div>
+    </InfoWrapper>
   );
 });

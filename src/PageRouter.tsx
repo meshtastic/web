@@ -14,7 +14,7 @@ import { PeersPage } from "./pages/Peers.js";
 export const PageRouter = (): JSX.Element => {
   const { activePage } = useDevice();
   return (
-    <>
+    <div className="flex-grow border-b">
       {activePage === "messages" && <MessagesPage />}
       {activePage === "map" && <MapPage />}
       {activePage === "extensions" && <ExtensionsPage />}
@@ -23,6 +23,6 @@ export const PageRouter = (): JSX.Element => {
       {activePage === "peers" && <PeersPage />}
       {activePage === "info" && <InfoPage />}
       {activePage === "logs" && <LogsPage />}
-    </>
+    </div>
   );
 };

@@ -3,7 +3,7 @@ import type React from "react";
 import { IconButton } from "@app/components/IconButton.js";
 import {
   TabbedContent,
-  TabType,
+  TabType
 } from "@components/layout/page/TabbedContent.js";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.js";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -21,7 +21,7 @@ export const MessagesPage = (): JSX.Element => {
         ? "Primary"
         : `Ch ${channel.config.index}`,
       element: () => <ChannelChat channel={channel} />,
-      disabled: channel.config.role === Protobuf.Channel_Role.DISABLED,
+      disabled: channel.config.role === Protobuf.Channel_Role.DISABLED
     };
   });
 
@@ -38,7 +38,7 @@ export const MessagesPage = (): JSX.Element => {
                 setActivePage("channels");
               }}
             />
-          ),
+          )
         ]}
       />
     </div>

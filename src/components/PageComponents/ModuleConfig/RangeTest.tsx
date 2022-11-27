@@ -18,10 +18,10 @@ export const RangeTest = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<RangeTestValidation>({
     defaultValues: moduleConfig.rangeTest,
-    resolver: classValidatorResolver(RangeTestValidation),
+    resolver: classValidatorResolver(RangeTestValidation)
   });
 
   useEffect(() => {
@@ -31,22 +31,22 @@ export const RangeTest = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig(
-          {
+        connection.setModuleConfig({
+          moduleConfig: {
             payloadVariant: {
               oneofKind: "rangeTest",
-              rangeTest: data,
-            },
+              rangeTest: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Range Test Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -55,7 +55,7 @@ export const RangeTest = (): JSX.Element => {
   const moduleEnabled = useWatch({
     control,
     name: "enabled",
-    defaultValue: false,
+    defaultValue: false
   });
 
   return (
@@ -85,7 +85,7 @@ export const RangeTest = (): JSX.Element => {
         disabled={!moduleEnabled}
         suffix="Seconds"
         {...register("sender", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
       <Controller

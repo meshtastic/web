@@ -24,6 +24,12 @@ export class PositionValidation implements Protobuf.Config_PositionConfig {
   @IsInt()
   positionFlags: number;
 
+  @IsInt()
+  rxGpio: number;
+
+  @IsInt()
+  txGpio: number;
+
   // fixed position fields
   @IsNumber()
   fixedAlt: number;

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
+import { BitwiseSelect } from "@app/components/form/BitwiseSelect.js";
 import { FormSection } from "@app/components/form/FormSection.js";
 import { Input } from "@app/components/form/Input.js";
 import { Toggle } from "@app/components/form/Toggle.js";
@@ -23,21 +24,21 @@ export const Position = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<PositionValidation>({
     defaultValues: {
       fixedAlt: myNode?.data.position?.altitude,
       fixedLat: (myNode?.data.position?.latitudeI ?? 0) / 1e7,
       fixedLng: (myNode?.data.position?.longitudeI ?? 0) / 1e7,
-      ...config.position,
+      ...config.position
     },
-    resolver: classValidatorResolver(PositionValidation),
+    resolver: classValidatorResolver(PositionValidation)
   });
 
   const fixedPositionEnabled = useWatch({
     control,
     name: "fixedPosition",
-    defaultValue: false,
+    defaultValue: false
   });
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export const Position = (): JSX.Element => {
       fixedAlt: myNode?.data.position?.altitude,
       fixedLat: (myNode?.data.position?.latitudeI ?? 0) / 1e7,
       fixedLng: (myNode?.data.position?.longitudeI ?? 0) / 1e7,
-      ...config.position,
+      ...config.position
     });
   }, [reset, config.position, myNode?.data.position]);
 
@@ -59,49 +60,41 @@ export const Position = (): JSX.Element => {
 
     if (connection) {
       void toast.promise(
-        connection.sendPacket(
-          Protobuf.Position.toBinary(
-            Protobuf.Position.create({
-              altitude: fixedAlt,
-              latitudeI: fixedLat * 1e7,
-              longitudeI: fixedLng * 1e7,
-            })
-          ),
-          Protobuf.PortNum.POSITION_APP,
-          undefined,
-          true,
-          undefined,
-          true,
-          false,
-          async () => {
+        connection.setPosition({
+          position: Protobuf.Position.create({
+            altitude: fixedAlt,
+            latitudeI: fixedLat * 1e7,
+            longitudeI: fixedLng * 1e7
+          }),
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Channel",
-          error: "No response received",
+          error: "No response received"
         }
       );
       if (configHasChanged) {
         void toast.promise(
-          connection.setConfig(
-            {
+          connection.setConfig({
+            config: {
               payloadVariant: {
                 oneofKind: "position",
-                position: rest,
-              },
+                position: rest
+              }
             },
-            async () => {
+            callback: async () => {
               reset({ ...data });
               await Promise.resolve();
             }
-          ),
+          }),
           {
             loading: "Saving...",
             success: "Saved Position Config, Restarting Node",
-            error: "No response received",
+            error: "No response received"
           }
         );
       }
@@ -201,94 +194,65 @@ export const Position = (): JSX.Element => {
         error={errors.gpsAttemptTime?.message}
         {...register("gpsAttemptTime", { valueAsNumber: true })}
       />
-      {/* <Controller
+      <Controller
         name="positionFlags"
         control={control}
         render={({ field, fieldState }): JSX.Element => {
           const { value, onChange, ...rest } = field;
           const { error } = fieldState;
-          const options = Object.entries(
-            Protobuf.Config_PositionConfig_PositionFlags
-          )
-            .filter((value) => typeof value[1] !== "number")
-            .filter(
-              (value) =>
-                parseInt(value[0]) !==
-                Protobuf.Config_PositionConfig_PositionFlags.UNSET
-            )
-            .map((value) => {
-              return {
-                value: parseInt(value[0]),
-                label: value[1].toString().replace("POS_", "").toLowerCase(),
-              };
-            });
+          // const options = Object.entries(
+          //   Protobuf.Config_PositionConfig_PositionFlags
+          // )
+          //   .filter((value) => typeof value[1] !== "number")
+          //   .filter(
+          //     (value) =>
+          //       parseInt(value[0]) !==
+          //       Protobuf.Config_PositionConfig_PositionFlags.UNSET
+          //   )
+          //   .map((value) => {
+          //     return {
+          //       value: parseInt(value[0]),
+          //       label: value[1].toString().replace("POS_", "").toLowerCase(),
+          //     };
+          //   });
 
-          const selected = bitwiseDecode(
-            value,
-            Protobuf.Config_PositionConfig_PositionFlags
-          ).map((flag) =>
-            Protobuf.Config_PositionConfig_PositionFlags[flag]
-              .replace("POS_", "")
-              .toLowerCase()
-          );
+          // const selected = bitwiseDecode(
+          //   value,
+          //   Protobuf.Config_PositionConfig_PositionFlags
+          // ).map((flag) =>
+          //   Protobuf.Config_PositionConfig_PositionFlags[flag]
+          //     .replace("POS_", "")
+          //     .toLowerCase()
+          // );
           //   onChange={(e: { value: number; label: string }[]): void =>
           //   onChange(bitwiseEncode(e.map((v) => v.value)))
           // }
           return (
-            <FormField
+            <BitwiseSelect
               label="Position Flags"
               description="Description"
-              isInvalid={!!errors.positionFlags?.message}
-              validationMessage={errors.positionFlags?.message}
-            >
-              <SelectMenu
-                isMultiSelect
-                title="Select multiple names"
-                options={options}
-                selected={selected}
-                // onSelect={(item) => {
-                //     const selected = [...selectedItemsState, item.value]
-                //     const selectedItems = selected
-                //     const selectedItemsLength = selectedItems.length
-                //     let selectedNames = ''
-                //     if (selectedItemsLength === 0) {
-                //     selectedNames = ''
-                //     } else if (selectedItemsLength === 1) {
-                //     selectedNames = selectedItems.toString()
-                //     } else if (selectedItemsLength > 1) {
-                //     selectedNames = selectedItemsLength.toString() + ' selected...'
-                //     }
-                //     setSelectedItems(selectedItems)
-                //     setSelectedItemNames(selectedNames)
-                // }}
-                // onDeselect={(item) => {
-                //     const deselectedItemIndex = selectedItemsState.indexOf(item.value)
-                //     const selectedItems = selectedItemsState.filter((_item, i) => i !== deselectedItemIndex)
-                //     const selectedItemsLength = selectedItems.length
-                //     let selectedNames = ''
-                //     if (selectedItemsLength === 0) {
-                //     selectedNames = ''
-                //     } else if (selectedItemsLength === 1) {
-                //     selectedNames = selectedItems.toString()
-                //     } else if (selectedItemsLength > 1) {
-                //     selectedNames = selectedItemsLength.toString() + ' selected...'
-                //     }
-
-                //     setSelectedItems(selectedItems)
-                //     setSelectedItemNames(selectedNames)
-                // }}
-              >
-                <Button>
-                  {selected.map(
-                    (item, index) =>
-                      `${item}${index !== selected.length - 1 ? ", " : ""}`
-                  )}
-                </Button>
-              </SelectMenu>
-            </FormField>
+              error={error?.message}
+              selected={value}
+              decodeEnun={Protobuf.Config_PositionConfig_PositionFlags}
+              onChange={onChange}
+            />
           );
         }}
-      /> */}
+      />
+      <Input
+        label="RX Pin"
+        description="GPS Module RX pin override"
+        type="number"
+        error={errors.rxGpio?.message}
+        {...register("rxGpio", { valueAsNumber: true })}
+      />
+      <Input
+        label="TX Pin"
+        description="GPS Module TX pin override"
+        type="number"
+        error={errors.txGpio?.message}
+        {...register("txGpio", { valueAsNumber: true })}
+      />
     </Form>
   );
 };

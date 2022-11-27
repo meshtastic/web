@@ -18,16 +18,16 @@ export const MQTT = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<MQTTValidation>({
     defaultValues: moduleConfig.mqtt,
-    resolver: classValidatorResolver(MQTTValidation),
+    resolver: classValidatorResolver(MQTTValidation)
   });
 
   const moduleEnabled = useWatch({
     control,
     name: "enabled",
-    defaultValue: false,
+    defaultValue: false
   });
 
   useEffect(() => {
@@ -37,22 +37,22 @@ export const MQTT = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig(
-          {
+        connection.setModuleConfig({
+          moduleConfig: {
             payloadVariant: {
               oneofKind: "mqtt",
-              mqtt: data,
-            },
+              mqtt: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved MQTT Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }

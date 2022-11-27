@@ -1,25 +1,15 @@
 import type React from "react";
 import { Fragment } from "react";
 
-import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.js";
-import { MQTT } from "@components/PageComponents/ModuleConfig/MQTT.js";
-import { Serial } from "@components/PageComponents/ModuleConfig/Serial.js";
+import { Map } from "@components/PageComponents/AppConfig/Map.js";
 import { Tab } from "@headlessui/react";
 
 export const AppConfig = (): JSX.Element => {
   const configSections = [
     {
-      label: "Interface",
-      element: MQTT,
-    },
-    {
-      label: "Logging",
-      element: Serial,
-    },
-    {
-      label: "Language",
-      element: ExternalNotification,
-    },
+      label: "Map",
+      element: Map
+    }
   ];
 
   return (

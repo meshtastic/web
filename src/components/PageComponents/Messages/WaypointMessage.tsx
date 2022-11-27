@@ -9,7 +9,7 @@ export interface WaypointMessageProps {
 }
 
 export const WaypointMessage = ({
-  waypointID,
+  waypointID
 }: WaypointMessageProps): JSX.Element => {
   const { waypoints } = useDevice();
   const waypoint = waypoints.find((wp) => wp.id === waypointID);

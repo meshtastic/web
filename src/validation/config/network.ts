@@ -6,14 +6,11 @@ export class NetworkValidation implements Protobuf.Config_NetworkConfig {
   @IsBoolean()
   wifiEnabled: boolean;
 
-  @IsEnum(Protobuf.Config_NetworkConfig_WiFiMode)
-  wifiMode: Protobuf.Config_NetworkConfig_WiFiMode;
-
-  @Length(0, 33) //min 1
+  @Length(1, 33)
   @IsOptional({})
   wifiSsid: string;
 
-  @Length(0, 64) //min 8
+  @Length(8, 64)
   @IsOptional()
   wifiPsk: string;
 
@@ -26,7 +23,7 @@ export class NetworkValidation implements Protobuf.Config_NetworkConfig {
   @IsEnum(Protobuf.Config_NetworkConfig_EthMode)
   ethMode: Protobuf.Config_NetworkConfig_EthMode;
 
-  ethConfig: NetworkValidation_IpV4Config;
+  ipv4Config: NetworkValidation_IpV4Config;
 }
 
 export class NetworkValidation_IpV4Config

@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum } from "class-validator";
+import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -11,4 +11,10 @@ export class DeviceValidation implements Protobuf.Config_DeviceConfig {
 
   @IsBoolean()
   debugLogEnabled: boolean;
+
+  @IsInt()
+  buttonGpio: number;
+
+  @IsInt()
+  buzzerGpio: number;
 }

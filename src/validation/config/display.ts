@@ -20,4 +20,7 @@ export class DisplayValidation implements Protobuf.Config_DisplayConfig {
 
   @IsEnum(Protobuf.Config_DisplayConfig_DisplayUnits)
   units: Protobuf.Config_DisplayConfig_DisplayUnits;
+
+  @IsEnum(Protobuf.Config_DisplayConfig_OledType)
+  oled: Protobuf.Config_DisplayConfig_OledType;
 }

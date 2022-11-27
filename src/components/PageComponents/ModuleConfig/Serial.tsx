@@ -18,10 +18,10 @@ export const Serial = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<SerialValidation>({
     defaultValues: moduleConfig.serial,
-    resolver: classValidatorResolver(SerialValidation),
+    resolver: classValidatorResolver(SerialValidation)
   });
 
   useEffect(() => {
@@ -31,22 +31,22 @@ export const Serial = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig(
-          {
+        connection.setModuleConfig({
+          moduleConfig: {
             payloadVariant: {
               oneofKind: "serial",
-              serial: data,
-            },
+              serial: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Serial Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -55,7 +55,7 @@ export const Serial = (): JSX.Element => {
   const moduleEnabled = useWatch({
     control,
     name: "enabled",
-    defaultValue: false,
+    defaultValue: false
   });
 
   return (
@@ -96,7 +96,7 @@ export const Serial = (): JSX.Element => {
         description="Max transmit power in dBm"
         disabled={!moduleEnabled}
         {...register("rxd", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
       <Input
@@ -105,7 +105,7 @@ export const Serial = (): JSX.Element => {
         description="Max transmit power in dBm"
         disabled={!moduleEnabled}
         {...register("txd", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
       <Input
@@ -114,7 +114,7 @@ export const Serial = (): JSX.Element => {
         description="Max transmit power in dBm"
         disabled={!moduleEnabled}
         {...register("baud", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
       <Input
@@ -123,7 +123,7 @@ export const Serial = (): JSX.Element => {
         description="Max transmit power in dBm"
         disabled={!moduleEnabled}
         {...register("timeout", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
       <Input
@@ -132,7 +132,7 @@ export const Serial = (): JSX.Element => {
         description="Max transmit power in dBm"
         disabled={!moduleEnabled}
         {...register("mode", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
     </Form>

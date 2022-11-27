@@ -18,10 +18,10 @@ export const StoreForward = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<StoreForwardValidation>({
     defaultValues: moduleConfig.storeForward,
-    resolver: classValidatorResolver(StoreForwardValidation),
+    resolver: classValidatorResolver(StoreForwardValidation)
   });
 
   useEffect(() => {
@@ -31,22 +31,22 @@ export const StoreForward = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig(
-          {
+        connection.setModuleConfig({
+          moduleConfig: {
             payloadVariant: {
               oneofKind: "storeForward",
-              storeForward: data,
-            },
+              storeForward: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Store & Forward Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -55,7 +55,7 @@ export const StoreForward = (): JSX.Element => {
   const moduleEnabled = useWatch({
     control,
     name: "enabled",
-    defaultValue: false,
+    defaultValue: false
   });
 
   return (
@@ -97,7 +97,7 @@ export const StoreForward = (): JSX.Element => {
         suffix="Records"
         disabled={!moduleEnabled}
         {...register("records", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
       <Input
@@ -106,7 +106,7 @@ export const StoreForward = (): JSX.Element => {
         description="Max transmit power in dBm"
         disabled={!moduleEnabled}
         {...register("historyReturnMax", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
       <Input
@@ -115,7 +115,7 @@ export const StoreForward = (): JSX.Element => {
         description="Max transmit power in dBm"
         disabled={!moduleEnabled}
         {...register("historyReturnWindow", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
     </Form>

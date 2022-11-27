@@ -7,7 +7,7 @@ import { Button } from "@components/Button.js";
 import {
   ArrowUturnLeftIcon,
   ChevronRightIcon,
-  HomeIcon,
+  HomeIcon
 } from "@heroicons/react/24/outline";
 
 export interface FormProps extends HTMLProps<HTMLFormElement> {

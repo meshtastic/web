@@ -21,16 +21,16 @@ export const CannedMessage = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<CannedMessageValidation>({
     defaultValues: moduleConfig.cannedMessage,
-    resolver: classValidatorResolver(CannedMessageValidation),
+    resolver: classValidatorResolver(CannedMessageValidation)
   });
 
   const moduleEnabled = useWatch({
     control,
     name: "rotary1Enabled",
-    defaultValue: false,
+    defaultValue: false
   });
 
   useEffect(() => {
@@ -40,22 +40,22 @@ export const CannedMessage = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig(
-          {
+        connection.setModuleConfig({
+          moduleConfig: {
             payloadVariant: {
               oneofKind: "cannedMessage",
-              cannedMessage: data,
-            },
+              cannedMessage: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Canned Message Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }

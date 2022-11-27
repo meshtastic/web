@@ -19,7 +19,7 @@ export interface TabbedContentProps {
 
 export const TabbedContent = ({
   tabs,
-  actions,
+  actions
 }: TabbedContentProps): JSX.Element => {
   return (
     <Tab.Group as="div" className="flex flex-grow flex-col gap-2 p-4">

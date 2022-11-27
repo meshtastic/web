@@ -8,7 +8,7 @@ export interface PaletteTransitionProps {
 }
 
 export const PaletteTransition = ({
-  children,
+  children
 }: PaletteTransitionProps): JSX.Element => {
   return (
     <>

@@ -6,7 +6,7 @@ import type { AllMessageTypes } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
   CheckCircleIcon,
-  EllipsisHorizontalCircleIcon,
+  EllipsisHorizontalCircleIcon
 } from "@heroicons/react/24/outline";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -19,7 +19,7 @@ export interface MessageProps {
 export const Message = ({
   lastMsgSameUser,
   message,
-  sender,
+  sender
 }: MessageProps): JSX.Element => {
   const { setPeerInfoOpen, setActivePeer, connection } = useDevice();
 
@@ -62,7 +62,7 @@ export const Message = ({
         <span className="text-sm">
           {new Date(message.packet.rxTime).toLocaleTimeString(undefined, {
             hour: "2-digit",
-            minute: "2-digit",
+            minute: "2-digit"
           })}
         </span>
       </div>

@@ -18,10 +18,10 @@ export const ExternalNotification = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<ExternalNotificationValidation>({
     defaultValues: moduleConfig.externalNotification,
-    resolver: classValidatorResolver(ExternalNotificationValidation),
+    resolver: classValidatorResolver(ExternalNotificationValidation)
   });
   useEffect(() => {
     reset(moduleConfig.externalNotification);
@@ -30,22 +30,22 @@ export const ExternalNotification = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig(
-          {
+        connection.setModuleConfig({
+          moduleConfig: {
             payloadVariant: {
               oneofKind: "externalNotification",
-              externalNotification: data,
-            },
+              externalNotification: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved External Notification Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -54,7 +54,7 @@ export const ExternalNotification = (): JSX.Element => {
   const moduleEnabled = useWatch({
     control,
     name: "enabled",
-    defaultValue: false,
+    defaultValue: false
   });
 
   return (
@@ -84,7 +84,7 @@ export const ExternalNotification = (): JSX.Element => {
         suffix="ms"
         disabled={!moduleEnabled}
         {...register("outputMs", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
       <Input
@@ -93,7 +93,7 @@ export const ExternalNotification = (): JSX.Element => {
         description="Max transmit power in dBm"
         disabled={!moduleEnabled}
         {...register("output", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
       <Controller
@@ -126,6 +126,18 @@ export const ExternalNotification = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Bell"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="usePwm"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Use PWM"
             description="Description"
             checked={value}
             {...rest}

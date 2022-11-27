@@ -14,7 +14,7 @@ export const ConfiguringWidget = (): JSX.Element => {
     moduleConfig,
     setReady,
     nodes,
-    connection,
+    connection
   } = useDevice();
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export const ConfiguringWidget = (): JSX.Element => {
     channels,
     hardware.maxChannels,
     hardware.myNodeNum,
-    setReady,
+    setReady
   ]);
 
   return (
@@ -80,7 +80,7 @@ export interface StatusIndicatorProps {
 const StatusIndicator = ({
   title,
   current,
-  total,
+  total
 }: StatusIndicatorProps): JSX.Element => {
   return (
     <li className="relative">

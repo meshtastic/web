@@ -10,7 +10,7 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 enum LocationType {
   MGRS,
   LatLng,
-  DecimalDegrees,
+  DecimalDegrees
 }
 
 export const NewLocationMessage = (): JSX.Element => {
@@ -31,14 +31,15 @@ export const NewLocationMessage = (): JSX.Element => {
         <Input label="Coordinates" />
         <Button
           onClick={() => {
-            void connection?.sendWaypoint(
-              Protobuf.Waypoint.create({
+            void connection?.sendWaypoint({
+              waypoint: Protobuf.Waypoint.create({
                 latitudeI: Math.floor(3.89103 * 1e7),
                 longitudeI: Math.floor(105.87005 * 1e7),
                 name: "TEST",
-                description: "This is a description",
-              })
-            );
+                description: "This is a description"
+              }),
+              destination: "broadcast"
+            });
           }}
         >
           Send

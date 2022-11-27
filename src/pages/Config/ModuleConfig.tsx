@@ -1,5 +1,5 @@
 import type React from "react";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 
 import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage";
 import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.js";
@@ -11,37 +11,35 @@ import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.js"
 import { Tab } from "@headlessui/react";
 
 export const ModuleConfig = (): JSX.Element => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
   const configSections = [
     {
       label: "MQTT",
-      element: MQTT,
+      element: MQTT
     },
     {
       label: "Serial",
-      element: Serial,
+      element: Serial
     },
     {
       label: "External Notification",
-      element: ExternalNotification,
+      element: ExternalNotification
     },
     {
       label: "Store & Forward",
-      element: StoreForward,
+      element: StoreForward
     },
     {
       label: "Range Test",
-      element: RangeTest,
+      element: RangeTest
     },
     {
       label: "Telemetry",
-      element: Telemetry,
+      element: Telemetry
     },
     {
       label: "Canned Message",
-      element: CannedMessage,
-    },
+      element: CannedMessage
+    }
   ];
 
   return (

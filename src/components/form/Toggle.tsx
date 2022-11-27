@@ -3,33 +3,37 @@ import type React from "react";
 import { Switch } from "@headlessui/react";
 
 export interface ToggleProps {
-  label: string;
-  description: string;
   checked: boolean;
+  label?: string;
+  description?: string;
   disabled?: boolean;
   onChange?: (checked: boolean) => void;
 }
 
 export const Toggle = ({
+  checked,
   label,
   description,
-  checked,
   disabled,
-  onChange,
+  onChange
 }: ToggleProps): JSX.Element => {
   return (
     <Switch.Group as="div" className="flex items-center justify-between">
       <span className="flex flex-grow flex-col">
-        <Switch.Label
-          as="span"
-          className="text-sm font-medium text-gray-900"
-          passive
-        >
-          {label}
-        </Switch.Label>
-        <Switch.Description as="span" className="text-sm text-gray-500">
-          {description}
-        </Switch.Description>
+        {label && (
+          <Switch.Label
+            as="span"
+            className="text-sm font-medium text-gray-900"
+            passive
+          >
+            {label}
+          </Switch.Label>
+        )}
+        {description && (
+          <Switch.Description as="span" className="text-sm text-gray-500">
+            {description}
+          </Switch.Description>
+        )}
       </span>
       <Switch
         checked={checked}

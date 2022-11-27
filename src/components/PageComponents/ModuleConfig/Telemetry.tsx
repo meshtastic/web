@@ -18,10 +18,10 @@ export const Telemetry = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<TelemetryValidation>({
     defaultValues: moduleConfig.telemetry,
-    resolver: classValidatorResolver(TelemetryValidation),
+    resolver: classValidatorResolver(TelemetryValidation)
   });
 
   useEffect(() => {
@@ -31,22 +31,22 @@ export const Telemetry = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig(
-          {
+        connection.setModuleConfig({
+          moduleConfig: {
             payloadVariant: {
               oneofKind: "telemetry",
-              telemetry: data,
-            },
+              telemetry: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Telemetry Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -90,7 +90,7 @@ export const Telemetry = (): JSX.Element => {
         suffix="Seconds"
         type="number"
         {...register("environmentUpdateInterval", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
       <Controller

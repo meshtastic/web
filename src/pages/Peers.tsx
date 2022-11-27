@@ -108,7 +108,7 @@ export const PeersPage = (): JSX.Element => {
                       onClick={() => {
                         if (connection) {
                           void toast.promise(
-                            connection.getMetadata(node.data.num),
+                            connection.getMetadata({ nodeNum: node.data.num }),
                             {
                               loading: "Requesting Metadata...",
                               success: "Recieved Metadata",

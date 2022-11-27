@@ -22,10 +22,10 @@ export const Bluetooth = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     control,
-    reset,
+    reset
   } = useForm<BluetoothValidation>({
     defaultValues: config.bluetooth,
-    resolver: classValidatorResolver(BluetoothValidation),
+    resolver: classValidatorResolver(BluetoothValidation)
   });
 
   useEffect(() => {
@@ -35,22 +35,22 @@ export const Bluetooth = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setConfig(
-          {
+        connection.setConfig({
+          config: {
             payloadVariant: {
               oneofKind: "bluetooth",
-              bluetooth: data,
-            },
+              bluetooth: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Bluetooth Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -59,7 +59,7 @@ export const Bluetooth = (): JSX.Element => {
   const pairingMode = useWatch({
     control,
     name: "mode",
-    defaultValue: Protobuf.Config_BluetoothConfig_PairingMode.RANDOM_PIN,
+    defaultValue: Protobuf.Config_BluetoothConfig_PairingMode.RANDOM_PIN
   });
 
   return (
@@ -98,7 +98,7 @@ export const Bluetooth = (): JSX.Element => {
         description="Pin to use when pairing"
         type="number"
         {...register("fixedPin", {
-          valueAsNumber: true,
+          valueAsNumber: true
         })}
       />
     </Form>

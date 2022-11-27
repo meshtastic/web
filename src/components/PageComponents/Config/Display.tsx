@@ -21,10 +21,10 @@ export const Display = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-    control,
+    control
   } = useForm<Protobuf.Config_DisplayConfig>({
     defaultValues: config.display,
-    resolver: classValidatorResolver(DisplayValidation),
+    resolver: classValidatorResolver(DisplayValidation)
   });
 
   useEffect(() => {
@@ -34,22 +34,22 @@ export const Display = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setConfig(
-          {
+        connection.setConfig({
+          config: {
             payloadVariant: {
               oneofKind: "display",
-              display: data,
-            },
+              display: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Display Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -114,6 +114,13 @@ export const Display = (): JSX.Element => {
         {...register("units", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.Config_DisplayConfig_DisplayUnits)}
+      </Select>
+      <Select
+        label="OLED Type"
+        description="Type of OLED screen attached to the device"
+        {...register("oled", { valueAsNumber: true })}
+      >
+        {renderOptions(Protobuf.Config_DisplayConfig_OledType)}
       </Select>
     </Form>
   );

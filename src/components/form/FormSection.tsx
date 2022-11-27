@@ -7,7 +7,7 @@ export interface FormSectionProps {
 
 export const FormSection = ({
   title,
-  children,
+  children
 }: FormSectionProps): JSX.Element => {
   return (
     <div className="relative">

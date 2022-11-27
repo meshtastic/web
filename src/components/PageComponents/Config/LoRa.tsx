@@ -23,16 +23,16 @@ export const LoRa = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     control,
-    reset,
+    reset
   } = useForm<LoRaValidation>({
     defaultValues: config.lora,
-    resolver: classValidatorResolver(LoRaValidation),
+    resolver: classValidatorResolver(LoRaValidation)
   });
 
   const usePreset = useWatch({
     control,
     name: "usePreset",
-    defaultValue: true,
+    defaultValue: true
   });
 
   useEffect(() => {
@@ -42,22 +42,22 @@ export const LoRa = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setConfig(
-          {
+        connection.setConfig({
+          config: {
             payloadVariant: {
               oneofKind: "lora",
-              lora: data,
-            },
+              lora: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved LoRa Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -99,7 +99,7 @@ export const LoRa = (): JSX.Element => {
           suffix="MHz"
           error={errors.bandwidth?.message}
           {...register("bandwidth", {
-            valueAsNumber: true,
+            valueAsNumber: true
           })}
           disabled={usePreset}
         />
@@ -110,7 +110,7 @@ export const LoRa = (): JSX.Element => {
           suffix="CPS"
           error={errors.spreadFactor?.message}
           {...register("spreadFactor", {
-            valueAsNumber: true,
+            valueAsNumber: true
           })}
           disabled={usePreset}
         />
@@ -120,7 +120,7 @@ export const LoRa = (): JSX.Element => {
           type="number"
           error={errors.codingRate?.message}
           {...register("codingRate", {
-            valueAsNumber: true,
+            valueAsNumber: true
           })}
           disabled={usePreset}
         />

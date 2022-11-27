@@ -40,7 +40,7 @@ import {
   TrashIcon,
   UsersIcon,
   WindowIcon,
-  XCircleIcon,
+  XCircleIcon
 } from "@heroicons/react/24/outline";
 
 import { GroupView } from "./GroupView.js";
@@ -77,58 +77,58 @@ export const CommandPalette = (): JSX.Element => {
           icon: InboxIcon,
           action() {
             setActivePage("messages");
-          },
+          }
         },
         {
           name: "Map",
           icon: MapIcon,
           action() {
             setActivePage("map");
-          },
+          }
         },
         {
           name: "Extensions",
           icon: BeakerIcon,
           action() {
             setActivePage("extensions");
-          },
+          }
         },
         {
           name: "Config",
           icon: Cog8ToothIcon,
           action() {
             setActivePage("config");
-          },
+          }
         },
         {
           name: "Channels",
           icon: Square3Stack3DIcon,
           action() {
             setActivePage("channels");
-          },
+          }
         },
         {
           name: "Peers",
           icon: UsersIcon,
           action() {
             setActivePage("peers");
-          },
+          }
         },
         {
           name: "Info",
           icon: IdentificationIcon,
           action() {
             setActivePage("info");
-          },
+          }
         },
         {
           name: "Logs",
           icon: DocumentTextIcon,
           action() {
             setActivePage("logs");
-          },
-        },
-      ],
+          }
+        }
+      ]
     },
     {
       name: "Manage",
@@ -138,17 +138,17 @@ export const CommandPalette = (): JSX.Element => {
           name: "[WIP] Switch Node",
           icon: ArrowsRightLeftIcon,
           action() {
-            alert('This feature is not implemented');
-          },
+            alert("This feature is not implemented");
+          }
         },
         {
           name: "Connect New Node",
           icon: PlusIcon,
           action() {
             setSelectedDevice(0);
-          },
-        },
-      ],
+          }
+        }
+      ]
     },
     {
       name: "Contextual",
@@ -159,20 +159,20 @@ export const CommandPalette = (): JSX.Element => {
           icon: QrCodeIcon,
           action() {
             setQRDialogOpen(true);
-          },
+          }
         },
         {
           name: "Reset Peers",
           icon: TrashIcon,
           action() {
             if (connection) {
-              void toast.promise(connection.resetPeers(), {
+              void toast.promise(connection.resetPeers({}), {
                 loading: "Resetting...",
                 success: "Succesfully reset peers",
-                error: "No response received",
+                error: "No response received"
               });
             }
-          },
+          }
         },
         {
           name: "Disconnect",
@@ -181,9 +181,9 @@ export const CommandPalette = (): JSX.Element => {
             void connection?.disconnect();
             setSelectedDevice(0);
             removeDevice(selectedDevice ?? 0);
-          },
-        },
-      ],
+          }
+        }
+      ]
     },
     {
       name: "Debug",
@@ -194,16 +194,16 @@ export const CommandPalette = (): JSX.Element => {
           icon: ArrowPathIcon,
           action() {
             void connection?.configure();
-          },
+          }
         },
         {
           name: "[WIP] Clear Messages",
           icon: ArchiveBoxXMarkIcon,
           action() {
-            alert('This feature is not implemented');
-          },
-        },
-      ],
+            alert("This feature is not implemented");
+          }
+        }
+      ]
     },
     {
       name: "Application",
@@ -213,11 +213,11 @@ export const CommandPalette = (): JSX.Element => {
           name: "[WIP] Toggle Dark Mode",
           icon: MoonIcon,
           action() {
-            alert('This feature is not implemented');
-          },
-        },
-      ],
-    },
+            alert("This feature is not implemented");
+          }
+        }
+      ]
+    }
   ];
 
   const handleKeydown = (e: KeyboardEvent) => {
@@ -243,7 +243,7 @@ export const CommandPalette = (): JSX.Element => {
                 return `${group.name} ${command.name}`
                   .toLowerCase()
                   .includes(query.toLowerCase());
-              }),
+              })
             };
           })
           .filter((group) => group.commands.length);

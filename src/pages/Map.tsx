@@ -1,25 +1,27 @@
 import type React from "react";
 
 import maplibregl from "maplibre-gl";
-import { Map, Marker, useMap } from "react-map-gl";
+import { Layer, Map, Marker, Source, useMap } from "react-map-gl";
 import { base16 } from "rfc4648";
 
 import { Card } from "@app/components/Card.js";
 import { IconButton } from "@app/components/IconButton.js";
 import { Mono } from "@app/components/Mono.js";
+import { useAppStore } from "@app/core/stores/appStore.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
   EllipsisHorizontalCircleIcon,
-  MapPinIcon,
+  MapPinIcon
 } from "@heroicons/react/24/outline";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
+  const { rasterSources } = useAppStore();
   const { current: map } = useMap();
 
   return (
-    <div className="flex-grow">
+    <div className="h-full flex-grow">
       <div className="absolute right-0 top-0 z-10 m-2">
         <Card className="flex-col p-3">
           <div className="p-1 text-lg font-medium">Title</div>
@@ -51,9 +53,9 @@ export const MapPage = (): JSX.Element => {
                         map?.flyTo({
                           center: [
                             n.data.position.longitudeI / 1e7,
-                            n.data.position.latitudeI / 1e7,
+                            n.data.position.latitudeI / 1e7
                           ],
-                          zoom: 10,
+                          zoom: 10
                         });
                       }
                     }}
@@ -62,6 +64,10 @@ export const MapPage = (): JSX.Element => {
               </div>
             ))}
           </div>
+          {/*  */}
+          {rasterSources.map((source, index) => (
+            <div key={index}>{source.title}Tst</div>
+          ))}
         </Card>
       </div>
       <Map
@@ -80,6 +86,11 @@ export const MapPage = (): JSX.Element => {
               <MapPinIcon className="h-4" />
             </div>
           </Marker>
+        ))}
+        {rasterSources.map((source, index) => (
+          <Source key={index} type="raster" {...source}>
+            <Layer type="raster" />
+          </Source>
         ))}
         {nodes.map((n) => {
           if (n.data.position?.latitudeI) {

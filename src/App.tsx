@@ -10,6 +10,7 @@ import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { CommandPalette } from "./components/CommandPalette/Index.js";
 import { DeviceSelector } from "./components/DeviceSelector.js";
 import { DialogManager } from "./components/Dialog/DialogManager.js";
+import { Drawer } from "./components/Drawer.js";
 import { NewDevice } from "./components/NewDevice.js";
 import { PageNav } from "./components/PageNav.js";
 import { Sidebar } from "./components/Sidebar.js";
@@ -30,14 +31,17 @@ export const App = (): JSX.Element => {
           <CommandPalette />
           <Toaster
             toastOptions={{
-              duration: 2000,
+              duration: 2000
             }}
           />
           <DialogManager />
           <Sidebar />
           <PageNav />
           <MapProvider>
-            <PageRouter />
+            <div className="flex h-full w-full flex-col overflow-y-auto">
+              <PageRouter />
+              <Drawer />
+            </div>
           </MapProvider>
         </DeviceWrapper>
       )}

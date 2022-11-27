@@ -12,10 +12,10 @@ module.exports = {
         "Consolas",
         "Liberation Mono",
         "Courier New",
-        "monospace",
-      ],
+        "monospace"
+      ]
     },
-    extend: {},
+    extend: {}
   },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [require("@tailwindcss/forms")]
 };

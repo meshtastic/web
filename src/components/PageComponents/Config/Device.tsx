@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
+import { Input } from "@app/components/form/Input.js";
 import { Select } from "@app/components/form/Select.js";
 import { Toggle } from "@app/components/form/Toggle.js";
 import { DeviceValidation } from "@app/validation/config/device.js";
@@ -20,10 +21,10 @@ export const Device = (): JSX.Element => {
     handleSubmit,
     formState: { errors, isDirty },
     control,
-    reset,
+    reset
   } = useForm<DeviceValidation>({
     defaultValues: config.device,
-    resolver: classValidatorResolver(DeviceValidation),
+    resolver: classValidatorResolver(DeviceValidation)
   });
 
   useEffect(() => {
@@ -33,22 +34,22 @@ export const Device = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setConfig(
-          {
+        connection.setConfig({
+          config: {
             payloadVariant: {
               oneofKind: "device",
-              device: data,
-            },
+              device: data
+            }
           },
-          async () => {
+          callback: async () => {
             reset({ ...data });
             await Promise.resolve();
           }
-        ),
+        }),
         {
           loading: "Saving...",
           success: "Saved Device Config, Restarting Node",
-          error: "No response received",
+          error: "No response received"
         }
       );
     }
@@ -92,6 +93,20 @@ export const Device = (): JSX.Element => {
             {...rest}
           />
         )}
+      />
+      <Input
+        label="Button Pin"
+        description="Button pin override"
+        type="number"
+        error={errors.buttonGpio?.message}
+        {...register("buttonGpio", { valueAsNumber: true })}
+      />
+      <Input
+        label="Buzzer Pin"
+        description="Buzzer pin override"
+        type="number"
+        error={errors.buzzerGpio?.message}
+        {...register("buzzerGpio", { valueAsNumber: true })}
       />
     </Form>
   );

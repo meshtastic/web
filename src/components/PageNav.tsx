@@ -10,7 +10,7 @@ import {
   InboxIcon,
   MapIcon,
   Square3Stack3DIcon,
-  UsersIcon,
+  UsersIcon
 } from "@heroicons/react/24/outline";
 
 export const PageNav = (): JSX.Element => {
@@ -26,43 +26,43 @@ export const PageNav = (): JSX.Element => {
     {
       name: "Messages",
       icon: <InboxIcon />,
-      page: "messages",
+      page: "messages"
     },
     {
       name: "Map",
       icon: <MapIcon />,
-      page: "map",
+      page: "map"
     },
     {
       name: "Extensions",
       icon: <BeakerIcon />,
-      page: "extensions",
+      page: "extensions"
     },
     {
       name: "Config",
       icon: <Cog8ToothIcon />,
-      page: "config",
+      page: "config"
     },
     {
       name: "Channels",
       icon: <Square3Stack3DIcon />,
-      page: "channels",
+      page: "channels"
     },
     {
       name: "Peers",
       icon: <UsersIcon />,
-      page: "peers",
+      page: "peers"
     },
     {
       name: "Info",
       icon: <IdentificationIcon />,
-      page: "info",
+      page: "info"
     },
     {
       name: "Logs",
       icon: <DocumentTextIcon />,
-      page: "logs",
-    },
+      page: "logs"
+    }
   ];
 
   return (
