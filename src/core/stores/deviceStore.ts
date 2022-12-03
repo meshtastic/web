@@ -162,6 +162,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                         config.payloadVariant.lora.region ===
                         Protobuf.Config_LoRaConfig_RegionCode.UNSET;
                       break;
+                    case "bluetooth":
+                      device.config.bluetooth = config.payloadVariant.bluetooth;
+                      break;
                   }
                 }
               })
