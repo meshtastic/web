@@ -167,6 +167,18 @@ export const LoRa = (): JSX.Element => {
           error={errors.frequencyOffset?.message}
           {...register("frequencyOffset", { valueAsNumber: true })}
         />
+        <Controller
+          name="overrideDutyCycle"
+          control={control}
+          render={({ field: { value, ...rest } }) => (
+            <Toggle
+              label="Override Duty Cycle"
+              description="Description"
+              checked={value}
+              {...rest}
+            />
+          )}
+        />
       </FormSection>
       <Input
         label="Hop Limit"

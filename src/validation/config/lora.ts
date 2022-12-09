@@ -43,6 +43,9 @@ export class LoRaValidation implements Protobuf.Config_LoRaConfig {
   @IsInt()
   channelNum: number;
 
+  @IsBoolean()
+  overrideDutyCycle: boolean;
+
   @IsArray()
   ignoreIncoming: number[];
 }
