@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { Mono } from "@app/components/Mono.js";
+import { Mono } from "@app/components/generic/Mono.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 

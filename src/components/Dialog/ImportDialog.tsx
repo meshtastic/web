@@ -5,13 +5,12 @@ import { fromByteArray } from "base64-js";
 import { toast } from "react-hot-toast";
 import { QRCode } from "react-qrcode-logo";
 
+import { Checkbox } from "@components/form/Checkbox.js";
+import { IconButton } from "@components/form/IconButton.js";
+import { Input } from "@components/form/Input.js";
 import { Dialog } from "@headlessui/react";
 import { ClipboardIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-
-import { Checkbox } from "../form/Checkbox.js";
-import { Input } from "../form/Input.js";
-import { IconButton } from "../IconButton.js";
 
 export interface ImportDialogProps {
   isOpen: boolean;

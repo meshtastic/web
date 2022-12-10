@@ -18,6 +18,11 @@ import { toast } from "react-hot-toast";
 
 import { useDevice } from "@app/core/providers/useDevice.js";
 import { useAppStore } from "@app/core/stores/appStore.js";
+import { GroupView } from "@components/CommandPalette/GroupView.js";
+import { NoResults } from "@components/CommandPalette/NoResults.js";
+import { PaletteTransition } from "@components/CommandPalette/PaletteTransition.js";
+import { SearchBox } from "@components/CommandPalette/SearchBox.js";
+import { SearchResult } from "@components/CommandPalette/SearchResult.js";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import {
   ArchiveBoxXMarkIcon,
@@ -42,12 +47,6 @@ import {
   WindowIcon,
   XCircleIcon
 } from "@heroicons/react/24/outline";
-
-import { GroupView } from "./GroupView.js";
-import { NoResults } from "./NoResults.js";
-import { PaletteTransition } from "./PaletteTransition.js";
-import { SearchBox } from "./SearchBox.js";
-import { SearchResult } from "./SearchResult.js";
 
 export interface Group {
   name: string;

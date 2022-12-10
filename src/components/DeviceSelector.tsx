@@ -2,10 +2,9 @@ import type React from "react";
 
 import { useAppStore } from "@app/core/stores/appStore.js";
 import { useDeviceStore } from "@app/core/stores/deviceStore.js";
+import { Mono } from "@components/generic/Mono.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { CommandLineIcon, PlusIcon } from "@heroicons/react/24/outline";
-
-import { Mono } from "./Mono.js";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();

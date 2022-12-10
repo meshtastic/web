@@ -23,6 +23,11 @@ export const MapPage = (): JSX.Element => {
         maxPitch={0}
         dragRotate={false}
         touchZoomRotate={false}
+        initialViewState={{
+          zoom: 10,
+          latitude: -38,
+          longitude: 145
+        }}
       >
         <MapControlls />
         {waypoints.map((wp) => (

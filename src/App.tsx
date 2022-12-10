@@ -5,16 +5,15 @@ import { MapProvider } from "react-map-gl";
 
 import { useAppStore } from "@app/core/stores/appStore.js";
 import { DeviceWrapper } from "@app/DeviceWrapper.js";
+import { PageRouter } from "@app/PageRouter.js";
+import { CommandPalette } from "@components/CommandPalette/Index.js";
+import { DeviceSelector } from "@components/DeviceSelector.js";
+import { DialogManager } from "@components/Dialog/DialogManager.js";
+import { Drawer } from "@components/Drawer/index.js";
+import { NewDevice } from "@components/NewDevice.js";
+import { PageNav } from "@components/PageNav.js";
+import { Sidebar } from "@components/Sidebar.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
-
-import { CommandPalette } from "./components/CommandPalette/Index.js";
-import { DeviceSelector } from "./components/DeviceSelector.js";
-import { DialogManager } from "./components/Dialog/DialogManager.js";
-import { Drawer } from "./components/Drawer/index.js";
-import { NewDevice } from "./components/NewDevice.js";
-import { PageNav } from "./components/PageNav.js";
-import { Sidebar } from "./components/Sidebar.js";
-import { PageRouter } from "./PageRouter.js";
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();

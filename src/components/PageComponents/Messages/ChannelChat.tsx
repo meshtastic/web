@@ -1,10 +1,9 @@
 import type React from "react";
 
 import { Message } from "@components/PageComponents/Messages/Message.js";
+import { MessageInput } from "@components/PageComponents/Messages/MessageInput.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import type { Channel } from "@core/stores/deviceStore.js";
-
-import { MessageInput } from "./MessageInput.js";
 
 export interface ChannelChatProps {
   channel: Channel;

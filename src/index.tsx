@@ -1,4 +1,4 @@
-import "./index.css";
+import "@app/index.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import type React from "react";

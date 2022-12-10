@@ -1,6 +1,6 @@
 import type React from "react";
 
-import { TabbedContent, TabType } from "@components/layout/page/TabbedContent";
+import { TabbedContent, TabType } from "@app/components/generic/TabbedContent";
 import { useDevice } from "@core/providers/useDevice.js";
 import {
   CloudIcon,

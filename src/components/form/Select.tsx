@@ -1,7 +1,7 @@
 import type React from "react";
 import { forwardRef, SelectHTMLAttributes } from "react";
 
-import { InfoWrapper, InfoWrapperProps } from "./InfoWrapper.js";
+import { InfoWrapper, InfoWrapperProps } from "@components/form/InfoWrapper.js";
 
 export interface SelectProps
   extends SelectHTMLAttributes<HTMLSelectElement>,

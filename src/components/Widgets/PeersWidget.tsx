@@ -1,14 +1,13 @@
 import type React from "react";
 
 import { useDevice } from "@app/core/providers/useDevice.js";
+import { IconButton } from "@components/form/IconButton.js";
+import { Mono } from "@components/generic/Mono.js";
 import {
   EllipsisHorizontalIcon,
   UserGroupIcon
 } from "@heroicons/react/24/outline";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
-
-import { IconButton } from "../IconButton.js";
-import { Mono } from "../Mono.js";
 
 export interface PeersWidgetProps {
   peers: Protobuf.NodeInfo[];

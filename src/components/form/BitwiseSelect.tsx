@@ -5,10 +5,9 @@ import {
   bitwiseEncode,
   enumLike
 } from "@app/core/utils/bitwise.js";
+import { InfoWrapper } from "@components/form/InfoWrapper.js";
 import { Listbox } from "@headlessui/react";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-
-import { InfoWrapper } from "./InfoWrapper.js";
 
 export interface BitwiseSelectProps {
   label?: string;

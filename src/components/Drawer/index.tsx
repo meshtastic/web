@@ -1,12 +1,11 @@
 import type React from "react";
 import { useState } from "react";
 
+import { Metrics } from "@components/Drawer/Metrics.js";
+import { Notifications } from "@components/Drawer/Notifications.js";
+import type { TabType } from "@components/generic/TabbedContent.js";
 import { Tab } from "@headlessui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
-
-import type { TabType } from "../layout/page/TabbedContent.js";
-import { Metrics } from "./Metrics.js";
-import { Notifications } from "./Notifications.js";
 
 export const Drawer = (): JSX.Element => {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -25,7 +24,7 @@ export const Drawer = (): JSX.Element => {
                 onClick={() => {
                   setDrawerOpen(true);
                 }}
-                className={`flex h-full cursor-pointer px-1 first:pl-2 last:pr-2 hover:bg-orange-300 ${
+                className={`flex h-full cursor-pointer px-1 first:pl-2 last:pr-2 hover:bg-orange-200 hover:text-orange-700 ${
                   selected ? "bg-orange-500 text-white" : "bg-white text-black"
                 }`}
               >

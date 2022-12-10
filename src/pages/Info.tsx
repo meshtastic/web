@@ -6,7 +6,7 @@ import { JSONTree } from "react-json-tree";
 import {
   TabbedContent,
   TabType
-} from "@app/components/layout/page/TabbedContent.js";
+} from "@app/components/generic/TabbedContent.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { EyeIcon } from "@heroicons/react/24/outline";
 
@@ -22,6 +22,11 @@ export const InfoPage = (): JSX.Element => {
 
   const tabs: TabType[] = [
     {
+      name: "Hardware",
+      icon: <EyeIcon className="h-4" />,
+      element: () => <JSONTree theme="monokai" data={hardware} />
+    },
+    {
       name: "Config",
       icon: <EyeIcon className="h-4" />,
       element: () => <JSONTree theme="monokai" data={config} />
@@ -31,11 +36,7 @@ export const InfoPage = (): JSX.Element => {
       icon: <EyeIcon className="h-4" />,
       element: () => <JSONTree theme="monokai" data={moduleConfig} />
     },
-    {
-      name: "Hardware",
-      icon: <EyeIcon className="h-4" />,
-      element: () => <JSONTree theme="monokai" data={hardware} />
-    },
+
     {
       name: "Nodes",
       icon: <EyeIcon className="h-4" />,

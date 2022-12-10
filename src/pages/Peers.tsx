@@ -3,8 +3,8 @@ import type React from "react";
 import toast from "react-hot-toast";
 import { base16 } from "rfc4648";
 
-import { IconButton } from "@app/components/IconButton.js";
-import { Mono } from "@app/components/Mono.js";
+import { IconButton } from "@app/components/form/IconButton.js";
+import { Mono } from "@app/components/generic/Mono.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import {

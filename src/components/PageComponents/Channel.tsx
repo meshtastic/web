@@ -5,9 +5,9 @@ import { fromByteArray, toByteArray } from "base64-js";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
-import { Input } from "@app/components/form/Input.js";
 import { ChannelSettingsValidation } from "@app/validation/channelSettings.js";
 import { Form } from "@components/form/Form";
+import { Input } from "@components/form/Input.js";
 import { Select } from "@components/form/Select.js";
 import { Toggle } from "@components/form/Toggle.js";
 import { useDevice } from "@core/providers/useDevice.js";

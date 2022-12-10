@@ -1,7 +1,7 @@
 import type React from "react";
 import { Fragment } from "react";
 
-import { Mono } from "@app/components/Mono";
+import { Mono } from "@components/generic/Mono";
 import { Tab } from "@headlessui/react";
 
 export interface TabType {
@@ -29,10 +29,11 @@ export const TabbedContent = ({
           <Tab key={index}>
             {({ selected }) => (
               <div
-                className={`flex h-10 cursor-pointer gap-3 rounded-md px-3 text-sm font-medium ${selected
-                  ? "bg-gray-100 text-gray-700"
-                  : "text-gray-500 hover:text-gray-700"
-                  }
+                className={`flex h-10 cursor-pointer gap-3 rounded-md px-3 text-sm font-medium ${
+                  selected
+                    ? "bg-gray-100 text-gray-700"
+                    : "text-gray-500 hover:text-gray-700"
+                }
                    `}
               >
                 {entry.icon && (
@@ -57,12 +58,10 @@ export const TabbedContent = ({
             ) : (
               <div>
                 <Mono>
-                  {entry.disabledMessage || "This tab is disabled"}.
-                  {' '}
+                  {entry.disabledMessage || "This tab is disabled"}.{" "}
                   {entry.disabledLink && (
                     <>
-                      Click
-                      {' '}
+                      Click{" "}
                       <a
                         className="underline"
                         target="_blank"
@@ -70,8 +69,7 @@ export const TabbedContent = ({
                         href={entry.disabledLink}
                       >
                         here
-                      </a>
-                      {' '}
+                      </a>{" "}
                       for more information.
                     </>
                   )}

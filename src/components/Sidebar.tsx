@@ -2,16 +2,13 @@ import type React from "react";
 
 import { useDevice } from "@app/core/providers/useDevice.js";
 import { toMGRS } from "@app/core/utils/toMGRS.js";
+import { BatteryWidget } from "@components/Widgets/BatteryWidget.js";
+import { DeviceWidget } from "@components/Widgets/DeviceWidget.js";
+import { PeersWidget } from "@components/Widgets/PeersWidget.js";
+import { PositionWidget } from "@components/Widgets/PositionWidget.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { Types } from "@meshtastic/meshtasticjs";
-
-import { BatteryWidget } from "./Widgets/BatteryWidget.js";
-import { ConfiguringWidget } from "./Widgets/ConfiguringWidget.js";
-import { DeviceWidget } from "./Widgets/DeviceWidget.js";
-import { NodeInfoWidget } from "./Widgets/NodeInfoWidget.js";
-import { PeersWidget } from "./Widgets/PeersWidget.js";
-import { PositionWidget } from "./Widgets/PositionWidget.js";
 
 export const Sidebar = (): JSX.Element => {
   const { removeDevice } = useDeviceStore();
@@ -39,7 +36,6 @@ export const Sidebar = (): JSX.Element => {
       />
 
       <div className="flex flex-col gap-3">
-        <NodeInfoWidget hardware={hardware} />
         <BatteryWidget
           batteryLevel={currentMetrics.batteryLevel}
           voltage={currentMetrics.voltage}
@@ -55,8 +51,6 @@ export const Sidebar = (): JSX.Element => {
             myNode?.data.position?.longitudeI
           )}
         />
-
-        <ConfiguringWidget />
       </div>
     </div>
   );

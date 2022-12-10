@@ -3,7 +3,7 @@ import type { HTMLProps } from "react";
 
 import { FiSave } from "react-icons/fi";
 
-import { Button } from "@components/Button.js";
+import { Button } from "@components/form/Button.js";
 import {
   ArrowUturnLeftIcon,
   ChevronRightIcon,

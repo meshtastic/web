@@ -13,7 +13,7 @@ export const MapControlls = (): JSX.Element => {
     <div className="absolute right-0 top-0 z-10 m-2">
       <div className="divide-y overflow-hidden rounded-md bg-white">
         <div
-          className="cursor-pointer p-3 hover:bg-orange-300"
+          className="cursor-pointer p-3 hover:bg-orange-200 hover:text-orange-700"
           onClick={() => {
             map?.zoomIn();
           }}
@@ -21,7 +21,7 @@ export const MapControlls = (): JSX.Element => {
           <MagnifyingGlassPlusIcon className="h-4 w-4" />
         </div>
         <div
-          className="cursor-pointer p-3 hover:bg-orange-300"
+          className="cursor-pointer p-3 hover:bg-orange-200 hover:text-orange-700"
           onClick={() => {
             map?.zoomOut();
           }}
@@ -29,7 +29,7 @@ export const MapControlls = (): JSX.Element => {
           <MagnifyingGlassMinusIcon className="h-4 w-4" />
         </div>
         <div
-          className="cursor-pointer p-3 hover:bg-orange-300"
+          className="cursor-pointer p-3 hover:bg-orange-200 hover:text-orange-700"
           onClick={() => {}}
         >
           <FiCrosshair className="h-4 w-4" />

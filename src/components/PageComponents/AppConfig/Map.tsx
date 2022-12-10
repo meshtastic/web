@@ -2,11 +2,11 @@ import type React from "react";
 
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 
-import { Button } from "@app/components/Button.js";
+import { Button } from "@app/components/form/Button.js";
+import { IconButton } from "@app/components/form/IconButton.js";
 import { InfoWrapper } from "@app/components/form/InfoWrapper.js";
 import { Input } from "@app/components/form/Input.js";
 import { Toggle } from "@app/components/form/Toggle.js";
-import { IconButton } from "@app/components/IconButton.js";
 import { useAppStore } from "@app/core/stores/appStore.js";
 import { MapValidation } from "@app/validation/appConfig/map.js";
 import { Form } from "@components/form/Form";

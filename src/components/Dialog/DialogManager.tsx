@@ -1,8 +1,7 @@
 import type React from "react";
 
 import { useDevice } from "@app/core/providers/useDevice.js";
-
-import { QRDialog } from "./QRDialog.js";
+import { QRDialog } from "@components/Dialog/QRDialog.js";
 
 export const DialogManager = (): JSX.Element => {
   const { channels, config, QRDialogOpen, setQRDialogOpen } = useDevice();
