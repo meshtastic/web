@@ -21,8 +21,6 @@ export const subscribeAll = (
   });
 
   connection.onTelemetryPacket.subscribe((telemetryPacket) => {
-    console.log(telemetryPacket.data.variant);
-
     device.setMetrics(telemetryPacket);
   });
 

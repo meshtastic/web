@@ -23,9 +23,7 @@ export const PeersWidget = ({ peers }: PeersWidgetProps): JSX.Element => {
         <UserGroupIcon className="h-6 text-white" />
       </div>
       <div>
-        <p className="truncate text-sm font-medium text-gray-500">
-          Connected Peers
-        </p>
+        <p className="truncate text-sm font-medium text-gray-500">Peers</p>
         <div className="flex gap-1">
           {peers.length > 0 ? (
             <p className="text-lg font-semibold text-gray-900">
