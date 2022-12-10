@@ -74,6 +74,10 @@ export const MapPage = (): JSX.Element => {
         mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
         mapLib={maplibregl}
         attributionControl={false}
+        renderWorldCopies={false}
+        maxPitch={0}
+        dragRotate={false}
+        touchZoomRotate={false}
       >
         {waypoints.map((wp) => (
           <Marker
