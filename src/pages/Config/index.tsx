@@ -1,6 +1,8 @@
 import type React from "react";
 
+import { Button } from "@app/components/form/Button.js";
 import { TabbedContent, TabType } from "@app/components/generic/TabbedContent";
+import { useDevice } from "@app/core/providers/useDevice.js";
 import {
   Cog8ToothIcon,
   CubeTransparentIcon,
@@ -11,6 +13,8 @@ import { DeviceConfig } from "@pages/Config/DeviceConfig.js";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.js";
 
 export const ConfigPage = (): JSX.Element => {
+  const { connection, pendingSettingsChanges } = useDevice();
+
   const tabs: TabType[] = [
     {
       name: "Device Config",
@@ -29,5 +33,20 @@ export const ConfigPage = (): JSX.Element => {
     }
   ];
 
-  return <TabbedContent tabs={tabs} />;
+  return (
+    <TabbedContent
+      tabs={tabs}
+      actions={[
+        () => (
+          <Button
+            disabled={!pendingSettingsChanges}
+            onClick={connection?.commitEditSettings}
+            variant="primary"
+          >
+            Commit Changes
+          </Button>
+        )
+      ]}
+    />
+  );
 };

@@ -89,4 +89,8 @@ export const subscribeAll = (
       ack: messagePacket.packet.from !== myNodeNum
     });
   });
+
+  connection.onPendingSettingsChange.subscribe((state) => {
+    device.setPendingSettingsChanges(state);
+  });
 };

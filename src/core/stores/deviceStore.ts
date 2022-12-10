@@ -56,6 +56,7 @@ export interface Device {
   regionUnset: boolean;
   currentMetrics: Protobuf.DeviceMetrics;
   QRDialogOpen: boolean;
+  pendingSettingsChanges: boolean;
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -66,6 +67,7 @@ export interface Device {
   setActivePage: (page: Page) => void;
   setPeerInfoOpen: (open: boolean) => void;
   setActivePeer: (peer: number) => void;
+  setPendingSettingsChanges: (state: boolean) => void;
   addChannel: (channel: Channel) => void;
   addWaypoint: (waypoint: Protobuf.Waypoint) => void;
   addNodeInfo: (nodeInfo: Types.NodeInfoPacket) => void;
@@ -113,6 +115,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           regionUnset: false,
           currentMetrics: Protobuf.DeviceMetrics.create(),
           QRDialogOpen: false,
+          pendingSettingsChanges: false,
 
           setReady: (ready: boolean) => {
             set(
@@ -290,6 +293,16 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.activePage = page;
+                }
+              })
+            );
+          },
+          setPendingSettingsChanges: (state) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.pendingSettingsChanges = state;
                 }
               })
             );
