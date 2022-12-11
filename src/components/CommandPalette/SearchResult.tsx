@@ -16,29 +16,54 @@ export const SearchResult = ({ group }: SearchResultProps): JSX.Element => {
         <span className="ml-3 flex-auto truncate">{group.name}</span>
       </div>
       {group.commands.map((command, index) => (
-        <Combobox.Option
-          key={index}
-          value={command}
-          className={({ active }) =>
-            `mr-2 ml-4 flex cursor-pointer select-none items-center rounded-md px-3 py-1 ${
-              active ? "bg-gray-900 bg-opacity-5 text-gray-900" : ""
-            }`
-          }
-        >
-          {({ active }) => (
-            <>
-              <command.icon
-                className={`h-4 flex-none text-gray-900 text-opacity-40 ${
-                  active ? "text-opacity-100" : ""
-                }`}
-              />
-              <span className="ml-3">{command.name}</span>
-              {active && (
-                <ChevronRightIcon className="ml-auto h-4 text-gray-400" />
-              )}
-            </>
+        <div key={index}>
+          <Combobox.Option
+            value={command}
+            className={({ active }) =>
+              `mr-2 ml-4 flex cursor-pointer select-none items-center rounded-md px-3 py-1 ${
+                active ? "bg-gray-900 bg-opacity-5 text-gray-900" : ""
+              }`
+            }
+          >
+            {({ active }) => (
+              <>
+                <command.icon
+                  className={`h-4 flex-none text-gray-900 text-opacity-40 ${
+                    active ? "text-opacity-100" : ""
+                  }`}
+                />
+                <span className="ml-3">{command.name}</span>
+                {active && (
+                  <ChevronRightIcon className="ml-auto h-4 text-gray-400" />
+                )}
+              </>
+            )}
+          </Combobox.Option>
+          {command.subItems && (
+            <div className=" ml-9 border-l">
+              {command.subItems?.map((item) => (
+                <Combobox.Option
+                  key={index}
+                  value={item}
+                  className={({ active }) =>
+                    `mx-2 flex cursor-pointer select-none items-center rounded-md px-3 py-1 ${
+                      active ? "bg-gray-900 bg-opacity-5 text-gray-900" : ""
+                    }`
+                  }
+                >
+                  {({ active }) => (
+                    <>
+                      <span className="ml-3">{item.name}</span>
+                      {active && (
+                        <ChevronRightIcon className="ml-auto h-4 text-gray-400" />
+                      )}
+                    </>
+                  )}
+                </Combobox.Option>
+              ))}
+            </div>
           )}
-        </Combobox.Option>
+        </div>
       ))}
     </div>
   );

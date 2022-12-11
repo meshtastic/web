@@ -18,11 +18,13 @@ import { toast } from "react-hot-toast";
 
 import { useDevice } from "@app/core/providers/useDevice.js";
 import { useAppStore } from "@app/core/stores/appStore.js";
+import { useDeviceStore } from "@app/core/stores/deviceStore.js";
 import { GroupView } from "@components/CommandPalette/GroupView.js";
 import { NoResults } from "@components/CommandPalette/NoResults.js";
 import { PaletteTransition } from "@components/CommandPalette/PaletteTransition.js";
 import { SearchBox } from "@components/CommandPalette/SearchBox.js";
 import { SearchResult } from "@components/CommandPalette/SearchResult.js";
+import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import {
   ArchiveBoxXMarkIcon,
@@ -57,13 +59,27 @@ export interface Group {
 export interface Command {
   name: string;
   icon: (props: React.ComponentProps<"svg">) => JSX.Element;
+  action?: () => void;
+  subItems?: SubItem[];
+}
+
+export interface SubItem {
+  name: string;
+  icon: JSX.Element;
   action: () => void;
 }
 
 export const CommandPalette = (): JSX.Element => {
   const [query, setQuery] = useState("");
-  const { commandPaletteOpen, setCommandPaletteOpen } = useAppStore();
-  // const [open, setOpen] = useState(false);
+  const {
+    commandPaletteOpen,
+    setCommandPaletteOpen,
+    devices,
+    setSelectedDevice,
+    removeDevice,
+    selectedDevice
+  } = useAppStore();
+  const { getDevices } = useDeviceStore();
 
   const {
     setQRDialogOpen,
@@ -72,7 +88,6 @@ export const CommandPalette = (): JSX.Element => {
     setActivePage,
     connection
   } = useDevice();
-  const { setSelectedDevice, removeDevice, selectedDevice } = useAppStore();
 
   const groups: Group[] = [
     {
@@ -142,11 +157,25 @@ export const CommandPalette = (): JSX.Element => {
       icon: DevicePhoneMobileIcon,
       commands: [
         {
-          name: "[WIP] Switch Node",
+          name: "Switch Node",
           icon: ArrowsRightLeftIcon,
-          action() {
-            alert("This feature is not implemented");
-          }
+          subItems: getDevices().map((device) => {
+            return {
+              name:
+                device.nodes.find(
+                  (n) => n.data.num === device.hardware.myNodeNum
+                )?.data.user?.longName ?? device.hardware.myNodeNum.toString(),
+              icon: (
+                <Hashicon
+                  size={24}
+                  value={device.hardware.myNodeNum.toString()}
+                />
+              ),
+              action() {
+                setSelectedDevice(device.id);
+              }
+            };
+          })
         },
         {
           name: "Connect New Node",
