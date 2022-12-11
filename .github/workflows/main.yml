@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: latest
       - run: pnpm install
-      - run: pnpm format
+      - run: pnpm format:check
       - run: pnpm build
       - run: pnpm package
 
