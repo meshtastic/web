@@ -4,7 +4,7 @@ import { useAppStore } from "@app/core/stores/appStore.js";
 import { useDeviceStore } from "@app/core/stores/deviceStore.js";
 import { Mono } from "@components/generic/Mono.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { CommandLineIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
@@ -43,14 +43,7 @@ export const DeviceSelector = (): JSX.Element => {
           <PlusIcon />
         </div>
       </span>
-      <img src="Logo_Black.svg" className="mt-auto px-3" />
-      <div className="my-4 flex flex-col gap-2 [writing-mode:horizontal-tb]">
-        <CommandLineIcon className="h-6 text-slate-400" />
-        <Mono className="text-xs">
-          <kbd className="rounded-md bg-slate-200 p-0.5 pr-1 italic">Ctrl</kbd>+
-          <kbd className="rounded-md bg-slate-200 p-0.5 pr-1 italic">K</kbd>
-        </Mono>
-      </div>
+      <img src="Logo_Black.svg" className="mt-auto px-3 py-4" />
     </div>
   );
 };

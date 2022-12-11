@@ -56,6 +56,8 @@ export interface Device {
   regionUnset: boolean;
   currentMetrics: Protobuf.DeviceMetrics;
   QRDialogOpen: boolean;
+  shutdownDialogOpen: boolean;
+  rebootDialogOpen: boolean;
   pendingSettingsChanges: boolean;
 
   setReady(ready: boolean): void;
@@ -79,6 +81,8 @@ export interface Device {
   addDeviceMetadataMessage: (metadata: Types.DeviceMetadataPacket) => void;
   ackMessage: (channelIndex: number, messageId: number) => void;
   setQRDialogOpen: (open: boolean) => void;
+  setShutdownDialogOpen: (open: boolean) => void;
+  setRebootDialogOpen: (open: boolean) => void;
 }
 
 export interface DeviceState {
@@ -115,6 +119,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           regionUnset: false,
           currentMetrics: Protobuf.DeviceMetrics.create(),
           QRDialogOpen: false,
+          shutdownDialogOpen: false,
+          rebootDialogOpen: false,
           pendingSettingsChanges: false,
 
           setReady: (ready: boolean) => {
@@ -536,6 +542,26 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.QRDialogOpen = open;
+                }
+              })
+            );
+          },
+          setShutdownDialogOpen: (open: boolean) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.shutdownDialogOpen = open;
+                }
+              })
+            );
+          },
+          setRebootDialogOpen: (open: boolean) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.rebootDialogOpen = open;
                 }
               })
             );

@@ -45,24 +45,19 @@ export const subscribeAll = (
   });
 
   connection.onMyNodeInfo.subscribe((nodeInfo) => {
-    console.log("^^^^^^^ GOT MY NODE INFO");
-
     device.setHardware(nodeInfo);
     myNodeNum = nodeInfo.myNodeNum;
   });
 
   connection.onUserPacket.subscribe((user) => {
-    console.log("^^^^^^^ GOT USER");
     device.addUser(user);
   });
 
   connection.onPositionPacket.subscribe((position) => {
-    console.log("^^^^^^^ GOT POSITION");
     device.addPosition(position);
   });
 
   connection.onNodeInfoPacket.subscribe((nodeInfo) => {
-    console.log("^^^^^^^ GOT NODE INFO");
     toast(`New Node Discovered: ${nodeInfo.data.user?.shortName ?? "UNK"}`, {
       icon: "🔎"
     });

@@ -40,6 +40,7 @@ import {
   MapIcon,
   MoonIcon,
   PlusIcon,
+  PowerIcon,
   QrCodeIcon,
   Square3Stack3DIcon,
   TrashIcon,
@@ -61,9 +62,16 @@ export interface Command {
 
 export const CommandPalette = (): JSX.Element => {
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
+  const { commandPaletteOpen, setCommandPaletteOpen } = useAppStore();
+  // const [open, setOpen] = useState(false);
 
-  const { setQRDialogOpen, setActivePage, connection } = useDevice();
+  const {
+    setQRDialogOpen,
+    setShutdownDialogOpen,
+    setRebootDialogOpen,
+    setActivePage,
+    connection
+  } = useDevice();
   const { setSelectedDevice, removeDevice, selectedDevice } = useAppStore();
 
   const groups: Group[] = [
@@ -181,6 +189,20 @@ export const CommandPalette = (): JSX.Element => {
             setSelectedDevice(0);
             removeDevice(selectedDevice ?? 0);
           }
+        },
+        {
+          name: "Schedule Shutdown",
+          icon: PowerIcon,
+          action() {
+            setShutdownDialogOpen(true);
+          }
+        },
+        {
+          name: "Schedule Reboot",
+          icon: ArrowPathIcon,
+          action() {
+            setRebootDialogOpen(true);
+          }
         }
       ]
     },
@@ -222,7 +244,7 @@ export const CommandPalette = (): JSX.Element => {
   const handleKeydown = (e: KeyboardEvent) => {
     if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
-      setOpen(true);
+      setCommandPaletteOpen(true);
     }
   };
 
@@ -249,12 +271,16 @@ export const CommandPalette = (): JSX.Element => {
 
   return (
     <Transition.Root
-      show={open}
+      show={commandPaletteOpen}
       as={Fragment}
       afterLeave={() => setQuery("")}
       appear
     >
-      <Dialog as="div" className="relative z-10" onClose={setOpen}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={setCommandPaletteOpen}
+      >
         <PaletteTransition>
           <Dialog.Panel className="mx-auto max-w-2xl transform divide-y divide-gray-500 divide-opacity-10 overflow-hidden rounded-xl bg-white  shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
             <Combobox<Command | string>
@@ -262,7 +288,7 @@ export const CommandPalette = (): JSX.Element => {
                 if (typeof input === "string") {
                   setQuery(input);
                 } else if (input.action) {
-                  setOpen(false);
+                  setCommandPaletteOpen(false);
                   input.action();
                 }
               }}

@@ -15,6 +15,7 @@ interface AppState {
     num: number;
   }[];
   rasterSources: RasterSource[];
+  commandPaletteOpen: boolean;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -23,6 +24,7 @@ interface AppState {
   setSelectedDevice: (deviceId: number) => void;
   addDevice: (device: { id: number; num: number }) => void;
   removeDevice: (deviceId: number) => void;
+  setCommandPaletteOpen: (open: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -30,6 +32,7 @@ export const useAppStore = create<AppState>()((set) => ({
   devices: [],
   currentPage: "messages",
   rasterSources: [],
+  commandPaletteOpen: false,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -52,7 +55,6 @@ export const useAppStore = create<AppState>()((set) => ({
       })
     );
   },
-
   setSelectedDevice: (deviceId) =>
     set(() => ({
       selectedDevice: deviceId
@@ -64,5 +66,12 @@ export const useAppStore = create<AppState>()((set) => ({
   removeDevice: (deviceId) =>
     set((state) => ({
       devices: state.devices.filter((device) => device.id !== deviceId)
-    }))
+    })),
+  setCommandPaletteOpen: (open: boolean) => {
+    set(
+      produce<AppState>((draft) => {
+        draft.commandPaletteOpen = open;
+      })
+    );
+  }
 }));

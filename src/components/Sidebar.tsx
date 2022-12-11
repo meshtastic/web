@@ -8,12 +8,16 @@ import { PeersWidget } from "@components/Widgets/PeersWidget.js";
 import { PositionWidget } from "@components/Widgets/PositionWidget.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
+import { CommandLineIcon } from "@heroicons/react/24/outline";
 import { Types } from "@meshtastic/meshtasticjs";
+
+import { Input } from "./form/Input.js";
 
 export const Sidebar = (): JSX.Element => {
   const { removeDevice } = useDeviceStore();
   const { connection, hardware, nodes, status, currentMetrics } = useDevice();
-  const { selectedDevice, setSelectedDevice } = useAppStore();
+  const { selectedDevice, setSelectedDevice, setCommandPaletteOpen } =
+    useAppStore();
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
   return (
@@ -35,7 +39,7 @@ export const Sidebar = (): JSX.Element => {
         }}
       />
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-grow flex-col gap-3">
         <BatteryWidget
           batteryLevel={currentMetrics.batteryLevel}
           voltage={currentMetrics.voltage}
@@ -51,6 +55,18 @@ export const Sidebar = (): JSX.Element => {
             myNode?.data.position?.longitudeI
           )}
         />
+        <div className="mt-auto">
+          <Input
+            placeholder={"Search for a command"}
+            onClick={() => setCommandPaletteOpen(true)}
+            action={{
+              icon: <CommandLineIcon className="w-4" />,
+              action() {
+                setCommandPaletteOpen(true);
+              }
+            }}
+          />
+        </div>
       </div>
     </div>
   );
