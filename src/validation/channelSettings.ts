@@ -14,7 +14,7 @@ export class ChannelSettingsValidation
   @IsNumber()
   channelNum: number;
 
-  @Length(1, 11)
+  @Length(0, 11)
   name: string;
 
   @IsInt()
