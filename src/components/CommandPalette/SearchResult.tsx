@@ -41,7 +41,7 @@ export const SearchResult = ({ group }: SearchResultProps): JSX.Element => {
           </Combobox.Option>
           {command.subItems && (
             <div className=" ml-9 border-l">
-              {command.subItems?.map((item) => (
+              {command.subItems?.map((item, index) => (
                 <Combobox.Option
                   key={index}
                   value={item}
