@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { Metrics } from "@components/Drawer/Metrics.js";
 import { Notifications } from "@components/Drawer/Notifications.js";
+import { Sensor } from "@components/Drawer/Sensor.js";
 import type { TabType } from "@components/generic/TabbedContent.js";
 import { Tab } from "@headlessui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
@@ -12,7 +13,8 @@ export const Drawer = (): JSX.Element => {
 
   const tabs: TabType[] = [
     { name: "Notifications", element: Notifications },
-    { name: "Metrics", element: Metrics }
+    { name: "Metrics", element: Metrics },
+    { name: "Sensor", element: Sensor }
   ];
   return (
     <Tab.Group>
