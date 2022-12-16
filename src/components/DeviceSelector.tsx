@@ -4,7 +4,7 @@ import { useAppStore } from "@app/core/stores/appStore.js";
 import { useDeviceStore } from "@app/core/stores/deviceStore.js";
 import { Mono } from "@components/generic/Mono.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { MoonIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { MoonIcon, PlusIcon, WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
 import { IconButton } from "./form/IconButton.js";
 
 export const DeviceSelector = (): JSX.Element => {
@@ -41,6 +41,19 @@ export const DeviceSelector = (): JSX.Element => {
           <div
             className={`absolute -left-1.5 h-7 w-0.5 rounded-full group-hover:bg-accent ${
               selectedDevice === 0 ? "bg-accent" : "bg-transparent"
+            }`}
+          />
+        </div>
+        <div
+          onClick={() => {
+            setSelectedDevice(-1);
+          }}
+          className="group flex h-8 w-8 cursor-pointer p-0.5 drop-shadow-md"
+        >
+          <WrenchScrewdriverIcon />
+          <div
+            className={`absolute -left-1.5 h-7 w-0.5 rounded-full group-hover:bg-accent ${
+              selectedDevice === -1 ? "bg-accent" : "bg-transparent"
             }`}
           />
         </div>

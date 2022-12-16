@@ -15,6 +15,7 @@ import { PageNav } from "@components/PageNav.js";
 import { Sidebar } from "@components/Sidebar.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { ThemeController } from "./components/generic/ThemeController.js";
+import { SetupPage } from "./components/SetupPage.js";
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();
@@ -45,7 +46,8 @@ export const App = (): JSX.Element => {
               </div>
             </MapProvider>
           </DeviceWrapper>
-        )}
+        )}        
+        {selectedDevice === -1 && <SetupPage/>}
         {selectedDevice === 0 && <NewDevice />}
       </div>
     </ThemeController>
