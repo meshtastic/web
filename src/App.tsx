@@ -11,11 +11,11 @@ import { DeviceSelector } from "@components/DeviceSelector.js";
 import { DialogManager } from "@components/Dialog/DialogManager.js";
 import { Drawer } from "@components/Drawer/index.js";
 import { NewDevice } from "@components/NewDevice.js";
-import { PageNav } from "@components/PageNav.js";
+import { PageNav, pagesDevice } from "@components/PageNav.js";
 import { Sidebar } from "@components/Sidebar.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { ThemeController } from "./components/generic/ThemeController.js";
-import { SetupPage } from "./components/SetupPage.js";
+import { DeviceSetup } from "./components/DeviceSetup.js";
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();
@@ -38,7 +38,7 @@ export const App = (): JSX.Element => {
             />
             <DialogManager />
             <Sidebar />
-            <PageNav />
+            <PageNav pages={pagesDevice} />
             <MapProvider>
               <div className="flex h-full w-full flex-col overflow-y-auto">
                 <PageRouter />
@@ -47,7 +47,7 @@ export const App = (): JSX.Element => {
             </MapProvider>
           </DeviceWrapper>
         )}        
-        {selectedDevice === -1 && <SetupPage/>}
+        {selectedDevice === -1 && <DeviceSetup/>}
         {selectedDevice === 0 && <NewDevice />}
       </div>
     </ThemeController>

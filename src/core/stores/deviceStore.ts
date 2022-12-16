@@ -13,7 +13,8 @@ export type Page =
   | "channels"
   | "peers"
   | "info"
-  | "logs";
+  | "logs"
+  | "setup";
 
 export interface MessageWithState extends Types.PacketMetadata<string> {
   state: MessageState;

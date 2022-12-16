@@ -9,6 +9,7 @@ import { LogsPage } from "@pages/Logs.js";
 import { MapPage } from "@pages/Map.js";
 import { MessagesPage } from "@pages/Messages.js";
 import { PeersPage } from "@pages/Peers.js";
+import { SetupPage } from "./pages/Setup";
 
 export const PageRouter = (): JSX.Element => {
   const { activePage } = useDevice();
@@ -22,6 +23,7 @@ export const PageRouter = (): JSX.Element => {
       {activePage === "peers" && <PeersPage />}
       {activePage === "info" && <InfoPage />}
       {activePage === "logs" && <LogsPage />}
+      {activePage === "setup" && <SetupPage />}
     </div>
   );
 };

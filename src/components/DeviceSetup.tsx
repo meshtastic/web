@@ -1,22 +1,23 @@
 import { useDeviceStore } from "@app/core/stores/deviceStore";
 import { DeviceWrapper } from "@app/DeviceWrapper";
+import { PageRouter } from "@app/PageRouter";
 import { ConfigPage } from "@app/pages/Config";
 import { Mono } from "./generic/Mono";
-import { PageNav } from "./PageNav";
+import { PageNav, pagesDevice, pagesSetup } from "./PageNav";
 import { SidebarSetup } from "./SidebarSetup";
 
 
 
-export const SetupPage = (): JSX.Element => {
+export const DeviceSetup = (): JSX.Element => {
     const { getDevices } = useDeviceStore();
     const testDevice = getDevices()[0];
 
     return (
         <DeviceWrapper device={testDevice}>
             
-                <SidebarSetup/>
-                    
-                <ConfigPage/>            
+            <SidebarSetup/>
+            <PageNav pages={pagesSetup}/>
+            <PageRouter/>            
         </DeviceWrapper>
     );
 }

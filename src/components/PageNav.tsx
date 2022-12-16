@@ -13,57 +13,12 @@ import {
   UsersIcon
 } from "@heroicons/react/24/outline";
 
-export const PageNav = (): JSX.Element => {
+interface PageNavProps {
+  pages: NavLink[]
+}
+
+export const PageNav = ({pages}: PageNavProps): JSX.Element => {
   const { activePage, setActivePage } = useDevice();
-
-  interface NavLink {
-    name: string;
-    icon: JSX.Element;
-    page: Page;
-  }
-
-  const pages: NavLink[] = [
-    {
-      name: "Messages",
-      icon: <InboxIcon />,
-      page: "messages"
-    },
-    {
-      name: "Map",
-      icon: <MapIcon />,
-      page: "map"
-    },
-    {
-      name: "Extensions",
-      icon: <BeakerIcon />,
-      page: "extensions"
-    },
-    {
-      name: "Config",
-      icon: <Cog8ToothIcon />,
-      page: "config"
-    },
-    {
-      name: "Channels",
-      icon: <Square3Stack3DIcon />,
-      page: "channels"
-    },
-    {
-      name: "Peers",
-      icon: <UsersIcon />,
-      page: "peers"
-    },
-    {
-      name: "Info",
-      icon: <IdentificationIcon />,
-      page: "info"
-    },
-    {
-      name: "Logs",
-      icon: <DocumentTextIcon />,
-      page: "logs"
-    }
-  ];
 
   return (
     <div className="flex h-full flex-shrink-0 whitespace-nowrap bg-backgroundPrimary text-sm [writing-mode:vertical-rl]">
@@ -87,3 +42,65 @@ export const PageNav = (): JSX.Element => {
     </div>
   );
 };
+
+interface NavLink {
+  name: string;
+  icon: JSX.Element;
+  page: Page;
+}  
+
+export const pagesDevice: NavLink[] = [
+  {
+    name: "Messages",
+    icon: <InboxIcon />,
+    page: "messages"
+  },
+  {
+    name: "Map",
+    icon: <MapIcon />,
+    page: "map"
+  },
+  {
+    name: "Extensions",
+    icon: <BeakerIcon />,
+    page: "extensions"
+  },
+  {
+    name: "Config",
+    icon: <Cog8ToothIcon />,
+    page: "config"
+  },
+  {
+    name: "Channels",
+    icon: <Square3Stack3DIcon />,
+    page: "channels"
+  },
+  {
+    name: "Peers",
+    icon: <UsersIcon />,
+    page: "peers"
+  },
+  {
+    name: "Info",
+    icon: <IdentificationIcon />,
+    page: "info"
+  },
+  {
+    name: "Logs",
+    icon: <DocumentTextIcon />,
+    page: "logs"
+  }
+];
+
+export const pagesSetup: NavLink[] = [
+  {
+    name: "Setup",
+    icon: <BeakerIcon />,
+    page: "extensions"
+  },
+  {
+    name: "Config",
+    icon: <Cog8ToothIcon />,
+    page: "config"
+  }
+]
