@@ -29,6 +29,19 @@ export const Serial = (): JSX.Element => {
     void updateSerialPortList();
   }, [updateSerialPortList]);
 
+  // // Check if this is a meshtastic device
+  // const probe = async (port: SerialPort) => {
+  //   return;
+  //   if(port.readable)
+  //     return;
+  //   console.log("Creating connection");
+  //   const connection = new ISerialConnection(randId());
+  //   await connection.connect({ port, concurrentLogOutput: false });
+  //   connection.events.onNodeInfoPacket.subscribe( async (nodeInfo) => {      
+  //     console.log(nodeInfo);
+  //   });    
+  // }  
+
   const onConnect = async (port: SerialPort) => {
     const id = randId();
     const device = addDevice(id);
@@ -73,6 +86,14 @@ export const Serial = (): JSX.Element => {
         }}
       >
         New device
+      </Button>
+      <Button
+        onClick={async () => {          
+          await Promise.all(serialPorts.map(s => s.forget()));
+          setSerialPorts([]);
+        }}
+      >
+        Clear all
       </Button>
     </div>
   );
