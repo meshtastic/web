@@ -3,11 +3,13 @@ import type { ButtonHTMLAttributes } from "react";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "sm" | "md" | "lg";
+  color?: string;
   iconBefore?: JSX.Element;
 }
 
 export const Button = ({
   size = "md",
+  color = "bg-accentMuted",
   iconBefore,
   children,
   disabled,
@@ -16,7 +18,7 @@ export const Button = ({
 }: ButtonProps): JSX.Element => {
   return (
     <button
-      className={`flex w-full rounded-md bg-accentMuted px-3 text-textPrimary hover:brightness-hover focus:outline-none active:brightness-press ${
+      className={`flex w-full rounded-md ${color} px-3 text-textPrimary hover:brightness-hover focus:outline-none active:brightness-press ${
         size === "sm"
           ? "h-8 text-sm"
           : size === "md"
