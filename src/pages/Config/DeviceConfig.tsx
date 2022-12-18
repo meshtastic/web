@@ -11,11 +11,13 @@ import { Power } from "@components/PageComponents/Config/Power.js";
 import { User } from "@components/PageComponents/Config/User.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Tab } from "@headlessui/react";
+import { useAppStore } from "@app/core/stores/appStore";
 
 export const DeviceConfig = (): JSX.Element => {
+  const { selectedDevice } = useAppStore();
   const { hardware } = useDevice();
 
-  const configSections = [
+  let configSections = [
     {
       label: "User",
       element: User
@@ -50,6 +52,11 @@ export const DeviceConfig = (): JSX.Element => {
       element: Bluetooth
     }
   ];
+  
+  // FIXME: Kinda hacky  
+  if(selectedDevice == -1) {
+    configSections = configSections.slice(1);
+  }
 
   return (
     <Tab.Group as="div" className="flex w-full gap-3">

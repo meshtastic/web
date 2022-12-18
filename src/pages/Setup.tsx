@@ -9,8 +9,10 @@ import {
   QrCodeIcon
 } from "@heroicons/react/24/outline";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Mono } from "@app/components/generic/Mono";
 
 export const SetupPage = (): JSX.Element => {
+    return ( <Mono>Setup page goes here</Mono> )
   const { channels, setQRDialogOpen, setImportDialogOpen } = useDevice();
 
   const tabs: TabType[] = channels.map((channel) => {

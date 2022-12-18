@@ -13,9 +13,15 @@ import { useDevice } from "@core/providers/useDevice.js";
 import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { useAppStore } from "@app/core/stores/appStore";
+import { getCurrentConfig } from "@app/core/stores/configStore";
 
 export const Device = (): JSX.Element => {
-  const { config, connection, setConfig } = useDevice();
+  // TODO: Apply to other pages as well
+  const { selectedDevice } = useAppStore();
+  const { config, moduleConfig } = getCurrentConfig();
+  // TODO: Put these in separate setCurrentConfig() function
+  const { connection, setConfig } = selectedDevice != -1 ? useDevice() : {connection: undefined, setConfig: undefined };
   const {
     register,
     handleSubmit,
