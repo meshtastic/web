@@ -12,9 +12,11 @@ export const DeviceSetup = (): JSX.Element => {
     const { getDevices } = useDeviceStore();
     const testDevice = getDevices()[0];
 
+    if(!testDevice)
+        return (<Mono>Currently needs at least one device.</Mono>)
+
     return (
         <DeviceWrapper device={testDevice}>
-            
             <SidebarSetup/>
             <PageNav pages={pagesSetup}/>
             <PageRouter/>            

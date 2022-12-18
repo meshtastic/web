@@ -70,6 +70,7 @@ export interface Device {
   shutdownDialogOpen: boolean;
   rebootDialogOpen: boolean;
   pendingSettingsChanges: boolean;
+  selectedToFlash: boolean;
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -81,6 +82,7 @@ export interface Device {
   setPeerInfoOpen: (open: boolean) => void;
   setActivePeer: (peer: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
+  setSelectedToFlash: (state: boolean) => void;
   addChannel: (channel: Channel) => void;
   addWaypoint: (waypoint: Protobuf.Waypoint) => void;
   addNodeInfo: (nodeInfo: Protobuf.NodeInfo) => void;
@@ -142,6 +144,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           shutdownDialogOpen: false,
           rebootDialogOpen: false,
           pendingSettingsChanges: false,
+          selectedToFlash: false,
 
           setReady: (ready: boolean) => {
             set(
@@ -309,6 +312,16 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.pendingSettingsChanges = state;
+                }
+              })
+            );
+          },
+          setSelectedToFlash: (state) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.selectedToFlash = state;
                 }
               })
             );

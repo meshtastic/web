@@ -8,10 +8,31 @@ import {
   ArrowDownOnSquareStackIcon,
   QrCodeIcon
 } from "@heroicons/react/24/outline";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { IBLEConnection, ISerialConnection, Protobuf } from "@meshtastic/meshtasticjs";
 import { Mono } from "@app/components/generic/Mono";
+import { useDeviceStore } from "@app/core/stores/deviceStore";
 
 export const SetupPage = (): JSX.Element => {
+  const { getDevices } = useDeviceStore();
+  const devices = getDevices();
+
+  return (
+    <div className="m-auto text-center w-64 pt-24">
+      <Mono>Devices to flash: {devices.filter(d => d.selectedToFlash).length}/{devices.length}</Mono><br/>
+      <Button
+        onClick={async () => {
+          const serialPort = (devices[0].connection instanceof ISerialConnection) ? await devices[0].connection.getPort() : undefined;
+          if(!serialPort)
+            throw "Not a serial port -- fix!";
+          // --> Here we flash
+        }}
+      >
+        Flash
+      </Button>
+    </div>
+  );
+
+
     return ( <Mono>Setup page goes here</Mono> )
   const { channels, setQRDialogOpen, setImportDialogOpen } = useDevice();
 

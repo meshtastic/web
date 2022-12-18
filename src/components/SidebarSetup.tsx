@@ -25,8 +25,7 @@ export const SidebarSetup = (): JSX.Element => {
 
   const { getDevices } = useDeviceStore();
   const devices = getDevices();
-  const [devicesToFlash, setSelectedToFlash] = useState<boolean[]>(devices.map(d => false));  
-  console.log(`Device 0: ${devicesToFlash[0]}`);
+  const devicesToFlash = devices.map(d => d.selectedToFlash);
 
   return (    
     <div className="bg-slate-50 relative flex flex-col w-72 flex-shrink-0 flex-col gap-2 p-2">
@@ -39,7 +38,7 @@ export const SidebarSetup = (): JSX.Element => {
               onClick={() => {
                 devicesToFlash[index] = !devicesToFlash[index];
                 console.log(`Set device ${index}: ${devicesToFlash[index]}`);
-                setSelectedToFlash(devicesToFlash.map(b => b));                
+                device.setSelectedToFlash(devicesToFlash[index]);
               }}
               size="sm"
             >
@@ -50,7 +49,7 @@ export const SidebarSetup = (): JSX.Element => {
         </div>
       </div>      
       <div className="w-1/1 h-0.5 bg-accent"></div>
-      <div className="h-1/2">{<Mono>Test2</Mono>}</div>
+      <div className="h-1/2">{<Mono>(Configurations go here)</Mono>}</div>
       
     </div>
   );

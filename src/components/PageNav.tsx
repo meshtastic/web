@@ -96,7 +96,7 @@ export const pagesSetup: NavLink[] = [
   {
     name: "Setup",
     icon: <BeakerIcon />,
-    page: "extensions"
+    page: "setup"
   },
   {
     name: "Config",
