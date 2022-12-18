@@ -4,62 +4,66 @@ import { TabbedContent, TabType } from "@app/components/generic/TabbedContent";
 import { Channel } from "@app/components/PageComponents/Channel.js";
 import { Button } from "@components/form/Button.js";
 import { useDevice } from "@core/providers/useDevice.js";
+import { EspLoader } from '@toit/esptool.js';
 import {
   ArrowDownOnSquareStackIcon,
   QrCodeIcon
 } from "@heroicons/react/24/outline";
 import { IBLEConnection, ISerialConnection, Protobuf } from "@meshtastic/meshtasticjs";
 import { Mono } from "@app/components/generic/Mono";
-import { useDeviceStore } from "@app/core/stores/deviceStore";
+import { FlashingProgress, useDeviceStore } from "@app/core/stores/deviceStore";
 
 export const SetupPage = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
   const devices = getDevices();
+  const devicesToFlash = devices.filter(d => d.selectedToFlash);
+  
+  let flashButtonText;
+  let flashButtonEnabled = false;
+  if(devicesToFlash.length == 0)
+    flashButtonText = "No device selected";
+  else if(devicesToFlash.filter(d => d.flashingProgress.step == 'done').length == devicesToFlash.length)
+    flashButtonText = "Flashing complete";
+  else {
+    flashButtonText = "Flash";
+    flashButtonEnabled = true;
+  }
 
   return (
     <div className="m-auto text-center w-64 pt-24">
-      <Mono>Devices to flash: {devices.filter(d => d.selectedToFlash).length}/{devices.length}</Mono><br/>
+      <Mono>Devices to flash: {devicesToFlash.length}/{devices.length}</Mono><br/>
       <Button
         onClick={async () => {
-          const serialPort = (devices[0].connection instanceof ISerialConnection) ? await devices[0].connection.getPort() : undefined;
-          if(!serialPort)
-            throw "Not a serial port -- fix!";
-          // --> Here we flash
+          // const serialPort = devices[0].serialPort;
+          // console.warn(`Serial port: ${serialPort}`);
+          // if(!serialPort)
+          //   throw "Not a serial port -- fix!";
+          
+          // const loader = new EspLoader(serialPort);
+          //   await loader.connect();
+          // --> Flash here
+
+          devicesToFlash.forEach(d => simulateProgress(d.setFlashingProgress));
+          //flash(serialPort, )
         }}
+        disabled={!flashButtonEnabled}
       >
-        Flash
+        { flashButtonText }
       </Button>
     </div>
   );
-
-
-    return ( <Mono>Setup page goes here</Mono> )
-  const { channels, setQRDialogOpen, setImportDialogOpen } = useDevice();
-
-  const tabs: TabType[] = channels.map((channel) => {
-    return {
-      name: channel.config.settings?.name.length
-        ? channel.config.settings.name
-        : channel.config.role === Protobuf.Channel_Role.PRIMARY
-        ? "Primary"
-        : `Channel: ${channel.config.index}`,
-      element: () => <Channel channel={channel.config} />
-    };
-  });
-
-  return (
-    <TabbedContent
-      tabs={tabs}
-      actions={[
-        {
-          icon: <ArrowDownOnSquareStackIcon className="w-4" />,
-          action: () => setImportDialogOpen(true)
-        },
-        {
-          icon: <QrCodeIcon className="w-4" />,
-          action: () => setQRDialogOpen(true)
-        }
-      ]}
-    />
-  );
 };
+
+async function flash(port: SerialPort, setProgress: (progress: FlashingProgress) => void) {
+
+}
+
+async function simulateProgress(setProgress: (progress: FlashingProgress) => void) {
+  let percentage = 0;  
+  while(percentage < 1) {    
+    setProgress({ step: 'flashing', percentage });
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 1000));
+    percentage += Math.random() * 0.1;    
+  }
+  setProgress({ step: 'done', percentage });
+}

@@ -49,6 +49,11 @@ export interface processPacketParams {
   time: number;
 }
 
+export interface FlashingProgress {
+  step: 'idle' | 'erasing' | 'flashing' | 'done';
+  percentage: number;
+}
+
 export interface Device {
   id: number;
   ready: boolean;
@@ -71,6 +76,8 @@ export interface Device {
   rebootDialogOpen: boolean;
   pendingSettingsChanges: boolean;
   selectedToFlash: boolean;
+  serialPort?: SerialPort;      // TEMP until lib let's you access the port
+  flashingProgress: FlashingProgress;
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -83,6 +90,8 @@ export interface Device {
   setActivePeer: (peer: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
   setSelectedToFlash: (state: boolean) => void;
+  setSerialPort: (port: SerialPort) => void;
+  setFlashingProgress: (progress: FlashingProgress) => void;
   addChannel: (channel: Channel) => void;
   addWaypoint: (waypoint: Protobuf.Waypoint) => void;
   addNodeInfo: (nodeInfo: Protobuf.NodeInfo) => void;
@@ -145,6 +154,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           rebootDialogOpen: false,
           pendingSettingsChanges: false,
           selectedToFlash: false,
+          flashingProgress: { step: 'idle', percentage: 0 },
 
           setReady: (ready: boolean) => {
             set(
@@ -325,6 +335,26 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 }
               })
             );
+          },
+          setSerialPort: (port) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.serialPort = port;
+                }
+              })
+            )
+          },
+          setFlashingProgress: (progress) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.flashingProgress = progress;
+                }
+              })
+            )
           },
           addChannel: (channel: Channel) => {
             set(

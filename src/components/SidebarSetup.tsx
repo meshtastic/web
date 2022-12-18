@@ -7,7 +7,7 @@ import { DeviceWidget } from "@components/Widgets/DeviceWidget.js";
 import { PeersWidget } from "@components/Widgets/PeersWidget.js";
 import { PositionWidget } from "@components/Widgets/PositionWidget.js";
 import { useAppStore } from "@core/stores/appStore.js";
-import { useDeviceStore } from "@core/stores/deviceStore.js";
+import { Device, useDeviceStore } from "@core/stores/deviceStore.js";
 import { CommandLineIcon } from "@heroicons/react/24/outline";
 import { Types } from "@meshtastic/meshtasticjs";
 
@@ -42,7 +42,7 @@ export const SidebarSetup = (): JSX.Element => {
               }}
               size="sm"
             >
-              {`${device.nodes.find(d => d.data.num == device.hardware.myNodeNum)?.data.user?.longName ?? "<Not flashed yet>"}`}
+              {`${getButtonText(device)}`}
             </Button>
           ))}
           
@@ -54,3 +54,11 @@ export const SidebarSetup = (): JSX.Element => {
     </div>
   );
 };
+
+function getButtonText(device: Device): string {
+  if(device.flashingProgress.step == 'flashing')
+    return `${(device.flashingProgress.percentage * 100).toFixed(2)}%`;
+  else if(device.flashingProgress.step == 'done')
+    return "Done"
+  return device.nodes.find(d => d.data.num == device.hardware.myNodeNum)?.data.user?.longName ?? "<Not flashed yet>";
+}

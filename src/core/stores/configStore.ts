@@ -49,32 +49,6 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
   configs: new Map(),
   templateConfigs: [],
 
-  // addDeviceConfig: (id: number) => {
-  //   set(
-  //     produce<ConfigState>((draft) => {
-  //       draft.configs.set(id, {
-  //         mainConfig: Protobuf.LocalConfig.create(),
-  //         moduleConfig: Protobuf.LocalModuleConfig.create()
-  //       });
-  //     })
-  //   );
-  //   return get().configs.get(id)!;
-  // },
-  // removeDeviceConfig: (id: number) => {
-  //   set(
-  //     produce<ConfigState>((draft) => {
-  //       draft.configs.delete(id);
-  //     })
-  //   );
-  // },
-  // getDeviceConfigs: () => {
-  //   const configs = get().configs;
-  //   const posKeys = Array.from(configs.keys()).filter(id => id > 0);
-  //   return posKeys.map(key => configs.get(key)!);    
-  // },
-  // getDeviceConfig: (id: number) => {
-  //   return get().configs.get(id);
-  // }
 
   addTemplateConfig: () => {
     const newConfig = { config: Protobuf.LocalConfig.create(), moduleConfig: Protobuf.LocalModuleConfig.create() };

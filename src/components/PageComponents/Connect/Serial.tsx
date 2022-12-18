@@ -55,6 +55,7 @@ export const Serial = (): JSX.Element => {
       })
       .catch((e: Error) => console.log(`Unable to Connect: ${e.message}`));
     device.addConnection(connection);
+    device.setSerialPort(port);
     subscribeAll(device, connection);
   };
 

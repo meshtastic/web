@@ -29,6 +29,7 @@
     "@hookform/resolvers": "^2.9.10",
     "@meshtastic/meshtasticjs": "^0.9.8",
     "@tailwindcss/typography": "^0.5.8",
+    "@toit/esptool.js": "^0.12.3",
     "@turf/turf": "^6.5.0",
     "base64-js": "^1.5.1",
     "chart.js": "^4.1.1",

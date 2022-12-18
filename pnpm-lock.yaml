@@ -9,6 +9,7 @@ specifiers:
   '@meshtastic/meshtasticjs': ^0.9.8
   '@tailwindcss/forms': ^0.5.3
   '@tailwindcss/typography': ^0.5.8
+  '@toit/esptool.js': ^0.12.3
   '@turf/turf': ^6.5.0
   '@types/chrome': ^0.0.206
   '@types/geodesy': ^2.2.3
@@ -72,6 +73,7 @@ dependencies:
   '@hookform/resolvers': 2.9.10_react-hook-form@7.41.3
   '@meshtastic/meshtasticjs': 0.9.8
   '@tailwindcss/typography': 0.5.8_tailwindcss@3.2.4
+  '@toit/esptool.js': 0.12.3
   '@turf/turf': 6.5.0
   base64-js: 1.5.1
   chart.js: 4.1.1
@@ -1890,6 +1892,10 @@ packages:
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.2.4_postcss@8.4.20
+    dev: false
+
+  /@toit/esptool.js/0.12.3:
+    resolution: {integrity: sha512-oli5WyZeSyDjjKAk5UC2hJMypmWUsI6kKUgkVihr56cKeK0KiJr4gu7LQ4IcvfduI92mm+bogLsgn9n2FXofeA==}
     dev: false
 
   /@turf/along/6.5.0:
