@@ -28,6 +28,7 @@ import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import {
   ArchiveBoxXMarkIcon,
+  ArrowDownOnSquareStackIcon,
   ArrowPathIcon,
   ArrowsRightLeftIcon,
   BeakerIcon,
@@ -44,6 +45,7 @@ import {
   PlusIcon,
   PowerIcon,
   QrCodeIcon,
+  QueueListIcon,
   Square3Stack3DIcon,
   TrashIcon,
   UsersIcon,
@@ -83,6 +85,7 @@ export const CommandPalette = (): JSX.Element => {
 
   const {
     setQRDialogOpen,
+    setImportDialogOpen,
     setShutdownDialogOpen,
     setRebootDialogOpen,
     setActivePage,
@@ -167,7 +170,7 @@ export const CommandPalette = (): JSX.Element => {
                 )?.data.user?.longName ?? device.hardware.myNodeNum.toString(),
               icon: (
                 <Hashicon
-                  size={24}
+                  size={18}
                   value={device.hardware.myNodeNum.toString()}
                 />
               ),
@@ -191,11 +194,24 @@ export const CommandPalette = (): JSX.Element => {
       icon: CubeTransparentIcon,
       commands: [
         {
-          name: "QR Code Generator",
+          name: "QR Code",
           icon: QrCodeIcon,
-          action() {
-            setQRDialogOpen(true);
-          }
+          subItems: [
+            {
+              name: "Generator",
+              icon: <QueueListIcon className="w-4" />,
+              action() {
+                setQRDialogOpen(true);
+              }
+            },
+            {
+              name: "Import",
+              icon: <ArrowDownOnSquareStackIcon className="w-4" />,
+              action() {
+                setImportDialogOpen(true);
+              }
+            }
+          ]
         },
         {
           name: "Reset Peers",

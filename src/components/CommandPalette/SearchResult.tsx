@@ -53,6 +53,7 @@ export const SearchResult = ({ group }: SearchResultProps): JSX.Element => {
                 >
                   {({ active }) => (
                     <>
+                      {item.icon}
                       <span className="ml-3">{item.name}</span>
                       {active && (
                         <ChevronRightIcon className="ml-auto h-4 text-gray-400" />
