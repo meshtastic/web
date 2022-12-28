@@ -20,7 +20,7 @@ export const HTTP = (): JSX.Element => {
     tls: boolean;
   }>({
     defaultValues: {
-      ip: ["client.meshtasti.org", "localhost"].includes(
+      ip: ["client.meshtastic.org", "localhost"].includes(
         window.location.hostname
       )
         ? "meshtastic.local"
