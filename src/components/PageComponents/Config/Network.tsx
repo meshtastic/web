@@ -6,7 +6,6 @@ import { toast } from "react-hot-toast";
 
 import { FormSection } from "@app/components/form/FormSection.js";
 import { Input } from "@app/components/form/Input.js";
-import { IPAddress } from "@app/components/form/IPAddress.js";
 import { Select } from "@app/components/form/Select.js";
 import { Toggle } from "@app/components/form/Toggle.js";
 import { renderOptions } from "@app/core/utils/selectEnumOptions.js";
@@ -42,6 +41,12 @@ export const Network = (): JSX.Element => {
     defaultValue: false
   });
 
+  const ethMode = useWatch({
+    control,
+    name: "ethMode",
+    defaultValue: Protobuf.Config_NetworkConfig_EthMode.DHCP
+  });
+
   useEffect(() => {
     reset(config.network);
   }, [reset, config.network]);
@@ -50,17 +55,13 @@ export const Network = (): JSX.Element => {
     console.log(data);
 
     if (connection) {
-      const tmp = Protobuf.Config_NetworkConfig.create({
-        ethEnabled: true,
-        ethMode: Protobuf.Config_NetworkConfig_EthMode.DHCP
-      });
       void toast.promise(
         connection
           .setConfig({
             config: {
               payloadVariant: {
                 oneofKind: "network",
-                network: tmp
+                network: Protobuf.Config_NetworkConfig.create(data)
               }
             },
             callback: async () => {
@@ -105,7 +106,7 @@ export const Network = (): JSX.Element => {
           control={control}
           render={({ field: { value, ...rest } }) => (
             <Toggle
-              label="WiFi Enabled"
+              label="Enabled"
               description="Enable or disable the WiFi radio"
               checked={value}
               {...rest}
@@ -134,7 +135,7 @@ export const Network = (): JSX.Element => {
           control={control}
           render={({ field: { value, ...rest } }) => (
             <Toggle
-              label="Ethernet Enabled"
+              label="Enabled"
               description="Enable or disbale the Ethernet port"
               checked={value}
               {...rest}
@@ -152,37 +153,38 @@ export const Network = (): JSX.Element => {
         >
           {renderOptions(Protobuf.Config_NetworkConfig_EthMode)}
         </Select>
-      </FormSection>
-      <FormSection title="IP Config">
-        <IPAddress label="IP" description="IP Address" />
-        <Input
-          label="IP"
-          type="number"
-          description="IP Address"
-          error={errors.ipv4Config?.ip?.message}
-          {...register("ipv4Config.ip", { valueAsNumber: true })}
-        />
-        <Input
-          label="Gateway"
-          type="number"
-          description="Default Gateway"
-          error={errors.ipv4Config?.gateway?.message}
-          {...register("ipv4Config.gateway", { valueAsNumber: true })}
-        />
-        <Input
-          label="Subnet"
-          type="number"
-          description="Subnet Mask"
-          error={errors.ipv4Config?.subnet?.message}
-          {...register("ipv4Config.subnet", { valueAsNumber: true })}
-        />
-        <Input
-          label="DNS"
-          type="number"
-          description="DNS Server"
-          error={errors.ipv4Config?.dns?.message}
-          {...register("ipv4Config.dns", { valueAsNumber: true })}
-        />
+        {ethMode === Protobuf.Config_NetworkConfig_EthMode.STATIC && (
+          <>
+            <Input
+              label="IP"
+              type="number"
+              description="IP Address"
+              error={errors.ipv4Config?.ip?.message}
+              {...register("ipv4Config.ip", { valueAsNumber: true })}
+            />
+            <Input
+              label="Gateway"
+              type="number"
+              description="Default Gateway"
+              error={errors.ipv4Config?.gateway?.message}
+              {...register("ipv4Config.gateway", { valueAsNumber: true })}
+            />
+            <Input
+              label="Subnet"
+              type="number"
+              description="Subnet Mask"
+              error={errors.ipv4Config?.subnet?.message}
+              {...register("ipv4Config.subnet", { valueAsNumber: true })}
+            />
+            <Input
+              label="DNS"
+              type="number"
+              description="DNS Server"
+              error={errors.ipv4Config?.dns?.message}
+              {...register("ipv4Config.dns", { valueAsNumber: true })}
+            />
+          </>
+        )}
       </FormSection>
       <Input
         label="NTP Server"
