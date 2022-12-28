@@ -27,10 +27,20 @@ export const MapControlls = (): JSX.Element => {
 
       const bounds = bbox(line);
 
-      const center = map?.cameraForBounds([
-        [bounds[1], bounds[0]],
-        [bounds[3], bounds[2]]
-      ]);
+      const center = map?.cameraForBounds(
+        [
+          [bounds[1], bounds[0]],
+          [bounds[3], bounds[2]]
+        ],
+        {
+          padding: {
+            top: 10,
+            bottom: 10,
+            left: 10,
+            right: 10
+          }
+        }
+      );
 
       if (center) {
         map?.easeTo(center);
@@ -45,10 +55,10 @@ export const MapControlls = (): JSX.Element => {
       });
     }
   };
-  
+
   useEffect(() => {
     getBBox();
-  }, [])
+  }, []);
 
   return (
     <div className="absolute right-0 top-0 z-10 m-2 ">
