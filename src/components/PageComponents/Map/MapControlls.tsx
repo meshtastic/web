@@ -8,6 +8,7 @@ import {
   ShareIcon
 } from "@heroicons/react/24/outline";
 import { useDevice } from "@app/core/providers/useDevice.js";
+import { useEffect } from "react";
 
 export const MapControlls = (): JSX.Element => {
   const { current: map } = useMap();
@@ -44,6 +45,10 @@ export const MapControlls = (): JSX.Element => {
       });
     }
   };
+  
+  useEffect(() => {
+    getBBox();
+  }, [])
 
   return (
     <div className="absolute right-0 top-0 z-10 m-2 ">
