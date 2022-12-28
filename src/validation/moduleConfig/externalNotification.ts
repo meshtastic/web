@@ -27,10 +27,10 @@ export class ExternalNotificationValidation
   alertMessage: boolean;
 
   @IsBoolean()
-  alertMessageVibra: boolean
+  alertMessageVibra: boolean;
 
   @IsBoolean()
-  alertMessageBuzzer: boolean
+  alertMessageBuzzer: boolean;
 
   @IsBoolean()
   alertBell: boolean;

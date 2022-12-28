@@ -30,6 +30,7 @@
     "@meshtastic/meshtasticjs": "^0.7.4",
     "@tailwindcss/line-clamp": "^0.4.2",
     "@tailwindcss/typography": "^0.5.8",
+    "@turf/turf": "^6.5.0",
     "base64-js": "^1.5.1",
     "chart.js": "^4.1.1",
     "chartjs-adapter-date-fns": "^3.0.0",
