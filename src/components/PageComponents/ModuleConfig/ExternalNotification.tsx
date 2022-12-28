@@ -80,7 +80,7 @@ export const ExternalNotification = (): JSX.Element => {
       <Input
         type="number"
         label="Output MS"
-        description="Max transmit power in dBm"
+        description="Description"
         suffix="ms"
         disabled={!moduleEnabled}
         {...register("outputMs", {
@@ -90,9 +90,27 @@ export const ExternalNotification = (): JSX.Element => {
       <Input
         type="number"
         label="Output"
-        description="Max transmit power in dBm"
+        description="Description"
         disabled={!moduleEnabled}
         {...register("output", {
+          valueAsNumber: true
+        })}
+      />
+      <Input
+        type="number"
+        label="Output Vibrate"
+        description="Description"
+        disabled={!moduleEnabled}
+        {...register("outputVibra", {
+          valueAsNumber: true
+        })}
+      />
+      <Input
+        type="number"
+        label="Output Buzzer"
+        description="Description"
+        disabled={!moduleEnabled}
+        {...register("outputBuzzer", {
           valueAsNumber: true
         })}
       />
@@ -113,7 +131,31 @@ export const ExternalNotification = (): JSX.Element => {
         control={control}
         render={({ field: { value, ...rest } }) => (
           <Toggle
-            label="Message"
+            label="Alert Message"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="alertMessageVibra"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Alert Message Vibrate"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="alertMessageBuzzer"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Alert Message Buzzer"
             description="Description"
             checked={value}
             {...rest}
@@ -125,7 +167,31 @@ export const ExternalNotification = (): JSX.Element => {
         control={control}
         render={({ field: { value, ...rest } }) => (
           <Toggle
-            label="Bell"
+            label="Alert Bell"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="alertBellVibra"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Alert Bell Vibrate"
+            description="Description"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
+      <Controller
+        name="alertBellBuzzer"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Alert Bell Buzzer"
             description="Description"
             checked={value}
             {...rest}
@@ -143,6 +209,15 @@ export const ExternalNotification = (): JSX.Element => {
             {...rest}
           />
         )}
+      />
+      <Input
+        type="number"
+        label="Nag Timeout"
+        description="Description"
+        disabled={!moduleEnabled}
+        {...register("nagTimeout", {
+          valueAsNumber: true
+        })}
       />
     </Form>
   );
