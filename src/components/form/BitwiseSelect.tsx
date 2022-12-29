@@ -62,10 +62,10 @@ export const BitwiseSelect = ({
         multiple
       >
         <Listbox.Button
-          className={`flex h-10 w-full items-center gap-2 rounded-md border-transparent bg-orange-100 px-3 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500`}
+          className={`bg-orange-100 focus:ring-orange-500 flex h-10 w-full items-center gap-2 rounded-md border-transparent px-3 text-sm focus:border-transparent focus:outline-none focus:ring-2`}
         >
           {decodedSelected.map((option) => (
-            <span className="rounded-md bg-orange-300 p-1">{option}</span>
+            <span className="bg-orange-300 rounded-md p-1">{option}</span>
           ))}
         </Listbox.Button>
         <Listbox.Options>

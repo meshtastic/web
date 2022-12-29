@@ -73,7 +73,7 @@ export const Position = (): JSX.Element => {
         }),
         {
           loading: "Saving...",
-          success: "Saved Channel",
+          success: "Saved Position Config, Restarting Node",
           error: "No response received"
         }
       );
@@ -109,13 +109,17 @@ export const Position = (): JSX.Element => {
       dirty={isDirty}
       onSubmit={onSubmit}
     >
-      <Input
-        suffix="Seconds"
-        label="Broadcast Interval"
-        description="How often your position is sent out over the mesh"
-        type="number"
-        error={errors.positionBroadcastSecs?.message}
-        {...register("positionBroadcastSecs", { valueAsNumber: true })}
+      <Controller
+        name="gpsEnabled"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="GPS Enabled"
+            description="Enable the internal GPS module"
+            checked={value}
+            {...rest}
+          />
+        )}
       />
       <Controller
         name="positionBroadcastSmartEnabled"
@@ -130,103 +134,12 @@ export const Position = (): JSX.Element => {
         )}
       />
       <Controller
-        name="fixedPosition"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Use Fixed Position"
-            description="Don't report GPS position, but a manually-specified one"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <FormSection title="Fixed Position">
-        <Input
-          suffix="m"
-          label="Altitude"
-          type="number"
-          error={errors.fixedAlt?.message}
-          disabled={!fixedPositionEnabled}
-          {...register("fixedAlt", { valueAsNumber: true })}
-        />
-        <Input
-          suffix="°"
-          label="Latitude"
-          type="number"
-          error={errors.fixedLat?.message}
-          disabled={!fixedPositionEnabled}
-          {...register("fixedLat", { valueAsNumber: true })}
-        />
-        <Input
-          suffix="°"
-          label="Longitude"
-          type="number"
-          error={errors.fixedLng?.message}
-          disabled={!fixedPositionEnabled}
-          {...register("fixedLng", { valueAsNumber: true })}
-        />
-      </FormSection>
-      <Controller
-        name="gpsEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="GPS Enabled"
-            description="Enable the internal GPS module"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Input
-        suffix="Seconds"
-        label="GPS Update Interval"
-        description="How often a GPS fix should be acquired"
-        type="number"
-        error={errors.gpsUpdateInterval?.message}
-        {...register("gpsUpdateInterval", { valueAsNumber: true })}
-      />
-      <Input
-        label="Fix Attempt Duration"
-        description="How long the device will try to get a fix for"
-        type="number"
-        error={errors.gpsAttemptTime?.message}
-        {...register("gpsAttemptTime", { valueAsNumber: true })}
-      />
-      <Controller
         name="positionFlags"
         control={control}
         render={({ field, fieldState }): JSX.Element => {
-          const { value, onChange, ...rest } = field;
+          const { value, onChange } = field;
           const { error } = fieldState;
-          // const options = Object.entries(
-          //   Protobuf.Config_PositionConfig_PositionFlags
-          // )
-          //   .filter((value) => typeof value[1] !== "number")
-          //   .filter(
-          //     (value) =>
-          //       parseInt(value[0]) !==
-          //       Protobuf.Config_PositionConfig_PositionFlags.UNSET
-          //   )
-          //   .map((value) => {
-          //     return {
-          //       value: parseInt(value[0]),
-          //       label: value[1].toString().replace("POS_", "").toLowerCase(),
-          //     };
-          //   });
 
-          // const selected = bitwiseDecode(
-          //   value,
-          //   Protobuf.Config_PositionConfig_PositionFlags
-          // ).map((flag) =>
-          //   Protobuf.Config_PositionConfig_PositionFlags[flag]
-          //     .replace("POS_", "")
-          //     .toLowerCase()
-          // );
-          //   onChange={(e: { value: number; label: string }[]): void =>
-          //   onChange(bitwiseEncode(e.map((v) => v.value)))
-          // }
           return (
             <BitwiseSelect
               label="Position Flags"
@@ -239,6 +152,74 @@ export const Position = (): JSX.Element => {
           );
         }}
       />
+      <FormSection title="Fixed Position">
+        <Controller
+          name="fixedPosition"
+          control={control}
+          render={({ field: { value, ...rest } }) => (
+            <Toggle
+              label="Enabled"
+              description="Don't report GPS position, but a manually-specified one"
+              checked={value}
+              {...rest}
+            />
+          )}
+        />
+        {fixedPositionEnabled && (
+          <>
+            <Input
+              suffix="m"
+              label="Altitude"
+              type="number"
+              error={errors.fixedAlt?.message}
+              disabled={!fixedPositionEnabled}
+              {...register("fixedAlt", { valueAsNumber: true })}
+            />
+            <Input
+              suffix="°"
+              label="Latitude"
+              type="number"
+              error={errors.fixedLat?.message}
+              disabled={!fixedPositionEnabled}
+              {...register("fixedLat", { valueAsNumber: true })}
+            />
+            <Input
+              suffix="°"
+              label="Longitude"
+              type="number"
+              error={errors.fixedLng?.message}
+              disabled={!fixedPositionEnabled}
+              {...register("fixedLng", { valueAsNumber: true })}
+            />
+          </>
+        )}
+      </FormSection>
+      <FormSection title="Intervals">
+        <Input
+          suffix="Seconds"
+          label="Broadcast Interval"
+          description="How often your position is sent out over the mesh"
+          type="number"
+          error={errors.positionBroadcastSecs?.message}
+          {...register("positionBroadcastSecs", { valueAsNumber: true })}
+        />
+        <Input
+          suffix="Seconds"
+          label="GPS Update Interval"
+          description="How often a GPS fix should be acquired"
+          type="number"
+          error={errors.gpsUpdateInterval?.message}
+          {...register("gpsUpdateInterval", { valueAsNumber: true })}
+        />
+        <Input
+          suffix="Seconds"
+          label="Fix Attempt Duration"
+          description="How long the device will try to get a fix for"
+          type="number"
+          error={errors.gpsAttemptTime?.message}
+          {...register("gpsAttemptTime", { valueAsNumber: true })}
+        />
+      </FormSection>
       <Input
         label="RX Pin"
         description="GPS Module RX pin override"

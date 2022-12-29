@@ -50,15 +50,11 @@ export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
             />
           </span>
           <IconButton
-            variant="secondary"
-            icon={<PaperAirplaneIcon className="h-4 text-slate-500" />}
+            icon={<PaperAirplaneIcon className="text-slate-500 h-4" />}
           />
         </div>
       </form>
-      <IconButton
-        variant="secondary"
-        icon={<MapPinIcon className="h-4 text-slate-500" />}
-      />
+      <IconButton icon={<MapPinIcon className="text-slate-500 h-4" />} />
     </div>
   );
 };

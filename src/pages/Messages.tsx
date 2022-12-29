@@ -32,7 +32,6 @@ export const MessagesPage = (): JSX.Element => {
         actions={[
           () => (
             <IconButton
-              variant="secondary"
               icon={<PencilIcon className="h-4" />}
               onClick={() => {
                 setActivePage("channels");

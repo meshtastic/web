@@ -1,16 +1,3 @@
-/**
- * Contextual
- * - Reset nodedb
- * - Map commands
- * - Disconnect
- * Debug commands
- * - Re-configure
- * - clear parts of store (messages, positions, telemetry etc)
- *
- * Application
- * - Light/Dark mode
- */
-
 import type React from "react";
 import { Fragment, useEffect, useState } from "react";
 
@@ -47,11 +34,15 @@ import {
   QrCodeIcon,
   QueueListIcon,
   Square3Stack3DIcon,
+  SwatchIcon,
   TrashIcon,
   UsersIcon,
   WindowIcon,
   XCircleIcon
 } from "@heroicons/react/24/outline";
+import { ThemeController } from "../generic/ThemeController.js";
+import { Blur } from "../generic/Blur.js";
+import { accentColor } from "@core/stores/appStore.js";
 
 export interface Group {
   name: string;
@@ -79,7 +70,10 @@ export const CommandPalette = (): JSX.Element => {
     devices,
     setSelectedDevice,
     removeDevice,
-    selectedDevice
+    selectedDevice,
+    darkMode,
+    setDarkMode,
+    setAccent
   } = useAppStore();
   const { getDevices } = useDeviceStore();
 
@@ -276,11 +270,108 @@ export const CommandPalette = (): JSX.Element => {
       icon: WindowIcon,
       commands: [
         {
-          name: "[WIP] Toggle Dark Mode",
+          name: "Toggle Dark Mode",
           icon: MoonIcon,
           action() {
-            alert("This feature is not implemented");
+            setDarkMode(!darkMode);
           }
+        },
+        {
+          name: "Accent Color",
+          icon: SwatchIcon,
+          subItems: [
+            {
+              name: "Red",
+              icon: (
+                <span
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#f25555]" : "bg-[#f28585]"
+                  }`}
+                />
+              ),
+              action() {
+                setAccent("red");
+              }
+            },
+            {
+              name: "Orange",
+              icon: (
+                <span
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#e1720b]" : "bg-[#edb17a]"
+                  }`}
+                />
+              ),
+              action() {
+                setAccent("orange");
+              }
+            },
+            {
+              name: "Yellow",
+              icon: (
+                <span
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#ac8c1a]" : "bg-[#e0cc87]"
+                  }`}
+                />
+              ),
+              action() {
+                setAccent("yellow");
+              }
+            },
+            {
+              name: "Green",
+              icon: (
+                <span
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#27a341]" : "bg-[#8bc9c5]"
+                  }`}
+                />
+              ),
+              action() {
+                setAccent("green");
+              }
+            },
+            {
+              name: "Blue",
+              icon: (
+                <span
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#2093fe]" : "bg-[#70afea]"
+                  }`}
+                />
+              ),
+              action() {
+                setAccent("blue");
+              }
+            },
+            {
+              name: "Purple",
+              icon: (
+                <span
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#926bff]" : "bg-[#a09eef]"
+                  }`}
+                />
+              ),
+              action() {
+                setAccent("purple");
+              }
+            },
+            {
+              name: "Pink",
+              icon: (
+                <span
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#e454c4]" : "bg-[#dba0c7]"
+                  }`}
+                />
+              ),
+              action() {
+                setAccent("pink");
+              }
+            }
+          ]
         }
       ]
     }
@@ -326,43 +417,46 @@ export const CommandPalette = (): JSX.Element => {
         className="relative z-10"
         onClose={setCommandPaletteOpen}
       >
-        <PaletteTransition>
-          <Dialog.Panel className="mx-auto max-w-2xl transform divide-y divide-gray-500 divide-opacity-10 overflow-hidden rounded-xl bg-white  shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
-            <Combobox<Command | string>
-              onChange={(input) => {
-                if (typeof input === "string") {
-                  setQuery(input);
-                } else if (input.action) {
-                  setCommandPaletteOpen(false);
-                  input.action();
-                }
-              }}
-            >
-              <SearchBox setQuery={setQuery} />
+        <ThemeController>
+          <Blur />
+          <PaletteTransition>
+            <Dialog.Panel className="mx-auto max-w-2xl transform overflow-hidden rounded-md bg-backgroundPrimary transition-all">
+              <Combobox<Command | string>
+                onChange={(input) => {
+                  if (typeof input === "string") {
+                    setQuery(input);
+                  } else if (input.action) {
+                    setCommandPaletteOpen(false);
+                    input.action();
+                  }
+                }}
+              >
+                <SearchBox setQuery={setQuery} />
 
-              {query === "" || filtered.length > 0 ? (
-                <Combobox.Options
-                  static
-                  className="max-h-80 scroll-py-2 divide-y divide-gray-500 divide-opacity-10 overflow-y-auto"
-                >
-                  <li className="p-2">
-                    <ul className="flex flex-col gap-2 text-sm text-gray-700">
-                      {filtered.map((group, index) => (
-                        <SearchResult key={index} group={group} />
-                      ))}
-                      {query === "" &&
-                        groups.map((group, index) => (
-                          <GroupView key={index} group={group} />
+                {query === "" || filtered.length > 0 ? (
+                  <Combobox.Options
+                    static
+                    className="max-h-80 scroll-py-2 divide-y divide-opacity-10 overflow-y-auto bg-backgroundSecondary"
+                  >
+                    <li className="p-2">
+                      <ul className="flex flex-col gap-2 text-sm text-textSecondary">
+                        {filtered.map((group, index) => (
+                          <SearchResult key={index} group={group} />
                         ))}
-                    </ul>
-                  </li>
-                </Combobox.Options>
-              ) : (
-                query !== "" && filtered.length === 0 && <NoResults />
-              )}
-            </Combobox>
-          </Dialog.Panel>
-        </PaletteTransition>
+                        {query === "" &&
+                          groups.map((group, index) => (
+                            <GroupView key={index} group={group} />
+                          ))}
+                      </ul>
+                    </li>
+                  </Combobox.Options>
+                ) : (
+                  query !== "" && filtered.length === 0 && <NoResults />
+                )}
+              </Combobox>
+            </Dialog.Panel>
+          </PaletteTransition>
+        </ThemeController>
       </Dialog>
     </Transition.Root>
   );

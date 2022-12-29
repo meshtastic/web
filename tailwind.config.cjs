@@ -15,6 +15,22 @@ module.exports = {
         "monospace"
       ]
     },
+    colors: {
+      transparent: "transparent",
+      current: "currentColor",
+      backgroundPrimary: "var(--backgroundPrimary)",
+      backgroundSecondary: "var(--backgroundSecondary)",
+      accent: "var(--accent)",
+      button: "var(--button)",
+      textPrimary: "var(--textPrimary)",
+      textSecondary: "var(--textSecondary)",
+      link: "var(--link)",
+    },
+    brightness: {
+      hover: "var(--brighnessHover)",
+      press: "var(--brightnessPress)",
+      disabled: "var(--brightnessDisabled)"
+    },
     extend: {}
   },
   plugins: [require("@tailwindcss/forms")]

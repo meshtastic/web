@@ -11,10 +11,10 @@ export const FormSection = ({
 }: FormSectionProps): JSX.Element => {
   return (
     <div className="relative">
-      <h3 className="absolute left-2 -top-2 bg-white px-1 text-lg font-medium">
+      <h3 className="absolute left-2 -top-2 bg-backgroundSecondary px-1 text-lg font-medium text-textPrimary">
         {title}
       </h3>
-      <div className="mt-2 rounded-md border-2 border-orange-200 p-2">
+      <div className="mt-2 rounded-md border-2 border-backgroundPrimary p-2">
         {children}
       </div>
     </div>

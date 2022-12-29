@@ -41,7 +41,6 @@ export const BLE = (): JSX.Element => {
         {bleDevices.map((device, index) => (
           <Button
             key={index}
-            variant="secondary"
             onClick={() => {
               void onConnect(device);
             }}

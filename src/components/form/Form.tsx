@@ -29,23 +29,23 @@ export const Form = ({
 }: FormProps): JSX.Element => {
   return (
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    <form className="w-full" onSubmit={onSubmit} {...props}>
-      <div className="select-none rounded-md bg-gray-700 p-4">
-        <ol className="flex gap-4">
-          <li className="cursor-pointer text-gray-400 hover:text-gray-200">
-            <HomeIcon className="h-5 w-5 flex-shrink-0 text-gray-400" />
+    <form className="w-full px-2" onSubmit={onSubmit} {...props}>
+      <div className="select-none rounded-md bg-backgroundPrimary p-4">
+        <ol className="flex gap-4 text-textSecondary">
+          <li className="cursor-pointer hover:brightness-disabled">
+            <HomeIcon className="h-5 w-5 flex-shrink-0" />
           </li>
           {breadcrumbs.map((breadcrumb, index) => (
             <li key={index} className="flex gap-4">
-              <ChevronRightIcon className="h-5 w-5 flex-shrink-0 text-gray-500" />
-              <span className="cursor-pointer text-sm font-medium text-gray-400 hover:text-gray-200">
+              <ChevronRightIcon className="h-5 w-5 flex-shrink-0 brightness-disabled" />
+              <span className="cursor-pointer text-sm font-medium hover:brightness-disabled">
                 {breadcrumb}
               </span>
             </li>
           ))}
         </ol>
         <div className="mt-2 flex items-center">
-          <h2 className="truncate text-3xl font-bold tracking-tight text-white">
+          <h2 className="text-3xl font-bold tracking-tight text-textPrimary">
             {title}
           </h2>
           <div className="ml-auto flex gap-2">
@@ -54,7 +54,6 @@ export const Form = ({
               onClick={() => {
                 reset();
               }}
-              variant="secondary"
               iconBefore={<ArrowUturnLeftIcon className="w-4" />}
             >
               Reset

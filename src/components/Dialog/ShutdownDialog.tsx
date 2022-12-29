@@ -48,8 +48,7 @@ export const ShutdownDialog = ({
         />
         <Button
           className="w-24"
-          variant="secondary"
-          iconAfter={<PowerIcon className="w-4" />}
+          iconBefore={<PowerIcon className="w-4" />}
           onClick={() => {
             connection?.shutdown({
               time: 0,

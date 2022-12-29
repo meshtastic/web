@@ -1,7 +1,7 @@
 import { toast } from "react-hot-toast";
 
 import type { Device } from "@core/stores/deviceStore.js";
-import { Types } from "@meshtastic/meshtasticjs";
+import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
 export const subscribeAll = (
   device: Device,
@@ -17,7 +17,33 @@ export const subscribeAll = (
   });
 
   connection.onRoutingPacket.subscribe((routingPacket) => {
-    console.log(routingPacket);
+    switch (routingPacket.data.variant.oneofKind) {
+      case "errorReason":
+        if (
+          routingPacket.data.variant.errorReason === Protobuf.Routing_Error.NONE
+        ) {
+          return;
+        }
+        toast.error(
+          `Routing error: ${
+            Protobuf.Routing_Error[routingPacket.data.variant.errorReason]
+          }`,
+          {
+            icon: "❌"
+          }
+        );
+        break;
+      case "routeReply":
+        toast(`Route Reply: ${routingPacket.data.variant.routeReply}`, {
+          icon: "✅"
+        });
+        break;
+      case "routeRequest":
+        toast(`Route Request: ${routingPacket.data.variant.routeRequest}`, {
+          icon: "✅"
+        });
+        break;
+    }
   });
 
   connection.onTelemetryPacket.subscribe((telemetryPacket) => {

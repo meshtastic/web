@@ -3,16 +3,12 @@ import type { ButtonHTMLAttributes } from "react";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "sm" | "md" | "lg";
-  variant?: "primary" | "secondary";
   iconBefore?: JSX.Element;
-  iconAfter?: JSX.Element;
 }
 
 export const Button = ({
   size = "md",
-  variant = "primary",
   iconBefore,
-  iconAfter,
   children,
   disabled,
   className,
@@ -20,11 +16,7 @@ export const Button = ({
 }: ButtonProps): JSX.Element => {
   return (
     <button
-      className={`flex w-full rounded-md border border-transparent px-3 focus:outline-none focus:ring-2 focus:ring-orange-500  ${
-        variant === "primary"
-          ? "bg-orange-600 text-white shadow-sm hover:bg-orange-700"
-          : "bg-orange-200 text-orange-700 hover:bg-orange-300"
-      } ${
+      className={`flex w-full rounded-md bg-button px-3 text-textPrimary hover:brightness-hover focus:outline-none active:brightness-press ${
         size === "sm"
           ? "h-8 text-sm"
           : size === "md"
@@ -32,7 +24,7 @@ export const Button = ({
           : "h-10 text-base"
       } ${
         disabled
-          ? "cursor-not-allowed bg-gray-400 hover:bg-gray-400 focus:ring-gray-500"
+          ? "cursor-not-allowed text-textSecondary brightness-disabled hover:brightness-disabled"
           : ""
       } ${className}`}
       disabled={disabled}
@@ -41,7 +33,6 @@ export const Button = ({
       <div className="m-auto flex shrink-0 items-center gap-2 font-medium">
         {iconBefore}
         {children}
-        {iconAfter}
       </div>
     </button>
   );

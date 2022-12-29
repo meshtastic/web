@@ -8,6 +8,15 @@ export interface RasterSource {
   tileSize: number;
 }
 
+export type accentColor =
+  | "red"
+  | "orange"
+  | "yellow"
+  | "green"
+  | "blue"
+  | "purple"
+  | "pink";
+
 interface AppState {
   selectedDevice: number;
   devices: {
@@ -16,6 +25,8 @@ interface AppState {
   }[];
   rasterSources: RasterSource[];
   commandPaletteOpen: boolean;
+  darkMode: boolean;
+  accent: accentColor;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -25,6 +36,8 @@ interface AppState {
   addDevice: (device: { id: number; num: number }) => void;
   removeDevice: (deviceId: number) => void;
   setCommandPaletteOpen: (open: boolean) => void;
+  setDarkMode: (enabled: boolean) => void;
+  setAccent: (color: accentColor) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -33,6 +46,8 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
+  darkMode: true,
+  accent: "orange",
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -71,6 +86,20 @@ export const useAppStore = create<AppState>()((set) => ({
     set(
       produce<AppState>((draft) => {
         draft.commandPaletteOpen = open;
+      })
+    );
+  },
+  setDarkMode: (enabled: boolean) => {
+    set(
+      produce<AppState>((draft) => {
+        draft.darkMode = enabled;
+      })
+    );
+  },
+  setAccent(color) {
+    set(
+      produce<AppState>((draft) => {
+        draft.accent = color;
       })
     );
   }

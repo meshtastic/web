@@ -518,23 +518,18 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             );
           },
           ackMessage: (channelIndex: number, messageId: number) => {
-            console.log("ack called");
-
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
-                if (device) {
-                  const channel = device.channels.find(
-                    (ch) => ch.config.index === channelIndex
-                  );
-                  if (channel) {
-                    const message = channel.messages.find(
-                      (msg) => msg.packet.id === messageId
-                    );
-                    if (message) {
-                      message.ack = true;
-                    }
-                  }
+
+                const channel = device?.channels.find(
+                  (ch) => ch.config.index === channelIndex
+                );
+                const message = channel?.messages.find(
+                  (msg) => msg.packet.id === messageId
+                );
+                if (message) {
+                  message.ack = true;
                 }
               })
             );

@@ -116,7 +116,7 @@ export const ImportDialog = ({
               {renderOptions(Protobuf.Config_LoRaConfig_RegionCode)}
             </Select>
 
-            <span className="text-md block font-medium text-gray-700">
+            <span className="text-md block font-medium text-textPrimary">
               Channels:
             </span>
             <div className="flex w-40 flex-col gap-1">

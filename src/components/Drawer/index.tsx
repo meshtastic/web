@@ -18,7 +18,7 @@ export const Drawer = (): JSX.Element => {
   ];
   return (
     <Tab.Group>
-      <Tab.List className="flex">
+      <Tab.List className="flex bg-backgroundPrimary">
         {tabs.map((tab, index) => (
           <Tab key={index}>
             {({ selected }) => (
@@ -26,8 +26,10 @@ export const Drawer = (): JSX.Element => {
                 onClick={() => {
                   setDrawerOpen(true);
                 }}
-                className={`flex h-full cursor-pointer px-1 first:pl-2 last:pr-2 hover:bg-orange-200 hover:text-orange-700 ${
-                  selected ? "bg-orange-500 text-white" : "bg-white text-black"
+                className={`flex h-full cursor-pointer border-b-2 px-1 first:pl-2 last:pr-2 hover:text-textPrimary ${
+                  selected
+                    ? "border-accent text-textPrimary"
+                    : "border-backgroundPrimary text-textSecondary"
                 }`}
               >
                 <span className="m-auto select-none">{tab.name}</span>
@@ -43,11 +45,11 @@ export const Drawer = (): JSX.Element => {
             }}
             className="flex cursor-pointer px-2"
           >
-            <div className="m-auto">
+            <div className="m-auto text-textSecondary">
               {drawerOpen ? (
-                <ChevronDownIcon className="h-4 text-gray-700" />
+                <ChevronDownIcon className="h-4" />
               ) : (
-                <ChevronUpIcon className="h-4 text-gray-700" />
+                <ChevronUpIcon className="h-4" />
               )}
             </div>
           </div>

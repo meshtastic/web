@@ -23,21 +23,25 @@ export const TabbedContent = ({
   actions
 }: TabbedContentProps): JSX.Element => {
   return (
-    <Tab.Group as="div" className="flex flex-grow flex-col gap-2 p-4">
-      <Tab.List className="flex gap-4 border-b pb-3">
+    <Tab.Group as="div" className="flex flex-grow flex-col gap-2">
+      <Tab.List className="flex bg-backgroundPrimary">
         {tabs.map((entry, index) => (
-          <Tab key={index}>
+          <Tab key={index} disabled={entry.disabled}>
             {({ selected }) => (
               <div
-                className={`flex h-10 cursor-pointer gap-3 rounded-md px-3 text-sm font-medium ${
+                className={`flex h-10 gap-3 truncate border-b-2 px-3 text-sm font-medium ${
                   selected
-                    ? "bg-gray-100 text-gray-700"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "border-accent text-textPrimary"
+                    : "border-backgroundPrimary text-textSecondary hover:text-textPrimary"
+                } ${
+                  entry.disabled
+                    ? "cursor-not-allowed hover:text-textSecondary"
+                    : "cursor-pointer"
                 }
                    `}
               >
                 {entry.icon && (
-                  <div className="m-auto text-slate-500">{entry.icon}</div>
+                  <div className="text-slate-500 m-auto">{entry.icon}</div>
                 )}
                 <span className="m-auto">{entry.name}</span>
               </div>

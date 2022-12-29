@@ -4,16 +4,17 @@ import { useAppStore } from "@app/core/stores/appStore.js";
 import { useDeviceStore } from "@app/core/stores/deviceStore.js";
 import { Mono } from "@components/generic/Mono.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { MoonIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { IconButton } from "./form/IconButton.js";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
-  const { selectedDevice, setSelectedDevice } = useAppStore();
+  const { selectedDevice, setSelectedDevice, darkMode } = useAppStore();
 
   return (
-    <div className="flex h-full w-16 items-center whitespace-nowrap bg-slate-50 pt-12 [writing-mode:vertical-rl]">
+    <div className="flex h-full w-16 items-center whitespace-nowrap bg-backgroundPrimary pt-12 [writing-mode:vertical-rl]">
       <Mono>Connected Devices</Mono>
-      <span className="mt-6 flex gap-4 font-bold text-slate-900">
+      <span className="mt-6 flex gap-4 font-bold text-textPrimary">
         {getDevices().map((device) => (
           <div
             key={device.id}
@@ -24,10 +25,8 @@ export const DeviceSelector = (): JSX.Element => {
           >
             <Hashicon size={32} value={device.hardware.myNodeNum.toString()} />
             <div
-              className={`absolute -left-1.5 h-7 w-0.5 rounded-full group-hover:bg-orange-300 ${
-                device.id === selectedDevice
-                  ? "bg-orange-400"
-                  : "bg-transparent"
+              className={`absolute -left-1.5 h-7 w-0.5 rounded-full group-hover:bg-accent ${
+                device.id === selectedDevice ? "bg-accent" : "bg-transparent"
               }`}
             />
           </div>
@@ -36,14 +35,17 @@ export const DeviceSelector = (): JSX.Element => {
           onClick={() => {
             setSelectedDevice(0);
           }}
-          className={`h-8 w-8 cursor-pointer rounded-md border-2 border-dashed p-2 hover:border-orange-300 ${
-            selectedDevice === 0 ? "border-orange-400" : "border-slate-200"
+          className={`h-8 w-8 cursor-pointer rounded-md border-2 border-dashed p-2 hover:border-accent ${
+            selectedDevice === 0 ? "border-accent" : "border-textSecondary"
           }`}
         >
           <PlusIcon />
         </div>
       </span>
-      <img src="Logo_Black.svg" className="mt-auto px-3 py-4" />
+      <img
+        src={darkMode ? "Logo_White.svg" : "Logo_Black.svg"}
+        className="mt-auto px-3 py-4"
+      />
     </div>
   );
 };

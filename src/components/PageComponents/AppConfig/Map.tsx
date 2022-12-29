@@ -111,7 +111,6 @@ export const Map = (): JSX.Element => {
             </div>
           ))}
           <Button
-            variant="secondary"
             onClick={() => {
               append({
                 enabled: true,

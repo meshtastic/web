@@ -17,31 +17,31 @@ export const LogsPage = (): JSX.Element => {
 
   return (
     <div className="w-full overflow-y-auto">
-      <div className="overflow-hidden ring-1 ring-black ring-opacity-5">
-        <table className="min-w-full divide-y divide-gray-300">
+      <div className="ring-black overflow-hidden ring-1 ring-opacity-5">
+        <table className="divide-gray-300 min-w-full divide-y">
           <thead className="bg-gray-50">
             <tr>
               <th
                 scope="col"
-                className="py-3.5 pr-3 pl-6 text-left text-sm font-semibold text-gray-900"
+                className="text-gray-900 py-3.5 pr-3 pl-6 text-left text-sm font-semibold"
               >
                 Emitter
               </th>
               <th
                 scope="col"
-                className="py-3.5 text-left text-sm font-semibold text-gray-900"
+                className="text-gray-900 py-3.5 text-left text-sm font-semibold"
               >
                 Level
               </th>
               <th
                 scope="col"
-                className="py-3.5 text-left text-sm font-semibold text-gray-900"
+                className="text-gray-900 py-3.5 text-left text-sm font-semibold"
               >
                 Message
               </th>
               <th
                 scope="col"
-                className="py-3.5 text-left text-sm font-semibold text-gray-900"
+                className="text-gray-900 py-3.5 text-left text-sm font-semibold"
               >
                 Scope
               </th>
@@ -53,18 +53,18 @@ export const LogsPage = (): JSX.Element => {
                 key={index}
                 className={index % 2 === 0 ? undefined : "bg-gray-50"}
               >
-                <td className="whitespace-nowrap py-2 pl-6 text-sm text-gray-500">
+                <td className="text-gray-500 whitespace-nowrap py-2 pl-6 text-sm">
                   <span className="my-auto">{Types.Emitter[log.emitter]}</span>
                 </td>
-                <td className="whitespace-nowrap py-2 text-sm text-gray-500">
-                  <span className="rounded-md bg-slate-200 p-1">
+                <td className="text-gray-500 whitespace-nowrap py-2 text-sm">
+                  <span className="bg-slate-200 rounded-md p-1">
                     <Mono>{[Protobuf.LogRecord_Level[log.level]]}</Mono>
                   </span>
                 </td>
-                <td className="whitespace-nowrap py-2 text-sm text-gray-500">
+                <td className="text-gray-500 whitespace-nowrap py-2 text-sm">
                   <Mono>{log.message}</Mono>
                 </td>
-                <td className="whitespace-nowrap py-2 text-sm text-gray-500">
+                <td className="text-gray-500 whitespace-nowrap py-2 text-sm">
                   {Types.EmitterScope[log.scope]}
                 </td>
               </tr>

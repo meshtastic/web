@@ -15,13 +15,13 @@ export const WaypointMessage = ({
   const waypoint = waypoints.find((wp) => wp.id === waypointID);
 
   return (
-    <div className="ml-4 border-l-2 border-l-slate-200 pl-2">
-      <div className="flex gap-2 rounded-md p-2 shadow-md shadow-orange-300">
-        <MapPinIcon className="m-auto w-6 text-slate-600" />
+    <div className="border-l-slate-200 ml-4 border-l-2 pl-2">
+      <div className="flex gap-2 rounded-md p-2">
+        <MapPinIcon className="text-slate-600 m-auto w-6" />
         <div>
           <div className="flex gap-2">
             <div className="font-bold">{waypoint?.name}</div>
-            <span className="font-mono text-sm text-slate-500">
+            <span className="text-slate-500 font-mono text-sm">
               {toMGRS(waypoint?.latitudeI, waypoint?.longitudeI)}
             </span>
           </div>

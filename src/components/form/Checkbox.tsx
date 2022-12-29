@@ -13,8 +13,10 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           <input
             ref={ref}
             type="checkbox"
-            className={`h-4 w-4 rounded border-transparent bg-orange-100 text-orange-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-              disabled ? "cursor-not-allowed bg-orange-50 text-orange-200" : ""
+            className={`h-4 w-4 rounded border-none bg-backgroundPrimary text-accent focus:outline-none focus:ring-2 focus:ring-accent ${
+              disabled
+                ? "bg-orange-50 cursor-not-allowed text-accent brightness-disabled"
+                : ""
             }`}
             disabled={disabled}
             {...rest}
@@ -23,7 +25,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         <div className="ml-3 text-sm">
           <label
             className={`font-medium  ${
-              disabled ? "text-gray-500" : "text-gray-700"
+              disabled ? "text-textSecondary" : "text-textPrimary"
             }`}
           >
             {label}

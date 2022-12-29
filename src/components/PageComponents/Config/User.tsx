@@ -74,10 +74,10 @@ export const User = (): JSX.Element => {
     >
       <Input
         label="Device ID"
+        disabled
         description="Preset unique identifier for this device."
         error={errors.id?.message}
         {...register("id")}
-        readOnly
       />
       <Input
         label="Device Name"

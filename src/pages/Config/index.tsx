@@ -41,7 +41,6 @@ export const ConfigPage = (): JSX.Element => {
           <Button
             disabled={!pendingSettingsChanges}
             onClick={connection?.commitEditSettings}
-            variant="primary"
           >
             Commit Changes
           </Button>

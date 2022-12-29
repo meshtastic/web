@@ -19,7 +19,7 @@ export const InfoWrapper = ({
     <div className="w-full">
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-textPrimary">
           {label}
         </label>
       )}
@@ -27,13 +27,13 @@ export const InfoWrapper = ({
       {children}
       {error && (
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-          <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+          <ExclamationCircleIcon className="text-red-500 h-5 w-5" />
         </div>
       )}
       {description && (
-        <p className="mt-2 text-sm text-gray-500">{description}</p>
+        <p className="mt-2 text-sm text-textSecondary">{description}</p>
       )}
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="text-red-600 mt-2 text-sm">{error}</p>}
     </div>
   );
 };

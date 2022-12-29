@@ -3,6 +3,7 @@ import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import EnvironmentPlugin from "vite-plugin-environment";
+import { VitePWA } from "vite-plugin-pwa";
 
 import react from "@vitejs/plugin-react";
 
@@ -19,6 +20,12 @@ export default defineConfig({
     react(),
     EnvironmentPlugin({
       COMMIT_HASH: hash
+    }),
+    VitePWA({
+      registerType: "autoUpdate",
+      devOptions: {
+        enabled: true
+      }
     })
   ],
   build: {

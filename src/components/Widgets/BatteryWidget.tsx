@@ -58,19 +58,17 @@ export const BatteryWidget = ({
   }, [hardware.myNodeNum, nodes]);
 
   return (
-    <div className="flex gap-3 overflow-hidden rounded-lg bg-white p-3 shadow">
-      <div className="rounded-md bg-indigo-500 p-3">
-        <Battery100Icon className="h-6 text-white" />
+    <div className="flex gap-3 overflow-hidden rounded-lg bg-backgroundPrimary p-3 text-textSecondary">
+      <div className="rounded-md bg-accent p-3 text-textPrimary">
+        <Battery100Icon className="h-6" />
       </div>
       <div>
-        <p className="truncate text-sm font-medium text-gray-500">
-          Battery State
-        </p>
+        <p className="truncate text-sm font-medium">Battery State</p>
         <div className="flex gap-1">
-          <p className="text-xl font-semibold text-gray-900">{batteryLevel}%</p>
-          <div className={`flex text-sm font-semibold text-orange-600`}>
+          <p className="text-xl font-semibold">{batteryLevel}%</p>
+          <div className="flex text-sm font-semibold">
             <ClockIcon
-              className="text-Orange-500 h-5 w-5 flex-shrink-0 self-center"
+              className="h-5 w-5 flex-shrink-0 self-center"
               aria-hidden="true"
             />
             <span className="my-auto">{timeRemaining}</span>

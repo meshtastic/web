@@ -8,16 +8,14 @@ export interface PositionWidgetProps {
 
 export const PositionWidget = ({ grid }: PositionWidgetProps): JSX.Element => {
   return (
-    <div className="flex gap-3 overflow-hidden rounded-lg bg-white p-3 shadow">
-      <div className="rounded-md bg-rose-500 p-3">
-        <MapPinIcon className="h-6 text-white" />
+    <div className="flex gap-3 overflow-hidden rounded-lg bg-backgroundPrimary p-3 text-textSecondary">
+      <div className="rounded-md bg-accent p-3 text-textPrimary">
+        <MapPinIcon className="text-white h-6" />
       </div>
       <div>
-        <p className="truncate text-sm font-medium text-gray-500">
-          Current Location
-        </p>
+        <p className="truncate text-sm font-medium">Current Location</p>
         <div className="flex gap-1">
-          <p className="text-lg font-semibold text-gray-900">{grid}</p>
+          <p className="text-lg font-semibold">{grid}</p>
         </div>
       </div>
     </div>

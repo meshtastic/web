@@ -14,37 +14,40 @@ import { NewDevice } from "@components/NewDevice.js";
 import { PageNav } from "@components/PageNav.js";
 import { Sidebar } from "@components/Sidebar.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
+import { ThemeController } from "./components/generic/ThemeController.js";
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();
-  const { selectedDevice } = useAppStore();
+  const { selectedDevice, darkMode, accent } = useAppStore();
 
   const device = getDevice(selectedDevice);
 
   return (
-    <div className="flex h-screen w-full">
-      <DeviceSelector />
+    <ThemeController>
+      <div className="flex h-screen w-full bg-backgroundSecondary">
+        <DeviceSelector />
 
-      {device && (
-        <DeviceWrapper device={device}>
-          <CommandPalette />
-          <Toaster
-            toastOptions={{
-              duration: 2000
-            }}
-          />
-          <DialogManager />
-          <Sidebar />
-          <PageNav />
-          <MapProvider>
-            <div className="flex h-full w-full flex-col overflow-y-auto">
-              <PageRouter />
-              <Drawer />
-            </div>
-          </MapProvider>
-        </DeviceWrapper>
-      )}
-      {selectedDevice === 0 && <NewDevice />}
-    </div>
+        {device && (
+          <DeviceWrapper device={device}>
+            <CommandPalette />
+            <Toaster
+              toastOptions={{
+                duration: 4000
+              }}
+            />
+            <DialogManager />
+            <Sidebar />
+            <PageNav />
+            <MapProvider>
+              <div className="flex h-full w-full flex-col overflow-y-auto">
+                <PageRouter />
+                <Drawer />
+              </div>
+            </MapProvider>
+          </DeviceWrapper>
+        )}
+        {selectedDevice === 0 && <NewDevice />}
+      </div>
+    </ThemeController>
   );
 };

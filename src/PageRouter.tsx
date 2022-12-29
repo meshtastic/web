@@ -13,7 +13,7 @@ import { PeersPage } from "@pages/Peers.js";
 export const PageRouter = (): JSX.Element => {
   const { activePage } = useDevice();
   return (
-    <div className="flex-grow border-b">
+    <div className="flex-grow overflow-y-auto">
       {activePage === "messages" && <MessagesPage />}
       {activePage === "map" && <MapPage />}
       {activePage === "extensions" && <ExtensionsPage />}

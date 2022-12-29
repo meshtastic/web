@@ -17,15 +17,15 @@ export const PeersWidget = ({ peers }: PeersWidgetProps): JSX.Element => {
   const { setActivePage } = useDevice();
 
   return (
-    <div className="flex gap-3 overflow-hidden rounded-lg bg-white p-3 shadow">
-      <div className="rounded-md bg-emerald-500 p-3">
-        <UserGroupIcon className="h-6 text-white" />
+    <div className="flex gap-3 overflow-hidden rounded-lg bg-backgroundPrimary p-3 text-textSecondary">
+      <div className="rounded-md bg-accent p-3">
+        <UserGroupIcon className="h-6 text-textPrimary" />
       </div>
       <div>
-        <p className="truncate text-sm font-medium text-gray-500">Peers</p>
+        <p className="truncate text-sm font-medium">Peers</p>
         <div className="flex gap-1">
           {peers.length > 0 ? (
-            <p className="text-lg font-semibold text-gray-900">
+            <p className="text-lg font-semibold">
               {`${peers.length} ${peers.length > 1 ? "Peers" : "Peer"}`}
             </p>
           ) : (
@@ -35,7 +35,6 @@ export const PeersWidget = ({ peers }: PeersWidgetProps): JSX.Element => {
       </div>
       <IconButton
         className="my-auto ml-auto"
-        variant="secondary"
         size="sm"
         onClick={() => {
           setActivePage("peers");

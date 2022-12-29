@@ -30,25 +30,27 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 ) {
   return (
     <InfoWrapper label={label} description={description} error={error}>
-      <div className="relative flex rounded-md shadow-sm">
+      <div className="relative flex rounded-md">
         {prefix && (
-          <span className="inline-flex items-center rounded-l-md border-gray-300 bg-orange-200 px-3 font-mono text-sm">
+          <span className="inline-flex items-center rounded-l-md bg-backgroundPrimary px-3 font-mono text-sm text-textSecondary brightness-hover">
             {prefix}
           </span>
         )}
         <input
           ref={ref}
-          className={`flex h-10 w-full rounded-md border-transparent bg-orange-100 px-3 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+          className={`flex h-10 w-full rounded-md border-none bg-backgroundPrimary px-3 text-sm text-textPrimary focus:outline-none focus:ring-2 focus:ring-accent ${
             prefix ? "rounded-l-none" : ""
           } ${action ? "rounded-r-none" : ""} ${
-            disabled ? "cursor-not-allowed bg-orange-50 text-orange-200" : ""
+            disabled
+              ? "cursor-not-allowed text-textSecondary brightness-disabled hover:brightness-disabled"
+              : ""
           }`}
           disabled={disabled}
           step="any"
           {...rest}
         />
         {suffix && (
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 font-mono">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 font-mono text-textSecondary">
             <span className="text-gray-500 sm:text-sm">{suffix}</span>
           </div>
         )}
@@ -56,14 +58,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           <button
             type="button"
             onClick={action.action}
-            className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md bg-orange-200 px-4 py-2 text-sm font-medium text-orange-700 hover:bg-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="relative -ml-px inline-flex items-center space-x-2 rounded-r-md bg-backgroundPrimary px-4 py-2 text-sm font-medium text-textSecondary brightness-hover hover:text-accent hover:brightness-hover focus:outline-none focus:ring-2 focus:ring-accent active:brightness-press"
           >
             {action.icon}
           </button>
         )}
         {error && (
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-            <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+            <ExclamationCircleIcon className="text-red-500 h-5 w-5" />
           </div>
         )}
       </div>

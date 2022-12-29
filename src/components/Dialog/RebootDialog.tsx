@@ -48,8 +48,7 @@ export const RebootDialog = ({
         />
         <Button
           className="w-24"
-          variant="secondary"
-          iconAfter={<ArrowPathIcon className="w-4" />}
+          iconBefore={<ArrowPathIcon className="w-4" />}
           onClick={() => {
             connection?.reboot({
               time: 0,

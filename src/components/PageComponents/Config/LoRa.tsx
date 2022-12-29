@@ -84,46 +84,47 @@ export const LoRa = (): JSX.Element => {
             />
           )}
         />
-        <Select
-          label="Preset"
-          description="Modem preset to use"
-          disabled={!usePreset}
-          {...register("modemPreset", { valueAsNumber: true })}
-        >
-          {renderOptions(Protobuf.Config_LoRaConfig_ModemPreset)}
-        </Select>
-        <Input
-          label="Bandwidth"
-          description="Channel bandwidth in MHz"
-          type="number"
-          suffix="MHz"
-          error={errors.bandwidth?.message}
-          {...register("bandwidth", {
-            valueAsNumber: true
-          })}
-          disabled={usePreset}
-        />
-        <Input
-          label="Spread Factor"
-          description="Indicates the number of chirps per symbol"
-          type="number"
-          suffix="CPS"
-          error={errors.spreadFactor?.message}
-          {...register("spreadFactor", {
-            valueAsNumber: true
-          })}
-          disabled={usePreset}
-        />
-        <Input
-          label="Coding Rate"
-          description="The denominator of the coding rate"
-          type="number"
-          error={errors.codingRate?.message}
-          {...register("codingRate", {
-            valueAsNumber: true
-          })}
-          disabled={usePreset}
-        />
+        {usePreset ? (
+          <Select
+            label="Preset"
+            description="Modem preset to use"
+            {...register("modemPreset", { valueAsNumber: true })}
+          >
+            {renderOptions(Protobuf.Config_LoRaConfig_ModemPreset)}
+          </Select>
+        ) : (
+          <>
+            <Input
+              label="Bandwidth"
+              description="Channel bandwidth in MHz"
+              type="number"
+              suffix="MHz"
+              error={errors.bandwidth?.message}
+              {...register("bandwidth", {
+                valueAsNumber: true
+              })}
+            />
+            <Input
+              label="Spread Factor"
+              description="Indicates the number of chirps per symbol"
+              type="number"
+              suffix="CPS"
+              error={errors.spreadFactor?.message}
+              {...register("spreadFactor", {
+                valueAsNumber: true
+              })}
+            />
+            <Input
+              label="Coding Rate"
+              description="The denominator of the coding rate"
+              type="number"
+              error={errors.codingRate?.message}
+              {...register("codingRate", {
+                valueAsNumber: true
+              })}
+            />
+          </>
+        )}
       </FormSection>
       <FormSection title="Radio Settings">
         <Controller

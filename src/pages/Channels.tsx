@@ -30,7 +30,6 @@ export const ChannelsPage = (): JSX.Element => {
       actions={[
         () => (
           <Button
-            variant="secondary"
             iconBefore={<ArrowDownOnSquareStackIcon className="w-4" />}
             onClick={() => {
               setImportDialogOpen(true);
@@ -41,7 +40,6 @@ export const ChannelsPage = (): JSX.Element => {
         ),
         () => (
           <Button
-            variant="secondary"
             iconBefore={<QrCodeIcon className="w-4" />}
             onClick={() => {
               setQRDialogOpen(true);

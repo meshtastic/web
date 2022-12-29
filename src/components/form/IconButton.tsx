@@ -4,13 +4,11 @@ import type { ButtonHTMLAttributes } from "react";
 export interface IconButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "sm" | "md" | "lg";
-  variant?: "primary" | "secondary";
   icon?: JSX.Element;
 }
 
 export const IconButton = ({
   size = "md",
-  variant = "primary",
   icon,
   disabled,
   className,
@@ -18,15 +16,13 @@ export const IconButton = ({
 }: IconButtonProps): JSX.Element => {
   return (
     <button
-      className={`flex rounded-md border border-transparent focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-        variant === "primary"
-          ? "bg-orange-600 text-white shadow-sm hover:bg-orange-700"
-          : "bg-orange-200 text-orange-700 hover:bg-orange-300"
-      } ${
+      className={`flex rounded-md bg-button text-textPrimary hover:text-accent hover:brightness-hover focus:outline-none active:brightness-press ${
         size === "sm" ? "h-8 w-8" : size === "md" ? "h-10 w-10" : "h-12 w-12"
-      } ${disabled ? "cursor-not-allowed bg-red-400 focus:ring-red-500" : ""} ${
-        className ?? ""
-      }`}
+      } ${
+        disabled
+          ? "cursor-not-allowed text-textSecondary brightness-disabled hover:brightness-disabled"
+          : ""
+      } ${className ?? ""}`}
       disabled={disabled}
       {...rest}
     >

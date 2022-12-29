@@ -10,7 +10,7 @@ export interface ChannelChatProps {
 }
 
 export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
-  const { nodes, connection, ackMessage } = useDevice();
+  const { nodes } = useDevice();
 
   return (
     <div className="flex flex-grow flex-col">
@@ -31,7 +31,9 @@ export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
           />
         ))}
       </div>
-      <MessageInput channel={channel} />
+      <div className="p-3">
+        <MessageInput channel={channel} />
+      </div>
     </div>
   );
 };
