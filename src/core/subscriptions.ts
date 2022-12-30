@@ -12,11 +12,11 @@ export const subscribeAll = (
   // onLogEvent
   // onMeshHeartbeat
 
-  connection.onDeviceMetadataPacket.subscribe((metadataPacket) => {
+  connection.events.onDeviceMetadataPacket.subscribe((metadataPacket) => {
     device.addDeviceMetadataMessage(metadataPacket);
   });
 
-  connection.onRoutingPacket.subscribe((routingPacket) => {
+  connection.events.onRoutingPacket.subscribe((routingPacket) => {
     switch (routingPacket.data.variant.oneofKind) {
       case "errorReason":
         if (
@@ -46,11 +46,11 @@ export const subscribeAll = (
     }
   });
 
-  connection.onTelemetryPacket.subscribe((telemetryPacket) => {
+  connection.events.onTelemetryPacket.subscribe((telemetryPacket) => {
     device.setMetrics(telemetryPacket);
   });
 
-  connection.onDeviceStatus.subscribe((status) => {
+  connection.events.onDeviceStatus.subscribe((status) => {
     device.setStatus(status);
 
     if (status === Types.DeviceStatusEnum.DEVICE_CONFIGURED) {
@@ -60,7 +60,7 @@ export const subscribeAll = (
     }
   });
 
-  connection.onWaypointPacket.subscribe((waypoint) => {
+  connection.events.onWaypointPacket.subscribe((waypoint) => {
     const { data, ...rest } = waypoint;
     device.addWaypoint(data);
     device.addWaypointMessage({
@@ -70,48 +70,48 @@ export const subscribeAll = (
     });
   });
 
-  connection.onMyNodeInfo.subscribe((nodeInfo) => {
+  connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
     device.setHardware(nodeInfo);
     myNodeNum = nodeInfo.myNodeNum;
   });
 
-  connection.onUserPacket.subscribe((user) => {
+  connection.events.onUserPacket.subscribe((user) => {
     device.addUser(user);
   });
 
-  connection.onPositionPacket.subscribe((position) => {
+  connection.events.onPositionPacket.subscribe((position) => {
     device.addPosition(position);
   });
 
-  connection.onNodeInfoPacket.subscribe((nodeInfo) => {
+  connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
     toast(`New Node Discovered: ${nodeInfo.data.user?.shortName ?? "UNK"}`, {
       icon: "🔎"
     });
     device.addNodeInfo(nodeInfo);
   });
 
-  connection.onChannelPacket.subscribe((channel) => {
+  connection.events.onChannelPacket.subscribe((channel) => {
     device.addChannel({
       config: channel.data,
       lastInterraction: new Date(),
       messages: []
     });
   });
-  connection.onConfigPacket.subscribe((config) => {
+  connection.events.onConfigPacket.subscribe((config) => {
     device.setConfig(config.data);
   });
-  connection.onModuleConfigPacket.subscribe((moduleConfig) => {
+  connection.events.onModuleConfigPacket.subscribe((moduleConfig) => {
     device.setModuleConfig(moduleConfig.data);
   });
 
-  connection.onMessagePacket.subscribe((messagePacket) => {
+  connection.events.onMessagePacket.subscribe((messagePacket) => {
     device.addMessage({
       ...messagePacket,
       ack: messagePacket.packet.from !== myNodeNum
     });
   });
 
-  connection.onPendingSettingsChange.subscribe((state) => {
+  connection.events.onPendingSettingsChange.subscribe((state) => {
     device.setPendingSettingsChanges(state);
   });
 };

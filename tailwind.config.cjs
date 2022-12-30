@@ -24,7 +24,7 @@ module.exports = {
       button: "var(--button)",
       textPrimary: "var(--textPrimary)",
       textSecondary: "var(--textSecondary)",
-      link: "var(--link)",
+      link: "var(--link)"
     },
     brightness: {
       hover: "var(--brighnessHover)",

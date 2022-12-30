@@ -16,7 +16,7 @@ export const InfoPage = (): JSX.Element => {
 
   const [serialLogs, setSerialLogs] = useState<string>("");
 
-  connection?.onDeviceDebugLog.subscribe((packet) => {
+  connection?.events.onDeviceDebugLog.subscribe((packet) => {
     setSerialLogs(serialLogs + new TextDecoder().decode(packet));
   });
 

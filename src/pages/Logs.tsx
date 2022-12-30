@@ -10,7 +10,7 @@ export const LogsPage = (): JSX.Element => {
   const [logs, setLogs] = useState<Types.LogEvent[]>([]);
 
   useEffect(() => {
-    connection?.onLogEvent.subscribe((log) => {
+    connection?.events.onLogEvent.subscribe((log) => {
       setLogs([...logs, log]);
     });
   }, [connection, setLogs, logs]);
