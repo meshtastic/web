@@ -54,6 +54,7 @@ export interface Command {
   icon: (props: React.ComponentProps<"svg">) => JSX.Element;
   action?: () => void;
   subItems?: SubItem[];
+  tags?: string[];
 }
 
 export interface SubItem {
@@ -117,7 +118,8 @@ export const CommandPalette = (): JSX.Element => {
           icon: Cog8ToothIcon,
           action() {
             setActivePage("config");
-          }
+          },
+          tags: ["settings"]
         },
         {
           name: "Channels",
@@ -397,9 +399,24 @@ export const CommandPalette = (): JSX.Element => {
             return {
               ...group,
               commands: group.commands.filter((command) => {
-                return `${group.name} ${command.name}`
+                const nameIncludes = `${group.name} ${command.name}`
                   .toLowerCase()
                   .includes(query.toLowerCase());
+
+                const tagsInclude = (
+                  command.tags
+                    ?.map((t) => t.includes(query.toLowerCase()))
+                    .filter(Boolean) ?? []
+                ).length;
+
+                const subItemsInclude = (
+                  command.subItems
+                    ?.map((s) =>
+                      s.name.toLowerCase().includes(query.toLowerCase())
+                    )
+                    .filter(Boolean) ?? []
+                ).length;
+                return nameIncludes || tagsInclude || subItemsInclude;
               })
             };
           })
