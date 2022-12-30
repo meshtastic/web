@@ -34,18 +34,16 @@ export const Device = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setConfig({
-          config: {
-            payloadVariant: {
-              oneofKind: "device",
-              device: data
+        connection
+          .setConfig({
+            config: {
+              payloadVariant: {
+                oneofKind: "device",
+                device: data
+              }
             }
-          },
-          callback: async () => {
-            reset({ ...data });
-            await Promise.resolve();
-          }
-        }),
+          })
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved Device Config, Restarting Node",

@@ -31,18 +31,16 @@ export const Serial = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig({
-          moduleConfig: {
-            payloadVariant: {
-              oneofKind: "serial",
-              serial: data
+        connection
+          .setModuleConfig({
+            moduleConfig: {
+              payloadVariant: {
+                oneofKind: "serial",
+                serial: data
+              }
             }
-          },
-          callback: async () => {
-            reset({ ...data });
-            await Promise.resolve();
-          }
-        }),
+          })
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved Serial Config, Restarting Node",

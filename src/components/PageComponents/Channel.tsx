@@ -65,25 +65,23 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setChannel({
-          channel: {
-            role:
-              channel?.role === Protobuf.Channel_Role.PRIMARY
-                ? Protobuf.Channel_Role.PRIMARY
-                : data.enabled
-                ? Protobuf.Channel_Role.SECONDARY
-                : Protobuf.Channel_Role.DISABLED,
-            index: channel?.index,
-            settings: {
-              ...data,
-              psk: toByteArray(data.psk ?? "")
+        connection
+          .setChannel({
+            channel: {
+              role:
+                channel?.role === Protobuf.Channel_Role.PRIMARY
+                  ? Protobuf.Channel_Role.PRIMARY
+                  : data.enabled
+                  ? Protobuf.Channel_Role.SECONDARY
+                  : Protobuf.Channel_Role.DISABLED,
+              index: channel?.index,
+              settings: {
+                ...data,
+                psk: toByteArray(data.psk ?? "")
+              }
             }
-          },
-          callback: (): Promise<void> => {
-            reset({ ...data });
-            return Promise.resolve();
-          }
-        }),
+          })
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved Channel",

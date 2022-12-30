@@ -31,18 +31,19 @@ export const Telemetry = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig({
-          moduleConfig: {
-            payloadVariant: {
-              oneofKind: "telemetry",
-              telemetry: data
+        connection
+          .setModuleConfig({
+            moduleConfig: {
+              payloadVariant: {
+                oneofKind: "telemetry",
+                telemetry: data
+              }
             }
-          },
-          callback: async () => {
+          })
+          .then(async () => {
             reset({ ...data });
             await Promise.resolve();
-          }
-        }),
+          }),
         {
           loading: "Saving...",
           success: "Saved Telemetry Config, Restarting Node",

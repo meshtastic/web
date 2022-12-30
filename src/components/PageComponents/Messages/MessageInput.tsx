@@ -14,7 +14,7 @@ export interface MessageInputProps {
 }
 
 export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
-  const { connection, ackMessage } = useDevice();
+  const { connection, setMessageState } = useDevice();
 
   const { register, handleSubmit } = useForm<{
     message: string;
@@ -24,16 +24,17 @@ export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
     }
   });
 
-  const onSubmit = handleSubmit((data) => {
-    void connection?.sendText({
-      text: data.message,
-      wantAck: true,
-      channel: channel.config.index as Types.ChannelNumber,
-      callback: (id) => {
-        ackMessage(channel.config.index, id);
-        return Promise.resolve();
-      }
-    });
+  const onSubmit = handleSubmit(async (data) => {
+    await connection
+      ?.sendText({
+        text: data.message,
+        wantAck: true,
+        channel: channel.config.index as Types.ChannelNumber
+      })
+      .then((id) => setMessageState(channel.config.index, id, "ack"))
+      .catch((e: Types.PacketError) =>
+        setMessageState(channel.config.index, e.id, e.error)
+      );
   });
 
   return (

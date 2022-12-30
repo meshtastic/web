@@ -42,13 +42,11 @@ export const User = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection && myNode?.data.user) {
       void toast.promise(
-        connection.setOwner({
-          owner: { ...myNode.data.user, ...data },
-          callback: async () => {
-            reset({ ...data });
-            await Promise.resolve();
-          }
-        }),
+        connection
+          .setOwner({
+            owner: { ...myNode.data.user, ...data }
+          })
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved User, Restarting Node",

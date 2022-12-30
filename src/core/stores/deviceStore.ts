@@ -15,16 +15,19 @@ export type Page =
   | "info"
   | "logs";
 
-export interface MessageWithAck extends Types.MessagePacket {
-  ack: boolean;
+export interface MessageWithState extends Types.MessagePacket {
+  state: MessageState;
 }
 
-export interface WaypointIDWithAck extends Omit<Types.WaypointPacket, "data"> {
+export interface WaypointIDWithState
+  extends Omit<Types.WaypointPacket, "data"> {
   waypointID: number;
-  ack: boolean;
+  state: MessageState;
 }
 
-export type AllMessageTypes = MessageWithAck | WaypointIDWithAck;
+export type AllMessageTypes = MessageWithState | WaypointIDWithState;
+
+export type MessageState = "ack" | "waiting" | Protobuf.Routing_Error;
 
 export interface Channel {
   config: Protobuf.Channel;
@@ -77,10 +80,14 @@ export interface Device {
   addUser: (user: Types.UserPacket) => void;
   addPosition: (position: Types.PositionPacket) => void;
   addConnection: (connection: Types.ConnectionType) => void;
-  addMessage: (message: MessageWithAck) => void;
-  addWaypointMessage: (message: WaypointIDWithAck) => void;
+  addMessage: (message: MessageWithState) => void;
+  addWaypointMessage: (message: WaypointIDWithState) => void;
   addDeviceMetadataMessage: (metadata: Types.DeviceMetadataPacket) => void;
-  ackMessage: (channelIndex: number, messageId: number) => void;
+  setMessageState: (
+    channelIndex: number,
+    messageId: number,
+    state: MessageState
+  ) => void;
   setImportDialogOpen: (open: boolean) => void;
   setQRDialogOpen: (open: boolean) => void;
   setShutdownDialogOpen: (open: boolean) => void;
@@ -517,7 +524,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               })
             );
           },
-          ackMessage: (channelIndex: number, messageId: number) => {
+          setMessageState: (
+            channelIndex: number,
+            messageId: number,
+            state: MessageState
+          ) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -529,7 +540,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   (msg) => msg.packet.id === messageId
                 );
                 if (message) {
-                  message.ack = true;
+                  message.state = state;
                 }
               })
             );

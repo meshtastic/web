@@ -31,18 +31,16 @@ export const RangeTest = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig({
-          moduleConfig: {
-            payloadVariant: {
-              oneofKind: "rangeTest",
-              rangeTest: data
+        connection
+          .setModuleConfig({
+            moduleConfig: {
+              payloadVariant: {
+                oneofKind: "rangeTest",
+                rangeTest: data
+              }
             }
-          },
-          callback: async () => {
-            reset({ ...data });
-            await Promise.resolve();
-          }
-        }),
+          })
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved Range Test Config, Restarting Node",

@@ -31,17 +31,19 @@ export const Message = ({
 
   return lastMsgSameUser ? (
     <div className="ml-4 flex">
-      {message.ack ? (
+      {message.state === "ack" ? (
         <CheckCircleIcon className="my-auto h-4 text-textSecondary" />
-      ) : (
+      ) : message.state === "waiting" ? (
         <EllipsisHorizontalCircleIcon className="my-auto h-4 text-textSecondary" />
+      ) : (
+        <ExclamationCircleIcon className="my-auto h-4 text-textSecondary" />
       )}
       {"waypointID" in message ? (
         <WaypointMessage waypointID={message.waypointID} />
       ) : (
         <span
           className={`ml-4 border-l-2 border-l-backgroundPrimary pl-2 ${
-            message.ack ? "text-textPrimary" : "text-textSecondary"
+            message.state === "ack" ? "text-textPrimary" : "text-textSecondary"
           }`}
         >
           {message.text}
@@ -69,17 +71,21 @@ export const Message = ({
       </div>
       <div className="flex">
         {/* <ExclamationCircleIcon /> */}
-        {message.ack ? (
+        {message.state === "ack" ? (
           <CheckCircleIcon className="my-auto h-4 text-textSecondary" />
-        ) : (
+        ) : message.state === "waiting" ? (
           <EllipsisHorizontalCircleIcon className="my-auto h-4 text-textSecondary" />
+        ) : (
+          <ExclamationCircleIcon className="my-auto h-4 text-textSecondary" />
         )}
         {"waypointID" in message ? (
           <WaypointMessage waypointID={message.waypointID} />
         ) : (
           <span
             className={`ml-4 border-l-2 border-l-backgroundPrimary pl-2 ${
-              message.ack ? "text-textPrimary" : "text-textSecondary"
+              message.state === "ack"
+                ? "text-textPrimary"
+                : "text-textSecondary"
             }`}
           >
             {message.text}

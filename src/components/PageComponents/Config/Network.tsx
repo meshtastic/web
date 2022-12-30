@@ -63,13 +63,9 @@ export const Network = (): JSX.Element => {
                 oneofKind: "network",
                 network: Protobuf.Config_NetworkConfig.create(data)
               }
-            },
-            callback: async () => {
-              reset({ ...data });
-              await Promise.resolve();
             }
           })
-          .catch((e) => console.log(e)),
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved Network Config, Restarting Node",

@@ -35,18 +35,16 @@ export const Bluetooth = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setConfig({
-          config: {
-            payloadVariant: {
-              oneofKind: "bluetooth",
-              bluetooth: data
+        connection
+          .setConfig({
+            config: {
+              payloadVariant: {
+                oneofKind: "bluetooth",
+                bluetooth: data
+              }
             }
-          },
-          callback: async () => {
-            reset({ ...data });
-            await Promise.resolve();
-          }
-        }),
+          })
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved Bluetooth Config, Restarting Node",

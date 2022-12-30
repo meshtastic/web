@@ -36,13 +36,11 @@ export const RebootDialog = ({
           action={{
             icon: <ClockIcon className="w-4" />,
             action() {
-              connection?.reboot({
-                time: time * 60,
-                callback: async () => {
-                  setRebootDialogOpen(false);
-                  await Promise.resolve();
-                }
-              });
+              connection
+                ?.reboot({
+                  time: time * 60
+                })
+                .then(() => setRebootDialogOpen(false));
             }
           }}
         />
@@ -50,13 +48,11 @@ export const RebootDialog = ({
           className="w-24"
           iconBefore={<ArrowPathIcon className="w-4" />}
           onClick={() => {
-            connection?.reboot({
-              time: 0,
-              callback: async () => {
-                setRebootDialogOpen(false);
-                await Promise.resolve();
-              }
-            });
+            connection
+              ?.reboot({
+                time: 0
+              })
+              .then(() => setRebootDialogOpen(false));
           }}
         >
           Now

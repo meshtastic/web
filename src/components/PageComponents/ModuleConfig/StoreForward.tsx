@@ -31,18 +31,16 @@ export const StoreForward = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig({
-          moduleConfig: {
-            payloadVariant: {
-              oneofKind: "storeForward",
-              storeForward: data
+        connection
+          .setModuleConfig({
+            moduleConfig: {
+              payloadVariant: {
+                oneofKind: "storeForward",
+                storeForward: data
+              }
             }
-          },
-          callback: async () => {
-            reset({ ...data });
-            await Promise.resolve();
-          }
-        }),
+          })
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved Store & Forward Config, Restarting Node",

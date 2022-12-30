@@ -36,13 +36,11 @@ export const ShutdownDialog = ({
           action={{
             icon: <ClockIcon className="w-4" />,
             action() {
-              connection?.shutdown({
-                time: time * 60,
-                callback: async () => {
-                  setShutdownDialogOpen(false);
-                  await Promise.resolve();
-                }
-              });
+              connection
+                ?.shutdown({
+                  time: time * 60
+                })
+                .then(() => setShutdownDialogOpen(false));
             }
           }}
         />
@@ -50,13 +48,11 @@ export const ShutdownDialog = ({
           className="w-24"
           iconBefore={<PowerIcon className="w-4" />}
           onClick={() => {
-            connection?.shutdown({
-              time: 0,
-              callback: async () => {
-                setShutdownDialogOpen(false);
-                await Promise.resolve();
-              }
-            });
+            connection
+              ?.shutdown({
+                time: 0
+              })
+              .then(() => setShutdownDialogOpen(false));
           }}
         >
           Now

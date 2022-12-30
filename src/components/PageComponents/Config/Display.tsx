@@ -34,18 +34,16 @@ export const Display = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setConfig({
-          config: {
-            payloadVariant: {
-              oneofKind: "display",
-              display: data
+        connection
+          .setConfig({
+            config: {
+              payloadVariant: {
+                oneofKind: "display",
+                display: data
+              }
             }
-          },
-          callback: async () => {
-            reset({ ...data });
-            await Promise.resolve();
-          }
-        }),
+          })
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved Display Config, Restarting Node",

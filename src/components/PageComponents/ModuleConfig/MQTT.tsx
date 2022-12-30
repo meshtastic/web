@@ -37,18 +37,16 @@ export const MQTT = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setModuleConfig({
-          moduleConfig: {
-            payloadVariant: {
-              oneofKind: "mqtt",
-              mqtt: data
+        connection
+          .setModuleConfig({
+            moduleConfig: {
+              payloadVariant: {
+                oneofKind: "mqtt",
+                mqtt: data
+              }
             }
-          },
-          callback: async () => {
-            reset({ ...data });
-            await Promise.resolve();
-          }
-        }),
+          })
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved MQTT Config, Restarting Node",

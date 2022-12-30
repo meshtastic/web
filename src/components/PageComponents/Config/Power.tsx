@@ -32,18 +32,16 @@ export const Power = (): JSX.Element => {
   const onSubmit = handleSubmit((data) => {
     if (connection) {
       void toast.promise(
-        connection.setConfig({
-          config: {
-            payloadVariant: {
-              oneofKind: "power",
-              power: data
+        connection
+          .setConfig({
+            config: {
+              payloadVariant: {
+                oneofKind: "power",
+                power: data
+              }
             }
-          },
-          callback: async () => {
-            reset({ ...data });
-            await Promise.resolve();
-          }
-        }),
+          })
+          .then(() => reset({ ...data })),
         {
           loading: "Saving...",
           success: "Saved Power Config, Restarting Node",

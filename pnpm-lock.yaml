@@ -6,7 +6,7 @@ specifiers:
   '@heroicons/react': ^2.0.13
   '@hookform/error-message': ^2.0.1
   '@hookform/resolvers': ^2.9.10
-  '@meshtastic/meshtasticjs': ^0.7.5
+  '@meshtastic/meshtasticjs': ^0.9.1
   '@tailwindcss/forms': ^0.5.3
   '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.8
@@ -49,12 +49,11 @@ specifiers:
   react-hook-form: ^7.41.2
   react-hot-toast: ^2.4.0
   react-icons: ^4.7.1
-  react-json-pretty: ^2.2.0
   react-json-tree: ^0.17.0
   react-map-gl: ^7.0.20
   react-qrcode-logo: ^2.8.0
   rfc4648: ^1.5.2
-  rollup-plugin-visualizer: ^5.8.3
+  rollup-plugin-visualizer: ^5.9.0
   tailwindcss: ^3.2.4
   tar: ^6.1.13
   tslib: ^2.4.1
@@ -71,7 +70,7 @@ dependencies:
   '@heroicons/react': 2.0.13_react@18.2.0
   '@hookform/error-message': 2.0.1_33unso2ocv5y5ix74fsplqd6ny
   '@hookform/resolvers': 2.9.10_react-hook-form@7.41.2
-  '@meshtastic/meshtasticjs': 0.7.5
+  '@meshtastic/meshtasticjs': 0.9.1
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.4
   '@tailwindcss/typography': 0.5.8_tailwindcss@3.2.4
   '@turf/turf': 6.5.0
@@ -92,7 +91,6 @@ dependencies:
   react-hook-form: 7.41.2_react@18.2.0
   react-hot-toast: 2.4.0_biqbaboplfbrettd7655fr4n2y
   react-icons: 4.7.1_react@18.2.0
-  react-json-pretty: 2.2.0_biqbaboplfbrettd7655fr4n2y
   react-json-tree: 0.17.0_kzbn2opkn2327fwg5yzwzya5o4
   react-map-gl: 7.0.20_6eczaga5xxiwzxtfiyk6fioasq
   react-qrcode-logo: 2.8.0_biqbaboplfbrettd7655fr4n2y
@@ -122,7 +120,7 @@ devDependencies:
   postcss: 8.4.20
   prettier: 2.8.1
   prettier-plugin-tailwindcss: 0.2.1_prettier@2.8.1
-  rollup-plugin-visualizer: 5.8.3
+  rollup-plugin-visualizer: 5.9.0
   tailwindcss: 3.2.4_postcss@8.4.20
   tar: 6.1.13
   tslib: 2.4.1
@@ -1252,7 +1250,7 @@ packages:
       babel-plugin-polyfill-corejs2: 0.3.3_@babel+core@7.20.7
       babel-plugin-polyfill-corejs3: 0.6.0_@babel+core@7.20.7
       babel-plugin-polyfill-regenerator: 0.4.1_@babel+core@7.20.7
-      core-js-compat: 3.27.0
+      core-js-compat: 3.27.1
       semver: 6.3.0
     transitivePeerDependencies:
       - supports-color
@@ -1712,8 +1710,8 @@ packages:
     engines: {node: '>=6.0.0'}
     dev: false
 
-  /@meshtastic/meshtasticjs/0.7.5:
-    resolution: {integrity: sha512-t4Yk/uf84WI3oia+ktZy35hlBZXKVQHm2suqGIlwewl6eFcRqi0dYHzSVugyYqs4vjOEmT5vZVpy9UZbyb/DTQ==}
+  /@meshtastic/meshtasticjs/0.9.1:
+    resolution: {integrity: sha512-BYTqcH/ArIr82EpYW23Y2cwvkWoKgNJAdjU21L8SUt9HjuVUNzeJOxieASINqLEWLFbcnOf7G5owmN2rKCSkLA==}
     dependencies:
       '@protobuf-ts/runtime': 2.8.2
       glob: 8.0.3
@@ -3386,7 +3384,7 @@ packages:
     dependencies:
       '@babel/core': 7.20.7
       '@babel/helper-define-polyfill-provider': 0.3.3_@babel+core@7.20.7
-      core-js-compat: 3.27.0
+      core-js-compat: 3.27.1
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3653,8 +3651,8 @@ packages:
     resolution: {integrity: sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A==}
     dev: true
 
-  /core-js-compat/3.27.0:
-    resolution: {integrity: sha512-spN2H4E/wocMML7XtbKuqttHHM+zbF3bAdl9mT4/iyFaF33bowQGjxiWNWyvUJGH9F+hTgnhWziiLtwu3oC/Qg==}
+  /core-js-compat/3.27.1:
+    resolution: {integrity: sha512-Dg91JFeCDA17FKnneN7oCMz4BkQ4TcffkgHP4OWwp9yx3pi7ubqMDXXSacfNak1PQqjc95skyt+YBLHQJnkJwA==}
     dependencies:
       browserslist: 4.21.4
     dev: true
@@ -5755,17 +5753,6 @@ packages:
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
-  /react-json-pretty/2.2.0_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-3UMzlAXkJ4R8S4vmkRKtvJHTewG4/rn1Q18n0zqdu/ipZbUPLVZD+QwC7uVcD/IAY3s8iNVHlgR2dMzIUS0n1A==}
-    peerDependencies:
-      react: '>=15.0'
-      react-dom: '>=15.0'
-    dependencies:
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-    dev: false
-
   /react-json-tree/0.17.0_kzbn2opkn2327fwg5yzwzya5o4:
     resolution: {integrity: sha512-hcWjibI/fAvsKnfYk+lka5OrE1Lvb1jH5pSnFhIU5T8cCCxB85r6h/NOzDPggSSgErjmx4rl3+2EkeclIKBOhg==}
     peerDependencies:
@@ -6010,8 +5997,8 @@ packages:
       terser: 5.16.1
     dev: true
 
-  /rollup-plugin-visualizer/5.8.3:
-    resolution: {integrity: sha512-QGJk4Bqe4AOat5AjipOh8esZH1nck5X2KFpf4VytUdSUuuuSwvIQZjMGgjcxe/zXexltqaXp5Vx1V3LmnQH15Q==}
+  /rollup-plugin-visualizer/5.9.0:
+    resolution: {integrity: sha512-bbDOv47+Bw4C/cgs0czZqfm8L82xOZssk4ayZjG40y9zbXclNk7YikrZTDao6p7+HDiGxrN0b65SgZiVm9k1Cg==}
     engines: {node: '>=14'}
     hasBin: true
     peerDependencies:
@@ -6021,6 +6008,7 @@ packages:
         optional: true
     dependencies:
       open: 8.4.0
+      picomatch: 2.3.1
       source-map: 0.7.4
       yargs: 17.6.2
     dev: true

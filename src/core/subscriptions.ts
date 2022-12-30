@@ -65,7 +65,7 @@ export const subscribeAll = (
     device.addWaypoint(data);
     device.addWaypointMessage({
       waypointID: data.id,
-      ack: rest.packet.from !== myNodeNum,
+      state: rest.packet.from !== myNodeNum ? "ack" : "waiting",
       ...rest
     });
   });
@@ -107,7 +107,7 @@ export const subscribeAll = (
   connection.events.onMessagePacket.subscribe((messagePacket) => {
     device.addMessage({
       ...messagePacket,
-      ack: messagePacket.packet.from !== myNodeNum
+      state: messagePacket.packet.from !== myNodeNum ? "ack" : "waiting"
     });
   });
 

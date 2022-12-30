@@ -20,13 +20,13 @@ export default defineConfig({
     react(),
     EnvironmentPlugin({
       COMMIT_HASH: hash
-    }),
-    VitePWA({
-      registerType: "autoUpdate",
-      devOptions: {
-        enabled: true
-      }
     })
+    // VitePWA({
+    //   registerType: "autoUpdate",
+    //   devOptions: {
+    //     enabled: true
+    //   }
+    // })
   ],
   build: {
     target: "esnext",

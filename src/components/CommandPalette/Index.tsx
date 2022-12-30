@@ -214,7 +214,7 @@ export const CommandPalette = (): JSX.Element => {
           icon: TrashIcon,
           action() {
             if (connection) {
-              void toast.promise(connection.resetPeers({}), {
+              void toast.promise(connection.resetPeers(), {
                 loading: "Resetting...",
                 success: "Succesfully reset peers",
                 error: "No response received"
