@@ -1,11 +1,12 @@
-import { IsBoolean, Length } from "class-validator";
+import { IsBoolean, IsOptional, IsString, Length } from "class-validator";
 
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class UserValidation
   implements Omit<Protobuf.User, "macaddr" | "hwModel">
 {
-  @Length(2, 30)
+  @IsString()
+  @IsOptional()
   id: string;
 
   @Length(2, 30)
