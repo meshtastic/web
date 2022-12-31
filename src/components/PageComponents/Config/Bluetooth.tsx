@@ -15,7 +15,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Bluetooth = (): JSX.Element => {
-  const { config, connection } = useDevice();
+  const { config, connection, setConfig } = useDevice();
 
   const {
     register,
@@ -44,7 +44,14 @@ export const Bluetooth = (): JSX.Element => {
               }
             }
           })
-          .then(() => reset({ ...data })),
+          .then(() =>
+            setConfig({
+              payloadVariant: {
+                oneofKind: "bluetooth",
+                bluetooth: data
+              }
+            })
+          ),
         {
           loading: "Saving...",
           success: "Saved Bluetooth Config, Restarting Node",

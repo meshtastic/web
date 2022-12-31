@@ -12,7 +12,7 @@ import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const StoreForward = (): JSX.Element => {
-  const { moduleConfig, connection } = useDevice();
+  const { moduleConfig, connection, setModuleConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -40,7 +40,14 @@ export const StoreForward = (): JSX.Element => {
               }
             }
           })
-          .then(() => reset({ ...data })),
+          .then(() =>
+            setModuleConfig({
+              payloadVariant: {
+                oneofKind: "storeForward",
+                storeForward: data
+              }
+            })
+          ),
         {
           loading: "Saving...",
           success: "Saved Store & Forward Config, Restarting Node",

@@ -12,7 +12,7 @@ import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const ExternalNotification = (): JSX.Element => {
-  const { moduleConfig, connection } = useDevice();
+  const { moduleConfig, connection, setModuleConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -39,7 +39,14 @@ export const ExternalNotification = (): JSX.Element => {
               }
             }
           })
-          .then(() => reset({ ...data })),
+          .then(() =>
+            setModuleConfig({
+              payloadVariant: {
+                oneofKind: "externalNotification",
+                externalNotification: data
+              }
+            })
+          ),
         {
           loading: "Saving...",
           success: "Saved External Notification Config, Restarting Node",

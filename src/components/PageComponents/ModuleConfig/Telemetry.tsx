@@ -12,7 +12,7 @@ import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const Telemetry = (): JSX.Element => {
-  const { moduleConfig, connection } = useDevice();
+  const { moduleConfig, connection, setModuleConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -40,10 +40,14 @@ export const Telemetry = (): JSX.Element => {
               }
             }
           })
-          .then(async () => {
-            reset({ ...data });
-            await Promise.resolve();
-          }),
+          .then(() =>
+            setModuleConfig({
+              payloadVariant: {
+                oneofKind: "telemetry",
+                telemetry: data
+              }
+            })
+          ),
         {
           loading: "Saving...",
           success: "Saved Telemetry Config, Restarting Node",

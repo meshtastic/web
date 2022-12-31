@@ -12,7 +12,7 @@ import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const MQTT = (): JSX.Element => {
-  const { moduleConfig, connection } = useDevice();
+  const { moduleConfig, connection, setModuleConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -46,7 +46,14 @@ export const MQTT = (): JSX.Element => {
               }
             }
           })
-          .then(() => reset({ ...data })),
+          .then(() =>
+            setModuleConfig({
+              payloadVariant: {
+                oneofKind: "mqtt",
+                mqtt: data
+              }
+            })
+          ),
         {
           loading: "Saving...",
           success: "Saved MQTT Config, Restarting Node",

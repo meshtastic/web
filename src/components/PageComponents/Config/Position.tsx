@@ -15,7 +15,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Position = (): JSX.Element => {
-  const { config, connection, nodes, hardware } = useDevice();
+  const { config, connection, nodes, hardware, setConfig } = useDevice();
 
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
@@ -86,7 +86,14 @@ export const Position = (): JSX.Element => {
                 }
               }
             })
-            .then(() => reset({ ...data })),
+            .then(() =>
+              setConfig({
+                payloadVariant: {
+                  oneofKind: "position",
+                  position: data
+                }
+              })
+            ),
           {
             loading: "Saving...",
             success: "Saved Position Config, Restarting Node",

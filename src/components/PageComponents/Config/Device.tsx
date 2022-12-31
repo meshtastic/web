@@ -15,7 +15,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Device = (): JSX.Element => {
-  const { config, connection } = useDevice();
+  const { config, connection, setConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -43,7 +43,14 @@ export const Device = (): JSX.Element => {
               }
             }
           })
-          .then(() => reset({ ...data })),
+          .then(() =>
+            setConfig({
+              payloadVariant: {
+                oneofKind: "device",
+                device: data
+              }
+            })
+          ),
         {
           loading: "Saving...",
           success: "Saved Device Config, Restarting Node",

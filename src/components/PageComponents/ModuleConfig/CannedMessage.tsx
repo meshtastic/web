@@ -15,7 +15,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const CannedMessage = (): JSX.Element => {
-  const { moduleConfig, connection } = useDevice();
+  const { moduleConfig, connection, setModuleConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -49,7 +49,14 @@ export const CannedMessage = (): JSX.Element => {
               }
             }
           })
-          .then(() => reset({ ...data })),
+          .then(() =>
+            setModuleConfig({
+              payloadVariant: {
+                oneofKind: "cannedMessage",
+                cannedMessage: data
+              }
+            })
+          ),
         {
           loading: "Saving...",
           success: "Saved Canned Message Config, Restarting Node",

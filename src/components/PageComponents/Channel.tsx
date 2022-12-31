@@ -24,7 +24,7 @@ export interface SettingsPanelProps {
 }
 
 export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
-  const { connection } = useDevice();
+  const { connection, addChannel } = useDevice();
   const [keySize, setKeySize] = useState<128 | 256>(256);
   const [pskHidden, setPskHidden] = useState(true);
 
@@ -81,7 +81,20 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               }
             }
           })
-          .then(() => reset({ ...data })),
+          .then(() =>
+            addChannel({
+              config: {
+                index: channel.index,
+                role: channel.role,
+                settings: {
+                  ...data,
+                  psk: toByteArray(data.psk ?? "")
+                }
+              },
+              lastInterraction: new Date(),
+              messages: []
+            })
+          ),
         {
           loading: "Saving...",
           success: "Saved Channel",

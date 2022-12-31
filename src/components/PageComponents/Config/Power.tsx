@@ -13,7 +13,7 @@ import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 
 export const Power = (): JSX.Element => {
-  const { config, connection } = useDevice();
+  const { config, connection, setConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -41,7 +41,14 @@ export const Power = (): JSX.Element => {
               }
             }
           })
-          .then(() => reset({ ...data })),
+          .then(() =>
+            setConfig({
+              payloadVariant: {
+                oneofKind: "power",
+                power: data
+              }
+            })
+          ),
         {
           loading: "Saving...",
           success: "Saved Power Config, Restarting Node",
