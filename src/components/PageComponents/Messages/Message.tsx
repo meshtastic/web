@@ -25,12 +25,12 @@ export const Message = ({
   const { setPeerInfoOpen, setActivePeer, connection } = useDevice();
 
   const openPeer = (): void => {
-    setActivePeer(message.packet.from);
+    setActivePeer(message.from);
     setPeerInfoOpen(true);
   };
 
   return lastMsgSameUser ? (
-    <div className="ml-4 flex">
+    <div className="ml-5 flex">
       {message.state === "ack" ? (
         <CheckCircleIcon className="my-auto h-4 text-textSecondary" />
       ) : message.state === "waiting" ? (
@@ -46,7 +46,7 @@ export const Message = ({
             message.state === "ack" ? "text-textPrimary" : "text-textSecondary"
           }`}
         >
-          {message.text}
+          {message.data}
         </span>
       )}
     </div>
@@ -63,14 +63,13 @@ export const Message = ({
           {sender?.user?.longName ?? "UNK"}
         </span>
         <span className="mt-1 font-mono text-xs text-textSecondary">
-          {new Date(message.packet.rxTime).toLocaleTimeString(undefined, {
+          {message.rxTime.toLocaleTimeString(undefined, {
             hour: "2-digit",
             minute: "2-digit"
           })}
         </span>
       </div>
-      <div className="flex">
-        {/* <ExclamationCircleIcon /> */}
+      <div className="ml-1 flex">
         {message.state === "ack" ? (
           <CheckCircleIcon className="my-auto h-4 text-textSecondary" />
         ) : message.state === "waiting" ? (
@@ -88,7 +87,7 @@ export const Message = ({
                 : "text-textSecondary"
             }`}
           >
-            {message.text}
+            {message.data}
           </span>
         )}
       </div>

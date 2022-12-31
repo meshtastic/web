@@ -12,6 +12,7 @@ import {
   EllipsisHorizontalIcon
 } from "@heroicons/react/24/outline";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import TimeAgo from "timeago-react";
 
 export const PeersPage = (): JSX.Element => {
   const { connection, nodes } = useDevice();
@@ -98,7 +99,10 @@ export const PeersPage = (): JSX.Element => {
                 )}
               </td>
               <td className="whitespace-nowrap py-2 text-sm text-textSecondary">
-                {new Date(node.data.lastHeard).toLocaleTimeString()}
+                <TimeAgo
+                  datetime={node.data.lastHeard * 1000}
+                  opts={{ minInterval: 10 }}
+                />
               </td>
               <td className="whitespace-nowrap py-2 text-sm text-textSecondary">
                 <Mono>{node.data.snr}db</Mono>

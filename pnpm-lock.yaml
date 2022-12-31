@@ -6,7 +6,7 @@ specifiers:
   '@heroicons/react': ^2.0.13
   '@hookform/error-message': ^2.0.1
   '@hookform/resolvers': ^2.9.10
-  '@meshtastic/meshtasticjs': ^0.9.2
+  '@meshtastic/meshtasticjs': ^0.9.7
   '@tailwindcss/forms': ^0.5.3
   '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.8
@@ -56,6 +56,7 @@ specifiers:
   rollup-plugin-visualizer: ^5.9.0
   tailwindcss: ^3.2.4
   tar: ^6.1.13
+  timeago-react: ^3.0.5
   tslib: ^2.4.1
   typescript: ^4.9.4
   unimported: ^1.24.0
@@ -70,7 +71,7 @@ dependencies:
   '@heroicons/react': 2.0.13_react@18.2.0
   '@hookform/error-message': 2.0.1_7yhncxxycytkes3mwygyjxyp6u
   '@hookform/resolvers': 2.9.10_react-hook-form@7.41.3
-  '@meshtastic/meshtasticjs': 0.9.2
+  '@meshtastic/meshtasticjs': 0.9.7
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.4
   '@tailwindcss/typography': 0.5.8_tailwindcss@3.2.4
   '@turf/turf': 6.5.0
@@ -95,6 +96,7 @@ dependencies:
   react-map-gl: 7.0.20_6eczaga5xxiwzxtfiyk6fioasq
   react-qrcode-logo: 2.8.0_biqbaboplfbrettd7655fr4n2y
   rfc4648: 1.5.2
+  timeago-react: 3.0.5_react@18.2.0
   zustand: 4.1.5_immer@9.0.16+react@18.2.0
 
 devDependencies:
@@ -1710,8 +1712,8 @@ packages:
     engines: {node: '>=6.0.0'}
     dev: false
 
-  /@meshtastic/meshtasticjs/0.9.2:
-    resolution: {integrity: sha512-rS/dK3RekRC9R930/RbNgdcktQ/XZv/bPpFZ6/6PJ61+8NjguN6SeNE3GP007TS5GSkp0zu3IgfOHn+pEL94KA==}
+  /@meshtastic/meshtasticjs/0.9.7:
+    resolution: {integrity: sha512-FQAfgJ2FeC55HbmOR1Z7Y3iIyXN32YO5OmtsviPolaZWivE7cCCfwSQGOHrtQUwXUSRv6Up0ucJ0eW7teaXxhA==}
     dependencies:
       '@protobuf-ts/runtime': 2.8.2
       glob: 8.0.3
@@ -6429,6 +6431,19 @@ packages:
     dependencies:
       readable-stream: 3.6.0
     dev: true
+
+  /timeago-react/3.0.5_react@18.2.0:
+    resolution: {integrity: sha512-1k/aDt+ADpcABCmg3BIBuZSa7aSxolmuYFkdcpL7mlNkFcDAK/KwuxLf68gowhM7Oq3vWTE7LPeq3kLkSt45Jg==}
+    peerDependencies:
+      react: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+      timeago.js: 4.0.2
+    dev: false
+
+  /timeago.js/4.0.2:
+    resolution: {integrity: sha512-a7wPxPdVlQL7lqvitHGGRsofhdwtkoSXPGATFuSOA2i1ZNQEPLrGnj68vOp2sOJTCFAQVXPeNMX/GctBaO9L2w==}
+    dev: false
 
   /tiny-glob/0.2.9:
     resolution: {integrity: sha512-g/55ssRPUjShh+xkfx9UPDXqhckHEsHr4Vd9zX55oSdGZc/MD0m3sferOkwWtp98bv+kcVfEHtRJgBVJzelrzg==}

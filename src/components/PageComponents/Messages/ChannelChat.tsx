@@ -22,12 +22,9 @@ export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
             lastMsgSameUser={
               index === 0
                 ? false
-                : channel.messages[index - 1].packet.from ===
-                  message.packet.from
+                : channel.messages[index - 1].from === message.from
             }
-            sender={
-              nodes.find((node) => node.data.num === message.packet.from)?.data
-            }
+            sender={nodes.find((node) => node.data.num === message.from)?.data}
           />
         ))}
       </div>

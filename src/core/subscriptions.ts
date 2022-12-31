@@ -65,7 +65,7 @@ export const subscribeAll = (
     device.addWaypoint(data);
     device.addWaypointMessage({
       waypointID: data.id,
-      state: rest.packet.from !== myNodeNum ? "ack" : "waiting",
+      state: rest.from !== myNodeNum ? "ack" : "waiting",
       ...rest
     });
   });
@@ -84,7 +84,7 @@ export const subscribeAll = (
   });
 
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-    toast(`New Node Discovered: ${nodeInfo.data.user?.shortName ?? "UNK"}`, {
+    toast(`New Node Discovered: ${nodeInfo.user?.shortName ?? "UNK"}`, {
       icon: "🔎"
     });
     device.addNodeInfo(nodeInfo);
@@ -92,26 +92,34 @@ export const subscribeAll = (
 
   connection.events.onChannelPacket.subscribe((channel) => {
     device.addChannel({
-      config: channel.data,
+      config: channel,
       lastInterraction: new Date(),
       messages: []
     });
   });
   connection.events.onConfigPacket.subscribe((config) => {
-    device.setConfig(config.data);
+    device.setConfig(config);
   });
   connection.events.onModuleConfigPacket.subscribe((moduleConfig) => {
-    device.setModuleConfig(moduleConfig.data);
+    device.setModuleConfig(moduleConfig);
   });
 
   connection.events.onMessagePacket.subscribe((messagePacket) => {
     device.addMessage({
       ...messagePacket,
-      state: messagePacket.packet.from !== myNodeNum ? "ack" : "waiting"
+      state: messagePacket.from !== myNodeNum ? "ack" : "waiting"
     });
   });
 
   connection.events.onPendingSettingsChange.subscribe((state) => {
     device.setPendingSettingsChanges(state);
+  });
+
+  connection.events.onMeshPacket.subscribe((meshPacket) => {
+    device.processPacket({
+      from: meshPacket.from,
+      snr: meshPacket.rxSnr,
+      time: meshPacket.rxTime
+    });
   });
 };

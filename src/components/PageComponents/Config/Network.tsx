@@ -52,8 +52,6 @@ export const Network = (): JSX.Element => {
   }, [reset, config.network]);
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
-
     if (connection) {
       void toast.promise(
         connection

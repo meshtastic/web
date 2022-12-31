@@ -15,12 +15,12 @@ export type Page =
   | "info"
   | "logs";
 
-export interface MessageWithState extends Types.MessagePacket {
+export interface MessageWithState extends Types.PacketMetadata<string> {
   state: MessageState;
 }
 
 export interface WaypointIDWithState
-  extends Omit<Types.WaypointPacket, "data"> {
+  extends Omit<Types.PacketMetadata<Protobuf.Waypoint>, "data"> {
   waypointID: number;
   state: MessageState;
 }
@@ -40,6 +40,12 @@ export interface Node {
   environmentMetrics: (Protobuf.EnvironmentMetrics & { timestamp: Date })[];
   metadata?: Protobuf.DeviceMetadata;
   data: Protobuf.NodeInfo;
+}
+
+export interface processPacketParams {
+  from: number;
+  snr: number;
+  time: number;
 }
 
 export interface Device {
@@ -69,20 +75,22 @@ export interface Device {
   setConfig: (config: Protobuf.Config) => void;
   setModuleConfig: (config: Protobuf.ModuleConfig) => void;
   setHardware: (hardware: Protobuf.MyNodeInfo) => void;
-  setMetrics: (metrics: Types.TelemetryPacket) => void;
+  setMetrics: (metrics: Types.PacketMetadata<Protobuf.Telemetry>) => void;
   setActivePage: (page: Page) => void;
   setPeerInfoOpen: (open: boolean) => void;
   setActivePeer: (peer: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
   addChannel: (channel: Channel) => void;
   addWaypoint: (waypoint: Protobuf.Waypoint) => void;
-  addNodeInfo: (nodeInfo: Types.NodeInfoPacket) => void;
-  addUser: (user: Types.UserPacket) => void;
-  addPosition: (position: Types.PositionPacket) => void;
+  addNodeInfo: (nodeInfo: Protobuf.NodeInfo) => void;
+  addUser: (user: Types.PacketMetadata<Protobuf.User>) => void;
+  addPosition: (position: Types.PacketMetadata<Protobuf.Position>) => void;
   addConnection: (connection: Types.ConnectionType) => void;
   addMessage: (message: MessageWithState) => void;
   addWaypointMessage: (message: WaypointIDWithState) => void;
-  addDeviceMetadataMessage: (metadata: Types.DeviceMetadataPacket) => void;
+  addDeviceMetadataMessage: (
+    metadata: Types.PacketMetadata<Protobuf.DeviceMetadata>
+  ) => void;
   setMessageState: (
     channelIndex: number,
     messageId: number,
@@ -92,6 +100,7 @@ export interface Device {
   setQRDialogOpen: (open: boolean) => void;
   setShutdownDialogOpen: (open: boolean) => void;
   setRebootDialogOpen: (open: boolean) => void;
+  processPacket: (data: processPacketParams) => void;
 }
 
 export interface DeviceState {
@@ -237,27 +246,13 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               })
             );
           },
-          setMetrics: (metrics: Types.TelemetryPacket) => {
+          setMetrics: (metrics: Types.PacketMetadata<Protobuf.Telemetry>) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 let node = device?.nodes.find(
-                  (n) => n.data.num === metrics.packet.from
+                  (n) => n.data.num === metrics.from
                 );
-                if (device && !node) {
-                  node = {
-                    data: Protobuf.NodeInfo.create({
-                      num: metrics.packet.from,
-                      snr: metrics.packet.rxSnr,
-                      lastHeard: Date.now()
-                    }),
-                    metadata: undefined,
-                    deviceMetrics: [],
-                    environmentMetrics: []
-                  };
-
-                  device.nodes.push(node);
-                }
                 if (node) {
                   switch (metrics.data.variant.oneofKind) {
                     case "deviceMetrics":
@@ -283,19 +278,13 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       }
                       node.deviceMetrics.push({
                         ...metrics.data.variant.deviceMetrics,
-                        timestamp:
-                          metrics.packet.rxTime === 0
-                            ? new Date()
-                            : new Date(metrics.packet.rxTime * 1000)
+                        timestamp: metrics.rxTime
                       });
                       break;
                     case "environmentMetrics":
                       node.environmentMetrics.push({
                         ...metrics.data.variant.environmentMetrics,
-                        timestamp:
-                          metrics.packet.rxTime === 0
-                            ? new Date()
-                            : new Date(metrics.packet.rxTime * 1000)
+                        timestamp: metrics.rxTime
                       });
                       break;
                   }
@@ -364,30 +353,18 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
-                if (device) {
-                  const node = device.nodes.find(
-                    (node) => node.data.num === nodeInfo.data.num
-                  );
-                  if (node) {
-                    node.data = nodeInfo.data;
-                    node.data.lastHeard =
-                      nodeInfo.packet.rxTime !== 0
-                        ? nodeInfo.packet.rxTime * 1000
-                        : Date.now();
-                  } else {
-                    device.nodes.push({
-                      data: Protobuf.NodeInfo.create({
-                        ...nodeInfo.data,
-                        lastHeard:
-                          nodeInfo.packet.rxTime !== 0
-                            ? nodeInfo.packet.rxTime * 1000
-                            : Date.now()
-                      }),
-                      metadata: undefined,
-                      deviceMetrics: [],
-                      environmentMetrics: []
-                    });
-                  }
+                const node = device?.nodes.find(
+                  (node) => node.data.num === nodeInfo.num
+                );
+                if (node) {
+                  node.data = nodeInfo;
+                } else {
+                  device?.nodes.push({
+                    data: nodeInfo,
+                    metadata: undefined,
+                    deviceMetrics: [],
+                    environmentMetrics: []
+                  });
                 }
               })
             );
@@ -416,29 +393,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
-                if (device) {
-                  const node = device.nodes.find(
-                    (node) => node.data.num === user.packet.from
-                  );
-                  if (node) {
-                    node.data.user = user.data;
-                    // if (action.payload.packet.rxTime) {
-                    //   node.data.lastHeard = new Date(
-                    //     action.payload.packet.rxTime * 1000,
-                    //   ).getTime();
-                    // }
-                  } else {
-                    device.nodes.push({
-                      data: Protobuf.NodeInfo.create({
-                        num: user.packet.from,
-                        snr: user.packet.rxSnr,
-                        user: user.data
-                      }),
-                      metadata: undefined,
-                      deviceMetrics: [],
-                      environmentMetrics: []
-                    });
-                  }
+                const node = device?.nodes.find(
+                  (node) => node.data.num === user.from
+                );
+                if (node) {
+                  node.data.user = user.data;
                 }
               })
             );
@@ -447,28 +406,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
-                if (device) {
-                  const node = device.nodes.find(
-                    (node) => node.data.num === position.packet.from
-                  );
-                  if (node) {
-                    node.data.position = position.data;
-                    // if (action.payload.packet.rxTime) {
-                    //   node.data.lastHeard = new Date(
-                    //     action.payload.packet.rxTime * 1000,
-                    //   ).getTime();
-                    // }
-                  } else {
-                    device.nodes.push({
-                      data: Protobuf.NodeInfo.create({
-                        num: position.packet.from,
-                        position: position.data
-                      }),
-                      metadata: undefined,
-                      deviceMetrics: [],
-                      environmentMetrics: []
-                    });
-                  }
+                const node = device?.nodes.find(
+                  (node) => node.data.num === position.from
+                );
+                if (node) {
+                  node.data.position = position.data;
                 }
               })
             );
@@ -487,11 +429,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
-                if (device) {
-                  device.channels
-                    .find((ch) => ch.config.index === message.packet.channel)
-                    ?.messages.push(message);
-                }
+                device?.channels
+                  .find((ch) => ch.config.index === message.channel)
+                  ?.messages.push(message);
               })
             );
           },
@@ -499,11 +439,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
-                if (device) {
-                  device.channels
-                    .find((ch) => ch.config.index === waypointID.packet.channel)
-                    ?.messages.push(waypointID);
-                }
+                device?.channels
+                  .find((ch) => ch.config.index === waypointID.channel)
+                  ?.messages.push(waypointID);
               })
             );
           },
@@ -511,15 +449,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
-                if (device) {
-                  const node = device.nodes.find(
-                    (n) => n.data.num === metadata.packet.from
-                  );
-                  if (node) {
-                    node.metadata = metadata.data;
-                  } else {
-                    console.log("Node not found!");
-                  }
+                const node = device?.nodes.find(
+                  (n) => n.data.num === metadata.from
+                );
+                if (node) {
+                  node.metadata = metadata.data;
                 }
               })
             );
@@ -537,7 +471,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   (ch) => ch.config.index === channelIndex
                 );
                 const message = channel?.messages.find(
-                  (msg) => msg.packet.id === messageId
+                  (msg) => msg.id === messageId
                 );
                 if (message) {
                   message.state = state;
@@ -581,6 +515,36 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.rebootDialogOpen = open;
+                }
+              })
+            );
+          },
+          processPacket(data: processPacketParams) {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+                const node = device.nodes.find((n) => n.data.num === data.from);
+                if (!node) {
+                  device.nodes.push({
+                    data: Protobuf.NodeInfo.create({
+                      num: data.from,
+                      lastHeard: data.time,
+                      snr: data.snr
+                    }),
+                    metadata: undefined,
+                    deviceMetrics: [],
+                    environmentMetrics: []
+                  });
+                  return;
+                } else {
+                  node.data = {
+                    ...node.data,
+                    lastHeard: data.time,
+                    snr: data.snr
+                  };
                 }
               })
             );

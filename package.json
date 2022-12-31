@@ -27,7 +27,7 @@
     "@heroicons/react": "^2.0.13",
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^2.9.10",
-    "@meshtastic/meshtasticjs": "^0.9.2",
+    "@meshtastic/meshtasticjs": "^0.9.7",
     "@tailwindcss/line-clamp": "^0.4.2",
     "@tailwindcss/typography": "^0.5.8",
     "@turf/turf": "^6.5.0",
@@ -52,6 +52,7 @@
     "react-map-gl": "^7.0.20",
     "react-qrcode-logo": "^2.8.0",
     "rfc4648": "^1.5.2",
+    "timeago-react": "^3.0.5",
     "zustand": "4.1.5"
   },
   "devDependencies": {
