@@ -85,7 +85,7 @@ export const User = (): JSX.Element => {
       <Input
         label="Short Name"
         description="Shown on small screens."
-        maxLength={3}
+        maxLength={4}
         {...register("shortName")}
       />
       <Input
