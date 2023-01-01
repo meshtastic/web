@@ -80,7 +80,7 @@ export const Power = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Enable power saving mode"
-            description="Description"
+            description="Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible."
             checked={value}
             {...rest}
           />
@@ -129,7 +129,7 @@ export const Power = (): JSX.Element => {
       </FormSection>
       <Input
         label="No Connection Bluetooth Disabled"
-        description="If the device does not revieve a bluetooth connection, the BLE radio will be disabled after this long"
+        description="If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long"
         suffix="Seconds"
         type="number"
         error={errors.waitBluetoothSecs?.message}
