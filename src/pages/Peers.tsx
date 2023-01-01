@@ -88,7 +88,7 @@ export const PeersPage = (): JSX.Element => {
                           connection.getMetadata({ nodeNum: node.data.num }),
                           {
                             loading: "Requesting Metadata...",
-                            success: "Received Metadata",
+                            success: "Recieved Metadata",
                             error: "No response received"
                           }
                         );
