@@ -81,7 +81,7 @@ export const Bluetooth = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Enabled"
-            description="Enable or disbale Bluetooth"
+            description="Enable or disable Bluetooth"
             checked={value}
             {...rest}
           />
