@@ -10,6 +10,9 @@ import { SerialValidation } from "@app/validation/moduleConfig/serial.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import { Protobuf } from "@meshtastic/meshtasticjs";
+import { renderOptions } from "@app/core/utils/selectEnumOptions";
+import { Select } from "@app/components/form/Select";
 
 export const Serial = (): JSX.Element => {
   const { moduleConfig, connection, setModuleConfig } = useDevice();
@@ -77,7 +80,7 @@ export const Serial = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Module Enabled"
-            description="Description"
+            description="Enable Serial output"
             checked={value}
             {...rest}
           />
@@ -89,7 +92,7 @@ export const Serial = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Echo"
-            description="Description"
+            description="Any packets you send will be echoed back to your device"
             checked={value}
             {...rest}
           />
@@ -97,8 +100,8 @@ export const Serial = (): JSX.Element => {
       />
       <Input
         type="number"
-        label="RX"
-        description="Max transmit power in dBm"
+        label="RX Pin"
+        description="Set the GPIO pin to the RXD pin you have set up."
         disabled={!moduleEnabled}
         {...register("rxd", {
           valueAsNumber: true
@@ -107,39 +110,38 @@ export const Serial = (): JSX.Element => {
       <Input
         type="number"
         label="TX Pin"
-        description="Max transmit power in dBm"
+        description="Set the GPIO pin to the TXD pin you have set up."
         disabled={!moduleEnabled}
         {...register("txd", {
           valueAsNumber: true
         })}
       />
-      <Input
-        type="number"
+      <Select
         label="Baud Rate"
-        description="Max transmit power in dBm"
+        description="The serial baud rate"
         disabled={!moduleEnabled}
-        {...register("baud", {
-          valueAsNumber: true
-        })}
-      />
+        {...register("baud", { valueAsNumber: true })}
+        >
+        {renderOptions(Protobuf.ModuleConfig_SerialConfig_Serial_Baud)}
+        </Select>
       <Input
         type="number"
         label="Timeout"
-        description="Max transmit power in dBm"
+        suffix="Seconds"
+        description="Seconds to wait before we consider your packet as 'done'"
         disabled={!moduleEnabled}
         {...register("timeout", {
           valueAsNumber: true
         })}
       />
-      <Input
-        type="number"
+      <Select
         label="Mode"
-        description="Max transmit power in dBm"
+        description="Select Mode"
         disabled={!moduleEnabled}
-        {...register("mode", {
-          valueAsNumber: true
-        })}
-      />
+        {...register("mode", { valueAsNumber: true })}
+        > 
+        {renderOptions(Protobuf.ModuleConfig_SerialConfig_Serial_Mode)}
+      </Select>
     </Form>
   );
 };

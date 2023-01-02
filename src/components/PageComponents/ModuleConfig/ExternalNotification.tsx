@@ -76,7 +76,7 @@ export const ExternalNotification = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Module Enabled"
-            description="Description"
+            description="Enable External Notification"
             checked={value}
             {...rest}
           />
@@ -173,7 +173,7 @@ export const ExternalNotification = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Alert Bell"
-            description="Description"
+            description="Should an alert be triggered when receiving an incoming bell?"
             checked={value}
             {...rest}
           />

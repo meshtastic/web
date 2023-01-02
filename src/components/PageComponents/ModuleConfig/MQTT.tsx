@@ -77,7 +77,7 @@ export const MQTT = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Module Enabled"
-            description="Description"
+            description="Enable MQTT"
             checked={value}
             {...rest}
           />
@@ -85,19 +85,19 @@ export const MQTT = (): JSX.Element => {
       />
       <Input
         label="MQTT Server Address"
-        description="Description"
+        //description="Description"
         disabled={!moduleEnabled}
         {...register("address")}
       />
       <Input
         label="MQTT Username"
-        description="Description"
+        description="MQTT username to use for default/custom servers"
         disabled={!moduleEnabled}
         {...register("username")}
       />
       <Input
         label="MQTT Password"
-        description="Description"
+        description="MQTT password to use for default/custom servers"
         type="password"
         autoComplete="off"
         disabled={!moduleEnabled}
@@ -109,7 +109,7 @@ export const MQTT = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Encryption Enabled"
-            description="Description"
+            //description="Description"
             checked={value}
             {...rest}
           />
@@ -121,7 +121,7 @@ export const MQTT = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="JSON Output Enabled"
-            description="Description"
+            description="Enable the sending / consumption of JSON packets on MQTT (Not encrypted)"
             checked={value}
             {...rest}
           />

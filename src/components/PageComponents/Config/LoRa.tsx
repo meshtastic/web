@@ -138,7 +138,7 @@ export const LoRa = (): JSX.Element => {
           render={({ field: { value, ...rest } }) => (
             <Toggle
               label="Transmit Enabled"
-              description="Description"
+              description="Enable/Disable transmit (TX) from the LoRa radio"
               checked={value}
               {...rest}
             />

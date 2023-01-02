@@ -71,7 +71,7 @@ export const Telemetry = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Module Enabled"
-            description="Description"
+            description="Enable the Environment Telemetry"
             checked={value}
             {...rest}
           />
@@ -83,7 +83,7 @@ export const Telemetry = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Displayed on Screen"
-            description="Description"
+            description="Show the Telemetry Module on the OLED"
             checked={value}
             {...rest}
           />
@@ -91,7 +91,7 @@ export const Telemetry = (): JSX.Element => {
       />
       <Input
         label="Update Interval"
-        description="Max transmit power in dBm"
+        description="How often to send Metrics over the mesh"
         suffix="Seconds"
         type="number"
         {...register("environmentUpdateInterval", {
@@ -103,8 +103,8 @@ export const Telemetry = (): JSX.Element => {
         control={control}
         render={({ field: { value, ...rest } }) => (
           <Toggle
-            label="Display Farenheit"
-            description="Description"
+            label="Display Fahrenheit"
+            description="Display temp in Fahrenheit"
             checked={value}
             {...rest}
           />

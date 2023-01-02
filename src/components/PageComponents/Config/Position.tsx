@@ -146,7 +146,7 @@ export const Position = (): JSX.Element => {
           return (
             <BitwiseSelect
               label="Position Flags"
-              description="Description"
+              description="Configuration options for POSITION messages"
               error={error?.message}
               selected={value}
               decodeEnun={Protobuf.Config_PositionConfig_PositionFlags}
