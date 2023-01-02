@@ -1,11 +1,11 @@
 import type React from "react";
 import type { HTMLProps } from "react";
 
-import { FiSave } from "react-icons/fi";
-
 import { Button } from "@components/form/Button.js";
 import {
+  ArrowRightCircleIcon,
   ArrowUturnLeftIcon,
+  CheckIcon,
   ChevronRightIcon,
   HomeIcon
 } from "@heroicons/react/24/outline";
@@ -58,7 +58,10 @@ export const Form = ({
             >
               Reset
             </Button>
-            <Button disabled={!dirty} iconBefore={<FiSave className="w-4" />}>
+            <Button
+              disabled={!dirty}
+              iconBefore={<CheckIcon className="w-4" />}
+            >
               Save
             </Button>
           </div>

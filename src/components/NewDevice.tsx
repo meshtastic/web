@@ -1,17 +1,18 @@
 import React from "react";
 
-import { FiBluetooth, FiTerminal, FiWifi } from "react-icons/fi";
-
 import { TabbedContent, TabType } from "@components/generic/TabbedContent.js";
 import { BLE } from "@components/PageComponents/Connect/BLE.js";
 import { HTTP } from "@components/PageComponents/Connect/HTTP.js";
 import { Serial } from "@components/PageComponents/Connect/Serial.js";
+import { useAppStore } from "@app/core/stores/appStore.js";
+import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 
 export const NewDevice = () => {
+  const { darkMode, setDarkMode } = useAppStore();
+
   const tabs: TabType[] = [
     {
-      name: "BLE",
-      icon: <FiBluetooth className="h-4" />,
+      name: "Bluetooth",
       element: BLE,
       disabled: !navigator.bluetooth,
       disabledMessage:
@@ -21,14 +22,12 @@ export const NewDevice = () => {
     },
     {
       name: "HTTP",
-      icon: <FiWifi className="h-4" />,
       element: HTTP,
       disabled: false,
       disabledMessage: "Unsuported connection method"
     },
     {
       name: "Serial",
-      icon: <FiTerminal className="h-4" />,
       element: Serial,
       disabled: !navigator.serial,
       disabledMessage:
@@ -38,7 +37,23 @@ export const NewDevice = () => {
 
   return (
     <div className="m-auto h-96 w-96">
-      <TabbedContent tabs={tabs} />
+      <TabbedContent
+        tabs={tabs}
+        actions={[
+          () => (
+            <div
+              className="my-auto cursor-pointer bg-backgroundPrimary p-2 text-textSecondary hover:brightness-hover active:brightness-press"
+              onClick={() => setDarkMode(!darkMode)}
+            >
+              {darkMode ? (
+                <SunIcon className="w-6" />
+              ) : (
+                <MoonIcon className="w-6" />
+              )}
+            </div>
+          )
+        ]}
+      />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import { FiCrosshair } from "react-icons/fi";
 import { useMap } from "react-map-gl";
 import { lineString, bbox } from "@turf/turf";
 
@@ -78,12 +77,6 @@ export const MapControlls = (): JSX.Element => {
           }}
         >
           <MagnifyingGlassMinusIcon className="h-4 w-4" />
-        </div>
-        <div
-          className="hover:bg-orange-200 cursor-pointer p-3 hover:text-accent"
-          onClick={() => {}}
-        >
-          <FiCrosshair className="h-4 w-4" />
         </div>
         <div
           className="hover:bg-orange-200 cursor-pointer p-3 hover:text-accent"

@@ -61,7 +61,7 @@ export const Serial = (): JSX.Element => {
           </Button>
         ))}
         {serialPorts.length === 0 && (
-          <Mono className="m-auto">No devices paired yet.</Mono>
+          <Mono className="m-auto select-none">No devices paired yet.</Mono>
         )}
       </div>
       <Button

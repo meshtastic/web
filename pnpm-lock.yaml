@@ -8,7 +8,6 @@ specifiers:
   '@hookform/resolvers': ^2.9.10
   '@meshtastic/meshtasticjs': ^0.9.8
   '@tailwindcss/forms': ^0.5.3
-  '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.8
   '@turf/turf': ^6.5.0
   '@types/chrome': ^0.0.206
@@ -48,7 +47,6 @@ specifiers:
   react-dom: ^18.2.0
   react-hook-form: ^7.41.3
   react-hot-toast: ^2.4.0
-  react-icons: ^4.7.1
   react-json-tree: ^0.17.0
   react-map-gl: ^7.0.20
   react-qrcode-logo: ^2.8.0
@@ -72,7 +70,6 @@ dependencies:
   '@hookform/error-message': 2.0.1_7yhncxxycytkes3mwygyjxyp6u
   '@hookform/resolvers': 2.9.10_react-hook-form@7.41.3
   '@meshtastic/meshtasticjs': 0.9.8
-  '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.4
   '@tailwindcss/typography': 0.5.8_tailwindcss@3.2.4
   '@turf/turf': 6.5.0
   base64-js: 1.5.1
@@ -91,7 +88,6 @@ dependencies:
   react-dom: 18.2.0_react@18.2.0
   react-hook-form: 7.41.3_react@18.2.0
   react-hot-toast: 2.4.0_biqbaboplfbrettd7655fr4n2y
-  react-icons: 4.7.1_react@18.2.0
   react-json-tree: 0.17.0_kzbn2opkn2327fwg5yzwzya5o4
   react-map-gl: 7.0.20_6eczaga5xxiwzxtfiyk6fioasq
   react-qrcode-logo: 2.8.0_biqbaboplfbrettd7655fr4n2y
@@ -1881,14 +1877,6 @@ packages:
       mini-svg-data-uri: 1.4.4
       tailwindcss: 3.2.4_postcss@8.4.20
     dev: true
-
-  /@tailwindcss/line-clamp/0.4.2_tailwindcss@3.2.4:
-    resolution: {integrity: sha512-HFzAQuqYCjyy/SX9sLGB1lroPzmcnWv1FHkIpmypte10hptf4oPUfucryMKovZh2u0uiS9U5Ty3GghWfEJGwVw==}
-    peerDependencies:
-      tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
-    dependencies:
-      tailwindcss: 3.2.4_postcss@8.4.20
-    dev: false
 
   /@tailwindcss/typography/0.5.8_tailwindcss@3.2.4:
     resolution: {integrity: sha512-xGQEp8KXN8Sd8m6R4xYmwxghmswrd0cPnNI2Lc6fmrC3OojysTBJJGSIVwPV56q4t6THFUK3HJ0EaWwpglSxWw==}
@@ -5742,14 +5730,6 @@ packages:
       react-dom: 18.2.0_react@18.2.0
     transitivePeerDependencies:
       - csstype
-    dev: false
-
-  /react-icons/4.7.1_react@18.2.0:
-    resolution: {integrity: sha512-yHd3oKGMgm7zxo3EA7H2n7vxSoiGmHk5t6Ou4bXsfcgWyhfDKMpyKfhHR6Bjnn63c+YXBLBPUql9H4wPJM6sXw==}
-    peerDependencies:
-      react: '*'
-    dependencies:
-      react: 18.2.0
     dev: false
 
   /react-is/16.13.1:
