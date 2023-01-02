@@ -21,7 +21,7 @@ export const DeviceSelector = (): JSX.Element => {
             onClick={() => {
               setSelectedDevice(device.id);
             }}
-            className="group flex h-8 w-8 cursor-pointer p-0.5 drop-shadow-md"
+            className="group flex h-8 w-8 cursor-pointer bg-backgroundPrimary p-0.5 drop-shadow-md hover:brightness-hover"
           >
             <Hashicon size={32} value={device.hardware.myNodeNum.toString()} />
             <div
@@ -35,11 +35,14 @@ export const DeviceSelector = (): JSX.Element => {
           onClick={() => {
             setSelectedDevice(0);
           }}
-          className={`h-8 w-8 cursor-pointer rounded-md border-2 border-dashed p-2 hover:border-accent ${
-            selectedDevice === 0 ? "border-accent" : "border-textSecondary"
-          }`}
+          className="group flex h-8 w-8 cursor-pointer p-0.5 drop-shadow-md"
         >
           <PlusIcon />
+          <div
+            className={`absolute -left-1.5 h-7 w-0.5 rounded-full group-hover:bg-accent ${
+              selectedDevice === 0 ? "bg-accent" : "bg-transparent"
+            }`}
+          />
         </div>
       </span>
       <img

@@ -33,19 +33,5 @@ export const ConfigPage = (): JSX.Element => {
     }
   ];
 
-  return (
-    <TabbedContent
-      tabs={tabs}
-      actions={[
-        () => (
-          <Button
-            disabled={!pendingSettingsChanges}
-            onClick={connection?.commitEditSettings}
-          >
-            Commit Changes
-          </Button>
-        )
-      ]}
-    />
-  );
+  return <TabbedContent tabs={tabs} />;
 };

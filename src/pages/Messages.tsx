@@ -30,14 +30,10 @@ export const MessagesPage = (): JSX.Element => {
       <TabbedContent
         tabs={tabs}
         actions={[
-          () => (
-            <IconButton
-              icon={<PencilIcon className="h-4" />}
-              onClick={() => {
-                setActivePage("channels");
-              }}
-            />
-          )
+          {
+            icon: <PencilIcon className="h-4" />,
+            action: () => setActivePage("channels")
+          }
         ]}
       />
     </div>

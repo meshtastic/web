@@ -28,26 +28,14 @@ export const ChannelsPage = (): JSX.Element => {
     <TabbedContent
       tabs={tabs}
       actions={[
-        () => (
-          <Button
-            iconBefore={<ArrowDownOnSquareStackIcon className="w-4" />}
-            onClick={() => {
-              setImportDialogOpen(true);
-            }}
-          >
-            Import
-          </Button>
-        ),
-        () => (
-          <Button
-            iconBefore={<QrCodeIcon className="w-4" />}
-            onClick={() => {
-              setQRDialogOpen(true);
-            }}
-          >
-            QR Code
-          </Button>
-        )
+        {
+          icon: <ArrowDownOnSquareStackIcon className="w-4" />,
+          action: () => setImportDialogOpen(true)
+        },
+        {
+          icon: <QrCodeIcon className="w-4" />,
+          action: () => setQRDialogOpen(true)
+        }
       ]}
     />
   );

@@ -13,9 +13,14 @@ export interface TabType {
   disabledLink?: string;
 }
 
+export interface TabbedCOntentAction {
+  icon: JSX.Element;
+  action: () => void;
+}
+
 export interface TabbedContentProps {
   tabs: TabType[];
-  actions?: (() => JSX.Element)[];
+  actions?: TabbedCOntentAction[];
 }
 
 export const TabbedContent = ({
@@ -36,7 +41,7 @@ export const TabbedContent = ({
                 } ${
                   entry.disabled
                     ? "cursor-not-allowed hover:text-textSecondary"
-                    : "cursor-pointer"
+                    : "cursor-pointer bg-backgroundPrimary hover:brightness-hover active:brightness-press"
                 }
                    `}
               >
@@ -48,9 +53,15 @@ export const TabbedContent = ({
             )}
           </Tab>
         ))}
-        <div className="ml-auto flex gap-2">
-          {actions?.map((Action, index) => (
-            <Action key={index} />
+        <div className="ml-auto flex">
+          {actions?.map((action, index) => (
+            <div
+              key={index}
+              className="my-auto cursor-pointer bg-backgroundPrimary p-3 text-textSecondary hover:brightness-hover active:brightness-press"
+              onClick={action.action}
+            >
+              {action.icon}
+            </div>
           ))}
         </div>
       </Tab.List>

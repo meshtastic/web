@@ -40,18 +40,14 @@ export const NewDevice = () => {
       <TabbedContent
         tabs={tabs}
         actions={[
-          () => (
-            <div
-              className="my-auto cursor-pointer bg-backgroundPrimary p-2 text-textSecondary hover:brightness-hover active:brightness-press"
-              onClick={() => setDarkMode(!darkMode)}
-            >
-              {darkMode ? (
-                <SunIcon className="w-6" />
-              ) : (
-                <MoonIcon className="w-6" />
-              )}
-            </div>
-          )
+          {
+            icon: darkMode ? (
+              <SunIcon className="w-4" />
+            ) : (
+              <MoonIcon className="w-4" />
+            ),
+            action: () => setDarkMode(!darkMode)
+          }
         ]}
       />
     </div>
