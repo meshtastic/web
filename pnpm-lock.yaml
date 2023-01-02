@@ -6,7 +6,7 @@ specifiers:
   '@heroicons/react': ^2.0.13
   '@hookform/error-message': ^2.0.1
   '@hookform/resolvers': ^2.9.10
-  '@meshtastic/meshtasticjs': ^0.9.7
+  '@meshtastic/meshtasticjs': ^0.9.8
   '@tailwindcss/forms': ^0.5.3
   '@tailwindcss/line-clamp': ^0.4.2
   '@tailwindcss/typography': ^0.5.8
@@ -36,7 +36,7 @@ specifiers:
   eslint-plugin-react-hooks: ^4.6.0
   geodesy: ^2.4.0
   gzipper: ^7.2.0
-  immer: ^9.0.16
+  immer: ^9.0.17
   mapbox-gl: npm:empty-npm-package@^1.0.0
   maplibre-gl: 2.4.0
   postcss: ^8.4.20
@@ -63,7 +63,7 @@ specifiers:
   vite: ^4.0.3
   vite-plugin-environment: ^1.1.3
   vite-plugin-pwa: ^0.14.0
-  zustand: 4.1.5
+  zustand: 4.2.0
 
 dependencies:
   '@emeraldpay/hashicon-react': 0.5.2
@@ -71,7 +71,7 @@ dependencies:
   '@heroicons/react': 2.0.13_react@18.2.0
   '@hookform/error-message': 2.0.1_7yhncxxycytkes3mwygyjxyp6u
   '@hookform/resolvers': 2.9.10_react-hook-form@7.41.3
-  '@meshtastic/meshtasticjs': 0.9.7
+  '@meshtastic/meshtasticjs': 0.9.8
   '@tailwindcss/line-clamp': 0.4.2_tailwindcss@3.2.4
   '@tailwindcss/typography': 0.5.8_tailwindcss@3.2.4
   '@turf/turf': 6.5.0
@@ -82,7 +82,7 @@ dependencies:
   class-validator: 0.14.0
   date-fns: 2.29.3
   geodesy: 2.4.0
-  immer: 9.0.16
+  immer: 9.0.17
   mapbox-gl: /empty-npm-package/1.0.0
   maplibre-gl: 2.4.0
   pretty-ms: 8.0.0
@@ -97,7 +97,7 @@ dependencies:
   react-qrcode-logo: 2.8.0_biqbaboplfbrettd7655fr4n2y
   rfc4648: 1.5.2
   timeago-react: 3.0.5_react@18.2.0
-  zustand: 4.1.5_immer@9.0.16+react@18.2.0
+  zustand: 4.2.0_immer@9.0.17+react@18.2.0
 
 devDependencies:
   '@tailwindcss/forms': 0.5.3_tailwindcss@3.2.4
@@ -183,7 +183,7 @@ packages:
       convert-source-map: 1.9.0
       debug: 4.3.4
       gensync: 1.0.0-beta.2
-      json5: 2.2.2
+      json5: 2.2.3
       semver: 6.3.0
     transitivePeerDependencies:
       - supports-color
@@ -1712,8 +1712,8 @@ packages:
     engines: {node: '>=6.0.0'}
     dev: false
 
-  /@meshtastic/meshtasticjs/0.9.7:
-    resolution: {integrity: sha512-FQAfgJ2FeC55HbmOR1Z7Y3iIyXN32YO5OmtsviPolaZWivE7cCCfwSQGOHrtQUwXUSRv6Up0ucJ0eW7teaXxhA==}
+  /@meshtastic/meshtasticjs/0.9.8:
+    resolution: {integrity: sha512-B76jPM3sKBVFcmW9Z3/I8DY+KHEbjVHfKTqIAnxfqTgDOTSIn5/kgxseVxnDLmMo795MxTey5rUm0ysao/s40g==}
     dependencies:
       '@protobuf-ts/runtime': 2.8.2
       glob: 8.0.3
@@ -1737,7 +1737,7 @@ packages:
     engines: {node: '>= 8'}
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
-      fastq: 1.14.0
+      fastq: 1.15.0
 
   /@pkgr/utils/2.3.1:
     resolution: {integrity: sha512-wfzX8kc1PMyUILA+1Z/EqoE4UCXGy0iRGMhPwdfae1+f0OXlLqCk+By+aMzgJBzR9AzS4CDizioG6Ss1gvAFJw==}
@@ -1868,7 +1868,7 @@ packages:
     resolution: {integrity: sha512-lR8q/9W7hZpMWweNiAKU7NQerBnzQQLvi8qnTDU/fxItPhtZVMbPV3lbCwjhIlNBe9Bbr5V+KHshvWmVSG9cxQ==}
     dependencies:
       ejs: 3.1.8
-      json5: 2.2.2
+      json5: 2.2.3
       magic-string: 0.25.9
       string.prototype.matchall: 4.0.8
     dev: true
@@ -4033,7 +4033,7 @@ packages:
       enhanced-resolve: 5.12.0
       eslint: 8.31.0
       eslint-plugin-import: 2.26.0_bpx4furzt4ibermwbsj75osuwi
-      get-tsconfig: 4.2.0
+      get-tsconfig: 4.3.0
       globby: 13.1.3
       is-core-module: 2.11.0
       is-glob: 4.0.3
@@ -4288,8 +4288,8 @@ packages:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
     dev: true
 
-  /fastq/1.14.0:
-    resolution: {integrity: sha512-eR2D+V9/ExcbF9ls441yIuN6TI2ED1Y2ZcA5BmMtJsOkWOFRJQ0Jt0g1UwqXJJVAb+V+umH5Dfr8oh4EVP7VVg==}
+  /fastq/1.15.0:
+    resolution: {integrity: sha512-wBrocU2LCXXa+lWBt8RoIRD89Fi8OdABODa/kEnyeyjS5aZO5/GNvI5sEINADqP/h8M29UHTHUb53sUu5Ihqdw==}
     dependencies:
       reusify: 1.0.4
 
@@ -4467,8 +4467,8 @@ packages:
       get-intrinsic: 1.1.3
     dev: true
 
-  /get-tsconfig/4.2.0:
-    resolution: {integrity: sha512-X8u8fREiYOE6S8hLbq99PeykTDoLVnxvF4DjWKJmz9xy2nNRdUcV8ZN9tniJFeKyTU3qnC9lL8n4Chd6LmVKHg==}
+  /get-tsconfig/4.3.0:
+    resolution: {integrity: sha512-YCcF28IqSay3fqpIu5y3Krg/utCBHBeoflkZyHj/QcqI2nrLPC3ZegS9CmIo+hJb8K7aiGsuUl7PwWVjNG2HQQ==}
     dev: true
 
   /gl-matrix/3.4.3:
@@ -4644,8 +4644,8 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
-  /immer/9.0.16:
-    resolution: {integrity: sha512-qenGE7CstVm1NrHQbMh8YaSzTZTFNP3zPqr3YU0S0UY441j4bJTg4A2Hh5KAhwgaiU6ZZ1Ar6y/2f4TblnMReQ==}
+  /immer/9.0.17:
+    resolution: {integrity: sha512-+hBruaLSQvkPfxRiTLK/mi4vLH+/VQS6z2KJahdoxlleFOI8ARqzOF17uy12eFDlqWmPoygwc5evgwcp+dlHhg==}
     dev: false
 
   /import-fresh/3.3.0:
@@ -4966,8 +4966,8 @@ packages:
       minimist: 1.2.7
     dev: true
 
-  /json5/2.2.2:
-    resolution: {integrity: sha512-46Tk9JiOL2z7ytNQWFLpj99RZkVgeHf87yGQKsIkaPz1qSH9UczKH1rO7K3wgRselo0tYMUNfecYpm/p1vC7tQ==}
+  /json5/2.2.3:
+    resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
     hasBin: true
     dev: true
@@ -6600,7 +6600,7 @@ packages:
       file-entry-cache: 6.0.1
       flow-remove-types: 2.156.0
       glob: 7.2.3
-      json5: 2.2.2
+      json5: 2.2.3
       ora: 5.4.1
       read-pkg-up: 7.0.1
       resolve: 1.22.1
@@ -7041,8 +7041,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /zustand/4.1.5_immer@9.0.16+react@18.2.0:
-    resolution: {integrity: sha512-PsdRT8Bvq22Yyh1tvpgdHNE7OAeFKqJXUxtJvj1Ixw2B9O2YZ1M34ImQ+xyZah4wZrR4lENMoDUutKPpyXCQ/Q==}
+  /zustand/4.2.0_immer@9.0.17+react@18.2.0:
+    resolution: {integrity: sha512-eNwaDoD2FYVnMgtNxiMUhTJO780wonZUzJrPQTLYI0erSIMZF8cniWFW22kGQUECd8rdHRJ/ZJL2XO54c9Ttuw==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
       immer: '>=9.0'
@@ -7053,7 +7053,7 @@ packages:
       react:
         optional: true
     dependencies:
-      immer: 9.0.16
+      immer: 9.0.17
       react: 18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0
     dev: false
