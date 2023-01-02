@@ -21,7 +21,7 @@ module.exports = {
       backgroundPrimary: "var(--backgroundPrimary)",
       backgroundSecondary: "var(--backgroundSecondary)",
       accent: "var(--accent)",
-      button: "var(--button)",
+      accentMuted: "var(--accentMuted)",
       textPrimary: "var(--textPrimary)",
       textSecondary: "var(--textSecondary)",
       link: "var(--link)"
