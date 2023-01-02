@@ -121,9 +121,9 @@ export const Serial = (): JSX.Element => {
         description="The serial baud rate"
         disabled={!moduleEnabled}
         {...register("baud", { valueAsNumber: true })}
-        >
+      >
         {renderOptions(Protobuf.ModuleConfig_SerialConfig_Serial_Baud)}
-        </Select>
+      </Select>
       <Input
         type="number"
         label="Timeout"
@@ -139,7 +139,7 @@ export const Serial = (): JSX.Element => {
         description="Select Mode"
         disabled={!moduleEnabled}
         {...register("mode", { valueAsNumber: true })}
-        > 
+      >
         {renderOptions(Protobuf.ModuleConfig_SerialConfig_Serial_Mode)}
       </Select>
     </Form>

@@ -75,11 +75,7 @@ export const RangeTest = (): JSX.Element => {
         name="enabled"
         control={control}
         render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Module Enabled"
-            checked={value}
-            {...rest}
-          />
+          <Toggle label="Module Enabled" checked={value} {...rest} />
         )}
       />
       <Input

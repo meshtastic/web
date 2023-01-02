@@ -90,11 +90,7 @@ export const CannedMessage = (): JSX.Element => {
         name="rotary1Enabled"
         control={control}
         render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Rotary Encoder #1 Enabled"
-            checked={value}
-            {...rest}
-          />
+          <Toggle label="Rotary Encoder #1 Enabled" checked={value} {...rest} />
         )}
       />
       <Input
