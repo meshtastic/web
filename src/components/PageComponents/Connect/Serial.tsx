@@ -51,6 +51,7 @@ export const Serial = (): JSX.Element => {
         {serialPorts.map((port, index) => (
           <Button
             key={index}
+            disabled={!port.readable}
             onClick={() => {
               void onConnect(port);
             }}
