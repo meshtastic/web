@@ -69,6 +69,7 @@ export interface Device {
   shutdownDialogOpen: boolean;
   rebootDialogOpen: boolean;
   pendingSettingsChanges: boolean;
+  messageDraft: string;
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -101,6 +102,7 @@ export interface Device {
   setShutdownDialogOpen: (open: boolean) => void;
   setRebootDialogOpen: (open: boolean) => void;
   processPacket: (data: processPacketParams) => void;
+  setMessageDraft: (message: string) => void;
 }
 
 export interface DeviceState {
@@ -141,6 +143,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           shutdownDialogOpen: false,
           rebootDialogOpen: false,
           pendingSettingsChanges: false,
+          messageDraft: "",
 
           setReady: (ready: boolean) => {
             set(
@@ -231,6 +234,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       device.moduleConfig.cannedMessage =
                         config.payloadVariant.cannedMessage;
                       break;
+                    case "audio":
+                      device.moduleConfig.audio = config.payloadVariant.audio;
                   }
                 }
               })
@@ -545,6 +550,16 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     lastHeard: data.time,
                     snr: data.snr
                   };
+                }
+              })
+            );
+          },
+          setMessageDraft: (message: string) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.messageDraft = message;
                 }
               })
             );

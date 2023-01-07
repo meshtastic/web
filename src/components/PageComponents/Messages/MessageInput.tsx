@@ -1,7 +1,5 @@
 import type React from "react";
 
-import { useForm } from "react-hook-form";
-
 import { IconButton } from "@app/components/form/IconButton.js";
 import { Input } from "@app/components/form/Input.js";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -14,20 +12,13 @@ export interface MessageInputProps {
 }
 
 export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
-  const { connection, setMessageState } = useDevice();
+  const { connection, setMessageState, messageDraft, setMessageDraft } =
+    useDevice();
 
-  const { register, handleSubmit } = useForm<{
-    message: string;
-  }>({
-    defaultValues: {
-      message: ""
-    }
-  });
-
-  const onSubmit = handleSubmit(async (data) => {
+  const sendText = async (message: string) => {
     await connection
       ?.sendText({
-        text: data.message,
+        text: message,
         wantAck: true,
         channel: channel.config.index as Types.ChannelNumber
       })
@@ -35,11 +26,18 @@ export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
       .catch((e: Types.PacketError) =>
         setMessageState(channel.config.index, e.id, e.error)
       );
-  });
+  };
 
   return (
     <div className="flex gap-2">
-      <form className="w-full" onSubmit={onSubmit}>
+      <form
+        className="w-full"
+        onSubmit={(e) => {
+          e.preventDefault();
+          sendText(messageDraft);
+          setMessageDraft("");
+        }}
+      >
         <div className="flex flex-grow gap-2">
           <span className="w-full">
             <Input
@@ -47,7 +45,8 @@ export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
               minLength={2}
               label=""
               placeholder="Enter Message"
-              {...register("message")}
+              value={messageDraft}
+              onChange={(e) => setMessageDraft(e.target.value)}
             />
           </span>
           <IconButton
