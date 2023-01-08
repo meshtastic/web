@@ -12,6 +12,7 @@ import { UserValidation } from "@app/validation/config/user.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { renderOptions } from "@core/utils/selectEnumOptions.js";
+import { ErrorMessage } from "@hookform/error-message";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -70,13 +71,9 @@ export const User = (): JSX.Element => {
       dirty={isDirty}
       onSubmit={onSubmit}
     >
-      <Input
-        label="Device ID"
-        disabled
-        description="Preset unique identifier for this device."
-        error={errors.id?.message}
-        {...register("id")}
-      />
+      <ErrorMessage errors={errors} name="longName" />
+      <ErrorMessage errors={errors} name="shortName" />
+      <ErrorMessage errors={errors} name="isLicensed" />
       <Input
         label="Device Name"
         description="Personalised name for this device."
@@ -88,25 +85,6 @@ export const User = (): JSX.Element => {
         maxLength={4}
         {...register("shortName")}
       />
-      <Input
-        label="Mac Address"
-        description="Hardware address for this node."
-        disabled
-        value={
-          base16
-            .stringify(myNode?.data.user?.macaddr ?? [])
-            .match(/.{1,2}/g)
-            ?.join(":") ?? ""
-        }
-      />
-      <Select
-        label="Hardware"
-        description="Hardware model of this device."
-        disabled
-        value={myNode?.data.user?.hwModel}
-      >
-        {renderOptions(Protobuf.HardwareModel)}
-      </Select>
       <Controller
         name="isLicensed"
         control={control}
@@ -119,6 +97,32 @@ export const User = (): JSX.Element => {
           />
         )}
       />
+      <Input
+        label="Mac Address"
+        description="Hardware address for this node."
+        disabled
+        value={
+          base16
+            .stringify(myNode?.data.user?.macaddr ?? [])
+            .match(/.{1,2}/g)
+            ?.join(":") ?? ""
+        }
+      />
+      <Input
+        label="Device ID"
+        disabled
+        description="Preset unique identifier for this device."
+        error={errors.id?.message}
+        value={myNode?.data.user?.id}
+      />
+      <Select
+        label="Hardware"
+        description="Hardware model of this device."
+        disabled
+        value={myNode?.data.user?.hwModel}
+      >
+        {renderOptions(Protobuf.HardwareModel)}
+      </Select>
     </Form>
   );
 };
