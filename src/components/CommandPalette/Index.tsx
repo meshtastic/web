@@ -17,6 +17,7 @@ import {
   ArchiveBoxXMarkIcon,
   ArrowDownOnSquareStackIcon,
   ArrowPathIcon,
+  ArrowPathRoundedSquareIcon,
   ArrowsRightLeftIcon,
   BeakerIcon,
   BugAntIcon,
@@ -40,9 +41,9 @@ import {
   WindowIcon,
   XCircleIcon
 } from "@heroicons/react/24/outline";
-import { ThemeController } from "../generic/ThemeController.js";
+
 import { Blur } from "../generic/Blur.js";
-import { accentColor } from "@core/stores/appStore.js";
+import { ThemeController } from "../generic/ThemeController.js";
 
 export interface Group {
   name: string;
@@ -210,19 +211,6 @@ export const CommandPalette = (): JSX.Element => {
           ]
         },
         {
-          name: "Reset Peers",
-          icon: TrashIcon,
-          action() {
-            if (connection) {
-              void toast.promise(connection.resetPeers(), {
-                loading: "Resetting...",
-                success: "Succesfully reset peers",
-                error: "No response received"
-              });
-            }
-          }
-        },
-        {
           name: "Disconnect",
           icon: XCircleIcon,
           action() {
@@ -243,6 +231,32 @@ export const CommandPalette = (): JSX.Element => {
           icon: ArrowPathIcon,
           action() {
             setRebootDialogOpen(true);
+          }
+        },
+        {
+          name: "Reset Peers",
+          icon: TrashIcon,
+          action() {
+            if (connection) {
+              void toast.promise(connection.resetPeers(), {
+                loading: "Resetting...",
+                success: "Succesfully reset peers",
+                error: "No response received"
+              });
+            }
+          }
+        },
+        {
+          name: "Factory Reset",
+          icon: ArrowPathRoundedSquareIcon,
+          action() {
+            if (connection) {
+              void toast.promise(connection.factoryReset(), {
+                loading: "Resetting...",
+                success: "Succesfully factory peers",
+                error: "No response received"
+              });
+            }
           }
         }
       ]
