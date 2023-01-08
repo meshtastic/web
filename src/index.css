@@ -95,3 +95,8 @@
   --accent: #e454c4;
   --accentMuted: #a84892;
 }
+
+img {
+  -drag: none;
+  -webkit-user-drag: none;
+}

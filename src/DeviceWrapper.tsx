@@ -5,7 +5,7 @@ import type { Device } from "@core/stores/deviceStore.js";
 
 export interface DeviceWrapperProps {
   children: React.ReactNode;
-  device: Device;
+  device?: Device;
 }
 
 export const DeviceWrapper = ({

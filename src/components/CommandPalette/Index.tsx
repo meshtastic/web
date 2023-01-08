@@ -24,8 +24,6 @@ import {
   Cog8ToothIcon,
   CubeTransparentIcon,
   DevicePhoneMobileIcon,
-  DocumentTextIcon,
-  IdentificationIcon,
   InboxIcon,
   LinkIcon,
   MapIcon,
@@ -134,20 +132,6 @@ export const CommandPalette = (): JSX.Element => {
           icon: UsersIcon,
           action() {
             setActivePage("peers");
-          }
-        },
-        {
-          name: "Info",
-          icon: IdentificationIcon,
-          action() {
-            setActivePage("info");
-          }
-        },
-        {
-          name: "Logs",
-          icon: DocumentTextIcon,
-          action() {
-            setActivePage("logs");
           }
         }
       ]

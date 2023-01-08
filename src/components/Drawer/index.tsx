@@ -17,8 +17,8 @@ export const Drawer = (): JSX.Element => {
     { name: "Sensor", element: Sensor }
   ];
   return (
-    <Tab.Group>
-      <Tab.List className="flex bg-backgroundPrimary">
+    <Tab.Group as="div">
+      <Tab.List className="flex w-full">
         {tabs.map((tab, index) => (
           <Tab key={index}>
             {({ selected }) => (
@@ -26,7 +26,7 @@ export const Drawer = (): JSX.Element => {
                 onClick={() => {
                   setDrawerOpen(true);
                 }}
-                className={`flex h-full cursor-pointer border-b-2 px-1 first:pl-2 last:pr-2 hover:text-textPrimary ${
+                className={`flex h-full cursor-pointer border-b-4 px-1 first:pl-2 last:pr-2 hover:text-textPrimary ${
                   selected
                     ? "border-accent text-textPrimary"
                     : "border-backgroundPrimary text-textSecondary"

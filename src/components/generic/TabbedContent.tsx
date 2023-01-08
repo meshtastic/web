@@ -34,7 +34,7 @@ export const TabbedContent = ({
           <Tab key={index} disabled={entry.disabled}>
             {({ selected }) => (
               <div
-                className={`flex h-10 gap-3 truncate border-b-2 px-3 text-sm font-medium ${
+                className={`flex h-10 gap-3 truncate border-b-4 px-3 text-sm font-medium ${
                   selected
                     ? "border-accent text-textPrimary"
                     : "border-backgroundPrimary text-textSecondary hover:text-textPrimary"

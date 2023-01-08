@@ -3,7 +3,7 @@ import { IsBoolean, IsOptional, IsString, Length } from "class-validator";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class UserValidation
-  implements Omit<Protobuf.User, "macaddr" | "hwModel">
+  implements Omit<Protobuf.User, "ID" | "macaddr" | "hwModel">
 {
   @IsString()
   @IsOptional()
