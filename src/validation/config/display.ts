@@ -23,4 +23,10 @@ export class DisplayValidation implements Protobuf.Config_DisplayConfig {
 
   @IsEnum(Protobuf.Config_DisplayConfig_OledType)
   oled: Protobuf.Config_DisplayConfig_OledType;
+
+  @IsEnum(Protobuf.Config_DisplayConfig_DisplayMode)
+  displaymode: Protobuf.Config_DisplayConfig_DisplayMode;
+
+  @IsBoolean()
+  headingBold: boolean;
 }

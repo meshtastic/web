@@ -27,7 +27,7 @@
     "@heroicons/react": "^2.0.13",
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^2.9.10",
-    "@meshtastic/meshtasticjs": "^0.9.8",
+    "@meshtastic/meshtasticjs": "^2.0.12",
     "@primer/octicons-react": "^17.10.1",
     "@tailwindcss/typography": "^0.5.8",
     "@turf/turf": "^6.5.0",

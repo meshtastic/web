@@ -20,9 +20,9 @@ export class NetworkValidation implements Protobuf.Config_NetworkConfig {
   @IsBoolean()
   ethEnabled: boolean;
 
-  @IsEnum(Protobuf.Config_NetworkConfig_EthMode)
-  @IsOptional()
-  ethMode: Protobuf.Config_NetworkConfig_EthMode;
+  @IsEnum(Protobuf.Config_NetworkConfig_AddressMode)
+  // @IsOptional()
+  addressMode: Protobuf.Config_NetworkConfig_AddressMode;
 
   ipv4Config: NetworkValidation_IpV4Config;
 }

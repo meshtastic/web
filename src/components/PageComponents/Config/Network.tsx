@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 
 import { FormSection } from "@app/components/form/FormSection.js";
 import { Input } from "@app/components/form/Input.js";
+import { IPInput } from "@app/components/form/IPInput.js";
 import { Select } from "@app/components/form/Select.js";
 import { Toggle } from "@app/components/form/Toggle.js";
 import { renderOptions } from "@app/core/utils/selectEnumOptions.js";
@@ -43,8 +44,8 @@ export const Network = (): JSX.Element => {
 
   const ethMode = useWatch({
     control,
-    name: "ethMode",
-    defaultValue: Protobuf.Config_NetworkConfig_EthMode.DHCP
+    name: "addressMode",
+    defaultValue: Protobuf.Config_NetworkConfig_AddressMode.DHCP
   });
 
   useEffect(() => {
@@ -94,7 +95,7 @@ export const Network = (): JSX.Element => {
       <ErrorMessage errors={errors} name="wifiPsk" />
       <ErrorMessage errors={errors} name="ntpServer" />
       <ErrorMessage errors={errors} name="ethEnabled" />
-      <ErrorMessage errors={errors} name="ethMode" />
+      <ErrorMessage errors={errors} name="addressMode" />
       <ErrorMessage errors={errors} name="ethConfig" />
       <ErrorMessage errors={errors} name="ip" />
       <ErrorMessage errors={errors} name="gateway" />
@@ -143,43 +144,41 @@ export const Network = (): JSX.Element => {
             />
           )}
         />
+      </FormSection>
+      <FormSection title="IP Config">
         <Select
-          label="Ethernet Mode"
+          label="Address Mode"
           description="Address assignment selection"
-          disabled={!ethEnabled}
-          {...register("ethMode", {
-            valueAsNumber: true,
-            disabled: !ethEnabled
+          disabled={!(ethEnabled || wifiEnabled)}
+          {...register("addressMode", {
+            valueAsNumber: true
           })}
         >
-          {renderOptions(Protobuf.Config_NetworkConfig_EthMode)}
+          {renderOptions(Protobuf.Config_NetworkConfig_AddressMode)}
         </Select>
-        {ethMode === Protobuf.Config_NetworkConfig_EthMode.STATIC && (
+        {ethMode === Protobuf.Config_NetworkConfig_AddressMode.STATIC && (
           <>
-            <Input
+            <IPInput
               label="IP"
-              type="number"
               description="IP Address"
               error={errors.ipv4Config?.ip?.message}
               {...register("ipv4Config.ip", { valueAsNumber: true })}
             />
-            <Input
+            <IPInput
               label="Gateway"
-              type="number"
               description="Default Gateway"
               error={errors.ipv4Config?.gateway?.message}
               {...register("ipv4Config.gateway", { valueAsNumber: true })}
             />
-            <Input
+            <IPInput
               label="Subnet"
-              type="number"
               description="Subnet Mask"
               error={errors.ipv4Config?.subnet?.message}
               {...register("ipv4Config.subnet", { valueAsNumber: true })}
             />
-            <Input
+            <IPInput
               label="DNS"
-              type="number"
+              // type="number" //prevent
               description="DNS Server"
               error={errors.ipv4Config?.dns?.message}
               {...register("ipv4Config.dns", { valueAsNumber: true })}
