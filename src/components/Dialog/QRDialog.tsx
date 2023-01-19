@@ -32,13 +32,13 @@ export const QRDialog = ({
       .filter((channel) => selectedChannels.includes(channel.index))
       .map((channel) => channel.settings)
       .filter((ch): ch is Protobuf.ChannelSettings => !!ch);
-    const encoded = Protobuf.ChannelSet.toBinary(
-      Protobuf.ChannelSet.create({
+    const encoded = new Protobuf.ChannelSet(
+      new Protobuf.ChannelSet({
         loraConfig,
         settings: channelsToEncode
       })
     );
-    const base64 = fromByteArray(encoded)
+    const base64 = fromByteArray(encoded.toBinary())
       .replace(/=/g, "")
       .replace(/\+/g, "-")
       .replace(/\//g, "_");

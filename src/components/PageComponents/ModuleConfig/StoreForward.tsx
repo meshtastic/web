@@ -10,6 +10,7 @@ import { StoreForwardValidation } from "@app/validation/moduleConfig/storeForwar
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const StoreForward = (): JSX.Element => {
   const { moduleConfig, connection, setModuleConfig } = useDevice();
@@ -32,21 +33,23 @@ export const StoreForward = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setModuleConfig({
-            moduleConfig: {
+          .setModuleConfig(
+            new Protobuf.ModuleConfig({
               payloadVariant: {
-                oneofKind: "storeForward",
-                storeForward: data
-              }
-            }
-          })
-          .then(() =>
-            setModuleConfig({
-              payloadVariant: {
-                oneofKind: "storeForward",
-                storeForward: data
+                case: "storeForward",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setModuleConfig(
+              new Protobuf.ModuleConfig({
+                payloadVariant: {
+                  case: "storeForward",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

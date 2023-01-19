@@ -35,21 +35,23 @@ export const Device = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setConfig({
-            config: {
+          .setConfig(
+            new Protobuf.Config({
               payloadVariant: {
-                oneofKind: "device",
-                device: data
-              }
-            }
-          })
-          .then(() =>
-            setConfig({
-              payloadVariant: {
-                oneofKind: "device",
-                device: data
+                case: "device",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setConfig(
+              new Protobuf.Config({
+                payloadVariant: {
+                  case: "device",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

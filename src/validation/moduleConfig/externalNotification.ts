@@ -3,7 +3,11 @@ import { IsBoolean, IsInt } from "class-validator";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class ExternalNotificationValidation
-  implements Protobuf.ModuleConfig_ExternalNotificationConfig
+  implements
+    Omit<
+      Protobuf.ModuleConfig_ExternalNotificationConfig,
+      keyof Protobuf.native.Message
+    >
 {
   @IsBoolean()
   enabled: boolean;

@@ -17,11 +17,12 @@ export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
 
   const sendText = async (message: string) => {
     await connection
-      ?.sendText({
-        text: message,
-        wantAck: true,
-        channel: channel.config.index as Types.ChannelNumber
-      })
+      ?.sendText(
+        message,
+        "broadcast",
+        true,
+        channel.config.index as Types.ChannelNumber
+      )
       .then((id) => setMessageState(channel.config.index, id, "ack"))
       .catch((e: Types.PacketError) =>
         setMessageState(channel.config.index, e.id, e.error)

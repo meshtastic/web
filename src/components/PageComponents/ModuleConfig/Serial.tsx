@@ -35,21 +35,23 @@ export const Serial = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setModuleConfig({
-            moduleConfig: {
+          .setModuleConfig(
+            new Protobuf.ModuleConfig({
               payloadVariant: {
-                oneofKind: "serial",
-                serial: data
-              }
-            }
-          })
-          .then(() =>
-            setModuleConfig({
-              payloadVariant: {
-                oneofKind: "serial",
-                serial: data
+                case: "serial",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setModuleConfig(
+              new Protobuf.ModuleConfig({
+                payloadVariant: {
+                  case: "serial",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

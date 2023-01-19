@@ -36,21 +36,23 @@ export const Bluetooth = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setConfig({
-            config: {
+          .setConfig(
+            new Protobuf.Config({
               payloadVariant: {
-                oneofKind: "bluetooth",
-                bluetooth: data
-              }
-            }
-          })
-          .then(() =>
-            setConfig({
-              payloadVariant: {
-                oneofKind: "bluetooth",
-                bluetooth: data
+                case: "bluetooth",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setConfig(
+              new Protobuf.Config({
+                payloadVariant: {
+                  case: "bluetooth",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

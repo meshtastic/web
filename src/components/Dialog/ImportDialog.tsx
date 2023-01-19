@@ -49,27 +49,27 @@ export const ImportDialog = ({
 
   const apply = () => {
     channelSet?.settings.map((ch, index) => {
-      connection?.setChannel({
-        channel: {
+      connection?.setChannel(
+        new Protobuf.Channel({
           index,
           role:
             index === 0
               ? Protobuf.Channel_Role.PRIMARY
               : Protobuf.Channel_Role.SECONDARY,
           settings: ch
-        }
-      });
+        })
+      );
     });
 
     if (channelSet?.loraConfig) {
-      connection?.setConfig({
-        config: {
+      connection?.setConfig(
+        new Protobuf.Config({
           payloadVariant: {
-            oneofKind: "lora",
-            lora: channelSet.loraConfig
+            case: "lora",
+            value: channelSet.loraConfig
           }
-        }
-      });
+        })
+      );
     }
   };
 

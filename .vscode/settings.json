@@ -1,6 +1,4 @@
 {
-  "css.validate": false,
-  "editor.quickSuggestions": {
-    "strings": true
-  }
+  "editor.defaultFormatter": "trunk.io",
+  "editor.formatOnSave": true
 }

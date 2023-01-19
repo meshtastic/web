@@ -35,21 +35,23 @@ export const Audio = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setModuleConfig({
-            moduleConfig: {
+          .setModuleConfig(
+            new Protobuf.ModuleConfig({
               payloadVariant: {
-                oneofKind: "audio",
-                audio: data
-              }
-            }
-          })
-          .then(() =>
-            setModuleConfig({
-              payloadVariant: {
-                oneofKind: "audio",
-                audio: data
+                case: "audio",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setModuleConfig(
+              new Protobuf.ModuleConfig({
+                payloadVariant: {
+                  case: "audio",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",
@@ -97,25 +99,25 @@ export const Audio = (): JSX.Element => {
         label="i2SWs"
         description="Enter a description."
         type="number"
-        {...register("i2SWs", { valueAsNumber: true })}
+        {...register("i2sWs", { valueAsNumber: true })}
       />
       <Input
         label="i2SSd"
         description="Enter a description."
         type="number"
-        {...register("i2SSd", { valueAsNumber: true })}
+        {...register("i2sSd", { valueAsNumber: true })}
       />
       <Input
         label="i2SDin"
         description="Enter a description."
         type="number"
-        {...register("i2SDin", { valueAsNumber: true })}
+        {...register("i2sDin", { valueAsNumber: true })}
       />
       <Input
         label="i2SSck"
         description="Enter a description."
         type="number"
-        {...register("i2SSck", { valueAsNumber: true })}
+        {...register("i2sSck", { valueAsNumber: true })}
       />
     </Form>
   );

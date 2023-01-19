@@ -2,7 +2,13 @@ import { IsBoolean, IsEnum, IsIP, IsOptional, Length } from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
-export class NetworkValidation implements Protobuf.Config_NetworkConfig {
+export class NetworkValidation
+  implements
+    Omit<
+      Protobuf.Config_NetworkConfig,
+      keyof Protobuf.native.Message | "ipv4Config"
+    >
+{
   @IsBoolean()
   wifiEnabled: boolean;
 
@@ -21,14 +27,17 @@ export class NetworkValidation implements Protobuf.Config_NetworkConfig {
   ethEnabled: boolean;
 
   @IsEnum(Protobuf.Config_NetworkConfig_AddressMode)
-  // @IsOptional()
   addressMode: Protobuf.Config_NetworkConfig_AddressMode;
 
   ipv4Config: NetworkValidation_IpV4Config;
 }
 
 export class NetworkValidation_IpV4Config
-  implements Protobuf.Config_NetworkConfig_IpV4Config
+  implements
+    Omit<
+      Protobuf.Config_NetworkConfig_IpV4Config,
+      keyof Protobuf.native.Message
+    >
 {
   @IsIP()
   @IsOptional()

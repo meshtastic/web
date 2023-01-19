@@ -10,6 +10,7 @@ import { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Telemetry = (): JSX.Element => {
   const { moduleConfig, connection, setModuleConfig } = useDevice();
@@ -32,21 +33,23 @@ export const Telemetry = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setModuleConfig({
-            moduleConfig: {
+          .setModuleConfig(
+            new Protobuf.ModuleConfig({
               payloadVariant: {
-                oneofKind: "telemetry",
-                telemetry: data
-              }
-            }
-          })
-          .then(() =>
-            setModuleConfig({
-              payloadVariant: {
-                oneofKind: "telemetry",
-                telemetry: data
+                case: "telemetry",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setModuleConfig(
+              new Protobuf.ModuleConfig({
+                payloadVariant: {
+                  case: "telemetry",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

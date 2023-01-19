@@ -55,19 +55,19 @@ export const Position = (): JSX.Element => {
 
     const configHasChanged = !Protobuf.Config_PositionConfig.equals(
       config.position,
-      Protobuf.Config_PositionConfig.create(rest)
+      new Protobuf.Config_PositionConfig(rest)
     );
 
     if (connection) {
       void toast.promise(
         connection
-          .setPosition({
-            position: Protobuf.Position.create({
+          .setPosition(
+            new Protobuf.Position({
               altitude: fixedAlt,
               latitudeI: fixedLat * 1e7,
               longitudeI: fixedLng * 1e7
             })
-          })
+          )
           .then(() => reset({ ...data })),
         {
           loading: "Saving...",
@@ -78,21 +78,23 @@ export const Position = (): JSX.Element => {
       if (configHasChanged) {
         void toast.promise(
           connection
-            .setConfig({
-              config: {
+            .setConfig(
+              new Protobuf.Config({
                 payloadVariant: {
-                  oneofKind: "position",
-                  position: rest
-                }
-              }
-            })
-            .then(() =>
-              setConfig({
-                payloadVariant: {
-                  oneofKind: "position",
-                  position: data
+                  case: "position",
+                  value: rest
                 }
               })
+            )
+            .then(() =>
+              setConfig(
+                new Protobuf.Config({
+                  payloadVariant: {
+                    case: "position",
+                    value: rest
+                  }
+                })
+              )
             ),
           {
             loading: "Saving...",

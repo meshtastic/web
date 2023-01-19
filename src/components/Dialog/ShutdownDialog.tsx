@@ -37,9 +37,7 @@ export const ShutdownDialog = ({
             icon: <ClockIcon className="w-4" />,
             action() {
               connection
-                ?.shutdown({
-                  time: time * 60
-                })
+                ?.shutdown(time * 60)
                 .then(() => setShutdownDialogOpen(false));
             }
           }}
@@ -48,11 +46,7 @@ export const ShutdownDialog = ({
           className="w-24"
           iconBefore={<PowerIcon className="w-4" />}
           onClick={() => {
-            connection
-              ?.shutdown({
-                time: 0
-              })
-              .then(() => setShutdownDialogOpen(false));
+            connection?.shutdown(2).then(() => setShutdownDialogOpen(false));
           }}
         >
           Now

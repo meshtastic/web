@@ -35,21 +35,23 @@ export const Display = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setConfig({
-            config: {
+          .setConfig(
+            new Protobuf.Config({
               payloadVariant: {
-                oneofKind: "display",
-                display: data
-              }
-            }
-          })
-          .then(() =>
-            setConfig({
-              payloadVariant: {
-                oneofKind: "display",
-                display: data
+                case: "display",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setConfig(
+              new Protobuf.Config({
+                payloadVariant: {
+                  case: "display",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",
@@ -127,6 +129,25 @@ export const Display = (): JSX.Element => {
       >
         {renderOptions(Protobuf.Config_DisplayConfig_OledType)}
       </Select>
+      <Select
+        label="Display Mode"
+        description="Screen layout variant"
+        {...register("displaymode", { valueAsNumber: true })}
+      >
+        {renderOptions(Protobuf.Config_DisplayConfig_DisplayMode)}
+      </Select>
+      <Controller
+        name="headingBold"
+        control={control}
+        render={({ field: { value, ...rest } }) => (
+          <Toggle
+            label="Bold Heading"
+            description="Bolden the heading text"
+            checked={value}
+            {...rest}
+          />
+        )}
+      />
     </Form>
   );
 };

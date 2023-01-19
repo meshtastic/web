@@ -43,21 +43,23 @@ export const LoRa = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setConfig({
-            config: {
+          .setConfig(
+            new Protobuf.Config({
               payloadVariant: {
-                oneofKind: "lora",
-                lora: data
-              }
-            }
-          })
-          .then(() =>
-            setConfig({
-              payloadVariant: {
-                oneofKind: "lora",
-                lora: data
+                case: "lora",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setConfig(
+              new Protobuf.Config({
+                payloadVariant: {
+                  case: "lora",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

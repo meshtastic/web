@@ -3,7 +3,11 @@ import { IsBoolean, IsInt } from "class-validator";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class StoreForwardValidation
-  implements Protobuf.ModuleConfig_StoreForwardConfig
+  implements
+    Omit<
+      Protobuf.ModuleConfig_StoreForwardConfig,
+      keyof Protobuf.native.Message
+    >
 {
   @IsBoolean()
   enabled: boolean;

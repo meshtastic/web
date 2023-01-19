@@ -81,7 +81,7 @@ export const Metrics = (): JSX.Element => {
               data: myNode?.deviceMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.airUtilTx
+                  y: metric.metric.airUtilTx
                 };
               }),
               backgroundColor: "rgba(102, 126, 234, 0.25)",
@@ -95,7 +95,7 @@ export const Metrics = (): JSX.Element => {
               data: myNode?.deviceMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.channelUtilization
+                  y: metric.metric.channelUtilization
                 };
               }),
               backgroundColor: "rgba(237, 100, 166, 0.25)",
@@ -109,7 +109,7 @@ export const Metrics = (): JSX.Element => {
               data: myNode?.deviceMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.batteryLevel
+                  y: metric.metric.batteryLevel
                 };
               }),
               backgroundColor: "rgba(113, 234, 102, 0.25)",
@@ -123,7 +123,7 @@ export const Metrics = (): JSX.Element => {
               data: myNode?.deviceMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.voltage
+                  y: metric.metric.voltage
                 };
               }),
               backgroundColor: "rgba(234, 166, 102, 0.25)",

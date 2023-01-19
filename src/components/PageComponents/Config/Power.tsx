@@ -11,6 +11,7 @@ import { PowerValidation } from "@app/validation/config/power.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Power = (): JSX.Element => {
   const { config, connection, setConfig } = useDevice();
@@ -33,21 +34,23 @@ export const Power = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setConfig({
-            config: {
+          .setConfig(
+            new Protobuf.Config({
               payloadVariant: {
-                oneofKind: "power",
-                power: data
-              }
-            }
-          })
-          .then(() =>
-            setConfig({
-              payloadVariant: {
-                oneofKind: "power",
-                power: data
+                case: "power",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setConfig(
+              new Protobuf.Config({
+                payloadVariant: {
+                  case: "power",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

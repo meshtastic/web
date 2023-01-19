@@ -41,21 +41,23 @@ export const CannedMessage = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setModuleConfig({
-            moduleConfig: {
+          .setModuleConfig(
+            new Protobuf.ModuleConfig({
               payloadVariant: {
-                oneofKind: "cannedMessage",
-                cannedMessage: data
-              }
-            }
-          })
-          .then(() =>
-            setModuleConfig({
-              payloadVariant: {
-                oneofKind: "cannedMessage",
-                cannedMessage: data
+                case: "cannedMessage",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setModuleConfig(
+              new Protobuf.ModuleConfig({
+                payloadVariant: {
+                  case: "cannedMessage",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

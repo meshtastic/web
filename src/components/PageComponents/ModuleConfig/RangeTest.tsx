@@ -10,6 +10,7 @@ import { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const RangeTest = (): JSX.Element => {
   const { moduleConfig, connection, setModuleConfig } = useDevice();
@@ -32,21 +33,23 @@ export const RangeTest = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setModuleConfig({
-            moduleConfig: {
+          .setModuleConfig(
+            new Protobuf.ModuleConfig({
               payloadVariant: {
-                oneofKind: "rangeTest",
-                rangeTest: data
-              }
-            }
-          })
-          .then(() =>
-            setModuleConfig({
-              payloadVariant: {
-                oneofKind: "rangeTest",
-                rangeTest: data
+                case: "rangeTest",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setModuleConfig(
+              new Protobuf.ModuleConfig({
+                payloadVariant: {
+                  case: "rangeTest",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

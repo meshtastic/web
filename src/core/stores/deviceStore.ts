@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 import { produce } from "immer";
-import create from "zustand";
+import { create } from "zustand";
 
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
@@ -34,8 +34,14 @@ export interface Channel {
 }
 
 export interface Node {
-  deviceMetrics: (Protobuf.DeviceMetrics & { timestamp: Date })[];
-  environmentMetrics: (Protobuf.EnvironmentMetrics & { timestamp: Date })[];
+  deviceMetrics: {
+    metric: Protobuf.DeviceMetrics;
+    timestamp: Date;
+  }[];
+  environmentMetrics: {
+    metric: Protobuf.EnvironmentMetrics;
+    timestamp: Date;
+  }[];
   metadata?: Protobuf.DeviceMetadata;
   data: Protobuf.NodeInfo;
 }
@@ -125,9 +131,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           ready: false,
           status: Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
           channels: [],
-          config: Protobuf.LocalConfig.create(),
-          moduleConfig: Protobuf.LocalModuleConfig.create(),
-          hardware: Protobuf.MyNodeInfo.create(),
+          config: new Protobuf.LocalConfig(),
+          moduleConfig: new Protobuf.LocalModuleConfig(),
+          hardware: new Protobuf.MyNodeInfo(),
           nodes: [],
           connection: undefined,
           activePage: "messages",
@@ -135,7 +141,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           activePeer: 0,
           waypoints: [],
           regionUnset: false,
-          currentMetrics: Protobuf.DeviceMetrics.create(),
+          currentMetrics: new Protobuf.DeviceMetrics(),
           importDialogOpen: false,
           QRDialogOpen: false,
           shutdownDialogOpen: false,
@@ -169,30 +175,30 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
 
                 if (device) {
-                  switch (config.payloadVariant.oneofKind) {
+                  switch (config.payloadVariant.case) {
                     case "device":
-                      device.config.device = config.payloadVariant.device;
+                      device.config.device = config.payloadVariant.value;
                       break;
                     case "position":
-                      device.config.position = config.payloadVariant.position;
+                      device.config.position = config.payloadVariant.value;
                       break;
                     case "power":
-                      device.config.power = config.payloadVariant.power;
+                      device.config.power = config.payloadVariant.value;
                       break;
                     case "network":
-                      device.config.network = config.payloadVariant.network;
+                      device.config.network = config.payloadVariant.value;
                       break;
                     case "display":
-                      device.config.display = config.payloadVariant.display;
+                      device.config.display = config.payloadVariant.value;
                       break;
                     case "lora":
-                      device.config.lora = config.payloadVariant.lora;
+                      device.config.lora = config.payloadVariant.value;
                       device.regionUnset =
-                        config.payloadVariant.lora.region ===
+                        config.payloadVariant.value.region ===
                         Protobuf.Config_LoRaConfig_RegionCode.UNSET;
                       break;
                     case "bluetooth":
-                      device.config.bluetooth = config.payloadVariant.bluetooth;
+                      device.config.bluetooth = config.payloadVariant.value;
                       break;
                   }
                 }
@@ -205,35 +211,35 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
 
                 if (device) {
-                  switch (config.payloadVariant.oneofKind) {
+                  switch (config.payloadVariant.case) {
                     case "mqtt":
-                      device.moduleConfig.mqtt = config.payloadVariant.mqtt;
+                      device.moduleConfig.mqtt = config.payloadVariant.value;
                       break;
                     case "serial":
-                      device.moduleConfig.serial = config.payloadVariant.serial;
+                      device.moduleConfig.serial = config.payloadVariant.value;
                       break;
                     case "externalNotification":
                       device.moduleConfig.externalNotification =
-                        config.payloadVariant.externalNotification;
+                        config.payloadVariant.value;
                       break;
                     case "storeForward":
                       device.moduleConfig.storeForward =
-                        config.payloadVariant.storeForward;
+                        config.payloadVariant.value;
                       break;
                     case "rangeTest":
                       device.moduleConfig.rangeTest =
-                        config.payloadVariant.rangeTest;
+                        config.payloadVariant.value;
                       break;
                     case "telemetry":
                       device.moduleConfig.telemetry =
-                        config.payloadVariant.telemetry;
+                        config.payloadVariant.value;
                       break;
                     case "cannedMessage":
                       device.moduleConfig.cannedMessage =
-                        config.payloadVariant.cannedMessage;
+                        config.payloadVariant.value;
                       break;
                     case "audio":
-                      device.moduleConfig.audio = config.payloadVariant.audio;
+                      device.moduleConfig.audio = config.payloadVariant.value;
                   }
                 }
               })
@@ -257,36 +263,34 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   (n) => n.data.num === metrics.from
                 );
                 if (node) {
-                  switch (metrics.data.variant.oneofKind) {
+                  switch (metrics.data.variant.case) {
                     case "deviceMetrics":
                       if (device) {
-                        if (metrics.data.variant.deviceMetrics.batteryLevel) {
+                        if (metrics.data.variant.value.batteryLevel) {
                           device.currentMetrics.batteryLevel =
-                            metrics.data.variant.deviceMetrics.batteryLevel;
+                            metrics.data.variant.value.batteryLevel;
                         }
-                        if (metrics.data.variant.deviceMetrics.voltage) {
+                        if (metrics.data.variant.value.voltage) {
                           device.currentMetrics.voltage =
-                            metrics.data.variant.deviceMetrics.voltage;
+                            metrics.data.variant.value.voltage;
                         }
-                        if (metrics.data.variant.deviceMetrics.airUtilTx) {
+                        if (metrics.data.variant.value.airUtilTx) {
                           device.currentMetrics.airUtilTx =
-                            metrics.data.variant.deviceMetrics.airUtilTx;
+                            metrics.data.variant.value.airUtilTx;
                         }
-                        if (
-                          metrics.data.variant.deviceMetrics.channelUtilization
-                        ) {
+                        if (metrics.data.variant.value.channelUtilization) {
                           device.currentMetrics.channelUtilization =
-                            metrics.data.variant.deviceMetrics.channelUtilization;
+                            metrics.data.variant.value.channelUtilization;
                         }
                       }
                       node.deviceMetrics.push({
-                        ...metrics.data.variant.deviceMetrics,
+                        metric: metrics.data.variant.value,
                         timestamp: metrics.rxTime
                       });
                       break;
                     case "environmentMetrics":
                       node.environmentMetrics.push({
-                        ...metrics.data.variant.environmentMetrics,
+                        metric: metrics.data.variant.value,
                         timestamp: metrics.rxTime
                       });
                       break;
@@ -532,7 +536,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const node = device.nodes.find((n) => n.data.num === data.from);
                 if (!node) {
                   device.nodes.push({
-                    data: Protobuf.NodeInfo.create({
+                    data: new Protobuf.NodeInfo({
                       num: data.from,
                       lastHeard: data.time,
                       snr: data.snr

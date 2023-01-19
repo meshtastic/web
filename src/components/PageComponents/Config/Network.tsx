@@ -56,21 +56,23 @@ export const Network = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setConfig({
-            config: {
+          .setConfig(
+            new Protobuf.Config({
               payloadVariant: {
-                oneofKind: "network",
-                network: Protobuf.Config_NetworkConfig.create(data)
-              }
-            }
-          })
-          .then(() =>
-            setConfig({
-              payloadVariant: {
-                oneofKind: "network",
-                network: data
+                case: "network",
+                value: new Protobuf.Config_NetworkConfig(data)
               }
             })
+          )
+          .then(() =>
+            setConfig(
+              new Protobuf.Config({
+                payloadVariant: {
+                  case: "network",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

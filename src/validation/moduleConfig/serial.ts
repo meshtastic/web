@@ -2,7 +2,10 @@ import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
-export class SerialValidation implements Protobuf.ModuleConfig_SerialConfig {
+export class SerialValidation
+  implements
+    Omit<Protobuf.ModuleConfig_SerialConfig, keyof Protobuf.native.Message>
+{
   @IsBoolean()
   enabled: boolean;
 

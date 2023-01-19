@@ -44,9 +44,12 @@ export const User = (): JSX.Element => {
     if (connection && myNode?.data.user) {
       void toast.promise(
         connection
-          .setOwner({
-            owner: { ...myNode.data.user, ...data }
-          })
+          .setOwner(
+            new Protobuf.User({
+              ...myNode.data.user,
+              ...data
+            })
+          )
           .then(() => reset({ ...data })),
         {
           loading: "Saving...",

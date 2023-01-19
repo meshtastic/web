@@ -37,9 +37,7 @@ export const RebootDialog = ({
             icon: <ClockIcon className="w-4" />,
             action() {
               connection
-                ?.reboot({
-                  time: time * 60
-                })
+                ?.reboot(time * 60)
                 .then(() => setRebootDialogOpen(false));
             }
           }}
@@ -48,11 +46,7 @@ export const RebootDialog = ({
           className="w-24"
           iconBefore={<ArrowPathIcon className="w-4" />}
           onClick={() => {
-            connection
-              ?.reboot({
-                time: 0
-              })
-              .then(() => setRebootDialogOpen(false));
+            connection?.reboot(2).then(() => setRebootDialogOpen(false));
           }}
         >
           Now

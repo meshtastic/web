@@ -3,7 +3,8 @@ import { IsBoolean, IsInt } from "class-validator";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class TelemetryValidation
-  implements Protobuf.ModuleConfig_TelemetryConfig
+  implements
+    Omit<Protobuf.ModuleConfig_TelemetryConfig, keyof Protobuf.native.Message>
 {
   @IsInt()
   deviceUpdateInterval: number;

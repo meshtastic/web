@@ -10,6 +10,7 @@ import { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const MQTT = (): JSX.Element => {
   const { moduleConfig, connection, setModuleConfig } = useDevice();
@@ -38,21 +39,23 @@ export const MQTT = (): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setModuleConfig({
-            moduleConfig: {
+          .setModuleConfig(
+            new Protobuf.ModuleConfig({
               payloadVariant: {
-                oneofKind: "mqtt",
-                mqtt: data
-              }
-            }
-          })
-          .then(() =>
-            setModuleConfig({
-              payloadVariant: {
-                oneofKind: "mqtt",
-                mqtt: data
+                case: "mqtt",
+                value: data
               }
             })
+          )
+          .then(() =>
+            setModuleConfig(
+              new Protobuf.ModuleConfig({
+                payloadVariant: {
+                  case: "mqtt",
+                  value: data
+                }
+              })
+            )
           ),
         {
           loading: "Saving...",

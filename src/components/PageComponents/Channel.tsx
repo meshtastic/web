@@ -66,8 +66,8 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
     if (connection) {
       void toast.promise(
         connection
-          .setChannel({
-            channel: {
+          .setChannel(
+            new Protobuf.Channel({
               role:
                 channel?.role === Protobuf.Channel_Role.PRIMARY
                   ? Protobuf.Channel_Role.PRIMARY
@@ -79,18 +79,18 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
                 ...data,
                 psk: toByteArray(data.psk ?? "")
               }
-            }
-          })
+            })
+          )
           .then(() =>
             addChannel({
-              config: {
+              config: new Protobuf.Channel({
                 index: channel.index,
                 role: channel.role,
                 settings: {
                   ...data,
                   psk: toByteArray(data.psk ?? "")
                 }
-              },
+              }),
               lastInterraction: new Date(),
               messages: []
             })

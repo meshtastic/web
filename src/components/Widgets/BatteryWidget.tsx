@@ -30,12 +30,12 @@ export const BatteryWidget = ({
       let previousStat: number | undefined = undefined;
       let previousTime = new Date();
       for (const stat of [...stats].reverse()) {
-        if (stat.batteryLevel) {
+        if (stat.metric.batteryLevel) {
           if (!currentStat) {
-            currentStat = stat.batteryLevel;
+            currentStat = stat.metric.batteryLevel;
             currentTime = stat.timestamp;
           } else {
-            previousStat = stat.batteryLevel;
+            previousStat = stat.metric.batteryLevel;
             previousTime = stat.timestamp;
             break;
           }
