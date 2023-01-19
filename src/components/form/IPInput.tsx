@@ -38,7 +38,12 @@ export const IPInput = forwardRef<HTMLInputElement, InputProps>(function Input(
   return (
     <InfoWrapper label={label} description={description} error={error}>
       <div className="relative flex rounded-md">
-        <input value={numericalValue} ref={ref} hidden />
+        <input
+          value={numericalValue}
+          onChange={(e) => setNumericalValue(parseInt(e.target.value))}
+          ref={ref}
+          hidden
+        />
         <input
           value={facadeInputValue}
           onChange={(e) => {
