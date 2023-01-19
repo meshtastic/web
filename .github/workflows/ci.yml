@@ -1,36 +1,26 @@
 name: CI
 
-# Controls when the workflow will run
-on:
-  # Triggers the workflow on push or pull request events but only for the master branch
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+on: push
 
 jobs:
   build-and-package:
     runs-on: ubuntu-latest
-
     steps:
-      # Checks-out repository
       - name: Checkout
         uses: actions/checkout@v2
       - uses: pnpm/action-setup@v2.2.4
         with:
           version: latest
-      - uses: actions/setup-node@v3
-        with:
-          node-version: latest
-      - run: pnpm install
-      - run: pnpm format:check
-      - run: pnpm build
-      - run: pnpm package
 
-      # Upload Artifact
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build Package
+        run: pnpm build
+
+      - name: Package Output
+        run: pnpm package
+
       - name: Upload Artifact
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
