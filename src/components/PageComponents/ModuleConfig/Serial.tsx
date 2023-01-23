@@ -69,13 +69,7 @@ export const Serial = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="Serial Config"
-      breadcrumbs={["Module Config", "Serial"]}
-      reset={() => reset(moduleConfig.serial)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}

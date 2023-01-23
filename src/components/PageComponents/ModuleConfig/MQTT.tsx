@@ -67,13 +67,7 @@ export const MQTT = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="MQTT Config"
-      breadcrumbs={["Module Config", "MQTT"]}
-      reset={() => reset(moduleConfig.mqtt)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}

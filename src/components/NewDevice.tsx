@@ -39,16 +39,6 @@ export const NewDevice = () => {
     <div className="m-auto h-96 w-96">
       <TabbedContent
         tabs={tabs}
-        actions={[
-          {
-            icon: darkMode ? (
-              <SunIcon className="w-4" />
-            ) : (
-              <MoonIcon className="w-4" />
-            ),
-            action: () => setDarkMode(!darkMode)
-          }
-        ]}
       />
     </div>
   );

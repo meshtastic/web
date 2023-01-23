@@ -108,10 +108,6 @@ export const Position = (): JSX.Element => {
 
   return (
     <Form
-      title="Position Config"
-      breadcrumbs={["Config", "Position"]}
-      reset={() => reset(config.position)}
-      dirty={isDirty}
       onSubmit={onSubmit}
     >
       <Controller

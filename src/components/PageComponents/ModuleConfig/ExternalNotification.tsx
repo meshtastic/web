@@ -66,13 +66,7 @@ export const ExternalNotification = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="External Notification Config"
-      breadcrumbs={["Module Config", "External Notification"]}
-      reset={() => reset(moduleConfig.externalNotification)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}

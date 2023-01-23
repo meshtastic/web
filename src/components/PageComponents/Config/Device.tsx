@@ -64,10 +64,6 @@ export const Device = (): JSX.Element => {
 
   return (
     <Form
-      title="Device Config"
-      breadcrumbs={["Config", "Device"]}
-      reset={() => reset(config.device)}
-      dirty={isDirty}
       onSubmit={onSubmit}
     >
       <Select

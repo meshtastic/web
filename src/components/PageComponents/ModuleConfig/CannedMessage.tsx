@@ -69,13 +69,7 @@ export const CannedMessage = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="Canned Message Config"
-      breadcrumbs={["Module Config", "Canned Message"]}
-      reset={() => reset(moduleConfig.cannedMessage)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}

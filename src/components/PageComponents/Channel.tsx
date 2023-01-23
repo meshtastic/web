@@ -105,31 +105,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   });
 
   return (
-    <Form
-      title="Channel Editor"
-      breadcrumbs={[
-        "Channels",
-        channel.settings?.name.length
-          ? channel.settings.name
-          : channel.role === Protobuf.Channel_Role.PRIMARY
-          ? "Primary"
-          : `Channel: ${channel.index}`
-      ]}
-      reset={() =>
-        reset({
-          enabled: [
-            Protobuf.Channel_Role.SECONDARY,
-            Protobuf.Channel_Role.PRIMARY
-          ].find((role) => role === channel?.role)
-            ? true
-            : false,
-          ...channel?.settings,
-          psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0))
-        })
-      }
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       {channel?.index !== 0 && (
         <>
           <Controller

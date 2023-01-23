@@ -21,10 +21,7 @@ export const DeviceWidget = ({
 }: DeviceWidgetProps): JSX.Element => {
   return (
     <div className="relative flex shrink-0 flex-col overflow-hidden rounded-md text-sm text-textPrimary">
-      <div className="absolute bottom-20 h-full w-full">
-        <Hashicon size={350} value={nodeNum} />
-      </div>
-      <div className="backdrop-brightness-50 flex p-3 backdrop-blur-md backdrop-hue-rotate-30">
+      <div className="bg-backgroundPrimary flex p-3">
         <div>
           <Hashicon size={96} value={nodeNum} />
         </div>

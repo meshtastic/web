@@ -68,10 +68,6 @@ export const RangeTest = (): JSX.Element => {
 
   return (
     <Form
-      title="Range Test Config"
-      breadcrumbs={["Module Config", "Range Test"]}
-      reset={() => reset(moduleConfig.rangeTest)}
-      dirty={isDirty}
       onSubmit={onSubmit}
     >
       <Controller

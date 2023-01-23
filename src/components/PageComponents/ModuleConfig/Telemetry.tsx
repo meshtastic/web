@@ -61,13 +61,7 @@ export const Telemetry = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="Telemetry Config"
-      breadcrumbs={["Module Config", "Telemetry"]}
-      reset={() => reset(moduleConfig.telemetry)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="environmentMeasurementEnabled"
         control={control}

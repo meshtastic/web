@@ -62,16 +62,6 @@ export const User = (): JSX.Element => {
 
   return (
     <Form
-      title="User Config"
-      breadcrumbs={["Config", "User"]}
-      reset={() => {
-        reset({
-          longName: myNode?.data.user?.longName,
-          shortName: myNode?.data.user?.shortName,
-          isLicensed: myNode?.data.user?.isLicensed
-        });
-      }}
-      dirty={isDirty}
       onSubmit={onSubmit}
     >
       <ErrorMessage errors={errors} name="longName" />

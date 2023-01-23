@@ -67,13 +67,7 @@ export const StoreForward = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="Store & Forward Config"
-      breadcrumbs={["Module Config", "Store & Forward"]}
-      reset={() => reset(moduleConfig.storeForward)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}

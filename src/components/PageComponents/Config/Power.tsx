@@ -63,10 +63,6 @@ export const Power = (): JSX.Element => {
 
   return (
     <Form
-      title="Power Config"
-      breadcrumbs={["Config", "Power"]}
-      reset={() => reset(config.power)}
-      dirty={isDirty}
       onSubmit={onSubmit}
     >
       <Input

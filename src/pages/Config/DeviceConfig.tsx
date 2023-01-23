@@ -11,6 +11,9 @@ import { Power } from "@components/PageComponents/Config/Power.js";
 import { User } from "@components/PageComponents/Config/User.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Tab } from "@headlessui/react";
+import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { Button } from "@app/components/form/Button.js";
+import { CheckIcon } from "@primer/octicons-react";
 
 export const DeviceConfig = (): JSX.Element => {
   const { hardware } = useDevice();
@@ -52,31 +55,53 @@ export const DeviceConfig = (): JSX.Element => {
   ];
 
   return (
-    <Tab.Group as="div" className="flex w-full gap-3">
-      <Tab.List className="flex w-44 flex-col gap-1">
-        {configSections.map((Config, index) => (
-          <Tab key={index} as={Fragment}>
-            {({ selected }) => (
-              <div
-                className={`flex cursor-pointer items-center rounded-md px-3 py-2 text-sm font-medium ${
-                  selected
-                    ? "bg-gray-100 text-gray-900"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
-              >
-                {Config.label}
-              </div>
-            )}
-          </Tab>
-        ))}
-      </Tab.List>
-      <Tab.Panels as={Fragment}>
-        {configSections.map((Config, index) => (
-          <Tab.Panel key={index} as={Fragment}>
-            <Config.element />
-          </Tab.Panel>
-        ))}
-      </Tab.Panels>
-    </Tab.Group>
+    <div className="w-full">
+      <div className="m-2 flex rounded-md bg-backgroundSecondary p-2">
+        <ol className="my-auto ml-2 flex gap-4 text-textSecondary">
+          <li className="cursor-pointer hover:brightness-disabled">
+            <HomeIcon className="h-5 w-5 flex-shrink-0" />
+          </li>
+          {["Config", "User"].map((breadcrumb, index) => (
+            <li key={index} className="flex gap-4">
+              <ChevronRightIcon className="h-5 w-5 flex-shrink-0 brightness-disabled" />
+              <span className="cursor-pointer text-sm font-medium hover:brightness-disabled">
+                {breadcrumb}
+              </span>
+            </li>
+          ))}
+        </ol>
+        <div className="ml-auto">
+          <Button iconBefore={<CheckIcon className="w-4" />}>Save</Button>
+        </div>
+      </div>
+
+      <Tab.Group as="div" className="flex w-full gap-3">
+        <Tab.List className="flex w-44 flex-col">
+          {configSections.map((Config, index) => (
+            <Tab key={index} as={Fragment}>
+              {({ selected }) => (
+                <div
+                  className={`flex cursor-pointer items-center border-l-4 p-4 text-sm font-medium ${
+                    selected
+                      ? "border-accent bg-accentMuted bg-opacity-10 text-textPrimary"
+                      : "border-backgroundPrimary text-textSecondary"
+                  }`}
+                >
+                  {Config.label}
+                  <span className="ml-auto bg-accent rounded-full px-3 text-textPrimary">3</span>
+                </div>
+              )}
+            </Tab>
+          ))}
+        </Tab.List>
+        <Tab.Panels as={Fragment}>
+          {configSections.map((Config, index) => (
+            <Tab.Panel key={index} as={Fragment}>
+              <Config.element />
+            </Tab.Panel>
+          ))}
+        </Tab.Panels>
+      </Tab.Group>
+    </div>
   );
 };

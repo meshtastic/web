@@ -28,7 +28,7 @@ export const TabbedContent = ({
   actions
 }: TabbedContentProps): JSX.Element => {
   return (
-    <Tab.Group as="div" className="flex flex-grow flex-col gap-2">
+    <Tab.Group as="div" className="flex flex-grow flex-col">
       <Tab.List className="flex bg-backgroundPrimary">
         {tabs.map((entry, index) => (
           <Tab key={index} disabled={entry.disabled}>

@@ -85,10 +85,6 @@ export const Network = (): JSX.Element => {
 
   return (
     <Form
-      title="Network Config"
-      breadcrumbs={["Config", "Network"]}
-      reset={() => reset(config.network)}
-      dirty={isDirty}
       onSubmit={onSubmit}
     >
       <ErrorMessage errors={errors} name="wifiEnabled" />

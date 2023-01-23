@@ -71,10 +71,6 @@ export const Bluetooth = (): JSX.Element => {
 
   return (
     <Form
-      title="Bluetooth Config"
-      breadcrumbs={["Config", "Bluetooth"]}
-      reset={() => reset(config.bluetooth)}
-      dirty={isDirty}
       onSubmit={onSubmit}
     >
       <Controller

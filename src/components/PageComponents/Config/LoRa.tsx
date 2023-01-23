@@ -72,10 +72,6 @@ export const LoRa = (): JSX.Element => {
 
   return (
     <Form
-      title="LoRa Config"
-      breadcrumbs={["Config", "LoRa"]}
-      reset={() => reset(config.lora)}
-      dirty={isDirty}
       onSubmit={onSubmit}
     >
       <FormSection title="Modem Settings">

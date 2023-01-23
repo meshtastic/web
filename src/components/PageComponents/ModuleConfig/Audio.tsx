@@ -63,13 +63,7 @@ export const Audio = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="Audio Config"
-      breadcrumbs={["Module Config", "Audio"]}
-      reset={() => reset(moduleConfig.audio)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="codec2Enabled"
         control={control}

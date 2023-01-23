@@ -49,17 +49,7 @@ export const Map = (): JSX.Element => {
   // }, [reset, rasterSources]);
 
   return (
-    <Form
-      title="Map Config"
-      breadcrumbs={["App Config", "Map"]}
-      reset={() =>
-        reset({
-          rasterSources
-        })
-      }
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <InfoWrapper label="WMS Sources">
         <div className="flex flex-col gap-2">
           {fields.map((field, index) => (

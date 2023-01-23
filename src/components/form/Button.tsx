@@ -16,7 +16,7 @@ export const Button = ({
 }: ButtonProps): JSX.Element => {
   return (
     <button
-      className={`flex w-full rounded-md bg-accentMuted px-3 text-textPrimary hover:brightness-hover focus:outline-none active:brightness-press ${
+      className={`flex w-full select-none rounded-md bg-accentMuted px-3 text-textPrimary hover:brightness-hover focus:outline-none active:brightness-press ${
         size === "sm"
           ? "h-8 text-sm"
           : size === "md"
