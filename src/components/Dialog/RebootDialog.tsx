@@ -17,7 +17,7 @@ export const RebootDialog = ({
   isOpen,
   close
 }: RebootDialogProps): JSX.Element => {
-  const { connection, setRebootDialogOpen } = useDevice();
+  const { connection, setDialogOpen } = useDevice();
 
   const [time, setTime] = useState<number>(5);
 
@@ -38,7 +38,7 @@ export const RebootDialog = ({
             action() {
               connection
                 ?.reboot(time * 60)
-                .then(() => setRebootDialogOpen(false));
+                .then(() => setDialogOpen("reboot", false));
             }
           }}
         />
@@ -46,7 +46,7 @@ export const RebootDialog = ({
           className="w-24"
           iconBefore={<ArrowPathIcon className="w-4" />}
           onClick={() => {
-            connection?.reboot(2).then(() => setRebootDialogOpen(false));
+            connection?.reboot(2).then(() => setDialogOpen("reboot", false));
           }}
         >
           Now

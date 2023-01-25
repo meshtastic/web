@@ -17,7 +17,7 @@ export const ShutdownDialog = ({
   isOpen,
   close
 }: ShutdownDialogProps): JSX.Element => {
-  const { connection, setShutdownDialogOpen } = useDevice();
+  const { connection, setDialogOpen } = useDevice();
 
   const [time, setTime] = useState<number>(5);
 
@@ -38,7 +38,7 @@ export const ShutdownDialog = ({
             action() {
               connection
                 ?.shutdown(time * 60)
-                .then(() => setShutdownDialogOpen(false));
+                .then(() => setDialogOpen("shutdown", false));
             }
           }}
         />
@@ -46,7 +46,9 @@ export const ShutdownDialog = ({
           className="w-24"
           iconBefore={<PowerIcon className="w-4" />}
           onClick={() => {
-            connection?.shutdown(2).then(() => setShutdownDialogOpen(false));
+            connection
+              ?.shutdown(2)
+              .then(() => setDialogOpen("shutdown", false));
           }}
         >
           Now

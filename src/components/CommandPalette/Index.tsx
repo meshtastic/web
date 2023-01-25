@@ -77,14 +77,7 @@ export const CommandPalette = (): JSX.Element => {
   } = useAppStore();
   const { getDevices } = useDeviceStore();
 
-  const {
-    setQRDialogOpen,
-    setImportDialogOpen,
-    setShutdownDialogOpen,
-    setRebootDialogOpen,
-    setActivePage,
-    connection
-  } = useDevice();
+  const { setDialogOpen, setActivePage, connection } = useDevice();
 
   const groups: Group[] = [
     {
@@ -182,14 +175,14 @@ export const CommandPalette = (): JSX.Element => {
               name: "Generator",
               icon: <QueueListIcon className="w-4" />,
               action() {
-                setQRDialogOpen(true);
+                setDialogOpen("QR", true);
               }
             },
             {
               name: "Import",
               icon: <ArrowDownOnSquareStackIcon className="w-4" />,
               action() {
-                setImportDialogOpen(true);
+                setDialogOpen("import", true);
               }
             }
           ]
@@ -207,14 +200,14 @@ export const CommandPalette = (): JSX.Element => {
           name: "Schedule Shutdown",
           icon: PowerIcon,
           action() {
-            setShutdownDialogOpen(true);
+            setDialogOpen("shutdown", true);
           }
         },
         {
           name: "Schedule Reboot",
           icon: ArrowPathIcon,
           action() {
-            setRebootDialogOpen(true);
+            setDialogOpen("reboot", true);
           }
         },
         {

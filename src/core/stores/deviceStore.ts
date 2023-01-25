@@ -52,6 +52,18 @@ export interface processPacketParams {
   time: number;
 }
 
+export type WorkingConfig = [
+  Protobuf.Config_DeviceConfig?,
+  Protobuf.Config_PositionConfig?,
+  Protobuf.Config_PowerConfig?,
+  Protobuf.Config_NetworkConfig?,
+  Protobuf.Config_DisplayConfig?,
+  Protobuf.Config_LoRaConfig?,
+  Protobuf.Config_BluetoothConfig?
+];
+
+export type DialogVariant = "import" | "QR" | "shutdown" | "reboot";
+
 export interface Device {
   id: number;
   ready: boolean;
@@ -68,12 +80,15 @@ export interface Device {
   waypoints: Protobuf.Waypoint[];
   regionUnset: boolean;
   currentMetrics: Protobuf.DeviceMetrics;
-  importDialogOpen: boolean;
-  QRDialogOpen: boolean;
-  shutdownDialogOpen: boolean;
-  rebootDialogOpen: boolean;
   pendingSettingsChanges: boolean;
   messageDraft: string;
+  workingConfig: WorkingConfig;
+  dialog: {
+    import: boolean;
+    QR: boolean;
+    shutdown: boolean;
+    reboot: boolean;
+  };
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -101,10 +116,7 @@ export interface Device {
     messageId: number,
     state: MessageState
   ) => void;
-  setImportDialogOpen: (open: boolean) => void;
-  setQRDialogOpen: (open: boolean) => void;
-  setShutdownDialogOpen: (open: boolean) => void;
-  setRebootDialogOpen: (open: boolean) => void;
+  setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   processPacket: (data: processPacketParams) => void;
   setMessageDraft: (message: string) => void;
 }
@@ -142,12 +154,15 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           waypoints: [],
           regionUnset: false,
           currentMetrics: new Protobuf.DeviceMetrics(),
-          importDialogOpen: false,
-          QRDialogOpen: false,
-          shutdownDialogOpen: false,
-          rebootDialogOpen: false,
+          dialog: {
+            import: false,
+            QR: false,
+            shutdown: false,
+            reboot: false
+          },
           pendingSettingsChanges: false,
           messageDraft: "",
+          workingConfig: [],
 
           setReady: (ready: boolean) => {
             set(
@@ -486,43 +501,14 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               })
             );
           },
-          setImportDialogOpen: (open: boolean) => {
+          setDialogOpen: (dialog: DialogVariant, open: boolean) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
-                if (device) {
-                  device.importDialogOpen = open;
+                if (!device) {
+                  return;
                 }
-              })
-            );
-          },
-          setQRDialogOpen: (open: boolean) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.QRDialogOpen = open;
-                }
-              })
-            );
-          },
-          setShutdownDialogOpen: (open: boolean) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.shutdownDialogOpen = open;
-                }
-              })
-            );
-          },
-          setRebootDialogOpen: (open: boolean) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.rebootDialogOpen = open;
-                }
+                device.dialog[dialog] = open;
               })
             );
           },

@@ -11,7 +11,7 @@ import {
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const ChannelsPage = (): JSX.Element => {
-  const { channels, setQRDialogOpen, setImportDialogOpen } = useDevice();
+  const { channels, setDialogOpen } = useDevice();
 
   const tabs: TabType[] = channels.map((channel) => {
     return {
@@ -30,11 +30,11 @@ export const ChannelsPage = (): JSX.Element => {
       actions={[
         {
           icon: <ArrowDownOnSquareStackIcon className="w-4" />,
-          action: () => setImportDialogOpen(true)
+          action: () => setDialogOpen("import", true)
         },
         {
           icon: <QrCodeIcon className="w-4" />,
-          action: () => setQRDialogOpen(true)
+          action: () => setDialogOpen("QR", true)
         }
       ]}
     />
