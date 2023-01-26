@@ -17,7 +17,7 @@ export const PageNav = (): JSX.Element => {
 
   interface NavLink {
     name: string;
-    icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
     page: Page;
   }
 

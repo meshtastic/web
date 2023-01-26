@@ -45,12 +45,12 @@ import { ThemeController } from "../generic/ThemeController.js";
 
 export interface Group {
   name: string;
-  icon: (props: React.ComponentProps<"svg">) => JSX.Element;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   commands: Command[];
 }
 export interface Command {
   name: string;
-  icon: (props: React.ComponentProps<"svg">) => JSX.Element;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   action?: () => void;
   subItems?: SubItem[];
   tags?: string[];
