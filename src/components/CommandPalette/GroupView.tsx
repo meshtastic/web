@@ -9,7 +9,7 @@ export interface GroupViewProps {
 export const GroupView = ({ group }: GroupViewProps): JSX.Element => {
   return (
     <Combobox.Option
-      value={group.name}
+      value={group.label}
       className={({ active }) =>
         `flex cursor-default select-none items-center rounded-md px-3 py-2 ${
           active ? "bg-backgroundPrimary text-textPrimary" : ""
@@ -19,7 +19,7 @@ export const GroupView = ({ group }: GroupViewProps): JSX.Element => {
       {({ active }) => (
         <>
           <group.icon className="h-6 w-6" />
-          <span className="ml-3 flex-auto truncate">{group.name}</span>
+          <span className="ml-3 flex-auto truncate">{group.label}</span>
           {active && <ChevronRightIcon className="h-5 text-textSecondary" />}
         </>
       )}

@@ -3,7 +3,7 @@ import { Mono } from "@components/generic/Mono";
 import { Tab } from "@headlessui/react";
 
 export interface TabType {
-  name: string;
+  label: string;
   icon?: JSX.Element;
   element: () => JSX.Element;
   disabled?: boolean;
@@ -46,7 +46,7 @@ export const TabbedContent = ({
                 {entry.icon && (
                   <div className="text-slate-500 m-auto">{entry.icon}</div>
                 )}
-                <span className="m-auto">{entry.name}</span>
+                <span className="m-auto">{entry.label}</span>
               </div>
             )}
           </Tab>
@@ -65,7 +65,7 @@ export const TabbedContent = ({
       </Tab.List>
       <Tab.Panels as={Fragment}>
         {tabs.map((entry, index) => (
-          <Tab.Panel key={index} className="flex flex-grow">
+          <Tab.Panel key={index} className="m-2 flex flex-grow">
             {!entry.disabled ? (
               <entry.element />
             ) : (

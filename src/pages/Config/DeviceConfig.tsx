@@ -12,11 +12,13 @@ import { Tab } from "@headlessui/react";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { Button } from "@components/form/Button.js";
 import { CheckIcon } from "@primer/octicons-react";
+import { NavBar } from "@app/Nav/NavBar.js";
+import { VerticalTabbedContent } from "@app/components/generic/VerticalTabbedContent.js";
 
 export const DeviceConfig = (): JSX.Element => {
   const { hardware, workingConfig, connection } = useDevice();
 
-  const configSections = [
+  const tabs = [
     {
       label: "User",
       element: User
@@ -53,65 +55,23 @@ export const DeviceConfig = (): JSX.Element => {
   ];
 
   return (
-    <div className="w-full">
-      <div className="m-2 flex rounded-md bg-backgroundSecondary p-2">
-        <ol className="my-auto ml-2 flex gap-4 text-textSecondary">
-          <li className="cursor-pointer hover:brightness-disabled">
-            <HomeIcon className="h-5 w-5 flex-shrink-0" />
-          </li>
-          {["Config", "User"].map((breadcrumb, index) => (
-            <li key={index} className="flex gap-4">
-              <ChevronRightIcon className="h-5 w-5 flex-shrink-0 brightness-disabled" />
-              <span className="cursor-pointer text-sm font-medium hover:brightness-disabled">
-                {breadcrumb}
-              </span>
-            </li>
-          ))}
-        </ol>
-        <div className="ml-auto">
-          <Button
-            onClick={async () => {
+    <div className="flex flex-grow flex-col gap-2">
+      <NavBar
+        breadcrumb={["Config"]}
+        actions={[
+          {
+            label: "Apply & Reboot",
+            async onClick() {
               workingConfig.map(async (config) => {
                 await connection?.setConfig(config);
               });
               await connection?.commitEditSettings();
-            }}
-            iconBefore={<CheckIcon className="w-4" />}
-          >
-            Apply & Reboot
-          </Button>
-        </div>
-      </div>
+            }
+          }
+        ]}
+      />
 
-      <Tab.Group as="div" className="flex w-full gap-3">
-        <Tab.List className="flex w-44 flex-col">
-          {configSections.map((Config, index) => (
-            <Tab key={index} as={Fragment}>
-              {({ selected }) => (
-                <div
-                  className={`flex cursor-pointer items-center border-l-4 p-4 text-sm font-medium ${
-                    selected
-                      ? "border-accent bg-accentMuted bg-opacity-10 text-textPrimary"
-                      : "border-backgroundPrimary text-textSecondary"
-                  }`}
-                >
-                  {Config.label}
-                  <span className="ml-auto rounded-full bg-accent px-3 text-textPrimary">
-                    3
-                  </span>
-                </div>
-              )}
-            </Tab>
-          ))}
-        </Tab.List>
-        <Tab.Panels as={Fragment}>
-          {configSections.map((Config, index) => (
-            <Tab.Panel key={index} as={Fragment}>
-              <Config.element />
-            </Tab.Panel>
-          ))}
-        </Tab.Panels>
-      </Tab.Group>
+      <VerticalTabbedContent tabs={tabs} />
     </div>
   );
 };

@@ -8,7 +8,6 @@ import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 export type Page =
   | "messages"
   | "map"
-  | "extensions"
   | "config"
   | "channels"
   | "peers";

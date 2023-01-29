@@ -28,12 +28,8 @@ export const DeviceWidget = ({
             {name}
           </span>
           <div className="my-auto ml-auto">
-            <Button
-              onClick={disconnected ? reconnect : disconnect}
-              size="sm"
-              iconBefore={<XCircleIcon className="h-4" />}
-            >
-              {disconnected ? "Reconnect" : "Disconnect"}
+            <Button onClick={disconnected ? reconnect : disconnect} size="sm">
+              <span>{disconnected ? "Reconnect" : "Disconnect"}</span>
             </Button>
           </div>
         </div>

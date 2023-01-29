@@ -10,9 +10,9 @@ export const Drawer = (): JSX.Element => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const tabs: TabType[] = [
-    { name: "Notifications", element: Notifications },
-    { name: "Metrics", element: Metrics },
-    { name: "Sensor", element: Sensor }
+    { label: "Notifications", element: Notifications },
+    { label: "Metrics", element: Metrics },
+    { label: "Sensor", element: Sensor }
   ];
   return (
     <Tab.Group as="div">
@@ -30,7 +30,7 @@ export const Drawer = (): JSX.Element => {
                     : "border-backgroundPrimary text-textSecondary"
                 }`}
               >
-                <span className="m-auto select-none">{tab.name}</span>
+                <span className="m-auto select-none">{tab.label}</span>
               </div>
             )}
           </Tab>

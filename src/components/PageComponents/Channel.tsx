@@ -15,6 +15,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { NavBar } from "@app/Nav/NavBar.js";
 
 export interface SettingsPanelProps {
   channel: Protobuf.Channel;
@@ -102,92 +103,106 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   });
 
   return (
-    <Form onSubmit={onSubmit}>
-      {channel?.index !== 0 && (
-        <>
-          <Controller
-            name="enabled"
-            control={control}
-            render={({ field: { value, ...rest } }) => (
-              <Toggle
-                label="Enabled"
-                description="Description"
-                checked={value}
-                {...rest}
-              />
-            )}
-          />
-          <Input
-            label="Name"
-            description="Max transmit power in dBm"
-            error={errors.name?.message}
-            {...register("name")}
-          />
-        </>
-      )}
-      <Select
-        label="Key Size"
-        description="Desired size of generated key."
-        value={keySize}
-        onChange={(e): void => {
-          setKeySize(parseInt(e.target.value) as 128 | 256);
-        }}
-        action={{
-          icon: <ArrowPathIcon className="h-4" />,
-          action: () => {
-            const key = new Uint8Array(keySize / 8);
-            crypto.getRandomValues(key);
-            setValue("psk", fromByteArray(key), {
-              shouldDirty: true
-            });
+    <div className="flex flex-grow flex-col gap-2">
+      <NavBar
+        breadcrumb={["Channels", channel?.index.toString()]}
+        actions={[
+          {
+            label: "Apply",
+            async onClick() {
+              await onSubmit();
+            }
           }
-        }}
-      >
-        <option value={128}>128 Bit</option>
-        <option value={256}>256 Bit</option>
-      </Select>
-      <Input
-        width="100%"
-        label="Pre-Shared Key"
-        description="Channel key to encrypt data"
-        type={pskHidden ? "password" : "text"}
-        action={{
-          icon: pskHidden ? (
-            <EyeIcon className="w-4" />
-          ) : (
-            <EyeSlashIcon className="w-4" />
-          ),
-          action: () => {
-            setPskHidden(!pskHidden);
-          }
-        }}
-        error={errors.psk?.message}
-        {...register("psk")}
+        ]}
       />
-      <Controller
-        name="uplinkEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Uplink Enabled"
-            description="Send packets to designated MQTT server"
-            checked={value}
-            {...rest}
-          />
+
+      <Form onSubmit={onSubmit}>
+        {channel?.index !== 0 && (
+          <>
+            <Controller
+              name="enabled"
+              control={control}
+              render={({ field: { value, ...rest } }) => (
+                <Toggle
+                  label="Enabled"
+                  description="Description"
+                  checked={value}
+                  {...rest}
+                />
+              )}
+            />
+            <Input
+              label="Name"
+              description="Max transmit power in dBm"
+              error={errors.name?.message}
+              {...register("name")}
+            />
+          </>
         )}
-      />
-      <Controller
-        name="downlinkEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Downlink Enabled"
-            description="Recieve packets to designated MQTT server"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-    </Form>
+        <Select
+          label="Key Size"
+          description="Desired size of generated key."
+          value={keySize}
+          onChange={(e): void => {
+            setKeySize(parseInt(e.target.value) as 128 | 256);
+          }}
+          action={{
+            icon: <ArrowPathIcon className="h-4" />,
+            action: () => {
+              const key = new Uint8Array(keySize / 8);
+              crypto.getRandomValues(key);
+              setValue("psk", fromByteArray(key), {
+                shouldDirty: true
+              });
+            }
+          }}
+        >
+          <option value={128}>128 Bit</option>
+          <option value={256}>256 Bit</option>
+        </Select>
+        <Input
+          width="100%"
+          label="Pre-Shared Key"
+          description="Channel key to encrypt data"
+          type={pskHidden ? "password" : "text"}
+          action={{
+            icon: pskHidden ? (
+              <EyeIcon className="w-4" />
+            ) : (
+              <EyeSlashIcon className="w-4" />
+            ),
+            action: () => {
+              setPskHidden(!pskHidden);
+            }
+          }}
+          error={errors.psk?.message}
+          {...register("psk")}
+        />
+        <Controller
+          name="uplinkEnabled"
+          control={control}
+          render={({ field: { value, ...rest } }) => (
+            <Toggle
+              label="Uplink Enabled"
+              description="Send packets to designated MQTT server"
+              checked={value}
+              {...rest}
+            />
+          )}
+        />
+        <Controller
+          name="downlinkEnabled"
+          control={control}
+          render={({ field: { value, ...rest } }) => (
+            <Toggle
+              label="Downlink Enabled"
+              description="Recieve packets to designated MQTT server"
+              checked={value}
+              {...rest}
+            />
+          )}
+        />
+      </Form>
+    </div>
   );
 };

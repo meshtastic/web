@@ -12,7 +12,7 @@ export const NewDevice = () => {
 
   const tabs: TabType[] = [
     {
-      name: "Bluetooth",
+      label: "Bluetooth",
       element: BLE,
       disabled: !navigator.bluetooth,
       disabledMessage:
@@ -21,13 +21,13 @@ export const NewDevice = () => {
         "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility"
     },
     {
-      name: "HTTP",
+      label: "HTTP",
       element: HTTP,
       disabled: false,
       disabledMessage: "Unsuported connection method"
     },
     {
-      name: "Serial",
+      label: "Serial",
       element: Serial,
       disabled: !navigator.serial,
       disabledMessage:

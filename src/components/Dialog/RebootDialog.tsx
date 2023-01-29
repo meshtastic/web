@@ -41,11 +41,13 @@ export const RebootDialog = ({
         />
         <Button
           className="w-24"
-          iconBefore={<ArrowPathIcon className="w-4" />}
           onClick={() => {
             connection?.reboot(2).then(() => setDialogOpen("reboot", false));
           }}
         >
+          <span>
+            <ArrowPathIcon className="w-4" />
+          </span>
           Now
         </Button>
       </div>

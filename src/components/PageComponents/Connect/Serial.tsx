@@ -64,14 +64,14 @@ export const Serial = (): JSX.Element => {
         )}
       </div>
       <Button
-        iconBefore={<PlusCircleIcon className="w-4" />}
         onClick={() => {
           void navigator.serial.requestPort().then((port) => {
             setSerialPorts(serialPorts.concat(port));
           });
         }}
       >
-        New device
+        <PlusCircleIcon className="w-4" />
+        <span>New device</span>
       </Button>
     </div>
   );

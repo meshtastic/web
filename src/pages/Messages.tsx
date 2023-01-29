@@ -9,7 +9,7 @@ export const MessagesPage = (): JSX.Element => {
 
   const tabs: TabType[] = channels.map((channel) => {
     return {
-      name: channel.config.settings?.name.length
+      label: channel.config.settings?.name.length
         ? channel.config.settings?.name
         : channel.config.index === 0
         ? "Primary"

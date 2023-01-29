@@ -71,8 +71,9 @@ export const HTTP = (): JSX.Element => {
           )}
         />
       </div>
-      <Button iconBefore={<PlusCircleIcon className="w-4" />} type="submit">
-        Connect
+      <Button type="submit">
+        <PlusCircleIcon className="w-4" />
+        <span>Connect</span>
       </Button>
     </form>
   );

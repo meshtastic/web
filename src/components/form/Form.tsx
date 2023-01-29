@@ -11,7 +11,7 @@ export const Form = ({
 }: FormProps): JSX.Element => {
   return (
     <form
-      className="mr-2 w-full rounded-md bg-backgroundSecondary px-2"
+      className="w-full rounded-md bg-backgroundSecondary px-2"
       onSubmit={onSubmit}
       onChange={onSubmit}
       {...props}

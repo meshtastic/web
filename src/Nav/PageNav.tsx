@@ -31,11 +31,6 @@ export const PageNav = (): JSX.Element => {
       page: "map"
     },
     {
-      name: "Extensions",
-      icon: BeakerIcon,
-      page: "extensions"
-    },
-    {
       name: "Config",
       icon: Cog8ToothIcon,
       page: "config"

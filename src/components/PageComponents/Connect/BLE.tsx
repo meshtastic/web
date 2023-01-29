@@ -51,7 +51,6 @@ export const BLE = (): JSX.Element => {
         )}
       </div>
       <Button
-        iconBefore={<PlusCircleIcon className="w-4" />}
         onClick={() => {
           void navigator.bluetooth
             .requestDevice({
@@ -65,7 +64,8 @@ export const BLE = (): JSX.Element => {
             });
         }}
       >
-        New device
+        <PlusCircleIcon className="w-4" />
+        <span>New device</span>
       </Button>
     </div>
   );

@@ -14,17 +14,17 @@ export const ConfigPage = (): JSX.Element => {
 
   const tabs: TabType[] = [
     {
-      name: "Device Config",
+      label: "Device Config",
       icon: <Cog8ToothIcon className="h-4" />,
       element: DeviceConfig
     },
     {
-      name: "Module Config",
+      label: "Module Config",
       icon: <CubeTransparentIcon className="h-4" />,
       element: ModuleConfig
     },
     {
-      name: "App Config",
+      label: "App Config",
       icon: <WindowIcon className="h-4" />,
       element: AppConfig
     }

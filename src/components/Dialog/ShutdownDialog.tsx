@@ -41,14 +41,14 @@ export const ShutdownDialog = ({
         />
         <Button
           className="w-24"
-          iconBefore={<PowerIcon className="w-4" />}
           onClick={() => {
             connection
               ?.shutdown(2)
               .then(() => setDialogOpen("shutdown", false));
           }}
         >
-          Now
+          <PowerIcon className="w-4" />
+          <span>Now</span>
         </Button>
       </div>
     </Dialog>

@@ -1,13 +1,11 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, ComponentType, SVGProps } from "react";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "sm" | "md" | "lg";
-  iconBefore?: JSX.Element;
 }
 
 export const Button = ({
   size = "md",
-  iconBefore,
   children,
   disabled,
   className,
@@ -30,7 +28,6 @@ export const Button = ({
       {...rest}
     >
       <div className="m-auto flex shrink-0 items-center gap-2 font-medium">
-        {iconBefore}
         {children}
       </div>
     </button>
