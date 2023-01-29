@@ -14,7 +14,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Power = (): JSX.Element => {
-  const { config, connection, setConfig } = useDevice();
+  const { config, setWorkingConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -22,6 +22,7 @@ export const Power = (): JSX.Element => {
     reset,
     control
   } = useForm<PowerValidation>({
+    mode: "onChange",
     defaultValues: config.power,
     resolver: classValidatorResolver(PowerValidation)
   });
@@ -31,40 +32,18 @@ export const Power = (): JSX.Element => {
   }, [reset, config.power]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setConfig(
-            new Protobuf.Config({
-              payloadVariant: {
-                case: "power",
-                value: data
-              }
-            })
-          )
-          .then(() =>
-            setConfig(
-              new Protobuf.Config({
-                payloadVariant: {
-                  case: "power",
-                  value: data
-                }
-              })
-            )
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Power Config, Restarting Node",
-          error: "No response received"
+    setWorkingConfig(
+      new Protobuf.Config({
+        payloadVariant: {
+          case: "power",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   return (
-    <Form
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Input
         label="Shutdown on battery delay"
         description="Automatically shutdown node after this long when on battery, 0 for indefinite"

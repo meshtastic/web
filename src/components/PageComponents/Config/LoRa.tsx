@@ -16,7 +16,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const LoRa = (): JSX.Element => {
-  const { config, connection, setConfig } = useDevice();
+  const { config, setWorkingConfig } = useDevice();
 
   const {
     register,
@@ -25,6 +25,7 @@ export const LoRa = (): JSX.Element => {
     control,
     reset
   } = useForm<LoRaValidation>({
+    mode: "onChange",
     defaultValues: config.lora,
     resolver: classValidatorResolver(LoRaValidation)
   });
@@ -40,40 +41,18 @@ export const LoRa = (): JSX.Element => {
   }, [reset, config.lora]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setConfig(
-            new Protobuf.Config({
-              payloadVariant: {
-                case: "lora",
-                value: data
-              }
-            })
-          )
-          .then(() =>
-            setConfig(
-              new Protobuf.Config({
-                payloadVariant: {
-                  case: "lora",
-                  value: data
-                }
-              })
-            )
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved LoRa Config, Restarting Node",
-          error: "No response received"
+    setWorkingConfig(
+      new Protobuf.Config({
+        payloadVariant: {
+          case: "lora",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   return (
-    <Form
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <FormSection title="Modem Settings">
         <Controller
           name="usePreset"

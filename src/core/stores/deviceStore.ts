@@ -52,16 +52,6 @@ export interface processPacketParams {
   time: number;
 }
 
-export type WorkingConfig = [
-  Protobuf.Config_DeviceConfig?,
-  Protobuf.Config_PositionConfig?,
-  Protobuf.Config_PowerConfig?,
-  Protobuf.Config_NetworkConfig?,
-  Protobuf.Config_DisplayConfig?,
-  Protobuf.Config_LoRaConfig?,
-  Protobuf.Config_BluetoothConfig?
-];
-
 export type DialogVariant = "import" | "QR" | "shutdown" | "reboot";
 
 export interface Device {
@@ -71,6 +61,8 @@ export interface Device {
   channels: Channel[];
   config: Protobuf.LocalConfig;
   moduleConfig: Protobuf.LocalModuleConfig;
+  workingConfig: Protobuf.Config[];
+  workingModuleConfig: Protobuf.ModuleConfig[];
   hardware: Protobuf.MyNodeInfo;
   nodes: Node[];
   connection?: Types.ConnectionType;
@@ -82,7 +74,6 @@ export interface Device {
   currentMetrics: Protobuf.DeviceMetrics;
   pendingSettingsChanges: boolean;
   messageDraft: string;
-  workingConfig: WorkingConfig;
   dialog: {
     import: boolean;
     QR: boolean;
@@ -94,6 +85,8 @@ export interface Device {
   setStatus: (status: Types.DeviceStatusEnum) => void;
   setConfig: (config: Protobuf.Config) => void;
   setModuleConfig: (config: Protobuf.ModuleConfig) => void;
+  setWorkingConfig: (config: Protobuf.Config) => void;
+  setWorkingModuleConfig: (config: Protobuf.ModuleConfig) => void;
   setHardware: (hardware: Protobuf.MyNodeInfo) => void;
   setMetrics: (metrics: Types.PacketMetadata<Protobuf.Telemetry>) => void;
   setActivePage: (page: Page) => void;
@@ -145,6 +138,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           channels: [],
           config: new Protobuf.LocalConfig(),
           moduleConfig: new Protobuf.LocalModuleConfig(),
+          workingConfig: [],
+          workingModuleConfig: [],
           hardware: new Protobuf.MyNodeInfo(),
           nodes: [],
           connection: undefined,
@@ -162,7 +157,6 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           },
           pendingSettingsChanges: false,
           messageDraft: "",
-          workingConfig: [],
 
           setReady: (ready: boolean) => {
             set(
@@ -256,6 +250,46 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     case "audio":
                       device.moduleConfig.audio = config.payloadVariant.value;
                   }
+                }
+              })
+            );
+          },
+          setWorkingConfig: (config: Protobuf.Config) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+                const workingConfigIndex = device?.workingConfig.findIndex(
+                  (wc) => wc.payloadVariant.case === config.payloadVariant.case
+                );
+                if (workingConfigIndex !== -1) {
+                  device.workingConfig[workingConfigIndex] = config;
+                } else {
+                  device?.workingConfig.push(config);
+                }
+              })
+            );
+          },
+          setWorkingModuleConfig: (moduleConfig: Protobuf.ModuleConfig) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+                const workingModuleConfigIndex =
+                  device?.workingModuleConfig.findIndex(
+                    (wmc) =>
+                      wmc.payloadVariant.case ===
+                      moduleConfig.payloadVariant.case
+                  );
+                if (workingModuleConfigIndex !== -1) {
+                  device.workingModuleConfig[workingModuleConfigIndex] =
+                    moduleConfig;
+                } else {
+                  device?.workingModuleConfig.push(moduleConfig);
                 }
               })
             );

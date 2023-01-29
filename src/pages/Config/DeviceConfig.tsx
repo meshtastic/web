@@ -16,7 +16,7 @@ import { Button } from "@app/components/form/Button.js";
 import { CheckIcon } from "@primer/octicons-react";
 
 export const DeviceConfig = (): JSX.Element => {
-  const { hardware } = useDevice();
+  const { hardware, workingConfig, connection } = useDevice();
 
   const configSections = [
     {
@@ -71,7 +71,17 @@ export const DeviceConfig = (): JSX.Element => {
           ))}
         </ol>
         <div className="ml-auto">
-          <Button iconBefore={<CheckIcon className="w-4" />}>Save</Button>
+          <Button
+            onClick={async () => {
+              workingConfig.map(async (config) => {
+                await connection?.setConfig(config);
+              });
+              await connection?.commitEditSettings();
+            }}
+            iconBefore={<CheckIcon className="w-4" />}
+          >
+            Apply & Reboot
+          </Button>
         </div>
       </div>
 
@@ -88,7 +98,9 @@ export const DeviceConfig = (): JSX.Element => {
                   }`}
                 >
                   {Config.label}
-                  <span className="ml-auto bg-accent rounded-full px-3 text-textPrimary">3</span>
+                  <span className="ml-auto rounded-full bg-accent px-3 text-textPrimary">
+                    3
+                  </span>
                 </div>
               )}
             </Tab>

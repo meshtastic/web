@@ -12,6 +12,7 @@ import { CommandLineIcon } from "@heroicons/react/24/outline";
 import { Types } from "@meshtastic/meshtasticjs";
 
 import { Input } from "./form/Input.js";
+import { Button } from "./form/Button.js";
 
 export const Sidebar = (): JSX.Element => {
   const { removeDevice } = useDeviceStore();

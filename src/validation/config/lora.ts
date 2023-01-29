@@ -48,6 +48,9 @@ export class LoRaValidation
   @IsBoolean()
   overrideDutyCycle: boolean;
 
+  @IsBoolean()
+  sx126xRxBoostedGain: boolean;
+
   @IsArray()
   ignoreIncoming: number[];
 }

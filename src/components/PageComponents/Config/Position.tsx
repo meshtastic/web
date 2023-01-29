@@ -15,7 +15,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Position = (): JSX.Element => {
-  const { config, connection, nodes, hardware, setConfig } = useDevice();
+  const { config, nodes, hardware, setWorkingConfig } = useDevice();
 
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
@@ -26,6 +26,7 @@ export const Position = (): JSX.Element => {
     reset,
     control
   } = useForm<PositionValidation>({
+    mode: "onChange",
     defaultValues: {
       fixedAlt: myNode?.data.position?.altitude,
       fixedLat: (myNode?.data.position?.latitudeI ?? 0) / 1e7,
@@ -58,58 +59,65 @@ export const Position = (): JSX.Element => {
       new Protobuf.Config_PositionConfig(rest)
     );
 
-    if (connection) {
-      void toast.promise(
-        connection
-          .setPosition(
-            new Protobuf.Position({
-              altitude: fixedAlt,
-              latitudeI: fixedLat * 1e7,
-              longitudeI: fixedLng * 1e7
-            })
-          )
-          .then(() => reset({ ...data })),
-        {
-          loading: "Saving...",
-          success: "Saved Position Config, Restarting Node",
-          error: "No response received"
+    setWorkingConfig(
+      new Protobuf.Config({
+        payloadVariant: {
+          case: "position",
+          value: rest
         }
-      );
-      if (configHasChanged) {
-        void toast.promise(
-          connection
-            .setConfig(
-              new Protobuf.Config({
-                payloadVariant: {
-                  case: "position",
-                  value: rest
-                }
-              })
-            )
-            .then(() =>
-              setConfig(
-                new Protobuf.Config({
-                  payloadVariant: {
-                    case: "position",
-                    value: rest
-                  }
-                })
-              )
-            ),
-          {
-            loading: "Saving...",
-            success: "Saved Position Config, Restarting Node",
-            error: "No response received"
-          }
-        );
-      }
-    }
+      })
+    );
+
+    // if (connection) {
+    //   void toast.promise(
+    //     connection
+    //       .setPosition(
+    //         new Protobuf.Position({
+    //           altitude: fixedAlt,
+    //           latitudeI: fixedLat * 1e7,
+    //           longitudeI: fixedLng * 1e7
+    //         })
+    //       )
+    //       .then(() => reset({ ...data })),
+    //     {
+    //       loading: "Saving...",
+    //       success: "Saved Position Config, Restarting Node",
+    //       error: "No response received"
+    //     }
+    //   );
+    //   if (configHasChanged) {
+    //     void toast.promise(
+    //       connection
+    //         .setConfig(
+    //           new Protobuf.Config({
+    //             payloadVariant: {
+    //               case: "position",
+    //               value: rest
+    //             }
+    //           })
+    //         )
+    //         .then(() =>
+    //           setConfig(
+    //             new Protobuf.Config({
+    //               payloadVariant: {
+    //                 case: "position",
+    //                 value: rest
+    //               }
+    //             })
+    //           )
+    //         ),
+    //       {
+    //         loading: "Saving...",
+    //         success: "Saved Position Config, Restarting Node",
+    //         error: "No response received"
+    //       }
+    //     );
+    //   }
+    // }
   });
 
   return (
-    <Form
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="gpsEnabled"
         control={control}

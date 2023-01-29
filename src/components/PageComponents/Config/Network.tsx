@@ -18,7 +18,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Network = (): JSX.Element => {
-  const { config, connection, setConfig } = useDevice();
+  const { config, setWorkingConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -26,6 +26,7 @@ export const Network = (): JSX.Element => {
     control,
     reset
   } = useForm<NetworkValidation>({
+    mode: "onChange",
     defaultValues: config.network,
     resolver: classValidatorResolver(NetworkValidation)
   });
@@ -53,40 +54,18 @@ export const Network = (): JSX.Element => {
   }, [reset, config.network]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setConfig(
-            new Protobuf.Config({
-              payloadVariant: {
-                case: "network",
-                value: new Protobuf.Config_NetworkConfig(data)
-              }
-            })
-          )
-          .then(() =>
-            setConfig(
-              new Protobuf.Config({
-                payloadVariant: {
-                  case: "network",
-                  value: data
-                }
-              })
-            )
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Network Config, Restarting Node",
-          error: "No response received"
+    setWorkingConfig(
+      new Protobuf.Config({
+        payloadVariant: {
+          case: "network",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   return (
-    <Form
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <ErrorMessage errors={errors} name="wifiEnabled" />
       <ErrorMessage errors={errors} name="wifiMode" />
       <ErrorMessage errors={errors} name="wifiSsid" />
@@ -189,6 +168,12 @@ export const Network = (): JSX.Element => {
         description="NTP server for time synchronization"
         error={errors.ntpServer?.message}
         {...register("ntpServer")}
+      />
+      <Input
+        label="Rsyslog Server"
+        description="Rsyslog server for external logging"
+        error={errors.rsyslogServer?.message}
+        {...register("rsyslogServer")}
       />
     </Form>
   );

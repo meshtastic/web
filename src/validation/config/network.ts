@@ -30,6 +30,8 @@ export class NetworkValidation
   addressMode: Protobuf.Config_NetworkConfig_AddressMode;
 
   ipv4Config: NetworkValidation_IpV4Config;
+
+  rsyslogServer: string;
 }
 
 export class NetworkValidation_IpV4Config

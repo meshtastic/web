@@ -15,7 +15,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Bluetooth = (): JSX.Element => {
-  const { config, connection, setConfig } = useDevice();
+  const { config, setWorkingConfig } = useDevice();
 
   const {
     register,
@@ -24,6 +24,7 @@ export const Bluetooth = (): JSX.Element => {
     control,
     reset
   } = useForm<BluetoothValidation>({
+    mode: "onChange",
     defaultValues: config.bluetooth,
     resolver: classValidatorResolver(BluetoothValidation)
   });
@@ -33,34 +34,14 @@ export const Bluetooth = (): JSX.Element => {
   }, [reset, config.bluetooth]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setConfig(
-            new Protobuf.Config({
-              payloadVariant: {
-                case: "bluetooth",
-                value: data
-              }
-            })
-          )
-          .then(() =>
-            setConfig(
-              new Protobuf.Config({
-                payloadVariant: {
-                  case: "bluetooth",
-                  value: data
-                }
-              })
-            )
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Bluetooth Config, Restarting Node",
-          error: "No response received"
+    setWorkingConfig(
+      new Protobuf.Config({
+        payloadVariant: {
+          case: "bluetooth",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   const pairingMode = useWatch({
@@ -70,9 +51,7 @@ export const Bluetooth = (): JSX.Element => {
   });
 
   return (
-    <Form
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}

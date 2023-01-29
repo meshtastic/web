@@ -15,7 +15,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Device = (): JSX.Element => {
-  const { config, connection, setConfig } = useDevice();
+  const { config, setWorkingConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -23,6 +23,7 @@ export const Device = (): JSX.Element => {
     control,
     reset
   } = useForm<DeviceValidation>({
+    mode: "onChange",
     defaultValues: config.device,
     resolver: classValidatorResolver(DeviceValidation)
   });
@@ -32,40 +33,18 @@ export const Device = (): JSX.Element => {
   }, [reset, config.device]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setConfig(
-            new Protobuf.Config({
-              payloadVariant: {
-                case: "device",
-                value: data
-              }
-            })
-          )
-          .then(() =>
-            setConfig(
-              new Protobuf.Config({
-                payloadVariant: {
-                  case: "device",
-                  value: data
-                }
-              })
-            )
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Device Config, Restarting Node",
-          error: "No response received"
+    setWorkingConfig(
+      new Protobuf.Config({
+        payloadVariant: {
+          case: "device",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   return (
-    <Form
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Select
         label="Role"
         description="What role the device performs on the mesh"
