@@ -1,9 +1,6 @@
-import type React from "react";
 import { useEffect, useState } from "react";
-
 import prettyMilliseconds from "pretty-ms";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Battery100Icon, ClockIcon } from "@heroicons/react/24/outline";
 
 export interface BatteryWidgetProps {

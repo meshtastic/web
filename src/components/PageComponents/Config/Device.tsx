@@ -1,12 +1,8 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { DeviceValidation } from "@app/validation/config/device.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -16,13 +12,7 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Device = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    control,
-    reset
-  } = useForm<DeviceValidation>({
+  const { register, handleSubmit, control, reset } = useForm<DeviceValidation>({
     mode: "onChange",
     defaultValues: config.device,
     resolver: classValidatorResolver(DeviceValidation)
@@ -80,14 +70,12 @@ export const Device = (): JSX.Element => {
         label="Button Pin"
         description="Button pin override"
         type="number"
-        error={errors.buttonGpio?.message}
         {...register("buttonGpio", { valueAsNumber: true })}
       />
       <Input
         label="Buzzer Pin"
         description="Buzzer pin override"
         type="number"
-        error={errors.buzzerGpio?.message}
         {...register("buzzerGpio", { valueAsNumber: true })}
       />
     </Form>

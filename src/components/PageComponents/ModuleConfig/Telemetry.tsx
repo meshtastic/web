@@ -1,11 +1,7 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -13,51 +9,27 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Telemetry = (): JSX.Element => {
-  const { moduleConfig, connection, setModuleConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<TelemetryValidation>({
-    defaultValues: moduleConfig.telemetry,
-    resolver: classValidatorResolver(TelemetryValidation)
-  });
+  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { register, handleSubmit, reset, control } =
+    useForm<TelemetryValidation>({
+      mode: "onChange",
+      defaultValues: moduleConfig.telemetry,
+      resolver: classValidatorResolver(TelemetryValidation)
+    });
 
   useEffect(() => {
     reset(moduleConfig.telemetry);
   }, [reset, moduleConfig.telemetry]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setModuleConfig(
-            new Protobuf.ModuleConfig({
-              payloadVariant: {
-                case: "telemetry",
-                value: data
-              }
-            })
-          )
-          .then(() =>
-            setModuleConfig(
-              new Protobuf.ModuleConfig({
-                payloadVariant: {
-                  case: "telemetry",
-                  value: data
-                }
-              })
-            )
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Telemetry Config, Restarting Node",
-          error: "No response received"
+    setWorkingModuleConfig(
+      new Protobuf.ModuleConfig({
+        payloadVariant: {
+          case: "telemetry",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   return (

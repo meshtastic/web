@@ -1,7 +1,5 @@
-import type React from "react";
 import { Fragment } from "react";
-
-import { Audio } from "@app/components/PageComponents/ModuleConfig/Audio.js";
+import { Audio } from "@components/PageComponents/ModuleConfig/Audio.js";
 import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage";
 import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.js";
 import { MQTT } from "@components/PageComponents/ModuleConfig/MQTT.js";

@@ -1,6 +1,4 @@
-import type React from "react";
 import { useState } from "react";
-
 import { Metrics } from "@components/Drawer/Metrics.js";
 import { Notifications } from "@components/Drawer/Notifications.js";
 import { Sensor } from "@components/Drawer/Sensor.js";

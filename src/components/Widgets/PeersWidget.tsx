@@ -1,6 +1,4 @@
-import type React from "react";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { IconButton } from "@components/form/IconButton.js";
 import { Mono } from "@components/generic/Mono.js";
 import {

@@ -1,7 +1,5 @@
-import type React from "react";
 import { Fragment } from "react";
-
-import { Network } from "@app/components/PageComponents/Config/Network.js";
+import { Network } from "@components/PageComponents/Config/Network.js";
 import { Bluetooth } from "@components/PageComponents/Config/Bluetooth.js";
 import { Device } from "@components/PageComponents/Config/Device.js";
 import { Display } from "@components/PageComponents/Config/Display.js";
@@ -12,7 +10,7 @@ import { User } from "@components/PageComponents/Config/User.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Tab } from "@headlessui/react";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
-import { Button } from "@app/components/form/Button.js";
+import { Button } from "@components/form/Button.js";
 import { CheckIcon } from "@primer/octicons-react";
 
 export const DeviceConfig = (): JSX.Element => {

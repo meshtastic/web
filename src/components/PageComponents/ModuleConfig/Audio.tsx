@@ -1,12 +1,8 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { AudioValidation } from "@app/validation/moduleConfig/audio.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -15,14 +11,9 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Audio = (): JSX.Element => {
-  const { moduleConfig, connection, setModuleConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { isDirty },
-    reset,
-    control
-  } = useForm<AudioValidation>({
+  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { register, handleSubmit, reset, control } = useForm<AudioValidation>({
+    mode: "onChange",
     defaultValues: moduleConfig.audio,
     resolver: classValidatorResolver(AudioValidation)
   });
@@ -32,34 +23,14 @@ export const Audio = (): JSX.Element => {
   }, [reset, moduleConfig.audio]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setModuleConfig(
-            new Protobuf.ModuleConfig({
-              payloadVariant: {
-                case: "audio",
-                value: data
-              }
-            })
-          )
-          .then(() =>
-            setModuleConfig(
-              new Protobuf.ModuleConfig({
-                payloadVariant: {
-                  case: "audio",
-                  value: data
-                }
-              })
-            )
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Audio Config, Restarting Node",
-          error: "No response received"
+    setWorkingModuleConfig(
+      new Protobuf.ModuleConfig({
+        payloadVariant: {
+          case: "audio",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   return (

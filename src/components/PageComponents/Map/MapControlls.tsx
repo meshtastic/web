@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { useMap } from "react-map-gl";
 
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import {
   MagnifyingGlassMinusIcon,
   MagnifyingGlassPlusIcon,

@@ -1,7 +1,4 @@
-import type React from "react";
-
 import { base16 } from "rfc4648";
-
 import { Mono } from "@components/generic/Mono.js";
 import { Table } from "@components/generic/Table";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.js";

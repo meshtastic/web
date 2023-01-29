@@ -1,12 +1,9 @@
-import type React from "react";
 import { useState } from "react";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Dialog } from "@components/generic/Dialog.js";
 import { ClockIcon, PowerIcon } from "@heroicons/react/24/outline";
-
-import { Button } from "../form/Button.js";
-import { Input } from "../form/Input.js";
+import { Button } from "@components/form/Button.js";
+import { Input } from "@components/form/Input.js";
 
 export interface ShutdownDialogProps {
   isOpen: boolean;

@@ -1,8 +1,8 @@
-import type React from "react";
+import type { ReactNode } from "react";
 
 export interface FormSectionProps {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const FormSection = ({

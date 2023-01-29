@@ -1,7 +1,5 @@
-import type React from "react";
-
-import { IconButton } from "@app/components/form/IconButton.js";
-import { Input } from "@app/components/form/Input.js";
+import { IconButton } from "@components/form/IconButton.js";
+import { Input } from "@components/form/Input.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import type { Channel } from "@core/stores/deviceStore.js";
 import { MapPinIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";

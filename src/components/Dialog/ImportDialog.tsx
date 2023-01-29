@@ -1,20 +1,14 @@
-import type React from "react";
 import { useEffect, useState } from "react";
-
-import { fromByteArray, toByteArray } from "base64-js";
-import { toast } from "react-hot-toast";
-import { QRCode } from "react-qrcode-logo";
-
+import { toByteArray } from "base64-js";
 import { Checkbox } from "@components/form/Checkbox.js";
 import { Input } from "@components/form/Input.js";
 import { Dialog } from "@components/generic/Dialog.js";
-import { ClipboardIcon } from "@heroicons/react/24/outline";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { Select } from "../form/Select.js";
-import { renderOptions } from "@app/core/utils/selectEnumOptions.js";
-import { Toggle } from "../form/Toggle.js";
-import { Button } from "../form/Button.js";
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { Select } from "@components/form/Select.js";
+import { renderOptions } from "@core/utils/selectEnumOptions.js";
+import { Toggle } from "@components/form/Toggle.js";
+import { Button } from "@components/form/Button.js";
+import { useDevice } from "@core/providers/useDevice.js";
 
 export interface ImportDialogProps {
   isOpen: boolean;

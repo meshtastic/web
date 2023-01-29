@@ -1,5 +1,3 @@
-import type React from "react";
-
 import { useDevice } from "@core/providers/useDevice.js";
 import { ChannelsPage } from "@pages/Channels.js";
 import { ConfigPage } from "@pages/Config/index.js";

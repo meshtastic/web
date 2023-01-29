@@ -1,8 +1,6 @@
-import type React from "react";
-import type { SVGProps } from "react";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
-import type { Page } from "@app/core/stores/deviceStore.js";
+import type { ComponentType, SVGProps } from "react";
+import { useDevice } from "@core/providers/useDevice.js";
+import type { Page } from "@core/stores/deviceStore.js";
 import {
   BeakerIcon,
   ChatBubbleBottomCenterTextIcon,
@@ -17,7 +15,7 @@ export const PageNav = (): JSX.Element => {
 
   interface NavLink {
     name: string;
-    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    icon: ComponentType<SVGProps<SVGSVGElement>>;
     page: Page;
   }
 

@@ -1,11 +1,8 @@
-import type React from "react";
-import { Fragment, useEffect, useState } from "react";
-
+import { ComponentType, Fragment, SVGProps, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
-import { useAppStore } from "@app/core/stores/appStore.js";
-import { useDeviceStore } from "@app/core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
+import { useAppStore } from "@core/stores/appStore.js";
+import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { GroupView } from "@components/CommandPalette/GroupView.js";
 import { NoResults } from "@components/CommandPalette/NoResults.js";
 import { PaletteTransition } from "@components/CommandPalette/PaletteTransition.js";
@@ -39,18 +36,17 @@ import {
   WindowIcon,
   XCircleIcon
 } from "@heroicons/react/24/outline";
-
-import { Blur } from "../generic/Blur.js";
-import { ThemeController } from "../generic/ThemeController.js";
+import { Blur } from "@components/generic/Blur.js";
+import { ThemeController } from "@components/generic/ThemeController.js";
 
 export interface Group {
   name: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
   commands: Command[];
 }
 export interface Command {
   name: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
   action?: () => void;
   subItems?: SubItem[];
   tags?: string[];

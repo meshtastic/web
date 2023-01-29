@@ -1,9 +1,8 @@
-import type React from "react";
-
 import { GitBranchIcon } from "@primer/octicons-react";
+import type { ReactNode } from "react";
 
 export interface BottomNavProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const BottomNav = ({ children }: BottomNavProps): JSX.Element => {

@@ -1,5 +1,3 @@
-import type React from "react";
-
 import { useDevice } from "@core/providers/useDevice.js";
 
 export const Environment = (): JSX.Element => {

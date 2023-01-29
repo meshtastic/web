@@ -1,12 +1,8 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { CannedMessageValidation } from "@app/validation/moduleConfig/cannedMessage.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -15,7 +11,7 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const CannedMessage = (): JSX.Element => {
-  const { moduleConfig, connection, setModuleConfig } = useDevice();
+  const { moduleConfig, setWorkingModuleConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -23,6 +19,7 @@ export const CannedMessage = (): JSX.Element => {
     reset,
     control
   } = useForm<CannedMessageValidation>({
+    mode: "onChange",
     defaultValues: moduleConfig.cannedMessage,
     resolver: classValidatorResolver(CannedMessageValidation)
   });
@@ -38,34 +35,14 @@ export const CannedMessage = (): JSX.Element => {
   }, [reset, moduleConfig.cannedMessage]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setModuleConfig(
-            new Protobuf.ModuleConfig({
-              payloadVariant: {
-                case: "cannedMessage",
-                value: data
-              }
-            })
-          )
-          .then(() =>
-            setModuleConfig(
-              new Protobuf.ModuleConfig({
-                payloadVariant: {
-                  case: "cannedMessage",
-                  value: data
-                }
-              })
-            )
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Canned Message Config, Restarting Node",
-          error: "No response received"
+    setWorkingModuleConfig(
+      new Protobuf.ModuleConfig({
+        payloadVariant: {
+          case: "cannedMessage",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   return (

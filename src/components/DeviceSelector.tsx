@@ -1,17 +1,15 @@
-import type React from "react";
-
-import { useAppStore } from "@app/core/stores/appStore.js";
-import { useDeviceStore } from "@app/core/stores/deviceStore.js";
+import { useAppStore } from "@core/stores/appStore.js";
+import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { NavSpacer } from "@app/Nav/NavSpacer.js";
 import { PageNav } from "@app/Nav/PageNav.js";
-import { Mono } from "@components/generic/Mono.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { MoonIcon, SunIcon } from "@primer/octicons-react";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
-  const { selectedDevice, setSelectedDevice, darkMode, setDarkMode } = useAppStore();
+  const { selectedDevice, setSelectedDevice, darkMode, setDarkMode } =
+    useAppStore();
 
   return (
     <div className="flex h-full w-14 items-center gap-3 bg-backgroundPrimary pt-3 [writing-mode:vertical-rl]">
@@ -55,12 +53,12 @@ export const DeviceSelector = (): JSX.Element => {
 
       <NavSpacer />
 
-      <div onClick={() => setDarkMode(!darkMode)} className="bg-backgroundPrimary py-5 px-4 hover:brightness-hover active:brightness-press text-textSecondary hover:text-textPrimary">{
-        darkMode ? (
-          <SunIcon className="w-4" />
-        ) : (
-          <MoonIcon className="w-4" />
-        )}</div>
+      <div
+        onClick={() => setDarkMode(!darkMode)}
+        className="bg-backgroundPrimary py-5 px-4 text-textSecondary hover:text-textPrimary hover:brightness-hover active:brightness-press"
+      >
+        {darkMode ? <SunIcon className="w-4" /> : <MoonIcon className="w-4" />}
+      </div>
 
       <img
         src={darkMode ? "Logo_White.svg" : "Logo_Black.svg"}

@@ -1,11 +1,7 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -13,51 +9,27 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const RangeTest = (): JSX.Element => {
-  const { moduleConfig, connection, setModuleConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<RangeTestValidation>({
-    defaultValues: moduleConfig.rangeTest,
-    resolver: classValidatorResolver(RangeTestValidation)
-  });
+  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { register, handleSubmit, reset, control } =
+    useForm<RangeTestValidation>({
+      mode: "onChange",
+      defaultValues: moduleConfig.rangeTest,
+      resolver: classValidatorResolver(RangeTestValidation)
+    });
 
   useEffect(() => {
     reset(moduleConfig.rangeTest);
   }, [reset, moduleConfig.rangeTest]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setModuleConfig(
-            new Protobuf.ModuleConfig({
-              payloadVariant: {
-                case: "rangeTest",
-                value: data
-              }
-            })
-          )
-          .then(() =>
-            setModuleConfig(
-              new Protobuf.ModuleConfig({
-                payloadVariant: {
-                  case: "rangeTest",
-                  value: data
-                }
-              })
-            )
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Range Test Config, Restarting Node",
-          error: "No response received"
+    setWorkingModuleConfig(
+      new Protobuf.ModuleConfig({
+        payloadVariant: {
+          case: "rangeTest",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   const moduleEnabled = useWatch({
@@ -67,9 +39,7 @@ export const RangeTest = (): JSX.Element => {
   });
 
   return (
-    <Form
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}

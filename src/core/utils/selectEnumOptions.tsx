@@ -1,5 +1,3 @@
-import type React from "react";
-
 export const renderOptions = (enumValue: {
   [s: string]: string | number;
 }): JSX.Element[] => {

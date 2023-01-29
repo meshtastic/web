@@ -1,5 +1,3 @@
-import type React from "react";
-
 import { Button } from "@components/form/Button.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { XCircleIcon } from "@heroicons/react/24/outline";
@@ -21,7 +19,7 @@ export const DeviceWidget = ({
 }: DeviceWidgetProps): JSX.Element => {
   return (
     <div className="relative flex shrink-0 flex-col overflow-hidden rounded-md text-sm text-textPrimary">
-      <div className="bg-backgroundPrimary flex p-3">
+      <div className="flex bg-backgroundPrimary p-3">
         <div>
           <Hashicon size={96} value={nodeNum} />
         </div>

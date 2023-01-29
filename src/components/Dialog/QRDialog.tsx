@@ -1,10 +1,7 @@
-import type React from "react";
 import { useEffect, useState } from "react";
-
 import { fromByteArray } from "base64-js";
 import { toast } from "react-hot-toast";
 import { QRCode } from "react-qrcode-logo";
-
 import { Checkbox } from "@components/form/Checkbox.js";
 import { Input } from "@components/form/Input.js";
 import { Dialog } from "@components/generic/Dialog.js";

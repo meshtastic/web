@@ -1,6 +1,4 @@
-import type React from "react";
 import { Fragment } from "react";
-
 import { Mono } from "@components/generic/Mono";
 import { Tab } from "@headlessui/react";
 

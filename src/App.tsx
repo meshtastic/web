@@ -1,8 +1,5 @@
-import type React from "react";
-
 import { MapProvider } from "react-map-gl";
-
-import { useAppStore } from "@app/core/stores/appStore.js";
+import { useAppStore } from "@core/stores/appStore.js";
 import { DeviceWrapper } from "@app/DeviceWrapper.js";
 import { PageRouter } from "@app/PageRouter.js";
 import { CommandPalette } from "@components/CommandPalette/Index.js";
@@ -12,9 +9,9 @@ import { NewDevice } from "@components/NewDevice.js";
 import { Sidebar } from "@components/Sidebar.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 
-import { Drawer } from "./components/Drawer/index.js";
-import { ThemeController } from "./components/generic/ThemeController.js";
-import { BottomNav } from "./Nav/BottomNav.js";
+import { Drawer } from "@components/Drawer/index.js";
+import { ThemeController } from "@components/generic/ThemeController.js";
+import { BottomNav } from "@app/Nav/BottomNav.js";
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();

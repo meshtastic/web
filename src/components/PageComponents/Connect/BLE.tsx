@@ -1,7 +1,5 @@
-import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-
-import { Mono } from "@app/components/generic/Mono.js";
+import { Mono } from "@components/generic/Mono.js";
 import { Button } from "@components/form/Button.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";

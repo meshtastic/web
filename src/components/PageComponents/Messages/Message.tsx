@@ -1,5 +1,3 @@
-import type React from "react";
-
 import { WaypointMessage } from "@components/PageComponents/Messages/WaypointMessage.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import type { AllMessageTypes } from "@core/stores/deviceStore.js";

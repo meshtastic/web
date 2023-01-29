@@ -1,6 +1,4 @@
-import type React from "react";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { toMGRS } from "@core/utils/toMGRS.js";
 import { MapPinIcon } from "@heroicons/react/24/outline";
 

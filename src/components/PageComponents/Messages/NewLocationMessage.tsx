@@ -1,7 +1,5 @@
-import type React from "react";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
 import { Button } from "@components/form/Button.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { renderOptions } from "@core/utils/selectEnumOptions.js";

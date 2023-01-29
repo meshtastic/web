@@ -1,11 +1,7 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -13,50 +9,26 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const ExternalNotification = (): JSX.Element => {
-  const { moduleConfig, connection, setModuleConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<ExternalNotificationValidation>({
-    defaultValues: moduleConfig.externalNotification,
-    resolver: classValidatorResolver(ExternalNotificationValidation)
-  });
+  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { register, handleSubmit, reset, control } =
+    useForm<ExternalNotificationValidation>({
+      mode: "onChange",
+      defaultValues: moduleConfig.externalNotification,
+      resolver: classValidatorResolver(ExternalNotificationValidation)
+    });
   useEffect(() => {
     reset(moduleConfig.externalNotification);
   }, [reset, moduleConfig.externalNotification]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setModuleConfig(
-            new Protobuf.ModuleConfig({
-              payloadVariant: {
-                case: "externalNotification",
-                value: data
-              }
-            })
-          )
-          .then(() =>
-            setModuleConfig(
-              new Protobuf.ModuleConfig({
-                payloadVariant: {
-                  case: "externalNotification",
-                  value: data
-                }
-              })
-            )
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved External Notification Config, Restarting Node",
-          error: "No response received"
+    setWorkingModuleConfig(
+      new Protobuf.ModuleConfig({
+        payloadVariant: {
+          case: "externalNotification",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   const moduleEnabled = useWatch({

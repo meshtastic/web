@@ -1,10 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import {
-  bitwiseDecode,
-  bitwiseEncode,
-  enumLike
-} from "@app/core/utils/bitwise.js";
+import { bitwiseDecode, bitwiseEncode, enumLike } from "@core/utils/bitwise.js";
 import { InfoWrapper } from "@components/form/InfoWrapper.js";
 import { Listbox } from "@headlessui/react";
 import { Protobuf } from "@meshtastic/meshtasticjs";
@@ -41,7 +37,7 @@ export const BitwiseSelect = ({
       };
     });
 
-  React.useEffect(() => {
+  useEffect(() => {
     setDecodedSelected(
       bitwiseDecode(selected, Protobuf.Config_PositionConfig_PositionFlags).map(
         (flag) =>

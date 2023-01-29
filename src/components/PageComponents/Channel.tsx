@@ -1,10 +1,7 @@
-import type React from "react";
 import { useEffect, useState } from "react";
-
 import { fromByteArray, toByteArray } from "base64-js";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-
 import { ChannelSettingsValidation } from "@app/validation/channelSettings.js";
 import { Form } from "@components/form/Form";
 import { Input } from "@components/form/Input.js";

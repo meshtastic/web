@@ -1,12 +1,11 @@
-import type React from "react";
-
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import type { ReactNode } from "react";
 
 export interface InfoWrapperProps {
   label?: string;
   description?: string;
   error?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const InfoWrapper = ({

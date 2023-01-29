@@ -1,18 +1,14 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { base16 } from "rfc4648";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { UserValidation } from "@app/validation/config/user.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { renderOptions } from "@core/utils/selectEnumOptions.js";
-import { ErrorMessage } from "@hookform/error-message";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -21,13 +17,7 @@ export const User = (): JSX.Element => {
 
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<UserValidation>({
+  const { register, handleSubmit, reset, control } = useForm<UserValidation>({
     defaultValues: myNode?.data.user,
     resolver: classValidatorResolver(UserValidation)
   });
@@ -61,12 +51,7 @@ export const User = (): JSX.Element => {
   });
 
   return (
-    <Form
-      onSubmit={onSubmit}
-    >
-      <ErrorMessage errors={errors} name="longName" />
-      <ErrorMessage errors={errors} name="shortName" />
-      <ErrorMessage errors={errors} name="isLicensed" />
+    <Form onSubmit={onSubmit}>
       <Input
         label="Device Name"
         description="Personalised name for this device."
@@ -105,7 +90,6 @@ export const User = (): JSX.Element => {
         label="Device ID"
         disabled
         description="Preset unique identifier for this device."
-        error={errors.id?.message}
         value={myNode?.data.user?.id}
       />
       <Select

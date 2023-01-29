@@ -1,8 +1,5 @@
-import type React from "react";
-
-import { Button } from "@app/components/form/Button.js";
-import { TabbedContent, TabType } from "@app/components/generic/TabbedContent";
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { TabbedContent, TabType } from "@components/generic/TabbedContent";
+import { useDevice } from "@core/providers/useDevice.js";
 import {
   Cog8ToothIcon,
   CubeTransparentIcon,

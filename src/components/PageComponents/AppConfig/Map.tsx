@@ -1,13 +1,10 @@
-import type React from "react";
-
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-
-import { Button } from "@app/components/form/Button.js";
-import { IconButton } from "@app/components/form/IconButton.js";
-import { InfoWrapper } from "@app/components/form/InfoWrapper.js";
-import { Input } from "@app/components/form/Input.js";
-import { Toggle } from "@app/components/form/Toggle.js";
-import { useAppStore } from "@app/core/stores/appStore.js";
+import { Button } from "@components/form/Button.js";
+import { IconButton } from "@components/form/IconButton.js";
+import { InfoWrapper } from "@components/form/InfoWrapper.js";
+import { Input } from "@components/form/Input.js";
+import { Toggle } from "@components/form/Toggle.js";
+import { useAppStore } from "@core/stores/appStore.js";
 import { MapValidation } from "@app/validation/appConfig/map.js";
 import { Form } from "@components/form/Form";
 import { TrashIcon } from "@heroicons/react/24/outline";

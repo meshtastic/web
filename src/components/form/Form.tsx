@@ -1,8 +1,7 @@
-import type React from "react";
-import type { HTMLProps } from "react";
+import type { FormEvent, HTMLProps } from "react";
 
 export interface FormProps extends HTMLProps<HTMLFormElement> {
-  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
+  onSubmit?: (event: FormEvent<HTMLFormElement>) => Promise<void>;
 }
 
 export const Form = ({

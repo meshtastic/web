@@ -1,13 +1,9 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { FormSection } from "@app/components/form/FormSection.js";
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { FormSection } from "@components/form/FormSection.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { LoRaValidation } from "@app/validation/config/lora.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -18,13 +14,7 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 export const LoRa = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    control,
-    reset
-  } = useForm<LoRaValidation>({
+  const { register, handleSubmit, control, reset } = useForm<LoRaValidation>({
     mode: "onChange",
     defaultValues: config.lora,
     resolver: classValidatorResolver(LoRaValidation)
@@ -81,7 +71,6 @@ export const LoRa = (): JSX.Element => {
               description="Channel bandwidth in MHz"
               type="number"
               suffix="MHz"
-              error={errors.bandwidth?.message}
               {...register("bandwidth", {
                 valueAsNumber: true
               })}
@@ -91,7 +80,6 @@ export const LoRa = (): JSX.Element => {
               description="Indicates the number of chirps per symbol"
               type="number"
               suffix="CPS"
-              error={errors.spreadFactor?.message}
               {...register("spreadFactor", {
                 valueAsNumber: true
               })}
@@ -100,7 +88,6 @@ export const LoRa = (): JSX.Element => {
               label="Coding Rate"
               description="The denominator of the coding rate"
               type="number"
-              error={errors.codingRate?.message}
               {...register("codingRate", {
                 valueAsNumber: true
               })}
@@ -132,14 +119,12 @@ export const LoRa = (): JSX.Element => {
           label="Transmit Power"
           description="Max transmit power in dBm"
           type="number"
-          error={errors.txPower?.message}
           {...register("txPower", { valueAsNumber: true })}
         />
         <Input
           label="Channel Number"
           description="LoRa channel number"
           type="number"
-          error={errors.channelNum?.message}
           {...register("channelNum", { valueAsNumber: true })}
         />
         <Input
@@ -147,7 +132,6 @@ export const LoRa = (): JSX.Element => {
           description="Frequency offset to correct for crystal calibration errors"
           suffix="Hz"
           type="number"
-          error={errors.frequencyOffset?.message}
           {...register("frequencyOffset", { valueAsNumber: true })}
         />
         <Controller
@@ -168,7 +152,6 @@ export const LoRa = (): JSX.Element => {
         description="Maximum number of hops"
         suffix="Hops"
         type="number"
-        error={errors.hopLimit?.message}
         {...register("hopLimit", { valueAsNumber: true })}
       />
     </Form>

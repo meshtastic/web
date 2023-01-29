@@ -1,5 +1,3 @@
-import type React from "react";
-
 export const Mono = ({
   children,
   className,

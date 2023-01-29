@@ -1,17 +1,16 @@
-import type React from "react";
-
 import { IconButton } from "@components/form/IconButton.js";
 import { Dialog as DialogUI } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { ThemeController } from "./ThemeController.js";
-import { Blur } from "./Blur.js";
+import { ThemeController } from "@components/generic/ThemeController.js";
+import { Blur } from "@components/generic/Blur.js";
+import type { ReactNode } from "react";
 
 export interface DialogProps {
   title: string;
   description: string;
   isOpen: boolean;
   close: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const Dialog = ({

@@ -1,12 +1,8 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { DisplayValidation } from "@app/validation/config/display.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -16,17 +12,13 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Display = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<DisplayValidation>({
-    mode: "onChange",
-    defaultValues: config.display,
-    resolver: classValidatorResolver(DisplayValidation)
-  });
+  const { register, handleSubmit, reset, control } = useForm<DisplayValidation>(
+    {
+      mode: "onChange",
+      defaultValues: config.display,
+      resolver: classValidatorResolver(DisplayValidation)
+    }
+  );
 
   useEffect(() => {
     reset(config.display);

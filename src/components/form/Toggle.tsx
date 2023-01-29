@@ -1,5 +1,3 @@
-import type React from "react";
-
 import { Switch } from "@headlessui/react";
 
 export interface ToggleProps {

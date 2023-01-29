@@ -1,8 +1,5 @@
-import type React from "react";
-
-import { TabbedContent, TabType } from "@app/components/generic/TabbedContent";
-import { Channel } from "@app/components/PageComponents/Channel.js";
-import { Button } from "@components/form/Button.js";
+import { TabbedContent, TabType } from "@components/generic/TabbedContent";
+import { Channel } from "@components/PageComponents/Channel.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import {
   ArrowDownOnSquareStackIcon,

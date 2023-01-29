@@ -1,7 +1,5 @@
 import "chartjs-adapter-date-fns";
 
-import type React from "react";
-
 import {
   Chart as ChartJS,
   Filler,
@@ -14,7 +12,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 
 export const Sensor = (): JSX.Element => {
   const { nodes, hardware } = useDevice();

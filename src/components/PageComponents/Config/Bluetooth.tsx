@@ -1,12 +1,8 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { BluetoothValidation } from "@app/validation/config/bluetooth.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -17,17 +13,12 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 export const Bluetooth = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    control,
-    reset
-  } = useForm<BluetoothValidation>({
-    mode: "onChange",
-    defaultValues: config.bluetooth,
-    resolver: classValidatorResolver(BluetoothValidation)
-  });
+  const { register, handleSubmit, control, reset } =
+    useForm<BluetoothValidation>({
+      mode: "onChange",
+      defaultValues: config.bluetooth,
+      resolver: classValidatorResolver(BluetoothValidation)
+    });
 
   useEffect(() => {
     reset(config.bluetooth);

@@ -1,5 +1,3 @@
-import type React from "react";
-
 import type { Group } from "@components/CommandPalette/Index.js";
 import { Combobox } from "@headlessui/react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";

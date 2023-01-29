@@ -1,10 +1,7 @@
-import type React from "react";
-import { forwardRef, InputHTMLAttributes, useEffect } from "react";
-
-import { InfoWrapper, InfoWrapperProps } from "@components/form/InfoWrapper.js";
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { forwardRef, useEffect } from "react";
+import { InfoWrapper } from "@components/form/InfoWrapper.js";
 import { useState } from "react";
-import type { InputProps } from "./Input.js";
+import type { InputProps } from "@components/form/Input.js";
 
 export const IPInput = forwardRef<HTMLInputElement, InputProps>(function Input(
   {

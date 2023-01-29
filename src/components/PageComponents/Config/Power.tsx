@@ -1,12 +1,8 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { FormSection } from "@app/components/form/FormSection.js";
-import { Input } from "@app/components/form/Input.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { FormSection } from "@components/form/FormSection.js";
+import { Input } from "@components/form/Input.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { PowerValidation } from "@app/validation/config/power.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -15,13 +11,7 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Power = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<PowerValidation>({
+  const { register, handleSubmit, reset, control } = useForm<PowerValidation>({
     mode: "onChange",
     defaultValues: config.power,
     resolver: classValidatorResolver(PowerValidation)
@@ -49,7 +39,6 @@ export const Power = (): JSX.Element => {
         description="Automatically shutdown node after this long when on battery, 0 for indefinite"
         suffix="Seconds"
         type="number"
-        error={errors.onBatteryShutdownAfterSecs?.message}
         {...register("onBatteryShutdownAfterSecs", { valueAsNumber: true })}
       />
       <Controller
@@ -68,7 +57,6 @@ export const Power = (): JSX.Element => {
         label="ADC Multiplier Override ratio"
         description="Used for tweaking battery voltage reading"
         type="number"
-        error={errors.adcMultiplierOverride?.message}
         {...register("adcMultiplierOverride", { valueAsNumber: true })}
       />
       <FormSection title="Sleep Settings">
@@ -77,7 +65,6 @@ export const Power = (): JSX.Element => {
           description="Minimum amount of time the device will stay awake for after receiving a packet"
           suffix="Seconds"
           type="number"
-          error={errors.minWakeSecs?.message}
           {...register("minWakeSecs", { valueAsNumber: true })}
         />
         <Input
@@ -85,7 +72,6 @@ export const Power = (): JSX.Element => {
           description="The device will enter super deep sleep after this time"
           suffix="Seconds"
           type="number"
-          error={errors.meshSdsTimeoutSecs?.message}
           {...register("meshSdsTimeoutSecs", { valueAsNumber: true })}
         />
         <Input
@@ -93,7 +79,6 @@ export const Power = (): JSX.Element => {
           description="How long the device will be in super deep sleep for"
           suffix="Seconds"
           type="number"
-          error={errors.sdsSecs?.message}
           {...register("sdsSecs", { valueAsNumber: true })}
         />
         <Input
@@ -101,7 +86,6 @@ export const Power = (): JSX.Element => {
           description="How long the device will be in light sleep for"
           suffix="Seconds"
           type="number"
-          error={errors.lsSecs?.message}
           {...register("lsSecs", { valueAsNumber: true })}
         />
       </FormSection>
@@ -110,7 +94,6 @@ export const Power = (): JSX.Element => {
         description="If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long"
         suffix="Seconds"
         type="number"
-        error={errors.waitBluetoothSecs?.message}
         {...register("waitBluetoothSecs", { valueAsNumber: true })}
       />
     </Form>
