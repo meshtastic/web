@@ -1,6 +1,4 @@
-import type React from "react";
 import { forwardRef, InputHTMLAttributes } from "react";
-
 import { InfoWrapper, InfoWrapperProps } from "@components/form/InfoWrapper.js";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 

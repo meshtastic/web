@@ -2,7 +2,9 @@ import { IsBoolean, IsInt, Max, Min } from "class-validator";
 
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
-export class PowerValidation implements Protobuf.Config_PowerConfig {
+export class PowerValidation
+  implements Omit<Protobuf.Config_PowerConfig, keyof Protobuf.native.Message>
+{
   @IsBoolean()
   isPowerSaving: boolean;
 

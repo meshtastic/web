@@ -1,5 +1,3 @@
-import type React from "react";
-
 import { MapPinIcon } from "@heroicons/react/24/outline";
 
 export interface PositionWidgetProps {

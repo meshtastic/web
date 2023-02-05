@@ -1,6 +1,4 @@
-import type React from "react";
 import { useState } from "react";
-
 import { Metrics } from "@components/Drawer/Metrics.js";
 import { Notifications } from "@components/Drawer/Notifications.js";
 import { Sensor } from "@components/Drawer/Sensor.js";
@@ -12,13 +10,13 @@ export const Drawer = (): JSX.Element => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const tabs: TabType[] = [
-    { name: "Notifications", element: Notifications },
-    { name: "Metrics", element: Metrics },
-    { name: "Sensor", element: Sensor }
+    { label: "Notifications", element: Notifications },
+    { label: "Metrics", element: Metrics },
+    { label: "Sensor", element: Sensor }
   ];
   return (
-    <Tab.Group>
-      <Tab.List className="flex bg-backgroundPrimary">
+    <Tab.Group as="div">
+      <Tab.List className="flex w-full">
         {tabs.map((tab, index) => (
           <Tab key={index}>
             {({ selected }) => (
@@ -26,13 +24,13 @@ export const Drawer = (): JSX.Element => {
                 onClick={() => {
                   setDrawerOpen(true);
                 }}
-                className={`flex h-full cursor-pointer border-b-2 px-1 first:pl-2 last:pr-2 hover:text-textPrimary ${
+                className={`flex h-full cursor-pointer border-b-4 px-1 first:pl-2 last:pr-2 hover:text-textPrimary ${
                   selected
                     ? "border-accent text-textPrimary"
                     : "border-backgroundPrimary text-textSecondary"
                 }`}
               >
-                <span className="m-auto select-none">{tab.name}</span>
+                <span className="m-auto select-none">{tab.label}</span>
               </div>
             )}
           </Tab>

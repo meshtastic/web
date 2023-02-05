@@ -1,10 +1,4 @@
-import type React from "react";
-
-import { IconButton } from "@app/components/form/IconButton.js";
-import {
-  TabbedContent,
-  TabType
-} from "@app/components/generic/TabbedContent.js";
+import { TabbedContent, TabType } from "@components/generic/TabbedContent.js";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { PencilIcon } from "@heroicons/react/24/outline";
@@ -15,7 +9,7 @@ export const MessagesPage = (): JSX.Element => {
 
   const tabs: TabType[] = channels.map((channel) => {
     return {
-      name: channel.config.settings?.name.length
+      label: channel.config.settings?.name.length
         ? channel.config.settings?.name
         : channel.config.index === 0
         ? "Primary"

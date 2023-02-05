@@ -1,7 +1,5 @@
-import type React from "react";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
 import { Button } from "@components/form/Button.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { renderOptions } from "@core/utils/selectEnumOptions.js";
@@ -31,15 +29,15 @@ export const NewLocationMessage = (): JSX.Element => {
         <Input label="Coordinates" />
         <Button
           onClick={() => {
-            void connection?.sendWaypoint({
-              waypoint: Protobuf.Waypoint.create({
+            void connection?.sendWaypoint(
+              new Protobuf.Waypoint({
                 latitudeI: Math.floor(3.89103 * 1e7),
                 longitudeI: Math.floor(105.87005 * 1e7),
                 name: "TEST",
                 description: "This is a description"
               }),
-              destination: "broadcast"
-            });
+              "broadcast"
+            );
           }}
         >
           Send

@@ -2,7 +2,10 @@ import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
-export class BluetoothValidation implements Protobuf.Config_BluetoothConfig {
+export class BluetoothValidation
+  implements
+    Omit<Protobuf.Config_BluetoothConfig, keyof Protobuf.native.Message>
+{
   @IsBoolean()
   enabled: boolean;
 

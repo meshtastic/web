@@ -1,11 +1,8 @@
-import type React from "react";
-import { Fragment, useEffect, useState } from "react";
-
+import { ComponentType, Fragment, SVGProps, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
-import { useAppStore } from "@app/core/stores/appStore.js";
-import { useDeviceStore } from "@app/core/stores/deviceStore.js";
+import { useDevice } from "@core/providers/useDevice.js";
+import { useAppStore } from "@core/stores/appStore.js";
+import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { GroupView } from "@components/CommandPalette/GroupView.js";
 import { NoResults } from "@components/CommandPalette/NoResults.js";
 import { PaletteTransition } from "@components/CommandPalette/PaletteTransition.js";
@@ -17,14 +14,13 @@ import {
   ArchiveBoxXMarkIcon,
   ArrowDownOnSquareStackIcon,
   ArrowPathIcon,
+  ArrowPathRoundedSquareIcon,
   ArrowsRightLeftIcon,
   BeakerIcon,
   BugAntIcon,
   Cog8ToothIcon,
   CubeTransparentIcon,
   DevicePhoneMobileIcon,
-  DocumentTextIcon,
-  IdentificationIcon,
   InboxIcon,
   LinkIcon,
   MapIcon,
@@ -40,25 +36,24 @@ import {
   WindowIcon,
   XCircleIcon
 } from "@heroicons/react/24/outline";
-import { ThemeController } from "../generic/ThemeController.js";
-import { Blur } from "../generic/Blur.js";
-import { accentColor } from "@core/stores/appStore.js";
+import { Blur } from "@components/generic/Blur.js";
+import { ThemeController } from "@components/generic/ThemeController.js";
 
 export interface Group {
-  name: string;
-  icon: (props: React.ComponentProps<"svg">) => JSX.Element;
+  label: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
   commands: Command[];
 }
 export interface Command {
-  name: string;
-  icon: (props: React.ComponentProps<"svg">) => JSX.Element;
+  label: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
   action?: () => void;
   subItems?: SubItem[];
   tags?: string[];
 }
 
 export interface SubItem {
-  name: string;
+  label: string;
   icon: JSX.Element;
   action: () => void;
 }
@@ -78,43 +73,29 @@ export const CommandPalette = (): JSX.Element => {
   } = useAppStore();
   const { getDevices } = useDeviceStore();
 
-  const {
-    setQRDialogOpen,
-    setImportDialogOpen,
-    setShutdownDialogOpen,
-    setRebootDialogOpen,
-    setActivePage,
-    connection
-  } = useDevice();
+  const { setDialogOpen, setActivePage, connection } = useDevice();
 
   const groups: Group[] = [
     {
-      name: "Goto",
+      label: "Goto",
       icon: LinkIcon,
       commands: [
         {
-          name: "Messages",
+          label: "Messages",
           icon: InboxIcon,
           action() {
             setActivePage("messages");
           }
         },
         {
-          name: "Map",
+          label: "Map",
           icon: MapIcon,
           action() {
             setActivePage("map");
           }
         },
         {
-          name: "Extensions",
-          icon: BeakerIcon,
-          action() {
-            setActivePage("extensions");
-          }
-        },
-        {
-          name: "Config",
+          label: "Config",
           icon: Cog8ToothIcon,
           action() {
             setActivePage("config");
@@ -122,45 +103,31 @@ export const CommandPalette = (): JSX.Element => {
           tags: ["settings"]
         },
         {
-          name: "Channels",
+          label: "Channels",
           icon: Square3Stack3DIcon,
           action() {
             setActivePage("channels");
           }
         },
         {
-          name: "Peers",
+          label: "Peers",
           icon: UsersIcon,
           action() {
             setActivePage("peers");
-          }
-        },
-        {
-          name: "Info",
-          icon: IdentificationIcon,
-          action() {
-            setActivePage("info");
-          }
-        },
-        {
-          name: "Logs",
-          icon: DocumentTextIcon,
-          action() {
-            setActivePage("logs");
           }
         }
       ]
     },
     {
-      name: "Manage",
+      label: "Manage",
       icon: DevicePhoneMobileIcon,
       commands: [
         {
-          name: "Switch Node",
+          label: "Switch Node",
           icon: ArrowsRightLeftIcon,
           subItems: getDevices().map((device) => {
             return {
-              name:
+              label:
                 device.nodes.find(
                   (n) => n.data.num === device.hardware.myNodeNum
                 )?.data.user?.longName ?? device.hardware.myNodeNum.toString(),
@@ -177,7 +144,7 @@ export const CommandPalette = (): JSX.Element => {
           })
         },
         {
-          name: "Connect New Node",
+          label: "Connect New Node",
           icon: PlusIcon,
           action() {
             setSelectedDevice(0);
@@ -186,31 +153,54 @@ export const CommandPalette = (): JSX.Element => {
       ]
     },
     {
-      name: "Contextual",
+      label: "Contextual",
       icon: CubeTransparentIcon,
       commands: [
         {
-          name: "QR Code",
+          label: "QR Code",
           icon: QrCodeIcon,
           subItems: [
             {
-              name: "Generator",
+              label: "Generator",
               icon: <QueueListIcon className="w-4" />,
               action() {
-                setQRDialogOpen(true);
+                setDialogOpen("QR", true);
               }
             },
             {
-              name: "Import",
+              label: "Import",
               icon: <ArrowDownOnSquareStackIcon className="w-4" />,
               action() {
-                setImportDialogOpen(true);
+                setDialogOpen("import", true);
               }
             }
           ]
         },
         {
-          name: "Reset Peers",
+          label: "Disconnect",
+          icon: XCircleIcon,
+          action() {
+            void connection?.disconnect();
+            setSelectedDevice(0);
+            removeDevice(selectedDevice ?? 0);
+          }
+        },
+        {
+          label: "Schedule Shutdown",
+          icon: PowerIcon,
+          action() {
+            setDialogOpen("shutdown", true);
+          }
+        },
+        {
+          label: "Schedule Reboot",
+          icon: ArrowPathIcon,
+          action() {
+            setDialogOpen("reboot", true);
+          }
+        },
+        {
+          label: "Reset Peers",
           icon: TrashIcon,
           action() {
             if (connection) {
@@ -223,43 +213,33 @@ export const CommandPalette = (): JSX.Element => {
           }
         },
         {
-          name: "Disconnect",
-          icon: XCircleIcon,
+          label: "Factory Reset",
+          icon: ArrowPathRoundedSquareIcon,
           action() {
-            void connection?.disconnect();
-            setSelectedDevice(0);
-            removeDevice(selectedDevice ?? 0);
-          }
-        },
-        {
-          name: "Schedule Shutdown",
-          icon: PowerIcon,
-          action() {
-            setShutdownDialogOpen(true);
-          }
-        },
-        {
-          name: "Schedule Reboot",
-          icon: ArrowPathIcon,
-          action() {
-            setRebootDialogOpen(true);
+            if (connection) {
+              void toast.promise(connection.factoryReset(), {
+                loading: "Resetting...",
+                success: "Succesfully factory peers",
+                error: "No response received"
+              });
+            }
           }
         }
       ]
     },
     {
-      name: "Debug",
+      label: "Debug",
       icon: BugAntIcon,
       commands: [
         {
-          name: "Reconfigure",
+          label: "Reconfigure",
           icon: ArrowPathIcon,
           action() {
             void connection?.configure();
           }
         },
         {
-          name: "[WIP] Clear Messages",
+          label: "[WIP] Clear Messages",
           icon: ArchiveBoxXMarkIcon,
           action() {
             alert("This feature is not implemented");
@@ -268,22 +248,22 @@ export const CommandPalette = (): JSX.Element => {
       ]
     },
     {
-      name: "Application",
+      label: "Application",
       icon: WindowIcon,
       commands: [
         {
-          name: "Toggle Dark Mode",
+          label: "Toggle Dark Mode",
           icon: MoonIcon,
           action() {
             setDarkMode(!darkMode);
           }
         },
         {
-          name: "Accent Color",
+          label: "Accent Color",
           icon: SwatchIcon,
           subItems: [
             {
-              name: "Red",
+              label: "Red",
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -296,7 +276,7 @@ export const CommandPalette = (): JSX.Element => {
               }
             },
             {
-              name: "Orange",
+              label: "Orange",
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -309,7 +289,7 @@ export const CommandPalette = (): JSX.Element => {
               }
             },
             {
-              name: "Yellow",
+              label: "Yellow",
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -322,7 +302,7 @@ export const CommandPalette = (): JSX.Element => {
               }
             },
             {
-              name: "Green",
+              label: "Green",
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -335,7 +315,7 @@ export const CommandPalette = (): JSX.Element => {
               }
             },
             {
-              name: "Blue",
+              label: "Blue",
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -348,7 +328,7 @@ export const CommandPalette = (): JSX.Element => {
               }
             },
             {
-              name: "Purple",
+              label: "Purple",
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -361,7 +341,7 @@ export const CommandPalette = (): JSX.Element => {
               }
             },
             {
-              name: "Pink",
+              label: "Pink",
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -399,7 +379,7 @@ export const CommandPalette = (): JSX.Element => {
             return {
               ...group,
               commands: group.commands.filter((command) => {
-                const nameIncludes = `${group.name} ${command.name}`
+                const nameIncludes = `${group.label} ${command.label}`
                   .toLowerCase()
                   .includes(query.toLowerCase());
 
@@ -412,7 +392,7 @@ export const CommandPalette = (): JSX.Element => {
                 const subItemsInclude = (
                   command.subItems
                     ?.map((s) =>
-                      s.name.toLowerCase().includes(query.toLowerCase())
+                      s.label.toLowerCase().includes(query.toLowerCase())
                     )
                     .filter(Boolean) ?? []
                 ).length;

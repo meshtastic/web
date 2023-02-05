@@ -1,7 +1,4 @@
 import "chartjs-adapter-date-fns";
-
-import type React from "react";
-
 import {
   Chart as ChartJS,
   Filler,
@@ -13,8 +10,7 @@ import {
   Tooltip
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 
 export const Metrics = (): JSX.Element => {
   const { nodes, hardware } = useDevice();
@@ -81,7 +77,7 @@ export const Metrics = (): JSX.Element => {
               data: myNode?.deviceMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.airUtilTx
+                  y: metric.metric.airUtilTx
                 };
               }),
               backgroundColor: "rgba(102, 126, 234, 0.25)",
@@ -95,7 +91,7 @@ export const Metrics = (): JSX.Element => {
               data: myNode?.deviceMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.channelUtilization
+                  y: metric.metric.channelUtilization
                 };
               }),
               backgroundColor: "rgba(237, 100, 166, 0.25)",
@@ -109,7 +105,7 @@ export const Metrics = (): JSX.Element => {
               data: myNode?.deviceMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.batteryLevel
+                  y: metric.metric.batteryLevel
                 };
               }),
               backgroundColor: "rgba(113, 234, 102, 0.25)",
@@ -123,7 +119,7 @@ export const Metrics = (): JSX.Element => {
               data: myNode?.deviceMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.voltage
+                  y: metric.metric.voltage
                 };
               }),
               backgroundColor: "rgba(234, 166, 102, 0.25)",

@@ -1,12 +1,8 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { DeviceValidation } from "@app/validation/config/device.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -19,61 +15,32 @@ import { getCurrentConfig } from "@app/core/stores/configStore";
 export const Device = (): JSX.Element => {
   // TODO: Apply to other pages as well
   const { selectedDevice } = useAppStore();
-  const { config, moduleConfig } = getCurrentConfig();
+  const { configCust, moduleConfig } = getCurrentConfig();
   // TODO: Put these in separate setCurrentConfig() function
-  const { connection, setConfig } = selectedDevice != -1 ? useDevice() : {connection: undefined, setConfig: undefined };
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    control,
-    reset
-  } = useForm<DeviceValidation>({
-    defaultValues: config.device,
+  const { config, setWorkingConfig } = selectedDevice != -1 ? useDevice() : {config: undefined, setWorkingConfig: undefined };
+  const { register, handleSubmit, control, reset } = useForm<DeviceValidation>({
+    mode: "onChange",
+    defaultValues: configCust.device,
     resolver: classValidatorResolver(DeviceValidation)
   });
 
   useEffect(() => {
-    reset(config.device);
-  }, [reset, config.device]);
+    reset(configCust.device);
+  }, [reset, configCust.device]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setConfig({
-            config: {
-              payloadVariant: {
-                oneofKind: "device",
-                device: data
-              }
-            }
-          })
-          .then(() =>
-            setConfig({
-              payloadVariant: {
-                oneofKind: "device",
-                device: data
-              }
-            })
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Device Config, Restarting Node",
-          error: "No response received"
+    setWorkingConfig ? (
+      new Protobuf.Config({
+        payloadVariant: {
+          case: "device",
+          value: data
         }
-      );
-    }
+      })
+    ) : null /* not implemented yet */ ;
   });
 
   return (
-    <Form
-      title="Device Config"
-      breadcrumbs={["Config", "Device"]}
-      reset={() => reset(config.device)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Select
         label="Role"
         description="What role the device performs on the mesh"
@@ -109,14 +76,12 @@ export const Device = (): JSX.Element => {
         label="Button Pin"
         description="Button pin override"
         type="number"
-        error={errors.buttonGpio?.message}
         {...register("buttonGpio", { valueAsNumber: true })}
       />
       <Input
         label="Buzzer Pin"
         description="Buzzer pin override"
         type="number"
-        error={errors.buzzerGpio?.message}
         {...register("buzzerGpio", { valueAsNumber: true })}
       />
     </Form>

@@ -1,8 +1,5 @@
-import type React from "react";
-
-import { Button } from "@app/components/form/Button.js";
-import { TabbedContent, TabType } from "@app/components/generic/TabbedContent";
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { TabbedContent, TabType } from "@components/generic/TabbedContent";
+import { useDevice } from "@core/providers/useDevice.js";
 import {
   Cog8ToothIcon,
   CubeTransparentIcon,
@@ -17,17 +14,17 @@ export const ConfigPage = (): JSX.Element => {
 
   const tabs: TabType[] = [
     {
-      name: "Device Config",
+      label: "Device Config",
       icon: <Cog8ToothIcon className="h-4" />,
       element: DeviceConfig
     },
     {
-      name: "Module Config",
+      label: "Module Config",
       icon: <CubeTransparentIcon className="h-4" />,
       element: ModuleConfig
     },
     {
-      name: "App Config",
+      label: "App Config",
       icon: <WindowIcon className="h-4" />,
       element: AppConfig
     }

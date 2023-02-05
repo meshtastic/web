@@ -1,53 +1,39 @@
-import type React from "react";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { QRDialog } from "@components/Dialog/QRDialog.js";
-
-import { RebootDialog } from "./RebootDialog.js";
-import { ShutdownDialog } from "./ShutdownDialog.js";
-import { ImportDialog } from "./ImportDialog.js";
+import { RebootDialog } from "@components/Dialog/RebootDialog.js";
+import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.js";
+import { ImportDialog } from "@components/Dialog/ImportDialog.js";
 
 export const DialogManager = (): JSX.Element => {
-  const {
-    channels,
-    config,
-    importDialogOpen,
-    setImportDialogOpen,
-    QRDialogOpen,
-    setQRDialogOpen,
-    shutdownDialogOpen,
-    setShutdownDialogOpen,
-    rebootDialogOpen,
-    setRebootDialogOpen
-  } = useDevice();
+  const { channels, config, dialog, setDialogOpen } = useDevice();
   return (
     <>
       <QRDialog
-        isOpen={QRDialogOpen}
+        isOpen={dialog.QR}
         close={() => {
-          setQRDialogOpen(false);
+          setDialogOpen("QR", false);
         }}
         channels={channels.map((ch) => ch.config)}
         loraConfig={config.lora}
       />
       <ImportDialog
-        isOpen={importDialogOpen}
+        isOpen={dialog.import}
         close={() => {
-          setImportDialogOpen(false);
+          setDialogOpen("import", false);
         }}
         channels={channels.map((ch) => ch.config)}
         loraConfig={config.lora}
       />
       <ShutdownDialog
-        isOpen={shutdownDialogOpen}
+        isOpen={dialog.shutdown}
         close={() => {
-          setShutdownDialogOpen(false);
+          setDialogOpen("shutdown", false);
         }}
       />
       <RebootDialog
-        isOpen={rebootDialogOpen}
+        isOpen={dialog.reboot}
         close={() => {
-          setRebootDialogOpen(false);
+          setDialogOpen("reboot", false);
         }}
       />
     </>

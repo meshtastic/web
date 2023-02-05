@@ -1,20 +1,14 @@
-import type React from "react";
 import { useEffect, useState } from "react";
-
-import { fromByteArray, toByteArray } from "base64-js";
-import { toast } from "react-hot-toast";
-import { QRCode } from "react-qrcode-logo";
-
+import { toByteArray } from "base64-js";
 import { Checkbox } from "@components/form/Checkbox.js";
 import { Input } from "@components/form/Input.js";
 import { Dialog } from "@components/generic/Dialog.js";
-import { ClipboardIcon } from "@heroicons/react/24/outline";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { Select } from "../form/Select.js";
-import { renderOptions } from "@app/core/utils/selectEnumOptions.js";
-import { Toggle } from "../form/Toggle.js";
-import { Button } from "../form/Button.js";
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { Select } from "@components/form/Select.js";
+import { renderOptions } from "@core/utils/selectEnumOptions.js";
+import { Toggle } from "@components/form/Toggle.js";
+import { Button } from "@components/form/Button.js";
+import { useDevice } from "@core/providers/useDevice.js";
 
 export interface ImportDialogProps {
   isOpen: boolean;
@@ -49,27 +43,27 @@ export const ImportDialog = ({
 
   const apply = () => {
     channelSet?.settings.map((ch, index) => {
-      connection?.setChannel({
-        channel: {
+      connection?.setChannel(
+        new Protobuf.Channel({
           index,
           role:
             index === 0
               ? Protobuf.Channel_Role.PRIMARY
               : Protobuf.Channel_Role.SECONDARY,
           settings: ch
-        }
-      });
+        })
+      );
     });
 
     if (channelSet?.loraConfig) {
-      connection?.setConfig({
-        config: {
+      connection?.setConfig(
+        new Protobuf.Config({
           payloadVariant: {
-            oneofKind: "lora",
-            lora: channelSet.loraConfig
+            case: "lora",
+            value: channelSet.loraConfig
           }
-        }
-      });
+        })
+      );
     }
   };
 

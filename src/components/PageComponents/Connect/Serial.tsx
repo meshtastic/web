@@ -1,7 +1,5 @@
-import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-
-import { Mono } from "@app/components/generic/Mono.js";
+import { Mono } from "@components/generic/Mono.js";
 import { Button } from "@components/form/Button.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
@@ -65,6 +63,7 @@ export const Serial = (): JSX.Element => {
         {serialPorts.map((port, index) => (
           <Button
             key={index}
+            disabled={port.readable !== null}
             onClick={() => {
               void onConnect(port);
             }}
@@ -79,14 +78,14 @@ export const Serial = (): JSX.Element => {
         )}
       </div>
       <Button
-        iconBefore={<PlusCircleIcon className="w-4" />}
         onClick={() => {
           void navigator.serial.requestPort().then((port) => {
             setSerialPorts(serialPorts.concat(port));
           });
         }}
       >
-        New device
+        <PlusCircleIcon className="w-4" />
+        <span>New device</span>
       </Button>
       <Button
         onClick={async () => {          

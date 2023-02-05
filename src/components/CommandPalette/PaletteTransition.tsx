@@ -1,10 +1,8 @@
-import type React from "react";
-import { Fragment } from "react";
-
+import { Fragment, ReactNode } from "react";
 import { Transition } from "@headlessui/react";
 
 export interface PaletteTransitionProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const PaletteTransition = ({

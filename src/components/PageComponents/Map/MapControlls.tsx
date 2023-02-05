@@ -1,13 +1,14 @@
-import { useMap } from "react-map-gl";
-import { lineString, bbox } from "@turf/turf";
+import { useEffect } from "react";
 
+import { useMap } from "react-map-gl";
+
+import { useDevice } from "@core/providers/useDevice.js";
 import {
   MagnifyingGlassMinusIcon,
   MagnifyingGlassPlusIcon,
   ShareIcon
 } from "@heroicons/react/24/outline";
-import { useDevice } from "@app/core/providers/useDevice.js";
-import { useEffect } from "react";
+import { bbox, lineString } from "@turf/turf";
 
 export const MapControlls = (): JSX.Element => {
   const { current: map } = useMap();
@@ -15,36 +16,23 @@ export const MapControlls = (): JSX.Element => {
 
   const getBBox = () => {
     const nodesWithPosition = nodes.filter((n) => n.data.position?.latitudeI);
-
-    if (nodesWithPosition.length > 1) {
-      const line = lineString(
-        nodesWithPosition.map((n) => [
-          (n.data.position?.latitudeI ?? 0) / 1e7,
-          (n.data.position?.longitudeI ?? 0) / 1e7
-        ])
-      );
-
-      const bounds = bbox(line);
-
-      const center = map?.cameraForBounds(
-        [
-          [bounds[1], bounds[0]],
-          [bounds[3], bounds[2]]
-        ],
-        {
-          padding: {
-            top: 10,
-            bottom: 10,
-            left: 10,
-            right: 10
-          }
-        }
-      );
-
-      if (center) {
-        map?.easeTo(center);
-      }
-    } else if (nodesWithPosition.length === 1) {
+    if (!nodesWithPosition.length) return;
+    const line = lineString(
+      nodesWithPosition.map((n) => [
+        (n.data.position?.latitudeI ?? 0) / 1e7,
+        (n.data.position?.longitudeI ?? 0) / 1e7
+      ])
+    );
+    const bounds = bbox(line);
+    const center = map?.cameraForBounds(
+      [
+        [bounds[1], bounds[0]],
+        [bounds[3], bounds[2]]
+      ],
+      { padding: { top: 10, bottom: 10, left: 10, right: 10 } }
+    );
+    if (center) map?.easeTo(center);
+    else if (nodesWithPosition.length === 1)
       map?.easeTo({
         zoom: 12,
         center: [
@@ -52,7 +40,6 @@ export const MapControlls = (): JSX.Element => {
           (nodesWithPosition[0].data.position?.latitudeI ?? 0) / 1e7
         ]
       });
-    }
   };
 
   useEffect(() => {

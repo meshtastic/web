@@ -1,14 +1,13 @@
 import { createContext } from "react";
 
 import { produce } from "immer";
-import create from "zustand";
+import { create } from "zustand";
 
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
 export type Page =
   | "messages"
   | "map"
-  | "extensions"
   | "config"
   | "channels"
   | "peers"
@@ -37,8 +36,14 @@ export interface Channel {
 }
 
 export interface Node {
-  deviceMetrics: (Protobuf.DeviceMetrics & { timestamp: Date })[];
-  environmentMetrics: (Protobuf.EnvironmentMetrics & { timestamp: Date })[];
+  deviceMetrics: {
+    metric: Protobuf.DeviceMetrics;
+    timestamp: Date;
+  }[];
+  environmentMetrics: {
+    metric: Protobuf.EnvironmentMetrics;
+    timestamp: Date;
+  }[];
   metadata?: Protobuf.DeviceMetadata;
   data: Protobuf.NodeInfo;
 }
@@ -54,6 +59,8 @@ export interface FlashingProgress {
   percentage: number;
 }
 
+export type DialogVariant = "import" | "QR" | "shutdown" | "reboot";
+
 export interface Device {
   id: number;
   ready: boolean;
@@ -61,6 +68,8 @@ export interface Device {
   channels: Channel[];
   config: Protobuf.LocalConfig;
   moduleConfig: Protobuf.LocalModuleConfig;
+  workingConfig: Protobuf.Config[];
+  workingModuleConfig: Protobuf.ModuleConfig[];
   hardware: Protobuf.MyNodeInfo;
   nodes: Node[];
   connection?: Types.ConnectionType;
@@ -70,19 +79,24 @@ export interface Device {
   waypoints: Protobuf.Waypoint[];
   regionUnset: boolean;
   currentMetrics: Protobuf.DeviceMetrics;
-  importDialogOpen: boolean;
-  QRDialogOpen: boolean;
-  shutdownDialogOpen: boolean;
-  rebootDialogOpen: boolean;
   pendingSettingsChanges: boolean;
   selectedToFlash: boolean;
   serialPort?: SerialPort;      // TEMP until lib let's you access the port
   flashingProgress: FlashingProgress;
+  messageDraft: string;
+  dialog: {
+    import: boolean;
+    QR: boolean;
+    shutdown: boolean;
+    reboot: boolean;
+  };
 
   setReady(ready: boolean): void;
   setStatus: (status: Types.DeviceStatusEnum) => void;
   setConfig: (config: Protobuf.Config) => void;
   setModuleConfig: (config: Protobuf.ModuleConfig) => void;
+  setWorkingConfig: (config: Protobuf.Config) => void;
+  setWorkingModuleConfig: (config: Protobuf.ModuleConfig) => void;
   setHardware: (hardware: Protobuf.MyNodeInfo) => void;
   setMetrics: (metrics: Types.PacketMetadata<Protobuf.Telemetry>) => void;
   setActivePage: (page: Page) => void;
@@ -108,11 +122,9 @@ export interface Device {
     messageId: number,
     state: MessageState
   ) => void;
-  setImportDialogOpen: (open: boolean) => void;
-  setQRDialogOpen: (open: boolean) => void;
-  setShutdownDialogOpen: (open: boolean) => void;
-  setRebootDialogOpen: (open: boolean) => void;
+  setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   processPacket: (data: processPacketParams) => void;
+  setMessageDraft: (message: string) => void;
 }
 
 export interface DeviceState {
@@ -137,9 +149,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           ready: false,
           status: Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
           channels: [],
-          config: Protobuf.LocalConfig.create(),
-          moduleConfig: Protobuf.LocalModuleConfig.create(),
-          hardware: Protobuf.MyNodeInfo.create(),
+          config: new Protobuf.LocalConfig(),
+          moduleConfig: new Protobuf.LocalModuleConfig(),
+          workingConfig: [],
+          workingModuleConfig: [],
+          hardware: new Protobuf.MyNodeInfo(),
           nodes: [],
           connection: undefined,
           activePage: "messages",
@@ -147,14 +161,17 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           activePeer: 0,
           waypoints: [],
           regionUnset: false,
-          currentMetrics: Protobuf.DeviceMetrics.create(),
-          importDialogOpen: false,
-          QRDialogOpen: false,
-          shutdownDialogOpen: false,
-          rebootDialogOpen: false,
+          currentMetrics: new Protobuf.DeviceMetrics(),
+          dialog: {
+            import: false,
+            QR: false,
+            shutdown: false,
+            reboot: false
+          },
           pendingSettingsChanges: false,
           selectedToFlash: false,
           flashingProgress: { step: 'idle', percentage: 0 },
+          messageDraft: "",
 
           setReady: (ready: boolean) => {
             set(
@@ -182,30 +199,30 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
 
                 if (device) {
-                  switch (config.payloadVariant.oneofKind) {
+                  switch (config.payloadVariant.case) {
                     case "device":
-                      device.config.device = config.payloadVariant.device;
+                      device.config.device = config.payloadVariant.value;
                       break;
                     case "position":
-                      device.config.position = config.payloadVariant.position;
+                      device.config.position = config.payloadVariant.value;
                       break;
                     case "power":
-                      device.config.power = config.payloadVariant.power;
+                      device.config.power = config.payloadVariant.value;
                       break;
                     case "network":
-                      device.config.network = config.payloadVariant.network;
+                      device.config.network = config.payloadVariant.value;
                       break;
                     case "display":
-                      device.config.display = config.payloadVariant.display;
+                      device.config.display = config.payloadVariant.value;
                       break;
                     case "lora":
-                      device.config.lora = config.payloadVariant.lora;
+                      device.config.lora = config.payloadVariant.value;
                       device.regionUnset =
-                        config.payloadVariant.lora.region ===
+                        config.payloadVariant.value.region ===
                         Protobuf.Config_LoRaConfig_RegionCode.UNSET;
                       break;
                     case "bluetooth":
-                      device.config.bluetooth = config.payloadVariant.bluetooth;
+                      device.config.bluetooth = config.payloadVariant.value;
                       break;
                   }
                 }
@@ -218,34 +235,76 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
 
                 if (device) {
-                  switch (config.payloadVariant.oneofKind) {
+                  switch (config.payloadVariant.case) {
                     case "mqtt":
-                      device.moduleConfig.mqtt = config.payloadVariant.mqtt;
+                      device.moduleConfig.mqtt = config.payloadVariant.value;
                       break;
                     case "serial":
-                      device.moduleConfig.serial = config.payloadVariant.serial;
+                      device.moduleConfig.serial = config.payloadVariant.value;
                       break;
                     case "externalNotification":
                       device.moduleConfig.externalNotification =
-                        config.payloadVariant.externalNotification;
+                        config.payloadVariant.value;
                       break;
                     case "storeForward":
                       device.moduleConfig.storeForward =
-                        config.payloadVariant.storeForward;
+                        config.payloadVariant.value;
                       break;
                     case "rangeTest":
                       device.moduleConfig.rangeTest =
-                        config.payloadVariant.rangeTest;
+                        config.payloadVariant.value;
                       break;
                     case "telemetry":
                       device.moduleConfig.telemetry =
-                        config.payloadVariant.telemetry;
+                        config.payloadVariant.value;
                       break;
                     case "cannedMessage":
                       device.moduleConfig.cannedMessage =
-                        config.payloadVariant.cannedMessage;
+                        config.payloadVariant.value;
                       break;
+                    case "audio":
+                      device.moduleConfig.audio = config.payloadVariant.value;
                   }
+                }
+              })
+            );
+          },
+          setWorkingConfig: (config: Protobuf.Config) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+                const workingConfigIndex = device?.workingConfig.findIndex(
+                  (wc) => wc.payloadVariant.case === config.payloadVariant.case
+                );
+                if (workingConfigIndex !== -1) {
+                  device.workingConfig[workingConfigIndex] = config;
+                } else {
+                  device?.workingConfig.push(config);
+                }
+              })
+            );
+          },
+          setWorkingModuleConfig: (moduleConfig: Protobuf.ModuleConfig) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+                const workingModuleConfigIndex =
+                  device?.workingModuleConfig.findIndex(
+                    (wmc) =>
+                      wmc.payloadVariant.case ===
+                      moduleConfig.payloadVariant.case
+                  );
+                if (workingModuleConfigIndex !== -1) {
+                  device.workingModuleConfig[workingModuleConfigIndex] =
+                    moduleConfig;
+                } else {
+                  device?.workingModuleConfig.push(moduleConfig);
                 }
               })
             );
@@ -268,36 +327,34 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   (n) => n.data.num === metrics.from
                 );
                 if (node) {
-                  switch (metrics.data.variant.oneofKind) {
+                  switch (metrics.data.variant.case) {
                     case "deviceMetrics":
                       if (device) {
-                        if (metrics.data.variant.deviceMetrics.batteryLevel) {
+                        if (metrics.data.variant.value.batteryLevel) {
                           device.currentMetrics.batteryLevel =
-                            metrics.data.variant.deviceMetrics.batteryLevel;
+                            metrics.data.variant.value.batteryLevel;
                         }
-                        if (metrics.data.variant.deviceMetrics.voltage) {
+                        if (metrics.data.variant.value.voltage) {
                           device.currentMetrics.voltage =
-                            metrics.data.variant.deviceMetrics.voltage;
+                            metrics.data.variant.value.voltage;
                         }
-                        if (metrics.data.variant.deviceMetrics.airUtilTx) {
+                        if (metrics.data.variant.value.airUtilTx) {
                           device.currentMetrics.airUtilTx =
-                            metrics.data.variant.deviceMetrics.airUtilTx;
+                            metrics.data.variant.value.airUtilTx;
                         }
-                        if (
-                          metrics.data.variant.deviceMetrics.channelUtilization
-                        ) {
+                        if (metrics.data.variant.value.channelUtilization) {
                           device.currentMetrics.channelUtilization =
-                            metrics.data.variant.deviceMetrics.channelUtilization;
+                            metrics.data.variant.value.channelUtilization;
                         }
                       }
                       node.deviceMetrics.push({
-                        ...metrics.data.variant.deviceMetrics,
+                        metric: metrics.data.variant.value,
                         timestamp: metrics.rxTime
                       });
                       break;
                     case "environmentMetrics":
                       node.environmentMetrics.push({
-                        ...metrics.data.variant.environmentMetrics,
+                        metric: metrics.data.variant.value,
                         timestamp: metrics.rxTime
                       });
                       break;
@@ -523,43 +580,14 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               })
             );
           },
-          setImportDialogOpen: (open: boolean) => {
+          setDialogOpen: (dialog: DialogVariant, open: boolean) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
-                if (device) {
-                  device.importDialogOpen = open;
+                if (!device) {
+                  return;
                 }
-              })
-            );
-          },
-          setQRDialogOpen: (open: boolean) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.QRDialogOpen = open;
-                }
-              })
-            );
-          },
-          setShutdownDialogOpen: (open: boolean) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.shutdownDialogOpen = open;
-                }
-              })
-            );
-          },
-          setRebootDialogOpen: (open: boolean) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.rebootDialogOpen = open;
-                }
+                device.dialog[dialog] = open;
               })
             );
           },
@@ -573,7 +601,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const node = device.nodes.find((n) => n.data.num === data.from);
                 if (!node) {
                   device.nodes.push({
-                    data: Protobuf.NodeInfo.create({
+                    data: new Protobuf.NodeInfo({
                       num: data.from,
                       lastHeard: data.time,
                       snr: data.snr
@@ -589,6 +617,16 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     lastHeard: data.time,
                     snr: data.snr
                   };
+                }
+              })
+            );
+          },
+          setMessageDraft: (message: string) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.messageDraft = message;
                 }
               })
             );

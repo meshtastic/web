@@ -1,7 +1,5 @@
 import "chartjs-adapter-date-fns";
 
-import type React from "react";
-
 import {
   Chart as ChartJS,
   Filler,
@@ -14,7 +12,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 
 export const Sensor = (): JSX.Element => {
   const { nodes, hardware } = useDevice();
@@ -87,7 +85,7 @@ export const Sensor = (): JSX.Element => {
               data: myNode?.environmentMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.barometricPressure
+                  y: metric.metric.barometricPressure
                 };
               }),
               backgroundColor: "rgba(102, 126, 234, 0.25)",
@@ -101,7 +99,7 @@ export const Sensor = (): JSX.Element => {
               data: myNode?.environmentMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.current
+                  y: metric.metric.current
                 };
               }),
               backgroundColor: "rgba(237, 100, 166, 0.25)",
@@ -115,7 +113,7 @@ export const Sensor = (): JSX.Element => {
               data: myNode?.environmentMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.gasResistance
+                  y: metric.metric.gasResistance
                 };
               }),
               backgroundColor: "rgba(113, 234, 102, 0.25)",
@@ -129,7 +127,7 @@ export const Sensor = (): JSX.Element => {
               data: myNode?.environmentMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.relativeHumidity
+                  y: metric.metric.relativeHumidity
                 };
               }),
               backgroundColor: "rgba(234, 166, 102, 0.25)",
@@ -143,7 +141,7 @@ export const Sensor = (): JSX.Element => {
               data: myNode?.environmentMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.temperature
+                  y: metric.metric.temperature
                 };
               }),
               backgroundColor: "rgba(38, 255, 212, 0.25)",
@@ -157,7 +155,7 @@ export const Sensor = (): JSX.Element => {
               data: myNode?.environmentMetrics.map((metric) => {
                 return {
                   x: metric.timestamp,
-                  y: metric.voltage
+                  y: metric.metric.voltage
                 };
               }),
               backgroundColor: "rgba(247, 255, 15, 0.25)",

@@ -1,9 +1,6 @@
-import type React from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-
-import { Input } from "@app/components/form/Input.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { Button } from "@components/form/Button.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
@@ -74,8 +71,9 @@ export const HTTP = (): JSX.Element => {
           )}
         />
       </div>
-      <Button iconBefore={<PlusCircleIcon className="w-4" />} type="submit">
-        Connect
+      <Button type="submit">
+        <PlusCircleIcon className="w-4" />
+        <span>Connect</span>
       </Button>
     </form>
   );

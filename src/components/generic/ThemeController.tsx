@@ -1,8 +1,8 @@
-import { useAppStore } from "@app/core/stores/appStore.js";
-import type React from "react";
+import { useAppStore } from "@core/stores/appStore.js";
+import type { ReactNode } from "react";
 
 export interface ThemeControllerProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const ThemeController = ({

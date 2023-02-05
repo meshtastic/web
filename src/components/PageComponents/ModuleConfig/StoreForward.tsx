@@ -1,60 +1,35 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { StoreForwardValidation } from "@app/validation/moduleConfig/storeForward.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const StoreForward = (): JSX.Element => {
-  const { moduleConfig, connection, setModuleConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<StoreForwardValidation>({
-    defaultValues: moduleConfig.storeForward,
-    resolver: classValidatorResolver(StoreForwardValidation)
-  });
+  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { register, handleSubmit, reset, control } =
+    useForm<StoreForwardValidation>({
+      mode: "onChange",
+      defaultValues: moduleConfig.storeForward,
+      resolver: classValidatorResolver(StoreForwardValidation)
+    });
 
   useEffect(() => {
     reset(moduleConfig.storeForward);
   }, [reset, moduleConfig.storeForward]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setModuleConfig({
-            moduleConfig: {
-              payloadVariant: {
-                oneofKind: "storeForward",
-                storeForward: data
-              }
-            }
-          })
-          .then(() =>
-            setModuleConfig({
-              payloadVariant: {
-                oneofKind: "storeForward",
-                storeForward: data
-              }
-            })
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Store & Forward Config, Restarting Node",
-          error: "No response received"
+    setWorkingModuleConfig(
+      new Protobuf.ModuleConfig({
+        payloadVariant: {
+          case: "storeForward",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   const moduleEnabled = useWatch({
@@ -64,13 +39,7 @@ export const StoreForward = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="Store & Forward Config"
-      breadcrumbs={["Module Config", "Store & Forward"]}
-      reset={() => reset(moduleConfig.storeForward)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}

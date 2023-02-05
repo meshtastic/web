@@ -1,28 +1,19 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { SerialValidation } from "@app/validation/moduleConfig/serial.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { renderOptions } from "@app/core/utils/selectEnumOptions";
-import { Select } from "@app/components/form/Select";
+import { renderOptions } from "@core/utils/selectEnumOptions";
+import { Select } from "@components/form/Select";
 
 export const Serial = (): JSX.Element => {
-  const { moduleConfig, connection, setModuleConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<SerialValidation>({
+  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { register, handleSubmit, reset, control } = useForm<SerialValidation>({
+    mode: "onChange",
     defaultValues: moduleConfig.serial,
     resolver: classValidatorResolver(SerialValidation)
   });
@@ -32,32 +23,14 @@ export const Serial = (): JSX.Element => {
   }, [reset, moduleConfig.serial]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setModuleConfig({
-            moduleConfig: {
-              payloadVariant: {
-                oneofKind: "serial",
-                serial: data
-              }
-            }
-          })
-          .then(() =>
-            setModuleConfig({
-              payloadVariant: {
-                oneofKind: "serial",
-                serial: data
-              }
-            })
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Serial Config, Restarting Node",
-          error: "No response received"
+    setWorkingModuleConfig(
+      new Protobuf.ModuleConfig({
+        payloadVariant: {
+          case: "serial",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   const moduleEnabled = useWatch({
@@ -67,13 +40,7 @@ export const Serial = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="Serial Config"
-      breadcrumbs={["Module Config", "Serial"]}
-      reset={() => reset(moduleConfig.serial)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}

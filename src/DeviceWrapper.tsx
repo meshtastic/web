@@ -1,11 +1,10 @@
-import type React from "react";
-
 import { DeviceContext } from "@core/providers/useDevice.js";
 import type { Device } from "@core/stores/deviceStore.js";
+import type { ReactNode } from "react";
 
 export interface DeviceWrapperProps {
-  children: React.ReactNode;
-  device: Device;
+  children: ReactNode;
+  device?: Device;
 }
 
 export const DeviceWrapper = ({

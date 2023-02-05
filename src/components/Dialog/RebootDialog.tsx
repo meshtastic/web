@@ -1,12 +1,9 @@
-import type React from "react";
 import { useState } from "react";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Dialog } from "@components/generic/Dialog.js";
 import { ArrowPathIcon, ClockIcon } from "@heroicons/react/24/outline";
-
-import { Button } from "../form/Button.js";
-import { Input } from "../form/Input.js";
+import { Button } from "@components/form/Button.js";
+import { Input } from "@components/form/Input.js";
 
 export interface RebootDialogProps {
   isOpen: boolean;
@@ -17,7 +14,7 @@ export const RebootDialog = ({
   isOpen,
   close
 }: RebootDialogProps): JSX.Element => {
-  const { connection, setRebootDialogOpen } = useDevice();
+  const { connection, setDialogOpen } = useDevice();
 
   const [time, setTime] = useState<number>(5);
 
@@ -37,24 +34,20 @@ export const RebootDialog = ({
             icon: <ClockIcon className="w-4" />,
             action() {
               connection
-                ?.reboot({
-                  time: time * 60
-                })
-                .then(() => setRebootDialogOpen(false));
+                ?.reboot(time * 60)
+                .then(() => setDialogOpen("reboot", false));
             }
           }}
         />
         <Button
           className="w-24"
-          iconBefore={<ArrowPathIcon className="w-4" />}
           onClick={() => {
-            connection
-              ?.reboot({
-                time: 0
-              })
-              .then(() => setRebootDialogOpen(false));
+            connection?.reboot(2).then(() => setDialogOpen("reboot", false));
           }}
         >
+          <span>
+            <ArrowPathIcon className="w-4" />
+          </span>
           Now
         </Button>
       </div>

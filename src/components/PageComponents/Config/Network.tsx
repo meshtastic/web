@@ -1,14 +1,11 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { FormSection } from "@app/components/form/FormSection.js";
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
-import { renderOptions } from "@app/core/utils/selectEnumOptions.js";
+import { FormSection } from "@components/form/FormSection.js";
+import { Input } from "@components/form/Input.js";
+import { IPInput } from "@components/form/IPInput.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
+import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { NetworkValidation } from "@app/validation/config/network.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -17,17 +14,14 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Network = (): JSX.Element => {
-  const { config, connection, setConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    control,
-    reset
-  } = useForm<NetworkValidation>({
-    defaultValues: config.network,
-    resolver: classValidatorResolver(NetworkValidation)
-  });
+  const { config, setWorkingConfig } = useDevice();
+  const { register, handleSubmit, control, reset } = useForm<NetworkValidation>(
+    {
+      mode: "onChange",
+      defaultValues: config.network,
+      resolver: classValidatorResolver(NetworkValidation)
+    }
+  );
 
   const wifiEnabled = useWatch({
     control,
@@ -43,8 +37,8 @@ export const Network = (): JSX.Element => {
 
   const ethMode = useWatch({
     control,
-    name: "ethMode",
-    defaultValue: Protobuf.Config_NetworkConfig_EthMode.DHCP
+    name: "addressMode",
+    defaultValue: Protobuf.Config_NetworkConfig_AddressMode.DHCP
   });
 
   useEffect(() => {
@@ -52,55 +46,18 @@ export const Network = (): JSX.Element => {
   }, [reset, config.network]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setConfig({
-            config: {
-              payloadVariant: {
-                oneofKind: "network",
-                network: Protobuf.Config_NetworkConfig.create(data)
-              }
-            }
-          })
-          .then(() =>
-            setConfig({
-              payloadVariant: {
-                oneofKind: "network",
-                network: data
-              }
-            })
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Network Config, Restarting Node",
-          error: "No response received"
+    setWorkingConfig(
+      new Protobuf.Config({
+        payloadVariant: {
+          case: "network",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   return (
-    <Form
-      title="Network Config"
-      breadcrumbs={["Config", "Network"]}
-      reset={() => reset(config.network)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
-      <ErrorMessage errors={errors} name="wifiEnabled" />
-      <ErrorMessage errors={errors} name="wifiMode" />
-      <ErrorMessage errors={errors} name="wifiSsid" />
-      <ErrorMessage errors={errors} name="wifiPsk" />
-      <ErrorMessage errors={errors} name="ntpServer" />
-      <ErrorMessage errors={errors} name="ethEnabled" />
-      <ErrorMessage errors={errors} name="ethMode" />
-      <ErrorMessage errors={errors} name="ethConfig" />
-      <ErrorMessage errors={errors} name="ip" />
-      <ErrorMessage errors={errors} name="gateway" />
-      <ErrorMessage errors={errors} name="subnet" />
-      <ErrorMessage errors={errors} name="dns" />
-
+    <Form onSubmit={onSubmit}>
       <FormSection title="WiFi Config">
         <Controller
           name="wifiEnabled"
@@ -117,7 +74,6 @@ export const Network = (): JSX.Element => {
         <Input
           label="SSID"
           description="Network name"
-          error={errors.wifiSsid?.message}
           disabled={!wifiEnabled}
           {...register("wifiSsid", { disabled: !wifiEnabled })}
         />
@@ -125,7 +81,6 @@ export const Network = (): JSX.Element => {
           label="PSK"
           type="password"
           description="Network password"
-          error={errors.wifiPsk?.message}
           disabled={!wifiEnabled}
           {...register("wifiPsk", { disabled: !wifiEnabled })}
         />
@@ -143,45 +98,38 @@ export const Network = (): JSX.Element => {
             />
           )}
         />
+      </FormSection>
+      <FormSection title="IP Config">
         <Select
-          label="Ethernet Mode"
+          label="Address Mode"
           description="Address assignment selection"
-          disabled={!ethEnabled}
-          {...register("ethMode", {
-            valueAsNumber: true,
-            disabled: !ethEnabled
+          disabled={!(ethEnabled || wifiEnabled)}
+          {...register("addressMode", {
+            valueAsNumber: true
           })}
         >
-          {renderOptions(Protobuf.Config_NetworkConfig_EthMode)}
+          {renderOptions(Protobuf.Config_NetworkConfig_AddressMode)}
         </Select>
-        {ethMode === Protobuf.Config_NetworkConfig_EthMode.STATIC && (
+        {ethMode === Protobuf.Config_NetworkConfig_AddressMode.STATIC && (
           <>
-            <Input
+            <IPInput
               label="IP"
-              type="number"
               description="IP Address"
-              error={errors.ipv4Config?.ip?.message}
               {...register("ipv4Config.ip", { valueAsNumber: true })}
             />
-            <Input
+            <IPInput
               label="Gateway"
-              type="number"
               description="Default Gateway"
-              error={errors.ipv4Config?.gateway?.message}
               {...register("ipv4Config.gateway", { valueAsNumber: true })}
             />
-            <Input
+            <IPInput
               label="Subnet"
-              type="number"
               description="Subnet Mask"
-              error={errors.ipv4Config?.subnet?.message}
               {...register("ipv4Config.subnet", { valueAsNumber: true })}
             />
-            <Input
+            <IPInput
               label="DNS"
-              type="number"
               description="DNS Server"
-              error={errors.ipv4Config?.dns?.message}
               {...register("ipv4Config.dns", { valueAsNumber: true })}
             />
           </>
@@ -190,8 +138,12 @@ export const Network = (): JSX.Element => {
       <Input
         label="NTP Server"
         description="NTP server for time synchronization"
-        error={errors.ntpServer?.message}
         {...register("ntpServer")}
+      />
+      <Input
+        label="Rsyslog Server"
+        description="Rsyslog server for external logging"
+        {...register("rsyslogServer")}
       />
     </Form>
   );

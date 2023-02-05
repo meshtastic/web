@@ -4,7 +4,7 @@ import { TabbedContent, TabType } from "@components/generic/TabbedContent.js";
 import { BLE } from "@components/PageComponents/Connect/BLE.js";
 import { HTTP } from "@components/PageComponents/Connect/HTTP.js";
 import { Serial } from "@components/PageComponents/Connect/Serial.js";
-import { useAppStore } from "@app/core/stores/appStore.js";
+import { useAppStore } from "@core/stores/appStore.js";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 
 export const NewDevice = () => {
@@ -12,7 +12,7 @@ export const NewDevice = () => {
 
   const tabs: TabType[] = [
     {
-      name: "Bluetooth",
+      label: "Bluetooth",
       element: BLE,
       disabled: !navigator.bluetooth,
       disabledMessage:
@@ -21,13 +21,13 @@ export const NewDevice = () => {
         "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility"
     },
     {
-      name: "HTTP",
+      label: "HTTP",
       element: HTTP,
       disabled: false,
       disabledMessage: "Unsuported connection method"
     },
     {
-      name: "Serial",
+      label: "Serial",
       element: Serial,
       disabled: !navigator.serial,
       disabledMessage:
@@ -37,19 +37,7 @@ export const NewDevice = () => {
 
   return (
     <div className="m-auto h-96 w-96">
-      <TabbedContent
-        tabs={tabs}
-        actions={[
-          {
-            icon: darkMode ? (
-              <SunIcon className="w-4" />
-            ) : (
-              <MoonIcon className="w-4" />
-            ),
-            action: () => setDarkMode(!darkMode)
-          }
-        ]}
-      />
+      <TabbedContent tabs={tabs} />
     </div>
   );
 };

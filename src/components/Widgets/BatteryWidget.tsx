@@ -1,9 +1,6 @@
-import type React from "react";
 import { useEffect, useState } from "react";
-
 import prettyMilliseconds from "pretty-ms";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
+import { useDevice } from "@core/providers/useDevice.js";
 import { Battery100Icon, ClockIcon } from "@heroicons/react/24/outline";
 
 export interface BatteryWidgetProps {
@@ -30,12 +27,12 @@ export const BatteryWidget = ({
       let previousStat: number | undefined = undefined;
       let previousTime = new Date();
       for (const stat of [...stats].reverse()) {
-        if (stat.batteryLevel) {
+        if (stat.metric.batteryLevel) {
           if (!currentStat) {
-            currentStat = stat.batteryLevel;
+            currentStat = stat.metric.batteryLevel;
             currentTime = stat.timestamp;
           } else {
-            previousStat = stat.batteryLevel;
+            previousStat = stat.metric.batteryLevel;
             previousTime = stat.timestamp;
             break;
           }

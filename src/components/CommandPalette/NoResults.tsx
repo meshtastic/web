@@ -1,5 +1,3 @@
-import type React from "react";
-
 import { Mono } from "@components/generic/Mono.js";
 import { CommandLineIcon } from "@heroicons/react/24/outline";
 

@@ -14,7 +14,7 @@ export function getCurrentConfig(): Config {
         const device = useDeviceStore().getDevice(selectedDevice);
         if(device === undefined)
           throw "Invalid device selected";
-        return { config: device.config, moduleConfig: device.moduleConfig };
+        return { configCust: device.config, moduleConfig: device.moduleConfig };
     }
     else {
         console.warn("Requesting template config");
@@ -51,7 +51,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
 
 
   addTemplateConfig: () => {
-    const newConfig = { config: Protobuf.LocalConfig.create(), moduleConfig: Protobuf.LocalModuleConfig.create() };
+    const newConfig = { configCust: new Protobuf.LocalConfig(), moduleConfig: new Protobuf.LocalModuleConfig() };
     set(
       produce<ConfigState>((draft) => {
         draft.templateConfigs.push(newConfig)
@@ -66,7 +66,7 @@ export const useConfigStore = create<ConfigState>((set, get) => ({
 }));
 
 export interface Config {    
-    config: Protobuf.LocalConfig;
+    configCust: Protobuf.LocalConfig;
     moduleConfig: Protobuf.LocalModuleConfig;
     
     // activePage: Page; // What to do???

@@ -2,7 +2,9 @@ import { IsArray, IsBoolean, IsEnum, IsInt, Max, Min } from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
-export class LoRaValidation implements Protobuf.Config_LoRaConfig {
+export class LoRaValidation
+  implements Omit<Protobuf.Config_LoRaConfig, keyof Protobuf.native.Message>
+{
   @IsBoolean()
   usePreset: boolean;
 
@@ -45,6 +47,9 @@ export class LoRaValidation implements Protobuf.Config_LoRaConfig {
 
   @IsBoolean()
   overrideDutyCycle: boolean;
+
+  @IsBoolean()
+  sx126xRxBoostedGain: boolean;
 
   @IsArray()
   ignoreIncoming: number[];

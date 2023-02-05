@@ -1,13 +1,10 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { base16 } from "rfc4648";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { UserValidation } from "@app/validation/config/user.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -20,13 +17,7 @@ export const User = (): JSX.Element => {
 
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<UserValidation>({
+  const { register, handleSubmit, reset, control } = useForm<UserValidation>({
     defaultValues: myNode?.data.user,
     resolver: classValidatorResolver(UserValidation)
   });
@@ -43,9 +34,12 @@ export const User = (): JSX.Element => {
     if (connection && myNode?.data.user) {
       void toast.promise(
         connection
-          .setOwner({
-            owner: { ...myNode.data.user, ...data }
-          })
+          .setOwner(
+            new Protobuf.User({
+              ...myNode.data.user,
+              ...data
+            })
+          )
           .then(() => reset({ ...data })),
         {
           loading: "Saving...",
@@ -57,26 +51,7 @@ export const User = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="User Config"
-      breadcrumbs={["Config", "User"]}
-      reset={() => {
-        reset({
-          longName: myNode?.data.user?.longName,
-          shortName: myNode?.data.user?.shortName,
-          isLicensed: myNode?.data.user?.isLicensed
-        });
-      }}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
-      <Input
-        label="Device ID"
-        disabled
-        description="Preset unique identifier for this device."
-        error={errors.id?.message}
-        {...register("id")}
-      />
+    <Form onSubmit={onSubmit}>
       <Input
         label="Device Name"
         description="Personalised name for this device."
@@ -88,25 +63,6 @@ export const User = (): JSX.Element => {
         maxLength={4}
         {...register("shortName")}
       />
-      <Input
-        label="Mac Address"
-        description="Hardware address for this node."
-        disabled
-        value={
-          base16
-            .stringify(myNode?.data.user?.macaddr ?? [])
-            .match(/.{1,2}/g)
-            ?.join(":") ?? ""
-        }
-      />
-      <Select
-        label="Hardware"
-        description="Hardware model of this device."
-        disabled
-        value={myNode?.data.user?.hwModel}
-      >
-        {renderOptions(Protobuf.HardwareModel)}
-      </Select>
       <Controller
         name="isLicensed"
         control={control}
@@ -119,6 +75,31 @@ export const User = (): JSX.Element => {
           />
         )}
       />
+      <Input
+        label="Mac Address"
+        description="Hardware address for this node."
+        disabled
+        value={
+          base16
+            .stringify(myNode?.data.user?.macaddr ?? [])
+            .match(/.{1,2}/g)
+            ?.join(":") ?? ""
+        }
+      />
+      <Input
+        label="Device ID"
+        disabled
+        description="Preset unique identifier for this device."
+        value={myNode?.data.user?.id}
+      />
+      <Select
+        label="Hardware"
+        description="Hardware model of this device."
+        disabled
+        value={myNode?.data.user?.hwModel}
+      >
+        {renderOptions(Protobuf.HardwareModel)}
+      </Select>
     </Form>
   );
 };

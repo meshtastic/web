@@ -1,12 +1,8 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Select } from "@app/components/form/Select.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Select } from "@components/form/Select.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { BluetoothValidation } from "@app/validation/config/bluetooth.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -15,50 +11,28 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Bluetooth = (): JSX.Element => {
-  const { config, connection, setConfig } = useDevice();
+  const { config, setWorkingConfig } = useDevice();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    control,
-    reset
-  } = useForm<BluetoothValidation>({
-    defaultValues: config.bluetooth,
-    resolver: classValidatorResolver(BluetoothValidation)
-  });
+  const { register, handleSubmit, control, reset } =
+    useForm<BluetoothValidation>({
+      mode: "onChange",
+      defaultValues: config.bluetooth,
+      resolver: classValidatorResolver(BluetoothValidation)
+    });
 
   useEffect(() => {
     reset(config.bluetooth);
   }, [reset, config.bluetooth]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setConfig({
-            config: {
-              payloadVariant: {
-                oneofKind: "bluetooth",
-                bluetooth: data
-              }
-            }
-          })
-          .then(() =>
-            setConfig({
-              payloadVariant: {
-                oneofKind: "bluetooth",
-                bluetooth: data
-              }
-            })
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Bluetooth Config, Restarting Node",
-          error: "No response received"
+    setWorkingConfig(
+      new Protobuf.Config({
+        payloadVariant: {
+          case: "bluetooth",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   const pairingMode = useWatch({
@@ -68,13 +42,7 @@ export const Bluetooth = (): JSX.Element => {
   });
 
   return (
-    <Form
-      title="Bluetooth Config"
-      breadcrumbs={["Config", "Bluetooth"]}
-      reset={() => reset(config.bluetooth)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}

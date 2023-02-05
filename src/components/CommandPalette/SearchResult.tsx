@@ -1,5 +1,3 @@
-import type React from "react";
-
 import type { Group } from "@components/CommandPalette/Index.js";
 import { Combobox } from "@headlessui/react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -13,7 +11,7 @@ export const SearchResult = ({ group }: SearchResultProps): JSX.Element => {
     <div className="rounded-md border-2 border-backgroundPrimary py-2">
       <div className="flex items-center px-3 py-2">
         <group.icon className="text-gray-900 h-6 w-6 flex-none text-opacity-40" />
-        <span className="ml-3 flex-auto truncate">{group.name}</span>
+        <span className="ml-3 flex-auto truncate">{group.label}</span>
       </div>
       {group.commands.map((command, index) => (
         <div key={index}>
@@ -32,7 +30,7 @@ export const SearchResult = ({ group }: SearchResultProps): JSX.Element => {
                     active ? "text-opacity-100" : ""
                   }`}
                 />
-                <span className="ml-3">{command.name}</span>
+                <span className="ml-3">{command.label}</span>
                 {active && (
                   <ChevronRightIcon className="text-gray-400 ml-auto h-4" />
                 )}
@@ -56,7 +54,7 @@ export const SearchResult = ({ group }: SearchResultProps): JSX.Element => {
                   {({ active }) => (
                     <>
                       {item.icon}
-                      <span className="ml-3">{item.name}</span>
+                      <span className="ml-3">{item.label}</span>
                       {active && (
                         <ChevronRightIcon className="text-gray-400 ml-auto h-4" />
                       )}

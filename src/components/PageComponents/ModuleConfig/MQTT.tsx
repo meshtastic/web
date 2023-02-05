@@ -1,18 +1,15 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { Input } from "@app/components/form/Input.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { Input } from "@components/form/Input.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const MQTT = (): JSX.Element => {
-  const { moduleConfig, connection, setModuleConfig } = useDevice();
+  const { moduleConfig, setWorkingModuleConfig } = useDevice();
   const {
     register,
     handleSubmit,
@@ -20,6 +17,7 @@ export const MQTT = (): JSX.Element => {
     reset,
     control
   } = useForm<MQTTValidation>({
+    mode: "onChange",
     defaultValues: moduleConfig.mqtt,
     resolver: classValidatorResolver(MQTTValidation)
   });
@@ -35,42 +33,18 @@ export const MQTT = (): JSX.Element => {
   }, [reset, moduleConfig.mqtt]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setModuleConfig({
-            moduleConfig: {
-              payloadVariant: {
-                oneofKind: "mqtt",
-                mqtt: data
-              }
-            }
-          })
-          .then(() =>
-            setModuleConfig({
-              payloadVariant: {
-                oneofKind: "mqtt",
-                mqtt: data
-              }
-            })
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved MQTT Config, Restarting Node",
-          error: "No response received"
+    setWorkingModuleConfig(
+      new Protobuf.ModuleConfig({
+        payloadVariant: {
+          case: "mqtt",
+          value: data
         }
-      );
-    }
+      })
+    );
   });
 
   return (
-    <Form
-      title="MQTT Config"
-      breadcrumbs={["Module Config", "MQTT"]}
-      reset={() => reset(moduleConfig.mqtt)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="enabled"
         control={control}
@@ -85,7 +59,7 @@ export const MQTT = (): JSX.Element => {
       />
       <Input
         label="MQTT Server Address"
-        //description="Description"
+        description="Description"
         disabled={!moduleEnabled}
         {...register("address")}
       />

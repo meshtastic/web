@@ -3,7 +3,11 @@ import { IsBoolean, IsEnum, IsInt, Length } from "class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class CannedMessageValidation
-  implements Protobuf.ModuleConfig_CannedMessageConfig
+  implements
+    Omit<
+      Protobuf.ModuleConfig_CannedMessageConfig,
+      keyof Protobuf.native.Message
+    >
 {
   @IsBoolean()
   rotary1Enabled: boolean;

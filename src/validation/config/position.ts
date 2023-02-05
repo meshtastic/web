@@ -2,7 +2,10 @@ import { IsBoolean, IsInt, IsNumber } from "class-validator";
 
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
-export class PositionValidation implements Protobuf.Config_PositionConfig {
+export class PositionValidation
+  implements
+    Omit<Protobuf.Config_PositionConfig, keyof Protobuf.native.Message>
+{
   @IsInt()
   positionBroadcastSecs: number;
 

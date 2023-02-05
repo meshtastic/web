@@ -1,13 +1,9 @@
-import type React from "react";
 import { useEffect } from "react";
-
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { toast } from "react-hot-toast";
-
-import { BitwiseSelect } from "@app/components/form/BitwiseSelect.js";
-import { FormSection } from "@app/components/form/FormSection.js";
-import { Input } from "@app/components/form/Input.js";
-import { Toggle } from "@app/components/form/Toggle.js";
+import { BitwiseSelect } from "@components/form/BitwiseSelect.js";
+import { FormSection } from "@components/form/FormSection.js";
+import { Input } from "@components/form/Input.js";
+import { Toggle } from "@components/form/Toggle.js";
 import { PositionValidation } from "@app/validation/config/position.js";
 import { Form } from "@components/form/Form";
 import { useDevice } from "@core/providers/useDevice.js";
@@ -15,25 +11,21 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Position = (): JSX.Element => {
-  const { config, connection, nodes, hardware, setConfig } = useDevice();
+  const { config, nodes, hardware, setWorkingConfig } = useDevice();
 
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<PositionValidation>({
-    defaultValues: {
-      fixedAlt: myNode?.data.position?.altitude,
-      fixedLat: (myNode?.data.position?.latitudeI ?? 0) / 1e7,
-      fixedLng: (myNode?.data.position?.longitudeI ?? 0) / 1e7,
-      ...config.position
-    },
-    resolver: classValidatorResolver(PositionValidation)
-  });
+  const { register, handleSubmit, reset, control } =
+    useForm<PositionValidation>({
+      mode: "onChange",
+      defaultValues: {
+        fixedAlt: myNode?.data.position?.altitude,
+        fixedLat: (myNode?.data.position?.latitudeI ?? 0) / 1e7,
+        fixedLng: (myNode?.data.position?.longitudeI ?? 0) / 1e7,
+        ...config.position
+      },
+      resolver: classValidatorResolver(PositionValidation)
+    });
 
   const fixedPositionEnabled = useWatch({
     control,
@@ -55,63 +47,68 @@ export const Position = (): JSX.Element => {
 
     const configHasChanged = !Protobuf.Config_PositionConfig.equals(
       config.position,
-      Protobuf.Config_PositionConfig.create(rest)
+      new Protobuf.Config_PositionConfig(rest)
     );
 
-    if (connection) {
-      void toast.promise(
-        connection
-          .setPosition({
-            position: Protobuf.Position.create({
-              altitude: fixedAlt,
-              latitudeI: fixedLat * 1e7,
-              longitudeI: fixedLng * 1e7
-            })
-          })
-          .then(() => reset({ ...data })),
-        {
-          loading: "Saving...",
-          success: "Saved Position Config, Restarting Node",
-          error: "No response received"
+    setWorkingConfig(
+      new Protobuf.Config({
+        payloadVariant: {
+          case: "position",
+          value: rest
         }
-      );
-      if (configHasChanged) {
-        void toast.promise(
-          connection
-            .setConfig({
-              config: {
-                payloadVariant: {
-                  oneofKind: "position",
-                  position: rest
-                }
-              }
-            })
-            .then(() =>
-              setConfig({
-                payloadVariant: {
-                  oneofKind: "position",
-                  position: data
-                }
-              })
-            ),
-          {
-            loading: "Saving...",
-            success: "Saved Position Config, Restarting Node",
-            error: "No response received"
-          }
-        );
-      }
-    }
+      })
+    );
+
+    // if (connection) {
+    //   void toast.promise(
+    //     connection
+    //       .setPosition(
+    //         new Protobuf.Position({
+    //           altitude: fixedAlt,
+    //           latitudeI: fixedLat * 1e7,
+    //           longitudeI: fixedLng * 1e7
+    //         })
+    //       )
+    //       .then(() => reset({ ...data })),
+    //     {
+    //       loading: "Saving...",
+    //       success: "Saved Position Config, Restarting Node",
+    //       error: "No response received"
+    //     }
+    //   );
+    //   if (configHasChanged) {
+    //     void toast.promise(
+    //       connection
+    //         .setConfig(
+    //           new Protobuf.Config({
+    //             payloadVariant: {
+    //               case: "position",
+    //               value: rest
+    //             }
+    //           })
+    //         )
+    //         .then(() =>
+    //           setConfig(
+    //             new Protobuf.Config({
+    //               payloadVariant: {
+    //                 case: "position",
+    //                 value: rest
+    //               }
+    //             })
+    //           )
+    //         ),
+    //       {
+    //         loading: "Saving...",
+    //         success: "Saved Position Config, Restarting Node",
+    //         error: "No response received"
+    //       }
+    //     );
+    //   }
+    // }
   });
 
   return (
-    <Form
-      title="Position Config"
-      breadcrumbs={["Config", "Position"]}
-      reset={() => reset(config.position)}
-      dirty={isDirty}
-      onSubmit={onSubmit}
-    >
+    <Form onSubmit={onSubmit}>
       <Controller
         name="gpsEnabled"
         control={control}
@@ -147,7 +144,6 @@ export const Position = (): JSX.Element => {
             <BitwiseSelect
               label="Position Flags"
               description="Configuration options for POSITION messages"
-              error={error?.message}
               selected={value}
               decodeEnun={Protobuf.Config_PositionConfig_PositionFlags}
               onChange={onChange}
@@ -174,7 +170,6 @@ export const Position = (): JSX.Element => {
               suffix="m"
               label="Altitude"
               type="number"
-              error={errors.fixedAlt?.message}
               disabled={!fixedPositionEnabled}
               {...register("fixedAlt", { valueAsNumber: true })}
             />
@@ -182,7 +177,6 @@ export const Position = (): JSX.Element => {
               suffix="°"
               label="Latitude"
               type="number"
-              error={errors.fixedLat?.message}
               disabled={!fixedPositionEnabled}
               {...register("fixedLat", { valueAsNumber: true })}
             />
@@ -190,7 +184,6 @@ export const Position = (): JSX.Element => {
               suffix="°"
               label="Longitude"
               type="number"
-              error={errors.fixedLng?.message}
               disabled={!fixedPositionEnabled}
               {...register("fixedLng", { valueAsNumber: true })}
             />
@@ -203,7 +196,6 @@ export const Position = (): JSX.Element => {
           label="Broadcast Interval"
           description="How often your position is sent out over the mesh"
           type="number"
-          error={errors.positionBroadcastSecs?.message}
           {...register("positionBroadcastSecs", { valueAsNumber: true })}
         />
         <Input
@@ -211,7 +203,6 @@ export const Position = (): JSX.Element => {
           label="GPS Update Interval"
           description="How often a GPS fix should be acquired"
           type="number"
-          error={errors.gpsUpdateInterval?.message}
           {...register("gpsUpdateInterval", { valueAsNumber: true })}
         />
         <Input
@@ -219,7 +210,6 @@ export const Position = (): JSX.Element => {
           label="Fix Attempt Duration"
           description="How long the device will try to get a fix for"
           type="number"
-          error={errors.gpsAttemptTime?.message}
           {...register("gpsAttemptTime", { valueAsNumber: true })}
         />
       </FormSection>
@@ -227,14 +217,12 @@ export const Position = (): JSX.Element => {
         label="RX Pin"
         description="GPS Module RX pin override"
         type="number"
-        error={errors.rxGpio?.message}
         {...register("rxGpio", { valueAsNumber: true })}
       />
       <Input
         label="TX Pin"
         description="GPS Module TX pin override"
         type="number"
-        error={errors.txGpio?.message}
         {...register("txGpio", { valueAsNumber: true })}
       />
     </Form>

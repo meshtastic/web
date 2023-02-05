@@ -1,7 +1,5 @@
-import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-
-import { Mono } from "@app/components/generic/Mono.js";
+import { Mono } from "@components/generic/Mono.js";
 import { Button } from "@components/form/Button.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
@@ -53,7 +51,6 @@ export const BLE = (): JSX.Element => {
         )}
       </div>
       <Button
-        iconBefore={<PlusCircleIcon className="w-4" />}
         onClick={() => {
           void navigator.bluetooth
             .requestDevice({
@@ -67,7 +64,8 @@ export const BLE = (): JSX.Element => {
             });
         }}
       >
-        New device
+        <PlusCircleIcon className="w-4" />
+        <span>New device</span>
       </Button>
     </div>
   );

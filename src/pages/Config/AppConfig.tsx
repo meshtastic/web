@@ -1,6 +1,4 @@
-import type React from "react";
 import { Fragment } from "react";
-
 import { Map } from "@components/PageComponents/AppConfig/Map.js";
 import { Tab } from "@headlessui/react";
 

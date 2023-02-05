@@ -1,8 +1,5 @@
-import type React from "react";
-
-import { TabbedContent, TabType } from "@app/components/generic/TabbedContent";
-import { Channel } from "@app/components/PageComponents/Channel.js";
-import { Button } from "@components/form/Button.js";
+import { TabbedContent, TabType } from "@components/generic/TabbedContent";
+import { Channel } from "@components/PageComponents/Channel.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import {
   ArrowDownOnSquareStackIcon,
@@ -11,11 +8,11 @@ import {
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const ChannelsPage = (): JSX.Element => {
-  const { channels, setQRDialogOpen, setImportDialogOpen } = useDevice();
+  const { channels, setDialogOpen } = useDevice();
 
   const tabs: TabType[] = channels.map((channel) => {
     return {
-      name: channel.config.settings?.name.length
+      label: channel.config.settings?.name.length
         ? channel.config.settings.name
         : channel.config.role === Protobuf.Channel_Role.PRIMARY
         ? "Primary"
@@ -30,11 +27,11 @@ export const ChannelsPage = (): JSX.Element => {
       actions={[
         {
           icon: <ArrowDownOnSquareStackIcon className="w-4" />,
-          action: () => setImportDialogOpen(true)
+          action: () => setDialogOpen("import", true)
         },
         {
           icon: <QrCodeIcon className="w-4" />,
-          action: () => setQRDialogOpen(true)
+          action: () => setDialogOpen("QR", true)
         }
       ]}
     />

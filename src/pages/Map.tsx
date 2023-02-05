@@ -1,10 +1,7 @@
-import type React from "react";
-
 import maplibregl from "maplibre-gl";
 import { Layer, Map, Marker, Source } from "react-map-gl";
-
-import { MapControlls } from "@app/components/PageComponents/Map/MapControlls.js";
-import { useAppStore } from "@app/core/stores/appStore.js";
+import { MapControlls } from "@components/PageComponents/Map/MapControlls.js";
+import { useAppStore } from "@core/stores/appStore.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { MapPinIcon } from "@heroicons/react/24/outline";

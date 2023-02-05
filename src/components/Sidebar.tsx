@@ -1,7 +1,5 @@
-import type React from "react";
-
-import { useDevice } from "@app/core/providers/useDevice.js";
-import { toMGRS } from "@app/core/utils/toMGRS.js";
+import { useDevice } from "@core/providers/useDevice.js";
+import { toMGRS } from "@core/utils/toMGRS.js";
 import { BatteryWidget } from "@components/Widgets/BatteryWidget.js";
 import { DeviceWidget } from "@components/Widgets/DeviceWidget.js";
 import { PeersWidget } from "@components/Widgets/PeersWidget.js";
@@ -10,8 +8,7 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { CommandLineIcon } from "@heroicons/react/24/outline";
 import { Types } from "@meshtastic/meshtasticjs";
-
-import { Input } from "./form/Input.js";
+import { Input } from "@components/form/Input.js";
 
 export const Sidebar = (): JSX.Element => {
   const { removeDevice } = useDeviceStore();

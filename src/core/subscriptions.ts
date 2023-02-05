@@ -17,16 +17,14 @@ export const subscribeAll = (
   });
 
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
-    switch (routingPacket.data.variant.oneofKind) {
+    switch (routingPacket.data.variant.case) {
       case "errorReason":
-        if (
-          routingPacket.data.variant.errorReason === Protobuf.Routing_Error.NONE
-        ) {
+        if (routingPacket.data.variant.value === Protobuf.Routing_Error.NONE) {
           return;
         }
         toast.error(
           `Routing error: ${
-            Protobuf.Routing_Error[routingPacket.data.variant.errorReason]
+            Protobuf.Routing_Error[routingPacket.data.variant.value]
           }`,
           {
             icon: "❌"
@@ -34,12 +32,12 @@ export const subscribeAll = (
         );
         break;
       case "routeReply":
-        toast(`Route Reply: ${routingPacket.data.variant.routeReply}`, {
+        toast(`Route Reply: ${routingPacket.data.variant.value}`, {
           icon: "✅"
         });
         break;
       case "routeRequest":
-        toast(`Route Request: ${routingPacket.data.variant.routeRequest}`, {
+        toast(`Route Request: ${routingPacket.data.variant.value}`, {
           icon: "✅"
         });
         break;

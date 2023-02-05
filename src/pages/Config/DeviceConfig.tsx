@@ -1,7 +1,5 @@
-import type React from "react";
 import { Fragment } from "react";
-
-import { Network } from "@app/components/PageComponents/Config/Network.js";
+import { Network } from "@components/PageComponents/Config/Network.js";
 import { Bluetooth } from "@components/PageComponents/Config/Bluetooth.js";
 import { Device } from "@components/PageComponents/Config/Device.js";
 import { Display } from "@components/PageComponents/Config/Display.js";
@@ -12,12 +10,17 @@ import { User } from "@components/PageComponents/Config/User.js";
 import { useDevice } from "@core/providers/useDevice.js";
 import { Tab } from "@headlessui/react";
 import { useAppStore } from "@app/core/stores/appStore";
+import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { Button } from "@components/form/Button.js";
+import { CheckIcon } from "@primer/octicons-react";
+import { NavBar } from "@app/Nav/NavBar.js";
+import { VerticalTabbedContent } from "@app/components/generic/VerticalTabbedContent.js";
 
 export const DeviceConfig = (): JSX.Element => {
   const { selectedDevice } = useAppStore();
-  const { hardware } = useDevice();
+  const { hardware, workingConfig, connection } = useDevice();
 
-  let configSections = [
+  let tabs = [
     {
       label: "User",
       element: User
@@ -55,35 +58,27 @@ export const DeviceConfig = (): JSX.Element => {
   
   // FIXME: Kinda hacky  
   if(selectedDevice == -1) {
-    configSections = configSections.slice(1);
+    tabs = tabs.slice(1);
   }
 
   return (
-    <Tab.Group as="div" className="flex w-full gap-3">
-      <Tab.List className="flex w-44 flex-col gap-1">
-        {configSections.map((Config, index) => (
-          <Tab key={index} as={Fragment}>
-            {({ selected }) => (
-              <div
-                className={`flex cursor-pointer items-center rounded-md px-3 py-2 text-sm font-medium ${
-                  selected
-                    ? "bg-gray-100 text-gray-900"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
-              >
-                {Config.label}
-              </div>
-            )}
-          </Tab>
-        ))}
-      </Tab.List>
-      <Tab.Panels as={Fragment}>
-        {configSections.map((Config, index) => (
-          <Tab.Panel key={index} as={Fragment}>
-            <Config.element />
-          </Tab.Panel>
-        ))}
-      </Tab.Panels>
-    </Tab.Group>
+    <div className="flex flex-grow flex-col gap-2">
+      <NavBar
+        breadcrumb={["Config"]}
+        actions={[
+          {
+            label: "Apply & Reboot",
+            async onClick() {
+              workingConfig.map(async (config) => {
+                await connection?.setConfig(config);
+              });
+              await connection?.commitEditSettings();
+            }
+          }
+        ]}
+      />
+
+      <VerticalTabbedContent tabs={tabs} />
+    </div>
   );
 };
