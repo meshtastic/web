@@ -17,9 +17,9 @@ export const DeviceSetup = (): JSX.Element => {
 
     return (
         <DeviceWrapper device={testDevice}>
-            <SidebarSetup/>
-            {/* <PageNav pages={pagesSetup}/> */}
-            <PageRouter/>            
+            { <SidebarSetup/> }
+            {/* <PageNav pages={pagesSetup}/> TODO_MG: Fix these */}
+            {/* <PageRouter/>             */}
         </DeviceWrapper>
     );
 }

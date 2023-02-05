@@ -39,7 +39,7 @@ export const App = (): JSX.Element => {
               ) : (
                 <NewDevice />
               )}                        
-              <BottomNav>{device && <Drawer />}</BottomNav>
+              {<BottomNav>{device && <Drawer />}</BottomNav>}
             </div>
           </div>
         </DeviceWrapper>

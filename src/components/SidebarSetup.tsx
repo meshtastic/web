@@ -28,29 +28,31 @@ export const SidebarSetup = (): JSX.Element => {
   const devicesToFlash = devices.map(d => d.selectedToFlash);
 
   return (    
-    <div className="bg-slate-50 relative flex flex-col w-72 flex-shrink-0 flex-col gap-2 p-2">
-      <div className="h-1/2">
-        <div className="flex h-16 flex-col gap-2 overflow-y-auto">        
-          {devices.map((device, index) => (
-            <Button
-              key={index}
-              color={devicesToFlash[index] ? "bg-accentMuted" : "bg-backgroundPrimary"}
-              onClick={() => {
-                devicesToFlash[index] = !devicesToFlash[index];
-                console.log(`Set device ${index}: ${devicesToFlash[index]}`);
-                device.setSelectedToFlash(devicesToFlash[index]);
-              }}
-              size="sm"
-            >
-              {`${getButtonText(device)}`}
-            </Button>
-          ))}
-          
-        </div>
-      </div>      
-      <div className="w-1/1 h-0.5 bg-accent"></div>
-      <div className="h-1/2">{<Mono>(Configurations go here)</Mono>}</div>
-      
+    <div className="flex flex-grow">
+      <div className="bg-slate-50 relative flex w-72 flex-shrink-0 flex-col gap-2 p-2">
+        <div className="h-1/2">
+          <div className="flex h-16 flex-col gap-2 overflow-y-auto">        
+            {devices.map((device, index) => (
+              <Button
+                key={index}
+                color={devicesToFlash[index] ? "bg-accentMuted" : "bg-backgroundPrimary"}
+                onClick={() => {
+                  devicesToFlash[index] = !devicesToFlash[index];                
+                  console.log(`Set device ${index}: ${devicesToFlash[index]}`);
+                  device.setSelectedToFlash(devicesToFlash[index]);
+                }}
+                size="sm"
+              >
+                {`${getButtonText(device)}`}
+              </Button>
+            ))}
+            
+          </div>
+        </div>      
+        <div className="w-1/1 h-0.5 bg-accent"></div>
+        <div className="h-1/2">{<Mono>(Configurations go here)</Mono>}</div>
+        
+      </div>
     </div>
   );
 };

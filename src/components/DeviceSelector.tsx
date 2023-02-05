@@ -12,6 +12,8 @@ export const DeviceSelector = (): JSX.Element => {
   const { selectedDevice, setSelectedDevice, darkMode, setDarkMode } =
     useAppStore();
 
+  console.log(`Current device: ${selectedDevice}`);
+
   return (
     <div className="flex h-full w-14 items-center gap-3 bg-backgroundPrimary pt-3 [writing-mode:vertical-rl]">
       <div className="flex items-center gap-3">
@@ -44,8 +46,8 @@ export const DeviceSelector = (): JSX.Element => {
           </div>
         </span>
       </div>
-
-      {selectedDevice !== 0 && (
+            
+      {selectedDevice > 0 && (    // TODO_MG: Handle selectedDevice == -1
         <>
           <NavSpacer />
           <PageNav />
