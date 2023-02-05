@@ -1,6 +1,5 @@
 import { ComponentType, Fragment, SVGProps, useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
-import { useDevice } from "@core/providers/useDevice.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { GroupView } from "@components/CommandPalette/GroupView.js";
@@ -11,42 +10,41 @@ import { SearchResult } from "@components/CommandPalette/SearchResult.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import {
-  ArchiveBoxXMarkIcon,
-  ArrowDownOnSquareStackIcon,
-  ArrowPathIcon,
-  ArrowPathRoundedSquareIcon,
-  ArrowsRightLeftIcon,
-  BeakerIcon,
-  BugAntIcon,
-  Cog8ToothIcon,
-  CubeTransparentIcon,
-  DevicePhoneMobileIcon,
-  InboxIcon,
+  LucideIcon,
   LinkIcon,
+  TrashIcon,
   MapIcon,
   MoonIcon,
   PlusIcon,
   PowerIcon,
+  EraserIcon,
+  ImportIcon,
+  RefreshCwIcon,
+  FactoryIcon,
+  ArrowLeftRightIcon,
+  BugIcon,
+  SettingsIcon,
+  SmartphoneIcon,
+  MessageSquareIcon,
   QrCodeIcon,
-  QueueListIcon,
-  Square3Stack3DIcon,
-  SwatchIcon,
-  TrashIcon,
+  LayersIcon,
+  PaletteIcon,
   UsersIcon,
-  WindowIcon,
-  XCircleIcon
-} from "@heroicons/react/24/outline";
+  LayoutIcon,
+  XCircleIcon,
+  BoxSelectIcon
+} from "lucide-react";
 import { Blur } from "@components/generic/Blur.js";
 import { ThemeController } from "@components/generic/ThemeController.js";
 
 export interface Group {
   label: string;
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  icon: LucideIcon;
   commands: Command[];
 }
 export interface Command {
   label: string;
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  icon: LucideIcon;
   action?: () => void;
   subItems?: SubItem[];
   tags?: string[];
@@ -63,7 +61,6 @@ export const CommandPalette = (): JSX.Element => {
   const {
     commandPaletteOpen,
     setCommandPaletteOpen,
-    devices,
     setSelectedDevice,
     removeDevice,
     selectedDevice,
@@ -82,7 +79,7 @@ export const CommandPalette = (): JSX.Element => {
       commands: [
         {
           label: "Messages",
-          icon: InboxIcon,
+          icon: MessageSquareIcon,
           action() {
             setActivePage("messages");
           }
@@ -96,7 +93,7 @@ export const CommandPalette = (): JSX.Element => {
         },
         {
           label: "Config",
-          icon: Cog8ToothIcon,
+          icon: SettingsIcon,
           action() {
             setActivePage("config");
           },
@@ -104,7 +101,7 @@ export const CommandPalette = (): JSX.Element => {
         },
         {
           label: "Channels",
-          icon: Square3Stack3DIcon,
+          icon: LayersIcon,
           action() {
             setActivePage("channels");
           }
@@ -120,11 +117,11 @@ export const CommandPalette = (): JSX.Element => {
     },
     {
       label: "Manage",
-      icon: DevicePhoneMobileIcon,
+      icon: SmartphoneIcon,
       commands: [
         {
           label: "Switch Node",
-          icon: ArrowsRightLeftIcon,
+          icon: ArrowLeftRightIcon,
           subItems: getDevices().map((device) => {
             return {
               label:
@@ -133,7 +130,7 @@ export const CommandPalette = (): JSX.Element => {
                 )?.data.user?.longName ?? device.hardware.myNodeNum.toString(),
               icon: (
                 <Hashicon
-                  size={18}
+                  size={16}
                   value={device.hardware.myNodeNum.toString()}
                 />
               ),
@@ -154,7 +151,7 @@ export const CommandPalette = (): JSX.Element => {
     },
     {
       label: "Contextual",
-      icon: CubeTransparentIcon,
+      icon: BoxSelectIcon,
       commands: [
         {
           label: "QR Code",
@@ -162,14 +159,14 @@ export const CommandPalette = (): JSX.Element => {
           subItems: [
             {
               label: "Generator",
-              icon: <QueueListIcon className="w-4" />,
+              icon: <QrCodeIcon size={16} />,
               action() {
                 setDialogOpen("QR", true);
               }
             },
             {
               label: "Import",
-              icon: <ArrowDownOnSquareStackIcon className="w-4" />,
+              icon: <QrCodeIcon size={16} />,
               action() {
                 setDialogOpen("import", true);
               }
@@ -194,7 +191,7 @@ export const CommandPalette = (): JSX.Element => {
         },
         {
           label: "Schedule Reboot",
-          icon: ArrowPathIcon,
+          icon: RefreshCwIcon,
           action() {
             setDialogOpen("reboot", true);
           }
@@ -203,44 +200,32 @@ export const CommandPalette = (): JSX.Element => {
           label: "Reset Peers",
           icon: TrashIcon,
           action() {
-            if (connection) {
-              void toast.promise(connection.resetPeers(), {
-                loading: "Resetting...",
-                success: "Succesfully reset peers",
-                error: "No response received"
-              });
-            }
+            connection?.resetPeers();
           }
         },
         {
           label: "Factory Reset",
-          icon: ArrowPathRoundedSquareIcon,
+          icon: FactoryIcon,
           action() {
-            if (connection) {
-              void toast.promise(connection.factoryReset(), {
-                loading: "Resetting...",
-                success: "Succesfully factory peers",
-                error: "No response received"
-              });
-            }
+            connection?.factoryReset();
           }
         }
       ]
     },
     {
       label: "Debug",
-      icon: BugAntIcon,
+      icon: BugIcon,
       commands: [
         {
           label: "Reconfigure",
-          icon: ArrowPathIcon,
+          icon: RefreshCwIcon,
           action() {
             void connection?.configure();
           }
         },
         {
           label: "[WIP] Clear Messages",
-          icon: ArchiveBoxXMarkIcon,
+          icon: EraserIcon,
           action() {
             alert("This feature is not implemented");
           }
@@ -249,7 +234,7 @@ export const CommandPalette = (): JSX.Element => {
     },
     {
       label: "Application",
-      icon: WindowIcon,
+      icon: LayoutIcon,
       commands: [
         {
           label: "Toggle Dark Mode",
@@ -260,7 +245,7 @@ export const CommandPalette = (): JSX.Element => {
         },
         {
           label: "Accent Color",
-          icon: SwatchIcon,
+          icon: PaletteIcon,
           subItems: [
             {
               label: "Red",

@@ -8,7 +8,7 @@ import { Toggle } from "@components/form/Toggle.js";
 import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { NetworkValidation } from "@app/validation/config/network.js";
 import { Form } from "@components/form/Form";
-import { useDevice } from "@core/providers/useDevice.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import { ErrorMessage } from "@hookform/error-message";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";

@@ -1,4 +1,4 @@
-import { ChevronUpIcon } from "@heroicons/react/24/outline";
+import { ChevronUpIcon } from "lucide-react";
 
 export interface TableProps {
   headings: Heading[];
@@ -28,7 +28,9 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
             >
               <div className="flex gap-2">
                 {heading.title}
-                {heading.sortable && <ChevronUpIcon className="my-auto h-3" />}
+                {heading.sortable && (
+                  <ChevronUpIcon size={16} className="my-auto" />
+                )}
               </div>
             </th>
           ))}

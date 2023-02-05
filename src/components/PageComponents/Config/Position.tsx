@@ -6,7 +6,7 @@ import { Input } from "@components/form/Input.js";
 import { Toggle } from "@components/form/Toggle.js";
 import { PositionValidation } from "@app/validation/config/position.js";
 import { Form } from "@components/form/Form";
-import { useDevice } from "@core/providers/useDevice.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -44,6 +44,8 @@ export const Position = (): JSX.Element => {
 
   const onSubmit = handleSubmit((data) => {
     const { fixedAlt, fixedLat, fixedLng, ...rest } = data;
+
+    console.log("detected change");
 
     const configHasChanged = !Protobuf.Config_PositionConfig.equals(
       config.position,

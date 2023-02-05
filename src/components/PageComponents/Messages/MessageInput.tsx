@@ -1,9 +1,9 @@
-import { IconButton } from "@components/form/IconButton.js";
 import { Input } from "@components/form/Input.js";
-import { useDevice } from "@core/providers/useDevice.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import type { Channel } from "@core/stores/deviceStore.js";
-import { MapPinIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import { SendIcon } from "lucide-react";
 import type { Types } from "@meshtastic/meshtasticjs";
+import { Button } from "@app/components/UI/Button.js";
 
 export interface MessageInputProps {
   channel: Channel;
@@ -48,12 +48,11 @@ export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
               onChange={(e) => setMessageDraft(e.target.value)}
             />
           </span>
-          <IconButton
-            icon={<PaperAirplaneIcon className="text-slate-500 h-4" />}
-          />
+          <Button variant="subtle">
+            <SendIcon size={16} className="text-slate-500" />
+          </Button>
         </div>
       </form>
-      <IconButton icon={<MapPinIcon className="text-slate-500 h-4" />} />
     </div>
   );
 };

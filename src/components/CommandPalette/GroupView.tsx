@@ -1,6 +1,6 @@
 import type { Group } from "@components/CommandPalette/Index.js";
 import { Combobox } from "@headlessui/react";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon } from "lucide-react";
 
 export interface GroupViewProps {
   group: Group;
@@ -18,9 +18,11 @@ export const GroupView = ({ group }: GroupViewProps): JSX.Element => {
     >
       {({ active }) => (
         <>
-          <group.icon className="h-6 w-6" />
+          <group.icon size={20} />
           <span className="ml-3 flex-auto truncate">{group.label}</span>
-          {active && <ChevronRightIcon className="h-5 text-textSecondary" />}
+          {active && (
+            <ChevronRightIcon size={16} className="text-textSecondary" />
+          )}
         </>
       )}
     </Combobox.Option>

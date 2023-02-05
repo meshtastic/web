@@ -4,7 +4,7 @@ import { Input } from "@components/form/Input.js";
 import { Toggle } from "@components/form/Toggle.js";
 import { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.js";
 import { Form } from "@components/form/Form";
-import { useDevice } from "@core/providers/useDevice.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 

@@ -6,7 +6,6 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { IHTTPConnection } from "@meshtastic/meshtasticjs";
 
 export const HTTP = (): JSX.Element => {
@@ -72,7 +71,6 @@ export const HTTP = (): JSX.Element => {
         />
       </div>
       <Button type="submit">
-        <PlusCircleIcon className="w-4" />
         <span>Connect</span>
       </Button>
     </form>

@@ -1,4 +1,4 @@
-import { DeviceContext } from "@core/providers/useDevice.js";
+import { DeviceContext } from "@core/stores/deviceStore.js";
 import type { Device } from "@core/stores/deviceStore.js";
 import type { ReactNode } from "react";
 

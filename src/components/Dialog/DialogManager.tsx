@@ -1,39 +1,46 @@
-import { useDevice } from "@core/providers/useDevice.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import { QRDialog } from "@components/Dialog/QRDialog.js";
 import { RebootDialog } from "@components/Dialog/RebootDialog.js";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.js";
 import { ImportDialog } from "@components/Dialog/ImportDialog.js";
+import { DeviceNameDialog } from "./DeviceNameDialog.js";
 
 export const DialogManager = (): JSX.Element => {
   const { channels, config, dialog, setDialogOpen } = useDevice();
   return (
     <>
       <QRDialog
-        isOpen={dialog.QR}
-        close={() => {
-          setDialogOpen("QR", false);
+        open={dialog.QR}
+        onOpenChange={(open) => {
+          setDialogOpen("QR", open);
         }}
         channels={channels.map((ch) => ch.config)}
         loraConfig={config.lora}
       />
       <ImportDialog
-        isOpen={dialog.import}
-        close={() => {
-          setDialogOpen("import", false);
+        open={dialog.import}
+        onOpenChange={(open) => {
+          setDialogOpen("import", open);
         }}
         channels={channels.map((ch) => ch.config)}
         loraConfig={config.lora}
       />
       <ShutdownDialog
-        isOpen={dialog.shutdown}
-        close={() => {
+        open={dialog.shutdown}
+        onOpenChange={() => {
           setDialogOpen("shutdown", false);
         }}
       />
       <RebootDialog
-        isOpen={dialog.reboot}
-        close={() => {
+        open={dialog.reboot}
+        onOpenChange={() => {
           setDialogOpen("reboot", false);
+        }}
+      />
+      <DeviceNameDialog
+        open={dialog.deviceName}
+        onOpenChange={(open) => {
+          setDialogOpen("deviceName", open);
         }}
       />
     </>

@@ -1,69 +1,86 @@
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
-import { NavSpacer } from "@app/Nav/NavSpacer.js";
-import { PageNav } from "@app/Nav/PageNav.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { PlusIcon } from "@heroicons/react/24/outline";
-import { MoonIcon, SunIcon } from "@primer/octicons-react";
+import {
+  PlusIcon,
+  HomeIcon,
+  LanguagesIcon,
+  SunIcon,
+  MoonIcon,
+  GithubIcon,
+  TerminalIcon
+} from "lucide-react";
+import { Separator } from "./UI/Seperator.js";
+import { cn } from "@app/core/utils/cn.js";
+import { Code } from "./UI/Typography/Code.js";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
-  const { selectedDevice, setSelectedDevice, darkMode, setDarkMode } =
-    useAppStore();
+  const {
+    selectedDevice,
+    setSelectedDevice,
+    darkMode,
+    setDarkMode,
+    setCommandPaletteOpen
+  } = useAppStore();
 
   return (
-    <div className="flex h-full w-14 items-center gap-3 bg-backgroundPrimary pt-3 [writing-mode:vertical-rl]">
-      <div className="flex items-center gap-3">
-        <span className="flex font-bold text-textPrimary">
+    <nav className="drag custom-border flex flex-col justify-between border-r-[0.5px] bg-transparent pt-2">
+      <div className="flex flex-col overflow-y-hidden">
+        <ul className="flex w-20 shrink-0 flex-col items-center justify-end space-y-2.5 bg-transparent px-5 pt-1 pb-px">
+          <li className="aspect-w-1 aspect-h-1 w-full">
+            <a className="text-primary-500 ring-primary-300 flex flex-col items-center justify-center rounded-full outline-none ring transition-all focus:outline-none sm:duration-300">
+              <HomeIcon />
+            </a>
+          </li>
+        </ul>
+        <ul className="flex w-20 grow flex-col items-center space-y-4 bg-transparent py-4 px-5">
           {getDevices().map((device) => (
-            <div
+            <li
               key={device.id}
+              className="aspect-w-1 aspect-h-1 w-full"
               onClick={() => {
                 setSelectedDevice(device.id);
               }}
-              className={`cursor-pointer border-x-4 border-backgroundPrimary bg-backgroundPrimary py-3 px-2 hover:brightness-hover active:brightness-press ${
-                selectedDevice === device.id ? "border-l-accent" : ""
-              }`}
             >
-              <Hashicon
-                size={32}
-                value={device.hardware.myNodeNum.toString()}
-              />
-            </div>
+              <div
+                className={cn(
+                  "flex aspect-square cursor-pointer flex-col items-center justify-center rounded-full ring ring-accent",
+                  selectedDevice === device.id ? "ring" : "ring-0"
+                )}
+              >
+                <Hashicon
+                  size={24}
+                  value={device.hardware.myNodeNum.toString()}
+                />
+              </div>
+            </li>
           ))}
-          <div
-            onClick={() => {
-              setSelectedDevice(0);
-            }}
-            className={`cursor-pointer border-x-4 border-backgroundPrimary bg-backgroundPrimary py-4 px-3 hover:brightness-hover active:brightness-press ${
-              selectedDevice === 0 ? "border-l-accent" : ""
-            }`}
-          >
-            <PlusIcon className="w-6" />
+          <Separator />
+          <div className="transition-all duration-300 hover:text-accent">
+            <PlusIcon />
           </div>
-        </span>
+        </ul>
       </div>
-
-      {selectedDevice !== 0 && (
-        <>
-          <NavSpacer />
-          <PageNav />
-        </>
-      )}
-
-      <NavSpacer />
-
-      <div
-        onClick={() => setDarkMode(!darkMode)}
-        className="bg-backgroundPrimary py-5 px-4 text-textSecondary hover:text-textPrimary hover:brightness-hover active:brightness-press"
-      >
-        {darkMode ? <SunIcon className="w-4" /> : <MoonIcon className="w-4" />}
+      <div className="flex w-20 flex-col items-center space-y-5 bg-transparent px-5 pb-5">
+        <button
+          className="transition-all hover:text-accent"
+          onClick={() => setDarkMode(!darkMode)}
+        >
+          {darkMode ? <SunIcon /> : <MoonIcon />}
+        </button>
+        <button
+          className="transition-all hover:text-accent"
+          onClick={() => setCommandPaletteOpen(true)}
+        >
+          <TerminalIcon />
+        </button>
+        <button className="transition-all hover:text-accent">
+          <LanguagesIcon />
+        </button>
+        <Separator />
+        <Code>{process.env.COMMIT_HASH}</Code>
       </div>
-
-      <img
-        src={darkMode ? "Logo_White.svg" : "Logo_Black.svg"}
-        className="mt-auto px-2 py-3"
-      />
-    </div>
+    </nav>
   );
 };

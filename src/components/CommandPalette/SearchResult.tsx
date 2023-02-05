@@ -1,6 +1,6 @@
 import type { Group } from "@components/CommandPalette/Index.js";
 import { Combobox } from "@headlessui/react";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon } from "lucide-react";
 
 export interface SearchResultProps {
   group: Group;
@@ -10,7 +10,10 @@ export const SearchResult = ({ group }: SearchResultProps): JSX.Element => {
   return (
     <div className="rounded-md border-2 border-backgroundPrimary py-2">
       <div className="flex items-center px-3 py-2">
-        <group.icon className="text-gray-900 h-6 w-6 flex-none text-opacity-40" />
+        <group.icon
+          size={16}
+          className="flex-none text-gray-900 text-opacity-40"
+        />
         <span className="ml-3 flex-auto truncate">{group.label}</span>
       </div>
       {group.commands.map((command, index) => (
@@ -19,20 +22,23 @@ export const SearchResult = ({ group }: SearchResultProps): JSX.Element => {
             value={command}
             className={({ active }) =>
               `mr-2 ml-4 flex cursor-pointer select-none items-center rounded-md px-3 py-1 ${
-                active ? "text-gray-900 bg-backgroundPrimary" : ""
+                active ? "bg-backgroundPrimary text-gray-900" : ""
               }`
             }
           >
             {({ active }) => (
               <>
                 <command.icon
-                  className={`text-gray-900 h-4 flex-none text-opacity-40 ${
+                  className={`h-4 flex-none text-gray-900 text-opacity-40 ${
                     active ? "text-opacity-100" : ""
                   }`}
                 />
                 <span className="ml-3">{command.label}</span>
                 {active && (
-                  <ChevronRightIcon className="text-gray-400 ml-auto h-4" />
+                  <ChevronRightIcon
+                    size={16}
+                    className="ml-auto text-gray-400"
+                  />
                 )}
               </>
             )}
@@ -46,7 +52,7 @@ export const SearchResult = ({ group }: SearchResultProps): JSX.Element => {
                   className={({ active }) =>
                     `mx-2 flex cursor-pointer select-none items-center rounded-md px-3 py-1 ${
                       active
-                        ? "text-gray-900 bg-backgroundPrimary bg-opacity-5"
+                        ? "bg-backgroundPrimary bg-opacity-5 text-gray-900"
                         : ""
                     }`
                   }
@@ -56,7 +62,10 @@ export const SearchResult = ({ group }: SearchResultProps): JSX.Element => {
                       {item.icon}
                       <span className="ml-3">{item.label}</span>
                       {active && (
-                        <ChevronRightIcon className="text-gray-400 ml-auto h-4" />
+                        <ChevronRightIcon
+                          size={16}
+                          className="ml-auto text-gray-400"
+                        />
                       )}
                     </>
                   )}

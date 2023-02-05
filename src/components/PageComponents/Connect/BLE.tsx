@@ -5,7 +5,6 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { Constants, IBLEConnection } from "@meshtastic/meshtasticjs";
 
 export const BLE = (): JSX.Element => {
@@ -64,7 +63,6 @@ export const BLE = (): JSX.Element => {
             });
         }}
       >
-        <PlusCircleIcon className="w-4" />
         <span>New device</span>
       </Button>
     </div>

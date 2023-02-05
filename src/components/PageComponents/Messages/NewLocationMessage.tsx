@@ -1,7 +1,7 @@
 import { Input } from "@components/form/Input.js";
 import { Select } from "@components/form/Select.js";
 import { Button } from "@components/form/Button.js";
-import { useDevice } from "@core/providers/useDevice.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
