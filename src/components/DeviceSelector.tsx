@@ -1,7 +1,7 @@
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { NavSpacer } from "@app/Nav/NavSpacer.js";
-import { PageNav } from "@app/Nav/PageNav.js";
+import { PageNav, pages, pagesSetup } from "@app/Nav/PageNav.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { PlusIcon, WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
 import { MoonIcon, SunIcon } from "@primer/octicons-react";
@@ -47,10 +47,10 @@ export const DeviceSelector = (): JSX.Element => {
         </span>
       </div>
             
-      {selectedDevice > 0 && (    // TODO_MG: Handle selectedDevice == -1
+      {selectedDevice !== 0 && (    // TODO_MG: Handle selectedDevice == -1
         <>
           <NavSpacer />
-          <PageNav />
+          <PageNav p={selectedDevice !== -1 ? pages : pagesSetup} />
         </>
       )}
 

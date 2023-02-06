@@ -28,7 +28,7 @@ export const SidebarSetup = (): JSX.Element => {
   const devicesToFlash = devices.map(d => d.selectedToFlash);
 
   return (    
-    <div className="flex flex-grow">
+    // <div className="flex flex-grow">
       <div className="bg-slate-50 relative flex w-72 flex-shrink-0 flex-col gap-2 p-2">
         <div className="h-1/2">
           <div className="flex h-16 flex-col gap-2 overflow-y-auto">        
@@ -53,7 +53,7 @@ export const SidebarSetup = (): JSX.Element => {
         <div className="h-1/2">{<Mono>(Configurations go here)</Mono>}</div>
         
       </div>
-    </div>
+    // </div>
   );
 };
 

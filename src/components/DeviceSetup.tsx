@@ -1,5 +1,6 @@
 import { useDeviceStore } from "@app/core/stores/deviceStore";
 import { DeviceWrapper } from "@app/DeviceWrapper";
+import { PageNav, pagesSetup } from "@app/Nav/PageNav";
 import { PageRouter } from "@app/PageRouter";
 import { ConfigPage } from "@app/pages/Config";
 import { Mono } from "./generic/Mono";
@@ -16,10 +17,12 @@ export const DeviceSetup = (): JSX.Element => {
         return (<Mono>Currently needs at least one device.</Mono>)
 
     return (
-        <DeviceWrapper device={testDevice}>
+        <DeviceWrapper device={testDevice}>            
+        <div className="flex flex-grow">
             { <SidebarSetup/> }
-            {/* <PageNav pages={pagesSetup}/> TODO_MG: Fix these */}
-            {/* <PageRouter/>             */}
+            { <PageRouter/> }
+        </div>            
+            {/* { <PageNav p={pagesSetup}/> } */}            
         </DeviceWrapper>
     );
 }

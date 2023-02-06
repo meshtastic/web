@@ -10,46 +10,63 @@ import {
   UsersIcon
 } from "@heroicons/react/24/outline";
 
-export const PageNav = (): JSX.Element => {
-  const { activePage, setActivePage } = useDevice();
+interface NavLink {
+  name: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  page: Page;
+}
 
-  interface NavLink {
-    name: string;
-    icon: ComponentType<SVGProps<SVGSVGElement>>;
-    page: Page;
+export const pages: NavLink[] = [
+  {
+    name: "Messages",
+    icon: ChatBubbleBottomCenterTextIcon,
+    page: "messages"
+  },
+  {
+    name: "Map",
+    icon: MapIcon,
+    page: "map"
+  },
+  {
+    name: "Config",
+    icon: Cog8ToothIcon,
+    page: "config"
+  },
+  {
+    name: "Channels",
+    icon: Square3Stack3DIcon,
+    page: "channels"
+  },
+  {
+    name: "Peers",
+    icon: UsersIcon,
+    page: "peers"
   }
+];
 
-  const pages: NavLink[] = [
-    {
-      name: "Messages",
-      icon: ChatBubbleBottomCenterTextIcon,
-      page: "messages"
-    },
-    {
-      name: "Map",
-      icon: MapIcon,
-      page: "map"
-    },
-    {
-      name: "Config",
-      icon: Cog8ToothIcon,
-      page: "config"
-    },
-    {
-      name: "Channels",
-      icon: Square3Stack3DIcon,
-      page: "channels"
-    },
-    {
-      name: "Peers",
-      icon: UsersIcon,
-      page: "peers"
-    }
-  ];
+export const pagesSetup: NavLink[] = [
+  {
+    name: "Setup",
+    icon: BeakerIcon,
+    page: "setup"
+  },
+  {
+    name: "Config",
+    icon: Cog8ToothIcon,
+    page: "config"
+  }
+];
+
+export interface TODORenameThisPageNavPages {
+  p: NavLink[]
+}
+
+export const PageNav = ({p}: TODORenameThisPageNavPages): JSX.Element => {
+  const { activePage, setActivePage } = useDevice();  
 
   return (
     <div className="flex text-textPrimary">
-      {pages.map((Link) => (
+      {p.map((Link) => (
         <div
           key={Link.name}
           onClick={() => {

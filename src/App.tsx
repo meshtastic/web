@@ -18,12 +18,13 @@ export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();
   const { selectedDevice, darkMode, accent } = useAppStore();
 
+  const { getDevices } = useDeviceStore();
   const device = getDevice(selectedDevice);
 
   return (
     <ThemeController>
       <MapProvider>
-        <DeviceWrapper device={device}>
+        <DeviceWrapper device={selectedDevice !== -1 ? device : getDevices()[0]}>
           <div className="flex bg-backgroundSecondary">
             <DeviceSelector />
             <div className="flex flex-grow flex-col">
