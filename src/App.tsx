@@ -9,15 +9,23 @@ import { NewDevice } from "@components/NewDevice.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { ThemeController } from "@components/generic/ThemeController.js";
 import { Menu } from "./components/Menu.js";
+import { NewDeviceDialog } from "./components/Dialog/NewDevice.js";
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();
-  const { selectedDevice, darkMode, accent } = useAppStore();
+  const { selectedDevice, setConnectDialogOpen, connectDialogOpen } =
+    useAppStore();
 
   const device = getDevice(selectedDevice);
 
   return (
     <ThemeController>
+      <NewDeviceDialog
+        open={connectDialogOpen}
+        onOpenChange={(open) => {
+          setConnectDialogOpen(open);
+        }}
+      />
       <MapProvider>
         <DeviceWrapper device={device}>
           <div className="flex min-h-screen flex-col">

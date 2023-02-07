@@ -13,6 +13,7 @@ import {
 import { Separator } from "./UI/Seperator.js";
 import { cn } from "@app/core/utils/cn.js";
 import { Code } from "./UI/Typography/Code.js";
+import { SidebarButton } from "./SidebarButton.js";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
@@ -21,45 +22,38 @@ export const DeviceSelector = (): JSX.Element => {
     setSelectedDevice,
     darkMode,
     setDarkMode,
-    setCommandPaletteOpen
+    setCommandPaletteOpen,
+    setConnectDialogOpen
   } = useAppStore();
 
   return (
     <nav className="drag custom-border flex flex-col justify-between border-r-[0.5px] bg-transparent pt-2">
       <div className="flex flex-col overflow-y-hidden">
-        <ul className="flex w-20 shrink-0 flex-col items-center justify-end space-y-2.5 bg-transparent px-5 pt-1 pb-px">
-          <li className="aspect-w-1 aspect-h-1 w-full">
-            <a className="text-primary-500 ring-primary-300 flex flex-col items-center justify-center rounded-full outline-none ring transition-all focus:outline-none sm:duration-300">
-              <HomeIcon />
-            </a>
-          </li>
-        </ul>
         <ul className="flex w-20 grow flex-col items-center space-y-4 bg-transparent py-4 px-5">
+          <SidebarButton active={false} onClick={() => {}}>
+            <HomeIcon />
+          </SidebarButton>
           {getDevices().map((device) => (
-            <li
+            <SidebarButton
               key={device.id}
-              className="aspect-w-1 aspect-h-1 w-full"
               onClick={() => {
                 setSelectedDevice(device.id);
               }}
+              active={selectedDevice === device.id}
             >
-              <div
-                className={cn(
-                  "flex aspect-square cursor-pointer flex-col items-center justify-center rounded-full ring ring-accent",
-                  selectedDevice === device.id ? "ring" : "ring-0"
-                )}
-              >
-                <Hashicon
-                  size={24}
-                  value={device.hardware.myNodeNum.toString()}
-                />
-              </div>
-            </li>
+              <Hashicon
+                size={24}
+                value={device.hardware.myNodeNum.toString()}
+              />
+            </SidebarButton>
           ))}
           <Separator />
-          <div className="transition-all duration-300 hover:text-accent">
+          <button
+            onClick={() => setConnectDialogOpen(true)}
+            className="transition-all duration-300 hover:text-accent"
+          >
             <PlusIcon />
-          </div>
+          </button>
         </ul>
       </div>
       <div className="flex w-20 flex-col items-center space-y-5 bg-transparent px-5 pb-5">

@@ -27,6 +27,7 @@ interface AppState {
   commandPaletteOpen: boolean;
   darkMode: boolean;
   accent: accentColor;
+  connectDialogOpen: boolean;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -38,6 +39,7 @@ interface AppState {
   setCommandPaletteOpen: (open: boolean) => void;
   setDarkMode: (enabled: boolean) => void;
   setAccent: (color: accentColor) => void;
+  setConnectDialogOpen: (open: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -48,6 +50,7 @@ export const useAppStore = create<AppState>()((set) => ({
   commandPaletteOpen: false,
   darkMode: true,
   accent: "orange",
+  connectDialogOpen: false,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -100,6 +103,13 @@ export const useAppStore = create<AppState>()((set) => ({
     set(
       produce<AppState>((draft) => {
         draft.accent = color;
+      })
+    );
+  },
+  setConnectDialogOpen: (open: boolean) => {
+    set(
+      produce<AppState>((draft) => {
+        draft.connectDialogOpen = open;
       })
     );
   }

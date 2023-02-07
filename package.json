@@ -41,7 +41,6 @@
     "class-validator": "^0.14.0",
     "class-variance-authority": "^0.4.0",
     "clsx": "^1.2.1",
-    "cmdk": "^0.1.21",
     "geodesy": "^2.4.0",
     "i18next": "^22.4.9",
     "immer": "^9.0.19",
