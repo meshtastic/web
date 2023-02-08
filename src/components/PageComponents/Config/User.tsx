@@ -13,39 +13,26 @@ import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const User = (): JSX.Element => {
-  const { hardware, nodes, connection } = useDevice();
+  const { hardware, nodes, connection, setWorkingOwner } = useDevice();
 
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
   const { register, handleSubmit, reset, control } = useForm<UserValidation>({
     defaultValues: myNode?.data.user,
-    resolver: classValidatorResolver(UserValidation)
+    resolver: classValidatorResolver(UserValidation),
   });
 
   useEffect(() => {
-    reset({
-      longName: myNode?.data.user?.longName,
-      shortName: myNode?.data.user?.shortName,
-      isLicensed: myNode?.data.user?.isLicensed
-    });
+    reset(myNode?.data.user);
   }, [reset, myNode]);
 
   const onSubmit = handleSubmit((data) => {
     if (connection && myNode?.data.user) {
-      void toast.promise(
-        connection
-          .setOwner(
-            new Protobuf.User({
-              ...myNode.data.user,
-              ...data
-            })
-          )
-          .then(() => reset({ ...data })),
-        {
-          loading: "Saving...",
-          success: "Saved User, Restarting Node",
-          error: "No response received"
-        }
+      setWorkingOwner(
+        new Protobuf.User({
+          ...myNode.data.user,
+          ...data,
+        })
       );
     }
   });

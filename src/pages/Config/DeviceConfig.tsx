@@ -16,42 +16,42 @@ import { NavBar } from "@app/Nav/NavBar.js";
 import { VerticalTabbedContent } from "@app/components/generic/VerticalTabbedContent.js";
 
 export const DeviceConfig = (): JSX.Element => {
-  const { hardware, workingConfig, connection } = useDevice();
+  const { hardware, workingConfig, workingOwner, connection } = useDevice();
 
   const tabs = [
     {
       label: "User",
-      element: User
+      element: User,
     },
     {
       label: "Device",
-      element: Device
+      element: Device,
     },
     {
       label: "Position",
-      element: Position
+      element: Position,
     },
     {
       label: "Power",
-      element: Power
+      element: Power,
     },
     {
       label: "Network",
       element: Network,
-      disabled: !hardware.hasWifi
+      disabled: !hardware.hasWifi,
     },
     {
       label: "Display",
-      element: Display
+      element: Display,
     },
     {
       label: "LoRa",
-      element: LoRa
+      element: LoRa,
     },
     {
       label: "Bluetooth",
-      element: Bluetooth
-    }
+      element: Bluetooth,
+    },
   ];
 
   return (
@@ -65,9 +65,10 @@ export const DeviceConfig = (): JSX.Element => {
               workingConfig.map(async (config) => {
                 await connection?.setConfig(config);
               });
+              connection?.setOwner(workingOwner);
               await connection?.commitEditSettings();
-            }
-          }
+            },
+          },
         ]}
       />
 
