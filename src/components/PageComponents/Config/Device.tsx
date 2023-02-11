@@ -48,7 +48,7 @@ export const Device = (): JSX.Element => {
         render={({ field: { value, ...rest } }) => (
           <Toggle
             label="Serial Output Enabled"
-            description="Disable the device's serial console"
+            description="Enable the device's serial console"
             checked={value}
             {...rest}
           />
