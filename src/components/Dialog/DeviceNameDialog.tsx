@@ -1,4 +1,4 @@
-import { Input } from "@components/form/Input.js";
+import { Input } from "@components/UI/Input.js";
 import {
   Dialog,
   DialogContent,
@@ -7,10 +7,11 @@ import {
   DialogHeader,
   DialogTitle
 } from "@components/UI/Dialog.js";
-import { Button } from "../form/Button.js";
+import { Button } from "@components/UI/Button.js";
 import { useDevice } from "@app/core/stores/deviceStore.js";
 import { useForm } from "react-hook-form";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Label } from "../UI/Label.js";
 
 export interface User {
   longName: string;
@@ -31,9 +32,9 @@ export const DeviceNameDialog = ({
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
   const { register, handleSubmit } = useForm<User>({
-    defaultValues: {
-      longName: myNode?.data.user?.longName,
-      shortName: myNode?.data.user?.shortName
+    values: {
+      longName: myNode?.data.user?.longName ?? "Unknown",
+      shortName: myNode?.data.user?.shortName ?? "Unknown"
     }
   });
 
@@ -58,17 +59,10 @@ export const DeviceNameDialog = ({
         </DialogHeader>
         <div className="gap-4">
           <form onSubmit={onSubmit}>
-            <Input
-              label="Long Name"
-              description="Personalised name for this device."
-              {...register("longName")}
-            />
-            <Input
-              label="Short Name"
-              description="Shown on small screens."
-              maxLength={4}
-              {...register("shortName")}
-            />
+            <Label>Long Name</Label>
+            <Input {...register("longName")} />
+            <Label>Short Name</Label>
+            <Input maxLength={4} {...register("shortName")} />
           </form>
         </div>
         <DialogFooter>

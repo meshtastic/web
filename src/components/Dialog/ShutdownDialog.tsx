@@ -8,7 +8,7 @@ import {
   DialogTitle
 } from "@components/UI/Dialog.js";
 import { ClockIcon, PowerIcon } from "lucide-react";
-import { Button } from "@components/form/Button.js";
+import { Button } from "@components/UI/Button.js";
 import { Input } from "@components/form/Input.js";
 
 export interface ShutdownDialogProps {

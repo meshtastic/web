@@ -40,7 +40,11 @@ export const PeersPage = (): JSX.Element => {
                 .match(/.{1,2}/g)
                 ?.join(":") ?? "UNK"}
             </Mono>,
-            <TimeAgo timestamp={node.data.lastHeard * 1000} />,
+            node.data.lastHeard === 0 ? (
+              <p>Never</p>
+            ) : (
+              <TimeAgo timestamp={node.data.lastHeard * 1000} />
+            ),
             <Mono>
               {node.data.snr}db/
               {Math.min(Math.max((node.data.snr + 10) * 5, 0), 100)}%/

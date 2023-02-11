@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Controller, useForm } from "react-hook-form";
 import { ChannelSettingsValidation } from "@app/validation/channelSettings.js";
-import { Form } from "@components/form/Form";
 import { Input } from "@components/form/Input.js";
-import { Select } from "@components/form/Select.js";
 import { Toggle } from "@components/form/Toggle.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { RefreshCwIcon, EyeIcon, EyeOffIcon } from "lucide-react";
@@ -88,17 +86,8 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   });
 
   return (
-    <div className="flex flex-grow flex-col gap-2">
-      {/* actions={[
-          {
-            label: "Apply",
-            async onClick() {
-              await onSubmit();
-            }
-          }
-        ]} */}
-
-      <Form onSubmit={onSubmit}>
+    <div className="p-3">
+      <form onSubmit={onSubmit}>
         {channel?.index !== 0 && (
           <>
             <Controller
@@ -121,7 +110,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
             />
           </>
         )}
-        <Select
+        {/* <Select
           label="Key Size"
           description="Desired size of generated key."
           value={keySize}
@@ -141,7 +130,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         >
           <option value={128}>128 Bit</option>
           <option value={256}>256 Bit</option>
-        </Select>
+        </Select> */}
         <Input
           width="100%"
           label="Pre-Shared Key"
@@ -180,7 +169,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
             />
           )}
         />
-      </Form>
+      </form>
     </div>
   );
 };

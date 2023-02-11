@@ -1,12 +1,9 @@
 import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { Input } from "@components/form/Input.js";
-import { Select } from "@components/form/Select.js";
 import { Toggle } from "@components/form/Toggle.js";
 import { CannedMessageValidation } from "@app/validation/moduleConfig/cannedMessage.js";
-import { Form } from "@components/form/Form";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -46,7 +43,7 @@ export const CannedMessage = (): JSX.Element => {
   });
 
   return (
-    <Form onSubmit={onSubmit}>
+    <form onChange={onSubmit}>
       <Controller
         name="enabled"
         control={control}
@@ -87,7 +84,7 @@ export const CannedMessage = (): JSX.Element => {
         disabled={moduleEnabled}
         {...register("inputbrokerPinPress", { valueAsNumber: true })}
       />
-      <Select
+      {/* <Select
         label="Clockwise event"
         description="Select input event."
         disabled={moduleEnabled}
@@ -116,7 +113,7 @@ export const CannedMessage = (): JSX.Element => {
         {renderOptions(
           Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar
         )}
-      </Select>
+      </Select> */}
       <Controller
         name="updown1Enabled"
         control={control}
@@ -147,6 +144,6 @@ export const CannedMessage = (): JSX.Element => {
           />
         )}
       />
-    </Form>
+    </form>
   );
 };

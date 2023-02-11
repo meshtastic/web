@@ -5,7 +5,6 @@ import { FormSection } from "@components/form/FormSection.js";
 import { Input } from "@components/form/Input.js";
 import { Toggle } from "@components/form/Toggle.js";
 import { PositionValidation } from "@app/validation/config/position.js";
-import { Form } from "@components/form/Form";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
@@ -110,7 +109,7 @@ export const Position = (): JSX.Element => {
   });
 
   return (
-    <Form onSubmit={onSubmit}>
+    <form onChange={onSubmit}>
       <Controller
         name="gpsEnabled"
         control={control}
@@ -227,6 +226,6 @@ export const Position = (): JSX.Element => {
         type="number"
         {...register("txGpio", { valueAsNumber: true })}
       />
-    </Form>
+    </form>
   );
 };

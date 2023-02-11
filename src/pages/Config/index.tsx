@@ -4,9 +4,10 @@ import { DeviceConfig } from "@pages/Config/DeviceConfig.js";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.js";
 import { PageLayout } from "@app/components/Topbar.js";
 import { SidebarSection } from "@app/components/UI/Sidebar/SidebarSection.js";
-import { SidebarItem } from "@app/components/UI/Sidebar/SidebarItem.js";
 import { useState } from "react";
 import { useDevice } from "@app/core/stores/deviceStore.js";
+import { Button } from "@app/components/UI/Button.js";
+import { SidebarButton } from "@app/components/UI/Sidebar/sidebarButton.js";
 
 export const ConfigPage = (): JSX.Element => {
   const { workingConfig, workingModuleConfig, connection } = useDevice();
@@ -17,31 +18,23 @@ export const ConfigPage = (): JSX.Element => {
   return (
     <>
       <Sidebar>
-        <SidebarSection title="Config Sections">
-          <SidebarItem
-            icon={SettingsIcon}
+        <SidebarSection label="Config Sections">
+          <SidebarButton
             label="Device Config"
             active={activeConfigSection === "device"}
             onClick={() => setActiveConfigSection("device")}
+            icon={SettingsIcon}
           />
-          <SidebarItem
-            icon={BoxesIcon}
+          <SidebarButton
             label="Module Config"
             active={activeConfigSection === "module"}
             onClick={() => setActiveConfigSection("module")}
+            icon={BoxesIcon}
           />
         </SidebarSection>
-        <div className="space-y-1.5">
-          <div className="bg-palette-0 sticky top-0 pb-2">
-            <div className="text-palette-700 flex items-center justify-between px-2">
-              <div className="text-base font-medium"></div>
-            </div>
-          </div>
-          <ul className="space-y-1"></ul>
-        </div>
       </Sidebar>
       <PageLayout
-        title={
+        label={
           activeConfigSection === "device" ? "Device Config" : "Module Config"
         }
         actions={[

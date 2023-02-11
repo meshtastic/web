@@ -64,10 +64,6 @@ export const QRDialog = ({
               {channels.map((channel) => (
                 <Checkbox
                   key={channel.index}
-                  disabled={
-                    channel.index === 0 ||
-                    channel.role === Protobuf.Channel_Role.DISABLED
-                  }
                   label={
                     channel.settings?.name.length
                       ? channel.settings.name

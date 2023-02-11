@@ -11,7 +11,6 @@ import {
   TerminalIcon
 } from "lucide-react";
 import { Separator } from "./UI/Seperator.js";
-import { cn } from "@app/core/utils/cn.js";
 import { Code } from "./UI/Typography/Code.js";
 import { SidebarButton } from "./SidebarButton.js";
 
@@ -27,10 +26,15 @@ export const DeviceSelector = (): JSX.Element => {
   } = useAppStore();
 
   return (
-    <nav className="drag custom-border flex flex-col justify-between border-r-[0.5px] bg-transparent pt-2">
+    <nav className="flex flex-col justify-between border-r-[0.5px] border-slate-300 bg-transparent pt-2 dark:border-slate-700">
       <div className="flex flex-col overflow-y-hidden">
         <ul className="flex w-20 grow flex-col items-center space-y-4 bg-transparent py-4 px-5">
-          <SidebarButton active={false} onClick={() => {}}>
+          <SidebarButton
+            active={selectedDevice === 0}
+            onClick={() => {
+              setSelectedDevice(0);
+            }}
+          >
             <HomeIcon />
           </SidebarButton>
           {getDevices().map((device) => (

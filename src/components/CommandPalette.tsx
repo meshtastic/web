@@ -1,14 +1,8 @@
-import { ComponentType, Fragment, SVGProps, useEffect, useState } from "react";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useEffect } from "react";
 import { useAppStore } from "@core/stores/appStore.js";
-import { useDeviceStore } from "@core/stores/deviceStore.js";
-import { GroupView } from "@components/CommandPalette/GroupView.js";
-import { NoResults } from "@components/CommandPalette/NoResults.js";
-import { PaletteTransition } from "@components/CommandPalette/PaletteTransition.js";
-import { SearchBox } from "@components/CommandPalette/SearchBox.js";
-import { SearchResult } from "@components/CommandPalette/SearchResult.js";
+import { useDevice, useDeviceStore } from "@core/stores/deviceStore.js";
+import { useCommandState } from "cmdk";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { Combobox, Dialog, Transition } from "@headlessui/react";
 import {
   LucideIcon,
   LinkIcon,
@@ -18,7 +12,6 @@ import {
   PlusIcon,
   PowerIcon,
   EraserIcon,
-  ImportIcon,
   RefreshCwIcon,
   FactoryIcon,
   ArrowLeftRightIcon,
@@ -34,8 +27,14 @@ import {
   XCircleIcon,
   BoxSelectIcon
 } from "lucide-react";
-import { Blur } from "@components/generic/Blur.js";
-import { ThemeController } from "@components/generic/ThemeController.js";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList
+} from "@components/UI/Command.js";
 
 export interface Group {
   label: string;
@@ -57,7 +56,6 @@ export interface SubItem {
 }
 
 export const CommandPalette = (): JSX.Element => {
-  const [query, setQuery] = useState("");
   const {
     commandPaletteOpen,
     setCommandPaletteOpen,
@@ -69,7 +67,6 @@ export const CommandPalette = (): JSX.Element => {
     setAccent
   } = useAppStore();
   const { getDevices } = useDeviceStore();
-
   const { setDialogOpen, setActivePage, connection } = useDevice();
 
   const groups: Group[] = [
@@ -344,102 +341,72 @@ export const CommandPalette = (): JSX.Element => {
     }
   ];
 
-  const handleKeydown = (e: KeyboardEvent) => {
-    if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-      e.preventDefault();
-      setCommandPaletteOpen(true);
-    }
-  };
-
   useEffect(() => {
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setCommandPaletteOpen(true);
+      }
+    };
+
     window.addEventListener("keydown", handleKeydown);
     return () => window.removeEventListener("keydown", handleKeydown);
   }, []);
 
-  const filtered =
-    query === ""
-      ? []
-      : groups
-          .map((group) => {
-            return {
-              ...group,
-              commands: group.commands.filter((command) => {
-                const nameIncludes = `${group.label} ${command.label}`
-                  .toLowerCase()
-                  .includes(query.toLowerCase());
+  return (
+    <CommandDialog
+      open={commandPaletteOpen}
+      onOpenChange={setCommandPaletteOpen}
+    >
+      <CommandInput placeholder="Type a command or search..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        {groups.map((group) => (
+          <CommandGroup heading={group.label}>
+            {group.commands.map((command) => (
+              <>
+                <CommandItem
+                  onSelect={() => {
+                    command.action && command.action();
+                    setCommandPaletteOpen(false);
+                  }}
+                >
+                  <command.icon size={16} className="mr-2" />
+                  {command.label}
+                </CommandItem>
+                {command.subItems &&
+                  command.subItems.map((subItem) => (
+                    <SubItem
+                      label={subItem.label}
+                      icon={subItem.icon}
+                      action={subItem.action}
+                    />
+                  ))}
+              </>
+            ))}
+          </CommandGroup>
+        ))}
+      </CommandList>
+    </CommandDialog>
+  );
+};
 
-                const tagsInclude = (
-                  command.tags
-                    ?.map((t) => t.includes(query.toLowerCase()))
-                    .filter(Boolean) ?? []
-                ).length;
-
-                const subItemsInclude = (
-                  command.subItems
-                    ?.map((s) =>
-                      s.label.toLowerCase().includes(query.toLowerCase())
-                    )
-                    .filter(Boolean) ?? []
-                ).length;
-                return nameIncludes || tagsInclude || subItemsInclude;
-              })
-            };
-          })
-          .filter((group) => group.commands.length);
+const SubItem = ({
+  label,
+  icon,
+  action
+}: {
+  label: string;
+  icon: React.ReactNode;
+  action: () => void;
+}) => {
+  const search = useCommandState((state) => state.search);
+  if (!search) return null;
 
   return (
-    <Transition.Root
-      show={commandPaletteOpen}
-      as={Fragment}
-      afterLeave={() => setQuery("")}
-      appear
-    >
-      <Dialog
-        as="div"
-        className="relative z-10"
-        onClose={setCommandPaletteOpen}
-      >
-        <ThemeController>
-          <Blur />
-          <PaletteTransition>
-            <Dialog.Panel className="mx-auto max-w-2xl transform overflow-hidden rounded-md bg-backgroundPrimary transition-all">
-              <Combobox<Command | string>
-                onChange={(input) => {
-                  if (typeof input === "string") {
-                    setQuery(input);
-                  } else if (input.action) {
-                    setCommandPaletteOpen(false);
-                    input.action();
-                  }
-                }}
-              >
-                <SearchBox setQuery={setQuery} />
-
-                {query === "" || filtered.length > 0 ? (
-                  <Combobox.Options
-                    static
-                    className="max-h-80 scroll-py-2 divide-y divide-opacity-10 overflow-y-auto bg-backgroundSecondary"
-                  >
-                    <li className="p-2">
-                      <ul className="flex flex-col gap-2 text-sm text-textSecondary">
-                        {filtered.map((group, index) => (
-                          <SearchResult key={index} group={group} />
-                        ))}
-                        {query === "" &&
-                          groups.map((group, index) => (
-                            <GroupView key={index} group={group} />
-                          ))}
-                      </ul>
-                    </li>
-                  </Combobox.Options>
-                ) : (
-                  query !== "" && filtered.length === 0 && <NoResults />
-                )}
-              </Combobox>
-            </Dialog.Panel>
-          </PaletteTransition>
-        </ThemeController>
-      </Dialog>
-    </Transition.Root>
+    <CommandItem onSelect={action}>
+      {icon}
+      {label}
+    </CommandItem>
   );
 };

@@ -1,7 +1,7 @@
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { Input } from "@components/form/Input.js";
 import { Toggle } from "@components/form/Toggle.js";
-import { Button } from "@components/form/Button.js";
+import { Button } from "@components/UI/Button.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
@@ -70,7 +70,7 @@ export const HTTP = (): JSX.Element => {
           )}
         />
       </div>
-      <Button type="submit">
+      <Button>
         <span>Connect</span>
       </Button>
     </form>

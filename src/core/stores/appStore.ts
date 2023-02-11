@@ -4,7 +4,7 @@ import { create } from "zustand";
 export interface RasterSource {
   enabled: boolean;
   title: string;
-  tiles: string[];
+  tiles: string;
   tileSize: number;
 }
 
@@ -48,7 +48,7 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
-  darkMode: true,
+  darkMode: false,
   accent: "orange",
   connectDialogOpen: false,
 

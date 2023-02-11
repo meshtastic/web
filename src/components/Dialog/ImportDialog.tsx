@@ -11,10 +11,8 @@ import {
   DialogTitle
 } from "@components/UI/Dialog.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { Select } from "@components/form/Select.js";
-import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { Toggle } from "@components/form/Toggle.js";
-import { Button } from "@components/form/Button.js";
+import { Button } from "@components/UI/Button.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 
 export interface ImportDialogProps {
@@ -97,27 +95,26 @@ export const ImportDialog = ({
               <div className="flex w-full gap-2">
                 <div className="w-36">
                   <Toggle
-                    className="flex-col gap-2"
                     label="Use Preset?"
                     disabled
                     checked={channelSet?.loraConfig?.usePreset ?? true}
                   />
                 </div>
-                <Select
+                {/* <Select
                   label="Modem Preset"
                   disabled
                   value={channelSet?.loraConfig?.modemPreset}
                 >
                   {renderOptions(Protobuf.Config_LoRaConfig_ModemPreset)}
-                </Select>
+                </Select> */}
               </div>
-              <Select
+              {/* <Select
                 label="Region"
                 disabled
                 value={channelSet?.loraConfig?.region}
               >
                 {renderOptions(Protobuf.Config_LoRaConfig_RegionCode)}
-              </Select>
+              </Select> */}
 
               <span className="text-md block font-medium text-textPrimary">
                 Channels:
@@ -138,7 +135,7 @@ export const ImportDialog = ({
           )}
         </div>
         <DialogFooter>
-          <Button onClick={() => apply()} disabled={!validURL}>
+          <Button onClick={apply} disabled={!validURL}>
             Apply
           </Button>
         </DialogFooter>

@@ -1,12 +1,9 @@
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "@components/form/Input.js";
-import { Select } from "@components/form/Select.js";
 import { Toggle } from "@components/form/Toggle.js";
 import { AudioValidation } from "@app/validation/moduleConfig/audio.js";
-import { Form } from "@components/form/Form";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -34,7 +31,7 @@ export const Audio = (): JSX.Element => {
   });
 
   return (
-    <Form onSubmit={onSubmit}>
+    <form onChange={onSubmit}>
       <Controller
         name="codec2Enabled"
         control={control}
@@ -53,13 +50,13 @@ export const Audio = (): JSX.Element => {
         type="number"
         {...register("pttPin", { valueAsNumber: true })}
       />
-      <Select
+      {/* <Select
         label="Bitrate"
         description="Enter a description."
         {...register("bitrate", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.ModuleConfig_AudioConfig_Audio_Baud)}
-      </Select>
+      </Select> */}
       <Input
         label="i2SWs"
         description="Enter a description."
@@ -84,6 +81,6 @@ export const Audio = (): JSX.Element => {
         type="number"
         {...register("i2sSck", { valueAsNumber: true })}
       />
-    </Form>
+    </form>
   );
 };

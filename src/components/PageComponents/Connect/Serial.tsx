@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Mono } from "@components/generic/Mono.js";
-import { Button } from "@components/form/Button.js";
+import { Button } from "@components/UI/Button.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";

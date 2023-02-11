@@ -54,7 +54,7 @@ export const ModuleConfig = (): JSX.Element => {
   ];
 
   return (
-    <Tabs defaultValue="MQTT" className="w-[400px]">
+    <Tabs defaultValue="MQTT">
       <TabsList>
         {tabs.map((tab) => (
           <TabsTrigger key={tab.label} value={tab.label}>

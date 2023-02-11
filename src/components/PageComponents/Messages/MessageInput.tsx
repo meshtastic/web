@@ -1,9 +1,9 @@
-import { Input } from "@components/form/Input.js";
+import { Input } from "@components/UI/Input.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import type { Channel } from "@core/stores/deviceStore.js";
 import { SendIcon } from "lucide-react";
 import type { Types } from "@meshtastic/meshtasticjs";
-import { Button } from "@app/components/UI/Button.js";
+import { Button } from "@components/UI/Button.js";
 
 export interface MessageInputProps {
   channel: Channel;
@@ -42,14 +42,13 @@ export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
             <Input
               autoFocus
               minLength={2}
-              label=""
               placeholder="Enter Message"
               value={messageDraft}
               onChange={(e) => setMessageDraft(e.target.value)}
             />
           </span>
-          <Button variant="subtle">
-            <SendIcon size={16} className="text-slate-500" />
+          <Button>
+            <SendIcon size={16} />
           </Button>
         </div>
       </form>

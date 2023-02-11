@@ -6,7 +6,7 @@ export interface ToggleProps {
   label?: string;
   description?: string;
   disabled?: boolean;
-  onChange: (checked: boolean) => void;
+  onChange?: (checked: boolean) => void;
 }
 
 export const Toggle = ({
@@ -21,7 +21,7 @@ export const Toggle = ({
       <Switch
         checked={checked}
         disabled={disabled}
-        onCheckedChange={(state) => onChange(state)}
+        onCheckedChange={onChange}
       />
     </InfoWrapper>
   );

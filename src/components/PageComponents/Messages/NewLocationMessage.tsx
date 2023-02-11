@@ -1,8 +1,6 @@
 import { Input } from "@components/form/Input.js";
-import { Select } from "@components/form/Select.js";
-import { Button } from "@components/form/Button.js";
+import { Button } from "@components/UI/Button.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { renderOptions } from "@core/utils/selectEnumOptions.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 enum LocationType {
@@ -23,9 +21,9 @@ export const NewLocationMessage = (): JSX.Element => {
       >
         <Input label="Name" />
         <Input label="Description" />
-        <Select label="Type" value={LocationType.MGRS}>
+        {/* <Select label="Type" value={LocationType.MGRS}>
           {renderOptions(LocationType)}
-        </Select>
+        </Select> */}
         <Input label="Coordinates" />
         <Button
           onClick={() => {

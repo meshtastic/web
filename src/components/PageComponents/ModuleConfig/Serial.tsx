@@ -3,12 +3,9 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { Input } from "@components/form/Input.js";
 import { Toggle } from "@components/form/Toggle.js";
 import { SerialValidation } from "@app/validation/moduleConfig/serial.js";
-import { Form } from "@components/form/Form";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { renderOptions } from "@core/utils/selectEnumOptions";
-import { Select } from "@components/form/Select";
 
 export const Serial = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -40,7 +37,7 @@ export const Serial = (): JSX.Element => {
   });
 
   return (
-    <Form onSubmit={onSubmit}>
+    <form onChange={onSubmit}>
       <Controller
         name="enabled"
         control={control}
@@ -83,14 +80,14 @@ export const Serial = (): JSX.Element => {
           valueAsNumber: true
         })}
       />
-      <Select
+      {/* <Select
         label="Baud Rate"
         description="The serial baud rate"
         disabled={!moduleEnabled}
         {...register("baud", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.ModuleConfig_SerialConfig_Serial_Baud)}
-      </Select>
+      </Select> */}
       <Input
         type="number"
         label="Timeout"
@@ -101,14 +98,14 @@ export const Serial = (): JSX.Element => {
           valueAsNumber: true
         })}
       />
-      <Select
+      {/* <Select
         label="Mode"
         description="Select Mode"
         disabled={!moduleEnabled}
         {...register("mode", { valueAsNumber: true })}
       >
         {renderOptions(Protobuf.ModuleConfig_SerialConfig_Serial_Mode)}
-      </Select>
-    </Form>
+      </Select> */}
+    </form>
   );
 };

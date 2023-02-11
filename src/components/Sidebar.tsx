@@ -7,10 +7,13 @@ import {
   SettingsIcon,
   LayersIcon,
   UsersIcon,
-  EditIcon
+  EditIcon,
+  LayoutGrid
 } from "lucide-react";
 import { Subtle } from "./UI/Typography/Subtle.js";
-import { SidebarItem } from "./UI/Sidebar/SidebarItem.js";
+import { Button } from "./UI/Button.js";
+import { SidebarSection } from "./UI/Sidebar/SidebarSection.js";
+import { SidebarButton } from "./UI/Sidebar/sidebarButton.js";
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -56,38 +59,36 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
   ];
 
   return (
-    <div className="min-w-[220px] flex-col border-r-[0.5px] bg-transparent">
-      <div className="flex h-16 flex-col justify-center px-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-lg font-medium">
-              {myNode?.data.user?.shortName ?? "UNK"}
-            </span>
-            <Subtle>{myNode?.data.user?.longName ?? "UNK"}</Subtle>
-          </div>
-          <button
-            className="transition-all hover:text-accent"
-            onClick={() => setDialogOpen("deviceName", true)}
-          >
-            <EditIcon size={16} />
-          </button>
+    <div className="min-w-[280px] max-w-min flex-col border-r-[0.5px] border-slate-300 bg-transparent dark:border-slate-700">
+      <div className="flex justify-between px-8 py-6">
+        <div>
+          <span className="text-lg font-medium">
+            {myNode?.data.user?.shortName ?? "UNK"}
+          </span>
+          <Subtle>{myNode?.data.user?.longName ?? "UNK"}</Subtle>
         </div>
+        <button
+          className="transition-all hover:text-accent"
+          onClick={() => setDialogOpen("deviceName", true)}
+        >
+          <EditIcon size={16} />
+        </button>
       </div>
 
-      <div className="mx-2.5 space-y-2">
+      <SidebarSection label="Navigation">
         {pages.map((link) => (
-          <SidebarItem
+          <SidebarButton
             key={link.page}
             label={link.name}
             icon={link.icon}
-            active={link.page === activePage}
             onClick={() => {
               setActivePage(link.page);
             }}
+            active={link.page === activePage}
           />
         ))}
-        {children}
-      </div>
+      </SidebarSection>
+      {children}
     </div>
   );
 };

@@ -14,12 +14,14 @@ import {
   PlusIcon
 } from "lucide-react";
 import { bbox, lineString } from "@turf/turf";
+import { SidebarSection } from "@app/components/UI/Sidebar/SidebarSection.js";
+import { Button } from "@app/components/UI/Button.js";
+import { SidebarButton } from "@app/components/UI/Sidebar/sidebarButton.js";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
   const { rasterSources } = useAppStore();
   const { default: map } = useMap();
-  const tmp = useMap();
 
   const getBBox = () => {
     const nodesWithPosition = nodes.filter((n) => n.data.position?.latitudeI);
@@ -52,32 +54,14 @@ export const MapPage = (): JSX.Element => {
   return (
     <>
       <Sidebar>
-        <div className="space-y-1.5">
-          <div className="bg-palette-0 sticky top-0 pb-2">
-            <div className="text-palette-700 flex items-center justify-between px-2">
-              <div className="text-base font-medium">Sources</div>
-              <div>
-                <button className="flex h-[22px] items-center transition-all duration-300 hover:text-accent">
-                  <PlusIcon size={16} />
-                </button>
-              </div>
-            </div>
-          </div>
-          <ul className="space-y-1">
-            {rasterSources.map((source, index) => (
-              <li key={index}>
-                <div className="text-palette-600 flex w-full cursor-pointer items-center space-x-2.5 rounded-xl bg-transparent px-2.5 py-2.5 transition-all duration-300 hover:text-accent">
-                  <span className="align-middle font-mono text-sm">
-                    {source.title}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <SidebarSection label="Sources">
+          {rasterSources.map((source, index) => (
+            <SidebarButton key={index} label={source.title} />
+          ))}
+        </SidebarSection>
       </Sidebar>
       <PageLayout
-        title="Map"
+        label="Map"
         actions={[
           {
             icon: ZoomInIcon,
@@ -125,11 +109,11 @@ export const MapPage = (): JSX.Element => {
               </div>
             </Marker>
           ))}
-          {rasterSources.map((source, index) => (
+          {/* {rasterSources.map((source, index) => (
             <Source key={index} type="raster" {...source}>
               <Layer type="raster" />
             </Source>
-          ))}
+          ))} */}
           {nodes.map((n) => {
             if (n.data.position?.latitudeI) {
               return (

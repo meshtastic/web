@@ -51,7 +51,7 @@ export const DeviceConfig = (): JSX.Element => {
   ];
 
   return (
-    <Tabs defaultValue="Device" className="w-[400px]">
+    <Tabs defaultValue="Device">
       <TabsList>
         {tabs.map((tab) => (
           <TabsTrigger

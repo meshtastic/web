@@ -6,8 +6,9 @@ import { useDevice } from "@core/stores/deviceStore.js";
 import { QrCodeIcon, ImportIcon } from "lucide-react";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 import { SidebarSection } from "@app/components/UI/Sidebar/SidebarSection.js";
-import { SidebarItem } from "@app/components/UI/Sidebar/SidebarItem.js";
 import { useState } from "react";
+import { Button } from "@app/components/UI/Button.js";
+import { SidebarButton } from "@app/components/UI/Sidebar/sidebarButton.js";
 
 export const getChannelName = (channel: Protobuf.Channel) =>
   channel.settings?.name.length
@@ -25,13 +26,12 @@ export const ChannelsPage = (): JSX.Element => {
   return (
     <>
       <Sidebar>
-        <SidebarSection title="Channels">
+        <SidebarSection label="Channels">
           {channels.map((channel) => (
-            <SidebarItem
+            <SidebarButton
+              label={getChannelName(channel.config)}
               key={channel.config.index}
               active={channel.config.index === activeChannel}
-              onClick={() => setActiveChannel(channel.config.index)}
-              label={getChannelName(channel.config)}
               element={
                 <span
                   className={cn(
@@ -42,12 +42,13 @@ export const ChannelsPage = (): JSX.Element => {
                   )}
                 />
               }
+              onClick={() => setActiveChannel(channel.config.index)}
             />
           ))}
         </SidebarSection>
       </Sidebar>
       <PageLayout
-        title={`Channel: ${
+        label={`Channel: ${
           channels[activeChannel]
             ? getChannelName(channels[activeChannel].config)
             : "Loading..."

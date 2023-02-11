@@ -19,4 +19,10 @@ export class DeviceValidation
 
   @IsInt()
   buzzerGpio: number;
+
+  @IsEnum(Protobuf.Config_DeviceConfig_RebroadcastMode)
+  rebroadcastMode: Protobuf.Config_DeviceConfig_RebroadcastMode;
+
+  @IsInt()
+  nodeInfoBroadcastSecs: number;
 }

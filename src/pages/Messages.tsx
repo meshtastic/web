@@ -3,47 +3,27 @@ import { PageLayout } from "@app/components/Topbar.js";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { EditIcon, HashIcon } from "lucide-react";
+import { HashIcon } from "lucide-react";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 import { SidebarSection } from "@app/components/UI/Sidebar/SidebarSection.js";
-import { SidebarItem } from "@app/components/UI/Sidebar/SidebarItem.js";
 import { useState } from "react";
 import { getChannelName } from "./Channels.js";
+import { SidebarButton } from "@app/components/UI/Sidebar/sidebarButton.js";
 
 export const MessagesPage = (): JSX.Element => {
-  const { channels, setActivePage, nodes, hardware } = useDevice();
+  const { channels, nodes, hardware } = useDevice();
   const [activeChannel, setActiveChannel] = useState<Types.ChannelNumber>(
     Types.ChannelNumber.PRIMARY
   );
 
-  const tabs = channels.map((channel) => {
-    return {
-      label: channel.config.settings?.name.length
-        ? channel.config.settings?.name
-        : channel.config.index === 0
-        ? "Primary"
-        : `Ch ${channel.config.index}`,
-      element: () => <ChannelChat channel={channel} />,
-      disabled: channel.config.role === Protobuf.Channel_Role.DISABLED
-    };
-  });
-
   return (
     <>
       <Sidebar>
-        <SidebarSection
-          title="Channels"
-          action={{
-            icon: EditIcon,
-            onClick() {
-              setActivePage("channels");
-            }
-          }}
-        >
+        <SidebarSection label="Channels">
           {channels
             .filter((ch) => ch.config.role !== Protobuf.Channel_Role.DISABLED)
             .map((channel) => (
-              <SidebarItem
+              <SidebarButton
                 key={channel.config.index}
                 label={
                   channel.config.settings?.name.length
@@ -52,15 +32,17 @@ export const MessagesPage = (): JSX.Element => {
                     ? "Primary"
                     : `Ch ${channel.config.index}`
                 }
-                icon={HashIcon}
+                active={channel.config.index === activeChannel}
+                onClick={() => setActiveChannel(channel.config.index)}
+                element={<HashIcon size={16} className="mr-2" />}
               />
             ))}
         </SidebarSection>
-        <SidebarSection title="Peers">
+        <SidebarSection label="Peers">
           {nodes
             .filter((n) => n.data.num !== hardware.myNodeNum)
             .map((node) => (
-              <SidebarItem
+              <SidebarButton
                 key={node.data.num}
                 label={node.data.user?.longName ?? "Unknown"}
                 element={
@@ -71,7 +53,7 @@ export const MessagesPage = (): JSX.Element => {
         </SidebarSection>
       </Sidebar>
       <PageLayout
-        title={`Messages: ${
+        label={`Messages: ${
           channels[activeChannel]
             ? getChannelName(channels[activeChannel].config)
             : "Loading..."

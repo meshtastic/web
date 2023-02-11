@@ -3,7 +3,6 @@ import { Controller, useForm } from "react-hook-form";
 import { Input } from "@components/form/Input.js";
 import { Toggle } from "@components/form/Toggle.js";
 import { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
-import { Form } from "@components/form/Form";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
@@ -33,7 +32,7 @@ export const Telemetry = (): JSX.Element => {
   });
 
   return (
-    <Form onSubmit={onSubmit}>
+    <form onChange={onSubmit}>
       <Controller
         name="environmentMeasurementEnabled"
         control={control}
@@ -79,6 +78,6 @@ export const Telemetry = (): JSX.Element => {
           />
         )}
       />
-    </Form>
+    </form>
   );
 };

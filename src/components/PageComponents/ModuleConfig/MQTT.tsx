@@ -3,7 +3,6 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { Input } from "@components/form/Input.js";
 import { Toggle } from "@components/form/Toggle.js";
 import { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
-import { Form } from "@components/form/Form";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
@@ -44,7 +43,7 @@ export const MQTT = (): JSX.Element => {
   });
 
   return (
-    <Form onSubmit={onSubmit}>
+    <form onChange={onSubmit}>
       <Controller
         name="enabled"
         control={control}
@@ -101,6 +100,6 @@ export const MQTT = (): JSX.Element => {
           />
         )}
       />
-    </Form>
+    </form>
   );
 };
