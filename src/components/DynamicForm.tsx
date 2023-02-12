@@ -92,14 +92,17 @@ export function DynamicForm<T extends FieldValues>({
       className="space-y-8 divide-y divide-gray-200"
       onChange={handleSubmit(onSubmit)}
     >
-      {fieldGroups.map((fieldGroup) => (
-        <div className="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+      {fieldGroups.map((fieldGroup, index) => (
+        <div
+          key={index}
+          className="space-y-8 divide-y divide-gray-200 sm:space-y-5"
+        >
           <div>
             <H4 className="font-medium">{fieldGroup.label}</H4>
             <Subtle>{fieldGroup.description}</Subtle>
           </div>
 
-          {fieldGroup.fields.map((field) => {
+          {fieldGroup.fields.map((field, index) => {
             const fieldWrapperData: FieldWrapperProps = {
               label: field.label,
               description: field.description,
@@ -109,7 +112,7 @@ export function DynamicForm<T extends FieldValues>({
             switch (field.type) {
               case "text":
                 return (
-                  <FieldWrapper {...fieldWrapperData}>
+                  <FieldWrapper key={index} {...fieldWrapperData}>
                     <Input
                       disabled={fieldWrapperData.disabled}
                       {...register(field.name)}
@@ -118,7 +121,7 @@ export function DynamicForm<T extends FieldValues>({
                 );
               case "number":
                 return (
-                  <FieldWrapper {...fieldWrapperData}>
+                  <FieldWrapper key={index} {...fieldWrapperData}>
                     <Input
                       type="number"
                       disabled={fieldWrapperData.disabled}
@@ -128,7 +131,7 @@ export function DynamicForm<T extends FieldValues>({
                 );
               case "password":
                 return (
-                  <FieldWrapper {...fieldWrapperData}>
+                  <FieldWrapper key={index} {...fieldWrapperData}>
                     <Input
                       type="password"
                       disabled={fieldWrapperData.disabled}
@@ -138,7 +141,7 @@ export function DynamicForm<T extends FieldValues>({
                 );
               case "toggle":
                 return (
-                  <FieldWrapper {...fieldWrapperData}>
+                  <FieldWrapper key={index} {...fieldWrapperData}>
                     <Controller
                       name={field.name}
                       control={control}
@@ -160,7 +163,7 @@ export function DynamicForm<T extends FieldValues>({
                     )
                   : [];
                 return (
-                  <FieldWrapper {...fieldWrapperData}>
+                  <FieldWrapper key={index} {...fieldWrapperData}>
                     <Controller
                       name={field.name}
                       control={control}
@@ -198,7 +201,11 @@ export function DynamicForm<T extends FieldValues>({
                   </FieldWrapper>
                 );
               case "multiSelect":
-                return <FieldWrapper {...fieldWrapperData}>tmp</FieldWrapper>;
+                return (
+                  <FieldWrapper key={index} {...fieldWrapperData}>
+                    tmp
+                  </FieldWrapper>
+                );
             }
           })}
         </div>

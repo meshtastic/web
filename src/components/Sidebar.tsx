@@ -76,9 +76,9 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
       </div>
 
       <SidebarSection label="Navigation">
-        {pages.map((link) => (
+        {pages.map((link, index) => (
           <SidebarButton
-            key={link.page}
+            key={index}
             label={link.name}
             icon={link.icon}
             onClick={() => {

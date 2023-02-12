@@ -2,11 +2,10 @@ import { Sidebar } from "@app/components/Sidebar.js";
 import { SettingsIcon, BoxesIcon, SaveIcon } from "lucide-react";
 import { DeviceConfig } from "@pages/Config/DeviceConfig.js";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.js";
-import { PageLayout } from "@app/components/Topbar.js";
+import { PageLayout } from "@app/components/PageLayout.js";
 import { SidebarSection } from "@app/components/UI/Sidebar/SidebarSection.js";
 import { useState } from "react";
 import { useDevice } from "@app/core/stores/deviceStore.js";
-import { Button } from "@app/components/UI/Button.js";
 import { SidebarButton } from "@app/components/UI/Sidebar/sidebarButton.js";
 
 export const ConfigPage = (): JSX.Element => {

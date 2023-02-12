@@ -1,5 +1,5 @@
 import { Sidebar } from "@app/components/Sidebar.js";
-import { PageLayout } from "@app/components/Topbar.js";
+import { PageLayout } from "@app/components/PageLayout.js";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";

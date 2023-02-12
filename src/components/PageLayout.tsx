@@ -24,8 +24,9 @@ export const PageLayout = ({
           <div className="flex w-full items-center">
             <span className="w-full text-lg font-medium">{title}</span>
             <div className="flex justify-end space-x-4">
-              {actions?.map((action) => (
+              {actions?.map((action, index) => (
                 <button
+                  key={index}
                   className="transition-all hover:text-accent"
                   onClick={action.onClick}
                 >

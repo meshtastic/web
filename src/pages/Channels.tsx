@@ -1,5 +1,5 @@
 import { Sidebar } from "@app/components/Sidebar.js";
-import { PageLayout } from "@app/components/Topbar.js";
+import { PageLayout } from "@app/components/PageLayout.js";
 import { cn } from "@app/core/utils/cn.js";
 import { Channel } from "@components/PageComponents/Channel.js";
 import { useDevice } from "@core/stores/deviceStore.js";

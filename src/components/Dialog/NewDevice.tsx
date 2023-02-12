@@ -55,13 +55,17 @@ export const NewDeviceDialog = ({
         <Tabs defaultValue="HTTP">
           <TabsList>
             {tabs.map((tab) => (
-              <TabsTrigger value={tab.label} disabled={tab.disabled}>
+              <TabsTrigger
+                key={tab.label}
+                value={tab.label}
+                disabled={tab.disabled}
+              >
                 {tab.label}
               </TabsTrigger>
             ))}
           </TabsList>
-          {tabs.map((tab) => (
-            <TabsContent value={tab.label}>
+          {tabs.map((tab, index) => (
+            <TabsContent key={index} value={tab.label}>
               {tab.disabled ? (
                 <p className="text-sm text-slate-500 dark:text-slate-400">
                   {tab.disabledMessage}

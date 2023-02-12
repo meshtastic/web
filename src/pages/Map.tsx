@@ -4,14 +4,12 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Sidebar } from "@app/components/Sidebar.js";
-import { PageLayout } from "@app/components/Topbar.js";
+import { PageLayout } from "@app/components/PageLayout.js";
 import {
   ZoomInIcon,
   ZoomOutIcon,
   BoxSelectIcon,
-  MapPinIcon,
-  EditIcon,
-  PlusIcon
+  MapPinIcon
 } from "lucide-react";
 import { bbox, lineString } from "@turf/turf";
 import { SidebarSection } from "@app/components/UI/Sidebar/SidebarSection.js";
