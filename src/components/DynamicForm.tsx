@@ -122,10 +122,17 @@ export function DynamicForm<T extends FieldValues>({
               case "number":
                 return (
                   <FieldWrapper key={index} {...fieldWrapperData}>
-                    <Input
-                      type="number"
-                      disabled={fieldWrapperData.disabled}
-                      {...register(field.name)}
+                    <Controller
+                      name={field.name}
+                      control={control}
+                      render={({ field: { value, onChange, ...rest } }) => (
+                        <Input
+                          type="number"
+                          value={parseInt(value)}
+                          onChange={(e) => onChange(parseInt(e.target.value))}
+                          disabled={fieldWrapperData.disabled}
+                        />
+                      )}
                     />
                   </FieldWrapper>
                 );
