@@ -38,7 +38,7 @@ export const Device = (): JSX.Element => {
               type: "toggle",
               name: "serialEnabled",
               label: "Serial Output Enabled",
-              description: "Disable the device's serial console"
+              description: "Enable the device's serial console"
             },
             {
               type: "toggle",
