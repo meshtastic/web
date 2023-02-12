@@ -1,26 +1,12 @@
-import { useEffect } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { Input } from "@components/form/Input.js";
-import { Toggle } from "@components/form/Toggle.js";
-import { StoreForwardValidation } from "@app/validation/moduleConfig/storeForward.js";
+import type { StoreForwardValidation } from "@app/validation/moduleConfig/storeForward.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { DynamicForm } from "@app/components/DynamicForm.js";
 
 export const StoreForward = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
-  const { register, handleSubmit, reset, control } =
-    useForm<StoreForwardValidation>({
-      mode: "onChange",
-      defaultValues: moduleConfig.storeForward,
-      resolver: classValidatorResolver(StoreForwardValidation)
-    });
 
-  useEffect(() => {
-    reset(moduleConfig.storeForward);
-  }, [reset, moduleConfig.storeForward]);
-
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = (data: StoreForwardValidation) => {
     setWorkingModuleConfig(
       new Protobuf.ModuleConfig({
         payloadVariant: {
@@ -29,68 +15,71 @@ export const StoreForward = (): JSX.Element => {
         }
       })
     );
-  });
-
-  const moduleEnabled = useWatch({
-    control,
-    name: "enabled",
-    defaultValue: false
-  });
+  };
 
   return (
-    <form onChange={onSubmit}>
-      <Controller
-        name="enabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Module Enabled"
-            description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="heartbeat"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Heartbeat Enabled"
-            description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Input
-        type="number"
-        label="Number of records"
-        description="Max transmit power in dBm"
-        suffix="Records"
-        disabled={!moduleEnabled}
-        {...register("records", {
-          valueAsNumber: true
-        })}
-      />
-      <Input
-        type="number"
-        label="History return max"
-        description="Max transmit power in dBm"
-        disabled={!moduleEnabled}
-        {...register("historyReturnMax", {
-          valueAsNumber: true
-        })}
-      />
-      <Input
-        type="number"
-        label="History return window"
-        description="Max transmit power in dBm"
-        disabled={!moduleEnabled}
-        {...register("historyReturnWindow", {
-          valueAsNumber: true
-        })}
-      />
-    </form>
+    <DynamicForm<StoreForwardValidation>
+      onSubmit={onSubmit}
+      defaultValues={moduleConfig.mqtt}
+      fieldGroups={[
+        {
+          label: "Store & Forward Settings",
+          description: "Settings for the Store & Forward module",
+          fields: [
+            {
+              type: "toggle",
+              name: "enabled",
+              label: "Module Enabled",
+              description: "Enable Store & Forward"
+            },
+            {
+              type: "toggle",
+              name: "heartbeat",
+              label: "Heartbeat Enabled",
+              description: "Enable Store & Forward heartbeat",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "number",
+              name: "records",
+              label: "Number of records",
+              description: "Number of records to store",
+              suffix: "Records",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "number",
+              name: "historyReturnMax",
+              label: "History return max",
+              description: "Max number of records to return",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "number",
+              name: "historyReturnWindow",
+              label: "History return window",
+              description: "Max number of records to return",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            }
+          ]
+        }
+      ]}
+    />
   );
 };

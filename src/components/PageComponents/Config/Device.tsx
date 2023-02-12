@@ -31,7 +31,8 @@ export const Device = (): JSX.Element => {
               name: "role",
               label: "Role",
               description: "What role the device performs on the mesh",
-              enumValue: Protobuf.Config_DeviceConfig_Role
+              enumValue: Protobuf.Config_DeviceConfig_Role,
+              formatEnumName: true
             },
             {
               type: "toggle",
@@ -63,7 +64,8 @@ export const Device = (): JSX.Element => {
               name: "rebroadcastMode",
               label: "Rebroadcast Mode",
               description: "How to handle rebroadcasting",
-              enumValue: Protobuf.Config_DeviceConfig_RebroadcastMode
+              enumValue: Protobuf.Config_DeviceConfig_RebroadcastMode,
+              formatEnumName: true
             },
             {
               type: "number",

@@ -1,25 +1,12 @@
-import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Input } from "@components/form/Input.js";
-import { Toggle } from "@components/form/Toggle.js";
-import { AudioValidation } from "@app/validation/moduleConfig/audio.js";
+import type { AudioValidation } from "@app/validation/moduleConfig/audio.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { DynamicForm } from "@app/components/DynamicForm.js";
 
 export const Audio = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
-  const { register, handleSubmit, reset, control } = useForm<AudioValidation>({
-    mode: "onChange",
-    defaultValues: moduleConfig.audio,
-    resolver: classValidatorResolver(AudioValidation)
-  });
 
-  useEffect(() => {
-    reset(moduleConfig.audio);
-  }, [reset, moduleConfig.audio]);
-
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = (data: AudioValidation) => {
     setWorkingModuleConfig(
       new Protobuf.ModuleConfig({
         payloadVariant: {
@@ -28,59 +15,63 @@ export const Audio = (): JSX.Element => {
         }
       })
     );
-  });
+  };
 
   return (
-    <form onChange={onSubmit}>
-      <Controller
-        name="codec2Enabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Codec 2 Enabled"
-            description="Enter a description."
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Input
-        label="PTT Pin"
-        description="Enter a description."
-        type="number"
-        {...register("pttPin", { valueAsNumber: true })}
-      />
-      {/* <Select
-        label="Bitrate"
-        description="Enter a description."
-        {...register("bitrate", { valueAsNumber: true })}
-      >
-        {renderOptions(Protobuf.ModuleConfig_AudioConfig_Audio_Baud)}
-      </Select> */}
-      <Input
-        label="i2SWs"
-        description="Enter a description."
-        type="number"
-        {...register("i2sWs", { valueAsNumber: true })}
-      />
-      <Input
-        label="i2SSd"
-        description="Enter a description."
-        type="number"
-        {...register("i2sSd", { valueAsNumber: true })}
-      />
-      <Input
-        label="i2SDin"
-        description="Enter a description."
-        type="number"
-        {...register("i2sDin", { valueAsNumber: true })}
-      />
-      <Input
-        label="i2SSck"
-        description="Enter a description."
-        type="number"
-        {...register("i2sSck", { valueAsNumber: true })}
-      />
-    </form>
+    <DynamicForm<AudioValidation>
+      onSubmit={onSubmit}
+      defaultValues={moduleConfig.audio}
+      fieldGroups={[
+        {
+          label: "Audio Settings",
+          description: "Settings for the Audio module",
+          fields: [
+            {
+              type: "toggle",
+              name: "codec2Enabled",
+              label: "Codec 2 Enabled",
+              description: "Enable Codec 2 audio encoding"
+            },
+            {
+              type: "number",
+              name: "pttPin",
+              label: "PTT Pin",
+              description: "GPIO pin to use for PTT"
+            },
+            {
+              type: "select",
+              name: "bitrate",
+              label: "Bitrate",
+              description: "Bitrate to use for audio encoding",
+              enumValue: Protobuf.ModuleConfig_AudioConfig_Audio_Baud
+            },
+            {
+              type: "number",
+              name: "i2sWs",
+              label: "i2S WS",
+              description: "GPIO pin to use for i2S WS"
+            },
+            {
+              type: "number",
+              name: "i2sSd",
+              label: "i2S SD",
+              description: "GPIO pin to use for i2S SD"
+            },
+            {
+              type: "number",
+              name: "i2sDin",
+              label: "i2S DIN",
+              description: "GPIO pin to use for i2S DIN"
+            },
+            {
+              type: "number",
+              name: "i2sSck",
+              label: "i2S SCK",
+              description: "GPIO pin to use for i2S SCK"
+            }
+          ]
+        }
+      ]}
+    />
   );
 };

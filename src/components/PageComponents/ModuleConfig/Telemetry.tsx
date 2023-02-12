@@ -1,26 +1,12 @@
-import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Input } from "@components/form/Input.js";
-import { Toggle } from "@components/form/Toggle.js";
-import { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
+import type { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { DynamicForm } from "@app/components/DynamicForm.js";
 
 export const Telemetry = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
-  const { register, handleSubmit, reset, control } =
-    useForm<TelemetryValidation>({
-      mode: "onChange",
-      defaultValues: moduleConfig.telemetry,
-      resolver: classValidatorResolver(TelemetryValidation)
-    });
 
-  useEffect(() => {
-    reset(moduleConfig.telemetry);
-  }, [reset, moduleConfig.telemetry]);
-
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = (data: TelemetryValidation) => {
     setWorkingModuleConfig(
       new Protobuf.ModuleConfig({
         payloadVariant: {
@@ -29,55 +15,51 @@ export const Telemetry = (): JSX.Element => {
         }
       })
     );
-  });
+  };
 
   return (
-    <form onChange={onSubmit}>
-      <Controller
-        name="environmentMeasurementEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Module Enabled"
-            description="Enable the Environment Telemetry"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="environmentScreenEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Displayed on Screen"
-            description="Show the Telemetry Module on the OLED"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Input
-        label="Update Interval"
-        description="How often to send Metrics over the mesh"
-        suffix="Seconds"
-        type="number"
-        {...register("environmentUpdateInterval", {
-          valueAsNumber: true
-        })}
-      />
-      <Controller
-        name="environmentDisplayFahrenheit"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Display Fahrenheit"
-            description="Display temp in Fahrenheit"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-    </form>
+    <DynamicForm<TelemetryValidation>
+      onSubmit={onSubmit}
+      defaultValues={moduleConfig.telemetry}
+      fieldGroups={[
+        {
+          label: "Telemetry Settings",
+          description: "Settings for the Telemetry module",
+          fields: [
+            {
+              type: "number",
+              name: "deviceUpdateInterval",
+              label: "Interval to get telemetry data",
+              suffix: "seconds"
+            },
+            {
+              type: "number",
+              name: "environmentUpdateInterval",
+              label: "Update Interval",
+              description: "How often to send Metrics over the mesh",
+              suffix: "seconds"
+            },
+            {
+              type: "toggle",
+              name: "environmentMeasurementEnabled",
+              label: "Module Enabled",
+              description: "Enable the Environment Telemetry"
+            },
+            {
+              type: "toggle",
+              name: "environmentScreenEnabled",
+              label: "Displayed on Screen",
+              description: "Show the Telemetry Module on the OLED"
+            },
+            {
+              type: "toggle",
+              name: "environmentDisplayFahrenheit",
+              label: "Display Fahrenheit",
+              description: "Display temp in Fahrenheit"
+            }
+          ]
+        }
+      ]}
+    />
   );
 };

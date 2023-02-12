@@ -62,7 +62,8 @@ export const Display = (): JSX.Element => {
               name: "units",
               label: "Display Units",
               description: "Display metric or imperial units",
-              enumValue: Protobuf.Config_DisplayConfig_DisplayUnits
+              enumValue: Protobuf.Config_DisplayConfig_DisplayUnits,
+              formatEnumName: true
             },
             {
               type: "select",
@@ -76,7 +77,8 @@ export const Display = (): JSX.Element => {
               name: "displaymode",
               label: "Display Mode",
               description: "Screen layout variant",
-              enumValue: Protobuf.Config_DisplayConfig_DisplayMode
+              enumValue: Protobuf.Config_DisplayConfig_DisplayMode,
+              formatEnumName: true
             },
             {
               type: "toggle",

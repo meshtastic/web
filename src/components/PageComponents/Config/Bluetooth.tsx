@@ -38,6 +38,7 @@ export const Bluetooth = (): JSX.Element => {
               label: "Pairing mode",
               description: "Pin selection behaviour.",
               enumValue: Protobuf.Config_BluetoothConfig_PairingMode,
+              formatEnumName: true,
               disabledBy: [
                 {
                   fieldName: "enabled"

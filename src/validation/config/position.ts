@@ -32,14 +32,4 @@ export class PositionValidation
 
   @IsInt()
   txGpio: number;
-
-  // fixed position fields
-  @IsNumber()
-  fixedAlt: number;
-
-  @IsNumber()
-  fixedLat: number;
-
-  @IsNumber()
-  fixedLng: number;
 }

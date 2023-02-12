@@ -1,37 +1,12 @@
-import { useEffect } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { Input } from "@components/form/Input.js";
-import { Toggle } from "@components/form/Toggle.js";
-import { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
-import { useDevice } from "@core/stores/deviceStore.js";
-import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import type { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { DynamicForm } from "@app/components/DynamicForm.js";
+import { useDevice } from "@app/core/stores/deviceStore.js";
 
 export const MQTT = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isDirty },
-    reset,
-    control
-  } = useForm<MQTTValidation>({
-    mode: "onChange",
-    defaultValues: moduleConfig.mqtt,
-    resolver: classValidatorResolver(MQTTValidation)
-  });
 
-  const moduleEnabled = useWatch({
-    control,
-    name: "enabled",
-    defaultValue: false
-  });
-
-  useEffect(() => {
-    reset(moduleConfig.mqtt);
-  }, [reset, moduleConfig.mqtt]);
-
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = (data: MQTTValidation) => {
     setWorkingModuleConfig(
       new Protobuf.ModuleConfig({
         payloadVariant: {
@@ -40,66 +15,71 @@ export const MQTT = (): JSX.Element => {
         }
       })
     );
-  });
+  };
 
   return (
-    <form onChange={onSubmit}>
-      <Controller
-        name="enabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Module Enabled"
-            description="Enable MQTT"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Input
-        label="MQTT Server Address"
-        description="Description"
-        disabled={!moduleEnabled}
-        {...register("address")}
-      />
-      <Input
-        label="MQTT Username"
-        description="MQTT username to use for default/custom servers"
-        disabled={!moduleEnabled}
-        {...register("username")}
-      />
-      <Input
-        label="MQTT Password"
-        description="MQTT password to use for default/custom servers"
-        type="password"
-        autoComplete="off"
-        disabled={!moduleEnabled}
-        {...register("password")}
-      />
-      <Controller
-        name="encryptionEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Encryption Enabled"
-            //description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="jsonEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="JSON Output Enabled"
-            description="Enable the sending / consumption of JSON packets on MQTT (Not encrypted)"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-    </form>
+    <DynamicForm<MQTTValidation>
+      onSubmit={onSubmit}
+      defaultValues={moduleConfig.mqtt}
+      fieldGroups={[
+        {
+          label: "MQTT Settings",
+          description: "Settings for the MQTT module",
+          fields: [
+            {
+              type: "toggle",
+              name: "enabled",
+              label: "Enabled",
+              description: "Enable or disable MQTT"
+            },
+            {
+              type: "text",
+              name: "address",
+              label: "MQTT Server Address",
+              description:
+                "MQTT server address to use for default/custom servers",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "text",
+              name: "username",
+              label: "MQTT Username",
+              description: "MQTT username to use for default/custom servers",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "password",
+              name: "password",
+              label: "MQTT Password",
+              description: "MQTT password to use for default/custom servers",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "toggle",
+              name: "encryptionEnabled",
+              label: "Encryption Enabled",
+              description: "Enable or disable MQTT encryption",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            }
+          ]
+        }
+      ]}
+    />
   );
 };

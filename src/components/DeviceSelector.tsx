@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Separator } from "./UI/Seperator.js";
 import { Code } from "./UI/Typography/Code.js";
-import { SidebarButton } from "./SidebarButton.js";
+import { DeviceSelectorButton } from "./DeviceSelectorButton.js";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
@@ -29,16 +29,16 @@ export const DeviceSelector = (): JSX.Element => {
     <nav className="flex flex-col justify-between border-r-[0.5px] border-slate-300 bg-transparent pt-2 dark:border-slate-700">
       <div className="flex flex-col overflow-y-hidden">
         <ul className="flex w-20 grow flex-col items-center space-y-4 bg-transparent py-4 px-5">
-          <SidebarButton
+          <DeviceSelectorButton
             active={selectedDevice === 0}
             onClick={() => {
               setSelectedDevice(0);
             }}
           >
             <HomeIcon />
-          </SidebarButton>
+          </DeviceSelectorButton>
           {getDevices().map((device) => (
-            <SidebarButton
+            <DeviceSelectorButton
               key={device.id}
               onClick={() => {
                 setSelectedDevice(device.id);
@@ -49,7 +49,7 @@ export const DeviceSelector = (): JSX.Element => {
                 size={24}
                 value={device.hardware.myNodeNum.toString()}
               />
-            </SidebarButton>
+            </DeviceSelectorButton>
           ))}
           <Separator />
           <button

@@ -36,12 +36,12 @@ interface BasicFieldProps<T> {
 }
 
 interface InputFieldProps<T> extends BasicFieldProps<T> {
-  type: "text" | "number" | "password" | "textarea";
+  type: "text" | "number" | "password";
   suffix?: string;
 }
 
 interface SelectFieldProps<T> extends BasicFieldProps<T> {
-  type: "select";
+  type: "select" | "multiSelect";
 
   enumValue: {
     [s: string]: string | number;
@@ -78,13 +78,12 @@ export function DynamicForm<T extends FieldValues>({
 
     return disabledBy.some((field) => {
       const value = getValues(field.fieldName);
-      return (
-        (typeof value === "boolean" && field.invert ? value : !value) ||
-        (typeof value === "number" &&
-          (field.selector && field.invert
-            ? !field.selector === value
-            : field.selector === value))
-      );
+      if (typeof value === "boolean") return field.invert ? value : !value;
+      if (typeof value === "number")
+        return field.invert
+          ? field.selector !== value
+          : field.selector === value;
+      return false;
     });
   };
 
@@ -122,6 +121,16 @@ export function DynamicForm<T extends FieldValues>({
                   <FieldWrapper {...fieldWrapperData}>
                     <Input
                       type="number"
+                      disabled={fieldWrapperData.disabled}
+                      {...register(field.name)}
+                    />
+                  </FieldWrapper>
+                );
+              case "password":
+                return (
+                  <FieldWrapper {...fieldWrapperData}>
+                    <Input
+                      type="password"
                       disabled={fieldWrapperData.disabled}
                       {...register(field.name)}
                     />
@@ -188,6 +197,8 @@ export function DynamicForm<T extends FieldValues>({
                     />
                   </FieldWrapper>
                 );
+              case "multiSelect":
+                return <FieldWrapper {...fieldWrapperData}>tmp</FieldWrapper>;
             }
           })}
         </div>

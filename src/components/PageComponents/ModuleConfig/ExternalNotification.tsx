@@ -1,25 +1,12 @@
-import { useEffect } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { Input } from "@components/form/Input.js";
-import { Toggle } from "@components/form/Toggle.js";
-import { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.js";
+import type { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { DynamicForm } from "@app/components/DynamicForm.js";
 
 export const ExternalNotification = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
-  const { register, handleSubmit, reset, control } =
-    useForm<ExternalNotificationValidation>({
-      mode: "onChange",
-      defaultValues: moduleConfig.externalNotification,
-      resolver: classValidatorResolver(ExternalNotificationValidation)
-    });
-  useEffect(() => {
-    reset(moduleConfig.externalNotification);
-  }, [reset, moduleConfig.externalNotification]);
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = (data: ExternalNotificationValidation) => {
     setWorkingModuleConfig(
       new Protobuf.ModuleConfig({
         payloadVariant: {
@@ -28,170 +15,171 @@ export const ExternalNotification = (): JSX.Element => {
         }
       })
     );
-  });
-
-  const moduleEnabled = useWatch({
-    control,
-    name: "enabled",
-    defaultValue: false
-  });
+  };
 
   return (
-    <form onChange={onSubmit}>
-      <Controller
-        name="enabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Module Enabled"
-            description="Enable External Notification"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Input
-        type="number"
-        label="Output MS"
-        description="Description"
-        suffix="ms"
-        disabled={!moduleEnabled}
-        {...register("outputMs", {
-          valueAsNumber: true
-        })}
-      />
-      <Input
-        type="number"
-        label="Output"
-        description="Description"
-        disabled={!moduleEnabled}
-        {...register("output", {
-          valueAsNumber: true
-        })}
-      />
-      <Input
-        type="number"
-        label="Output Vibrate"
-        description="Description"
-        disabled={!moduleEnabled}
-        {...register("outputVibra", {
-          valueAsNumber: true
-        })}
-      />
-      <Input
-        type="number"
-        label="Output Buzzer"
-        description="Description"
-        disabled={!moduleEnabled}
-        {...register("outputBuzzer", {
-          valueAsNumber: true
-        })}
-      />
-      <Controller
-        name="active"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Active"
-            description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="alertMessage"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Alert Message"
-            description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="alertMessageVibra"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Alert Message Vibrate"
-            description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="alertMessageBuzzer"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Alert Message Buzzer"
-            description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="alertBell"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Alert Bell"
-            description="Should an alert be triggered when receiving an incoming bell?"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="alertBellVibra"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Alert Bell Vibrate"
-            description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="alertBellBuzzer"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Alert Bell Buzzer"
-            description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="usePwm"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Use PWM"
-            description="Description"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Input
-        type="number"
-        label="Nag Timeout"
-        description="Description"
-        disabled={!moduleEnabled}
-        {...register("nagTimeout", {
-          valueAsNumber: true
-        })}
-      />
-    </form>
+    <DynamicForm<ExternalNotificationValidation>
+      onSubmit={onSubmit}
+      defaultValues={moduleConfig.externalNotification}
+      fieldGroups={[
+        {
+          label: "External Notification Settings",
+          description: "Configure the external notification module",
+          fields: [
+            {
+              type: "toggle",
+              name: "enabled",
+              label: "Module Enabled",
+              description: "Enable External Notification"
+            },
+            {
+              type: "number",
+              name: "outputMs",
+              label: "Output MS",
+              description: "Output MS",
+              suffix: "ms",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "number",
+              name: "output",
+              label: "Output",
+              description: "Output",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "number",
+              name: "outputVibra",
+              label: "Output Vibrate",
+              description: "Output Vibrate",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "number",
+              name: "outputBuzzer",
+              label: "Output Buzzer",
+              description: "Output Buzzer",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "toggle",
+              name: "active",
+              label: "Active",
+              description: "Active",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "toggle",
+              name: "alertMessage",
+              label: "Alert Message",
+              description: "Alert Message",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "toggle",
+              name: "alertMessageVibra",
+              label: "Alert Message Vibrate",
+              description: "Alert Message Vibrate",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "toggle",
+              name: "alertMessageBuzzer",
+              label: "Alert Message Buzzer",
+              description: "Alert Message Buzzer",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "toggle",
+              name: "alertBell",
+              label: "Alert Bell",
+              description:
+                "Should an alert be triggered when receiving an incoming bell?",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "toggle",
+              name: "alertBellVibra",
+              label: "Alert Bell Vibrate",
+              description: "Alert Bell Vibrate",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "toggle",
+              name: "alertBellBuzzer",
+              label: "Alert Bell Buzzer",
+              description: "Alert Bell Buzzer",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "toggle",
+              name: "usePwm",
+              label: "Use PWM",
+              description: "Use PWM",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "number",
+              name: "nagTimeout",
+              label: "Nag Timeout",
+              description: "Nag Timeout",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            }
+          ]
+        }
+      ]}
+    />
   );
 };
