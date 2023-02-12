@@ -1,4 +1,4 @@
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { AlertCircleIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 export interface InfoWrapperProps {
@@ -26,13 +26,13 @@ export const InfoWrapper = ({
       {children}
       {error && (
         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-          <ExclamationCircleIcon className="text-red-500 h-5 w-5" />
+          <AlertCircleIcon size={16} className="text-red-500" />
         </div>
       )}
       {description && (
         <p className="mt-2 text-sm text-textSecondary">{description}</p>
       )}
-      {error && <p className="text-red-600 mt-2 text-sm">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>
   );
 };

@@ -1,12 +1,12 @@
 import { WaypointMessage } from "@components/PageComponents/Messages/WaypointMessage.js";
-import { useDevice } from "@core/providers/useDevice.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import type { AllMessageTypes } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
-  CheckCircleIcon,
-  EllipsisHorizontalCircleIcon,
-  ExclamationCircleIcon
-} from "@heroicons/react/24/outline";
+  CircleEllipsisIcon,
+  AlertCircleIcon,
+  CheckCircle2Icon
+} from "lucide-react";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export interface MessageProps {
@@ -30,11 +30,11 @@ export const Message = ({
   return lastMsgSameUser ? (
     <div className="ml-5 flex">
       {message.state === "ack" ? (
-        <CheckCircleIcon className="my-auto h-4 text-textSecondary" />
+        <CheckCircle2Icon size={16} className="my-auto text-textSecondary" />
       ) : message.state === "waiting" ? (
-        <EllipsisHorizontalCircleIcon className="my-auto h-4 text-textSecondary" />
+        <CircleEllipsisIcon size={16} className="my-auto text-textSecondary" />
       ) : (
-        <ExclamationCircleIcon className="my-auto h-4 text-textSecondary" />
+        <AlertCircleIcon size={16} className="my-auto text-textSecondary" />
       )}
       {"waypointID" in message ? (
         <WaypointMessage waypointID={message.waypointID} />
@@ -69,11 +69,14 @@ export const Message = ({
       </div>
       <div className="ml-1 flex">
         {message.state === "ack" ? (
-          <CheckCircleIcon className="my-auto h-4 text-textSecondary" />
+          <CheckCircle2Icon size={16} className="my-auto text-textSecondary" />
         ) : message.state === "waiting" ? (
-          <EllipsisHorizontalCircleIcon className="my-auto h-4 text-textSecondary" />
+          <CircleEllipsisIcon
+            size={16}
+            className="my-auto text-textSecondary"
+          />
         ) : (
-          <ExclamationCircleIcon className="my-auto h-4 text-textSecondary" />
+          <AlertCircleIcon size={16} className="my-auto text-textSecondary" />
         )}
         {"waypointID" in message ? (
           <WaypointMessage waypointID={message.waypointID} />

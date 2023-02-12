@@ -1,30 +1,12 @@
-import { useEffect } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { Input } from "@components/form/Input.js";
-import { Select } from "@components/form/Select.js";
-import { Toggle } from "@components/form/Toggle.js";
-import { BluetoothValidation } from "@app/validation/config/bluetooth.js";
-import { Form } from "@components/form/Form";
-import { useDevice } from "@core/providers/useDevice.js";
-import { renderOptions } from "@core/utils/selectEnumOptions.js";
-import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import type { BluetoothValidation } from "@app/validation/config/bluetooth.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { DynamicForm } from "@app/components/DynamicForm.js";
 
 export const Bluetooth = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
 
-  const { register, handleSubmit, control, reset } =
-    useForm<BluetoothValidation>({
-      mode: "onChange",
-      defaultValues: config.bluetooth,
-      resolver: classValidatorResolver(BluetoothValidation)
-    });
-
-  useEffect(() => {
-    reset(config.bluetooth);
-  }, [reset, config.bluetooth]);
-
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = (data: BluetoothValidation) => {
     setWorkingConfig(
       new Protobuf.Config({
         payloadVariant: {
@@ -33,47 +15,56 @@ export const Bluetooth = (): JSX.Element => {
         }
       })
     );
-  });
-
-  const pairingMode = useWatch({
-    control,
-    name: "mode",
-    defaultValue: Protobuf.Config_BluetoothConfig_PairingMode.RANDOM_PIN
-  });
+  };
 
   return (
-    <Form onSubmit={onSubmit}>
-      <Controller
-        name="enabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Enabled"
-            description="Enable or disable Bluetooth"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Select
-        label="Pairing mode"
-        description="Pin selection behaviour."
-        {...register("mode", { valueAsNumber: true })}
-      >
-        {renderOptions(Protobuf.Config_BluetoothConfig_PairingMode)}
-      </Select>
-
-      <Input
-        disabled={
-          pairingMode !== Protobuf.Config_BluetoothConfig_PairingMode.FIXED_PIN
+    <DynamicForm<BluetoothValidation>
+      onSubmit={onSubmit}
+      defaultValues={config.bluetooth}
+      fieldGroups={[
+        {
+          label: "Bluetooth Settings",
+          description: "Settings for the Bluetooth module",
+          fields: [
+            {
+              type: "toggle",
+              name: "enabled",
+              label: "Enabled",
+              description: "Enable or disable Bluetooth"
+            },
+            {
+              type: "select",
+              name: "mode",
+              label: "Pairing mode",
+              description: "Pin selection behaviour.",
+              enumValue: Protobuf.Config_BluetoothConfig_PairingMode,
+              formatEnumName: true,
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "number",
+              name: "fixedPin",
+              label: "Pin",
+              description: "Pin to use when pairing",
+              disabledBy: [
+                {
+                  fieldName: "mode",
+                  selector:
+                    Protobuf.Config_BluetoothConfig_PairingMode.FIXED_PIN,
+                  invert: true
+                },
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            }
+          ]
         }
-        label="Pin"
-        description="Pin to use when pairing"
-        type="number"
-        {...register("fixedPin", {
-          valueAsNumber: true
-        })}
-      />
-    </Form>
+      ]}
+    />
   );
 };

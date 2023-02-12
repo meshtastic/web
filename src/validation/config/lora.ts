@@ -51,6 +51,9 @@ export class LoRaValidation
   @IsBoolean()
   sx126xRxBoostedGain: boolean;
 
+  @IsInt()
+  overrideFrequency: number;
+
   @IsArray()
   ignoreIncoming: number[];
 }

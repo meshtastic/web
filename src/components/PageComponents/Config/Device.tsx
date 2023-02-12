@@ -1,28 +1,12 @@
-import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Input } from "@components/form/Input.js";
-import { Select } from "@components/form/Select.js";
-import { Toggle } from "@components/form/Toggle.js";
-import { DeviceValidation } from "@app/validation/config/device.js";
-import { Form } from "@components/form/Form";
-import { useDevice } from "@core/providers/useDevice.js";
-import { renderOptions } from "@core/utils/selectEnumOptions.js";
-import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import type { DeviceValidation } from "@app/validation/config/device.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { DynamicForm } from "@app/components/DynamicForm.js";
 
 export const Device = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
-  const { register, handleSubmit, control, reset } = useForm<DeviceValidation>({
-    mode: "onChange",
-    defaultValues: config.device,
-    resolver: classValidatorResolver(DeviceValidation)
-  });
 
-  useEffect(() => {
-    reset(config.device);
-  }, [reset, config.device]);
-
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = (data: DeviceValidation) => {
     setWorkingConfig(
       new Protobuf.Config({
         payloadVariant: {
@@ -31,53 +15,68 @@ export const Device = (): JSX.Element => {
         }
       })
     );
-  });
+  };
 
   return (
-    <Form onSubmit={onSubmit}>
-      <Select
-        label="Role"
-        description="What role the device performs on the mesh"
-        {...register("role", { valueAsNumber: true })}
-      >
-        {renderOptions(Protobuf.Config_DeviceConfig_Role)}
-      </Select>
-      <Controller
-        name="serialEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Serial Output Enabled"
-            description="Disable the device's serial console"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="debugLogEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Enabled Debug Log"
-            description="Output debugging information to the device's serial port (auto disables when serial client is connected)"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Input
-        label="Button Pin"
-        description="Button pin override"
-        type="number"
-        {...register("buttonGpio", { valueAsNumber: true })}
-      />
-      <Input
-        label="Buzzer Pin"
-        description="Buzzer pin override"
-        type="number"
-        {...register("buzzerGpio", { valueAsNumber: true })}
-      />
-    </Form>
+    <DynamicForm<DeviceValidation>
+      onSubmit={onSubmit}
+      defaultValues={config.device}
+      fieldGroups={[
+        {
+          label: "Device Settings",
+          description: "Settings for the device",
+          fields: [
+            {
+              type: "select",
+              name: "role",
+              label: "Role",
+              description: "What role the device performs on the mesh",
+              enumValue: Protobuf.Config_DeviceConfig_Role,
+              formatEnumName: true
+            },
+            {
+              type: "toggle",
+              name: "serialEnabled",
+              label: "Serial Output Enabled",
+              description: "Disable the device's serial console"
+            },
+            {
+              type: "toggle",
+              name: "debugLogEnabled",
+              label: "Enabled Debug Log",
+              description:
+                "Output debugging information to the device's serial port (auto disables when serial client is connected)"
+            },
+            {
+              type: "number",
+              name: "buttonGpio",
+              label: "Button Pin",
+              description: "Button pin override"
+            },
+            {
+              type: "number",
+              name: "buzzerGpio",
+              label: "Buzzer Pin",
+              description: "Buzzer pin override"
+            },
+            {
+              type: "select",
+              name: "rebroadcastMode",
+              label: "Rebroadcast Mode",
+              description: "How to handle rebroadcasting",
+              enumValue: Protobuf.Config_DeviceConfig_RebroadcastMode,
+              formatEnumName: true
+            },
+            {
+              type: "number",
+              name: "nodeInfoBroadcastSecs",
+              label: "Node Info Broadcast Interval",
+              description: "How often to broadcast node info",
+              suffix: "Seconds"
+            }
+          ]
+        }
+      ]}
+    />
   );
 };

@@ -1,16 +1,11 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 
 import { produce } from "immer";
 import { create } from "zustand";
 
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
-export type Page =
-  | "messages"
-  | "map"
-  | "config"
-  | "channels"
-  | "peers";
+export type Page = "messages" | "map" | "config" | "channels" | "peers";
 
 export interface MessageWithState extends Types.PacketMetadata<string> {
   state: MessageState;
@@ -51,7 +46,12 @@ export interface processPacketParams {
   time: number;
 }
 
-export type DialogVariant = "import" | "QR" | "shutdown" | "reboot";
+export type DialogVariant =
+  | "import"
+  | "QR"
+  | "shutdown"
+  | "reboot"
+  | "deviceName";
 
 export interface Device {
   id: number;
@@ -78,6 +78,7 @@ export interface Device {
     QR: boolean;
     shutdown: boolean;
     reboot: boolean;
+    deviceName: boolean;
   };
 
   setReady(ready: boolean): void;
@@ -152,7 +153,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             import: false,
             QR: false,
             shutdown: false,
-            reboot: false
+            reboot: false,
+            deviceName: false
           },
           pendingSettingsChanges: false,
           messageDraft: "",
@@ -610,3 +612,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 }));
 
 export const DeviceContext = createContext<Device | undefined>(undefined);
+
+export const useDevice = (): Device => {
+  const context = useContext(DeviceContext);
+  if (context === undefined) {
+    throw new Error("useDevice must be used within a DeviceProvider");
+  }
+  return context;
+};

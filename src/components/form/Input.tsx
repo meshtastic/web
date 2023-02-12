@@ -1,6 +1,6 @@
 import { forwardRef, InputHTMLAttributes } from "react";
 import { InfoWrapper, InfoWrapperProps } from "@components/form/InfoWrapper.js";
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { AlertCircleIcon } from "lucide-react";
 
 export interface InputProps
   extends InputHTMLAttributes<HTMLInputElement>,
@@ -63,7 +63,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         )}
         {error && (
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-            <ExclamationCircleIcon className="text-red-500 h-5 w-5" />
+            <AlertCircleIcon size={16} className="text-red-500" />
           </div>
         )}
       </div>

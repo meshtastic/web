@@ -1,6 +1,6 @@
 import { Message } from "@components/PageComponents/Messages/Message.js";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.js";
-import { useDevice } from "@core/providers/useDevice.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import type { Channel } from "@core/stores/deviceStore.js";
 
 export interface ChannelChatProps {

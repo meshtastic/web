@@ -1,69 +1,84 @@
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
-import { NavSpacer } from "@app/Nav/NavSpacer.js";
-import { PageNav } from "@app/Nav/PageNav.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { PlusIcon } from "@heroicons/react/24/outline";
-import { MoonIcon, SunIcon } from "@primer/octicons-react";
+import {
+  PlusIcon,
+  HomeIcon,
+  LanguagesIcon,
+  SunIcon,
+  MoonIcon,
+  GithubIcon,
+  TerminalIcon
+} from "lucide-react";
+import { Separator } from "./UI/Seperator.js";
+import { Code } from "./UI/Typography/Code.js";
+import { DeviceSelectorButton } from "./DeviceSelectorButton.js";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
-  const { selectedDevice, setSelectedDevice, darkMode, setDarkMode } =
-    useAppStore();
+  const {
+    selectedDevice,
+    setSelectedDevice,
+    darkMode,
+    setDarkMode,
+    setCommandPaletteOpen,
+    setConnectDialogOpen
+  } = useAppStore();
 
   return (
-    <div className="flex h-full w-14 items-center gap-3 bg-backgroundPrimary pt-3 [writing-mode:vertical-rl]">
-      <div className="flex items-center gap-3">
-        <span className="flex font-bold text-textPrimary">
+    <nav className="flex flex-col justify-between border-r-[0.5px] border-slate-300 bg-transparent pt-2 dark:border-slate-700">
+      <div className="flex flex-col overflow-y-hidden">
+        <ul className="flex w-20 grow flex-col items-center space-y-4 bg-transparent py-4 px-5">
+          <DeviceSelectorButton
+            active={selectedDevice === 0}
+            onClick={() => {
+              setSelectedDevice(0);
+            }}
+          >
+            <HomeIcon />
+          </DeviceSelectorButton>
           {getDevices().map((device) => (
-            <div
+            <DeviceSelectorButton
               key={device.id}
               onClick={() => {
                 setSelectedDevice(device.id);
               }}
-              className={`cursor-pointer border-x-4 border-backgroundPrimary bg-backgroundPrimary py-3 px-2 hover:brightness-hover active:brightness-press ${
-                selectedDevice === device.id ? "border-l-accent" : ""
-              }`}
+              active={selectedDevice === device.id}
             >
               <Hashicon
-                size={32}
+                size={24}
                 value={device.hardware.myNodeNum.toString()}
               />
-            </div>
+            </DeviceSelectorButton>
           ))}
-          <div
-            onClick={() => {
-              setSelectedDevice(0);
-            }}
-            className={`cursor-pointer border-x-4 border-backgroundPrimary bg-backgroundPrimary py-4 px-3 hover:brightness-hover active:brightness-press ${
-              selectedDevice === 0 ? "border-l-accent" : ""
-            }`}
+          <Separator />
+          <button
+            onClick={() => setConnectDialogOpen(true)}
+            className="transition-all duration-300 hover:text-accent"
           >
-            <PlusIcon className="w-6" />
-          </div>
-        </span>
+            <PlusIcon />
+          </button>
+        </ul>
       </div>
-
-      {selectedDevice !== 0 && (
-        <>
-          <NavSpacer />
-          <PageNav />
-        </>
-      )}
-
-      <NavSpacer />
-
-      <div
-        onClick={() => setDarkMode(!darkMode)}
-        className="bg-backgroundPrimary py-5 px-4 text-textSecondary hover:text-textPrimary hover:brightness-hover active:brightness-press"
-      >
-        {darkMode ? <SunIcon className="w-4" /> : <MoonIcon className="w-4" />}
+      <div className="flex w-20 flex-col items-center space-y-5 bg-transparent px-5 pb-5">
+        <button
+          className="transition-all hover:text-accent"
+          onClick={() => setDarkMode(!darkMode)}
+        >
+          {darkMode ? <SunIcon /> : <MoonIcon />}
+        </button>
+        <button
+          className="transition-all hover:text-accent"
+          onClick={() => setCommandPaletteOpen(true)}
+        >
+          <TerminalIcon />
+        </button>
+        <button className="transition-all hover:text-accent">
+          <LanguagesIcon />
+        </button>
+        <Separator />
+        <Code>{process.env.COMMIT_HASH}</Code>
       </div>
-
-      <img
-        src={darkMode ? "Logo_White.svg" : "Logo_Black.svg"}
-        className="mt-auto px-2 py-3"
-      />
-    </div>
+    </nav>
   );
 };

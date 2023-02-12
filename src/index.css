@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --backgroundPrimary: #f5f5f6;
+  --backgroundPrimary: #ffffff;
   --backgroundSecondary: #e6e9ed;
   --textPrimary: #111132;
   --textSecondary: #64748b;
@@ -15,7 +15,7 @@
 }
 
 [data-theme="dark"] {
-  --backgroundPrimary: #2d2d30;
+  --backgroundPrimary: #0f172a;
   --backgroundSecondary: #363638;
   --textPrimary: #ebebeb;
   --textSecondary: #bdbdbd;

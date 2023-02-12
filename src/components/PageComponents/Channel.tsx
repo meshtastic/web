@@ -1,21 +1,13 @@
 import { useEffect, useState } from "react";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 import { ChannelSettingsValidation } from "@app/validation/channelSettings.js";
-import { Form } from "@components/form/Form";
 import { Input } from "@components/form/Input.js";
-import { Select } from "@components/form/Select.js";
 import { Toggle } from "@components/form/Toggle.js";
-import { useDevice } from "@core/providers/useDevice.js";
-import {
-  ArrowPathIcon,
-  EyeIcon,
-  EyeSlashIcon
-} from "@heroicons/react/24/outline";
+import { useDevice } from "@core/stores/deviceStore.js";
+import { RefreshCwIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { NavBar } from "@app/Nav/NavBar.js";
 
 export interface SettingsPanelProps {
   channel: Protobuf.Channel;
@@ -61,62 +53,41 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   }, [channel, reset]);
 
   const onSubmit = handleSubmit((data) => {
-    if (connection) {
-      void toast.promise(
-        connection
-          .setChannel(
-            new Protobuf.Channel({
-              role:
-                channel?.role === Protobuf.Channel_Role.PRIMARY
-                  ? Protobuf.Channel_Role.PRIMARY
-                  : data.enabled
-                  ? Protobuf.Channel_Role.SECONDARY
-                  : Protobuf.Channel_Role.DISABLED,
-              index: channel?.index,
-              settings: {
-                ...data,
-                psk: toByteArray(data.psk ?? "")
-              }
-            })
-          )
-          .then(() =>
-            addChannel({
-              config: new Protobuf.Channel({
-                index: channel.index,
-                role: channel.role,
-                settings: {
-                  ...data,
-                  psk: toByteArray(data.psk ?? "")
-                }
-              }),
-              lastInterraction: new Date(),
-              messages: []
-            })
-          ),
-        {
-          loading: "Saving...",
-          success: "Saved Channel",
-          error: "No response received"
-        }
+    connection
+      ?.setChannel(
+        new Protobuf.Channel({
+          role:
+            channel?.role === Protobuf.Channel_Role.PRIMARY
+              ? Protobuf.Channel_Role.PRIMARY
+              : data.enabled
+              ? Protobuf.Channel_Role.SECONDARY
+              : Protobuf.Channel_Role.DISABLED,
+          index: channel?.index,
+          settings: {
+            ...data,
+            psk: toByteArray(data.psk ?? "")
+          }
+        })
+      )
+      .then(() =>
+        addChannel({
+          config: new Protobuf.Channel({
+            index: channel.index,
+            role: channel.role,
+            settings: {
+              ...data,
+              psk: toByteArray(data.psk ?? "")
+            }
+          }),
+          lastInterraction: new Date(),
+          messages: []
+        })
       );
-    }
   });
 
   return (
-    <div className="flex flex-grow flex-col gap-2">
-      <NavBar
-        breadcrumb={["Channels", channel?.index.toString()]}
-        actions={[
-          {
-            label: "Apply",
-            async onClick() {
-              await onSubmit();
-            }
-          }
-        ]}
-      />
-
-      <Form onSubmit={onSubmit}>
+    <div className="p-3">
+      <form onSubmit={onSubmit}>
         {channel?.index !== 0 && (
           <>
             <Controller
@@ -139,7 +110,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
             />
           </>
         )}
-        <Select
+        {/* <Select
           label="Key Size"
           description="Desired size of generated key."
           value={keySize}
@@ -147,7 +118,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
             setKeySize(parseInt(e.target.value) as 128 | 256);
           }}
           action={{
-            icon: <ArrowPathIcon className="h-4" />,
+            icon: <RefreshCwIcon size={16} />,
             action: () => {
               const key = new Uint8Array(keySize / 8);
               crypto.getRandomValues(key);
@@ -159,18 +130,14 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         >
           <option value={128}>128 Bit</option>
           <option value={256}>256 Bit</option>
-        </Select>
+        </Select> */}
         <Input
           width="100%"
           label="Pre-Shared Key"
           description="Channel key to encrypt data"
           type={pskHidden ? "password" : "text"}
           action={{
-            icon: pskHidden ? (
-              <EyeIcon className="w-4" />
-            ) : (
-              <EyeSlashIcon className="w-4" />
-            ),
+            icon: pskHidden ? <EyeIcon size={16} /> : <EyeOffIcon size={16} />,
             action: () => {
               setPskHidden(!pskHidden);
             }
@@ -202,7 +169,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
             />
           )}
         />
-      </Form>
+      </form>
     </div>
   );
 };

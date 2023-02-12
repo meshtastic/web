@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { Mono } from "@components/generic/Mono.js";
-import { Button } from "@components/form/Button.js";
+import { Button } from "@components/UI/Button.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { ISerialConnection } from "@meshtastic/meshtasticjs";
 
 export const Serial = (): JSX.Element => {
@@ -70,7 +69,6 @@ export const Serial = (): JSX.Element => {
           });
         }}
       >
-        <PlusCircleIcon className="w-4" />
         <span>New device</span>
       </Button>
     </div>

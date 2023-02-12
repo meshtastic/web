@@ -7,9 +7,13 @@ import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.js"
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.js";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.js";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.js";
-import { useDevice } from "@app/core/providers/useDevice.js";
-import { NavBar } from "@app/Nav/NavBar.js";
-import { VerticalTabbedContent } from "@app/components/generic/VerticalTabbedContent.js";
+import { useDevice } from "@app/core/stores/deviceStore.js";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from "@components/UI/Tabs.js";
 
 export const ModuleConfig = (): JSX.Element => {
   const { workingModuleConfig, connection } = useDevice();
@@ -24,11 +28,11 @@ export const ModuleConfig = (): JSX.Element => {
       element: Serial
     },
     {
-      label: "External Notification",
+      label: "Ext Notif",
       element: ExternalNotification
     },
     {
-      label: "Store & Forward",
+      label: "S&F",
       element: StoreForward
     },
     {
@@ -40,33 +44,29 @@ export const ModuleConfig = (): JSX.Element => {
       element: Telemetry
     },
     {
-      label: "Canned Message",
+      label: "Canned",
       element: CannedMessage
     },
     {
-      label: "Audio Config",
+      label: "Audio",
       element: Audio
     }
   ];
 
   return (
-    <div className="flex flex-grow flex-col gap-2">
-      <NavBar
-        breadcrumb={["Module Config"]}
-        actions={[
-          {
-            label: "Apply & Reboot",
-            async onClick() {
-              workingModuleConfig.map(async (moduleConfig) => {
-                await connection?.setModuleConfig(moduleConfig);
-              });
-              await connection?.commitEditSettings();
-            }
-          }
-        ]}
-      />
-
-      <VerticalTabbedContent tabs={tabs} />
-    </div>
+    <Tabs defaultValue="MQTT">
+      <TabsList>
+        {tabs.map((tab) => (
+          <TabsTrigger key={tab.label} value={tab.label}>
+            {tab.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {tabs.map((tab) => (
+        <TabsContent key={tab.label} value={tab.label}>
+          <tab.element />
+        </TabsContent>
+      ))}
+    </Tabs>
   );
 };

@@ -1,5 +1,3 @@
-import { toast } from "react-hot-toast";
-
 import type { Device } from "@core/stores/deviceStore.js";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
@@ -22,24 +20,15 @@ export const subscribeAll = (
         if (routingPacket.data.variant.value === Protobuf.Routing_Error.NONE) {
           return;
         }
-        toast.error(
-          `Routing error: ${
-            Protobuf.Routing_Error[routingPacket.data.variant.value]
-          }`,
-          {
-            icon: "❌"
-          }
-        );
+        console.log(`Routing Error: ${routingPacket.data.variant.value}`);
         break;
       case "routeReply":
-        toast(`Route Reply: ${routingPacket.data.variant.value}`, {
-          icon: "✅"
-        });
+        console.log(`Route Reply: ${routingPacket.data.variant.value}`);
+
         break;
       case "routeRequest":
-        toast(`Route Request: ${routingPacket.data.variant.value}`, {
-          icon: "✅"
-        });
+        console.log(`Route Request: ${routingPacket.data.variant.value}`);
+
         break;
     }
   });
@@ -82,9 +71,9 @@ export const subscribeAll = (
   });
 
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-    toast(`New Node Discovered: ${nodeInfo.user?.shortName ?? "UNK"}`, {
-      icon: "🔎"
-    });
+    // toast(`New Node Discovered: ${nodeInfo.user?.shortName ?? "UNK"}`, {
+    //   icon: "🔎"
+    // });
     device.addNodeInfo(nodeInfo);
   });
 

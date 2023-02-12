@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { bitwiseDecode, bitwiseEncode, enumLike } from "@core/utils/bitwise.js";
 import { InfoWrapper } from "@components/form/InfoWrapper.js";
-import { Listbox } from "@headlessui/react";
+// import { Listbox } from "@headlessui/react";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export interface BitwiseSelectProps {
@@ -50,7 +50,7 @@ export const BitwiseSelect = ({
 
   return (
     <InfoWrapper label={label} description={description} error={error}>
-      <Listbox
+      {/* <Listbox
         value={bitwiseDecode(selected, decodeEnun)}
         onChange={(value) => {
           onChange(bitwiseEncode(value));
@@ -71,7 +71,7 @@ export const BitwiseSelect = ({
             </Listbox.Option>
           ))}
         </Listbox.Options>
-      </Listbox>
+      </Listbox> */}
     </InfoWrapper>
   );
 };

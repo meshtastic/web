@@ -1,70 +1,94 @@
-import { useDevice } from "@core/providers/useDevice.js";
-import { toMGRS } from "@core/utils/toMGRS.js";
-import { BatteryWidget } from "@components/Widgets/BatteryWidget.js";
-import { DeviceWidget } from "@components/Widgets/DeviceWidget.js";
-import { PeersWidget } from "@components/Widgets/PeersWidget.js";
-import { PositionWidget } from "@components/Widgets/PositionWidget.js";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDeviceStore } from "@core/stores/deviceStore.js";
-import { CommandLineIcon } from "@heroicons/react/24/outline";
-import { Types } from "@meshtastic/meshtasticjs";
-import { Input } from "@components/form/Input.js";
+import { useDevice } from "@core/stores/deviceStore.js";
+import type { Page } from "@core/stores/deviceStore.js";
+import {
+  LucideIcon,
+  MapIcon,
+  MessageSquareIcon,
+  SettingsIcon,
+  LayersIcon,
+  UsersIcon,
+  EditIcon,
+  LayoutGrid
+} from "lucide-react";
+import { Subtle } from "./UI/Typography/Subtle.js";
+import { Button } from "./UI/Button.js";
+import { SidebarSection } from "./UI/Sidebar/SidebarSection.js";
+import { SidebarButton } from "./UI/Sidebar/sidebarButton.js";
 
-export const Sidebar = (): JSX.Element => {
-  const { removeDevice } = useDeviceStore();
-  const { connection, hardware, nodes, status, currentMetrics } = useDevice();
-  const { selectedDevice, setSelectedDevice, setCommandPaletteOpen } =
-    useAppStore();
+export interface SidebarProps {
+  children?: React.ReactNode;
+}
+
+export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
+  const { hardware, nodes } = useDevice();
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
+  const { activePage, setActivePage, setDialogOpen } = useDevice();
+
+  interface NavLink {
+    name: string;
+    icon: LucideIcon;
+    page: Page;
+  }
+
+  const pages: NavLink[] = [
+    {
+      name: "Messages",
+      icon: MessageSquareIcon,
+      page: "messages"
+    },
+    {
+      name: "Map",
+      icon: MapIcon,
+      page: "map"
+    },
+    {
+      name: "Config",
+      icon: SettingsIcon,
+      page: "config"
+    },
+    {
+      name: "Channels",
+      icon: LayersIcon,
+      page: "channels"
+    },
+    {
+      name: "Peers",
+      icon: UsersIcon,
+      page: "peers"
+    }
+  ];
 
   return (
-    <div className="bg-slate-50 relative flex w-72 flex-shrink-0 flex-col gap-2 p-2">
-      <DeviceWidget
-        name={
-          nodes.find((n) => n.data.num === hardware.myNodeNum)?.data.user
-            ?.longName ?? "UNK"
-        }
-        nodeNum={hardware.myNodeNum.toString()}
-        disconnected={status === Types.DeviceStatusEnum.DEVICE_DISCONNECTED}
-        disconnect={() => {
-          void connection?.disconnect();
-          setSelectedDevice(0);
-          removeDevice(selectedDevice ?? 0);
-        }}
-        reconnect={() => {
-          void connection?.disconnect();
-        }}
-      />
-
-      <div className="flex flex-grow flex-col gap-3">
-        <BatteryWidget
-          batteryLevel={currentMetrics.batteryLevel}
-          voltage={currentMetrics.voltage}
-        />
-        <PeersWidget
-          peers={nodes
-            .map((n) => n.data)
-            .filter((n) => n.num !== hardware.myNodeNum)}
-        />
-        <PositionWidget
-          grid={toMGRS(
-            myNode?.data.position?.latitudeI,
-            myNode?.data.position?.longitudeI
-          )}
-        />
-        <div className="mt-auto">
-          <Input
-            placeholder={"Search for a command"}
-            onClick={() => setCommandPaletteOpen(true)}
-            action={{
-              icon: <CommandLineIcon className="w-4" />,
-              action() {
-                setCommandPaletteOpen(true);
-              }
-            }}
-          />
+    <div className="min-w-[280px] max-w-min flex-col border-r-[0.5px] border-slate-300 bg-transparent dark:border-slate-700">
+      <div className="flex justify-between px-8 py-6">
+        <div>
+          <span className="text-lg font-medium">
+            {myNode?.data.user?.shortName ?? "UNK"}
+          </span>
+          <Subtle>{myNode?.data.user?.longName ?? "UNK"}</Subtle>
         </div>
+        <button
+          className="transition-all hover:text-accent"
+          onClick={() => setDialogOpen("deviceName", true)}
+        >
+          <EditIcon size={16} />
+        </button>
       </div>
+
+      <SidebarSection label="Navigation">
+        {pages.map((link) => (
+          <SidebarButton
+            key={link.page}
+            label={link.name}
+            icon={link.icon}
+            onClick={() => {
+              setActivePage(link.page);
+            }}
+            active={link.page === activePage}
+          />
+        ))}
+      </SidebarSection>
+      {children}
     </div>
   );
 };

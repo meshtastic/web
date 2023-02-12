@@ -1,230 +1,97 @@
-import { useEffect } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { BitwiseSelect } from "@components/form/BitwiseSelect.js";
-import { FormSection } from "@components/form/FormSection.js";
-import { Input } from "@components/form/Input.js";
-import { Toggle } from "@components/form/Toggle.js";
-import { PositionValidation } from "@app/validation/config/position.js";
-import { Form } from "@components/form/Form";
-import { useDevice } from "@core/providers/useDevice.js";
-import { classValidatorResolver } from "@hookform/resolvers/class-validator";
+import type { PositionValidation } from "@app/validation/config/position.js";
+import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { DynamicForm } from "@app/components/DynamicForm.js";
 
 export const Position = (): JSX.Element => {
   const { config, nodes, hardware, setWorkingConfig } = useDevice();
 
-  const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
-
-  const { register, handleSubmit, reset, control } =
-    useForm<PositionValidation>({
-      mode: "onChange",
-      defaultValues: {
-        fixedAlt: myNode?.data.position?.altitude,
-        fixedLat: (myNode?.data.position?.latitudeI ?? 0) / 1e7,
-        fixedLng: (myNode?.data.position?.longitudeI ?? 0) / 1e7,
-        ...config.position
-      },
-      resolver: classValidatorResolver(PositionValidation)
-    });
-
-  const fixedPositionEnabled = useWatch({
-    control,
-    name: "fixedPosition",
-    defaultValue: false
-  });
-
-  useEffect(() => {
-    reset({
-      fixedAlt: myNode?.data.position?.altitude,
-      fixedLat: (myNode?.data.position?.latitudeI ?? 0) / 1e7,
-      fixedLng: (myNode?.data.position?.longitudeI ?? 0) / 1e7,
-      ...config.position
-    });
-  }, [reset, config.position, myNode?.data.position]);
-
-  const onSubmit = handleSubmit((data) => {
-    const { fixedAlt, fixedLat, fixedLng, ...rest } = data;
-
-    const configHasChanged = !Protobuf.Config_PositionConfig.equals(
-      config.position,
-      new Protobuf.Config_PositionConfig(rest)
-    );
-
+  const onSubmit = (data: PositionValidation) => {
     setWorkingConfig(
       new Protobuf.Config({
         payloadVariant: {
           case: "position",
-          value: rest
+          value: data
         }
       })
     );
-
-    // if (connection) {
-    //   void toast.promise(
-    //     connection
-    //       .setPosition(
-    //         new Protobuf.Position({
-    //           altitude: fixedAlt,
-    //           latitudeI: fixedLat * 1e7,
-    //           longitudeI: fixedLng * 1e7
-    //         })
-    //       )
-    //       .then(() => reset({ ...data })),
-    //     {
-    //       loading: "Saving...",
-    //       success: "Saved Position Config, Restarting Node",
-    //       error: "No response received"
-    //     }
-    //   );
-    //   if (configHasChanged) {
-    //     void toast.promise(
-    //       connection
-    //         .setConfig(
-    //           new Protobuf.Config({
-    //             payloadVariant: {
-    //               case: "position",
-    //               value: rest
-    //             }
-    //           })
-    //         )
-    //         .then(() =>
-    //           setConfig(
-    //             new Protobuf.Config({
-    //               payloadVariant: {
-    //                 case: "position",
-    //                 value: rest
-    //               }
-    //             })
-    //           )
-    //         ),
-    //       {
-    //         loading: "Saving...",
-    //         success: "Saved Position Config, Restarting Node",
-    //         error: "No response received"
-    //       }
-    //     );
-    //   }
-    // }
-  });
+  };
 
   return (
-    <Form onSubmit={onSubmit}>
-      <Controller
-        name="gpsEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="GPS Enabled"
-            description="Enable the internal GPS module"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="positionBroadcastSmartEnabled"
-        control={control}
-        render={({ field: { value, ...rest } }) => (
-          <Toggle
-            label="Enable Smart Position"
-            description="Only send position when there has been a meaningful change in location"
-            checked={value}
-            {...rest}
-          />
-        )}
-      />
-      <Controller
-        name="positionFlags"
-        control={control}
-        render={({ field, fieldState }): JSX.Element => {
-          const { value, onChange } = field;
-          const { error } = fieldState;
-
-          return (
-            <BitwiseSelect
-              label="Position Flags"
-              description="Configuration options for POSITION messages"
-              selected={value}
-              decodeEnun={Protobuf.Config_PositionConfig_PositionFlags}
-              onChange={onChange}
-            />
-          );
-        }}
-      />
-      <FormSection title="Fixed Position">
-        <Controller
-          name="fixedPosition"
-          control={control}
-          render={({ field: { value, ...rest } }) => (
-            <Toggle
-              label="Enabled"
-              description="Don't report GPS position, but a manually-specified one"
-              checked={value}
-              {...rest}
-            />
-          )}
-        />
-        {fixedPositionEnabled && (
-          <>
-            <Input
-              suffix="m"
-              label="Altitude"
-              type="number"
-              disabled={!fixedPositionEnabled}
-              {...register("fixedAlt", { valueAsNumber: true })}
-            />
-            <Input
-              suffix="°"
-              label="Latitude"
-              type="number"
-              disabled={!fixedPositionEnabled}
-              {...register("fixedLat", { valueAsNumber: true })}
-            />
-            <Input
-              suffix="°"
-              label="Longitude"
-              type="number"
-              disabled={!fixedPositionEnabled}
-              {...register("fixedLng", { valueAsNumber: true })}
-            />
-          </>
-        )}
-      </FormSection>
-      <FormSection title="Intervals">
-        <Input
-          suffix="Seconds"
-          label="Broadcast Interval"
-          description="How often your position is sent out over the mesh"
-          type="number"
-          {...register("positionBroadcastSecs", { valueAsNumber: true })}
-        />
-        <Input
-          suffix="Seconds"
-          label="GPS Update Interval"
-          description="How often a GPS fix should be acquired"
-          type="number"
-          {...register("gpsUpdateInterval", { valueAsNumber: true })}
-        />
-        <Input
-          suffix="Seconds"
-          label="Fix Attempt Duration"
-          description="How long the device will try to get a fix for"
-          type="number"
-          {...register("gpsAttemptTime", { valueAsNumber: true })}
-        />
-      </FormSection>
-      <Input
-        label="RX Pin"
-        description="GPS Module RX pin override"
-        type="number"
-        {...register("rxGpio", { valueAsNumber: true })}
-      />
-      <Input
-        label="TX Pin"
-        description="GPS Module TX pin override"
-        type="number"
-        {...register("txGpio", { valueAsNumber: true })}
-      />
-    </Form>
+    <DynamicForm<PositionValidation>
+      onSubmit={onSubmit}
+      defaultValues={config.position}
+      fieldGroups={[
+        {
+          label: "Position settings",
+          description: "Settings for the position module",
+          fields: [
+            {
+              type: "toggle",
+              name: "positionBroadcastSmartEnabled",
+              label: "Enable Smart Position",
+              description:
+                "Only send position when there has been a meaningful change in location"
+            },
+            {
+              type: "toggle",
+              name: "fixedPosition",
+              label: "Fixed Position",
+              description:
+                "Don't report GPS position, but a manually-specified one"
+            },
+            {
+              type: "toggle",
+              name: "gpsEnabled",
+              label: "GPS Enabled",
+              description: "Enable the internal GPS module"
+            },
+            {
+              type: "multiSelect",
+              name: "positionFlags",
+              label: "Position Flags",
+              description: "Configuration options for Position messages",
+              enumValue: Protobuf.Config_PositionConfig_PositionFlags
+            },
+            {
+              type: "number",
+              name: "rxGpio",
+              label: "Receive Pin",
+              description: "GPS Module RX pin override"
+            },
+            {
+              type: "number",
+              name: "txGpio",
+              label: "Transmit Pin",
+              description: "GPS Module TX pin override"
+            }
+          ]
+        },
+        {
+          label: "Intervals",
+          description: "How often to send position updates",
+          fields: [
+            {
+              type: "number",
+              name: "positionBroadcastSecs",
+              label: "Broadcast Interval",
+              description: "How often your position is sent out over the mesh"
+            },
+            {
+              type: "number",
+              name: "gpsUpdateInterval",
+              label: "GPS Update Interval",
+              description: "How often a GPS fix should be acquired"
+            },
+            {
+              type: "number",
+              name: "gpsAttemptTime",
+              label: "Fix Attempt Duration",
+              description: "How long the device will try to get a fix for"
+            }
+          ]
+        }
+      ]}
+    />
   );
 };
