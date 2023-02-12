@@ -11,7 +11,12 @@ export const Network = (): JSX.Element => {
       new Protobuf.Config({
         payloadVariant: {
           case: "network",
-          value: data
+          value: {
+            ...data,
+            ipv4Config: new Protobuf.Config_NetworkConfig_IpV4Config(
+              data.ipv4Config
+            )
+          }
         }
       })
     );
