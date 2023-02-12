@@ -15,9 +15,10 @@ import { bbox, lineString } from "@turf/turf";
 import { SidebarSection } from "@app/components/UI/Sidebar/SidebarSection.js";
 import { Button } from "@app/components/UI/Button.js";
 import { SidebarButton } from "@app/components/UI/Sidebar/sidebarButton.js";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const MapPage = (): JSX.Element => {
-  const { nodes, waypoints } = useDevice();
+  const { nodes, waypoints, addWaypoint, connection } = useDevice();
   const { rasterSources } = useAppStore();
   const { default: map } = useMap();
 
@@ -83,6 +84,16 @@ export const MapPage = (): JSX.Element => {
       >
         <Map
           mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
+          onClick={(e) => {
+            const waypoint = new Protobuf.Waypoint({
+              name: "test",
+              description: "test description",
+              latitudeI: Math.trunc(e.lngLat.lat * 1e7),
+              longitudeI: Math.trunc(e.lngLat.lng * 1e7)
+            });
+            addWaypoint(waypoint);
+            connection?.sendWaypoint(waypoint, "broadcast");
+          }}
           mapLib={maplibregl}
           attributionControl={false}
           renderWorldCopies={false}
