@@ -55,13 +55,7 @@ export const ConfigPage = (): JSX.Element => {
           }
         ]}
       >
-        <div className="p-3">
-          {activeConfigSection === "device" ? (
-            <DeviceConfig />
-          ) : (
-            <ModuleConfig />
-          )}
-        </div>
+        {activeConfigSection === "device" ? <DeviceConfig /> : <ModuleConfig />}
       </PageLayout>
     </>
   );

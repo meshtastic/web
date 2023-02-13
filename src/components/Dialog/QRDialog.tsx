@@ -63,7 +63,7 @@ export const QRDialog = ({
           <div className="flex gap-3 px-4 py-5 sm:p-6">
             <div className="flex w-40 flex-col gap-1">
               {channels.map((channel) => (
-                <>
+                <div key={channel.index}>
                   <Label>
                     {channel.settings?.name.length
                       ? channel.settings.name
@@ -87,7 +87,7 @@ export const QRDialog = ({
                       }
                     }}
                   />
-                </>
+                </div>
               ))}
             </div>
             <QRCode value={QRCodeURL} size={200} qrStyle="dots" />

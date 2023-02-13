@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { bbox, lineString } from "@turf/turf";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
-import { Button } from "@components/UI/Button.js";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -61,6 +60,7 @@ export const MapPage = (): JSX.Element => {
       </Sidebar>
       <PageLayout
         label="Map"
+        noPadding
         actions={[
           {
             icon: ZoomInIcon,

@@ -1,4 +1,11 @@
-import { IsBoolean, IsInt, IsNumber, IsString, Length } from "class-validator";
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsString,
+  Length
+} from "class-validator";
 
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -9,11 +16,11 @@ export class ChannelSettingsValidation
   @IsBoolean()
   enabled: boolean;
 
-  @IsString()
-  psk: string;
-
   @IsNumber()
   channelNum: number;
+
+  @IsString()
+  psk: string;
 
   @Length(0, 11)
   name: string;
