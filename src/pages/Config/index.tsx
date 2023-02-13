@@ -7,12 +7,14 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
 import { useState } from "react";
 import { useDevice } from "@app/core/stores/deviceStore.js";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
+import { useToast } from "@core/hooks/useToast.js";
 
 export const ConfigPage = (): JSX.Element => {
   const { workingConfig, workingModuleConfig, connection } = useDevice();
   const [activeConfigSection, setActiveConfigSection] = useState<
     "device" | "module"
   >("device");
+  const { toast } = useToast();
 
   return (
     <>
@@ -42,11 +44,21 @@ export const ConfigPage = (): JSX.Element => {
             async onClick() {
               if (activeConfigSection === "device") {
                 workingConfig.map(
-                  async (config) => await connection?.setConfig(config)
+                  async (config) =>
+                    await connection?.setConfig(config).then(() =>
+                      toast({
+                        title: `Config ${config.payloadVariant.case} saved`
+                      })
+                    )
                 );
               } else {
                 workingModuleConfig.map(
-                  async (config) => await connection?.setModuleConfig(config)
+                  async (moduleConfig) =>
+                    await connection?.setModuleConfig(moduleConfig).then(() =>
+                      toast({
+                        title: `Config ${moduleConfig.payloadVariant.case} saved`
+                      })
+                    )
                 );
               }
 

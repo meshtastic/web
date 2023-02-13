@@ -9,6 +9,7 @@ import { Dashboard } from "@components/Dashboard.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { ThemeController } from "@components/generic/ThemeController.js";
 import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.js";
+import { Toaster } from "@components/Toaster.js";
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();
@@ -25,6 +26,7 @@ export const App = (): JSX.Element => {
           setConnectDialogOpen(open);
         }}
       />
+      <Toaster />
       <MapProvider>
         <DeviceWrapper device={device}>
           <div className="flex min-h-screen flex-col bg-backgroundPrimary text-textPrimary">
