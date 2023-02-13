@@ -10,10 +10,9 @@ import {
   EditIcon,
   LayoutGrid
 } from "lucide-react";
-import { Subtle } from "./UI/Typography/Subtle.js";
-import { Button } from "./UI/Button.js";
-import { SidebarSection } from "./UI/Sidebar/SidebarSection.js";
-import { SidebarButton } from "./UI/Sidebar/sidebarButton.js";
+import { Subtle } from "@components/UI/Typography/Subtle.js";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
+import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 
 export interface SidebarProps {
   children?: React.ReactNode;

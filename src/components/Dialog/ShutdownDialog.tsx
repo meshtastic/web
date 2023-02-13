@@ -9,7 +9,7 @@ import {
 } from "@components/UI/Dialog.js";
 import { ClockIcon, PowerIcon } from "lucide-react";
 import { Button } from "@components/UI/Button.js";
-import { Input } from "@components/form/Input.js";
+import { Input } from "@components/UI/Input.js";
 
 export interface ShutdownDialogProps {
   open: boolean;
@@ -20,7 +20,7 @@ export const ShutdownDialog = ({
   open,
   onOpenChange
 }: ShutdownDialogProps): JSX.Element => {
-  const { connection, setDialogOpen } = useDevice();
+  const { connection } = useDevice();
 
   const [time, setTime] = useState<number>(5);
 
@@ -39,25 +39,24 @@ export const ShutdownDialog = ({
             type="number"
             value={time}
             onChange={(e) => setTime(parseInt(e.target.value))}
-            action={{
-              icon: <ClockIcon size={16} />,
-              action() {
-                connection
-                  ?.shutdown(time * 60)
-                  .then(() => setDialogOpen("shutdown", false));
-              }
-            }}
+            suffix="Minutes"
           />
           <Button
             className="w-24"
             onClick={() => {
-              connection
-                ?.shutdown(2)
-                .then(() => setDialogOpen("shutdown", false));
+              connection?.shutdown(time * 60).then(() => onOpenChange(false));
             }}
           >
-            <PowerIcon size={16} />
-            <span>Now</span>
+            <ClockIcon size={16} />
+          </Button>
+          <Button
+            className="w-24"
+            onClick={() => {
+              connection?.shutdown(2).then(() => () => onOpenChange(false));
+            }}
+          >
+            <PowerIcon className="mr-2" size={16} />
+            Now
           </Button>
         </div>
       </DialogContent>

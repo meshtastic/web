@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Controller, useForm } from "react-hook-form";
 import { ChannelSettingsValidation } from "@app/validation/channelSettings.js";
-import { Input } from "@components/form/Input.js";
-import { Toggle } from "@components/form/Toggle.js";
+import { Input } from "@components/UI/Input.js";
+import { Switch } from "@components/UI/Switch.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { RefreshCwIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import { classValidatorResolver } from "@hookform/resolvers/class-validator";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Label } from "@radix-ui/react-label";
 
 export interface SettingsPanelProps {
   channel: Protobuf.Channel;
@@ -94,18 +95,21 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               name="enabled"
               control={control}
               render={({ field: { value, ...rest } }) => (
-                <Toggle
-                  label="Enabled"
-                  description="Description"
-                  checked={value}
-                  {...rest}
-                />
+                <>
+                  <Label>Enabled</Label>
+                  <Switch
+                    // label="Enabled"
+                    // description="Description"
+                    checked={value}
+                    {...rest}
+                  />
+                </>
               )}
             />
+            <Label>Name</Label>
             <Input
-              label="Name"
-              description="Max transmit power in dBm"
-              error={errors.name?.message}
+              // description="Max transmit power in dBm"
+              // error={errors.name?.message}
               {...register("name")}
             />
           </>
@@ -131,42 +135,49 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
           <option value={128}>128 Bit</option>
           <option value={256}>256 Bit</option>
         </Select> */}
+        <Label>Pre-Shared Key</Label>
         <Input
-          width="100%"
-          label="Pre-Shared Key"
-          description="Channel key to encrypt data"
+          // width="100%"
+          // label="Pre-Shared Key"
+          // description="Channel key to encrypt data"
           type={pskHidden ? "password" : "text"}
           action={{
-            icon: pskHidden ? <EyeIcon size={16} /> : <EyeOffIcon size={16} />,
-            action: () => {
+            icon: pskHidden ? EyeIcon : EyeOffIcon,
+            onClick: () => {
               setPskHidden(!pskHidden);
             }
           }}
-          error={errors.psk?.message}
+          // error={errors.psk?.message}
           {...register("psk")}
         />
         <Controller
           name="uplinkEnabled"
           control={control}
           render={({ field: { value, ...rest } }) => (
-            <Toggle
-              label="Uplink Enabled"
-              description="Send packets to designated MQTT server"
-              checked={value}
-              {...rest}
-            />
+            <>
+              <Label>Uplink Enabled</Label>
+              <Switch
+                // label="Uplink Enabled"
+                // description="Send packets to designated MQTT server"
+                checked={value}
+                {...rest}
+              />
+            </>
           )}
         />
         <Controller
           name="downlinkEnabled"
           control={control}
           render={({ field: { value, ...rest } }) => (
-            <Toggle
-              label="Downlink Enabled"
-              description="Recieve packets to designated MQTT server"
-              checked={value}
-              {...rest}
-            />
+            <>
+              <Label>Downlink Enabled</Label>
+              <Switch
+                // label="Downlink Enabled"
+                // description="Recieve packets to designated MQTT server"
+                checked={value}
+                {...rest}
+              />
+            </>
           )}
         />
       </form>

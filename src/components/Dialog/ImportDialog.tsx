@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toByteArray } from "base64-js";
-import { Checkbox } from "@components/form/Checkbox.js";
-import { Input } from "@components/form/Input.js";
+import { Checkbox } from "@components/UI/Checkbox.js";
+import { Input } from "@components/UI/Input.js";
 import {
   Dialog,
   DialogContent,
@@ -11,9 +11,10 @@ import {
   DialogTitle
 } from "@components/UI/Dialog.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { Toggle } from "@components/form/Toggle.js";
+import { Switch } from "@components/UI/Switch.js";
 import { Button } from "@components/UI/Button.js";
 import { useDevice } from "@core/stores/deviceStore.js";
+import { Label } from "@components/UI/Label.js";
 
 export interface ImportDialogProps {
   open: boolean;
@@ -82,8 +83,8 @@ export const ImportDialog = ({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
+          <Label>Channel Set/QR Code URL</Label>
           <Input
-            label="Channel Set/QR Code URL"
             value={QRCodeURL}
             suffix={validURL ? "✅" : "❌"}
             onChange={(e) => {
@@ -94,8 +95,8 @@ export const ImportDialog = ({
             <div className="flex flex-col gap-3">
               <div className="flex w-full gap-2">
                 <div className="w-36">
-                  <Toggle
-                    label="Use Preset?"
+                  <Label>Use Preset?</Label>
+                  <Switch
                     disabled
                     checked={channelSet?.loraConfig?.usePreset ?? true}
                   />
@@ -121,14 +122,14 @@ export const ImportDialog = ({
               </span>
               <div className="flex w-40 flex-col gap-1">
                 {channelSet?.settings.map((channel, index) => (
-                  <Checkbox
-                    key={index}
-                    label={
-                      channel.name.length
+                  <>
+                    <Label>
+                      {channel.name.length
                         ? channel.name
-                        : `Channel: ${channel.id}`
-                    }
-                  />
+                        : `Channel: ${channel.id}`}
+                    </Label>
+                    <Checkbox key={index} />
+                  </>
                 ))}
               </div>
             </div>

@@ -1,7 +1,7 @@
 import type { PositionValidation } from "@app/validation/config/position.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@app/components/DynamicForm.js";
+import { DynamicForm } from "@components/DynamicForm.js";
 
 export const Position = (): JSX.Element => {
   const { config, nodes, hardware, setWorkingConfig } = useDevice();

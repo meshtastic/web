@@ -5,10 +5,10 @@ import { PageRouter } from "@app/PageRouter.js";
 import { CommandPalette } from "@components/CommandPalette.js";
 import { DeviceSelector } from "@components/DeviceSelector.js";
 import { DialogManager } from "@components/Dialog/DialogManager.js";
-import { Dashboard } from "@app/components/Dashboard.js";
+import { Dashboard } from "@components/Dashboard.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { ThemeController } from "@components/generic/ThemeController.js";
-import { NewDeviceDialog } from "./components/Dialog/NewDevice.js";
+import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.js";
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();

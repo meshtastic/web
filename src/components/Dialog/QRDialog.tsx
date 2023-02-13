@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { fromByteArray } from "base64-js";
 import { QRCode } from "react-qrcode-logo";
-import { Checkbox } from "@components/form/Checkbox.js";
-import { Input } from "@components/form/Input.js";
+import { Checkbox } from "@components/UI/Checkbox.js";
+import { Input } from "@components/UI/Input.js";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import {
 } from "@components/UI/Dialog.js";
 import { ClipboardIcon } from "lucide-react";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Label } from "@components/UI/Label.js";
 
 export interface QRDialogProps {
   open: boolean;
@@ -62,39 +63,44 @@ export const QRDialog = ({
           <div className="flex gap-3 px-4 py-5 sm:p-6">
             <div className="flex w-40 flex-col gap-1">
               {channels.map((channel) => (
-                <Checkbox
-                  key={channel.index}
-                  label={
-                    channel.settings?.name.length
+                <>
+                  <Label>
+                    {channel.settings?.name.length
                       ? channel.settings.name
                       : channel.role === Protobuf.Channel_Role.PRIMARY
                       ? "Primary"
-                      : `Channel: ${channel.index}`
-                  }
-                  checked={selectedChannels.includes(channel.index)}
-                  onChange={() => {
-                    if (selectedChannels.includes(channel.index)) {
-                      setSelectedChannels(
-                        selectedChannels.filter((c) => c !== channel.index)
-                      );
-                    } else {
-                      setSelectedChannels([...selectedChannels, channel.index]);
-                    }
-                  }}
-                />
+                      : `Channel: ${channel.index}`}
+                  </Label>
+                  <Checkbox
+                    key={channel.index}
+                    checked={selectedChannels.includes(channel.index)}
+                    onChange={() => {
+                      if (selectedChannels.includes(channel.index)) {
+                        setSelectedChannels(
+                          selectedChannels.filter((c) => c !== channel.index)
+                        );
+                      } else {
+                        setSelectedChannels([
+                          ...selectedChannels,
+                          channel.index
+                        ]);
+                      }
+                    }}
+                  />
+                </>
               ))}
             </div>
             <QRCode value={QRCodeURL} size={200} qrStyle="dots" />
           </div>
         </div>
         <DialogFooter>
+          <Label>Sharable URL</Label>
           <Input
-            label="Sharable URL"
             value={QRCodeURL}
             disabled
             action={{
-              icon: <ClipboardIcon size={16} />,
-              action() {
+              icon: ClipboardIcon,
+              onClick() {
                 void navigator.clipboard.writeText(QRCodeURL);
               }
             }}

@@ -10,7 +10,7 @@ import {
 } from "@components/UI/Dialog.js";
 import { ClockIcon, RefreshCwIcon } from "lucide-react";
 import { Button } from "@components/UI/Button.js";
-import { Input } from "@components/form/Input.js";
+import { Input } from "@components/UI/Input.js";
 
 export interface RebootDialogProps {
   open: boolean;
@@ -21,7 +21,7 @@ export const RebootDialog = ({
   open,
   onOpenChange
 }: RebootDialogProps): JSX.Element => {
-  const { connection, setDialogOpen } = useDevice();
+  const { connection } = useDevice();
 
   const [time, setTime] = useState<number>(5);
 
@@ -40,21 +40,19 @@ export const RebootDialog = ({
             value={time}
             onChange={(e) => setTime(parseInt(e.target.value))}
             action={{
-              icon: <ClockIcon size={16} />,
-              action() {
-                connection
-                  ?.reboot(time * 60)
-                  .then(() => setDialogOpen("reboot", false));
+              icon: ClockIcon,
+              onClick() {
+                connection?.reboot(time * 60).then(() => onOpenChange(false));
               }
             }}
           />
           <Button
             className="w-24"
             onClick={() => {
-              connection?.reboot(2).then(() => setDialogOpen("reboot", false));
+              connection?.reboot(2).then(() => onOpenChange(false));
             }}
           >
-            <RefreshCwIcon size={16} />
+            <RefreshCwIcon className="mr-2" size={16} />
             Now
           </Button>
         </div>

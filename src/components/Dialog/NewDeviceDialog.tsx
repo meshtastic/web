@@ -1,4 +1,3 @@
-import { Input } from "@components/form/Input.js";
 import {
   Dialog,
   DialogContent,
@@ -6,9 +5,14 @@ import {
   DialogHeader,
   DialogTitle
 } from "@components/UI/Dialog.js";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../UI/Tabs.js";
-import { Subtle } from "../UI/Typography/Subtle.js";
-import { Link } from "../UI/Typography/Link.js";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from "@components/UI/Tabs.js";
+import { Subtle } from "@components/UI/Typography/Subtle.js";
+import { Link } from "@components/UI/Typography/Link.js";
 import { HTTP } from "../PageComponents/Connect/HTTP.js";
 import { BLE } from "../PageComponents/Connect/BLE.js";
 import { Serial } from "../PageComponents/Connect/Serial.js";

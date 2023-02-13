@@ -1,7 +1,7 @@
 import type { DisplayValidation } from "@app/validation/config/display.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@app/components/DynamicForm.js";
+import { DynamicForm } from "@components/DynamicForm.js";
 
 export const Display = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
@@ -30,7 +30,8 @@ export const Display = (): JSX.Element => {
               type: "number",
               name: "screenOnSecs",
               label: "Screen Timeout",
-              description: "Turn off the display after this long"
+              description: "Turn off the display after this long",
+              suffix: "seconds"
             },
             {
               type: "select",

@@ -10,8 +10,8 @@ import {
   GithubIcon,
   TerminalIcon
 } from "lucide-react";
-import { Separator } from "./UI/Seperator.js";
-import { Code } from "./UI/Typography/Code.js";
+import { Separator } from "@components/UI/Seperator.js";
+import { Code } from "@components/UI/Typography/Code.js";
 import { DeviceSelectorButton } from "./DeviceSelectorButton.js";
 
 export const DeviceSelector = (): JSX.Element => {

@@ -1,14 +1,14 @@
-import { Sidebar } from "@app/components/Sidebar.js";
-import { PageLayout } from "@app/components/PageLayout.js";
+import { Sidebar } from "@components/Sidebar.js";
+import { PageLayout } from "@components/PageLayout.js";
 import { cn } from "@app/core/utils/cn.js";
 import { Channel } from "@components/PageComponents/Channel.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { QrCodeIcon, ImportIcon } from "lucide-react";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
-import { SidebarSection } from "@app/components/UI/Sidebar/SidebarSection.js";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
 import { useState } from "react";
-import { Button } from "@app/components/UI/Button.js";
-import { SidebarButton } from "@app/components/UI/Sidebar/sidebarButton.js";
+import { Button } from "@components/UI/Button.js";
+import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 
 export const getChannelName = (channel: Protobuf.Channel) =>
   channel.settings?.name.length

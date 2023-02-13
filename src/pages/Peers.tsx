@@ -5,7 +5,7 @@ import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { Sidebar } from "@app/components/Sidebar.js";
+import { Sidebar } from "@components/Sidebar.js";
 
 export const PeersPage = (): JSX.Element => {
   const { connection, nodes } = useDevice();

@@ -11,7 +11,7 @@ import { Button } from "@components/UI/Button.js";
 import { useDevice } from "@app/core/stores/deviceStore.js";
 import { useForm } from "react-hook-form";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { Label } from "../UI/Label.js";
+import { Label } from "@components/UI/Label.js";
 
 export interface User {
   longName: string;
@@ -27,7 +27,7 @@ export const DeviceNameDialog = ({
   open,
   onOpenChange
 }: DeviceNameDialogProps): JSX.Element => {
-  const { hardware, nodes, connection, setDialogOpen } = useDevice();
+  const { hardware, nodes, connection } = useDevice();
 
   const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
 
@@ -45,7 +45,7 @@ export const DeviceNameDialog = ({
         ...data
       })
     );
-    setDialogOpen("deviceName", false);
+    onOpenChange(false);
   });
 
   return (

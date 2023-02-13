@@ -1,7 +1,7 @@
 import type { BluetoothValidation } from "@app/validation/config/bluetooth.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@app/components/DynamicForm.js";
+import { DynamicForm } from "@components/DynamicForm.js";
 
 export const Bluetooth = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();

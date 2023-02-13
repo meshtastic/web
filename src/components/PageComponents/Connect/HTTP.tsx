@@ -1,12 +1,14 @@
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { Input } from "@components/form/Input.js";
-import { Toggle } from "@components/form/Toggle.js";
+import { Input } from "@components/UI/Input.js";
+import { Switch } from "@components/UI/Switch.js";
 import { Button } from "@components/UI/Button.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
 import { IHTTPConnection } from "@meshtastic/meshtasticjs";
+import { Label } from "@components/UI/Label.js";
+import { SelectLabel } from "@components/UI/Select.js";
 
 export const HTTP = (): JSX.Element => {
   const { addDevice } = useDeviceStore();
@@ -50,8 +52,9 @@ export const HTTP = (): JSX.Element => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     <form className="flex w-full flex-col gap-2 p-4" onSubmit={onSubmit}>
       <div className="flex h-48 flex-col gap-2">
+        <Label>IP Address/Hostname</Label>
         <Input
-          label="IP Address/Hostname"
+          // label="IP Address/Hostname"
           prefix={TLSEnabled ? "https://" : "http://"}
           placeholder="000.000.000.000 / meshtastic.local"
           {...register("ip")}
@@ -60,13 +63,16 @@ export const HTTP = (): JSX.Element => {
           name="tls"
           control={control}
           render={({ field: { value, ...rest } }) => (
-            <Toggle
-              label="Use TLS"
-              description="Description"
-              disabled={location.protocol === "https:"}
-              checked={value}
-              {...rest}
-            />
+            <>
+              <Label>Use TLS</Label>
+              <Switch
+                // label="Use TLS"
+                // description="Description"
+                disabled={location.protocol === "https:"}
+                checked={value}
+                {...rest}
+              />
+            </>
           )}
         />
       </div>

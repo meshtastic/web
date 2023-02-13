@@ -6,8 +6,8 @@ import {
   SubmitHandler,
   useForm
 } from "react-hook-form";
-import { Input } from "./UI/Input.js";
-import { Label } from "./UI/Label.js";
+import { Input } from "@components/UI/Input.js";
+import { Label } from "@components/UI/Label.js";
 import { ErrorMessage } from "@hookform/error-message";
 import {
   Select,
@@ -15,10 +15,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "./UI/Select.js";
-import { Switch } from "./UI/Switch.js";
-import { H4 } from "./UI/Typography/H4.js";
-import { Subtle } from "./UI/Typography/Subtle.js";
+} from "@components/UI/Select.js";
+import { Switch } from "@components/UI/Switch.js";
+import { H4 } from "@components/UI/Typography/H4.js";
+import { Subtle } from "@components/UI/Typography/Subtle.js";
 
 interface DisabledBy<T> {
   fieldName: Path<T>;
@@ -114,6 +114,8 @@ export function DynamicForm<T extends FieldValues>({
                 return (
                   <FieldWrapper key={index} {...fieldWrapperData}>
                     <Input
+                      type="text"
+                      suffix={field.suffix}
                       disabled={fieldWrapperData.disabled}
                       {...register(field.name)}
                     />
@@ -129,8 +131,10 @@ export function DynamicForm<T extends FieldValues>({
                         <Input
                           type="number"
                           value={parseInt(value)}
+                          suffix={field.suffix}
                           onChange={(e) => onChange(parseInt(e.target.value))}
                           disabled={fieldWrapperData.disabled}
+                          {...rest}
                         />
                       )}
                     />
@@ -141,7 +145,13 @@ export function DynamicForm<T extends FieldValues>({
                   <FieldWrapper key={index} {...fieldWrapperData}>
                     <Input
                       type="password"
+                      suffix={field.suffix}
                       disabled={fieldWrapperData.disabled}
+                      // action={{
+                      //   icon: hidden ? EyeIcon : EyeOffIcon,
+                      //   onClick: () => {
+                      //   }
+                      // }}
                       {...register(field.name)}
                     />
                   </FieldWrapper>

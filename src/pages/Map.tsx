@@ -3,8 +3,8 @@ import { Layer, Map, Marker, Source, useMap } from "react-map-gl";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { Sidebar } from "@app/components/Sidebar.js";
-import { PageLayout } from "@app/components/PageLayout.js";
+import { Sidebar } from "@components/Sidebar.js";
+import { PageLayout } from "@components/PageLayout.js";
 import {
   ZoomInIcon,
   ZoomOutIcon,
@@ -12,9 +12,9 @@ import {
   MapPinIcon
 } from "lucide-react";
 import { bbox, lineString } from "@turf/turf";
-import { SidebarSection } from "@app/components/UI/Sidebar/SidebarSection.js";
-import { Button } from "@app/components/UI/Button.js";
-import { SidebarButton } from "@app/components/UI/Sidebar/sidebarButton.js";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
+import { Button } from "@components/UI/Button.js";
+import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const MapPage = (): JSX.Element => {

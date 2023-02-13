@@ -10,11 +10,11 @@ import {
   UsbIcon,
   NetworkIcon
 } from "lucide-react";
-import { Subtle } from "./UI/Typography/Subtle.js";
-import { H3 } from "./UI/Typography/H3.js";
+import { Subtle } from "@components/UI/Typography/Subtle.js";
+import { H3 } from "@components/UI/Typography/H3.js";
 import { useDeviceStore } from "@app/core/stores/deviceStore.js";
 import { useMemo } from "react";
-import { Separator } from "./UI/Seperator.js";
+import { Separator } from "@components/UI/Seperator.js";
 
 export const Dashboard = () => {
   const { setConnectDialogOpen } = useAppStore();

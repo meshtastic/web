@@ -1,7 +1,7 @@
 import type { PowerValidation } from "@app/validation/config/power.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@app/components/DynamicForm.js";
+import { DynamicForm } from "@components/DynamicForm.js";
 
 export const Power = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
