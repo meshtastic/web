@@ -1,7 +1,7 @@
 import type { AudioValidation } from "@app/validation/moduleConfig/audio.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Audio = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -43,7 +43,9 @@ export const Audio = (): JSX.Element => {
               name: "bitrate",
               label: "Bitrate",
               description: "Bitrate to use for audio encoding",
-              enumValue: Protobuf.ModuleConfig_AudioConfig_Audio_Baud
+              properties: {
+                enumValue: Protobuf.ModuleConfig_AudioConfig_Audio_Baud
+              }
             },
             {
               type: "number",

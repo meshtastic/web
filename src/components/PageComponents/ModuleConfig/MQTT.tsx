@@ -1,6 +1,6 @@
 import type { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@app/core/stores/deviceStore.js";
 
 export const MQTT = (): JSX.Element => {

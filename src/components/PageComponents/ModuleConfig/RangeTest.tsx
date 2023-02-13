@@ -1,7 +1,7 @@
 import type { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const RangeTest = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();

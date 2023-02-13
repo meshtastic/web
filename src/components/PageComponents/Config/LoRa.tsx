@@ -1,7 +1,7 @@
 import type { LoRaValidation } from "@app/validation/config/lora.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const LoRa = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
@@ -31,7 +31,9 @@ export const LoRa = (): JSX.Element => {
               name: "region",
               label: "Region",
               description: "Sets the region for your node",
-              enumValue: Protobuf.Config_LoRaConfig_RegionCode
+              properties: {
+                enumValue: Protobuf.Config_LoRaConfig_RegionCode
+              }
             },
             {
               type: "number",
@@ -62,39 +64,46 @@ export const LoRa = (): JSX.Element => {
               name: "modemPreset",
               label: "Modem Preset",
               description: "Modem preset to use",
-              enumValue: Protobuf.Config_LoRaConfig_ModemPreset,
-              formatEnumName: true,
               disabledBy: [
                 {
                   fieldName: "usePreset"
                 }
-              ]
+              ],
+              properties: {
+                enumValue: Protobuf.Config_LoRaConfig_ModemPreset,
+                formatEnumName: true
+              }
             },
             {
               type: "number",
               name: "bandwidth",
               label: "Bandwidth",
               description: "Channel bandwidth in MHz",
-              suffix: "MHz",
               disabledBy: [
                 {
                   fieldName: "usePreset",
                   invert: true
                 }
-              ]
+              ],
+              properties: {
+                suffix: "MHz"
+              }
             },
             {
               type: "number",
               name: "spreadFactor",
               label: "Spreading Factor",
               description: "Indicates the number of chirps per symbol",
-              suffix: "CPS",
+
               disabledBy: [
                 {
                   fieldName: "usePreset",
                   invert: true
                 }
-              ]
+              ],
+              properties: {
+                suffix: "CPS"
+              }
             },
             {
               type: "number",
@@ -125,7 +134,9 @@ export const LoRa = (): JSX.Element => {
               name: "txPower",
               label: "Transmit Power",
               description: "Max transmit power",
-              suffix: "dBm"
+              properties: {
+                suffix: "dBm"
+              }
             },
             {
               type: "toggle",
@@ -139,7 +150,9 @@ export const LoRa = (): JSX.Element => {
               label: "Frequency Offset",
               description:
                 "Frequency offset to correct for crystal calibration errors",
-              suffix: "Hz"
+              properties: {
+                suffix: "Hz"
+              }
             },
             {
               type: "toggle",
@@ -152,7 +165,9 @@ export const LoRa = (): JSX.Element => {
               name: "overrideFrequency",
               label: "Override Frequency",
               description: "Override frequency",
-              suffix: "Hz"
+              properties: {
+                suffix: "Hz"
+              }
             }
           ]
         }

@@ -1,7 +1,7 @@
 import type { NetworkValidation } from "@app/validation/config/network.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Network = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
@@ -82,7 +82,9 @@ export const Network = (): JSX.Element => {
               name: "addressMode",
               label: "Address Mode",
               description: "Address assignment selection",
-              enumValue: Protobuf.Config_NetworkConfig_AddressMode
+              properties: {
+                enumValue: Protobuf.Config_NetworkConfig_AddressMode
+              }
             },
             {
               type: "text",

@@ -1,7 +1,7 @@
 import type { PowerValidation } from "@app/validation/config/power.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Power = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
@@ -39,7 +39,9 @@ export const Power = (): JSX.Element => {
               label: "Shutdown on battery delay",
               description:
                 "Automatically shutdown node after this long when on battery, 0 for indefinite",
-              suffix: "Seconds"
+              properties: {
+                suffix: "Seconds"
+              }
             },
             {
               type: "number",
@@ -53,7 +55,9 @@ export const Power = (): JSX.Element => {
               label: "No Connection Bluetooth Disabled",
               description:
                 "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
-              suffix: "Seconds"
+              properties: {
+                suffix: "Seconds"
+              }
             }
           ]
         },
@@ -67,7 +71,9 @@ export const Power = (): JSX.Element => {
               label: "Mesh SDS Timeout",
               description:
                 "The device will enter super deep sleep after this time",
-              suffix: "Seconds"
+              properties: {
+                suffix: "Seconds"
+              }
             },
             {
               type: "number",
@@ -75,14 +81,18 @@ export const Power = (): JSX.Element => {
               label: "Super Deep Sleep Duration",
               description:
                 "How long the device will be in super deep sleep for",
-              suffix: "Seconds"
+              properties: {
+                suffix: "Seconds"
+              }
             },
             {
               type: "number",
               name: "lsSecs",
               label: "Light Sleep Duration",
               description: "How long the device will be in light sleep for",
-              suffix: "Seconds"
+              properties: {
+                suffix: "Seconds"
+              }
             },
             {
               type: "number",
@@ -90,7 +100,9 @@ export const Power = (): JSX.Element => {
               label: "Minimum Wake Time",
               description:
                 "Minimum amount of time the device will stay awake for after receiving a packet",
-              suffix: "Seconds"
+              properties: {
+                suffix: "Seconds"
+              }
             }
           ]
         }

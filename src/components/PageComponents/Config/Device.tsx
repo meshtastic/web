@@ -1,7 +1,7 @@
 import type { DeviceValidation } from "@app/validation/config/device.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Device = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
@@ -31,8 +31,10 @@ export const Device = (): JSX.Element => {
               name: "role",
               label: "Role",
               description: "What role the device performs on the mesh",
-              enumValue: Protobuf.Config_DeviceConfig_Role,
-              formatEnumName: true
+              properties: {
+                enumValue: Protobuf.Config_DeviceConfig_Role,
+                formatEnumName: true
+              }
             },
             {
               type: "toggle",
@@ -64,15 +66,19 @@ export const Device = (): JSX.Element => {
               name: "rebroadcastMode",
               label: "Rebroadcast Mode",
               description: "How to handle rebroadcasting",
-              enumValue: Protobuf.Config_DeviceConfig_RebroadcastMode,
-              formatEnumName: true
+              properties: {
+                enumValue: Protobuf.Config_DeviceConfig_RebroadcastMode,
+                formatEnumName: true
+              }
             },
             {
               type: "number",
               name: "nodeInfoBroadcastSecs",
               label: "Node Info Broadcast Interval",
               description: "How often to broadcast node info",
-              suffix: "Seconds"
+              properties: {
+                suffix: "Seconds"
+              }
             }
           ]
         }

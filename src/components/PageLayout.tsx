@@ -1,7 +1,9 @@
+import { cn } from "@app/core/utils/cn.js";
 import { LucideIcon, AlignLeftIcon } from "lucide-react";
 
 export interface PageLayoutProps {
   label: string;
+  noPadding?: boolean;
   children: React.ReactNode;
   actions?: {
     icon: LucideIcon;
@@ -10,7 +12,8 @@ export interface PageLayoutProps {
 }
 
 export const PageLayout = ({
-  label: title,
+  label,
+  noPadding,
   actions,
   children
 }: PageLayoutProps): JSX.Element => {
@@ -22,7 +25,7 @@ export const PageLayout = ({
         </button>
         <div className="flex flex-1 items-center justify-between px-4 md:px-0">
           <div className="flex w-full items-center">
-            <span className="w-full text-lg font-medium">{title}</span>
+            <span className="w-full text-lg font-medium">{label}</span>
             <div className="flex justify-end space-x-4">
               {actions?.map((action, index) => (
                 <button
@@ -37,7 +40,10 @@ export const PageLayout = ({
           </div>
         </div>
       </div>
-      {children}
+      {/* relative flex h-full w-full flex-col */}
+      <div className={cn("flex h-full w-full flex-col", !noPadding && "p-3")}>
+        {children}
+      </div>
     </div>
   );
 };

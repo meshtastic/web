@@ -1,7 +1,7 @@
 import type { StoreForwardValidation } from "@app/validation/moduleConfig/storeForward.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const StoreForward = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -48,12 +48,15 @@ export const StoreForward = (): JSX.Element => {
               name: "records",
               label: "Number of records",
               description: "Number of records to store",
-              suffix: "Records",
+
               disabledBy: [
                 {
                   fieldName: "enabled"
                 }
-              ]
+              ],
+              properties: {
+                suffix: "Records"
+              }
             },
             {
               type: "number",

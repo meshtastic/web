@@ -1,7 +1,7 @@
 import type { DisplayValidation } from "@app/validation/config/display.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Display = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
@@ -31,14 +31,18 @@ export const Display = (): JSX.Element => {
               name: "screenOnSecs",
               label: "Screen Timeout",
               description: "Turn off the display after this long",
-              suffix: "seconds"
+              properties: {
+                suffix: "seconds"
+              }
             },
             {
               type: "select",
               name: "gpsFormat",
               label: "GPS Display Units",
               description: "Coordinate display format",
-              enumValue: Protobuf.Config_DisplayConfig_GpsCoordinateFormat
+              properties: {
+                enumValue: Protobuf.Config_DisplayConfig_GpsCoordinateFormat
+              }
             },
             {
               type: "number",
@@ -63,23 +67,29 @@ export const Display = (): JSX.Element => {
               name: "units",
               label: "Display Units",
               description: "Display metric or imperial units",
-              enumValue: Protobuf.Config_DisplayConfig_DisplayUnits,
-              formatEnumName: true
+              properties: {
+                enumValue: Protobuf.Config_DisplayConfig_DisplayUnits,
+                formatEnumName: true
+              }
             },
             {
               type: "select",
               name: "oled",
               label: "OLED Type",
               description: "Type of OLED screen attached to the device",
-              enumValue: Protobuf.Config_DisplayConfig_OledType
+              properties: {
+                enumValue: Protobuf.Config_DisplayConfig_OledType
+              }
             },
             {
               type: "select",
               name: "displaymode",
               label: "Display Mode",
               description: "Screen layout variant",
-              enumValue: Protobuf.Config_DisplayConfig_DisplayMode,
-              formatEnumName: true
+              properties: {
+                enumValue: Protobuf.Config_DisplayConfig_DisplayMode,
+                formatEnumName: true
+              }
             },
             {
               type: "toggle",

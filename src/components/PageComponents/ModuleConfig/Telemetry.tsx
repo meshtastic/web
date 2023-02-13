@@ -1,7 +1,7 @@
 import type { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Telemetry = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -29,15 +29,20 @@ export const Telemetry = (): JSX.Element => {
             {
               type: "number",
               name: "deviceUpdateInterval",
-              label: "Interval to get telemetry data",
-              suffix: "seconds"
+              label: "Query Interval",
+              description: "Interval to get telemetry data",
+              properties: {
+                suffix: "seconds"
+              }
             },
             {
               type: "number",
               name: "environmentUpdateInterval",
               label: "Update Interval",
               description: "How often to send Metrics over the mesh",
-              suffix: "seconds"
+              properties: {
+                suffix: "seconds"
+              }
             },
             {
               type: "toggle",

@@ -1,7 +1,7 @@
 import type { BluetoothValidation } from "@app/validation/config/bluetooth.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Bluetooth = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
@@ -37,13 +37,15 @@ export const Bluetooth = (): JSX.Element => {
               name: "mode",
               label: "Pairing mode",
               description: "Pin selection behaviour.",
-              enumValue: Protobuf.Config_BluetoothConfig_PairingMode,
-              formatEnumName: true,
               disabledBy: [
                 {
                   fieldName: "enabled"
                 }
-              ]
+              ],
+              properties: {
+                enumValue: Protobuf.Config_BluetoothConfig_PairingMode,
+                formatEnumName: true
+              }
             },
             {
               type: "number",
@@ -60,7 +62,8 @@ export const Bluetooth = (): JSX.Element => {
                 {
                   fieldName: "enabled"
                 }
-              ]
+              ],
+              properties: {}
             }
           ]
         }

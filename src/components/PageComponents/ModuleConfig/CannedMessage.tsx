@@ -1,7 +1,7 @@
 import type { CannedMessageValidation } from "@app/validation/moduleConfig/cannedMessage.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const CannedMessage = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -55,24 +55,30 @@ export const CannedMessage = (): JSX.Element => {
               name: "inputbrokerEventCw",
               label: "Clockwise event",
               description: "Select input event.",
-              enumValue:
-                Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar
+              properties: {
+                enumValue:
+                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar
+              }
             },
             {
               type: "select",
               name: "inputbrokerEventCcw",
               label: "Counter Clockwise event",
               description: "Select input event.",
-              enumValue:
-                Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar
+              properties: {
+                enumValue:
+                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar
+              }
             },
             {
               type: "select",
               name: "inputbrokerEventPress",
               label: "Press event",
               description: "Select input event",
-              enumValue:
-                Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar
+              properties: {
+                enumValue:
+                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar
+              }
             },
             {
               type: "toggle",

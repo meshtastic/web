@@ -1,7 +1,7 @@
 import type { PositionValidation } from "@app/validation/config/position.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Position = (): JSX.Element => {
   const { config, nodes, hardware, setWorkingConfig } = useDevice();
@@ -51,7 +51,9 @@ export const Position = (): JSX.Element => {
               name: "positionFlags",
               label: "Position Flags",
               description: "Configuration options for Position messages",
-              enumValue: Protobuf.Config_PositionConfig_PositionFlags
+              properties: {
+                enumValue: Protobuf.Config_PositionConfig_PositionFlags
+              }
             },
             {
               type: "number",
