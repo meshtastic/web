@@ -9,6 +9,12 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
 import { useState } from "react";
 import { Button } from "@components/UI/Button.js";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from "@app/components/UI/Tabs.js";
 
 export const getChannelName = (channel: Protobuf.Channel) =>
   channel.settings?.name.length
@@ -25,28 +31,7 @@ export const ChannelsPage = (): JSX.Element => {
 
   return (
     <>
-      <Sidebar>
-        <SidebarSection label="Channels">
-          {channels.map((channel) => (
-            <SidebarButton
-              label={getChannelName(channel.config)}
-              key={channel.config.index}
-              active={channel.config.index === activeChannel}
-              element={
-                <span
-                  className={cn(
-                    "h-3 w-3 rounded-full",
-                    channel.config.role === Protobuf.Channel_Role.DISABLED
-                      ? "bg-gray-500"
-                      : "bg-green-500"
-                  )}
-                />
-              }
-              onClick={() => setActiveChannel(channel.config.index)}
-            />
-          ))}
-        </SidebarSection>
-      </Sidebar>
+      <Sidebar></Sidebar>
       <PageLayout
         label={`Channel: ${
           channels[activeChannel]
@@ -70,12 +55,26 @@ export const ChannelsPage = (): JSX.Element => {
           }
         ]}
       >
-        {channels.map(
-          (channel) =>
-            channel.config.index === activeChannel && (
+        <Tabs defaultValue="0">
+          <TabsList>
+            {channels.map((channel) => (
+              <TabsTrigger
+                key={channel.config.index}
+                value={channel.config.index.toString()}
+              >
+                {getChannelName(channel.config)}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {channels.map((channel) => (
+            <TabsContent
+              key={channel.config.index}
+              value={channel.config.index.toString()}
+            >
               <Channel key={channel.config.index} channel={channel.config} />
-            )
-        )}
+            </TabsContent>
+          ))}
+        </Tabs>
       </PageLayout>
     </>
   );
