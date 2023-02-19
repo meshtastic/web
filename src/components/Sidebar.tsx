@@ -20,7 +20,7 @@ export interface SidebarProps {
 
 export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
   const { hardware, nodes } = useDevice();
-  const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
+  const myNode = nodes.get(hardware.myNodeNum);
   const { activePage, setActivePage, setDialogOpen } = useDevice();
 
   interface NavLink {
@@ -62,9 +62,9 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
       <div className="flex justify-between px-8 py-6">
         <div>
           <span className="text-lg font-medium">
-            {myNode?.data.user?.shortName ?? "UNK"}
+            {myNode?.user?.shortName ?? "UNK"}
           </span>
-          <Subtle>{myNode?.data.user?.longName ?? "UNK"}</Subtle>
+          <Subtle>{myNode?.user?.longName ?? "UNK"}</Subtle>
         </div>
         <button
           className="transition-all hover:text-accent"

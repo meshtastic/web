@@ -1,33 +1,46 @@
+import { Subtle } from "@app/components/UI/Typography/Subtle.js";
+import { MessageWithState, useDevice } from "@app/core/stores/deviceStore.js";
 import { Message } from "@components/PageComponents/Messages/Message.js";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.js";
-import { useDevice } from "@core/stores/deviceStore.js";
-import type { Channel } from "@core/stores/deviceStore.js";
+import type { Types } from "@meshtastic/meshtasticjs";
+import { InboxIcon } from "lucide-react";
 
 export interface ChannelChatProps {
-  channel: Channel;
+  messages?: MessageWithState[];
+  channel: Types.ChannelNumber;
+  to: Types.Destination;
 }
 
-export const ChannelChat = ({ channel }: ChannelChatProps): JSX.Element => {
+export const ChannelChat = ({
+  messages,
+  channel,
+  to
+}: ChannelChatProps): JSX.Element => {
   const { nodes } = useDevice();
 
   return (
     <div className="flex flex-grow flex-col">
       <div className="flex flex-grow flex-col">
-        {channel.messages.map((message, index) => (
-          <Message
-            key={index}
-            message={message}
-            lastMsgSameUser={
-              index === 0
-                ? false
-                : channel.messages[index - 1].from === message.from
-            }
-            sender={nodes.find((node) => node.data.num === message.from)?.data}
-          />
-        ))}
+        {messages ? (
+          messages.map((message, index) => (
+            <Message
+              key={index}
+              message={message}
+              lastMsgSameUser={
+                index === 0 ? false : messages[index - 1].from === message.from
+              }
+              sender={nodes.get(message.from)}
+            />
+          ))
+        ) : (
+          <div className="m-auto">
+            <InboxIcon className="m-auto" />
+            <Subtle>No Messages</Subtle>
+          </div>
+        )}
       </div>
       <div className="p-3">
-        <MessageInput channel={channel} />
+        <MessageInput to={to} channel={channel} />
       </div>
     </div>
   );

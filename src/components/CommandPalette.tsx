@@ -122,9 +122,8 @@ export const CommandPalette = (): JSX.Element => {
           subItems: getDevices().map((device) => {
             return {
               label:
-                device.nodes.find(
-                  (n) => n.data.num === device.hardware.myNodeNum
-                )?.data.user?.longName ?? device.hardware.myNodeNum.toString(),
+                device.nodes.get(device.hardware.myNodeNum)?.user?.longName ??
+                device.hardware.myNodeNum.toString(),
               icon: (
                 <Hashicon
                   size={16}

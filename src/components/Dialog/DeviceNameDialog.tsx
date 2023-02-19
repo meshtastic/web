@@ -29,19 +29,19 @@ export const DeviceNameDialog = ({
 }: DeviceNameDialogProps): JSX.Element => {
   const { hardware, nodes, connection } = useDevice();
 
-  const myNode = nodes.find((n) => n.data.num === hardware.myNodeNum);
+  const myNode = nodes.get(hardware.myNodeNum);
 
   const { register, handleSubmit } = useForm<User>({
     values: {
-      longName: myNode?.data.user?.longName ?? "Unknown",
-      shortName: myNode?.data.user?.shortName ?? "Unknown"
+      longName: myNode?.user?.longName ?? "Unknown",
+      shortName: myNode?.user?.shortName ?? "Unknown"
     }
   });
 
   const onSubmit = handleSubmit((data) => {
     connection?.setOwner(
       new Protobuf.User({
-        ...myNode?.data.user,
+        ...myNode?.user,
         ...data
       })
     );

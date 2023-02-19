@@ -14,7 +14,7 @@ export const DialogManager = (): JSX.Element => {
         onOpenChange={(open) => {
           setDialogOpen("QR", open);
         }}
-        channels={channels.map((ch) => ch.config)}
+        channels={channels}
         loraConfig={config.lora}
       />
       <ImportDialog
@@ -22,7 +22,7 @@ export const DialogManager = (): JSX.Element => {
         onOpenChange={(open) => {
           setDialogOpen("import", open);
         }}
-        channels={channels.map((ch) => ch.config)}
+        channels={channels}
         loraConfig={config.lora}
       />
       <ShutdownDialog

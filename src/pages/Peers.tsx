@@ -8,7 +8,11 @@ import { Protobuf } from "@meshtastic/meshtasticjs";
 import { Sidebar } from "@components/Sidebar.js";
 
 export const PeersPage = (): JSX.Element => {
-  const { connection, nodes } = useDevice();
+  const { nodes, hardware } = useDevice();
+
+  const filteredNodes = Array.from(nodes.values()).filter(
+    (n) => n.num !== hardware.myNodeNum
+  );
 
   return (
     <>
@@ -23,32 +27,32 @@ export const PeersPage = (): JSX.Element => {
             { title: "Last Heard", type: "normal", sortable: true },
             { title: "SNR", type: "normal", sortable: true }
           ]}
-          rows={nodes.map((node) => [
-            <Hashicon size={24} value={node.data.num.toString()} />,
+          rows={filteredNodes.map((node) => [
+            <Hashicon size={24} value={node.num.toString()} />,
             <h1>
-              {node.data.user?.longName ?? node.data.user?.macaddr
+              {node.user?.longName ?? node.user?.macaddr
                 ? `Meshtastic_${base16
-                    .stringify(node.data.user?.macaddr.subarray(4, 6) ?? [])
+                    .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
                     .toLowerCase()}`
-                : `UNK: ${node.data.num}`}
+                : `UNK: ${node.num}`}
             </h1>,
 
-            <Mono>{Protobuf.HardwareModel[node.data.user?.hwModel ?? 0]}</Mono>,
+            <Mono>{Protobuf.HardwareModel[node.user?.hwModel ?? 0]}</Mono>,
             <Mono>
               {base16
-                .stringify(node.data.user?.macaddr ?? [])
+                .stringify(node.user?.macaddr ?? [])
                 .match(/.{1,2}/g)
                 ?.join(":") ?? "UNK"}
             </Mono>,
-            node.data.lastHeard === 0 ? (
+            node.lastHeard === 0 ? (
               <p>Never</p>
             ) : (
-              <TimeAgo timestamp={node.data.lastHeard * 1000} />
+              <TimeAgo timestamp={node.lastHeard * 1000} />
             ),
             <Mono>
-              {node.data.snr}db/
-              {Math.min(Math.max((node.data.snr + 10) * 5, 0), 100)}%/
-              {(node.data.snr + 10) * 5}raw
+              {node.snr}db/
+              {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%/
+              {(node.snr + 10) * 5}raw
             </Mono>
           ])}
         />

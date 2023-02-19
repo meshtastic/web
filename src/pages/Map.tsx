@@ -21,13 +21,17 @@ export const MapPage = (): JSX.Element => {
   const { rasterSources } = useAppStore();
   const { default: map } = useMap();
 
+  const allNodes = Array.from(nodes.values());
+
   const getBBox = () => {
-    const nodesWithPosition = nodes.filter((n) => n.data.position?.latitudeI);
+    const nodesWithPosition = allNodes.filter(
+      (node) => node.position?.latitudeI
+    );
     if (!nodesWithPosition.length) return;
     const line = lineString(
       nodesWithPosition.map((n) => [
-        (n.data.position?.latitudeI ?? 0) / 1e7,
-        (n.data.position?.longitudeI ?? 0) / 1e7
+        (n.position?.latitudeI ?? 0) / 1e7,
+        (n.position?.longitudeI ?? 0) / 1e7
       ])
     );
     const bounds = bbox(line);
@@ -43,8 +47,8 @@ export const MapPage = (): JSX.Element => {
       map?.easeTo({
         zoom: 12,
         center: [
-          (nodesWithPosition[0].data.position?.longitudeI ?? 0) / 1e7,
-          (nodesWithPosition[0].data.position?.latitudeI ?? 0) / 1e7
+          (nodesWithPosition[0].position?.longitudeI ?? 0) / 1e7,
+          (nodesWithPosition[0].position?.latitudeI ?? 0) / 1e7
         ]
       });
   };
@@ -123,16 +127,16 @@ export const MapPage = (): JSX.Element => {
               <Layer type="raster" />
             </Source>
           ))} */}
-          {nodes.map((n) => {
-            if (n.data.position?.latitudeI) {
+          {allNodes.map((node) => {
+            if (node.position?.latitudeI) {
               return (
                 <Marker
-                  key={n.data.num}
-                  longitude={n.data.position.longitudeI / 1e7}
-                  latitude={n.data.position.latitudeI / 1e7}
+                  key={node.num}
+                  longitude={node.position.longitudeI / 1e7}
+                  latitude={node.position.latitudeI / 1e7}
                   anchor="bottom"
                 >
-                  <Hashicon value={n.data.num.toString()} size={32} />
+                  <Hashicon value={node.num.toString()} size={32} />
                 </Marker>
               );
             }

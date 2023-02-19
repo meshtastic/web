@@ -11,7 +11,7 @@ export const subscribeAll = (
   // onMeshHeartbeat
 
   connection.events.onDeviceMetadataPacket.subscribe((metadataPacket) => {
-    device.addDeviceMetadataMessage(metadataPacket);
+    device.addMetadata(metadataPacket.from, metadataPacket.data);
   });
 
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
@@ -34,27 +34,16 @@ export const subscribeAll = (
   });
 
   connection.events.onTelemetryPacket.subscribe((telemetryPacket) => {
-    device.setMetrics(telemetryPacket);
+    // device.setMetrics(telemetryPacket);
   });
 
   connection.events.onDeviceStatus.subscribe((status) => {
     device.setStatus(status);
-
-    if (status === Types.DeviceStatusEnum.DEVICE_CONFIGURED) {
-      // device.setReady(true);
-    } else if (status === Types.DeviceStatusEnum.DEVICE_DISCONNECTED) {
-      device.setReady(false);
-    }
   });
 
   connection.events.onWaypointPacket.subscribe((waypoint) => {
     const { data, ...rest } = waypoint;
     device.addWaypoint(data);
-    device.addWaypointMessage({
-      waypointID: data.id,
-      state: rest.from !== myNodeNum ? "ack" : "waiting",
-      ...rest
-    });
   });
 
   connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
@@ -78,11 +67,7 @@ export const subscribeAll = (
   });
 
   connection.events.onChannelPacket.subscribe((channel) => {
-    device.addChannel({
-      config: channel,
-      lastInterraction: new Date(),
-      messages: []
-    });
+    device.addChannel(channel);
   });
   connection.events.onConfigPacket.subscribe((config) => {
     device.setConfig(config);

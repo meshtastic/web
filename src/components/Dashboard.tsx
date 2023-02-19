@@ -42,9 +42,8 @@ export const Dashboard = () => {
                   <div className="px-4 py-4 sm:px-6">
                     <div className="flex items-center justify-between">
                       <p className="truncate text-sm font-medium text-accent">
-                        {device.nodes.filter(
-                          (n) => n.data.num === device.hardware.myNodeNum
-                        )[0]?.data.user?.longName ?? "UNK"}
+                        {device.nodes.get(device.hardware.myNodeNum)?.user
+                          ?.longName ?? "UNK"}
                       </p>
                       <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
                         {device.connection?.connType === "ble" && (
@@ -74,9 +73,7 @@ export const Dashboard = () => {
                           className="text-gray-400"
                           aria-hidden="true"
                         />
-                        {device.nodes.length === 0
-                          ? 0
-                          : device.nodes.length - 1}
+                        {device.nodes.size === 0 ? 0 : device.nodes.size - 1}
                       </div>
                     </div>
                   </div>

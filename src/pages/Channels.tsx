@@ -5,10 +5,7 @@ import { Channel } from "@components/PageComponents/Channel.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { QrCodeIcon, ImportIcon } from "lucide-react";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
 import { useState } from "react";
-import { Button } from "@components/UI/Button.js";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import {
   Tabs,
   TabsContent,
@@ -35,7 +32,7 @@ export const ChannelsPage = (): JSX.Element => {
       <PageLayout
         label={`Channel: ${
           channels[activeChannel]
-            ? getChannelName(channels[activeChannel].config)
+            ? getChannelName(channels[activeChannel])
             : "Loading..."
         }`}
         actions={[
@@ -58,20 +55,14 @@ export const ChannelsPage = (): JSX.Element => {
         <Tabs defaultValue="0">
           <TabsList>
             {channels.map((channel) => (
-              <TabsTrigger
-                key={channel.config.index}
-                value={channel.config.index.toString()}
-              >
-                {getChannelName(channel.config)}
+              <TabsTrigger key={channel.index} value={channel.index.toString()}>
+                {getChannelName(channel)}
               </TabsTrigger>
             ))}
           </TabsList>
           {channels.map((channel) => (
-            <TabsContent
-              key={channel.config.index}
-              value={channel.config.index.toString()}
-            >
-              <Channel key={channel.config.index} channel={channel.config} />
+            <TabsContent key={channel.index} value={channel.index.toString()}>
+              <Channel key={channel.index} channel={channel} />
             </TabsContent>
           ))}
         </Tabs>

@@ -1,29 +1,50 @@
 import { Input } from "@components/UI/Input.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import type { Channel } from "@core/stores/deviceStore.js";
 import { SendIcon } from "lucide-react";
 import type { Types } from "@meshtastic/meshtasticjs";
 import { Button } from "@components/UI/Button.js";
 
 export interface MessageInputProps {
-  channel: Channel;
+  to: Types.Destination;
+  channel: Types.ChannelNumber;
 }
 
-export const MessageInput = ({ channel }: MessageInputProps): JSX.Element => {
-  const { connection, setMessageState, messageDraft, setMessageDraft } =
-    useDevice();
+export const MessageInput = ({
+  to,
+  channel
+}: MessageInputProps): JSX.Element => {
+  const {
+    connection,
+    setMessageState,
+    messageDraft,
+    setMessageDraft,
+    hardware
+  } = useDevice();
+
+  const myNodeNum = hardware.myNodeNum;
 
   const sendText = async (message: string) => {
     await connection
-      ?.sendText(
-        message,
-        "broadcast",
-        true,
-        channel.config.index as Types.ChannelNumber
+      ?.sendText(message, to, true, channel)
+      .then((id) =>
+        setMessageState(
+          to === "broadcast" ? "broadcast" : "direct",
+          channel,
+          to as number,
+          myNodeNum,
+          id,
+          "ack"
+        )
       )
-      .then((id) => setMessageState(channel.config.index, id, "ack"))
       .catch((e: Types.PacketError) =>
-        setMessageState(channel.config.index, e.id, e.error)
+        setMessageState(
+          to === "broadcast" ? "broadcast" : "direct",
+          channel,
+          to as number,
+          myNodeNum,
+          e.id,
+          e.error
+        )
       );
   };
 
