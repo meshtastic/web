@@ -23,6 +23,7 @@
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^2.9.11",
     "@meshtastic/meshtasticjs": "2.0.20-5",
+    "@preact/signals-react": "^1.2.2",
     "@radix-ui/react-accordion": "^1.1.0",
     "@radix-ui/react-checkbox": "^1.0.1",
     "@radix-ui/react-dialog": "^1.0.2",
