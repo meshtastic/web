@@ -26,14 +26,15 @@ export const ChannelsPage = (): JSX.Element => {
     Types.ChannelNumber.PRIMARY
   );
 
+  const currentChannel = channels.get(activeChannel);
+  const allChannels = Array.from(channels.values());
+
   return (
     <>
       <Sidebar></Sidebar>
       <PageLayout
         label={`Channel: ${
-          channels[activeChannel]
-            ? getChannelName(channels[activeChannel])
-            : "Loading..."
+          currentChannel ? getChannelName(currentChannel) : "Loading..."
         }`}
         actions={[
           {
@@ -54,13 +55,13 @@ export const ChannelsPage = (): JSX.Element => {
       >
         <Tabs defaultValue="0">
           <TabsList>
-            {channels.map((channel) => (
+            {allChannels.map((channel) => (
               <TabsTrigger key={channel.index} value={channel.index.toString()}>
                 {getChannelName(channel)}
               </TabsTrigger>
             ))}
           </TabsList>
-          {channels.map((channel) => (
+          {allChannels.map((channel) => (
             <TabsContent key={channel.index} value={channel.index.toString()}>
               <Channel key={channel.index} channel={channel} />
             </TabsContent>

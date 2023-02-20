@@ -1,4 +1,11 @@
-import { IsBoolean, IsEnum, IsIP, IsOptional, Length } from "class-validator";
+import {
+  IsBoolean,
+  IsEnum,
+  IsIP,
+  IsOptional,
+  IsString,
+  Length
+} from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -31,6 +38,7 @@ export class NetworkValidation
 
   ipv4Config: NetworkValidation_IpV4Config;
 
+  @IsString()
   rsyslogServer: string;
 }
 

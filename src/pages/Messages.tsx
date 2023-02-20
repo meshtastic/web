@@ -20,31 +20,34 @@ export const MessagesPage = (): JSX.Element => {
   const filteredNodes = Array.from(nodes.values()).filter(
     (n) => n.num !== hardware.myNodeNum
   );
+  const allChannels = Array.from(channels.values());
+  const filteredChannels = allChannels.filter(
+    (ch) => ch.role !== Protobuf.Channel_Role.DISABLED
+  );
+  const currentChannel = channels.get(activeChat);
 
   return (
     <>
       <Sidebar>
         <SidebarSection label="Channels">
-          {channels
-            .filter((ch) => ch.role !== Protobuf.Channel_Role.DISABLED)
-            .map((channel) => (
-              <SidebarButton
-                key={channel.index}
-                label={
-                  channel.settings?.name.length
-                    ? channel.settings?.name
-                    : channel.index === 0
-                    ? "Primary"
-                    : `Ch ${channel.index}`
-                }
-                active={activeChat === channel.index}
-                onClick={() => {
-                  setChatType("broadcast");
-                  setActiveChat(channel.index);
-                }}
-                element={<HashIcon size={16} className="mr-2" />}
-              />
-            ))}
+          {filteredChannels.map((channel) => (
+            <SidebarButton
+              key={channel.index}
+              label={
+                channel.settings?.name.length
+                  ? channel.settings?.name
+                  : channel.index === 0
+                  ? "Primary"
+                  : `Ch ${channel.index}`
+              }
+              active={activeChat === channel.index}
+              onClick={() => {
+                setChatType("broadcast");
+                setActiveChat(channel.index);
+              }}
+              element={<HashIcon size={16} className="mr-2" />}
+            />
+          ))}
         </SidebarSection>
         <SidebarSection label="Peers">
           {filteredNodes.map((node) => (
@@ -63,14 +66,14 @@ export const MessagesPage = (): JSX.Element => {
       </Sidebar>
       <PageLayout
         label={`Messages: ${
-          chatType === "broadcast" && channels[activeChat]
-            ? getChannelName(channels[activeChat])
+          chatType === "broadcast" && currentChannel
+            ? getChannelName(currentChannel)
             : chatType === "direct" && nodes.get(activeChat)
             ? nodes.get(activeChat)?.user?.longName ?? "Unknown"
             : "Loading..."
         }`}
       >
-        {channels.map(
+        {allChannels.map(
           (channel) =>
             activeChat === channel.index && (
               <ChannelChat

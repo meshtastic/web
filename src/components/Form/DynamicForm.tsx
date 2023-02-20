@@ -10,6 +10,7 @@ import { H4 } from "@components/UI/Typography/H4.js";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { DynamicFormField, FieldProps } from "./DynamicFormField.js";
 import { FieldWrapper } from "./FormWrapper.js";
+import { Button } from "../UI/Button.js";
 
 interface DisabledBy<T> {
   fieldName: Path<T>;
@@ -33,6 +34,8 @@ export interface GenericFormElementProps<T extends FieldValues, Y> {
 
 export interface DynamicFormProps<T extends FieldValues> {
   onSubmit: SubmitHandler<T>;
+  submitType?: "onChange" | "onSubmit";
+  hasSubmitButton?: boolean;
   defaultValues?: DeepPartial<T>;
   fieldGroups: {
     label: string;
@@ -42,12 +45,14 @@ export interface DynamicFormProps<T extends FieldValues> {
 }
 
 export function DynamicForm<T extends FieldValues>({
-  fieldGroups,
   onSubmit,
-  defaultValues
+  submitType = "onChange",
+  hasSubmitButton,
+  defaultValues,
+  fieldGroups
 }: DynamicFormProps<T>) {
   const { handleSubmit, control, getValues } = useForm<T>({
-    mode: "onChange",
+    mode: submitType,
     defaultValues: defaultValues
   });
 
@@ -68,7 +73,11 @@ export function DynamicForm<T extends FieldValues>({
   return (
     <form
       className="space-y-8 divide-y divide-gray-200"
-      onChange={handleSubmit(onSubmit)}
+      {...(submitType === "onSubmit"
+        ? { onSubmit: handleSubmit(onSubmit) }
+        : {
+            onChange: handleSubmit(onSubmit)
+          })}
     >
       {fieldGroups.map((fieldGroup, index) => (
         <div
@@ -92,6 +101,7 @@ export function DynamicForm<T extends FieldValues>({
           ))}
         </div>
       ))}
+      {hasSubmitButton && <Button type="submit">Submit</Button>}
     </form>
   );
 }

@@ -20,7 +20,6 @@ export interface ImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   loraConfig?: Protobuf.Config_LoRaConfig;
-  channels: Protobuf.Channel[];
 }
 
 export const ImportDialog = ({

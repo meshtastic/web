@@ -30,7 +30,7 @@ export type DialogVariant =
 export interface Device {
   id: number;
   status: Types.DeviceStatusEnum;
-  channels: Protobuf.Channel[];
+  channels: Map<Types.ChannelNumber, Protobuf.Channel>;
   config: Protobuf.LocalConfig;
   moduleConfig: Protobuf.LocalModuleConfig;
   workingConfig: Protobuf.Config[];
@@ -108,7 +108,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
         draft.devices.set(id, {
           id,
           status: Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
-          channels: [],
+          channels: new Map(),
           config: new Protobuf.LocalConfig(),
           moduleConfig: new Protobuf.LocalModuleConfig(),
           workingConfig: [],
@@ -336,16 +336,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
-                if (device) {
-                  const channelIndex = device.channels.findIndex(
-                    (c) => c.index === channel.index
-                  );
-                  if (channelIndex !== -1) {
-                    device.channels[channelIndex] = channel;
-                  } else {
-                    device.channels.push(channel);
-                  }
+                if (!device) {
+                  return;
                 }
+                device.channels.set(channel.index, channel);
               })
             );
           },

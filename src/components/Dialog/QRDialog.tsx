@@ -12,14 +12,14 @@ import {
   DialogTitle
 } from "@components/UI/Dialog.js";
 import { ClipboardIcon } from "lucide-react";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 import { Label } from "@components/UI/Label.js";
 
 export interface QRDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   loraConfig?: Protobuf.Config_LoRaConfig;
-  channels: Protobuf.Channel[];
+  channels: Map<Types.ChannelNumber, Protobuf.Channel>;
 }
 
 export const QRDialog = ({
@@ -31,9 +31,12 @@ export const QRDialog = ({
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [QRCodeURL, setQRCodeURL] = useState<string>("");
 
+  const filteredChannels = Array.from(channels.values()).filter((channel) =>
+    selectedChannels.includes(channel.index)
+  );
+
   useEffect(() => {
-    const channelsToEncode = channels
-      .filter((channel) => selectedChannels.includes(channel.index))
+    const channelsToEncode = filteredChannels
       .map((channel) => channel.settings)
       .filter((ch): ch is Protobuf.ChannelSettings => !!ch);
     const encoded = new Protobuf.ChannelSet(
@@ -62,7 +65,7 @@ export const QRDialog = ({
         <div className="grid gap-4 py-4">
           <div className="flex gap-3 px-4 py-5 sm:p-6">
             <div className="flex w-40 flex-col gap-1">
-              {channels.map((channel) => (
+              {filteredChannels.map((channel) => (
                 <div key={channel.index}>
                   <Label>
                     {channel.settings?.name.length

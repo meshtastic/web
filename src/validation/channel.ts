@@ -7,15 +7,24 @@ import {
   Length
 } from "class-validator";
 
-import type { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
-export class ChannelSettingsValidation
+export class ChannelValidation
+  implements Omit<Protobuf.Channel, keyof Protobuf.native.Message | "settings">
+{
+  @IsNumber()
+  index: number;
+
+  settings: Channel_SettingsValidation;
+
+  @IsEnum(Protobuf.Channel_Role)
+  role: Protobuf.Channel_Role;
+}
+
+export class Channel_SettingsValidation
   implements
     Omit<Protobuf.ChannelSettings, keyof Protobuf.native.Message | "psk">
 {
-  @IsBoolean()
-  enabled: boolean;
-
   @IsNumber()
   channelNum: number;
 

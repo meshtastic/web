@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
 import { fromByteArray, toByteArray } from "base64-js";
-import type { ChannelSettingsValidation } from "@app/validation/channelSettings.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { ChannelValidation } from "@app/validation/channel.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import { DynamicForm } from "../Form/DynamicForm.js";
 
@@ -10,10 +8,6 @@ export interface SettingsPanelProps {
 }
 
 export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
-  const { connection, addChannel } = useDevice();
-  const [keySize, setKeySize] = useState<128 | 256>(256);
-  const [pskHidden, setPskHidden] = useState(true);
-
   // const {
   //   register,
   //   handleSubmit,
@@ -81,116 +75,23 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   //     );
   // });
 
-  const onSubmit = (data: ChannelSettingsValidation) => {
+  const onSubmit = (data: ChannelValidation) => {
     console.log(data);
   };
 
   return (
-    // <div className="p-3">
-    //   <form onSubmit={onSubmit}>
-    //     {channel?.index !== 0 && (
-    //       <>
-    //         <Controller
-    //           name="enabled"
-    //           control={control}
-    //           render={({ field: { value, ...rest } }) => (
-    //             <>
-    //               <Label>Enabled</Label>
-    //               <Switch
-    //                 // label="Enabled"
-    //                 // description="Description"
-    //                 checked={value}
-    //                 {...rest}
-    //               />
-    //             </>
-    //           )}
-    //         />
-    //         <Label>Name</Label>
-    //         <Input
-    //           // description="Max transmit power in dBm"
-    //           // error={errors.name?.message}
-    //           {...register("name")}
-    //         />
-    //       </>
-    //     )}
-    //     {/* <Select
-    //       label="Key Size"
-    //       description="Desired size of generated key."
-    //       value={keySize}
-    //       onChange={(e): void => {
-    //         setKeySize(parseInt(e.target.value) as 128 | 256);
-    //       }}
-    //       action={{
-    //         icon: <RefreshCwIcon size={16} />,
-    //         action: () => {
-    //           const key = new Uint8Array(keySize / 8);
-    //           crypto.getRandomValues(key);
-    //           setValue("psk", fromByteArray(key), {
-    //             shouldDirty: true
-    //           });
-    //         }
-    //       }}
-    //     >
-    //       <option value={128}>128 Bit</option>
-    //       <option value={256}>256 Bit</option>
-    //     </Select> */}
-    //     <Label>Pre-Shared Key</Label>
-    //     <Input
-    //       // width="100%"
-    //       // label="Pre-Shared Key"
-    //       // description="Channel key to encrypt data"
-    //       type={pskHidden ? "password" : "text"}
-    //       action={{
-    //         icon: pskHidden ? EyeIcon : EyeOffIcon,
-    //         onClick: () => {
-    //           setPskHidden(!pskHidden);
-    //         }
-    //       }}
-    //       // error={errors.psk?.message}
-    //       {...register("psk")}
-    //     />
-    //     <Controller
-    //       name="uplinkEnabled"
-    //       control={control}
-    //       render={({ field: { value, ...rest } }) => (
-    //         <>
-    //           <Label>Uplink Enabled</Label>
-    //           <Switch
-    //             // label="Uplink Enabled"
-    //             // description="Send packets to designated MQTT server"
-    //             checked={value}
-    //             {...rest}
-    //           />
-    //         </>
-    //       )}
-    //     />
-    //     <Controller
-    //       name="downlinkEnabled"
-    //       control={control}
-    //       render={({ field: { value, ...rest } }) => (
-    //         <>
-    //           <Label>Downlink Enabled</Label>
-    //           <Switch
-    //             // label="Downlink Enabled"
-    //             // description="Recieve packets to designated MQTT server"
-    //             checked={value}
-    //             {...rest}
-    //           />
-    //         </>
-    //       )}
-    //     />
-    //   </form>
-    <DynamicForm<ChannelSettingsValidation>
+    <DynamicForm<ChannelValidation>
       onSubmit={onSubmit}
+      submitType="onSubmit"
+      hasSubmitButton={true}
       defaultValues={{
-        enabled: [
-          Protobuf.Channel_Role.SECONDARY,
-          Protobuf.Channel_Role.PRIMARY
-        ].find((role) => role === channel?.role)
-          ? true
-          : false,
-        ...channel?.settings,
-        psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0))
+        ...channel,
+        ...{
+          settings: {
+            ...channel?.settings,
+            psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0))
+          }
+        }
       }}
       fieldGroups={[
         {
@@ -198,80 +99,52 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
           description: "Settings for the Bluetooth module",
           fields: [
             {
-              type: "toggle",
-              name: "enabled",
-              label: "Enabled",
-              description: "Description"
+              type: "select",
+              name: "role",
+              label: "Role",
+              description: "Description",
+              properties: {
+                enumValue: Protobuf.Channel_Role
+              }
             },
             {
               type: "password",
-              name: "psk",
+              name: "settings.psk",
               label: "pre-Shared Key",
               description: "Description",
-
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ],
               properties: {
                 // act
               }
             },
             {
               type: "number",
-              name: "channelNum",
+              name: "settings.channelNum",
               label: "Channel Number",
-              description: "Description",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Description"
             },
             {
               type: "text",
-              name: "name",
+              name: "settings.name",
               label: "Name",
-              description: "Description",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Description"
             },
             {
               type: "number",
-              name: "id",
+              name: "settings.id",
               label: "ID",
-              description: "Description",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Description"
             },
             {
               type: "toggle",
-              name: "uplinkEnabled",
+              name: "settings.uplinkEnabled",
               label: "Uplink Enabled",
-              description: "Description",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Description"
             },
             {
               type: "toggle",
-              name: "downlinkEnabled",
+              name: "settings.downlinkEnabled",
               label: "Downlink Enabled",
-              description: "Description",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Description"
             }
           ]
         }

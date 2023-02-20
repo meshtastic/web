@@ -22,7 +22,6 @@ export const DialogManager = (): JSX.Element => {
         onOpenChange={(open) => {
           setDialogOpen("import", open);
         }}
-        channels={channels}
         loraConfig={config.lora}
       />
       <ShutdownDialog
