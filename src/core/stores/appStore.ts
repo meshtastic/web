@@ -1,5 +1,6 @@
 import { produce } from "immer";
 import { create } from "zustand";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export interface RasterSource {
   enabled: boolean;
@@ -28,6 +29,7 @@ interface AppState {
   darkMode: boolean;
   accent: accentColor;
   connectDialogOpen: boolean;
+  configPresetRoot: ConfigPreset;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -40,6 +42,8 @@ interface AppState {
   setDarkMode: (enabled: boolean) => void;
   setAccent: (color: accentColor) => void;
   setConnectDialogOpen: (open: boolean) => void;
+  setConfigPresetRoot: (root: ConfigPreset) => void;
+
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -51,6 +55,7 @@ export const useAppStore = create<AppState>()((set) => ({
   darkMode: false,
   accent: "orange",
   connectDialogOpen: false,
+  configPresetRoot: undefined,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -112,5 +117,18 @@ export const useAppStore = create<AppState>()((set) => ({
         draft.connectDialogOpen = open;
       })
     );
+  },
+  setConfigPresetRoot: (root: ConfigPreset) => {
+    set(
+      produce<AppState>((draft) => {
+        draft.configPresetRoot = root;
+      })
+    )
   }
 }));
+
+export class ConfigPreset {
+  public children: ConfigPreset[] = [];
+
+  public constructor(public name: string, public config : Protobuf.Config) { }
+}
