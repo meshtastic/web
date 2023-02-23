@@ -9,12 +9,13 @@ import { PositionWidget } from "@components/Widgets/PositionWidget.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { Device, useDeviceStore } from "@core/stores/deviceStore.js";
 import { CommandLineIcon } from "@heroicons/react/24/outline";
-import { Types } from "@meshtastic/meshtasticjs";
+import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
 import { Input } from "./form/Input.js";
 import { Mono } from "./generic/Mono.js";
 import { useState } from "react";
 import { Button } from "./form/Button.js";
+import { getCurrentConfig } from "@app/core/stores/configStore.js";
 
 export const SidebarSetup = (): JSX.Element => {
   // const { removeDevice } = useDeviceStore();
@@ -26,12 +27,13 @@ export const SidebarSetup = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
   const devices = getDevices();
   const devicesToFlash = devices.map(d => d.selectedToFlash);
+  const currentConfig = getCurrentConfig();
 
   return (    
     // <div className="flex flex-grow">
       <div className="bg-slate-50 relative flex w-72 flex-shrink-0 flex-col gap-2 p-2">
         <div className="h-1/2">
-          <div className="flex h-16 flex-col gap-2 overflow-y-auto">        
+          <div className="flex h-16 flex-col gap-2 overflow-y-auto">
             {devices.map((device, index) => (
               <Button
                 key={index}
@@ -50,10 +52,61 @@ export const SidebarSetup = (): JSX.Element => {
           </div>
         </div>      
         <div className="w-1/1 h-0.5 bg-accent"></div>
-        <div className="h-1/2">{<Mono>(Configurations go here)</Mono>}</div>
+        <div className="h-1/2 flex flex-col">{
+          <div className="flex h-16 flex-col gap-2 overflow-y-auto">
+          {[ currentConfig ].map((c, index) => (
+            <Button          
+            color={"bg-accentMuted"}
+            onClick={() => {                        
+              
+            }}
+            size="sm"
+            >
+              { `Config ${index}` }
+            </Button>       
+          ))}
+          
+        </div> 
+          }
+          <div className="mt-auto space-y-1.5">{
+            <Button          
+            color={"bg-accentMuted"}
+            onClick={() => {                        
+              
+            }}
+            size="sm"
+            >
+              { "New config" }
+            </Button>      
+          }{
+            <Button          
+            color={"bg-accentMuted"}
+            onClick={async () => {
+              const configToUse = new Protobuf.Config({
+                payloadVariant: {
+                  case: "device",
+                  value: currentConfig.configCust.device!
+                }
+              });
+              console.warn("Uploading configs");
+              devices[0].connection?.setConfig(configToUse);
+                devices[0].connection?.commitEditSettings();
+              const configPromises = devices.filter((d, i) => devicesToFlash[i]).map((d, i) => {
+                console.warn(`Device ${i}`)
+                d.connection?.setConfig(configToUse);
+                d.connection?.commitEditSettings();
+              });              
+              await Promise.all(configPromises);
+              console.warn("Successfully uploaded");
+            }}
+            size="sm"
+            >
+              { "-- Test config upload --" }
+            </Button>
+          }</div>          
         
+        </div>
       </div>
-    // </div>
   );
 };
 
