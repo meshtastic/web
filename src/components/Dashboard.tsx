@@ -32,7 +32,7 @@ export const Dashboard = () => {
   if(configPresetRoot == undefined && devices.length > 0) {
     // Initialize configs if none exist yet    
     const basicConfig: ConfigPreset = new ConfigPreset("Root", devices[0].config /* TEMP ONLY */);
-    basicConfig.children.push(new ConfigPreset("TEST", devices[0].config));
+    basicConfig.children.push(new ConfigPreset("Preset 0", devices[0].config));
     setConfigPresetRoot(basicConfig);        
     configPresetRoot = useAppStore().configPresetRoot;    
   }    
@@ -51,7 +51,7 @@ export const Dashboard = () => {
       <div className="flex w-full h-full gap-3">
         <div className="flex flex-col w-[400px] h-full">
           <DeviceList devices={devices}/>
-          <ConfigList configs={configPresetRoot?.children}/>
+          <ConfigList rootConfig={configPresetRoot}/>
         </div>
         {devices.length > 0 ? (        
         <DeviceWrapper device={devices[0]}>
@@ -154,13 +154,23 @@ const DeviceList = ({devices}: {devices: Device[]}) => {
 };
 
 
-const ConfigList = ({configs}: {configs: ConfigPreset[]}) => {
+const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
+  
   const { setConfigPresetRoot, configPresetSelected, setConfigPresetSelected } = useAppStore();
   const [dummyState, setDummyState] = useState(0);
 
   return (
-    <div className="flex rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
-      {configs ? configs.map((config, index) => {
+    <div className="flex flex-col rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
+      <button        
+        className="transition-all hover:text-accent mb-4"
+        onClick={() => {
+          rootConfig?.children.push(new ConfigPreset(`Preset ${rootConfig.children.length}`, rootConfig.children[0]));
+          setDummyState(dummyState + 1);
+        }}
+      >
+        <PlusIcon/>
+      </button>
+      {rootConfig ? rootConfig.children.map((config, index) => {
         return (<ConfigSelectButton
           label={config.name}
           active={index == configPresetSelected}
