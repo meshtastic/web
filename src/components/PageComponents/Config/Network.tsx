@@ -1,25 +1,26 @@
 import type { NetworkValidation } from "@app/validation/config/network.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Network = (): JSX.Element => {
-  const { config, setWorkingConfig } = useDevice();
+  // const { config, setWorkingConfig } = useDevice();
+  const config = useConfig();  
 
   const onSubmit = (data: NetworkValidation) => {
-    setWorkingConfig(
-      new Protobuf.Config({
-        payloadVariant: {
-          case: "network",
-          value: {
-            ...data,
-            ipv4Config: new Protobuf.Config_NetworkConfig_IpV4Config(
-              data.ipv4Config
-            )
-          }
-        }
-      })
-    );
+    // setWorkingConfig(
+    //   new Protobuf.Config({
+    //     payloadVariant: {
+    //       case: "network",
+    //       value: {
+    //         ...data,
+    //         ipv4Config: new Protobuf.Config_NetworkConfig_IpV4Config(
+    //           data.ipv4Config
+    //         )
+    //       }
+    //     }
+    //   })
+    // );
   };
 
   return (

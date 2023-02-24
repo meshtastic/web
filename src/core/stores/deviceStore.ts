@@ -595,7 +595,7 @@ export const useDevice = (): Device => {
   return context;
 };
 
-export const useConfig = (): Protobuf.Config => {
+export const useConfig = (): Protobuf.LocalConfig => {
   const context = useContext(DeviceContext);
   if(context == undefined) {
     const {configPresetRoot, configPresetSelected } = useAppStore();

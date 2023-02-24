@@ -140,5 +140,5 @@ export class ConfigPreset {
   public children: ConfigPreset[] = [];
   public count: number = 0;
 
-  public constructor(public name: string, public config : Protobuf.Config) { }
+  public constructor(public name: string, public config : Protobuf.LocalConfig) { }
 }

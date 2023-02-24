@@ -36,6 +36,7 @@ export const Dashboard = () => {
     setConfigPresetRoot(basicConfig);        
     configPresetRoot = useAppStore().configPresetRoot;    
   }    
+  //const totalConfigCount = configPresetRoot.children.reduce((r, p) => r + p.count, 0);
   
   return (
     <div className="flex flex-col h-full gap-3 p-3">
@@ -50,20 +51,20 @@ export const Dashboard = () => {
 
       <div className="flex w-full h-full gap-3">
         <div className="flex flex-col w-[400px] h-full">
-          <DeviceList devices={devices}/>
+          <DeviceList devices={devices} /*umSelectedConfigs={}*//>
           <ConfigList rootConfig={configPresetRoot}/>
         </div>
         {devices.length > 0 ? (        
-        <DeviceWrapper device={devices[0]}>
-          <div className="flex w-full h-full"><DeviceConfig/></div>          
-        </DeviceWrapper>
+        // <DeviceWrapper device={devices[0]}>
+          <div className="flex w-full h-full"><DeviceConfig/></div>
+        // </DeviceWrapper>
         ) : <div/>}
       </div>
     </div>
   );
 };
 
-const DeviceList = ({devices}: {devices: Device[]}) => {  
+const DeviceList = ({devices/*, numSelectedConfigs*/}: {devices: Device[]/*, numSelectedConfigs: number*/}) => {  
   const { setConnectDialogOpen } = useAppStore();  
     
   const [devicesToFlash, setDevicesToFlashFlash] = useState(devices.map(d => d.selectedToFlash));

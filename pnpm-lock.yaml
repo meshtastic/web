@@ -4,7 +4,7 @@ specifiers:
   '@emeraldpay/hashicon-react': ^0.5.2
   '@hookform/error-message': ^2.0.1
   '@hookform/resolvers': ^2.9.11
-  '@meshtastic/meshtasticjs': 2.0.20-5
+  '@meshtastic/meshtasticjs': link:../../js_2023/js
   '@preact/signals-react': ^1.2.2
   '@radix-ui/react-accordion': ^1.1.0
   '@radix-ui/react-checkbox': ^1.0.1
@@ -21,6 +21,7 @@ specifiers:
   '@radix-ui/react-tooltip': ^1.0.3
   '@tailwindcss/forms': ^0.5.3
   '@tailwindcss/typography': ^0.5.9
+  '@toit/esptool.js': ^0.12.3
   '@turf/turf': ^6.5.0
   '@types/chrome': ^0.0.216
   '@types/geodesy': ^2.2.3
@@ -77,7 +78,7 @@ dependencies:
   '@emeraldpay/hashicon-react': 0.5.2
   '@hookform/error-message': 2.0.1_zf7ga3u4zrffjlingb6kh5ipva
   '@hookform/resolvers': 2.9.11_react-hook-form@7.43.1
-  '@meshtastic/meshtasticjs': 2.0.20-5
+  '@meshtastic/meshtasticjs': link:../../js_2023/js
   '@preact/signals-react': 1.2.2_react@18.2.0
   '@radix-ui/react-accordion': 1.1.0_biqbaboplfbrettd7655fr4n2y
   '@radix-ui/react-checkbox': 1.0.1_biqbaboplfbrettd7655fr4n2y
@@ -93,6 +94,7 @@ dependencies:
   '@radix-ui/react-toast': 1.1.2_biqbaboplfbrettd7655fr4n2y
   '@radix-ui/react-tooltip': 1.0.3_zula6vjvt3wdocc4mwcxqa6nzi
   '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.7
+  '@toit/esptool.js': 0.12.3
   '@turf/turf': 6.5.0
   base64-js: 1.5.1
   class-transformer: 0.5.1
@@ -1334,18 +1336,6 @@ packages:
       to-fast-properties: 2.0.0
     dev: true
 
-  /@buf/meshtastic_protobufs.bufbuild_es/1.0.0-20230217124815-d362b2e8810a.1_@bufbuild+protobuf@1.0.0:
-    resolution: {registry: https://buf.build/gen/npm/v1, tarball: https://buf.build/gen/npm/v1/@buf/meshtastic_protobufs.bufbuild_es/1.0.0-20230217124815-d362b2e8810a.1/tarball}
-    peerDependencies:
-      '@bufbuild/protobuf': ^1.0.0
-    dependencies:
-      '@bufbuild/protobuf': 1.0.0
-    dev: false
-
-  /@bufbuild/protobuf/1.0.0:
-    resolution: {integrity: sha512-oH3jHBrZ6to8Qf4zLg7O8KqSY42kQZNBRXJRMp5uSi0mqE4L8NbyMnZHeOsbXmTb0xpptRyH11LfS+KeVhXzAA==}
-    dev: false
-
   /@emeraldpay/hashicon-react/0.5.2:
     resolution: {integrity: sha512-XCoYKpq8QQOniiSZf5ouzdvXbKfG6q4ICHRqCO/GNofiF0Ra+LR/7+tomHlXVcLPBS9sDAoZQQw/Sr24KRAbJg==}
     engines: {node: '>=8'}
@@ -1731,18 +1721,6 @@ packages:
   /@mapbox/whoots-js/3.1.0:
     resolution: {integrity: sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==}
     engines: {node: '>=6.0.0'}
-    dev: false
-
-  /@meshtastic/meshtasticjs/2.0.20-5:
-    resolution: {integrity: sha512-4N1stS98kPeCro8VaWlcv9Y59aBvhFMi5fx7EEeWtbYElhWPI3ahhqChoykY6hh5ommHqESe954WbG7eh0wT4Q==}
-    dependencies:
-      '@buf/meshtastic_protobufs.bufbuild_es': 1.0.0-20230217124815-d362b2e8810a.1_@bufbuild+protobuf@1.0.0
-      '@bufbuild/protobuf': 1.0.0
-      crc: 4.3.2
-      sub-events: 1.9.0
-      tslog: 4.7.4
-    transitivePeerDependencies:
-      - buffer
     dev: false
 
   /@nodelib/fs.scandir/2.1.5:
@@ -2647,6 +2625,10 @@ packages:
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.2.7_postcss@8.4.21
+    dev: false
+
+  /@toit/esptool.js/0.12.3:
+    resolution: {integrity: sha512-oli5WyZeSyDjjKAk5UC2hJMypmWUsI6kKUgkVihr56cKeK0KiJr4gu7LQ4IcvfduI92mm+bogLsgn9n2FXofeA==}
     dev: false
 
   /@turf/along/6.5.0:
@@ -4372,16 +4354,6 @@ packages:
   /core-util-is/1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
     dev: true
-
-  /crc/4.3.2:
-    resolution: {integrity: sha512-uGDHf4KLLh2zsHa8D8hIQ1H/HtFQhyHrc0uhHBcoKGol/Xnb+MPYfUMw7cvON6ze/GUESTudKayDcJC5HnJv1A==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      buffer: '>=6.0.3'
-    peerDependenciesMeta:
-      buffer:
-        optional: true
-    dev: false
 
   /cross-spawn/7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
@@ -6856,11 +6828,6 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /sub-events/1.9.0:
-    resolution: {integrity: sha512-dnFBayilG9Ku0k/lNs1Y7WV4kv91+ovCoeBV3uIYrY49DylvBb6z9d9ED2ctcrvX2YlReFalpCgJNtSgmrOaJg==}
-    engines: {node: '>=10.0.0'}
-    dev: false
-
   /supercluster/7.1.5:
     resolution: {integrity: sha512-EulshI3pGUM66o6ZdH3ReiFcvHpM3vAigyK+vcxdjpJyEbIIrtbmBdY23mGgnI24uXiGFvrGq9Gkum/8U7vJWg==}
     dependencies:
@@ -7076,11 +7043,6 @@ packages:
 
   /tslib/2.5.0:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
-
-  /tslog/4.7.4:
-    resolution: {integrity: sha512-/hz7E1ahN9KXNywEGJZ8SL4s3YLu9fKYBHOXsKgXwk73qZ7Y5NCkqktP6Y+0MQNfnqOdH8eRE0Rw0spmyTWLPg==}
-    engines: {node: '>=16'}
-    dev: false
 
   /tsutils/3.21.0_typescript@4.9.5:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}

@@ -1,20 +1,21 @@
 import type { PositionValidation } from "@app/validation/config/position.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Position = (): JSX.Element => {
-  const { config, nodes, hardware, setWorkingConfig } = useDevice();
+  // const { config, nodes, hardware, setWorkingConfig } = useDevice();
+  const config = useConfig();  
 
   const onSubmit = (data: PositionValidation) => {
-    setWorkingConfig(
-      new Protobuf.Config({
-        payloadVariant: {
-          case: "position",
-          value: data
-        }
-      })
-    );
+    // setWorkingConfig(
+    //   new Protobuf.Config({
+    //     payloadVariant: {
+    //       case: "position",
+    //       value: data
+    //     }
+    //   })
+    // );
   };
 
   return (

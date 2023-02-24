@@ -1,20 +1,21 @@
 import type { LoRaValidation } from "@app/validation/config/lora.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const LoRa = (): JSX.Element => {
-  const { config, setWorkingConfig } = useDevice();
+  // const { config, setWorkingConfig } = useDevice();
+  const config = useConfig();  
 
   const onSubmit = (data: LoRaValidation) => {
-    setWorkingConfig(
-      new Protobuf.Config({
-        payloadVariant: {
-          case: "lora",
-          value: data
-        }
-      })
-    );
+    // setWorkingConfig(
+    //   new Protobuf.Config({
+    //     payloadVariant: {
+    //       case: "lora",
+    //       value: data
+    //     }
+    //   })
+    // );
   };
 
   return (

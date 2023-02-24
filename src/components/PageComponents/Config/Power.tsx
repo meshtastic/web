@@ -1,20 +1,21 @@
 import type { PowerValidation } from "@app/validation/config/power.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Power = (): JSX.Element => {
-  const { config, setWorkingConfig } = useDevice();
+  // const { config, setWorkingConfig } = useDevice();
+  const config = useConfig();  
 
   const onSubmit = (data: PowerValidation) => {
-    setWorkingConfig(
-      new Protobuf.Config({
-        payloadVariant: {
-          case: "power",
-          value: data
-        }
-      })
-    );
+    // setWorkingConfig(
+    //   new Protobuf.Config({
+    //     payloadVariant: {
+    //       case: "power",
+    //       value: data
+    //     }
+    //   })
+    // );
   };
 
   return (
