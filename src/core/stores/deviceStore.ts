@@ -5,6 +5,7 @@ import { create } from "zustand";
 
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 import { channel } from "diagnostics_channel";
+import { useAppStore } from "./appStore";
 
 export type Page = "messages" | "map" | "config" | "channels" | "peers";
 
@@ -592,4 +593,13 @@ export const useDevice = (): Device => {
     throw new Error("useDevice must be used within a DeviceProvider");
   }
   return context;
+};
+
+export const useConfig = (): Protobuf.Config => {
+  const context = useContext(DeviceContext);
+  if(context == undefined) {
+    const {configPresetRoot, configPresetSelected } = useAppStore();
+    return configPresetRoot.children[configPresetSelected].config;
+  }
+  return context.config;
 };

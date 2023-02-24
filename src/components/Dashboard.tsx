@@ -71,70 +71,78 @@ const DeviceList = ({devices}: {devices: Device[]}) => {
   return (
     <div className="flex rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
       {devices.length ? (
-        <ul role="list" className="grow divide-y divide-gray-200">
-          {devices.map((device, index) => {
-            return (
-              <li key={device.id}>
-                <div className="px-4 py-4 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <p className="truncate text-sm font-medium text-accent">
-                      {device.nodes.get(device.hardware.myNodeNum)?.user
-                        ?.longName ?? "<Not flashed yet>"}
-                    </p>
-                    <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
-                      {device.connection?.connType === "ble" && (
-                        <>
-                          <BluetoothIcon size={16} />
-                          BLE
-                        </>
-                      )}
-                      {device.connection?.connType === "serial" && (
-                        <>
-                          <UsbIcon size={16} />
-                          Serial
-                        </>
-                      )}
-                      {device.connection?.connType === "http" && (
-                        <>
-                          <NetworkIcon size={16} />
-                          Network
-                        </>
-                      )}
+        <div className="flex flex-col justify-between w-full">        
+          <ul role="list" className="grow divide-y divide-gray-200">
+            {devices.map((device, index) => {
+              return (
+                <li key={device.id}>
+                  <div className="py-4">
+                    <div className="flex items-center justify-between">
+                      <p className="truncate text-sm font-medium text-accent">
+                        {device.nodes.get(device.hardware.myNodeNum)?.user
+                          ?.longName ?? "<Not flashed yet>"}
+                      </p>
+                      <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
+                        {device.connection?.connType === "ble" && (
+                          <>
+                            <BluetoothIcon size={16} />
+                            BLE
+                          </>
+                        )}
+                        {device.connection?.connType === "serial" && (
+                          <>
+                            <UsbIcon size={16} />
+                            Serial
+                          </>
+                        )}
+                        {device.connection?.connType === "http" && (
+                          <>
+                            <NetworkIcon size={16} />
+                            Network
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-1 sm:flex sm:justify-between">
+                      <div className="flex gap-2 w-full items-center text-sm text-gray-500">
+                        <UsersIcon
+                          size={20}
+                          className="text-gray-400"
+                          aria-hidden="true"
+                        />
+                        {device.nodes.size === 0 ? 0 : device.nodes.size - 1}
+                        <Button
+                          variant={devicesToFlash[index] ? "default" : "outline"}
+                          size="sm"
+                          className="w-full gap-2 h-8"
+                          onClick={() => {         
+                            // TODO: HACKY AF, fix.
+                            // Used to make sure page rerenders but this has issues
+                            devicesToFlash[index] = !devicesToFlash[index];                 
+                            device.setSelectedToFlash(!devicesToFlash[index]);
+                            setDevicesToFlashFlash(devicesToFlash);
+                            // devicesToFlash[index] = !devicesToFlash[index];                
+                            // console.log(`Set device ${index}: ${devicesToFlash[index]}`);                          
+                            // toggleDeviceFlash(device);                          
+                          }}
+                        >
+                          {devicesToFlash[index] ? "Enabled" : "Disabled"}
+                        </Button>
+                      </div>
+                      
                     </div>
                   </div>
-                  <div className="mt-1 sm:flex sm:justify-between">
-                    <div className="flex gap-2 items-center text-sm text-gray-500">
-                      <UsersIcon
-                        size={20}
-                        className="text-gray-400"
-                        aria-hidden="true"
-                      />
-                      {device.nodes.size === 0 ? 0 : device.nodes.size - 1}
-                      <Button
-                        variant={devicesToFlash[index] ? "default" : "outline"}
-                        size="sm"
-                        className="w-full justify-start gap-2"
-                        onClick={() => {         
-                          // TODO: HACKY AF, fix.
-                          // Used to make sure page rerenders but this has issues
-                          devicesToFlash[index] = !devicesToFlash[index];                 
-                          device.setSelectedToFlash(!devicesToFlash[index]);
-                          setDevicesToFlashFlash(devicesToFlash);
-                          // devicesToFlash[index] = !devicesToFlash[index];                
-                          // console.log(`Set device ${index}: ${devicesToFlash[index]}`);                          
-                          // toggleDeviceFlash(device);                          
-                        }}
-                      >
-                        {devicesToFlash[index] ? "Yes" : "No"}
-                      </Button>
-                    </div>
-                    
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                </li>
+              );
+            })}
+          </ul>
+          <Button
+            className="gap-2"
+            onClick={() => setConnectDialogOpen(true)}            
+          >            
+            Flash
+          </Button>
+        </div>
       ) : (
         <div className="m-auto flex flex-col gap-3 text-center">
           <ListPlusIcon size={48} className="mx-auto text-textSecondary" />

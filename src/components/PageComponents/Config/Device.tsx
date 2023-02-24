@@ -1,20 +1,21 @@
 import type { DeviceValidation } from "@app/validation/config/device.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Device = (): JSX.Element => {
-  const { config, setWorkingConfig } = useDevice();
+  // const { config, setWorkingConfig } = useDevice();
+  const config = useConfig();
 
   const onSubmit = (data: DeviceValidation) => {
-    setWorkingConfig(
-      new Protobuf.Config({
-        payloadVariant: {
-          case: "device",
-          value: data
-        }
-      })
-    );
+    // setWorkingConfig(
+    //   new Protobuf.Config({
+    //     payloadVariant: {
+    //       case: "device",
+    //       value: data
+    //     }
+    //   })
+    // );
   };
 
   return (
