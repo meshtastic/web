@@ -43,6 +43,7 @@ export interface Device {
     broadcast: Map<Types.ChannelNumber, MessageWithState[]>;
   };
   connection?: Types.ConnectionType;
+  selectedToFlash: boolean;
   activePage: Page;
   activePeer: number;
   waypoints: Protobuf.Waypoint[];
@@ -67,6 +68,7 @@ export interface Device {
   setActivePage: (page: Page) => void;
   setActivePeer: (peer: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
+  setSelectedToFlash: (state: boolean) => void;
   addChannel: (channel: Protobuf.Channel) => void;
   addWaypoint: (waypoint: Protobuf.Waypoint) => void;
   addNodeInfo: (nodeInfo: Protobuf.NodeInfo) => void;
@@ -121,6 +123,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             broadcast: new Map()
           },
           connection: undefined,
+          selectedToFlash: false,          
           activePage: "messages",
           activePeer: 0,
           waypoints: [],
@@ -328,6 +331,16 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.pendingSettingsChanges = state;
+                }
+              })
+            );
+          },
+          setSelectedToFlash: (state) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.selectedToFlash = state;
                 }
               })
             );

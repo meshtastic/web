@@ -30,6 +30,7 @@ interface AppState {
   accent: accentColor;
   connectDialogOpen: boolean;
   configPresetRoot: ConfigPreset;
+  configPresetSelected: number;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -43,7 +44,7 @@ interface AppState {
   setAccent: (color: accentColor) => void;
   setConnectDialogOpen: (open: boolean) => void;
   setConfigPresetRoot: (root: ConfigPreset) => void;
-
+  setConfigPresetSelected: (selection: number) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -52,10 +53,11 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
-  darkMode: false,
+  darkMode: true,     // TEMP: Default to dark mode
   accent: "orange",
   connectDialogOpen: false,
   configPresetRoot: undefined,
+  configPresetSelected: 0,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -124,11 +126,19 @@ export const useAppStore = create<AppState>()((set) => ({
         draft.configPresetRoot = root;
       })
     )
+  },
+  setConfigPresetSelected: (selection: number) => {
+    set(
+      produce<AppState>((draft) => {
+        draft.configPresetSelected = selection;
+      })
+    )
   }
 }));
 
 export class ConfigPreset {
   public children: ConfigPreset[] = [];
+  public count: number = 0;
 
   public constructor(public name: string, public config : Protobuf.Config) { }
 }

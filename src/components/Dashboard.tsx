@@ -13,19 +13,21 @@ import {
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { H3 } from "@components/UI/Typography/H3.js";
 import { Device, useDeviceStore } from "@app/core/stores/deviceStore.js";
-import { useMemo, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { Separator } from "@components/UI/Seperator.js";
 import { Mono } from "./generic/Mono";
 import { DeviceWrapper } from "@app/DeviceWrapper";
 import { DeviceConfig } from "@app/pages/Config/DeviceConfig";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { SidebarButton } from "./UI/Sidebar/sidebarButton";
+import { ConfigSelectButton } from "./UI/ConfigSelectButton";
 
 export const Dashboard = () => {
   const { setConfigPresetRoot } = useAppStore();
   let { configPresetRoot } : {configPresetRoot: ConfigPreset} = useAppStore();
   const { getDevices } = useDeviceStore();  
 
-  const devices = useMemo(() => getDevices(), [getDevices]);  
+  const devices: Device[] = useMemo(() => getDevices(), [getDevices]);  
   
   if(configPresetRoot == undefined && devices.length > 0) {
     // Initialize configs if none exist yet    
@@ -34,8 +36,6 @@ export const Dashboard = () => {
     setConfigPresetRoot(basicConfig);        
     configPresetRoot = useAppStore().configPresetRoot;    
   }    
-  
-  debugger;
   
   return (
     <div className="flex flex-col h-full gap-3 p-3">
@@ -49,7 +49,7 @@ export const Dashboard = () => {
       <Separator />
 
       <div className="flex w-full h-full gap-3">
-        <div className="flex flex-col w-1/4 h-full">
+        <div className="flex flex-col w-[400px] h-full">
           <DeviceList devices={devices}/>
           <ConfigList configs={configPresetRoot?.children}/>
         </div>
@@ -64,12 +64,15 @@ export const Dashboard = () => {
 };
 
 const DeviceList = ({devices}: {devices: Device[]}) => {  
-  const { setConnectDialogOpen } = useAppStore();
+  const { setConnectDialogOpen } = useAppStore();  
+    
+  const [devicesToFlash, setDevicesToFlashFlash] = useState(devices.map(d => d.selectedToFlash));
+ 
   return (
     <div className="flex rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
       {devices.length ? (
         <ul role="list" className="grow divide-y divide-gray-200">
-          {devices.map((device) => {
+          {devices.map((device, index) => {
             return (
               <li key={device.id}>
                 <div className="px-4 py-4 sm:px-6">
@@ -99,15 +102,33 @@ const DeviceList = ({devices}: {devices: Device[]}) => {
                       )}
                     </div>
                   </div>
-                  <div className="mt-2 sm:flex sm:justify-between">
-                    <div className="flex gap-2 text-sm text-gray-500">
+                  <div className="mt-1 sm:flex sm:justify-between">
+                    <div className="flex gap-2 items-center text-sm text-gray-500">
                       <UsersIcon
                         size={20}
                         className="text-gray-400"
                         aria-hidden="true"
                       />
                       {device.nodes.size === 0 ? 0 : device.nodes.size - 1}
+                      <Button
+                        variant={devicesToFlash[index] ? "default" : "outline"}
+                        size="sm"
+                        className="w-full justify-start gap-2"
+                        onClick={() => {         
+                          // TODO: HACKY AF, fix.
+                          // Used to make sure page rerenders but this has issues
+                          devicesToFlash[index] = !devicesToFlash[index];                 
+                          device.setSelectedToFlash(!devicesToFlash[index]);
+                          setDevicesToFlashFlash(devicesToFlash);
+                          // devicesToFlash[index] = !devicesToFlash[index];                
+                          // console.log(`Set device ${index}: ${devicesToFlash[index]}`);                          
+                          // toggleDeviceFlash(device);                          
+                        }}
+                      >
+                        {devicesToFlash[index] ? "Yes" : "No"}
+                      </Button>
                     </div>
+                    
                   </div>
                 </div>
               </li>
@@ -134,17 +155,19 @@ const DeviceList = ({devices}: {devices: Device[]}) => {
 
 
 const ConfigList = ({configs}: {configs: ConfigPreset[]}) => {
+  const { setConfigPresetRoot, configPresetSelected, setConfigPresetSelected } = useAppStore();
+  const [dummyState, setDummyState] = useState(0);
+
   return (
     <div className="flex rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
-      {configs ? configs.map((config) => {
-        return (<Button
-          onClick={() => alert("Hey")}
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-2"
-        >
-          {config.name}
-        </Button>)
+      {configs ? configs.map((config, index) => {
+        return (<ConfigSelectButton
+          label={config.name}
+          active={index == configPresetSelected}
+          setValue={(value) => {config.count = value; setDummyState(dummyState + 1)}}
+          value={config.count}
+          onClick={() => setConfigPresetSelected(index)}
+          />)
       }) : <div/>}
     </div>
   )
