@@ -31,7 +31,7 @@ export const PeersPage = (): JSX.Element => {
             <Hashicon size={24} value={node.num.toString()} />,
             <h1>
               {node.user?.longName ?? node.user?.macaddr
-                ? `Meshtastic_${base16
+                ? `Meshtastic ${base16
                     .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
                     .toLowerCase()}`
                 : `UNK: ${node.num}`}

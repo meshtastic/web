@@ -40,8 +40,6 @@ export const ChannelsPage = (): JSX.Element => {
           {
             icon: ImportIcon,
             onClick() {
-              console.log("fired");
-
               setDialogOpen("import", true);
             }
           },
