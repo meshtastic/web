@@ -29,7 +29,7 @@ export const App = (): JSX.Element => {
       <Toaster />
       <MapProvider>
         <DeviceWrapper device={device}>
-          <div className="flex flex-col overflow-hidden bg-backgroundPrimary text-textPrimary">
+          <div className="flex h-screen flex-col overflow-hidden bg-backgroundPrimary text-textPrimary">
             <div className="flex flex-grow">
               <DeviceSelector />
               <div className="flex flex-grow flex-col">
