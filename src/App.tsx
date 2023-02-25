@@ -29,12 +29,12 @@ export const App = (): JSX.Element => {
       <Toaster />
       <MapProvider>
         <DeviceWrapper device={device}>
-          <div className="flex min-h-screen flex-col bg-backgroundPrimary text-textPrimary">
+          <div className="flex flex-col overflow-hidden bg-backgroundPrimary text-textPrimary">
             <div className="flex flex-grow">
               <DeviceSelector />
               <div className="flex flex-grow flex-col">
                 {device ? (
-                  <div className="flex flex-grow">
+                  <div className="flex h-screen">
                     <DialogManager />
                     <CommandPalette />
                     <PageRouter />

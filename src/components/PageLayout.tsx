@@ -40,8 +40,12 @@ export const PageLayout = ({
           </div>
         </div>
       </div>
-      {/* relative flex h-full w-full flex-col */}
-      <div className={cn("flex h-full w-full flex-col", !noPadding && "p-3")}>
+      <div
+        className={cn(
+          "flex h-full w-full flex-col overflow-y-auto",
+          !noPadding && "p-3"
+        )}
+      >
         {children}
       </div>
     </div>

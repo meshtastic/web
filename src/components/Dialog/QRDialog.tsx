@@ -31,12 +31,11 @@ export const QRDialog = ({
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [QRCodeURL, setQRCodeURL] = useState<string>("");
 
-  const filteredChannels = Array.from(channels.values()).filter((channel) =>
-    selectedChannels.includes(channel.index)
-  );
+  const allChannels = Array.from(channels.values());
 
   useEffect(() => {
-    const channelsToEncode = filteredChannels
+    const channelsToEncode = allChannels
+      .filter((ch) => selectedChannels.includes(ch.index))
       .map((channel) => channel.settings)
       .filter((ch): ch is Protobuf.ChannelSettings => !!ch);
     const encoded = new Protobuf.ChannelSet(
@@ -64,9 +63,9 @@ export const QRDialog = ({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex gap-3 px-4 py-5 sm:p-6">
-            <div className="flex w-40 flex-col gap-1">
-              {filteredChannels.map((channel) => (
-                <div key={channel.index}>
+            <div className="flex w-40 flex-col gap-2">
+              {allChannels.map((channel) => (
+                <div className="flex justify-between" key={channel.index}>
                   <Label>
                     {channel.settings?.name.length
                       ? channel.settings.name
@@ -77,7 +76,7 @@ export const QRDialog = ({
                   <Checkbox
                     key={channel.index}
                     checked={selectedChannels.includes(channel.index)}
-                    onChange={() => {
+                    onCheckedChange={() => {
                       if (selectedChannels.includes(channel.index)) {
                         setSelectedChannels(
                           selectedChannels.filter((c) => c !== channel.index)
