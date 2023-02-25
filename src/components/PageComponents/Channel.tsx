@@ -1,82 +1,32 @@
 import { fromByteArray, toByteArray } from "base64-js";
 import type { ChannelValidation } from "@app/validation/channel.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "../Form/DynamicForm.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
+import { useDevice } from "@core/stores/deviceStore.js";
+import { useToast } from "@core/hooks/useToast.js";
 
 export interface SettingsPanelProps {
   channel: Protobuf.Channel;
 }
 
 export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
-  // const {
-  //   register,
-  //   handleSubmit,
-  //   formState: { errors, isDirty },
-  //   reset,
-  //   control,
-  //   setValue
-  // } = useForm<ChannelSettingsValidation>({
-  //   defaultValues: {
-  //     enabled: [
-  //       Protobuf.Channel_Role.SECONDARY,
-  //       Protobuf.Channel_Role.PRIMARY
-  //     ].find((role) => role === channel?.role)
-  //       ? true
-  //       : false,
-  //     ...channel?.settings,
-  //     psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0))
-  //   },
-  //   resolver: classValidatorResolver(ChannelSettingsValidation)
-  // });
-
-  // useEffect(() => {
-  //   reset({
-  //     enabled: [
-  //       Protobuf.Channel_Role.SECONDARY,
-  //       Protobuf.Channel_Role.PRIMARY
-  //     ].find((role) => role === channel?.role)
-  //       ? true
-  //       : false,
-  //     ...channel?.settings,
-  //     psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0))
-  //   });
-  // }, [channel, reset]);
-
-  // const onSubmit = handleSubmit((data) => {
-  //   connection
-  //     ?.setChannel(
-  //       new Protobuf.Channel({
-  //         role:
-  //           channel?.role === Protobuf.Channel_Role.PRIMARY
-  //             ? Protobuf.Channel_Role.PRIMARY
-  //             : data.enabled
-  //             ? Protobuf.Channel_Role.SECONDARY
-  //             : Protobuf.Channel_Role.DISABLED,
-  //         index: channel?.index,
-  //         settings: {
-  //           ...data,
-  //           psk: toByteArray(data.psk ?? "")
-  //         }
-  //       })
-  //     )
-  //     .then(() =>
-  //       addChannel({
-  //         config: new Protobuf.Channel({
-  //           index: channel.index,
-  //           role: channel.role,
-  //           settings: {
-  //             ...data,
-  //             psk: toByteArray(data.psk ?? "")
-  //           }
-  //         }),
-  //         lastInterraction: new Date(),
-  //         messages: []
-  //       })
-  //     );
-  // });
+  const { connection, addChannel } = useDevice();
+  const { toast } = useToast();
 
   const onSubmit = (data: ChannelValidation) => {
-    console.log(data);
+    const channel = new Protobuf.Channel({
+      ...data,
+      settings: {
+        ...data.settings,
+        psk: toByteArray(data.settings.psk ?? "")
+      }
+    });
+    connection?.setChannel(channel).then(() => {
+      toast({
+        title: `Saved Channel: ${channel.settings?.name}`
+      });
+      addChannel(channel);
+    });
   };
 
   return (
@@ -95,8 +45,8 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
       }}
       fieldGroups={[
         {
-          label: "Bluetooth Settings",
-          description: "Settings for the Bluetooth module",
+          label: "Channel Settings",
+          description: "Crypto, MQTT & misc settings",
           fields: [
             {
               type: "select",
