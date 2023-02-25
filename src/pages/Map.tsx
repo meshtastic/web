@@ -14,12 +14,16 @@ import {
 import { bbox, lineString } from "@turf/turf";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Subtle } from "@app/components/UI/Typography/Subtle.js";
+import { cn } from "@app/core/utils/cn.js";
+import { useCallback, useEffect, useState } from "react";
 
 export const MapPage = (): JSX.Element => {
-  const { nodes, waypoints, addWaypoint, connection } = useDevice();
+  const { nodes, waypoints } = useDevice();
   const { rasterSources } = useAppStore();
   const { default: map } = useMap();
+
+  const [zoom, setZoom] = useState(0);
 
   const allNodes = Array.from(nodes.values());
 
@@ -52,6 +56,12 @@ export const MapPage = (): JSX.Element => {
         ]
       });
   };
+
+  useEffect(() => {
+    map?.on("zoom", () => {
+      setZoom(map?.getZoom() ?? 0);
+    });
+  }, [map, zoom]);
 
   return (
     <>
@@ -88,16 +98,16 @@ export const MapPage = (): JSX.Element => {
       >
         <Map
           mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
-          onClick={(e) => {
-            const waypoint = new Protobuf.Waypoint({
-              name: "test",
-              description: "test description",
-              latitudeI: Math.trunc(e.lngLat.lat * 1e7),
-              longitudeI: Math.trunc(e.lngLat.lng * 1e7)
-            });
-            addWaypoint(waypoint);
-            connection?.sendWaypoint(waypoint, "broadcast");
-          }}
+          // onClick={(e) => {
+          //   const waypoint = new Protobuf.Waypoint({
+          //     name: "test",
+          //     description: "test description",
+          //     latitudeI: Math.trunc(e.lngLat.lat * 1e7),
+          //     longitudeI: Math.trunc(e.lngLat.lng * 1e7)
+          //   });
+          //   addWaypoint(waypoint);
+          //   connection?.sendWaypoint(waypoint, "broadcast");
+          // }}
           mapLib={maplibregl}
           attributionControl={false}
           renderWorldCopies={false}
@@ -136,7 +146,23 @@ export const MapPage = (): JSX.Element => {
                   latitude={node.position.latitudeI / 1e7}
                   anchor="bottom"
                 >
-                  <Hashicon value={node.num.toString()} size={32} />
+                  <div
+                    className="flex cursor-pointer gap-2 rounded-md border bg-backgroundPrimary p-1.5"
+                    onClick={() => {
+                      map?.easeTo({
+                        zoom: 12,
+                        center: [
+                          (node.position?.longitudeI ?? 0) / 1e7,
+                          (node.position?.latitudeI ?? 0) / 1e7
+                        ]
+                      });
+                    }}
+                  >
+                    <Hashicon value={node.num.toString()} size={22} />
+                    <Subtle className={cn(zoom < 12 && "hidden")}>
+                      {node.user?.longName}
+                    </Subtle>
+                  </div>
                 </Marker>
               );
             }
