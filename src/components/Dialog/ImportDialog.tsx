@@ -121,14 +121,14 @@ export const ImportDialog = ({
               </span>
               <div className="flex w-40 flex-col gap-1">
                 {channelSet?.settings.map((channel, index) => (
-                  <>
+                  <div className="flex justify-between" key={index}>
                     <Label>
                       {channel.name.length
                         ? channel.name
                         : `Channel: ${channel.id}`}
                     </Label>
                     <Checkbox key={index} />
-                  </>
+                  </div>
                 ))}
               </div>
             </div>
