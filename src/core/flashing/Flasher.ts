@@ -3,16 +3,18 @@ import type { ConfigPreset } from "../stores/appStore";
 import type { Device } from "../stores/deviceStore";
 import { EspLoader } from "@toit/esptool.js";
 
-type State = "idle" | "connecting" | "erasing" | "flashing" | "config" | "done";
+type State = "doNotFlash" | "doFlash" | "idle" | "connecting" | "erasing" | "flashing" | "config" | "done";
 
 export class Flasher {
-
-    public progress: FlashState[];
-    public static sections: {data: Uint8Array, offset: number}[] = [ ];
-    public static initDone: boolean = false;
     
+    // TODO: Add choice for different firmwares
+    public sections: {data: Uint8Array, offset: number}[] = [ ];
+    public firmwareAvailable: boolean = false;
 
-    public constructor(public devices: Device[], configs: ConfigPreset[], public callback: (flashState: FlashState) => void) {
+    public async flashAll(devices: Device[], configs: ConfigPreset[], callback: (flashState: FlashOperation) => void) {
+        if(!this.firmwareAvailable)
+            await this.init();
+
         const configMap: Protobuf.LocalConfig[] = [];
         for(const c in configs) {
             const config = configs[c];
@@ -20,70 +22,51 @@ export class Flasher {
                 configMap.push(config.config);
             }            
         }
+        if(devices.length < configMap.length)
+            throw "Not enough devices"
 
-        const d = devices.slice(0, Math.min(devices.length, configMap.length));
-        this.progress = d.map((device, i) => new FlashState(device, configMap[i]));
+        const operations = configMap.map((cfg, index) => new FlashOperation(devices[index], cfg, callback));
+        operations.map(op => this.flashDevice(op));
     }
 
-    public static async Init() {
-        this.initDone = true;
-        await Flasher.DownloadFirmware("firmware-tlora-v2-1-1.6-2.0.6.97fd5cf.bin", 0, 0);
-        await Flasher.DownloadFirmware("bleota.bin", 2490368, 1);
-        await Flasher.DownloadFirmware("littlefs-2.0.6.97fd5cf.bin", 3145728, 2);
+    public constructor() {
+        // this.Init();
     }
 
-    private static async DownloadFirmware(path: string, offset: number, slot: number) {        
-        const request = new XMLHttpRequest();
-        request.open("GET", `http://localhost:8080/data/${path}`, true);
-        request.responseType = "arraybuffer";    
-        let data: Uint8Array;
-        request.onloadend = () => {               
-            data = new Uint8Array(request.response);
-            Flasher.sections[slot] = {data, offset}; 
-            console.log(`Downloaded ${path}`);
-            // if(Flasher.sections.length == 3)
-            //     Promise.resolve();
-            // if(downloaded == 3) {
-            //     console.log("Unlocked button");
-            //     document.getElementById("add-btn")?.addEventListener('click', (ev) => addSlot());
-            //     document.getElementById("select-btn")?.addEventListener('click', (ev) => addDevices());
-            //     document.getElementById("go-btn")?.addEventListener('click', (ev) => {
-            //         for(let i = 0; i < setCounter; i++) {
-            //             if(ports[i].done)
-            //                 continue;
-            //             start(i);
-            //         }                
-            //     });
-            // }            
-        };
-        request.send();        
+    public async init() {        
+        this.firmwareAvailable = true;
+        await this.downloadFirmware("firmware-tlora-v2-1-1.6-2.0.6.97fd5cf.bin", 0, 0);
+        await this.downloadFirmware("bleota.bin", 2490368, 1);
+        await this.downloadFirmware("littlefs-2.0.6.97fd5cf.bin", 3145728, 2);
     }
 
-    public async FlashAll() {
-        debugger;
-        for(const p in this.progress) {
-            const progress = this.progress[p];
-            this.FlashDevice(progress);
-            // this.setConfig(progress);
-        }
+    private async downloadFirmware(path: string, offset: number, slot: number) {     
+        const req = await fetch(path);
+        if(!req.ok)
+            throw "failed";
+        const hmm = await req.arrayBuffer();
+        const data = new Uint8Array(hmm);
+        this.sections[slot] = {data, offset};
+        console.log(`Downloaded ${path}`);      
     }
 
-    public async FlashDevice(state: FlashState) {      
-        const sections = Flasher.sections;  
+
+    public async flashDevice(state: FlashOperation) {      
+        const sections = this.sections;  
         const port = await (state.device.connection! as ISerialConnection).freePort();
         await port!.open({baudRate: 115200});
         const loader = new EspLoader(port!);
-        this.setState(state, "connecting");
+        state.setState("connecting");
         await loader.connect();
         await loader.loadStub();
-        this.setState(state, "erasing");
+        state.setState("erasing");
         const t = this;
         try {                
             await loader.eraseFlash();        
         
             for (let i = 0; i < 3; i++) {              
               await loader.flashData(sections[i].data, sections[i].offset, function (idx, cnt) {
-                t.setState(state, "flashing", (1/3)  * idx/cnt);
+                state.setState("flashing", (1/3)  * idx/cnt);
               });          
             }                
           } finally {        
@@ -98,29 +81,27 @@ export class Flasher {
             baudRate: 115200,
             concurrentLogOutput: true
         });               
-        t.setState(state, "done", 0);
-    }
-
-    private async setConfig(state: FlashState) {
-
-    }
-
-    private setState(flashState: FlashState, state: State, progress = 0) {
-        flashState.state = state;
-        flashState.progress = progress;
-        console.log(`${state}: ${progress}`);
-        this.callback(flashState);
+        state.setState("done", 0);
     }
 
 }
 
-export class FlashState {
-    
-    public state: State = "connecting";
-    public progress: number = 0;
+export class FlashOperation {
+        
+    public state: FlashState = { progress: 0, state: "idle" };    
 
-    public constructor(public device: Device, public config: Protobuf.LocalConfig) {
+    public constructor(public device: Device, public config: Protobuf.LocalConfig, public callback: (operation: FlashOperation) => void) {
         
     }
 
+    public setState(state: State, progress = 0) {
+        this.state = {state, progress};
+        this.callback(this);
+    }
+
 }
+
+export interface FlashState {
+    state: State,
+    progress: number,
+};

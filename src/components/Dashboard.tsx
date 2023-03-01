@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { H3 } from "@components/UI/Typography/H3.js";
-import { Device, useDeviceStore } from "@app/core/stores/deviceStore.js";
+import { Device, useDevice, useDeviceStore } from "@app/core/stores/deviceStore.js";
 import { useCallback, useMemo, useState, useTransition } from "react";
 import { Separator } from "@components/UI/Seperator.js";
 import { Mono } from "./generic/Mono";
@@ -21,12 +21,9 @@ import { DeviceConfig } from "@app/pages/Config/DeviceConfig";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import { SidebarButton } from "./UI/Sidebar/sidebarButton";
 import { ConfigSelectButton } from "./UI/ConfigSelectButton";
-import { Flasher, FlashState } from "@app/core/flashing/Flasher";
+import { Flasher, FlashOperation, FlashState } from "@app/core/flashing/Flasher";
 
 export const Dashboard = () => {
-  if(!Flasher.initDone)
-    Flasher.Init();
-
   const { setConfigPresetRoot } = useAppStore();
   let { configPresetRoot } : {configPresetRoot: ConfigPreset} = useAppStore();
   const { getDevices } = useDeviceStore();  
@@ -69,9 +66,9 @@ export const Dashboard = () => {
 };
 
 const DeviceList = ({devices, rootConfig}: {devices: Device[], rootConfig: ConfigPreset}) => {  
-  const { setConnectDialogOpen } = useAppStore();  
-    
-  const [devicesToFlash, setDevicesToFlashFlash] = useState(devices.map(d => d.selectedToFlash));
+  const { setConnectDialogOpen, flasher } = useAppStore();
+  const [deviceSelectedToFlash, setDeviceSelectedToFlash] = useState(devices.map(d => d.flashState));
+  // const [flashingState, setFlashingState]: any = useState([]);
  
   return (
     <div className="flex rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
@@ -79,77 +76,35 @@ const DeviceList = ({devices, rootConfig}: {devices: Device[], rootConfig: Confi
         <div className="flex flex-col justify-between w-full">        
           <ul role="list" className="grow divide-y divide-gray-200">
             {devices.map((device, index) => {
-              return (
-                <li key={device.id}>
-                  <div className="py-4">
-                    <div className="flex items-center justify-between">
-                      <p className="truncate text-sm font-medium text-accent">
-                        {device.nodes.get(device.hardware.myNodeNum)?.user
-                          ?.longName ?? "<Not flashed yet>"}
-                      </p>
-                      <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
-                        {device.connection?.connType === "ble" && (
-                          <>
-                            <BluetoothIcon size={16} />
-                            BLE
-                          </>
-                        )}
-                        {device.connection?.connType === "serial" && (
-                          <>
-                            <UsbIcon size={16} />
-                            Serial
-                          </>
-                        )}
-                        {device.connection?.connType === "http" && (
-                          <>
-                            <NetworkIcon size={16} />
-                            Network
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-1 sm:flex sm:justify-between">
-                      <div className="flex gap-2 w-full items-center text-sm text-gray-500">
-                        <UsersIcon
-                          size={20}
-                          className="text-gray-400"
-                          aria-hidden="true"
-                        />
-                        {device.nodes.size === 0 ? 0 : device.nodes.size - 1}                        
-                        <Button
-                          variant={devicesToFlash[index] ? "default" : "outline"}
-                          size="sm"
-                          className="w-full gap-2 h-8"
-                          onClick={() => {         
-                            // TODO: HACKY AF, fix.
-                            // Used to make sure page rerenders but this has issues
-                            devicesToFlash[index] = !devicesToFlash[index];                 
-                            device.setSelectedToFlash(!devicesToFlash[index]);
-                            setDevicesToFlashFlash(devicesToFlash);
-                            // devicesToFlash[index] = !devicesToFlash[index];                
-                            // console.log(`Set device ${index}: ${devicesToFlash[index]}`);                          
-                            // toggleDeviceFlash(device);                          
-                          }}
-                        >
-                          {devicesToFlash[index] ? "Enabled" : "Disabled"}
-                        </Button>
-                      </div>
-                      
-                    </div>
-                  </div>
-                </li>
+              return (<DeviceSetupEntry
+                device={device}
+                selectedToFlash={deviceSelectedToFlash[index].state == 'doFlash'}
+                toggleSelectedToFlash={() => {
+                  const newState: FlashState = deviceSelectedToFlash[index].state == 'doFlash' ? {progress: 0, state: 'doNotFlash'} : {progress: 1, state: 'doFlash'};
+                  deviceSelectedToFlash[index] = newState;
+                  device.setFlashState(newState);
+                  setDeviceSelectedToFlash(deviceSelectedToFlash);
+                }}
+                progressText={deviceSelectedToFlash[index]}
+              />
               );
             })}
           </ul>
-          <Button
+          {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
             className="gap-2"
-            onClick={() => {
-              debugger;
-              new Flasher(devices, rootConfig.children, (f)=> {}).FlashAll();
-            }}            
+            onClick={() => {              
+              flasher.flashAll(devices, rootConfig.children, (f)=> {
+                f.device.setFlashState(f.state);
+                deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
+                setDeviceSelectedToFlash(deviceSelectedToFlash);
+                // flashingState[f.device.id] = f.state;
+                // setFlashingState(flashingState);
+                debugger;
+              });
+            }}
           >            
             Flash
-          </Button>
+          </Button>}
         </div>
       ) : (
         <div className="m-auto flex flex-col gap-3 text-center">
@@ -199,3 +154,81 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
   )
 
 };
+
+
+
+const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progressText}
+  :{device: Device, selectedToFlash: boolean, toggleSelectedToFlash: () => void, progressText: FlashState}) => {  
+  // const [toBeFlashed, setToBeFlashed] = useState(device.selectedToFlash);
+
+  
+
+  return (
+    <li key={device.id}>
+      <div className="py-4">
+        <div className="flex items-center justify-between">
+          <p className="truncate text-sm font-medium text-accent">
+            {device.nodes.get(device.hardware.myNodeNum)?.user
+              ?.longName ?? "<Not flashed yet>"}
+          </p>
+          <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
+            {device.connection?.connType === "ble" && (
+              <>
+                <BluetoothIcon size={16} />
+                BLE
+              </>
+            )}
+            {device.connection?.connType === "serial" && (
+              <>
+                <UsbIcon size={16} />
+                Serial
+              </>
+            )}
+            {device.connection?.connType === "http" && (
+              <>
+                <NetworkIcon size={16} />
+                Network
+              </>
+            )}
+          </div>
+        </div>
+        <div className="mt-1 sm:flex sm:justify-between">
+          <div className="flex gap-2 w-full items-center text-sm text-gray-500">
+            <UsersIcon
+              size={20}
+              className="text-gray-400"
+              aria-hidden="true"
+            />
+            {device.nodes.size === 0 ? 0 : device.nodes.size - 1}                        
+            <Button
+              variant={selectedToFlash && !progressText ? "default" : "outline"}
+              size="sm"
+              className="w-full gap-2 h-8"
+              onClick={() => toggleSelectedToFlash()}
+            >
+              {stateToText(progressText)}
+            </Button>
+          </div>
+          
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function stateToText(state: FlashState) {
+  switch(state.state) {
+    case "doNotFlash":
+      return "Disabled";
+    case "doFlash":
+      return "Enabled";
+    case "connecting":
+      return "Connecting...";
+    case "erasing":
+      return "Erasing...";
+    case "flashing":
+      return `Flashing... (${(state.progress * 100).toFixed(1)} %)`;    
+    default:
+      return state.state;
+  }
+}

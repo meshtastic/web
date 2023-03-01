@@ -1,6 +1,7 @@
 import { produce } from "immer";
 import { create } from "zustand";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Flasher } from "../flashing/Flasher";
 
 export interface RasterSource {
   enabled: boolean;
@@ -31,6 +32,7 @@ interface AppState {
   connectDialogOpen: boolean;
   configPresetRoot: ConfigPreset;
   configPresetSelected: number;
+  flasher: Flasher;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -58,6 +60,7 @@ export const useAppStore = create<AppState>()((set) => ({
   connectDialogOpen: false,
   configPresetRoot: undefined,
   configPresetSelected: 0,
+  flasher: new Flasher(),
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
