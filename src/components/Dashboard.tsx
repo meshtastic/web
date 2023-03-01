@@ -21,8 +21,12 @@ import { DeviceConfig } from "@app/pages/Config/DeviceConfig";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import { SidebarButton } from "./UI/Sidebar/sidebarButton";
 import { ConfigSelectButton } from "./UI/ConfigSelectButton";
+import { Flasher, FlashState } from "@app/core/flashing/Flasher";
 
 export const Dashboard = () => {
+  if(!Flasher.initDone)
+    Flasher.Init();
+
   const { setConfigPresetRoot } = useAppStore();
   let { configPresetRoot } : {configPresetRoot: ConfigPreset} = useAppStore();
   const { getDevices } = useDeviceStore();  
@@ -51,7 +55,7 @@ export const Dashboard = () => {
 
       <div className="flex w-full h-full gap-3">
         <div className="flex flex-col w-[400px] h-full">
-          <DeviceList devices={devices} /*umSelectedConfigs={}*//>
+          <DeviceList devices={devices} rootConfig={configPresetRoot}/>
           <ConfigList rootConfig={configPresetRoot}/>
         </div>
         {devices.length > 0 ? (        
@@ -64,7 +68,7 @@ export const Dashboard = () => {
   );
 };
 
-const DeviceList = ({devices/*, numSelectedConfigs*/}: {devices: Device[]/*, numSelectedConfigs: number*/}) => {  
+const DeviceList = ({devices, rootConfig}: {devices: Device[], rootConfig: ConfigPreset}) => {  
   const { setConnectDialogOpen } = useAppStore();  
     
   const [devicesToFlash, setDevicesToFlashFlash] = useState(devices.map(d => d.selectedToFlash));
@@ -111,7 +115,7 @@ const DeviceList = ({devices/*, numSelectedConfigs*/}: {devices: Device[]/*, num
                           className="text-gray-400"
                           aria-hidden="true"
                         />
-                        {device.nodes.size === 0 ? 0 : device.nodes.size - 1}
+                        {device.nodes.size === 0 ? 0 : device.nodes.size - 1}                        
                         <Button
                           variant={devicesToFlash[index] ? "default" : "outline"}
                           size="sm"
@@ -139,7 +143,10 @@ const DeviceList = ({devices/*, numSelectedConfigs*/}: {devices: Device[]/*, num
           </ul>
           <Button
             className="gap-2"
-            onClick={() => setConnectDialogOpen(true)}            
+            onClick={() => {
+              debugger;
+              new Flasher(devices, rootConfig.children, (f)=> {}).FlashAll();
+            }}            
           >            
             Flash
           </Button>
