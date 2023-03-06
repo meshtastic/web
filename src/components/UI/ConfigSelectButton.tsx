@@ -22,7 +22,7 @@ export const ConfigSelectButton = ({
     onClick={onClick}
     variant={active ? "subtle" : "ghost"}
     size="sm"
-    className="w-full justify-between gap-2"
+    className="w-full justify-between gap-2 my-[2px]"
   >
     {element && element}
     {label}

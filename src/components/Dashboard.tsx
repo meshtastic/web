@@ -127,21 +127,23 @@ const DeviceList = ({devices, rootConfig}: {devices: Device[], rootConfig: Confi
 
 const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
   
-  const { setConfigPresetRoot, configPresetSelected, setConfigPresetSelected } = useAppStore();
-  const [dummyState, setDummyState] = useState(0);
+  const { configPresetRoot, setConfigPresetRoot, configPresetSelected, setConfigPresetSelected } = useAppStore();  
 
   return (
     <div className="flex flex-col rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
       <button        
         className="transition-all hover:text-accent mb-4"
-        onClick={() => {
-          rootConfig?.children.push(new ConfigPreset(`Preset ${rootConfig.children.length}`, rootConfig.children[0]));
-          setDummyState(dummyState + 1);
+        onClick={() => {          
+          const newPreset = new ConfigPreset(`Preset ${rootConfig.children.length}`, rootConfig.children[0].config);
+          configPresetSelected?.children.push(newPreset);          
+          setConfigPresetRoot(Object.create(configPresetRoot));
+          setConfigPresetSelected(newPreset);
         }}
       >
         <PlusIcon/>
       </button>
-      {rootConfig ? rootConfig.children.map((config, index) => {
+      {rootConfig && <ConfigEntry config={rootConfig} configPresetSelected={configPresetSelected} setConfigPresetSelected={setConfigPresetSelected}/>}
+      {/* {rootConfig ? rootConfig.children.map((config, index) => {
         return (<ConfigSelectButton
           label={config.name}
           active={index == configPresetSelected}
@@ -149,12 +151,31 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
           value={config.count}
           onClick={() => setConfigPresetSelected(index)}
           />)
-      }) : <div/>}
+      }) : <div/>} */}
     </div>
   )
 
 };
 
+const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected}: {config: ConfigPreset, configPresetSelected: ConfigPreset, setConfigPresetSelected: (selection: ConfigPreset) => void}) => {
+  const [configCount, setConfigCount] = useState(config.count);
+  return (
+    <div>
+      <ConfigSelectButton
+      label={config.name}
+      active={config == configPresetSelected}
+      setValue={(value) => {setConfigCount(value);}}
+      value={configCount}
+      onClick={() => setConfigPresetSelected(config)}
+      />
+      <div className="ml-[20px]">
+        {config.children.map(c =>
+            (<ConfigEntry config={c} configPresetSelected={configPresetSelected} setConfigPresetSelected={setConfigPresetSelected}/>)
+        )}
+      </div>
+    </div>
+  );
+}
 
 
 const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progressText}

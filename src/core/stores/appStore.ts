@@ -31,7 +31,7 @@ interface AppState {
   accent: accentColor;
   connectDialogOpen: boolean;
   configPresetRoot: ConfigPreset;
-  configPresetSelected: number;
+  configPresetSelected: ConfigPreset;
   flasher: Flasher;
 
   setRasterSources: (sources: RasterSource[]) => void;
@@ -46,7 +46,7 @@ interface AppState {
   setAccent: (color: accentColor) => void;
   setConnectDialogOpen: (open: boolean) => void;
   setConfigPresetRoot: (root: ConfigPreset) => void;
-  setConfigPresetSelected: (selection: number) => void;
+  setConfigPresetSelected: (selection: ConfigPreset) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -59,7 +59,7 @@ export const useAppStore = create<AppState>()((set) => ({
   accent: "orange",
   connectDialogOpen: false,
   configPresetRoot: undefined,
-  configPresetSelected: 0,
+  configPresetSelected: undefined,
   flasher: new Flasher(),
 
   setRasterSources: (sources: RasterSource[]) => {
@@ -130,7 +130,7 @@ export const useAppStore = create<AppState>()((set) => ({
       })
     )
   },
-  setConfigPresetSelected: (selection: number) => {
+  setConfigPresetSelected: (selection: ConfigPreset) => {
     set(
       produce<AppState>((draft) => {
         draft.configPresetSelected = selection;

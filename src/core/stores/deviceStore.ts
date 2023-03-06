@@ -600,7 +600,7 @@ export const useConfig = (): Protobuf.LocalConfig => {
   const context = useContext(DeviceContext);
   if(context == undefined) {
     const {configPresetRoot, configPresetSelected } = useAppStore();
-    return configPresetRoot.children[configPresetSelected].config;
+    return configPresetRoot.config;     // TEMP
   }
   return context.config;
 };
