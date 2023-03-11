@@ -1,13 +1,15 @@
 import type { LucideIcon } from "lucide-react";
 import { Button } from "./Button.js";
+import { Input } from "./Input.js";
 
 export interface ConfigSelectButtonProps {
   label: string;
   active?: boolean;
   value: number;
   setValue: (val: number) => void;
-  element?: JSX.Element;
+  editing: boolean;
   onClick?: () => void;
+  onChangeDone?: (value: string) => void;
 }
 
 export const ConfigSelectButton = ({
@@ -15,8 +17,9 @@ export const ConfigSelectButton = ({
   active,
   value,
   setValue,
-  element,
+  editing,
   onClick,
+  onChangeDone,
 }: ConfigSelectButtonProps): JSX.Element => (
   <Button
     onClick={onClick}
@@ -24,8 +27,15 @@ export const ConfigSelectButton = ({
     size="sm"
     className="w-full justify-between gap-2 my-[2px]"
   >
-    {element && element}
-    {label}
+    {editing ? 
+    <Input
+        autoFocus
+        onFocus={(event) => event.target.select()}
+        id="configRename"
+        onBlur={(event) => {onChangeDone && onChangeDone(event.target.value)}}
+        onKeyUp={(event) => event.key == "Enter" && event.currentTarget.blur()}
+        defaultValue={label}
+        className="h-8"/> : label}
     <div className="flex">
       <Button
       onClick={(e) => {

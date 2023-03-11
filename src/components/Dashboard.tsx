@@ -3,6 +3,7 @@ import { Button } from "@components/UI/Button.js";
 import {
   PlusIcon,
   Trash2Icon,
+  Edit3Icon,
   ListPlusIcon,
   UsersIcon,
   MapPinIcon,
@@ -116,6 +117,7 @@ const DeviceList = ({devices, rootConfig}: {devices: Device[], rootConfig: Confi
 const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
   
   const { configPresetRoot, setConfigPresetRoot, configPresetSelected, setConfigPresetSelected } = useAppStore();
+  const [ editSelected, setEditSelected ] = useState(false);
   if(configPresetSelected === undefined) {
     setConfigPresetSelected(configPresetRoot);
     return (<div/>);    
@@ -127,13 +129,22 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
         <button        
           className="transition-all hover:text-accent mb-4"
           onClick={() => {         
-            const newPreset = new ConfigPreset(`Preset ${/*configPresetSelected.children.length*/ Math.floor(Math.random() * 100)}`, configPresetSelected);
+            const newPreset = new ConfigPreset("New Preset", configPresetSelected);
             configPresetSelected?.children.push(newPreset);          
             setConfigPresetRoot(Object.create(configPresetRoot));
             setConfigPresetSelected(newPreset);
+            setEditSelected(true);
           }}
         >
           <PlusIcon/>
+        </button>
+        <button        
+          className="transition-all hover:text-accent mb-4"
+          onClick={() => {                     
+            setEditSelected(true);
+          }}
+        >
+          <Edit3Icon/>
         </button>
         <button        
           className="transition-all hover:text-accent mb-4"
@@ -153,7 +164,19 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
         </button>
       </div>
       
-      {rootConfig && <ConfigEntry config={rootConfig} configPresetSelected={configPresetSelected} setConfigPresetSelected={setConfigPresetSelected}/>}
+      {rootConfig &&
+        <ConfigEntry
+          config={rootConfig}
+          configPresetSelected={configPresetSelected}
+          setConfigPresetSelected={setConfigPresetSelected}
+          editSelected={editSelected}
+          onEditDone={(val) => {
+            configPresetSelected.name = val;
+            setEditSelected(false);
+          }
+          }
+        />
+      }
       {/* {rootConfig ? rootConfig.children.map((config, index) => {
         return (<ConfigSelectButton
           label={config.name}
@@ -168,7 +191,8 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
 
 };
 
-const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected}: {config: ConfigPreset, configPresetSelected: ConfigPreset, setConfigPresetSelected: (selection: ConfigPreset) => void}) => {
+const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected, editSelected, onEditDone}:
+  {config: ConfigPreset, configPresetSelected: ConfigPreset, setConfigPresetSelected: (selection: ConfigPreset) => void, editSelected: boolean, onEditDone: (value: string) => void}) => {
   const [configCount, setConfigCount] = useState(config.count);
   return (
     <div>
@@ -177,11 +201,13 @@ const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected}: {c
       active={config == configPresetSelected}
       setValue={(value) => {setConfigCount(value);}}
       value={configCount}
+      editing={editSelected && config == configPresetSelected}
       onClick={() => setConfigPresetSelected(config)}
+      onChangeDone={onEditDone}
       />
       <div className="ml-[20px]">
         {config.children.map(c =>
-            (<ConfigEntry config={c} configPresetSelected={configPresetSelected} setConfigPresetSelected={setConfigPresetSelected}/>)
+            (<ConfigEntry config={c} configPresetSelected={configPresetSelected} setConfigPresetSelected={setConfigPresetSelected} editSelected={editSelected} onEditDone={onEditDone}/>)
         )}
       </div>
     </div>
