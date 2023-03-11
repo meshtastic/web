@@ -20,10 +20,10 @@ export type accentColor =
   | "pink";
 
 export class ConfigPreset {
-  public children: ConfigPreset[] = [];
+  public children: ConfigPreset[] = [];  
   public count: number = 0;
 
-  public constructor(public name: string, public config : Protobuf.LocalConfig = new Protobuf.LocalConfig()) {
+  public constructor(public name: string, public parent?: ConfigPreset, public config : Protobuf.LocalConfig = new Protobuf.LocalConfig()) {
     if(config.device === undefined)
       config.device = new Protobuf.Config_DeviceConfig();
     // TODO: Add remaining

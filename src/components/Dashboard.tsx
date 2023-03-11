@@ -2,6 +2,7 @@ import { ConfigPreset, useAppStore } from "@app/core/stores/appStore.js";
 import { Button } from "@components/UI/Button.js";
 import {
   PlusIcon,
+  Trash2Icon,
   ListPlusIcon,
   UsersIcon,
   MapPinIcon,
@@ -122,17 +123,36 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
 
   return (
     <div className="flex flex-col rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
-      <button        
-        className="transition-all hover:text-accent mb-4"
-        onClick={() => {         
-          const newPreset = new ConfigPreset(`Preset ${/*configPresetSelected.children.length*/ Math.floor(Math.random() * 100)}`);
-          configPresetSelected?.children.push(newPreset);          
-          setConfigPresetRoot(Object.create(configPresetRoot));
-          setConfigPresetSelected(newPreset);
-        }}
-      >
-        <PlusIcon/>
-      </button>
+      <div className="flex gap-2">
+        <button        
+          className="transition-all hover:text-accent mb-4"
+          onClick={() => {         
+            const newPreset = new ConfigPreset(`Preset ${/*configPresetSelected.children.length*/ Math.floor(Math.random() * 100)}`, configPresetSelected);
+            configPresetSelected?.children.push(newPreset);          
+            setConfigPresetRoot(Object.create(configPresetRoot));
+            setConfigPresetSelected(newPreset);
+          }}
+        >
+          <PlusIcon/>
+        </button>
+        <button        
+          className="transition-all hover:text-accent mb-4"
+          onClick={() => {                     
+            if(configPresetSelected.parent === undefined) {
+              alert("-- cannot delete root --");
+              return;
+            } 
+            // TEMP: Replace with proper dialog.
+            if(!confirm(`Are you sure you want to remove "${configPresetSelected.name}"?`))
+              return;
+            configPresetSelected.parent.children = configPresetSelected.parent.children.filter(c => c != configPresetSelected);
+            setConfigPresetSelected(configPresetSelected.parent);            
+          }}
+        >
+          <Trash2Icon/>
+        </button>
+      </div>
+      
       {rootConfig && <ConfigEntry config={rootConfig} configPresetSelected={configPresetSelected} setConfigPresetSelected={setConfigPresetSelected}/>}
       {/* {rootConfig ? rootConfig.children.map((config, index) => {
         return (<ConfigSelectButton
