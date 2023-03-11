@@ -25,19 +25,10 @@ import { Flasher, FlashOperation, FlashState } from "@app/core/flashing/Flasher"
 
 export const Dashboard = () => {
   const { setConfigPresetRoot } = useAppStore();
-  let { configPresetRoot } : {configPresetRoot: ConfigPreset} = useAppStore();
+  let { configPresetRoot, configPresetSelected } : {configPresetRoot: ConfigPreset, configPresetSelected?: ConfigPreset} = useAppStore();
   const { getDevices } = useDeviceStore();  
 
   const devices: Device[] = useMemo(() => getDevices(), [getDevices]);  
-  
-  if(configPresetRoot == undefined && devices.length > 0) {
-    // Initialize configs if none exist yet    
-    const basicConfig: ConfigPreset = new ConfigPreset("Root", devices[0].config /* TEMP ONLY */);
-    basicConfig.children.push(new ConfigPreset("Preset 0", devices[0].config));
-    setConfigPresetRoot(basicConfig);        
-    configPresetRoot = useAppStore().configPresetRoot;    
-  }    
-  //const totalConfigCount = configPresetRoot.children.reduce((r, p) => r + p.count, 0);
   
   return (
     <div className="flex flex-col h-full gap-3 p-3">
@@ -55,11 +46,7 @@ export const Dashboard = () => {
           <DeviceList devices={devices} rootConfig={configPresetRoot}/>
           <ConfigList rootConfig={configPresetRoot}/>
         </div>
-        {devices.length > 0 ? (        
-        // <DeviceWrapper device={devices[0]}>
-          <div className="flex w-full h-full"><DeviceConfig/></div>
-        // </DeviceWrapper>
-        ) : <div/>}
+        <div className="flex w-full h-full"><DeviceConfig key={configPresetSelected?.name}/></div>
       </div>
     </div>
   );
@@ -127,14 +114,18 @@ const DeviceList = ({devices, rootConfig}: {devices: Device[], rootConfig: Confi
 
 const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
   
-  const { configPresetRoot, setConfigPresetRoot, configPresetSelected, setConfigPresetSelected } = useAppStore();  
+  const { configPresetRoot, setConfigPresetRoot, configPresetSelected, setConfigPresetSelected } = useAppStore();
+  if(configPresetSelected === undefined) {
+    setConfigPresetSelected(configPresetRoot);
+    return (<div/>);    
+  }    
 
   return (
     <div className="flex flex-col rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
       <button        
         className="transition-all hover:text-accent mb-4"
-        onClick={() => {          
-          const newPreset = new ConfigPreset(`Preset ${rootConfig.children.length}`, rootConfig.children[0].config);
+        onClick={() => {         
+          const newPreset = new ConfigPreset(`Preset ${/*configPresetSelected.children.length*/ Math.floor(Math.random() * 100)}`);
           configPresetSelected?.children.push(newPreset);          
           setConfigPresetRoot(Object.create(configPresetRoot));
           setConfigPresetSelected(newPreset);

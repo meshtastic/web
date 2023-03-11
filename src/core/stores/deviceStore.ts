@@ -600,7 +600,13 @@ export const useConfig = (): Protobuf.LocalConfig => {
   const context = useContext(DeviceContext);
   if(context == undefined) {
     const {configPresetRoot, configPresetSelected } = useAppStore();
-    return configPresetRoot.config;     // TEMP
+    if(configPresetSelected) {
+      console.log(`Displaying selected preset: ${configPresetSelected.name} (${configPresetSelected.config.device?.buttonGpio})`);
+      console.log(`Identical? ${configPresetSelected.config == configPresetRoot.config}`);
+    }      
+    else
+      console.log(`No preset selected; Displaying root preset. (${configPresetRoot.config.device?.buttonGpio})`);
+    return (configPresetSelected ?? configPresetRoot).config;     // TEMP
   }
   return context.config;
 };

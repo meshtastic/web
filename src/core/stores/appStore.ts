@@ -19,6 +19,17 @@ export type accentColor =
   | "purple"
   | "pink";
 
+export class ConfigPreset {
+  public children: ConfigPreset[] = [];
+  public count: number = 0;
+
+  public constructor(public name: string, public config : Protobuf.LocalConfig = new Protobuf.LocalConfig()) {
+    if(config.device === undefined)
+      config.device = new Protobuf.Config_DeviceConfig();
+    // TODO: Add remaining
+  }
+}
+
 interface AppState {
   selectedDevice: number;
   devices: {
@@ -31,7 +42,7 @@ interface AppState {
   accent: accentColor;
   connectDialogOpen: boolean;
   configPresetRoot: ConfigPreset;
-  configPresetSelected: ConfigPreset;
+  configPresetSelected: ConfigPreset | undefined;
   flasher: Flasher;
 
   setRasterSources: (sources: RasterSource[]) => void;
@@ -58,7 +69,7 @@ export const useAppStore = create<AppState>()((set) => ({
   darkMode: true,     // TEMP: Default to dark mode
   accent: "orange",
   connectDialogOpen: false,
-  configPresetRoot: undefined,
+  configPresetRoot: new ConfigPreset("Root"),
   configPresetSelected: undefined,
   flasher: new Flasher(),
 
@@ -131,6 +142,7 @@ export const useAppStore = create<AppState>()((set) => ({
     )
   },
   setConfigPresetSelected: (selection: ConfigPreset) => {
+    console.log(`${selection.name} has been selected.`);
     set(
       produce<AppState>((draft) => {
         draft.configPresetSelected = selection;
@@ -138,10 +150,3 @@ export const useAppStore = create<AppState>()((set) => ({
     )
   }
 }));
-
-export class ConfigPreset {
-  public children: ConfigPreset[] = [];
-  public count: number = 0;
-
-  public constructor(public name: string, public config : Protobuf.LocalConfig) { }
-}

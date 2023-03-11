@@ -26,7 +26,7 @@ export const ConfigSelectButton = ({
   >
     {element && element}
     {label}
-    <div>
+    <div className="flex">
       <Button
       onClick={(e) => {
         e.stopPropagation();
@@ -37,7 +37,7 @@ export const ConfigSelectButton = ({
       >
         -
       </Button>
-      {value}
+      <div className="my-2 w-4">{value}</div>
       <Button
       onClick={(e) => {
         e.stopPropagation();
