@@ -26,11 +26,9 @@ import { ConfigSelectButton } from "./UI/ConfigSelectButton";
 import { Flasher, FlashOperation, FlashState } from "@app/core/flashing/Flasher";
 
 export const Dashboard = () => {
-  const { setConfigPresetRoot } = useAppStore();
   let { configPresetRoot, configPresetSelected } : {configPresetRoot: ConfigPreset, configPresetSelected?: ConfigPreset} = useAppStore();
-  const { getDevices } = useDeviceStore();  
-
-  const devices: Device[] = useMemo(() => getDevices(), [getDevices]);  
+  const { getDevices } = useDeviceStore();
+  const devices: Device[] = useMemo(() => getDevices(), [getDevices]);
   
   return (
     <div className="flex flex-col h-full gap-3 p-3">
@@ -134,6 +132,7 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
             setConfigPresetRoot(Object.create(configPresetRoot));
             setConfigPresetSelected(newPreset);
             setEditSelected(true);
+            newPreset.saveConfigTree();
           }}
         >
           <PlusIcon/>
@@ -157,7 +156,8 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
             if(!confirm(`Are you sure you want to remove "${configPresetSelected.name}"?`))
               return;
             configPresetSelected.parent.children = configPresetSelected.parent.children.filter(c => c != configPresetSelected);
-            setConfigPresetSelected(configPresetSelected.parent);            
+            setConfigPresetSelected(configPresetSelected.parent);
+            configPresetSelected.saveConfigTree();            
           }}
         >
           <Trash2Icon/>
@@ -173,6 +173,7 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
           onEditDone={(val) => {
             configPresetSelected.name = val;
             setEditSelected(false);
+            configPresetSelected.saveConfigTree();
           }
           }
         />

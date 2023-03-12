@@ -2,11 +2,11 @@ import type { DeviceValidation } from "@app/validation/config/device.js";
 import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const Device = (): JSX.Element => {
   //const { config, setWorkingConfig } = useDevice();
   const config = useConfig();
-  debugger;
   const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
     getEnabled(name) {
       return config.overrideValues![name] ?? false;
@@ -15,9 +15,12 @@ export const Device = (): JSX.Element => {
       config.overrideValues![name] = value;      
     },
   } : undefined;
-  
+  const isPresetConfig = !("id" in config);   // Kinda hacky...
 
   const onSubmit = (data: DeviceValidation) => {
+    if(isPresetConfig) {
+      (config as ConfigPreset).saveConfigTree();
+    }
     // setWorkingConfig(
     //   new Protobuf.Config({
     //     payloadVariant: {
@@ -31,6 +34,7 @@ export const Device = (): JSX.Element => {
   return (
     <DynamicForm<DeviceValidation>
       onSubmit={onSubmit}
+      submitType={isPresetConfig ? "onChange" : "onSubmit"}
       defaultValues={config.config.device}
       enableSwitch={enableSwitch}
       fieldGroups={[

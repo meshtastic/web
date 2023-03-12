@@ -33,6 +33,45 @@ export class ConfigPreset {
       config.device = new Protobuf.Config_DeviceConfig();
     // TODO: Add remaining
   }
+
+  public saveConfigTree() {
+    if(this.parent) {
+      this.parent.saveConfigTree();
+      return;
+    }
+    const replacer = (key: string, value: any) => {
+      if(key == "parent" || key == "count")
+        return undefined;
+      return value;
+    }
+    localStorage.setItem("PresetConfigs", JSON.stringify(this, replacer));
+  }
+
+  public static loadOrCreate(): ConfigPreset {
+    const storedConfigs = localStorage.getItem("PresetConfigs");
+    if(storedConfigs !== null) {
+      const rootPreset = JSON.parse(storedConfigs, (key: string, value:  any) => {            
+        if(key == '' || !isNaN(Number(key))) {
+          // Create new ConfigPreset object to ensure that the member functions are not undefined.
+          const preset = new ConfigPreset(value.name, undefined, value.config);
+          preset.children = value.children;
+          preset.children.forEach(c => c.parent = preset);
+          return preset;
+        }
+        return value;
+      });
+      return rootPreset;
+    }
+    return new ConfigPreset("Root");
+  }
+
+  public restoreChildConnections() {
+    this.children.forEach((c) => {
+      c.parent = this;  
+      c.restoreChildConnections();
+    });
+  }
+
 }
 
 interface AppState {
@@ -74,7 +113,7 @@ export const useAppStore = create<AppState>()((set) => ({
   darkMode: true,     // TEMP: Default to dark mode
   accent: "orange",
   connectDialogOpen: false,
-  configPresetRoot: new ConfigPreset("Root"),
+  configPresetRoot: ConfigPreset.loadOrCreate(),
   configPresetSelected: undefined,
   flasher: new Flasher(),
 
