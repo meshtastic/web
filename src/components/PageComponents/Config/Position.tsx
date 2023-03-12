@@ -21,7 +21,7 @@ export const Position = (): JSX.Element => {
   return (
     <DynamicForm<PositionValidation>
       onSubmit={onSubmit}
-      defaultValues={config.position}
+      defaultValues={config.config.position}
       fieldGroups={[
         {
           label: "Position settings",

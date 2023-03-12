@@ -1,11 +1,21 @@
 import type { DeviceValidation } from "@app/validation/config/device.js";
 import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
 
 export const Device = (): JSX.Element => {
   //const { config, setWorkingConfig } = useDevice();
-  const config = useConfig();  
+  const config = useConfig();
+  debugger;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
+    getEnabled(name) {
+      return config.overrideValues![name] ?? false;
+    },
+    setEnabled(name, value) {
+      config.overrideValues![name] = value;      
+    },
+  } : undefined;
+  
 
   const onSubmit = (data: DeviceValidation) => {
     // setWorkingConfig(
@@ -21,7 +31,8 @@ export const Device = (): JSX.Element => {
   return (
     <DynamicForm<DeviceValidation>
       onSubmit={onSubmit}
-      defaultValues={config.device}
+      defaultValues={config.config.device}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "Device Settings",

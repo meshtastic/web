@@ -596,7 +596,12 @@ export const useDevice = (): Device => {
   return context;
 };
 
-export const useConfig = (): Protobuf.LocalConfig => {
+interface ConfigProvider {
+  config: Protobuf.LocalConfig;
+  overrideValues?: {[fieldName: string]: boolean};
+}
+
+export const useConfig = (): ConfigProvider => {
   const context = useContext(DeviceContext);
   if(context == undefined) {
     const {configPresetRoot, configPresetSelected } = useAppStore();
@@ -606,7 +611,7 @@ export const useConfig = (): Protobuf.LocalConfig => {
     }      
     else
       console.log(`No preset selected; Displaying root preset. (${configPresetRoot.config.device?.buttonGpio})`);
-    return (configPresetSelected ?? configPresetRoot).config;     // TEMP
+    return (configPresetSelected ?? configPresetRoot);     // TEMP
   }
-  return context.config;
+  return context;
 };

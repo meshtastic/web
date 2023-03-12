@@ -11,6 +11,12 @@ import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { DynamicFormField, FieldProps } from "./DynamicFormField.js";
 import { FieldWrapper } from "./FormWrapper.js";
 import { Button } from "../UI/Button.js";
+import { useState } from "react";
+
+export interface EnableSwitchData {
+  getEnabled: (name: string) => boolean;
+  setEnabled: (name: string, value: boolean) => void;
+}
 
 interface DisabledBy<T> {
   fieldName: Path<T>;
@@ -37,6 +43,7 @@ export interface DynamicFormProps<T extends FieldValues> {
   submitType?: "onChange" | "onSubmit";
   hasSubmitButton?: boolean;
   defaultValues?: DeepPartial<T>;
+  enableSwitch?: EnableSwitchData;
   fieldGroups: {
     label: string;
     description: string;
@@ -49,6 +56,7 @@ export function DynamicForm<T extends FieldValues>({
   submitType = "onChange",
   hasSubmitButton,
   defaultValues,
+  enableSwitch,
   fieldGroups
 }: DynamicFormProps<T>) {
   const { handleSubmit, control, getValues } = useForm<T>({
@@ -89,16 +97,22 @@ export function DynamicForm<T extends FieldValues>({
             <Subtle>{fieldGroup.description}</Subtle>
           </div>
 
-          {fieldGroup.fields.map((field, index) => (
-            <FieldWrapper label={field.label} description={field.description}>
-              <DynamicFormField
-                key={index}
-                field={field}
-                control={control}
-                disabled={isDisabled(field.disabledBy)}
-              />
-            </FieldWrapper>
-          ))}
+          {fieldGroup.fields.map((field, index) => {
+            const [ enableSwitchState, setEnableSwitchState ] = useState(enableSwitch?.getEnabled(field.name)); 
+            return (
+              <FieldWrapper label={field.label} description={field.description} enableSwitchEnabled={enableSwitchState} onEnableSwitchChanged={(value) => {
+                enableSwitch?.setEnabled(field.name, value);
+                setEnableSwitchState(value);
+              }}>
+                <DynamicFormField
+                  key={index}
+                  field={field}
+                  control={control}
+                  disabled={isDisabled(field.disabledBy) || enableSwitchState == false}
+                />
+              </FieldWrapper>
+            );
+          })}
         </div>
       ))}
       {hasSubmitButton && <Button type="submit">Submit</Button>}

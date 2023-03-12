@@ -22,6 +22,7 @@ export type accentColor =
 export class ConfigPreset {
   public children: ConfigPreset[] = [];  
   public count: number = 0;
+  public overrideValues: {[fieldName: string]: boolean} = {};
 
   public constructor(public name: string, public parent?: ConfigPreset, public config : Protobuf.LocalConfig = new Protobuf.LocalConfig()) {
     if(config.device === undefined)
