@@ -35,16 +35,31 @@ export class ConfigPreset {
   }
 
   public saveConfigTree() {
+    localStorage.setItem("PresetConfigs", this.getConfigTreeJSON());
+  }
+
+  public exportConfigTree() {
+    const blob = new Blob([this.getConfigTreeJSON()], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const elem = document.createElement("a");
+    elem.setAttribute("href", url);
+    elem.setAttribute("download", "ConfigPresets.json");
+    document.body.appendChild(elem);
+    elem.click();
+    document.body.removeChild(elem);
+    URL.revokeObjectURL(url);
+  }
+
+  private getConfigTreeJSON(): string {
     if(this.parent) {
-      this.parent.saveConfigTree();
-      return;
+      return this.parent.getConfigTreeJSON();      
     }
     const replacer = (key: string, value: any) => {
       if(key == "parent" || key == "count")
         return undefined;
       return value;
     }
-    localStorage.setItem("PresetConfigs", JSON.stringify(this, replacer));
+    return JSON.stringify(this, replacer);
   }
 
   public static loadOrCreate(): ConfigPreset {
@@ -63,6 +78,10 @@ export class ConfigPreset {
       return rootPreset;
     }
     return new ConfigPreset("Root");
+  }
+
+  public static importConfigTree() {
+    
   }
 
   public restoreChildConnections() {
