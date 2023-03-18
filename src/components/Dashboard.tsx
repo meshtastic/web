@@ -20,15 +20,43 @@ import { Separator } from "@components/UI/Seperator.js";
 import { Mono } from "./generic/Mono";
 import { DeviceWrapper } from "@app/DeviceWrapper";
 import { DeviceConfig } from "@app/pages/Config/DeviceConfig";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { ISerialConnection, Protobuf } from "@meshtastic/meshtasticjs";
 import { SidebarButton } from "./UI/Sidebar/sidebarButton";
 import { ConfigSelectButton } from "./UI/ConfigSelectButton";
 import { Flasher, FlashOperation, FlashState } from "@app/core/flashing/Flasher";
+import { randId } from "@app/core/utils/randId";
+import { subscribeAll } from "@app/core/subscriptions";
+import { connect } from "http2";
+
+let initTest: boolean  = false;
 
 export const Dashboard = () => {
   let { configPresetRoot, configPresetSelected } : {configPresetRoot: ConfigPreset, configPresetSelected?: ConfigPreset} = useAppStore();
-  const { getDevices } = useDeviceStore();
+  const { addDevice, getDevices } = useDeviceStore();
   const devices: Device[] = useMemo(() => getDevices(), [getDevices]);
+  const onConnect = async (port: SerialPort) => {
+    const id = randId();
+    const device = addDevice(id);
+    const connection = new ISerialConnection(id);
+    await connection
+      .connect({
+        port,
+        baudRate: undefined,
+        concurrentLogOutput: true
+      })
+      .catch((e: Error) => console.log(`Unable to Connect: ${e.message}`));
+    device.addConnection(connection);
+    subscribeAll(device, connection);
+  };
+  const connectToAll = async () => {
+    const dev = await navigator.serial.getPorts();    
+    debugger;
+    dev.filter(d => d.readable === null).forEach(d => onConnect(d));
+  };
+  if(!initTest) {
+    connectToAll();
+    initTest = true;
+  }
   
   return (
     <div className="flex flex-col h-full gap-3 p-3">
