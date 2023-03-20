@@ -22,7 +22,7 @@ import { DeviceConfig } from "@app/pages/Config/DeviceConfig";
 import { ISerialConnection, Protobuf } from "@meshtastic/meshtasticjs";
 import { SidebarButton } from "./UI/Sidebar/sidebarButton";
 import { ConfigSelectButton } from "./UI/ConfigSelectButton";
-import { setup, FlashOperation, FlashState, nextBatch, OverallFlashingState } from "@app/core/flashing/Flasher";
+import { setup, FlashOperation, FlashState, nextBatch, OverallFlashingState, cancel } from "@app/core/flashing/Flasher";
 import { randId } from "@app/core/utils/randId";
 import { subscribeAll } from "@app/core/subscriptions";
 import { connect } from "http2";
@@ -51,8 +51,7 @@ export const Dashboard = () => {
     subscribeAll(device, connection);
   };
   const connectToAll = async () => {
-    const dev = await navigator.serial.getPorts();    
-    debugger;
+    const dev = await navigator.serial.getPorts();
     dev.filter(d => d.readable === null).forEach(d => onConnect(d));
   };
   if(!initTest) {
@@ -143,6 +142,11 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
             {cancelButtonVisible && <Button
               className="ml-1 p-2"
               variant={"destructive"}
+              onClick={() => {
+                if(!confirm("Cancel flashing?"))
+                  return;
+                cancel();
+              }}
             >
               <XIcon/>
             </Button>}

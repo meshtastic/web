@@ -340,8 +340,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           setFlashState: (state) => {
             set(
               produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                debugger;
+                const device = draft.devices.get(id);                
                 if (device) {
                   device.flashState = state;
                 }

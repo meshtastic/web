@@ -3,12 +3,13 @@ import { ConfigPreset, useAppStore } from "../stores/appStore";
 import type { Device } from "../stores/deviceStore";
 import { EspLoader } from "@toit/esptool.js";
 
-type DeviceFlashingState = "doNotFlash" | "doFlash" | "idle" | "connecting" | "erasing" | "flashing" | "config" | "done";
+type DeviceFlashingState = "doNotFlash" | "doFlash" | "idle" | "connecting" | "erasing" | "flashing" | "config" | "done" | "aborted" | "failed";
 export type OverallFlashingState = "idle"  | "busy" | "waiting";
 
 const sections: {data: Uint8Array, offset: number}[] = [ ];
 let configQueue: Protobuf.LocalConfig[] = [];
 let firmwareAvailable: boolean = false;
+let operations: FlashOperation[] = [];
 let callback: (flashState: OverallFlashingState) => void;
 
 export async function setup(configs: ConfigPreset[], overallCallback: (flashState: OverallFlashingState) => void) {        
@@ -32,12 +33,17 @@ export async function nextBatch(devices: Device[], flashStates: FlashState[], de
         console.warn("Too many devices!");
         devices = devices.slice(0, configQueue.length);
     }
-    const operations = devices.map((dev, index) => new FlashOperation(dev, configQueue[index], deviceCallback));
+    operations = devices.map((dev, index) => new FlashOperation(dev, configQueue[index], deviceCallback));
     operations.forEach((o, i) => o.state = flashStates[i]);
     configQueue = configQueue.slice(operations.length)
     console.log(`New config queue count: ${configQueue.length}`);
     
-    Promise.allSettled(operations.map(op => flashDevice(op))).then(p => handleFlashingDone());
+    Promise.allSettled(operations.map(op => op.flash())).then(p => handleFlashingDone());
+}
+
+export function cancel() {
+    operations.forEach(o => o.cancel());
+    callback("idle");
 }
 
 function handleFlashingDone() {
@@ -65,42 +71,10 @@ async function downloadFirmware(path: string, offset: number, slot: number) {
 }
 
 
-async function flashDevice(state: FlashOperation) {          
-    const port = await (state.device.connection! as ISerialConnection).freePort();
-    await port!.open({baudRate: 115200});
-    const loader = new EspLoader(port!);
-    state.setState("connecting");
-    await loader.connect();
-    await loader.loadStub();
-    state.setState("erasing");
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    // try {                
-    //     await loader.eraseFlash();        
-    
-    //     for (let i = 0; i < 3; i++) {              
-    //         await loader.flashData(sections[i].data, sections[i].offset, function (idx, cnt) {
-    //         state.setState("flashing", (1/3)  * idx/cnt);
-    //         });          
-    //     }                
-    //     } finally {        
-    //     await loader.disconnect();             
-    // }  
-    // port!.setSignals({requestToSend: true});
-    // await new Promise(r => setTimeout(r, 100));   
-    // port!.setSignals({requestToSend: false});    
-    // await port!.close();           
-    // (state.device.connection! as ISerialConnection).connect({ 
-    //     port,
-    //     baudRate: 115200,
-    //     concurrentLogOutput: true
-    // });               
-    state.setState("done", 0);    
-}
-
-
 export class FlashOperation {
         
-    public state: FlashState = { progress: 0, state: "idle" };    
+    public state: FlashState = { progress: 0, state: "idle" };   
+    private loader?: EspLoader; 
 
     public constructor(public device: Device, public config: Protobuf.LocalConfig, public callback: (operation: FlashOperation) => void) {
         
@@ -111,6 +85,53 @@ export class FlashOperation {
             ?.longName ?? "<Not flashed yet>"} flash state: ${state}`);
         this.state = {state, progress};
         this.callback(this);
+    }
+
+    public async flash() {
+        let port;
+        try {
+            port = await (this.device.connection! as ISerialConnection).freePort();
+            await port!.open({baudRate: 115200});
+            this.loader = new EspLoader(port!);        
+            const loader = this.loader;
+            this.setState("connecting");
+            await loader.connect();
+            await loader.loadStub();
+            this.setState("erasing");
+            await new Promise(resolve => setTimeout(resolve, 2000));             
+            await loader.eraseFlash();            
+            const lul = this;
+            for (let i = 0; i < 3; i++) {              
+                await loader.flashData(sections[i].data, sections[i].offset, function (idx, cnt) {
+                    lul.setState("flashing", (1/3) * (i + idx/cnt));
+                });
+            }    
+        }
+        catch (e) {
+            debugger;
+            this.setState("failed");
+            return;
+        }
+        finally {        
+            await this.loader!.disconnect();       
+            debugger;      
+        }
+        port!.setSignals({requestToSend: true});
+        await new Promise(r => setTimeout(r, 100));   
+        port!.setSignals({requestToSend: false});    
+        await port!.close();           
+        (this.device.connection! as ISerialConnection).connect({ 
+            port,
+            baudRate: 115200,
+            concurrentLogOutput: true
+        });               
+        this.setState("done", 0);    
+    }
+
+    public async cancel() {
+        debugger;
+        await this.loader?.disconnect();
+        this.setState("aborted");
     }
 
 }
