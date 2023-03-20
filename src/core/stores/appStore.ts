@@ -1,7 +1,7 @@
 import { produce } from "immer";
 import { create } from "zustand";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { Flasher } from "../flashing/Flasher";
+import { OverallFlashingState } from "../flashing/Flasher";
 
 export interface RasterSource {
   enabled: boolean;
@@ -50,6 +50,18 @@ export class ConfigPreset {
     URL.revokeObjectURL(url);
   }
 
+  public getTotalConfigCount(): number {
+    return this.children.map(child => child.getTotalConfigCount()).reduce((prev, cur) => prev + cur, this.count);
+  }
+
+  public getAll(): ConfigPreset[] {
+    const configs: ConfigPreset[] = [ this ];
+    this.children.forEach(c => 
+      configs.push(...c.getAll())
+    );
+    return configs;
+  }
+
   private getConfigTreeJSON(): string {
     if(this.parent) {
       return this.parent.getConfigTreeJSON();      
@@ -82,7 +94,7 @@ export class ConfigPreset {
 
   public static importConfigTree() {
     
-  }
+  }  
 
   public restoreChildConnections() {
     this.children.forEach((c) => {
@@ -106,7 +118,7 @@ interface AppState {
   connectDialogOpen: boolean;
   configPresetRoot: ConfigPreset;
   configPresetSelected: ConfigPreset | undefined;
-  flasher: Flasher;
+  overallFlashingState: OverallFlashingState;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -121,6 +133,7 @@ interface AppState {
   setConnectDialogOpen: (open: boolean) => void;
   setConfigPresetRoot: (root: ConfigPreset) => void;
   setConfigPresetSelected: (selection: ConfigPreset) => void;
+  setOverallFlashingState: (state: OverallFlashingState) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -134,7 +147,7 @@ export const useAppStore = create<AppState>()((set) => ({
   connectDialogOpen: false,
   configPresetRoot: ConfigPreset.loadOrCreate(),
   configPresetSelected: undefined,
-  flasher: new Flasher(),
+  overallFlashingState: "idle",
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -211,5 +224,12 @@ export const useAppStore = create<AppState>()((set) => ({
         draft.configPresetSelected = selection;
       })
     )
-  }
+  },
+  setOverallFlashingState: (state: OverallFlashingState) => {    
+    set(
+      produce<AppState>((draft) => {
+        draft.overallFlashingState = state;
+      })
+    )
+  },
 }));

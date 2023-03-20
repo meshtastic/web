@@ -6,8 +6,7 @@ import {
   Edit3Icon,
   ListPlusIcon,
   UsersIcon,
-  MapPinIcon,
-  CalendarIcon,
+  XIcon,
   BluetoothIcon,
   UsbIcon,
   NetworkIcon
@@ -23,7 +22,7 @@ import { DeviceConfig } from "@app/pages/Config/DeviceConfig";
 import { ISerialConnection, Protobuf } from "@meshtastic/meshtasticjs";
 import { SidebarButton } from "./UI/Sidebar/sidebarButton";
 import { ConfigSelectButton } from "./UI/ConfigSelectButton";
-import { Flasher, FlashOperation, FlashState } from "@app/core/flashing/Flasher";
+import { setup, FlashOperation, FlashState, nextBatch, OverallFlashingState } from "@app/core/flashing/Flasher";
 import { randId } from "@app/core/utils/randId";
 import { subscribeAll } from "@app/core/subscriptions";
 import { connect } from "http2";
@@ -33,6 +32,9 @@ let initTest: boolean  = false;
 export const Dashboard = () => {
   let { configPresetRoot, configPresetSelected } : {configPresetRoot: ConfigPreset, configPresetSelected?: ConfigPreset} = useAppStore();
   const { addDevice, getDevices } = useDeviceStore();
+  const getTotalConfigCount = (c: ConfigPreset): number => c.children.map(child => getTotalConfigCount(child)).reduce((prev, cur) => prev + cur, c.count);  
+  const [ totalConfigCount, setTotalConfigCount ] = useState(configPresetRoot.getTotalConfigCount());
+  console.log(`${totalConfigCount} :: ${useAppStore().overallFlashingState}`);
   const devices: Device[] = useMemo(() => getDevices(), [getDevices]);
   const onConnect = async (port: SerialPort) => {
     const id = randId();
@@ -71,8 +73,8 @@ export const Dashboard = () => {
 
       <div className="flex w-full h-full gap-3">
         <div className="flex flex-col w-[400px] h-full">
-          <DeviceList devices={devices} rootConfig={configPresetRoot}/>
-          <ConfigList rootConfig={configPresetRoot}/>
+          <DeviceList devices={devices} rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
+          <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
         </div>
         <div className="flex w-full h-full"><DeviceConfig key={configPresetSelected?.name}/></div>
       </div>
@@ -80,11 +82,12 @@ export const Dashboard = () => {
   );
 };
 
-const DeviceList = ({devices, rootConfig}: {devices: Device[], rootConfig: ConfigPreset}) => {  
-  const { setConnectDialogOpen, flasher } = useAppStore();
-  const [deviceSelectedToFlash, setDeviceSelectedToFlash] = useState(devices.map(d => d.flashState));
+const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[], rootConfig: ConfigPreset, totalConfigCount: number}) => {  
+  const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState } = useAppStore();
+  const [deviceSelectedToFlash, setDeviceSelectedToFlash] = useState(devices.map(d => d.flashState));    
   // const [flashingState, setFlashingState]: any = useState([]);
- 
+  const cancelButtonVisible = overallFlashingState != "idle";
+
   return (
     <div className="flex rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
       {devices.length ? (
@@ -104,22 +107,46 @@ const DeviceList = ({devices, rootConfig}: {devices: Device[], rootConfig: Confi
               />
               );
             })}
+            {<div className="m-auto flex flex-col gap-3 text-center">
+              <Button
+                className="mt-3 gap-2"
+                variant="outline"
+                onClick={() => setConnectDialogOpen(true)}
+              >
+                <PlusIcon size={16} />
+                New Connection
+              </Button>
+            </div>}
           </ul>
-          {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
-            className="gap-2"
-            onClick={() => {              
-              flasher.flashAll(devices, rootConfig.children, (f)=> {
-                f.device.setFlashState(f.state);
-                deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
-                setDeviceSelectedToFlash(deviceSelectedToFlash);
-                // flashingState[f.device.id] = f.state;
-                // setFlashingState(flashingState);
-                debugger;
-              });
-            }}
-          >            
-            Flash
-          </Button>}
+          <div className="flex">
+            {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
+              className="gap-2 w-full"
+              disabled={totalConfigCount == 0 || overallFlashingState == "busy"}
+              onClick={async () => {
+                if(overallFlashingState == "idle")
+                  await setup(rootConfig.getAll(), setOverallFlashingState);
+                nextBatch(devices,
+                  deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
+                  (f)=> {
+                    f.device.setFlashState(f.state);
+                    deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
+                    setDeviceSelectedToFlash(deviceSelectedToFlash);                
+                    
+                    // flashingState[f.device.id] = f.state;
+                    // setFlashingState(flashingState);
+                  }
+                );
+              }}
+            >            
+              {stateToText(overallFlashingState)}
+            </Button>}
+            {cancelButtonVisible && <Button
+              className="ml-1 p-2"
+              variant={"destructive"}
+            >
+              <XIcon/>
+            </Button>}
+          </div>
         </div>
       ) : (
         <div className="m-auto flex flex-col gap-3 text-center">
@@ -140,14 +167,14 @@ const DeviceList = ({devices, rootConfig}: {devices: Device[], rootConfig: Confi
 };
 
 
-const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
+const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPreset, setTotalConfigCountDiff: (val: number) => void}) => {
   
   const { configPresetRoot, setConfigPresetRoot, configPresetSelected, setConfigPresetSelected } = useAppStore();
   const [ editSelected, setEditSelected ] = useState(false);
   if(configPresetSelected === undefined) {
     setConfigPresetSelected(configPresetRoot);
     return (<div/>);    
-  }    
+  }
 
   return (
     <div className="flex flex-col rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
@@ -198,6 +225,7 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
           configPresetSelected={configPresetSelected}
           setConfigPresetSelected={setConfigPresetSelected}
           editSelected={editSelected}
+          onConfigCountChanged={(val, diff) => setTotalConfigCountDiff(diff)}
           onEditDone={(val) => {
             configPresetSelected.name = val;
             setEditSelected(false);
@@ -220,15 +248,20 @@ const ConfigList = ({rootConfig}: {rootConfig: ConfigPreset}) => {
 
 };
 
-const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected, editSelected, onEditDone}:
-  {config: ConfigPreset, configPresetSelected: ConfigPreset, setConfigPresetSelected: (selection: ConfigPreset) => void, editSelected: boolean, onEditDone: (value: string) => void}) => {
+const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected, editSelected, onEditDone, onConfigCountChanged}:
+  {config: ConfigPreset,
+    configPresetSelected: ConfigPreset,
+    setConfigPresetSelected: (selection: ConfigPreset) => void,
+    editSelected: boolean, onEditDone: (value: string) => void,
+    onConfigCountChanged: (val: number, diff: number) => void
+  }) => {
   const [configCount, setConfigCount] = useState(config.count);
   return (
     <div>
       <ConfigSelectButton
       label={config.name}
       active={config == configPresetSelected}
-      setValue={(value) => {setConfigCount(value);}}
+      setValue={(value) => {const diff = value - config.count; config.count = value; setConfigCount(value); onConfigCountChanged(value, diff);}}
       value={configCount}
       editing={editSelected && config == configPresetSelected}
       onClick={() => setConfigPresetSelected(config)}
@@ -236,7 +269,14 @@ const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected, edi
       />
       <div className="ml-[20px]">
         {config.children.map(c =>
-            (<ConfigEntry config={c} configPresetSelected={configPresetSelected} setConfigPresetSelected={setConfigPresetSelected} editSelected={editSelected} onEditDone={onEditDone}/>)
+            (<ConfigEntry
+              config={c}
+              configPresetSelected={configPresetSelected}
+              setConfigPresetSelected={setConfigPresetSelected}
+              editSelected={editSelected}
+              onEditDone={onEditDone}
+              onConfigCountChanged={onConfigCountChanged}
+            />)
         )}
       </div>
     </div>
@@ -293,7 +333,7 @@ const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progr
               className="w-full gap-2 h-8"
               onClick={() => toggleSelectedToFlash()}
             >
-              {stateToText(progressText)}
+              {deviceStateToText(progressText)} {/* TODO: Replace with inner text */}
             </Button>
           </div>
           
@@ -303,7 +343,7 @@ const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progr
   );
 }
 
-function stateToText(state: FlashState) {
+function deviceStateToText(state: FlashState) {
   switch(state.state) {
     case "doNotFlash":
       return "Disabled";
@@ -317,5 +357,18 @@ function stateToText(state: FlashState) {
       return `Flashing... (${(state.progress * 100).toFixed(1)} %)`;    
     default:
       return state.state;
+  }
+}
+
+function stateToText(state: OverallFlashingState) {
+  switch(state) {
+    case "idle":
+      return "Flash";
+    case "busy":
+      return "In Progress...";
+    case "waiting":
+      return "Continue";
+    default:
+      state;
   }
 }
