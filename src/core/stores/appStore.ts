@@ -1,7 +1,6 @@
 import { produce } from "immer";
 import { create } from "zustand";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { OverallFlashingState } from "../flashing/Flasher";
 
 export interface RasterSource {
   enabled: boolean;
@@ -81,6 +80,7 @@ export class ConfigPreset {
         if(key == '' || !isNaN(Number(key))) {
           // Create new ConfigPreset object to ensure that the member functions are not undefined.
           const preset = new ConfigPreset(value.name, undefined, value.config);
+          preset.overrideValues = value.overrideValues;
           preset.children = value.children;
           preset.children.forEach(c => c.parent = preset);
           return preset;
