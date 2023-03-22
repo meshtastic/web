@@ -121,7 +121,10 @@ export class ConfigPreset {
           const preset = new ConfigPreset(value.name, undefined, value.config);
           preset.overrideValues = value.overrideValues;
           preset.children = value.children;
-          preset.children.forEach(c => c.parent = preset);
+          preset.children.forEach(c => {
+            c.parent = preset;
+            c.overrideValues = {};
+          });
           return preset;
         }
         return value;
