@@ -122,6 +122,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
               className="gap-2 w-full"
               disabled={totalConfigCount == 0 || overallFlashingState == "busy"}
               onClick={async () => {
+                rootConfig.children[0].getFinalConfig();
                 if(overallFlashingState == "idle")
                   await setup(rootConfig.getAll(), setOverallFlashingState);
                 nextBatch(devices,
@@ -220,6 +221,14 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
           }}
         >
           <Trash2Icon/>
+        </button>
+        <button        
+          className="transition-all hover:text-accent mb-4"
+          onClick={() => {                     
+            configPresetSelected.getFinalConfig();      
+          }}
+        >
+          DEBUG Test config merge
         </button>
       </div>
       

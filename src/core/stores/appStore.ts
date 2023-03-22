@@ -1,6 +1,7 @@
 import { produce } from "immer";
 import { create } from "zustand";
 import { Protobuf } from "@meshtastic/meshtasticjs";
+import type { OverallFlashingState } from "../flashing/Flasher";
 
 export interface RasterSource {
   enabled: boolean;
@@ -30,7 +31,18 @@ export class ConfigPreset {
     }
     if(config.device === undefined)
       config.device = new Protobuf.Config_DeviceConfig();
-    // TODO: Add remaining
+    if(config.position === undefined)
+      config.position = new Protobuf.Config_PositionConfig();
+    if(config.power === undefined)
+      config.power = new Protobuf.Config_PowerConfig();
+    if(config.network === undefined)
+      config.network = new Protobuf.Config_NetworkConfig();
+    if(config.display === undefined)
+      config.display = new Protobuf.Config_DisplayConfig();
+    if(config.lora === undefined)
+      config.lora = new Protobuf.Config_LoRaConfig();
+    if(config.bluetooth === undefined)
+      config.bluetooth = new Protobuf.Config_BluetoothConfig();    
   }
 
   public saveConfigTree() {
@@ -71,6 +83,33 @@ export class ConfigPreset {
       return value;
     }
     return JSON.stringify(this, replacer);
+  }
+
+  public getFinalConfig(): Protobuf.LocalConfig {    
+    const config = new Protobuf.LocalConfig();
+    config.device = new Protobuf.Config_DeviceConfig();
+    config.position = new Protobuf.Config_PositionConfig();
+    config.power = new Protobuf.Config_PowerConfig();
+    config.network = new Protobuf.Config_NetworkConfig();
+    config.display = new Protobuf.Config_DisplayConfig();
+    debugger;
+    Object.entries(config).forEach(([sectionKey, value]) => {
+      if(sectionKey == "version")
+        return;
+      Object.keys(value).forEach(key => {        
+        (value as any)[key] = this.getConfigValue(sectionKey as keyof Protobuf.LocalConfig, key);
+      })
+    });    
+    return config;
+  }
+
+  private getConfigValue(sectionKey: keyof Protobuf.LocalConfig, key: string): any {
+    if(this.parent !== undefined && !this.overrideValues[key])
+      return this.parent.getConfigValue(sectionKey, key);
+    const conf = this.config[sectionKey];
+    
+    // TODO: any???
+    return (conf as any)[key];
   }
 
   public static loadOrCreate(): ConfigPreset {
