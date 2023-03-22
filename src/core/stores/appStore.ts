@@ -2,6 +2,7 @@ import { produce } from "immer";
 import { create } from "zustand";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import type { OverallFlashingState } from "../flashing/Flasher";
+import type { FirmwareVersion } from "@app/components/Dashboard";
 
 export interface RasterSource {
   enabled: boolean;
@@ -42,7 +43,7 @@ export class ConfigPreset {
     if(config.lora === undefined)
       config.lora = new Protobuf.Config_LoRaConfig();
     if(config.bluetooth === undefined)
-      config.bluetooth = new Protobuf.Config_BluetoothConfig();    
+      config.bluetooth = new Protobuf.Config_BluetoothConfig();
   }
 
   public saveConfigTree() {
@@ -161,6 +162,8 @@ interface AppState {
   configPresetRoot: ConfigPreset;
   configPresetSelected: ConfigPreset | undefined;
   overallFlashingState: OverallFlashingState;
+  firmwareRefreshing: boolean;
+  firmwareList: FirmwareVersion[];
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -176,6 +179,8 @@ interface AppState {
   setConfigPresetRoot: (root: ConfigPreset) => void;
   setConfigPresetSelected: (selection: ConfigPreset) => void;
   setOverallFlashingState: (state: OverallFlashingState) => void;
+  setFirmwareRefreshing: (state: boolean) => void;
+  setFirmwareList: (state: FirmwareVersion[]) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -190,6 +195,8 @@ export const useAppStore = create<AppState>()((set) => ({
   configPresetRoot: ConfigPreset.loadOrCreate(),
   configPresetSelected: undefined,
   overallFlashingState: "idle",
+  firmwareRefreshing: false,
+  firmwareList: [],
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -274,4 +281,18 @@ export const useAppStore = create<AppState>()((set) => ({
       })
     )
   },
+  setFirmwareRefreshing: (state: boolean) => {
+    set(
+      produce<AppState>((draft) => {
+        draft.firmwareRefreshing = state;
+      })
+    )
+  },
+  setFirmwareList: (state: FirmwareVersion[]) => {
+    set(
+      produce<AppState>((draft) => {
+        draft.firmwareList = state;
+      })
+    )
+  }
 }));

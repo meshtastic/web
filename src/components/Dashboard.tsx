@@ -9,7 +9,8 @@ import {
   XIcon,
   BluetoothIcon,
   UsbIcon,
-  NetworkIcon
+  NetworkIcon,
+  RefreshCwIcon
 } from "lucide-react";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { H3 } from "@components/UI/Typography/H3.js";
@@ -26,6 +27,7 @@ import { setup, FlashOperation, FlashState, nextBatch, OverallFlashingState, can
 import { randId } from "@app/core/utils/randId";
 import { subscribeAll } from "@app/core/subscriptions";
 import { connect } from "http2";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./UI/Select";
 
 let initTest: boolean  = false;
 
@@ -117,7 +119,8 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
               </Button>
             </div>}
           </ul>
-          <div className="flex">
+          <div className="flex gap-3">
+            <FirmwareSelection/>
             {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
               className="gap-2 w-full"
               disabled={totalConfigCount == 0 || overallFlashingState == "busy"}
@@ -354,6 +357,88 @@ const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progr
       </div>
     </li>
   );
+}
+
+const FirmwareSelection = () => {  
+  const { firmwareRefreshing, setFirmwareRefreshing, firmwareList, setFirmwareList } = useAppStore();  
+
+  let selectItems;
+  if(firmwareRefreshing) {
+    selectItems = [
+      <SelectItem key={0} value={"0"}>
+        {"Downloading firmware list..."}
+      </SelectItem>
+    ];
+  }
+  else {
+    selectItems = firmwareList.map((f, index) => (
+      <SelectItem key={index}
+      value={index.toString()}>
+        {f.name}
+      </SelectItem>
+    ))
+  }
+  const [ selectedFirmware, setSelectedFirmware ] = useState("0");
+
+  return (
+    <div className="flex gap-1 w-full">
+      <Select   
+        disabled={firmwareRefreshing}           
+        onValueChange={setSelectedFirmware}            
+        value={selectedFirmware}                // << Value of selected item
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {selectItems}
+        </SelectContent>
+      </Select>
+      <Button
+        variant="outline"
+        className="ml-1 p-2"
+        disabled={firmwareRefreshing}
+        onClick={() => {
+          setFirmwareRefreshing(true);
+          loadFirmwareList().then((list) => {
+            setFirmwareList(list.slice(0, 10))
+            setFirmwareRefreshing(false)
+          });
+        }}
+      >
+        <RefreshCwIcon size={20}/>
+      </Button>
+    </div>
+    
+  );
+}
+
+export type FirmwareVersion = {
+  name: string,
+  link: string,
+}
+
+interface FirmwareGithubRelease {
+  name: string,
+  assets: {
+    name: string,
+    browser_download_url: string
+  }[]
+}
+
+async function loadFirmwareList() : Promise<FirmwareVersion[]> {
+  const releases: FirmwareGithubRelease[] = await (await fetch("https://api.github.com/repos/meshtastic/firmware/releases")).json();
+  console.log(releases);
+  const yo = releases.map(r => {
+    const url = r.assets.find(a => a.name.startsWith("firmware"))!.browser_download_url;
+    if(url === undefined)
+      return undefined;
+    return { 
+      name: r.name.replace("Meshtastic Firmware ", ""),
+      link: url
+    };
+  }).filter(r => r !== undefined) as FirmwareVersion[];
+  return yo;
 }
 
 function deviceStateToText(state: FlashState) {
