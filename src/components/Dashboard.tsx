@@ -71,7 +71,7 @@ export const Dashboard = () => {
       <Separator />
 
       <div className="flex w-full h-full gap-3">
-        <div className="flex flex-col w-[400px] h-full">
+        <div className="flex flex-col w-full max-w-[800px] h-full">
           <DeviceList devices={devices} rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
           <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
         </div>
@@ -106,7 +106,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
               />
               );
             })}
-            {<div className="m-auto flex flex-col gap-3 text-center">
+            {<div className="m-auto flex flex-col  items-center gap-3 text-center">
               <Button
                 className="mt-3 gap-2"
                 variant="outline"
@@ -307,50 +307,50 @@ const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progr
     <li key={device.id}>
       <div className="py-4">
         <div className="flex items-center justify-between">
-          <p className="truncate text-sm font-medium text-accent">
-            {device.nodes.get(device.hardware.myNodeNum)?.user
-              ?.longName ?? "<Not flashed yet>"}
-          </p>
-          <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
-            {device.connection?.connType === "ble" && (
-              <>
-                <BluetoothIcon size={16} />
-                BLE
-              </>
-            )}
-            {device.connection?.connType === "serial" && (
-              <>
-                <UsbIcon size={16} />
-                Serial
-              </>
-            )}
-            {device.connection?.connType === "http" && (
-              <>
-                <NetworkIcon size={16} />
-                Network
-              </>
-            )}
-          </div>
-        </div>
-        <div className="mt-1 sm:flex sm:justify-between">
-          <div className="flex gap-2 w-full items-center text-sm text-gray-500">
-            <UsersIcon
-              size={20}
-              className="text-gray-400"
-              aria-hidden="true"
-            />
-            {device.nodes.size === 0 ? 0 : device.nodes.size - 1}                        
-            <Button
-              variant={selectedToFlash && !progressText ? "default" : "outline"}
-              size="sm"
-              className="w-full gap-2 h-8"
-              onClick={() => toggleSelectedToFlash()}
-            >
-              {deviceStateToText(progressText)} {/* TODO: Replace with inner text */}
-            </Button>
-          </div>
-          
-        </div>
+          <div className="flex gap-4">
+            <p className="truncate text-sm font-medium text-accent">
+              {device.nodes.get(device.hardware.myNodeNum)?.user
+                ?.longName ?? "<Not flashed yet>"}
+            </p>
+            <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
+              {device.connection?.connType === "ble" && (
+                <>
+                  <BluetoothIcon size={16} />
+                  BLE
+                </>
+              )}
+              {device.connection?.connType === "serial" && (
+                <>
+                  <UsbIcon size={16} />
+                  Serial
+                </>
+              )}
+              {device.connection?.connType === "http" && (
+                <>
+                  <NetworkIcon size={16} />
+                  Network
+                </>
+              )}
+            </div>
+          </div>          
+          <div className="flex gap-2 items-center text-sm text-gray-500">
+              <UsersIcon
+                size={20}
+                className="text-gray-400"
+                aria-hidden="true"
+              />
+              {device.nodes.size === 0 ? 0 : device.nodes.size - 1}                        
+              <Button
+                variant={selectedToFlash && !progressText ? "default" : "outline"}
+                size="sm"
+                style={deviceStateToStyle(progressText)}
+                className="w-[10rem] gap-2 h-8"
+                onClick={() => toggleSelectedToFlash()}
+              >
+                {deviceStateToText(progressText)} {/* TODO: Replace with inner text */}
+              </Button>
+            </div>
+        </div>        
       </div>
     </li>
   );
@@ -383,5 +383,18 @@ function stateToText(state: OverallFlashingState) {
       return "Continue";
     default:
       state;
+  }
+}
+
+function deviceStateToStyle(state: FlashState): React.CSSProperties {
+  switch(state.state) {
+    case "doFlash":      
+    default:
+      return {
+        color: "var(--textPrimary)",
+        borderColor: "var(--accentMuted)",
+        background: `linear-gradient(90deg, var(--accentMuted) ${state.progress * 100}%, transparent ${state.progress * 100}%)`
+      };    
+      return {};
   }
 }
