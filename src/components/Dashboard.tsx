@@ -360,32 +360,45 @@ const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progr
 }
 
 const FirmwareSelection = () => {  
-  const { firmwareRefreshing, setFirmwareRefreshing, firmwareList, setFirmwareList } = useAppStore();  
+  const { firmwareRefreshing, setFirmwareRefreshing, firmwareList, setFirmwareList, selectedFirmware, setSelectedFirmware } = useAppStore();  
 
   let selectItems;
+  let selection = selectedFirmware;
   if(firmwareRefreshing) {
     selectItems = [
-      <SelectItem key={0} value={"0"}>
-        {"Downloading firmware list..."}
+      <SelectItem key={0} value={"updating"}>
+        {"Updating firmware list..."}
       </SelectItem>
     ];
+    selection = "updating";
+  }
+  else if(firmwareList.length == 0) {
+    selectItems = [
+      <SelectItem key={0} value={"none"}>
+        {"Press it >>"}
+      </SelectItem>
+    ];
+    selection = "none";
   }
   else {
     selectItems = firmwareList.map((f, index) => (
-      <SelectItem key={index}
-      value={index.toString()}>
+      <SelectItem key={index} value={f.name}>
         {f.name}
       </SelectItem>
     ))
   }
-  const [ selectedFirmware, setSelectedFirmware ] = useState("0");
+  selectItems.push(
+    <SelectItem key={100} value={"custom"}>
+      {"< Select custom firmware >"}
+    </SelectItem>
+  );
 
   return (
     <div className="flex gap-1 w-full">
       <Select   
         disabled={firmwareRefreshing}           
         onValueChange={setSelectedFirmware}            
-        value={selectedFirmware}                // << Value of selected item
+        value={selection}                // << Value of selected item
       >
         <SelectTrigger>
           <SelectValue />
@@ -401,8 +414,10 @@ const FirmwareSelection = () => {
         onClick={() => {
           setFirmwareRefreshing(true);
           loadFirmwareList().then((list) => {
-            setFirmwareList(list.slice(0, 10))
-            setFirmwareRefreshing(false)
+            setFirmwareList(list.slice(0, 10));
+            setFirmwareRefreshing(false);
+            setSelectedFirmware(list[0].name);    // TODO: What if list length 0?
+            // TODO: What if download fails?
           });
         }}
       >

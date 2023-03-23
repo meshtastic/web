@@ -164,6 +164,7 @@ interface AppState {
   overallFlashingState: OverallFlashingState;
   firmwareRefreshing: boolean;
   firmwareList: FirmwareVersion[];
+  selectedFirmware: string;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -181,6 +182,7 @@ interface AppState {
   setOverallFlashingState: (state: OverallFlashingState) => void;
   setFirmwareRefreshing: (state: boolean) => void;
   setFirmwareList: (state: FirmwareVersion[]) => void;
+  setSelectedFirmware: (state: string) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -197,6 +199,7 @@ export const useAppStore = create<AppState>()((set) => ({
   overallFlashingState: "idle",
   firmwareRefreshing: false,
   firmwareList: [],
+  selectedFirmware: "none",
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -294,5 +297,12 @@ export const useAppStore = create<AppState>()((set) => ({
         draft.firmwareList = state;
       })
     )
-  }
+  },
+  setSelectedFirmware: (state: string) => {
+    set(
+      produce<AppState>((draft) => {
+        draft.selectedFirmware = state;
+      })
+    )
+  },
 }));
