@@ -1,33 +1,53 @@
-import { ConfigPreset, useAppStore } from "@app/core/stores/appStore.js";
-import { Button } from "@components/UI/Button.js";
 import {
-  PlusIcon,
-  Trash2Icon,
+  useMemo,
+  useState,
+} from 'react';
+
+import {
+  BluetoothIcon,
   Edit3Icon,
   ListPlusIcon,
+  NetworkIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  Trash2Icon,
+  UsbIcon,
   UsersIcon,
   XIcon,
-  BluetoothIcon,
-  UsbIcon,
-  NetworkIcon,
-  RefreshCwIcon
-} from "lucide-react";
-import { Subtle } from "@components/UI/Typography/Subtle.js";
-import { H3 } from "@components/UI/Typography/H3.js";
-import { Device, useDevice, useDeviceStore } from "@app/core/stores/deviceStore.js";
-import { useCallback, useMemo, useState, useTransition } from "react";
-import { Separator } from "@components/UI/Seperator.js";
-import { Mono } from "./generic/Mono";
-import { DeviceWrapper } from "@app/DeviceWrapper";
-import { DeviceConfig } from "@app/pages/Config/DeviceConfig";
-import { ISerialConnection, Protobuf } from "@meshtastic/meshtasticjs";
-import { SidebarButton } from "./UI/Sidebar/sidebarButton";
-import { ConfigSelectButton } from "./UI/ConfigSelectButton";
-import { setup, FlashOperation, FlashState, nextBatch, OverallFlashingState, cancel } from "@app/core/flashing/Flasher";
-import { randId } from "@app/core/utils/randId";
-import { subscribeAll } from "@app/core/subscriptions";
-import { connect } from "http2";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./UI/Select";
+} from 'lucide-react';
+
+import {
+  cancel,
+  FlashState,
+  nextBatch,
+  OverallFlashingState,
+  setup,
+} from '@app/core/flashing/Flasher';
+import {
+  ConfigPreset,
+  useAppStore,
+} from '@app/core/stores/appStore.js';
+import {
+  Device,
+  useDeviceStore,
+} from '@app/core/stores/deviceStore.js';
+import { subscribeAll } from '@app/core/subscriptions';
+import { randId } from '@app/core/utils/randId';
+import { DeviceConfig } from '@app/pages/Config/DeviceConfig';
+import { Button } from '@components/UI/Button.js';
+import { Separator } from '@components/UI/Seperator.js';
+import { H3 } from '@components/UI/Typography/H3.js';
+import { Subtle } from '@components/UI/Typography/Subtle.js';
+import { ISerialConnection } from '@meshtastic/meshtasticjs';
+
+import { ConfigSelectButton } from './UI/ConfigSelectButton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './UI/Select';
 
 let initTest: boolean  = false;
 
@@ -84,10 +104,12 @@ export const Dashboard = () => {
 };
 
 const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[], rootConfig: ConfigPreset, totalConfigCount: number}) => {  
-  const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState } = useAppStore();
+  const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, firmwareList } = useAppStore();
   const [deviceSelectedToFlash, setDeviceSelectedToFlash] = useState(devices.map(d => d.flashState));    
   // const [flashingState, setFlashingState]: any = useState([]);
   const cancelButtonVisible = overallFlashingState != "idle";
+  const firmware = firmwareList.find(f => f.name == selectedFirmware);
+  console.log(`Selected firmware: ${firmware?.name}`);
 
   return (
     <div className="flex rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
@@ -125,9 +147,9 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
               className="gap-2 w-full"
               disabled={totalConfigCount == 0 || overallFlashingState == "busy"}
               onClick={async () => {
-                rootConfig.children[0].getFinalConfig();
+                rootConfig.children[0].getFinalConfig(); // FIXME
                 if(overallFlashingState == "idle")
-                  await setup(rootConfig.getAll(), setOverallFlashingState);
+                  await setup(rootConfig.getAll(), firmware!, setOverallFlashingState);
                 nextBatch(devices,
                   deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
                   (f)=> {
@@ -362,8 +384,12 @@ const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progr
 const FirmwareSelection = () => {  
   const { firmwareRefreshing, setFirmwareRefreshing, firmwareList, setFirmwareList, selectedFirmware, setSelectedFirmware } = useAppStore();  
 
-  let selectItems;
-  let selection = selectedFirmware;
+  let selectItems = [
+    <SelectItem key={-1} value={"latest"}>
+      {"Latest version"}
+    </SelectItem>
+  ];
+  let selection = selectedFirmware;  
   if(firmwareRefreshing) {
     selectItems = [
       <SelectItem key={0} value={"updating"}>
@@ -373,20 +399,20 @@ const FirmwareSelection = () => {
     selection = "updating";
   }
   else if(firmwareList.length == 0) {
-    selectItems = [
-      <SelectItem key={0} value={"none"}>
-        {"Press it >>"}
+    selectItems.push(
+      <SelectItem key={0} value={"hint"} disabled={true}>
+        {"(Press update button to get version list)"}
       </SelectItem>
-    ];
-    selection = "none";
+    );
   }
   else {
-    selectItems = firmwareList.map((f, index) => (
+    const versions = firmwareList.map((f, index) => (
       <SelectItem key={index} value={f.name}>
         {f.name}
       </SelectItem>
     ))
-  }
+    selectItems.push(...versions);
+  }  
   selectItems.push(
     <SelectItem key={100} value={"custom"}>
       {"< Select custom firmware >"}
@@ -415,8 +441,7 @@ const FirmwareSelection = () => {
           setFirmwareRefreshing(true);
           loadFirmwareList().then((list) => {
             setFirmwareList(list.slice(0, 10));
-            setFirmwareRefreshing(false);
-            setSelectedFirmware(list[0].name);    // TODO: What if list length 0?
+            setFirmwareRefreshing(false);            
             // TODO: What if download fails?
           });
         }}
@@ -431,6 +456,10 @@ const FirmwareSelection = () => {
 export type FirmwareVersion = {
   name: string,
   link: string,
+  sections?: {
+    data: Uint8Array,
+    offset: number
+  }[]
 }
 
 interface FirmwareGithubRelease {
@@ -444,7 +473,7 @@ interface FirmwareGithubRelease {
 async function loadFirmwareList() : Promise<FirmwareVersion[]> {
   const releases: FirmwareGithubRelease[] = await (await fetch("https://api.github.com/repos/meshtastic/firmware/releases")).json();
   console.log(releases);
-  const yo = releases.map(r => {
+  return releases.map(r => {
     const url = r.assets.find(a => a.name.startsWith("firmware"))!.browser_download_url;
     if(url === undefined)
       return undefined;
@@ -452,8 +481,7 @@ async function loadFirmwareList() : Promise<FirmwareVersion[]> {
       name: r.name.replace("Meshtastic Firmware ", ""),
       link: url
     };
-  }).filter(r => r !== undefined) as FirmwareVersion[];
-  return yo;
+  }).filter(r => r !== undefined) as FirmwareVersion[];  
 }
 
 function deviceStateToText(state: FlashState) {

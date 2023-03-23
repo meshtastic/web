@@ -1,8 +1,10 @@
-import { produce } from "immer";
-import { create } from "zustand";
-import { Protobuf } from "@meshtastic/meshtasticjs";
-import type { OverallFlashingState } from "../flashing/Flasher";
-import type { FirmwareVersion } from "@app/components/Dashboard";
+import { produce } from 'immer';
+import { create } from 'zustand';
+
+import type { FirmwareVersion } from '@app/components/Dashboard';
+import { Protobuf } from '@meshtastic/meshtasticjs';
+
+import type { OverallFlashingState } from '../flashing/Flasher';
 
 export interface RasterSource {
   enabled: boolean;
@@ -199,7 +201,7 @@ export const useAppStore = create<AppState>()((set) => ({
   overallFlashingState: "idle",
   firmwareRefreshing: false,
   firmwareList: [],
-  selectedFirmware: "none",
+  selectedFirmware: "latest",
 
   setRasterSources: (sources: RasterSource[]) => {
     set(

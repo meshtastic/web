@@ -1,21 +1,28 @@
-import type { ISerialConnection, Protobuf } from "@meshtastic/meshtasticjs";
-import { ConfigPreset, useAppStore } from "../stores/appStore";
-import type { Device } from "../stores/deviceStore";
-import { EspLoader } from "@toit/esptool.js";
+import type { FirmwareVersion } from '@app/components/Dashboard';
+import type {
+  ISerialConnection,
+  Protobuf,
+} from '@meshtastic/meshtasticjs';
+import { EspLoader } from '@toit/esptool.js';
+
+import { ConfigPreset } from '../stores/appStore';
+import type { Device } from '../stores/deviceStore';
 
 type DeviceFlashingState = "doNotFlash" | "doFlash" | "idle" | "connecting" | "erasing" | "flashing" | "config" | "done" | "aborted" | "failed";
 export type OverallFlashingState = "idle"  | "busy" | "waiting";
 
 const sections: {data: Uint8Array, offset: number}[] = [ ];
 let configQueue: Protobuf.LocalConfig[] = [];
-let firmwareAvailable: boolean = false;
+let firmwareToUse: FirmwareVersion;
 let operations: FlashOperation[] = [];
 let callback: (flashState: OverallFlashingState) => void;
 
-export async function setup(configs: ConfigPreset[], overallCallback: (flashState: OverallFlashingState) => void) {        
-    callback = overallCallback;    
-    if(!firmwareAvailable)
-        await init();    
+export async function setup(configs: ConfigPreset[], firmware: FirmwareVersion, overallCallback: (flashState: OverallFlashingState) => void) {        
+    callback = overallCallback;
+    console.log(`Firmware to use: ${firmware?.name} - ${firmware?.link}`);
+    firmwareToUse = firmware;
+    if(firmware.sections === undefined)
+        await loadFirmware();    
     for(const c in configs) {
         const config = configs[c];
         for (let i = 0; i < config.count; i++) {
@@ -53,11 +60,16 @@ function handleFlashingDone() {
         callback("waiting");
 }
 
-async function init() {        
-    firmwareAvailable = true;
-    await downloadFirmware("firmware-tlora-v2-1-1.6-2.0.6.97fd5cf.bin", 0, 0);
-    await downloadFirmware("bleota.bin", 2490368, 1);
-    await downloadFirmware("littlefs-2.0.6.97fd5cf.bin", 3145728, 2);
+async function loadFirmware() {        
+    // // TODO: Error handling    
+    // debugger;
+    // // TODO: Figure out CORS stuff
+    // const zip = await fetch("https://api.allorigins.win/raw?url=" + firmwareToUse.link);
+    // debugger;
+
+    // await downloadFirmware("firmware-tlora-v2-1-1.6-2.0.6.97fd5cf.bin", 0, 0);
+    // await downloadFirmware("bleota.bin", 2490368, 1);
+    // await downloadFirmware("littlefs-2.0.6.97fd5cf.bin", 3145728, 2);
 }
 
 async function downloadFirmware(path: string, offset: number, slot: number) {     
@@ -68,6 +80,19 @@ async function downloadFirmware(path: string, offset: number, slot: number) {
     const data = new Uint8Array(hmm);
     sections[slot] = {data, offset};
     console.log(`Downloaded ${path}`);      
+}
+
+function getDeviceType(port: SerialPort) {
+    const info = port.getInfo();
+    switch(info.usbVendorId) {
+        case 6790:
+            switch(info.usbProductId) {
+                case 21972:
+                    return "tlora-v2-1-1.6";
+            }
+            break;
+    }
+    return undefined;
 }
 
 
@@ -91,6 +116,7 @@ export class FlashOperation {
         let port;
         try {
             port = await (this.device.connection! as ISerialConnection).freePort();
+            const info = port?.getInfo();
             await port!.open({baudRate: 115200});
             this.loader = new EspLoader(port!);        
             const loader = this.loader;
