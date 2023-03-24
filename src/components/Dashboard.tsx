@@ -228,6 +228,7 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
       <div className="flex gap-2">
         <button        
           className="transition-all hover:text-accent mb-4"
+          title="Add new configuration as child"
           onClick={() => {         
             const newPreset = new ConfigPreset("New Preset", configPresetSelected);
             configPresetSelected?.children.push(newPreset);          
@@ -241,6 +242,7 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
         </button>
         <button        
           className="transition-all hover:text-accent mb-4"
+          title="Rename"
           onClick={() => {                     
             setEditSelected(true);
           }}
@@ -249,6 +251,7 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
         </button>
         <button        
           className="transition-all hover:text-accent mb-4"
+          title="Delete"
           onClick={() => {                     
             if(configPresetSelected.parent === undefined) {
               alert("-- cannot delete root --");
@@ -266,6 +269,7 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
         </button>
         <button        
           className="transition-all hover:text-accent mb-4"
+          title="Delete"
           onClick={() => {                     
             configPresetSelected.getFinalConfig();      
           }}
@@ -454,6 +458,7 @@ const FirmwareSelection = () => {
       <Button
         variant="outline"
         className="ml-1 p-2"
+        title="Update firmware version list"
         disabled={firmwareRefreshing}
         onClick={() => {
           setFirmwareRefreshing(true);
