@@ -1,3 +1,5 @@
+import JSZip from 'jszip';
+
 import type { FirmwareVersion } from '@app/components/Dashboard';
 import type {
   ISerialConnection,
@@ -21,8 +23,7 @@ export async function setup(configs: ConfigPreset[], firmware: FirmwareVersion, 
     callback = overallCallback;
     console.log(`Firmware to use: ${firmware?.name} - ${firmware?.link}`);
     firmwareToUse = firmware;
-    if(firmware.sections === undefined)
-        await loadFirmware();    
+    await loadFirmware();    
     for(const c in configs) {
         const config = configs[c];
         for (let i = 0; i < config.count; i++) {
@@ -60,16 +61,80 @@ function handleFlashingDone() {
         callback("waiting");
 }
 
-async function loadFirmware() {        
-    // // TODO: Error handling    
-    // debugger;
-    // // TODO: Figure out CORS stuff
-    // const zip = await fetch("https://api.allorigins.win/raw?url=" + firmwareToUse.link);
-    // debugger;
+function storeInDb(firmware: FirmwareVersion, file: ArrayBuffer) {
+    const db = indexedDB.open("firmwares");
+    db.onsuccess = () => {
+        debugger;
+        store(db.result, firmware, file);
+    };    
+    db.onupgradeneeded = (ev) => {
+        const objStore = db.result.createObjectStore("files");
+        debugger;
+        objStore.transaction.oncomplete = () => store(db.result, firmware, file);
+    };    
+}
 
-    // await downloadFirmware("firmware-tlora-v2-1-1.6-2.0.6.97fd5cf.bin", 0, 0);
-    // await downloadFirmware("bleota.bin", 2490368, 1);
-    // await downloadFirmware("littlefs-2.0.6.97fd5cf.bin", 3145728, 2);
+async function loadFromDb(firmware: FirmwareVersion) {    
+    return new Promise<ArrayBuffer>((resolve, reject) => {
+        const db = indexedDB.open("firmwares");
+        db.onsuccess = () => {
+            const objStore = db.result.transaction("files", "readonly").objectStore("files");
+            const transaction = objStore.get(firmware.tag);
+            transaction.onsuccess = () => {   
+                debugger;             
+                resolve(transaction.result as ArrayBuffer);
+            };
+            transaction.onerror = reject;            
+        }
+    });
+}
+
+function store(db: IDBDatabase, firmware: FirmwareVersion, file: ArrayBuffer) {
+    debugger;
+    const fileStore = db.transaction("files", "readwrite").objectStore("files");
+    fileStore.transaction.oncomplete = () => {        
+        console.log("Successfully stored firmware in DB.");
+    }
+    fileStore.add(file, firmware.tag);
+}
+
+async function getZipFile() {    
+    if(firmwareToUse.inLocalDb) {
+        const storedZip = await loadFromDb(firmwareToUse);
+        if(storedZip !== undefined)
+            return storedZip;
+    }
+
+    const zip = await fetch("firmware-2.1.5.23272da.zip");
+    const content = await zip.arrayBuffer();
+    storeInDb(firmwareToUse, content);
+    return content;
+}
+
+function getFileName() {
+    const device = "tlora-v2-1-1.6";
+    return `firmware-${device}-${firmwareToUse.tag}.bin`;
+}
+
+async function loadFirmware() {        
+    console.warn("Loading firmware");
+    // TODO: Error handling
+    debugger;
+    // TODO: Figure out CORS stuff
+
+    const zip = await getZipFile();
+    const z = await JSZip.loadAsync(zip);    
+    const filename = getFileName();
+    const mainFile = await z.file(filename)?.async("uint8array");
+    const bleoata = await z.file("bleota.bin")?.async("uint8array");
+    const littlefs = await z.file(`littlefs-${firmwareToUse.tag}.bin`)?.async("uint8array");
+    if(mainFile === undefined || bleoata === undefined || littlefs === undefined)
+        throw "Missing file(s)";
+    sections.push(...[
+        { offset: 0, data: mainFile },
+        { offset: 0x260000, data: bleoata },
+        { offset: 0x300000, data: littlefs }
+    ]);    
 }
 
 async function downloadFirmware(path: string, offset: number, slot: number) {     

@@ -45,6 +45,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from './UI/Select';
@@ -387,7 +388,8 @@ const FirmwareSelection = () => {
   let selectItems = [
     <SelectItem key={-1} value={"latest"}>
       {"Latest version"}
-    </SelectItem>
+    </SelectItem>,
+    <SelectSeparator/>
   ];
   let selection = selectedFirmware;  
   if(firmwareRefreshing) {
@@ -439,7 +441,7 @@ const FirmwareSelection = () => {
         disabled={firmwareRefreshing}
         onClick={() => {
           setFirmwareRefreshing(true);
-          loadFirmwareList().then((list) => {
+          loadFirmwareList().then((list) => { 
             setFirmwareList(list.slice(0, 10));
             setFirmwareRefreshing(false);            
             // TODO: What if download fails?
@@ -455,33 +457,55 @@ const FirmwareSelection = () => {
 
 export type FirmwareVersion = {
   name: string,
+  tag: string,
   link: string,
-  sections?: {
-    data: Uint8Array,
-    offset: number
-  }[]
+  inLocalDb: boolean
+  // partitions: {[index: string]: Uint8Array},
 }
 
 interface FirmwareGithubRelease {
   name: string,
+  tag_name: string,  
   assets: {
     name: string,
     browser_download_url: string
   }[]
 }
 
+async function isStoredInDb(firmwareTag: string): Promise<boolean> {
+    const dbs = await indexedDB.databases();
+    if(dbs.find(db => db.name == "firmwares") === undefined)
+        return false;
+    return new Promise<boolean>((resolve, reject) => {        
+        const db = indexedDB.open("firmwares");
+        db.onsuccess = () => {
+            if(!db.result.objectStoreNames.contains("files"))
+                resolve(false);
+            const objStore = db.result.transaction("files", "readonly").objectStore("files");
+            const transaction = objStore.getKey(firmwareTag);
+            transaction.onsuccess = () => resolve(transaction.result !== undefined);                
+            transaction.onerror = () => resolve(false);     
+        }
+    });
+}
+
 async function loadFirmwareList() : Promise<FirmwareVersion[]> {
   const releases: FirmwareGithubRelease[] = await (await fetch("https://api.github.com/repos/meshtastic/firmware/releases")).json();
   console.log(releases);
-  return releases.map(r => {
+  const firmwareDescriptions = await Promise.all(releases.map(async (r) => {
     const url = r.assets.find(a => a.name.startsWith("firmware"))!.browser_download_url;
     if(url === undefined)
       return undefined;
+    const tag = r.tag_name.substring(1);      // remove leading "v"    
     return { 
       name: r.name.replace("Meshtastic Firmware ", ""),
-      link: url
+      tag: tag,
+      link: url,
+      inLocalDb: await isStoredInDb(tag)
     };
-  }).filter(r => r !== undefined) as FirmwareVersion[];  
+  }));  
+  return firmwareDescriptions.filter(r => r !== undefined) as FirmwareVersion[];
+ 
 }
 
 function deviceStateToText(state: FlashState) {

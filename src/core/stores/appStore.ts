@@ -94,8 +94,7 @@ export class ConfigPreset {
     config.position = new Protobuf.Config_PositionConfig();
     config.power = new Protobuf.Config_PowerConfig();
     config.network = new Protobuf.Config_NetworkConfig();
-    config.display = new Protobuf.Config_DisplayConfig();
-    debugger;
+    config.display = new Protobuf.Config_DisplayConfig();    
     Object.entries(config).forEach(([sectionKey, value]) => {
       if(sectionKey == "version")
         return;
