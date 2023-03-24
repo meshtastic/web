@@ -1,7 +1,7 @@
 import { produce } from 'immer';
 import { create } from 'zustand';
 
-import type { FirmwareVersion } from '@app/components/Dashboard';
+import { FirmwareVersion } from '@app/components/Dashboard';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import type { OverallFlashingState } from '../flashing/Flasher';
@@ -149,6 +149,22 @@ export class ConfigPreset {
 
 }
 
+function loadFirmwareListFromStorage(): FirmwareVersion[] {
+  const list = localStorage.getItem("firmwareList") as (string | undefined);
+  if(list === undefined)
+    return [];
+  try {
+    const json = JSON.parse(list) as FirmwareVersion[];
+    if(json.every(o => "name" in o && "inLocalDb" in o && "link" in o && "tag" in o))
+      return json;    
+    else
+      return [];
+  }
+  catch {
+    return [];
+  }
+}
+
 interface AppState {
   selectedDevice: number;
   devices: {
@@ -199,7 +215,7 @@ export const useAppStore = create<AppState>()((set) => ({
   configPresetSelected: undefined,
   overallFlashingState: "idle",
   firmwareRefreshing: false,
-  firmwareList: [],
+  firmwareList: loadFirmwareListFromStorage(),
   selectedFirmware: "latest",
 
   setRasterSources: (sources: RasterSource[]) => {
@@ -295,6 +311,7 @@ export const useAppStore = create<AppState>()((set) => ({
   setFirmwareList: (state: FirmwareVersion[]) => {
     set(
       produce<AppState>((draft) => {
+        localStorage.setItem("firmwareList", JSON.stringify(state));
         draft.firmwareList = state;
       })
     )

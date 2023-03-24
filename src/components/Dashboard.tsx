@@ -4,6 +4,7 @@ import {
 } from 'react';
 
 import {
+  ArrowDownCircleIcon,
   BluetoothIcon,
   Edit3Icon,
   ListPlusIcon,
@@ -105,7 +106,7 @@ export const Dashboard = () => {
 };
 
 const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[], rootConfig: ConfigPreset, totalConfigCount: number}) => {  
-  const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, firmwareList } = useAppStore();
+  const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, firmwareList, setFirmwareList } = useAppStore();
   const [deviceSelectedToFlash, setDeviceSelectedToFlash] = useState(devices.map(d => d.flashState));    
   // const [flashingState, setFlashingState]: any = useState([]);
   const cancelButtonVisible = overallFlashingState != "idle";
@@ -150,7 +151,22 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
               onClick={async () => {
                 rootConfig.children[0].getFinalConfig(); // FIXME
                 if(overallFlashingState == "idle")
-                  await setup(rootConfig.getAll(), firmware!, setOverallFlashingState);
+                  await setup(rootConfig.getAll(), firmware!, (state: OverallFlashingState) => {
+                    if(state == 'busy') {
+                      isStoredInDb(firmware!.tag).then(b => {
+                        // All FirmwareVersion objects are immutable here so we'll have to re-create each entry
+                        const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => { return {
+                          name: f.name,
+                          tag: f.tag,
+                          link: f.link,
+                          inLocalDb: f == firmware ? b : f.inLocalDb 
+                        }});
+                        setFirmwareList(newFirmwareList);
+                      });
+                    }
+                      
+                    setOverallFlashingState(state);
+                  });
                 nextBatch(devices,
                   deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
                   (f)=> {
@@ -410,7 +426,7 @@ const FirmwareSelection = () => {
   else {
     const versions = firmwareList.map((f, index) => (
       <SelectItem key={index} value={f.name}>
-        {f.name}
+        <div className="flex gap-2 items-center">{f.name} {f.inLocalDb ? <ArrowDownCircleIcon size={20}/> : <div/>}</div>
       </SelectItem>
     ))
     selectItems.push(...versions);
@@ -472,7 +488,8 @@ interface FirmwareGithubRelease {
   }[]
 }
 
-async function isStoredInDb(firmwareTag: string): Promise<boolean> {
+// TODO: Move this somewhere better
+export async function isStoredInDb(firmwareTag: string): Promise<boolean> {
     const dbs = await indexedDB.databases();
     if(dbs.find(db => db.name == "firmwares") === undefined)
         return false;
