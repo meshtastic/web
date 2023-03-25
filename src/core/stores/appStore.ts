@@ -178,7 +178,10 @@ interface AppState {
   connectDialogOpen: boolean;
   configPresetRoot: ConfigPreset;
   configPresetSelected: ConfigPreset | undefined;
-  overallFlashingState: OverallFlashingState;
+  overallFlashingState: {
+    state: OverallFlashingState,
+    progress?: number
+  },
   firmwareRefreshing: boolean;
   firmwareList: FirmwareVersion[];
   selectedFirmware: string;
@@ -196,7 +199,7 @@ interface AppState {
   setConnectDialogOpen: (open: boolean) => void;
   setConfigPresetRoot: (root: ConfigPreset) => void;
   setConfigPresetSelected: (selection: ConfigPreset) => void;
-  setOverallFlashingState: (state: OverallFlashingState) => void;
+  setOverallFlashingState: (state: { state: OverallFlashingState, progress?: number }) => void;
   setFirmwareRefreshing: (state: boolean) => void;
   setFirmwareList: (state: FirmwareVersion[]) => void;
   setSelectedFirmware: (state: string) => void;
@@ -213,7 +216,8 @@ export const useAppStore = create<AppState>()((set) => ({
   connectDialogOpen: false,
   configPresetRoot: ConfigPreset.loadOrCreate(),
   configPresetSelected: undefined,
-  overallFlashingState: "idle",
+  overallFlashingState: { state: "idle" },
+  firmwareDownloadProgress: undefined,
   firmwareRefreshing: false,
   firmwareList: loadFirmwareListFromStorage(),
   selectedFirmware: "latest",
@@ -294,7 +298,7 @@ export const useAppStore = create<AppState>()((set) => ({
       })
     )
   },
-  setOverallFlashingState: (state: OverallFlashingState) => {    
+  setOverallFlashingState: (state: { state: OverallFlashingState, progress?: number }) => {    
     set(
       produce<AppState>((draft) => {
         draft.overallFlashingState = state;

@@ -109,7 +109,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
   const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, firmwareList, setFirmwareList } = useAppStore();
   const [deviceSelectedToFlash, setDeviceSelectedToFlash] = useState(devices.map(d => d.flashState));    
   // const [flashingState, setFlashingState]: any = useState([]);
-  const cancelButtonVisible = overallFlashingState != "idle";
+  const cancelButtonVisible = overallFlashingState.state != "idle";
   const firmware = firmwareList.find(f => f.name == selectedFirmware);
   console.log(`Selected firmware: ${firmware?.name}`);
 
@@ -147,11 +147,11 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
             <FirmwareSelection/>
             {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
               className="gap-2 w-full"
-              disabled={totalConfigCount == 0 || overallFlashingState == "busy"}
+              disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
               onClick={async () => {
                 rootConfig.children[0].getFinalConfig(); // FIXME
-                if(overallFlashingState == "idle")
-                  await setup(rootConfig.getAll(), firmware!, (state: OverallFlashingState) => {
+                if(overallFlashingState.state == "idle")
+                  await setup(rootConfig.getAll(), firmware!, (state: OverallFlashingState, progress?: number) => {
                     if(state == 'busy') {
                       isStoredInDb(firmware!.tag).then(b => {
                         // All FirmwareVersion objects are immutable here so we'll have to re-create each entry
@@ -165,7 +165,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                       });
                     }
                       
-                    setOverallFlashingState(state);
+                    setOverallFlashingState({state, progress});
                   });
                 nextBatch(devices,
                   deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
@@ -180,7 +180,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                 );
               }}
             >            
-              {stateToText(overallFlashingState)}
+              {stateToText(overallFlashingState.state, overallFlashingState.progress)}
             </Button>}
             {cancelButtonVisible && <Button
               className="ml-1 p-2"
@@ -547,12 +547,14 @@ function deviceStateToText(state: FlashState) {
   }
 }
 
-function stateToText(state: OverallFlashingState) {
+function stateToText(state: OverallFlashingState, progress?: number) {
   switch(state) {
     case "idle":
       return "Flash";
+    case "downloading":
+      return progress ? `Downloading firmware... (${(progress * 100).toFixed(1)} %)` : "Downloading firmware...";
     case "busy":
-      return "In Progress...";
+      return "In Progress...";    
     case "waiting":
       return "Continue";
     default:

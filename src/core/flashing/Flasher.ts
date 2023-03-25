@@ -11,15 +11,17 @@ import { ConfigPreset } from '../stores/appStore';
 import type { Device } from '../stores/deviceStore';
 
 type DeviceFlashingState = "doNotFlash" | "doFlash" | "idle" | "connecting" | "erasing" | "flashing" | "config" | "done" | "aborted" | "failed";
-export type OverallFlashingState = "idle"  | "busy" | "waiting";
+export type OverallFlashingState = "idle" | "downloading" | "busy" | "waiting";
+
+type OverallFlashingCallback = (flashState: OverallFlashingState, progress?: number) => void;
 
 const sections: {data: Uint8Array, offset: number}[] = [ ];
 let configQueue: Protobuf.LocalConfig[] = [];
 let firmwareToUse: FirmwareVersion;
 let operations: FlashOperation[] = [];
-let callback: (flashState: OverallFlashingState) => void;
+let callback: OverallFlashingCallback;
 
-export async function setup(configs: ConfigPreset[], firmware: FirmwareVersion, overallCallback: (flashState: OverallFlashingState) => void) {        
+export async function setup(configs: ConfigPreset[], firmware: FirmwareVersion, overallCallback: OverallFlashingCallback) {
     callback = overallCallback;
     console.log(`Firmware to use: ${firmware?.name} - ${firmware?.link}`);
     firmwareToUse = firmware;
