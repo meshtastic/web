@@ -158,7 +158,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                         const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => { return {
                           name: f.name,
                           tag: f.tag,
-                          link: f.link,
+                          id: f.id,
                           inLocalDb: f == firmware ? b : f.inLocalDb 
                         }});
                         setFirmwareList(newFirmwareList);
@@ -479,7 +479,7 @@ const FirmwareSelection = () => {
 export type FirmwareVersion = {
   name: string,
   tag: string,
-  link: string,
+  id: string,
   inLocalDb: boolean
   // partitions: {[index: string]: Uint8Array},
 }
@@ -489,7 +489,7 @@ interface FirmwareGithubRelease {
   tag_name: string,  
   assets: {
     name: string,
-    browser_download_url: string
+    id: string
   }[]
 }
 
@@ -515,14 +515,14 @@ async function loadFirmwareList() : Promise<FirmwareVersion[]> {
   const releases: FirmwareGithubRelease[] = await (await fetch("https://api.github.com/repos/meshtastic/firmware/releases")).json();
   console.log(releases);
   const firmwareDescriptions = await Promise.all(releases.map(async (r) => {
-    const url = r.assets.find(a => a.name.startsWith("firmware"))!.browser_download_url;
-    if(url === undefined)
+    const id = r.assets.find(a => a.name.startsWith("firmware"))!.id;
+    if(id === undefined)
       return undefined;
     const tag = r.tag_name.substring(1);      // remove leading "v"    
     return { 
       name: r.name.replace("Meshtastic Firmware ", ""),
       tag: tag,
-      link: url,
+      id: id,
       inLocalDb: await isStoredInDb(tag)
     };
   }));  

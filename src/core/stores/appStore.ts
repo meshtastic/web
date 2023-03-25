@@ -155,7 +155,7 @@ function loadFirmwareListFromStorage(): FirmwareVersion[] {
     return [];
   try {
     const json = JSON.parse(list) as FirmwareVersion[];
-    if(json.every(o => "name" in o && "inLocalDb" in o && "link" in o && "tag" in o))
+    if(json.every(o => "name" in o && "inLocalDb" in o && "id" in o && "tag" in o))
       return json;    
     else
       return [];

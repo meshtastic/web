@@ -23,7 +23,7 @@ let callback: OverallFlashingCallback;
 
 export async function setup(configs: ConfigPreset[], firmware: FirmwareVersion, overallCallback: OverallFlashingCallback) {
     callback = overallCallback;
-    console.log(`Firmware to use: ${firmware?.name} - ${firmware?.link}`);
+    console.log(`Firmware to use: ${firmware?.name} - ${firmware?.id}`);
     firmwareToUse = firmware;
     await loadFirmware();    
     for(const c in configs) {
@@ -107,8 +107,22 @@ async function getZipFile() {
             return storedZip;
     }
 
-    const zip = await fetch("firmware-2.1.5.23272da.zip");
-    const content = await zip.arrayBuffer();
+    const zip = await fetch(`/firmware/${firmwareToUse.id}`);
+    const zipClone = zip.clone();
+    const contentLength = zip.headers.get("content-length");
+    const totalLength = contentLength ? parseInt(contentLength) : undefined;    
+    const reader = zip.body!.getReader();
+    let bytesLoaded = 0;
+    
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done)
+            break;
+
+        bytesLoaded += value!.byteLength;
+        callback("downloading", totalLength ? bytesLoaded / totalLength : undefined);
+    }
+    const content = await zipClone.arrayBuffer();
     storeInDb(firmwareToUse, content);
     return content;
 }
@@ -121,11 +135,9 @@ function getFileName() {
 async function loadFirmware() {        
     console.warn("Loading firmware");
     // TODO: Error handling
-    debugger;
-    // TODO: Figure out CORS stuff
 
     const zip = await getZipFile();
-    const z = await JSZip.loadAsync(zip);    
+    const z = await JSZip.loadAsync(zip);
     const filename = getFileName();
     const mainFile = await z.file(filename)?.async("uint8array");
     const bleoata = await z.file("bleota.bin")?.async("uint8array");
