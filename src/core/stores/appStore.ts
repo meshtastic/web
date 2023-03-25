@@ -185,6 +185,7 @@ interface AppState {
   firmwareRefreshing: boolean;
   firmwareList: FirmwareVersion[];
   selectedFirmware: string;
+  selectedDeviceModel: string;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -203,6 +204,7 @@ interface AppState {
   setFirmwareRefreshing: (state: boolean) => void;
   setFirmwareList: (state: FirmwareVersion[]) => void;
   setSelectedFirmware: (state: string) => void;
+  setSelectedDeviceModel: (state: string) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -221,6 +223,7 @@ export const useAppStore = create<AppState>()((set) => ({
   firmwareRefreshing: false,
   firmwareList: loadFirmwareListFromStorage(),
   selectedFirmware: "latest",
+  selectedDeviceModel: "auto",
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -324,6 +327,13 @@ export const useAppStore = create<AppState>()((set) => ({
     set(
       produce<AppState>((draft) => {
         draft.selectedFirmware = state;
+      })
+    )
+  },
+  setSelectedDeviceModel(state: string) {
+    set(
+      produce<AppState>((draft) => {
+        draft.selectedDeviceModel = state;
       })
     )
   },

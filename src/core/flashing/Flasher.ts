@@ -1,6 +1,9 @@
 import JSZip from 'jszip';
 
-import type { FirmwareVersion } from '@app/components/Dashboard';
+import {
+  deviceModels,
+  FirmwareVersion,
+} from '@app/components/Dashboard';
 import type {
   ISerialConnection,
   Protobuf,
@@ -15,17 +18,21 @@ export type OverallFlashingState = "idle" | "downloading" | "busy" | "waiting";
 
 type OverallFlashingCallback = (flashState: OverallFlashingState, progress?: number) => void;
 
-const sections: {data: Uint8Array, offset: number}[] = [ ];
+let dataSections: {[index: string]: Uint8Array};
+let zipFile: JSZip;
 let configQueue: Protobuf.LocalConfig[] = [];
 let firmwareToUse: FirmwareVersion;
 let operations: FlashOperation[] = [];
 let callback: OverallFlashingCallback;
+let selectedDeviceModel: string;
 
-export async function setup(configs: ConfigPreset[], firmware: FirmwareVersion, overallCallback: OverallFlashingCallback) {
+export async function setup(configs: ConfigPreset[], deviceModelName: string, firmware: FirmwareVersion, overallCallback: OverallFlashingCallback) {
+    dataSections = {};
+    selectedDeviceModel = deviceModelName;
     callback = overallCallback;
     console.log(`Firmware to use: ${firmware?.name} - ${firmware?.id}`);
     firmwareToUse = firmware;
-    await loadFirmware();    
+    await loadFirmware();
     for(const c in configs) {
         const config = configs[c];
         for (let i = 0; i < config.count; i++) {
@@ -127,57 +134,48 @@ async function getZipFile() {
     return content;
 }
 
-function getFileName() {
-    const device = "tlora-v2-1-1.6";
-    return `firmware-${device}-${firmwareToUse.tag}.bin`;
-}
-
-async function loadFirmware() {        
-    console.warn("Loading firmware");
+async function loadFirmware() {    
+    console.log("Loading firmware");
     // TODO: Error handling
 
     const zip = await getZipFile();
-    const z = await JSZip.loadAsync(zip);
-    const filename = getFileName();
-    const mainFile = await z.file(filename)?.async("uint8array");
-    const bleoata = await z.file("bleota.bin")?.async("uint8array");
-    const littlefs = await z.file(`littlefs-${firmwareToUse.tag}.bin`)?.async("uint8array");
-    if(mainFile === undefined || bleoata === undefined || littlefs === undefined)
-        throw "Missing file(s)";
-    sections.push(...[
+    zipFile = await JSZip.loadAsync(zip);    
+}
+
+async function getSection(name: string): Promise<Uint8Array> {    
+    if(!(name in dataSections)) {
+        const dataSection = await zipFile.file(name)?.async("uint8array");
+        if(dataSection === undefined)
+            throw `File ${name} missing from firmware directory`;
+        dataSections[name] = dataSection;
+    }            
+    return dataSections[name];
+}
+
+async function getFirmwareSections(deviceModel: string) {
+    debugger;
+    const filename = `firmware-${deviceModel}-${firmwareToUse.tag}.bin`;
+    const mainFile = await getSection(filename);
+    const bleoata = await getSection("bleota.bin");
+    
+    const littlefs = await getSection(`littlefs-${firmwareToUse.tag}.bin`);
+
+    return [            // TODO: Is this correct for all device models?
         { offset: 0, data: mainFile },
         { offset: 0x260000, data: bleoata },
         { offset: 0x300000, data: littlefs }
-    ]);    
+    ];
 }
 
-async function downloadFirmware(path: string, offset: number, slot: number) {     
-    const req = await fetch(path);
-    if(!req.ok)
-        throw "failed";
-    const hmm = await req.arrayBuffer();
-    const data = new Uint8Array(hmm);
-    sections[slot] = {data, offset};
-    console.log(`Downloaded ${path}`);      
-}
-
-function getDeviceType(port: SerialPort) {
+function autoDetectDeviceModel(port: SerialPort) {
     const info = port.getInfo();
-    switch(info.usbVendorId) {
-        case 6790:
-            switch(info.usbProductId) {
-                case 21972:
-                    return "tlora-v2-1-1.6";
-            }
-            break;
-    }
-    return undefined;
+    return deviceModels.find(d => info.usbVendorId == d.vendorId && info.usbProductId == d.productId)?.name;
 }
 
 
 export class FlashOperation {
         
-    public state: FlashState = { progress: 0, state: "idle" };   
+    public state: FlashState = { progress: 0, state: "idle" };
     private loader?: EspLoader; 
 
     public constructor(public device: Device, public config: Protobuf.LocalConfig, public callback: (operation: FlashOperation) => void) {
@@ -195,15 +193,22 @@ export class FlashOperation {
         let port;
         try {
             port = await (this.device.connection! as ISerialConnection).freePort();
-            const info = port?.getInfo();
+            if(port === undefined)
+                throw "Port unavailable";
+            const deviceModel = selectedDeviceModel == "auto" ? autoDetectDeviceModel(port) : selectedDeviceModel;
+            if(deviceModel === undefined)
+                throw "Could not detect device model";
+            const info = port.getInfo();
+            console.log(`Device info: vendor ${info.usbVendorId}, product ${info.usbProductId}`);
+            const sections = await getFirmwareSections(deviceModel);
             await port!.open({baudRate: 115200});
-            this.loader = new EspLoader(port!);        
+            this.loader = new EspLoader(port!);
             const loader = this.loader;
             this.setState("connecting");
             await loader.connect();
             await loader.loadStub();
             this.setState("erasing");
-            await new Promise(resolve => setTimeout(resolve, 2000));             
+            await new Promise(resolve => setTimeout(resolve, 2000));
             await loader.eraseFlash();            
             const lul = this;
             for (let i = 0; i < 3; i++) {              

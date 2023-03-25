@@ -106,7 +106,7 @@ export const Dashboard = () => {
 };
 
 const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[], rootConfig: ConfigPreset, totalConfigCount: number}) => {  
-  const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, firmwareList, setFirmwareList } = useAppStore();
+  const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, selectedDeviceModel, firmwareList, setFirmwareList } = useAppStore();
   const [deviceSelectedToFlash, setDeviceSelectedToFlash] = useState(devices.map(d => d.flashState));    
   // const [flashingState, setFlashingState]: any = useState([]);
   const cancelButtonVisible = overallFlashingState.state != "idle";
@@ -143,56 +143,62 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
               </Button>
             </div>}
           </ul>
-          <div className="flex gap-3">
-            <FirmwareSelection/>
-            {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
-              className="gap-2 w-full"
-              disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
-              onClick={async () => {
-                rootConfig.children[0].getFinalConfig(); // FIXME
-                if(overallFlashingState.state == "idle")
-                  await setup(rootConfig.getAll(), firmware!, (state: OverallFlashingState, progress?: number) => {
-                    if(state == 'busy') {
-                      isStoredInDb(firmware!.tag).then(b => {
-                        // All FirmwareVersion objects are immutable here so we'll have to re-create each entry
-                        const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => { return {
-                          name: f.name,
-                          tag: f.tag,
-                          id: f.id,
-                          inLocalDb: f == firmware ? b : f.inLocalDb 
-                        }});
-                        setFirmwareList(newFirmwareList);
-                      });
-                    }
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-3">
+              <DeviceModelSelection/>
+              <FirmwareSelection/>
+            </div>            
+            <div className="flex gap-3">
+              <FirmwareSelection/>
+              {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
+                className="gap-2 w-full"
+                disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
+                onClick={async () => {
+                  rootConfig.children[0].getFinalConfig(); // FIXME
+                  if(overallFlashingState.state == "idle")
+                    await setup(rootConfig.getAll(), selectedDeviceModel, firmware!, (state: OverallFlashingState, progress?: number) => {
+                      if(state == 'busy') {
+                        isStoredInDb(firmware!.tag).then(b => {
+                          // All FirmwareVersion objects are immutable here so we'll have to re-create each entry
+                          const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => { return {
+                            name: f.name,
+                            tag: f.tag,
+                            id: f.id,
+                            inLocalDb: f == firmware ? b : f.inLocalDb 
+                          }});
+                          setFirmwareList(newFirmwareList);
+                        });
+                      }
+                        
+                      setOverallFlashingState({state, progress});
+                    });
+                  nextBatch(devices,
+                    deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
+                    (f)=> {
+                      f.device.setFlashState(f.state);
+                      deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
+                      setDeviceSelectedToFlash(deviceSelectedToFlash);                
                       
-                    setOverallFlashingState({state, progress});
-                  });
-                nextBatch(devices,
-                  deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
-                  (f)=> {
-                    f.device.setFlashState(f.state);
-                    deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
-                    setDeviceSelectedToFlash(deviceSelectedToFlash);                
-                    
-                    // flashingState[f.device.id] = f.state;
-                    // setFlashingState(flashingState);
-                  }
-                );
-              }}
-            >            
-              {stateToText(overallFlashingState.state, overallFlashingState.progress)}
-            </Button>}
-            {cancelButtonVisible && <Button
-              className="ml-1 p-2"
-              variant={"destructive"}
-              onClick={() => {
-                if(!confirm("Cancel flashing?"))
-                  return;
-                cancel();
-              }}
-            >
-              <XIcon/>
-            </Button>}
+                      // flashingState[f.device.id] = f.state;
+                      // setFlashingState(flashingState);
+                    }
+                  );
+                }}
+              >            
+                {stateToText(overallFlashingState.state, overallFlashingState.progress)}
+              </Button>}
+              {cancelButtonVisible && <Button
+                className="ml-1 p-2"
+                variant={"destructive"}
+                onClick={() => {
+                  if(!confirm("Cancel flashing?"))
+                    return;
+                  cancel();
+                }}
+              >
+                <XIcon/>
+              </Button>}
+            </div>
           </div>
         </div>
       ) : (
@@ -342,7 +348,6 @@ const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected, edi
   );
 }
 
-
 const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progressText}
   :{device: Device, selectedToFlash: boolean, toggleSelectedToFlash: () => void, progressText: FlashState}) => {  
   // const [toBeFlashed, setToBeFlashed] = useState(device.selectedToFlash);
@@ -471,6 +476,121 @@ const FirmwareSelection = () => {
       >
         <RefreshCwIcon size={20}/>
       </Button>
+    </div>
+    
+  );
+}
+
+type DeviceModel = {
+  displayName: string,
+  name: string,
+  vendorId: number,
+  productId: number
+}
+
+// TODO: Fill in remaining vendor and product IDs
+export const deviceModels: DeviceModel[] = [
+  {
+    displayName: "Heltec v1",
+    name: "heltec-v1",
+    vendorId: -1,
+    productId: -1
+  },
+  {
+    displayName: "Heltec v2.0",
+    name: "heltec-v2.0",
+    vendorId: -1,
+    productId: -1
+  },
+  {
+    displayName: "Heltec v2.1",
+    name: "heltec-v2.1",
+    vendorId: -1,
+    productId: -1
+  },
+  {
+    displayName: "T-Beam v0.7",
+    name: "tbeam0.7",
+    vendorId: -1,
+    productId: -1
+  },
+  {
+    displayName: "T-Beam",
+    name: "tbeam",
+    vendorId: -1,
+    productId: -1
+  },
+  {
+    displayName: "T-Lora v1",
+    name: "tlora-v1",
+    vendorId: -1,
+    productId: -1
+  },
+  {
+    displayName: "T-Lora v1.3",
+    name: "tlora-v1_3",
+    vendorId: -1,
+    productId: -1
+  },
+  {
+    displayName: "T-Lora v2",
+    name: "tlora-v2",
+    vendorId: -1,
+    productId: -1
+  },
+  {
+    displayName: "T-Lora v2.1-1.6",
+    name: "tlora-v2-1-1.6",
+    vendorId: 6790,
+    productId: 21972
+  },
+]
+
+const DeviceModelSelection = () => {  
+  const { selectedDeviceModel, setSelectedDeviceModel } = useAppStore();
+  
+  let selectItems = [
+    <SelectItem key={"auto"} value={"auto"}>
+      {"Auto-detect device model"}
+    </SelectItem>,
+    <SelectSeparator/>
+  ];
+  selectItems.push(...deviceModels.map(d =>
+    <SelectItem key={d.name} value={d.name}>
+      {d.displayName}
+    </SelectItem>
+  ));
+
+
+  return (
+    <div className="flex gap-1 w-full">
+      <Select        
+        onValueChange={setSelectedDeviceModel}            
+        value={selectedDeviceModel}
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {selectItems}
+        </SelectContent>
+      </Select>
+      {/* <Button
+        variant="outline"
+        className="ml-1 p-2"
+        title="Update firmware version list"
+        disabled={firmwareRefreshing}
+        onClick={() => {
+          setFirmwareRefreshing(true);
+          loadFirmwareList().then((list) => { 
+            setFirmwareList(list.slice(0, 10));
+            setFirmwareRefreshing(false);            
+            // TODO: What if download fails?
+          });
+        }}
+      >
+        <RefreshCwIcon size={20}/>
+      </Button> */}
     </div>
     
   );
