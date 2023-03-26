@@ -42,6 +42,7 @@ import { Subtle } from '@components/UI/Typography/Subtle.js';
 import { ISerialConnection } from '@meshtastic/meshtasticjs';
 
 import { ConfigSelectButton } from './UI/ConfigSelectButton';
+import { Label } from './UI/Label';
 import {
   Select,
   SelectContent,
@@ -50,6 +51,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './UI/Select';
+import { Switch } from './UI/Switch';
 
 let initTest: boolean  = false;
 
@@ -108,6 +110,7 @@ export const Dashboard = () => {
 const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[], rootConfig: ConfigPreset, totalConfigCount: number}) => {  
   const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, selectedDeviceModel, firmwareList, setFirmwareList } = useAppStore();
   const [deviceSelectedToFlash, setDeviceSelectedToFlash] = useState(devices.map(d => d.flashState));    
+  const [ fullFlash, setFullFlash ] = useState(false);
   // const [flashingState, setFlashingState]: any = useState([]);
   const cancelButtonVisible = overallFlashingState.state != "idle";
   const firmware = firmwareList.find(f => f.name == selectedFirmware);
@@ -144,9 +147,12 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
             </div>}
           </ul>
           <div className="flex flex-col gap-3">
-            <div className="flex gap-3">
+            <div className="flex gap-3 w-full">
               <DeviceModelSelection/>
-              <FirmwareSelection/>
+              <div className='flex w-full items-center gap-3'>
+                <Switch checked={fullFlash} onCheckedChange={setFullFlash}/>
+                <Label>Force full wipe and reinstall</Label>
+              </div>
             </div>            
             <div className="flex gap-3">
               <FirmwareSelection/>
@@ -156,7 +162,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                 onClick={async () => {
                   rootConfig.children[0].getFinalConfig(); // FIXME
                   if(overallFlashingState.state == "idle")
-                    await setup(rootConfig.getAll(), selectedDeviceModel, firmware!, (state: OverallFlashingState, progress?: number) => {
+                    await setup(rootConfig.getAll(), selectedDeviceModel, firmware!, fullFlash, (state: OverallFlashingState, progress?: number) => {
                       if(state == 'busy') {
                         isStoredInDb(firmware!.tag).then(b => {
                           // All FirmwareVersion objects are immutable here so we'll have to re-create each entry

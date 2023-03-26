@@ -25,13 +25,16 @@ let firmwareToUse: FirmwareVersion;
 let operations: FlashOperation[] = [];
 let callback: OverallFlashingCallback;
 let selectedDeviceModel: string;
+let fullFlash: boolean;
 
-export async function setup(configs: ConfigPreset[], deviceModelName: string, firmware: FirmwareVersion, overallCallback: OverallFlashingCallback) {
+export async function setup(configs: ConfigPreset[], deviceModelName: string, firmware: FirmwareVersion,
+    forceFullFlash: boolean, overallCallback: OverallFlashingCallback) {
     dataSections = {};
     selectedDeviceModel = deviceModelName;
     callback = overallCallback;
     console.log(`Firmware to use: ${firmware?.name} - ${firmware?.id}`);
     firmwareToUse = firmware;
+    fullFlash = forceFullFlash;
     await loadFirmware();
     for(const c in configs) {
         const config = configs[c];
@@ -142,26 +145,35 @@ async function loadFirmware() {
     zipFile = await JSZip.loadAsync(zip);    
 }
 
-async function getSection(name: string): Promise<Uint8Array> {    
+async function getSection(name: string): Promise<Uint8Array | undefined> {    
     if(!(name in dataSections)) {
         const dataSection = await zipFile.file(name)?.async("uint8array");
-        if(dataSection === undefined)
-            throw `File ${name} missing from firmware directory`;
+        if(dataSection === undefined) {
+            console.warn(`Firmware file ${name} not found.`);
+            return undefined;
+        }            
         dataSections[name] = dataSection;
     }            
     return dataSections[name];
 }
 
-async function getFirmwareSections(deviceModel: string) {
-    debugger;
+async function getFirmwareSections(deviceModel: string, alreadyFlashed: boolean) {
+    if(alreadyFlashed && !fullFlash) {
+        const updateFilename = `firmware-${deviceModel}-${firmwareToUse.tag}-update.bin`;
+        const mainUpdate = await getSection(updateFilename);
+        if(mainUpdate !== undefined) {
+            return [ { offset: 0x10000, data: mainUpdate } ];
+        }
+    }
     const filename = `firmware-${deviceModel}-${firmwareToUse.tag}.bin`;
-    const mainFile = await getSection(filename);
+    const main = await getSection(filename);
     const bleoata = await getSection("bleota.bin");
-    
     const littlefs = await getSection(`littlefs-${firmwareToUse.tag}.bin`);
+    if(main === undefined || bleoata === undefined || littlefs === undefined)
+        throw "Missing firmware files.";
 
     return [            // TODO: Is this correct for all device models?
-        { offset: 0, data: mainFile },
+        { offset: 0, data: main },
         { offset: 0x260000, data: bleoata },
         { offset: 0x300000, data: littlefs }
     ];
@@ -192,6 +204,8 @@ export class FlashOperation {
     public async flash() {
         let port;
         try {
+            debugger;
+            const updatePossible = this.device.nodes.get(this.device.hardware.myNodeNum) !== undefined;
             port = await (this.device.connection! as ISerialConnection).freePort();
             if(port === undefined)
                 throw "Port unavailable";
@@ -200,7 +214,7 @@ export class FlashOperation {
                 throw "Could not detect device model";
             const info = port.getInfo();
             console.log(`Device info: vendor ${info.usbVendorId}, product ${info.usbProductId}`);
-            const sections = await getFirmwareSections(deviceModel);
+            const sections = await getFirmwareSections(deviceModel, updatePossible);
             await port!.open({baudRate: 115200});
             this.loader = new EspLoader(port!);
             const loader = this.loader;

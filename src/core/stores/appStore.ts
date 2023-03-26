@@ -186,6 +186,7 @@ interface AppState {
   firmwareList: FirmwareVersion[];
   selectedFirmware: string;
   selectedDeviceModel: string;
+  fullFlash: boolean;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -205,6 +206,7 @@ interface AppState {
   setFirmwareList: (state: FirmwareVersion[]) => void;
   setSelectedFirmware: (state: string) => void;
   setSelectedDeviceModel: (state: string) => void;
+  setFullFlash: (state: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -224,6 +226,7 @@ export const useAppStore = create<AppState>()((set) => ({
   firmwareList: loadFirmwareListFromStorage(),
   selectedFirmware: "latest",
   selectedDeviceModel: "auto",
+  fullFlash: false,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -337,4 +340,11 @@ export const useAppStore = create<AppState>()((set) => ({
       })
     )
   },
+  setFullFlash(state: boolean) {
+    set(
+      produce<AppState>((draft) => {
+        draft.fullFlash = state;
+      })
+    )
+  }
 }));
