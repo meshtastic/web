@@ -1,6 +1,6 @@
 {
   "include": ["src", "types"],
-  "compilerOptions": {
+  "compilerOptions": {    
     "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
@@ -29,6 +29,7 @@
     "strictNullChecks": true,
     "types": ["vite/client", "node"],
     "importsNotUsedAsValues": "error",
+    "ignoreDeprecations": "5.0",
     "strictPropertyInitialization": false,
     "experimentalDecorators": true
   }

@@ -1,7 +1,7 @@
 import { produce } from 'immer';
 import { create } from 'zustand';
 
-import { FirmwareVersion } from '@app/components/Dashboard';
+import type { FirmwareVersion } from '@app/components/Dashboard';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import type { OverallFlashingState } from '../flashing/Flasher';

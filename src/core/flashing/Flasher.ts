@@ -10,7 +10,7 @@ import type {
 } from '@meshtastic/meshtasticjs';
 import { EspLoader } from '@toit/esptool.js';
 
-import { ConfigPreset } from '../stores/appStore';
+import type { ConfigPreset } from '../stores/appStore';
 import type { Device } from '../stores/deviceStore';
 
 type DeviceFlashingState = "doNotFlash" | "doFlash" | "idle" | "connecting" | "erasing" | "flashing" | "config" | "done" | "aborted" | "failed";
