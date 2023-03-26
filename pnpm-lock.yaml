@@ -1728,18 +1728,6 @@ packages:
     engines: {node: '>=6.0.0'}
     dev: false
 
-  /@meshtastic/meshtasticjs/2.0.20-5:
-    resolution: {integrity: sha512-4N1stS98kPeCro8VaWlcv9Y59aBvhFMi5fx7EEeWtbYElhWPI3ahhqChoykY6hh5ommHqESe954WbG7eh0wT4Q==}
-    dependencies:
-      '@buf/meshtastic_protobufs.bufbuild_es': 1.0.0-20230217124815-d362b2e8810a.1_@bufbuild+protobuf@1.0.0
-      '@bufbuild/protobuf': 1.0.0
-      crc: 4.3.2
-      sub-events: 1.9.0
-      tslog: 4.7.5
-    transitivePeerDependencies:
-      - buffer
-    dev: false
-
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -5696,7 +5684,7 @@ packages:
     dependencies:
       lie: 3.3.0
       pako: 1.0.11
-      readable-stream: 2.3.7
+      readable-stream: 2.3.8
       setimmediate: 1.0.5
     dev: false
 
@@ -7100,11 +7088,6 @@ packages:
 
   /tslib/2.5.0:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
-
-  /tslog/4.7.5:
-    resolution: {integrity: sha512-3n3ZsDfRq4fmoGUo8mQ+1ZrTn1Ujdxno6qHNRjRqHPnDYk6VRdnmluAeT7HqRX72YA0pZgj1eU3DZAyu9dwKCA==}
-    engines: {node: '>=16'}
-    dev: false
 
   /tsutils/3.21.0_typescript@4.9.5:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
