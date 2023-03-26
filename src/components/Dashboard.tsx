@@ -160,7 +160,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                 className="gap-2 w-full"
                 disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
                 onClick={async () => {
-                  rootConfig.children[0].getFinalConfig(); // FIXME
+                  // rootConfig.children[0].getFinalConfig(); // FIXME
                   if(overallFlashingState.state == "idle")
                     setOverallFlashingState({ state: "busy" });
                     let actualFirmware = firmware;

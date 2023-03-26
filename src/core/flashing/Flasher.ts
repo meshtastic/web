@@ -221,14 +221,20 @@ export class FlashOperation {
             this.setState("connecting");
             await loader.connect();
             await loader.loadStub();
-            this.setState("erasing");
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            await loader.eraseFlash();            
-            const lul = this;
-            for (let i = 0; i < 3; i++) {              
+            if(sections.length > 1) {
+                this.setState("erasing");                
+                await loader.eraseFlash();            
+            }       
+            const thisOp = this;
+            const totalLength = sections.reduce<number>((p, c) => p + c.data.byteLength, 0);
+            let bytesFlashed = 0;
+            for (let i = 0; i < sections.length; i++) {                              
                 await loader.flashData(sections[i].data, sections[i].offset, function (idx, cnt) {
-                    lul.setState("flashing", (1/3) * (i + idx/cnt));
+                    const segSize = sections[i].data.length / cnt;                    
+                    thisOp.setState("flashing", (bytesFlashed + idx * segSize) / totalLength);
+                    console.log(`Flashing progress: ${bytesFlashed} + ${(idx * segSize).toFixed(2)}/${sections[i].data.length} = ${(bytesFlashed + idx * segSize).toFixed(2)} / ${totalLength}`);
                 });
+                bytesFlashed += sections[i].data.byteLength;
             }    
         }
         catch (e) {
