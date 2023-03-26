@@ -162,15 +162,25 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                 onClick={async () => {
                   rootConfig.children[0].getFinalConfig(); // FIXME
                   if(overallFlashingState.state == "idle")
-                    await setup(rootConfig.getAll(), selectedDeviceModel, firmware!, fullFlash, (state: OverallFlashingState, progress?: number) => {
+                    setOverallFlashingState({ state: "busy" });
+                    let actualFirmware = firmware;
+                    debugger;
+                    if(actualFirmware === undefined) {
+                      const list = await loadFirmwareList();
+                      setFirmwareList(list.slice(0, 10));
+                      if(list.length == 0)
+                        throw "Failed";
+                      actualFirmware = list[0];
+                    }
+                    await setup(rootConfig.getAll(), selectedDeviceModel, actualFirmware, fullFlash, (state: OverallFlashingState, progress?: number) => {
                       if(state == 'busy') {
-                        isStoredInDb(firmware!.tag).then(b => {
+                        isStoredInDb(actualFirmware!.tag).then(b => {
                           // All FirmwareVersion objects are immutable here so we'll have to re-create each entry
                           const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => { return {
                             name: f.name,
                             tag: f.tag,
                             id: f.id,
-                            inLocalDb: f == firmware ? b : f.inLocalDb 
+                            inLocalDb: f == actualFirmware ? b : f.inLocalDb 
                           }});
                           setFirmwareList(newFirmwareList);
                         });
