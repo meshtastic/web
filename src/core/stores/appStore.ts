@@ -129,6 +129,9 @@ export class ConfigPreset {
           });
           return preset;
         }
+        else if(key == "config") {
+          return Protobuf.LocalConfig.fromJson(value);
+        }
         return value;
       });
       return rootPreset;

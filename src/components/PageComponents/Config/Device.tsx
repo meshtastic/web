@@ -1,8 +1,11 @@
-import type { DeviceValidation } from "@app/validation/config/device.js";
-import { useConfig, useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
-import type { ConfigPreset } from "@app/core/stores/appStore";
+import type { ConfigPreset } from '@app/core/stores/appStore';
+import type { DeviceValidation } from '@app/validation/config/device.js';
+import {
+  DynamicForm,
+  EnableSwitchData,
+} from '@components/Form/DynamicForm.js';
+import { useConfig } from '@core/stores/deviceStore.js';
+import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Device = (): JSX.Element => {
   //const { config, setWorkingConfig } = useDevice();
@@ -18,7 +21,8 @@ export const Device = (): JSX.Element => {
   const isPresetConfig = !("id" in config);   // Kinda hacky...
 
   const onSubmit = (data: DeviceValidation) => {
-    if(isPresetConfig) {
+    if(isPresetConfig) {      
+      config.config.device = new Protobuf.Config_DeviceConfig(data);    
       (config as ConfigPreset).saveConfigTree();
     }
     // setWorkingConfig(
