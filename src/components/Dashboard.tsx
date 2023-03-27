@@ -23,6 +23,7 @@ import {
   nextBatch,
   OverallFlashingState,
   setup,
+  uploadCustomFirmware,
 } from '@app/core/flashing/Flasher';
 import {
   ConfigPreset,
@@ -450,23 +451,37 @@ const FirmwareSelection = () => {
   }
   else {
     const versions = firmwareList.map((f, index) => (
-      <SelectItem key={index} value={f.name}>
+      <SelectItem key={index} value={f.id}>
         <div className="flex gap-2 items-center">{f.name} {f.inLocalDb ? <ArrowDownCircleIcon size={20}/> : <div/>}</div>
       </SelectItem>
     ))
     selectItems.push(...versions);
   }  
   selectItems.push(
-    <SelectItem key={100} value={"custom"}>
-      {"< Select custom firmware >"}
+    <SelectItem  key={100} value={"custom"}>
+      {"< Load custom firmware >"}
     </SelectItem>
   );
 
   return (
     <div className="flex gap-1 w-full">
       <Select   
-        disabled={firmwareRefreshing}           
-        onValueChange={setSelectedFirmware}            
+        disabled={firmwareRefreshing}        
+        onValueChange={async (v) => {
+          if(v == "custom") {            
+            const desc = await uploadCustomFirmware();
+            if(desc === undefined)
+              return;
+            if(!firmwareList.find(f => f.id == desc.id)) {
+              const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => f).concat([ desc ]);
+              setFirmwareList(newFirmwareList);
+            }            
+            setSelectedFirmware(desc.id);
+          }
+          else {
+            setSelectedFirmware(v);
+          }          
+        }}
         value={selection}                // << Value of selected item
       >
         <SelectTrigger>

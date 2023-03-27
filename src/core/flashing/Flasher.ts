@@ -99,6 +99,31 @@ async function loadFromDb(firmware: FirmwareVersion) {
     });
 }
 
+export async function uploadCustomFirmware() {
+    //@ts-ignore
+    const promise: Promise<FileSystemFileHandle[]> = window.showOpenFilePicker({
+      types: [ { description: "ZIP file", accept: { "application/zip": [".zip"] } }]
+    });
+    const fileHandle: FileSystemFileHandle | undefined = await promise.then(f => f[0], () => undefined);
+    if(fileHandle == undefined)
+      return undefined;
+    try {
+      const file = await fileHandle.getFile();      
+      const content = await file.arrayBuffer();
+      const firmwareDesc: FirmwareVersion = {
+        id: "custom_" + file.name,
+        name: file.name,
+        inLocalDb: true,
+        tag: "custom_" + file.name
+      }
+      storeInDb(firmwareDesc, content);
+      return firmwareDesc;
+    } catch {
+      console.error("Insufficient permission to access file.");
+    } 
+    return undefined;
+  }
+
 function store(db: IDBDatabase, firmware: FirmwareVersion, file: ArrayBuffer) {
     debugger;
     const fileStore = db.transaction("files", "readwrite").objectStore("files");

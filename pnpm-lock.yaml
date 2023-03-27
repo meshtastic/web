@@ -31,6 +31,7 @@ specifiers:
   '@types/react-dom': ^18.0.11
   '@types/w3c-web-serial': ^1.0.3
   '@types/web-bluetooth': ^0.0.16
+  '@types/wicg-file-system-access': ^2020.9.6
   '@typescript-eslint/eslint-plugin': ^5.53.0
   '@typescript-eslint/parser': ^5.53.0
   '@vitejs/plugin-react': ^3.1.0
@@ -131,6 +132,7 @@ devDependencies:
   '@types/react-dom': 18.0.11
   '@types/w3c-web-serial': 1.0.3
   '@types/web-bluetooth': 0.0.16
+  '@types/wicg-file-system-access': 2020.9.6
   '@typescript-eslint/eslint-plugin': 5.53.0_ny4s7qc6yg74faf3d6xty2ofzy
   '@typescript-eslint/parser': 5.53.0_7kw3g6rralp5ps6mg3uyzz6azm
   '@vitejs/plugin-react': 3.1.0_vite@4.1.4
@@ -3804,6 +3806,10 @@ packages:
 
   /@types/web-bluetooth/0.0.16:
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==}
+    dev: true
+
+  /@types/wicg-file-system-access/2020.9.6:
+    resolution: {integrity: sha512-6hogE75Hl2Ov/jgp8ZhDaGmIF/q3J07GtXf8nCJCwKTHq7971po5+DId7grft09zG7plBwpF6ZU0yx9Du4/e1A==}
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.53.0_ny4s7qc6yg74faf3d6xty2ofzy:

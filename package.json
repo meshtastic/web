@@ -75,6 +75,7 @@
     "@types/web-bluetooth": "^0.0.16",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
+    "@types/wicg-file-system-access": "^2020.9.6",
     "@vitejs/plugin-react": "^3.1.0",
     "autoprefixer": "^10.4.13",
     "eslint": "^8.34.0",
