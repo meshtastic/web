@@ -114,7 +114,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
   const [ fullFlash, setFullFlash ] = useState(false);
   // const [flashingState, setFlashingState]: any = useState([]);
   const cancelButtonVisible = overallFlashingState.state != "idle";
-  const firmware = firmwareList.find(f => f.name == selectedFirmware);
+  const firmware = firmwareList.find(f => f.id == selectedFirmware);
   console.log(`Selected firmware: ${firmware?.name}`);
 
   return (
