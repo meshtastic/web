@@ -200,11 +200,11 @@ export class FlashOperation {
     }
 
     public async flash() {
-        let port;
+        let port: SerialPort | undefined;
         try {
             debugger;
             const updatePossible = this.device.nodes.get(this.device.hardware.myNodeNum) !== undefined;
-            port = await (this.device.connection! as ISerialConnection).freePort();
+            port = await (this.device.connection! as ISerialConnection).disconnect();
             if(port === undefined)
                 throw "Port unavailable";
             const deviceModel = selectedDeviceModel == "auto" ? autoDetectDeviceModel(port) : selectedDeviceModel;
@@ -235,15 +235,14 @@ export class FlashOperation {
                 bytesFlashed += sections[i].data.byteLength;
             }    
         }
-        catch (e) {
-            debugger;
+        catch (e) {            
             this.setState("failed");
             return;
         }
         finally {        
-            await this.loader!.disconnect();       
-            debugger;      
+            await this.loader!.disconnect();
         }
+
         this.setState("config");
         await port!.setSignals({requestToSend: true});
         await new Promise(r => setTimeout(r, 100));   
