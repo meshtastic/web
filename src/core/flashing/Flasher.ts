@@ -4,7 +4,7 @@ import {
   deviceModels,
   FirmwareVersion,
 } from '@app/components/Dashboard';
-import type {
+import {
   ISerialConnection,
   Protobuf,
 } from '@meshtastic/meshtasticjs';
@@ -45,8 +45,7 @@ export async function setup(configs: ConfigPreset[], deviceModelName: string, fi
 }
 
 export async function nextBatch(devices: Device[], flashStates: FlashState[], deviceCallback: (flashState: FlashOperation) => void) {
-    callback("busy");
-    debugger;
+    callback("busy");    
     devices = devices.filter((d, i) => flashStates[i].state == "doFlash");
     flashStates = flashStates.filter(f => f.state == "doFlash");
     if(devices.length > configQueue.length) {
@@ -93,7 +92,6 @@ async function loadFromDb(firmware: FirmwareVersion) {
             const objStore = db.result.transaction("files", "readonly").objectStore("files");
             const transaction = objStore.get(firmware.tag);
             transaction.onsuccess = () => {   
-                debugger;             
                 resolve(transaction.result as ArrayBuffer);
             };
             transaction.onerror = reject;            
@@ -246,16 +244,33 @@ export class FlashOperation {
             await this.loader!.disconnect();       
             debugger;      
         }
-        port!.setSignals({requestToSend: true});
+        this.setState("config");
+        await port!.setSignals({requestToSend: true});
         await new Promise(r => setTimeout(r, 100));   
-        port!.setSignals({requestToSend: false});    
-        await port!.close();           
-        (this.device.connection! as ISerialConnection).connect({ 
+        await port!.setSignals({requestToSend: false});    
+        await port!.close();
+        const connection = (this.device.connection! as ISerialConnection);
+        await connection.connect({ 
             port,
-            baudRate: 115200,
+            baudRate: undefined,
             concurrentLogOutput: true
-        });               
-        this.setState("done", 0);    
+        });
+                
+        const newConfig = new Protobuf.Config({
+            payloadVariant: {
+                case: "device",
+                value: this.config.device!
+            }
+        });
+        const promise = connection.setConfig(newConfig).then(() => 
+        connection.commitEditSettings().then(() => console.log("FLASHER: Config saved"))
+        );
+        
+        // We won't get an answer if serial output has been disabled in the new config
+        if(this.config.device!.serialEnabled)
+            await promise;
+
+        this.setState("done");
     }
 
     public async cancel() {

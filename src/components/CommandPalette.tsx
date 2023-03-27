@@ -1,40 +1,45 @@
-import { useEffect } from "react";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDevice, useDeviceStore } from "@core/stores/deviceStore.js";
-import { useCommandState } from "cmdk";
-import { Hashicon } from "@emeraldpay/hashicon-react";
+import { useEffect } from 'react';
+
+import { useCommandState } from 'cmdk';
 import {
-  LucideIcon,
+  ArrowLeftRightIcon,
+  BoxSelectIcon,
+  BugIcon,
+  EraserIcon,
+  FactoryIcon,
+  LayersIcon,
+  LayoutIcon,
   LinkIcon,
-  TrashIcon,
+  LucideIcon,
   MapIcon,
+  MessageSquareIcon,
   MoonIcon,
+  PaletteIcon,
   PlusIcon,
   PowerIcon,
-  EraserIcon,
+  QrCodeIcon,
   RefreshCwIcon,
-  FactoryIcon,
-  ArrowLeftRightIcon,
-  BugIcon,
   SettingsIcon,
   SmartphoneIcon,
-  MessageSquareIcon,
-  QrCodeIcon,
-  LayersIcon,
-  PaletteIcon,
+  TrashIcon,
   UsersIcon,
-  LayoutIcon,
   XCircleIcon,
-  BoxSelectIcon
-} from "lucide-react";
+} from 'lucide-react';
+
 import {
   CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList
-} from "@components/UI/Command.js";
+  CommandList,
+} from '@components/UI/Command.js';
+import { useAppStore } from '@core/stores/appStore.js';
+import {
+  useDevice,
+  useDeviceStore,
+} from '@core/stores/deviceStore.js';
+import { Hashicon } from '@emeraldpay/hashicon-react';
 
 export interface Group {
   label: string;
