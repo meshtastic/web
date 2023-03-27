@@ -282,11 +282,15 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
             title="Delete"
             onClick={() => {                     
               if(configPresetSelected.parent === undefined) {
-                alert("-- cannot delete root --");
+                if(!confirm(`Are you sure you want to reset the preset list to default?`))
+                  return;
+                const newDefault = new ConfigPreset("Default");
+                setConfigPresetRoot(newDefault);
+                newDefault.saveConfigTree();
                 return;
               } 
               // TEMP: Replace with proper dialog.
-              if(!confirm(`Are you sure you want to remove "${configPresetSelected.name}"?`))
+              if(!confirm(`Are you sure you want to remove "${configPresetSelected.name}" and all its children?`))
                 return;
               configPresetSelected.parent.children = configPresetSelected.parent.children.filter(c => c != configPresetSelected);
               setConfigPresetSelected(configPresetSelected.parent);

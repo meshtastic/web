@@ -148,7 +148,7 @@ export class ConfigPreset {
       if(rootPreset !== undefined)
         return rootPreset;
     }
-    return new ConfigPreset("Root");
+    return new ConfigPreset("Default");
   }
 
   public static async importConfigTree() {
