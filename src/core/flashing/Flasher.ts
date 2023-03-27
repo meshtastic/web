@@ -72,30 +72,56 @@ function handleFlashingDone() {
         callback("waiting");
 }
 
-function storeInDb(firmware: FirmwareVersion, file: ArrayBuffer) {
-    const db = indexedDB.open("firmwares");
-    db.onsuccess = () => {
-        debugger;
-        store(db.result, firmware, file);
-    };    
-    db.onupgradeneeded = (ev) => {
-        const objStore = db.result.createObjectStore("files");
-        debugger;
-        objStore.transaction.oncomplete = () => store(db.result, firmware, file);
-    };    
+function openDb() {
+    return new Promise<IDBDatabase>((resolve, reject) => {
+        const db = indexedDB.open("firmwares");
+        db.onsuccess = () => {
+            resolve(db.result);
+            
+        };    
+        db.onupgradeneeded = (ev) => {
+            const objStore = db.result.createObjectStore("files");            
+            objStore.transaction.oncomplete = () => resolve(db.result);
+        };
+    });
+}
+
+async function storeInDb(firmware: FirmwareVersion, file: ArrayBuffer) {
+    const db = await openDb();
+    return new Promise<void>((resolve, reject) => {
+        const fileStore = db.transaction("files", "readwrite").objectStore("files");
+        const addOp = fileStore.add(file, firmware.tag);
+        fileStore.transaction.oncomplete = () => {
+            console.log("Successfully stored firmware in DB.");
+            resolve();
+        }
+        fileStore.transaction.onerror = reject;
+    });    
 }
 
 async function loadFromDb(firmware: FirmwareVersion) {    
-    return new Promise<ArrayBuffer>((resolve, reject) => {
-        const db = indexedDB.open("firmwares");
-        db.onsuccess = () => {
-            const objStore = db.result.transaction("files", "readonly").objectStore("files");
-            const transaction = objStore.get(firmware.tag);
-            transaction.onsuccess = () => {   
-                resolve(transaction.result as ArrayBuffer);
-            };
-            transaction.onerror = reject;            
+    const db = await openDb();
+    return new Promise<ArrayBuffer>((resolve, reject) => {                
+        const objStore = db.transaction("files", "readonly").objectStore("files");
+        const transaction = objStore.get(firmware.tag);
+        transaction.onsuccess = () => {   
+            resolve(transaction.result as ArrayBuffer);
+        };
+        transaction.onerror = reject;                    
+    });
+}
+
+async function deleteFromDb(firmware: FirmwareVersion) {
+    const db = await openDb();
+    return new Promise<void>((resolve, reject) => {  
+        if(!db.objectStoreNames.contains("files")) {
+            resolve();
+            return;
         }
+        const objStore = db.transaction("files", "readonly").objectStore("files");
+        const transaction = objStore.delete(firmware.tag);            
+        transaction.onsuccess = () => resolve;
+        transaction.onerror = reject;    
     });
 }
 
@@ -123,15 +149,6 @@ export async function uploadCustomFirmware() {
     } 
     return undefined;
   }
-
-function store(db: IDBDatabase, firmware: FirmwareVersion, file: ArrayBuffer) {
-    debugger;
-    const fileStore = db.transaction("files", "readwrite").objectStore("files");
-    fileStore.transaction.oncomplete = () => {        
-        console.log("Successfully stored firmware in DB.");
-    }
-    fileStore.add(file, firmware.tag);
-}
 
 async function getZipFile() {    
     if(firmwareToUse.inLocalDb) {
