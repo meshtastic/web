@@ -6,12 +6,14 @@ import {
 import {
   ArrowDownCircleIcon,
   BluetoothIcon,
+  DownloadIcon,
   Edit3Icon,
   ListPlusIcon,
   NetworkIcon,
   PlusIcon,
   RefreshCwIcon,
   Trash2Icon,
+  UploadIcon,
   UsbIcon,
   UsersIcon,
   XIcon,
@@ -25,6 +27,7 @@ import {
   setup,
   uploadCustomFirmware,
 } from '@app/core/flashing/Flasher';
+import { useToast } from '@app/core/hooks/useToast';
 import {
   ConfigPreset,
   useAppStore,
@@ -241,6 +244,7 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
   
   const { configPresetRoot, setConfigPresetRoot, configPresetSelected, setConfigPresetSelected } = useAppStore();
   const [ editSelected, setEditSelected ] = useState(false);
+  const { toast } = useToast();
   if(configPresetSelected === undefined) {
     setConfigPresetSelected(configPresetRoot);
     return (<div/>);    
@@ -248,57 +252,84 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
 
   return (
     <div className="flex flex-col rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
-      <div className="flex gap-2">
-        <button        
-          className="transition-all hover:text-accent mb-4"
-          title="Add new configuration as child"
-          onClick={() => {         
-            const newPreset = new ConfigPreset("New Preset", configPresetSelected);
-            configPresetSelected?.children.push(newPreset);          
-            setConfigPresetRoot(Object.create(configPresetRoot));
-            setConfigPresetSelected(newPreset);
-            setEditSelected(true);
-            newPreset.saveConfigTree();
-          }}
-        >
-          <PlusIcon/>
-        </button>
-        <button        
-          className="transition-all hover:text-accent mb-4"
-          title="Rename"
-          onClick={() => {                     
-            setEditSelected(true);
-          }}
-        >
-          <Edit3Icon/>
-        </button>
-        <button        
-          className="transition-all hover:text-accent mb-4"
-          title="Delete"
-          onClick={() => {                     
-            if(configPresetSelected.parent === undefined) {
-              alert("-- cannot delete root --");
-              return;
-            } 
-            // TEMP: Replace with proper dialog.
-            if(!confirm(`Are you sure you want to remove "${configPresetSelected.name}"?`))
-              return;
-            configPresetSelected.parent.children = configPresetSelected.parent.children.filter(c => c != configPresetSelected);
-            setConfigPresetSelected(configPresetSelected.parent);
-            configPresetSelected.saveConfigTree();            
-          }}
-        >
-          <Trash2Icon/>
-        </button>
-        <button        
-          className="transition-all hover:text-accent mb-4"
-          title="Delete"
-          onClick={() => {                     
-            configPresetSelected.getFinalConfig();      
-          }}
-        >
-          DEBUG Test config merge
-        </button>
+      <div className="flex justify-between">
+        <div className="flex gap-2">
+          <button        
+            className="transition-all hover:text-accent mb-4"
+            title="Add new configuration as child"
+            onClick={() => {         
+              const newPreset = new ConfigPreset("New Preset", configPresetSelected);
+              configPresetSelected?.children.push(newPreset);          
+              setConfigPresetRoot(Object.create(configPresetRoot));
+              setConfigPresetSelected(newPreset);
+              setEditSelected(true);
+              newPreset.saveConfigTree();
+            }}
+          >
+            <PlusIcon/>
+          </button>
+          <button        
+            className="transition-all hover:text-accent mb-4"
+            title="Rename"
+            onClick={() => {                     
+              setEditSelected(true);
+            }}
+          >
+            <Edit3Icon/>
+          </button>
+          <button        
+            className="transition-all hover:text-accent mb-4"
+            title="Delete"
+            onClick={() => {                     
+              if(configPresetSelected.parent === undefined) {
+                alert("-- cannot delete root --");
+                return;
+              } 
+              // TEMP: Replace with proper dialog.
+              if(!confirm(`Are you sure you want to remove "${configPresetSelected.name}"?`))
+                return;
+              configPresetSelected.parent.children = configPresetSelected.parent.children.filter(c => c != configPresetSelected);
+              setConfigPresetSelected(configPresetSelected.parent);
+              configPresetSelected.saveConfigTree();            
+            }}
+          >
+            <Trash2Icon/>
+          </button>
+        </div>
+        <div className="flex gap-2">
+          <button        
+            className="transition-all hover:text-accent mb-4"
+            title="Import"
+            onClick={() => {                     
+              ConfigPreset.importConfigTree().then(
+                (root) => {
+                  if(root) {
+                    setConfigPresetRoot(root);
+                    root.saveConfigTree();
+                    toast({
+                      title: `Presets successfully imported.`
+                    });
+                  }
+                },
+                () => {toast({
+                  title: `This is not a valid configuration file.`
+                });}
+              );
+            }}
+          >
+          <UploadIcon/> 
+          </button>
+          <button        
+            className="transition-all hover:text-accent mb-4"
+            title="Export"
+            onClick={() => {                     
+              rootConfig.exportConfigTree();
+            }}
+          >
+          <DownloadIcon/> 
+          </button>
+        </div>
+        
       </div>
       
       {rootConfig &&

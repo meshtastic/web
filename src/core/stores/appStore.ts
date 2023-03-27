@@ -53,6 +53,7 @@ export class ConfigPreset {
   }
 
   public exportConfigTree() {
+    const json = this.getConfigTreeJSON();        
     const blob = new Blob([this.getConfigTreeJSON()], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const elem = document.createElement("a");
@@ -114,10 +115,9 @@ export class ConfigPreset {
     return (conf as any)[key];
   }
 
-  public static loadOrCreate(): ConfigPreset {
-    const storedConfigs = localStorage.getItem("PresetConfigs");
-    if(storedConfigs !== null) {
-      const rootPreset = JSON.parse(storedConfigs, (key: string, value:  any) => {            
+  public static tryFromJson(json: string): ConfigPreset | undefined {
+    try {
+      const rootPreset = JSON.parse(json, (key: string, value:  any) => {            
         if(key == '' || !isNaN(Number(key))) {
           // Create new ConfigPreset object to ensure that the member functions are not undefined.
           const preset = new ConfigPreset(value.name, undefined, value.config);
@@ -136,11 +136,36 @@ export class ConfigPreset {
       });
       return rootPreset;
     }
+    catch {
+      return undefined;
+    }
+  }
+
+  public static loadOrCreate(): ConfigPreset {
+    const storedConfigs = localStorage.getItem("PresetConfigs");
+    if(storedConfigs !== null) {
+      const rootPreset = this.tryFromJson(storedConfigs);
+      if(rootPreset !== undefined)
+        return rootPreset;
+    }
     return new ConfigPreset("Root");
   }
 
-  public static importConfigTree() {
-    
+  public static async importConfigTree() {
+    //@ts-ignore
+    const promise: Promise<FileSystemFileHandle[]> = window.showOpenFilePicker({
+      types: [ { description: "JSON file", accept: { "application/json": [".json"] } }]
+    });
+    const fileHandle: FileSystemFileHandle | undefined = await promise.then(f => f[0], () => undefined);
+    const file = await fileHandle?.getFile();
+    const content = await file?.arrayBuffer();
+    if(content === undefined)
+      return undefined;
+    const json = new TextDecoder().decode(content);
+    const newRoot = this.tryFromJson(json);
+    if(newRoot === undefined)
+      throw "";
+    return newRoot;
   }  
 
   public restoreChildConnections() {
