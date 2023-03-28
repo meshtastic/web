@@ -140,7 +140,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                   disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
                   onClick={async () => {
                     // rootConfig.children[0].getFinalConfig(); // FIXME
-                    if(overallFlashingState.state == "idle")
+                    if(overallFlashingState.state == "idle") {
                       setOverallFlashingState({ state: "busy" });
                       let actualFirmware = firmware;
                       debugger;
@@ -167,6 +167,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                           
                         setOverallFlashingState({state, progress});
                       });
+                    }
                     nextBatch(devices,
                       deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
                       (f)=> {

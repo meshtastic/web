@@ -45,7 +45,8 @@ export async function setup(configs: ConfigPreset[], deviceModelName: string, fi
 }
 
 export async function nextBatch(devices: Device[], flashStates: FlashState[], deviceCallback: (flashState: FlashOperation) => void) {
-    callback("busy");    
+    callback("busy");
+    debugger;
     devices = devices.filter((d, i) => flashStates[i].state == "doFlash");
     flashStates = flashStates.filter(f => f.state == "doFlash");
     if(devices.length > configQueue.length) {
@@ -285,33 +286,38 @@ export class FlashOperation {
             await this.loader!.disconnect();
         }
 
-        this.setState("config");
-        await port!.setSignals({requestToSend: true});
-        await new Promise(r => setTimeout(r, 100));   
-        await port!.setSignals({requestToSend: false});    
-        await port!.close();
-        const connection = (this.device.connection! as ISerialConnection);
-        await connection.connect({ 
-            port,
-            baudRate: undefined,
-            concurrentLogOutput: true
-        });
-                
-        const newConfig = new Protobuf.Config({
-            payloadVariant: {
-                case: "device",
-                value: this.config.device!
-            }
-        });
-        const promise = connection.setConfig(newConfig).then(() => 
-        connection.commitEditSettings().then(() => console.log("FLASHER: Config saved"))
-        );
-        
-        // We won't get an answer if serial output has been disabled in the new config
-        if(this.config.device!.serialEnabled)
-            await promise;
+        try {
+            this.setState("config");
+            await port!.setSignals({requestToSend: true});
+            await new Promise(r => setTimeout(r, 100));   
+            await port!.setSignals({requestToSend: false});    
+            await port!.close();
+            const connection = (this.device.connection! as ISerialConnection);
+            await connection.connect({ 
+                port,
+                baudRate: undefined,
+                concurrentLogOutput: true
+            });
+                    
+            const newConfig = new Protobuf.Config({
+                payloadVariant: {
+                    case: "device",
+                    value: this.config.device!
+                }
+            });
+            const promise = connection.setConfig(newConfig).then(() => 
+            connection.commitEditSettings().then(() => console.log("FLASHER: Config saved"))
+            ).catch(e => console.error(e));
+            
+            // We won't get an answer if serial output has been disabled in the new config
+            if(this.config.device!.serialEnabled)
+                await promise;
 
-        this.setState("done");
+            this.setState("done");
+        }
+        catch(e) {
+            this.setState("failed");            
+        }
     }
 
     public async cancel() {
