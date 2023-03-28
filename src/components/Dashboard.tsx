@@ -74,12 +74,12 @@ console.warn(`Device count: ${devices.length}`);
 
       <Separator />
 
-      <div className="flex w-full h-full gap-3">
-        <div className="flex flex-col w-full max-w-[800px] h-full">
+      <div className="flex w-full h-full gap-3 overflow-auto">
+        <div className="flex flex-col w-full min-h-[500px] min-w-[400px] max-w-[500px] h-full">
           <DeviceList devices={getDevices()} rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
           <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
         </div>
-        <div className="flex w-full h-full"><DeviceConfig key={configPresetSelected?.name}/></div>
+        <div className="flex h-full overflow-auto w-full relative"><DeviceConfig key={configPresetSelected?.name}/></div>
       </div>
     </div>
   );
@@ -100,7 +100,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
   return (
     <div className="flex rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
       {getDevices().length ? (
-        <div className="flex flex-col justify-between w-full">        
+        <div className="flex flex-col justify-between w-full overflow-y-auto overflow-x-clip">        
           <ul role="list" className="grow divide-y divide-gray-200">
             {getDevices().map((device, index) => {
               return (<DeviceSetupEntry
@@ -313,6 +313,7 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
         
       </div>
       
+      <div className='overflow-y-auto'>
       {rootConfig &&
         <ConfigEntry
           config={rootConfig}
@@ -327,7 +328,7 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
           }
           }
         />
-      }
+      }</div>
       {/* {rootConfig ? rootConfig.children.map((config, index) => {
         return (<ConfigSelectButton
           label={config.name}

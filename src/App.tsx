@@ -67,9 +67,9 @@ export const App = (): JSX.Element => {
       <MapProvider>
         <DeviceWrapper device={device}>
           <div className="flex flex-col overflow-hidden bg-backgroundPrimary text-textPrimary">
-            <div className="flex flex-grow">
+            <div className="flex">
               <DeviceSelector />
-              <div className="flex flex-grow flex-col">
+              <div className="flex h-screen flex-col w-full">
                 {device ? (
                   <div className="flex h-screen">
                     <DialogManager />
