@@ -88,7 +88,7 @@ console.warn(`Device count: ${devices.length}`);
 const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[], rootConfig: ConfigPreset, totalConfigCount: number}) => {  
   const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, selectedDeviceModel, firmwareList, setFirmwareList } = useAppStore();
   const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  // TODO: Remove this somehow
-    useState(new Array<{state: string, progress: number}>(100).fill({progress: 0, state: 'doNotFlash'}));//useState(devices.map(d => d.flashState));    
+    useState(new Array<{state: string, progress: number}>(100).fill({progress: 0, state: 'doFlash'}));//useState(devices.map(d => d.flashState));    
   const [ fullFlash, setFullFlash ] = useState(false);
   const { getDevices } = useDeviceStore();
   // const [flashingState, setFlashingState]: any = useState([]);
@@ -705,7 +705,15 @@ function deviceStateToText(state: FlashState) {
     case "erasing":
       return "Erasing...";
     case "flashing":
-      return `Flashing... (${(state.progress * 100).toFixed(1)} %)`;    
+      return `Flashing... (${(state.progress * 100).toFixed(1)} %)`;
+    case "config":
+      return "Configuring...";
+    case "done":
+      return "Completed";
+    case "aborted":
+      return "Cancelled";
+    case "failed":
+      return "Failed";        
     default:
       return state.state;
   }
@@ -728,13 +736,22 @@ function stateToText(state: OverallFlashingState, progress?: number) {
 
 function deviceStateToStyle(state: FlashState): React.CSSProperties {
   switch(state.state) {
+    case "failed":
+      return {
+        color: "red",
+        borderColor: "red"
+      };
+    case "done":
+      return {
+        color: "green",
+        borderColor: "green"
+      };
     case "doFlash":      
     default:
       return {
         color: "var(--textPrimary)",
         borderColor: "var(--accentMuted)",
         background: `linear-gradient(90deg, var(--accentMuted) ${state.progress * 100}%, transparent ${state.progress * 100}%)`
-      };    
-      return {};
+      };          
   }
 }

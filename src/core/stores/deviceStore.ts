@@ -131,7 +131,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             broadcast: new Map()
           },
           connection: undefined,
-          flashState: { state: 'doNotFlash', progress: 0 },          
+          flashState: { state: 'doFlash', progress: 0 },          
           activePage: "messages",
           activePeer: 0,
           waypoints: [],
