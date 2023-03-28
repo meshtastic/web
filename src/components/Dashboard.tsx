@@ -61,7 +61,6 @@ export const Dashboard = () => {
   const [ totalConfigCount, setTotalConfigCount ] = useState(configPresetRoot.getTotalConfigCount());
   console.log(`${totalConfigCount} :: ${useAppStore().overallFlashingState}`);
   const devices: Device[] = useMemo(() => getDevices(), [getDevices]);  
-console.warn(`Device count: ${devices.length}`);
 
   return (
     <div className="flex flex-col h-full gap-3 p-3">
@@ -75,10 +74,8 @@ console.warn(`Device count: ${devices.length}`);
       <Separator />
 
       <div className="flex w-full h-full gap-3 overflow-auto">
-        <div className="flex flex-col w-full min-h-[500px] min-w-[400px] max-w-[500px] h-full">
-          <DeviceList devices={getDevices()} rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
-          <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
-        </div>
+        <DeviceList devices={getDevices()} rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
+        <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
         <div className="flex h-full overflow-auto w-full relative"><DeviceConfig key={configPresetSelected?.name}/></div>
       </div>
     </div>
@@ -88,7 +85,7 @@ console.warn(`Device count: ${devices.length}`);
 const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[], rootConfig: ConfigPreset, totalConfigCount: number}) => {  
   const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, selectedDeviceModel, firmwareList, setFirmwareList } = useAppStore();
   const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  // TODO: Remove this somehow
-    useState(new Array<{state: string, progress: number}>(100).fill({progress: 0, state: 'doFlash'}));//useState(devices.map(d => d.flashState));    
+    useState(new Array<{state: string, progress: number}>(100).fill({progress: 1, state: 'doFlash'}));//useState(devices.map(d => d.flashState));    
   const [ fullFlash, setFullFlash ] = useState(false);
   const { getDevices } = useDeviceStore();
   // const [flashingState, setFlashingState]: any = useState([]);
@@ -98,7 +95,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
   console.warn(`Device count check 2: ${devices.length}`);
 
   return (
-    <div className="flex rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
+    <div className="flex min-w-[500px] rounded-md border border-dashed border-slate-200 p-3 mb-2 dark:border-slate-700">
       {getDevices().length ? (
         <div className="flex flex-col justify-between w-full overflow-y-auto overflow-x-clip">        
           <ul role="list" className="grow divide-y divide-gray-200">
@@ -130,60 +127,62 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
           <div className="flex flex-col gap-3">
             <div className="flex gap-3 w-full">
               <DeviceModelSelection/>
-              <div className='flex w-full items-center gap-3'>
+              <div className='flex w-full items-center gap-3' title="Fully reinstalls every device, even if they could simply be updated.">
                 <Switch checked={fullFlash} onCheckedChange={setFullFlash}/>
                 <Label>Force full wipe and reinstall</Label>
               </div>
             </div>            
             <div className="flex gap-3">
               <FirmwareSelection/>
-              {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
-                className="gap-2 w-full"
-                disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
-                onClick={async () => {
-                  // rootConfig.children[0].getFinalConfig(); // FIXME
-                  if(overallFlashingState.state == "idle")
-                    setOverallFlashingState({ state: "busy" });
-                    let actualFirmware = firmware;
-                    debugger;
-                    if(actualFirmware === undefined) {
-                      const list = await loadFirmwareList();
-                      setFirmwareList(list.slice(0, 10));
-                      if(list.length == 0)
-                        throw "Failed";
-                      actualFirmware = list[0];
-                    }
-                    await setup(rootConfig.getAll(), selectedDeviceModel, actualFirmware, fullFlash, (state: OverallFlashingState, progress?: number) => {
-                      if(state == 'busy') {
-                        isStoredInDb(actualFirmware!.tag).then(b => {
-                          // All FirmwareVersion objects are immutable here so we'll have to re-create each entry
-                          const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => { return {
-                            name: f.name,
-                            tag: f.tag,
-                            id: f.id,
-                            inLocalDb: f == actualFirmware ? b : f.inLocalDb 
-                          }});
-                          setFirmwareList(newFirmwareList);
-                        });
+              <div className="flex w-full">
+                {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
+                  className="gap-2 w-full"
+                  disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
+                  onClick={async () => {
+                    // rootConfig.children[0].getFinalConfig(); // FIXME
+                    if(overallFlashingState.state == "idle")
+                      setOverallFlashingState({ state: "busy" });
+                      let actualFirmware = firmware;
+                      debugger;
+                      if(actualFirmware === undefined) {
+                        const list = await loadFirmwareList();
+                        setFirmwareList(list.slice(0, 10));
+                        if(list.length == 0)
+                          throw "Failed";
+                        actualFirmware = list[0];
                       }
+                      await setup(rootConfig.getAll(), selectedDeviceModel, actualFirmware, fullFlash, (state: OverallFlashingState, progress?: number) => {
+                        if(state == 'busy') {
+                          isStoredInDb(actualFirmware!.tag).then(b => {
+                            // All FirmwareVersion objects are immutable here so we'll have to re-create each entry
+                            const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => { return {
+                              name: f.name,
+                              tag: f.tag,
+                              id: f.id,
+                              inLocalDb: f == actualFirmware ? b : f.inLocalDb 
+                            }});
+                            setFirmwareList(newFirmwareList);
+                          });
+                        }
+                          
+                        setOverallFlashingState({state, progress});
+                      });
+                    nextBatch(devices,
+                      deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
+                      (f)=> {
+                        f.device.setFlashState(f.state);
+                        deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
+                        setDeviceSelectedToFlash(deviceSelectedToFlash);                
                         
-                      setOverallFlashingState({state, progress});
-                    });
-                  nextBatch(devices,
-                    deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
-                    (f)=> {
-                      f.device.setFlashState(f.state);
-                      deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
-                      setDeviceSelectedToFlash(deviceSelectedToFlash);                
-                      
-                      // flashingState[f.device.id] = f.state;
-                      // setFlashingState(flashingState);
-                    }
-                  );
-                }}
-              >            
-                {stateToText(overallFlashingState.state, overallFlashingState.progress)}
-              </Button>}
+                        // flashingState[f.device.id] = f.state;
+                        // setFlashingState(flashingState);
+                      }
+                    );
+                  }}
+                >            
+                  {stateToText(overallFlashingState.state, overallFlashingState.progress)}
+                </Button>}
+              </div>
               {cancelButtonVisible && <Button
                 className="ml-1 p-2"
                 variant={"destructive"}
@@ -228,7 +227,7 @@ const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPr
   }
 
   return (
-    <div className="flex flex-col rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
+    <div className="flex flex-col min-w-[400px] rounded-md border border-dashed border-slate-200 p-3 mb-2 dark:border-slate-700">
       <div className="flex justify-between">
         <div className="flex gap-2">
           <button        
@@ -735,6 +734,7 @@ function stateToText(state: OverallFlashingState, progress?: number) {
 }
 
 function deviceStateToStyle(state: FlashState): React.CSSProperties {
+  debugger;
   switch(state.state) {
     case "failed":
       return {
