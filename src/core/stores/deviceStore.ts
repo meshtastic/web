@@ -1,12 +1,18 @@
-import { createContext, useContext } from "react";
+import {
+  createContext,
+  useContext,
+} from 'react';
 
-import { produce } from "immer";
-import { create } from "zustand";
+import { produce } from 'immer';
+import { create } from 'zustand';
 
-import { Protobuf, Types } from "@meshtastic/meshtasticjs";
-import { channel } from "diagnostics_channel";
-import { useAppStore } from "./appStore";
-import type { FlashState } from "../flashing/Flasher";
+import {
+  Protobuf,
+  Types,
+} from '@meshtastic/meshtasticjs';
+
+import type { FlashState } from '../flashing/Flasher';
+import { useAppStore } from './appStore';
 
 export type Page = "messages" | "map" | "config" | "channels" | "peers";
 
@@ -605,6 +611,7 @@ export const useConfig = (): ConfigProvider => {
   const context = useContext(DeviceContext);
   if(context == undefined) {
     const {configPresetRoot, configPresetSelected } = useAppStore();
+    debugger;
     if(configPresetSelected) {
       console.log(`Displaying selected preset: ${configPresetSelected.name} (${configPresetSelected.config.device?.buttonGpio})`);
       console.log(`Identical? ${configPresetSelected.config == configPresetRoot.config}`);

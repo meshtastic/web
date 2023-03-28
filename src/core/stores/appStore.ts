@@ -23,29 +23,16 @@ export type accentColor =
   | "pink";
 
 export class ConfigPreset {
+
   public children: ConfigPreset[] = [];  
   public count: number = 0;
   public overrideValues: {[fieldName: string]: boolean};
 
-  public constructor(public name: string, public parent?: ConfigPreset, public config : Protobuf.LocalConfig = new Protobuf.LocalConfig()) {
+  public constructor(public name: string, public parent?: ConfigPreset, public config = ConfigPreset.createDefaultConfig()) {
     if(parent) {
       // Root config should not be overridable
       this.overrideValues = {};
-    }
-    if(config.device === undefined)
-      config.device = new Protobuf.Config_DeviceConfig();
-    if(config.position === undefined)
-      config.position = new Protobuf.Config_PositionConfig();
-    if(config.power === undefined)
-      config.power = new Protobuf.Config_PowerConfig();
-    if(config.network === undefined)
-      config.network = new Protobuf.Config_NetworkConfig();
-    if(config.display === undefined)
-      config.display = new Protobuf.Config_DisplayConfig();
-    if(config.lora === undefined)
-      config.lora = new Protobuf.Config_LoRaConfig();
-    if(config.bluetooth === undefined)
-      config.bluetooth = new Protobuf.Config_BluetoothConfig();
+    }    
   }
 
   public saveConfigTree() {
@@ -143,6 +130,7 @@ export class ConfigPreset {
 
   public static loadOrCreate(): ConfigPreset {
     const storedConfigs = localStorage.getItem("PresetConfigs");
+    debugger;
     if(storedConfigs !== null) {
       const rootPreset = this.tryFromJson(storedConfigs);
       if(rootPreset !== undefined)
@@ -172,6 +160,21 @@ export class ConfigPreset {
     this.children.forEach((c) => {
       c.parent = this;  
       c.restoreChildConnections();
+    });
+  }
+
+  private static createDefaultConfig(): Protobuf.LocalConfig {
+    return new Protobuf.LocalConfig({
+      device: new Protobuf.Config_DeviceConfig({      
+        serialEnabled: true,      
+        nodeInfoBroadcastSecs: 10800
+      }),
+      position: new Protobuf.Config_PositionConfig({ }),
+      power: new Protobuf.Config_PowerConfig({ }),
+      network: new Protobuf.Config_NetworkConfig({ }),
+      display: new Protobuf.Config_DisplayConfig({ }),
+      lora: new Protobuf.Config_LoRaConfig({ }),
+      bluetooth: new Protobuf.Config_BluetoothConfig({ }),
     });
   }
 

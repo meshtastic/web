@@ -1,27 +1,50 @@
-import type { DisplayValidation } from "@app/validation/config/display.js";
-import { useConfig, useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import type { ConfigPreset } from '@app/core/stores/appStore';
+import type { DisplayValidation } from '@app/validation/config/display.js';
+import {
+  DynamicForm,
+  EnableSwitchData,
+} from '@components/Form/DynamicForm.js';
+import {
+  useConfig,
+  useDevice,
+} from '@core/stores/deviceStore.js';
+import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Display = (): JSX.Element => {
-  // const { config, setWorkingConfig } = useDevice();
-  const config = useConfig();  
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
+    getEnabled(name) {
+      return config.overrideValues![name] ?? false;
+    },
+    setEnabled(name, value) {
+      config.overrideValues![name] = value;      
+    },
+  } : undefined;
+  const isPresetConfig = !("id" in config);
+  const setConfig: (data: DisplayValidation) => void =
+    isPresetConfig ? (data) => {
+      config.config.display = new Protobuf.Config_DisplayConfig(data);    
+      debugger;
+      (config as ConfigPreset).saveConfigTree();
+    }
+    : (data) => {
+      useDevice().setWorkingConfig!(
+        new Protobuf.Config({
+          payloadVariant: {
+            case: "display",
+            value: data
+          }
+        })
+      );
+    }  
 
-  const onSubmit = (data: DisplayValidation) => {
-    // setWorkingConfig(
-    //   new Protobuf.Config({
-    //     payloadVariant: {
-    //       case: "display",
-    //       value: data
-    //     }
-    //   })
-    // );
-  };
+  const onSubmit = setConfig;  
 
   return (
     <DynamicForm<DisplayValidation>
       onSubmit={onSubmit}
-      defaultValues={config.display}
+      defaultValues={config.config.display}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "Display Settings",

@@ -1,32 +1,49 @@
-import type { NetworkValidation } from "@app/validation/config/network.js";
-import { useConfig, useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import type { ConfigPreset } from '@app/core/stores/appStore';
+import type { NetworkValidation } from '@app/validation/config/network.js';
+import {
+  DynamicForm,
+  EnableSwitchData,
+} from '@components/Form/DynamicForm.js';
+import {
+  useConfig,
+  useDevice,
+} from '@core/stores/deviceStore.js';
+import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Network = (): JSX.Element => {
-  // const { config, setWorkingConfig } = useDevice();
-  const config = useConfig();  
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
+    getEnabled(name) {
+      return config.overrideValues![name] ?? false;
+    },
+    setEnabled(name, value) {
+      config.overrideValues![name] = value;      
+    },
+  } : undefined;
+  const isPresetConfig = !("id" in config);
+  const setConfig: (data: NetworkValidation) => void =
+    isPresetConfig ? (data) => {
+      config.config.network = new Protobuf.Config_NetworkConfig(data);    
+      (config as ConfigPreset).saveConfigTree();
+    }
+    : (data) => {
+      useDevice().setWorkingConfig!(
+        new Protobuf.Config({
+          payloadVariant: {
+            case: "network",
+            value: data
+          }
+        })
+      );
+    }  
 
-  const onSubmit = (data: NetworkValidation) => {
-    // setWorkingConfig(
-    //   new Protobuf.Config({
-    //     payloadVariant: {
-    //       case: "network",
-    //       value: {
-    //         ...data,
-    //         ipv4Config: new Protobuf.Config_NetworkConfig_IpV4Config(
-    //           data.ipv4Config
-    //         )
-    //       }
-    //     }
-    //   })
-    // );
-  };
+  const onSubmit = setConfig;  
 
   return (
     <DynamicForm<NetworkValidation>
       onSubmit={onSubmit}
-      defaultValues={config.network}
+      defaultValues={config.config.network}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "WiFi Config",

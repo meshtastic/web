@@ -1,27 +1,49 @@
-import type { PositionValidation } from "@app/validation/config/position.js";
-import { useConfig, useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import type { ConfigPreset } from '@app/core/stores/appStore';
+import type { PositionValidation } from '@app/validation/config/position.js';
+import {
+  DynamicForm,
+  EnableSwitchData,
+} from '@components/Form/DynamicForm.js';
+import {
+  useConfig,
+  useDevice,
+} from '@core/stores/deviceStore.js';
+import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Position = (): JSX.Element => {
-  // const { config, nodes, hardware, setWorkingConfig } = useDevice();
-  const config = useConfig();  
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
+    getEnabled(name) {
+      return config.overrideValues![name] ?? false;
+    },
+    setEnabled(name, value) {
+      config.overrideValues![name] = value;      
+    },
+  } : undefined;
+  const isPresetConfig = !("id" in config);
+  const setConfig: (data: PositionValidation) => void =
+    isPresetConfig ? (data) => {
+      config.config.position = new Protobuf.Config_PositionConfig(data);    
+      (config as ConfigPreset).saveConfigTree();
+    }
+    : (data) => {
+      useDevice().setWorkingConfig!(
+        new Protobuf.Config({
+          payloadVariant: {
+            case: "position",
+            value: data
+          }
+        })
+      );
+    }  
 
-  const onSubmit = (data: PositionValidation) => {
-    // setWorkingConfig(
-    //   new Protobuf.Config({
-    //     payloadVariant: {
-    //       case: "position",
-    //       value: data
-    //     }
-    //   })
-    // );
-  };
+  const onSubmit = setConfig;  
 
   return (
     <DynamicForm<PositionValidation>
       onSubmit={onSubmit}
       defaultValues={config.config.position}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "Position settings",
