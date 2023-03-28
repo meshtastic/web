@@ -36,14 +36,11 @@ import {
   Device,
   useDeviceStore,
 } from '@app/core/stores/deviceStore.js';
-import { subscribeAll } from '@app/core/subscriptions';
-import { randId } from '@app/core/utils/randId';
 import { DeviceConfig } from '@app/pages/Config/DeviceConfig';
 import { Button } from '@components/UI/Button.js';
 import { Separator } from '@components/UI/Seperator.js';
 import { H3 } from '@components/UI/Typography/H3.js';
 import { Subtle } from '@components/UI/Typography/Subtle.js';
-import { ISerialConnection } from '@meshtastic/meshtasticjs';
 
 import { ConfigSelectButton } from './UI/ConfigSelectButton';
 import { Label } from './UI/Label';
@@ -57,38 +54,15 @@ import {
 } from './UI/Select';
 import { Switch } from './UI/Switch';
 
-let initTest: boolean  = false;
-
 export const Dashboard = () => {
   let { configPresetRoot, configPresetSelected } : {configPresetRoot: ConfigPreset, configPresetSelected?: ConfigPreset} = useAppStore();
   const { addDevice, getDevices } = useDeviceStore();
   const getTotalConfigCount = (c: ConfigPreset): number => c.children.map(child => getTotalConfigCount(child)).reduce((prev, cur) => prev + cur, c.count);  
   const [ totalConfigCount, setTotalConfigCount ] = useState(configPresetRoot.getTotalConfigCount());
   console.log(`${totalConfigCount} :: ${useAppStore().overallFlashingState}`);
-  const devices: Device[] = useMemo(() => getDevices(), [getDevices]);
-  const onConnect = async (port: SerialPort) => {
-    const id = randId();
-    const device = addDevice(id);
-    const connection = new ISerialConnection(id);
-    await connection
-      .connect({
-        port,
-        baudRate: undefined,
-        concurrentLogOutput: true
-      })
-      .catch((e: Error) => console.log(`Unable to Connect: ${e.message}`));
-    device.addConnection(connection);
-    subscribeAll(device, connection);
-  };
-  const connectToAll = async () => {
-    const dev = await navigator.serial.getPorts();
-    dev.filter(d => d.readable === null).forEach(d => onConnect(d));
-  };
-  if(!initTest) {
-    connectToAll();
-    initTest = true;
-  }
-  
+  const devices: Device[] = useMemo(() => getDevices(), [getDevices]);  
+console.warn(`Device count: ${devices.length}`);
+
   return (
     <div className="flex flex-col h-full gap-3 p-3">
       <div className="flex items-center justify-between">
@@ -102,7 +76,7 @@ export const Dashboard = () => {
 
       <div className="flex w-full h-full gap-3">
         <div className="flex flex-col w-full max-w-[800px] h-full">
-          <DeviceList devices={devices} rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
+          <DeviceList devices={getDevices()} rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
           <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
         </div>
         <div className="flex w-full h-full"><DeviceConfig key={configPresetSelected?.name}/></div>
@@ -113,19 +87,22 @@ export const Dashboard = () => {
 
 const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[], rootConfig: ConfigPreset, totalConfigCount: number}) => {  
   const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, selectedDeviceModel, firmwareList, setFirmwareList } = useAppStore();
-  const [deviceSelectedToFlash, setDeviceSelectedToFlash] = useState(devices.map(d => d.flashState));    
+  const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  // TODO: Remove this somehow
+    useState(new Array<{state: string, progress: number}>(100).fill({progress: 0, state: 'doNotFlash'}));//useState(devices.map(d => d.flashState));    
   const [ fullFlash, setFullFlash ] = useState(false);
+  const { getDevices } = useDeviceStore();
   // const [flashingState, setFlashingState]: any = useState([]);
   const cancelButtonVisible = overallFlashingState.state != "idle";
   const firmware = firmwareList.find(f => f.id == selectedFirmware);
   console.log(`Selected firmware: ${firmware?.name}`);
+  console.warn(`Device count check 2: ${devices.length}`);
 
   return (
     <div className="flex rounded-md border border-dashed border-slate-200 h-1/2 p-3 mb-2 dark:border-slate-700">
-      {devices.length ? (
+      {getDevices().length ? (
         <div className="flex flex-col justify-between w-full">        
           <ul role="list" className="grow divide-y divide-gray-200">
-            {devices.map((device, index) => {
+            {getDevices().map((device, index) => {
               return (<DeviceSetupEntry
                 device={device}
                 selectedToFlash={deviceSelectedToFlash[index].state == 'doFlash'}
