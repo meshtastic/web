@@ -21,9 +21,9 @@ import { randId } from './core/utils/randId';
 let ensureOnce = false;
 
 export const App = (): JSX.Element => {
-  const { getDevice } = useDeviceStore();
+  const { getDevice, getDevices, removeDevice } = useDeviceStore();
   const { addDevice } = useDeviceStore();
-  const { selectedDevice, setConnectDialogOpen, connectDialogOpen } =
+  const { selectedDevice, setConnectDialogOpen, connectDialogOpen, setSelectedDevice } =
     useAppStore();
   const [initialized, setInitialized] = useState(false);
 
@@ -46,6 +46,23 @@ export const App = (): JSX.Element => {
   };
   const connectToAll = async () => {
     const dev = await navigator.serial.getPorts();
+    
+    navigator.serial.onconnect = (ev) => {
+      const port = ev.target as SerialPort;
+      if(port.readable === null)
+        onConnect(port);
+    };
+    navigator.serial.ondisconnect = (ev) => {
+      const port = ev.target as SerialPort;
+      const device = getDevices().filter(d => d.connection?.connType == 'serial');
+      const d = device.find(d => (d.connection! as ISerialConnection).getCurrentPort() == port);
+      if(!d)
+        return;
+      d.connection!.disconnect();
+      removeDevice(d.id ?? 0);
+      if(selectedDevice == d.id)
+        setSelectedDevice(0);
+    }
     dev.filter(d => d.readable === null).forEach(d => onConnect(d));
   };
   if(!initialized && !ensureOnce) {
