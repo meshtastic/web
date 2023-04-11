@@ -97,7 +97,8 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
   return (
     <div className="flex min-w-[500px] rounded-md border border-dashed border-slate-200 p-3 mb-2 dark:border-slate-700">
       {getDevices().length ? (
-        <div className="flex flex-col justify-between w-full overflow-y-auto overflow-x-clip">        
+        <div className="flex flex-col justify-between w-full overflow-y-auto overflow-x-clip">
+          <Subtle>Select all devices to flash:</Subtle>
           <ul role="list" className="grow divide-y divide-gray-200">
             {getDevices().map((device, index) => {
               return (<DeviceSetupEntry
@@ -414,7 +415,7 @@ const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progr
               )}
             </div>
           </div>          
-          <div className="flex gap-2 items-center text-sm text-gray-500">
+          <div className="flex gap-2 items-center text-sm text-gray-500" title="Number of peers">
               <UsersIcon
                 size={20}
                 className="text-gray-400"
@@ -697,9 +698,9 @@ async function loadFirmwareList() : Promise<FirmwareVersion[]> {
 function deviceStateToText(state: FlashState) {
   switch(state.state) {
     case "doNotFlash":
-      return "Disabled";
+      return "Unselected";
     case "doFlash":
-      return "Enabled";
+      return "Selected";
     case "connecting":
       return "Connecting...";
     case "erasing":
@@ -746,6 +747,11 @@ function deviceStateToStyle(state: FlashState): React.CSSProperties {
       return {
         color: "green",
         borderColor: "green"
+      };
+    case "doNotFlash":
+      return {
+        color: "gray",
+        borderColor: "gray"
       };
     case "doFlash":      
     default:
