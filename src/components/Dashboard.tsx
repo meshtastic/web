@@ -143,8 +143,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                     // rootConfig.children[0].getFinalConfig(); // FIXME
                     if(overallFlashingState.state == "idle") {
                       setOverallFlashingState({ state: "busy" });
-                      let actualFirmware = firmware;
-                      debugger;
+                      let actualFirmware = firmware;                      
                       if(actualFirmware === undefined) {
                         const list = await loadFirmwareList();
                         setFirmwareList(list.slice(0, 10));
@@ -735,8 +734,7 @@ function stateToText(state: OverallFlashingState, progress?: number) {
   }
 }
 
-function deviceStateToStyle(state: FlashState): React.CSSProperties {
-  debugger;
+function deviceStateToStyle(state: FlashState): React.CSSProperties {  
   switch(state.state) {
     case "failed":
       return {

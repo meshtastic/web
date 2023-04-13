@@ -65,8 +65,7 @@ export const App = (): JSX.Element => {
     }
     dev.filter(d => d.readable === null).forEach(d => onConnect(d));
   };
-  if(!initialized && !ensureOnce) {
-    debugger;
+  if(!initialized && !ensureOnce) {    
     connectToAll();
     setInitialized(true);
     ensureOnce = true;    

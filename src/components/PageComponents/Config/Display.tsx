@@ -23,8 +23,7 @@ export const Display = (): JSX.Element => {
   const isPresetConfig = !("id" in config);
   const setConfig: (data: DisplayValidation) => void =
     isPresetConfig ? (data) => {
-      config.config.display = new Protobuf.Config_DisplayConfig(data);    
-      debugger;
+      config.config.display = new Protobuf.Config_DisplayConfig(data);          
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {

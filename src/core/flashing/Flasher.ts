@@ -45,8 +45,7 @@ export async function setup(configs: ConfigPreset[], deviceModelName: string, fi
 }
 
 export async function nextBatch(devices: Device[], flashStates: FlashState[], deviceCallback: (flashState: FlashOperation) => void) {
-    callback("busy");
-    debugger;
+    callback("busy");    
     devices = devices.filter((d, i) => flashStates[i].state == "doFlash");
     flashStates = flashStates.filter(f => f.state == "doFlash");
     if(devices.length > configQueue.length) {
@@ -244,8 +243,7 @@ export class FlashOperation {
 
     public async flash() {
         let port: SerialPort | undefined;
-        try {
-            debugger;
+        try {            
             const updatePossible = this.device.nodes.get(this.device.hardware.myNodeNum) !== undefined;
             port = await (this.device.connection! as ISerialConnection).disconnect();
             if(port === undefined)
@@ -320,8 +318,7 @@ export class FlashOperation {
         }
     }
 
-    public async cancel() {
-        debugger;
+    public async cancel() {        
         await this.loader?.disconnect();
         this.setState("aborted");
     }

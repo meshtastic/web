@@ -129,8 +129,7 @@ export class ConfigPreset {
   }
 
   public static loadOrCreate(): ConfigPreset {
-    const storedConfigs = localStorage.getItem("PresetConfigs");
-    debugger;
+    const storedConfigs = localStorage.getItem("PresetConfigs");    
     if(storedConfigs !== null) {
       const rootPreset = this.tryFromJson(storedConfigs);
       if(rootPreset !== undefined)
