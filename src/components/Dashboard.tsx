@@ -149,7 +149,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                         setFirmwareList(list.slice(0, 10));
                         if(list.length == 0)
                           throw "Failed";
-                        actualFirmware = list[0];
+                        actualFirmware = list.filter(l => !l.isPreRelease)[0];
                       }
                       await setup(rootConfig.getAll(), selectedDeviceModel, actualFirmware, fullFlash, (state: OverallFlashingState, progress?: number) => {
                         if(state == 'busy') {
@@ -159,6 +159,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                               name: f.name,
                               tag: f.tag,
                               id: f.id,
+                              isPreRelease: f.isPreRelease,
                               inLocalDb: f == actualFirmware ? b : f.inLocalDb 
                             }});
                             setFirmwareList(newFirmwareList);
@@ -442,7 +443,7 @@ const FirmwareSelection = () => {
 
   let selectItems = [
     <SelectItem key={-1} value={"latest"}>
-      {"Latest version"}
+      {"Latest stable version"}
     </SelectItem>,
     <SelectSeparator/>
   ];
@@ -463,9 +464,12 @@ const FirmwareSelection = () => {
     );
   }
   else {
-    const versions = firmwareList.map((f, index) => (
+    const versions = firmwareList.map((f, index) => (      
       <SelectItem key={index} value={f.id}>
-        <div className="flex gap-2 items-center">{f.name} {f.inLocalDb ? <ArrowDownCircleIcon size={20}/> : <div/>}</div>
+        {f.isPreRelease ?
+        (<div className="flex gap-2 items-center">{`(${f.name})`} {f.inLocalDb ? [<ArrowDownCircleIcon size={20}/>] : []}</div>) :
+        (<div className="flex gap-2 items-center">{f.name} {f.inLocalDb ? [<ArrowDownCircleIcon size={20}/>] : []}</div>)
+        }
       </SelectItem>
     ))
     selectItems.push(...versions);
@@ -644,13 +648,14 @@ export type FirmwareVersion = {
   name: string,
   tag: string,
   id: string,
-  inLocalDb: boolean
-  // partitions: {[index: string]: Uint8Array},
+  inLocalDb: boolean,
+  isPreRelease: boolean
 }
 
 interface FirmwareGithubRelease {
   name: string,
   tag_name: string,  
+  prerelease: boolean,
   assets: {
     name: string,
     id: string
@@ -687,6 +692,7 @@ async function loadFirmwareList() : Promise<FirmwareVersion[]> {
       name: r.name.replace("Meshtastic Firmware ", ""),
       tag: tag,
       id: id,
+      isPreRelease: r.prerelease,
       inLocalDb: await isStoredInDb(tag)
     };
   }));  

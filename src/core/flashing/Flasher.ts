@@ -140,6 +140,7 @@ export async function uploadCustomFirmware() {
         id: "custom_" + file.name,
         name: file.name,
         inLocalDb: true,
+        isPreRelease: false,
         tag: "custom_" + file.name
       }
       storeInDb(firmwareDesc, content);

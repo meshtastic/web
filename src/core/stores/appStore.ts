@@ -179,13 +179,13 @@ export class ConfigPreset {
 
 }
 
-function loadFirmwareListFromStorage(): FirmwareVersion[] {
+function loadFirmwareListFromStorage(): FirmwareVersion[] {  
   const list = localStorage.getItem("firmwareList") as (string | undefined);
   if(list === undefined)
     return [];
   try {
     const json = JSON.parse(list) as FirmwareVersion[];
-    if(json.every(o => "name" in o && "inLocalDb" in o && "id" in o && "tag" in o))
+    if(json.every(o => "name" in o && "inLocalDb" in o && "id" in o && "tag" in o && "isPreRelease" in o))
       return json;    
     else
       return [];
