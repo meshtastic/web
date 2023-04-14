@@ -229,16 +229,18 @@ function autoDetectDeviceModel(port: SerialPort) {
 export class FlashOperation {
         
     public state: FlashState = { progress: 0, state: "idle" };
+    public errorReason?: string;
     private loader?: EspLoader; 
 
     public constructor(public device: Device, public config: Protobuf.LocalConfig, public callback: (operation: FlashOperation) => void) {
         
     }
 
-    public setState(state: DeviceFlashingState, progress = 0) {
+    public setState(state: DeviceFlashingState, progress = 0, errorReason : string | undefined = undefined) {
         console.log(`${this.device.nodes.get(this.device.hardware.myNodeNum)?.user
             ?.longName ?? "<Not flashed yet>"} flash state: ${state}`);
         this.state = {state, progress};
+        this.errorReason = errorReason;
         this.callback(this);
     }
 
@@ -249,8 +251,8 @@ export class FlashOperation {
             this.setState("done");
         }   
         catch(e) {
-            debugger;
-            this.setState("failed");
+            this.setState("failed", 0, e as string);            
+            throw e;
         }     
         
     }
@@ -295,7 +297,7 @@ export class FlashOperation {
                 bytesFlashed += sections[i].data.byteLength;
             }    
         }
-        catch (e) {            
+        catch (e) {                                    
             throw e;            
         }
         finally {        

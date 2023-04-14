@@ -88,6 +88,7 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
     useState(new Array<{state: string, progress: number}>(100).fill({progress: 1, state: 'doFlash'}));//useState(devices.map(d => d.flashState));    
   const [ fullFlash, setFullFlash ] = useState(false);
   const { getDevices } = useDeviceStore();
+  const { toast, toasts } = useToast();
   // const [flashingState, setFlashingState]: any = useState([]);
   const cancelButtonVisible = overallFlashingState.state != "idle";
   const firmware = firmwareList.find(f => f.id == selectedFirmware);
@@ -174,10 +175,11 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
                       (f)=> {
                         f.device.setFlashState(f.state);
                         deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
-                        setDeviceSelectedToFlash(deviceSelectedToFlash);                
-                        
-                        // flashingState[f.device.id] = f.state;
-                        // setFlashingState(flashingState);
+                        setDeviceSelectedToFlash(deviceSelectedToFlash);           
+
+                        if(f.state.state == "failed") {                              
+                          toast({ title: `❌ Error: ${f.errorReason}`});                          
+                        }
                       }
                     );
                   }}
