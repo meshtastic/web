@@ -57,7 +57,7 @@ export async function nextBatch(devices: Device[], flashStates: FlashState[], de
     configQueue = configQueue.slice(operations.length)
     console.log(`New config queue count: ${configQueue.length}`);
     
-    Promise.allSettled(operations.map(op => op.flash())).then(p => handleFlashingDone());
+    Promise.allSettled(operations.map(op => op.flashAndConfigDevice())).then(p => handleFlashingDone());
 }
 
 export function cancel() {
@@ -198,8 +198,8 @@ async function getSection(name: string): Promise<Uint8Array | undefined> {
     return dataSections[name];
 }
 
-async function getFirmwareSections(deviceModel: string, alreadyFlashed: boolean) {
-    if(alreadyFlashed && !fullFlash) {
+async function getFirmwareSections(deviceModel: string, update: boolean) {
+    if(update) {
         const updateFilename = `firmware-${deviceModel}-${firmwareToUse.tag}-update.bin`;
         const mainUpdate = await getSection(updateFilename);
         if(mainUpdate !== undefined) {
@@ -242,21 +242,39 @@ export class FlashOperation {
         this.callback(this);
     }
 
-    public async flash() {
-        let port: SerialPort | undefined;
-        try {            
-            const updatePossible = this.device.nodes.get(this.device.hardware.myNodeNum) !== undefined;
-            port = await (this.device.connection! as ISerialConnection).disconnect();
-            if(port === undefined)
-                throw "Port unavailable";
-            const deviceModel = selectedDeviceModel == "auto" ? autoDetectDeviceModel(port) : selectedDeviceModel;
-            if(deviceModel === undefined)
-                throw "Could not detect device model";
-            const info = port.getInfo();
-            console.log(`Device info: vendor ${info.usbVendorId}, product ${info.usbProductId}`);
-            const sections = await getFirmwareSections(deviceModel, updatePossible);
-            await port!.open({baudRate: 115200});
-            this.loader = new EspLoader(port!);
+    public async flashAndConfigDevice() {
+        try {
+            await this.flash();
+            await this.setConfig();
+            this.setState("done");
+        }   
+        catch(e) {
+            debugger;
+            this.setState("failed");
+        }     
+        
+    }
+
+    private async flash() {
+        const installedVersion = this.device.hardware.firmwareVersion;
+        console.log(`Installed firmware verson: ${installedVersion}`);
+        const update = !fullFlash && this.device.nodes.get(this.device.hardware.myNodeNum) !== undefined ;    
+        if(update && installedVersion == firmwareToUse.tag)
+            return;
+
+        const port = await (this.device.connection! as ISerialConnection).disconnect();
+        if(port === undefined)
+            throw "Port unavailable";
+        const deviceModel = selectedDeviceModel == "auto" ? autoDetectDeviceModel(port) : selectedDeviceModel;
+        if(deviceModel === undefined)
+            throw "Could not detect device model";
+        const info = port.getInfo();
+        console.log(`Device info: vendor ${info.usbVendorId}, product ${info.usbProductId}`);
+        const sections = await getFirmwareSections(deviceModel, update);
+        await port!.open({baudRate: 115200});
+        this.loader = new EspLoader(port!);
+        
+        try {                                    
             const loader = this.loader;
             this.setState("connecting");
             await loader.connect();
@@ -278,25 +296,29 @@ export class FlashOperation {
             }    
         }
         catch (e) {            
-            this.setState("failed");
-            return;
+            throw e;            
         }
         finally {        
             await this.loader!.disconnect();
         }
 
+        this.setState("config");
+        await port!.setSignals({requestToSend: true});
+        await new Promise(r => setTimeout(r, 100));   
+        await port!.setSignals({requestToSend: false});    
+        await port!.close();
+        const connection = (this.device.connection! as ISerialConnection);
+        await connection.connect({ 
+            port,
+            baudRate: undefined,
+            concurrentLogOutput: true
+        });
+    }
+
+    private async setConfig() {
         try {
             this.setState("config");
-            await port!.setSignals({requestToSend: true});
-            await new Promise(r => setTimeout(r, 100));   
-            await port!.setSignals({requestToSend: false});    
-            await port!.close();
             const connection = (this.device.connection! as ISerialConnection);
-            await connection.connect({ 
-                port,
-                baudRate: undefined,
-                concurrentLogOutput: true
-            });
                     
             const newConfig = new Protobuf.Config({
                 payloadVariant: {
@@ -311,8 +333,7 @@ export class FlashOperation {
             // We won't get an answer if serial output has been disabled in the new config
             if(this.config.device!.serialEnabled)
                 await promise;
-
-            this.setState("done");
+            
         }
         catch(e) {
             this.setState("failed");            
