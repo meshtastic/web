@@ -53,14 +53,12 @@ import {
   SelectValue,
 } from './UI/Select';
 import { Switch } from './UI/Switch';
+import { ConfigList } from './PageComponents/Flasher/ConfigList';
 
 export const Dashboard = () => {
   let { configPresetRoot, configPresetSelected } : {configPresetRoot: ConfigPreset, configPresetSelected?: ConfigPreset} = useAppStore();
-  const { addDevice, getDevices } = useDeviceStore();
   const getTotalConfigCount = (c: ConfigPreset): number => c.children.map(child => getTotalConfigCount(child)).reduce((prev, cur) => prev + cur, c.count);  
-  const [ totalConfigCount, setTotalConfigCount ] = useState(configPresetRoot.getTotalConfigCount());
-  console.log(`${totalConfigCount} :: ${useAppStore().overallFlashingState}`);
-  const devices: Device[] = useMemo(() => getDevices(), [getDevices]);  
+  const [ totalConfigCount, setTotalConfigCount ] = useState(configPresetRoot.getTotalConfigCount());    
 
   return (
     <div className="flex flex-col h-full gap-3 p-3">
@@ -74,7 +72,7 @@ export const Dashboard = () => {
       <Separator />
 
       <div className="flex w-full h-full gap-3 overflow-auto">
-        <DeviceList devices={getDevices()} rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
+        <DeviceList rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
         <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
         <div className="flex h-full overflow-auto w-full relative"><DeviceConfig key={configPresetSelected?.name}/></div>
       </div>
@@ -82,18 +80,11 @@ export const Dashboard = () => {
   );
 };
 
-const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[], rootConfig: ConfigPreset, totalConfigCount: number}) => {  
-  const { setConnectDialogOpen, overallFlashingState, setOverallFlashingState, selectedFirmware, selectedDeviceModel, firmwareList, setFirmwareList } = useAppStore();
-  const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  // TODO: Remove this somehow
-    useState(new Array<{state: string, progress: number}>(100).fill({progress: 1, state: 'doFlash'}));//useState(devices.map(d => d.flashState));    
-  const [ fullFlash, setFullFlash ] = useState(false);
-  const { getDevices } = useDeviceStore();
-  const { toast, toasts } = useToast();
-  // const [flashingState, setFlashingState]: any = useState([]);
-  const cancelButtonVisible = overallFlashingState.state != "idle";
-  const firmware = firmwareList.find(f => f.id == selectedFirmware);
-  console.log(`Selected firmware: ${firmware?.name}`);
-  console.warn(`Device count check 2: ${devices.length}`);
+const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPreset, totalConfigCount: number}) => {  
+  const { setConnectDialogOpen } = useAppStore();
+  const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  useState(new Array<FlashState>(100).fill({progress: 1, state: 'doFlash'})); // TODO: Remove this somehow   
+  const { getDevices } = useDeviceStore();  
+  const  devices = getDevices();  
 
   return (
     <div className="flex min-w-[500px] rounded-md border border-dashed border-slate-200 p-3 mb-2 dark:border-slate-700">
@@ -126,80 +117,9 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
               </Button>
             </div>}
           </ul>
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-3 w-full">
-              <DeviceModelSelection/>
-              <div className='flex w-full items-center gap-3' title="Fully reinstalls every device, even if they could simply be updated.">
-                <Switch checked={fullFlash} onCheckedChange={setFullFlash}/>
-                <Label>Force full wipe and reinstall</Label>
-              </div>
-            </div>            
-            <div className="flex gap-3">
-              <FirmwareSelection/>
-              <div className="flex w-full">
-                {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
-                  className="gap-2 w-full"
-                  disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
-                  onClick={async () => {
-                    // rootConfig.children[0].getFinalConfig(); // FIXME
-                    if(overallFlashingState.state == "idle") {
-                      setOverallFlashingState({ state: "busy" });
-                      let actualFirmware = firmware;                      
-                      if(actualFirmware === undefined) {
-                        const list = await loadFirmwareList();
-                        setFirmwareList(list.slice(0, 10));
-                        if(list.length == 0)
-                          throw "Failed";
-                        actualFirmware = list.filter(l => !l.isPreRelease)[0];
-                      }
-                      await setup(rootConfig.getAll(), selectedDeviceModel, actualFirmware, fullFlash, (state: OverallFlashingState, progress?: number) => {
-                        if(state == 'busy') {
-                          isStoredInDb(actualFirmware!.tag).then(b => {
-                            // All FirmwareVersion objects are immutable here so we'll have to re-create each entry
-                            const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => { return {
-                              name: f.name,
-                              tag: f.tag,
-                              id: f.id,
-                              isPreRelease: f.isPreRelease,
-                              inLocalDb: f == actualFirmware ? b : f.inLocalDb 
-                            }});
-                            setFirmwareList(newFirmwareList);
-                          });
-                        }
-                          
-                        setOverallFlashingState({state, progress});
-                      });
-                    }
-                    nextBatch(devices,
-                      deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
-                      (f)=> {
-                        f.device.setFlashState(f.state);
-                        deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
-                        setDeviceSelectedToFlash(deviceSelectedToFlash);           
-
-                        if(f.state.state == "failed") {                              
-                          toast({ title: `❌ Error: ${f.errorReason}`});                          
-                        }
-                      }
-                    );
-                  }}
-                >            
-                  {stateToText(overallFlashingState.state, overallFlashingState.progress)}
-                </Button>}
-              </div>
-              {cancelButtonVisible && <Button
-                className="ml-1 p-2"
-                variant={"destructive"}
-                onClick={() => {
-                  if(!confirm("Cancel flashing?"))
-                    return;
-                  cancel();
-                }}
-              >
-                <XIcon/>
-              </Button>}
-            </div>
-          </div>
+          <FlashSettings
+            deviceSelectedToFlash={deviceSelectedToFlash} setDeviceSelectedToFlash={setDeviceSelectedToFlash} totalConfigCount={totalConfigCount} rootConfig={rootConfig} devices={devices}
+          />
         </div>
       ) : (
         <div className="m-auto flex flex-col gap-3 text-center">
@@ -219,167 +139,92 @@ const DeviceList = ({devices, rootConfig, totalConfigCount}: {devices: Device[],
   )
 };
 
-
-const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: ConfigPreset, setTotalConfigCountDiff: (val: number) => void}) => {
-  
-  const { configPresetRoot, setConfigPresetRoot, configPresetSelected, setConfigPresetSelected } = useAppStore();
-  const [ editSelected, setEditSelected ] = useState(false);
+const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, totalConfigCount, rootConfig, devices}:
+  {deviceSelectedToFlash: FlashState[], setDeviceSelectedToFlash: React.Dispatch<React.SetStateAction<FlashState[]>>, totalConfigCount: number, rootConfig: ConfigPreset, devices: Device[]}) => {
+  const [ fullFlash, setFullFlash ] = useState(false);
+  const { overallFlashingState, setOverallFlashingState, selectedFirmware, selectedDeviceModel, firmwareList, setFirmwareList } = useAppStore();
+  const firmware = firmwareList.find(f => f.id == selectedFirmware);
   const { toast } = useToast();
-  if(configPresetSelected === undefined) {
-    setConfigPresetSelected(configPresetRoot);
-    return (<div/>);    
-  }
+  const cancelButtonVisible = overallFlashingState.state != "idle";  
 
-  return (
-    <div className="flex flex-col min-w-[400px] rounded-md border border-dashed border-slate-200 p-3 mb-2 dark:border-slate-700">
-      <div className="flex justify-between">
-        <div className="flex gap-2">
-          <button        
-            className="transition-all hover:text-accent mb-4"
-            title="Add new configuration as child"
-            onClick={() => {         
-              const newPreset = new ConfigPreset("New Preset", configPresetSelected);
-              configPresetSelected?.children.push(newPreset);          
-              setConfigPresetRoot(Object.create(configPresetRoot));
-              setConfigPresetSelected(newPreset);
-              setEditSelected(true);
-              newPreset.saveConfigTree();
-            }}
-          >
-            <PlusIcon/>
-          </button>
-          <button        
-            className="transition-all hover:text-accent mb-4"
-            title="Rename"
-            onClick={() => {                     
-              setEditSelected(true);
-            }}
-          >
-            <Edit3Icon/>
-          </button>
-          <button        
-            className="transition-all hover:text-accent mb-4"
-            title="Delete"
-            onClick={() => {                     
-              if(configPresetSelected.parent === undefined) {
-                if(!confirm(`Are you sure you want to reset the preset list to default?`))
-                  return;
-                const newDefault = new ConfigPreset("Default");
-                setConfigPresetRoot(newDefault);
-                newDefault.saveConfigTree();
-                return;
-              } 
-              // TEMP: Replace with proper dialog.
-              if(!confirm(`Are you sure you want to remove "${configPresetSelected.name}" and all its children?`))
-                return;
-              configPresetSelected.parent.children = configPresetSelected.parent.children.filter(c => c != configPresetSelected);
-              setConfigPresetSelected(configPresetSelected.parent);
-              configPresetSelected.saveConfigTree();            
-            }}
-          >
-            <Trash2Icon/>
-          </button>
-        </div>
-        <div className="flex gap-2">
-          <button        
-            className="transition-all hover:text-accent mb-4"
-            title="Import"
-            onClick={() => {                     
-              ConfigPreset.importConfigTree().then(
-                (root) => {
-                  if(root) {
-                    setConfigPresetRoot(root);
-                    root.saveConfigTree();
-                    toast({
-                      title: `Presets successfully imported.`
-                    });
-                  }
-                },
-                () => {toast({
-                  title: `This is not a valid configuration file.`
-                });}
-              );
-            }}
-          >
-          <UploadIcon/> 
-          </button>
-          <button        
-            className="transition-all hover:text-accent mb-4"
-            title="Export"
-            onClick={() => {                     
-              rootConfig.exportConfigTree();
-            }}
-          >
-          <DownloadIcon/> 
-          </button>
-        </div>
-        
+  return (<div className="flex flex-col gap-3">
+    <div className="flex gap-3 w-full">
+      <DeviceModelSelection/>
+      <div className='flex w-full items-center gap-3' title="Fully reinstalls every device, even if they could simply be updated.">
+        <Switch checked={fullFlash} onCheckedChange={setFullFlash}/>
+        <Label>Force full wipe and reinstall</Label>
       </div>
-      
-      <div className='overflow-y-auto'>
-      {rootConfig &&
-        <ConfigEntry
-          config={rootConfig}
-          configPresetSelected={configPresetSelected}
-          setConfigPresetSelected={setConfigPresetSelected}
-          editSelected={editSelected}
-          onConfigCountChanged={(val, diff) => setTotalConfigCountDiff(diff)}
-          onEditDone={(val) => {
-            configPresetSelected.name = val;
-            setEditSelected(false);
-            configPresetSelected.saveConfigTree();
-          }
-          }
-        />
-      }</div>
-      {/* {rootConfig ? rootConfig.children.map((config, index) => {
-        return (<ConfigSelectButton
-          label={config.name}
-          active={index == configPresetSelected}
-          setValue={(value) => {config.count = value; setDummyState(dummyState + 1)}}
-          value={config.count}
-          onClick={() => setConfigPresetSelected(index)}
-          />)
-      }) : <div/>} */}
-    </div>
-  )
+    </div>            
+    <div className="flex gap-3">
+      <FirmwareSelection/>
+      <div className="flex w-full">
+        {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
+          className="gap-2 w-full"
+          disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
+          onClick={async () => {
+            // rootConfig.children[0].getFinalConfig(); // FIXME
+            if(overallFlashingState.state == "idle") {
+              setOverallFlashingState({ state: "busy" });
+              let actualFirmware = firmware;                      
+              if(actualFirmware === undefined) {
+                const list = await loadFirmwareList();
+                setFirmwareList(list.slice(0, 10));
+                if(list.length == 0)
+                  throw "Failed";
+                actualFirmware = list.filter(l => !l.isPreRelease)[0];
+              }
+              await setup(rootConfig.getAll(), selectedDeviceModel, actualFirmware, fullFlash, (state: OverallFlashingState, progress?: number) => {
+                if(state == 'busy') {
+                  isStoredInDb(actualFirmware!.tag).then(b => {
+                    // All FirmwareVersion objects are immutable here so we'll have to re-create each entry
+                    const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => { return {
+                      name: f.name,
+                      tag: f.tag,
+                      id: f.id,
+                      isPreRelease: f.isPreRelease,
+                      inLocalDb: f == actualFirmware ? b : f.inLocalDb 
+                    }});
+                    setFirmwareList(newFirmwareList);
+                  });
+                }
+                  
+                setOverallFlashingState({state, progress});
+              });
+            }
+            nextBatch(devices,
+              deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
+              (f)=> {
+                f.device.setFlashState(f.state);
+                deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
+                setDeviceSelectedToFlash(deviceSelectedToFlash);           
 
+                if(f.state.state == "failed") {                              
+                  toast({ title: `❌ Error: ${f.errorReason}`});                          
+                }
+              }
+            );
+          }}
+        >            
+          {stateToText(overallFlashingState.state, overallFlashingState.progress)}
+        </Button>}
+      </div>
+      {cancelButtonVisible && <Button
+        className="ml-1 p-2"
+        variant={"destructive"}
+        onClick={() => {
+          if(!confirm("Cancel flashing?"))
+            return;
+          cancel();
+        }}
+      >
+        <XIcon/>
+      </Button>}
+    </div>
+  </div>
+  )
 };
 
-const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected, editSelected, onEditDone, onConfigCountChanged}:
-  {config: ConfigPreset,
-    configPresetSelected: ConfigPreset,
-    setConfigPresetSelected: (selection: ConfigPreset) => void,
-    editSelected: boolean, onEditDone: (value: string) => void,
-    onConfigCountChanged: (val: number, diff: number) => void
-  }) => {
-  const [configCount, setConfigCount] = useState(config.count);
-  return (
-    <div>
-      <ConfigSelectButton
-      label={config.name}
-      active={config == configPresetSelected}
-      setValue={(value) => {const diff = value - config.count; config.count = value; setConfigCount(value); onConfigCountChanged(value, diff);}}
-      value={configCount}
-      editing={editSelected && config == configPresetSelected}
-      onClick={() => setConfigPresetSelected(config)}
-      onChangeDone={onEditDone}
-      />
-      <div className="ml-[20px]">
-        {config.children.map(c =>
-            (<ConfigEntry
-              config={c}
-              configPresetSelected={configPresetSelected}
-              setConfigPresetSelected={setConfigPresetSelected}
-              editSelected={editSelected}
-              onEditDone={onEditDone}
-              onConfigCountChanged={onConfigCountChanged}
-            />)
-        )}
-      </div>
-    </div>
-  );
-}
+
 
 const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progressText}
   :{device: Device, selectedToFlash: boolean, toggleSelectedToFlash: () => void, progressText: FlashState}) => {  
@@ -625,22 +470,6 @@ const DeviceModelSelection = () => {
           {selectItems}
         </SelectContent>
       </Select>
-      {/* <Button
-        variant="outline"
-        className="ml-1 p-2"
-        title="Update firmware version list"
-        disabled={firmwareRefreshing}
-        onClick={() => {
-          setFirmwareRefreshing(true);
-          loadFirmwareList().then((list) => { 
-            setFirmwareList(list.slice(0, 10));
-            setFirmwareRefreshing(false);            
-            // TODO: What if download fails?
-          });
-        }}
-      >
-        <RefreshCwIcon size={20}/>
-      </Button> */}
     </div>
     
   );
@@ -768,3 +597,4 @@ function deviceStateToStyle(state: FlashState): React.CSSProperties {
       };          
   }
 }
+
