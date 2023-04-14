@@ -1,10 +1,6 @@
 import JSZip from 'jszip';
 
 import {
-  deviceModels,
-  FirmwareVersion,
-} from '@app/components/Dashboard';
-import {
   ISerialConnection,
   Protobuf,
 } from '@meshtastic/meshtasticjs';
@@ -12,6 +8,8 @@ import { EspLoader } from '@toit/esptool.js';
 
 import type { ConfigPreset } from '../stores/appStore';
 import type { Device } from '../stores/deviceStore';
+import { FirmwareVersion, deviceModels } from '@app/components/PageComponents/Flasher/FlashSettings';
+import { storeInDb, loadFromDb } from './FirmwareDb';
 
 type DeviceFlashingState = "doNotFlash" | "doFlash" | "idle" | "connecting" | "erasing" | "flashing" | "config" | "done" | "aborted" | "failed";
 export type OverallFlashingState = "idle" | "downloading" | "busy" | "waiting";
@@ -70,59 +68,6 @@ function handleFlashingDone() {
         callback("idle");
     else
         callback("waiting");
-}
-
-function openDb() {
-    return new Promise<IDBDatabase>((resolve, reject) => {
-        const db = indexedDB.open("firmwares");
-        db.onsuccess = () => {
-            resolve(db.result);
-            
-        };    
-        db.onupgradeneeded = (ev) => {
-            const objStore = db.result.createObjectStore("files");            
-            objStore.transaction.oncomplete = () => resolve(db.result);
-        };
-    });
-}
-
-async function storeInDb(firmware: FirmwareVersion, file: ArrayBuffer) {
-    const db = await openDb();
-    return new Promise<void>((resolve, reject) => {
-        const fileStore = db.transaction("files", "readwrite").objectStore("files");
-        const addOp = fileStore.add(file, firmware.tag);
-        fileStore.transaction.oncomplete = () => {
-            console.log("Successfully stored firmware in DB.");
-            resolve();
-        }
-        fileStore.transaction.onerror = reject;
-    });    
-}
-
-async function loadFromDb(firmware: FirmwareVersion) {    
-    const db = await openDb();
-    return new Promise<ArrayBuffer>((resolve, reject) => {                
-        const objStore = db.transaction("files", "readonly").objectStore("files");
-        const transaction = objStore.get(firmware.tag);
-        transaction.onsuccess = () => {   
-            resolve(transaction.result as ArrayBuffer);
-        };
-        transaction.onerror = reject;                    
-    });
-}
-
-async function deleteFromDb(firmware: FirmwareVersion) {
-    const db = await openDb();
-    return new Promise<void>((resolve, reject) => {  
-        if(!db.objectStoreNames.contains("files")) {
-            resolve();
-            return;
-        }
-        const objStore = db.transaction("files", "readonly").objectStore("files");
-        const transaction = objStore.delete(firmware.tag);            
-        transaction.onsuccess = () => resolve;
-        transaction.onerror = reject;    
-    });
 }
 
 export async function uploadCustomFirmware() {

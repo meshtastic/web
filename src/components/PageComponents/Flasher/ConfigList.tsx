@@ -116,17 +116,17 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
             />
         }</div>
         </div>
-    )
+    );
 
-    };
+};
 
-    const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected, editSelected, onEditDone, onConfigCountChanged}:
-    {config: ConfigPreset,
-        configPresetSelected: ConfigPreset,
-        setConfigPresetSelected: (selection: ConfigPreset) => void,
-        editSelected: boolean, onEditDone: (value: string) => void,
-        onConfigCountChanged: (val: number, diff: number) => void
-    }) => {
+const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected, editSelected, onEditDone, onConfigCountChanged}:
+{config: ConfigPreset,
+    configPresetSelected: ConfigPreset,
+    setConfigPresetSelected: (selection: ConfigPreset) => void,
+    editSelected: boolean, onEditDone: (value: string) => void,
+    onConfigCountChanged: (val: number, diff: number) => void
+}) => {
     const [configCount, setConfigCount] = useState(config.count);
     return (
         <div>
@@ -153,4 +153,4 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
         </div>
         </div>
     );
-    }
+}

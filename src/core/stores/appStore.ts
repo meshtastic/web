@@ -1,10 +1,10 @@
 import { produce } from 'immer';
 import { create } from 'zustand';
 
-import type { FirmwareVersion } from '@app/components/Dashboard';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import type { OverallFlashingState } from '../flashing/Flasher';
+import type { FirmwareVersion } from '@app/components/PageComponents/Flasher/FlashSettings';
 
 export interface RasterSource {
   enabled: boolean;
