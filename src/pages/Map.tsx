@@ -115,9 +115,9 @@ export const MapPage = (): JSX.Element => {
           dragRotate={false}
           touchZoomRotate={false}
           initialViewState={{
-            zoom: 10,
-            latitude: -38,
-            longitude: 145
+            zoom: 4,
+            latitude: 0,
+            longitude: 0
           }}
         >
           {waypoints.map((wp) => (
