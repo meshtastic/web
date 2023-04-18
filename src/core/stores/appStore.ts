@@ -48,7 +48,7 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
-  darkMode: false,
+  darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
   accent: "orange",
   connectDialogOpen: false,
 
