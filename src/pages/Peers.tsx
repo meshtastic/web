@@ -30,11 +30,11 @@ export const PeersPage = (): JSX.Element => {
           rows={filteredNodes.map((node) => [
             <Hashicon size={24} value={node.num.toString()} />,
             <h1>
-              {node.user?.longName ?? node.user?.macaddr
+              {node.user?.longName ?? (node.user?.macaddr
                 ? `Meshtastic ${base16
                     .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
                     .toLowerCase()}`
-                : `UNK: ${node.num}`}
+                : `UNK: ${node.num}`)}
             </h1>,
 
             <Mono>{Protobuf.HardwareModel[node.user?.hwModel ?? 0]}</Mono>,
