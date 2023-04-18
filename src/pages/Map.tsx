@@ -28,10 +28,21 @@ export const MapPage = (): JSX.Element => {
   const allNodes = Array.from(nodes.values());
 
   const getBBox = () => {
+    if (!map) return;
     const nodesWithPosition = allNodes.filter(
       (node) => node.position?.latitudeI
     );
     if (!nodesWithPosition.length) return;
+    if (nodesWithPosition.length === 1) {
+      map.easeTo({
+        zoom: 12,
+        center: [
+          (nodesWithPosition[0].position?.longitudeI ?? 0) / 1e7,
+          (nodesWithPosition[0].position?.latitudeI ?? 0) / 1e7
+        ]
+      });
+      return;
+    }
     const line = lineString(
       nodesWithPosition.map((n) => [
         (n.position?.latitudeI ?? 0) / 1e7,
@@ -39,22 +50,14 @@ export const MapPage = (): JSX.Element => {
       ])
     );
     const bounds = bbox(line);
-    const center = map?.cameraForBounds(
+    const center = map.cameraForBounds(
       [
         [bounds[1], bounds[0]],
         [bounds[3], bounds[2]]
       ],
       { padding: { top: 10, bottom: 10, left: 10, right: 10 } }
     );
-    if (center) map?.easeTo(center);
-    else if (nodesWithPosition.length === 1)
-      map?.easeTo({
-        zoom: 12,
-        center: [
-          (nodesWithPosition[0].position?.longitudeI ?? 0) / 1e7,
-          (nodesWithPosition[0].position?.latitudeI ?? 0) / 1e7
-        ]
-      });
+    if (center) map.easeTo(center);
   };
 
   useEffect(() => {
