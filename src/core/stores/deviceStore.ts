@@ -610,14 +610,8 @@ interface ConfigProvider {
 export const useConfig = (): ConfigProvider => {
   const context = useContext(DeviceContext);
   if(context == undefined) {
-    const {configPresetRoot, configPresetSelected } = useAppStore();    
-    if(configPresetSelected) {
-      console.log(`Displaying selected preset: ${configPresetSelected.name} (${configPresetSelected.config.device?.buttonGpio})`);
-      console.log(`Identical? ${configPresetSelected.config == configPresetRoot.config}`);
-    }      
-    else
-      console.log(`No preset selected; Displaying root preset. (${configPresetRoot.config.device?.buttonGpio})`);
-    return (configPresetSelected ?? configPresetRoot);     // TEMP
+    const {configPresetRoot, configPresetSelected } = useAppStore();
+    return (configPresetSelected ?? configPresetRoot);
   }
   return context;
 };

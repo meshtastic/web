@@ -12,25 +12,39 @@ export const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPr
     const { setConnectDialogOpen } = useAppStore();
     const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  useState(new Array<FlashState>(100).fill({progress: 1, state: 'doFlash'})); // TODO: Remove this somehow   
     const { getDevices } = useDeviceStore();  
-    const  devices = getDevices();  
+    const devices = getDevices();
+
+    const allConfigs = rootConfig.getAll();
+    const configQueue: string[] = [];
+    for(const c in allConfigs) {
+      const config = allConfigs[c];
+      for (let i = 0; i < config.count; i++) {
+          configQueue.push(config.name);
+      }            
+    }    
+    const yo = new Map<Device, string | undefined>();
+    devices.filter(d => d.flashState.state == "doFlash").forEach(d => yo.set(d, configQueue.shift()));
+
   
     return (
       <div className="flex min-w-[500px] rounded-md border border-dashed border-slate-200 p-3 mb-2 dark:border-slate-700">
-        {getDevices().length ? (
+        {devices.length ? (
           <div className="flex flex-col justify-between w-full overflow-y-auto overflow-x-clip">
             <Subtle>Select all devices to flash:</Subtle>
             <ul role="list" className="grow divide-y divide-gray-200">
-              {getDevices().map((device, index) => {
+              {devices.map((device, index) => {
+                debugger;
+                const state = deviceSelectedToFlash[index];
                 return (<DeviceSetupEntry
                   device={device}
-                  selectedToFlash={deviceSelectedToFlash[index].state == 'doFlash'}
+                  configName={yo.get(device)}                  
                   toggleSelectedToFlash={() => {
-                    const newState: FlashState = deviceSelectedToFlash[index].state == 'doFlash' ? {progress: 0, state: 'doNotFlash'} : {progress: 1, state: 'doFlash'};
+                    const newState: FlashState = state.state == 'doFlash' ? {progress: 0, state: 'doNotFlash'} : {progress: 1, state: 'doFlash'};
                     deviceSelectedToFlash[index] = newState;
                     device.setFlashState(newState);
                     setDeviceSelectedToFlash(deviceSelectedToFlash);
                   }}
-                  progressText={deviceSelectedToFlash[index]}
+                  progressText={state}
                 />
                 );
               })}
@@ -67,68 +81,72 @@ export const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPr
     )
   };
   
-  const DeviceSetupEntry = ({device, selectedToFlash, toggleSelectedToFlash, progressText}
-    :{device: Device, selectedToFlash: boolean, toggleSelectedToFlash: () => void, progressText: FlashState}) => {    
-  
-    return (
-      <li key={device.id}>
-        <div className="py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex gap-4">
-              <p className="truncate text-sm font-medium text-accent">
-                {device.nodes.get(device.hardware.myNodeNum)?.user
-                  ?.longName ?? "<Not flashed yet>"}
-              </p>
-              <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
-                {device.connection?.connType === "ble" && (
-                  <>
-                    <BluetoothIcon size={16} />
-                    BLE
-                  </>
-                )}
-                {device.connection?.connType === "serial" && (
-                  <>
-                    <UsbIcon size={16} />
-                    Serial
-                  </>
-                )}
-                {device.connection?.connType === "http" && (
-                  <>
-                    <NetworkIcon size={16} />
-                    Network
-                  </>
-                )}
-              </div>
-            </div>          
-            <div className="flex gap-2 items-center text-sm text-gray-500" title="Number of peers">
-                <UsersIcon
-                  size={20}
-                  className="text-gray-400"
-                  aria-hidden="true"
-                />
-                {device.nodes.size === 0 ? 0 : device.nodes.size - 1}                        
-                <Button
-                  variant={selectedToFlash && !progressText ? "default" : "outline"}
-                  size="sm"
-                  style={deviceStateToStyle(progressText)}
-                  className="w-[10rem] gap-2 h-8"
-                  onClick={() => toggleSelectedToFlash()}
-                >
-                  {deviceStateToText(progressText)} {/* TODO: Replace with inner text */}
-                </Button>
-              </div>
-          </div>        
-        </div>
-      </li>
-    );
-  }
+const DeviceSetupEntry = ({device, configName, toggleSelectedToFlash, progressText}
+  :{device: Device, configName?: string, toggleSelectedToFlash: () => void, progressText: FlashState}) => {    
+    
+  const selectedToFlash = progressText.state == "doFlash";
+  const buttonCaption = selectedToFlash ? configName ?? "Unassigned" : deviceStateToText(progressText);
+  const buttonStyle = deviceStateToStyle(progressText, configName !== undefined);
+
+  return (
+    <li key={device.id}>
+      <div className="py-2">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-4">
+            <p className="truncate text-sm font-medium text-accent">
+              {device.nodes.get(device.hardware.myNodeNum)?.user
+                ?.longName ?? "<Not flashed yet>"}
+            </p>
+            <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
+              {device.connection?.connType === "ble" && (
+                <>
+                  <BluetoothIcon size={16} />
+                  BLE
+                </>
+              )}
+              {device.connection?.connType === "serial" && (
+                <>
+                  <UsbIcon size={16} />
+                  Serial
+                </>
+              )}
+              {device.connection?.connType === "http" && (
+                <>
+                  <NetworkIcon size={16} />
+                  Network
+                </>
+              )}
+            </div>
+          </div>          
+          <div className="flex gap-2 items-center text-sm text-gray-500" title="Number of peers">
+              <UsersIcon
+                size={20}
+                className="text-gray-400"
+                aria-hidden="true"
+              />
+              {device.nodes.size === 0 ? 0 : device.nodes.size - 1}                        
+              <Button
+                variant={selectedToFlash && !progressText ? "default" : "outline"}
+                size="sm"
+                style={buttonStyle}
+                className="w-[10rem] gap-2 h-8 text-ellipsis overflow-hidden whitespace-nowrap inline-block"
+                onClick={() => toggleSelectedToFlash()}
+              >
+                {buttonCaption}
+              </Button>
+            </div>
+        </div>        
+      </div>
+    </li>
+  );
+}
   
   
   
   function deviceStateToText(state: FlashState) {
     switch(state.state) {
       case "doNotFlash":
-        return "Unselected";
+        return "Skip";
       case "doFlash":
         return "Selected";
       case "connecting":
@@ -150,7 +168,7 @@ export const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPr
     }
   }
   
-  function deviceStateToStyle(state: FlashState): React.CSSProperties {  
+  function deviceStateToStyle(state: FlashState, configAssigned: boolean): React.CSSProperties {      
     switch(state.state) {
       case "failed":
         return {
@@ -167,7 +185,14 @@ export const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPr
           color: "gray",
           borderColor: "gray"
         };
-      case "doFlash":      
+      case "doFlash":  
+        if(!configAssigned) {
+          return {
+            color: "var(--textPrimary)",
+            borderColor: "gray",
+            background: `dimgray`
+          };  
+        }
       default:
         return {
           color: "var(--textPrimary)",
