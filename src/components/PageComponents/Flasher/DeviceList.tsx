@@ -9,7 +9,7 @@ import { useState } from "react";
 import { FlashSettings } from "./FlashSettings";
 
 export const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPreset, totalConfigCount: number}) => {  
-    const { setConnectDialogOpen } = useAppStore();
+    const { setConnectDialogOpen, overallFlashingState } = useAppStore();
     const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  useState(new Array<FlashState>(100).fill({progress: 1, state: 'doFlash'})); // TODO: Remove this somehow   
     const { getDevices } = useDeviceStore();  
     const devices = getDevices();
@@ -22,8 +22,8 @@ export const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPr
           configQueue.push(config.name);
       }            
     }    
-    const yo = new Map<Device, string | undefined>();
-    devices.filter(d => d.flashState.state == "doFlash").forEach(d => yo.set(d, configQueue.shift()));
+    const configMap = new Map<Device, string | undefined>();
+    devices.filter(d => d.flashState.state == "doFlash").forEach(d => configMap.set(d, configQueue.shift()));
 
   
     return (
@@ -32,13 +32,14 @@ export const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPr
           <div className="flex flex-col justify-between w-full overflow-y-auto overflow-x-clip">
             <Subtle>Select all devices to flash:</Subtle>
             <ul role="list" className="grow divide-y divide-gray-200">
-              {devices.map((device, index) => {
-                debugger;
+              {devices.map((device, index) => {                
                 const state = deviceSelectedToFlash[index];
                 return (<DeviceSetupEntry
                   device={device}
-                  configName={yo.get(device)}                  
-                  toggleSelectedToFlash={() => {
+                  configName={configMap.get(device)}                  
+                  toggleSelectedToFlash={() => {                  
+                    if(overallFlashingState.state == "busy")
+                      return;  
                     const newState: FlashState = state.state == 'doFlash' ? {progress: 0, state: 'doNotFlash'} : {progress: 1, state: 'doFlash'};
                     deviceSelectedToFlash[index] = newState;
                     device.setFlashState(newState);
@@ -149,8 +150,8 @@ const DeviceSetupEntry = ({device, configName, toggleSelectedToFlash, progressTe
         return "Skip";
       case "doFlash":
         return "Selected";
-      case "connecting":
-        return "Connecting...";
+      case "preparing":
+        return "Preparing...";
       case "erasing":
         return "Erasing...";
       case "flashing":

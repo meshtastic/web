@@ -22,7 +22,7 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
     <div className="flex gap-3 w-full">
       <DeviceModelSelection/>
       <div className='flex w-full items-center gap-3' title="Fully reinstalls every device, even if they could simply be updated.">
-        <Switch checked={fullFlash} onCheckedChange={setFullFlash}/>
+        <Switch disabled={overallFlashingState.state == "busy"} checked={fullFlash} onCheckedChange={setFullFlash}/>
         <Label>Force full wipe and reinstall</Label>
       </div>
     </div>            
@@ -32,9 +32,9 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
         {deviceSelectedToFlash.filter(d => d).length > 0 && <Button
           className="gap-2 w-full"
           disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
-          onClick={async () => {            
+          onClick={async () => {
             if(overallFlashingState.state == "idle") {
-              setOverallFlashingState({ state: "busy" });
+              setOverallFlashingState({ state: "busy" });              
               let actualFirmware = firmware;                      
               if(actualFirmware === undefined) {
                 const list = await loadFirmwareList();
@@ -95,7 +95,8 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
 };
 
 const FirmwareSelection = () => {  
-  const { firmwareRefreshing, setFirmwareRefreshing, firmwareList, setFirmwareList, selectedFirmware, setSelectedFirmware } = useAppStore();  
+  const { firmwareRefreshing, setFirmwareRefreshing, firmwareList, setFirmwareList, selectedFirmware, setSelectedFirmware, overallFlashingState } = useAppStore();
+  const isBusy = firmwareRefreshing || overallFlashingState.state == "busy";
 
   let selectItems = [
     <SelectItem key={-1} value={"latest"}>
@@ -139,7 +140,7 @@ const FirmwareSelection = () => {
   return (
     <div className="flex gap-1 w-full">
       <Select   
-        disabled={firmwareRefreshing}        
+        disabled={isBusy}        
         onValueChange={async (v) => {
           if(v == "custom") {            
             const desc = await uploadCustomFirmware();
@@ -168,7 +169,7 @@ const FirmwareSelection = () => {
         variant="outline"
         className="ml-1 p-2"
         title="Update firmware version list"
-        disabled={firmwareRefreshing}
+        disabled={isBusy}
         onClick={() => {
           setFirmwareRefreshing(true);
           loadFirmwareList().then((list) => { 
@@ -269,7 +270,7 @@ export const deviceModels: DeviceModel[] = [
 ]
 
 const DeviceModelSelection = () => {  
-  const { selectedDeviceModel, setSelectedDeviceModel } = useAppStore();
+  const { selectedDeviceModel, setSelectedDeviceModel, overallFlashingState } = useAppStore();
   
   let selectItems = [
     <SelectItem key={"auto"} value={"auto"}>
@@ -289,6 +290,7 @@ const DeviceModelSelection = () => {
       <Select        
         onValueChange={setSelectedDeviceModel}            
         value={selectedDeviceModel}
+        disabled={overallFlashingState.state == "busy"}
       >
         <SelectTrigger>
           <SelectValue />

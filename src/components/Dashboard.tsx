@@ -15,9 +15,9 @@ import { ConfigList } from './PageComponents/Flasher/ConfigList';
 import { DeviceList } from './PageComponents/Flasher/DeviceList';
 
 export const Dashboard = () => {
-  let { configPresetRoot, configPresetSelected } : {configPresetRoot: ConfigPreset, configPresetSelected?: ConfigPreset} = useAppStore();
+  let { configPresetRoot, configPresetSelected, overallFlashingState } = useAppStore();
   const getTotalConfigCount = (c: ConfigPreset): number => c.children.map(child => getTotalConfigCount(child)).reduce((prev, cur) => prev + cur, c.count);  
-  const [ totalConfigCount, setTotalConfigCount ] = useState(configPresetRoot.getTotalConfigCount());    
+  const [ totalConfigCount, setTotalConfigCount ] = useState(configPresetRoot.getTotalConfigCount()); 
 
   return (
     <div className="flex flex-col h-full gap-3 p-3">

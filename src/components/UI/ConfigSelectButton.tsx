@@ -10,6 +10,7 @@ export interface ConfigSelectButtonProps {
   editing: boolean;
   onClick?: () => void;
   onChangeDone?: (value: string) => void;
+  disabled: boolean;
 }
 
 export const ConfigSelectButton = ({
@@ -20,6 +21,7 @@ export const ConfigSelectButton = ({
   editing,
   onClick,
   onChangeDone,
+  disabled
 }: ConfigSelectButtonProps): JSX.Element => (
   <Button
     onClick={onClick}
@@ -38,23 +40,25 @@ export const ConfigSelectButton = ({
         className="h-8"/> : label}
     <div className="flex">
       <Button
-      onClick={(e) => {
-        e.stopPropagation();
-        setValue(Math.max(value - 1, 0));
-      }}
-      variant="outline"
-      className="h-[20px] p-2 m-2"
+        onClick={(e) => {
+          e.stopPropagation();
+          setValue(Math.max(value - 1, 0));
+        }}
+        variant="outline"
+        className="h-[20px] p-2 m-2"
+        disabled={disabled}
       >
         -
       </Button>
       <div className="my-2 w-4">{value}</div>
       <Button
-      onClick={(e) => {
-        e.stopPropagation();
-        setValue(value + 1);
-      }}
-      variant="outline"
-      className="h-[20px] p-2  m-2"
+        onClick={(e) => {
+          e.stopPropagation();
+          setValue(value + 1);
+        }}
+        variant="outline"
+        className="h-[20px] p-2  m-2"
+        disabled={disabled}
       >
         +
       </Button>

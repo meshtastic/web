@@ -11,7 +11,7 @@ import type { Device } from '../stores/deviceStore';
 import { FirmwareVersion, deviceModels } from '@app/components/PageComponents/Flasher/FlashSettings';
 import { storeInDb, loadFromDb } from './FirmwareDb';
 
-type DeviceFlashingState = "doNotFlash" | "doFlash" | "idle" | "connecting" | "erasing" | "flashing" | "config" | "done" | "aborted" | "failed";
+type DeviceFlashingState = "doNotFlash" | "doFlash" | "idle" | "preparing" | "erasing" | "flashing" | "config" | "done" | "aborted" | "failed";
 export type OverallFlashingState = "idle" | "downloading" | "busy" | "waiting";
 
 type OverallFlashingCallback = (flashState: OverallFlashingState, progress?: number) => void;
@@ -223,7 +223,7 @@ export class FlashOperation {
         
         try {                                    
             const loader = this.loader;
-            this.setState("connecting");
+            this.setState("preparing");
             await loader.connect();
             await loader.loadStub();
             if(sections.length > 1) {
