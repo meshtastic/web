@@ -66,6 +66,12 @@ export const MapPage = (): JSX.Element => {
     });
   }, [map, zoom]);
 
+  useEffect(() => {
+    if (map) {
+      getBBox();
+    }
+  }, [map]);
+
   return (
     <>
       <Sidebar>
