@@ -76,6 +76,17 @@ export const MQTT = (): JSX.Element => {
                   fieldName: "enabled"
                 }
               ]
+            },
+            {
+              type: "toggle",
+              name: "jsonEnabled",
+              label: "JSON Enabled",
+              description: "Whether to send/consume JSON packets on MQTT",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
             }
           ]
         }
