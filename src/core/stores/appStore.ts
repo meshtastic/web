@@ -40,8 +40,7 @@ export class ConfigPreset {
     localStorage.setItem("PresetConfigs", this.getConfigTreeJSON());
   }
 
-  public exportConfigTree() {
-    const json = this.getConfigTreeJSON();        
+  public exportConfigTree() {    
     const blob = new Blob([this.getConfigTreeJSON()], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const elem = document.createElement("a");
@@ -104,21 +103,26 @@ export class ConfigPreset {
   }
 
   public static tryFromJson(json: string): ConfigPreset | undefined {
+    debugger;
     try {
       const rootPreset = JSON.parse(json, (key: string, value:  any) => {            
         if(key == '' || !isNaN(Number(key))) {
           // Create new ConfigPreset object to ensure that the member functions are not undefined.
-          const preset = new ConfigPreset(value.name, undefined, value.config);
+          const preset = new ConfigPreset(value.name, undefined, value.config, value.moduleConfig);
           preset.overrideValues = value.overrideValues;
           preset.children = value.children;
           preset.children.forEach(c => {
             c.parent = preset;
-            c.overrideValues = {};
+            if(c.overrideValues === undefined)
+              c.overrideValues = {};
           });
           return preset;
         }
         else if(key == "config") {
           return Protobuf.LocalConfig.fromJson(value);
+        }
+        else if(key == "moduleConfig") {
+          return Protobuf.LocalModuleConfig.fromJson(value);
         }
         return value;
       });
@@ -126,7 +130,7 @@ export class ConfigPreset {
     }
     catch {
       return undefined;
-    }
+    }    
   }
 
   public static loadOrCreate(): ConfigPreset {
