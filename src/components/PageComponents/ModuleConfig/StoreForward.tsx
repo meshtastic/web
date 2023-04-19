@@ -1,26 +1,42 @@
 import type { StoreForwardValidation } from "@app/validation/moduleConfig/storeForward.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const StoreForward = (): JSX.Element => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
-
-  const onSubmit = (data: StoreForwardValidation) => {
-    setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
-        payloadVariant: {
-          case: "storeForward",
-          value: data
-        }
-      })
-    );
-  };
-
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
+    getEnabled(name) {
+      return config.overrideValues![name] ?? false;
+    },
+    setEnabled(name, value) {
+      config.overrideValues![name] = value;      
+    },
+  } : undefined;
+  const isPresetConfig = !("id" in config);
+  const setConfig: (data: StoreForwardValidation) => void =
+    isPresetConfig ? (data) => {
+      config.moduleConfig.storeForward = new Protobuf.ModuleConfig_StoreForwardConfig(data);    
+      (config as ConfigPreset).saveConfigTree();
+    }
+    : (data) => {
+      useDevice().setWorkingModuleConfig(
+        new Protobuf.ModuleConfig({
+          payloadVariant: {
+            case: "storeForward",
+            value: data
+          }
+        })
+      );
+    }
+  
+  const onSubmit = setConfig;
   return (
     <DynamicForm<StoreForwardValidation>
       onSubmit={onSubmit}
-      defaultValues={moduleConfig.mqtt}
+      defaultValues={config.moduleConfig.storeForward}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "Store & Forward Settings",

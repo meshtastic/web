@@ -5,6 +5,7 @@ import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import type { OverallFlashingState } from '../flashing/Flasher';
 import type { FirmwareVersion } from '@app/components/PageComponents/Flasher/FlashSettings';
+import type { LocalModuleConfig } from '@meshtastic/meshtasticjs/dist/protobufs';
 
 export interface RasterSource {
   enabled: boolean;
@@ -28,7 +29,7 @@ export class ConfigPreset {
   public count: number = 0;
   public overrideValues: {[fieldName: string]: boolean};
 
-  public constructor(public name: string, public parent?: ConfigPreset, public config = ConfigPreset.createDefaultConfig()) {
+  public constructor(public name: string, public parent?: ConfigPreset, public config = ConfigPreset.createDefaultConfig(), public moduleConfig = ConfigPreset.createDefaultModuleConfig()) {
     if(parent) {
       // Root config should not be overridable
       this.overrideValues = {};
@@ -174,6 +175,19 @@ export class ConfigPreset {
       display: new Protobuf.Config_DisplayConfig({ }),
       lora: new Protobuf.Config_LoRaConfig({ }),
       bluetooth: new Protobuf.Config_BluetoothConfig({ }),
+    });
+  }
+
+  private static createDefaultModuleConfig(): Protobuf.LocalModuleConfig {
+    return new Protobuf.LocalModuleConfig({
+      mqtt: new Protobuf.ModuleConfig_MQTTConfig({ }),
+      serial: new Protobuf.ModuleConfig_SerialConfig({ }),
+      externalNotification: new Protobuf.ModuleConfig_ExternalNotificationConfig({ }),
+      storeForward: new Protobuf.ModuleConfig_StoreForwardConfig({ }),
+      rangeTest: new Protobuf.ModuleConfig_RangeTestConfig({ }),
+      telemetry: new Protobuf.ModuleConfig_TelemetryConfig({ }),
+      cannedMessage: new Protobuf.ModuleConfig_CannedMessageConfig({ }),
+      audio: new Protobuf.ModuleConfig_AudioConfig({ })
     });
   }
 

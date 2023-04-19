@@ -1,26 +1,43 @@
 import type { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const ExternalNotification = (): JSX.Element => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
-
-  const onSubmit = (data: ExternalNotificationValidation) => {
-    setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
-        payloadVariant: {
-          case: "externalNotification",
-          value: data
-        }
-      })
-    );
-  };
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
+    getEnabled(name) {
+      return config.overrideValues![name] ?? false;
+    },
+    setEnabled(name, value) {
+      config.overrideValues![name] = value;      
+    },
+  } : undefined;
+  const isPresetConfig = !("id" in config);
+  const setConfig: (data: ExternalNotificationValidation) => void =
+    isPresetConfig ? (data) => {
+      config.moduleConfig.externalNotification = new Protobuf.ModuleConfig_ExternalNotificationConfig(data);    
+      (config as ConfigPreset).saveConfigTree();
+    }
+    : (data) => {
+      useDevice().setWorkingModuleConfig(
+        new Protobuf.ModuleConfig({
+          payloadVariant: {
+            case: "externalNotification",
+            value: data
+          }
+        })
+      );
+    }
+  
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<ExternalNotificationValidation>
       onSubmit={onSubmit}
-      defaultValues={moduleConfig.externalNotification}
+      defaultValues={config.moduleConfig.externalNotification}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "External Notification Settings",

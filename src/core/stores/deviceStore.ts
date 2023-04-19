@@ -604,6 +604,7 @@ export const useDevice = (): Device => {
 
 interface ConfigProvider {
   config: Protobuf.LocalConfig;
+  moduleConfig: Protobuf.LocalModuleConfig;
   overrideValues?: {[fieldName: string]: boolean};
 }
 

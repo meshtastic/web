@@ -13,6 +13,7 @@ import { Subtle } from '@components/UI/Typography/Subtle.js';
 
 import { ConfigList } from './PageComponents/Flasher/ConfigList';
 import { DeviceList } from './PageComponents/Flasher/DeviceList';
+import { ConfigTabs } from '@app/pages/Config/ConfigTabs';
 
 export const Dashboard = () => {
   let { configPresetRoot, configPresetSelected, overallFlashingState } = useAppStore();
@@ -33,7 +34,7 @@ export const Dashboard = () => {
       <div className="flex w-full h-full gap-3 overflow-auto">
         <DeviceList rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
         <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
-        <div className="flex h-full overflow-auto w-full relative"><DeviceConfig key={configPresetSelected?.name}/></div>
+        <div className="flex h-full overflow-auto w-full relative"><ConfigTabs key={configPresetSelected?.name}/></div>
       </div>
     </div>
   );

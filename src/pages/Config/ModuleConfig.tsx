@@ -7,7 +7,6 @@ import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.js"
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.js";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.js";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.js";
-import { useDevice } from "@app/core/stores/deviceStore.js";
 import {
   Tabs,
   TabsContent,
@@ -15,9 +14,7 @@ import {
   TabsTrigger
 } from "@components/UI/Tabs.js";
 
-export const ModuleConfig = (): JSX.Element => {
-  const { workingModuleConfig, connection } = useDevice();
-
+export const ModuleConfig = (): JSX.Element => {    
   const tabs = [
     {
       label: "MQTT",

@@ -1,26 +1,43 @@
 import type { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@app/core/stores/deviceStore.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import { useConfig, useDevice } from "@app/core/stores/deviceStore.js";
+import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const MQTT = (): JSX.Element => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
-
-  const onSubmit = (data: MQTTValidation) => {
-    setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
-        payloadVariant: {
-          case: "mqtt",
-          value: data
-        }
-      })
-    );
-  };
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
+    getEnabled(name) {
+      return config.overrideValues![name] ?? false;
+    },
+    setEnabled(name, value) {
+      config.overrideValues![name] = value;      
+    },
+  } : undefined;
+  const isPresetConfig = !("id" in config);
+  const setConfig: (data: MQTTValidation) => void =
+    isPresetConfig ? (data) => {
+      config.moduleConfig.mqtt = new Protobuf.ModuleConfig_MQTTConfig(data);    
+      (config as ConfigPreset).saveConfigTree();
+    }
+    : (data) => {
+      useDevice().setWorkingModuleConfig(
+        new Protobuf.ModuleConfig({
+          payloadVariant: {
+            case: "mqtt",
+            value: data
+          }
+        })
+      );
+    }
+  
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<MQTTValidation>
       onSubmit={onSubmit}
-      defaultValues={moduleConfig.mqtt}
+      defaultValues={config.moduleConfig.mqtt}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "MQTT Settings",
