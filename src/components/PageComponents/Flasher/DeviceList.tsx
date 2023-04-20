@@ -26,7 +26,7 @@ export const DeviceList = ({rootConfig, deviceSelectedToFlash, setDeviceSelected
 
   
     return (
-      <div className="flex min-w-[350px] rounded-md border border-dashed border-slate-200 p-3 mb-2 dark:border-slate-700">
+      <div className="flex min-w-[250px]  max-w-[400px] w-full rounded-md border border-dashed border-slate-200 p-3 dark:border-slate-700">
         {devices.length ? (
           <div className="flex flex-col justify-between w-full overflow-y-auto overflow-x-clip">
             <Subtle>Select all devices to flash:</Subtle>
@@ -89,14 +89,14 @@ const DeviceSetupEntry = ({device, configName, toggleSelectedToFlash, progressTe
     <li key={device.id}>
       <div className="py-2">
         <div className="flex items-center justify-between">
-          <div className="flex gap-4">
+          <div className="flex gap-4 text-ellipsis overflow-hidden whitespace-nowrap">
             <p className="truncate text-sm font-medium text-accent">
               {device.nodes.get(device.hardware.myNodeNum)?.user
                 ?.longName ?? "<Not flashed yet>"}
             </p>
             
           </div>          
-          <div className="flex gap-2 items-center text-sm text-gray-500" title="Number of peers">
+          <div className="flex gap-2 items-center text-sm text-gray-500">
                              
               <Button
                 variant={selectedToFlash && !progressText ? "default" : "outline"}

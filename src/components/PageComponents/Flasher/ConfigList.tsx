@@ -15,7 +15,7 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
     const disabled = overallFlashingState.state == "busy";
 
     return (
-        <div className="flex flex-col min-w-[350px] rounded-md border border-dashed border-slate-200 py-3 px-2 mb-2 dark:border-slate-700">
+        <div className="flex flex-col min-w-[250px] w-full rounded-md border border-dashed border-slate-200 py-3 px-2 dark:border-slate-700">
         <div className="flex justify-between">
             <div className="flex gap-2">
             <button        

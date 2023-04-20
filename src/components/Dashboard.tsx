@@ -35,20 +35,17 @@ export const Dashboard = () => {
       <Separator />
 
       <div className="flex w-full h-full gap-1 overflow-auto">
-        <div className="flex flex-col h-full">
-          <div className="flex w-full h-full gap-1">
+        <div className='flex flex-col w-full h-full max-w-[800px] gap-1'>
+          <div className='flex w-full h-full gap-1 overflow-auto'>
             <DeviceList rootConfig={configPresetRoot} deviceSelectedToFlash={deviceSelectedToFlash}  setDeviceSelectedToFlash={setDeviceSelectedToFlash}/>
             <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
-          </div>          
+          </div>
           <FlashSettings deviceSelectedToFlash={deviceSelectedToFlash} setDeviceSelectedToFlash={setDeviceSelectedToFlash} totalConfigCount={totalConfigCount}/>
         </div>
-        
-        <div className="flex h-full overflow-auto w-full relative"><ConfigTabs key={configPresetSelected?.name}/></div>
+        <div className='flex w-full  min-w-[500px] overflow-auto relative'>
+          <ConfigTabs key={configPresetSelected?.name}/>
+        </div>
       </div>
     </div>
   );
 };
-
-
-
-
