@@ -23,6 +23,7 @@ export const ConfigSelectButton = ({
   onChangeDone,
   disabled
 }: ConfigSelectButtonProps): JSX.Element => (
+  <div className="mx-1">
   <Button
     onClick={onClick}
     variant={active ? "subtle" : "ghost"}
@@ -38,14 +39,14 @@ export const ConfigSelectButton = ({
         onKeyUp={(event) => event.key == "Enter" && event.currentTarget.blur()}
         defaultValue={label}
         className="h-8"/> : label}
-    <div className="flex">
+    <div className="flex gap-1">
       <Button
         onClick={(e) => {
           e.stopPropagation();
           setValue(Math.max(value - 1, 0));
         }}
         variant="outline"
-        className="h-[20px] p-2 m-2"
+        className="h-[20px] p-2 my-2"
         disabled={disabled}
       >
         -
@@ -57,11 +58,12 @@ export const ConfigSelectButton = ({
           setValue(value + 1);
         }}
         variant="outline"
-        className="h-[20px] p-2  m-2"
+        className="h-[20px] p-2  my-2"
         disabled={disabled}
       >
         +
       </Button>
     </div>
   </Button>
+  </div>
 );

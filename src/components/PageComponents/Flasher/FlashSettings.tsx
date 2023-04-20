@@ -2,7 +2,7 @@ import { Button } from "@app/components/UI/Button";
 import { type FlashState, setup, type OverallFlashingState, nextBatch, cancel, uploadCustomFirmware } from "@app/core/flashing/Flasher";
 import { useToast } from "@app/core/hooks/useToast";
 import { type ConfigPreset, useAppStore } from "@app/core/stores/appStore";
-import type { Device } from "@app/core/stores/deviceStore";
+import { Device, useDeviceStore } from "@app/core/stores/deviceStore";
 import { Label } from "../../UI/Label";
 import { Switch } from "../../UI/Switch";
 import { ArrowDownCircleIcon, RefreshCwIcon, XIcon } from "lucide-react";
@@ -10,18 +10,20 @@ import { useState } from "react";
 import { SelectItem, SelectSeparator, Select, SelectTrigger, SelectValue, SelectContent } from "../../UI/Select";
 import { isStoredInDb } from "@app/core/flashing/FirmwareDb";
 
-export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, totalConfigCount, rootConfig, devices}:
-    {deviceSelectedToFlash: FlashState[], setDeviceSelectedToFlash: React.Dispatch<React.SetStateAction<FlashState[]>>, totalConfigCount: number, rootConfig: ConfigPreset, devices: Device[]}) => {
+export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, totalConfigCount}:
+    {deviceSelectedToFlash: FlashState[], setDeviceSelectedToFlash: React.Dispatch<React.SetStateAction<FlashState[]>>, totalConfigCount: number}) => {
   const [ fullFlash, setFullFlash ] = useState(false);
-  const { overallFlashingState, setOverallFlashingState, selectedFirmware, selectedDeviceModel, firmwareList, setFirmwareList } = useAppStore();
+  const { overallFlashingState, setOverallFlashingState, selectedFirmware, selectedDeviceModel, firmwareList, setFirmwareList, configPresetRoot } = useAppStore();
   const firmware = firmwareList.find(f => f.id == selectedFirmware);
   const { toast } = useToast();
+  const { getDevices } =  useDeviceStore();
+  const devices = getDevices();
   const cancelButtonVisible = overallFlashingState.state != "idle";  
 
-  return (<div className="flex flex-col gap-3">
+  return (<div className="flex flex-col gap-1 rounded-md border border-dashed w-full border-slate-200 p-1 dark:border-slate-700">
     <div className="flex gap-3 w-full">
       <DeviceModelSelection/>
-      <div className='flex w-full items-center gap-3' title="Fully reinstalls every device, even if they could simply be updated.">
+      <div className='flex w-full items-center gap-1' title="Fully reinstalls every device, even if they could simply be updated.">
         <Switch disabled={overallFlashingState.state == "busy"} checked={fullFlash} onCheckedChange={setFullFlash}/>
         <Label>Force full wipe and reinstall</Label>
       </div>
@@ -43,7 +45,7 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
                   throw "Failed";
                 actualFirmware = list.filter(l => !l.isPreRelease)[0];
               }
-              await setup(rootConfig.getAll(), selectedDeviceModel, actualFirmware, fullFlash, (state: OverallFlashingState, progress?: number) => {
+              await setup(configPresetRoot.getAll(), selectedDeviceModel, actualFirmware, fullFlash, (state: OverallFlashingState, progress?: number) => {
                 if(state == 'busy') {
                   isStoredInDb(actualFirmware!.tag).then(b => {
                     // All FirmwareVersion objects are immutable here so we'll have to re-create each entry

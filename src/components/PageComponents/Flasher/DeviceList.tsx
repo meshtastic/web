@@ -8,12 +8,11 @@ import { PlusIcon, ListPlusIcon, BluetoothIcon, UsbIcon, NetworkIcon, UsersIcon 
 import { useState } from "react";
 import { FlashSettings } from "./FlashSettings";
 
-export const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPreset, totalConfigCount: number}) => {  
+export const DeviceList = ({rootConfig, deviceSelectedToFlash, setDeviceSelectedToFlash}:
+      {rootConfig: ConfigPreset, deviceSelectedToFlash: FlashState[], setDeviceSelectedToFlash: React.Dispatch<React.SetStateAction<FlashState[]>>}) => {  
     const { setConnectDialogOpen, overallFlashingState } = useAppStore();
-    const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  useState(new Array<FlashState>(100).fill({progress: 1, state: 'doFlash'})); // TODO: Remove this somehow   
     const { getDevices } = useDeviceStore();  
-    const devices = getDevices();
-
+    const devices = getDevices();    
     const allConfigs = rootConfig.getAll();
     const configQueue: string[] = [];
     for(const c in allConfigs) {
@@ -27,7 +26,7 @@ export const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPr
 
   
     return (
-      <div className="flex min-w-[500px] rounded-md border border-dashed border-slate-200 p-3 mb-2 dark:border-slate-700">
+      <div className="flex min-w-[350px] rounded-md border border-dashed border-slate-200 p-3 mb-2 dark:border-slate-700">
         {devices.length ? (
           <div className="flex flex-col justify-between w-full overflow-y-auto overflow-x-clip">
             <Subtle>Select all devices to flash:</Subtle>
@@ -60,9 +59,6 @@ export const DeviceList = ({rootConfig, totalConfigCount}: {rootConfig: ConfigPr
                 </Button>
               </div>}
             </ul>
-            <FlashSettings
-              deviceSelectedToFlash={deviceSelectedToFlash} setDeviceSelectedToFlash={setDeviceSelectedToFlash} totalConfigCount={totalConfigCount} rootConfig={rootConfig} devices={devices}
-            />
           </div>
         ) : (
           <div className="m-auto flex flex-col gap-3 text-center">
@@ -98,39 +94,15 @@ const DeviceSetupEntry = ({device, configName, toggleSelectedToFlash, progressTe
               {device.nodes.get(device.hardware.myNodeNum)?.user
                 ?.longName ?? "<Not flashed yet>"}
             </p>
-            <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
-              {device.connection?.connType === "ble" && (
-                <>
-                  <BluetoothIcon size={16} />
-                  BLE
-                </>
-              )}
-              {device.connection?.connType === "serial" && (
-                <>
-                  <UsbIcon size={16} />
-                  Serial
-                </>
-              )}
-              {device.connection?.connType === "http" && (
-                <>
-                  <NetworkIcon size={16} />
-                  Network
-                </>
-              )}
-            </div>
+            
           </div>          
           <div className="flex gap-2 items-center text-sm text-gray-500" title="Number of peers">
-              <UsersIcon
-                size={20}
-                className="text-gray-400"
-                aria-hidden="true"
-              />
-              {device.nodes.size === 0 ? 0 : device.nodes.size - 1}                        
+                             
               <Button
                 variant={selectedToFlash && !progressText ? "default" : "outline"}
                 size="sm"
                 style={buttonStyle}
-                className="w-[10rem] gap-2 h-8 text-ellipsis overflow-hidden whitespace-nowrap inline-block"
+                className="w-[9rem] gap-2 h-8 text-sm text-ellipsis overflow-hidden whitespace-nowrap inline-block"
                 onClick={() => toggleSelectedToFlash()}
               >
                 {buttonCaption}
@@ -155,7 +127,7 @@ const DeviceSetupEntry = ({device, configName, toggleSelectedToFlash, progressTe
       case "erasing":
         return "Erasing...";
       case "flashing":
-        return `Flashing... (${(state.progress * 100).toFixed(1)} %)`;
+        return `Flashing... (${(state.progress * 100).toFixed(1)}%)`;
       case "config":
         return "Configuring...";
       case "done":

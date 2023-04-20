@@ -14,11 +14,14 @@ import { Subtle } from '@components/UI/Typography/Subtle.js';
 import { ConfigList } from './PageComponents/Flasher/ConfigList';
 import { DeviceList } from './PageComponents/Flasher/DeviceList';
 import { ConfigTabs } from '@app/pages/Config/ConfigTabs';
+import { FlashSettings } from './PageComponents/Flasher/FlashSettings';
+import type { FlashState } from '@app/core/flashing/Flasher';
 
 export const Dashboard = () => {
   let { configPresetRoot, configPresetSelected, overallFlashingState } = useAppStore();
   const getTotalConfigCount = (c: ConfigPreset): number => c.children.map(child => getTotalConfigCount(child)).reduce((prev, cur) => prev + cur, c.count);  
   const [ totalConfigCount, setTotalConfigCount ] = useState(configPresetRoot.getTotalConfigCount()); 
+  const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  useState(new Array<FlashState>(100).fill({progress: 1, state: 'doFlash'})); // TODO: Remove this somehow   
 
   return (
     <div className="flex flex-col h-full gap-3 p-3">
@@ -31,9 +34,15 @@ export const Dashboard = () => {
 
       <Separator />
 
-      <div className="flex w-full h-full gap-3 overflow-auto">
-        <DeviceList rootConfig={configPresetRoot} totalConfigCount={totalConfigCount}/>
-        <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
+      <div className="flex w-full h-full gap-1 overflow-auto">
+        <div className="flex flex-col h-full">
+          <div className="flex w-full h-full gap-1">
+            <DeviceList rootConfig={configPresetRoot} deviceSelectedToFlash={deviceSelectedToFlash}  setDeviceSelectedToFlash={setDeviceSelectedToFlash}/>
+            <ConfigList rootConfig={configPresetRoot} setTotalConfigCountDiff={(diff) => setTotalConfigCount(totalConfigCount + diff)}/>
+          </div>          
+          <FlashSettings deviceSelectedToFlash={deviceSelectedToFlash} setDeviceSelectedToFlash={setDeviceSelectedToFlash} totalConfigCount={totalConfigCount}/>
+        </div>
+        
         <div className="flex h-full overflow-auto w-full relative"><ConfigTabs key={configPresetSelected?.name}/></div>
       </div>
     </div>
