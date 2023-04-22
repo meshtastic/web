@@ -4,7 +4,7 @@ specifiers:
   '@emeraldpay/hashicon-react': ^0.5.2
   '@hookform/error-message': ^2.0.1
   '@hookform/resolvers': ^2.9.11
-  '@meshtastic/meshtasticjs': link:../../js_2023
+  '@meshtastic/meshtasticjs': git://github.com/trelbutate/js.git#master
   '@preact/signals-react': ^1.2.2
   '@radix-ui/react-accordion': ^1.1.0
   '@radix-ui/react-checkbox': ^1.0.2
@@ -48,6 +48,7 @@ specifiers:
   eslint-plugin-import: ^2.27.5
   eslint-plugin-react: ^7.32.2
   eslint-plugin-react-hooks: ^4.6.0
+  esptool-js: ^0.2.1
   geodesy: ^2.4.0
   gzipper: ^7.2.0
   immer: ^9.0.19
@@ -81,7 +82,7 @@ dependencies:
   '@emeraldpay/hashicon-react': 0.5.2
   '@hookform/error-message': 2.0.1_bamyqy2r5urjalaw4du2uschzm
   '@hookform/resolvers': 2.9.11_react-hook-form@7.43.2
-  '@meshtastic/meshtasticjs': 2.0.20-5
+  '@meshtastic/meshtasticjs': github.com/trelbutate/js/cf110ec5bdb44f6b7fab66eeff6b5ae62dbac563
   '@preact/signals-react': 1.2.2_react@18.2.0
   '@radix-ui/react-accordion': 1.1.0_biqbaboplfbrettd7655fr4n2y
   '@radix-ui/react-checkbox': 1.0.2_biqbaboplfbrettd7655fr4n2y
@@ -106,6 +107,7 @@ dependencies:
   class-variance-authority: 0.4.0_typescript@4.9.5
   clsx: 1.2.1
   cmdk: 0.1.22_zula6vjvt3wdocc4mwcxqa6nzi
+  esptool-js: 0.2.1
   geodesy: 2.4.0
   immer: 9.0.19
   jszip: 3.10.1
@@ -1342,6 +1344,18 @@ packages:
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
     dev: true
+
+  /@buf/meshtastic_protobufs.bufbuild_es/1.2.0-20230328173351-271d1533a896.1_@bufbuild+protobuf@1.2.0:
+    resolution: {registry: https://buf.build/gen/npm/v1, tarball: https://buf.build/gen/npm/v1/@buf/meshtastic_protobufs.bufbuild_es/-/meshtastic_protobufs.bufbuild_es-1.2.0-20230328173351-271d1533a896.1.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.2.0
+    dependencies:
+      '@bufbuild/protobuf': 1.2.0
+    dev: false
+
+  /@bufbuild/protobuf/1.2.0:
+    resolution: {integrity: sha512-MBVuQMOBHxgGnZ9XCUIi8WOy5O/T4ma3TduCRhRvndv3UDbG9cHgd8h6nOYSGyBYPEvXf1z9nTwhp8mVIDbq2g==}
+    dev: false
 
   /@emeraldpay/hashicon-react/0.5.2:
     resolution: {integrity: sha512-XCoYKpq8QQOniiSZf5ouzdvXbKfG6q4ICHRqCO/GNofiF0Ra+LR/7+tomHlXVcLPBS9sDAoZQQw/Sr24KRAbJg==}
@@ -4385,6 +4399,16 @@ packages:
   /core-util-is/1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
 
+  /crc/4.3.2:
+    resolution: {integrity: sha512-uGDHf4KLLh2zsHa8D8hIQ1H/HtFQhyHrc0uhHBcoKGol/Xnb+MPYfUMw7cvON6ze/GUESTudKayDcJC5HnJv1A==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      buffer: '>=6.0.3'
+    peerDependenciesMeta:
+      buffer:
+        optional: true
+    dev: false
+
   /cross-spawn/7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
@@ -4949,6 +4973,13 @@ packages:
       acorn-jsx: 5.3.2_acorn@8.8.2
       eslint-visitor-keys: 3.3.0
     dev: true
+
+  /esptool-js/0.2.1:
+    resolution: {integrity: sha512-M2UteDiWrllJOBWLHwNRGaEAkDEHAG6FH6LdsTxJPUFLxbH/xwFMQEudiVH+REZc0FGfvY0YntVMes+HkZBeKw==}
+    dependencies:
+      pako: 2.1.0
+      tslib: 2.5.0
+    dev: false
 
   /esquery/1.4.2:
     resolution: {integrity: sha512-JVSoLdTlTDkmjFmab7H/9SL9qGSyjElT3myyKp7krqjVFQCDLmj1QFaCLRFBszBKI0XVZaiiXvuPIX3ZwHe1Ng==}
@@ -6051,6 +6082,10 @@ packages:
     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
     dev: false
 
+  /pako/2.1.0:
+    resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
+    dev: false
+
   /parent-module/1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -6879,6 +6914,11 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /sub-events/1.9.0:
+    resolution: {integrity: sha512-dnFBayilG9Ku0k/lNs1Y7WV4kv91+ovCoeBV3uIYrY49DylvBb6z9d9ED2ctcrvX2YlReFalpCgJNtSgmrOaJg==}
+    engines: {node: '>=10.0.0'}
+    dev: false
+
   /supercluster/7.1.5:
     resolution: {integrity: sha512-EulshI3pGUM66o6ZdH3ReiFcvHpM3vAigyK+vcxdjpJyEbIIrtbmBdY23mGgnI24uXiGFvrGq9Gkum/8U7vJWg==}
     dependencies:
@@ -7094,6 +7134,11 @@ packages:
 
   /tslib/2.5.0:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
+
+  /tslog/4.8.2:
+    resolution: {integrity: sha512-eAKIRjxfSKYLs06r1wT7oou6Uv9VN6NW9g0JPidBlqQwPBBl5+84dm7r8zSOPVq1kyfEw1P6B3/FLSpZCorAgA==}
+    engines: {node: '>=16'}
+    dev: false
 
   /tsutils/3.21.0_typescript@4.9.5:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
@@ -7624,4 +7669,20 @@ packages:
       immer: 9.0.19
       react: 18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0
+    dev: false
+
+  github.com/trelbutate/js/cf110ec5bdb44f6b7fab66eeff6b5ae62dbac563:
+    resolution: {tarball: https://codeload.github.com/trelbutate/js/tar.gz/cf110ec5bdb44f6b7fab66eeff6b5ae62dbac563}
+    name: '@meshtastic/meshtasticjs'
+    version: 2.1.6-0
+    requiresBuild: true
+    dependencies:
+      '@buf/meshtastic_protobufs.bufbuild_es': 1.2.0-20230328173351-271d1533a896.1_@bufbuild+protobuf@1.2.0
+      '@bufbuild/protobuf': 1.2.0
+      crc: 4.3.2
+      sub-events: 1.9.0
+      tslib: 2.5.0
+      tslog: 4.8.2
+    transitivePeerDependencies:
+      - buffer
     dev: false
