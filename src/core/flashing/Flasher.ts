@@ -10,6 +10,7 @@ import type { ConfigPreset } from '../stores/appStore';
 import type { Device } from '../stores/deviceStore';
 import { FirmwareVersion, deviceModels } from '@app/components/PageComponents/Flasher/FlashSettings';
 import { storeInDb, loadFromDb } from './FirmwareDb';
+import * as esptooljs from "esptool-js";
 
 type DeviceFlashingState = "doNotFlash" | "doFlash" | "idle" | "preparing" | "erasing" | "flashing" | "config" | "done" | "aborted" | "failed";
 export type OverallFlashingState = "idle" | "downloading" | "busy" | "waiting";
@@ -175,7 +176,7 @@ export class FlashOperation {
         
     public state: FlashState = { progress: 0, state: "idle" };
     public errorReason?: string;
-    private loader?: EspLoader; 
+    private loader?: esptooljs.ESPLoader; 
 
     public constructor(public device: Device, public config: Protobuf.LocalConfig, public callback: (operation: FlashOperation) => void) {
         
@@ -192,7 +193,7 @@ export class FlashOperation {
     public async flashAndConfigDevice() {
         try {
             await this.flash();
-            await this.setConfig();
+            // await this.setConfig();
             this.setState("done");
         }   
         catch(e) {
@@ -206,8 +207,8 @@ export class FlashOperation {
         const installedVersion = this.device.hardware.firmwareVersion;
         console.log(`Installed firmware verson: ${installedVersion}`);
         const update = !fullFlash && this.device.nodes.get(this.device.hardware.myNodeNum) !== undefined ;    
-        if(update && installedVersion == firmwareToUse.tag)
-            return;
+        // if(update && installedVersion == firmwareToUse.tag)
+        //     return;
 
         const port = await (this.device.connection! as ISerialConnection).disconnect();
         if(port === undefined)
@@ -218,37 +219,57 @@ export class FlashOperation {
         const info = port.getInfo();
         console.log(`Device info: vendor ${info.usbVendorId}, product ${info.usbProductId}`);
         const sections = await getFirmwareSections(deviceModel, update);
-        await port!.open({baudRate: 115200});
-        this.loader = new EspLoader(port!);
+        // await port!.open({baudRate: 115200});
+
+        debugger;
+
+        // -----------
         
-        try {                                    
+        try {         
+            const transport = new esptooljs.Transport(port);
+            this.loader = new esptooljs.ESPLoader(transport, 115200);                           
             const loader = this.loader;
             this.setState("preparing");
-            await loader.connect();
-            await loader.loadStub();
+            await loader.main_fn();            // TODO: This returns some interesting stuff, check it out            
             if(sections.length > 1) {
                 this.setState("erasing");                
-                await loader.eraseFlash();            
-            }       
-            const thisOp = this;
+                await loader.erase_flash();
+            }                   
             const totalLength = sections.reduce<number>((p, c) => p + c.data.byteLength, 0);
             let bytesFlashed = 0;
-            for (let i = 0; i < sections.length; i++) {                              
-                await loader.flashData(sections[i].data, sections[i].offset, function (idx, cnt) {
-                    const segSize = sections[i].data.length / cnt;                    
-                    thisOp.setState("flashing", (bytesFlashed + idx * segSize) / totalLength);
-                    console.log(`Flashing progress: ${bytesFlashed} + ${(idx * segSize).toFixed(2)}/${sections[i].data.length} = ${(bytesFlashed + idx * segSize).toFixed(2)} / ${totalLength}`);
+            let lastIndex = 0;
+
+            const files = await Promise.all(sections.map(async s => {
+                //  TODO:  Move this to loading, also check if  this can be handled by loader.ui8ToBstr()
+                const fileReader = new FileReader();
+                const blob = new Blob([s.data]);
+                const content = await new Promise<string>((resolve, reject) => {
+                    fileReader.onloadend = e => resolve(fileReader.result as string);
+                    fileReader.onerror = e => reject(fileReader.result as string);
+                    fileReader.readAsBinaryString(blob); 
                 });
-                bytesFlashed += sections[i].data.byteLength;
-            }    
+                return { data: content, address: s.offset };
+            }));
+
+            await loader.write_flash(files, "keep", undefined,  undefined, false, true, (index, written, total) => {
+                if(index != lastIndex) {
+                    bytesFlashed += sections[lastIndex].data.byteLength;
+                    lastIndex = index;
+                }
+                // I don't know what kind of weird size esploader computes but it doesn't match ours
+                const bytesThisSegment = (written / total) * sections[index].data.byteLength;
+                console.log(`FLASHING PROGRESS ${bytesFlashed + written} / ${totalLength} ... ${bytesFlashed} | ${written} | ${total} | ${index}`);
+                this.setState("flashing", (bytesFlashed + bytesThisSegment) /  totalLength);
+            });                            
         }
         catch (e) {                                    
             throw e;            
         }
         finally {        
-            await this.loader!.disconnect();
+            
         }
 
+        debugger;
         this.setState("config");
         await port!.setSignals({requestToSend: true});
         await new Promise(r => setTimeout(r, 100));   
