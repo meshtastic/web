@@ -193,7 +193,7 @@ export class FlashOperation {
     public async flashAndConfigDevice() {
         try {
             await this.flash();
-            // await this.setConfig();
+            await this.setConfig();
             this.setState("done");
         }   
         catch(e) {
@@ -207,8 +207,8 @@ export class FlashOperation {
         const installedVersion = this.device.hardware.firmwareVersion;
         console.log(`Installed firmware verson: ${installedVersion}`);
         const update = !fullFlash && this.device.nodes.get(this.device.hardware.myNodeNum) !== undefined ;    
-        // if(update && installedVersion == firmwareToUse.tag)
-        //     return;
+        if(update && installedVersion == firmwareToUse.tag)
+            return;
 
         const port = await (this.device.connection! as ISerialConnection).disconnect();
         if(port === undefined)
@@ -233,7 +233,7 @@ export class FlashOperation {
             await loader.main_fn();            // TODO: This returns some interesting stuff, check it out            
             if(sections.length > 1) {
                 this.setState("erasing");                
-                await loader.erase_flash();
+                // await loader.erase_flash();
             }                   
             const totalLength = sections.reduce<number>((p, c) => p + c.data.byteLength, 0);
             let bytesFlashed = 0;
@@ -251,25 +251,24 @@ export class FlashOperation {
                 return { data: content, address: s.offset };
             }));
 
-            await loader.write_flash(files, "keep", undefined,  undefined, false, true, (index, written, total) => {
-                if(index != lastIndex) {
-                    bytesFlashed += sections[lastIndex].data.byteLength;
-                    lastIndex = index;
-                }
-                // I don't know what kind of weird size esploader computes but it doesn't match ours
-                const bytesThisSegment = (written / total) * sections[index].data.byteLength;
-                console.log(`FLASHING PROGRESS ${bytesFlashed + written} / ${totalLength} ... ${bytesFlashed} | ${written} | ${total} | ${index}`);
-                this.setState("flashing", (bytesFlashed + bytesThisSegment) /  totalLength);
-            });                            
+            // await loader.write_flash(files, "keep", undefined,  undefined, false, true, (index, written, total) => {
+            //     if(index != lastIndex) {
+            //         bytesFlashed += sections[lastIndex].data.byteLength;
+            //         lastIndex = index;
+            //     }
+            //     // I don't know what kind of weird size esploader computes but it doesn't match ours
+            //     const bytesThisSegment = (written / total) * sections[index].data.byteLength;
+            //     console.log(`FLASHING PROGRESS ${bytesFlashed + written} / ${totalLength} ... ${bytesFlashed} | ${written} | ${total} | ${index}`);
+            //     this.setState("flashing", (bytesFlashed + bytesThisSegment) /  totalLength);
+            // });                            
         }
         catch (e) {                                    
             throw e;            
         }
         finally {        
-            
+            await this.loader?.flash_finish();
         }
 
-        debugger;
         this.setState("config");
         await port!.setSignals({requestToSend: true});
         await new Promise(r => setTimeout(r, 100));   
@@ -281,31 +280,44 @@ export class FlashOperation {
             baudRate: undefined,
             concurrentLogOutput: true
         });
+        await new Promise(r => setTimeout(r, 5000));   
     }
 
     private async setConfig() {
-        try {
+        
             this.setState("config");
             const connection = (this.device.connection! as ISerialConnection);
-                    
-            const newConfig = new Protobuf.Config({
-                payloadVariant: {
-                    case: "device",
-                    value: this.config.device!
-                }
-            });
-            const promise = connection.setConfig(newConfig).then(() => 
-            connection.commitEditSettings().then(() => console.log("FLASHER: Config saved"))
-            ).catch(e => console.error(e));
+            // await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "device", value: this.config.device! } }));
+
+
+            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "position", value: this.config.position! } }));
+            // await connection.commitEditSettings().then(() => console.log("FLASHER: Config saved"));
+            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "power", value: this.config.power! } }));
+            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "network", value: this.config.network! } }));
+            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "display", value: this.config.display! } }));
+            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "lora", value: this.config.lora! } }));
+            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "bluetooth", value: this.config.bluetooth! } }));
+            await connection.commitEditSettings().then(() => console.log("FLASHER: Config saved"));
+            // await Promise.all([
+            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "device", value: this.config.device! } })),
+            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "position", value: this.config.position! } })),
+            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "power", value: this.config.power! } })),
+            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "network", value: this.config.network! } })),
+            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "display", value: this.config.display! } })),
+            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "lora", value: this.config.lora! } })),
+                // connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "bluetooth", value: this.config.bluetooth! } })),
+                // connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "mqtt", value: this.! } })),
+                // connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "device", value: this.config.device! } })),
+                // connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "device", value: this.config.device! } })),
+            // ]);            
+            
+
+
+            
             
             // We won't get an answer if serial output has been disabled in the new config
-            if(this.config.device!.serialEnabled)
-                await promise;
-            
-        }
-        catch(e) {
-            this.setState("failed");            
-        }
+            // if(this.config.device!.serialEnabled)
+            //     await promise;
     }
 
     public async cancel() {        

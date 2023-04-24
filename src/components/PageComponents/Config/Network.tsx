@@ -21,13 +21,14 @@ export const Network = (): JSX.Element => {
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
+  const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
   const setConfig: (data: NetworkValidation) => void =
     isPresetConfig ? (data) => {
       config.config.network = new Protobuf.Config_NetworkConfig(data);    
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
-      useDevice().setWorkingConfig!(
+      setWorkingConfig!(
         new Protobuf.Config({
           payloadVariant: {
             case: "network",

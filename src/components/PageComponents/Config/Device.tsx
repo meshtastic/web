@@ -11,7 +11,7 @@ import {
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
 export const Device = (): JSX.Element => {  
-  const config = useConfig();
+  const config = useConfig();  
   const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
     getEnabled(name) {
       return config.overrideValues![name] ?? false;
@@ -21,13 +21,14 @@ export const Device = (): JSX.Element => {
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
+  const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
   const setConfig: (data: DeviceValidation) => void =
     isPresetConfig ? (data) => {
       config.config.device = new Protobuf.Config_DeviceConfig(data);    
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
-      useDevice().setWorkingConfig!(
+      setWorkingConfig!(
         new Protobuf.Config({
           payloadVariant: {
             case: "device",

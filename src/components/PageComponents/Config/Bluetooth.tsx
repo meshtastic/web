@@ -21,13 +21,14 @@ export const Bluetooth = (): JSX.Element => {
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
+  const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
   const setConfig: (data: BluetoothValidation) => void =
     isPresetConfig ? (data) => {
       config.config.bluetooth = new Protobuf.Config_BluetoothConfig(data);    
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
-      useDevice().setWorkingConfig!(
+      setWorkingConfig!(
         new Protobuf.Config({
           payloadVariant: {
             case: "bluetooth",

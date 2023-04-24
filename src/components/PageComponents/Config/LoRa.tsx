@@ -21,13 +21,14 @@ export const LoRa = (): JSX.Element => {
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
+  const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
   const setConfig: (data: LoRaValidation) => void =
     isPresetConfig ? (data) => {
       config.config.lora = new Protobuf.Config_LoRaConfig(data);    
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
-      useDevice().setWorkingConfig!(
+      setWorkingConfig!(
         new Protobuf.Config({
           payloadVariant: {
             case: "lora",

@@ -173,12 +173,38 @@ export class ConfigPreset {
         serialEnabled: true,      
         nodeInfoBroadcastSecs: 10800
       }),
-      position: new Protobuf.Config_PositionConfig({ }),
-      power: new Protobuf.Config_PowerConfig({ }),
-      network: new Protobuf.Config_NetworkConfig({ }),
-      display: new Protobuf.Config_DisplayConfig({ }),
-      lora: new Protobuf.Config_LoRaConfig({ }),
-      bluetooth: new Protobuf.Config_BluetoothConfig({ }),
+      position: new Protobuf.Config_PositionConfig({
+        positionBroadcastSmartEnabled: true,
+        gpsEnabled: true,
+        rxGpio: 15,
+        txGpio: 13,
+        positionBroadcastSecs: 900,
+        gpsUpdateInterval: 120,
+        gpsAttemptTime: 900
+      }),
+      power: new Protobuf.Config_PowerConfig({
+        waitBluetoothSecs: 60,
+        meshSdsTimeoutSecs: 7200,
+        sdsSecs: 4294967295,
+        lsSecs: 300,
+        minWakeSecs: 10
+      }),
+      network: new Protobuf.Config_NetworkConfig({
+        ntpServer: "0.pool.ntp.org"
+      }),
+      display: new Protobuf.Config_DisplayConfig({
+        screenOnSecs: 600
+      }),
+      lora: new Protobuf.Config_LoRaConfig({
+        hopLimit: 3,
+        usePreset: true,
+        txEnabled: true,
+        txPower: 30
+      }),
+      bluetooth: new Protobuf.Config_BluetoothConfig({
+        enabled: true,
+        fixedPin: 123456
+      }),
     });
   }
 

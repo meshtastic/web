@@ -21,13 +21,14 @@ export const Display = (): JSX.Element => {
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
+  const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
   const setConfig: (data: DisplayValidation) => void =
     isPresetConfig ? (data) => {
       config.config.display = new Protobuf.Config_DisplayConfig(data);          
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
-      useDevice().setWorkingConfig!(
+      setWorkingConfig!(
         new Protobuf.Config({
           payloadVariant: {
             case: "display",
