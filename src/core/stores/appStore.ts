@@ -5,7 +5,6 @@ import { Protobuf } from '@meshtastic/meshtasticjs';
 
 import type { OverallFlashingState } from '../flashing/Flasher';
 import type { FirmwareVersion } from '@app/components/PageComponents/Flasher/FlashSettings';
-import type { LocalModuleConfig } from '@meshtastic/meshtasticjs/dist/protobufs';
 
 export interface RasterSource {
   enabled: boolean;
@@ -27,7 +26,7 @@ export class ConfigPreset {
 
   public children: ConfigPreset[] = [];  
   public count: number = 0;
-  public overrideValues: {[fieldName: string]: boolean};
+  public overrideValues: {[fieldName: string]: boolean} | undefined;
 
   public constructor(public name: string, public parent?: ConfigPreset, public config = ConfigPreset.createDefaultConfig(), public moduleConfig = ConfigPreset.createDefaultModuleConfig()) {
     if(parent) {
@@ -37,11 +36,14 @@ export class ConfigPreset {
   }
 
   public saveConfigTree() {
-    localStorage.setItem("PresetConfigs", this.getConfigTreeJSON());
+    if(this.parent)
+      this.parent.saveConfigTree();
+    else
+      localStorage.setItem("PresetConfigs", this.getConfigJSON());
   }
 
   public exportConfigTree() {    
-    const blob = new Blob([this.getConfigTreeJSON()], {type: "application/json"});
+    const blob = new Blob([this.getConfigJSON()], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const elem = document.createElement("a");
     elem.setAttribute("href", url);
@@ -64,10 +66,7 @@ export class ConfigPreset {
     return configs;
   }
 
-  private getConfigTreeJSON(): string {
-    if(this.parent) {
-      return this.parent.getConfigTreeJSON();      
-    }
+  private getConfigJSON(): string {
     const replacer = (key: string, value: any) => {
       if(key == "parent" || key == "count")
         return undefined;
@@ -94,11 +93,10 @@ export class ConfigPreset {
   }
 
   private getConfigValue(sectionKey: keyof Protobuf.LocalConfig, key: string): any {
-    if(this.parent !== undefined && !this.overrideValues[key])
+    if(this.parent !== undefined && !this.overrideValues![key])
       return this.parent.getConfigValue(sectionKey, key);
     const conf = this.config[sectionKey];
-    
-    // TODO: any???
+        
     return (conf as any)[key];
   }
 
@@ -210,15 +208,30 @@ export class ConfigPreset {
 
   private static createDefaultModuleConfig(): Protobuf.LocalModuleConfig {
     return new Protobuf.LocalModuleConfig({
-      mqtt: new Protobuf.ModuleConfig_MQTTConfig({ }),
+      mqtt: new Protobuf.ModuleConfig_MQTTConfig({
+        address: "mqtt.meshtastic.org",
+        username: "meshdev",
+        password: "large4cats",
+      }),
       serial: new Protobuf.ModuleConfig_SerialConfig({ }),
       externalNotification: new Protobuf.ModuleConfig_ExternalNotificationConfig({ }),
       storeForward: new Protobuf.ModuleConfig_StoreForwardConfig({ }),
       rangeTest: new Protobuf.ModuleConfig_RangeTestConfig({ }),
-      telemetry: new Protobuf.ModuleConfig_TelemetryConfig({ }),
+      telemetry: new Protobuf.ModuleConfig_TelemetryConfig({
+        deviceUpdateInterval: 900,
+        environmentUpdateInterval: 900
+      }),
       cannedMessage: new Protobuf.ModuleConfig_CannedMessageConfig({ }),
       audio: new Protobuf.ModuleConfig_AudioConfig({ })
     });
+  }
+
+  public shallowClone() {
+    const clone = new ConfigPreset(this.name, this.parent, this.config, this.moduleConfig);
+    clone.children = this.children;
+    clone.count = this.count;
+    clone.overrideValues =  this.overrideValues;
+    return clone;
   }
 
 }
@@ -289,7 +302,7 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
-  darkMode: true,     // TEMP: Default to dark mode
+  darkMode: true,
   accent: "orange",
   connectDialogOpen: false,
   configPresetRoot: ConfigPreset.loadOrCreate(),

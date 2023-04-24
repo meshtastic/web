@@ -54,12 +54,6 @@ export const ExternalNotification = (): JSX.Element => {
               name: "outputMs",
               label: "Output MS",
               description: "Output MS",
-
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ],
               properties: {
                 suffix: "ms"
               }
@@ -69,77 +63,42 @@ export const ExternalNotification = (): JSX.Element => {
               name: "output",
               label: "Output",
               description: "Output",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "number",
               name: "outputVibra",
               label: "Output Vibrate",
               description: "Output Vibrate",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "number",
               name: "outputBuzzer",
               label: "Output Buzzer",
               description: "Output Buzzer",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "toggle",
               name: "active",
               label: "Active",
               description: "Active",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "toggle",
               name: "alertMessage",
               label: "Alert Message",
               description: "Alert Message",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "toggle",
               name: "alertMessageVibra",
               label: "Alert Message Vibrate",
               description: "Alert Message Vibrate",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "toggle",
               name: "alertMessageBuzzer",
               label: "Alert Message Buzzer",
               description: "Alert Message Buzzer",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "toggle",
@@ -147,55 +106,30 @@ export const ExternalNotification = (): JSX.Element => {
               label: "Alert Bell",
               description:
                 "Should an alert be triggered when receiving an incoming bell?",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "toggle",
               name: "alertBellVibra",
               label: "Alert Bell Vibrate",
               description: "Alert Bell Vibrate",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "toggle",
               name: "alertBellBuzzer",
               label: "Alert Bell Buzzer",
               description: "Alert Bell Buzzer",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "toggle",
               name: "usePwm",
               label: "Use PWM",
               description: "Use PWM",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "number",
               name: "nagTimeout",
               label: "Nag Timeout",
               description: "Nag Timeout",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             }
           ]
         }

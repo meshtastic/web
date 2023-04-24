@@ -55,44 +55,24 @@ export const MQTT = (): JSX.Element => {
               label: "MQTT Server Address",
               description:
                 "MQTT server address to use for default/custom servers",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "text",
               name: "username",
               label: "MQTT Username",
               description: "MQTT username to use for default/custom servers",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "password",
               name: "password",
               label: "MQTT Password",
               description: "MQTT password to use for default/custom servers",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "toggle",
               name: "encryptionEnabled",
               label: "Encryption Enabled",
               description: "Enable or disable MQTT encryption",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             }
           ]
         }

@@ -82,7 +82,7 @@ dependencies:
   '@emeraldpay/hashicon-react': 0.5.2
   '@hookform/error-message': 2.0.1_bamyqy2r5urjalaw4du2uschzm
   '@hookform/resolvers': 2.9.11_react-hook-form@7.43.2
-  '@meshtastic/meshtasticjs': github.com/trelbutate/js/cf110ec5bdb44f6b7fab66eeff6b5ae62dbac563
+  '@meshtastic/meshtasticjs': github.com/trelbutate/js/a8fd34819d56d5c0ae5a48ff0b6dbf0635a4c982
   '@preact/signals-react': 1.2.2_react@18.2.0
   '@radix-ui/react-accordion': 1.1.0_biqbaboplfbrettd7655fr4n2y
   '@radix-ui/react-checkbox': 1.0.2_biqbaboplfbrettd7655fr4n2y
@@ -7671,11 +7671,10 @@ packages:
       use-sync-external-store: 1.2.0_react@18.2.0
     dev: false
 
-  github.com/trelbutate/js/cf110ec5bdb44f6b7fab66eeff6b5ae62dbac563:
-    resolution: {tarball: https://codeload.github.com/trelbutate/js/tar.gz/cf110ec5bdb44f6b7fab66eeff6b5ae62dbac563}
+  github.com/trelbutate/js/a8fd34819d56d5c0ae5a48ff0b6dbf0635a4c982:
+    resolution: {tarball: https://codeload.github.com/trelbutate/js/tar.gz/a8fd34819d56d5c0ae5a48ff0b6dbf0635a4c982}
     name: '@meshtastic/meshtasticjs'
     version: 2.1.6-0
-    requiresBuild: true
     dependencies:
       '@buf/meshtastic_protobufs.bufbuild_es': 1.2.0-20230328173351-271d1533a896.1_@bufbuild+protobuf@1.2.0
       '@bufbuild/protobuf': 1.2.0

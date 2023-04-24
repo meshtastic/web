@@ -55,45 +55,24 @@ export const Serial = (): JSX.Element => {
               label: "Echo",
               description:
                 "Any packets you send will be echoed back to your device",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "number",
               name: "rxd",
               label: "Receive Pin",
               description: "Set the GPIO pin to the RXD pin you have set up.",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "number",
               name: "txd",
               label: "Transmit Pin",
               description: "Set the GPIO pin to the TXD pin you have set up.",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "select",
               name: "baud",
               label: "Baud Rate",
               description: "The serial baud rate",
-
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ],
               properties: {
                 enumValue: Protobuf.ModuleConfig_SerialConfig_Serial_Baud
               }
@@ -105,11 +84,6 @@ export const Serial = (): JSX.Element => {
 
               description:
                 "Seconds to wait before we consider your packet as 'done'",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ],
               properties: {
                 suffix: "Seconds"
               }
@@ -119,12 +93,6 @@ export const Serial = (): JSX.Element => {
               name: "mode",
               label: "Mode",
               description: "Select Mode",
-
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ],
               properties: {
                 enumValue: Protobuf.ModuleConfig_SerialConfig_Serial_Mode,
                 formatEnumName: true

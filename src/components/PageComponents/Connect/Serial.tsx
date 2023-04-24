@@ -29,7 +29,6 @@ export const Serial = (): JSX.Element => {
   const onConnect = async (port: SerialPort) => {
     const id = randId();
     const device = addDevice(id);
-    setSelectedDevice(id);
     const connection = new ISerialConnection(id);
     await connection
       .connect({

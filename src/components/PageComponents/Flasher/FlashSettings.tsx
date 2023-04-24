@@ -64,7 +64,7 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
               });
             }
             nextBatch(devices,
-              deviceSelectedToFlash,    /* EXTREMELY HACKY -- FIX THIS */
+              deviceSelectedToFlash,
               (f)=> {
                 f.device.setFlashState(f.state);
                 deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
@@ -99,6 +99,7 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
 const FirmwareSelection = () => {  
   const { firmwareRefreshing, setFirmwareRefreshing, firmwareList, setFirmwareList, selectedFirmware, setSelectedFirmware, overallFlashingState } = useAppStore();
   const isBusy = firmwareRefreshing || overallFlashingState.state == "busy";
+  const { toast } = useToast();
 
   let selectItems = [
     <SelectItem key={-1} value={"latest"}>
@@ -176,9 +177,10 @@ const FirmwareSelection = () => {
           setFirmwareRefreshing(true);
           loadFirmwareList().then((list) => { 
             setFirmwareList(list.slice(0, 10));
-            setFirmwareRefreshing(false);            
-            // TODO: What if download fails?
-          });
+            setFirmwareRefreshing(false);
+          }).catch(() => toast({
+            title: "❌ Could not download firmware version list."
+          }));
         }}
       >
         <RefreshCwIcon size={20}/>
@@ -213,7 +215,7 @@ type DeviceModel = {
   productId: number
 }
 
-// TODO: Fill in remaining vendor and product IDs
+// This is still missing some vendor and product IDs that could not be determined
 export const deviceModels: DeviceModel[] = [
   {
     displayName: "Heltec v1",

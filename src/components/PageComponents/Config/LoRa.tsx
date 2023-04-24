@@ -88,11 +88,6 @@ export const LoRa = (): JSX.Element => {
               name: "modemPreset",
               label: "Modem Preset",
               description: "Modem preset to use",
-              disabledBy: [
-                {
-                  fieldName: "usePreset"
-                }
-              ],
               properties: {
                 enumValue: Protobuf.Config_LoRaConfig_ModemPreset,
                 formatEnumName: true
@@ -103,12 +98,6 @@ export const LoRa = (): JSX.Element => {
               name: "bandwidth",
               label: "Bandwidth",
               description: "Channel bandwidth in MHz",
-              disabledBy: [
-                {
-                  fieldName: "usePreset",
-                  invert: true
-                }
-              ],
               properties: {
                 suffix: "MHz"
               }
@@ -119,12 +108,6 @@ export const LoRa = (): JSX.Element => {
               label: "Spreading Factor",
               description: "Indicates the number of chirps per symbol",
 
-              disabledBy: [
-                {
-                  fieldName: "usePreset",
-                  invert: true
-                }
-              ],
               properties: {
                 suffix: "CPS"
               }
@@ -134,12 +117,6 @@ export const LoRa = (): JSX.Element => {
               name: "codingRate",
               label: "Coding Rate",
               description: "The denominator of the coding rate",
-              disabledBy: [
-                {
-                  fieldName: "usePreset",
-                  invert: true
-                }
-              ]
             }
           ]
         },

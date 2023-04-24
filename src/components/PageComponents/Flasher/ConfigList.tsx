@@ -23,8 +23,8 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
                 title="Add new configuration as child"                
                 onClick={() => {         
                     const newPreset = new ConfigPreset("New Preset", configPresetSelected);
-                    configPresetSelected?.children.push(newPreset);          
-                    setConfigPresetRoot(Object.create(configPresetRoot));
+                    configPresetSelected?.children.push(newPreset);       
+                    setConfigPresetRoot(configPresetRoot.shallowClone());
                     setConfigPresetSelected(newPreset);
                     setEditSelected(true);
                     newPreset.saveConfigTree();
@@ -55,7 +55,6 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
                         newDefault.saveConfigTree();
                         return;
                     } 
-                    // TEMP: Replace with proper dialog.
                     if(!confirm(`Are you sure you want to remove "${configPresetSelected.name}" and all its children?`))
                         return;
                     configPresetSelected.parent.children = configPresetSelected.parent.children.filter(c => c != configPresetSelected);
@@ -75,7 +74,20 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
                 ConfigPreset.importConfigTree().then(
                     (root) => {
                     if(root) {
-                        setConfigPresetRoot(root);
+                        let newEntry = root;
+                        debugger;
+                        if(configPresetSelected.parent) {                            
+                            const childIndex = configPresetSelected.parent.children.indexOf(configPresetSelected);
+                            configPresetSelected.parent.children[childIndex] = root;
+                            root.parent = configPresetSelected.parent;
+                            newEntry = root;                            
+                            setConfigPresetRoot(configPresetRoot.shallowClone());
+                        }                        
+                        else {
+                            root.overrideValues = undefined;
+                            setConfigPresetRoot(root);
+                        }                            
+                        setConfigPresetSelected(newEntry);
                         root.saveConfigTree();
                         toast({
                         title: `Presets successfully imported.`
@@ -95,7 +107,7 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
                 className="transition-all hover:text-accent mb-4"
                 title="Export"
                 onClick={() => {                     
-                    rootConfig.exportConfigTree();
+                    configPresetSelected.exportConfigTree();
                 }}
                 disabled={disabled}
             >

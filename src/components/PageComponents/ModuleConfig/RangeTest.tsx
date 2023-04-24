@@ -54,22 +54,12 @@ export const RangeTest = (): JSX.Element => {
               name: "sender",
               label: "Message Interval",
               description: "How long to wait between sending test packets",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
             },
             {
               type: "toggle",
               name: "save",
               label: "Save CSV to storage",
-              description: "ESP32 Only",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "ESP32 Only"
             }
           ]
         }

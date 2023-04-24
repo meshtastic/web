@@ -61,22 +61,12 @@ export const Network = (): JSX.Element => {
               name: "wifiSsid",
               label: "SSID",
               description: "Network name",
-              disabledBy: [
-                {
-                  fieldName: "wifiEnabled"
-                }
-              ]
             },
             {
               type: "password",
               name: "wifiPsk",
               label: "PSK",
               description: "Network password",
-              disabledBy: [
-                {
-                  fieldName: "wifiEnabled"
-                }
-              ]
             }
           ]
         },
@@ -110,48 +100,24 @@ export const Network = (): JSX.Element => {
               name: "ipv4Config.ip",
               label: "IP",
               description: "IP Address",
-              disabledBy: [
-                {
-                  fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
             },
             {
               type: "text",
               name: "ipv4Config.gateway",
               label: "Gateway",
               description: "Default Gateway",
-              disabledBy: [
-                {
-                  fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
             },
             {
               type: "text",
               name: "ipv4Config.subnet",
               label: "Subnet",
               description: "Subnet Mask",
-              disabledBy: [
-                {
-                  fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
             },
             {
               type: "text",
               name: "ipv4Config.dns",
               label: "DNS",
               description: "DNS Server",
-              disabledBy: [
-                {
-                  fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
             }
           ]
         },

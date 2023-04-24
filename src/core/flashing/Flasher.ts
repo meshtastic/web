@@ -19,7 +19,7 @@ type OverallFlashingCallback = (flashState: OverallFlashingState, progress?: num
 
 let dataSections: {[index: string]: Uint8Array};
 let zipFile: JSZip;
-let configQueue: Protobuf.LocalConfig[] = [];
+let configQueue: {config: Protobuf.LocalConfig, moduleConfig: Protobuf.LocalModuleConfig}[] = [];
 let firmwareToUse: FirmwareVersion;
 let operations: FlashOperation[] = [];
 let callback: OverallFlashingCallback;
@@ -38,7 +38,7 @@ export async function setup(configs: ConfigPreset[], deviceModelName: string, fi
     for(const c in configs) {
         const config = configs[c];
         for (let i = 0; i < config.count; i++) {
-            configQueue.push(config.config);
+            configQueue.push({config: config.config, moduleConfig: config.moduleConfig});
         }            
     }    
 }
@@ -51,7 +51,7 @@ export async function nextBatch(devices: Device[], flashStates: FlashState[], de
         console.warn("Too many devices!");
         devices = devices.slice(0, configQueue.length);
     }
-    operations = devices.map((dev, index) => new FlashOperation(dev, configQueue[index], deviceCallback));
+    operations = devices.map((dev, index) => new FlashOperation(dev, configQueue[index].config, configQueue[index].moduleConfig, deviceCallback));
     operations.forEach((o, i) => o.state = flashStates[i]);
     configQueue = configQueue.slice(operations.length)
     console.log(`New config queue count: ${configQueue.length}`);
@@ -125,8 +125,7 @@ async function getZipFile() {
 }
 
 async function loadFirmware() {    
-    console.log("Loading firmware");
-    // TODO: Error handling
+    console.log("Loading firmware");    
 
     const zip = await getZipFile();
     zipFile = await JSZip.loadAsync(zip);    
@@ -159,7 +158,7 @@ async function getFirmwareSections(deviceModel: string, update: boolean) {
     if(main === undefined || bleoata === undefined || littlefs === undefined)
         throw "Missing firmware files.";
 
-    return [            // TODO: Is this correct for all device models?
+    return [
         { offset: 0, data: main },
         { offset: 0x260000, data: bleoata },
         { offset: 0x300000, data: littlefs }
@@ -177,12 +176,15 @@ export class FlashOperation {
     public state: FlashState = { progress: 0, state: "idle" };
     public errorReason?: string;
     private loader?: esptooljs.ESPLoader; 
+    private  isCancelled: boolean;
 
-    public constructor(public device: Device, public config: Protobuf.LocalConfig, public callback: (operation: FlashOperation) => void) {
+    public constructor(public device: Device, public config: Protobuf.LocalConfig, public moduleConfig: Protobuf.LocalModuleConfig, public callback: (operation: FlashOperation) => void) {
         
     }
 
     public setState(state: DeviceFlashingState, progress = 0, errorReason : string | undefined = undefined) {
+        if(this.isCancelled)
+            return;
         console.log(`${this.device.nodes.get(this.device.hardware.myNodeNum)?.user
             ?.longName ?? "<Not flashed yet>"} flash state: ${state}`);
         this.state = {state, progress};
@@ -219,9 +221,7 @@ export class FlashOperation {
         const info = port.getInfo();
         console.log(`Device info: vendor ${info.usbVendorId}, product ${info.usbProductId}`);
         const sections = await getFirmwareSections(deviceModel, update);
-        // await port!.open({baudRate: 115200});
 
-        debugger;
 
         // -----------
         
@@ -230,17 +230,16 @@ export class FlashOperation {
             this.loader = new esptooljs.ESPLoader(transport, 115200);                           
             const loader = this.loader;
             this.setState("preparing");
-            await loader.main_fn();            // TODO: This returns some interesting stuff, check it out            
+            await loader.main_fn();       
             if(sections.length > 1) {
                 this.setState("erasing");                
-                // await loader.erase_flash();
+                await loader.erase_flash();
             }                   
             const totalLength = sections.reduce<number>((p, c) => p + c.data.byteLength, 0);
             let bytesFlashed = 0;
             let lastIndex = 0;
 
-            const files = await Promise.all(sections.map(async s => {
-                //  TODO:  Move this to loading, also check if  this can be handled by loader.ui8ToBstr()
+            const files = await Promise.all(sections.map(async s => {                
                 const fileReader = new FileReader();
                 const blob = new Blob([s.data]);
                 const content = await new Promise<string>((resolve, reject) => {
@@ -251,16 +250,18 @@ export class FlashOperation {
                 return { data: content, address: s.offset };
             }));
 
-            // await loader.write_flash(files, "keep", undefined,  undefined, false, true, (index, written, total) => {
-            //     if(index != lastIndex) {
-            //         bytesFlashed += sections[lastIndex].data.byteLength;
-            //         lastIndex = index;
-            //     }
-            //     // I don't know what kind of weird size esploader computes but it doesn't match ours
-            //     const bytesThisSegment = (written / total) * sections[index].data.byteLength;
-            //     console.log(`FLASHING PROGRESS ${bytesFlashed + written} / ${totalLength} ... ${bytesFlashed} | ${written} | ${total} | ${index}`);
-            //     this.setState("flashing", (bytesFlashed + bytesThisSegment) /  totalLength);
-            // });                            
+            await loader.write_flash(files, "keep", undefined,  undefined, false, true, (index, written, total) => {
+                if(this.isCancelled)
+                    throw "Cancelled";
+                if(index != lastIndex) {
+                    bytesFlashed += sections[lastIndex].data.byteLength;
+                    lastIndex = index;
+                }
+                // I don't know what kind of weird size esploader computes but it doesn't match ours
+                const bytesThisSegment = (written / total) * sections[index].data.byteLength;
+                console.log(`FLASHING PROGRESS ${bytesFlashed + written} / ${totalLength} ... ${bytesFlashed} | ${written} | ${total} | ${index}`);
+                this.setState("flashing", (bytesFlashed + bytesThisSegment) /  totalLength);
+            });                            
         }
         catch (e) {                                    
             throw e;            
@@ -275,6 +276,9 @@ export class FlashOperation {
         await port!.setSignals({requestToSend: false});    
         await port!.close();
         const connection = (this.device.connection! as ISerialConnection);
+        //@ts-ignore
+        connection.preventLock = false;
+        debugger;
         await connection.connect({ 
             port,
             baudRate: undefined,
@@ -284,45 +288,37 @@ export class FlashOperation {
     }
 
     private async setConfig() {
-        
+            if(this.isCancelled)
+                return;
             this.setState("config");
             const connection = (this.device.connection! as ISerialConnection);
-            // await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "device", value: this.config.device! } }));
-
-
+            
+            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "device", value: this.config.device! } }));
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "position", value: this.config.position! } }));
-            // await connection.commitEditSettings().then(() => console.log("FLASHER: Config saved"));
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "power", value: this.config.power! } }));
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "network", value: this.config.network! } }));
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "display", value: this.config.display! } }));
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "lora", value: this.config.lora! } }));
-            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "bluetooth", value: this.config.bluetooth! } }));
+            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "bluetooth", value: this.config.bluetooth! } }));                        
+
+            await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "mqtt", value: this.moduleConfig.mqtt! } }));
+            await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "serial", value: this.moduleConfig.serial! } }));
+            await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "externalNotification", value: this.moduleConfig.externalNotification! } })),
+            await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "storeForward", value: this.moduleConfig.storeForward! } })),
+            await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "telemetry", value: this.moduleConfig.telemetry! } })),
+            await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "cannedMessage", value: this.moduleConfig.cannedMessage! } })),
+            await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "audio", value: this.moduleConfig.audio! } }));
+        
+                    // We won't get an answer if serial output has been disabled in the new config
+            if(!this.config.device!.serialEnabled)
+                return;
             await connection.commitEditSettings().then(() => console.log("FLASHER: Config saved"));
-            // await Promise.all([
-            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "device", value: this.config.device! } })),
-            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "position", value: this.config.position! } })),
-            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "power", value: this.config.power! } })),
-            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "network", value: this.config.network! } })),
-            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "display", value: this.config.display! } })),
-            //     connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "lora", value: this.config.lora! } })),
-                // connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "bluetooth", value: this.config.bluetooth! } })),
-                // connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "mqtt", value: this.! } })),
-                // connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "device", value: this.config.device! } })),
-                // connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "device", value: this.config.device! } })),
-            // ]);            
-            
 
-
-            
-            
-            // We won't get an answer if serial output has been disabled in the new config
-            // if(this.config.device!.serialEnabled)
-            //     await promise;
     }
 
-    public async cancel() {        
-        await this.loader?.disconnect();
+    public async cancel() {
         this.setState("aborted");
+        this.isCancelled = true;
     }
 
 }
