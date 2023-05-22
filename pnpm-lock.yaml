@@ -31,7 +31,6 @@ specifiers:
   '@types/react-dom': ^18.0.11
   '@types/w3c-web-serial': ^1.0.3
   '@types/web-bluetooth': ^0.0.16
-  '@types/wicg-file-system-access': ^2020.9.6
   '@typescript-eslint/eslint-plugin': ^5.53.0
   '@typescript-eslint/parser': ^5.53.0
   '@vitejs/plugin-react': ^3.1.0
@@ -82,7 +81,7 @@ dependencies:
   '@emeraldpay/hashicon-react': 0.5.2
   '@hookform/error-message': 2.0.1_bamyqy2r5urjalaw4du2uschzm
   '@hookform/resolvers': 2.9.11_react-hook-form@7.43.2
-  '@meshtastic/meshtasticjs': github.com/trelbutate/js/a8fd34819d56d5c0ae5a48ff0b6dbf0635a4c982
+  '@meshtastic/meshtasticjs': 2.0.20-5
   '@preact/signals-react': 1.2.2_react@18.2.0
   '@radix-ui/react-accordion': 1.1.0_biqbaboplfbrettd7655fr4n2y
   '@radix-ui/react-checkbox': 1.0.2_biqbaboplfbrettd7655fr4n2y
@@ -134,7 +133,6 @@ devDependencies:
   '@types/react-dom': 18.0.11
   '@types/w3c-web-serial': 1.0.3
   '@types/web-bluetooth': 0.0.16
-  '@types/wicg-file-system-access': 2020.9.6
   '@typescript-eslint/eslint-plugin': 5.53.0_ny4s7qc6yg74faf3d6xty2ofzy
   '@typescript-eslint/parser': 5.53.0_7kw3g6rralp5ps6mg3uyzz6azm
   '@vitejs/plugin-react': 3.1.0_vite@4.1.4
@@ -1742,6 +1740,18 @@ packages:
   /@mapbox/whoots-js/3.1.0:
     resolution: {integrity: sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==}
     engines: {node: '>=6.0.0'}
+    dev: false
+
+  /@meshtastic/meshtasticjs/2.0.20-5:
+    resolution: {integrity: sha512-4N1stS98kPeCro8VaWlcv9Y59aBvhFMi5fx7EEeWtbYElhWPI3ahhqChoykY6hh5ommHqESe954WbG7eh0wT4Q==}
+    dependencies:
+      '@buf/meshtastic_protobufs.bufbuild_es': 1.0.0-20230217124815-d362b2e8810a.1_@bufbuild+protobuf@1.0.0
+      '@bufbuild/protobuf': 1.0.0
+      crc: 4.3.2
+      sub-events: 1.9.0
+      tslog: 4.7.5
+    transitivePeerDependencies:
+      - buffer
     dev: false
 
   /@nodelib/fs.scandir/2.1.5:
@@ -3820,10 +3830,6 @@ packages:
 
   /@types/web-bluetooth/0.0.16:
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==}
-    dev: true
-
-  /@types/wicg-file-system-access/2020.9.6:
-    resolution: {integrity: sha512-6hogE75Hl2Ov/jgp8ZhDaGmIF/q3J07GtXf8nCJCwKTHq7971po5+DId7grft09zG7plBwpF6ZU0yx9Du4/e1A==}
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.53.0_ny4s7qc6yg74faf3d6xty2ofzy:
@@ -7135,8 +7141,8 @@ packages:
   /tslib/2.5.0:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
 
-  /tslog/4.8.2:
-    resolution: {integrity: sha512-eAKIRjxfSKYLs06r1wT7oou6Uv9VN6NW9g0JPidBlqQwPBBl5+84dm7r8zSOPVq1kyfEw1P6B3/FLSpZCorAgA==}
+  /tslog/4.7.5:
+    resolution: {integrity: sha512-3n3ZsDfRq4fmoGUo8mQ+1ZrTn1Ujdxno6qHNRjRqHPnDYk6VRdnmluAeT7HqRX72YA0pZgj1eU3DZAyu9dwKCA==}
     engines: {node: '>=16'}
     dev: false
 

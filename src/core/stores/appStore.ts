@@ -24,7 +24,7 @@ export type accentColor =
 
 export class ConfigPreset {
 
-  public children: ConfigPreset[] = [];  
+  public children: ConfigPreset[] = [];
   public count: number = 0;
   public overrideValues: {[fieldName: string]: boolean} | undefined;
 
@@ -32,7 +32,7 @@ export class ConfigPreset {
     if(parent) {
       // Root config should not be overridable
       this.overrideValues = {};
-    }    
+    }
   }
 
   public saveConfigTree() {
@@ -42,7 +42,7 @@ export class ConfigPreset {
       localStorage.setItem("PresetConfigs", this.getConfigJSON());
   }
 
-  public exportConfigTree() {    
+  public exportConfigTree() {
     const blob = new Blob([this.getConfigJSON()], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const elem = document.createElement("a");
@@ -60,7 +60,7 @@ export class ConfigPreset {
 
   public getAll(): ConfigPreset[] {
     const configs: ConfigPreset[] = [ this ];
-    this.children.forEach(c => 
+    this.children.forEach(c =>
       configs.push(...c.getAll())
     );
     return configs;
@@ -75,20 +75,20 @@ export class ConfigPreset {
     return JSON.stringify(this, replacer);
   }
 
-  public getFinalConfig(): Protobuf.LocalConfig {    
+  public getFinalConfig(): Protobuf.LocalConfig {
     const config = new Protobuf.LocalConfig();
     config.device = new Protobuf.Config_DeviceConfig();
     config.position = new Protobuf.Config_PositionConfig();
     config.power = new Protobuf.Config_PowerConfig();
     config.network = new Protobuf.Config_NetworkConfig();
-    config.display = new Protobuf.Config_DisplayConfig();    
+    config.display = new Protobuf.Config_DisplayConfig();
     Object.entries(config).forEach(([sectionKey, value]) => {
       if(sectionKey == "version")
         return;
-      Object.keys(value).forEach(key => {        
+      Object.keys(value).forEach(key => {
         (value as any)[key] = this.getConfigValue(sectionKey as keyof Protobuf.LocalConfig, key);
       })
-    });    
+    });
     return config;
   }
 
@@ -96,14 +96,14 @@ export class ConfigPreset {
     if(this.parent !== undefined && !this.overrideValues![key])
       return this.parent.getConfigValue(sectionKey, key);
     const conf = this.config[sectionKey];
-        
+
     return (conf as any)[key];
   }
 
   public static tryFromJson(json: string): ConfigPreset | undefined {
     debugger;
     try {
-      const rootPreset = JSON.parse(json, (key: string, value:  any) => {            
+      const rootPreset = JSON.parse(json, (key: string, value:  any) => {
         if(key == '' || !isNaN(Number(key))) {
           // Create new ConfigPreset object to ensure that the member functions are not undefined.
           const preset = new ConfigPreset(value.name, undefined, value.config, value.moduleConfig);
@@ -128,11 +128,11 @@ export class ConfigPreset {
     }
     catch {
       return undefined;
-    }    
+    }
   }
 
   public static loadOrCreate(): ConfigPreset {
-    const storedConfigs = localStorage.getItem("PresetConfigs");    
+    const storedConfigs = localStorage.getItem("PresetConfigs");
     if(storedConfigs !== null) {
       const rootPreset = this.tryFromJson(storedConfigs);
       if(rootPreset !== undefined)
@@ -156,19 +156,19 @@ export class ConfigPreset {
     if(newRoot === undefined)
       throw "";
     return newRoot;
-  }  
+  }
 
   public restoreChildConnections() {
     this.children.forEach((c) => {
-      c.parent = this;  
+      c.parent = this;
       c.restoreChildConnections();
     });
   }
 
   private static createDefaultConfig(): Protobuf.LocalConfig {
     return new Protobuf.LocalConfig({
-      device: new Protobuf.Config_DeviceConfig({      
-        serialEnabled: true,      
+      device: new Protobuf.Config_DeviceConfig({
+        serialEnabled: true,
         nodeInfoBroadcastSecs: 10800
       }),
       position: new Protobuf.Config_PositionConfig({
@@ -236,14 +236,14 @@ export class ConfigPreset {
 
 }
 
-function loadFirmwareListFromStorage(): FirmwareVersion[] {  
+function loadFirmwareListFromStorage(): FirmwareVersion[] {
   const list = localStorage.getItem("firmwareList") as (string | undefined);
   if(list === undefined)
     return [];
   try {
     const json = JSON.parse(list) as FirmwareVersion[];
     if(json.every(o => "name" in o && "inLocalDb" in o && "id" in o && "tag" in o && "isPreRelease" in o))
-      return json;    
+      return json;
     else
       return [];
   }
@@ -302,7 +302,7 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
-  darkMode: true,
+  darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
   accent: "orange",
   connectDialogOpen: false,
   configPresetRoot: ConfigPreset.loadOrCreate(),
@@ -391,7 +391,7 @@ export const useAppStore = create<AppState>()((set) => ({
       })
     )
   },
-  setOverallFlashingState: (state: { state: OverallFlashingState, progress?: number }) => {    
+  setOverallFlashingState: (state: { state: OverallFlashingState, progress?: number }) => {
     set(
       produce<AppState>((draft) => {
         draft.overallFlashingState = state;

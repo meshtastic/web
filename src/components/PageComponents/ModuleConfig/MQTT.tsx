@@ -11,13 +11,13 @@ export const MQTT = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const setConfig: (data: MQTTValidation) => void =
     isPresetConfig ? (data) => {
-      config.moduleConfig.mqtt = new Protobuf.ModuleConfig_MQTTConfig(data);    
+      config.moduleConfig.mqtt = new Protobuf.ModuleConfig_MQTTConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -30,7 +30,7 @@ export const MQTT = (): JSX.Element => {
         })
       );
     }
-  
+
   const onSubmit = setConfig;
 
   return (
@@ -73,6 +73,22 @@ export const MQTT = (): JSX.Element => {
               name: "encryptionEnabled",
               label: "Encryption Enabled",
               description: "Enable or disable MQTT encryption",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
+            },
+            {
+              type: "toggle",
+              name: "jsonEnabled",
+              label: "JSON Enabled",
+              description: "Whether to send/consume JSON packets on MQTT",
+              disabledBy: [
+                {
+                  fieldName: "enabled"
+                }
+              ]
             }
           ]
         }

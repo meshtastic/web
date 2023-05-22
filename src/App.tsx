@@ -46,7 +46,7 @@ export const App = (): JSX.Element => {
   };
   const connectToAll = async () => {
     const dev = await navigator.serial.getPorts();
-    
+
     navigator.serial.onconnect = (ev) => {
       const port = ev.target as SerialPort;
       if(port.readable === null)
@@ -65,10 +65,10 @@ export const App = (): JSX.Element => {
     }
     dev.filter(d => d.readable === null).forEach(d => onConnect(d));
   };
-  if(!initialized && !ensureOnce) {    
+  if(!initialized && !ensureOnce) {
     connectToAll();
     setInitialized(true);
-    ensureOnce = true;    
+    ensureOnce = true;
   }
 
   return (
@@ -82,8 +82,8 @@ export const App = (): JSX.Element => {
       <Toaster />
       <MapProvider>
         <DeviceWrapper device={device}>
-          <div className="flex flex-col overflow-hidden bg-backgroundPrimary text-textPrimary">
-            <div className="flex">
+          <div className="flex h-screen flex-col overflow-hidden bg-backgroundPrimary text-textPrimary">
+            <div className="flex flex-grow">
               <DeviceSelector />
               <div className="flex h-screen flex-col w-full">
                 {device ? (
