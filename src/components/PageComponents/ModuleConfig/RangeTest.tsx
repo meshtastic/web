@@ -11,13 +11,13 @@ export const RangeTest = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const setConfig: (data: RangeTestValidation) => void =
     isPresetConfig ? (data) => {
-      config.moduleConfig.rangeTest = new Protobuf.ModuleConfig_RangeTestConfig(data);    
+      config.moduleConfig.rangeTest = new Protobuf.ModuleConfig_RangeTestConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -30,7 +30,7 @@ export const RangeTest = (): JSX.Element => {
         })
       );
     }
-  
+
   const onSubmit = setConfig;
 
   return (

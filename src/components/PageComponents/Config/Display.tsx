@@ -17,14 +17,14 @@ export const Display = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
   const setConfig: (data: DisplayValidation) => void =
     isPresetConfig ? (data) => {
-      config.config.display = new Protobuf.Config_DisplayConfig(data);          
+      config.config.display = new Protobuf.Config_DisplayConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -36,9 +36,9 @@ export const Display = (): JSX.Element => {
           }
         })
       );
-    }  
+    }
 
-  const onSubmit = setConfig;  
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<DisplayValidation>

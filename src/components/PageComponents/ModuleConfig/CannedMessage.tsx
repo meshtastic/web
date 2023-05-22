@@ -11,13 +11,13 @@ export const CannedMessage = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const setConfig: (data: CannedMessageValidation) => void =
     isPresetConfig ? (data) => {
-      config.moduleConfig.cannedMessage = new Protobuf.ModuleConfig_CannedMessageConfig(data);    
+      config.moduleConfig.cannedMessage = new Protobuf.ModuleConfig_CannedMessageConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -30,7 +30,7 @@ export const CannedMessage = (): JSX.Element => {
         })
       );
     }
-  
+
   const onSubmit = setConfig;
 
   return (

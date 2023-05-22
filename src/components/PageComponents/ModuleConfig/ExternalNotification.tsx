@@ -11,13 +11,13 @@ export const ExternalNotification = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const setConfig: (data: ExternalNotificationValidation) => void =
     isPresetConfig ? (data) => {
-      config.moduleConfig.externalNotification = new Protobuf.ModuleConfig_ExternalNotificationConfig(data);    
+      config.moduleConfig.externalNotification = new Protobuf.ModuleConfig_ExternalNotificationConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -30,7 +30,7 @@ export const ExternalNotification = (): JSX.Element => {
         })
       );
     }
-  
+
   const onSubmit = setConfig;
 
   return (

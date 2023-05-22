@@ -9,36 +9,36 @@ import { useState } from "react";
 import { FlashSettings } from "./FlashSettings";
 
 export const DeviceList = ({rootConfig, deviceSelectedToFlash, setDeviceSelectedToFlash}:
-      {rootConfig: ConfigPreset, deviceSelectedToFlash: FlashState[], setDeviceSelectedToFlash: React.Dispatch<React.SetStateAction<FlashState[]>>}) => {  
+      {rootConfig: ConfigPreset, deviceSelectedToFlash: FlashState[], setDeviceSelectedToFlash: React.Dispatch<React.SetStateAction<FlashState[]>>}) => {
     const { setConnectDialogOpen, overallFlashingState } = useAppStore();
-    const { getDevices } = useDeviceStore();  
-    const devices = getDevices();    
+    const { getDevices } = useDeviceStore();
+    const devices = getDevices();
     const allConfigs = rootConfig.getAll();
     const configQueue: string[] = [];
     for(const c in allConfigs) {
       const config = allConfigs[c];
       for (let i = 0; i < config.count; i++) {
           configQueue.push(config.name);
-      }            
-    }    
+      }
+    }
     const configMap = new Map<Device, string | undefined>();
     devices.filter(d => d.flashState.state == "doFlash").forEach(d => configMap.set(d, configQueue.shift()));
 
-  
+
     return (
       <div className="flex min-w-[250px]  max-w-[400px] w-full rounded-md border border-dashed border-slate-200 p-3 dark:border-slate-700">
         {devices.length ? (
           <div className="flex flex-col justify-between w-full overflow-y-auto overflow-x-clip">
             <Subtle>Select all devices to flash:</Subtle>
             <ul role="list" className="grow divide-y divide-gray-200">
-              {devices.map((device, index) => {                
+              {devices.map((device, index) => {
                 const state = deviceSelectedToFlash[index];
                 return (<DeviceSetupEntry
                   device={device}
-                  configName={configMap.get(device)}                  
-                  toggleSelectedToFlash={() => {                  
+                  configName={configMap.get(device)}
+                  toggleSelectedToFlash={() => {
                     if(overallFlashingState.state == "busy")
-                      return;  
+                      return;
                     const newState: FlashState = state.state == 'doFlash' ? {progress: 0, state: 'doNotFlash'} : {progress: 1, state: 'doFlash'};
                     deviceSelectedToFlash[index] = newState;
                     device.setFlashState(newState);
@@ -77,10 +77,10 @@ export const DeviceList = ({rootConfig, deviceSelectedToFlash, setDeviceSelected
       </div>
     )
   };
-  
+
 const DeviceSetupEntry = ({device, configName, toggleSelectedToFlash, progressText}
-  :{device: Device, configName?: string, toggleSelectedToFlash: () => void, progressText: FlashState}) => {    
-    
+  :{device: Device, configName?: string, toggleSelectedToFlash: () => void, progressText: FlashState}) => {
+
   const selectedToFlash = progressText.state == "doFlash";
   const buttonCaption = selectedToFlash ? configName ?? "Unassigned" : deviceStateToText(progressText);
   const buttonStyle = deviceStateToStyle(progressText, configName !== undefined);
@@ -94,10 +94,10 @@ const DeviceSetupEntry = ({device, configName, toggleSelectedToFlash, progressTe
               {device.nodes.get(device.hardware.myNodeNum)?.user
                 ?.longName ?? "<Not flashed yet>"}
             </p>
-            
-          </div>          
+
+          </div>
           <div className="flex gap-2 items-center text-sm text-gray-500">
-                             
+
               <Button
                 variant={selectedToFlash && !progressText ? "default" : "outline"}
                 size="sm"
@@ -108,14 +108,14 @@ const DeviceSetupEntry = ({device, configName, toggleSelectedToFlash, progressTe
                 {buttonCaption}
               </Button>
             </div>
-        </div>        
+        </div>
       </div>
     </li>
   );
 }
-  
-  
-  
+
+
+
   function deviceStateToText(state: FlashState) {
     switch(state.state) {
       case "doNotFlash":
@@ -135,13 +135,13 @@ const DeviceSetupEntry = ({device, configName, toggleSelectedToFlash, progressTe
       case "aborted":
         return "Cancelled";
       case "failed":
-        return "Failed";        
+        return "Failed";
       default:
         return state.state;
     }
   }
-  
-  function deviceStateToStyle(state: FlashState, configAssigned: boolean): React.CSSProperties {      
+
+  function deviceStateToStyle(state: FlashState, configAssigned: boolean): React.CSSProperties {
     switch(state.state) {
       case "failed":
         return {
@@ -158,20 +158,19 @@ const DeviceSetupEntry = ({device, configName, toggleSelectedToFlash, progressTe
           color: "gray",
           borderColor: "gray"
         };
-      case "doFlash":  
+      case "doFlash":
         if(!configAssigned) {
           return {
             color: "var(--textPrimary)",
             borderColor: "gray",
             background: `dimgray`
-          };  
+          };
         }
       default:
         return {
           color: "var(--textPrimary)",
           borderColor: "var(--accentMuted)",
           background: `linear-gradient(90deg, var(--accentMuted) ${state.progress * 100}%, transparent ${state.progress * 100}%)`
-        };          
+        };
     }
   }
-  

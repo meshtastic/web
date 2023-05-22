@@ -19,9 +19,9 @@ import type { FlashState } from '@app/core/flashing/Flasher';
 
 export const Dashboard = () => {
   let { configPresetRoot, configPresetSelected, overallFlashingState } = useAppStore();
-  const getTotalConfigCount = (c: ConfigPreset): number => c.children.map(child => getTotalConfigCount(child)).reduce((prev, cur) => prev + cur, c.count);  
-  const [ totalConfigCount, setTotalConfigCount ] = useState(configPresetRoot.getTotalConfigCount()); 
-  const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  useState(new Array<FlashState>(100).fill({progress: 1, state: 'doFlash'}));  
+  const getTotalConfigCount = (c: ConfigPreset): number => c.children.map(child => getTotalConfigCount(child)).reduce((prev, cur) => prev + cur, c.count);
+  const [ totalConfigCount, setTotalConfigCount ] = useState(configPresetRoot.getTotalConfigCount());
+  const [deviceSelectedToFlash, setDeviceSelectedToFlash] =  useState(new Array<FlashState>(100).fill({progress: 1, state: 'doFlash'}));
 
   return (
     <div className="flex flex-col h-full gap-3 p-3">

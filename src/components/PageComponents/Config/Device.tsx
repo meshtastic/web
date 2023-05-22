@@ -10,21 +10,21 @@ import {
 } from '@core/stores/deviceStore.js';
 import { Protobuf } from '@meshtastic/meshtasticjs';
 
-export const Device = (): JSX.Element => {  
-  const config = useConfig();  
+export const Device = (): JSX.Element => {
+  const config = useConfig();
   const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
     getEnabled(name) {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
   const setConfig: (data: DeviceValidation) => void =
     isPresetConfig ? (data) => {
-      config.config.device = new Protobuf.Config_DeviceConfig(data);    
+      config.config.device = new Protobuf.Config_DeviceConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -36,9 +36,9 @@ export const Device = (): JSX.Element => {
           }
         })
       );
-    }  
+    }
 
-  const onSubmit = setConfig;  
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<DeviceValidation>

@@ -30,7 +30,7 @@ export const ConfigSelectButton = ({
     size="sm"
     className="w-full justify-between gap-2 my-[2px]"
   >
-    {editing ? 
+    {editing ?
     <Input
         autoFocus
         onFocus={(event) => event.target.select()}

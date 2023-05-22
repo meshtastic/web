@@ -26,12 +26,12 @@ export const FieldWrapper = ({
           {enableSwitchEnabled !== undefined && (
             <div className="mt-4 space-y-4">
               <Switch
-                defaultChecked={enableSwitchEnabled}                  
+                defaultChecked={enableSwitchEnabled}
                 onCheckedChange={onEnableSwitchChanged}
               />
             </div>
           )}
-        </div>        
+        </div>
         <div className="sm:col-span-2">
           <div className="max-w-lg">
             <p className="text-sm text-gray-500">{description}</p>

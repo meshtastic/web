@@ -11,13 +11,13 @@ export const StoreForward = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const setConfig: (data: StoreForwardValidation) => void =
     isPresetConfig ? (data) => {
-      config.moduleConfig.storeForward = new Protobuf.ModuleConfig_StoreForwardConfig(data);    
+      config.moduleConfig.storeForward = new Protobuf.ModuleConfig_StoreForwardConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -30,7 +30,7 @@ export const StoreForward = (): JSX.Element => {
         })
       );
     }
-  
+
   const onSubmit = setConfig;
   return (
     <DynamicForm<StoreForwardValidation>

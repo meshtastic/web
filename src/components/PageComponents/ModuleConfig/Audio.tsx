@@ -11,13 +11,13 @@ export const Audio = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const setConfig: (data: AudioValidation) => void =
     isPresetConfig ? (data) => {
-      config.moduleConfig.audio = new Protobuf.ModuleConfig_AudioConfig(data);    
+      config.moduleConfig.audio = new Protobuf.ModuleConfig_AudioConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -30,7 +30,7 @@ export const Audio = (): JSX.Element => {
         })
       );
     }
-  
+
   const onSubmit = setConfig;
 
   return (

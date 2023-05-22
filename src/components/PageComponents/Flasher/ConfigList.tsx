@@ -10,7 +10,7 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
     const { toast } = useToast();
     if(configPresetSelected === undefined) {
         setConfigPresetSelected(configPresetRoot);
-        return (<div/>);    
+        return (<div/>);
     }
     const disabled = overallFlashingState.state == "busy";
 
@@ -18,12 +18,12 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
         <div className="flex flex-col min-w-[250px] w-full rounded-md border border-dashed border-slate-200 py-3 px-2 dark:border-slate-700">
         <div className="flex justify-between">
             <div className="flex gap-2">
-            <button        
+            <button
                 className="transition-all hover:text-accent mb-4"
-                title="Add new configuration as child"                
-                onClick={() => {         
+                title="Add new configuration as child"
+                onClick={() => {
                     const newPreset = new ConfigPreset("New Preset", configPresetSelected);
-                    configPresetSelected?.children.push(newPreset);       
+                    configPresetSelected?.children.push(newPreset);
                     setConfigPresetRoot(configPresetRoot.shallowClone());
                     setConfigPresetSelected(newPreset);
                     setEditSelected(true);
@@ -33,20 +33,20 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
             >
                 <PlusIcon/>
             </button>
-            <button        
+            <button
                 className="transition-all hover:text-accent mb-4"
                 title="Rename"
-                onClick={() => {                     
+                onClick={() => {
                     setEditSelected(true);
                 }}
                 disabled={disabled}
             >
                 <Edit3Icon/>
             </button>
-            <button        
+            <button
                 className="transition-all hover:text-accent mb-4"
                 title="Delete"
-                onClick={() => {                     
+                onClick={() => {
                     if(configPresetSelected.parent === undefined) {
                         if(!confirm(`Are you sure you want to reset the preset list to default?`))
                         return;
@@ -54,12 +54,12 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
                         setConfigPresetRoot(newDefault);
                         newDefault.saveConfigTree();
                         return;
-                    } 
+                    }
                     if(!confirm(`Are you sure you want to remove "${configPresetSelected.name}" and all its children?`))
                         return;
                     configPresetSelected.parent.children = configPresetSelected.parent.children.filter(c => c != configPresetSelected);
                     setConfigPresetSelected(configPresetSelected.parent);
-                    configPresetSelected.saveConfigTree();            
+                    configPresetSelected.saveConfigTree();
                 }}
                 disabled={disabled}
             >
@@ -67,26 +67,26 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
             </button>
             </div>
             <div className="flex gap-2">
-            <button        
+            <button
                 className="transition-all hover:text-accent mb-4"
                 title="Import"
-                onClick={() => {                     
+                onClick={() => {
                 ConfigPreset.importConfigTree().then(
                     (root) => {
                     if(root) {
                         let newEntry = root;
                         debugger;
-                        if(configPresetSelected.parent) {                            
+                        if(configPresetSelected.parent) {
                             const childIndex = configPresetSelected.parent.children.indexOf(configPresetSelected);
                             configPresetSelected.parent.children[childIndex] = root;
                             root.parent = configPresetSelected.parent;
-                            newEntry = root;                            
+                            newEntry = root;
                             setConfigPresetRoot(configPresetRoot.shallowClone());
-                        }                        
+                        }
                         else {
                             root.overrideValues = undefined;
                             setConfigPresetRoot(root);
-                        }                            
+                        }
                         setConfigPresetSelected(newEntry);
                         root.saveConfigTree();
                         toast({
@@ -101,22 +101,22 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
                 }}
                 disabled={disabled}
             >
-            <UploadIcon/> 
+            <UploadIcon/>
             </button>
-            <button        
+            <button
                 className="transition-all hover:text-accent mb-4"
                 title="Export"
-                onClick={() => {                     
+                onClick={() => {
                     configPresetSelected.exportConfigTree();
                 }}
                 disabled={disabled}
             >
-            <DownloadIcon/> 
+            <DownloadIcon/>
             </button>
             </div>
-            
+
         </div>
-        
+
         <div className='overflow-y-auto'>
         {rootConfig &&
             <ConfigEntry
@@ -124,7 +124,7 @@ export const ConfigList = ({rootConfig, setTotalConfigCountDiff}: {rootConfig: C
                 configPresetSelected={configPresetSelected}
                 setConfigPresetSelected={setConfigPresetSelected}
                 editSelected={editSelected}
-                onConfigCountChanged={(val, diff) => setTotalConfigCountDiff(diff)}            
+                onConfigCountChanged={(val, diff) => setTotalConfigCountDiff(diff)}
                 onEditDone={(val) => {
                     configPresetSelected.name = val;
                     setEditSelected(false);
@@ -146,7 +146,7 @@ const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected, edi
     onConfigCountChanged: (val: number, diff: number) => void,
     disabled: boolean
 }) => {
-    const [configCount, setConfigCount] = useState(config.count);    
+    const [configCount, setConfigCount] = useState(config.count);
     return (
         <div>
         <ConfigSelectButton
@@ -156,7 +156,7 @@ const ConfigEntry = ({config, configPresetSelected, setConfigPresetSelected, edi
             value={configCount}
             editing={editSelected && config == configPresetSelected}
             onClick={() => setConfigPresetSelected(config)}
-            onChangeDone={onEditDone}   
+            onChangeDone={onEditDone}
             disabled={disabled}
         />
         <div className="ml-[20px]">

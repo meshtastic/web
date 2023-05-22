@@ -39,12 +39,12 @@ export async function setup(configs: ConfigPreset[], deviceModelName: string, fi
         const config = configs[c];
         for (let i = 0; i < config.count; i++) {
             configQueue.push({config: config.config, moduleConfig: config.moduleConfig});
-        }            
-    }    
+        }
+    }
 }
 
 export async function nextBatch(devices: Device[], flashStates: FlashState[], deviceCallback: (flashState: FlashOperation) => void) {
-    callback("busy");    
+    callback("busy");
     devices = devices.filter((d, i) => flashStates[i].state == "doFlash");
     flashStates = flashStates.filter(f => f.state == "doFlash");
     if(devices.length > configQueue.length) {
@@ -55,7 +55,7 @@ export async function nextBatch(devices: Device[], flashStates: FlashState[], de
     operations.forEach((o, i) => o.state = flashStates[i]);
     configQueue = configQueue.slice(operations.length)
     console.log(`New config queue count: ${configQueue.length}`);
-    
+
     Promise.allSettled(operations.map(op => op.flashAndConfigDevice())).then(p => handleFlashingDone());
 }
 
@@ -80,7 +80,7 @@ export async function uploadCustomFirmware() {
     if(fileHandle == undefined)
       return undefined;
     try {
-      const file = await fileHandle.getFile();      
+      const file = await fileHandle.getFile();
       const content = await file.arrayBuffer();
       const firmwareDesc: FirmwareVersion = {
         id: "custom_" + file.name,
@@ -93,11 +93,11 @@ export async function uploadCustomFirmware() {
       return firmwareDesc;
     } catch {
       console.error("Insufficient permission to access file.");
-    } 
+    }
     return undefined;
   }
 
-async function getZipFile() {    
+async function getZipFile() {
     if(firmwareToUse.inLocalDb) {
         const storedZip = await loadFromDb(firmwareToUse);
         if(storedZip !== undefined)
@@ -107,10 +107,10 @@ async function getZipFile() {
     const zip = await fetch(`/firmware/${firmwareToUse.id}`);
     const zipClone = zip.clone();
     const contentLength = zip.headers.get("content-length");
-    const totalLength = contentLength ? parseInt(contentLength) : undefined;    
+    const totalLength = contentLength ? parseInt(contentLength) : undefined;
     const reader = zip.body!.getReader();
     let bytesLoaded = 0;
-    
+
     while (true) {
         const { done, value } = await reader.read();
         if (done)
@@ -124,22 +124,22 @@ async function getZipFile() {
     return content;
 }
 
-async function loadFirmware() {    
-    console.log("Loading firmware");    
+async function loadFirmware() {
+    console.log("Loading firmware");
 
     const zip = await getZipFile();
-    zipFile = await JSZip.loadAsync(zip);    
+    zipFile = await JSZip.loadAsync(zip);
 }
 
-async function getSection(name: string): Promise<Uint8Array | undefined> {    
+async function getSection(name: string): Promise<Uint8Array | undefined> {
     if(!(name in dataSections)) {
         const dataSection = await zipFile.file(name)?.async("uint8array");
         if(dataSection === undefined) {
             console.warn(`Firmware file ${name} not found.`);
             return undefined;
-        }            
+        }
         dataSections[name] = dataSection;
-    }            
+    }
     return dataSections[name];
 }
 
@@ -172,14 +172,14 @@ function autoDetectDeviceModel(port: SerialPort) {
 
 
 export class FlashOperation {
-        
+
     public state: FlashState = { progress: 0, state: "idle" };
     public errorReason?: string;
-    private loader?: esptooljs.ESPLoader; 
+    private loader?: esptooljs.ESPLoader;
     private  isCancelled: boolean;
 
     public constructor(public device: Device, public config: Protobuf.LocalConfig, public moduleConfig: Protobuf.LocalModuleConfig, public callback: (operation: FlashOperation) => void) {
-        
+
     }
 
     public setState(state: DeviceFlashingState, progress = 0, errorReason : string | undefined = undefined) {
@@ -197,18 +197,18 @@ export class FlashOperation {
             await this.flash();
             await this.setConfig();
             this.setState("done");
-        }   
+        }
         catch(e) {
-            this.setState("failed", 0, e as string);            
+            this.setState("failed", 0, e as string);
             throw e;
-        }     
-        
+        }
+
     }
 
     private async flash() {
         const installedVersion = this.device.hardware.firmwareVersion;
         console.log(`Installed firmware verson: ${installedVersion}`);
-        const update = !fullFlash && this.device.nodes.get(this.device.hardware.myNodeNum) !== undefined ;    
+        const update = !fullFlash && this.device.nodes.get(this.device.hardware.myNodeNum) !== undefined ;
         if(update && installedVersion == firmwareToUse.tag)
             return;
 
@@ -224,28 +224,28 @@ export class FlashOperation {
 
 
         // -----------
-        
-        try {         
+
+        try {
             const transport = new esptooljs.Transport(port);
-            this.loader = new esptooljs.ESPLoader(transport, 115200);                           
+            this.loader = new esptooljs.ESPLoader(transport, 115200);
             const loader = this.loader;
             this.setState("preparing");
-            await loader.main_fn();       
+            await loader.main_fn();
             if(sections.length > 1) {
-                this.setState("erasing");                
+                this.setState("erasing");
                 await loader.erase_flash();
-            }                   
+            }
             const totalLength = sections.reduce<number>((p, c) => p + c.data.byteLength, 0);
             let bytesFlashed = 0;
             let lastIndex = 0;
 
-            const files = await Promise.all(sections.map(async s => {                
+            const files = await Promise.all(sections.map(async s => {
                 const fileReader = new FileReader();
                 const blob = new Blob([s.data]);
                 const content = await new Promise<string>((resolve, reject) => {
                     fileReader.onloadend = e => resolve(fileReader.result as string);
                     fileReader.onerror = e => reject(fileReader.result as string);
-                    fileReader.readAsBinaryString(blob); 
+                    fileReader.readAsBinaryString(blob);
                 });
                 return { data: content, address: s.offset };
             }));
@@ -261,30 +261,30 @@ export class FlashOperation {
                 const bytesThisSegment = (written / total) * sections[index].data.byteLength;
                 console.log(`FLASHING PROGRESS ${bytesFlashed + written} / ${totalLength} ... ${bytesFlashed} | ${written} | ${total} | ${index}`);
                 this.setState("flashing", (bytesFlashed + bytesThisSegment) /  totalLength);
-            });                            
+            });
         }
-        catch (e) {                                    
-            throw e;            
+        catch (e) {
+            throw e;
         }
-        finally {        
+        finally {
             await this.loader?.flash_finish();
         }
 
         this.setState("config");
         await port!.setSignals({requestToSend: true});
-        await new Promise(r => setTimeout(r, 100));   
-        await port!.setSignals({requestToSend: false});    
+        await new Promise(r => setTimeout(r, 100));
+        await port!.setSignals({requestToSend: false});
         await port!.close();
         const connection = (this.device.connection! as ISerialConnection);
         //@ts-ignore
         connection.preventLock = false;
         debugger;
-        await connection.connect({ 
+        await connection.connect({
             port,
             baudRate: undefined,
             concurrentLogOutput: true
         });
-        await new Promise(r => setTimeout(r, 5000));   
+        await new Promise(r => setTimeout(r, 5000));
     }
 
     private async setConfig() {
@@ -292,14 +292,14 @@ export class FlashOperation {
                 return;
             this.setState("config");
             const connection = (this.device.connection! as ISerialConnection);
-            
+
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "device", value: this.config.device! } }));
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "position", value: this.config.position! } }));
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "power", value: this.config.power! } }));
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "network", value: this.config.network! } }));
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "display", value: this.config.display! } }));
             await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "lora", value: this.config.lora! } }));
-            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "bluetooth", value: this.config.bluetooth! } }));                        
+            await connection.setConfig(new Protobuf.Config({ payloadVariant: { case: "bluetooth", value: this.config.bluetooth! } }));
 
             await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "mqtt", value: this.moduleConfig.mqtt! } }));
             await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "serial", value: this.moduleConfig.serial! } }));
@@ -308,7 +308,7 @@ export class FlashOperation {
             await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "telemetry", value: this.moduleConfig.telemetry! } })),
             await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "cannedMessage", value: this.moduleConfig.cannedMessage! } })),
             await connection.setModuleConfig(new Protobuf.ModuleConfig({ payloadVariant: { case: "audio", value: this.moduleConfig.audio! } }));
-        
+
                     // We won't get an answer if serial output has been disabled in the new config
             if(!this.config.device!.serialEnabled)
                 return;

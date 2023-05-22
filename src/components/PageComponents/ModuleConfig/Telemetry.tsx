@@ -11,13 +11,13 @@ export const Telemetry = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const setConfig: (data: TelemetryValidation) => void =
     isPresetConfig ? (data) => {
-      config.moduleConfig.telemetry = new Protobuf.ModuleConfig_TelemetryConfig(data);    
+      config.moduleConfig.telemetry = new Protobuf.ModuleConfig_TelemetryConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -30,7 +30,7 @@ export const Telemetry = (): JSX.Element => {
         })
       );
     }
-  
+
   const onSubmit = setConfig;
 
   return (

@@ -17,14 +17,14 @@ export const LoRa = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
   const setConfig: (data: LoRaValidation) => void =
     isPresetConfig ? (data) => {
-      config.config.lora = new Protobuf.Config_LoRaConfig(data);    
+      config.config.lora = new Protobuf.Config_LoRaConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -36,9 +36,9 @@ export const LoRa = (): JSX.Element => {
           }
         })
       );
-    }  
+    }
 
-  const onSubmit = setConfig;  
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<LoRaValidation>

@@ -17,14 +17,14 @@ export const Power = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
   const setConfig: (data: PowerValidation) => void =
     isPresetConfig ? (data) => {
-      config.config.power = new Protobuf.Config_PowerConfig(data);    
+      config.config.power = new Protobuf.Config_PowerConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -36,9 +36,9 @@ export const Power = (): JSX.Element => {
           }
         })
       );
-    }  
+    }
 
-  const onSubmit = setConfig;  
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<PowerValidation>

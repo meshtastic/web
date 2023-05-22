@@ -11,13 +11,13 @@ export const Serial = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const setConfig: (data: SerialValidation) => void =
     isPresetConfig ? (data) => {
-      config.moduleConfig.serial = new Protobuf.ModuleConfig_SerialConfig(data);    
+      config.moduleConfig.serial = new Protobuf.ModuleConfig_SerialConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -30,7 +30,7 @@ export const Serial = (): JSX.Element => {
         })
       );
     }
-  
+
   const onSubmit = setConfig;
 
   return (

@@ -18,7 +18,7 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
   const { toast } = useToast();
   const { getDevices } =  useDeviceStore();
   const devices = getDevices();
-  const cancelButtonVisible = overallFlashingState.state != "idle";  
+  const cancelButtonVisible = overallFlashingState.state != "idle";
 
   return (<div className="flex flex-col gap-1 rounded-md border border-dashed w-full border-slate-200 p-1 dark:border-slate-700">
     <div className="flex gap-3 w-full">
@@ -27,7 +27,7 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
         <Switch disabled={overallFlashingState.state == "busy"} checked={fullFlash} onCheckedChange={setFullFlash}/>
         <Label>Force full wipe and reinstall</Label>
       </div>
-    </div>            
+    </div>
     <div className="flex gap-3">
       <FirmwareSelection/>
       <div className="flex w-full">
@@ -36,8 +36,8 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
           disabled={totalConfigCount == 0 || overallFlashingState.state == "busy"}
           onClick={async () => {
             if(overallFlashingState.state == "idle") {
-              setOverallFlashingState({ state: "busy" });              
-              let actualFirmware = firmware;                      
+              setOverallFlashingState({ state: "busy" });
+              let actualFirmware = firmware;
               if(actualFirmware === undefined) {
                 const list = await loadFirmwareList();
                 setFirmwareList(list.slice(0, 10));
@@ -54,12 +54,12 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
                       tag: f.tag,
                       id: f.id,
                       isPreRelease: f.isPreRelease,
-                      inLocalDb: f == actualFirmware ? b : f.inLocalDb 
+                      inLocalDb: f == actualFirmware ? b : f.inLocalDb
                     }});
                     setFirmwareList(newFirmwareList);
                   });
                 }
-                  
+
                 setOverallFlashingState({state, progress});
               });
             }
@@ -68,15 +68,15 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
               (f)=> {
                 f.device.setFlashState(f.state);
                 deviceSelectedToFlash[devices.indexOf(f.device)] = f.state;
-                setDeviceSelectedToFlash(deviceSelectedToFlash);           
+                setDeviceSelectedToFlash(deviceSelectedToFlash);
 
-                if(f.state.state == "failed") {                              
-                  toast({ title: `❌ Error: ${f.errorReason}`});                          
+                if(f.state.state == "failed") {
+                  toast({ title: `❌ Error: ${f.errorReason}`});
                 }
               }
             );
           }}
-        >            
+        >
           {stateToText(overallFlashingState.state, overallFlashingState.progress)}
         </Button>}
       </div>
@@ -96,7 +96,7 @@ export const FlashSettings = ({deviceSelectedToFlash, setDeviceSelectedToFlash, 
   )
 };
 
-const FirmwareSelection = () => {  
+const FirmwareSelection = () => {
   const { firmwareRefreshing, setFirmwareRefreshing, firmwareList, setFirmwareList, selectedFirmware, setSelectedFirmware, overallFlashingState } = useAppStore();
   const isBusy = firmwareRefreshing || overallFlashingState.state == "busy";
   const { toast } = useToast();
@@ -107,7 +107,7 @@ const FirmwareSelection = () => {
     </SelectItem>,
     <SelectSeparator/>
   ];
-  let selection = selectedFirmware;  
+  let selection = selectedFirmware;
   if(firmwareRefreshing) {
     selectItems = [
       <SelectItem key={0} value={"updating"}>
@@ -124,7 +124,7 @@ const FirmwareSelection = () => {
     );
   }
   else {
-    const versions = firmwareList.map((f, index) => (      
+    const versions = firmwareList.map((f, index) => (
       <SelectItem key={index} value={f.id}>
         {f.isPreRelease ?
         (<div className="flex gap-2 items-center">{`(${f.name})`} {f.inLocalDb ? [<ArrowDownCircleIcon size={20}/>] : []}</div>) :
@@ -133,7 +133,7 @@ const FirmwareSelection = () => {
       </SelectItem>
     ))
     selectItems.push(...versions);
-  }  
+  }
   selectItems.push(
     <SelectItem  key={100} value={"custom"}>
       {"< Load custom firmware >"}
@@ -142,22 +142,22 @@ const FirmwareSelection = () => {
 
   return (
     <div className="flex gap-1 w-full">
-      <Select   
-        disabled={isBusy}        
+      <Select
+        disabled={isBusy}
         onValueChange={async (v) => {
-          if(v == "custom") {            
+          if(v == "custom") {
             const desc = await uploadCustomFirmware();
             if(desc === undefined)
               return;
             if(!firmwareList.find(f => f.id == desc.id)) {
               const newFirmwareList: FirmwareVersion[] = firmwareList.map(f => f).concat([ desc ]);
               setFirmwareList(newFirmwareList);
-            }            
+            }
             setSelectedFirmware(desc.id);
           }
           else {
             setSelectedFirmware(v);
-          }          
+          }
         }}
         value={selection}                // << Value of selected item
       >
@@ -175,7 +175,7 @@ const FirmwareSelection = () => {
         disabled={isBusy}
         onClick={() => {
           setFirmwareRefreshing(true);
-          loadFirmwareList().then((list) => { 
+          loadFirmwareList().then((list) => {
             setFirmwareList(list.slice(0, 10));
             setFirmwareRefreshing(false);
           }).catch(() => toast({
@@ -186,7 +186,7 @@ const FirmwareSelection = () => {
         <RefreshCwIcon size={20}/>
       </Button>
     </div>
-    
+
   );
 }
 
@@ -200,7 +200,7 @@ export type FirmwareVersion = {
 
 interface FirmwareGithubRelease {
   name: string,
-  tag_name: string,  
+  tag_name: string,
   prerelease: boolean,
   assets: {
     name: string,
@@ -273,9 +273,9 @@ export const deviceModels: DeviceModel[] = [
   },
 ]
 
-const DeviceModelSelection = () => {  
+const DeviceModelSelection = () => {
   const { selectedDeviceModel, setSelectedDeviceModel, overallFlashingState } = useAppStore();
-  
+
   let selectItems = [
     <SelectItem key={"auto"} value={"auto"}>
       {"Auto-detect device model"}
@@ -291,8 +291,8 @@ const DeviceModelSelection = () => {
 
   return (
     <div className="flex gap-1 w-full">
-      <Select        
-        onValueChange={setSelectedDeviceModel}            
+      <Select
+        onValueChange={setSelectedDeviceModel}
         value={selectedDeviceModel}
         disabled={overallFlashingState.state == "busy"}
       >
@@ -304,7 +304,7 @@ const DeviceModelSelection = () => {
         </SelectContent>
       </Select>
     </div>
-    
+
   );
 }
 
@@ -315,7 +315,7 @@ function stateToText(state: OverallFlashingState, progress?: number) {
     case "downloading":
       return progress ? `Downloading firmware... (${(progress * 100).toFixed(1)} %)` : "Downloading firmware...";
     case "busy":
-      return "In Progress...";    
+      return "In Progress...";
     case "waiting":
       return "Continue";
     default:
@@ -330,15 +330,15 @@ async function loadFirmwareList() : Promise<FirmwareVersion[]> {
     const id = r.assets.find(a => a.name.startsWith("firmware"))!.id;
     if(id === undefined)
       return undefined;
-    const tag = r.tag_name.substring(1);      // remove leading "v"    
-    return { 
+    const tag = r.tag_name.substring(1);      // remove leading "v"
+    return {
       name: r.name.replace("Meshtastic Firmware ", ""),
       tag: tag,
       id: id,
       isPreRelease: r.prerelease,
       inLocalDb: await isStoredInDb(tag)
     };
-  }));  
+  }));
   return firmwareDescriptions.filter(r => r !== undefined) as FirmwareVersion[];
 
 }

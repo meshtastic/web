@@ -16,7 +16,7 @@ import {
 import { DeviceConfig } from "./DeviceConfig";
 import { ModuleConfig } from "./ModuleConfig";
 
-export const ConfigTabs = (): JSX.Element => {    
+export const ConfigTabs = (): JSX.Element => {
     const tabs = [
       {
         label: "Device",
@@ -28,7 +28,7 @@ export const ConfigTabs = (): JSX.Element => {
         element: ModuleConfig
       }
     ];
-  
+
     return (
       <Tabs defaultValue="Device">
         <TabsList>
@@ -49,4 +49,3 @@ export const ConfigTabs = (): JSX.Element => {
       </Tabs>
     );
   };
-  

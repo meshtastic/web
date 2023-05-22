@@ -17,14 +17,14 @@ export const Position = (): JSX.Element => {
       return config.overrideValues![name] ?? false;
     },
     setEnabled(name, value) {
-      config.overrideValues![name] = value;      
+      config.overrideValues![name] = value;
     },
   } : undefined;
   const isPresetConfig = !("id" in config);
   const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
   const setConfig: (data: PositionValidation) => void =
     isPresetConfig ? (data) => {
-      config.config.position = new Protobuf.Config_PositionConfig(data);    
+      config.config.position = new Protobuf.Config_PositionConfig(data);
       (config as ConfigPreset).saveConfigTree();
     }
     : (data) => {
@@ -36,9 +36,9 @@ export const Position = (): JSX.Element => {
           }
         })
       );
-    }  
+    }
 
-  const onSubmit = setConfig;  
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<PositionValidation>

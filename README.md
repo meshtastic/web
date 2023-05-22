@@ -6,7 +6,7 @@
         pnpm install
 
 3. Start the server by running
-        
+
         pnpm dev
 
 4. The website can then be found at http://localhost:5173/
