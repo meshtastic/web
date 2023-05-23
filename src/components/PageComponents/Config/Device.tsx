@@ -108,6 +108,12 @@ export const Device = (): JSX.Element => {
               label: "Double Tap as Button Press",
               description:
                 "Require a double tap of the button to send a button press"
+            },
+            {
+              type: "toggle",
+              name: "isManaged",
+              label: "Managed",
+              description: "Is this device managed by an external application"
             }
           ]
         }

@@ -23,4 +23,10 @@ export class MQTTValidation
 
   @IsBoolean()
   jsonEnabled: boolean;
+
+  @IsBoolean()
+  tlsEnabled: boolean;
+
+  @Length(0, 30)
+  root: string;
 }

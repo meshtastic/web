@@ -91,6 +91,18 @@ export const MQTT = (): JSX.Element => {
                   fieldName: "enabled"
                 }
               ]
+            },
+            {
+              type: "toggle",
+              name: "tlsEnabled",
+              label: "TLS Enabled",
+              description: "Enable or disable TLS",
+            },
+            {
+              type: "text",
+              name: "root",
+              label: "Root",
+              description: "Root topic to publish/subscribe to",
             }
           ]
         }

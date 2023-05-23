@@ -28,4 +28,7 @@ export class DeviceValidation
 
   @IsBoolean()
   doubleTapAsButtonPress: boolean;
+
+  @IsBoolean()
+  isManaged: boolean;
 }
