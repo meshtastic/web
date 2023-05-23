@@ -20,4 +20,10 @@ export class TelemetryValidation
 
   @IsBoolean()
   environmentDisplayFahrenheit: boolean;
+
+  @IsBoolean()
+  airQualityEnabled: boolean;
+
+  @IsInt()
+  airQualityInterval: number;
 }

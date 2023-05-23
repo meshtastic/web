@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsNumber } from "class-validator";
+import { IsBoolean, IsIn, IsInt, IsNumber } from "class-validator";
 
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -32,4 +32,10 @@ export class PositionValidation
 
   @IsInt()
   txGpio: number;
+
+  @IsInt()
+  broadcastSmartMinimumDistance: number;
+
+  @IsInt()
+  broadcastSmartMinimumIntervalSecs: number;
 }

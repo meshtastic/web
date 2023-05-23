@@ -1,42 +1,40 @@
-import type { ConfigPreset } from '@app/core/stores/appStore';
-import type { DisplayValidation } from '@app/validation/config/display.js';
-import {
-  DynamicForm,
-  EnableSwitchData,
-} from '@components/Form/DynamicForm.js';
-import {
-  useConfig,
-  useDevice,
-} from '@core/stores/deviceStore.js';
-import { Protobuf } from '@meshtastic/meshtasticjs';
+import type { ConfigPreset } from "@app/core/stores/appStore";
+import type { DisplayValidation } from "@app/validation/config/display.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const Display = (): JSX.Element => {
   const config = useConfig();
-  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
-    getEnabled(name) {
-      return config.overrideValues![name] ?? false;
-    },
-    setEnabled(name, value) {
-      config.overrideValues![name] = value;
-    },
-  } : undefined;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
+        }
+      }
+    : undefined;
   const isPresetConfig = !("id" in config);
-  const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
-  const setConfig: (data: DisplayValidation) => void =
-    isPresetConfig ? (data) => {
-      config.config.display = new Protobuf.Config_DisplayConfig(data);
-      (config as ConfigPreset).saveConfigTree();
-    }
+  const { setWorkingConfig } = !isPresetConfig
+    ? useDevice()
+    : { setWorkingConfig: undefined };
+  const setConfig: (data: DisplayValidation) => void = isPresetConfig
+    ? (data) => {
+        config.config.display = new Protobuf.Config_DisplayConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
     : (data) => {
-      setWorkingConfig!(
-        new Protobuf.Config({
-          payloadVariant: {
-            case: "display",
-            value: data
-          }
-        })
-      );
-    }
+        setWorkingConfig!(
+          new Protobuf.Config({
+            payloadVariant: {
+              case: "display",
+              value: data
+            }
+          })
+        );
+      };
 
   const onSubmit = setConfig;
 
@@ -120,6 +118,12 @@ export const Display = (): JSX.Element => {
               name: "headingBold",
               label: "Bold Heading",
               description: "Bolden the heading text"
+            },
+            {
+              type: "toggle",
+              name: "wakeOnTapOrMotion",
+              label: "Wake on Tap or Motion",
+              description: "Wake the device on tap or motion"
             }
           ]
         }

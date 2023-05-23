@@ -6,30 +6,33 @@ import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const Telemetry = (): JSX.Element => {
   const config = useConfig();
-  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
-    getEnabled(name) {
-      return config.overrideValues![name] ?? false;
-    },
-    setEnabled(name, value) {
-      config.overrideValues![name] = value;
-    },
-  } : undefined;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
+        }
+      }
+    : undefined;
   const isPresetConfig = !("id" in config);
-  const setConfig: (data: TelemetryValidation) => void =
-    isPresetConfig ? (data) => {
-      config.moduleConfig.telemetry = new Protobuf.ModuleConfig_TelemetryConfig(data);
-      (config as ConfigPreset).saveConfigTree();
-    }
+  const setConfig: (data: TelemetryValidation) => void = isPresetConfig
+    ? (data) => {
+        config.moduleConfig.telemetry =
+          new Protobuf.ModuleConfig_TelemetryConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
     : (data) => {
-      useDevice().setWorkingModuleConfig(
-        new Protobuf.ModuleConfig({
-          payloadVariant: {
-            case: "telemetry",
-            value: data
-          }
-        })
-      );
-    }
+        useDevice().setWorkingModuleConfig(
+          new Protobuf.ModuleConfig({
+            payloadVariant: {
+              case: "telemetry",
+              value: data
+            }
+          })
+        );
+      };
 
   const onSubmit = setConfig;
 
@@ -78,6 +81,18 @@ export const Telemetry = (): JSX.Element => {
               name: "environmentDisplayFahrenheit",
               label: "Display Fahrenheit",
               description: "Display temp in Fahrenheit"
+            },
+            {
+              type: "toggle",
+              name: "airQualityEnabled",
+              label: "Air Quality Enabled",
+              description: "Enable Air Quality Telemetry"
+            },
+            {
+              type: "number",
+              name: "airQualityInterval",
+              label: "Air Quality Interval",
+              description: "How often to send Air Quality Metrics"
             }
           ]
         }
