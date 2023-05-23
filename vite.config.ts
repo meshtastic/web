@@ -1,10 +1,10 @@
-import { execSync } from 'child_process';
-import { resolve } from 'path';
-import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig } from 'vite';
-import EnvironmentPlugin from 'vite-plugin-environment';
+import { execSync } from "child_process";
+import { resolve } from "path";
+import { visualizer } from "rollup-plugin-visualizer";
+import { defineConfig } from "vite";
+import EnvironmentPlugin from "vite-plugin-environment";
 
-import react from '@vitejs/plugin-react';
+import react from "@vitejs/plugin-react";
 
 let hash = "";
 
@@ -48,14 +48,15 @@ export default defineConfig({
       // Firmware must be downloaded through this server as a proxy.
       // It can't be downloaded directly because of GitHub's CORS policy.
       "^/firmware/.*": {
-        target: "https://api.github.com/repos/meshtastic/firmware/releases/assets/",
+        target:
+          "https://api.github.com/repos/meshtastic/firmware/releases/assets/",
         changeOrigin: true,
         followRedirects: true,
-        rewrite: (path) => path.replace(/^\/firmware/, ''),
+        rewrite: (path) => path.replace(/^\/firmware/, ""),
         headers: {
-          "Accept": "application/octet-stream"
+          Accept: "application/octet-stream"
         }
       }
-    },
+    }
   }
 });

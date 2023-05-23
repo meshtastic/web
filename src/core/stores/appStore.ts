@@ -1,10 +1,10 @@
-import { produce } from 'immer';
-import { create } from 'zustand';
+import { produce } from "immer";
+import { create } from "zustand";
 
-import { Protobuf } from '@meshtastic/meshtasticjs';
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
-import type { OverallFlashingState } from '../flashing/Flasher';
-import type { FirmwareVersion } from '@app/components/PageComponents/Flasher/FlashSettings';
+import type { OverallFlashingState } from "../flashing/Flasher";
+import type { FirmwareVersion } from "@app/components/PageComponents/Flasher/FlashSettings";
 
 export interface RasterSource {
   enabled: boolean;
@@ -23,27 +23,29 @@ export type accentColor =
   | "pink";
 
 export class ConfigPreset {
-
   public children: ConfigPreset[] = [];
   public count: number = 0;
-  public overrideValues: {[fieldName: string]: boolean} | undefined;
+  public overrideValues: { [fieldName: string]: boolean } | undefined;
 
-  public constructor(public name: string, public parent?: ConfigPreset, public config = ConfigPreset.createDefaultConfig(), public moduleConfig = ConfigPreset.createDefaultModuleConfig()) {
-    if(parent) {
+  public constructor(
+    public name: string,
+    public parent?: ConfigPreset,
+    public config = ConfigPreset.createDefaultConfig(),
+    public moduleConfig = ConfigPreset.createDefaultModuleConfig()
+  ) {
+    if (parent) {
       // Root config should not be overridable
       this.overrideValues = {};
     }
   }
 
   public saveConfigTree() {
-    if(this.parent)
-      this.parent.saveConfigTree();
-    else
-      localStorage.setItem("PresetConfigs", this.getConfigJSON());
+    if (this.parent) this.parent.saveConfigTree();
+    else localStorage.setItem("PresetConfigs", this.getConfigJSON());
   }
 
   public exportConfigTree() {
-    const blob = new Blob([this.getConfigJSON()], {type: "application/json"});
+    const blob = new Blob([this.getConfigJSON()], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const elem = document.createElement("a");
     elem.setAttribute("href", url);
@@ -55,23 +57,22 @@ export class ConfigPreset {
   }
 
   public getTotalConfigCount(): number {
-    return this.children.map(child => child.getTotalConfigCount()).reduce((prev, cur) => prev + cur, this.count);
+    return this.children
+      .map((child) => child.getTotalConfigCount())
+      .reduce((prev, cur) => prev + cur, this.count);
   }
 
   public getAll(): ConfigPreset[] {
-    const configs: ConfigPreset[] = [ this ];
-    this.children.forEach(c =>
-      configs.push(...c.getAll())
-    );
+    const configs: ConfigPreset[] = [this];
+    this.children.forEach((c) => configs.push(...c.getAll()));
     return configs;
   }
 
   private getConfigJSON(): string {
     const replacer = (key: string, value: any) => {
-      if(key == "parent" || key == "count")
-        return undefined;
+      if (key == "parent" || key == "count") return undefined;
       return value;
-    }
+    };
     return JSON.stringify(this, replacer);
   }
 
@@ -83,17 +84,22 @@ export class ConfigPreset {
     config.network = new Protobuf.Config_NetworkConfig();
     config.display = new Protobuf.Config_DisplayConfig();
     Object.entries(config).forEach(([sectionKey, value]) => {
-      if(sectionKey == "version")
-        return;
-      Object.keys(value).forEach(key => {
-        (value as any)[key] = this.getConfigValue(sectionKey as keyof Protobuf.LocalConfig, key);
-      })
+      if (sectionKey == "version") return;
+      Object.keys(value).forEach((key) => {
+        (value as any)[key] = this.getConfigValue(
+          sectionKey as keyof Protobuf.LocalConfig,
+          key
+        );
+      });
     });
     return config;
   }
 
-  private getConfigValue(sectionKey: keyof Protobuf.LocalConfig, key: string): any {
-    if(this.parent !== undefined && !this.overrideValues![key])
+  private getConfigValue(
+    sectionKey: keyof Protobuf.LocalConfig,
+    key: string
+  ): any {
+    if (this.parent !== undefined && !this.overrideValues![key])
       return this.parent.getConfigValue(sectionKey, key);
     const conf = this.config[sectionKey];
 
@@ -103,40 +109,40 @@ export class ConfigPreset {
   public static tryFromJson(json: string): ConfigPreset | undefined {
     debugger;
     try {
-      const rootPreset = JSON.parse(json, (key: string, value:  any) => {
-        if(key == '' || !isNaN(Number(key))) {
+      const rootPreset = JSON.parse(json, (key: string, value: any) => {
+        if (key == "" || !isNaN(Number(key))) {
           // Create new ConfigPreset object to ensure that the member functions are not undefined.
-          const preset = new ConfigPreset(value.name, undefined, value.config, value.moduleConfig);
+          const preset = new ConfigPreset(
+            value.name,
+            undefined,
+            value.config,
+            value.moduleConfig
+          );
           preset.overrideValues = value.overrideValues;
           preset.children = value.children;
-          preset.children.forEach(c => {
+          preset.children.forEach((c) => {
             c.parent = preset;
-            if(c.overrideValues === undefined)
-              c.overrideValues = {};
+            if (c.overrideValues === undefined) c.overrideValues = {};
           });
           return preset;
-        }
-        else if(key == "config") {
+        } else if (key == "config") {
           return Protobuf.LocalConfig.fromJson(value);
-        }
-        else if(key == "moduleConfig") {
+        } else if (key == "moduleConfig") {
           return Protobuf.LocalModuleConfig.fromJson(value);
         }
         return value;
       });
       return rootPreset;
-    }
-    catch {
+    } catch {
       return undefined;
     }
   }
 
   public static loadOrCreate(): ConfigPreset {
     const storedConfigs = localStorage.getItem("PresetConfigs");
-    if(storedConfigs !== null) {
+    if (storedConfigs !== null) {
       const rootPreset = this.tryFromJson(storedConfigs);
-      if(rootPreset !== undefined)
-        return rootPreset;
+      if (rootPreset !== undefined) return rootPreset;
     }
     return new ConfigPreset("Default");
   }
@@ -144,17 +150,20 @@ export class ConfigPreset {
   public static async importConfigTree() {
     //@ts-ignore
     const promise: Promise<FileSystemFileHandle[]> = window.showOpenFilePicker({
-      types: [ { description: "JSON file", accept: { "application/json": [".json"] } }]
+      types: [
+        { description: "JSON file", accept: { "application/json": [".json"] } }
+      ]
     });
-    const fileHandle: FileSystemFileHandle | undefined = await promise.then(f => f[0], () => undefined);
+    const fileHandle: FileSystemFileHandle | undefined = await promise.then(
+      (f) => f[0],
+      () => undefined
+    );
     const file = await fileHandle?.getFile();
     const content = await file?.arrayBuffer();
-    if(content === undefined)
-      return undefined;
+    if (content === undefined) return undefined;
     const json = new TextDecoder().decode(content);
     const newRoot = this.tryFromJson(json);
-    if(newRoot === undefined)
-      throw "";
+    if (newRoot === undefined) throw "";
     return newRoot;
   }
 
@@ -202,7 +211,7 @@ export class ConfigPreset {
       bluetooth: new Protobuf.Config_BluetoothConfig({
         enabled: true,
         fixedPin: 123456
-      }),
+      })
     });
   }
 
@@ -211,43 +220,54 @@ export class ConfigPreset {
       mqtt: new Protobuf.ModuleConfig_MQTTConfig({
         address: "mqtt.meshtastic.org",
         username: "meshdev",
-        password: "large4cats",
+        password: "large4cats"
       }),
-      serial: new Protobuf.ModuleConfig_SerialConfig({ }),
-      externalNotification: new Protobuf.ModuleConfig_ExternalNotificationConfig({ }),
-      storeForward: new Protobuf.ModuleConfig_StoreForwardConfig({ }),
-      rangeTest: new Protobuf.ModuleConfig_RangeTestConfig({ }),
+      serial: new Protobuf.ModuleConfig_SerialConfig({}),
+      externalNotification:
+        new Protobuf.ModuleConfig_ExternalNotificationConfig({}),
+      storeForward: new Protobuf.ModuleConfig_StoreForwardConfig({}),
+      rangeTest: new Protobuf.ModuleConfig_RangeTestConfig({}),
       telemetry: new Protobuf.ModuleConfig_TelemetryConfig({
         deviceUpdateInterval: 900,
         environmentUpdateInterval: 900
       }),
-      cannedMessage: new Protobuf.ModuleConfig_CannedMessageConfig({ }),
-      audio: new Protobuf.ModuleConfig_AudioConfig({ })
+      cannedMessage: new Protobuf.ModuleConfig_CannedMessageConfig({}),
+      audio: new Protobuf.ModuleConfig_AudioConfig({})
     });
   }
 
   public shallowClone() {
-    const clone = new ConfigPreset(this.name, this.parent, this.config, this.moduleConfig);
+    const clone = new ConfigPreset(
+      this.name,
+      this.parent,
+      this.config,
+      this.moduleConfig
+    );
     clone.children = this.children;
     clone.count = this.count;
-    clone.overrideValues =  this.overrideValues;
+    clone.overrideValues = this.overrideValues;
     return clone;
   }
-
 }
 
 function loadFirmwareListFromStorage(): FirmwareVersion[] {
-  const list = localStorage.getItem("firmwareList") as (string | undefined);
-  if(list === undefined)
-    return [];
+  const list = localStorage.getItem("firmwareList") as string | undefined;
+  if (list === undefined) return [];
   try {
     const json = JSON.parse(list) as FirmwareVersion[];
-    if(json.every(o => "name" in o && "inLocalDb" in o && "id" in o && "tag" in o && "isPreRelease" in o))
+    if (
+      json.every(
+        (o) =>
+          "name" in o &&
+          "inLocalDb" in o &&
+          "id" in o &&
+          "tag" in o &&
+          "isPreRelease" in o
+      )
+    )
       return json;
-    else
-      return [];
-  }
-  catch {
+    else return [];
+  } catch {
     return [];
   }
 }
@@ -266,9 +286,9 @@ interface AppState {
   configPresetRoot: ConfigPreset;
   configPresetSelected: ConfigPreset | undefined;
   overallFlashingState: {
-    state: OverallFlashingState,
-    progress?: number
-  },
+    state: OverallFlashingState;
+    progress?: number;
+  };
   firmwareRefreshing: boolean;
   firmwareList: FirmwareVersion[];
   selectedFirmware: string;
@@ -288,7 +308,10 @@ interface AppState {
   setConnectDialogOpen: (open: boolean) => void;
   setConfigPresetRoot: (root: ConfigPreset) => void;
   setConfigPresetSelected: (selection: ConfigPreset) => void;
-  setOverallFlashingState: (state: { state: OverallFlashingState, progress?: number }) => void;
+  setOverallFlashingState: (state: {
+    state: OverallFlashingState;
+    progress?: number;
+  }) => void;
   setFirmwareRefreshing: (state: boolean) => void;
   setFirmwareList: (state: FirmwareVersion[]) => void;
   setSelectedFirmware: (state: string) => void;
@@ -302,7 +325,7 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
-  darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
+  darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
   accent: "orange",
   connectDialogOpen: false,
   configPresetRoot: ConfigPreset.loadOrCreate(),
@@ -381,7 +404,7 @@ export const useAppStore = create<AppState>()((set) => ({
       produce<AppState>((draft) => {
         draft.configPresetRoot = root;
       })
-    )
+    );
   },
   setConfigPresetSelected: (selection: ConfigPreset) => {
     console.log(`${selection.name} has been selected.`);
@@ -389,21 +412,24 @@ export const useAppStore = create<AppState>()((set) => ({
       produce<AppState>((draft) => {
         draft.configPresetSelected = selection;
       })
-    )
+    );
   },
-  setOverallFlashingState: (state: { state: OverallFlashingState, progress?: number }) => {
+  setOverallFlashingState: (state: {
+    state: OverallFlashingState;
+    progress?: number;
+  }) => {
     set(
       produce<AppState>((draft) => {
         draft.overallFlashingState = state;
       })
-    )
+    );
   },
   setFirmwareRefreshing: (state: boolean) => {
     set(
       produce<AppState>((draft) => {
         draft.firmwareRefreshing = state;
       })
-    )
+    );
   },
   setFirmwareList: (state: FirmwareVersion[]) => {
     set(
@@ -411,27 +437,27 @@ export const useAppStore = create<AppState>()((set) => ({
         localStorage.setItem("firmwareList", JSON.stringify(state));
         draft.firmwareList = state;
       })
-    )
+    );
   },
   setSelectedFirmware: (state: string) => {
     set(
       produce<AppState>((draft) => {
         draft.selectedFirmware = state;
       })
-    )
+    );
   },
   setSelectedDeviceModel(state: string) {
     set(
       produce<AppState>((draft) => {
         draft.selectedDeviceModel = state;
       })
-    )
+    );
   },
   setFullFlash(state: boolean) {
     set(
       produce<AppState>((draft) => {
         draft.fullFlash = state;
       })
-    )
+    );
   }
 }));

@@ -6,30 +6,33 @@ import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const RangeTest = (): JSX.Element => {
   const config = useConfig();
-  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
-    getEnabled(name) {
-      return config.overrideValues![name] ?? false;
-    },
-    setEnabled(name, value) {
-      config.overrideValues![name] = value;
-    },
-  } : undefined;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
+        }
+      }
+    : undefined;
   const isPresetConfig = !("id" in config);
-  const setConfig: (data: RangeTestValidation) => void =
-    isPresetConfig ? (data) => {
-      config.moduleConfig.rangeTest = new Protobuf.ModuleConfig_RangeTestConfig(data);
-      (config as ConfigPreset).saveConfigTree();
-    }
+  const setConfig: (data: RangeTestValidation) => void = isPresetConfig
+    ? (data) => {
+        config.moduleConfig.rangeTest =
+          new Protobuf.ModuleConfig_RangeTestConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
     : (data) => {
-      useDevice().setWorkingModuleConfig(
-        new Protobuf.ModuleConfig({
-          payloadVariant: {
-            case: "rangeTest",
-            value: data
-          }
-        })
-      );
-    }
+        useDevice().setWorkingModuleConfig(
+          new Protobuf.ModuleConfig({
+            payloadVariant: {
+              case: "rangeTest",
+              value: data
+            }
+          })
+        );
+      };
 
   const onSubmit = setConfig;
 
@@ -53,7 +56,7 @@ export const RangeTest = (): JSX.Element => {
               type: "number",
               name: "sender",
               label: "Message Interval",
-              description: "How long to wait between sending test packets",
+              description: "How long to wait between sending test packets"
             },
             {
               type: "toggle",

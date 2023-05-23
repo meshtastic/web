@@ -6,30 +6,34 @@ import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const ExternalNotification = (): JSX.Element => {
   const config = useConfig();
-  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
-    getEnabled(name) {
-      return config.overrideValues![name] ?? false;
-    },
-    setEnabled(name, value) {
-      config.overrideValues![name] = value;
-    },
-  } : undefined;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
+        }
+      }
+    : undefined;
   const isPresetConfig = !("id" in config);
   const setConfig: (data: ExternalNotificationValidation) => void =
-    isPresetConfig ? (data) => {
-      config.moduleConfig.externalNotification = new Protobuf.ModuleConfig_ExternalNotificationConfig(data);
-      (config as ConfigPreset).saveConfigTree();
-    }
-    : (data) => {
-      useDevice().setWorkingModuleConfig(
-        new Protobuf.ModuleConfig({
-          payloadVariant: {
-            case: "externalNotification",
-            value: data
-          }
-        })
-      );
-    }
+    isPresetConfig
+      ? (data) => {
+          config.moduleConfig.externalNotification =
+            new Protobuf.ModuleConfig_ExternalNotificationConfig(data);
+          (config as ConfigPreset).saveConfigTree();
+        }
+      : (data) => {
+          useDevice().setWorkingModuleConfig(
+            new Protobuf.ModuleConfig({
+              payloadVariant: {
+                case: "externalNotification",
+                value: data
+              }
+            })
+          );
+        };
 
   const onSubmit = setConfig;
 
@@ -62,74 +66,74 @@ export const ExternalNotification = (): JSX.Element => {
               type: "number",
               name: "output",
               label: "Output",
-              description: "Output",
+              description: "Output"
             },
             {
               type: "number",
               name: "outputVibra",
               label: "Output Vibrate",
-              description: "Output Vibrate",
+              description: "Output Vibrate"
             },
             {
               type: "number",
               name: "outputBuzzer",
               label: "Output Buzzer",
-              description: "Output Buzzer",
+              description: "Output Buzzer"
             },
             {
               type: "toggle",
               name: "active",
               label: "Active",
-              description: "Active",
+              description: "Active"
             },
             {
               type: "toggle",
               name: "alertMessage",
               label: "Alert Message",
-              description: "Alert Message",
+              description: "Alert Message"
             },
             {
               type: "toggle",
               name: "alertMessageVibra",
               label: "Alert Message Vibrate",
-              description: "Alert Message Vibrate",
+              description: "Alert Message Vibrate"
             },
             {
               type: "toggle",
               name: "alertMessageBuzzer",
               label: "Alert Message Buzzer",
-              description: "Alert Message Buzzer",
+              description: "Alert Message Buzzer"
             },
             {
               type: "toggle",
               name: "alertBell",
               label: "Alert Bell",
               description:
-                "Should an alert be triggered when receiving an incoming bell?",
+                "Should an alert be triggered when receiving an incoming bell?"
             },
             {
               type: "toggle",
               name: "alertBellVibra",
               label: "Alert Bell Vibrate",
-              description: "Alert Bell Vibrate",
+              description: "Alert Bell Vibrate"
             },
             {
               type: "toggle",
               name: "alertBellBuzzer",
               label: "Alert Bell Buzzer",
-              description: "Alert Bell Buzzer",
+              description: "Alert Bell Buzzer"
             },
             {
               type: "toggle",
               name: "usePwm",
               label: "Use PWM",
-              description: "Use PWM",
+              description: "Use PWM"
             },
             {
               type: "number",
               name: "nagTimeout",
               label: "Nag Timeout",
-              description: "Nag Timeout",
+              description: "Nag Timeout"
             }
           ]
         }

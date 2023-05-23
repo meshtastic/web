@@ -6,30 +6,33 @@ import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const StoreForward = (): JSX.Element => {
   const config = useConfig();
-  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
-    getEnabled(name) {
-      return config.overrideValues![name] ?? false;
-    },
-    setEnabled(name, value) {
-      config.overrideValues![name] = value;
-    },
-  } : undefined;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
+        }
+      }
+    : undefined;
   const isPresetConfig = !("id" in config);
-  const setConfig: (data: StoreForwardValidation) => void =
-    isPresetConfig ? (data) => {
-      config.moduleConfig.storeForward = new Protobuf.ModuleConfig_StoreForwardConfig(data);
-      (config as ConfigPreset).saveConfigTree();
-    }
+  const setConfig: (data: StoreForwardValidation) => void = isPresetConfig
+    ? (data) => {
+        config.moduleConfig.storeForward =
+          new Protobuf.ModuleConfig_StoreForwardConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
     : (data) => {
-      useDevice().setWorkingModuleConfig(
-        new Protobuf.ModuleConfig({
-          payloadVariant: {
-            case: "storeForward",
-            value: data
-          }
-        })
-      );
-    }
+        useDevice().setWorkingModuleConfig(
+          new Protobuf.ModuleConfig({
+            payloadVariant: {
+              case: "storeForward",
+              value: data
+            }
+          })
+        );
+      };
 
   const onSubmit = setConfig;
   return (

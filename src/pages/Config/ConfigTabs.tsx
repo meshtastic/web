@@ -17,35 +17,32 @@ import { DeviceConfig } from "./DeviceConfig";
 import { ModuleConfig } from "./ModuleConfig";
 
 export const ConfigTabs = (): JSX.Element => {
-    const tabs = [
-      {
-        label: "Device",
-        element: DeviceConfig,
-        count: 0
-      },
-      {
-        label: "Module",
-        element: ModuleConfig
-      }
-    ];
+  const tabs = [
+    {
+      label: "Device",
+      element: DeviceConfig,
+      count: 0
+    },
+    {
+      label: "Module",
+      element: ModuleConfig
+    }
+  ];
 
-    return (
-      <Tabs defaultValue="Device">
-        <TabsList>
-          {tabs.map((tab) => (
-            <TabsTrigger
-              key={tab.label}
-              value={tab.label}
-            >
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+  return (
+    <Tabs defaultValue="Device">
+      <TabsList>
         {tabs.map((tab) => (
-          <TabsContent key={tab.label} value={tab.label} className="border-0 p-0">
-            <tab.element />
-          </TabsContent>
+          <TabsTrigger key={tab.label} value={tab.label}>
+            {tab.label}
+          </TabsTrigger>
         ))}
-      </Tabs>
-    );
-  };
+      </TabsList>
+      {tabs.map((tab) => (
+        <TabsContent key={tab.label} value={tab.label} className="border-0 p-0">
+          <tab.element />
+        </TabsContent>
+      ))}
+    </Tabs>
+  );
+};

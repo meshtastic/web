@@ -6,30 +6,33 @@ import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const CannedMessage = (): JSX.Element => {
   const config = useConfig();
-  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
-    getEnabled(name) {
-      return config.overrideValues![name] ?? false;
-    },
-    setEnabled(name, value) {
-      config.overrideValues![name] = value;
-    },
-  } : undefined;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
+        }
+      }
+    : undefined;
   const isPresetConfig = !("id" in config);
-  const setConfig: (data: CannedMessageValidation) => void =
-    isPresetConfig ? (data) => {
-      config.moduleConfig.cannedMessage = new Protobuf.ModuleConfig_CannedMessageConfig(data);
-      (config as ConfigPreset).saveConfigTree();
-    }
+  const setConfig: (data: CannedMessageValidation) => void = isPresetConfig
+    ? (data) => {
+        config.moduleConfig.cannedMessage =
+          new Protobuf.ModuleConfig_CannedMessageConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
     : (data) => {
-      useDevice().setWorkingModuleConfig(
-        new Protobuf.ModuleConfig({
-          payloadVariant: {
-            case: "cannedMessage",
-            value: data
-          }
-        })
-      );
-    }
+        useDevice().setWorkingModuleConfig(
+          new Protobuf.ModuleConfig({
+            payloadVariant: {
+              case: "cannedMessage",
+              value: data
+            }
+          })
+        );
+      };
 
   const onSubmit = setConfig;
 

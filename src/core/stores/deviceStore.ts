@@ -1,18 +1,12 @@
-import {
-  createContext,
-  useContext,
-} from 'react';
+import { createContext, useContext } from "react";
 
-import { produce } from 'immer';
-import { create } from 'zustand';
+import { produce } from "immer";
+import { create } from "zustand";
 
-import {
-  Protobuf,
-  Types,
-} from '@meshtastic/meshtasticjs';
+import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
-import type { FlashState } from '../flashing/Flasher';
-import { useAppStore } from './appStore';
+import type { FlashState } from "../flashing/Flasher";
+import { useAppStore } from "./appStore";
 
 export type Page = "messages" | "map" | "config" | "channels" | "peers";
 
@@ -131,7 +125,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             broadcast: new Map()
           },
           connection: undefined,
-          flashState: { state: 'doFlash', progress: 0 },
+          flashState: { state: "doFlash", progress: 0 },
           activePage: "messages",
           activePeer: 0,
           waypoints: [],
@@ -605,14 +599,14 @@ export const useDevice = (): Device => {
 interface ConfigProvider {
   config: Protobuf.LocalConfig;
   moduleConfig: Protobuf.LocalModuleConfig;
-  overrideValues?: {[fieldName: string]: boolean};
+  overrideValues?: { [fieldName: string]: boolean };
 }
 
 export const useConfig = (): ConfigProvider => {
   const context = useContext(DeviceContext);
-  if(context == undefined) {
-    const {configPresetRoot, configPresetSelected } = useAppStore();
-    return (configPresetSelected ?? configPresetRoot);
+  if (context == undefined) {
+    const { configPresetRoot, configPresetSelected } = useAppStore();
+    return configPresetSelected ?? configPresetRoot;
   }
   return context;
 };

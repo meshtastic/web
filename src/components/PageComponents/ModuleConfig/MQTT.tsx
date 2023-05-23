@@ -6,30 +6,32 @@ import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const MQTT = (): JSX.Element => {
   const config = useConfig();
-  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
-    getEnabled(name) {
-      return config.overrideValues![name] ?? false;
-    },
-    setEnabled(name, value) {
-      config.overrideValues![name] = value;
-    },
-  } : undefined;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
+        }
+      }
+    : undefined;
   const isPresetConfig = !("id" in config);
-  const setConfig: (data: MQTTValidation) => void =
-    isPresetConfig ? (data) => {
-      config.moduleConfig.mqtt = new Protobuf.ModuleConfig_MQTTConfig(data);
-      (config as ConfigPreset).saveConfigTree();
-    }
+  const setConfig: (data: MQTTValidation) => void = isPresetConfig
+    ? (data) => {
+        config.moduleConfig.mqtt = new Protobuf.ModuleConfig_MQTTConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
     : (data) => {
-      useDevice().setWorkingModuleConfig(
-        new Protobuf.ModuleConfig({
-          payloadVariant: {
-            case: "mqtt",
-            value: data
-          }
-        })
-      );
-    }
+        useDevice().setWorkingModuleConfig(
+          new Protobuf.ModuleConfig({
+            payloadVariant: {
+              case: "mqtt",
+              value: data
+            }
+          })
+        );
+      };
 
   const onSubmit = setConfig;
 
@@ -54,19 +56,19 @@ export const MQTT = (): JSX.Element => {
               name: "address",
               label: "MQTT Server Address",
               description:
-                "MQTT server address to use for default/custom servers",
+                "MQTT server address to use for default/custom servers"
             },
             {
               type: "text",
               name: "username",
               label: "MQTT Username",
-              description: "MQTT username to use for default/custom servers",
+              description: "MQTT username to use for default/custom servers"
             },
             {
               type: "password",
               name: "password",
               label: "MQTT Password",
-              description: "MQTT password to use for default/custom servers",
+              description: "MQTT password to use for default/custom servers"
             },
             {
               type: "toggle",

@@ -6,30 +6,34 @@ import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const Serial = (): JSX.Element => {
   const config = useConfig();
-  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
-    getEnabled(name) {
-      return config.overrideValues![name] ?? false;
-    },
-    setEnabled(name, value) {
-      config.overrideValues![name] = value;
-    },
-  } : undefined;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
+        }
+      }
+    : undefined;
   const isPresetConfig = !("id" in config);
-  const setConfig: (data: SerialValidation) => void =
-    isPresetConfig ? (data) => {
-      config.moduleConfig.serial = new Protobuf.ModuleConfig_SerialConfig(data);
-      (config as ConfigPreset).saveConfigTree();
-    }
+  const setConfig: (data: SerialValidation) => void = isPresetConfig
+    ? (data) => {
+        config.moduleConfig.serial = new Protobuf.ModuleConfig_SerialConfig(
+          data
+        );
+        (config as ConfigPreset).saveConfigTree();
+      }
     : (data) => {
-      useDevice().setWorkingModuleConfig(
-        new Protobuf.ModuleConfig({
-          payloadVariant: {
-            case: "serial",
-            value: data
-          }
-        })
-      );
-    }
+        useDevice().setWorkingModuleConfig(
+          new Protobuf.ModuleConfig({
+            payloadVariant: {
+              case: "serial",
+              value: data
+            }
+          })
+        );
+      };
 
   const onSubmit = setConfig;
 
@@ -54,19 +58,19 @@ export const Serial = (): JSX.Element => {
               name: "echo",
               label: "Echo",
               description:
-                "Any packets you send will be echoed back to your device",
+                "Any packets you send will be echoed back to your device"
             },
             {
               type: "number",
               name: "rxd",
               label: "Receive Pin",
-              description: "Set the GPIO pin to the RXD pin you have set up.",
+              description: "Set the GPIO pin to the RXD pin you have set up."
             },
             {
               type: "number",
               name: "txd",
               label: "Transmit Pin",
-              description: "Set the GPIO pin to the TXD pin you have set up.",
+              description: "Set the GPIO pin to the TXD pin you have set up."
             },
             {
               type: "select",

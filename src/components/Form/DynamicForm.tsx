@@ -98,18 +98,27 @@ export function DynamicForm<T extends FieldValues>({
           </div>
 
           {fieldGroup.fields.map((field, index) => {
-            const fullFieldName = `${fieldGroup.label}_${field.name}`
-            const [ enableSwitchState, setEnableSwitchState ] = useState(enableSwitch?.getEnabled(fullFieldName));
+            const fullFieldName = `${fieldGroup.label}_${field.name}`;
+            const [enableSwitchState, setEnableSwitchState] = useState(
+              enableSwitch?.getEnabled(fullFieldName)
+            );
             return (
-              <FieldWrapper label={field.label} description={field.description} enableSwitchEnabled={enableSwitchState} onEnableSwitchChanged={(value) => {
-                enableSwitch?.setEnabled(fullFieldName, value);
-                setEnableSwitchState(value);
-              }}>
+              <FieldWrapper
+                label={field.label}
+                description={field.description}
+                enableSwitchEnabled={enableSwitchState}
+                onEnableSwitchChanged={(value) => {
+                  enableSwitch?.setEnabled(fullFieldName, value);
+                  setEnableSwitchState(value);
+                }}
+              >
                 <DynamicFormField
                   key={index}
                   field={field}
                   control={control}
-                  disabled={isDisabled(field.disabledBy) || enableSwitchState == false}
+                  disabled={
+                    isDisabled(field.disabledBy) || enableSwitchState == false
+                  }
                 />
               </FieldWrapper>
             );

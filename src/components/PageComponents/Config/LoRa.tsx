@@ -1,42 +1,40 @@
-import type { ConfigPreset } from '@app/core/stores/appStore';
-import type { LoRaValidation } from '@app/validation/config/lora.js';
-import {
-  DynamicForm,
-  EnableSwitchData,
-} from '@components/Form/DynamicForm.js';
-import {
-  useConfig,
-  useDevice,
-} from '@core/stores/deviceStore.js';
-import { Protobuf } from '@meshtastic/meshtasticjs';
+import type { ConfigPreset } from "@app/core/stores/appStore";
+import type { LoRaValidation } from "@app/validation/config/lora.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const LoRa = (): JSX.Element => {
   const config = useConfig();
-  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
-    getEnabled(name) {
-      return config.overrideValues![name] ?? false;
-    },
-    setEnabled(name, value) {
-      config.overrideValues![name] = value;
-    },
-  } : undefined;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
+        }
+      }
+    : undefined;
   const isPresetConfig = !("id" in config);
-  const { setWorkingConfig } = !isPresetConfig ? useDevice() : { setWorkingConfig: undefined };
-  const setConfig: (data: LoRaValidation) => void =
-    isPresetConfig ? (data) => {
-      config.config.lora = new Protobuf.Config_LoRaConfig(data);
-      (config as ConfigPreset).saveConfigTree();
-    }
+  const { setWorkingConfig } = !isPresetConfig
+    ? useDevice()
+    : { setWorkingConfig: undefined };
+  const setConfig: (data: LoRaValidation) => void = isPresetConfig
+    ? (data) => {
+        config.config.lora = new Protobuf.Config_LoRaConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
     : (data) => {
-      setWorkingConfig!(
-        new Protobuf.Config({
-          payloadVariant: {
-            case: "lora",
-            value: data
-          }
-        })
-      );
-    }
+        setWorkingConfig!(
+          new Protobuf.Config({
+            payloadVariant: {
+              case: "lora",
+              value: data
+            }
+          })
+        );
+      };
 
   const onSubmit = setConfig;
 
@@ -116,7 +114,7 @@ export const LoRa = (): JSX.Element => {
               type: "number",
               name: "codingRate",
               label: "Coding Rate",
-              description: "The denominator of the coding rate",
+              description: "The denominator of the coding rate"
             }
           ]
         },

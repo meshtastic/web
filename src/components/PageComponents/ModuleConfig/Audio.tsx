@@ -6,30 +6,32 @@ import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const Audio = (): JSX.Element => {
   const config = useConfig();
-  const enableSwitch: EnableSwitchData | undefined = config.overrideValues ? {
-    getEnabled(name) {
-      return config.overrideValues![name] ?? false;
-    },
-    setEnabled(name, value) {
-      config.overrideValues![name] = value;
-    },
-  } : undefined;
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
+        }
+      }
+    : undefined;
   const isPresetConfig = !("id" in config);
-  const setConfig: (data: AudioValidation) => void =
-    isPresetConfig ? (data) => {
-      config.moduleConfig.audio = new Protobuf.ModuleConfig_AudioConfig(data);
-      (config as ConfigPreset).saveConfigTree();
-    }
+  const setConfig: (data: AudioValidation) => void = isPresetConfig
+    ? (data) => {
+        config.moduleConfig.audio = new Protobuf.ModuleConfig_AudioConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
     : (data) => {
-      useDevice().setWorkingModuleConfig(
-        new Protobuf.ModuleConfig({
-          payloadVariant: {
-            case: "audio",
-            value: data
-          }
-        })
-      );
-    }
+        useDevice().setWorkingModuleConfig(
+          new Protobuf.ModuleConfig({
+            payloadVariant: {
+              case: "audio",
+              value: data
+            }
+          })
+        );
+      };
 
   const onSubmit = setConfig;
 

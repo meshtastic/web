@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { useCommandState } from 'cmdk';
+import { useCommandState } from "cmdk";
 import {
   ArrowLeftRightIcon,
   BoxSelectIcon,
@@ -23,8 +23,8 @@ import {
   SmartphoneIcon,
   TrashIcon,
   UsersIcon,
-  XCircleIcon,
-} from 'lucide-react';
+  XCircleIcon
+} from "lucide-react";
 
 import {
   CommandDialog,
@@ -32,14 +32,11 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList,
-} from '@components/UI/Command.js';
-import { useAppStore } from '@core/stores/appStore.js';
-import {
-  useDevice,
-  useDeviceStore,
-} from '@core/stores/deviceStore.js';
-import { Hashicon } from '@emeraldpay/hashicon-react';
+  CommandList
+} from "@components/UI/Command.js";
+import { useAppStore } from "@core/stores/appStore.js";
+import { useDevice, useDeviceStore } from "@core/stores/deviceStore.js";
+import { Hashicon } from "@emeraldpay/hashicon-react";
 
 export interface Group {
   label: string;
