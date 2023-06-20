@@ -34,6 +34,9 @@ jobs:
           files: |
             ./dist/build.tar
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
       - name: Buildah Build
         id: build-container
         uses: redhat-actions/buildah-build@v2.12
@@ -43,9 +46,7 @@ jobs:
           image: ${{github.event.repository.full_name}}
           tags: latest ${{ github.sha }}
           oci: true
-          platforms: |
-            linux/amd64
-            linux/arm64
+          platforms: linux/amd64, linux/arm64
 
       - name: Push To Registry
         id: push-to-registry
