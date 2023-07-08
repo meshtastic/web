@@ -20,7 +20,7 @@ export const RangeTest = (): JSX.Element => {
   return (
     <DynamicForm<RangeTestValidation>
       onSubmit={onSubmit}
-      defaultValues={moduleConfig.mqtt}
+      defaultValues={moduleConfig.rangeTest}
       fieldGroups={[
         {
           label: "Range Test Settings",
