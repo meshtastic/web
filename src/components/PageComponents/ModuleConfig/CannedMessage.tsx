@@ -20,7 +20,7 @@ export const CannedMessage = (): JSX.Element => {
   return (
     <DynamicForm<CannedMessageValidation>
       onSubmit={onSubmit}
-      defaultValues={moduleConfig.mqtt}
+      defaultValues={moduleConfig.cannedMessage}
       fieldGroups={[
         {
           label: "Canned Message Settings",
