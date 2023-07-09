@@ -39,7 +39,7 @@ export const RangeTest = (): JSX.Element => {
   return (
     <DynamicForm<RangeTestValidation>
       onSubmit={onSubmit}
-      defaultValues={config.moduleConfig.rangeTest}
+      defaultValues={moduleConfig.rangeTest}
       enableSwitch={enableSwitch}
       fieldGroups={[
         {

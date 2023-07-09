@@ -38,7 +38,7 @@ export const StoreForward = (): JSX.Element => {
   return (
     <DynamicForm<StoreForwardValidation>
       onSubmit={onSubmit}
-      defaultValues={config.moduleConfig.storeForward}
+      defaultValues={moduleConfig.storeForward}
       enableSwitch={enableSwitch}
       fieldGroups={[
         {
