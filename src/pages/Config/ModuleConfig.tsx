@@ -1,6 +1,5 @@
-import { useDevice } from "@app/core/stores/deviceStore.js";
 import { Audio } from "@components/PageComponents/ModuleConfig/Audio.js";
-import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage";
+import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage.js";
 import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.js";
 import { MQTT } from "@components/PageComponents/ModuleConfig/MQTT.js";
 import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.js";
@@ -13,11 +12,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.js";
-import { Fragment } from "react";
 
 export const ModuleConfig = (): JSX.Element => {
-  const { workingModuleConfig, connection } = useDevice();
-
   const tabs = [
     {
       label: "MQTT",

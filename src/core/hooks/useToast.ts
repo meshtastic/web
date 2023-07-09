@@ -1,10 +1,9 @@
 import * as React from "react";
 
 import type { ToastActionElement, ToastProps } from "@components/UI/Toast.js";
-import { DialogProps } from "@radix-ui/react-dialog";
 
 const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000;
+const TOAST_REMOVE_DELAY = 1000000;
 
 type ToasterToast = ToastProps & {
   id: string;
@@ -110,8 +109,7 @@ export const reducer = (state: State, action: Action): State => {
         ),
       };
     }
-
-    case "REMOVE_TOAST": {
+    case "REMOVE_TOAST":
       if (action.toastId === undefined) {
         return {
           ...state,
@@ -122,7 +120,6 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         toasts: state.toasts.filter((t) => t.id !== action.toastId),
       };
-    }
   }
 };
 
@@ -137,7 +134,9 @@ function dispatch(action: Action) {
   });
 }
 
-function toast({ ...props }: DialogProps) {
+type Toast = Omit<ToasterToast, "id">;
+
+function toast({ ...props }: Toast) {
   const id = genId();
 
   const update = (props: ToasterToast) =>

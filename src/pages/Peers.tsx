@@ -1,6 +1,6 @@
 import { Sidebar } from "@components/Sidebar.js";
 import { Mono } from "@components/generic/Mono.js";
-import { Table } from "@components/generic/Table";
+import { Table } from "@components/generic/Table/index.js";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
