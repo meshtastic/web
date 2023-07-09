@@ -41,7 +41,7 @@ Install the dependencies.
 pnpm i
 ```
 
-Start the developtment server:
+Start the development server:
 
 ```bash
 pnpm dev
