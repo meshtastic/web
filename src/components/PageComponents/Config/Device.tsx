@@ -1,26 +1,48 @@
+import type { ConfigPreset } from "@app/core/stores/appStore";
 import type { DeviceValidation } from "@app/validation/config/device.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Device = (): JSX.Element => {
-  const { config, setWorkingConfig } = useDevice();
-
-  const onSubmit = (data: DeviceValidation) => {
-    setWorkingConfig(
-      new Protobuf.Config({
-        payloadVariant: {
-          case: "device",
-          value: data
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
         }
-      })
-    );
-  };
+      }
+    : undefined;
+  const isPresetConfig = !("id" in config);
+  const { setWorkingConfig } = !isPresetConfig
+    ? useDevice()
+    : { setWorkingConfig: undefined };
+  const setConfig: (data: DeviceValidation) => void = isPresetConfig
+    ? (data) => {
+        config.config.device = new Protobuf.Config_DeviceConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
+    : (data) => {
+        setWorkingConfig!(
+          new Protobuf.Config({
+            payloadVariant: {
+              case: "device",
+              value: data
+            }
+          })
+        );
+      };
+
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<DeviceValidation>
       onSubmit={onSubmit}
-      defaultValues={config.device}
+      defaultValues={config.config.device}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "Device Settings",
@@ -79,6 +101,19 @@ export const Device = (): JSX.Element => {
               properties: {
                 suffix: "Seconds"
               }
+            },
+            {
+              type: "toggle",
+              name: "doubleTapAsButtonPress",
+              label: "Double Tap as Button Press",
+              description:
+                "Require a double tap of the button to send a button press"
+            },
+            {
+              type: "toggle",
+              name: "isManaged",
+              label: "Managed",
+              description: "Is this device managed by an external application"
             }
           ]
         }

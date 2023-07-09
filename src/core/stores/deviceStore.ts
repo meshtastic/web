@@ -4,7 +4,9 @@ import { produce } from "immer";
 import { create } from "zustand";
 
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
-import { channel } from "diagnostics_channel";
+
+import type { FlashState } from "../flashing/Flasher";
+import { useAppStore } from "./appStore";
 
 export type Page = "messages" | "map" | "config" | "channels" | "peers";
 
@@ -43,6 +45,7 @@ export interface Device {
     broadcast: Map<Types.ChannelNumber, MessageWithState[]>;
   };
   connection?: Types.ConnectionType;
+  flashState: FlashState;
   activePage: Page;
   activePeer: number;
   waypoints: Protobuf.Waypoint[];
@@ -67,6 +70,7 @@ export interface Device {
   setActivePage: (page: Page) => void;
   setActivePeer: (peer: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
+  setFlashState: (state: FlashState) => void;
   addChannel: (channel: Protobuf.Channel) => void;
   addWaypoint: (waypoint: Protobuf.Waypoint) => void;
   addNodeInfo: (nodeInfo: Protobuf.NodeInfo) => void;
@@ -121,6 +125,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             broadcast: new Map()
           },
           connection: undefined,
+          flashState: { state: "doFlash", progress: 0 },
           activePage: "messages",
           activePeer: 0,
           waypoints: [],
@@ -328,6 +333,16 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.pendingSettingsChanges = state;
+                }
+              })
+            );
+          },
+          setFlashState: (state) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.flashState = state;
                 }
               })
             );
@@ -577,6 +592,21 @@ export const useDevice = (): Device => {
   const context = useContext(DeviceContext);
   if (context === undefined) {
     throw new Error("useDevice must be used within a DeviceProvider");
+  }
+  return context;
+};
+
+interface ConfigProvider {
+  config: Protobuf.LocalConfig;
+  moduleConfig: Protobuf.LocalModuleConfig;
+  overrideValues?: { [fieldName: string]: boolean };
+}
+
+export const useConfig = (): ConfigProvider => {
+  const context = useContext(DeviceContext);
+  if (context == undefined) {
+    const { configPresetRoot, configPresetSelected } = useAppStore();
+    return configPresetSelected ?? configPresetRoot;
   }
   return context;
 };

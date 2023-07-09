@@ -1,26 +1,48 @@
+import type { ConfigPreset } from "@app/core/stores/appStore";
 import type { BluetoothValidation } from "@app/validation/config/bluetooth.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Bluetooth = (): JSX.Element => {
-  const { config, setWorkingConfig } = useDevice();
-
-  const onSubmit = (data: BluetoothValidation) => {
-    setWorkingConfig(
-      new Protobuf.Config({
-        payloadVariant: {
-          case: "bluetooth",
-          value: data
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
         }
-      })
-    );
-  };
+      }
+    : undefined;
+  const isPresetConfig = !("id" in config);
+  const { setWorkingConfig } = !isPresetConfig
+    ? useDevice()
+    : { setWorkingConfig: undefined };
+  const setConfig: (data: BluetoothValidation) => void = isPresetConfig
+    ? (data) => {
+        config.config.bluetooth = new Protobuf.Config_BluetoothConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
+    : (data) => {
+        setWorkingConfig!(
+          new Protobuf.Config({
+            payloadVariant: {
+              case: "bluetooth",
+              value: data
+            }
+          })
+        );
+      };
+
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<BluetoothValidation>
       onSubmit={onSubmit}
-      defaultValues={config.bluetooth}
+      defaultValues={config.config.bluetooth}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "Bluetooth Settings",
@@ -37,11 +59,6 @@ export const Bluetooth = (): JSX.Element => {
               name: "mode",
               label: "Pairing mode",
               description: "Pin selection behaviour.",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ],
               properties: {
                 enumValue: Protobuf.Config_BluetoothConfig_PairingMode,
                 formatEnumName: true
@@ -52,17 +69,6 @@ export const Bluetooth = (): JSX.Element => {
               name: "fixedPin",
               label: "Pin",
               description: "Pin to use when pairing",
-              disabledBy: [
-                {
-                  fieldName: "mode",
-                  selector:
-                    Protobuf.Config_BluetoothConfig_PairingMode.FIXED_PIN,
-                  invert: true
-                },
-                {
-                  fieldName: "enabled"
-                }
-              ],
               properties: {}
             }
           ]

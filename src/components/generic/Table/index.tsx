@@ -20,7 +20,7 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
             <th
               key={index}
               scope="col"
-              className={`py-2 pr-3 pl-6 text-left ${
+              className={`py-2 pl-6 pr-3 text-left ${
                 heading.sortable
                   ? "cursor-pointer hover:brightness-hover active:brightness-press"
                   : ""

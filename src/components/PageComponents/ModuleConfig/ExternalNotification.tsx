@@ -1,26 +1,47 @@
 import type { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import type { ConfigPreset } from "@app/core/stores/appStore";
 
 export const ExternalNotification = (): JSX.Element => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
-
-  const onSubmit = (data: ExternalNotificationValidation) => {
-    setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
-        payloadVariant: {
-          case: "externalNotification",
-          value: data
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
         }
-      })
-    );
-  };
+      }
+    : undefined;
+  const isPresetConfig = !("id" in config);
+  const setConfig: (data: ExternalNotificationValidation) => void =
+    isPresetConfig
+      ? (data) => {
+          config.moduleConfig.externalNotification =
+            new Protobuf.ModuleConfig_ExternalNotificationConfig(data);
+          (config as ConfigPreset).saveConfigTree();
+        }
+      : (data) => {
+          useDevice().setWorkingModuleConfig(
+            new Protobuf.ModuleConfig({
+              payloadVariant: {
+                case: "externalNotification",
+                value: data
+              }
+            })
+          );
+        };
+
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<ExternalNotificationValidation>
       onSubmit={onSubmit}
-      defaultValues={moduleConfig.externalNotification}
+      defaultValues={config.moduleConfig.externalNotification}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "External Notification Settings",
@@ -37,12 +58,6 @@ export const ExternalNotification = (): JSX.Element => {
               name: "outputMs",
               label: "Output MS",
               description: "Output MS",
-
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ],
               properties: {
                 suffix: "ms"
               }
@@ -51,134 +66,74 @@ export const ExternalNotification = (): JSX.Element => {
               type: "number",
               name: "output",
               label: "Output",
-              description: "Output",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Output"
             },
             {
               type: "number",
               name: "outputVibra",
               label: "Output Vibrate",
-              description: "Output Vibrate",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Output Vibrate"
             },
             {
               type: "number",
               name: "outputBuzzer",
               label: "Output Buzzer",
-              description: "Output Buzzer",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Output Buzzer"
             },
             {
               type: "toggle",
               name: "active",
               label: "Active",
-              description: "Active",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Active"
             },
             {
               type: "toggle",
               name: "alertMessage",
               label: "Alert Message",
-              description: "Alert Message",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Alert Message"
             },
             {
               type: "toggle",
               name: "alertMessageVibra",
               label: "Alert Message Vibrate",
-              description: "Alert Message Vibrate",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Alert Message Vibrate"
             },
             {
               type: "toggle",
               name: "alertMessageBuzzer",
               label: "Alert Message Buzzer",
-              description: "Alert Message Buzzer",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Alert Message Buzzer"
             },
             {
               type: "toggle",
               name: "alertBell",
               label: "Alert Bell",
               description:
-                "Should an alert be triggered when receiving an incoming bell?",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+                "Should an alert be triggered when receiving an incoming bell?"
             },
             {
               type: "toggle",
               name: "alertBellVibra",
               label: "Alert Bell Vibrate",
-              description: "Alert Bell Vibrate",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Alert Bell Vibrate"
             },
             {
               type: "toggle",
               name: "alertBellBuzzer",
               label: "Alert Bell Buzzer",
-              description: "Alert Bell Buzzer",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Alert Bell Buzzer"
             },
             {
               type: "toggle",
               name: "usePwm",
               label: "Use PWM",
-              description: "Use PWM",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Use PWM"
             },
             {
               type: "number",
               name: "nagTimeout",
               label: "Nag Timeout",
-              description: "Nag Timeout",
-              disabledBy: [
-                {
-                  fieldName: "enabled"
-                }
-              ]
+              description: "Nag Timeout"
             }
           ]
         }

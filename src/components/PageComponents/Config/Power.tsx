@@ -1,26 +1,48 @@
+import type { ConfigPreset } from "@app/core/stores/appStore";
 import type { PowerValidation } from "@app/validation/config/power.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Power = (): JSX.Element => {
-  const { config, setWorkingConfig } = useDevice();
-
-  const onSubmit = (data: PowerValidation) => {
-    setWorkingConfig(
-      new Protobuf.Config({
-        payloadVariant: {
-          case: "power",
-          value: data
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
         }
-      })
-    );
-  };
+      }
+    : undefined;
+  const isPresetConfig = !("id" in config);
+  const { setWorkingConfig } = !isPresetConfig
+    ? useDevice()
+    : { setWorkingConfig: undefined };
+  const setConfig: (data: PowerValidation) => void = isPresetConfig
+    ? (data) => {
+        config.config.power = new Protobuf.Config_PowerConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
+    : (data) => {
+        setWorkingConfig!(
+          new Protobuf.Config({
+            payloadVariant: {
+              case: "power",
+              value: data
+            }
+          })
+        );
+      };
+
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<PowerValidation>
       onSubmit={onSubmit}
-      defaultValues={config.power}
+      defaultValues={config.config.power}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "Power Config",

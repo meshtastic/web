@@ -3,7 +3,6 @@ import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import EnvironmentPlugin from "vite-plugin-environment";
-import { VitePWA } from "vite-plugin-pwa";
 
 import react from "@vitejs/plugin-react";
 
@@ -42,6 +41,22 @@ export default defineConfig({
       "@components": resolve(__dirname, "./src/components"),
       "@core": resolve(__dirname, "./src/core"),
       "@layouts": resolve(__dirname, "./src/layouts")
+    }
+  },
+  server: {
+    proxy: {
+      // Firmware must be downloaded through this server as a proxy.
+      // It can't be downloaded directly because of GitHub's CORS policy.
+      "^/firmware/.*": {
+        target:
+          "https://api.github.com/repos/meshtastic/firmware/releases/assets/",
+        changeOrigin: true,
+        followRedirects: true,
+        rewrite: (path) => path.replace(/^\/firmware/, ""),
+        headers: {
+          Accept: "application/octet-stream"
+        }
+      }
     }
   }
 });

@@ -1,31 +1,48 @@
+import type { ConfigPreset } from "@app/core/stores/appStore";
 import type { NetworkValidation } from "@app/validation/config/network.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { DynamicForm, EnableSwitchData } from "@components/Form/DynamicForm.js";
+import { useConfig, useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Network = (): JSX.Element => {
-  const { config, setWorkingConfig } = useDevice();
-
-  const onSubmit = (data: NetworkValidation) => {
-    setWorkingConfig(
-      new Protobuf.Config({
-        payloadVariant: {
-          case: "network",
-          value: {
-            ...data,
-            ipv4Config: new Protobuf.Config_NetworkConfig_IpV4Config(
-              data.ipv4Config
-            )
-          }
+  const config = useConfig();
+  const enableSwitch: EnableSwitchData | undefined = config.overrideValues
+    ? {
+        getEnabled(name) {
+          return config.overrideValues![name] ?? false;
+        },
+        setEnabled(name, value) {
+          config.overrideValues![name] = value;
         }
-      })
-    );
-  };
+      }
+    : undefined;
+  const isPresetConfig = !("id" in config);
+  const { setWorkingConfig } = !isPresetConfig
+    ? useDevice()
+    : { setWorkingConfig: undefined };
+  const setConfig: (data: NetworkValidation) => void = isPresetConfig
+    ? (data) => {
+        config.config.network = new Protobuf.Config_NetworkConfig(data);
+        (config as ConfigPreset).saveConfigTree();
+      }
+    : (data) => {
+        setWorkingConfig!(
+          new Protobuf.Config({
+            payloadVariant: {
+              case: "network",
+              value: data
+            }
+          })
+        );
+      };
+
+  const onSubmit = setConfig;
 
   return (
     <DynamicForm<NetworkValidation>
       onSubmit={onSubmit}
-      defaultValues={config.network}
+      defaultValues={config.config.network}
+      enableSwitch={enableSwitch}
       fieldGroups={[
         {
           label: "WiFi Config",
@@ -41,23 +58,13 @@ export const Network = (): JSX.Element => {
               type: "text",
               name: "wifiSsid",
               label: "SSID",
-              description: "Network name",
-              disabledBy: [
-                {
-                  fieldName: "wifiEnabled"
-                }
-              ]
+              description: "Network name"
             },
             {
               type: "password",
               name: "wifiPsk",
               label: "PSK",
-              description: "Network password",
-              disabledBy: [
-                {
-                  fieldName: "wifiEnabled"
-                }
-              ]
+              description: "Network password"
             }
           ]
         },
@@ -90,49 +97,25 @@ export const Network = (): JSX.Element => {
               type: "text",
               name: "ipv4Config.ip",
               label: "IP",
-              description: "IP Address",
-              disabledBy: [
-                {
-                  fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
+              description: "IP Address"
             },
             {
               type: "text",
               name: "ipv4Config.gateway",
               label: "Gateway",
-              description: "Default Gateway",
-              disabledBy: [
-                {
-                  fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
+              description: "Default Gateway"
             },
             {
               type: "text",
               name: "ipv4Config.subnet",
               label: "Subnet",
-              description: "Subnet Mask",
-              disabledBy: [
-                {
-                  fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
+              description: "Subnet Mask"
             },
             {
               type: "text",
               name: "ipv4Config.dns",
               label: "DNS",
-              description: "DNS Server",
-              disabledBy: [
-                {
-                  fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
+              description: "DNS Server"
             }
           ]
         },

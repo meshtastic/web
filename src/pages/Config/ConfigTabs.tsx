@@ -13,40 +13,19 @@ import {
   TabsList,
   TabsTrigger
 } from "@components/UI/Tabs.js";
+import { DeviceConfig } from "./DeviceConfig";
+import { ModuleConfig } from "./ModuleConfig";
 
-export const DeviceConfig = (): JSX.Element => {
-  const device = useContext(DeviceContext);
-
+export const ConfigTabs = (): JSX.Element => {
   const tabs = [
     {
       label: "Device",
-      element: Device,
+      element: DeviceConfig,
       count: 0
     },
     {
-      label: "Position",
-      element: Position
-    },
-    {
-      label: "Power",
-      element: Power
-    },
-    {
-      label: "Network",
-      element: Network,
-      disabled: device && !device.hardware.hasWifi
-    },
-    {
-      label: "Display",
-      element: Display
-    },
-    {
-      label: "LoRa",
-      element: LoRa
-    },
-    {
-      label: "Bluetooth",
-      element: Bluetooth
+      label: "Module",
+      element: ModuleConfig
     }
   ];
 
@@ -54,17 +33,13 @@ export const DeviceConfig = (): JSX.Element => {
     <Tabs defaultValue="Device">
       <TabsList>
         {tabs.map((tab) => (
-          <TabsTrigger
-            key={tab.label}
-            value={tab.label}
-            disabled={tab.disabled}
-          >
+          <TabsTrigger key={tab.label} value={tab.label}>
             {tab.label}
           </TabsTrigger>
         ))}
       </TabsList>
       {tabs.map((tab) => (
-        <TabsContent key={tab.label} value={tab.label}>
+        <TabsContent key={tab.label} value={tab.label} className="border-0 p-0">
           <tab.element />
         </TabsContent>
       ))}
