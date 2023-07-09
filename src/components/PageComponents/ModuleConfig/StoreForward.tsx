@@ -20,7 +20,7 @@ export const StoreForward = (): JSX.Element => {
   return (
     <DynamicForm<StoreForwardValidation>
       onSubmit={onSubmit}
-      defaultValues={moduleConfig.mqtt}
+      defaultValues={moduleConfig.storeForward}
       fieldGroups={[
         {
           label: "Store & Forward Settings",
