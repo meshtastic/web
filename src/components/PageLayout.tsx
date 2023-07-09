@@ -1,5 +1,5 @@
 import { cn } from "@app/core/utils/cn.js";
-import { LucideIcon, AlignLeftIcon } from "lucide-react";
+import { AlignLeftIcon, LucideIcon } from "lucide-react";
 
 export interface PageLayoutProps {
   label: string;
@@ -20,7 +20,10 @@ export const PageLayout = ({
   return (
     <div className="relative flex h-full w-full flex-col">
       <div className="flex h-14 shrink-0 border-b-[0.5px] border-slate-300 dark:border-slate-700 md:h-16 md:px-4">
-        <button className="pl-4 transition-all hover:text-accent md:hidden">
+        <button
+          type="button"
+          className="pl-4 transition-all hover:text-accent md:hidden"
+        >
           <AlignLeftIcon />
         </button>
         <div className="flex flex-1 items-center justify-between px-4 md:px-0">
@@ -30,6 +33,7 @@ export const PageLayout = ({
               {actions?.map((action, index) => (
                 <button
                   key={index}
+                  type="button"
                   className="transition-all hover:text-accent"
                   onClick={action.onClick}
                 >

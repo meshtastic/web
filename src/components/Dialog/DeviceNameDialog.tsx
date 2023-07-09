@@ -1,4 +1,5 @@
-import { Input } from "@components/UI/Input.js";
+import { useDevice } from "@app/core/stores/deviceStore.js";
+import { Button } from "@components/UI/Button.js";
 import {
   Dialog,
   DialogContent,
@@ -7,11 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.js";
-import { Button } from "@components/UI/Button.js";
-import { useDevice } from "@app/core/stores/deviceStore.js";
-import { useForm } from "react-hook-form";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
+import { Protobuf } from "@meshtastic/meshtasticjs";
+import { useForm } from "react-hook-form";
 
 export interface User {
   longName: string;

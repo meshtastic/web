@@ -1,7 +1,7 @@
-import type { Control, FieldValues } from "react-hook-form";
 import { GenericInput, InputFieldProps } from "./FormInput.js";
-import { ToggleFieldProps, ToggleInput } from "./FormToggle.js";
 import { SelectFieldProps, SelectInput } from "./FormSelect.js";
+import { ToggleFieldProps, ToggleInput } from "./FormToggle.js";
+import type { Control, FieldValues } from "react-hook-form";
 
 export type FieldProps<T> =
   | InputFieldProps<T>

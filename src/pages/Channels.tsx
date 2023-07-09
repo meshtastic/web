@@ -1,17 +1,17 @@
-import { Sidebar } from "@components/Sidebar.js";
-import { PageLayout } from "@components/PageLayout.js";
-import { cn } from "@app/core/utils/cn.js";
-import { Channel } from "@components/PageComponents/Channel.js";
-import { useDevice } from "@core/stores/deviceStore.js";
-import { QrCodeIcon, ImportIcon } from "lucide-react";
-import { Protobuf, Types } from "@meshtastic/meshtasticjs";
-import { useState } from "react";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@app/components/UI/Tabs.js";
+import { cn } from "@app/core/utils/cn.js";
+import { Channel } from "@components/PageComponents/Channel.js";
+import { PageLayout } from "@components/PageLayout.js";
+import { Sidebar } from "@components/Sidebar.js";
+import { useDevice } from "@core/stores/deviceStore.js";
+import { Protobuf, Types } from "@meshtastic/meshtasticjs";
+import { ImportIcon, QrCodeIcon } from "lucide-react";
+import { useState } from "react";
 
 export const getChannelName = (channel: Protobuf.Channel) =>
   channel.settings?.name.length
@@ -31,7 +31,7 @@ export const ChannelsPage = (): JSX.Element => {
 
   return (
     <>
-      <Sidebar></Sidebar>
+      <Sidebar />
       <PageLayout
         label={`Channel: ${
           currentChannel ? getChannelName(currentChannel) : "Loading..."

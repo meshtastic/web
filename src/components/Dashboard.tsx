@@ -1,20 +1,20 @@
 import { useAppStore } from "@app/core/stores/appStore.js";
-import { Button } from "@components/UI/Button.js";
-import {
-  PlusIcon,
-  ListPlusIcon,
-  UsersIcon,
-  MapPinIcon,
-  CalendarIcon,
-  BluetoothIcon,
-  UsbIcon,
-  NetworkIcon,
-} from "lucide-react";
-import { Subtle } from "@components/UI/Typography/Subtle.js";
-import { H3 } from "@components/UI/Typography/H3.js";
 import { useDeviceStore } from "@app/core/stores/deviceStore.js";
-import { useMemo } from "react";
+import { Button } from "@components/UI/Button.js";
 import { Separator } from "@components/UI/Seperator.js";
+import { H3 } from "@components/UI/Typography/H3.js";
+import { Subtle } from "@components/UI/Typography/Subtle.js";
+import {
+  BluetoothIcon,
+  CalendarIcon,
+  ListPlusIcon,
+  MapPinIcon,
+  NetworkIcon,
+  PlusIcon,
+  UsbIcon,
+  UsersIcon,
+} from "lucide-react";
+import { useMemo } from "react";
 
 export const Dashboard = () => {
   const { setConnectDialogOpen } = useAppStore();

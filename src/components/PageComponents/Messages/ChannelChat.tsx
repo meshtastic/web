@@ -24,7 +24,7 @@ export const ChannelChat = ({
         {messages ? (
           messages.map((message, index) => (
             <Message
-              key={index}
+              key={message.id}
               message={message}
               lastMsgSameUser={
                 index === 0 ? false : messages[index - 1].from === message.from

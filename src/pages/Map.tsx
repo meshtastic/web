@@ -1,22 +1,22 @@
-import maplibregl from "maplibre-gl";
-import { Layer, Map, Marker, Source, useMap } from "react-map-gl";
+import { Subtle } from "@app/components/UI/Typography/Subtle.js";
+import { cn } from "@app/core/utils/cn.js";
+import { PageLayout } from "@components/PageLayout.js";
+import { Sidebar } from "@components/Sidebar.js";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
+import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { Sidebar } from "@components/Sidebar.js";
-import { PageLayout } from "@components/PageLayout.js";
+import { bbox, lineString } from "@turf/turf";
 import {
-  ZoomInIcon,
-  ZoomOutIcon,
   BoxSelectIcon,
   MapPinIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
 } from "lucide-react";
-import { bbox, lineString } from "@turf/turf";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
-import { Subtle } from "@app/components/UI/Typography/Subtle.js";
-import { cn } from "@app/core/utils/cn.js";
+import maplibregl from "maplibre-gl";
 import { useCallback, useEffect, useState } from "react";
+import { Layer, Map as MapGL, Marker, Source, useMap } from "react-map-gl";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
@@ -76,8 +76,8 @@ export const MapPage = (): JSX.Element => {
     <>
       <Sidebar>
         <SidebarSection label="Sources">
-          {rasterSources.map((source, index) => (
-            <SidebarButton key={index} label={source.title} />
+          {rasterSources.map((source) => (
+            <SidebarButton key={source.title} label={source.title} />
           ))}
         </SidebarSection>
       </Sidebar>
@@ -105,7 +105,7 @@ export const MapPage = (): JSX.Element => {
           },
         ]}
       >
-        <Map
+        <MapGL
           mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
           // onClick={(e) => {
           //   const waypoint = new Protobuf.Waypoint({
@@ -176,7 +176,7 @@ export const MapPage = (): JSX.Element => {
               );
             }
           })}
-        </Map>
+        </MapGL>
       </PageLayout>
     </>
   );

@@ -1,18 +1,18 @@
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
+import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
+import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import type { Page } from "@core/stores/deviceStore.js";
 import {
+  EditIcon,
+  LayersIcon,
+  LayoutGrid,
   LucideIcon,
   MapIcon,
   MessageSquareIcon,
   SettingsIcon,
-  LayersIcon,
   UsersIcon,
-  EditIcon,
-  LayoutGrid,
 } from "lucide-react";
-import { Subtle } from "@components/UI/Typography/Subtle.js";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -67,6 +67,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
           <Subtle>{myNode?.user?.longName ?? "UNK"}</Subtle>
         </div>
         <button
+          type="button"
           className="transition-all hover:text-accent"
           onClick={() => setDialogOpen("deviceName", true)}
         >
@@ -75,9 +76,9 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
       </div>
 
       <SidebarSection label="Navigation">
-        {pages.map((link, index) => (
+        {pages.map((link) => (
           <SidebarButton
-            key={index}
+            key={link.name}
             label={link.name}
             icon={link.icon}
             onClick={() => {

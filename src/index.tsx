@@ -1,7 +1,7 @@
 import "@app/index.css";
+import { enableMapSet } from "immer";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { StrictMode } from "react";
-import { enableMapSet } from "immer";
 import { createRoot } from "react-dom/client";
 
 import { App } from "@app/App.js";

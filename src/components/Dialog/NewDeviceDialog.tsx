@@ -1,3 +1,6 @@
+import { BLE } from "../PageComponents/Connect/BLE.js";
+import { HTTP } from "../PageComponents/Connect/HTTP.js";
+import { Serial } from "../PageComponents/Connect/Serial.js";
 import {
   Dialog,
   DialogContent,
@@ -11,11 +14,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.js";
-import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { Link } from "@components/UI/Typography/Link.js";
-import { HTTP } from "../PageComponents/Connect/HTTP.js";
-import { BLE } from "../PageComponents/Connect/BLE.js";
-import { Serial } from "../PageComponents/Connect/Serial.js";
+import { Subtle } from "@components/UI/Typography/Subtle.js";
 
 const tabs = [
   {

@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-import { toByteArray } from "base64-js";
+import { Button } from "@components/UI/Button.js";
 import { Checkbox } from "@components/UI/Checkbox.js";
-import { Input } from "@components/UI/Input.js";
 import {
   Dialog,
   DialogContent,
@@ -10,11 +8,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
-import { Switch } from "@components/UI/Switch.js";
-import { Button } from "@components/UI/Button.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
+import { Switch } from "@components/UI/Switch.js";
+import { useDevice } from "@core/stores/deviceStore.js";
+import { Protobuf } from "@meshtastic/meshtasticjs";
+import { toByteArray } from "base64-js";
+import { useEffect, useState } from "react";
 
 export interface ImportDialogProps {
   open: boolean;
@@ -120,14 +120,14 @@ export const ImportDialog = ({
                 Channels:
               </span>
               <div className="flex w-40 flex-col gap-1">
-                {channelSet?.settings.map((channel, index) => (
-                  <div className="flex justify-between" key={index}>
+                {channelSet?.settings.map((channel) => (
+                  <div className="flex justify-between" key={channel.id}>
                     <Label>
                       {channel.name.length
                         ? channel.name
                         : `Channel: ${channel.id}`}
                     </Label>
-                    <Checkbox key={index} />
+                    <Checkbox key={channel.id} />
                   </div>
                 ))}
               </div>

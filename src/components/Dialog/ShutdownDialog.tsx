@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { Button } from "@components/UI/Button.js";
 import {
   Dialog,
   DialogContent,
@@ -7,9 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.js";
-import { ClockIcon, PowerIcon } from "lucide-react";
-import { Button } from "@components/UI/Button.js";
 import { Input } from "@components/UI/Input.js";
+import { useDevice } from "@core/stores/deviceStore.js";
+import { ClockIcon, PowerIcon } from "lucide-react";
+import { useState } from "react";
 
 export interface ShutdownDialogProps {
   open: boolean;

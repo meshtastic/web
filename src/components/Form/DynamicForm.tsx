@@ -1,3 +1,8 @@
+import { Button } from "../UI/Button.js";
+import { DynamicFormField, FieldProps } from "./DynamicFormField.js";
+import { FieldWrapper } from "./FormWrapper.js";
+import { H4 } from "@components/UI/Typography/H4.js";
+import { Subtle } from "@components/UI/Typography/Subtle.js";
 import {
   Control,
   DeepPartial,
@@ -6,11 +11,6 @@ import {
   SubmitHandler,
   useForm,
 } from "react-hook-form";
-import { H4 } from "@components/UI/Typography/H4.js";
-import { Subtle } from "@components/UI/Typography/Subtle.js";
-import { DynamicFormField, FieldProps } from "./DynamicFormField.js";
-import { FieldWrapper } from "./FormWrapper.js";
-import { Button } from "../UI/Button.js";
 
 interface DisabledBy<T> {
   fieldName: Path<T>;
@@ -79,9 +79,9 @@ export function DynamicForm<T extends FieldValues>({
             onChange: handleSubmit(onSubmit),
           })}
     >
-      {fieldGroups.map((fieldGroup, index) => (
+      {fieldGroups.map((fieldGroup) => (
         <div
-          key={index}
+          key={fieldGroup.label}
           className="space-y-8 divide-y divide-gray-200 sm:space-y-5"
         >
           <div>
@@ -89,10 +89,10 @@ export function DynamicForm<T extends FieldValues>({
             <Subtle>{fieldGroup.description}</Subtle>
           </div>
 
-          {fieldGroup.fields.map((field, index) => (
+          {fieldGroup.fields.map((field) => (
             <FieldWrapper label={field.label} description={field.description}>
               <DynamicFormField
-                key={index}
+                key={field.label}
                 field={field}
                 control={control}
                 disabled={isDisabled(field.disabledBy)}

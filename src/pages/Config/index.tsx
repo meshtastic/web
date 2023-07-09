@@ -1,13 +1,13 @@
-import { Sidebar } from "@components/Sidebar.js";
-import { SettingsIcon, BoxesIcon, SaveIcon } from "lucide-react";
-import { DeviceConfig } from "@pages/Config/DeviceConfig.js";
-import { ModuleConfig } from "@pages/Config/ModuleConfig.js";
-import { PageLayout } from "@components/PageLayout.js";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
-import { useState } from "react";
 import { useDevice } from "@app/core/stores/deviceStore.js";
+import { PageLayout } from "@components/PageLayout.js";
+import { Sidebar } from "@components/Sidebar.js";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import { useToast } from "@core/hooks/useToast.js";
+import { DeviceConfig } from "@pages/Config/DeviceConfig.js";
+import { ModuleConfig } from "@pages/Config/ModuleConfig.js";
+import { BoxesIcon, SaveIcon, SettingsIcon } from "lucide-react";
+import { useState } from "react";
 
 export const ConfigPage = (): JSX.Element => {
   const { workingConfig, workingModuleConfig, connection } = useDevice();

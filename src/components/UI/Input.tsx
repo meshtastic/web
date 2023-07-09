@@ -38,6 +38,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         {action && (
           <button
+            type="button"
             className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-400 focus:outline-none "
             onClick={action.onClick}
           >

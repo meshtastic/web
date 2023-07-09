@@ -1,8 +1,8 @@
+import { Button } from "@components/UI/Button.js";
 import { Input } from "@components/UI/Input.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { SendIcon } from "lucide-react";
 import type { Types } from "@meshtastic/meshtasticjs";
-import { Button } from "@components/UI/Button.js";
+import { SendIcon } from "lucide-react";
 
 export interface MessageInputProps {
   to: Types.Destination;

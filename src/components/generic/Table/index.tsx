@@ -16,9 +16,9 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
     <table className="min-w-full">
       <thead className="bg-backgroundPrimary text-sm font-semibold text-textPrimary">
         <tr>
-          {headings.map((heading, index) => (
+          {headings.map((heading) => (
             <th
-              key={index}
+              key={heading.title}
               scope="col"
               className={`py-2 pr-3 pl-6 text-left ${
                 heading.sortable

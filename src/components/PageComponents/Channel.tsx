@@ -1,9 +1,9 @@
-import { fromByteArray, toByteArray } from "base64-js";
 import type { ChannelValidation } from "@app/validation/channel.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
 import { useToast } from "@core/hooks/useToast.js";
+import { useDevice } from "@core/stores/deviceStore.js";
+import { Protobuf } from "@meshtastic/meshtasticjs";
+import { fromByteArray, toByteArray } from "base64-js";
 
 export interface SettingsPanelProps {
   channel: Protobuf.Channel;

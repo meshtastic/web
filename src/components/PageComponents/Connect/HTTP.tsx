@@ -1,14 +1,14 @@
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { Input } from "@components/UI/Input.js";
-import { Switch } from "@components/UI/Switch.js";
 import { Button } from "@components/UI/Button.js";
+import { Input } from "@components/UI/Input.js";
+import { Label } from "@components/UI/Label.js";
+import { SelectLabel } from "@components/UI/Select.js";
+import { Switch } from "@components/UI/Switch.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
 import { IHTTPConnection } from "@meshtastic/meshtasticjs";
-import { Label } from "@components/UI/Label.js";
-import { SelectLabel } from "@components/UI/Select.js";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
 export const HTTP = (): JSX.Element => {
   const { addDevice } = useDeviceStore();

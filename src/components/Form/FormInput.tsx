@@ -1,9 +1,9 @@
-import type { LucideIcon } from "lucide-react";
+import { Input } from "../UI/Input.js";
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
 } from "./DynamicForm.js";
-import { Input } from "../UI/Input.js";
+import type { LucideIcon } from "lucide-react";
 import { Controller, FieldValues } from "react-hook-form";
 
 export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {

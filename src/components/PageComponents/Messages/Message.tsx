@@ -1,11 +1,11 @@
+import type { MessageWithState } from "@app/core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
+import type { Protobuf } from "@meshtastic/meshtasticjs";
 import {
-  CircleEllipsisIcon,
   AlertCircleIcon,
   CheckCircle2Icon,
+  CircleEllipsisIcon,
 } from "lucide-react";
-import type { Protobuf } from "@meshtastic/meshtasticjs";
-import type { MessageWithState } from "@app/core/stores/deviceStore.js";
 
 export interface MessageProps {
   lastMsgSameUser: boolean;

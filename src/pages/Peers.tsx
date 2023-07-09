@@ -1,11 +1,11 @@
-import { base16 } from "rfc4648";
+import { Sidebar } from "@components/Sidebar.js";
 import { Mono } from "@components/generic/Mono.js";
 import { Table } from "@components/generic/Table";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { Sidebar } from "@components/Sidebar.js";
+import { base16 } from "rfc4648";
 
 export const PeersPage = (): JSX.Element => {
   const { nodes, hardware } = useDevice();
@@ -16,7 +16,7 @@ export const PeersPage = (): JSX.Element => {
 
   return (
     <>
-      <Sidebar></Sidebar>
+      <Sidebar />
       <div className="w-full overflow-y-auto">
         <Table
           headings={[

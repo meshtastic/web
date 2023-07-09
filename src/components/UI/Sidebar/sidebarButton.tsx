@@ -1,5 +1,5 @@
-import type { LucideIcon } from "lucide-react";
 import { Button } from "../Button.js";
+import type { LucideIcon } from "lucide-react";
 
 export interface SidebarButtonProps {
   label: string;

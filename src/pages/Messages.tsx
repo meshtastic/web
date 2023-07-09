@@ -1,14 +1,14 @@
-import { Sidebar } from "@components/Sidebar.js";
-import { PageLayout } from "@components/PageLayout.js";
+import { getChannelName } from "./Channels.js";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.js";
+import { PageLayout } from "@components/PageLayout.js";
+import { Sidebar } from "@components/Sidebar.js";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
+import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { HashIcon } from "lucide-react";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
+import { HashIcon } from "lucide-react";
 import { useMemo, useState } from "react";
-import { getChannelName } from "./Channels.js";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 
 export const MessagesPage = (): JSX.Element => {
   const { channels, nodes, hardware, messages } = useDevice();

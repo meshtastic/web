@@ -1,18 +1,18 @@
-import { Fragment } from "react";
-import { Network } from "@components/PageComponents/Config/Network.js";
 import { Bluetooth } from "@components/PageComponents/Config/Bluetooth.js";
 import { Device } from "@components/PageComponents/Config/Device.js";
 import { Display } from "@components/PageComponents/Config/Display.js";
 import { LoRa } from "@components/PageComponents/Config/LoRa.js";
+import { Network } from "@components/PageComponents/Config/Network.js";
 import { Position } from "@components/PageComponents/Config/Position.js";
 import { Power } from "@components/PageComponents/Config/Power.js";
-import { useDevice } from "@core/stores/deviceStore.js";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.js";
+import { useDevice } from "@core/stores/deviceStore.js";
+import { Fragment } from "react";
 
 export const DeviceConfig = (): JSX.Element => {
   const { hardware } = useDevice();

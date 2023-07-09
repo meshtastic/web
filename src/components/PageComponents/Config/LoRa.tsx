@@ -1,7 +1,7 @@
 import type { LoRaValidation } from "@app/validation/config/lora.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const LoRa = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();

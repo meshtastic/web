@@ -1,18 +1,18 @@
+import { DeviceSelectorButton } from "./DeviceSelectorButton.js";
+import { Separator } from "@components/UI/Seperator.js";
+import { Code } from "@components/UI/Typography/Code.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
-  PlusIcon,
+  GithubIcon,
   HomeIcon,
   LanguagesIcon,
-  SunIcon,
   MoonIcon,
-  GithubIcon,
+  PlusIcon,
+  SunIcon,
   TerminalIcon,
 } from "lucide-react";
-import { Separator } from "@components/UI/Seperator.js";
-import { Code } from "@components/UI/Typography/Code.js";
-import { DeviceSelectorButton } from "./DeviceSelectorButton.js";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
@@ -53,6 +53,7 @@ export const DeviceSelector = (): JSX.Element => {
           ))}
           <Separator />
           <button
+            type="button"
             onClick={() => setConnectDialogOpen(true)}
             className="transition-all duration-300 hover:text-accent"
           >
@@ -62,18 +63,20 @@ export const DeviceSelector = (): JSX.Element => {
       </div>
       <div className="flex w-20 flex-col items-center space-y-5 bg-transparent px-5 pb-5">
         <button
+          type="button"
           className="transition-all hover:text-accent"
           onClick={() => setDarkMode(!darkMode)}
         >
           {darkMode ? <SunIcon /> : <MoonIcon />}
         </button>
         <button
+          type="button"
           className="transition-all hover:text-accent"
           onClick={() => setCommandPaletteOpen(true)}
         >
           <TerminalIcon />
         </button>
-        <button className="transition-all hover:text-accent">
+        <button type="button" className="transition-all hover:text-accent">
           <LanguagesIcon />
         </button>
         <Separator />

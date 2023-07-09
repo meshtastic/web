@@ -1,8 +1,4 @@
-import { useEffect, useState } from "react";
-import { fromByteArray } from "base64-js";
-import { QRCode } from "react-qrcode-logo";
 import { Checkbox } from "@components/UI/Checkbox.js";
-import { Input } from "@components/UI/Input.js";
 import {
   Dialog,
   DialogContent,
@@ -11,9 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.js";
-import { ClipboardIcon } from "lucide-react";
-import { Protobuf, Types } from "@meshtastic/meshtasticjs";
+import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
+import { Protobuf, Types } from "@meshtastic/meshtasticjs";
+import { fromByteArray } from "base64-js";
+import { ClipboardIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { QRCode } from "react-qrcode-logo";
 
 export interface QRDialogProps {
   open: boolean;

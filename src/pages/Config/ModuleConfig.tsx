@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { useDevice } from "@app/core/stores/deviceStore.js";
 import { Audio } from "@components/PageComponents/ModuleConfig/Audio.js";
 import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage";
 import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.js";
@@ -7,13 +7,13 @@ import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.js"
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.js";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.js";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.js";
-import { useDevice } from "@app/core/stores/deviceStore.js";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.js";
+import { Fragment } from "react";
 
 export const ModuleConfig = (): JSX.Element => {
   const { workingModuleConfig, connection } = useDevice();

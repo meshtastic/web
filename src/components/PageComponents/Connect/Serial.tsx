@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-import { Mono } from "@components/generic/Mono.js";
 import { Button } from "@components/UI/Button.js";
+import { Mono } from "@components/generic/Mono.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
 import { ISerialConnection } from "@meshtastic/meshtasticjs";
+import { useCallback, useEffect, useState } from "react";
 
 export const Serial = (): JSX.Element => {
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);

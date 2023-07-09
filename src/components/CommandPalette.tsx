@@ -360,28 +360,27 @@ export const CommandPalette = (): JSX.Element => {
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        {groups.map((group, index) => (
-          <CommandGroup key={index} heading={group.label}>
-            {group.commands.map((command, index) => (
-              <div key={index}>
+        {groups.map((group) => (
+          <CommandGroup key={group.label} heading={group.label}>
+            {group.commands.map((command) => (
+              <div key={command.label}>
                 <CommandItem
                   onSelect={() => {
-                    command.action && command.action();
+                    command.action?.();
                     setCommandPaletteOpen(false);
                   }}
                 >
                   <command.icon size={16} className="mr-2" />
                   {command.label}
                 </CommandItem>
-                {command.subItems &&
-                  command.subItems.map((subItem, index) => (
-                    <SubItem
-                      key={index}
-                      label={subItem.label}
-                      icon={subItem.icon}
-                      action={subItem.action}
-                    />
-                  ))}
+                {command.subItems?.map((subItem) => (
+                  <SubItem
+                    key={subItem.label}
+                    label={subItem.label}
+                    icon={subItem.icon}
+                    action={subItem.action}
+                  />
+                ))}
               </div>
             ))}
           </CommandGroup>
