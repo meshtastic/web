@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@components/UI/Dialog.js";
 import { ClockIcon, RefreshCwIcon } from "lucide-react";
 import { Button } from "@components/UI/Button.js";
@@ -19,7 +19,7 @@ export interface RebootDialogProps {
 
 export const RebootDialog = ({
   open,
-  onOpenChange
+  onOpenChange,
 }: RebootDialogProps): JSX.Element => {
   const { connection } = useDevice();
 
@@ -43,7 +43,7 @@ export const RebootDialog = ({
               icon: ClockIcon,
               onClick() {
                 connection?.reboot(time * 60).then(() => onOpenChange(false));
-              }
+              },
             }}
           />
           <Button

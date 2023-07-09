@@ -6,7 +6,7 @@ export interface ThemeControllerProps {
 }
 
 export const ThemeController = ({
-  children
+  children,
 }: ThemeControllerProps): JSX.Element => {
   const { darkMode, accent } = useAppStore();
 

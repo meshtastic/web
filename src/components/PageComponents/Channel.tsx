@@ -18,12 +18,12 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
       ...data,
       settings: {
         ...data.settings,
-        psk: toByteArray(data.settings.psk ?? "")
-      }
+        psk: toByteArray(data.settings.psk ?? ""),
+      },
     });
     connection?.setChannel(channel).then(() => {
       toast({
-        title: `Saved Channel: ${channel.settings?.name}`
+        title: `Saved Channel: ${channel.settings?.name}`,
       });
       addChannel(channel);
     });
@@ -39,9 +39,9 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         ...{
           settings: {
             ...channel?.settings,
-            psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0))
-          }
-        }
+            psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+          },
+        },
       }}
       fieldGroups={[
         {
@@ -54,8 +54,8 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               label: "Role",
               description: "Description",
               properties: {
-                enumValue: Protobuf.Channel_Role
-              }
+                enumValue: Protobuf.Channel_Role,
+              },
             },
             {
               type: "password",
@@ -64,40 +64,40 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               description: "Description",
               properties: {
                 // act
-              }
+              },
             },
             {
               type: "number",
               name: "settings.channelNum",
               label: "Channel Number",
-              description: "Description"
+              description: "Description",
             },
             {
               type: "text",
               name: "settings.name",
               label: "Name",
-              description: "Description"
+              description: "Description",
             },
             {
               type: "number",
               name: "settings.id",
               label: "ID",
-              description: "Description"
+              description: "Description",
             },
             {
               type: "toggle",
               name: "settings.uplinkEnabled",
               label: "Uplink Enabled",
-              description: "Description"
+              description: "Description",
             },
             {
               type: "toggle",
               name: "settings.downlinkEnabled",
               label: "Downlink Enabled",
-              description: "Description"
-            }
-          ]
-        }
+              description: "Description",
+            },
+          ],
+        },
       ]}
     />
   );

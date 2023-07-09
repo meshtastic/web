@@ -6,7 +6,7 @@ import {
   ToastDescription,
   ToastProvider,
   ToastTitle,
-  ToastViewport
+  ToastViewport,
 } from "@components/UI/Toast.js";
 
 export function Toaster() {

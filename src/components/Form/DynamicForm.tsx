@@ -4,7 +4,7 @@ import {
   FieldValues,
   Path,
   SubmitHandler,
-  useForm
+  useForm,
 } from "react-hook-form";
 import { H4 } from "@components/UI/Typography/H4.js";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
@@ -49,11 +49,11 @@ export function DynamicForm<T extends FieldValues>({
   submitType = "onChange",
   hasSubmitButton,
   defaultValues,
-  fieldGroups
+  fieldGroups,
 }: DynamicFormProps<T>) {
   const { handleSubmit, control, getValues } = useForm<T>({
     mode: submitType,
-    defaultValues: defaultValues
+    defaultValues: defaultValues,
   });
 
   const isDisabled = (disabledBy?: DisabledBy<T>[]): boolean => {
@@ -76,7 +76,7 @@ export function DynamicForm<T extends FieldValues>({
       {...(submitType === "onSubmit"
         ? { onSubmit: handleSubmit(onSubmit) }
         : {
-            onChange: handleSubmit(onSubmit)
+            onChange: handleSubmit(onSubmit),
           })}
     >
       {fieldGroups.map((fieldGroup, index) => (

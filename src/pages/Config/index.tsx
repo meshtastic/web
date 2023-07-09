@@ -47,24 +47,24 @@ export const ConfigPage = (): JSX.Element => {
                   async (config) =>
                     await connection?.setConfig(config).then(() =>
                       toast({
-                        title: `Config ${config.payloadVariant.case} saved`
-                      })
-                    )
+                        title: `Config ${config.payloadVariant.case} saved`,
+                      }),
+                    ),
                 );
               } else {
                 workingModuleConfig.map(
                   async (moduleConfig) =>
                     await connection?.setModuleConfig(moduleConfig).then(() =>
                       toast({
-                        title: `Config ${moduleConfig.payloadVariant.case} saved`
-                      })
-                    )
+                        title: `Config ${moduleConfig.payloadVariant.case} saved`,
+                      }),
+                    ),
                 );
               }
 
               await connection?.commitEditSettings();
-            }
-          }
+            },
+          },
         ]}
       >
         {activeConfigSection === "device" ? <DeviceConfig /> : <ModuleConfig />}

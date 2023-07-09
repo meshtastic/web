@@ -9,7 +9,7 @@ export interface DeviceWrapperProps {
 
 export const DeviceWrapper = ({
   children,
-  device
+  device,
 }: DeviceWrapperProps): JSX.Element => {
   return (
     <DeviceContext.Provider value={device}>{children}</DeviceContext.Provider>

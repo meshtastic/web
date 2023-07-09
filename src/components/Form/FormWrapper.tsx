@@ -11,7 +11,7 @@ export interface FieldWrapperProps {
 export const FieldWrapper = ({
   label,
   description,
-  children
+  children,
 }: FieldWrapperProps): JSX.Element => (
   <div className="pt-6 sm:pt-5">
     <div role="group" aria-labelledby="label-notifications">

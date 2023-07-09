@@ -15,14 +15,14 @@ export const MessagesPage = (): JSX.Element => {
   const [chatType, setChatType] =
     useState<Types.PacketDestination>("broadcast");
   const [activeChat, setActiveChat] = useState<number>(
-    Types.ChannelNumber.PRIMARY
+    Types.ChannelNumber.PRIMARY,
   );
   const filteredNodes = Array.from(nodes.values()).filter(
-    (n) => n.num !== hardware.myNodeNum
+    (n) => n.num !== hardware.myNodeNum,
   );
   const allChannels = Array.from(channels.values());
   const filteredChannels = allChannels.filter(
-    (ch) => ch.role !== Protobuf.Channel_Role.DISABLED
+    (ch) => ch.role !== Protobuf.Channel_Role.DISABLED,
   );
   const currentChannel = channels.get(activeChat);
 
@@ -82,7 +82,7 @@ export const MessagesPage = (): JSX.Element => {
                 messages={messages.broadcast.get(channel.index)}
                 channel={channel.index}
               />
-            )
+            ),
         )}
         {filteredNodes.map(
           (node) =>
@@ -93,7 +93,7 @@ export const MessagesPage = (): JSX.Element => {
                 messages={messages.direct.get(node.num)}
                 channel={Types.ChannelNumber.PRIMARY}
               />
-            )
+            ),
         )}
       </PageLayout>
     </>

@@ -1,6 +1,6 @@
 import type {
   BaseFormBuilderProps,
-  GenericFormElementProps
+  GenericFormElementProps,
 } from "./DynamicForm.js";
 import { Controller, FieldValues } from "react-hook-form";
 import {
@@ -8,7 +8,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "../UI/Select.js";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
@@ -24,7 +24,7 @@ export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
 export function SelectInput<T extends FieldValues>({
   control,
   disabled,
-  field
+  field,
 }: GenericFormElementProps<T, SelectFieldProps<T>>) {
   return (
     <Controller
@@ -35,7 +35,7 @@ export function SelectInput<T extends FieldValues>({
           field.properties;
         const optionsEnumValues = enumValue
           ? Object.entries(enumValue).filter(
-              (value) => typeof value[1] === "number"
+              (value) => typeof value[1] === "number",
             )
           : [];
         return (

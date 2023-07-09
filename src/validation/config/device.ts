@@ -25,4 +25,10 @@ export class DeviceValidation
 
   @IsInt()
   nodeInfoBroadcastSecs: number;
+
+  @IsBoolean()
+  doubleTapAsButtonPress: boolean;
+
+  @IsBoolean()
+  isManaged: boolean;
 }

@@ -15,7 +15,7 @@ export const PageLayout = ({
   label,
   noPadding,
   actions,
-  children
+  children,
 }: PageLayoutProps): JSX.Element => {
   return (
     <div className="relative flex h-full w-full flex-col">
@@ -43,7 +43,7 @@ export const PageLayout = ({
       <div
         className={cn(
           "flex h-full w-full flex-col overflow-y-auto",
-          !noPadding && "p-3"
+          !noPadding && "p-3",
         )}
       >
         {children}

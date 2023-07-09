@@ -1,4 +1,4 @@
-import { IsBoolean, Length } from "class-validator";
+import { IsBoolean, IsString, Length } from "class-validator";
 
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
@@ -23,4 +23,13 @@ export class MQTTValidation
 
   @IsBoolean()
   jsonEnabled: boolean;
+
+  @IsBoolean()
+  tlsEnabled: boolean;
+
+  @IsString()
+  root: string;
+
+  @IsBoolean()
+  proxyToClientEnabled: boolean;
 }

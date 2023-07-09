@@ -12,7 +12,7 @@ import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from "@components/UI/Tabs.js";
 
 export const ModuleConfig = (): JSX.Element => {
@@ -21,36 +21,36 @@ export const ModuleConfig = (): JSX.Element => {
   const tabs = [
     {
       label: "MQTT",
-      element: MQTT
+      element: MQTT,
     },
     {
       label: "Serial",
-      element: Serial
+      element: Serial,
     },
     {
       label: "Ext Notif",
-      element: ExternalNotification
+      element: ExternalNotification,
     },
     {
       label: "S&F",
-      element: StoreForward
+      element: StoreForward,
     },
     {
       label: "Range Test",
-      element: RangeTest
+      element: RangeTest,
     },
     {
       label: "Telemetry",
-      element: Telemetry
+      element: Telemetry,
     },
     {
       label: "Canned",
-      element: CannedMessage
+      element: CannedMessage,
     },
     {
       label: "Audio",
-      element: Audio
-    }
+      element: Audio,
+    },
   ];
 
   return (

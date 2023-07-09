@@ -1,7 +1,7 @@
 import type { SerialValidation } from "@app/validation/moduleConfig/serial.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Serial = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -11,9 +11,9 @@ export const Serial = (): JSX.Element => {
       new Protobuf.ModuleConfig({
         payloadVariant: {
           case: "serial",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -30,7 +30,7 @@ export const Serial = (): JSX.Element => {
               type: "toggle",
               name: "enabled",
               label: "Module Enabled",
-              description: "Enable Serial output"
+              description: "Enable Serial output",
             },
             {
               type: "toggle",
@@ -40,9 +40,9 @@ export const Serial = (): JSX.Element => {
                 "Any packets you send will be echoed back to your device",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "number",
@@ -51,9 +51,9 @@ export const Serial = (): JSX.Element => {
               description: "Set the GPIO pin to the RXD pin you have set up.",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "number",
@@ -62,9 +62,9 @@ export const Serial = (): JSX.Element => {
               description: "Set the GPIO pin to the TXD pin you have set up.",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "select",
@@ -74,12 +74,12 @@ export const Serial = (): JSX.Element => {
 
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
+                  fieldName: "enabled",
+                },
               ],
               properties: {
-                enumValue: Protobuf.ModuleConfig_SerialConfig_Serial_Baud
-              }
+                enumValue: Protobuf.ModuleConfig_SerialConfig_Serial_Baud,
+              },
             },
             {
               type: "number",
@@ -90,12 +90,12 @@ export const Serial = (): JSX.Element => {
                 "Seconds to wait before we consider your packet as 'done'",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
+                  fieldName: "enabled",
+                },
               ],
               properties: {
-                suffix: "Seconds"
-              }
+                suffix: "Seconds",
+              },
             },
             {
               type: "select",
@@ -105,16 +105,23 @@ export const Serial = (): JSX.Element => {
 
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
+                  fieldName: "enabled",
+                },
               ],
               properties: {
                 enumValue: Protobuf.ModuleConfig_SerialConfig_Serial_Mode,
-                formatEnumName: true
-              }
-            }
-          ]
-        }
+                formatEnumName: true,
+              },
+            },
+            {
+              type: "toggle",
+              name: "overrideConsoleSerialPort",
+              label: "Override Console Serial Port",
+              description:
+                "If you have a serial port connected to the console, this will override it.",
+            },
+          ],
+        },
       ]}
     />
   );

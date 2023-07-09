@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@components/UI/Dialog.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
 import { Switch } from "@components/UI/Switch.js";
@@ -24,7 +24,7 @@ export interface ImportDialogProps {
 
 export const ImportDialog = ({
   open,
-  onOpenChange
+  onOpenChange,
 }: ImportDialogProps): JSX.Element => {
   const [QRCodeURL, setQRCodeURL] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.ChannelSet>();
@@ -55,8 +55,8 @@ export const ImportDialog = ({
             index === 0
               ? Protobuf.Channel_Role.PRIMARY
               : Protobuf.Channel_Role.SECONDARY,
-          settings: ch
-        })
+          settings: ch,
+        }),
       );
     });
 
@@ -65,9 +65,9 @@ export const ImportDialog = ({
         new Protobuf.Config({
           payloadVariant: {
             case: "lora",
-            value: channelSet.loraConfig
-          }
-        })
+            value: channelSet.loraConfig,
+          },
+        }),
       );
     }
   };

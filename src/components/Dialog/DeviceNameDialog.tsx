@@ -5,7 +5,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@components/UI/Dialog.js";
 import { Button } from "@components/UI/Button.js";
 import { useDevice } from "@app/core/stores/deviceStore.js";
@@ -25,7 +25,7 @@ export interface DeviceNameDialogProps {
 
 export const DeviceNameDialog = ({
   open,
-  onOpenChange
+  onOpenChange,
 }: DeviceNameDialogProps): JSX.Element => {
   const { hardware, nodes, connection } = useDevice();
 
@@ -34,16 +34,16 @@ export const DeviceNameDialog = ({
   const { register, handleSubmit } = useForm<User>({
     values: {
       longName: myNode?.user?.longName ?? "Unknown",
-      shortName: myNode?.user?.shortName ?? "Unknown"
-    }
+      shortName: myNode?.user?.shortName ?? "Unknown",
+    },
   });
 
   const onSubmit = handleSubmit((data) => {
     connection?.setOwner(
       new Protobuf.User({
         ...myNode?.user,
-        ...data
-      })
+        ...data,
+      }),
     );
     onOpenChange(false);
   });

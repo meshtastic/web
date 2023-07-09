@@ -8,7 +8,7 @@ export interface SidebarSectionProps {
 
 export const SidebarSection = ({
   label: title,
-  children
+  children,
 }: SidebarSectionProps): JSX.Element => (
   <div className="px-4 py-2">
     <H4 className="mb-2 ml-2">{title}</H4>

@@ -9,7 +9,7 @@ export interface DeviceSelectorButtonProps {
 export const DeviceSelectorButton = ({
   active,
   onClick,
-  children
+  children,
 }: DeviceSelectorButtonProps): JSX.Element => (
   <li className="aspect-w-1 aspect-h-1 relative w-full" onClick={onClick}>
     {active && (

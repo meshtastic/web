@@ -11,9 +11,9 @@ export const ExternalNotification = (): JSX.Element => {
       new Protobuf.ModuleConfig({
         payloadVariant: {
           case: "externalNotification",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -30,7 +30,7 @@ export const ExternalNotification = (): JSX.Element => {
               type: "toggle",
               name: "enabled",
               label: "Module Enabled",
-              description: "Enable External Notification"
+              description: "Enable External Notification",
             },
             {
               type: "number",
@@ -40,12 +40,12 @@ export const ExternalNotification = (): JSX.Element => {
 
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
+                  fieldName: "enabled",
+                },
               ],
               properties: {
-                suffix: "ms"
-              }
+                suffix: "ms",
+              },
             },
             {
               type: "number",
@@ -54,9 +54,9 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Output",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "number",
@@ -65,9 +65,9 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Output Vibrate",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "number",
@@ -76,9 +76,9 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Output Buzzer",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -87,9 +87,9 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Active",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -98,9 +98,9 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Alert Message",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -109,9 +109,9 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Alert Message Vibrate",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -120,9 +120,9 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Alert Message Buzzer",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -132,9 +132,9 @@ export const ExternalNotification = (): JSX.Element => {
                 "Should an alert be triggered when receiving an incoming bell?",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -143,9 +143,9 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Alert Bell Vibrate",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -154,9 +154,9 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Alert Bell Buzzer",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -165,9 +165,9 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Use PWM",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "number",
@@ -176,12 +176,12 @@ export const ExternalNotification = (): JSX.Element => {
               description: "Nag Timeout",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
-            }
-          ]
-        }
+                  fieldName: "enabled",
+                },
+              ],
+            },
+          ],
+        },
       ]}
     />
   );

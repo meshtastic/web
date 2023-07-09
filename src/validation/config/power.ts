@@ -30,4 +30,7 @@ export class PowerValidation
 
   @IsInt()
   minWakeSecs: number;
+
+  @IsInt()
+  deviceBatteryInaAddress: number;
 }

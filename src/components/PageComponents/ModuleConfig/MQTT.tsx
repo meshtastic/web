@@ -1,7 +1,7 @@
-import type { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@app/core/stores/deviceStore.js";
+import type { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
+import { Protobuf } from "@meshtastic/meshtasticjs";
 
 export const MQTT = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -11,9 +11,9 @@ export const MQTT = (): JSX.Element => {
       new Protobuf.ModuleConfig({
         payloadVariant: {
           case: "mqtt",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -30,7 +30,7 @@ export const MQTT = (): JSX.Element => {
               type: "toggle",
               name: "enabled",
               label: "Enabled",
-              description: "Enable or disable MQTT"
+              description: "Enable or disable MQTT",
             },
             {
               type: "text",
@@ -40,9 +40,9 @@ export const MQTT = (): JSX.Element => {
                 "MQTT server address to use for default/custom servers",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "text",
@@ -51,9 +51,9 @@ export const MQTT = (): JSX.Element => {
               description: "MQTT username to use for default/custom servers",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "password",
@@ -62,9 +62,9 @@ export const MQTT = (): JSX.Element => {
               description: "MQTT password to use for default/custom servers",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -73,9 +73,9 @@ export const MQTT = (): JSX.Element => {
               description: "Enable or disable MQTT encryption",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -84,12 +84,46 @@ export const MQTT = (): JSX.Element => {
               description: "Whether to send/consume JSON packets on MQTT",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
-            }
-          ]
-        }
+                  fieldName: "enabled",
+                },
+              ],
+            },
+            {
+              type: "toggle",
+              name: "tlsEnabled",
+              label: "TLS Enabled",
+              description: "Enable or disable TLS",
+              disabledBy: [
+                {
+                  fieldName: "enabled",
+                },
+              ],
+            },
+            {
+              type: "text",
+              name: "root",
+              label: "Root topic",
+              description: "MQTT root topic to use for default/custom servers",
+              disabledBy: [
+                {
+                  fieldName: "enabled",
+                },
+              ],
+            },
+            {
+              type: "toggle",
+              name: "proxyToClientEnabled",
+              label: "Proxy to Client Enabled",
+              description:
+                "Whether to proxy MQTT packets to the client (for example to Home Assistant)",
+              disabledBy: [
+                {
+                  fieldName: "enabled",
+                },
+              ],
+            },
+          ],
+        },
       ]}
     />
   );

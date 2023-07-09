@@ -11,9 +11,9 @@ export const Audio = (): JSX.Element => {
       new Protobuf.ModuleConfig({
         payloadVariant: {
           case: "audio",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -30,13 +30,13 @@ export const Audio = (): JSX.Element => {
               type: "toggle",
               name: "codec2Enabled",
               label: "Codec 2 Enabled",
-              description: "Enable Codec 2 audio encoding"
+              description: "Enable Codec 2 audio encoding",
             },
             {
               type: "number",
               name: "pttPin",
               label: "PTT Pin",
-              description: "GPIO pin to use for PTT"
+              description: "GPIO pin to use for PTT",
             },
             {
               type: "select",
@@ -44,35 +44,35 @@ export const Audio = (): JSX.Element => {
               label: "Bitrate",
               description: "Bitrate to use for audio encoding",
               properties: {
-                enumValue: Protobuf.ModuleConfig_AudioConfig_Audio_Baud
-              }
+                enumValue: Protobuf.ModuleConfig_AudioConfig_Audio_Baud,
+              },
             },
             {
               type: "number",
               name: "i2sWs",
               label: "i2S WS",
-              description: "GPIO pin to use for i2S WS"
+              description: "GPIO pin to use for i2S WS",
             },
             {
               type: "number",
               name: "i2sSd",
               label: "i2S SD",
-              description: "GPIO pin to use for i2S SD"
+              description: "GPIO pin to use for i2S SD",
             },
             {
               type: "number",
               name: "i2sDin",
               label: "i2S DIN",
-              description: "GPIO pin to use for i2S DIN"
+              description: "GPIO pin to use for i2S DIN",
             },
             {
               type: "number",
               name: "i2sSck",
               label: "i2S SCK",
-              description: "GPIO pin to use for i2S SCK"
-            }
-          ]
-        }
+              description: "GPIO pin to use for i2S SCK",
+            },
+          ],
+        },
       ]}
     />
   );

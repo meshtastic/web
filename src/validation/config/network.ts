@@ -4,7 +4,7 @@ import {
   IsIP,
   IsOptional,
   IsString,
-  Length
+  Length,
 } from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";

@@ -9,7 +9,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@components/UI/Dialog.js";
 import { ClipboardIcon } from "lucide-react";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
@@ -26,7 +26,7 @@ export const QRDialog = ({
   open,
   onOpenChange,
   loraConfig,
-  channels
+  channels,
 }: QRDialogProps): JSX.Element => {
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [QRCodeURL, setQRCodeURL] = useState<string>("");
@@ -41,8 +41,8 @@ export const QRDialog = ({
     const encoded = new Protobuf.ChannelSet(
       new Protobuf.ChannelSet({
         loraConfig,
-        settings: channelsToEncode
-      })
+        settings: channelsToEncode,
+      }),
     );
     const base64 = fromByteArray(encoded.toBinary())
       .replace(/=/g, "")
@@ -79,12 +79,12 @@ export const QRDialog = ({
                     onCheckedChange={() => {
                       if (selectedChannels.includes(channel.index)) {
                         setSelectedChannels(
-                          selectedChannels.filter((c) => c !== channel.index)
+                          selectedChannels.filter((c) => c !== channel.index),
                         );
                       } else {
                         setSelectedChannels([
                           ...selectedChannels,
-                          channel.index
+                          channel.index,
                         ]);
                       }
                     }}
@@ -104,7 +104,7 @@ export const QRDialog = ({
               icon: ClipboardIcon,
               onClick() {
                 void navigator.clipboard.writeText(QRCodeURL);
-              }
+              },
             }}
           />
         </DialogFooter>

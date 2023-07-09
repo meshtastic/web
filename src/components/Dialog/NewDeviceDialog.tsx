@@ -3,13 +3,13 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@components/UI/Dialog.js";
 import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from "@components/UI/Tabs.js";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { Link } from "@components/UI/Typography/Link.js";
@@ -22,7 +22,7 @@ const tabs = [
     label: "HTTP",
     element: HTTP,
     disabled: false,
-    disabledMessage: "Unsuported connection method"
+    disabledMessage: "Unsuported connection method",
   },
   {
     label: "Bluetooth",
@@ -31,15 +31,15 @@ const tabs = [
     disabledMessage:
       "Web Bluetooth is currently only supported by Chromium-based browsers",
     disabledLink:
-      "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility"
+      "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
   },
   {
     label: "Serial",
     element: Serial,
     disabled: !navigator.serial,
     disabledMessage:
-      "WebSerial is currently only supported by Chromium based browsers: https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility"
-  }
+      "WebSerial is currently only supported by Chromium based browsers: https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility",
+  },
 ];
 export interface NewDeviceProps {
   open: boolean;
@@ -48,7 +48,7 @@ export interface NewDeviceProps {
 
 export const NewDeviceDialog = ({
   open,
-  onOpenChange
+  onOpenChange,
 }: NewDeviceProps): JSX.Element => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

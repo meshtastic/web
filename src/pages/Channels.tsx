@@ -10,7 +10,7 @@ import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from "@app/components/UI/Tabs.js";
 
 export const getChannelName = (channel: Protobuf.Channel) =>
@@ -23,7 +23,7 @@ export const getChannelName = (channel: Protobuf.Channel) =>
 export const ChannelsPage = (): JSX.Element => {
   const { channels, setDialogOpen } = useDevice();
   const [activeChannel, setActiveChannel] = useState<Types.ChannelNumber>(
-    Types.ChannelNumber.PRIMARY
+    Types.ChannelNumber.PRIMARY,
   );
 
   const currentChannel = channels.get(activeChannel);
@@ -41,14 +41,14 @@ export const ChannelsPage = (): JSX.Element => {
             icon: ImportIcon,
             onClick() {
               setDialogOpen("import", true);
-            }
+            },
           },
           {
             icon: QrCodeIcon,
             onClick() {
               setDialogOpen("QR", true);
-            }
-          }
+            },
+          },
         ]}
       >
         <Tabs defaultValue="0">

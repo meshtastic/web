@@ -8,7 +8,7 @@ import {
   LayersIcon,
   UsersIcon,
   EditIcon,
-  LayoutGrid
+  LayoutGrid,
 } from "lucide-react";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
@@ -33,28 +33,28 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
     {
       name: "Messages",
       icon: MessageSquareIcon,
-      page: "messages"
+      page: "messages",
     },
     {
       name: "Map",
       icon: MapIcon,
-      page: "map"
+      page: "map",
     },
     {
       name: "Config",
       icon: SettingsIcon,
-      page: "config"
+      page: "config",
     },
     {
       name: "Channels",
       icon: LayersIcon,
-      page: "channels"
+      page: "channels",
     },
     {
       name: "Peers",
       icon: UsersIcon,
-      page: "peers"
-    }
+      page: "peers",
+    },
   ];
 
   return (

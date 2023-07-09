@@ -8,7 +8,7 @@ import {
   CalendarIcon,
   BluetoothIcon,
   UsbIcon,
-  NetworkIcon
+  NetworkIcon,
 } from "lucide-react";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { H3 } from "@components/UI/Typography/H3.js";

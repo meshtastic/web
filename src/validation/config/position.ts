@@ -3,8 +3,7 @@ import { IsBoolean, IsInt, IsNumber } from "class-validator";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 
 export class PositionValidation
-  implements
-    Omit<Protobuf.Config_PositionConfig, keyof Protobuf.native.Message>
+  implements Omit<Protobuf.Config_PositionConfig, keyof Protobuf.native.Message>
 {
   @IsInt()
   positionBroadcastSecs: number;
@@ -32,4 +31,10 @@ export class PositionValidation
 
   @IsInt()
   txGpio: number;
+
+  @IsInt()
+  broadcastSmartMinimumDistance: number;
+
+  @IsInt()
+  broadcastSmartMinimumIntervalSecs: number;
 }

@@ -11,9 +11,9 @@ export const StoreForward = (): JSX.Element => {
       new Protobuf.ModuleConfig({
         payloadVariant: {
           case: "storeForward",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -30,7 +30,7 @@ export const StoreForward = (): JSX.Element => {
               type: "toggle",
               name: "enabled",
               label: "Module Enabled",
-              description: "Enable Store & Forward"
+              description: "Enable Store & Forward",
             },
             {
               type: "toggle",
@@ -39,9 +39,9 @@ export const StoreForward = (): JSX.Element => {
               description: "Enable Store & Forward heartbeat",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "number",
@@ -51,12 +51,12 @@ export const StoreForward = (): JSX.Element => {
 
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
+                  fieldName: "enabled",
+                },
               ],
               properties: {
-                suffix: "Records"
-              }
+                suffix: "Records",
+              },
             },
             {
               type: "number",
@@ -65,9 +65,9 @@ export const StoreForward = (): JSX.Element => {
               description: "Max number of records to return",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "number",
@@ -76,12 +76,12 @@ export const StoreForward = (): JSX.Element => {
               description: "Max number of records to return",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
-            }
-          ]
-        }
+                  fieldName: "enabled",
+                },
+              ],
+            },
+          ],
+        },
       ]}
     />
   );

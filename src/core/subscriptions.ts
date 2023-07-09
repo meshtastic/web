@@ -3,7 +3,7 @@ import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 
 export const subscribeAll = (
   device: Device,
-  connection: Types.ConnectionType
+  connection: Types.ConnectionType,
 ) => {
   let myNodeNum = 0;
 
@@ -79,7 +79,7 @@ export const subscribeAll = (
   connection.events.onMessagePacket.subscribe((messagePacket) => {
     device.addMessage({
       ...messagePacket,
-      state: messagePacket.from !== myNodeNum ? "ack" : "waiting"
+      state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
     });
   });
 
@@ -91,7 +91,7 @@ export const subscribeAll = (
     device.processPacket({
       from: meshPacket.from,
       snr: meshPacket.rxSnr,
-      time: meshPacket.rxTime
+      time: meshPacket.rxTime,
     });
   });
 };

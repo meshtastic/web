@@ -17,7 +17,7 @@ export interface DynamicFormFieldProps<T extends FieldValues> {
 export function DynamicFormField<T extends FieldValues>({
   field,
   control,
-  disabled
+  disabled,
 }: DynamicFormFieldProps<T>) {
   switch (field.type) {
     case "text":

@@ -28,7 +28,6 @@
     "removeComments": true,
     "strictNullChecks": true,
     "types": ["vite/client", "node"],
-    "importsNotUsedAsValues": "error",
     "strictPropertyInitialization": false,
     "experimentalDecorators": true
   }

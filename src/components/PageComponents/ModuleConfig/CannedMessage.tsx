@@ -11,9 +11,9 @@ export const CannedMessage = (): JSX.Element => {
       new Protobuf.ModuleConfig({
         payloadVariant: {
           case: "cannedMessage",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -30,25 +30,25 @@ export const CannedMessage = (): JSX.Element => {
               type: "toggle",
               name: "rotary1Enabled",
               label: "Rotary Encoder #1 Enabled",
-              description: "Enable the rotary encoder"
+              description: "Enable the rotary encoder",
             },
             {
               type: "number",
               name: "inputbrokerPinA",
               label: "Encoder Pin A",
-              description: "GPIO Pin Value (1-39) For encoder port A"
+              description: "GPIO Pin Value (1-39) For encoder port A",
             },
             {
               type: "number",
               name: "inputbrokerPinB",
               label: "Encoder Pin B",
-              description: "GPIO Pin Value (1-39) For encoder port B"
+              description: "GPIO Pin Value (1-39) For encoder port B",
             },
             {
               type: "number",
               name: "inputbrokerPinPress",
               label: "Encoder Pin Press",
-              description: "GPIO Pin Value (1-39) For encoder Press"
+              description: "GPIO Pin Value (1-39) For encoder Press",
             },
             {
               type: "select",
@@ -57,8 +57,8 @@ export const CannedMessage = (): JSX.Element => {
               description: "Select input event.",
               properties: {
                 enumValue:
-                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar
-              }
+                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar,
+              },
             },
             {
               type: "select",
@@ -67,8 +67,8 @@ export const CannedMessage = (): JSX.Element => {
               description: "Select input event.",
               properties: {
                 enumValue:
-                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar
-              }
+                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar,
+              },
             },
             {
               type: "select",
@@ -77,30 +77,30 @@ export const CannedMessage = (): JSX.Element => {
               description: "Select input event",
               properties: {
                 enumValue:
-                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar
-              }
+                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar,
+              },
             },
             {
               type: "toggle",
               name: "updown1Enabled",
               label: "Up Down enabled",
-              description: "Enable the up / down encoder"
+              description: "Enable the up / down encoder",
             },
             {
               type: "text",
               name: "allowInputSource",
               label: "Allow Input Source",
               description:
-                "Select from: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
+                "Select from: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'",
             },
             {
               type: "toggle",
               name: "sendBell",
               label: "Send Bell",
-              description: "Sends a bell character with each message"
-            }
-          ]
-        }
+              description: "Sends a bell character with each message",
+            },
+          ],
+        },
       ]}
     />
   );

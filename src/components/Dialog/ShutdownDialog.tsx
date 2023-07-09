@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@components/UI/Dialog.js";
 import { ClockIcon, PowerIcon } from "lucide-react";
 import { Button } from "@components/UI/Button.js";
@@ -18,7 +18,7 @@ export interface ShutdownDialogProps {
 
 export const ShutdownDialog = ({
   open,
-  onOpenChange
+  onOpenChange,
 }: ShutdownDialogProps): JSX.Element => {
   const { connection } = useDevice();
 

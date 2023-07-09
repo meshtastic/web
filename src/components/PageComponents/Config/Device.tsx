@@ -1,7 +1,7 @@
 import type { DeviceValidation } from "@app/validation/config/device.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Device = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
@@ -11,9 +11,9 @@ export const Device = (): JSX.Element => {
       new Protobuf.Config({
         payloadVariant: {
           case: "device",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -33,33 +33,33 @@ export const Device = (): JSX.Element => {
               description: "What role the device performs on the mesh",
               properties: {
                 enumValue: Protobuf.Config_DeviceConfig_Role,
-                formatEnumName: true
-              }
+                formatEnumName: true,
+              },
             },
             {
               type: "toggle",
               name: "serialEnabled",
               label: "Serial Output Enabled",
-              description: "Enable the device's serial console"
+              description: "Enable the device's serial console",
             },
             {
               type: "toggle",
               name: "debugLogEnabled",
               label: "Enabled Debug Log",
               description:
-                "Output debugging information to the device's serial port (auto disables when serial client is connected)"
+                "Output debugging information to the device's serial port (auto disables when serial client is connected)",
             },
             {
               type: "number",
               name: "buttonGpio",
               label: "Button Pin",
-              description: "Button pin override"
+              description: "Button pin override",
             },
             {
               type: "number",
               name: "buzzerGpio",
               label: "Buzzer Pin",
-              description: "Buzzer pin override"
+              description: "Buzzer pin override",
             },
             {
               type: "select",
@@ -68,8 +68,8 @@ export const Device = (): JSX.Element => {
               description: "How to handle rebroadcasting",
               properties: {
                 enumValue: Protobuf.Config_DeviceConfig_RebroadcastMode,
-                formatEnumName: true
-              }
+                formatEnumName: true,
+              },
             },
             {
               type: "number",
@@ -77,11 +77,23 @@ export const Device = (): JSX.Element => {
               label: "Node Info Broadcast Interval",
               description: "How often to broadcast node info",
               properties: {
-                suffix: "Seconds"
-              }
-            }
-          ]
-        }
+                suffix: "Seconds",
+              },
+            },
+            {
+              type: "toggle",
+              name: "doubleTapAsButtonPress",
+              label: "Double Tap as Button Press",
+              description: "Treat double tap as button press",
+            },
+            {
+              type: "toggle",
+              name: "isManaged",
+              label: "Managed",
+              description: "Is this device managed by a mesh administator",
+            },
+          ],
+        },
       ]}
     />
   );

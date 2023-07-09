@@ -9,7 +9,7 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
   BoxSelectIcon,
-  MapPinIcon
+  MapPinIcon,
 } from "lucide-react";
 import { bbox, lineString } from "@turf/turf";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
@@ -30,7 +30,7 @@ export const MapPage = (): JSX.Element => {
   const getBBox = () => {
     if (!map) return;
     const nodesWithPosition = allNodes.filter(
-      (node) => node.position?.latitudeI
+      (node) => node.position?.latitudeI,
     );
     if (!nodesWithPosition.length) return;
     if (nodesWithPosition.length === 1) {
@@ -38,24 +38,24 @@ export const MapPage = (): JSX.Element => {
         zoom: 12,
         center: [
           (nodesWithPosition[0].position?.longitudeI ?? 0) / 1e7,
-          (nodesWithPosition[0].position?.latitudeI ?? 0) / 1e7
-        ]
+          (nodesWithPosition[0].position?.latitudeI ?? 0) / 1e7,
+        ],
       });
       return;
     }
     const line = lineString(
       nodesWithPosition.map((n) => [
         (n.position?.latitudeI ?? 0) / 1e7,
-        (n.position?.longitudeI ?? 0) / 1e7
-      ])
+        (n.position?.longitudeI ?? 0) / 1e7,
+      ]),
     );
     const bounds = bbox(line);
     const center = map.cameraForBounds(
       [
         [bounds[1], bounds[0]],
-        [bounds[3], bounds[2]]
+        [bounds[3], bounds[2]],
       ],
-      { padding: { top: 10, bottom: 10, left: 10, right: 10 } }
+      { padding: { top: 10, bottom: 10, left: 10, right: 10 } },
     );
     if (center) map.easeTo(center);
   };
@@ -89,20 +89,20 @@ export const MapPage = (): JSX.Element => {
             icon: ZoomInIcon,
             onClick() {
               map?.zoomIn();
-            }
+            },
           },
           {
             icon: ZoomOutIcon,
             onClick() {
               map?.zoomOut();
-            }
+            },
           },
           {
             icon: BoxSelectIcon,
             onClick() {
               getBBox();
-            }
-          }
+            },
+          },
         ]}
       >
         <Map
@@ -126,7 +126,7 @@ export const MapPage = (): JSX.Element => {
           initialViewState={{
             zoom: 10,
             latitude: -38,
-            longitude: 145
+            longitude: 145,
           }}
         >
           {waypoints.map((wp) => (
@@ -162,8 +162,8 @@ export const MapPage = (): JSX.Element => {
                         zoom: 12,
                         center: [
                           (node.position?.longitudeI ?? 0) / 1e7,
-                          (node.position?.latitudeI ?? 0) / 1e7
-                        ]
+                          (node.position?.latitudeI ?? 0) / 1e7,
+                        ],
                       });
                     }}
                   >

@@ -31,4 +31,7 @@ export class DisplayValidation
 
   @IsBoolean()
   headingBold: boolean;
+
+  @IsBoolean()
+  wakeOnTapOrMotion: boolean;
 }

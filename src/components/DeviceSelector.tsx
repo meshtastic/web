@@ -8,7 +8,7 @@ import {
   SunIcon,
   MoonIcon,
   GithubIcon,
-  TerminalIcon
+  TerminalIcon,
 } from "lucide-react";
 import { Separator } from "@components/UI/Seperator.js";
 import { Code } from "@components/UI/Typography/Code.js";
@@ -22,7 +22,7 @@ export const DeviceSelector = (): JSX.Element => {
     darkMode,
     setDarkMode,
     setCommandPaletteOpen,
-    setConnectDialogOpen
+    setConnectDialogOpen,
   } = useAppStore();
 
   return (

@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import type {
   BaseFormBuilderProps,
-  GenericFormElementProps
+  GenericFormElementProps,
 } from "./DynamicForm.js";
 import { Input } from "../UI/Input.js";
 import { Controller, FieldValues } from "react-hook-form";
@@ -21,7 +21,7 @@ export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
 export function GenericInput<T extends FieldValues>({
   control,
   disabled,
-  field
+  field,
 }: GenericFormElementProps<T, InputFieldProps<T>>) {
   return (
     <Controller
@@ -35,7 +35,7 @@ export function GenericInput<T extends FieldValues>({
             onChange(
               field.type === "number"
                 ? parseInt(e.target.value)
-                : e.target.value
+                : e.target.value,
             )
           }
           disabled={disabled}

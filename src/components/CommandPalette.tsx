@@ -1,40 +1,40 @@
-import { useEffect } from "react";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDevice, useDeviceStore } from "@core/stores/deviceStore.js";
-import { useCommandState } from "cmdk";
-import { Hashicon } from "@emeraldpay/hashicon-react";
-import {
-  LucideIcon,
-  LinkIcon,
-  TrashIcon,
-  MapIcon,
-  MoonIcon,
-  PlusIcon,
-  PowerIcon,
-  EraserIcon,
-  RefreshCwIcon,
-  FactoryIcon,
-  ArrowLeftRightIcon,
-  BugIcon,
-  SettingsIcon,
-  SmartphoneIcon,
-  MessageSquareIcon,
-  QrCodeIcon,
-  LayersIcon,
-  PaletteIcon,
-  UsersIcon,
-  LayoutIcon,
-  XCircleIcon,
-  BoxSelectIcon
-} from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList
+  CommandList,
 } from "@components/UI/Command.js";
+import { useAppStore } from "@core/stores/appStore.js";
+import { useDevice, useDeviceStore } from "@core/stores/deviceStore.js";
+import { Hashicon } from "@emeraldpay/hashicon-react";
+import { useCommandState } from "cmdk";
+import {
+  ArrowLeftRightIcon,
+  BoxSelectIcon,
+  BugIcon,
+  EraserIcon,
+  FactoryIcon,
+  LayersIcon,
+  LayoutIcon,
+  LinkIcon,
+  LucideIcon,
+  MapIcon,
+  MessageSquareIcon,
+  MoonIcon,
+  PaletteIcon,
+  PlusIcon,
+  PowerIcon,
+  QrCodeIcon,
+  RefreshCwIcon,
+  SettingsIcon,
+  SmartphoneIcon,
+  TrashIcon,
+  UsersIcon,
+  XCircleIcon,
+} from "lucide-react";
+import { useEffect } from "react";
 
 export interface Group {
   label: string;
@@ -64,7 +64,7 @@ export const CommandPalette = (): JSX.Element => {
     selectedDevice,
     darkMode,
     setDarkMode,
-    setAccent
+    setAccent,
   } = useAppStore();
   const { getDevices } = useDeviceStore();
   const { setDialogOpen, setActivePage, connection } = useDevice();
@@ -79,14 +79,14 @@ export const CommandPalette = (): JSX.Element => {
           icon: MessageSquareIcon,
           action() {
             setActivePage("messages");
-          }
+          },
         },
         {
           label: "Map",
           icon: MapIcon,
           action() {
             setActivePage("map");
-          }
+          },
         },
         {
           label: "Config",
@@ -94,23 +94,23 @@ export const CommandPalette = (): JSX.Element => {
           action() {
             setActivePage("config");
           },
-          tags: ["settings"]
+          tags: ["settings"],
         },
         {
           label: "Channels",
           icon: LayersIcon,
           action() {
             setActivePage("channels");
-          }
+          },
         },
         {
           label: "Peers",
           icon: UsersIcon,
           action() {
             setActivePage("peers");
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: "Manage",
@@ -132,18 +132,18 @@ export const CommandPalette = (): JSX.Element => {
               ),
               action() {
                 setSelectedDevice(device.id);
-              }
+              },
             };
-          })
+          }),
         },
         {
           label: "Connect New Node",
           icon: PlusIcon,
           action() {
             setSelectedDevice(0);
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: "Contextual",
@@ -158,16 +158,16 @@ export const CommandPalette = (): JSX.Element => {
               icon: <QrCodeIcon size={16} />,
               action() {
                 setDialogOpen("QR", true);
-              }
+              },
             },
             {
               label: "Import",
               icon: <QrCodeIcon size={16} />,
               action() {
                 setDialogOpen("import", true);
-              }
-            }
-          ]
+              },
+            },
+          ],
         },
         {
           label: "Disconnect",
@@ -176,37 +176,37 @@ export const CommandPalette = (): JSX.Element => {
             void connection?.disconnect();
             setSelectedDevice(0);
             removeDevice(selectedDevice ?? 0);
-          }
+          },
         },
         {
           label: "Schedule Shutdown",
           icon: PowerIcon,
           action() {
             setDialogOpen("shutdown", true);
-          }
+          },
         },
         {
           label: "Schedule Reboot",
           icon: RefreshCwIcon,
           action() {
             setDialogOpen("reboot", true);
-          }
+          },
         },
         {
           label: "Reset Peers",
           icon: TrashIcon,
           action() {
             connection?.resetPeers();
-          }
+          },
         },
         {
           label: "Factory Reset",
           icon: FactoryIcon,
           action() {
             connection?.factoryReset();
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: "Debug",
@@ -217,16 +217,16 @@ export const CommandPalette = (): JSX.Element => {
           icon: RefreshCwIcon,
           action() {
             void connection?.configure();
-          }
+          },
         },
         {
           label: "[WIP] Clear Messages",
           icon: EraserIcon,
           action() {
             alert("This feature is not implemented");
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: "Application",
@@ -237,7 +237,7 @@ export const CommandPalette = (): JSX.Element => {
           icon: MoonIcon,
           action() {
             setDarkMode(!darkMode);
-          }
+          },
         },
         {
           label: "Accent Color",
@@ -254,7 +254,7 @@ export const CommandPalette = (): JSX.Element => {
               ),
               action() {
                 setAccent("red");
-              }
+              },
             },
             {
               label: "Orange",
@@ -267,7 +267,7 @@ export const CommandPalette = (): JSX.Element => {
               ),
               action() {
                 setAccent("orange");
-              }
+              },
             },
             {
               label: "Yellow",
@@ -280,7 +280,7 @@ export const CommandPalette = (): JSX.Element => {
               ),
               action() {
                 setAccent("yellow");
-              }
+              },
             },
             {
               label: "Green",
@@ -293,7 +293,7 @@ export const CommandPalette = (): JSX.Element => {
               ),
               action() {
                 setAccent("green");
-              }
+              },
             },
             {
               label: "Blue",
@@ -306,7 +306,7 @@ export const CommandPalette = (): JSX.Element => {
               ),
               action() {
                 setAccent("blue");
-              }
+              },
             },
             {
               label: "Purple",
@@ -319,7 +319,7 @@ export const CommandPalette = (): JSX.Element => {
               ),
               action() {
                 setAccent("purple");
-              }
+              },
             },
             {
               label: "Pink",
@@ -332,12 +332,12 @@ export const CommandPalette = (): JSX.Element => {
               ),
               action() {
                 setAccent("pink");
-              }
-            }
-          ]
-        }
-      ]
-    }
+              },
+            },
+          ],
+        },
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -394,7 +394,7 @@ export const CommandPalette = (): JSX.Element => {
 const SubItem = ({
   label,
   icon,
-  action
+  action,
 }: {
   label: string;
   icon: React.ReactNode;

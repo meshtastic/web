@@ -2,7 +2,7 @@ import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
   CircleEllipsisIcon,
   AlertCircleIcon,
-  CheckCircle2Icon
+  CheckCircle2Icon,
 } from "lucide-react";
 import type { Protobuf } from "@meshtastic/meshtasticjs";
 import type { MessageWithState } from "@app/core/stores/deviceStore.js";
@@ -16,7 +16,7 @@ export interface MessageProps {
 export const Message = ({
   lastMsgSameUser,
   message,
-  sender
+  sender,
 }: MessageProps): JSX.Element => {
   return lastMsgSameUser ? (
     <div className="ml-5 flex">
@@ -47,7 +47,7 @@ export const Message = ({
         <span className="mt-1 font-mono text-xs text-textSecondary">
           {message.rxTime.toLocaleTimeString(undefined, {
             hour: "2-digit",
-            minute: "2-digit"
+            minute: "2-digit",
           })}
         </span>
       </div>

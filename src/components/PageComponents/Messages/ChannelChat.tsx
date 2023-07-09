@@ -14,7 +14,7 @@ export interface ChannelChatProps {
 export const ChannelChat = ({
   messages,
   channel,
-  to
+  to,
 }: ChannelChatProps): JSX.Element => {
   const { nodes } = useDevice();
 

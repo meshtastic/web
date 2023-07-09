@@ -1,7 +1,7 @@
 import type { DisplayValidation } from "@app/validation/config/display.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Display = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
@@ -11,9 +11,9 @@ export const Display = (): JSX.Element => {
       new Protobuf.Config({
         payloadVariant: {
           case: "display",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -32,8 +32,8 @@ export const Display = (): JSX.Element => {
               label: "Screen Timeout",
               description: "Turn off the display after this long",
               properties: {
-                suffix: "seconds"
-              }
+                suffix: "seconds",
+              },
             },
             {
               type: "select",
@@ -41,26 +41,26 @@ export const Display = (): JSX.Element => {
               label: "GPS Display Units",
               description: "Coordinate display format",
               properties: {
-                enumValue: Protobuf.Config_DisplayConfig_GpsCoordinateFormat
-              }
+                enumValue: Protobuf.Config_DisplayConfig_GpsCoordinateFormat,
+              },
             },
             {
               type: "number",
               name: "autoScreenCarouselSecs",
               label: "Carousel Delay",
-              description: "How fast to cycle through windows"
+              description: "How fast to cycle through windows",
             },
             {
               type: "toggle",
               name: "compassNorthTop",
               label: "Compass North Top",
-              description: "Fix north to the top of compass"
+              description: "Fix north to the top of compass",
             },
             {
               type: "toggle",
               name: "flipScreen",
               label: "Flip Screen",
-              description: "Flip display 180 degrees"
+              description: "Flip display 180 degrees",
             },
             {
               type: "select",
@@ -69,8 +69,8 @@ export const Display = (): JSX.Element => {
               description: "Display metric or imperial units",
               properties: {
                 enumValue: Protobuf.Config_DisplayConfig_DisplayUnits,
-                formatEnumName: true
-              }
+                formatEnumName: true,
+              },
             },
             {
               type: "select",
@@ -78,8 +78,8 @@ export const Display = (): JSX.Element => {
               label: "OLED Type",
               description: "Type of OLED screen attached to the device",
               properties: {
-                enumValue: Protobuf.Config_DisplayConfig_OledType
-              }
+                enumValue: Protobuf.Config_DisplayConfig_OledType,
+              },
             },
             {
               type: "select",
@@ -88,17 +88,23 @@ export const Display = (): JSX.Element => {
               description: "Screen layout variant",
               properties: {
                 enumValue: Protobuf.Config_DisplayConfig_DisplayMode,
-                formatEnumName: true
-              }
+                formatEnumName: true,
+              },
             },
             {
               type: "toggle",
               name: "headingBold",
               label: "Bold Heading",
-              description: "Bolden the heading text"
-            }
-          ]
-        }
+              description: "Bolden the heading text",
+            },
+            {
+              type: "toggle",
+              name: "wakeOnTapOrMotion",
+              label: "Wake on Tap or Motion",
+              description: "Wake the device on tap or motion",
+            },
+          ],
+        },
       ]}
     />
   );

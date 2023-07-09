@@ -81,7 +81,7 @@ export interface Device {
     to: number,
     from: number,
     messageId: number,
-    state: MessageState
+    state: MessageState,
   ) => void;
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   processPacket: (data: processPacketParams) => void;
@@ -118,7 +118,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           metadata: new Map(),
           messages: {
             direct: new Map(),
-            broadcast: new Map()
+            broadcast: new Map(),
           },
           connection: undefined,
           activePage: "messages",
@@ -130,7 +130,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             QR: false,
             shutdown: false,
             reboot: false,
-            deviceName: false
+            deviceName: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
@@ -142,7 +142,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 if (device) {
                   device.status = status;
                 }
-              })
+              }),
             );
           },
           setConfig: (config: Protobuf.Config) => {
@@ -175,7 +175,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       break;
                   }
                 }
-              })
+              }),
             );
           },
           setModuleConfig: (config: Protobuf.ModuleConfig) => {
@@ -215,7 +215,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       device.moduleConfig.audio = config.payloadVariant.value;
                   }
                 }
-              })
+              }),
             );
           },
           setWorkingConfig: (config: Protobuf.Config) => {
@@ -226,14 +226,14 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 const workingConfigIndex = device?.workingConfig.findIndex(
-                  (wc) => wc.payloadVariant.case === config.payloadVariant.case
+                  (wc) => wc.payloadVariant.case === config.payloadVariant.case,
                 );
                 if (workingConfigIndex !== -1) {
                   device.workingConfig[workingConfigIndex] = config;
                 } else {
                   device?.workingConfig.push(config);
                 }
-              })
+              }),
             );
           },
           setWorkingModuleConfig: (moduleConfig: Protobuf.ModuleConfig) => {
@@ -247,7 +247,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   device?.workingModuleConfig.findIndex(
                     (wmc) =>
                       wmc.payloadVariant.case ===
-                      moduleConfig.payloadVariant.case
+                      moduleConfig.payloadVariant.case,
                   );
                 if (workingModuleConfigIndex !== -1) {
                   device.workingModuleConfig[workingModuleConfigIndex] =
@@ -255,7 +255,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 } else {
                   device?.workingModuleConfig.push(moduleConfig);
                 }
-              })
+              }),
             );
           },
           setHardware: (hardware: Protobuf.MyNodeInfo) => {
@@ -265,7 +265,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 if (device) {
                   device.hardware = hardware;
                 }
-              })
+              }),
             );
           },
           // setMetrics: (metrics: Types.PacketMetadata<Protobuf.Telemetry>) => {
@@ -319,7 +319,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 if (device) {
                   device.activePage = page;
                 }
-              })
+              }),
             );
           },
           setPendingSettingsChanges: (state) => {
@@ -329,7 +329,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 if (device) {
                   device.pendingSettingsChanges = state;
                 }
-              })
+              }),
             );
           },
           addChannel: (channel: Protobuf.Channel) => {
@@ -340,7 +340,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.channels.set(channel.index, channel);
-              })
+              }),
             );
           },
           addWaypoint: (waypoint: Protobuf.Waypoint) => {
@@ -349,7 +349,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   const waypointIndex = device.waypoints.findIndex(
-                    (wp) => wp.id === waypoint.id
+                    (wp) => wp.id === waypoint.id,
                   );
 
                   if (waypointIndex !== -1) {
@@ -358,7 +358,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     device.waypoints.push(waypoint);
                   }
                 }
-              })
+              }),
             );
           },
           addNodeInfo: (nodeInfo) => {
@@ -369,7 +369,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.nodes.set(nodeInfo.num, nodeInfo);
-              })
+              }),
             );
           },
           setActivePeer: (peer) => {
@@ -379,7 +379,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 if (device) {
                   device.activePeer = peer;
                 }
-              })
+              }),
             );
           },
           addUser: (user) => {
@@ -393,7 +393,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   device.nodes.get(user.from) ?? new Protobuf.NodeInfo();
                 currentNode.user = user.data;
                 device.nodes.set(user.from, currentNode);
-              })
+              }),
             );
           },
           addPosition: (position) => {
@@ -407,7 +407,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   device.nodes.get(position.from) ?? new Protobuf.NodeInfo();
                 currentNode.position = position.data;
                 device.nodes.set(position.from, currentNode);
-              })
+              }),
             );
           },
           addConnection: (connection) => {
@@ -417,7 +417,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 if (device) {
                   device.connection = connection;
                 }
-              })
+              }),
             );
           },
           addMessage: (message) => {
@@ -442,7 +442,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 } else {
                   messageGroup.set(messageIndex, [message]);
                 }
-              })
+              }),
             );
           },
           addMetadata: (from, metadata) => {
@@ -453,7 +453,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.metadata.set(from, metadata);
-              })
+              }),
             );
           },
           setMessageState: (
@@ -462,7 +462,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             to: number,
             from: number,
             messageId: number,
-            state: MessageState
+            state: MessageState,
           ) => {
             set(
               produce<DeviceState>((draft) => {
@@ -494,9 +494,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       msg.state = state;
                     }
                     return msg;
-                  })
+                  }),
                 );
-              })
+              }),
             );
           },
           setDialogOpen: (dialog: DialogVariant, open: boolean) => {
@@ -507,7 +507,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.dialog[dialog] = open;
-              })
+              }),
             );
           },
           processPacket(data: processPacketParams) {
@@ -524,17 +524,17 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     new Protobuf.NodeInfo({
                       num: data.from,
                       lastHeard: data.time,
-                      snr: data.snr
-                    })
+                      snr: data.snr,
+                    }),
                   );
                 } else {
                   device.nodes.set(data.from, {
                     ...node,
                     lastHeard: data.time,
-                    snr: data.snr
+                    snr: data.snr,
                   });
                 }
-              })
+              }),
             );
           },
           setMessageDraft: (message: string) => {
@@ -544,11 +544,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 if (device) {
                   device.messageDraft = message;
                 }
-              })
+              }),
             );
-          }
+          },
         });
-      })
+      }),
     );
 
     const device = get().devices.get(id);
@@ -562,13 +562,13 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     set(
       produce<DeviceState>((draft) => {
         draft.devices.delete(id);
-      })
+      }),
     );
   },
 
   getDevices: () => Array.from(get().devices.values()),
 
-  getDevice: (id) => get().devices.get(id)
+  getDevice: (id) => get().devices.get(id),
 }));
 
 export const DeviceContext = createContext<Device | undefined>(undefined);

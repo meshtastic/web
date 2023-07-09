@@ -4,7 +4,7 @@ import {
   IsInt,
   IsNumber,
   IsString,
-  Length
+  Length,
 } from "class-validator";
 
 import { Protobuf } from "@meshtastic/meshtasticjs";

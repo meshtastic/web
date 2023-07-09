@@ -1,7 +1,7 @@
 import type { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
+import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/meshtasticjs";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
 
 export const Telemetry = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -11,9 +11,9 @@ export const Telemetry = (): JSX.Element => {
       new Protobuf.ModuleConfig({
         payloadVariant: {
           case: "telemetry",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -32,8 +32,8 @@ export const Telemetry = (): JSX.Element => {
               label: "Query Interval",
               description: "Interval to get telemetry data",
               properties: {
-                suffix: "seconds"
-              }
+                suffix: "seconds",
+              },
             },
             {
               type: "number",
@@ -41,29 +41,41 @@ export const Telemetry = (): JSX.Element => {
               label: "Update Interval",
               description: "How often to send Metrics over the mesh",
               properties: {
-                suffix: "seconds"
-              }
+                suffix: "seconds",
+              },
             },
             {
               type: "toggle",
               name: "environmentMeasurementEnabled",
               label: "Module Enabled",
-              description: "Enable the Environment Telemetry"
+              description: "Enable the Environment Telemetry",
             },
             {
               type: "toggle",
               name: "environmentScreenEnabled",
               label: "Displayed on Screen",
-              description: "Show the Telemetry Module on the OLED"
+              description: "Show the Telemetry Module on the OLED",
             },
             {
               type: "toggle",
               name: "environmentDisplayFahrenheit",
               label: "Display Fahrenheit",
-              description: "Display temp in Fahrenheit"
-            }
-          ]
-        }
+              description: "Display temp in Fahrenheit",
+            },
+            {
+              type: "toggle",
+              name: "airQualityEnabled",
+              label: "Air Quality Enabled",
+              description: "Enable the Air Quality Telemetry",
+            },
+            {
+              type: "number",
+              name: "airQualityInterval",
+              label: "Air Quality Update Interval",
+              description: "How often to send Air Quality data over the mesh",
+            },
+          ],
+        },
       ]}
     />
   );

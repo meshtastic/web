@@ -11,9 +11,9 @@ export const Bluetooth = (): JSX.Element => {
       new Protobuf.Config({
         payloadVariant: {
           case: "bluetooth",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -30,7 +30,7 @@ export const Bluetooth = (): JSX.Element => {
               type: "toggle",
               name: "enabled",
               label: "Enabled",
-              description: "Enable or disable Bluetooth"
+              description: "Enable or disable Bluetooth",
             },
             {
               type: "select",
@@ -39,13 +39,13 @@ export const Bluetooth = (): JSX.Element => {
               description: "Pin selection behaviour.",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
+                  fieldName: "enabled",
+                },
               ],
               properties: {
                 enumValue: Protobuf.Config_BluetoothConfig_PairingMode,
-                formatEnumName: true
-              }
+                formatEnumName: true,
+              },
             },
             {
               type: "number",
@@ -57,16 +57,16 @@ export const Bluetooth = (): JSX.Element => {
                   fieldName: "mode",
                   selector:
                     Protobuf.Config_BluetoothConfig_PairingMode.FIXED_PIN,
-                  invert: true
+                  invert: true,
                 },
                 {
-                  fieldName: "enabled"
-                }
+                  fieldName: "enabled",
+                },
               ],
-              properties: {}
-            }
-          ]
-        }
+              properties: {},
+            },
+          ],
+        },
       ]}
     />
   );

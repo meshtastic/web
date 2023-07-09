@@ -48,7 +48,7 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
-  darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
+  darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
   accent: "orange",
   connectDialogOpen: false,
 
@@ -56,61 +56,61 @@ export const useAppStore = create<AppState>()((set) => ({
     set(
       produce<AppState>((draft) => {
         draft.rasterSources = sources;
-      })
+      }),
     );
   },
   addRasterSource: (source: RasterSource) => {
     set(
       produce<AppState>((draft) => {
         draft.rasterSources.push(source);
-      })
+      }),
     );
   },
   removeRasterSource: (index: number) => {
     set(
       produce<AppState>((draft) => {
         draft.rasterSources.splice(index, 1);
-      })
+      }),
     );
   },
   setSelectedDevice: (deviceId) =>
     set(() => ({
-      selectedDevice: deviceId
+      selectedDevice: deviceId,
     })),
   addDevice: (device) =>
     set((state) => ({
-      devices: [...state.devices, device]
+      devices: [...state.devices, device],
     })),
   removeDevice: (deviceId) =>
     set((state) => ({
-      devices: state.devices.filter((device) => device.id !== deviceId)
+      devices: state.devices.filter((device) => device.id !== deviceId),
     })),
   setCommandPaletteOpen: (open: boolean) => {
     set(
       produce<AppState>((draft) => {
         draft.commandPaletteOpen = open;
-      })
+      }),
     );
   },
   setDarkMode: (enabled: boolean) => {
     set(
       produce<AppState>((draft) => {
         draft.darkMode = enabled;
-      })
+      }),
     );
   },
   setAccent(color) {
     set(
       produce<AppState>((draft) => {
         draft.accent = color;
-      })
+      }),
     );
   },
   setConnectDialogOpen: (open: boolean) => {
     set(
       produce<AppState>((draft) => {
         draft.connectDialogOpen = open;
-      })
+      }),
     );
-  }
+  },
 }));

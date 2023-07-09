@@ -11,7 +11,7 @@ import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from "@components/UI/Tabs.js";
 
 export const DeviceConfig = (): JSX.Element => {
@@ -21,33 +21,33 @@ export const DeviceConfig = (): JSX.Element => {
     {
       label: "Device",
       element: Device,
-      count: 0
+      count: 0,
     },
     {
       label: "Position",
-      element: Position
+      element: Position,
     },
     {
       label: "Power",
-      element: Power
+      element: Power,
     },
     {
       label: "Network",
       element: Network,
-      disabled: !hardware.hasWifi
+      disabled: !hardware.hasWifi,
     },
     {
       label: "Display",
-      element: Display
+      element: Display,
     },
     {
       label: "LoRa",
-      element: LoRa
+      element: LoRa,
     },
     {
       label: "Bluetooth",
-      element: Bluetooth
-    }
+      element: Bluetooth,
+    },
   ];
 
   return (

@@ -11,14 +11,14 @@ export interface MessageInputProps {
 
 export const MessageInput = ({
   to,
-  channel
+  channel,
 }: MessageInputProps): JSX.Element => {
   const {
     connection,
     setMessageState,
     messageDraft,
     setMessageDraft,
-    hardware
+    hardware,
   } = useDevice();
 
   const myNodeNum = hardware.myNodeNum;
@@ -33,8 +33,8 @@ export const MessageInput = ({
           to as number,
           myNodeNum,
           id,
-          "ack"
-        )
+          "ack",
+        ),
       )
       .catch((e: Types.PacketError) =>
         setMessageState(
@@ -43,8 +43,8 @@ export const MessageInput = ({
           to as number,
           myNodeNum,
           e.id,
-          e.error
-        )
+          e.error,
+        ),
       );
   };
 

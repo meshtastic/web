@@ -11,9 +11,9 @@ export const LoRa = (): JSX.Element => {
       new Protobuf.Config({
         payloadVariant: {
           case: "lora",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -32,22 +32,22 @@ export const LoRa = (): JSX.Element => {
               label: "Region",
               description: "Sets the region for your node",
               properties: {
-                enumValue: Protobuf.Config_LoRaConfig_RegionCode
-              }
+                enumValue: Protobuf.Config_LoRaConfig_RegionCode,
+              },
             },
             {
               type: "number",
               name: "hopLimit",
               label: "Hop Limit",
-              description: "Maximum number of hops"
+              description: "Maximum number of hops",
             },
             {
               type: "number",
               name: "channelNum",
               label: "Channel Number",
-              description: "LoRa channel number"
-            }
-          ]
+              description: "LoRa channel number",
+            },
+          ],
         },
         {
           label: "Waveform Settings",
@@ -57,7 +57,7 @@ export const LoRa = (): JSX.Element => {
               type: "toggle",
               name: "usePreset",
               label: "Use Preset",
-              description: "Use one of the predefined modem presets"
+              description: "Use one of the predefined modem presets",
             },
             {
               type: "select",
@@ -66,13 +66,13 @@ export const LoRa = (): JSX.Element => {
               description: "Modem preset to use",
               disabledBy: [
                 {
-                  fieldName: "usePreset"
-                }
+                  fieldName: "usePreset",
+                },
               ],
               properties: {
                 enumValue: Protobuf.Config_LoRaConfig_ModemPreset,
-                formatEnumName: true
-              }
+                formatEnumName: true,
+              },
             },
             {
               type: "number",
@@ -82,12 +82,12 @@ export const LoRa = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "usePreset",
-                  invert: true
-                }
+                  invert: true,
+                },
               ],
               properties: {
-                suffix: "MHz"
-              }
+                suffix: "MHz",
+              },
             },
             {
               type: "number",
@@ -98,12 +98,12 @@ export const LoRa = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "usePreset",
-                  invert: true
-                }
+                  invert: true,
+                },
               ],
               properties: {
-                suffix: "CPS"
-              }
+                suffix: "CPS",
+              },
             },
             {
               type: "number",
@@ -113,11 +113,11 @@ export const LoRa = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "usePreset",
-                  invert: true
-                }
-              ]
-            }
-          ]
+                  invert: true,
+                },
+              ],
+            },
+          ],
         },
         {
           label: "Radio Settings",
@@ -127,7 +127,7 @@ export const LoRa = (): JSX.Element => {
               type: "toggle",
               name: "txEnabled",
               label: "Tramsmit Enabled",
-              description: "Enable/Disable transmit (TX) from the LoRa radio"
+              description: "Enable/Disable transmit (TX) from the LoRa radio",
             },
             {
               type: "number",
@@ -135,14 +135,14 @@ export const LoRa = (): JSX.Element => {
               label: "Transmit Power",
               description: "Max transmit power",
               properties: {
-                suffix: "dBm"
-              }
+                suffix: "dBm",
+              },
             },
             {
               type: "toggle",
               name: "overrideDutyCycle",
               label: "Override Duty Cycle",
-              description: "Override Duty Cycle"
+              description: "Override Duty Cycle",
             },
             {
               type: "number",
@@ -151,14 +151,14 @@ export const LoRa = (): JSX.Element => {
               description:
                 "Frequency offset to correct for crystal calibration errors",
               properties: {
-                suffix: "Hz"
-              }
+                suffix: "Hz",
+              },
             },
             {
               type: "toggle",
               name: "sx126xRxBoostedGain",
               label: "Boosted RX Gain",
-              description: "Boosted RX gain"
+              description: "Boosted RX gain",
             },
             {
               type: "number",
@@ -166,11 +166,11 @@ export const LoRa = (): JSX.Element => {
               label: "Override Frequency",
               description: "Override frequency",
               properties: {
-                suffix: "Hz"
-              }
-            }
-          ]
-        }
+                suffix: "Hz",
+              },
+            },
+          ],
+        },
       ]}
     />
   );

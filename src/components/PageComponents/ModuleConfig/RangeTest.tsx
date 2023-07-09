@@ -11,9 +11,9 @@ export const RangeTest = (): JSX.Element => {
       new Protobuf.ModuleConfig({
         payloadVariant: {
           case: "rangeTest",
-          value: data
-        }
-      })
+          value: data,
+        },
+      }),
     );
   };
 
@@ -30,7 +30,7 @@ export const RangeTest = (): JSX.Element => {
               type: "toggle",
               name: "enabled",
               label: "Module Enabled",
-              description: "Enable Range Test"
+              description: "Enable Range Test",
             },
             {
               type: "number",
@@ -39,9 +39,9 @@ export const RangeTest = (): JSX.Element => {
               description: "How long to wait between sending test packets",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
+                  fieldName: "enabled",
+                },
+              ],
             },
             {
               type: "toggle",
@@ -50,12 +50,12 @@ export const RangeTest = (): JSX.Element => {
               description: "ESP32 Only",
               disabledBy: [
                 {
-                  fieldName: "enabled"
-                }
-              ]
-            }
-          ]
-        }
+                  fieldName: "enabled",
+                },
+              ],
+            },
+          ],
+        },
       ]}
     />
   );

@@ -8,7 +8,7 @@ export const bitwiseEncode = (enumValues: number[]): number => {
 
 export const bitwiseDecode = (
   value: number,
-  decodeEnum: enumLike
+  decodeEnum: enumLike,
 ): number[] => {
   const enumValues = Object.keys(decodeEnum).map(Number).filter(Boolean);
   return enumValues.map((b) => value & b).filter(Boolean);

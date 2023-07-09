@@ -14,11 +14,11 @@ export const Network = (): JSX.Element => {
           value: {
             ...data,
             ipv4Config: new Protobuf.Config_NetworkConfig_IpV4Config(
-              data.ipv4Config
-            )
-          }
-        }
-      })
+              data.ipv4Config,
+            ),
+          },
+        },
+      }),
     );
   };
 
@@ -35,7 +35,7 @@ export const Network = (): JSX.Element => {
               type: "toggle",
               name: "wifiEnabled",
               label: "Enabled",
-              description: "Enable or disable the WiFi radio"
+              description: "Enable or disable the WiFi radio",
             },
             {
               type: "text",
@@ -44,9 +44,9 @@ export const Network = (): JSX.Element => {
               description: "Network name",
               disabledBy: [
                 {
-                  fieldName: "wifiEnabled"
-                }
-              ]
+                  fieldName: "wifiEnabled",
+                },
+              ],
             },
             {
               type: "password",
@@ -55,11 +55,11 @@ export const Network = (): JSX.Element => {
               description: "Network password",
               disabledBy: [
                 {
-                  fieldName: "wifiEnabled"
-                }
-              ]
-            }
-          ]
+                  fieldName: "wifiEnabled",
+                },
+              ],
+            },
+          ],
         },
         {
           label: "Ethernet Config",
@@ -69,9 +69,9 @@ export const Network = (): JSX.Element => {
               type: "toggle",
               name: "ethEnabled",
               label: "Enabled",
-              description: "Enable or disable the Ethernet port"
-            }
-          ]
+              description: "Enable or disable the Ethernet port",
+            },
+          ],
         },
         {
           label: "IP Config",
@@ -83,8 +83,8 @@ export const Network = (): JSX.Element => {
               label: "Address Mode",
               description: "Address assignment selection",
               properties: {
-                enumValue: Protobuf.Config_NetworkConfig_AddressMode
-              }
+                enumValue: Protobuf.Config_NetworkConfig_AddressMode,
+              },
             },
             {
               type: "text",
@@ -94,9 +94,9 @@ export const Network = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
+                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP,
+                },
+              ],
             },
             {
               type: "text",
@@ -106,9 +106,9 @@ export const Network = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
+                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP,
+                },
+              ],
             },
             {
               type: "text",
@@ -118,9 +118,9 @@ export const Network = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
+                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP,
+                },
+              ],
             },
             {
               type: "text",
@@ -130,11 +130,11 @@ export const Network = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP
-                }
-              ]
-            }
-          ]
+                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP,
+                },
+              ],
+            },
+          ],
         },
         {
           label: "NTP Config",
@@ -143,9 +143,9 @@ export const Network = (): JSX.Element => {
             {
               type: "text",
               name: "ntpServer",
-              label: "NTP Server"
-            }
-          ]
+              label: "NTP Server",
+            },
+          ],
         },
         {
           label: "Rsyslog Config",
@@ -154,10 +154,10 @@ export const Network = (): JSX.Element => {
             {
               type: "text",
               name: "rsyslogServer",
-              label: "Rsyslog Server"
-            }
-          ]
-        }
+              label: "Rsyslog Server",
+            },
+          ],
+        },
       ]}
     />
   );

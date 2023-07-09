@@ -26,4 +26,7 @@ export class SerialValidation
 
   @IsEnum(Protobuf.ModuleConfig_SerialConfig_Serial_Mode)
   mode: Protobuf.ModuleConfig_SerialConfig_Serial_Mode;
+
+  @IsBoolean()
+  overrideConsoleSerialPort: boolean;
 }

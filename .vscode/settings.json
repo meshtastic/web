@@ -1,4 +1,4 @@
 {
-  "editor.defaultFormatter": "trunk.io",
+  "editor.defaultFormatter": "rome.rome",
   "editor.formatOnSave": true
 }
