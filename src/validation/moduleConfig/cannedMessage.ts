@@ -9,8 +9,6 @@ export class CannedMessageValidation
       keyof Protobuf.native.Message
     >
 {
-  @IsBoolean()
-  enabled: boolean;
 
   @IsBoolean()
   rotary1Enabled: boolean;
