@@ -10,6 +10,9 @@ export class CannedMessageValidation
     >
 {
   @IsBoolean()
+  enabled: boolean;
+
+  @IsBoolean()
   rotary1Enabled: boolean;
 
   @IsInt()
