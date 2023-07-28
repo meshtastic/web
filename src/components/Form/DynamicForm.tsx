@@ -6,6 +6,7 @@ import { Subtle } from "@components/UI/Typography/Subtle.js";
 import {
   Control,
   DeepPartial,
+  DefaultValues,
   FieldValues,
   Path,
   SubmitHandler,
@@ -36,7 +37,8 @@ export interface DynamicFormProps<T extends FieldValues> {
   onSubmit: SubmitHandler<T>;
   submitType?: "onChange" | "onSubmit";
   hasSubmitButton?: boolean;
-  defaultValues?: DeepPartial<T>;
+  // defaultValues?: DeepPartial<T>;
+  defaultValues?: DefaultValues<T>;
   fieldGroups: {
     label: string;
     description: string;

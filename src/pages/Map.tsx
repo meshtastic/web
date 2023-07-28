@@ -14,9 +14,9 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
 } from "lucide-react";
-import maplibregl from "maplibre-gl";
 import { useCallback, useEffect, useState } from "react";
 import { Layer, Map as MapGL, Marker, Source, useMap } from "react-map-gl";
+import maplibre from "react-map-gl/maplibre";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
@@ -117,7 +117,9 @@ export const MapPage = (): JSX.Element => {
           //   addWaypoint(waypoint);
           //   connection?.sendWaypoint(waypoint, "broadcast");
           // }}
-          mapLib={maplibregl}
+
+          // @ts-ignore
+          mapLib={maplibre}
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
