@@ -126,7 +126,7 @@ export const LoRa = (): JSX.Element => {
             {
               type: "toggle",
               name: "txEnabled",
-              label: "Tramsmit Enabled",
+              label: "Transmit Enabled",
               description: "Enable/Disable transmit (TX) from the LoRa radio",
             },
             {
