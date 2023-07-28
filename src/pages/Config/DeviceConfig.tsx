@@ -34,7 +34,6 @@ export const DeviceConfig = (): JSX.Element => {
     {
       label: "Network",
       element: Network,
-      disabled: !hardware.hasWifi,
     },
     {
       label: "Display",
