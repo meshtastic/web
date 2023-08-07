@@ -15,8 +15,8 @@ dependencies:
     specifier: ^3.2.0
     version: 3.2.0(react-hook-form@7.45.4)
   '@meshtastic/meshtasticjs':
-    specifier: 2.2.0-0
-    version: 2.2.0-0
+    specifier: 2.2.0-1
+    version: 2.2.0-1
   '@preact/signals-react':
     specifier: ^1.3.5
     version: 1.3.5(react@18.2.0)
@@ -1763,8 +1763,8 @@ packages:
       sort-object: 3.0.3
     dev: false
 
-  /@meshtastic/meshtasticjs@2.2.0-0:
-    resolution: {integrity: sha512-8CIoTVza6I5w39FNI2vz9DXUHYDvMByrPogj7Mxfe6ia9VtRWcz6rw/3SFs8AhokdOBZhI4eIyqaN5sFhpexGA==}
+  /@meshtastic/meshtasticjs@2.2.0-1:
+    resolution: {integrity: sha512-Fjh6R7mQdEWNFwz9HsS3G79klQCqGdL8LseJK591AJfG35Ri2o/kDJJD9L/WLMPxVrneKRwGQhxPLt7KlT5zvg==}
     dependencies:
       '@buf/meshtastic_protobufs.bufbuild_es': 1.3.0-20230807174505-db3cb0c7cf53.1(@bufbuild/protobuf@1.3.0)
       '@bufbuild/protobuf': 1.3.0
