@@ -1,14 +1,14 @@
+import type {
+  BaseFormBuilderProps,
+  GenericFormElementProps,
+} from "@components/Form/DynamicForm.js";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../UI/Select.js";
-import type {
-  BaseFormBuilderProps,
-  GenericFormElementProps,
-} from "./DynamicForm.js";
+} from "@components/UI/Select.js";
 import { Controller, FieldValues } from "react-hook-form";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {

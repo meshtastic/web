@@ -1,9 +1,15 @@
 {
-  "include": ["src", "types"],
+  "include": [
+    "src"
+  ],
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -18,16 +24,29 @@
     "jsx": "react-jsx",
     "baseUrl": "./",
     "paths": {
-      "@app/*": ["./src/*"],
-      "@pages/*": ["./src/pages/*"],
-      "@components/*": ["./src/components/*"],
-      "@core/*": ["./src/core/*"],
-      "@layouts/*": ["./src/layouts/*"]
+      "@app/*": [
+        "./src/*"
+      ],
+      "@pages/*": [
+        "./src/pages/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@core/*": [
+        "./src/core/*"
+      ],
+      "@layouts/*": [
+        "./src/layouts/*"
+      ]
     },
     "importHelpers": true,
     "removeComments": true,
     "strictNullChecks": true,
-    "types": ["vite/client", "node"],
+    "types": [
+      "vite/client",
+      "node"
+    ],
     "strictPropertyInitialization": false,
     "experimentalDecorators": true
   }

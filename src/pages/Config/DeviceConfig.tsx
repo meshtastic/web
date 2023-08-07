@@ -15,7 +15,7 @@ import { useDevice } from "@core/stores/deviceStore.js";
 import { Fragment } from "react";
 
 export const DeviceConfig = (): JSX.Element => {
-  const { hardware } = useDevice();
+  const { metadata } = useDevice();
 
   const tabs = [
     {
@@ -34,7 +34,7 @@ export const DeviceConfig = (): JSX.Element => {
     {
       label: "Network",
       element: Network,
-      disabled: !hardware.hasWifi,
+      disabled: !metadata.get(0)?.hasWifi,
     },
     {
       label: "Display",

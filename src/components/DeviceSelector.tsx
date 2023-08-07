@@ -1,4 +1,4 @@
-import { DeviceSelectorButton } from "./DeviceSelectorButton.js";
+import { DeviceSelectorButton } from "@components/DeviceSelectorButton.js";
 import { Separator } from "@components/UI/Seperator.js";
 import { Code } from "@components/UI/Typography/Code.js";
 import { useAppStore } from "@core/stores/appStore.js";

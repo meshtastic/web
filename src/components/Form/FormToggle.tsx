@@ -1,8 +1,8 @@
-import { Switch } from "../UI/Switch.js";
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
-} from "./DynamicForm.js";
+} from "@components/Form/DynamicForm.js";
+import { Switch } from "@components/UI/Switch.js";
 import { ChangeEvent } from "react";
 import { Controller, FieldPathValue, FieldValues } from "react-hook-form";
 

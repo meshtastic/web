@@ -1,6 +1,6 @@
-import { BLE } from "../PageComponents/Connect/BLE.js";
-import { HTTP } from "../PageComponents/Connect/HTTP.js";
-import { Serial } from "../PageComponents/Connect/Serial.js";
+import { BLE } from "@components/PageComponents/Connect/BLE.js";
+import { HTTP } from "@components/PageComponents/Connect/HTTP.js";
+import { Serial } from "@components/PageComponents/Connect/Serial.js";
 import {
   Dialog,
   DialogContent,
@@ -68,8 +68,8 @@ export const NewDeviceDialog = ({
               </TabsTrigger>
             ))}
           </TabsList>
-          {tabs.map((tab, index) => (
-            <TabsContent key={index} value={tab.label}>
+          {tabs.map((tab) => (
+            <TabsContent key={tab.label} value={tab.label}>
               {tab.disabled ? (
                 <p className="text-sm text-slate-500 dark:text-slate-400">
                   {tab.disabledMessage}

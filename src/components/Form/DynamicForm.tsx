@@ -1,6 +1,9 @@
-import { Button } from "../UI/Button.js";
-import { DynamicFormField, FieldProps } from "./DynamicFormField.js";
-import { FieldWrapper } from "./FormWrapper.js";
+import {
+  DynamicFormField,
+  FieldProps,
+} from "@components/Form/DynamicFormField.js";
+import { FieldWrapper } from "@components/Form/FormWrapper.js";
+import { Button } from "@components/UI/Button.js";
 import { H4 } from "@components/UI/Typography/H4.js";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 import {

@@ -1,4 +1,3 @@
-import { getChannelName } from "./Channels.js";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.js";
 import { PageLayout } from "@components/PageLayout.js";
 import { Sidebar } from "@components/Sidebar.js";
@@ -7,6 +6,7 @@ import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
+import { getChannelName } from "@pages/Channels.js";
 import { HashIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 

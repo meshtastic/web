@@ -1,4 +1,4 @@
-import { H4 } from "../Typography/H4.js";
+import { H4 } from "@components/UI/Typography/H4.js";
 
 export interface SidebarSectionProps {
   label: string;

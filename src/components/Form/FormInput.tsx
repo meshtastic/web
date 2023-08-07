@@ -1,8 +1,8 @@
-import { Input } from "../UI/Input.js";
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
-} from "./DynamicForm.js";
+} from "@components/Form/DynamicForm.js";
+import { Input } from "@components/UI/Input.js";
 import type { LucideIcon } from "lucide-react";
 import { Controller, FieldValues } from "react-hook-form";
 

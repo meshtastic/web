@@ -1,4 +1,4 @@
-import { DeviceNameDialog } from "./DeviceNameDialog.js";
+import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.js";
 import { ImportDialog } from "@components/Dialog/ImportDialog.js";
 import { QRDialog } from "@components/Dialog/QRDialog.js";
 import { RebootDialog } from "@components/Dialog/RebootDialog.js";
