@@ -20,9 +20,6 @@ export class PowerValidation
   waitBluetoothSecs: number;
 
   @IsInt()
-  meshSdsTimeoutSecs: number;
-
-  @IsInt()
   sdsSecs: number;
 
   @IsInt()

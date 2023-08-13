@@ -73,16 +73,6 @@ export const Power = (): JSX.Element => {
           fields: [
             {
               type: "number",
-              name: "meshSdsTimeoutSecs",
-              label: "Mesh SDS Timeout",
-              description:
-                "The device will enter super deep sleep after this time",
-              properties: {
-                suffix: "Seconds",
-              },
-            },
-            {
-              type: "number",
               name: "sdsSecs",
               label: "Super Deep Sleep Duration",
               description:
