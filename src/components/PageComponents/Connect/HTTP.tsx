@@ -76,7 +76,7 @@ export const HTTP = (): JSX.Element => {
           )}
         />
       </div>
-      <Button>
+      <Button type="submit">
         <span>Connect</span>
       </Button>
     </form>
