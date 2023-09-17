@@ -15,8 +15,8 @@ import {
   ZoomOutIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Layer, Map as MapGL, Marker, Source, useMap } from "react-map-gl";
-import maplibre from "react-map-gl/maplibre";
+import { Layer, Map as Marker, Source, useMap } from "react-map-gl";
+import MapGL from "react-map-gl/maplibre";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
@@ -119,7 +119,6 @@ export const MapPage = (): JSX.Element => {
           // }}
 
           // @ts-ignore
-          mapLib={maplibre}
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
