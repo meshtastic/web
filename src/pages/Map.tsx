@@ -15,7 +15,7 @@ import {
   ZoomOutIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Layer, Map as Marker, Source, useMap } from "react-map-gl";
+import { Layer, Marker, Source, useMap } from "react-map-gl";
 import MapGL from "react-map-gl/maplibre";
 
 export const MapPage = (): JSX.Element => {
