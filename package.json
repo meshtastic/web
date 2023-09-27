@@ -1,6 +1,6 @@
 {
   "name": "meshtastic-web",
-  "version": "2.2.4-0",
+  "version": "2.2.5-0",
   "type": "module",
   "description": "Meshtastic web client",
   "license": "GPL-3.0-only",
