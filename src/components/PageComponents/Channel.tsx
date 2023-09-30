@@ -61,7 +61,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               type: "password",
               name: "settings.psk",
               label: "pre-Shared Key",
-              description: "0, 16, or 32 bytes, \"0\"= no crypto, \"1\" = default key",
+              description: "16, or 32 bytes, \"0\"= no crypto, \"1\" = default key",
               properties: {
                 // act
               },
@@ -76,13 +76,13 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               type: "toggle",
               name: "settings.uplinkEnabled",
               label: "Uplink Enabled",
-              description: "Sends messages to MQTT from the local mesh",
+              description: "Send messages to MQTT from the local mesh",
             },
             {
               type: "toggle",
               name: "settings.downlinkEnabled",
               label: "Downlink Enabled",
-              description: "Sends messages from the local mesh to MQTT",
+              description: "Send messages to the local mesh from MQTT",
             },
           ],
         },
