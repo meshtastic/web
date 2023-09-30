@@ -52,7 +52,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               type: "select",
               name: "role",
               label: "Role",
-              description: "Description",
+              description: "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
               properties: {
                 enumValue: Protobuf.Channel_Role,
               },
@@ -61,40 +61,28 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               type: "password",
               name: "settings.psk",
               label: "pre-Shared Key",
-              description: "Description",
+              description: "0, 16, or 32 bytes, \"0\"= no crypto, \"1\" = default key",
               properties: {
                 // act
               },
             },
             {
-              type: "number",
-              name: "settings.channelNum",
-              label: "Channel Number",
-              description: "Description",
-            },
-            {
               type: "text",
               name: "settings.name",
               label: "Name",
-              description: "Description",
-            },
-            {
-              type: "number",
-              name: "settings.id",
-              label: "ID",
-              description: "Description",
+              description: "A unique name for the channel <12 bytes, leave blank for default",
             },
             {
               type: "toggle",
               name: "settings.uplinkEnabled",
               label: "Uplink Enabled",
-              description: "Description",
+              description: "Send messages to MQTT from the local mesh",
             },
             {
               type: "toggle",
               name: "settings.downlinkEnabled",
               label: "Downlink Enabled",
-              description: "Description",
+              description: "Forward messages from MQTT to the local mesh",
             },
           ],
         },
