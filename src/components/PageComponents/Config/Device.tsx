@@ -92,6 +92,12 @@ export const Device = (): JSX.Element => {
               label: "Managed",
               description: "Is this device managed by a mesh administator",
             },
+            {
+              type: "toggle",
+              name: "disableTripleClick",
+              label: "Disable Triple Click",
+              description: "Disable triple click",
+            },
           ],
         },
       ]}

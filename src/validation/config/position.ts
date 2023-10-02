@@ -37,4 +37,7 @@ export class PositionValidation
 
   @IsInt()
   broadcastSmartMinimumIntervalSecs: number;
+
+  @IsInt()
+  gpsEnGpio: number;
 }

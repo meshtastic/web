@@ -31,4 +31,7 @@ export class DeviceValidation
 
   @IsBoolean()
   isManaged: boolean;
+
+  @IsBoolean()
+  disableTripleClick: boolean;
 }
