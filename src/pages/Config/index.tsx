@@ -21,7 +21,7 @@ export const ConfigPage = (): JSX.Element => {
       <Sidebar>
         <SidebarSection label="Config Sections">
           <SidebarButton
-            label="Device Config"
+            label="Radio Config"
             active={activeConfigSection === "device"}
             onClick={() => setActiveConfigSection("device")}
             icon={SettingsIcon}
@@ -36,7 +36,7 @@ export const ConfigPage = (): JSX.Element => {
       </Sidebar>
       <PageLayout
         label={
-          activeConfigSection === "device" ? "Device Config" : "Module Config"
+          activeConfigSection === "device" ? "Radio Config" : "Module Config"
         }
         actions={[
           {
