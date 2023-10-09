@@ -68,7 +68,7 @@ export const MessageInput = ({
               onChange={(e) => setMessageDraft(e.target.value)}
             />
           </span>
-          <Button>
+          <Button type="submit">
             <SendIcon size={16} />
           </Button>
         </div>
