@@ -23,7 +23,7 @@ export const Position = (): JSX.Element => {
       defaultValues={config.position}
       fieldGroups={[
         {
-          label: "Position settings",
+          label: "Position Settings",
           description: "Settings for the position module",
           fields: [
             {
