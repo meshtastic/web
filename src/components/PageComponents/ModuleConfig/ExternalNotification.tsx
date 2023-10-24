@@ -180,6 +180,17 @@ export const ExternalNotification = (): JSX.Element => {
                 },
               ],
             },
+            {
+              type: "toggle",
+              name: "useI2sAsBuzzer",
+              label: "Use I²S Pin as Buzzer",
+              description: "Designate I²S Pin as Buzzer Output",
+              disabledBy: [
+                {
+                  fieldName: "enabled",
+                },
+              ]
+            },
           ],
         },
       ]}

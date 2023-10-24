@@ -50,4 +50,7 @@ export class ExternalNotificationValidation
 
   @IsInt()
   nagTimeout: number;
+
+  @IsBoolean()
+  useI2sAsBuzzer: boolean;
 }
