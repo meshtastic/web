@@ -185,9 +185,6 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 
                 if (device) {
                   switch (config.payloadVariant.case) {
-                    case "detectionSensor":
-                      device.moduleConfig.detectionSensor = config.payloadVariant.value;
-                      break;
                     case "mqtt":
                       device.moduleConfig.mqtt = config.payloadVariant.value;
                       break;
@@ -216,6 +213,12 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       break;
                     case "audio":
                       device.moduleConfig.audio = config.payloadVariant.value;
+                      break;
+                    case "detectionSensor":
+                      device.moduleConfig.detectionSensor = config.payloadVariant.value;
+                      break;
+                    case "neighborInfo":
+                        device.moduleConfig.neighborInfo = config.payloadVariant.value;
                   }
                 }
               }),
