@@ -214,11 +214,14 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     case "audio":
                       device.moduleConfig.audio = config.payloadVariant.value;
                       break;
+                    case "neighborInfo":
+                      device.moduleConfig.neighborInfo = config.payloadVariant.value;
+                      break;
+                    case "ambientLighting":
+                      device.moduleConfig.ambientLighting = config.payloadVariant.value;
+                      break;
                     case "detectionSensor":
                       device.moduleConfig.detectionSensor = config.payloadVariant.value;
-                      break;
-                    case "neighborInfo":
-                        device.moduleConfig.neighborInfo = config.payloadVariant.value;
                   }
                 }
               }),
