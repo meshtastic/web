@@ -34,11 +34,12 @@ export const ImportDialog = ({
 
   useEffect(() => {
     const base64String = QRCodeURL.split("e/#")[1]
-      ?.replace(/-/g, "+")
-      .replace(/_/g, "/")
-      .padEnd(QRCodeURL.length + ((4 - (QRCodeURL.length % 4)) % 4), "=");
+    const paddedString = base64String
+      ?.padEnd(base64String.length + ((4 - (base64String.length % 4)) % 4), "=")
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
     try {
-      setChannelSet(Protobuf.ChannelSet.fromBinary(toByteArray(base64String)));
+      setChannelSet(Protobuf.ChannelSet.fromBinary(toByteArray(paddedString)));
       setValidURL(true);
     } catch (error) {
       setValidURL(false);
