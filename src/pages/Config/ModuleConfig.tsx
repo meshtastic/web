@@ -1,4 +1,5 @@
 import { NeighborInfo } from "@app/components/PageComponents/ModuleConfig/NeighborInfo.js";
+import { AmbientLighting } from "@app/components/PageComponents/ModuleConfig/AmbientLighting.js";
 import { DetectionSensor } from "@app/components/PageComponents/ModuleConfig/DetectionSensor.js";
 import { Audio } from "@components/PageComponents/ModuleConfig/Audio.js";
 import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage.js";
@@ -52,6 +53,10 @@ export const ModuleConfig = (): JSX.Element => {
     {
       label: "Neighbor Info",
       element: NeighborInfo,
+    },
+    {
+      label: "Ambient Lighting",
+      element: AmbientLighting,
     },
     {
       label: "Detection Sensor",
