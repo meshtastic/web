@@ -61,7 +61,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               type: "password",
               name: "settings.psk",
               label: "pre-Shared Key",
-              description: "16, or 32 bytes, \"0\"= no crypto, \"1\" = default key",
+              description: "16, or 32 bytes",
               properties: {
                 // act
               },
