@@ -26,4 +26,13 @@ export class TelemetryValidation
 
   @IsInt()
   airQualityInterval: number;
+
+  @IsBoolean()
+  powerMeasurementEnabled: boolean;
+
+  @IsInt()
+  powerUpdateInterval: number;
+
+  @IsBoolean()
+  powerScreenEnabled: boolean;
 }

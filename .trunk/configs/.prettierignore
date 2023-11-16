@@ -1,4 +1,0 @@
-# Ignore artifacts:
-dist
-pnpm-lock.yaml
-stats.html

@@ -74,6 +74,24 @@ export const Telemetry = (): JSX.Element => {
               label: "Air Quality Update Interval",
               description: "How often to send Air Quality data over the mesh",
             },
+            {
+              type: "toggle",
+              name: "powerMeasurementEnabled",
+              label: "Power Measurement Enabled",
+              description: "Enable the Power Measurement Telemetry",
+            },
+            {
+              type: "number",
+              name: "powerUpdateInterval",
+              label: "Power Update Interval",
+              description: "How often to send Power data over the mesh",
+            },
+            {
+              type: "text",
+              name: "powerScreenEnabled",
+              label: "Power Screen Enabled",
+              description: "Enable the Power Telemetry Screen",
+            },
           ],
         },
       ]}
