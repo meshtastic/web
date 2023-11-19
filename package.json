@@ -69,12 +69,12 @@
     "@tailwindcss/forms": "^0.5.7",
     "@types/chrome": "^0.0.251",
     "@types/geodesy": "^2.2.7",
-    "@types/node": "^20.9.0",
+    "@types/node": "^20.9.2",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@types/w3c-web-serial": "^1.0.6",
     "@types/web-bluetooth": "^0.0.20",
-    "@vitejs/plugin-react": "^4.1.1",
+    "@vitejs/plugin-react": "^4.2.0",
     "autoprefixer": "^10.4.16",
     "biome": "^0.3.3",
     "gzipper": "^7.2.0",
@@ -84,8 +84,8 @@
     "tar": "^6.2.0",
     "tslib": "^2.6.2",
     "typescript": "^5.2.2",
-    "vite": "^4.5.0",
+    "vite": "^5.0.0",
     "vite-plugin-environment": "^1.1.3",
-    "vite-plugin-pwa": "^0.16.7"
+    "vite-plugin-pwa": "^0.17.0"
   }
 }
