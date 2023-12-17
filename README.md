@@ -17,6 +17,19 @@ Official [Meshtastic](https://meshtastic.org) web interface, that can be hosted 
 
 ![Alt](https://repobeats.axiom.co/api/embed/e5b062db986cb005d83e81724c00cb2b9cce8e4c.svg "Repobeats analytics image")
 
+## Self-host
+
+The client can be self hosted using the precompiled container images with an OCI compatible runtime such as [Docker](https://www.docker.com/) or [Podman](https://podman.io/).
+The base image used is [UBI9 Nginx 1.22](https://catalog.redhat.com/software/containers/ubi9/nginx-122/63f7653b9b0ca19f84f7e9a1)
+
+```bash
+# With Docker
+docker run -d -p 8080:8080 -p 8443:8443 --restart always --name Meshtastic-Web ghcr.io/meshtastic/web
+
+#With Podman
+podman run -d -p 8080:8080 -p 8443:8443 --restart always --name Meshtastic-Web ghcr.io/meshtastic/web
+```
+
 ## Development & Building
 
 ### Building and Packaging
