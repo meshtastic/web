@@ -17,13 +17,13 @@ export const Serial = (): JSX.Element => {
   }, []);
 
   navigator.serial.addEventListener("connect", () => {
-    void updateSerialPortList();
+    updateSerialPortList();
   });
   navigator.serial.addEventListener("disconnect", () => {
-    void updateSerialPortList();
+    updateSerialPortList();
   });
   useEffect(() => {
-    void updateSerialPortList();
+    updateSerialPortList();
   }, [updateSerialPortList]);
 
   const onConnect = async (port: SerialPort) => {
@@ -49,8 +49,8 @@ export const Serial = (): JSX.Element => {
           <Button
             key={index}
             disabled={port.readable !== null}
-            onClick={() => {
-              void onConnect(port);
+            onClick={async () => {
+              await onConnect(port);
             }}
           >
             {`# ${index} - ${port.getInfo().usbVendorId ?? "UNK"} - ${
@@ -63,8 +63,8 @@ export const Serial = (): JSX.Element => {
         )}
       </div>
       <Button
-        onClick={() => {
-          void navigator.serial.requestPort().then((port) => {
+        onClick={async () => {
+          await navigator.serial.requestPort().then((port) => {
             setSerialPorts(serialPorts.concat(port));
           });
         }}

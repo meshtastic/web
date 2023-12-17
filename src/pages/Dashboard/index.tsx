@@ -6,9 +6,7 @@ import { H3 } from "@components/UI/Typography/H3.js";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 import {
   BluetoothIcon,
-  CalendarIcon,
   ListPlusIcon,
-  MapPinIcon,
   NetworkIcon,
   PlusIcon,
   UsbIcon,
@@ -35,7 +33,7 @@ export const Dashboard = () => {
 
       <div className="flex h-[450px] rounded-md border border-dashed border-slate-200 p-3 dark:border-slate-700">
         {devices.length ? (
-          <ul role="list" className="grow divide-y divide-gray-200">
+          <ul className="grow divide-y divide-gray-200">
             {devices.map((device) => {
               return (
                 <li key={device.id}>

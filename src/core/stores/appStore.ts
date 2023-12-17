@@ -8,7 +8,7 @@ export interface RasterSource {
   tileSize: number;
 }
 
-export type accentColor =
+export type AccentColor =
   | "red"
   | "orange"
   | "yellow"
@@ -26,7 +26,7 @@ interface AppState {
   rasterSources: RasterSource[];
   commandPaletteOpen: boolean;
   darkMode: boolean;
-  accent: accentColor;
+  accent: AccentColor;
   connectDialogOpen: boolean;
 
   setRasterSources: (sources: RasterSource[]) => void;
@@ -38,7 +38,7 @@ interface AppState {
   removeDevice: (deviceId: number) => void;
   setCommandPaletteOpen: (open: boolean) => void;
   setDarkMode: (enabled: boolean) => void;
-  setAccent: (color: accentColor) => void;
+  setAccent: (color: AccentColor) => void;
   setConnectDialogOpen: (open: boolean) => void;
 }
 

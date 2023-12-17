@@ -14,9 +14,9 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import { Layer, Marker, Source, useMap } from "react-map-gl";
-import MapGL from "react-map-gl/maplibre";
+import { useEffect, useState } from "react";
+import { Marker, useMap } from "react-map-gl";
+import MapGl from "react-map-gl/maplibre";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
@@ -28,11 +28,15 @@ export const MapPage = (): JSX.Element => {
   const allNodes = Array.from(nodes.values());
 
   const getBBox = () => {
-    if (!map) return;
+    if (!map) {
+      return;
+    }
     const nodesWithPosition = allNodes.filter(
       (node) => node.position?.latitudeI,
     );
-    if (!nodesWithPosition.length) return;
+    if (!nodesWithPosition.length) {
+      return;
+    }
     if (nodesWithPosition.length === 1) {
       map.easeTo({
         zoom: 12,
@@ -57,20 +61,22 @@ export const MapPage = (): JSX.Element => {
       ],
       { padding: { top: 10, bottom: 10, left: 10, right: 10 } },
     );
-    if (center) map.easeTo(center);
+    if (center) {
+      map.easeTo(center);
+    }
   };
 
   useEffect(() => {
     map?.on("zoom", () => {
       setZoom(map?.getZoom() ?? 0);
     });
-  }, [map, zoom]);
+  }, [map]);
 
   useEffect(() => {
     if (map) {
       getBBox();
     }
-  }, [map]);
+  }, [map, getBBox]);
 
   return (
     <>
@@ -83,7 +89,7 @@ export const MapPage = (): JSX.Element => {
       </Sidebar>
       <PageLayout
         label="Map"
-        noPadding
+        noPadding={true}
         actions={[
           {
             icon: ZoomInIcon,
@@ -105,7 +111,7 @@ export const MapPage = (): JSX.Element => {
           },
         ]}
       >
-        <MapGL
+        <MapGl
           mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
           // onClick={(e) => {
           //   const waypoint = new Protobuf.Waypoint({
@@ -177,7 +183,7 @@ export const MapPage = (): JSX.Element => {
               );
             }
           })}
-        </MapGL>
+        </MapGl>
       </PageLayout>
     </>
   );

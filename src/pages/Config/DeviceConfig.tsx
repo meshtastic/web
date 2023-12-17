@@ -12,7 +12,6 @@ import {
   TabsTrigger,
 } from "@components/UI/Tabs.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { Fragment } from "react";
 
 export const DeviceConfig = (): JSX.Element => {
   const { metadata } = useDevice();

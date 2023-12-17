@@ -4,7 +4,6 @@ import { produce } from "immer";
 import { create } from "zustand";
 
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
-import { channel } from "diagnostics_channel";
 
 export type Page = "messages" | "map" | "config" | "channels" | "peers";
 
@@ -14,7 +13,7 @@ export interface MessageWithState extends Types.PacketMetadata<string> {
 
 export type MessageState = "ack" | "waiting" | Protobuf.Routing_Error;
 
-export interface processPacketParams {
+export interface ProcessPacketParams {
   from: number;
   snr: number;
   time: number;
@@ -84,7 +83,7 @@ export interface Device {
     state: MessageState,
   ) => void;
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
-  processPacket: (data: processPacketParams) => void;
+  processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
 }
 
@@ -152,27 +151,34 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 
                 if (device) {
                   switch (config.payloadVariant.case) {
-                    case "device":
+                    case "device": {
                       device.config.device = config.payloadVariant.value;
                       break;
-                    case "position":
+                    }
+                    case "position": {
                       device.config.position = config.payloadVariant.value;
                       break;
-                    case "power":
+                    }
+                    case "power": {
                       device.config.power = config.payloadVariant.value;
                       break;
-                    case "network":
+                    }
+                    case "network": {
                       device.config.network = config.payloadVariant.value;
                       break;
-                    case "display":
+                    }
+                    case "display": {
                       device.config.display = config.payloadVariant.value;
                       break;
-                    case "lora":
+                    }
+                    case "lora": {
                       device.config.lora = config.payloadVariant.value;
                       break;
-                    case "bluetooth":
+                    }
+                    case "bluetooth": {
                       device.config.bluetooth = config.payloadVariant.value;
                       break;
+                    }
                   }
                 }
               }),
@@ -185,43 +191,58 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 
                 if (device) {
                   switch (config.payloadVariant.case) {
-                    case "mqtt":
+                    case "mqtt": {
                       device.moduleConfig.mqtt = config.payloadVariant.value;
                       break;
-                    case "serial":
+                    }
+                    case "serial": {
                       device.moduleConfig.serial = config.payloadVariant.value;
                       break;
-                    case "externalNotification":
+                    }
+                    case "externalNotification": {
                       device.moduleConfig.externalNotification =
                         config.payloadVariant.value;
                       break;
-                    case "storeForward":
+                    }
+                    case "storeForward": {
                       device.moduleConfig.storeForward =
                         config.payloadVariant.value;
                       break;
-                    case "rangeTest":
+                    }
+                    case "rangeTest": {
                       device.moduleConfig.rangeTest =
                         config.payloadVariant.value;
                       break;
-                    case "telemetry":
+                    }
+                    case "telemetry": {
                       device.moduleConfig.telemetry =
                         config.payloadVariant.value;
                       break;
-                    case "cannedMessage":
+                    }
+                    case "cannedMessage": {
                       device.moduleConfig.cannedMessage =
                         config.payloadVariant.value;
                       break;
-                    case "audio":
+                    }
+                    case "audio": {
                       device.moduleConfig.audio = config.payloadVariant.value;
                       break;
-                    case "neighborInfo":
-                      device.moduleConfig.neighborInfo = config.payloadVariant.value;
+                    }
+                    case "neighborInfo": {
+                      device.moduleConfig.neighborInfo =
+                        config.payloadVariant.value;
                       break;
-                    case "ambientLighting":
-                      device.moduleConfig.ambientLighting = config.payloadVariant.value;
+                    }
+                    case "ambientLighting": {
+                      device.moduleConfig.ambientLighting =
+                        config.payloadVariant.value;
                       break;
-                    case "detectionSensor":
-                      device.moduleConfig.detectionSensor = config.payloadVariant.value;
+                    }
+                    case "detectionSensor": {
+                      device.moduleConfig.detectionSensor =
+                        config.payloadVariant.value;
+                      break;
+                    }
                   }
                 }
               }),
@@ -519,7 +540,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
-          processPacket(data: processPacketParams) {
+          processPacket(data: ProcessPacketParams) {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -527,7 +548,13 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 const node = device.nodes.get(data.from);
-                if (!node) {
+                if (node) {
+                  device.nodes.set(data.from, {
+                    ...node,
+                    lastHeard: data.time,
+                    snr: data.snr,
+                  });
+                } else {
                   device.nodes.set(
                     data.from,
                     new Protobuf.NodeInfo({
@@ -536,12 +563,6 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       snr: data.snr,
                     }),
                   );
-                } else {
-                  device.nodes.set(data.from, {
-                    ...node,
-                    lastHeard: data.time,
-                    snr: data.snr,
-                  });
                 }
               }),
             );

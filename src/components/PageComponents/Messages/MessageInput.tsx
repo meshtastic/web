@@ -61,7 +61,7 @@ export const MessageInput = ({
         <div className="flex flex-grow gap-2">
           <span className="w-full">
             <Input
-              autoFocus
+              autoFocus={true}
               minLength={2}
               placeholder="Enter Message"
               value={messageDraft}

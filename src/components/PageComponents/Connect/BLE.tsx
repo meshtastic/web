@@ -17,16 +17,16 @@ export const BLE = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    void updateBleDeviceList();
+    updateBleDeviceList();
   }, [updateBleDeviceList]);
 
-  const onConnect = async (BLEDevice: BluetoothDevice) => {
+  const onConnect = async (bleDevice: BluetoothDevice) => {
     const id = randId();
     const device = addDevice(id);
     setSelectedDevice(id);
     const connection = new IBLEConnection(id);
     await connection.connect({
-      device: BLEDevice,
+      device: bleDevice,
     });
     device.addConnection(connection);
     subscribeAll(device, connection);
@@ -39,7 +39,7 @@ export const BLE = (): JSX.Element => {
           <Button
             key={device.id}
             onClick={() => {
-              void onConnect(device);
+              onConnect(device);
             }}
           >
             {device.name}
@@ -50,8 +50,8 @@ export const BLE = (): JSX.Element => {
         )}
       </div>
       <Button
-        onClick={() => {
-          void navigator.bluetooth
+        onClick={async () => {
+          await navigator.bluetooth
             .requestDevice({
               filters: [{ services: [Constants.ServiceUuid] }],
             })

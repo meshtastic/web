@@ -16,20 +16,21 @@ export const subscribeAll = (
 
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     switch (routingPacket.data.variant.case) {
-      case "errorReason":
+      case "errorReason": {
         if (routingPacket.data.variant.value === Protobuf.Routing_Error.NONE) {
           return;
         }
         console.log(`Routing Error: ${routingPacket.data.variant.value}`);
         break;
-      case "routeReply":
+      }
+      case "routeReply": {
         console.log(`Route Reply: ${routingPacket.data.variant.value}`);
-
         break;
-      case "routeRequest":
+      }
+      case "routeRequest": {
         console.log(`Route Request: ${routingPacket.data.variant.value}`);
-
         break;
+      }
     }
   });
 

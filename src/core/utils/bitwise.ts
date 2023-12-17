@@ -1,4 +1,4 @@
-export interface enumLike {
+export interface EnumLike {
   [key: number]: string | number;
 }
 
@@ -8,7 +8,7 @@ export const bitwiseEncode = (enumValues: number[]): number => {
 
 export const bitwiseDecode = (
   value: number,
-  decodeEnum: enumLike,
+  decodeEnum: EnumLike,
 ): number[] => {
   const enumValues = Object.keys(decodeEnum).map(Number).filter(Boolean);
   return enumValues.map((b) => value & b).filter(Boolean);

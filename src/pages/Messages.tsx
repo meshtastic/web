@@ -8,7 +8,7 @@ import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, Types } from "@meshtastic/meshtasticjs";
 import { getChannelName } from "@pages/Channels.js";
 import { HashIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 export const MessagesPage = (): JSX.Element => {
   const { channels, nodes, hardware, messages } = useDevice();
@@ -37,8 +37,8 @@ export const MessagesPage = (): JSX.Element => {
                 channel.settings?.name.length
                   ? channel.settings?.name
                   : channel.index === 0
-                  ? "Primary"
-                  : `Ch ${channel.index}`
+                    ? "Primary"
+                    : `Ch ${channel.index}`
               }
               active={activeChat === channel.index}
               onClick={() => {
@@ -69,8 +69,8 @@ export const MessagesPage = (): JSX.Element => {
           chatType === "broadcast" && currentChannel
             ? getChannelName(currentChannel)
             : chatType === "direct" && nodes.get(activeChat)
-            ? nodes.get(activeChat)?.user?.longName ?? "Unknown"
-            : "Loading..."
+              ? nodes.get(activeChat)?.user?.longName ?? "Unknown"
+              : "Loading..."
         }`}
       >
         {allChannels.map(
