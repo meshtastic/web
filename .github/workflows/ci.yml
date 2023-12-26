@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: pnpm/action-setup@v2.2.4
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
         with:
           version: latest
 
@@ -35,11 +35,11 @@ jobs:
             ./dist/build.tar
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Buildah Build
         id: build-container
-        uses: redhat-actions/buildah-build@v2.12
+        uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
             ./Containerfile
@@ -50,7 +50,7 @@ jobs:
 
       - name: Push To Registry
         id: push-to-registry
-        uses: redhat-actions/push-to-registry@v2.7
+        uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-container.outputs.image }}
           tags: ${{ steps.build-container.outputs.tags }}
