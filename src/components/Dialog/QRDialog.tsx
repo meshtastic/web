@@ -9,7 +9,7 @@ import {
 } from "@components/UI/Dialog.js";
 import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
-import { Protobuf, Types } from "@meshtastic/meshtasticjs";
+import { Protobuf, Types } from "@meshtastic/js";
 import { fromByteArray } from "base64-js";
 import { ClipboardIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -70,8 +70,8 @@ export const QRDialog = ({
                     {channel.settings?.name.length
                       ? channel.settings.name
                       : channel.role === Protobuf.Channel_Role.PRIMARY
-                      ? "Primary"
-                      : `Channel: ${channel.index}`}
+                        ? "Primary"
+                        : `Channel: ${channel.index}`}
                   </Label>
                   <Checkbox
                     key={channel.index}

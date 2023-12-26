@@ -1,7 +1,7 @@
 import type { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 
 export const ExternalNotification = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -189,7 +189,7 @@ export const ExternalNotification = (): JSX.Element => {
                 {
                   fieldName: "enabled",
                 },
-              ]
+              ],
             },
           ],
         },

@@ -1,7 +1,7 @@
 import type { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 
 export const Telemetry = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();

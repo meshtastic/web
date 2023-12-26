@@ -4,7 +4,7 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
-import { Constants, IBLEConnection } from "@meshtastic/meshtasticjs";
+import { Constants, IBLEConnection } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 
 export const BLE = (): JSX.Element => {

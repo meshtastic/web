@@ -3,7 +3,7 @@ import { createContext, useContext } from "react";
 import { produce } from "immer";
 import { create } from "zustand";
 
-import { Protobuf, Types } from "@meshtastic/meshtasticjs";
+import { Protobuf, Types } from "@meshtastic/js";
 
 export type Page = "messages" | "map" | "config" | "channels" | "peers";
 

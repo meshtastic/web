@@ -1,6 +1,6 @@
 import type { MessageWithState } from "@app/core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import type { Protobuf } from "@meshtastic/meshtasticjs";
+import type { Protobuf } from "@meshtastic/js";
 import {
   AlertCircleIcon,
   CheckCircle2Icon,

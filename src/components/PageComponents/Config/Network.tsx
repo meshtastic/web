@@ -1,7 +1,7 @@
 import type { NetworkValidation } from "@app/validation/config/network.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 
 export const Network = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();

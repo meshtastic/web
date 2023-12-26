@@ -1,5 +1,5 @@
 import type { Device } from "@core/stores/deviceStore.js";
-import { Protobuf, Types } from "@meshtastic/meshtasticjs";
+import { Protobuf, Types } from "@meshtastic/js";
 
 export const subscribeAll = (
   device: Device,

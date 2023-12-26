@@ -7,7 +7,7 @@ import {
   Length,
 } from "class-validator";
 
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 
 export class NetworkValidation
   implements

@@ -5,7 +5,7 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { Protobuf, Types } from "@meshtastic/meshtasticjs";
+import { Protobuf, Types } from "@meshtastic/js";
 import { getChannelName } from "@pages/Channels.js";
 import { HashIcon } from "lucide-react";
 import { useState } from "react";

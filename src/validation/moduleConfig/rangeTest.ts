@@ -1,6 +1,6 @@
 import { IsBoolean, IsInt } from "class-validator";
 
-import type { Protobuf } from "@meshtastic/meshtasticjs";
+import type { Protobuf } from "@meshtastic/js";
 
 export class RangeTestValidation
   implements

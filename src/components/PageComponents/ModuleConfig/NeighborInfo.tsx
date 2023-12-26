@@ -1,7 +1,7 @@
 import { useDevice } from "@app/core/stores/deviceStore.js";
 import type { NeighborInfoValidation } from "@app/validation/moduleConfig/neighborInfo.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 
 export const NeighborInfo = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -36,7 +36,8 @@ export const NeighborInfo = (): JSX.Element => {
               type: "number",
               name: "updateInterval",
               label: "Update Interval",
-              description: "Interval in seconds of how often we should try to send our Neighbor Info to the mesh",
+              description:
+                "Interval in seconds of how often we should try to send our Neighbor Info to the mesh",
               disabledBy: [
                 {
                   fieldName: "enabled",

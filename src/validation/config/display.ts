@@ -1,6 +1,6 @@
 import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 
 export class DisplayValidation
   implements Omit<Protobuf.Config_DisplayConfig, keyof Protobuf.native.Message>

@@ -1,7 +1,7 @@
 import { useDevice } from "@app/core/stores/deviceStore.js";
 import type { MQTTValidation } from "@app/validation/moduleConfig/mqtt.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 
 export const MQTT = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();

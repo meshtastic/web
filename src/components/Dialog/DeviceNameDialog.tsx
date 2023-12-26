@@ -10,7 +10,7 @@ import {
 } from "@components/UI/Dialog.js";
 import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 import { useForm } from "react-hook-form";
 
 export interface User {

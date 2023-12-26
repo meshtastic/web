@@ -1,7 +1,7 @@
 import { useDevice } from "@app/core/stores/deviceStore.js";
 import type { DetectionSensorValidation } from "@app/validation/moduleConfig/detectionSensor.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 
 export const DetectionSensor = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
@@ -36,7 +36,8 @@ export const DetectionSensor = (): JSX.Element => {
               type: "number",
               name: "minimumBroadcastSecs",
               label: "Minimum Broadcast Seconds",
-              description: "The interval in seconds of how often we can send a message to the mesh when a state change is detected",
+              description:
+                "The interval in seconds of how often we can send a message to the mesh when a state change is detected",
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -47,7 +48,8 @@ export const DetectionSensor = (): JSX.Element => {
               type: "number",
               name: "stateBroadcastSecs",
               label: "State Broadcast Seconds",
-              description: "The interval in seconds of how often we should send a message to the mesh with the current state regardless of changes",
+              description:
+                "The interval in seconds of how often we should send a message to the mesh with the current state regardless of changes",
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -69,7 +71,8 @@ export const DetectionSensor = (): JSX.Element => {
               type: "text",
               name: "name",
               label: "Friendly Name",
-              description: "Used to format the message sent to mesh, max 20 Characters",
+              description:
+                "Used to format the message sent to mesh, max 20 Characters",
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -91,7 +94,8 @@ export const DetectionSensor = (): JSX.Element => {
               type: "toggle",
               name: "detectionTriggeredHigh",
               label: "Detection Triggered High",
-              description: "Whether or not the GPIO pin state detection is triggered on HIGH (1), otherwise LOW (0)",
+              description:
+                "Whether or not the GPIO pin state detection is triggered on HIGH (1), otherwise LOW (0)",
               disabledBy: [
                 {
                   fieldName: "enabled",

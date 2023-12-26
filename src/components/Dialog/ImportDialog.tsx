@@ -12,7 +12,7 @@ import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
 import { Switch } from "@components/UI/Switch.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 import { toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
 
@@ -33,7 +33,7 @@ export const ImportDialog = ({
   const { connection } = useDevice();
 
   useEffect(() => {
-    const base64String = QRCodeURL.split("e/#")[1]
+    const base64String = QRCodeURL.split("e/#")[1];
     const paddedString = base64String
       ?.padEnd(base64String.length + ((4 - (base64String.length % 4)) % 4), "=")
       .replace(/-/g, "+")

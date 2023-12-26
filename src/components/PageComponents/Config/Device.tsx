@@ -1,7 +1,7 @@
 import type { DeviceValidation } from "@app/validation/config/device.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 
 export const Device = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();

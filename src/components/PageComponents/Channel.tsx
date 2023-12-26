@@ -2,7 +2,7 @@ import type { ChannelValidation } from "@app/validation/channel.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useToast } from "@core/hooks/useToast.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf } from "@meshtastic/meshtasticjs";
+import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
 
 export interface SettingsPanelProps {
@@ -52,7 +52,8 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               type: "select",
               name: "role",
               label: "Role",
-              description: "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
+              description:
+                "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
               properties: {
                 enumValue: Protobuf.Channel_Role,
               },
@@ -70,7 +71,8 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               type: "text",
               name: "settings.name",
               label: "Name",
-              description: "A unique name for the channel <12 bytes, leave blank for default",
+              description:
+                "A unique name for the channel <12 bytes, leave blank for default",
             },
             {
               type: "toggle",
