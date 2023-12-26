@@ -3,7 +3,6 @@ import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import EnvironmentPlugin from "vite-plugin-environment";
-import { VitePWA } from "vite-plugin-pwa";
 
 import react from "@vitejs/plugin-react";
 
@@ -19,8 +18,8 @@ export default defineConfig({
   plugins: [
     react(),
     EnvironmentPlugin({
-      COMMIT_HASH: hash
-    })
+      COMMIT_HASH: hash,
+    }),
     // VitePWA({
     //   registerType: "autoUpdate",
     //   devOptions: {
@@ -32,8 +31,8 @@ export default defineConfig({
     target: "esnext",
     assetsDir: "",
     rollupOptions: {
-      plugins: [visualizer()]
-    }
+      plugins: [visualizer()],
+    },
   },
   resolve: {
     alias: {
@@ -41,7 +40,7 @@ export default defineConfig({
       "@pages": resolve(__dirname, "./src/pages"),
       "@components": resolve(__dirname, "./src/components"),
       "@core": resolve(__dirname, "./src/core"),
-      "@layouts": resolve(__dirname, "./src/layouts")
-    }
-  }
+      "@layouts": resolve(__dirname, "./src/layouts"),
+    },
+  },
 });

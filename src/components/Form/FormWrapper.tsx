@@ -1,5 +1,4 @@
 import { Label } from "@components/UI/Label.js";
-import { ErrorMessage } from "@hookform/error-message";
 
 export interface FieldWrapperProps {
   label: string;
