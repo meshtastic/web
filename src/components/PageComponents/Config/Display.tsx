@@ -8,7 +8,7 @@ export const Display = (): JSX.Element => {
 
   const onSubmit = (data: DisplayValidation) => {
     setWorkingConfig(
-      new Protobuf.Config({
+      new Protobuf.Config.Config({
         payloadVariant: {
           case: "display",
           value: data,
@@ -41,7 +41,8 @@ export const Display = (): JSX.Element => {
               label: "GPS Display Units",
               description: "Coordinate display format",
               properties: {
-                enumValue: Protobuf.Config_DisplayConfig_GpsCoordinateFormat,
+                enumValue:
+                  Protobuf.Config.Config_DisplayConfig_GpsCoordinateFormat,
               },
             },
             {
@@ -68,7 +69,7 @@ export const Display = (): JSX.Element => {
               label: "Display Units",
               description: "Display metric or imperial units",
               properties: {
-                enumValue: Protobuf.Config_DisplayConfig_DisplayUnits,
+                enumValue: Protobuf.Config.Config_DisplayConfig_DisplayUnits,
                 formatEnumName: true,
               },
             },
@@ -78,7 +79,7 @@ export const Display = (): JSX.Element => {
               label: "OLED Type",
               description: "Type of OLED screen attached to the device",
               properties: {
-                enumValue: Protobuf.Config_DisplayConfig_OledType,
+                enumValue: Protobuf.Config.Config_DisplayConfig_OledType,
               },
             },
             {
@@ -87,7 +88,7 @@ export const Display = (): JSX.Element => {
               label: "Display Mode",
               description: "Screen layout variant",
               properties: {
-                enumValue: Protobuf.Config_DisplayConfig_DisplayMode,
+                enumValue: Protobuf.Config.Config_DisplayConfig_DisplayMode,
                 formatEnumName: true,
               },
             },

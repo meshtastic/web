@@ -6,7 +6,7 @@ import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
 
 export interface SettingsPanelProps {
-  channel: Protobuf.Channel;
+  channel: Protobuf.Channel.Channel;
 }
 
 export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
@@ -14,7 +14,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   const { toast } = useToast();
 
   const onSubmit = (data: ChannelValidation) => {
-    const channel = new Protobuf.Channel({
+    const channel = new Protobuf.Channel.Channel({
       ...data,
       settings: {
         ...data.settings,
@@ -55,7 +55,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               description:
                 "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
               properties: {
-                enumValue: Protobuf.Channel_Role,
+                enumValue: Protobuf.Channel.Channel_Role,
               },
             },
             {

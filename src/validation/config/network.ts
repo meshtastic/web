@@ -6,15 +6,12 @@ import {
   IsString,
   Length,
 } from "class-validator";
-
 import { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class NetworkValidation
   implements
-    Omit<
-      Protobuf.Config_NetworkConfig,
-      keyof Protobuf.native.Message | "ipv4Config"
-    >
+    Omit<Protobuf.Config.Config_NetworkConfig, keyof Message | "ipv4Config">
 {
   @IsBoolean()
   wifiEnabled: boolean;
@@ -33,21 +30,18 @@ export class NetworkValidation
   @IsBoolean()
   ethEnabled: boolean;
 
-  @IsEnum(Protobuf.Config_NetworkConfig_AddressMode)
-  addressMode: Protobuf.Config_NetworkConfig_AddressMode;
+  @IsEnum(Protobuf.Config.Config_NetworkConfig_AddressMode)
+  addressMode: Protobuf.Config.Config_NetworkConfig_AddressMode;
 
-  ipv4Config: NetworkValidation_IpV4Config;
+  ipv4Config: NetworkValidationIpV4Config;
 
   @IsString()
   rsyslogServer: string;
 }
 
-export class NetworkValidation_IpV4Config
+export class NetworkValidationIpV4Config
   implements
-    Omit<
-      Protobuf.Config_NetworkConfig_IpV4Config,
-      keyof Protobuf.native.Message
-    >
+    Omit<Protobuf.Config.Config_NetworkConfig_IpV4Config, keyof Message>
 {
   @IsIP()
   @IsOptional()

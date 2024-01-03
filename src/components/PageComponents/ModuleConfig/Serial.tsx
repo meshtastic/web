@@ -8,7 +8,7 @@ export const Serial = (): JSX.Element => {
 
   const onSubmit = (data: SerialValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
+      new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "serial",
           value: data,
@@ -78,7 +78,8 @@ export const Serial = (): JSX.Element => {
                 },
               ],
               properties: {
-                enumValue: Protobuf.ModuleConfig_SerialConfig_Serial_Baud,
+                enumValue:
+                  Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud,
               },
             },
             {
@@ -109,7 +110,8 @@ export const Serial = (): JSX.Element => {
                 },
               ],
               properties: {
-                enumValue: Protobuf.ModuleConfig_SerialConfig_Serial_Mode,
+                enumValue:
+                  Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode,
                 formatEnumName: true,
               },
             },

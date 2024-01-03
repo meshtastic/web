@@ -22,7 +22,7 @@ export const MessagesPage = (): JSX.Element => {
   );
   const allChannels = Array.from(channels.values());
   const filteredChannels = allChannels.filter(
-    (ch) => ch.role !== Protobuf.Channel_Role.DISABLED,
+    (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
   );
   const currentChannel = channels.get(activeChat);
 

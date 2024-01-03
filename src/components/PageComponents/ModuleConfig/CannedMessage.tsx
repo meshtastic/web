@@ -8,7 +8,7 @@ export const CannedMessage = (): JSX.Element => {
 
   const onSubmit = (data: CannedMessageValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
+      new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "cannedMessage",
           value: data,
@@ -63,7 +63,8 @@ export const CannedMessage = (): JSX.Element => {
               description: "Select input event.",
               properties: {
                 enumValue:
-                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar,
+                  Protobuf.ModuleConfig
+                    .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
@@ -73,7 +74,8 @@ export const CannedMessage = (): JSX.Element => {
               description: "Select input event.",
               properties: {
                 enumValue:
-                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar,
+                  Protobuf.ModuleConfig
+                    .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
@@ -83,7 +85,8 @@ export const CannedMessage = (): JSX.Element => {
               description: "Select input event",
               properties: {
                 enumValue:
-                  Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar,
+                  Protobuf.ModuleConfig
+                    .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {

@@ -1,13 +1,10 @@
-import { IsBoolean, IsInt, Length } from "class-validator";
-
+import { IsBoolean, IsInt } from "class-validator";
 import type { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class NeighborInfoValidation
   implements
-    Omit<
-      Protobuf.ModuleConfig_NeighborInfoConfig,
-      keyof Protobuf.native.Message
-    >
+    Omit<Protobuf.ModuleConfig.ModuleConfig_NeighborInfoConfig, keyof Message>
 {
   @IsBoolean()
   enabled: boolean;

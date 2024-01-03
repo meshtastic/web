@@ -1,12 +1,12 @@
 import { IsBoolean, IsInt, Length } from "class-validator";
-
 import type { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class DetectionSensorValidation
   implements
     Omit<
-      Protobuf.ModuleConfig_DetectionSensorConfig,
-      keyof Protobuf.native.Message
+      Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig,
+      keyof Message
     >
 {
   @IsBoolean()

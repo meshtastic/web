@@ -38,7 +38,7 @@ export const PeersPage = (): JSX.Element => {
                   : `UNK: ${node.num}`)}
             </h1>,
 
-            <Mono>{Protobuf.HardwareModel[node.user?.hwModel ?? 0]}</Mono>,
+            <Mono>{Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}</Mono>,
             <Mono>
               {base16
                 .stringify(node.user?.macaddr ?? [])

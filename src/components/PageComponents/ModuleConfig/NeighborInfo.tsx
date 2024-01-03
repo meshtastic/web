@@ -8,7 +8,7 @@ export const NeighborInfo = (): JSX.Element => {
 
   const onSubmit = (data: NeighborInfoValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
+      new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "neighborInfo",
           value: data,

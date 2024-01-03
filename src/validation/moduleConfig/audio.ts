@@ -1,10 +1,9 @@
 import { IsBoolean, IsEnum, IsInt } from "class-validator";
-
 import { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class AudioValidation
-  implements
-    Omit<Protobuf.ModuleConfig_AudioConfig, keyof Protobuf.native.Message>
+  implements Omit<Protobuf.ModuleConfig.ModuleConfig_AudioConfig, keyof Message>
 {
   @IsBoolean()
   codec2Enabled: boolean;
@@ -12,8 +11,8 @@ export class AudioValidation
   @IsInt()
   pttPin: number;
 
-  @IsEnum(Protobuf.ModuleConfig_AudioConfig_Audio_Baud)
-  bitrate: Protobuf.ModuleConfig_AudioConfig_Audio_Baud;
+  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud)
+  bitrate: Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud;
 
   @IsInt()
   i2sWs: number;

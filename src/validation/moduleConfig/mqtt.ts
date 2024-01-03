@@ -1,10 +1,9 @@
 import { IsBoolean, IsString, Length } from "class-validator";
-
 import type { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
-export class MQTTValidation
-  implements
-    Omit<Protobuf.ModuleConfig_MQTTConfig, keyof Protobuf.native.Message>
+export class MqttValidation
+  implements Omit<Protobuf.ModuleConfig.ModuleConfig_MQTTConfig, keyof Message>
 {
   @IsBoolean()
   enabled: boolean;

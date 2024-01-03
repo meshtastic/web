@@ -18,8 +18,8 @@ import { QRCode } from "react-qrcode-logo";
 export interface QRDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  loraConfig?: Protobuf.Config_LoRaConfig;
-  channels: Map<Types.ChannelNumber, Protobuf.Channel>;
+  loraConfig?: Protobuf.Config.Config_LoRaConfig;
+  channels: Map<Types.ChannelNumber, Protobuf.Channel.Channel>;
 }
 
 export const QRDialog = ({
@@ -37,9 +37,9 @@ export const QRDialog = ({
     const channelsToEncode = allChannels
       .filter((ch) => selectedChannels.includes(ch.index))
       .map((channel) => channel.settings)
-      .filter((ch): ch is Protobuf.ChannelSettings => !!ch);
-    const encoded = new Protobuf.ChannelSet(
-      new Protobuf.ChannelSet({
+      .filter((ch): ch is Protobuf.Channel.ChannelSettings => !!ch);
+    const encoded = new Protobuf.AppOnly.ChannelSet(
+      new Protobuf.AppOnly.ChannelSet({
         loraConfig,
         settings: channelsToEncode,
       }),
@@ -69,7 +69,7 @@ export const QRDialog = ({
                   <Label>
                     {channel.settings?.name.length
                       ? channel.settings.name
-                      : channel.role === Protobuf.Channel_Role.PRIMARY
+                      : channel.role === Protobuf.Channel.Channel_Role.PRIMARY
                         ? "Primary"
                         : `Channel: ${channel.index}`}
                   </Label>

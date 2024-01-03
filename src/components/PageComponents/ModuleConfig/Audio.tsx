@@ -8,7 +8,7 @@ export const Audio = (): JSX.Element => {
 
   const onSubmit = (data: AudioValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
+      new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "audio",
           value: data,
@@ -44,7 +44,8 @@ export const Audio = (): JSX.Element => {
               label: "Bitrate",
               description: "Bitrate to use for audio encoding",
               properties: {
-                enumValue: Protobuf.ModuleConfig_AudioConfig_Audio_Baud,
+                enumValue:
+                  Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud,
               },
             },
             {

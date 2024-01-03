@@ -1,12 +1,12 @@
 import { IsBoolean, IsEnum, IsInt } from "class-validator";
-
 import { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class DeviceValidation
-  implements Omit<Protobuf.Config_DeviceConfig, keyof Protobuf.native.Message>
+  implements Omit<Protobuf.Config.Config_DeviceConfig, keyof Message>
 {
-  @IsEnum(Protobuf.Config_DeviceConfig_Role)
-  role: Protobuf.Config_DeviceConfig_Role;
+  @IsEnum(Protobuf.Config.Config_DeviceConfig_Role)
+  role: Protobuf.Config.Config_DeviceConfig_Role;
 
   @IsBoolean()
   serialEnabled: boolean;
@@ -20,8 +20,8 @@ export class DeviceValidation
   @IsInt()
   buzzerGpio: number;
 
-  @IsEnum(Protobuf.Config_DeviceConfig_RebroadcastMode)
-  rebroadcastMode: Protobuf.Config_DeviceConfig_RebroadcastMode;
+  @IsEnum(Protobuf.Config.Config_DeviceConfig_RebroadcastMode)
+  rebroadcastMode: Protobuf.Config.Config_DeviceConfig_RebroadcastMode;
 
   @IsInt()
   nodeInfoBroadcastSecs: number;

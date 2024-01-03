@@ -11,7 +11,7 @@ export interface MessageWithState extends Types.PacketMetadata<string> {
   state: MessageState;
 }
 
-export type MessageState = "ack" | "waiting" | Protobuf.Routing_Error;
+export type MessageState = "ack" | "waiting" | Protobuf.Mesh.Routing_Error;
 
 export interface ProcessPacketParams {
   from: number;
@@ -29,14 +29,14 @@ export type DialogVariant =
 export interface Device {
   id: number;
   status: Types.DeviceStatusEnum;
-  channels: Map<Types.ChannelNumber, Protobuf.Channel>;
-  config: Protobuf.LocalConfig;
-  moduleConfig: Protobuf.LocalModuleConfig;
-  workingConfig: Protobuf.Config[];
-  workingModuleConfig: Protobuf.ModuleConfig[];
-  hardware: Protobuf.MyNodeInfo;
-  nodes: Map<number, Protobuf.NodeInfo>;
-  metadata: Map<number, Protobuf.DeviceMetadata>;
+  channels: Map<Types.ChannelNumber, Protobuf.Channel.Channel>;
+  config: Protobuf.LocalOnly.LocalConfig;
+  moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
+  workingConfig: Protobuf.Config.Config[];
+  workingModuleConfig: Protobuf.ModuleConfig.ModuleConfig[];
+  hardware: Protobuf.Mesh.MyNodeInfo;
+  nodes: Map<number, Protobuf.Mesh.NodeInfo>;
+  metadata: Map<number, Protobuf.Mesh.DeviceMetadata>;
   messages: {
     direct: Map<number, MessageWithState[]>;
     broadcast: Map<Types.ChannelNumber, MessageWithState[]>;
@@ -44,7 +44,7 @@ export interface Device {
   connection?: Types.ConnectionType;
   activePage: Page;
   activePeer: number;
-  waypoints: Protobuf.Waypoint[];
+  waypoints: Protobuf.Mesh.Waypoint[];
   // currentMetrics: Protobuf.DeviceMetrics;
   pendingSettingsChanges: boolean;
   messageDraft: string;
@@ -57,23 +57,23 @@ export interface Device {
   };
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
-  setConfig: (config: Protobuf.Config) => void;
-  setModuleConfig: (config: Protobuf.ModuleConfig) => void;
-  setWorkingConfig: (config: Protobuf.Config) => void;
-  setWorkingModuleConfig: (config: Protobuf.ModuleConfig) => void;
-  setHardware: (hardware: Protobuf.MyNodeInfo) => void;
+  setConfig: (config: Protobuf.Config.Config) => void;
+  setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
+  setWorkingConfig: (config: Protobuf.Config.Config) => void;
+  setWorkingModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
+  setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
   // setMetrics: (metrics: Types.PacketMetadata<Protobuf.Telemetry>) => void;
   setActivePage: (page: Page) => void;
   setActivePeer: (peer: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
-  addChannel: (channel: Protobuf.Channel) => void;
-  addWaypoint: (waypoint: Protobuf.Waypoint) => void;
-  addNodeInfo: (nodeInfo: Protobuf.NodeInfo) => void;
-  addUser: (user: Types.PacketMetadata<Protobuf.User>) => void;
-  addPosition: (position: Types.PacketMetadata<Protobuf.Position>) => void;
+  addChannel: (channel: Protobuf.Channel.Channel) => void;
+  addWaypoint: (waypoint: Protobuf.Mesh.Waypoint) => void;
+  addNodeInfo: (nodeInfo: Protobuf.Mesh.NodeInfo) => void;
+  addUser: (user: Types.PacketMetadata<Protobuf.Mesh.User>) => void;
+  addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
   addConnection: (connection: Types.ConnectionType) => void;
   addMessage: (message: MessageWithState) => void;
-  addMetadata: (from: number, metadata: Protobuf.DeviceMetadata) => void;
+  addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
   setMessageState: (
     type: "direct" | "broadcast",
     channelIndex: Types.ChannelNumber,
@@ -108,11 +108,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           id,
           status: Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
           channels: new Map(),
-          config: new Protobuf.LocalConfig(),
-          moduleConfig: new Protobuf.LocalModuleConfig(),
+          config: new Protobuf.LocalOnly.LocalConfig(),
+          moduleConfig: new Protobuf.LocalOnly.LocalModuleConfig(),
           workingConfig: [],
           workingModuleConfig: [],
-          hardware: new Protobuf.MyNodeInfo(),
+          hardware: new Protobuf.Mesh.MyNodeInfo(),
           nodes: new Map(),
           metadata: new Map(),
           messages: {
@@ -144,7 +144,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
-          setConfig: (config: Protobuf.Config) => {
+          setConfig: (config: Protobuf.Config.Config) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -184,7 +184,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
-          setModuleConfig: (config: Protobuf.ModuleConfig) => {
+          setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -248,7 +248,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
-          setWorkingConfig: (config: Protobuf.Config) => {
+          setWorkingConfig: (config: Protobuf.Config.Config) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -266,7 +266,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
-          setWorkingModuleConfig: (moduleConfig: Protobuf.ModuleConfig) => {
+          setWorkingModuleConfig: (
+            moduleConfig: Protobuf.ModuleConfig.ModuleConfig,
+          ) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -288,7 +290,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
-          setHardware: (hardware: Protobuf.MyNodeInfo) => {
+          setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -362,7 +364,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
-          addChannel: (channel: Protobuf.Channel) => {
+          addChannel: (channel: Protobuf.Channel.Channel) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -373,7 +375,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
-          addWaypoint: (waypoint: Protobuf.Waypoint) => {
+          addWaypoint: (waypoint: Protobuf.Mesh.Waypoint) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -420,7 +422,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 const currentNode =
-                  device.nodes.get(user.from) ?? new Protobuf.NodeInfo();
+                  device.nodes.get(user.from) ?? new Protobuf.Mesh.NodeInfo();
                 currentNode.user = user.data;
                 device.nodes.set(user.from, currentNode);
               }),
@@ -434,7 +436,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 const currentNode =
-                  device.nodes.get(position.from) ?? new Protobuf.NodeInfo();
+                  device.nodes.get(position.from) ??
+                  new Protobuf.Mesh.NodeInfo();
                 currentNode.position = position.data;
                 device.nodes.set(position.from, currentNode);
               }),
@@ -557,7 +560,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 } else {
                   device.nodes.set(
                     data.from,
-                    new Protobuf.NodeInfo({
+                    new Protobuf.Mesh.NodeInfo({
                       num: data.from,
                       lastHeard: data.time,
                       snr: data.snr,

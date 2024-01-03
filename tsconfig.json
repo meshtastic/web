@@ -1,15 +1,9 @@
 {
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -24,28 +18,20 @@
     "jsx": "react-jsx",
     "baseUrl": "./",
     "paths": {
-      "@app/*": [
-        "./src/*"
-      ],
-      "@pages/*": [
-        "./src/pages/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ],
-      "@core/*": [
-        "./src/core/*"
-      ],
-      "@layouts/*": [
-        "./src/layouts/*"
-      ]
+      "@app/*": ["./src/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@components/*": ["./src/components/*"],
+      "@core/*": ["./src/core/*"],
+      "@layouts/*": ["./src/layouts/*"]
     },
     "importHelpers": true,
     "removeComments": true,
     "strictNullChecks": true,
     "types": [
       "vite/client",
-      "node"
+      "node",
+      "@types/web-bluetooth",
+      "@types/w3c-web-serial"
     ],
     "strictPropertyInitialization": false,
     "experimentalDecorators": true

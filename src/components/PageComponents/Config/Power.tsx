@@ -8,7 +8,7 @@ export const Power = (): JSX.Element => {
 
   const onSubmit = (data: PowerValidation) => {
     setWorkingConfig(
-      new Protobuf.Config({
+      new Protobuf.Config.Config({
         payloadVariant: {
           case: "power",
           value: data,

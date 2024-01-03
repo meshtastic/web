@@ -8,7 +8,7 @@ export const Telemetry = (): JSX.Element => {
 
   const onSubmit = (data: TelemetryValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
+      new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "telemetry",
           value: data,

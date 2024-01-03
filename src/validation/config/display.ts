@@ -1,15 +1,15 @@
 import { IsBoolean, IsEnum, IsInt } from "class-validator";
-
 import { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class DisplayValidation
-  implements Omit<Protobuf.Config_DisplayConfig, keyof Protobuf.native.Message>
+  implements Omit<Protobuf.Config.Config_DisplayConfig, keyof Message>
 {
   @IsInt()
   screenOnSecs: number;
 
-  @IsEnum(Protobuf.Config_DisplayConfig_GpsCoordinateFormat)
-  gpsFormat: Protobuf.Config_DisplayConfig_GpsCoordinateFormat;
+  @IsEnum(Protobuf.Config.Config_DisplayConfig_GpsCoordinateFormat)
+  gpsFormat: Protobuf.Config.Config_DisplayConfig_GpsCoordinateFormat;
 
   @IsInt()
   autoScreenCarouselSecs: number;
@@ -20,14 +20,14 @@ export class DisplayValidation
   @IsBoolean()
   flipScreen: boolean;
 
-  @IsEnum(Protobuf.Config_DisplayConfig_DisplayUnits)
-  units: Protobuf.Config_DisplayConfig_DisplayUnits;
+  @IsEnum(Protobuf.Config.Config_DisplayConfig_DisplayUnits)
+  units: Protobuf.Config.Config_DisplayConfig_DisplayUnits;
 
-  @IsEnum(Protobuf.Config_DisplayConfig_OledType)
-  oled: Protobuf.Config_DisplayConfig_OledType;
+  @IsEnum(Protobuf.Config.Config_DisplayConfig_OledType)
+  oled: Protobuf.Config.Config_DisplayConfig_OledType;
 
-  @IsEnum(Protobuf.Config_DisplayConfig_DisplayMode)
-  displaymode: Protobuf.Config_DisplayConfig_DisplayMode;
+  @IsEnum(Protobuf.Config.Config_DisplayConfig_DisplayMode)
+  displaymode: Protobuf.Config.Config_DisplayConfig_DisplayMode;
 
   @IsBoolean()
   headingBold: boolean;

@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 export interface ImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  loraConfig?: Protobuf.Config_LoRaConfig;
+  loraConfig?: Protobuf.Config.Config_LoRaConfig;
 }
 
 export const ImportDialog = ({
@@ -27,7 +27,7 @@ export const ImportDialog = ({
   onOpenChange,
 }: ImportDialogProps): JSX.Element => {
   const [QRCodeURL, setQRCodeURL] = useState<string>("");
-  const [channelSet, setChannelSet] = useState<Protobuf.ChannelSet>();
+  const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
   const [validURL, setValidURL] = useState<boolean>(false);
 
   const { connection } = useDevice();
@@ -39,7 +39,9 @@ export const ImportDialog = ({
       .replace(/-/g, "+")
       .replace(/_/g, "/");
     try {
-      setChannelSet(Protobuf.ChannelSet.fromBinary(toByteArray(paddedString)));
+      setChannelSet(
+        Protobuf.AppOnly.ChannelSet.fromBinary(toByteArray(paddedString)),
+      );
       setValidURL(true);
     } catch (error) {
       setValidURL(false);
@@ -50,12 +52,12 @@ export const ImportDialog = ({
   const apply = () => {
     channelSet?.settings.map((ch, index) => {
       connection?.setChannel(
-        new Protobuf.Channel({
+        new Protobuf.Channel.Channel({
           index,
           role:
             index === 0
-              ? Protobuf.Channel_Role.PRIMARY
-              : Protobuf.Channel_Role.SECONDARY,
+              ? Protobuf.Channel.Channel_Role.PRIMARY
+              : Protobuf.Channel.Channel_Role.SECONDARY,
           settings: ch,
         }),
       );
@@ -63,7 +65,7 @@ export const ImportDialog = ({
 
     if (channelSet?.loraConfig) {
       connection?.setConfig(
-        new Protobuf.Config({
+        new Protobuf.Config.Config({
           payloadVariant: {
             case: "lora",
             value: channelSet.loraConfig,

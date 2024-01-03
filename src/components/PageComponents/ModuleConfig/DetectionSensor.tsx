@@ -8,7 +8,7 @@ export const DetectionSensor = (): JSX.Element => {
 
   const onSubmit = (data: DetectionSensorValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
+      new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "detectionSensor",
           value: data,

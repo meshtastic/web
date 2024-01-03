@@ -4,7 +4,7 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
-import { Constants, IBLEConnection } from "@meshtastic/js";
+import { Constants, BleConnection } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 
 export const BLE = (): JSX.Element => {
@@ -24,7 +24,7 @@ export const BLE = (): JSX.Element => {
     const id = randId();
     const device = addDevice(id);
     setSelectedDevice(id);
-    const connection = new IBLEConnection(id);
+    const connection = new BleConnection(id);
     await connection.connect({
       device: bleDevice,
     });

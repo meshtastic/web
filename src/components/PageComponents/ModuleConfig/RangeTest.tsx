@@ -8,7 +8,7 @@ export const RangeTest = (): JSX.Element => {
 
   const onSubmit = (data: RangeTestValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
+      new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "rangeTest",
           value: data,

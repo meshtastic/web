@@ -8,7 +8,7 @@ export const StoreForward = (): JSX.Element => {
 
   const onSubmit = (data: StoreForwardValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
+      new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "storeForward",
           value: data,

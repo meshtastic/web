@@ -8,7 +8,7 @@ export const LoRa = (): JSX.Element => {
 
   const onSubmit = (data: LoRaValidation) => {
     setWorkingConfig(
-      new Protobuf.Config({
+      new Protobuf.Config.Config({
         payloadVariant: {
           case: "lora",
           value: data,
@@ -32,7 +32,7 @@ export const LoRa = (): JSX.Element => {
               label: "Region",
               description: "Sets the region for your node",
               properties: {
-                enumValue: Protobuf.Config_LoRaConfig_RegionCode,
+                enumValue: Protobuf.Config.Config_LoRaConfig_RegionCode,
               },
             },
             {
@@ -70,7 +70,7 @@ export const LoRa = (): JSX.Element => {
                 },
               ],
               properties: {
-                enumValue: Protobuf.Config_LoRaConfig_ModemPreset,
+                enumValue: Protobuf.Config.Config_LoRaConfig_ModemPreset,
                 formatEnumName: true,
               },
             },

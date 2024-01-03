@@ -10,7 +10,7 @@ import {
 export interface MessageProps {
   lastMsgSameUser: boolean;
   message: MessageWithState;
-  sender?: Protobuf.NodeInfo;
+  sender?: Protobuf.Mesh.NodeInfo;
 }
 
 export const Message = ({

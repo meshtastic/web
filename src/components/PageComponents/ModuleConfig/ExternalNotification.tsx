@@ -8,7 +8,7 @@ export const ExternalNotification = (): JSX.Element => {
 
   const onSubmit = (data: ExternalNotificationValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
+      new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "externalNotification",
           value: data,

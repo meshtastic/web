@@ -40,7 +40,7 @@ export const DeviceNameDialog = ({
 
   const onSubmit = handleSubmit((data) => {
     connection?.setOwner(
-      new Protobuf.User({
+      new Protobuf.Mesh.User({
         ...myNode?.user,
         ...data,
       }),

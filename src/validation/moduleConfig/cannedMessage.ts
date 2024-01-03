@@ -1,13 +1,10 @@
 import { IsBoolean, IsEnum, IsInt, Length } from "class-validator";
-
 import { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class CannedMessageValidation
   implements
-    Omit<
-      Protobuf.ModuleConfig_CannedMessageConfig,
-      keyof Protobuf.native.Message
-    >
+    Omit<Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig, keyof Message>
 {
   @IsBoolean()
   rotary1Enabled: boolean;
@@ -21,14 +18,14 @@ export class CannedMessageValidation
   @IsInt()
   inputbrokerPinPress: number;
 
-  @IsEnum(Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar)
-  inputbrokerEventCw: Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar;
+  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar)
+  inputbrokerEventCw: Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar;
 
-  @IsEnum(Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar)
-  inputbrokerEventCcw: Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar;
+  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar)
+  inputbrokerEventCcw: Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar;
 
-  @IsEnum(Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar)
-  inputbrokerEventPress: Protobuf.ModuleConfig_CannedMessageConfig_InputEventChar;
+  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar)
+  inputbrokerEventPress: Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar;
 
   @IsBoolean()
   updown1Enabled: boolean;

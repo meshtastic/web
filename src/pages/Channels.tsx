@@ -13,7 +13,7 @@ import { Protobuf, Types } from "@meshtastic/js";
 import { ImportIcon, QrCodeIcon } from "lucide-react";
 import { useState } from "react";
 
-export const getChannelName = (channel: Protobuf.Channel) =>
+export const getChannelName = (channel: Protobuf.Channel.Channel) =>
   channel.settings?.name.length
     ? channel.settings?.name
     : channel.index === 0

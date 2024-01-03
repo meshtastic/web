@@ -8,7 +8,7 @@ export const Position = (): JSX.Element => {
 
   const onSubmit = (data: PositionValidation) => {
     setWorkingConfig(
-      new Protobuf.Config({
+      new Protobuf.Config.Config({
         payloadVariant: {
           case: "position",
           value: data,
@@ -52,7 +52,7 @@ export const Position = (): JSX.Element => {
               label: "Position Flags",
               description: "Configuration options for Position messages",
               properties: {
-                enumValue: Protobuf.Config_PositionConfig_PositionFlags,
+                enumValue: Protobuf.Config.Config_PositionConfig_PositionFlags,
               },
             },
             {

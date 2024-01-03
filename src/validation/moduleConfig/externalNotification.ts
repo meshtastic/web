@@ -1,12 +1,12 @@
 import { IsBoolean, IsInt } from "class-validator";
-
 import type { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class ExternalNotificationValidation
   implements
     Omit<
-      Protobuf.ModuleConfig_ExternalNotificationConfig,
-      keyof Protobuf.native.Message
+      Protobuf.ModuleConfig.ModuleConfig_ExternalNotificationConfig,
+      keyof Message
     >
 {
   @IsBoolean()

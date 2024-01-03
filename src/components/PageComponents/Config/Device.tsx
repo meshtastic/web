@@ -8,7 +8,7 @@ export const Device = (): JSX.Element => {
 
   const onSubmit = (data: DeviceValidation) => {
     setWorkingConfig(
-      new Protobuf.Config({
+      new Protobuf.Config.Config({
         payloadVariant: {
           case: "device",
           value: data,
@@ -32,7 +32,7 @@ export const Device = (): JSX.Element => {
               label: "Role",
               description: "What role the device performs on the mesh",
               properties: {
-                enumValue: Protobuf.Config_DeviceConfig_Role,
+                enumValue: Protobuf.Config.Config_DeviceConfig_Role,
                 formatEnumName: true,
               },
             },
@@ -67,7 +67,7 @@ export const Device = (): JSX.Element => {
               label: "Rebroadcast Mode",
               description: "How to handle rebroadcasting",
               properties: {
-                enumValue: Protobuf.Config_DeviceConfig_RebroadcastMode,
+                enumValue: Protobuf.Config.Config_DeviceConfig_RebroadcastMode,
                 formatEnumName: true,
               },
             },

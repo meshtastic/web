@@ -17,7 +17,9 @@ export const subscribeAll = (
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     switch (routingPacket.data.variant.case) {
       case "errorReason": {
-        if (routingPacket.data.variant.value === Protobuf.Routing_Error.NONE) {
+        if (
+          routingPacket.data.variant.value === Protobuf.Mesh.Routing_Error.NONE
+        ) {
           return;
         }
         console.log(`Routing Error: ${routingPacket.data.variant.value}`);

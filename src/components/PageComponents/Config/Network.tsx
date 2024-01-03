@@ -8,12 +8,12 @@ export const Network = (): JSX.Element => {
 
   const onSubmit = (data: NetworkValidation) => {
     setWorkingConfig(
-      new Protobuf.Config({
+      new Protobuf.Config.Config({
         payloadVariant: {
           case: "network",
           value: {
             ...data,
-            ipv4Config: new Protobuf.Config_NetworkConfig_IpV4Config(
+            ipv4Config: new Protobuf.Config.Config_NetworkConfig_IpV4Config(
               data.ipv4Config,
             ),
           },
@@ -83,7 +83,7 @@ export const Network = (): JSX.Element => {
               label: "Address Mode",
               description: "Address assignment selection",
               properties: {
-                enumValue: Protobuf.Config_NetworkConfig_AddressMode,
+                enumValue: Protobuf.Config.Config_NetworkConfig_AddressMode,
               },
             },
             {
@@ -94,7 +94,8 @@ export const Network = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP,
+                  selector:
+                    Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
                 },
               ],
             },
@@ -106,7 +107,8 @@ export const Network = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP,
+                  selector:
+                    Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
                 },
               ],
             },
@@ -118,7 +120,8 @@ export const Network = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP,
+                  selector:
+                    Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
                 },
               ],
             },
@@ -130,7 +133,8 @@ export const Network = (): JSX.Element => {
               disabledBy: [
                 {
                   fieldName: "addressMode",
-                  selector: Protobuf.Config_NetworkConfig_AddressMode.DHCP,
+                  selector:
+                    Protobuf.Config.Config_NetworkConfig_AddressMode.DHCP,
                 },
               ],
             },

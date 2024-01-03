@@ -6,7 +6,7 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
-import { IHTTPConnection } from "@meshtastic/js";
+import { HttpConnection } from "@meshtastic/js";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
 export const HTTP = (): JSX.Element => {
@@ -36,7 +36,7 @@ export const HTTP = (): JSX.Element => {
     const id = randId();
     const device = addDevice(id);
     setSelectedDevice(id);
-    const connection = new IHTTPConnection(id);
+    const connection = new HttpConnection(id);
     // TODO: Promise never resolves
     await connection.connect({
       address: data.ip,

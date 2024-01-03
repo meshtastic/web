@@ -1,15 +1,15 @@
 import { IsArray, IsBoolean, IsEnum, IsInt, Max, Min } from "class-validator";
-
 import { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class LoRaValidation
-  implements Omit<Protobuf.Config_LoRaConfig, keyof Protobuf.native.Message>
+  implements Omit<Protobuf.Config.Config_LoRaConfig, keyof Message>
 {
   @IsBoolean()
   usePreset: boolean;
 
-  @IsEnum(Protobuf.Config_LoRaConfig_ModemPreset)
-  modemPreset: Protobuf.Config_LoRaConfig_ModemPreset;
+  @IsEnum(Protobuf.Config.Config_LoRaConfig_ModemPreset)
+  modemPreset: Protobuf.Config.Config_LoRaConfig_ModemPreset;
 
   @IsInt()
   bandwidth: number;
@@ -27,8 +27,8 @@ export class LoRaValidation
   @IsInt()
   frequencyOffset: number;
 
-  @IsEnum(Protobuf.Config_LoRaConfig_RegionCode)
-  region: Protobuf.Config_LoRaConfig_RegionCode;
+  @IsEnum(Protobuf.Config.Config_LoRaConfig_RegionCode)
+  region: Protobuf.Config.Config_LoRaConfig_RegionCode;
 
   @IsInt()
   @Min(1)

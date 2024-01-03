@@ -1,10 +1,10 @@
 import { IsBoolean, IsEnum, IsInt } from "class-validator";
-
 import { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class SerialValidation
   implements
-    Omit<Protobuf.ModuleConfig_SerialConfig, keyof Protobuf.native.Message>
+    Omit<Protobuf.ModuleConfig.ModuleConfig_SerialConfig, keyof Message>
 {
   @IsBoolean()
   enabled: boolean;
@@ -18,14 +18,14 @@ export class SerialValidation
   @IsInt()
   txd: number;
 
-  @IsEnum(Protobuf.ModuleConfig_SerialConfig_Serial_Baud)
-  baud: Protobuf.ModuleConfig_SerialConfig_Serial_Baud;
+  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud)
+  baud: Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud;
 
   @IsInt()
   timeout: number;
 
-  @IsEnum(Protobuf.ModuleConfig_SerialConfig_Serial_Mode)
-  mode: Protobuf.ModuleConfig_SerialConfig_Serial_Mode;
+  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode)
+  mode: Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode;
 
   @IsBoolean()
   overrideConsoleSerialPort: boolean;

@@ -1,9 +1,9 @@
-import { IsBoolean, IsInt, IsNumber } from "class-validator";
-
+import { IsBoolean, IsInt } from "class-validator";
 import type { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class PositionValidation
-  implements Omit<Protobuf.Config_PositionConfig, keyof Protobuf.native.Message>
+  implements Omit<Protobuf.Config.Config_PositionConfig, keyof Message>
 {
   @IsInt()
   positionBroadcastSecs: number;

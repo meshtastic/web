@@ -8,7 +8,7 @@ export const Bluetooth = (): JSX.Element => {
 
   const onSubmit = (data: BluetoothValidation) => {
     setWorkingConfig(
-      new Protobuf.Config({
+      new Protobuf.Config.Config({
         payloadVariant: {
           case: "bluetooth",
           value: data,
@@ -43,7 +43,7 @@ export const Bluetooth = (): JSX.Element => {
                 },
               ],
               properties: {
-                enumValue: Protobuf.Config_BluetoothConfig_PairingMode,
+                enumValue: Protobuf.Config.Config_BluetoothConfig_PairingMode,
                 formatEnumName: true,
               },
             },
@@ -56,7 +56,8 @@ export const Bluetooth = (): JSX.Element => {
                 {
                   fieldName: "mode",
                   selector:
-                    Protobuf.Config_BluetoothConfig_PairingMode.FIXED_PIN,
+                    Protobuf.Config.Config_BluetoothConfig_PairingMode
+                      .FIXED_PIN,
                   invert: true,
                 },
                 {

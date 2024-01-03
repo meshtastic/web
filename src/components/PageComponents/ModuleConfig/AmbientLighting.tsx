@@ -8,7 +8,7 @@ export const AmbientLighting = (): JSX.Element => {
 
   const onSubmit = (data: AmbientLightingValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig({
+      new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "ambientLighting",
           value: data,

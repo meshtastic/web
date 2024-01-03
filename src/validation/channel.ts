@@ -6,24 +6,23 @@ import {
   IsString,
   Length,
 } from "class-validator";
-
 import { Protobuf } from "@meshtastic/js";
+import type { Message } from "@bufbuild/protobuf";
 
 export class ChannelValidation
-  implements Omit<Protobuf.Channel, keyof Protobuf.native.Message | "settings">
+  implements Omit<Protobuf.Channel.Channel, keyof Message | "settings">
 {
   @IsNumber()
   index: number;
 
   settings: Channel_SettingsValidation;
 
-  @IsEnum(Protobuf.Channel_Role)
-  role: Protobuf.Channel_Role;
+  @IsEnum(Protobuf.Channel.Channel_Role)
+  role: Protobuf.Channel.Channel_Role;
 }
 
 export class Channel_SettingsValidation
-  implements
-    Omit<Protobuf.ChannelSettings, keyof Protobuf.native.Message | "psk">
+  implements Omit<Protobuf.Channel.ChannelSettings, keyof Message | "psk">
 {
   @IsNumber()
   channelNum: number;

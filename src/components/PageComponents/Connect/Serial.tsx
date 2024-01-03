@@ -4,7 +4,7 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
-import { ISerialConnection } from "@meshtastic/js";
+import { SerialConnection } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 
 export const Serial = (): JSX.Element => {
@@ -30,7 +30,7 @@ export const Serial = (): JSX.Element => {
     const id = randId();
     const device = addDevice(id);
     setSelectedDevice(id);
-    const connection = new ISerialConnection(id);
+    const connection = new SerialConnection(id);
     await connection
       .connect({
         port,
