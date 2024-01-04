@@ -38,9 +38,9 @@ export function GenericInput<T extends FieldValues>({
                 : e.target.value,
             )
           }
-          disabled={disabled}
           {...field.properties}
           {...rest}
+          disabled={disabled}
         />
       )}
     />
