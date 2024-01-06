@@ -60,6 +60,7 @@
     "zustand": "4.4.7"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.4.1",
     "@buf/meshtastic_protobufs.bufbuild_es": "1.6.0-20231227193150-3f9c1dfd2a29.1",
     "@types/chrome": "^0.0.254",
     "@types/node": "^20.10.6",
@@ -69,7 +70,6 @@
     "@types/web-bluetooth": "^0.0.20",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
-    "biome": "^0.3.3",
     "gzipper": "^7.2.0",
     "postcss": "^8.4.32",
     "rollup-plugin-visualizer": "^5.12.0",
