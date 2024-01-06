@@ -4,7 +4,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@app/components/UI/Tabs.js";
-import { cn } from "@app/core/utils/cn.js";
 import { Channel } from "@components/PageComponents/Channel.js";
 import { PageLayout } from "@components/PageLayout.js";
 import { Sidebar } from "@components/Sidebar.js";

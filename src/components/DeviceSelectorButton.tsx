@@ -1,5 +1,3 @@
-import { cn } from "@app/core/utils/cn.js";
-
 export interface DeviceSelectorButtonProps {
   active: boolean;
   onClick: () => void;

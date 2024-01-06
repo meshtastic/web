@@ -1,6 +1,6 @@
-import { IsArray, IsBoolean, IsEnum, IsInt, Max, Min } from "class-validator";
-import { Protobuf } from "@meshtastic/js";
 import type { Message } from "@bufbuild/protobuf";
+import { Protobuf } from "@meshtastic/js";
+import { IsArray, IsBoolean, IsEnum, IsInt, Max, Min } from "class-validator";
 
 export class LoRaValidation
   implements Omit<Protobuf.Config.Config_LoRaConfig, keyof Message>

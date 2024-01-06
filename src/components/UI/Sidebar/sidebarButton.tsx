@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 export interface SidebarButtonProps {
   label: string;
   active?: boolean;
-  icon?: LucideIcon;
+  Icon?: LucideIcon;
   element?: JSX.Element;
   onClick?: () => void;
 }
@@ -12,7 +12,7 @@ export interface SidebarButtonProps {
 export const SidebarButton = ({
   label,
   active,
-  icon: Icon,
+  Icon,
   element,
   onClick,
 }: SidebarButtonProps): JSX.Element => (

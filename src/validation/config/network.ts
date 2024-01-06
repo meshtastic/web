@@ -1,3 +1,5 @@
+import type { Message } from "@bufbuild/protobuf";
+import { Protobuf } from "@meshtastic/js";
 import {
   IsBoolean,
   IsEnum,
@@ -6,8 +8,6 @@ import {
   IsString,
   Length,
 } from "class-validator";
-import { Protobuf } from "@meshtastic/js";
-import type { Message } from "@bufbuild/protobuf";
 
 export class NetworkValidation
   implements

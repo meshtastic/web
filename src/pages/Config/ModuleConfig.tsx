@@ -1,6 +1,6 @@
-import { NeighborInfo } from "@app/components/PageComponents/ModuleConfig/NeighborInfo.js";
 import { AmbientLighting } from "@app/components/PageComponents/ModuleConfig/AmbientLighting.js";
 import { DetectionSensor } from "@app/components/PageComponents/ModuleConfig/DetectionSensor.js";
+import { NeighborInfo } from "@app/components/PageComponents/ModuleConfig/NeighborInfo.js";
 import { Audio } from "@components/PageComponents/ModuleConfig/Audio.js";
 import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage.js";
 import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.js";

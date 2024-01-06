@@ -1,6 +1,6 @@
-import { IsBoolean, IsInt, Length } from "class-validator";
-import type { Protobuf } from "@meshtastic/js";
 import type { Message } from "@bufbuild/protobuf";
+import type { Protobuf } from "@meshtastic/js";
+import { IsBoolean, IsInt, Length } from "class-validator";
 
 export class DetectionSensorValidation
   implements

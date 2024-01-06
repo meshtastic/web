@@ -1,6 +1,6 @@
-import { IsBoolean, IsInt } from "class-validator";
-import type { Protobuf } from "@meshtastic/js";
 import type { Message } from "@bufbuild/protobuf";
+import type { Protobuf } from "@meshtastic/js";
+import { IsBoolean, IsInt } from "class-validator";
 
 export class PositionValidation
   implements Omit<Protobuf.Config.Config_PositionConfig, keyof Message>

@@ -1,6 +1,6 @@
-import { IsBoolean, IsString, Length } from "class-validator";
-import type { Protobuf } from "@meshtastic/js";
 import type { Message } from "@bufbuild/protobuf";
+import type { Protobuf } from "@meshtastic/js";
+import { IsBoolean, IsString, Length } from "class-validator";
 
 export class MqttValidation
   implements Omit<Protobuf.ModuleConfig.ModuleConfig_MQTTConfig, keyof Message>

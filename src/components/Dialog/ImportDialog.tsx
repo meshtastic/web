@@ -26,14 +26,14 @@ export const ImportDialog = ({
   open,
   onOpenChange,
 }: ImportDialogProps): JSX.Element => {
-  const [QRCodeURL, setQRCodeURL] = useState<string>("");
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
-  const [validURL, setValidURL] = useState<boolean>(false);
+  const [validUrl, setValidUrl] = useState<boolean>(false);
 
   const { connection } = useDevice();
 
   useEffect(() => {
-    const base64String = QRCodeURL.split("e/#")[1];
+    const base64String = qrCodeUrl.split("e/#")[1];
     const paddedString = base64String
       ?.padEnd(base64String.length + ((4 - (base64String.length % 4)) % 4), "=")
       .replace(/-/g, "+")
@@ -42,12 +42,12 @@ export const ImportDialog = ({
       setChannelSet(
         Protobuf.AppOnly.ChannelSet.fromBinary(toByteArray(paddedString)),
       );
-      setValidURL(true);
+      setValidUrl(true);
     } catch (error) {
-      setValidURL(false);
+      setValidUrl(false);
       setChannelSet(undefined);
     }
-  }, [QRCodeURL]);
+  }, [qrCodeUrl]);
 
   const apply = () => {
     channelSet?.settings.map((ch, index) => {
@@ -87,19 +87,19 @@ export const ImportDialog = ({
         <div className="flex flex-col gap-3">
           <Label>Channel Set/QR Code URL</Label>
           <Input
-            value={QRCodeURL}
-            suffix={validURL ? "✅" : "❌"}
+            value={qrCodeUrl}
+            suffix={validUrl ? "✅" : "❌"}
             onChange={(e) => {
-              setQRCodeURL(e.target.value);
+              setQrCodeUrl(e.target.value);
             }}
           />
-          {validURL && (
+          {validUrl && (
             <div className="flex flex-col gap-3">
               <div className="flex w-full gap-2">
                 <div className="w-36">
                   <Label>Use Preset?</Label>
                   <Switch
-                    disabled
+                    disabled={true}
                     checked={channelSet?.loraConfig?.usePreset ?? true}
                   />
                 </div>
@@ -138,7 +138,7 @@ export const ImportDialog = ({
           )}
         </div>
         <DialogFooter>
-          <Button onClick={apply} disabled={!validURL}>
+          <Button onClick={apply} disabled={!validUrl}>
             Apply
           </Button>
         </DialogFooter>

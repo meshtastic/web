@@ -29,7 +29,7 @@ export const QRDialog = ({
   channels,
 }: QRDialogProps): JSX.Element => {
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
-  const [QRCodeURL, setQRCodeURL] = useState<string>("");
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
 
   const allChannels = Array.from(channels.values());
 
@@ -49,7 +49,7 @@ export const QRDialog = ({
       .replace(/\+/g, "-")
       .replace(/\//g, "_");
 
-    setQRCodeURL(`https://meshtastic.org/e/#${base64}`);
+    setQrCodeUrl(`https://meshtastic.org/e/#${base64}`);
   }, [channels, selectedChannels, loraConfig]);
 
   return (
@@ -92,18 +92,18 @@ export const QRDialog = ({
                 </div>
               ))}
             </div>
-            <QRCode value={QRCodeURL} size={200} qrStyle="dots" />
+            <QRCode value={qrCodeUrl} size={200} qrStyle="dots" />
           </div>
         </div>
         <DialogFooter>
           <Label>Sharable URL</Label>
           <Input
-            value={QRCodeURL}
-            disabled
+            value={qrCodeUrl}
+            disabled={true}
             action={{
               icon: ClipboardIcon,
               onClick() {
-                void navigator.clipboard.writeText(QRCodeURL);
+                void navigator.clipboard.writeText(qrCodeUrl);
               },
             }}
           />

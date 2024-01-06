@@ -24,13 +24,13 @@ export const ConfigPage = (): JSX.Element => {
             label="Radio Config"
             active={activeConfigSection === "device"}
             onClick={() => setActiveConfigSection("device")}
-            icon={SettingsIcon}
+            Icon={SettingsIcon}
           />
           <SidebarButton
             label="Module Config"
             active={activeConfigSection === "module"}
             onClick={() => setActiveConfigSection("module")}
-            icon={BoxesIcon}
+            Icon={BoxesIcon}
           />
         </SidebarSection>
       </Sidebar>

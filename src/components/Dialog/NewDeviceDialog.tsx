@@ -4,7 +4,6 @@ import { Serial } from "@components/PageComponents/Connect/Serial.js";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.js";

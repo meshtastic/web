@@ -1,6 +1,6 @@
-import { IsBoolean, IsEnum, IsInt, Length } from "class-validator";
-import { Protobuf } from "@meshtastic/js";
 import type { Message } from "@bufbuild/protobuf";
+import { Protobuf } from "@meshtastic/js";
+import { IsBoolean, IsEnum, IsInt, Length } from "class-validator";
 
 export class CannedMessageValidation
   implements

@@ -5,7 +5,6 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
-  GithubIcon,
   HomeIcon,
   LanguagesIcon,
   MoonIcon,

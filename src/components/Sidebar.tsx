@@ -6,7 +6,6 @@ import type { Page } from "@core/stores/deviceStore.js";
 import {
   EditIcon,
   LayersIcon,
-  LayoutGrid,
   LucideIcon,
   MapIcon,
   MessageSquareIcon,
@@ -80,7 +79,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
           <SidebarButton
             key={link.name}
             label={link.name}
-            icon={link.icon}
+            Icon={link.icon}
             onClick={() => {
               setActivePage(link.page);
             }}

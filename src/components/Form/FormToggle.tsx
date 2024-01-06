@@ -4,7 +4,7 @@ import type {
 } from "@components/Form/DynamicForm.js";
 import { Switch } from "@components/UI/Switch.js";
 import { ChangeEvent } from "react";
-import { Controller, FieldPathValue, FieldValues } from "react-hook-form";
+import { Controller, FieldValues } from "react-hook-form";
 
 export interface ToggleFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "toggle";

@@ -1,6 +1,6 @@
-import { IsBoolean, IsInt, Max, Min } from "class-validator";
-import type { Protobuf } from "@meshtastic/js";
 import type { Message } from "@bufbuild/protobuf";
+import type { Protobuf } from "@meshtastic/js";
+import { IsBoolean, IsInt, Max, Min } from "class-validator";
 
 export class PowerValidation
   implements Omit<Protobuf.Config.Config_PowerConfig, keyof Message>

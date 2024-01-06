@@ -1,6 +1,6 @@
-import { IsBoolean, IsEnum, IsInt } from "class-validator";
-import { Protobuf } from "@meshtastic/js";
 import type { Message } from "@bufbuild/protobuf";
+import { Protobuf } from "@meshtastic/js";
+import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
 export class AudioValidation
   implements Omit<Protobuf.ModuleConfig.ModuleConfig_AudioConfig, keyof Message>
