@@ -1,6 +1,6 @@
 {
   "name": "meshtastic-web",
-  "version": "2.2.17-1",
+  "version": "2.2.18-0",
   "type": "module",
   "description": "Meshtastic web client",
   "license": "GPL-3.0-only",
@@ -22,7 +22,7 @@
   "dependencies": {
     "@bufbuild/protobuf": "^1.6.0",
     "@emeraldpay/hashicon-react": "^0.5.2",
-    "@meshtastic/js": "2.2.17-5",
+    "@meshtastic/js": "2.2.18-0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",
@@ -45,7 +45,7 @@
     "clsx": "^2.1.0",
     "cmdk": "^0.2.0",
     "immer": "^10.0.3",
-    "lucide-react": "^0.306.0",
+    "lucide-react": "^0.307.0",
     "mapbox-gl": "npm:empty-npm-package@^1.0.0",
     "maplibre-gl": "3.6.2",
     "react": "^18.2.0",
@@ -60,11 +60,11 @@
     "zustand": "4.4.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.4.1",
-    "@buf/meshtastic_protobufs.bufbuild_es": "1.6.0-20240104182715-af4a215beb91.1",
+    "@biomejs/biome": "^1.5.0",
+    "@buf/meshtastic_protobufs.bufbuild_es": "1.6.0-20240106203407-94f78518ac45.1",
     "@types/chrome": "^0.0.256",
-    "@types/node": "^20.10.6",
-    "@types/react": "^18.2.46",
+    "@types/node": "^20.10.7",
+    "@types/react": "^18.2.47",
     "@types/react-dom": "^18.2.18",
     "@types/w3c-web-serial": "^1.0.6",
     "@types/web-bluetooth": "^0.0.20",
