@@ -16,7 +16,19 @@ import {
 import { Link } from "@components/UI/Typography/Link.js";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 
-const tabs = [
+export interface TabElementProps {
+  closeDialog: () => void;
+}
+
+export interface TabManifest {
+  label: string;
+  element: React.FC<TabElementProps>;
+  disabled: boolean;
+  disabledMessage: string;
+  disabledLink?: string;
+}
+
+const tabs: TabManifest[] = [
   {
     label: "HTTP",
     element: HTTP,
@@ -74,7 +86,7 @@ export const NewDeviceDialog = ({
                   {tab.disabledMessage}
                 </p>
               ) : (
-                <tab.element />
+                <tab.element closeDialog={() => onOpenChange(false)} />
               )}
             </TabsContent>
           ))}
