@@ -73,9 +73,9 @@ export const MapPage = (): JSX.Element => {
   }, [map]);
 
   useEffect(() => {
-    if (map) {
+    map?.on("load", () => {
       getBBox();
-    }
+    });
   }, [map, getBBox]);
 
   return (
@@ -131,9 +131,8 @@ export const MapPage = (): JSX.Element => {
           dragRotate={false}
           touchZoomRotate={false}
           initialViewState={{
-            zoom: 10,
-            latitude: -38,
-            longitude: 145,
+            latitude: 50,
+            longitude: 0,
           }}
         >
           {waypoints.map((wp) => (
