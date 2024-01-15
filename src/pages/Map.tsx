@@ -131,7 +131,7 @@ export const MapPage = (): JSX.Element => {
           dragRotate={false}
           touchZoomRotate={false}
           initialViewState={{
-            zoom: 1.5,
+            zoom: 1.6,
             latitude: 35,
             longitude: 0,
           }}
