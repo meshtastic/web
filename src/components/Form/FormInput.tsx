@@ -11,6 +11,7 @@ export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
   properties?: {
     prefix?: string;
     suffix?: string;
+    step?: number;
     action?: {
       icon: LucideIcon;
       onClick: () => void;
@@ -30,11 +31,12 @@ export function GenericInput<T extends FieldValues>({
       render={({ field: { value, onChange, ...rest } }) => (
         <Input
           type={field.type}
-          value={field.type === "number" ? parseInt(value) : value}
+          step={field.properties?.step}
+          value={field.type === "number" ? Number.parseInt(value) : value}
           onChange={(e) =>
             onChange(
               field.type === "number"
-                ? parseInt(e.target.value)
+                ? Number.parseInt(e.target.value)
                 : e.target.value,
             )
           }

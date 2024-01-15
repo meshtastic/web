@@ -1,3 +1,4 @@
+import { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
 import { Button } from "@components/UI/Button.js";
 import { Mono } from "@components/generic/Mono.js";
 import { useAppStore } from "@core/stores/appStore.js";
@@ -7,7 +8,7 @@ import { randId } from "@core/utils/randId.js";
 import { BleConnection, Constants } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 
-export const BLE = (): JSX.Element => {
+export const BLE = ({ closeDialog }: TabElementProps): JSX.Element => {
   const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
@@ -30,6 +31,8 @@ export const BLE = (): JSX.Element => {
     });
     device.addConnection(connection);
     subscribeAll(device, connection);
+
+    closeDialog();
   };
 
   return (

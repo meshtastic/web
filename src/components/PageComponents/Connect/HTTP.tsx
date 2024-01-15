@@ -1,3 +1,4 @@
+import { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
 import { Button } from "@components/UI/Button.js";
 import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
@@ -9,7 +10,7 @@ import { randId } from "@core/utils/randId.js";
 import { HttpConnection } from "@meshtastic/js";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
-export const HTTP = (): JSX.Element => {
+export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
   const { register, handleSubmit, control } = useForm<{
@@ -18,7 +19,7 @@ export const HTTP = (): JSX.Element => {
   }>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
-        window.location.hostname,
+        window.location.hostname
       )
         ? "meshtastic.local"
         : window.location.hostname,
@@ -45,6 +46,8 @@ export const HTTP = (): JSX.Element => {
     });
     device.addConnection(connection);
     subscribeAll(device, connection);
+
+    closeDialog();
   });
 
   return (

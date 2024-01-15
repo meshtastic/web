@@ -115,7 +115,7 @@ export const MQTT = (): JSX.Element => {
               name: "proxyToClientEnabled",
               label: "Proxy to Client Enabled",
               description:
-                "Whether to proxy MQTT packets to the client (for example to Home Assistant)",
+                "Use the client's internet connection for MQTT (feature only active in mobile apps)",
               disabledBy: [
                 {
                   fieldName: "enabled",

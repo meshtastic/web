@@ -1,3 +1,4 @@
+import { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
 import { Button } from "@components/UI/Button.js";
 import { Mono } from "@components/generic/Mono.js";
 import { useAppStore } from "@core/stores/appStore.js";
@@ -7,7 +8,7 @@ import { randId } from "@core/utils/randId.js";
 import { SerialConnection } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 
-export const Serial = (): JSX.Element => {
+export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
@@ -40,6 +41,8 @@ export const Serial = (): JSX.Element => {
       .catch((e: Error) => console.log(`Unable to Connect: ${e.message}`));
     device.addConnection(connection);
     subscribeAll(device, connection);
+
+    closeDialog();
   };
 
   return (
