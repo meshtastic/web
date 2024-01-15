@@ -166,7 +166,8 @@ export const LoRa = (): JSX.Element => {
               label: "Override Frequency",
               description: "Override frequency",
               properties: {
-                suffix: "Hz",
+                suffix: "MHz",
+                step: 0.001,
               },
             },
           ],
