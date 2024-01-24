@@ -56,4 +56,7 @@ export class LoRaValidation
 
   @IsArray()
   ignoreIncoming: number[];
+
+  @IsBoolean()
+  ignoreMqtt: boolean;
 }

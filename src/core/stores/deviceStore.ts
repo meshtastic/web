@@ -106,7 +106,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
       produce<DeviceState>((draft) => {
         draft.devices.set(id, {
           id,
-          status: Types.DeviceStatusEnum.DEVICE_DISCONNECTED,
+          status: Types.DeviceStatusEnum.DeviceDisconnected,
           channels: new Map(),
           config: new Protobuf.LocalOnly.LocalConfig(),
           moduleConfig: new Protobuf.LocalOnly.LocalModuleConfig(),

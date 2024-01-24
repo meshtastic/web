@@ -8,7 +8,8 @@ import { Channel } from "@components/PageComponents/Channel.js";
 import { PageLayout } from "@components/PageLayout.js";
 import { Sidebar } from "@components/Sidebar.js";
 import { useDevice } from "@core/stores/deviceStore.js";
-import { Protobuf, Types } from "@meshtastic/js";
+import { Types } from "@meshtastic/js";
+import type { Protobuf } from "@meshtastic/js";
 import { ImportIcon, QrCodeIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -22,7 +23,7 @@ export const getChannelName = (channel: Protobuf.Channel.Channel) =>
 export const ChannelsPage = (): JSX.Element => {
   const { channels, setDialogOpen } = useDevice();
   const [activeChannel, setActiveChannel] = useState<Types.ChannelNumber>(
-    Types.ChannelNumber.PRIMARY,
+    Types.ChannelNumber.Primary,
   );
 
   const currentChannel = channels.get(activeChannel);

@@ -47,6 +47,12 @@ export const LoRa = (): JSX.Element => {
               label: "Channel Number",
               description: "LoRa channel number",
             },
+            {
+              type: "toggle",
+              name: "ignoreMqtt",
+              label: "Ignore MQTT",
+              description: "Don't forward MQTT messages over the mesh",
+            },
           ],
         },
         {

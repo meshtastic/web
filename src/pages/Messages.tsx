@@ -15,7 +15,7 @@ export const MessagesPage = (): JSX.Element => {
   const [chatType, setChatType] =
     useState<Types.PacketDestination>("broadcast");
   const [activeChat, setActiveChat] = useState<number>(
-    Types.ChannelNumber.PRIMARY,
+    Types.ChannelNumber.Primary,
   );
   const filteredNodes = Array.from(nodes.values()).filter(
     (n) => n.num !== hardware.myNodeNum,
@@ -91,7 +91,7 @@ export const MessagesPage = (): JSX.Element => {
                 key={node.num}
                 to={activeChat}
                 messages={messages.direct.get(node.num)}
-                channel={Types.ChannelNumber.PRIMARY}
+                channel={Types.ChannelNumber.Primary}
               />
             ),
         )}
