@@ -1,8 +1,10 @@
+import type { NodeInfo } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.js";
 import { PageLayout } from "@components/PageLayout.js";
 import { Sidebar } from "@components/Sidebar.js";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
+import { Search } from "@app/components/generic/Search.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, Types } from "@meshtastic/js";
@@ -25,6 +27,9 @@ export const MessagesPage = (): JSX.Element => {
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
   );
   const currentChannel = channels.get(activeChat);
+  const [searchNodes, setSearchNodes] = useState<NodeInfo[]>(filteredNodes);
+
+  const onSearchFilter = (result: NodeInfo[]) => setSearchNodes(result);
 
   return (
     <>
@@ -50,7 +55,12 @@ export const MessagesPage = (): JSX.Element => {
           ))}
         </SidebarSection>
         <SidebarSection label="Peers">
-          {filteredNodes.map((node) => (
+          <Search<NodeInfo>
+            data={filteredNodes}
+            filterBy="user.longName"
+            onFilter={onSearchFilter}
+          />
+          {searchNodes.map((node) => (
             <SidebarButton
               key={node.num}
               label={node.user?.longName ?? "Unknown"}

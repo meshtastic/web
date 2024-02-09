@@ -2,10 +2,14 @@ import { Sidebar } from "@components/Sidebar.js";
 import { Mono } from "@components/generic/Mono.js";
 import { Table } from "@components/generic/Table/index.js";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.js";
+import { SidebarSection } from '@components/UI/Sidebar/SidebarSection.js';
+import { Search } from '@app/components/generic/Search'
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/js";
 import { base16 } from "rfc4648";
+import { NodeInfo } from '@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb';
+import { useState } from 'react';
 
 export const PeersPage = (): JSX.Element => {
   const { nodes, hardware } = useDevice();
@@ -13,10 +17,21 @@ export const PeersPage = (): JSX.Element => {
   const filteredNodes = Array.from(nodes.values()).filter(
     (n) => n.num !== hardware.myNodeNum,
   );
+  const [searchNodes, setSearchNodes] = useState<NodeInfo[]>(filteredNodes)
+
+  const onFilter = (results: NodeInfo[]) => setSearchNodes(results);
 
   return (
     <>
-      <Sidebar />
+      <Sidebar>
+        <SidebarSection label="Peers">
+          <Search<NodeInfo>
+            data={filteredNodes}
+            filterBy="user.longName"
+            onFilter={onFilter}
+          />
+        </SidebarSection>
+      </Sidebar>
       <div className="w-full overflow-y-auto">
         <Table
           headings={[
@@ -27,7 +42,7 @@ export const PeersPage = (): JSX.Element => {
             { title: "Last Heard", type: "normal", sortable: true },
             { title: "SNR", type: "normal", sortable: true },
           ]}
-          rows={filteredNodes.map((node) => [
+          rows={searchNodes.map((node) => [
             <Hashicon size={24} value={node.num.toString()} />,
             <h1>
               {node.user?.longName ??
