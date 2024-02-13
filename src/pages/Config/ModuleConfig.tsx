@@ -9,6 +9,7 @@ import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.js"
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.js";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.js";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.js";
+import { Paxcounter } from "@components/PageComponents/ModuleConfig/Paxcounter.js";
 import {
   Tabs,
   TabsContent,
@@ -61,6 +62,10 @@ export const ModuleConfig = (): JSX.Element => {
     {
       label: "Detection Sensor",
       element: DetectionSensor,
+    },
+    {
+      label: "Paxcounter",
+      element: Paxcounter,
     },
   ];
 
