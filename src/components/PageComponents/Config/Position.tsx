@@ -73,6 +73,21 @@ export const Position = (): JSX.Element => {
               label: "Enable Pin",
               description: "GPS module enable pin override",
             },
+            {
+              type: "select",
+              name: "gpsMode",
+              label: "GPS Mode",
+              description: "GPS module mode",
+              properties: {
+                enumValue: Protobuf.Config.Config_PositionConfig_GpsMode,
+              },
+            },
+            {
+              type: "number",
+              name: "channelPrecision",
+              label: "Channel Precision",
+              description: "GPS channel precision",
+            },
           ],
         },
         {

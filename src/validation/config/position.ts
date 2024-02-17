@@ -1,6 +1,6 @@
 import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/js";
-import { IsBoolean, IsInt } from "class-validator";
+import { Protobuf } from "@meshtastic/js";
+import { IsArray, IsBoolean, IsEnum, IsInt } from "class-validator";
 
 export class PositionValidation
   implements Omit<Protobuf.Config.Config_PositionConfig, keyof Message>
@@ -40,4 +40,10 @@ export class PositionValidation
 
   @IsInt()
   gpsEnGpio: number;
+
+  @IsEnum(Protobuf.Config.Config_PositionConfig_GpsMode)
+  gpsMode: Protobuf.Config.Config_PositionConfig_GpsMode;
+
+  @IsArray()
+  channelPrecision: number[];
 }
