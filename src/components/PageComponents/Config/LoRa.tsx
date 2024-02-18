@@ -44,8 +44,8 @@ export const LoRa = (): JSX.Element => {
             {
               type: "number",
               name: "channelNum",
-              label: "Channel Number",
-              description: "LoRa channel number",
+              label: "Frequency Slot",
+              description: "LoRa frequency channel number",
             },
             {
               type: "toggle",
