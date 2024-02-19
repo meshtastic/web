@@ -243,6 +243,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                         config.payloadVariant.value;
                       break;
                     }
+                    case "paxcounter": {
+                      device.moduleConfig.paxcounter =
+                        config.payloadVariant.value;
+                      break;
+                    }
                   }
                 }
               }),
