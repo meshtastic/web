@@ -56,7 +56,6 @@ export const DeviceConfig = (): JSX.Element => {
           <TabsTrigger
             key={tab.label}
             value={tab.label}
-            disabled={tab.disabled}
           >
             {tab.label}
           </TabsTrigger>
