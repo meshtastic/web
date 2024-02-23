@@ -39,7 +39,7 @@ export const CannedMessage = (): JSX.Element => {
   return (
     <DynamicForm<CannedMessageValidation>
       onSubmit={onSubmit}
-      defaultValues={moduleConfig.cannedMessage}
+      defaultValues={config.moduleConfig.cannedMessage}
       enableSwitch={enableSwitch}
       fieldGroups={[
         {
