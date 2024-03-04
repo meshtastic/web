@@ -5,7 +5,7 @@ import { create } from "zustand";
 
 import { Protobuf, Types } from "@meshtastic/js";
 
-export type Page = "messages" | "map" | "config" | "channels" | "peers";
+export type Page = "messages" | "map" | "config" | "channels" | "nodes";
 
 export interface MessageWithState extends Types.PacketMetadata<string> {
   state: MessageState;
@@ -43,7 +43,7 @@ export interface Device {
   };
   connection?: Types.ConnectionType;
   activePage: Page;
-  activePeer: number;
+  activeNode: number;
   waypoints: Protobuf.Mesh.Waypoint[];
   // currentMetrics: Protobuf.DeviceMetrics;
   pendingSettingsChanges: boolean;
@@ -64,7 +64,7 @@ export interface Device {
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
   // setMetrics: (metrics: Types.PacketMetadata<Protobuf.Telemetry>) => void;
   setActivePage: (page: Page) => void;
-  setActivePeer: (peer: number) => void;
+  setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
   addChannel: (channel: Protobuf.Channel.Channel) => void;
   addWaypoint: (waypoint: Protobuf.Mesh.Waypoint) => void;
@@ -121,7 +121,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           },
           connection: undefined,
           activePage: "messages",
-          activePeer: 0,
+          activeNode: 0,
           waypoints: [],
           // currentMetrics: new Protobuf.DeviceMetrics(),
           dialog: {
@@ -409,12 +409,12 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
-          setActivePeer: (peer) => {
+          setActiveNode: (node) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
-                  device.activePeer = peer;
+                  device.activeNode = node;
                 }
               }),
             );

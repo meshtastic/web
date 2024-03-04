@@ -104,10 +104,10 @@ export const CommandPalette = (): JSX.Element => {
           },
         },
         {
-          label: "Peers",
+          label: "Nodes",
           icon: UsersIcon,
           action() {
-            setActivePage("peers");
+            setActivePage("nodes");
           },
         },
       ],
@@ -193,10 +193,10 @@ export const CommandPalette = (): JSX.Element => {
           },
         },
         {
-          label: "Reset Peers",
+          label: "Reset Nodes",
           icon: TrashIcon,
           action() {
-            connection?.resetPeers();
+            connection?.resetNodes();
           },
         },
         {

@@ -49,7 +49,7 @@ export const MessagesPage = (): JSX.Element => {
             />
           ))}
         </SidebarSection>
-        <SidebarSection label="Peers">
+        <SidebarSection label="Nodes">
           {filteredNodes.map((node) => (
             <SidebarButton
               key={node.num}

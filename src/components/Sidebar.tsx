@@ -50,9 +50,9 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
       page: "channels",
     },
     {
-      name: "Peers",
+      name: "Nodes",
       icon: UsersIcon,
-      page: "peers",
+      page: "nodes",
     },
   ];
 
