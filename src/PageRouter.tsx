@@ -3,7 +3,7 @@ import { ChannelsPage } from "@pages/Channels.js";
 import { ConfigPage } from "@pages/Config/index.js";
 import { MapPage } from "@pages/Map.js";
 import { MessagesPage } from "@pages/Messages.js";
-import { PeersPage } from "@pages/Peers.js";
+import { NodesPage } from "@pages/Nodes.js";
 
 export const PageRouter = (): JSX.Element => {
   const { activePage } = useDevice();
@@ -13,7 +13,7 @@ export const PageRouter = (): JSX.Element => {
       {activePage === "map" && <MapPage />}
       {activePage === "config" && <ConfigPage />}
       {activePage === "channels" && <ChannelsPage />}
-      {activePage === "peers" && <PeersPage />}
+      {activePage === "nodes" && <NodesPage />}
     </>
   );
 };

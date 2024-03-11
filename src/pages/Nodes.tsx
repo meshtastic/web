@@ -7,7 +7,7 @@ import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/js";
 import { base16 } from "rfc4648";
 
-export const PeersPage = (): JSX.Element => {
+export const NodesPage = (): JSX.Element => {
   const { nodes, hardware } = useDevice();
 
   const filteredNodes = Array.from(nodes.values()).filter(
