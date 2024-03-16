@@ -122,6 +122,45 @@ export const MQTT = (): JSX.Element => {
                 },
               ],
             },
+            {
+              type: "toggle",
+              name: "mapReportingEnabled",
+              label: "Map Reporting Enabled",
+              description: "Enable or disable map reporting",
+              disabledBy: [
+                {
+                  fieldName: "enabled",
+                },
+              ],
+            },
+            {
+              type: "number",
+              name: "mapReportSettings.publishIntervalSecs",
+              label: "Map Report Publish Interval (s)",
+              description: "Interval in seconds to publish map reports",
+              disabledBy: [
+                {
+                  fieldName: "enabled",
+                },
+                {
+                  fieldName: "mapReportingEnabled",
+                },
+              ],
+            },
+            {
+              type: "number",
+              name: "mapReportSettings.positionPrecision",
+              label: "Position Precision",
+              description: "Precision of the position",
+              disabledBy: [
+                {
+                  fieldName: "enabled",
+                },
+                {
+                  fieldName: "mapReportingEnabled",
+                },
+              ],
+            },
           ],
         },
       ]}
