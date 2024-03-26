@@ -12,8 +12,8 @@ dependencies:
     specifier: ^0.5.2
     version: 0.5.2
   '@meshtastic/js':
-    specifier: 2.3.0-0
-    version: 2.3.0-0
+    specifier: 2.3.2-0
+    version: 2.3.2-0
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.22)(@types/react@18.2.66)(react-dom@18.2.0)(react@18.2.0)
@@ -883,8 +883,8 @@ packages:
       sort-object: 3.0.3
     dev: false
 
-  /@meshtastic/js@2.3.0-0:
-    resolution: {integrity: sha512-BN+SZU1weKw9jSAV905wOaCL5R2nh1f9LGKz3csXqJcbe2Dxbjg2KMZjR8jbC1e9gprcEbifVCDgGZfMc9hN1Q==}
+  /@meshtastic/js@2.3.2-0:
+    resolution: {integrity: sha512-N8LDHWL2qtdb5y3xV6bos945jPAdj/dInzD1ost05N+ma3nji2YNw0lQekyfnwD/raMA+FrydKaHDT+O3umrhg==}
     dependencies:
       crc: 4.3.2
       sub-events: 1.9.0
