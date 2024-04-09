@@ -14,14 +14,8 @@ export class PositionValidation
   @IsBoolean()
   fixedPosition: boolean;
 
-  @IsBoolean()
-  gpsEnabled: boolean;
-
   @IsInt()
   gpsUpdateInterval: number;
-
-  @IsInt()
-  gpsAttemptTime: number;
 
   @IsInt()
   positionFlags: number;

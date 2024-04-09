@@ -34,17 +34,21 @@ export const Position = (): JSX.Element => {
                 "Only send position when there has been a meaningful change in location",
             },
             {
+              type: "select",
+              name: "gpsMode",
+              label: "GPS Mode",
+              description:
+                "Configure whether device GPS is Enabled, Disabled, or Not Present",
+              properties: {
+                enumValue: Protobuf.Config.Config_PositionConfig_GpsMode,
+              },
+            },
+            {
               type: "toggle",
               name: "fixedPosition",
               label: "Fixed Position",
               description:
                 "Don't report GPS position, but a manually-specified one",
-            },
-            {
-              type: "toggle",
-              name: "gpsEnabled",
-              label: "GPS Enabled",
-              description: "Enable the internal GPS module",
             },
             {
               type: "multiSelect",
@@ -74,15 +78,6 @@ export const Position = (): JSX.Element => {
               description: "GPS module enable pin override",
             },
             {
-              type: "select",
-              name: "gpsMode",
-              label: "GPS Mode",
-              description: "GPS module mode",
-              properties: {
-                enumValue: Protobuf.Config.Config_PositionConfig_GpsMode,
-              },
-            },
-            {
               type: "number",
               name: "channelPrecision",
               label: "Channel Precision",
@@ -105,12 +100,6 @@ export const Position = (): JSX.Element => {
               name: "gpsUpdateInterval",
               label: "GPS Update Interval",
               description: "How often a GPS fix should be acquired",
-            },
-            {
-              type: "number",
-              name: "gpsAttemptTime",
-              label: "Fix Attempt Duration",
-              description: "How long the device will try to get a fix for",
             },
             {
               type: "number",
