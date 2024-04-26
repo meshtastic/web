@@ -1,6 +1,6 @@
 import { useAppStore } from '@core/stores/appStore.js';
 
-const notificationSound = new Audio("/notification.mp3");
+const notificationSound = new Audio("/notification.wav");
 
 let isPlaying = false;
 
