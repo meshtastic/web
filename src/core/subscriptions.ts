@@ -1,5 +1,6 @@
 import type { Device } from "@core/stores/deviceStore.js";
 import { Protobuf, Types } from "@meshtastic/js";
+import { playNotificationSound } from "./utils/notify";
 
 export const subscribeAll = (
   device: Device,
@@ -84,6 +85,7 @@ export const subscribeAll = (
       ...messagePacket,
       state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
     });
+    playNotificationSound();
   });
 
   connection.events.onPendingSettingsChange.subscribe((state) => {
