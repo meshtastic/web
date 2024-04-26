@@ -1,6 +1,6 @@
 import { useAppStore } from '@core/stores/appStore.js';
 
-const notificationSound = new Audio("/notification.wav");
+const notificationSound = new Audio("/notification.wav"); //change sound if needed
 
 let isPlaying = false;
 
@@ -9,7 +9,6 @@ export const playNotificationSound = () => {
   if (notifications && !isPlaying) {
     isPlaying = true;
     notificationSound.play();
-
 
     notificationSound.onended = () => {
       isPlaying = false;
