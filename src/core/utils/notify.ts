@@ -10,6 +10,7 @@ export const playNotificationSound = () => {
     isPlaying = true;
     notificationSound.play();
 
+
     notificationSound.onended = () => {
       isPlaying = false;
     };

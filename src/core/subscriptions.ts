@@ -85,7 +85,9 @@ export const subscribeAll = (
       ...messagePacket,
       state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
     });
-    playNotificationSound();
+    if(messagePacket.from !== myNodeNum){
+      playNotificationSound();
+    } 
   });
 
   connection.events.onPendingSettingsChange.subscribe((state) => {
