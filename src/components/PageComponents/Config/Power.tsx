@@ -49,7 +49,7 @@ export const Power = (): JSX.Element => {
               label: "ADC Multiplier Override ratio",
               description: "Used for tweaking battery voltage reading",
               properties: {
-                step: 0.01,
+                step: 0.0001,
               },
             },
             {
