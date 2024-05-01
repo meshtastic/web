@@ -11,6 +11,8 @@ import {
   PlusIcon,
   SunIcon,
   TerminalIcon,
+  BellIcon,
+  BellOffIcon,
 } from "lucide-react";
 
 export const DeviceSelector = (): JSX.Element => {
@@ -20,6 +22,8 @@ export const DeviceSelector = (): JSX.Element => {
     setSelectedDevice,
     darkMode,
     setDarkMode,
+    notifications,
+    setNotifications,
     setCommandPaletteOpen,
     setConnectDialogOpen,
   } = useAppStore();
@@ -61,6 +65,13 @@ export const DeviceSelector = (): JSX.Element => {
         </ul>
       </div>
       <div className="flex w-20 flex-col items-center space-y-5 bg-transparent px-5 pb-5">
+        <button
+          type="button"
+          className="transition-all hover:text-accent"
+          onClick={() => setNotifications(!notifications)}
+        >
+          {notifications ? <BellIcon /> : <BellOffIcon />}
+        </button>
         <button
           type="button"
           className="transition-all hover:text-accent"
