@@ -40,4 +40,10 @@ export class PositionValidation
 
   @IsArray()
   channelPrecision: number[];
+
+  @IsInt()
+  gpsAttemptTime: number;
+
+  @IsBoolean()
+  gpsEnabled: boolean;
 }
