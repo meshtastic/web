@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
 import { Button } from "@components/UI/Button.js";
 import { Input } from "@components/UI/Input.js";
@@ -33,10 +34,13 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
     defaultValue: location.protocol === "https:",
   });
 
+  const [connectionInProgress, setConnectionInProgress] = useState(false);
+
   const onSubmit = handleSubmit(async (data) => {
+    setConnectionInProgress(true);
+    
     const id = randId();
     const device = addDevice(id);
-    setSelectedDevice(id);
     const connection = new HttpConnection(id);
     // TODO: Promise never resolves
     await connection.connect({
@@ -44,9 +48,10 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
       fetchInterval: 2000,
       tls: data.tls,
     });
+
+    setSelectedDevice(id);
     device.addConnection(connection);
     subscribeAll(device, connection);
-
     closeDialog();
   });
 
@@ -77,8 +82,8 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
           )}
         />
       </div>
-      <Button type="submit">
-        <span>Connect</span>
+      <Button type="submit" disabled={connectionInProgress}>
+        <span>{connectionInProgress ? 'Connecting...' : 'Connect' }</span>
       </Button>
     </form>
   );
