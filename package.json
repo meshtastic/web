@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsc && vite build",
-    "check": "biome check .",
+    "test": "npm run test:static && npm run test:browsers",
+    "test:static": "biome check .",
+    "test:browsers": "playwright test",
     "preview": "vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)"
   },
