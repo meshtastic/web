@@ -3,3 +3,7 @@ node_modules
 stats.html
 .vercel
 dev-dist
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
