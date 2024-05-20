@@ -67,7 +67,7 @@ export const Message = ({
             message.state === "ack" ? "text-textPrimary" : "text-textSecondary"
           }`}
         >
-          {message.data}
+          {message.data}asdasdkjahkd!!!!!!!123!!!!!!!!
         </span>
       </div>
     </div>

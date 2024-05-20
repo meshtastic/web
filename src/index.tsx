@@ -16,3 +16,7 @@ root.render(
     <App />
   </StrictMode>,
 );
+
+export default () => (
+  <App />
+);

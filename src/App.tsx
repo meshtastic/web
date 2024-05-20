@@ -1,4 +1,4 @@
-import { DeviceWrapper } from "@app/DeviceWrapper.js";
+import { DeviceWrapper } from "@app/DeviceWrapper.js"
 import { PageRouter } from "@app/PageRouter.js";
 import { CommandPalette } from "@components/CommandPalette.js";
 import { DeviceSelector } from "@components/DeviceSelector.js";
@@ -50,3 +50,5 @@ export const App = (): JSX.Element => {
     </ThemeController>
   );
 };
+
+export default App;
