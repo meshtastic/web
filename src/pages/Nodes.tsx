@@ -26,6 +26,7 @@ export const NodesPage = (): JSX.Element => {
             { title: "MAC Address", type: "normal", sortable: true },
             { title: "Last Heard", type: "normal", sortable: true },
             { title: "SNR", type: "normal", sortable: true },
+            { title: "Connection", type: "normal", sortable: true },
           ]}
           rows={filteredNodes.map((node) => [
             <Hashicon size={24} value={node.num.toString()} />,
@@ -55,6 +56,10 @@ export const NodesPage = (): JSX.Element => {
               {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%/
               {(node.snr + 10) * 5}raw
             </Mono>,
+            <Mono>
+              {node.viaMqtt === false && node.hopsAway === 0? "Direct": node.hopsAway.toString() + " hops away"}
+              {node.viaMqtt === true? ", via MQTT": ""}
+            </Mono>
           ])}
         />
       </div>
