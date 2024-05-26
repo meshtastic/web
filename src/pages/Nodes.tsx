@@ -57,7 +57,10 @@ export const NodesPage = (): JSX.Element => {
               {(node.snr + 10) * 5}raw
             </Mono>,
             <Mono>
-              {node.viaMqtt === false && node.hopsAway === 0? "Direct": node.hopsAway.toString() + " hops away"}
+              {node.lastHeard != 0 ?
+                (node.viaMqtt === false && node.hopsAway === 0
+                  ? "Direct": node.hopsAway.toString() + " hops away")
+                  : "-"}
               {node.viaMqtt === true? ", via MQTT": ""}
             </Mono>
           ])}
