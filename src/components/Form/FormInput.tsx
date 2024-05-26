@@ -32,11 +32,11 @@ export function GenericInput<T extends FieldValues>({
         <Input
           type={field.type}
           step={field.properties?.step}
-          value={field.type === "number" ? Number.parseFloat(value) : value}
+          value={field.type === "number" ? Number.parseInt(value) : value}
           onChange={(e) =>
             onChange(
               field.type === "number"
-                ? Number.parseFloat(e.target.value)
+                ? Number.parseInt(e.target.value)
                 : e.target.value,
             )
           }
