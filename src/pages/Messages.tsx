@@ -9,6 +9,8 @@ import { Protobuf, Types } from "@meshtastic/js";
 import { getChannelName } from "@pages/Channels.js";
 import { HashIcon, WaypointsIcon } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@core/hooks/useToast.js";
+
 
 export const MessagesPage = (): JSX.Element => {
   const { channels, nodes, hardware, messages, connection } = useDevice();
@@ -25,6 +27,8 @@ export const MessagesPage = (): JSX.Element => {
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
   );
   const currentChannel = channels.get(activeChat);
+  const { toast } = useToast();
+
 
   return (
     <>
