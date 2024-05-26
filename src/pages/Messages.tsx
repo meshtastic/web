@@ -7,11 +7,11 @@ import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, Types } from "@meshtastic/js";
 import { getChannelName } from "@pages/Channels.js";
-import { HashIcon } from "lucide-react";
+import { HashIcon, WaypointsIcon } from "lucide-react";
 import { useState } from "react";
 
 export const MessagesPage = (): JSX.Element => {
-  const { channels, nodes, hardware, messages } = useDevice();
+  const { channels, nodes, hardware, messages, connection } = useDevice();
   const [chatType, setChatType] =
     useState<Types.PacketDestination>("broadcast");
   const [activeChat, setActiveChat] = useState<number>(
@@ -72,6 +72,18 @@ export const MessagesPage = (): JSX.Element => {
               ? nodes.get(activeChat)?.user?.longName ?? "Unknown"
               : "Loading..."
         }`}
+      actions={[
+          {
+            icon: WaypointsIcon,
+            async onClick() {
+              await connection?.traceRoute(nodes.get(activeChat)?.num).then(() =>
+                toast({
+                  title: `Traceroute sent.`,
+                }),
+              );
+            },
+           },
+         ]}
       >
         {allChannels.map(
           (channel) =>
