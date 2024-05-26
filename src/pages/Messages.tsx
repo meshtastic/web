@@ -13,7 +13,7 @@ import { useToast } from "@core/hooks/useToast.js";
 
 
 export const MessagesPage = (): JSX.Element => {
-  const { channels, nodes, hardware, messages, connection } = useDevice();
+  const { channels, nodes, hardware, messages, traceroutes, connection } = useDevice();
   const [chatType, setChatType] =
     useState<Types.PacketDestination>("broadcast");
   const [activeChat, setActiveChat] = useState<number>(
@@ -108,6 +108,7 @@ export const MessagesPage = (): JSX.Element => {
                 to={activeChat}
                 messages={messages.direct.get(node.num)}
                 channel={Types.ChannelNumber.Primary}
+                traceroutes={traceroutes.get(node.num)}
               />
             ),
         )}

@@ -1,6 +1,7 @@
 import { Subtle } from "@app/components/UI/Typography/Subtle.js";
 import { MessageWithState, useDevice } from "@app/core/stores/deviceStore.js";
 import { Message } from "@components/PageComponents/Messages/Message.js";
+import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.js";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.js";
 import type { Types } from "@meshtastic/js";
 import { InboxIcon } from "lucide-react";
@@ -9,12 +10,14 @@ export interface ChannelChatProps {
   messages?: MessageWithState[];
   channel: Types.ChannelNumber;
   to: Types.Destination;
+  traceroutes?: Types.PacketMetadata[];
 }
 
 export const ChannelChat = ({
   messages,
   channel,
   to,
+  traceroutes,
 }: ChannelChatProps): JSX.Element => {
   const { nodes } = useDevice();
 
@@ -36,6 +39,21 @@ export const ChannelChat = ({
           <div className="m-auto">
             <InboxIcon className="m-auto" />
             <Subtle>No Messages</Subtle>
+          </div>
+        )}
+        {traceroutes ? (
+          traceroutes.map((traceroute, index) => (
+            <TraceRoute
+              key={traceroute.id}
+              from={nodes.get(traceroute.from)}
+              to={nodes.get(traceroute.to)}
+              route={traceroute.data.route}
+            />
+          ))
+        ) : (
+          <div className="m-auto">
+            <InboxIcon className="m-auto" />
+            <Subtle>No Traceroutes</Subtle>
           </div>
         )}
       </div>

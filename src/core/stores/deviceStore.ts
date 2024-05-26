@@ -512,7 +512,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     nodetraceroutes.push(traceroute);
                     device.traceroutes.set(traceroute.from, nodetraceroutes);
                 } else {
-                    device.traceroutes.set(traceroute.from, [traceroute]);
+                   device.traceroutes.set(traceroute.from, [traceroute]);
                 }
                 console.log(device.traceroutes);
               }),
