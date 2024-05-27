@@ -26,7 +26,7 @@ export const TraceRoute = ({
       <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
       {to?.user?.longName}↔
       {route.map((hop) => (
-         nodes.get(hop)?.user?.longName + "↔" ?? "Unknown↔"
+         (nodes.get(hop)?.user?.longName ?? "Unknown↔") + "↔"
      ))}
       {from?.user?.longName}
       </span>
