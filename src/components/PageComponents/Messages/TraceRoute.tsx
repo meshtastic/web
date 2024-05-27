@@ -4,7 +4,7 @@ import type { Protobuf } from "@meshtastic/js";
 export interface TraceRouteProps {
   from: Protobuf.Mesh.NodeInfo;
   to: Protobuf.Mesh.NodeInfo;
-  route: Array<Number>;
+  route: Array<number>;
 }
 
 
