@@ -41,7 +41,7 @@ export const ChannelChat = ({
             <Subtle>No Messages</Subtle>
           </div>
         )}
-        {traceroutes ? (
+        { to === "broadcast" ? null : traceroutes ? (
           traceroutes.map((traceroute, index) => (
             <TraceRoute
               key={traceroute.id}
