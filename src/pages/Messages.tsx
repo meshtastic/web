@@ -76,7 +76,9 @@ export const MessagesPage = (): JSX.Element => {
               ? nodes.get(activeChat)?.user?.longName ?? "Unknown"
               : "Loading..."
         }`}
-      actions={[
+      actions={
+         chatType === "direct"
+          ? [
           {
             icon: WaypointsIcon,
             async onClick() {
@@ -87,7 +89,9 @@ export const MessagesPage = (): JSX.Element => {
               );
             },
            },
-         ]}
+         ]
+         : []
+         }
       >
         {allChannels.map(
           (channel) =>
