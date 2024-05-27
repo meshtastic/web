@@ -53,10 +53,7 @@ export const DeviceConfig = (): JSX.Element => {
     <Tabs defaultValue="Device">
       <TabsList>
         {tabs.map((tab) => (
-          <TabsTrigger
-            key={tab.label}
-            value={tab.label}
-          >
+          <TabsTrigger key={tab.label} value={tab.label}>
             {tab.label}
           </TabsTrigger>
         ))}

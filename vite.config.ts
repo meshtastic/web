@@ -1,5 +1,5 @@
-import { execSync } from "child_process";
-import { resolve } from "path";
+import { execSync } from "node:child_process";
+import { resolve } from "node:path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import EnvironmentPlugin from "vite-plugin-environment";

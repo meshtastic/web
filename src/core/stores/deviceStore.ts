@@ -506,8 +506,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.nodes.delete(nodeNum);
-              })
-            )
+              }),
+            );
           },
           setMessageState: (
             type: "direct" | "broadcast",

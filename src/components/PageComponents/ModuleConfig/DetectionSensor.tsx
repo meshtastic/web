@@ -38,9 +38,9 @@ export const DetectionSensor = (): JSX.Element => {
               label: "Minimum Broadcast Seconds",
               description:
                 "The interval in seconds of how often we can send a message to the mesh when a state change is detected",
-                properties: {
-                  suffix: "Seconds",
-                },  
+              properties: {
+                suffix: "Seconds",
+              },
               disabledBy: [
                 {
                   fieldName: "enabled",

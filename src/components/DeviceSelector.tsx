@@ -9,8 +9,8 @@ import {
   LanguagesIcon,
   MoonIcon,
   PlusIcon,
-  SunIcon,
   SearchIcon,
+  SunIcon,
 } from "lucide-react";
 
 export const DeviceSelector = (): JSX.Element => {

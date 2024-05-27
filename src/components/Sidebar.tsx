@@ -4,15 +4,15 @@ import { Subtle } from "@components/UI/Typography/Subtle.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import type { Page } from "@core/stores/deviceStore.js";
 import {
+  BatteryMediumIcon,
   EditIcon,
   LayersIcon,
-  LucideIcon,
+  type LucideIcon,
   MapIcon,
   MessageSquareIcon,
   SettingsIcon,
   UsersIcon,
   ZapIcon,
-  BatteryMediumIcon
 } from "lucide-react";
 
 export interface SidebarProps {
@@ -77,12 +77,14 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
       </div>
       <div className="px-8 pb-6">
         <div className="flex items-center">
-            <BatteryMediumIcon size={24} viewBox={'0 0 28 24'}/>
-            <Subtle>{myNode?.deviceMetrics?.batteryLevel ?? "UNK"}%</Subtle>
+          <BatteryMediumIcon size={24} viewBox={"0 0 28 24"} />
+          <Subtle>{myNode?.deviceMetrics?.batteryLevel ?? "UNK"}%</Subtle>
         </div>
         <div className="flex items-center">
-            <ZapIcon size={24} viewBox={'0 0 36 24'}/>
-            <Subtle>{myNode?.deviceMetrics?.voltage.toPrecision(3) ?? "UNK"} volts</Subtle>
+          <ZapIcon size={24} viewBox={"0 0 36 24"} />
+          <Subtle>
+            {myNode?.deviceMetrics?.voltage.toPrecision(3) ?? "UNK"} volts
+          </Subtle>
         </div>
       </div>
 
