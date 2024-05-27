@@ -514,7 +514,6 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 } else {
                    device.traceroutes.set(traceroute.from, [traceroute]);
                 }
-                console.log(device.traceroutes);
               }),
             );
           },
