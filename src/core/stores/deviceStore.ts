@@ -41,6 +41,7 @@ export interface Device {
     direct: Map<number, MessageWithState[]>;
     broadcast: Map<Types.ChannelNumber, MessageWithState[]>;
   };
+  traceroutes: Map<number, Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]>;
   connection?: Types.ConnectionType;
   activePage: Page;
   activeNode: number;
@@ -73,7 +74,7 @@ export interface Device {
   addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
   addConnection: (connection: Types.ConnectionType) => void;
   addMessage: (message: MessageWithState) => void;
-  addTraceRoute: (traceroute: Protobuf.Mesh.RouteDiscovery) => void;
+  addTraceRoute: (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
   setMessageState: (
     type: "direct" | "broadcast",

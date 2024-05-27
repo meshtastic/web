@@ -3,14 +3,14 @@ import { MessageWithState, useDevice } from "@app/core/stores/deviceStore.js";
 import { Message } from "@components/PageComponents/Messages/Message.js";
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.js";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.js";
-import type { Types } from "@meshtastic/js";
+import type { Protobuf, Types } from "@meshtastic/js";
 import { InboxIcon } from "lucide-react";
 
 export interface ChannelChatProps {
   messages?: MessageWithState[];
   channel: Types.ChannelNumber;
   to: Types.Destination;
-  traceroutes?: Types.PacketMetadata[];
+  traceroutes?: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[];
 }
 
 export const ChannelChat = ({
