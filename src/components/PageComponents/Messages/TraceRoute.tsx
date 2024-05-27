@@ -2,8 +2,8 @@ import { useDevice } from "@app/core/stores/deviceStore.js";
 import type { Protobuf } from "@meshtastic/js";
 
 export interface TraceRouteProps {
-  from: Protobuf.Mesh.NodeInfo;
-  to: Protobuf.Mesh.NodeInfo;
+  from?: Protobuf.Mesh.NodeInfo;
+  to?: Protobuf.Mesh.NodeInfo;
   route: Array<number>;
 }
 
