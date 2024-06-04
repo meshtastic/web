@@ -76,15 +76,15 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
         </button>
       </div>
       <div className="px-8 pb-6">
-          <div className="flex items-center">
-              <BatteryMediumIcon size={24} viewBox={'0 0 28 24'}/>
-              <Subtle>{myNode?.deviceMetrics?.batteryLevel ?? "UNK"}%</Subtle>
-          </div>
-          <div className="flex items-center">
-              <ZapIcon size={24} viewBox={'0 0 36 24'}/>
-              <Subtle>{myNode?.deviceMetrics?.voltage.toPrecision(3) ?? "UNK"} volts</Subtle>
-          </div>
+        <div className="flex items-center">
+            <BatteryMediumIcon size={24} viewBox={'0 0 28 24'}/>
+            <Subtle>{myNode?.deviceMetrics?.batteryLevel ?? "UNK"}%</Subtle>
         </div>
+        <div className="flex items-center">
+            <ZapIcon size={24} viewBox={'0 0 36 24'}/>
+            <Subtle>{myNode?.deviceMetrics?.voltage.toPrecision(3) ?? "UNK"} volts</Subtle>
+        </div>
+      </div>
 
       <SidebarSection label="Navigation">
         {pages.map((link) => (
