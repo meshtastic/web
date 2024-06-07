@@ -20,7 +20,7 @@ import MapGl from "react-map-gl/maplibre";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
-  const { rasterSources } = useAppStore();
+  const { rasterSources, darkMode } = useAppStore();
   const { default: map } = useMap();
 
   const [zoom, setZoom] = useState(0);
@@ -128,6 +128,7 @@ export const MapPage = (): JSX.Element => {
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
+          style = {{filter: darkMode ? 'invert(100%)' : ''}}
           dragRotate={false}
           touchZoomRotate={false}
           initialViewState={{
@@ -160,6 +161,7 @@ export const MapPage = (): JSX.Element => {
                   key={node.num}
                   longitude={node.position.longitudeI / 1e7}
                   latitude={node.position.latitudeI / 1e7}
+                  style = {{filter: darkMode ? 'invert(100%)' : ''}}
                   anchor="bottom"
                 >
                   <div
