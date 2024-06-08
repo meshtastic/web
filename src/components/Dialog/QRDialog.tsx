@@ -1,4 +1,3 @@
-import { Field } from "@bufbuild/protobuf";
 import { Checkbox } from "@components/UI/Checkbox.js";
 import {
   Dialog,
@@ -12,14 +11,9 @@ import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
 import { Protobuf, Types } from "@meshtastic/js";
 import { fromByteArray } from "base64-js";
-import { ClipboardIcon, PlusIcon, ReplaceIcon } from "lucide-react";
+import { ClipboardIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
-import { DynamicForm } from "../Form/DynamicForm";
-import { ToggleFieldProps, ToggleInput } from "../Form/FormToggle";
-import { Button } from "../UI/Button";
-import { Switch } from "@components/UI/Switch.js";
-import { Controller, useForm, useWatch } from "react-hook-form";
 
 export interface QRDialogProps {
   open: boolean;
@@ -56,7 +50,6 @@ export const QRDialog = ({
       .replace(/\+/g, "-")
       .replace(/\//g, "_");
 
-    console.log("here ran");
     setQrCodeUrl(`https://meshtastic.org/e/#${base64}${qrCodeAdd ? "?add=true" : ""}`);
   }, [channels, selectedChannels, qrCodeAdd, loraConfig]);
 
