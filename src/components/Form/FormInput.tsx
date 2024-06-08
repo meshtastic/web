@@ -12,6 +12,8 @@ export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
     prefix?: string;
     suffix?: string;
     step?: number;
+    min?: number;
+    max?: number;
     action?: {
       icon: LucideIcon;
       onClick: () => void;
