@@ -1,3 +1,4 @@
+import { Field } from "@bufbuild/protobuf";
 import { Checkbox } from "@components/UI/Checkbox.js";
 import {
   Dialog,
@@ -11,9 +12,12 @@ import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
 import { Protobuf, Types } from "@meshtastic/js";
 import { fromByteArray } from "base64-js";
-import { ClipboardIcon } from "lucide-react";
+import { ClipboardIcon, ReplaceIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
+import { DynamicForm } from "../Form/DynamicForm";
+import { ToggleFieldProps, ToggleInput } from "../Form/FormToggle";
+import { Button } from "../UI/Button";
 
 export interface QRDialogProps {
   open: boolean;
@@ -32,6 +36,10 @@ export const QRDialog = ({
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
 
   const allChannels = Array.from(channels.values());
+
+  const onSubmit = () => {
+    console.log("ran");
+  };
 
   useEffect(() => {
     const channelsToEncode = allChannels
@@ -93,6 +101,12 @@ export const QRDialog = ({
               ))}
             </div>
             <QRCode value={qrCodeUrl} size={200} qrStyle="dots" />
+          </div>
+          <div className="flex justify-center">
+            <button
+              type="button" className="rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:hover:bg-slate-800 dark:hover:text-slate-100 disabled:opacity-50 dark:focus:ring-slate-400 disabled:pointer-events-none dark:focus:ring-offset-slate-900 data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800 bg-slate-900 text-white hover:bg-slate-700 dark:bg-slate-50 dark:text-slate-900 h-10 py-2 px-4">
+                Replace Channels
+            </button>
           </div>
         </div>
         <DialogFooter>
