@@ -18,6 +18,8 @@ import { QRCode } from "react-qrcode-logo";
 import { DynamicForm } from "../Form/DynamicForm";
 import { ToggleFieldProps, ToggleInput } from "../Form/FormToggle";
 import { Button } from "../UI/Button";
+import { Switch } from "@components/UI/Switch.js";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
 export interface QRDialogProps {
   open: boolean;
@@ -37,9 +39,13 @@ export const QRDialog = ({
 
   const allChannels = Array.from(channels.values());
 
-  const onSubmit = () => {
-    console.log("ran");
-  };
+  const { register, handleSubmit, control } = useForm<{
+    replace: boolean;
+  }>({
+    defaultValues: {
+      replace: true,
+    },
+  });
 
   useEffect(() => {
     const channelsToEncode = allChannels
@@ -104,7 +110,11 @@ export const QRDialog = ({
           </div>
           <div className="flex justify-center">
             <button
-              type="button" className="rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:hover:bg-slate-800 dark:hover:text-slate-100 disabled:opacity-50 dark:focus:ring-slate-400 disabled:pointer-events-none dark:focus:ring-offset-slate-900 data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800 bg-slate-900 text-white hover:bg-slate-700 dark:bg-slate-50 dark:text-slate-900 h-10 py-2 px-4">
+              type="button" className="border-black border-t border-l border-b rounded-l px-7 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-800 focus:ring-offset-2 dark:hover:bg-green-800 dark:hover:text-slate-100 disabled:opacity-50 dark:focus:ring-slate-400 disabled:pointer-events-none dark:focus:ring-offset-green-800 data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-green-800 bg-green-800 text-white hover:bg-green-800 dark:bg-slate-50 dark:text-green-800 h-10 py-2 px-4">
+                Add Channels
+            </button>
+            <button
+              type="button" className="border-black border-t border-r border-b rounded-r text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:hover:bg-slate-400 dark:hover:text-slate-100 disabled:opacity-50 dark:focus:ring-slate-400 disabled:pointer-events-none dark:focus:ring-offset-slate-400 data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-400 bg-slate-400 text-white hover:bg-slate-400 dark:bg-slate-50 dark:text-slate-400 h-10 py-2 px-4">
                 Replace Channels
             </button>
           </div>
