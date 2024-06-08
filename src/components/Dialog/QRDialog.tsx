@@ -98,14 +98,14 @@ export const QRDialog = ({
           <div className="flex justify-center">
             <button
               type="button" 
-              className={ qrCodeAdd ? "border-black border-t border-l border-b rounded-l px-7 h-10 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-800 focus:ring-offset-2 bg-green-800 text-white hover:bg-green-800" : "border-black border-t border-l border-b rounded-l h-10 py-2 px-7 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 bg-slate-400 text-white hover:bg-green-600" }
+              className={ "border-black border-t border-l border-b rounded-l h-10 px-7 py-2 text-sm font-medium focus:outline-none focus:ring-2" + (qrCodeAdd ? "focus:ring-green-800 focus:ring-offset-2 bg-green-800 text-white hover:bg-green-800" : "focus:ring-slate-400 focus:ring-offset-2 bg-slate-400 text-white hover:bg-green-600") }
               onClick={() => setQrCodeAdd(true)}
               >
                 Add Channels
             </button>
             <button
               type="button" 
-              className={ !qrCodeAdd ? "border-black border-t border-r border-b rounded-r h-10 py-2 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-green-800 focus:ring-offset-2 bg-green-800 text-white hover:bg-green-800" : "border-black border-t border-r border-b rounded-r h-10 py-2 px-4 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 bg-slate-400 text-white hover:bg-green-600" }
+              className={ "border-black border-t border-r border-b rounded-r h-10 px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2" + (!qrCodeAdd ? "focus:ring-green-800 focus:ring-offset-2 bg-green-800 text-white hover:bg-green-800" : "focus:ring-slate-400 focus:ring-offset-2 bg-slate-400 text-white hover:bg-green-600") }
               onClick={() => setQrCodeAdd(false)}
               >
                 Replace Channels
