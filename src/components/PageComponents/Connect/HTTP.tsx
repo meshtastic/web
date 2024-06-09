@@ -63,6 +63,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
           // label="IP Address/Hostname"
           prefix={tlsEnabled ? "https://" : "http://"}
           placeholder="000.000.000.000 / meshtastic.local"
+          disabled={connectionInProgress}
           {...register("ip")}
         />
         <Controller
@@ -74,7 +75,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
               <Switch
                 // label="Use TLS"
                 // description="Description"
-                disabled={location.protocol === "https:"}
+                disabled={location.protocol === "https:" || connectionInProgress}
                 checked={value}
                 {...rest}
               />
