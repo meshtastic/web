@@ -10,7 +10,7 @@ export interface SettingsPanelProps {
 }
 
 export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
-  const { connection, addChannel } = useDevice();
+  const { config, connection, addChannel } = useDevice();
   const { toast } = useToast();
 
   const onSubmit = (data: ChannelValidation) => {
@@ -19,6 +19,9 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
       settings: {
         ...data.settings,
         psk: toByteArray(data.settings.psk ?? ""),
+        moduleSettings: {
+          positionPrecision: data.settings.positionPrecision,
+        }
       },
     });
     connection?.setChannel(channel).then(() => {
@@ -85,6 +88,18 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               name: "settings.downlinkEnabled",
               label: "Downlink Enabled",
               description: "Send messages from MQTT to the local mesh",
+            },
+            {
+              type: "select",
+              name: "settings.positionPrecision",
+              label: "Position Precision",
+              description:
+                "Position shared on mesh is accurate within this distance",
+              properties: {
+                enumValue: config.display?.units == 0 ?
+                { "Within 23 km":2300, "Within 12 km":12000, "Within 5.8 km":5800, "Within 2.9 km":2900, "Within 1.5 km":1500, "Within 700 m":700, "Within 350 m":350, "Within 200 m":200, "Within 90 m":90, "Within 50 m":50 } :
+                { "Within 15 miles":1, "Within 7.3 miles":2, "Within 3.6 miles":3, "Within 1.8 miles":4, "Within 0.9 miles":5, "Within 0.5 miles":6, "Within 0.2 miles":7, "Within 600 feet":8, "Within 300 feet":9, "Within 150 feet":10 }
+              },
             },
           ],
         },

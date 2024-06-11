@@ -41,4 +41,7 @@ export class Channel_SettingsValidation
 
   @IsBoolean()
   downlinkEnabled: boolean;
+
+  @IsInt()
+  positionPrecision: number;
 }
