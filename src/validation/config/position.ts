@@ -5,6 +5,12 @@ import { IsArray, IsBoolean, IsEnum, IsInt } from "class-validator";
 export class PositionValidation
   implements Omit<Protobuf.Config.Config_PositionConfig, keyof Message>
 {
+  @IsBoolean()
+  gpsEnabled: boolean;
+
+  @IsInt()
+  gpsAttemptTime: number;
+
   @IsInt()
   positionBroadcastSecs: number;
 
