@@ -2,7 +2,6 @@ import type { Message } from "@bufbuild/protobuf";
 import { Protobuf } from "@meshtastic/js";
 import { IsArray, IsBoolean, IsEnum, IsInt } from "class-validator";
 
-//type DeprecatedPositionValidationFields = 'gpsEnabled' | 'gpdAttempttime';
 const DeprecatedPositionValidationFields = ['gpsEnabled', 'gpsAttemptTime'];
 
 export class PositionValidation
