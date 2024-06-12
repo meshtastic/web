@@ -110,7 +110,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               name: "settings.positionPrecision",
               label: "Approximate Location",
               description:
-                "If not sharing precise location, position shared on mesh will be accurate within this distance",
+                "If not sharing precise location, position shared on channel will be accurate within this distance",
               properties: {
                 enumValue: config.display?.units == 0 ?
                 { "Within 23 km":23000, "Within 12 km":12000, "Within 5.8 km":5800, "Within 2.9 km":2900, "Within 1.5 km":1500, "Within 700 m":700, "Within 350 m":350, "Within 200 m":200, "Within 90 m":90, "Within 50 m":50 } :
