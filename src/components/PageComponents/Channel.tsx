@@ -1,4 +1,4 @@
-import { ChannelValidation, Channel_SettingsValidation } from "@app/validation/channel.js";
+import type{ ChannelValidation } from "@app/validation/channel.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useToast } from "@core/hooks/useToast.js";
 import { useDevice } from "@core/stores/deviceStore.js";
@@ -85,7 +85,6 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               name: "settings.uplinkEnabled",
               label: "Uplink Enabled",
               description: "Send messages from the local mesh to MQTT",
-              
             },
             {
               type: "toggle",
