@@ -26,7 +26,6 @@ interface AppState {
   rasterSources: RasterSource[];
   commandPaletteOpen: boolean;
   darkMode: boolean;
-  nodeNumToBeRemoved: number;
   accent: AccentColor;
   connectDialogOpen: boolean;
 
@@ -39,7 +38,6 @@ interface AppState {
   removeDevice: (deviceId: number) => void;
   setCommandPaletteOpen: (open: boolean) => void;
   setDarkMode: (enabled: boolean) => void;
-  setNodeNumToBeRemoved: (nodeNum: number) => void;
   setAccent: (color: AccentColor) => void;
   setConnectDialogOpen: (open: boolean) => void;
 }
@@ -53,7 +51,6 @@ export const useAppStore = create<AppState>()((set) => ({
   darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
   accent: "orange",
   connectDialogOpen: false,
-  nodeNumToBeRemoved: 0,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -102,10 +99,6 @@ export const useAppStore = create<AppState>()((set) => ({
       }),
     );
   },
-  setNodeNumToBeRemoved: (nodeNum) =>
-    set((state) => ({
-      nodeNumToBeRemoved: nodeNum
-    })),
   setAccent(color) {
     set(
       produce<AppState>((draft) => {
