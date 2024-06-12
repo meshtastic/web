@@ -19,6 +19,15 @@ export class ChannelValidation
 
   @IsEnum(Protobuf.Channel.Channel_Role)
   role: Protobuf.Channel.Channel_Role;
+
+  @IsBoolean()
+  positionEnabled: boolean;
+
+  @IsBoolean()
+  preciseLocation: boolean;
+
+  @IsInt()
+  positionPrecision: number;
 }
 
 export class Channel_SettingsValidation
@@ -41,7 +50,4 @@ export class Channel_SettingsValidation
 
   @IsBoolean()
   downlinkEnabled: boolean;
-
-  @IsInt()
-  positionPrecision: number;
 }

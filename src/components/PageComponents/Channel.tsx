@@ -20,7 +20,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         ...data.settings,
         psk: toByteArray(data.settings.psk ?? ""),
         moduleSettings: {
-          positionPrecision: data.settings.positionPrecision,
+          positionPrecision: data.positionPrecision,
         }
       },
     });
@@ -45,6 +45,9 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
             psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
           },
         },
+        positionEnabled: true,
+        preciseLocation: true,
+        positionPrecision: 1
       }}
       fieldGroups={[
         {
@@ -90,9 +93,24 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               description: "Send messages from MQTT to the local mesh",
             },
             {
+              type: "toggle",
+              name: "positionEnabled",
+              label: "Allow Position Requests",
+              description: "Send position to channel",
+            },
+            {
+              type: "toggle",
+              name: "preciseLocation",
+              label: "Precise Location",
+              description: "Send precise location to channel",
+              disabledBy: [{
+                fieldName: "positionEnabled",
+              }]
+            },
+            {
               type: "select",
-              name: "settings.positionPrecision",
-              label: "Position Precision",
+              name: "positionPrecision",
+              label: "Approximate Location",
               description:
                 "Position shared on mesh is accurate within this distance",
               properties: {
@@ -100,6 +118,11 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
                 { "Within 23 km":2300, "Within 12 km":12000, "Within 5.8 km":5800, "Within 2.9 km":2900, "Within 1.5 km":1500, "Within 700 m":700, "Within 350 m":350, "Within 200 m":200, "Within 90 m":90, "Within 50 m":50 } :
                 { "Within 15 miles":1, "Within 7.3 miles":2, "Within 3.6 miles":3, "Within 1.8 miles":4, "Within 0.9 miles":5, "Within 0.5 miles":6, "Within 0.2 miles":7, "Within 600 feet":8, "Within 300 feet":9, "Within 150 feet":10 }
               },
+              disabledBy: [
+                {
+                  fieldName: "positionEnabled",
+                },
+              ],
             },
           ],
         },
