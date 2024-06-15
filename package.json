@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsc && vite build",
-    "check": "biome check .",
+    "test": "npm run test:static && npm run test:browsers",
+    "test:static": "biome check .",
+    "test:browsers": "playwright test",
     "preview": "vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)"
   },
@@ -62,6 +64,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.6.3",
     "@buf/meshtastic_protobufs.bufbuild_es": "1.8.0-20240325205556-b11811405eea.2",
+    "@playwright/test": "^1.44.0",
     "@types/chrome": "^0.0.263",
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.73",
