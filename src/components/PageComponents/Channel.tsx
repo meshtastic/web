@@ -112,8 +112,8 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
                 "If not sharing precise location, position shared on channel will be accurate within this distance",
               properties: {
                 enumValue: config.display?.units == 0 ?
-                { "Within 23 km":23000, "Within 12 km":12000, "Within 5.8 km":5800, "Within 2.9 km":2900, "Within 1.5 km":1500, "Within 700 m":700, "Within 350 m":350, "Within 200 m":200, "Within 90 m":90, "Within 50 m":50 } :
-                { "Within 15 miles":24140, "Within 7.3 miles":11748, "Within 3.6 miles":5793, "Within 1.8 miles":2896, "Within 0.9 miles":1448, "Within 0.5 miles":804, "Within 0.2 miles":321, "Within 600 feet":182, "Within 300 feet":91, "Within 150 feet":45 }
+                { "Within 23 km":23, "Within 12 km":12, "Within 5.8 km":5.8, "Within 2.9 km":2.9, "Within 1.5 km":1.5, "Within 700 m":0.7, "Within 350 m":0.35, "Within 200 m":0.2, "Within 90 m":0.09, "Within 50 m":0.05 } :
+                { "Within 15 miles":24.140, "Within 7.3 miles":11.748, "Within 3.6 miles":5.793, "Within 1.8 miles":2.896, "Within 0.9 miles":1.448, "Within 0.5 miles":0.804, "Within 0.2 miles":0.321, "Within 600 feet":0.182, "Within 300 feet":0.091, "Within 150 feet":0.045 }
               },
             },
           ],
