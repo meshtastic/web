@@ -10,6 +10,7 @@ import { Button } from "@components/UI/Button.js";
 import { TrashIcon } from "lucide-react";
 import { useAppStore } from "@app/core/stores/appStore";
 
+
 export interface DeleteNoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -66,6 +67,17 @@ export const NodesPage = (): JSX.Element => {
               {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%/
               {(node.snr + 10) * 5}raw
             </Mono>,
+            <Mono>
+            {node.lastHeard != 0 ?
+              (node.viaMqtt === false && node.hopsAway === 0
+                ? "Direct": node.hopsAway.toString() + " hops away")
+                : "-"}
+            {node.viaMqtt === true? ", via MQTT": ""}
+          </Mono>,
+            <Button variant="destructive" onClick={() => {
+              setNodeNumToBeRemoved(node.num);
+              setDialogOpen("nodeRemoval", true)
+            }}><TrashIcon />Remove</Button>
           ])}
         />
       </div>
