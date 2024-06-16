@@ -23,7 +23,8 @@ export const ChannelChat = ({
 
   return (
     <div className="flex flex-grow flex-col">
-      <div className="flex flex-grow flex-col">
+      <div className="flex flex-grow">
+        <div className="flex flex-grow flex-col">
         {messages ? (
           messages.map((message, index) => (
             <Message
@@ -41,6 +42,8 @@ export const ChannelChat = ({
             <Subtle>No Messages</Subtle>
           </div>
         )}
+        </div>
+        <div className={"flex flex-grow flex-col border-slate-400 border-l " + (traceroutes == undefined ? "hidden" : "") }>
         { to === "broadcast" ? null : traceroutes ? (
           traceroutes.map((traceroute, index) => (
             <TraceRoute
@@ -56,6 +59,7 @@ export const ChannelChat = ({
             <Subtle>No Traceroutes</Subtle>
           </div>
         )}
+      </div>
       </div>
       <div className="p-3">
         <MessageInput to={to} channel={channel} />
