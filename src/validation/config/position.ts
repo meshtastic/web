@@ -7,12 +7,6 @@ const DeprecatedPositionValidationFields = ['gpsEnabled', 'gpsAttemptTime'];
 export class PositionValidation
   implements Omit<Protobuf.Config.Config_PositionConfig, keyof Message | typeof DeprecatedPositionValidationFields[number]>
 {
-  @IsBoolean()
-  gpsEnabled: boolean;
-
-  @IsInt()
-  gpsAttemptTime: number;
-
   @IsInt()
   positionBroadcastSecs: number;
 
