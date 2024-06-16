@@ -32,7 +32,7 @@ export const Telemetry = (): JSX.Element => {
               label: "Query Interval",
               description: "Interval to get telemetry data",
               properties: {
-                suffix: "seconds",
+                suffix: "Seconds",
               },
             },
             {
@@ -41,7 +41,7 @@ export const Telemetry = (): JSX.Element => {
               label: "Update Interval",
               description: "How often to send Metrics over the mesh",
               properties: {
-                suffix: "seconds",
+                suffix: "Seconds",
               },
             },
             {

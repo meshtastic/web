@@ -94,12 +94,18 @@ export const Position = (): JSX.Element => {
               name: "positionBroadcastSecs",
               label: "Broadcast Interval",
               description: "How often your position is sent out over the mesh",
+              properties: {
+                suffix: "Seconds",
+              },
             },
             {
               type: "number",
               name: "gpsUpdateInterval",
               label: "GPS Update Interval",
               description: "How often a GPS fix should be acquired",
+              properties: {
+                suffix: "Seconds",
+              },
             },
             {
               type: "number",

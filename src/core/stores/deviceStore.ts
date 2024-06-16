@@ -24,7 +24,8 @@ export type DialogVariant =
   | "QR"
   | "shutdown"
   | "reboot"
-  | "deviceName";
+  | "deviceName"
+  | "nodeRemoval";
 
 export interface Device {
   id: number;
@@ -55,6 +56,7 @@ export interface Device {
     shutdown: boolean;
     reboot: boolean;
     deviceName: boolean;
+    nodeRemoval: boolean;
   };
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -76,6 +78,7 @@ export interface Device {
   addMessage: (message: MessageWithState) => void;
   addTraceRoute: (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
+  removeNode: (nodeNum: number) => void;
   setMessageState: (
     type: "direct" | "broadcast",
     channelIndex: Types.ChannelNumber,
@@ -133,6 +136,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             shutdown: false,
             reboot: false,
             deviceName: false,
+            nodeRemoval: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
@@ -517,6 +521,17 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 }
               }),
             );
+          },
+          removeNode: (nodeNum) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+                device.nodes.delete(nodeNum);
+              })
+            )
           },
           setMessageState: (
             type: "direct" | "broadcast",

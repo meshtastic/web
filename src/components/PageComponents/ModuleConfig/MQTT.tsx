@@ -138,6 +138,9 @@ export const MQTT = (): JSX.Element => {
               name: "mapReportSettings.publishIntervalSecs",
               label: "Map Report Publish Interval (s)",
               description: "Interval in seconds to publish map reports",
+              properties: {
+                suffix: "Seconds",
+              },
               disabledBy: [
                 {
                   fieldName: "enabled",
