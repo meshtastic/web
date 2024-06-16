@@ -1,4 +1,4 @@
-import type { ChannelValidation } from "@app/validation/channel.js";
+import type{ ChannelValidation } from "@app/validation/channel.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useToast } from "@core/hooks/useToast.js";
 import { useDevice } from "@core/stores/deviceStore.js";
@@ -10,7 +10,7 @@ export interface SettingsPanelProps {
 }
 
 export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
-  const { connection, addChannel } = useDevice();
+  const { config, connection, addChannel } = useDevice();
   const { toast } = useToast();
 
   const onSubmit = (data: ChannelValidation) => {
@@ -19,6 +19,9 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
       settings: {
         ...data.settings,
         psk: toByteArray(data.settings.psk ?? ""),
+        moduleSettings: {
+          positionPrecision: data.settings.positionEnabled ? data.settings.preciseLocation ? 32 : data.settings.positionPrecision : 0,
+        }
       },
     });
     connection?.setChannel(channel).then(() => {
@@ -40,6 +43,9 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
           settings: {
             ...channel?.settings,
             psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+            positionEnabled: channel?.settings?.moduleSettings?.positionPrecision != undefined && channel?.settings?.moduleSettings?.positionPrecision > 0,
+            preciseLocation: channel?.settings?.moduleSettings?.positionPrecision == 32,
+            positionPrecision: channel?.settings?.moduleSettings?.positionPrecision == undefined ? config.display?.units == 0 ? 23000 : 24140 : channel?.settings?.moduleSettings?.positionPrecision
           },
         },
       }}
@@ -85,6 +91,30 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               name: "settings.downlinkEnabled",
               label: "Downlink Enabled",
               description: "Send messages from MQTT to the local mesh",
+            },
+            {
+              type: "toggle",
+              name: "settings.positionEnabled",
+              label: "Allow Position Requests",
+              description: "Send position to channel",
+            },
+            {
+              type: "toggle",
+              name: "settings.preciseLocation",
+              label: "Precise Location",
+              description: "Send precise location to channel",
+            },
+            {
+              type: "select",
+              name: "settings.positionPrecision",
+              label: "Approximate Location",
+              description:
+                "If not sharing precise location, position shared on channel will be accurate within this distance",
+              properties: {
+                enumValue: config.display?.units == 0 ?
+                { "Within 23 km":23000, "Within 12 km":12000, "Within 5.8 km":5800, "Within 2.9 km":2900, "Within 1.5 km":1500, "Within 700 m":700, "Within 350 m":350, "Within 200 m":200, "Within 90 m":90, "Within 50 m":50 } :
+                { "Within 15 miles":24140, "Within 7.3 miles":11748, "Within 3.6 miles":5793, "Within 1.8 miles":2896, "Within 0.9 miles":1448, "Within 0.5 miles":804, "Within 0.2 miles":321, "Within 600 feet":182, "Within 300 feet":91, "Within 150 feet":45 }
+              },
             },
           ],
         },

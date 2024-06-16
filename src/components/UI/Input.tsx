@@ -32,7 +32,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {suffix && (
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 font-mono text-textSecondary">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-9 font-mono text-textSecondary">
             <span className="text-gray-500 sm:text-sm">{suffix}</span>
           </div>
         )}
