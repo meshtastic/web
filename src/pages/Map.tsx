@@ -128,7 +128,7 @@ export const MapPage = (): JSX.Element => {
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
-          style = {{filter: darkMode ? 'invert(100%)' : ''}}
+          style = {{filter: darkMode ? 'brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7)' : ''}}
           dragRotate={false}
           touchZoomRotate={false}
           initialViewState={{
@@ -161,7 +161,7 @@ export const MapPage = (): JSX.Element => {
                   key={node.num}
                   longitude={node.position.longitudeI / 1e7}
                   latitude={node.position.latitudeI / 1e7}
-                  style = {{filter: darkMode ? 'invert(100%)' : ''}}
+                  style = {{filter: darkMode ? 'invert(1)' : ''}}
                   anchor="bottom"
                 >
                   <div
