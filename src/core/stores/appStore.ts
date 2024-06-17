@@ -50,7 +50,7 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
-  darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
+  darkMode: (localStorage.getItem('theme-dark') !== null ? (localStorage.getItem('theme-dark') === 'true' ? true : false) : window.matchMedia("(prefers-color-scheme: dark)").matches),
   accent: "orange",
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
@@ -96,6 +96,7 @@ export const useAppStore = create<AppState>()((set) => ({
     );
   },
   setDarkMode: (enabled: boolean) => {
+    localStorage.setItem('theme-dark', enabled.toString());
     set(
       produce<AppState>((draft) => {
         draft.darkMode = enabled;
