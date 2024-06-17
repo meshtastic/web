@@ -37,6 +37,9 @@ export const RangeTest = (): JSX.Element => {
               name: "sender",
               label: "Message Interval",
               description: "How long to wait between sending test packets",
+              properties: {
+                suffix: "Seconds",
+              },
               disabledBy: [
                 {
                   fieldName: "enabled",
