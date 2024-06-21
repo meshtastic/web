@@ -69,6 +69,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
               <Label>Use HTTPS</Label>
               <Switch
                 onCheckedChange={(checked) => {checked ? setHTTPS(true) : setHTTPS(false) }}
+                disabled={connectionInProgress}
                 {...rest}
               />
             </>
