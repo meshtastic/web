@@ -24,17 +24,13 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
       )
         ? "meshtastic.local"
         : window.location.hostname,
-      tls: location.protocol === "https:",
+      tls: false,
     },
   });
 
-  const tlsEnabled = useWatch({
-    control,
-    name: "tls",
-    defaultValue: location.protocol === "https:",
-  });
 
   const [connectionInProgress, setConnectionInProgress] = useState(false);
+  const [https, setHTTPS] = useState(false);
 
   const onSubmit = handleSubmit(async (data) => {
     setConnectionInProgress(true);
@@ -46,7 +42,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
     await connection.connect({
       address: data.ip,
       fetchInterval: 2000,
-      tls: data.tls,
+      tls: https,
     });
 
     setSelectedDevice(id);
@@ -60,8 +56,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
       <div className="flex h-48 flex-col gap-2">
         <Label>IP Address/Hostname</Label>
         <Input
-          // label="IP Address/Hostname"
-          prefix={tlsEnabled ? "https://" : "http://"}
+          prefix={https ? "https://" : "http://"}
           placeholder="000.000.000.000 / meshtastic.local"
           disabled={connectionInProgress}
           {...register("ip")}
@@ -71,12 +66,9 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
           control={control}
           render={({ field: { value, ...rest } }) => (
             <>
-              <Label>Use TLS</Label>
+              <Label>Use HTTPS</Label>
               <Switch
-                // label="Use TLS"
-                // description="Description"
-                disabled={location.protocol === "https:" || connectionInProgress}
-                checked={value}
+                onCheckedChange={(checked) => {checked ? setHTTPS(true) : setHTTPS(false) }}
                 {...rest}
               />
             </>
