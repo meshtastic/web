@@ -37,6 +37,9 @@ export const Paxcounter = (): JSX.Element => {
               name: "paxcounterUpdateInterval",
               label: "Update Interval (seconds)",
               description: "How long to wait between sending paxcounter packets",
+              properties: {
+                suffix: "Seconds",
+              },
               disabledBy: [
                 {
                   fieldName: "enabled",

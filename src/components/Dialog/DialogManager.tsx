@@ -3,6 +3,7 @@ import { ImportDialog } from "@components/Dialog/ImportDialog.js";
 import { QRDialog } from "@components/Dialog/QRDialog.js";
 import { RebootDialog } from "@components/Dialog/RebootDialog.js";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.js";
+import { RemoveNodeDialog } from "@app/components/Dialog/RemoveNodeDialog.js"
 import { useDevice } from "@core/stores/deviceStore.js";
 
 export const DialogManager = (): JSX.Element => {
@@ -40,6 +41,12 @@ export const DialogManager = (): JSX.Element => {
         open={dialog.deviceName}
         onOpenChange={(open) => {
           setDialogOpen("deviceName", open);
+        }}
+      />
+      <RemoveNodeDialog
+        open={dialog.nodeRemoval}
+        onOpenChange={(open) => {
+          setDialogOpen("nodeRemoval", open);
         }}
       />
     </>

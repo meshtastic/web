@@ -32,7 +32,7 @@ export const Display = (): JSX.Element => {
               label: "Screen Timeout",
               description: "Turn off the display after this long",
               properties: {
-                suffix: "seconds",
+                suffix: "Seconds",
               },
             },
             {
@@ -50,6 +50,9 @@ export const Display = (): JSX.Element => {
               name: "autoScreenCarouselSecs",
               label: "Carousel Delay",
               description: "How fast to cycle through windows",
+              properties: {
+                suffix: "Seconds",
+              },
             },
             {
               type: "toggle",

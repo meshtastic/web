@@ -6,9 +6,19 @@ import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/js";
 import { base16 } from "rfc4648";
+import { Button } from "@components/UI/Button.js";
+import { TrashIcon } from "lucide-react";
+import { useAppStore } from "@app/core/stores/appStore";
+
+
+export interface DeleteNoteDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
 
 export const NodesPage = (): JSX.Element => {
-  const { nodes, hardware } = useDevice();
+  const { nodes, hardware, setDialogOpen } = useDevice();
+  const { setNodeNumToBeRemoved } = useAppStore();
 
   const filteredNodes = Array.from(nodes.values()).filter(
     (n) => n.num !== hardware.myNodeNum,
@@ -27,6 +37,7 @@ export const NodesPage = (): JSX.Element => {
             { title: "Last Heard", type: "normal", sortable: true },
             { title: "SNR", type: "normal", sortable: true },
             { title: "Connection", type: "normal", sortable: true },
+            { title: "Remove", type: "normal", sortable: false },
           ]}
           rows={filteredNodes.map((node) => [
             <Hashicon size={24} value={node.num.toString()} />,
@@ -57,12 +68,16 @@ export const NodesPage = (): JSX.Element => {
               {(node.snr + 10) * 5}raw
             </Mono>,
             <Mono>
-              {node.lastHeard != 0 ?
-                (node.viaMqtt === false && node.hopsAway === 0
-                  ? "Direct": node.hopsAway.toString() + " hops away")
-                  : "-"}
-              {node.viaMqtt === true? ", via MQTT": ""}
-            </Mono>
+            {node.lastHeard != 0 ?
+              (node.viaMqtt === false && node.hopsAway === 0
+                ? "Direct": node.hopsAway.toString() + " hops away")
+                : "-"}
+            {node.viaMqtt === true? ", via MQTT": ""}
+          </Mono>,
+            <Button variant="destructive" onClick={() => {
+              setNodeNumToBeRemoved(node.num);
+              setDialogOpen("nodeRemoval", true)
+            }}><TrashIcon />Remove</Button>
           ])}
         />
       </div>
