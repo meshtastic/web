@@ -1,4 +1,3 @@
-import { DeviceMetadata } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
@@ -24,7 +23,7 @@ export interface SidebarProps {
 export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
   const { hardware, nodes, metadata } = useDevice();
   const myNode = nodes.get(hardware.myNodeNum);
-  const myMetadata = metadata.get(hardware.myNodeNum);
+  const myMetadata = metadata.get(0);
   const { activePage, setActivePage, setDialogOpen } = useDevice();
 
   interface NavLink {
@@ -89,7 +88,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
         </div>
         <div className="flex items-center">
             <CpuIcon size={24} viewBox={'0 0 36 24'}/>
-            <Subtle>{ myMetadata?.firmwareVersion ?? "UNK"}</Subtle>
+            <Subtle>v{ myMetadata?.firmwareVersion ?? "UNK"}</Subtle>
         </div>
       </div>
 
