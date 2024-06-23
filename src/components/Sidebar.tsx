@@ -1,3 +1,4 @@
+import { DeviceMetadata } from "@buf/meshtastic_protobufs.bufbuild_es/meshtastic/mesh_pb";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
@@ -12,7 +13,8 @@ import {
   SettingsIcon,
   UsersIcon,
   ZapIcon,
-  BatteryMediumIcon
+  BatteryMediumIcon,
+  CpuIcon
 } from "lucide-react";
 
 export interface SidebarProps {
@@ -20,8 +22,9 @@ export interface SidebarProps {
 }
 
 export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
-  const { hardware, nodes } = useDevice();
+  const { hardware, nodes, metadata } = useDevice();
   const myNode = nodes.get(hardware.myNodeNum);
+  const myMetadata = metadata.get(hardware.myNodeNum);
   const { activePage, setActivePage, setDialogOpen } = useDevice();
 
   interface NavLink {
@@ -84,6 +87,10 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
             <ZapIcon size={24} viewBox={'0 0 36 24'}/>
             <Subtle>{myNode?.deviceMetrics?.voltage.toPrecision(3) ?? "UNK"} volts</Subtle>
         </div>
+        <div className="flex items-center">
+            <CpuIcon size={24} viewBox={'0 0 36 24'}/>
+            <Subtle>{ myMetadata?.firmwareVersion ?? "UNK"}</Subtle>
+        </div>
       </div>
 
       <SidebarSection label="Navigation">
@@ -103,3 +110,4 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
     </div>
   );
 };
+
