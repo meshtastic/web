@@ -46,11 +46,11 @@ export class MqttValidationMapReportSettings
   implements
     Omit<Protobuf.ModuleConfig.ModuleConfig_MapReportSettings, keyof Message>
 {
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   publishIntervalSecs: number;
 
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   positionPrecision: number;
 }

@@ -11,7 +11,10 @@ export const MQTT = (): JSX.Element => {
       new Protobuf.ModuleConfig.ModuleConfig({
         payloadVariant: {
           case: "mqtt",
-          value: data,
+          value: {
+            ...data,
+            mapReportSettings: new Protobuf.ModuleConfig.ModuleConfig_MapReportSettings(data.mapReportSettings)
+          },
         },
       }),
     );
