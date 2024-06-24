@@ -1,4 +1,4 @@
-import { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
+import type { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
 import { Button } from "@components/UI/Button.js";
 import { Mono } from "@components/generic/Mono.js";
 import { useAppStore } from "@core/stores/appStore.js";

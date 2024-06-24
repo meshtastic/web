@@ -4,7 +4,7 @@ import type {
 } from "@components/Form/DynamicForm.js";
 import { Input } from "@components/UI/Input.js";
 import type { LucideIcon } from "lucide-react";
-import { Controller, FieldValues } from "react-hook-form";
+import { Controller, type FieldValues } from "react-hook-form";
 
 export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "text" | "number" | "password";

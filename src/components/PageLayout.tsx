@@ -1,5 +1,5 @@
 import { cn } from "@app/core/utils/cn.js";
-import { AlignLeftIcon, LucideIcon } from "lucide-react";
+import { AlignLeftIcon, type LucideIcon } from "lucide-react";
 
 export interface PageLayoutProps {
   label: string;
