@@ -13,7 +13,6 @@ import {
   SettingsIcon,
   UsersIcon,
   ZapIcon,
-  BatteryMediumIcon,
   CpuIcon
 } from "lucide-react";
 
