@@ -1,17 +1,17 @@
 import {
   DynamicFormField,
-  FieldProps,
+  type FieldProps,
 } from "@components/Form/DynamicFormField.js";
 import { FieldWrapper } from "@components/Form/FormWrapper.js";
 import { Button } from "@components/UI/Button.js";
 import { H4 } from "@components/UI/Typography/H4.js";
 import { Subtle } from "@components/UI/Typography/Subtle.js";
 import {
-  Control,
-  DefaultValues,
-  FieldValues,
-  Path,
-  SubmitHandler,
+  type Control,
+  type DefaultValues,
+  type FieldValues,
+  type Path,
+  type SubmitHandler,
   useForm,
 } from "react-hook-form";
 
@@ -26,7 +26,7 @@ export interface BaseFormBuilderProps<T> {
   disabledBy?: DisabledBy<T>[];
   label: string;
   description?: string;
-  properties?: {};
+  properties?: Record<string, unknown>;
 }
 
 export interface GenericFormElementProps<T extends FieldValues, Y> {
@@ -94,9 +94,12 @@ export function DynamicForm<T extends FieldValues>({
           </div>
 
           {fieldGroup.fields.map((field) => (
-            <FieldWrapper label={field.label} description={field.description}>
+            <FieldWrapper
+              key={field.label}
+              label={field.label}
+              description={field.description}
+            >
               <DynamicFormField
-                key={field.label}
                 field={field}
                 control={control}
                 disabled={isDisabled(field.disabledBy)}

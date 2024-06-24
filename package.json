@@ -6,8 +6,9 @@
   "license": "GPL-3.0-only",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc && vite build",
+    "build": "tsc && pnpm check && vite build ",
     "check": "biome check .",
+    "check:fix": "pnpm check --write",
     "preview": "vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)"
   },
@@ -60,7 +61,7 @@
     "zustand": "4.5.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.6.3",
+    "@biomejs/biome": "^1.8.1",
     "@buf/meshtastic_protobufs.bufbuild_es": "1.8.0-20240325205556-b11811405eea.2",
     "@types/chrome": "^0.0.263",
     "@types/node": "^20.11.30",
