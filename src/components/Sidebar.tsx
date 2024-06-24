@@ -13,6 +13,8 @@ import {
   SettingsIcon,
   UsersIcon,
   ZapIcon,
+  BatteryMediumIcon,
+  CpuIcon
 } from "lucide-react";
 
 export interface SidebarProps {
@@ -20,8 +22,9 @@ export interface SidebarProps {
 }
 
 export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
-  const { hardware, nodes } = useDevice();
+  const { hardware, nodes, metadata } = useDevice();
   const myNode = nodes.get(hardware.myNodeNum);
+  const myMetadata = metadata.get(0);
   const { activePage, setActivePage, setDialogOpen } = useDevice();
 
   interface NavLink {
@@ -86,6 +89,10 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
             {myNode?.deviceMetrics?.voltage.toPrecision(3) ?? "UNK"} volts
           </Subtle>
         </div>
+        <div className="flex items-center">
+            <CpuIcon size={24} viewBox={'0 0 36 24'}/>
+            <Subtle>v{ myMetadata?.firmwareVersion ?? "UNK"}</Subtle>
+        </div>
       </div>
 
       <SidebarSection label="Navigation">
@@ -105,3 +112,4 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
     </div>
   );
 };
+
