@@ -5,6 +5,7 @@ import { useDevice } from "@core/stores/deviceStore.js";
 import type { Page } from "@core/stores/deviceStore.js";
 import {
   BatteryMediumIcon,
+  CpuIcon,
   EditIcon,
   LayersIcon,
   type LucideIcon,
@@ -13,7 +14,6 @@ import {
   SettingsIcon,
   UsersIcon,
   ZapIcon,
-  CpuIcon
 } from "lucide-react";
 
 export interface SidebarProps {
@@ -89,8 +89,8 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
           </Subtle>
         </div>
         <div className="flex items-center">
-            <CpuIcon size={24} viewBox={'0 0 36 24'}/>
-            <Subtle>v{ myMetadata?.firmwareVersion ?? "UNK"}</Subtle>
+          <CpuIcon size={24} viewBox={"0 0 36 24"} />
+          <Subtle>v{myMetadata?.firmwareVersion ?? "UNK"}</Subtle>
         </div>
       </div>
 
@@ -111,4 +111,3 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
     </div>
   );
 };
-
