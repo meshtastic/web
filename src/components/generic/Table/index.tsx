@@ -34,8 +34,12 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
 
     // Custom comparison for 'Last Heard' column
     if (sortColumn === "Last Heard") {
-      const aTimestamp = a[columnIndex].props.timestamp ? a[columnIndex].props.timestamp : 0;
-      const bTimestamp = b[columnIndex].props.timestamp ? b[columnIndex].props.timestamp : 0;
+      const aTimestamp = a[columnIndex].props.timestamp
+        ? a[columnIndex].props.timestamp
+        : 0;
+      const bTimestamp = b[columnIndex].props.timestamp
+        ? b[columnIndex].props.timestamp
+        : 0;
 
       if (aTimestamp < bTimestamp) {
         return sortOrder === "asc" ? -1 : 1;
@@ -70,11 +74,18 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
                   : ""
               }`}
               onClick={() => heading.sortable && headingSort(heading.title)}
+              onKeyUp={() => heading.sortable && headingSort(heading.title)}
             >
               <div className="flex gap-2">
                 {heading.title}
                 {sortColumn === heading.title && (
-                  <>{sortOrder === "asc" ? <ChevronUpIcon size={16} /> : <ChevronDownIcon size={16} />}</>
+                  <>
+                    {sortOrder === "asc" ? (
+                      <ChevronUpIcon size={16} />
+                    ) : (
+                      <ChevronDownIcon size={16} />
+                    )}
+                  </>
                 )}
               </div>
             </th>
@@ -83,9 +94,11 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
       </thead>
       <tbody>
         {sortedRows.map((row, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: TODO: Once this table is sortable, this should get fixed.
           <tr key={index}>
             {row.map((item, index) => (
               <td
+                // biome-ignore lint/suspicious/noArrayIndexKey: OK because column order never changes.
                 key={index}
                 className="whitespace-nowrap py-2 text-sm text-textSecondary first:pl-2"
               >
