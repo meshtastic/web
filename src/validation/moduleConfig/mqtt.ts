@@ -1,6 +1,12 @@
 import type { Message } from "@bufbuild/protobuf";
 import type { Protobuf } from "@meshtastic/js";
-import { IsBoolean, IsNumber, IsOptional, IsString, Length } from "class-validator";
+import {
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Length,
+} from "class-validator";
 
 export class MqttValidation
   implements

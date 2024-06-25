@@ -13,7 +13,10 @@ export const MQTT = (): JSX.Element => {
           case: "mqtt",
           value: {
             ...data,
-            mapReportSettings: new Protobuf.ModuleConfig.ModuleConfig_MapReportSettings(data.mapReportSettings)
+            mapReportSettings:
+              new Protobuf.ModuleConfig.ModuleConfig_MapReportSettings(
+                data.mapReportSettings,
+              ),
           },
         },
       }),
