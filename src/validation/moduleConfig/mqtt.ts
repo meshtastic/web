@@ -1,6 +1,12 @@
 import type { Message } from "@bufbuild/protobuf";
 import type { Protobuf } from "@meshtastic/js";
-import { IsBoolean, IsNumber, IsString, Length } from "class-validator";
+import {
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Length,
+} from "class-validator";
 
 export class MqttValidation
   implements
@@ -47,8 +53,10 @@ export class MqttValidationMapReportSettings
     Omit<Protobuf.ModuleConfig.ModuleConfig_MapReportSettings, keyof Message>
 {
   @IsNumber()
+  @IsOptional()
   publishIntervalSecs: number;
 
   @IsNumber()
+  @IsOptional()
   positionPrecision: number;
 }

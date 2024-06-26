@@ -4,7 +4,8 @@
     "enabled": true
   },
   "files": {
-    "ignoreUnknown": true
+    "ignoreUnknown": true,
+    "ignore": ["vercel.json"]
   },
   "vcs": {
     "enabled": true,
