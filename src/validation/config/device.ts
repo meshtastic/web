@@ -1,12 +1,15 @@
 import type { Message } from "@bufbuild/protobuf";
 import { Protobuf } from "@meshtastic/js";
-import { IsBoolean, IsEnum, IsInt } from "class-validator";
+import { IsBoolean, IsEnum, IsInt, IsString } from "class-validator";
 
 export class DeviceValidation
   implements Omit<Protobuf.Config.Config_DeviceConfig, keyof Message>
 {
   @IsEnum(Protobuf.Config.Config_DeviceConfig_Role)
   role: Protobuf.Config.Config_DeviceConfig_Role;
+
+  @IsString()
+  tzdef: string;
 
   @IsBoolean()
   serialEnabled: boolean;
@@ -34,4 +37,7 @@ export class DeviceValidation
 
   @IsBoolean()
   disableTripleClick: boolean;
+
+  @IsBoolean()
+  ledHeartbeatDisabled: boolean;
 }

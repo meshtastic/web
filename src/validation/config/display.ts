@@ -1,6 +1,6 @@
 import type { Message } from "@bufbuild/protobuf";
 import { Protobuf } from "@meshtastic/js";
-import { IsBoolean, IsEnum, IsInt } from "class-validator";
+import { IsBoolean, IsEnum, IsInt, IsNumber } from "class-validator";
 
 export class DisplayValidation
   implements Omit<Protobuf.Config.Config_DisplayConfig, keyof Message>
@@ -34,4 +34,7 @@ export class DisplayValidation
 
   @IsBoolean()
   wakeOnTapOrMotion: boolean;
+
+  @IsInt()
+  compassOrientation: number;
 }
