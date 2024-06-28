@@ -1,12 +1,14 @@
+import { tzInfo } from "@app/core/utils/tz";
 import type { DeviceValidation } from "@app/validation/config/device.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
 
 export const Device = (): JSX.Element => {
-  const { config, setWorkingConfig } = useDevice();
+  const { config, setWorkingConfig, setTzDropdown } = useDevice();
 
   const onSubmit = (data: DeviceValidation) => {
+    const tzInt = Number.parseInt(data.tzdef);
     setWorkingConfig(
       new Protobuf.Config.Config({
         payloadVariant: {
@@ -20,7 +22,10 @@ export const Device = (): JSX.Element => {
   return (
     <DynamicForm<DeviceValidation>
       onSubmit={onSubmit}
-      defaultValues={config.device}
+      defaultValues={{
+        //tzdef: toTzDropdown(config.device?.tzdef ?? ""),
+        ...config.device,
+      }}
       fieldGroups={[
         {
           label: "Device Settings",
@@ -34,6 +39,15 @@ export const Device = (): JSX.Element => {
               properties: {
                 enumValue: Protobuf.Config.Config_DeviceConfig_Role,
                 formatEnumName: true,
+              },
+            },
+            {
+              type: "stringSelect",
+              name: "tzdef",
+              label: "Timezone",
+              description: "What timezone is the device in",
+              properties: {
+                enumValue: tzInfo,
               },
             },
             {

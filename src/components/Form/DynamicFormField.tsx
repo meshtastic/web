@@ -5,6 +5,7 @@ import {
 import {
   type SelectFieldProps,
   SelectInput,
+  SelectStringInput,
 } from "@components/Form/FormSelect.js";
 import {
   type ToggleFieldProps,
@@ -43,6 +44,10 @@ export function DynamicFormField<T extends FieldValues>({
     case "select":
       return (
         <SelectInput field={field} control={control} disabled={disabled} />
+      );
+    case "stringSelect":
+      return (
+        <SelectStringInput field={field} control={control} disabled={disabled} />
       );
     case "multiSelect":
       return <div>tmp</div>;

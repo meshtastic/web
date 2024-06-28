@@ -5,7 +5,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "ignore": ["vercel.json"]
+    "ignore": ["vercel.json", "tz.ts"]
   },
   "vcs": {
     "enabled": true,
