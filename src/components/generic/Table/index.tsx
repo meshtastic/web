@@ -34,12 +34,8 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
 
     // Custom comparison for 'Last Heard' column
     if (sortColumn === "Last Heard") {
-      const aTimestamp = a[columnIndex].props.timestamp
-        ? a[columnIndex].props.timestamp
-        : 0;
-      const bTimestamp = b[columnIndex].props.timestamp
-        ? b[columnIndex].props.timestamp
-        : 0;
+      const aTimestamp = aValue.props.timestamp ?? 0;
+      const bTimestamp = bValue.props.timestamp ?? 0;
 
       if (aTimestamp < bTimestamp) {
         return sortOrder === "asc" ? -1 : 1;
