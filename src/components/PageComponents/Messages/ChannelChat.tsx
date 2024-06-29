@@ -4,20 +4,23 @@ import {
   useDevice,
 } from "@app/core/stores/deviceStore.js";
 import { Message } from "@components/PageComponents/Messages/Message.js";
+import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.js";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.js";
-import type { Types } from "@meshtastic/js";
+import type { Protobuf, Types } from "@meshtastic/js";
 import { InboxIcon } from "lucide-react";
 
 export interface ChannelChatProps {
   messages?: MessageWithState[];
   channel: Types.ChannelNumber;
   to: Types.Destination;
+  traceroutes?: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[];
 }
 
 export const ChannelChat = ({
   messages,
   channel,
   to,
+  traceroutes,
 }: ChannelChatProps): JSX.Element => {
   const { nodes } = useDevice();
 
@@ -39,6 +42,21 @@ export const ChannelChat = ({
           <div className="m-auto">
             <InboxIcon className="m-auto" />
             <Subtle>No Messages</Subtle>
+          </div>
+        )}
+        { to === "broadcast" ? null : traceroutes ? (
+          traceroutes.map((traceroute, index) => (
+            <TraceRoute
+              key={traceroute.id}
+              from={nodes.get(traceroute.from)}
+              to={nodes.get(traceroute.to)}
+              route={traceroute.data.route}
+            />
+          ))
+        ) : (
+          <div className="m-auto">
+            <InboxIcon className="m-auto" />
+            <Subtle>No Traceroutes</Subtle>
           </div>
         )}
       </div>

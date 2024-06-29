@@ -7,11 +7,13 @@ import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, Types } from "@meshtastic/js";
 import { getChannelName } from "@pages/Channels.js";
-import { HashIcon } from "lucide-react";
+import { HashIcon, WaypointsIcon } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@core/hooks/useToast.js";
+
 
 export const MessagesPage = (): JSX.Element => {
-  const { channels, nodes, hardware, messages } = useDevice();
+  const { channels, nodes, hardware, messages, traceroutes, connection } = useDevice();
   const [chatType, setChatType] =
     useState<Types.PacketDestination>("broadcast");
   const [activeChat, setActiveChat] = useState<number>(
@@ -25,6 +27,8 @@ export const MessagesPage = (): JSX.Element => {
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
   );
   const currentChannel = channels.get(activeChat);
+  const { toast } = useToast();
+
 
   return (
     <>
@@ -72,6 +76,23 @@ export const MessagesPage = (): JSX.Element => {
               ? nodes.get(activeChat)?.user?.longName ?? "Unknown"
               : "Loading..."
         }`}
+      actions={
+         chatType === "direct"
+          ? [
+          {
+            icon: WaypointsIcon,
+            async onClick() {
+              if (nodes.get(activeChat)?.num === undefined) return;
+              await connection?.traceRoute(nodes.get(activeChat)?.num!).then(() =>
+                toast({
+                  title: `Traceroute sent.`,
+                }),
+              );
+            },
+           },
+         ]
+         : []
+         }
       >
         {allChannels.map(
           (channel) =>
@@ -92,6 +113,7 @@ export const MessagesPage = (): JSX.Element => {
                 to={activeChat}
                 messages={messages.direct.get(node.num)}
                 channel={Types.ChannelNumber.Primary}
+                traceroutes={traceroutes.get(node.num)}
               />
             ),
         )}

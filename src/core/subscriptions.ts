@@ -86,6 +86,12 @@ export const subscribeAll = (
     });
   });
 
+  connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
+    device.addTraceRoute({
+      ...traceRoutePacket,
+    });
+  });
+
   connection.events.onPendingSettingsChange.subscribe((state) => {
     device.setPendingSettingsChanges(state);
   });
