@@ -527,8 +527,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               produce<DeviceState>((draft) => {
 
                 device.nodes.delete(nodeNum);
-              })
-            )
+              }),
+            );
           },
           setMessageState: (
             type: "direct" | "broadcast",

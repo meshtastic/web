@@ -19,7 +19,7 @@ import {
   LayersIcon,
   LayoutIcon,
   LinkIcon,
-  LucideIcon,
+  type LucideIcon,
   MapIcon,
   MessageSquareIcon,
   MoonIcon,
@@ -350,7 +350,7 @@ export const CommandPalette = (): JSX.Element => {
 
     window.addEventListener("keydown", handleKeydown);
     return () => window.removeEventListener("keydown", handleKeydown);
-  }, []);
+  }, [setCommandPaletteOpen]);
 
   return (
     <CommandDialog

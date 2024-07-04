@@ -1,4 +1,4 @@
-import { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
+import type { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
 import { Button } from "@components/UI/Button.js";
 import { Mono } from "@components/generic/Mono.js";
 import { useAppStore } from "@core/stores/appStore.js";
@@ -48,19 +48,22 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
   return (
     <div className="flex w-full flex-col gap-2 p-4">
       <div className="flex h-48 flex-col gap-2 overflow-y-auto">
-        {serialPorts.map((port, index) => (
-          <Button
-            key={index}
-            disabled={port.readable !== null}
-            onClick={async () => {
-              await onConnect(port);
-            }}
-          >
-            {`# ${index} - ${port.getInfo().usbVendorId ?? "UNK"} - ${
-              port.getInfo().usbProductId ?? "UNK"
-            }`}
-          </Button>
-        ))}
+        {serialPorts.map((port, index) => {
+          const { usbProductId, usbVendorId } = port.getInfo();
+          return (
+            <Button
+              key={`${usbVendorId ?? "UNK"}-${usbProductId ?? "UNK"}-${index}`}
+              disabled={port.readable !== null}
+              onClick={async () => {
+                await onConnect(port);
+              }}
+            >
+              {`# ${index} - ${usbVendorId ?? "UNK"} - ${
+                usbProductId ?? "UNK"
+              }`}
+            </Button>
+          );
+        })}
         {serialPorts.length === 0 && (
           <Mono className="m-auto select-none">No devices paired yet.</Mono>
         )}
