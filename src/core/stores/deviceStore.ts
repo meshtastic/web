@@ -42,6 +42,10 @@ export interface Device {
     direct: Map<number, MessageWithState[]>;
     broadcast: Map<Types.ChannelNumber, MessageWithState[]>;
   };
+  traceroutes: Map<
+    number,
+    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
+  >;
   connection?: Types.ConnectionType;
   activePage: Page;
   activeNode: number;
@@ -75,6 +79,9 @@ export interface Device {
   addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
   addConnection: (connection: Types.ConnectionType) => void;
   addMessage: (message: MessageWithState) => void;
+  addTraceRoute: (
+    traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
+  ) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
   removeNode: (nodeNum: number) => void;
   setMessageState: (
@@ -122,6 +129,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             direct: new Map(),
             broadcast: new Map(),
           },
+          traceroutes: new Map(),
           connection: undefined,
           activePage: "messages",
           activeNode: 0,
@@ -487,6 +495,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
+
           addMetadata: (from, metadata) => {
             set(
               produce<DeviceState>((draft) => {
@@ -495,6 +504,26 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.metadata.set(from, metadata);
+              }),
+            );
+          },
+          addTraceRoute: (traceroute) => {
+            set(
+              produce<DeviceState>((draft) => {
+                console.log("addTraceRoute called");
+                console.log(traceroute);
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+
+                const nodetraceroutes = device.traceroutes.get(traceroute.from);
+                if (nodetraceroutes) {
+                  nodetraceroutes.push(traceroute);
+                  device.traceroutes.set(traceroute.from, nodetraceroutes);
+                } else {
+                  device.traceroutes.set(traceroute.from, [traceroute]);
+                }
               }),
             );
           },
