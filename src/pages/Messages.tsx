@@ -83,6 +83,9 @@ export const MessagesPage = (): JSX.Element => {
             icon: WaypointsIcon,
             async onClick() {
               if (nodes.get(activeChat)?.num === undefined) return;
+              toast({
+                title: "Sending Traceroute, please wait..."
+              })
               await connection?.traceRoute(nodes.get(activeChat)?.num!).then(() =>
                 toast({
                   title: `Traceroute sent.`,
