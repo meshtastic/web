@@ -42,7 +42,10 @@ export interface Device {
     direct: Map<number, MessageWithState[]>;
     broadcast: Map<Types.ChannelNumber, MessageWithState[]>;
   };
-  traceroutes: Map<number, Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]>;
+  traceroutes: Map<
+    number,
+    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
+  >;
   connection?: Types.ConnectionType;
   activePage: Page;
   activeNode: number;
@@ -76,7 +79,9 @@ export interface Device {
   addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
   addConnection: (connection: Types.ConnectionType) => void;
   addMessage: (message: MessageWithState) => void;
-  addTraceRoute: (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => void;
+  addTraceRoute: (
+    traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
+  ) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
   removeNode: (nodeNum: number) => void;
   setMessageState: (
@@ -512,12 +517,12 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
 
-                const nodetraceroutes = device.traceroutes.get(traceroute.from)
+                const nodetraceroutes = device.traceroutes.get(traceroute.from);
                 if (nodetraceroutes) {
-                    nodetraceroutes.push(traceroute);
-                    device.traceroutes.set(traceroute.from, nodetraceroutes);
+                  nodetraceroutes.push(traceroute);
+                  device.traceroutes.set(traceroute.from, nodetraceroutes);
                 } else {
-                   device.traceroutes.set(traceroute.from, [traceroute]);
+                  device.traceroutes.set(traceroute.from, [traceroute]);
                 }
               }),
             );
@@ -525,7 +530,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           removeNode: (nodeNum) => {
             set(
               produce<DeviceState>((draft) => {
-
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
                 device.nodes.delete(nodeNum);
               }),
             );
