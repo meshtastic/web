@@ -1,5 +1,8 @@
 import { Subtle } from "@app/components/UI/Typography/Subtle.js";
-import { MessageWithState, useDevice } from "@app/core/stores/deviceStore.js";
+import {
+  type MessageWithState,
+  useDevice,
+} from "@app/core/stores/deviceStore.js";
 import { Message } from "@components/PageComponents/Messages/Message.js";
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.js";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.js";

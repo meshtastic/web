@@ -44,7 +44,9 @@ export const RemoveNodeDialog = ({
           </form>
         </div>
         <DialogFooter>
-          <Button variant="destructive" onClick={() => onSubmit()}>Remove</Button>
+          <Button variant="destructive" onClick={() => onSubmit()}>
+            Remove
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

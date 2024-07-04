@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.js";
-import { Controller, FieldValues } from "react-hook-form";
+import { Controller, type FieldValues } from "react-hook-form";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select" | "multiSelect";
@@ -40,7 +40,7 @@ export function SelectInput<T extends FieldValues>({
           : [];
         return (
           <Select
-            onValueChange={(e) => onChange(parseInt(e))}
+            onValueChange={(e) => onChange(Number.parseInt(e))}
             disabled={disabled}
             value={value?.toString()}
             {...remainingProperties}

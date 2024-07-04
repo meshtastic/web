@@ -1,9 +1,9 @@
+import { RemoveNodeDialog } from "@app/components/Dialog/RemoveNodeDialog.js";
 import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.js";
 import { ImportDialog } from "@components/Dialog/ImportDialog.js";
 import { QRDialog } from "@components/Dialog/QRDialog.js";
 import { RebootDialog } from "@components/Dialog/RebootDialog.js";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.js";
-import { RemoveNodeDialog } from "@app/components/Dialog/RemoveNodeDialog.js"
 import { useDevice } from "@core/stores/deviceStore.js";
 
 export const DialogManager = (): JSX.Element => {
