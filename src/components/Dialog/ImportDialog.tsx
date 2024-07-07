@@ -26,19 +26,34 @@ export const ImportDialog = ({
   open,
   onOpenChange,
 }: ImportDialogProps): JSX.Element => {
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+  const [importDialogInput, setImportDialogInput] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
   const [validUrl, setValidUrl] = useState<boolean>(false);
 
   const { connection } = useDevice();
 
   useEffect(() => {
-    const base64String = qrCodeUrl.split("e/#")[1];
-    const paddedString = base64String
-      ?.padEnd(base64String.length + ((4 - (base64String.length % 4)) % 4), "=")
-      .replace(/-/g, "+")
-      .replace(/_/g, "/");
+    // the channel information is contained in the URL's fragment, which will be present after a
+    // non-URL encoded `#`.
     try {
+      const channelsUrl = new URL(importDialogInput);
+      if (
+        (channelsUrl.hostname !== "meshtastic.org" &&
+          channelsUrl.pathname !== "/e/") ||
+        !channelsUrl.hash
+      ) {
+        throw "Invalid Meshtastic URL";
+      }
+
+      const encodedChannelConfig = channelsUrl.hash.substring(1);
+      const paddedString = encodedChannelConfig
+        .padEnd(
+          encodedChannelConfig.length +
+            ((4 - (encodedChannelConfig.length % 4)) % 4),
+          "=",
+        )
+        .replace(/-/g, "+")
+        .replace(/_/g, "/");
       setChannelSet(
         Protobuf.AppOnly.ChannelSet.fromBinary(toByteArray(paddedString)),
       );
@@ -47,7 +62,7 @@ export const ImportDialog = ({
       setValidUrl(false);
       setChannelSet(undefined);
     }
-  }, [qrCodeUrl]);
+  }, [importDialogInput]);
 
   const apply = () => {
     channelSet?.settings.map((ch, index) => {
@@ -87,10 +102,10 @@ export const ImportDialog = ({
         <div className="flex flex-col gap-3">
           <Label>Channel Set/QR Code URL</Label>
           <Input
-            value={qrCodeUrl}
+            value={importDialogInput}
             suffix={validUrl ? "✅" : "❌"}
             onChange={(e) => {
-              setQrCodeUrl(e.target.value);
+              setImportDialogInput(e.target.value);
             }}
           />
           {validUrl && (
