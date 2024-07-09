@@ -474,6 +474,7 @@ async function checkNumberOfCompletedTodosInLocalStorage(
   return await page.waitForFunction((e) => {
     return (
       JSON.parse(localStorage["react-todos"]).filter(
+        // biome-ignore lint/suspicious/noExplicitAny: test example from Playwright, any is only for demonstration and won't be used testing the project
         (todo: any) => todo.completed,
       ).length === e
     );
@@ -482,8 +483,11 @@ async function checkNumberOfCompletedTodosInLocalStorage(
 
 async function checkTodosInLocalStorage(page: Page, title: string) {
   return await page.waitForFunction((t) => {
-    return JSON.parse(localStorage["react-todos"])
-      .map((todo: any) => todo.title)
-      .includes(t);
+    return (
+      JSON.parse(localStorage["react-todos"])
+        // biome-ignore lint/suspicious/noExplicitAny: test example from Playwright, any is only for demonstration and won't be used testing the project
+        .map((todo: any) => todo.title)
+        .includes(t)
+    );
   }, title);
 }
