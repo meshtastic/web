@@ -14,20 +14,20 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Marker, useMap } from "react-map-gl";
 import MapGl from "react-map-gl/maplibre";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
-  const { rasterSources } = useAppStore();
+  const { rasterSources, darkMode } = useAppStore();
   const { default: map } = useMap();
 
   const [zoom, setZoom] = useState(0);
 
   const allNodes = Array.from(nodes.values());
 
-  const getBBox = () => {
+  const getBBox = useCallback(() => {
     if (!map) {
       return;
     }
@@ -64,7 +64,7 @@ export const MapPage = (): JSX.Element => {
     if (center) {
       map.easeTo(center);
     }
-  };
+  }, [allNodes, map]);
 
   useEffect(() => {
     map?.on("zoom", () => {
@@ -128,6 +128,11 @@ export const MapPage = (): JSX.Element => {
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
+          style={{
+            filter: darkMode
+              ? "brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7)"
+              : "",
+          }}
           dragRotate={false}
           touchZoomRotate={false}
           initialViewState={{
@@ -160,20 +165,19 @@ export const MapPage = (): JSX.Element => {
                   key={node.num}
                   longitude={node.position.longitudeI / 1e7}
                   latitude={node.position.latitudeI / 1e7}
+                  style={{ filter: darkMode ? "invert(1)" : "" }}
                   anchor="bottom"
+                  onClick={() => {
+                    map?.easeTo({
+                      zoom: 12,
+                      center: [
+                        (node.position?.longitudeI ?? 0) / 1e7,
+                        (node.position?.latitudeI ?? 0) / 1e7,
+                      ],
+                    });
+                  }}
                 >
-                  <div
-                    className="flex cursor-pointer gap-2 rounded-md border bg-backgroundPrimary p-1.5"
-                    onClick={() => {
-                      map?.easeTo({
-                        zoom: 12,
-                        center: [
-                          (node.position?.longitudeI ?? 0) / 1e7,
-                          (node.position?.latitudeI ?? 0) / 1e7,
-                        ],
-                      });
-                    }}
-                  >
+                  <div className="flex cursor-pointer gap-2 rounded-md border bg-backgroundPrimary p-1.5">
                     <Hashicon value={node.num.toString()} size={22} />
                     <Subtle className={cn(zoom < 12 && "hidden")}>
                       {node.user?.longName}

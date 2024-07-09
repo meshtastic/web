@@ -9,8 +9,8 @@ import {
   LanguagesIcon,
   MoonIcon,
   PlusIcon,
+  SearchIcon,
   SunIcon,
-  TerminalIcon,
 } from "lucide-react";
 
 export const DeviceSelector = (): JSX.Element => {
@@ -73,7 +73,7 @@ export const DeviceSelector = (): JSX.Element => {
           className="transition-all hover:text-accent"
           onClick={() => setCommandPaletteOpen(true)}
         >
-          <TerminalIcon />
+          <SearchIcon />
         </button>
         <button type="button" className="transition-all hover:text-accent">
           <LanguagesIcon />

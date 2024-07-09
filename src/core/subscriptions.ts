@@ -1,5 +1,5 @@
 import type { Device } from "@core/stores/deviceStore.js";
-import { Protobuf, Types } from "@meshtastic/js";
+import { Protobuf, type Types } from "@meshtastic/js";
 
 export const subscribeAll = (
   device: Device,
@@ -83,6 +83,12 @@ export const subscribeAll = (
     device.addMessage({
       ...messagePacket,
       state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
+    });
+  });
+
+  connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
+    device.addTraceRoute({
+      ...traceRoutePacket,
     });
   });
 

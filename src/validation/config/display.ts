@@ -34,4 +34,7 @@ export class DisplayValidation
 
   @IsBoolean()
   wakeOnTapOrMotion: boolean;
+
+  @IsEnum(Protobuf.Config.Config_DisplayConfig_CompassOrientation)
+  compassOrientation: Protobuf.Config.Config_DisplayConfig_CompassOrientation;
 }

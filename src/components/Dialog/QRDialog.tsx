@@ -9,10 +9,10 @@ import {
 } from "@components/UI/Dialog.js";
 import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
-import { Protobuf, Types } from "@meshtastic/js";
+import { Protobuf, type Types } from "@meshtastic/js";
 import { fromByteArray } from "base64-js";
 import { ClipboardIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
 
 export interface QRDialogProps {
@@ -30,8 +30,9 @@ export const QRDialog = ({
 }: QRDialogProps): JSX.Element => {
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+  const [qrCodeAdd, setQrCodeAdd] = useState<boolean>();
 
-  const allChannels = Array.from(channels.values());
+  const allChannels = useMemo(() => Array.from(channels.values()), [channels]);
 
   useEffect(() => {
     const channelsToEncode = allChannels
@@ -49,8 +50,10 @@ export const QRDialog = ({
       .replace(/\+/g, "-")
       .replace(/\//g, "_");
 
-    setQrCodeUrl(`https://meshtastic.org/e/#${base64}`);
-  }, [channels, selectedChannels, loraConfig]);
+    setQrCodeUrl(
+      `https://meshtastic.org/e/#${base64}${qrCodeAdd ? "?add=true" : ""}`,
+    );
+  }, [allChannels, selectedChannels, qrCodeAdd, loraConfig]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -93,6 +96,30 @@ export const QRDialog = ({
               ))}
             </div>
             <QRCode value={qrCodeUrl} size={200} qrStyle="dots" />
+          </div>
+          <div className="flex justify-center">
+            <button
+              type="button"
+              className={`border-black border-t border-l border-b rounded-l h-10 px-7 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                qrCodeAdd
+                  ? "focus:ring-green-800 bg-green-800 text-white"
+                  : "focus:ring-slate-400 bg-slate-400 hover:bg-green-600"
+              }`}
+              onClick={() => setQrCodeAdd(true)}
+            >
+              Add Channels
+            </button>
+            <button
+              type="button"
+              className={`border-black border-t border-r border-b rounded-r h-10 px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                !qrCodeAdd
+                  ? "focus:ring-green-800 bg-green-800 text-white"
+                  : "focus:ring-slate-400 bg-slate-400 hover:bg-green-600"
+              }`}
+              onClick={() => setQrCodeAdd(false)}
+            >
+              Replace Channels
+            </button>
           </div>
         </div>
         <DialogFooter>

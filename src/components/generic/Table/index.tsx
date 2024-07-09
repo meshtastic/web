@@ -1,4 +1,5 @@
-import { ChevronUpIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import React, { useState } from "react";
 
 export interface TableProps {
   headings: Heading[];
@@ -12,6 +13,49 @@ export interface Heading {
 }
 
 export const Table = ({ headings, rows }: TableProps): JSX.Element => {
+  const [sortColumn, setSortColumn] = useState<string | null>("Last Heard");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const headingSort = (title: string) => {
+    if (sortColumn === title) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(title);
+      setSortOrder("asc");
+    }
+  };
+
+  const sortedRows = rows.slice().sort((a, b) => {
+    if (!sortColumn) return 0;
+
+    const columnIndex = headings.findIndex((h) => h.title === sortColumn);
+    const aValue = a[columnIndex].props.children;
+    const bValue = b[columnIndex].props.children;
+
+    // Custom comparison for 'Last Heard' column
+    if (sortColumn === "Last Heard") {
+      const aTimestamp = aValue.props.timestamp ?? 0;
+      const bTimestamp = bValue.props.timestamp ?? 0;
+
+      if (aTimestamp < bTimestamp) {
+        return sortOrder === "asc" ? -1 : 1;
+      }
+      if (aTimestamp > bTimestamp) {
+        return sortOrder === "asc" ? 1 : -1;
+      }
+      return 0;
+    }
+
+    // Default comparison for other columns
+    if (aValue < bValue) {
+      return sortOrder === "asc" ? -1 : 1;
+    }
+    if (aValue > bValue) {
+      return sortOrder === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
   return (
     <table className="min-w-full">
       <thead className="bg-backgroundPrimary text-sm font-semibold text-textPrimary">
@@ -25,11 +69,19 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
                   ? "cursor-pointer hover:brightness-hover active:brightness-press"
                   : ""
               }`}
+              onClick={() => heading.sortable && headingSort(heading.title)}
+              onKeyUp={() => heading.sortable && headingSort(heading.title)}
             >
               <div className="flex gap-2">
                 {heading.title}
-                {heading.sortable && (
-                  <ChevronUpIcon size={16} className="my-auto" />
+                {sortColumn === heading.title && (
+                  <>
+                    {sortOrder === "asc" ? (
+                      <ChevronUpIcon size={16} />
+                    ) : (
+                      <ChevronDownIcon size={16} />
+                    )}
+                  </>
                 )}
               </div>
             </th>
@@ -37,10 +89,12 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
         </tr>
       </thead>
       <tbody>
-        {rows.map((row, index) => (
+        {sortedRows.map((row, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: TODO: Once this table is sortable, this should get fixed.
           <tr key={index}>
             {row.map((item, index) => (
               <td
+                // biome-ignore lint/suspicious/noArrayIndexKey: OK because column order never changes.
                 key={index}
                 className="whitespace-nowrap py-2 text-sm text-textSecondary first:pl-2"
               >
