@@ -51,7 +51,7 @@ export const QRDialog = ({
       .replace(/\//g, "_");
 
     setQrCodeUrl(
-      `https://meshtastic.org/e/#${base64}${qrCodeAdd ? "?add=true" : ""}`,
+      `https://meshtastic.org/e/${qrCodeAdd ? "?add=true" : ""}#${base64}`,
     );
   }, [allChannels, selectedChannels, qrCodeAdd, loraConfig]);
 
