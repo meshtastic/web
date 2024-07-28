@@ -12,6 +12,7 @@ import {
   SelectValue, 
 } from "@components/UI/Select.js";
 import { useState } from "react";
+import cryptoRandomString from 'crypto-random-string';
 
 const generatorVariants = cva(
   "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2",
@@ -61,13 +62,13 @@ const Generator = React.forwardRef<HTMLButtonElement, GeneratorProps>(
     const generate = () => {
       let generated = "thisisapass";
       if (bitCount == "bit8") {
-        generated = "8bitpassword"
+        generated = btoa(cryptoRandomString({length: 1, type: 'alphanumeric'}));
       }
       if (bitCount == "bit128") {
-        generated = "128bitpassword"
+        generated = btoa(cryptoRandomString({length: 16, type: 'alphanumeric'}));
       }
       if (bitCount == "bit256") {
-        generated = "256bitpassword"
+        generated = btoa(cryptoRandomString({length: 32, type: 'alphanumeric'}));
       }
       return generated;
     };
