@@ -76,10 +76,10 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               },
             },
             {
-              type: "password",
+              type: "passwordGenerator",
               name: "settings.psk",
               label: "pre-Shared Key",
-              description: "16, or 32 bytes",
+              description: "256, 128, or 8 bit PSKs allowed",
               properties: {
                 // act
               },
