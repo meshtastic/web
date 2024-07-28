@@ -50,28 +50,15 @@ export interface GeneratorProps
   extends React.BaseHTMLAttributes<HTMLElement>,
     VariantProps<typeof generatorVariants> 
     {
+      devicePSKBitCount?: number;
       passwordValue?: string;
       textValue?: string;
     }
 
 const Generator = React.forwardRef<HTMLButtonElement, GeneratorProps>(
-  ({ passwordValue, textValue, className, variant, size, ...props }, ref) => {
-    const [pass, setPass] = useState<string>("");
-    const [bitCount, setBits] = useState<string>("bit256");
-
-    const generate = () => {
-      let generated = "thisisapass";
-      if (bitCount == "bit8") {
-        generated = btoa(cryptoRandomString({length: 1, type: 'alphanumeric'}));
-      }
-      if (bitCount == "bit128") {
-        generated = btoa(cryptoRandomString({length: 16, type: 'alphanumeric'}));
-      }
-      if (bitCount == "bit256") {
-        generated = btoa(cryptoRandomString({length: 32, type: 'alphanumeric'}));
-      }
-      return generated;
-    };
+  ({ devicePSKBitCount, passwordValue, textValue, className, variant, size, ...props }, ref) => {    
+    const [pass, setPass] = useState<string>(passwordValue ?? "");
+    const [bitCount, setBits] = useState<string>(devicePSKBitCount?.toString() ?? "");
 
     return (
       <>
@@ -87,9 +74,9 @@ const Generator = React.forwardRef<HTMLButtonElement, GeneratorProps>(
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-            <SelectItem key="bit256" value="bit256">256 bit</SelectItem>
-            <SelectItem key="bit128" value="bit128">128 bit</SelectItem>
-            <SelectItem key="bit8" value="bit8">8 bit</SelectItem>
+            <SelectItem key="bit256" value="32">256 bit</SelectItem>
+            <SelectItem key="bit128" value="16">128 bit</SelectItem>
+            <SelectItem key="bit8" value="1">8 bit</SelectItem>
         </SelectContent>
       </Select>
       <Button
@@ -98,7 +85,7 @@ const Generator = React.forwardRef<HTMLButtonElement, GeneratorProps>(
         ref={ref}
         {...props}
         onClick={() => {
-          setPass(generate());
+          setPass(btoa(cryptoRandomString({length: Number.parseInt(bitCount), type: 'alphanumeric'})));
         }}
       >
         {textValue}

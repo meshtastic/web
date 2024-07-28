@@ -14,13 +14,6 @@ import type {
     control,
     field,
   }: GenericFormElementProps<T, PasswordGeneratorProps<T>>) {
-    const [password, createPassword] = useState<string>("");
-
-    const generate = () => {
-      let generatedPass = "VHl1OTVpY7TAly0jGF0X2A==";
-      return generatedPass
-    }
-  
     return (
       <Controller
         name={field.name}

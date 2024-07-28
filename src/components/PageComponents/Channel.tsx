@@ -81,7 +81,8 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               label: "pre-Shared Key",
               description: "256, 128, or 8 bit PSKs allowed",
               properties: {
-                // act
+                passwordValue: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+                devicePSKBitCount: channel?.settings?.psk.length
               },
             },
             {
