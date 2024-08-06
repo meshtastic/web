@@ -45,7 +45,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
     });
   };
 
-  const clickEventCb = (e) => {
+  const clickEvent = () => {
     setPass(
       btoa(
         cryptoRandomString({
@@ -103,7 +103,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               devicePSKBitCount: bitCount ?? 0,
               properties: {
                 value: pass,
-                onClick: clickEventCb,
+                onClick: clickEvent,
                 changeEvent: (e: string) => setBits(Number.parseInt(e)),
               },
             },

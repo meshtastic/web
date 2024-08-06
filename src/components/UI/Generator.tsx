@@ -10,9 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.js";
-import { fromByteArray, toByteArray } from "base64-js";
-import cryptoRandomString from "crypto-random-string";
-import { useState } from "react";
 
 const generatorVariants = cva(
   "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2",
