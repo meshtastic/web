@@ -4,6 +4,8 @@ import { useToast } from "@core/hooks/useToast.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
+import cryptoRandomString from "crypto-random-string";
+import { useState } from "react";
 
 export interface SettingsPanelProps {
   channel: Protobuf.Channel.Channel;
@@ -13,12 +15,15 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   const { config, connection, addChannel } = useDevice();
   const { toast } = useToast();
 
+  const [pass, setPass] = useState<string>(fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)));
+  const [bitCount, setBits] = useState<number>(channel?.settings?.psk.length ?? 16);
+
   const onSubmit = (data: ChannelValidation) => {
     const channel = new Protobuf.Channel.Channel({
       ...data,
       settings: {
         ...data.settings,
-        psk: toByteArray(data.settings.psk ?? ""),
+        psk: toByteArray(pass),
         moduleSettings: {
           positionPrecision: data.settings.positionEnabled
             ? data.settings.preciseLocation
@@ -36,6 +41,18 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
     });
   };
 
+
+  const clickEventCb = (e) => {
+    setPass(
+      btoa(
+        cryptoRandomString({
+          length: bitCount ?? 0,
+          type: "alphanumeric",
+        }),
+      ),
+    );
+  }
+
   return (
     <DynamicForm<ChannelValidation>
       onSubmit={onSubmit}
@@ -46,7 +63,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         ...{
           settings: {
             ...channel?.settings,
-            psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+            psk: pass,
             positionEnabled:
               channel?.settings?.moduleSettings?.positionPrecision !==
                 undefined &&
@@ -80,11 +97,11 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               name: "settings.psk",
               label: "pre-Shared Key",
               description: "256, 128, or 8 bit PSKs allowed",
+              devicePSKBitCount: bitCount ?? 0,
               properties: {
-                passwordValue: fromByteArray(
-                  channel?.settings?.psk ?? new Uint8Array(0),
-                ),
-                devicePSKBitCount: channel?.settings?.psk.length,
+                value: pass,
+                onClick: clickEventCb,
+                changeEvent: (e: string) => setBits(parseInt(e)),
               },
             },
             {

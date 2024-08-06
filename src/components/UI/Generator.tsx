@@ -10,9 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.js";
-import { cn } from "@core/utils/cn.js";
 import cryptoRandomString from "crypto-random-string";
 import { useState } from "react";
+import { fromByteArray, toByteArray } from "base64-js";
 
 const generatorVariants = cva(
   "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2",
@@ -49,36 +49,41 @@ export interface GeneratorProps
   extends React.BaseHTMLAttributes<HTMLElement>,
     VariantProps<typeof generatorVariants> {
   devicePSKBitCount?: number;
-  passwordValue?: string;
-  textValue?: string;
+  value: string;
+  buttonText?: string;
+  changeEvent: Function;
+  
 }
 
-const Generator = React.forwardRef<HTMLButtonElement, GeneratorProps>(
+const getBitString = (bitcount?: number) => {
+  if (bitcount == 32) {
+    return "32"
+  }
+  if (bitcount == 1) {
+    return "1"
+  }
+  return "16"
+}
+
+const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
   (
     {
       devicePSKBitCount,
-      passwordValue,
-      textValue,
-      className,
+      value,
+      buttonText,
       variant,
-      size,
+      changeEvent,
       ...props
     },
     ref,
   ) => {
-    const [pass, setPass] = useState<string>(passwordValue ?? "");
-    const [bitCount, setBits] = useState<string>(
-      devicePSKBitCount?.toString() ?? "",
-    );
 
     return (
       <>
-        <Input type="text" id="pskInput" value={pass} />
+        <Input type="text" id="pskInput" value={value} />
         <Select
-          value={bitCount}
-          onValueChange={(value) => {
-            setBits(value);
-          }}
+          value={getBitString(devicePSKBitCount)}
+          onValueChange={(e) => changeEvent(e)}
         >
           <SelectTrigger>
             <SelectValue />
@@ -98,20 +103,9 @@ const Generator = React.forwardRef<HTMLButtonElement, GeneratorProps>(
         <Button
           type="button"
           variant="success"
-          ref={ref}
           {...props}
-          onClick={() => {
-            setPass(
-              btoa(
-                cryptoRandomString({
-                  length: Number.parseInt(bitCount),
-                  type: "alphanumeric",
-                }),
-              ),
-            );
-          }}
         >
-          {textValue}
+          {buttonText}
         </Button>
       </>
     );
