@@ -21,12 +21,13 @@ export function PasswordGenerator<T extends FieldValues>({
       render={({ field: { value, onChange, ...rest } }) => (
         <Generator
           devicePSKBitCount={field.devicePSKBitCount}
-          changeEvent={onChange} 
+          changeEvent={onChange}
           value={value}
           variant={"success"}
           buttonText="Generate"
           {...field.properties}
-          {...rest}        />
+          {...rest}
+        />
       )}
     />
   );

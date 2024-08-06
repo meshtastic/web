@@ -10,9 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.js";
+import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
 import { useState } from "react";
-import { fromByteArray, toByteArray } from "base64-js";
 
 const generatorVariants = cva(
   "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2",
@@ -51,33 +51,24 @@ export interface GeneratorProps
   devicePSKBitCount?: number;
   value: string;
   buttonText?: string;
-  changeEvent: Function;
-  
+  changeEvent: (event: string) => void;
 }
 
 const getBitString = (bitcount?: number) => {
-  if (bitcount == 32) {
-    return "32"
+  if (bitcount === 32) {
+    return "32";
   }
-  if (bitcount == 1) {
-    return "1"
+  if (bitcount === 1) {
+    return "1";
   }
-  return "16"
-}
+  return "16";
+};
 
 const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
   (
-    {
-      devicePSKBitCount,
-      value,
-      buttonText,
-      variant,
-      changeEvent,
-      ...props
-    },
+    { devicePSKBitCount, value, buttonText, variant, changeEvent, ...props },
     ref,
   ) => {
-
     return (
       <>
         <Input type="text" id="pskInput" value={value} />
@@ -100,11 +91,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
             </SelectItem>
           </SelectContent>
         </Select>
-        <Button
-          type="button"
-          variant="success"
-          {...props}
-        >
+        <Button type="button" variant="success" {...props}>
           {buttonText}
         </Button>
       </>

@@ -15,8 +15,12 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   const { config, connection, addChannel } = useDevice();
   const { toast } = useToast();
 
-  const [pass, setPass] = useState<string>(fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)));
-  const [bitCount, setBits] = useState<number>(channel?.settings?.psk.length ?? 16);
+  const [pass, setPass] = useState<string>(
+    fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+  );
+  const [bitCount, setBits] = useState<number>(
+    channel?.settings?.psk.length ?? 16,
+  );
 
   const onSubmit = (data: ChannelValidation) => {
     const channel = new Protobuf.Channel.Channel({
@@ -41,7 +45,6 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
     });
   };
 
-
   const clickEventCb = (e) => {
     setPass(
       btoa(
@@ -51,7 +54,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         }),
       ),
     );
-  }
+  };
 
   return (
     <DynamicForm<ChannelValidation>
@@ -101,7 +104,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               properties: {
                 value: pass,
                 onClick: clickEventCb,
-                changeEvent: (e: string) => setBits(parseInt(e)),
+                changeEvent: (e: string) => setBits(Number.parseInt(e)),
               },
             },
             {
