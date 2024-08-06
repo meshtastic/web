@@ -75,7 +75,9 @@ export const NodesPage = (): JSX.Element => {
               {node.lastHeard !== 0
                 ? node.viaMqtt === false && node.hopsAway === 0
                   ? "Direct"
-                  : `${node.hopsAway.toString()} hops away`
+                  : `${node.hopsAway.toString()} ${
+                      node.hopsAway > 1 ? "hops" : "hop"
+                    } away`
                 : "-"}
               {node.viaMqtt === true ? ", via MQTT" : ""}
             </Mono>,
