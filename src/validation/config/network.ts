@@ -45,17 +45,17 @@ export class NetworkValidationIpV4Config
 {
   @IsIP()
   @IsOptional()
-  ip: number;
+  ip: string;
 
   @IsIP()
   @IsOptional()
-  gateway: number;
+  gateway: string;
 
   @IsIP()
   @IsOptional()
-  subnet: number;
+  subnet: string;
 
   @IsIP()
   @IsOptional()
-  dns: number;
+  dns: string;
 }
