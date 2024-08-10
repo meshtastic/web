@@ -40,7 +40,6 @@ export interface DynamicFormProps<T extends FieldValues> {
   onSubmit: SubmitHandler<T>;
   submitType?: "onChange" | "onSubmit";
   hasSubmitButton?: boolean;
-  // defaultValues?: DeepPartial<T>;
   defaultValues?: DefaultValues<T>;
   fieldGroups: {
     label: string;

@@ -59,30 +59,14 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   };
 
   const validatePass = (input: string, count: number) => {
-    if (count === 32) {
-      if (input.length !== 44) {
-        setValidationText("Please enter a valid 256 bit PSK.");
-      } else {
-        setValidationText(undefined);
-      }
-    } else if (count === 16) {
-      if (input.length !== 24) {
-        setValidationText("Please enter a valid 128 bit PSK.");
-      } else {
-        setValidationText(undefined);
-      }
-    } else if (count === 1) {
-      if (input.length !== 4) {
-        setValidationText("Please enter a valid 1 bit PSK");
-      } else {
-        setValidationText(undefined);
-      }
+    if (input.length % 4 !== 0 || toByteArray(input).length !== count) {
+      setValidationText(`Please enter a valid ${count * 8} bit PSK.`);
     } else {
-      setValidationText("Unkown PSK length.");
+      setValidationText(undefined);
     }
   };
 
-  const inputChangeEvent = (e) => {
+  const inputChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
     const psk = e.currentTarget?.value;
     setPass(psk);
     validatePass(psk, bitCount);
