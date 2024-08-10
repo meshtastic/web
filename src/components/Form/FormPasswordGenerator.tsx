@@ -3,11 +3,15 @@ import type {
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.js";
 import { Generator } from "@components/UI/Generator.js";
+import { ChangeEventHandler, MouseEventHandler } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
 
 export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
   type: "passwordGenerator";
   devicePSKBitCount: number;
+  inputChange: ChangeEventHandler;
+  selectChange: (event: string) => void;
+  buttonClick: MouseEventHandler;
 }
 
 export function PasswordGenerator<T extends FieldValues>({
@@ -18,12 +22,14 @@ export function PasswordGenerator<T extends FieldValues>({
     <Controller
       name={field.name}
       control={control}
-      render={({ field: { value, onChange, ...rest } }) => (
+      render={({ field: { value,...rest } }) => (
         <Generator
           devicePSKBitCount={field.devicePSKBitCount}
-          changeEvent={onChange}
+          inputChange={field.inputChange}
+          selectChange={field.selectChange}
+          buttonClick={field.buttonClick}
           value={value}
-          variant={"success"}
+          variant={field.validationText ? "invalid" : "default"}
           buttonText="Generate"
           {...field.properties}
           {...rest}

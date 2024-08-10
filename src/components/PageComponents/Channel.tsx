@@ -21,6 +21,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   const [bitCount, setBits] = useState<number>(
     channel?.settings?.psk.length ?? 16,
   );
+  const [validationText, setValidationText] = useState<string>();
 
   const onSubmit = (data: ChannelValidation) => {
     const channel = new Protobuf.Channel.Channel({
@@ -54,7 +55,52 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         }),
       ),
     );
+    setValidationText(undefined);
   };
+
+  const validatePass = (input: string, count: number) => {
+    if (count == 32) {
+      if (input.length != 44) {
+        setValidationText("Please enter a valid 256 bit PSK.");
+      }
+      else {
+        setValidationText(undefined);
+      }
+    }
+    else if (count == 16)
+    {
+      if (input.length != 24) {
+        setValidationText("Please enter a valid 128 bit PSK.");
+      }
+      else {
+        setValidationText(undefined);
+      }
+    }
+    else if (count == 1)
+    {
+      if (input.length != 4) {
+        setValidationText("Please enter a valid 1 bit PSK");
+      }
+      else {
+        setValidationText(undefined);
+      }
+    }
+    else {
+      setValidationText("Unkown PSK length.");
+    }
+  }
+
+  const inputChangeEvent = (e) => {
+    let psk = e.currentTarget?.value;
+    setPass(psk);
+    validatePass(psk, bitCount);
+  };
+
+  const selectChangeEvent = (e: string) => {
+    let count = Number.parseInt(e);
+    setBits(count);
+    validatePass(pass, count);
+  }
 
   return (
     <DynamicForm<ChannelValidation>
@@ -100,11 +146,13 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               name: "settings.psk",
               label: "pre-Shared Key",
               description: "256, 128, or 8 bit PSKs allowed",
+              validationText: validationText,
               devicePSKBitCount: bitCount ?? 0,
+              inputChange: inputChangeEvent,
+              selectChange: selectChangeEvent,
+              buttonClick: clickEvent,
               properties: {
-                value: pass,
-                onClick: clickEvent,
-                changeEvent: (e: string) => setBits(Number.parseInt(e)),
+                value: pass
               },
             },
             {

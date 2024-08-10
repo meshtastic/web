@@ -26,6 +26,7 @@ export interface BaseFormBuilderProps<T> {
   disabledBy?: DisabledBy<T>[];
   label: string;
   description?: string;
+  validationText?: string;
   properties?: Record<string, unknown>;
 }
 
@@ -44,6 +45,8 @@ export interface DynamicFormProps<T extends FieldValues> {
   fieldGroups: {
     label: string;
     description: string;
+    valid?: boolean;
+    validationText?: string;
     fields: FieldProps<T>[];
   }[];
 }
@@ -98,6 +101,8 @@ export function DynamicForm<T extends FieldValues>({
               key={field.label}
               label={field.label}
               description={field.description}
+              valid={field.validationText == undefined || field.validationText == ""}
+              validationText={field.validationText}
             >
               <DynamicFormField
                 field={field}
