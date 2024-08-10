@@ -10,8 +10,7 @@ import {
   SelectValue,
 } from "@components/UI/Select.js";
 
-export interface GeneratorProps
-  extends React.BaseHTMLAttributes<HTMLElement> {
+export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   devicePSKBitCount?: number;
   value: string;
   variant: "default" | "invalid";
@@ -21,17 +20,25 @@ export interface GeneratorProps
   buttonClick: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-
 const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
   (
-    { devicePSKBitCount, variant, value, buttonText, selectChange, inputChange, buttonClick, ...props },
+    {
+      devicePSKBitCount,
+      variant,
+      value,
+      buttonText,
+      selectChange,
+      inputChange,
+      buttonClick,
+      ...props
+    },
     ref,
   ) => {
     return (
       <>
-        <Input 
-          type="text" 
-          id="pskInput" 
+        <Input
+          type="text"
+          id="pskInput"
           variant={variant}
           value={value}
           onChange={inputChange}
@@ -55,7 +62,12 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
             </SelectItem>
           </SelectContent>
         </Select>
-        <Button type="button" variant="success" onClick={buttonClick} {...props}>
+        <Button
+          type="button"
+          variant="success"
+          onClick={buttonClick}
+          {...props}
+        >
           {buttonText}
         </Button>
       </>

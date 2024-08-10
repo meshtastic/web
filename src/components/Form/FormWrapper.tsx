@@ -23,7 +23,9 @@ export const FieldWrapper = ({
         <div className="sm:col-span-2">
           <div className="max-w-lg">
             <p className="text-sm text-gray-500">{description}</p>
-            <p hidden={valid ?? true} className="text-sm text-red-500">{validationText}</p>
+            <p hidden={valid ?? true} className="text-sm text-red-500">
+              {validationText}
+            </p>
             <div className="mt-4 space-y-4">
               <div className="flex items-center">{children}</div>
             </div>

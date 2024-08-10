@@ -101,7 +101,10 @@ export function DynamicForm<T extends FieldValues>({
               key={field.label}
               label={field.label}
               description={field.description}
-              valid={field.validationText == undefined || field.validationText == ""}
+              valid={
+                field.validationText === undefined ||
+                field.validationText === ""
+              }
               validationText={field.validationText}
             >
               <DynamicFormField
