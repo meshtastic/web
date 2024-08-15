@@ -45,6 +45,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "crypto-random-string": "^5.0.0",
     "immer": "^10.1.1",
     "lucide-react": "^0.363.0",
     "mapbox-gl": "npm:empty-npm-package@^1.0.0",

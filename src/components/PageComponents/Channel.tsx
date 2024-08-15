@@ -4,6 +4,8 @@ import { useToast } from "@core/hooks/useToast.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
+import cryptoRandomString from "crypto-random-string";
+import { useState } from "react";
 
 export interface SettingsPanelProps {
   channel: Protobuf.Channel.Channel;
@@ -13,12 +15,20 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   const { config, connection, addChannel } = useDevice();
   const { toast } = useToast();
 
+  const [pass, setPass] = useState<string>(
+    fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+  );
+  const [bitCount, setBits] = useState<number>(
+    channel?.settings?.psk.length ?? 16,
+  );
+  const [validationText, setValidationText] = useState<string>();
+
   const onSubmit = (data: ChannelValidation) => {
     const channel = new Protobuf.Channel.Channel({
       ...data,
       settings: {
         ...data.settings,
-        psk: toByteArray(data.settings.psk ?? ""),
+        psk: toByteArray(pass),
         moduleSettings: {
           positionPrecision: data.settings.positionEnabled
             ? data.settings.preciseLocation
@@ -36,6 +46,38 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
     });
   };
 
+  const clickEvent = () => {
+    setPass(
+      btoa(
+        cryptoRandomString({
+          length: bitCount ?? 0,
+          type: "alphanumeric",
+        }),
+      ),
+    );
+    setValidationText(undefined);
+  };
+
+  const validatePass = (input: string, count: number) => {
+    if (input.length % 4 !== 0 || toByteArray(input).length !== count) {
+      setValidationText(`Please enter a valid ${count * 8} bit PSK.`);
+    } else {
+      setValidationText(undefined);
+    }
+  };
+
+  const inputChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const psk = e.currentTarget?.value;
+    setPass(psk);
+    validatePass(psk, bitCount);
+  };
+
+  const selectChangeEvent = (e: string) => {
+    const count = Number.parseInt(e);
+    setBits(count);
+    validatePass(pass, count);
+  };
+
   return (
     <DynamicForm<ChannelValidation>
       onSubmit={onSubmit}
@@ -46,7 +88,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         ...{
           settings: {
             ...channel?.settings,
-            psk: fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+            psk: pass,
             positionEnabled:
               channel?.settings?.moduleSettings?.positionPrecision !==
                 undefined &&
@@ -76,12 +118,17 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               },
             },
             {
-              type: "password",
+              type: "passwordGenerator",
               name: "settings.psk",
               label: "pre-Shared Key",
-              description: "16, or 32 bytes",
+              description: "256, 128, or 8 bit PSKs allowed",
+              validationText: validationText,
+              devicePSKBitCount: bitCount ?? 0,
+              inputChange: inputChangeEvent,
+              selectChange: selectChangeEvent,
+              buttonClick: clickEvent,
               properties: {
-                // act
+                value: pass,
               },
             },
             {
