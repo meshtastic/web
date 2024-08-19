@@ -19,7 +19,7 @@ const Footer = () => {
         </a>{" "}
         | Meshtastic® is a registered trademark of Meshtastic LLC. |
         <a
-          href="/docs/legal"
+          href="https://meshtastic.org/docs/legal"
           className="hover:underline"
           style={{ color: "var(--link)" }}
         >
