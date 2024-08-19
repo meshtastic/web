@@ -5,6 +5,7 @@ import { LoRa } from "@components/PageComponents/Config/LoRa.js";
 import { Network } from "@components/PageComponents/Config/Network.js";
 import { Position } from "@components/PageComponents/Config/Position.js";
 import { Power } from "@components/PageComponents/Config/Power.js";
+import { Security } from "@components/PageComponents/Config/Security.js";
 import {
   Tabs,
   TabsContent,
@@ -46,6 +47,10 @@ export const DeviceConfig = (): JSX.Element => {
     {
       label: "Bluetooth",
       element: Bluetooth,
+    },
+    {
+      label: "Security",
+      element: Security,
     },
   ];
 
