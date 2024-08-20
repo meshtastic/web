@@ -45,7 +45,7 @@ export const Security = (): JSX.Element => {
       fieldGroups={[
         {
           label: "Security Settings",
-          description: "Settings for the Security module",
+          description: "Settings for the Security configuration",
           fields: [
             {
               type: "text",
@@ -69,13 +69,13 @@ export const Security = (): JSX.Element => {
               type: "toggle",
               name: "adminChannelEnabled",
               label: "Admin Channel",
-              description: "Enable 'admin' channel",
+              description: "Allow incoming device control over the insecure legacy admin channel",
             },
             {
               type: "toggle",
               name: "isManaged",
               label: "Is Managed",
-              description: "Enable if you want to manage this node from other nodes",
+              description: 'If true, device is considered to be "managed" by a mesh administrator via admin messages',
             },
             {
               type: "text",
@@ -93,19 +93,19 @@ export const Security = (): JSX.Element => {
               type: "toggle",
               name: "bluetoothLoggingEnabled",
               label: "Bluetooth Logging",
-              description: "Enable Bluetooth Logging",
+              description: "Enables device (serial style logs) over Bluetooth",
             },
             {
               type: "toggle",
               name: "debugLogApiEnabled",
               label: "Debug Log API",
-              description: "Enable Log API",
+              description: "Output live debug logging over serial",
             },
             {
               type: "toggle",
               name: "serialEnabled",
               label: "Serial",
-              description: "Enable Serial"
+              description: "Serial Console over the Stream API"
             }
           ],
         },
