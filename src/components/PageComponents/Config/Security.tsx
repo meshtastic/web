@@ -49,15 +49,16 @@ export const Security = (): JSX.Element => {
           fields: [
             {
               type: "text",
-              name: "publicKey",
-              label: "Public Key",
-              description: "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
-            },
-            {
-              type: "text",
               name: "privateKey",
               label: "Private Key",
               description: "Used to create a shared key with a remote device",
+            },
+            {
+              type: "text",
+              name: "publicKey",
+              label: "Public Key",
+              description: "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+              disabledBy: [ { fieldName: "always" } ]
             },
           ],
         },
