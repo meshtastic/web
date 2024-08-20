@@ -1,12 +1,47 @@
+import type { SecurityValidation } from "@app/validation/config/security.js"
 import { DynamicForm } from "@app/components/Form/DynamicForm.js";
+import { useDevice } from "@core/stores/deviceStore.js";
+import { Protobuf } from "@meshtastic/js";
+import { fromByteArray, toByteArray } from "base64-js";
+import { useState } from "react";
 
 export const Security = (): JSX.Element => {
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const { config, nodes, hardware, setWorkingConfig } = useDevice();
+
+  const [adminKey, setAdminKey] = useState<string>(
+    fromByteArray(config.security?.adminKey ?? new Uint8Array(0))
+  );
+  const [privateKey, setPrivateKey] = useState<string>(
+    fromByteArray(config.security?.privateKey ?? new Uint8Array(0))
+  );
+  const [publicKey, setPublicKey] = useState<string>(
+    fromByteArray(config.security?.publicKey ?? new Uint8Array(0))
+  );
+
+  const onSubmit = (data: SecurityValidation) => {
+    setWorkingConfig(
+      new Protobuf.Config.Config({
+        payloadVariant: {
+          case: "security",
+          value: {
+            ...data,
+            adminKey: toByteArray(adminKey),
+            privateKey: toByteArray(privateKey),
+            publicKey: toByteArray(publicKey),
+          }
+        },
+      })
+    )
   };
   return (
-    <DynamicForm
+    <DynamicForm<SecurityValidation>
       onSubmit={onSubmit}
+      defaultValues={{
+        ...config.security,
+        adminKey: adminKey,
+        privateKey: privateKey,
+        publicKey: publicKey
+      }}
       fieldGroups={[
         {
           label: "Security Settings",
