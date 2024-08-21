@@ -1,5 +1,5 @@
-import type { SecurityValidation } from "@app/validation/config/security.js"
 import { DynamicForm } from "@app/components/Form/DynamicForm.js";
+import type { SecurityValidation } from "@app/validation/config/security.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
@@ -9,13 +9,13 @@ export const Security = (): JSX.Element => {
   const { config, nodes, hardware, setWorkingConfig } = useDevice();
 
   const [adminKey, setAdminKey] = useState<string>(
-    fromByteArray(config.security?.adminKey ?? new Uint8Array(0))
+    fromByteArray(config.security?.adminKey ?? new Uint8Array(0)),
   );
   const [privateKey, setPrivateKey] = useState<string>(
-    fromByteArray(config.security?.privateKey ?? new Uint8Array(0))
+    fromByteArray(config.security?.privateKey ?? new Uint8Array(0)),
   );
   const [publicKey, setPublicKey] = useState<string>(
-    fromByteArray(config.security?.publicKey ?? new Uint8Array(0))
+    fromByteArray(config.security?.publicKey ?? new Uint8Array(0)),
   );
 
   const onSubmit = (data: SecurityValidation) => {
@@ -28,10 +28,10 @@ export const Security = (): JSX.Element => {
             adminKey: toByteArray(adminKey),
             privateKey: toByteArray(privateKey),
             publicKey: toByteArray(publicKey),
-          }
+          },
         },
-      })
-    )
+      }),
+    );
   };
   return (
     <DynamicForm<SecurityValidation>
@@ -40,7 +40,7 @@ export const Security = (): JSX.Element => {
         ...config.security,
         adminKey: adminKey,
         privateKey: privateKey,
-        publicKey: publicKey
+        publicKey: publicKey,
       }}
       fieldGroups={[
         {
@@ -57,8 +57,9 @@ export const Security = (): JSX.Element => {
               type: "text",
               name: "publicKey",
               label: "Public Key",
-              description: "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
-              disabledBy: [ { fieldName: "always" } ]
+              description:
+                "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+              disabledBy: [{ fieldName: "always" }],
             },
           ],
         },
@@ -70,20 +71,23 @@ export const Security = (): JSX.Element => {
               type: "toggle",
               name: "adminChannelEnabled",
               label: "Admin Channel",
-              description: "Allow incoming device control over the insecure legacy admin channel",
+              description:
+                "Allow incoming device control over the insecure legacy admin channel",
             },
             {
               type: "toggle",
               name: "isManaged",
               label: "Is Managed",
-              description: 'If true, device is considered to be "managed" by a mesh administrator via admin messages',
+              description:
+                'If true, device is considered to be "managed" by a mesh administrator via admin messages',
             },
             {
               type: "text",
               name: "adminKey",
               label: "Admin Key",
-              description: "The public key authorized to send admin messages to this node",
-            }
+              description:
+                "The public key authorized to send admin messages to this node",
+            },
           ],
         },
         {
@@ -106,11 +110,11 @@ export const Security = (): JSX.Element => {
               type: "toggle",
               name: "serialEnabled",
               label: "Serial",
-              description: "Serial Console over the Stream API"
-            }
+              description: "Serial Console over the Stream API",
+            },
           ],
         },
       ]}
-      />
-  )
+    />
+  );
 };

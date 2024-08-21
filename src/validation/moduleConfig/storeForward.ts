@@ -4,7 +4,10 @@ import { IsBoolean, IsInt } from "class-validator";
 
 export class StoreForwardValidation
   implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_StoreForwardConfig, keyof Message>
+    Omit<
+      Protobuf.ModuleConfig.ModuleConfig_StoreForwardConfig,
+      keyof Message | "isServer"
+    >
 {
   @IsBoolean()
   enabled: boolean;

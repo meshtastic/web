@@ -144,8 +144,8 @@ export const MapPage = (): JSX.Element => {
           {waypoints.map((wp) => (
             <Marker
               key={wp.id}
-              longitude={wp.longitudeI / 1e7}
-              latitude={wp.latitudeI / 1e7}
+              longitude={(wp.longitudeI ?? 0) / 1e7}
+              latitude={(wp.latitudeI ?? 0) / 1e7}
               anchor="bottom"
             >
               <div>
@@ -163,8 +163,8 @@ export const MapPage = (): JSX.Element => {
               return (
                 <Marker
                   key={node.num}
-                  longitude={node.position.longitudeI / 1e7}
-                  latitude={node.position.latitudeI / 1e7}
+                  longitude={(node.position.longitudeI ?? 0) / 1e7}
+                  latitude={(node.position.latitudeI ?? 0) / 1e7}
                   style={{ filter: darkMode ? "invert(1)" : "" }}
                   anchor="bottom"
                   onClick={() => {
