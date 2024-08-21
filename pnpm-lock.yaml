@@ -130,8 +130,8 @@ importers:
         specifier: ^1.8.2
         version: 1.8.2
       '@buf/meshtastic_protobufs.bufbuild_es':
-        specifier: 2.0.0-20240820152623-fac6975bbc78.2
-        version: 2.0.0-20240820152623-fac6975bbc78.2(@bufbuild/protobuf@1.10.0)
+        specifier: 1.10.0-20240820152623-fac6975bbc78.1
+        version: 1.10.0-20240820152623-fac6975bbc78.1(@bufbuild/protobuf@1.10.0)
       '@types/chrome':
         specifier: ^0.0.263
         version: 0.0.263
@@ -354,10 +354,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@buf/meshtastic_protobufs.bufbuild_es@2.0.0-20240820152623-fac6975bbc78.2':
-    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/meshtastic_protobufs.bufbuild_es/-/meshtastic_protobufs.bufbuild_es-2.0.0-20240820152623-fac6975bbc78.2.tgz}
+  '@buf/meshtastic_protobufs.bufbuild_es@1.10.0-20240820152623-fac6975bbc78.1':
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/meshtastic_protobufs.bufbuild_es/-/meshtastic_protobufs.bufbuild_es-1.10.0-20240820152623-fac6975bbc78.1.tgz}
     peerDependencies:
-      '@bufbuild/protobuf': ^2.0.0
+      '@bufbuild/protobuf': ^1.10.0
 
   '@bufbuild/protobuf@1.10.0':
     resolution: {integrity: sha512-QDdVFLoN93Zjg36NoQPZfsVH9tZew7wKDKyV5qRdj8ntT4wQCOradQjRaTdwMhWUYsgKsvCINKKm87FdEk96Ag==}
@@ -3306,7 +3306,7 @@ snapshots:
   '@biomejs/cli-win32-x64@1.8.2':
     optional: true
 
-  '@buf/meshtastic_protobufs.bufbuild_es@2.0.0-20240820152623-fac6975bbc78.2(@bufbuild/protobuf@1.10.0)':
+  '@buf/meshtastic_protobufs.bufbuild_es@1.10.0-20240820152623-fac6975bbc78.1(@bufbuild/protobuf@1.10.0)':
     dependencies:
       '@bufbuild/protobuf': 1.10.0
 

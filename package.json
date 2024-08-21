@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.2",
-    "@buf/meshtastic_protobufs.bufbuild_es": "2.0.0-20240820152623-fac6975bbc78.2",
+    "@buf/meshtastic_protobufs.bufbuild_es": "1.10.0-20240820152623-fac6975bbc78.1",
     "@types/chrome": "^0.0.263",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
