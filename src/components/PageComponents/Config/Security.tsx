@@ -3,20 +3,23 @@ import type { SecurityValidation } from "@app/validation/config/security.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
 export const Security = (): JSX.Element => {
   const { config, nodes, hardware, setWorkingConfig } = useDevice();
 
-  const [adminKey, setAdminKey] = useState<string>(
-    fromByteArray(config.security?.adminKey ?? new Uint8Array(0)),
-  );
   const [privateKey, setPrivateKey] = useState<string>(
     fromByteArray(config.security?.privateKey ?? new Uint8Array(0)),
   );
+  const [privateKeyVisible, setPrivateKeyVisible] = useState<boolean>(false);
   const [publicKey, setPublicKey] = useState<string>(
     fromByteArray(config.security?.publicKey ?? new Uint8Array(0)),
   );
+  const [adminKey, setAdminKey] = useState<string>(
+    fromByteArray(config.security?.adminKey ?? new Uint8Array(0)),
+  );
+  const [adminKeyVisible, setAdminKeyVisible] = useState<boolean>(false);
 
   const onSubmit = (data: SecurityValidation) => {
     setWorkingConfig(
@@ -48,10 +51,22 @@ export const Security = (): JSX.Element => {
           description: "Settings for the Security configuration",
           fields: [
             {
-              type: "text",
+              type: privateKeyVisible ? "text" : "password",
               name: "privateKey",
               label: "Private Key",
               description: "Used to create a shared key with a remote device",
+              disabledBy: [
+                {
+                  fieldName: "adminChannelEnabled",
+                  invert: true,
+                },
+              ],
+              properties: {
+                action: {
+                  icon: privateKeyVisible ? EyeOff : Eye,
+                  onClick: () => setPrivateKeyVisible(!privateKeyVisible),
+                },
+              },
             },
             {
               type: "text",
@@ -70,21 +85,28 @@ export const Security = (): JSX.Element => {
             {
               type: "toggle",
               name: "adminChannelEnabled",
-              label: "Admin Channel",
+              label: "Allow Legacy Admin",
               description:
                 "Allow incoming device control over the insecure legacy admin channel",
             },
             {
               type: "toggle",
               name: "isManaged",
-              label: "Is Managed",
+              label: "Managed",
               description:
                 'If true, device is considered to be "managed" by a mesh administrator via admin messages',
             },
             {
-              type: "text",
+              type: adminKeyVisible ? "text" : "password",
               name: "adminKey",
               label: "Admin Key",
+              disabledBy: [{ fieldName: "adminChannelEnabled" }],
+              properties: {
+                action: {
+                  icon: adminKeyVisible ? EyeOff : Eye,
+                  onClick: () => setAdminKeyVisible(!adminKeyVisible),
+                },
+              },
               description:
                 "The public key authorized to send admin messages to this node",
             },
@@ -97,19 +119,19 @@ export const Security = (): JSX.Element => {
             {
               type: "toggle",
               name: "bluetoothLoggingEnabled",
-              label: "Bluetooth Logging",
+              label: "Allow Bluetooth Logging",
               description: "Enables device (serial style logs) over Bluetooth",
             },
             {
               type: "toggle",
               name: "debugLogApiEnabled",
-              label: "Debug Log API",
+              label: "Enable Debug Log API",
               description: "Output live debug logging over serial",
             },
             {
               type: "toggle",
               name: "serialEnabled",
-              label: "Serial",
+              label: "Serial Output Enabled",
               description: "Serial Console over the Stream API",
             },
           ],
