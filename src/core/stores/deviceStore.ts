@@ -191,6 +191,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       device.config.bluetooth = config.payloadVariant.value;
                       break;
                     }
+                    case "security": {
+                      device.config.security = config.payloadVariant.value;
+                    }
                   }
                 }
               }),

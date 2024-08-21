@@ -16,7 +16,7 @@ import {
 } from "react-hook-form";
 
 interface DisabledBy<T> {
-  fieldName: Path<T>;
+  fieldName: Path<T> | "always";
   selector?: number;
   invert?: boolean;
 }
@@ -66,7 +66,9 @@ export function DynamicForm<T extends FieldValues>({
     if (!disabledBy) return false;
 
     return disabledBy.some((field) => {
+      if (field.fieldName === "always") return true;
       const value = getValues(field.fieldName);
+      if (value === "always") return true;
       if (typeof value === "boolean") return field.invert ? value : !value;
       if (typeof value === "number")
         return field.invert
