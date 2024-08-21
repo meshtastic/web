@@ -1,8 +1,11 @@
 import type { NetworkValidation } from "@app/validation/config/network.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
+import {
+  convertIntToIpAddress,
+  convertIpAddressToInt,
+} from "@core/utils/ip.js";
 import { Protobuf } from "@meshtastic/js";
-import { convertIntToIpAddress, convertIpAddressToInt } from "@core/utils/ip.js";
 
 export const Network = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
@@ -21,7 +24,7 @@ export const Network = (): JSX.Element => {
     },
     ntpServer: config.network?.ntpServer,
     rsyslogServer: config.network?.rsyslogServer,
-  }
+  };
 
   const onSubmit = (data: NetworkValidation) => {
     setWorkingConfig(
@@ -30,14 +33,12 @@ export const Network = (): JSX.Element => {
           case: "network",
           value: {
             ...data,
-            ipv4Config: new Protobuf.Config.Config_NetworkConfig_IpV4Config(
-              {
-                ip: convertIpAddressToInt(data.ipv4Config.ip) ?? 0,
-                gateway: convertIpAddressToInt(data.ipv4Config.gateway) ?? 0,
-                subnet: convertIpAddressToInt(data.ipv4Config.subnet) ?? 0,
-                dns: convertIpAddressToInt(data.ipv4Config.dns) ?? 0,
-              },
-            ),
+            ipv4Config: new Protobuf.Config.Config_NetworkConfig_IpV4Config({
+              ip: convertIpAddressToInt(data.ipv4Config.ip) ?? 0,
+              gateway: convertIpAddressToInt(data.ipv4Config.gateway) ?? 0,
+              subnet: convertIpAddressToInt(data.ipv4Config.subnet) ?? 0,
+              dns: convertIpAddressToInt(data.ipv4Config.dns) ?? 0,
+            }),
           },
         },
       }),

@@ -41,7 +41,10 @@ export class NetworkValidation
 
 export class NetworkValidationIpV4Config
   implements
-    Omit<Protobuf.Config.Config_NetworkConfig_IpV4Config, keyof Message>
+    Omit<
+      Protobuf.Config.Config_NetworkConfig_IpV4Config,
+      keyof Message | "ip" | "gateway" | "subnet" | "dns"
+    >
 {
   @IsIP()
   @IsOptional()

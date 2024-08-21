@@ -3,10 +3,10 @@ export function convertIntToIpAddress(int: number): string {
 }
 
 export function convertIpAddressToInt(ip: string): number | null {
-  const parts = ip.split('.').map(Number).reverse(); // little-endian byte order
+  const parts = ip.split(".").map(Number).reverse(); // little-endian byte order
 
   if (parts.some(Number.isNaN)) {
-      return null;
+    return null;
   }
 
   return parts.reduce((total, part) => (total << 8) | part, 0);
