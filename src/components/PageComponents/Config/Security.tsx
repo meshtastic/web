@@ -133,6 +133,7 @@ export const Security = (): JSX.Element => {
               devicePSKBitCount: privateKeyBitCount,
               inputChange: privateKeyInputChangeEvent,
               selectChange: privateKeySelectChangeEvent,
+              hide: !privateKeyVisible,
               buttonClick: () =>
                 clickEvent(
                   setPrivateKey,
@@ -191,6 +192,7 @@ export const Security = (): JSX.Element => {
               devicePSKBitCount: adminKeyBitCount,
               inputChange: adminKeyInputChangeEvent,
               selectChange: adminKeySelectChangeEvent,
+              hide: !adminKeyVisible,
               buttonClick: () =>
                 clickEvent(
                   setAdminKey,

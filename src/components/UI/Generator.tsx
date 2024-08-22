@@ -9,8 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.js";
+import type { LucideIcon } from "lucide-react";
 
 export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
+  hide?: boolean;
   devicePSKBitCount?: number;
   value: string;
   variant: "default" | "invalid";
@@ -18,11 +20,17 @@ export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   selectChange: (event: string) => void;
   inputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   buttonClick: React.MouseEventHandler<HTMLButtonElement>;
+  action?: {
+    icon: LucideIcon;
+    onClick: () => void;
+  };
+  disabled?: boolean;
 }
 
 const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
   (
     {
+      hide = true,
       devicePSKBitCount,
       variant,
       value,
@@ -30,6 +38,8 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
       selectChange,
       inputChange,
       buttonClick,
+      action,
+      disabled,
       ...props
     },
     ref,
@@ -37,17 +47,19 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
     return (
       <>
         <Input
-          type="text"
+          type={hide ? "password" : "text"}
           id="pskInput"
           variant={variant}
           value={value}
           onChange={inputChange}
+          action={action}
+          disabled={disabled}
         />
         <Select
           value={devicePSKBitCount?.toString()}
           onValueChange={(e) => selectChange(e)}
         >
-          <SelectTrigger>
+          <SelectTrigger className="!max-w-max">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
