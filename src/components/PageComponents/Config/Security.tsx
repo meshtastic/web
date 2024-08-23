@@ -1,4 +1,8 @@
 import { DynamicForm } from "@app/components/Form/DynamicForm.js";
+import {
+  getX25519PrivateKey,
+  getX25519PublicKey,
+} from "@app/core/utils/x25519";
 import type { SecurityValidation } from "@app/validation/config/security.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
@@ -50,22 +54,25 @@ export const Security = (): JSX.Element => {
     );
   };
 
-  const clickEvent = (
-    setKey: (value: React.SetStateAction<string>) => void,
-    bitCount: number,
-    setValidationText: (
-      value: React.SetStateAction<string | undefined>,
-    ) => void,
-  ) => {
-    setKey(
+  const privateKeyClickEvent = () => {
+    const privateKey = getX25519PrivateKey();
+    const publicKey = getX25519PublicKey(privateKey);
+
+    setPrivateKey(fromByteArray(privateKey));
+    setPublicKey(fromByteArray(publicKey));
+    setPrivateKeyValidationText(undefined);
+  };
+
+  const adminKeyClickEvent = () => {
+    setAdminKey(
       btoa(
         cryptoRandomString({
-          length: bitCount ?? 0,
+          length: adminKeyBitCount ?? 0,
           type: "alphanumeric",
         }),
       ),
     );
-    setValidationText(undefined);
+    setAdminKeyValidationText(undefined);
   };
 
   const validatePass = (
@@ -129,17 +136,13 @@ export const Security = (): JSX.Element => {
               name: "privateKey",
               label: "Private Key",
               description: "Used to create a shared key with a remote device",
+              bits: [{ text: "128 bit", value: "16", key: "bit128" }],
               validationText: privateKeyValidationText,
               devicePSKBitCount: privateKeyBitCount,
               inputChange: privateKeyInputChangeEvent,
               selectChange: privateKeySelectChangeEvent,
               hide: !privateKeyVisible,
-              buttonClick: () =>
-                clickEvent(
-                  setPrivateKey,
-                  privateKeyBitCount,
-                  setPrivateKeyValidationText,
-                ),
+              buttonClick: privateKeyClickEvent,
               disabledBy: [
                 {
                   fieldName: "adminChannelEnabled",
@@ -161,6 +164,9 @@ export const Security = (): JSX.Element => {
               description:
                 "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
               disabledBy: [{ fieldName: "always" }],
+              properties: {
+                value: publicKey,
+              },
             },
           ],
         },
@@ -193,12 +199,7 @@ export const Security = (): JSX.Element => {
               inputChange: adminKeyInputChangeEvent,
               selectChange: adminKeySelectChangeEvent,
               hide: !adminKeyVisible,
-              buttonClick: () =>
-                clickEvent(
-                  setAdminKey,
-                  adminKeyBitCount,
-                  setAdminKeyValidationText,
-                ),
+              buttonClick: adminKeyClickEvent,
               disabledBy: [{ fieldName: "adminChannelEnabled" }],
               properties: {
                 value: adminKey,
