@@ -19,7 +19,7 @@ export const Security = (): JSX.Element => {
   );
   const [privateKeyVisible, setPrivateKeyVisible] = useState<boolean>(false);
   const [privateKeyBitCount, setPrivateKeyBitCount] = useState<number>(
-    config.security?.privateKey.length ?? 16,
+    config.security?.privateKey.length ?? 32,
   );
   const [privateKeyValidationText, setPrivateKeyValidationText] =
     useState<string>();
@@ -60,7 +60,11 @@ export const Security = (): JSX.Element => {
 
     setPrivateKey(fromByteArray(privateKey));
     setPublicKey(fromByteArray(publicKey));
-    setPrivateKeyValidationText(undefined);
+    validatePass(
+      fromByteArray(privateKey),
+      privateKeyBitCount,
+      setPrivateKeyValidationText,
+    );
   };
 
   const adminKeyClickEvent = () => {
@@ -82,19 +86,31 @@ export const Security = (): JSX.Element => {
       value: React.SetStateAction<string | undefined>,
     ) => void,
   ) => {
-    if (input.length % 4 !== 0 || toByteArray(input).length !== count) {
+    try {
+      if (input.length % 4 !== 0 || toByteArray(input).length !== count) {
+        setValidationText(`Please enter a valid ${count * 8} bit PSK.`);
+      } else {
+        setValidationText(undefined);
+      }
+    } catch (e) {
+      console.error(e);
       setValidationText(`Please enter a valid ${count * 8} bit PSK.`);
-    } else {
-      setValidationText(undefined);
     }
   };
 
   const privateKeyInputChangeEvent = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const psk = e.currentTarget?.value;
-    setPrivateKey(psk);
-    validatePass(psk, privateKeyBitCount, setPrivateKeyValidationText);
+    const privateKeyB64String = e.currentTarget?.value;
+    setPrivateKey(privateKeyB64String);
+    validatePass(
+      privateKeyB64String,
+      privateKeyBitCount,
+      setPrivateKeyValidationText,
+    );
+
+    const publicKey = getX25519PublicKey(toByteArray(privateKeyB64String));
+    setPublicKey(fromByteArray(publicKey));
   };
 
   const adminKeyInputChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,7 +152,7 @@ export const Security = (): JSX.Element => {
               name: "privateKey",
               label: "Private Key",
               description: "Used to create a shared key with a remote device",
-              bits: [{ text: "128 bit", value: "16", key: "bit128" }],
+              bits: [{ text: "256 bit", value: "32", key: "bit256" }],
               validationText: privateKeyValidationText,
               devicePSKBitCount: privateKeyBitCount,
               inputChange: privateKeyInputChangeEvent,
