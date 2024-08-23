@@ -41,11 +41,13 @@ export const App = (): JSX.Element => {
                     <PageRouter />
                   </div>
                 ) : (
-                  <Dashboard />
+                  <>
+                    <Dashboard />
+                    <Footer />
+                  </>
                 )}
               </div>
             </div>
-            <Footer />
           </div>
         </DeviceWrapper>
       </MapProvider>
