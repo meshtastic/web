@@ -17,6 +17,7 @@ export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   value: string;
   variant: "default" | "invalid";
   buttonText?: string;
+  bits?: { text: string; value: string; key: string }[];
   selectChange: (event: string) => void;
   inputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   buttonClick: React.MouseEventHandler<HTMLButtonElement>;
@@ -35,6 +36,11 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
       variant,
       value,
       buttonText,
+      bits = [
+        { text: "256 bit", value: "32", key: "bit256" },
+        { text: "128 bit", value: "16", key: "bit128" },
+        { text: "8 bit", value: "1", key: "bit8" },
+      ],
       selectChange,
       inputChange,
       buttonClick,
@@ -63,15 +69,11 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem key="bit256" value="32">
-              256 bit
-            </SelectItem>
-            <SelectItem key="bit128" value="16">
-              128 bit
-            </SelectItem>
-            <SelectItem key="bit8" value="1">
-              8 bit
-            </SelectItem>
+            {bits.map(({ text, value, key }) => (
+              <SelectItem key={key} value={value}>
+                {text}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Button
