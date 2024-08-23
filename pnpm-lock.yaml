@@ -17,6 +17,9 @@ importers:
       '@meshtastic/js':
         specifier: 2.3.7-1
         version: 2.3.7-1
+      '@noble/curves':
+        specifier: ^1.5.0
+        version: 1.5.0
       '@radix-ui/react-accordion':
         specifier: ^1.2.0
         version: 1.2.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -583,6 +586,13 @@ packages:
 
   '@meshtastic/js@2.3.7-1':
     resolution: {integrity: sha512-pv+Xk6HkKrScCrQp31k5QOUYozabXn6NhXN7c7Cc9ysG94U1wGtfueRbEbFxXCHO3JshNz0CdE1FcSMnrLMjsQ==}
+
+  '@noble/curves@1.5.0':
+    resolution: {integrity: sha512-J5EKamIHnKPyClwVrzmaf5wSdQXgdHcPZIZLu3bwnbeCx8/7NPK5q2ZBWF+5FvYGByjiQQsJYX6jfgB2wDPn3A==}
+
+  '@noble/hashes@1.4.0':
+    resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
+    engines: {node: '>= 16'}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -3484,6 +3494,12 @@ snapshots:
       tslog: 4.9.3
     transitivePeerDependencies:
       - buffer
+
+  '@noble/curves@1.5.0':
+    dependencies:
+      '@noble/hashes': 1.4.0
+
+  '@noble/hashes@1.4.0': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
