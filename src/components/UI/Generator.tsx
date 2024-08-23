@@ -64,6 +64,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
         <Select
           value={devicePSKBitCount?.toString()}
           onValueChange={(e) => selectChange(e)}
+          disabled={disabled}
         >
           <SelectTrigger className="!max-w-max">
             <SelectValue />
@@ -80,6 +81,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
           type="button"
           variant="success"
           onClick={buttonClick}
+          disabled={disabled}
           {...props}
         >
           {buttonText}
