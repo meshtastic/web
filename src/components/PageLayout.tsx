@@ -1,5 +1,6 @@
 import { cn } from "@app/core/utils/cn.js";
 import { AlignLeftIcon, type LucideIcon } from "lucide-react";
+import Footer from "./UI/Footer";
 
 export interface PageLayoutProps {
   label: string;
@@ -18,6 +19,7 @@ export const PageLayout = ({
   children,
 }: PageLayoutProps): JSX.Element => {
   return (
+    <>
     <div className="relative flex h-full w-full flex-col">
       <div className="flex h-14 shrink-0 border-b-[0.5px] border-slate-300 dark:border-slate-700 md:h-16 md:px-4">
         <button
@@ -47,11 +49,13 @@ export const PageLayout = ({
       <div
         className={cn(
           "flex h-full w-full flex-col overflow-y-auto",
-          !noPadding && "p-3",
+          !noPadding && "pl-3 pr-3 ",
         )}
       >
         {children}
+        <Footer />
       </div>
     </div>
+    </>
   );
 };
