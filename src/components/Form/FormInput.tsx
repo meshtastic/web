@@ -9,6 +9,7 @@ import { Controller, type FieldValues } from "react-hook-form";
 export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "text" | "number" | "password";
   properties?: {
+    value?: string;
     prefix?: string;
     suffix?: string;
     step?: number;
