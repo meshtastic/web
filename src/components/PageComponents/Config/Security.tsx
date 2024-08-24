@@ -29,10 +29,6 @@ export const Security = (): JSX.Element => {
   const [adminKey, setAdminKey] = useState<string>(
     fromByteArray(config.security?.adminKey ?? new Uint8Array(0)),
   );
-  const [adminKeyVisible, setAdminKeyVisible] = useState<boolean>(false);
-  const [adminKeyBitCount, setAdminKeyBitCount] = useState<number>(
-    config.security?.adminKey.length ?? 16,
-  );
   const [adminKeyValidationText, setAdminKeyValidationText] =
     useState<string>();
 
@@ -54,32 +50,7 @@ export const Security = (): JSX.Element => {
     );
   };
 
-  const privateKeyClickEvent = () => {
-    const privateKey = getX25519PrivateKey();
-    const publicKey = getX25519PublicKey(privateKey);
-
-    setPrivateKey(fromByteArray(privateKey));
-    setPublicKey(fromByteArray(publicKey));
-    validatePass(
-      fromByteArray(privateKey),
-      privateKeyBitCount,
-      setPrivateKeyValidationText,
-    );
-  };
-
-  const adminKeyClickEvent = () => {
-    setAdminKey(
-      btoa(
-        cryptoRandomString({
-          length: adminKeyBitCount ?? 0,
-          type: "alphanumeric",
-        }),
-      ),
-    );
-    setAdminKeyValidationText(undefined);
-  };
-
-  const validatePass = (
+  const validateKey = (
     input: string,
     count: number,
     setValidationText: (
@@ -98,12 +69,25 @@ export const Security = (): JSX.Element => {
     }
   };
 
+  const privateKeyClickEvent = () => {
+    const privateKey = getX25519PrivateKey();
+    const publicKey = getX25519PublicKey(privateKey);
+
+    setPrivateKey(fromByteArray(privateKey));
+    setPublicKey(fromByteArray(publicKey));
+    validateKey(
+      fromByteArray(privateKey),
+      privateKeyBitCount,
+      setPrivateKeyValidationText,
+    );
+  };
+
   const privateKeyInputChangeEvent = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const privateKeyB64String = e.currentTarget?.value;
     setPrivateKey(privateKeyB64String);
-    validatePass(
+    validateKey(
       privateKeyB64String,
       privateKeyBitCount,
       setPrivateKeyValidationText,
@@ -116,19 +100,13 @@ export const Security = (): JSX.Element => {
   const adminKeyInputChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
     const psk = e.currentTarget?.value;
     setAdminKey(psk);
-    validatePass(psk, privateKeyBitCount, setAdminKeyValidationText);
+    validateKey(psk, privateKeyBitCount, setAdminKeyValidationText);
   };
 
   const privateKeySelectChangeEvent = (e: string) => {
     const count = Number.parseInt(e);
     setPrivateKeyBitCount(count);
-    validatePass(privateKey, count, setPrivateKeyValidationText);
-  };
-
-  const adminKeySelectChangeEvent = (e: string) => {
-    const count = Number.parseInt(e);
-    setAdminKeyBitCount(count);
-    validatePass(privateKey, count, setAdminKeyValidationText);
+    validateKey(privateKey, count, setPrivateKeyValidationText);
   };
 
   return (
@@ -205,24 +183,16 @@ export const Security = (): JSX.Element => {
                 'If true, device is considered to be "managed" by a mesh administrator via admin messages',
             },
             {
-              type: "passwordGenerator",
+              type: "text",
               name: "adminKey",
               label: "Admin Key",
               description:
                 "The public key authorized to send admin messages to this node",
               validationText: adminKeyValidationText,
-              devicePSKBitCount: adminKeyBitCount,
               inputChange: adminKeyInputChangeEvent,
-              selectChange: adminKeySelectChangeEvent,
-              hide: !adminKeyVisible,
-              buttonClick: adminKeyClickEvent,
               disabledBy: [{ fieldName: "adminChannelEnabled" }],
               properties: {
                 value: adminKey,
-                action: {
-                  icon: adminKeyVisible ? EyeOff : Eye,
-                  onClick: () => setAdminKeyVisible(!adminKeyVisible),
-                },
               },
             },
           ],
