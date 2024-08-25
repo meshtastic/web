@@ -7,7 +7,6 @@ import type { SecurityValidation } from "@app/validation/config/security.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
-import cryptoRandomString from "crypto-random-string";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
@@ -70,6 +69,11 @@ export const Security = (): JSX.Element => {
   };
 
   const privateKeyClickEvent = () => {
+    const generate = confirm(
+      "Are you sure you want to generate a new key pair?",
+    );
+    if (!generate) return;
+
     const privateKey = getX25519PrivateKey();
     const publicKey = getX25519PublicKey(privateKey);
 
