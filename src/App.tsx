@@ -43,7 +43,7 @@ export const App = (): JSX.Element => {
                 ) : (
                   <>
                     <Dashboard />
-                    <div className="flex flex-grow"></div>
+                    <div className="flex flex-grow" />
                     <Footer />
                   </>
                 )}
