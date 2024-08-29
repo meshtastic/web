@@ -200,10 +200,17 @@ export const CommandPalette = (): JSX.Element => {
           },
         },
         {
-          label: "Factory Reset",
+          label: "Factory Reset Device",
           icon: FactoryIcon,
           action() {
-            connection?.factoryReset();
+            connection?.factoryResetDevice();
+          },
+        },
+        {
+          label: "Factory Reset Config",
+          icon: FactoryIcon,
+          action() {
+            connection?.factoryResetConfig();
           },
         },
       ],
