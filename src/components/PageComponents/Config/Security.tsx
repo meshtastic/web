@@ -122,6 +122,11 @@ export const Security = (): JSX.Element => {
           adminKey: adminKey,
           privateKey: privateKey,
           publicKey: publicKey,
+          adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
+          isManaged: config.security?.isManaged ?? false,
+          bluetoothLoggingEnabled: config.security?.bluetoothLoggingEnabled ?? false,
+          debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
+          serialEnabled: config.security?.serialEnabled ?? false,
         },
       }}
       fieldGroups={[
@@ -170,7 +175,7 @@ export const Security = (): JSX.Element => {
         },
         {
           label: "Admin Settings",
-          description: "Settings for Admin ",
+          description: "Settings for Admin",
           fields: [
             {
               type: "toggle",
