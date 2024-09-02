@@ -126,7 +126,8 @@ export const Security = (): JSX.Element => {
           publicKey: publicKey,
           adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
           isManaged: config.security?.isManaged ?? false,
-          bluetoothLoggingEnabled: config.security?.bluetoothLoggingEnabled ?? false,
+          bluetoothLoggingEnabled:
+            config.security?.bluetoothLoggingEnabled ?? false,
           debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
           serialEnabled: config.security?.serialEnabled ?? false,
         },
