@@ -89,7 +89,7 @@ export const Security = (): JSX.Element => {
   const privateKeyInputChangeEvent = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const privateKeyB64String = e.currentTarget?.value;
+    const privateKeyB64String = e.target.value;
     setPrivateKey(privateKeyB64String);
     validateKey(
       privateKeyB64String,
@@ -116,6 +116,8 @@ export const Security = (): JSX.Element => {
   return (
     <DynamicForm<SecurityValidation>
       onSubmit={onSubmit}
+      submitType="onSubmit"
+      hasSubmitButton={true}
       defaultValues={{
         ...config.security,
         ...{
