@@ -1,3 +1,4 @@
+import { PkiRegenerateDialog } from "@app/components/Dialog/PkiRegenerateDialog";
 import { DynamicForm } from "@app/components/Form/DynamicForm.js";
 import {
   getX25519PrivateKey,
@@ -30,6 +31,7 @@ export const Security = (): JSX.Element => {
   );
   const [adminKeyValidationText, setAdminKeyValidationText] =
     useState<string>();
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const onSubmit = (data: SecurityValidation) => {
     if (privateKeyValidationText || adminKeyValidationText) return;
@@ -69,11 +71,10 @@ export const Security = (): JSX.Element => {
   };
 
   const privateKeyClickEvent = () => {
-    const generate = confirm(
-      "Are you sure you want to generate a new key pair?",
-    );
-    if (!generate) return;
+    setDialogOpen(true);
+  };
 
+  const pkiRegenerate = () => {
     const privateKey = getX25519PrivateKey();
     const publicKey = getX25519PublicKey(privateKey);
 
@@ -84,6 +85,8 @@ export const Security = (): JSX.Element => {
       privateKeyBitCount,
       setPrivateKeyValidationText,
     );
+
+    setDialogOpen(false);
   };
 
   const privateKeyInputChangeEvent = (
@@ -114,126 +117,134 @@ export const Security = (): JSX.Element => {
   };
 
   return (
-    <DynamicForm<SecurityValidation>
-      onSubmit={onSubmit}
-      submitType="onSubmit"
-      hasSubmitButton={true}
-      defaultValues={{
-        ...config.security,
-        ...{
-          adminKey: adminKey,
-          privateKey: privateKey,
-          publicKey: publicKey,
-          adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
-          isManaged: config.security?.isManaged ?? false,
-          bluetoothLoggingEnabled:
-            config.security?.bluetoothLoggingEnabled ?? false,
-          debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
-          serialEnabled: config.security?.serialEnabled ?? false,
-        },
-      }}
-      fieldGroups={[
-        {
-          label: "Security Settings",
-          description: "Settings for the Security configuration",
-          fields: [
-            {
-              type: "passwordGenerator",
-              name: "privateKey",
-              label: "Private Key",
-              description: "Used to create a shared key with a remote device",
-              bits: [{ text: "256 bit", value: "32", key: "bit256" }],
-              validationText: privateKeyValidationText,
-              devicePSKBitCount: privateKeyBitCount,
-              inputChange: privateKeyInputChangeEvent,
-              selectChange: privateKeySelectChangeEvent,
-              hide: !privateKeyVisible,
-              buttonClick: privateKeyClickEvent,
-              disabledBy: [
-                {
-                  fieldName: "adminChannelEnabled",
-                  invert: true,
+    <>
+      <DynamicForm<SecurityValidation>
+        onSubmit={onSubmit}
+        submitType="onSubmit"
+        hasSubmitButton={true}
+        defaultValues={{
+          ...config.security,
+          ...{
+            adminKey: adminKey,
+            privateKey: privateKey,
+            publicKey: publicKey,
+            adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
+            isManaged: config.security?.isManaged ?? false,
+            bluetoothLoggingEnabled:
+              config.security?.bluetoothLoggingEnabled ?? false,
+            debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
+            serialEnabled: config.security?.serialEnabled ?? false,
+          },
+        }}
+        fieldGroups={[
+          {
+            label: "Security Settings",
+            description: "Settings for the Security configuration",
+            fields: [
+              {
+                type: "passwordGenerator",
+                name: "privateKey",
+                label: "Private Key",
+                description: "Used to create a shared key with a remote device",
+                bits: [{ text: "256 bit", value: "32", key: "bit256" }],
+                validationText: privateKeyValidationText,
+                devicePSKBitCount: privateKeyBitCount,
+                inputChange: privateKeyInputChangeEvent,
+                selectChange: privateKeySelectChangeEvent,
+                hide: !privateKeyVisible,
+                buttonClick: privateKeyClickEvent,
+                disabledBy: [
+                  {
+                    fieldName: "adminChannelEnabled",
+                    invert: true,
+                  },
+                ],
+                properties: {
+                  value: privateKey,
+                  action: {
+                    icon: privateKeyVisible ? EyeOff : Eye,
+                    onClick: () => setPrivateKeyVisible(!privateKeyVisible),
+                  },
                 },
-              ],
-              properties: {
-                value: privateKey,
-                action: {
-                  icon: privateKeyVisible ? EyeOff : Eye,
-                  onClick: () => setPrivateKeyVisible(!privateKeyVisible),
+              },
+              {
+                type: "text",
+                name: "publicKey",
+                label: "Public Key",
+                description:
+                  "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+                disabledBy: [{ fieldName: "always" }],
+                properties: {
+                  value: publicKey,
                 },
               },
-            },
-            {
-              type: "text",
-              name: "publicKey",
-              label: "Public Key",
-              description:
-                "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
-              disabledBy: [{ fieldName: "always" }],
-              properties: {
-                value: publicKey,
+            ],
+          },
+          {
+            label: "Admin Settings",
+            description: "Settings for Admin",
+            fields: [
+              {
+                type: "toggle",
+                name: "adminChannelEnabled",
+                label: "Allow Legacy Admin",
+                description:
+                  "Allow incoming device control over the insecure legacy admin channel",
               },
-            },
-          ],
-        },
-        {
-          label: "Admin Settings",
-          description: "Settings for Admin",
-          fields: [
-            {
-              type: "toggle",
-              name: "adminChannelEnabled",
-              label: "Allow Legacy Admin",
-              description:
-                "Allow incoming device control over the insecure legacy admin channel",
-            },
-            {
-              type: "toggle",
-              name: "isManaged",
-              label: "Managed",
-              description:
-                'If true, device is considered to be "managed" by a mesh administrator via admin messages',
-            },
-            {
-              type: "text",
-              name: "adminKey",
-              label: "Admin Key",
-              description:
-                "The public key authorized to send admin messages to this node",
-              validationText: adminKeyValidationText,
-              inputChange: adminKeyInputChangeEvent,
-              disabledBy: [{ fieldName: "adminChannelEnabled" }],
-              properties: {
-                value: adminKey,
+              {
+                type: "toggle",
+                name: "isManaged",
+                label: "Managed",
+                description:
+                  'If true, device is considered to be "managed" by a mesh administrator via admin messages',
               },
-            },
-          ],
-        },
-        {
-          label: "Logging Settings",
-          description: "Settings for Logging",
-          fields: [
-            {
-              type: "toggle",
-              name: "bluetoothLoggingEnabled",
-              label: "Allow Bluetooth Logging",
-              description: "Enables device (serial style logs) over Bluetooth",
-            },
-            {
-              type: "toggle",
-              name: "debugLogApiEnabled",
-              label: "Enable Debug Log API",
-              description: "Output live debug logging over serial",
-            },
-            {
-              type: "toggle",
-              name: "serialEnabled",
-              label: "Serial Output Enabled",
-              description: "Serial Console over the Stream API",
-            },
-          ],
-        },
-      ]}
-    />
+              {
+                type: "text",
+                name: "adminKey",
+                label: "Admin Key",
+                description:
+                  "The public key authorized to send admin messages to this node",
+                validationText: adminKeyValidationText,
+                inputChange: adminKeyInputChangeEvent,
+                disabledBy: [{ fieldName: "adminChannelEnabled" }],
+                properties: {
+                  value: adminKey,
+                },
+              },
+            ],
+          },
+          {
+            label: "Logging Settings",
+            description: "Settings for Logging",
+            fields: [
+              {
+                type: "toggle",
+                name: "bluetoothLoggingEnabled",
+                label: "Allow Bluetooth Logging",
+                description:
+                  "Enables device (serial style logs) over Bluetooth",
+              },
+              {
+                type: "toggle",
+                name: "debugLogApiEnabled",
+                label: "Enable Debug Log API",
+                description: "Output live debug logging over serial",
+              },
+              {
+                type: "toggle",
+                name: "serialEnabled",
+                label: "Serial Output Enabled",
+                description: "Serial Console over the Stream API",
+              },
+            ],
+          },
+        ]}
+      />
+      <PkiRegenerateDialog
+        open={dialogOpen}
+        onOpenChange={() => setDialogOpen(false)}
+        onSubmit={() => pkiRegenerate()}
+      />
+    </>
   );
 };
