@@ -19,3 +19,12 @@ jobs:
 
       - name: Build Package
         run: pnpm build
+
+      - name: Compress build
+        run: pnpm package
+
+      - name: Archive compressed build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: dist/build.tar
