@@ -27,15 +27,6 @@ jobs:
       - name: Package Output
         run: pnpm package
 
-      - name: Upload Artifact
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: false
-          files: |
-            ./dist/build.tar
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
