@@ -153,12 +153,6 @@ export const Security = (): JSX.Element => {
                 selectChange: privateKeySelectChangeEvent,
                 hide: !privateKeyVisible,
                 buttonClick: privateKeyClickEvent,
-                disabledBy: [
-                  {
-                    fieldName: "adminChannelEnabled",
-                    invert: true,
-                  },
-                ],
                 properties: {
                   value: privateKey,
                   action: {
