@@ -67,10 +67,10 @@ export function DynamicForm<T extends FieldValues>({
     disabledBy?: DisabledBy<T>[],
     disabled?: boolean,
   ): boolean => {
+    if (disabled) return true;
     if (!disabledBy) return false;
 
     return disabledBy.some((field) => {
-      if (disabled) return true;
       const value = getValues(field.fieldName);
       if (value === "always") return true;
       if (typeof value === "boolean") return field.invert ? value : !value;
