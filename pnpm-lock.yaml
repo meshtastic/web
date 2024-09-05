@@ -15,8 +15,8 @@ importers:
         specifier: ^0.5.2
         version: 0.5.2
       '@meshtastic/js':
-        specifier: 2.3.7-0
-        version: 2.3.7-0
+        specifier: 2.3.7-1
+        version: 2.3.7-1
       '@radix-ui/react-accordion':
         specifier: ^1.2.0
         version: 1.2.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -581,8 +581,8 @@ packages:
     resolution: {integrity: sha512-eSiQ3E5LUSxAOY9ABXGyfNhout2iEa6mUxKeaQ9nJ8NL1NuaQYU7zKqzx/LEYcXe1neT4uYAgM1wYZj3fTSXtA==}
     hasBin: true
 
-  '@meshtastic/js@2.3.7-0':
-    resolution: {integrity: sha512-XTNyUXj3SWQ91XqwgrTZT7rTQsiI3d8noRaxnpxRw6Ck7WtjjPF0ygnPA8eQ6kastyUkgpXzcjtD9a6Qz6n+WQ==}
+  '@meshtastic/js@2.3.7-1':
+    resolution: {integrity: sha512-pv+Xk6HkKrScCrQp31k5QOUYozabXn6NhXN7c7Cc9ysG94U1wGtfueRbEbFxXCHO3JshNz0CdE1FcSMnrLMjsQ==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -3477,7 +3477,7 @@ snapshots:
       sort-object: 3.0.3
       tinyqueue: 2.0.3
 
-  '@meshtastic/js@2.3.7-0':
+  '@meshtastic/js@2.3.7-1':
     dependencies:
       crc: 4.3.2
       ste-simple-events: 3.0.11
