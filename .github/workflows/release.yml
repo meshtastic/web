@@ -1,0 +1,55 @@
+name: 'Release'
+
+on:
+  release:
+    types: [released]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build Package
+        run: pnpm build
+
+      - name: Package Output
+        run: pnpm package
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Buildah Build
+        id: build-container
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: |
+            ./Containerfile
+          image: ${{github.event.repository.full_name}}
+          tags: latest ${{ github.sha }}
+          oci: true
+          platforms: linux/amd64, linux/arm64
+
+      - name: Push To Registry
+        id: push-to-registry
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-container.outputs.image }}
+          tags: ${{ steps.build-container.outputs.tags }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print image url
+        run: echo "Image pushed to ${{ steps.push-to-registry.outputs.registry-paths }}"
