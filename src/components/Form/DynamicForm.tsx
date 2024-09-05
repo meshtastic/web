@@ -16,13 +16,14 @@ import {
 } from "react-hook-form";
 
 interface DisabledBy<T> {
-  fieldName: Path<T> | "always";
+  fieldName: Path<T>;
   selector?: number;
   invert?: boolean;
 }
 
 export interface BaseFormBuilderProps<T> {
   name: Path<T>;
+  disabled?: boolean;
   disabledBy?: DisabledBy<T>[];
   label: string;
   description?: string;
@@ -62,11 +63,14 @@ export function DynamicForm<T extends FieldValues>({
     defaultValues: defaultValues,
   });
 
-  const isDisabled = (disabledBy?: DisabledBy<T>[]): boolean => {
+  const isDisabled = (
+    disabledBy?: DisabledBy<T>[],
+    disabled?: boolean,
+  ): boolean => {
     if (!disabledBy) return false;
 
     return disabledBy.some((field) => {
-      if (field.fieldName === "always") return true;
+      if (disabled) return true;
       const value = getValues(field.fieldName);
       if (value === "always") return true;
       if (typeof value === "boolean") return field.invert ? value : !value;
@@ -111,7 +115,7 @@ export function DynamicForm<T extends FieldValues>({
               <DynamicFormField
                 field={field}
                 control={control}
-                disabled={isDisabled(field.disabledBy)}
+                disabled={isDisabled(field.disabledBy, field.disabled)}
               />
             </FieldWrapper>
           ))}
