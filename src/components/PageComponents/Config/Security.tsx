@@ -120,8 +120,7 @@ export const Security = (): JSX.Element => {
     <>
       <DynamicForm<SecurityValidation>
         onSubmit={onSubmit}
-        submitType="onSubmit"
-        hasSubmitButton={true}
+        submitType="onChange"
         defaultValues={{
           ...config.security,
           ...{

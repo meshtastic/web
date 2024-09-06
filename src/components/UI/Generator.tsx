@@ -50,6 +50,21 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
     },
     ref,
   ) => {
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
+    // Invokes onChange event on the input element when the value changes from the parent component
+    React.useEffect(() => {
+      if (!inputRef.current) return;
+      const setValue = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value",
+      )?.set;
+
+      if (!setValue) return;
+      inputRef.current.value = "";
+      setValue.call(inputRef.current, value);
+      inputRef.current.dispatchEvent(new Event("input", { bubbles: true }));
+    }, [value]);
     return (
       <>
         <Input
@@ -60,6 +75,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
           onChange={inputChange}
           action={action}
           disabled={disabled}
+          ref={inputRef}
         />
         <Select
           value={devicePSKBitCount?.toString()}
