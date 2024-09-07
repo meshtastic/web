@@ -67,60 +67,62 @@ export const MessagesPage = (): JSX.Element => {
           ))}
         </SidebarSection>
       </Sidebar>
-      <PageLayout
-        label={`Messages: ${
-          chatType === "broadcast" && currentChannel
-            ? getChannelName(currentChannel)
-            : chatType === "direct" && nodes.get(activeChat)
-              ? nodes.get(activeChat)?.user?.longName ?? "Unknown"
-              : "Loading..."
-        }`}
-        actions={
-          chatType === "direct"
-            ? [
-                {
-                  icon: WaypointsIcon,
-                  async onClick() {
-                    const targetNode = nodes.get(activeChat)?.num;
-                    if (targetNode === undefined) return;
-                    toast({
-                      title: "Sending Traceroute, please wait...",
-                    });
-                    await connection?.traceRoute(targetNode).then(() =>
+      <div className="flex flex-col flex-grow">
+        <PageLayout
+          label={`Messages: ${
+            chatType === "broadcast" && currentChannel
+              ? getChannelName(currentChannel)
+              : chatType === "direct" && nodes.get(activeChat)
+                ? nodes.get(activeChat)?.user?.longName ?? "Unknown"
+                : "Loading..."
+          }`}
+          actions={
+            chatType === "direct"
+              ? [
+                  {
+                    icon: WaypointsIcon,
+                    async onClick() {
+                      const targetNode = nodes.get(activeChat)?.num;
+                      if (targetNode === undefined) return;
                       toast({
-                        title: "Traceroute sent.",
-                      }),
-                    );
+                        title: "Sending Traceroute, please wait...",
+                      });
+                      await connection?.traceRoute(targetNode).then(() =>
+                        toast({
+                          title: "Traceroute sent.",
+                        }),
+                      );
+                    },
                   },
-                },
-              ]
-            : []
-        }
-      >
-        {allChannels.map(
-          (channel) =>
-            activeChat === channel.index && (
-              <ChannelChat
-                key={channel.index}
-                to="broadcast"
-                messages={messages.broadcast.get(channel.index)}
-                channel={channel.index}
-              />
-            ),
-        )}
-        {filteredNodes.map(
-          (node) =>
-            activeChat === node.num && (
-              <ChannelChat
-                key={node.num}
-                to={activeChat}
-                messages={messages.direct.get(node.num)}
-                channel={Types.ChannelNumber.Primary}
-                traceroutes={traceroutes.get(node.num)}
-              />
-            ),
-        )}
-      </PageLayout>
+                ]
+              : []
+          }
+        >
+          {allChannels.map(
+            (channel) =>
+              activeChat === channel.index && (
+                <ChannelChat
+                  key={channel.index}
+                  to="broadcast"
+                  messages={messages.broadcast.get(channel.index)}
+                  channel={channel.index}
+                />
+              ),
+          )}
+          {filteredNodes.map(
+            (node) =>
+              activeChat === node.num && (
+                <ChannelChat
+                  key={node.num}
+                  to={activeChat}
+                  messages={messages.direct.get(node.num)}
+                  channel={Types.ChannelNumber.Primary}
+                  traceroutes={traceroutes.get(node.num)}
+                />
+              ),
+          )}
+        </PageLayout>
+      </div>
     </>
   );
 };

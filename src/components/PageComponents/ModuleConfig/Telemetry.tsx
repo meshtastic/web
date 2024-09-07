@@ -87,7 +87,7 @@ export const Telemetry = (): JSX.Element => {
               description: "How often to send Power data over the mesh",
             },
             {
-              type: "text",
+              type: "toggle",
               name: "powerScreenEnabled",
               label: "Power Screen Enabled",
               description: "Enable the Power Telemetry Screen",

@@ -5,6 +5,7 @@ import { DeviceSelector } from "@components/DeviceSelector.js";
 import { DialogManager } from "@components/Dialog/DialogManager.js";
 import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.js";
 import { Toaster } from "@components/Toaster.js";
+import Footer from "@components/UI/Footer.js";
 import { ThemeController } from "@components/generic/ThemeController.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
@@ -40,7 +41,11 @@ export const App = (): JSX.Element => {
                     <PageRouter />
                   </div>
                 ) : (
-                  <Dashboard />
+                  <>
+                    <Dashboard />
+                    <div className="flex flex-grow" />
+                    <Footer />
+                  </>
                 )}
               </div>
             </div>
