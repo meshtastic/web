@@ -1,9 +1,13 @@
+import { PkiRegenerateDialog } from "@app/components/Dialog/PkiRegenerateDialog";
 import { DynamicForm } from "@app/components/Form/DynamicForm.js";
+import {
+  getX25519PrivateKey,
+  getX25519PublicKey,
+} from "@app/core/utils/x25519";
 import type { SecurityValidation } from "@app/validation/config/security.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
-import cryptoRandomString from "crypto-random-string";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
@@ -15,7 +19,7 @@ export const Security = (): JSX.Element => {
   );
   const [privateKeyVisible, setPrivateKeyVisible] = useState<boolean>(false);
   const [privateKeyBitCount, setPrivateKeyBitCount] = useState<number>(
-    config.security?.privateKey.length ?? 16,
+    config.security?.privateKey.length ?? 32,
   );
   const [privateKeyValidationText, setPrivateKeyValidationText] =
     useState<string>();
@@ -25,12 +29,9 @@ export const Security = (): JSX.Element => {
   const [adminKey, setAdminKey] = useState<string>(
     fromByteArray(config.security?.adminKey ?? new Uint8Array(0)),
   );
-  const [adminKeyVisible, setAdminKeyVisible] = useState<boolean>(false);
-  const [adminKeyBitCount, setAdminKeyBitCount] = useState<number>(
-    config.security?.adminKey.length ?? 16,
-  );
   const [adminKeyValidationText, setAdminKeyValidationText] =
     useState<string>();
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const onSubmit = (data: SecurityValidation) => {
     if (privateKeyValidationText || adminKeyValidationText) return;
@@ -50,191 +51,195 @@ export const Security = (): JSX.Element => {
     );
   };
 
-  const clickEvent = (
-    setKey: (value: React.SetStateAction<string>) => void,
-    bitCount: number,
-    setValidationText: (
-      value: React.SetStateAction<string | undefined>,
-    ) => void,
-  ) => {
-    setKey(
-      btoa(
-        cryptoRandomString({
-          length: bitCount ?? 0,
-          type: "alphanumeric",
-        }),
-      ),
-    );
-    setValidationText(undefined);
-  };
-
-  const validatePass = (
+  const validateKey = (
     input: string,
     count: number,
     setValidationText: (
       value: React.SetStateAction<string | undefined>,
     ) => void,
   ) => {
-    if (input.length % 4 !== 0 || toByteArray(input).length !== count) {
+    try {
+      if (input.length % 4 !== 0 || toByteArray(input).length !== count) {
+        setValidationText(`Please enter a valid ${count * 8} bit PSK.`);
+      } else {
+        setValidationText(undefined);
+      }
+    } catch (e) {
+      console.error(e);
       setValidationText(`Please enter a valid ${count * 8} bit PSK.`);
-    } else {
-      setValidationText(undefined);
     }
+  };
+
+  const privateKeyClickEvent = () => {
+    setDialogOpen(true);
+  };
+
+  const pkiRegenerate = () => {
+    const privateKey = getX25519PrivateKey();
+    const publicKey = getX25519PublicKey(privateKey);
+
+    setPrivateKey(fromByteArray(privateKey));
+    setPublicKey(fromByteArray(publicKey));
+    validateKey(
+      fromByteArray(privateKey),
+      privateKeyBitCount,
+      setPrivateKeyValidationText,
+    );
+
+    setDialogOpen(false);
   };
 
   const privateKeyInputChangeEvent = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const psk = e.currentTarget?.value;
-    setPrivateKey(psk);
-    validatePass(psk, privateKeyBitCount, setPrivateKeyValidationText);
+    const privateKeyB64String = e.target.value;
+    setPrivateKey(privateKeyB64String);
+    validateKey(
+      privateKeyB64String,
+      privateKeyBitCount,
+      setPrivateKeyValidationText,
+    );
+
+    const publicKey = getX25519PublicKey(toByteArray(privateKeyB64String));
+    setPublicKey(fromByteArray(publicKey));
   };
 
   const adminKeyInputChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
     const psk = e.currentTarget?.value;
     setAdminKey(psk);
-    validatePass(psk, privateKeyBitCount, setAdminKeyValidationText);
+    validateKey(psk, privateKeyBitCount, setAdminKeyValidationText);
   };
 
   const privateKeySelectChangeEvent = (e: string) => {
     const count = Number.parseInt(e);
     setPrivateKeyBitCount(count);
-    validatePass(privateKey, count, setPrivateKeyValidationText);
-  };
-
-  const adminKeySelectChangeEvent = (e: string) => {
-    const count = Number.parseInt(e);
-    setAdminKeyBitCount(count);
-    validatePass(privateKey, count, setAdminKeyValidationText);
+    validateKey(privateKey, count, setPrivateKeyValidationText);
   };
 
   return (
-    <DynamicForm<SecurityValidation>
-      onSubmit={onSubmit}
-      defaultValues={{
-        ...config.security,
-        ...{
-          adminKey: adminKey,
-          privateKey: privateKey,
-          publicKey: publicKey,
-        },
-      }}
-      fieldGroups={[
-        {
-          label: "Security Settings",
-          description: "Settings for the Security configuration",
-          fields: [
-            {
-              type: "passwordGenerator",
-              name: "privateKey",
-              label: "Private Key",
-              description: "Used to create a shared key with a remote device",
-              validationText: privateKeyValidationText,
-              devicePSKBitCount: privateKeyBitCount,
-              inputChange: privateKeyInputChangeEvent,
-              selectChange: privateKeySelectChangeEvent,
-              hide: !privateKeyVisible,
-              buttonClick: () =>
-                clickEvent(
-                  setPrivateKey,
-                  privateKeyBitCount,
-                  setPrivateKeyValidationText,
-                ),
-              disabledBy: [
-                {
-                  fieldName: "adminChannelEnabled",
-                  invert: true,
-                },
-              ],
-              properties: {
-                value: privateKey,
-                action: {
-                  icon: privateKeyVisible ? EyeOff : Eye,
-                  onClick: () => setPrivateKeyVisible(!privateKeyVisible),
-                },
-              },
-            },
-            {
-              type: "text",
-              name: "publicKey",
-              label: "Public Key",
-              disabled: true,
-              description:
-                "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
-            },
-          ],
-        },
-        {
-          label: "Admin Settings",
-          description: "Settings for Admin ",
-          fields: [
-            {
-              type: "toggle",
-              name: "adminChannelEnabled",
-              label: "Allow Legacy Admin",
-              description:
-                "Allow incoming device control over the insecure legacy admin channel",
-            },
-            {
-              type: "toggle",
-              name: "isManaged",
-              label: "Managed",
-              description:
-                'If true, device is considered to be "managed" by a mesh administrator via admin messages',
-            },
-            {
-              type: "passwordGenerator",
-              name: "adminKey",
-              label: "Admin Key",
-              description:
-                "The public key authorized to send admin messages to this node",
-              validationText: adminKeyValidationText,
-              devicePSKBitCount: adminKeyBitCount,
-              inputChange: adminKeyInputChangeEvent,
-              selectChange: adminKeySelectChangeEvent,
-              hide: !adminKeyVisible,
-              buttonClick: () =>
-                clickEvent(
-                  setAdminKey,
-                  adminKeyBitCount,
-                  setAdminKeyValidationText,
-                ),
-              disabledBy: [{ fieldName: "adminChannelEnabled" }],
-              properties: {
-                value: adminKey,
-                action: {
-                  icon: adminKeyVisible ? EyeOff : Eye,
-                  onClick: () => setAdminKeyVisible(!adminKeyVisible),
+    <>
+      <DynamicForm<SecurityValidation>
+        onSubmit={onSubmit}
+        submitType="onChange"
+        defaultValues={{
+          ...config.security,
+          ...{
+            adminKey: adminKey,
+            privateKey: privateKey,
+            publicKey: publicKey,
+            adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
+            isManaged: config.security?.isManaged ?? false,
+            bluetoothLoggingEnabled:
+              config.security?.bluetoothLoggingEnabled ?? false,
+            debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
+            serialEnabled: config.security?.serialEnabled ?? false,
+          },
+        }}
+        fieldGroups={[
+          {
+            label: "Security Settings",
+            description: "Settings for the Security configuration",
+            fields: [
+              {
+                type: "passwordGenerator",
+                name: "privateKey",
+                label: "Private Key",
+                description: "Used to create a shared key with a remote device",
+                bits: [{ text: "256 bit", value: "32", key: "bit256" }],
+                validationText: privateKeyValidationText,
+                devicePSKBitCount: privateKeyBitCount,
+                inputChange: privateKeyInputChangeEvent,
+                selectChange: privateKeySelectChangeEvent,
+                hide: !privateKeyVisible,
+                buttonClick: privateKeyClickEvent,
+                properties: {
+                  value: privateKey,
+                  action: {
+                    icon: privateKeyVisible ? EyeOff : Eye,
+                    onClick: () => setPrivateKeyVisible(!privateKeyVisible),
+                  },
                 },
               },
-            },
-          ],
-        },
-        {
-          label: "Logging Settings",
-          description: "Settings for Logging",
-          fields: [
-            {
-              type: "toggle",
-              name: "bluetoothLoggingEnabled",
-              label: "Allow Bluetooth Logging",
-              description: "Enables device (serial style logs) over Bluetooth",
-            },
-            {
-              type: "toggle",
-              name: "debugLogApiEnabled",
-              label: "Enable Debug Log API",
-              description: "Output live debug logging over serial",
-            },
-            {
-              type: "toggle",
-              name: "serialEnabled",
-              label: "Serial Output Enabled",
-              description: "Serial Console over the Stream API",
-            },
-          ],
-        },
-      ]}
-    />
+              {
+                type: "text",
+                name: "publicKey",
+                label: "Public Key",
+                disabled: true,
+                description:
+                  "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+                properties: {
+                  value: publicKey,
+                },
+              },
+            ],
+          },
+          {
+            label: "Admin Settings",
+            description: "Settings for Admin",
+            fields: [
+              {
+                type: "toggle",
+                name: "adminChannelEnabled",
+                label: "Allow Legacy Admin",
+                description:
+                  "Allow incoming device control over the insecure legacy admin channel",
+              },
+              {
+                type: "toggle",
+                name: "isManaged",
+                label: "Managed",
+                description:
+                  'If true, device is considered to be "managed" by a mesh administrator via admin messages',
+              },
+              {
+                type: "text",
+                name: "adminKey",
+                label: "Admin Key",
+                description:
+                  "The public key authorized to send admin messages to this node",
+                validationText: adminKeyValidationText,
+                inputChange: adminKeyInputChangeEvent,
+                disabledBy: [
+                  { fieldName: "adminChannelEnabled", invert: true },
+                ],
+                properties: {
+                  value: adminKey,
+                },
+              },
+            ],
+          },
+          {
+            label: "Logging Settings",
+            description: "Settings for Logging",
+            fields: [
+              {
+                type: "toggle",
+                name: "bluetoothLoggingEnabled",
+                label: "Allow Bluetooth Logging",
+                description:
+                  "Enables device (serial style logs) over Bluetooth",
+              },
+              {
+                type: "toggle",
+                name: "debugLogApiEnabled",
+                label: "Enable Debug Log API",
+                description: "Output live debug logging over serial",
+              },
+              {
+                type: "toggle",
+                name: "serialEnabled",
+                label: "Serial Output Enabled",
+                description: "Serial Console over the Stream API",
+              },
+            ],
+          },
+        ]}
+      />
+      <PkiRegenerateDialog
+        open={dialogOpen}
+        onOpenChange={() => setDialogOpen(false)}
+        onSubmit={() => pkiRegenerate()}
+      />
+    </>
   );
 };
