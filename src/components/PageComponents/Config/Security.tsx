@@ -199,7 +199,7 @@ export const Security = (): JSX.Element => {
                   "The public key authorized to send admin messages to this node",
                 validationText: adminKeyValidationText,
                 inputChange: adminKeyInputChangeEvent,
-                disabledBy: [{ fieldName: "adminChannelEnabled" }],
+                disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
                 properties: {
                   value: adminKey,
                 },
