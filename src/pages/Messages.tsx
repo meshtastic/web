@@ -8,7 +8,7 @@ import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, Types } from "@meshtastic/js";
 import { getChannelName } from "@pages/Channels.js";
-import { HashIcon, WaypointsIcon } from "lucide-react";
+import { HashIcon, LockIcon, LockOpenIcon, WaypointsIcon } from "lucide-react";
 import { useState } from "react";
 
 export const MessagesPage = (): JSX.Element => {
@@ -79,6 +79,17 @@ export const MessagesPage = (): JSX.Element => {
           actions={
             chatType === "direct"
               ? [
+                  {
+                    icon: nodes.get(activeChat)?.user?.publicKey && nodes.get(activeChat)?.user?.publicKey.length > 0 ? LockIcon : LockOpenIcon,
+                    iconClasses: nodes.get(activeChat)?.user?.publicKey && nodes.get(activeChat)?.user?.publicKey.length > 0 ? "text-green-600" : "text-yellow-300",
+                    async onClick() {
+                      const targetNode = nodes.get(activeChat)?.num;
+                      if (targetNode === undefined) return;
+                      toast({
+                        title: nodes.get(activeChat)?.user?.publicKey && nodes.get(activeChat)?.user?.publicKey.length > 0 ? "Chat is using PKI encryption." : "Chat is using PSK encryption.",
+                      });
+                    },
+                  },
                   {
                     icon: WaypointsIcon,
                     async onClick() {

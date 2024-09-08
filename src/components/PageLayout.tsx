@@ -8,6 +8,7 @@ export interface PageLayoutProps {
   children: React.ReactNode;
   actions?: {
     icon: LucideIcon;
+    iconClasses?: string;
     onClick: () => void;
   }[];
 }
@@ -39,7 +40,7 @@ export const PageLayout = ({
                     className="transition-all hover:text-accent"
                     onClick={action.onClick}
                   >
-                    <action.icon />
+                    <action.icon className={action.iconClasses}/>
                   </button>
                 ))}
               </div>

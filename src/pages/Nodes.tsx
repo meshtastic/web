@@ -8,7 +8,7 @@ import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/js";
-import { TrashIcon } from "lucide-react";
+import { LockIcon, LockOpenIcon, TrashIcon } from "lucide-react";
 import { Fragment } from "react";
 import { base16 } from "rfc4648";
 
@@ -38,6 +38,7 @@ export const NodesPage = (): JSX.Element => {
               { title: "MAC Address", type: "normal", sortable: true },
               { title: "Last Heard", type: "normal", sortable: true },
               { title: "SNR", type: "normal", sortable: true },
+              { title: "Encryption", type: "normal", sortable: false },
               { title: "Connection", type: "normal", sortable: true },
               { title: "Remove", type: "normal", sortable: false },
             ]}
@@ -72,6 +73,9 @@ export const NodesPage = (): JSX.Element => {
                 {node.snr}db/
                 {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%/
                 {(node.snr + 10) * 5}raw
+              </Mono>,
+              <Mono key="pki">
+                { node.user?.publicKey && node.user?.publicKey.length > 0 ? <LockIcon className="text-green-600"/> : <LockOpenIcon className="text-yellow-300"/> }
               </Mono>,
               <Mono key="hops">
                 {node.lastHeard !== 0
