@@ -164,9 +164,9 @@ export const Security = (): JSX.Element => {
                 type: "text",
                 name: "publicKey",
                 label: "Public Key",
+                disabled: true,
                 description:
                   "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
-                disabledBy: [{ fieldName: "always" }],
                 properties: {
                   value: publicKey,
                 },
