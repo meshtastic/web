@@ -160,57 +160,48 @@ export const Security = (): JSX.Element => {
                   },
                 },
               },
-            {
-              type: "text",
-              name: "publicKey",
-              label: "Public Key",
-              disabled: true,
-              description:
-                "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
-            },
-          ],
-        },
-        {
-          label: "Admin Settings",
-          description: "Settings for Admin ",
-          fields: [
-            {
-              type: "toggle",
-              name: "adminChannelEnabled",
-              label: "Allow Legacy Admin",
-              description:
-                "Allow incoming device control over the insecure legacy admin channel",
-            },
-            {
-              type: "toggle",
-              name: "isManaged",
-              label: "Managed",
-              description:
-                'If true, device is considered to be "managed" by a mesh administrator via admin messages',
-            },
-            {
-              type: "passwordGenerator",
-              name: "adminKey",
-              label: "Admin Key",
-              description:
-                "The public key authorized to send admin messages to this node",
-              validationText: adminKeyValidationText,
-              devicePSKBitCount: adminKeyBitCount,
-              inputChange: adminKeyInputChangeEvent,
-              selectChange: adminKeySelectChangeEvent,
-              hide: !adminKeyVisible,
-              buttonClick: () =>
-                clickEvent(
-                  setAdminKey,
-                  adminKeyBitCount,
-                  setAdminKeyValidationText,
-                ),
-              disabledBy: [{ fieldName: "adminChannelEnabled" }],
-              properties: {
-                value: adminKey,
-                action: {
-                  icon: adminKeyVisible ? EyeOff : Eye,
-                  onClick: () => setAdminKeyVisible(!adminKeyVisible),
+              {
+                type: "text",
+                name: "publicKey",
+                label: "Public Key",
+                description:
+                  "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+                disabledBy: [{ fieldName: "always" }],
+                properties: {
+                  value: publicKey,
+                },
+              },
+            ],
+          },
+          {
+            label: "Admin Settings",
+            description: "Settings for Admin",
+            fields: [
+              {
+                type: "toggle",
+                name: "adminChannelEnabled",
+                label: "Allow Legacy Admin",
+                description:
+                  "Allow incoming device control over the insecure legacy admin channel",
+              },
+              {
+                type: "toggle",
+                name: "isManaged",
+                label: "Managed",
+                description:
+                  'If true, device is considered to be "managed" by a mesh administrator via admin messages',
+              },
+              {
+                type: "text",
+                name: "adminKey",
+                label: "Admin Key",
+                description:
+                  "The public key authorized to send admin messages to this node",
+                validationText: adminKeyValidationText,
+                inputChange: adminKeyInputChangeEvent,
+                disabledBy: [{ fieldName: "adminChannelEnabled" }],
+                properties: {
+                  value: adminKey,
                 },
               },
             ],
