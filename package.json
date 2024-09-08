@@ -9,6 +9,7 @@
     "build": "tsc && pnpm check && vite build ",
     "check": "biome check .",
     "check:fix": "pnpm check --write",
+    "test": "playwright test",
     "preview": "vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)"
   },
@@ -64,6 +65,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.8.2",
     "@buf/meshtastic_protobufs.bufbuild_es": "1.10.0-20240613143006-244927bc441a.1",
+    "@playwright/test": "^1.44.0",
     "@types/chrome": "^0.0.263",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
