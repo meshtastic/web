@@ -27,7 +27,7 @@ export const Security = (): JSX.Element => {
     fromByteArray(config.security?.publicKey ?? new Uint8Array(0)),
   );
   const [adminKey, setAdminKey] = useState<string>(
-    fromByteArray(config.security?.adminKey ?? new Uint8Array(0)),
+    fromByteArray(config.security?.adminKey[0] ?? new Uint8Array(0)),
   );
   const [adminKeyValidationText, setAdminKeyValidationText] =
     useState<string>();
@@ -42,7 +42,7 @@ export const Security = (): JSX.Element => {
           case: "security",
           value: {
             ...data,
-            adminKey: toByteArray(adminKey),
+            adminKey: [toByteArray(adminKey)],
             privateKey: toByteArray(privateKey),
             publicKey: toByteArray(publicKey),
           },
@@ -129,8 +129,6 @@ export const Security = (): JSX.Element => {
             publicKey: publicKey,
             adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
             isManaged: config.security?.isManaged ?? false,
-            bluetoothLoggingEnabled:
-              config.security?.bluetoothLoggingEnabled ?? false,
             debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
             serialEnabled: config.security?.serialEnabled ?? false,
           },
@@ -214,16 +212,10 @@ export const Security = (): JSX.Element => {
             fields: [
               {
                 type: "toggle",
-                name: "bluetoothLoggingEnabled",
-                label: "Allow Bluetooth Logging",
-                description:
-                  "Enables device (serial style logs) over Bluetooth",
-              },
-              {
-                type: "toggle",
                 name: "debugLogApiEnabled",
                 label: "Enable Debug Log API",
-                description: "Output live debug logging over serial",
+                description:
+                  "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
               },
               {
                 type: "toggle",
