@@ -9,6 +9,7 @@ import { Controller, type FieldValues } from "react-hook-form";
 export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
   type: "passwordGenerator";
   hide?: boolean;
+  bits?: { text: string; value: string; key: string }[];
   devicePSKBitCount: number;
   inputChange: ChangeEventHandler;
   selectChange: (event: string) => void;
@@ -28,6 +29,7 @@ export function PasswordGenerator<T extends FieldValues>({
         <Generator
           hide={field.hide}
           devicePSKBitCount={field.devicePSKBitCount}
+          bits={field.bits}
           inputChange={field.inputChange}
           selectChange={field.selectChange}
           buttonClick={field.buttonClick}
