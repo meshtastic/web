@@ -214,7 +214,8 @@ export const Security = (): JSX.Element => {
                 type: "toggle",
                 name: "debugLogApiEnabled",
                 label: "Enable Debug Log API",
-                description: "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+                description:
+                  "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
               },
               {
                 type: "toggle",
