@@ -129,8 +129,6 @@ export const Security = (): JSX.Element => {
             publicKey: publicKey,
             adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
             isManaged: config.security?.isManaged ?? false,
-            bluetoothLoggingEnabled:
-              config.security?.bluetoothLoggingEnabled ?? false,
             debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
             serialEnabled: config.security?.serialEnabled ?? false,
           },
@@ -206,30 +204,28 @@ export const Security = (): JSX.Element => {
                   value: adminKey,
                 },
               },
-            },
-          ],
-        },
-        {
-          label: "Logging Settings",
-          description: "Settings for Logging",
-          fields: [
-            {
-              type: "toggle",
-              name: "debugLogApiEnabled",
-              label: "Enable Debug Log API",
-              description:
-                "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
-            },
-            {
-              type: "toggle",
-              name: "serialEnabled",
-              label: "Enable Serial Output",
-              description: "Serial Console over the Stream API",
-            },
-          ],
-        },
-      ]}
-    />
+            ],
+          },
+          {
+            label: "Logging Settings",
+            description: "Settings for Logging",
+            fields: [
+              {
+                type: "toggle",
+                name: "debugLogApiEnabled",
+                label: "Enable Debug Log API",
+                description: "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+              },
+              {
+                type: "toggle",
+                name: "serialEnabled",
+                label: "Serial Output Enabled",
+                description: "Serial Console over the Stream API",
+              },
+            ],
+          },
+        ]}
+      />
       <PkiRegenerateDialog
         open={dialogOpen}
         onOpenChange={() => setDialogOpen(false)}
