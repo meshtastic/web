@@ -216,20 +216,14 @@ export const Security = (): JSX.Element => {
           fields: [
             {
               type: "toggle",
-              name: "bluetoothLoggingEnabled",
-              label: "Allow Bluetooth Logging",
-              description: "Enables device (serial style logs) over Bluetooth",
-            },
-            {
-              type: "toggle",
               name: "debugLogApiEnabled",
               label: "Enable Debug Log API",
-              description: "Output live debug logging over serial",
+              description: "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
             },
             {
               type: "toggle",
               name: "serialEnabled",
-              label: "Serial Output Enabled",
+              label: "Enable Serial Output",
               description: "Serial Console over the Stream API",
             },
           ],
