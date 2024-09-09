@@ -60,4 +60,7 @@ export class LoRaValidation
 
   @IsBoolean()
   ignoreMqtt: boolean;
+
+  @IsBoolean()
+  configOkToMqtt: boolean;
 }

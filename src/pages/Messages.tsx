@@ -80,13 +80,19 @@ export const MessagesPage = (): JSX.Element => {
             chatType === "direct"
               ? [
                   {
-                    icon: nodes.get(activeChat)?.user?.publicKey && nodes.get(activeChat)?.user?.publicKey.length > 0 ? LockIcon : LockOpenIcon,
-                    iconClasses: nodes.get(activeChat)?.user?.publicKey && nodes.get(activeChat)?.user?.publicKey.length > 0 ? "text-green-600" : "text-yellow-300",
+                    icon: nodes.get(activeChat)?.user?.publicKey.length
+                      ? LockIcon
+                      : LockOpenIcon,
+                    iconClasses: nodes.get(activeChat)?.user?.publicKey.length
+                      ? "text-green-600"
+                      : "text-yellow-300",
                     async onClick() {
                       const targetNode = nodes.get(activeChat)?.num;
                       if (targetNode === undefined) return;
                       toast({
-                        title: nodes.get(activeChat)?.user?.publicKey && nodes.get(activeChat)?.user?.publicKey.length > 0 ? "Chat is using PKI encryption." : "Chat is using PSK encryption.",
+                        title: nodes.get(activeChat)?.user?.publicKey.length
+                          ? "Chat is using PKI encryption."
+                          : "Chat is using PSK encryption.",
                       });
                     },
                   },

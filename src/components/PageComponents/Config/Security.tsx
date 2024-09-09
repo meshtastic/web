@@ -23,7 +23,7 @@ export const Security = (): JSX.Element => {
     fromByteArray(config.security?.publicKey ?? new Uint8Array(0)),
   );
   const [adminKey, setAdminKey] = useState<string>(
-    fromByteArray(config.security?.adminKey ?? new Uint8Array(0)),
+    fromByteArray(config.security?.adminKey[0] ?? new Uint8Array(0)),
   );
   const [adminKeyVisible, setAdminKeyVisible] = useState<boolean>(false);
   const [adminKeyBitCount, setAdminKeyBitCount] = useState<number>(
@@ -41,7 +41,7 @@ export const Security = (): JSX.Element => {
           case: "security",
           value: {
             ...data,
-            adminKey: toByteArray(adminKey),
+            adminKey: [toByteArray(adminKey)],
             privateKey: toByteArray(privateKey),
             publicKey: toByteArray(publicKey),
           },

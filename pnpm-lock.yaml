@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@bufbuild/protobuf':
-        specifier: ^2.0.0
-        version: 2.0.0
+        specifier: ^1.10.0
+        version: 1.10.0
       '@emeraldpay/hashicon-react':
         specifier: ^0.5.2
         version: 0.5.2
@@ -130,8 +130,8 @@ importers:
         specifier: ^1.8.2
         version: 1.8.2
       '@buf/meshtastic_protobufs.bufbuild_es':
-        specifier: 2.0.0-20240906232734-3da561588c55.2
-        version: 2.0.0-20240906232734-3da561588c55.2(@bufbuild/protobuf@2.0.0)
+        specifier: 1.10.0-20240906232734-3da561588c55.1
+        version: 1.10.0-20240906232734-3da561588c55.1(@bufbuild/protobuf@1.10.0)
       '@types/chrome':
         specifier: ^0.0.263
         version: 0.0.263
@@ -354,13 +354,13 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@buf/meshtastic_protobufs.bufbuild_es@2.0.0-20240906232734-3da561588c55.2':
-    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/meshtastic_protobufs.bufbuild_es/-/meshtastic_protobufs.bufbuild_es-2.0.0-20240906232734-3da561588c55.2.tgz}
+  '@buf/meshtastic_protobufs.bufbuild_es@1.10.0-20240906232734-3da561588c55.1':
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/meshtastic_protobufs.bufbuild_es/-/meshtastic_protobufs.bufbuild_es-1.10.0-20240906232734-3da561588c55.1.tgz}
     peerDependencies:
-      '@bufbuild/protobuf': ^2.0.0
+      '@bufbuild/protobuf': ^1.10.0
 
-  '@bufbuild/protobuf@2.0.0':
-    resolution: {integrity: sha512-sw2JhwJyvyL0zlhG61aDzOVryEfJg2PDZFSV7i7IdC7nAE41WuXCru3QWLGiP87At0BMzKOoKO/FqEGoKygGZQ==}
+  '@bufbuild/protobuf@1.10.0':
+    resolution: {integrity: sha512-QDdVFLoN93Zjg36NoQPZfsVH9tZew7wKDKyV5qRdj8ntT4wQCOradQjRaTdwMhWUYsgKsvCINKKm87FdEk96Ag==}
 
   '@emeraldpay/hashicon-react@0.5.2':
     resolution: {integrity: sha512-XCoYKpq8QQOniiSZf5ouzdvXbKfG6q4ICHRqCO/GNofiF0Ra+LR/7+tomHlXVcLPBS9sDAoZQQw/Sr24KRAbJg==}
@@ -3340,11 +3340,11 @@ snapshots:
   '@biomejs/cli-win32-x64@1.8.2':
     optional: true
 
-  '@buf/meshtastic_protobufs.bufbuild_es@2.0.0-20240906232734-3da561588c55.2(@bufbuild/protobuf@2.0.0)':
+  '@buf/meshtastic_protobufs.bufbuild_es@1.10.0-20240906232734-3da561588c55.1(@bufbuild/protobuf@1.10.0)':
     dependencies:
-      '@bufbuild/protobuf': 2.0.0
+      '@bufbuild/protobuf': 1.10.0
 
-  '@bufbuild/protobuf@2.0.0': {}
+  '@bufbuild/protobuf@1.10.0': {}
 
   '@emeraldpay/hashicon-react@0.5.2':
     dependencies:

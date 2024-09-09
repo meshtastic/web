@@ -75,7 +75,11 @@ export const NodesPage = (): JSX.Element => {
                 {(node.snr + 10) * 5}raw
               </Mono>,
               <Mono key="pki">
-                { node.user?.publicKey && node.user?.publicKey.length > 0 ? <LockIcon className="text-green-600"/> : <LockOpenIcon className="text-yellow-300"/> }
+                {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
+                  <LockIcon className="text-green-600" />
+                ) : (
+                  <LockOpenIcon className="text-yellow-300" />
+                )}
               </Mono>,
               <Mono key="hops">
                 {node.lastHeard !== 0

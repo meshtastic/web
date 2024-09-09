@@ -40,7 +40,7 @@ export const PageLayout = ({
                     className="transition-all hover:text-accent"
                     onClick={action.onClick}
                   >
-                    <action.icon className={action.iconClasses}/>
+                    <action.icon className={action.iconClasses} />
                   </button>
                 ))}
               </div>
