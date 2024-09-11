@@ -15,8 +15,8 @@ importers:
         specifier: ^0.5.2
         version: 0.5.2
       '@meshtastic/js':
-        specifier: 2.3.7-1
-        version: 2.3.7-1
+        specifier: 2.3.7-3
+        version: 2.3.7-3
       '@noble/curves':
         specifier: ^1.5.0
         version: 1.5.0
@@ -587,8 +587,8 @@ packages:
     resolution: {integrity: sha512-eSiQ3E5LUSxAOY9ABXGyfNhout2iEa6mUxKeaQ9nJ8NL1NuaQYU7zKqzx/LEYcXe1neT4uYAgM1wYZj3fTSXtA==}
     hasBin: true
 
-  '@meshtastic/js@2.3.7-1':
-    resolution: {integrity: sha512-pv+Xk6HkKrScCrQp31k5QOUYozabXn6NhXN7c7Cc9ysG94U1wGtfueRbEbFxXCHO3JshNz0CdE1FcSMnrLMjsQ==}
+  '@meshtastic/js@2.3.7-3':
+    resolution: {integrity: sha512-ezdloSREVd9DytZ8sSBmEVsG4Xp6I91yAPnT51OjOC9n/3ZQjyjCUwesys/fTC6077JQO3+ton1IO9HuMLPNiA==}
 
   '@noble/curves@1.5.0':
     resolution: {integrity: sha512-J5EKamIHnKPyClwVrzmaf5wSdQXgdHcPZIZLu3bwnbeCx8/7NPK5q2ZBWF+5FvYGByjiQQsJYX6jfgB2wDPn3A==}
@@ -2866,6 +2866,10 @@ packages:
     resolution: {integrity: sha512-owllqNuDDEimQat7EPG0tH7JjO090xKNzUtYz6X+Sk2BXDnOCilDdNLwjWeFywG9xkJul1ULvtUQa9O4pUaY0w==}
     engines: {node: '>=4.0.0'}
 
+  serialport@12.0.0:
+    resolution: {integrity: sha512-AmH3D9hHPFmnF/oq/rvigfiAouAKyK/TjnrkwZRYSFZxNggJxwvbAbfYrLeuvq7ktUdhuHdVdSjj852Z55R+uA==}
+    engines: {node: '>=16.0.0'}
+
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
     engines: {node: '>= 0.4'}
@@ -3603,13 +3607,15 @@ snapshots:
       sort-object: 3.0.3
       tinyqueue: 2.0.3
 
-  '@meshtastic/js@2.3.7-1':
+  '@meshtastic/js@2.3.7-3':
     dependencies:
       crc: 4.3.2
+      serialport: 12.0.0
       ste-simple-events: 3.0.11
       tslog: 4.9.3
     transitivePeerDependencies:
       - buffer
+      - supports-color
 
   '@noble/curves@1.5.0':
     dependencies:
@@ -6390,6 +6396,25 @@ snapshots:
   semver@6.3.1: {}
 
   serialize-to-js@3.1.2: {}
+
+  serialport@12.0.0:
+    dependencies:
+      '@serialport/binding-mock': 10.2.2
+      '@serialport/bindings-cpp': 12.0.1
+      '@serialport/parser-byte-length': 12.0.0
+      '@serialport/parser-cctalk': 12.0.0
+      '@serialport/parser-delimiter': 12.0.0
+      '@serialport/parser-inter-byte-timeout': 12.0.0
+      '@serialport/parser-packet-length': 12.0.0
+      '@serialport/parser-readline': 12.0.0
+      '@serialport/parser-ready': 12.0.0
+      '@serialport/parser-regex': 12.0.0
+      '@serialport/parser-slip-encoder': 12.0.0
+      '@serialport/parser-spacepacket': 12.0.0
+      '@serialport/stream': 12.0.0
+      debug: 4.3.4
+    transitivePeerDependencies:
+      - supports-color
 
   set-function-length@1.2.2:
     dependencies:
