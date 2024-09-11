@@ -4,7 +4,8 @@ import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
 
 export const CannedMessage = (): JSX.Element => {
-  const { moduleConfig, setWorkingModuleConfig, setCannedMessages } = useDevice();
+  const { moduleConfig, setWorkingModuleConfig, setCannedMessages } =
+    useDevice();
 
   const onSubmit = (data: CannedMessageValidation) => {
     setWorkingModuleConfig(
@@ -18,9 +19,9 @@ export const CannedMessage = (): JSX.Element => {
 
     setCannedMessages(
       new Protobuf.CannedMessages.CannedMessageModuleConfig({
-        messages: data.messages
-      })
-    )
+        messages: data.messages,
+      }),
+    );
   };
 
   return (

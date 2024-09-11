@@ -69,7 +69,9 @@ export interface Device {
   setWorkingModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
   // setMetrics: (metrics: Types.PacketMetadata<Protobuf.Telemetry>) => void;
-  setCannedMessages: (message: Protobuf.CannedMessages.CannedMessageModuleConfig) => void;
+  setCannedMessages: (
+    message: Protobuf.CannedMessages.CannedMessageModuleConfig,
+  ) => void;
   setActivePage: (page: Page) => void;
   setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
