@@ -4,7 +4,7 @@ import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
 
 export const CannedMessage = (): JSX.Element => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { moduleConfig, setWorkingModuleConfig, setCannedMessages } = useDevice();
 
   const onSubmit = (data: CannedMessageValidation) => {
     setWorkingModuleConfig(
@@ -15,6 +15,12 @@ export const CannedMessage = (): JSX.Element => {
         },
       }),
     );
+
+    setCannedMessages(
+      new Protobuf.CannedMessages.CannedMessageModuleConfig({
+        messages: data.messages
+      })
+    )
   };
 
   return (
@@ -31,6 +37,12 @@ export const CannedMessage = (): JSX.Element => {
               name: "enabled",
               label: "Module Enabled",
               description: "Enable Canned Message",
+            },
+            {
+              type: "text",
+              name: "messages",
+              label: "Messages",
+              description: "Separate messages with |",
             },
             {
               type: "toggle",
