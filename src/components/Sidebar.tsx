@@ -85,7 +85,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
         <div className="flex items-center">
           <ZapIcon size={24} viewBox={"0 0 36 24"} />
           <Subtle>
-            {myNode?.deviceMetrics?.voltage.toPrecision(3) ?? "UNK"} volts
+            {myNode?.deviceMetrics?.voltage?.toPrecision(3) ?? "UNK"} volts
           </Subtle>
         </div>
         <div className="flex items-center">

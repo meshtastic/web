@@ -3,7 +3,8 @@ import { Protobuf } from "@meshtastic/js";
 import { IsArray, IsBoolean, IsEnum, IsInt, Max, Min } from "class-validator";
 
 export class LoRaValidation
-  implements Omit<Protobuf.Config.Config_LoRaConfig, keyof Message>
+  implements
+    Omit<Protobuf.Config.Config_LoRaConfig, keyof Message | "paFanDisabled">
 {
   @IsBoolean()
   usePreset: boolean;
@@ -59,4 +60,7 @@ export class LoRaValidation
 
   @IsBoolean()
   ignoreMqtt: boolean;
+
+  @IsBoolean()
+  configOkToMqtt: boolean;
 }
