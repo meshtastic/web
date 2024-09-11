@@ -31,7 +31,7 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, variant, prefix, suffix, action, ...props }, ref) => {
+  ({ className, value, variant, prefix, suffix, action, ...props }, ref) => {
     return (
       <div className="relative w-full">
         {prefix && (
@@ -45,6 +45,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className,
             inputVariants({ variant }),
           )}
+          value={value}
           ref={ref}
           {...props}
         />
