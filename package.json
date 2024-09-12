@@ -23,7 +23,7 @@
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0",
     "@emeraldpay/hashicon-react": "^0.5.2",
-    "@meshtastic/js": "2.3.7-3",
+    "@meshtastic/js": "2.3.7-4",
     "@noble/curves": "^1.5.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-checkbox": "^1.1.0",
@@ -60,6 +60,7 @@
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "timeago-react": "^3.0.6",
+    "vite-plugin-node-polyfills": "^0.22.0",
     "zustand": "4.5.2"
   },
   "devDependencies": {
