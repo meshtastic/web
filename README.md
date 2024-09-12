@@ -59,3 +59,15 @@ Start the development server:
 ```bash
 pnpm dev
 ```
+
+### Updating Protobufs
+
+To update to the latest protobufs go to https://buf.build/meshtastic/protobufs/sdks and select plugin version `1.10`.
+
+The version should look something like this: `1.10.0-20240906232734-3da561588c55.1`
+
+Where the version is *always* `1.10.0` followed by a timestamp and a commit hash. Updating to an SDK version higher than 1.10.0 has breaking changes.
+
+Use that version to updated your `package.json` file.
+
+*Ensure to keep the `meshtastic/js` protobufs in step with web*
