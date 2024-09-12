@@ -1,10 +1,10 @@
 import { execSync } from "node:child_process";
 import { resolve } from "node:path";
+import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import EnvironmentPlugin from "vite-plugin-environment";
-
-import react from "@vitejs/plugin-react";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 let hash = "";
 
@@ -17,6 +17,7 @@ try {
 export default defineConfig({
   plugins: [
     react(),
+    nodePolyfills(),
     EnvironmentPlugin({
       COMMIT_HASH: hash,
     }),
