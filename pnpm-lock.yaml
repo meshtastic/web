@@ -15,8 +15,8 @@ importers:
         specifier: ^0.5.2
         version: 0.5.2
       '@meshtastic/js':
-        specifier: 2.3.7-4
-        version: 2.3.7-4
+        specifier: 2.3.7-5
+        version: 2.3.7-5
       '@noble/curves':
         specifier: ^1.5.0
         version: 1.5.0
@@ -593,8 +593,8 @@ packages:
     resolution: {integrity: sha512-eSiQ3E5LUSxAOY9ABXGyfNhout2iEa6mUxKeaQ9nJ8NL1NuaQYU7zKqzx/LEYcXe1neT4uYAgM1wYZj3fTSXtA==}
     hasBin: true
 
-  '@meshtastic/js@2.3.7-4':
-    resolution: {integrity: sha512-+HuXNoBMS669JZXhhcNSap58rTPv/OuylvMKht4gPnpzk8Stb/oj3O5wVchyAaVmCR64kK/wPstNMxWcP7PORQ==}
+  '@meshtastic/js@2.3.7-5':
+    resolution: {integrity: sha512-77wYoCl83PgRLkvWE8ko0YFm5LbolrfFPqoBkwLd2AFgZOHGsHTlUwA7cj82yhZM3f4mf7yTFxl+8CBawEAXRA==}
 
   '@noble/curves@1.5.0':
     resolution: {integrity: sha512-J5EKamIHnKPyClwVrzmaf5wSdQXgdHcPZIZLu3bwnbeCx8/7NPK5q2ZBWF+5FvYGByjiQQsJYX6jfgB2wDPn3A==}
@@ -3886,7 +3886,7 @@ snapshots:
       sort-object: 3.0.3
       tinyqueue: 2.0.3
 
-  '@meshtastic/js@2.3.7-4':
+  '@meshtastic/js@2.3.7-5':
     dependencies:
       crc: 4.3.2
       serialport: 12.0.0
