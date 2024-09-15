@@ -56,6 +56,13 @@ export const LoRa = (): JSX.Element => {
               label: "Ignore MQTT",
               description: "Don't forward MQTT messages over the mesh",
             },
+            {
+              type: "toggle",
+              name: "configOkToMqtt",
+              label: "OK to MQTT",
+              description:
+                "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+            },
           ],
         },
         {

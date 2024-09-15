@@ -3,7 +3,8 @@ import type { Protobuf } from "@meshtastic/js";
 import { IsBoolean, IsInt, IsNumber, Max, Min } from "class-validator";
 
 export class PowerValidation
-  implements Omit<Protobuf.Config.Config_PowerConfig, keyof Message>
+  implements
+    Omit<Protobuf.Config.Config_PowerConfig, keyof Message | "powermonEnables">
 {
   @IsBoolean()
   isPowerSaving: boolean;

@@ -84,7 +84,7 @@ export const Dashboard = () => {
             <div className="m-auto flex flex-col gap-3 text-center">
               <ListPlusIcon size={48} className="mx-auto text-textSecondary" />
               <H3>No Devices</H3>
-              <Subtle>Connect atleast one device to get started</Subtle>
+              <Subtle>Connect at least one device to get started</Subtle>
               <Button
                 className="gap-2"
                 onClick={() => setConnectDialogOpen(true)}

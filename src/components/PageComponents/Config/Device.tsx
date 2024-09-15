@@ -37,19 +37,6 @@ export const Device = (): JSX.Element => {
               },
             },
             {
-              type: "toggle",
-              name: "serialEnabled",
-              label: "Serial Output Enabled",
-              description: "Enable the device's serial console",
-            },
-            {
-              type: "toggle",
-              name: "debugLogEnabled",
-              label: "Enabled Debug Log",
-              description:
-                "Output debugging information to the device's serial port (auto disables when serial client is connected)",
-            },
-            {
               type: "number",
               name: "buttonGpio",
               label: "Button Pin",
@@ -85,12 +72,6 @@ export const Device = (): JSX.Element => {
               name: "doubleTapAsButtonPress",
               label: "Double Tap as Button Press",
               description: "Treat double tap as button press",
-            },
-            {
-              type: "toggle",
-              name: "isManaged",
-              label: "Managed",
-              description: "Is this device managed by a mesh administator",
             },
             {
               type: "toggle",

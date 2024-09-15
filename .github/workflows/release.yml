@@ -27,6 +27,12 @@ jobs:
       - name: Package Output
         run: pnpm package
 
+      - name: Archive compressed build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: dist/build.tar
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 

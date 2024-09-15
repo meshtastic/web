@@ -4,11 +4,14 @@ import type {
 } from "@components/Form/DynamicForm.js";
 import { Input } from "@components/UI/Input.js";
 import type { LucideIcon } from "lucide-react";
+import type { ChangeEventHandler } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
 
 export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "text" | "number" | "password";
+  inputChange?: ChangeEventHandler;
   properties?: {
+    value?: string;
     prefix?: string;
     suffix?: string;
     step?: number;
@@ -33,13 +36,14 @@ export function GenericInput<T extends FieldValues>({
           type={field.type}
           step={field.properties?.step}
           value={field.type === "number" ? Number.parseFloat(value) : value}
-          onChange={(e) =>
+          onChange={(e) => {
+            if (field.inputChange) field.inputChange(e);
             onChange(
               field.type === "number"
                 ? Number.parseFloat(e.target.value)
                 : e.target.value,
-            )
-          }
+            );
+          }}
           {...field.properties}
           {...rest}
           disabled={disabled}

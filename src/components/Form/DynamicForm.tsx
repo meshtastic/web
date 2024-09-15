@@ -23,6 +23,7 @@ interface DisabledBy<T> {
 
 export interface BaseFormBuilderProps<T> {
   name: Path<T>;
+  disabled?: boolean;
   disabledBy?: DisabledBy<T>[];
   label: string;
   description?: string;
@@ -62,11 +63,16 @@ export function DynamicForm<T extends FieldValues>({
     defaultValues: defaultValues,
   });
 
-  const isDisabled = (disabledBy?: DisabledBy<T>[]): boolean => {
+  const isDisabled = (
+    disabledBy?: DisabledBy<T>[],
+    disabled?: boolean,
+  ): boolean => {
+    if (disabled) return true;
     if (!disabledBy) return false;
 
     return disabledBy.some((field) => {
       const value = getValues(field.fieldName);
+      if (value === "always") return true;
       if (typeof value === "boolean") return field.invert ? value : !value;
       if (typeof value === "number")
         return field.invert
@@ -109,7 +115,7 @@ export function DynamicForm<T extends FieldValues>({
               <DynamicFormField
                 field={field}
                 control={control}
-                disabled={isDisabled(field.disabledBy)}
+                disabled={isDisabled(field.disabledBy, field.disabled)}
               />
             </FieldWrapper>
           ))}
