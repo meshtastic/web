@@ -111,7 +111,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               type: "select",
               name: "role",
               label: "Role",
-              disabled: channel.index == 0,
+              disabled: channel.index === 0,
               description:
                 "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
               properties: {
