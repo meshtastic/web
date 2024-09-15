@@ -4,7 +4,7 @@ import { useDevice } from "@core/stores/deviceStore.js";
 import { Protobuf } from "@meshtastic/js";
 
 export const CannedMessage = (): JSX.Element => {
-  const { moduleConfig, setWorkingModuleConfig, setCannedMessages } =
+  const { moduleConfig, cannedMessagesConfig, setWorkingModuleConfig, setWorkingCannedMessages } =
     useDevice();
 
   const onSubmit = (data: CannedMessageValidation) => {
@@ -17,7 +17,7 @@ export const CannedMessage = (): JSX.Element => {
       }),
     );
 
-    setCannedMessages(
+    setWorkingCannedMessages(
       new Protobuf.CannedMessages.CannedMessageModuleConfig({
         messages: data.messages,
       }),
@@ -27,7 +27,12 @@ export const CannedMessage = (): JSX.Element => {
   return (
     <DynamicForm<CannedMessageValidation>
       onSubmit={onSubmit}
-      defaultValues={moduleConfig.cannedMessage}
+      defaultValues={{
+        ...moduleConfig.cannedMessage,
+        ...{
+          messages: cannedMessagesConfig.messages
+        }
+      }}
       fieldGroups={[
         {
           label: "Canned Message Settings",

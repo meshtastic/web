@@ -10,7 +10,7 @@ import { BoxesIcon, SaveIcon, SettingsIcon } from "lucide-react";
 import { useState } from "react";
 
 export const ConfigPage = (): JSX.Element => {
-  const { workingConfig, workingModuleConfig, connection } = useDevice();
+  const { workingConfig, workingModuleConfig, workingCannedMessagesConfig, connection } = useDevice();
   const [activeConfigSection, setActiveConfigSection] = useState<
     "device" | "module"
   >("device");
@@ -55,9 +55,14 @@ export const ConfigPage = (): JSX.Element => {
                 workingModuleConfig.map(
                   async (moduleConfig) =>
                     await connection?.setModuleConfig(moduleConfig).then(() =>
-                      toast({
-                        title: `Config ${moduleConfig.payloadVariant.case} saved`,
-                      }),
+                      workingCannedMessagesConfig.map(
+                        async (cannedConfig) =>
+                          await connection?.setCannedMessages(cannedConfig).then(() =>
+                            toast({
+                              title: `Config ${moduleConfig.payloadVariant.case} saved`,
+                            }),
+                          )
+                      )
                     ),
                 );
               }
