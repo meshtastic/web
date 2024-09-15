@@ -115,7 +115,10 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               description:
                 "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
               properties: {
-                enumValue: channel.index === 0 ? {"PRIMARY":1} : {"DISABLED":0, "SECONDARY":2},
+                enumValue:
+                  channel.index === 0
+                    ? { PRIMARY: 1 }
+                    : { DISABLED: 0, SECONDARY: 2 },
               },
             },
             {
