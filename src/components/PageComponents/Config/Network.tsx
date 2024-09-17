@@ -10,22 +10,6 @@ import { Protobuf } from "@meshtastic/js";
 export const Network = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
 
-  const netConfig = {
-    wifiEnabled: config.network?.wifiEnabled,
-    wifiSsid: config.network?.wifiSsid,
-    wifiPsk: config.network?.wifiPsk,
-    ethEnabled: config.network?.ethEnabled,
-    addressMode: config.network?.addressMode,
-    ipv4Config: {
-      ip: convertIntToIpAddress(config.network?.ipv4Config?.ip ?? 0),
-      gateway: convertIntToIpAddress(config.network?.ipv4Config?.gateway ?? 0),
-      subnet: convertIntToIpAddress(config.network?.ipv4Config?.subnet ?? 0),
-      dns: convertIntToIpAddress(config.network?.ipv4Config?.dns ?? 0),
-    },
-    ntpServer: config.network?.ntpServer,
-    rsyslogServer: config.network?.rsyslogServer,
-  };
-
   const onSubmit = (data: NetworkValidation) => {
     setWorkingConfig(
       new Protobuf.Config.Config({
@@ -48,7 +32,19 @@ export const Network = (): JSX.Element => {
   return (
     <DynamicForm<NetworkValidation>
       onSubmit={onSubmit}
-      defaultValues={netConfig}
+      defaultValues={{
+        ...config.network,
+        ipv4Config: {
+          ip: convertIntToIpAddress(config.network?.ipv4Config?.ip ?? 0),
+          gateway: convertIntToIpAddress(
+            config.network?.ipv4Config?.gateway ?? 0,
+          ),
+          subnet: convertIntToIpAddress(
+            config.network?.ipv4Config?.subnet ?? 0,
+          ),
+          dns: convertIntToIpAddress(config.network?.ipv4Config?.dns ?? 0),
+        },
+      }}
       fieldGroups={[
         {
           label: "WiFi Config",
