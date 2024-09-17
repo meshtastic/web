@@ -7,6 +7,7 @@ import { useToast } from "@core/hooks/useToast.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, Types } from "@meshtastic/js";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { getChannelName } from "@pages/Channels.js";
 import { HashIcon, LockIcon, LockOpenIcon, WaypointsIcon } from "lucide-react";
 import { useState } from "react";
@@ -28,6 +29,8 @@ export const MessagesPage = (): JSX.Element => {
   );
   const currentChannel = channels.get(activeChat);
   const { toast } = useToast();
+  const node = nodes.get(activeChat);
+  const nodeHex = node?.num ? numberToHexUnpadded(node.num) : "Unknown";
 
   return (
     <>
@@ -56,7 +59,7 @@ export const MessagesPage = (): JSX.Element => {
           {filteredNodes.map((node) => (
             <SidebarButton
               key={node.num}
-              label={node.user?.longName ?? "Unknown"}
+              label={node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`}
               active={activeChat === node.num}
               onClick={() => {
                 setChatType("direct");
@@ -73,7 +76,7 @@ export const MessagesPage = (): JSX.Element => {
             chatType === "broadcast" && currentChannel
               ? getChannelName(currentChannel)
               : chatType === "direct" && nodes.get(activeChat)
-                ? nodes.get(activeChat)?.user?.longName ?? "Unknown"
+                ? nodes.get(activeChat)?.user?.longName ?? nodeHex
                 : "Loading..."
           }`}
           actions={
