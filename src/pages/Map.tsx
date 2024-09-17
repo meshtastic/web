@@ -7,6 +7,7 @@ import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
 import { useAppStore } from "@core/stores/appStore.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { bbox, lineString } from "@turf/turf";
 import {
   BoxSelectIcon,
@@ -180,7 +181,8 @@ export const MapPage = (): JSX.Element => {
                   <div className="flex cursor-pointer gap-2 rounded-md border bg-backgroundPrimary p-1.5">
                     <Hashicon value={node.num.toString()} size={22} />
                     <Subtle className={cn(zoom < 12 && "hidden")}>
-                      {node.user?.longName}
+                      {node.user?.longName ||
+                        `!${numberToHexUnpadded(node.num)}`}
                     </Subtle>
                   </div>
                 </Marker>
