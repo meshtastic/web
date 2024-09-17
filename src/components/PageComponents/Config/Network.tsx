@@ -1,6 +1,10 @@
 import type { NetworkValidation } from "@app/validation/config/network.js";
 import { DynamicForm } from "@components/Form/DynamicForm.js";
 import { useDevice } from "@core/stores/deviceStore.js";
+import {
+  convertIntToIpAddress,
+  convertIpAddressToInt,
+} from "@core/utils/ip.js";
 import { Protobuf } from "@meshtastic/js";
 
 export const Network = (): JSX.Element => {
@@ -13,9 +17,12 @@ export const Network = (): JSX.Element => {
           case: "network",
           value: {
             ...data,
-            ipv4Config: new Protobuf.Config.Config_NetworkConfig_IpV4Config(
-              data.ipv4Config,
-            ),
+            ipv4Config: new Protobuf.Config.Config_NetworkConfig_IpV4Config({
+              ip: convertIpAddressToInt(data.ipv4Config.ip) ?? 0,
+              gateway: convertIpAddressToInt(data.ipv4Config.gateway) ?? 0,
+              subnet: convertIpAddressToInt(data.ipv4Config.subnet) ?? 0,
+              dns: convertIpAddressToInt(data.ipv4Config.dns) ?? 0,
+            }),
           },
         },
       }),
@@ -25,7 +32,19 @@ export const Network = (): JSX.Element => {
   return (
     <DynamicForm<NetworkValidation>
       onSubmit={onSubmit}
-      defaultValues={config.network}
+      defaultValues={{
+        ...config.network,
+        ipv4Config: {
+          ip: convertIntToIpAddress(config.network?.ipv4Config?.ip ?? 0),
+          gateway: convertIntToIpAddress(
+            config.network?.ipv4Config?.gateway ?? 0,
+          ),
+          subnet: convertIntToIpAddress(
+            config.network?.ipv4Config?.subnet ?? 0,
+          ),
+          dns: convertIntToIpAddress(config.network?.ipv4Config?.dns ?? 0),
+        },
+      }}
       fieldGroups={[
         {
           label: "WiFi Config",
