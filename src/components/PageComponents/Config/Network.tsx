@@ -14,7 +14,12 @@ export const Network = (): JSX.Element => {
           value: {
             ...data,
             ipv4Config: new Protobuf.Config.Config_NetworkConfig_IpV4Config(
-              data.ipv4Config,
+              {
+                ip: data.ipv4Config.ip.split('.').reverse().reduce((ipnum, octet) => { return (ipnum<<8) + parseInt(octet)}, 0) >>> 0,
+                subnet: data.ipv4Config.subnet.split('.').reverse().reduce((ipnum, octet) => { return (ipnum<<8) + parseInt(octet)}, 0) >>> 0,
+                gateway: data.ipv4Config.gateway.split('.').reverse().reduce((ipnum, octet) => { return (ipnum<<8) + parseInt(octet)}, 0) >>> 0,
+                dns: data.ipv4Config.dns.split('.').reverse().reduce((ipnum, octet) => { return (ipnum<<8) + parseInt(octet)}, 0) >>> 0,
+              }
             ),
           },
         },
@@ -25,7 +30,16 @@ export const Network = (): JSX.Element => {
   return (
     <DynamicForm<NetworkValidation>
       onSubmit={onSubmit}
-      defaultValues={config.network}
+      defaultValues={{
+        ...config.network,
+        ipv4Config: {
+          ip: 
+          config.network?.ipv4Config?.ip.toString() ?? "0",
+          subnet: config.network?.ipv4Config?.subnet.toString() ?? "0",
+          gateway: config.network?.ipv4Config?.gateway.toString() ?? "0",
+          dns: config.network?.ipv4Config?.dns.toString() ?? "0",
+        }
+      }}
       fieldGroups={[
         {
           label: "WiFi Config",
