@@ -8,6 +8,7 @@ import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/js";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon, TrashIcon } from "lucide-react";
 import { Fragment } from "react";
 import { base16 } from "rfc4648";
@@ -50,7 +51,7 @@ export const NodesPage = (): JSX.Element => {
                     ? `Meshtastic ${base16
                         .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
                         .toLowerCase()}`
-                    : `UNK: ${node.num}`)}
+                    : `!${numberToHexUnpadded(node.num)}`)}
               </h1>,
 
               <Mono key="model">
