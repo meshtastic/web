@@ -3,11 +3,5 @@ export function convertIntToIpAddress(int: number): string {
 }
 
 export function convertIpAddressToInt(ip: string): number | null {
-  const parts = ip.split(".").map(Number).reverse(); // little-endian byte order
-
-  if (parts.some(Number.isNaN)) {
-    return null;
-  }
-
-  return parts.reduce((total, part) => (total << 8) | part, 0);
+  return ip.split('.').reverse().reduce((ipnum, octet) => { return (ipnum<<8) + parseInt(octet)}, 0) >>> 0;
 }
