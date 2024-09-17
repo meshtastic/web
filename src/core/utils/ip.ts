@@ -3,5 +3,12 @@ export function convertIntToIpAddress(int: number): string {
 }
 
 export function convertIpAddressToInt(ip: string): number | null {
-  return ip.split('.').reverse().reduce((ipnum, octet) => { return (ipnum<<8) + parseInt(octet)}, 0) >>> 0;
+  return (
+    ip
+      .split(".")
+      .reverse()
+      .reduce((ipnum, octet) => {
+        return (ipnum << 8) + Number.parseInt(octet);
+      }, 0) >>> 0
+  );
 }
