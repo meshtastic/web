@@ -43,7 +43,4 @@ export class PositionValidation
 
   @IsEnum(Protobuf.Config.Config_PositionConfig_GpsMode)
   gpsMode: Protobuf.Config.Config_PositionConfig_GpsMode;
-
-  @IsArray()
-  channelPrecision: number[];
 }
