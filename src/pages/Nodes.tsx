@@ -1,3 +1,5 @@
+import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog";
+import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog";
 import Footer from "@app/components/UI/Footer";
 import { useAppStore } from "@app/core/stores/appStore";
 import { Sidebar } from "@components/Sidebar.js";
@@ -7,10 +9,10 @@ import { Table } from "@components/generic/Table/index.js";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.js";
 import { useDevice } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf, type Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon, TrashIcon } from "lucide-react";
-import { Fragment } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
 
 export interface DeleteNoteDialogProps {
@@ -19,11 +21,34 @@ export interface DeleteNoteDialogProps {
 }
 
 export const NodesPage = (): JSX.Element => {
-  const { nodes, hardware, setDialogOpen } = useDevice();
+  const { nodes, hardware, setDialogOpen, connection } = useDevice();
   const { setNodeNumToBeRemoved } = useAppStore();
+  const [selectedNode, setSelectedNode] = useState<
+    Protobuf.Mesh.NodeInfo | undefined
+  >(undefined);
+  const [selectedTraceroute, setSelectedTraceroute] = useState<
+    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
+  >();
 
   const filteredNodes = Array.from(nodes.values()).filter(
     (n) => n.num !== hardware.myNodeNum,
+  );
+
+  useEffect(() => {
+    connection?.events.onTraceRoutePacket.subscribe(handleTraceroute);
+    return () => {
+      connection?.events.onTraceRoutePacket.unsubscribe(handleTraceroute);
+    };
+  }, [
+    connection?.events.onTraceRoutePacket.subscribe,
+    connection?.events.onTraceRoutePacket.unsubscribe,
+  ]);
+
+  const handleTraceroute = useCallback(
+    (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
+      setSelectedTraceroute(traceroute);
+    },
+    [],
   );
 
   return (
@@ -45,7 +70,7 @@ export const NodesPage = (): JSX.Element => {
             ]}
             rows={filteredNodes.map((node) => [
               <Hashicon key="icon" size={24} value={node.num.toString()} />,
-              <h1 key="header">
+              <h1 key="header" onMouseDown={() => setSelectedNode(node)}>
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
@@ -104,6 +129,16 @@ export const NodesPage = (): JSX.Element => {
                 Remove
               </Button>,
             ])}
+          />
+          <NodeOptionsDialog
+            node={selectedNode}
+            open={!!selectedNode}
+            onOpenChange={() => setSelectedNode(undefined)}
+          />
+          <TracerouteResponseDialog
+            traceroute={selectedTraceroute}
+            open={!!selectedTraceroute}
+            onOpenChange={() => setSelectedTraceroute(undefined)}
           />
         </div>
         <Footer />
