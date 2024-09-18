@@ -77,12 +77,6 @@ export const Position = (): JSX.Element => {
               label: "Enable Pin",
               description: "GPS module enable pin override",
             },
-            {
-              type: "number",
-              name: "channelPrecision",
-              label: "Channel Precision",
-              description: "GPS channel precision",
-            },
           ],
         },
         {
