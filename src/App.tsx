@@ -11,6 +11,7 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { Dashboard } from "@pages/Dashboard/index.js";
 import { MapProvider } from "react-map-gl";
+import { Notifications } from "./components/Notifications";
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();
@@ -39,6 +40,7 @@ export const App = (): JSX.Element => {
                     <DialogManager />
                     <CommandPalette />
                     <PageRouter />
+                    <Notifications />
                   </div>
                 ) : (
                   <>
