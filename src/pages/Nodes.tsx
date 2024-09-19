@@ -39,10 +39,7 @@ export const NodesPage = (): JSX.Element => {
     return () => {
       connection?.events.onTraceRoutePacket.unsubscribe(handleTraceroute);
     };
-  }, [
-    connection?.events.onTraceRoutePacket.subscribe,
-    connection?.events.onTraceRoutePacket.unsubscribe,
-  ]);
+  }, [connection]);
 
   const handleTraceroute = useCallback(
     (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
@@ -70,7 +67,7 @@ export const NodesPage = (): JSX.Element => {
             ]}
             rows={filteredNodes.map((node) => [
               <Hashicon key="icon" size={24} value={node.num.toString()} />,
-              <h1 key="header" onMouseDown={() => setSelectedNode(node)}>
+              <h1 className="cursor-pointer" key="header" onMouseDown={() => setSelectedNode(node)}>
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
@@ -104,7 +101,7 @@ export const NodesPage = (): JSX.Element => {
                 {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
                   <LockIcon className="text-green-600" />
                 ) : (
-                  <LockOpenIcon className="text-yellow-300" />
+                  <LockOpenIcon className="text-yellow-300 mx-auto" />
                 )}
               </Mono>,
               <Mono key="hops">
