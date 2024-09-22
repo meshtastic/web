@@ -32,7 +32,22 @@ export const Device = (): JSX.Element => {
               label: "Role",
               description: "What role the device performs on the mesh",
               properties: {
-                enumValue: Protobuf.Config.Config_DeviceConfig_Role,
+                enumValue: {
+                  Client: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
+                  "Client Mute":
+                    Protobuf.Config.Config_DeviceConfig_Role.CLIENT_MUTE,
+                  Router: Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
+                  Repeater: Protobuf.Config.Config_DeviceConfig_Role.REPEATER,
+                  Tracker: Protobuf.Config.Config_DeviceConfig_Role.TRACKER,
+                  Sensor: Protobuf.Config.Config_DeviceConfig_Role.SENSOR,
+                  TAK: Protobuf.Config.Config_DeviceConfig_Role.TAK,
+                  "Client Hidden":
+                    Protobuf.Config.Config_DeviceConfig_Role.CLIENT_HIDDEN,
+                  "Lost and Found":
+                    Protobuf.Config.Config_DeviceConfig_Role.LOST_AND_FOUND,
+                  "TAK Tracker":
+                    Protobuf.Config.Config_DeviceConfig_Role.SENSOR,
+                },
                 formatEnumName: true,
               },
             },
