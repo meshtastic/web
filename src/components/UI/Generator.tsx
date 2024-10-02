@@ -12,7 +12,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
-  hide?: boolean;
+  type: "text" | "password";
   devicePSKBitCount?: number;
   value: string;
   variant: "default" | "invalid";
@@ -31,7 +31,7 @@ export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
 const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
   (
     {
-      hide = true,
+      type,
       devicePSKBitCount,
       variant,
       value,
@@ -68,7 +68,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
     return (
       <>
         <Input
-          type={hide ? "password" : "text"}
+          type={type}
           id="pskInput"
           variant={variant}
           value={value}
