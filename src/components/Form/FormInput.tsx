@@ -31,7 +31,7 @@ export function GenericInput<T extends FieldValues>({
 }: GenericFormElementProps<T, InputFieldProps<T>>) {
   const [passwordShown, setPasswordShown] = useState(false);
   const togglePasswordVisiblity = () => {
-    setPasswordShown(passwordShown ? false : true);
+    setPasswordShown(!passwordShown);
   };
 
   return (
@@ -40,9 +40,11 @@ export function GenericInput<T extends FieldValues>({
       control={control}
       render={({ field: { value, onChange, ...rest } }) => (
         <Input
-          type={field.type == "password" && passwordShown ? "text" : field.type}
+          type={
+            field.type === "password" && passwordShown ? "text" : field.type
+          }
           action={
-            field.type == "password"
+            field.type === "password"
               ? {
                   icon: passwordShown ? EyeOff : Eye,
                   onClick: togglePasswordVisiblity,

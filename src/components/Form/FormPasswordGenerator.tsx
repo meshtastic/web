@@ -25,7 +25,7 @@ export function PasswordGenerator<T extends FieldValues>({
 }: GenericFormElementProps<T, PasswordGeneratorProps<T>>) {
   const [passwordShown, setPasswordShown] = useState(false);
   const togglePasswordVisiblity = () => {
-    setPasswordShown(passwordShown ? false : true);
+    setPasswordShown(!passwordShown);
   };
 
   return (
