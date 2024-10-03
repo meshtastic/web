@@ -1,6 +1,6 @@
 import type { Message } from "@bufbuild/protobuf";
 import { Protobuf } from "@meshtastic/js";
-import { IsBoolean, IsEnum, IsInt, Length } from "class-validator";
+import { IsBoolean, IsEnum, IsInt, IsString, Length } from "class-validator";
 
 export class CannedMessageValidation
   implements
@@ -38,4 +38,7 @@ export class CannedMessageValidation
 
   @IsBoolean()
   sendBell: boolean;
+
+  @IsString()
+  messages: string;
 }
