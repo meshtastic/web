@@ -41,10 +41,14 @@ export function GenericInput<T extends FieldValues>({
       render={({ field: { value, onChange, ...rest } }) => (
         <Input
           type={field.type == "password" && passwordShown ? "text" : field.type}
-          action={field.type == "password" ? {
-            icon: passwordShown ? EyeOff : Eye,
-            onClick: togglePasswordVisiblity
-          } : undefined}
+          action={
+            field.type == "password"
+              ? {
+                  icon: passwordShown ? EyeOff : Eye,
+                  onClick: togglePasswordVisiblity,
+                }
+              : undefined
+          }
           step={field.properties?.step}
           value={field.type === "number" ? Number.parseFloat(value) : value}
           onChange={(e) => {

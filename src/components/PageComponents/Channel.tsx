@@ -133,7 +133,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               buttonClick: clickEvent,
               hide: true,
               properties: {
-                value: pass
+                value: pass,
               },
             },
             {
