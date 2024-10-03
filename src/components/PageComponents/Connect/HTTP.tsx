@@ -1,4 +1,4 @@
-import { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
+import type { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
 import { Button } from "@components/UI/Button.js";
 import { Input } from "@components/UI/Input.js";
 import { Label } from "@components/UI/Label.js";
@@ -8,6 +8,7 @@ import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { subscribeAll } from "@core/subscriptions.js";
 import { randId } from "@core/utils/randId.js";
 import { HttpConnection } from "@meshtastic/js";
+import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
 export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
@@ -19,7 +20,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
   }>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
-        window.location.hostname
+        window.location.hostname,
       )
         ? "meshtastic.local"
         : window.location.hostname,
@@ -33,10 +34,13 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
     defaultValue: location.protocol === "https:",
   });
 
+  const [connectionInProgress, setConnectionInProgress] = useState(false);
+
   const onSubmit = handleSubmit(async (data) => {
+    setConnectionInProgress(true);
+
     const id = randId();
     const device = addDevice(id);
-    setSelectedDevice(id);
     const connection = new HttpConnection(id);
     // TODO: Promise never resolves
     await connection.connect({
@@ -44,9 +48,10 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
       fetchInterval: 2000,
       tls: data.tls,
     });
+
+    setSelectedDevice(id);
     device.addConnection(connection);
     subscribeAll(device, connection);
-
     closeDialog();
   });
 
@@ -58,6 +63,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
           // label="IP Address/Hostname"
           prefix={tlsEnabled ? "https://" : "http://"}
           placeholder="000.000.000.000 / meshtastic.local"
+          disabled={connectionInProgress}
           {...register("ip")}
         />
         <Controller
@@ -69,7 +75,9 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
               <Switch
                 // label="Use TLS"
                 // description="Description"
-                disabled={location.protocol === "https:"}
+                disabled={
+                  location.protocol === "https:" || connectionInProgress
+                }
                 checked={value}
                 {...rest}
               />
@@ -77,8 +85,8 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
           )}
         />
       </div>
-      <Button type="submit">
-        <span>Connect</span>
+      <Button type="submit" disabled={connectionInProgress}>
+        <span>{connectionInProgress ? "Connecting..." : "Connect"}</span>
       </Button>
     </form>
   );

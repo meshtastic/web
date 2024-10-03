@@ -1,3 +1,4 @@
+import { RemoveNodeDialog } from "@app/components/Dialog/RemoveNodeDialog.js";
 import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.js";
 import { ImportDialog } from "@components/Dialog/ImportDialog.js";
 import { QRDialog } from "@components/Dialog/QRDialog.js";
@@ -40,6 +41,12 @@ export const DialogManager = (): JSX.Element => {
         open={dialog.deviceName}
         onOpenChange={(open) => {
           setDialogOpen("deviceName", open);
+        }}
+      />
+      <RemoveNodeDialog
+        open={dialog.nodeRemoval}
+        onOpenChange={(open) => {
+          setDialogOpen("nodeRemoval", open);
         }}
       />
     </>

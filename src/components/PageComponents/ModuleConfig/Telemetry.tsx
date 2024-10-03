@@ -32,7 +32,7 @@ export const Telemetry = (): JSX.Element => {
               label: "Query Interval",
               description: "Interval to get telemetry data",
               properties: {
-                suffix: "seconds",
+                suffix: "Seconds",
               },
             },
             {
@@ -41,7 +41,7 @@ export const Telemetry = (): JSX.Element => {
               label: "Update Interval",
               description: "How often to send Metrics over the mesh",
               properties: {
-                suffix: "seconds",
+                suffix: "Seconds",
               },
             },
             {
@@ -87,7 +87,7 @@ export const Telemetry = (): JSX.Element => {
               description: "How often to send Power data over the mesh",
             },
             {
-              type: "text",
+              type: "toggle",
               name: "powerScreenEnabled",
               label: "Power Screen Enabled",
               description: "Enable the Power Telemetry Screen",

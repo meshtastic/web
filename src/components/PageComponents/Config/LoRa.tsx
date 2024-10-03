@@ -36,10 +36,13 @@ export const LoRa = (): JSX.Element => {
               },
             },
             {
-              type: "number",
+              type: "select",
               name: "hopLimit",
               label: "Hop Limit",
               description: "Maximum number of hops",
+              properties: {
+                enumValue: { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7 },
+              },
             },
             {
               type: "number",
@@ -52,6 +55,13 @@ export const LoRa = (): JSX.Element => {
               name: "ignoreMqtt",
               label: "Ignore MQTT",
               description: "Don't forward MQTT messages over the mesh",
+            },
+            {
+              type: "toggle",
+              name: "configOkToMqtt",
+              label: "OK to MQTT",
+              description:
+                "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
             },
           ],
         },

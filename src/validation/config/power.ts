@@ -1,9 +1,10 @@
 import type { Message } from "@bufbuild/protobuf";
 import type { Protobuf } from "@meshtastic/js";
-import { IsBoolean, IsInt, Max, Min } from "class-validator";
+import { IsBoolean, IsInt, IsNumber, Max, Min } from "class-validator";
 
 export class PowerValidation
-  implements Omit<Protobuf.Config.Config_PowerConfig, keyof Message>
+  implements
+    Omit<Protobuf.Config.Config_PowerConfig, keyof Message | "powermonEnables">
 {
   @IsBoolean()
   isPowerSaving: boolean;
@@ -11,7 +12,7 @@ export class PowerValidation
   @IsInt()
   onBatteryShutdownAfterSecs: number;
 
-  @IsInt()
+  @IsNumber()
   @Min(2)
   @Max(4)
   adcMultiplierOverride: number;

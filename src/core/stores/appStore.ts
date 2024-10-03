@@ -27,6 +27,7 @@ interface AppState {
   commandPaletteOpen: boolean;
   darkMode: boolean;
   notifications: boolean;
+  nodeNumToBeRemoved: number;
   accent: AccentColor;
   connectDialogOpen: boolean;
 
@@ -40,6 +41,7 @@ interface AppState {
   setCommandPaletteOpen: (open: boolean) => void;
   setDarkMode: (enabled: boolean) => void;
   setNotifications: (enabled: boolean) => void;
+  setNodeNumToBeRemoved: (nodeNum: number) => void;
   setAccent: (color: AccentColor) => void;
   setConnectDialogOpen: (open: boolean) => void;
 }
@@ -50,10 +52,14 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
-  darkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
   notifications: true,
+  darkMode:
+    localStorage.getItem("theme-dark") !== null
+      ? localStorage.getItem("theme-dark") === "true"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches,
   accent: "orange",
   connectDialogOpen: false,
+  nodeNumToBeRemoved: 0,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -96,6 +102,7 @@ export const useAppStore = create<AppState>()((set) => ({
     );
   },
   setDarkMode: (enabled: boolean) => {
+    localStorage.setItem("theme-dark", enabled.toString());
     set(
       produce<AppState>((draft) => {
         draft.darkMode = enabled;
@@ -109,6 +116,10 @@ export const useAppStore = create<AppState>()((set) => ({
       }),
     );
   },
+  setNodeNumToBeRemoved: (nodeNum) =>
+    set((state) => ({
+      nodeNumToBeRemoved: nodeNum,
+    })),
   setAccent(color) {
     set(
       produce<AppState>((draft) => {

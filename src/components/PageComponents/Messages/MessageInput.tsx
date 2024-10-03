@@ -62,7 +62,7 @@ export const MessageInput = ({
           <span className="w-full">
             <Input
               autoFocus={true}
-              minLength={2}
+              minLength={1}
               placeholder="Enter Message"
               value={messageDraft}
               onChange={(e) => setMessageDraft(e.target.value)}

@@ -32,22 +32,24 @@ export const Device = (): JSX.Element => {
               label: "Role",
               description: "What role the device performs on the mesh",
               properties: {
-                enumValue: Protobuf.Config.Config_DeviceConfig_Role,
+                enumValue: {
+                  Client: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
+                  "Client Mute":
+                    Protobuf.Config.Config_DeviceConfig_Role.CLIENT_MUTE,
+                  Router: Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
+                  Repeater: Protobuf.Config.Config_DeviceConfig_Role.REPEATER,
+                  Tracker: Protobuf.Config.Config_DeviceConfig_Role.TRACKER,
+                  Sensor: Protobuf.Config.Config_DeviceConfig_Role.SENSOR,
+                  TAK: Protobuf.Config.Config_DeviceConfig_Role.TAK,
+                  "Client Hidden":
+                    Protobuf.Config.Config_DeviceConfig_Role.CLIENT_HIDDEN,
+                  "Lost and Found":
+                    Protobuf.Config.Config_DeviceConfig_Role.LOST_AND_FOUND,
+                  "TAK Tracker":
+                    Protobuf.Config.Config_DeviceConfig_Role.SENSOR,
+                },
                 formatEnumName: true,
               },
-            },
-            {
-              type: "toggle",
-              name: "serialEnabled",
-              label: "Serial Output Enabled",
-              description: "Enable the device's serial console",
-            },
-            {
-              type: "toggle",
-              name: "debugLogEnabled",
-              label: "Enabled Debug Log",
-              description:
-                "Output debugging information to the device's serial port (auto disables when serial client is connected)",
             },
             {
               type: "number",
@@ -85,12 +87,6 @@ export const Device = (): JSX.Element => {
               name: "doubleTapAsButtonPress",
               label: "Double Tap as Button Press",
               description: "Treat double tap as button press",
-            },
-            {
-              type: "toggle",
-              name: "isManaged",
-              label: "Managed",
-              description: "Is this device managed by a mesh administator",
             },
             {
               type: "toggle",

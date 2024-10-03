@@ -37,7 +37,7 @@ export const RebootDialog = ({
           <Input
             type="number"
             value={time}
-            onChange={(e) => setTime(parseInt(e.target.value))}
+            onChange={(e) => setTime(Number.parseInt(e.target.value))}
             action={{
               icon: ClockIcon,
               onClick() {

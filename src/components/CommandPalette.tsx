@@ -19,7 +19,7 @@ import {
   LayersIcon,
   LayoutIcon,
   LinkIcon,
-  LucideIcon,
+  type LucideIcon,
   MapIcon,
   MessageSquareIcon,
   MoonIcon,
@@ -200,10 +200,17 @@ export const CommandPalette = (): JSX.Element => {
           },
         },
         {
-          label: "Factory Reset",
+          label: "Factory Reset Device",
           icon: FactoryIcon,
           action() {
-            connection?.factoryReset();
+            connection?.factoryResetDevice();
+          },
+        },
+        {
+          label: "Factory Reset Config",
+          icon: FactoryIcon,
+          action() {
+            connection?.factoryResetConfig();
           },
         },
       ],
@@ -350,7 +357,7 @@ export const CommandPalette = (): JSX.Element => {
 
     window.addEventListener("keydown", handleKeydown);
     return () => window.removeEventListener("keydown", handleKeydown);
-  }, []);
+  }, [setCommandPaletteOpen]);
 
   return (
     <CommandDialog

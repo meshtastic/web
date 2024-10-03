@@ -24,7 +24,8 @@ export type DialogVariant =
   | "QR"
   | "shutdown"
   | "reboot"
-  | "deviceName";
+  | "deviceName"
+  | "nodeRemoval";
 
 export interface Device {
   id: number;
@@ -41,6 +42,10 @@ export interface Device {
     direct: Map<number, MessageWithState[]>;
     broadcast: Map<Types.ChannelNumber, MessageWithState[]>;
   };
+  traceroutes: Map<
+    number,
+    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
+  >;
   connection?: Types.ConnectionType;
   activePage: Page;
   activeNode: number;
@@ -54,6 +59,7 @@ export interface Device {
     shutdown: boolean;
     reboot: boolean;
     deviceName: boolean;
+    nodeRemoval: boolean;
   };
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -73,7 +79,11 @@ export interface Device {
   addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
   addConnection: (connection: Types.ConnectionType) => void;
   addMessage: (message: MessageWithState) => void;
+  addTraceRoute: (
+    traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
+  ) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
+  removeNode: (nodeNum: number) => void;
   setMessageState: (
     type: "direct" | "broadcast",
     channelIndex: Types.ChannelNumber,
@@ -119,6 +129,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             direct: new Map(),
             broadcast: new Map(),
           },
+          traceroutes: new Map(),
           connection: undefined,
           activePage: "messages",
           activeNode: 0,
@@ -130,6 +141,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             shutdown: false,
             reboot: false,
             deviceName: false,
+            nodeRemoval: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
@@ -178,6 +190,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                     case "bluetooth": {
                       device.config.bluetooth = config.payloadVariant.value;
                       break;
+                    }
+                    case "security": {
+                      device.config.security = config.payloadVariant.value;
                     }
                   }
                 }
@@ -483,6 +498,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
+
           addMetadata: (from, metadata) => {
             set(
               produce<DeviceState>((draft) => {
@@ -491,6 +507,37 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.metadata.set(from, metadata);
+              }),
+            );
+          },
+          addTraceRoute: (traceroute) => {
+            set(
+              produce<DeviceState>((draft) => {
+                console.log("addTraceRoute called");
+                console.log(traceroute);
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+
+                const nodetraceroutes = device.traceroutes.get(traceroute.from);
+                if (nodetraceroutes) {
+                  nodetraceroutes.push(traceroute);
+                  device.traceroutes.set(traceroute.from, nodetraceroutes);
+                } else {
+                  device.traceroutes.set(traceroute.from, [traceroute]);
+                }
+              }),
+            );
+          },
+          removeNode: (nodeNum) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+                device.nodes.delete(nodeNum);
               }),
             );
           },

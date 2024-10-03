@@ -38,6 +38,9 @@ export const NeighborInfo = (): JSX.Element => {
               label: "Update Interval",
               description:
                 "Interval in seconds of how often we should try to send our Neighbor Info to the mesh",
+              properties: {
+                suffix: "Seconds",
+              },
               disabledBy: [
                 {
                   fieldName: "enabled",
