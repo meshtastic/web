@@ -131,6 +131,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
               inputChange: inputChangeEvent,
               selectChange: selectChangeEvent,
               buttonClick: clickEvent,
+              hide: true,
               properties: {
                 value: pass,
               },

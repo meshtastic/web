@@ -3,7 +3,9 @@ import type {
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.js";
 import { Generator } from "@components/UI/Generator.js";
+import { Eye, EyeOff } from "lucide-react";
 import type { ChangeEventHandler, MouseEventHandler } from "react";
+import { useState } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
 
 export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
@@ -21,13 +23,26 @@ export function PasswordGenerator<T extends FieldValues>({
   field,
   disabled,
 }: GenericFormElementProps<T, PasswordGeneratorProps<T>>) {
+  const [passwordShown, setPasswordShown] = useState(false);
+  const togglePasswordVisiblity = () => {
+    setPasswordShown(!passwordShown);
+  };
+
   return (
     <Controller
       name={field.name}
       control={control}
       render={({ field: { value, ...rest } }) => (
         <Generator
-          hide={field.hide}
+          type={field.hide && !passwordShown ? "password" : "text"}
+          action={
+            field.hide
+              ? {
+                  icon: passwordShown ? EyeOff : Eye,
+                  onClick: togglePasswordVisiblity,
+                }
+              : undefined
+          }
           devicePSKBitCount={field.devicePSKBitCount}
           bits={field.bits}
           inputChange={field.inputChange}
