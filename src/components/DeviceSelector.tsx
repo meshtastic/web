@@ -5,6 +5,8 @@ import { useAppStore } from "@core/stores/appStore.js";
 import { useDeviceStore } from "@core/stores/deviceStore.js";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
+  BellIcon,
+  BellOffIcon,
   HomeIcon,
   LanguagesIcon,
   MoonIcon,
@@ -12,8 +14,6 @@ import {
   SearchIcon,
   SunIcon,
   TerminalIcon,
-  BellIcon,
-  BellOffIcon,
 } from "lucide-react";
 
 export const DeviceSelector = (): JSX.Element => {

@@ -1,5 +1,5 @@
 import type { Device } from "@core/stores/deviceStore.js";
-import { Protobuf, Types } from "@meshtastic/js";
+import { Protobuf, type Types } from "@meshtastic/js";
 import { playNotificationSound } from "./utils/notify";
 
 export const subscribeAll = (
@@ -85,9 +85,9 @@ export const subscribeAll = (
       ...messagePacket,
       state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
     });
-    if(messagePacket.from !== myNodeNum){
+    if (messagePacket.from !== myNodeNum) {
       playNotificationSound();
-    } 
+    }
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {

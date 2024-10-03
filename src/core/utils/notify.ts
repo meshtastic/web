@@ -1,4 +1,4 @@
-import { useAppStore } from '@core/stores/appStore.js';
+import { useAppStore } from "@core/stores/appStore.js";
 
 const notificationSound = new Audio("/notification.wav"); //change sound if needed
 
