@@ -1,4 +1,4 @@
-import { Checkbox } from "@components/UI/Checkbox.js";
+import { Checkbox } from "@components/UI/Checkbox.tsx";
 import {
   Dialog,
   DialogContent,
@@ -6,9 +6,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.js";
-import { Input } from "@components/UI/Input.js";
-import { Label } from "@components/UI/Label.js";
+} from "@components/UI/Dialog.tsx";
+import { Input } from "@components/UI/Input.tsx";
+import { Label } from "@components/UI/Label.tsx";
 import { Protobuf, type Types } from "@meshtastic/js";
 import { fromByteArray } from "base64-js";
 import { ClipboardIcon } from "lucide-react";

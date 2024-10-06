@@ -1,8 +1,8 @@
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
-} from "@components/Form/DynamicForm.js";
-import { Input } from "@components/UI/Input.js";
+} from "@components/Form/DynamicForm.tsx";
+import { Input } from "@components/UI/Input.tsx";
 import type { LucideIcon } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react";
 import type { ChangeEventHandler } from "react";

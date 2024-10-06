@@ -1,4 +1,4 @@
-import type { MessageWithState } from "@app/core/stores/deviceStore.js";
+import type { MessageWithState } from "@app/core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import type { Protobuf } from "@meshtastic/js";
 import {

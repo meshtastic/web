@@ -1,8 +1,8 @@
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
-} from "@components/Form/DynamicForm.js";
-import { Generator } from "@components/UI/Generator.js";
+} from "@components/Form/DynamicForm.tsx";
+import { Generator } from "@components/UI/Generator.tsx";
 import { Eye, EyeOff } from "lucide-react";
 import type { ChangeEventHandler, MouseEventHandler } from "react";
 import { useState } from "react";

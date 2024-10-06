@@ -1,8 +1,8 @@
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
-import { Subtle } from "@components/UI/Typography/Subtle.js";
-import { useDevice } from "@core/stores/deviceStore.js";
-import type { Page } from "@core/stores/deviceStore.js";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
+import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
+import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import type { Page } from "@core/stores/deviceStore.ts";
 import {
   BatteryMediumIcon,
   CpuIcon,

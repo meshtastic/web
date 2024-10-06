@@ -1,4 +1,4 @@
-import type { Device } from "@core/stores/deviceStore.js";
+import type { Device } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/js";
 
 export const subscribeAll = (

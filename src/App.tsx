@@ -1,15 +1,15 @@
-import { DeviceWrapper } from "@app/DeviceWrapper.js";
-import { PageRouter } from "@app/PageRouter.js";
-import { CommandPalette } from "@components/CommandPalette.js";
-import { DeviceSelector } from "@components/DeviceSelector.js";
-import { DialogManager } from "@components/Dialog/DialogManager.js";
-import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.js";
-import { Toaster } from "@components/Toaster.js";
-import Footer from "@components/UI/Footer.js";
-import { ThemeController } from "@components/generic/ThemeController.js";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDeviceStore } from "@core/stores/deviceStore.js";
-import { Dashboard } from "@pages/Dashboard/index.js";
+import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
+import { PageRouter } from "@app/PageRouter.tsx";
+import { CommandPalette } from "@components/CommandPalette.tsx";
+import { DeviceSelector } from "@components/DeviceSelector.tsx";
+import { DialogManager } from "@components/Dialog/DialogManager.tsx";
+import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.tsx";
+import { Toaster } from "@components/Toaster.tsx";
+import Footer from "@components/UI/Footer.tsx";
+import { ThemeController } from "@components/generic/ThemeController.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDeviceStore } from "@core/stores/deviceStore.ts";
+import { Dashboard } from "@pages/Dashboard/index.tsx";
 import { MapProvider } from "react-map-gl";
 
 export const App = (): JSX.Element => {

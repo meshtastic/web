@@ -1,4 +1,4 @@
-import { useDevice } from "@app/core/stores/deviceStore.js";
+import { useDevice } from "@app/core/stores/deviceStore.ts";
 import type { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 

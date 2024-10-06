@@ -5,11 +5,12 @@
   "description": "Meshtastic web client",
   "license": "GPL-3.0-only",
   "scripts": {
-    "dev": "vite --host",
-    "build": "tsc && pnpm check && vite build ",
+    "build": "rsbuild build",
     "check": "biome check .",
     "check:fix": "pnpm check --write",
-    "preview": "vite preview",
+    "dev": "rsbuild dev --open",
+    "format": "biome format --write",
+    "preview": "rsbuild preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)"
   },
   "repository": {
@@ -66,13 +67,14 @@
   "devDependencies": {
     "@biomejs/biome": "^1.8.2",
     "@buf/meshtastic_protobufs.bufbuild_es": "1.10.0-20240906232734-3da561588c55.1",
+    "@rsbuild/core": "^1.0.10",
+    "@rsbuild/plugin-react": "^1.0.3",
     "@types/chrome": "^0.0.263",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/w3c-web-serial": "^1.0.6",
     "@types/web-bluetooth": "^0.0.20",
-    "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
     "gzipper": "^7.2.0",
     "postcss": "^8.4.38",
@@ -80,8 +82,6 @@
     "tailwindcss": "^3.4.4",
     "tar": "^6.2.1",
     "tslib": "^2.6.3",
-    "typescript": "^5.5.2",
-    "vite": "^5.3.1",
-    "vite-plugin-environment": "^1.1.3"
+    "typescript": "^5.5.2"
   }
 }

@@ -1,10 +1,10 @@
-import { RemoveNodeDialog } from "@app/components/Dialog/RemoveNodeDialog.js";
-import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.js";
-import { ImportDialog } from "@components/Dialog/ImportDialog.js";
-import { QRDialog } from "@components/Dialog/QRDialog.js";
-import { RebootDialog } from "@components/Dialog/RebootDialog.js";
-import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { RemoveNodeDialog } from "@app/components/Dialog/RemoveNodeDialog.tsx";
+import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.tsx";
+import { ImportDialog } from "@components/Dialog/ImportDialog.tsx";
+import { QRDialog } from "@components/Dialog/QRDialog.tsx";
+import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
+import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 
 export const DialogManager = (): JSX.Element => {
   const { channels, config, dialog, setDialogOpen } = useDevice();

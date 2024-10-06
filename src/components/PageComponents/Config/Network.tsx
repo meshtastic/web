@@ -1,10 +1,10 @@
-import type { NetworkValidation } from "@app/validation/config/network.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { NetworkValidation } from "@app/validation/config/network.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import {
   convertIntToIpAddress,
   convertIpAddressToInt,
-} from "@core/utils/ip.js";
+} from "@core/utils/ip.ts";
 import { Protobuf } from "@meshtastic/js";
 
 export const Network = (): JSX.Element => {

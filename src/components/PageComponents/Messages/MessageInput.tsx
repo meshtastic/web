@@ -1,6 +1,6 @@
-import { Button } from "@components/UI/Button.js";
-import { Input } from "@components/UI/Input.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { Button } from "@components/UI/Button.tsx";
+import { Input } from "@components/UI/Input.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/js";
 import { SendIcon } from "lucide-react";
 

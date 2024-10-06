@@ -1,6 +1,6 @@
-import type { LoRaValidation } from "@app/validation/config/lora.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { LoRaValidation } from "@app/validation/config/lora.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 
 export const LoRa = (): JSX.Element => {

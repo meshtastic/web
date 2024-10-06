@@ -1,7 +1,7 @@
-import type { ChannelValidation } from "@app/validation/channel.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useToast } from "@core/hooks/useToast.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { ChannelValidation } from "@app/validation/channel.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useToast } from "@core/hooks/useToast.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";

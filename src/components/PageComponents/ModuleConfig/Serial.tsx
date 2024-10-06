@@ -1,6 +1,6 @@
-import type { SerialValidation } from "@app/validation/moduleConfig/serial.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { SerialValidation } from "@app/validation/moduleConfig/serial.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 
 export const Serial = (): JSX.Element => {

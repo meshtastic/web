@@ -1,4 +1,4 @@
-import { Button } from "@components/UI/Button.js";
+import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.js";
+} from "@components/UI/Dialog.tsx";
 
 export interface PkiRegenerateDialogProps {
   open: boolean;

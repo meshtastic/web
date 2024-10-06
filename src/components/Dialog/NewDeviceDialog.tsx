@@ -1,20 +1,20 @@
-import { BLE } from "@components/PageComponents/Connect/BLE.js";
-import { HTTP } from "@components/PageComponents/Connect/HTTP.js";
-import { Serial } from "@components/PageComponents/Connect/Serial.js";
+import { BLE } from "@components/PageComponents/Connect/BLE.tsx";
+import { HTTP } from "@components/PageComponents/Connect/HTTP.tsx";
+import { Serial } from "@components/PageComponents/Connect/Serial.tsx";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.js";
+} from "@components/UI/Dialog.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@components/UI/Tabs.js";
-import { Link } from "@components/UI/Typography/Link.js";
-import { Subtle } from "@components/UI/Typography/Subtle.js";
+} from "@components/UI/Tabs.tsx";
+import { Link } from "@components/UI/Typography/Link.tsx";
+import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 
 export interface TabElementProps {
   closeDialog: () => void;

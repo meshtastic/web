@@ -1,14 +1,14 @@
 import * as React from "react";
 
-import { Button } from "@components/UI/Button.js";
-import { Input } from "@components/UI/Input.js";
+import { Button } from "@components/UI/Button.tsx";
+import { Input } from "@components/UI/Input.tsx";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@components/UI/Select.js";
+} from "@components/UI/Select.tsx";
 import type { LucideIcon } from "lucide-react";
 
 export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {

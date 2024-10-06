@@ -1,11 +1,11 @@
 import { PkiRegenerateDialog } from "@app/components/Dialog/PkiRegenerateDialog";
-import { DynamicForm } from "@app/components/Form/DynamicForm.js";
+import { DynamicForm } from "@app/components/Form/DynamicForm.tsx";
 import {
   getX25519PrivateKey,
   getX25519PublicKey,
 } from "@app/core/utils/x25519";
-import type { SecurityValidation } from "@app/validation/config/security.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { SecurityValidation } from "@app/validation/config/security.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Eye, EyeOff } from "lucide-react";

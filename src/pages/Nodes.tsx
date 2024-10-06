@@ -1,11 +1,11 @@
 import Footer from "@app/components/UI/Footer";
 import { useAppStore } from "@app/core/stores/appStore";
-import { Sidebar } from "@components/Sidebar.js";
-import { Button } from "@components/UI/Button.js";
-import { Mono } from "@components/generic/Mono.js";
-import { Table } from "@components/generic/Table/index.js";
-import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { Sidebar } from "@components/Sidebar.tsx";
+import { Button } from "@components/UI/Button.tsx";
+import { Mono } from "@components/generic/Mono.tsx";
+import { Table } from "@components/generic/Table/index.tsx";
+import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";

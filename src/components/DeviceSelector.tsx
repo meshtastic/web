@@ -1,8 +1,8 @@
-import { DeviceSelectorButton } from "@components/DeviceSelectorButton.js";
-import { Separator } from "@components/UI/Seperator.js";
-import { Code } from "@components/UI/Typography/Code.js";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDeviceStore } from "@core/stores/deviceStore.js";
+import { DeviceSelectorButton } from "@components/DeviceSelectorButton.tsx";
+import { Separator } from "@components/UI/Seperator.tsx";
+import { Code } from "@components/UI/Typography/Code.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
   HomeIcon,
