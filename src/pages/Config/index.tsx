@@ -7,6 +7,7 @@ import { useToast } from "@core/hooks/useToast.ts";
 import { DeviceConfig } from "@pages/Config/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.tsx";
 import { BoxesIcon, SaveIcon, SettingsIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 export const ConfigPage = (): JSX.Element => {
@@ -15,19 +16,20 @@ export const ConfigPage = (): JSX.Element => {
     "device" | "module"
   >("device");
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   return (
     <>
       <Sidebar>
         <SidebarSection label="Config Sections">
           <SidebarButton
-            label="Radio Config"
+            label={t("Radio Config")}
             active={activeConfigSection === "device"}
             onClick={() => setActiveConfigSection("device")}
             Icon={SettingsIcon}
           />
           <SidebarButton
-            label="Module Config"
+            label={t("Module Config")}
             active={activeConfigSection === "module"}
             onClick={() => setActiveConfigSection("module")}
             Icon={BoxesIcon}
@@ -48,8 +50,8 @@ export const ConfigPage = (): JSX.Element => {
                     await connection?.setConfig(config).then(() =>
                       toast({
                         title: `Config ${config.payloadVariant.case} saved`,
-                      }),
-                    ),
+                      })
+                    )
                 );
               } else {
                 workingModuleConfig.map(
@@ -57,8 +59,8 @@ export const ConfigPage = (): JSX.Element => {
                     await connection?.setModuleConfig(moduleConfig).then(() =>
                       toast({
                         title: `Config ${moduleConfig.payloadVariant.case} saved`,
-                      }),
-                    ),
+                      })
+                    )
                 );
               }
 

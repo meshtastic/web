@@ -10,7 +10,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { ClockIcon, RefreshCwIcon } from "lucide-react";
 import { useState } from "react";
-
+import { useTranslation } from "react-i18next";
 export interface RebootDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -20,6 +20,7 @@ export const RebootDialog = ({
   open,
   onOpenChange,
 }: RebootDialogProps): JSX.Element => {
+  const { t } = useTranslation();
   const { connection } = useDevice();
 
   const [time, setTime] = useState<number>(5);
@@ -28,9 +29,9 @@ export const RebootDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Schedule Reboot</DialogTitle>
+          <DialogTitle>{t("Schedule Reboot")}</DialogTitle>
           <DialogDescription>
-            Reboot the connected node after x minutes.
+            {t("Reboot the connected node after x minutes.")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex gap-2 p-4">
@@ -52,7 +53,7 @@ export const RebootDialog = ({
             }}
           >
             <RefreshCwIcon className="mr-2" size={16} />
-            Now
+            {t("Now")}
           </Button>
         </div>
       </DialogContent>

@@ -10,6 +10,7 @@ import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice, useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { useCommandState } from "cmdk";
+import { useTranslation } from "react-i18next";
 import {
   ArrowLeftRightIcon,
   BoxSelectIcon,
@@ -56,6 +57,7 @@ export interface SubItem {
 }
 
 export const CommandPalette = (): JSX.Element => {
+  const { t } = useTranslation();
   const {
     commandPaletteOpen,
     setCommandPaletteOpen,
@@ -71,25 +73,25 @@ export const CommandPalette = (): JSX.Element => {
 
   const groups: Group[] = [
     {
-      label: "Goto",
+      label: t("Goto"),
       icon: LinkIcon,
       commands: [
         {
-          label: "Messages",
+          label: t("Messages"),
           icon: MessageSquareIcon,
           action() {
             setActivePage("messages");
           },
         },
         {
-          label: "Map",
+          label: t("Map"),
           icon: MapIcon,
           action() {
             setActivePage("map");
           },
         },
         {
-          label: "Config",
+          label: t("Config"),
           icon: SettingsIcon,
           action() {
             setActivePage("config");
@@ -97,14 +99,14 @@ export const CommandPalette = (): JSX.Element => {
           tags: ["settings"],
         },
         {
-          label: "Channels",
+          label: t("Channels"),
           icon: LayersIcon,
           action() {
             setActivePage("channels");
           },
         },
         {
-          label: "Nodes",
+          label: t("Nodes"),
           icon: UsersIcon,
           action() {
             setActivePage("nodes");
@@ -113,11 +115,11 @@ export const CommandPalette = (): JSX.Element => {
       ],
     },
     {
-      label: "Manage",
+      label: t("Manage"),
       icon: SmartphoneIcon,
       commands: [
         {
-          label: "Switch Node",
+          label: t("Switch Node"),
           icon: ArrowLeftRightIcon,
           subItems: getDevices().map((device) => {
             return {
@@ -137,7 +139,7 @@ export const CommandPalette = (): JSX.Element => {
           }),
         },
         {
-          label: "Connect New Node",
+          label: t("Connect New Node"),
           icon: PlusIcon,
           action() {
             setSelectedDevice(0);
@@ -146,22 +148,22 @@ export const CommandPalette = (): JSX.Element => {
       ],
     },
     {
-      label: "Contextual",
+      label: t("Contextual"),
       icon: BoxSelectIcon,
       commands: [
         {
-          label: "QR Code",
+          label: t("QR Code"),
           icon: QrCodeIcon,
           subItems: [
             {
-              label: "Generator",
+              label: t("Generator"),
               icon: <QrCodeIcon size={16} />,
               action() {
                 setDialogOpen("QR", true);
               },
             },
             {
-              label: "Import",
+              label: t("Import"),
               icon: <QrCodeIcon size={16} />,
               action() {
                 setDialogOpen("import", true);
@@ -170,7 +172,7 @@ export const CommandPalette = (): JSX.Element => {
           ],
         },
         {
-          label: "Disconnect",
+          label: t("Disconnect"),
           icon: XCircleIcon,
           action() {
             void connection?.disconnect();
@@ -179,35 +181,35 @@ export const CommandPalette = (): JSX.Element => {
           },
         },
         {
-          label: "Schedule Shutdown",
+          label: t("Schedule Shutdown"),
           icon: PowerIcon,
           action() {
             setDialogOpen("shutdown", true);
           },
         },
         {
-          label: "Schedule Reboot",
+          label: t("Schedule Reboot"),
           icon: RefreshCwIcon,
           action() {
             setDialogOpen("reboot", true);
           },
         },
         {
-          label: "Reset Nodes",
+          label: t("Reset Nodes"),
           icon: TrashIcon,
           action() {
             connection?.resetNodes();
           },
         },
         {
-          label: "Factory Reset Device",
+          label: t("Factory Reset Device"),
           icon: FactoryIcon,
           action() {
             connection?.factoryResetDevice();
           },
         },
         {
-          label: "Factory Reset Config",
+          label: t("Factory Reset Config"),
           icon: FactoryIcon,
           action() {
             connection?.factoryResetConfig();
@@ -216,42 +218,42 @@ export const CommandPalette = (): JSX.Element => {
       ],
     },
     {
-      label: "Debug",
+      label: t("Debug"),
       icon: BugIcon,
       commands: [
         {
-          label: "Reconfigure",
+          label: t("Reconfigure"),
           icon: RefreshCwIcon,
           action() {
             void connection?.configure();
           },
         },
         {
-          label: "[WIP] Clear Messages",
+          label: t("[WIP] Clear Messages"),
           icon: EraserIcon,
           action() {
-            alert("This feature is not implemented");
+            alert(t("This feature is not implemented"));
           },
         },
       ],
     },
     {
-      label: "Application",
+      label: t("Application"),
       icon: LayoutIcon,
       commands: [
         {
-          label: "Toggle Dark Mode",
+          label: t("Toggle Dark Mode"),
           icon: MoonIcon,
           action() {
             setDarkMode(!darkMode);
           },
         },
         {
-          label: "Accent Color",
+          label: t("Accent Color"),
           icon: PaletteIcon,
           subItems: [
             {
-              label: "Red",
+              label: t("Red"),
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -264,7 +266,7 @@ export const CommandPalette = (): JSX.Element => {
               },
             },
             {
-              label: "Orange",
+              label: t("Orange"),
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -277,7 +279,7 @@ export const CommandPalette = (): JSX.Element => {
               },
             },
             {
-              label: "Yellow",
+              label: t("Yellow"),
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -290,7 +292,7 @@ export const CommandPalette = (): JSX.Element => {
               },
             },
             {
-              label: "Green",
+              label: t("Green"),
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -303,7 +305,7 @@ export const CommandPalette = (): JSX.Element => {
               },
             },
             {
-              label: "Blue",
+              label: t("Blue"),
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -316,7 +318,7 @@ export const CommandPalette = (): JSX.Element => {
               },
             },
             {
-              label: "Purple",
+              label: t("Purple"),
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -329,7 +331,7 @@ export const CommandPalette = (): JSX.Element => {
               },
             },
             {
-              label: "Pink",
+              label: t("Pink"),
               icon: (
                 <span
                   className={`h-3 w-3 rounded-full ${
@@ -364,9 +366,9 @@ export const CommandPalette = (): JSX.Element => {
       open={commandPaletteOpen}
       onOpenChange={setCommandPaletteOpen}
     >
-      <CommandInput placeholder="Type a command or search..." />
+      <CommandInput placeholder={t("Type a command or search...")} />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>{t("No results found.")}</CommandEmpty>
         {groups.map((group) => (
           <CommandGroup key={group.label} heading={group.label}>
             {group.commands.map((command) => (

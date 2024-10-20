@@ -2,6 +2,7 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useTranslation } from "react-i18next";
 import type { Page } from "@core/stores/deviceStore.ts";
 import {
   BatteryMediumIcon,
@@ -24,6 +25,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
   const { hardware, nodes, metadata } = useDevice();
   const myNode = nodes.get(hardware.myNodeNum);
   const myMetadata = metadata.get(0);
+   const { t } = useTranslation();
   const { activePage, setActivePage, setDialogOpen } = useDevice();
 
   interface NavLink {
@@ -34,27 +36,27 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
 
   const pages: NavLink[] = [
     {
-      name: "Messages",
+      name: t("Messages"),
       icon: MessageSquareIcon,
       page: "messages",
     },
     {
-      name: "Map",
+      name: t("Map"),
       icon: MapIcon,
       page: "map",
     },
     {
-      name: "Config",
+      name: t("Config"),
       icon: SettingsIcon,
       page: "config",
     },
     {
-      name: "Channels",
+      name: t("Channels"),
       icon: LayersIcon,
       page: "channels",
     },
     {
-      name: "Nodes",
+      name: t("Nodes"),
       icon: UsersIcon,
       page: "nodes",
     },

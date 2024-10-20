@@ -16,55 +16,57 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
+import { useTranslation } from "react-i18next";
 
 export const ModuleConfig = (): JSX.Element => {
+  const { t } = useTranslation();
   const tabs = [
     {
-      label: "MQTT",
+      label: t("MQTT"),
       element: MQTT,
     },
     {
-      label: "Serial",
+      label: t("Serial"),
       element: Serial,
     },
     {
-      label: "Ext Notif",
+      label: t("Ext Notif"),
       element: ExternalNotification,
     },
     {
-      label: "S&F",
+      label: t("S&F"),
       element: StoreForward,
     },
     {
-      label: "Range Test",
+      label: t("Range Test"),
       element: RangeTest,
     },
     {
-      label: "Telemetry",
+      label: t("Telemetry"),
       element: Telemetry,
     },
     {
-      label: "Canned",
+      label: t("Canned"),
       element: CannedMessage,
     },
     {
-      label: "Audio",
+      label: t("Audio"),
       element: Audio,
     },
     {
-      label: "Neighbor Info",
+      label: t("Neighbor Info"),
       element: NeighborInfo,
     },
     {
-      label: "Ambient Lighting",
+      label: t("Ambient Lighting"),
       element: AmbientLighting,
     },
     {
-      label: "Detection Sensor",
+      label: t("Detection Sensor"),
       element: DetectionSensor,
     },
     {
-      label: "Paxcounter",
+      label: t("Paxcounter"),
       element: Paxcounter,
     },
   ];

@@ -4,6 +4,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
 import { H3 } from "@components/UI/Typography/H3.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { useTranslation } from "react-i18next";
 import {
   BluetoothIcon,
   ListPlusIcon,
@@ -17,6 +18,7 @@ import { useMemo } from "react";
 export const Dashboard = () => {
   const { setConnectDialogOpen } = useAppStore();
   const { getDevices } = useDeviceStore();
+  const { t } = useTranslation();
 
   const devices = useMemo(() => getDevices(), [getDevices]);
 
@@ -25,8 +27,8 @@ export const Dashboard = () => {
       <div className="flex flex-col gap-3 p-3">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <H3>Connected Devices</H3>
-            <Subtle>Manage, connect and disconnect devices</Subtle>
+            <H3>{t("Connected Devices")}</H3>
+            <Subtle>{t("Manage, connect and disconnect devices")}</Subtle>
           </div>
         </div>
 
@@ -48,19 +50,19 @@ export const Dashboard = () => {
                           {device.connection?.connType === "ble" && (
                             <>
                               <BluetoothIcon size={16} />
-                              BLE
+                              {"BLE"}
                             </>
                           )}
                           {device.connection?.connType === "serial" && (
                             <>
                               <UsbIcon size={16} />
-                              Serial
+                              {t("Serial")}
                             </>
                           )}
                           {device.connection?.connType === "http" && (
                             <>
                               <NetworkIcon size={16} />
-                              Network
+                              {t("Network")}
                             </>
                           )}
                         </div>
@@ -83,14 +85,14 @@ export const Dashboard = () => {
           ) : (
             <div className="m-auto flex flex-col gap-3 text-center">
               <ListPlusIcon size={48} className="mx-auto text-textSecondary" />
-              <H3>No Devices</H3>
-              <Subtle>Connect at least one device to get started</Subtle>
+              <H3>{t("No Devices")}</H3>
+              <Subtle>{t("Connect at least one device to get started")}</Subtle>
               <Button
                 className="gap-2"
                 onClick={() => setConnectDialogOpen(true)}
               >
                 <PlusIcon size={16} />
-                New Connection
+                {t("New Connection")}
               </Button>
             </div>
           )}

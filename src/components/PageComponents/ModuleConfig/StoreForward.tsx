@@ -1,10 +1,12 @@
 import type { StoreForwardValidation } from "@app/validation/moduleConfig/storeForward.ts";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useTranslation } from "react-i18next";
 import { Protobuf } from "@meshtastic/js";
 
 export const StoreForward = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation();
 
   const onSubmit = (data: StoreForwardValidation) => {
     setWorkingModuleConfig(
@@ -13,7 +15,7 @@ export const StoreForward = (): JSX.Element => {
           case: "storeForward",
           value: data,
         },
-      }),
+      })
     );
   };
 
@@ -23,20 +25,20 @@ export const StoreForward = (): JSX.Element => {
       defaultValues={moduleConfig.storeForward}
       fieldGroups={[
         {
-          label: "Store & Forward Settings",
-          description: "Settings for the Store & Forward module",
+          label: t("Store & Forward Settings"),
+          description: t("Settings for the Store & Forward module"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Module Enabled",
-              description: "Enable Store & Forward",
+              label: t("Module Enabled"),
+              description: t("Enable Store & Forward"),
             },
             {
               type: "toggle",
               name: "heartbeat",
-              label: "Heartbeat Enabled",
-              description: "Enable Store & Forward heartbeat",
+              label: t("Heartbeat Enabled"),
+              description: t("Enable Store & Forward heartbeat"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -46,8 +48,8 @@ export const StoreForward = (): JSX.Element => {
             {
               type: "number",
               name: "records",
-              label: "Number of records",
-              description: "Number of records to store",
+              label: t("Number of records"),
+              description: t("Number of records to store"),
 
               disabledBy: [
                 {
@@ -61,8 +63,8 @@ export const StoreForward = (): JSX.Element => {
             {
               type: "number",
               name: "historyReturnMax",
-              label: "History return max",
-              description: "Max number of records to return",
+              label: t("History return max"),
+              description: t("Max number of records to return"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -72,8 +74,8 @@ export const StoreForward = (): JSX.Element => {
             {
               type: "number",
               name: "historyReturnWindow",
-              label: "History return window",
-              description: "Max number of records to return",
+              label: t("History return window"),
+              description: t("Max number of records to return"),
               disabledBy: [
                 {
                   fieldName: "enabled",

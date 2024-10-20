@@ -15,6 +15,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 import { toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export interface ImportDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ export const ImportDialog = ({
   open,
   onOpenChange,
 }: ImportDialogProps): JSX.Element => {
+  const { t } = useTranslation();
   const [importDialogInput, setImportDialogInput] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
   const [validUrl, setValidUrl] = useState<boolean>(false);
@@ -50,12 +52,12 @@ export const ImportDialog = ({
         .padEnd(
           encodedChannelConfig.length +
             ((4 - (encodedChannelConfig.length % 4)) % 4),
-          "=",
+          "="
         )
         .replace(/-/g, "+")
         .replace(/_/g, "/");
       setChannelSet(
-        Protobuf.AppOnly.ChannelSet.fromBinary(toByteArray(paddedString)),
+        Protobuf.AppOnly.ChannelSet.fromBinary(toByteArray(paddedString))
       );
       setValidUrl(true);
     } catch (error) {
@@ -74,7 +76,7 @@ export const ImportDialog = ({
               ? Protobuf.Channel.Channel_Role.PRIMARY
               : Protobuf.Channel.Channel_Role.SECONDARY,
           settings: ch,
-        }),
+        })
       );
     });
 
@@ -85,7 +87,7 @@ export const ImportDialog = ({
             case: "lora",
             value: channelSet.loraConfig,
           },
-        }),
+        })
       );
     }
   };
@@ -94,13 +96,13 @@ export const ImportDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Import Channel Set</DialogTitle>
+          <DialogTitle>{t("Import Channel Set")}</DialogTitle>
           <DialogDescription>
-            The current LoRa configuration will be overridden.
+            {t("The current LoRa configuration will be overridden.")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
-          <Label>Channel Set/QR Code URL</Label>
+          <Label>{t("Channel Set/QR Code URL")}</Label>
           <Input
             value={importDialogInput}
             suffix={validUrl ? "✅" : "❌"}
@@ -112,7 +114,7 @@ export const ImportDialog = ({
             <div className="flex flex-col gap-3">
               <div className="flex w-full gap-2">
                 <div className="w-36">
-                  <Label>Use Preset?</Label>
+                  <Label>{t("Use Preset?")}</Label>
                   <Switch
                     disabled={true}
                     checked={channelSet?.loraConfig?.usePreset ?? true}
@@ -135,7 +137,7 @@ export const ImportDialog = ({
               </Select> */}
 
               <span className="text-md block font-medium text-textPrimary">
-                Channels:
+                {t("Channels:")}
               </span>
               <div className="flex w-40 flex-col gap-1">
                 {channelSet?.settings.map((channel) => (
@@ -154,7 +156,7 @@ export const ImportDialog = ({
         </div>
         <DialogFooter>
           <Button onClick={apply} disabled={!validUrl}>
-            Apply
+            {t("Apply")}
           </Button>
         </DialogFooter>
       </DialogContent>

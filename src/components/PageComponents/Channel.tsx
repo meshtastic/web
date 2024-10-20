@@ -5,6 +5,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 export interface SettingsPanelProps {
@@ -14,12 +15,13 @@ export interface SettingsPanelProps {
 export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
   const { config, connection, addChannel } = useDevice();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const [pass, setPass] = useState<string>(
-    fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+    fromByteArray(channel?.settings?.psk ?? new Uint8Array(0))
   );
   const [bitCount, setBits] = useState<number>(
-    channel?.settings?.psk.length ?? 16,
+    channel?.settings?.psk.length ?? 16
   );
   const [validationText, setValidationText] = useState<string>();
 
@@ -52,8 +54,8 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
         cryptoRandomString({
           length: bitCount ?? 0,
           type: "alphanumeric",
-        }),
-      ),
+        })
+      )
     );
     setValidationText(undefined);
   };
@@ -104,16 +106,17 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
       }}
       fieldGroups={[
         {
-          label: "Channel Settings",
-          description: "Crypto, MQTT & misc settings",
+          label: t("Channel Settings"),
+          description: t("Crypto, MQTT & misc settings"),
           fields: [
             {
               type: "select",
               name: "role",
-              label: "Role",
+              label: t("Role"),
               disabled: channel.index === 0,
-              description:
-                "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
+              description: t(
+                "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed"
+              ),
               properties: {
                 enumValue:
                   channel.index === 0
@@ -124,8 +127,8 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
             {
               type: "passwordGenerator",
               name: "settings.psk",
-              label: "pre-Shared Key",
-              description: "256, 128, or 8 bit PSKs allowed",
+              label: t("pre-Shared Key"),
+              description: t("256, 128, or 8 bit PSKs allowed"),
               validationText: validationText,
               devicePSKBitCount: bitCount ?? 0,
               inputChange: inputChangeEvent,
@@ -139,40 +142,41 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
             {
               type: "text",
               name: "settings.name",
-              label: "Name",
-              description:
-                "A unique name for the channel <12 bytes, leave blank for default",
+              label: t("Name"),
+              description: t(
+                "A unique name for the channel <12 bytes, leave blank for default"
+              ),
             },
             {
               type: "toggle",
               name: "settings.uplinkEnabled",
-              label: "Uplink Enabled",
+              label: t("Uplink Enabled"),
               description: "Send messages from the local mesh to MQTT",
             },
             {
               type: "toggle",
               name: "settings.downlinkEnabled",
-              label: "Downlink Enabled",
-              description: "Send messages from MQTT to the local mesh",
+              label: t("Downlink Enabled"),
+              description: t("Send messages from MQTT to the local mesh"),
             },
             {
               type: "toggle",
               name: "settings.positionEnabled",
-              label: "Allow Position Requests",
-              description: "Send position to channel",
+              label: t("Allow Position Requests"),
+              description: t("Send position to channel"),
             },
             {
               type: "toggle",
               name: "settings.preciseLocation",
-              label: "Precise Location",
-              description: "Send precise location to channel",
+              label: t("Precise Location"),
+              description: t("Send precise location to channel"),
             },
             {
               type: "select",
               name: "settings.positionPrecision",
-              label: "Approximate Location",
+              label: t("Approximate Location"),
               description:
-                "If not sharing precise location, position shared on channel will be accurate within this distance",
+                t("If not sharing precise location, position shared on channel will be accurate within this distance"),
               properties: {
                 enumValue:
                   config.display?.units === 0

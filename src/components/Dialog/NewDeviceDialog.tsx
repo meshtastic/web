@@ -15,6 +15,8 @@ import {
 } from "@components/UI/Tabs.tsx";
 import { Link } from "@components/UI/Typography/Link.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 export interface TabElementProps {
   closeDialog: () => void;
@@ -30,26 +32,28 @@ export interface TabManifest {
 
 const tabs: TabManifest[] = [
   {
-    label: "HTTP",
+    label: i18n.t("HTTP"),
     element: HTTP,
     disabled: false,
-    disabledMessage: "Unsuported connection method",
+    disabledMessage: i18n.t("Unsuported connection method"),
   },
   {
-    label: "Bluetooth",
+    label: i18n.t("Bluetooth"),
     element: BLE,
     disabled: !navigator.bluetooth,
-    disabledMessage:
-      "Web Bluetooth is currently only supported by Chromium-based browsers",
+    disabledMessage: i18n.t(
+      "Web Bluetooth is currently only supported by Chromium-based browsers"
+    ),
     disabledLink:
       "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
   },
   {
-    label: "Serial",
+    label: i18n.t("Serial"),
     element: Serial,
     disabled: !navigator.serial,
-    disabledMessage:
-      "WebSerial is currently only supported by Chromium based browsers: https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility",
+    disabledMessage: i18n.t(
+      "WebSerial is currently only supported by Chromium based browsers"
+    ),
   },
 ];
 export interface NewDeviceProps {
@@ -61,11 +65,12 @@ export const NewDeviceDialog = ({
   open,
   onOpenChange,
 }: NewDeviceProps): JSX.Element => {
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Connect New Device</DialogTitle>
+          <DialogTitle>{t("Connect New Device")}</DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="HTTP">
           <TabsList>
@@ -95,17 +100,18 @@ export const NewDeviceDialog = ({
         {(!navigator.bluetooth || !navigator.serial) && (
           <>
             <Subtle>
-              Web Bluetooth and Web Serial are currently only supported by
-              Chromium-based browsers.
+              {t(
+                "Web Bluetooth and Web Serial are currently only supported by Chromium-based browsers."
+              )}
             </Subtle>
             <Subtle>
-              Read more:&nbsp;
+              {t("Read more:")}
               <Link href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility">
-                Web Bluetooth
+                {t("Web Bluetooth")}
               </Link>
               &nbsp;
               <Link href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility">
-                Web Serial
+                {t("Web Serial")}
               </Link>
             </Subtle>
           </>

@@ -6,6 +6,7 @@ import { Network } from "@components/PageComponents/Config/Network.tsx";
 import { Position } from "@components/PageComponents/Config/Position.tsx";
 import { Power } from "@components/PageComponents/Config/Power.tsx";
 import { Security } from "@components/PageComponents/Config/Security.tsx";
+import { useTranslation } from "react-i18next";
 import {
   Tabs,
   TabsContent,
@@ -16,40 +17,41 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 
 export const DeviceConfig = (): JSX.Element => {
   const { metadata } = useDevice();
+  const { t } = useTranslation();
 
   const tabs = [
     {
-      label: "Device",
+      label: t("Device"),
       element: Device,
       count: 0,
     },
     {
-      label: "Position",
+      label: t("Position"),
       element: Position,
     },
     {
-      label: "Power",
+      label: t("Power"),
       element: Power,
     },
     {
-      label: "Network",
+      label: t("network"),
       element: Network,
       // disabled: !metadata.get(0)?.hasWifi,
     },
     {
-      label: "Display",
+      label: t("Display"),
       element: Display,
     },
     {
-      label: "LoRa",
+      label: t("LoRa"),
       element: LoRa,
     },
     {
-      label: "Bluetooth",
+      label: t("Bluetooth"),
       element: Bluetooth,
     },
     {
-      label: "Security",
+      label: t("Security"),
       element: Security,
     },
   ];

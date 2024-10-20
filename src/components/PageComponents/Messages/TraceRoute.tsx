@@ -1,6 +1,7 @@
 import { useDevice } from "@app/core/stores/deviceStore.ts";
 import type { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { useTranslation } from "react-i18next";
 
 export interface TraceRouteProps {
   from?: Protobuf.Mesh.NodeInfo;
@@ -14,6 +15,7 @@ export const TraceRoute = ({
   route,
 }: TraceRouteProps): JSX.Element => {
   const { nodes } = useDevice();
+  const { t } = useTranslation("translation");
 
   return route.length === 0 ? (
     <div className="ml-5 flex">
@@ -27,7 +29,10 @@ export const TraceRoute = ({
         {to?.user?.longName}↔
         {route.map((hop) => {
           const node = nodes.get(hop);
-          return `${node?.user?.longName ?? (node?.num ? numberToHexUnpadded(node.num) : "Unknown")}↔`;
+          return `${
+            node?.user?.longName ??
+            (node?.num ? numberToHexUnpadded(node.num) : t("Unknown"))
+          }↔`;
         })}
         {from?.user?.longName}
       </span>

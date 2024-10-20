@@ -7,6 +7,7 @@ import { Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
+import { useTranslation } from "react-i18next";
 import { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon, TrashIcon } from "lucide-react";
@@ -21,9 +22,10 @@ export interface DeleteNoteDialogProps {
 export const NodesPage = (): JSX.Element => {
   const { nodes, hardware, setDialogOpen } = useDevice();
   const { setNodeNumToBeRemoved } = useAppStore();
+  const { t } = useTranslation();
 
   const filteredNodes = Array.from(nodes.values()).filter(
-    (n) => n.num !== hardware.myNodeNum,
+    (n) => n.num !== hardware.myNodeNum
   );
 
   return (
@@ -34,14 +36,14 @@ export const NodesPage = (): JSX.Element => {
           <Table
             headings={[
               { title: "", type: "blank", sortable: false },
-              { title: "Name", type: "normal", sortable: true },
-              { title: "Model", type: "normal", sortable: true },
-              { title: "MAC Address", type: "normal", sortable: true },
-              { title: "Last Heard", type: "normal", sortable: true },
-              { title: "SNR", type: "normal", sortable: true },
-              { title: "Encryption", type: "normal", sortable: false },
-              { title: "Connection", type: "normal", sortable: true },
-              { title: "Remove", type: "normal", sortable: false },
+              { title: t("Name"), type: "normal", sortable: true },
+              { title: t("Model"), type: "normal", sortable: true },
+              { title: t("MAC Address"), type: "normal", sortable: true },
+              { title: t("Last Heard"), type: "normal", sortable: true },
+              { title: t("SNR"), type: "normal", sortable: true },
+              { title: t("Encryption"), type: "normal", sortable: false },
+              { title: t("Connection"), type: "normal", sortable: true },
+              { title: t("Remove"), type: "normal", sortable: false },
             ]}
             rows={filteredNodes.map((node) => [
               <Hashicon key="icon" size={24} value={node.num.toString()} />,
@@ -65,7 +67,7 @@ export const NodesPage = (): JSX.Element => {
               </Mono>,
               <Fragment key="lastHeard">
                 {node.lastHeard === 0 ? (
-                  <p>Never</p>
+                  <p>{t("Never")}</p>
                 ) : (
                   <TimeAgo timestamp={node.lastHeard * 1000} />
                 )}
@@ -101,7 +103,7 @@ export const NodesPage = (): JSX.Element => {
                 }}
               >
                 <TrashIcon />
-                Remove
+                {t("Remove")}
               </Button>,
             ])}
           />

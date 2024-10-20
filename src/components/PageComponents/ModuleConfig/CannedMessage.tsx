@@ -1,10 +1,12 @@
 import type { CannedMessageValidation } from "@app/validation/moduleConfig/cannedMessage.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useTranslation } from "react-i18next";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 
 export const CannedMessage = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation();
 
   const onSubmit = (data: CannedMessageValidation) => {
     setWorkingModuleConfig(
@@ -13,7 +15,7 @@ export const CannedMessage = (): JSX.Element => {
           case: "cannedMessage",
           value: data,
         },
-      }),
+      })
     );
   };
 
@@ -23,44 +25,44 @@ export const CannedMessage = (): JSX.Element => {
       defaultValues={moduleConfig.cannedMessage}
       fieldGroups={[
         {
-          label: "Canned Message Settings",
-          description: "Settings for the Canned Message module",
+          label: t("Canned Message Settings"),
+          description: t("Settings for the Canned Message module"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Module Enabled",
-              description: "Enable Canned Message",
+              label: t("Module Enabled"),
+              description: t("Enable Canned Message"),
             },
             {
               type: "toggle",
               name: "rotary1Enabled",
-              label: "Rotary Encoder #1 Enabled",
-              description: "Enable the rotary encoder",
+              label: t("Rotary Encoder #1 Enabled"),
+              description: t("Enable the rotary encoder"),
             },
             {
               type: "number",
               name: "inputbrokerPinA",
-              label: "Encoder Pin A",
-              description: "GPIO Pin Value (1-39) For encoder port A",
+              label: t("Encoder Pin A"),
+              description: t("GPIO Pin Value (1-39) For encoder port A"),
             },
             {
               type: "number",
               name: "inputbrokerPinB",
-              label: "Encoder Pin B",
-              description: "GPIO Pin Value (1-39) For encoder port B",
+              label: t("Encoder Pin B"),
+              description: t("GPIO Pin Value (1-39) For encoder port B"),
             },
             {
               type: "number",
               name: "inputbrokerPinPress",
-              label: "Encoder Pin Press",
-              description: "GPIO Pin Value (1-39) For encoder Press",
+              label: t("Encoder Pin Press"),
+              description: t("GPIO Pin Value (1-39) For encoder Press"),
             },
             {
               type: "select",
               name: "inputbrokerEventCw",
-              label: "Clockwise event",
-              description: "Select input event.",
+              label: t("Clockwise event"),
+              description: t(t("Select input event.")),
               properties: {
                 enumValue:
                   Protobuf.ModuleConfig
@@ -70,8 +72,8 @@ export const CannedMessage = (): JSX.Element => {
             {
               type: "select",
               name: "inputbrokerEventCcw",
-              label: "Counter Clockwise event",
-              description: "Select input event.",
+              label: t("Counter Clockwise event"),
+              description: t("Select input event."),
               properties: {
                 enumValue:
                   Protobuf.ModuleConfig
@@ -81,8 +83,8 @@ export const CannedMessage = (): JSX.Element => {
             {
               type: "select",
               name: "inputbrokerEventPress",
-              label: "Press event",
-              description: "Select input event",
+              label: t("Press event"),
+              description: t("Select input event."),
               properties: {
                 enumValue:
                   Protobuf.ModuleConfig
@@ -92,21 +94,21 @@ export const CannedMessage = (): JSX.Element => {
             {
               type: "toggle",
               name: "updown1Enabled",
-              label: "Up Down enabled",
-              description: "Enable the up / down encoder",
+              label: t("Up Down enabled"),
+              description: t("Enable the up / down encoder"),
             },
             {
               type: "text",
               name: "allowInputSource",
-              label: "Allow Input Source",
+              label: t("Allow Input Source"),
               description:
                 "Select from: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'",
             },
             {
               type: "toggle",
               name: "sendBell",
-              label: "Send Bell",
-              description: "Sends a bell character with each message",
+              label: t("Send Bell"),
+              description: t("Sends a bell character with each message"),
             },
           ],
         },
