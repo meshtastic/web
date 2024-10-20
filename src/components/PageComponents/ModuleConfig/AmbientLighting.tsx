@@ -1,10 +1,12 @@
 import { useDevice } from "@app/core/stores/deviceStore.ts";
 import type { AmbientLightingValidation } from "@app/validation/moduleConfig/ambientLighting.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useTranslation } from "react-i18next";
 import { Protobuf } from "@meshtastic/js";
 
 export const AmbientLighting = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("translation");
 
   const onSubmit = (data: AmbientLightingValidation) => {
     setWorkingModuleConfig(
@@ -13,7 +15,7 @@ export const AmbientLighting = (): JSX.Element => {
           case: "ambientLighting",
           value: data,
         },
-      }),
+      })
     );
   };
 
@@ -29,32 +31,34 @@ export const AmbientLighting = (): JSX.Element => {
             {
               type: "toggle",
               name: "ledState",
-              label: "LED State",
-              description: "Sets LED to on or off",
+              label: t("LED State"),
+              description: t("Sets LED to on or off"),
             },
             {
               type: "number",
               name: "current",
-              label: "Current",
-              description: "Sets the current for the LED output. Default is 10",
+              label: t("Current"),
+              description: t(
+                "Sets the current for the LED output. Default is 10"
+              ),
             },
             {
               type: "number",
               name: "red",
-              label: "Red",
-              description: "Sets the red LED level. Values are 0-255",
+              label: t("Red"),
+              description: t("Sets the red LED level. Values are 0-255"),
             },
             {
               type: "number",
               name: "green",
-              label: "Green",
-              description: "Sets the green LED level. Values are 0-255",
+              label: t("Green"),
+              description: t("Sets the green LED level. Values are 0-255"),
             },
             {
               type: "number",
               name: "blue",
-              label: "Blue",
-              description: "Sets the blue LED level. Values are 0-255",
+              label: t("Blue"),
+              description: t("Sets the blue LED level. Values are 0-255"),
             },
           ],
         },

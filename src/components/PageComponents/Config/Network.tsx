@@ -1,6 +1,7 @@
 import type { NetworkValidation } from "@app/validation/config/network.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useTranslation } from "react-i18next";
 import {
   convertIntToIpAddress,
   convertIpAddressToInt,
@@ -9,6 +10,7 @@ import { Protobuf } from "@meshtastic/js";
 
 export const Network = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
+  const { t } = useTranslation();
 
   const onSubmit = (data: NetworkValidation) => {
     setWorkingConfig(
@@ -25,7 +27,7 @@ export const Network = (): JSX.Element => {
             }),
           },
         },
-      }),
+      })
     );
   };
 
@@ -37,30 +39,30 @@ export const Network = (): JSX.Element => {
         ipv4Config: {
           ip: convertIntToIpAddress(config.network?.ipv4Config?.ip ?? 0),
           gateway: convertIntToIpAddress(
-            config.network?.ipv4Config?.gateway ?? 0,
+            config.network?.ipv4Config?.gateway ?? 0
           ),
           subnet: convertIntToIpAddress(
-            config.network?.ipv4Config?.subnet ?? 0,
+            config.network?.ipv4Config?.subnet ?? 0
           ),
           dns: convertIntToIpAddress(config.network?.ipv4Config?.dns ?? 0),
         },
       }}
       fieldGroups={[
         {
-          label: "WiFi Config",
-          description: "WiFi radio configuration",
+          label: t("WiFi Config"),
+          description: t("WiFi radio configuration"),
           fields: [
             {
               type: "toggle",
               name: "wifiEnabled",
-              label: "Enabled",
-              description: "Enable or disable the WiFi radio",
+              label: t("Enabled"),
+              description: t("Enable or disable the WiFi radio"),
             },
             {
               type: "text",
               name: "wifiSsid",
-              label: "SSID",
-              description: "Network name",
+              label: t("SSID"),
+              description: t("Network name"),
               disabledBy: [
                 {
                   fieldName: "wifiEnabled",
@@ -70,8 +72,8 @@ export const Network = (): JSX.Element => {
             {
               type: "password",
               name: "wifiPsk",
-              label: "PSK",
-              description: "Network password",
+              label: t("PSK"),
+              description: t("Network password"),
               disabledBy: [
                 {
                   fieldName: "wifiEnabled",
@@ -81,26 +83,26 @@ export const Network = (): JSX.Element => {
           ],
         },
         {
-          label: "Ethernet Config",
-          description: "Ethernet port configuration",
+          label: t("Ethernet Config"),
+          description: t("Ethernet port configuration"),
           fields: [
             {
               type: "toggle",
               name: "ethEnabled",
-              label: "Enabled",
-              description: "Enable or disable the Ethernet port",
+              label: t("Enabled"),
+              description: t("Enable or disable the Ethernet port"),
             },
           ],
         },
         {
-          label: "IP Config",
-          description: "IP configuration",
+          label: t("IP Config"),
+          description: t("IP configuration"),
           fields: [
             {
               type: "select",
               name: "addressMode",
-              label: "Address Mode",
-              description: "Address assignment selection",
+              label: t("Address Mode"),
+              description: t("Address assignment selection"),
               properties: {
                 enumValue: Protobuf.Config.Config_NetworkConfig_AddressMode,
               },
@@ -108,8 +110,8 @@ export const Network = (): JSX.Element => {
             {
               type: "text",
               name: "ipv4Config.ip",
-              label: "IP",
-              description: "IP Address",
+              label: t("IP"),
+              description: t("IP Address"),
               disabledBy: [
                 {
                   fieldName: "addressMode",
@@ -121,8 +123,8 @@ export const Network = (): JSX.Element => {
             {
               type: "text",
               name: "ipv4Config.gateway",
-              label: "Gateway",
-              description: "Default Gateway",
+              label: t("Gateway"),
+              description: t("Default Gateway"),
               disabledBy: [
                 {
                   fieldName: "addressMode",
@@ -134,8 +136,8 @@ export const Network = (): JSX.Element => {
             {
               type: "text",
               name: "ipv4Config.subnet",
-              label: "Subnet",
-              description: "Subnet Mask",
+              label: t("Subnet"),
+              description: t("Subnet Mask"),
               disabledBy: [
                 {
                   fieldName: "addressMode",
@@ -147,8 +149,8 @@ export const Network = (): JSX.Element => {
             {
               type: "text",
               name: "ipv4Config.dns",
-              label: "DNS",
-              description: "DNS Server",
+              label: t("DNS"),
+              description: t("DNS Server"),
               disabledBy: [
                 {
                   fieldName: "addressMode",
@@ -160,24 +162,24 @@ export const Network = (): JSX.Element => {
           ],
         },
         {
-          label: "NTP Config",
-          description: "NTP configuration",
+          label: t("NTP Config"),
+          description: t("NTP configuration"),
           fields: [
             {
               type: "text",
               name: "ntpServer",
-              label: "NTP Server",
+              label: t("NTP Server"),
             },
           ],
         },
         {
-          label: "Rsyslog Config",
-          description: "Rsyslog configuration",
+          label: t("Rsyslog Config"),
+          description: t("Rsyslog configuration"),
           fields: [
             {
               type: "text",
               name: "rsyslogServer",
-              label: "Rsyslog Server",
+              label: t("Rsyslog Server"),
             },
           ],
         },
