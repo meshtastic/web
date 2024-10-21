@@ -74,15 +74,12 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
             >
               <div className="flex gap-2">
                 {heading.title}
-                {sortColumn === heading.title && (
-                  <>
-                    {sortOrder === "asc" ? (
-                      <ChevronUpIcon size={16} />
-                    ) : (
-                      <ChevronDownIcon size={16} />
-                    )}
-                  </>
-                )}
+                {sortColumn === heading.title &&
+                  (sortOrder === "asc" ? (
+                    <ChevronUpIcon size={16} />
+                  ) : (
+                    <ChevronDownIcon size={16} />
+                  ))}
               </div>
             </th>
           ))}
