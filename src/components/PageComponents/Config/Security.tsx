@@ -187,7 +187,7 @@ export const Security = (): JSX.Element => {
                 name: "isManaged",
                 label: "Managed",
                 description:
-                  'If true, device is considered to be "managed" by a mesh administrator via admin messages',
+                  'If true, device configuration options are only able to be changed remotely by a mesh administrator via admin messages. Do not enable this option unless a suitable Remote Admin node has been setup, and the public key stored in the field below.',
               },
               {
                 type: "text",
