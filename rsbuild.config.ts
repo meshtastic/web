@@ -24,4 +24,7 @@ export default defineConfig({
       "@layouts": "./src/layouts",
     },
   },
+  html: {
+    title: "Meshtastic Web",
+  },
 });
