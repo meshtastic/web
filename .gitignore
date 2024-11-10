@@ -3,3 +3,5 @@ node_modules
 stats.html
 .vercel
 dev-dist
+.vscode
+package-lock.json
