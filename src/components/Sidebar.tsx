@@ -80,7 +80,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
       <div className="px-8 pb-6">
         <div className="flex items-center">
           <BatteryMediumIcon size={24} viewBox={"0 0 28 24"} />
-          <Subtle>{myNode?.deviceMetrics?.batteryLevel ?? "UNK"}%</Subtle>
+          <Subtle>{myNode?.deviceMetrics?.batteryLevel ? myNode?.deviceMetrics?.batteryLevel > 100 ? "Charging" : myNode?.deviceMetrics?.batteryLevel + "%"  : "UNK"}</Subtle>
         </div>
         <div className="flex items-center">
           <ZapIcon size={24} viewBox={"0 0 36 24"} />
