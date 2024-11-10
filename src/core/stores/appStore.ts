@@ -26,6 +26,7 @@ interface AppState {
   rasterSources: RasterSource[];
   commandPaletteOpen: boolean;
   darkMode: boolean;
+  notifications: boolean;
   nodeNumToBeRemoved: number;
   accent: AccentColor;
   connectDialogOpen: boolean;
@@ -39,6 +40,7 @@ interface AppState {
   removeDevice: (deviceId: number) => void;
   setCommandPaletteOpen: (open: boolean) => void;
   setDarkMode: (enabled: boolean) => void;
+  setNotifications: (enabled: boolean) => void;
   setNodeNumToBeRemoved: (nodeNum: number) => void;
   setAccent: (color: AccentColor) => void;
   setConnectDialogOpen: (open: boolean) => void;
@@ -50,6 +52,7 @@ export const useAppStore = create<AppState>()((set) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
+  notifications: true,
   darkMode:
     localStorage.getItem("theme-dark") !== null
       ? localStorage.getItem("theme-dark") === "true"
@@ -103,6 +106,13 @@ export const useAppStore = create<AppState>()((set) => ({
     set(
       produce<AppState>((draft) => {
         draft.darkMode = enabled;
+      }),
+    );
+  },
+  setNotifications: (enabled: boolean) => {
+    set(
+      produce<AppState>((draft) => {
+        draft.notifications = enabled;
       }),
     );
   },

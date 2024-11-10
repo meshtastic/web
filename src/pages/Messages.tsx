@@ -15,6 +15,7 @@ import { useState } from "react";
 export const MessagesPage = (): JSX.Element => {
   const { channels, nodes, hardware, messages, traceroutes, connection } =
     useDevice();
+    const { hasUnread, markAllRead } = useDevice();
   const [chatType, setChatType] =
     useState<Types.PacketDestination>("broadcast");
   const [activeChat, setActiveChat] = useState<number>(
@@ -48,10 +49,12 @@ export const MessagesPage = (): JSX.Element => {
               }
               active={activeChat === channel.index}
               onClick={() => {
+                markAllRead(channel.index, null)
                 setChatType("broadcast");
                 setActiveChat(channel.index);
               }}
               element={<HashIcon size={16} className="mr-2" />}
+              unread={hasUnread(channel.index, null)}
             />
           ))}
         </SidebarSection>
@@ -62,10 +65,12 @@ export const MessagesPage = (): JSX.Element => {
               label={node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`}
               active={activeChat === node.num}
               onClick={() => {
+                markAllRead(null, node.num)
                 setChatType("direct");
                 setActiveChat(node.num);
               }}
               element={<Hashicon size={20} value={node.num.toString()} />}
+              unread={hasUnread(null, node.num)}
             />
           ))}
         </SidebarSection>

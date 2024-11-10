@@ -1,11 +1,12 @@
 import { Button } from "@components/UI/Button.tsx";
-import type { LucideIcon } from "lucide-react";
+import {LucideMessageSquareDot, type LucideIcon } from "lucide-react";
 
 export interface SidebarButtonProps {
   label: string;
   active?: boolean;
   Icon?: LucideIcon;
   element?: JSX.Element;
+  unread: boolean;
   onClick?: () => void;
 }
 
@@ -14,6 +15,7 @@ export const SidebarButton = ({
   active,
   Icon,
   element,
+  unread,
   onClick,
 }: SidebarButtonProps): JSX.Element => (
   <Button
@@ -25,5 +27,9 @@ export const SidebarButton = ({
     {Icon && <Icon size={16} />}
     {element && element}
     {label}
+    {unread ? 
+      <div className="notifyBadge"><LucideMessageSquareDot size={12} /></div>
+      : null
+    }
   </Button>
 );

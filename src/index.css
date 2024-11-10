@@ -100,3 +100,11 @@ img {
   -drag: none;
   -webkit-user-drag: none;
 }
+
+.notifyBadge {
+  background-color: #f25555;
+  border-radius: 50%;
+  padding:5px;
+  color: #ffffff;
+  font-weight: bold;
+}

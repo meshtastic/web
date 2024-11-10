@@ -9,6 +9,7 @@ export type Page = "messages" | "map" | "config" | "channels" | "nodes";
 
 export interface MessageWithState extends Types.PacketMetadata<string> {
   state: MessageState;
+  unread: boolean;
 }
 
 export type MessageState = "ack" | "waiting" | Protobuf.Mesh.Routing_Error;
@@ -95,6 +96,8 @@ export interface Device {
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
+  hasUnread: (channel: number | null, nodeNum: number | null) => boolean;
+  markAllRead: (channel: number | null, nodeNum: number | null) => void;
 }
 
 export interface DeviceState {
@@ -112,7 +115,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   remoteDevices: new Map(),
 
   addDevice: (id: number) => {
-    set(
+    set(      
       produce<DeviceState>((draft) => {
         draft.devices.set(id, {
           id,
@@ -312,10 +315,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           },
           setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => {
             set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
+              produce<DeviceState>((draft) => {                
+                const device = draft.devices.get(id);                
                 if (device) {
-                  device.hardware = hardware;
+                  device.hardware = hardware;                  
                 }
               }),
             );
@@ -392,6 +395,30 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.channels.set(channel.index, channel);
+
+                const messageGroup = device.messages["broadcast"];
+                
+                let msgJson = localStorage.getItem("msg_" + channel.index)
+                if (msgJson !== null) {
+                  let storedMsgs = JSON.parse(msgJson)
+                  for (let a = 0; a < storedMsgs.length; a++) {
+                    let message = <MessageWithState>storedMsgs[a]
+                    if (channel.index == 0) {
+                      message.unread = false
+                    }
+                    message.rxTime = new Date(message.rxTime)
+                    message.state = "ack"
+                    let messageIndex = message.channel
+                    let messages = messageGroup.get(messageIndex);
+                    if (messages === undefined) {
+                      messages = [message]
+                    } else {
+                      messages.push(message);
+                    }
+                    messageGroup.set(messageIndex, messages)
+                  }
+                }
+
               }),
             );
           },
@@ -421,6 +448,26 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.nodes.set(nodeInfo.num, nodeInfo);
+
+                const messageGroup = device.messages["direct"];
+                
+                let msgJson = localStorage.getItem("msg_" + nodeInfo.num)
+                if (msgJson !== null) {
+                  let storedMsgs = JSON.parse(msgJson)
+                  for (let a = 0; a < storedMsgs.length; a++) {                    
+                    let message = <MessageWithState>storedMsgs[a]
+                    message.rxTime = new Date(message.rxTime)
+                    message.state = "ack"
+                    let messageIndex = (message.from === device.hardware.myNodeNum) ? message.to : message.from
+                    let messages = messageGroup.get(messageIndex);
+                    if (messages === undefined) {
+                      messages = [message]
+                    } else {
+                      messages.push(message);
+                    }
+                    messageGroup.set(messageIndex, messages)
+                  }
+                }
               }),
             );
           },
@@ -474,9 +521,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             );
           },
           addMessage: (message) => {
+
             set(
               produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
+                let device = draft.devices.get(id);
                 if (!device) {
                   return;
                 }
@@ -487,14 +535,19 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                       ? message.to
                       : message.from
                     : message.channel;
-                const messages = messageGroup.get(messageIndex);
+                let messages = messageGroup.get(messageIndex);
 
-                if (messages) {
-                  messages.push(message);
-                  messageGroup.set(messageIndex, messages);
-                } else {
-                  messageGroup.set(messageIndex, [message]);
+                if (message.from !== device.hardware.myNodeNum) {
+                  message.unread = true;
                 }
+
+                if (messages === undefined) {
+                  messages = [message];
+                } else {
+                  messages.push(message);
+                }
+                messageGroup.set(messageIndex, messages);
+                localStorage.setItem("msg_" + messageIndex, JSON.stringify(messages))
               }),
             );
           },
@@ -513,8 +566,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           addTraceRoute: (traceroute) => {
             set(
               produce<DeviceState>((draft) => {
-                console.log("addTraceRoute called");
-                console.log(traceroute);
+                //console.log("addTraceRoute called");
+                //console.log(traceroute);
                 const device = draft.devices.get(id);
                 if (!device) {
                   return;
@@ -632,6 +685,94 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
               }),
             );
           },
+          hasUnread: (channel: number | null, nodeNum: number | null) => {
+            const device = get().devices.get(id);
+
+            if (device == null) {
+              return false
+            }
+
+            if (channel == null && nodeNum == null) {
+              let channelsWithMessages = device.messages["broadcast"]
+              for (let [channelIndex, messages] of channelsWithMessages) {
+                for (let msg of messages) {
+                  if (msg.unread) {
+                    return true
+                  }
+                }
+              }
+              channelsWithMessages = device.messages["direct"]
+              for (let [nodeIndex, messages] of channelsWithMessages) {
+                for (let msg of messages) {
+                  if (msg.unread) {
+                    return true
+                  }
+                }
+              }
+            }
+
+            if (channel !== null) {
+              const channelsWithMessages = device.messages["broadcast"]
+              let messages = channelsWithMessages.get(channel)
+              if (messages == null) {
+                return false
+              }
+              for (let msg of messages) {
+                if (msg.unread) {
+                  return true
+                }
+              }
+            }
+
+            if (nodeNum !== null) {
+              const channelsWithMessages = device.messages["direct"]
+              let messages = channelsWithMessages.get(nodeNum)
+              if (messages == null) {
+                return false
+              }
+              for (let msg of messages) {
+                if (msg.unread) {
+                  return true
+                }
+              }
+            }
+
+            return false
+          },
+          markAllRead: (channel: number | null, nodeNum: number | null) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device == null) {
+                  return
+                }
+                if (channel !== null) {
+                  const channelsWithMessages = device.messages["broadcast"]
+                  let messages = channelsWithMessages.get(channel)
+                  if (messages == null) {
+                    return
+                  }
+                  for (let msg of messages) {
+                    msg.unread = false
+                  }
+                  channelsWithMessages.set(channel, messages);
+                  localStorage.setItem("msg_" + channel, JSON.stringify(messages))
+                }
+                if (nodeNum !== null) {
+                  const directsWithMessages = device.messages["direct"]
+                  let messages = directsWithMessages.get(nodeNum)
+                  if (messages == null) {
+                    return
+                  }
+                  for (let msg of messages) {
+                    msg.unread = false
+                  }
+                  directsWithMessages.set(nodeNum, messages);
+                  localStorage.setItem("msg_" + nodeNum, JSON.stringify(messages))
+                }
+              })
+            )
+          }
         });
       }),
     );
@@ -654,6 +795,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   getDevices: () => Array.from(get().devices.values()),
 
   getDevice: (id) => get().devices.get(id),
+
 }));
 
 export const DeviceContext = createContext<Device | undefined>(undefined);
