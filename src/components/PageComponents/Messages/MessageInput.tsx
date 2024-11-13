@@ -3,6 +3,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/js";
 import { SendIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export interface MessageInputProps {
   to: Types.Destination;
@@ -20,6 +21,7 @@ export const MessageInput = ({
     setMessageDraft,
     hardware,
   } = useDevice();
+  const { t } = useTranslation();
 
   const myNodeNum = hardware.myNodeNum;
 
@@ -33,8 +35,8 @@ export const MessageInput = ({
           to as number,
           myNodeNum,
           id,
-          "ack",
-        ),
+          "ack"
+        )
       )
       .catch((e: Types.PacketError) =>
         setMessageState(
@@ -43,8 +45,8 @@ export const MessageInput = ({
           to as number,
           myNodeNum,
           e.id,
-          e.error,
-        ),
+          e.error
+        )
       );
   };
 
@@ -63,7 +65,7 @@ export const MessageInput = ({
             <Input
               autoFocus={true}
               minLength={1}
-              placeholder="Enter Message"
+              placeholder={t("Enter Message")}
               value={messageDraft}
               onChange={(e) => setMessageDraft(e.target.value)}
             />

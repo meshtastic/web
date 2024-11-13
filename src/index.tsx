@@ -3,6 +3,7 @@ import { enableMapSet } from "immer";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import "./lang/i18n";
 
 import { App } from "@app/App.tsx";
 

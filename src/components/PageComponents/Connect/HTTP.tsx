@@ -10,17 +10,19 @@ import { randId } from "@core/utils/randId.ts";
 import { HttpConnection } from "@meshtastic/js";
 import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
+  const { t } = useTranslation();
   const { register, handleSubmit, control } = useForm<{
     ip: string;
     tls: boolean;
   }>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
-        window.location.hostname,
+        window.location.hostname
       )
         ? "meshtastic.local"
         : window.location.hostname,
@@ -58,7 +60,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
   return (
     <form className="flex w-full flex-col gap-2 p-4" onSubmit={onSubmit}>
       <div className="flex h-48 flex-col gap-2">
-        <Label>IP Address/Hostname</Label>
+        <Label>{t("IP Address/Hostname")}</Label>
         <Input
           // label="IP Address/Hostname"
           prefix={tlsEnabled ? "https://" : "http://"}
@@ -71,7 +73,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
           control={control}
           render={({ field: { value, ...rest } }) => (
             <>
-              <Label>Use TLS</Label>
+              <Label>{t("Use TLS")}</Label>
               <Switch
                 // label="Use TLS"
                 // description="Description"
@@ -86,7 +88,9 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
         />
       </div>
       <Button type="submit" disabled={connectionInProgress}>
-        <span>{connectionInProgress ? "Connecting..." : "Connect"}</span>
+        <span>
+          {connectionInProgress ? t("Connecting...") : t("Connected")}
+        </span>
       </Button>
     </form>
   );
