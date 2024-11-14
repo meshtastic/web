@@ -3,6 +3,8 @@ import { createContext, useContext } from "react";
 import { produce } from "immer";
 import { create } from "zustand";
 
+import MessageStore from "@core/stores/messageStore.ts";
+
 import { Protobuf, Types } from "@meshtastic/js";
 
 export type Page = "messages" | "map" | "config" | "channels" | "nodes";
@@ -38,10 +40,11 @@ export interface Device {
   hardware: Protobuf.Mesh.MyNodeInfo;
   nodes: Map<number, Protobuf.Mesh.NodeInfo>;
   metadata: Map<number, Protobuf.Mesh.DeviceMetadata>;
-  messages: {
-    direct: Map<number, MessageWithState[]>;
-    broadcast: Map<Types.ChannelNumber, MessageWithState[]>;
-  };
+  messageStores: {
+    direct: Map<number, MessageStore>;
+    broadcast: Map<Types.ChannelNumber, MessageStore>;
+    semaphore: boolean;
+  }
   traceroutes: Map<
     number,
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
@@ -125,9 +128,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           hardware: new Protobuf.Mesh.MyNodeInfo(),
           nodes: new Map(),
           metadata: new Map(),
-          messages: {
+          messageStores: {
             direct: new Map(),
             broadcast: new Map(),
+            semaphore: false,
           },
           traceroutes: new Map(),
           connection: undefined,
@@ -392,6 +396,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.channels.set(channel.index, channel);
+
+                const messageStoreGroup = device.messageStores.broadcast;
+                messageStoreGroup.set(channel.index, new MessageStore(device.hardware.myNodeNum, channel.index))
               }),
             );
           },
@@ -421,6 +428,9 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 device.nodes.set(nodeInfo.num, nodeInfo);
+
+                const messageStoreGroup = device.messageStores.direct;
+                messageStoreGroup.set(nodeInfo.num, new MessageStore(device.hardware.myNodeNum, nodeInfo.num))
               }),
             );
           },
@@ -480,21 +490,19 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 if (!device) {
                   return;
                 }
-                const messageGroup = device.messages[message.type];
-                const messageIndex =
+
+                const messageStoreGroup = device.messageStores[message.type];
+                const messageStoreIndex =
                   message.type === "direct"
                     ? message.from === device.hardware.myNodeNum
                       ? message.to
                       : message.from
                     : message.channel;
-                const messages = messageGroup.get(messageIndex);
+                const messageStore = messageStoreGroup.get(messageStoreIndex);
 
-                if (messages) {
-                  messages.push(message);
-                  messageGroup.set(messageIndex, messages);
-                } else {
-                  messageGroup.set(messageIndex, [message]);
-                }
+                messageStore.addMessage(message);
+
+                device.messageStores.semaphore = !device.messageStores.semaphore;
               }),
             );
           },
@@ -557,30 +565,24 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   console.log("no device found for id");
                   return;
                 }
-                const messageGroup = device.messages[type];
 
-                const messageIndex =
+                const messageStoreGroup = device.messageStores[type];
+                const messageStoreIndex =
                   type === "direct"
                     ? from === device.hardware.myNodeNum
                       ? to
                       : from
                     : channelIndex;
-                const messages = messageGroup.get(messageIndex);
+                const messageStore = messageStoreGroup.get(messageStoreIndex);
 
-                if (!messages) {
+                if (!messageStore) {
                   console.log("no messages found for id");
                   return;
                 }
 
-                messageGroup.set(
-                  messageIndex,
-                  messages.map((msg) => {
-                    if (msg.id === messageId) {
-                      msg.state = state;
-                    }
-                    return msg;
-                  }),
-                );
+                messageStore.setMessageState(messageId, state);
+
+                device.messageStores.semaphore = !device.messageStores.semaphore;
               }),
             );
           },

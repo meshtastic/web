@@ -18,6 +18,7 @@ export const PageLayout = ({
   noPadding,
   actions,
   children,
+  onScroll,
 }: PageLayoutProps): JSX.Element => {
   return (
     <>
@@ -52,6 +53,7 @@ export const PageLayout = ({
             "flex h-full w-full flex-col overflow-y-auto",
             !noPadding && "pl-3 pr-3 ",
           )}
+          onScroll={onScroll}
         >
           {children}
           <Footer />

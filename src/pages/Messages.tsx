@@ -9,11 +9,11 @@ import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { getChannelName } from "@pages/Channels.tsx";
-import { HashIcon, LockIcon, LockOpenIcon, WaypointsIcon } from "lucide-react";
+import { HashIcon, LockIcon, LockOpenIcon, WaypointsIcon, TrashIcon } from "lucide-react";
 import { useState } from "react";
 
 export const MessagesPage = (): JSX.Element => {
-  const { channels, nodes, hardware, messages, traceroutes, connection } =
+  const { channels, nodes, hardware, messageStores, traceroutes, connection } =
     useDevice();
   const [chatType, setChatType] =
     useState<Types.PacketDestination>("broadcast");
@@ -31,6 +31,20 @@ export const MessagesPage = (): JSX.Element => {
   const { toast } = useToast();
   const node = nodes.get(activeChat);
   const nodeHex = node?.num ? numberToHexUnpadded(node.num) : "Unknown";
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleScroll = (event) => {
+    if (!isLoading && activeChat && event.currentTarget.scrollTop < 10) {
+      setIsLoading(true);
+
+      const messageStore = messageStores[chatType].get(activeChat);
+
+      messageStore.loadMessages();
+
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -72,6 +86,7 @@ export const MessagesPage = (): JSX.Element => {
       </Sidebar>
       <div className="flex flex-col flex-grow">
         <PageLayout
+          onScroll={handleScroll}
           label={`Messages: ${
             chatType === "broadcast" && currentChannel
               ? getChannelName(currentChannel)
@@ -114,8 +129,31 @@ export const MessagesPage = (): JSX.Element => {
                       );
                     },
                   },
+                  {
+                    icon: TrashIcon,
+                    onClick() {
+                      const targetNode = nodes.get(activeChat)?.num;
+                      if (targetNode === undefined) return;
+                      messageStores.direct.get(targetNode).clear()
+                      toast({
+                        title: "Message history cleared.",
+                      });
+                    }
+                  },
                 ]
-              : []
+              : [
+                  {
+                    icon: TrashIcon,
+                    onClick() {
+                      const targetChannel = channels.get(activeChat)?.index;
+                      if (targetChannel === undefined) return;
+                      messageStores.broadcast.get(targetChannel).clear()
+                      toast({
+                        title: "Message history cleared.",
+                      });
+                    }
+                  },
+                ]
           }
         >
           {allChannels.map(
@@ -124,7 +162,7 @@ export const MessagesPage = (): JSX.Element => {
                 <ChannelChat
                   key={channel.index}
                   to="broadcast"
-                  messages={messages.broadcast.get(channel.index)}
+                  messageStore={messageStores.broadcast.get(channel.index)}
                   channel={channel.index}
                 />
               ),
@@ -135,7 +173,7 @@ export const MessagesPage = (): JSX.Element => {
                 <ChannelChat
                   key={node.num}
                   to={activeChat}
-                  messages={messages.direct.get(node.num)}
+                  messageStore={messageStores.direct.get(node.num)}
                   channel={Types.ChannelNumber.Primary}
                   traceroutes={traceroutes.get(node.num)}
                 />
