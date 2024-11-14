@@ -1,28 +1,28 @@
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
-import {
-  type MessageWithState,
-  useDevice,
-} from "@app/core/stores/deviceStore.ts";
+import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { MessageStore } from "@app/core/stores/messageStore.ts";
 import { Message } from "@components/PageComponents/Messages/Message.tsx";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
 import type { Protobuf, Types } from "@meshtastic/js";
 import { InboxIcon } from "lucide-react";
+import { useState, useEffect, useRef } from 'react';
 
 export interface ChannelChatProps {
-  messages?: MessageWithState[];
+  messageStore: MessageStore;
   channel: Types.ChannelNumber;
   to: Types.Destination;
   traceroutes?: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[];
 }
 
 export const ChannelChat = ({
-  messages,
+  messageStore,
   channel,
   to,
   traceroutes,
 }: ChannelChatProps): JSX.Element => {
   const { nodes } = useDevice();
+  const messages = messageStore.messages;
 
   return (
     <div className="flex flex-grow flex-col">

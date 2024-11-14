@@ -10,44 +10,35 @@ export default class MessageStore {
   constructor(deviceNumber: number, channelNumber: number) {
     this.deviceNumber = deviceNumber;
     this.channelNumber = channelNumber;
-    this.indexKey = `device/${this.deviceNumber}/group/${this.channelNumber}/index`;
+    this.messageIdsKey = `device/${this.deviceNumber}/group/${this.channelNumber}/message_ids`;
+    this.cursor = 0;
+    this.loaded = false;
+    this.messageIds = [];
     this.messages = [];
 
+    this.loadMessageIds();
     this.loadMessages();
   }
 
-  get currentIndex(): number {
-    return parseInt(localStorage.getItem(this.indexKey)) || 0;
-  }
-
-  messageKey(messageIndex: number): string  {
-    return `device/${this.deviceNumber}/group/${this.channelNumber}/message/${messageIndex}`;
-  }
-
-  nextIndex(): number {
-    const nextIndex = this.currentIndex + 1;
-
-    localStorage.setItem(this.indexKey, nextIndex);
-
-    return nextIndex;
+  messageKey(messageId: number): string  {
+    return `device/${this.deviceNumber}/message/${messageId}`;
   }
 
   addMessage(message: MessageWithState): void {
-    const messageIndex = this.nextIndex();
-    const messageKey = this.messageKey(messageIndex);
+    this.setMessage(message);
 
-    localStorage.setItem(messageKey, JSON.stringify(message));
+    this.messageIds.unshift(message.id);
+    localStorage.setItem(this.messageIdsKey, JSON.stringify(this.messageIds));
 
     this.messages.push(message);
   }
 
-  getMessage(messageIndex: number): MessageWithState {
-    const messageKey = this.messageKey(messageIndex);
-
+  getMessage(messageId: number): MessageWithState {
+    const messageKey = this.messageKey(messageId);
     const messageJSON = localStorage.getItem(messageKey);
 
     if (messageJSON === null) {
-      return;
+      return null;
     }
 
     const message = JSON.parse(messageJSON);
@@ -57,45 +48,70 @@ export default class MessageStore {
     return message;
   }
 
+  setMessage(message: MessageWithState): void {
+    const messageKey = this.messageKey(message.id);
+
+    localStorage.setItem(messageKey, JSON.stringify(message));
+  }
+
   setMessageState(messageId: number, state: MessageState): void {
-    this.messages.forEach((message, i) => {
-      if (message.id === messageId) {
-        const messageKey = this.messageKey(i + 1);
+    const message = this.getMessage(messageId);
 
-        message.state = state;
-        localStorage.setItem(messageKey, JSON.stringify(message));
+    message.state = state;
 
+    this.setMessage(message);
+
+    this.messages.forEach((m, i) => {
+      if (m.id === messageId) {
+        this.messages[i] = message
         return;
       }
     });
   }
 
-  deleteMessage(messageIndex: number): void {
-    const messageKey = this.messageKey(messageIndex);
+  deleteMessage(messageId: number): void {
+    const messageKey = this.messageKey(messageId);
     localStorage.removeItem(messageKey);
   }
 
-  loadMessages(): MessageWithState[] {
-    if (this.currentIndex === 0) {
+  loadMessageIds(): void {
+    const messageIdsJSON = localStorage.getItem(this.messageIdsKey);
+
+    if (messageIdsJSON === null) {
+      this.messageIds = [];
+      localStorage.setItem(this.messageIdsKey, JSON.stringify(this.messageIds));
       return;
     }
 
-    for (let i = 1; i <= this.currentIndex; i++) {
-      this.messages.push(this.getMessage(i));
-    }
+    this.messageIds = JSON.parse(messageIdsJSON);
+  }
+
+  loadMessages(): void {
+    if (this.loaded) return;
+
+    let message;
+
+    for (let i = this.cursor; i <= 50 + this.cursor; i++) {
+      message = this.getMessage(this.messageIds[i]);
+
+      if (message === null) {
+        this.loaded = true;
+        return;
+      }
+
+      this.cursor = i;
+      this.messages.unshift(message);
+    };
   }
 
   clear() {
-    if (this.currentIndex === 0) {
-      return;
-    }
+    this.messageIds.forEach((messageId) => {
+      this.deleteMessage(messageId);
+    });
 
-    for (let i = 1; i <= this.currentIndex; i++) {
-      this.deleteMessage(i);
-    }
+    localStorage.removeItem(this.messageIdsKey);
 
-    localStorage.removeItem(this.indexKey);
-
+    this.messageIds = [];
     this.messages = [];
   }
 }

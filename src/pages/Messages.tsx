@@ -32,6 +32,20 @@ export const MessagesPage = (): JSX.Element => {
   const node = nodes.get(activeChat);
   const nodeHex = node?.num ? numberToHexUnpadded(node.num) : "Unknown";
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleScroll = (event) => {
+    if (!isLoading && activeChat && event.currentTarget.scrollTop < 10) {
+      setIsLoading(true);
+
+      const messageStore = messageStores[chatType].get(activeChat);
+
+      messageStore.loadMessages();
+
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <Sidebar>
@@ -72,6 +86,7 @@ export const MessagesPage = (): JSX.Element => {
       </Sidebar>
       <div className="flex flex-col flex-grow">
         <PageLayout
+          onScroll={handleScroll}
           label={`Messages: ${
             chatType === "broadcast" && currentChannel
               ? getChannelName(currentChannel)
@@ -147,7 +162,7 @@ export const MessagesPage = (): JSX.Element => {
                 <ChannelChat
                   key={channel.index}
                   to="broadcast"
-                  messages={messageStores.broadcast.get(channel.index).messages}
+                  messageStore={messageStores.broadcast.get(channel.index)}
                   channel={channel.index}
                 />
               ),
@@ -158,7 +173,7 @@ export const MessagesPage = (): JSX.Element => {
                 <ChannelChat
                   key={node.num}
                   to={activeChat}
-                  messages={messageStores.direct.get(node.num).messages}
+                  messageStore={messageStores.direct.get(node.num)}
                   channel={Types.ChannelNumber.Primary}
                   traceroutes={traceroutes.get(node.num)}
                 />

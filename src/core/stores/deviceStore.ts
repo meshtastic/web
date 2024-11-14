@@ -43,7 +43,7 @@ export interface Device {
   messageStores: {
     direct: Map<number, MessageStore>;
     broadcast: Map<Types.ChannelNumber, MessageStore>;
-    semaphore: number;
+    semaphore: boolean;
   }
   traceroutes: Map<
     number,
@@ -131,7 +131,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           messageStores: {
             direct: new Map(),
             broadcast: new Map(),
-            semaphore: 0,
+            semaphore: false,
           },
           traceroutes: new Map(),
           connection: undefined,
@@ -502,7 +502,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 
                 messageStore.addMessage(message);
 
-                device.messageStores.semaphore++;
+                device.messageStores.semaphore = !device.messageStores.semaphore;
               }),
             );
           },
@@ -582,7 +582,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 
                 messageStore.setMessageState(messageId, state);
 
-                device.messageStores.semaphore++;
+                device.messageStores.semaphore = !device.messageStores.semaphore;
               }),
             );
           },
