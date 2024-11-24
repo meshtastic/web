@@ -35,7 +35,7 @@ export const PageLayout = ({
               <div className="flex justify-end space-x-4">
                 {actions?.map((action, index) => (
                   <button
-                    key={action.icon.name}
+                    key={action.icon.displayName}
                     type="button"
                     className="transition-all hover:text-accent"
                     onClick={action.onClick}
