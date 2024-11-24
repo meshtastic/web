@@ -24,7 +24,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
   const { hardware, nodes, metadata } = useDevice();
   const myNode = nodes.get(hardware.myNodeNum);
   const myMetadata = metadata.get(0);
-  const { activePage, setActivePage, setDialogOpen } = useDevice();
+  const { activePage, setActivePage, setDialogOpen, hasUnread } = useDevice();
 
   interface NavLink {
     name: string;
@@ -94,7 +94,8 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
         </div>
       </div>
 
-      <SidebarSection label="Navigation">
+      <SidebarSection label="Navigation">        
+
         {pages.map((link) => (
           <SidebarButton
             key={link.name}
@@ -104,6 +105,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
               setActivePage(link.page);
             }}
             active={link.page === activePage}
+            unread={link.name == "Messages" ? hasUnread(null, null) : false}
           />
         ))}
       </SidebarSection>
