@@ -94,6 +94,12 @@ export const Device = (): JSX.Element => {
               label: "Disable Triple Click",
               description: "Disable triple click",
             },
+            {
+              type: "toggle",
+              name: "ledHeartbeatDisabled",
+              label: "LED Heartbeat Disabled",
+              description: "Disable default blinking LED",
+            },
           ],
         },
       ]}
