@@ -3,15 +3,17 @@ import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export const Bluetooth = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
+  const { t } = useTranslation();
   const [bluetoothValidationText, setBluetoothValidationText] = useState<string>();
 
   const bluetoothPinChangeEvent = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    if (e.target.value[0] == "0")
+    if (e.target.value[0] === "0")
     {
       setBluetoothValidationText("Bluetooth Pin cannot start with 0.");
     }
@@ -28,7 +30,7 @@ export const Bluetooth = (): JSX.Element => {
           case: "bluetooth",
           value: data,
         },
-      }),
+      })
     );
   };
 
@@ -38,20 +40,20 @@ export const Bluetooth = (): JSX.Element => {
       defaultValues={config.bluetooth}
       fieldGroups={[
         {
-          label: "Bluetooth Settings",
-          description: "Settings for the Bluetooth module",
+          label: t("Bluetooth Settings"),
+          description: t("Settings for the Bluetooth module"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Enabled",
-              description: "Enable or disable Bluetooth",
+              label: t("Enabled"),
+              description: t("Enable or disable Bluetooth"),
             },
             {
               type: "select",
               name: "mode",
-              label: "Pairing mode",
-              description: "Pin selection behaviour.",
+              label: t("Pairing mode"),
+              description: t("Pin selection behaviour."),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -65,10 +67,10 @@ export const Bluetooth = (): JSX.Element => {
             {
               type: "number",
               name: "fixedPin",
-              label: "Pin",
-              description: "Pin to use when pairing",
               validationText: bluetoothValidationText,
               inputChange: bluetoothPinChangeEvent,
+              label:t( "Pin"),
+              description: t("Pin to use when pairing"),
               disabledBy: [
                 {
                   fieldName: "mode",

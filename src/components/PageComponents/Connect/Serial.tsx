@@ -7,11 +7,13 @@ import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { SerialConnection } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
+  const { t } = useTranslation();
 
   const updateSerialPortList = useCallback(async () => {
     setSerialPorts(await navigator.serial.getPorts());
@@ -38,7 +40,7 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
         baudRate: undefined,
         concurrentLogOutput: true,
       })
-      .catch((e: Error) => console.log(`Unable to Connect: ${e.message}`));
+      .catch((e: Error) => console.log(`${"Unable to Connect:"} ${e.message}`));
     device.addConnection(connection);
     subscribeAll(device, connection);
 
@@ -65,7 +67,7 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
           );
         })}
         {serialPorts.length === 0 && (
-          <Mono className="m-auto select-none">No devices paired yet.</Mono>
+          <Mono className="m-auto select-none">{t("No devices paired yet.")}</Mono>
         )}
       </div>
       <Button
@@ -75,7 +77,7 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
           });
         }}
       >
-        <span>New device</span>
+        <span>{t("New device")}</span>
       </Button>
     </div>
   );
