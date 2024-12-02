@@ -25,6 +25,6 @@ export default defineConfig({
     },
   },
   html: {
-    title: 'Meshtastic Web',
+    title: "Meshtastic Web",
   },
 });
