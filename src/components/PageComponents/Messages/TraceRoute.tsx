@@ -18,17 +18,17 @@ export const TraceRoute = ({
   return route.length === 0 ? (
     <div className="ml-5 flex">
       <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
-        {to?.user?.longName}↔{from?.user?.longName}
+        {to?.user?.longName} ↔ {from?.user?.longName}
       </span>
     </div>
   ) : (
     <div className="ml-5 flex">
       <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
-        {to?.user?.longName}↔
-        {route.map((hop) => {
-          const node = nodes.get(hop);
-          return `${node?.user?.longName ?? (node?.num ? numberToHexUnpadded(node.num) : "Unknown")}↔`;
-        })}
+        {to?.user?.longName} ↔{" "}
+        {route.map(
+          (hop) =>
+            `${nodes.get(hop)?.user?.longName ?? `!${numberToHexUnpadded(hop)}`} ↔ `,
+        )}
         {from?.user?.longName}
       </span>
     </div>
