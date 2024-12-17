@@ -7,6 +7,7 @@ import { Message } from "@components/PageComponents/Messages/Message.tsx";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
 import type { Protobuf, Types } from "@meshtastic/js";
+import { useTranslation } from "react-i18next";
 import { InboxIcon } from "lucide-react";
 
 export interface ChannelChatProps {
@@ -23,6 +24,7 @@ export const ChannelChat = ({
   traceroutes,
 }: ChannelChatProps): JSX.Element => {
   const { nodes } = useDevice();
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-grow flex-col">
@@ -44,12 +46,14 @@ export const ChannelChat = ({
           ) : (
             <div className="m-auto">
               <InboxIcon className="m-auto" />
-              <Subtle>No Messages</Subtle>
+              <Subtle>{t("No Messages")}</Subtle>
             </div>
           )}
         </div>
         <div
-          className={`flex flex-grow flex-col border-slate-400 border-l ${traceroutes === undefined ? "hidden" : ""}`}
+          className={`flex flex-grow flex-col border-slate-400 border-l ${
+            traceroutes === undefined ? "hidden" : ""
+          }`}
         >
           {to === "broadcast" ? null : traceroutes ? (
             traceroutes.map((traceroute, index) => (
@@ -63,7 +67,7 @@ export const ChannelChat = ({
           ) : (
             <div className="m-auto">
               <InboxIcon className="m-auto" />
-              <Subtle>No Traceroutes</Subtle>
+              <Subtle>{t("No Traceroutes")}</Subtle>
             </div>
           )}
         </div>

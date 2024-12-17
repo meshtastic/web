@@ -7,27 +7,29 @@ import {
 import type { SecurityValidation } from "@app/validation/config/security.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
+import { useTranslation } from "react-i18next";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
 export const Security = (): JSX.Element => {
   const { config, nodes, hardware, setWorkingConfig } = useDevice();
+  const { t } = useTranslation();
 
   const [privateKey, setPrivateKey] = useState<string>(
-    fromByteArray(config.security?.privateKey ?? new Uint8Array(0)),
+    fromByteArray(config.security?.privateKey ?? new Uint8Array(0))
   );
   const [privateKeyVisible, setPrivateKeyVisible] = useState<boolean>(false);
   const [privateKeyBitCount, setPrivateKeyBitCount] = useState<number>(
-    config.security?.privateKey.length ?? 32,
+    config.security?.privateKey.length ?? 32
   );
   const [privateKeyValidationText, setPrivateKeyValidationText] =
     useState<string>();
   const [publicKey, setPublicKey] = useState<string>(
-    fromByteArray(config.security?.publicKey ?? new Uint8Array(0)),
+    fromByteArray(config.security?.publicKey ?? new Uint8Array(0))
   );
   const [adminKey, setAdminKey] = useState<string>(
-    fromByteArray(config.security?.adminKey[0] ?? new Uint8Array(0)),
+    fromByteArray(config.security?.adminKey[0] ?? new Uint8Array(0))
   );
   const [adminKeyValidationText, setAdminKeyValidationText] =
     useState<string>();
@@ -47,26 +49,28 @@ export const Security = (): JSX.Element => {
             publicKey: toByteArray(publicKey),
           },
         },
-      }),
+      })
     );
   };
 
   const validateKey = (
     input: string,
     count: number,
-    setValidationText: (
-      value: React.SetStateAction<string | undefined>,
-    ) => void,
+    setValidationText: (value: React.SetStateAction<string | undefined>) => void
   ) => {
     try {
       if (input.length % 4 !== 0 || toByteArray(input).length !== count) {
-        setValidationText(`Please enter a valid ${count * 8} bit PSK.`);
+        setValidationText(
+          t("Please enter a valid bit PSK.", { count: count * 8 })
+        );
       } else {
         setValidationText(undefined);
       }
     } catch (e) {
       console.error(e);
-      setValidationText(`Please enter a valid ${count * 8} bit PSK.`);
+      setValidationText(
+        t("Please enter a valid bit PSK.", { count: count * 8 })
+      );
     }
   };
 
@@ -83,21 +87,21 @@ export const Security = (): JSX.Element => {
     validateKey(
       fromByteArray(privateKey),
       privateKeyBitCount,
-      setPrivateKeyValidationText,
+      setPrivateKeyValidationText
     );
 
     setDialogOpen(false);
   };
 
   const privateKeyInputChangeEvent = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const privateKeyB64String = e.target.value;
     setPrivateKey(privateKeyB64String);
     validateKey(
       privateKeyB64String,
       privateKeyBitCount,
-      setPrivateKeyValidationText,
+      setPrivateKeyValidationText
     );
 
     const publicKey = getX25519PublicKey(toByteArray(privateKeyB64String));
@@ -135,14 +139,16 @@ export const Security = (): JSX.Element => {
         }}
         fieldGroups={[
           {
-            label: "Security Settings",
+            label: t("Security Settings"),
             description: "Settings for the Security configuration",
             fields: [
               {
                 type: "passwordGenerator",
                 name: "privateKey",
-                label: "Private Key",
-                description: "Used to create a shared key with a remote device",
+                label: t("Private Key"),
+                description: t(
+                  "Used to create a shared key with a remote device"
+                ),
                 bits: [{ text: "256 bit", value: "32", key: "bit256" }],
                 validationText: privateKeyValidationText,
                 devicePSKBitCount: privateKeyBitCount,
@@ -161,10 +167,11 @@ export const Security = (): JSX.Element => {
               {
                 type: "text",
                 name: "publicKey",
-                label: "Public Key",
+                label: t("Public Key"),
                 disabled: true,
-                description:
-                  "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+                description: t(
+                  "Sent out to other nodes on the mesh to allow them to compute a shared secret key"
+                ),
                 properties: {
                   value: publicKey,
                 },
@@ -172,29 +179,32 @@ export const Security = (): JSX.Element => {
             ],
           },
           {
-            label: "Admin Settings",
-            description: "Settings for Admin",
+            label: t("Admin Settings"),
+            description: t("Settings for Admin"),
             fields: [
               {
                 type: "toggle",
                 name: "adminChannelEnabled",
-                label: "Allow Legacy Admin",
-                description:
-                  "Allow incoming device control over the insecure legacy admin channel",
+                label: t("Allow Legacy Admin"),
+                description: t(
+                  "Allow incoming device control over the insecure legacy admin channel"
+                ),
               },
               {
                 type: "toggle",
                 name: "isManaged",
-                label: "Managed",
-                description:
-                  'If true, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless a suitable Remote Admin node has been setup, and the public key stored in the field below.',
+               label: t("Managed"),
+                description: t(
+                  'If true, device is considered to be "managed" by a mesh administrator via admin messages'
+                ),
               },
               {
                 type: "text",
                 name: "adminKey",
-                label: "Admin Key",
-                description:
-                  "The public key authorized to send admin messages to this node",
+                label: t("Admin Key"),
+                description: t(
+                  "The public key authorized to send admin messages to this node"
+                ),
                 validationText: adminKeyValidationText,
                 inputChange: adminKeyInputChangeEvent,
                 disabledBy: [
@@ -207,21 +217,22 @@ export const Security = (): JSX.Element => {
             ],
           },
           {
-            label: "Logging Settings",
-            description: "Settings for Logging",
+            label: t("Logging Settings"),
+            description: t("Settings for Logging"),
             fields: [
               {
                 type: "toggle",
                 name: "debugLogApiEnabled",
-                label: "Enable Debug Log API",
-                description:
-                  "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+                label: t("Enable Debug Log API"),
+                description: t(
+                  "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth"
+                ),
               },
               {
                 type: "toggle",
                 name: "serialEnabled",
-                label: "Serial Output Enabled",
-                description: "Serial Console over the Stream API",
+                label: t("Serial Output Enabled"),
+                description: t("Serial Console over the Stream API"),
               },
             ],
           },

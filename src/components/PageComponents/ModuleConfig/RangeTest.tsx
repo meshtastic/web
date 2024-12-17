@@ -1,9 +1,11 @@
 import type { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useTranslation } from "react-i18next";
 import { Protobuf } from "@meshtastic/js";
 
 export const RangeTest = (): JSX.Element => {
+  const { t } = useTranslation();
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
 
   const onSubmit = (data: RangeTestValidation) => {
@@ -13,7 +15,7 @@ export const RangeTest = (): JSX.Element => {
           case: "rangeTest",
           value: data,
         },
-      }),
+      })
     );
   };
 
@@ -23,20 +25,20 @@ export const RangeTest = (): JSX.Element => {
       defaultValues={moduleConfig.rangeTest}
       fieldGroups={[
         {
-          label: "Range Test Settings",
-          description: "Settings for the Range Test module",
+          label: t("Range Test Settings"),
+          description: t("Settings for the Range Test module"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Module Enabled",
-              description: "Enable Range Test",
+              label: t("Module Enabled"),
+              description: t("Enable Range Test"),
             },
             {
               type: "number",
               name: "sender",
-              label: "Message Interval",
-              description: "How long to wait between sending test packets",
+              label: t("Message Interval"),
+              description: t("How long to wait between sending test packets"),
               properties: {
                 suffix: "Seconds",
               },
@@ -49,8 +51,8 @@ export const RangeTest = (): JSX.Element => {
             {
               type: "toggle",
               name: "save",
-              label: "Save CSV to storage",
-              description: "ESP32 Only",
+              label: t("Save CSV to storage"),
+              description: t("ESP32 Only"),
               disabledBy: [
                 {
                   fieldName: "enabled",

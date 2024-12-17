@@ -2,9 +2,11 @@ import type { DeviceValidation } from "@app/validation/config/device.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
+import { useTranslation } from "react-i18next";
 
 export const Device = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
+  const { t } = useTranslation();
 
   const onSubmit = (data: DeviceValidation) => {
     setWorkingConfig(
@@ -13,7 +15,7 @@ export const Device = (): JSX.Element => {
           case: "device",
           value: data,
         },
-      }),
+      })
     );
   };
 
@@ -23,14 +25,14 @@ export const Device = (): JSX.Element => {
       defaultValues={config.device}
       fieldGroups={[
         {
-          label: "Device Settings",
-          description: "Settings for the device",
+          label: t("Device Settings"),
+          description: t("Settings for the device"),
           fields: [
             {
               type: "select",
               name: "role",
-              label: "Role",
-              description: "What role the device performs on the mesh",
+              label: t("Role"),
+              description: t("What role the device performs on the mesh"),
               properties: {
                 enumValue: {
                   Client: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
@@ -54,20 +56,20 @@ export const Device = (): JSX.Element => {
             {
               type: "number",
               name: "buttonGpio",
-              label: "Button Pin",
-              description: "Button pin override",
+              label: t("Button Pin"),
+              description: t("Button pin override"),
             },
             {
               type: "number",
               name: "buzzerGpio",
-              label: "Buzzer Pin",
-              description: "Buzzer pin override",
+              label: t("Buzzer Pin"),
+              description: t("Buzzer pin override"),
             },
             {
               type: "select",
               name: "rebroadcastMode",
-              label: "Rebroadcast Mode",
-              description: "How to handle rebroadcasting",
+              label: t("Rebroadcast Mode"),
+              description: t("How to handle rebroadcasting"),
               properties: {
                 enumValue: Protobuf.Config.Config_DeviceConfig_RebroadcastMode,
                 formatEnumName: true,
@@ -76,8 +78,8 @@ export const Device = (): JSX.Element => {
             {
               type: "number",
               name: "nodeInfoBroadcastSecs",
-              label: "Node Info Broadcast Interval",
-              description: "How often to broadcast node info",
+              label: t("Node Info Broadcast Interval"),
+              description: t("How often to broadcast node info"),
               properties: {
                 suffix: "Seconds",
               },
@@ -85,14 +87,14 @@ export const Device = (): JSX.Element => {
             {
               type: "toggle",
               name: "doubleTapAsButtonPress",
-              label: "Double Tap as Button Press",
-              description: "Treat double tap as button press",
+              label: t("Double Tap as Button Press"),
+              description: t("Treat double tap as button press"),
             },
             {
               type: "toggle",
               name: "disableTripleClick",
-              label: "Disable Triple Click",
-              description: "Disable triple click",
+              label: t("Disable Triple Click"),
+              description: t("Disable Triple Click"),
             },
             {
               type: "toggle",

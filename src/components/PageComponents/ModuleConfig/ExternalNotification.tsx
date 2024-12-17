@@ -1,10 +1,12 @@
 import type { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useTranslation } from "react-i18next";
 import { Protobuf } from "@meshtastic/js";
 
 export const ExternalNotification = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation();
 
   const onSubmit = (data: ExternalNotificationValidation) => {
     setWorkingModuleConfig(
@@ -13,7 +15,7 @@ export const ExternalNotification = (): JSX.Element => {
           case: "externalNotification",
           value: data,
         },
-      }),
+      })
     );
   };
 
@@ -23,20 +25,20 @@ export const ExternalNotification = (): JSX.Element => {
       defaultValues={moduleConfig.externalNotification}
       fieldGroups={[
         {
-          label: "External Notification Settings",
+          label: t("External Notification Settings"),
           description: "Configure the external notification module",
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Module Enabled",
-              description: "Enable External Notification",
+              label: t("Module Enabled"),
+              description: t("Enable External Notification"),
             },
             {
               type: "number",
               name: "outputMs",
-              label: "Output MS",
-              description: "Output MS",
+              label: t("Output MS"),
+              description: t("Output MS"),
 
               disabledBy: [
                 {
@@ -50,8 +52,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "number",
               name: "output",
-              label: "Output",
-              description: "Output",
+              label: t("Output"),
+              description: t("Output"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -61,8 +63,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "number",
               name: "outputVibra",
-              label: "Output Vibrate",
-              description: "Output Vibrate",
+              label: t("Output Vibrate"),
+              description: t("Output Vibrate"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -72,8 +74,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "number",
               name: "outputBuzzer",
-              label: "Output Buzzer",
-              description: "Output Buzzer",
+              label: t("Output Buzzer"),
+              description: t("Output Buzzer"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -83,8 +85,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "toggle",
               name: "active",
-              label: "Active",
-              description: "Active",
+              label: t("Active"),
+              description: t("Active"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -94,8 +96,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "toggle",
               name: "alertMessage",
-              label: "Alert Message",
-              description: "Alert Message",
+              label: t("Alert Message"),
+              description: t("Alert Message"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -105,8 +107,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "toggle",
               name: "alertMessageVibra",
-              label: "Alert Message Vibrate",
-              description: "Alert Message Vibrate",
+              label: t("Alert Message Vibrate"),
+              description: t("Alert Message Vibrate"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -116,8 +118,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "toggle",
               name: "alertMessageBuzzer",
-              label: "Alert Message Buzzer",
-              description: "Alert Message Buzzer",
+              label: t("Alert Message Buzzer"),
+              description: t("Alert Message Buzzer"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -127,9 +129,10 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "toggle",
               name: "alertBell",
-              label: "Alert Bell",
-              description:
-                "Should an alert be triggered when receiving an incoming bell?",
+              label: t("Alert Bell"),
+              description: t(
+                "Should an alert be triggered when receiving an incoming bell?"
+              ),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -139,8 +142,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "toggle",
               name: "alertBellVibra",
-              label: "Alert Bell Vibrate",
-              description: "Alert Bell Vibrate",
+              label: t("Alert Bell Vibrate"),
+              description: t("Alert Bell Vibrate"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -150,8 +153,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "toggle",
               name: "alertBellBuzzer",
-              label: "Alert Bell Buzzer",
-              description: "Alert Bell Buzzer",
+              label: t("Alert Bell Buzzer"),
+              description: t("Alert Bell Buzzer"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -161,8 +164,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "toggle",
               name: "usePwm",
-              label: "Use PWM",
-              description: "Use PWM",
+              label: t("Use PWM"),
+              description: t("Use PWM"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -172,8 +175,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "number",
               name: "nagTimeout",
-              label: "Nag Timeout",
-              description: "Nag Timeout",
+              label: t("Nag Timeout"),
+              description: t("Nag Timeout"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -183,8 +186,8 @@ export const ExternalNotification = (): JSX.Element => {
             {
               type: "toggle",
               name: "useI2sAsBuzzer",
-              label: "Use I²S Pin as Buzzer",
-              description: "Designate I²S Pin as Buzzer Output",
+              label: t("Use I²S Pin as Buzzer"),
+              description: t("Designate I²S Pin as Buzzer Output"),
               disabledBy: [
                 {
                   fieldName: "enabled",

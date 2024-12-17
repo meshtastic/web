@@ -1,10 +1,12 @@
 import { useDevice } from "@app/core/stores/deviceStore.ts";
 import type { MqttValidation } from "@app/validation/moduleConfig/mqtt.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useTranslation } from "react-i18next";
 import { Protobuf } from "@meshtastic/js";
 
 export const MQTT = (): JSX.Element => {
   const { config, moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation();
 
   const onSubmit = (data: MqttValidation) => {
     setWorkingModuleConfig(
@@ -15,11 +17,11 @@ export const MQTT = (): JSX.Element => {
             ...data,
             mapReportSettings:
               new Protobuf.ModuleConfig.ModuleConfig_MapReportSettings(
-                data.mapReportSettings,
+                data.mapReportSettings
               ),
           },
         },
-      }),
+      })
     );
   };
 
@@ -29,21 +31,22 @@ export const MQTT = (): JSX.Element => {
       defaultValues={moduleConfig.mqtt}
       fieldGroups={[
         {
-          label: "MQTT Settings",
-          description: "Settings for the MQTT module",
+          label: t("MQTT Settings"),
+          description: t("Settings for the MQTT module"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Enabled",
-              description: "Enable or disable MQTT",
+              label: t("Enabled"),
+              description: t("Enable or disable MQTT"),
             },
             {
               type: "text",
               name: "address",
-              label: "MQTT Server Address",
-              description:
-                "MQTT server address to use for default/custom servers",
+              label: t("MQTT Server Address"),
+              description: t(
+                "MQTT server address to use for default/custom servers"
+              ),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -53,8 +56,8 @@ export const MQTT = (): JSX.Element => {
             {
               type: "text",
               name: "username",
-              label: "MQTT Username",
-              description: "MQTT username to use for default/custom servers",
+              label: t("MQTT Username"),
+              description: t("MQTT username to use for default/custom servers"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -64,8 +67,8 @@ export const MQTT = (): JSX.Element => {
             {
               type: "password",
               name: "password",
-              label: "MQTT Password",
-              description: "MQTT password to use for default/custom servers",
+              label: t("MQTT Password"),
+              description: t("MQTT password to use for default/custom servers"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -75,9 +78,10 @@ export const MQTT = (): JSX.Element => {
             {
               type: "toggle",
               name: "encryptionEnabled",
-              label: "Encryption Enabled",
-              description:
-                "Enable or disable MQTT encryption. Note: All messages are sent to the MQTT broker unencrypted if this option is not enabled, even when your uplink channels have encryption keys set. This includes position data.",
+              label: t("Encryption Enabled"),
+              description: t(
+                "Enable or disable MQTT encryption. Note: All messages are sent to the MQTT broker unencrypted if this option is not enabled, even when your uplink channels have encryption keys set. This includes position data."
+              ),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -87,8 +91,8 @@ export const MQTT = (): JSX.Element => {
             {
               type: "toggle",
               name: "jsonEnabled",
-              label: "JSON Enabled",
-              description: "Whether to send/consume JSON packets on MQTT",
+              label: t("JSON Enabled"),
+              description: t("Whether to send/consume JSON packets on MQTT"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -98,8 +102,8 @@ export const MQTT = (): JSX.Element => {
             {
               type: "toggle",
               name: "tlsEnabled",
-              label: "TLS Enabled",
-              description: "Enable or disable TLS",
+              label: t("TLS Enabled"),
+              description: t("Enable or disable TLS"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -109,8 +113,10 @@ export const MQTT = (): JSX.Element => {
             {
               type: "text",
               name: "root",
-              label: "Root topic",
-              description: "MQTT root topic to use for default/custom servers",
+              label: t("Root topic"),
+              description: t(
+                "MQTT root topic to use for default/custom servers"
+              ),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -120,9 +126,10 @@ export const MQTT = (): JSX.Element => {
             {
               type: "toggle",
               name: "proxyToClientEnabled",
-              label: "Proxy to Client Enabled",
-              description:
-                "Use the client's internet connection for MQTT (feature only active in mobile apps)",
+              label: t("Proxy to Client Enabled"),
+              description: t(
+                "Use the client's internet connection for MQTT (feature only active in mobile apps)"
+              ),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -132,8 +139,8 @@ export const MQTT = (): JSX.Element => {
             {
               type: "toggle",
               name: "mapReportingEnabled",
-              label: "Map Reporting Enabled",
-              description: "Enable or disable map reporting",
+              label: t("Map Reporting Enabled"),
+              description: t("Enable or disable map reporting"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -143,8 +150,8 @@ export const MQTT = (): JSX.Element => {
             {
               type: "number",
               name: "mapReportSettings.publishIntervalSecs",
-              label: "Map Report Publish Interval (s)",
-              description: "Interval in seconds to publish map reports",
+              label: t("Map Report Publish Interval (s)"),
+              description: t("Interval in seconds to publish map reports"),
               properties: {
                 suffix: "Seconds",
               },
@@ -167,28 +174,28 @@ export const MQTT = (): JSX.Element => {
                 enumValue:
                   config.display?.units === 0
                     ? {
-                        "Within 23 km": 10,
-                        "Within 12 km": 11,
-                        "Within 5.8 km": 12,
-                        "Within 2.9 km": 13,
-                        "Within 1.5 km": 14,
-                        "Within 700 m": 15,
-                        "Within 350 m": 16,
-                        "Within 200 m": 17,
-                        "Within 90 m": 18,
-                        "Within 50 m": 19,
+                        [t("Within km", { value: 23 })]: 10,
+                        [t("Within km", { value: 12 })]: 11,
+                        [t("Within km", { value: "5.8" })]: 12,
+                        [t("Within km", { value: "2.9" })]: 13,
+                        [t("Within km", { value: "1.5" })]: 14,
+                        [t("Within m", { value: "700" })]: 15,
+                        [t("Within m", { value: "350" })]: 16,
+                        [t("Within m", { value: "200" })]: 17,
+                        [t("Within m", { value: "90" })]: 18,
+                        [t("Within m", { value: "50" })]: 19,
                       }
                     : {
-                        "Within 15 miles": 10,
-                        "Within 7.3 miles": 11,
-                        "Within 3.6 miles": 12,
-                        "Within 1.8 miles": 13,
-                        "Within 0.9 miles": 14,
-                        "Within 0.5 miles": 15,
-                        "Within 0.2 miles": 16,
-                        "Within 600 feet": 17,
-                        "Within 300 feet": 18,
-                        "Within 150 feet": 19,
+                        [t("Within miles", { value: 15 })]: 10,
+                        [t("Within miles", { value: 7.3 })]: 11,
+                        [t("Within miles", { value: 3.6 })]: 12,
+                        [t("Within miles", { value: 1.8 })]: 13,
+                        [t("Within miles", { value: 0.9 })]: 14,
+                        [t("Within miles", { value: 0.5 })]: 15,
+                        [t("Within miles", { value: 0.2 })]: 16,
+                        [t("Within feet", { value: 600 })]: 17,
+                        [t("Within feet", { value: 300 })]: 18,
+                        [t("Within feet", { value: 150 })]: 19,
                       },
               },
               disabledBy: [

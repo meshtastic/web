@@ -1,10 +1,12 @@
 import type { LoRaValidation } from "@app/validation/config/lora.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useTranslation } from "react-i18next";
 import { Protobuf } from "@meshtastic/js";
 
 export const LoRa = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
+  const { t } = useTranslation();
 
   const onSubmit = (data: LoRaValidation) => {
     setWorkingConfig(
@@ -13,7 +15,7 @@ export const LoRa = (): JSX.Element => {
           case: "lora",
           value: data,
         },
-      }),
+      })
     );
   };
 
@@ -23,14 +25,14 @@ export const LoRa = (): JSX.Element => {
       defaultValues={config.lora}
       fieldGroups={[
         {
-          label: "Mesh Settings",
-          description: "Settings for the LoRa mesh",
+          label: t("Mesh Settings"),
+          description: t("Settings for the LoRa mesh"),
           fields: [
             {
               type: "select",
               name: "region",
-              label: "Region",
-              description: "Sets the region for your node",
+              label: t("Region"),
+              description: t("Sets the region for your node"),
               properties: {
                 enumValue: Protobuf.Config.Config_LoRaConfig_RegionCode,
               },
@@ -38,8 +40,8 @@ export const LoRa = (): JSX.Element => {
             {
               type: "select",
               name: "hopLimit",
-              label: "Hop Limit",
-              description: "Maximum number of hops",
+              label: t("Hop Limit"),
+              description: t("Maximum number of hops"),
               properties: {
                 enumValue: { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7 },
               },
@@ -47,39 +49,38 @@ export const LoRa = (): JSX.Element => {
             {
               type: "number",
               name: "channelNum",
-              label: "Frequency Slot",
-              description: "LoRa frequency channel number",
+              label: t("Frequency Slot"),
+              description: t("LoRa frequency channel number"),
             },
             {
               type: "toggle",
               name: "ignoreMqtt",
-              label: "Ignore MQTT",
-              description: "Don't forward MQTT messages over the mesh",
+              label: t("Ignore MQTT"),
+              description: t("Don't forward MQTT messages over the mesh"),
             },
             {
               type: "toggle",
               name: "configOkToMqtt",
-              label: "OK to MQTT",
-              description:
-                "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+              label: t("OK to MQTT"),
+              description: t("OK to MQTT description"),
             },
           ],
         },
         {
-          label: "Waveform Settings",
-          description: "Settings for the LoRa waveform",
+          label: t("Waveform Settings"),
+          description: t("Settings for the LoRa waveform"),
           fields: [
             {
               type: "toggle",
               name: "usePreset",
-              label: "Use Preset",
-              description: "Use one of the predefined modem presets",
+              label: t("Use Preset"),
+              description: t("Use one of the predefined modem presets"),
             },
             {
               type: "select",
               name: "modemPreset",
-              label: "Modem Preset",
-              description: "Modem preset to use",
+              label:t( "Modem Preset"),
+              description:t( "Modem preset to use"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -93,8 +94,8 @@ export const LoRa = (): JSX.Element => {
             {
               type: "number",
               name: "bandwidth",
-              label: "Bandwidth",
-              description: "Channel bandwidth in MHz",
+              label: t("Bandwidth"),
+              description:t( "Channel bandwidth in MHz"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -108,8 +109,8 @@ export const LoRa = (): JSX.Element => {
             {
               type: "number",
               name: "spreadFactor",
-              label: "Spreading Factor",
-              description: "Indicates the number of chirps per symbol",
+              label: t("Spreading Factor"),
+              description: ("Indicates the number of chirps per symbol"),
 
               disabledBy: [
                 {
@@ -124,8 +125,8 @@ export const LoRa = (): JSX.Element => {
             {
               type: "number",
               name: "codingRate",
-              label: "Coding Rate",
-              description: "The denominator of the coding rate",
+              label: t("Coding Rate"),
+              description: t("The denominator of the coding rate"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -136,20 +137,20 @@ export const LoRa = (): JSX.Element => {
           ],
         },
         {
-          label: "Radio Settings",
-          description: "Settings for the LoRa radio",
+          label: t("Radio Settings"),
+          description: t("Settings for the LoRa radio"),
           fields: [
             {
               type: "toggle",
               name: "txEnabled",
-              label: "Transmit Enabled",
-              description: "Enable/Disable transmit (TX) from the LoRa radio",
+              label:t( "Transmit Enabled"),
+              description: t("Enable/Disable transmit (TX) from the LoRa radio"),
             },
             {
               type: "number",
               name: "txPower",
-              label: "Transmit Power",
-              description: "Max transmit power",
+              label: t("Transmit Power"),
+              description: t("Max transmit power"),
               properties: {
                 suffix: "dBm",
               },
@@ -157,15 +158,15 @@ export const LoRa = (): JSX.Element => {
             {
               type: "toggle",
               name: "overrideDutyCycle",
-              label: "Override Duty Cycle",
-              description: "Override Duty Cycle",
+              label: t("Override Duty Cycle"),
+              description: t("Override Duty Cycle"),
             },
             {
               type: "number",
               name: "frequencyOffset",
-              label: "Frequency Offset",
+              label: t("Frequency Offset"),
               description:
-                "Frequency offset to correct for crystal calibration errors",
+                t("Frequency offset to correct for crystal calibration errors"),
               properties: {
                 suffix: "Hz",
               },
@@ -173,14 +174,14 @@ export const LoRa = (): JSX.Element => {
             {
               type: "toggle",
               name: "sx126xRxBoostedGain",
-              label: "Boosted RX Gain",
-              description: "Boosted RX gain",
+              label: t("Boosted RX Gain"),
+              description: t("Boosted RX gain"),
             },
             {
               type: "number",
               name: "overrideFrequency",
-              label: "Override Frequency",
-              description: "Override frequency",
+              label: t("Override Frequency"),
+              description: t("Override frequency"),
               properties: {
                 suffix: "MHz",
                 step: 0.001,
