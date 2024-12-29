@@ -16,7 +16,7 @@ import {
   ZoomOutIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Marker, useMap } from "react-map-gl";
+import { AttributionControl, Marker, useMap } from "react-map-gl";
 import MapGl from "react-map-gl/maplibre";
 
 export const MapPage = (): JSX.Element => {
@@ -126,6 +126,7 @@ export const MapPage = (): JSX.Element => {
           // }}
 
           // @ts-ignore
+
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
@@ -142,6 +143,9 @@ export const MapPage = (): JSX.Element => {
             longitude: 0,
           }}
         >
+          <AttributionControl
+            style={{ background: darkMode ? "#ffffff" : "", color: darkMode ? "black" : "" }}
+          />
           {waypoints.map((wp) => (
             <Marker
               key={wp.id}
