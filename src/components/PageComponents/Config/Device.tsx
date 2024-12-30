@@ -46,7 +46,7 @@ export const Device = (): JSX.Element => {
                   "Lost and Found":
                     Protobuf.Config.Config_DeviceConfig_Role.LOST_AND_FOUND,
                   "TAK Tracker":
-                    Protobuf.Config.Config_DeviceConfig_Role.SENSOR,
+                    Protobuf.Config.Config_DeviceConfig_Role.TAK_TRACKER,
                 },
                 formatEnumName: true,
               },

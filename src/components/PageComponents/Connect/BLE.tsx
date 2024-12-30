@@ -14,6 +14,7 @@ export const BLE = ({ closeDialog }: TabElementProps): JSX.Element => {
   const { setSelectedDevice } = useAppStore();
 
   const updateBleDeviceList = useCallback(async (): Promise<void> => {
+    if (!navigator.bluetooth.getDevices) return;
     setBleDevices(await navigator.bluetooth.getDevices());
   }, []);
 
@@ -65,6 +66,7 @@ export const BLE = ({ closeDialog }: TabElementProps): JSX.Element => {
               }
             });
         }}
+        disabled={!navigator.bluetooth.getDevices}
       >
         <span>New device</span>
       </Button>
