@@ -5,6 +5,7 @@ import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { PkiBackupDialog } from "./PKIBackupDialog";
 
 export const DialogManager = (): JSX.Element => {
   const { channels, config, dialog, setDialogOpen } = useDevice();
@@ -47,6 +48,12 @@ export const DialogManager = (): JSX.Element => {
         open={dialog.nodeRemoval}
         onOpenChange={(open) => {
           setDialogOpen("nodeRemoval", open);
+        }}
+      />
+      <PkiBackupDialog
+        open={dialog.pkiBackup}
+        onOpenChange={(open) => {
+          setDialogOpen("pkiBackup", open);
         }}
       />
     </>
