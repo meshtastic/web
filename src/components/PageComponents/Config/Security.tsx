@@ -12,7 +12,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
 export const Security = (): JSX.Element => {
-  const { config, nodes, hardware, setWorkingConfig } = useDevice();
+  const { config, nodes, hardware, setWorkingConfig, setDialogOpen } = useDevice();
 
   const [privateKey, setPrivateKey] = useState<string>(
     fromByteArray(config.security?.privateKey ?? new Uint8Array(0)),
@@ -31,7 +31,7 @@ export const Security = (): JSX.Element => {
   );
   const [adminKeyValidationText, setAdminKeyValidationText] =
     useState<string>();
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [privateKeyDialogOpen, setPrivateKeyDialogOpen] = useState<boolean>(false);
 
   const onSubmit = (data: SecurityValidation) => {
     if (privateKeyValidationText || adminKeyValidationText) return;
@@ -71,8 +71,12 @@ export const Security = (): JSX.Element => {
   };
 
   const privateKeyClickEvent = () => {
-    setDialogOpen(true);
+    setPrivateKeyDialogOpen(true);
   };
+
+  const pkiBackupClickEvent = () => {
+    setDialogOpen("pkiBackup", true);
+  }
 
   const pkiRegenerate = () => {
     const privateKey = getX25519PrivateKey();
@@ -86,7 +90,7 @@ export const Security = (): JSX.Element => {
       setPrivateKeyValidationText,
     );
 
-    setDialogOpen(false);
+    setPrivateKeyDialogOpen(false);
   };
 
   const privateKeyInputChangeEvent = (
@@ -149,7 +153,18 @@ export const Security = (): JSX.Element => {
                 inputChange: privateKeyInputChangeEvent,
                 selectChange: privateKeySelectChangeEvent,
                 hide: !privateKeyVisible,
-                buttonClick: privateKeyClickEvent,
+                actionButtons: [
+                  {
+                    text: "Generate",
+                    onClick: privateKeyClickEvent,
+                    variant: "success",
+                  },
+                  {
+                    text: "Backup Key",
+                    onClick: pkiBackupClickEvent,
+                    variant: "subtle",
+                  },
+                ],
                 properties: {
                   value: privateKey,
                   action: {
@@ -228,8 +243,8 @@ export const Security = (): JSX.Element => {
         ]}
       />
       <PkiRegenerateDialog
-        open={dialogOpen}
-        onOpenChange={() => setDialogOpen(false)}
+        open={privateKeyDialogOpen}
+        onOpenChange={() => setPrivateKeyDialogOpen(false)}
         onSubmit={() => pkiRegenerate()}
       />
     </>
