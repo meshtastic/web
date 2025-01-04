@@ -21,7 +21,7 @@ export const PkiBackupDialog = ({
   open,
   onOpenChange,
 }: PkiBackupDialogProps) => {
-  const { config } = useDevice();
+  const { config, setDialogOpen } = useDevice();
   const privateKeyData = config.security?.privateKey
 
   // If the private data doesn't exist return null
@@ -30,6 +30,10 @@ export const PkiBackupDialog = ({
   }
 
   const getPrivateKey = React.useMemo(() => fromByteArray(config.security?.privateKey ?? new Uint8Array(0)), [config.security?.privateKey]);
+
+  const closeDialog = React.useCallback(() => {
+    setDialogOpen("pkiBackup", false)
+  }, [setDialogOpen])
 
   const renderPrintWindow = React.useCallback(() => {
     const printWindow = window.open("", "_blank");
@@ -52,8 +56,10 @@ export const PkiBackupDialog = ({
       `);
       printWindow.document.close();
       printWindow.print();
+      closeDialog()
+
     }
-  }, [getPrivateKey]);
+  }, [getPrivateKey, closeDialog]);
 
   const createDownloadKeyFile = React.useCallback(() => {
     const blob = new Blob([getPrivateKey], { type: "text/plain" });
@@ -65,8 +71,9 @@ export const PkiBackupDialog = ({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    closeDialog()
     URL.revokeObjectURL(url);
-  }, [getPrivateKey]);
+  }, [getPrivateKey, closeDialog]);
 
 
   return (
