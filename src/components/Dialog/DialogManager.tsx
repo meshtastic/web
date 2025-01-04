@@ -5,7 +5,7 @@ import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { PkiBackupDialog } from "./PKIBackupDialog";
+import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog";
 
 export const DialogManager = (): JSX.Element => {
   const { channels, config, dialog, setDialogOpen } = useDevice();
