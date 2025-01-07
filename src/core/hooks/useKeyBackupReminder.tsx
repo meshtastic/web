@@ -17,6 +17,8 @@ interface ReminderState {
   lastShown: string;
 }
 
+const TOAST_DELAY = 10000;
+
 export function useBackupReminder({
   suppressDays = 365,
   message = "It's time to back up your key data. Would you like to do this now?",
@@ -47,35 +49,37 @@ export function useBackupReminder({
 
   useEffect(() => {
     if (!reminderState) {
-      const { dismiss: dimissToast } = toast({
-        title: "Backup Reminder",
-        description: message,
-        action: (
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant={"default"}
-              onClick={async () => {
-                await onAccept();
-                dimissToast()
-                suppressReminder();
-              }}
-            >
-              Back up now
-            </Button>
-            <Button
-              type="button"
-              variant={"outline"}
-              onClick={() => {
-                dimissToast();
-                suppressReminder();
-              }}
-            >
-              Remind me later
-            </Button>
-          </div>
-        ),
-      });
+      setTimeout(() => {
+        const { dismiss: dimissToast } = toast({
+          title: "Backup Reminder",
+          description: message,
+          action: (
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={"default"}
+                onClick={async () => {
+                  await onAccept();
+                  dimissToast()
+                  suppressReminder();
+                }}
+              >
+                Back up now
+              </Button>
+              <Button
+                type="button"
+                variant={"outline"}
+                onClick={() => {
+                  dimissToast();
+                  suppressReminder();
+                }}
+              >
+                Remind me later
+              </Button>
+            </div>
+          ),
+        });
+      }, TOAST_DELAY);
     }
   }, [reminderState]);
 
