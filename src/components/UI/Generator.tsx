@@ -40,6 +40,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
         { text: "256 bit", value: "32", key: "bit256" },
         { text: "128 bit", value: "16", key: "bit128" },
         { text: "8 bit", value: "1", key: "bit8" },
+        { text: "Empty", value: "0", key: "empty" },
       ],
       selectChange,
       inputChange,
