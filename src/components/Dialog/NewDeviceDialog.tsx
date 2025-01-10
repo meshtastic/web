@@ -1,3 +1,4 @@
+import { useBrowserFeatureDetection } from "@app/core/hooks/useBrowserFeatureDetection";
 import { BLE } from "@components/PageComponents/Connect/BLE.tsx";
 import { HTTP } from "@components/PageComponents/Connect/HTTP.tsx";
 import { Serial } from "@components/PageComponents/Connect/Serial.tsx";
@@ -28,30 +29,8 @@ export interface TabManifest {
   disabledLink?: string;
 }
 
-const tabs: TabManifest[] = [
-  {
-    label: "HTTP",
-    element: HTTP,
-    disabled: false,
-    disabledMessage: "Unsuported connection method",
-  },
-  {
-    label: "Bluetooth",
-    element: BLE,
-    disabled: !navigator.bluetooth,
-    disabledMessage:
-      "Web Bluetooth is currently only supported by Chromium-based browsers",
-    disabledLink:
-      "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
-  },
-  {
-    label: "Serial",
-    element: Serial,
-    disabled: !navigator.serial,
-    disabledMessage:
-      "WebSerial is currently only supported by Chromium based browsers: https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility",
-  },
-];
+
+
 export interface NewDeviceProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -61,6 +40,36 @@ export const NewDeviceDialog = ({
   open,
   onOpenChange,
 }: NewDeviceProps): JSX.Element => {
+  const { hasRequiredFeatures, isSecureContext, missingFeatures } = useBrowserFeatureDetection();
+  console.log(missingFeatures);
+
+  const tabs: TabManifest[] = [
+    {
+      label: "HTTP",
+      element: HTTP,
+      disabled: false,
+      disabledMessage: "Unsuported connection method",
+    },
+    {
+      label: "Bluetooth",
+      element: BLE,
+      disabled: missingFeatures.includes("Web Bluetooth"),
+      disabledMessage:
+        "Web Bluetooth is currently only supported by Chromium-based browsers",
+      disabledLink:
+        "https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility"
+    },
+    {
+      label: "Serial",
+      element: Serial,
+      disabled: missingFeatures.includes("Web Serial"),
+      disabledMessage:
+        "Web Serial is currently only supported by Chromium based browsers",
+      disabledLink: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
+    },
+  ];
+
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -92,7 +101,21 @@ export const NewDeviceDialog = ({
           ))}
         </Tabs>
 
-        {(!navigator.bluetooth || !navigator.serial) && (
+        {!isSecureContext && (
+          <>
+            <Subtle>
+              Web Bluetooth and Web Serial require using a HTTPS connection or to localhost.
+            </Subtle>
+            <Subtle>
+              Read more:&nbsp;
+              <Link href="https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts">
+                Secure Contexts
+              </Link>
+            </Subtle>
+          </>
+        )}
+
+        {!hasRequiredFeatures && (
           <>
             <Subtle>
               Web Bluetooth and Web Serial are currently only supported by
