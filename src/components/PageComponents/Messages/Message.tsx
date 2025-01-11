@@ -45,9 +45,12 @@ export const Message = ({
           {sender?.user?.longName ?? "UNK"}
         </span>
         <span className="mt-1 font-mono text-xs text-textSecondary">
+          {message.rxTime.toLocaleDateString()} 
+        </span>
+        <span className="mt-1 font-mono text-xs text-textSecondary">
           {message.rxTime.toLocaleTimeString(undefined, {
-            hour: "2-digit",
-            minute: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
           })}
         </span>
       </div>
