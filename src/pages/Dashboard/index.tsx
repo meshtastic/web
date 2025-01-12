@@ -15,7 +15,7 @@ import {
 import { useMemo } from "react";
 
 export const Dashboard = () => {
-  const { setConnectDialogOpen } = useAppStore();
+  const { setConnectDialogOpen, setSelectedDevice } = useAppStore();
   const { getDevices } = useDeviceStore();
 
   const devices = useMemo(() => getDevices(), [getDevices]);
@@ -38,7 +38,12 @@ export const Dashboard = () => {
               {devices.map((device) => {
                 return (
                   <li key={device.id}>
-                    <div className="px-4 py-4 sm:px-6">
+                    <button
+                      className="w-full px-4 py-4 sm:px-6 hover:bg-slate-50 focus:bg-slate-50 active:bg-slate-100"
+                      onClick={() => {
+                        setSelectedDevice(device.id);
+                      }}
+                    >
                       <div className="flex items-center justify-between">
                         <p className="truncate text-sm font-medium text-accent">
                           {device.nodes.get(device.hardware.myNodeNum)?.user
@@ -75,7 +80,7 @@ export const Dashboard = () => {
                           {device.nodes.size === 0 ? 0 : device.nodes.size - 1}
                         </div>
                       </div>
-                    </div>
+                    </button>
                   </li>
                 );
               })}
