@@ -30,7 +30,7 @@ export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
   ].replaceAll("_", " ");
 
   return (
-    <>
+    <div className="dark:text-black">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
           <Hashicon value={node.num.toString()} size={22} />
@@ -166,6 +166,6 @@ export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
           </Mono>
         </div>
       )}
-    </>
+    </div>
   );
 };
