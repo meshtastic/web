@@ -1,35 +1,52 @@
-import React from "react";
 import Cookies, { type CookieAttributes } from "js-cookie";
+import { useCallback, useState } from "react";
 
-type Cookie<T> = [
-  T | undefined,
-  (value: T, options?: CookieAttributes) => void,
-  () => void,
-];
+interface CookieHookResult<T> {
+  value: T | undefined;
+  setCookie: (value: T, options?: CookieAttributes) => void;
+  removeCookie: () => void;
+}
 
-const useCookie = <T>(
+function useCookie<T extends object>(
   cookieName: string,
   initialValue?: T,
-): Cookie<T> => {
-  const [cookieValue, setCookieValue] = React.useState<T | undefined>(() => {
-    const cookie = Cookies.get(cookieName);
-    return cookie ? (JSON.parse(cookie) as T) : initialValue;
+): CookieHookResult<T> {
+  const [cookieValue, setCookieValue] = useState<T | undefined>(() => {
+    try {
+      const cookie = Cookies.get(cookieName);
+      return cookie ? (JSON.parse(cookie) as T) : initialValue;
+    } catch (error) {
+      console.error(`Error parsing cookie ${cookieName}:`, error);
+      return initialValue;
+    }
   });
 
-  const setCookie = React.useCallback(
+  const setCookie = useCallback(
     (value: T, options?: CookieAttributes) => {
-      Cookies.set(cookieName, JSON.stringify(value), options);
-      setCookieValue(value);
+      try {
+        Cookies.set(cookieName, JSON.stringify(value), options);
+        setCookieValue(value);
+      } catch (error) {
+        console.error(`Error setting cookie ${cookieName}:`, error);
+      }
     },
     [cookieName],
   );
 
-  const removeCookie = React.useCallback(() => {
-    Cookies.remove(cookieName);
-    setCookieValue(undefined);
+  const removeCookie = useCallback(() => {
+    try {
+      Cookies.remove(cookieName);
+      setCookieValue(undefined);
+    } catch (error) {
+      console.error(`Error removing cookie ${cookieName}:`, error);
+    }
   }, [cookieName]);
 
-  return [cookieValue, setCookie, removeCookie];
-};
+  return {
+    value: cookieValue,
+    setCookie,
+    removeCookie,
+  };
+}
 
 export default useCookie;

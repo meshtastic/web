@@ -5,17 +5,15 @@ export const KeyBackupReminder = (): JSX.Element => {
   const { setDialogOpen } = useDevice();
 
   useBackupReminder({
-    suppressDays: 7,
-    message: "We recommend backing up your key data regularly. Would you like to back up now?",
+    reminderInDays: 7,
+    message:
+      "We recommend backing up your key data regularly. Would you like to back up now?",
     onAccept: () => setDialogOpen("pkiBackup", true),
+    enabled: true,
     cookieOptions: {
       secure: true,
-      sameSite: 'strict'
-    }
+      sameSite: "strict",
+    },
   });
-
-  return (
-    <>
-    </>
-  );
+  return <></>;
 };
