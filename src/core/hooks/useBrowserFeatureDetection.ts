@@ -1,32 +1,29 @@
-type Feature = 'Web Bluetooth' | 'Web Serial';
-type FeatureKey = 'bluetooth' | 'serial';
+import { useMemo } from 'react';
 
-interface BrowserFeatureDetection {
-  hasRequiredFeatures: boolean;
-  missingFeatures: Feature[];
-  isSecureContext: boolean;
+export type BrowserFeature = 'Web Bluetooth' | 'Web Serial' | 'Secure Context';
+
+interface BrowserSupport {
+  supported: BrowserFeature[];
+  unsupported: BrowserFeature[];
 }
 
-const featureLabels: Record<FeatureKey, Feature> = {
-  bluetooth: 'Web Bluetooth',
-  serial: 'Web Serial'
-};
+export function useBrowserFeatureDetection(): BrowserSupport {
+  const support = useMemo(() => {
+    const features: [BrowserFeature, boolean][] = [
+      ['Web Bluetooth', !!navigator.bluetooth],
+      ['Web Serial', !!navigator.serial],
+      ['Secure Context', window.location.protocol === 'https:' || window.location.hostname === 'localhost']
+    ];
 
-export function useBrowserFeatureDetection(): BrowserFeatureDetection {
-  const { bluetooth, serial } = navigator;
-  const isSecureContext = window.location.protocol === 'https:' ||
-    window.location.hostname === 'localhost';
+    return features.reduce<BrowserSupport>(
+      (acc, [feature, isSupported]) => {
+        const list = isSupported ? acc.supported : acc.unsupported;
+        list.push(feature);
+        return acc;
+      },
+      { supported: [], unsupported: [] }
+    );
+  }, []);
 
-  const features = {
-    bluetooth,
-    serial
-  };
-
-  return {
-    hasRequiredFeatures: Object.values(features).every(Boolean),
-    missingFeatures: Object.entries(features)
-      .filter(([_, supported]) => !supported)
-      .map(([feature]) => featureLabels[feature as FeatureKey]),
-    isSecureContext
-  };
+  return support;
 }
