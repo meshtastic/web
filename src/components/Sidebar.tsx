@@ -12,9 +12,12 @@ import {
   MapIcon,
   MessageSquareIcon,
   SettingsIcon,
+  SidebarCloseIcon,
+  SidebarOpenIcon,
   UsersIcon,
   ZapIcon,
 } from "lucide-react";
+import { useState } from "react";
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -25,6 +28,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
   const myNode = nodes.get(hardware.myNodeNum);
   const myMetadata = metadata.get(0);
   const { activePage, setActivePage, setDialogOpen } = useDevice();
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
   interface NavLink {
     name: string;
@@ -60,7 +64,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
     },
   ];
 
-  return (
+  return showSidebar ? (
     <div className="min-w-[280px] max-w-min flex-col overflow-y-auto border-r-[0.5px] border-slate-300 bg-transparent dark:border-slate-700">
       <div className="flex justify-between px-8 pt-6">
         <div>
@@ -76,11 +80,20 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
         >
           <EditIcon size={16} />
         </button>
+        <button type="button" onClick={() => setShowSidebar(false)}>
+          <SidebarCloseIcon size={24} />
+        </button>
       </div>
       <div className="px-8 pb-6">
         <div className="flex items-center">
           <BatteryMediumIcon size={24} viewBox={"0 0 28 24"} />
-          <Subtle>{myNode?.deviceMetrics?.batteryLevel ? myNode?.deviceMetrics?.batteryLevel > 100 ? "Charging" : myNode?.deviceMetrics?.batteryLevel + "%"  : "UNK"}</Subtle>
+          <Subtle>
+            {myNode?.deviceMetrics?.batteryLevel
+              ? myNode?.deviceMetrics?.batteryLevel > 100
+                ? "Charging"
+                : myNode?.deviceMetrics?.batteryLevel + "%"
+              : "UNK"}
+          </Subtle>
         </div>
         <div className="flex items-center">
           <ZapIcon size={24} viewBox={"0 0 36 24"} />
@@ -108,6 +121,12 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
         ))}
       </SidebarSection>
       {children}
+    </div>
+  ) : (
+    <div className="px-1 pt-8 border-r-[0.5px] border-slate-700">
+      <button type="button" onClick={() => setShowSidebar(true)}>
+        <SidebarOpenIcon size={24} />
+      </button>
     </div>
   );
 };
