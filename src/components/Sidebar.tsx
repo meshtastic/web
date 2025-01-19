@@ -80,17 +80,20 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
         >
           <EditIcon size={16} />
         </button>
-        <button
-          type="button"
-          onClick={() => setShowSidebar(false)}
-        >
+        <button type="button" onClick={() => setShowSidebar(false)}>
           <SidebarCloseIcon size={24} />
         </button>
       </div>
       <div className="px-8 pb-6">
         <div className="flex items-center">
           <BatteryMediumIcon size={24} viewBox={"0 0 28 24"} />
-          <Subtle>{myNode?.deviceMetrics?.batteryLevel ? myNode?.deviceMetrics?.batteryLevel > 100 ? "Charging" : myNode?.deviceMetrics?.batteryLevel + "%"  : "UNK"}</Subtle>
+          <Subtle>
+            {myNode?.deviceMetrics?.batteryLevel
+              ? myNode?.deviceMetrics?.batteryLevel > 100
+                ? "Charging"
+                : myNode?.deviceMetrics?.batteryLevel + "%"
+              : "UNK"}
+          </Subtle>
         </div>
         <div className="flex items-center">
           <ZapIcon size={24} viewBox={"0 0 36 24"} />
@@ -120,13 +123,10 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
       {children}
     </div>
   ) : (
-    <div className="px-1 pt-8">
-      <button
-        type="button"
-        onClick={() => setShowSidebar(true)}
-      >
+    <div className="px-1 pt-8 border-r-[0.5px] border-slate-700">
+      <button type="button" onClick={() => setShowSidebar(true)}>
         <SidebarOpenIcon size={24} />
-      </button> 
+      </button>
     </div>
   );
 };
