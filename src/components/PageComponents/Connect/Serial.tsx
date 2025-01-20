@@ -14,13 +14,13 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
   const { setSelectedDevice } = useAppStore();
 
   const updateSerialPortList = useCallback(async () => {
-    setSerialPorts(await navigator.serial.getPorts());
+    setSerialPorts(await navigator?.serial.getPorts());
   }, []);
 
-  navigator.serial.addEventListener("connect", () => {
+  navigator?.serial?.addEventListener("connect", () => {
     updateSerialPortList();
   });
-  navigator.serial.addEventListener("disconnect", () => {
+  navigator?.serial?.addEventListener("disconnect", () => {
     updateSerialPortList();
   });
   useEffect(() => {
@@ -58,9 +58,8 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
                 await onConnect(port);
               }}
             >
-              {`# ${index} - ${usbVendorId ?? "UNK"} - ${
-                usbProductId ?? "UNK"
-              }`}
+              {`# ${index} - ${usbVendorId ?? "UNK"} - ${usbProductId ?? "UNK"
+                }`}
             </Button>
           );
         })}
