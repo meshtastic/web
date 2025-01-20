@@ -10,8 +10,8 @@ interface BrowserSupport {
 export function useBrowserFeatureDetection(): BrowserSupport {
   const support = useMemo(() => {
     const features: [BrowserFeature, boolean][] = [
-      ['Web Bluetooth', !!navigator.bluetooth],
-      ['Web Serial', !!navigator.serial],
+      ['Web Bluetooth', !!navigator?.bluetooth],
+      ['Web Serial', !!navigator?.serial],
       ['Secure Context', window.location.protocol === 'https:' || window.location.hostname === 'localhost']
     ];
 

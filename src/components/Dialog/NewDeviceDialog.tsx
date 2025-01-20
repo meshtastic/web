@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { AlertCircle, } from "lucide-react";
+import { AlertCircle, InfoIcon, } from "lucide-react";
 import {
   Tabs,
   TabsContent,
@@ -29,9 +29,7 @@ export interface TabElementProps {
 export interface TabManifest {
   label: string;
   element: React.FC<TabElementProps>;
-  disabled: boolean;
-  disabledMessage: string;
-  disabledLink?: string;
+  isDisabled: boolean;
 }
 
 export interface NewDeviceProps {
@@ -121,24 +119,21 @@ export const NewDeviceDialog = ({
     {
       label: "HTTP",
       element: HTTP,
-      disabled: false,
-      disabledMessage: "Unsuported connection method",
+      isDisabled: false,
     },
     {
       label: "Bluetooth",
       element: BLE,
-      disabled:
+      isDisabled:
         unsupported.includes("Web Bluetooth") ||
         unsupported.includes("Secure Context"),
-      disabledMessage: "",
     },
     {
       label: "Serial",
       element: Serial,
-      disabled:
+      isDisabled:
         unsupported.includes("Web Serial") ||
         unsupported.includes("Secure Context"),
-      disabledMessage: "",
     },
   ];
 
@@ -154,7 +149,6 @@ export const NewDeviceDialog = ({
               <TabsTrigger
                 key={tab.label}
                 value={tab.label}
-                disabled={tab.disabled}
               >
                 {tab.label}
               </TabsTrigger>
@@ -162,16 +156,12 @@ export const NewDeviceDialog = ({
           </TabsList>
           {tabs.map((tab) => (
             <TabsContent key={tab.label} value={tab.label}>
-              {tab.disabled ? (
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {tab.disabledMessage}
-                </p>
-              ) : (
+              <fieldset disabled={tab.isDisabled}>
+                {tab.isDisabled ? <ErrorMessage missingFeatures={unsupported} /> : null}
                 <tab.element closeDialog={() => onOpenChange(false)} />
-              )}
+              </fieldset>
             </TabsContent>
           ))}
-          <ErrorMessage missingFeatures={unsupported} />
         </Tabs>
       </DialogContent>
     </Dialog>
