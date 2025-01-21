@@ -135,9 +135,6 @@ importers:
       '@biomejs/biome':
         specifier: ^1.8.2
         version: 1.8.2
-      '@buf/meshtastic_protobufs.bufbuild_es':
-        specifier: 1.10.0-20240906232734-3da561588c55.1
-        version: 1.10.0-20240906232734-3da561588c55.1(@bufbuild/protobuf@1.10.0)
       '@rsbuild/core':
         specifier: ^1.0.10
         version: 1.0.10
@@ -249,11 +246,6 @@ packages:
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
-
-  '@buf/meshtastic_protobufs.bufbuild_es@1.10.0-20240906232734-3da561588c55.1':
-    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/meshtastic_protobufs.bufbuild_es/-/meshtastic_protobufs.bufbuild_es-1.10.0-20240906232734-3da561588c55.1.tgz}
-    peerDependencies:
-      '@bufbuild/protobuf': ^1.10.0
 
   '@bufbuild/protobuf@1.10.0':
     resolution: {integrity: sha512-QDdVFLoN93Zjg36NoQPZfsVH9tZew7wKDKyV5qRdj8ntT4wQCOradQjRaTdwMhWUYsgKsvCINKKm87FdEk96Ag==}
@@ -3390,10 +3382,6 @@ snapshots:
 
   '@biomejs/cli-win32-x64@1.8.2':
     optional: true
-
-  '@buf/meshtastic_protobufs.bufbuild_es@1.10.0-20240906232734-3da561588c55.1(@bufbuild/protobuf@1.10.0)':
-    dependencies:
-      '@bufbuild/protobuf': 1.10.0
 
   '@bufbuild/protobuf@1.10.0': {}
 
