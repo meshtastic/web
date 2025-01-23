@@ -1,3 +1,4 @@
+import { Avatar } from "@app/components/UI/Avatar";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
@@ -5,12 +6,11 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { getChannelName } from "@pages/Channels.tsx";
 import { HashIcon, LockIcon, LockOpenIcon, WaypointsIcon } from "lucide-react";
-import { useState } from "react";
+import { type JSX, useState } from "react";
 
 export const MessagesPage = (): JSX.Element => {
   const { channels, nodes, hardware, messages, traceroutes, connection } =
@@ -55,7 +55,7 @@ export const MessagesPage = (): JSX.Element => {
             />
           ))}
         </SidebarSection>
-        <SidebarSection label="Nodes">
+        <SidebarSection label="Nodes" className="flex flex-col gap-4">
           {filteredNodes.map((node) => (
             <SidebarButton
               key={node.num}
@@ -65,56 +65,55 @@ export const MessagesPage = (): JSX.Element => {
                 setChatType("direct");
                 setActiveChat(node.num);
               }}
-              element={<Hashicon size={20} value={node.num.toString()} />}
+              element={<Avatar text={node.user?.shortName.toString() ?? node.num.toString()} />}
             />
           ))}
         </SidebarSection>
       </Sidebar>
       <div className="flex flex-col flex-grow">
         <PageLayout
-          label={`Messages: ${
-            chatType === "broadcast" && currentChannel
-              ? getChannelName(currentChannel)
-              : chatType === "direct" && nodes.get(activeChat)
-                ? nodes.get(activeChat)?.user?.longName ?? nodeHex
-                : "Loading..."
-          }`}
+          label={`Messages: ${chatType === "broadcast" && currentChannel
+            ? getChannelName(currentChannel)
+            : chatType === "direct" && nodes.get(activeChat)
+              ? (nodes.get(activeChat)?.user?.longName ?? nodeHex)
+              : "Loading..."
+            }`}
           actions={
             chatType === "direct"
               ? [
-                  {
-                    icon: nodes.get(activeChat)?.user?.publicKey.length
-                      ? LockIcon
-                      : LockOpenIcon,
-                    iconClasses: nodes.get(activeChat)?.user?.publicKey.length
-                      ? "text-green-600"
-                      : "text-yellow-300",
-                    async onClick() {
-                      const targetNode = nodes.get(activeChat)?.num;
-                      if (targetNode === undefined) return;
-                      toast({
-                        title: nodes.get(activeChat)?.user?.publicKey.length
-                          ? "Chat is using PKI encryption."
-                          : "Chat is using PSK encryption.",
-                      });
-                    },
+                {
+                  icon: nodes.get(activeChat)?.user?.publicKey.length
+                    ? LockIcon
+                    : LockOpenIcon,
+                  iconClasses: nodes.get(activeChat)?.user?.publicKey.length
+                    ? "text-green-600"
+                    : "text-yellow-300",
+                  async onClick() {
+                    const targetNode = nodes.get(activeChat)?.num;
+                    if (targetNode === undefined) return;
+                    toast({
+                      title: nodes.get(activeChat)?.user?.publicKey.length
+                        ? "Chat is using PKI encryption."
+                        : "Chat is using PSK encryption.",
+                    });
                   },
-                  {
-                    icon: WaypointsIcon,
-                    async onClick() {
-                      const targetNode = nodes.get(activeChat)?.num;
-                      if (targetNode === undefined) return;
+                },
+                {
+                  icon: WaypointsIcon,
+                  async onClick() {
+                    const targetNode = nodes.get(activeChat)?.num;
+                    if (targetNode === undefined) return;
+                    toast({
+                      title: "Sending Traceroute, please wait...",
+                    });
+                    await connection?.traceRoute(targetNode).then(() =>
                       toast({
-                        title: "Sending Traceroute, please wait...",
-                      });
-                      await connection?.traceRoute(targetNode).then(() =>
-                        toast({
-                          title: "Traceroute sent.",
-                        }),
-                      );
-                    },
+                        title: "Traceroute sent.",
+                      }),
+                    );
                   },
-                ]
+                },
+              ]
               : []
           }
         >

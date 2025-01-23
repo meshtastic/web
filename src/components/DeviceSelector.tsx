@@ -3,7 +3,6 @@ import { Separator } from "@components/UI/Seperator.tsx";
 import { Code } from "@components/UI/Typography/Code.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
-import { Hashicon } from "@emeraldpay/hashicon-react";
 import {
   HomeIcon,
   LanguagesIcon,
@@ -12,6 +11,8 @@ import {
   SearchIcon,
   SunIcon,
 } from "lucide-react";
+import { Avatar } from "./UI/Avatar";
+import type { JSX } from "react";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
@@ -44,10 +45,7 @@ export const DeviceSelector = (): JSX.Element => {
               }}
               active={selectedDevice === device.id}
             >
-              <Hashicon
-                size={24}
-                value={device.hardware.myNodeNum.toString()}
-              />
+              <Avatar text={device.nodes.get(device.hardware.myNodeNum)?.user?.shortName.toString() ?? "UNK"} />
             </DeviceSelectorButton>
           ))}
           <Separator />

@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 export interface DeviceSelectorButtonProps {
   active: boolean;
   onClick: () => void;
@@ -14,9 +16,9 @@ export const DeviceSelectorButton = ({
     onClick={onClick}
     onKeyDown={onClick}
   >
-    {active && (
+    {/* {active && (
       <div className="absolute -left-2 h-10 w-1.5 rounded-full bg-accent" />
-    )}
+    )} */}
     <div className="flex aspect-square cursor-pointer flex-col items-center justify-center">
       {children}
     </div>

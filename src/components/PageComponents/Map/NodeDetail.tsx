@@ -3,7 +3,6 @@ import { H5 } from "@app/components/UI/Typography/H5.tsx";
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
 import { Separator } from "@app/components/UI/Seperator";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
-import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/js";
 import type { Protobuf as ProtobufType } from "@meshtastic/js";
 import {
@@ -18,6 +17,7 @@ import {
   Star,
 } from "lucide-react";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { Avatar } from "@app/components/UI/Avatar";
 
 export interface NodeDetailProps {
   node: ProtobufType.Mesh.NodeInfo;
@@ -25,6 +25,7 @@ export interface NodeDetailProps {
 
 export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
   const name = node.user?.longName || `!${numberToHexUnpadded(node.num)}`;
+  const shortName = node.user?.shortName || `!${numberToHexUnpadded(node.num)}`;
   const hardwareType = Protobuf.Mesh.HardwareModel[
     node.user?.hwModel ?? 0
   ].replaceAll("_", " ");
@@ -33,8 +34,7 @@ export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
     <div className="dark:text-black">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
-          <Hashicon value={node.num.toString()} size={22} />
-
+          <Avatar text={shortName.toString()} />
           <div>
             {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
               <LockIcon
@@ -68,9 +68,8 @@ export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
           {!!node.deviceMetrics?.batteryLevel && (
             <div
               className="flex items-center gap-1"
-              title={`${
-                node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
-              } volts`}
+              title={`${node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
+                } volts`}
             >
               {node.deviceMetrics?.batteryLevel > 100 ? (
                 <BatteryChargingIcon size={22} />
