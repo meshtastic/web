@@ -41,6 +41,7 @@
     "@radix-ui/react-toast": "^1.2.5",
     "@radix-ui/react-tooltip": "^1.1.7",
     "@turf/turf": "^7.2.0",
+    "@types/js-cookie": "^3.0.6",
     "base64-js": "^1.5.1",
     "class-validator": "^0.14.1",
     "class-variance-authority": "^0.7.1",
