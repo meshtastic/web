@@ -5,7 +5,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.js";
+} from "@components/UI/Dialog";
 import type { Protobuf, Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { TraceRoute } from "../PageComponents/Messages/TraceRoute";
