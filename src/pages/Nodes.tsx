@@ -67,7 +67,11 @@ export const NodesPage = (): JSX.Element => {
             ]}
             rows={filteredNodes.map((node) => [
               <Hashicon key="icon" size={24} value={node.num.toString()} />,
-              <h1 className="cursor-pointer" key="header" onMouseDown={() => setSelectedNode(node)}>
+              <h1
+                className="cursor-pointer"
+                key="header"
+                onMouseDown={() => setSelectedNode(node)}
+              >
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
