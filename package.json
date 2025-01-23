@@ -13,6 +13,7 @@
     "preview": "rsbuild preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)"
   },
+  "packageManager": "pnpm@9.15.4"
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meshtastic/web.git"
@@ -84,4 +85,5 @@
     "tslib": "^2.8.1",
     "typescript": "^5.7.3"
   }
+
 }
