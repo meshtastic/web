@@ -85,5 +85,6 @@
     "tar": "^6.2.1",
     "tslib": "^2.6.3",
     "typescript": "^5.5.2"
-  }
+  },
+  "packageManager": "pnpm@9.15.4"
 }
