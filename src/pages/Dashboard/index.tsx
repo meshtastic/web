@@ -1,9 +1,9 @@
-import { useAppStore } from "@app/core/stores/appStore.js";
-import { useDeviceStore } from "@app/core/stores/deviceStore.js";
-import { Button } from "@components/UI/Button.js";
-import { Separator } from "@components/UI/Seperator.js";
-import { H3 } from "@components/UI/Typography/H3.js";
-import { Subtle } from "@components/UI/Typography/Subtle.js";
+import { useAppStore } from "@app/core/stores/appStore.ts";
+import { useDeviceStore } from "@app/core/stores/deviceStore.ts";
+import { Button } from "@components/UI/Button.tsx";
+import { Separator } from "@components/UI/Seperator.tsx";
+import { H3 } from "@components/UI/Typography/H3.tsx";
+import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import {
   BluetoothIcon,
   ListPlusIcon,

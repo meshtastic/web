@@ -1,6 +1,6 @@
-import { useDevice } from "@app/core/stores/deviceStore.js";
-import type { AmbientLightingValidation } from "@app/validation/moduleConfig/ambientLighting.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import { useDevice } from "@app/core/stores/deviceStore.ts";
+import type { AmbientLightingValidation } from "@app/validation/moduleConfig/ambientLighting.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/js";
 
 export const AmbientLighting = (): JSX.Element => {

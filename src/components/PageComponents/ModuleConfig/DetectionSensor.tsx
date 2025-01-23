@@ -1,6 +1,6 @@
-import { useDevice } from "@app/core/stores/deviceStore.js";
-import type { DetectionSensorValidation } from "@app/validation/moduleConfig/detectionSensor.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import { useDevice } from "@app/core/stores/deviceStore.ts";
+import type { DetectionSensorValidation } from "@app/validation/moduleConfig/detectionSensor.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/js";
 
 export const DetectionSensor = (): JSX.Element => {

@@ -1,4 +1,4 @@
-import type { MessageWithState } from "@app/core/stores/deviceStore.js";
+import type { MessageWithState } from "@app/core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import type { Protobuf } from "@meshtastic/js";
 import {
@@ -43,6 +43,9 @@ export const Message = ({
         </div>
         <span className="cursor-pointer font-medium text-textPrimary">
           {sender?.user?.longName ?? "UNK"}
+        </span>
+        <span className="mt-1 font-mono text-xs text-textSecondary">
+          {message.rxTime.toLocaleDateString()} 
         </span>
         <span className="mt-1 font-mono text-xs text-textSecondary">
           {message.rxTime.toLocaleTimeString(undefined, {

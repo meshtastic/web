@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "@core/utils/cn.js";
+import { cn } from "@core/utils/cn.ts";
 import { type VariantProps, cva } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react";
 

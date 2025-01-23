@@ -1,13 +1,13 @@
-import { Button } from "@components/UI/Button.js";
+import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.js";
-import { Input } from "@components/UI/Input.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+} from "@components/UI/Dialog.tsx";
+import { Input } from "@components/UI/Input.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { ClockIcon, PowerIcon } from "lucide-react";
 import { useState } from "react";
 

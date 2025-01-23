@@ -1,4 +1,4 @@
-import { cn } from "@app/core/utils/cn.js";
+import { cn } from "@app/core/utils/cn.ts";
 import { AlignLeftIcon, type LucideIcon } from "lucide-react";
 import Footer from "./UI/Footer";
 

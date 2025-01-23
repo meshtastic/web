@@ -1,6 +1,6 @@
-import type { PositionValidation } from "@app/validation/config/position.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { PositionValidation } from "@app/validation/config/position.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 
 export const Position = (): JSX.Element => {
@@ -76,12 +76,6 @@ export const Position = (): JSX.Element => {
               name: "gpsEnGpio",
               label: "Enable Pin",
               description: "GPS module enable pin override",
-            },
-            {
-              type: "number",
-              name: "channelPrecision",
-              label: "Channel Precision",
-              description: "GPS channel precision",
             },
           ],
         },

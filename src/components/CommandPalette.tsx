@@ -5,9 +5,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@components/UI/Command.js";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDevice, useDeviceStore } from "@core/stores/deviceStore.js";
+} from "@components/UI/Command.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDevice, useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { useCommandState } from "cmdk";
 import {

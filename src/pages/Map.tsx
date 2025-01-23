@@ -1,11 +1,12 @@
-import { Subtle } from "@app/components/UI/Typography/Subtle.js";
-import { cn } from "@app/core/utils/cn.js";
-import { PageLayout } from "@components/PageLayout.js";
-import { Sidebar } from "@components/Sidebar.js";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
+import { NodeDetail } from "@app/components/PageComponents/Map/NodeDetail";
+import { cn } from "@app/core/utils/cn.ts";
+import { PageLayout } from "@components/PageLayout.tsx";
+import { Sidebar } from "@components/Sidebar.tsx";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
+import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { bbox, lineString } from "@turf/turf";
@@ -16,8 +17,9 @@ import {
   ZoomOutIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Marker, useMap } from "react-map-gl";
+import { AttributionControl, Marker, Popup, useMap } from "react-map-gl";
 import MapGl from "react-map-gl/maplibre";
+import { Protobuf } from "@meshtastic/js";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
@@ -25,6 +27,8 @@ export const MapPage = (): JSX.Element => {
   const { default: map } = useMap();
 
   const [zoom, setZoom] = useState(0);
+  const [selectedNode, setSelectedNode] =
+    useState<Protobuf.Mesh.NodeInfo | null>(null);
 
   const allNodes = Array.from(nodes.values());
 
@@ -126,6 +130,7 @@ export const MapPage = (): JSX.Element => {
           // }}
 
           // @ts-ignore
+
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
@@ -142,6 +147,9 @@ export const MapPage = (): JSX.Element => {
             longitude: 0,
           }}
         >
+          <AttributionControl
+            style={{ background: darkMode ? "#ffffff" : "", color: darkMode ? "black" : "" }}
+          />
           {waypoints.map((wp) => (
             <Marker
               key={wp.id}
@@ -160,7 +168,7 @@ export const MapPage = (): JSX.Element => {
             </Source>
           ))} */}
           {allNodes.map((node) => {
-            if (node.position?.latitudeI) {
+            if (node.position?.latitudeI && node.num !== selectedNode?.num) {
               return (
                 <Marker
                   key={node.num}
@@ -169,6 +177,7 @@ export const MapPage = (): JSX.Element => {
                   style={{ filter: darkMode ? "invert(1)" : "" }}
                   anchor="bottom"
                   onClick={() => {
+                    setSelectedNode(node);
                     map?.easeTo({
                       zoom: 12,
                       center: [
@@ -189,6 +198,17 @@ export const MapPage = (): JSX.Element => {
               );
             }
           })}
+          {selectedNode?.position && (
+            <Popup
+              longitude={(selectedNode.position.longitudeI ?? 0) / 1e7}
+              latitude={(selectedNode.position.latitudeI ?? 0) / 1e7}
+              anchor="left"
+              closeOnClick={false}
+              onClose={() => setSelectedNode(null)}
+            >
+              <NodeDetail node={selectedNode} />
+            </Popup>
+          )}
         </MapGl>
       </PageLayout>
     </>

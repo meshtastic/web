@@ -1,14 +1,14 @@
-import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.js";
-import { PageLayout } from "@components/PageLayout.js";
-import { Sidebar } from "@components/Sidebar.js";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
-import { useToast } from "@core/hooks/useToast.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.tsx";
+import { PageLayout } from "@components/PageLayout.tsx";
+import { Sidebar } from "@components/Sidebar.tsx";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
+import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
+import { useToast } from "@core/hooks/useToast.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { getChannelName } from "@pages/Channels.js";
+import { getChannelName } from "@pages/Channels.tsx";
 import { HashIcon, LockIcon, LockOpenIcon, WaypointsIcon } from "lucide-react";
 import { useState } from "react";
 

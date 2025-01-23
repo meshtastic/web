@@ -1,4 +1,4 @@
-import { useAppStore } from "@core/stores/appStore.js";
+import { useAppStore } from "@core/stores/appStore.ts";
 import type { ReactNode } from "react";
 
 export interface ThemeControllerProps {

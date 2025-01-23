@@ -1,6 +1,6 @@
 import { useAppStore } from "@app/core/stores/appStore";
-import { useDevice } from "@app/core/stores/deviceStore.js";
-import { Button } from "@components/UI/Button.js";
+import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
   DialogContent,
@@ -8,8 +8,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.js";
-import { Label } from "@components/UI/Label.js";
+} from "@components/UI/Dialog.tsx";
+import { Label } from "@components/UI/Label.tsx";
 
 export interface RemoveNodeDialogProps {
   open: boolean;

@@ -1,19 +1,19 @@
 import {
   GenericInput,
   type InputFieldProps,
-} from "@components/Form/FormInput.js";
+} from "@components/Form/FormInput.tsx";
 import {
   PasswordGenerator,
   type PasswordGeneratorProps,
-} from "@components/Form/FormPasswordGenerator.js";
+} from "@components/Form/FormPasswordGenerator.tsx";
 import {
   type SelectFieldProps,
   SelectInput,
-} from "@components/Form/FormSelect.js";
+} from "@components/Form/FormSelect.tsx";
 import {
   type ToggleFieldProps,
   ToggleInput,
-} from "@components/Form/FormToggle.js";
+} from "@components/Form/FormToggle.tsx";
 import type { Control, FieldValues } from "react-hook-form";
 
 export type FieldProps<T> =

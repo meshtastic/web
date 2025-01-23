@@ -1,4 +1,4 @@
-import { Label } from "@components/UI/Label.js";
+import { Label } from "@components/UI/Label.tsx";
 
 export interface FieldWrapperProps {
   label: string;

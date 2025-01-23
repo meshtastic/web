@@ -1,11 +1,11 @@
 import {
   DynamicFormField,
   type FieldProps,
-} from "@components/Form/DynamicFormField.js";
-import { FieldWrapper } from "@components/Form/FormWrapper.js";
-import { Button } from "@components/UI/Button.js";
-import { H4 } from "@components/UI/Typography/H4.js";
-import { Subtle } from "@components/UI/Typography/Subtle.js";
+} from "@components/Form/DynamicFormField.tsx";
+import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
+import { Button } from "@components/UI/Button.tsx";
+import { H4 } from "@components/UI/Typography/H4.tsx";
+import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import {
   type Control,
   type DefaultValues,

@@ -1,10 +1,10 @@
 import type { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
-import { Button } from "@components/UI/Button.js";
-import { Mono } from "@components/generic/Mono.js";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDeviceStore } from "@core/stores/deviceStore.js";
-import { subscribeAll } from "@core/subscriptions.js";
-import { randId } from "@core/utils/randId.js";
+import { Button } from "@components/UI/Button.tsx";
+import { Mono } from "@components/generic/Mono.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDeviceStore } from "@core/stores/deviceStore.ts";
+import { subscribeAll } from "@core/subscriptions.ts";
+import { randId } from "@core/utils/randId.ts";
 import { SerialConnection } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 
@@ -14,13 +14,13 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
   const { setSelectedDevice } = useAppStore();
 
   const updateSerialPortList = useCallback(async () => {
-    setSerialPorts(await navigator.serial.getPorts());
+    setSerialPorts(await navigator?.serial.getPorts());
   }, []);
 
-  navigator.serial.addEventListener("connect", () => {
+  navigator?.serial?.addEventListener("connect", () => {
     updateSerialPortList();
   });
-  navigator.serial.addEventListener("disconnect", () => {
+  navigator?.serial?.addEventListener("disconnect", () => {
     updateSerialPortList();
   });
   useEffect(() => {
@@ -58,9 +58,8 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
                 await onConnect(port);
               }}
             >
-              {`# ${index} - ${usbVendorId ?? "UNK"} - ${
-                usbProductId ?? "UNK"
-              }`}
+              {`# ${index} - ${usbVendorId ?? "UNK"} - ${usbProductId ?? "UNK"
+                }`}
             </Button>
           );
         })}

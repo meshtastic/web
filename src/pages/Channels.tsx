@@ -3,11 +3,11 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@app/components/UI/Tabs.js";
-import { Channel } from "@components/PageComponents/Channel.js";
-import { PageLayout } from "@components/PageLayout.js";
-import { Sidebar } from "@components/Sidebar.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+} from "@app/components/UI/Tabs.tsx";
+import { Channel } from "@components/PageComponents/Channel.tsx";
+import { PageLayout } from "@components/PageLayout.tsx";
+import { Sidebar } from "@components/Sidebar.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Types } from "@meshtastic/js";
 import type { Protobuf } from "@meshtastic/js";
 import { ImportIcon, QrCodeIcon } from "lucide-react";

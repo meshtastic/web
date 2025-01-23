@@ -1,26 +1,30 @@
 import * as React from "react";
 
-import { Button } from "@components/UI/Button.js";
-import { Input } from "@components/UI/Input.js";
+import { Button, type ButtonVariant } from "@components/UI/Button.tsx";
+import { Input } from "@components/UI/Input.tsx";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@components/UI/Select.js";
+} from "@components/UI/Select.tsx";
 import type { LucideIcon } from "lucide-react";
 
 export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
-  hide?: boolean;
+  type: "text" | "password";
   devicePSKBitCount?: number;
   value: string;
   variant: "default" | "invalid";
-  buttonText?: string;
+  actionButtons: {
+    text: string;
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+    variant: ButtonVariant;
+    className?: string;
+  }[];
   bits?: { text: string; value: string; key: string }[];
   selectChange: (event: string) => void;
   inputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  buttonClick: React.MouseEventHandler<HTMLButtonElement>;
   action?: {
     icon: LucideIcon;
     onClick: () => void;
@@ -31,19 +35,19 @@ export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
 const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
   (
     {
-      hide = true,
+      type,
       devicePSKBitCount,
       variant,
       value,
-      buttonText,
+      actionButtons,
       bits = [
         { text: "256 bit", value: "32", key: "bit256" },
         { text: "128 bit", value: "16", key: "bit128" },
         { text: "8 bit", value: "1", key: "bit8" },
+        { text: "Empty", value: "0", key: "empty" },
       ],
       selectChange,
       inputChange,
-      buttonClick,
       action,
       disabled,
       ...props
@@ -68,7 +72,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
     return (
       <>
         <Input
-          type={hide ? "password" : "text"}
+          type={type}
           id="pskInput"
           variant={variant}
           value={value}
@@ -93,15 +97,21 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
             ))}
           </SelectContent>
         </Select>
-        <Button
-          type="button"
-          variant="success"
-          onClick={buttonClick}
-          disabled={disabled}
-          {...props}
-        >
-          {buttonText}
-        </Button>
+        <div className="flex ml-4 space-x-4">
+          {actionButtons?.map(({ text, onClick, variant, className }) => (
+            <Button
+              key={text}
+              type="button"
+              onClick={onClick}
+              disabled={disabled}
+              variant={variant}
+              className={className}
+              {...props}
+            >
+              {text}
+            </Button>
+          ))}
+        </div>
       </>
     );
   },
