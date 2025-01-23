@@ -14,7 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-      - uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v4
+        with:
+          version:
 
       - name: Install Dependencies
         run: pnpm install
