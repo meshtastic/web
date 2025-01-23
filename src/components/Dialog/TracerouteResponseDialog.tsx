@@ -23,6 +23,7 @@ export const TracerouteResponseDialog = ({
 }: TracerouteResponseDialogProps): JSX.Element => {
   const { nodes } = useDevice();
   const route: number[] = traceroute?.data.route ?? [];
+  const routeBack: number[] = traceroute?.data.routeBack ?? [];
   const from = nodes.get(traceroute?.from ?? 0);
   const longName =
     from?.user?.longName ??
@@ -38,7 +39,7 @@ export const TracerouteResponseDialog = ({
           <DialogTitle>{`Traceroute: ${longName} (${shortName})`}</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          <TraceRoute route={route} from={from} to={to} />
+          <TraceRoute route={route} routeBack={routeBack} from={from} to={to} />
         </DialogDescription>
       </DialogContent>
     </Dialog>

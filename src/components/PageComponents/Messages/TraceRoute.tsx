@@ -6,12 +6,14 @@ export interface TraceRouteProps {
   from?: Protobuf.Mesh.NodeInfo;
   to?: Protobuf.Mesh.NodeInfo;
   route: Array<number>;
+  routeBack?: Array<number>;
 }
 
 export const TraceRoute = ({
   from,
   to,
   route,
+  routeBack,
 }: TraceRouteProps): JSX.Element => {
   const { nodes } = useDevice();
 
@@ -22,8 +24,9 @@ export const TraceRoute = ({
       </span>
     </div>
   ) : (
-    <div className="ml-5 flex">
+    <div className="ml-5 flex flex-col">
       <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
+        <p className="font-semibold">Route traced towards destination:</p>
         {to?.user?.longName} ↔{" "}
         {route.map(
           (hop) =>
@@ -31,6 +34,17 @@ export const TraceRoute = ({
         )}
         {from?.user?.longName}
       </span>
+      {routeBack ? (
+        <span className="ml-4 mt-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
+          <p className="font-semibold">Route traced back to us:</p>
+          {from?.user?.longName} ↔{" "}
+          {routeBack.map(
+            (hop) =>
+              `${nodes.get(hop)?.user?.longName ?? `!${numberToHexUnpadded(hop)}`} ↔ `,
+          )}
+          {to?.user?.longName}
+        </span>
+      ) : null}
     </div>
   );
 };
