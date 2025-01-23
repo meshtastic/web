@@ -21,7 +21,6 @@ import MapGl from "react-map-gl/maplibre";
 import type { Protobuf } from "@meshtastic/js";
 import { Avatar } from "@app/components/UI/Avatar";
 
-
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
   const { rasterSources, darkMode } = useAppStore();
