@@ -13,10 +13,11 @@ jobs:
   build-and-package:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          package_json_file: package.json
 
       - name: Install Dependencies
         run: pnpm install
