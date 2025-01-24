@@ -6,20 +6,16 @@ import { useState } from "react";
 
 export const Bluetooth = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
-  const [bluetoothValidationText, setBluetoothValidationText] = useState<string>();
+  const [bluetoothValidationText, setBluetoothValidationText] =
+    useState<string>();
 
-  const bluetoothPinChangeEvent = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    if (e.target.value[0] == "0")
-    {
+  const bluetoothPinChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value[0] == "0") {
       setBluetoothValidationText("Bluetooth Pin cannot start with 0.");
-    }
-    else
-    {
+    } else {
       setBluetoothValidationText("");
     }
-  }
+  };
 
   const onSubmit = (data: BluetoothValidation) => {
     setWorkingConfig(
