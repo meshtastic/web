@@ -10,14 +10,14 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import type { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { bbox, lineString } from "@turf/turf";
+import { bbox, lineString } from "@core/utils/maps";
 import {
   BoxSelectIcon,
   MapPinIcon,
   ZoomInIcon,
   ZoomOutIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { type JSX, useCallback, useEffect, useState } from "react";
 import { AttributionControl, Marker, Popup, useMap } from "react-map-gl";
 import MapGl from "react-map-gl/maplibre";
 

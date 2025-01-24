@@ -40,7 +40,6 @@
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-tooltip": "^1.1.1",
-    "@turf/turf": "^6.5.0",
     "base64-js": "^1.5.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
