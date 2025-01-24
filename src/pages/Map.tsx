@@ -1,5 +1,5 @@
-import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
 import { NodeDetail } from "@app/components/PageComponents/Map/NodeDetail";
+import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
 import { cn } from "@app/core/utils/cn.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
@@ -8,6 +8,7 @@ import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Hashicon } from "@emeraldpay/hashicon-react";
+import type { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { bbox, lineString } from "@turf/turf";
 import {
@@ -19,7 +20,6 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { AttributionControl, Marker, Popup, useMap } from "react-map-gl";
 import MapGl from "react-map-gl/maplibre";
-import { Protobuf } from "@meshtastic/js";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
@@ -148,7 +148,10 @@ export const MapPage = (): JSX.Element => {
           }}
         >
           <AttributionControl
-            style={{ background: darkMode ? "#ffffff" : "", color: darkMode ? "black" : "" }}
+            style={{
+              background: darkMode ? "#ffffff" : "",
+              color: darkMode ? "black" : "",
+            }}
           />
           {waypoints.map((wp) => (
             <Marker

@@ -1,11 +1,12 @@
-import { Mono } from "@components/generic/Mono.tsx";
+import { Separator } from "@app/components/UI/Seperator";
 import { H5 } from "@app/components/UI/Typography/H5.tsx";
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
-import { Separator } from "@app/components/UI/Seperator";
+import { Mono } from "@components/generic/Mono.tsx";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/js";
 import type { Protobuf as ProtobufType } from "@meshtastic/js";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import {
   BatteryChargingIcon,
   BatteryFullIcon,
@@ -17,7 +18,6 @@ import {
   MountainSnow,
   Star,
 } from "lucide-react";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 
 export interface NodeDetailProps {
   node: ProtobufType.Mesh.NodeInfo;
@@ -84,7 +84,7 @@ export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
               <Subtle aria-label="Battery">
                 {node.deviceMetrics?.batteryLevel > 100
                   ? "Charging"
-                  : node.deviceMetrics?.batteryLevel + "%"}
+                  : `${node.deviceMetrics?.batteryLevel}%`}
               </Subtle>
             </div>
           )}
@@ -121,7 +121,7 @@ export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
       <div className="flex mt-2 text-sm">
         <div className="flex items-center flex-grow">
           <div className="border-2 border-black rounded px-0.5 mr-1">
-            {isNaN(node.hopsAway) ? "?" : node.hopsAway}
+            {Number.isNaN(node.hopsAway) ? "?" : node.hopsAway}
           </div>
           <div>{node.hopsAway === 1 ? "Hop" : "Hops"}</div>
         </div>

@@ -5,7 +5,7 @@
   "description": "Meshtastic web client",
   "license": "GPL-3.0-only",
   "scripts": {
-    "build": "rsbuild build",
+    "build": "pnpm check && rsbuild build",
     "check": "biome check .",
     "check:fix": "pnpm check --write",
     "dev": "rsbuild dev --open",

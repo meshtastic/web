@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { AlertCircle, InfoIcon, } from "lucide-react";
 import {
   Tabs,
   TabsContent,
@@ -19,8 +18,9 @@ import {
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { Link } from "../UI/Typography/Link";
+import { AlertCircle, InfoIcon } from "lucide-react";
 import { Fragment } from "react/jsx-runtime";
+import { Link } from "../UI/Typography/Link";
 
 export interface TabElementProps {
   closeDialog: () => void;
@@ -50,26 +50,25 @@ const links: { [key: string]: string } = {
     "https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts",
 };
 
-const listFormatter = new Intl.ListFormat('en', {
-  style: 'long',
-  type: 'conjunction'
+const listFormatter = new Intl.ListFormat("en", {
+  style: "long",
+  type: "conjunction",
 });
 
 const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
   if (missingFeatures.length === 0) return null;
 
-  const browserFeatures = missingFeatures.filter(feature => feature !== "Secure Context");
+  const browserFeatures = missingFeatures.filter(
+    (feature) => feature !== "Secure Context",
+  );
   const needsSecureContext = missingFeatures.includes("Secure Context");
 
   const formatFeatureList = (features: string[]) => {
     const parts = listFormatter.formatToParts(features);
     return parts.map((part) => {
-      if (part.type === 'element') {
+      if (part.type === "element") {
         return (
-          <Link
-            key={part.value}
-            href={links[part.value]}
-          >
+          <Link key={part.value} href={links[part.value]}>
             {part.value}
           </Link>
         );
@@ -94,12 +93,8 @@ const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
               <>
                 {browserFeatures.length > 0 && " Additionally, it"}
                 {browserFeatures.length === 0 && "This application"} requires a{" "}
-                <Link
-                  href={links["Secure Context"]}
-                >
-                  secure context
-                </Link>
-                . Please connect using HTTPS or localhost.
+                <Link href={links["Secure Context"]}>secure context</Link>.
+                Please connect using HTTPS or localhost.
               </>
             )}
           </p>
@@ -146,10 +141,7 @@ export const NewDeviceDialog = ({
         <Tabs defaultValue="HTTP">
           <TabsList>
             {tabs.map((tab) => (
-              <TabsTrigger
-                key={tab.label}
-                value={tab.label}
-              >
+              <TabsTrigger key={tab.label} value={tab.label}>
                 {tab.label}
               </TabsTrigger>
             ))}
@@ -157,7 +149,9 @@ export const NewDeviceDialog = ({
           {tabs.map((tab) => (
             <TabsContent key={tab.label} value={tab.label}>
               <fieldset disabled={tab.isDisabled}>
-                {tab.isDisabled ? <ErrorMessage missingFeatures={unsupported} /> : null}
+                {tab.isDisabled ? (
+                  <ErrorMessage missingFeatures={unsupported} />
+                ) : null}
                 <tab.element closeDialog={() => onOpenChange(false)} />
               </fieldset>
             </TabsContent>

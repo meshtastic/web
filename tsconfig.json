@@ -35,6 +35,6 @@
     ],
     "strictPropertyInitialization": false,
     "experimentalDecorators": true,
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": true
   }
 }
