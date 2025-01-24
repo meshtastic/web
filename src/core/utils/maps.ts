@@ -106,4 +106,4 @@ function getAllCoordinates(
   return coords;
 }
 
-export { bbox, lineString }
+export { bbox, lineString };

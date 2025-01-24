@@ -7,10 +7,10 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { bbox, lineString } from "@core/utils/maps";
 import { Hashicon } from "@emeraldpay/hashicon-react";
 import type { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { bbox, lineString } from "@core/utils/maps";
 import {
   BoxSelectIcon,
   MapPinIcon,
