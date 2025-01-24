@@ -10,7 +10,7 @@ export const Bluetooth = (): JSX.Element => {
     useState<string>();
 
   const bluetoothPinChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value[0] == "0") {
+    if (e.target.value[0] === "0") {
       setBluetoothValidationText("Bluetooth Pin cannot start with 0.");
     } else {
       setBluetoothValidationText("");

@@ -91,7 +91,7 @@ export const Sidebar = ({ children }: SidebarProps): JSX.Element => {
             {myNode?.deviceMetrics?.batteryLevel
               ? myNode?.deviceMetrics?.batteryLevel > 100
                 ? "Charging"
-                : myNode?.deviceMetrics?.batteryLevel + "%"
+                : `${myNode?.deviceMetrics?.batteryLevel}%`
               : "UNK"}
           </Subtle>
         </div>

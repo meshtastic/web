@@ -84,7 +84,7 @@ export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
               <Subtle aria-label="Battery">
                 {node.deviceMetrics?.batteryLevel > 100
                   ? "Charging"
-                  : node.deviceMetrics?.batteryLevel + "%"}
+                  : `${node.deviceMetrics?.batteryLevel}%`}
               </Subtle>
             </div>
           )}
@@ -121,7 +121,7 @@ export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
       <div className="flex mt-2 text-sm">
         <div className="flex items-center flex-grow">
           <div className="border-2 border-black rounded px-0.5 mr-1">
-            {isNaN(node.hopsAway) ? "?" : node.hopsAway}
+            {Number.isNaN(node.hopsAway) ? "?" : node.hopsAway}
           </div>
           <div>{node.hopsAway === 1 ? "Hop" : "Hops"}</div>
         </div>
