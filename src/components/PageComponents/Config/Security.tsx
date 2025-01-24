@@ -12,7 +12,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
 export const Security = (): JSX.Element => {
-  const { config, nodes, hardware, setWorkingConfig, setDialogOpen } = useDevice();
+  const { config, nodes, hardware, setWorkingConfig, setDialogOpen } =
+    useDevice();
 
   const [privateKey, setPrivateKey] = useState<string>(
     fromByteArray(config.security?.privateKey ?? new Uint8Array(0)),
@@ -31,7 +32,8 @@ export const Security = (): JSX.Element => {
   );
   const [adminKeyValidationText, setAdminKeyValidationText] =
     useState<string>();
-  const [privateKeyDialogOpen, setPrivateKeyDialogOpen] = useState<boolean>(false);
+  const [privateKeyDialogOpen, setPrivateKeyDialogOpen] =
+    useState<boolean>(false);
 
   const onSubmit = (data: SecurityValidation) => {
     if (privateKeyValidationText || adminKeyValidationText) return;
@@ -76,7 +78,7 @@ export const Security = (): JSX.Element => {
 
   const pkiBackupClickEvent = () => {
     setDialogOpen("pkiBackup", true);
-  }
+  };
 
   const pkiRegenerate = () => {
     const privateKey = getX25519PrivateKey();
@@ -202,7 +204,7 @@ export const Security = (): JSX.Element => {
                 name: "isManaged",
                 label: "Managed",
                 description:
-                  'If true, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless a suitable Remote Admin node has been setup, and the public key stored in the field below.',
+                  "If true, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless a suitable Remote Admin node has been setup, and the public key stored in the field below.",
               },
               {
                 type: "text",

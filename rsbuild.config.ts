@@ -1,6 +1,6 @@
+import { execSync } from "node:child_process";
 import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
-import { execSync } from "node:child_process";
 
 let hash = "";
 

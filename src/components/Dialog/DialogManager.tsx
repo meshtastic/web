@@ -1,11 +1,11 @@
 import { RemoveNodeDialog } from "@app/components/Dialog/RemoveNodeDialog.tsx";
 import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.tsx";
 import { ImportDialog } from "@components/Dialog/ImportDialog.tsx";
+import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog";
 import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog";
 
 export const DialogManager = (): JSX.Element => {
   const { channels, config, dialog, setDialogOpen } = useDevice();
