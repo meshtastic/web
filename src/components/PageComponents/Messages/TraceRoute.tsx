@@ -32,14 +32,14 @@ export const TraceRoute = ({
       <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
         <p className="font-semibold">Route to destination:</p>
         <p>{to?.user?.longName}</p>
-        <p>↓ {snrTowards ? snrTowards[0] : null}dB</p>
+        <p>↓ {snrTowards?.[0] ? snrTowards[0] : "??"}dB</p>
         {route.map((hop, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
           <span key={i}>
             <p>
               {nodes.get(hop)?.user?.longName ?? `!${numberToHexUnpadded(hop)}`}
             </p>
-            <p>↓ {snrTowards ? snrTowards[i + 1] : null}dB</p>
+            <p>↓ {snrTowards?.[i + 1] ? snrTowards[i + 1] : "??"}dB</p>
           </span>
         ))}
         {from?.user?.longName}
@@ -48,7 +48,7 @@ export const TraceRoute = ({
         <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
           <p className="font-semibold">Route back:</p>
           <p>{from?.user?.longName}</p>
-          <p>↓ {snrBack ? snrBack[0] : null}dB</p>
+          <p>↓ {snrBack?.[0] ? snrBack[0] : "??"}dB</p>
           {routeBack.map((hop, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             <span key={i}>
@@ -56,7 +56,7 @@ export const TraceRoute = ({
                 {nodes.get(hop)?.user?.longName ??
                   `!${numberToHexUnpadded(hop)}`}
               </p>
-              <p>↓ {snrBack ? snrBack[i + 1] : null}dB</p>
+              <p>↓ {snrBack?.[i + 1] ? snrBack[i + 1] : "??"}dB</p>
             </span>
           ))}
           {to?.user?.longName}
