@@ -10,7 +10,7 @@ import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { bbox, lineString } from "@turf/turf";
+import { bbox, lineString } from "@core/utils/maps";
 import {
   BoxSelectIcon,
   MapPinIcon,
