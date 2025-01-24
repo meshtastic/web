@@ -94,8 +94,7 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
           <tr key={index}>
             {row.map((item, index) => (
               <td
-                // biome-ignore lint/suspicious/noArrayIndexKey: OK because column order never changes.
-                key={index}
+                key={item.key ?? index}
                 className="whitespace-nowrap py-2 text-sm text-textSecondary first:pl-2"
               >
                 {item}
