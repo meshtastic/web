@@ -43,7 +43,6 @@
     "@turf/turf": "^7.2.0",
     "@types/js-cookie": "^3.0.6",
     "base64-js": "^1.5.1",
-    "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -60,8 +59,7 @@
     "react-map-gl": "7.1.8",
     "react-qrcode-logo": "^3.0.0",
     "rfc4648": "^1.5.4",
-    "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7",
+
     "timeago-react": "^3.0.6",
     "vite-plugin-node-polyfills": "^0.23.0",
     "zustand": "5.0.3"
@@ -72,6 +70,7 @@
     "@rsbuild/core": "^1.2.2",
     "@rsbuild/plugin-react": "^1.1.0",
     "@types/node": "^22.10.9",
+    "@types/js-cookie": "^3.0.6",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@types/w3c-web-serial": "^1.0.7",
@@ -81,6 +80,8 @@
     "postcss": "^8.5.1",
     "rollup-plugin-visualizer": "^5.14.0",
     "tailwindcss": "^3.4.17",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss-animate": "^1.0.7",
     "tar": "^7.4.3",
     "tslib": "^2.8.1",
     "typescript": "^5.7.3"
