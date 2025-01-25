@@ -17,7 +17,6 @@ export function Toaster() {
         <Toast
           key={id}
           {...props}
-
           duration={duration}
           className="flex flex-col gap-4"
         >

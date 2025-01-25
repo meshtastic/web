@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-export type BrowserFeature = 'Web Bluetooth' | 'Web Serial' | 'Secure Context';
+export type BrowserFeature = "Web Bluetooth" | "Web Serial" | "Secure Context";
 
 interface BrowserSupport {
   supported: BrowserFeature[];
@@ -10,9 +10,13 @@ interface BrowserSupport {
 export function useBrowserFeatureDetection(): BrowserSupport {
   const support = useMemo(() => {
     const features: [BrowserFeature, boolean][] = [
-      ['Web Bluetooth', !!navigator?.bluetooth],
-      ['Web Serial', !!navigator?.serial],
-      ['Secure Context', window.location.protocol === 'https:' || window.location.hostname === 'localhost']
+      ["Web Bluetooth", !!navigator?.bluetooth],
+      ["Web Serial", !!navigator?.serial],
+      [
+        "Secure Context",
+        window.location.protocol === "https:" ||
+          window.location.hostname === "localhost",
+      ],
     ];
 
     return features.reduce<BrowserSupport>(
@@ -21,7 +25,7 @@ export function useBrowserFeatureDetection(): BrowserSupport {
         list.push(feature);
         return acc;
       },
-      { supported: [], unsupported: [] }
+      { supported: [], unsupported: [] },
     );
   }, []);
 

@@ -1,5 +1,5 @@
-import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
 import { NodeDetail } from "@app/components/PageComponents/Map/NodeDetail";
+import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
 import { cn } from "@app/core/utils/cn.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
@@ -20,6 +20,7 @@ import { AttributionControl, Marker, Popup, useMap } from "react-map-gl";
 import MapGl from "react-map-gl/maplibre";
 import type { Protobuf } from "@meshtastic/js";
 import { Avatar } from "@app/components/UI/Avatar";
+
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
