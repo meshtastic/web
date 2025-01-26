@@ -6,12 +6,16 @@
   "license": "GPL-3.0-only",
   "scripts": {
     "build": "pnpm check && rsbuild build",
-    "check": "biome check .",
-    "check:fix": "pnpm check --write",
+    "check": "biome check src/",
+    "check:fix": "pnpm check --write src/",
+    "format": "biome format --write src/",
     "dev": "rsbuild dev --open",
-    "format": "biome format --write",
     "preview": "rsbuild preview",
-    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)"
+    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)",
+    "postinstall": "npx simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run check:fix && npm run format"
   },
   "repository": {
     "type": "git",
@@ -42,7 +46,6 @@
     "@radix-ui/react-tooltip": "^1.1.1",
     "@turf/turf": "^6.5.0",
     "base64-js": "^1.5.1",
-    "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -59,15 +62,12 @@
     "react-map-gl": "7.1.7",
     "react-qrcode-logo": "^2.10.0",
     "rfc4648": "^1.5.3",
-    "tailwind-merge": "^2.3.0",
-    "tailwindcss-animate": "^1.0.7",
     "timeago-react": "^3.0.6",
     "vite-plugin-node-polyfills": "^0.22.0",
     "zustand": "4.5.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.2",
-    "@buf/meshtastic_protobufs.bufbuild_es": "1.10.0-20240906232734-3da561588c55.1",
     "@rsbuild/core": "^1.0.10",
     "@rsbuild/plugin-react": "^1.0.3",
     "@types/chrome": "^0.0.263",
@@ -80,10 +80,11 @@
     "autoprefixer": "^10.4.19",
     "gzipper": "^7.2.0",
     "postcss": "^8.4.38",
-    "rollup-plugin-visualizer": "^5.12.0",
+    "simple-git-hooks": "^2.11.1",
+    "tailwind-merge": "^2.3.0",
     "tailwindcss": "^3.4.4",
+    "tailwindcss-animate": "^1.0.7",
     "tar": "^6.2.1",
-    "tslib": "^2.6.3",
     "typescript": "^5.5.2"
   },
   "packageManager": "pnpm@9.15.4"
