@@ -4,9 +4,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/js";
 import { SendIcon } from "lucide-react";
-import { useCallback, useState, useMemo } from "react";
-
-
+import { useCallback, useMemo, useState } from "react";
 
 export interface MessageInputProps {
   to: Types.Destination;
@@ -29,33 +27,36 @@ export const MessageInput = ({
 
   const debouncedSetMessageDraft = useMemo(
     () => debounce(setMessageDraft, 300),
-    [setMessageDraft]
+    [setMessageDraft],
   );
 
-  const sendText = useCallback(async (message: string) => {
-    await connection
-      ?.sendText(message, to, true, channel)
-      .then((id) =>
-        setMessageState(
-          to === "broadcast" ? "broadcast" : "direct",
-          channel,
-          to as number,
-          myNodeNum,
-          id,
-          "ack",
-        ),
-      )
-      .catch((e: Types.PacketError) =>
-        setMessageState(
-          to === "broadcast" ? "broadcast" : "direct",
-          channel,
-          to as number,
-          myNodeNum,
-          e.id,
-          e.error,
-        ),
-      );
-  }, [channel, connection, myNodeNum, setMessageState, to]);
+  const sendText = useCallback(
+    async (message: string) => {
+      await connection
+        ?.sendText(message, to, true, channel)
+        .then((id) =>
+          setMessageState(
+            to === "broadcast" ? "broadcast" : "direct",
+            channel,
+            to as number,
+            myNodeNum,
+            id,
+            "ack",
+          ),
+        )
+        .catch((e: Types.PacketError) =>
+          setMessageState(
+            to === "broadcast" ? "broadcast" : "direct",
+            channel,
+            to as number,
+            myNodeNum,
+            e.id,
+            e.error,
+          ),
+        );
+    },
+    [channel, connection, myNodeNum, setMessageState, to],
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
