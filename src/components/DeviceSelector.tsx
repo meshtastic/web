@@ -11,8 +11,8 @@ import {
   SearchIcon,
   SunIcon,
 } from "lucide-react";
-import { Avatar } from "./UI/Avatar";
 import type { JSX } from "react";
+import { Avatar } from "./UI/Avatar";
 
 export const DeviceSelector = (): JSX.Element => {
   const { getDevices } = useDeviceStore();
@@ -45,7 +45,13 @@ export const DeviceSelector = (): JSX.Element => {
               }}
               active={selectedDevice === device.id}
             >
-              <Avatar text={device.nodes.get(device.hardware.myNodeNum)?.user?.shortName.toString() ?? "UNK"} />
+              <Avatar
+                text={
+                  device.nodes
+                    .get(device.hardware.myNodeNum)
+                    ?.user?.shortName.toString() ?? "UNK"
+                }
+              />
             </DeviceSelectorButton>
           ))}
           <Separator />

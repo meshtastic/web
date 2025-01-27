@@ -1,3 +1,4 @@
+import { Avatar } from "@app/components/UI/Avatar";
 import { Separator } from "@app/components/UI/Seperator";
 import { H5 } from "@app/components/UI/Typography/H5.tsx";
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
@@ -17,7 +18,7 @@ import {
   MountainSnow,
   Star,
 } from "lucide-react";
-import { Avatar } from "@app/components/UI/Avatar";
+import type { JSX } from "react";
 
 export interface NodeDetailProps {
   node: ProtobufType.Mesh.NodeInfo;
@@ -68,8 +69,9 @@ export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
           {!!node.deviceMetrics?.batteryLevel && (
             <div
               className="flex items-center gap-1"
-              title={`${node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
-                } volts`}
+              title={`${
+                node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
+              } volts`}
             >
               {node.deviceMetrics?.batteryLevel > 100 ? (
                 <BatteryChargingIcon size={22} />

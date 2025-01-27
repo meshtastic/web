@@ -29,8 +29,9 @@ export const Message = ({
         <AlertCircleIcon size={16} className="my-auto text-textSecondary" />
       )}
       <span
-        className={`ml-4 border-l-2 border-l-backgroundPrimary pl-2 ${message.state === "ack" ? "text-textPrimary" : "text-textSecondary"
-          }`}
+        className={`ml-4 border-l-2 border-l-backgroundPrimary pl-2 ${
+          message.state === "ack" ? "text-textPrimary" : "text-textSecondary"
+        }`}
       >
         {message.data}
       </span>
@@ -66,8 +67,9 @@ export const Message = ({
           <AlertCircleIcon size={16} className="my-auto text-textSecondary" />
         )}
         <span
-          className={`ml-4 border-l-2 border-l-backgroundPrimary pl-2 ${message.state === "ack" ? "text-textPrimary" : "text-textSecondary"
-            }`}
+          className={`ml-4 border-l-2 border-l-backgroundPrimary pl-2 ${
+            message.state === "ack" ? "text-textPrimary" : "text-textSecondary"
+          }`}
         >
           {message.data}
         </span>

@@ -1,4 +1,5 @@
 import { NodeDetail } from "@app/components/PageComponents/Map/NodeDetail";
+import { Avatar } from "@app/components/UI/Avatar";
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
 import { cn } from "@app/core/utils/cn.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
@@ -7,6 +8,7 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import type { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { bbox, lineString } from "@turf/turf";
 import {
@@ -18,8 +20,6 @@ import {
 import { type JSX, useCallback, useEffect, useState } from "react";
 import { AttributionControl, Marker, Popup, useMap } from "react-map-gl";
 import MapGl from "react-map-gl/maplibre";
-import type { Protobuf } from "@meshtastic/js";
-import { Avatar } from "@app/components/UI/Avatar";
 
 export const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
@@ -135,9 +135,7 @@ export const MapPage = (): JSX.Element => {
           renderWorldCopies={false}
           maxPitch={0}
           style={{
-            filter: darkMode
-              ? "brightness(0.8)"
-              : "",
+            filter: darkMode ? "brightness(0.8)" : "",
           }}
           dragRotate={false}
           touchZoomRotate={false}
@@ -191,7 +189,12 @@ export const MapPage = (): JSX.Element => {
                   }}
                 >
                   <div className="flex cursor-pointer gap-2 rounded-md bg-transparent p-1.5">
-                    <Avatar text={node.user?.shortName.toString() ?? node.num.toString()} size="sm" />
+                    <Avatar
+                      text={
+                        node.user?.shortName.toString() ?? node.num.toString()
+                      }
+                      size="sm"
+                    />
                     <Subtle className={cn(zoom < 12 && "hidden")}>
                       {node.user?.longName ||
                         `!${numberToHexUnpadded(node.num)}`}

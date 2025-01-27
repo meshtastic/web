@@ -126,11 +126,8 @@ export const CommandPalette = (): JSX.Element => {
             const nodeNum = device.hardware.myNodeNum.toString();
 
             return {
-              label:
-                longName ?? nodeNum,
-              icon: (
-                <Avatar text={shortName?.toString() ?? nodeNum} />
-              ),
+              label: longName ?? nodeNum,
+              icon: <Avatar text={shortName?.toString() ?? nodeNum} />,
               action() {
                 setSelectedDevice(device.id);
               },
@@ -255,8 +252,9 @@ export const CommandPalette = (): JSX.Element => {
               label: "Red",
               icon: (
                 <span
-                  className={`h-3 w-3 rounded-full ${darkMode ? "bg-[#f25555]" : "bg-[#f28585]"
-                    }`}
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#f25555]" : "bg-[#f28585]"
+                  }`}
                 />
               ),
               action() {
@@ -267,8 +265,9 @@ export const CommandPalette = (): JSX.Element => {
               label: "Orange",
               icon: (
                 <span
-                  className={`h-3 w-3 rounded-full ${darkMode ? "bg-[#e1720b]" : "bg-[#edb17a]"
-                    }`}
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#e1720b]" : "bg-[#edb17a]"
+                  }`}
                 />
               ),
               action() {
@@ -279,8 +278,9 @@ export const CommandPalette = (): JSX.Element => {
               label: "Yellow",
               icon: (
                 <span
-                  className={`h-3 w-3 rounded-full ${darkMode ? "bg-[#ac8c1a]" : "bg-[#e0cc87]"
-                    }`}
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#ac8c1a]" : "bg-[#e0cc87]"
+                  }`}
                 />
               ),
               action() {
@@ -291,8 +291,9 @@ export const CommandPalette = (): JSX.Element => {
               label: "Green",
               icon: (
                 <span
-                  className={`h-3 w-3 rounded-full ${darkMode ? "bg-[#27a341]" : "bg-[#8bc9c5]"
-                    }`}
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#27a341]" : "bg-[#8bc9c5]"
+                  }`}
                 />
               ),
               action() {
@@ -303,8 +304,9 @@ export const CommandPalette = (): JSX.Element => {
               label: "Blue",
               icon: (
                 <span
-                  className={`h-3 w-3 rounded-full ${darkMode ? "bg-[#2093fe]" : "bg-[#70afea]"
-                    }`}
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#2093fe]" : "bg-[#70afea]"
+                  }`}
                 />
               ),
               action() {
@@ -315,8 +317,9 @@ export const CommandPalette = (): JSX.Element => {
               label: "Purple",
               icon: (
                 <span
-                  className={`h-3 w-3 rounded-full ${darkMode ? "bg-[#926bff]" : "bg-[#a09eef]"
-                    }`}
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#926bff]" : "bg-[#a09eef]"
+                  }`}
                 />
               ),
               action() {
@@ -327,8 +330,9 @@ export const CommandPalette = (): JSX.Element => {
               label: "Pink",
               icon: (
                 <span
-                  className={`h-3 w-3 rounded-full ${darkMode ? "bg-[#e454c4]" : "bg-[#dba0c7]"
-                    }`}
+                  className={`h-3 w-3 rounded-full ${
+                    darkMode ? "bg-[#e454c4]" : "bg-[#dba0c7]"
+                  }`}
                 />
               ),
               action() {

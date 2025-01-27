@@ -18,7 +18,7 @@ export const SidebarButton = ({
   Icon,
   element,
   onClick,
-  className
+  className,
 }: SidebarButtonProps): JSX.Element => (
   <Button
     onClick={onClick}

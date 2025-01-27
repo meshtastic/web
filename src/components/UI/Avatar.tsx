@@ -14,7 +14,7 @@ interface AvatarProps {
   className?: string;
 }
 
-// biome-ignore lint/complexity/noStaticOnlyClass: stop being annoying Biome 
+// biome-ignore lint/complexity/noStaticOnlyClass: stop being annoying Biome
 class ColorUtils {
   static hexToRgb(hex: number): RGBColor {
     return {
@@ -72,28 +72,26 @@ export const Avatar: React.FC<AvatarProps> = ({
   const bgColor = getColorFromText();
   const isLight = ColorUtils.isLight(bgColor);
   const textColor = isLight ? "#000000" : "#FFFFFF";
-  const initials = text
-    .toUpperCase()
-    .slice(0, 4);
+  const initials = text.toUpperCase().slice(0, 4);
 
   return (
     <div
-      className={cn(`
+      className={cn(
+        `
         rounded-full 
         flex 
         items-center 
         justify-center 
         font-semibold`,
         sizes[size],
-        className)
-      }
+        className,
+      )}
       style={{
         backgroundColor: `rgb(${bgColor.r}, ${bgColor.g}, ${bgColor.b})`,
         color: textColor,
       }}
     >
       <p className="p-1">{initials}</p>
-
     </div>
   );
 };

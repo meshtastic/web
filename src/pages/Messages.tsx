@@ -65,55 +65,60 @@ export const MessagesPage = (): JSX.Element => {
                 setChatType("direct");
                 setActiveChat(node.num);
               }}
-              element={<Avatar text={node.user?.shortName.toString() ?? node.num.toString()} />}
+              element={
+                <Avatar
+                  text={node.user?.shortName.toString() ?? node.num.toString()}
+                />
+              }
             />
           ))}
         </SidebarSection>
       </Sidebar>
       <div className="flex flex-col flex-grow">
         <PageLayout
-          label={`Messages: ${chatType === "broadcast" && currentChannel
-            ? getChannelName(currentChannel)
-            : chatType === "direct" && nodes.get(activeChat)
-              ? (nodes.get(activeChat)?.user?.longName ?? nodeHex)
-              : "Loading..."
-            }`}
+          label={`Messages: ${
+            chatType === "broadcast" && currentChannel
+              ? getChannelName(currentChannel)
+              : chatType === "direct" && nodes.get(activeChat)
+                ? (nodes.get(activeChat)?.user?.longName ?? nodeHex)
+                : "Loading..."
+          }`}
           actions={
             chatType === "direct"
               ? [
-                {
-                  icon: nodes.get(activeChat)?.user?.publicKey.length
-                    ? LockIcon
-                    : LockOpenIcon,
-                  iconClasses: nodes.get(activeChat)?.user?.publicKey.length
-                    ? "text-green-600"
-                    : "text-yellow-300",
-                  async onClick() {
-                    const targetNode = nodes.get(activeChat)?.num;
-                    if (targetNode === undefined) return;
-                    toast({
-                      title: nodes.get(activeChat)?.user?.publicKey.length
-                        ? "Chat is using PKI encryption."
-                        : "Chat is using PSK encryption.",
-                    });
-                  },
-                },
-                {
-                  icon: WaypointsIcon,
-                  async onClick() {
-                    const targetNode = nodes.get(activeChat)?.num;
-                    if (targetNode === undefined) return;
-                    toast({
-                      title: "Sending Traceroute, please wait...",
-                    });
-                    await connection?.traceRoute(targetNode).then(() =>
+                  {
+                    icon: nodes.get(activeChat)?.user?.publicKey.length
+                      ? LockIcon
+                      : LockOpenIcon,
+                    iconClasses: nodes.get(activeChat)?.user?.publicKey.length
+                      ? "text-green-600"
+                      : "text-yellow-300",
+                    async onClick() {
+                      const targetNode = nodes.get(activeChat)?.num;
+                      if (targetNode === undefined) return;
                       toast({
-                        title: "Traceroute sent.",
-                      }),
-                    );
+                        title: nodes.get(activeChat)?.user?.publicKey.length
+                          ? "Chat is using PKI encryption."
+                          : "Chat is using PSK encryption.",
+                      });
+                    },
                   },
-                },
-              ]
+                  {
+                    icon: WaypointsIcon,
+                    async onClick() {
+                      const targetNode = nodes.get(activeChat)?.num;
+                      if (targetNode === undefined) return;
+                      toast({
+                        title: "Sending Traceroute, please wait...",
+                      });
+                      await connection?.traceRoute(targetNode).then(() =>
+                        toast({
+                          title: "Traceroute sent.",
+                        }),
+                      );
+                    },
+                  },
+                ]
               : []
           }
         >
