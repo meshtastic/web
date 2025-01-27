@@ -6,12 +6,16 @@
   "license": "GPL-3.0-only",
   "scripts": {
     "build": "pnpm check && rsbuild build",
-    "check": "biome check .",
-    "check:fix": "pnpm check --write",
+    "check": "biome check src/",
+    "check:fix": "pnpm check --write src/",
+    "format": "biome format --write src/",
     "dev": "rsbuild dev --open",
-    "format": "biome format --write",
     "preview": "rsbuild preview",
-    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)"
+    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)",
+    "postinstall": "npx simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run check:fix && npm run format"
   },
   "repository": {
     "type": "git",
@@ -76,8 +80,9 @@
     "autoprefixer": "^10.4.19",
     "gzipper": "^7.2.0",
     "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.4",
+    "simple-git-hooks": "^2.11.1",
     "tailwind-merge": "^2.3.0",
+    "tailwindcss": "^3.4.4",
     "tailwindcss-animate": "^1.0.7",
     "tar": "^6.2.1",
     "typescript": "^5.5.2"
