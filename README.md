@@ -24,10 +24,10 @@ The base image used is [Nginx 1.27](https://hub.docker.com/_/nginx)
 
 ```bash
 # With Docker
-docker run -d -p 8080:80 --restart always --name Meshtastic-Web ghcr.io/meshtastic/web
+docker run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshtastic/web
 
 #With Podman
-podman run -d -p 8080:80 --restart always --name Meshtastic-Web ghcr.io/meshtastic/web
+podman run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshtastic/web
 ```
 
 ## Development & Building
