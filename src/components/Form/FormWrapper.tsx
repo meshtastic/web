@@ -15,9 +15,9 @@ export const FieldWrapper = ({
   children,
   valid,
   validationText,
-}: FieldWrapperProps): JSX.Element => (
+}: FieldWrapperProps) => (
   <div className="pt-6 sm:pt-5">
-    <div role="group" aria-labelledby="label-notifications">
+    <fieldset aria-labelledby="label-notifications">
       <div className="sm:grid sm:grid-cols-3 sm:items-baseline sm:gap-4">
         <Label>{label}</Label>
         <div className="sm:col-span-2">
@@ -32,6 +32,6 @@ export const FieldWrapper = ({
           </div>
         </div>
       </div>
-    </div>
+    </fieldset>
   </div>
 );

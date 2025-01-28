@@ -9,7 +9,7 @@ import { ModuleConfig } from "@pages/Config/ModuleConfig.tsx";
 import { BoxesIcon, SaveIcon, SettingsIcon } from "lucide-react";
 import { useState } from "react";
 
-export const ConfigPage = (): JSX.Element => {
+const ConfigPage = (): JSX.Element => {
   const { workingConfig, workingModuleConfig, connection } = useDevice();
   const [activeConfigSection, setActiveConfigSection] = useState<
     "device" | "module"
@@ -72,3 +72,5 @@ export const ConfigPage = (): JSX.Element => {
     </>
   );
 };
+
+export default ConfigPage;
