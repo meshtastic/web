@@ -1,5 +1,5 @@
 import type { MessageWithState } from "@app/core/stores/deviceStore.ts";
-import { Hashicon } from "@emeraldpay/hashicon-react";
+import { Avatar } from "@components/UI/Avatar";
 import type { Protobuf } from "@meshtastic/js";
 import {
   AlertCircleIcon,
@@ -13,11 +13,7 @@ export interface MessageProps {
   sender?: Protobuf.Mesh.NodeInfo;
 }
 
-export const Message = ({
-  lastMsgSameUser,
-  message,
-  sender,
-}: MessageProps): JSX.Element => {
+export const Message = ({ lastMsgSameUser, message, sender }: MessageProps) => {
   return lastMsgSameUser ? (
     <div className="ml-5 flex">
       {message.state === "ack" ? (
@@ -39,7 +35,7 @@ export const Message = ({
     <div className="mx-4 mt-2 gap-2">
       <div className="flex gap-2">
         <div className="w-6 cursor-pointer">
-          <Hashicon value={(sender?.num ?? 0).toString()} size={32} />
+          <Avatar text={sender?.user?.shortName ?? "UNK"} />
         </div>
         <span className="cursor-pointer font-medium text-textPrimary">
           {sender?.user?.longName ?? "UNK"}
