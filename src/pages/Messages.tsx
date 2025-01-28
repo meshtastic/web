@@ -80,7 +80,7 @@ export const MessagesPage = (): JSX.Element => {
             chatType === "broadcast" && currentChannel
               ? getChannelName(currentChannel)
               : chatType === "direct" && nodes.get(activeChat)
-                ? nodes.get(activeChat)?.user?.longName ?? nodeHex
+                ? (nodes.get(activeChat)?.user?.longName ?? nodeHex)
                 : "Loading..."
           }`}
           actions={
