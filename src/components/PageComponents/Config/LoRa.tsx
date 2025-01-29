@@ -1,6 +1,6 @@
-import type { LoRaValidation } from "@app/validation/config/lora.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { LoRaValidation } from "@app/validation/config/lora.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 
 export const LoRa = (): JSX.Element => {
@@ -41,7 +41,7 @@ export const LoRa = (): JSX.Element => {
               label: "Hop Limit",
               description: "Maximum number of hops",
               properties: {
-                enumValue: {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7}
+                enumValue: { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7 },
               },
             },
             {
@@ -55,6 +55,13 @@ export const LoRa = (): JSX.Element => {
               name: "ignoreMqtt",
               label: "Ignore MQTT",
               description: "Don't forward MQTT messages over the mesh",
+            },
+            {
+              type: "toggle",
+              name: "configOkToMqtt",
+              label: "OK to MQTT",
+              description:
+                "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
             },
           ],
         },

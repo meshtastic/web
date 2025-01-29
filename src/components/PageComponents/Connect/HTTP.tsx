@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
-import { Button } from "@components/UI/Button.js";
-import { Input } from "@components/UI/Input.js";
-import { Label } from "@components/UI/Label.js";
-import { Switch } from "@components/UI/Switch.js";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDeviceStore } from "@core/stores/deviceStore.js";
-import { subscribeAll } from "@core/subscriptions.js";
-import { randId } from "@core/utils/randId.js";
+import type { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
+import { Button } from "@components/UI/Button.tsx";
+import { Input } from "@components/UI/Input.tsx";
+import { Label } from "@components/UI/Label.tsx";
+import { Switch } from "@components/UI/Switch.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDeviceStore } from "@core/stores/deviceStore.ts";
+import { subscribeAll } from "@core/subscriptions.ts";
+import { randId } from "@core/utils/randId.ts";
 import { HttpConnection } from "@meshtastic/js";
+import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
 export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
@@ -20,7 +20,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
   }>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
-        window.location.hostname
+        window.location.hostname,
       )
         ? "meshtastic.local"
         : window.location.hostname,
@@ -34,7 +34,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
 
   const onSubmit = handleSubmit(async (data) => {
     setConnectionInProgress(true);
-    
+
     const id = randId();
     const device = addDevice(id);
     const connection = new HttpConnection(id);
@@ -69,7 +69,12 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
               <Label>Use HTTPS</Label>
               <Switch
                 onCheckedChange={(checked) => {checked ? setHTTPS(true) : setHTTPS(false) }}
-                disabled={connectionInProgress}
+                // label="Use TLS"
+                // description="Description"
+                disabled={
+                  location.protocol === "https:" || connectionInProgress
+                }
+                checked={value}
                 {...rest}
               />
             </>
@@ -77,7 +82,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
         />
       </div>
       <Button type="submit" disabled={connectionInProgress}>
-        <span>{connectionInProgress ? 'Connecting...' : 'Connect' }</span>
+        <span>{connectionInProgress ? "Connecting..." : "Connect"}</span>
       </Button>
     </form>
   );

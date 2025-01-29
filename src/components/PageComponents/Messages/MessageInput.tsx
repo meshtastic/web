@@ -1,8 +1,10 @@
-import { Button } from "@components/UI/Button.js";
-import { Input } from "@components/UI/Input.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import { debounce } from "@app/core/utils/debounce";
+import { Button } from "@components/UI/Button.tsx";
+import { Input } from "@components/UI/Input.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/js";
 import { SendIcon } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 
 export interface MessageInputProps {
   to: Types.Destination;
@@ -20,32 +22,46 @@ export const MessageInput = ({
     setMessageDraft,
     hardware,
   } = useDevice();
-
   const myNodeNum = hardware.myNodeNum;
+  const [localDraft, setLocalDraft] = useState(messageDraft);
 
-  const sendText = async (message: string) => {
-    await connection
-      ?.sendText(message, to, true, channel)
-      .then((id) =>
-        setMessageState(
-          to === "broadcast" ? "broadcast" : "direct",
-          channel,
-          to as number,
-          myNodeNum,
-          id,
-          "ack",
-        ),
-      )
-      .catch((e: Types.PacketError) =>
-        setMessageState(
-          to === "broadcast" ? "broadcast" : "direct",
-          channel,
-          to as number,
-          myNodeNum,
-          e.id,
-          e.error,
-        ),
-      );
+  const debouncedSetMessageDraft = useMemo(
+    () => debounce(setMessageDraft, 300),
+    [setMessageDraft],
+  );
+
+  const sendText = useCallback(
+    async (message: string) => {
+      await connection
+        ?.sendText(message, to, true, channel)
+        .then((id) =>
+          setMessageState(
+            to === "broadcast" ? "broadcast" : "direct",
+            channel,
+            to as number,
+            myNodeNum,
+            id,
+            "ack",
+          ),
+        )
+        .catch((e: Types.PacketError) =>
+          setMessageState(
+            to === "broadcast" ? "broadcast" : "direct",
+            channel,
+            to as number,
+            myNodeNum,
+            e.id,
+            e.error,
+          ),
+        );
+    },
+    [channel, connection, myNodeNum, setMessageState, to],
+  );
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setLocalDraft(newValue);
+    debouncedSetMessageDraft(newValue);
   };
 
   return (
@@ -54,7 +70,8 @@ export const MessageInput = ({
         className="w-full"
         onSubmit={(e) => {
           e.preventDefault();
-          sendText(messageDraft);
+          sendText(localDraft);
+          setLocalDraft("");
           setMessageDraft("");
         }}
       >
@@ -62,10 +79,10 @@ export const MessageInput = ({
           <span className="w-full">
             <Input
               autoFocus={true}
-              minLength={2}
+              minLength={1}
               placeholder="Enter Message"
-              value={messageDraft}
-              onChange={(e) => setMessageDraft(e.target.value)}
+              value={localDraft}
+              onChange={handleInputChange}
             />
           </span>
           <Button type="submit">

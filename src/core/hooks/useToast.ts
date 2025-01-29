@@ -1,6 +1,6 @@
-import { ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useSyncExternalStore } from "react";
 
-import type { ToastActionElement, ToastProps } from "@components/UI/Toast.js";
+import type { ToastActionElement, ToastProps } from "@components/UI/Toast.tsx";
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
@@ -10,6 +10,7 @@ type ToasterToast = ToastProps & {
   title?: ReactNode;
   description?: ReactNode;
   action?: ToastActionElement;
+  delay?: number;
 };
 
 const actionTypes = {
@@ -92,9 +93,9 @@ export const reducer = (state: State, action: Action): State => {
       if (toastId) {
         addToRemoveQueue(toastId);
       } else {
-        state.toasts.forEach((toast) => {
+        for (const toast of state.toasts) {
           addToRemoveQueue(toast.id);
-        });
+        }
       }
 
       return {
@@ -130,14 +131,14 @@ let memoryState: State = { toasts: [] };
 
 function dispatch(action: Action) {
   memoryState = reducer(memoryState, action);
-  listeners.forEach((listener) => {
+  for (const listener of listeners) {
     listener(memoryState);
-  });
+  }
 }
 
 type Toast = Omit<ToasterToast, "id">;
 
-function toast({ ...props }: Toast) {
+function toast({ delay = 0, ...props }: Toast) {
   const id = genId();
 
   const update = (props: ToasterToast) =>
@@ -147,17 +148,19 @@ function toast({ ...props }: Toast) {
     });
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
 
-  dispatch({
-    type: "ADD_TOAST",
-    toast: {
-      ...props,
-      id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss();
+  setTimeout(() => {
+    dispatch({
+      type: "ADD_TOAST",
+      toast: {
+        ...props,
+        id,
+        open: true,
+        onOpenChange: (open) => {
+          if (!open) dismiss();
+        },
       },
-    },
-  });
+    });
+  }, delay);
 
   return {
     id: id,
@@ -166,18 +169,22 @@ function toast({ ...props }: Toast) {
   };
 }
 
-function useToast() {
-  const [state, setState] = useState<State>(memoryState);
+const subscribe = (listener: () => void) => {
+  listeners.push(listener);
+  return function unsubscribe() {
+    const index = listeners.indexOf(listener);
+    if (index > -1) {
+      listeners.splice(index, 1);
+    }
+  };
+};
 
-  useEffect(() => {
-    listeners.push(setState);
-    return () => {
-      const index = listeners.indexOf(setState);
-      if (index > -1) {
-        listeners.splice(index, 1);
-      }
-    };
-  }, [state]);
+const getState = () => {
+  return memoryState;
+};
+
+function useToast() {
+  const state = useSyncExternalStore(subscribe, getState);
 
   return {
     ...state,
@@ -186,4 +193,4 @@ function useToast() {
   };
 }
 
-export { useToast, toast };
+export { toast, useToast };

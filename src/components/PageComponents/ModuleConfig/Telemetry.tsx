@@ -1,6 +1,6 @@
-import type { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 
 export const Telemetry = (): JSX.Element => {
@@ -87,7 +87,7 @@ export const Telemetry = (): JSX.Element => {
               description: "How often to send Power data over the mesh",
             },
             {
-              type: "text",
+              type: "toggle",
               name: "powerScreenEnabled",
               label: "Power Screen Enabled",
               description: "Enable the Power Telemetry Screen",

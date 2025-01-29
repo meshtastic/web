@@ -1,6 +1,6 @@
-import type { PaxcounterValidation } from "@app/validation/moduleConfig/paxcounter.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { PaxcounterValidation } from "@app/validation/moduleConfig/paxcounter.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 
 export const Paxcounter = (): JSX.Element => {
@@ -36,7 +36,8 @@ export const Paxcounter = (): JSX.Element => {
               type: "number",
               name: "paxcounterUpdateInterval",
               label: "Update Interval (seconds)",
-              description: "How long to wait between sending paxcounter packets",
+              description:
+                "How long to wait between sending paxcounter packets",
               properties: {
                 suffix: "Seconds",
               },

@@ -1,15 +1,15 @@
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
-} from "@components/Form/DynamicForm.js";
+} from "@components/Form/DynamicForm.tsx";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@components/UI/Select.js";
-import { Controller, FieldValues } from "react-hook-form";
+} from "@components/UI/Select.tsx";
+import { Controller, type FieldValues } from "react-hook-form";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select" | "multiSelect";
@@ -40,7 +40,7 @@ export function SelectInput<T extends FieldValues>({
           : [];
         return (
           <Select
-            onValueChange={(e) => onChange(parseInt(e))}
+            onValueChange={(e) => onChange(Number.parseInt(e))}
             disabled={disabled}
             value={value?.toString()}
             {...remainingProperties}
@@ -51,7 +51,7 @@ export function SelectInput<T extends FieldValues>({
             </SelectTrigger>
             <SelectContent>
               {optionsEnumValues.map(([name, value]) => (
-                <SelectItem key={name} value={value.toString()}>
+                <SelectItem key={name + value} value={value.toString()}>
                   {formatEnumName
                     ? name
                         .replace(/_/g, " ")

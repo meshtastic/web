@@ -1,6 +1,6 @@
-import { useDevice } from "@app/core/stores/deviceStore.js";
-import type { DetectionSensorValidation } from "@app/validation/moduleConfig/detectionSensor.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import { useDevice } from "@app/core/stores/deviceStore.ts";
+import type { DetectionSensorValidation } from "@app/validation/moduleConfig/detectionSensor.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/js";
 
 export const DetectionSensor = (): JSX.Element => {
@@ -38,9 +38,9 @@ export const DetectionSensor = (): JSX.Element => {
               label: "Minimum Broadcast Seconds",
               description:
                 "The interval in seconds of how often we can send a message to the mesh when a state change is detected",
-                properties: {
-                  suffix: "Seconds",
-                },  
+              properties: {
+                suffix: "Seconds",
+              },
               disabledBy: [
                 {
                   fieldName: "enabled",

@@ -1,6 +1,6 @@
 import { IsArray, IsBoolean, IsNumber, IsString, IsUrl } from "class-validator";
 
-import type { RasterSource } from "@core/stores/appStore.js";
+import type { RasterSource } from "@core/stores/appStore.ts";
 
 export class MapValidation {
   @IsArray()

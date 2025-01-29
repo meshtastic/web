@@ -1,4 +1,4 @@
-import { cn } from "@app/core/utils/cn.js";
+import { cn } from "@app/core/utils/cn.ts";
 
 export interface H4Props {
   className?: string;

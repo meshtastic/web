@@ -1,6 +1,6 @@
-import type { DeviceValidation } from "@app/validation/config/device.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { DeviceValidation } from "@app/validation/config/device.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 
 export const Device = (): JSX.Element => {
@@ -32,22 +32,24 @@ export const Device = (): JSX.Element => {
               label: "Role",
               description: "What role the device performs on the mesh",
               properties: {
-                enumValue: Protobuf.Config.Config_DeviceConfig_Role,
+                enumValue: {
+                  Client: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
+                  "Client Mute":
+                    Protobuf.Config.Config_DeviceConfig_Role.CLIENT_MUTE,
+                  Router: Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
+                  Repeater: Protobuf.Config.Config_DeviceConfig_Role.REPEATER,
+                  Tracker: Protobuf.Config.Config_DeviceConfig_Role.TRACKER,
+                  Sensor: Protobuf.Config.Config_DeviceConfig_Role.SENSOR,
+                  TAK: Protobuf.Config.Config_DeviceConfig_Role.TAK,
+                  "Client Hidden":
+                    Protobuf.Config.Config_DeviceConfig_Role.CLIENT_HIDDEN,
+                  "Lost and Found":
+                    Protobuf.Config.Config_DeviceConfig_Role.LOST_AND_FOUND,
+                  "TAK Tracker":
+                    Protobuf.Config.Config_DeviceConfig_Role.SENSOR,
+                },
                 formatEnumName: true,
               },
-            },
-            {
-              type: "toggle",
-              name: "serialEnabled",
-              label: "Serial Output Enabled",
-              description: "Enable the device's serial console",
-            },
-            {
-              type: "toggle",
-              name: "debugLogEnabled",
-              label: "Enabled Debug Log",
-              description:
-                "Output debugging information to the device's serial port (auto disables when serial client is connected)",
             },
             {
               type: "number",
@@ -88,15 +90,15 @@ export const Device = (): JSX.Element => {
             },
             {
               type: "toggle",
-              name: "isManaged",
-              label: "Managed",
-              description: "Is this device managed by a mesh administator",
-            },
-            {
-              type: "toggle",
               name: "disableTripleClick",
               label: "Disable Triple Click",
               description: "Disable triple click",
+            },
+            {
+              type: "toggle",
+              name: "ledHeartbeatDisabled",
+              label: "LED Heartbeat Disabled",
+              description: "Disable default blinking LED",
             },
           ],
         },

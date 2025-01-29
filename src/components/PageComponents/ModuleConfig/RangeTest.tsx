@@ -1,6 +1,6 @@
-import type { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 
 export const RangeTest = (): JSX.Element => {

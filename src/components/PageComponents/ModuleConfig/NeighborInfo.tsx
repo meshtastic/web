@@ -1,6 +1,6 @@
-import { useDevice } from "@app/core/stores/deviceStore.js";
-import type { NeighborInfoValidation } from "@app/validation/moduleConfig/neighborInfo.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
+import { useDevice } from "@app/core/stores/deviceStore.ts";
+import type { NeighborInfoValidation } from "@app/validation/moduleConfig/neighborInfo.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/js";
 
 export const NeighborInfo = (): JSX.Element => {
@@ -36,7 +36,7 @@ export const NeighborInfo = (): JSX.Element => {
               type: "number",
               name: "updateInterval",
               label: "Update Interval",
-              description: 
+              description:
                 "Interval in seconds of how often we should try to send our Neighbor Info to the mesh",
               properties: {
                 suffix: "Seconds",

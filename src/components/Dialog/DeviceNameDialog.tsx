@@ -1,5 +1,5 @@
-import { useDevice } from "@app/core/stores/deviceStore.js";
-import { Button } from "@components/UI/Button.js";
+import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
   DialogContent,
@@ -7,9 +7,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.js";
-import { Input } from "@components/UI/Input.js";
-import { Label } from "@components/UI/Label.js";
+} from "@components/UI/Dialog.tsx";
+import { Input } from "@components/UI/Input.tsx";
+import { Label } from "@components/UI/Label.tsx";
 import { Protobuf } from "@meshtastic/js";
 import { useForm } from "react-hook-form";
 

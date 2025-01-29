@@ -1,10 +1,27 @@
 import * as React from "react";
 
-import { cn } from "@core/utils/cn.js";
+import { cn } from "@core/utils/cn.ts";
+import { type VariantProps, cva } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react";
 
+const inputVariants = cva(
+  "flex h-10 w-full rounded-md border bg-transparent py-2 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-50 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-900",
+  {
+    variants: {
+      variant: {
+        default: "border-slate-300 dark:border-slate-700",
+        invalid: "border-red-500 dark:border-red-500",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+);
+
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+  extends React.InputHTMLAttributes<HTMLInputElement>,
+    VariantProps<typeof inputVariants> {
   prefix?: string;
   suffix?: string;
   action?: {
@@ -14,7 +31,7 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, prefix, suffix, action, ...props }, ref) => {
+  ({ className, value, variant, prefix, suffix, action, ...props }, ref) => {
     return (
       <div className="relative w-full">
         {prefix && (
@@ -24,10 +41,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         <input
           className={cn(
-            "flex h-10 w-full rounded-md border border-slate-300 bg-transparent py-2 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-50 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-900",
             action && "pr-8",
             className,
+            inputVariants({ variant }),
           )}
+          value={value}
           ref={ref}
           {...props}
         />
@@ -51,4 +69,4 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 Input.displayName = "Input";
 
-export { Input };
+export { Input, inputVariants };

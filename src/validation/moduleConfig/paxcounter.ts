@@ -11,4 +11,10 @@ export class PaxcounterValidation
 
   @IsInt()
   paxcounterUpdateInterval: number;
+
+  @IsInt()
+  bleThreshold: number;
+
+  @IsInt()
+  wifiThreshold: number;
 }

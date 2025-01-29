@@ -1,4 +1,4 @@
-import { Button } from "@components/UI/Button.js";
+import { Button } from "@components/UI/Button.tsx";
 import type { LucideIcon } from "lucide-react";
 
 export interface SidebarButtonProps {

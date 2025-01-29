@@ -1,12 +1,15 @@
-import { Subtle } from "@app/components/UI/Typography/Subtle.js";
-import { cn } from "@app/core/utils/cn.js";
-import { PageLayout } from "@components/PageLayout.js";
-import { Sidebar } from "@components/Sidebar.js";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.js";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.js";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDevice } from "@core/stores/deviceStore.js";
-import { Hashicon } from "@emeraldpay/hashicon-react";
+import { NodeDetail } from "@app/components/PageComponents/Map/NodeDetail";
+import { Avatar } from "@app/components/UI/Avatar";
+import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
+import { cn } from "@app/core/utils/cn.ts";
+import { PageLayout } from "@components/PageLayout.tsx";
+import { Sidebar } from "@components/Sidebar.tsx";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
+import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import type { Protobuf } from "@meshtastic/js";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { bbox, lineString } from "@turf/turf";
 import {
   BoxSelectIcon,
@@ -14,20 +17,22 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Marker, useMap } from "react-map-gl";
+import { type JSX, useCallback, useEffect, useMemo, useState } from "react";
+import { AttributionControl, Marker, Popup, useMap } from "react-map-gl";
 import MapGl from "react-map-gl/maplibre";
 
-export const MapPage = (): JSX.Element => {
+const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
   const { rasterSources, darkMode } = useAppStore();
   const { default: map } = useMap();
 
   const [zoom, setZoom] = useState(0);
+  const [selectedNode, setSelectedNode] =
+    useState<Protobuf.Mesh.NodeInfo | null>(null);
 
-  const allNodes = Array.from(nodes.values());
+  const allNodes = useMemo(() => Array.from(nodes.values()), [nodes]);
 
-  const getBBox = () => {
+  const getBBox = useCallback(() => {
     if (!map) {
       return;
     }
@@ -64,7 +69,7 @@ export const MapPage = (): JSX.Element => {
     if (center) {
       map.easeTo(center);
     }
-  };
+  }, [allNodes, map]);
 
   useEffect(() => {
     map?.on("zoom", () => {
@@ -125,10 +130,13 @@ export const MapPage = (): JSX.Element => {
           // }}
 
           // @ts-ignore
+
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
-          style = {{filter: darkMode ? 'brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7)' : ''}}
+          style={{
+            filter: darkMode ? "brightness(0.8)" : "",
+          }}
           dragRotate={false}
           touchZoomRotate={false}
           initialViewState={{
@@ -137,11 +145,17 @@ export const MapPage = (): JSX.Element => {
             longitude: 0,
           }}
         >
+          <AttributionControl
+            style={{
+              background: darkMode ? "#ffffff" : "",
+              color: darkMode ? "black" : "",
+            }}
+          />
           {waypoints.map((wp) => (
             <Marker
               key={wp.id}
-              longitude={wp.longitudeI / 1e7}
-              latitude={wp.latitudeI / 1e7}
+              longitude={(wp.longitudeI ?? 0) / 1e7}
+              latitude={(wp.latitudeI ?? 0) / 1e7}
               anchor="bottom"
             >
               <div>
@@ -155,38 +169,56 @@ export const MapPage = (): JSX.Element => {
             </Source>
           ))} */}
           {allNodes.map((node) => {
-            if (node.position?.latitudeI) {
+            if (node.position?.latitudeI && node.num !== selectedNode?.num) {
               return (
                 <Marker
                   key={node.num}
-                  longitude={node.position.longitudeI / 1e7}
-                  latitude={node.position.latitudeI / 1e7}
-                  style = {{filter: darkMode ? 'invert(1)' : ''}}
+                  longitude={(node.position.longitudeI ?? 0) / 1e7}
+                  latitude={(node.position.latitudeI ?? 0) / 1e7}
+                  // style={{ filter: darkMode ? "invert(1)" : "" }}
                   anchor="bottom"
+                  onClick={() => {
+                    setSelectedNode(node);
+                    map?.easeTo({
+                      zoom: 12,
+                      center: [
+                        (node.position?.longitudeI ?? 0) / 1e7,
+                        (node.position?.latitudeI ?? 0) / 1e7,
+                      ],
+                    });
+                  }}
                 >
-                  <div
-                    className="flex cursor-pointer gap-2 rounded-md border bg-backgroundPrimary p-1.5"
-                    onClick={() => {
-                      map?.easeTo({
-                        zoom: 12,
-                        center: [
-                          (node.position?.longitudeI ?? 0) / 1e7,
-                          (node.position?.latitudeI ?? 0) / 1e7,
-                        ],
-                      });
-                    }}
-                  >
-                    <Hashicon value={node.num.toString()} size={22} />
+                  <div className="flex cursor-pointer gap-2 rounded-md bg-transparent p-1.5">
+                    <Avatar
+                      text={
+                        node.user?.shortName.toString() ?? node.num.toString()
+                      }
+                      size="sm"
+                    />
                     <Subtle className={cn(zoom < 12 && "hidden")}>
-                      {node.user?.longName}
+                      {node.user?.longName ||
+                        `!${numberToHexUnpadded(node.num)}`}
                     </Subtle>
                   </div>
                 </Marker>
               );
             }
           })}
+          {selectedNode?.position && (
+            <Popup
+              longitude={(selectedNode.position.longitudeI ?? 0) / 1e7}
+              latitude={(selectedNode.position.latitudeI ?? 0) / 1e7}
+              anchor="left"
+              closeOnClick={false}
+              onClose={() => setSelectedNode(null)}
+            >
+              <NodeDetail node={selectedNode} />
+            </Popup>
+          )}
         </MapGl>
       </PageLayout>
     </>
   );
 };
+
+export default MapPage;

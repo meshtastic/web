@@ -1,10 +1,10 @@
-import { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
-import { Button } from "@components/UI/Button.js";
-import { Mono } from "@components/generic/Mono.js";
-import { useAppStore } from "@core/stores/appStore.js";
-import { useDeviceStore } from "@core/stores/deviceStore.js";
-import { subscribeAll } from "@core/subscriptions.js";
-import { randId } from "@core/utils/randId.js";
+import type { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
+import { Button } from "@components/UI/Button.tsx";
+import { Mono } from "@components/generic/Mono.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDeviceStore } from "@core/stores/deviceStore.ts";
+import { subscribeAll } from "@core/subscriptions.ts";
+import { randId } from "@core/utils/randId.ts";
 import { BleConnection, Constants } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 

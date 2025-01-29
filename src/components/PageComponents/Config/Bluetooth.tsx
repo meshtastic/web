@@ -1,10 +1,21 @@
-import type { BluetoothValidation } from "@app/validation/config/bluetooth.js";
-import { DynamicForm } from "@components/Form/DynamicForm.js";
-import { useDevice } from "@core/stores/deviceStore.js";
+import type { BluetoothValidation } from "@app/validation/config/bluetooth.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
+import { useState } from "react";
 
 export const Bluetooth = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();
+  const [bluetoothValidationText, setBluetoothValidationText] =
+    useState<string>();
+
+  const bluetoothPinChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value[0] === "0") {
+      setBluetoothValidationText("Bluetooth Pin cannot start with 0.");
+    } else {
+      setBluetoothValidationText("");
+    }
+  };
 
   const onSubmit = (data: BluetoothValidation) => {
     setWorkingConfig(
@@ -52,6 +63,8 @@ export const Bluetooth = (): JSX.Element => {
               name: "fixedPin",
               label: "Pin",
               description: "Pin to use when pairing",
+              validationText: bluetoothValidationText,
+              inputChange: bluetoothPinChangeEvent,
               disabledBy: [
                 {
                   fieldName: "mode",
