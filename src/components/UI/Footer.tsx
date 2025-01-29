@@ -6,7 +6,7 @@ const Footer = React.forwardRef<HTMLElement, FooterProps>(
   ({ className, ...props }, ref) => {
     return (
       <footer
-        className={`flex flex- justify-center p-2 ${className}`}
+        className={`flex mt-auto justify-center p-2 ${className}`}
         style={{
           backgroundColor: "var(--backgroundPrimary)",
           color: "var(--textPrimary)",

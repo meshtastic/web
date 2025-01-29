@@ -4,7 +4,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/js";
 import { SendIcon } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { type JSX, useCallback, useMemo, useState } from "react";
 
 export interface MessageInputProps {
   to: Types.Destination;

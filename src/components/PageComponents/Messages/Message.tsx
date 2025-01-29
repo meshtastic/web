@@ -1,11 +1,7 @@
 import type { MessageWithState } from "@app/core/stores/deviceStore.ts";
 import { Avatar } from "@components/UI/Avatar";
 import type { Protobuf } from "@meshtastic/js";
-import {
-  AlertCircleIcon,
-  CheckCircle2Icon,
-  CircleEllipsisIcon,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 
 export interface MessageProps {
   lastMsgSameUser: boolean;
@@ -13,61 +9,62 @@ export interface MessageProps {
   sender?: Protobuf.Mesh.NodeInfo;
 }
 
+const StatusIcon = ({ state }: { state: MessageWithState["state"] }) => {
+  const iconClass = "text-gray-500 dark:text-gray-400 w-4 h-4";
+  switch (state) {
+    case "ack":
+      return <CheckCircle2 className={iconClass} />;
+    case "waiting":
+      return <CircleEllipsis className={iconClass} />;
+    default:
+      return <AlertCircle className={iconClass} />;
+  }
+};
+
 export const Message = ({ lastMsgSameUser, message, sender }: MessageProps) => {
-  return lastMsgSameUser ? (
-    <div className="ml-5 flex">
-      {message.state === "ack" ? (
-        <CheckCircle2Icon size={16} className="my-auto text-textSecondary" />
-      ) : message.state === "waiting" ? (
-        <CircleEllipsisIcon size={16} className="my-auto text-textSecondary" />
-      ) : (
-        <AlertCircleIcon size={16} className="my-auto text-textSecondary" />
-      )}
-      <span
-        className={`ml-4 border-l-2 border-l-backgroundPrimary pl-2 ${
-          message.state === "ack" ? "text-textPrimary" : "text-textSecondary"
-        }`}
-      >
-        {message.data}
-      </span>
-    </div>
-  ) : (
-    <div className="mx-4 mt-2 gap-2">
-      <div className="flex gap-2">
-        <div className="w-6 cursor-pointer">
-          <Avatar text={sender?.user?.shortName ?? "UNK"} />
+  const messageTextClass =
+    message.state === "ack"
+      ? "text-gray-900 dark:text-white"
+      : "text-gray-500 dark:text-gray-400";
+  if (lastMsgSameUser) {
+    return (
+      <div className="mx-4 mt-2">
+        <div className="ml-12 flex items-start gap-2">
+          <div
+            className={`${messageTextClass} border-l-2 border-gray-200 dark:border-gray-700 pl-4 flex-grow`}
+          >
+            {message.data}
+          </div>
+          <StatusIcon state={message.state} />
         </div>
-        <span className="cursor-pointer font-medium text-textPrimary">
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-4 mt-2 space-y-2">
+      <div className="flex items-center gap-2">
+        <Avatar text={sender?.user?.shortName ?? "UNK"} />
+        <span className="font-medium text-gray-900 dark:text-white">
           {sender?.user?.longName ?? "UNK"}
         </span>
-        <span className="mt-1 font-mono text-xs text-textSecondary">
+        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
           {message.rxTime.toLocaleDateString()}
         </span>
-        <span className="mt-1 font-mono text-xs text-textSecondary">
+        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
           {message.rxTime.toLocaleTimeString(undefined, {
             hour: "2-digit",
             minute: "2-digit",
           })}
         </span>
       </div>
-      <div className="ml-1 flex">
-        {message.state === "ack" ? (
-          <CheckCircle2Icon size={16} className="my-auto text-textSecondary" />
-        ) : message.state === "waiting" ? (
-          <CircleEllipsisIcon
-            size={16}
-            className="my-auto text-textSecondary"
-          />
-        ) : (
-          <AlertCircleIcon size={16} className="my-auto text-textSecondary" />
-        )}
-        <span
-          className={`ml-4 border-l-2 border-l-backgroundPrimary pl-2 ${
-            message.state === "ack" ? "text-textPrimary" : "text-textSecondary"
-          }`}
+      <div className="ml-12 flex items-start gap-2">
+        <div
+          className={`${messageTextClass} border-l-2 border-gray-200 dark:border-gray-700 pl-4 flex-grow`}
         >
           {message.data}
-        </span>
+        </div>
+        <StatusIcon state={message.state} />
       </div>
     </div>
   );

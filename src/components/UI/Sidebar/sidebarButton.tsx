@@ -1,5 +1,6 @@
 import { Button } from "@components/UI/Button.tsx";
 import type { LucideIcon } from "lucide-react";
+import type { JSX } from "react";
 
 export interface SidebarButtonProps {
   label: string;
@@ -20,10 +21,10 @@ export const SidebarButton = ({
     onClick={onClick}
     variant={active ? "subtle" : "ghost"}
     size="sm"
-    className="w-full justify-start gap-2"
+    className="flex gap-2"
   >
     {Icon && <Icon size={16} />}
     {element && element}
-    {label}
+    <span className="flex flex-1 justify-start flex-shrink-0">{label}</span>
   </Button>
 );
