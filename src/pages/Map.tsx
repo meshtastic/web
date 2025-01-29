@@ -1,4 +1,5 @@
 import { NodeDetail } from "@app/components/PageComponents/Map/NodeDetail";
+import { Avatar } from "@app/components/UI/Avatar";
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
 import { cn } from "@app/core/utils/cn.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
@@ -7,7 +8,6 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Hashicon } from "@emeraldpay/hashicon-react";
 import type { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { bbox, lineString } from "@turf/turf";
@@ -17,11 +17,11 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { type JSX, useCallback, useEffect, useMemo, useState } from "react";
 import { AttributionControl, Marker, Popup, useMap } from "react-map-gl";
 import MapGl from "react-map-gl/maplibre";
 
-export const MapPage = (): JSX.Element => {
+const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
   const { rasterSources, darkMode } = useAppStore();
   const { default: map } = useMap();
@@ -30,7 +30,7 @@ export const MapPage = (): JSX.Element => {
   const [selectedNode, setSelectedNode] =
     useState<Protobuf.Mesh.NodeInfo | null>(null);
 
-  const allNodes = Array.from(nodes.values());
+  const allNodes = useMemo(() => Array.from(nodes.values()), [nodes]);
 
   const getBBox = useCallback(() => {
     if (!map) {
@@ -135,9 +135,7 @@ export const MapPage = (): JSX.Element => {
           renderWorldCopies={false}
           maxPitch={0}
           style={{
-            filter: darkMode
-              ? "brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7)"
-              : "",
+            filter: darkMode ? "brightness(0.8)" : "",
           }}
           dragRotate={false}
           touchZoomRotate={false}
@@ -177,7 +175,7 @@ export const MapPage = (): JSX.Element => {
                   key={node.num}
                   longitude={(node.position.longitudeI ?? 0) / 1e7}
                   latitude={(node.position.latitudeI ?? 0) / 1e7}
-                  style={{ filter: darkMode ? "invert(1)" : "" }}
+                  // style={{ filter: darkMode ? "invert(1)" : "" }}
                   anchor="bottom"
                   onClick={() => {
                     setSelectedNode(node);
@@ -190,8 +188,13 @@ export const MapPage = (): JSX.Element => {
                     });
                   }}
                 >
-                  <div className="flex cursor-pointer gap-2 rounded-md border bg-backgroundPrimary p-1.5">
-                    <Hashicon value={node.num.toString()} size={22} />
+                  <div className="flex cursor-pointer gap-2 rounded-md bg-transparent p-1.5">
+                    <Avatar
+                      text={
+                        node.user?.shortName.toString() ?? node.num.toString()
+                      }
+                      size="sm"
+                    />
                     <Subtle className={cn(zoom < 12 && "hidden")}>
                       {node.user?.longName ||
                         `!${numberToHexUnpadded(node.num)}`}
@@ -217,3 +220,5 @@ export const MapPage = (): JSX.Element => {
     </>
   );
 };
+
+export default MapPage;

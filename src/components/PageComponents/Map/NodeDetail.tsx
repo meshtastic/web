@@ -1,9 +1,9 @@
 import { Separator } from "@app/components/UI/Seperator";
 import { H5 } from "@app/components/UI/Typography/H5.tsx";
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
+import { Avatar } from "@components/UI/Avatar";
 import { Mono } from "@components/generic/Mono.tsx";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
-import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf } from "@meshtastic/js";
 import type { Protobuf as ProtobufType } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
@@ -23,7 +23,7 @@ export interface NodeDetailProps {
   node: ProtobufType.Mesh.NodeInfo;
 }
 
-export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
+export const NodeDetail = ({ node }: NodeDetailProps) => {
   const name = node.user?.longName || `!${numberToHexUnpadded(node.num)}`;
   const hardwareType = Protobuf.Mesh.HardwareModel[
     node.user?.hwModel ?? 0
@@ -33,7 +33,7 @@ export const NodeDetail = ({ node }: NodeDetailProps): JSX.Element => {
     <div className="dark:text-black">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
-          <Hashicon value={node.num.toString()} size={22} />
+          <Avatar text={node.user?.shortName} />
 
           <div>
             {node.user?.publicKey && node.user?.publicKey.length > 0 ? (

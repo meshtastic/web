@@ -8,11 +8,10 @@ import { Mono } from "@components/generic/Mono.tsx";
 import { Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Hashicon } from "@emeraldpay/hashicon-react";
 import { Protobuf, type Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon, TrashIcon } from "lucide-react";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, type JSX, useCallback, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
 
 export interface DeleteNoteDialogProps {
@@ -20,7 +19,7 @@ export interface DeleteNoteDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const NodesPage = (): JSX.Element => {
+const NodesPage = (): JSX.Element => {
   const { nodes, hardware, setDialogOpen, connection } = useDevice();
   const { setNodeNumToBeRemoved } = useAppStore();
   const [selectedNode, setSelectedNode] = useState<
@@ -66,12 +65,12 @@ export const NodesPage = (): JSX.Element => {
               { title: "Remove", type: "normal", sortable: false },
             ]}
             rows={filteredNodes.map((node) => [
-              <Hashicon key="icon" size={24} value={node.num.toString()} />,
-              <h1
-                className="cursor-pointer"
-                key="header"
-                onMouseDown={() => setSelectedNode(node)}
-              >
+              <span
+                key={node.num}
+                className="h-3 w-3 rounded-full bg-accent"
+              />,
+
+              <h1 key="header" onMouseDown={() => setSelectedNode(node)}>
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
@@ -147,3 +146,5 @@ export const NodesPage = (): JSX.Element => {
     </>
   );
 };
+
+export default NodesPage;

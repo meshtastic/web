@@ -7,10 +7,7 @@ export interface DeviceWrapperProps {
   device?: Device;
 }
 
-export const DeviceWrapper = ({
-  children,
-  device,
-}: DeviceWrapperProps): JSX.Element => {
+export const DeviceWrapper = ({ children, device }: DeviceWrapperProps) => {
   return (
     <DeviceContext.Provider value={device}>{children}</DeviceContext.Provider>
   );
