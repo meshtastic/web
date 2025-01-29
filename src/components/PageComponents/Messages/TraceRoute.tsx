@@ -1,6 +1,7 @@
 import { useDevice } from "@app/core/stores/deviceStore.ts";
 import type { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import type { JSX } from "react";
 
 export interface TraceRouteProps {
   from?: Protobuf.Mesh.NodeInfo;
@@ -21,13 +22,7 @@ export const TraceRoute = ({
 }: TraceRouteProps): JSX.Element => {
   const { nodes } = useDevice();
 
-  return route.length === 0 ? (
-    <div className="ml-5 flex">
-      <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
-        {to?.user?.longName} ↔ {from?.user?.longName}
-      </span>
-    </div>
-  ) : (
+  return (
     <div className="ml-5 flex">
       <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
         <p className="font-semibold">Route to destination:</p>

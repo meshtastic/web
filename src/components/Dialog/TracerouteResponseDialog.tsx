@@ -8,6 +8,7 @@ import {
 } from "@components/UI/Dialog";
 import type { Protobuf, Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import type { JSX } from "react";
 import { TraceRoute } from "../PageComponents/Messages/TraceRoute";
 
 export interface TracerouteResponseDialogProps {
