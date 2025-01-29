@@ -62,7 +62,6 @@ const NodesPage = (): JSX.Element => {
               { title: "SNR", type: "normal", sortable: true },
               { title: "Encryption", type: "normal", sortable: false },
               { title: "Connection", type: "normal", sortable: true },
-              { title: "Remove", type: "normal", sortable: false },
             ]}
             rows={filteredNodes.map((node) => [
               <span
@@ -70,7 +69,11 @@ const NodesPage = (): JSX.Element => {
                 className="h-3 w-3 rounded-full bg-accent"
               />,
 
-              <h1 key="header" onMouseDown={() => setSelectedNode(node)}>
+              <h1
+                key="header"
+                onMouseDown={() => setSelectedNode(node)}
+                className="cursor-pointer"
+              >
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
@@ -117,17 +120,6 @@ const NodesPage = (): JSX.Element => {
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
               </Mono>,
-              <Button
-                key="remove"
-                variant="destructive"
-                onClick={() => {
-                  setNodeNumToBeRemoved(node.num);
-                  setDialogOpen("nodeRemoval", true);
-                }}
-              >
-                <TrashIcon />
-                Remove
-              </Button>,
             ])}
           />
           <NodeOptionsDialog

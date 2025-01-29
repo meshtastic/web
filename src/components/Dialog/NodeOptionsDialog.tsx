@@ -1,4 +1,5 @@
 import { toast } from "@app/core/hooks/useToast";
+import { useAppStore } from "@app/core/stores/appStore";
 import { useDevice } from "@app/core/stores/deviceStore";
 import {
   Dialog,
@@ -8,6 +9,7 @@ import {
 } from "@components/UI/Dialog";
 import type { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { TrashIcon } from "lucide-react";
 import type { JSX } from "react";
 import { Button } from "../UI/Button";
 
@@ -22,26 +24,14 @@ export const NodeOptionsDialog = ({
   open,
   onOpenChange,
 }: NodeOptionsDialogProps): JSX.Element => {
-  const { connection } = useDevice();
+  const { setDialogOpen, connection } = useDevice();
+  const { setNodeNumToBeRemoved } = useAppStore();
   const longName =
     node?.user?.longName ??
     (node ? `!${numberToHexUnpadded(node?.num)}` : "Unknown");
   const shortName =
     node?.user?.shortName ??
     (node ? `${numberToHexUnpadded(node?.num).substring(0, 4)}` : "UNK");
-
-  function handleTraceroute() {
-    if (!node) return;
-    toast({
-      title: "Sending Traceroute, please wait...",
-    });
-    connection?.traceRoute(node.num).then(() =>
-      toast({
-        title: "Traceroute sent.",
-      }),
-    );
-    onOpenChange();
-  }
 
   function handleRequestPosition() {
     if (!node) return;
@@ -56,6 +46,19 @@ export const NodeOptionsDialog = ({
     onOpenChange();
   }
 
+  function handleTraceroute() {
+    if (!node) return;
+    toast({
+      title: "Sending Traceroute, please wait...",
+    });
+    connection?.traceRoute(node.num).then(() =>
+      toast({
+        title: "Traceroute sent.",
+      }),
+    );
+    onOpenChange();
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -64,10 +67,23 @@ export const NodeOptionsDialog = ({
         </DialogHeader>
         <div className="flex flex-col space-y-1">
           <div>
+            <Button onClick={handleRequestPosition}>Request Position</Button>
+          </div>
+          <div>
             <Button onClick={handleTraceroute}>Trace Route</Button>
           </div>
           <div>
-            <Button onClick={handleRequestPosition}>Request Position</Button>
+            <Button
+              key="remove"
+              variant="destructive"
+              onClick={() => {
+                setNodeNumToBeRemoved(node.num);
+                setDialogOpen("nodeRemoval", true);
+              }}
+            >
+              <TrashIcon />
+              Remove
+            </Button>
           </div>
         </div>
       </DialogContent>
