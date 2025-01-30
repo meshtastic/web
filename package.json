@@ -6,6 +6,7 @@
   "license": "GPL-3.0-only",
   "scripts": {
     "build": "pnpm check && rsbuild build",
+    "build:analyze": "BUNDLE_ANALYZE=true rsbuild build",
     "check": "biome check src/",
     "check:fix": "pnpm check --write src/",
     "format": "biome format --write src/",
