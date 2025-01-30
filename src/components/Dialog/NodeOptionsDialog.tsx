@@ -25,7 +25,7 @@ export const NodeOptionsDialog = ({
   onOpenChange,
 }: NodeOptionsDialogProps): JSX.Element => {
   const { setDialogOpen, connection } = useDevice();
-  const { setNodeNumToBeRemoved } = useAppStore();
+  const { setNodeNumToBeRemoved, setNodeNumDetails } = useAppStore();
   const longName =
     node?.user?.longName ??
     (node ? `!${numberToHexUnpadded(node?.num)}` : "Unknown");
@@ -83,6 +83,16 @@ export const NodeOptionsDialog = ({
             >
               <TrashIcon />
               Remove
+            </Button>
+          </div>
+          <div>
+            <Button
+              onClick={() => {
+                setNodeNumDetails(node.num);
+                setDialogOpen("nodeDetails", true);
+              }}
+            >
+              More Details
             </Button>
           </div>
         </div>

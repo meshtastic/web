@@ -29,6 +29,7 @@ interface AppState {
   nodeNumToBeRemoved: number;
   accent: AccentColor;
   connectDialogOpen: boolean;
+  nodeNumDetails: number;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -42,6 +43,7 @@ interface AppState {
   setNodeNumToBeRemoved: (nodeNum: number) => void;
   setAccent: (color: AccentColor) => void;
   setConnectDialogOpen: (open: boolean) => void;
+  setNodeNumDetails: (nodeNum: number) => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -57,6 +59,7 @@ export const useAppStore = create<AppState>()((set) => ({
   accent: "orange",
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
+  nodeNumDetails: 0,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -124,4 +127,8 @@ export const useAppStore = create<AppState>()((set) => ({
       }),
     );
   },
+  setNodeNumDetails: (nodeNum) =>
+    set((state) => ({
+      nodeNumDetails: nodeNum,
+    })),
 }));
