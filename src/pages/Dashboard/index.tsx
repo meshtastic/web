@@ -17,6 +17,7 @@ import { useMemo } from "react";
 export const Dashboard = () => {
   const { setConnectDialogOpen, setSelectedDevice } = useAppStore();
   const { getDevices } = useDeviceStore();
+  const { darkMode } = useAppStore();
 
   const devices = useMemo(() => getDevices(), [getDevices]);
 
@@ -39,7 +40,8 @@ export const Dashboard = () => {
                 return (
                   <li key={device.id}>
                     <button
-                      className="w-full px-4 py-4 sm:px-6 hover:bg-slate-50 focus:bg-slate-50 active:bg-slate-100"
+                      type="button"
+                      className={`w-full px-4 py-4 sm:px-6 ${darkMode ? "hover:bg-slate-800 focus:bg-slate-400 active:bg-slate-600" : "hover:bg-slate-50 focus:bg-slate-50 active:bg-slate-100"}`}
                       onClick={() => {
                         setSelectedDevice(device.id);
                       }}
