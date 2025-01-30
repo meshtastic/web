@@ -12,7 +12,7 @@ const getTimeAgo = (timestamp: number): string => {
   if (secondsPast < 60) return `${secondsPast} seconds ago`;
   if (secondsPast < 3600) return `${Math.floor(secondsPast / 60)} minutes ago`;
   if (secondsPast < 86400) return `${Math.floor(secondsPast / 3600)} hours ago`;
-  return `${Math.floor(secondsPast / 86400)} days ago`;
+  return `${Math.floor(secondsPast / 86400)} days ago ${secondsPast}`;
 };
 
 export const TimeAgo = ({ timestamp }: TimeAgoProps): JSX.Element => {
