@@ -6,7 +6,7 @@ import { Sidebar } from "@components/Sidebar.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { Table } from "@components/generic/Table/index.tsx";
-import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
@@ -77,8 +77,8 @@ const NodesPage = (): JSX.Element => {
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
-                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                        .toLowerCase()}`
+                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                      .toLowerCase()}`
                     : `!${numberToHexUnpadded(node.num)}`)}
               </h1>,
 
@@ -114,9 +114,8 @@ const NodesPage = (): JSX.Element => {
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
-                    : `${node.hopsAway.toString()} ${
-                        node.hopsAway > 1 ? "hops" : "hop"
-                      } away`
+                    : `${node.hopsAway.toString()} ${node.hopsAway > 1 ? "hops" : "hop"
+                    } away`
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
               </Mono>,

@@ -61,7 +61,6 @@
     "react-map-gl": "7.1.9",
     "react-qrcode-logo": "^3.0.0",
     "rfc4648": "^1.5.4",
-    "timeago-react": "^3.0.6",
     "vite-plugin-node-polyfills": "^0.23.0",
     "zustand": "5.0.3"
   },
