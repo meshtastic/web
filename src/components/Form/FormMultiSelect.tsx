@@ -28,8 +28,8 @@ export function MultiSelectInput<T extends FieldValues>({
   // Make sure to filter out the UNSET value, as it shouldn't be shown in the UI
   const optionsEnumValues = enumValue
     ? Object.entries(enumValue)
-      .filter((value) => typeof value[1] === "number")
-      .filter((value) => value[0] !== "UNSET")
+        .filter((value) => typeof value[1] === "number")
+        .filter((value) => value[0] !== "UNSET")
     : [];
 
   const formatName = (name: string) => {
