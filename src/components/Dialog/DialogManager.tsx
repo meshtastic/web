@@ -1,6 +1,7 @@
 import { RemoveNodeDialog } from "@app/components/Dialog/RemoveNodeDialog.tsx";
 import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.tsx";
 import { ImportDialog } from "@components/Dialog/ImportDialog.tsx";
+import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog";
 import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
@@ -47,6 +48,12 @@ export const DialogManager = (): JSX.Element => {
         open={dialog.nodeRemoval}
         onOpenChange={(open) => {
           setDialogOpen("nodeRemoval", open);
+        }}
+      />
+      <PkiBackupDialog
+        open={dialog.pkiBackup}
+        onOpenChange={(open) => {
+          setDialogOpen("pkiBackup", open);
         }}
       />
     </>

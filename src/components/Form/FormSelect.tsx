@@ -51,7 +51,7 @@ export function SelectInput<T extends FieldValues>({
             </SelectTrigger>
             <SelectContent>
               {optionsEnumValues.map(([name, value]) => (
-                <SelectItem key={name} value={value.toString()}>
+                <SelectItem key={name + value} value={value.toString()}>
                   {formatEnumName
                     ? name
                         .replace(/_/g, " ")

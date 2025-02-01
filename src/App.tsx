@@ -2,8 +2,9 @@ import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import { PageRouter } from "@app/PageRouter.tsx";
 import { CommandPalette } from "@components/CommandPalette.tsx";
 import { DeviceSelector } from "@components/DeviceSelector.tsx";
-import { DialogManager } from "@components/Dialog/DialogManager.tsx";
+import { DialogManager } from "@components/Dialog/DialogManager";
 import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.tsx";
+import { KeyBackupReminder } from "@components/KeyBackupReminder";
 import { Toaster } from "@components/Toaster.tsx";
 import Footer from "@components/UI/Footer.tsx";
 import { ThemeController } from "@components/generic/ThemeController.tsx";
@@ -37,6 +38,7 @@ export const App = (): JSX.Element => {
                 {device ? (
                   <div className="flex h-screen">
                     <DialogManager />
+                    <KeyBackupReminder />
                     <CommandPalette />
                     <PageRouter />
                   </div>

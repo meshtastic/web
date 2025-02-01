@@ -1,18 +1,18 @@
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
+import { Avatar } from "@components/UI/Avatar.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
-import { Hashicon } from "@emeraldpay/hashicon-react";
+import { Device, useDevice, useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Protobuf, Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { getChannelName } from "@pages/Channels.tsx";
 import { HashIcon, LockIcon, LockOpenIcon, WaypointsIcon } from "lucide-react";
 import { useState } from "react";
 
-export const MessagesPage = (): JSX.Element => {
+const MessagesPage = () => {
   const { channels, nodes, hardware, messages, traceroutes, connection } =
     useDevice();
   const [chatType, setChatType] =
@@ -68,18 +68,27 @@ export const MessagesPage = (): JSX.Element => {
               className="w-full p-2 border border-gray-300 rounded bg-white text-black"
             />
           </div>
-          {filteredNodes.map((node) => (
-            <SidebarButton
-              key={node.num}
-              label={node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`}
-              active={activeChat === node.num}
-              onClick={() => {
-                setChatType("direct");
-                setActiveChat(node.num);
-              }}
-              element={<Hashicon size={20} value={node.num.toString()} />}
-            />
-          ))}
+          <div className="flex flex-col gap-4">
+            {filteredNodes.map((node) => (
+              <SidebarButton
+                key={node.num}
+                label={
+                  node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`
+                }
+                active={activeChat === node.num}
+                onClick={() => {
+                  setChatType("direct");
+                  setActiveChat(node.num);
+                }}
+                element={
+                  <Avatar
+                    text={node.user?.shortName ?? node.num.toString()}
+                    size="sm"
+                  />
+                }
+              />
+            ))}
+          </div>
         </SidebarSection>
       </Sidebar>
       <div className="flex flex-col flex-grow">
@@ -88,7 +97,7 @@ export const MessagesPage = (): JSX.Element => {
             chatType === "broadcast" && currentChannel
               ? getChannelName(currentChannel)
               : chatType === "direct" && nodes.get(activeChat)
-                ? nodes.get(activeChat)?.user?.longName ?? nodeHex
+                ? (nodes.get(activeChat)?.user?.longName ?? nodeHex)
                 : "Loading..."
           }`}
           actions={
@@ -158,3 +167,5 @@ export const MessagesPage = (): JSX.Element => {
     </>
   );
 };
+
+export default MessagesPage;

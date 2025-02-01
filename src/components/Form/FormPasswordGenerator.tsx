@@ -2,6 +2,7 @@ import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.tsx";
+import type { ButtonVariant } from "@components/UI/Button";
 import { Generator } from "@components/UI/Generator.tsx";
 import { Eye, EyeOff } from "lucide-react";
 import type { ChangeEventHandler, MouseEventHandler } from "react";
@@ -15,7 +16,12 @@ export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
   devicePSKBitCount: number;
   inputChange: ChangeEventHandler;
   selectChange: (event: string) => void;
-  buttonClick: MouseEventHandler;
+  actionButtons: {
+    text: string;
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+    variant: ButtonVariant;
+    className?: string;
+  }[];
 }
 
 export function PasswordGenerator<T extends FieldValues>({
@@ -47,10 +53,9 @@ export function PasswordGenerator<T extends FieldValues>({
           bits={field.bits}
           inputChange={field.inputChange}
           selectChange={field.selectChange}
-          buttonClick={field.buttonClick}
           value={value}
           variant={field.validationText ? "invalid" : "default"}
-          buttonText="Generate"
+          actionButtons={field.actionButtons}
           {...field.properties}
           {...rest}
           disabled={disabled}

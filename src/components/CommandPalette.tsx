@@ -1,3 +1,4 @@
+import { Avatar } from "@components/UI/Avatar";
 import {
   CommandDialog,
   CommandEmpty,
@@ -8,7 +9,6 @@ import {
 } from "@components/UI/Command.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice, useDeviceStore } from "@core/stores/deviceStore.ts";
-import { Hashicon } from "@emeraldpay/hashicon-react";
 import { useCommandState } from "cmdk";
 import {
   ArrowLeftRightIcon,
@@ -51,11 +51,11 @@ export interface Command {
 
 export interface SubItem {
   label: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
   action: () => void;
 }
 
-export const CommandPalette = (): JSX.Element => {
+export const CommandPalette = () => {
   const {
     commandPaletteOpen,
     setCommandPaletteOpen,
@@ -125,9 +125,11 @@ export const CommandPalette = (): JSX.Element => {
                 device.nodes.get(device.hardware.myNodeNum)?.user?.longName ??
                 device.hardware.myNodeNum.toString(),
               icon: (
-                <Hashicon
-                  size={16}
-                  value={device.hardware.myNodeNum.toString()}
+                <Avatar
+                  text={
+                    device.nodes.get(device.hardware.myNodeNum)?.user
+                      ?.shortName ?? device.hardware.myNodeNum.toString()
+                  }
                 />
               ),
               action() {

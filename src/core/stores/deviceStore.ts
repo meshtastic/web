@@ -25,7 +25,8 @@ export type DialogVariant =
   | "shutdown"
   | "reboot"
   | "deviceName"
-  | "nodeRemoval";
+  | "nodeRemoval"
+  | "pkiBackup";
 
 export interface Device {
   id: number;
@@ -60,6 +61,7 @@ export interface Device {
     reboot: boolean;
     deviceName: boolean;
     nodeRemoval: boolean;
+    pkiBackup: boolean;
   };
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -142,6 +144,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             reboot: false,
             deviceName: false,
             nodeRemoval: false,
+            pkiBackup: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",

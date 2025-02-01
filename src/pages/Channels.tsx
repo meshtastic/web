@@ -20,7 +20,7 @@ export const getChannelName = (channel: Protobuf.Channel.Channel) =>
       ? "Primary"
       : `Ch ${channel.index}`;
 
-export const ChannelsPage = (): JSX.Element => {
+const ChannelsPage = () => {
   const { channels, setDialogOpen } = useDevice();
   const [activeChannel, setActiveChannel] = useState<Types.ChannelNumber>(
     Types.ChannelNumber.Primary,
@@ -69,3 +69,4 @@ export const ChannelsPage = (): JSX.Element => {
     </>
   );
 };
+export default ChannelsPage;
