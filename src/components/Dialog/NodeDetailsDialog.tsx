@@ -152,7 +152,7 @@ export const NodeDetailsDialog = ({
                         All Raw Metrics:
                       </p>
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className="overflow-x-scroll">
                       <pre className="text-xs w-full">
                         {JSON.stringify(device, null, 2)}
                       </pre>
