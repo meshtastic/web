@@ -1,16 +1,14 @@
 import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog";
 import Footer from "@app/components/UI/Footer";
-import { useAppStore } from "@app/core/stores/appStore";
 import { Sidebar } from "@components/Sidebar.tsx";
-import { Button } from "@components/UI/Button.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { LockIcon, LockOpenIcon, TrashIcon } from "lucide-react";
+import { LockIcon, LockOpenIcon } from "lucide-react";
 import { Fragment, type JSX, useCallback, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
 
@@ -20,8 +18,7 @@ export interface DeleteNoteDialogProps {
 }
 
 const NodesPage = (): JSX.Element => {
-  const { nodes, hardware, setDialogOpen, connection } = useDevice();
-  const { setNodeNumToBeRemoved } = useAppStore();
+  const { nodes, hardware, connection } = useDevice();
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);
