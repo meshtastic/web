@@ -4,27 +4,40 @@ export interface TimeAgoProps {
   timestamp: number;
 }
 
-const getTimeAgo = (timestamp: number): string => {
-  const now = Date.now();
-  const secondsPast = Math.floor((now - timestamp) / 1000);
+const getTimeAgo = (
+  unixTimestamp: number,
+  locale: Intl.LocalesArgument = "en",
+): string => {
+  const timestamp = new Date(unixTimestamp);
+  const diff = (new Date().getTime() - timestamp.getTime()) / 1000;
 
-  if (secondsPast < 10) return "now";
-  if (secondsPast < 60) return `${secondsPast} seconds ago`;
-  if (secondsPast < 3600) return `${Math.floor(secondsPast / 60)} minutes ago`;
-  if (secondsPast < 86400) return `${Math.floor(secondsPast / 3600)} hours ago`;
-  return `${Math.floor(secondsPast / 86400)} days ago ${secondsPast}`;
+  const minutes = Math.floor(diff / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(months / 12);
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+
+  if (years > 0) {
+    return rtf.format(0 - years, "year");
+  }
+  if (months > 0) {
+    return rtf.format(0 - months, "month");
+  }
+  if (days > 0) {
+    return rtf.format(0 - days, "day");
+  }
+  if (hours > 0) {
+    return rtf.format(0 - hours, "hour");
+  }
+  if (minutes > 0) {
+    return rtf.format(0 - minutes, "minute");
+  }
+  return rtf.format(Math.floor(0 - diff), "second");
 };
 
 export const TimeAgo = ({ timestamp }: TimeAgoProps): JSX.Element => {
   const [timeAgo, setTimeAgo] = useState(getTimeAgo(timestamp));
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeAgo(getTimeAgo(timestamp));
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [timestamp]);
 
   useEffect(() => {
     setTimeAgo(getTimeAgo(timestamp));
