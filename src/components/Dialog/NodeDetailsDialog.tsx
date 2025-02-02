@@ -1,16 +1,21 @@
 import { useAppStore } from "@app/core/stores/appStore";
 import { useDevice } from "@app/core/stores/deviceStore";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@components/UI/Accordion";
+import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.tsx";
+} from "@components/UI/Dialog";
 import { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DeviceImage } from "../generic/DeviceImage";
 import { TimeAgo } from "../generic/TimeAgo";
 import { Uptime } from "../generic/Uptime";
@@ -138,49 +143,22 @@ export const NodeDetailsDialog = ({
               </div>
             ) : null}
 
-            {device.environmentMetrics ? (
-              <div className="mt-5 bg-gray-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
-                <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                  Environment Metrics:
-                </p>
-                {device.deviceMetrics.airUtilTx ? (
-                  <p>
-                    Air TX utilization:{" "}
-                    {device.deviceMetrics.airUtilTx.toFixed(2)}%
-                  </p>
-                ) : null}
-                {device.deviceMetrics.channelUtilization ? (
-                  <p>
-                    Channel utilization:{" "}
-                    {device.deviceMetrics.channelUtilization.toFixed(2)}%
-                  </p>
-                ) : null}
-                {device.deviceMetrics.batteryLevel ? (
-                  <p>
-                    Battery level:{" "}
-                    {device.deviceMetrics.batteryLevel.toFixed(2)}%
-                  </p>
-                ) : null}
-                {device.deviceMetrics.voltage ? (
-                  <p>Voltage: {device.deviceMetrics.voltage.toFixed(2)}V</p>
-                ) : null}
-                {device.deviceMetrics.uptimeSeconds ? (
-                  <p>
-                    Uptime:{" "}
-                    <Uptime seconds={device.deviceMetrics.uptimeSeconds} />
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-
             {device ? (
               <div className="mt-5 w-full max-w-[464px] bg-gray-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
-                <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                  All Raw Metrics:
-                </p>
-                <pre className="text-xs w-full">
-                  {JSON.stringify(device, null, 2)}
-                </pre>
+                <Accordion className="AccordionRoot" type="single" collapsible>
+                  <AccordionItem className="AccordionItem" value="item-1">
+                    <AccordionTrigger>
+                      <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                        All Raw Metrics:
+                      </p>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <pre className="text-xs w-full">
+                        {JSON.stringify(device, null, 2)}
+                      </pre>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
             ) : null}
           </div>
