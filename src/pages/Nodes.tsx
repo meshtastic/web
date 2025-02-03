@@ -8,7 +8,7 @@ import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { LockIcon, LockOpenIcon } from "lucide-react";
+import { LockIcon, LockOpenIcon, TrashIcon } from "lucide-react";
 import { Fragment, type JSX, useCallback, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
 
@@ -18,17 +18,21 @@ export interface DeleteNoteDialogProps {
 }
 
 const NodesPage = (): JSX.Element => {
-  const { nodes, hardware, connection } = useDevice();
+  const { nodes, hardware, setDialogOpen } = useDevice();
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);
   const [selectedTraceroute, setSelectedTraceroute] = useState<
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
   >();
+  const { setNodeNumToBeRemoved } = useAppStore();
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const filteredNodes = Array.from(nodes.values()).filter(
-    (n) => n.num !== hardware.myNodeNum,
-  );
+  const filteredNodes = Array.from(nodes.values()).filter((node) => {
+    if (node.num === hardware.myNodeNum) return false;
+    const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
+    return nodeName.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   useEffect(() => {
     connection?.events.onTraceRoutePacket.subscribe(handleTraceroute);
@@ -48,6 +52,15 @@ const NodesPage = (): JSX.Element => {
     <>
       <Sidebar />
       <div className="flex flex-col w-full">
+        <div className="p-4">
+          <input
+            type="text"
+            placeholder="Search nodes..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+          />
+        </div>
         <div className="overflow-y-auto h-full">
           <Table
             headings={[

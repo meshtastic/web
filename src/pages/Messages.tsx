@@ -20,9 +20,12 @@ const MessagesPage = () => {
   const [activeChat, setActiveChat] = useState<number>(
     Types.ChannelNumber.Primary,
   );
-  const filteredNodes = Array.from(nodes.values()).filter(
-    (n) => n.num !== hardware.myNodeNum,
-  );
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const filteredNodes = Array.from(nodes.values()).filter((node) => {
+    if (node.num === hardware.myNodeNum) return false;
+    const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
+    return nodeName.toLowerCase().includes(searchTerm.toLowerCase());
+  });
   const allChannels = Array.from(channels.values());
   const filteredChannels = allChannels.filter(
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
@@ -56,6 +59,15 @@ const MessagesPage = () => {
           ))}
         </SidebarSection>
         <SidebarSection label="Nodes">
+          <div className="p-4">
+            <input
+              type="text"
+              placeholder="Search nodes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+            />
+          </div>
           <div className="flex flex-col gap-4">
             {filteredNodes.map((node) => (
               <SidebarButton
