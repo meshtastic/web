@@ -8,7 +8,7 @@ import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { LockIcon, LockOpenIcon, TrashIcon } from "lucide-react";
+import { LockIcon, LockOpenIcon } from "lucide-react";
 import { Fragment, type JSX, useCallback, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
 
@@ -18,14 +18,13 @@ export interface DeleteNoteDialogProps {
 }
 
 const NodesPage = (): JSX.Element => {
-  const { nodes, hardware, setDialogOpen } = useDevice();
+  const { nodes, hardware, connection } = useDevice();
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);
   const [selectedTraceroute, setSelectedTraceroute] = useState<
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
   >();
-  const { setNodeNumToBeRemoved } = useAppStore();
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const filteredNodes = Array.from(nodes.values()).filter((node) => {
