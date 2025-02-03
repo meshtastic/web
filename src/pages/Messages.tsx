@@ -108,21 +108,6 @@ const MessagesPage = () => {
                       });
                     },
                   },
-                  {
-                    icon: WaypointsIcon,
-                    async onClick() {
-                      const targetNode = nodes.get(activeChat)?.num;
-                      if (targetNode === undefined) return;
-                      toast({
-                        title: "Sending Traceroute, please wait...",
-                      });
-                      await connection?.traceRoute(targetNode).then(() =>
-                        toast({
-                          title: "Traceroute sent.",
-                        }),
-                      );
-                    },
-                  },
                 ]
               : []
           }
