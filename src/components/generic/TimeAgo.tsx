@@ -1,3 +1,10 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@radix-ui/react-tooltip";
 import type { JSX } from "react";
 
 export interface TimeAgoProps {
@@ -38,8 +45,22 @@ const getTimeAgo = (
 
 export const TimeAgo = ({ timestamp }: TimeAgoProps): JSX.Element => {
   return (
-    <span title={new Date(timestamp).toLocaleString()}>
-      {getTimeAgo(timestamp)}
-    </span>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <span>{getTimeAgo(timestamp)}</span>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent
+            className="rounded-md bg-slate-800 px-3 py-1.5 text-sm text-white shadow-md animate-in fade-in-0 zoom-in-95"
+            side="top"
+            align="center"
+            sideOffset={5}
+          >
+            {new Date(timestamp).toLocaleString()}
+          </TooltipContent>
+        </TooltipPortal>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
