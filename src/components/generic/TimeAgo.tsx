@@ -37,5 +37,9 @@ const getTimeAgo = (
 };
 
 export const TimeAgo = ({ timestamp }: TimeAgoProps): JSX.Element => {
-  return <span>{getTimeAgo(timestamp)}</span>;
+  return (
+    <span title={new Date(timestamp).toLocaleString()}>
+      {getTimeAgo(timestamp)}
+    </span>
+  );
 };
