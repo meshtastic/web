@@ -21,7 +21,7 @@ export const SidebarButton = ({
     onClick={onClick}
     variant={active ? "subtle" : "ghost"}
     size="sm"
-    className="flex gap-2"
+    className="flex gap-2 w-full"
   >
     {Icon && <Icon size={16} />}
     {element && element}
