@@ -29,8 +29,7 @@ export const TraceRoute = ({
         <p>{to?.user?.longName}</p>
         <p>↓ {snrTowards?.[0] ? snrTowards[0] : "??"}dB</p>
         {route.map((hop, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-          <span key={i}>
+          <span key={nodes.get(hop)?.num}>
             <p>
               {nodes.get(hop)?.user?.longName ?? `!${numberToHexUnpadded(hop)}`}
             </p>
@@ -45,8 +44,7 @@ export const TraceRoute = ({
           <p>{from?.user?.longName}</p>
           <p>↓ {snrBack?.[0] ? snrBack[0] : "??"}dB</p>
           {routeBack.map((hop, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            <span key={i}>
+            <span key={nodes.get(hop)?.num}>
               <p>
                 {nodes.get(hop)?.user?.longName ??
                   `!${numberToHexUnpadded(hop)}`}

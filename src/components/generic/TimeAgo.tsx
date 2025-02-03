@@ -1,4 +1,4 @@
-import { type JSX, useEffect, useState } from "react";
+import type { JSX } from "react";
 
 export interface TimeAgoProps {
   timestamp: number;
@@ -37,11 +37,5 @@ const getTimeAgo = (
 };
 
 export const TimeAgo = ({ timestamp }: TimeAgoProps): JSX.Element => {
-  const [timeAgo, setTimeAgo] = useState(getTimeAgo(timestamp));
-
-  useEffect(() => {
-    setTimeAgo(getTimeAgo(timestamp));
-  }, [timestamp]);
-
-  return <span>{timeAgo}</span>;
+  return <span>{getTimeAgo(timestamp)}</span>;
 };

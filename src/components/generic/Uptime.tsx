@@ -1,4 +1,4 @@
-import { type JSX, useEffect, useState } from "react";
+import type { JSX } from "react";
 
 export interface UptimeProps {
   seconds: number;
@@ -13,11 +13,5 @@ const getUptime = (seconds: number): string => {
 };
 
 export const Uptime = ({ seconds }: UptimeProps): JSX.Element => {
-  const [uptime, setUptime] = useState(getUptime(seconds));
-
-  useEffect(() => {
-    setUptime(getUptime(seconds));
-  }, [seconds]);
-
-  return <span>{uptime}</span>;
+  return <span>{getUptime(seconds)}</span>;
 };
