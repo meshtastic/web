@@ -131,7 +131,6 @@ const MessagesPage = () => {
                   to={activeChat}
                   messages={messages.direct.get(node.num)}
                   channel={Types.ChannelNumber.Primary}
-                  traceroutes={traceroutes.get(node.num)}
                 />
               ),
           )}

@@ -1,4 +1,3 @@
-import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
 import {
   type MessageWithState,
   useDevice,
