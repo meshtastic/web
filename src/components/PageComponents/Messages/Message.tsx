@@ -1,4 +1,5 @@
 import type { MessageWithState } from "@app/core/stores/deviceStore.ts";
+import { cn } from "@app/core/utils/cn";
 import { Avatar } from "@components/UI/Avatar";
 import type { Protobuf } from "@meshtastic/js";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -45,8 +46,14 @@ const StatusTooltip = ({ state, children }: StatusTooltipProps) => (
   </Tooltip.Provider>
 );
 
-const StatusIcon = ({ state }: { state: MessageWithState["state"] }) => {
-  const iconClass = "text-gray-500 dark:text-gray-400 w-4 h-4";
+const StatusIcon = ({
+  state,
+  className,
+}: { state: MessageWithState["state"]; className?: string }) => {
+  const iconClass = cn(
+    className,
+    "text-gray-500 dark:text-gray-400 w-4 h-4 flex-shrink-0",
+  );
   const Icon = (() => {
     switch (state) {
       case "ack":
@@ -57,7 +64,6 @@ const StatusIcon = ({ state }: { state: MessageWithState["state"] }) => {
         return AlertCircle;
     }
   })();
-
   return (
     <StatusTooltip state={state}>
       <Icon className={iconClass} />
@@ -66,50 +72,52 @@ const StatusIcon = ({ state }: { state: MessageWithState["state"] }) => {
 };
 
 export const Message = ({ lastMsgSameUser, message, sender }: MessageProps) => {
-  const messageTextClass =
+  const messageTextClass = cn(
+    "border-l-2 pl-4 break-words min-w-0",
     message.state === "ack"
       ? "text-gray-900 dark:text-white"
-      : "text-gray-500 dark:text-gray-400";
+      : "text-gray-500 dark:text-gray-400",
+    lastMsgSameUser
+      ? "border-gray-600 dark:border-gray-700"
+      : "border-gray-200 dark:border-gray-600",
+  );
 
-  if (lastMsgSameUser) {
-    return (
-      <div className="mx-4 mt-2">
-        <div className="ml-12 flex items-start gap-2">
-          <div
-            className={`${messageTextClass} border-l-2 border-gray-200 dark:border-gray-700 pl-4 flex-grow`}
-          >
-            {message.data}
-          </div>
-          <StatusIcon state={message.state} />
-        </div>
-      </div>
-    );
-  }
+  const baseMessageWrapper = cn(
+    "ml-12 flex items-start gap-2 w-full max-w-full",
+    lastMsgSameUser ? "mt-1" : "mt-4",
+    !lastMsgSameUser && "flex-wrap flex-grow",
+  );
+
+  const containerClass = cn(
+    "px-4 relative",
+    lastMsgSameUser ? "mt-0" : "mt-2",
+    !lastMsgSameUser && "pt-2",
+  );
 
   return (
-    <div className="mx-4 mt-2 space-y-2">
-      <div className="flex items-center gap-2">
-        <Avatar text={sender?.user?.shortName ?? "UNK"} />
-        <span className="font-medium text-gray-900 dark:text-white">
-          {sender?.user?.longName ?? "UNK"}
-        </span>
-        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-          {message.rxTime.toLocaleDateString()}
-        </span>
-        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-          {message.rxTime.toLocaleTimeString(undefined, {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </span>
-      </div>
-      <div className="ml-12 flex items-start gap-2">
-        <div
-          className={`${messageTextClass} border-l-2 border-gray-200 dark:border-gray-700 pl-4 flex-grow`}
-        >
-          {message.data}
+    <div className={containerClass}>
+      {!lastMsgSameUser && (
+        <div className="flex items-center gap-2 mb-2">
+          <Avatar text={sender?.user?.shortName ?? "UNK"} />
+          <span className="font-medium text-gray-900 dark:text-white">
+            {sender?.user?.longName ?? "UNK"}
+          </span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+            {message.rxTime.toLocaleDateString()}
+          </span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+            {message.rxTime.toLocaleTimeString(undefined, {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
         </div>
-        <StatusIcon state={message.state} />
+      )}
+      <div className={baseMessageWrapper}>
+        <div className="flex-1 min-w-0">
+          <div className={messageTextClass}>{message.data}</div>
+        </div>
+        <StatusIcon state={message.state} className="ml-auto" />
       </div>
     </div>
   );

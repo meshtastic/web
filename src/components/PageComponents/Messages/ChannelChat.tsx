@@ -6,6 +6,7 @@ import { Message } from "@components/PageComponents/Messages/Message.tsx";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import type { Types } from "@meshtastic/js";
 import { InboxIcon } from "lucide-react";
+import { useCallback, useEffect, useRef } from "react";
 import type { JSX } from "react";
 
 export interface ChannelChatProps {
@@ -27,24 +28,45 @@ export const ChannelChat = ({
   to,
 }: ChannelChatProps): JSX.Element => {
   const { nodes } = useDevice();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = useCallback(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      const isNearBottom =
+        scrollContainer.scrollHeight -
+          scrollContainer.scrollTop -
+          scrollContainer.clientHeight <
+        100;
+
+      if (isNearBottom) {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [scrollToBottom]);
 
   if (!messages?.length) {
     return (
-      <>
-        <div className="flex place-content-center place-items-center h-full">
+      <div className="flex flex-col h-full">
+        <div className="flex-1 flex items-center justify-center overflow-y-auto">
           <EmptyState />
         </div>
-        <div className="mt-auto pb-4 w-full">
+        <div className="flex-shrink-0 p-4 w-full bg-gray-900">
           <MessageInput to={to} channel={channel} />
         </div>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="flex flex-col h-full">
-        <div className="w-full">
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
+        <div className="w-full min-h-full flex flex-col justify-end">
           {messages.map((message, index) => (
             <Message
               key={message.id}
@@ -55,11 +77,12 @@ export const ChannelChat = ({
               sender={nodes.get(message.from)}
             />
           ))}
-        </div>
-        <div className="mt-auto pb-4 w-full">
-          <MessageInput to={to} channel={channel} />
+          <div ref={messagesEndRef} />
         </div>
       </div>
-    </>
+      <div className="flex-shrink-0 p-4 w-full bg-gray-900">
+        <MessageInput to={to} channel={channel} />
+      </div>
+    </div>
   );
 };
