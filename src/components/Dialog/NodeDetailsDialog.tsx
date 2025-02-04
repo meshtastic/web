@@ -15,7 +15,6 @@ import {
 } from "@components/UI/Dialog";
 import { Protobuf } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { useEffect, useState } from "react";
 import { DeviceImage } from "../generic/DeviceImage";
 import { TimeAgo } from "../generic/TimeAgo";
 import { Uptime } from "../generic/Uptime";
@@ -31,12 +30,7 @@ export const NodeDetailsDialog = ({
 }: NodeDetailsDialogProps) => {
   const { nodes } = useDevice();
   const { nodeNumDetails } = useAppStore();
-  const [device, setDevice] = useState<Protobuf.Mesh.NodeInfo | null>(null);
-
-  useEffect(() => {
-    if (!nodeNumDetails) return;
-    setDevice(nodes.get(nodeNumDetails));
-  }, [nodeNumDetails, nodes]);
+  const device: Protobuf.Mesh.NodeInfo = nodes.get(nodeNumDetails);
 
   return device ? (
     <Dialog open={open} onOpenChange={onOpenChange}>
