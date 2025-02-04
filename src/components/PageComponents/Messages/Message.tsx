@@ -4,28 +4,45 @@ import { Avatar } from "@components/UI/Avatar";
 import type { Protobuf } from "@meshtastic/js";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-export interface MessageProps {
+const MESSAGE_STATES = {
+  ACK: "ack",
+  WAITING: "waiting",
+  FAILED: "failed",
+} as const;
+
+type MessageState = MessageWithState["state"];
+
+interface MessageProps {
   lastMsgSameUser: boolean;
   message: MessageWithState;
   sender?: Protobuf.Mesh.NodeInfo;
 }
 
 interface StatusTooltipProps {
-  state: MessageWithState["state"];
+  state: MessageState;
   children: React.ReactNode;
 }
 
-const getStatusText = (state: MessageWithState["state"]): string => {
-  switch (state) {
-    case "ack":
-      return "Message delivered";
-    case "waiting":
-      return "Waiting for delivery";
-    default:
-      return "Delivery failed";
-  }
-};
+interface StatusIconProps {
+  state: MessageState;
+  className?: string;
+}
+
+const STATUS_TEXT_MAP: Record<MessageState, string> = {
+  [MESSAGE_STATES.ACK]: "Message delivered",
+  [MESSAGE_STATES.WAITING]: "Waiting for delivery",
+  [MESSAGE_STATES.FAILED]: "Delivery failed",
+} as const;
+
+const STATUS_ICON_MAP: Record<MessageState, LucideIcon> = {
+  [MESSAGE_STATES.ACK]: CheckCircle2,
+  [MESSAGE_STATES.WAITING]: CircleEllipsis,
+  [MESSAGE_STATES.FAILED]: AlertCircle,
+} as const;
+
+const getStatusText = (state: MessageState): string => STATUS_TEXT_MAP[state];
 
 const StatusTooltip = ({ state, children }: StatusTooltipProps) => (
   <Tooltip.Provider>
@@ -46,78 +63,92 @@ const StatusTooltip = ({ state, children }: StatusTooltipProps) => (
   </Tooltip.Provider>
 );
 
-const StatusIcon = ({
-  state,
-  className,
-}: { state: MessageWithState["state"]; className?: string }) => {
+const StatusIcon = ({ state, className, ...otherProps }: StatusIconProps) => {
+  const isFailed = state === MESSAGE_STATES.FAILED;
   const iconClass = cn(
     className,
     "text-gray-500 dark:text-gray-400 w-4 h-4 flex-shrink-0",
   );
-  const Icon = (() => {
-    switch (state) {
-      case "ack":
-        return CheckCircle2;
-      case "waiting":
-        return CircleEllipsis;
-      default:
-        return AlertCircle;
-    }
-  })();
+
+  const Icon = STATUS_ICON_MAP[state];
   return (
     <StatusTooltip state={state}>
-      <Icon className={iconClass} />
+      <Icon
+        className={iconClass}
+        {...otherProps}
+        color={isFailed ? "red" : "currentColor"}
+      />
     </StatusTooltip>
   );
 };
 
-export const Message = ({ lastMsgSameUser, message, sender }: MessageProps) => {
-  const messageTextClass = cn(
-    "border-l-2 pl-4 break-words min-w-0",
-    message.state === "ack"
-      ? "text-gray-900 dark:text-white"
-      : "text-gray-500 dark:text-gray-400",
-    lastMsgSameUser
-      ? "border-gray-600 dark:border-gray-700"
-      : "border-gray-200 dark:border-gray-600",
+const getMessageTextStyles = (state: MessageState) => {
+  const isAcknowledged = state === MESSAGE_STATES.ACK;
+  const isFailed = state === MESSAGE_STATES.FAILED;
+  const isWaiting = state === MESSAGE_STATES.WAITING;
+
+  return cn(
+    "pl-2 break-words overflow-hidden",
+    isAcknowledged
+      ? "text-black dark:text-white"
+      : "text-black dark:text-gray-400",
+    isFailed && "text-red-500 dark:text-red-500",
   );
+};
+
+const TimeDisplay = ({ date }: { date: Date }) => (
+  <div className="flex items-center gap-2 flex-shrink-0">
+    <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+      {date.toLocaleDateString()}
+    </span>
+    <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+      {date.toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}
+    </span>
+  </div>
+);
+
+export const Message = ({ lastMsgSameUser, message, sender }: MessageProps) => {
+  const messageTextClass = getMessageTextStyles(message.state);
+  const isFailed = message.state === MESSAGE_STATES.ACK;
 
   const baseMessageWrapper = cn(
-    "ml-12 flex items-start gap-2 w-full max-w-full",
-    lastMsgSameUser ? "mt-1" : "mt-4",
+    "flex items-center gap-2 w-full max-w-full pl-11",
     !lastMsgSameUser && "flex-wrap flex-grow",
   );
 
   const containerClass = cn(
-    "px-4 relative",
-    lastMsgSameUser ? "mt-0" : "mt-2",
+    "w-full px-4 relative",
+    lastMsgSameUser ? "mt-1" : "mt-2",
     !lastMsgSameUser && "pt-2",
   );
 
   return (
     <div className={containerClass}>
       {!lastMsgSameUser && (
-        <div className="flex items-center gap-2 mb-2">
-          <Avatar text={sender?.user?.shortName ?? "UNK"} />
-          <span className="font-medium text-gray-900 dark:text-white">
-            {sender?.user?.longName ?? "UNK"}
-          </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-            {message.rxTime.toLocaleDateString()}
-          </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-            {message.rxTime.toLocaleTimeString(undefined, {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </span>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <div className="flex items-center gap-2 min-w-0">
+            <Avatar
+              text={sender?.user?.shortName ?? "UNK"}
+              className="flex-shrink-0"
+            />
+            <span className="font-medium text-gray-900 dark:text-white truncate">
+              {sender?.user?.longName ?? "UNK"}
+            </span>
+          </div>
+          <TimeDisplay date={message.rxTime} />
         </div>
       )}
       <div className={baseMessageWrapper}>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 max-w-full">
           <div className={messageTextClass}>{message.data}</div>
         </div>
-        <StatusIcon state={message.state} className="ml-auto" />
+        <StatusIcon
+          state={message.state}
+          className="ml-auto mr-6 flex-shrink-0"
+        />
       </div>
     </div>
   );

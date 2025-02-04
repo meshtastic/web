@@ -39,7 +39,6 @@ export const ChannelChat = ({
           scrollContainer.scrollTop -
           scrollContainer.clientHeight <
         100;
-
       if (isNearBottom) {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }
@@ -52,8 +51,8 @@ export const ChannelChat = ({
 
   if (!messages?.length) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex-1 flex items-center justify-center overflow-y-auto">
+      <div className="flex flex-col h-full w-full">
+        <div className="flex-1 flex items-center justify-center">
           <EmptyState />
         </div>
         <div className="flex-shrink-0 p-4 w-full bg-gray-900">
@@ -64,9 +63,9 @@ export const ChannelChat = ({
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
-        <div className="w-full min-h-full flex flex-col justify-end">
+    <div className="flex flex-col h-full w-full">
+      <div className="flex-1 overflow-y-scroll w-full" ref={scrollContainerRef}>
+        <div className="w-full h-full flex flex-col justify-end">
           {messages.map((message, index) => (
             <Message
               key={message.id}
@@ -77,10 +76,10 @@ export const ChannelChat = ({
               sender={nodes.get(message.from)}
             />
           ))}
-          <div ref={messagesEndRef} />
+          <div ref={messagesEndRef} className="w-full" />
         </div>
       </div>
-      <div className="flex-shrink-0 p-4 w-full bg-gray-900">
+      <div className="flex-shrink-0 mt-2 p-4 w-full bg-gray-900">
         <MessageInput to={to} channel={channel} />
       </div>
     </div>
