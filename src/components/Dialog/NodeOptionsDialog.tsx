@@ -24,14 +24,26 @@ export const NodeOptionsDialog = ({
   open,
   onOpenChange,
 }: NodeOptionsDialogProps): JSX.Element => {
-  const { setDialogOpen, connection } = useDevice();
-  const { setNodeNumToBeRemoved, setNodeNumDetails } = useAppStore();
+  const { setDialogOpen, connection, setActivePage } = useDevice();
+  const {
+    setNodeNumToBeRemoved,
+    setNodeNumDetails,
+    setChatType,
+    setActiveChat,
+  } = useAppStore();
   const longName =
     node?.user?.longName ??
     (node ? `!${numberToHexUnpadded(node?.num)}` : "Unknown");
   const shortName =
     node?.user?.shortName ??
     (node ? `${numberToHexUnpadded(node?.num).substring(0, 4)}` : "UNK");
+
+  function handleDirectMessage() {
+    if (!node) return;
+    setChatType("direct");
+    setActiveChat(node.num);
+    setActivePage("messages");
+  }
 
   function handleRequestPosition() {
     if (!node) return;
@@ -66,6 +78,9 @@ export const NodeOptionsDialog = ({
           <DialogTitle>{`${longName} (${shortName})`}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col space-y-1">
+          <div>
+            <Button onClick={handleDirectMessage}>Direct Message</Button>
+          </div>
           <div>
             <Button onClick={handleRequestPosition}>Request Position</Button>
           </div>
