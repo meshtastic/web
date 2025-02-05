@@ -1,3 +1,4 @@
+import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog";
 import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog";
 import Footer from "@app/components/UI/Footer";
@@ -25,6 +26,9 @@ const NodesPage = (): JSX.Element => {
   const [selectedTraceroute, setSelectedTraceroute] = useState<
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
   >();
+  const [selectedLocation, setSelectedLocation] = useState<
+    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
+  >();
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const filteredNodes = Array.from(nodes.values()).filter((node) => {
@@ -34,15 +38,31 @@ const NodesPage = (): JSX.Element => {
   });
 
   useEffect(() => {
-    connection?.events.onTraceRoutePacket.subscribe(handleTraceroute);
+    if (!connection) return;
+    connection.events.onTraceRoutePacket.subscribe(handleTraceroute);
     return () => {
-      connection?.events.onTraceRoutePacket.unsubscribe(handleTraceroute);
+      connection.events.onTraceRoutePacket.unsubscribe(handleTraceroute);
     };
   }, [connection]);
 
   const handleTraceroute = useCallback(
     (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
       setSelectedTraceroute(traceroute);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!connection) return;
+    connection.events.onPositionPacket.subscribe(handleLocation);
+    return () => {
+      connection.events.onPositionPacket.subscribe(handleLocation);
+    };
+  }, [connection]);
+
+  const handleLocation = useCallback(
+    (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
+      setSelectedLocation(location);
     },
     [],
   );
@@ -154,6 +174,11 @@ const NodesPage = (): JSX.Element => {
             traceroute={selectedTraceroute}
             open={!!selectedTraceroute}
             onOpenChange={() => setSelectedTraceroute(undefined)}
+          />
+          <LocationResponseDialog
+            location={selectedLocation}
+            open={!!selectedLocation}
+            onOpenChange={() => setSelectedLocation(undefined)}
           />
         </div>
         <Footer />
