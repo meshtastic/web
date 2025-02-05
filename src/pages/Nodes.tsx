@@ -64,7 +64,8 @@ const NodesPage = (): JSX.Element => {
           <Table
             headings={[
               { title: "", type: "blank", sortable: false },
-              { title: "Name", type: "normal", sortable: true },
+              { title: "Short Name", type: "normal", sortable: true },
+              { title: "Long Name", type: "normal", sortable: true },
               { title: "Model", type: "normal", sortable: true },
               { title: "MAC Address", type: "normal", sortable: true },
               { title: "Last Heard", type: "normal", sortable: true },
@@ -79,7 +80,20 @@ const NodesPage = (): JSX.Element => {
               />,
 
               <h1
-                key="header"
+                key="shortName"
+                onMouseDown={() => setSelectedNode(node)}
+                className="cursor-pointer"
+              >
+                {node.user?.shortName ??
+                  (node.user?.macaddr
+                    ? `${base16
+                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                        .toLowerCase()}`
+                    : `${numberToHexUnpadded(node.num).slice(-4)}`)}
+              </h1>,
+
+              <h1
+                key="longName"
                 onMouseDown={() => setSelectedNode(node)}
                 className="cursor-pointer"
               >
