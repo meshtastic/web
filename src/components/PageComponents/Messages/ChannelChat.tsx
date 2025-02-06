@@ -69,7 +69,7 @@ export const ChannelChat = ({
         </div>
       </div>
       <div className="pl-3 pr-3 pt-3 pb-1">
-        <MessageInput to={to} channel={channel} />
+        <MessageInput to={to} channel={channel} maxBytes={200} />
       </div>
     </div>
   );
