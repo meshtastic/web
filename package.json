@@ -18,6 +18,9 @@
   "simple-git-hooks": {
     "pre-commit": "npm run check:fix && npm run format"
   },
+  "lint-staged": {
+    "*.{ts,tsx}": ["npm run check:fix", "npm run format"]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meshtastic/web.git"

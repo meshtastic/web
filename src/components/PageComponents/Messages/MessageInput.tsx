@@ -9,11 +9,13 @@ import { useCallback, useMemo, useState } from "react";
 export interface MessageInputProps {
   to: Types.Destination;
   channel: Types.ChannelNumber;
+  maxBytes: number;
 }
 
 export const MessageInput = ({
   to,
   channel,
+  maxBytes,
 }: MessageInputProps): JSX.Element => {
   const {
     connection,
@@ -24,6 +26,7 @@ export const MessageInput = ({
   } = useDevice();
   const myNodeNum = hardware.myNodeNum;
   const [localDraft, setLocalDraft] = useState(messageDraft);
+  const [messageBytes, setMessageBytes] = useState(maxBytes);
 
   const debouncedSetMessageDraft = useMemo(
     () => debounce(setMessageDraft, 300),
@@ -60,8 +63,12 @@ export const MessageInput = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    setLocalDraft(newValue);
-    debouncedSetMessageDraft(newValue);
+    const byteLength = new Blob([newValue]).size;
+    if (byteLength <= maxBytes) {
+      setLocalDraft(newValue);
+      debouncedSetMessageDraft(newValue);
+      setMessageBytes(maxBytes - byteLength);
+    }
   };
 
   return (
@@ -85,6 +92,9 @@ export const MessageInput = ({
               onChange={handleInputChange}
             />
           </span>
+          <div className="flex items-center">
+            {messageBytes}/{maxBytes}
+          </div>
           <Button type="submit">
             <SendIcon size={16} />
           </Button>
