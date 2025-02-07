@@ -80,7 +80,7 @@ export const ChannelChat = ({
         </div>
       </div>
       <div className="flex-shrink-0 mt-2 p-4 w-full bg-gray-900">
-        <MessageInput to={to} channel={channel} />
+        <MessageInput to={to} channel={channel} maxBytes={200} />
       </div>
     </div>
   );

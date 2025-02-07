@@ -6,6 +6,7 @@
   "license": "GPL-3.0-only",
   "scripts": {
     "build": "pnpm check && rsbuild build",
+    "build:analyze": "BUNDLE_ANALYZE=true rsbuild build",
     "check": "biome check src/",
     "check:fix": "pnpm check --write src/",
     "format": "biome format --write src/",
@@ -16,6 +17,9 @@
   },
   "simple-git-hooks": {
     "pre-commit": "npm run check:fix && npm run format"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": ["npm run check:fix", "npm run format"]
   },
   "repository": {
     "type": "git",
