@@ -49,7 +49,7 @@ export const PageLayout = ({
         </div>
         <div
           className={cn(
-            "flex h-full w-full flex-col",
+            "flex h-full w-full flex-col overflow-y-auto",
             !noPadding && "pl-3 pr-3 ",
           )}
         >
