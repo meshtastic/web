@@ -1,23 +1,27 @@
 import { useCallback, useMemo, useState } from "react";
 
-export type FlagName =
-  | "UNSET"
-  | "ALTITUDE"
-  | "ALTITUDE_MSL"
-  | "GEOIDAL_SEPARATION"
-  | "DOP"
-  | "HVDOP"
-  | "SATINVIEW"
-  | "SEQ_NO"
-  | "TIMESTAMP"
-  | "HEADING"
-  | "SPEED";
+const FLAGS = {
+  UNSET: 0,
+  Altitude: 1,
+  "Altitude is Mean Sea Level": 2,
+  "Altitude Geoidal Seperation": 4,
+  "Dilution of precision (DOP) PDOP used by default": 8,
+  "If DOP is set, use HDOP / VDOP values instead of PDOP": 16,
+  "Number of satellites": 32,
+  "Sequence number": 64,
+  Timestamp: 128,
+  "Vehicle heading": 256,
+  "Vehicle speed": 512,
+} as const;
+
+export type FlagName = keyof typeof FLAGS;
+type FlagsObject = typeof FLAGS;
 
 type UsePositionFlagsProps = {
   decode: (value: number) => FlagName[];
   encode: (flagNames: FlagName[]) => number;
   hasFlag: (value: number, flagName: FlagName) => boolean;
-  getAllFlags: () => FlagName[];
+  getAllFlags: () => FlagsObject;
   isValidValue: (value: number) => boolean;
   flagsValue: number;
   activeFlags: FlagName[];
@@ -27,30 +31,17 @@ type UsePositionFlagsProps = {
   clearFlags: () => void;
 };
 
-const FLAGS_MAP: ReadonlyMap<FlagName, number> = new Map([
-  ["UNSET", 0],
-  ["ALTITUDE", 1],
-  ["ALTITUDE_MSL", 2],
-  ["GEOIDAL_SEPARATION", 4],
-  ["DOP", 8],
-  ["HVDOP", 16],
-  ["SATINVIEW", 32],
-  ["SEQ_NO", 64],
-  ["TIMESTAMP", 128],
-  ["HEADING", 256],
-  ["SPEED", 512],
-]);
-
 export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
   const [flagsValue, setFlagsValue] = useState<number>(initialValue);
 
   const utils = useMemo(() => {
     const decode = (value: number): FlagName[] => {
       if (value === 0) return ["UNSET"];
+
       const activeFlags: FlagName[] = [];
-      for (const [name, flagValue] of FLAGS_MAP) {
+      for (const [name, flagValue] of Object.entries(FLAGS)) {
         if (flagValue !== 0 && (value & flagValue) === flagValue) {
-          activeFlags.push(name);
+          activeFlags.push(name as FlagName);
         }
       }
       return activeFlags;
@@ -61,31 +52,24 @@ export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
         return 0;
       }
       return flagNames.reduce((acc, name) => {
-        const value = FLAGS_MAP.get(name);
-        if (value === undefined) {
-          throw new Error(`Invalid flag name: ${name}`);
-        }
+        const value = FLAGS[name];
         return acc | value;
       }, 0);
     };
 
     const hasFlag = (value: number, flagName: FlagName): boolean => {
-      const flagValue = FLAGS_MAP.get(flagName);
-      if (flagValue === undefined) {
-        throw new Error(`Invalid flag name: ${flagName}`);
-      }
+      const flagValue = FLAGS[flagName];
       return (value & flagValue) === flagValue;
     };
 
-    const getAllFlags = (): FlagName[] => {
-      return Array.from(FLAGS_MAP.keys());
+    const getAllFlags = (): FlagsObject => {
+      return FLAGS;
     };
 
     const isValidValue = (value: number): boolean => {
-      const maxValue = Array.from(FLAGS_MAP.values()).reduce(
-        (a, b) => a + b,
-        0,
-      );
+      const maxValue = Object.values(FLAGS)
+        .filter((val) => val !== 0) // Exclude UNSET (0) from the calculation
+        .reduce((acc, val) => acc | val, 0);
       return Number.isInteger(value) && value >= 0 && value <= maxValue;
     };
 
@@ -99,18 +83,12 @@ export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
   }, []);
 
   const toggleFlag = useCallback((flagName: FlagName) => {
-    const flagValue = FLAGS_MAP.get(flagName);
-    if (flagValue === undefined) {
-      throw new Error(`Invalid flag name: ${flagName}`);
-    }
+    const flagValue = FLAGS[flagName];
     setFlagsValue((prev) => prev ^ flagValue);
   }, []);
 
   const setFlag = useCallback((flagName: FlagName, enabled: boolean) => {
-    const flagValue = FLAGS_MAP.get(flagName);
-    if (flagValue === undefined) {
-      throw new Error(`Invalid flag name: ${flagName}`);
-    }
+    const flagValue = FLAGS[flagName];
     setFlagsValue((prev) => (enabled ? prev | flagValue : prev & ~flagValue));
   }, []);
 

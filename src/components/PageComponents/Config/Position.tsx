@@ -6,10 +6,11 @@ import type { PositionValidation } from "@app/validation/config/position.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
+import { useCallback } from "react";
 
 export const Position = () => {
   const { config, setWorkingConfig } = useDevice();
-  const { flagsValue, activeFlags, toggleFlag } = usePositionFlags(
+  const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     config.position.positionFlags ?? 0,
   );
 
@@ -24,9 +25,12 @@ export const Position = () => {
     );
   };
 
-  const onPositonFlagChange = (name: string) => {
-    return toggleFlag(name as FlagName);
-  };
+  const onPositonFlagChange = useCallback(
+    (name: string) => {
+      return toggleFlag(name as FlagName);
+    },
+    [toggleFlag],
+  );
 
   return (
     <DynamicForm<PositionValidation>
@@ -73,9 +77,10 @@ export const Position = () => {
               onValueChange: onPositonFlagChange,
               label: "Position Flags",
               placeholder: "Select position flags...",
-              description: "Configuration options for Position messages",
+              description:
+                "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
               properties: {
-                enumValue: Protobuf.Config.Config_PositionConfig_PositionFlags,
+                enumValue: getAllFlags(),
               },
             },
             {

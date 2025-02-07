@@ -46,10 +46,10 @@ const MultiSelectItem = ({
         className,
       )}
     >
-      <CheckboxPrimitive.Indicator>
+      <CheckboxPrimitive.Indicator className="mr-2">
         <Check className="h-4 w-4 animate-in zoom-in duration-200" />
       </CheckboxPrimitive.Indicator>
-      <span className="ml-2">{children}</span>
+      {children}
     </CheckboxPrimitive.Root>
   );
 };
