@@ -12,7 +12,7 @@ import {
 import { Controller, type FieldValues } from "react-hook-form";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
-  type: "select" | "multiSelect";
+  type: "select";
   properties: BaseFormBuilderProps<T>["properties"] & {
     enumValue: {
       [s: string]: string | number;
@@ -51,7 +51,7 @@ export function SelectInput<T extends FieldValues>({
             </SelectTrigger>
             <SelectContent>
               {optionsEnumValues.map(([name, value]) => (
-                <SelectItem key={name + value} value={value.toString()}>
+                <SelectItem key={name} value={value.toString()}>
                   {formatEnumName
                     ? name
                         .replace(/_/g, " ")

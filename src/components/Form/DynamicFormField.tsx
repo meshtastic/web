@@ -1,4 +1,8 @@
 import {
+  type MultiSelectFieldProps,
+  MultiSelectInput,
+} from "@app/components/Form/FormMultiSelect";
+import {
   GenericInput,
   type InputFieldProps,
 } from "@components/Form/FormInput.tsx";
@@ -19,6 +23,7 @@ import type { Control, FieldValues } from "react-hook-form";
 export type FieldProps<T> =
   | InputFieldProps<T>
   | SelectFieldProps<T>
+  | MultiSelectFieldProps<T>
   | ToggleFieldProps<T>
   | PasswordGeneratorProps<T>;
 
@@ -58,6 +63,8 @@ export function DynamicFormField<T extends FieldValues>({
         />
       );
     case "multiSelect":
-      return <div>tmp</div>;
+      return (
+        <MultiSelectInput field={field} control={control} disabled={disabled} />
+      );
   }
 }
