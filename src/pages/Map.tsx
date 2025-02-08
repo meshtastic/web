@@ -44,7 +44,7 @@ const MapPage = (): JSX.Element => {
     }
     if (nodesWithPosition.length === 1) {
       map.easeTo({
-        zoom: 12,
+        zoom: map.getZoom(),
         center: [
           (nodesWithPosition[0].position?.longitudeI ?? 0) / 1e7,
           (nodesWithPosition[0].position?.latitudeI ?? 0) / 1e7,
@@ -118,19 +118,6 @@ const MapPage = (): JSX.Element => {
       >
         <MapGl
           mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
-          // onClick={(e) => {
-          //   const waypoint = new Protobuf.Waypoint({
-          //     name: "test",
-          //     description: "test description",
-          //     latitudeI: Math.trunc(e.lngLat.lat * 1e7),
-          //     longitudeI: Math.trunc(e.lngLat.lng * 1e7)
-          //   });
-          //   addWaypoint(waypoint);
-          //   connection?.sendWaypoint(waypoint, "broadcast");
-          // }}
-
-          // @ts-ignore
-
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
@@ -163,11 +150,6 @@ const MapPage = (): JSX.Element => {
               </div>
             </Marker>
           ))}
-          {/* {rasterSources.map((source, index) => (
-            <Source key={index} type="raster" {...source}>
-              <Layer type="raster" />
-            </Source>
-          ))} */}
           {allNodes.map((node) => {
             if (node.position?.latitudeI && node.num !== selectedNode?.num) {
               return (
@@ -175,12 +157,11 @@ const MapPage = (): JSX.Element => {
                   key={node.num}
                   longitude={(node.position.longitudeI ?? 0) / 1e7}
                   latitude={(node.position.latitudeI ?? 0) / 1e7}
-                  // style={{ filter: darkMode ? "invert(1)" : "" }}
                   anchor="bottom"
                   onClick={() => {
                     setSelectedNode(node);
                     map?.easeTo({
-                      zoom: 12,
+                      zoom: map.getZoom(),
                       center: [
                         (node.position?.longitudeI ?? 0) / 1e7,
                         (node.position?.latitudeI ?? 0) / 1e7,
