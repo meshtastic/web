@@ -1,59 +1,94 @@
 import { NodeDetail } from "@app/components/PageComponents/Map/NodeDetail";
 import { Avatar } from "@app/components/UI/Avatar";
-import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
-import { cn } from "@app/core/utils/cn.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Protobuf } from "@meshtastic/js";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { bbox, lineString } from "@turf/turf";
-import {
-  BoxSelectIcon,
-  MapPinIcon,
-  ZoomInIcon,
-  ZoomOutIcon,
-} from "lucide-react";
+import { MapPinIcon } from "lucide-react";
 import { type JSX, useCallback, useEffect, useMemo, useState } from "react";
-import { AttributionControl, Marker, Popup, useMap } from "react-map-gl";
+import {
+  AttributionControl,
+  GeolocateControl,
+  Marker,
+  MarkerEvent,
+  NavigationControl,
+  Popup,
+  ScaleControl,
+  useMap,
+} from "react-map-gl";
 import MapGl from "react-map-gl/maplibre";
+
+type NodePosition = {
+  latitude: number;
+  longitude: number;
+};
+
+const convertToLatLng = (position: {
+  latitudeI?: number;
+  longitudeI?: number;
+}): NodePosition => ({
+  latitude: (position.latitudeI ?? 0) / 1e7,
+  longitude: (position.longitudeI ?? 0) / 1e7,
+});
 
 const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
-  const { rasterSources, darkMode } = useAppStore();
+  const { darkMode } = useAppStore();
   const { default: map } = useMap();
 
-  const [zoom, setZoom] = useState(0);
   const [selectedNode, setSelectedNode] =
     useState<Protobuf.Mesh.NodeInfo | null>(null);
 
-  const allNodes = useMemo(() => Array.from(nodes.values()), [nodes]);
+  // Filter out nodes without a valid position
+  const validNodes = useMemo(
+    () =>
+      Array.from(nodes.values()).filter(
+        (node): node is Protobuf.Mesh.NodeInfo =>
+          Boolean(node.position?.latitudeI),
+      ),
+    [nodes],
+  );
 
-  const getBBox = useCallback(() => {
+  const handleMarkerClick = useCallback(
+    (node: Protobuf.Mesh.NodeInfo, event: { originalEvent: MouseEvent }) => {
+      event?.originalEvent?.stopPropagation();
+
+      setSelectedNode(node);
+
+      if (map) {
+        const position = convertToLatLng(node.position);
+        map.easeTo({
+          center: [position.longitude, position.latitude],
+          zoom: map?.getZoom(),
+        });
+      }
+    },
+    [map],
+  );
+
+  // Get the bounds of the map based on the nodes furtherest away from center
+  const getMapBounds = useCallback(() => {
     if (!map) {
       return;
     }
-    const nodesWithPosition = allNodes.filter(
-      (node) => node.position?.latitudeI,
-    );
-    if (!nodesWithPosition.length) {
+
+    if (!validNodes.length) {
       return;
     }
-    if (nodesWithPosition.length === 1) {
+    if (validNodes.length === 1) {
       map.easeTo({
         zoom: map.getZoom(),
         center: [
-          (nodesWithPosition[0].position?.longitudeI ?? 0) / 1e7,
-          (nodesWithPosition[0].position?.latitudeI ?? 0) / 1e7,
+          (validNodes[0].position?.longitudeI ?? 0) / 1e7,
+          (validNodes[0].position?.latitudeI ?? 0) / 1e7,
         ],
       });
       return;
     }
     const line = lineString(
-      nodesWithPosition.map((n) => [
+      validNodes.map((n) => [
         (n.position?.latitudeI ?? 0) / 1e7,
         (n.position?.longitudeI ?? 0) / 1e7,
       ]),
@@ -69,65 +104,53 @@ const MapPage = (): JSX.Element => {
     if (center) {
       map.easeTo(center);
     }
-  }, [allNodes, map]);
+  }, [validNodes, map]);
 
-  useEffect(() => {
-    map?.on("zoom", () => {
-      setZoom(map?.getZoom() ?? 0);
-    });
-  }, [map]);
+  // Generate all markers
+  const markers = useMemo(
+    () =>
+      validNodes.map((node) => {
+        const position = convertToLatLng(node.position);
+        return (
+          <Marker
+            key={`marker-${node.num}`}
+            longitude={position.longitude}
+            latitude={position.latitude}
+            anchor="bottom"
+            onClick={(e) => handleMarkerClick(node, e)}
+          >
+            <Avatar
+              text={node.user?.shortName?.toString() ?? node.num.toString()}
+            />
+          </Marker>
+        );
+      }),
+    [validNodes, handleMarkerClick],
+  );
 
   useEffect(() => {
     map?.on("load", () => {
-      getBBox();
+      getMapBounds();
     });
-  }, [map, getBBox]);
+  }, [map, getMapBounds]);
 
   return (
     <>
-      <Sidebar>
-        <SidebarSection label="Sources">
-          {rasterSources.map((source) => (
-            <SidebarButton key={source.title} label={source.title} />
-          ))}
-        </SidebarSection>
-      </Sidebar>
-      <PageLayout
-        label="Map"
-        noPadding={true}
-        actions={[
-          {
-            icon: ZoomInIcon,
-            onClick() {
-              map?.zoomIn();
-            },
-          },
-          {
-            icon: ZoomOutIcon,
-            onClick() {
-              map?.zoomOut();
-            },
-          },
-          {
-            icon: BoxSelectIcon,
-            onClick() {
-              getBBox();
-            },
-          },
-        ]}
-      >
+      <Sidebar />
+      <PageLayout label="Map" noPadding={true} actions={[]}>
         <MapGl
           mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
+          antialias={true}
           style={{
             filter: darkMode ? "brightness(0.8)" : "",
           }}
           dragRotate={false}
           touchZoomRotate={false}
           initialViewState={{
-            zoom: 1.6,
+            zoom: 1.8,
             latitude: 35,
             longitude: 0,
           }}
@@ -138,6 +161,14 @@ const MapPage = (): JSX.Element => {
               color: darkMode ? "black" : "",
             }}
           />
+          <GeolocateControl
+            position="top-right"
+            positionOptions={{ enableHighAccuracy: true }}
+            trackUserLocation
+          />
+          <NavigationControl position="top-right" showCompass={false} />
+
+          <ScaleControl />
           {waypoints.map((wp) => (
             <Marker
               key={wp.id}
@@ -150,52 +181,17 @@ const MapPage = (): JSX.Element => {
               </div>
             </Marker>
           ))}
-          {allNodes.map((node) => {
-            if (node.position?.latitudeI && node.num !== selectedNode?.num) {
-              return (
-                <Marker
-                  key={node.num}
-                  longitude={(node.position.longitudeI ?? 0) / 1e7}
-                  latitude={(node.position.latitudeI ?? 0) / 1e7}
-                  anchor="bottom"
-                  onClick={() => {
-                    setSelectedNode(node);
-                    map?.easeTo({
-                      zoom: map.getZoom(),
-                      center: [
-                        (node.position?.longitudeI ?? 0) / 1e7,
-                        (node.position?.latitudeI ?? 0) / 1e7,
-                      ],
-                    });
-                  }}
-                >
-                  <div className="flex cursor-pointer gap-2 rounded-md bg-transparent p-1.5">
-                    <Avatar
-                      text={
-                        node.user?.shortName.toString() ?? node.num.toString()
-                      }
-                      size="sm"
-                    />
-                    <Subtle className={cn(zoom < 12 && "hidden")}>
-                      {node.user?.longName ||
-                        `!${numberToHexUnpadded(node.num)}`}
-                    </Subtle>
-                  </div>
-                </Marker>
-              );
-            }
-          })}
-          {selectedNode?.position && (
+          {markers}
+          {selectedNode ? (
             <Popup
-              longitude={(selectedNode.position.longitudeI ?? 0) / 1e7}
-              latitude={(selectedNode.position.latitudeI ?? 0) / 1e7}
-              anchor="left"
-              closeOnClick={false}
+              anchor="top"
+              longitude={convertToLatLng(selectedNode.position).longitude}
+              latitude={convertToLatLng(selectedNode.position).latitude}
               onClose={() => setSelectedNode(null)}
             >
               <NodeDetail node={selectedNode} />
             </Popup>
-          )}
+          ) : null}
         </MapGl>
       </PageLayout>
     </>
