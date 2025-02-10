@@ -5,13 +5,13 @@
   "description": "Meshtastic web client",
   "license": "GPL-3.0-only",
   "scripts": {
-    "build": "pnpm check && rsbuild build",
-    "build:analyze": "BUNDLE_ANALYZE=true rsbuild build",
+    "build": "vite build",
+    "build:analyze": "BUNDLE_ANALYZE=true vite build",
     "check": "biome check src/",
     "check:fix": "pnpm check --write src/",
     "format": "biome format --write src/",
-    "dev": "rsbuild dev --open",
-    "preview": "rsbuild preview",
+    "dev": "vite dev --open",
+    "preview": "vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)",
     "postinstall": "npx simple-git-hooks"
   },
@@ -19,7 +19,10 @@
     "pre-commit": "npm run check:fix && npm run format"
   },
   "lint-staged": {
-    "*.{ts,tsx}": ["npm run check:fix", "npm run format"]
+    "*.{ts,tsx}": [
+      "npm run check:fix",
+      "npm run format"
+    ]
   },
   "repository": {
     "type": "git",
@@ -71,8 +74,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@rsbuild/core": "^1.2.3",
-    "@rsbuild/plugin-react": "^1.1.0",
     "@types/chrome": "^0.0.299",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.12.0",
@@ -80,6 +81,7 @@
     "@types/react-dom": "^19.0.3",
     "@types/w3c-web-serial": "^1.0.7",
     "@types/web-bluetooth": "^0.0.20",
+    "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "gzipper": "^8.2.0",
     "postcss": "^8.5.1",
@@ -88,7 +90,8 @@
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
     "tar": "^7.4.3",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0"
   },
   "packageManager": "pnpm@10.1.0"
 }

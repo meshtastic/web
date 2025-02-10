@@ -1,45 +1,30 @@
-import { execSync } from "node:child_process";
-import { resolve } from "node:path";
-import react from "@vitejs/plugin-react";
-import { visualizer } from "rollup-plugin-visualizer";
-import { defineConfig } from "vite";
-import EnvironmentPlugin from "vite-plugin-environment";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { execSync } from 'node:child_process';
+import path from 'path';
 
-let hash = "";
-
+let hash = '';
 try {
-  hash = execSync("git rev-parse --short HEAD").toString().trim();
+  hash = execSync('git rev-parse --short HEAD').toString().trim();
 } catch (error) {
-  hash = "DEVELOPMENT";
+  hash = 'DEV';
 }
 
 export default defineConfig({
-  plugins: [
-    react(),
-    EnvironmentPlugin({
-      COMMIT_HASH: hash,
-    }),
-    // VitePWA({
-    //   registerType: "autoUpdate",
-    //   devOptions: {
-    //     enabled: true
-    //   }
-    // })
-  ],
-  build: {
-    target: "esnext",
-    assetsDir: "",
-    rollupOptions: {
-      plugins: [visualizer()],
-    },
+  plugins: [react()],
+  define: {
+    'process.env.COMMIT_HASH': JSON.stringify(hash),
   },
   resolve: {
     alias: {
-      "@app": resolve(__dirname, "./src"),
-      "@pages": resolve(__dirname, "./src/pages"),
-      "@components": resolve(__dirname, "./src/components"),
-      "@core": resolve(__dirname, "./src/core"),
-      "@layouts": resolve(__dirname, "./src/layouts"),
+      '@app': path.resolve(__dirname, './src'),
+      '@pages': path.resolve(__dirname, './src/pages'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@core': path.resolve(__dirname, './src/core'),
+      '@layouts': path.resolve(__dirname, './src/layouts'),
     },
   },
+  server: {
+    port: 3000
+  }
 });
