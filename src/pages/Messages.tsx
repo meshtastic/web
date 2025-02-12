@@ -1,3 +1,4 @@
+import { useAppStore } from "@app/core/stores/appStore";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
@@ -5,21 +6,17 @@ import { Avatar } from "@components/UI/Avatar.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
-import { Device, useDevice, useDeviceStore } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { getChannelName } from "@pages/Channels.tsx";
 import { HashIcon, LockIcon, LockOpenIcon, WaypointsIcon } from "lucide-react";
 import { useState } from "react";
 
-const MessagesPage = () => {
+export const MessagesPage = () => {
   const { channels, nodes, hardware, messages, traceroutes, connection } =
     useDevice();
-  const [chatType, setChatType] =
-    useState<Types.PacketDestination>("broadcast");
-  const [activeChat, setActiveChat] = useState<number>(
-    Types.ChannelNumber.Primary,
-  );
+  const { activeChat, chatType, setActiveChat, setChatType } = useAppStore();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const filteredNodes = Array.from(nodes.values()).filter((node) => {
     if (node.num === hardware.myNodeNum) return false;
