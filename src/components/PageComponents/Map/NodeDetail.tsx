@@ -1,6 +1,7 @@
 import { Separator } from "@app/components/UI/Seperator";
 import { H5 } from "@app/components/UI/Typography/H5.tsx";
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
+import { formatQuantity } from "@app/core/utils/string";
 import { Avatar } from "@components/UI/Avatar";
 import { Mono } from "@components/generic/Mono.tsx";
 import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
@@ -132,7 +133,12 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
               className="ml-2 mr-1"
               aria-label="Elevation"
             />
-            <div>{node.position?.altitude} ft</div>
+            <div>
+              {formatQuantity(node.position?.altitude, {
+                one: "meter",
+                other: "meters",
+              })}
+            </div>
           </div>
         )}
       </div>
