@@ -26,7 +26,7 @@ export const MessageInput = ({
   } = useDevice();
   const myNodeNum = hardware.myNodeNum;
   const [localDraft, setLocalDraft] = useState(messageDraft);
-  const [messageBytes, setMessageBytes] = useState(maxBytes);
+  const [messageBytes, setMessageBytes] = useState(0);
 
   const debouncedSetMessageDraft = useMemo(
     () => debounce(setMessageDraft, 300),
@@ -64,10 +64,11 @@ export const MessageInput = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     const byteLength = new Blob([newValue]).size;
+
     if (byteLength <= maxBytes) {
       setLocalDraft(newValue);
       debouncedSetMessageDraft(newValue);
-      setMessageBytes(maxBytes - byteLength);
+      setMessageBytes(byteLength);
     }
   };
 
@@ -80,21 +81,23 @@ export const MessageInput = ({
           sendText(localDraft);
           setLocalDraft("");
           setMessageDraft("");
+          setMessageBytes(0);
         }}
       >
         <div className="flex flex-grow gap-2">
-          <span className="w-full">
-            <Input
-              autoFocus={true}
-              minLength={1}
-              placeholder="Enter Message"
-              value={localDraft}
-              onChange={handleInputChange}
-            />
-          </span>
-          <div className="flex items-center">
-            {messageBytes}/{maxBytes}
+          <Input
+            autoFocus={true}
+            minLength={1}
+            placeholder="Enter Message"
+            value={localDraft}
+            onChange={handleInputChange}
+          />
+          <div className="flex items-center w-24 p-2 place-content-end">
+            <span>
+              {messageBytes}/{maxBytes}
+            </span>
           </div>
+
           <Button type="submit">
             <SendIcon size={16} />
           </Button>
