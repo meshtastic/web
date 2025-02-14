@@ -12,7 +12,6 @@ import {
   AttributionControl,
   GeolocateControl,
   Marker,
-  MarkerEvent,
   NavigationControl,
   Popup,
   ScaleControl,
@@ -121,6 +120,7 @@ const MapPage = (): JSX.Element => {
           >
             <Avatar
               text={node.user?.shortName?.toString() ?? node.num.toString()}
+              className="border-[1.5px] border-slate-600 shadow-xl shadow-slate-600"
             />
           </Marker>
         );
@@ -145,7 +145,7 @@ const MapPage = (): JSX.Element => {
           maxPitch={0}
           antialias={true}
           style={{
-            filter: darkMode ? "brightness(0.8)" : "",
+            filter: darkMode ? "brightness(0.9)" : "",
           }}
           dragRotate={false}
           touchZoomRotate={false}
