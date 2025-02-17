@@ -4,7 +4,13 @@ import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/js";
 import { SendIcon } from "lucide-react";
-import { type JSX, useCallback, useMemo, useState } from "react";
+import {
+  type JSX,
+  startTransition,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 
 export interface MessageInputProps {
   to: Types.Destination;
@@ -76,26 +82,31 @@ export const MessageInput = ({
     <div className="flex gap-2">
       <form
         className="w-full"
-        onSubmit={(e) => {
-          e.preventDefault();
-          sendText(localDraft);
-          setLocalDraft("");
-          setMessageDraft("");
-          setMessageBytes(0);
+        action={async (formData: FormData) => {
+          // prevent user from sending blank/empty message
+          if (localDraft === "") return;
+          const message = formData.get("messageInput") as string;
+          startTransition(() => {
+            sendText(message);
+            setLocalDraft("");
+            setMessageDraft("");
+            setMessageBytes(0);
+          });
         }}
       >
         <div className="flex flex-grow gap-2">
-          <Input
-            autoFocus={true}
-            minLength={1}
-            placeholder="Enter Message"
-            value={localDraft}
-            onChange={handleInputChange}
-          />
+          <span className="w-full">
+            <Input
+              autoFocus={true}
+              minLength={1}
+              name="messageInput"
+              placeholder="Enter Message"
+              value={localDraft}
+              onChange={handleInputChange}
+            />
+          </span>
           <div className="flex items-center w-24 p-2 place-content-end">
-            <span>
-              {messageBytes}/{maxBytes}
-            </span>
+            {messageBytes}/{maxBytes}
           </div>
 
           <Button type="submit">
