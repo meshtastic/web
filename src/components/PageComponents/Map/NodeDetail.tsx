@@ -4,7 +4,7 @@ import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
 import { formatQuantity } from "@app/core/utils/string";
 import { Avatar } from "@components/UI/Avatar";
 import { Mono } from "@components/generic/Mono.tsx";
-import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Protobuf } from "@meshtastic/js";
 import type { Protobuf as ProtobufType } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
