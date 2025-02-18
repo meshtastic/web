@@ -3,6 +3,8 @@ import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog";
 import Footer from "@app/components/UI/Footer";
 import { Sidebar } from "@components/Sidebar.tsx";
+import { Avatar } from "@components/UI/Avatar.tsx";
+import { Button } from "@components/UI/Button.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
@@ -94,10 +96,9 @@ const NodesPage = (): JSX.Element => {
               { title: "Connection", type: "normal", sortable: true },
             ]}
             rows={filteredNodes.map((node) => [
-              <span
-                key={node.num}
-                className="h-3 w-3 rounded-full bg-accent"
-              />,
+              <div key={node.num}>
+                <Avatar text={node.user?.shortName.toString() ?? "UNK"} />
+              </div>,
 
               <h1
                 key="shortName"
@@ -107,8 +108,8 @@ const NodesPage = (): JSX.Element => {
                 {node.user?.shortName ??
                   (node.user?.macaddr
                     ? `${base16
-                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                        .toLowerCase()}`
+                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                      .toLowerCase()}`
                     : `${numberToHexUnpadded(node.num).slice(-4)}`)}
               </h1>,
 
@@ -120,8 +121,8 @@ const NodesPage = (): JSX.Element => {
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
-                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                        .toLowerCase()}`
+                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                      .toLowerCase()}`
                     : `!${numberToHexUnpadded(node.num)}`)}
               </h1>,
 
@@ -157,9 +158,8 @@ const NodesPage = (): JSX.Element => {
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
-                    : `${node.hopsAway.toString()} ${
-                        node.hopsAway > 1 ? "hops" : "hop"
-                      } away`
+                    : `${node.hopsAway.toString()} ${node.hopsAway > 1 ? "hops" : "hop"
+                    } away`
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
               </Mono>,
