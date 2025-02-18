@@ -32,7 +32,7 @@ export const MessageInput = ({
   } = useDevice();
   const myNodeNum = hardware.myNodeNum;
   const [localDraft, setLocalDraft] = useState(messageDraft);
-  const [messageBytes, setMessageBytes] = useState(maxBytes);
+  const [messageBytes, setMessageBytes] = useState(0);
 
   const debouncedSetMessageDraft = useMemo(
     () => debounce(setMessageDraft, 300),
@@ -69,11 +69,12 @@ export const MessageInput = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    const messageLength = newValue.length;
-    if (messageLength <= maxBytes) {
+    const byteLength = new Blob([newValue]).size;
+
+    if (byteLength <= maxBytes) {
       setLocalDraft(newValue);
       debouncedSetMessageDraft(newValue);
-      setMessageBytes(maxBytes - messageLength);
+      setMessageBytes(byteLength);
     }
   };
 
@@ -89,6 +90,7 @@ export const MessageInput = ({
             sendText(message);
             setLocalDraft("");
             setMessageDraft("");
+            setMessageBytes(0);
           });
         }}
       >
@@ -103,9 +105,10 @@ export const MessageInput = ({
               onChange={handleInputChange}
             />
           </span>
-          <div className="flex items-center">
+          <div className="flex items-center w-24 p-2 place-content-end">
             {messageBytes}/{maxBytes}
           </div>
+
           <Button type="submit">
             <SendIcon size={16} />
           </Button>

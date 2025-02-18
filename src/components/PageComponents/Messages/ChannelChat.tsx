@@ -51,7 +51,7 @@ export const ChannelChat = ({
 
   if (!messages?.length) {
     return (
-      <div className="flex flex-col h-full w-full">
+      <div className="flex flex-col h-full w-full container mx-auto">
         <div className="flex-1 flex items-center justify-center">
           <EmptyState />
         </div>
@@ -63,23 +63,25 @@ export const ChannelChat = ({
   }
 
   return (
-    <div className="flex flex-col h-full w-full">
-      <div className="flex-1 overflow-y-scroll w-full" ref={scrollContainerRef}>
-        <div className="w-full h-full flex flex-col justify-end">
-          {messages.map((message, index) => (
-            <Message
-              key={message.id}
-              message={message}
-              lastMsgSameUser={
-                index > 0 && messages[index - 1].from === message.from
-              }
-              sender={nodes.get(message.from)}
-            />
-          ))}
+    <div className="flex flex-col h-full w-full container mx-auto">
+      <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
+        <div className="w-full h-full flex flex-col justify-end pl-4 pr-44">
+          {messages.map((message, index) => {
+            return (
+              <Message
+                key={message.id}
+                message={message}
+                sender={nodes.get(message.from)}
+                lastMsgSameUser={
+                  index > 0 && messages[index - 1].from === message.from
+                }
+              />
+            );
+          })}
           <div ref={messagesEndRef} className="w-full" />
         </div>
       </div>
-      <div className="flex-shrink-0 mt-2 p-4 w-full bg-gray-900">
+      <div className="flex-shrink-0 mt-2 p-4 w-full dark:bg-gray-900">
         <MessageInput to={to} channel={channel} maxBytes={200} />
       </div>
     </div>
