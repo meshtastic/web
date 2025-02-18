@@ -31,7 +31,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
   ].replaceAll("_", " ");
 
   return (
-    <div className="dark:text-black">
+    <div className="dark:text-black p-1">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
           <Avatar text={node.user?.shortName} />
