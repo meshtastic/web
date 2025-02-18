@@ -1,6 +1,7 @@
 import Footer from "@app/components/UI/Footer";
 import { useAppStore } from "@app/core/stores/appStore";
 import { Sidebar } from "@components/Sidebar.tsx";
+import { Avatar } from "@components/UI/Avatar.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { Table } from "@components/generic/Table/index.tsx";
@@ -56,10 +57,9 @@ const NodesPage = (): JSX.Element => {
               { title: "Remove", type: "normal", sortable: false },
             ]}
             rows={filteredNodes.map((node) => [
-              <span
-                key={node.num}
-                className="h-3 w-3 rounded-full bg-accent"
-              />,
+              <div key={node.num}>
+                <Avatar text={node.user?.shortName.toString() ?? "UNK"}/>
+              </div>,
 
               <h1 key="header">
                 {node.user?.longName ??
