@@ -6,6 +6,8 @@ import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import type { JSX } from "react";
+import { NodeDetailsDialog } from "./NodeDetailsDialog";
 
 export const DialogManager = (): JSX.Element => {
   const { channels, config, dialog, setDialogOpen } = useDevice();
@@ -54,6 +56,12 @@ export const DialogManager = (): JSX.Element => {
         open={dialog.pkiBackup}
         onOpenChange={(open) => {
           setDialogOpen("pkiBackup", open);
+        }}
+      />
+      <NodeDetailsDialog
+        open={dialog.nodeDetails}
+        onOpenChange={(open) => {
+          setDialogOpen("nodeDetails", open);
         }}
       />
     </>

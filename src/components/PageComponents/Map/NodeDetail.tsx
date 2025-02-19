@@ -1,9 +1,10 @@
 import { Separator } from "@app/components/UI/Seperator";
 import { H5 } from "@app/components/UI/Typography/H5.tsx";
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
+import { formatQuantity } from "@app/core/utils/string";
 import { Avatar } from "@components/UI/Avatar";
 import { Mono } from "@components/generic/Mono.tsx";
-import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Protobuf } from "@meshtastic/js";
 import type { Protobuf as ProtobufType } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
@@ -25,12 +26,12 @@ export interface NodeDetailProps {
 
 export const NodeDetail = ({ node }: NodeDetailProps) => {
   const name = node.user?.longName || `!${numberToHexUnpadded(node.num)}`;
-  const hardwareType = Protobuf.Mesh.HardwareModel[
-    node.user?.hwModel ?? 0
-  ].replaceAll("_", " ");
+  const hwModel = node.user?.hwModel ?? 0;
+  const hardwareType =
+    Protobuf.Mesh.HardwareModel[hwModel]?.replaceAll("_", " ") ?? `${hwModel}`;
 
   return (
-    <div className="dark:text-black">
+    <div className="dark:text-black p-1">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
           <Avatar text={node.user?.shortName} />
@@ -132,7 +133,12 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
               className="ml-2 mr-1"
               aria-label="Elevation"
             />
-            <div>{node.position?.altitude} ft</div>
+            <div>
+              {formatQuantity(node.position?.altitude, {
+                one: "meter",
+                other: "meters",
+              })}
+            </div>
           </div>
         )}
       </div>

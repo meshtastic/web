@@ -1,3 +1,4 @@
+import { Types } from "@meshtastic/js";
 import { produce } from "immer";
 import { create } from "zustand";
 
@@ -29,6 +30,9 @@ interface AppState {
   nodeNumToBeRemoved: number;
   accent: AccentColor;
   connectDialogOpen: boolean;
+  nodeNumDetails: number;
+  activeChat: number;
+  chatType: "broadcast" | "direct";
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -42,6 +46,9 @@ interface AppState {
   setNodeNumToBeRemoved: (nodeNum: number) => void;
   setAccent: (color: AccentColor) => void;
   setConnectDialogOpen: (open: boolean) => void;
+  setNodeNumDetails: (nodeNum: number) => void;
+  setActiveChat: (chat: number) => void;
+  setChatType: (type: "broadcast" | "direct") => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -57,6 +64,9 @@ export const useAppStore = create<AppState>()((set) => ({
   accent: "orange",
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
+  nodeNumDetails: 0,
+  activeChat: Types.ChannelNumber.Primary,
+  chatType: "broadcast",
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -124,4 +134,16 @@ export const useAppStore = create<AppState>()((set) => ({
       }),
     );
   },
+  setNodeNumDetails: (nodeNum) =>
+    set((state) => ({
+      nodeNumDetails: nodeNum,
+    })),
+  setActiveChat: (chat) =>
+    set(() => ({
+      activeChat: chat,
+    })),
+  setChatType: (type) =>
+    set(() => ({
+      chatType: type,
+    })),
 }));

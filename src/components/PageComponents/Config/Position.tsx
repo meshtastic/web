@@ -1,25 +1,43 @@
+import {
+  type FlagName,
+  usePositionFlags,
+} from "@app/core/hooks/usePositionFlags";
 import type { PositionValidation } from "@app/validation/config/position.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
+import { useCallback } from "react";
 
-export const Position = (): JSX.Element => {
-  const { config, nodes, hardware, setWorkingConfig } = useDevice();
+export const Position = () => {
+  const { config, setWorkingConfig } = useDevice();
+  const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
+    config.position.positionFlags ?? 0,
+  );
 
   const onSubmit = (data: PositionValidation) => {
-    setWorkingConfig(
+    return setWorkingConfig(
       new Protobuf.Config.Config({
         payloadVariant: {
           case: "position",
-          value: data,
+          value: { ...data, positionFlags: flagsValue },
         },
       }),
     );
   };
 
+  const onPositonFlagChange = useCallback(
+    (name: string) => {
+      return toggleFlag(name as FlagName);
+    },
+    [toggleFlag],
+  );
+
   return (
     <DynamicForm<PositionValidation>
-      onSubmit={onSubmit}
+      onSubmit={(data) => {
+        data.positionFlags = flagsValue;
+        return onSubmit(data);
+      }}
       defaultValues={config.position}
       fieldGroups={[
         {
@@ -53,10 +71,16 @@ export const Position = (): JSX.Element => {
             {
               type: "multiSelect",
               name: "positionFlags",
+              value: activeFlags,
+              isChecked: (name: string) =>
+                activeFlags.includes(name as FlagName),
+              onValueChange: onPositonFlagChange,
               label: "Position Flags",
-              description: "Configuration options for Position messages",
+              placeholder: "Select position flags...",
+              description:
+                "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
               properties: {
-                enumValue: Protobuf.Config.Config_PositionConfig_PositionFlags,
+                enumValue: getAllFlags(),
               },
             },
             {

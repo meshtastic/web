@@ -6,6 +6,7 @@
   "license": "GPL-3.0-only",
   "scripts": {
     "build": "pnpm check && rsbuild build",
+    "build:analyze": "BUNDLE_ANALYZE=true rsbuild build",
     "check": "biome check src/",
     "check:fix": "pnpm check --write src/",
     "format": "biome format --write src/",
@@ -16,6 +17,9 @@
   },
   "simple-git-hooks": {
     "pre-commit": "npm run check:fix && npm run format"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": ["npm run check:fix", "npm run format"]
   },
   "repository": {
     "type": "git",
@@ -61,7 +65,6 @@
     "react-map-gl": "7.1.9",
     "react-qrcode-logo": "^3.0.0",
     "rfc4648": "^1.5.4",
-    "timeago-react": "^3.0.6",
     "vite-plugin-node-polyfills": "^0.23.0",
     "zustand": "5.0.3"
   },
@@ -86,5 +89,5 @@
     "tar": "^7.4.3",
     "typescript": "^5.7.3"
   },
-  "packageManager": "pnpm@9.15.4"
+  "packageManager": "pnpm@10.1.0"
 }

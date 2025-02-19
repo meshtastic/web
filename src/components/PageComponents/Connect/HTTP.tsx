@@ -23,8 +23,8 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
         window.location.hostname,
       )
         ? "meshtastic.local"
-        : window.location.hostname,
-      tls: false,
+        : window.location.host,
+      tls: location.protocol === "https:",
     },
   });
 
