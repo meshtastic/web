@@ -1,101 +1,95 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
 
-:root {
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme {
+  --font-mono: Cascadia Code, ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: Inter var, ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  --color-background-primary: var(--backgroundPrimary);
+  --color-background-secondary: var(--backgroundSecondary);
+  --color-accent: var(--accent);
+  --color-accent-muted: var(--accentMuted);
+  --color-text-primary: var(--textPrimary);
+  --color-text-secondary: var(--textSecondary);
+  --color-link: var(--link);
+
+  --brightness-hover: var(--brightnessHover);
+  --brightness-press: var(--brightnessPress);
+  --brightness-disabled: var(--brightnessDisabled);
+}
+
+[data-theme="light"] {
   --backgroundPrimary: #ffffff;
-  --backgroundSecondary: #e6e9ed;
   --textPrimary: #111132;
   --textSecondary: #64748b;
   --link: #0b69bf;
 
-  --brighnessHover: 0.95;
+  --brightnessHover: 0.95;
   --brightnessPress: 1.05;
   --brightnessDisabled: 0.75;
 }
 
 [data-theme="dark"] {
   --backgroundPrimary: #0f172a;
-  --backgroundSecondary: #363638;
   --textPrimary: #ebebeb;
   --textSecondary: #bdbdbd;
   --link: #8ec9ff;
 
-  --brighnessHover: 1.1;
+  --brightnessHover: 1.1;
   --brightnessPress: 0.9;
   --brightnessDisabled: 0.75;
 }
 
-[data-accent="red"] {
-  --accent: #f28585;
-  --accentMuted: #f4abab;
+/* Accordion Animations */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--radix-accordion-content-height);
+  }
 }
 
-[data-accent="red"][data-theme="dark"] {
-  --accent: #f25555;
-  --accentMuted: #b04749;
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+
+  to {
+    height: 0;
+  }
 }
 
-[data-accent="orange"] {
-  --accent: #edb17a;
-  --accentMuted: #efc7a4;
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
 }
 
-[data-accent="orange"][data-theme="dark"] {
-  --accent: #e1720b;
-  --accentMuted: #a55c17;
+@layer components {
+  .maplibregl-popup-close-button {
+    padding: 4px 10px 8px 0;
+    font-size: 1.2rem;
+  }
+
+  .maplibregl-popup-close-button:hover {
+    background-color: white !important;
+  }
 }
 
-[data-accent="yellow"] {
-  --accent: #e0cc87;
-  --accentMuted: #e8daad;
-}
-
-[data-accent="yellow"][data-theme="dark"] {
-  --accent: #ac8c1a;
-  --accentMuted: #826c22;
-}
-
-[data-accent="green"] {
-  --accent: #8bc9c5;
-  --accentMuted: #afd7d5;
-}
-
-[data-accent="green"][data-theme="dark"] {
-  --accent: #27a341;
-  --accentMuted: #297b3b;
-}
-
-[data-accent="blue"] {
-  --accent: #70afea;
-  --accentMuted: #9cc7ee;
-}
-
-[data-accent="blue"][data-theme="dark"] {
-  --accent: #2093fe;
-  --accentMuted: #2471ba;
-}
-
-[data-accent="purple"] {
-  --accent: #a09eef;
-  --accentMuted: #bcbcf1;
-}
-
-[data-accent="purple"][data-theme="dark"] {
-  --accent: #926bff;
-  --accentMuted: #7057bb;
-}
-
-[data-accent="pink"] {
-  --accent: #dba0c7;
-  --accentMuted: #e3bcd7;
-}
-
-[data-accent="pink"][data-theme="dark"] {
-  --accent: #e454c4;
-  --accentMuted: #a84892;
-}
-
+/* Prevent image dragging */
 img {
   -webkit-user-drag: none;
 }

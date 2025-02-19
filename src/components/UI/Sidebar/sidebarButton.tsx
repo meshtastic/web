@@ -25,6 +25,6 @@ export const SidebarButton = ({
   >
     {Icon && <Icon size={16} />}
     {element && element}
-    <span className="flex flex-1 justify-start flex-shrink-0">{label}</span>
+    <span className="flex flex-1 justify-start shrink-0">{label}</span>
   </Button>
 );

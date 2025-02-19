@@ -41,7 +41,7 @@ export const Dashboard = () => {
                   <li key={device.id}>
                     <button
                       type="button"
-                      className={`w-full px-4 py-4 sm:px-6 ${darkMode ? "hover:bg-slate-800 focus:bg-slate-400 active:bg-slate-600" : "hover:bg-slate-50 focus:bg-slate-50 active:bg-slate-100"}`}
+                      className="w-full px-4 py-4 sm:px-6"
                       onClick={() => {
                         setSelectedDevice(device.id);
                       }}
@@ -89,11 +89,12 @@ export const Dashboard = () => {
             </ul>
           ) : (
             <div className="m-auto flex flex-col gap-3 text-center">
-              <ListPlusIcon size={48} className="mx-auto text-textSecondary" />
+              <ListPlusIcon size={48} className="mx-auto text-text-secondary" />
               <H3>No Devices</H3>
               <Subtle>Connect at least one device to get started</Subtle>
               <Button
                 className="gap-2"
+                variant={"default"}
                 onClick={() => setConnectDialogOpen(true)}
               >
                 <PlusIcon size={16} />

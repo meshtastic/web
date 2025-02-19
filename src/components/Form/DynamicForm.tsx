@@ -84,7 +84,7 @@ export function DynamicForm<T extends FieldValues>({
 
   return (
     <form
-      className="space-y-8 divide-y divide-gray-200"
+      className="space-y-8"
       {...(submitType === "onSubmit"
         ? { onSubmit: handleSubmit(onSubmit) }
         : {
@@ -92,10 +92,7 @@ export function DynamicForm<T extends FieldValues>({
           })}
     >
       {fieldGroups.map((fieldGroup) => (
-        <div
-          key={fieldGroup.label}
-          className="space-y-8 divide-y divide-gray-200 sm:space-y-5"
-        >
+        <div key={fieldGroup.label} className="space-y-8 sm:space-y-5">
           <div>
             <H4 className="font-medium">{fieldGroup.label}</H4>
             <Subtle>{fieldGroup.description}</Subtle>

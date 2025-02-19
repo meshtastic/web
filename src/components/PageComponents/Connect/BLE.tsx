@@ -41,6 +41,7 @@ export const BLE = ({ closeDialog }: TabElementProps): JSX.Element => {
         {bleDevices.map((device) => (
           <Button
             key={device.id}
+            className="dark:bg-slate-900 dark:text-white"
             onClick={() => {
               onConnect(device);
             }}
@@ -53,6 +54,7 @@ export const BLE = ({ closeDialog }: TabElementProps): JSX.Element => {
         )}
       </div>
       <Button
+        className="dark:bg-slate-900 dark:text-white"
         onClick={async () => {
           await navigator.bluetooth
             .requestDevice({

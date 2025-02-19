@@ -55,7 +55,7 @@ export const ChannelChat = ({
         <div className="flex-1 flex items-center justify-center">
           <EmptyState />
         </div>
-        <div className="flex-shrink-0 p-4 w-full dark:bg-gray-900">
+        <div className="shrink-0 p-4 w-full dark:bg-gray-900">
           <MessageInput to={to} channel={channel} maxBytes={200} />
         </div>
       </div>
@@ -81,7 +81,7 @@ export const ChannelChat = ({
           <div ref={messagesEndRef} className="w-full" />
         </div>
       </div>
-      <div className="flex-shrink-0 mt-2 p-4 w-full dark:bg-gray-900">
+      <div className="shrink-0 mt-2 p-4 w-full dark:bg-gray-900">
         <MessageInput to={to} channel={channel} maxBytes={200} />
       </div>
     </div>

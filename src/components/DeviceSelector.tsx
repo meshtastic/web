@@ -3,15 +3,9 @@ import { Separator } from "@components/UI/Seperator.tsx";
 import { Code } from "@components/UI/Typography/Code.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
-import {
-  HomeIcon,
-  LanguagesIcon,
-  MoonIcon,
-  PlusIcon,
-  SearchIcon,
-  SunIcon,
-} from "lucide-react";
+import { HomeIcon, PlusIcon, SearchIcon } from "lucide-react";
 import type { JSX } from "react";
+import ThemeSwitcher from "./ThemeSwitcher";
 import { Avatar } from "./UI/Avatar";
 
 export const DeviceSelector = (): JSX.Element => {
@@ -19,14 +13,12 @@ export const DeviceSelector = (): JSX.Element => {
   const {
     selectedDevice,
     setSelectedDevice,
-    darkMode,
-    setDarkMode,
     setCommandPaletteOpen,
     setConnectDialogOpen,
   } = useAppStore();
 
   return (
-    <nav className="flex flex-col justify-between border-r-[0.5px] border-slate-300 bg-transparent pt-2 dark:border-slate-700">
+    <nav className="flex flex-col justify-between border-r-[0.5px]  border-slate-300 pt-2 dark:border-slate-700">
       <div className="flex flex-col overflow-y-hidden">
         <ul className="flex w-20 grow flex-col items-center space-y-4 bg-transparent py-4 px-5">
           <DeviceSelectorButton
@@ -65,13 +57,14 @@ export const DeviceSelector = (): JSX.Element => {
         </ul>
       </div>
       <div className="flex w-20 flex-col items-center space-y-5 bg-transparent px-5 pb-5">
-        <button
+        <ThemeSwitcher />
+        {/* <button
           type="button"
           className="transition-all hover:text-accent"
           onClick={() => setDarkMode(!darkMode)}
         >
           {darkMode ? <SunIcon /> : <MoonIcon />}
-        </button>
+        </button> */}
         <button
           type="button"
           className="transition-all hover:text-accent"
@@ -79,9 +72,10 @@ export const DeviceSelector = (): JSX.Element => {
         >
           <SearchIcon />
         </button>
-        <button type="button" className="transition-all hover:text-accent">
+        {/* TODO: This is being commented out until its fixed */}
+        {/* <button type="button" className="transition-all hover:text-accent">
           <LanguagesIcon />
-        </button>
+        </button> */}
         <Separator />
         <Code>{process.env.COMMIT_HASH}</Code>
       </div>

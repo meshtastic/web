@@ -94,7 +94,7 @@ export const MessageInput = ({
           });
         }}
       >
-        <div className="flex flex-grow gap-2">
+        <div className="flex grow gap-2">
           <span className="w-full">
             <Input
               autoFocus={true}
