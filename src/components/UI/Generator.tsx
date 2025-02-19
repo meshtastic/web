@@ -86,7 +86,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
           onValueChange={(e) => selectChange(e)}
           disabled={disabled}
         >
-          <SelectTrigger className="!max-w-max">
+          <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

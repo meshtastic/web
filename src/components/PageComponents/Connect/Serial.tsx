@@ -54,6 +54,7 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
             <Button
               key={`${usbVendorId ?? "UNK"}-${usbProductId ?? "UNK"}-${index}`}
               disabled={port.readable !== null}
+              className="dark:bg-slate-900 dark:text-white"
               onClick={async () => {
                 await onConnect(port);
               }}
@@ -69,6 +70,7 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
         )}
       </div>
       <Button
+        className="dark:bg-slate-900 dark:text-white"
         onClick={async () => {
           await navigator.serial.requestPort().then((port) => {
             setSerialPorts(serialPorts.concat(port));

@@ -17,13 +17,10 @@ import {
   EraserIcon,
   FactoryIcon,
   LayersIcon,
-  LayoutIcon,
   LinkIcon,
   type LucideIcon,
   MapIcon,
   MessageSquareIcon,
-  MoonIcon,
-  PaletteIcon,
   PlusIcon,
   PowerIcon,
   QrCodeIcon,
@@ -62,9 +59,6 @@ export const CommandPalette = () => {
     setSelectedDevice,
     removeDevice,
     selectedDevice,
-    darkMode,
-    setDarkMode,
-    setAccent,
   } = useAppStore();
   const { getDevices } = useDeviceStore();
   const { setDialogOpen, setActivePage, connection } = useDevice();
@@ -234,116 +228,6 @@ export const CommandPalette = () => {
           action() {
             alert("This feature is not implemented");
           },
-        },
-      ],
-    },
-    {
-      label: "Application",
-      icon: LayoutIcon,
-      commands: [
-        {
-          label: "Toggle Dark Mode",
-          icon: MoonIcon,
-          action() {
-            setDarkMode(!darkMode);
-          },
-        },
-        {
-          label: "Accent Color",
-          icon: PaletteIcon,
-          subItems: [
-            {
-              label: "Red",
-              icon: (
-                <span
-                  className={`h-3 w-3 rounded-full ${
-                    darkMode ? "bg-[#f25555]" : "bg-[#f28585]"
-                  }`}
-                />
-              ),
-              action() {
-                setAccent("red");
-              },
-            },
-            {
-              label: "Orange",
-              icon: (
-                <span
-                  className={`h-3 w-3 rounded-full ${
-                    darkMode ? "bg-[#e1720b]" : "bg-[#edb17a]"
-                  }`}
-                />
-              ),
-              action() {
-                setAccent("orange");
-              },
-            },
-            {
-              label: "Yellow",
-              icon: (
-                <span
-                  className={`h-3 w-3 rounded-full ${
-                    darkMode ? "bg-[#ac8c1a]" : "bg-[#e0cc87]"
-                  }`}
-                />
-              ),
-              action() {
-                setAccent("yellow");
-              },
-            },
-            {
-              label: "Green",
-              icon: (
-                <span
-                  className={`h-3 w-3 rounded-full ${
-                    darkMode ? "bg-[#27a341]" : "bg-[#8bc9c5]"
-                  }`}
-                />
-              ),
-              action() {
-                setAccent("green");
-              },
-            },
-            {
-              label: "Blue",
-              icon: (
-                <span
-                  className={`h-3 w-3 rounded-full ${
-                    darkMode ? "bg-[#2093fe]" : "bg-[#70afea]"
-                  }`}
-                />
-              ),
-              action() {
-                setAccent("blue");
-              },
-            },
-            {
-              label: "Purple",
-              icon: (
-                <span
-                  className={`h-3 w-3 rounded-full ${
-                    darkMode ? "bg-[#926bff]" : "bg-[#a09eef]"
-                  }`}
-                />
-              ),
-              action() {
-                setAccent("purple");
-              },
-            },
-            {
-              label: "Pink",
-              icon: (
-                <span
-                  className={`h-3 w-3 rounded-full ${
-                    darkMode ? "bg-[#e454c4]" : "bg-[#dba0c7]"
-                  }`}
-                />
-              ),
-              action() {
-                setAccent("pink");
-              },
-            },
-          ],
         },
       ],
     },

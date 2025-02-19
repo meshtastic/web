@@ -3,5 +3,5 @@ export interface PProps {
 }
 
 export const P = ({ children }: PProps): JSX.Element => (
-  <p className="leading-7 [&:not(:first-child)]:mt-6">{children}</p>
+  <p className="leading-7 not-first:mt-6">{children}</p>
 );

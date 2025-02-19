@@ -5,7 +5,7 @@ export const Mono = ({
 }: JSX.IntrinsicElements["span"]): JSX.Element => {
   return (
     <span
-      className={`font-mono text-sm text-textSecondary ${className ?? ""}`}
+      className={`font-mono text-sm text-text-secondary ${className ?? ""}`}
       {...rest}
     >
       {children}
