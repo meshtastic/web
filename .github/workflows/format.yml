@@ -5,6 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  # Allow manual triggering
   workflow_dispatch:
 
 jobs:
@@ -12,13 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     
     permissions:
-      # We need to give the default GITHUB_TOKEN write permission to commit and push
+      # Give the default GITHUB_TOKEN write permission to commit and push
       contents: write
       
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          fetch-depth: 0  
+          token: ${{ github.token }}
           
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,13 +37,20 @@ jobs:
       - name: Check for changes
         id: git-check
         run: |
-          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
+          git diff --quiet || echo "changes=true" >> $GITHUB_OUTPUT
           
-      - name: Commit changes
+      - name: Configure Git
         if: steps.git-check.outputs.changes == 'true'
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          
+      - name: Commit and push changes
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          branch_name=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Current branch: $branch_name"
           git add -A
+          git status
           git commit -m "chore: format code"
-          git push
+          git push origin HEAD:$branch_name
