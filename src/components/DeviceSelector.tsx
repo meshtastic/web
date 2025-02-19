@@ -1,5 +1,5 @@
 import { DeviceSelectorButton } from "@components/DeviceSelectorButton.tsx";
-import ThemeSwitcher from "@components/ThemeSwitcher";
+import { ThemeSwitcher } from "@components/ThemeSwitcher.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
 import { Code } from "@components/UI/Typography/Code.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";

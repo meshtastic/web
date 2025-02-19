@@ -20,6 +20,7 @@ interface AppState {
     id: number;
     num: number;
   }[];
+
   rasterSources: RasterSource[];
   commandPaletteOpen: boolean;
   nodeNumToBeRemoved: number;
