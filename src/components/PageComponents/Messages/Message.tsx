@@ -76,7 +76,7 @@ const StatusIcon = ({ state, className, ...otherProps }: StatusIconProps) => {
   const isFailed = state === MESSAGE_STATES.FAILED;
   const iconClass = cn(
     className,
-    "text-gray-500 dark:text-gray-400 w-4 h-4 flex-shrink-0",
+    "text-gray-500 dark:text-gray-400 w-4 h-4 shrink-0",
   );
 
   const Icon = STATUS_ICON_MAP[state];
@@ -99,8 +99,8 @@ const getMessageTextStyles = (state: MessageState) => {
   return cn(
     "break-words overflow-hidden",
     isAcknowledged
-      ? "text-black dark:text-white"
-      : "text-black dark:text-gray-400",
+      ? "text-slate-900 dark:text-white"
+      : "text-slate-900 dark:text-gray-400",
     isFailed && "text-red-500 dark:text-red-500",
   );
 };
@@ -109,7 +109,7 @@ const TimeDisplay = ({
   date,
   className,
 }: { date: Date; className?: string }) => (
-  <div className={cn("flex items-center gap-2 flex-shrink-0", className)}>
+  <div className={cn("flex items-center gap-2 shrink-0", className)}>
     <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
       {date.toLocaleDateString()}
     </span>

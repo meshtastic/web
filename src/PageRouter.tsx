@@ -1,7 +1,7 @@
+import MapPage from "@app/pages/Map/index.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import ChannelsPage from "@pages/Channels.tsx";
 import ConfigPage from "@pages/Config/index.tsx";
-import MapPage from "@pages/Map.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes.tsx";
 

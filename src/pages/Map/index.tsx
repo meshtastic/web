@@ -1,11 +1,12 @@
 import { NodeDetail } from "@app/components/PageComponents/Map/NodeDetail";
 import { Avatar } from "@app/components/UI/Avatar";
+import { useTheme } from "@app/core/hooks/useTheme";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
-import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Protobuf } from "@meshtastic/js";
 import { bbox, lineString } from "@turf/turf";
+import { current } from "immer";
 import { MapPinIcon } from "lucide-react";
 import { type JSX, useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -34,8 +35,10 @@ const convertToLatLng = (position: {
 
 const MapPage = (): JSX.Element => {
   const { nodes, waypoints } = useDevice();
-  const { darkMode } = useAppStore();
+  const currentTheme = useTheme();
   const { default: map } = useMap();
+
+  const darkMode = currentTheme === "dark";
 
   const [selectedNode, setSelectedNode] =
     useState<Protobuf.Mesh.NodeInfo | null>(null);

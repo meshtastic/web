@@ -4,7 +4,6 @@ import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteRespo
 import Footer from "@app/components/UI/Footer";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
-import { Button } from "@components/UI/Button.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
@@ -79,7 +78,7 @@ const NodesPage = (): JSX.Element => {
             placeholder="Search nodes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded bg-white text-black"
+            className="w-full p-2 border border-gray-300 rounded-sm bg-white text-slate-900"
           />
         </div>
         <div className="overflow-y-auto h-full">

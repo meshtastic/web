@@ -60,9 +60,9 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
       <div className="flex h-48 flex-col gap-2">
         <Label>IP Address/Hostname</Label>
         <Input
-          // label="IP Address/Hostname"
           prefix={tlsEnabled ? "https://" : "http://"}
           placeholder="000.000.000.000 / meshtastic.local"
+          className="text-black"
           disabled={connectionInProgress}
           {...register("ip")}
         />
@@ -85,7 +85,11 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
           )}
         />
       </div>
-      <Button type="submit" disabled={connectionInProgress}>
+      <Button
+        type="submit"
+        disabled={connectionInProgress}
+        className="dark:bg-slate-900 dark:text-white"
+      >
         <span>{connectionInProgress ? "Connecting..." : "Connect"}</span>
       </Button>
     </form>

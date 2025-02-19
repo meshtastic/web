@@ -58,7 +58,7 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
 
   return (
     <table className="min-w-full">
-      <thead className="bg-backgroundPrimary text-sm font-semibold text-textPrimary">
+      <thead className="bg-backgound-primary text-sm font-semibold text-text-primary">
         <tr>
           {headings.map((heading) => (
             <th
@@ -92,7 +92,7 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
             {row.map((item, index) => (
               <td
                 key={item.key ?? index}
-                className="whitespace-nowrap py-2 text-sm text-textSecondary first:pl-2"
+                className="whitespace-nowrap py-2 text-sm text-text-secondary first:pl-2"
               >
                 {item}
               </td>
