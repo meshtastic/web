@@ -31,6 +31,10 @@
   "bugs": {
     "url": "https://github.com/meshtastic/web/issues"
   },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.1.0"
+  },
   "homepage": "https://meshtastic.org",
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0",
@@ -64,6 +68,7 @@
     "maplibre-gl": "4.1.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-error-boundary": "^5.0.0",
     "react-hook-form": "^7.54.2",
     "react-map-gl": "7.1.9",
     "react-qrcode-logo": "^3.0.0",
@@ -91,6 +96,5 @@
     "tailwindcss-animate": "^1.0.7",
     "tar": "^7.4.3",
     "typescript": "^5.7.3"
-  },
-  "packageManager": "pnpm@10.1.0"
+  }
 }
