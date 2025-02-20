@@ -14,7 +14,7 @@ import {
 } from "@components/UI/Tabs.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 
-export const DeviceConfig = (): JSX.Element => {
+export const DeviceConfig = () => {
   const { metadata } = useDevice();
 
   const tabs = [
