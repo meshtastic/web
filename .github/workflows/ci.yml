@@ -28,7 +28,7 @@ jobs:
           version: latest 
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install 
 
       - name: Build Package
         run: pnpm build
