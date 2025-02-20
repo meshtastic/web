@@ -13,6 +13,7 @@ import { Controller, type FieldValues } from "react-hook-form";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select";
+  selectChange?: (e: string) => void;
   properties: BaseFormBuilderProps<T>["properties"] & {
     enumValue: {
       [s: string]: string | number;
@@ -40,7 +41,10 @@ export function SelectInput<T extends FieldValues>({
           : [];
         return (
           <Select
-            onValueChange={(e) => onChange(Number.parseInt(e))}
+            onValueChange={(e) => {
+              if (field.selectChange) field.selectChange(e);
+              onChange(Number.parseInt(e));
+            }}
             disabled={disabled}
             value={value?.toString()}
             {...remainingProperties}

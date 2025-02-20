@@ -93,3 +93,13 @@
 img {
   -webkit-user-drag: none;
 }
+
+@keyframes spin-slower {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slower 2s linear infinite;
+}

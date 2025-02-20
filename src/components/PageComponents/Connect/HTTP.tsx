@@ -71,7 +71,6 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
                 onCheckedChange={(checked) => {
                   checked ? setHTTPS(true) : setHTTPS(false);
                 }}
-
                 // label="Use TLS"
                 // description="Description"
                 disabled={
