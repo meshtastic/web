@@ -1,16 +1,18 @@
+import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog";
+import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog";
+import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog";
 import Footer from "@app/components/UI/Footer";
-import { useAppStore } from "@app/core/stores/appStore";
 import { Sidebar } from "@components/Sidebar.tsx";
+import { Avatar } from "@components/UI/Avatar.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { Table } from "@components/generic/Table/index.tsx";
-import { TimeAgo } from "@components/generic/Table/tmp/TimeAgo.tsx";
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf, type Types } from "@meshtastic/js";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { LockIcon, LockOpenIcon, TrashIcon } from "lucide-react";
-import { useState } from "react";
-import { Fragment, type JSX } from "react";
+import { LockIcon, LockOpenIcon } from "lucide-react";
+import { Fragment, type JSX, useCallback, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
 
 export interface DeleteNoteDialogProps {
@@ -19,8 +21,16 @@ export interface DeleteNoteDialogProps {
 }
 
 const NodesPage = (): JSX.Element => {
-  const { nodes, hardware, setDialogOpen } = useDevice();
-  const { setNodeNumToBeRemoved } = useAppStore();
+  const { nodes, hardware, connection } = useDevice();
+  const [selectedNode, setSelectedNode] = useState<
+    Protobuf.Mesh.NodeInfo | undefined
+  >(undefined);
+  const [selectedTraceroute, setSelectedTraceroute] = useState<
+    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
+  >();
+  const [selectedLocation, setSelectedLocation] = useState<
+    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
+  >();
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const filteredNodes = Array.from(nodes.values()).filter((node) => {
@@ -28,6 +38,36 @@ const NodesPage = (): JSX.Element => {
     const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
     return nodeName.toLowerCase().includes(searchTerm.toLowerCase());
   });
+
+  useEffect(() => {
+    if (!connection) return;
+    connection.events.onTraceRoutePacket.subscribe(handleTraceroute);
+    return () => {
+      connection.events.onTraceRoutePacket.unsubscribe(handleTraceroute);
+    };
+  }, [connection]);
+
+  const handleTraceroute = useCallback(
+    (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
+      setSelectedTraceroute(traceroute);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!connection) return;
+    connection.events.onPositionPacket.subscribe(handleLocation);
+    return () => {
+      connection.events.onPositionPacket.subscribe(handleLocation);
+    };
+  }, [connection]);
+
+  const handleLocation = useCallback(
+    (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
+      setSelectedLocation(location);
+    },
+    [],
+  );
 
   return (
     <>
@@ -46,22 +86,38 @@ const NodesPage = (): JSX.Element => {
           <Table
             headings={[
               { title: "", type: "blank", sortable: false },
-              { title: "Name", type: "normal", sortable: true },
+              { title: "Short Name", type: "normal", sortable: true },
+              { title: "Long Name", type: "normal", sortable: true },
               { title: "Model", type: "normal", sortable: true },
               { title: "MAC Address", type: "normal", sortable: true },
               { title: "Last Heard", type: "normal", sortable: true },
               { title: "SNR", type: "normal", sortable: true },
               { title: "Encryption", type: "normal", sortable: false },
               { title: "Connection", type: "normal", sortable: true },
-              { title: "Remove", type: "normal", sortable: false },
             ]}
             rows={filteredNodes.map((node) => [
-              <span
-                key={node.num}
-                className="h-3 w-3 rounded-full bg-accent"
-              />,
+              <div key={node.num}>
+                <Avatar text={node.user?.shortName.toString() ?? "UNK"} />
+              </div>,
 
-              <h1 key="header">
+              <h1
+                key="shortName"
+                onMouseDown={() => setSelectedNode(node)}
+                className="cursor-pointer"
+              >
+                {node.user?.shortName ??
+                  (node.user?.macaddr
+                    ? `${base16
+                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                        .toLowerCase()}`
+                    : `${numberToHexUnpadded(node.num).slice(-4)}`)}
+              </h1>,
+
+              <h1
+                key="longName"
+                onMouseDown={() => setSelectedNode(node)}
+                className="cursor-pointer"
+              >
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
@@ -95,7 +151,7 @@ const NodesPage = (): JSX.Element => {
                 {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
                   <LockIcon className="text-green-600" />
                 ) : (
-                  <LockOpenIcon className="text-yellow-300" />
+                  <LockOpenIcon className="text-yellow-300 mx-auto" />
                 )}
               </Mono>,
               <Mono key="hops">
@@ -108,18 +164,22 @@ const NodesPage = (): JSX.Element => {
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
               </Mono>,
-              <Button
-                key="remove"
-                variant="destructive"
-                onClick={() => {
-                  setNodeNumToBeRemoved(node.num);
-                  setDialogOpen("nodeRemoval", true);
-                }}
-              >
-                <TrashIcon />
-                Remove
-              </Button>,
             ])}
+          />
+          <NodeOptionsDialog
+            node={selectedNode}
+            open={!!selectedNode}
+            onOpenChange={() => setSelectedNode(undefined)}
+          />
+          <TracerouteResponseDialog
+            traceroute={selectedTraceroute}
+            open={!!selectedTraceroute}
+            onOpenChange={() => setSelectedTraceroute(undefined)}
+          />
+          <LocationResponseDialog
+            location={selectedLocation}
+            open={!!selectedLocation}
+            onOpenChange={() => setSelectedLocation(undefined)}
           />
         </div>
         <Footer />

@@ -1,10 +1,21 @@
-import type { MessageWithState } from "@app/core/stores/deviceStore.ts";
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@app/components/UI/Tooltip";
+import { useAppStore } from "@app/core/stores/appStore";
+import {
+  type MessageWithState,
+  useDeviceStore,
+} from "@app/core/stores/deviceStore.ts";
 import { cn } from "@app/core/utils/cn";
 import { Avatar } from "@components/UI/Avatar";
 import type { Protobuf } from "@meshtastic/js";
-import * as Tooltip from "@radix-ui/react-tooltip";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useMemo } from "react";
 
 const MESSAGE_STATES = {
   ACK: "ack",
@@ -17,7 +28,7 @@ type MessageState = MessageWithState["state"];
 interface MessageProps {
   lastMsgSameUser: boolean;
   message: MessageWithState;
-  sender?: Protobuf.Mesh.NodeInfo;
+  sender: Protobuf.Mesh.NodeInfo;
 }
 
 interface StatusTooltipProps {
@@ -45,22 +56,20 @@ const STATUS_ICON_MAP: Record<MessageState, LucideIcon> = {
 const getStatusText = (state: MessageState): string => STATUS_TEXT_MAP[state];
 
 const StatusTooltip = ({ state, children }: StatusTooltipProps) => (
-  <Tooltip.Provider>
-    <Tooltip.Root>
-      <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Content
-          className="rounded-md bg-slate-800 px-3 py-1.5 text-sm text-white shadow-md animate-in fade-in-0 zoom-in-95"
-          side="top"
-          align="center"
-          sideOffset={5}
-        >
-          {getStatusText(state)}
-          <Tooltip.Arrow className="fill-slate-800" />
-        </Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
-  </Tooltip.Provider>
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent
+        className="rounded-md bg-slate-800 px-3 py-1.5 text-sm text-white shadow-md animate-in fade-in-0 zoom-in-95"
+        side="top"
+        align="center"
+        sideOffset={5}
+      >
+        {getStatusText(state)}
+        <TooltipArrow className="fill-slate-800" />
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
 );
 
 const StatusIcon = ({ state, className, ...otherProps }: StatusIconProps) => {
@@ -88,7 +97,7 @@ const getMessageTextStyles = (state: MessageState) => {
   const isWaiting = state === MESSAGE_STATES.WAITING;
 
   return cn(
-    "pl-2 break-words overflow-hidden",
+    "break-words overflow-hidden",
     isAcknowledged
       ? "text-black dark:text-white"
       : "text-black dark:text-gray-400",
@@ -96,8 +105,11 @@ const getMessageTextStyles = (state: MessageState) => {
   );
 };
 
-const TimeDisplay = ({ date }: { date: Date }) => (
-  <div className="flex items-center gap-2 flex-shrink-0">
+const TimeDisplay = ({
+  date,
+  className,
+}: { date: Date; className?: string }) => (
+  <div className={cn("flex items-center gap-2 flex-shrink-0", className)}>
     <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
       {date.toLocaleDateString()}
     </span>
@@ -111,44 +123,46 @@ const TimeDisplay = ({ date }: { date: Date }) => (
 );
 
 export const Message = ({ lastMsgSameUser, message, sender }: MessageProps) => {
+  const { getDevices } = useDeviceStore();
+
+  const isDeviceUser = useMemo(
+    () =>
+      getDevices()
+        .map((device) => device.nodes.get(device.hardware.myNodeNum)?.num)
+        .includes(message.from),
+    [getDevices, message.from],
+  );
+  const messageUser = sender?.user;
+
   const messageTextClass = getMessageTextStyles(message.state);
-  const isFailed = message.state === MESSAGE_STATES.ACK;
-
-  const baseMessageWrapper = cn(
-    "flex items-center gap-2 w-full max-w-full pl-11",
-    !lastMsgSameUser && "flex-wrap flex-grow",
-  );
-
-  const containerClass = cn(
-    "w-full px-4 relative",
-    lastMsgSameUser ? "mt-1" : "mt-2",
-    !lastMsgSameUser && "pt-2",
-  );
 
   return (
-    <div className={containerClass}>
-      {!lastMsgSameUser && (
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <div className="flex items-center gap-2 min-w-0">
-            <Avatar
-              text={sender?.user?.shortName ?? "UNK"}
-              className="flex-shrink-0"
-            />
-            <span className="font-medium text-gray-900 dark:text-white truncate">
-              {sender?.user?.longName ?? "UNK"}
-            </span>
+    <div className="flex flex-col w-full px-4 justify-start">
+      <div
+        className={cn(
+          "flex flex-col flex-wrap items-start py-1",
+          isDeviceUser && "items-end",
+        )}
+      >
+        <div className="flex items-center gap-2 mb-2">
+          {!lastMsgSameUser ? (
+            <div className="flex place-items-center gap-2 mb-1">
+              <Avatar text={messageUser?.shortName} />
+              <div className="flex flex-col">
+                <span className="font-medium text-gray-900 dark:text-white truncate">
+                  {messageUser?.longName}
+                </span>
+              </div>
+            </div>
+          ) : null}
+        </div>
+        <TimeDisplay date={message.rxTime} />
+        <div className="flex place-items-center gap-2 pb-2">
+          <div className={cn(isDeviceUser && "pl-11", messageTextClass)}>
+            {message.data}
           </div>
-          <TimeDisplay date={message.rxTime} />
+          <StatusIcon state={message.state} />
         </div>
-      )}
-      <div className={baseMessageWrapper}>
-        <div className="flex-1 min-w-0 max-w-full">
-          <div className={messageTextClass}>{message.data}</div>
-        </div>
-        <StatusIcon
-          state={message.state}
-          className="ml-auto mr-6 flex-shrink-0"
-        />
       </div>
     </div>
   );
