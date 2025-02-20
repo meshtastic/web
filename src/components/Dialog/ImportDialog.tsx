@@ -14,7 +14,7 @@ import { Switch } from "@components/UI/Switch.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 import { toByteArray } from "base64-js";
-import { useEffect, useState } from "react";
+import { type JSX, useEffect, useState } from "react";
 
 export interface ImportDialogProps {
   open: boolean;
@@ -65,7 +65,7 @@ export const ImportDialog = ({
   }, [importDialogInput]);
 
   const apply = () => {
-    channelSet?.settings.map((ch, index) => {
+    channelSet?.settings.map((ch: unknown, index: number) => {
       connection?.setChannel(
         new Protobuf.Channel.Channel({
           index,
@@ -134,7 +134,7 @@ export const ImportDialog = ({
                 {renderOptions(Protobuf.Config_LoRaConfig_RegionCode)}
               </Select> */}
 
-              <span className="text-md block font-medium text-textPrimary">
+              <span className="text-md block font-medium text-text-primary">
                 Channels:
               </span>
               <div className="flex w-40 flex-col gap-1">

@@ -52,9 +52,13 @@ const ChannelsPage = () => {
         ]}
       >
         <Tabs defaultValue="0">
-          <TabsList>
+          <TabsList className="dark:bg-slate-800 ">
             {allChannels.map((channel) => (
-              <TabsTrigger key={channel.index} value={channel.index.toString()}>
+              <TabsTrigger
+                key={channel.index}
+                value={channel.index.toString()}
+                className="dark:text-white"
+              >
                 {getChannelName(channel)}
               </TabsTrigger>
             ))}

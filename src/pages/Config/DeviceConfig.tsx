@@ -12,7 +12,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
 
 export const DeviceConfig = () => {
   const { metadata } = useDevice();
@@ -56,9 +55,13 @@ export const DeviceConfig = () => {
 
   return (
     <Tabs defaultValue="Device">
-      <TabsList>
+      <TabsList className="dark:bg-slate-800">
         {tabs.map((tab) => (
-          <TabsTrigger key={tab.label} value={tab.label}>
+          <TabsTrigger
+            key={tab.label}
+            value={tab.label}
+            className="dark:text-white"
+          >
             {tab.label}
           </TabsTrigger>
         ))}

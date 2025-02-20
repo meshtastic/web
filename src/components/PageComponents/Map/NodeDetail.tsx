@@ -31,7 +31,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
     Protobuf.Mesh.HardwareModel[hwModel]?.replaceAll("_", " ") ?? `${hwModel}`;
 
   return (
-    <div className="dark:text-black p-1">
+    <div className="dark:text-slate-900 p-1">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
           <Avatar text={node.user?.shortName} />
@@ -120,14 +120,14 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       <Separator className="my-1" />
 
       <div className="flex mt-2 text-sm">
-        <div className="flex items-center flex-grow">
-          <div className="border-2 border-black rounded px-0.5 mr-1">
+        <div className="flex items-center grow">
+          <div className="border-2 border-black rounded-sm px-0.5 mr-1">
             {Number.isNaN(node.hopsAway) ? "?" : node.hopsAway}
           </div>
           <div>{node.hopsAway === 1 ? "Hop" : "Hops"}</div>
         </div>
         {node.position?.altitude && (
-          <div className="flex items-center flex-grow">
+          <div className="flex items-center grow">
             <MountainSnow
               size={15}
               className="ml-2 mr-1"
@@ -145,7 +145,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
 
       <div className="flex mt-2">
         {!!node.deviceMetrics?.channelUtilization && (
-          <div className="flex-grow">
+          <div className="grow">
             <div>Channel Util</div>
             <Mono>
               {node.deviceMetrics?.channelUtilization.toPrecision(3)}%
@@ -153,7 +153,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
           </div>
         )}
         {!!node.deviceMetrics?.airUtilTx && (
-          <div className="flex-grow">
+          <div className="grow">
             <div>Airtime Util</div>
             <Mono>{node.deviceMetrics?.airUtilTx.toPrecision(3)}%</Mono>
           </div>

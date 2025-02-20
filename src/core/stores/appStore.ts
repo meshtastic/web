@@ -9,15 +9,6 @@ export interface RasterSource {
   tileSize: number;
 }
 
-export type AccentColor =
-  | "red"
-  | "orange"
-  | "yellow"
-  | "green"
-  | "blue"
-  | "purple"
-  | "pink";
-
 interface ErrorState {
   field: string;
   message: string;
@@ -31,9 +22,7 @@ interface AppState {
   }[];
   rasterSources: RasterSource[];
   commandPaletteOpen: boolean;
-  darkMode: boolean;
   nodeNumToBeRemoved: number;
-  accent: AccentColor;
   connectDialogOpen: boolean;
   nodeNumDetails: number;
   activeChat: number;
@@ -47,9 +36,7 @@ interface AppState {
   addDevice: (device: { id: number; num: number }) => void;
   removeDevice: (deviceId: number) => void;
   setCommandPaletteOpen: (open: boolean) => void;
-  setDarkMode: (enabled: boolean) => void;
   setNodeNumToBeRemoved: (nodeNum: number) => void;
-  setAccent: (color: AccentColor) => void;
   setConnectDialogOpen: (open: boolean) => void;
   setNodeNumDetails: (nodeNum: number) => void;
   setActiveChat: (chat: number) => void;
@@ -71,11 +58,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
   currentPage: "messages",
   rasterSources: [],
   commandPaletteOpen: false,
-  darkMode:
-    localStorage.getItem("theme-dark") !== null
-      ? localStorage.getItem("theme-dark") === "true"
-      : window.matchMedia("(prefers-color-scheme: dark)").matches,
-  accent: "orange",
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
   nodeNumDetails: 0,
@@ -123,25 +105,10 @@ export const useAppStore = create<AppState>()((set, get) => ({
       }),
     );
   },
-  setDarkMode: (enabled: boolean) => {
-    localStorage.setItem("theme-dark", enabled.toString());
-    set(
-      produce<AppState>((draft) => {
-        draft.darkMode = enabled;
-      }),
-    );
-  },
   setNodeNumToBeRemoved: (nodeNum) =>
     set((state) => ({
       nodeNumToBeRemoved: nodeNum,
     })),
-  setAccent(color) {
-    set(
-      produce<AppState>((draft) => {
-        draft.accent = color;
-      }),
-    );
-  },
   setConnectDialogOpen: (open: boolean) => {
     set(
       produce<AppState>((draft) => {
@@ -149,6 +116,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       }),
     );
   },
+
   setNodeNumDetails: (nodeNum) =>
     set((state) => ({
       nodeNumDetails: nodeNum,

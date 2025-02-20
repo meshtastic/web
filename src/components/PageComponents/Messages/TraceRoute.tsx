@@ -24,7 +24,7 @@ export const TraceRoute = ({
 
   return (
     <div className="ml-5 flex">
-      <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
+      <span className="ml-4 border-l-2 border-l-background-primary pl-2 text-text-primary">
         <p className="font-semibold">Route to destination:</p>
         <p>{to?.user?.longName}</p>
         <p>↓ {snrTowards?.[0] ? snrTowards[0] : "??"}dB</p>
@@ -39,7 +39,7 @@ export const TraceRoute = ({
         {from?.user?.longName}
       </span>
       {routeBack ? (
-        <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
+        <span className="ml-4 border-l-2 border-l-background-primary pl-2 text-text-primary">
           <p className="font-semibold">Route back:</p>
           <p>{from?.user?.longName}</p>
           <p>↓ {snrBack?.[0] ? snrBack[0] : "??"}dB</p>

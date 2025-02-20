@@ -57,6 +57,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
         <Input
           prefix={https ? "https://" : "http://"}
           placeholder="000.000.000.000 / meshtastic.local"
+          className="text-black"
           disabled={connectionInProgress}
           {...register("ip")}
         />
@@ -82,7 +83,11 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
           )}
         />
       </div>
-      <Button type="submit" disabled={connectionInProgress}>
+      <Button
+        type="submit"
+        disabled={connectionInProgress}
+        className="dark:bg-slate-900 dark:text-white"
+      >
         <span>{connectionInProgress ? "Connecting..." : "Connect"}</span>
       </Button>
     </form>
