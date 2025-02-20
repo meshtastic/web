@@ -14,6 +14,11 @@ interface ErrorState {
   message: string;
 }
 
+interface ErrorState {
+  field: string;
+  message: string;
+}
+
 interface AppState {
   selectedDevice: number;
   devices: {
