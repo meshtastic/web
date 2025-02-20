@@ -9,12 +9,12 @@ import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { HttpConnection } from "@meshtastic/js";
 import { useState } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
-  const { register, handleSubmit, control } = useForm<{
+  const { register, handleSubmit, control, watch } = useForm<{
     ip: string;
     tls: boolean;
   }>({
@@ -29,7 +29,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
   });
 
   const [connectionInProgress, setConnectionInProgress] = useState(false);
-  const [https, setHTTPS] = useState(false);
+  const https = watch("tls");
 
   const onSubmit = handleSubmit(async (data) => {
     setConnectionInProgress(true);
@@ -41,7 +41,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
     await connection.connect({
       address: data.ip,
       fetchInterval: 2000,
-      tls: https,
+      tls: data.tls,
     });
 
     setSelectedDevice(id);
@@ -63,13 +63,11 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
         <Controller
           name="tls"
           control={control}
-          render={({ field: { value, ...rest } }) => (
+          render={({ field: { value, onChange, ...rest } }) => (
             <>
               <Label>Use HTTPS</Label>
               <Switch
-                onCheckedChange={(checked) => {
-                  checked ? setHTTPS(true) : setHTTPS(false);
-                }}
+                onCheckedChange={onChange}
                 // label="Use TLS"
                 // description="Description"
                 disabled={
