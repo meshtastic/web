@@ -1,6 +1,7 @@
 import { cn } from "@app/core/utils/cn.ts";
 import { AlignLeftIcon, type LucideIcon } from "lucide-react";
 import Footer from "./UI/Footer";
+import { Spinner } from "./UI/Spinner";
 
 export interface PageLayoutProps {
   label: string;
@@ -10,6 +11,8 @@ export interface PageLayoutProps {
     icon: LucideIcon;
     iconClasses?: string;
     onClick: () => void;
+    disabled?: boolean;
+    isLoading?: boolean;
   }[];
 }
 
@@ -18,7 +21,7 @@ export const PageLayout = ({
   noPadding,
   actions,
   children,
-}: PageLayoutProps): JSX.Element => {
+}: PageLayoutProps) => {
   return (
     <>
       <div className="relative flex h-full w-full flex-col">
@@ -33,14 +36,22 @@ export const PageLayout = ({
             <div className="flex w-full items-center">
               <span className="w-full text-lg font-medium">{label}</span>
               <div className="flex justify-end space-x-4">
-                {actions?.map((action, index) => (
+                {actions?.map((action) => (
                   <button
                     key={action.icon.displayName}
                     type="button"
+                    disabled={action?.disabled}
                     className="transition-all hover:text-accent"
                     onClick={action.onClick}
                   >
-                    <action.icon className={action.iconClasses} />
+                    {action?.isLoading ? (
+                      <Spinner />
+                    ) : (
+                      <action.icon
+                        className={action.iconClasses}
+                        aria-disabled={action.disabled}
+                      />
+                    )}
                   </button>
                 ))}
               </div>
