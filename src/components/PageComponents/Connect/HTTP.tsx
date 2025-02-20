@@ -28,7 +28,6 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
     },
   });
 
-
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [https, setHTTPS] = useState(false);
 
@@ -69,7 +68,9 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
             <>
               <Label>Use HTTPS</Label>
               <Switch
-                onCheckedChange={(checked) => {checked ? setHTTPS(true) : setHTTPS(false) }}
+                onCheckedChange={(checked) => {
+                  checked ? setHTTPS(true) : setHTTPS(false);
+                }}
                 // label="Use TLS"
                 // description="Description"
                 disabled={
