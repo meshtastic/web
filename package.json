@@ -35,6 +35,10 @@
   "bugs": {
     "url": "https://github.com/meshtastic/web/issues"
   },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.1.0"
+  },
   "homepage": "https://meshtastic.org",
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0",
