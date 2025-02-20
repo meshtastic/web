@@ -1,3 +1,4 @@
+import { useAppStore } from "@app/core/stores/appStore";
 import { useDevice } from "@app/core/stores/deviceStore.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
@@ -6,15 +7,62 @@ import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { DeviceConfig } from "@pages/Config/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.tsx";
-import { BoxesIcon, SaveIcon, SettingsIcon } from "lucide-react";
+import { BoxesIcon, SaveIcon, SaveOff, SettingsIcon } from "lucide-react";
 import { useState } from "react";
 
-const ConfigPage = (): JSX.Element => {
+const ConfigPage = () => {
   const { workingConfig, workingModuleConfig, connection } = useDevice();
+  const { hasErrors } = useAppStore();
   const [activeConfigSection, setActiveConfigSection] = useState<
     "device" | "module"
   >("device");
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+  const isError = hasErrors();
+
+  const handleSave = async () => {
+    if (hasErrors()) {
+      return toast({
+        title: "Config Errors Exist",
+        description: "Please fix the configuration errors before saving.",
+      });
+    }
+
+    setIsSaving(true);
+    try {
+      if (activeConfigSection === "device") {
+        await Promise.all(
+          workingConfig.map((config) =>
+            connection?.setConfig(config).then(() =>
+              toast({
+                title: "Saving Config",
+                description: `The configuration change ${config.payloadVariant.case} has been saved.`,
+              }),
+            ),
+          ),
+        );
+      } else {
+        await Promise.all(
+          workingModuleConfig.map((moduleConfig) =>
+            connection?.setModuleConfig(moduleConfig).then(() =>
+              toast({
+                title: "Saving Config",
+                description: `The configuration change ${moduleConfig.payloadVariant.case} has been saved.`,
+              }),
+            ),
+          ),
+        );
+      }
+      await connection?.commitEditSettings();
+    } catch (error) {
+      toast({
+        title: "Error Saving Config",
+        description: "An error occurred while saving the configuration.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <>
@@ -40,30 +88,11 @@ const ConfigPage = (): JSX.Element => {
         }
         actions={[
           {
-            icon: SaveIcon,
-            async onClick() {
-              if (activeConfigSection === "device") {
-                workingConfig.map(
-                  async (config) =>
-                    await connection?.setConfig(config).then(() =>
-                      toast({
-                        title: `Config ${config.payloadVariant.case} saved`,
-                      }),
-                    ),
-                );
-              } else {
-                workingModuleConfig.map(
-                  async (moduleConfig) =>
-                    await connection?.setModuleConfig(moduleConfig).then(() =>
-                      toast({
-                        title: `Config ${moduleConfig.payloadVariant.case} saved`,
-                      }),
-                    ),
-                );
-              }
-
-              await connection?.commitEditSettings();
-            },
+            icon: isError ? SaveOff : SaveIcon,
+            isLoading: isSaving,
+            disabled: isSaving,
+            iconClasses: isError ? "text-red-400 cursor-not-allowed" : "",
+            onClick: handleSave,
           },
         ]}
       >

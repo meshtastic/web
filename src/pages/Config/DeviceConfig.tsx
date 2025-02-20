@@ -13,7 +13,10 @@ import {
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
 
-export const DeviceConfig = (): JSX.Element => {
+
+export const DeviceConfig = () => {
+  const { metadata } = useDevice();
+
   const tabs = [
     {
       label: "Device",
