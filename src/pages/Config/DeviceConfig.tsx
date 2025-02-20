@@ -14,8 +14,6 @@ import {
 } from "@components/UI/Tabs.tsx";
 
 export const DeviceConfig = () => {
-  const { metadata } = useDevice();
-
   const tabs = [
     {
       label: "Device",
