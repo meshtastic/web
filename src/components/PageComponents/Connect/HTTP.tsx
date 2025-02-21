@@ -8,7 +8,7 @@ import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { HttpConnection } from "@meshtastic/js";
-import { useState } from "react";
+import { type JSX, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
@@ -68,15 +68,13 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
             <>
               <Label>Use HTTPS</Label>
               <Switch
-
                 onCheckedChange={(checked) => {
                   checked ? setHTTPS(true) : setHTTPS(false);
                 }}
-
-              disabled={
+                disabled={
                   location.protocol === "https:" || connectionInProgress
                 }
-                checked={value}
+                checked={https}
                 {...rest}
               />
             </>
