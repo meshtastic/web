@@ -12,6 +12,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
+  const [https, setHTTPS] = useState(false);
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
   const { register, handleSubmit, control, watch } = useForm<{
@@ -29,7 +30,6 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
   });
 
   const [connectionInProgress, setConnectionInProgress] = useState(false);
-  const https = watch("tls");
 
   const onSubmit = handleSubmit(async (data) => {
     setConnectionInProgress(true);
@@ -57,7 +57,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
         <Input
           prefix={https ? "https://" : "http://"}
           placeholder="000.000.000.000 / meshtastic.local"
-          className="text-black"
+          className="text-black dark:text-black"
           disabled={connectionInProgress}
           {...register("ip")}
         />
@@ -68,10 +68,12 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
             <>
               <Label>Use HTTPS</Label>
               <Switch
-                onCheckedChange={onChange}
-                // label="Use TLS"
-                // description="Description"
-                disabled={
+
+                onCheckedChange={(checked) => {
+                  checked ? setHTTPS(true) : setHTTPS(false);
+                }}
+
+              disabled={
                   location.protocol === "https:" || connectionInProgress
                 }
                 checked={value}

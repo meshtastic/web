@@ -1,39 +1,44 @@
 import { useTheme } from "@app/core/hooks/useTheme";
-import { Moon, Sun } from "lucide-react";
-import React from "react";
+import { cn } from "@app/core/utils/cn";
+import { Monitor, Moon, Sun } from "lucide-react";
 
-type Theme = "light" | "dark";
+type ThemePreference = "light" | "dark" | "system";
 
 export default function ThemeSwitcher({
   className = "",
-}: { className?: string }) {
-  const currentTheme = useTheme(); // Get current theme from DOM
-  const [theme, setTheme] = React.useState<Theme>(currentTheme);
-
-  React.useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+}: {
+  className?: string;
+}) {
+  const { theme, preference, setPreference } = useTheme();
 
   const themeIcons = {
-    light: (
-      <Sun className="size-5 transition-transform duration-300 scale-100" />
-    ),
-    dark: (
-      <Moon className="size-5 transition-transform duration-300 scale-100" />
-    ),
+    light: <Sun className="size-5" />,
+    dark: <Moon className="size-5" />,
+    system: <Monitor className="size-5" />,
   };
 
-  const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
+  const toggleTheme = () => {
+    const preferences: ThemePreference[] = ["light", "dark", "system"];
+    const currentIndex = preferences.indexOf(preference);
+    const nextPreference = preferences[(currentIndex + 1) % preferences.length];
+    setPreference(nextPreference);
+  };
 
   return (
     <button
       type="button"
-      className={`transition-all duration-300 hover:text-accent ${className}`}
+      className={cn(
+        "transition-all duration-300 scale-100 cursor-pointer m-6 p-2",
+        className,
+      )}
       onClick={toggleTheme}
-      aria-label={`Current theme: ${theme}. Click to change theme.`}
+      aria-label={
+        preference === "system"
+          ? `System theme (currently ${theme}). Click to change theme.`
+          : `Current theme: ${theme}. Click to change theme.`
+      }
     >
-      {themeIcons[theme]}
+      {themeIcons[preference]}
     </button>
   );
 }

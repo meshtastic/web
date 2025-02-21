@@ -82,10 +82,11 @@
   .maplibregl-popup-close-button {
     padding: 4px 10px 8px 0;
     font-size: 1.2rem;
+    color: #000;
   }
 
   .maplibregl-popup-close-button:hover {
-    background-color: white !important;
+    background-color: transparent !important;
   }
 }
 

@@ -1,11 +1,11 @@
 import { DeviceSelectorButton } from "@components/DeviceSelectorButton.tsx";
+import ThemeSwitcher from "@components/ThemeSwitcher.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
 import { Code } from "@components/UI/Typography/Code.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { HomeIcon, PlusIcon, SearchIcon } from "lucide-react";
 import type { JSX } from "react";
-import ThemeSwitcher from "./ThemeSwitcher";
 import { Avatar } from "./UI/Avatar";
 
 export const DeviceSelector = (): JSX.Element => {
@@ -50,21 +50,14 @@ export const DeviceSelector = (): JSX.Element => {
           <button
             type="button"
             onClick={() => setConnectDialogOpen(true)}
-            className="transition-all duration-300 hover:text-accent"
+            className="transition-all duration-300"
           >
             <PlusIcon />
           </button>
         </ul>
       </div>
-      <div className="flex w-20 flex-col items-center space-y-5 bg-transparent px-5 pb-5">
+      <div className="flex w-20 flex-col items-center space-y-5 px-5 pb-5">
         <ThemeSwitcher />
-        {/* <button
-          type="button"
-          className="transition-all hover:text-accent"
-          onClick={() => setDarkMode(!darkMode)}
-        >
-          {darkMode ? <SunIcon /> : <MoonIcon />}
-        </button> */}
         <button
           type="button"
           className="transition-all hover:text-accent"
