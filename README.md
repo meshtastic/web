@@ -31,19 +31,20 @@ podman run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshta
 ```
 
 ## Development & Building
+You'll need to download the package manager used with this repo. You can install it by visiting [Bun.sh](https://bun.sh/) and following the installation instructions. 
 
 ### Building and Packaging
 
 Build the project:
 
 ```bash
-pnpm build
+bun run build
 ```
 
 GZip the output:
 
 ```bash
-pnpm package
+bun run package
 ```
 
 ### Development
@@ -51,11 +52,11 @@ pnpm package
 Install the dependencies.
 
 ```bash
-pnpm i
+bun i
 ```
 
 Start the development server:
 
 ```bash
-pnpm dev
+bun run dev
 ```
