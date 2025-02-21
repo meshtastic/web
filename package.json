@@ -16,17 +16,13 @@
     "postinstall": "npx simple-git-hooks"
   },
   "simple-git-hooks": {
-    "pre-commit": "npm run check:fix && npm run format"
+    "pre-commit": "bun run check:fix && bun run format"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "npm run check:fix",
-      "npm run format"
+      "bun run check:fix",
+      "bun run format"
     ]
-  },
-  "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=10.0.0"
   },
   "repository": {
     "type": "git",
