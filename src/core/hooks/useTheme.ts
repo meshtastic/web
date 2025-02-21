@@ -1,37 +1,42 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "light" | "dark" | "system";
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === "undefined") return "light";
-    return (
-      (document.documentElement.getAttribute("data-theme") as Theme) || "light"
-    );
-  });
+  const getSystemTheme = () =>
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+
+  const getStoredPreference = useCallback(
+    (): Theme => (localStorage.getItem("theme") as Theme) || "system",
+    [],
+  );
+
+  const [preference, setPreference] = useState<Theme>(() =>
+    typeof window !== "undefined" ? getStoredPreference() : "light",
+  );
+
+  const theme = preference === "system" ? getSystemTheme() : preference;
 
   useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (
-          mutation.type === "attributes" &&
-          mutation.attributeName === "data-theme"
-        ) {
-          const newTheme = document.documentElement.getAttribute(
-            "data-theme",
-          ) as Theme;
-          setTheme(newTheme);
-        }
-      }
-    });
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
+  useEffect(() => {
+    if (preference !== "system") return;
 
-    return () => observer.disconnect();
-  }, []);
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const updateTheme = () => setPreference(getStoredPreference());
 
-  return theme;
+    media.addEventListener("change", updateTheme);
+    return () => media.removeEventListener("change", updateTheme);
+  }, [preference, getStoredPreference]);
+
+  const setPreferenceValue = (newPreference: Theme) => {
+    localStorage.setItem("theme", newPreference);
+    setPreference(newPreference);
+  };
+
+  return { theme, preference, setPreference: setPreferenceValue };
 }

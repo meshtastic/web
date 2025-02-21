@@ -57,28 +57,30 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
         <Input
           prefix={https ? "https://" : "http://"}
           placeholder="000.000.000.000 / meshtastic.local"
-          className="text-black"
+          className="text-black dark:text-black"
           disabled={connectionInProgress}
           {...register("ip")}
         />
         <Controller
           name="tls"
           control={control}
-          render={({ field: { value, onChange, ...rest } }) => (
-            <>
-              <Label>Use HTTPS</Label>
-              <Switch
-                onCheckedChange={onChange}
-                // label="Use TLS"
-                // description="Description"
-                disabled={
-                  location.protocol === "https:" || connectionInProgress
-                }
-                checked={value}
-                {...rest}
-              />
-            </>
-          )}
+          render={({ field: { value, onChange, ...rest } }) => {
+            console.log(value);
+
+            return (
+              <>
+                <Label>Use HTTPS</Label>
+                <Switch
+                  onCheckedChange={onChange}
+                  disabled={
+                    location.protocol === "https:" || connectionInProgress
+                  }
+                  checked={!!value}
+                  {...rest}
+                />
+              </>
+            );
+          }}
         />
       </div>
       <Button
