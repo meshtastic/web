@@ -64,16 +64,16 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
         <Controller
           name="tls"
           control={control}
-          render={({ field: { value, ...rest } }) => (
+          render={({ field: { value, onChange, ...rest } }) => (
             <>
               <Label>Use HTTPS</Label>
               <Switch
+
                 onCheckedChange={(checked) => {
                   checked ? setHTTPS(true) : setHTTPS(false);
                 }}
-                // label="Use TLS"
-                // description="Description"
-                disabled={
+
+              disabled={
                   location.protocol === "https:" || connectionInProgress
                 }
                 checked={value}
