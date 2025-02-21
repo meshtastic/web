@@ -24,10 +24,6 @@
       "npm run format"
     ]
   },
-  "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=10.0.0"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meshtastic/web.git"
