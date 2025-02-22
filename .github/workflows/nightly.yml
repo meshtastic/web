@@ -1,0 +1,61 @@
+name: 'Nightly Release'
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # Run every day at 5am UTC
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Build Package
+        run: bun run build
+
+      - name: Package Output
+        run: bun run package
+
+      - name: Archive compressed build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: dist/build.tar
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Buildah Build
+        id: build-container
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: |
+            ./Containerfile
+          image: ${{github.event.repository.full_name}}
+          tags: nightly ${{ github.sha }}
+          oci: true
+          platforms: linux/amd64, linux/arm64
+
+      - name: Push To Registry
+        id: push-to-registry
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-container.outputs.image }}
+          tags: ${{ steps.build-container.outputs.tags }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print image url
+        run: echo "Image pushed to ${{ steps.push-to-registry.outputs.registry-paths }}"
