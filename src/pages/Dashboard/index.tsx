@@ -1,8 +1,8 @@
+import { Heading } from "@app/components/UI/Typography/Heading";
 import { useAppStore } from "@app/core/stores/appStore.ts";
 import { useDeviceStore } from "@app/core/stores/deviceStore.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
-import { H3 } from "@components/UI/Typography/H3.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import {
   BluetoothIcon,
@@ -17,7 +17,6 @@ import { useMemo } from "react";
 export const Dashboard = () => {
   const { setConnectDialogOpen, setSelectedDevice } = useAppStore();
   const { getDevices } = useDeviceStore();
-  const { darkMode } = useAppStore();
 
   const devices = useMemo(() => getDevices(), [getDevices]);
 
@@ -26,7 +25,7 @@ export const Dashboard = () => {
       <div className="flex flex-col gap-3 p-3">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <H3>Connected Devices</H3>
+            <Heading as="h3">Connected Devices</Heading>
             <Subtle>Manage, connect and disconnect devices</Subtle>
           </div>
         </div>
@@ -90,7 +89,7 @@ export const Dashboard = () => {
           ) : (
             <div className="m-auto flex flex-col gap-3 text-center">
               <ListPlusIcon size={48} className="mx-auto text-text-secondary" />
-              <H3>No Devices</H3>
+              <Heading as="h3">No Devices</Heading>
               <Subtle>Connect at least one device to get started</Subtle>
               <Button
                 className="gap-2"
