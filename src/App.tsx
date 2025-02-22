@@ -38,7 +38,7 @@ export const App = (): JSX.Element => {
             <DeviceSelector />
             <div className="flex grow flex-col">
               {device ? (
-                <div className="flex h-screen">
+                <div className="flex h-screen w-full">
                   <DialogManager />
                   <KeyBackupReminder />
                   <CommandPalette />
