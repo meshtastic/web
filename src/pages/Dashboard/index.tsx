@@ -1,8 +1,8 @@
+import { Heading } from "../../components/UI/Typography/Heading.tsx";
 import { useAppStore } from "@app/core/stores/appStore.ts";
 import { useDeviceStore } from "@app/core/stores/deviceStore.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
-import { H3 } from "@components/UI/Typography/H3.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import {
   BluetoothIcon,
@@ -25,7 +25,7 @@ export const Dashboard = () => {
       <div className="flex flex-col gap-3 p-3">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <H3>Connected Devices</H3>
+            <Heading as="h3">Connected Devices</Heading>
             <Subtle>Manage, connect and disconnect devices</Subtle>
           </div>
         </div>
@@ -71,17 +71,17 @@ export const Dashboard = () => {
                               </>
                             )}
                           </div>
-                        </div>
-                        <div className="mt-2 sm:flex sm:justify-between">
-                          <div className="flex gap-2 text-sm text-slate-500">
-                            <UsersIcon
-                              size={20}
-                              className="text-slate-400"
-                              aria-hidden="true"
-                            />
-                            {device.nodes.size === 0
-                              ? 0
-                              : device.nodes.size - 1}
+                          <div className="mt-2 sm:flex sm:justify-between">
+                            <div className="flex gap-2 text-sm text-slate-500">
+                              <UsersIcon
+                                size={20}
+                                className="text-slate-400"
+                                aria-hidden="true"
+                              />
+                              {device.nodes.size === 0
+                                ? 0
+                                : device.nodes.size - 1}
+                            </div>
                           </div>
                         </div>
                       </button>
@@ -96,10 +96,10 @@ export const Dashboard = () => {
                   size={48}
                   className="mx-auto text-text-secondary"
                 />
-                <H3>No Devices</H3>
+                <Heading as="h3">No Devices</Heading>
                 <Subtle>Connect at least one device to get started</Subtle>
                 <Button
-                  className="gap-2 dark:bg-white dark:text-slate-900 dark:hover:text-slate-100"
+                  className="gap-2"
                   variant="default"
                   onClick={() => setConnectDialogOpen(true)}
                 >

@@ -78,6 +78,10 @@
   ::file-selector-button {
     border-color: var(--color-slate-200, currentColor);
   }
+
+  body {
+    font-family: var(--font-sans);
+  }
 }
 
 @layer components {

@@ -146,7 +146,7 @@ export const Message = ({ lastMsgSameUser, message, sender }: MessageProps) => {
           {!lastMsgSameUser
             ? (
               <div className="flex place-items-center gap-2 mb-1">
-                <Avatar text={messageUser?.shortName} />
+                <Avatar text={messageUser?.shortName ?? "UNK"} />
                 <div className="flex flex-col">
                   <span className="font-medium text-slate-900 dark:text-white truncate">
                     {messageUser?.longName}
