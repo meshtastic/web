@@ -5,6 +5,7 @@ export const subscribeAll = (
   device: Device,
   connection: Types.ConnectionType,
 ) => {
+  // Set device as a global variable for debugging
   let myNodeNum = 0;
 
   // onLogEvent
@@ -87,6 +88,7 @@ export const subscribeAll = (
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
+    console.log("Trace Route Packet", traceRoutePacket);
     device.addTraceRoute({
       ...traceRoutePacket,
     });
@@ -102,5 +104,9 @@ export const subscribeAll = (
       snr: meshPacket.rxSnr,
       time: meshPacket.rxTime,
     });
+  });
+
+  connection.events.onNeighborInfoPacket.subscribe((neighborInfo) => {
+    device.setNeighborInfo(neighborInfo.from, neighborInfo.data);
   });
 };
