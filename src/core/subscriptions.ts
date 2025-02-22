@@ -9,6 +9,7 @@ export const subscribeAll = (
   connection: MeshDevice,
   messageStore: MessageStore,
 ) => {
+  // Set device as a global variable for debugging
   let myNodeNum = 0;
 
   connection.events.onDeviceMetadataPacket.subscribe((metadataPacket) => {
@@ -97,6 +98,7 @@ export const subscribeAll = (
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
+    console.log("Trace Route Packet", traceRoutePacket);
     device.addTraceRoute({
       ...traceRoutePacket,
     });
@@ -141,5 +143,9 @@ export const subscribeAll = (
         }
       }
     }
+  });
+  
+  connection.events.onNeighborInfoPacket.subscribe((neighborInfo) => {
+    device.setNeighborInfo(neighborInfo.from, neighborInfo.data);
   });
 };

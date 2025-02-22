@@ -11,15 +11,36 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AttributionControl,
   GeolocateControl,
+  Layer,
   Marker,
   NavigationControl,
   Popup,
   ScaleControl,
+  Source,
   useMap,
 } from "react-map-gl/maplibre";
 import MapGl from "react-map-gl/maplibre";
 import { useNodeFilters } from "@core/hooks/useNodeFilters.ts";
 import { FilterControl } from "@pages/Map/FilterControl.tsx";
+
+// taken from android client these probably should be moved into a shared file
+const SNR_GOOD_THRESHOLD = -7;
+const SNR_FAIR_THRESHOLD = -15;
+const RSSI_GOOD_THRESHOLD = -115;
+const RSSI_FAIR_THRESHOLD = -126;
+const LINE_GOOD_COLOR = "#00ff00";
+const LINE_FAIR_COLOR = "#ffe600";
+const LINE_BAD_COLOR = "#f7931a";
+
+const getSignalColor = (snr: number, rssi?: number) => {
+  if (snr > SNR_GOOD_THRESHOLD && (rssi == null || rssi > RSSI_GOOD_THRESHOLD))
+    return LINE_GOOD_COLOR;
+  if (snr > SNR_FAIR_THRESHOLD && (rssi == null || rssi > RSSI_FAIR_THRESHOLD))
+    return LINE_FAIR_COLOR;
+  return LINE_BAD_COLOR;
+};
+
+const DIRECT_NODE_TIMEOUT = 60 * 20; // 60 seconds * ? minutes
 
 type NodePosition = {
   latitude: number;
@@ -34,8 +55,72 @@ const convertToLatLng = (position: {
   longitude: (position.longitudeI ?? 0) / 1e7,
 });
 
+const generateNeighborLines = (
+  nodes: {
+    node: Protobuf.Mesh.NodeInfo;
+    neighborInfo: Protobuf.Mesh.NeighborInfo;
+  }[],
+) => {
+  const features = [];
+  for (const { node, neighborInfo } of nodes) {
+    const start = convertToLatLng(node.position);
+    if (!neighborInfo) continue;
+    for (const neighbor of neighborInfo.neighbors) {
+      const toNode = nodes.find((n) => n.node.num === neighbor.nodeId)?.node;
+      if (!toNode) continue;
+      const end = convertToLatLng(toNode.position);
+      features.push({
+        type: "Feature",
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [start.longitude, start.latitude],
+            [end.longitude, end.latitude],
+          ],
+        },
+        properties: {
+          color: getSignalColor(neighbor.snr),
+        },
+      });
+    }
+  }
+
+  return {
+    type: "FeatureCollection",
+    features,
+  };
+};
+const generateDirectLines = (nodes: Protobuf.Mesh.NodeInfo[]) => {
+  const features = [];
+  for (const node of nodes) {
+    if (!node.position) continue;
+    if (node.hopsAway > 0) continue;
+    if (Date.now() / 1000 - node.lastHeard > DIRECT_NODE_TIMEOUT) continue;
+    const start = convertToLatLng(node.position);
+    const selfNode = nodes.find((n) => n.isFavorite);
+    const end = convertToLatLng(selfNode.position);
+    features.push({
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [start.longitude, start.latitude],
+          [end.longitude, end.latitude],
+        ],
+      },
+      properties: {
+        color: getSignalColor(node.snr),
+      },
+    });
+  }
+
+  return {
+    type: "FeatureCollection",
+    features,
+  };
+};
 const MapPage = () => {
-  const { getNodes, waypoints } = useDevice();
+  const { getNodes, waypoints, neighborInfo } = useDevice();
   const { theme } = useTheme();
   const { default: map } = useMap();
 
@@ -153,6 +238,19 @@ const MapPage = () => {
     [filteredNodes, handleMarkerClick],
   );
 
+  const neighborLines = useMemo(() => {
+    return generateNeighborLines(
+      validNodes.map((vn) => ({
+        node: vn,
+        neighborInfo: neighborInfo.get(vn.num),
+      })),
+    );
+  }, [validNodes, neighborInfo]);
+
+  const directLines = useMemo(
+    () => generateDirectLines(validNodes),
+    [validNodes],
+  );
   useEffect(() => {
     map?.on("load", () => {
       getMapBounds();
@@ -205,6 +303,26 @@ const MapPage = () => {
             </Marker>
           ))}
           {markers}
+          <Source id="neighbor-lines" type="geojson" data={neighborLines}>
+            <Layer
+              id="neighborLineLayer"
+              type="line"
+              paint={{
+                "line-color": ["get", "color"],
+                "line-width": 2,
+              }}
+            />
+          </Source>
+          <Source id="direct-lines" type="geojson" data={directLines}>
+            <Layer
+              id="directLineLayer"
+              type="line"
+              paint={{
+                "line-color": ["get", "color"],
+                "line-width": 4,
+              }}
+            />
+          </Source>
           {selectedNode
             ? (
               <Popup
