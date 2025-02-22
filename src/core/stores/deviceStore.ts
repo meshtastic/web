@@ -55,6 +55,7 @@ export interface Device {
   activePage: Page;
   activeNode: number;
   waypoints: Protobuf.Mesh.Waypoint[];
+  neighborInfo: Map<number, Protobuf.Mesh.NeighborInfo>;
   // currentMetrics: Protobuf.DeviceMetrics;
   pendingSettingsChanges: boolean;
   messageDraft: string;
@@ -82,6 +83,10 @@ export interface Device {
   setActivePage: (page: Page) => void;
   setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
+  setNeighborInfo: (
+    nodeId: number,
+    neighborInfo: Protobuf.Mesh.NeighborInfo,
+  ) => void;
   addChannel: (channel: Protobuf.Channel.Channel) => void;
   addWaypoint: (waypoint: Protobuf.Mesh.Waypoint) => void;
   addNodeInfo: (nodeInfo: Protobuf.Mesh.NodeInfo) => void;
@@ -161,6 +166,20 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           },
           pendingSettingsChanges: false,
           messageDraft: "",
+          neighborInfo: new Map<number, Protobuf.Mesh.NeighborInfo>(),
+          setNeighborInfo: (
+            nodeId: number,
+            neighborInfo: Protobuf.Mesh.NeighborInfo,
+          ) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.neighborInfo.set(nodeId, neighborInfo);
+                }
+              }),
+            );
+          },
 
           setStatus: (status: Types.DeviceStatusEnum) => {
             set(
