@@ -91,13 +91,26 @@ const generateNeighborLines = (
   };
 };
 const generateDirectLines = (nodes: Protobuf.Mesh.NodeInfo[]) => {
-  const features = [];
+  const selfNode = nodes.find((n) => n.isFavorite);
+  const features: {
+    type: string;
+    geometry: {
+      type: string;
+      coordinates: number[][];
+    };
+    properties: {
+      color: string;
+    };
+  }[] = [];
+
+  if (!selfNode || !selfNode.position)
+    return { type: "FeatureCollection", features };
+
   for (const node of nodes) {
     if (!node.position) continue;
     if (node.hopsAway > 0) continue;
     if (Date.now() / 1000 - node.lastHeard > DIRECT_NODE_TIMEOUT) continue;
     const start = convertToLatLng(node.position);
-    const selfNode = nodes.find((n) => n.isFavorite);
     const end = convertToLatLng(selfNode.position);
     features.push({
       type: "Feature",
