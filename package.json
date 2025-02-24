@@ -11,6 +11,9 @@
     "check:fix": "pnpm check --write src/",
     "format": "biome format --write src/",
     "dev": "vite dev --open",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
     "preview": "vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)",
     "postinstall": "npx simple-git-hooks"
@@ -74,6 +77,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@tailwindcss/postcss": "^4.0.7",
+    "@testing-library/react": "^16.2.0",
     "@types/chrome": "^0.0.304",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.13.4",
@@ -84,6 +88,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "gzipper": "^8.2.0",
+    "happy-dom": "^17.1.4",
     "postcss": "^8.5.1",
     "simple-git-hooks": "^2.11.1",
     "tailwind-merge": "^3.0.1",
@@ -91,6 +96,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tar": "^7.4.3",
     "typescript": "^5.7.3",
-    "vite": "^6.1.1"
+    "vite": "^6.1.1",
+    "vitest": "^3.0.6"
   }
 }
