@@ -63,9 +63,10 @@ const NodesPage = (): JSX.Element => {
 
   const handleLocation = useCallback(
     (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
+      if (location.to.valueOf() !== hardware.myNodeNum) return;
       setSelectedLocation(location);
     },
-    [],
+    [hardware.myNodeNum],
   );
 
   return (
