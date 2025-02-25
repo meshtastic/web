@@ -41,11 +41,11 @@ docker run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshta
 podman run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshtastic/web:nightly
 ```
 
-[!WARNING] 
- - Nightly builds represent the latest development state and may contain breaking changes
- - These builds undergo automated testing but may be less stable than tagged release versions
- - Not recommended for production environments unless you are actively testing new features
- - No guarantee of backward compatibility between nightly builds
+> [!WARNING] 
+> - Nightly builds represent the latest development state and may contain breaking changes
+> - These builds undergo automated testing but may be less stable than tagged release versions
+> - Not recommended for production environments unless you are actively testing new features
+> - No guarantee of backward compatibility between nightly builds
 
 ### Version Information
 Each nightly build is tagged with:
