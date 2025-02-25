@@ -29,11 +29,14 @@ export const Security = () => {
     privateKeyVisible: false,
     adminKeyVisible: false,
     privateKeyBitCount: config.security?.privateKey.length ?? 32,
-    adminKeyBitCount: config.security?.adminKey[0].length ?? 32,
+    adminKeyBitCount: config.security?.adminKey.at(0).length ?? 32,
     publicKey: fromByteArray(config.security?.publicKey ?? new Uint8Array(0)),
-    adminKey: fromByteArray(config.security?.adminKey[0]),
+    adminKey: fromByteArray(
+      config.security?.adminKey.at(0) ?? new Uint8Array(0),
+    ),
     privateKeyDialogOpen: false,
   });
+  console.log(config.security.adminKey);
 
   const validateKey = (
     input: string,
@@ -43,18 +46,19 @@ export const Security = () => {
     try {
       removeError(fieldName);
 
-      if (input === "") {
-        addError(
-          fieldName,
-          `${fieldName === "privateKey" ? "Private" : "Admin"} Key is required`,
-        );
+      if (fieldName === "privateKey" && input === "") {
+        addError(fieldName, "Private Key is required");
+        return;
+      }
+
+      if (fieldName === "adminKey" && input === "") {
         return;
       }
 
       if (input.length % 4 !== 0) {
         addError(
           fieldName,
-          `${fieldName === "privateKey" ? "Private" : "Admin"} Key is required to 256 bit pre-shared key (PSK)`,
+          `${fieldName === "privateKey" ? "Private" : "Admin"} Key is required to be a 256 bit pre-shared key (PSK)`,
         );
         return;
       }
@@ -77,6 +81,7 @@ export const Security = () => {
     if (hasErrors()) {
       return;
     }
+    console.log(toByteArray(state.adminKey));
 
     setWorkingConfig(
       new Protobuf.Config.Config({
@@ -84,7 +89,7 @@ export const Security = () => {
           case: "security",
           value: {
             ...data,
-            adminKey: [toByteArray(state.adminKey)],
+            adminKey: [new Uint8Array(0)],
             privateKey: toByteArray(state.privateKey),
             publicKey: toByteArray(state.publicKey),
           },
