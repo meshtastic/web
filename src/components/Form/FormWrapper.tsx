@@ -22,7 +22,7 @@ export const FieldWrapper = ({
         <Label>{label}</Label>
         <div className="sm:col-span-2">
           <div className="max-w-lg">
-            <p className="text-sm text-gray-500">{description}</p>
+            <p className="text-sm text-slate-500">{description}</p>
             <p hidden={valid ?? true} className="text-sm text-red-500">
               {validationText}
             </p>

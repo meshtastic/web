@@ -76,7 +76,7 @@ const StatusIcon = ({ state, className, ...otherProps }: StatusIconProps) => {
   const isFailed = state === MESSAGE_STATES.FAILED;
   const iconClass = cn(
     className,
-    "text-gray-500 dark:text-gray-400 w-4 h-4 shrink-0",
+    "text-slate-500 dark:text-slate-400 w-4 h-4 shrink-0",
   );
 
   const Icon = STATUS_ICON_MAP[state];
@@ -100,7 +100,7 @@ const getMessageTextStyles = (state: MessageState) => {
     "break-words overflow-hidden",
     isAcknowledged
       ? "text-slate-900 dark:text-white"
-      : "text-slate-900 dark:text-gray-400",
+      : "text-slate-900 dark:text-slate-400",
     isFailed && "text-red-500 dark:text-red-500",
   );
 };
@@ -110,10 +110,10 @@ const TimeDisplay = ({
   className,
 }: { date: Date; className?: string }) => (
   <div className={cn("flex items-center gap-2 shrink-0", className)}>
-    <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+    <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
       {date.toLocaleDateString()}
     </span>
-    <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+    <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
       {date.toLocaleTimeString(undefined, {
         hour: "2-digit",
         minute: "2-digit",
@@ -149,7 +149,7 @@ export const Message = ({ lastMsgSameUser, message, sender }: MessageProps) => {
             <div className="flex place-items-center gap-2 mb-1">
               <Avatar text={messageUser?.shortName} />
               <div className="flex flex-col">
-                <span className="font-medium text-gray-900 dark:text-white truncate">
+                <span className="font-medium text-slate-900 dark:text-white truncate">
                   {messageUser?.longName}
                 </span>
               </div>

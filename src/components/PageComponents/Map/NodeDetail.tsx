@@ -121,7 +121,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
 
       <div className="flex mt-2 text-sm">
         <div className="flex items-center grow">
-          <div className="border-2 border-black rounded-sm px-0.5 mr-1">
+          <div className="border-2 border-slate-900 rounded-sm px-0.5 mr-1">
             {Number.isNaN(node.hopsAway) ? "?" : node.hopsAway}
           </div>
           <div>{node.hopsAway === 1 ? "Hop" : "Hops"}</div>
