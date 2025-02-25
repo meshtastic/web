@@ -41,11 +41,11 @@ docker run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshta
 podman run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshtastic/web:nightly
 ```
 
-[!WARNING] 
- - Nightly builds represent the latest development state and may contain breaking changes
- - These builds undergo automated testing but may be less stable than tagged release versions
- - Not recommended for production environments unless you are actively testing new features
- - No guarantee of backward compatibility between nightly builds
+> [!WARNING] 
+> - Nightly builds represent the latest development state and may contain breaking changes
+> - These builds undergo automated testing but may be less stable than tagged release versions
+> - Not recommended for production environments unless you are actively testing new features
+> - No guarantee of backward compatibility between nightly builds
 
 ### Version Information
 Each nightly build is tagged with:
@@ -54,7 +54,7 @@ Each nightly build is tagged with:
 - A specific SHA for build reproducibility
 
 ### Feedback
-If you encounter any issues with nightly builds, please report them in our [issues tracker](https://github.com/danditomaso/meshtastic-web/issues). Your feedback helps improve the stability of future releases
+If you encounter any issues with nightly builds, please report them in our [issues tracker](https://github.com/meshtastic/web/issues). Your feedback helps improve the stability of future releases
 
 ## Development & Building
 You'll need to download the package manager used with this repo. You can install it by visiting [Bun.sh](https://bun.sh/) and following the installation instructions. 
