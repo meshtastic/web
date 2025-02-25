@@ -54,7 +54,7 @@ Each nightly build is tagged with:
 - A specific SHA for build reproducibility
 
 ### Feedback
-If you encounter any issues with nightly builds, please report them in our [issues tracker](https://github.com/danditomaso/meshtastic-web/issues). Your feedback helps improve the stability of future releases
+If you encounter any issues with nightly builds, please report them in our [issues tracker](https://github.com/meshtastic/web/issues). Your feedback helps improve the stability of future releases
 
 ## Development & Building
 You'll need to download the package manager used with this repo. You can install it by visiting [Bun.sh](https://bun.sh/) and following the installation instructions. 
