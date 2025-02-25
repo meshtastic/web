@@ -108,8 +108,8 @@ const NodesPage = (): JSX.Element => {
                 {node.user?.shortName ??
                   (node.user?.macaddr
                     ? `${base16
-                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                      .toLowerCase()}`
+                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                        .toLowerCase()}`
                     : `${numberToHexUnpadded(node.num).slice(-4)}`)}
               </h1>,
 
@@ -121,8 +121,8 @@ const NodesPage = (): JSX.Element => {
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
-                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                      .toLowerCase()}`
+                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                        .toLowerCase()}`
                     : `!${numberToHexUnpadded(node.num)}`)}
               </h1>,
 
@@ -158,8 +158,9 @@ const NodesPage = (): JSX.Element => {
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
-                    : `${node.hopsAway.toString()} ${node.hopsAway > 1 ? "hops" : "hop"
-                    } away`
+                    : `${node.hopsAway.toString()} ${
+                        node.hopsAway > 1 ? "hops" : "hop"
+                      } away`
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
               </Mono>,
