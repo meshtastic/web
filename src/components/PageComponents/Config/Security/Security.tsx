@@ -28,15 +28,14 @@ export const Security = () => {
     privateKey: fromByteArray(config.security?.privateKey ?? new Uint8Array(0)),
     privateKeyVisible: false,
     adminKeyVisible: false,
-    privateKeyBitCount: config.security?.privateKey.length ?? 32,
-    adminKeyBitCount: config.security?.adminKey.at(0).length ?? 32,
+    privateKeyBitCount: config.security?.privateKey?.length ?? 32,
+    adminKeyBitCount: config.security?.adminKey?.at(0)?.length ?? 32,
     publicKey: fromByteArray(config.security?.publicKey ?? new Uint8Array(0)),
     adminKey: fromByteArray(
-      config.security?.adminKey.at(0) ?? new Uint8Array(0),
+      config.security?.adminKey?.at(0) ?? new Uint8Array(0),
     ),
     privateKeyDialogOpen: false,
   });
-  console.log(config.security.adminKey);
 
   const validateKey = (
     input: string,
@@ -242,7 +241,7 @@ export const Security = () => {
                   ? getErrorMessage("adminKey")
                   : "",
                 inputChange: adminKeyInputChangeEvent,
-                selectChange: () => {},
+                selectChange: () => { },
                 bits: [{ text: "256 bit", value: "32", key: "bit256" }],
                 devicePSKBitCount: state.privateKeyBitCount,
                 hide: !state.adminKeyVisible,
