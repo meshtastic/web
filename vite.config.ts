@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react';
 import { execSync } from 'node:child_process';
 import path from 'path';
@@ -26,5 +26,10 @@ export default defineConfig({
   },
   server: {
     port: 3000
+  },
+  test: {
+    environment: 'happy-dom',
+    globals: true,
+    include: ['**/*.{test,spec}.{ts,tsx}'],
   }
 });
