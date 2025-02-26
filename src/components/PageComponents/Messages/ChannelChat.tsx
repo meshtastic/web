@@ -51,11 +51,11 @@ export const ChannelChat = ({
 
   if (!messages?.length) {
     return (
-      <div className="flex flex-col h-full w-full container mx-auto">
+      <div className="flex flex-col h-full container mx-auto">
         <div className="flex-1 flex items-center justify-center">
           <EmptyState />
         </div>
-        <div className="shrink-0 p-4 w-full dark:bg-gray-900">
+        <div className="shrink-0 p-4 w-full dark:bg-slate-900">
           <MessageInput to={to} channel={channel} maxBytes={200} />
         </div>
       </div>
@@ -63,7 +63,7 @@ export const ChannelChat = ({
   }
 
   return (
-    <div className="flex flex-col h-full w-full container mx-auto">
+    <div className="flex flex-col h-full container mx-auto">
       <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
         <div className="w-full h-full flex flex-col justify-end pl-4 pr-44">
           {messages.map((message, index) => {
@@ -81,7 +81,7 @@ export const ChannelChat = ({
           <div ref={messagesEndRef} className="w-full" />
         </div>
       </div>
-      <div className="shrink-0 mt-2 p-4 w-full dark:bg-gray-900">
+      <div className="shrink-0 mt-2 p-4 w-full dark:bg-slate-900">
         <MessageInput to={to} channel={channel} maxBytes={200} />
       </div>
     </div>

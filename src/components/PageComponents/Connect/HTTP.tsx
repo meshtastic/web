@@ -57,7 +57,7 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
         <Input
           prefix={https ? "https://" : "http://"}
           placeholder="000.000.000.000 / meshtastic.local"
-          className="text-black dark:text-black"
+          className="text-slate-900 dark:text-slate-900"
           disabled={connectionInProgress}
           {...register("ip")}
         />

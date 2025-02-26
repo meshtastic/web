@@ -39,6 +39,7 @@ export const ShutdownDialog = ({
             type="number"
             value={time}
             onChange={(e) => setTime(Number.parseInt(e.target.value))}
+            className="dark:text-slate-900"
             suffix="Minutes"
           />
           <Button

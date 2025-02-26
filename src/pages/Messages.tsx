@@ -62,7 +62,7 @@ export const MessagesPage = () => {
               placeholder="Search nodes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-sm bg-white text-slate-900"
+              className="w-full p-2 border border-slate-300 rounded-sm bg-white text-slate-900"
             />
           </div>
           <div className="flex flex-col gap-4">

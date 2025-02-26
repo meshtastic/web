@@ -16,7 +16,7 @@ export const AccordionTrigger = forwardRef<
   <AccordionPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex justify-between items-center w-full p-4 border-b border-gray-200 dark:border-gray-800 group",
+      "flex justify-between items-center w-full p-4 border-b border-slat-200 dark:border-slat-800 group",
       className,
     )}
     {...props}
@@ -36,7 +36,7 @@ export const AccordionContent = forwardRef<
   <AccordionPrimitive.Content
     ref={ref}
     className={cn(
-      "p-4 border-b border-gray-200 dark:border-gray-800",
+      "p-4 border-b border-slat-200 dark:border-slat-800",
       className,
     )}
     {...props}

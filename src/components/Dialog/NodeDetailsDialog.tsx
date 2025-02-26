@@ -44,12 +44,12 @@ export const NodeDetailsDialog = ({
         <DialogFooter>
           <div className="w-full">
             <DeviceImage
-              className="w-32 h-32 mx-auto rounded-lg border-4 border-gray-200 dark:border-gray-800"
+              className="w-32 h-32 mx-auto rounded-lg border-4 border-slate-200 dark:border-slate-800"
               deviceType={
                 Protobuf.Mesh.HardwareModel[device.user?.hwModel ?? 0]
               }
             />
-            <div className="mt-5 bg-gray-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
+            <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
               <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
                 Details:
               </p>
@@ -78,7 +78,7 @@ export const NodeDetailsDialog = ({
             </div>
 
             {device.position ? (
-              <div className="mt-5 bg-gray-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
+              <div className="mt-5 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
                 <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
                   Position:
                 </p>
@@ -103,7 +103,7 @@ export const NodeDetailsDialog = ({
             ) : null}
 
             {device.deviceMetrics ? (
-              <div className="mt-5 bg-gray-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
+              <div className="mt-5 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
                 <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
                   Device Metrics:
                 </p>
@@ -138,7 +138,7 @@ export const NodeDetailsDialog = ({
             ) : null}
 
             {device ? (
-              <div className="mt-5 w-full max-w-[464px] bg-gray-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
+              <div className="mt-5 w-full max-w-[464px] bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
                 <Accordion className="AccordionRoot" type="single" collapsible>
                   <AccordionItem className="AccordionItem" value="item-1">
                     <AccordionTrigger>
