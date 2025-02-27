@@ -85,6 +85,7 @@
     "@types/node": "^22.13.4",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@types/serviceworker": "^0.0.122",
     "@types/w3c-web-serial": "^1.0.7",
     "@types/web-bluetooth": "^0.0.20",
     "@vitejs/plugin-react": "^4.3.4",
@@ -99,6 +100,7 @@
     "tar": "^7.4.3",
     "typescript": "^5.7.3",
     "vite": "^6.1.1",
+    "vite-plugin-pwa": "^0.21.1",
     "vitest": "^3.0.6"
   }
 }

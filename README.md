@@ -17,6 +17,22 @@ Official [Meshtastic](https://meshtastic.org) web interface, that can be hosted 
 
 ![Alt](https://repobeats.axiom.co/api/embed/e5b062db986cb005d83e81724c00cb2b9cce8e4c.svg "Repobeats analytics image")
 
+## Progress Web App Support (PWA)
+
+Meshtastic Web Client now includes Progressive Web App (PWA) functionality, allowing users to:
+
+- Install the app on desktop and mobile devices
+- Access the interface offline
+- Receive updates automatically
+- Experience faster load times with caching
+
+To install as a PWA:
+
+- On desktop: Look for the install icon in your browser's address bar
+- On mobile: Use "Add to Home Screen" option in your browser menu
+
+PWA functionality works with both the hosted version and self-hosted instances.
+
 ## Self-host
 
 The client can be self hosted using the precompiled container images with an OCI compatible runtime such as [Docker](https://www.docker.com/) or [Podman](https://podman.io/).
