@@ -40,6 +40,9 @@ export default defineConfig({
   server: {
     port: 3000
   },
+  optimizeDeps: {
+    exclude: ['react-scan']
+  },
   test: {
     environment: 'happy-dom',
     globals: true,
