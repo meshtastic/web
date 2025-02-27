@@ -11,7 +11,7 @@
     "check:fix": "pnpm check --write src/",
     "format": "biome format --write src/",
     "dev": "vite dev --open",
-    "dev:debug": "VITE_DEBUG=true vite dev",
+    "dev:scan": "VITE_DEBUG_SCAN=true vite dev",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",

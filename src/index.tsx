@@ -8,7 +8,8 @@ import { createRoot } from "react-dom/client";
 import { App } from "@app/App.tsx";
 
 // run react scan tool in development mode only
-import.meta.env.VITE_DEBUG &&
+// react scan must be the first import and the first line in this file in order to work properly
+import.meta.env.VITE_DEBUG_SCAN &&
   scan({
     enabled: true,
   });
