@@ -7,7 +7,7 @@ import {
 } from "@core/utils/ip.ts";
 import { Protobuf } from "@meshtastic/js";
 
-export const Network = (): JSX.Element => {
+export const Network = () => {
   const { config, setWorkingConfig } = useDevice();
 
   const onSubmit = (data: NetworkValidation) => {
@@ -49,6 +49,8 @@ export const Network = (): JSX.Element => {
         {
           label: "WiFi Config",
           description: "WiFi radio configuration",
+          notes:
+            "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
           fields: [
             {
               type: "toggle",

@@ -17,7 +17,9 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
     setSerialPorts(await navigator?.serial.getPorts());
   }, []);
 
-  navigator?.serial?.addEventListener("connect", () => {
+  navigator?.serial?.addEventListener("connect", (event) => {
+    console.log(event);
+
     updateSerialPortList();
   });
   navigator?.serial?.addEventListener("disconnect", () => {
@@ -39,16 +41,22 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
         concurrentLogOutput: true,
       })
       .catch((e: Error) => console.log(`Unable to Connect: ${e.message}`));
+    console.log(connection);
+
     device.addConnection(connection);
     subscribeAll(device, connection);
 
     closeDialog();
   };
 
+  console.log(serialPorts);
+
   return (
     <div className="flex w-full flex-col gap-2 p-4">
       <div className="flex h-48 flex-col gap-2 overflow-y-auto">
         {serialPorts.map((port, index) => {
+          console.log(port);
+
           const { usbProductId, usbVendorId } = port.getInfo();
           return (
             <Button
@@ -59,9 +67,8 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
                 await onConnect(port);
               }}
             >
-              {`# ${index} - ${usbVendorId ?? "UNK"} - ${
-                usbProductId ?? "UNK"
-              }`}
+              {`# ${index} - ${usbVendorId ?? "UNK"} - ${usbProductId ?? "UNK"
+                }`}
             </Button>
           );
         })}

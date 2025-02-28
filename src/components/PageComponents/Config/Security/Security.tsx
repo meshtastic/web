@@ -241,7 +241,7 @@ export const Security = () => {
                   ? getErrorMessage("adminKey")
                   : "",
                 inputChange: adminKeyInputChangeEvent,
-                selectChange: () => { },
+                selectChange: () => {},
                 bits: [{ text: "256 bit", value: "32", key: "bit256" }],
                 devicePSKBitCount: state.privateKeyBitCount,
                 hide: !state.adminKeyVisible,
