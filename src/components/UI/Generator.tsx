@@ -15,6 +15,7 @@ export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   type: "text" | "password";
   devicePSKBitCount?: number;
   value: string;
+  id: string;
   variant: "default" | "invalid";
   actionButtons: {
     text: string;
@@ -37,6 +38,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
     {
       type,
       devicePSKBitCount,
+      id = "pskInput",
       variant,
       value,
       actionButtons,
@@ -73,7 +75,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
       <>
         <Input
           type={type}
-          id="pskInput"
+          id={id}
           variant={variant}
           value={value}
           onChange={inputChange}

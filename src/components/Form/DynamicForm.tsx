@@ -98,24 +98,27 @@ export function DynamicForm<T extends FieldValues>({
             <Subtle>{fieldGroup.description}</Subtle>
           </div>
 
-          {fieldGroup.fields.map((field) => (
-            <FieldWrapper
-              key={field.label}
-              label={field.label}
-              description={field.description}
-              valid={
-                field.validationText === undefined ||
-                field.validationText === ""
-              }
-              validationText={field.validationText}
-            >
-              <DynamicFormField
-                field={field}
-                control={control}
-                disabled={isDisabled(field.disabledBy, field.disabled)}
-              />
-            </FieldWrapper>
-          ))}
+          {fieldGroup.fields.map((field) => {
+            return (
+              <FieldWrapper
+                key={field.label}
+                label={field.label}
+                fieldName={field.name}
+                description={field.description}
+                valid={
+                  field.validationText === undefined ||
+                  field.validationText === ""
+                }
+                validationText={field.validationText}
+              >
+                <DynamicFormField
+                  field={field}
+                  control={control}
+                  disabled={isDisabled(field.disabledBy, field.disabled)}
+                />
+              </FieldWrapper>
+            );
+          })}
         </div>
       ))}
       {hasSubmitButton && <Button type="submit">Submit</Button>}

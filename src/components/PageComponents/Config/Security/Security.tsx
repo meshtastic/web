@@ -164,6 +164,7 @@ export const Security = () => {
             fields: [
               {
                 type: "passwordGenerator",
+                id: "pskInput",
                 name: "privateKey",
                 label: "Private Key",
                 description: "Used to create a shared key with a remote device",
@@ -234,6 +235,7 @@ export const Security = () => {
               {
                 type: "passwordGenerator",
                 name: "adminKey",
+                id: "adminKeyInput",
                 label: "Admin Key",
                 description:
                   "The public key authorized to send admin messages to this node",
