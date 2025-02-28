@@ -34,7 +34,7 @@ export const Dashboard = () => {
 
         <div className="flex h-[450px] rounded-md border border-dashed border-slate-200 p-3 dark:border-slate-700">
           {devices.length ? (
-            <ul className="grow divide-y divide-gray-200">
+            <ul className="grow divide-y divide-slate-200">
               {devices.map((device) => {
                 return (
                   <li key={device.id}>
@@ -72,10 +72,10 @@ export const Dashboard = () => {
                         </div>
                       </div>
                       <div className="mt-2 sm:flex sm:justify-between">
-                        <div className="flex gap-2 text-sm text-gray-500">
+                        <div className="flex gap-2 text-sm text-slate-500">
                           <UsersIcon
                             size={20}
-                            className="text-gray-400"
+                            className="text-slate-400"
                             aria-hidden="true"
                           />
                           {device.nodes.size === 0 ? 0 : device.nodes.size - 1}
@@ -92,7 +92,7 @@ export const Dashboard = () => {
               <Heading as="h3">No Devices</Heading>
               <Subtle>Connect at least one device to get started</Subtle>
               <Button
-                className="gap-2"
+                className="gap-2 dark:bg-white dark:text-slate-900 dark:hover:text-slate-100"
                 variant={"default"}
                 onClick={() => setConnectDialogOpen(true)}
               >

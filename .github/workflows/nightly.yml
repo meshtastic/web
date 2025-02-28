@@ -1,8 +1,8 @@
-name: 'Release'
+name: 'Nightly Release'
 
 on:
-  release:
-    types: [released]
+  schedule:
+    - cron: "0 5 * * *" # Run every day at 5am UTC
 
 permissions:
   contents: write
@@ -46,7 +46,7 @@ jobs:
           containerfiles: |
             ./Containerfile
           image: ${{github.event.repository.full_name}}
-          tags: latest ${{ github.sha }}
+          tags: nightly ${{ github.sha }}
           oci: true
           platforms: linux/amd64, linux/arm64
 

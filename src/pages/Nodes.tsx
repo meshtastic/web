@@ -63,9 +63,10 @@ const NodesPage = (): JSX.Element => {
 
   const handleLocation = useCallback(
     (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
+      if (location.to.valueOf() !== hardware.myNodeNum) return;
       setSelectedLocation(location);
     },
-    [],
+    [hardware.myNodeNum],
   );
 
   return (
@@ -78,7 +79,7 @@ const NodesPage = (): JSX.Element => {
             placeholder="Search nodes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-sm bg-white text-slate-900"
+            className="w-full p-2 border border-slate-300 rounded-sm bg-white text-slate-900"
           />
         </div>
         <div className="overflow-y-auto h-full">

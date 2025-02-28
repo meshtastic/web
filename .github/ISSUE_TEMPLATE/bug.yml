@@ -6,8 +6,20 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
-
+        # Bug Report
+        Thanks for taking the time to fill out this bug report! The more information you provide, the faster we can diagnose and fix the issue.
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Before submitting
+      description: Please confirm you've completed the following steps
+      options:
+        - label: I have searched existing issues to make sure this bug hasn't already been reported
+          required: true
+        - label: I have updated to the latest version of the software to verify the issue still exists
+          required: true
+        - label: I have cleared cache/cookies/storage or tried in a private/incognito window (if applicable)
+          required: false
   - type: dropdown
     id: hardware
     attributes:
@@ -41,7 +53,6 @@ body:
         - Other
     validations:
       required: true
-
   - type: dropdown
     id: category
     attributes:
@@ -54,7 +65,6 @@ body:
         - Serial
     validations:
       required: true
-
   - type: dropdown
     id: local
     attributes:
@@ -66,7 +76,6 @@ body:
         - https://client.meshtastic.org
     validations:
       required: true
-
   - type: input
     id: version
     attributes:
@@ -75,15 +84,50 @@ body:
       placeholder: x.x.x.yyyyyyy
     validations:
       required: true
-
-  - type: textarea
-    id: body
+  - type: input
+    id: os
     attributes:
-      label: Description
-      description: Please provide details on what steps you performed for this to happen.
+      label: Operating System
+      description: What OS are you running? Include version if possible.
+      placeholder: e.g., Windows 11, macOS 13.1, Android 13, iOS 16.2
     validations:
       required: true
-
+  - type: input
+    id: browser
+    attributes:
+      label: Browser 
+      description: What browser are you using? Include version if possible.
+      placeholder: e.g., Chrome 108, Firefox 107, Safari 16.2
+    validations:
+      required: false
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Describe what you expected to occur...
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe what occurred instead...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Provide clear steps to reproduce the issue
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
   - type: textarea
     id: logs
     attributes:
@@ -92,3 +136,21 @@ body:
       render: Shell
     validations:
       required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+    validations:
+      required: false
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here.
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve our project by reporting this bug!

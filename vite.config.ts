@@ -1,5 +1,6 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 import { execSync } from 'node:child_process';
 import path from 'path';
 
@@ -11,7 +12,19 @@ try {
 }
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(),
+  VitePWA({
+    registerType: 'autoUpdate',
+    strategies: 'generateSW',
+    devOptions: {
+      enabled: true
+    },
+    workbox: {
+      cleanupOutdatedCaches: true,
+      sourcemap: true
+    }
+  })
+  ],
   define: {
     'process.env.COMMIT_HASH': JSON.stringify(hash),
   },
@@ -26,5 +39,13 @@ export default defineConfig({
   },
   server: {
     port: 3000
+  },
+  optimizeDeps: {
+    exclude: ['react-scan']
+  },
+  test: {
+    environment: 'happy-dom',
+    globals: true,
+    include: ['**/*.{test,spec}.{ts,tsx}'],
   }
 });

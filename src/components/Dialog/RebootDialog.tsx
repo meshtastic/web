@@ -36,6 +36,7 @@ export const RebootDialog = ({
         <div className="flex gap-2 p-4">
           <Input
             type="number"
+            className="dark:text-slate-900"
             value={time}
             onChange={(e) => setTime(Number.parseInt(e.target.value))}
             action={{

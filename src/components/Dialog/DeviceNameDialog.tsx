@@ -26,7 +26,7 @@ export interface DeviceNameDialogProps {
 export const DeviceNameDialog = ({
   open,
   onOpenChange,
-}: DeviceNameDialogProps): JSX.Element => {
+}: DeviceNameDialogProps) => {
   const { hardware, nodes, connection } = useDevice();
 
   const myNode = nodes.get(hardware.myNodeNum);
@@ -60,9 +60,13 @@ export const DeviceNameDialog = ({
         <div className="gap-4">
           <form onSubmit={onSubmit}>
             <Label>Long Name</Label>
-            <Input {...register("longName")} />
+            <Input className="dark:text-slte-900" {...register("longName")} />
             <Label>Short Name</Label>
-            <Input maxLength={4} {...register("shortName")} />
+            <Input
+              className="dark:text-slte-900"
+              maxLength={4}
+              {...register("shortName")}
+            />
           </form>
         </div>
         <DialogFooter>
