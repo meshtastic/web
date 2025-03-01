@@ -1,14 +1,15 @@
 import type { AudioValidation } from "@app/validation/moduleConfig/audio.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 
 export const Audio = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
 
   const onSubmit = (data: AudioValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig.ModuleConfig({
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "audio",
           value: data,

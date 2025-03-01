@@ -4,7 +4,7 @@ import {
 } from "@app/core/stores/deviceStore.ts";
 import { Message } from "@components/PageComponents/Messages/Message.tsx";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
-import type { Types } from "@meshtastic/js";
+import type { Types } from "@meshtastic/core";
 import { InboxIcon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 import type { JSX } from "react";

@@ -5,8 +5,8 @@ import { formatQuantity } from "@app/core/utils/string";
 import { Avatar } from "@components/UI/Avatar";
 import { Mono } from "@components/generic/Mono.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import { Protobuf } from "@meshtastic/js";
-import type { Protobuf as ProtobufType } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
+import type { Protobuf as ProtobufType } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import {
   BatteryChargingIcon,

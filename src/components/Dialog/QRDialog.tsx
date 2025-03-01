@@ -1,3 +1,4 @@
+import { create, toBinary } from "@bufbuild/protobuf";
 import { Checkbox } from "@components/UI/Checkbox.tsx";
 import {
   Dialog,
@@ -9,7 +10,7 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
-import { Protobuf, type Types } from "@meshtastic/js";
+import { Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
 import { ClipboardIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -39,13 +40,16 @@ export const QRDialog = ({
       .filter((ch) => selectedChannels.includes(ch.index))
       .map((channel) => channel.settings)
       .filter((ch): ch is Protobuf.Channel.ChannelSettings => !!ch);
-    const encoded = new Protobuf.AppOnly.ChannelSet(
-      new Protobuf.AppOnly.ChannelSet({
+    const encoded = create(
+      Protobuf.AppOnly.ChannelSetSchema,
+      create(Protobuf.AppOnly.ChannelSetSchema, {
         loraConfig,
         settings: channelsToEncode,
       }),
     );
-    const base64 = fromByteArray(encoded.toBinary())
+    const base64 = fromByteArray(
+      toBinary(Protobuf.AppOnly.ChannelSetSchema, encoded),
+    )
       .replace(/=/g, "")
       .replace(/\+/g, "-")
       .replace(/\//g, "_");

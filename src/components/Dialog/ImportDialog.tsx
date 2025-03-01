@@ -1,3 +1,4 @@
+import { create, fromBinary } from "@bufbuild/protobuf";
 import { Button } from "@components/UI/Button.tsx";
 import { Checkbox } from "@components/UI/Checkbox.tsx";
 import {
@@ -12,7 +13,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { toByteArray } from "base64-js";
 import { type JSX, useEffect, useState } from "react";
 
@@ -55,7 +56,10 @@ export const ImportDialog = ({
         .replace(/-/g, "+")
         .replace(/_/g, "/");
       setChannelSet(
-        Protobuf.AppOnly.ChannelSet.fromBinary(toByteArray(paddedString)),
+        fromBinary(
+          Protobuf.AppOnly.ChannelSetSchema,
+          toByteArray(paddedString),
+        ),
       );
       setValidUrl(true);
     } catch (error) {
@@ -67,7 +71,7 @@ export const ImportDialog = ({
   const apply = () => {
     channelSet?.settings.map((ch: unknown, index: number) => {
       connection?.setChannel(
-        new Protobuf.Channel.Channel({
+        create(Protobuf.Channel.ChannelSchema, {
           index,
           role:
             index === 0
@@ -80,7 +84,7 @@ export const ImportDialog = ({
 
     if (channelSet?.loraConfig) {
       connection?.setConfig(
-        new Protobuf.Config.Config({
+        create(Protobuf.Config.ConfigSchema, {
           payloadVariant: {
             case: "lora",
             value: channelSet.loraConfig,

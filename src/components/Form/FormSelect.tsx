@@ -50,7 +50,7 @@ export function SelectInput<T extends FieldValues>({
             {...remainingProperties}
             {...rest}
           >
-            <SelectTrigger>
+            <SelectTrigger id={field.name}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

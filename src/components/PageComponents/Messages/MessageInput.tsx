@@ -2,7 +2,7 @@ import { debounce } from "@app/core/utils/debounce";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import type { Types } from "@meshtastic/js";
+import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
 import {
   type JSX,

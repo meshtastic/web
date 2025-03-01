@@ -4,7 +4,7 @@ import { useTheme } from "@app/core/hooks/useTheme";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import type { Protobuf } from "@meshtastic/js";
+import type { Protobuf } from "@meshtastic/core";
 import { bbox, lineString } from "@turf/turf";
 import { current } from "immer";
 import { MapPinIcon } from "lucide-react";
@@ -17,7 +17,7 @@ import {
   Popup,
   ScaleControl,
   useMap,
-} from "react-map-gl";
+} from "react-map-gl/maplibre";
 import MapGl from "react-map-gl/maplibre";
 
 type NodePosition = {

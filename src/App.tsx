@@ -13,8 +13,9 @@ import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
 import type { JSX } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { MapProvider } from "react-map-gl";
 import { ErrorPage } from "./components/UI/ErrorPage";
+import { MapProvider } from "react-map-gl/maplibre";
+
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();

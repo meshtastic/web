@@ -1,22 +1,23 @@
 import { useDevice } from "@app/core/stores/deviceStore.ts";
 import type { MqttValidation } from "@app/validation/moduleConfig/mqtt.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 
 export const MQTT = (): JSX.Element => {
   const { config, moduleConfig, setWorkingModuleConfig } = useDevice();
 
   const onSubmit = (data: MqttValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig.ModuleConfig({
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "mqtt",
           value: {
             ...data,
-            mapReportSettings:
-              new Protobuf.ModuleConfig.ModuleConfig_MapReportSettings(
-                data.mapReportSettings,
-              ),
+            mapReportSettings: create(
+              Protobuf.ModuleConfig.ModuleConfig_MapReportSettingsSchema,
+              data.mapReportSettings,
+            ),
           },
         },
       }),

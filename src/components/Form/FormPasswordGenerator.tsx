@@ -11,6 +11,7 @@ import { Controller, type FieldValues } from "react-hook-form";
 
 export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
   type: "passwordGenerator";
+  id: string;
   hide?: boolean;
   bits?: { text: string; value: string; key: string }[];
   devicePSKBitCount: number;
@@ -41,6 +42,7 @@ export function PasswordGenerator<T extends FieldValues>({
       render={({ field: { value, ...rest } }) => (
         <Generator
           type={field.hide && !passwordShown ? "password" : "text"}
+          id={field.id}
           action={
             field.hide
               ? {

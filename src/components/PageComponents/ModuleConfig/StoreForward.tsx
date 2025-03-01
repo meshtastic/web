@@ -1,14 +1,15 @@
 import type { StoreForwardValidation } from "@app/validation/moduleConfig/storeForward.ts";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 
 export const StoreForward = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
 
   const onSubmit = (data: StoreForwardValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig.ModuleConfig({
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "storeForward",
           value: data,
