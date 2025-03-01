@@ -6,7 +6,7 @@ import type { PositionValidation } from "@app/validation/config/position.tsx";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";
 
 export const Position = () => {

@@ -5,7 +5,9 @@
       "name": "meshtastic-web",
       "dependencies": {
         "@bufbuild/protobuf": "^2.2.3",
+        "@meshtastic/core": "npm:@jsr/meshtastic__core@2.6.0-0",
         "@meshtastic/js": "npm:@jsr/meshtastic__js@2.6.0-0",
+        "@meshtastic/transport-web-serial": "npm:@jsr/meshtastic__transport-web-serial",
         "@noble/curves": "^1.8.1",
         "@radix-ui/react-accordion": "^1.2.3",
         "@radix-ui/react-checkbox": "^1.1.4",
@@ -359,6 +361,8 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.25", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ=="],
 
+    "@jsr/meshtastic__core": ["@jsr/meshtastic__core@2.6.0-0", "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.0-0.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3", "@jsr/meshtastic__protobufs": "^2.6.0", "crc": "^4.3.2", "ste-simple-events": "^3.0.11", "tslog": "^4.9.3" } }, "sha512-Ks71sRagbBipotznULpsJZ1EMcQIqCEJQx6mf628dmCNVf2YECi2zi/i/5zErp1hGPgfbDvCz9oPogvsd/7fMA=="],
+
     "@jsr/meshtastic__protobufs": ["@jsr/meshtastic__protobufs@2.6.0", "https://npm.jsr.io/~/11/@jsr/meshtastic__protobufs/2.6.0.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3" } }, "sha512-CGlgBdzAuQCZuGPrnzP8zU+EcLlmyYeeMbqFHuJ834cYfArWXDjDh1UYaPo2rI03LTjqa3MeWpfqDlzBR8kIMg=="],
 
     "@mapbox/geojson-rewind": ["@mapbox/geojson-rewind@0.5.2", "", { "dependencies": { "get-stream": "^6.0.1", "minimist": "^1.2.6" }, "bin": { "geojson-rewind": "geojson-rewind" } }, "sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA=="],
@@ -379,7 +383,11 @@
 
     "@maplibre/maplibre-gl-style-spec": ["@maplibre/maplibre-gl-style-spec@23.1.0", "", { "dependencies": { "@mapbox/jsonlint-lines-primitives": "~2.0.2", "@mapbox/unitbezier": "^0.0.1", "json-stringify-pretty-compact": "^4.0.0", "minimist": "^1.2.8", "quickselect": "^3.0.0", "rw": "^1.3.3", "tinyqueue": "^3.0.0" }, "bin": { "gl-style-migrate": "dist/gl-style-migrate.mjs", "gl-style-validate": "dist/gl-style-validate.mjs", "gl-style-format": "dist/gl-style-format.mjs" } }, "sha512-R6/ihEuC5KRexmKIYkWqUv84Gm+/QwsOUgHyt1yy2XqCdGdLvlBWVWIIeTZWN4NGdwmY6xDzdSGU2R9oBLNg2w=="],
 
+    "@meshtastic/core": ["@jsr/meshtastic__core@2.6.0-0", "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.0-0.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3", "@jsr/meshtastic__protobufs": "^2.6.0", "crc": "^4.3.2", "ste-simple-events": "^3.0.11", "tslog": "^4.9.3" } }, "sha512-Ks71sRagbBipotznULpsJZ1EMcQIqCEJQx6mf628dmCNVf2YECi2zi/i/5zErp1hGPgfbDvCz9oPogvsd/7fMA=="],
+
     "@meshtastic/js": ["@jsr/meshtastic__js@2.6.0-0", "https://npm.jsr.io/~/11/@jsr/meshtastic__js/2.6.0-0.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3", "@jsr/meshtastic__protobufs": "^2.6.0", "crc": "^4.3.2", "ste-simple-events": "^3.0.11", "tslog": "^4.9.3" } }, "sha512-+xpZpxK6oUIVOuEs7C+LyxRr2druvc7UNNNTK9Rl8ioXj63Jz1uQXlYe2Gj0xjnRAiSQLR7QVaPef21BR/YTxA=="],
+
+    "@meshtastic/transport-web-serial": ["@jsr/meshtastic__transport-web-serial@0.2.0", "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-web-serial/0.2.0.tgz", { "dependencies": { "@jsr/meshtastic__core": "^2.6.0-0" } }, "sha512-mP/nxOj0syABh3FkG5iIolWhUMiFh/qtJtvqihxLkaRoxdabUyW62mOtfhCMBEjxgVnKg4Gy7GkaXfC/eFy19Q=="],
 
     "@noble/curves": ["@noble/curves@1.8.1", "", { "dependencies": { "@noble/hashes": "1.7.1" } }, "sha512-warwspo+UYUPep0Q+vtdVB4Ugn8GGQj8iyB3gnRWsztmUHTI3S1nhdiWNsPUGL0vud7JlRRk1XEu7Lq1KGTnMQ=="],
 

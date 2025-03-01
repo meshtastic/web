@@ -5,7 +5,8 @@ import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
-import { SerialConnection } from "@meshtastic/js";
+import { MeshDevice } from "@meshtastic/core";
+import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { useCallback, useEffect, useState } from "react";
 
 export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
@@ -31,14 +32,9 @@ export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
     const id = randId();
     const device = addDevice(id);
     setSelectedDevice(id);
-    const connection = new SerialConnection(id);
-    await connection
-      .connect({
-        port,
-        baudRate: undefined,
-        concurrentLogOutput: true,
-      })
-      .catch((e: Error) => console.log(`Unable to Connect: ${e.message}`));
+    const transport = await TransportWebSerial.createFromPort(port);
+    const connection = new MeshDevice(transport, id);
+    connection.configure();
     device.addConnection(connection);
     subscribeAll(device, connection);
 

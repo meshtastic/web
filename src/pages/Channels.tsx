@@ -8,8 +8,8 @@ import { Channel } from "@components/PageComponents/Channel.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Types } from "@meshtastic/js";
-import type { Protobuf } from "@meshtastic/js";
+import { Types } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/core";
 import { ImportIcon, QrCodeIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -17,8 +17,8 @@ export const getChannelName = (channel: Protobuf.Channel.Channel) =>
   channel.settings?.name.length
     ? channel.settings?.name
     : channel.index === 0
-      ? "Primary"
-      : `Ch ${channel.index}`;
+    ? "Primary"
+    : `Ch ${channel.index}`;
 
 const ChannelsPage = () => {
   const { channels, setDialogOpen } = useDevice();

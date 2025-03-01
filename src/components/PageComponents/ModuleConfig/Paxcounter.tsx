@@ -2,7 +2,7 @@ import type { PaxcounterValidation } from "@app/validation/moduleConfig/paxcount
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 
 export const Paxcounter = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();

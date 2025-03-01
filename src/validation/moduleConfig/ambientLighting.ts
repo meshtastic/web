@@ -1,14 +1,12 @@
 import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/js";
+import type { Protobuf } from "@meshtastic/core";
 import { IsBoolean, IsInt } from "class-validator";
 
-export class AmbientLightingValidation
-  implements
-    Omit<
-      Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig,
-      keyof Message
-    >
-{
+export class AmbientLightingValidation implements
+  Omit<
+    Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig,
+    keyof Message
+  > {
   @IsBoolean()
   ledState: boolean;
 

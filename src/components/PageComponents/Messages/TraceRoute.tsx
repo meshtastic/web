@@ -1,5 +1,5 @@
 import { useDevice } from "@app/core/stores/deviceStore.ts";
-import type { Protobuf } from "@meshtastic/js";
+import type { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import type { JSX } from "react";
 
@@ -38,23 +38,25 @@ export const TraceRoute = ({
         ))}
         {from?.user?.longName}
       </span>
-      {routeBack ? (
-        <span className="ml-4 border-l-2 border-l-background-primary pl-2 text-text-primary">
-          <p className="font-semibold">Route back:</p>
-          <p>{from?.user?.longName}</p>
-          <p>↓ {snrBack?.[0] ? snrBack[0] : "??"}dB</p>
-          {routeBack.map((hop, i) => (
-            <span key={nodes.get(hop)?.num}>
-              <p>
-                {nodes.get(hop)?.user?.longName ??
-                  `!${numberToHexUnpadded(hop)}`}
-              </p>
-              <p>↓ {snrBack?.[i + 1] ? snrBack[i + 1] : "??"}dB</p>
-            </span>
-          ))}
-          {to?.user?.longName}
-        </span>
-      ) : null}
+      {routeBack
+        ? (
+          <span className="ml-4 border-l-2 border-l-background-primary pl-2 text-text-primary">
+            <p className="font-semibold">Route back:</p>
+            <p>{from?.user?.longName}</p>
+            <p>↓ {snrBack?.[0] ? snrBack[0] : "??"}dB</p>
+            {routeBack.map((hop, i) => (
+              <span key={nodes.get(hop)?.num}>
+                <p>
+                  {nodes.get(hop)?.user?.longName ??
+                    `!${numberToHexUnpadded(hop)}`}
+                </p>
+                <p>↓ {snrBack?.[i + 1] ? snrBack[i + 1] : "??"}dB</p>
+              </span>
+            ))}
+            {to?.user?.longName}
+          </span>
+        )
+        : null}
     </div>
   );
 };

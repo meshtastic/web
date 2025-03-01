@@ -2,7 +2,7 @@ import type { CannedMessageValidation } from "@app/validation/moduleConfig/canne
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 
 export const CannedMessage = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();

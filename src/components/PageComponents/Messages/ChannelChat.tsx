@@ -4,7 +4,7 @@ import {
 } from "@app/core/stores/deviceStore.ts";
 import { Message } from "@components/PageComponents/Messages/Message.tsx";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
-import type { Types } from "@meshtastic/js";
+import type { Types } from "@meshtastic/core";
 import { InboxIcon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 import type { JSX } from "react";
@@ -34,8 +34,7 @@ export const ChannelChat = ({
   const scrollToBottom = useCallback(() => {
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
-      const isNearBottom =
-        scrollContainer.scrollHeight -
+      const isNearBottom = scrollContainer.scrollHeight -
           scrollContainer.scrollTop -
           scrollContainer.clientHeight <
         100;
@@ -72,9 +71,8 @@ export const ChannelChat = ({
                 key={message.id}
                 message={message}
                 sender={nodes.get(message.from)}
-                lastMsgSameUser={
-                  index > 0 && messages[index - 1].from === message.from
-                }
+                lastMsgSameUser={index > 0 &&
+                  messages[index - 1].from === message.from}
               />
             );
           })}

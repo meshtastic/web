@@ -2,7 +2,7 @@ import type { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 
 export const RangeTest = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();

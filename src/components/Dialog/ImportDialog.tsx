@@ -13,7 +13,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { toByteArray } from "base64-js";
 import { type JSX, useEffect, useState } from "react";
 
@@ -73,10 +73,9 @@ export const ImportDialog = ({
       connection?.setChannel(
         create(Protobuf.Channel.ChannelSchema, {
           index,
-          role:
-            index === 0
-              ? Protobuf.Channel.Channel_Role.PRIMARY
-              : Protobuf.Channel.Channel_Role.SECONDARY,
+          role: index === 0
+            ? Protobuf.Channel.Channel_Role.PRIMARY
+            : Protobuf.Channel.Channel_Role.SECONDARY,
           settings: ch,
         }),
       );
@@ -123,21 +122,25 @@ export const ImportDialog = ({
                     checked={channelSet?.loraConfig?.usePreset ?? true}
                   />
                 </div>
-                {/* <Select
+                {
+                  /* <Select
                   label="Modem Preset"
                   disabled
                   value={channelSet?.loraConfig?.modemPreset}
                 >
                   {renderOptions(Protobuf.Config_LoRaConfig_ModemPreset)}
-                </Select> */}
+                </Select> */
+                }
               </div>
-              {/* <Select
+              {
+                /* <Select
                 label="Region"
                 disabled
                 value={channelSet?.loraConfig?.region}
               >
                 {renderOptions(Protobuf.Config_LoRaConfig_RegionCode)}
-              </Select> */}
+              </Select> */
+              }
 
               <span className="text-md block font-medium text-text-primary">
                 Channels:

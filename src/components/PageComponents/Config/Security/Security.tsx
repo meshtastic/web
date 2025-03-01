@@ -8,7 +8,7 @@ import {
 import type { SecurityValidation } from "@app/validation/config/security.tsx";
 import { create } from "@bufbuild/protobuf";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Eye, EyeOff } from "lucide-react";
 import { useReducer } from "react";

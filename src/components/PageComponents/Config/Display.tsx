@@ -2,7 +2,7 @@ import type { DisplayValidation } from "@app/validation/config/display.tsx";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 
 export const Display = (): JSX.Element => {
   const { config, setWorkingConfig } = useDevice();

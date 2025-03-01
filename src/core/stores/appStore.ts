@@ -1,4 +1,4 @@
-import { Types } from "@meshtastic/js";
+import { Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create } from "zustand";
 

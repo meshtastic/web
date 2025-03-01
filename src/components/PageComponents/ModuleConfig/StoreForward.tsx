@@ -2,7 +2,7 @@ import type { StoreForwardValidation } from "@app/validation/moduleConfig/storeF
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 
 export const StoreForward = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();

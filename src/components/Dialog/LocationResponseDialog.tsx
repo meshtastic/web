@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog";
-import type { Protobuf, Types } from "@meshtastic/js";
+import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import type { JSX } from "react";
 
@@ -24,11 +24,9 @@ export const LocationResponseDialog = ({
   const { nodes } = useDevice();
 
   const from = nodes.get(location?.from ?? 0);
-  const longName =
-    from?.user?.longName ??
+  const longName = from?.user?.longName ??
     (from ? `!${numberToHexUnpadded(from?.num)}` : "Unknown");
-  const shortName =
-    from?.user?.shortName ??
+  const shortName = from?.user?.shortName ??
     (from ? `${numberToHexUnpadded(from?.num).substring(0, 4)}` : "UNK");
 
   return (
@@ -44,7 +42,9 @@ export const LocationResponseDialog = ({
                 Coordinates:{" "}
                 <a
                   className="text-blue-500 dark:text-blue-400"
-                  href={`https://www.openstreetmap.org/?mlat=${location?.data.latitudeI / 1e7}&mlon=${location?.data.longitudeI / 1e7}&layers=N`}
+                  href={`https://www.openstreetmap.org/?mlat=${
+                    location?.data.latitudeI / 1e7
+                  }&mlon=${location?.data.longitudeI / 1e7}&layers=N`}
                   target="_blank"
                   rel="noreferrer"
                 >

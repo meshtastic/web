@@ -1,11 +1,10 @@
 import type { Message } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
 export class SerialValidation
   implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_SerialConfig, keyof Message>
-{
+    Omit<Protobuf.ModuleConfig.ModuleConfig_SerialConfig, keyof Message> {
   @IsBoolean()
   enabled: boolean;
 

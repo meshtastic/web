@@ -10,7 +10,7 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
-import { Protobuf, type Types } from "@meshtastic/js";
+import { Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
 import { ClipboardIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -77,8 +77,8 @@ export const QRDialog = ({
                     {channel.settings?.name.length
                       ? channel.settings.name
                       : channel.role === Protobuf.Channel.Channel_Role.PRIMARY
-                        ? "Primary"
-                        : `Channel: ${channel.index}`}
+                      ? "Primary"
+                      : `Channel: ${channel.index}`}
                   </Label>
                   <Checkbox
                     key={channel.index}
@@ -86,7 +86,9 @@ export const QRDialog = ({
                     onCheckedChange={() => {
                       if (selectedChannels.includes(channel.index)) {
                         setSelectedChannels(
-                          selectedChannels.filter((c) => c !== channel.index),
+                          selectedChannels.filter((c) =>
+                            c !== channel.index
+                          ),
                         );
                       } else {
                         setSelectedChannels([

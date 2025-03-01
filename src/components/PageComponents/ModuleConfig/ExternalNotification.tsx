@@ -2,7 +2,7 @@ import type { ExternalNotificationValidation } from "@app/validation/moduleConfi
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 
 export const ExternalNotification = (): JSX.Element => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
