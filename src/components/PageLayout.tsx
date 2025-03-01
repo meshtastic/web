@@ -1,5 +1,7 @@
 import { cn } from "@app/core/utils/cn.ts";
 import { AlignLeftIcon, type LucideIcon } from "lucide-react";
+import { ErrorBoundary } from "react-error-boundary";
+import { ErrorPage } from "./UI/ErrorPage";
 import Footer from "./UI/Footer";
 import { Spinner } from "./UI/Spinner";
 
@@ -23,7 +25,7 @@ export const PageLayout = ({
   children,
 }: PageLayoutProps) => {
   return (
-    <>
+    <ErrorBoundary FallbackComponent={ErrorPage}>
       <div className="relative flex h-full w-full flex-col">
         <div className="flex h-14 shrink-0 border-b-[0.5px]  border-slate-300 dark:border-slate-700 md:h-16 md:px-4">
           <button
@@ -68,6 +70,6 @@ export const PageLayout = ({
           <Footer />
         </div>
       </div>
-    </>
+    </ErrorBoundary>
   );
 };

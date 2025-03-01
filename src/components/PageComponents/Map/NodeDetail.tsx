@@ -1,5 +1,5 @@
 import { Separator } from "@app/components/UI/Seperator";
-import { H5 } from "@app/components/UI/Typography/H5.tsx";
+import { Heading } from "@app/components/UI/Typography/Heading";
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
 import { formatQuantity } from "@app/core/utils/string";
 import { Avatar } from "@components/UI/Avatar";
@@ -62,7 +62,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         </div>
 
         <div>
-          <H5>{name}</H5>
+          <Heading as="h5">{name}</Heading>
 
           {hardwareType !== "UNSET" && <Subtle>{hardwareType}</Subtle>}
 

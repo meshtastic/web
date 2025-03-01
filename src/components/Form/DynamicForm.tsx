@@ -4,7 +4,6 @@ import {
 } from "@components/Form/DynamicFormField.tsx";
 import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { Button } from "@components/UI/Button.tsx";
-import { H4 } from "@components/UI/Typography/H4.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import {
   type Control,
@@ -14,6 +13,7 @@ import {
   type SubmitHandler,
   useForm,
 } from "react-hook-form";
+import { Heading } from "../UI/Typography/Heading";
 
 interface DisabledBy<T> {
   fieldName: Path<T>;
@@ -94,7 +94,9 @@ export function DynamicForm<T extends FieldValues>({
       {fieldGroups.map((fieldGroup) => (
         <div key={fieldGroup.label} className="space-y-8 sm:space-y-5">
           <div>
-            <H4 className="font-medium">{fieldGroup.label}</H4>
+            <Heading as="h4" className="font-medium">
+              {fieldGroup.label}
+            </Heading>
             <Subtle>{fieldGroup.description}</Subtle>
           </div>
 

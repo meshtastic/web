@@ -5,7 +5,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@app/components/UI/Tooltip";
-import { useAppStore } from "@app/core/stores/appStore";
 import {
   type MessageWithState,
   useDeviceStore,
