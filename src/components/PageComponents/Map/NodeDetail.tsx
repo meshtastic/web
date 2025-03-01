@@ -37,23 +37,21 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
           <Avatar text={node.user?.shortName} />
 
           <div>
-            {node.user?.publicKey && node.user?.publicKey.length > 0
-              ? (
-                <LockIcon
-                  className="text-green-600"
-                  size={12}
-                  strokeWidth={3}
-                  aria-label="Public Key Enabled"
-                />
-              )
-              : (
-                <LockOpenIcon
-                  className="text-yellow-500"
-                  size={12}
-                  strokeWidth={3}
-                  aria-label="No Public Key"
-                />
-              )}
+            {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
+              <LockIcon
+                className="text-green-600"
+                size={12}
+                strokeWidth={3}
+                aria-label="Public Key Enabled"
+              />
+            ) : (
+              <LockOpenIcon
+                className="text-yellow-500"
+                size={12}
+                strokeWidth={3}
+                aria-label="No Public Key"
+              />
+            )}
           </div>
 
           <Star
@@ -75,13 +73,15 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
                 node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
               } volts`}
             >
-              {node.deviceMetrics?.batteryLevel > 100
-                ? <BatteryChargingIcon size={22} />
-                : node.deviceMetrics?.batteryLevel > 80
-                ? <BatteryFullIcon size={22} />
-                : node.deviceMetrics?.batteryLevel > 20
-                ? <BatteryMediumIcon size={22} />
-                : <BatteryLowIcon size={22} />}
+              {node.deviceMetrics?.batteryLevel > 100 ? (
+                <BatteryChargingIcon size={22} />
+              ) : node.deviceMetrics?.batteryLevel > 80 ? (
+                <BatteryFullIcon size={22} />
+              ) : node.deviceMetrics?.batteryLevel > 20 ? (
+                <BatteryMediumIcon size={22} />
+              ) : (
+                <BatteryLowIcon size={22} />
+              )}
               <Subtle aria-label="Battery">
                 {node.deviceMetrics?.batteryLevel > 100
                   ? "Charging"

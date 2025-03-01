@@ -2,11 +2,13 @@ import type { Message } from "@bufbuild/protobuf";
 import type { Protobuf } from "@meshtastic/core";
 import { IsBoolean, IsInt, Length } from "class-validator";
 
-export class DetectionSensorValidation implements
-  Omit<
-    Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig,
-    keyof Message
-  > {
+export class DetectionSensorValidation
+  implements
+    Omit<
+      Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig,
+      keyof Message
+    >
+{
   @IsBoolean()
   enabled: boolean;
 

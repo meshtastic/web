@@ -24,9 +24,11 @@ export const LocationResponseDialog = ({
   const { nodes } = useDevice();
 
   const from = nodes.get(location?.from ?? 0);
-  const longName = from?.user?.longName ??
+  const longName =
+    from?.user?.longName ??
     (from ? `!${numberToHexUnpadded(from?.num)}` : "Unknown");
-  const shortName = from?.user?.shortName ??
+  const shortName =
+    from?.user?.shortName ??
     (from ? `${numberToHexUnpadded(from?.num).substring(0, 4)}` : "UNK");
 
   return (

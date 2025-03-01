@@ -17,8 +17,8 @@ export const getChannelName = (channel: Protobuf.Channel.Channel) =>
   channel.settings?.name.length
     ? channel.settings?.name
     : channel.index === 0
-    ? "Primary"
-    : `Ch ${channel.index}`;
+      ? "Primary"
+      : `Ch ${channel.index}`;
 
 const ChannelsPage = () => {
   const { channels, setDialogOpen } = useDevice();

@@ -111,8 +111,9 @@ export const Bluetooth = () => {
               disabledBy: [
                 {
                   fieldName: "mode",
-                  selector: Protobuf.Config.Config_BluetoothConfig_PairingMode
-                    .FIXED_PIN,
+                  selector:
+                    Protobuf.Config.Config_BluetoothConfig_PairingMode
+                      .FIXED_PIN,
                   invert: true,
                 },
                 {

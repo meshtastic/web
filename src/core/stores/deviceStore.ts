@@ -299,11 +299,11 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 if (!device) {
                   return;
                 }
-                const workingModuleConfigIndex = device?.workingModuleConfig
-                  .findIndex(
+                const workingModuleConfigIndex =
+                  device?.workingModuleConfig.findIndex(
                     (wmc) =>
                       wmc.payloadVariant.case ===
-                        moduleConfig.payloadVariant.case,
+                      moduleConfig.payloadVariant.case,
                   );
                 if (workingModuleConfigIndex !== -1) {
                   device.workingModuleConfig[workingModuleConfigIndex] =
@@ -445,7 +445,8 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 if (!device) {
                   return;
                 }
-                const currentNode = device.nodes.get(user.from) ??
+                const currentNode =
+                  device.nodes.get(user.from) ??
                   create(Protobuf.Mesh.NodeInfoSchema);
                 currentNode.user = user.data;
                 device.nodes.set(user.from, currentNode);
@@ -459,7 +460,8 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 if (!device) {
                   return;
                 }
-                const currentNode = device.nodes.get(position.from) ??
+                const currentNode =
+                  device.nodes.get(position.from) ??
                   create(Protobuf.Mesh.NodeInfoSchema);
                 currentNode.position = position.data;
                 device.nodes.set(position.from, currentNode);
@@ -484,11 +486,12 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                   return;
                 }
                 const messageGroup = device.messages[message.type];
-                const messageIndex = message.type === "direct"
-                  ? message.from === device.hardware.myNodeNum
-                    ? message.to
-                    : message.from
-                  : message.channel;
+                const messageIndex =
+                  message.type === "direct"
+                    ? message.from === device.hardware.myNodeNum
+                      ? message.to
+                      : message.from
+                    : message.channel;
                 const messages = messageGroup.get(messageIndex);
 
                 if (messages) {
@@ -561,9 +564,12 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 }
                 const messageGroup = device.messages[type];
 
-                const messageIndex = type === "direct"
-                  ? from === device.hardware.myNodeNum ? to : from
-                  : channelIndex;
+                const messageIndex =
+                  type === "direct"
+                    ? from === device.hardware.myNodeNum
+                      ? to
+                      : from
+                    : channelIndex;
                 const messages = messageGroup.get(messageIndex);
 
                 if (!messages) {

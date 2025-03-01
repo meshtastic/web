@@ -2,11 +2,13 @@ import type { Message } from "@bufbuild/protobuf";
 import type { Protobuf } from "@meshtastic/core";
 import { IsBoolean, IsString } from "class-validator";
 
-export class SecurityValidation implements
-  Omit<
-    Protobuf.Config.Config_SecurityConfig,
-    keyof Message | "adminKey" | "privateKey" | "publicKey"
-  > {
+export class SecurityValidation
+  implements
+    Omit<
+      Protobuf.Config.Config_SecurityConfig,
+      keyof Message | "adminKey" | "privateKey" | "publicKey"
+    >
+{
   @IsBoolean()
   adminChannelEnabled: boolean;
 

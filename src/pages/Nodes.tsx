@@ -107,11 +107,9 @@ const NodesPage = (): JSX.Element => {
               >
                 {node.user?.shortName ??
                   (node.user?.macaddr
-                    ? `${
-                      base16
+                    ? `${base16
                         .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                        .toLowerCase()
-                    }`
+                        .toLowerCase()}`
                     : `${numberToHexUnpadded(node.num).slice(-4)}`)}
               </h1>,
 
@@ -122,11 +120,9 @@ const NodesPage = (): JSX.Element => {
               >
                 {node.user?.longName ??
                   (node.user?.macaddr
-                    ? `Meshtastic ${
-                      base16
+                    ? `Meshtastic ${base16
                         .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                        .toLowerCase()
-                    }`
+                        .toLowerCase()}`
                     : `!${numberToHexUnpadded(node.num)}`)}
               </h1>,
 
@@ -140,9 +136,11 @@ const NodesPage = (): JSX.Element => {
                   ?.join(":") ?? "UNK"}
               </Mono>,
               <Fragment key="lastHeard">
-                {node.lastHeard === 0
-                  ? <p>Never</p>
-                  : <TimeAgo timestamp={node.lastHeard * 1000} />}
+                {node.lastHeard === 0 ? (
+                  <p>Never</p>
+                ) : (
+                  <TimeAgo timestamp={node.lastHeard * 1000} />
+                )}
               </Fragment>,
               <Mono key="snr">
                 {node.snr}db/
@@ -150,17 +148,19 @@ const NodesPage = (): JSX.Element => {
                 {(node.snr + 10) * 5}raw
               </Mono>,
               <Mono key="pki">
-                {node.user?.publicKey && node.user?.publicKey.length > 0
-                  ? <LockIcon className="text-green-600" />
-                  : <LockOpenIcon className="text-yellow-300 mx-auto" />}
+                {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
+                  <LockIcon className="text-green-600" />
+                ) : (
+                  <LockOpenIcon className="text-yellow-300 mx-auto" />
+                )}
               </Mono>,
               <Mono key="hops">
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
                     : `${node.hopsAway.toString()} ${
-                      node.hopsAway > 1 ? "hops" : "hop"
-                    } away`
+                        node.hopsAway > 1 ? "hops" : "hop"
+                      } away`
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
               </Mono>,

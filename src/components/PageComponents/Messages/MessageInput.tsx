@@ -51,7 +51,7 @@ export const MessageInput = ({
             myNodeNum,
             id,
             "ack",
-          )
+          ),
         )
         .catch((e: Types.PacketError) =>
           setMessageState(
@@ -61,7 +61,7 @@ export const MessageInput = ({
             myNodeNum,
             e.id,
             e.error,
-          )
+          ),
         );
     },
     [channel, connection, myNodeNum, setMessageState, to],

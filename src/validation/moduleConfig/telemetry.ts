@@ -4,7 +4,8 @@ import { IsBoolean, IsInt } from "class-validator";
 
 export class TelemetryValidation
   implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_TelemetryConfig, keyof Message> {
+    Omit<Protobuf.ModuleConfig.ModuleConfig_TelemetryConfig, keyof Message>
+{
   @IsInt()
   deviceUpdateInterval: number;
 

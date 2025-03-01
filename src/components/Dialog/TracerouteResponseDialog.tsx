@@ -28,9 +28,11 @@ export const TracerouteResponseDialog = ({
   const snrTowards = traceroute?.data.snrTowards ?? [];
   const snrBack = traceroute?.data.snrBack ?? [];
   const from = nodes.get(traceroute?.from ?? 0);
-  const longName = from?.user?.longName ??
+  const longName =
+    from?.user?.longName ??
     (from ? `!${numberToHexUnpadded(from?.num)}` : "Unknown");
-  const shortName = from?.user?.shortName ??
+  const shortName =
+    from?.user?.shortName ??
     (from ? `${numberToHexUnpadded(from?.num).substring(0, 4)}` : "UNK");
   const to = nodes.get(traceroute?.to ?? 0);
   return (

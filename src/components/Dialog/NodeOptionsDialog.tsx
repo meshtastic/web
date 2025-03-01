@@ -31,9 +31,11 @@ export const NodeOptionsDialog = ({
     setChatType,
     setActiveChat,
   } = useAppStore();
-  const longName = node?.user?.longName ??
+  const longName =
+    node?.user?.longName ??
     (node ? `!${numberToHexUnpadded(node?.num)}` : "Unknown");
-  const shortName = node?.user?.shortName ??
+  const shortName =
+    node?.user?.shortName ??
     (node ? `${numberToHexUnpadded(node?.num).substring(0, 4)}` : "UNK");
 
   function handleDirectMessage() {
@@ -51,7 +53,7 @@ export const NodeOptionsDialog = ({
     connection?.requestPosition(node.num).then(() =>
       toast({
         title: "Position request sent.",
-      })
+      }),
     );
     onOpenChange();
   }
@@ -64,7 +66,7 @@ export const NodeOptionsDialog = ({
     connection?.traceRoute(node.num).then(() =>
       toast({
         title: "Traceroute sent.",
-      })
+      }),
     );
     onOpenChange();
   }

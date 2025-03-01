@@ -4,11 +4,13 @@ import { IsArray, IsBoolean, IsEnum, IsInt } from "class-validator";
 
 const DeprecatedPositionValidationFields = ["gpsEnabled", "gpsAttemptTime"];
 
-export class PositionValidation implements
-  Omit<
-    Protobuf.Config.Config_PositionConfig,
-    keyof Message | (typeof DeprecatedPositionValidationFields)[number]
-  > {
+export class PositionValidation
+  implements
+    Omit<
+      Protobuf.Config.Config_PositionConfig,
+      keyof Message | (typeof DeprecatedPositionValidationFields)[number]
+    >
+{
   @IsInt()
   positionBroadcastSecs: number;
 
