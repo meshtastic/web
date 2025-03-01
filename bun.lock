@@ -7,6 +7,7 @@
         "@bufbuild/protobuf": "^2.2.3",
         "@meshtastic/core": "npm:@jsr/meshtastic__core@2.6.0-0",
         "@meshtastic/js": "npm:@jsr/meshtastic__js@2.6.0-0",
+        "@meshtastic/transport-http": "npm:@jsr/meshtastic__transport-http",
         "@meshtastic/transport-web-serial": "npm:@jsr/meshtastic__transport-web-serial",
         "@noble/curves": "^1.8.1",
         "@radix-ui/react-accordion": "^1.2.3",
@@ -361,7 +362,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.25", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ=="],
 
-    "@jsr/meshtastic__core": ["@jsr/meshtastic__core@2.6.0-0", "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.0-0.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3", "@jsr/meshtastic__protobufs": "^2.6.0", "crc": "^4.3.2", "ste-simple-events": "^3.0.11", "tslog": "^4.9.3" } }, "sha512-Ks71sRagbBipotznULpsJZ1EMcQIqCEJQx6mf628dmCNVf2YECi2zi/i/5zErp1hGPgfbDvCz9oPogvsd/7fMA=="],
+    "@jsr/meshtastic__core": ["@jsr/meshtastic__core@2.6.0-1", "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.0-1.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3", "@jsr/meshtastic__protobufs": "^2.6.0", "crc": "^4.3.2", "ste-simple-events": "^3.0.11", "tslog": "^4.9.3" } }, "sha512-fVlFVImuthS5oIH3J5Glue+0OizGmhtvzTWEmAJwdgmYyUn7mfA2iEvoUHFv3EiEDq6BJ9SjkLzOSqMTRPSNuw=="],
 
     "@jsr/meshtastic__protobufs": ["@jsr/meshtastic__protobufs@2.6.0", "https://npm.jsr.io/~/11/@jsr/meshtastic__protobufs/2.6.0.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3" } }, "sha512-CGlgBdzAuQCZuGPrnzP8zU+EcLlmyYeeMbqFHuJ834cYfArWXDjDh1UYaPo2rI03LTjqa3MeWpfqDlzBR8kIMg=="],
 
@@ -386,6 +387,8 @@
     "@meshtastic/core": ["@jsr/meshtastic__core@2.6.0-0", "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.0-0.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3", "@jsr/meshtastic__protobufs": "^2.6.0", "crc": "^4.3.2", "ste-simple-events": "^3.0.11", "tslog": "^4.9.3" } }, "sha512-Ks71sRagbBipotznULpsJZ1EMcQIqCEJQx6mf628dmCNVf2YECi2zi/i/5zErp1hGPgfbDvCz9oPogvsd/7fMA=="],
 
     "@meshtastic/js": ["@jsr/meshtastic__js@2.6.0-0", "https://npm.jsr.io/~/11/@jsr/meshtastic__js/2.6.0-0.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3", "@jsr/meshtastic__protobufs": "^2.6.0", "crc": "^4.3.2", "ste-simple-events": "^3.0.11", "tslog": "^4.9.3" } }, "sha512-+xpZpxK6oUIVOuEs7C+LyxRr2druvc7UNNNTK9Rl8ioXj63Jz1uQXlYe2Gj0xjnRAiSQLR7QVaPef21BR/YTxA=="],
+
+    "@meshtastic/transport-http": ["@jsr/meshtastic__transport-http@0.1.0", "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-http/0.1.0.tgz", { "dependencies": { "@jsr/meshtastic__core": "^2.6.0-1" } }, "sha512-+cICcTAowbnTz9yffUod1c2XxuPgJRw6VfXYHZgJZ3oaBXtUoUFHl9WdMdZLE0juzMRpTARZY2/bAH3brCf0rw=="],
 
     "@meshtastic/transport-web-serial": ["@jsr/meshtastic__transport-web-serial@0.2.0", "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-web-serial/0.2.0.tgz", { "dependencies": { "@jsr/meshtastic__core": "^2.6.0-0" } }, "sha512-mP/nxOj0syABh3FkG5iIolWhUMiFh/qtJtvqihxLkaRoxdabUyW62mOtfhCMBEjxgVnKg4Gy7GkaXfC/eFy19Q=="],
 
@@ -1876,6 +1879,8 @@
     "yocto-queue": ["yocto-queue@0.1.0", "", {}, "sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q=="],
 
     "zustand": ["zustand@5.0.3", "", { "peerDependencies": { "@types/react": ">=18.0.0", "immer": ">=9.0.6", "react": ">=18.0.0", "use-sync-external-store": ">=1.2.0" }, "optionalPeers": ["@types/react", "immer", "react", "use-sync-external-store"] }, "sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg=="],
+
+    "@meshtastic/transport-web-serial/@jsr/meshtastic__core": ["@jsr/meshtastic__core@2.6.0-0", "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.0-0.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3", "@jsr/meshtastic__protobufs": "^2.6.0", "crc": "^4.3.2", "ste-simple-events": "^3.0.11", "tslog": "^4.9.3" } }, "sha512-Ks71sRagbBipotznULpsJZ1EMcQIqCEJQx6mf628dmCNVf2YECi2zi/i/5zErp1hGPgfbDvCz9oPogvsd/7fMA=="],
 
     "@rollup/plugin-babel/@rollup/pluginutils": ["@rollup/pluginutils@3.1.0", "", { "dependencies": { "@types/estree": "0.0.39", "estree-walker": "^1.0.1", "picomatch": "^2.2.2" }, "peerDependencies": { "rollup": "^1.20.0||^2.0.0" } }, "sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg=="],
 

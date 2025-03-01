@@ -7,7 +7,8 @@ import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
-import { HttpConnection } from "@meshtastic/js";
+import { MeshDevice } from "@meshtastic/core";
+import { TransportHTTP } from "@meshtastic/transport-http";
 import { type JSX, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -36,13 +37,9 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
 
     const id = randId();
     const device = addDevice(id);
-    const connection = new HttpConnection(id);
-    // TODO: Promise never resolves
-    await connection.connect({
-      address: data.ip,
-      fetchInterval: 2000,
-      tls: data.tls,
-    });
+    const transport = await TransportHTTP.create(data.ip, data.tls);
+    const connection = new MeshDevice(transport, id);
+    connection.configure();
 
     setSelectedDevice(id);
     device.addConnection(connection);
