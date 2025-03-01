@@ -1,9 +1,8 @@
-import { createContext, useContext } from "react";
-
+import { create } from "@bufbuild/protobuf";
+import { Protobuf, Types } from "@meshtastic/core";
 import { produce } from "immer";
-import { create } from "zustand";
-
-import { Protobuf, Types } from "@meshtastic/js";
+import { createContext, useContext } from "react";
+import { create as createStore } from "zustand";
 
 export type Page = "messages" | "map" | "config" | "channels" | "nodes";
 
@@ -111,7 +110,7 @@ export interface DeviceState {
   getDevice: (id: number) => Device | undefined;
 }
 
-export const useDeviceStore = create<DeviceState>((set, get) => ({
+export const useDeviceStore = createStore<DeviceState>((set, get) => ({
   devices: new Map(),
   remoteDevices: new Map(),
 
@@ -122,11 +121,11 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           id,
           status: Types.DeviceStatusEnum.DeviceDisconnected,
           channels: new Map(),
-          config: new Protobuf.LocalOnly.LocalConfig(),
-          moduleConfig: new Protobuf.LocalOnly.LocalModuleConfig(),
+          config: create(Protobuf.LocalOnly.LocalConfigSchema),
+          moduleConfig: create(Protobuf.LocalOnly.LocalModuleConfigSchema),
           workingConfig: [],
           workingModuleConfig: [],
-          hardware: new Protobuf.Mesh.MyNodeInfo(),
+          hardware: create(Protobuf.Mesh.MyNodeInfoSchema),
           nodes: new Map(),
           metadata: new Map(),
           messages: {
@@ -138,7 +137,6 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
           activePage: "messages",
           activeNode: 0,
           waypoints: [],
-          // currentMetrics: new Protobuf.DeviceMetrics(),
           dialog: {
             import: false,
             QR: false,
@@ -448,7 +446,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                   return;
                 }
                 const currentNode =
-                  device.nodes.get(user.from) ?? new Protobuf.Mesh.NodeInfo();
+                  device.nodes.get(user.from) ??
+                  create(Protobuf.Mesh.NodeInfoSchema);
                 currentNode.user = user.data;
                 device.nodes.set(user.from, currentNode);
               }),
@@ -463,7 +462,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 }
                 const currentNode =
                   device.nodes.get(position.from) ??
-                  new Protobuf.Mesh.NodeInfo();
+                  create(Protobuf.Mesh.NodeInfoSchema);
                 currentNode.position = position.data;
                 device.nodes.set(position.from, currentNode);
               }),
@@ -618,7 +617,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 } else {
                   device.nodes.set(
                     data.from,
-                    new Protobuf.Mesh.NodeInfo({
+                    create(Protobuf.Mesh.NodeInfoSchema, {
                       num: data.from,
                       lastHeard: data.time,
                       snr: data.snr,

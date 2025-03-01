@@ -1,8 +1,9 @@
 import type { ChannelValidation } from "@app/validation/channel.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
 import { useState } from "react";
@@ -27,7 +28,7 @@ export const Channel = ({ channel }: SettingsPanelProps): JSX.Element => {
     useState<boolean>(false);
 
   const onSubmit = (data: ChannelValidation) => {
-    const channel = new Protobuf.Channel.Channel({
+    const channel = create(Protobuf.Channel.ChannelSchema, {
       ...data,
       settings: {
         ...data.settings,

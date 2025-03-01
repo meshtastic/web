@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog";
-import type { Protobuf, Types } from "@meshtastic/js";
+import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import type { JSX } from "react";
 import { TraceRoute } from "../PageComponents/Messages/TraceRoute";

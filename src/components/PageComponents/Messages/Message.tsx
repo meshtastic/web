@@ -12,7 +12,7 @@ import {
 } from "@app/core/stores/deviceStore.ts";
 import { cn } from "@app/core/utils/cn";
 import { Avatar } from "@components/UI/Avatar";
-import type { Protobuf } from "@meshtastic/js";
+import type { Protobuf } from "@meshtastic/core";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useMemo } from "react";

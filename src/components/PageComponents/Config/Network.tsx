@@ -1,28 +1,32 @@
 import type { NetworkValidation } from "@app/validation/config/network.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import {
   convertIntToIpAddress,
   convertIpAddressToInt,
 } from "@core/utils/ip.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 
 export const Network = () => {
   const { config, setWorkingConfig } = useDevice();
 
   const onSubmit = (data: NetworkValidation) => {
     setWorkingConfig(
-      new Protobuf.Config.Config({
+      create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "network",
           value: {
             ...data,
-            ipv4Config: new Protobuf.Config.Config_NetworkConfig_IpV4Config({
-              ip: convertIpAddressToInt(data.ipv4Config.ip) ?? 0,
-              gateway: convertIpAddressToInt(data.ipv4Config.gateway) ?? 0,
-              subnet: convertIpAddressToInt(data.ipv4Config.subnet) ?? 0,
-              dns: convertIpAddressToInt(data.ipv4Config.dns) ?? 0,
-            }),
+            ipv4Config: create(
+              Protobuf.Config.Config_NetworkConfig_IpV4ConfigSchema,
+              {
+                ip: convertIpAddressToInt(data.ipv4Config.ip) ?? 0,
+                gateway: convertIpAddressToInt(data.ipv4Config.gateway) ?? 0,
+                subnet: convertIpAddressToInt(data.ipv4Config.subnet) ?? 0,
+                dns: convertIpAddressToInt(data.ipv4Config.dns) ?? 0,
+              },
+            ),
           },
         },
       }),

@@ -1,5 +1,5 @@
 import type { Message } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import {
   IsBoolean,
   IsEnum,

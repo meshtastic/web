@@ -1,5 +1,5 @@
 import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/js";
+import type { Protobuf } from "@meshtastic/core";
 import { IsBoolean, IsString } from "class-validator";
 
 export class SecurityValidation

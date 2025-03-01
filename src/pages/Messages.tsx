@@ -7,7 +7,7 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf, Types } from "@meshtastic/js";
+import { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { getChannelName } from "@pages/Channels.tsx";
 import { HashIcon, LockIcon, LockOpenIcon, WaypointsIcon } from "lucide-react";

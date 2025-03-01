@@ -1,5 +1,5 @@
 import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/js";
+import type { Protobuf } from "@meshtastic/core";
 import { IsBoolean, IsInt, IsNumber, Max, Min } from "class-validator";
 
 export class PowerValidation

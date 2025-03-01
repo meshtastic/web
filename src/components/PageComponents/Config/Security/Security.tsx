@@ -6,8 +6,9 @@ import {
   getX25519PublicKey,
 } from "@app/core/utils/x25519";
 import type { SecurityValidation } from "@app/validation/config/security.tsx";
+import { create } from "@bufbuild/protobuf";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Eye, EyeOff } from "lucide-react";
 import { useReducer } from "react";
@@ -57,7 +58,9 @@ export const Security = () => {
       if (input.length % 4 !== 0) {
         addError(
           fieldName,
-          `${fieldName === "privateKey" ? "Private" : "Admin"} Key is required to be a 256 bit pre-shared key (PSK)`,
+          `${
+            fieldName === "privateKey" ? "Private" : "Admin"
+          } Key is required to be a 256 bit pre-shared key (PSK)`,
         );
         return;
       }
@@ -71,7 +74,9 @@ export const Security = () => {
       console.error(e);
       addError(
         fieldName,
-        `Invalid ${fieldName === "privateKey" ? "Private" : "Admin"} Key format`,
+        `Invalid ${
+          fieldName === "privateKey" ? "Private" : "Admin"
+        } Key format`,
       );
     }
   };
@@ -83,7 +88,7 @@ export const Security = () => {
     console.log(toByteArray(state.adminKey));
 
     setWorkingConfig(
-      new Protobuf.Config.Config({
+      create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "security",
           value: {
@@ -164,6 +169,7 @@ export const Security = () => {
             fields: [
               {
                 type: "passwordGenerator",
+                id: "pskInput",
                 name: "privateKey",
                 label: "Private Key",
                 description: "Used to create a shared key with a remote device",
@@ -234,6 +240,7 @@ export const Security = () => {
               {
                 type: "passwordGenerator",
                 name: "adminKey",
+                id: "adminKeyInput",
                 label: "Admin Key",
                 description:
                   "The public key authorized to send admin messages to this node",

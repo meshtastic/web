@@ -1,8 +1,9 @@
 import { useAppStore } from "@app/core/stores/appStore";
 import type { BluetoothValidation } from "@app/validation/config/bluetooth.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { useState } from "react";
 
 export const Bluetooth = () => {
@@ -53,7 +54,7 @@ export const Bluetooth = () => {
     }
 
     setWorkingConfig(
-      new Protobuf.Config.Config({
+      create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "bluetooth",
           value: data,

@@ -1,4 +1,5 @@
 import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { create } from "@bufbuild/protobuf";
 import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
@@ -10,7 +11,7 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { useForm } from "react-hook-form";
 
 export interface User {
@@ -40,7 +41,7 @@ export const DeviceNameDialog = ({
 
   const onSubmit = handleSubmit((data) => {
     connection?.setOwner(
-      new Protobuf.Mesh.User({
+      create(Protobuf.Mesh.UserSchema, {
         ...myNode?.user,
         ...data,
       }),

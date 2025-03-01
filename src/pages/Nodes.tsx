@@ -8,7 +8,7 @@ import { Mono } from "@components/generic/Mono.tsx";
 import { Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf, type Types } from "@meshtastic/js";
+import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
 import { Fragment, type JSX, useCallback, useEffect, useState } from "react";

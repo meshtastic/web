@@ -53,6 +53,7 @@ export function GenericInput<T extends FieldValues>({
           }
           step={field.properties?.step}
           value={field.type === "number" ? Number.parseFloat(value) : value}
+          id={field.name}
           onChange={(e) => {
             if (field.inputChange) field.inputChange(e);
             onChange(

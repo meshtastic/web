@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { DeviceImage } from "../generic/DeviceImage";
 import { TimeAgo } from "../generic/TimeAgo";
@@ -87,7 +87,9 @@ export const NodeDetailsDialog = ({
                     Coordinates:{" "}
                     <a
                       className="text-blue-500 dark:text-blue-400"
-                      href={`https://www.openstreetmap.org/?mlat=${device.position.latitudeI / 1e7}&mlon=${device.position.longitudeI / 1e7}&layers=N`}
+                      href={`https://www.openstreetmap.org/?mlat=${
+                        device.position.latitudeI / 1e7
+                      }&mlon=${device.position.longitudeI / 1e7}&layers=N`}
                       target="_blank"
                       rel="noreferrer"
                     >

@@ -1,5 +1,5 @@
 import type { Message } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/js";
+import { Protobuf } from "@meshtastic/core";
 import { IsArray, IsBoolean, IsEnum, IsInt } from "class-validator";
 
 const DeprecatedPositionValidationFields = ["gpsEnabled", "gpsAttemptTime"];
