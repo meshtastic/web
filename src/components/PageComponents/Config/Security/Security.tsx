@@ -6,13 +6,13 @@ import {
   getX25519PublicKey,
 } from "@app/core/utils/x25519";
 import type { SecurityValidation } from "@app/validation/config/security.tsx";
+import { create } from "@bufbuild/protobuf";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Eye, EyeOff } from "lucide-react";
 import { useReducer } from "react";
 import { securityReducer } from "./securityReducer";
-import { create } from "@bufbuild/protobuf";
 
 export const Security = () => {
   const { config, setWorkingConfig, setDialogOpen } = useDevice();
@@ -308,7 +308,8 @@ export const Security = () => {
       <PkiRegenerateDialog
         open={state.privateKeyDialogOpen}
         onOpenChange={() =>
-          dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })}
+          dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })
+        }
         onSubmit={pkiRegenerate}
       />
     </>

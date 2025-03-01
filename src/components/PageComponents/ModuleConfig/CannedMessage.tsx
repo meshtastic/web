@@ -63,8 +63,9 @@ export const CannedMessage = (): JSX.Element => {
               label: "Clockwise event",
               description: "Select input event.",
               properties: {
-                enumValue: Protobuf.ModuleConfig
-                  .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue:
+                  Protobuf.ModuleConfig
+                    .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
@@ -73,8 +74,9 @@ export const CannedMessage = (): JSX.Element => {
               label: "Counter Clockwise event",
               description: "Select input event.",
               properties: {
-                enumValue: Protobuf.ModuleConfig
-                  .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue:
+                  Protobuf.ModuleConfig
+                    .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
@@ -83,8 +85,9 @@ export const CannedMessage = (): JSX.Element => {
               label: "Press event",
               description: "Select input event",
               properties: {
-                enumValue: Protobuf.ModuleConfig
-                  .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue:
+                  Protobuf.ModuleConfig
+                    .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {

@@ -1,4 +1,5 @@
 import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { create } from "@bufbuild/protobuf";
 import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
@@ -12,7 +13,6 @@ import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Protobuf } from "@meshtastic/js";
 import { useForm } from "react-hook-form";
-import { create } from "@bufbuild/protobuf";
 
 export interface User {
   longName: string;

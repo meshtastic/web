@@ -40,9 +40,8 @@ const MapPage = (): JSX.Element => {
 
   const darkMode = currentTheme === "dark";
 
-  const [selectedNode, setSelectedNode] = useState<
-    Protobuf.Mesh.NodeInfo | null
-  >(null);
+  const [selectedNode, setSelectedNode] =
+    useState<Protobuf.Mesh.NodeInfo | null>(null);
 
   // Filter out nodes without a valid position
   const validNodes = useMemo(
@@ -186,18 +185,16 @@ const MapPage = (): JSX.Element => {
             </Marker>
           ))}
           {markers}
-          {selectedNode
-            ? (
-              <Popup
-                anchor="top"
-                longitude={convertToLatLng(selectedNode.position).longitude}
-                latitude={convertToLatLng(selectedNode.position).latitude}
-                onClose={() => setSelectedNode(null)}
-              >
-                <NodeDetail node={selectedNode} />
-              </Popup>
-            )
-            : null}
+          {selectedNode ? (
+            <Popup
+              anchor="top"
+              longitude={convertToLatLng(selectedNode.position).longitude}
+              latitude={convertToLatLng(selectedNode.position).latitude}
+              onClose={() => setSelectedNode(null)}
+            >
+              <NodeDetail node={selectedNode} />
+            </Popup>
+          ) : null}
         </MapGl>
       </PageLayout>
     </>
