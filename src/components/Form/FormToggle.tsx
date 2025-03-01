@@ -33,6 +33,7 @@ export function ToggleInput<T extends FieldValues>({
         <Switch
           checked={value}
           onCheckedChange={onChangeHandler(onChange)}
+          id={field.name}
           disabled={disabled}
           {...field.properties}
           {...rest}

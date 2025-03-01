@@ -2,6 +2,7 @@ import { Label } from "@components/UI/Label.tsx";
 
 export interface FieldWrapperProps {
   label: string;
+  fieldName: string;
   description?: string;
   disabled?: boolean;
   children?: React.ReactNode;
@@ -11,6 +12,7 @@ export interface FieldWrapperProps {
 
 export const FieldWrapper = ({
   label,
+  fieldName,
   description,
   children,
   valid,
@@ -19,7 +21,7 @@ export const FieldWrapper = ({
   <div className="pt-6 sm:pt-5">
     <fieldset aria-labelledby="label-notifications">
       <div className="sm:grid sm:grid-cols-3 sm:items-baseline sm:gap-4">
-        <Label>{label}</Label>
+        <Label htmlFor={fieldName}>{label}</Label>
         <div className="sm:col-span-2">
           <div className="max-w-lg">
             <p className="text-sm text-slate-500">{description}</p>
