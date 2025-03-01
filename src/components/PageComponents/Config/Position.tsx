@@ -3,6 +3,7 @@ import {
   usePositionFlags,
 } from "@app/core/hooks/usePositionFlags";
 import type { PositionValidation } from "@app/validation/config/position.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
@@ -16,7 +17,7 @@ export const Position = () => {
 
   const onSubmit = (data: PositionValidation) => {
     return setWorkingConfig(
-      new Protobuf.Config.Config({
+      create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "position",
           value: { ...data, positionFlags: flagsValue },

@@ -1,4 +1,5 @@
 import type { DeviceValidation } from "@app/validation/config/device.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
@@ -8,7 +9,7 @@ export const Device = (): JSX.Element => {
 
   const onSubmit = (data: DeviceValidation) => {
     setWorkingConfig(
-      new Protobuf.Config.Config({
+      create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "device",
           value: data,

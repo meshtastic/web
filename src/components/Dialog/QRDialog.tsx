@@ -1,3 +1,4 @@
+import { create, toBinary } from "@bufbuild/protobuf";
 import { Checkbox } from "@components/UI/Checkbox.tsx";
 import {
   Dialog,
@@ -39,13 +40,16 @@ export const QRDialog = ({
       .filter((ch) => selectedChannels.includes(ch.index))
       .map((channel) => channel.settings)
       .filter((ch): ch is Protobuf.Channel.ChannelSettings => !!ch);
-    const encoded = new Protobuf.AppOnly.ChannelSet(
-      new Protobuf.AppOnly.ChannelSet({
+    const encoded = create(
+      Protobuf.AppOnly.ChannelSetSchema,
+      create(Protobuf.AppOnly.ChannelSetSchema, {
         loraConfig,
         settings: channelsToEncode,
       }),
     );
-    const base64 = fromByteArray(encoded.toBinary())
+    const base64 = fromByteArray(
+      toBinary(Protobuf.AppOnly.ChannelSetSchema, encoded),
+    )
       .replace(/=/g, "")
       .replace(/\+/g, "-")
       .replace(/\//g, "_");
@@ -73,8 +77,8 @@ export const QRDialog = ({
                     {channel.settings?.name.length
                       ? channel.settings.name
                       : channel.role === Protobuf.Channel.Channel_Role.PRIMARY
-                        ? "Primary"
-                        : `Channel: ${channel.index}`}
+                      ? "Primary"
+                      : `Channel: ${channel.index}`}
                   </Label>
                   <Checkbox
                     key={channel.index}
@@ -82,7 +86,9 @@ export const QRDialog = ({
                     onCheckedChange={() => {
                       if (selectedChannels.includes(channel.index)) {
                         setSelectedChannels(
-                          selectedChannels.filter((c) => c !== channel.index),
+                          selectedChannels.filter((c) =>
+                            c !== channel.index
+                          ),
                         );
                       } else {
                         setSelectedChannels([

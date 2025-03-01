@@ -1,5 +1,6 @@
 import { useDevice } from "@app/core/stores/deviceStore.ts";
 import type { MqttValidation } from "@app/validation/moduleConfig/mqtt.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/js";
 
@@ -8,15 +9,16 @@ export const MQTT = (): JSX.Element => {
 
   const onSubmit = (data: MqttValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig.ModuleConfig({
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "mqtt",
           value: {
             ...data,
-            mapReportSettings:
-              new Protobuf.ModuleConfig.ModuleConfig_MapReportSettings(
-                data.mapReportSettings,
-              ),
+            mapReportSettings: create(
+              Protobuf.ModuleConfig
+                .ModuleConfig_MapReportSettingsSchema,
+              data.mapReportSettings,
+            ),
           },
         },
       }),
@@ -164,32 +166,31 @@ export const MQTT = (): JSX.Element => {
               description:
                 "Position shared will be accurate within this distance",
               properties: {
-                enumValue:
-                  config.display?.units === 0
-                    ? {
-                        "Within 23 km": 10,
-                        "Within 12 km": 11,
-                        "Within 5.8 km": 12,
-                        "Within 2.9 km": 13,
-                        "Within 1.5 km": 14,
-                        "Within 700 m": 15,
-                        "Within 350 m": 16,
-                        "Within 200 m": 17,
-                        "Within 90 m": 18,
-                        "Within 50 m": 19,
-                      }
-                    : {
-                        "Within 15 miles": 10,
-                        "Within 7.3 miles": 11,
-                        "Within 3.6 miles": 12,
-                        "Within 1.8 miles": 13,
-                        "Within 0.9 miles": 14,
-                        "Within 0.5 miles": 15,
-                        "Within 0.2 miles": 16,
-                        "Within 600 feet": 17,
-                        "Within 300 feet": 18,
-                        "Within 150 feet": 19,
-                      },
+                enumValue: config.display?.units === 0
+                  ? {
+                    "Within 23 km": 10,
+                    "Within 12 km": 11,
+                    "Within 5.8 km": 12,
+                    "Within 2.9 km": 13,
+                    "Within 1.5 km": 14,
+                    "Within 700 m": 15,
+                    "Within 350 m": 16,
+                    "Within 200 m": 17,
+                    "Within 90 m": 18,
+                    "Within 50 m": 19,
+                  }
+                  : {
+                    "Within 15 miles": 10,
+                    "Within 7.3 miles": 11,
+                    "Within 3.6 miles": 12,
+                    "Within 1.8 miles": 13,
+                    "Within 0.9 miles": 14,
+                    "Within 0.5 miles": 15,
+                    "Within 0.2 miles": 16,
+                    "Within 600 feet": 17,
+                    "Within 300 feet": 18,
+                    "Within 150 feet": 19,
+                  },
               },
               disabledBy: [
                 {

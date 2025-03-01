@@ -1,4 +1,5 @@
 import type { PowerValidation } from "@app/validation/config/power.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
@@ -8,7 +9,7 @@ export const Power = (): JSX.Element => {
 
   const onSubmit = (data: PowerValidation) => {
     setWorkingConfig(
-      new Protobuf.Config.Config({
+      create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "power",
           value: data,

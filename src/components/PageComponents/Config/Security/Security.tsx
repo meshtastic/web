@@ -12,6 +12,7 @@ import { fromByteArray, toByteArray } from "base64-js";
 import { Eye, EyeOff } from "lucide-react";
 import { useReducer } from "react";
 import { securityReducer } from "./securityReducer";
+import { create } from "@bufbuild/protobuf";
 
 export const Security = () => {
   const { config, setWorkingConfig, setDialogOpen } = useDevice();
@@ -57,7 +58,9 @@ export const Security = () => {
       if (input.length % 4 !== 0) {
         addError(
           fieldName,
-          `${fieldName === "privateKey" ? "Private" : "Admin"} Key is required to be a 256 bit pre-shared key (PSK)`,
+          `${
+            fieldName === "privateKey" ? "Private" : "Admin"
+          } Key is required to be a 256 bit pre-shared key (PSK)`,
         );
         return;
       }
@@ -71,7 +74,9 @@ export const Security = () => {
       console.error(e);
       addError(
         fieldName,
-        `Invalid ${fieldName === "privateKey" ? "Private" : "Admin"} Key format`,
+        `Invalid ${
+          fieldName === "privateKey" ? "Private" : "Admin"
+        } Key format`,
       );
     }
   };
@@ -83,7 +88,7 @@ export const Security = () => {
     console.log(toByteArray(state.adminKey));
 
     setWorkingConfig(
-      new Protobuf.Config.Config({
+      create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "security",
           value: {
@@ -243,7 +248,7 @@ export const Security = () => {
                   ? getErrorMessage("adminKey")
                   : "",
                 inputChange: adminKeyInputChangeEvent,
-                selectChange: () => { },
+                selectChange: () => {},
                 bits: [{ text: "256 bit", value: "32", key: "bit256" }],
                 devicePSKBitCount: state.privateKeyBitCount,
                 hide: !state.adminKeyVisible,
@@ -303,8 +308,7 @@ export const Security = () => {
       <PkiRegenerateDialog
         open={state.privateKeyDialogOpen}
         onOpenChange={() =>
-          dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })
-        }
+          dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })}
         onSubmit={pkiRegenerate}
       />
     </>

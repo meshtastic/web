@@ -1,4 +1,5 @@
 import type { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
@@ -8,7 +9,7 @@ export const Telemetry = (): JSX.Element => {
 
   const onSubmit = (data: TelemetryValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig.ModuleConfig({
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "telemetry",
           value: data,

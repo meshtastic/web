@@ -1,4 +1,5 @@
 import type { LoRaValidation } from "@app/validation/config/lora.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
@@ -8,7 +9,7 @@ export const LoRa = (): JSX.Element => {
 
   const onSubmit = (data: LoRaValidation) => {
     setWorkingConfig(
-      new Protobuf.Config.Config({
+      create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "lora",
           value: data,

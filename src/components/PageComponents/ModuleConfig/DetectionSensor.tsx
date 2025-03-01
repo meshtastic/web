@@ -1,5 +1,6 @@
 import { useDevice } from "@app/core/stores/deviceStore.ts";
 import type { DetectionSensorValidation } from "@app/validation/moduleConfig/detectionSensor.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/js";
 
@@ -8,7 +9,7 @@ export const DetectionSensor = (): JSX.Element => {
 
   const onSubmit = (data: DetectionSensorValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig.ModuleConfig({
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "detectionSensor",
           value: data,

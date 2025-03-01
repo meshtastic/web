@@ -1,4 +1,5 @@
 import type { CannedMessageValidation } from "@app/validation/moduleConfig/cannedMessage.tsx";
+import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/js";
@@ -8,7 +9,7 @@ export const CannedMessage = (): JSX.Element => {
 
   const onSubmit = (data: CannedMessageValidation) => {
     setWorkingModuleConfig(
-      new Protobuf.ModuleConfig.ModuleConfig({
+      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "cannedMessage",
           value: data,
@@ -62,9 +63,8 @@ export const CannedMessage = (): JSX.Element => {
               label: "Clockwise event",
               description: "Select input event.",
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig
-                    .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue: Protobuf.ModuleConfig
+                  .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
@@ -73,9 +73,8 @@ export const CannedMessage = (): JSX.Element => {
               label: "Counter Clockwise event",
               description: "Select input event.",
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig
-                    .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue: Protobuf.ModuleConfig
+                  .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
@@ -84,9 +83,8 @@ export const CannedMessage = (): JSX.Element => {
               label: "Press event",
               description: "Select input event",
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig
-                    .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue: Protobuf.ModuleConfig
+                  .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
