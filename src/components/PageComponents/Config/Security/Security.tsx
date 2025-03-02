@@ -58,8 +58,7 @@ export const Security = () => {
       if (input.length % 4 !== 0) {
         addError(
           fieldName,
-          `${
-            fieldName === "privateKey" ? "Private" : "Admin"
+          `${fieldName === "privateKey" ? "Private" : "Admin"
           } Key is required to be a 256 bit pre-shared key (PSK)`,
         );
         return;
@@ -74,8 +73,7 @@ export const Security = () => {
       console.error(e);
       addError(
         fieldName,
-        `Invalid ${
-          fieldName === "privateKey" ? "Private" : "Admin"
+        `Invalid ${fieldName === "privateKey" ? "Private" : "Admin"
         } Key format`,
       );
     }
@@ -85,8 +83,6 @@ export const Security = () => {
     if (hasErrors()) {
       return;
     }
-    console.log(toByteArray(state.adminKey));
-
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
@@ -248,7 +244,7 @@ export const Security = () => {
                   ? getErrorMessage("adminKey")
                   : "",
                 inputChange: adminKeyInputChangeEvent,
-                selectChange: () => {},
+                selectChange: () => { },
                 bits: [{ text: "256 bit", value: "32", key: "bit256" }],
                 devicePSKBitCount: state.privateKeyBitCount,
                 hide: !state.adminKeyVisible,

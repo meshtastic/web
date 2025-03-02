@@ -5,9 +5,7 @@ import { Code } from "@components/UI/Typography/Code.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { HomeIcon, PlusIcon, SearchIcon } from "lucide-react";
-
-import { Avatar } from "./UI/Avatar.tsx";
-import process from "node:process";
+import { Avatar } from "@components/UI/Avatar.tsx";
 
 export const DeviceSelector = () => {
   const { getDevices } = useDeviceStore();
@@ -17,6 +15,7 @@ export const DeviceSelector = () => {
     setCommandPaletteOpen,
     setConnectDialogOpen,
   } = useAppStore();
+  console.log(import.meta.env.VITE_COMMIT_HASH);
 
   return (
     <nav className="flex flex-col justify-between border-r-[0.5px]  border-slate-300 pt-2 dark:border-slate-700">
@@ -71,7 +70,7 @@ export const DeviceSelector = () => {
         </button> */
         }
         <Separator />
-        <Code>{process.env.COMMIT_HASH}</Code>
+        <Code>{import.meta.env.VITE_COMMIT_HASH}</Code>
       </div>
     </nav>
   );
