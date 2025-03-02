@@ -27,6 +27,7 @@ export interface BaseFormBuilderProps<T> {
   disabledBy?: DisabledBy<T>[];
   label: string;
   description?: string;
+  notes?: string;
   validationText?: string;
   properties?: Record<string, unknown>;
 }
@@ -45,6 +46,7 @@ export interface DynamicFormProps<T extends FieldValues> {
   fieldGroups: {
     label: string;
     description: string;
+    notes?: string;
     valid?: boolean;
     validationText?: string;
     fields: FieldProps<T>[];
@@ -95,6 +97,7 @@ export function DynamicForm<T extends FieldValues>({
           <div>
             <H4 className="font-medium">{fieldGroup.label}</H4>
             <Subtle>{fieldGroup.description}</Subtle>
+            <Subtle className="font-semibold">{fieldGroup?.notes}</Subtle>
           </div>
 
           {fieldGroup.fields.map((field) => {

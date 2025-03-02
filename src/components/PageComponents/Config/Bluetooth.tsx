@@ -70,7 +70,9 @@ export const Bluetooth = () => {
       fieldGroups={[
         {
           label: "Bluetooth Settings",
-          description: "Settings for the Bluetooth module",
+          description: "Settings for the Bluetooth module ",
+          notes:
+            "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
           fields: [
             {
               type: "toggle",
