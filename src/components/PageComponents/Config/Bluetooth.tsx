@@ -1,4 +1,4 @@
-import { useAppStore } from "@app/core/stores/appStore";
+import { useAppStore } from "../../../core/stores/appStore.ts";
 import type { BluetoothValidation } from "@app/validation/config/bluetooth.tsx";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
@@ -111,9 +111,8 @@ export const Bluetooth = () => {
               disabledBy: [
                 {
                   fieldName: "mode",
-                  selector:
-                    Protobuf.Config.Config_BluetoothConfig_PairingMode
-                      .FIXED_PIN,
+                  selector: Protobuf.Config.Config_BluetoothConfig_PairingMode
+                    .FIXED_PIN,
                   invert: true,
                 },
                 {

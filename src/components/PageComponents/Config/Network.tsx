@@ -8,7 +8,7 @@ import {
 } from "@core/utils/ip.ts";
 import { Protobuf } from "@meshtastic/core";
 
-export const Network = (): JSX.Element => {
+export const Network = () => {
   const { config, setWorkingConfig } = useDevice();
 
   const onSubmit = (data: NetworkValidation) => {

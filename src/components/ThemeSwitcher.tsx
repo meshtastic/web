@@ -1,5 +1,5 @@
-import { useTheme } from "@app/core/hooks/useTheme";
-import { cn } from "@app/core/utils/cn";
+import { useTheme } from "../core/hooks/useTheme.ts";
+import { cn } from "../core/utils/cn.ts";
 import { Monitor, Moon, Sun } from "lucide-react";
 
 type ThemePreference = "light" | "dark" | "system";
@@ -32,11 +32,9 @@ export default function ThemeSwitcher({
         className,
       )}
       onClick={toggleTheme}
-      aria-label={
-        preference === "system"
-          ? `System theme (currently ${theme}). Click to change theme.`
-          : `Current theme: ${theme}. Click to change theme.`
-      }
+      aria-label={preference === "system"
+        ? `System theme (currently ${theme}). Click to change theme.`
+        : `Current theme: ${theme}. Click to change theme.`}
     >
       {themeIcons[preference]}
     </button>

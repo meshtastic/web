@@ -36,8 +36,8 @@ export function SelectInput<T extends FieldValues>({
           field.properties;
         const optionsEnumValues = enumValue
           ? Object.entries(enumValue).filter(
-              (value) => typeof value[1] === "number",
-            )
+            (value) => typeof value[1] === "number",
+          )
           : [];
         return (
           <Select
@@ -58,11 +58,13 @@ export function SelectInput<T extends FieldValues>({
                 <SelectItem key={name} value={value.toString()}>
                   {formatEnumName
                     ? name
-                        .replace(/_/g, " ")
-                        .toLowerCase()
-                        .split(" ")
-                        .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-                        .join(" ")
+                      .replace(/_/g, " ")
+                      .toLowerCase()
+                      .split(" ")
+                      .map((s) =>
+                        s.charAt(0).toUpperCase() + s.substring(1)
+                      )
+                      .join(" ")
                     : name}
                 </SelectItem>
               ))}

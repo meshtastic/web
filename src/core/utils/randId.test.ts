@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { randId } from "./randId";
+import { randId } from "./randId.ts";
 
 describe("randId", () => {
   beforeEach(() => {

@@ -1,4 +1,4 @@
-import { cn } from "@app/core/utils/cn";
+import { cn } from "../../core/utils/cn.ts";
 import type React from "react";
 
 type RGBColor = {

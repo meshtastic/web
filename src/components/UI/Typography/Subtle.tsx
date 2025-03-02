@@ -5,7 +5,7 @@ export interface SubtleProps {
   children: React.ReactNode;
 }
 
-export const Subtle = ({ className, children }: SubtleProps): JSX.Element => (
+export const Subtle = ({ className, children }: SubtleProps) => (
   <p className={cn("text-sm text-slate-500 dark:text-slate-400", className)}>
     {children}
   </p>

@@ -1,4 +1,4 @@
-export const Blur = (): JSX.Element => {
+export const Blur = () => {
   return (
     <div
       className="fixed inset-0 backdrop-blur-md backdrop-brightness-press"

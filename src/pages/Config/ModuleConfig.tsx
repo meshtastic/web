@@ -17,7 +17,7 @@ import {
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
 
-export const ModuleConfig = (): JSX.Element => {
+export const ModuleConfig = () => {
   const tabs = [
     {
       label: "MQTT",

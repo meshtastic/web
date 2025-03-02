@@ -2,10 +2,10 @@ import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.tsx";
-import type { ButtonVariant } from "@components/UI/Button";
+import type { ButtonVariant } from "../UI/Button.tsx";
 import { Generator } from "@components/UI/Generator.tsx";
 import { Eye, EyeOff } from "lucide-react";
-import type { ChangeEventHandler, MouseEventHandler } from "react";
+import type { ChangeEventHandler } from "react";
 import { useState } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
 
@@ -43,14 +43,12 @@ export function PasswordGenerator<T extends FieldValues>({
         <Generator
           type={field.hide && !passwordShown ? "password" : "text"}
           id={field.id}
-          action={
-            field.hide
-              ? {
-                  icon: passwordShown ? EyeOff : Eye,
-                  onClick: togglePasswordVisiblity,
-                }
-              : undefined
-          }
+          action={field.hide
+            ? {
+              icon: passwordShown ? EyeOff : Eye,
+              onClick: togglePasswordVisiblity,
+            }
+            : undefined}
           devicePSKBitCount={field.devicePSKBitCount}
           bits={field.bits}
           inputChange={field.inputChange}

@@ -1,5 +1,5 @@
-import { useDevice } from "@app/core/stores/deviceStore";
-import { Button } from "@components/UI/Button";
+import { useDevice } from "../../core/stores/deviceStore.ts";
+import { Button } from "../UI/Button.tsx";
 import {
   Dialog,
   DialogContent,
@@ -40,7 +40,7 @@ export const PkiBackupDialog = ({
   const renderPrintWindow = React.useCallback(() => {
     if (!privateKey || !publicKey) return;
 
-    const printWindow = window.open("", "_blank");
+    const printWindow = globalThis.open("", "_blank");
     if (printWindow) {
       printWindow.document.write(`
         <html>
@@ -116,14 +116,14 @@ export const PkiBackupDialog = ({
         </DialogHeader>
         <DialogFooter className="mt-6">
           <Button
-            variant={"default"}
+            variant="default"
             onClick={() => createDownloadKeyFile()}
             className=""
           >
             <DownloadIcon size={20} className="mr-2" />
             Download
           </Button>
-          <Button variant={"default"} onClick={() => renderPrintWindow()}>
+          <Button variant="default" onClick={() => renderPrintWindow()}>
             <PrinterIcon size={20} className="mr-2" />
             Print
           </Button>

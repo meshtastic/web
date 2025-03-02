@@ -4,7 +4,7 @@ import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
 
-export const DetectionSensor = (): JSX.Element => {
+export const DetectionSensor = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
 
   const onSubmit = (data: DetectionSensorValidation) => {

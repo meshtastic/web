@@ -1,4 +1,4 @@
-import { cn } from "@app/core/utils/cn";
+import { cn } from "../../core/utils/cn.ts";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
 
@@ -8,9 +8,8 @@ interface MultiSelectProps {
 }
 
 const MultiSelect = ({ children, className = "" }: MultiSelectProps) => {
-  return (
-    <div className={cn("flex flex-wrap gap-2", className)}>{children}</div>
-  );
+  return <div className={cn("flex flex-wrap gap-2", className)}>{children}
+  </div>;
 };
 
 interface MultiSelectItemProps {

@@ -4,7 +4,7 @@ import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 
-export const Display = (): JSX.Element => {
+export const Display = () => {
   const { config, setWorkingConfig } = useDevice();
 
   const onSubmit = (data: DisplayValidation) => {

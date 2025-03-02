@@ -1,10 +1,10 @@
-import { PkiRegenerateDialog } from "@app/components/Dialog/PkiRegenerateDialog";
+import { PkiRegenerateDialog } from "../../../Dialog/PkiRegenerateDialog.tsx";
 import { DynamicForm } from "@app/components/Form/DynamicForm.tsx";
-import { useAppStore } from "@app/core/stores/appStore";
+import { useAppStore } from "../../../../core/stores/appStore.ts";
 import {
   getX25519PrivateKey,
   getX25519PublicKey,
-} from "@app/core/utils/x25519";
+} from "../../../../core/utils/x25519.ts";
 import type { SecurityValidation } from "@app/validation/config/security.tsx";
 import { create } from "@bufbuild/protobuf";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -12,7 +12,7 @@ import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Eye, EyeOff } from "lucide-react";
 import { useReducer } from "react";
-import { securityReducer } from "./securityReducer";
+import { securityReducer } from "./securityReducer.tsx";
 
 export const Security = () => {
   const { config, setWorkingConfig, setDialogOpen } = useDevice();
@@ -308,8 +308,7 @@ export const Security = () => {
       <PkiRegenerateDialog
         open={state.privateKeyDialogOpen}
         onOpenChange={() =>
-          dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })
-        }
+          dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })}
         onSubmit={pkiRegenerate}
       />
     </>

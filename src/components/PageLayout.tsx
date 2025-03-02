@@ -1,7 +1,7 @@
 import { cn } from "@app/core/utils/cn.ts";
 import { AlignLeftIcon, type LucideIcon } from "lucide-react";
-import Footer from "./UI/Footer";
-import { Spinner } from "./UI/Spinner";
+import Footer from "./UI/Footer.tsx";
+import { Spinner } from "./UI/Spinner.tsx";
 
 export interface PageLayoutProps {
   label: string;
@@ -44,9 +44,7 @@ export const PageLayout = ({
                     className="transition-all hover:text-accent"
                     onClick={action.onClick}
                   >
-                    {action?.isLoading ? (
-                      <Spinner />
-                    ) : (
+                    {action?.isLoading ? <Spinner /> : (
                       <action.icon
                         className={action.iconClasses}
                         aria-disabled={action.disabled}

@@ -1,5 +1,3 @@
-import type { JSX } from "react";
-
 export interface UptimeProps {
   seconds: number;
 }
@@ -12,6 +10,6 @@ const getUptime = (seconds: number): string => {
   return `${days}d ${hours}h ${minutes}m ${secondsLeft}s`;
 };
 
-export const Uptime = ({ seconds }: UptimeProps): JSX.Element => {
+export const Uptime = ({ seconds }: UptimeProps) => {
   return <span>{getUptime(seconds)}</span>;
 };

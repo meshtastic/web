@@ -3,8 +3,7 @@ import { Protobuf } from "@meshtastic/core";
 import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
 export class DisplayValidation
-  implements Omit<Protobuf.Config.Config_DisplayConfig, keyof Message>
-{
+  implements Omit<Protobuf.Config.Config_DisplayConfig, keyof Message> {
   @IsInt()
   screenOnSecs: number;
 

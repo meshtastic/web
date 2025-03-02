@@ -54,7 +54,6 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
       disabled,
       ...props
     },
-    ref,
   ) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
 

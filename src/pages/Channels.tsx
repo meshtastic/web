@@ -17,12 +17,12 @@ export const getChannelName = (channel: Protobuf.Channel.Channel) =>
   channel.settings?.name.length
     ? channel.settings?.name
     : channel.index === 0
-      ? "Primary"
-      : `Ch ${channel.index}`;
+    ? "Primary"
+    : `Ch ${channel.index}`;
 
 const ChannelsPage = () => {
   const { channels, setDialogOpen } = useDevice();
-  const [activeChannel, setActiveChannel] = useState<Types.ChannelNumber>(
+  const [activeChannel] = useState<Types.ChannelNumber>(
     Types.ChannelNumber.Primary,
   );
 

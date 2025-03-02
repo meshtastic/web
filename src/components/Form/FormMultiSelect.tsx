@@ -3,7 +3,7 @@ import type {
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.tsx";
 import type { FieldValues } from "react-hook-form";
-import { MultiSelect, MultiSelectItem } from "../UI/MultiSelect";
+import { MultiSelect, MultiSelectItem } from "../UI/MultiSelect.tsx";
 
 export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "multiSelect";
@@ -28,8 +28,8 @@ export function MultiSelectInput<T extends FieldValues>({
   // Make sure to filter out the UNSET value, as it shouldn't be shown in the UI
   const optionsEnumValues = enumValue
     ? Object.entries(enumValue)
-        .filter((value) => typeof value[1] === "number")
-        .filter((value) => value[0] !== "UNSET")
+      .filter((value) => typeof value[1] === "number")
+      .filter((value) => value[0] !== "UNSET")
     : [];
 
   const formatName = (name: string) => {

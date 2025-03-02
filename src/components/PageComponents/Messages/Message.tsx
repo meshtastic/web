@@ -4,14 +4,13 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@app/components/UI/Tooltip";
-import { useAppStore } from "@app/core/stores/appStore";
+} from "@components/UI/Tooltip.tsx";
 import {
   type MessageWithState,
   useDeviceStore,
 } from "@app/core/stores/deviceStore.ts";
-import { cn } from "@app/core/utils/cn";
-import { Avatar } from "@components/UI/Avatar";
+import { cn } from "@core/utils/cn.ts";
+import { Avatar } from "@components/UI/Avatar.tsx";
 import type { Protobuf } from "@meshtastic/core";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -94,7 +93,6 @@ const StatusIcon = ({ state, className, ...otherProps }: StatusIconProps) => {
 const getMessageTextStyles = (state: MessageState) => {
   const isAcknowledged = state === MESSAGE_STATES.ACK;
   const isFailed = state === MESSAGE_STATES.FAILED;
-  const isWaiting = state === MESSAGE_STATES.WAITING;
 
   return cn(
     "break-words overflow-hidden",
@@ -145,16 +143,18 @@ export const Message = ({ lastMsgSameUser, message, sender }: MessageProps) => {
         )}
       >
         <div className="flex items-center gap-2 mb-2">
-          {!lastMsgSameUser ? (
-            <div className="flex place-items-center gap-2 mb-1">
-              <Avatar text={messageUser?.shortName} />
-              <div className="flex flex-col">
-                <span className="font-medium text-slate-900 dark:text-white truncate">
-                  {messageUser?.longName}
-                </span>
+          {!lastMsgSameUser
+            ? (
+              <div className="flex place-items-center gap-2 mb-1">
+                <Avatar text={messageUser?.shortName} />
+                <div className="flex flex-col">
+                  <span className="font-medium text-slate-900 dark:text-white truncate">
+                    {messageUser?.longName}
+                  </span>
+                </div>
               </div>
-            </div>
-          ) : null}
+            )
+            : null}
         </div>
         <TimeDisplay date={message.rxTime} />
         <div className="flex place-items-center gap-2 pb-2">

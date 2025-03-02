@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { convertIntToIpAddress, convertIpAddressToInt } from "./ip";
+import { convertIntToIpAddress, convertIpAddressToInt } from "./ip.ts";
 
 describe("IP Address Conversion Functions", () => {
   describe("convertIntToIpAddress", () => {

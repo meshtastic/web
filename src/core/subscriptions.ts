@@ -36,7 +36,7 @@ export const subscribeAll = (
     }
   });
 
-  connection.events.onTelemetryPacket.subscribe((telemetryPacket) => {
+  connection.events.onTelemetryPacket.subscribe(() => {
     // device.setMetrics(telemetryPacket);
   });
 
@@ -45,7 +45,7 @@ export const subscribeAll = (
   });
 
   connection.events.onWaypointPacket.subscribe((waypoint) => {
-    const { data, ...rest } = waypoint;
+    const { data } = waypoint;
     device.addWaypoint(data);
   });
 

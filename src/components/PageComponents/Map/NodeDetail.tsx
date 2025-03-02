@@ -1,8 +1,8 @@
-import { Separator } from "@app/components/UI/Seperator";
+import { Separator } from "../../UI/Seperator.tsx";
 import { H5 } from "@app/components/UI/Typography/H5.tsx";
 import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
-import { formatQuantity } from "@app/core/utils/string";
-import { Avatar } from "@components/UI/Avatar";
+import { formatQuantity } from "../../../core/utils/string.ts";
+import { Avatar } from "../../UI/Avatar.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Protobuf } from "@meshtastic/core";
@@ -37,21 +37,23 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
           <Avatar text={node.user?.shortName} />
 
           <div>
-            {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
-              <LockIcon
-                className="text-green-600"
-                size={12}
-                strokeWidth={3}
-                aria-label="Public Key Enabled"
-              />
-            ) : (
-              <LockOpenIcon
-                className="text-yellow-500"
-                size={12}
-                strokeWidth={3}
-                aria-label="No Public Key"
-              />
-            )}
+            {node.user?.publicKey && node.user?.publicKey.length > 0
+              ? (
+                <LockIcon
+                  className="text-green-600"
+                  size={12}
+                  strokeWidth={3}
+                  aria-label="Public Key Enabled"
+                />
+              )
+              : (
+                <LockOpenIcon
+                  className="text-yellow-500"
+                  size={12}
+                  strokeWidth={3}
+                  aria-label="No Public Key"
+                />
+              )}
           </div>
 
           <Star
@@ -73,15 +75,13 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
                 node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
               } volts`}
             >
-              {node.deviceMetrics?.batteryLevel > 100 ? (
-                <BatteryChargingIcon size={22} />
-              ) : node.deviceMetrics?.batteryLevel > 80 ? (
-                <BatteryFullIcon size={22} />
-              ) : node.deviceMetrics?.batteryLevel > 20 ? (
-                <BatteryMediumIcon size={22} />
-              ) : (
-                <BatteryLowIcon size={22} />
-              )}
+              {node.deviceMetrics?.batteryLevel > 100
+                ? <BatteryChargingIcon size={22} />
+                : node.deviceMetrics?.batteryLevel > 80
+                ? <BatteryFullIcon size={22} />
+                : node.deviceMetrics?.batteryLevel > 20
+                ? <BatteryMediumIcon size={22} />
+                : <BatteryLowIcon size={22} />}
               <Subtle aria-label="Battery">
                 {node.deviceMetrics?.batteryLevel > 100
                   ? "Charging"

@@ -74,10 +74,11 @@ export function DynamicForm<T extends FieldValues>({
       const value = getValues(field.fieldName);
       if (value === "always") return true;
       if (typeof value === "boolean") return field.invert ? value : !value;
-      if (typeof value === "number")
+      if (typeof value === "number") {
         return field.invert
           ? field.selector !== value
           : field.selector === value;
+      }
       return false;
     });
   };
@@ -85,11 +86,9 @@ export function DynamicForm<T extends FieldValues>({
   return (
     <form
       className="space-y-8"
-      {...(submitType === "onSubmit"
-        ? { onSubmit: handleSubmit(onSubmit) }
-        : {
-            onChange: handleSubmit(onSubmit),
-          })}
+      {...(submitType === "onSubmit" ? { onSubmit: handleSubmit(onSubmit) } : {
+        onChange: handleSubmit(onSubmit),
+      })}
     >
       {fieldGroups.map((fieldGroup) => (
         <div key={fieldGroup.label} className="space-y-8 sm:space-y-5">
@@ -105,10 +104,8 @@ export function DynamicForm<T extends FieldValues>({
                 label={field.label}
                 fieldName={field.name}
                 description={field.description}
-                valid={
-                  field.validationText === undefined ||
-                  field.validationText === ""
-                }
+                valid={field.validationText === undefined ||
+                  field.validationText === ""}
                 validationText={field.validationText}
               >
                 <DynamicFormField

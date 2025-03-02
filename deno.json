@@ -1,0 +1,36 @@
+{
+  "imports": {
+    "@meshtastic/core": "jsr:@meshtastic/core@^2.6.0",
+    "@meshtastic/js": "jsr:@meshtastic/js@^2.3.4",
+    "@meshtastic/transport-http": "jsr:@meshtastic/transport-http@^0.2.1",
+    "@meshtastic/transport-web-serial": "jsr:@meshtastic/transport-web-serial@^0.2.1",
+    "@app/": "./src/",
+    "@pages/": "./src/pages/",
+    "@components/": "./src/components/",
+    "@core/": "./src/core/",
+    "@layouts/": "./src/layouts/"
+  },
+  "compilerOptions": {
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "types": [
+      "vite/client",
+      "node",
+      "@types/web-bluetooth",
+      "@types/w3c-web-serial"
+    ],
+    "strictPropertyInitialization": false
+  },
+  "unstable": [
+    "sloppy-imports"
+  ]
+}

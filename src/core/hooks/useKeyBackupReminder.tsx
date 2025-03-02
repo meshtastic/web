@@ -1,8 +1,8 @@
-import { Button } from "@app/components/UI/Button";
+import { Button } from "../../components/UI/Button.tsx";
 import type { CookieAttributes } from "js-cookie";
 import { useCallback, useEffect, useRef } from "react";
-import useCookie from "./useCookie";
-import { useToast } from "./useToast";
+import useCookie from "./useCookie.ts";
+import { useToast } from "./useToast.ts";
 
 interface UseBackupReminderOptions {
   reminderInDays?: number;
@@ -26,8 +26,8 @@ const ON_ACCEPT_REMINDER_DAYS = 365;
 function isReminderExpired(lastShown: string): boolean {
   const lastShownDate = new Date(lastShown);
   const now = new Date();
-  const daysSinceLastShown =
-    (now.getTime() - lastShownDate.getTime()) / (1000 * 60 * 60 * 24);
+  const daysSinceLastShown = (now.getTime() - lastShownDate.getTime()) /
+    (1000 * 60 * 60 * 24);
   return daysSinceLastShown >= 7;
 }
 
@@ -63,8 +63,7 @@ export function useBackupReminder({
   useEffect(() => {
     if (!enabled || toastShownRef.current) return;
 
-    const shouldShowReminder =
-      !reminderCookie?.suppressed ||
+    const shouldShowReminder = !reminderCookie?.suppressed ||
       isReminderExpired(reminderCookie.lastShown);
     if (!shouldShowReminder) return;
 

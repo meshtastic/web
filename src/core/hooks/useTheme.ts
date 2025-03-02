@@ -4,7 +4,7 @@ type Theme = "light" | "dark" | "system";
 
 export function useTheme() {
   const getSystemTheme = () =>
-    window.matchMedia("(prefers-color-scheme: dark)").matches
+    globalThis.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
 
@@ -14,7 +14,7 @@ export function useTheme() {
   );
 
   const [preference, setPreference] = useState<Theme>(() =>
-    typeof window !== "undefined" ? getStoredPreference() : "light",
+    typeof window !== "undefined" ? getStoredPreference() : "light"
   );
 
   const theme = preference === "system" ? getSystemTheme() : preference;
@@ -26,7 +26,7 @@ export function useTheme() {
   useEffect(() => {
     if (preference !== "system") return;
 
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const media = globalThis.matchMedia("(prefers-color-scheme: dark)");
     const updateTheme = () => setPreference(getStoredPreference());
 
     media.addEventListener("change", updateTheme);

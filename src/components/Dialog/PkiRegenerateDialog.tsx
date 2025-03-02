@@ -18,7 +18,7 @@ export const PkiRegenerateDialog = ({
   open,
   onOpenChange,
   onSubmit,
-}: PkiRegenerateDialogProps): JSX.Element => {
+}: PkiRegenerateDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>

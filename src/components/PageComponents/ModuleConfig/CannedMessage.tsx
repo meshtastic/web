@@ -4,7 +4,7 @@ import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 
-export const CannedMessage = (): JSX.Element => {
+export const CannedMessage = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
 
   const onSubmit = (data: CannedMessageValidation) => {
@@ -63,9 +63,8 @@ export const CannedMessage = (): JSX.Element => {
               label: "Clockwise event",
               description: "Select input event.",
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig
-                    .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue: Protobuf.ModuleConfig
+                  .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
@@ -74,9 +73,8 @@ export const CannedMessage = (): JSX.Element => {
               label: "Counter Clockwise event",
               description: "Select input event.",
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig
-                    .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue: Protobuf.ModuleConfig
+                  .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {
@@ -85,9 +83,8 @@ export const CannedMessage = (): JSX.Element => {
               label: "Press event",
               description: "Select input event",
               properties: {
-                enumValue:
-                  Protobuf.ModuleConfig
-                    .ModuleConfig_CannedMessageConfig_InputEventChar,
+                enumValue: Protobuf.ModuleConfig
+                  .ModuleConfig_CannedMessageConfig_InputEventChar,
               },
             },
             {

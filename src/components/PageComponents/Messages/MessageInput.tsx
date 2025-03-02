@@ -1,16 +1,10 @@
-import { debounce } from "@app/core/utils/debounce";
+import { debounce } from "../../../core/utils/debounce.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
-import {
-  type JSX,
-  startTransition,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import { startTransition, useCallback, useMemo, useState } from "react";
 
 export interface MessageInputProps {
   to: Types.Destination;
@@ -22,7 +16,7 @@ export const MessageInput = ({
   to,
   channel,
   maxBytes,
-}: MessageInputProps): JSX.Element => {
+}: MessageInputProps) => {
   const {
     connection,
     setMessageState,
@@ -43,7 +37,7 @@ export const MessageInput = ({
     async (message: string) => {
       await connection
         ?.sendText(message, to, true, channel)
-        .then((id) =>
+        .then((id: number) =>
           setMessageState(
             to === "broadcast" ? "broadcast" : "direct",
             channel,
@@ -51,7 +45,7 @@ export const MessageInput = ({
             myNodeNum,
             id,
             "ack",
-          ),
+          )
         )
         .catch((e: Types.PacketError) =>
           setMessageState(
@@ -61,7 +55,7 @@ export const MessageInput = ({
             myNodeNum,
             e.id,
             e.error,
-          ),
+          )
         );
     },
     [channel, connection, myNodeNum, setMessageState, to],
@@ -82,7 +76,7 @@ export const MessageInput = ({
     <div className="flex gap-2">
       <form
         className="w-full"
-        action={async (formData: FormData) => {
+        action={(formData: FormData) => {
           // prevent user from sending blank/empty message
           if (localDraft === "") return;
           const message = formData.get("messageInput") as string;
@@ -97,7 +91,7 @@ export const MessageInput = ({
         <div className="flex grow gap-2">
           <span className="w-full">
             <Input
-              autoFocus={true}
+              autoFocus
               minLength={1}
               name="messageInput"
               placeholder="Enter Message"

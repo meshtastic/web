@@ -5,7 +5,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
-import type { JSX } from "react";
 
 export interface TimeAgoProps {
   timestamp: number;
@@ -43,7 +42,7 @@ const getTimeAgo = (
   return rtf.format(Math.floor(0 - diff), "second");
 };
 
-export const TimeAgo = ({ timestamp }: TimeAgoProps): JSX.Element => {
+export const TimeAgo = ({ timestamp }: TimeAgoProps) => {
   return (
     <TooltipProvider>
       <Tooltip>

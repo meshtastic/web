@@ -5,7 +5,7 @@ export interface H5Props {
   children: React.ReactNode;
 }
 
-export const H5 = ({ className, children }: H5Props): JSX.Element => (
+export const H5 = ({ className, children }: H5Props) => (
   <h5
     className={cn("scroll-m-20 text-lg font-medium tracking-tight", className)}
   >

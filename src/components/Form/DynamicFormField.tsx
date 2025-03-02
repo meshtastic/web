@@ -1,7 +1,7 @@
 import {
   type MultiSelectFieldProps,
   MultiSelectInput,
-} from "@app/components/Form/FormMultiSelect";
+} from "./FormMultiSelect.tsx";
 import {
   GenericInput,
   type InputFieldProps,
@@ -48,11 +48,19 @@ export function DynamicFormField<T extends FieldValues>({
 
     case "toggle":
       return (
-        <ToggleInput field={field} control={control} disabled={disabled} />
+        <ToggleInput
+          field={field}
+          control={control}
+          disabled={disabled}
+        />
       );
     case "select":
       return (
-        <SelectInput field={field} control={control} disabled={disabled} />
+        <SelectInput
+          field={field}
+          control={control}
+          disabled={disabled}
+        />
       );
     case "passwordGenerator":
       return (

@@ -3,8 +3,8 @@ import { Protobuf } from "@meshtastic/core";
 import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
 export class AudioValidation
-  implements Omit<Protobuf.ModuleConfig.ModuleConfig_AudioConfig, keyof Message>
-{
+  implements
+    Omit<Protobuf.ModuleConfig.ModuleConfig_AudioConfig, keyof Message> {
   @IsBoolean()
   codec2Enabled: boolean;
 

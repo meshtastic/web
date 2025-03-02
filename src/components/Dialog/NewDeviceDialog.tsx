@@ -1,7 +1,7 @@
 import {
   type BrowserFeature,
   useBrowserFeatureDetection,
-} from "@app/core/hooks/useBrowserFeatureDetection";
+} from "../../core/hooks/useBrowserFeatureDetection.ts";
 import { BLE } from "@components/PageComponents/Connect/BLE.tsx";
 import { HTTP } from "@components/PageComponents/Connect/HTTP.tsx";
 import { Serial } from "@components/PageComponents/Connect/Serial.tsx";
@@ -18,9 +18,9 @@ import {
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { AlertCircle, InfoIcon } from "lucide-react";
-import { Fragment, type JSX } from "react/jsx-runtime";
-import { Link } from "../UI/Typography/Link";
+import { AlertCircle } from "lucide-react";
+import { Link } from "../UI/Typography/Link.tsx";
+import { Fragment } from "react/jsx-runtime";
 
 export interface TabElementProps {
   closeDialog: () => void;
@@ -85,14 +85,16 @@ const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
           <p className="text-sm">
             {browserFeatures.length > 0 && (
               <>
-                This application requires {formatFeatureList(browserFeatures)}.
-                Please use a Chromium-based browser like Chrome or Edge.
+                This application requires{" "}
+                {formatFeatureList(browserFeatures)}. Please use a
+                Chromium-based browser like Chrome or Edge.
               </>
             )}
             {needsSecureContext && (
               <>
                 {browserFeatures.length > 0 && " Additionally, it"}
-                {browserFeatures.length === 0 && "This application"} requires a{" "}
+                {browserFeatures.length === 0 && "This application"} requires a
+                {" "}
                 <Link href={links["Secure Context"]}>secure context</Link>.
                 Please connect using HTTPS or localhost.
               </>
@@ -107,7 +109,7 @@ const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
 export const NewDeviceDialog = ({
   open,
   onOpenChange,
-}: NewDeviceProps): JSX.Element => {
+}: NewDeviceProps) => {
   const { unsupported } = useBrowserFeatureDetection();
 
   const tabs: TabManifest[] = [
@@ -119,15 +121,13 @@ export const NewDeviceDialog = ({
     {
       label: "Bluetooth",
       element: BLE,
-      isDisabled:
-        unsupported.includes("Web Bluetooth") ||
+      isDisabled: unsupported.includes("Web Bluetooth") ||
         unsupported.includes("Secure Context"),
     },
     {
       label: "Serial",
       element: Serial,
-      isDisabled:
-        unsupported.includes("Web Serial") ||
+      isDisabled: unsupported.includes("Web Serial") ||
         unsupported.includes("Secure Context"),
     },
   ];
@@ -149,9 +149,9 @@ export const NewDeviceDialog = ({
           {tabs.map((tab) => (
             <TabsContent key={tab.label} value={tab.label}>
               <fieldset disabled={tab.isDisabled}>
-                {tab.isDisabled ? (
-                  <ErrorMessage missingFeatures={unsupported} />
-                ) : null}
+                {tab.isDisabled
+                  ? <ErrorMessage missingFeatures={unsupported} />
+                  : null}
                 <tab.element closeDialog={() => onOpenChange(false)} />
               </fieldset>
             </TabsContent>

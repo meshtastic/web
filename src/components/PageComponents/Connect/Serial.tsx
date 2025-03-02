@@ -1,4 +1,4 @@
-import type { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
+import type { TabElementProps } from "../../Dialog/NewDeviceDialog.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
@@ -9,7 +9,7 @@ import { MeshDevice } from "@meshtastic/core";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { useCallback, useEffect, useState } from "react";
 
-export const Serial = ({ closeDialog }: TabElementProps): JSX.Element => {
+export const Serial = ({ closeDialog }: TabElementProps) => {
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();

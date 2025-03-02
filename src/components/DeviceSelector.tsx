@@ -5,10 +5,11 @@ import { Code } from "@components/UI/Typography/Code.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { HomeIcon, PlusIcon, SearchIcon } from "lucide-react";
-import type { JSX } from "react";
-import { Avatar } from "./UI/Avatar";
 
-export const DeviceSelector = (): JSX.Element => {
+import { Avatar } from "./UI/Avatar.tsx";
+import process from "node:process";
+
+export const DeviceSelector = () => {
   const { getDevices } = useDeviceStore();
   const {
     selectedDevice,
@@ -38,11 +39,9 @@ export const DeviceSelector = (): JSX.Element => {
               active={selectedDevice === device.id}
             >
               <Avatar
-                text={
-                  device.nodes
-                    .get(device.hardware.myNodeNum)
-                    ?.user?.shortName.toString() ?? "UNK"
-                }
+                text={device.nodes
+                  .get(device.hardware.myNodeNum)
+                  ?.user?.shortName.toString() ?? "UNK"}
               />
             </DeviceSelectorButton>
           ))}
@@ -66,9 +65,11 @@ export const DeviceSelector = (): JSX.Element => {
           <SearchIcon />
         </button>
         {/* TODO: This is being commented out until its fixed */}
-        {/* <button type="button" className="transition-all hover:text-accent">
+        {
+          /* <button type="button" className="transition-all hover:text-accent">
           <LanguagesIcon />
-        </button> */}
+        </button> */
+        }
         <Separator />
         <Code>{process.env.COMMIT_HASH}</Code>
       </div>

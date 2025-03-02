@@ -1,7 +1,7 @@
 import {
   type FlagName,
   usePositionFlags,
-} from "@app/core/hooks/usePositionFlags";
+} from "../../../core/hooks/usePositionFlags.ts";
 import type { PositionValidation } from "@app/validation/config/position.tsx";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";

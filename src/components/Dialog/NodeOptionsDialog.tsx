@@ -1,17 +1,17 @@
-import { toast } from "@app/core/hooks/useToast";
-import { useAppStore } from "@app/core/stores/appStore";
-import { useDevice } from "@app/core/stores/deviceStore";
+import { toast } from "../../core/hooks/useToast.ts";
+import { useAppStore } from "../../core/stores/appStore.ts";
+import { useDevice } from "../../core/stores/deviceStore.ts";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog";
+} from "../UI/Dialog.tsx";
 import type { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { TrashIcon } from "lucide-react";
-import type { JSX } from "react";
-import { Button } from "../UI/Button";
+
+import { Button } from "../UI/Button.tsx";
 
 export interface NodeOptionsDialogProps {
   node: Protobuf.Mesh.NodeInfo | undefined;
@@ -23,7 +23,7 @@ export const NodeOptionsDialog = ({
   node,
   open,
   onOpenChange,
-}: NodeOptionsDialogProps): JSX.Element => {
+}: NodeOptionsDialogProps) => {
   const { setDialogOpen, connection, setActivePage } = useDevice();
   const {
     setNodeNumToBeRemoved,
@@ -31,11 +31,9 @@ export const NodeOptionsDialog = ({
     setChatType,
     setActiveChat,
   } = useAppStore();
-  const longName =
-    node?.user?.longName ??
+  const longName = node?.user?.longName ??
     (node ? `!${numberToHexUnpadded(node?.num)}` : "Unknown");
-  const shortName =
-    node?.user?.shortName ??
+  const shortName = node?.user?.shortName ??
     (node ? `${numberToHexUnpadded(node?.num).substring(0, 4)}` : "UNK");
 
   function handleDirectMessage() {
@@ -53,7 +51,7 @@ export const NodeOptionsDialog = ({
     connection?.requestPosition(node.num).then(() =>
       toast({
         title: "Position request sent.",
-      }),
+      })
     );
     onOpenChange();
   }
@@ -66,7 +64,7 @@ export const NodeOptionsDialog = ({
     connection?.traceRoute(node.num).then(() =>
       toast({
         title: "Traceroute sent.",
-      }),
+      })
     );
     onOpenChange();
   }

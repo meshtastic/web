@@ -1,12 +1,15 @@
-import { cn } from "@app/core/utils/cn";
+import { cn } from "../../core/utils/cn.ts";
 import React from "react";
 
 export interface FooterProps extends React.HTMLAttributes<HTMLElement> {}
 
 const Footer = React.forwardRef<HTMLElement, FooterProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, ...props }) => {
     return (
-      <footer className={cn("flex mt-auto justify-center p-2", className)}>
+      <footer
+        className={cn("flex mt-auto justify-center p-2", className)}
+        {...props}
+      >
         <p>
           <a
             href="https://vercel.com/?utm_source=meshtastic&utm_campaign=oss"

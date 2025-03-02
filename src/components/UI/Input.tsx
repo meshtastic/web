@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@core/utils/cn.ts";
-import { type VariantProps, cva } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react";
 
 const inputVariants = cva(
@@ -20,7 +20,8 @@ const inputVariants = cva(
 );
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement>,
+  extends
+    React.InputHTMLAttributes<HTMLInputElement>,
     VariantProps<typeof inputVariants> {
   prefix?: string;
   suffix?: string;

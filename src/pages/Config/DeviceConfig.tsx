@@ -5,7 +5,7 @@ import { LoRa } from "@components/PageComponents/Config/LoRa.tsx";
 import { Network } from "@components/PageComponents/Config/Network.tsx";
 import { Position } from "@components/PageComponents/Config/Position.tsx";
 import { Power } from "@components/PageComponents/Config/Power.tsx";
-import { Security } from "@components/PageComponents/Config/Security/Security";
+import { Security } from "../../components/PageComponents/Config/Security/Security.tsx";
 import {
   Tabs,
   TabsContent,
