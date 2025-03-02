@@ -2,4 +2,5 @@ dist
 node_modules
 stats.html
 .vercel
+.vite/deps
 dev-dist

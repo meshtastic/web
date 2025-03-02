@@ -5,29 +5,20 @@
   "description": "Meshtastic web client",
   "license": "GPL-3.0-only",
   "scripts": {
-    "build": "vite build",
-    "build:analyze": "BUNDLE_ANALYZE=true vite build",
-    "check": "biome check src/",
-    "check:fix": "pnpm check --write src/",
-    "format": "biome format --write src/",
-    "dev": "vite dev --open",
-    "dev:scan": "VITE_DEBUG_SCAN=true vite dev",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:run": "vitest run",
-    "preview": "vite preview",
-    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ $(ls ./dist/output/)",
-    "postinstall": "npx simple-git-hooks"
+    "build": "deno run -A npm:vite build",
+    "build:analyze": "BUNDLE_ANALYZE=true deno task build",
+    "lint": "deno lint src/",
+    "lint:fix": "deno lint --write src/",
+    "format": "deno fmt --write src/",
+    "dev": "deno task dev:ui",
+    "dev:ui": "deno run -A npm:vite dev",
+    "dev:scan": "VITE_DEBUG_SCAN=true deno task dev:ui",
+    "test": "deno run vitest",
+    "test:ui": "deno task test --ui",
+    "preview": "deno run --allow-net npm:vite preview",
+    "package": "deno run -A npm:gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && deno run -A --allow-run tar -cvf dist/build.tar -C ./dist/output/ ."
   },
-  "simple-git-hooks": {
-    "pre-commit": "bun run check:fix && bun run format"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "bun run check:fix",
-      "bun run format"
-    ]
-  },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meshtastic/web.git"
@@ -79,7 +70,6 @@
     "zustand": "5.0.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
     "@tailwindcss/postcss": "^4.0.9",
     "@testing-library/react": "^16.2.0",
     "@types/chrome": "^0.0.307",
