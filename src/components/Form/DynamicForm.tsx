@@ -13,7 +13,7 @@ import {
   type SubmitHandler,
   useForm,
 } from "react-hook-form";
-import { Heading } from "../UI/Typography/Heading";
+import { Heading } from "../UI/Typography/Heading.tsx";
 
 interface DisabledBy<T> {
   fieldName: Path<T>;

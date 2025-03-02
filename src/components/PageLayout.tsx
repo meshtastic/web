@@ -1,4 +1,4 @@
-import { cn } from "@app/core/utils/cn.ts";
+import { cn } from "@core/utils/cn.ts";
 import { AlignLeftIcon, type LucideIcon } from "lucide-react";
 import Footer from "@components/UI/Footer.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";

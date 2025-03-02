@@ -1,4 +1,4 @@
-import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import type { MqttValidation } from "@app/validation/moduleConfig/mqtt.tsx";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";

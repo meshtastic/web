@@ -1,6 +1,6 @@
-import { Heading } from "../../components/UI/Typography/Heading.tsx";
-import { useAppStore } from "@app/core/stores/appStore.ts";
-import { useDeviceStore } from "@app/core/stores/deviceStore.ts";
+import { Heading } from "@components/UI/Typography/Heading.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
@@ -99,7 +99,7 @@ export const Dashboard = () => {
                 <Heading as="h3">No Devices</Heading>
                 <Subtle>Connect at least one device to get started</Subtle>
                 <Button
-                  className="gap-2"
+                  className="gap-2 dark:bg-white dark:text-slate-900 dark:hover:text-slate-100"
                   variant="default"
                   onClick={() => setConnectDialogOpen(true)}
                 >

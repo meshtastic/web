@@ -1,5 +1,5 @@
 import { useAppStore } from "../../core/stores/appStore.ts";
-import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";

@@ -15,7 +15,6 @@ export const DeviceSelector = () => {
     setCommandPaletteOpen,
     setConnectDialogOpen,
   } = useAppStore();
-  console.log(import.meta.env.VITE_COMMIT_HASH);
 
   return (
     <nav className="flex flex-col justify-between border-r-[0.5px]  border-slate-300 pt-2 dark:border-slate-700">

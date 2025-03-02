@@ -1,4 +1,4 @@
-import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import type { DetectionSensorValidation } from "@app/validation/moduleConfig/detectionSensor.tsx";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";

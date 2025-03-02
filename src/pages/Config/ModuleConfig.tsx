@@ -1,6 +1,6 @@
-import { AmbientLighting } from "@app/components/PageComponents/ModuleConfig/AmbientLighting.tsx";
-import { DetectionSensor } from "@app/components/PageComponents/ModuleConfig/DetectionSensor.tsx";
-import { NeighborInfo } from "@app/components/PageComponents/ModuleConfig/NeighborInfo.tsx";
+import { AmbientLighting } from "@components/PageComponents/ModuleConfig/AmbientLighting.tsx";
+import { DetectionSensor } from "@components/PageComponents/ModuleConfig/DetectionSensor.tsx";
+import { NeighborInfo } from "@components/PageComponents/ModuleConfig/NeighborInfo.tsx";
 import { Audio } from "@components/PageComponents/ModuleConfig/Audio.tsx";
 import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage.tsx";
 import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.tsx";

@@ -11,7 +11,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { type JSX, useCallback, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
 
 export interface DeleteNoteDialogProps {
@@ -138,11 +138,9 @@ const NodesPage = () => {
                   ?.join(":") ?? "UNK"}
               </Mono>,
               <Mono className="px-4" key="lastHeard">
-                {node.lastHeard === 0 ? (
-                  <p className="px-4">Never</p>
-                ) : (
-                  <TimeAgo timestamp={node.lastHeard * 1000} />
-                )}
+                {node.lastHeard === 0
+                  ? <p className="px-4">Never</p>
+                  : <TimeAgo timestamp={node.lastHeard * 1000} />}
               </Mono>,
               <Mono key="snr">
                 {node.snr}db/
@@ -150,11 +148,9 @@ const NodesPage = () => {
                 {(node.snr + 10) * 5}raw
               </Mono>,
               <Mono key="pki">
-                {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
-                  <LockIcon className="text-green-600 mx-auto" />
-                ) : (
-                  <LockOpenIcon className="text-yellow-300 mx-auto" />
-                )}
+                {node.user?.publicKey && node.user?.publicKey.length > 0
+                  ? <LockIcon className="text-green-600 mx-auto" />
+                  : <LockOpenIcon className="text-yellow-300 mx-auto" />}
               </Mono>,
               <Mono key="hops">
                 {node?.lastHeard !== 0

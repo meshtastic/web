@@ -1,4 +1,4 @@
-import { RemoveNodeDialog } from "@app/components/Dialog/RemoveNodeDialog.tsx";
+import { RemoveNodeDialog } from "@components/Dialog/RemoveNodeDialog.tsx";
 import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.tsx";
 import { ImportDialog } from "@components/Dialog/ImportDialog.tsx";
 import { PkiBackupDialog } from "./PKIBackupDialog.tsx";

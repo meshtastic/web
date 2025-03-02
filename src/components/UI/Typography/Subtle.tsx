@@ -1,4 +1,4 @@
-import { cn } from "@app/core/utils/cn.ts";
+import { cn } from "@core/utils/cn.ts";
 
 export interface SubtleProps {
   className?: string;

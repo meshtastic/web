@@ -10,11 +10,13 @@ import Footer from "@components/UI/Footer.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
+import type { JSX } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { ErrorPage } from "./components/UI/ErrorPage.tsx";
+import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import { MapProvider } from "react-map-gl/maplibre";
 
-export const App = () => {
+
+export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();
   const { selectedDevice, setConnectDialogOpen, connectDialogOpen } =
     useAppStore();
@@ -35,23 +37,21 @@ export const App = () => {
           <div className="flex grow">
             <DeviceSelector />
             <div className="flex grow flex-col">
-              {device
-                ? (
-                  <div className="flex h-screen">
-                    <DialogManager />
-                    <KeyBackupReminder />
-                    <CommandPalette />
-                    <MapProvider>
-                      <PageRouter />
-                    </MapProvider>
-                  </div>
-                )
-                : (
-                  <>
-                    <Dashboard />
-                    <Footer />
-                  </>
-                )}
+              {device ? (
+                <div className="flex h-screen w-full">
+                  <DialogManager />
+                  <KeyBackupReminder />
+                  <CommandPalette />
+                  <MapProvider>
+                    <PageRouter />
+                  </MapProvider>
+                </div>
+              ) : (
+                <>
+                  <Dashboard />
+                  <Footer />
+                </>
+              )}
             </div>
           </div>
         </div>

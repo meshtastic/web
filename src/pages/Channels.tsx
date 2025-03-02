@@ -3,7 +3,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@app/components/UI/Tabs.tsx";
+} from "@components/UI/Tabs.tsx";
 import { Channel } from "@components/PageComponents/Channel.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";

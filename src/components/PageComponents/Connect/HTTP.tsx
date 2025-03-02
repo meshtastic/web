@@ -1,4 +1,4 @@
-import type { TabElementProps } from "@app/components/Dialog/NewDeviceDialog.tsx";
+import type { TabElementProps } from "@components/Dialog/NewDeviceDialog.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
@@ -22,8 +22,8 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   }>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
-          globalThis.location.hostname,
-        )
+        globalThis.location.hostname,
+      )
         ? "meshtastic.local"
         : globalThis.location.host,
       tls: location.protocol === "https:",

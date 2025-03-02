@@ -8,7 +8,7 @@ import {
 import {
   type MessageWithState,
   useDeviceStore,
-} from "@app/core/stores/deviceStore.ts";
+} from "@core/stores/deviceStore.ts";
 import { cn } from "@core/utils/cn.ts";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import type { Protobuf } from "@meshtastic/core";
@@ -44,13 +44,13 @@ const STATUS_TEXT_MAP: Record<MessageState, string> = {
   [MESSAGE_STATES.ACK]: "Message delivered",
   [MESSAGE_STATES.WAITING]: "Waiting for delivery",
   [MESSAGE_STATES.FAILED]: "Delivery failed",
-} as const;
+};
 
 const STATUS_ICON_MAP: Record<MessageState, LucideIcon> = {
   [MESSAGE_STATES.ACK]: CheckCircle2,
   [MESSAGE_STATES.WAITING]: CircleEllipsis,
   [MESSAGE_STATES.FAILED]: AlertCircle,
-} as const;
+};
 
 const getStatusText = (state: MessageState): string => STATUS_TEXT_MAP[state];
 

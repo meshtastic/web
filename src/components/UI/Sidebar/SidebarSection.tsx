@@ -1,4 +1,4 @@
-import { Heading } from "../Typography/Heading";
+import { Heading } from "../Typography/Heading.tsx";
 
 export interface SidebarSectionProps {
   label: string;

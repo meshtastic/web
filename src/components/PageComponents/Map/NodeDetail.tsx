@@ -1,7 +1,7 @@
-import { Separator } from "@app/components/UI/Seperator.tsx";
-import { Heading } from "@app/components/UI/Typography/Heading.tsx";
-import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
-import { formatQuantity } from "@app/core/utils/string.ts";
+import { Separator } from "@components/UI/Seperator.tsx";
+import { Heading } from "@components/UI/Typography/Heading.tsx";
+import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { formatQuantity } from "@core/utils/string.ts";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";

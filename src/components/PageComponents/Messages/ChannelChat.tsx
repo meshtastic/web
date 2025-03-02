@@ -1,7 +1,4 @@
-import {
-  type MessageWithState,
-  useDevice,
-} from "@app/core/stores/deviceStore.ts";
+import { type MessageWithState, useDevice } from "@core/stores/deviceStore.ts";
 import { Message } from "@components/PageComponents/Messages/Message.tsx";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import type { Types } from "@meshtastic/core";

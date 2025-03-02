@@ -1,8 +1,8 @@
-import newGithubIssueUrl from "@app/core/utils/github";
+import newGithubIssueUrl from "../../core/utils/github.ts";
 import { ExternalLink } from "lucide-react";
-import { Heading } from "./Typography/Heading";
-import { Link } from "./Typography/Link";
-import { P } from "./Typography/P";
+import { Heading } from "./Typography/Heading.tsx";
+import { Link } from "./Typography/Link.tsx";
+import { P } from "./Typography/P.tsx";
 
 export function ErrorPage({ error }: { error: Error }) {
   if (!error) {

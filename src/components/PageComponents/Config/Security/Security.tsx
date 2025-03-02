@@ -1,18 +1,18 @@
-import { PkiRegenerateDialog } from "../../../Dialog/PkiRegenerateDialog.tsx";
-import { DynamicForm } from "@app/components/Form/DynamicForm.tsx";
-import { useAppStore } from "../../../../core/stores/appStore.ts";
+import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
 import {
   getX25519PrivateKey,
   getX25519PublicKey,
-} from "../../../../core/utils/x25519.ts";
-import type { SecurityValidation } from "@app/validation/config/security.tsx";
+} from "@core/utils/x25519.ts";
+import type { SecurityValidation } from "@app/validation/config/security.ts";
 import { create } from "@bufbuild/protobuf";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Eye, EyeOff } from "lucide-react";
 import { useReducer } from "react";
-import { securityReducer } from "./securityReducer.tsx";
+import { securityReducer } from "@components/PageComponents/Config/Security/securityReducer.tsx";
 
 export const Security = () => {
   const { config, setWorkingConfig, setDialogOpen } = useDevice();
