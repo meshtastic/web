@@ -1,9 +1,5 @@
 {
   "imports": {
-    "@meshtastic/core": "jsr:@meshtastic/core@^2.6.0",
-    "@meshtastic/js": "jsr:@meshtastic/js@^2.3.4",
-    "@meshtastic/transport-http": "jsr:@meshtastic/transport-http@^0.2.1",
-    "@meshtastic/transport-web-serial": "jsr:@meshtastic/transport-web-serial@^0.2.1",
     "@app/": "./src/",
     "@pages/": "./src/pages/",
     "@components/": "./src/components/",
@@ -14,7 +10,9 @@
     "lib": [
       "DOM",
       "DOM.Iterable",
-      "ESNext"
+      "ESNext",
+      "deno.window",
+      "deno.ns"
     ],
     "jsx": "react-jsx",
     "strict": true,

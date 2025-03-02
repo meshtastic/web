@@ -2,6 +2,10 @@
   "version": "4",
   "specifiers": {
     "npm:@bufbuild/protobuf@^2.2.3": "2.2.3",
+    "npm:@jsr/meshtastic__core@2.6.0-0": "2.6.0-0",
+    "npm:@jsr/meshtastic__js@2.6.0-0": "2.6.0-0",
+    "npm:@jsr/meshtastic__transport-http@*": "0.2.1",
+    "npm:@jsr/meshtastic__transport-web-serial@*": "0.2.1",
     "npm:@noble/curves@^1.8.1": "1.8.1",
     "npm:@radix-ui/react-accordion@^1.2.3": "1.2.3_@types+react@19.0.10_@types+react-dom@19.0.4__@types+react@19.0.10_react@19.0.0_react-dom@19.0.0__react@19.0.0",
     "npm:@radix-ui/react-checkbox@^1.1.4": "1.1.4_@types+react@19.0.10_@types+react-dom@19.0.4__@types+react@19.0.10_react@19.0.0_react-dom@19.0.0__react@19.0.0",
@@ -36,6 +40,7 @@
     "npm:class-variance-authority@~0.7.1": "0.7.1",
     "npm:clsx@^2.1.1": "2.1.1",
     "npm:cmdk@^1.0.4": "1.0.4_react@19.0.0_react-dom@19.0.0__react@19.0.0_@types+react@19.0.10_@types+react-dom@19.0.4__@types+react@19.0.10",
+    "npm:crc@^4.3.2": "4.3.2",
     "npm:crypto-random-string@5": "5.0.0",
     "npm:gzipper@^8.2.0": "8.2.0",
     "npm:happy-dom@^17.1.8": "17.1.8",
@@ -51,10 +56,14 @@
     "npm:react-scan@~0.2.8": "0.2.8_react@19.0.0_react-dom@19.0.0__react@19.0.0_preact@10.26.4",
     "npm:react@19": "19.0.0",
     "npm:rfc4648@^1.5.4": "1.5.4",
+    "npm:simple-git-hooks@^2.11.1": "2.11.1",
+    "npm:ste-simple-events@^3.0.11": "3.0.11",
     "npm:tailwind-merge@^3.0.2": "3.0.2",
     "npm:tailwindcss-animate@^1.0.7": "1.0.7_tailwindcss@4.0.9",
     "npm:tailwindcss@^4.0.9": "4.0.9",
     "npm:tar@^7.4.3": "7.4.3",
+    "npm:tslog@^4.9.2": "4.9.3",
+    "npm:tslog@^4.9.3": "4.9.3",
     "npm:typescript@^5.8.2": "5.8.2",
     "npm:vite-plugin-node-polyfills@0.23": "0.23.0_vite@6.2.0__@types+node@22.13.8_@types+node@22.13.8",
     "npm:vite-plugin-pwa@~0.21.1": "0.21.1_vite@6.2.0__@types+node@22.13.8_workbox-build@7.3.0__ajv@8.17.1__@babel+core@7.26.9__rollup@2.79.2_workbox-window@7.3.0_@types+node@22.13.8",
@@ -1089,6 +1098,54 @@
       "dependencies": [
         "@jridgewell/resolve-uri",
         "@jridgewell/sourcemap-codec"
+      ]
+    },
+    "@jsr/meshtastic__core@2.6.0": {
+      "integrity": "sha512-+Ik6gzZnfi5sW+WC06bRayA6KGF2NI+zi3bqKbvA8mGDNSOPgsFhA4VZ79DKY4bSflTW170MRIUeyYo0IWQQuw==",
+      "dependencies": [
+        "@bufbuild/protobuf",
+        "@jsr/meshtastic__protobufs",
+        "crc",
+        "ste-simple-events",
+        "tslog"
+      ]
+    },
+    "@jsr/meshtastic__core@2.6.0-0": {
+      "integrity": "sha512-Ks71sRagbBipotznULpsJZ1EMcQIqCEJQx6mf628dmCNVf2YECi2zi/i/5zErp1hGPgfbDvCz9oPogvsd/7fMA==",
+      "dependencies": [
+        "@bufbuild/protobuf",
+        "@jsr/meshtastic__protobufs",
+        "crc",
+        "ste-simple-events",
+        "tslog"
+      ]
+    },
+    "@jsr/meshtastic__js@2.6.0-0": {
+      "integrity": "sha512-+xpZpxK6oUIVOuEs7C+LyxRr2druvc7UNNNTK9Rl8ioXj63Jz1uQXlYe2Gj0xjnRAiSQLR7QVaPef21BR/YTxA==",
+      "dependencies": [
+        "@bufbuild/protobuf",
+        "@jsr/meshtastic__protobufs",
+        "crc",
+        "ste-simple-events",
+        "tslog"
+      ]
+    },
+    "@jsr/meshtastic__protobufs@2.6.0": {
+      "integrity": "sha512-CGlgBdzAuQCZuGPrnzP8zU+EcLlmyYeeMbqFHuJ834cYfArWXDjDh1UYaPo2rI03LTjqa3MeWpfqDlzBR8kIMg==",
+      "dependencies": [
+        "@bufbuild/protobuf"
+      ]
+    },
+    "@jsr/meshtastic__transport-http@0.2.1": {
+      "integrity": "sha512-lmQKr3aIINKvtGROU4HchmSVqbZSbkIHqajowRRC8IAjsnR0zNTyxz210QyY4pFUF9hpcW3GRjwq5h/VO2JuGg==",
+      "dependencies": [
+        "@jsr/meshtastic__core@2.6.0"
+      ]
+    },
+    "@jsr/meshtastic__transport-web-serial@0.2.1": {
+      "integrity": "sha512-yumjEGLkAuJYOC3aWKvZzbQqi/LnqaKfNpVCY7Ki7oLtAshNiZrBLiwiFhN7+ZR9FfMdJThyBMqREBDRRWTO1Q==",
+      "dependencies": [
+        "@jsr/meshtastic__core@2.6.0"
       ]
     },
     "@mapbox/geojson-rewind@0.5.2": {
@@ -3899,6 +3956,9 @@
     "core-util-is@1.0.3": {
       "integrity": "sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ=="
     },
+    "crc@4.3.2": {
+      "integrity": "sha512-uGDHf4KLLh2zsHa8D8hIQ1H/HtFQhyHrc0uhHBcoKGol/Xnb+MPYfUMw7cvON6ze/GUESTudKayDcJC5HnJv1A=="
+    },
     "create-ecdh@4.0.4": {
       "integrity": "sha512-mf+TCx8wWc9VpuxfP2ht0iSISLZnt0JgWlrOKZiNqyUZWnjIaCIVNQArMHnCZKfEYRg6IM7A+NeJoN8gf/Ws0A==",
       "dependencies": [
@@ -5804,6 +5864,9 @@
     "signal-exit@4.1.0": {
       "integrity": "sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw=="
     },
+    "simple-git-hooks@2.11.1": {
+      "integrity": "sha512-tgqwPUMDcNDhuf1Xf6KTUsyeqGdgKMhzaH4PAZZuzguOgTl5uuyeYe/8mWgAr6IBxB5V06uqEf6Dy37gIWDtDg=="
+    },
     "simple-zstd@1.4.2": {
       "integrity": "sha512-kGYEvT33M5XfyQvvW4wxl3eKcWbdbCc1V7OZzuElnaXft0qbVzoIIXHXiCm3JCUki+MZKKmvjl8p2VGLJc5Y/A==",
       "dependencies": [
@@ -5875,6 +5938,15 @@
     },
     "std-env@3.8.0": {
       "integrity": "sha512-Bc3YwwCB+OzldMxOXJIIvC6cPRWr/LxOp48CdQTOkPyk/t4JWWJbrilwBd7RJzKV8QW7tJkcgAmeuLLJugl5/w=="
+    },
+    "ste-core@3.0.11": {
+      "integrity": "sha512-ivkRENMh0mdGoPlZ4xVcEaC8rXQfTEfvonRw5m8VDKV7kgcbZbaNd1TnKl08wXbcLdT7okSc63HNP8cVhy95zg=="
+    },
+    "ste-simple-events@3.0.11": {
+      "integrity": "sha512-PDoQajqiTtJLNDWfJCihzACiTVZyFsXi6hNAVNelNJoNmqj+BaWuhJ/NHaAHxzfSRoMbL+hFgfPqFmxiHhAQSQ==",
+      "dependencies": [
+        "ste-core"
+      ]
     },
     "stream-browserify@3.0.0": {
       "integrity": "sha512-H73RAHsVBapbim0tU2JwwOiXUj+fikfiaoYAKHF3VJfA0pe2BCzkhAHBlLG6REzE+2WNZcxOXjK7lkso+9euLA==",
@@ -6128,6 +6200,9 @@
     },
     "tslib@2.8.1": {
       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="
+    },
+    "tslog@4.9.3": {
+      "integrity": "sha512-oDWuGVONxhVEBtschLf2cs/Jy8i7h1T+CpdkTNWQgdAF7DhRo2G8vMCgILKe7ojdEkLhICWgI1LYSSKaJsRgcw=="
     },
     "tsx@4.19.3": {
       "integrity": "sha512-4H8vUNGNjQ4V2EOoGw005+c+dGuPSnhpPBPHBtsZdGZBk/iJb4kguGlPWaZTZ3q5nMtFOEsY0nRDlh9PJyd6SQ==",
