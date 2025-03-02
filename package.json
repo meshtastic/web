@@ -5,7 +5,7 @@
   "description": "Meshtastic web client",
   "license": "GPL-3.0-only",
   "scripts": {
-    "build": "deno run -A npm:vite build",
+    "build": "vite build",
     "build:analyze": "BUNDLE_ANALYZE=true deno task build",
     "lint": "deno lint src/",
     "lint:fix": "deno lint --fix src/",
@@ -13,10 +13,10 @@
     "dev": "deno task dev:ui",
     "dev:ui": "deno run -A npm:vite dev",
     "dev:scan": "VITE_DEBUG_SCAN=true deno task dev:ui",
-    "test": "deno run vitest",
+    "test": "deno run -A npm:vitest",
     "test:ui": "deno task test --ui",
-    "preview": "deno run --allow-net npm:vite preview",
-    "package": "deno run -A npm:gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && deno run -A --allow-run tar -cvf dist/build.tar -C ./dist/output/ ."
+    "preview": "deno run -A npm:vite preview",
+    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
   },
   "repository": {
     "type": "git",

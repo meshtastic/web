@@ -2,21 +2,15 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 
 let hash = '';
 try {
-  const process = new Deno.Command('git', {
-    args: ['rev-parse', '--short', 'HEAD'],
-    stdout: 'piped'
-  });
-  const output = await process.output();
-  hash = new TextDecoder().decode(output.stdout).trim();
+  hash = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
 } catch (error) {
   console.error('Error getting git hash:', error);
   hash = 'DEV';
 }
-
-console.log('Commit hash:', hash);
 
 export default defineConfig({
   plugins: [
@@ -38,11 +32,12 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@app': path.resolve(Deno.cwd(), './src'),
-      '@pages': path.resolve(Deno.cwd(), './src/pages'),
-      '@components': path.resolve(Deno.cwd(), './src/components'),
-      '@core': path.resolve(Deno.cwd(), './src/core'),
-      '@layouts': path.resolve(Deno.cwd(), './src/layouts'),
+      // Using Node's path and process.cwd() instead of Deno.cwd()
+      '@app': path.resolve(process.cwd(), './src'),
+      '@pages': path.resolve(process.cwd(), './src/pages'),
+      '@components': path.resolve(process.cwd(), './src/components'),
+      '@core': path.resolve(process.cwd(), './src/core'),
+      '@layouts': path.resolve(process.cwd(), './src/layouts'),
     },
   },
   server: {
