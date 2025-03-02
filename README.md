@@ -92,6 +92,53 @@ You'll need to download the package manager used with this repo. You can install
 it by visiting [deno.com](https://deno.com/) and following the installation
 instructions listed on the home page.
 
+### Development
+
+Install the dependencies.
+
+```bash
+deno i
+```
+
+Start the development server:
+
+```bash
+deno task dev
+```
+
+### Building and Packaging
+
+Build the project:
+
+```bash
+deno task build
+```
+
+GZip the output:
+
+```bash
+deno task package
+```
+
+### Why Deno?
+
+Meshtastic Web uses Deno as its development platform for several compelling
+reasons:
+
+- **Built-in Security**: Deno's security-first approach requires explicit
+  permissions for file, network, and environment access, reducing vulnerability
+  risks.
+- **TypeScript Support**: Native TypeScript support without additional
+  configuration, enhancing code quality and developer experience.
+- **Modern JavaScript**: First-class support for ESM imports, top-level await,
+  and other modern JavaScript features.
+- **Simplified Tooling**: Built-in formatter, linter, test runner, and bundler
+  eliminate the need for multiple third-party tools.
+- **Reproducible Builds**: Lockfile ensures consistent builds across all
+  environments.
+- **Web Standard APIs**: Uses browser-compatible APIs, making code more portable
+  between server and client environments.
+
 ### Debugging
 
 #### Debugging with React Scan
@@ -135,31 +182,3 @@ This will allow you to discover the following about your components and pages:
 
 Use these insights to apply targeted optimizations like `React.memo()`,
 `useCallback()`, or `useMemo()` where they'll have the most impact.
-
-### Building and Packaging
-
-Build the project:
-
-```bash
-deno task build
-```
-
-GZip the output:
-
-```bash
-deno task package
-```
-
-### Development
-
-Install the dependencies.
-
-```bash
-deno i
-```
-
-Start the development server:
-
-```bash
-deno task dev
-```
