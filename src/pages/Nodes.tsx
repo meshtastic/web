@@ -135,13 +135,13 @@ const NodesPage = (): JSX.Element => {
                   .match(/.{1,2}/g)
                   ?.join(":") ?? "UNK"}
               </Mono>,
-              <Fragment key="lastHeard">
+              <Mono className="px-4" key="lastHeard">
                 {node.lastHeard === 0 ? (
                   <p>Never</p>
                 ) : (
                   <TimeAgo timestamp={node.lastHeard * 1000} />
                 )}
-              </Fragment>,
+              </Mono>,
               <Mono key="snr">
                 {node.snr}db/
                 {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%/
