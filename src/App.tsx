@@ -12,7 +12,10 @@ import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
 import type { JSX } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import { ErrorPage } from "./components/UI/ErrorPage";
 import { MapProvider } from "react-map-gl/maplibre";
+
 
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();
@@ -22,7 +25,7 @@ export const App = (): JSX.Element => {
   const device = getDevice(selectedDevice);
 
   return (
-    <>
+    <ErrorBoundary FallbackComponent={ErrorPage}>
       <NewDeviceDialog
         open={connectDialogOpen}
         onOpenChange={(open) => {
@@ -30,30 +33,30 @@ export const App = (): JSX.Element => {
         }}
       />
       <Toaster />
-      <MapProvider>
-        <DeviceWrapper device={device}>
-          <div className="flex h-screen flex-col overflow-hidden bg-background-primary text-text-primary">
-            <div className="flex grow">
-              <DeviceSelector />
-              <div className="flex grow flex-col">
-                {device ? (
-                  <div className="flex h-screen">
-                    <DialogManager />
-                    <KeyBackupReminder />
-                    <CommandPalette />
+      <DeviceWrapper device={device}>
+        <div className="flex h-screen flex-col overflow-hidden bg-background-primary text-text-primary">
+          <div className="flex grow">
+            <DeviceSelector />
+            <div className="flex grow flex-col">
+              {device ? (
+                <div className="flex h-screen w-full">
+                  <DialogManager />
+                  <KeyBackupReminder />
+                  <CommandPalette />
+                  <MapProvider>
                     <PageRouter />
-                  </div>
-                ) : (
-                  <>
-                    <Dashboard />
-                    <Footer />
-                  </>
-                )}
-              </div>
+                  </MapProvider>
+                </div>
+              ) : (
+                <>
+                  <Dashboard />
+                  <Footer />
+                </>
+              )}
             </div>
           </div>
-        </DeviceWrapper>
-      </MapProvider>
-    </>
+        </div>
+      </DeviceWrapper>
+    </ErrorBoundary>
   );
 };

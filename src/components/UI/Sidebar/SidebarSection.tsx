@@ -1,4 +1,4 @@
-import { H4 } from "@components/UI/Typography/H4.tsx";
+import { Heading } from "../Typography/Heading";
 
 export interface SidebarSectionProps {
   label: string;
@@ -11,7 +11,9 @@ export const SidebarSection = ({
   children,
 }: SidebarSectionProps) => (
   <div className="px-4 py-2">
-    <H4 className="mb-3 ml-2">{title}</H4>
+    <Heading as="h4" className="mb-3 ml-2">
+      {title}
+    </Heading>
     <div className="space-y-1">{children}</div>
   </div>
 );
