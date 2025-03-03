@@ -139,7 +139,7 @@ const NodesPage = () => {
               </Mono>,
               <Mono className="px-4" key="lastHeard">
                 {node.lastHeard === 0 ? (
-                  <p>Never</p>
+                  <p className="px-4">Never</p>
                 ) : (
                   <TimeAgo timestamp={node.lastHeard * 1000} />
                 )}
