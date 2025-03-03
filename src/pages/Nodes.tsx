@@ -1,7 +1,7 @@
-import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog";
-import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog";
-import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog";
-import Footer from "@app/components/UI/Footer";
+import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
+import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog.tsx";
+import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
+import Footer from "@app/components/UI/Footer.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
@@ -149,7 +149,7 @@ const NodesPage = (): JSX.Element => {
               </Mono>,
               <Mono key="pki">
                 {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
-                  <LockIcon className="text-green-600" />
+                  <LockIcon className="text-green-600 mx-auto" />
                 ) : (
                   <LockOpenIcon className="text-yellow-300 mx-auto" />
                 )}
@@ -158,7 +158,7 @@ const NodesPage = (): JSX.Element => {
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
-                    : `${node.hopsAway.toString()} ${
+                    : `${node.hopsAway?.toString()} ${
                         node.hopsAway > 1 ? "hops" : "hop"
                       } away`
                   : "-"}
