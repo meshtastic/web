@@ -10,37 +10,43 @@ import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm, useController } from "react-hook-form";
+import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
+
+interface FormData {
+  ip: string;
+  tls: boolean;
+}
 
 export const HTTP = ({ closeDialog }: TabElementProps) => {
-  const [https, setHTTPS] = useState(false);
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
-  const { register, handleSubmit, control } = useForm<{
-    ip: string;
-    tls: boolean;
-  }>({
+  const { control, handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
         globalThis.location.hostname,
       )
         ? "meshtastic.local"
         : globalThis.location.host,
-      tls: location.protocol === "https:",
+      tls: false,
     },
   });
+
+  const {
+    field: { value: tlsValue, onChange: setTLS },
+  } = useController({ name: "tls", control });
 
   const [connectionInProgress, setConnectionInProgress] = useState(false);
 
   const onSubmit = handleSubmit(async (data) => {
-    setConnectionInProgress(true);
+    console.log(data);
 
+    setConnectionInProgress(true);
     const id = randId();
     const device = addDevice(id);
     const transport = await TransportHTTP.create(data.ip, data.tls);
     const connection = new MeshDevice(transport, id);
     connection.configure();
-
     setSelectedDevice(id);
     device.addConnection(connection);
     subscribeAll(device, connection);
@@ -50,32 +56,26 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   return (
     <form className="flex w-full flex-col gap-2 p-4" onSubmit={onSubmit}>
       <div className="flex h-48 flex-col gap-2">
-        <Label>IP Address/Hostname</Label>
-        <Input
-          prefix={https ? "https://" : "http://"}
-          placeholder="000.000.000.000 / meshtastic.local"
-          className="text-slate-900 dark:text-slate-900"
-          disabled={connectionInProgress}
-          {...register("ip")}
-        />
-        <Controller
-          name="tls"
-          control={control}
-          render={({ field: { ...rest } }) => (
-            <>
-              <Label>Use HTTPS</Label>
-              <Switch
-                onCheckedChange={(checked: boolean) => {
-                  checked ? setHTTPS(true) : setHTTPS(false);
-                }}
-                disabled={location.protocol === "https:" ||
-                  connectionInProgress}
-                checked={https}
-                {...rest}
-              />
-            </>
-          )}
-        />
+        <div>
+          <Label>IP Address/Hostname</Label>
+          <Input
+            prefix={tlsValue ? "https://" : "http://"}
+            placeholder="000.000.000.000 / meshtastic.local"
+            className="text-slate-900 dark:text-slate-900"
+            disabled={connectionInProgress}
+            {...register("ip")}
+          />
+        </div>
+        <div className="flex items-center gap-2 mt-2">
+          <Switch
+            onCheckedChange={setTLS}
+            disabled={location.protocol === "https:" || connectionInProgress}
+            checked={location.protocol === 'https:' || tlsValue}
+            {...register("tls")}
+          />
+          <Label>Use HTTPS</Label>
+
+        </div>
       </div>
       <Button
         type="submit"

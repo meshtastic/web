@@ -80,6 +80,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.9",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@types/chrome": "^0.0.307",
     "@types/js-cookie": "^3.0.6",
@@ -92,8 +93,8 @@
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "gzipper": "^8.2.0",
-    "happy-dom": "^17.1.8",
     "postcss": "^8.5.3",
+    "jsdom": "^26.0.0",
     "simple-git-hooks": "^2.11.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.9",

@@ -21,8 +21,8 @@ const inputVariants = cva(
 
 export interface InputProps
   extends
-    React.InputHTMLAttributes<HTMLInputElement>,
-    VariantProps<typeof inputVariants> {
+  React.InputHTMLAttributes<HTMLInputElement>,
+  VariantProps<typeof inputVariants> {
   prefix?: string;
   suffix?: string;
   action?: {
@@ -36,9 +36,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative w-full">
         {prefix && (
-          <span className="inline-flex items-center rounded-l-md bg-slate-100/80 px-3 font-mono text-sm text-slate-600">
+          <label className="inline-flex items-center rounded-l-md bg-slate-100/80 px-3 font-mono text-sm text-slate-600">
             {prefix}
-          </span>
+          </label>
         )}
         <input
           className={cn(
