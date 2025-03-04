@@ -33,7 +33,7 @@ export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   disabled?: boolean;
 }
 
-const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
+const Generator =
   (
     {
       type,
@@ -53,8 +53,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
       action,
       disabled,
       ...props
-    },
-    ref,
+    }: GeneratorProps
   ) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -116,8 +115,7 @@ const Generator = React.forwardRef<HTMLInputElement, GeneratorProps>(
         </div>
       </>
     );
-  },
-);
+  }
 Generator.displayName = "Button";
 
 export { Generator };

@@ -4,7 +4,7 @@ import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 
-export const RangeTest = (): JSX.Element => {
+export const RangeTest = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
 
   const onSubmit = (data: RangeTestValidation) => {

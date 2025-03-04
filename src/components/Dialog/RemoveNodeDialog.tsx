@@ -1,5 +1,5 @@
-import { useAppStore } from "@app/core/stores/appStore";
-import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { useAppStore } from "../../core/stores/appStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
@@ -19,7 +19,7 @@ export interface RemoveNodeDialogProps {
 export const RemoveNodeDialog = ({
   open,
   onOpenChange,
-}: RemoveNodeDialogProps): JSX.Element => {
+}: RemoveNodeDialogProps) => {
   const { connection, nodes, removeNode } = useDevice();
   const { nodeNumToBeRemoved } = useAppStore();
 

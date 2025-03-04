@@ -1,10 +1,10 @@
-import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import type { NeighborInfoValidation } from "@app/validation/moduleConfig/neighborInfo.tsx";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
 
-export const NeighborInfo = (): JSX.Element => {
+export const NeighborInfo = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
 
   const onSubmit = (data: NeighborInfoValidation) => {

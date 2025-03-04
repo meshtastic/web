@@ -1,0 +1,34 @@
+{
+  "imports": {
+    "@app/": "./src/",
+    "@pages/": "./src/pages/",
+    "@components/": "./src/components/",
+    "@core/": "./src/core/",
+    "@layouts/": "./src/layouts/"
+  },
+  "compilerOptions": {
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext",
+      "deno.window",
+      "deno.ns"
+    ],
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "types": [
+      "vite/client",
+      "node",
+      "@types/web-bluetooth",
+      "@types/w3c-web-serial"
+    ],
+    "strictPropertyInitialization": false
+  },
+  "unstable": [
+    "sloppy-imports"
+  ]
+}

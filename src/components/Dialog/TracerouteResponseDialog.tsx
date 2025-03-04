@@ -1,15 +1,15 @@
-import { useDevice } from "@app/core/stores/deviceStore";
+import { useDevice } from "../../core/stores/deviceStore.ts";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog";
+} from "../UI/Dialog.tsx";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import type { JSX } from "react";
-import { TraceRoute } from "../PageComponents/Messages/TraceRoute";
+
+import { TraceRoute } from "../PageComponents/Messages/TraceRoute.tsx";
 
 export interface TracerouteResponseDialogProps {
   traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined;
@@ -21,18 +21,16 @@ export const TracerouteResponseDialog = ({
   traceroute,
   open,
   onOpenChange,
-}: TracerouteResponseDialogProps): JSX.Element => {
+}: TracerouteResponseDialogProps) => {
   const { nodes } = useDevice();
   const route: number[] = traceroute?.data.route ?? [];
   const routeBack: number[] = traceroute?.data.routeBack ?? [];
   const snrTowards = traceroute?.data.snrTowards ?? [];
   const snrBack = traceroute?.data.snrBack ?? [];
   const from = nodes.get(traceroute?.from ?? 0);
-  const longName =
-    from?.user?.longName ??
+  const longName = from?.user?.longName ??
     (from ? `!${numberToHexUnpadded(from?.num)}` : "Unknown");
-  const shortName =
-    from?.user?.shortName ??
+  const shortName = from?.user?.shortName ??
     (from ? `${numberToHexUnpadded(from?.num).substring(0, 4)}` : "UNK");
   const to = nodes.get(traceroute?.to ?? 0);
   return (

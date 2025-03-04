@@ -1,14 +1,13 @@
-import { useDevice } from "@app/core/stores/deviceStore";
+import { useDevice } from "../../core/stores/deviceStore.ts";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog";
+} from "../UI/Dialog.tsx";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import type { JSX } from "react";
 
 export interface LocationResponseDialogProps {
   location: Types.PacketMetadata<Protobuf.Mesh.location> | undefined;
@@ -20,15 +19,13 @@ export const LocationResponseDialog = ({
   location,
   open,
   onOpenChange,
-}: LocationResponseDialogProps): JSX.Element => {
+}: LocationResponseDialogProps) => {
   const { nodes } = useDevice();
 
   const from = nodes.get(location?.from ?? 0);
-  const longName =
-    from?.user?.longName ??
+  const longName = from?.user?.longName ??
     (from ? `!${numberToHexUnpadded(from?.num)}` : "Unknown");
-  const shortName =
-    from?.user?.shortName ??
+  const shortName = from?.user?.shortName ??
     (from ? `${numberToHexUnpadded(from?.num).substring(0, 4)}` : "UNK");
 
   return (

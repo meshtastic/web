@@ -4,13 +4,13 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@app/components/UI/Tooltip";
+} from "@components/UI/Tooltip.tsx";
 import {
   type MessageWithState,
   useDeviceStore,
-} from "@app/core/stores/deviceStore.ts";
-import { cn } from "@app/core/utils/cn";
-import { Avatar } from "@components/UI/Avatar";
+} from "@core/stores/deviceStore.ts";
+import { cn } from "@core/utils/cn.ts";
+import { Avatar } from "@components/UI/Avatar.tsx";
 import type { Protobuf } from "@meshtastic/core";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -44,13 +44,13 @@ const STATUS_TEXT_MAP: Record<MessageState, string> = {
   [MESSAGE_STATES.ACK]: "Message delivered",
   [MESSAGE_STATES.WAITING]: "Waiting for delivery",
   [MESSAGE_STATES.FAILED]: "Delivery failed",
-} as const;
+};
 
 const STATUS_ICON_MAP: Record<MessageState, LucideIcon> = {
   [MESSAGE_STATES.ACK]: CheckCircle2,
   [MESSAGE_STATES.WAITING]: CircleEllipsis,
   [MESSAGE_STATES.FAILED]: AlertCircle,
-} as const;
+};
 
 const getStatusText = (state: MessageState): string => STATUS_TEXT_MAP[state];
 
@@ -93,7 +93,6 @@ const StatusIcon = ({ state, className, ...otherProps }: StatusIconProps) => {
 const getMessageTextStyles = (state: MessageState) => {
   const isAcknowledged = state === MESSAGE_STATES.ACK;
   const isFailed = state === MESSAGE_STATES.FAILED;
-  const isWaiting = state === MESSAGE_STATES.WAITING;
 
   return cn(
     "break-words overflow-hidden",
@@ -144,16 +143,18 @@ export const Message = ({ lastMsgSameUser, message, sender }: MessageProps) => {
         )}
       >
         <div className="flex items-center gap-2 mb-2">
-          {!lastMsgSameUser ? (
-            <div className="flex place-items-center gap-2 mb-1">
-              <Avatar text={messageUser?.shortName} />
-              <div className="flex flex-col">
-                <span className="font-medium text-slate-900 dark:text-white truncate">
-                  {messageUser?.longName}
-                </span>
+          {!lastMsgSameUser
+            ? (
+              <div className="flex place-items-center gap-2 mb-1">
+                <Avatar text={messageUser?.shortName ?? "UNK"} />
+                <div className="flex flex-col">
+                  <span className="font-medium text-slate-900 dark:text-white truncate">
+                    {messageUser?.longName}
+                  </span>
+                </div>
               </div>
-            </div>
-          ) : null}
+            )
+            : null}
         </div>
         <TimeDisplay date={message.rxTime} />
         <div className="flex place-items-center gap-2 pb-2">

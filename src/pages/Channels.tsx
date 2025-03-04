@@ -3,7 +3,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@app/components/UI/Tabs.tsx";
+} from "@components/UI/Tabs.tsx";
 import { Channel } from "@components/PageComponents/Channel.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
@@ -17,12 +17,12 @@ export const getChannelName = (channel: Protobuf.Channel.Channel) =>
   channel.settings?.name.length
     ? channel.settings?.name
     : channel.index === 0
-      ? "Primary"
-      : `Ch ${channel.index}`;
+    ? "Primary"
+    : `Ch ${channel.index}`;
 
 const ChannelsPage = () => {
   const { channels, setDialogOpen } = useDevice();
-  const [activeChannel, setActiveChannel] = useState<Types.ChannelNumber>(
+  const [activeChannel] = useState<Types.ChannelNumber>(
     Types.ChannelNumber.Primary,
   );
 

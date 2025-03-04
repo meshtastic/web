@@ -1,11 +1,10 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import { PageRouter } from "@app/PageRouter.tsx";
-import { ThemeProvider } from "@app/components/generic/ThemeProvider";
 import { CommandPalette } from "@components/CommandPalette.tsx";
 import { DeviceSelector } from "@components/DeviceSelector.tsx";
-import { DialogManager } from "@components/Dialog/DialogManager";
+import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.tsx";
-import { KeyBackupReminder } from "@components/KeyBackupReminder";
+import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import Footer from "@components/UI/Footer.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
@@ -13,7 +12,7 @@ import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
 import type { JSX } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { ErrorPage } from "./components/UI/ErrorPage";
+import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import { MapProvider } from "react-map-gl/maplibre";
 
 

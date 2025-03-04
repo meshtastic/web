@@ -10,8 +10,7 @@ import {
 } from "class-validator";
 
 export class ChannelValidation
-  implements Omit<Protobuf.Channel.Channel, keyof Message | "settings">
-{
+  implements Omit<Protobuf.Channel.Channel, keyof Message | "settings"> {
   @IsNumber()
   index: number;
 
@@ -22,8 +21,7 @@ export class ChannelValidation
 }
 
 export class Channel_SettingsValidation
-  implements Omit<Protobuf.Channel.ChannelSettings, keyof Message | "psk">
-{
+  implements Omit<Protobuf.Channel.ChannelSettings, keyof Message | "psk"> {
   @IsNumber()
   channelNum: number;
 

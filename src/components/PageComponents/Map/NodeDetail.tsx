@@ -1,8 +1,8 @@
-import { Separator } from "@app/components/UI/Seperator";
-import { Heading } from "@app/components/UI/Typography/Heading";
-import { Subtle } from "@app/components/UI/Typography/Subtle.tsx";
-import { formatQuantity } from "@app/core/utils/string";
-import { Avatar } from "@components/UI/Avatar";
+import { Separator } from "@components/UI/Seperator.tsx";
+import { Heading } from "@components/UI/Typography/Heading.tsx";
+import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { formatQuantity } from "@core/utils/string.ts";
+import { Avatar } from "@components/UI/Avatar.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Protobuf } from "@meshtastic/core";
@@ -34,24 +34,26 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
     <div className="dark:text-slate-900 p-1">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
-          <Avatar text={node.user?.shortName} />
+          <Avatar text={node.user?.shortName ?? "UNK"} />
 
           <div>
-            {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
-              <LockIcon
-                className="text-green-600"
-                size={12}
-                strokeWidth={3}
-                aria-label="Public Key Enabled"
-              />
-            ) : (
-              <LockOpenIcon
-                className="text-yellow-500"
-                size={12}
-                strokeWidth={3}
-                aria-label="No Public Key"
-              />
-            )}
+            {node.user?.publicKey && node.user?.publicKey.length > 0
+              ? (
+                <LockIcon
+                  className="text-green-600"
+                  size={12}
+                  strokeWidth={3}
+                  aria-label="Public Key Enabled"
+                />
+              )
+              : (
+                <LockOpenIcon
+                  className="text-yellow-500"
+                  size={12}
+                  strokeWidth={3}
+                  aria-label="No Public Key"
+                />
+              )}
           </div>
 
           <Star
@@ -69,19 +71,16 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
           {!!node.deviceMetrics?.batteryLevel && (
             <div
               className="flex items-center gap-1"
-              title={`${
-                node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
-              } volts`}
+              title={`${node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
+                } volts`}
             >
-              {node.deviceMetrics?.batteryLevel > 100 ? (
-                <BatteryChargingIcon size={22} />
-              ) : node.deviceMetrics?.batteryLevel > 80 ? (
-                <BatteryFullIcon size={22} />
-              ) : node.deviceMetrics?.batteryLevel > 20 ? (
-                <BatteryMediumIcon size={22} />
-              ) : (
-                <BatteryLowIcon size={22} />
-              )}
+              {node.deviceMetrics?.batteryLevel > 100
+                ? <BatteryChargingIcon size={22} />
+                : node.deviceMetrics?.batteryLevel > 80
+                  ? <BatteryFullIcon size={22} />
+                  : node.deviceMetrics?.batteryLevel > 20
+                    ? <BatteryMediumIcon size={22} />
+                    : <BatteryLowIcon size={22} />}
               <Subtle aria-label="Battery">
                 {node.deviceMetrics?.batteryLevel > 100
                   ? "Charging"

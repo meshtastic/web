@@ -112,7 +112,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     );
   },
   setNodeNumToBeRemoved: (nodeNum) =>
-    set((state) => ({
+    set(() => ({
       nodeNumToBeRemoved: nodeNum,
     })),
   setConnectDialogOpen: (open: boolean) => {
@@ -124,7 +124,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
 
   setNodeNumDetails: (nodeNum) =>
-    set((state) => ({
+    set(() => ({
       nodeNumDetails: nodeNum,
     })),
   setActiveChat: (chat) =>

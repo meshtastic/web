@@ -4,7 +4,7 @@ import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 
-export const StoreForward = (): JSX.Element => {
+export const StoreForward = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
 
   const onSubmit = (data: StoreForwardValidation) => {

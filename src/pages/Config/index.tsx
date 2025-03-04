@@ -1,5 +1,5 @@
-import { useAppStore } from "@app/core/stores/appStore";
-import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { useAppStore } from "../../core/stores/appStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
@@ -36,9 +36,10 @@ const ConfigPage = () => {
             connection?.setConfig(config).then(() =>
               toast({
                 title: "Saving Config",
-                description: `The configuration change ${config.payloadVariant.case} has been saved.`,
-              }),
-            ),
+                description:
+                  `The configuration change ${config.payloadVariant.case} has been saved.`,
+              })
+            )
           ),
         );
       } else {
@@ -47,14 +48,15 @@ const ConfigPage = () => {
             connection?.setModuleConfig(moduleConfig).then(() =>
               toast({
                 title: "Saving Config",
-                description: `The configuration change ${moduleConfig.payloadVariant.case} has been saved.`,
-              }),
-            ),
+                description:
+                  `The configuration change ${moduleConfig.payloadVariant.case} has been saved.`,
+              })
+            )
           ),
         );
       }
       await connection?.commitEditSettings();
-    } catch (error) {
+    } catch (_error) {
       toast({
         title: "Error Saving Config",
         description: "An error occurred while saving the configuration.",
@@ -83,9 +85,9 @@ const ConfigPage = () => {
         </SidebarSection>
       </Sidebar>
       <PageLayout
-        label={
-          activeConfigSection === "device" ? "Radio Config" : "Module Config"
-        }
+        label={activeConfigSection === "device"
+          ? "Radio Config"
+          : "Module Config"}
         actions={[
           {
             icon: isError ? SaveOff : SaveIcon,

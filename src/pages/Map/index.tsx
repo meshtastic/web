@@ -1,14 +1,13 @@
-import { NodeDetail } from "@app/components/PageComponents/Map/NodeDetail";
-import { Avatar } from "@app/components/UI/Avatar";
-import { useTheme } from "@app/core/hooks/useTheme";
+import { NodeDetail } from "../../components/PageComponents/Map/NodeDetail.tsx";
+import { Avatar } from "../../components/UI/Avatar.tsx";
+import { useTheme } from "../../core/hooks/useTheme.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { bbox, lineString } from "@turf/turf";
-import { current } from "immer";
 import { MapPinIcon } from "lucide-react";
-import { type JSX, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AttributionControl,
   GeolocateControl,
@@ -33,15 +32,16 @@ const convertToLatLng = (position: {
   longitude: (position.longitudeI ?? 0) / 1e7,
 });
 
-const MapPage = (): JSX.Element => {
+const MapPage = () => {
   const { nodes, waypoints } = useDevice();
-  const currentTheme = useTheme();
+  const { theme } = useTheme();
   const { default: map } = useMap();
 
-  const darkMode = currentTheme === "dark";
+  const darkMode = theme === "dark";
 
-  const [selectedNode, setSelectedNode] =
-    useState<Protobuf.Mesh.NodeInfo | null>(null);
+  const [selectedNode, setSelectedNode] = useState<
+    Protobuf.Mesh.NodeInfo | null
+  >(null);
 
   // Filter out nodes without a valid position
   const validNodes = useMemo(
@@ -140,13 +140,12 @@ const MapPage = (): JSX.Element => {
   return (
     <>
       <Sidebar />
-      <PageLayout label="Map" noPadding={true} actions={[]}>
+      <PageLayout label="Map" noPadding actions={[]}>
         <MapGl
           mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
           attributionControl={false}
           renderWorldCopies={false}
           maxPitch={0}
-          antialias={true}
           style={{
             filter: darkMode ? "brightness(0.9)" : "",
           }}
@@ -185,16 +184,18 @@ const MapPage = (): JSX.Element => {
             </Marker>
           ))}
           {markers}
-          {selectedNode ? (
-            <Popup
-              anchor="top"
-              longitude={convertToLatLng(selectedNode.position).longitude}
-              latitude={convertToLatLng(selectedNode.position).latitude}
-              onClose={() => setSelectedNode(null)}
-            >
-              <NodeDetail node={selectedNode} />
-            </Popup>
-          ) : null}
+          {selectedNode
+            ? (
+              <Popup
+                anchor="top"
+                longitude={convertToLatLng(selectedNode.position).longitude}
+                latitude={convertToLatLng(selectedNode.position).latitude}
+                onClose={() => setSelectedNode(null)}
+              >
+                <NodeDetail node={selectedNode} />
+              </Popup>
+            )
+            : null}
         </MapGl>
       </PageLayout>
     </>

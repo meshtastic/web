@@ -15,7 +15,7 @@ import { Switch } from "@components/UI/Switch.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { toByteArray } from "base64-js";
-import { type JSX, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface ImportDialogProps {
   open: boolean;
@@ -26,7 +26,7 @@ export interface ImportDialogProps {
 export const ImportDialog = ({
   open,
   onOpenChange,
-}: ImportDialogProps): JSX.Element => {
+}: ImportDialogProps) => {
   const [importDialogInput, setImportDialogInput] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
   const [validUrl, setValidUrl] = useState<boolean>(false);
@@ -62,7 +62,7 @@ export const ImportDialog = ({
         ),
       );
       setValidUrl(true);
-    } catch (error) {
+    } catch (_error) {
       setValidUrl(false);
       setChannelSet(undefined);
     }
@@ -73,10 +73,9 @@ export const ImportDialog = ({
       connection?.setChannel(
         create(Protobuf.Channel.ChannelSchema, {
           index,
-          role:
-            index === 0
-              ? Protobuf.Channel.Channel_Role.PRIMARY
-              : Protobuf.Channel.Channel_Role.SECONDARY,
+          role: index === 0
+            ? Protobuf.Channel.Channel_Role.PRIMARY
+            : Protobuf.Channel.Channel_Role.SECONDARY,
           settings: ch,
         }),
       );
@@ -119,25 +118,29 @@ export const ImportDialog = ({
                 <div className="w-36">
                   <Label>Use Preset?</Label>
                   <Switch
-                    disabled={true}
+                    disabled
                     checked={channelSet?.loraConfig?.usePreset ?? true}
                   />
                 </div>
-                {/* <Select
+                {
+                  /* <Select
                   label="Modem Preset"
                   disabled
                   value={channelSet?.loraConfig?.modemPreset}
                 >
                   {renderOptions(Protobuf.Config_LoRaConfig_ModemPreset)}
-                </Select> */}
+                </Select> */
+                }
               </div>
-              {/* <Select
+              {
+                /* <Select
                 label="Region"
                 disabled
                 value={channelSet?.loraConfig?.region}
               >
                 {renderOptions(Protobuf.Config_LoRaConfig_RegionCode)}
-              </Select> */}
+              </Select> */
+              }
 
               <span className="text-md block font-medium text-text-primary">
                 Channels:

@@ -28,7 +28,7 @@ export const QRDialog = ({
   onOpenChange,
   loraConfig,
   channels,
-}: QRDialogProps): JSX.Element => {
+}: QRDialogProps) => {
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [qrCodeAdd, setQrCodeAdd] = useState<boolean>();
@@ -77,8 +77,8 @@ export const QRDialog = ({
                     {channel.settings?.name.length
                       ? channel.settings.name
                       : channel.role === Protobuf.Channel.Channel_Role.PRIMARY
-                        ? "Primary"
-                        : `Channel: ${channel.index}`}
+                      ? "Primary"
+                      : `Channel: ${channel.index}`}
                   </Label>
                   <Checkbox
                     key={channel.index}
@@ -86,7 +86,9 @@ export const QRDialog = ({
                     onCheckedChange={() => {
                       if (selectedChannels.includes(channel.index)) {
                         setSelectedChannels(
-                          selectedChannels.filter((c) => c !== channel.index),
+                          selectedChannels.filter((c) =>
+                            c !== channel.index
+                          ),
                         );
                       } else {
                         setSelectedChannels([
@@ -130,7 +132,7 @@ export const QRDialog = ({
           <Label>Sharable URL</Label>
           <Input
             value={qrCodeUrl}
-            disabled={true}
+            disabled
             className="dark:text-slate-900"
             action={{
               icon: ClipboardIcon,

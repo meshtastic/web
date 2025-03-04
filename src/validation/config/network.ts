@@ -11,8 +11,7 @@ import {
 
 export class NetworkValidation
   implements
-    Omit<Protobuf.Config.Config_NetworkConfig, keyof Message | "ipv4Config">
-{
+    Omit<Protobuf.Config.Config_NetworkConfig, keyof Message | "ipv4Config"> {
   @IsBoolean()
   wifiEnabled: boolean;
 
@@ -39,13 +38,11 @@ export class NetworkValidation
   rsyslogServer: string;
 }
 
-export class NetworkValidationIpV4Config
-  implements
-    Omit<
-      Protobuf.Config.Config_NetworkConfig_IpV4Config,
-      keyof Message | "ip" | "gateway" | "subnet" | "dns"
-    >
-{
+export class NetworkValidationIpV4Config implements
+  Omit<
+    Protobuf.Config.Config_NetworkConfig_IpV4Config,
+    keyof Message | "ip" | "gateway" | "subnet" | "dns"
+  > {
   @IsIP()
   @IsOptional()
   ip: string;

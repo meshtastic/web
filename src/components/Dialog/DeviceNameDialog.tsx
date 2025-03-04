@@ -1,4 +1,4 @@
-import { useDevice } from "@app/core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { create } from "@bufbuild/protobuf";
 import { Button } from "@components/UI/Button.tsx";
 import {

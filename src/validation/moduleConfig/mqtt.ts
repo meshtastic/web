@@ -8,13 +8,11 @@ import {
   Length,
 } from "class-validator";
 
-export class MqttValidation
-  implements
-    Omit<
-      Protobuf.ModuleConfig.ModuleConfig_MQTTConfig,
-      keyof Message | "mapReportSettings"
-    >
-{
+export class MqttValidation implements
+  Omit<
+    Protobuf.ModuleConfig.ModuleConfig_MQTTConfig,
+    keyof Message | "mapReportSettings"
+  > {
   @IsBoolean()
   enabled: boolean;
 
@@ -50,8 +48,7 @@ export class MqttValidation
 
 export class MqttValidationMapReportSettings
   implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_MapReportSettings, keyof Message>
-{
+    Omit<Protobuf.ModuleConfig.ModuleConfig_MapReportSettings, keyof Message> {
   @IsNumber()
   @IsOptional()
   publishIntervalSecs: number;

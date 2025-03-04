@@ -1,4 +1,4 @@
-import { Avatar } from "@components/UI/Avatar";
+import { Avatar } from "./UI/Avatar.tsx";
 import {
   CommandDialog,
   CommandEmpty,
@@ -117,13 +117,11 @@ export const CommandPalette = () => {
             return {
               label:
                 device.nodes.get(device.hardware.myNodeNum)?.user?.longName ??
-                device.hardware.myNodeNum.toString(),
+                  device.hardware.myNodeNum.toString(),
               icon: (
                 <Avatar
-                  text={
-                    device.nodes.get(device.hardware.myNodeNum)?.user
-                      ?.shortName ?? device.hardware.myNodeNum.toString()
-                  }
+                  text={device.nodes.get(device.hardware.myNodeNum)?.user
+                    ?.shortName ?? device.hardware.myNodeNum.toString()}
                 />
               ),
               action() {
@@ -241,8 +239,8 @@ export const CommandPalette = () => {
       }
     };
 
-    window.addEventListener("keydown", handleKeydown);
-    return () => window.removeEventListener("keydown", handleKeydown);
+    globalThis.addEventListener("keydown", handleKeydown);
+    return () => globalThis.removeEventListener("keydown", handleKeydown);
   }, [setCommandPaletteOpen]);
 
   return (

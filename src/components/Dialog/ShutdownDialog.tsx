@@ -19,7 +19,7 @@ export interface ShutdownDialogProps {
 export const ShutdownDialog = ({
   open,
   onOpenChange,
-}: ShutdownDialogProps): JSX.Element => {
+}: ShutdownDialogProps) => {
   const { connection } = useDevice();
 
   const [time, setTime] = useState<number>(5);

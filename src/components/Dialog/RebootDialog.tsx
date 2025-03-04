@@ -19,7 +19,7 @@ export interface RebootDialogProps {
 export const RebootDialog = ({
   open,
   onOpenChange,
-}: RebootDialogProps): JSX.Element => {
+}: RebootDialogProps) => {
   const { connection } = useDevice();
 
   const [time, setTime] = useState<number>(5);

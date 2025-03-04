@@ -1,7 +1,7 @@
-import { useBackupReminder } from "@app/core/hooks/useKeyBackupReminder";
-import { useDevice } from "@app/core/stores/deviceStore";
+import { useBackupReminder } from "@core/hooks/useKeyBackupReminder.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 
-export const KeyBackupReminder = (): JSX.Element => {
+export const KeyBackupReminder = () => {
   const { setDialogOpen } = useDevice();
 
   useBackupReminder({
@@ -15,5 +15,6 @@ export const KeyBackupReminder = (): JSX.Element => {
       sameSite: "strict",
     },
   });
+  // deno-lint-ignore jsx-no-useless-fragment
   return <></>;
 };

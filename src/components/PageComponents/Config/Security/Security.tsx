@@ -1,18 +1,18 @@
-import { PkiRegenerateDialog } from "@app/components/Dialog/PkiRegenerateDialog";
-import { DynamicForm } from "@app/components/Form/DynamicForm.tsx";
-import { useAppStore } from "@app/core/stores/appStore";
+import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
+import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
 import {
   getX25519PrivateKey,
   getX25519PublicKey,
-} from "@app/core/utils/x25519";
-import type { SecurityValidation } from "@app/validation/config/security.tsx";
+} from "@core/utils/x25519.ts";
+import type { SecurityValidation } from "@app/validation/config/security.ts";
 import { create } from "@bufbuild/protobuf";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import { Eye, EyeOff } from "lucide-react";
 import { useReducer } from "react";
-import { securityReducer } from "./securityReducer";
+import { securityReducer } from "@components/PageComponents/Config/Security/securityReducer.tsx";
 
 export const Security = () => {
   const { config, setWorkingConfig, setDialogOpen } = useDevice();
@@ -58,8 +58,7 @@ export const Security = () => {
       if (input.length % 4 !== 0) {
         addError(
           fieldName,
-          `${
-            fieldName === "privateKey" ? "Private" : "Admin"
+          `${fieldName === "privateKey" ? "Private" : "Admin"
           } Key is required to be a 256 bit pre-shared key (PSK)`,
         );
         return;
@@ -74,8 +73,7 @@ export const Security = () => {
       console.error(e);
       addError(
         fieldName,
-        `Invalid ${
-          fieldName === "privateKey" ? "Private" : "Admin"
+        `Invalid ${fieldName === "privateKey" ? "Private" : "Admin"
         } Key format`,
       );
     }
@@ -85,8 +83,6 @@ export const Security = () => {
     if (hasErrors()) {
       return;
     }
-    console.log(toByteArray(state.adminKey));
-
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
@@ -248,7 +244,7 @@ export const Security = () => {
                   ? getErrorMessage("adminKey")
                   : "",
                 inputChange: adminKeyInputChangeEvent,
-                selectChange: () => {},
+                selectChange: () => { },
                 bits: [{ text: "256 bit", value: "32", key: "bit256" }],
                 devicePSKBitCount: state.privateKeyBitCount,
                 hide: !state.adminKeyVisible,
@@ -308,8 +304,7 @@ export const Security = () => {
       <PkiRegenerateDialog
         open={state.privateKeyDialogOpen}
         onOpenChange={() =>
-          dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })
-        }
+          dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })}
         onSubmit={pkiRegenerate}
       />
     </>

@@ -1,4 +1,4 @@
-import type { SecurityAction, SecurityState } from "./types";
+import type { SecurityAction, SecurityState } from "./types.ts";
 
 export function securityReducer(
   state: SecurityState,

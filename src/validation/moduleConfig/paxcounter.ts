@@ -4,8 +4,7 @@ import { IsBoolean, IsInt } from "class-validator";
 
 export class PaxcounterValidation
   implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_PaxcounterConfig, keyof Message>
-{
+    Omit<Protobuf.ModuleConfig.ModuleConfig_PaxcounterConfig, keyof Message> {
   @IsBoolean()
   enabled: boolean;
 

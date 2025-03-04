@@ -15,20 +15,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
 
       - name: Install Dependencies
-        run: bun install
+        run: deno install
       
       - name: Run tests
-        run: bun run test:run
+        run: deno task test
 
       - name: Build Package
-        run: bun run build
+        run: deno task build
 
       - name: Package Output
-        run: bun run package
+        run: deno task package
 
       - name: Archive compressed build
         uses: actions/upload-artifact@v4

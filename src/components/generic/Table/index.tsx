@@ -1,9 +1,9 @@
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 export interface TableProps {
   headings: Heading[];
-  rows: JSX.Element[][];
+  rows: [][];
 }
 
 export interface Heading {
@@ -12,7 +12,7 @@ export interface Heading {
   sortable: boolean;
 }
 
-export const Table = ({ headings, rows }: TableProps): JSX.Element => {
+export const Table = ({ headings, rows }: TableProps) => {
   const [sortColumn, setSortColumn] = useState<string | null>("Last Heard");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -75,11 +75,9 @@ export const Table = ({ headings, rows }: TableProps): JSX.Element => {
               <div className="flex gap-2">
                 {heading.title}
                 {sortColumn === heading.title &&
-                  (sortOrder === "asc" ? (
-                    <ChevronUpIcon size={16} />
-                  ) : (
-                    <ChevronDownIcon size={16} />
-                  ))}
+                  (sortOrder === "asc"
+                    ? <ChevronUpIcon size={16} />
+                    : <ChevronDownIcon size={16} />)}
               </div>
             </th>
           ))}

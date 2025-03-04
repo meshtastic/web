@@ -3,8 +3,7 @@ import { Protobuf } from "@meshtastic/core";
 import { IsBoolean, IsEnum, IsInt, IsString } from "class-validator";
 
 export class DeviceValidation
-  implements Omit<Protobuf.Config.Config_DeviceConfig, keyof Message>
-{
+  implements Omit<Protobuf.Config.Config_DeviceConfig, keyof Message> {
   @IsEnum(Protobuf.Config.Config_DeviceConfig_Role)
   role: Protobuf.Config.Config_DeviceConfig_Role;
 

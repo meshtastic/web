@@ -1,5 +1,7 @@
 export function convertIntToIpAddress(int: number): string {
-  return `${int & 0xff}.${(int >> 8) & 0xff}.${(int >> 16) & 0xff}.${(int >> 24) & 0xff}`;
+  return `${int & 0xff}.${(int >> 8) & 0xff}.${(int >> 16) & 0xff}.${
+    (int >> 24) & 0xff
+  }`;
 }
 
 export function convertIpAddressToInt(ip: string): number | null {

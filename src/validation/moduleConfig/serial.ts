@@ -4,8 +4,7 @@ import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
 export class SerialValidation
   implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_SerialConfig, keyof Message>
-{
+    Omit<Protobuf.ModuleConfig.ModuleConfig_SerialConfig, keyof Message> {
   @IsBoolean()
   enabled: boolean;
 

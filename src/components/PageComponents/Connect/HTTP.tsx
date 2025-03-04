@@ -1,4 +1,4 @@
-import type { TabElementProps } from "@app/components/Dialog/NewDeviceDialog";
+import type { TabElementProps } from "@components/Dialog/NewDeviceDialog.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
@@ -9,23 +9,23 @@ import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
-import { type JSX, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
+export const HTTP = ({ closeDialog }: TabElementProps) => {
   const [https, setHTTPS] = useState(false);
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
-  const { register, handleSubmit, control, watch } = useForm<{
+  const { register, handleSubmit, control } = useForm<{
     ip: string;
     tls: boolean;
   }>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
-        window.location.hostname,
+        globalThis.location.hostname,
       )
         ? "meshtastic.local"
-        : window.location.host,
+        : globalThis.location.host,
       tls: location.protocol === "https:",
     },
   });
@@ -61,16 +61,15 @@ export const HTTP = ({ closeDialog }: TabElementProps): JSX.Element => {
         <Controller
           name="tls"
           control={control}
-          render={({ field: { value, onChange, ...rest } }) => (
+          render={({ field: { ...rest } }) => (
             <>
               <Label>Use HTTPS</Label>
               <Switch
-                onCheckedChange={(checked) => {
+                onCheckedChange={(checked: boolean) => {
                   checked ? setHTTPS(true) : setHTTPS(false);
                 }}
-                disabled={
-                  location.protocol === "https:" || connectionInProgress
-                }
+                disabled={location.protocol === "https:" ||
+                  connectionInProgress}
                 checked={https}
                 {...rest}
               />
