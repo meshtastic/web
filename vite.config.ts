@@ -47,8 +47,10 @@ export default defineConfig({
     exclude: ['react-scan']
   },
   test: {
-    environment: 'happy-dom',
+    environment: 'jsdom',
     globals: true,
     include: ['**/*.{test,spec}.{ts,tsx}'],
+    setupFiles: ["./src/tests/setupTests.ts"],
+
   }
 });
