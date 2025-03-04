@@ -1,7 +1,7 @@
-import { LocationResponseDialog } from "@components/Dialog/LocationResponseDialog.tsx";
-import { NodeOptionsDialog } from "@components/Dialog/NodeOptionsDialog.tsx";
-import { TracerouteResponseDialog } from "@components/Dialog/TracerouteResponseDialog.tsx";
-import Footer from "@components/UI/Footer.tsx";
+import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
+import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog.tsx";
+import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
+import Footer from "@app/components/UI/Footer.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
@@ -11,7 +11,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
-import { type JSX, useCallback, useEffect, useState } from "react";
+import { Fragment, type JSX, useCallback, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
 
 export interface DeleteNoteDialogProps {
@@ -19,7 +19,7 @@ export interface DeleteNoteDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const NodesPage = () => {
+const NodesPage = (): JSX.Element => {
   const { nodes, hardware, connection } = useDevice();
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
@@ -108,9 +108,8 @@ const NodesPage = () => {
                 {node.user?.shortName ??
                   (node.user?.macaddr
                     ? `${base16
-                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                      .toLowerCase()
-                    }`
+                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                        .toLowerCase()}`
                     : `${numberToHexUnpadded(node.num).slice(-4)}`)}
               </h1>,
 
@@ -122,9 +121,8 @@ const NodesPage = () => {
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
-                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                      .toLowerCase()
-                    }`
+                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                        .toLowerCase()}`
                     : `!${numberToHexUnpadded(node.num)}`)}
               </h1>,
 
@@ -138,9 +136,11 @@ const NodesPage = () => {
                   ?.join(":") ?? "UNK"}
               </Mono>,
               <Mono className="px-4" key="lastHeard">
-                {node.lastHeard === 0
-                  ? <p className="px-4">Never</p>
-                  : <TimeAgo timestamp={node.lastHeard * 1000} />}
+                {node.lastHeard === 0 ? (
+                  <p className="px-4">Never</p>
+                ) : (
+                  <TimeAgo timestamp={node.lastHeard * 1000} />
+                )}
               </Mono>,
               <Mono key="snr">
                 {node.snr}db/
@@ -148,16 +148,19 @@ const NodesPage = () => {
                 {(node.snr + 10) * 5}raw
               </Mono>,
               <Mono key="pki">
-                {node.user?.publicKey && node.user?.publicKey.length > 0
-                  ? <LockIcon className="text-green-600 mx-auto" />
-                  : <LockOpenIcon className="text-yellow-300 mx-auto" />}
+                {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
+                  <LockIcon className="text-green-600 mx-auto" />
+                ) : (
+                  <LockOpenIcon className="text-yellow-300 mx-auto" />
+                )}
               </Mono>,
               <Mono key="hops">
-                {node?.lastHeard !== 0
-                  ? node?.viaMqtt === false && node?.hopsAway === 0
+                {node.lastHeard !== 0
+                  ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
-                    : `${node?.hopsAway?.toString()} ${node?.hopsAway > 1 ? "hops" : "hop"
-                    } away`
+                    : `${node.hopsAway?.toString()} ${
+                        node.hopsAway > 1 ? "hops" : "hop"
+                      } away`
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
               </Mono>,

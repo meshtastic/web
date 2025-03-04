@@ -5,6 +5,7 @@ import { Spinner } from "@components/UI/Spinner.tsx";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 
+
 export interface PageLayoutProps {
   label: string;
   noPadding?: boolean;

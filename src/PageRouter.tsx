@@ -5,7 +5,7 @@ import ConfigPage from "@pages/Config/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes.tsx";
 import { ErrorBoundary } from "react-error-boundary";
-import { ErrorPage } from "./components/UI/ErrorPage.tsx";
+import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 
 export const ErrorBoundaryWrapper = ({
   children,

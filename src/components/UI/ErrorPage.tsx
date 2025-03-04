@@ -4,6 +4,7 @@ import { Heading } from "./Typography/Heading.tsx";
 import { Link } from "./Typography/Link.tsx";
 import { P } from "./Typography/P.tsx";
 
+
 export function ErrorPage({ error }: { error: Error }) {
   if (!error) {
     return null;
