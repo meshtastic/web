@@ -58,6 +58,18 @@ describe("HTTP Component", () => {
     expect(screen.getByText("http://")).toBeInTheDocument();
   });
 
+  it("enables HTTPS toggle when location protocol is https", () => {
+    Object.defineProperty(globalThis, "location", {
+      value: { protocol: "https:" },
+      writable: true,
+    });
+
+    render(<HTTP closeDialog={vi.fn()} />);
+
+    const switchInput = screen.getByRole("switch");
+    expect(switchInput).toBeChecked();
+  });
+
   it.skip("submits form and triggers connection process", () => {
     // This will need further work to test, as it involves a lot of other plumbing mocking
     const closeDialog = vi.fn();

@@ -70,7 +70,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
           <Switch
             onCheckedChange={setTLS}
             disabled={location.protocol === "https:" || connectionInProgress}
-            checked={tlsValue}
+            checked={location.protocol === 'https:' || tlsValue}
             {...register("tls")}
           />
           <Label>Use HTTPS</Label>
