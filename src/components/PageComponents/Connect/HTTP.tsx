@@ -26,10 +26,10 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   const { control, handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
-        globalThis.location.hostname,
+        window.location.hostname,
       )
         ? "meshtastic.local"
-        : globalThis.location.host,
+        : window.location.host,
       tls: isURLHTTPS ? true : false,
     },
   });
