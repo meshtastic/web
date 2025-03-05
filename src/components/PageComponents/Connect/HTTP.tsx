@@ -11,7 +11,6 @@ import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { useState } from "react";
 import { useForm, useController } from "react-hook-form";
-import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 
 interface FormData {
   ip: string;
@@ -19,8 +18,11 @@ interface FormData {
 }
 
 export const HTTP = ({ closeDialog }: TabElementProps) => {
+  const isURLHTTPS = location.protocol === "https:";
+
   const { addDevice } = useDeviceStore();
   const { setSelectedDevice } = useAppStore();
+
   const { control, handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
@@ -28,7 +30,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
       )
         ? "meshtastic.local"
         : globalThis.location.host,
-      tls: false,
+      tls: isURLHTTPS ? true : false,
     },
   });
 
@@ -39,8 +41,6 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   const [connectionInProgress, setConnectionInProgress] = useState(false);
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log(data);
-
     setConnectionInProgress(true);
     const id = randId();
     const device = addDevice(id);
@@ -69,8 +69,8 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
         <div className="flex items-center gap-2 mt-2">
           <Switch
             onCheckedChange={setTLS}
-            disabled={location.protocol === "https:" || connectionInProgress}
-            checked={location.protocol === 'https:' || tlsValue}
+            disabled={isURLHTTPS || connectionInProgress}
+            checked={isURLHTTPS || tlsValue}
             {...register("tls")}
           />
           <Label>Use HTTPS</Label>
