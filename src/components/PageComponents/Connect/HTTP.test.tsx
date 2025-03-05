@@ -68,6 +68,8 @@ describe("HTTP Component", () => {
 
     const switchInput = screen.getByRole("switch");
     expect(switchInput).toBeChecked();
+
+    expect(screen.getByText("https://")).toBeInTheDocument();
   });
 
   it.skip("submits form and triggers connection process", () => {
