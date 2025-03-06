@@ -127,9 +127,7 @@ export const MessagesPage = () => {
                 <div className="flex-1 overflow-y-auto">
                   <ChannelChat
                     key={currentChannel.index}
-                    to="broadcast"
                     messages={messages.broadcast.get(currentChannel.index)}
-                    channel={currentChannel.index}
                   />
                 </div>
               </div>
@@ -140,7 +138,8 @@ export const MessagesPage = () => {
                 <div className="flex-1 overflow-y-auto">
                   <ChannelChat
                     key={node.num}
-                    messages={messages.direct.get(node.num)} channel={ChannelNumber.Primary} to={0} />
+                    messages={messages.direct.get(node.num)}
+                  />
                 </div>
               </div>
             )}

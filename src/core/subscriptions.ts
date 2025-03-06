@@ -1,9 +1,9 @@
 import type { Device } from "@core/stores/deviceStore.ts";
-import { Protobuf, type Types } from "@meshtastic/core";
+import { MeshDevice, Protobuf } from "@meshtastic/core";
 
 export const subscribeAll = (
   device: Device,
-  connection: Types.ConnectionType,
+  connection: MeshDevice,
 ) => {
   let myNodeNum = 0;
 
@@ -70,6 +70,8 @@ export const subscribeAll = (
   });
 
   connection.events.onChannelPacket.subscribe((channel) => {
+    console.log('channel', channel);
+
     device.addChannel(channel);
   });
   connection.events.onConfigPacket.subscribe((config) => {
@@ -80,6 +82,9 @@ export const subscribeAll = (
   });
 
   connection.events.onMessagePacket.subscribe((messagePacket) => {
+
+    console.log('messagePacket', messagePacket);
+
     device.addMessage({
       ...messagePacket,
       state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
@@ -102,5 +107,12 @@ export const subscribeAll = (
       snr: meshPacket.rxSnr,
       time: meshPacket.rxTime,
     });
+  });
+
+  connection.events.onQueueStatus.subscribe((queueStatus) => {
+    device.setQueueStatus(queueStatus);
+    if (queueStatus.free < 10) {
+      // start queueing messages
+    }
   });
 };
