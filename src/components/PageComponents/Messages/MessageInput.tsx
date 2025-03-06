@@ -1,4 +1,4 @@
-import { debounce } from "../../../core/utils/debounce.ts";
+import { debounce } from "@core/utils/debounce.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -22,6 +22,8 @@ export const MessageInput = ({
     setMessageState,
     messageDraft,
     setMessageDraft,
+    isQueueingMessages,
+    queueStatus,
     hardware,
   } = useDevice();
   const myNodeNum = hardware.myNodeNum;
@@ -33,8 +35,12 @@ export const MessageInput = ({
     [setMessageDraft],
   );
 
+  // sends the message to the selected destination
   const sendText = useCallback(
     async (message: string) => {
+
+      console.log('queueStatus', queueStatus.free)
+
       await connection
         ?.sendText(message, to, true, channel)
         .then((id: number) =>
@@ -58,7 +64,7 @@ export const MessageInput = ({
           )
         );
     },
-    [channel, connection, myNodeNum, setMessageState, to],
+    [channel, connection, myNodeNum, setMessageState, to, queueStatus],
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,14 +87,17 @@ export const MessageInput = ({
           if (localDraft === "") return;
           const message = formData.get("messageInput") as string;
           startTransition(() => {
-            sendText(message);
-            setLocalDraft("");
-            setMessageDraft("");
-            setMessageBytes(0);
+            if (!isQueueingMessages) {
+              sendText(message);
+              setLocalDraft("");
+              setMessageDraft("");
+              setMessageBytes(0);
+            }
+
           });
         }}
       >
-        <div className="flex grow gap-2">
+        <div className="flex grow gap-2 ">
           <span className="w-full">
             <Input
               autoFocus
@@ -99,11 +108,11 @@ export const MessageInput = ({
               onChange={handleInputChange}
             />
           </span>
-          <div className="flex items-center w-24 p-2 place-content-end">
+          <label className="flex items-center w-24 p-2 place-content-end">
             {messageBytes}/{maxBytes}
-          </div>
+          </label>
 
-          <Button type="submit">
+          <Button type="submit" className="dark:bg-white dark:text-slate-900 dark:hover:bg-slate-400 dark:hover:text-slate-700">
             <SendIcon size={16} />
           </Button>
         </div>

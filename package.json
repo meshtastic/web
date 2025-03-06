@@ -14,7 +14,6 @@
     "dev:ui": "deno run -A npm:vite dev",
     "dev:scan": "VITE_DEBUG_SCAN=true deno task dev:ui",
     "test": "deno run -A npm:vitest",
-    "test:ui": "deno task test --ui",
     "preview": "deno run -A npm:vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
   },
@@ -67,6 +66,7 @@
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.477.0",
     "maplibre-gl": "5.1.1",
+    "playwright": "^1.50.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",
@@ -76,6 +76,8 @@
     "react-scan": "^0.2.8",
     "rfc4648": "^1.5.4",
     "vite-plugin-node-polyfills": "^0.23.0",
+    "vitest": "^3.0.7",
+    "vitest-browser-react": "^0.1.1",
     "zustand": "5.0.3"
   },
   "devDependencies": {
@@ -102,7 +104,6 @@
     "tar": "^7.4.3",
     "typescript": "^5.8.2",
     "vite": "^6.2.0",
-    "vite-plugin-pwa": "^0.21.1",
-    "vitest": "^3.0.7"
+    "vite-plugin-pwa": "^0.21.1"
   }
 }
