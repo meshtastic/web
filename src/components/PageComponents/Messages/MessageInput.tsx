@@ -112,7 +112,7 @@ export const MessageInput = ({
             {messageBytes}/{maxBytes}
           </label>
 
-          <Button type="submit" className="dark:bg-white dark:text-slate-900 dark:hover:bg-slate-400 dark:hover:text-slate-700">
+          <Button type="submit" className="dark:bg-white dark:text-slate-900 dark:hover:bg-slate-400 dark:hover:text-white">
             <SendIcon size={16} />
           </Button>
         </div>
