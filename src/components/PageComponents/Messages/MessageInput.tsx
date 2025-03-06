@@ -39,8 +39,6 @@ export const MessageInput = ({
   const sendText = useCallback(
     async (message: string) => {
 
-      console.log('queueStatus', queueStatus.free)
-
       await connection
         ?.sendText(message, to, true, channel)
         .then((id: number) =>
@@ -82,6 +80,7 @@ export const MessageInput = ({
     <div className="flex gap-2">
       <form
         className="w-full"
+        role="form"
         action={(formData: FormData) => {
           // prevent user from sending blank/empty message
           if (localDraft === "") return;
@@ -98,7 +97,7 @@ export const MessageInput = ({
         }}
       >
         <div className="flex grow gap-2 ">
-          <span className="w-full">
+          <label className="w-full">
             <Input
               autoFocus
               minLength={1}
@@ -107,8 +106,8 @@ export const MessageInput = ({
               value={localDraft}
               onChange={handleInputChange}
             />
-          </span>
-          <label className="flex items-center w-24 p-2 place-content-end">
+          </label>
+          <label data-testid="byte-counter" className="flex items-center w-24 p-2 place-content-end">
             {messageBytes}/{maxBytes}
           </label>
 
