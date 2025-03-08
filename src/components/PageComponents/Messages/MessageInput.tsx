@@ -80,7 +80,6 @@ export const MessageInput = ({
     <div className="flex gap-2">
       <form
         className="w-full"
-        role="form"
         action={(formData: FormData) => {
           // prevent user from sending blank/empty message
           if (localDraft === "") return;
