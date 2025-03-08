@@ -64,6 +64,7 @@ export interface Device {
     pkiBackup: boolean;
     nodeDetails: boolean;
   };
+  unreadCounts: Map<number, number>;
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
   setConfig: (config: Protobuf.Config.Config) => void;
@@ -98,6 +99,7 @@ export interface Device {
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
+  setUnread: (id: number, count: number) => void;
 }
 
 export interface DeviceState {
@@ -149,6 +151,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           },
           pendingSettingsChanges: false,
           messageDraft: "",
+          unreadCounts: new Map([[0, 100],[2718471552, 1]]),
 
           setStatus: (status: Types.DeviceStatusEnum) => {
             set(
@@ -631,6 +634,17 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               }),
             );
           },
+          setUnread: (id: number, count: number) => {
+              set(
+                produce<DeviceState>((draft) => {
+                  console.log(id, count);
+                  const device = draft.devices.get(id);
+                  if (device) {
+                    device.unreadCounts.set(id, count);
+                  }
+                })
+              );
+            }
         });
       }),
     );

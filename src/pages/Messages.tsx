@@ -14,7 +14,7 @@ import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useState } from "react";
 
 export const MessagesPage = () => {
-  const { channels, nodes, hardware, messages } = useDevice();
+  const { channels, nodes, hardware, messages, unreadCounts } = useDevice();
   const { activeChat, chatType, setActiveChat, setChatType } = useAppStore();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const filteredNodes = Array.from(nodes.values()).filter((node) => {
@@ -38,6 +38,7 @@ export const MessagesPage = () => {
           {filteredChannels.map((channel) => (
             <SidebarButton
               key={channel.index}
+              count={unreadCounts.get(channel.index)}
               label={channel.settings?.name.length
                 ? channel.settings?.name
                 : channel.index === 0
@@ -47,6 +48,7 @@ export const MessagesPage = () => {
               onClick={() => {
                 setChatType("broadcast");
                 setActiveChat(channel.index);
+                unreadCounts.set(channel.index, 0);
               }}
               element={<HashIcon size={16} className="mr-2" />}
             />
@@ -66,12 +68,14 @@ export const MessagesPage = () => {
             {filteredNodes.map((node) => (
               <SidebarButton
                 key={node.num}
+                count={unreadCounts.get(node.num)}
                 label={node.user?.longName ??
                   `!${numberToHexUnpadded(node.num)}`}
                 active={activeChat === node.num}
                 onClick={() => {
                   setChatType("direct");
                   setActiveChat(node.num);
+                  unreadCounts.set(node.num, 1)
                 }}
                 element={
                   <Avatar

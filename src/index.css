@@ -110,3 +110,11 @@ img {
 .animate-spin-slow {
   animation: spin-slower 2s linear infinite;
 }
+
+.notification-count {
+  color: white;
+  border-radius: 20%;
+  padding-left: 2%;
+  padding-right: 2%;
+  background-color: rgb(195,0,0);
+}

@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react";
 
 export interface SidebarButtonProps {
   label: string;
+  count?: number;
   active?: boolean;
   Icon?: LucideIcon;
   element?;
@@ -13,6 +14,7 @@ export const SidebarButton = ({
   label,
   active,
   Icon,
+  count,
   element,
   onClick,
 }: SidebarButtonProps) => (
@@ -25,5 +27,6 @@ export const SidebarButton = ({
     {Icon && <Icon size={16} />}
     {element && element}
     <span className="flex flex-1 justify-start shrink-0">{label}</span>
+    {count > 0 && <div className="justify-end notification-count">{count}</div>}
   </Button>
 );
