@@ -14,14 +14,15 @@ import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useState } from "react";
 
 export const MessagesPage = () => {
-  const { channels, nodes, hardware, messages, unreadCounts } = useDevice();
+  const { channels, nodes, hardware, messages, unreadCounts, setUnread } = useDevice();
   const { activeChat, chatType, setActiveChat, setChatType } = useAppStore();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const filteredNodes = Array.from(nodes.values()).filter((node) => {
     if (node.num === hardware.myNodeNum) return false;
     const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
     return nodeName.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  }).map((node) => { node.unreadCount = unreadCounts.get(node.num) ?? 0; return node;})
+  .sort((a, b) => b.unreadCount - a.unreadCount);
   const allChannels = Array.from(channels.values());
   const filteredChannels = allChannels.filter(
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
@@ -48,7 +49,7 @@ export const MessagesPage = () => {
               onClick={() => {
                 setChatType("broadcast");
                 setActiveChat(channel.index);
-                unreadCounts.set(channel.index, 0);
+                setUnread(channel.index, 0);
               }}
               element={<HashIcon size={16} className="mr-2" />}
             />
@@ -75,7 +76,7 @@ export const MessagesPage = () => {
                 onClick={() => {
                   setChatType("direct");
                   setActiveChat(node.num);
-                  unreadCounts.set(node.num, 1)
+                  setUnread(node.num, 0)
                 }}
                 element={
                   <Avatar

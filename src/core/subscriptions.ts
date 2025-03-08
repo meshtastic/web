@@ -85,7 +85,7 @@ export const subscribeAll = (
       ...messagePacket,
       state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
     });
-    device.unreadCounts.set(messagePacket.from, 1);
+    device.setUnread(messagePacket.from);
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {

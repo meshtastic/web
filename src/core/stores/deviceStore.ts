@@ -151,7 +151,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           },
           pendingSettingsChanges: false,
           messageDraft: "",
-          unreadCounts: new Map([[0, 100],[2718471552, 1]]),
+          unreadCounts: new Map([[0, 100],[3663106604, 1]]),
 
           setStatus: (status: Types.DeviceStatusEnum) => {
             set(
@@ -634,13 +634,16 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               }),
             );
           },
-          setUnread: (id: number, count: number) => {
+          setUnread: (unread_id: number, count?: number) => {
               set(
                 produce<DeviceState>((draft) => {
-                  console.log(id, count);
                   const device = draft.devices.get(id);
                   if (device) {
-                    device.unreadCounts.set(id, count);
+                    if (count == null) {
+                      let currentCount = device.unreadCounts.get(unread_id) ?? 0;
+                      count = currentCount + 1;
+                    }
+                    device.unreadCounts.set(unread_id, count);
                   }
                 })
               );
