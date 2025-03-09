@@ -21,7 +21,10 @@ export const MessagesPage = () => {
     if (node.num === hardware.myNodeNum) return false;
     const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
     return nodeName.toLowerCase().includes(searchTerm.toLowerCase());
-  }).map((node) => { node.unreadCount = unreadCounts.get(node.num) ?? 0; return node;})
+  }).map((node) => { 
+    node = {...node, unreadCount: unreadCounts.get(node.num) ?? 0}
+    return node;
+  })
   .sort((a, b) => b.unreadCount - a.unreadCount);
   const allChannels = Array.from(channels.values());
   const filteredChannels = allChannels.filter(
