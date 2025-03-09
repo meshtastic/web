@@ -1,22 +1,43 @@
-import type { DeviceValidation } from "@app/validation/config/device.tsx";
+import type { DeviceValidation } from "@app/validation/config/device.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useUnsafeRoles } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRoles.ts";
 
 export const Device = () => {
-  const { config, setWorkingConfig } = useDevice();
+
+  const { config, setWorkingConfig, setDialogOpen } = useDevice();
+  const { agreedToUnSafeRoles } = useUnsafeRoles();
 
   const onSubmit = (data: DeviceValidation) => {
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "device",
-          value: data,
+          value: data
         },
       }),
     );
   };
+
+  // deno-lint-ignore require-await
+  async function handleOnBeforeChange(newValue: string) {
+    if (newValue === "ROUTER" || newValue === 'REPEATER') {
+      // Open the dialog to confirm the user wants to select an unsafe role
+      setDialogOpen('unsafeRoles', true);
+
+      // We checked the persisted value of agreedToUnSafeRoles in localStorage to see if the user has agreed to unsafe roles
+      if (agreedToUnSafeRoles) {
+        return newValue;
+      } else {
+        // If the user has not agreed to unsafe roles, we return false to prevent the role from being set
+        return false;
+      }
+
+    }
+    return newValue;
+  }
 
   return (
     <DynamicForm<DeviceValidation>
@@ -32,23 +53,9 @@ export const Device = () => {
               name: "role",
               label: "Role",
               description: "What role the device performs on the mesh",
+              onBeforeChange: handleOnBeforeChange,
               properties: {
-                enumValue: {
-                  Client: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
-                  "Client Mute":
-                    Protobuf.Config.Config_DeviceConfig_Role.CLIENT_MUTE,
-                  Router: Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
-                  Repeater: Protobuf.Config.Config_DeviceConfig_Role.REPEATER,
-                  Tracker: Protobuf.Config.Config_DeviceConfig_Role.TRACKER,
-                  Sensor: Protobuf.Config.Config_DeviceConfig_Role.SENSOR,
-                  TAK: Protobuf.Config.Config_DeviceConfig_Role.TAK,
-                  "Client Hidden":
-                    Protobuf.Config.Config_DeviceConfig_Role.CLIENT_HIDDEN,
-                  "Lost and Found":
-                    Protobuf.Config.Config_DeviceConfig_Role.LOST_AND_FOUND,
-                  "TAK Tracker":
-                    Protobuf.Config.Config_DeviceConfig_Role.TAK_TRACKER,
-                },
+                enumValue: Protobuf.Config.Config_DeviceConfig_Role,
                 formatEnumName: true,
               },
             },

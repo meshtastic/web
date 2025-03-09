@@ -1,8 +1,9 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import path from 'node:path';
 import { execSync } from 'node:child_process';
+import process from "node:process";
+import path from 'node:path';
 
 let hash = '';
 try {
@@ -32,7 +33,6 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // Using Node's path and process.cwd() instead of Deno.cwd()
       '@app': path.resolve(process.cwd(), './src'),
       '@pages': path.resolve(process.cwd(), './src/pages'),
       '@components': path.resolve(process.cwd(), './src/components'),
@@ -49,6 +49,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    mockReset: true,
+    clearMocks: true,
+    restoreMocks: true,
+    root: path.resolve(process.cwd(), './src'),
     include: ['**/*.{test,spec}.{ts,tsx}'],
     setupFiles: ["./src/tests/setupTests.ts"],
 
