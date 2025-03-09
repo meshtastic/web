@@ -102,13 +102,13 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
               psk: pass,
               positionEnabled:
                 channel?.settings?.moduleSettings?.positionPrecision !==
-                  undefined &&
+                undefined &&
                 channel?.settings?.moduleSettings?.positionPrecision > 0,
               preciseLocation:
                 channel?.settings?.moduleSettings?.positionPrecision === 32,
               positionPrecision:
                 channel?.settings?.moduleSettings?.positionPrecision ===
-                    undefined
+                  undefined
                   ? 10
                   : channel?.settings?.moduleSettings?.positionPrecision,
             },
@@ -135,6 +135,7 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
               {
                 type: "passwordGenerator",
                 name: "settings.psk",
+                id: 'channel-psk',
                 label: "Pre-Shared Key",
                 description:
                   "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",

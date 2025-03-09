@@ -1,5 +1,5 @@
 import { Bluetooth } from "@components/PageComponents/Config/Bluetooth.tsx";
-import { Device } from "@components/PageComponents/Config/Device.tsx";
+import { Device } from "../../components/PageComponents/Config/Device/index.tsx";
 import { Display } from "@components/PageComponents/Config/Display.tsx";
 import { LoRa } from "@components/PageComponents/Config/LoRa.tsx";
 import { Network } from "@components/PageComponents/Config/Network.tsx";

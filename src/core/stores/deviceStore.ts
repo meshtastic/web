@@ -26,7 +26,8 @@ export type DialogVariant =
   | "deviceName"
   | "nodeRemoval"
   | "pkiBackup"
-  | "nodeDetails";
+  | "nodeDetails"
+  | "unsafeRoles";
 
 export interface Device {
   id: number;
@@ -63,6 +64,7 @@ export interface Device {
     nodeRemoval: boolean;
     pkiBackup: boolean;
     nodeDetails: boolean;
+    unsafeRoles: boolean;
   };
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -146,6 +148,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             nodeRemoval: false,
             pkiBackup: false,
             nodeDetails: false,
+            unsafeRoles: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
@@ -303,7 +306,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                   .findIndex(
                     (wmc) =>
                       wmc.payloadVariant.case ===
-                        moduleConfig.payloadVariant.case,
+                      moduleConfig.payloadVariant.case,
                   );
                 if (workingModuleConfigIndex !== -1) {
                   device.workingModuleConfig[workingModuleConfigIndex] =

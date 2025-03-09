@@ -12,7 +12,7 @@ import { useCallback } from "react";
 export const Position = () => {
   const { config, setWorkingConfig } = useDevice();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
-    config.position.positionFlags ?? 0,
+    config?.position.positionFlags ?? 0,
   );
 
   const onSubmit = (data: PositionValidation) => {
