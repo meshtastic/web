@@ -75,8 +75,7 @@
     "react-scan": "^0.2.8",
     "rfc4648": "^1.5.4",
     "vite-plugin-node-polyfills": "^0.23.0",
-    "vitest": "^3.0.7",
-    "vitest-browser-react": "^0.1.1",
+
     "zustand": "5.0.3"
   },
   "devDependencies": {
@@ -105,6 +104,7 @@
     "testing-library": "^0.0.2",
     "typescript": "^5.8.2",
     "vite": "^6.2.0",
+    "vitest": "^3.0.7",
     "vite-plugin-pwa": "^0.21.1"
   }
 }
