@@ -62,7 +62,6 @@ export const Table = ({ headings, rows }: TableProps) => {
 
     // Custom comparison for 'Connection' column
     if (sortColumn === "Connection") {
-      //debugger;
       const aNumHops = numericHops(aValue[0]);
       const bNumHops = numericHops(bValue[0]);
 
