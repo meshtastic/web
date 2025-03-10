@@ -90,7 +90,7 @@ export const MessagesPage = () => {
           </div>
         </SidebarSection>
       </Sidebar>
-      <div className="flex flex-col w-full h-full">
+      <div className="flex flex-col w-full h-full container mx-auto">
         <PageLayout
           className="flex flex-col h-full"
           label={`Messages: ${chatType === "broadcast" && currentChannel
