@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import path from 'node:path';
 import { execSync } from 'node:child_process';
+import path from "node:path";
 
 let hash = '';
 try {
@@ -19,7 +19,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       strategies: 'generateSW',
       devOptions: {
-        enabled: true
+        enabled: false
       },
       workbox: {
         cleanupOutdatedCaches: true,
@@ -50,11 +50,4 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['react-scan']
   },
-  test: {
-    environment: 'jsdom',
-    globals: true,
-    include: ['**/*.{test,spec}.{ts,tsx}'],
-    setupFiles: ["./src/tests/setupTests.ts"],
-
-  }
 });

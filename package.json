@@ -14,7 +14,6 @@
     "dev:ui": "deno run -A npm:vite dev",
     "dev:scan": "VITE_DEBUG_SCAN=true deno task dev:ui",
     "test": "deno run -A npm:vitest",
-    "test:ui": "deno task test --ui",
     "preview": "deno run -A npm:vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
   },
@@ -76,12 +75,14 @@
     "react-scan": "^0.2.8",
     "rfc4648": "^1.5.4",
     "vite-plugin-node-polyfills": "^0.23.0",
+
     "zustand": "5.0.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.9",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/chrome": "^0.0.307",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.13.7",
@@ -93,16 +94,17 @@
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "gzipper": "^8.2.0",
+    "happy-dom": "^17.2.2",
     "postcss": "^8.5.3",
-    "jsdom": "^26.0.0",
     "simple-git-hooks": "^2.11.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.9",
     "tailwindcss-animate": "^1.0.7",
     "tar": "^7.4.3",
+    "testing-library": "^0.0.2",
     "typescript": "^5.8.2",
     "vite": "^6.2.0",
-    "vite-plugin-pwa": "^0.21.1",
-    "vitest": "^3.0.7"
+    "vitest": "^3.0.7",
+    "vite-plugin-pwa": "^0.21.1"
   }
 }
