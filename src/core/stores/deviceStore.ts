@@ -151,7 +151,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           },
           pendingSettingsChanges: false,
           messageDraft: "",
-          unreadCounts: new Map([[0, 100],[3663106604, 1]]),
+          unreadCounts: new Map(),
 
           setStatus: (status: Types.DeviceStatusEnum) => {
             set(
