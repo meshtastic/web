@@ -40,16 +40,20 @@ export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 
 export interface ButtonProps
   extends
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  VariantProps<typeof buttonVariants> { }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => {
+  ({ className, variant, size, disabled, ...props }, ref) => {
     return (
       <button
         type="button"
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          { "cursor-not-allowed": disabled }
+        )}
         ref={ref}
+        disabled={disabled}
         {...props}
       />
     );

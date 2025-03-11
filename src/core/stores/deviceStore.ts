@@ -26,7 +26,8 @@ export type DialogVariant =
   | "deviceName"
   | "nodeRemoval"
   | "pkiBackup"
-  | "nodeDetails";
+  | "nodeDetails"
+  | "unsafeRoles";
 
 type QueueStatus = {
   res: number, free: number, maxlen: number
@@ -69,6 +70,7 @@ export interface Device {
     nodeRemoval: boolean;
     pkiBackup: boolean;
     nodeDetails: boolean;
+    unsafeRoles: boolean;
   };
 
 
@@ -103,6 +105,7 @@ export interface Device {
     state: MessageState,
   ) => void;
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
+  getDialogOpen: (dialog: DialogVariant) => boolean;
   processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
   setQueueStatus: (status: QueueStatus) => void;
@@ -158,6 +161,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             nodeRemoval: false,
             pkiBackup: false,
             nodeDetails: false,
+            unsafeRoles: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
@@ -604,6 +608,13 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 device.dialog[dialog] = open;
               }),
             );
+          },
+          getDialogOpen: (dialog: DialogVariant) => {
+            const device = get().devices.get(id);
+            if (!device) {
+              throw new Error("Device not found");
+            }
+            return device.dialog[dialog];
           },
           processPacket(data: ProcessPacketParams) {
             set(

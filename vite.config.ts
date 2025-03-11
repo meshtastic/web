@@ -1,8 +1,10 @@
-import { defineConfig } from "vite";
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { execSync } from 'node:child_process';
-import path from "node:path";
+import process from "node:process";
+import path from 'node:path';
+
 
 let hash = '';
 try {
@@ -32,7 +34,6 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // Using Node's path and process.cwd() instead of Deno.cwd()
       '@app': path.resolve(process.cwd(), './src'),
       '@pages': path.resolve(process.cwd(), './src/pages'),
       '@components': path.resolve(process.cwd(), './src/components'),

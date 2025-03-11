@@ -3,6 +3,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -32,6 +33,7 @@ export const RemoveNodeDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>Remove Node?</DialogTitle>
           <DialogDescription>

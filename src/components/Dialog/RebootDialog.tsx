@@ -1,6 +1,7 @@
 import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -27,6 +28,7 @@ export const RebootDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>Schedule Reboot</DialogTitle>
           <DialogDescription>

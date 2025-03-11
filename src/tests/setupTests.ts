@@ -1,13 +1,13 @@
-// Try this import style instead
 import { expect, afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
+import "@testing-library/jest-dom";
 
-// Add the matchers (should work with * as import)
-expect.extend(matchers);
+// Enable auto mocks for our UI components
+//vi.mock('@components/UI/Dialog.tsx');
+//vi.mock('@components/UI/Typography/Link.tsx');
 
-// Mock ResizeObserver
-global.ResizeObserver = class {
+globalThis.ResizeObserver = class {
   observe() { }
   unobserve() { }
   disconnect() { }

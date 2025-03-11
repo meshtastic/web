@@ -7,6 +7,7 @@ import { HTTP } from "@components/PageComponents/Connect/HTTP.tsx";
 import { Serial } from "@components/PageComponents/Connect/Serial.tsx";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -135,6 +136,7 @@ export const NewDeviceDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>Connect New Device</DialogTitle>
         </DialogHeader>
