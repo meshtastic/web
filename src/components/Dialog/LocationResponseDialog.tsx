@@ -1,6 +1,7 @@
 import { useDevice } from "../../core/stores/deviceStore.ts";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -31,6 +32,7 @@ export const LocationResponseDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>{`Location: ${longName} (${shortName})`}</DialogTitle>
         </DialogHeader>
@@ -41,9 +43,8 @@ export const LocationResponseDialog = ({
                 Coordinates:{" "}
                 <a
                   className="text-blue-500 dark:text-blue-400"
-                  href={`https://www.openstreetmap.org/?mlat=${
-                    location?.data.latitudeI / 1e7
-                  }&mlon=${location?.data.longitudeI / 1e7}&layers=N`}
+                  href={`https://www.openstreetmap.org/?mlat=${location?.data.latitudeI / 1e7
+                    }&mlon=${location?.data.longitudeI / 1e7}&layers=N`}
                   target="_blank"
                   rel="noreferrer"
                 >

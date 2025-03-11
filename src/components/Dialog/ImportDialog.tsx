@@ -3,6 +3,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { Checkbox } from "../UI/Checkbox/index.tsx";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -96,6 +97,7 @@ export const ImportDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>Import Channel Set</DialogTitle>
           <DialogDescription>

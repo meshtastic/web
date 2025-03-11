@@ -2,6 +2,7 @@ import { useDevice } from "../../core/stores/deviceStore.ts";
 import { Button } from "../UI/Button.tsx";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -102,6 +103,7 @@ export const PkiBackupDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>Backup Keys</DialogTitle>
           <DialogDescription>

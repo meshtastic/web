@@ -1,6 +1,7 @@
 import { useDevice } from "../../core/stores/deviceStore.ts";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -36,6 +37,7 @@ export const TracerouteResponseDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>{`Traceroute: ${longName} (${shortName})`}</DialogTitle>
         </DialogHeader>

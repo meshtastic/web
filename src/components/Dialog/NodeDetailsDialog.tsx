@@ -8,6 +8,7 @@ import {
 } from "../UI/Accordion.tsx";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -36,6 +37,7 @@ export const NodeDetailsDialog = ({
     ? (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
+          <DialogClose />
           <DialogHeader>
             <DialogTitle>
               Node Details for {device.user?.longName ?? "UNKNOWN"} (
@@ -85,11 +87,9 @@ export const NodeDetailsDialog = ({
                           Coordinates:{" "}
                           <a
                             className="text-blue-500 dark:text-blue-400"
-                            href={`https://www.openstreetmap.org/?mlat=${
-                              device.position.latitudeI / 1e7
-                            }&mlon=${
-                              device.position.longitudeI / 1e7
-                            }&layers=N`}
+                            href={`https://www.openstreetmap.org/?mlat=${device.position.latitudeI / 1e7
+                              }&mlon=${device.position.longitudeI / 1e7
+                              }&layers=N`}
                             target="_blank"
                             rel="noreferrer"
                           >
@@ -173,7 +173,7 @@ export const NodeDetailsDialog = ({
                         </AccordionTrigger>
                         <AccordionContent className="overflow-x-scroll">
                           <pre className="text-xs w-full">
-                        {JSON.stringify(device, null, 2)}
+                            {JSON.stringify(device, null, 2)}
                           </pre>
                         </AccordionContent>
                       </AccordionItem>

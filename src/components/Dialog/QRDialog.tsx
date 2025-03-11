@@ -2,6 +2,7 @@ import { create, toBinary } from "@bufbuild/protobuf";
 import { Checkbox } from "../UI/Checkbox/index.tsx";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -62,6 +63,7 @@ export const QRDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>Generate QR Code</DialogTitle>
           <DialogDescription>
@@ -107,8 +109,8 @@ export const QRDialog = ({
             <button
               type="button"
               className={`border-slate-900 border-t border-l border-b rounded-l h-10 px-7 py-2 text-sm font-medium focus:outline-hidden focus:ring-2 focus:ring-offset-2 ${qrCodeAdd
-                  ? "focus:ring-green-800 bg-green-800 text-white"
-                  : "focus:ring-slate-400 bg-slate-400 hover:bg-green-600"
+                ? "focus:ring-green-800 bg-green-800 text-white"
+                : "focus:ring-slate-400 bg-slate-400 hover:bg-green-600"
                 }`}
               onClick={() => setQrCodeAdd(true)}
             >
@@ -117,8 +119,8 @@ export const QRDialog = ({
             <button
               type="button"
               className={`border-slate-900 border-t border-r border-b rounded-r h-10 px-4 py-2 text-sm font-medium focus:outline-hidden focus:ring-2 focus:ring-offset-2 ${!qrCodeAdd
-                  ? "focus:ring-green-800 bg-green-800 text-white"
-                  : "focus:ring-slate-400 bg-slate-400 hover:bg-green-600"
+                ? "focus:ring-green-800 bg-green-800 text-white"
+                : "focus:ring-slate-400 bg-slate-400 hover:bg-green-600"
                 }`}
               onClick={() => setQrCodeAdd(false)}
             >
