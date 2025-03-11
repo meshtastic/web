@@ -98,6 +98,7 @@ export interface Device {
     state: MessageState,
   ) => void;
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
+  getDialogOpen: (dialog: DialogVariant) => boolean;
   processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
 }
@@ -596,6 +597,13 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 device.dialog[dialog] = open;
               }),
             );
+          },
+          getDialogOpen: (dialog: DialogVariant) => {
+            const device = get().devices.get(id);
+            if (!device) {
+              throw new Error("Device not found");
+            }
+            return device.dialog[dialog];
           },
           processPacket(data: ProcessPacketParams) {
             set(

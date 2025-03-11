@@ -1,88 +1,91 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { UnsafeRolesDialog } from '@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx';
-import { useUnsafeRoles } from '@components/Dialog/UnsafeRolesDialog/useUnsafeRoles.ts';
+// deno-lint-ignore-file
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
+import { eventBus } from "@core/utils/eventBus.ts";
+import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 
-vi.mock('@components/Dialog/UnsafeRolesDialog/useUnsafeRoles', () => ({
-  useUnsafeRoles: vi.fn()
-}));
+describe("UnsafeRolesDialog", () => {
+  const mockDevice = {
+    setDialogOpen: vi.fn(),
+  };
 
-describe('UnsafeRolesDialog', () => {
-  const getConfirmStateMock = vi.fn();
-  const toggleConfirmStateMock = vi.fn();
-  const handleCloseDialogMock = vi.fn();
-  const onOpenChangeMock = vi.fn();
+  const renderWithDeviceContext = (ui: any) => {
+    return render(
+      <DeviceWrapper device={mockDevice}>
+        {ui}
+      </DeviceWrapper>
+    );
+  };
 
-  beforeEach(() => {
-    vi.resetAllMocks();
+  it("renders the dialog when open is true", () => {
+    renderWithDeviceContext(<UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />);
 
-    getConfirmStateMock.mockReturnValue(false);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
 
-    (useUnsafeRoles as any).mockReturnValue({
-      getConfirmState: getConfirmStateMock,
-      toggleConfirmState: toggleConfirmStateMock,
-      handleCloseDialog: handleCloseDialogMock
-    });
+    expect(screen.getByText(/I have read the/i)).toBeInTheDocument();
+    expect(screen.getByText(/understand the implications/i)).toBeInTheDocument();
+
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(2);
+    expect(links[0]).toHaveTextContent('Device Role Documentation');
+    expect(links[1]).toHaveTextContent('Choosing The Right Device Role');
   });
 
-  it('should not render when open is false', () => {
-    render(<UnsafeRolesDialog open={false} onOpenChange={onOpenChangeMock} />);
+  it("displays the correct links", () => {
+    renderWithDeviceContext(<UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />);
 
-    expect(screen.queryByTestId('dialog')).not.toBeInTheDocument();
+    const docLink = screen.getByRole("link", { name: /Device Role Documentation/i });
+    const blogLink = screen.getByRole("link", { name: /Choosing The Right Device Role/i });
+
+    expect(docLink).toHaveAttribute("href", "https://meshtastic.org/docs/configuration/radio/device/");
+    expect(blogLink).toHaveAttribute("href", "https://meshtastic.org/blog/choosing-the-right-device-role/");
   });
 
-  it('should render when open is true', () => {
-    render(<UnsafeRolesDialog open={true} onOpenChange={onOpenChangeMock} />);
+  it("does not allow confirmation until checkbox is checked", () => {
+    renderWithDeviceContext(<UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />);
 
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByRole('heading')).toBeInTheDocument();
-    expect(screen.getByText('Are you sure?')).toBeInTheDocument();
-    expect(screen.getAllByRole('link')).length(2);
-    expect(screen.getByRole('checkbox')).toBeInTheDocument();
-    expect(screen.getByText('Yes, I know what I\'m doing')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /dismiss/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /confirm/i })).toBeInTheDocument();
+    const confirmButton = screen.getByRole("button", { name: /confirm/i });
+
+    expect(confirmButton).toBeDisabled();
+
+    const checkbox = screen.getByRole("checkbox");
+    fireEvent.click(checkbox);
+
+    expect(confirmButton).toBeEnabled();
   });
 
-  it('should have disabled confirm button when checkbox is unchecked', () => {
-    getConfirmStateMock.mockReturnValue(false);
+  it("emits the correct event when closing via close button", () => {
+    const eventSpy = vi.spyOn(eventBus, "emit");
+    renderWithDeviceContext(<UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />);
 
-    render(<UnsafeRolesDialog open={true} onOpenChange={onOpenChangeMock} />);
+    const dismissButton = screen.getByRole("button", { name: /close/i });
+    fireEvent.click(dismissButton);
 
-    expect(screen.getByRole('button', { name: /confirm/i })).toBeDisabled();
+    expect(eventSpy).toHaveBeenCalledWith("dialog:unsafeRoles", { action: "dismiss" });
   });
 
-  it('should have enabled confirm button when checkbox is checked', () => {
-    getConfirmStateMock.mockReturnValue(true);
+  it("emits the correct event when dismissing", () => {
+    const eventSpy = vi.spyOn(eventBus, "emit");
+    renderWithDeviceContext(<UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />);
 
-    render(<UnsafeRolesDialog open={true} onOpenChange={onOpenChangeMock} />);
+    const dismissButton = screen.getByRole("button", { name: /dismiss/i });
+    fireEvent.click(dismissButton);
 
-    expect(screen.getByRole('button', { name: /confirm/i })).not.toBeDisabled();
+    expect(eventSpy).toHaveBeenCalledWith("dialog:unsafeRoles", { action: "dismiss" });
   });
 
-  it('should call toggleConfirmState when checkbox is clicked', () => {
-    render(<UnsafeRolesDialog open={true} onOpenChange={onOpenChangeMock} />);
+  it("emits the correct event when confirming", () => {
+    const eventSpy = vi.spyOn(eventBus, "emit");
+    renderWithDeviceContext(<UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />);
 
-    fireEvent.click(screen.getByRole('checkbox'));
+    const checkbox = screen.getByRole("checkbox");
+    const confirmButton = screen.getByRole("button", { name: /confirm/i });
 
-    expect(toggleConfirmStateMock).toHaveBeenCalledTimes(1);
-  });
+    fireEvent.click(checkbox);
+    fireEvent.click(confirmButton);
 
-  it('should call handleCloseDialog with "dismiss" when dismiss button is clicked', () => {
-    render(<UnsafeRolesDialog open={true} onOpenChange={onOpenChangeMock} />);
-
-    fireEvent.click(screen.getByRole('button', { name: /dismiss/i }));
-
-    expect(handleCloseDialogMock).toHaveBeenCalledWith('dismiss');
-  });
-
-  it('should call handleCloseDialog with "confirm" when confirm button is clicked', () => {
-    getConfirmStateMock.mockReturnValue(true);
-
-    render(<UnsafeRolesDialog open={true} onOpenChange={onOpenChangeMock} />);
-
-    fireEvent.click(screen.getByRole('button', { name: /confirm/i }));
-
-    expect(handleCloseDialogMock).toHaveBeenCalledWith("confirm");
+    expect(eventSpy).toHaveBeenCalledWith("dialog:unsafeRoles", { action: "confirm" });
   });
 });

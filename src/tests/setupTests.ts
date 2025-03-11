@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import "@testing-library/jest-dom";
 
 // Enable auto mocks for our UI components
