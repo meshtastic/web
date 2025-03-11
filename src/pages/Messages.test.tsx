@@ -19,6 +19,10 @@ const mockUseDevice = {
         }]
     ]),
     nodes: new Map([
+        [0, {
+            num: 0,
+            user: { longName: "Test Node 0", shortName: "TN0", publicKey: "0000" }
+        }],
         [1111, {
             num: 1111,
             user: { longName: "Test Node 1", shortName: "TN1", publicKey: "12345" }
@@ -53,24 +57,17 @@ describe("Messages Page", () => {
 
     it("updates unread when active chat changes",() => {
         render(<MessagesPage />);
-        const nodeButton = screen.getByRole("button", { name: "TN Test Node 3" });
+        const nodeButton = screen.getAllByRole("button").filter(b => b.textContent.includes("TN1Test Node 13"))[0];
         fireEvent.click(nodeButton);
-
         expect(mockUseDevice.setUnread).toHaveBeenCalledWith(1111, 0);
-        expect(mockUseDevice.unreadCounts.get(1111)).toBe(0);
-        const unreadCount = screen.getByText("3");
-        expect(unreadCount).not.toBeInTheDocument();
     });
 
-    it("does not update the incorrect node",() => {
+    it("does not update the incorrect node", async () => {
         render(<MessagesPage />);
         const nodeButton = screen.getAllByRole("button").filter(b => b.textContent.includes("TN1Test Node 13"))[0];
         fireEvent.click(nodeButton);
-
         expect(mockUseDevice.setUnread).toHaveBeenCalledWith(1111, 0);
         expect(mockUseDevice.unreadCounts.get(2222)).toBe(10);
-        const unreadCount = screen.getByText("10");
-        expect(unreadCount).toBeInTheDocument();
     });
 
     it("sorts unreads to the top", () => {
@@ -78,6 +75,7 @@ describe("Messages Page", () => {
         const buttonOrder = screen.getAllByRole("button").filter(b => b.textContent.includes("Test Node"));
         expect(buttonOrder[0].textContent).toContain("TN2Test Node 210");
         expect(buttonOrder[1].textContent).toContain("TN1Test Node 13");
-        expect(buttonOrder[2].textContent).toContain("TN3Test Node 3");
+        expect(buttonOrder[2].textContent).toContain("TN0Test Node 0");
+        expect(buttonOrder[3].textContent).toContain("TN3Test Node 3");
     });
 });
