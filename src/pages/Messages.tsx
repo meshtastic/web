@@ -79,7 +79,7 @@ export const MessagesPage = () => {
                 onClick={() => {
                   setChatType("direct");
                   setActiveChat(node.num);
-                  setUnread(node.num, 0)
+                  setUnread(node.num, 0);
                 }}
                 element={
                   <Avatar
