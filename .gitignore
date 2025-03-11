@@ -4,3 +4,4 @@ stats.html
 .vercel
 .vite/deps
 dev-dist
+__screenshots__*

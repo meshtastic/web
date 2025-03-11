@@ -5,6 +5,7 @@ import { execSync } from 'node:child_process';
 import process from "node:process";
 import path from 'node:path';
 
+
 let hash = '';
 try {
   hash = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
@@ -20,7 +21,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       strategies: 'generateSW',
       devOptions: {
-        enabled: true
+        enabled: false
       },
       workbox: {
         cleanupOutdatedCaches: true,
@@ -41,11 +42,16 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000
+    port: 3000,
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    }
   },
   optimizeDeps: {
     exclude: ['react-scan']
   },
+
   test: {
     environment: 'jsdom',
     globals: true,
@@ -57,4 +63,5 @@ export default defineConfig({
     setupFiles: ["./src/tests/setupTests.ts"],
 
   }
+
 });

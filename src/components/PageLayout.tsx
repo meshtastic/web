@@ -10,6 +10,7 @@ export interface PageLayoutProps {
   label: string;
   noPadding?: boolean;
   children: React.ReactNode;
+  className?: string;
   actions?: {
     icon: LucideIcon;
     iconClasses?: string;
@@ -23,6 +24,7 @@ export const PageLayout = ({
   label,
   noPadding,
   actions,
+  className,
   children,
 }: PageLayoutProps) => {
   return (
@@ -63,6 +65,7 @@ export const PageLayout = ({
           className={cn(
             "flex h-full w-full flex-col overflow-y-auto",
             !noPadding && "pl-3 pr-3 ",
+            className
           )}
         >
           {children}

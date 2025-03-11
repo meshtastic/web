@@ -71,6 +71,7 @@
 }
 
 @layer base {
+
   *,
   ::after,
   ::before,
@@ -96,10 +97,22 @@
   }
 }
 
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Prevent image dragging */
 img {
   -webkit-user-drag: none;
 }
+
 
 @keyframes spin-slower {
   to {
