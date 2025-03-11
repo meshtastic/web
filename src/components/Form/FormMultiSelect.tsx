@@ -19,28 +19,32 @@ export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
   };
 }
 
+const formatEnumDisplay = (name: string): string => {
+  return name
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .split(" ")
+    .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+    .join(" ");
+};
+
 export function MultiSelectInput<T extends FieldValues>({
   field,
 }: GenericFormElementProps<T, MultiSelectFieldProps<T>>) {
   const { enumValue, formatEnumName, ...remainingProperties } =
     field.properties;
 
-  // Make sure to filter out the UNSET value, as it shouldn't be shown in the UI
-  const optionsEnumValues = enumValue
-    ? Object.entries(enumValue)
-      .filter((value) => typeof value[1] === "number")
-      .filter((value) => value[0] !== "UNSET")
-    : [];
+  const valueToKeyMap: Record<string, string> = {};
+  const optionsEnumValues: [string, number][] = [];
 
-  const formatName = (name: string) => {
-    if (!formatEnumName) return name;
-    return name
-      .replace(/_/g, " ")
-      .toLowerCase()
-      .split(" ")
-      .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-      .join(" ");
-  };
+  if (enumValue) {
+    Object.entries(enumValue).forEach(([key, val]) => {
+      if (typeof val === "number" && key !== "UNSET") {
+        valueToKeyMap[val.toString()] = key;
+        optionsEnumValues.push([key, val as number]);
+      }
+    });
+  }
 
   return (
     <MultiSelect {...remainingProperties}>
@@ -52,7 +56,7 @@ export function MultiSelectInput<T extends FieldValues>({
           checked={field.isChecked(name)}
           onCheckedChange={() => field.onValueChange(name)}
         >
-          {formatEnumName ? formatName(name) : name}
+          {formatEnumName ? formatEnumDisplay(name) : name}
         </MultiSelectItem>
       ))}
     </MultiSelect>

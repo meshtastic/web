@@ -12,6 +12,7 @@ import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { getChannelName } from "@pages/Channels.tsx";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useState } from "react";
+import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 
 export const MessagesPage = () => {
   const { channels, nodes, hardware, messages, unreadCounts, setUnread } = useDevice();
@@ -36,6 +37,11 @@ export const MessagesPage = () => {
   const node = nodes.get(activeChat);
   const nodeHex = node?.num ? numberToHexUnpadded(node.num) : "Unknown";
 
+  const messageDestination = chatType === "direct" ? activeChat : "broadcast";
+  const messageChannel = chatType === "direct"
+    ? Types.ChannelNumber.Primary
+    : activeChat;
+
   return (
     <>
       <Sidebar>
@@ -47,9 +53,9 @@ export const MessagesPage = () => {
               label={channel.settings?.name.length
                 ? channel.settings?.name
                 : channel.index === 0
-                ? "Primary"
-                : `Ch ${channel.index}`}
-              active={activeChat === channel.index}
+                  ? "Primary"
+                  : `Ch ${channel.index}`}
+              active={activeChat === channel.index && chatType === "broadcast"}
               onClick={() => {
                 setChatType("broadcast");
                 setActiveChat(channel.index);
@@ -76,7 +82,7 @@ export const MessagesPage = () => {
                 count={unreadCounts.get(node.num)}
                 label={node.user?.longName ??
                   `!${numberToHexUnpadded(node.num)}`}
-                active={activeChat === node.num}
+                active={activeChat === node.num && chatType === "direct"}
                 onClick={() => {
                   setChatType("direct");
                   setActiveChat(node.num);
@@ -93,15 +99,15 @@ export const MessagesPage = () => {
           </div>
         </SidebarSection>
       </Sidebar>
-      <div className="flex flex-col grow">
+      <div className="flex flex-col w-full h-full container mx-auto">
         <PageLayout
-          label={`Messages: ${
-            chatType === "broadcast" && currentChannel
-              ? getChannelName(currentChannel)
-              : chatType === "direct" && nodes.get(activeChat)
+          className="flex flex-col h-full"
+          label={`Messages: ${chatType === "broadcast" && currentChannel
+            ? getChannelName(currentChannel)
+            : chatType === "direct" && nodes.get(activeChat)
               ? (nodes.get(activeChat)?.user?.longName ?? nodeHex)
               : "Loading..."
-          }`}
+            }`}
           actions={chatType === "direct"
             ? [
               {
@@ -124,28 +130,38 @@ export const MessagesPage = () => {
             ]
             : []}
         >
-          {allChannels.map(
-            (channel) =>
-              activeChat === channel.index && (
-                <ChannelChat
-                  key={channel.index}
-                  to="broadcast"
-                  messages={messages.broadcast.get(channel.index)}
-                  channel={channel.index}
-                />
-              ),
-          )}
-          {filteredNodes.map(
-            (node) =>
-              activeChat === node.num && (
-                <ChannelChat
-                  key={node.num}
-                  to={activeChat}
-                  messages={messages.direct.get(node.num)}
-                  channel={Types.ChannelNumber.Primary}
-                />
-              ),
-          )}
+          <div className="flex-1 overflow-y-auto">
+            {chatType === "broadcast" && currentChannel && (
+              <div className="flex flex-col h-full">
+                <div className="flex-1 overflow-y-auto">
+                  <ChannelChat
+                    key={currentChannel.index}
+                    messages={messages.broadcast.get(currentChannel.index)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {chatType === "direct" && node && (
+              <div className="flex flex-col h-full">
+                <div className="flex-1 overflow-y-auto">
+                  <ChannelChat
+                    key={node.num}
+                    messages={messages.direct.get(node.num)}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Single message input for both chat types */}
+          <div className="shrink-0 p-4 w-full dark:bg-slate-900">
+            <MessageInput
+              to={messageDestination}
+              channel={messageChannel}
+              maxBytes={200}
+            />
+          </div>
         </PageLayout>
       </div>
     </>

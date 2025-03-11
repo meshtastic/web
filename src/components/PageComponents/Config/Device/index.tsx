@@ -1,11 +1,13 @@
-import type { DeviceValidation } from "@app/validation/config/device.tsx";
+import type { DeviceValidation } from "@app/validation/config/device.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
 
 export const Device = () => {
   const { config, setWorkingConfig } = useDevice();
+  const { validateRoleSelection } = useUnsafeRolesDialog();
 
   const onSubmit = (data: DeviceValidation) => {
     setWorkingConfig(
@@ -14,10 +16,9 @@ export const Device = () => {
           case: "device",
           value: data,
         },
-      }),
+      })
     );
   };
-
   return (
     <DynamicForm<DeviceValidation>
       onSubmit={onSubmit}
@@ -32,23 +33,9 @@ export const Device = () => {
               name: "role",
               label: "Role",
               description: "What role the device performs on the mesh",
+              validate: validateRoleSelection,
               properties: {
-                enumValue: {
-                  Client: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
-                  "Client Mute":
-                    Protobuf.Config.Config_DeviceConfig_Role.CLIENT_MUTE,
-                  Router: Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
-                  Repeater: Protobuf.Config.Config_DeviceConfig_Role.REPEATER,
-                  Tracker: Protobuf.Config.Config_DeviceConfig_Role.TRACKER,
-                  Sensor: Protobuf.Config.Config_DeviceConfig_Role.SENSOR,
-                  TAK: Protobuf.Config.Config_DeviceConfig_Role.TAK,
-                  "Client Hidden":
-                    Protobuf.Config.Config_DeviceConfig_Role.CLIENT_HIDDEN,
-                  "Lost and Found":
-                    Protobuf.Config.Config_DeviceConfig_Role.LOST_AND_FOUND,
-                  "TAK Tracker":
-                    Protobuf.Config.Config_DeviceConfig_Role.TAK_TRACKER,
-                },
+                enumValue: Protobuf.Config.Config_DeviceConfig_Role,
                 formatEnumName: true,
               },
             },

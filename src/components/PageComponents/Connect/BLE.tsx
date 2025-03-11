@@ -5,7 +5,7 @@ import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
-import { BleConnection, Constants } from "@meshtastic/js";
+import { BleConnection, ServiceUuid } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 
 export const BLE = ({ closeDialog }: TabElementProps) => {
@@ -58,7 +58,7 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
         onClick={async () => {
           await navigator.bluetooth
             .requestDevice({
-              filters: [{ services: [Constants.ServiceUuid] }],
+              filters: [{ services: [ServiceUuid] }],
             })
             .then((device) => {
               const exists = bleDevices.findIndex((d) => d.id === device.id);

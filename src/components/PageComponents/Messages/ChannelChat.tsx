@@ -1,14 +1,10 @@
 import { type MessageWithState, useDevice } from "@core/stores/deviceStore.ts";
 import { Message } from "@components/PageComponents/Messages/Message.tsx";
-import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
-import type { Types } from "@meshtastic/core";
 import { InboxIcon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 
 export interface ChannelChatProps {
   messages?: MessageWithState[];
-  channel: Types.ChannelNumber;
-  to: Types.Destination;
 }
 
 const EmptyState = () => (
@@ -20,8 +16,6 @@ const EmptyState = () => (
 
 export const ChannelChat = ({
   messages,
-  channel,
-  to,
 }: ChannelChatProps) => {
   const { nodes } = useDevice();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -30,10 +24,12 @@ export const ChannelChat = ({
   const scrollToBottom = useCallback(() => {
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
-      const isNearBottom = scrollContainer.scrollHeight -
-          scrollContainer.scrollTop -
-          scrollContainer.clientHeight <
+      const isNearBottom =
+        scrollContainer.scrollHeight -
+        scrollContainer.scrollTop -
+        scrollContainer.clientHeight <
         100;
+
       if (isNearBottom) {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }
@@ -42,7 +38,7 @@ export const ChannelChat = ({
 
   useEffect(() => {
     scrollToBottom();
-  }, [scrollToBottom]);
+  }, [scrollToBottom, messages]);
 
   if (!messages?.length) {
     return (
@@ -50,34 +46,31 @@ export const ChannelChat = ({
         <div className="flex-1 flex items-center justify-center">
           <EmptyState />
         </div>
-        <div className="shrink-0 p-4 w-full dark:bg-slate-900">
-          <MessageInput to={to} channel={channel} maxBytes={200} />
-        </div>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col h-full container mx-auto">
-      <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
-        <div className="w-full h-full flex flex-col justify-end pl-4 pr-44">
-          {messages.map((message, index) => {
-            return (
-              <Message
-                key={message.id}
-                message={message}
-                sender={nodes.get(message.from)}
-                lastMsgSameUser={index > 0 &&
-                  messages[index - 1].from === message.from}
-              />
-            );
-          })}
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto pl-4 pr-4 md:pr-44"
+      >
+        <div className="flex flex-col justify-end min-h-full">
+          {messages.map((message, index) => (
+            <Message
+              key={message.id}
+              message={message}
+              sender={nodes.get(message.from)}
+              lastMsgSameUser={
+                index > 0 && messages[index - 1].from === message.from
+              }
+            />
+          ))}
           <div ref={messagesEndRef} className="w-full" />
         </div>
       </div>
-      <div className="shrink-0 mt-2 p-4 w-full dark:bg-slate-900">
-        <MessageInput to={to} channel={channel} maxBytes={200} />
-      </div>
+
     </div>
   );
 };

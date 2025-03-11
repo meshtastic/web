@@ -1,8 +1,9 @@
 import { create, fromBinary } from "@bufbuild/protobuf";
 import { Button } from "@components/UI/Button.tsx";
-import { Checkbox } from "@components/UI/Checkbox.tsx";
+import { Checkbox } from "../UI/Checkbox/index.tsx";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -50,7 +51,7 @@ export const ImportDialog = ({
       const paddedString = encodedChannelConfig
         .padEnd(
           encodedChannelConfig.length +
-            ((4 - (encodedChannelConfig.length % 4)) % 4),
+          ((4 - (encodedChannelConfig.length % 4)) % 4),
           "=",
         )
         .replace(/-/g, "+")
@@ -96,6 +97,7 @@ export const ImportDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>Import Channel Set</DialogTitle>
           <DialogDescription>
