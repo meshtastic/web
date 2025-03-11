@@ -16,9 +16,13 @@ export default defineConfig({
     },
   },
   test: {
+    environment: 'jsdom',
     globals: true,
-    include: ['src/**/*.test.tsx', 'src/**/*.test.ts'],
-    setupFiles: ['src/tests/setupTests.ts'],
-    environment: 'happy-dom',
+    mockReset: true,
+    clearMocks: true,
+    restoreMocks: true,
+    root: path.resolve(process.cwd(), './src'),
+    include: ['**/*.{test,spec}.{ts,tsx}'],
+    setupFiles: ["./src/tests/setupTests.ts"],
   },
 })
