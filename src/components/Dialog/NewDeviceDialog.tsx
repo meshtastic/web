@@ -53,7 +53,7 @@ const links: { [key: string]: string } = {
 
 const listFormatter = new Intl.ListFormat("en", {
   style: "long",
-  type: "conjunction",
+  type: "disjunction",
 });
 
 const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
@@ -79,16 +79,16 @@ const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
   };
 
   return (
-    <Subtle className="flex flex-col items-start gap-2 text-slate-900 bg-red-200/80 p-4 rounded-md">
+    <Subtle className="flex flex-col items-start gap-2 bg-red-500 p-4 rounded-md">
       <div className="flex items-center gap-2 w-full">
-        <AlertCircle size={40} className="mr-2 shrink-0" />
+        <AlertCircle size={40} className="mr-2 shrink-0 text-white" />
         <div className="flex flex-col gap-3">
-          <p className="text-sm">
+          <p className="text-sm text-white">
             {browserFeatures.length > 0 && (
               <>
-                This application requires{" "}
+                This connection type requires{" "}
                 {formatFeatureList(browserFeatures)}. Please use a
-                Chromium-based browser like Chrome or Edge.
+                supported browser, like Chrome or Edge.
               </>
             )}
             {needsSecureContext && (
