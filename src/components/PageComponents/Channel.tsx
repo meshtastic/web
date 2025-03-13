@@ -34,13 +34,13 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
       settings: {
         ...data.settings,
         psk: toByteArray(pass),
-        moduleSettings: {
-          positionPrecision: data.settings.positionEnabled
-            ? data.settings.preciseLocation
-              ? 32
-              : data.settings.positionPrecision
-            : 0,
-        },
+        // moduleSettings: {
+        //   positionPrecision: data.settings.positionEnabled
+        //     ? data.settings.preciseLocation
+        //       ? 32
+        //       : data.settings.positionPrecision
+        //     : 0,
+        // },
       },
     });
     connection?.setChannel(channel).then(() => {
