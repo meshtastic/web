@@ -5,6 +5,7 @@ export const subscribeAll = (
   device: Device,
   connection: MeshDevice,
 ) => {
+  // Set device as a global variable for debugging
   let myNodeNum = 0;
 
   // onLogEvent
@@ -92,6 +93,7 @@ export const subscribeAll = (
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
+    console.log("Trace Route Packet", traceRoutePacket);
     device.addTraceRoute({
       ...traceRoutePacket,
     });
@@ -114,5 +116,9 @@ export const subscribeAll = (
     if (queueStatus.free < 10) {
       // start queueing messages
     }
+  });
+  
+  connection.events.onNeighborInfoPacket.subscribe((neighborInfo) => {
+    device.setNeighborInfo(neighborInfo.from, neighborInfo.data);
   });
 };
