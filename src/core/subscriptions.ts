@@ -90,7 +90,14 @@ export const subscribeAll = (
       ...messagePacket,
       state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
     });
-    device.setUnread(messagePacket.from);
+    if (messagePacket.type == "direct")
+    {
+      device.setUnread(messagePacket.from);
+    }
+    else
+    {
+      device.setUnread(messagePacket.channel);
+    }
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
