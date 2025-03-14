@@ -15,14 +15,19 @@ import { useState } from "react";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 
 export const MessagesPage = () => {
-  const { channels, nodes, hardware, messages } = useDevice();
+  const { channels, nodes, hardware, messages, unreadCounts, setUnread } = useDevice();
   const { activeChat, chatType, setActiveChat, setChatType } = useAppStore();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const filteredNodes = Array.from(nodes.values()).filter((node) => {
     if (node.num === hardware.myNodeNum) return false;
     const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
     return nodeName.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  })
+  .map((node) => ({ 
+    ...node, 
+    unreadCount: unreadCounts.get(node.num) ?? 0
+  }))
+  .sort((a, b) => b.unreadCount - a.unreadCount);
   const allChannels = Array.from(channels.values());
   const filteredChannels = allChannels.filter(
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
@@ -44,6 +49,7 @@ export const MessagesPage = () => {
           {filteredChannels.map((channel) => (
             <SidebarButton
               key={channel.index}
+              count={unreadCounts.get(channel.index)}
               label={channel.settings?.name.length
                 ? channel.settings?.name
                 : channel.index === 0
@@ -53,6 +59,7 @@ export const MessagesPage = () => {
               onClick={() => {
                 setChatType("broadcast");
                 setActiveChat(channel.index);
+                setUnread(channel.index, 0);
               }}
               element={<HashIcon size={16} className="mr-2" />}
             />
@@ -72,12 +79,14 @@ export const MessagesPage = () => {
             {filteredNodes.map((node) => (
               <SidebarButton
                 key={node.num}
+                count={unreadCounts.get(node.num)}
                 label={node.user?.longName ??
                   `!${numberToHexUnpadded(node.num)}`}
                 active={activeChat === node.num && chatType === "direct"}
                 onClick={() => {
                   setChatType("direct");
                   setActiveChat(node.num);
+                  setUnread(node.num, 0);
                 }}
                 element={
                   <Avatar

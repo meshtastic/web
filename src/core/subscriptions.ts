@@ -1,6 +1,7 @@
 import type { Device } from "@core/stores/deviceStore.ts";
 import { MeshDevice, Protobuf } from "@meshtastic/core";
 
+
 export const subscribeAll = (
   device: Device,
   connection: MeshDevice,
@@ -89,6 +90,14 @@ export const subscribeAll = (
       ...messagePacket,
       state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
     });
+    if (messagePacket.type == "direct")
+    {
+      device.setUnread(messagePacket.from);
+    }
+    else
+    {
+      device.setUnread(messagePacket.channel);
+    }
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
