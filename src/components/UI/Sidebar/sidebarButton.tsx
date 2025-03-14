@@ -27,6 +27,6 @@ export const SidebarButton = ({
     {Icon && <Icon size={16} />}
     {element && element}
     <span className="flex flex-1 justify-start shrink-0">{label}</span>
-    {count > 0 && <div className="justify-end notification-count">{count}</div>}
+    {count > 0 && !active && <div className="justify-end notification-count">{count}</div>}
   </Button>
 );
