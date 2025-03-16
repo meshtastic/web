@@ -92,7 +92,7 @@ export const Table = ({ headings, rows }: TableProps) => {
             <th
               key={heading.title}
               scope="col"
-              className={`py-2 pr-3 pl-6 text-left ${
+              className={`py-2 pr-3 text-left ${
                 heading.sortable
                   ? "cursor-pointer hover:brightness-hover active:brightness-press"
                   : ""
@@ -114,8 +114,16 @@ export const Table = ({ headings, rows }: TableProps) => {
       <tbody>
         {sortedRows.map((row, index) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: TODO: Once this table is sortable, this should get fixed.
-          <tr key={index}>
+          <tr key={index} className={`${index % 2 ? 'bg-white' : 'bg-slate-50/50'} border-b-1 border-gray`}>
             {row.map((item, index) => (
+               index === 0 ?
+               <th 
+                 key={item.key ?? index}
+                 className="whitespace-nowrap py-2 text-sm text-text-secondary first:pl-2"
+                 scope="row"
+               >
+                 {item}
+               </th> :
               <td
                 key={item.key ?? index}
                 className="whitespace-nowrap py-2 text-sm text-text-secondary first:pl-2"
