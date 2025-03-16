@@ -3,6 +3,7 @@ import { useAppStore } from "../../core/stores/appStore.ts";
 import { useDevice } from "../../core/stores/deviceStore.ts";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -72,6 +73,7 @@ export const NodeOptionsDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>{`${longName} (${shortName})`}</DialogTitle>
         </DialogHeader>

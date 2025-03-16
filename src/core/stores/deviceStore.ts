@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { Protobuf, Types } from "@meshtastic/core";
+import { MeshDevice, Protobuf, Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { createContext, useContext } from "react";
 import { create as createStore } from "zustand";
@@ -26,7 +26,12 @@ export type DialogVariant =
   | "deviceName"
   | "nodeRemoval"
   | "pkiBackup"
-  | "nodeDetails";
+  | "nodeDetails"
+  | "unsafeRoles";
+
+type QueueStatus = {
+  res: number, free: number, maxlen: number
+}
 
 export interface Device {
   id: number;
@@ -47,13 +52,15 @@ export interface Device {
     number,
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
   >;
-  connection?: Types.ConnectionType;
+  connection?: MeshDevice;
   activePage: Page;
   activeNode: number;
   waypoints: Protobuf.Mesh.Waypoint[];
   // currentMetrics: Protobuf.DeviceMetrics;
   pendingSettingsChanges: boolean;
   messageDraft: string;
+  queueStatus: QueueStatus,
+  isQueueingMessages: boolean,
   dialog: {
     import: boolean;
     QR: boolean;
@@ -63,7 +70,9 @@ export interface Device {
     nodeRemoval: boolean;
     pkiBackup: boolean;
     nodeDetails: boolean;
+    unsafeRoles: boolean;
   };
+
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
   setConfig: (config: Protobuf.Config.Config) => void;
@@ -80,7 +89,7 @@ export interface Device {
   addNodeInfo: (nodeInfo: Protobuf.Mesh.NodeInfo) => void;
   addUser: (user: Types.PacketMetadata<Protobuf.Mesh.User>) => void;
   addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
-  addConnection: (connection: Types.ConnectionType) => void;
+  addConnection: (connection: MeshDevice) => void;
   addMessage: (message: MessageWithState) => void;
   addTraceRoute: (
     traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
@@ -96,8 +105,10 @@ export interface Device {
     state: MessageState,
   ) => void;
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
+  getDialogOpen: (dialog: DialogVariant) => boolean;
   processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
+  setQueueStatus: (status: QueueStatus) => void;
 }
 
 export interface DeviceState {
@@ -137,6 +148,10 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           activePage: "messages",
           activeNode: 0,
           waypoints: [],
+          queueStatus: {
+            res: 0, free: 0, maxlen: 0
+          },
+          isQueueingMessages: false,
           dialog: {
             import: false,
             QR: false,
@@ -146,6 +161,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             nodeRemoval: false,
             pkiBackup: false,
             nodeDetails: false,
+            unsafeRoles: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
@@ -303,7 +319,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                   .findIndex(
                     (wmc) =>
                       wmc.payloadVariant.case ===
-                        moduleConfig.payloadVariant.case,
+                      moduleConfig.payloadVariant.case,
                   );
                 if (workingModuleConfigIndex !== -1) {
                   device.workingModuleConfig[workingModuleConfigIndex] =
@@ -516,7 +532,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             set(
               produce<DeviceState>((draft) => {
                 console.log("addTraceRoute called");
-                console.log(traceroute);
                 const device = draft.devices.get(id);
                 if (!device) {
                   return;
@@ -594,6 +609,13 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               }),
             );
           },
+          getDialogOpen: (dialog: DialogVariant) => {
+            const device = get().devices.get(id);
+            if (!device) {
+              throw new Error("Device not found");
+            }
+            return device.dialog[dialog];
+          },
           processPacket(data: ProcessPacketParams) {
             set(
               produce<DeviceState>((draft) => {
@@ -631,6 +653,17 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               }),
             );
           },
+          setQueueStatus: (status: QueueStatus) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.queueStatus = status;
+                  device.queueStatus.free >= 10 ? true : false
+                }
+              }),
+            );
+          }
         });
       }),
     );

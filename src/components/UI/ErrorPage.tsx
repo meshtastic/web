@@ -1,8 +1,8 @@
-import newGithubIssueUrl from "../../core/utils/github.ts";
+import newGithubIssueUrl from "@core/utils/github.ts";
 import { ExternalLink } from "lucide-react";
-import { Heading } from "./Typography/Heading.tsx";
-import { Link } from "./Typography/Link.tsx";
-import { P } from "./Typography/P.tsx";
+import { Heading } from "@components/UI/Typography/Heading.tsx";
+import { Link } from "@components/UI/Typography/Link.tsx";
+import { P } from "@components/UI/Typography/P.tsx";
 
 
 export function ErrorPage({ error }: { error: Error }) {
@@ -11,8 +11,8 @@ export function ErrorPage({ error }: { error: Error }) {
   }
 
   return (
-    <article className="w-full overflow-y-auto">
-      <section className="flex shrink md:flex-row gap-16 mt-20 px-4 md:px-8 text-lg md:text-xl space-y-2 place-items-center">
+    <article className="w-full h-screen overflow-y-auto dark:bg-background-primary dark:text-text-primary">
+      <section className="flex shrink md:flex-row gap-16 mt-20 px-4 md:px-8 text-lg md:text-xl space-y-2 place-items-center dark:bg-background-primary text-slate-900 dark:text-text-primary">
         <div>
           <Heading as="h2" className="text-text-primary">
             This is a little embarrassing...

@@ -123,6 +123,7 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
               {
                 type: "passwordGenerator",
                 name: "settings.psk",
+                id: 'channel-psk',
                 label: "Pre-Shared Key",
                 description:
                   "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",

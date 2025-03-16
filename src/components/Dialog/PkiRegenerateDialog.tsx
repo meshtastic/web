@@ -1,6 +1,7 @@
 import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -22,6 +23,7 @@ export const PkiRegenerateDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
+        <DialogClose />
         <DialogHeader>
           <DialogTitle>Regenerate Key pair?</DialogTitle>
           <DialogDescription>

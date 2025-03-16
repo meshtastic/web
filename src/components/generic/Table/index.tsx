@@ -12,6 +12,20 @@ export interface Heading {
   sortable: boolean;
 }
 
+/**
+ * @param hopsAway String describing the number of hops away the node is from the current node
+ * @returns number of hopsAway or `0` if hopsAway is 'Direct'
+ */
+function numericHops(hopsAway: string): number {
+  if(hopsAway.match(/direct/i)){
+    return 0;
+  }
+  if ( hopsAway.match(/\d+\s+hop/gi) ) {
+    return Number( hopsAway.match(/(\d+)\s+hop/i)?.[1] );
+  }
+  return Number.MAX_SAFE_INTEGER;
+}
+
 export const Table = ({ headings, rows }: TableProps) => {
   const [sortColumn, setSortColumn] = useState<string | null>("Last Heard");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -41,6 +55,20 @@ export const Table = ({ headings, rows }: TableProps) => {
         return sortOrder === "asc" ? -1 : 1;
       }
       if (aTimestamp > bTimestamp) {
+        return sortOrder === "asc" ? 1 : -1;
+      }
+      return 0;
+    }
+
+    // Custom comparison for 'Connection' column
+    if (sortColumn === "Connection") {
+      const aNumHops = numericHops(aValue instanceof Array ? aValue[0] : aValue);
+      const bNumHops = numericHops(bValue instanceof Array ? bValue[0] : bValue);
+      
+      if (aNumHops < bNumHops) {
+        return sortOrder === "asc" ? -1 : 1;
+      }
+      if (aNumHops > bNumHops) {
         return sortOrder === "asc" ? 1 : -1;
       }
       return 0;

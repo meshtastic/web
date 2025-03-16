@@ -9,11 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
-import { Controller, type FieldValues } from "react-hook-form";
+import { useController, type FieldValues } from "react-hook-form";
+import { computeHeadingLevel } from "@core/utils/test.tsx";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select";
-  selectChange?: (e: string) => void;
+  selectChange?: (e: string, name: string) => void;
+  validate?: (newValue: string) => Promise<boolean>;
   properties: BaseFormBuilderProps<T>["properties"] & {
     enumValue: {
       [s: string]: string | number;
@@ -22,56 +24,71 @@ export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   };
 }
 
+const formatEnumDisplay = (name: string): string => {
+  return name
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .split(" ")
+    .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+    .join(" ");
+};
+
 export function SelectInput<T extends FieldValues>({
   control,
   disabled,
   field,
 }: GenericFormElementProps<T, SelectFieldProps<T>>) {
+  const {
+    field: { value, onChange, ...rest },
+  } = useController({
+    name: field.name,
+    control,
+  });
+
+  const { enumValue, formatEnumName, ...remainingProperties } = field.properties;
+  const valueToKeyMap: Record<string, string> = {};
+  const optionsEnumValues: [string, number][] = [];
+
+  if (enumValue) {
+    Object.entries(enumValue).forEach(([key, val]) => {
+      if (typeof val === "number") {
+        valueToKeyMap[val.toString()] = key;
+        optionsEnumValues.push([key, val]);
+      }
+    });
+  }
+
+  const handleValueChange = async (newValue: string) => {
+    const selectedKey = valueToKeyMap[newValue];
+
+    if (field.validate) {
+      const isValid = await field.validate(selectedKey);
+      if (!isValid) return;
+    }
+
+    if (field.selectChange) field.selectChange(newValue, selectedKey);
+    onChange(Number.parseInt(newValue));
+  };
+
+
   return (
-    <Controller
-      name={field.name}
-      control={control}
-      render={({ field: { value, onChange, ...rest } }) => {
-        const { enumValue, formatEnumName, ...remainingProperties } =
-          field.properties;
-        const optionsEnumValues = enumValue
-          ? Object.entries(enumValue).filter(
-            (value) => typeof value[1] === "number",
-          )
-          : [];
-        return (
-          <Select
-            onValueChange={(e) => {
-              if (field.selectChange) field.selectChange(e);
-              onChange(Number.parseInt(e));
-            }}
-            disabled={disabled}
-            value={value?.toString()}
-            {...remainingProperties}
-            {...rest}
-          >
-            <SelectTrigger id={field.name}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {optionsEnumValues.map(([name, value]) => (
-                <SelectItem key={name} value={value.toString()}>
-                  {formatEnumName
-                    ? name
-                      .replace(/_/g, " ")
-                      .toLowerCase()
-                      .split(" ")
-                      .map((s) =>
-                        s.charAt(0).toUpperCase() + s.substring(1)
-                      )
-                      .join(" ")
-                    : name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        );
-      }}
-    />
+    <Select
+      onValueChange={handleValueChange}
+      disabled={disabled}
+      value={value?.toString()}
+      {...remainingProperties}
+      {...rest}
+    >
+      <SelectTrigger id={field.name}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {optionsEnumValues.map(([name, val]) => (
+          <SelectItem key={name} value={val.toString()}>
+            {formatEnumName ? formatEnumDisplay(name) : name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

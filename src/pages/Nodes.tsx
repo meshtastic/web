@@ -11,7 +11,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
-import { Fragment, type JSX, useCallback, useEffect, useState } from "react";
+import { type JSX, useCallback, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
 
 export interface DeleteNoteDialogProps {
@@ -21,6 +21,8 @@ export interface DeleteNoteDialogProps {
 
 const NodesPage = (): JSX.Element => {
   const { nodes, hardware, connection } = useDevice();
+  console.log(connection);
+
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);
@@ -60,6 +62,7 @@ const NodesPage = (): JSX.Element => {
       connection.events.onPositionPacket.subscribe(handleLocation);
     };
   }, [connection]);
+
 
   const handleLocation = useCallback(
     (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
@@ -108,8 +111,8 @@ const NodesPage = (): JSX.Element => {
                 {node.user?.shortName ??
                   (node.user?.macaddr
                     ? `${base16
-                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                        .toLowerCase()}`
+                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                      .toLowerCase()}`
                     : `${numberToHexUnpadded(node.num).slice(-4)}`)}
               </h1>,
 
@@ -121,8 +124,8 @@ const NodesPage = (): JSX.Element => {
                 {node.user?.longName ??
                   (node.user?.macaddr
                     ? `Meshtastic ${base16
-                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                        .toLowerCase()}`
+                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                      .toLowerCase()}`
                     : `!${numberToHexUnpadded(node.num)}`)}
               </h1>,
 
@@ -158,9 +161,8 @@ const NodesPage = (): JSX.Element => {
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
-                    : `${node.hopsAway?.toString()} ${
-                        node.hopsAway > 1 ? "hops" : "hop"
-                      } away`
+                    : `${node.hopsAway?.toString()} ${node.hopsAway > 1 ? "hops" : "hop"
+                    } away`
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
               </Mono>,
