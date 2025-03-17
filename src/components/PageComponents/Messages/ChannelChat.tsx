@@ -15,9 +15,10 @@ const EmptyState = () => (
 );
 
 export const ChannelChat = ({
-  messages,
+  messages = [],
 }: ChannelChatProps) => {
   const { nodes } = useDevice();
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -57,7 +58,7 @@ export const ChannelChat = ({
         className="flex-1 overflow-y-auto pl-4 pr-4 md:pr-44"
       >
         <div className="flex flex-col justify-end min-h-full">
-          {messages.map((message, index) => (
+          {messages?.map((message, index) => (
             <Message
               key={message.id}
               message={message}
