@@ -34,13 +34,9 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
       settings: {
         ...data.settings,
         psk: toByteArray(pass),
-        // moduleSettings: {
-        //   positionPrecision: data.settings.positionEnabled
-        //     ? data.settings.preciseLocation
-        //       ? 32
-        //       : data.settings.positionPrecision
-        //     : 0,
-        // },
+        moduleSettings: {...data.settings.moduleSettings,
+          positionPrecision: data.settings.moduleSettings.positionPrecision,
+        },
       },
     });
     connection?.setChannel(channel).then(() => {
@@ -100,17 +96,9 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
             settings: {
               ...channel?.settings,
               psk: pass,
-              positionEnabled:
-                channel?.settings?.moduleSettings?.positionPrecision !==
-                undefined &&
-                channel?.settings?.moduleSettings?.positionPrecision > 0,
-              preciseLocation:
-                channel?.settings?.moduleSettings?.positionPrecision === 32,
-              positionPrecision:
-                channel?.settings?.moduleSettings?.positionPrecision ===
-                  undefined
-                  ? 10
-                  : channel?.settings?.moduleSettings?.positionPrecision,
+              moduleSettings: {...channel?.settings?.moduleSettings,
+                positionPrecision: channel?.settings?.moduleSettings?.positionPrecision === undefined ? 10 : channel?.settings?.moduleSettings?.positionPrecision,
+              }
             },
           },
         }}
@@ -175,38 +163,29 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                 description: "Send messages from MQTT to the local mesh",
               },
               {
-                type: "toggle",
-                name: "settings.positionEnabled",
-                label: "Allow Position Requests",
-                description: "Send position to channel",
-              },
-              {
-                type: "toggle",
-                name: "settings.preciseLocation",
-                label: "Precise Location",
-                description: "Send precise location to channel",
-              },
-              {
                 type: "select",
-                name: "settings.positionPrecision",
-                label: "Approximate Location",
+                name: "settings.moduleSettings.positionPrecision",
+                label: "Location",
                 description:
-                  "If not sharing precise location, position shared on channel will be accurate within this distance",
+                  "The precision of the location to share with the channel. Can be disabled.",
                 properties: {
                   enumValue: config.display?.units === 0
                     ? {
-                      "Within 23 km": 10,
-                      "Within 12 km": 11,
-                      "Within 5.8 km": 12,
-                      "Within 2.9 km": 13,
-                      "Within 1.5 km": 14,
-                      "Within 700 m": 15,
-                      "Within 350 m": 16,
-                      "Within 200 m": 17,
-                      "Within 90 m": 18,
-                      "Within 50 m": 19,
+                      "Do not share location": 0,
+                      "Within 23 kilometers": 10,
+                      "Within 12 kilometers": 11,
+                      "Within 5.8 kilometers": 12,
+                      "Within 2.9 kilometers": 13,
+                      "Within 1.5 kilometers": 14,
+                      "Within 700 meters": 15,
+                      "Within 350 meters": 16,
+                      "Within 200 meters": 17,
+                      "Within 90 meters": 18,
+                      "Within 50 meters": 19,
+                      "Precise Location": 32,
                     }
                     : {
+                      "Do not share location": 0,
                       "Within 15 miles": 10,
                       "Within 7.3 miles": 11,
                       "Within 3.6 miles": 12,
@@ -217,6 +196,7 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                       "Within 600 feet": 17,
                       "Within 300 feet": 18,
                       "Within 150 feet": 19,
+                      "Precise Location": 32,
                     },
                 },
               },
