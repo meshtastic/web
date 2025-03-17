@@ -114,7 +114,7 @@ export const Table = ({ headings, rows }: TableProps) => {
       <tbody>
         {sortedRows.map((row, index) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: TODO: Once this table is sortable, this should get fixed.
-          <tr key={index} className={`${index % 2 ? 'bg-white' : 'bg-slate-50/50'} border-b-1 border-gray`}>
+          <tr key={index} className={`${index % 2 ? 'bg-white dark:bg-white/2' : 'bg-slate-50/50 dark:bg-slate-50/5'} border-b-1 border-slate-200 dark:border-slate-900`}>
             {row.map((item, index) => (
                index === 0 ?
                <th 
