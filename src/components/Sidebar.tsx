@@ -58,7 +58,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
       page: "channels",
     },
     {
-      name: "Nodes",
+      name: `Nodes (${nodes.size})`,
       icon: UsersIcon,
       page: "nodes",
     },
