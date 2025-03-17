@@ -21,8 +21,6 @@ export interface DeleteNoteDialogProps {
 
 const NodesPage = (): JSX.Element => {
   const { nodes, hardware, connection } = useDevice();
-  console.log(connection);
-
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);

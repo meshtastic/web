@@ -1,4 +1,5 @@
-import { cn } from "../../core/utils/cn.ts";
+import { cn } from "@core/utils/cn.ts";
+import { LockKeyholeOpenIcon } from 'lucide-react';
 import type React from "react";
 
 type RGBColor = {
@@ -12,6 +13,7 @@ interface AvatarProps {
   text: string;
   size?: "sm" | "lg";
   className?: string;
+  showError?: boolean;
 }
 
 // biome-ignore lint/complexity/noStaticOnlyClass: stop being annoying Biome
@@ -43,6 +45,7 @@ class ColorUtils {
 export const Avatar: React.FC<AvatarProps> = ({
   text,
   size = "sm",
+  showError = false,
   className,
 }) => {
   const sizes = {
@@ -73,12 +76,11 @@ export const Avatar: React.FC<AvatarProps> = ({
   return (
     <div
       className={cn(
-        `
+        `flex
+        relative
         rounded-full 
-        flex 
         items-center 
         justify-center 
-        size-11
         font-semibold`,
         sizes[size],
         className,
@@ -88,6 +90,7 @@ export const Avatar: React.FC<AvatarProps> = ({
         color: textColor,
       }}
     >
+      {showError ? <LockKeyholeOpenIcon className="size-4 absolute bottom-0 right-0 z-10 text-red-500 stroke-3" /> : null}
       <p className="p-1">{initials}</p>
     </div>
   );
