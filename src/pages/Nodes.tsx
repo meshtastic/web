@@ -19,6 +19,15 @@ export interface DeleteNoteDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+function shortNameFromNode(node: ReturnType<useDevice>["nodes"][number]): string {
+  const shortNameOfNode = node.user?.shortName ?? (node.user?.macaddr
+    ? `${base16
+        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+        .toLowerCase()}`
+    : `${numberToHexUnpadded(node.num).slice(-4)}`);
+  return String(shortNameOfNode);
+}
+
 const NodesPage = (): JSX.Element => {
   const { nodes, hardware, connection } = useDevice();
   console.log(connection);
@@ -89,7 +98,6 @@ const NodesPage = (): JSX.Element => {
           <Table
             headings={[
               { title: "", type: "blank", sortable: false },
-              { title: "Short Name", type: "normal", sortable: true },
               { title: "Long Name", type: "normal", sortable: true },
               { title: "Model", type: "normal", sortable: true },
               { title: "MAC Address", type: "normal", sortable: true },
@@ -100,26 +108,15 @@ const NodesPage = (): JSX.Element => {
             ]}
             rows={filteredNodes.map((node) => [
               <div key={node.num}>
-                <Avatar text={node.user?.shortName.toString() ?? "UNK"} />
+                <Avatar text={shortNameFromNode(node)} />
               </div>,
-
-              <h1
-                key="shortName"
-                onMouseDown={() => setSelectedNode(node)}
-                className="cursor-pointer"
-              >
-                {node.user?.shortName ??
-                  (node.user?.macaddr
-                    ? `${base16
-                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                      .toLowerCase()}`
-                    : `${numberToHexUnpadded(node.num).slice(-4)}`)}
-              </h1>,
-
               <h1
                 key="longName"
                 onMouseDown={() => setSelectedNode(node)}
-                className="cursor-pointer"
+                onKeyUp={(evt)=>{ evt.key === "Enter" && setSelectedNode(node) }}
+                className="cursor-pointer underline"
+                tabIndex={0}
+                role="button"
               >
                 {node.user?.longName ??
                   (node.user?.macaddr
@@ -138,9 +135,9 @@ const NodesPage = (): JSX.Element => {
                   .match(/.{1,2}/g)
                   ?.join(":") ?? "UNK"}
               </Mono>,
-              <Mono className="px-4" key="lastHeard">
+              <Mono key="lastHeard">
                 {node.lastHeard === 0 ? (
-                  <p className="px-4">Never</p>
+                  <p>Never</p>
                 ) : (
                   <TimeAgo timestamp={node.lastHeard * 1000} />
                 )}
