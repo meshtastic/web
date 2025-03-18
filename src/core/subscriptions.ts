@@ -117,6 +117,11 @@ export const subscribeAll = (
           device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);
           device.setDialogOpen("refreshKeys", true);
           break;
+        case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
+          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
+          device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);
+          device.setDialogOpen("refreshKeys", true);
+          break;
         default: {
           break;
         }
