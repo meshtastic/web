@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTheme } from "../core/hooks/useTheme.ts";
 import { cn } from "../core/utils/cn.ts";
 import { Monitor, Moon, Sun } from "lucide-react";
@@ -10,6 +11,7 @@ export default function ThemeSwitcher({
   className?: string;
 }) {
   const { theme, preference, setPreference } = useTheme();
+  const [isFocused, setIsFocused] = useState(false);
 
   const themeIcons = {
     light: <Sun className="size-5" />,
@@ -24,6 +26,17 @@ export default function ThemeSwitcher({
     setPreference(nextPreference);
   };
 
+  const labelStyle = {
+    display: "block",
+    margin: "0 auto",
+    fontSize: ".65rem",
+    width: "100%",
+    position: "absolute",
+    top: isFocused ? "-2em" : "2em",
+    left: "0",
+    opacity: isFocused ? "100" : "0"
+  };
+
   return (
     <button
       type="button"
@@ -32,10 +45,11 @@ export default function ThemeSwitcher({
         className,
       )}
       onClick={toggleTheme}
-      aria-label={preference === "system"
-        ? `System theme (currently ${theme}). Click to change theme.`
-        : `Current theme: ${theme}. Click to change theme.`}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+      aria-description={'Current theme'}
     >
+      <span style={labelStyle}>{preference}</span>
       {themeIcons[preference]}
     </button>
   );
