@@ -6,7 +6,7 @@ import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog.tsx";
 import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
-import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog.tsx";
+import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 
 export const DialogManager = () => {
