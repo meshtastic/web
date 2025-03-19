@@ -2,6 +2,6 @@ dist
 node_modules
 stats.html
 .vercel
-.vite/deps
+.vite
 dev-dist
 __screenshots__*
