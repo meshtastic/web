@@ -56,7 +56,7 @@
     "npm:react-hook-form@^7.54.2": "7.54.2_react@19.0.0",
     "npm:react-map-gl@8.0.1": "8.0.1_maplibre-gl@5.1.1_react@19.0.0_react-dom@19.0.0__react@19.0.0",
     "npm:react-qrcode-logo@3": "3.0.0_react@19.0.0_react-dom@19.0.0__react@19.0.0",
-    "npm:react-scan@~0.2.8": "0.2.8_react@19.0.0_react-dom@19.0.0__react@19.0.0_preact@10.26.4",
+    "npm:react-scan@~0.3.2": "0.3.2_react@19.0.0_react-dom@19.0.0__react@19.0.0_preact@10.26.4_@types+react@19.0.10",
     "npm:react@19": "19.0.0",
     "npm:rfc4648@^1.5.4": "1.5.4",
     "npm:simple-git-hooks@^2.11.1": "2.11.1",
@@ -1305,8 +1305,8 @@
     "@open-draft/until@2.1.0": {
       "integrity": "sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg=="
     },
-    "@pivanov/utils@0.0.1_react@19.0.0_react-dom@19.0.0__react@19.0.0": {
-      "integrity": "sha512-JQ/pXeG9/Yq3UuwH2Xp4F6bSAIDGzbxT0Vrg/82tMi3Yp+Ps9AYzjSDE+zfvBRqc7J11V6MMonUrWj4+2dYgrg==",
+    "@pivanov/utils@0.0.2_react@19.0.0_react-dom@19.0.0__react@19.0.0": {
+      "integrity": "sha512-q9CN0bFWxWgMY5hVVYyBgez1jGiLBa6I+LkG37ycylPhFvEGOOeaADGtUSu46CaZasPnlY8fCdVJZmrgKb1EPA==",
       "dependencies": [
         "react",
         "react-dom"
@@ -1918,6 +1918,14 @@
         "estree-walker@1.0.1",
         "picomatch@2.3.1",
         "rollup@2.79.2"
+      ]
+    },
+    "@rollup/pluginutils@5.1.4": {
+      "integrity": "sha512-USm05zrsFxYLPdWWq+K3STlWiT/3ELn3RcV5hJMghpeAIhxfsUIg6mt12CBJBInWMV4VneoV7SfGv8xIwo2qNQ==",
+      "dependencies": [
+        "@types/estree@1.0.6",
+        "estree-walker@2.0.2",
+        "picomatch@4.0.2"
       ]
     },
     "@rollup/pluginutils@5.1.4_rollup@2.79.2": {
@@ -3531,8 +3539,8 @@
         "@types/pbf"
       ]
     },
-    "@types/node@20.17.22": {
-      "integrity": "sha512-9RV2zST+0s3EhfrMZIhrz2bhuhBwxgkbHEwP2gtGWPjBzVQjifMzJ9exw7aDZhR1wbpj8zBrfp3bo8oJcGiUUw==",
+    "@types/node@20.17.24": {
+      "integrity": "sha512-d7fGCyB96w9BnWQrOsJtpyiSaBcAYYr75bnK6ZRjDbql2cGLj/3GsL5OYmLPNq76l7Gf2q4Rv9J2o6h5CrD9sA==",
       "dependencies": [
         "undici-types@6.19.8"
       ]
@@ -3548,6 +3556,12 @@
     },
     "@types/react-dom@19.0.4_@types+react@19.0.10": {
       "integrity": "sha512-4fSQ8vWFkg+TGhePfUzVmat3eC14TXYSsiiDSLI0dVLsrm9gZFABjPy/Qu6TKgl1tq1Bu1yDsuQgY3A3DOjCcg==",
+      "dependencies": [
+        "@types/react"
+      ]
+    },
+    "@types/react-reconciler@0.28.9_@types+react@19.0.10": {
+      "integrity": "sha512-HHM3nxyUZ3zAylX8ZEyrDNd2XZOnQ0D5XfunJF5FLQnZbHHYq4UWvW1QfelQNXv1ICNkwYhfxjwfnqivYB6bFg==",
       "dependencies": [
         "@types/react"
       ]
@@ -3848,8 +3862,12 @@
     "bignumber.js@9.1.2": {
       "integrity": "sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug=="
     },
-    "bippy@0.2.7": {
-      "integrity": "sha512-LTCos3SmOJHrag0qF91tLUZMMw6wA+i15ESRBp71pvfNlTMYcxYoJHJ/pvFhd+29Wm5vfgVxBHV7kP5OKUUipg=="
+    "bippy@0.3.8_react@19.0.0_@types+react@19.0.10": {
+      "integrity": "sha512-0ou8fJWxUXK/+eRjUz5unbtX8Mrn0OYRs6QQwwUJtU6hsFDTSmSeI1fJC/2nrPA4G6GWcxwT+O6TbHyGhl4fEg==",
+      "dependencies": [
+        "@types/react-reconciler",
+        "react"
+      ]
     },
     "bn.js@4.12.1": {
       "integrity": "sha512-k8TVBiPkPJT9uHLdOKfFpqcfprwBFOAAXXozRubr7R7PfIuKvQlzcI4M0pALeqXN09vdaMbUdUj+pass+uULAg=="
@@ -5777,8 +5795,8 @@
         "use-sidecar"
       ]
     },
-    "react-scan@0.2.8_react@19.0.0_react-dom@19.0.0__react@19.0.0_preact@10.26.4": {
-      "integrity": "sha512-+6Gvu9b0UMmzV0JkigA7Y2YcjQABiNrweP9l9j8nrutN5OAYLRe4JgfwiUohPFngMD+Y6I5N0kW+okXhvVLGUw==",
+    "react-scan@0.3.2_react@19.0.0_react-dom@19.0.0__react@19.0.0_preact@10.26.4_@types+react@19.0.10": {
+      "integrity": "sha512-lJb/klITqM95+MT+tR4nhfMl+ApXUeQ4iH0A0CsKYKkc66Wu01bOv+SxzZR1ksIPUWon7m2S3/83maZENtLEAQ==",
       "dependencies": [
         "@babel/core",
         "@babel/generator",
@@ -5787,8 +5805,8 @@
         "@clack/prompts",
         "@pivanov/utils",
         "@preact/signals",
-        "@rollup/pluginutils@5.1.4_rollup@2.79.2",
-        "@types/node@20.17.22",
+        "@rollup/pluginutils@5.1.4",
+        "@types/node@20.17.24",
         "bippy",
         "esbuild@0.24.2",
         "estree-walker@3.0.3",
@@ -7151,7 +7169,7 @@
         "npm:react-hook-form@^7.54.2",
         "npm:react-map-gl@8.0.1",
         "npm:react-qrcode-logo@3",
-        "npm:react-scan@~0.2.8",
+        "npm:react-scan@~0.3.2",
         "npm:react@19",
         "npm:rfc4648@^1.5.4",
         "npm:simple-git-hooks@^2.11.1",
