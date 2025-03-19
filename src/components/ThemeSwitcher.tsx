@@ -24,18 +24,25 @@ export default function ThemeSwitcher({
     setPreference(nextPreference);
   };
 
+  const [firstCharOfPreference = "", ...restOfPreference] = preference;
+
   return (
     <button
       type="button"
       className={cn(
-        "transition-all duration-300 scale-100 cursor-pointer m-6 p-2",
+        "transition-all duration-300 scale-100 cursor-pointer m-6 p-2 focus:*:data-label:opacity-100",
         className,
       )}
       onClick={toggleTheme}
-      aria-label={preference === "system"
-        ? `System theme (currently ${theme}). Click to change theme.`
-        : `Current theme: ${theme}. Click to change theme.`}
+      aria-description={"Change current theme"}
     >
+      <span
+        data-label
+        className="transition-all block absolute w-full mb-auto mt-auto ml-0 mr-0 text-xs left-0 -top-5 opacity-0 rounded-lg"
+      >
+        {firstCharOfPreference.toLocaleUpperCase() +
+          (restOfPreference ?? []).join("")}
+      </span>
       {themeIcons[preference]}
     </button>
   );
