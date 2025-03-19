@@ -27,10 +27,16 @@ export type DialogVariant =
   | "nodeRemoval"
   | "pkiBackup"
   | "nodeDetails"
-  | "unsafeRoles";
+  | "unsafeRoles"
+  | "refreshKeys";
 
 type QueueStatus = {
   res: number, free: number, maxlen: number
+}
+
+type NodeError = {
+  node: number;
+  error: string;
 }
 
 export interface Device {
@@ -52,6 +58,7 @@ export interface Device {
     number,
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
   >;
+  nodeErrors: Map<number, NodeError>;
   connection?: MeshDevice;
   activePage: Page;
   activeNode: number;
@@ -71,6 +78,7 @@ export interface Device {
     pkiBackup: boolean;
     nodeDetails: boolean;
     unsafeRoles: boolean;
+    refreshKeys: boolean;
   };
 
 
@@ -109,6 +117,10 @@ export interface Device {
   processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
   setQueueStatus: (status: QueueStatus) => void;
+  setNodeError: (nodeNum: number, error: string) => void;
+  clearNodeError: (nodeNum: number) => void;
+  getNodeError: (nodeNum: number) => NodeError | undefined;
+  hasNodeError: (nodeNum: number) => boolean
 }
 
 export interface DeviceState {
@@ -162,9 +174,12 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             pkiBackup: false,
             nodeDetails: false,
             unsafeRoles: false,
+            refreshKeys: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
+          nodeErrors: new Map(),
+
 
           setStatus: (status: Types.DeviceStatusEnum) => {
             set(
@@ -531,7 +546,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           addTraceRoute: (traceroute) => {
             set(
               produce<DeviceState>((draft) => {
-                console.log("addTraceRoute called");
                 const device = draft.devices.get(id);
                 if (!device) {
                   return;
@@ -568,10 +582,8 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           ) => {
             set(
               produce<DeviceState>((draft) => {
-                console.log("setMessageState called");
                 const device = draft.devices.get(id);
                 if (!device) {
-                  console.log("no device found for id");
                   return;
                 }
                 const messageGroup = device.messages[type];
@@ -582,7 +594,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 const messages = messageGroup.get(messageIndex);
 
                 if (!messages) {
-                  console.log("no messages found for id");
                   return;
                 }
 
@@ -663,7 +674,42 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 }
               }),
             );
-          }
+          },
+          setNodeError: (nodeNum, error) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.nodeErrors.set(nodeNum, { node: nodeNum, error });
+                }
+              }),
+            );
+          },
+          clearNodeError: (nodeNum: number) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (device) {
+                  device.nodeErrors.delete(nodeNum);
+                }
+              }),
+            );
+          },
+          getNodeError: (nodeNum: number) => {
+            const device = get().devices.get(id);
+            if (!device) {
+              throw new Error("Device not found");
+            }
+            return device.nodeErrors.get(nodeNum);
+          },
+          hasNodeError: (nodeNum: number) => {
+            const device = get().devices.get(id);
+            if (!device) {
+              throw new Error("Device not found");
+            }
+            return device.nodeErrors.has(nodeNum);
+          },
+
         });
       }),
     );

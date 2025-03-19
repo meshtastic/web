@@ -18,9 +18,7 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
     setSerialPorts(await navigator?.serial.getPorts());
   }, []);
 
-  navigator?.serial?.addEventListener("connect", (event) => {
-    console.log(event);
-
+  navigator?.serial?.addEventListener("connect", () => {
     updateSerialPortList();
   });
   navigator?.serial?.addEventListener("disconnect", () => {
@@ -47,8 +45,6 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
     <div className="flex w-full flex-col gap-2 p-4">
       <div className="flex h-48 flex-col gap-2 overflow-y-auto">
         {serialPorts.map((port, index) => {
-          console.log(port);
-
           const { usbProductId, usbVendorId } = port.getInfo();
           return (
             <Button

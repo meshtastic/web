@@ -13,9 +13,10 @@ import { getChannelName } from "@pages/Channels.tsx";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useState } from "react";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
+import { cn } from "@core/utils/cn.ts";
 
 export const MessagesPage = () => {
-  const { channels, nodes, hardware, messages } = useDevice();
+  const { channels, nodes, hardware, messages, hasNodeError } = useDevice();
   const { activeChat, chatType, setActiveChat, setChatType } = useAppStore();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const filteredNodes = Array.from(nodes.values()).filter((node) => {
@@ -82,6 +83,8 @@ export const MessagesPage = () => {
                 element={
                   <Avatar
                     text={node.user?.shortName ?? node.num.toString()}
+                    className={cn(hasNodeError(node.num) && "text-red-500")}
+                    showError={hasNodeError(node.num)}
                     size="sm"
                   />
                 }
@@ -145,7 +148,6 @@ export const MessagesPage = () => {
             )}
           </div>
 
-          {/* Single message input for both chat types */}
           <div className="shrink-0 p-4 w-full dark:bg-slate-900">
             <MessageInput
               to={messageDestination}

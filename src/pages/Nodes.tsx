@@ -30,8 +30,6 @@ function shortNameFromNode(node: ReturnType<useDevice>["nodes"][number]): string
 
 const NodesPage = (): JSX.Element => {
   const { nodes, hardware, connection } = useDevice();
-  console.log(connection);
-
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);

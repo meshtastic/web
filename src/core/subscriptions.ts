@@ -22,15 +22,15 @@ export const subscribeAll = (
         ) {
           return;
         }
-        console.log(`Routing Error: ${routingPacket.data.variant.value}`);
+        console.info(`Routing Error: ${routingPacket.data.variant.value}`);
         break;
       }
       case "routeReply": {
-        console.log(`Route Reply: ${routingPacket.data.variant.value}`);
+        console.info(`Route Reply: ${routingPacket.data.variant.value}`);
         break;
       }
       case "routeRequest": {
-        console.log(`Route Request: ${routingPacket.data.variant.value}`);
+        console.info(`Route Request: ${routingPacket.data.variant.value}`);
         break;
       }
     }
@@ -70,8 +70,6 @@ export const subscribeAll = (
   });
 
   connection.events.onChannelPacket.subscribe((channel) => {
-    console.log('channel', channel);
-
     device.addChannel(channel);
   });
   connection.events.onConfigPacket.subscribe((config) => {
@@ -81,10 +79,8 @@ export const subscribeAll = (
     device.setModuleConfig(moduleConfig);
   });
 
+
   connection.events.onMessagePacket.subscribe((messagePacket) => {
-
-    console.log('messagePacket', messagePacket);
-
     device.addMessage({
       ...messagePacket,
       state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
@@ -111,8 +107,26 @@ export const subscribeAll = (
 
   connection.events.onQueueStatus.subscribe((queueStatus) => {
     device.setQueueStatus(queueStatus);
-    if (queueStatus.free < 10) {
-      // start queueing messages
+  });
+
+  connection.events.onRoutingPacket.subscribe((routingPacket) => {
+    if (routingPacket.data.variant.case === "errorReason") {
+      switch (routingPacket.data.variant.value) {
+        case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
+          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
+          device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);
+          device.setDialogOpen("refreshKeys", true);
+          break;
+        case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
+          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
+          device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);
+          device.setDialogOpen("refreshKeys", true);
+          break;
+        default: {
+          break;
+        }
+      }
+
     }
   });
 };
