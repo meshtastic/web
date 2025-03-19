@@ -97,10 +97,23 @@ instructions listed on the home page.
 Install the dependencies.
 
 ```bash
-deno i
+deno install
 ```
 
-Start the development server:
+### Install Git Hooks (Optional but highly recommended)
+
+This project uses the npm package `simple-git-hooks` to enforce linting and
+formatting before you are allowed to commit. Run the following command once on
+your machine after cloning or installing dependencies:
+
+```bash
+deno task install-hooks
+```
+
+This will install the pre-commit hook that runs `deno task lint:fix` and
+`deno task format` before every commit.
+
+### Start the development server:
 
 ```bash
 deno task dev
