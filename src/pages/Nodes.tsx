@@ -19,12 +19,17 @@ export interface DeleteNoteDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function shortNameFromNode(node: ReturnType<useDevice>["nodes"][number]): string {
-  const shortNameOfNode = node.user?.shortName ?? (node.user?.macaddr
-    ? `${base16
-        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-        .toLowerCase()}`
-    : `${numberToHexUnpadded(node.num).slice(-4)}`);
+function shortNameFromNode(
+  node: ReturnType<useDevice>["nodes"][number],
+): string {
+  const shortNameOfNode = node.user?.shortName ??
+    (node.user?.macaddr
+      ? `${
+        base16
+          .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+          .toLowerCase()
+      }`
+      : `${numberToHexUnpadded(node.num).slice(-4)}`);
   return String(shortNameOfNode);
 }
 
@@ -72,7 +77,6 @@ const NodesPage = (): JSX.Element => {
     };
   }, [connection]);
 
-
   const handleLocation = useCallback(
     (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
       if (location.to.valueOf() !== hardware.myNodeNum) return;
@@ -99,12 +103,12 @@ const NodesPage = (): JSX.Element => {
             headings={[
               { title: "", type: "blank", sortable: false },
               { title: "Long Name", type: "normal", sortable: true },
+              { title: "Connection", type: "normal", sortable: true },
+              { title: "Last Heard", type: "normal", sortable: true },
+              { title: "Encryption", type: "normal", sortable: false },
+              { title: "SNR", type: "normal", sortable: true },
               { title: "Model", type: "normal", sortable: true },
               { title: "MAC Address", type: "normal", sortable: true },
-              { title: "Last Heard", type: "normal", sortable: true },
-              { title: "SNR", type: "normal", sortable: true },
-              { title: "Encryption", type: "normal", sortable: false },
-              { title: "Connection", type: "normal", sortable: true },
             ]}
             rows={filteredNodes.map((node) => [
               <div key={node.num}>
@@ -113,19 +117,47 @@ const NodesPage = (): JSX.Element => {
               <h1
                 key="longName"
                 onMouseDown={() => setSelectedNode(node)}
-                onKeyUp={(evt)=>{ evt.key === "Enter" && setSelectedNode(node) }}
+                onKeyUp={(evt) => {
+                  evt.key === "Enter" && setSelectedNode(node);
+                }}
                 className="cursor-pointer underline"
                 tabIndex={0}
                 role="button"
               >
                 {node.user?.longName ??
                   (node.user?.macaddr
-                    ? `Meshtastic ${base16
-                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                      .toLowerCase()}`
+                    ? `Meshtastic ${
+                      base16
+                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                        .toLowerCase()
+                    }`
                     : `!${numberToHexUnpadded(node.num)}`)}
               </h1>,
-
+              <Mono key="hops">
+                {node.lastHeard !== 0
+                  ? node.viaMqtt === false && node.hopsAway === 0
+                    ? "Direct"
+                    : `${node.hopsAway?.toString()} ${
+                      node.hopsAway > 1 ? "hops" : "hop"
+                    } away`
+                  : "-"}
+                {node.viaMqtt === true ? ", via MQTT" : ""}
+              </Mono>,
+              <Mono key="lastHeard">
+                {node.lastHeard === 0
+                  ? <p>Never</p>
+                  : <TimeAgo timestamp={node.lastHeard * 1000} />}
+              </Mono>,
+              <Mono key="pki">
+                {node.user?.publicKey && node.user?.publicKey.length > 0
+                  ? <LockIcon className="text-green-600 mx-auto" />
+                  : <LockOpenIcon className="text-yellow-300 mx-auto" />}
+              </Mono>,
+              <Mono key="snr">
+                {node.snr}db/
+                {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%/
+                {(node.snr + 10) * 5}raw
+              </Mono>,
               <Mono key="model">
                 {Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}
               </Mono>,
@@ -134,34 +166,6 @@ const NodesPage = (): JSX.Element => {
                   .stringify(node.user?.macaddr ?? [])
                   .match(/.{1,2}/g)
                   ?.join(":") ?? "UNK"}
-              </Mono>,
-              <Mono key="lastHeard">
-                {node.lastHeard === 0 ? (
-                  <p>Never</p>
-                ) : (
-                  <TimeAgo timestamp={node.lastHeard * 1000} />
-                )}
-              </Mono>,
-              <Mono key="snr">
-                {node.snr}db/
-                {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%/
-                {(node.snr + 10) * 5}raw
-              </Mono>,
-              <Mono key="pki">
-                {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
-                  <LockIcon className="text-green-600 mx-auto" />
-                ) : (
-                  <LockOpenIcon className="text-yellow-300 mx-auto" />
-                )}
-              </Mono>,
-              <Mono key="hops">
-                {node.lastHeard !== 0
-                  ? node.viaMqtt === false && node.hopsAway === 0
-                    ? "Direct"
-                    : `${node.hopsAway?.toString()} ${node.hopsAway > 1 ? "hops" : "hop"
-                    } away`
-                  : "-"}
-                {node.viaMqtt === true ? ", via MQTT" : ""}
               </Mono>,
             ])}
           />
