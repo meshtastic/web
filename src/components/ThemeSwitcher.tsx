@@ -24,7 +24,7 @@ export default function ThemeSwitcher({
     setPreference(nextPreference);
   };
 
-  const [firstCharOfPreference="", ...restOfPreference] = preference;
+  const [firstCharOfPreference = "", ...restOfPreference] = preference;
 
   return (
     <button
@@ -34,9 +34,15 @@ export default function ThemeSwitcher({
         className,
       )}
       onClick={toggleTheme}
-      aria-description={'Change current theme'}
+      aria-description={"Change current theme"}
     >
-      <span data-label className="transition-all block absolute w-full mb-auto mt-auto ml-0 mr-0 text-xs left-0 -top-5 opacity-0 rounded-lg">{firstCharOfPreference.toLocaleUpperCase() + (restOfPreference ?? []).join("")}</span>
+      <span
+        data-label
+        className="transition-all block absolute w-full mb-auto mt-auto ml-0 mr-0 text-xs left-0 -top-5 opacity-0 rounded-lg"
+      >
+        {firstCharOfPreference.toLocaleUpperCase() +
+          (restOfPreference ?? []).join("")}
+      </span>
       {themeIcons[preference]}
     </button>
   );
