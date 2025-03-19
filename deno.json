@@ -28,12 +28,12 @@
   },
   "imports": {
     "@app/": "./src/",
+    "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.4",
     "@pages/": "./src/pages/",
     "@components/": "./src/components/",
     "@core/": "./src/core/",
     "@layouts/": "./src/layouts/",
 
-    // --- NPM dependencies ---
     "@bufbuild/protobuf": "npm:@bufbuild/protobuf@^2.2.3",
     "@meshtastic/core": "npm:@jsr/meshtastic__core@2.6.0-0",
     "@meshtastic/js": "npm:@jsr/meshtastic__js@2.6.0-0",
@@ -73,10 +73,8 @@
     "react-qrcode-logo": "npm:react-qrcode-logo@^3.0.0",
     "react-scan": "npm:react-scan@^0.2.8",
     "rfc4648": "npm:rfc4648@^1.5.4",
-    "vite-plugin-node-polyfills": "npm:vite-plugin-node-polyfills@^0.23.0",
     "zustand": "npm:zustand@5.0.3",
 
-    // --- NPM devDependencies ---
     "@tailwindcss/postcss": "npm:@tailwindcss/postcss@^4.0.9",
     "@testing-library/jest-dom": "npm:@testing-library/jest-dom@^6.6.3",
     "@testing-library/react": "npm:@testing-library/react@^16.2.0",
@@ -107,16 +105,15 @@
   },
   "tasks": {
     "install:hooks": "deno run -A npm:simple-git-hooks",
-    "build": "vite build",
+    "build": "deno run -A --node-modules-dir npm:vite build",
     "build:analyze": "BUNDLE_ANALYZE=true deno task build",
     "lint": "deno lint src/",
     "lint:fix": "deno lint --fix src/",
     "format": "deno fmt src/",
-    "dev": "deno task dev:ui",
-    "dev:ui": "deno run -A npm:vite dev",
-    "dev:scan": "VITE_DEBUG_SCAN=true deno task dev:ui",
-    "test": "deno run -A npm:vitest",
-    "preview": "deno run -A npm:vite preview",
+    "dev": "deno run -A --node-modules-dir npm:vite",
+    "dev:scan": "VITE_DEBUG_SCAN=true deno task dev",
+    "test": "deno run -A --node-modules-dir npm:vitest",
+    "preview": "deno run -A --node-modules-dir npm:vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
   },
   "lint": {
