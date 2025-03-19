@@ -7,7 +7,6 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { LockKeyholeOpenIcon } from "lucide-react";
-import { P } from "@components/UI/Typography/P.tsx";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 
 export interface RefreshKeysDialogProps {
@@ -25,17 +24,19 @@ export const RefreshKeysDialog = ({ open, onOpenChange }: RefreshKeysDialogProps
         <DialogHeader>
           <DialogTitle>Keys Mismatch</DialogTitle>
         </DialogHeader>
-        Your node is unable to send a direct message to this node. This is due to public/private key mismatch.
+        Your node is unable to send a direct message to this node. This is due to the remote node's current public key not matching the previously stored key for this node.
         <ul className="mt-2">
           <li className="flex place-items-center gap-2 items-start">
-            <div className="p-2 bg-slate-500 rounded-lg mt-2">
+            <div className="p-2 bg-slate-500 rounded-lg mt-1">
               <LockKeyholeOpenIcon size={30} className="text-white justify-center" />
             </div>
-            <div className="flex flex-col gap-2" >
-              <P className="font-bold">Refresh this node</P>
-              <p>
-                This will remove the node from the chat and request new keys. The process may take a few moments to complete.
-              </p>
+            <div className="flex flex-col gap-2">
+              <div>
+                <p className="font-bold mb-0.5">Accept New Keys</p>
+                <p>
+                  This will remove the node from device and request new keys.
+                </p>
+              </div>
               <Button
                 variant="default"
                 onClick={handleNodeRemove}
