@@ -138,3 +138,29 @@ reasons:
   environments.
 - **Web Standard APIs**: Uses browser-compatible APIs, making code more portable
   between server and client environments.
+
+### Contributing
+
+We welcome contributions! Here’s how the deployment flow works for pull
+requests:
+
+- **Preview Deployments:**\
+  Every pull request automatically generates a preview deployment on Vercel.
+  This allows you and reviewers to easily preview changes before merging.
+
+- **Staging Environment (`client-test`):**\
+  Once your PR is merged, your changes will be available on our staging site:
+  [client-test.meshtastic.org](https://client-test.meshtastic.org/).\
+  This environment supports rapid feature iteration and testing without
+  impacting the production site.
+
+- **Production Releases:**\
+  At regular intervals, stable and fully tested releases are promoted to our
+  production site: [client.meshtastic.org](https://client.meshtastic.org/).\
+  This is the primary interface used by the public to connect with their
+  Meshtastic nodes.
+
+Please review our
+[Contribution Guidelines](https://github.com/meshtastic/web/blob/master/CONTRIBUTING.md)
+before submitting a pull request. We appreciate your help in making the project
+better!
