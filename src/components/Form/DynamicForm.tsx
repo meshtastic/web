@@ -124,7 +124,7 @@ export function DynamicForm<T extends FieldValues>({
           })}
         </div>
       ))}
-      {hasSubmitButton && <Button type="submit">Submit</Button>}
+      {hasSubmitButton && <Button type="submit" variant="outline">Submit</Button>}
     </form>
   );
 }

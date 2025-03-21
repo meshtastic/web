@@ -11,6 +11,33 @@ export interface TraceRouteProps {
   snrBack?: Array<number>;
 }
 
+interface RoutePathProps {
+  title: string;
+  startNode?: Protobuf.Mesh.NodeInfo;
+  endNode?: Protobuf.Mesh.NodeInfo;
+  path: number[];
+  snr?: number[];
+}
+
+const RoutePath = ({ title, startNode, endNode, path, snr }: RoutePathProps) => {
+  const { nodes } = useDevice();
+
+  return (
+    <span className="ml-4 border-l-2 border-l-background-primary pl-2 text-slate-900 dark:text-slate-900">
+      <p className="font-semibold">{title}</p>
+      <p>{startNode?.user?.longName}</p>
+      <p>↓ {snr?.[0] ?? "??"}dB</p>
+      {path.map((hop, i) => (
+        <span key={nodes.get(hop)?.num ?? hop}>
+          <p>{nodes.get(hop)?.user?.longName ?? `!${numberToHexUnpadded(hop)}`}</p>
+          <p>↓ {snr?.[i + 1] ?? "??"}dB</p>
+        </span>
+      ))}
+      <p>{endNode?.user?.longName}</p>
+    </span>
+  );
+};
+
 export const TraceRoute = ({
   from,
   to,
@@ -19,43 +46,24 @@ export const TraceRoute = ({
   snrTowards,
   snrBack,
 }: TraceRouteProps) => {
-  const { nodes } = useDevice();
-
   return (
     <div className="ml-5 flex">
-      <span className="ml-4 border-l-2 border-l-background-primary pl-2 text-text-primary">
-        <p className="font-semibold">Route to destination:</p>
-        <p>{to?.user?.longName}</p>
-        <p>↓ {snrTowards?.[0] ? snrTowards[0] : "??"}dB</p>
-        {route.map((hop, i) => (
-          <span key={nodes.get(hop)?.num}>
-            <p>
-              {nodes.get(hop)?.user?.longName ?? `!${numberToHexUnpadded(hop)}`}
-            </p>
-            <p>↓ {snrTowards?.[i + 1] ? snrTowards[i + 1] : "??"}dB</p>
-          </span>
-        ))}
-        {from?.user?.longName}
-      </span>
-      {routeBack
-        ? (
-          <span className="ml-4 border-l-2 border-l-background-primary pl-2 text-text-primary">
-            <p className="font-semibold">Route back:</p>
-            <p>{from?.user?.longName}</p>
-            <p>↓ {snrBack?.[0] ? snrBack[0] : "??"}dB</p>
-            {routeBack.map((hop, i) => (
-              <span key={nodes.get(hop)?.num}>
-                <p>
-                  {nodes.get(hop)?.user?.longName ??
-                    `!${numberToHexUnpadded(hop)}`}
-                </p>
-                <p>↓ {snrBack?.[i + 1] ? snrBack[i + 1] : "??"}dB</p>
-              </span>
-            ))}
-            {to?.user?.longName}
-          </span>
-        )
-        : null}
+      <RoutePath
+        title="Route to destination:"
+        startNode={to}
+        endNode={from}
+        path={route}
+        snr={snrTowards}
+      />
+      {routeBack && (
+        <RoutePath
+          title="Route back:"
+          startNode={from}
+          endNode={to}
+          path={routeBack}
+          snr={snrBack}
+        />
+      )}
     </div>
   );
 };

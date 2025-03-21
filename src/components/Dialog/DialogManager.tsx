@@ -6,8 +6,9 @@ import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog.tsx";
 import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
-import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog.tsx";
+import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
+import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
 
 export const DialogManager = () => {
   const { channels, config, dialog, setDialogOpen } = useDevice();
@@ -68,6 +69,12 @@ export const DialogManager = () => {
         open={dialog.unsafeRoles}
         onOpenChange={(open) => {
           setDialogOpen("unsafeRoles", open);
+        }}
+      />
+      <RefreshKeysDialog
+        open={dialog.refreshKeys}
+        onOpenChange={(open) => {
+          setDialogOpen("refreshKeys", open);
         }}
       />
     </>

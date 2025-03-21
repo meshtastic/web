@@ -139,46 +139,28 @@ reasons:
 - **Web Standard APIs**: Uses browser-compatible APIs, making code more portable
   between server and client environments.
 
-### Debugging
+### Contributing
 
-#### Debugging with React Scan
+We welcome contributions! Here’s how the deployment flow works for pull
+requests:
 
-Meshtastic Web Client has included the library
-[React Scan](https://github.com/aidenybai/react-scan) to help you identify and
-resolve render performance issues during development.
+- **Preview Deployments:**\
+  Every pull request automatically generates a preview deployment on Vercel.
+  This allows you and reviewers to easily preview changes before merging.
 
-React's comparison-by-reference approach to props makes it easy to inadvertently
-cause unnecessary re-renders, especially with:
+- **Staging Environment (`client-test`):**\
+  Once your PR is merged, your changes will be available on our staging site:
+  [client-test.meshtastic.org](https://client-test.meshtastic.org/).\
+  This environment supports rapid feature iteration and testing without
+  impacting the production site.
 
-- Inline function callbacks (`onClick={() => handleClick()}`)
-- Object literals (`style={{ color: "purple" }}`)
-- Array literals (`items={[1, 2, 3]}`)
+- **Production Releases:**\
+  At regular intervals, stable and fully tested releases are promoted to our
+  production site: [client.meshtastic.org](https://client.meshtastic.org/).\
+  This is the primary interface used by the public to connect with their
+  Meshtastic nodes.
 
-These are recreated on every render, causing child components to re-render even
-when nothing has actually changed.
-
-Unlike React DevTools, React Scan specifically focuses on performance
-optimization by:
-
-- Clearly distinguishing between necessary and unnecessary renders
-- Providing render counts for components
-- Highlighting slow-rendering components
-- Offering a dedicated performance debugging experience
-
-#### Usage
-
-When experiencing slow renders, run:
-
-```bash
-deno task dev:scan
-```
-
-This will allow you to discover the following about your components and pages:
-
-- Components with excessive re-renders
-- Performance bottlenecks in the render tree
-- Expensive hook operations
-- Props that change reference on every render
-
-Use these insights to apply targeted optimizations like `React.memo()`,
-`useCallback()`, or `useMemo()` where they'll have the most impact.
+Please review our
+[Contribution Guidelines](https://github.com/meshtastic/web/blob/master/CONTRIBUTING.md)
+before submitting a pull request. We appreciate your help in making the project
+better!
