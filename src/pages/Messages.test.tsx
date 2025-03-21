@@ -40,7 +40,8 @@ const mockUseDevice = {
     messages: { broadcast: new Map(), direct: new Map() },
     metadata: new Map(),
     unreadCounts: new Map([[1111, 3], [2222, 10]]),
-    setUnread: vi.fn()
+    setUnread: vi.fn(),
+    hasNodeError: vi.fn()
 };
 
 
@@ -64,7 +65,7 @@ describe("Messages Page", () => {
 
     it("does not update the incorrect node", async () => {
         render(<MessagesPage />);
-        const nodeButton = screen.getAllByRole("button").filter(b => b.textContent.includes("TN1Test Node 13"))[0];
+        const nodeButton = screen.getAllByRole("button").filter(b => b.textContent.includes("TN1Test Node 1"))[0];
         fireEvent.click(nodeButton);
         expect(mockUseDevice.setUnread).toHaveBeenCalledWith(1111, 0);
         expect(mockUseDevice.unreadCounts.get(2222)).toBe(10);
