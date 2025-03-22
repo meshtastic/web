@@ -24,7 +24,10 @@ const STORAGE_KEY = "key_backup_reminder";
 function isReminderExpired(expires?: string): boolean {
   if (!expires) return true;
   const expiryDate = new Date(expires);
-  return isNaN(expiryDate.getTime()) || new Date() >= expiryDate;
+  if (isNaN(expiryDate.getTime())) return true; // Invalid date passed
+
+  const now = new Date();
+  return now.getTime() >= expiryDate.getTime();
 }
 
 export function useBackupReminder({
@@ -70,7 +73,7 @@ export function useBackupReminder({
                 setReminderExpiry(reminderInDays);
               }}
             >
-              Remind me in {reminderInDays} days
+              Remind me in {reminderInDays} day{reminderInDays > 1 ? 's' : ''}
             </Button>
             <Button
               type="button"
