@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MessagesPage } from "./Messages.tsx";
 import { useDevice } from "../core/stores/deviceStore";
 import { Protobuf } from "@meshtastic/core";
-import { b } from "vitest/dist/chunks/suite.qtkXWc6R.js";
 
 // Mock the store
 vi.mock("../core/stores/deviceStore", () => ({
@@ -50,10 +49,13 @@ describe("Messages Page", () => {
         vi.mocked(useDevice).mockReturnValue(mockUseDevice);
     });
 
-    it("shows unread count correctly", () => {
+    it("sorts unreads to the top", () => {
         render(<MessagesPage />);
-        const unreadCount = screen.getByText("3");
-        expect(unreadCount).toBeInTheDocument();
+        const buttonOrder = screen.getAllByRole("button").filter(b => b.textContent.includes("Test Node"));
+        expect(buttonOrder[0].textContent).toContain("TN2Test Node 210");
+        expect(buttonOrder[1].textContent).toContain("TN1Test Node 13");
+        expect(buttonOrder[2].textContent).toContain("TN0Test Node 0");
+        expect(buttonOrder[3].textContent).toContain("TN3Test Node 3");
     });
 
     it("updates unread when active chat changes",() => {
@@ -69,14 +71,5 @@ describe("Messages Page", () => {
         fireEvent.click(nodeButton);
         expect(mockUseDevice.setUnread).toHaveBeenCalledWith(1111, 0);
         expect(mockUseDevice.unreadCounts.get(2222)).toBe(10);
-    });
-
-    it("sorts unreads to the top", () => {
-        const container = render(<MessagesPage />);
-        const buttonOrder = screen.getAllByRole("button").filter(b => b.textContent.includes("Test Node"));
-        expect(buttonOrder[0].textContent).toContain("TN2Test Node 210");
-        expect(buttonOrder[1].textContent).toContain("TN1Test Node 13");
-        expect(buttonOrder[2].textContent).toContain("TN0Test Node 0");
-        expect(buttonOrder[3].textContent).toContain("TN3Test Node 3");
     });
 });
