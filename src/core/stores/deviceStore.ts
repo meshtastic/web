@@ -80,6 +80,7 @@ export interface Device {
     unsafeRoles: boolean;
     refreshKeys: boolean;
   };
+  unreadCounts: Map<number, number>;
 
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -116,6 +117,7 @@ export interface Device {
   getDialogOpen: (dialog: DialogVariant) => boolean;
   processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
+  setUnread: (id: number, count: number) => void;
   setQueueStatus: (status: QueueStatus) => void;
   setNodeError: (nodeNum: number, error: string) => void;
   clearNodeError: (nodeNum: number) => void;
@@ -178,8 +180,8 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           },
           pendingSettingsChanges: false,
           messageDraft: "",
+          unreadCounts: new Map(),
           nodeErrors: new Map(),
-
 
           setStatus: (status: Types.DeviceStatusEnum) => {
             set(
@@ -664,6 +666,20 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               }),
             );
           },
+          setUnread: (unread_id: number, count?: number) => {
+              set(
+                produce<DeviceState>((draft) => {
+                  const device = draft.devices.get(id);
+                  if (device) {
+                    if (count == null) {
+                      let currentCount = device.unreadCounts.get(unread_id) ?? 0;
+                      count = currentCount + 1;
+                    }
+                    device.unreadCounts.set(unread_id, count);
+                  }
+                })
+              );
+            },
           setQueueStatus: (status: QueueStatus) => {
             set(
               produce<DeviceState>((draft) => {
