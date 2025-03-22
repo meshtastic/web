@@ -1,71 +1,58 @@
-import { Button } from "../../components/UI/Button.tsx";
-import type { CookieAttributes } from "js-cookie";
+import { Button } from "@components/UI/Button.tsx";
 import { useCallback, useEffect, useRef } from "react";
-import useCookie from "./useCookie.ts";
-import { useToast } from "./useToast.ts";
+import { useToast } from "@core/hooks/useToast.ts";
+import useLocalStorage from "@core/hooks/useLocalStorage.ts";
 
 interface UseBackupReminderOptions {
   reminderInDays?: number;
   message: string;
   onAccept?: () => void | Promise<void>;
   enabled: boolean;
-  cookieOptions?: CookieAttributes;
 }
 
 interface ReminderState {
-  suppressed: boolean;
-  lastShown: string;
+  expires: string;
 }
 
-const TOAST_APPEAR_DELAY = 10_000; // 10 seconds;
-const TOAST_DURATION = 30_000; // 30 seconds;:
+const TOAST_APPEAR_DELAY = 10_000; // 10 seconds
+const TOAST_DURATION = 30_000; // 30 seconds
+const REMINDER_DAYS_ONE_WEEK = 7;
+const REMINDER_DAYS_ONE_YEAR = 365;
+const REMINDER_DAYS_FOREVER = 3650;
+const STORAGE_KEY = "key_backup_reminder";
 
-// remind user in 1 year to backup keys again, if they accept the reminder;
-const ON_ACCEPT_REMINDER_DAYS = 365;
+function isReminderExpired(expires?: string): boolean {
+  if (!expires) return true;
+  const expiryDate = new Date(expires);
+  if (isNaN(expiryDate.getTime())) return true; // Invalid date passed
 
-function isReminderExpired(lastShown: string): boolean {
-  const lastShownDate = new Date(lastShown);
   const now = new Date();
-  const daysSinceLastShown = (now.getTime() - lastShownDate.getTime()) /
-    (1000 * 60 * 60 * 24);
-  return daysSinceLastShown >= 7;
+  return now.getTime() >= expiryDate.getTime();
 }
 
 export function useBackupReminder({
-  reminderInDays = 7,
   enabled,
   message,
-  onAccept = () => {},
-  cookieOptions,
+  onAccept = () => { },
+  reminderInDays = REMINDER_DAYS_ONE_WEEK,
 }: UseBackupReminderOptions) {
   const { toast } = useToast();
   const toastShownRef = useRef(false);
-  const { value: reminderCookie, setCookie } = useCookie<ReminderState>(
-    "key_backup_reminder",
+  const [reminderState, setReminderState] = useLocalStorage<ReminderState | null>(
+    STORAGE_KEY,
+    null
   );
 
-  const suppressReminder = useCallback(
-    (days: number) => {
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + days);
-
-      setCookie(
-        {
-          suppressed: true,
-          lastShown: new Date().toISOString(),
-        },
-        { ...cookieOptions, expires: expiryDate },
-      );
-    },
-    [setCookie, cookieOptions],
-  );
+  const setReminderExpiry = useCallback((days: number) => {
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + days);
+    setReminderState({ expires: expiryDate.toISOString() });
+  }, [setReminderState]);
 
   useEffect(() => {
     if (!enabled || toastShownRef.current) return;
 
-    const shouldShowReminder = !reminderCookie?.suppressed ||
-      isReminderExpired(reminderCookie.lastShown);
-    if (!shouldShowReminder) return;
+    if (!isReminderExpired(reminderState?.expires)) return;
 
     toastShownRef.current = true;
 
@@ -75,44 +62,52 @@ export function useBackupReminder({
       delay: TOAST_APPEAR_DELAY,
       description: message,
       action: (
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="p-1"
+              onClick={() => {
+                dismiss();
+                setReminderExpiry(reminderInDays);
+              }}
+            >
+              Remind me in {reminderInDays} day{reminderInDays > 1 ? 's' : ''}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="p-1"
+              onClick={() => {
+                dismiss();
+                setReminderExpiry(REMINDER_DAYS_FOREVER);
+              }}
+            >
+              Never remind me
+            </Button>
+          </div>
           <Button
             type="button"
             variant="default"
+            className="w-full"
             onClick={() => {
               onAccept();
               dismiss();
-              suppressReminder(ON_ACCEPT_REMINDER_DAYS);
+              setReminderExpiry(REMINDER_DAYS_ONE_YEAR);
             }}
           >
             Back up now
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              dismiss();
-              suppressReminder(reminderInDays);
-            }}
-          >
-            Remind me in {reminderInDays} days
           </Button>
         </div>
       ),
     });
 
-    return () => {
-      if (!toastShownRef.current) {
-        dismiss();
-      }
-    };
+    return () => dismiss();
   }, [
     enabled,
     message,
     onAccept,
-    reminderInDays,
-    suppressReminder,
-    toast,
-    reminderCookie,
+
   ]);
-}
+};
