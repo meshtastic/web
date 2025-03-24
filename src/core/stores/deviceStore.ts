@@ -30,10 +30,6 @@ export type DialogVariant =
   | "unsafeRoles"
   | "refreshKeys";
 
-type QueueStatus = {
-  res: number, free: number, maxlen: number
-}
-
 type NodeError = {
   node: number;
   error: string;
@@ -66,8 +62,6 @@ export interface Device {
   // currentMetrics: Protobuf.DeviceMetrics;
   pendingSettingsChanges: boolean;
   messageDraft: string;
-  queueStatus: QueueStatus,
-  isQueueingMessages: boolean,
   dialog: {
     import: boolean;
     QR: boolean;
@@ -116,7 +110,6 @@ export interface Device {
   getDialogOpen: (dialog: DialogVariant) => boolean;
   processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
-  setQueueStatus: (status: QueueStatus) => void;
   setNodeError: (nodeNum: number, error: string) => void;
   clearNodeError: (nodeNum: number) => void;
   getNodeError: (nodeNum: number) => NodeError | undefined;
@@ -160,10 +153,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           activePage: "messages",
           activeNode: 0,
           waypoints: [],
-          queueStatus: {
-            res: 0, free: 0, maxlen: 0
-          },
-          isQueueingMessages: false,
           dialog: {
             import: false,
             QR: false,
@@ -660,17 +649,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.messageDraft = message;
-                }
-              }),
-            );
-          },
-          setQueueStatus: (status: QueueStatus) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.queueStatus = status;
-                  device.queueStatus.free >= 10 ? true : false
                 }
               }),
             );

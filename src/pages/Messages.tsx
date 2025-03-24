@@ -1,4 +1,3 @@
-import { useAppStore } from "../core/stores/appStore.ts";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
@@ -14,11 +13,14 @@ import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useState } from "react";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import { cn } from "@core/utils/cn.ts";
+import { useMessageStore } from "@core/stores/messageStore.ts";
 
 export const MessagesPage = () => {
-  const { channels, nodes, hardware, messages, hasNodeError } = useDevice();
-  const { activeChat, chatType, setActiveChat, setChatType } = useAppStore();
+  const { channels, nodes, hardware, hasNodeError } = useDevice();
+  const { getMessages, setActiveChat, chatType, activeChat, setChatType } = useMessageStore()
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState<string>("");
+
   const filteredNodes = Array.from(nodes.values()).filter((node) => {
     if (node.num === hardware.myNodeNum) return false;
     const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
@@ -29,7 +31,6 @@ export const MessagesPage = () => {
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
   );
   const currentChannel = channels.get(activeChat);
-  const { toast } = useToast();
   const node = nodes.get(activeChat);
   const nodeHex = node?.num ? numberToHexUnpadded(node.num) : "Unknown";
 
@@ -130,7 +131,7 @@ export const MessagesPage = () => {
                 <div className="flex-1 overflow-y-auto">
                   <ChannelChat
                     key={currentChannel.index}
-                    messages={messages.broadcast.get(currentChannel.index)}
+                    messages={getMessages('broadcast', currentChannel?.index)}
                   />
                 </div>
               </div>
@@ -141,7 +142,7 @@ export const MessagesPage = () => {
                 <div className="flex-1 overflow-y-auto">
                   <ChannelChat
                     key={node.num}
-                    messages={messages.direct.get(node.num)}
+                    messages={getMessages('direct', node?.num)}
                   />
                 </div>
               </div>

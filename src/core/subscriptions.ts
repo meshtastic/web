@@ -1,9 +1,11 @@
 import type { Device } from "@core/stores/deviceStore.ts";
 import { MeshDevice, Protobuf } from "@meshtastic/core";
+import type { MessageStore } from "@core/stores/messageStore.ts";
 
 export const subscribeAll = (
   device: Device,
   connection: MeshDevice,
+  messageStore: MessageStore
 ) => {
   let myNodeNum = 0;
 
@@ -15,6 +17,8 @@ export const subscribeAll = (
   });
 
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
+    console.log("routingPacket", routingPacket);
+
     switch (routingPacket.data.variant.case) {
       case "errorReason": {
         if (
@@ -81,8 +85,10 @@ export const subscribeAll = (
 
 
   connection.events.onMessagePacket.subscribe((messagePacket) => {
-    device.addMessage({
+    console.log("messagePacket", messagePacket);
+    messageStore.addMessage({
       ...messagePacket,
+
       state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
     });
   });
@@ -105,9 +111,9 @@ export const subscribeAll = (
     });
   });
 
-  connection.events.onQueueStatus.subscribe((queueStatus) => {
-    device.setQueueStatus(queueStatus);
-  });
+  // connection.events.onQueueStatus.subscribe((queueStatus) => {
+  //   device.setQueueStatus(queueStatus);
+  // });
 
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     if (routingPacket.data.variant.case === "errorReason") {

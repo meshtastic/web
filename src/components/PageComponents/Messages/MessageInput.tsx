@@ -5,6 +5,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
 import { startTransition, useCallback, useMemo, useState } from "react";
+import { useMessageStore } from "@core/stores/messageStore.ts";
 
 export interface MessageInputProps {
   to: Types.Destination;
@@ -19,13 +20,11 @@ export const MessageInput = ({
 }: MessageInputProps) => {
   const {
     connection,
-    setMessageState,
     messageDraft,
     setMessageDraft,
-    isQueueingMessages,
-    queueStatus,
     hardware,
   } = useDevice();
+  const { setMessageState } = useMessageStore()
   const myNodeNum = hardware.myNodeNum;
   const [localDraft, setLocalDraft] = useState(messageDraft);
   const [messageBytes, setMessageBytes] = useState(0);
@@ -62,7 +61,7 @@ export const MessageInput = ({
           )
         );
     },
-    [channel, connection, myNodeNum, setMessageState, to, queueStatus],
+    [channel, connection, myNodeNum, setMessageState, to],
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,12 +84,10 @@ export const MessageInput = ({
           if (localDraft === "") return;
           const message = formData.get("messageInput") as string;
           startTransition(() => {
-            if (!isQueueingMessages) {
-              sendText(message);
-              setLocalDraft("");
-              setMessageDraft("");
-              setMessageBytes(0);
-            }
+            sendText(message);
+            setLocalDraft("");
+            setMessageDraft("");
+            setMessageBytes(0);
 
           });
         }}

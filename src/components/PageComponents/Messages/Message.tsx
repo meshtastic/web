@@ -101,10 +101,10 @@ const StatusIcon = ({ state, className, ...otherProps }: StatusIconProps) => {
 const TimeDisplay = memo(({ date, className }: { date: Date; className?: string }) => (
   <div className={cn("flex items-center gap-2 shrink-0", className)}>
     <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-      {date.toLocaleDateString()}
+      {date?.toLocaleDateString()}
     </span>
     <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-      {date.toLocaleTimeString(undefined, {
+      {date?.toLocaleTimeString(undefined, {
         hour: "2-digit",
         minute: "2-digit",
       })}
@@ -112,7 +112,9 @@ const TimeDisplay = memo(({ date, className }: { date: Date; className?: string 
   </div>
 ));
 
-export const Message = memo(({ lastMsgSameUser, message, sender }: MessageProps) => {
+export const Message = (({ lastMsgSameUser, message, sender }: MessageProps) => {
+  console.log('Message', message);
+
   const { getDevices } = useDeviceStore();
 
   const isDeviceUser = useMemo(
@@ -162,7 +164,7 @@ export const Message = memo(({ lastMsgSameUser, message, sender }: MessageProps)
             </div>
           )}
         </div>
-        <TimeDisplay date={message.rxTime} />
+        <TimeDisplay date={message?.rxTime} />
         <div className="flex place-items-center gap-2 pb-2">
           <div className={cn(isDeviceUser && "pl-11", messageTextClass)}>
             {message.data}
