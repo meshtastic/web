@@ -33,7 +33,7 @@
     ]
   },
   "homepage": "https://meshtastic.org",
-  "ddbependencies": {
+  "dependencies": {
     "@bufbuild/protobuf": "^2.2.3",
     "@meshtastic/core": "npm:@jsr/meshtastic__core@2.6.0-0",
     "@meshtastic/js": "npm:@jsr/meshtastic__js@2.6.0-0",

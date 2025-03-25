@@ -2,40 +2,60 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { produce } from 'immer';
 import { Types } from '@meshtastic/core';
-import { zustandIDBStorage } from "@core/services/messaging/db.ts";
+import { zustandIndexDBStorage } from "@core/services/messaging/db.ts";
 
-export interface MessageWithState {
-  id: number;
-  from: number;
+const MESSAGE_STATES = {
+  ack: "ack",
+  waiting: "waiting",
+  failed: 'failed',
+};
+export type MessageState = keyof typeof MESSAGE_STATES;
+
+export const ChatTypes = {
+  DIRECT: "direct",
+  BROADCAST: "broadcast",
+} as const;
+
+export type MessageType = "broadcast" | "direct";
+
+interface MessageBase {
+  channel: Types.ChannelNumber;
   to: number;
-  channel: number;
-  content: string;
-  state: 'ack' | 'waiting' | 'failed';
-  type: 'direct' | 'broadcast';
+  from: number;
+  date: string;
+  messageId: number;
+  state: MessageState;
+  message: string;
 }
 
-type MessageType = 'direct' | 'broadcast';
+interface GenericMessage<T extends MessageType> extends MessageBase {
+  type: T;
+}
+
+export type Message = GenericMessage<'direct'> | GenericMessage<'broadcast'>;
 
 export interface MessageStore {
   messages: {
-    direct: Record<number, MessageWithState[]>;
-    broadcast: Record<number, MessageWithState[]>;
+    direct: Record<number, Record<number, Message>>; // node -> messageId -> Message
+    broadcast: Record<number, Record<number, Message>>; // channel -> messageId -> Message
   };
-
+  nodeNum: number;
   activeChat: number;
   chatType: MessageType;
 
+  setNodeNum: (nodeNum: number) => void;
+  getNodeNum: () => number;
   setActiveChat: (chat: number) => void;
   setChatType: (type: MessageType) => void;
-  addMessage: (message: MessageWithState) => void;
-  getMessages: (type: MessageType, key: number) => MessageWithState[];
-  setMessageState: (
-    type: MessageType,
-    key: number,
-    messageId: number,
-    newState: MessageWithState['state']
-  ) => void;
+  saveMessage: (message: Message) => void;
+  setMessageState: (params: {
+    type: MessageType;
+    key: number;
+    messageId: number;
+    newState?: MessageState;
+  }) => void;
   clearMessages: () => void;
+  getMessages: (type: MessageType, options: { myNodeNum?: number; otherNodeNum?: number; channel?: number }) => Message[];
 }
 
 export const useMessageStore = create<MessageStore>()(
@@ -45,9 +65,16 @@ export const useMessageStore = create<MessageStore>()(
         direct: {},
         broadcast: {},
       },
-
-      activeChat: Types.ChannelNumber.Primary,
+      activeChat: 0,
       chatType: 'broadcast',
+      nodeNum: 0,
+      setNodeNum: (nodeNum) => {
+        set(produce((state: MessageStore) => {
+          state.nodeNum = nodeNum;
+        }));
+      },
+
+      getNodeNum: () => get().nodeNum,
 
       setActiveChat: (chat) => {
         set(produce((state: MessageStore) => {
@@ -61,48 +88,62 @@ export const useMessageStore = create<MessageStore>()(
         }));
       },
 
-      addMessage: (message) => {
+      saveMessage: (message) => {
         set(produce((state: MessageStore) => {
-          const group = message.type === 'direct' ? state.messages.direct : state.messages.broadcast;
-          const key = message.type === 'direct' ? message.from : message.channel;
+          const group = state.messages[message.type];
+          const key = message.type === 'direct' ? Number(message.from) : Number(message.channel);
+
           if (!group[key]) {
-            group[key] = [];
+            group[key] = {};
           }
-          group[key].push(message);
+          group[key][message.messageId] = message;
         }));
       },
-
-      getMessages: (type, key) => {
-        const group = type === 'direct' ? get().messages.direct : get().messages.broadcast;
-        return group[key] ?? [];
-      },
-
-      setMessageState: (type, key, messageId, newState) => {
+      setMessageState: ({ type, key, messageId, newState = 'ack' }) => {
         set(produce((state: MessageStore) => {
-          const group = type === 'direct' ? state.messages.direct : state.messages.broadcast;
-          const messages = group[key];
-          if (!messages) return;
-          const message = messages.find((msg) => msg.id === messageId);
-          if (message) {
-            message.state = newState;
-          }
+          const group = state.messages[type];
+          const messageMap = group[key];
+          if (!messageMap || !messageMap[messageId]) return;
+          messageMap[messageId].state = newState;
         }));
       },
-
       clearMessages: () => {
         set(produce((state: MessageStore) => {
           state.messages.direct = {};
           state.messages.broadcast = {};
         }));
       },
+      getMessages: (type, options) => {
+        const state = get();
+
+        if (type === 'broadcast' && options.channel !== undefined) {
+          const messageMap = state.messages.broadcast[options.channel] ?? {};
+          return Object.values(messageMap).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        }
+
+        if (type === 'direct' && options.myNodeNum !== undefined && options.otherNodeNum !== undefined) {
+          const receivedMap = state.messages.direct[options.otherNodeNum] ?? {};
+          const sentMap = state.messages.direct[options.myNodeNum] ?? {};
+
+          // Pull messages where I am the sender and otherNode is the receiver
+          const sentMessages = Object.values(sentMap).filter(msg => msg.to === options.otherNodeNum);
+
+          // Pull messages received from otherNode
+          const receivedMessages = Object.values(receivedMap);
+
+          // Merge and sort chronologically
+          return [...receivedMessages, ...sentMessages].sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          );
+        }
+
+        return [];
+      },
     }),
     {
-      name: 'mesh-messages',
-      storage: createJSONStorage(() => zustandIDBStorage),
-      // ✅ No need for partialize magic — simple object storage
+      name: 'meshtastic-message-store',
+      storage: createJSONStorage(() => zustandIndexDBStorage),
       partialize: (state) => ({
-        activeChat: state.activeChat,
-        chatType: state.chatType,
         messages: state.messages,
       }),
     }

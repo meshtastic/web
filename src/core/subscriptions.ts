@@ -1,6 +1,7 @@
 import type { Device } from "@core/stores/deviceStore.ts";
 import { MeshDevice, Protobuf } from "@meshtastic/core";
 import type { MessageStore } from "@core/stores/messageStore.ts";
+import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
 
 export const subscribeAll = (
   device: Device,
@@ -17,7 +18,7 @@ export const subscribeAll = (
   });
 
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
-    console.log("routingPacket", routingPacket);
+    console.log("Routing Packet", routingPacket);
 
     switch (routingPacket.data.variant.case) {
       case "errorReason": {
@@ -55,6 +56,7 @@ export const subscribeAll = (
 
   connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
     device.setHardware(nodeInfo);
+    messageStore.setNodeNum(nodeInfo.myNodeNum);
     myNodeNum = nodeInfo.myNodeNum;
   });
 
@@ -85,12 +87,13 @@ export const subscribeAll = (
 
 
   connection.events.onMessagePacket.subscribe((messagePacket) => {
-    console.log("messagePacket", messagePacket);
-    messageStore.addMessage({
-      ...messagePacket,
+    console.log("before Message Packet", messagePacket);
 
-      state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
-    });
+    // incoming and outgoing messages are handled by this event listener
+    const dto = new PacketToMessageDTO(messagePacket, myNodeNum);
+    const message = dto.toMessage();
+    console.log("after Message Packet", message);
+    messageStore.saveMessage(message);
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
@@ -111,9 +114,6 @@ export const subscribeAll = (
     });
   });
 
-  // connection.events.onQueueStatus.subscribe((queueStatus) => {
-  //   device.setQueueStatus(queueStatus);
-  // });
 
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     if (routingPacket.data.variant.case === "errorReason") {

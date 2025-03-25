@@ -10,7 +10,7 @@ export interface MessageWithState extends Types.PacketMetadata<string> {
   state: MessageState;
 }
 
-export type MessageState = "ack" | "waiting" | Protobuf.Mesh.Routing_Error;
+export type MessageState = "ack" | "waiting" | 'failed';
 
 export interface ProcessPacketParams {
   from: number;
