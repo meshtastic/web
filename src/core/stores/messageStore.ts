@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { produce } from 'immer';
 import { Types } from '@meshtastic/core';
-import { zustandIndexDBStorage } from "@core/services/messaging/db.ts";
+import { zustandIndexDBStorage } from "./storage/indexDB.ts";
 
 const MESSAGE_STATES = {
   ack: "ack",
@@ -36,9 +36,10 @@ export type Message = GenericMessage<'direct'> | GenericMessage<'broadcast'>;
 
 export interface MessageStore {
   messages: {
-    direct: Record<number, Record<number, Message>>; // node -> messageId -> Message
+    direct: Record<number, Record<number, Message>>; // other_node_num -> messageId -> Message
     broadcast: Record<number, Record<number, Message>>; // channel -> messageId -> Message
   };
+  draft: Map<Types.Destination, string>;
   nodeNum: number;
   activeChat: number;
   chatType: MessageType;
@@ -56,6 +57,11 @@ export interface MessageStore {
   }) => void;
   clearMessages: () => void;
   getMessages: (type: MessageType, options: { myNodeNum?: number; otherNodeNum?: number; channel?: number }) => Message[];
+  getDraft: (key: Types.Destination) => string;
+  setDraft: (key: Types.Destination, message: string) => void;
+  clearMessageByMessageId: (type: MessageType, messageId: number) => void;
+  clearDraft: (key: Types.Destination) => void;
+
 }
 
 export const useMessageStore = create<MessageStore>()(
@@ -65,6 +71,7 @@ export const useMessageStore = create<MessageStore>()(
         direct: {},
         broadcast: {},
       },
+      draft: new Map<number, string>(),
       activeChat: 0,
       chatType: 'broadcast',
       nodeNum: 0,
@@ -73,26 +80,21 @@ export const useMessageStore = create<MessageStore>()(
           state.nodeNum = nodeNum;
         }));
       },
-
       getNodeNum: () => get().nodeNum,
-
       setActiveChat: (chat) => {
         set(produce((state: MessageStore) => {
           state.activeChat = chat;
         }));
       },
-
       setChatType: (type) => {
         set(produce((state: MessageStore) => {
           state.chatType = type;
         }));
       },
-
       saveMessage: (message) => {
         set(produce((state: MessageStore) => {
           const group = state.messages[message.type];
-          const key = message.type === 'direct' ? Number(message.from) : Number(message.channel);
-
+          const key = message.type === 'direct' ? Number(message.to) : Number(message.channel);
           if (!group[key]) {
             group[key] = {};
           }
@@ -100,11 +102,13 @@ export const useMessageStore = create<MessageStore>()(
         }));
       },
       setMessageState: ({ type, key, messageId, newState = 'ack' }) => {
+        const group = get().messages[type];
+        const messageMap = group[key];
+
+        if (!messageMap || !messageMap[messageId]) return;
+
         set(produce((state: MessageStore) => {
-          const group = state.messages[type];
-          const messageMap = group[key];
-          if (!messageMap || !messageMap[messageId]) return;
-          messageMap[messageId].state = newState;
+          state.messages[type][key][messageId].state = newState;
         }));
       },
       clearMessages: () => {
@@ -138,6 +142,33 @@ export const useMessageStore = create<MessageStore>()(
         }
 
         return [];
+      },
+      getDraft: (key) => {
+        return get().draft.get(key) ?? '';
+      },
+      setDraft: (key, message) => {
+        set(produce((state: MessageStore) => {
+          state.draft.set(key, message);
+        }));
+      },
+      clearMessageByMessageId: (type, messageId) => {
+        set(produce((state: MessageStore) => {
+          const group = state.messages[type];
+          for (const key in group) {
+            if (group[key][messageId]) {
+              delete group[key][messageId];
+              if (Object.keys(group[key]).length === 0) {
+                delete group[key];
+              }
+              break;
+            }
+          }
+        }));
+      },
+      clearDraft: (key) => {
+        set(produce((state: MessageStore) => {
+          state.draft.delete(key);
+        }));
       },
     }),
     {

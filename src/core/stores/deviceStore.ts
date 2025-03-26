@@ -46,10 +46,6 @@ export interface Device {
   hardware: Protobuf.Mesh.MyNodeInfo;
   nodes: Map<number, Protobuf.Mesh.NodeInfo>;
   metadata: Map<number, Protobuf.Mesh.DeviceMetadata>;
-  messages: {
-    direct: Map<number, MessageWithState[]>;
-    broadcast: Map<Types.ChannelNumber, MessageWithState[]>;
-  };
   traceroutes: Map<
     number,
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
@@ -92,20 +88,11 @@ export interface Device {
   addUser: (user: Types.PacketMetadata<Protobuf.Mesh.User>) => void;
   addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
   addConnection: (connection: MeshDevice) => void;
-  addMessage: (message: MessageWithState) => void;
   addTraceRoute: (
     traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
   ) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
   removeNode: (nodeNum: number) => void;
-  setMessageState: (
-    type: "direct" | "broadcast",
-    channelIndex: Types.ChannelNumber,
-    to: number,
-    from: number,
-    messageId: number,
-    state: MessageState,
-  ) => void;
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   getDialogOpen: (dialog: DialogVariant) => boolean;
   processPacket: (data: ProcessPacketParams) => void;
@@ -144,10 +131,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           hardware: create(Protobuf.Mesh.MyNodeInfoSchema),
           nodes: new Map(),
           metadata: new Map(),
-          messages: {
-            direct: new Map(),
-            broadcast: new Map(),
-          },
           traceroutes: new Map(),
           connection: undefined,
           activePage: "messages",
@@ -496,31 +479,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               }),
             );
           },
-          addMessage: (message) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (!device) {
-                  return;
-                }
-                const messageGroup = device.messages[message.type];
-                const messageIndex = message.type === "direct"
-                  ? message.from === device.hardware.myNodeNum
-                    ? message.to
-                    : message.from
-                  : message.channel;
-                const messages = messageGroup.get(messageIndex);
-
-                if (messages) {
-                  messages.push(message);
-                  messageGroup.set(messageIndex, messages);
-                } else {
-                  messageGroup.set(messageIndex, [message]);
-                }
-              }),
-            );
-          },
-
           addMetadata: (from, metadata) => {
             set(
               produce<DeviceState>((draft) => {
@@ -558,43 +516,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                   return;
                 }
                 device.nodes.delete(nodeNum);
-              }),
-            );
-          },
-          setMessageState: (
-            type: "direct" | "broadcast",
-            channelIndex: Types.ChannelNumber,
-            to: number,
-            from: number,
-            messageId: number,
-            state: MessageState,
-          ) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (!device) {
-                  return;
-                }
-                const messageGroup = device.messages[type];
-
-                const messageIndex = type === "direct"
-                  ? from === device.hardware.myNodeNum ? to : from
-                  : channelIndex;
-                const messages = messageGroup.get(messageIndex);
-
-                if (!messages) {
-                  return;
-                }
-
-                messageGroup.set(
-                  messageIndex,
-                  messages.map((msg) => {
-                    if (msg.id === messageId) {
-                      msg.state = state;
-                    }
-                    return msg;
-                  }),
-                );
               }),
             );
           },

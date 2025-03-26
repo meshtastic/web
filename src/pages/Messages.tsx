@@ -17,7 +17,7 @@ import { ChatTypes, useMessageStore } from "@core/stores/messageStore.ts";
 
 export const MessagesPage = () => {
   const { channels, nodes, hardware, hasNodeError } = useDevice();
-  const { nodeNum, getMessages, setActiveChat, chatType, activeChat, setChatType } = useMessageStore()
+  const { getNodeNum, getMessages, setActiveChat, chatType, activeChat, setChatType } = useMessageStore()
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -132,7 +132,7 @@ export const MessagesPage = () => {
                 <div className="flex-1 overflow-y-auto">
                   <ChannelChat
                     messages={getMessages('broadcast', {
-                      myNodeNum: nodeNum,
+                      myNodeNum: getNodeNum(),
                       channel: currentChannel?.index
                     })}
                   />
@@ -144,7 +144,7 @@ export const MessagesPage = () => {
               <div className="flex flex-col h-full">
                 <div className="flex-1 overflow-y-auto">
                   <ChannelChat
-                    messages={getMessages('direct', { myNodeNum: nodeNum, otherNodeNum: activeChat, })}
+                    messages={getMessages('direct', { myNodeNum: getNodeNum(), otherNodeNum: activeChat })}
                   />
                 </div>
               </div>

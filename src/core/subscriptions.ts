@@ -18,8 +18,6 @@ export const subscribeAll = (
   });
 
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
-    console.log("Routing Packet", routingPacket);
-
     switch (routingPacket.data.variant.case) {
       case "errorReason": {
         if (
@@ -87,12 +85,9 @@ export const subscribeAll = (
 
 
   connection.events.onMessagePacket.subscribe((messagePacket) => {
-    console.log("before Message Packet", messagePacket);
-
     // incoming and outgoing messages are handled by this event listener
     const dto = new PacketToMessageDTO(messagePacket, myNodeNum);
     const message = dto.toMessage();
-    console.log("after Message Packet", message);
     messageStore.saveMessage(message);
   });
 

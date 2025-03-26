@@ -1,4 +1,3 @@
-import { debounce } from "@core/utils/debounce.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -6,6 +5,7 @@ import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
 import { startTransition, useCallback, useMemo, useState } from "react";
 import { ChatTypes, useMessageStore } from "@core/stores/messageStore.ts";
+import { debounce } from "@core/utils/debounce.ts";
 
 export interface MessageInputProps {
   to: Types.Destination;
@@ -18,15 +18,15 @@ export const MessageInput = ({
   channel,
   maxBytes,
 }: MessageInputProps) => {
-  const { connection, messageDraft, setMessageDraft } = useDevice();
-  const { setMessageState, activeChat } = useMessageStore();
+  const { connection } = useDevice();
+  const { setMessageState, activeChat, setDraft, getDraft, clearDraft } = useMessageStore();
 
-  const [localDraft, setLocalDraft] = useState(messageDraft);
+  const [localDraft, setLocalDraft] = useState(getDraft(to));
   const [messageBytes, setMessageBytes] = useState(0);
 
   const debouncedSetMessageDraft = useMemo(
-    () => debounce((value: string) => setMessageDraft(value), 300),
-    [setMessageDraft]
+    () => debounce((value: string) => setDraft(to, value), 300),
+    [setDraft, to]
   );
 
   const calculateBytes = (text: string) => new Blob([text]).size;
@@ -39,6 +39,7 @@ export const MessageInput = ({
       if (messageId !== undefined) {
         setMessageState({ type: chatType, key: activeChat, messageId, newState: 'ack' });
       }
+      // deno-lint-ignore no-explicit-any
     } catch (e: any) {
       setMessageState({
         type: chatType,
@@ -60,13 +61,6 @@ export const MessageInput = ({
     }
   };
 
-  const handleBeforeInput = (e: React.FormEvent<HTMLInputElement>) => {
-    const nextValue = localDraft + (e.nativeEvent as InputEvent).data;
-    if (calculateBytes(nextValue) > maxBytes) {
-      e.preventDefault();
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!localDraft.trim()) return;
@@ -74,7 +68,7 @@ export const MessageInput = ({
     startTransition(() => {
       sendText(localDraft.trim());
       setLocalDraft("");
-      setMessageDraft("");
+      clearDraft(to);
       setMessageBytes(0);
     });
   };
@@ -91,7 +85,6 @@ export const MessageInput = ({
               placeholder="Enter Message"
               value={localDraft}
               onChange={handleInputChange}
-              onBeforeInput={handleBeforeInput}
             />
           </label>
 
