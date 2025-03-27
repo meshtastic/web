@@ -55,7 +55,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
           <Avatar text={shortName} />
 
-          <div>            
+          <div>
             {node.user?.publicKey && node.user?.publicKey.length > 0
               ? (
                 <LockIcon
