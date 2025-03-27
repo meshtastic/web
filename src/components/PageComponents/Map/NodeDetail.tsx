@@ -56,7 +56,6 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
           <Avatar text={shortName} />
 
           <div>            
-
             {node.user?.publicKey && node.user?.publicKey.length > 0
               ? (
                 <LockIcon
@@ -131,7 +130,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
               </Subtle>
             </div>
           )}
-          
+
           <div className="flex gap-2 items-center">
             {node.user?.shortName && <div>"{node.user?.shortName}"</div>}
             {node.user?.id && <div>{node.user?.id}</div>}
