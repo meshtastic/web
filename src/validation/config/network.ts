@@ -11,7 +11,7 @@ import {
 
 export class NetworkValidation
   implements
-    Omit<Protobuf.Config.Config_NetworkConfig, keyof Message | "ipv4Config"> {
+  Omit<Protobuf.Config.Config_NetworkConfig, keyof Message | "ipv4Config"> {
   @IsBoolean()
   wifiEnabled: boolean;
 
@@ -33,6 +33,9 @@ export class NetworkValidation
   addressMode: Protobuf.Config.Config_NetworkConfig_AddressMode;
 
   ipv4Config: NetworkValidationIpV4Config;
+
+  @IsEnum(Protobuf.Config.Config_NetworkConfig_EnabledProtocols)
+  enabledProtocols: Protobuf.Config.Config_NetworkConfig_ProtocolFlags;
 
   @IsString()
   rsyslogServer: string;

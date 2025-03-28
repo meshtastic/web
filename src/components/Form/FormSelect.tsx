@@ -10,13 +10,14 @@ import {
   SelectValue,
 } from "@components/UI/Select.tsx";
 import { useController, type FieldValues } from "react-hook-form";
-import { computeHeadingLevel } from "@core/utils/test.tsx";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select";
   selectChange?: (e: string, name: string) => void;
   validate?: (newValue: string) => Promise<boolean>;
+  defaultValue?: string;
   properties: BaseFormBuilderProps<T>["properties"] & {
+    defaultValue?: T;
     enumValue: {
       [s: string]: string | number;
     };
@@ -38,11 +39,15 @@ export function SelectInput<T extends FieldValues>({
   disabled,
   field,
 }: GenericFormElementProps<T, SelectFieldProps<T>>) {
+  // Get default value and set it
+  const defaultValue = field.properties.defaultValue ?? field.defaultValue;
+
   const {
     field: { value, onChange, ...rest },
   } = useController({
     name: field.name,
     control,
+    defaultValue: defaultValue ? defaultValue.toString() : undefined,
   });
 
   const { enumValue, formatEnumName, ...remainingProperties } = field.properties;
@@ -70,12 +75,12 @@ export function SelectInput<T extends FieldValues>({
     onChange(Number.parseInt(newValue));
   };
 
-
   return (
     <Select
       onValueChange={handleValueChange}
       disabled={disabled}
       value={value?.toString()}
+      defaultValue={defaultValue?.toString()}
       {...remainingProperties}
       {...rest}
     >
