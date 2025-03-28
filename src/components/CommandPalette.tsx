@@ -32,6 +32,7 @@ import {
   XCircleIcon,
 } from "lucide-react";
 import { useEffect } from "react";
+import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 
 export interface Group {
   label: string;
@@ -170,6 +171,13 @@ export const CommandPalette = () => {
             void connection?.disconnect();
             setSelectedDevice(0);
             removeDevice(selectedDevice ?? 0);
+          },
+        },
+        {
+          label: "Reboot",
+          icon: PowerIcon,
+          action() {
+            connection?.reboot(0);
           },
         },
         {
