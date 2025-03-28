@@ -54,8 +54,11 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
           <Avatar text={shortName} />
-
-          <div>
+          
+          <div onFocusCapture={(e) => {
+            // Required to prevent DM tooltip auto-appearing on creation
+            e.stopPropagation();
+          }}>
             {node.user?.publicKey && node.user?.publicKey.length > 0
               ? (
                 <LockIcon
