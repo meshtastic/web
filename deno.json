@@ -1,5 +1,10 @@
 {
   "imports": {
+    "@meshtastic/core": "jsr:@meshtastic/core@^2.6.2",
+    "@meshtastic/js": "jsr:@meshtastic/js@^2.3.4",
+    "@meshtastic/transport-http": "jsr:@meshtastic/transport-http@^0.2.1",
+    "@meshtastic/transport-web-bluetooth": "jsr:@meshtastic/transport-web-bluetooth@^0.1.1",
+    "@meshtastic/transport-web-serial": "jsr:@meshtastic/transport-web-serial@^0.2.1",
     "@app/": "./src/",
     "@pages/": "./src/pages/",
     "@components/": "./src/components/",
