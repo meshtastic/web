@@ -9,9 +9,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@app': path.resolve(process.cwd(), './src'),
+      '@core': path.resolve(process.cwd(), './src/core'),
       '@pages': path.resolve(process.cwd(), './src/pages'),
       '@components': path.resolve(process.cwd(), './src/components'),
-      '@core': path.resolve(process.cwd(), './src/core'),
       '@layouts': path.resolve(process.cwd(), './src/layouts'),
     },
   },

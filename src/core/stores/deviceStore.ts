@@ -23,6 +23,7 @@ export type DialogVariant =
   | "QR"
   | "shutdown"
   | "reboot"
+  | "rebootOTA"
   | "deviceName"
   | "nodeRemoval"
   | "pkiBackup"
@@ -73,6 +74,7 @@ export interface Device {
     QR: boolean;
     shutdown: boolean;
     reboot: boolean;
+    rebootOTA: boolean;
     deviceName: boolean;
     nodeRemoval: boolean;
     pkiBackup: boolean;
@@ -175,6 +177,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             nodeDetails: false,
             unsafeRoles: false,
             refreshKeys: false,
+            rebootOTA: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
