@@ -16,31 +16,53 @@ import {
   Dot,
   LockIcon,
   LockOpenIcon,
+  MessageSquareIcon,
   MountainSnow,
   Star,
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@radix-ui/react-tooltip";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 
 export interface NodeDetailProps {
   node: ProtobufType.Mesh.NodeInfo;
 }
 
 export const NodeDetail = ({ node }: NodeDetailProps) => {
+  const { setChatType, setActiveChat } = useAppStore();
+  const { setActivePage } = useDevice();
   const name = node.user?.longName || `!${numberToHexUnpadded(node.num)}`;
+  const shortName = node.user?.shortName ?? "UNK";
   const hwModel = node.user?.hwModel ?? 0;
   const hardwareType =
     Protobuf.Mesh.HardwareModel[hwModel]?.replaceAll("_", " ") ?? `${hwModel}`;
+
+  function handleDirectMessage() {
+    setChatType("direct");
+    setActiveChat(node.num);
+    setActivePage("messages");
+  }
 
   return (
     <div className="dark:text-slate-900 p-1">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
-          <Avatar text={node.user?.shortName ?? "UNK"} />
-
-          <div>
+          <Avatar text={shortName} />
+          
+          <div onFocusCapture={(e) => {
+            // Required to prevent DM tooltip auto-appearing on creation
+            e.stopPropagation();
+          }}>
             {node.user?.publicKey && node.user?.publicKey.length > 0
               ? (
                 <LockIcon
-                  className="text-green-600"
+                  className="text-green-600 mb-1.5"
                   size={12}
                   strokeWidth={3}
                   aria-label="Public Key Enabled"
@@ -48,19 +70,42 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
               )
               : (
                 <LockOpenIcon
-                  className="text-yellow-500"
+                  className="text-yellow-500 mb-1.5"
                   size={12}
                   strokeWidth={3}
                   aria-label="No Public Key"
                 />
               )}
-          </div>
 
-          <Star
-            fill={node.isFavorite ? "black" : "none"}
-            size={15}
-            aria-label={node.isFavorite ? "Favorite" : "Not a Favorite"}
-          />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <MessageSquareIcon 
+                    size={14}
+                    onClick={handleDirectMessage}
+                    className="cursor-pointer hover:text-blue-500"
+                    title="Send Message"
+                  />
+                </TooltipTrigger>
+                <TooltipPortal>
+                  <TooltipContent
+                    className="rounded-md bg-slate-800 px-3 py-1.5 text-sm text-white shadow-md animate-in fade-in-0 zoom-in-95"
+                    side="top"
+                    align="center"
+                    sideOffset={5}
+                  >
+                    Direct Message {shortName}
+                  </TooltipContent>
+                </TooltipPortal>
+              </Tooltip>
+            </TooltipProvider>
+
+            <Star
+              fill={node.isFavorite ? "black" : "none"}
+              size={15}
+              aria-label={node.isFavorite ? "Favorite" : "Not a Favorite"}
+            />
+          </div>
         </div>
 
         <div>
@@ -70,7 +115,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
 
           {!!node.deviceMetrics?.batteryLevel && (
             <div
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 mt-0.5"
               title={`${node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
                 } volts`}
             >
