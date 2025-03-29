@@ -7,6 +7,7 @@ export interface SidebarButtonProps {
   Icon?: LucideIcon;
   element?;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 export const SidebarButton = ({
@@ -15,12 +16,14 @@ export const SidebarButton = ({
   Icon,
   element,
   onClick,
+  disabled = false,
 }: SidebarButtonProps) => (
   <Button
     onClick={onClick}
     variant={active ? "subtle" : "ghost"}
     size="sm"
     className="flex gap-2 w-full"
+    disabled={disabled}
   >
     {Icon && <Icon size={16} />}
     {element && element}
