@@ -33,7 +33,7 @@ import {
 import { useEffect } from "react";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { cn } from "@core/utils/cn.ts";
-import { usePinnedItems } from "@core/hooks/usePinnedItems.tsx";
+import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
 
 export interface Group {
   label: string;
