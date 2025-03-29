@@ -74,7 +74,7 @@ export const Position = () => {
               name: "positionFlags",
               value: activeFlags,
               isChecked: (name: string) =>
-                activeFlags?.includes(name as FlagName) ?? false,
+              activeFlags?.includes(name as FlagName) ?? false,
               onValueChange: onPositonFlagChange,
               label: "Position Flags",
               placeholder: "Select position flags...",

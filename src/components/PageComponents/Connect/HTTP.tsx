@@ -11,6 +11,7 @@ import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { useState } from "react";
 import { useForm, useController } from "react-hook-form";
+import { useMessageStore } from "@core/stores/messageStore.ts";
 
 interface FormData {
   ip: string;
@@ -21,6 +22,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   const isURLHTTPS = location.protocol === "https:";
 
   const { addDevice } = useDeviceStore();
+  const messageStore = useMessageStore();
   const { setSelectedDevice } = useAppStore();
 
   const { control, handleSubmit, register } = useForm<FormData>({
@@ -49,7 +51,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
     connection.configure();
     setSelectedDevice(id);
     device.addConnection(connection);
-    subscribeAll(device, connection);
+    subscribeAll(device, connection, messageStore);
     closeDialog();
   });
 

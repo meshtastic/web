@@ -5,13 +5,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import { useDeviceStore } from "@core/stores/deviceStore.ts";
+import { MessageState, useDeviceStore } from "@core/stores/deviceStore.ts";
 import { cn } from "@core/utils/cn.ts";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ReactNode, useMemo } from "react";
-import { Message, MessageState } from "@core/services/types.ts";
+import { Message } from "@core/stores/messageStore.ts";
 
 interface MessageProps {
   lastMsgSameUser: boolean;
@@ -73,14 +73,15 @@ const getMessageTextStyles = (status: MessageStatus) => {
   );
 };
 
-const TimeDisplay = ({ date, className }: { date: Date; className?: string }) => (
-  <div className={cn("flex items-center gap-2 shrink-0", className)}>
-    <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">{date.toLocaleDateString()}</span>
+const TimeDisplay = ({ date, className }: { date: Date; className?: string }) => {
+  const _date = new Date(date);
+  return (<div className={cn("flex items-center gap-2 shrink-0", className)}>
+    <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">{_date?.toLocaleDateString()}</span>
     <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-      {date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
+      {_date?.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
     </span>
-  </div>
-);
+  </div>)
+};
 
 export const MessageItem = ({ lastMsgSameUser, message }: MessageProps) => {
   const { getDevices } = useDeviceStore();

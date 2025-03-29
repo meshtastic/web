@@ -1,4 +1,3 @@
-import { Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create } from "zustand";
 
@@ -25,14 +24,11 @@ interface AppState {
     id: number;
     num: number;
   }[];
-
   rasterSources: RasterSource[];
   commandPaletteOpen: boolean;
   nodeNumToBeRemoved: number;
   connectDialogOpen: boolean;
   nodeNumDetails: number;
-  activeChat: number;
-  chatType: "broadcast" | "direct";
   errors: ErrorState[];
 
   setRasterSources: (sources: RasterSource[]) => void;
@@ -45,8 +41,6 @@ interface AppState {
   setNodeNumToBeRemoved: (nodeNum: number) => void;
   setConnectDialogOpen: (open: boolean) => void;
   setNodeNumDetails: (nodeNum: number) => void;
-  setActiveChat: (chat: number) => void;
-  setChatType: (type: "broadcast" | "direct") => void;
 
   // Error management
   hasErrors: () => boolean;
@@ -67,8 +61,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
   nodeNumDetails: 0,
-  activeChat: Types.ChannelNumber.Primary,
-  chatType: "broadcast",
   errors: [],
 
   setRasterSources: (sources: RasterSource[]) => {
@@ -126,14 +118,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
   setNodeNumDetails: (nodeNum) =>
     set(() => ({
       nodeNumDetails: nodeNum,
-    })),
-  setActiveChat: (chat) =>
-    set(() => ({
-      activeChat: chat,
-    })),
-  setChatType: (type) =>
-    set(() => ({
-      chatType: type,
     })),
   hasErrors: () => {
     const state = get();
