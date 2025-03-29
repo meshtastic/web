@@ -1,4 +1,3 @@
-import { Avatar } from "./UI/Avatar.tsx";
 import {
   CommandDialog,
   CommandEmpty,
@@ -18,7 +17,6 @@ import {
   FactoryIcon,
   LayersIcon,
   LinkIcon,
-  type LucideIcon,
   MapIcon,
   MessageSquareIcon,
   PlusIcon,
@@ -29,10 +27,13 @@ import {
   SmartphoneIcon,
   TrashIcon,
   UsersIcon,
-  XCircleIcon,
+  Pin,
+  type LucideIcon,
 } from "lucide-react";
 import { useEffect } from "react";
-import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
+import { Avatar } from "@components/UI/Avatar.tsx";
+import { cn } from "@core/utils/cn.ts";
+import { usePinnedItems } from "@core/hooks/usePinnedItems.tsx";
 
 export interface Group {
   label: string;
@@ -46,7 +47,6 @@ export interface Command {
   subItems?: SubItem[];
   tags?: string[];
 }
-
 export interface SubItem {
   label: string;
   icon: React.ReactNode;
@@ -58,11 +58,10 @@ export const CommandPalette = () => {
     commandPaletteOpen,
     setCommandPaletteOpen,
     setSelectedDevice,
-    removeDevice,
-    selectedDevice,
   } = useAppStore();
   const { getDevices } = useDeviceStore();
   const { setDialogOpen, setActivePage, connection } = useDevice();
+  const { pinnedItems, togglePinnedItem } = usePinnedItems({ storageName: 'pinnedCommandMenuGroups' });
 
   const groups: Group[] = [
     {
@@ -114,22 +113,22 @@ export const CommandPalette = () => {
         {
           label: "Switch Node",
           icon: ArrowLeftRightIcon,
-          subItems: getDevices().map((device) => {
-            return {
-              label:
-                device.nodes.get(device.hardware.myNodeNum)?.user?.longName ??
-                device.hardware.myNodeNum.toString(),
-              icon: (
-                <Avatar
-                  text={device.nodes.get(device.hardware.myNodeNum)?.user
-                    ?.shortName ?? device.hardware.myNodeNum.toString()}
-                />
-              ),
-              action() {
-                setSelectedDevice(device.id);
-              },
-            };
-          }),
+          subItems: getDevices().map((device) => ({
+            label:
+              device.nodes.get(device.hardware.myNodeNum)?.user?.longName ??
+              device.hardware.myNodeNum.toString(),
+            icon: (
+              <Avatar
+                text={
+                  device.nodes.get(device.hardware.myNodeNum)?.user?.shortName ??
+                  device.hardware.myNodeNum.toString()
+                }
+              />
+            ),
+            action() {
+              setSelectedDevice(device.id);
+            },
+          })),
         },
         {
           label: "Connect New Node",
@@ -165,22 +164,6 @@ export const CommandPalette = () => {
           ],
         },
         {
-          label: "Disconnect",
-          icon: XCircleIcon,
-          action() {
-            void connection?.disconnect();
-            setSelectedDevice(0);
-            removeDevice(selectedDevice ?? 0);
-          },
-        },
-        {
-          label: "Reboot",
-          icon: PowerIcon,
-          action() {
-            connection?.reboot(0);
-          },
-        },
-        {
           label: "Schedule Shutdown",
           icon: PowerIcon,
           action() {
@@ -192,6 +175,13 @@ export const CommandPalette = () => {
           icon: RefreshCwIcon,
           action() {
             setDialogOpen("reboot", true);
+          },
+        },
+        {
+          label: "Reboot To OTA Mode",
+          icon: RefreshCwIcon,
+          action() {
+            setDialogOpen("rebootOTA", true);
           },
         },
         {
@@ -239,6 +229,12 @@ export const CommandPalette = () => {
     },
   ];
 
+  const sortedGroups = [...groups].sort((a, b) => {
+    const aPinned = pinnedItems.includes(a.label) ? 1 : 0;
+    const bPinned = pinnedItems.includes(b.label) ? 1 : 0;
+    return bPinned - aPinned;
+  });
+
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -252,15 +248,45 @@ export const CommandPalette = () => {
   }, [setCommandPaletteOpen]);
 
   return (
-    <CommandDialog
-      open={commandPaletteOpen}
-      onOpenChange={setCommandPaletteOpen}
-    >
+    <CommandDialog open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen}>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        {groups.map((group) => (
-          <CommandGroup key={group.label} heading={group.label}>
+        {sortedGroups.map((group) => (
+          <CommandGroup
+            key={group.label}
+            heading={
+              <div className="flex items-center justify-between">
+                <span>{group.label}</span>
+                <button
+                  type="button"
+                  onClick={() => togglePinnedItem(group.label)}
+                  className={cn(
+                    "transition-all duration-300 scale-100 cursor-pointer m-0.5 p-2 focus:*:data-label:opacity-100"
+                  )}
+                  aria-description={
+                    pinnedItems.includes(group.label)
+                      ? "Unpin command group"
+                      : "Pin command group"
+                  }
+                >
+                  <span
+                    data-label
+                    className="transition-all block absolute w-full mb-auto mt-auto ml-0 mr-0 text-xs left-0 -top-5 opacity-0 rounded-lg"
+                  />
+                  <Pin
+                    size={16}
+                    className={cn(
+                      "transition-opacity",
+                      pinnedItems.includes(group.label)
+                        ? "opacity-100 text-red-500"
+                        : "opacity-40 hover:opacity-70"
+                    )}
+                  />
+                </button>
+              </div>
+            }
+          >
             {group.commands.map((command) => (
               <div key={command.label}>
                 <CommandItem

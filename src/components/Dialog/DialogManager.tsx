@@ -9,6 +9,7 @@ import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
+import { RebootOTADialog } from "@components/Dialog/RebootOTADialog.tsx";
 
 export const DialogManager = () => {
   const { channels, config, dialog, setDialogOpen } = useDevice();
@@ -75,6 +76,12 @@ export const DialogManager = () => {
         open={dialog.refreshKeys}
         onOpenChange={(open) => {
           setDialogOpen("refreshKeys", open);
+        }}
+      />
+      <RebootOTADialog
+        open={dialog.rebootOTA}
+        onOpenChange={(open) => {
+          setDialogOpen("rebootOTA", open);
         }}
       />
     </>
