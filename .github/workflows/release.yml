@@ -46,7 +46,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            ./Containerfile
+            ./infra/Containerfile
           image: ${{github.event.repository.full_name}}
           tags: latest ${{ github.sha }}
           oci: true
