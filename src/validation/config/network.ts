@@ -1,64 +1,27 @@
-import type { Message } from "@bufbuild/protobuf";
+import { z } from "zod";
 import { Protobuf } from "@meshtastic/core";
-import {
-  IsBoolean,
-  IsEnum,
-  IsIP,
-  IsOptional,
-  IsString,
-  Length,
-} from "class-validator";
 
-export class NetworkValidation
-  implements
-  Omit<Protobuf.Config.Config_NetworkConfig, keyof Message | "ipv4Config"> {
-  @IsBoolean()
-  wifiEnabled: boolean;
+const AddressModeEnum = z.nativeEnum(Protobuf.Config.Config_NetworkConfig_AddressMode);
+const ProtocolFlagsEnum = z.nativeEnum(Protobuf.Config.Config_NetworkConfig_ProtocolFlags);
 
-  @Length(1, 33)
-  @IsOptional({})
-  wifiSsid: string;
+export const NetworkValidationIpV4ConfigSchema = z.object({
+  ip: z.string().ip(),
+  gateway: z.string().ip(),
+  subnet: z.string().ip(),
+  dns: z.string().ip(),
+});
 
-  @Length(8, 64)
-  @IsOptional()
-  wifiPsk: string;
+export const NetworkValidationSchema = z.object({
+  wifiEnabled: z.boolean(),
+  wifiSsid: z.string().min(0).max(33).optional(),
+  wifiPsk: z.string().min(0).max(64).optional(),
+  ntpServer: z.string().min(2).max(30),
+  ethEnabled: z.boolean(),
+  addressMode: AddressModeEnum,
+  ipv4Config: NetworkValidationIpV4ConfigSchema.optional(),
+  enabledProtocols: ProtocolFlagsEnum,
+  rsyslogServer: z.string(),
+});
 
-  @Length(2, 30)
-  ntpServer: string;
+export type NetworkValidation = z.infer<typeof NetworkValidationSchema>;
 
-  @IsBoolean()
-  ethEnabled: boolean;
-
-  @IsEnum(Protobuf.Config.Config_NetworkConfig_AddressMode)
-  addressMode: Protobuf.Config.Config_NetworkConfig_AddressMode;
-
-  ipv4Config: NetworkValidationIpV4Config;
-
-  @IsEnum(Protobuf.Config.Config_NetworkConfig_EnabledProtocols)
-  enabledProtocols: Protobuf.Config.Config_NetworkConfig_ProtocolFlags;
-
-  @IsString()
-  rsyslogServer: string;
-}
-
-export class NetworkValidationIpV4Config implements
-  Omit<
-    Protobuf.Config.Config_NetworkConfig_IpV4Config,
-    keyof Message | "ip" | "gateway" | "subnet" | "dns"
-  > {
-  @IsIP()
-  @IsOptional()
-  ip: string;
-
-  @IsIP()
-  @IsOptional()
-  gateway: string;
-
-  @IsIP()
-  @IsOptional()
-  subnet: string;
-
-  @IsIP()
-  @IsOptional()
-  dns: string;
-}

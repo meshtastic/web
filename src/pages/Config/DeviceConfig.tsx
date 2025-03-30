@@ -31,7 +31,6 @@ export const DeviceConfig = () => {
     {
       label: "Network",
       element: Network,
-      // disabled: !metadata.get(0)?.hasWifi,
     },
     {
       label: "Display",

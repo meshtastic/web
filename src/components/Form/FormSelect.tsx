@@ -39,15 +39,11 @@ export function SelectInput<T extends FieldValues>({
   disabled,
   field,
 }: GenericFormElementProps<T, SelectFieldProps<T>>) {
-  // Get default value and set it
-  const defaultValue = field.properties.defaultValue ?? field.defaultValue;
-
   const {
     field: { value, onChange, ...rest },
   } = useController({
     name: field.name,
     control,
-    defaultValue: defaultValue ? defaultValue.toString() : undefined,
   });
 
   const { enumValue, formatEnumName, ...remainingProperties } = field.properties;
@@ -80,7 +76,6 @@ export function SelectInput<T extends FieldValues>({
       onValueChange={handleValueChange}
       disabled={disabled}
       value={value?.toString()}
-      defaultValue={defaultValue?.toString()}
       {...remainingProperties}
       {...rest}
     >

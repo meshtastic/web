@@ -1,4 +1,4 @@
-import type { NetworkValidation } from "@app/validation/config/network.ts";
+import { NetworkValidationSchema, type NetworkValidation } from "@app/validation/config/network.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -7,13 +7,19 @@ import {
   convertIpAddressToInt,
 } from "@core/utils/ip.ts";
 import { Protobuf } from "@meshtastic/core";
+import { validateSchema } from "@app/validation/validate.ts";
 
 export const Network = () => {
   const { config, setWorkingConfig } = useDevice();
 
-  const onSubmit = (data: NetworkValidation) => {
+  console.log(config.network);
 
-    console.log("Network data", data);
+  const onSubmit = (data: NetworkValidation) => {
+    const result = validateSchema(NetworkValidationSchema, data);
+
+    if (!result.success) {
+      console.error("Validation errors:", result.errors);
+    }
 
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
@@ -24,10 +30,10 @@ export const Network = () => {
             ipv4Config: create(
               Protobuf.Config.Config_NetworkConfig_IpV4ConfigSchema,
               {
-                ip: convertIpAddressToInt(data?.ipv4Config?.ip) ?? 0,
-                gateway: convertIpAddressToInt(data.ipv4Config.gateway) ?? 0,
-                subnet: convertIpAddressToInt(data.ipv4Config.subnet) ?? 0,
-                dns: convertIpAddressToInt(data.ipv4Config.dns) ?? 0,
+                ip: convertIpAddressToInt(data.ipv4Config?.ip ?? ""),
+                gateway: convertIpAddressToInt(data.ipv4Config?.gateway ?? ""),
+                subnet: convertIpAddressToInt(data.ipv4Config?.subnet ?? ""),
+                dns: convertIpAddressToInt(data.ipv4Config?.dns ?? ""),
               },
             ),
           },
@@ -51,6 +57,8 @@ export const Network = () => {
           ),
           dns: convertIntToIpAddress(config.network?.ipv4Config?.dns ?? 0),
         },
+        enabledProtocols: config.network?.enabledProtocols ?? Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST
+
       }}
       fieldGroups={[
         {
@@ -175,7 +183,7 @@ export const Network = () => {
             {
               type: "select",
               name: "enabledProtocols",
-              label: "Mesh via UDP enabled",
+              label: "Mesh via UDP",
               properties: {
                 enumValue:
                   Protobuf.Config.Config_NetworkConfig_ProtocolFlags,
