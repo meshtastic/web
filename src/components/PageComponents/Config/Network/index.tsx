@@ -12,8 +12,6 @@ import { validateSchema } from "@app/validation/validate.ts";
 export const Network = () => {
   const { config, setWorkingConfig } = useDevice();
 
-  console.log(config.network);
-
   const onSubmit = (data: NetworkValidation) => {
     const result = validateSchema(NetworkValidationSchema, data);
 
