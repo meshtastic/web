@@ -88,15 +88,16 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
         </div>
 
         {connectionError && (
-          <div className="mt-4 p-3 bg-amber-100 dark:bg-amber-900 rounded-md border border-amber-300 dark:border-amber-700">
+          <div className="mt-2 mb-2 p-3 rounded-md bg-amber-100 border border-amber-300 dark:bg-amber-900 dark:border-amber-700">
             <div className="flex gap-2 items-start">
-              <AlertTriangle className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" size={20} />
+              <AlertTriangle className="shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" size={20} />
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
                   Connection Failed
                 </p>
-                <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
-                  Could not connect to the device. If using HTTPS, you may need to accept a self-signed certificate first. Please open{" "}
+                <p className="text-xs mt-1 text-amber-700 dark:text-amber-400">
+                  Could not connect to the device. {connectionError.secure && "If using HTTPS, you may need to accept a self-signed certificate first. "}
+                  Please open{" "}
                   <a
                     href={`${connectionError.secure ? "https" : "http"}://${connectionError.host}`}
                     target="_blank"
@@ -104,8 +105,16 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
                     className="underline font-medium"
                   >
                     {`${connectionError.secure ? "https" : "http"}://${connectionError.host}`}
+                  </a>{" "}
+                  in a new tab{connectionError.secure ? ", accept any TLS warnings if prompted, then try again" : ""}.{" "}
+                  <a
+                    href="https://meshtastic.org/docs/software/web-client/#http"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline font-medium"
+                  >
+                    Learn more
                   </a>
-                  {" "}in a new tab, accept any certificate warnings if prompted, then return here to try connecting again.
                 </p>
               </div>
             </div>
