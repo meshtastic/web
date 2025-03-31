@@ -11,6 +11,7 @@ import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { useState } from "react";
 import { useForm, useController } from "react-hook-form";
+import { AlertTriangle } from "lucide-react";
 import { useMessageStore } from "@core/stores/messageStore.ts";
 
 interface FormData {
@@ -41,23 +42,33 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   } = useController({ name: "tls", control });
 
   const [connectionInProgress, setConnectionInProgress] = useState(false);
+  const [connectionError, setConnectionError] = useState<{ host: string; secure: boolean } | null>(null);
 
   const onSubmit = handleSubmit(async (data) => {
     setConnectionInProgress(true);
-    const id = randId();
-    const device = addDevice(id);
-    const transport = await TransportHTTP.create(data.ip, data.tls);
-    const connection = new MeshDevice(transport, id);
-    connection.configure();
-    setSelectedDevice(id);
-    device.addConnection(connection);
-    subscribeAll(device, connection, messageStore);
-    closeDialog();
+    setConnectionError(null);
+
+    try {
+      const id = randId();
+      const transport = await TransportHTTP.create(data.ip, data.tls);
+      const device = addDevice(id);
+      const connection = new MeshDevice(transport, id);
+      connection.configure();
+      setSelectedDevice(id);
+      device.addConnection(connection);
+      subscribeAll(device, connection, messageStore);
+      closeDialog();
+    } catch (error) {
+      console.error("Connection error:", error);
+      // Capture all connection errors regardless of type
+      setConnectionError({ host: data.ip, secure: data.tls });
+      setConnectionInProgress(false);
+    }
   });
 
   return (
     <form className="flex w-full flex-col gap-2 p-4" onSubmit={onSubmit}>
-      <div className="flex h-48 flex-col gap-2">
+      <div className="flex flex-col gap-2" style={{ minHeight: "12rem" }}>
         <div>
           <Label>IP Address/Hostname</Label>
           <Input
@@ -76,8 +87,32 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
             {...register("tls")}
           />
           <Label>Use HTTPS</Label>
-
         </div>
+
+        {connectionError && (
+          <div className="mt-4 p-3 bg-amber-100 dark:bg-amber-900 rounded-md border border-amber-300 dark:border-amber-700">
+            <div className="flex gap-2 items-start">
+              <AlertTriangle className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" size={20} />
+              <div>
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                  Connection Failed
+                </p>
+                <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
+                  Could not connect to the device. If using HTTPS, you may need to accept a self-signed certificate first. Please open{" "}
+                  <a
+                    href={`${connectionError.secure ? "https" : "http"}://${connectionError.host}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline font-medium"
+                  >
+                    {`${connectionError.secure ? "https" : "http"}://${connectionError.host}`}
+                  </a>
+                  {" "}in a new tab, accept any certificate warnings if prompted, then return here to try connecting again.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <Button
         type="submit"
