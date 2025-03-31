@@ -1,6 +1,7 @@
 import type { TabElementProps } from "@components/Dialog/NewDeviceDialog.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
+import { Link } from "@components/UI/Typography/Link.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
@@ -88,33 +89,29 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
         </div>
 
         {connectionError && (
-          <div className="mt-2 mb-2 p-3 rounded-md bg-amber-100 border border-amber-300 dark:bg-amber-900 dark:border-amber-700">
+          <div className="mt-2 mb-2 p-3 rounded-md bg-amber-100 border border-amber-300 dark:bg-amber-100 dark:border-amber-300">
             <div className="flex gap-2 items-start">
-              <AlertTriangle className="shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" size={20} />
+              <AlertTriangle className="shrink-0 mt-0.5 text-amber-600 dark:text-amber-600" size={20} />
               <div>
-                <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-800">
                   Connection Failed
                 </p>
-                <p className="text-xs mt-1 text-amber-700 dark:text-amber-400">
+                <p className="text-xs mt-1 text-amber-700 dark:text-amber-700">
                   Could not connect to the device. {connectionError.secure && "If using HTTPS, you may need to accept a self-signed certificate first. "}
                   Please open{" "}
-                  <a
+                  <Link
                     href={`${connectionError.secure ? "https" : "http"}://${connectionError.host}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline font-medium"
+                    className="underline font-medium text-amber-800 dark:text-amber-800"
                   >
                     {`${connectionError.secure ? "https" : "http"}://${connectionError.host}`}
-                  </a>{" "}
+                  </Link>{" "}
                   in a new tab{connectionError.secure ? ", accept any TLS warnings if prompted, then try again" : ""}.{" "}
-                  <a
+                  <Link
                     href="https://meshtastic.org/docs/software/web-client/#http"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline font-medium"
+                    className="underline font-medium text-amber-800 dark:text-amber-800"
                   >
                     Learn more
-                  </a>
+                  </Link>
                 </p>
               </div>
             </div>
