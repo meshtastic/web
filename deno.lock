@@ -1,11 +1,15 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@meshtastic/core@^2.6.0": "2.6.2",
+    "jsr:@meshtastic/core@^2.6.2": "2.6.2",
+    "jsr:@meshtastic/js@^2.3.4": "2.3.4",
+    "jsr:@meshtastic/protobufs@^2.3.12": "2.6.2",
+    "jsr:@meshtastic/protobufs@^2.6.2": "2.6.2",
+    "jsr:@meshtastic/transport-http@~0.2.1": "0.2.1",
+    "jsr:@meshtastic/transport-web-bluetooth@~0.1.1": "0.1.1",
+    "jsr:@meshtastic/transport-web-serial@~0.2.1": "0.2.1",
     "npm:@bufbuild/protobuf@^2.2.3": "2.2.3",
-    "npm:@jsr/meshtastic__core@2.6.0-0": "2.6.0-0",
-    "npm:@jsr/meshtastic__js@2.6.0-0": "2.6.0-0",
-    "npm:@jsr/meshtastic__transport-http@*": "0.2.1",
-    "npm:@jsr/meshtastic__transport-web-serial@*": "0.2.1",
     "npm:@noble/curves@^1.8.1": "1.8.1",
     "npm:@radix-ui/react-accordion@^1.2.3": "1.2.3_@types+react@19.0.10_@types+react-dom@19.0.4__@types+react@19.0.10_react@19.0.0_react-dom@19.0.0__react@19.0.0",
     "npm:@radix-ui/react-checkbox@^1.1.4": "1.1.4_@types+react@19.0.10_@types+react-dom@19.0.4__@types+react@19.0.10_react@19.0.0_react-dom@19.0.0__react@19.0.0",
@@ -73,7 +77,47 @@
     "npm:vite@*": "6.2.0_@types+node@22.13.8",
     "npm:vite@^6.2.0": "6.2.0_@types+node@22.13.8",
     "npm:vitest@^3.0.7": "3.0.8_@types+node@22.13.8_happy-dom@17.2.2_vite@6.2.0__@types+node@22.13.8_@vitest+browser@3.0.8__playwright@1.50.1__vitest@3.0.8___@types+node@22.13.8___happy-dom@17.2.2___@vitest+browser@3.0.8____playwright@1.50.1____vitest@3.0.8____msw@2.7.3_____typescript@5.8.2_____@types+node@22.13.8____vite@6.2.0_____@types+node@22.13.8____typescript@5.8.2____@types+node@22.13.8____happy-dom@17.2.2___playwright@1.50.1___vite@6.2.0____@types+node@22.13.8___typescript@5.8.2__vitest@3.0.8__typescript@5.8.2__msw@2.7.3___typescript@5.8.2___@types+node@22.13.8__vite@6.2.0___@types+node@22.13.8__@types+node@22.13.8_playwright@1.50.1_typescript@5.8.2",
+    "npm:zod@^3.24.2": "3.24.2",
     "npm:zustand@5.0.3": "5.0.3_@types+react@19.0.10_immer@10.1.1_react@19.0.0"
+  },
+  "jsr": {
+    "@meshtastic/core@2.6.2": {
+      "integrity": "5c948bbbfad280c5eb093c62edc84773f76509487b333066ec4a349f40dcacf2",
+      "dependencies": [
+        "jsr:@meshtastic/protobufs@^2.6.2",
+        "npm:@bufbuild/protobuf",
+        "npm:crc",
+        "npm:ste-simple-events",
+        "npm:tslog@^4.9.3"
+      ]
+    },
+    "@meshtastic/js@2.3.4": {
+      "integrity": "7a81a36fb7ef1b7b68a3989c02d50f687114ac56bcd7f0452a31ef560ac99719",
+      "dependencies": [
+        "jsr:@meshtastic/protobufs@^2.3.12",
+        "npm:crc",
+        "npm:ste-simple-events",
+        "npm:tslog@^4.9.2"
+      ]
+    },
+    "@meshtastic/protobufs@2.6.2": {
+      "integrity": "55e9b98fc22ea0d28e6a7979e4ff0a5f2c94513c1bc93e67522636a89925ad69",
+      "dependencies": [
+        "npm:@bufbuild/protobuf"
+      ]
+    },
+    "@meshtastic/transport-http@0.2.1": {
+      "integrity": "4d086ee6d5665c3490736737c4354eb3049edf792b1d195b30a3254cb535a7d6"
+    },
+    "@meshtastic/transport-web-bluetooth@0.1.1": {
+      "integrity": "f7676b98e2049ad0bca508e34054730b22cf2648019921989f11297441fe958d"
+    },
+    "@meshtastic/transport-web-serial@0.2.1": {
+      "integrity": "d09fa8ac278b105c8f2b3a72af9cf8a5676baac6f4e9111c6773ff6217e2d5be",
+      "dependencies": [
+        "jsr:@meshtastic/core@^2.6.0"
+      ]
+    }
   },
   "npm": {
     "@adobe/css-tools@4.4.2": {
@@ -1080,54 +1124,6 @@
       "dependencies": [
         "@jridgewell/resolve-uri",
         "@jridgewell/sourcemap-codec"
-      ]
-    },
-    "@jsr/meshtastic__core@2.6.0": {
-      "integrity": "sha512-+Ik6gzZnfi5sW+WC06bRayA6KGF2NI+zi3bqKbvA8mGDNSOPgsFhA4VZ79DKY4bSflTW170MRIUeyYo0IWQQuw==",
-      "dependencies": [
-        "@bufbuild/protobuf",
-        "@jsr/meshtastic__protobufs",
-        "crc",
-        "ste-simple-events",
-        "tslog"
-      ]
-    },
-    "@jsr/meshtastic__core@2.6.0-0": {
-      "integrity": "sha512-Ks71sRagbBipotznULpsJZ1EMcQIqCEJQx6mf628dmCNVf2YECi2zi/i/5zErp1hGPgfbDvCz9oPogvsd/7fMA==",
-      "dependencies": [
-        "@bufbuild/protobuf",
-        "@jsr/meshtastic__protobufs",
-        "crc",
-        "ste-simple-events",
-        "tslog"
-      ]
-    },
-    "@jsr/meshtastic__js@2.6.0-0": {
-      "integrity": "sha512-+xpZpxK6oUIVOuEs7C+LyxRr2druvc7UNNNTK9Rl8ioXj63Jz1uQXlYe2Gj0xjnRAiSQLR7QVaPef21BR/YTxA==",
-      "dependencies": [
-        "@bufbuild/protobuf",
-        "@jsr/meshtastic__protobufs",
-        "crc",
-        "ste-simple-events",
-        "tslog"
-      ]
-    },
-    "@jsr/meshtastic__protobufs@2.6.0": {
-      "integrity": "sha512-CGlgBdzAuQCZuGPrnzP8zU+EcLlmyYeeMbqFHuJ834cYfArWXDjDh1UYaPo2rI03LTjqa3MeWpfqDlzBR8kIMg==",
-      "dependencies": [
-        "@bufbuild/protobuf"
-      ]
-    },
-    "@jsr/meshtastic__transport-http@0.2.1": {
-      "integrity": "sha512-lmQKr3aIINKvtGROU4HchmSVqbZSbkIHqajowRRC8IAjsnR0zNTyxz210QyY4pFUF9hpcW3GRjwq5h/VO2JuGg==",
-      "dependencies": [
-        "@jsr/meshtastic__core@2.6.0"
-      ]
-    },
-    "@jsr/meshtastic__transport-web-serial@0.2.1": {
-      "integrity": "sha512-yumjEGLkAuJYOC3aWKvZzbQqi/LnqaKfNpVCY7Ki7oLtAshNiZrBLiwiFhN7+ZR9FfMdJThyBMqREBDRRWTO1Q==",
-      "dependencies": [
-        "@jsr/meshtastic__core@2.6.0"
       ]
     },
     "@mapbox/geojson-rewind@0.5.2": {
@@ -6869,6 +6865,9 @@
     "yoctocolors-cjs@2.1.2": {
       "integrity": "sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA=="
     },
+    "zod@3.24.2": {
+      "integrity": "sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ=="
+    },
     "zone.js@0.8.29": {
       "integrity": "sha512-mla2acNCMkWXBD+c+yeUrBUrzOxYMNFdQ6FGfigGGtEVBPJx07BQeJekjt9DmH1FtZek4E9rE1eRR9qQpxACOQ=="
     },
@@ -6882,13 +6881,16 @@
     }
   },
   "workspace": {
+    "dependencies": [
+      "jsr:@meshtastic/core@^2.6.2",
+      "jsr:@meshtastic/js@^2.3.4",
+      "jsr:@meshtastic/transport-http@~0.2.1",
+      "jsr:@meshtastic/transport-web-bluetooth@~0.1.1",
+      "jsr:@meshtastic/transport-web-serial@~0.2.1"
+    ],
     "packageJson": {
       "dependencies": [
         "npm:@bufbuild/protobuf@^2.2.3",
-        "npm:@jsr/meshtastic__core@2.6.0-0",
-        "npm:@jsr/meshtastic__js@2.6.0-0",
-        "npm:@jsr/meshtastic__transport-http@*",
-        "npm:@jsr/meshtastic__transport-web-serial@*",
         "npm:@noble/curves@^1.8.1",
         "npm:@radix-ui/react-accordion@^1.2.3",
         "npm:@radix-ui/react-checkbox@^1.1.4",
@@ -6950,6 +6952,7 @@
         "npm:vite-plugin-pwa@~0.21.1",
         "npm:vite@^6.2.0",
         "npm:vitest@^3.0.7",
+        "npm:zod@^3.24.2",
         "npm:zustand@5.0.3"
       ]
     }
