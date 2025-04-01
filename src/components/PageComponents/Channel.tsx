@@ -34,9 +34,10 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
       settings: {
         ...data.settings,
         psk: toByteArray(pass),
-        moduleSettings: {...data.settings.moduleSettings,
+        moduleSettings: create(Protobuf.Channel.ModuleSettingsSchema, {
+          ...data.settings.moduleSettings,
           positionPrecision: data.settings.moduleSettings.positionPrecision,
-        },
+        }),
       },
     });
     connection?.setChannel(channel).then(() => {
