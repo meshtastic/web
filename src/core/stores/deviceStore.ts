@@ -28,7 +28,8 @@ export type DialogVariant =
   | "pkiBackup"
   | "nodeDetails"
   | "unsafeRoles"
-  | "refreshKeys";
+  | "refreshKeys"
+  | "clearMessages";
 
 type NodeError = {
   node: number;
@@ -69,6 +70,7 @@ export interface Device {
     nodeDetails: boolean;
     unsafeRoles: boolean;
     refreshKeys: boolean;
+    clearMessages: boolean;
   };
 
 

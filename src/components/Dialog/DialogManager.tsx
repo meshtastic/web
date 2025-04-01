@@ -9,6 +9,7 @@ import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
+import { ClearMessagesDialog } from "@components/Dialog/ClearMessagesDialog/ClearMessagesDialog.tsx";
 
 export const DialogManager = () => {
   const { channels, config, dialog, setDialogOpen } = useDevice();
@@ -75,6 +76,12 @@ export const DialogManager = () => {
         open={dialog.refreshKeys}
         onOpenChange={(open) => {
           setDialogOpen("refreshKeys", open);
+        }}
+      />
+      <ClearMessagesDialog
+        open={dialog.clearMessages}
+        onOpenChange={(open) => {
+          setDialogOpen("clearMessages", open);
         }}
       />
     </>
