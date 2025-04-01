@@ -5,23 +5,33 @@ class PacketToMessageDTO {
   channel: Types.ChannelNumber;
   to: number;
   from: number;
-  date: string;
+  date: number; // (timestamp ms)
   messageId: number;
   state: MessageState;
   message: string;
   type: MessageType;
 
   constructor(data: Types.PacketMetadata<string>, nodeNum: number) {
-    const payload = data
+    this.channel = data.channel;
+    this.to = data.to;
+    this.from = data.from;
+    this.messageId = data.id;
+    this.state = data.from !== nodeNum ? MessageState.Ack : MessageState.Waiting;
+    this.message = data.data;
+    this.type = (data.type === 'direct') ? MessageType.Direct : MessageType.Broadcast;
 
-    this.channel = payload.channel
-    this.to = payload.to;
-    this.from = payload.from;
-    this.date = new Date(payload.rxTime).toISOString();
-    this.messageId = payload.id;
-    this.state = payload.from !== nodeNum ? "ack" : "waiting";
-    this.message = payload.data;
-    this.type = payload.type;
+    let dateTimestamp = Date.now();
+    if (data.rxTime instanceof Date) {
+      const timeValue = data.rxTime.getTime();
+
+      if (!isNaN(timeValue)) {
+        dateTimestamp = timeValue;
+      }
+    }
+    else if (data.rxTime != null) {
+      console.warn(`Received rxTime in PacketToMessageDTO was not a Date object as expected (type: ${typeof data.rxTime}, value: ${data.rxTime}). Using current time as fallback.`);
+    }
+    this.date = dateTimestamp;
   }
 
   toMessage(): Message {
@@ -34,7 +44,7 @@ class PacketToMessageDTO {
       state: this.state,
       message: this.message,
       type: this.type,
-    } as Message;
+    };
   }
 }
 

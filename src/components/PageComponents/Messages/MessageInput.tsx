@@ -4,7 +4,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
 import { startTransition, useCallback, useMemo, useState } from "react";
-import { ChatTypes, useMessageStore } from "@core/stores/messageStore.ts";
+import { MessageState, MessageType, useMessageStore } from "@core/stores/messageStore.ts";
 import { debounce } from "@core/utils/debounce.ts";
 
 export interface MessageInputProps {
@@ -12,6 +12,7 @@ export interface MessageInputProps {
   channel: Types.ChannelNumber;
   maxBytes: number;
 }
+
 
 export const MessageInput = ({
   to,
@@ -31,13 +32,13 @@ export const MessageInput = ({
 
   const calculateBytes = (text: string) => new Blob([text]).size;
 
-  const chatType = to === 'broadcast' ? ChatTypes.BROADCAST : ChatTypes.DIRECT;
+  const chatType = to === MessageType.Broadcast ? MessageType.Broadcast : MessageType.Direct;
 
   const sendText = useCallback(async (message: string) => {
     try {
       const messageId = await connection?.sendText(message, to, true, channel);
       if (messageId !== undefined) {
-        setMessageState({ type: chatType, key: activeChat, messageId, newState: 'ack' });
+        setMessageState({ type: chatType, key: activeChat, messageId, newState: MessageState.Ack });
       }
       // deno-lint-ignore no-explicit-any
     } catch (e: any) {
@@ -45,7 +46,7 @@ export const MessageInput = ({
         type: chatType,
         key: activeChat,
         messageId: e?.id,
-        newState: 'failed',
+        newState: MessageState.Failed,
       });
     }
   }, [channel, connection, setMessageState, to, activeChat, chatType]);
@@ -75,7 +76,7 @@ export const MessageInput = ({
 
   return (
     <div className="flex gap-2">
-      <form className="w-full" onSubmit={handleSubmit}>
+      <form className="w-full" action="#" name="messageInput" onSubmit={handleSubmit}>
         <div className="flex grow gap-2">
           <label className="w-full">
             <Input

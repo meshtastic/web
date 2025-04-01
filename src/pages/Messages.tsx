@@ -13,7 +13,7 @@ import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useState } from "react";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import { cn } from "@core/utils/cn.ts";
-import { ChatTypes, useMessageStore } from "@core/stores/messageStore.ts";
+import { MessageType, useMessageStore } from "@core/stores/messageStore.ts";
 
 export const MessagesPage = () => {
   const { channels, nodes, hardware, hasNodeError } = useDevice();
@@ -36,8 +36,8 @@ export const MessagesPage = () => {
 
   const nodeHex = otherNode?.num ? numberToHexUnpadded(otherNode.num) : "Unknown";
 
-  const isDirect = chatType === ChatTypes.DIRECT;
-  const isBroadcast = chatType === ChatTypes.BROADCAST;
+  const isDirect = chatType === MessageType.Direct;
+  const isBroadcast = chatType === MessageType.Broadcast;
 
   const currentChat = { type: chatType, id: activeChat };
 
@@ -54,7 +54,7 @@ export const MessagesPage = () => {
                   ? "Primary"
                   : `Ch ${channel.index}`}
               onClick={() => {
-                setChatType("broadcast");
+                setChatType(MessageType.Broadcast);
                 setActiveChat(channel.index);
               }}
               element={<HashIcon size={16} className="mr-2" />}
@@ -79,7 +79,7 @@ export const MessagesPage = () => {
                   `!${numberToHexUnpadded(otherNode.num)}`}
                 active={activeChat === otherNode.num && chatType === "direct"}
                 onClick={() => {
-                  setChatType("direct");
+                  setChatType(MessageType.Direct);
                   setActiveChat(otherNode.num);
                 }}
                 element={
@@ -98,13 +98,13 @@ export const MessagesPage = () => {
       <div className="flex flex-col w-full h-full container mx-auto">
         <PageLayout
           className="flex flex-col h-full"
-          label={`Messages: ${chatType === "broadcast" && currentChannel
+          label={`Messages: ${MessageType.Broadcast && currentChannel
             ? getChannelName(currentChannel)
-            : chatType === "direct" && nodes.get(activeChat)
+            : chatType === MessageType.Direct && nodes.get(activeChat)
               ? (nodes.get(activeChat)?.user?.longName ?? nodeHex)
               : "Loading..."
             }`}
-          actions={chatType === "direct"
+          actions={chatType === MessageType.Direct
             ? [
               {
                 icon: nodes.get(activeChat)?.user?.publicKey.length
@@ -131,7 +131,7 @@ export const MessagesPage = () => {
               <div className="flex flex-col h-full">
                 <div className="flex-1 overflow-y-auto">
                   <ChannelChat
-                    messages={getMessages('broadcast', {
+                    messages={getMessages(MessageType.Broadcast, {
                       myNodeNum: getNodeNum(),
                       channel: currentChannel?.index
                     })}
@@ -144,7 +144,7 @@ export const MessagesPage = () => {
               <div className="flex flex-col h-full">
                 <div className="flex-1 overflow-y-auto">
                   <ChannelChat
-                    messages={getMessages('direct', { myNodeNum: getNodeNum(), otherNodeNum: activeChat })}
+                    messages={getMessages(MessageType.Direct, { myNodeNum: getNodeNum(), otherNodeNum: activeChat })}
                   />
                 </div>
               </div>
@@ -153,8 +153,8 @@ export const MessagesPage = () => {
 
           <div className="shrink-0 p-4 w-full dark:bg-slate-900">
             <MessageInput
-              to={currentChat.type === ChatTypes.DIRECT ? activeChat : ChatTypes.BROADCAST}
-              channel={currentChat.type === ChatTypes.DIRECT ? Types.ChannelNumber.Primary : currentChat.id}
+              to={currentChat.type === MessageType.Direct ? activeChat : MessageType.Broadcast}
+              channel={currentChat.type === MessageType.Direct ? Types.ChannelNumber.Primary : currentChat.id}
               maxBytes={200}
             />
           </div>

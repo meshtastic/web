@@ -4,25 +4,22 @@ import { produce } from 'immer';
 import { Types } from '@meshtastic/core';
 import { zustandIndexDBStorage } from "./storage/indexDB.ts";
 
-const MESSAGE_STATES = {
-  ack: "ack",
-  waiting: "waiting",
-  failed: 'failed',
-};
-export type MessageState = keyof typeof MESSAGE_STATES;
+export enum MessageState {
+  Ack = "ack",
+  Waiting = "waiting",
+  Failed = "failed",
+}
 
-export const ChatTypes = {
-  DIRECT: "direct",
-  BROADCAST: "broadcast",
-} as const;
-
-export type MessageType = "broadcast" | "direct";
+export enum MessageType {
+  Direct = "direct",
+  Broadcast = "broadcast",
+}
 
 interface MessageBase {
   channel: Types.ChannelNumber;
   to: number;
   from: number;
-  date: string;
+  date: number; // Unix timestamp in milliseconds
   messageId: number;
   state: MessageState;
   message: string;
@@ -32,7 +29,7 @@ interface GenericMessage<T extends MessageType> extends MessageBase {
   type: T;
 }
 
-export type Message = GenericMessage<'direct'> | GenericMessage<'broadcast'>;
+export type Message = GenericMessage<MessageType.Direct> | GenericMessage<MessageType.Broadcast>;
 
 export interface MessageStore {
   messages: {
@@ -55,10 +52,10 @@ export interface MessageStore {
     messageId: number;
     newState?: MessageState;
   }) => void;
-  clearMessages: () => void;
   getMessages: (type: MessageType, options: { myNodeNum?: number; otherNodeNum?: number; channel?: number }) => Message[];
   getDraft: (key: Types.Destination) => string;
   setDraft: (key: Types.Destination, message: string) => void;
+  clearAllMessages: () => void;
   clearMessageByMessageId: (type: MessageType, messageId: number) => void;
   clearDraft: (key: Types.Destination) => void;
 
@@ -73,7 +70,7 @@ export const useMessageStore = create<MessageStore>()(
       },
       draft: new Map<number, string>(),
       activeChat: 0,
-      chatType: 'broadcast',
+      chatType: MessageType.Broadcast,
       nodeNum: 0,
       setNodeNum: (nodeNum) => {
         set(produce((state: MessageStore) => {
@@ -94,22 +91,32 @@ export const useMessageStore = create<MessageStore>()(
       saveMessage: (message) => {
         set(produce((state: MessageStore) => {
           const group = state.messages[message.type];
-          const key = message.type === 'direct' ? Number(message.to) : Number(message.channel);
+          // Direct messages are keyed by the RECIPIENT's node number (`message.to`)
+          // Broadcast messages are keyed by the channel number (`message.channel`)
+          const key = message.type === MessageType.Direct ? Number(message.to) : Number(message.channel);
           if (!group[key]) {
             group[key] = {};
           }
-          group[key][message.messageId] = message;
+          const messageToSave = { ...message };
+          group[key][message.messageId] = messageToSave;
         }));
       },
-      setMessageState: ({ type, key, messageId, newState = 'ack' }) => {
-        const group = get().messages[type];
-        const messageMap = group[key];
-
-        if (!messageMap || !messageMap[messageId]) return;
-
-        set(produce((state: MessageStore) => {
-          state.messages[type][key][messageId].state = newState;
-        }));
+      setMessageState: ({
+        type,
+        key,
+        messageId,
+        newState = MessageState.Ack,
+      }) => {
+        set(
+          produce((state: MessageStore) => {
+            const message = state.messages[type]?.[key]?.[messageId];
+            if (message) {
+              message.state = newState;
+            } else {
+              console.warn(`Message not found - type: ${type}, key: ${key}, messageId: ${messageId}`);
+            }
+          }),
+        );
       },
       clearMessages: () => {
         set(produce((state: MessageStore) => {
@@ -120,24 +127,26 @@ export const useMessageStore = create<MessageStore>()(
       getMessages: (type, options) => {
         const state = get();
 
-        if (type === 'broadcast' && options.channel !== undefined) {
+        if (type === MessageType.Broadcast && options.channel !== undefined) {
           const messageMap = state.messages.broadcast[options.channel] ?? {};
-          return Object.values(messageMap).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          return Object.values(messageMap).sort((a, b) => a.date - b.date);
         }
 
-        if (type === 'direct' && options.myNodeNum !== undefined && options.otherNodeNum !== undefined) {
-          const receivedMap = state.messages.direct[options.otherNodeNum] ?? {};
-          const sentMap = state.messages.direct[options.myNodeNum] ?? {};
+        if (type === MessageType.Direct && options.myNodeNum !== undefined && options.otherNodeNum !== undefined) {
+          // Messages TO the other node (sent by me) are keyed under their nodeNum
+          const messagesToOtherNodeMap = state.messages.direct[options.otherNodeNum] ?? {};
+          const sentByMe = Object.values(messagesToOtherNodeMap);
 
-          // Pull messages where I am the sender and otherNode is the receiver
-          const sentMessages = Object.values(sentMap).filter(msg => msg.to === options.otherNodeNum);
-
-          // Pull messages received from otherNode
-          const receivedMessages = Object.values(receivedMap);
+          // Messages TO me (potentially from the other node) are keyed under my nodeNum
+          const messagesToMeMap = state.messages.direct[options.myNodeNum] ?? {};
+          // Filter messages TO me to find the ones FROM the specific other node
+          const sentByOtherNode = Object.values(messagesToMeMap).filter(
+            (msg) => msg.from === options.otherNodeNum
+          );
 
           // Merge and sort chronologically
-          return [...receivedMessages, ...sentMessages].sort(
-            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          return [...sentByMe, ...sentByOtherNode].sort(
+            (a, b) => a.date - b.date
           );
         }
 
@@ -170,6 +179,12 @@ export const useMessageStore = create<MessageStore>()(
           state.draft.delete(key);
         }));
       },
+      clearAllMessages: () => {
+        set(produce((state: MessageStore) => {
+          state.messages.direct = {};
+          state.messages.broadcast = {};
+        }));
+      }
     }),
     {
       name: 'meshtastic-message-store',

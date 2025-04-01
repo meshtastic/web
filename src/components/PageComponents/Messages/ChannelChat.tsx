@@ -55,7 +55,7 @@ export const ChannelChat = ({
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto pl-4 pr-4 md:pr-44"
       >
-        <div className="flex flex-col justify-end min-h-full">
+        <div className="flex flex-col gap-1.5 justify-end min-h-full">
           {messages?.map((message, index) => (
             <MessageItem
               key={message.messageId + index}

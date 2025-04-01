@@ -13,7 +13,7 @@ import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { TrashIcon } from "lucide-react";
 
 import { Button } from "../UI/Button.tsx";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { MessageType, useMessageStore } from "@core/stores/messageStore.ts";
 
 export interface NodeOptionsDialogProps {
   node: Protobuf.Mesh.NodeInfo | undefined;
@@ -41,7 +41,7 @@ export const NodeOptionsDialog = ({
     (node ? `${numberToHexUnpadded(node?.num).substring(0, 4)}` : "UNK");
 
   function handleDirectMessage() {
-    setChatType("direct");
+    setChatType(MessageType.Direct);
     setActiveChat(node.num);
     setActivePage("messages");
   }

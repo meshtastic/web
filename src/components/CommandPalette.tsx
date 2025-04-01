@@ -9,6 +9,7 @@ import {
 } from "@components/UI/Command.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice, useDeviceStore } from "@core/stores/deviceStore.ts";
+import { use } from "chai";
 import { useCommandState } from "cmdk";
 import {
   ArrowLeftRightIcon,
@@ -32,6 +33,8 @@ import {
   XCircleIcon,
 } from "lucide-react";
 import { useEffect } from "react";
+import { useMap } from "react-map-gl/maplibre";
+import { useMessageStore } from "@core/stores/messageStore.ts";
 
 export interface Group {
   label: string;
@@ -61,6 +64,7 @@ export const CommandPalette = () => {
     selectedDevice,
   } = useAppStore();
   const { getDevices } = useDeviceStore();
+  const { clearAllMessages } = useMessageStore();
   const { setDialogOpen, setActivePage, connection } = useDevice();
 
   const groups: Group[] = [
@@ -117,7 +121,7 @@ export const CommandPalette = () => {
             return {
               label:
                 device.nodes.get(device.hardware.myNodeNum)?.user?.longName ??
-                  device.hardware.myNodeNum.toString(),
+                device.hardware.myNodeNum.toString(),
               icon: (
                 <Avatar
                   text={device.nodes.get(device.hardware.myNodeNum)?.user
@@ -221,10 +225,10 @@ export const CommandPalette = () => {
           },
         },
         {
-          label: "[WIP] Clear Messages",
+          label: "Clear All Stored Message",
           icon: EraserIcon,
           action() {
-            alert("This feature is not implemented");
+            void clearAllMessages();
           },
         },
       ],
