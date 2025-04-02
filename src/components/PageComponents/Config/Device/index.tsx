@@ -83,6 +83,19 @@ export const Device = () => {
               description: "Disable triple click",
             },
             {
+              type: 'text',
+              name: 'tzdef',
+              label: 'POSIX Timezone',
+              description: 'The POSIX timezone string for the device',
+              properties: {
+                fieldLength: {
+                  max: 64,
+                  currentValueLength: config.device?.tzdef?.length,
+                  showCharacterCount: true,
+                }
+              },
+            },
+            {
               type: "toggle",
               name: "ledHeartbeatDisabled",
               label: "LED Heartbeat Disabled",
