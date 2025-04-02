@@ -1,4 +1,4 @@
-name: 'Release'
+name: Release
 
 on:
   release:
@@ -37,6 +37,10 @@ jobs:
         with:
           name: build
           path: dist/build.tar
+
+      - name: Attach build.tar to release
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} dist/build.tar
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
