@@ -50,6 +50,28 @@ docker run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshta
 podman run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshtastic/web
 ```
 
+## SBC Linux
+
+The WebUI can be manually updated on linux systems using the precompiled build tar.
+
+Download latest Build.tar file, extract to `/usr/shared/meshtasticd/web`. 
+
+```bash
+# Extract Build.tar
+wget https://github.com/meshtastic/web/releases/download/v2.6.0/Build.tar
+mkdir -p web && tar xf Build.tar -C web
+
+# Extract files.
+gunzip web/ -r
+
+# Back up existing web dir for rollback
+mv /usr/shared/meshtasticd/web /usr/shared/meshtasticd/web.org
+
+# Move files to the required directory
+sudo mv web /usr/shared/meshtasticd/
+```
+
+
 ## Nightly releases
 
 Our nightly releases provide the latest development builds with cutting-edge
