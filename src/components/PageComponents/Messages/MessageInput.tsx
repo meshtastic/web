@@ -13,7 +13,6 @@ export interface MessageInputProps {
   maxBytes: number;
 }
 
-
 export const MessageInput = ({
   to,
   channel,

@@ -90,11 +90,7 @@ export const MessageItem = ({ lastMsgSameUser, message }: MessageProps) => {
   const messageUser: Protobuf.Mesh.NodeInfo | null = useMemo(() => {
     if (message?.from === null || message?.from === undefined) return null;
     for (const device of getDevices()) {
-      console.log("MessageItem: getDevices", { device });
-
       if (device.nodes.has(message.from)) {
-        console.log("MessageItem hasNode", { device, message });
-
         return device.nodes.get(message.from) ?? null;
       }
     }

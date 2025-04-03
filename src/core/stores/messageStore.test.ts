@@ -1,337 +1,372 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useMessageStore, Message, MessageState, MessageType } from './messageStore.ts';
-import { Types } from '@meshtastic/core';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import {
+  useMessageStore,
+  MessageType,
+  MessageState,
+  type Message,
+} from './messageStore.ts';
 
-vi.mock('./storage/indexDB.ts', () => ({
-  zustandIndexDBStorage: {
-    getItem: vi.fn(),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-  },
-}));
+let memoryStorage: Record<string, string> = {};
 
-beforeEach(() => {
-  useMessageStore.setState({
-    messages: { direct: {}, broadcast: {} },
-    draft: new Map<Types.Destination, string>(),
-    nodeNum: 0,
-    activeChat: 0,
-    chatType: MessageType.Broadcast,
-  });
+vi.mock('./storage/indexDB.ts', () => {
+  console.log("Mocking zustandIndexDBStorage...");
+  return {
+    zustandIndexDBStorage: {
+      getItem: vi.fn(async (name: string): Promise<string | null> => {
+        console.log(`Mock getItem: ${name}`, memoryStorage[name] ?? null);
+        return memoryStorage[name] ?? null;
+      }),
+      setItem: vi.fn(async (name: string, value: string): Promise<void> => {
+        console.log(`Mock setItem: ${name}`, value);
+        memoryStorage[name] = value;
+      }),
+      removeItem: vi.fn(async (name: string): Promise<void> => {
+        console.log(`Mock removeItem: ${name}`);
+        delete memoryStorage[name];
+      }),
+    },
+  };
 });
 
+const myNodeNum = 111;
+const otherNodeNum1 = 222;
+const otherNodeNum2 = 333;
+const broadcastChannel = 0;
+
+
+
+const directMessageToOther1: Message = {
+  type: MessageType.Direct,
+  from: myNodeNum,
+  to: otherNodeNum1,
+  channel: 0,
+  date: Date.now(),
+  messageId: 101,
+  state: MessageState.Waiting,
+  message: 'Hello other 1 from me',
+};
+
+const directMessageFromOther1: Message = {
+  type: MessageType.Direct,
+  from: otherNodeNum1,
+  to: myNodeNum,
+  channel: 0,
+  date: Date.now() + 1000,
+  messageId: 102,
+  state: MessageState.Waiting,
+  message: 'Hello me from other 1',
+};
+
+const directMessageToOther2: Message = {
+  type: MessageType.Direct,
+  from: myNodeNum,
+  to: otherNodeNum2,
+  channel: 0,
+  date: Date.now() + 2000,
+  messageId: 103,
+  state: MessageState.Waiting,
+  message: 'Hello other 2 from me',
+};
+
+const broadcastMessage1: Message = {
+  type: MessageType.Broadcast,
+  from: otherNodeNum1,
+  to: 0xffffffff,
+  channel: broadcastChannel,
+  date: Date.now() + 3000,
+  messageId: 201,
+  state: MessageState.Waiting,
+  message: 'Broadcast message 1',
+};
+
+const broadcastMessage2: Message = {
+  type: MessageType.Broadcast,
+  from: myNodeNum,
+  to: 0xffffffff,
+  channel: broadcastChannel,
+  date: Date.now() + 4000,
+  messageId: 202,
+  state: MessageState.Waiting,
+  message: 'Broadcast message 2',
+};
+
 describe('useMessageStore', () => {
-  it('sets and gets nodeNum', () => {
-    useMessageStore.getState().setNodeNum(42);
-    expect(useMessageStore.getState().getNodeNum()).toBe(42);
+  const initialState = useMessageStore.getState();
+
+  beforeEach(() => {
+    useMessageStore.setState(initialState, true);
   });
 
-  it('sets activeChat', () => {
-    useMessageStore.getState().setActiveChat(123);
-    expect(useMessageStore.getState().activeChat).toBe(123);
+  it('should have correct initial state', () => {
+    const state = useMessageStore.getState();
+    expect(state.messages.direct).toEqual({});
+    expect(state.messages.broadcast).toEqual({});
+    expect(state.draft).toBeInstanceOf(Map);
+    expect(state.draft.size).toBe(0);
+    expect(state.nodeNum).toBe(0);
+    expect(state.activeChat).toBe(0);
+    expect(state.chatType).toBe(MessageType.Broadcast);
   });
 
-  it('sets chatType', () => {
+  it('should set nodeNum', () => {
+    useMessageStore.getState().setNodeNum(myNodeNum);
+    expect(useMessageStore.getState().nodeNum).toBe(myNodeNum);
+  });
+
+  it('should set activeChat and chatType', () => {
+    useMessageStore.getState().setActiveChat(otherNodeNum1);
     useMessageStore.getState().setChatType(MessageType.Direct);
+    expect(useMessageStore.getState().activeChat).toBe(otherNodeNum1);
     expect(useMessageStore.getState().chatType).toBe(MessageType.Direct);
   });
 
   describe('saveMessage', () => {
-    it('saves a direct message', () => {
-      const message: Message = {
-        type: MessageType.Direct,
-        channel: 0,
-        to: 101,
-        from: 202,
-        date: Date.now(),
-        messageId: 1,
-        state: MessageState.Waiting,
-        message: 'Hello Direct',
-      };
-      useMessageStore.getState().saveMessage(message);
-      expect(useMessageStore.getState().messages.direct[101]?.[1]).toEqual(message);
+    it('should save a direct message with correct structure', () => {
+      useMessageStore.getState().saveMessage(directMessageToOther1);
+      const state = useMessageStore.getState();
+      expect(state.messages.direct[myNodeNum]).toBeDefined();
+      expect(state.messages.direct[myNodeNum][otherNodeNum1]).toBeDefined();
+      expect(
+        state.messages.direct[myNodeNum][otherNodeNum1][directMessageToOther1.messageId],
+      ).toEqual(directMessageToOther1);
     });
 
-    it('saves a broadcast message', () => {
-      const message: Message = {
-        type: MessageType.Broadcast,
-        channel: 5,
-        to: 0,
-        from: 303,
-        date: Date.now(),
-        messageId: 100,
-        state: MessageState.Waiting,
-        message: 'Broadcast Message',
-      };
-      useMessageStore.getState().saveMessage(message);
-      expect(useMessageStore.getState().messages.broadcast[5]?.[100]).toEqual(message);
+    it('should save a broadcast message with correct structure', () => {
+      useMessageStore.getState().saveMessage(broadcastMessage1);
+      const state = useMessageStore.getState();
+      expect(state.messages.broadcast[broadcastChannel]).toBeDefined();
+      expect(
+        state.messages.broadcast[broadcastChannel][broadcastMessage1.messageId],
+      ).toEqual(broadcastMessage1);
     });
 
-    it('ensures date is stored as milliseconds', () => {
-      const now = Date.now();
-      const message: Message = {
-        type: MessageType.Direct,
-        channel: 0,
-        to: 101,
-        from: 202,
-        date: now,
-        messageId: 1,
-        state: MessageState.Waiting,
-        message: 'Hello Direct',
-      };
-      useMessageStore.getState().saveMessage(message);
-      expect(useMessageStore.getState().messages.direct[101]?.[1]?.date).toBe(new Date(now).getTime());
+    it('should save multiple messages correctly', () => {
+      useMessageStore.getState().saveMessage(directMessageToOther1);
+      useMessageStore.getState().saveMessage(directMessageFromOther1);
+      useMessageStore.getState().saveMessage(broadcastMessage1);
+
+      const state = useMessageStore.getState();
+
+      // Direct msg 1 (me -> other1)
+      expect(state.messages.direct[myNodeNum]?.[otherNodeNum1]?.[directMessageToOther1.messageId]).toEqual(directMessageToOther1);
+      // Direct msg 2 (other1 -> me)
+      expect(state.messages.direct[otherNodeNum1]?.[myNodeNum]?.[directMessageFromOther1.messageId]).toEqual(directMessageFromOther1);
+      // Broadcast msg 1
+      expect(state.messages.broadcast[broadcastChannel]?.[broadcastMessage1.messageId]).toEqual(broadcastMessage1);
+    });
+  });
+
+  describe('getMessages', () => {
+    beforeEach(() => {
+      useMessageStore.getState().setNodeNum(myNodeNum);
+      useMessageStore.getState().saveMessage(directMessageToOther1);
+      useMessageStore.getState().saveMessage(directMessageFromOther1);
+      useMessageStore.getState().saveMessage(directMessageToOther2);
+      useMessageStore.getState().saveMessage(broadcastMessage1);
+      useMessageStore.getState().saveMessage(broadcastMessage2);
+    });
+
+    it('should return broadcast messages for a channel, sorted by date', () => {
+      const messages = useMessageStore.getState().getMessages(MessageType.Broadcast, {
+        myNodeNum: myNodeNum, // Not strictly needed for broadcast, but good practice
+        channel: broadcastChannel
+      });
+      expect(messages).toHaveLength(2);
+      expect(messages[0]).toEqual(broadcastMessage1);
+      expect(messages[1]).toEqual(broadcastMessage2);
+    });
+
+    it('should return empty array for broadcast if channel has no messages', () => {
+      const messages = useMessageStore.getState().getMessages(MessageType.Broadcast, {
+        myNodeNum: myNodeNum,
+        channel: 99
+      });
+      expect(messages).toEqual([]);
+    });
+
+    it('should return combined direct messages for a specific chat (pair), sorted by date', () => {
+      const messages = useMessageStore.getState().getMessages(MessageType.Direct, {
+        myNodeNum: myNodeNum,
+        otherNodeNum: otherNodeNum1
+      });
+      expect(messages).toHaveLength(2);
+      expect(messages[0]).toEqual(directMessageToOther1);
+      expect(messages[1]).toEqual(directMessageFromOther1);
+    });
+
+    it('should return only relevant direct messages for a different chat pair', () => {
+      const messages = useMessageStore.getState().getMessages(MessageType.Direct, {
+        myNodeNum: myNodeNum,
+        otherNodeNum: otherNodeNum2
+      });
+      expect(messages).toHaveLength(1);
+      expect(messages[0]).toEqual(directMessageToOther2);
+    });
+
+    it('should return empty array for direct chat if no messages exist', () => {
+      const messages = useMessageStore.getState().getMessages(MessageType.Direct, {
+        myNodeNum: myNodeNum,
+        otherNodeNum: 999
+      });
+      expect(messages).toEqual([]);
+    });
+
+    it('should return empty array if myNodeNum is not provided for direct messages', () => {
+      const messages = useMessageStore.getState().getMessages(MessageType.Direct, {
+        otherNodeNum: otherNodeNum1
+      });
+      expect(messages).toEqual([]);
     });
   });
 
   describe('setMessageState', () => {
-    it('updates the state of an existing direct message', () => {
-      const message: Message = {
-        type: MessageType.Direct,
-        channel: 0,
-        to: 101,
-        from: 202,
-        date: Date.now(),
-        messageId: 1,
-        state: MessageState.Waiting,
-        message: 'Change me',
-      };
-      useMessageStore.getState().saveMessage(message);
-
-      useMessageStore.getState().setMessageState({
-        type: MessageType.Direct,
-        key: 101,
-        messageId: 1,
-        newState: MessageState.Ack,
-      });
-
-      expect(useMessageStore.getState().messages.direct[101]?.[1]?.state).toBe(MessageState.Ack);
+    beforeEach(() => {
+      useMessageStore.getState().setNodeNum(myNodeNum);
+      useMessageStore.getState().saveMessage(directMessageToOther1);
+      useMessageStore.getState().saveMessage(directMessageFromOther1);
+      useMessageStore.getState().saveMessage(broadcastMessage1);
     });
 
-    it('updates the state of an existing broadcast message', () => {
-      const message: Message = {
-        type: MessageType.Broadcast,
-        channel: 5,
-        to: 0,
-        from: 303,
-        date: Date.now(),
-        messageId: 100,
-        state: MessageState.Waiting,
-        message: 'Broadcast Message',
-      };
-      useMessageStore.getState().saveMessage(message);
-
+    it('should update state for a direct message sent BY ME', () => {
       useMessageStore.getState().setMessageState({
-        type: MessageType.Broadcast,
-        key: 5,
-        messageId: 100,
+        type: MessageType.Direct,
+        key: otherNodeNum1,
+        messageId: directMessageToOther1.messageId,
+        newState: MessageState.Ack,
+      });
+      const message = useMessageStore.getState().messages.direct[myNodeNum]?.[otherNodeNum1]?.[directMessageToOther1.messageId];
+      expect(message?.state).toBe(MessageState.Ack);
+    });
+
+    it('should update state for a direct message received FROM OTHER', () => {
+      useMessageStore.getState().setMessageState({
+        type: MessageType.Direct,
+        key: otherNodeNum1,
+        messageId: directMessageFromOther1.messageId,
         newState: MessageState.Failed,
       });
-
-      expect(useMessageStore.getState().messages.broadcast[5]?.[100]?.state).toBe(MessageState.Failed);
+      const message = useMessageStore.getState().messages.direct[otherNodeNum1]?.[myNodeNum]?.[directMessageFromOther1.messageId];
+      expect(message?.state).toBe(MessageState.Failed);
     });
 
-    it('does not update if the message is not found and logs a warning', () => {
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
-
+    it('should update state for a broadcast message', () => {
       useMessageStore.getState().setMessageState({
-        type: MessageType.Direct,
-        key: 999,
-        messageId: 99,
+        type: MessageType.Broadcast,
+        key: broadcastChannel,
+        messageId: broadcastMessage1.messageId,
         newState: MessageState.Ack,
       });
-
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Message not found - type: direct, key: 999, messageId: 99',
-      );
-
-      consoleWarnSpy.mockRestore();
-    });
-  });
-
-  it('clears all messages', () => {
-    useMessageStore.getState().saveMessage({
-      type: MessageType.Broadcast,
-      channel: 5,
-      to: 0,
-      from: 303,
-      date: Date.now(),
-      messageId: 100,
-      state: MessageState.Waiting,
-      message: 'Broadcast Message',
-    });
-    useMessageStore.getState().saveMessage({
-      type: MessageType.Direct,
-      channel: 0,
-      to: 101,
-      from: 202,
-      date: Date.now(),
-      messageId: 1,
-      state: MessageState.Waiting,
-      message: 'Hello Direct',
-    });
-    useMessageStore.getState().clearAllMessages();
-    expect(useMessageStore.getState().messages.direct).toEqual({});
-    expect(useMessageStore.getState().messages.broadcast).toEqual({});
-  });
-
-  describe('getMessages', () => {
-    it('retrieves sorted broadcast messages for a channel', () => {
-      const now = Date.now();
-      const earlier = now - 10000;
-      const later = now;
-
-      useMessageStore.getState().saveMessage({
-        type: MessageType.Broadcast,
-        channel: 4,
-        to: 0,
-        from: 404,
-        date: later,
-        messageId: 2,
-        state: MessageState.Waiting,
-        message: 'Second',
-      });
-      useMessageStore.getState().saveMessage({
-        type: MessageType.Broadcast,
-        channel: 4,
-        to: 0,
-        from: 404,
-        date: earlier,
-        messageId: 1,
-        state: MessageState.Waiting,
-        message: 'First',
-      });
-
-      const messages = useMessageStore.getState().getMessages(MessageType.Broadcast, { channel: 4 });
-      expect(messages.map((m) => m.message)).toEqual(['First', 'Second']);
-      expect(messages[0]?.date).toBe(earlier);
-      expect(messages[1]?.date).toBe(later);
+      const message = useMessageStore.getState().messages.broadcast[broadcastChannel]?.[broadcastMessage1.messageId];
+      expect(message?.state).toBe(MessageState.Ack);
     });
 
-    it('returns an empty array for broadcast messages if channel does not exist', () => {
-      const messages = useMessageStore.getState().getMessages(MessageType.Broadcast, { channel: 99 });
-      expect(messages).toEqual([]);
-    });
-
-    it('merges and sorts direct messages by date', () => {
-      const myNodeNum = 1;
-      const otherNodeNum = 2;
-      const now = Date.now();
-      const earlier = now - 10000;
-      const later = now + 10000;
-
-      const incomingMessage: Message = {
+    it('should warn if message is not found', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
+      useMessageStore.getState().setMessageState({
         type: MessageType.Direct,
-        channel: 0,
-        to: myNodeNum,
-        from: otherNodeNum,
-        date: earlier,
-        messageId: 1,
-        state: MessageState.Ack,
-        message: 'Incoming from 2',
-      };
-      useMessageStore.getState().saveMessage(incomingMessage);
-
-      const outgoingMessage: Message = {
-        type: MessageType.Direct,
-        channel: 0,
-        to: otherNodeNum,
-        from: myNodeNum,
-        date: later,
-        messageId: 2,
-        state: MessageState.Waiting,
-        message: 'Outgoing from 1',
-      };
-      useMessageStore.getState().saveMessage(outgoingMessage);
-
-      const merged = useMessageStore.getState().getMessages(MessageType.Direct, {
-        myNodeNum: myNodeNum,
-        otherNodeNum: otherNodeNum,
+        key: otherNodeNum1,
+        messageId: 999,
+        newState: MessageState.Ack,
       });
-
-      expect(merged.length).toBe(2);
-      expect(merged.map((m) => m.message)).toEqual(['Incoming from 2', 'Outgoing from 1']);
-      expect(merged[0]?.date).toBe(earlier);
-      expect(merged[1]?.date).toBe(later);
-    });
-
-    it('returns an empty array for direct messages if no messages exist between nodes', () => {
-      const myNodeNum = 1;
-      const otherNodeNum = 2;
-      const messages = useMessageStore.getState().getMessages(MessageType.Direct, {
-        myNodeNum: myNodeNum,
-        otherNodeNum: otherNodeNum,
-      });
-      expect(messages).toEqual([]);
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Message not found for state update'));
+      warnSpy.mockRestore();
     });
   });
 
-  describe('draft functionality', () => {
-    it('sets and gets a draft message', () => {
-      const key: Types.Destination = 123;
-      useMessageStore.getState().setDraft(key, 'Draft text');
-      expect(useMessageStore.getState().getDraft(key)).toBe('Draft text');
-    });
-
-    it('gets an empty string if no draft exists for a key', () => {
-      const key: Types.Destination = 456;
-      expect(useMessageStore.getState().getDraft(key)).toBe('');
-    });
-
-    it('clears a draft message', () => {
-      const key: Types.Destination = 123;
-      useMessageStore.getState().setDraft(key, 'Draft to clear');
-      useMessageStore.getState().clearDraft(key);
-      expect(useMessageStore.getState().getDraft(key)).toBe('');
-    });
-  });
 
   describe('clearMessageByMessageId', () => {
-    it('clears a direct message by messageId', () => {
-      const message: Message = {
+    beforeEach(() => {
+      useMessageStore.getState().setNodeNum(myNodeNum);
+      useMessageStore.getState().saveMessage(directMessageToOther1);
+      useMessageStore.getState().saveMessage(directMessageFromOther1);
+      useMessageStore.getState().saveMessage(broadcastMessage1);
+      useMessageStore.getState().saveMessage({ ...directMessageToOther1, messageId: 1011, date: Date.now() + 50 });
+    });
+
+    it('should delete a specific direct message (sent by me)', () => {
+      const messageIdToDelete = directMessageToOther1.messageId;
+      useMessageStore.getState().clearMessageByMessageId({
         type: MessageType.Direct,
-        channel: 0,
-        to: 111,
-        from: 222,
-        date: Date.now(),
-        messageId: 42,
-        state: MessageState.Waiting,
-        message: 'To be deleted',
-      };
-      useMessageStore.getState().saveMessage(message);
-      expect(useMessageStore.getState().messages.direct[111]?.[42]).toBeDefined();
-
-      useMessageStore.getState().clearMessageByMessageId(MessageType.Direct, 42);
-
-      expect(useMessageStore.getState().messages.direct[111]?.[42]).toBeUndefined();
-      expect(useMessageStore.getState().messages.direct[111]).toBeUndefined();
+        sender: myNodeNum,
+        recipient: otherNodeNum1,
+        messageId: messageIdToDelete
+      });
+      const state = useMessageStore.getState();
+      expect(state.messages.direct[myNodeNum]?.[otherNodeNum1]?.[messageIdToDelete]).toBeUndefined();
+      expect(state.messages.direct[myNodeNum]?.[otherNodeNum1]?.[1011]).toBeDefined();
+      expect(state.messages.direct[otherNodeNum1]?.[myNodeNum]?.[directMessageFromOther1.messageId]).toBeDefined();
     });
 
-    it('clears a broadcast message by messageId', () => {
-      const message: Message = {
+    it('should delete a specific direct message (sent by other)', () => {
+      const messageIdToDelete = directMessageFromOther1.messageId;
+      useMessageStore.getState().clearMessageByMessageId({
+        type: MessageType.Direct,
+        sender: otherNodeNum1,
+        recipient: myNodeNum,
+        messageId: messageIdToDelete
+      });
+      const state = useMessageStore.getState();
+      expect(state.messages.direct[otherNodeNum1]?.[myNodeNum]?.[messageIdToDelete]).toBeUndefined();
+      expect(state.messages.direct[myNodeNum]?.[otherNodeNum1]?.[directMessageToOther1.messageId]).toBeDefined();
+      expect(state.messages.direct[myNodeNum]?.[otherNodeNum1]?.[1011]).toBeDefined();
+    });
+
+    it('should delete a specific broadcast message', () => {
+      const messageIdToDelete = broadcastMessage1.messageId;
+      useMessageStore.getState().clearMessageByMessageId({
         type: MessageType.Broadcast,
-        channel: 2,
-        to: 0,
-        from: 333,
-        date: Date.now(),
-        messageId: 77,
-        state: MessageState.Waiting,
-        message: 'Broadcast to delete',
-      };
-      useMessageStore.getState().saveMessage(message);
-      expect(useMessageStore.getState().messages.broadcast[2]?.[77]).toBeDefined();
-
-      useMessageStore.getState().clearMessageByMessageId(MessageType.Broadcast, 77);
-
-      expect(useMessageStore.getState().messages.broadcast[2]?.[77]).toBeUndefined();
-      expect(useMessageStore.getState().messages.broadcast[2]).toBeUndefined();
+        channel: broadcastChannel,
+        messageId: messageIdToDelete
+      });
+      const state = useMessageStore.getState();
+      expect(state.messages.broadcast[broadcastChannel]?.[messageIdToDelete]).toBeUndefined();
     });
 
-    it('does not throw error if trying to clear a non-existent message', () => {
-      expect(() => {
-        useMessageStore.getState().clearMessageByMessageId(MessageType.Direct, 999);
-        useMessageStore.getState().clearMessageByMessageId(MessageType.Broadcast, 999);
-      }).not.toThrow();
+    it('should clean up empty recipient/sender/channel objects', () => {
+      useMessageStore.getState().clearMessageByMessageId({ type: MessageType.Direct, sender: otherNodeNum1, recipient: myNodeNum, messageId: directMessageFromOther1.messageId });
+      expect(useMessageStore.getState().messages.direct[otherNodeNum1]?.[myNodeNum]).toBeUndefined(); // Recipient level removed
+      expect(useMessageStore.getState().messages.direct[otherNodeNum1]).toBeUndefined(); // Sender level removed
+
+      useMessageStore.getState().clearMessageByMessageId({ type: MessageType.Broadcast, channel: broadcastChannel, messageId: broadcastMessage1.messageId });
+      expect(useMessageStore.getState().messages.broadcast[broadcastChannel]).toBeUndefined(); // Channel level removed
     });
   });
+
+  describe('Drafts', () => {
+    const draftKey = otherNodeNum1;
+    const draftMessage = 'This is a draft';
+
+    it('should set and get a draft', () => {
+      useMessageStore.getState().setDraft(draftKey, draftMessage);
+      expect(useMessageStore.getState().draft.get(draftKey)).toBe(draftMessage);
+      expect(useMessageStore.getState().getDraft(draftKey)).toBe(draftMessage);
+    });
+
+    it('should return empty string for non-existent draft', () => {
+      expect(useMessageStore.getState().getDraft(999)).toBe('');
+    });
+
+    it('should clear a draft', () => {
+      useMessageStore.getState().setDraft(draftKey, draftMessage);
+      expect(useMessageStore.getState().draft.has(draftKey)).toBe(true);
+      useMessageStore.getState().clearDraft(draftKey);
+      expect(useMessageStore.getState().draft.has(draftKey)).toBe(false);
+      expect(useMessageStore.getState().getDraft(draftKey)).toBe('');
+    });
+  });
+
+  describe('clearAllMessages', () => {
+    it('should clear all direct and broadcast messages', () => {
+      useMessageStore.getState().saveMessage(directMessageToOther1);
+      useMessageStore.getState().saveMessage(broadcastMessage1);
+      expect(Object.keys(useMessageStore.getState().messages.direct).length).toBeGreaterThan(0);
+      expect(Object.keys(useMessageStore.getState().messages.broadcast).length).toBeGreaterThan(0);
+
+      useMessageStore.getState().clearAllMessages();
+
+      expect(useMessageStore.getState().messages.direct).toEqual({});
+      expect(useMessageStore.getState().messages.broadcast).toEqual({});
+    });
+  });
+
 });
