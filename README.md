@@ -58,6 +58,7 @@ Download latest Build.tar file, extract to `/usr/shared/meshtasticd/web`.
 
 ```bash
 # Extract Build.tar
+cd ~
 wget https://github.com/meshtastic/web/releases/download/v2.6.0/Build.tar
 mkdir -p web && tar xf Build.tar -C web
 
