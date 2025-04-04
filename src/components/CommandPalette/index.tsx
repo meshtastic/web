@@ -219,10 +219,10 @@ export const CommandPalette = () => {
           },
         },
         {
-          label: "[WIP] Clear Messages",
+          label: "Clear All Stored Message",
           icon: EraserIcon,
           action() {
-            alert("This feature is not implemented");
+            setDialogOpen("clearMessages", true);
           },
         },
       ],

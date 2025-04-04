@@ -8,10 +8,12 @@ import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { useCallback, useEffect, useState } from "react";
+import { useMessageStore } from "@core/stores/messageStore.ts";
 
 export const Serial = ({ closeDialog }: TabElementProps) => {
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
   const { addDevice } = useDeviceStore();
+  const messageStore = useMessageStore()
   const { setSelectedDevice } = useAppStore();
 
   const updateSerialPortList = useCallback(async () => {
@@ -36,7 +38,7 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
     const connection = new MeshDevice(transport, id);
     connection.configure();
     device.addConnection(connection);
-    subscribeAll(device, connection);
+    subscribeAll(device, connection, messageStore);
 
     closeDialog();
   };

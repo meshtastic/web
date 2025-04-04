@@ -45,6 +45,7 @@
     "npm:crypto-random-string@5": "5.0.0",
     "npm:gzipper@^8.2.1": "8.2.1",
     "npm:happy-dom@^17.4.4": "17.4.4",
+    "npm:idb-keyval@^6.2.1": "6.2.1",
     "npm:immer@^10.1.1": "10.1.1",
     "npm:js-cookie@^3.0.5": "3.0.5",
     "npm:lucide-react@0.486": "0.486.0_react@19.1.0",
@@ -4492,6 +4493,9 @@
     "https-browserify@1.0.0": {
       "integrity": "sha512-J+FkSdyD+0mA0N+81tMotaRMfSL9SGi+xpD3T6YApKsc3bGSXJlfXri3VyFOeYkfLRQisDk1W+jIFFKBeUBbBg=="
     },
+    "idb-keyval@6.2.1": {
+      "integrity": "sha512-8Sb3veuYCyrZL+VBt9LJfZjLUPWVvqn8tG28VqYNFCo43KHcKuq+b4EiXGeuaLAQWL2YmyDgMp2aSpH9JHsEQg=="
+    },
     "idb@7.1.1": {
       "integrity": "sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ=="
     },
@@ -6491,6 +6495,7 @@
         "npm:crypto-random-string@5",
         "npm:gzipper@^8.2.1",
         "npm:happy-dom@^17.4.4",
+        "npm:idb-keyval@^6.2.1",
         "npm:immer@^10.1.1",
         "npm:js-cookie@^3.0.5",
         "npm:lucide-react@0.486",

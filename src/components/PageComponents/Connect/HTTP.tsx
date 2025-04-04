@@ -13,6 +13,7 @@ import { TransportHTTP } from "@meshtastic/transport-http";
 import { useState } from "react";
 import { useForm, useController } from "react-hook-form";
 import { AlertTriangle } from "lucide-react";
+import { useMessageStore } from "@core/stores/messageStore.ts";
 
 interface FormData {
   ip: string;
@@ -23,6 +24,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   const isURLHTTPS = location.protocol === "https:";
 
   const { addDevice } = useDeviceStore();
+  const messageStore = useMessageStore();
   const { setSelectedDevice } = useAppStore();
 
   const { control, handleSubmit, register } = useForm<FormData>({
@@ -46,16 +48,16 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   const onSubmit = handleSubmit(async (data) => {
     setConnectionInProgress(true);
     setConnectionError(null);
-    
+
     try {
-      const id = randId();      
+      const id = randId();
       const transport = await TransportHTTP.create(data.ip, data.tls);
       const device = addDevice(id);
       const connection = new MeshDevice(transport, id);
       connection.configure();
       setSelectedDevice(id);
       device.addConnection(connection);
-      subscribeAll(device, connection);
+      subscribeAll(device, connection, messageStore);
       closeDialog();
     } catch (error) {
       console.error("Connection error:", error);

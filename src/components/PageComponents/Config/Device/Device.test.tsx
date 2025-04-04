@@ -5,11 +5,11 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
 import { Protobuf } from "@meshtastic/core";
 
-vi.mock('@core/stores/deviceStore', () => ({
+vi.mock('@core/stores/deviceStore.ts', () => ({
   useDevice: vi.fn()
 }));
 
-vi.mock('@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog', () => ({
+vi.mock('@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts', () => ({
   useUnsafeRolesDialog: vi.fn()
 }));
 

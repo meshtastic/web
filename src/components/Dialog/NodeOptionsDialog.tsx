@@ -13,6 +13,7 @@ import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { TrashIcon } from "lucide-react";
 
 import { Button } from "../UI/Button.tsx";
+import { MessageType, useMessageStore } from "@core/stores/messageStore.ts";
 
 export interface NodeOptionsDialogProps {
   node: Protobuf.Mesh.NodeInfo | undefined;
@@ -29,23 +30,23 @@ export const NodeOptionsDialog = ({
   const {
     setNodeNumToBeRemoved,
     setNodeNumDetails,
-    setChatType,
-    setActiveChat,
   } = useAppStore();
+  const { setChatType, setActiveChat } = useMessageStore();
+
+  if (!node) return null;
+
   const longName = node?.user?.longName ??
     (node ? `!${numberToHexUnpadded(node?.num)}` : "Unknown");
   const shortName = node?.user?.shortName ??
     (node ? `${numberToHexUnpadded(node?.num).substring(0, 4)}` : "UNK");
 
   function handleDirectMessage() {
-    if (!node) return;
-    setChatType("direct");
+    setChatType(MessageType.Direct);
     setActiveChat(node.num);
     setActivePage("messages");
   }
 
   function handleRequestPosition() {
-    if (!node) return;
     toast({
       title: "Requesting position, please wait...",
     });
@@ -58,7 +59,6 @@ export const NodeOptionsDialog = ({
   }
 
   function handleTraceroute() {
-    if (!node) return;
     toast({
       title: "Sending Traceroute, please wait...",
     });
@@ -92,7 +92,7 @@ export const NodeOptionsDialog = ({
               key="remove"
               variant="destructive"
               onClick={() => {
-                setNodeNumToBeRemoved(node.num);
+                setNodeNumToBeRemoved(node?.num);
                 setDialogOpen("nodeRemoval", true);
               }}
             >
@@ -103,7 +103,7 @@ export const NodeOptionsDialog = ({
           <div>
             <Button
               onClick={() => {
-                setNodeNumDetails(node.num);
+                setNodeNumDetails(node?.num);
                 setDialogOpen("nodeDetails", true);
               }}
             >

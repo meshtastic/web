@@ -1,10 +1,10 @@
-import { type MessageWithState, useDevice } from "@core/stores/deviceStore.ts";
-import { Message } from "@components/PageComponents/Messages/Message.tsx";
+import { MessageItem } from "@components/PageComponents/Messages/MessageItem.tsx";
+import type { Message as Message } from "@core/stores/messageStore.ts";
 import { InboxIcon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 
 export interface ChannelChatProps {
-  messages?: MessageWithState[];
+  messages?: Message[];
 }
 
 const EmptyState = () => (
@@ -17,8 +17,6 @@ const EmptyState = () => (
 export const ChannelChat = ({
   messages = [],
 }: ChannelChatProps) => {
-  const { nodes } = useDevice();
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -57,14 +55,14 @@ export const ChannelChat = ({
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto pl-4 pr-4 md:pr-44"
       >
-        <div className="flex flex-col justify-end min-h-full">
+        <div className="flex flex-col gap-1.5 justify-end min-h-full">
           {messages?.map((message, index) => (
-            <Message
-              key={message.id}
+            <MessageItem
+              key={message.messageId + index}
               message={message}
-              sender={nodes.get(message.from)}
               lastMsgSameUser={
-                index > 0 && messages[index - 1].from === message.from
+                index > 0 &&
+                messages[index - 1].from === message.from
               }
             />
           ))}

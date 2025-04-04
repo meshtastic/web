@@ -7,10 +7,12 @@ import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { BleConnection, ServiceUuid } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
+import { useMessageStore } from "@core/stores/messageStore.ts";
 
 export const BLE = ({ closeDialog }: TabElementProps) => {
   const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);
   const { addDevice } = useDeviceStore();
+  const messageStore = useMessageStore()
   const { setSelectedDevice } = useAppStore();
 
   const updateBleDeviceList = useCallback(async (): Promise<void> => {
@@ -30,7 +32,7 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
       device: bleDevice,
     });
     device.addConnection(connection);
-    subscribeAll(device, connection);
+    subscribeAll(device, connection, messageStore);
 
     closeDialog();
   };

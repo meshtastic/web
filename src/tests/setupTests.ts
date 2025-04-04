@@ -1,11 +1,9 @@
-import { expect, afterEach } from 'vitest';
+import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
-import * as matchers from '@testing-library/jest-dom/matchers';
+import { enableMapSet } from "immer";
 import "@testing-library/jest-dom";
 
-// Enable auto mocks for our UI components
-//vi.mock('@components/UI/Dialog.tsx');
-//vi.mock('@components/UI/Typography/Link.tsx');
+enableMapSet();
 
 globalThis.ResizeObserver = class {
   observe() { }

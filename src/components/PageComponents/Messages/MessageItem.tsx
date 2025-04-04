@@ -11,7 +11,8 @@ import { Avatar } from "@components/UI/Avatar.tsx";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ReactNode, useMemo } from "react";
-import { Message, MessageState } from "@core/services/types.ts";
+import { Message, MessageState, useMessageStore } from "@core/stores/messageStore.ts";
+import { Protobuf } from "@meshtastic/js";
 
 interface MessageProps {
   lastMsgSameUser: boolean;
@@ -25,24 +26,20 @@ interface MessageStatus {
 }
 
 const MESSAGE_STATUS: Record<MessageState, MessageStatus> = {
-  ack: { state: "ack", displayText: "Message delivered", icon: CheckCircle2 },
-  waiting: { state: "waiting", displayText: "Waiting for delivery", icon: CircleEllipsis },
-  failed: { state: "failed", displayText: "Delivery failed", icon: AlertCircle },
+  [MessageState.Ack]: { state: MessageState.Ack, displayText: "Message delivered", icon: CheckCircle2 },
+  [MessageState.Waiting]: { state: MessageState.Waiting, displayText: "Waiting for delivery", icon: CircleEllipsis },
+  [MessageState.Failed]: { state: MessageState.Failed, displayText: "Delivery failed", icon: AlertCircle },
 };
 
 const getMessageStatus = (state: MessageState): MessageStatus =>
-  MESSAGE_STATUS[state] || { state: "failed", displayText: "Unknown error", icon: AlertCircle };
+  MESSAGE_STATUS[state] ?? { state: MessageState.Failed, displayText: "Unknown state", icon: AlertCircle };
+
 
 const StatusTooltip = ({ status, children }: { status: MessageStatus; children: ReactNode }) => (
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent
-        className="rounded-md bg-slate-800 px-3 py-1.5 text-sm text-white shadow-md animate-in fade-in-0 zoom-in-95"
-        side="top"
-        align="center"
-        sideOffset={5}
-      >
+      <TooltipContent /* ...props... */ >
         {status.displayText}
         <TooltipArrow className="fill-slate-800" />
       </TooltipContent>
@@ -51,76 +48,105 @@ const StatusTooltip = ({ status, children }: { status: MessageStatus; children: 
 );
 
 const StatusIcon = ({ status, className, ...otherProps }: { status: MessageStatus; className?: string }) => {
-  const isFailed = status.state === "failed";
-  const iconClass = cn("text-slate-500 dark:text-slate-400 w-4 h-4 shrink-0", className);
+  const isFailed = status.state === MessageState.Failed;
+  const iconClass = cn("w-4 h-4 shrink-0", className);
   const Icon = status.icon;
-
   return (
     <StatusTooltip status={status}>
-      <Icon className={iconClass} {...otherProps} color={isFailed ? "red" : "currentColor"} />
+      <Icon className={iconClass} {...otherProps} color={isFailed ? "currentColor" : undefined} />
     </StatusTooltip>
   );
 };
 
-const getMessageTextStyles = (status: MessageStatus) => {
-  const isAcknowledged = status.state === "ack";
-  const isFailed = status.state === "failed";
-
+const getMessageTextStyles = (status: MessageState, isDeviceUser: boolean) => {
+  const isFailed = status === MessageState.Failed;
   return cn(
-    "break-words overflow-hidden",
-    isAcknowledged ? "text-slate-900 dark:text-white" : "text-slate-900 dark:text-slate-400",
-    isFailed && "text-red-500 dark:text-red-500",
+    "break-words overflow-hidden whitespace-pre-wrap flex items-center gap-1.5",
+    isFailed && (isDeviceUser ? "text-red-500" : "text-red-600 dark:text-red-500")
   );
 };
 
-const TimeDisplay = ({ date, className }: { date: Date; className?: string }) => (
-  <div className={cn("flex items-center gap-2 shrink-0", className)}>
-    <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">{date.toLocaleDateString()}</span>
-    <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-      {date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
-    </span>
-  </div>
-);
+
+const TimeDisplay = ({ date, className }: { date: number; className?: string }) => {
+  const _date = new Date(date);
+  const locale = 'en-US'; // TODO: this should be dynamic based on user settings
+  return (
+    <div className={cn("flex items-center gap-1 text-xs font-mono", className)}>
+      <span>
+        {_date?.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit', hour12: true })}
+      </span>
+      {/* TODO: Conditionally show date for older messages? */}
+    </div>
+  );
+};
 
 export const MessageItem = ({ lastMsgSameUser, message }: MessageProps) => {
+  const myNodeNum = useMessageStore((state) => state.nodeNum);
+
   const { getDevices } = useDeviceStore();
 
-  const isDeviceUser = useMemo(
-    () =>
-      getDevices()
-        .map((device) => device.nodes.get(device.hardware.myNodeNum)?.num)
-        .includes(message.from),
-    [getDevices, message.from],
-  );
+  const isDeviceUser = message.from === myNodeNum;
 
-  const messageUser = message?.from
-    ? getDevices().find((device) => device.nodes.has(message.from))?.nodes.get(message.from)
-    : null;
+  const messageUser: Protobuf.Mesh.NodeInfo | null = useMemo(() => {
+    if (message?.from === null || message?.from === undefined) return null;
+    for (const device of getDevices()) {
+      if (device.nodes.has(message.from)) {
+        return device.nodes.get(message.from) ?? null;
+      }
+    }
+    return null;
+  }, [getDevices, message.from]);
+
+  const fallbackName = `${message.from}`;
+  const longName = messageUser?.user?.longName;
+  const shortName = messageUser?.user?.shortName ?? fallbackName.slice(0, 2).toUpperCase();
+  const displayName = isDeviceUser ? "You" : (longName || fallbackName);
+
+  const messageContainerClass = cn(
+    "flex flex-col w-full px-4 justify-start",
+    !lastMsgSameUser ? "pt-3" : "pt-0.5"
+  );
+  const alignmentClass = cn(
+    "flex flex-col flex-wrap w-full",
+    isDeviceUser ? "items-end" : "items-start"
+  );
+  const bubbleBaseStyle = "flex flex-col max-w-[75%] rounded-lg px-3 py-1.5 text-sm shadow-md";
+  const sentBubbleStyle = "bg-gradient-to-br from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white";
+  const receivedBubbleStyle = "bg-slate-200 dark:bg-slate-500 text-slate-900 dark:text-white";
+  const timeStatusColor = isDeviceUser ? "text-blue-100 dark:text-blue-200" : "text-slate-500 dark:text-slate-300";
 
   const messageStatus = getMessageStatus(message.state);
-  const messageTextClass = getMessageTextStyles(messageStatus);
+
 
   return (
-    <div className="flex flex-col w-full px-4 justify-start">
-      <div className={cn("flex flex-col flex-wrap items-start py-1", messageTextClass, isDeviceUser && "items-end")}>
-        <div className="flex items-center gap-2 mb-2">
-          {!lastMsgSameUser && (
-            <div className="flex place-items-center gap-2 mb-1">
-              <Avatar text={messageUser?.user?.shortName ?? "UNK"} />
-              <div className="flex flex-col">
-                <span className="font-medium text-slate-900 dark:text-white truncate">
-                  {messageUser?.user?.longName}
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-        <TimeDisplay date={message.date} />
-        <div className="flex place-items-center gap-2 pb-2">
-          <div className={cn(isDeviceUser && "pl-11", messageTextClass)}>{message.message}</div>
-          <StatusIcon status={messageStatus} />
+    <div className={messageContainerClass}>
+      <div className={alignmentClass}>
+
+        {/* Show only if not consecutive message AND not sent by self */}
+        {!lastMsgSameUser && (
+          <div className="flex items-center gap-1.5 mb-1 px-1">
+            <Avatar text={shortName} />
+            <span className="text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
+              {displayName}
+            </span>
+          </div>
+        )}
+
+        <div className={cn(
+          bubbleBaseStyle,
+          isDeviceUser ? sentBubbleStyle : receivedBubbleStyle
+        )}>
+          <div className={cn("flex items-center gap-1.5 mt-1 self-end", timeStatusColor)}>
+            <TimeDisplay date={message.date} />
+          </div>
+
+          <div className={cn(getMessageTextStyles(message.state, isDeviceUser))}>
+            {message.message || <span className="italic opacity-70">Empty message</span>}
+            {isDeviceUser && <StatusIcon status={messageStatus} />}
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
