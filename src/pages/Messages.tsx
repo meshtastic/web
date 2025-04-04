@@ -77,7 +77,7 @@ export const MessagesPage = () => {
                 key={otherNode.num}
                 label={otherNode.user?.longName ??
                   `!${numberToHexUnpadded(otherNode.num)}`}
-                active={activeChat === otherNode.num && chatType === "direct"}
+                active={activeChat === otherNode.num && chatType === MessageType.Direct}
                 onClick={() => {
                   setChatType(MessageType.Direct);
                   setActiveChat(otherNode.num);
@@ -153,7 +153,6 @@ export const MessagesPage = () => {
 
           <div className="shrink-0 p-4 w-full dark:bg-slate-900">
             <MessageInput
-              from={activeChat}
               to={currentChat.type === MessageType.Direct ? activeChat : MessageType.Broadcast}
               channel={currentChat.type === MessageType.Direct ? Types.ChannelNumber.Primary : currentChat.id}
               maxBytes={200}

@@ -27,15 +27,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
-import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { MessageType, useMessageStore } from "@core/stores/messageStore.ts";
 
 export interface NodeDetailProps {
   node: ProtobufType.Mesh.NodeInfo;
 }
 
 export const NodeDetail = ({ node }: NodeDetailProps) => {
-  const { setChatType, setActiveChat } = useAppStore();
+  const { setChatType, setActiveChat } = useMessageStore();
   const { setActivePage } = useDevice();
   const name = node.user?.longName || `!${numberToHexUnpadded(node.num)}`;
   const shortName = node.user?.shortName ?? "UNK";
@@ -44,7 +44,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
     Protobuf.Mesh.HardwareModel[hwModel]?.replaceAll("_", " ") ?? `${hwModel}`;
 
   function handleDirectMessage() {
-    setChatType("direct");
+    setChatType(MessageType.Direct);
     setActiveChat(node.num);
     setActivePage("messages");
   }
@@ -54,7 +54,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
           <Avatar text={shortName} />
-          
+
           <div onFocusCapture={(e) => {
             // Required to prevent DM tooltip auto-appearing on creation
             e.stopPropagation();
@@ -80,11 +80,10 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <MessageSquareIcon 
+                  <MessageSquareIcon
                     size={14}
                     onClick={handleDirectMessage}
                     className="cursor-pointer hover:text-blue-500"
-                    title="Send Message"
                   />
                 </TooltipTrigger>
                 <TooltipPortal>
