@@ -153,7 +153,6 @@ export const MessagesPage = () => {
 
           <div className="shrink-0 p-4 w-full dark:bg-slate-900">
             <MessageInput
-              from={activeChat}
               to={currentChat.type === MessageType.Direct ? activeChat : MessageType.Broadcast}
               channel={currentChat.type === MessageType.Direct ? Types.ChannelNumber.Primary : currentChat.id}
               maxBytes={200}
