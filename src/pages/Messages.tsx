@@ -77,7 +77,7 @@ export const MessagesPage = () => {
                 key={otherNode.num}
                 label={otherNode.user?.longName ??
                   `!${numberToHexUnpadded(otherNode.num)}`}
-                active={activeChat === otherNode.num && chatType === "direct"}
+                active={activeChat === otherNode.num && chatType === MessageType.Direct}
                 onClick={() => {
                   setChatType(MessageType.Direct);
                   setActiveChat(otherNode.num);
