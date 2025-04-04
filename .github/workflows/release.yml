@@ -1,4 +1,4 @@
-name: 'Release'
+name: Release
 
 on:
   release:
@@ -38,6 +38,10 @@ jobs:
           name: build
           path: dist/build.tar
 
+      - name: Attach build.tar to release
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} dist/build.tar
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -46,7 +50,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            ./Containerfile
+            ./infra/Containerfile
           image: ${{github.event.repository.full_name}}
           tags: latest ${{ github.sha }}
           oci: true

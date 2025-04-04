@@ -1,10 +1,11 @@
-import { debounce } from "@core/utils/debounce.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
 import { startTransition, useCallback, useMemo, useState } from "react";
+import { MessageState, MessageType, useMessageStore } from "@core/stores/messageStore.ts";
+import { debounce } from "@core/utils/debounce.ts";
 
 export interface MessageInputProps {
   to: Types.Destination;
@@ -17,57 +18,41 @@ export const MessageInput = ({
   channel,
   maxBytes,
 }: MessageInputProps) => {
-  const {
-    connection,
-    setMessageState,
-    messageDraft,
-    setMessageDraft,
-    isQueueingMessages,
-    queueStatus,
-    hardware,
-  } = useDevice();
-  const myNodeNum = hardware.myNodeNum;
-  const [localDraft, setLocalDraft] = useState(messageDraft);
+  const { connection } = useDevice();
+  const { setMessageState, activeChat, setDraft, getDraft, clearDraft } = useMessageStore();
+
+  const [localDraft, setLocalDraft] = useState(getDraft(to));
   const [messageBytes, setMessageBytes] = useState(0);
 
   const debouncedSetMessageDraft = useMemo(
-    () => debounce(setMessageDraft, 300),
-    [setMessageDraft],
+    () => debounce((value: string) => setDraft(to, value), 300),
+    [setDraft, to]
   );
 
-  // sends the message to the selected destination
-  const sendText = useCallback(
-    async (message: string) => {
+  const calculateBytes = (text: string) => new Blob([text]).size;
 
-      await connection
-        ?.sendText(message, to, true, channel)
-        .then((id: number) =>
-          setMessageState(
-            to === "broadcast" ? "broadcast" : "direct",
-            channel,
-            to as number,
-            myNodeNum,
-            id,
-            "ack",
-          )
-        )
-        .catch((e: Types.PacketError) =>
-          setMessageState(
-            to === "broadcast" ? "broadcast" : "direct",
-            channel,
-            to as number,
-            myNodeNum,
-            e.id,
-            e.error,
-          )
-        );
-    },
-    [channel, connection, myNodeNum, setMessageState, to, queueStatus],
-  );
+  const chatType = to === MessageType.Broadcast ? MessageType.Broadcast : MessageType.Direct;
+
+  const sendText = useCallback(async (message: string) => {
+    try {
+      const messageId = await connection?.sendText(message, to, true, channel);
+      if (messageId !== undefined) {
+        setMessageState({ type: chatType, key: activeChat, messageId, newState: MessageState.Ack });
+      }
+      // deno-lint-ignore no-explicit-any
+    } catch (e: any) {
+      setMessageState({
+        type: chatType,
+        key: activeChat,
+        messageId: e?.id,
+        newState: MessageState.Failed,
+      });
+    }
+  }, [channel, connection, setMessageState, to, activeChat, chatType]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    const byteLength = new Blob([newValue]).size;
+    const byteLength = calculateBytes(newValue);
 
     if (byteLength <= maxBytes) {
       setLocalDraft(newValue);
@@ -76,26 +61,22 @@ export const MessageInput = ({
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!localDraft.trim()) return;
+
+    startTransition(() => {
+      sendText(localDraft.trim());
+      setLocalDraft("");
+      clearDraft(to);
+      setMessageBytes(0);
+    });
+  };
+
   return (
     <div className="flex gap-2">
-      <form
-        className="w-full"
-        action={(formData: FormData) => {
-          // prevent user from sending blank/empty message
-          if (localDraft === "") return;
-          const message = formData.get("messageInput") as string;
-          startTransition(() => {
-            if (!isQueueingMessages) {
-              sendText(message);
-              setLocalDraft("");
-              setMessageDraft("");
-              setMessageBytes(0);
-            }
-
-          });
-        }}
-      >
-        <div className="flex grow gap-2 ">
+      <form className="w-full" action="#" name="messageInput" onSubmit={handleSubmit}>
+        <div className="flex grow gap-2">
           <label className="w-full">
             <Input
               autoFocus
@@ -106,11 +87,15 @@ export const MessageInput = ({
               onChange={handleInputChange}
             />
           </label>
+
           <label data-testid="byte-counter" className="flex items-center w-24 p-2 place-content-end">
             {messageBytes}/{maxBytes}
           </label>
 
-          <Button type="submit" className="dark:bg-white dark:text-slate-900 dark:hover:bg-slate-400 dark:hover:text-white">
+          <Button
+            type="submit"
+            className="dark:bg-white dark:text-slate-900 dark:hover:bg-slate-400 dark:hover:text-white"
+          >
             <SendIcon size={16} />
           </Button>
         </div>

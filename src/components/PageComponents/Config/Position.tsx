@@ -1,8 +1,8 @@
 import {
   type FlagName,
   usePositionFlags,
-} from "../../../core/hooks/usePositionFlags.ts";
-import type { PositionValidation } from "@app/validation/config/position.tsx";
+} from "@core/hooks/usePositionFlags.ts";
+import type { PositionValidation } from "@app/validation/config/position.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -12,7 +12,7 @@ import { useCallback } from "react";
 export const Position = () => {
   const { config, setWorkingConfig } = useDevice();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
-    config?.position.positionFlags ?? 0,
+    config?.position?.positionFlags ?? 0,
   );
 
   const onSubmit = (data: PositionValidation) => {
@@ -74,7 +74,7 @@ export const Position = () => {
               name: "positionFlags",
               value: activeFlags,
               isChecked: (name: string) =>
-                activeFlags.includes(name as FlagName),
+              activeFlags?.includes(name as FlagName) ?? false,
               onValueChange: onPositonFlagChange,
               label: "Position Flags",
               placeholder: "Select position flags...",

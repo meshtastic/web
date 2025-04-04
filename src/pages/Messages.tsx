@@ -1,4 +1,3 @@
-import { useAppStore } from "../core/stores/appStore.ts";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
@@ -14,11 +13,15 @@ import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import { useState } from "react";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import { cn } from "@core/utils/cn.ts";
+import { MessageType, useMessageStore } from "@core/stores/messageStore.ts";
 
 export const MessagesPage = () => {
-  const { channels, nodes, hardware, messages, hasNodeError, unreadCounts, setUnread } = useDevice();
-  const { activeChat, chatType, setActiveChat, setChatType } = useAppStore();
+  const { channels, nodes, hardware, hasNodeError, unreadCounts, setUnread } = useDevice();
+  const { getNodeNum, getMessages, setActiveChat, chatType, activeChat, setChatType } = useMessageStore()
+  const { toast } = useToast();
+
   const [searchTerm, setSearchTerm] = useState<string>("");
+
   const filteredNodes = Array.from(nodes.values()).filter((node) => {
     if (node.num === hardware.myNodeNum) return false;
     const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
@@ -34,14 +37,15 @@ export const MessagesPage = () => {
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
   );
   const currentChannel = channels.get(activeChat);
-  const { toast } = useToast();
-  const node = nodes.get(activeChat);
-  const nodeHex = node?.num ? numberToHexUnpadded(node.num) : "Unknown";
 
-  const messageDestination = chatType === "direct" ? activeChat : "broadcast";
-  const messageChannel = chatType === "direct"
-    ? Types.ChannelNumber.Primary
-    : activeChat;
+  const otherNode = nodes.get(activeChat);
+
+  const nodeHex = otherNode?.num ? numberToHexUnpadded(otherNode.num) : "Unknown";
+
+  const isDirect = chatType === MessageType.Direct;
+  const isBroadcast = chatType === MessageType.Broadcast;
+
+  const currentChat = { type: chatType, id: activeChat };
 
   return (
     <>
@@ -56,9 +60,8 @@ export const MessagesPage = () => {
                 : channel.index === 0
                   ? "Primary"
                   : `Ch ${channel.index}`}
-              active={activeChat === channel.index && chatType === "broadcast"}
               onClick={() => {
-                setChatType("broadcast");
+                setChatType(MessageType.Broadcast);
                 setActiveChat(channel.index);
                 setUnread(channel.index, 0);
               }}
@@ -77,23 +80,22 @@ export const MessagesPage = () => {
             />
           </div>
           <div className="flex flex-col gap-4">
-            {filteredNodes.map((node) => (
+            {filteredNodes.map((otherNode) => (
               <SidebarButton
-                key={node.num}
                 count={unreadCounts.get(node.num)}
                 label={node.user?.longName ??
                   `!${numberToHexUnpadded(node.num)}`}
-                active={activeChat === node.num && chatType === "direct"}
+               active={activeChat === otherNode.num && chatType === MessageType.Direct}
                 onClick={() => {
-                  setChatType("direct");
-                  setActiveChat(node.num);
-                  setUnread(node.num, 0);
+                  setChatType(MessageType.Direct);
+                  setActiveChat(otherNode.num);
+                  setUnread(otherNode.num, 0);
                 }}
                 element={
                   <Avatar
-                    text={node.user?.shortName ?? node.num.toString()}
-                    className={cn(hasNodeError(node.num) && "text-red-500")}
-                    showError={hasNodeError(node.num)}
+                    text={otherNode?.user?.shortName ?? otherNode.num.toString()}
+                    className={cn(hasNodeError(otherNode?.num) && "text-red-500")}
+                    showError={hasNodeError(otherNode?.num)}
                     size="sm"
                   />
                 }
@@ -105,13 +107,13 @@ export const MessagesPage = () => {
       <div className="flex flex-col w-full h-full container mx-auto">
         <PageLayout
           className="flex flex-col h-full"
-          label={`Messages: ${chatType === "broadcast" && currentChannel
+          label={`Messages: ${MessageType.Broadcast && currentChannel
             ? getChannelName(currentChannel)
-            : chatType === "direct" && nodes.get(activeChat)
+            : chatType === MessageType.Direct && nodes.get(activeChat)
               ? (nodes.get(activeChat)?.user?.longName ?? nodeHex)
               : "Loading..."
             }`}
-          actions={chatType === "direct"
+          actions={chatType === MessageType.Direct
             ? [
               {
                 icon: nodes.get(activeChat)?.user?.publicKey.length
@@ -134,23 +136,24 @@ export const MessagesPage = () => {
             : []}
         >
           <div className="flex-1 overflow-y-auto">
-            {chatType === "broadcast" && currentChannel && (
+            {isBroadcast && currentChannel && (
               <div className="flex flex-col h-full">
                 <div className="flex-1 overflow-y-auto">
                   <ChannelChat
-                    key={currentChannel.index}
-                    messages={messages.broadcast.get(currentChannel.index)}
+                    messages={getMessages(MessageType.Broadcast, {
+                      myNodeNum: getNodeNum(),
+                      channel: currentChannel?.index
+                    })}
                   />
                 </div>
               </div>
             )}
 
-            {chatType === "direct" && node && (
+            {isDirect && otherNode && (
               <div className="flex flex-col h-full">
                 <div className="flex-1 overflow-y-auto">
                   <ChannelChat
-                    key={node.num}
-                    messages={messages.direct.get(node.num)}
+                    messages={getMessages(MessageType.Direct, { myNodeNum: getNodeNum(), otherNodeNum: activeChat })}
                   />
                 </div>
               </div>
@@ -159,8 +162,8 @@ export const MessagesPage = () => {
 
           <div className="shrink-0 p-4 w-full dark:bg-slate-900">
             <MessageInput
-              to={messageDestination}
-              channel={messageChannel}
+              to={currentChat.type === MessageType.Direct ? activeChat : MessageType.Broadcast}
+              channel={currentChat.type === MessageType.Direct ? Types.ChannelNumber.Primary : currentChat.id}
               maxBytes={200}
             />
           </div>

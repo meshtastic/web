@@ -2,7 +2,7 @@ import { Bluetooth } from "@components/PageComponents/Config/Bluetooth.tsx";
 import { Device } from "../../components/PageComponents/Config/Device/index.tsx";
 import { Display } from "@components/PageComponents/Config/Display.tsx";
 import { LoRa } from "@components/PageComponents/Config/LoRa.tsx";
-import { Network } from "@components/PageComponents/Config/Network.tsx";
+import { Network } from "../../components/PageComponents/Config/Network/index.tsx";
 import { Position } from "@components/PageComponents/Config/Position.tsx";
 import { Power } from "@components/PageComponents/Config/Power.tsx";
 import { Security } from "../../components/PageComponents/Config/Security/Security.tsx";
@@ -31,7 +31,6 @@ export const DeviceConfig = () => {
     {
       label: "Network",
       element: Network,
-      // disabled: !metadata.get(0)?.hasWifi,
     },
     {
       label: "Display",
