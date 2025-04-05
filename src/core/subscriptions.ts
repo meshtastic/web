@@ -1,6 +1,6 @@
 import type { Device } from "@core/stores/deviceStore.ts";
 import { MeshDevice, Protobuf } from "@meshtastic/core";
-import type { MessageStore } from "@core/stores/messageStore.ts";
+import { MessageType, type MessageStore } from "@core/stores/messageStore.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
 
 export const subscribeAll = (
