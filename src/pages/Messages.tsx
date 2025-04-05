@@ -15,23 +15,27 @@ import { MessageInput } from "@components/PageComponents/Messages/MessageInput.t
 import { cn } from "@core/utils/cn.ts";
 import { MessageType, useMessageStore } from "@core/stores/messageStore.ts";
 
+type NodeInfoWithUnread = Protobuf.Mesh.NodeInfo & { unreadCount: number };
+
 export const MessagesPage = () => {
-  const { channels, nodes, hardware, hasNodeError, unreadCounts, setUnread } = useDevice();
+  const { channels, nodes, hardware, hasNodeError, unreadCounts, resetUnread } = useDevice();
   const { getNodeNum, getMessages, setActiveChat, chatType, activeChat, setChatType } = useMessageStore()
   const { toast } = useToast();
-
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const filteredNodes = Array.from(nodes.values()).filter((node) => {
-    if (node.num === hardware.myNodeNum) return false;
-    const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
-    return nodeName.toLowerCase().includes(searchTerm.toLowerCase());
-  })
-  .map((node) => ({ 
-    ...node, 
-    unreadCount: unreadCounts.get(node.num) ?? 0
-  }))
-  .sort((a, b) => b.unreadCount - a.unreadCount);
+  const filteredNodes: NodeInfoWithUnread[] = Array.from(nodes.values())
+    .filter((node) => node.num !== hardware.myNodeNum)
+    .map((node) => ({
+      ...node,
+      unreadCount: unreadCounts.get(node.num) ?? 0,
+    }))
+    .filter((node) => {
+      const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
+      return nodeName.toLowerCase().includes(searchTerm.toLowerCase());
+    })
+    .sort((a, b) => b.unreadCount - a.unreadCount);
+
+
   const allChannels = Array.from(channels.values());
   const filteredChannels = allChannels.filter(
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
@@ -55,47 +59,44 @@ export const MessagesPage = () => {
             <SidebarButton
               key={channel.index}
               count={unreadCounts.get(channel.index)}
-              label={channel.settings?.name.length
-                ? channel.settings?.name
-                : channel.index === 0
-                  ? "Primary"
-                  : `Ch ${channel.index}`}
+              label={channel.settings?.name || (channel.index === 0 ? "Primary" : `Ch ${channel.index}`)}
+              active={activeChat === channel.index && chatType === MessageType.Broadcast}
               onClick={() => {
                 setChatType(MessageType.Broadcast);
                 setActiveChat(channel.index);
-                setUnread(channel.index, 0);
+                resetUnread(channel.index);
               }}
               element={<HashIcon size={16} className="mr-2" />}
             />
           ))}
         </SidebarSection>
         <SidebarSection label="Nodes">
-          <div className="p-4">
+          <div className="p-1 mb-4">
             <input
               type="text"
               placeholder="Search nodes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-2 border border-slate-300 rounded-sm bg-white text-slate-900"
+              className="w-full p-2 border border-slate-300 rounded-sm bg-white text-slate-900 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="flex flex-col gap-4">
-            {filteredNodes.map((otherNode) => (
+          <div className="flex flex-col gap-3.5">
+            {filteredNodes.map((node) => (
               <SidebarButton
-                count={unreadCounts.get(node.num)}
-                label={node.user?.longName ??
-                  `!${numberToHexUnpadded(node.num)}`}
-               active={activeChat === otherNode.num && chatType === MessageType.Direct}
+                key={node.num}
+                label={node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`}
+                count={node.unreadCount > 0 ? node.unreadCount : undefined}
+                active={activeChat === node.num && chatType === MessageType.Direct}
                 onClick={() => {
                   setChatType(MessageType.Direct);
-                  setActiveChat(otherNode.num);
-                  setUnread(otherNode.num, 0);
+                  setActiveChat(node.num);
+                  resetUnread(node.num);
                 }}
                 element={
                   <Avatar
-                    text={otherNode?.user?.shortName ?? otherNode.num.toString()}
-                    className={cn(hasNodeError(otherNode?.num) && "text-red-500")}
-                    showError={hasNodeError(otherNode?.num)}
+                    text={node.user?.shortName ?? node.num.toString()}
+                    className={cn(hasNodeError(node.num) && "text-red-500")}
+                    showError={hasNodeError(node.num)}
                     size="sm"
                   />
                 }
@@ -107,26 +108,22 @@ export const MessagesPage = () => {
       <div className="flex flex-col w-full h-full container mx-auto">
         <PageLayout
           className="flex flex-col h-full"
-          label={`Messages: ${MessageType.Broadcast && currentChannel
+          label={`Messages: ${isBroadcast && currentChannel
             ? getChannelName(currentChannel)
-            : chatType === MessageType.Direct && nodes.get(activeChat)
-              ? (nodes.get(activeChat)?.user?.longName ?? nodeHex)
-              : "Loading..."
+            : isDirect && otherNode
+              ? (otherNode.user?.longName ?? nodeHex)
+              : "Select a Chat"
             }`}
-          actions={chatType === MessageType.Direct
+          actions={isDirect && otherNode
             ? [
               {
-                icon: nodes.get(activeChat)?.user?.publicKey.length
-                  ? LockIcon
-                  : LockOpenIcon,
-                iconClasses: nodes.get(activeChat)?.user?.publicKey.length
+                icon: otherNode.user?.publicKey?.length ? LockIcon : LockOpenIcon,
+                iconClasses: otherNode.user?.publicKey?.length
                   ? "text-green-600"
                   : "text-yellow-300",
                 onClick() {
-                  const targetNode = nodes.get(activeChat)?.num;
-                  if (targetNode === undefined) return;
                   toast({
-                    title: nodes.get(activeChat)?.user?.publicKey.length
+                    title: otherNode.user?.publicKey?.length
                       ? "Chat is using PKI encryption."
                       : "Chat is using PSK encryption.",
                   });
@@ -158,14 +155,24 @@ export const MessagesPage = () => {
                 </div>
               </div>
             )}
+
+            {!isBroadcast && !isDirect && (
+              <div className="flex items-center justify-center h-full text-slate-500">
+                Select a channel or node to start messaging.
+              </div>
+            )}
           </div>
 
           <div className="shrink-0 p-4 w-full dark:bg-slate-900">
-            <MessageInput
-              to={currentChat.type === MessageType.Direct ? activeChat : MessageType.Broadcast}
-              channel={currentChat.type === MessageType.Direct ? Types.ChannelNumber.Primary : currentChat.id}
-              maxBytes={200}
-            />
+            {(isBroadcast || isDirect) ? (
+              <MessageInput
+                to={isDirect ? activeChat : MessageType.Broadcast}
+                channel={isDirect ? Types.ChannelNumber.Primary : currentChat.id}
+                maxBytes={200}
+              />
+            ) : (
+              <div className="text-center text-slate-400 italic">Select a chat to send a message.</div>
+            )}
           </div>
         </PageLayout>
       </div>

@@ -1,9 +1,7 @@
 import type { Device } from "@core/stores/deviceStore.ts";
 import { MeshDevice, Protobuf } from "@meshtastic/core";
-import type { MessageStore, MessageType } from "@core/stores/messageStore.ts";
-import { MessageType } from "@core/stores/messageStore.ts";
+import type { MessageStore } from "@core/stores/messageStore.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
-
 
 export const subscribeAll = (
   device: Device,
@@ -87,15 +85,20 @@ export const subscribeAll = (
 
 
   connection.events.onMessagePacket.subscribe((messagePacket) => {
+    // incoming and outgoing messages are handled by this event listener
     const dto = new PacketToMessageDTO(messagePacket, myNodeNum);
     const message = dto.toMessage();
-    messsageStore.saveMessage(message);
-    
-    message.type == MessageType.Direct 
-      ? 
-      device.setUnread(messagePacket.from);
-      :
-      device.setUnread(messagePacket.channel);  
+    messageStore.saveMessage(message);
+
+    if (message.type == MessageType.Direct) {
+      if (message.to === myNodeNum) {
+        device.incrementUnread(messagePacket.from);
+      }
+    } else if (message.type == MessageType.Broadcast) {
+      if (message.from !== myNodeNum) {
+        device.incrementUnread(message.channel);
+      }
+    }
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {

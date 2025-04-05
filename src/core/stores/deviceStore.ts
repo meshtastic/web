@@ -74,7 +74,6 @@ export interface Device {
     refreshKeys: boolean;
     clearMessages: boolean;
   };
-  unreadCounts: Map<number, number>;
 
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -102,11 +101,12 @@ export interface Device {
   getDialogOpen: (dialog: DialogVariant) => boolean;
   processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
-  setUnread: (id: number, count: number) => void;
   setNodeError: (nodeNum: number, error: string) => void;
   clearNodeError: (nodeNum: number) => void;
   getNodeError: (nodeNum: number) => NodeError | undefined;
   hasNodeError: (nodeNum: number) => boolean
+  incrementUnread: (nodeNum: number) => void;
+  resetUnread: (nodeNum: number) => void;
 }
 
 export interface DeviceState {
@@ -154,11 +154,12 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             unsafeRoles: false,
             refreshKeys: false,
             rebootOTA: false,
+            clearMessages: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
-          unreadCounts: new Map(),
           nodeErrors: new Map(),
+
 
           setStatus: (status: Types.DeviceStatusEnum) => {
             set(
@@ -581,20 +582,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               }),
             );
           },
-          setUnread: (unread_id: number, count?: number) => {
-              set(
-                produce<DeviceState>((draft) => {
-                  const device = draft.devices.get(id);
-                  if (device) {
-                    if (count == null) {
-                      let currentCount = device.unreadCounts.get(unread_id) ?? 0;
-                      count = currentCount + 1;
-                    }
-                    device.unreadCounts.set(unread_id, count);
-                  }
-                })
-              );
-            },
           setNodeError: (nodeNum, error) => {
             set(
               produce<DeviceState>((draft) => {
@@ -629,7 +616,35 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             }
             return device.nodeErrors.has(nodeNum);
           },
+          incrementUnread: (nodeNum: number) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  console.warn(`incrementUnread: Device with ID ${id} not found.`);
+                  return;
+                }
+                const currentCount = device.unreadCounts.get(nodeNum) ?? 0;
+                device.unreadCounts.set(nodeNum, currentCount + 1);
+              })
+            );
+          },
+          resetUnread: (nodeNum: number) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  console.warn(`resetUnread: Device with ID ${id} not found.`);
+                  return;
+                }
+                device.unreadCounts.set(nodeNum, 0);
 
+                if (device.unreadCounts.get(nodeNum) === 0) {
+                  device.unreadCounts.delete(nodeNum);
+                }
+              })
+            );
+          },
         });
       }),
     );

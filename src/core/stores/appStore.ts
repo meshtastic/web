@@ -8,7 +8,6 @@ export interface RasterSource {
   tileSize: number;
 }
 
-
 interface ErrorState {
   field: string;
   message: string;
@@ -19,12 +18,7 @@ interface ErrorState {
   message: string;
 }
 
-export interface App {
-  unreadCounts: Map<number, number>;
-  setUnread: (id: number, count: number) => void;
-}
-
-export interface AppState {
+interface AppState {
   selectedDevice: number;
   devices: {
     id: number;
@@ -36,7 +30,6 @@ export interface AppState {
   connectDialogOpen: boolean;
   nodeNumDetails: number;
   errors: ErrorState[];
-  unreadCounts: Map<number, number>;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -57,9 +50,6 @@ export interface AppState {
   removeError: (field: string) => void;
   clearErrors: () => void;
   setNewErrors: (newErrors: ErrorState[]) => void;
-
-  // unread counts
-  setUnread: (id: number, count: number) => void;
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
@@ -72,7 +62,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
   nodeNumToBeRemoved: 0,
   nodeNumDetails: 0,
   errors: [],
-  unreadCounts: new Map([[0, 100],[2718471552, 1]]),
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -173,11 +162,4 @@ export const useAppStore = create<AppState>()((set, get) => ({
       }),
     );
   },
-  setUnread: (id: number, count: number) => {
-    set(
-      produce<AppState>((draft) => {
-        draft.unreadCounts.set(id, count);
-      })
-    );
-  }
 }));

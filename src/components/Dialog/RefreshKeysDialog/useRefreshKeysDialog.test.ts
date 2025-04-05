@@ -3,8 +3,8 @@ import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import { useDevice } from "@core/stores/deviceStore.ts";
 
-vi.mock("@core/stores/appStore.ts", () => ({
-  useAppStore: vi.fn(() => ({ activeChat: "chat-123" })),
+vi.mock("@core/stores/messageStore.ts", () => ({
+  useMessageStore: vi.fn(() => ({ activeChat: "chat-123" })),
 }));
 
 vi.mock("@core/stores/deviceStore.ts", () => ({

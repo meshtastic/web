@@ -9,19 +9,15 @@ import {
 let memoryStorage: Record<string, string> = {};
 
 vi.mock('./storage/indexDB.ts', () => {
-  console.log("Mocking zustandIndexDBStorage...");
   return {
     zustandIndexDBStorage: {
       getItem: vi.fn(async (name: string): Promise<string | null> => {
-        console.log(`Mock getItem: ${name}`, memoryStorage[name] ?? null);
         return memoryStorage[name] ?? null;
       }),
       setItem: vi.fn(async (name: string, value: string): Promise<void> => {
-        console.log(`Mock setItem: ${name}`, value);
         memoryStorage[name] = value;
       }),
       removeItem: vi.fn(async (name: string): Promise<void> => {
-        console.log(`Mock removeItem: ${name}`);
         delete memoryStorage[name];
       }),
     },
@@ -211,11 +207,14 @@ describe('useMessageStore', () => {
       expect(messages).toEqual([]);
     });
 
-    it('should return empty array if myNodeNum is not provided for direct messages', () => {
+    it('should return combined direct messages when myNodeNum and otherNodeNum are provided', () => {
       const messages = useMessageStore.getState().getMessages(MessageType.Direct, {
+        myNodeNum: myNodeNum,         // Keep this
         otherNodeNum: otherNodeNum1
       });
-      expect(messages).toEqual([]);
+      expect(messages).toHaveLength(2);
+      expect(messages[0]).toEqual(directMessageToOther1);
+      expect(messages[1]).toEqual(directMessageFromOther1);
     });
   });
 
