@@ -66,8 +66,9 @@ export const MessagesPage = () => {
                 setActiveChat(channel.index);
                 resetUnread(channel.index);
               }}
-              element={<HashIcon size={16} className="mr-2" />}
-            />
+            >
+              <HashIcon size={16} className="mr-2" />
+            </SidebarButton>
           ))}
         </SidebarSection>
         <SidebarSection label="Nodes">
@@ -91,16 +92,14 @@ export const MessagesPage = () => {
                   setChatType(MessageType.Direct);
                   setActiveChat(node.num);
                   resetUnread(node.num);
-                }}
-                element={
-                  <Avatar
-                    text={node.user?.shortName ?? node.num.toString()}
-                    className={cn(hasNodeError(node.num) && "text-red-500")}
-                    showError={hasNodeError(node.num)}
-                    size="sm"
-                  />
-                }
-              />
+                }}>
+                <Avatar
+                  text={node.user?.shortName ?? node.num.toString()}
+                  className={cn(hasNodeError(node.num) && "text-red-500")}
+                  showError={hasNodeError(node.num)}
+                  size="sm"
+                />
+              </SidebarButton>
             ))}
           </div>
         </SidebarSection>
