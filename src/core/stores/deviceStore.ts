@@ -60,6 +60,7 @@ export interface Device {
   // currentMetrics: Protobuf.DeviceMetrics;
   pendingSettingsChanges: boolean;
   messageDraft: string;
+  unreadCounts: Map<number, number>;
   dialog: {
     import: boolean;
     QR: boolean;
@@ -159,6 +160,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           pendingSettingsChanges: false,
           messageDraft: "",
           nodeErrors: new Map(),
+          unreadCounts: new Map(),
 
 
           setStatus: (status: Types.DeviceStatusEnum) => {
