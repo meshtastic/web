@@ -4,7 +4,6 @@ import { MessagesPage } from "./Messages.tsx";
 import { useDevice } from "../core/stores/deviceStore";
 import { Protobuf } from "@meshtastic/core";
 
-// Mock the store
 vi.mock("../core/stores/deviceStore", () => ({
   useDevice: vi.fn()
 }));
@@ -39,7 +38,7 @@ const mockUseDevice = {
     messages: { broadcast: new Map(), direct: new Map() },
     metadata: new Map(),
     unreadCounts: new Map([[1111, 3], [2222, 10]]),
-    setUnread: vi.fn(),
+    resetUnread: vi.fn(),
     hasNodeError: vi.fn()
 };
 
@@ -62,14 +61,14 @@ describe("Messages Page", () => {
         render(<MessagesPage />);
         const nodeButton = screen.getAllByRole("button").filter(b => b.textContent.includes("TN1Test Node 13"))[0];
         fireEvent.click(nodeButton);
-        expect(mockUseDevice.setUnread).toHaveBeenCalledWith(1111, 0);
+        expect(mockUseDevice.resetUnread).toHaveBeenCalledWith(1111, 0);
     });
 
     it("does not update the incorrect node", async () => {
         render(<MessagesPage />);
         const nodeButton = screen.getAllByRole("button").filter(b => b.textContent.includes("TN1Test Node 1"))[0];
         fireEvent.click(nodeButton);
-        expect(mockUseDevice.setUnread).toHaveBeenCalledWith(1111, 0);
+        expect(mockUseDevice.resetUnread).toHaveBeenCalledWith(1111, 0);
         expect(mockUseDevice.unreadCounts.get(2222)).toBe(10);
     });
 });
