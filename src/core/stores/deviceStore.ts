@@ -105,6 +105,8 @@ export interface Device {
   clearNodeError: (nodeNum: number) => void;
   getNodeError: (nodeNum: number) => NodeError | undefined;
   hasNodeError: (nodeNum: number) => boolean
+  incrementUnread: (nodeNum: number) => void;
+  resetUnread: (nodeNum: number) => void;
 }
 
 export interface DeviceState {
@@ -152,6 +154,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             unsafeRoles: false,
             refreshKeys: false,
             rebootOTA: false,
+            clearMessages: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
@@ -613,7 +616,35 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             }
             return device.nodeErrors.has(nodeNum);
           },
+          incrementUnread: (nodeNum: number) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  console.warn(`incrementUnread: Device with ID ${id} not found.`);
+                  return;
+                }
+                const currentCount = device.unreadCounts.get(nodeNum) ?? 0;
+                device.unreadCounts.set(nodeNum, currentCount + 1);
+              })
+            );
+          },
+          resetUnread: (nodeNum: number) => {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  console.warn(`resetUnread: Device with ID ${id} not found.`);
+                  return;
+                }
+                device.unreadCounts.set(nodeNum, 0);
 
+                if (device.unreadCounts.get(nodeNum) === 0) {
+                  device.unreadCounts.delete(nodeNum);
+                }
+              })
+            );
+          },
         });
       }),
     );

@@ -89,6 +89,16 @@ export const subscribeAll = (
     const dto = new PacketToMessageDTO(messagePacket, myNodeNum);
     const message = dto.toMessage();
     messageStore.saveMessage(message);
+
+    if (message.type == MessageType.Direct) {
+      if (message.to === myNodeNum) {
+        device.incrementUnread(messagePacket.from);
+      }
+    } else if (message.type == MessageType.Broadcast) {
+      if (message.from !== myNodeNum) {
+        device.incrementUnread(message.channel);
+      }
+    }
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {

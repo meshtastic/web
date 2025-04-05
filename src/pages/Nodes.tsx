@@ -24,10 +24,9 @@ function shortNameFromNode(
 ): string {
   const shortNameOfNode = node.user?.shortName ??
     (node.user?.macaddr
-      ? `${
-        base16
-          .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-          .toLowerCase()
+      ? `${base16
+        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+        .toLowerCase()
       }`
       : `${numberToHexUnpadded(node.num).slice(-4)}`);
   return String(shortNameOfNode);
@@ -93,7 +92,7 @@ const NodesPage = (): JSX.Element => {
             placeholder="Search nodes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 border border-slate-300 rounded-sm bg-white text-slate-900"
+            className="w-full p-2 border border-slate-300 rounded-sm bg-white text-slate-900 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <div className="overflow-y-auto h-full">
@@ -124,10 +123,9 @@ const NodesPage = (): JSX.Element => {
               >
                 {node.user?.longName ??
                   (node.user?.macaddr
-                    ? `Meshtastic ${
-                      base16
-                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                        .toLowerCase()
+                    ? `Meshtastic ${base16
+                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+                      .toLowerCase()
                     }`
                     : `!${numberToHexUnpadded(node.num)}`)}
               </h1>,
@@ -135,8 +133,7 @@ const NodesPage = (): JSX.Element => {
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
-                    : `${node.hopsAway?.toString()} ${
-                      node.hopsAway > 1 ? "hops" : "hop"
+                    : `${node.hopsAway?.toString()} ${node.hopsAway > 1 ? "hops" : "hop"
                     } away`
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
