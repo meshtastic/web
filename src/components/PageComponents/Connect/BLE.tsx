@@ -9,7 +9,7 @@ import { BleConnection, ServiceUuid } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 import { useMessageStore } from "@core/stores/messageStore.ts";
 
-export const BLE = ({ closeDialog }: TabElementProps) => {
+export const BLE = ({ setConnectionInProgress, closeDialog }: TabElementProps) => {
   const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);
   const { addDevice } = useDeviceStore();
   const messageStore = useMessageStore()
@@ -45,6 +45,7 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
             key={device.id}
             className="dark:bg-slate-900 dark:text-white"
             onClick={() => {
+              setConnectionInProgress(true);
               onConnect(device);
             }}
           >
@@ -67,6 +68,11 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
               if (exists === -1) {
                 setBleDevices(bleDevices.concat(device));
               }
+            }).catch((error) => {
+              console.error("Error requesting device:", error);
+              setConnectionInProgress(false);
+            }).finally(() => {
+              setConnectionInProgress(false);
             });
         }}
       >

@@ -10,7 +10,7 @@ import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { useCallback, useEffect, useState } from "react";
 import { useMessageStore } from "@core/stores/messageStore.ts";
 
-export const Serial = ({ closeDialog }: TabElementProps) => {
+export const Serial = ({ setConnectionInProgress, closeDialog }: TabElementProps) => {
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
   const { addDevice } = useDeviceStore();
   const messageStore = useMessageStore()
@@ -54,6 +54,7 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
               disabled={port.readable !== null}
               className="dark:bg-slate-900 dark:text-white"
               onClick={async () => {
+                setConnectionInProgress(true);
                 await onConnect(port);
               }}
             >
@@ -71,6 +72,11 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
         onClick={async () => {
           await navigator.serial.requestPort().then((port) => {
             setSerialPorts(serialPorts.concat(port));
+          }).catch((error) => {
+            console.error("Error requesting port:", error);
+            setConnectionInProgress(false);
+          }).finally(() => {
+            setConnectionInProgress(false);
           });
         }}
       >

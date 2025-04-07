@@ -20,7 +20,7 @@ interface FormData {
   tls: boolean;
 }
 
-export const HTTP = ({ closeDialog }: TabElementProps) => {
+export const HTTP = ({ closeDialog, setConnectionInProgress, connectionInProgress }: TabElementProps) => {
   const isURLHTTPS = location.protocol === "https:";
 
   const { addDevice } = useDeviceStore();
@@ -30,10 +30,10 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   const { control, handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
-        window.location.hostname,
+        globalThis.location.hostname,
       )
         ? "meshtastic.local"
-        : window.location.host,
+        : globalThis.location.host,
       tls: isURLHTTPS ? true : false,
     },
   });
@@ -42,7 +42,6 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
     field: { value: tlsValue, onChange: setTLS },
   } = useController({ name: "tls", control });
 
-  const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [connectionError, setConnectionError] = useState<{ host: string; secure: boolean } | null>(null);
 
   const onSubmit = handleSubmit(async (data) => {
@@ -76,14 +75,13 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
             prefix={tlsValue ? "https://" : "http://"}
             placeholder="000.000.000.000 / meshtastic.local"
             className="text-slate-900 dark:text-slate-900"
-            disabled={connectionInProgress}
             {...register("ip")}
           />
         </div>
         <div className="flex items-center gap-2 mt-2">
           <Switch
             onCheckedChange={setTLS}
-            disabled={isURLHTTPS || connectionInProgress}
+            disabled={isURLHTTPS}
             checked={isURLHTTPS || tlsValue}
             {...register("tls")}
           />
@@ -122,7 +120,6 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
       </div>
       <Button
         type="submit"
-        disabled={connectionInProgress}
         className="dark:bg-slate-900 dark:text-white"
       >
         <span>{connectionInProgress ? "Connecting..." : "Connect"}</span>

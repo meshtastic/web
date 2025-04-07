@@ -22,9 +22,12 @@ import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { AlertCircle } from "lucide-react";
 import { Link } from "../UI/Typography/Link.tsx";
 import { Fragment } from "react/jsx-runtime";
+import { useState } from "react";
 
 export interface TabElementProps {
   closeDialog: () => void;
+  connectionInProgress: boolean;
+  setConnectionInProgress: (inProgress: boolean) => void;
 }
 
 export interface TabManifest {
@@ -111,25 +114,28 @@ export const NewDeviceDialog = ({
   open,
   onOpenChange,
 }: NewDeviceProps) => {
+  const [connectionInProgress, setConnectionInProgress] =
+    useState(false);
   const { unsupported } = useBrowserFeatureDetection();
+
 
   const tabs: TabManifest[] = [
     {
       label: "HTTP",
       element: HTTP,
-      isDisabled: false,
+      isDisabled: connectionInProgress,
     },
     {
       label: "Bluetooth",
       element: BLE,
       isDisabled: unsupported.includes("Web Bluetooth") ||
-        unsupported.includes("Secure Context"),
+        unsupported.includes("Secure Context") || connectionInProgress,
     },
     {
       label: "Serial",
       element: Serial,
       isDisabled: unsupported.includes("Web Serial") ||
-        unsupported.includes("Secure Context"),
+        unsupported.includes("Secure Context") || connectionInProgress,
     },
   ];
 
@@ -154,7 +160,7 @@ export const NewDeviceDialog = ({
                 {tab.isDisabled
                   ? <ErrorMessage missingFeatures={unsupported} />
                   : null}
-                <tab.element closeDialog={() => onOpenChange(false)} />
+                <tab.element closeDialog={() => onOpenChange(false)} setConnectionInProgress={setConnectionInProgress} connectionInProgress={connectionInProgress} />
               </fieldset>
             </TabsContent>
           ))}
