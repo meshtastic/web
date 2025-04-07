@@ -1,14 +1,14 @@
 import { MessageItem } from "@components/PageComponents/Messages/MessageItem.tsx";
-import type { Message as Message } from "@core/stores/messageStore.ts";
+import type { Message as MessageType } from "@core/stores/messageStore.ts";
 import { InboxIcon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 
 export interface ChannelChatProps {
-  messages?: Message[];
+  messages?: MessageType[];
 }
 
 const EmptyState = () => (
-  <div className="flex flex-col place-content-center place-items-center p-8 text-white">
+  <div className="flex flex-col place-content-center place-items-center p-8 text-gray-500 dark:text-gray-400">
     <InboxIcon className="h-8 w-8 mb-2" />
     <span className="text-sm">No Messages</span>
   </div>
@@ -41,7 +41,7 @@ export const ChannelChat = ({
 
   if (!messages?.length) {
     return (
-      <div className="flex flex-col h-full container mx-auto">
+      <div className="flex flex-col h-full">
         <div className="flex-1 flex items-center justify-center">
           <EmptyState />
         </div>
@@ -50,26 +50,23 @@ export const ChannelChat = ({
   }
 
   return (
-    <div className="flex flex-col h-full container mx-auto">
+    <div className="flex flex-col h-full">
       <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto pl-4 pr-4 md:pr-44"
+        className="flex-1 overflow-y-auto py-4"
       >
-        <div className="flex flex-col gap-1.5 justify-end min-h-full">
-          {messages?.map((message, index) => (
-            <MessageItem
-              key={message.messageId + index}
-              message={message}
-              lastMsgSameUser={
-                index > 0 &&
-                messages[index - 1].from === message.from
-              }
-            />
-          ))}
-          <div ref={messagesEndRef} className="w-full" />
+        <div className="flex flex-col justify-end min-h-full space-y-4">
+          {messages?.map((message) => {
+            return (
+              <MessageItem
+                key={message?.messageId}
+                message={message}
+              />
+            );
+          })}
+          <div ref={messagesEndRef} className="h-0 w-full" />
         </div>
       </div>
-
     </div>
   );
 };

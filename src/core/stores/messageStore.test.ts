@@ -286,8 +286,8 @@ describe('useMessageStore', () => {
       const messageIdToDelete = directMessageToOther1.messageId;
       useMessageStore.getState().clearMessageByMessageId({
         type: MessageType.Direct,
-        sender: myNodeNum,
-        recipient: otherNodeNum1,
+        from: myNodeNum,
+        to: otherNodeNum1,
         messageId: messageIdToDelete
       });
       const state = useMessageStore.getState();
@@ -300,8 +300,8 @@ describe('useMessageStore', () => {
       const messageIdToDelete = directMessageFromOther1.messageId;
       useMessageStore.getState().clearMessageByMessageId({
         type: MessageType.Direct,
-        sender: otherNodeNum1,
-        recipient: myNodeNum,
+        from: otherNodeNum1,
+        to: myNodeNum,
         messageId: messageIdToDelete
       });
       const state = useMessageStore.getState();
@@ -321,8 +321,8 @@ describe('useMessageStore', () => {
       expect(state.messages.broadcast[broadcastChannel]?.[messageIdToDelete]).toBeUndefined();
     });
 
-    it('should clean up empty recipient/sender/channel objects', () => {
-      useMessageStore.getState().clearMessageByMessageId({ type: MessageType.Direct, sender: otherNodeNum1, recipient: myNodeNum, messageId: directMessageFromOther1.messageId });
+    it('should clean up empty to/from/channel objects', () => {
+      useMessageStore.getState().clearMessageByMessageId({ type: MessageType.Direct, from: otherNodeNum1, to: myNodeNum, messageId: directMessageFromOther1.messageId });
       expect(useMessageStore.getState().messages.direct[otherNodeNum1]?.[myNodeNum]).toBeUndefined(); // Recipient level removed
       expect(useMessageStore.getState().messages.direct[otherNodeNum1]).toBeUndefined(); // Sender level removed
 
@@ -354,14 +354,14 @@ describe('useMessageStore', () => {
     });
   });
 
-  describe('clearAllMessages', () => {
+  describe('deleteAllMessages', () => {
     it('should clear all direct and broadcast messages', () => {
       useMessageStore.getState().saveMessage(directMessageToOther1);
       useMessageStore.getState().saveMessage(broadcastMessage1);
       expect(Object.keys(useMessageStore.getState().messages.direct).length).toBeGreaterThan(0);
       expect(Object.keys(useMessageStore.getState().messages.broadcast).length).toBeGreaterThan(0);
 
-      useMessageStore.getState().clearAllMessages();
+      useMessageStore.getState().deleteAllMessages();
 
       expect(useMessageStore.getState().messages.direct).toEqual({});
       expect(useMessageStore.getState().messages.broadcast).toEqual({});

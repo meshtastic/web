@@ -10,7 +10,7 @@ import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDeta
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
 import { RebootOTADialog } from "@components/Dialog/RebootOTADialog.tsx";
-import { ClearMessagesDialog } from "@components/Dialog/ClearMessagesDialog/ClearMessagesDialog.tsx";
+import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
 
 
 export const DialogManager = () => {
@@ -86,10 +86,10 @@ export const DialogManager = () => {
           setDialogOpen("rebootOTA", open);
         }}
       />
-      <ClearMessagesDialog
-        open={dialog.clearMessages}
+      <DeleteMessagesDialog
+        open={dialog.deleteMessages}
         onOpenChange={(open) => {
-          setDialogOpen("clearMessages", open);
+          setDialogOpen("deleteMessages", open);
         }}
       />
     </>

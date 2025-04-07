@@ -104,7 +104,7 @@ export const MessagesPage = () => {
           </div>
         </SidebarSection>
       </Sidebar>
-      <div className="flex flex-col w-full h-full container mx-auto">
+      <div className="flex flex-col w-full h-full">
         <PageLayout
           className="flex flex-col h-full"
           label={`Messages: ${isBroadcast && currentChannel

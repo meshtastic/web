@@ -10,7 +10,7 @@ type RGBColor = {
 };
 
 interface AvatarProps {
-  text: string;
+  text: string | number;
   size?: "sm" | "lg";
   className?: string;
   showError?: boolean;
@@ -68,10 +68,11 @@ export const Avatar: React.FC<AvatarProps> = ({
     };
   };
 
-  const bgColor = getColorFromText(text ?? "UNK");
+  const safeText = text?.toString().toUpperCase() ?? "UNK";
+  const bgColor = getColorFromText(safeText);
   const isLight = ColorUtils.isLight(bgColor);
   const textColor = isLight ? "#000000" : "#FFFFFF";
-  const initials = text?.toUpperCase().slice(0, 4) ?? "UNK";
+  const initials = safeText.slice(0, 4) ?? "UNK";
 
   return (
     <div
