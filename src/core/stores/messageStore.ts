@@ -57,11 +57,11 @@ export interface MessageStore {
   getMessages: (type: MessageType, options: { myNodeNum: number; otherNodeNum?: number; channel?: number }) => Message[];
   getDraft: (key: Types.Destination) => string;
   setDraft: (key: Types.Destination, message: string) => void;
-  clearAllMessages: () => void;
+  deleteAllMessages: () => void;
   clearMessageByMessageId: (params: {
     type: MessageType;
-    sender?: number;
-    recipient?: number;
+    from?: number;
+    to?: number;
     channel?: number;
     messageId: number
   }) => void;
@@ -177,7 +177,7 @@ export const useMessageStore = create<MessageStore>()(
         }
         return [];
       },
-      clearMessageByMessageId: ({ type, sender, recipient, channel, messageId }) => {
+      clearMessageByMessageId: ({ type, from, to, channel, messageId }) => {
         set(produce((state: MessageStore) => {
           if (type === MessageType.Broadcast && channel !== undefined) {
             const messageMap = state.messages.broadcast[channel];
@@ -187,14 +187,14 @@ export const useMessageStore = create<MessageStore>()(
                 delete state.messages.broadcast[channel];
               }
             }
-          } else if (type === MessageType.Direct && sender !== undefined && recipient !== undefined) {
-            const messageMap = state.messages.direct?.[sender]?.[recipient];
+          } else if (type === MessageType.Direct && from !== undefined && to !== undefined) {
+            const messageMap = state.messages.direct?.[from]?.[to];
             if (messageMap?.[messageId]) {
               delete messageMap[messageId];
               if (Object.keys(messageMap).length === 0) {
-                delete state.messages.direct[sender][recipient];
-                if (Object.keys(state.messages.direct[sender]).length === 0) {
-                  delete state.messages.direct[sender];
+                delete state.messages.direct[from][to];
+                if (Object.keys(state.messages.direct[from]).length === 0) {
+                  delete state.messages.direct[from];
                 }
               }
             }
@@ -215,7 +215,7 @@ export const useMessageStore = create<MessageStore>()(
           state.draft.delete(key);
         }));
       },
-      clearAllMessages: () => {
+      deleteAllMessages: () => {
         set(produce((state: MessageStore) => {
           state.messages.direct = {};
           state.messages.broadcast = {};

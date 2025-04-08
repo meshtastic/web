@@ -12,16 +12,16 @@ import {
 import { AlertTriangleIcon } from "lucide-react";
 import { useMessageStore } from "@core/stores/messageStore.ts";
 
-export interface ClearMessagesDialogProps {
+export interface DeleteMessagesDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const ClearMessagesDialog = ({
+export const DeleteMessagesDialog = ({
   open,
   onOpenChange,
-}: ClearMessagesDialogProps) => {
-  const { clearAllMessages } = useMessageStore();
+}: DeleteMessagesDialogProps) => {
+  const { deleteAllMessages } = useMessageStore();
   const handleCloseDialog = () => {
     onOpenChange(false);
   };
@@ -50,7 +50,7 @@ export const ClearMessagesDialog = ({
           <Button
             variant="destructive"
             onClick={() => {
-              clearAllMessages();
+              deleteAllMessages();
               handleCloseDialog();
             }}
           >

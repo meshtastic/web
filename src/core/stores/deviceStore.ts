@@ -30,7 +30,7 @@ export type DialogVariant =
   | "nodeDetails"
   | "unsafeRoles"
   | "refreshKeys"
-  | "clearMessages";
+  | "deleteMessages";
 
 type NodeError = {
   node: number;
@@ -73,7 +73,7 @@ export interface Device {
     nodeDetails: boolean;
     unsafeRoles: boolean;
     refreshKeys: boolean;
-    clearMessages: boolean;
+    deleteMessages: boolean;
   };
 
 
@@ -155,7 +155,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             unsafeRoles: false,
             refreshKeys: false,
             rebootOTA: false,
-            clearMessages: false,
+            deleteMessages: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",

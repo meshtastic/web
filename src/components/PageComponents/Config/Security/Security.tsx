@@ -302,6 +302,11 @@ export const Security = () => {
         ]}
       />
       <PkiRegenerateDialog
+        text={{
+          button: "Regenerate",
+          title: "Regenerate Key pair?",
+          description: "Are you sure you want to regenerate key pair?",
+        }}
         open={state.privateKeyDialogOpen}
         onOpenChange={() =>
           dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })}
