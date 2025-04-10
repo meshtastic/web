@@ -63,6 +63,12 @@ export const Display = () => {
             },
             {
               type: "toggle",
+              name: "use12hClock",
+              label: "12-Hour Clock",
+              description: "Use 12-hour clock format",
+            },
+            {
+              type: "toggle",
               name: "flipScreen",
               label: "Flip Screen",
               description: "Flip display 180 degrees",
