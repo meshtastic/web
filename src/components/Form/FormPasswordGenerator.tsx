@@ -4,10 +4,9 @@ import type {
 } from "@components/Form/DynamicForm.tsx";
 import type { ButtonVariant } from "../UI/Button.tsx";
 import { Generator } from "@components/UI/Generator.tsx";
-import { Eye, EyeOff } from "lucide-react";
 import type { ChangeEventHandler } from "react";
-import { useState } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
+import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
 
 export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
   type: "passwordGenerator";
@@ -15,7 +14,7 @@ export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
   hide?: boolean;
   bits?: { text: string; value: string; key: string }[];
   devicePSKBitCount: number;
-  inputChange: ChangeEventHandler;
+  inputChange: ChangeEventHandler<HTMLInputElement> | undefined;
   selectChange: (event: string) => void;
   actionButtons: {
     text: string;
@@ -23,6 +22,8 @@ export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
     variant: ButtonVariant;
     className?: string;
   }[];
+  showPasswordToggle?: boolean;
+  showCopyButton?: boolean;
 }
 
 export function PasswordGenerator<T extends FieldValues>({
@@ -30,10 +31,7 @@ export function PasswordGenerator<T extends FieldValues>({
   field,
   disabled,
 }: GenericFormElementProps<T, PasswordGeneratorProps<T>>) {
-  const [passwordShown, setPasswordShown] = useState(false);
-  const togglePasswordVisiblity = () => {
-    setPasswordShown(!passwordShown);
-  };
+  const { isVisible } = usePasswordVisibilityToggle()
 
   return (
     <Controller
@@ -41,14 +39,8 @@ export function PasswordGenerator<T extends FieldValues>({
       control={control}
       render={({ field: { value, ...rest } }) => (
         <Generator
-          type={field.hide && !passwordShown ? "password" : "text"}
+          type={field.hide && !isVisible ? "password" : "text"}
           id={field.id}
-          action={field.hide
-            ? {
-              icon: passwordShown ? EyeOff : Eye,
-              onClick: togglePasswordVisiblity,
-            }
-            : undefined}
           devicePSKBitCount={field.devicePSKBitCount}
           bits={field.bits}
           inputChange={field.inputChange}
@@ -56,6 +48,8 @@ export function PasswordGenerator<T extends FieldValues>({
           value={value}
           variant={field.validationText ? "invalid" : "default"}
           actionButtons={field.actionButtons}
+          showPasswordToggle={field.showPasswordToggle}
+          showCopyButton={field.showCopyButton}
           {...field.properties}
           {...rest}
           disabled={disabled}

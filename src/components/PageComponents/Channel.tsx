@@ -143,6 +143,8 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                 hide: true,
                 properties: {
                   value: pass,
+                  showPasswordToggle: true,
+                  showCopyButton: true,
                 },
               },
               {

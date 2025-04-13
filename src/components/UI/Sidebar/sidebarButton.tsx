@@ -6,7 +6,7 @@ export interface SidebarButtonProps {
   count?: number;
   active?: boolean;
   Icon?: LucideIcon;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
 }
