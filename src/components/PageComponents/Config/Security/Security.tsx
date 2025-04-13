@@ -195,11 +195,8 @@ export const Security = () => {
                 ],
                 properties: {
                   value: state.privateKey,
-                  action: {
-                    icon: state.privateKeyVisible ? EyeOff : Eye,
-                    onClick: () =>
-                      dispatch({ type: "TOGGLE_PRIVATE_KEY_VISIBILITY" }),
-                  },
+                  showCopyButton: true,
+                  showPasswordToggle: true,
                 },
               },
               {
@@ -211,6 +208,7 @@ export const Security = () => {
                   "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
                 properties: {
                   value: state.publicKey,
+                  showCopyButton: true,
                 },
               },
             ],
@@ -271,6 +269,7 @@ export const Security = () => {
                 ],
                 properties: {
                   value: state.adminKey,
+                  showCopyButton: true,
                   action: {
                     icon: state.adminKeyVisible ? EyeOff : Eye,
                     onClick: () =>
