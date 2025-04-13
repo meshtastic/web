@@ -24,14 +24,12 @@ export const FieldWrapper = ({
       <div className="grid md:grid-cols-[1fr_2fr] lg:grid-cols-[1fr_2fr_1fr] sm:items-baseline gap-4">
         <Label htmlFor={fieldName}>{label}</Label>
         <div className="max-w-3xl">
-          <div className="max-w-lg">
-            <p className="text-sm text-slate-400">{description}</p>
-            <p hidden={valid ?? true} className="text-sm text-red-500">
-              {validationText}
-            </p>
-            <div className="mt-4 space-y-4 sm:col-span-2">
-              <div className="flex items-center">{children}</div>
-            </div>
+          <p className="text-sm text-slate-400">{description}</p>
+          <p hidden={valid ?? true} className="text-sm text-red-500">
+            {validationText}
+          </p>
+          <div className="mt-4 space-y-4 sm:col-span-2">
+            <div className="flex items-center">{children}</div>
           </div>
         </div>
       </div>
