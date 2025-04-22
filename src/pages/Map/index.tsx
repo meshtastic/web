@@ -214,7 +214,6 @@ const MapPage = () => {
           onChange={onFilterChange}
           resetFilters={resetFilters}
         />
-
       </PageLayout>
     </>
   );

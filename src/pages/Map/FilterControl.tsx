@@ -1,16 +1,30 @@
-import { Popover, PopoverTrigger, PopoverContent } from "@components/UI/Popover.tsx";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@components/UI/Popover.tsx";
 import { FunnelIcon } from "lucide-react";
 import { Checkbox } from "@components/UI/Checkbox/index.tsx";
 import { Slider } from "@components/UI/Slider.tsx";
-import type { FilterConfig, FilterValue } from "@core/hooks/useNodeFilters.ts";
+import type {
+  FilterConfig,
+  FilterValueMap,
+} from "@core/hooks/useNodeFilters.ts";
 
 interface FilterControlProps {
   configs: FilterConfig[];
-  values: Record<string, FilterValue>;
-  onChange: (key: string, value: FilterValue) => void;
+  values: FilterValueMap;
+  onChange: <K extends keyof FilterValueMap>(
+    key: K,
+    value: FilterValueMap[K],
+  ) => void;
+  resetFilters: () => void;
+  children?: React.ReactNode;
 }
 
-export function FilterControl({ configs, values, onChange, resetFilters, children }: FilterControlProps) {
+export function FilterControl(
+  { configs, values, onChange, resetFilters, children }: FilterControlProps,
+) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -22,24 +36,38 @@ export function FilterControl({ configs, values, onChange, resetFilters, childre
           <FunnelIcon />
         </button>
       </PopoverTrigger>
-      <PopoverContent side="bottom" align="end" sideOffset={12} className="dark:bg-slate-100 dark:border-slate-300">
+      <PopoverContent
+        side="bottom"
+        align="end"
+        sideOffset={12}
+        className="dark:bg-slate-100 dark:border-slate-300"
+      >
         <div className="space-y-4">
           {configs.map((cfg) => {
             const val = values[cfg.key];
             switch (cfg.type) {
               case "boolean":
+                if (typeof val !== "boolean") return null;
                 return (
                   <Checkbox
                     key={cfg.key}
-                    checked={val as boolean}
-                    onChange={(v) => onChange(cfg.key, v as boolean)}
+                    checked={val}
+                    onChange={(v) => onChange(cfg.key, v)}
                     labelClassName="dark:text-gray-900"
-                    >
+                  >
                     {cfg.label}
                   </Checkbox>
                 );
               case "range": {
-                const [min, max] = val as [number, number];
+                if (
+                  !Array.isArray(val) ||
+                  val.length !== 2 ||
+                  typeof val[0] !== "number" ||
+                  typeof val[1] !== "number"
+                ) {
+                  return null;
+                }
+                const [min, max] = val;
                 const [lo, hi] = cfg.bounds!;
                 return (
                   <div key={cfg.key} className="space-y-2">
@@ -51,9 +79,10 @@ export function FilterControl({ configs, values, onChange, resetFilters, childre
                       min={lo}
                       max={hi}
                       step={1}
-                      onValueChange={(newRange) =>
-                        onChange(cfg.key, newRange as [number, number])
-                      }
+                      onValueChange={(newRange) => {
+                        const [newMin, newMax] = newRange;
+                        onChange(cfg.key, [newMin, newMax]);
+                      }}
                       className="w-full"
                       trackClassName="h-1 bg-gray-200 dark:bg-slate-700"
                       rangeClassName="bg-blue-500"
@@ -63,24 +92,25 @@ export function FilterControl({ configs, values, onChange, resetFilters, childre
                 );
               }
               case "search":
-              return (
-                <div key={cfg.key} className="flex flex-col space-y-1">
-                  <label htmlFor={cfg.key} className="font-medium text-sm">
-                    {cfg.label}
-                  </label>
-                  <input
-                    id={cfg.key}
-                    type="text"
-                    value={val as string}
-                    onChange={(e) => onChange(cfg.key, e.target.value)}
-                    placeholder="Search phrase"
-                    className="w-full px-2 py-1 border rounded shadow-sm dark:bg-slate-200 dark:border-slate-600"
-                  />
-                </div>
-              );
+                if (typeof val !== "string") return null;
+                return (
+                  <div key={cfg.key} className="flex flex-col space-y-1">
+                    <label htmlFor={cfg.key} className="font-medium text-sm">
+                      {cfg.label}
+                    </label>
+                    <input
+                      id={cfg.key}
+                      type="text"
+                      value={val}
+                      onChange={(e) => onChange(cfg.key, e.target.value)}
+                      placeholder="Search phrase"
+                      className="w-full px-2 py-1 border rounded shadow-sm dark:bg-slate-200 dark:border-slate-600"
+                    />
+                  </div>
+                );
 
-            default:
-              return null;
+              default:
+                return null;
             }
           })}
 
@@ -89,7 +119,7 @@ export function FilterControl({ configs, values, onChange, resetFilters, childre
             onClick={resetFilters}
             className="w-full py-1 bg-slate-600 text-white rounded text-sm"
           >
-          Reset Filters
+            Reset Filters
           </button>
 
           {children && (
@@ -101,4 +131,4 @@ export function FilterControl({ configs, values, onChange, resetFilters, childre
       </PopoverContent>
     </Popover>
   );
-} 
+}

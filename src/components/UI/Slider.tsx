@@ -3,11 +3,10 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "@core/utils/cn.ts";
 
 export interface SliderProps {
-  value?: number[];
-  defaultValue?: number[];
+  value: number[];
   step?: number;
   min?: number;
-  max?: number;
+  max: number;
   onValueChange?: (value: number[]) => void;
   onValueCommit?: (value: number[]) => void;
   disabled?: boolean;
@@ -19,10 +18,9 @@ export interface SliderProps {
 
 export function Slider({
   value,
-  defaultValue = [0],
   step = 1,
   min = 0,
-  max = 100,
+  max,
   onValueChange,
   onValueCommit,
   disabled = false,
@@ -30,8 +28,8 @@ export function Slider({
   trackClassName,
   rangeClassName,
   thumbClassName,
-}:SliderProps) {
-  const [internalValue, setInternalValue] = useState<number[]>(defaultValue);
+}: SliderProps) {
+  const [internalValue, setInternalValue] = useState<number[]>(value);
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value! : internalValue;
 
@@ -46,9 +44,11 @@ export function Slider({
 
   return (
     <SliderPrimitive.Root
-      className={cn("relative flex items-center select-none touch-none", className)}
+      className={cn(
+        "relative flex items-center select-none touch-none",
+        className,
+      )}
       value={currentValue}
-      defaultValue={defaultValue}
       step={step}
       min={min}
       max={max}
@@ -58,22 +58,28 @@ export function Slider({
       aria-label="Slider"
     >
       <SliderPrimitive.Track
-        className={cn("relative h-2 flex-1 rounded-full bg-gray-200", trackClassName)}
+        className={cn(
+          "relative h-2 flex-1 rounded-full bg-slate-200",
+          trackClassName,
+        )}
       >
         <SliderPrimitive.Range
-          className={cn("absolute h-full rounded-full bg-blue-500", rangeClassName)}
+          className={cn(
+            "absolute h-full rounded-full bg-blue-500",
+            rangeClassName,
+          )}
         />
       </SliderPrimitive.Track>
       {currentValue.map((_, i) => (
         <SliderPrimitive.Thumb
           key={i}
           className={cn(
-            "block w-4 h-4 rounded-full bg-white border border-gray-400 shadow-md",
-            thumbClassName
+            "block w-4 h-4 rounded-full bg-white border border-slate-400 shadow-md",
+            thumbClassName,
           )}
           aria-label={`Thumb ${i + 1}`}
         />
       ))}
     </SliderPrimitive.Root>
   );
-};
+}

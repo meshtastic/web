@@ -1,24 +1,40 @@
-import { useState, useMemo, useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 
-export type FilterValue = 
-  | boolean 
-  | [number, number] 
-  | string[]
-  | string;   
-
-export interface FilterConfig<T extends FilterValue = FilterValue> {
+interface BooleanFilter {
   key: string;
   label: string;
-  type: "boolean" | "range" | "search";
-  bounds?: [number, number];
-  options?: string[];
-  predicate: (node: Protobuf.Mesh.NodeInfo, value: T) => boolean;
+  type: "boolean";
+  predicate: (node: Node, value: boolean) => boolean;
 }
 
+interface RangeFilter {
+  key: string;
+  label: string;
+  type: "range";
+  bounds: [number, number];
+  predicate: (node: Node, value: [number, number]) => boolean;
+}
+
+interface SearchFilter {
+  key: string;
+  label: string;
+  type: "search";
+  predicate: (node: Node, value: string) => boolean;
+}
+
+export type FilterConfig = BooleanFilter | RangeFilter | SearchFilter;
+
+export type FilterValueMap = {
+  [C in FilterConfig as C["key"]]: C extends BooleanFilter ? boolean
+    : C extends RangeFilter ? [number, number]
+    : C extends SearchFilter ? string
+    : never;
+};
+
 // Defines all node filters in this object
-export const filterConfigs: FilterConfig[] = [ 
+export const filterConfigs: FilterConfig[] = [
   {
     key: "searchText",
     label: "Node name/number",
@@ -30,7 +46,9 @@ export const filterConfigs: FilterConfig[] = [
       const nodeNum = node.num?.toString() ?? "";
       const nodeNumHex = numberToHexUnpadded(node.num) ?? "";
       const search = text.toLowerCase();
-      return shortName.includes(search) || longName.includes(search) || nodeNum.includes(search) || nodeNumHex.includes(search.replace(/!/g, ""));
+      return shortName.includes(search) || longName.includes(search) ||
+        nodeNum.includes(search) ||
+        nodeNumHex.includes(search.replace(/!/g, ""));
     },
   },
   {
@@ -84,11 +102,11 @@ export const filterConfigs: FilterConfig[] = [
     label: "Hide MQTT-connected nodes",
     type: "boolean",
     predicate: (node, hide: boolean) => !hide || !node.viaMqtt,
-  }
+  },
 ];
 
 export function useNodeFilters(nodes: Protobuf.Mesh.NodeInfo[]) {
-  const defaultState = useMemo<Record<string, FilterValue>>(() => {
+  const defaultState = useMemo(() => {
     return filterConfigs.reduce((acc, cfg) => {
       switch (cfg.type) {
         case "boolean":
@@ -102,31 +120,37 @@ export function useNodeFilters(nodes: Protobuf.Mesh.NodeInfo[]) {
           break;
       }
       return acc;
-    }, {} as Record<string, FilterValue>);
+    }, {} as FilterValueMap);
   }, []);
 
-  const [filters, setFilters] = useState<Record<string, FilterValue>>(defaultState);
+  const [filters, setFilters] = useState<FilterValueMap>(
+    defaultState,
+  );
 
   const resetFilters = useCallback(() => {
     setFilters(defaultState);
   }, [defaultState]);
 
   const onFilterChange = useCallback(
-    (key: string, value: FilterValue) => {
+    <K extends keyof FilterValueMap>(key: K, value: FilterValueMap[K]) => {
       setFilters((f) => ({ ...f, [key]: value }));
     },
-    []
+    [],
   );
 
   const filteredNodes = useMemo(
     () =>
       nodes.filter((node) =>
-        filterConfigs.every((cfg) =>
-          cfg.predicate(node, filters[cfg.key])
-        )
+        filterConfigs.every((cfg) => cfg.predicate(node, filters[cfg.key]))
       ),
-    [nodes, filters]
+    [nodes, filters],
   );
 
-  return { filters, onFilterChange, resetFilters, filteredNodes, filterConfigs };
+  return {
+    filters,
+    onFilterChange,
+    resetFilters,
+    filteredNodes,
+    filterConfigs,
+  };
 }
