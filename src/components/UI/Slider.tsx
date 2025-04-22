@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "@core/utils/cn.ts";
 
@@ -32,6 +32,7 @@ export function Slider({
   const [internalValue, setInternalValue] = useState<number[]>(value);
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value! : internalValue;
+  const id = useId();
 
   const handleValueChange = (newValue: number[]) => {
     if (!isControlled) setInternalValue(newValue);
@@ -72,7 +73,7 @@ export function Slider({
       </SliderPrimitive.Track>
       {currentValue.map((_, i) => (
         <SliderPrimitive.Thumb
-          key={i}
+          key={`${id}-thumb-${i}`}
           className={cn(
             "block w-4 h-4 rounded-full bg-white border border-slate-400 shadow-md",
             thumbClassName,
