@@ -68,7 +68,7 @@ export function FilterControl(
                   return null;
                 }
                 const [min, max] = val;
-                const [lo, hi] = cfg.bounds!;
+                const [lo, hi] = cfg.bounds;
                 return (
                   <div key={cfg.key} className="space-y-2">
                     <label className="block text-sm font-medium">
