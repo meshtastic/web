@@ -28,6 +28,7 @@ export function Slider({
   trackClassName,
   rangeClassName,
   thumbClassName,
+  ...props
 }: SliderProps) {
   const [internalValue, setInternalValue] = useState<number[]>(value);
   const isControlled = value !== undefined;
@@ -56,7 +57,7 @@ export function Slider({
       disabled={disabled}
       onValueChange={handleValueChange}
       onValueCommit={handleValueCommit}
-      aria-label="Slider"
+      {...props}
     >
       <SliderPrimitive.Track
         className={cn(

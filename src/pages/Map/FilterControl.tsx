@@ -87,6 +87,7 @@ export function FilterControl(
                       trackClassName="h-1 bg-gray-200 dark:bg-slate-700"
                       rangeClassName="bg-blue-500"
                       thumbClassName="w-3 h-3 bg-white border border-gray-400 dark:border-slate-600"
+                      aria-label={`Slider - ${cfg.label}`}
                     />
                   </div>
                 );
