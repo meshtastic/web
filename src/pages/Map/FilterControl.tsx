@@ -36,8 +36,8 @@ export function FilterControl(
           className={cn(
             "fixed bottom-17 right-2 px-1 py-1 rounded shadow-md",
             isDirty
-              ? " text-slate-100  bg-green-600"
-              : "text-slate-600  bg-slate-100",
+              ? " text-slate-100  bg-green-600 hover:bg-green-700 hover:text-slate-200 active:bg-green-800"
+              : "text-slate-600  bg-slate-100 hover:bg-slate-200 hover:text-slate-700 active:bg-slate-300",
           )}
           aria-label="Filter"
         >
@@ -126,7 +126,7 @@ export function FilterControl(
           <button
             type="button"
             onClick={resetFilters}
-            className="w-full py-1 bg-slate-600 text-white rounded text-sm"
+            className="w-full py-1 shadow-sm hover:shadow-md bg-slate-600 text-white rounded text-sm  hover:text-slate-100 hover:bg-slate-700 active:bg-slate-800"
           >
             Reset Filters
           </button>
