@@ -10,6 +10,7 @@ import type {
   FilterConfig,
   FilterValueMap,
 } from "@core/hooks/useNodeFilters.ts";
+import { cn } from "@core/utils/cn.ts";
 
 interface FilterControlProps {
   configs: FilterConfig[];
@@ -19,18 +20,25 @@ interface FilterControlProps {
     value: FilterValueMap[K],
   ) => void;
   resetFilters: () => void;
+  isDirty: boolean;
   children?: React.ReactNode;
 }
 
 export function FilterControl(
-  { configs, values, onChange, resetFilters, children }: FilterControlProps,
+  { configs, values, onChange, resetFilters, isDirty, children }:
+    FilterControlProps,
 ) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="fixed bottom-17 right-2 px-1 py-1 bg-slate-100  text-slate-600 rounded shadow-md"
+          className={cn(
+            "fixed bottom-17 right-2 px-1 py-1 rounded shadow-md",
+            isDirty
+              ? " text-slate-100  bg-green-600"
+              : "text-slate-600  bg-slate-100",
+          )}
           aria-label="Filter"
         >
           <FunnelIcon />

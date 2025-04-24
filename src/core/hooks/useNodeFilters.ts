@@ -6,7 +6,7 @@ interface BooleanFilter {
   key: string;
   label: string;
   type: "boolean";
-  predicate: (node: Node, value: boolean) => boolean;
+  predicate: (node: Protobuf.Mesh.NodeInfo, value: boolean) => boolean;
 }
 
 interface RangeFilter {
@@ -14,14 +14,14 @@ interface RangeFilter {
   label: string;
   type: "range";
   bounds: [number, number];
-  predicate: (node: Node, value: [number, number]) => boolean;
+  predicate: (node: Protobuf.Mesh.NodeInfo, value: [number, number]) => boolean;
 }
 
 interface SearchFilter {
   key: string;
   label: string;
   type: "search";
-  predicate: (node: Node, value: string) => boolean;
+  predicate: (node: Protobuf.Mesh.NodeInfo, value: string) => boolean;
 }
 
 export type FilterConfig = BooleanFilter | RangeFilter | SearchFilter;
@@ -113,7 +113,7 @@ export function useNodeFilters(nodes: Protobuf.Mesh.NodeInfo[]) {
           acc[cfg.key] = false;
           break;
         case "range":
-          acc[cfg.key] = cfg.bounds!;
+          acc[cfg.key] = cfg.bounds;
           break;
         case "search":
           acc[cfg.key] = "";
@@ -141,13 +141,36 @@ export function useNodeFilters(nodes: Protobuf.Mesh.NodeInfo[]) {
   const filteredNodes = useMemo(
     () =>
       nodes.filter((node) =>
-        filterConfigs.every((cfg) => cfg.predicate(node, filters[cfg.key]))
+        filterConfigs.every((cfg) => {
+          const val = filters[cfg.key];
+          switch (cfg.type) {
+            case "boolean":
+              if (typeof val !== "boolean") return true;
+              return cfg.predicate(node, val);
+
+            case "range":
+              if (
+                !Array.isArray(val) ||
+                val.length !== 2 ||
+                typeof val[0] !== "number" ||
+                typeof val[1] !== "number"
+              ) {
+                return true;
+              }
+              return cfg.predicate(node, val);
+
+            case "search":
+              if (typeof val !== "string") return true;
+              return cfg.predicate(node, val);
+          }
+        })
       ),
     [nodes, filters],
   );
 
   return {
     filters,
+    defaultState,
     onFilterChange,
     resetFilters,
     filteredNodes,
