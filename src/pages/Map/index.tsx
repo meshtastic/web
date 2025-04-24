@@ -18,6 +18,8 @@ import {
   useMap,
 } from "react-map-gl/maplibre";
 import MapGl from "react-map-gl/maplibre";
+import { useNodeFilters } from "@core/hooks/useNodeFilters.ts";
+import { FilterControl } from "@pages/Map/FilterControl.tsx";
 
 type NodePosition = {
   latitude: number;
@@ -52,6 +54,14 @@ const MapPage = () => {
       ),
     [nodes],
   );
+
+  const {
+    filteredNodes,
+    filters,
+    onFilterChange,
+    resetFilters,
+    filterConfigs,
+  } = useNodeFilters(validNodes);
 
   const handleMarkerClick = useCallback(
     (node: Protobuf.Mesh.NodeInfo, event: { originalEvent: MouseEvent }) => {
@@ -106,12 +116,12 @@ const MapPage = () => {
     if (center) {
       map.easeTo(center);
     }
-  }, [validNodes, map]);
+  }, [filteredNodes, map]);
 
   // Generate all markers
   const markers = useMemo(
     () =>
-      validNodes.map((node) => {
+      filteredNodes.map((node) => {
         const position = convertToLatLng(node.position);
         return (
           <Marker
@@ -128,7 +138,7 @@ const MapPage = () => {
           </Marker>
         );
       }),
-    [validNodes, handleMarkerClick],
+    [filteredNodes, handleMarkerClick],
   );
 
   useEffect(() => {
@@ -197,6 +207,13 @@ const MapPage = () => {
             )
             : null}
         </MapGl>
+
+        <FilterControl
+          configs={filterConfigs}
+          values={filters}
+          onChange={onFilterChange}
+          resetFilters={resetFilters}
+        />
       </PageLayout>
     </>
   );

@@ -1,4 +1,4 @@
-import { useState, useId } from "react";
+import { useState, useEffect, useId } from "react";
 import { Check } from "lucide-react";
 import { Label } from "@components/UI/Label.tsx";
 import { cn } from "@core/utils/cn.ts";
@@ -31,6 +31,11 @@ export function Checkbox({
   const id = propId || generatedId;
 
   const [isChecked, setIsChecked] = useState(checked || false);
+
+  // Make sure setIsChecked state updates with checked
+  useEffect(() => {
+    setIsChecked(checked || false);
+  }, [checked]);
 
   const handleToggle = () => {
     if (disabled) return;
