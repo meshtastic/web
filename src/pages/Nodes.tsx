@@ -13,27 +13,29 @@ import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
 import { type JSX, useCallback, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
+import { Input } from "@components/UI/Input.tsx";
+import { PageLayout } from "@components/PageLayout.tsx";
 
 export interface DeleteNoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-function shortNameFromNode(
-  node: ReturnType<useDevice>["nodes"][number],
-): string {
-  const shortNameOfNode = node.user?.shortName ??
-    (node.user?.macaddr
-      ? `${base16
-        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-        .toLowerCase()
-      }`
-      : `${numberToHexUnpadded(node.num).slice(-4)}`);
-  return String(shortNameOfNode);
-}
+// function shortNameFromNode(
+//   node: ReturnType<useDevice>["nodes"][number],
+// ): string {
+//   const shortNameOfNode = node.user?.shortName ??
+//     (node.user?.macaddr
+//       ? `${base16
+//         .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
+//         .toLowerCase()
+//       }`
+//       : `${numberToHexUnpadded(node.num).slice(-4)}`);
+//   return String(shortNameOfNode);
+// }
 
 const NodesPage = (): JSX.Element => {
-  const { nodes, hardware, connection } = useDevice();
+  const { getNodes, hardware, connection } = useDevice();
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);
@@ -45,11 +47,7 @@ const NodesPage = (): JSX.Element => {
   >();
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const filteredNodes = Array.from(nodes.values()).filter((node) => {
-    if (node.num === hardware.myNodeNum) return false;
-    const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
-    return nodeName.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const filteredNodes = getNodes()
 
   useEffect(() => {
     if (!connection) return;
@@ -84,18 +82,16 @@ const NodesPage = (): JSX.Element => {
 
   return (
     <>
-      <Sidebar />
-      <div className="flex flex-col w-full">
-        <div className="p-4">
-          <input
-            type="text"
+      <PageLayout label="" leftBar={<Sidebar />} className="flex flex-col w-full">
+        <div className="p-2">
+          <Input
             placeholder="Search nodes..."
             value={searchTerm}
+            className="bg-transparent"
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 border border-slate-300 rounded-sm bg-white text-slate-900 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <div className="overflow-y-auto h-full">
+        <div className="overflow-y-auto">
           <Table
             headings={[
               { title: "", type: "blank", sortable: false },
@@ -109,7 +105,7 @@ const NodesPage = (): JSX.Element => {
             ]}
             rows={filteredNodes.map((node) => [
               <div key={node.num}>
-                <Avatar text={shortNameFromNode(node)} />
+                <Avatar text={node.user?.shortName ?? "UNK "} />
               </div>,
               <h1
                 key="longName"
@@ -117,23 +113,17 @@ const NodesPage = (): JSX.Element => {
                 onKeyUp={(evt) => {
                   evt.key === "Enter" && setSelectedNode(node);
                 }}
-                className="cursor-pointer underline"
+                className="cursor-pointer underline ml-2 whitespace-break-spaces"
                 tabIndex={0}
                 role="button"
               >
-                {node.user?.longName ??
-                  (node.user?.macaddr
-                    ? `Meshtastic ${base16
-                      .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                      .toLowerCase()
-                    }`
-                    : `!${numberToHexUnpadded(node.num)}`)}
+                {node.user?.longName ?? numberToHexUnpadded(node.num)}
               </h1>,
               <Mono key="hops">
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
-                    : `${node.hopsAway?.toString()} ${node.hopsAway > 1 ? "hops" : "hop"
+                    : `${node.hopsAway?.toString()} ${node.hopsAway ?? 0 > 1 ? "hops" : "hop"
                     } away`
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
@@ -181,7 +171,7 @@ const NodesPage = (): JSX.Element => {
           />
         </div>
         <Footer />
-      </div>
+      </PageLayout>
     </>
   );
 };

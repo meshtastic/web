@@ -7,7 +7,6 @@ import { Mono } from "@components/generic/Mono.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Protobuf } from "@meshtastic/core";
 import type { Protobuf as ProtobufType } from "@meshtastic/core";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import {
   BatteryChargingIcon,
   BatteryFullIcon,
@@ -37,7 +36,7 @@ export interface NodeDetailProps {
 export const NodeDetail = ({ node }: NodeDetailProps) => {
   const { setChatType, setActiveChat } = useMessageStore();
   const { setActivePage } = useDevice();
-  const name = node.user?.longName || `!${numberToHexUnpadded(node.num)}`;
+  const name = node.user?.longName ?? `UNK`;
   const shortName = node.user?.shortName ?? "UNK";
   const hwModel = node.user?.hwModel ?? 0;
   const hardwareType =
@@ -53,7 +52,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
     <div className="dark:text-slate-900 p-1">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
-          <Avatar text={shortName} />
+          <Avatar text={shortName} size="sm" />
 
           <div onFocusCapture={(e) => {
             // Required to prevent DM tooltip auto-appearing on creation

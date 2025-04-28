@@ -75,8 +75,8 @@ export const MessageInput = ({
 
   return (
     <div className="flex gap-2">
-      <form className="w-full" action="#" name="messageInput" onSubmit={handleSubmit}>
-        <div className="flex grow gap-2">
+      <form className="w-full" name="messageInput" onSubmit={handleSubmit}>
+        <div className="flex grow gap-1">
           <label className="w-full">
             <Input
               autoFocus
@@ -88,7 +88,7 @@ export const MessageInput = ({
             />
           </label>
 
-          <label data-testid="byte-counter" className="flex items-center w-24 p-2 place-content-end">
+          <label data-testid="byte-counter" className="flex items-center w-20 p-1 text-sm place-content-end">
             {messageBytes}/{maxBytes}
           </label>
 

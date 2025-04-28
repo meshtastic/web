@@ -29,10 +29,10 @@ export const NodeDetailsDialog = ({
   open,
   onOpenChange,
 }: NodeDetailsDialogProps) => {
-  const { nodes } = useDevice();
+  const { getNode } = useDevice();
   const { nodeNumDetails } = useAppStore();
 
-  const device = nodes.get(nodeNumDetails);
+  const device = getNode(nodeNumDetails);
 
   if (!device) return null;
 

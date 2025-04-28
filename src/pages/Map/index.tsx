@@ -35,7 +35,7 @@ const convertToLatLng = (position: {
 });
 
 const MapPage = () => {
-  const { nodes, waypoints } = useDevice();
+  const { getNodes, waypoints } = useDevice();
   const { theme } = useTheme();
   const { default: map } = useMap();
 
@@ -48,11 +48,11 @@ const MapPage = () => {
   // Filter out nodes without a valid position
   const validNodes = useMemo(
     () =>
-      Array.from(nodes.values()).filter(
+      getNodes(
         (node): node is Protobuf.Mesh.NodeInfo =>
           Boolean(node.position?.latitudeI),
       ),
-    [nodes],
+    [getNodes],
   );
 
   const {
@@ -149,8 +149,7 @@ const MapPage = () => {
 
   return (
     <>
-      <Sidebar />
-      <PageLayout label="Map" noPadding actions={[]}>
+      <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
         <MapGl
           mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
           attributionControl={false}

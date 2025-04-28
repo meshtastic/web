@@ -10,10 +10,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Protobuf } from "@meshtastic/core";
 import { useForm } from "react-hook-form";
+import { GenericInput } from "@components/Form/FormInput.tsx";
+import { validateMaxByteLength } from "@core/utils/string.ts";
 
 export interface User {
   longName: string;
@@ -24,31 +25,43 @@ export interface DeviceNameDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+const MAX_LONG_NAME_BYTE_LENGTH = 40;
+const MAX_SHORT_NAME_BYTE_LENGTH = 4;
 
 export const DeviceNameDialog = ({
   open,
   onOpenChange,
 }: DeviceNameDialogProps) => {
-  const { hardware, nodes, connection } = useDevice();
+  const { hardware, getNode, connection } = useDevice();
+  const myNode = getNode(hardware.myNodeNum);
 
-  const myNode = nodes.get(hardware.myNodeNum);
+  const defaultValues = {
+    longName: myNode?.user?.longName ?? "Unknown",
+    shortName: myNode?.user?.shortName ?? "??",
+  };
 
-  const { register, handleSubmit } = useForm<User>({
-    values: {
-      longName: myNode?.user?.longName ?? "Unknown",
-      shortName: myNode?.user?.shortName ?? "Unknown",
-    },
+  const { getValues, setValue, reset, control, handleSubmit } = useForm<User>({
+    values: defaultValues,
   });
+
+  const { currentLength: currentLongNameLength } = validateMaxByteLength(getValues('longName'), MAX_LONG_NAME_BYTE_LENGTH);
+  const { currentLength: currentShortNameLength } = validateMaxByteLength(getValues('shortName'), MAX_SHORT_NAME_BYTE_LENGTH);
 
   const onSubmit = handleSubmit((data) => {
     connection?.setOwner(
       create(Protobuf.Mesh.UserSchema, {
-        ...myNode?.user,
+        ...(myNode?.user ?? {}),
         ...data,
       }),
     );
     onOpenChange(false);
   });
+
+  const handleReset = () => {
+    reset({ longName: "", shortName: "" });
+    setValue("longName", "");
+    setValue("shortName", "");
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -60,21 +73,49 @@ export const DeviceNameDialog = ({
             The Device will restart once the config is saved.
           </DialogDescription>
         </DialogHeader>
-        <div className="gap-4">
-          <form onSubmit={onSubmit}>
-            <Label>Long Name</Label>
-            <Input className="dark:text-slte-900" {...register("longName")} />
-            <Label>Short Name</Label>
-            <Input
-              className="dark:text-slte-900"
-              maxLength={4}
-              {...register("shortName")}
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <div>
+            <Label htmlFor="longName">Long Name</Label>
+            <GenericInput
+              control={control}
+              field={{
+                name: "longName",
+                label: "Long Name",
+                type: "text",
+                properties: {
+                  fieldLength: {
+                    currentValueLength: currentLongNameLength ?? 0,
+                    max: MAX_LONG_NAME_BYTE_LENGTH,
+                    showCharacterCount: true,
+                  },
+                },
+              }}
             />
-          </form>
-        </div>
-        <DialogFooter>
-          <Button onClick={() => onSubmit()}>Save</Button>
-        </DialogFooter>
+          </div>
+          <div>
+            <Label htmlFor="shortName">Short Name</Label>
+            <GenericInput
+              control={control}
+              field={{
+                name: "shortName",
+                label: "Short Name",
+                type: "text",
+                properties: {
+                  fieldLength: {
+                    currentValueLength: currentShortNameLength ?? 0,
+                    max: MAX_SHORT_NAME_BYTE_LENGTH,
+                    showCharacterCount: true,
+                  },
+                },
+              }}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="destructive" onClick={handleReset}>Reset</Button>
+            <Button type="submit">Save</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

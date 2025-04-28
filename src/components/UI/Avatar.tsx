@@ -49,7 +49,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   className,
 }) => {
   const sizes = {
-    sm: "size-11 text-xs",
+    sm: "size-10 text-xs font-light",
     lg: "size-16 text-lg",
   };
 

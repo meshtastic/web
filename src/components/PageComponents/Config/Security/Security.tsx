@@ -270,11 +270,6 @@ export const Security = () => {
                 properties: {
                   value: state.adminKey,
                   showCopyButton: true,
-                  action: {
-                    icon: state.adminKeyVisible ? EyeOff : Eye,
-                    onClick: () =>
-                      dispatch({ type: "TOGGLE_ADMIN_KEY_VISIBILITY" }),
-                  },
                 },
               },
             ],

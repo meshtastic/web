@@ -5,7 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import { useDeviceStore } from "@core/stores/deviceStore.ts";
+import { useDevice, useDeviceStore } from "@core/stores/deviceStore.ts";
 import { cn } from "@core/utils/cn.ts";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
@@ -76,14 +76,13 @@ const TimeDisplay = ({ date, className }: { date: number; className?: string }) 
 
 export const MessageItem = ({ message }: MessageProps) => {
   const { getDevices } = useDeviceStore();
+  const { getNode } = useDevice()
 
   const messageUser: Protobuf.Mesh.NodeInfo | null = useMemo(() => {
     if (message?.from === null || message?.from === undefined) return null;
-    const devices = getDevices();
-    for (const device of devices) {
-      if (device.nodes.has(message.from)) {
-        return device.nodes.get(message.from) ?? null;
-      }
+    const fromNode = getNode(message.from);
+    if (fromNode) {
+      return fromNode ?? null;
     }
     return null;
   }, [getDevices, message.from]);
@@ -102,14 +101,14 @@ export const MessageItem = ({ message }: MessageProps) => {
   const isFailed = message.state === MessageState.Failed;
 
   const messageItemWrapperClass = cn(
-    "group w-full px-4 py-2 relative list-none",
+    "group w-full px-2 py-2 relative list-none",
     "rounded-md",
     "hover:bg-slate-300/15 dark:hover:bg-slate-600/20",
     "transition-colors duration-100 ease-in-out",
   );
 
-  const avatarSizeClass = "size-11";
-  const gridGapClass = "gap-x-4";
+  // const avatarSizeClass = "size-11";
+  const gridGapClass = "gap-x-2";
 
   const baseTextStyle = "text-sm text-gray-800 dark:text-gray-200";
   const nameTextStyle = "font-medium text-gray-900 dark:text-gray-100 mr-2";
@@ -120,7 +119,7 @@ export const MessageItem = ({ message }: MessageProps) => {
   return (
     <li className={messageItemWrapperClass}>
       <div className={cn("grid grid-cols-[auto_1fr]", gridGapClass)}>
-        <Avatar size="sm" text={shortName} className={cn(avatarSizeClass, "pt-0.5")} />
+        <Avatar size="sm" text={shortName} className="pt-0.5" />
 
         <div className="flex flex-col gap-1.5 min-w-0">
           {messageDate != null ? (

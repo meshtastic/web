@@ -18,7 +18,7 @@ export const MessageActionsMenu = ({
   onReply
 }: MessageActionsMenuProps) => {
   const hoverIconBarClass = cn(
-    "absolute top-2 right-4",
+    "absolute top-2 right-2",
     "flex items-center gap-x-1",
     "bg-white dark:bg-zinc-800",
     "border border-gray-200 dark:border-zinc-600",

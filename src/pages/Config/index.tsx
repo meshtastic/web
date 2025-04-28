@@ -8,7 +8,7 @@ import { useToast } from "@core/hooks/useToast.ts";
 import { DeviceConfig } from "@pages/Config/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.tsx";
 import { BoxesIcon, SaveIcon, SaveOff, SettingsIcon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const ConfigPage = () => {
   const { workingConfig, workingModuleConfig, connection } = useDevice();
@@ -51,11 +51,14 @@ const ConfigPage = () => {
                 description:
                   `The configuration change ${moduleConfig.payloadVariant.case} has been saved.`,
               })
+
             )
           ),
         );
+        setIsSaving(false);
       }
       await connection?.commitEditSettings();
+
     } catch (_error) {
       toast({
         title: "Error Saving Config",
@@ -66,8 +69,8 @@ const ConfigPage = () => {
     }
   };
 
-  return (
-    <>
+  const leftSidebar = useMemo(
+    () => (
       <Sidebar>
         <SidebarSection label="Config Sections">
           <SidebarButton
@@ -84,7 +87,13 @@ const ConfigPage = () => {
           />
         </SidebarSection>
       </Sidebar>
+    ), [])
+
+  return (
+    <>
+
       <PageLayout
+        leftBar={leftSidebar}
         label={activeConfigSection === "device"
           ? "Radio Config"
           : "Module Config"}

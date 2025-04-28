@@ -2,6 +2,7 @@ import type { Device } from "@core/stores/deviceStore.ts";
 import { MeshDevice, Protobuf } from "@meshtastic/core";
 import { MessageType, type MessageStore } from "@core/stores/messageStore.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
+import NodeInfoFactory from "@core/dto/NodeNumToNodeInfoDTO.ts";
 
 export const subscribeAll = (
   device: Device,
@@ -9,9 +10,6 @@ export const subscribeAll = (
   messageStore: MessageStore
 ) => {
   let myNodeNum = 0;
-
-  // onLogEvent
-  // onMeshHeartbeat
 
   connection.events.onDeviceMetadataPacket.subscribe((metadataPacket) => {
     device.addMetadata(metadataPacket.from, metadataPacket.data);
@@ -67,10 +65,8 @@ export const subscribeAll = (
   });
 
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-    // toast(`New Node Discovered: ${nodeInfo.user?.shortName ?? "UNK"}`, {
-    //   icon: "🔎"
-    // });
-    device.addNodeInfo(nodeInfo);
+    const nodeWithUser = NodeInfoFactory.ensureDefaultUser(nodeInfo);
+    device.addNodeInfo(nodeWithUser);
   });
 
   connection.events.onChannelPacket.subscribe((channel) => {
@@ -126,12 +122,14 @@ export const subscribeAll = (
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
           device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);
-          device.setDialogOpen("refreshKeys", true);
+          // TODO: this has be refactored as it isn't working properly
+          // device.setDialogOpen("refreshKeys", true);
           break;
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
           device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);
-          device.setDialogOpen("refreshKeys", true);
+          // TODO: this has be refactored as it isn't working properly
+          // device.setDialogOpen("refreshKeys", true);
           break;
         default: {
           break;

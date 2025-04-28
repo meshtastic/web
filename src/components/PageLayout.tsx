@@ -1,76 +1,124 @@
+import React from 'react';
 import { cn } from "@core/utils/cn.ts";
-import { AlignLeftIcon, type LucideIcon } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 import Footer from "@components/UI/Footer.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 
+export interface ActionItem {
+  key: string;
+  icon: LucideIcon;
+  iconClasses?: string;
+  onClick: () => void;
+  disabled?: boolean;
+  isLoading?: boolean;
+  ariaLabel?: string;
+}
 
 export interface PageLayoutProps {
   label: string;
-  noPadding?: boolean;
+  actions?: ActionItem[];
   children: React.ReactNode;
+  leftBar?: React.ReactNode;
+  rightBar?: React.ReactNode;
   className?: string;
-  actions?: {
-    icon: LucideIcon;
-    iconClasses?: string;
-    onClick: () => void;
-    disabled?: boolean;
-    isLoading?: boolean;
-  }[];
+  noPadding?: boolean;
+  leftBarClassName?: string;
+  rightBarClassName?: string;
+  topBarClassName?: string;
 }
 
 export const PageLayout = ({
   label,
-  noPadding,
   actions,
-  className,
   children,
+  leftBar,
+  rightBar,
+  className,
+  noPadding,
+  leftBarClassName,
+  rightBarClassName,
+  topBarClassName,
 }: PageLayoutProps) => {
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      <div className="relative flex h-full w-full flex-col">
-        <div className="flex h-14 shrink-0 border-b-[0.5px]  border-slate-300 dark:border-slate-700 md:h-16 md:px-4">
-          <button
-            type="button"
-            className="pl-4 transition-all hover:text-accent md:hidden"
+      <div className="flex flex-1 bg-background text-foreground overflow-hidden">
+        {/* Left Sidebar */}
+        {leftBar && (
+          <aside
+            className={cn(
+              "p-2 shrink-0 border-r-[0.5px] border-slate-300 dark:border-slate-700",
+              leftBarClassName
+            )}
           >
-            <AlignLeftIcon />
-          </button>
-          <div className="flex flex-1 items-center justify-between px-4 md:px-0">
-            <div className="flex w-full items-center">
-              <span className="w-full text-lg font-medium">{label}</span>
-              <div className="flex justify-end space-x-4">
+            {leftBar}
+          </aside>
+        )}
+
+        {/* Center column (Header + Main) */}
+        <div className="flex flex-1 flex-col min-w-0">
+          {/* Header */}
+          <header
+            className={cn(
+              "flex h-16 shrink-0 p-2 items-center border-b border-slate-300 dark:border-slate-700 px-4",
+              topBarClassName
+            )}
+          >
+            {/* Header Content */}
+            <div className="flex flex-1 items-center justify-between min-w-0">
+              <span className="text-lg font-medium text-foreground truncate pr-4">
+                {label}
+              </span>
+              <div className="flex items-center space-x-3 md:space-x-4 shrink-0">
                 {actions?.map((action) => (
                   <button
-                    key={action.icon.displayName}
+                    key={action.key}
                     type="button"
-                    disabled={action?.disabled}
-                    className="transition-all hover:text-accent"
+                    disabled={action.disabled || action.isLoading}
+                    className="text-foreground transition-colors hover:text-accent disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={action.onClick}
+                    aria-label={action.ariaLabel || `Action ${action.key}`}
+                    aria-disabled={action.disabled}
+                    aria-busy={action.isLoading}
                   >
-                    {action?.isLoading ? <Spinner /> : (
+                    {action.isLoading ? (
+                      <Spinner size="sm" />
+                    ) : (
                       <action.icon
-                        className={action.iconClasses}
-                        aria-disabled={action.disabled}
+                        className={cn("h-5 w-5", action.iconClasses)}
                       />
                     )}
                   </button>
                 ))}
               </div>
             </div>
-          </div>
+          </header>
+
+          <main
+            className={cn(
+              "flex-1 flex flex-col",
+              "overflow-hidden",
+              !noPadding && "px-2",
+              className
+            )}
+          >
+            {children}
+          </main>
+          {/* <Footer /> */}
         </div>
-        <div
-          className={cn(
-            "flex h-full w-full flex-col overflow-y-auto",
-            !noPadding && "pl-3 pr-3 ",
-            className
-          )}
-        >
-          {children}
-          <Footer />
-        </div>
+
+        {/* Right Sidebar */}
+        {rightBar && (
+          <aside
+            className={cn(
+              "w-[281px] shrink-0 border-l border-slate-300 dark:border-slate-700 p-2",
+              rightBarClassName
+            )}
+          >
+            {rightBar}
+          </aside>
+        )}
       </div>
     </ErrorBoundary>
   );
