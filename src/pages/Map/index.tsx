@@ -61,7 +61,7 @@ const MapPage = () => {
     onFilterChange,
     resetFilters,
     filteredNodes,
-    filterConfigs,
+    groupedFilterConfigs,
   } = useNodeFilters(validNodes);
 
   const isDirty = useMemo(() => {
@@ -221,7 +221,7 @@ const MapPage = () => {
         </MapGl>
 
         <FilterControl
-          configs={filterConfigs}
+          groupedFilterConfigs={groupedFilterConfigs}
           values={filters}
           onChange={onFilterChange}
           resetFilters={resetFilters}
