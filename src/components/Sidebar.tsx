@@ -47,7 +47,7 @@ const CollapseToggleButton = () => {
       onClick={toggleSidebar}
       className={cn(
         'absolute top-21 -right-2 z-10 p-0.5 rounded-full transform translate-x-1/2',
-        'bg-background-primary border border-slate-300 dark:border-slate-700',
+        'border border-slate-300 dark:border-slate-700',
         'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-100',
         'focus:outline-none focus:ring-2 focus:ring-accent transition-transform'
       )}
@@ -92,7 +92,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
   return (
     <div
       className={cn(
-        'relative bg-background-primary border-slate-300 dark:border-slate-700',
+        'relative border-slate-300 dark:border-slate-700',
         'transition-all duration-300 ease-in-out flex-shrink-0',
         isCollapsed ? 'w-24' : 'w-46 lg:w-64'
       )}
@@ -151,7 +151,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         {children}
       </div>
 
-      <div className="border-t-[0.5px] bg-background-primary border-slate-300 dark:border-slate-700 p-2 flex-shrink-0">
+      <div className="pt-4 border-t-[0.5px] bg-background-primary border-slate-300 dark:border-slate-700 p-2 flex-shrink-0">
         {myNode === undefined ? (
           <div className="flex flex-col items-center justify-center py-6">
             <Spinner />
@@ -221,7 +221,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
             </div>
             <div
               className={cn(
-                'flex items-center flex-shrink-0 ml-14',
+                'flex items-center flex-shrink-0 ml-2',
                 'transition-all duration-300 ease-in-out',
                 isCollapsed
                   ? 'opacity-0 max-w-0 invisible pointer-events-none'

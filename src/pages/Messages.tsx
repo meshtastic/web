@@ -54,6 +54,11 @@ export const MessagesPage = () => {
 
   const currentChat = { type: chatType, id: activeChat };
 
+  console.log(getMessages(MessageType.Broadcast, {
+    myNodeNum: getNodeNum(),
+    channel: currentChannel?.index
+  }));
+
   const renderChatContent = () => {
     switch (chatType) {
       case MessageType.Broadcast:
@@ -103,8 +108,8 @@ export const MessagesPage = () => {
   ), [filteredChannels, unreadCounts, activeChat, chatType, isCollapsed, setActiveChat, setChatType, resetUnread]);
 
   const rightSidebar = useMemo(() => (
-    <SidebarSection label="" className="px-0 relative">
-      <label className="">
+    <SidebarSection label="" className="px-0 flex flex-col h-full overflow-y-auto">
+      <label className="px-4 pt-4">
         <Input
           type="text"
           placeholder="Search nodes..."
@@ -114,7 +119,7 @@ export const MessagesPage = () => {
         />
       </label>
       <div className={cn(
-        "flex flex-col gap-3 pt-4",
+        "flex flex-col h-full flex-1 overflow-y-auto gap-2.5 pt-1",
       )}>
         {filteredNodes?.map((node) => (
           <SidebarButton
@@ -138,7 +143,6 @@ export const MessagesPage = () => {
       </div>
     </SidebarSection>
   ), [filteredNodes, searchTerm, activeChat, chatType, setActiveChat, setChatType, resetUnread, hasNodeError]);
-
   return (
     <PageLayout
       label={`Messages: ${isBroadcast && currentChannel

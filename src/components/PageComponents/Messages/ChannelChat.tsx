@@ -9,7 +9,7 @@ export interface ChannelChatProps {
 
 const EmptyState = () => (
   <div className="flex flex-1 flex-col place-content-center place-items-center p-8 text-gray-500 dark:text-gray-400">
-    <InboxIcon className="h-8 w-8 mb-2" />
+    <InboxIcon className="mb-2 h-8 w-8" />
     <span className="text-sm">No Messages</span>
   </div>
 );
@@ -24,10 +24,7 @@ export const ChannelChat = ({
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
 
-    const isNearBottom =
-      scrollContainer.scrollHeight -
-      scrollContainer.scrollTop -
-      scrollContainer.clientHeight < 100; // Threshold in pixels
+    const isNearBottom = scrollContainer.scrollTop < 100;
 
     if (isNearBottom || behavior === 'instant') {
       messagesEndRef.current?.scrollIntoView({ behavior });
@@ -35,17 +32,21 @@ export const ChannelChat = ({
   }, []);
 
   useEffect(() => {
-    scrollToBottom('smooth');
+    if (messages.length > 0) {
+      scrollToBottom('smooth');
+    }
   }, [messages, scrollToBottom]);
 
   useEffect(() => {
-    scrollToBottom('instant');
-  }, [scrollToBottom]);
+    if (messages.length > 0) {
+      scrollToBottom('instant');
+    }
+  }, [scrollToBottom, messages.length]);
+
 
   if (!messages?.length) {
     return (
-      <ul ref={scrollContainerRef} className="flex-1 flex flex-col items-center justify-center">
-
+      <ul ref={scrollContainerRef} className="flex flex-1 flex-col items-center justify-center">
         <EmptyState />
       </ul>
     );
@@ -54,8 +55,9 @@ export const ChannelChat = ({
   return (
     <ul
       ref={scrollContainerRef}
-      className="flex-1 overflow-y-auto px-3 py-2"
+      className="flex flex-1 flex-col-reverse overflow-y-auto px-3 py-2"
     >
+      <div ref={messagesEndRef} className="h-px" />
       {messages?.map((message) => {
         return (
           <MessageItem
@@ -64,7 +66,6 @@ export const ChannelChat = ({
           />
         );
       })}
-      <div ref={messagesEndRef} className="h-px" />
     </ul>
   );
 };

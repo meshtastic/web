@@ -21,19 +21,6 @@ export interface DeleteNoteDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-// function shortNameFromNode(
-//   node: ReturnType<useDevice>["nodes"][number],
-// ): string {
-//   const shortNameOfNode = node.user?.shortName ??
-//     (node.user?.macaddr
-//       ? `${base16
-//         .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-//         .toLowerCase()
-//       }`
-//       : `${numberToHexUnpadded(node.num).slice(-4)}`);
-//   return String(shortNameOfNode);
-// }
-
 const NodesPage = (): JSX.Element => {
   const { getNodes, hardware, connection } = useDevice();
   const [selectedNode, setSelectedNode] = useState<
