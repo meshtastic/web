@@ -87,7 +87,7 @@ export function FilterControl(
                             checked={val}
                             onChange={(v) => onChange(cfg.key, v)}
                             className="pb-1"
-                            labelClassName="dark:text-gray-900"
+                            labelClassName="dark:text-slate-900"
                           >
                             {cfg.label}
                           </Checkbox>
@@ -157,9 +157,9 @@ export function FilterControl(
                                 onChange(cfg.key, [newMin, newMax]);
                               }}
                               className="w-full pb-3"
-                              trackClassName="h-1 bg-gray-200 dark:bg-slate-700"
+                              trackClassName="h-1 bg-slate-200 dark:bg-slate-700"
                               rangeClassName="bg-blue-500"
-                              thumbClassName="w-3 h-3 bg-white border border-gray-400 dark:border-slate-600"
+                              thumbClassName="w-3 h-3 bg-white border border-slate-400 dark:border-slate-600"
                               aria-label={`Slider - ${cfg.label}`}
                             />
                           </div>
