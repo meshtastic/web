@@ -141,9 +141,10 @@ export const MessageItem = ({ message }: MessageProps) => {
 
         </div>
       </div>
-      <MessageActionsMenu
+      {/* TODO: Restore when reactions/emojis are functional  */}
+      {/* <MessageActionsMenu
         onReply={() => console.log("Reply to message:", message.messageId)}
-      />
+      /> */}
     </li>
   );
 };
