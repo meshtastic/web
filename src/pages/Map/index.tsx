@@ -56,12 +56,24 @@ const MapPage = () => {
   );
 
   const {
-    filteredNodes,
     filters,
+    defaultState,
     onFilterChange,
     resetFilters,
-    filterConfigs,
+    filteredNodes,
+    groupedFilterConfigs,
   } = useNodeFilters(validNodes);
+
+  const isDirty = useMemo(() => {
+    return Object.keys(filters).some((key) => {
+      const a = filters[key];
+      const b = defaultState[key];
+      // simple deep‐equal for primitives and [number,number]
+      return Array.isArray(a) && Array.isArray(b)
+        ? a[0] !== b[0] || a[1] !== b[1]
+        : a !== b;
+    });
+  }, [filters, defaultState]);
 
   const handleMarkerClick = useCallback(
     (node: Protobuf.Mesh.NodeInfo, event: { originalEvent: MouseEvent }) => {
@@ -209,10 +221,11 @@ const MapPage = () => {
         </MapGl>
 
         <FilterControl
-          configs={filterConfigs}
+          groupedFilterConfigs={groupedFilterConfigs}
           values={filters}
           onChange={onFilterChange}
           resetFilters={resetFilters}
+          isDirty={isDirty}
         />
       </PageLayout>
     </>
