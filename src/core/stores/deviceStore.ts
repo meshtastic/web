@@ -41,7 +41,7 @@ export interface Device {
   pendingSettingsChanges: boolean;
   messageDraft: string;
   unreadCounts: Map<number, number>;
-  nodesMap: Map<number, Protobuf.Mesh.NodeInfo>;
+  nodesMap: Map<number, Protobuf.Mesh.NodeInfo>; // dont access directly, use getNodes, or getNode
   dialog: {
     import: boolean;
     QR: boolean;
@@ -148,7 +148,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
           unreadCounts: new Map(),
           nodesMap: new Map(),
 
-          // --- Standard Setter Methods ---
           setStatus: (status: Types.DeviceStatusEnum) => {
             set(
               produce<DeviceState>((draft) => {

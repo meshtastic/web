@@ -112,7 +112,7 @@ export const PageLayout = ({
         {rightBar && (
           <aside
             className={cn(
-              "w-[281px] shrink-0 border-l border-slate-300 dark:border-slate-700 p-2 overflow-hidden",
+              "max-w-[288px] shrink-0 border-l border-slate-300 dark:border-slate-700 p-2 overflow-hidden",
               rightBarClassName
             )}
           >

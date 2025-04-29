@@ -38,6 +38,7 @@ export const SidebarButton = ({
       )}
       disabled={disabled}
     >
+      {/* Icon */}
       {Icon && (
         <Icon
           size={isCollapsed ? 20 : 18}
@@ -50,9 +51,12 @@ export const SidebarButton = ({
       <span
         className={cn(
           'flex justify-start text-left',
+          'min-w-0',
+          'text-wrap',
+          'px-1',
           'transition-all duration-300 ease-in-out',
           isCollapsed
-            ? 'opacity-0 max-w-0 invisible flex-1 w-0 whitespace-wrap'
+            ? 'opacity-0 max-w-0 invisible w-0 overflow-hidden'
             : 'opacity-100 max-w-full visible flex-1 whitespace-normal'
         )}
       >
@@ -63,6 +67,7 @@ export const SidebarButton = ({
         <div
           className={cn(
             "ml-auto flex-shrink-0 justify-end text-white text-xs rounded-full px-1.5 py-0.5 bg-red-600",
+            "flex-shrink-0",
             "transition-opacity duration-300 ease-in-out",
             isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'
           )}

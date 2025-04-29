@@ -25,7 +25,7 @@ export const MessagesPage = () => {
   const { isCollapsed } = useSidebar()
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const filteredNodes: NodeInfoWithUnread[] = useMemo(() => {
+  const filteredNodes = (): NodeInfoWithUnread[] => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
     return getNodes(node => {
@@ -38,7 +38,7 @@ export const MessagesPage = () => {
         unreadCount: unreadCounts.get(node.num) ?? 0,
       }))
       .sort((a, b) => b.unreadCount - a.unreadCount);
-  }, [getNodes, searchTerm, unreadCounts]);
+  }
 
 
   const allChannels = Array.from(channels.values());
@@ -119,9 +119,9 @@ export const MessagesPage = () => {
         />
       </label>
       <div className={cn(
-        "flex flex-col h-full flex-1 overflow-y-auto gap-2.5 pt-1",
+        "flex flex-col h-full flex-1 overflow-y-auto gap-2.5 pt-1 ",
       )}>
-        {filteredNodes?.map((node) => (
+        {filteredNodes()?.map((node) => (
           <SidebarButton
             key={node.num}
             label={node.user?.longName ?? `UNK`}
@@ -179,7 +179,7 @@ export const MessagesPage = () => {
           {(isBroadcast || isDirect) ? (
             <MessageInput
               to={isDirect ? activeChat : MessageType.Broadcast}
-              channel={isBroadcast ? currentChat.id : Types.ChannelNumber.Primary}
+              channel={isDirect ? Types.ChannelNumber.Primary : currentChat.id}
               maxBytes={200}
             />
           ) : (
