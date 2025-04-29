@@ -99,7 +99,7 @@ export const PageLayout = ({
             className={cn(
               "flex-1 flex flex-col",
               "overflow-hidden",
-              !noPadding && "px-2",
+              !noPadding && "px-4",
               className
             )}
           >
