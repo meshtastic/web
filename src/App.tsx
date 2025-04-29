@@ -14,6 +14,7 @@ import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import { MapProvider } from "react-map-gl/maplibre";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { SidebarProvider } from "@core/stores/sidebarStore.tsx";
+import { useTheme } from "@core/hooks/useTheme.ts";
 
 
 export const App = (): JSX.Element => {
@@ -23,6 +24,8 @@ export const App = (): JSX.Element => {
 
   const device = getDevice(selectedDevice);
 
+  // Sets up light/dark mode based on user preferences or system settings
+  useTheme()
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
