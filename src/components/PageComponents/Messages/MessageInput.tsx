@@ -96,7 +96,8 @@ export const MessageInput = ({
 
           <Button
             type="submit"
-            className="dark:bg-white dark:text-slate-900 dark:hover:bg-slate-400 dark:hover:text-white"
+            variant={"default"}
+          // className=" dark:text-slate-900 dark:hover:bg-slate-400 dark:hover:text-white"
           >
             <SendIcon size={16} />
           </Button>

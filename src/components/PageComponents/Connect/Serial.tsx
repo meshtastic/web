@@ -52,7 +52,7 @@ export const Serial = ({ setConnectionInProgress, closeDialog }: TabElementProps
             <Button
               key={`${usbVendorId ?? "UNK"}-${usbProductId ?? "UNK"}-${index}`}
               disabled={port.readable !== null}
-              className="dark:bg-slate-900 dark:text-white"
+              variant="default"
               onClick={async () => {
                 setConnectionInProgress(true);
                 await onConnect(port);
@@ -68,7 +68,7 @@ export const Serial = ({ setConnectionInProgress, closeDialog }: TabElementProps
         )}
       </div>
       <Button
-        className="dark:bg-slate-900 dark:text-white"
+        variant="default"
         onClick={async () => {
           await navigator.serial.requestPort().then((port) => {
             setSerialPorts(serialPorts.concat(port));

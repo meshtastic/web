@@ -6,6 +6,7 @@ import { Input } from "@components/UI/Input.tsx";
 import type { ChangeEventHandler } from "react";
 import { useState } from "react";
 import { useController, type FieldValues } from "react-hook-form";
+import { cn } from "@core/utils/cn.ts";
 
 export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "text" | "number" | "password";
@@ -15,6 +16,7 @@ export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
     prefix?: string;
     suffix?: string;
     step?: number;
+    className?: string;
     fieldLength?: {
       min?: number;
       max?: number;
@@ -63,6 +65,7 @@ export function GenericInput<T extends FieldValues>({
         onChange={handleInputChange}
         showCopyButton={field.properties?.showCopyButton}
         showPasswordToggle={field.properties?.showPasswordToggle || field.type === "password"}
+        className={field.properties?.className}
         {...restProperties}
         disabled={disabled}
       />

@@ -6,7 +6,7 @@ export interface SubtleProps {
 }
 
 export const Subtle = ({ className, children }: SubtleProps) => (
-  <p className={cn("text-sm text-slate-500 dark:text-slate-400", className)}>
+  <p className={cn("text-sm text-slate-500 dark:text-slate-300", className)}>
     {children}
   </p>
 );

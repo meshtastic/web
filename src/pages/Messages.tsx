@@ -113,7 +113,6 @@ export const MessagesPage = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           showClearButton={!!searchTerm}
-          className={cn('relative w-full p-2 border border-slate-300 rounded-sm bg-white text-slate-900 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-slate-700 focus:dark:ring-slate-100')}
         />
       </label>
       <div className={cn(

@@ -43,7 +43,7 @@ export const BLE = ({ setConnectionInProgress, closeDialog }: TabElementProps) =
         {bleDevices.map((device) => (
           <Button
             key={device.id}
-            className="dark:bg-slate-900 dark:text-white"
+            variant="default"
             onClick={() => {
               setConnectionInProgress(true);
               onConnect(device);
@@ -57,8 +57,10 @@ export const BLE = ({ setConnectionInProgress, closeDialog }: TabElementProps) =
         )}
       </div>
       <Button
-        className="dark:bg-slate-900 dark:text-white"
+        variant="default"
         onClick={async () => {
+
+
           await navigator.bluetooth
             .requestDevice({
               filters: [{ services: [ServiceUuid] }],

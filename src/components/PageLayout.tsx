@@ -22,11 +22,11 @@ export interface PageLayoutProps {
   children: React.ReactNode;
   leftBar?: React.ReactNode;
   rightBar?: React.ReactNode;
-  className?: string;
   noPadding?: boolean;
   leftBarClassName?: string;
   rightBarClassName?: string;
   topBarClassName?: string;
+  contentClassName?: string;
 }
 
 export const PageLayout = ({
@@ -35,11 +35,11 @@ export const PageLayout = ({
   children,
   leftBar,
   rightBar,
-  className,
   noPadding,
   leftBarClassName,
   rightBarClassName,
   topBarClassName,
+  contentClassName
 }: PageLayoutProps) => {
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
@@ -100,7 +100,7 @@ export const PageLayout = ({
               "flex-1 flex flex-col",
               "overflow-hidden",
               !noPadding && "px-2",
-              className
+              contentClassName
             )}
           >
             {children}

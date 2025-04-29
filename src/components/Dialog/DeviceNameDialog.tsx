@@ -83,6 +83,7 @@ export const DeviceNameDialog = ({
                 label: "Long Name",
                 type: "text",
                 properties: {
+                  className: 'text-slate-900 dark:text-slate-200',
                   fieldLength: {
                     currentValueLength: currentLongNameLength ?? 0,
                     max: MAX_LONG_NAME_BYTE_LENGTH,

@@ -93,6 +93,7 @@ const ConfigPage = () => {
     <>
 
       <PageLayout
+        contentClassName="overflow-auto"
         leftBar={leftSidebar}
         label={activeConfigSection === "device"
           ? "Radio Config"

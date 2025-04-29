@@ -40,9 +40,9 @@ const StatusTooltip = ({ status, children }: { status: MessageStatus; children: 
   <TooltipProvider delayDuration={300}>
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent className="bg-gray-800 text-white px-2 py-1 rounded text-xs">
+      <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-2 py-1 rounded text-xs">
         {status.displayText}
-        <TooltipArrow className="fill-gray-800" />
+        <TooltipArrow className="fill-slate-800" />
       </TooltipContent>
     </Tooltip>
   </TooltipProvider>
@@ -50,7 +50,7 @@ const StatusTooltip = ({ status, children }: { status: MessageStatus; children: 
 
 const StatusIcon = ({ status, className }: { status: MessageStatus; className?: string }) => {
   const Icon = status.icon;
-  const iconClass = cn("w-3.5 h-3.5 shrink-0", className);
+  const iconClass = cn("size-4 shrink-0", className);
   return (
     <StatusTooltip status={status}>
       <span aria-label={status.ariaLabel} role="img">
@@ -110,10 +110,10 @@ export const MessageItem = ({ message }: MessageProps) => {
   // const avatarSizeClass = "size-11";
   const gridGapClass = "gap-x-2";
 
-  const baseTextStyle = "text-sm text-gray-800 dark:text-gray-200";
-  const nameTextStyle = "font-medium text-gray-900 dark:text-gray-100 mr-2";
-  const dateTextStyle = "text-gray-500 dark:text-gray-400";
-  const statusIconBaseColor = "text-gray-400 dark:text-gray-500";
+  const baseTextStyle = "text-sm text-slate-800 dark:text-slate-200";
+  const nameTextStyle = "font-medium text-slate-900 dark:text-slate-100 mr-2";
+  const dateTextStyle = "text-slate-500 dark:text-slate-400";
+  const statusIconBaseColor = "text-slate-400 dark:text-slate-400";
   const statusIconFailedColor = "text-red-500 dark:text-red-400";
 
   return (

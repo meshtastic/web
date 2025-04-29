@@ -6,11 +6,11 @@ import { useCopyToClipboard } from "@core/hooks/useCopyToClipboard.ts";
 import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
 
 const inputVariants = cva(
-  "flex h-10 w-full rounded-md border border-slate-300 bg-transparent py-2 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-100 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-600",
+  "flex h-10 w-full rounded-md border border-slate-300 bg-transparent py-2 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-500 dark:bg-transparet dark:text-slate-100 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-600",
   {
     variants: {
       variant: {
-        default: "border-slate-300 dark:border-slate-700",
+        default: "border-slate-300 dark:border-slate-500",
         invalid:
           "border-red-500 dark:border-red-500 focus:ring-red-500 dark:focus:ring-red-500",
       },
@@ -26,7 +26,7 @@ type InputActionType = {
   icon: LucideIcon;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   ariaLabel: string;
-  tooltip?: string;
+  tooltip?: string
   condition?: boolean;
 };
 
@@ -128,7 +128,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn("relative flex w-full items-stretch", containerClassName)}>
         {prefix && (
-          <span className="inline-flex items-center rounded-l-md border border-r-0 border-slate-300 bg-slate-100/80 px-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-700 dark:text-slate-300">
+          <span className="inline-flex items-center rounded-l-md border border-r-0 border-slate-300 bg-slate-100/80 px-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-200 dark:text-slate-700">
             {prefix}
           </span>
         )}

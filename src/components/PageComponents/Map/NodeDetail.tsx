@@ -49,7 +49,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
   }
 
   return (
-    <div className="dark:text-slate-900 p-1">
+    <div className="p-1">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
           <Avatar text={shortName} size="sm" />
