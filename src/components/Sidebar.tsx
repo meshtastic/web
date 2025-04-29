@@ -47,8 +47,9 @@ const CollapseToggleButton = () => {
       onClick={toggleSidebar}
       className={cn(
         'absolute top-21 -right-2 z-10 p-0.5 rounded-full transform translate-x-1/2',
-        'border border-slate-300 dark:border-slate-700',
-        'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-100',
+        'transition-colors duration-300 ease-in-out',
+        'border border-slate-300 dark:border-slate-200',
+        'text-slate-500 dark:text-slate-200 hover:text-slate-400 dark:hover:text-slate-400',
         'focus:outline-none focus:ring-2 focus:ring-accent transition-transform'
       )}
     >
@@ -185,7 +186,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                 />
                 <p
                   className={cn(
-                    'max-w-[20ch] whitespace-wrap text-sm font-medium',
+                    'max-w-[20ch] text-wrap text-sm font-medium',
                     'transition-all duration-300 ease-in-out overflow-hidden',
                     isCollapsed
                       ? 'opacity-0 max-w-0 invisible'

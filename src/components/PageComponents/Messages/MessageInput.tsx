@@ -3,9 +3,11 @@ import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
-import { startTransition, useCallback, useMemo, useState } from "react";
+import {
+  startTransition, useCallback, // @ts-types="react"
+  useDeferredValue, useState
+} from "react";
 import { MessageState, MessageType, useMessageStore } from "@core/stores/messageStore.ts";
-import { debounce } from "@core/utils/debounce.ts";
 
 export interface MessageInputProps {
   to: Types.Destination;
@@ -24,12 +26,9 @@ export const MessageInput = ({
   const [localDraft, setLocalDraft] = useState(getDraft(to));
   const [messageBytes, setMessageBytes] = useState(0);
 
-  const debouncedSetMessageDraft = useMemo(
-    () => debounce((value: string) => setDraft(to, value), 300),
-    [setDraft, to]
-  );
-
   const calculateBytes = (text: string) => new Blob([text]).size;
+  const deferredBytes = useDeferredValue(calculateBytes(localDraft));
+
 
   const chatType = to === MessageType.Broadcast ? MessageType.Broadcast : MessageType.Direct;
 
@@ -52,12 +51,15 @@ export const MessageInput = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    const byteLength = calculateBytes(newValue);
+    const byteLength = deferredBytes
 
     if (byteLength <= maxBytes) {
       setLocalDraft(newValue);
-      debouncedSetMessageDraft(newValue);
       setMessageBytes(byteLength);
+
+      startTransition(() => {
+        setDraft(to, newValue);
+      });
     }
   };
 

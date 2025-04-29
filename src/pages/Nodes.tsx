@@ -11,7 +11,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
-import { type JSX, useCallback, useEffect, useState } from "react";
+import { type JSX, useCallback, useDeferredValue, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
 import { Input } from "@components/UI/Input.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
@@ -33,8 +33,16 @@ const NodesPage = (): JSX.Element => {
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
   >();
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const deferredSearch = useDeferredValue(searchTerm);
 
-  const filteredNodes = getNodes()
+  const filteredNodes = getNodes(node => {
+    if (!node.user) return false;
+    const lowerCaseSearchTerm = deferredSearch.toLowerCase();
+    return (
+      node.user?.longName?.toLowerCase().includes(lowerCaseSearchTerm) ||
+      node.user?.shortName?.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+  })
 
   useEffect(() => {
     if (!connection) return;
@@ -75,6 +83,7 @@ const NodesPage = (): JSX.Element => {
             placeholder="Search nodes..."
             value={searchTerm}
             className="bg-transparent"
+            showClearButton={!!searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
@@ -157,7 +166,6 @@ const NodesPage = (): JSX.Element => {
             onOpenChange={() => setSelectedLocation(undefined)}
           />
         </div>
-        <Footer />
       </PageLayout>
     </>
   );

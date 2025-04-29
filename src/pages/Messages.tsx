@@ -8,8 +8,8 @@ import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, Types } from "@meshtastic/core";
 import { getChannelName } from "@pages/Channels.tsx";
-import { HashIcon, LockIcon, LockOpenIcon, SearchIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { MessageType, useMessageStore } from "@core/stores/messageStore.ts";
@@ -24,9 +24,11 @@ export const MessagesPage = () => {
   const { toast } = useToast();
   const { isCollapsed } = useSidebar()
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const deferredSearch = useDeferredValue(searchTerm);
+
 
   const filteredNodes = (): NodeInfoWithUnread[] => {
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const lowerCaseSearchTerm = deferredSearch.toLowerCase();
 
     return getNodes(node => {
       const longName = node.user?.longName?.toLowerCase() ?? '';
@@ -53,11 +55,6 @@ export const MessagesPage = () => {
   const isBroadcast = chatType === MessageType.Broadcast;
 
   const currentChat = { type: chatType, id: activeChat };
-
-  console.log(getMessages(MessageType.Broadcast, {
-    myNodeNum: getNodeNum(),
-    channel: currentChannel?.index
-  }));
 
   const renderChatContent = () => {
     switch (chatType) {
@@ -115,6 +112,7 @@ export const MessagesPage = () => {
           placeholder="Search nodes..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          showClearButton={!!searchTerm}
           className={cn('relative w-full p-2 border border-slate-300 rounded-sm bg-white text-slate-900 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-slate-700 focus:dark:ring-slate-100')}
         />
       </label>
@@ -175,7 +173,7 @@ export const MessagesPage = () => {
       <div className="flex flex-1 flex-col overflow-hidden">
         {renderChatContent()}
 
-        <div className="flex-none mt-auto dark:bg-slate-900 p-4">
+        <div className="flex-none dark:bg-slate-900 p-4">
           {(isBroadcast || isDirect) ? (
             <MessageInput
               to={isDirect ? activeChat : MessageType.Broadcast}

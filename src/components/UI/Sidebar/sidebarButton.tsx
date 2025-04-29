@@ -31,14 +31,13 @@ export const SidebarButton = ({
       variant={active ? "subtle" : "ghost"}
       size="sm"
       className={cn(
-        "flex w-full items-center",
+        "flex w-full items-center text-wrap",
         isCollapsed
           ? 'justify-center gap-0 px-2 h-9'
           : 'justify-start gap-2 min-h-9'
       )}
       disabled={disabled}
     >
-      {/* Icon */}
       {Icon && (
         <Icon
           size={isCollapsed ? 20 : 18}
@@ -50,9 +49,8 @@ export const SidebarButton = ({
 
       <span
         className={cn(
-          'flex justify-start text-left',
+          'flex flex-wrap justify-start text-left text-wrap',
           'min-w-0',
-          'text-wrap',
           'px-1',
           'transition-all duration-300 ease-in-out',
           isCollapsed

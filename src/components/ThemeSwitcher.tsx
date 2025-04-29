@@ -34,7 +34,7 @@ export default function ThemeSwitcher({
         className,
       )}
       onClick={toggleTheme}
-      aria-description={"Change current theme"}
+      aria-description="Change current theme"
     >
       <span
         data-label

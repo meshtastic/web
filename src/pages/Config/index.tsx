@@ -99,6 +99,7 @@ const ConfigPage = () => {
           : "Module Config"}
         actions={[
           {
+            key: "save",
             icon: isError ? SaveOff : SaveIcon,
             isLoading: isSaving,
             disabled: isSaving,

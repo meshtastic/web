@@ -105,14 +105,14 @@ export const PageLayout = ({
           >
             {children}
           </main>
-          {/* <Footer /> */}
+          <Footer />
         </div>
 
         {/* Right Sidebar */}
         {rightBar && (
           <aside
             className={cn(
-              "max-w-[288px] shrink-0 border-l border-slate-300 dark:border-slate-700 p-2 overflow-hidden",
+              "w-76 max-w-76 shrink-0 border-l border-slate-300 dark:border-slate-700 p-2 overflow-hidden",
               rightBarClassName
             )}
           >

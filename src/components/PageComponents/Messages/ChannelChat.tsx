@@ -8,7 +8,7 @@ export interface ChannelChatProps {
 }
 
 const EmptyState = () => (
-  <div className="flex flex-1 flex-col place-content-center place-items-center p-8 text-gray-500 dark:text-gray-400">
+  <div className="flex flex-1 flex-col place-content-center place-items-center p-8 text-slate-500 dark:text-slate-400">
     <InboxIcon className="mb-2 h-8 w-8" />
     <span className="text-sm">No Messages</span>
   </div>
@@ -24,9 +24,10 @@ export const ChannelChat = ({
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
 
-    const isNearBottom = scrollContainer.scrollTop < 100;
+    const scrollThreshold = 50; // How close to bottom to trigger smooth scroll
+    const isNearBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight < scrollThreshold;
 
-    if (isNearBottom || behavior === 'instant') {
+    if (behavior === 'instant' || isNearBottom) {
       messagesEndRef.current?.scrollIntoView({ behavior });
     }
   }, []);
@@ -37,25 +38,21 @@ export const ChannelChat = ({
     }
   }, [messages, scrollToBottom]);
 
-  useEffect(() => {
-    if (messages.length > 0) {
-      scrollToBottom('instant');
-    }
-  }, [scrollToBottom, messages.length]);
-
 
   if (!messages?.length) {
     return (
       <ul ref={scrollContainerRef} className="flex flex-1 flex-col items-center justify-center">
         <EmptyState />
+        <div ref={messagesEndRef} />
       </ul>
     );
   }
 
+
   return (
     <ul
       ref={scrollContainerRef}
-      className="flex flex-1 flex-col-reverse overflow-y-auto px-3 py-2"
+      className="mt-auto overflow-y-auto px-3 py-2"
     >
       <div ref={messagesEndRef} className="h-px" />
       {messages?.map((message) => {

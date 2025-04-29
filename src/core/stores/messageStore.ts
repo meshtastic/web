@@ -71,164 +71,164 @@ export interface MessageStore {
 const CURRENT_STORE_VERSION = 0;
 
 export const useMessageStore = create<MessageStore>()(
-  persist(
-    (set, get) => ({
-      messages: {
-        direct: {}, // Record<sender, Record<recipient, Record<messageId, Message>>>
-        broadcast: {},
-      },
-      draft: new Map<number, string>(),
-      activeChat: 0,
-      chatType: MessageType.Broadcast,
-      nodeNum: 0,
-      setNodeNum: (nodeNum) => {
-        set(produce((state: MessageStore) => {
-          state.nodeNum = nodeNum;
-        }));
-      },
-      getNodeNum: () => get().nodeNum,
-      setActiveChat: (chat) => {
-        set(produce((state: MessageStore) => {
-          state.activeChat = chat;
-        }));
-      },
-      setChatType: (type) => {
-        set(produce((state: MessageStore) => {
-          state.chatType = type;
-        }));
-      },
-      saveMessage: (message) => {
-        set(produce((state: MessageStore) => {
-          if (message.type === MessageType.Direct) {
-            const sender = Number(message.from);
-            const recipient = Number(message.to);
+  // persist(
+  (set, get) => ({
+    messages: {
+      direct: {}, // Record<sender, Record<recipient, Record<messageId, Message>>>
+      broadcast: {},
+    },
+    draft: new Map<number, string>(),
+    activeChat: 0,
+    chatType: MessageType.Broadcast,
+    nodeNum: 0,
+    setNodeNum: (nodeNum) => {
+      set(produce((state: MessageStore) => {
+        state.nodeNum = nodeNum;
+      }));
+    },
+    getNodeNum: () => get().nodeNum,
+    setActiveChat: (chat) => {
+      set(produce((state: MessageStore) => {
+        state.activeChat = chat;
+      }));
+    },
+    setChatType: (type) => {
+      set(produce((state: MessageStore) => {
+        state.chatType = type;
+      }));
+    },
+    saveMessage: (message) => {
+      set(produce((state: MessageStore) => {
+        if (message.type === MessageType.Direct) {
+          const sender = Number(message.from);
+          const recipient = Number(message.to);
 
-            if (!state.messages.direct[sender]) {
-              state.messages.direct[sender] = {};
-            }
-            if (!state.messages.direct[sender][recipient]) {
-              state.messages.direct[sender][recipient] = {};
-            }
-            state.messages.direct[sender][recipient][message.messageId] = message;
-
-          } else if (message.type === MessageType.Broadcast) {
-            const channel = Number(message.channel);
-            if (!state.messages.broadcast[channel]) {
-              state.messages.broadcast[channel] = {};
-            }
-            state.messages.broadcast[channel][message.messageId] = message;
+          if (!state.messages.direct[sender]) {
+            state.messages.direct[sender] = {};
           }
-        }));
-      },
-      setMessageState: ({
-        type,
-        key,
-        messageId,
-        newState = MessageState.Ack,
-      }) => {
-        set(
-          produce((state: MessageStore) => {
-            let message: Message | undefined;
-
-            if (type === MessageType.Broadcast) {
-              const channel = key;
-              message = state.messages.broadcast?.[channel]?.[messageId];
-            } else if (type === MessageType.Direct) {
-              const otherNodeNum = key;
-              const myNodeNum = state.nodeNum;
-
-              message = state.messages.direct?.[myNodeNum]?.[otherNodeNum]?.[messageId];
-
-              if (!message) {
-                message = state.messages.direct?.[otherNodeNum]?.[myNodeNum]?.[messageId];
-              }
-            }
-
-            if (message) {
-              message.state = newState;
-            } else {
-              console.warn(`Message not found for state update - type: ${type}, key (otherNode/channel): ${key}, messageId: ${messageId}, myNodeNum: ${state.nodeNum}`);
-            }
-          }),
-        );
-      },
-      getMessages: (type, options) => {
-        const state = get();
-
-        if (type === MessageType.Broadcast && options.channel !== undefined) {
-          const messageMap = state.messages.broadcast[options.channel] ?? {};
-          return Object.values(messageMap).sort((a, b) => a.date - b.date);
-        }
-
-        if (type === MessageType.Direct && options.myNodeNum !== undefined && options.otherNodeNum !== undefined) {
-          const myNodeNum = options.myNodeNum;
-          const otherNodeNum = options.otherNodeNum;
-
-          // Messages sent BY ME TO OTHER
-          const sentByMeMap = state.messages.direct?.[myNodeNum]?.[otherNodeNum] ?? {};
-          const sentByMe = Object.values(sentByMeMap);
-
-          // Messages sent BY OTHER TO ME
-          const sentByOtherMap = state.messages.direct?.[otherNodeNum]?.[myNodeNum] ?? {};
-          const sentByOther = Object.values(sentByOtherMap);
-
-          // Merge and sort chronologically
-          return [...sentByMe, ...sentByOther].sort((a, b) => a.date - b.date);
-        }
-        return [];
-      },
-      clearMessageByMessageId: ({ type, from, to, channel, messageId }) => {
-        set(produce((state: MessageStore) => {
-          if (type === MessageType.Broadcast && channel !== undefined) {
-            const messageMap = state.messages.broadcast[channel];
-            if (messageMap?.[messageId]) {
-              delete messageMap[messageId];
-              if (Object.keys(messageMap).length === 0) {
-                delete state.messages.broadcast[channel];
-              }
-            }
-          } else if (type === MessageType.Direct && from !== undefined && to !== undefined) {
-            const messageMap = state.messages.direct?.[from]?.[to];
-            if (messageMap?.[messageId]) {
-              delete messageMap[messageId];
-              if (Object.keys(messageMap).length === 0) {
-                delete state.messages.direct[from][to];
-                if (Object.keys(state.messages.direct[from]).length === 0) {
-                  delete state.messages.direct[from];
-                }
-              }
-            }
-            console.warn("clearMessageByMessageId called without sufficient identifiers for type", type);
+          if (!state.messages.direct[sender][recipient]) {
+            state.messages.direct[sender][recipient] = {};
           }
-        }));
-      },
-      getDraft: (key) => {
-        return get().draft.get(key) ?? '';
-      },
-      setDraft: (key, message) => {
-        set(produce((state: MessageStore) => {
-          state.draft.set(key, message);
-        }));
-      },
-      clearDraft: (key) => {
-        set(produce((state: MessageStore) => {
-          state.draft.delete(key);
-        }));
-      },
-      deleteAllMessages: () => {
-        set(produce((state: MessageStore) => {
-          state.messages.direct = {};
-          state.messages.broadcast = {};
-        }));
+          state.messages.direct[sender][recipient][message.messageId] = message;
+
+        } else if (message.type === MessageType.Broadcast) {
+          const channel = Number(message.channel);
+          if (!state.messages.broadcast[channel]) {
+            state.messages.broadcast[channel] = {};
+          }
+          state.messages.broadcast[channel][message.messageId] = message;
+        }
+      }));
+    },
+    setMessageState: ({
+      type,
+      key,
+      messageId,
+      newState = MessageState.Ack,
+    }) => {
+      set(
+        produce((state: MessageStore) => {
+          let message: Message | undefined;
+
+          if (type === MessageType.Broadcast) {
+            const channel = key;
+            message = state.messages.broadcast?.[channel]?.[messageId];
+          } else if (type === MessageType.Direct) {
+            const otherNodeNum = key;
+            const myNodeNum = state.nodeNum;
+
+            message = state.messages.direct?.[myNodeNum]?.[otherNodeNum]?.[messageId];
+
+            if (!message) {
+              message = state.messages.direct?.[otherNodeNum]?.[myNodeNum]?.[messageId];
+            }
+          }
+
+          if (message) {
+            message.state = newState;
+          } else {
+            console.warn(`Message not found for state update - type: ${type}, key (otherNode/channel): ${key}, messageId: ${messageId}, myNodeNum: ${state.nodeNum}`);
+          }
+        }),
+      );
+    },
+    getMessages: (type, options) => {
+      const state = get();
+
+      if (type === MessageType.Broadcast && options.channel !== undefined) {
+        const messageMap = state.messages.broadcast[options.channel] ?? {};
+        return Object.values(messageMap).sort((a, b) => a.date - b.date);
       }
-    }),
-    {
-      name: 'meshtastic-message-store',
-      storage: createJSONStorage(() => zustandIndexDBStorage),
-      version: CURRENT_STORE_VERSION,
-      partialize: (state) => ({
-        messages: state.messages,
-        nodeNum: state.nodeNum,
-      }),
+
+      if (type === MessageType.Direct && options.myNodeNum !== undefined && options.otherNodeNum !== undefined) {
+        const myNodeNum = options.myNodeNum;
+        const otherNodeNum = options.otherNodeNum;
+
+        // Messages sent BY ME TO OTHER
+        const sentByMeMap = state.messages.direct?.[myNodeNum]?.[otherNodeNum] ?? {};
+        const sentByMe = Object.values(sentByMeMap);
+
+        // Messages sent BY OTHER TO ME
+        const sentByOtherMap = state.messages.direct?.[otherNodeNum]?.[myNodeNum] ?? {};
+        const sentByOther = Object.values(sentByOtherMap);
+
+        // Merge and sort chronologically
+        return [...sentByMe, ...sentByOther].sort((a, b) => a.date - b.date);
+      }
+      return [];
+    },
+    clearMessageByMessageId: ({ type, from, to, channel, messageId }) => {
+      set(produce((state: MessageStore) => {
+        if (type === MessageType.Broadcast && channel !== undefined) {
+          const messageMap = state.messages.broadcast[channel];
+          if (messageMap?.[messageId]) {
+            delete messageMap[messageId];
+            if (Object.keys(messageMap).length === 0) {
+              delete state.messages.broadcast[channel];
+            }
+          }
+        } else if (type === MessageType.Direct && from !== undefined && to !== undefined) {
+          const messageMap = state.messages.direct?.[from]?.[to];
+          if (messageMap?.[messageId]) {
+            delete messageMap[messageId];
+            if (Object.keys(messageMap).length === 0) {
+              delete state.messages.direct[from][to];
+              if (Object.keys(state.messages.direct[from]).length === 0) {
+                delete state.messages.direct[from];
+              }
+            }
+          }
+          console.warn("clearMessageByMessageId called without sufficient identifiers for type", type);
+        }
+      }));
+    },
+    getDraft: (key) => {
+      return get().draft.get(key) ?? '';
+    },
+    setDraft: (key, message) => {
+      set(produce((state: MessageStore) => {
+        state.draft.set(key, message);
+      }));
+    },
+    clearDraft: (key) => {
+      set(produce((state: MessageStore) => {
+        state.draft.delete(key);
+      }));
+    },
+    deleteAllMessages: () => {
+      set(produce((state: MessageStore) => {
+        state.messages.direct = {};
+        state.messages.broadcast = {};
+      }));
     }
-  ));
+  }),
+  // {
+  // name: 'meshtastic-message-store',
+  // storage: createJSONStorage(() => zustandIndexDBStorage),
+  // version: CURRENT_STORE_VERSION,
+  // partialize: (state) => ({
+  //   messages: state.messages,
+  //   nodeNum: state.nodeNum,
+  // }),
+  // }
+);

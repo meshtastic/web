@@ -27,12 +27,7 @@ export const RefreshKeysDialog = ({ open, onOpenChange }: RefreshKeysDialogProps
     return null;
   }
 
-  const nodeWithError = getNode(nodeErrorNum?.node ?? 0);
-
-  if (!nodeWithError) {
-    console.error("Node with error not found");
-    return null;
-  }
+  const nodeWithError = getNode(nodeErrorNum.node);
 
   const text = {
     title: `Keys Mismatch - ${nodeWithError?.user?.longName ?? ""}`,
