@@ -14,55 +14,66 @@ const EmptyState = () => (
   </div>
 );
 
-export const ChannelChat = ({
-  messages = [],
-}: ChannelChatProps) => {
+export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLUListElement>(null);
+  const userScrolledUpRef = useRef(false);
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
-
-    const scrollThreshold = 50; // How close to bottom to trigger smooth scroll
-    const isNearBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight < scrollThreshold;
-
-    if (behavior === 'instant' || isNearBottom) {
+    requestAnimationFrame(() => {
       messagesEndRef.current?.scrollIntoView({ behavior });
-    }
+    });
   }, []);
 
   useEffect(() => {
-    if (messages.length > 0) {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const isScrolledToBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight <= 10;
+
+    if (isScrolledToBottom || !userScrolledUpRef.current) {
       scrollToBottom('smooth');
     }
   }, [messages, scrollToBottom]);
 
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    const handleScroll = () => {
+      if (!scrollContainer) return;
+      const isAtBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight <= 10;
+      userScrolledUpRef.current = !isAtBottom;
+    };
+
+    scrollContainer?.addEventListener('scroll', handleScroll);
+
+    return () => {
+      scrollContainer?.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   if (!messages?.length) {
     return (
-      <ul ref={scrollContainerRef} className="flex flex-1 flex-col items-center justify-center">
+      <div className="flex flex-1 flex-col items-center justify-center">
         <EmptyState />
         <div ref={messagesEndRef} />
-      </ul>
+      </div>
     );
   }
-
 
   return (
     <ul
       ref={scrollContainerRef}
-      className="mt-auto overflow-y-auto px-3 py-2"
+      className="flex-grow overflow-y-auto px-3 py-2"
     >
-      <div ref={messagesEndRef} className="h-px" />
       {messages?.map((message) => {
         return (
           <MessageItem
-            key={message?.messageId ?? `${message?.from}-${message?.date}`}
+            key={message.messageId ?? `${message.from}-${message.date}`}
             message={message}
           />
         );
       })}
+      <div ref={messagesEndRef} className="h-px" />
     </ul>
   );
 };

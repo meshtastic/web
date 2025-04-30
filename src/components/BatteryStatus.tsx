@@ -27,7 +27,7 @@ const batteryStates: BatteryStateConfig[] = [
   {
     condition: level => level > 100,
     Icon: PlugZapIcon,
-    className: 'text-gray-600',
+    className: 'text-gray-500',
     text: () => 'Plugged in',
   },
   {
@@ -39,7 +39,7 @@ const batteryStates: BatteryStateConfig[] = [
   {
     condition: level => level > 20,
     Icon: BatteryMediumIcon,
-    className: 'text-yellow-400',
+    className: 'text-yellow-500',
     text: level => `${level}% charging`,
   },
   {

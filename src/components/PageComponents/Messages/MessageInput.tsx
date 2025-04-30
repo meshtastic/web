@@ -56,10 +56,7 @@ export const MessageInput = ({
     if (byteLength <= maxBytes) {
       setLocalDraft(newValue);
       setMessageBytes(byteLength);
-
-      startTransition(() => {
-        setDraft(to, newValue);
-      });
+      setDraft(to, newValue);
     }
   };
 

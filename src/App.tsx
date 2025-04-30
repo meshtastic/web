@@ -37,7 +37,7 @@ export const App = (): JSX.Element => {
       />
       <Toaster />
       <DeviceWrapper device={device}>
-        <div className="flex h-screen flex-col bg-background-primary text-text-primary">
+        <div className="flex h-screen flex-col bg-background-primary text-text-primary" style={{ scrollbarWidth: 'thin' }}>
           <SidebarProvider>
             <div className="h-full flex flex-col">
               {device ? (
