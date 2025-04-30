@@ -101,7 +101,7 @@ export const MessageItem = ({ message }: MessageProps) => {
   const isFailed = message.state === MessageState.Failed;
 
   const messageItemWrapperClass = cn(
-    "group w-full px-2 py-2 relative list-none",
+    "group w-full py-2 relative list-none",
     "rounded-md",
     "hover:bg-slate-300/15 dark:hover:bg-slate-600/20",
     "transition-colors duration-100 ease-in-out",
