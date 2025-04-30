@@ -12,6 +12,7 @@ export interface SidebarButtonProps {
   children?: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
+  preventCollapse?: boolean;
 }
 
 export const SidebarButton = ({
@@ -22,8 +23,10 @@ export const SidebarButton = ({
   children,
   onClick,
   disabled = false,
+  preventCollapse = false,
 }: SidebarButtonProps) => {
-  const { isCollapsed } = useSidebar();
+  const { isCollapsed: isSidebarCollapsed } = useSidebar();
+  const isButtonCollapsed = isSidebarCollapsed && !preventCollapse;
 
   return (
     <Button
@@ -32,7 +35,7 @@ export const SidebarButton = ({
       size="sm"
       className={cn(
         "flex w-full items-center text-wrap",
-        isCollapsed
+        isButtonCollapsed
           ? 'justify-center gap-0 px-2 h-9'
           : 'justify-start gap-2 min-h-9'
       )}
@@ -40,7 +43,7 @@ export const SidebarButton = ({
     >
       {Icon && (
         <Icon
-          size={isCollapsed ? 20 : 18}
+          size={isButtonCollapsed ? 20 : 18}
           className="flex-shrink-0"
         />
       )}
@@ -53,7 +56,7 @@ export const SidebarButton = ({
           'min-w-0',
           'px-1',
           'transition-all duration-300 ease-in-out',
-          isCollapsed
+          isButtonCollapsed
             ? 'opacity-0 max-w-0 invisible w-0 overflow-hidden'
             : 'opacity-100 max-w-full visible flex-1 whitespace-normal'
         )}
@@ -61,13 +64,13 @@ export const SidebarButton = ({
         {label}
       </span>
 
-      {!isCollapsed && !active && count && count > 0 && (
+      {!isButtonCollapsed && !active && count && count > 0 && (
         <div
           className={cn(
             "ml-auto flex-shrink-0 justify-end text-white text-xs rounded-full px-1.5 py-0.5 bg-red-600",
             "flex-shrink-0",
             "transition-opacity duration-300 ease-in-out",
-            isCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'
+            isButtonCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'
           )}
         >
           {count}

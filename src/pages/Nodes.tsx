@@ -1,7 +1,6 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
 import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
-import Footer from "@app/components/UI/Footer.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
@@ -115,7 +114,7 @@ const NodesPage = (): JSX.Element => {
               >
                 {node.user?.longName ?? numberToHexUnpadded(node.num)}
               </h1>,
-              <Mono key="hops">
+              <Mono key="hops" className="w-16">
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"

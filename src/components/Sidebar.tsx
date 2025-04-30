@@ -1,6 +1,6 @@
 import React from "react";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
+import { SidebarButton } from "./UI/Sidebar/sidebarButton.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Page } from "@core/stores/deviceStore.ts";
@@ -8,7 +8,6 @@ import { Spinner } from "@components/UI/Spinner.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 
 import {
-  BatteryMediumIcon,
   CircleChevronLeft,
   CpuIcon,
   LayersIcon,
@@ -25,6 +24,7 @@ import { cn } from "@core/utils/cn.ts";
 import { useSidebar } from "@core/stores/sidebarStore.tsx";
 import ThemeSwitcher from "@components/ThemeSwitcher.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
+import BatteryStatus from "@components/BatteryStatus.tsx";
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -63,13 +63,6 @@ const CollapseToggleButton = () => {
     </button>
   );
 }
-
-const getBatteryStatus = (level: number | undefined): string => {
-  if (level === undefined) return "UNK";
-  if (level > 100) return "Charging";
-  return `${level}%`;
-};
-
 
 export const Sidebar = ({ children }: SidebarProps) => {
   const { hardware, getNode, getNodesLength, metadata, activePage, setActivePage, setDialogOpen } = useDevice();
@@ -207,8 +200,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                 )}
               >
                 <div className="inline-flex gap-2">
-                  <BatteryMediumIcon size={22} className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0" />
-                  <Subtle>{getBatteryStatus(myNode.deviceMetrics?.batteryLevel)}</Subtle>
+                  <BatteryStatus deviceMetrics={myNode.deviceMetrics} />
                 </div>
                 <div className="inline-flex gap-2">
                   <ZapIcon size={18} className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0" />

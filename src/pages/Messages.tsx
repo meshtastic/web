@@ -3,7 +3,7 @@ import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
+import { SidebarButton } from "../components/UI/Sidebar/sidebarButton.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, Types } from "@meshtastic/core";
@@ -121,6 +121,7 @@ export const MessagesPage = () => {
         {filteredNodes()?.map((node) => (
           <SidebarButton
             key={node.num}
+            preventCollapse={true}
             label={node.user?.longName ?? `UNK`}
             count={node.unreadCount > 0 ? node.unreadCount : undefined}
             active={activeChat === node.num && chatType === MessageType.Direct}

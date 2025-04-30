@@ -3,7 +3,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
+import { SidebarButton } from "../../components/UI/Sidebar/sidebarButton.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { DeviceConfig } from "@pages/Config/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.tsx";

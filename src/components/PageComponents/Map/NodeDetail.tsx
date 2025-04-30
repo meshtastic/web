@@ -8,10 +8,6 @@ import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Protobuf } from "@meshtastic/core";
 import type { Protobuf as ProtobufType } from "@meshtastic/core";
 import {
-  BatteryChargingIcon,
-  BatteryFullIcon,
-  BatteryLowIcon,
-  BatteryMediumIcon,
   Dot,
   LockIcon,
   LockOpenIcon,
@@ -28,6 +24,7 @@ import {
 } from "@radix-ui/react-tooltip";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { MessageType, useMessageStore } from "@core/stores/messageStore.ts";
+import BatteryStatus from "@components/BatteryStatus.tsx";
 
 export interface NodeDetailProps {
   node: ProtobufType.Mesh.NodeInfo;
@@ -112,24 +109,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
           {hardwareType !== "UNSET" && <Subtle>{hardwareType}</Subtle>}
 
           {!!node.deviceMetrics?.batteryLevel && (
-            <div
-              className="flex items-center gap-1 mt-0.5 text-gray-500"
-              title={`${node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
-                } volts`}
-            >
-              {node.deviceMetrics?.batteryLevel > 100
-                ? <BatteryChargingIcon size={22} className="text-gray-600" />
-                : node.deviceMetrics?.batteryLevel > 80
-                  ? <BatteryFullIcon size={22} className="text-green-500" />
-                  : node.deviceMetrics?.batteryLevel > 20
-                    ? <BatteryMediumIcon size={22} className="text-yellow-400" />
-                    : <BatteryLowIcon size={22} className="text-red-500" />}
-              <Subtle aria-label="Battery">
-                {node.deviceMetrics?.batteryLevel > 100
-                  ? "Charging"
-                  : `${node.deviceMetrics?.batteryLevel}%`}
-              </Subtle>
-            </div>
+            <BatteryStatus deviceMetrics={node.deviceMetrics} />
           )}
 
           <div className="flex gap-2 items-center">
