@@ -49,7 +49,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
   }
 
   return (
-    <div className="p-1">
+    <div className="p-1 text-slate-900">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
           <Avatar text={shortName} size="sm" />
@@ -113,17 +113,17 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
 
           {!!node.deviceMetrics?.batteryLevel && (
             <div
-              className="flex items-center gap-1 mt-0.5"
+              className="flex items-center gap-1 mt-0.5 text-gray-500"
               title={`${node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
                 } volts`}
             >
               {node.deviceMetrics?.batteryLevel > 100
-                ? <BatteryChargingIcon size={22} />
+                ? <BatteryChargingIcon size={22} className="text-gray-600" />
                 : node.deviceMetrics?.batteryLevel > 80
-                  ? <BatteryFullIcon size={22} />
+                  ? <BatteryFullIcon size={22} className="text-green-500" />
                   : node.deviceMetrics?.batteryLevel > 20
-                    ? <BatteryMediumIcon size={22} />
-                    : <BatteryLowIcon size={22} />}
+                    ? <BatteryMediumIcon size={22} className="text-yellow-400" />
+                    : <BatteryLowIcon size={22} className="text-red-500" />}
               <Subtle aria-label="Battery">
                 {node.deviceMetrics?.batteryLevel > 100
                   ? "Charging"
@@ -197,7 +197,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         {!!node.deviceMetrics?.airUtilTx && (
           <div className="grow">
             <div>Airtime Util</div>
-            <Mono>{node.deviceMetrics?.airUtilTx.toPrecision(3)}%</Mono>
+            <Mono className="text-gray-500">{node.deviceMetrics?.airUtilTx.toPrecision(3)}%</Mono>
           </div>
         )}
       </div>
@@ -205,7 +205,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       {node.snr !== 0 && (
         <div className="mt-2">
           <div>SNR</div>
-          <Mono className="flex items-center text-xs">
+          <Mono className="flex items-center text-xs text-gray-500">
             {node.snr}db
             <Dot />
             {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%

@@ -7,7 +7,7 @@ type FooterProps = {
 const Footer = ({ className, ...props }: FooterProps) => {
   return (
     <footer
-      className={cn("flex mt-auto justify-center p-2", className)}
+      className={cn("flex mt-auto justify-center p-2 text-sm lg:text-md", className)}
       {...props}
     >
       <p>

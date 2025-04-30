@@ -200,6 +200,7 @@ const MapPage = () => {
                 longitude={convertToLatLng(selectedNode.position).longitude}
                 latitude={convertToLatLng(selectedNode.position).latitude}
                 onClose={() => setSelectedNode(null)}
+                className="w-full"
               >
                 <NodeDetail node={selectedNode} />
               </Popup>
