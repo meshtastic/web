@@ -11,7 +11,7 @@ import { Avatar } from "@components/UI/Avatar.tsx";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ReactNode, useMemo } from "react";
-import { Message, MessageState } from "@core/stores/messageStore.ts";
+import { Message, MessageState } from "../../../core/stores/messageStore/index.ts";
 import { Protobuf } from "@meshtastic/js";
 import { MessageActionsMenu } from "@components/PageComponents/Messages/MessageActionsMenu.tsx";
 
@@ -25,12 +25,13 @@ interface MessageStatus {
   displayText: string;
   icon: LucideIcon;
   ariaLabel: string;
+  iconClassName?: string;
 }
 
 const MESSAGE_STATUS: Record<MessageState, MessageStatus> = {
-  [MessageState.Ack]: { state: MessageState.Ack, displayText: "Message delivered", icon: CheckCircle2, ariaLabel: "Message delivered" },
-  [MessageState.Waiting]: { state: MessageState.Waiting, displayText: "Waiting for delivery", icon: CircleEllipsis, ariaLabel: "Sending message" },
-  [MessageState.Failed]: { state: MessageState.Failed, displayText: "Delivery failed", icon: AlertCircle, ariaLabel: "Message delivery failed" },
+  [MessageState.Ack]: { state: MessageState.Ack, displayText: "Message delivered", icon: CheckCircle2, ariaLabel: "Message delivered", iconClassName: "text-green-500 dark:text-green-500" },
+  [MessageState.Waiting]: { state: MessageState.Waiting, displayText: "Waiting for delivery", icon: CircleEllipsis, ariaLabel: "Sending message", iconClassName: "text-slate-400 dark:text-slate-400" },
+  [MessageState.Failed]: { state: MessageState.Failed, displayText: "Delivery failed", icon: AlertCircle, ariaLabel: "Message delivery failed", iconClassName: "text-red-500 dark:text-red-400" },
 };
 
 const getMessageStatus = (state: MessageState): MessageStatus =>
@@ -40,7 +41,7 @@ const StatusTooltip = ({ status, children }: { status: MessageStatus; children: 
   <TooltipProvider delayDuration={300}>
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-2 py-1 rounded text-xs">
+      <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
         {status.displayText}
         <TooltipArrow className="fill-slate-800" />
       </TooltipContent>
@@ -48,9 +49,9 @@ const StatusTooltip = ({ status, children }: { status: MessageStatus; children: 
   </TooltipProvider>
 );
 
-const StatusIcon = ({ status, className }: { status: MessageStatus; className?: string }) => {
+const StatusIcon = ({ status }: { status: MessageStatus }) => {
   const Icon = status.icon;
-  const iconClass = cn("size-4 shrink-0", className);
+  const iconClass = cn("size-4 shrink-0", status.iconClassName);
   return (
     <StatusTooltip status={status}>
       <span aria-label={status.ariaLabel} role="img">
@@ -107,14 +108,11 @@ export const MessageItem = ({ message }: MessageProps) => {
     "transition-colors duration-100 ease-in-out",
   );
 
-  // const avatarSizeClass = "size-11";
   const gridGapClass = "gap-x-2";
 
   const baseTextStyle = "text-sm text-slate-800 dark:text-slate-200";
   const nameTextStyle = "font-medium text-slate-900 dark:text-slate-100 mr-2";
   const dateTextStyle = "text-slate-500 dark:text-slate-400";
-  const statusIconBaseColor = "text-slate-400 dark:text-slate-400";
-  const statusIconFailedColor = "text-red-500 dark:text-red-400";
 
   return (
     <li className={messageItemWrapperClass}>
@@ -128,10 +126,7 @@ export const MessageItem = ({ message }: MessageProps) => {
                 {displayName}
               </span>
               <TimeDisplay date={messageDate} className={dateTextStyle} />
-              <StatusIcon
-                status={messageStatus}
-                className={cn(isFailed ? statusIconFailedColor : statusIconBaseColor)}
-              />
+              <StatusIcon status={messageStatus} />
             </div>
           ) : null}
 

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { DeviceContext, useDeviceStore } from "@core/stores/deviceStore.ts";
 import { RefreshKeysDialog } from "./RefreshKeysDialog.tsx";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 import { expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { Protobuf } from "@meshtastic/core";

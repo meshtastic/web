@@ -48,7 +48,7 @@ export const PageLayout = ({
         {leftBar && (
           <aside
             className={cn(
-              "p-2 shrink-0 border-r-[0.5px] border-slate-300 dark:border-slate-700 ",
+              "px-2 shrink-0 border-r-[0.5px] border-slate-300 dark:border-slate-700 ",
               leftBarClassName
             )}
           >
@@ -56,18 +56,17 @@ export const PageLayout = ({
           </aside>
         )}
 
-        {/* Center column (Header + Main) */}
         <div className="flex flex-1 flex-col min-w-0">
           {/* Header */}
           <header
             className={cn(
-              "flex h-16 shrink-0 p-2 items-center border-b border-slate-300 dark:border-slate-700 px-4",
+              "flex h-14 shrink-0 mt-2 p-2 items-center border-b border-slate-300 dark:border-slate-700",
               topBarClassName
             )}
           >
             {/* Header Content */}
             <div className="flex flex-1 items-center justify-between min-w-0">
-              <span className="text-lg font-medium text-foreground truncate pr-4">
+              <span className="text-lg font-medium text-foreground truncate px-2">
                 {label}
               </span>
               <div className="flex items-center space-x-3 md:space-x-4 shrink-0">
@@ -82,13 +81,15 @@ export const PageLayout = ({
                     aria-disabled={action.disabled}
                     aria-busy={action.isLoading}
                   >
-                    {action.isLoading ? (
-                      <Spinner size="sm" />
-                    ) : (
-                      <action.icon
-                        className={cn("h-5 w-5", action.iconClasses)}
-                      />
-                    )}
+                    <div className="mr-6">
+                      {action.isLoading ? (
+                        <Spinner size="md" />
+                      ) : (
+                        <action.icon
+                          className={cn("h-5 w-5", action.iconClasses)}
+                        />
+                      )}
+                    </div>
                   </button>
                 ))}
               </div>
@@ -112,7 +113,7 @@ export const PageLayout = ({
         {rightBar && (
           <aside
             className={cn(
-              "w-56 lg:w-76 max-w-76 shrink-0 border-l border-slate-300 dark:border-slate-700 p-2 overflow-hidden",
+              "w-64 shrink-0 border-l border-slate-300 dark:border-slate-700 px-2 overflow-hidden",
               rightBarClassName
             )}
           >

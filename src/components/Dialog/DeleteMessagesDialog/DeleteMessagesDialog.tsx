@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { AlertTriangleIcon } from "lucide-react";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export interface DeleteMessagesDialogProps {
   open: boolean;

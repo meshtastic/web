@@ -4,7 +4,7 @@ import {
   MessageType,
   MessageState,
   type Message,
-} from './messageStore.ts';
+} from './index.ts';
 
 let memoryStorage: Record<string, string> = {};
 

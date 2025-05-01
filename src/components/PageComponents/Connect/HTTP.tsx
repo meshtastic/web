@@ -13,7 +13,7 @@ import { TransportHTTP } from "@meshtastic/transport-http";
 import { useState } from "react";
 import { useForm, useController } from "react-hook-form";
 import { AlertTriangle } from "lucide-react";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 interface FormData {
   ip: string;

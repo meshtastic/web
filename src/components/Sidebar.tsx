@@ -1,6 +1,5 @@
 import React from "react";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { SidebarButton } from "./UI/Sidebar/sidebarButton.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Page } from "@core/stores/deviceStore.ts";
@@ -25,6 +24,7 @@ import { useSidebar } from "@core/stores/sidebarStore.tsx";
 import ThemeSwitcher from "@components/ThemeSwitcher.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import BatteryStatus from "@components/BatteryStatus.tsx";
+import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -95,7 +95,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
 
       <div
         className={cn(
-          'h-14 py-4 px-1 flex gap-2 items-center flex-shrink-0 transition-all duration-300 ease-in-out',
+          'h-14 flex mt-2 gap-2 items-center flex-shrink-0 transition-all duration-300 ease-in-out',
           'border-b-[0.5px] border-slate-300 dark:border-slate-700',
           isCollapsed && 'justify-center px-0'
 
@@ -145,7 +145,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         {children}
       </div>
 
-      <div className="pt-4 border-t-[0.5px] bg-background-primary border-slate-300 dark:border-slate-700 p-2 flex-shrink-0">
+      <div className="pt-4 border-t-[0.5px] bg-background-primary border-slate-300 dark:border-slate-700 flex-shrink-0">
         {myNode === undefined ? (
           <div className="flex flex-col items-center justify-center py-6">
             <Spinner />
@@ -162,54 +162,49 @@ export const Sidebar = ({ children }: SidebarProps) => {
           <>
             <div
               className={cn(
-                'flex flex-col items-start justify-between',
-                isCollapsed && 'items-center justify-center'
+                'flex place-items-center gap-2',
+                isCollapsed && 'justify-center'
               )}
             >
-              <div
-                className={cn(
-                  'flex place-items-center gap-2',
-                  isCollapsed && 'w-full justify-center'
+              <Avatar
+                text={myNode.user?.shortName ?? myNode.num.toString()}
+                className={cn("flex-shrink-0 ml-2",
+                  isCollapsed && "ml-0",
                 )}
-              >
-                <Avatar
-                  text={myNode.user?.shortName ?? myNode.num.toString()}
-                  className="flex-shrink-0"
-                  size="sm"
-                />
-                <p
-                  className={cn(
-                    'max-w-[20ch] text-wrap text-sm font-medium',
-                    'transition-all duration-300 ease-in-out overflow-hidden',
-                    isCollapsed
-                      ? 'opacity-0 max-w-0 invisible'
-                      : 'opacity-100 max-w-full visible'
-                  )}
-                >
-                  {myNode.user?.longName ?? "UNK"}
-                </p>
-              </div>
-
-              <div
+                size="sm"
+              />
+              <p
                 className={cn(
-                  'flex flex-col gap-0.5 ml-2 mt-2',
-                  'transition-all duration-300 ease-in-out',
+                  'max-w-[20ch] text-wrap text-sm font-medium',
+                  'transition-all duration-300 ease-in-out overflow-hidden',
                   isCollapsed
-                    ? 'opacity-0 max-w-0 h-0 invisible'
-                    : 'opacity-100 max-w-xs h-auto visible'
+                    ? 'opacity-0 max-w-0 invisible'
+                    : 'opacity-100 max-w-full visible'
                 )}
               >
-                <div className="inline-flex gap-2">
-                  <BatteryStatus deviceMetrics={myNode.deviceMetrics} />
-                </div>
-                <div className="inline-flex gap-2">
-                  <ZapIcon size={18} className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0" />
-                  <Subtle>{myNode.deviceMetrics?.voltage?.toPrecision(3) ?? "UNK"} volts</Subtle>
-                </div>
-                <div className="inline-flex gap-2">
-                  <CpuIcon size={18} className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0" />
-                  <Subtle>v{myMetadata?.firmwareVersion ?? "UNK"}</Subtle>
-                </div>
+                {myNode.user?.longName}
+              </p>
+            </div>
+
+            <div
+              className={cn(
+                'flex flex-col gap-0.5 ml-2 mt-2',
+                'transition-all duration-300 ease-in-out',
+                isCollapsed
+                  ? 'opacity-0 max-w-0 h-0 invisible'
+                  : 'opacity-100 max-w-xs h-auto visible'
+              )}
+            >
+              <div className="inline-flex gap-2">
+                <BatteryStatus deviceMetrics={myNode.deviceMetrics} />
+              </div>
+              <div className="inline-flex gap-2">
+                <ZapIcon size={18} className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0" />
+                <Subtle>{myNode.deviceMetrics?.voltage?.toPrecision(3) ?? "UNK"} volts</Subtle>
+              </div>
+              <div className="inline-flex gap-2">
+                <CpuIcon size={18} className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0" />
+                <Subtle>v{myMetadata?.firmwareVersion ?? "UNK"}</Subtle>
               </div>
             </div>
             <div

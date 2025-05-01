@@ -7,7 +7,7 @@ import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { BleConnection, ServiceUuid } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export const BLE = ({ setConnectionInProgress, closeDialog }: TabElementProps) => {
   const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);

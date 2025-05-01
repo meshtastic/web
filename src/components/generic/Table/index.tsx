@@ -112,8 +112,6 @@ export const Table = ({ headings, rows }: TableProps) => {
           // biome-ignore lint/suspicious/noArrayIndexKey: TODO: Once this table is sortable, this should get fixed.
           return (<tr key={index} className={`${index % 2 ? 'bg-white dark:bg-white/2' : 'bg-slate-50/50 dark:bg-slate-50/5'} border-b-1 border-slate-200 dark:border-slate-900`}>
             {row.map((item, index) => {
-              console.log(item);
-
               return (index === 0 ?
                 <th
                   key={item.key ?? index}

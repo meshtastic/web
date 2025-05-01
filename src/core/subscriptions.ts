@@ -1,6 +1,6 @@
 import type { Device } from "@core/stores/deviceStore.ts";
 import { MeshDevice, Protobuf } from "@meshtastic/core";
-import { MessageType, type MessageStore } from "@core/stores/messageStore.ts";
+import { MessageState, MessageType, type MessageStore } from "./stores/messageStore/index.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
 import NodeInfoFactory from "@core/dto/NodeNumToNodeInfoDTO.ts";
 
@@ -57,16 +57,22 @@ export const subscribeAll = (
   });
 
   connection.events.onUserPacket.subscribe((user) => {
+    console.log("User Packet", user);
+
     device.addUser(user);
   });
 
   connection.events.onPositionPacket.subscribe((position) => {
+    console.log("Position Packet", position);
+
     device.addPosition(position);
   });
 
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-    const nodeWithUser = NodeInfoFactory.ensureDefaultUser(nodeInfo);
-    device.addNodeInfo(nodeWithUser);
+    // const nodeWithUser = NodeInfoFactory.ensureDefaultUser(nodeInfo);
+    // console.log("Node Info", nodeWithUser);
+
+    device.addNodeInfo(nodeInfo);
   });
 
   connection.events.onChannelPacket.subscribe((channel) => {
@@ -82,6 +88,8 @@ export const subscribeAll = (
 
   connection.events.onMessagePacket.subscribe((messagePacket) => {
     // incoming and outgoing messages are handled by this event listener
+    console.log("Message Packet", messagePacket);
+
     const dto = new PacketToMessageDTO(messagePacket, myNodeNum);
     const message = dto.toMessage();
     messageStore.saveMessage(message);
@@ -119,16 +127,17 @@ export const subscribeAll = (
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     if (routingPacket.data.variant.case === "errorReason") {
       switch (routingPacket.data.variant.value) {
+        case Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT:
+          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
+          break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
           device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);
-          // TODO: this has be refactored as it isn't working properly
           device.setDialogOpen("refreshKeys", true);
           break;
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
           device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);
-          // TODO: this has be refactored as it isn't working properly
           device.setDialogOpen("refreshKeys", true);
           break;
         default: {

@@ -1,57 +1,31 @@
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
-import {
-  startTransition, useCallback, // @ts-types="react"
-  useDeferredValue, useState
-} from "react";
-import { MessageState, MessageType, useMessageStore } from "@core/stores/messageStore.ts";
+import { startTransition, useState } from "react";
+import { useMessageStore } from "@core/stores/messageStore/index.ts";
 
 export interface MessageInputProps {
+  onSend: (message: string) => void;
   to: Types.Destination;
-  channel: Types.ChannelNumber;
   maxBytes: number;
 }
 
 export const MessageInput = ({
+  onSend,
   to,
-  channel,
   maxBytes,
 }: MessageInputProps) => {
-  const { connection } = useDevice();
-  const { setMessageState, activeChat, setDraft, getDraft, clearDraft } = useMessageStore();
+  const { setDraft, getDraft, clearDraft } = useMessageStore();
 
   const [localDraft, setLocalDraft] = useState(getDraft(to));
   const [messageBytes, setMessageBytes] = useState(0);
 
   const calculateBytes = (text: string) => new Blob([text]).size;
-  const deferredBytes = useDeferredValue(calculateBytes(localDraft));
-
-
-  const chatType = to === MessageType.Broadcast ? MessageType.Broadcast : MessageType.Direct;
-
-  const sendText = useCallback(async (message: string) => {
-    try {
-      const messageId = await connection?.sendText(message, to, true, channel);
-      if (messageId !== undefined) {
-        setMessageState({ type: chatType, key: activeChat, messageId, newState: MessageState.Ack });
-      }
-      // deno-lint-ignore no-explicit-any
-    } catch (e: any) {
-      setMessageState({
-        type: chatType,
-        key: activeChat,
-        messageId: e?.id,
-        newState: MessageState.Failed,
-      });
-    }
-  }, [channel, connection, setMessageState, to, activeChat, chatType]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    const byteLength = deferredBytes
+    const byteLength = calculateBytes(newValue);
 
     if (byteLength <= maxBytes) {
       setLocalDraft(newValue);
@@ -63,12 +37,12 @@ export const MessageInput = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!localDraft.trim()) return;
+    setMessageBytes(0);
 
     startTransition(() => {
-      sendText(localDraft.trim());
+      onSend(localDraft.trim());
       setLocalDraft("");
       clearDraft(to);
-      setMessageBytes(0);
     });
   };
 

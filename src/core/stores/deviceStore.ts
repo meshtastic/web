@@ -288,6 +288,8 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             );
           },
           addNodeInfo: (nodeInfo) => {
+            console.log("Node Info", nodeInfo);
+
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);

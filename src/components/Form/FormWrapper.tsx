@@ -24,7 +24,7 @@ export const FieldWrapper = ({
       <div className="grid grid-cols-1 lg:grid-cols-[0.6fr_2fr_.1fr] sm:items-baseline gap-4">
         <Label htmlFor={fieldName}>{label}</Label>
         <div className="max-w-3xl">
-          <p className="text-sm text-slate-400">{description}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
           <p hidden={valid ?? true} className="text-sm text-red-500">
             {validationText}
           </p>

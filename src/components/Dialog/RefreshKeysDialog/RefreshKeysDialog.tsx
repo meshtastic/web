@@ -9,7 +9,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { LockKeyholeOpenIcon } from "lucide-react";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export interface RefreshKeysDialogProps {
   open: boolean;

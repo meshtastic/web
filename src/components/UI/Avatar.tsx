@@ -41,8 +41,11 @@ class ColorUtils {
 }
 
 const getColorFromText = (text: string): RGBColor => {
+  if (!text) {
+    return { r: 0, g: 0, b: 0, a: 255 };
+  }
   let hash = 0;
-  for (let i = 0; i < text.length; i++) {
+  for (let i = 0; i < text?.length; i++) {
     hash = text.charCodeAt(i) + ((hash << 5) - hash);
     hash |= 0;
   }
@@ -66,11 +69,11 @@ export const Avatar = ({
     lg: "size-16 text-lg",
   };
 
-  const safeText = text?.toString().toUpperCase() ?? "UNK";
+  const safeText = text?.toString().toUpperCase();
   const bgColor = getColorFromText(safeText);
   const isLight = ColorUtils.isLight(bgColor);
   const textColor = isLight ? "#000000" : "#FFFFFF";
-  const initials = safeText.slice(0, 4) || "UNK";
+  const initials = safeText?.slice(0, 4) ?? "UNK";
 
   return (
     <div

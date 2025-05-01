@@ -3,29 +3,28 @@ import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { SidebarButton } from "../components/UI/Sidebar/sidebarButton.tsx";
+import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, Types } from "@meshtastic/core";
 import { getChannelName } from "@pages/Channels.tsx";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
-import { useDeferredValue, useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import { cn } from "@core/utils/cn.ts";
-import { MessageType, useMessageStore } from "@core/stores/messageStore.ts";
+import { MessageState, MessageType, useMessageStore } from "@core/stores/messageStore/index.ts";
 import { useSidebar } from "@core/stores/sidebarStore.tsx";
 import { Input } from "@components/UI/Input.tsx";
 
 type NodeInfoWithUnread = Protobuf.Mesh.NodeInfo & { unreadCount: number };
 
 export const MessagesPage = () => {
-  const { channels, getNodes, getNode, hasNodeError, unreadCounts, resetUnread } = useDevice();
-  const { getNodeNum, getMessages, setActiveChat, chatType, activeChat, setChatType } = useMessageStore()
+  const { channels, getNodes, getNode, hasNodeError, unreadCounts, resetUnread, connection } = useDevice();
+  const { getMyNodeNum, getMessages, setActiveChat, chatType, activeChat, setChatType, setMessageState, } = useMessageStore()
   const { toast } = useToast();
   const { isCollapsed } = useSidebar()
   const [searchTerm, setSearchTerm] = useState<string>("");
   const deferredSearch = useDeferredValue(searchTerm);
-
 
   const filteredNodes = (): NodeInfoWithUnread[] => {
     const lowerCaseSearchTerm = deferredSearch.toLowerCase();
@@ -42,35 +41,70 @@ export const MessagesPage = () => {
       .sort((a, b) => b.unreadCount - a.unreadCount);
   }
 
+  console.log('filtered nodes', filteredNodes());
 
   const allChannels = Array.from(channels.values());
   const filteredChannels = allChannels.filter(
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
   );
   const currentChannel = channels.get(activeChat);
-
   const otherNode = getNode(activeChat);
 
   const isDirect = chatType === MessageType.Direct;
   const isBroadcast = chatType === MessageType.Broadcast;
 
-  const currentChat = { type: chatType, id: activeChat };
+  const sendText = useCallback(async (message: string) => {
+    const isDirect = chatType === MessageType.Direct;
+    const toValue = isDirect ? activeChat : MessageType.Broadcast;
+
+    const channelValue = isDirect ? Types.ChannelNumber.Primary : activeChat ?? 0;
+
+    console.log(`Sending message: "${message}" to: ${toValue}, channel: ${channelValue}, type: ${chatType}`);
+
+    let messageId: number | undefined;
+
+    try {
+      messageId = await connection?.sendText(message, toValue, true, channelValue);
+      console.log("Message sent, ID:", messageId);
+
+      if (messageId !== undefined) {
+        if (chatType === MessageType.Broadcast) {
+          setMessageState({ type: chatType, channelId: channelValue, messageId, newState: MessageState.Ack });
+        } else {
+          setMessageState({ type: chatType, nodeA: getMyNodeNum(), nodeB: activeChat, messageId, newState: MessageState.Ack });
+        }
+      } else {
+        console.warn("sendText completed but messageId is undefined");
+      }
+      // deno-lint-ignore no-explicit-any
+    } catch (e: any) {
+      console.error("Failed to send message:", e);
+      // Note: messageId might be undefined here if the error occurred before it was assigned
+      if (chatType === MessageType.Broadcast) {
+        const failedId = messageId ?? `failed-${Date.now()}`;
+        setMessageState({ type: chatType, channelId: channelValue, messageId: failedId, newState: MessageState.Failed });
+      } else { // MessageType.Direct
+        const failedId = messageId ?? `failed-${Date.now()}`;
+        setMessageState({ type: chatType, nodeA: getMyNodeNum(), nodeB: activeChat, messageId: failedId, newState: MessageState.Failed });
+      }
+    }
+  }, [activeChat, chatType, connection, getMyNodeNum, setMessageState]);
 
   const renderChatContent = () => {
     switch (chatType) {
       case MessageType.Broadcast:
         return (
           <ChannelChat
-            messages={getMessages(MessageType.Broadcast, {
-              myNodeNum: getNodeNum(),
-              channel: currentChannel?.index
+            messages={getMessages({
+              type: MessageType.Broadcast,
+              channelId: activeChat ?? 0,
             })}
           />
         );
       case MessageType.Direct:
         return (
           <ChannelChat
-            messages={getMessages(MessageType.Direct, { myNodeNum: getNodeNum(), otherNodeNum: activeChat })}
+            messages={getMessages({ type: MessageType.Direct, nodeA: getMyNodeNum(), nodeB: activeChat })}
           />
         );
       default:
@@ -106,7 +140,7 @@ export const MessagesPage = () => {
 
   const rightSidebar = useMemo(() => (
     <SidebarSection label="" className="px-0 flex flex-col h-full overflow-y-auto">
-      <label className="px-4 pt-4">
+      <label className="p-2 block">
         <Input
           type="text"
           placeholder="Search nodes..."
@@ -177,7 +211,7 @@ export const MessagesPage = () => {
           {(isBroadcast || isDirect) ? (
             <MessageInput
               to={isDirect ? activeChat : MessageType.Broadcast}
-              channel={isDirect ? Types.ChannelNumber.Primary : currentChat.id}
+              onSend={sendText}
               maxBytes={200}
             />
           ) : (

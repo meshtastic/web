@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MessageInput } from './MessageInput.tsx';
 import { useDevice } from '@core/stores/deviceStore.ts';
-import { useMessageStore } from '@core/stores/messageStore.ts';
+import { useMessageStore } from '../../../core/stores/messageStore/index.ts';
 import { debounce } from '@core/utils/debounce.ts';
 import { Types } from "@meshtastic/core";
 

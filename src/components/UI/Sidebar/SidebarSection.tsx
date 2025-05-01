@@ -18,7 +18,7 @@ export const SidebarSection = ({
   return (
     <div className={cn(
       "py-2",
-      isCollapsed ? 'px-0' : 'px-3',
+      isCollapsed ? 'px-0' : 'px-4',
       className,
     )}>
 

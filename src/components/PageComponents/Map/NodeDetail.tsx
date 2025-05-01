@@ -23,7 +23,7 @@ import {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { MessageType, useMessageStore } from "@core/stores/messageStore.ts";
+import { MessageType, useMessageStore } from "../../../core/stores/messageStore/index.ts";
 import BatteryStatus from "@components/BatteryStatus.tsx";
 
 export interface NodeDetailProps {

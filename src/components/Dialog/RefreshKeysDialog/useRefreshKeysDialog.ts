@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export function useRefreshKeysDialog() {
   const { removeNode, setDialogOpen, clearNodeError, getNodeError } = useDevice();
