@@ -7,7 +7,12 @@ import { Mono } from "@components/generic/Mono.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Protobuf } from "@meshtastic/core";
 import type { Protobuf as ProtobufType } from "@meshtastic/core";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import {
+  BatteryChargingIcon,
+  BatteryFullIcon,
+  BatteryLowIcon,
+  BatteryMediumIcon,
   Dot,
   LockIcon,
   LockOpenIcon,
@@ -22,35 +27,34 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
+import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { MessageType, useMessageStore } from "../../../core/stores/messageStore/index.ts";
-import BatteryStatus from "@components/BatteryStatus.tsx";
 
 export interface NodeDetailProps {
   node: ProtobufType.Mesh.NodeInfo;
 }
 
 export const NodeDetail = ({ node }: NodeDetailProps) => {
-  const { setChatType, setActiveChat } = useMessageStore();
+  const { setChatType, setActiveChat } = useAppStore();
   const { setActivePage } = useDevice();
-  const name = node.user?.longName ?? `UNK`;
+  const name = node.user?.longName || `!${numberToHexUnpadded(node.num)}`;
   const shortName = node.user?.shortName ?? "UNK";
   const hwModel = node.user?.hwModel ?? 0;
   const hardwareType =
     Protobuf.Mesh.HardwareModel[hwModel]?.replaceAll("_", " ") ?? `${hwModel}`;
 
   function handleDirectMessage() {
-    setChatType(MessageType.Direct);
+    setChatType("direct");
     setActiveChat(node.num);
     setActivePage("messages");
   }
 
   return (
-    <div className="p-1 text-slate-900">
+    <div className="dark:text-slate-900 p-1">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
-          <Avatar text={shortName} size="sm" />
-
+          <Avatar text={shortName} />
+          
           <div onFocusCapture={(e) => {
             // Required to prevent DM tooltip auto-appearing on creation
             e.stopPropagation();
@@ -76,10 +80,11 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <MessageSquareIcon
+                  <MessageSquareIcon 
                     size={14}
                     onClick={handleDirectMessage}
                     className="cursor-pointer hover:text-blue-500"
+                    title="Send Message"
                   />
                 </TooltipTrigger>
                 <TooltipPortal>
@@ -109,7 +114,24 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
           {hardwareType !== "UNSET" && <Subtle>{hardwareType}</Subtle>}
 
           {!!node.deviceMetrics?.batteryLevel && (
-            <BatteryStatus deviceMetrics={node.deviceMetrics} />
+            <div
+              className="flex items-center gap-1 mt-0.5"
+              title={`${node.deviceMetrics?.voltage?.toPrecision(3) ?? "Unknown"
+                } volts`}
+            >
+              {node.deviceMetrics?.batteryLevel > 100
+                ? <BatteryChargingIcon size={22} />
+                : node.deviceMetrics?.batteryLevel > 80
+                  ? <BatteryFullIcon size={22} />
+                  : node.deviceMetrics?.batteryLevel > 20
+                    ? <BatteryMediumIcon size={22} />
+                    : <BatteryLowIcon size={22} />}
+              <Subtle aria-label="Battery">
+                {node.deviceMetrics?.batteryLevel > 100
+                  ? "Charging"
+                  : `${node.deviceMetrics?.batteryLevel}%`}
+              </Subtle>
+            </div>
           )}
 
           <div className="flex gap-2 items-center">
@@ -177,7 +199,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         {!!node.deviceMetrics?.airUtilTx && (
           <div className="grow">
             <div>Airtime Util</div>
-            <Mono className="text-gray-500">{node.deviceMetrics?.airUtilTx.toPrecision(3)}%</Mono>
+            <Mono>{node.deviceMetrics?.airUtilTx.toPrecision(3)}%</Mono>
           </div>
         )}
       </div>
@@ -185,7 +207,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       {node.snr !== 0 && (
         <div className="mt-2">
           <div>SNR</div>
-          <Mono className="flex items-center text-xs text-gray-500">
+          <Mono className="flex items-center text-xs">
             {node.snr}db
             <Dot />
             {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%

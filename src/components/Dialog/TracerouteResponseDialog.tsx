@@ -23,17 +23,17 @@ export const TracerouteResponseDialog = ({
   open,
   onOpenChange,
 }: TracerouteResponseDialogProps) => {
-  const { getNode } = useDevice();
+  const { nodes } = useDevice();
   const route: number[] = traceroute?.data.route ?? [];
   const routeBack: number[] = traceroute?.data.routeBack ?? [];
-  const snrTowards = (traceroute?.data.snrTowards ?? []).map(snr => snr / 4);
-  const snrBack = (traceroute?.data.snrBack ?? []).map(snr => snr / 4);
-  const from = getNode(traceroute?.from ?? 0);
+  const snrTowards = traceroute?.data.snrTowards ?? [];
+  const snrBack = traceroute?.data.snrBack ?? [];
+  const from = nodes.get(traceroute?.from ?? 0);
   const longName = from?.user?.longName ??
     (from ? `!${numberToHexUnpadded(from?.num)}` : "Unknown");
   const shortName = from?.user?.shortName ??
     (from ? `${numberToHexUnpadded(from?.num).substring(0, 4)}` : "UNK");
-  const to = getNode(traceroute?.to ?? 0);
+  const to = nodes.get(traceroute?.to ?? 0);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>

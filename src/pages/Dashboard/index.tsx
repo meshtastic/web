@@ -99,7 +99,7 @@ export const Dashboard = () => {
                 <Heading as="h3">No Devices</Heading>
                 <Subtle>Connect at least one device to get started</Subtle>
                 <Button
-                  className="gap-2"
+                  className="gap-2 dark:bg-white dark:text-slate-900 dark:hover:text-slate-100"
                   variant="default"
                   onClick={() => setConnectDialogOpen(true)}
                 >

@@ -1,57 +1,101 @@
+import { debounce } from "@core/utils/debounce.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
-import { startTransition, useState } from "react";
-import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { startTransition, useCallback, useMemo, useState } from "react";
 
 export interface MessageInputProps {
-  onSend: (message: string) => void;
   to: Types.Destination;
+  channel: Types.ChannelNumber;
   maxBytes: number;
 }
 
 export const MessageInput = ({
-  onSend,
   to,
+  channel,
   maxBytes,
 }: MessageInputProps) => {
-  const { setDraft, getDraft, clearDraft } = useMessageStore();
+  const {
+    connection,
+    setMessageState,
+    messageDraft,
+    setMessageDraft,
+    isQueueingMessages,
+    queueStatus,
+    hardware,
+  } = useDevice();
+  const myNodeNum = hardware.myNodeNum;
+  const [localDraft, setLocalDraft] = useState(messageDraft);
+  const [messageBytes, setMessageBytes] = useState(0);
 
-  const calculateBytes = (text: string) => new Blob([text]).size;
+  const debouncedSetMessageDraft = useMemo(
+    () => debounce(setMessageDraft, 300),
+    [setMessageDraft],
+  );
 
-  const initialDraft = getDraft(to);
-  const [localDraft, setLocalDraft] = useState(initialDraft);
-  const [messageBytes, setMessageBytes] = useState(() => calculateBytes(initialDraft));
+  // sends the message to the selected destination
+  const sendText = useCallback(
+    async (message: string) => {
+
+      await connection
+        ?.sendText(message, to, true, channel)
+        .then((id: number) =>
+          setMessageState(
+            to === "broadcast" ? "broadcast" : "direct",
+            channel,
+            to as number,
+            myNodeNum,
+            id,
+            "ack",
+          )
+        )
+        .catch((e: Types.PacketError) =>
+          setMessageState(
+            to === "broadcast" ? "broadcast" : "direct",
+            channel,
+            to as number,
+            myNodeNum,
+            e.id,
+            e.error,
+          )
+        );
+    },
+    [channel, connection, myNodeNum, setMessageState, to, queueStatus],
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    const byteLength = calculateBytes(newValue);
+    const byteLength = new Blob([newValue]).size;
 
     if (byteLength <= maxBytes) {
       setLocalDraft(newValue);
+      debouncedSetMessageDraft(newValue);
       setMessageBytes(byteLength);
-      setDraft(to, newValue);
     }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!localDraft.trim()) return;
-    // Reset bytes *before* sending (consider if onSend failure needs different handling)
-    setMessageBytes(0);
-
-    startTransition(() => {
-      onSend(localDraft.trim());
-      setLocalDraft("");
-      clearDraft(to);
-    });
   };
 
   return (
     <div className="flex gap-2">
-      <form className="w-full" name="messageInput" onSubmit={handleSubmit}>
-        <div className="flex grow gap-1">
+      <form
+        className="w-full"
+        action={(formData: FormData) => {
+          // prevent user from sending blank/empty message
+          if (localDraft === "") return;
+          const message = formData.get("messageInput") as string;
+          startTransition(() => {
+            if (!isQueueingMessages) {
+              sendText(message);
+              setLocalDraft("");
+              setMessageDraft("");
+              setMessageBytes(0);
+            }
+
+          });
+        }}
+      >
+        <div className="flex grow gap-2 ">
           <label className="w-full">
             <Input
               autoFocus
@@ -62,15 +106,11 @@ export const MessageInput = ({
               onChange={handleInputChange}
             />
           </label>
-
-          <label data-testid="byte-counter" className="flex items-center w-20 p-1 text-sm place-content-end">
+          <label data-testid="byte-counter" className="flex items-center w-24 p-2 place-content-end">
             {messageBytes}/{maxBytes}
           </label>
 
-          <Button
-            type="submit"
-            variant="default"
-          >
+          <Button type="submit" className="dark:bg-white dark:text-slate-900 dark:hover:bg-slate-400 dark:hover:text-white">
             <SendIcon size={16} />
           </Button>
         </div>

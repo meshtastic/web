@@ -1,4 +1,4 @@
-import { useState, useEffect, useId } from "react";
+import { useState, useId } from "react";
 import { Check } from "lucide-react";
 import { Label } from "@components/UI/Label.tsx";
 import { cn } from "@core/utils/cn.ts";
@@ -31,11 +31,6 @@ export function Checkbox({
   const id = propId || generatedId;
 
   const [isChecked, setIsChecked] = useState(checked || false);
-
-  // Make sure setIsChecked state updates with checked
-  useEffect(() => {
-    setIsChecked(checked || false);
-  }, [checked]);
 
   const handleToggle = () => {
     if (disabled) return;
@@ -71,7 +66,7 @@ export function Checkbox({
           >
             {isChecked && (
               <div className="animate-fade-in scale-100 opacity-100">
-                <Check className="w-4 h-4 text-slate-900 dark:text-slate-200" />
+                <Check className="w-4 h-4 text-slate-900 dark:text-slate-900" />
               </div>
             )}
           </div>

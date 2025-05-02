@@ -1,5 +1,6 @@
 import { cn } from "@core/utils/cn.ts";
 import { LockKeyholeOpenIcon } from 'lucide-react';
+import type React from "react";
 
 type RGBColor = {
   r: number;
@@ -9,12 +10,13 @@ type RGBColor = {
 };
 
 interface AvatarProps {
-  text: string | number;
+  text: string;
   size?: "sm" | "lg";
   className?: string;
   showError?: boolean;
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: stop being annoying Biome
 class ColorUtils {
   static hexToRgb(hex: number): RGBColor {
     return {
@@ -40,46 +42,46 @@ class ColorUtils {
   }
 }
 
-const getColorFromText = (text: string): RGBColor => {
-  if (!text) {
-    return { r: 0, g: 0, b: 0, a: 255 };
-  }
-  let hash = 0;
-  for (let i = 0; i < text?.length; i++) {
-    hash = text.charCodeAt(i) + ((hash << 5) - hash);
-    hash |= 0;
-  }
-
-  return {
-    r: (hash & 0xff0000) >> 16,
-    g: (hash & 0x00ff00) >> 8,
-    b: hash & 0x0000ff,
-    a: 255,
-  };
-};
-
-export const Avatar = ({
+export const Avatar: React.FC<AvatarProps> = ({
   text,
   size = "sm",
   showError = false,
   className,
-}: AvatarProps) => {
+}) => {
   const sizes = {
-    sm: "size-10 text-xs font-light",
+    sm: "size-11 text-xs",
     lg: "size-16 text-lg",
   };
 
-  const safeText = text?.toString().toUpperCase();
-  const bgColor = getColorFromText(safeText);
+  // Pick a color based on the text provided to function
+  const getColorFromText = (text: string): RGBColor => {
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) {
+      hash = text.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    return {
+      r: (hash & 0xff0000) >> 16,
+      g: (hash & 0x00ff00) >> 8,
+      b: hash & 0x0000ff,
+      a: 255,
+    };
+  };
+
+  const bgColor = getColorFromText(text ?? "UNK");
   const isLight = ColorUtils.isLight(bgColor);
   const textColor = isLight ? "#000000" : "#FFFFFF";
-  const initials = safeText?.slice(0, 4) ?? "UNK";
+  const initials = text?.toUpperCase().slice(0, 4) ?? "UNK";
 
   return (
     <div
       className={cn(
-        `relative flex items-center justify-center rounded-full font-semibold 
-`,
+        `flex
+        relative
+        rounded-full 
+        items-center 
+        justify-center 
+        font-semibold`,
         sizes[size],
         className,
       )}
@@ -88,17 +90,8 @@ export const Avatar = ({
         color: textColor,
       }}
     >
-      {showError ? (
-        <LockKeyholeOpenIcon
-          className="absolute bottom-0 right-0 z-10 size-4 text-red-500 stroke-3"
-          aria-hidden="true"
-        />
-      ) : null}
-      <p
-        className="p-1"
-      >
-        {initials}
-      </p>
+      {showError ? <LockKeyholeOpenIcon className="size-4 absolute bottom-0 right-0 z-10 text-red-500 stroke-3" /> : null}
+      <p className="p-1">{initials}</p>
     </div>
   );
 };

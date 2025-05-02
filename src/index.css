@@ -25,7 +25,6 @@
   --brightness-hover: var(--brightnessHover);
   --brightness-press: var(--brightnessPress);
   --brightness-disabled: var(--brightnessDisabled);
-  --sidebar-width: @apply w-50 lg:w-64;
 }
 
 [data-theme="light"] {
