@@ -7,7 +7,7 @@ type ChannelId = Types.ChannelNumber;
 type ConversationId = string;
 type MessageLogMap = Map<MessageId, Message>;
 
-export interface MessageBase {
+interface MessageBase {
   channel: Types.ChannelNumber;
   to: number;
   from: number;
@@ -21,7 +21,7 @@ interface GenericMessage<T extends MessageType> extends MessageBase {
   type: T;
 }
 
-export type Message = GenericMessage<MessageType.Direct> | GenericMessage<MessageType.Broadcast>;
+type Message = GenericMessage<MessageType.Direct> | GenericMessage<MessageType.Broadcast>;
 
 
 type GetMessagesParams =
@@ -58,6 +58,7 @@ type ClearMessageParams =
   };
 
 export type {
+  Message,
   ConversationId,
   NodeNum,
   MessageLogMap,

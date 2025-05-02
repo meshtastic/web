@@ -69,10 +69,8 @@ export const subscribeAll = (
   });
 
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-    // const nodeWithUser = NodeInfoFactory.ensureDefaultUser(nodeInfo);
-    // console.log("Node Info", nodeWithUser);
-
-    device.addNodeInfo(nodeInfo);
+    const nodeWithUser = NodeInfoFactory.ensureDefaultUser(nodeInfo);
+    device.addNodeInfo(nodeWithUser);
   });
 
   connection.events.onChannelPacket.subscribe((channel) => {

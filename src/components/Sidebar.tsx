@@ -46,7 +46,7 @@ const CollapseToggleButton = () => {
       aria-label={buttonLabel}
       onClick={toggleSidebar}
       className={cn(
-        'absolute top-21 -right-2 z-10 p-0.5 rounded-full transform translate-x-1/2',
+        'absolute top-20 right-0 z-10 p-0.5 rounded-full transform translate-x-1/2',
         'transition-colors duration-300 ease-in-out',
         'border border-slate-300 dark:border-slate-200',
         'text-slate-500 dark:text-slate-200 hover:text-slate-400 dark:hover:text-slate-400',
@@ -137,7 +137,6 @@ export const Sidebar = ({ children }: SidebarProps) => {
       </SidebarSection>
 
       <div className={cn(
-        '',
         'flex-1 min-h-0',
         isCollapsed && 'overflow-hidden'
       )}

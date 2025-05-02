@@ -48,7 +48,7 @@ export const PageLayout = ({
         {leftBar && (
           <aside
             className={cn(
-              "px-2 shrink-0 border-r-[0.5px] border-slate-300 dark:border-slate-700 ",
+              "px-2 pr-0 shrink-0 border-r-[0.5px] border-slate-300 dark:border-slate-700 ",
               leftBarClassName
             )}
           >
@@ -113,7 +113,7 @@ export const PageLayout = ({
         {rightBar && (
           <aside
             className={cn(
-              "w-64 shrink-0 border-l border-slate-300 dark:border-slate-700 px-2 overflow-hidden",
+              "w-48 lg:w-[270px] shrink-0 border-l border-slate-300 dark:border-slate-700 px-2 overflow-hidden",
               rightBarClassName
             )}
           >
