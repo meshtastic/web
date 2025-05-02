@@ -57,14 +57,10 @@ export const subscribeAll = (
   });
 
   connection.events.onUserPacket.subscribe((user) => {
-    console.log("User Packet", user);
-
     device.addUser(user);
   });
 
   connection.events.onPositionPacket.subscribe((position) => {
-    console.log("Position Packet", position);
-
     device.addPosition(position);
   });
 
