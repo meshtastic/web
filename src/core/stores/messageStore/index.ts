@@ -16,7 +16,7 @@ export enum MessageType {
   Broadcast = "broadcast",
 }
 
-function getConversationId(node1: NodeNum, node2: NodeNum): ConversationId {
+export function getConversationId(node1: NodeNum, node2: NodeNum): ConversationId {
   return [node1, node2].sort((a, b) => a - b).join(':');
 }
 
@@ -165,17 +165,17 @@ export const useMessageStore = create<MessageStore>()(
               const deleted = messageLog.delete(params.messageId);
 
               if (deleted) {
-                console.log(`Deleted message ${params.messageId} from ${params.type} chat ${parentKey}`);
+                console.log(`Deleted message ${params.messageId} from ${params.type} message ${parentKey}`);
                 // Clean up empty MessageLogMap and its entry in the parent map
                 if (messageLog.size === 0) {
                   parentMap.delete(parentKey);
-                  console.log(`Cleaned up empty chat entry for ${parentKey}`);
+                  console.log(`Cleaned up empty message entry for ${parentKey}`);
                 }
               } else {
                 console.warn(`Message ${params.messageId} not found in ${params.type} chat ${parentKey} for deletion.`);
               }
             } else {
-              console.warn(`Chat entry ${parentKey} not found for message deletion.`);
+              console.warn(`Message entry ${parentKey} not found for message deletion.`);
             }
           })
         );

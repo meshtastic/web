@@ -1,14 +1,11 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { MessageInput } from './MessageInput.tsx';
-import { useDevice } from '@core/stores/deviceStore.ts';
-import { useMessageStore } from '../../../core/stores/messageStore/index.ts';
-import { debounce } from '@core/utils/debounce.ts';
-import { Types } from "@meshtastic/core";
+import { MessageInput, MessageInputProps } from './MessageInput.tsx';
+import { Types } from '@meshtastic/core';
 
 vi.mock('@components/UI/Button.tsx', () => ({
-  Button: vi.fn(({ type, className, children, onClick, onSubmit }) => (
-    <button type={type} className={className} onClick={onClick} onSubmit={onSubmit}>
+  Button: vi.fn(({ type, className, children, onClick, onSubmit, variant, ...rest }) => (
+    <button type={type} className={className} onClick={onClick} onSubmit={onSubmit} {...rest}>
       {children}
     </button>
   )),
@@ -23,16 +20,21 @@ vi.mock('@components/UI/Input.tsx', () => ({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
+      data-testid="message-input-field"
     />
   )),
 }));
 
-vi.mock('@core/stores/deviceStore.ts', () => ({
-  useDevice: vi.fn(),
-}));
+const mockSetDraft = vi.fn();
+const mockGetDraft = vi.fn();
+const mockClearDraft = vi.fn();
 
-vi.mock('@core/stores/messageStore.ts', () => ({
-  useMessageStore: vi.fn(),
+vi.mock('@core/stores/messageStore', () => ({
+  useMessageStore: vi.fn(() => ({
+    setDraft: mockSetDraft,
+    getDraft: mockGetDraft,
+    clearDraft: mockClearDraft,
+  })),
   MessageState: {
     Ack: 'ack',
     Waiting: 'waiting',
@@ -44,111 +46,177 @@ vi.mock('@core/stores/messageStore.ts', () => ({
   },
 }));
 
-vi.mock('@core/utils/debounce.ts', () => ({
-  debounce: vi.fn((fn) => fn),
-}));
-
 vi.mock('lucide-react', () => ({
   SendIcon: vi.fn(() => <svg data-testid="send-icon" />),
 }));
 
 describe('MessageInput', () => {
-  const mockSetMessageState = vi.fn();
-  const mockSetActiveChat = vi.fn();
-  const mockSetDraft = vi.fn();
-  const mockGetDraft = vi.fn();
-  const mockClearDraft = vi.fn();
-  const mockSendText = vi.fn();
-
-  beforeEach(() => {
-    (useDevice as ReturnType<typeof vi.fn>).mockReturnValue({
-      connection: {
-        sendText: mockSendText,
-      },
-    });
-
-    (useMessageStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      setMessageState: mockSetMessageState,
-      activeChat: 123,
-      setDraft: mockSetDraft,
-      getDraft: mockGetDraft,
-      clearDraft: mockClearDraft,
-    });
-
-    mockSetMessageState.mockClear();
-    mockSetActiveChat.mockClear();
-    mockSetDraft.mockClear();
-    mockGetDraft.mockClear();
-    mockClearDraft.mockClear();
-    mockSendText.mockClear();
-    (debounce as ReturnType<typeof vi.fn>).mockImplementation((fn) => fn);
-  });
-
-  const renderComponent = (props: { to: Types.Destination; channel: Types.ChannelNumber; maxBytes: number }) => {
-    render(<MessageInput {...props} />);
+  const mockOnSend = vi.fn();
+  const defaultProps: MessageInputProps = {
+    onSend: mockOnSend,
+    to: 123,
+    maxBytes: 256,
   };
 
-  it.skip('sends text message and updates state to Ack on submit', async () => {
-    renderComponent({ to: 2, channel: 3, maxBytes: 256 });
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    mockGetDraft.mockReturnValue('');
+  });
+
+  const renderComponent = (props: Partial<MessageInputProps> = {}) => {
+    render(<MessageInput {...defaultProps} {...props} />);
+  };
+
+  it('should render the input field, byte counter, and send button', () => {
+    renderComponent();
+    expect(screen.getByPlaceholderText('Enter Message')).toBeInTheDocument();
+    expect(screen.getByTestId('byte-counter')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeInTheDocument();
+    expect(screen.getByTestId('send-icon')).toBeInTheDocument();
+  });
+
+  it('should initialize with the draft from the store', () => {
+    const initialDraft = 'Existing draft message';
+    mockGetDraft.mockImplementation((key) => {
+      return key === defaultProps.to ? initialDraft : '';
+    });
+
+    renderComponent();
+
     const inputElement = screen.getByPlaceholderText('Enter Message') as HTMLInputElement;
-    fireEvent.change(inputElement, { target: { value: 'Hello' } });
+    expect(inputElement.value).toBe(initialDraft);
+    expect(mockGetDraft).toHaveBeenCalledWith(defaultProps.to);
+    const expectedBytes = new Blob([initialDraft]).size;
+    expect(screen.getByTestId('byte-counter')).toHaveTextContent(`${expectedBytes}/${defaultProps.maxBytes}`);
+  });
+
+  it('should update input value, byte counter, and call setDraft on change within limits', () => {
+    renderComponent();
+    const inputElement = screen.getByPlaceholderText('Enter Message');
+    const testMessage = 'Hello there!';
+    const expectedBytes = new Blob([testMessage]).size;
+
+    fireEvent.change(inputElement, { target: { value: testMessage } });
+
+    expect((inputElement as HTMLInputElement).value).toBe(testMessage);
+    expect(screen.getByTestId('byte-counter')).toHaveTextContent(`${expectedBytes}/${defaultProps.maxBytes}`);
+    expect(mockSetDraft).toHaveBeenCalledTimes(1);
+    expect(mockSetDraft).toHaveBeenCalledWith(defaultProps.to, testMessage);
+  });
+
+  it('should NOT update input value or call setDraft if maxBytes is exceeded', () => {
+    const smallMaxBytes = 5;
+    renderComponent({ maxBytes: smallMaxBytes });
+    const inputElement = screen.getByPlaceholderText('Enter Message');
+    const initialValue = '12345';
+    const excessiveValue = '123456';
+
+    fireEvent.change(inputElement, { target: { value: initialValue } });
+    expect((inputElement as HTMLInputElement).value).toBe(initialValue);
+    expect(mockSetDraft).toHaveBeenCalledWith(defaultProps.to, initialValue);
+    mockSetDraft.mockClear();
+
+    fireEvent.change(inputElement, { target: { value: excessiveValue } });
+
+    expect((inputElement as HTMLInputElement).value).toBe(initialValue);
+    expect(screen.getByTestId('byte-counter')).toHaveTextContent(`${smallMaxBytes}/${smallMaxBytes}`);
+    expect(mockSetDraft).not.toHaveBeenCalled();
+  });
+
+  it('should call onSend, clear input, reset byte counter, and call clearDraft on valid submit', async () => {
+    renderComponent();
+    const inputElement = screen.getByPlaceholderText('Enter Message');
     const formElement = screen.getByRole('form');
+    const testMessage = 'Send this message';
+
+    fireEvent.change(inputElement, { target: { value: testMessage } });
     fireEvent.submit(formElement);
 
     await waitFor(() => {
-      expect(mockSendText).toHaveBeenCalledWith('Hello', 2, true, 3);
-      expect(mockSetMessageState).toHaveBeenCalledWith({
-        type: 'direct',
-        key: 123,
-        messageId: undefined,
-        newState: 'ack',
-      });
-      expect(mockClearDraft).toHaveBeenCalledWith(2);
-      expect(inputElement.value).toBe('');
-      expect(screen.getByTestId('byte-counter')).toHaveTextContent('0/256');
+      expect(mockOnSend).toHaveBeenCalledTimes(1);
+      expect(mockOnSend).toHaveBeenCalledWith(testMessage);
+      expect((inputElement as HTMLInputElement).value).toBe('');
+      expect(screen.getByTestId('byte-counter')).toHaveTextContent(`0/${defaultProps.maxBytes}`);
+      expect(mockClearDraft).toHaveBeenCalledTimes(1);
+      expect(mockClearDraft).toHaveBeenCalledWith(defaultProps.to);
     });
   });
 
-  it.skip('sends broadcast message if to is "broadcast" and updates state to Ack', async () => {
-    renderComponent({ to: 'broadcast', channel: 5, maxBytes: 256 });
-    const inputElement = screen.getByPlaceholderText('Enter Message') as HTMLInputElement;
-    fireEvent.change(inputElement, { target: { value: 'Broadcast message' } });
+  it('should trim whitespace before calling onSend', async () => {
+    renderComponent();
+    const inputElement = screen.getByPlaceholderText('Enter Message');
     const formElement = screen.getByRole('form');
+    const testMessageWithWhitespace = '  Trim me!  ';
+    const expectedTrimmedMessage = 'Trim me!';
+
+    fireEvent.change(inputElement, { target: { value: testMessageWithWhitespace } });
     fireEvent.submit(formElement);
 
     await waitFor(() => {
-      expect(mockSendText).toHaveBeenCalledWith('Broadcast message', 'broadcast', true, 5);
-      expect(mockSetMessageState).toHaveBeenCalledWith({
-        type: 'broadcast',
-        key: 123,
-        messageId: undefined,
-        newState: 'ack',
-      });
-      expect(mockClearDraft).toHaveBeenCalledWith('broadcast');
-      expect(inputElement.value).toBe('');
-      expect(screen.getByTestId('byte-counter')).toHaveTextContent('0/256');
+      expect(mockOnSend).toHaveBeenCalledTimes(1);
+      expect(mockOnSend).toHaveBeenCalledWith(expectedTrimmedMessage);
+      expect(mockClearDraft).toHaveBeenCalledWith(defaultProps.to);
     });
   });
 
-  it('updates state to Failed if sendText throws an error', async () => {
-    mockSendText.mockRejectedValue({ id: 456 });
-    renderComponent({ to: 3, channel: 1, maxBytes: 256 });
-    const inputElement = screen.getByPlaceholderText('Enter Message') as HTMLInputElement;
-    fireEvent.change(inputElement, { target: { value: 'Error message' } });
+  it('should not call onSend or clearDraft if input is empty on submit', async () => {
+    renderComponent();
+    const inputElement = screen.getByPlaceholderText('Enter Message');
     const formElement = screen.getByRole('form');
+
+    expect((inputElement as HTMLInputElement).value).toBe('');
+
     fireEvent.submit(formElement);
 
-    await waitFor(() => {
-      expect(mockSendText).toHaveBeenCalledWith('Error message', 3, true, 1);
-      expect(mockSetMessageState).toHaveBeenCalledWith({
-        type: 'direct',
-        key: 123,
-        messageId: 456,
-        newState: 'failed',
-      });
-      expect(mockClearDraft).toHaveBeenCalledWith(3);
-      expect(inputElement.value).toBe('');
-      expect(screen.getByTestId('byte-counter')).toHaveTextContent('0/256');
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 50));
     });
+
+    expect(mockOnSend).not.toHaveBeenCalled();
+    expect(mockClearDraft).not.toHaveBeenCalled();
+  });
+
+  it('should not call onSend or clearDraft if input contains only whitespace on submit', async () => {
+    renderComponent();
+    const inputElement = screen.getByTestId('message-input-field');
+    const formElement = screen.getByRole('form');
+    const whitespaceMessage = '   \t   ';
+
+    fireEvent.change(inputElement, { target: { value: whitespaceMessage } });
+    expect((inputElement as HTMLInputElement).value).toBe(whitespaceMessage);
+
+    fireEvent.submit(formElement);
+
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    });
+
+    expect(mockOnSend).not.toHaveBeenCalled();
+    expect(mockClearDraft).not.toHaveBeenCalled();
+
+    expect((inputElement as HTMLInputElement).value).toBe(whitespaceMessage);
+  });
+
+  it('should work with broadcast destination for drafts', () => {
+    const broadcastDest: Types.Destination = 'broadcast';
+    mockGetDraft.mockImplementation((key) => key === broadcastDest ? 'Broadcast draft' : '');
+
+    renderComponent({ to: broadcastDest });
+
+    expect(mockGetDraft).toHaveBeenCalledWith(broadcastDest);
+    expect((screen.getByPlaceholderText('Enter Message') as HTMLInputElement).value).toBe('Broadcast draft');
+
+    const inputElement = screen.getByPlaceholderText('Enter Message');
+    const formElement = screen.getByRole('form');
+    const newMessage = 'New broadcast msg';
+
+    fireEvent.change(inputElement, { target: { value: newMessage } });
+    expect(mockSetDraft).toHaveBeenCalledWith(broadcastDest, newMessage);
+
+    fireEvent.submit(formElement);
+
+    expect(mockOnSend).toHaveBeenCalledWith(newMessage);
+    expect(mockClearDraft).toHaveBeenCalledWith(broadcastDest);
   });
 });

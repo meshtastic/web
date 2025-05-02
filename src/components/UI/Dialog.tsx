@@ -61,6 +61,7 @@ const DialogClose = ({
 }: DialogPrimitive.DialogCloseProps & React.RefAttributes<HTMLButtonElement> & { className?: string }) => (
   <DialogPrimitive.Close
     aria-label="Close"
+    data-testid="dialog-close-button"
     className={cn(
       "absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-slate-100 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-900",
       className,

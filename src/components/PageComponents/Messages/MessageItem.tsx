@@ -88,18 +88,17 @@ export const MessageItem = ({ message }: MessageProps) => {
     return null;
   }, [getDevices, message.from]);
 
-  const { shortName, displayName } = useMemo(() => {
+  const { shortName, displayName, } = useMemo(() => {
     const fallbackName = message.from
     const longName = messageUser?.user?.longName;
     const shortName = messageUser?.user?.shortName ?? fallbackName;
     const displayName = longName || fallbackName;
-    return { shortName, displayName };
+    return { shortName, displayName, from: message.from };
   }, [messageUser, message.from]);
 
   const messageStatus = getMessageStatus(message.state);
   const messageText = message?.message ?? "";
   const messageDate = message?.date;
-  const isFailed = message.state === MessageState.Failed;
 
   const messageItemWrapperClass = cn(
     "group w-full py-2 relative list-none",
