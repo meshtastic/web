@@ -9,13 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
-
-export interface ActionButton {
-  text: string;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
-  variant: ButtonVariant;
-  className?: string;
-}[]
+import type { LucideIcon } from "lucide-react";
 
 export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   type: "text" | "password";
@@ -23,12 +17,19 @@ export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   value: string;
   id: string;
   variant: "default" | "invalid";
-  actionButtons: ActionButton[];
+  actionButtons: {
+    text: string;
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
+    variant: ButtonVariant;
+    className?: string;
+  }[];
   bits?: { text: string; value: string; key: string }[];
   selectChange: (event: string) => void;
-  inputChange: (event: React.ChangeEventHandler<HTMLInputElement> | undefined) => void;
-  showPasswordToggle?: boolean;
-  showCopyButton?: boolean;
+  inputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  action?: {
+    icon: LucideIcon;
+    onClick: () => void;
+  };
   disabled?: boolean;
 }
 
@@ -49,9 +50,8 @@ const Generator =
       ],
       selectChange,
       inputChange,
+      action,
       disabled,
-      showPasswordToggle,
-      showCopyButton,
       ...props
     }: GeneratorProps
   ) => {
@@ -78,28 +78,27 @@ const Generator =
           variant={variant}
           value={value}
           onChange={inputChange}
+          action={action}
           disabled={disabled}
           ref={inputRef}
-          showCopyButton={showCopyButton}
-          showPasswordToggle={showPasswordToggle}
         />
         <Select
           value={devicePSKBitCount?.toString()}
           onValueChange={(e) => selectChange(e)}
           disabled={disabled}
         >
-          <SelectTrigger className="w-36 ml-2">
+          <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="w-36">
+          <SelectContent>
             {bits.map(({ text, value, key }) => (
-              <SelectItem key={key} value={value} className="w-36">
+              <SelectItem key={key} value={value}>
                 {text}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <div className="flex ml-2 space-x-2">
+        <div className="flex ml-4 space-x-4">
           {actionButtons?.map(({ text, onClick, variant, className }) => (
             <Button
               key={text}

@@ -195,8 +195,11 @@ export const Security = () => {
                 ],
                 properties: {
                   value: state.privateKey,
-                  showCopyButton: true,
-                  showPasswordToggle: true,
+                  action: {
+                    icon: state.privateKeyVisible ? EyeOff : Eye,
+                    onClick: () =>
+                      dispatch({ type: "TOGGLE_PRIVATE_KEY_VISIBILITY" }),
+                  },
                 },
               },
               {
@@ -208,7 +211,6 @@ export const Security = () => {
                   "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
                 properties: {
                   value: state.publicKey,
-                  showCopyButton: true,
                 },
               },
             ],
@@ -269,7 +271,11 @@ export const Security = () => {
                 ],
                 properties: {
                   value: state.adminKey,
-                  showCopyButton: true,
+                  action: {
+                    icon: state.adminKeyVisible ? EyeOff : Eye,
+                    onClick: () =>
+                      dispatch({ type: "TOGGLE_ADMIN_KEY_VISIBILITY" }),
+                  },
                 },
               },
             ],
@@ -296,11 +302,6 @@ export const Security = () => {
         ]}
       />
       <PkiRegenerateDialog
-        text={{
-          button: "Regenerate",
-          title: "Regenerate Key pair?",
-          description: "Are you sure you want to regenerate key pair?",
-        }}
         open={state.privateKeyDialogOpen}
         onOpenChange={() =>
           dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })}

@@ -32,10 +32,6 @@ export default defineConfig({
   define: {
     'import.meta.env.VITE_COMMIT_HASH': JSON.stringify(hash),
   },
-  build: {
-    emptyOutDir: true,
-    assetsDir: './',
-  },
   resolve: {
     alias: {
       '@app': path.resolve(process.cwd(), './src'),

@@ -12,9 +12,9 @@ export default function ThemeSwitcher({
   const { theme, preference, setPreference } = useTheme();
 
   const themeIcons = {
-    light: <Sun className="size-6" />,
-    dark: <Moon className="size-6" />,
-    system: <Monitor className="size-6" />,
+    light: <Sun className="size-5" />,
+    dark: <Moon className="size-5" />,
+    system: <Monitor className="size-5" />,
   };
 
   const toggleTheme = () => {
@@ -30,15 +30,15 @@ export default function ThemeSwitcher({
     <button
       type="button"
       className={cn(
-        "transition-all duration-300 scale-100 cursor-pointer m-3 p-2 focus:*:data-label:opacity-100",
+        "transition-all duration-300 scale-100 cursor-pointer m-6 p-2 focus:*:data-label:opacity-100",
         className,
       )}
       onClick={toggleTheme}
-      aria-description="Change current theme"
+      aria-description={"Change current theme"}
     >
       <span
         data-label
-        className="transition-all block absolute w-full mb-auto mt-auto ml-0 mr-0 text-xs left-0 -top-3 opacity-0 rounded-lg"
+        className="transition-all block absolute w-full mb-auto mt-auto ml-0 mr-0 text-xs left-0 -top-5 opacity-0 rounded-lg"
       >
         {firstCharOfPreference.toLocaleUpperCase() +
           (restOfPreference ?? []).join("")}

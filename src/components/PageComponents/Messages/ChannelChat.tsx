@@ -1,77 +1,77 @@
-import { MessageItem } from "@components/PageComponents/Messages/MessageItem.tsx";
+import { type MessageWithState, useDevice } from "@core/stores/deviceStore.ts";
+import { Message } from "@components/PageComponents/Messages/Message.tsx";
 import { InboxIcon } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
-import { Message } from "@core/stores/messageStore/types.ts";
 
 export interface ChannelChatProps {
-  messages?: Message[];
+  messages?: MessageWithState[];
 }
 
 const EmptyState = () => (
-  <div className="flex flex-1 flex-col place-content-center place-items-center p-8 text-slate-500 dark:text-slate-400">
-    <InboxIcon className="mb-2 h-8 w-8" />
+  <div className="flex flex-col place-content-center place-items-center p-8 text-white">
+    <InboxIcon className="h-8 w-8 mb-2" />
     <span className="text-sm">No Messages</span>
   </div>
 );
 
-export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
+export const ChannelChat = ({
+  messages = [],
+}: ChannelChatProps) => {
+  const { nodes } = useDevice();
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLUListElement>(null);
-  const userScrolledUpRef = useRef(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
-    requestAnimationFrame(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior });
-    });
-  }, []);
-
-  useEffect(() => {
+  const scrollToBottom = useCallback(() => {
     const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
-    const isScrolledToBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight <= 10;
+    if (scrollContainer) {
+      const isNearBottom =
+        scrollContainer.scrollHeight -
+        scrollContainer.scrollTop -
+        scrollContainer.clientHeight <
+        100;
 
-    if (isScrolledToBottom || !userScrolledUpRef.current) {
-      scrollToBottom('smooth');
+      if (isNearBottom) {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }
     }
-  }, [messages, scrollToBottom]);
+  }, []);
 
   useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    const handleScroll = () => {
-      if (!scrollContainer) return;
-      const isAtBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight <= 10;
-      userScrolledUpRef.current = !isAtBottom;
-    };
-    scrollContainer?.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      scrollContainer?.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+    scrollToBottom();
+  }, [scrollToBottom, messages]);
 
   if (!messages?.length) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center">
-        <EmptyState />
-        <div ref={messagesEndRef} />
+      <div className="flex flex-col h-full container mx-auto">
+        <div className="flex-1 flex items-center justify-center">
+          <EmptyState />
+        </div>
       </div>
     );
   }
 
   return (
-    <ul
-      ref={scrollContainerRef}
-      className="flex flex-col flex-grow overflow-y-auto px-3 py-2"
-    >
-      <div className="flex-grow" />
+    <div className="flex flex-col h-full container mx-auto">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto pl-4 pr-4 md:pr-44"
+      >
+        <div className="flex flex-col justify-end min-h-full">
+          {messages?.map((message, index) => (
+            <Message
+              key={message.id}
+              message={message}
+              sender={nodes.get(message.from)}
+              lastMsgSameUser={
+                index > 0 && messages[index - 1].from === message.from
+              }
+            />
+          ))}
+          <div ref={messagesEndRef} className="w-full" />
+        </div>
+      </div>
 
-      {messages?.map((message) => (
-        <MessageItem
-          key={message.messageId ?? `${message.from}-${message.date}`}
-          message={message}
-        />
-      ))}
-
-      <div ref={messagesEndRef} className="h-px" />
-    </ul>
+    </div>
   );
 };

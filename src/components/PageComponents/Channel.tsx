@@ -1,4 +1,4 @@
-import type { ChannelValidation } from "@app/validation/channel.ts";
+import type { ChannelValidation } from "@app/validation/channel.tsx";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
@@ -97,8 +97,7 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
             settings: {
               ...channel?.settings,
               psk: pass,
-              moduleSettings: {
-                ...channel?.settings?.moduleSettings,
+              moduleSettings: {...channel?.settings?.moduleSettings,
                 positionPrecision: channel?.settings?.moduleSettings?.positionPrecision === undefined ? 10 : channel?.settings?.moduleSettings?.positionPrecision,
               }
             },
@@ -143,8 +142,6 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                 hide: true,
                 properties: {
                   value: pass,
-                  showPasswordToggle: true,
-                  showCopyButton: true,
                 },
               },
               {
@@ -209,11 +206,6 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
         ]}
       />
       <PkiRegenerateDialog
-        text={{
-          button: "Regenerate",
-          title: "Regenerate Pre-Shared Key?",
-          description: "Are you sure you want to regenerate the pre-shared key?",
-        }}
         open={preSharedDialogOpen}
         onOpenChange={() => setPreSharedDialogOpen(false)}
         onSubmit={() => preSharedKeyRegenerate()}

@@ -29,10 +29,10 @@ export const NodeDetailsDialog = ({
   open,
   onOpenChange,
 }: NodeDetailsDialogProps) => {
-  const { getNode } = useDevice();
+  const { nodes } = useDevice();
   const { nodeNumDetails } = useAppStore();
 
-  const device = getNode(nodeNumDetails);
+  const device = nodes.get(nodeNumDetails);
 
   if (!device) return null;
 
@@ -131,7 +131,7 @@ export const NodeDetailsDialog = ({
 
               {device.deviceMetrics && (
                 <div className="text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
-                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-0">
+                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
                     Device Metrics:
                   </p>
                   {deviceMetricsMap.map(

@@ -10,22 +10,12 @@ import {
 } from "@components/UI/Dialog.tsx";
 
 export interface PkiRegenerateDialogProps {
-  text: {
-    title: string;
-    description: string;
-    button: string;
-  }
   open: boolean;
   onOpenChange: () => void;
   onSubmit: () => void;
 }
 
 export const PkiRegenerateDialog = ({
-  text = {
-    title: "Regenerate Key Pair",
-    description: "Are you sure you want to regenerate key pair?",
-    button: "Regenerate",
-  },
   open,
   onOpenChange,
   onSubmit,
@@ -35,14 +25,14 @@ export const PkiRegenerateDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>{text?.title}</DialogTitle>
+          <DialogTitle>Regenerate Key pair?</DialogTitle>
           <DialogDescription>
-            {text?.description}
+            Are you sure you want to regenerate key pair?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="destructive" onClick={() => onSubmit()}>
-            {text?.button}
+            Regenerate
           </Button>
         </DialogFooter>
       </DialogContent>
