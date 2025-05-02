@@ -1,14 +1,15 @@
 import type { Device } from "@core/stores/deviceStore.ts";
 import { MeshDevice, Protobuf } from "@meshtastic/core";
+import { MessageState, MessageType, type MessageStore } from "./stores/messageStore/index.ts";
+import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
+import NodeInfoFactory from "@core/dto/NodeNumToNodeInfoDTO.ts";
 
 export const subscribeAll = (
   device: Device,
   connection: MeshDevice,
+  messageStore: MessageStore
 ) => {
   let myNodeNum = 0;
-
-  // onLogEvent
-  // onMeshHeartbeat
 
   connection.events.onDeviceMetadataPacket.subscribe((metadataPacket) => {
     device.addMetadata(metadataPacket.from, metadataPacket.data);
@@ -51,6 +52,7 @@ export const subscribeAll = (
 
   connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
     device.setHardware(nodeInfo);
+    messageStore.setNodeNum(nodeInfo.myNodeNum);
     myNodeNum = nodeInfo.myNodeNum;
   });
 
@@ -63,10 +65,8 @@ export const subscribeAll = (
   });
 
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-    // toast(`New Node Discovered: ${nodeInfo.user?.shortName ?? "UNK"}`, {
-    //   icon: "🔎"
-    // });
-    device.addNodeInfo(nodeInfo);
+    const nodeWithUser = NodeInfoFactory.ensureDefaultUser(nodeInfo);
+    device.addNodeInfo(nodeWithUser);
   });
 
   connection.events.onChannelPacket.subscribe((channel) => {
@@ -81,10 +81,22 @@ export const subscribeAll = (
 
 
   connection.events.onMessagePacket.subscribe((messagePacket) => {
-    device.addMessage({
-      ...messagePacket,
-      state: messagePacket.from !== myNodeNum ? "ack" : "waiting",
-    });
+    // incoming and outgoing messages are handled by this event listener
+    console.log("Message Packet", messagePacket);
+
+    const dto = new PacketToMessageDTO(messagePacket, myNodeNum);
+    const message = dto.toMessage();
+    messageStore.saveMessage(message);
+
+    if (message.type == MessageType.Direct) {
+      if (message.to === myNodeNum) {
+        device.incrementUnread(messagePacket.from);
+      }
+    } else if (message.type == MessageType.Broadcast) {
+      if (message.from !== myNodeNum) {
+        device.incrementUnread(message.channel);
+      }
+    }
   });
 
   connection.events.onTraceRoutePacket.subscribe((traceRoutePacket) => {
@@ -105,13 +117,13 @@ export const subscribeAll = (
     });
   });
 
-  connection.events.onQueueStatus.subscribe((queueStatus) => {
-    device.setQueueStatus(queueStatus);
-  });
 
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     if (routingPacket.data.variant.case === "errorReason") {
       switch (routingPacket.data.variant.value) {
+        case Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT:
+          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
+          break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
           device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);

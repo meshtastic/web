@@ -1,5 +1,5 @@
 import { useAppStore } from "../../../core/stores/appStore.ts";
-import type { BluetoothValidation } from "@app/validation/config/bluetooth.tsx";
+import type { BluetoothValidation } from "@app/validation/config/bluetooth.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";

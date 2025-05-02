@@ -1,10 +1,14 @@
 import { useCallback } from "react";
-import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useMessageStore } from "@core/stores/messageStore/index.ts";
 
 export function useRefreshKeysDialog() {
   const { removeNode, setDialogOpen, clearNodeError, getNodeError } = useDevice();
-  const { activeChat } = useAppStore();
+  const { activeChat } = useMessageStore();
+
+  const handleCloseDialog = useCallback(() => {
+    setDialogOpen('refreshKeys', false);
+  }, [setDialogOpen]);
 
   const handleNodeRemove = useCallback(() => {
     const nodeWithError = getNodeError(activeChat);
@@ -12,17 +16,12 @@ export function useRefreshKeysDialog() {
       return;
     }
     clearNodeError(activeChat);
-    handleCloseDialog();;
+    handleCloseDialog();
     return removeNode(nodeWithError?.node);
-  }, [activeChat, clearNodeError, setDialogOpen, removeNode]);
-
-  const handleCloseDialog = useCallback(() => {
-    setDialogOpen('refreshKeys', false);
-  }, [setDialogOpen])
+  }, [activeChat, clearNodeError, getNodeError, removeNode, handleCloseDialog]);
 
   return {
     handleCloseDialog,
     handleNodeRemove
   };
-
 }

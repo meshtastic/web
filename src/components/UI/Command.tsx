@@ -41,7 +41,7 @@ const CommandInput = React.forwardRef<
     className="flex items-center border-b border-b-slate-100 px-4 dark:border-b-slate-700"
     cmdk-input-wrapper=""
   >
-    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50 text-white" />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
@@ -88,7 +88,7 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      "overflow-hidden py-3 px-2 text-slate-700 dark:text-slate-400 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-slate-900 dark:[&_[cmdk-group-heading]]:text-slate-300",
+      "overflow-hidden py-3 px-2 text-slate-700 dark:text-slate-200 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-slate-900 dark:[&_[cmdk-group-heading]]:text-slate-300",
       className,
     )}
     {...props}
@@ -103,7 +103,7 @@ const CommandSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 h-px bg-slate-100 dark:bg-slate-700", className)}
+    className={cn("-mx-1 h-px bg-slate-100 dark:bg-slate-200", className)}
     {...props}
   />
 ));

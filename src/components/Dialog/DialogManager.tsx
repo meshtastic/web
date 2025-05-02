@@ -10,6 +10,8 @@ import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDeta
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
 import { RebootOTADialog } from "@components/Dialog/RebootOTADialog.tsx";
+import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
+
 
 export const DialogManager = () => {
   const { channels, config, dialog, setDialogOpen } = useDevice();
@@ -82,6 +84,12 @@ export const DialogManager = () => {
         open={dialog.rebootOTA}
         onOpenChange={(open) => {
           setDialogOpen("rebootOTA", open);
+        }}
+      />
+      <DeleteMessagesDialog
+        open={dialog.deleteMessages}
+        onOpenChange={(open) => {
+          setDialogOpen("deleteMessages", open);
         }}
       />
     </>

@@ -133,8 +133,8 @@ export const QRDialog = ({
           <Input
             value={qrCodeUrl}
             disabled
-            className="dark:text-slate-900"
             action={{
+              key: 'copy-value',
               icon: ClipboardIcon,
               onClick() {
                 void navigator.clipboard.writeText(qrCodeUrl);

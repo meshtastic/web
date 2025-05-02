@@ -8,10 +8,12 @@ import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { useCallback, useEffect, useState } from "react";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
-export const Serial = ({ closeDialog }: TabElementProps) => {
+export const Serial = ({ setConnectionInProgress, closeDialog }: TabElementProps) => {
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
   const { addDevice } = useDeviceStore();
+  const messageStore = useMessageStore()
   const { setSelectedDevice } = useAppStore();
 
   const updateSerialPortList = useCallback(async () => {
@@ -36,7 +38,7 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
     const connection = new MeshDevice(transport, id);
     connection.configure();
     device.addConnection(connection);
-    subscribeAll(device, connection);
+    subscribeAll(device, connection, messageStore);
 
     closeDialog();
   };
@@ -50,8 +52,9 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
             <Button
               key={`${usbVendorId ?? "UNK"}-${usbProductId ?? "UNK"}-${index}`}
               disabled={port.readable !== null}
-              className="dark:bg-slate-900 dark:text-white"
+              variant="default"
               onClick={async () => {
+                setConnectionInProgress(true);
                 await onConnect(port);
               }}
             >
@@ -65,10 +68,15 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
         )}
       </div>
       <Button
-        className="dark:bg-slate-900 dark:text-white"
+        variant="default"
         onClick={async () => {
           await navigator.serial.requestPort().then((port) => {
             setSerialPorts(serialPorts.concat(port));
+          }).catch((error) => {
+            console.error("Error requesting port:", error);
+            setConnectionInProgress(false);
+          }).finally(() => {
+            setConnectionInProgress(false);
           });
         }}
       >

@@ -18,6 +18,8 @@ import {
   useMap,
 } from "react-map-gl/maplibre";
 import MapGl from "react-map-gl/maplibre";
+import { useNodeFilters } from "@core/hooks/useNodeFilters.ts";
+import { FilterControl } from "@pages/Map/FilterControl.tsx";
 
 type NodePosition = {
   latitude: number;
@@ -33,7 +35,7 @@ const convertToLatLng = (position: {
 });
 
 const MapPage = () => {
-  const { nodes, waypoints } = useDevice();
+  const { getNodes, waypoints } = useDevice();
   const { theme } = useTheme();
   const { default: map } = useMap();
 
@@ -46,12 +48,32 @@ const MapPage = () => {
   // Filter out nodes without a valid position
   const validNodes = useMemo(
     () =>
-      Array.from(nodes.values()).filter(
+      getNodes(
         (node): node is Protobuf.Mesh.NodeInfo =>
           Boolean(node.position?.latitudeI),
       ),
-    [nodes],
+    [getNodes],
   );
+
+  const {
+    filters,
+    defaultState,
+    onFilterChange,
+    resetFilters,
+    filteredNodes,
+    groupedFilterConfigs,
+  } = useNodeFilters(validNodes);
+
+  const isDirty = useMemo(() => {
+    return Object.keys(filters).some((key) => {
+      const a = filters[key];
+      const b = defaultState[key];
+      // simple deep‐equal for primitives and [number,number]
+      return Array.isArray(a) && Array.isArray(b)
+        ? a[0] !== b[0] || a[1] !== b[1]
+        : a !== b;
+    });
+  }, [filters, defaultState]);
 
   const handleMarkerClick = useCallback(
     (node: Protobuf.Mesh.NodeInfo, event: { originalEvent: MouseEvent }) => {
@@ -106,12 +128,12 @@ const MapPage = () => {
     if (center) {
       map.easeTo(center);
     }
-  }, [validNodes, map]);
+  }, [filteredNodes, map]);
 
   // Generate all markers
   const markers = useMemo(
     () =>
-      validNodes.map((node) => {
+      filteredNodes.map((node) => {
         const position = convertToLatLng(node.position);
         return (
           <Marker
@@ -128,7 +150,7 @@ const MapPage = () => {
           </Marker>
         );
       }),
-    [validNodes, handleMarkerClick],
+    [filteredNodes, handleMarkerClick],
   );
 
   useEffect(() => {
@@ -139,8 +161,7 @@ const MapPage = () => {
 
   return (
     <>
-      <Sidebar />
-      <PageLayout label="Map" noPadding actions={[]}>
+      <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
         <MapGl
           mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
           attributionControl={false}
@@ -191,12 +212,21 @@ const MapPage = () => {
                 longitude={convertToLatLng(selectedNode.position).longitude}
                 latitude={convertToLatLng(selectedNode.position).latitude}
                 onClose={() => setSelectedNode(null)}
+                className="w-full"
               >
                 <NodeDetail node={selectedNode} />
               </Popup>
             )
             : null}
         </MapGl>
+
+        <FilterControl
+          groupedFilterConfigs={groupedFilterConfigs}
+          values={filters}
+          onChange={onFilterChange}
+          resetFilters={resetFilters}
+          isDirty={isDirty}
+        />
       </PageLayout>
     </>
   );

@@ -60,7 +60,7 @@ export const CommandPalette = () => {
     setSelectedDevice,
   } = useAppStore();
   const { getDevices } = useDeviceStore();
-  const { setDialogOpen, setActivePage, connection } = useDevice();
+  const { setDialogOpen, setActivePage, getNode, connection } = useDevice();
   const { pinnedItems, togglePinnedItem } = usePinnedItems({ storageName: 'pinnedCommandMenuGroups' });
 
   const groups: Group[] = [
@@ -115,12 +115,12 @@ export const CommandPalette = () => {
           icon: ArrowLeftRightIcon,
           subItems: getDevices().map((device) => ({
             label:
-              device.nodes.get(device.hardware.myNodeNum)?.user?.longName ??
+              getNode(device.hardware.myNodeNum)?.user?.longName ??
               device.hardware.myNodeNum.toString(),
             icon: (
               <Avatar
                 text={
-                  device.nodes.get(device.hardware.myNodeNum)?.user?.shortName ??
+                  getNode(device.hardware.myNodeNum)?.user?.shortName ??
                   device.hardware.myNodeNum.toString()
                 }
               />
@@ -219,10 +219,10 @@ export const CommandPalette = () => {
           },
         },
         {
-          label: "[WIP] Clear Messages",
+          label: "Clear All Stored Message",
           icon: EraserIcon,
           action() {
-            alert("This feature is not implemented");
+            setDialogOpen("deleteMessages", true);
           },
         },
       ],
@@ -262,7 +262,7 @@ export const CommandPalette = () => {
                   type="button"
                   onClick={() => togglePinnedItem(group.label)}
                   className={cn(
-                    "transition-all duration-300 scale-100 cursor-pointer m-0.5 p-2 focus:*:data-label:opacity-100"
+                    "transition-all duration-300 scale-100 cursor-pointer p-2 focus:*:data-label:opacity-100"
                   )}
                   aria-description={
                     pinnedItems.includes(group.label)

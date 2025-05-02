@@ -7,10 +7,12 @@ import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { BleConnection, ServiceUuid } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
-export const BLE = ({ closeDialog }: TabElementProps) => {
+export const BLE = ({ setConnectionInProgress, closeDialog }: TabElementProps) => {
   const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);
   const { addDevice } = useDeviceStore();
+  const messageStore = useMessageStore()
   const { setSelectedDevice } = useAppStore();
 
   const updateBleDeviceList = useCallback(async (): Promise<void> => {
@@ -30,7 +32,7 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
       device: bleDevice,
     });
     device.addConnection(connection);
-    subscribeAll(device, connection);
+    subscribeAll(device, connection, messageStore);
 
     closeDialog();
   };
@@ -41,8 +43,9 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
         {bleDevices.map((device) => (
           <Button
             key={device.id}
-            className="dark:bg-slate-900 dark:text-white"
+            variant="default"
             onClick={() => {
+              setConnectionInProgress(true);
               onConnect(device);
             }}
           >
@@ -54,8 +57,10 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
         )}
       </div>
       <Button
-        className="dark:bg-slate-900 dark:text-white"
+        variant="default"
         onClick={async () => {
+
+
           await navigator.bluetooth
             .requestDevice({
               filters: [{ services: [ServiceUuid] }],
@@ -65,6 +70,11 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
               if (exists === -1) {
                 setBleDevices(bleDevices.concat(device));
               }
+            }).catch((error) => {
+              console.error("Error requesting device:", error);
+              setConnectionInProgress(false);
+            }).finally(() => {
+              setConnectionInProgress(false);
             });
         }}
       >

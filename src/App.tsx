@@ -1,6 +1,5 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import { PageRouter } from "@app/PageRouter.tsx";
-import { DeviceSelector } from "@components/DeviceSelector.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.tsx";
 import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
@@ -14,6 +13,8 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import { MapProvider } from "react-map-gl/maplibre";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
+import { SidebarProvider } from "@core/stores/sidebarStore.tsx";
+import { useTheme } from "@core/hooks/useTheme.ts";
 
 
 export const App = (): JSX.Element => {
@@ -22,6 +23,9 @@ export const App = (): JSX.Element => {
     useAppStore();
 
   const device = getDevice(selectedDevice);
+
+  // Sets up light/dark mode based on user preferences or system settings
+  useTheme()
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
@@ -33,12 +37,11 @@ export const App = (): JSX.Element => {
       />
       <Toaster />
       <DeviceWrapper device={device}>
-        <div className="flex h-screen flex-col overflow-hidden bg-background-primary text-text-primary">
-          <div className="flex grow">
-            <DeviceSelector />
-            <div className="flex grow flex-col">
+        <div className="flex h-screen flex-col bg-background-primary text-text-primary" style={{ scrollbarWidth: 'thin' }}>
+          <SidebarProvider>
+            <div className="h-full flex flex-col">
               {device ? (
-                <div className="flex h-screen w-full">
+                <div className="h-full flex w-full">
                   <DialogManager />
                   <KeyBackupReminder />
                   <CommandPalette />
@@ -53,9 +56,9 @@ export const App = (): JSX.Element => {
                 </>
               )}
             </div>
-          </div>
+          </SidebarProvider>
         </div>
       </DeviceWrapper>
-    </ErrorBoundary>
+    </ErrorBoundary >
   );
 };

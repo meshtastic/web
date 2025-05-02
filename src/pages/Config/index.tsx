@@ -3,12 +3,12 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { SidebarButton } from "@components/UI/Sidebar/sidebarButton.tsx";
+import { SidebarButton } from "../../components/UI/Sidebar/SidebarButton.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { DeviceConfig } from "@pages/Config/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.tsx";
 import { BoxesIcon, SaveIcon, SaveOff, SettingsIcon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const ConfigPage = () => {
   const { workingConfig, workingModuleConfig, connection } = useDevice();
@@ -51,11 +51,14 @@ const ConfigPage = () => {
                 description:
                   `The configuration change ${moduleConfig.payloadVariant.case} has been saved.`,
               })
+
             )
           ),
         );
+        setIsSaving(false);
       }
       await connection?.commitEditSettings();
+
     } catch (_error) {
       toast({
         title: "Error Saving Config",
@@ -66,10 +69,10 @@ const ConfigPage = () => {
     }
   };
 
-  return (
-    <>
+  const leftSidebar = useMemo(
+    () => (
       <Sidebar>
-        <SidebarSection label="Config Sections">
+        <SidebarSection label="Modules">
           <SidebarButton
             label="Radio Config"
             active={activeConfigSection === "device"}
@@ -84,12 +87,20 @@ const ConfigPage = () => {
           />
         </SidebarSection>
       </Sidebar>
+    ), [])
+
+  return (
+    <>
+
       <PageLayout
+        contentClassName="overflow-auto"
+        leftBar={leftSidebar}
         label={activeConfigSection === "device"
           ? "Radio Config"
           : "Module Config"}
         actions={[
           {
+            key: "save",
             icon: isError ? SaveOff : SaveIcon,
             isLoading: isSaving,
             disabled: isSaving,

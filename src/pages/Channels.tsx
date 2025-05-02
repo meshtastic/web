@@ -17,8 +17,8 @@ export const getChannelName = (channel: Protobuf.Channel.Channel) =>
   channel.settings?.name.length
     ? channel.settings?.name
     : channel.index === 0
-    ? "Primary"
-    : `Ch ${channel.index}`;
+      ? "Primary"
+      : `Ch ${channel.index}`;
 
 const ChannelsPage = () => {
   const { channels, setDialogOpen } = useDevice();
@@ -31,19 +31,20 @@ const ChannelsPage = () => {
 
   return (
     <>
-      <Sidebar />
       <PageLayout
-        label={`Channel: ${
-          currentChannel ? getChannelName(currentChannel) : "Loading..."
-        }`}
+        leftBar={<Sidebar />}
+        label={`Channel: ${currentChannel ? getChannelName(currentChannel) : "Loading..."
+          }`}
         actions={[
           {
+            key: "search",
             icon: ImportIcon,
             onClick() {
               setDialogOpen("import", true);
             },
           },
           {
+            key: "import",
             icon: QrCodeIcon,
             onClick() {
               setDialogOpen("QR", true);

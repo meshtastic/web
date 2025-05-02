@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useUnsafeRolesDialog, UNSAFE_ROLES } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog";
-import { eventBus } from "@core/utils/eventBus";
+import { useUnsafeRolesDialog, UNSAFE_ROLES } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
+import { eventBus } from "@core/utils/eventBus.ts";
 
 vi.mock('@core/utils/eventBus', () => ({
   eventBus: {

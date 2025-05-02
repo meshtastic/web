@@ -1,7 +1,6 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
 import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
-import Footer from "@app/components/UI/Footer.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
@@ -11,30 +10,18 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
-import { type JSX, useCallback, useEffect, useState } from "react";
+import { type JSX, useCallback, useDeferredValue, useEffect, useState } from "react";
 import { base16 } from "rfc4648";
+import { Input } from "@components/UI/Input.tsx";
+import { PageLayout } from "@components/PageLayout.tsx";
 
 export interface DeleteNoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-function shortNameFromNode(
-  node: ReturnType<useDevice>["nodes"][number],
-): string {
-  const shortNameOfNode = node.user?.shortName ??
-    (node.user?.macaddr
-      ? `${
-        base16
-          .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-          .toLowerCase()
-      }`
-      : `${numberToHexUnpadded(node.num).slice(-4)}`);
-  return String(shortNameOfNode);
-}
-
 const NodesPage = (): JSX.Element => {
-  const { nodes, hardware, connection } = useDevice();
+  const { getNodes, hardware, connection } = useDevice();
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);
@@ -45,12 +32,16 @@ const NodesPage = (): JSX.Element => {
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
   >();
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const deferredSearch = useDeferredValue(searchTerm);
 
-  const filteredNodes = Array.from(nodes.values()).filter((node) => {
-    if (node.num === hardware.myNodeNum) return false;
-    const nodeName = node.user?.longName ?? `!${numberToHexUnpadded(node.num)}`;
-    return nodeName.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const filteredNodes = getNodes(node => {
+    if (!node.user) return false;
+    const lowerCaseSearchTerm = deferredSearch.toLowerCase();
+    return (
+      node.user?.longName?.toLowerCase().includes(lowerCaseSearchTerm) ||
+      node.user?.shortName?.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+  })
 
   useEffect(() => {
     if (!connection) return;
@@ -85,18 +76,17 @@ const NodesPage = (): JSX.Element => {
 
   return (
     <>
-      <Sidebar />
-      <div className="flex flex-col w-full">
-        <div className="p-4">
-          <input
-            type="text"
+      <PageLayout label="" leftBar={<Sidebar />} className="flex flex-col w-full">
+        <div className="p-2">
+          <Input
             placeholder="Search nodes..."
             value={searchTerm}
+            className="bg-transparent"
+            showClearButton={!!searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 border border-slate-300 rounded-sm bg-white text-slate-900"
           />
         </div>
-        <div className="overflow-y-auto h-full">
+        <div className="overflow-y-auto">
           <Table
             headings={[
               { title: "", type: "blank", sortable: false },
@@ -110,7 +100,7 @@ const NodesPage = (): JSX.Element => {
             ]}
             rows={filteredNodes.map((node) => [
               <div key={node.num}>
-                <Avatar text={shortNameFromNode(node)} />
+                <Avatar text={node.user?.shortName ?? "UNK "} />
               </div>,
               <h1
                 key="longName"
@@ -118,25 +108,17 @@ const NodesPage = (): JSX.Element => {
                 onKeyUp={(evt) => {
                   evt.key === "Enter" && setSelectedNode(node);
                 }}
-                className="cursor-pointer underline"
+                className="cursor-pointer underline ml-2 whitespace-break-spaces"
                 tabIndex={0}
                 role="button"
               >
-                {node.user?.longName ??
-                  (node.user?.macaddr
-                    ? `Meshtastic ${
-                      base16
-                        .stringify(node.user?.macaddr.subarray(4, 6) ?? [])
-                        .toLowerCase()
-                    }`
-                    : `!${numberToHexUnpadded(node.num)}`)}
+                {node.user?.longName ?? numberToHexUnpadded(node.num)}
               </h1>,
-              <Mono key="hops">
+              <Mono key="hops" className="w-16">
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
-                    : `${node.hopsAway?.toString()} ${
-                      node.hopsAway > 1 ? "hops" : "hop"
+                    : `${node.hopsAway?.toString()} ${node.hopsAway ?? 0 > 1 ? "hops" : "hop"
                     } away`
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}
@@ -183,8 +165,7 @@ const NodesPage = (): JSX.Element => {
             onOpenChange={() => setSelectedLocation(undefined)}
           />
         </div>
-        <Footer />
-      </div>
+      </PageLayout>
     </>
   );
 };
