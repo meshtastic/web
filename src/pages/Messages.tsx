@@ -41,8 +41,6 @@ export const MessagesPage = () => {
       .sort((a, b) => b.unreadCount - a.unreadCount);
   }
 
-  console.log('filtered nodes', filteredNodes());
-
   const allChannels = Array.from(channels.values());
   const filteredChannels = allChannels.filter(
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
@@ -65,8 +63,6 @@ export const MessagesPage = () => {
 
     try {
       messageId = await connection?.sendText(message, toValue, true, channelValue);
-      console.log("Message sent, ID:", messageId);
-
       if (messageId !== undefined) {
         if (chatType === MessageType.Broadcast) {
           setMessageState({ type: chatType, channelId: channelValue, messageId, newState: MessageState.Ack });
