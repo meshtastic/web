@@ -9,7 +9,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { LockKeyholeOpenIcon } from "lucide-react";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export interface RefreshKeysDialogProps {
   open: boolean;
@@ -18,22 +18,16 @@ export interface RefreshKeysDialogProps {
 
 export const RefreshKeysDialog = ({ open, onOpenChange }: RefreshKeysDialogProps) => {
   const { activeChat } = useMessageStore();
-  const { nodeErrors, nodes } = useDevice();
+  const { nodeErrors, getNode } = useDevice();
   const { handleCloseDialog, handleNodeRemove } = useRefreshKeysDialog();
 
   const nodeErrorNum = nodeErrors.get(activeChat);
 
   if (!nodeErrorNum) {
-    console.error("Node with error not found");
     return null;
   }
 
-  const nodeWithError = nodes.get(nodeErrorNum?.node ?? 0);
-
-  if (!nodeWithError) {
-    console.error("Node with error not found");
-    return null;
-  }
+  const nodeWithError = getNode(nodeErrorNum.node);
 
   const text = {
     title: `Keys Mismatch - ${nodeWithError?.user?.longName ?? ""}`,

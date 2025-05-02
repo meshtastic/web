@@ -5,146 +5,138 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import { useDeviceStore } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { cn } from "@core/utils/cn.ts";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ReactNode, useMemo } from "react";
-import { Message, MessageState } from "@core/stores/messageStore.ts";
-import { Protobuf } from "@meshtastic/js";
-import { MessageActionsMenu } from "@components/PageComponents/Messages/MessageActionsMenu.tsx";
+import { MessageState, useMessageStore } from "@core/stores/messageStore/index.ts";
+import { Protobuf, Types } from "@meshtastic/js";
+import { Message } from "@core/stores/messageStore/types.ts";
+// import { MessageActionsMenu } from "@components/PageComponents/Messages/MessageActionsMenu.tsx"; // Uncomment if needed later
 
-interface MessageProps {
-  message: Message;
-  // locale?: string; // locale
-}
-
-interface MessageStatus {
-  state: MessageState;
+interface MessageStatusInfo {
   displayText: string;
   icon: LucideIcon;
   ariaLabel: string;
+  iconClassName?: string;
 }
 
-const MESSAGE_STATUS: Record<MessageState, MessageStatus> = {
-  [MessageState.Ack]: { state: MessageState.Ack, displayText: "Message delivered", icon: CheckCircle2, ariaLabel: "Message delivered" },
-  [MessageState.Waiting]: { state: MessageState.Waiting, displayText: "Waiting for delivery", icon: CircleEllipsis, ariaLabel: "Sending message" },
-  [MessageState.Failed]: { state: MessageState.Failed, displayText: "Delivery failed", icon: AlertCircle, ariaLabel: "Message delivery failed" },
+const MESSAGE_STATUS_MAP: Record<MessageState, MessageStatusInfo> = {
+  [MessageState.Ack]: { displayText: "Message delivered", icon: CheckCircle2, ariaLabel: "Message delivered", iconClassName: "text-green-500" },
+  [MessageState.Waiting]: { displayText: "Waiting for delivery", icon: CircleEllipsis, ariaLabel: "Sending message", iconClassName: "text-slate-400" },
+  [MessageState.Failed]: { displayText: "Delivery failed", icon: AlertCircle, ariaLabel: "Message delivery failed", iconClassName: "text-red-500 dark:text-red-400" },
 };
 
-const getMessageStatus = (state: MessageState): MessageStatus =>
-  MESSAGE_STATUS[state] ?? { state: MessageState.Failed, displayText: "Unknown state", icon: AlertCircle, ariaLabel: "Message status unknown" };
+const UNKNOWN_STATUS: MessageStatusInfo = { displayText: "Unknown state", icon: AlertCircle, ariaLabel: "Message status unknown", iconClassName: "text-red-500 dark:text-red-400" };
 
-const StatusTooltip = ({ status, children }: { status: MessageStatus; children: ReactNode }) => (
+const getMessageStatusInfo = (state: MessageState): MessageStatusInfo =>
+  MESSAGE_STATUS_MAP[state] ?? UNKNOWN_STATUS;
+
+const StatusTooltip = ({ statusInfo, children }: { statusInfo: MessageStatusInfo; children: ReactNode }) => (
   <TooltipProvider delayDuration={300}>
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent className="bg-gray-800 text-white px-2 py-1 rounded text-xs">
-        {status.displayText}
-        <TooltipArrow className="fill-gray-800" />
+      <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
+        {statusInfo.displayText}
+        <TooltipArrow className="fill-slate-800" />
       </TooltipContent>
     </Tooltip>
   </TooltipProvider>
 );
 
-const StatusIcon = ({ status, className }: { status: MessageStatus; className?: string }) => {
-  const Icon = status.icon;
-  const iconClass = cn("w-3.5 h-3.5 shrink-0", className);
-  return (
-    <StatusTooltip status={status}>
-      <span aria-label={status.ariaLabel} role="img">
-        <Icon className={iconClass} aria-hidden="true" />
-      </span>
-    </StatusTooltip>
-  );
-};
+interface MessageItemProps {
+  message: Message;
+}
 
-const TimeDisplay = ({ date, className }: { date: number; className?: string }) => {
-  const _date = useMemo(() => new Date(date), [date]);
-  const locale = 'en-US'; // TODO: Make dynamic
-  const formattedTime = useMemo(() => _date.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit', hour12: true }), [_date, locale]);
-  const fullDate = useMemo(() => _date.toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' }), [_date, locale]);
+export const MessageItem = ({ message }: MessageItemProps) => {
+  const { getNode } = useDevice();
+  const { getMyNodeNum } = useMessageStore()
 
-  return (
-    <time dateTime={_date.toISOString()} className={cn("text-xs", className)}>
-      <span aria-hidden="true">{formattedTime}</span>
-      <span className="sr-only">{fullDate}</span>
-    </time>
-  );
-};
+  const messageUser: Protobuf.Mesh.NodeInfo | null | undefined = useMemo(() => {
+    return message.from != null ? getNode(message.from) : null;
+  }, [getNode, message.from]);
 
-export const MessageItem = ({ message }: MessageProps) => {
-  const { getDevices } = useDeviceStore();
 
-  const messageUser: Protobuf.Mesh.NodeInfo | null = useMemo(() => {
-    if (message?.from === null || message?.from === undefined) return null;
-    const devices = getDevices();
-    for (const device of devices) {
-      if (device.nodes.has(message.from)) {
-        return device.nodes.get(message.from) ?? null;
-      }
-    }
-    return null;
-  }, [getDevices, message.from]);
-
-  const { shortName, displayName } = useMemo(() => {
-    const fallbackName = message.from
+  const myNodeNum = useMemo(() => getMyNodeNum(), [getMyNodeNum]);
+  const { displayName, shortName } = useMemo(() => {
+    const userIdHex = message.from.toString(16).toUpperCase().padStart(2, '0');
+    const last4 = userIdHex.slice(-4);
+    const fallbackName = `Meshtastic ${last4}`
     const longName = messageUser?.user?.longName;
-    const shortName = messageUser?.user?.shortName ?? fallbackName;
-    const displayName = longName || fallbackName;
-    return { shortName, displayName };
+    const derivedShortName = messageUser?.user?.shortName || fallbackName;
+    const derivedDisplayName = longName || derivedShortName;
+    return { displayName: derivedDisplayName, shortName: derivedShortName };
   }, [messageUser, message.from]);
 
-  const messageStatus = getMessageStatus(message.state);
-  const messageText = message?.message ?? "";
-  const messageDate = message?.date;
-  const isFailed = message.state === MessageState.Failed;
+  const messageStatusInfo = getMessageStatusInfo(message.state);
+  const StatusIconComponent = messageStatusInfo.icon;
+
+  const messageDate = useMemo(() => message.date ? new Date(message.date) : null, [message.date]);
+  const locale = 'en-US'; // TODO: Make dynamic via props or context
+
+  const formattedTime = useMemo(() =>
+    messageDate?.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit', hour12: true }) ?? '',
+    [messageDate, locale]);
+
+  const fullDateTime = useMemo(() =>
+    messageDate?.toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' }) ?? '',
+    [messageDate, locale]);
+
+  const isSender = myNodeNum !== undefined && message.from === myNodeNum;
+  const isOnPrimaryChannel = message.channel === Types.ChannelNumber.Primary; // Use the enum
+  const shouldShowStatusIcon = isSender && isOnPrimaryChannel;
+
 
   const messageItemWrapperClass = cn(
-    "group w-full px-4 py-2 relative list-none",
+    "group w-full py-2 relative list-none",
     "rounded-md",
     "hover:bg-slate-300/15 dark:hover:bg-slate-600/20",
     "transition-colors duration-100 ease-in-out",
   );
+  const dateTextStyle = "text-xs text-slate-500 dark:text-slate-400";
 
-  const avatarSizeClass = "size-11";
-  const gridGapClass = "gap-x-4";
-
-  const baseTextStyle = "text-sm text-gray-800 dark:text-gray-200";
-  const nameTextStyle = "font-medium text-gray-900 dark:text-gray-100 mr-2";
-  const dateTextStyle = "text-gray-500 dark:text-gray-400";
-  const statusIconBaseColor = "text-gray-400 dark:text-gray-500";
-  const statusIconFailedColor = "text-red-500 dark:text-red-400";
 
   return (
     <li className={messageItemWrapperClass}>
-      <div className={cn("grid grid-cols-[auto_1fr]", gridGapClass)}>
-        <Avatar size="sm" text={shortName} className={cn(avatarSizeClass, "pt-0.5")} />
+      <div className="grid grid-cols-[auto_1fr] gap-x-2">
+        <Avatar size="sm" text={shortName} className="pt-0.5" />
 
-        <div className="flex flex-col gap-1.5 min-w-0">
-          {messageDate != null ? (
-            <div className="flex items-center gap-1.5">
-              <span className={nameTextStyle} aria-hidden="true">
-                {displayName}
-              </span>
-              <TimeDisplay date={messageDate} className={dateTextStyle} />
-              <StatusIcon
-                status={messageStatus}
-                className={cn(isFailed ? statusIconFailedColor : statusIconBaseColor)}
-              />
-            </div>
-          ) : null}
-
-          <div className={cn(baseTextStyle, "whitespace-pre-wrap")}>
-            {messageText}
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="font-medium text-sm text-slate-900 dark:text-slate-100 truncate mr-1">
+              {displayName}
+            </span>
+            {messageDate && (
+              <time dateTime={messageDate.toISOString()} className={dateTextStyle}>
+                <span aria-hidden="true">{formattedTime}</span>
+                <span className="sr-only">{fullDateTime}</span>
+              </time>
+            )}
+            {shouldShowStatusIcon && (
+              <StatusTooltip statusInfo={messageStatusInfo}>
+                <span aria-label={messageStatusInfo.ariaLabel} role="img">
+                  <StatusIconComponent
+                    className={cn("size-4 shrink-0", messageStatusInfo.iconClassName)}
+                    aria-hidden="true"
+                  />
+                </span>
+              </StatusTooltip>
+            )}
           </div>
 
+          {message?.message && (
+            <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words">
+              {message.message}
+            </div>
+          )}
         </div>
       </div>
-      <MessageActionsMenu
-        onReply={() => console.log("Reply to message:", message.messageId)}
-      />
+      {/* Actions Menu Placeholder */}
+      {/* <div className="absolute top-1 right-1">
+        <MessageActionsMenu onReply={() => console.log("Reply")} />
+       </div> */}
     </li>
   );
 };

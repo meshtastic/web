@@ -8,7 +8,7 @@ import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { useCallback, useEffect, useState } from "react";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export const Serial = ({ setConnectionInProgress, closeDialog }: TabElementProps) => {
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
@@ -52,7 +52,7 @@ export const Serial = ({ setConnectionInProgress, closeDialog }: TabElementProps
             <Button
               key={`${usbVendorId ?? "UNK"}-${usbProductId ?? "UNK"}-${index}`}
               disabled={port.readable !== null}
-              className="dark:bg-slate-900 dark:text-white"
+              variant="default"
               onClick={async () => {
                 setConnectionInProgress(true);
                 await onConnect(port);
@@ -68,7 +68,7 @@ export const Serial = ({ setConnectionInProgress, closeDialog }: TabElementProps
         )}
       </div>
       <Button
-        className="dark:bg-slate-900 dark:text-white"
+        variant="default"
         onClick={async () => {
           await navigator.serial.requestPort().then((port) => {
             setSerialPorts(serialPorts.concat(port));

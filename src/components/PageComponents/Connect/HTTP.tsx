@@ -13,7 +13,7 @@ import { TransportHTTP } from "@meshtastic/transport-http";
 import { useState } from "react";
 import { useForm, useController } from "react-hook-form";
 import { AlertTriangle } from "lucide-react";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 interface FormData {
   ip: string;
@@ -74,7 +74,7 @@ export const HTTP = ({ closeDialog, setConnectionInProgress, connectionInProgres
           <Input
             prefix={tlsValue ? "https://" : "http://"}
             placeholder="000.000.000.000 / meshtastic.local"
-            className="text-slate-900 dark:text-slate-900"
+            className="text-slate-900 dark:text-slate-100"
             {...register("ip")}
           />
         </div>
@@ -120,7 +120,7 @@ export const HTTP = ({ closeDialog, setConnectionInProgress, connectionInProgres
       </div>
       <Button
         type="submit"
-        className="dark:bg-slate-900 dark:text-white"
+        variant={"default"}
       >
         <span>{connectionInProgress ? "Connecting..." : "Connect"}</span>
       </Button>

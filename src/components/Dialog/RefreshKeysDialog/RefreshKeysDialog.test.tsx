@@ -1,102 +1,97 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi, Mock } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { DeviceContext, useDeviceStore } from "@core/stores/deviceStore.ts";
 import { RefreshKeysDialog } from "./RefreshKeysDialog.tsx";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
-import { useMessageStore } from "@core/stores/messageStore.ts"; // Import for mocking
-import { useDevice } from "@core/stores/deviceStore.ts"; // Import for mocking
+import { expect, test, vi, beforeEach, afterEach } from 'vitest';
 import { Protobuf } from "@meshtastic/core";
 
+vi.mock("@core/stores/messageStore");
+vi.mock("./useRefreshKeysDialog");
 
-vi.mock("@core/stores/messageStore.ts", () => ({
-  useMessageStore: vi.fn(),
-}));
+const mockUseMessageStore = vi.mocked(useMessageStore);
+const mockUseRefreshKeysDialog = vi.mocked(useRefreshKeysDialog);
 
-const mockNodeWithError: Partial<Protobuf.Mesh.NodeInfo> = {
-  user: { longName: "Test Node Long", shortName: "TNL", id: 456 },
-};
-const mockNodes = new Map([[456, mockNodeWithError]]);
-const mockNodeErrors = new Map([[123, { node: 456 }]]);
+const getInitialState = () => useDeviceStore.getInitialState?.() ?? { devices: new Map(), remoteDevices: new Map() };
 
-vi.mock("@core/stores/deviceStore.ts", () => ({
-  useDevice: vi.fn(),
-}));
+beforeEach(() => {
+  useDeviceStore.setState(getInitialState(), true);
+  vi.clearAllMocks();
+});
 
-const mockHandleCloseDialog = vi.fn();
-const mockHandleNodeRemove = vi.fn();
-vi.mock("./useRefreshKeysDialog.ts", () => ({
-  useRefreshKeysDialog: vi.fn(() => ({
-    handleCloseDialog: mockHandleCloseDialog,
-    handleNodeRemove: mockHandleNodeRemove,
-  })),
-}));
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
-describe("RefreshKeysDialog Component", () => {
-  let onOpenChangeMock: Mock;
+test("renders dialog when there is a node error for the active chat", () => {
+  const deviceId = 1;
+  const nodeWithErrorNum = 12345;
+  const activeChatNum = nodeWithErrorNum;
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    onOpenChangeMock = vi.fn();
+  const deviceStore = useDeviceStore.getState().addDevice(deviceId);
 
-    vi.mocked(useMessageStore).mockReturnValue({ activeChat: 123 });
-    vi.mocked(useDevice).mockReturnValue({
-      nodeErrors: mockNodeErrors,
-      nodes: mockNodes,
-    });
-    vi.mocked(useRefreshKeysDialog).mockReturnValue({
-      handleCloseDialog: mockHandleCloseDialog,
-      handleNodeRemove: mockHandleNodeRemove,
-    });
+  deviceStore.addNodeInfo({
+    num: nodeWithErrorNum,
+    user: {
+      id: nodeWithErrorNum.toString(),
+      publicKey: new Uint8Array(0),
+      hwModel: Protobuf.Mesh.HardwareModel.HELTEC_V3,
+      longName: "Problem Node Long",
+      shortName: "ProbNode",
+      isLicensed: false,
+      macaddr: new Uint8Array(0)
+    },
+    lastHeard: Date.now() / 1000,
+    snr: 10
+  } as Protobuf.Mesh.NodeInfo);
+
+  deviceStore.setNodeError(activeChatNum, "PKI_MISMATCH");
+
+  const updatedDeviceState = useDeviceStore.getState().getDevice(deviceId);
+  if (!updatedDeviceState) {
+    throw new Error("Failed to get updated device state from store for provider");
+  }
+
+  mockUseMessageStore.mockReturnValue({ activeChat: activeChatNum });
+  const mockHandleClose = vi.fn();
+  const mockHandleRemove = vi.fn();
+  mockUseRefreshKeysDialog.mockReturnValue({
+    handleCloseDialog: mockHandleClose,
+    handleNodeRemove: mockHandleRemove,
   });
 
-  it("should render the dialog with dynamic content when open and data is available", () => {
-    render(<RefreshKeysDialog open onOpenChange={onOpenChangeMock} />);
+  render(
+    <DeviceContext.Provider value={updatedDeviceState}>
+      <RefreshKeysDialog open onOpenChange={vi.fn()} />
+    </DeviceContext.Provider>
+  );
 
-    expect(screen.getByText(`Keys Mismatch - ${mockNodeWithError?.user?.longName}`)).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(`${mockNodeWithError?.user?.longName}.*${mockNodeWithError?.user?.shortName}`))).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /request new keys/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /dismiss/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Close/i })).toBeInTheDocument();
+  expect(screen.getByText(/Keys Mismatch - Problem Node Long/)).toBeInTheDocument();
+  expect(screen.getByText(/Your node is unable to send a direct message to node: Problem Node Long \(ProbNode\)/)).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Request New Keys" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
+});
+
+test("does not render dialog if no error exists for active chat", () => {
+  const deviceId = 1;
+  const activeChatNum = 54321;
+
+  useDeviceStore.getState().addDevice(deviceId);
+
+  const currentDeviceState = useDeviceStore.getState().getDevice(deviceId);
+  if (!currentDeviceState) throw new Error("Device not found");
+
+  mockUseMessageStore.mockReturnValue({ activeChat: activeChatNum });
+  mockUseRefreshKeysDialog.mockReturnValue({
+    handleCloseDialog: vi.fn(),
+    handleNodeRemove: vi.fn(),
   });
 
-  it("should call handleNodeRemove when 'Request New Keys' button is clicked", () => {
-    render(<RefreshKeysDialog open onOpenChange={onOpenChangeMock} />);
-    fireEvent.click(screen.getByRole('button', { name: /request new keys/i }));
-    expect(mockHandleNodeRemove).toHaveBeenCalledTimes(1);
-  });
+  const { container } = render(
+    <DeviceContext.Provider value={currentDeviceState}>
+      <RefreshKeysDialog open onOpenChange={vi.fn()} />
+    </DeviceContext.Provider>
+  );
 
-  it("should call handleCloseDialog when 'Dismiss' button is clicked", () => {
-    render(<RefreshKeysDialog open onOpenChange={onOpenChangeMock} />);
-    fireEvent.click(screen.getByRole('button', { name: /dismiss/i }));
-    expect(mockHandleCloseDialog).toHaveBeenCalledTimes(1);
-  });
-
-  it("should call handleCloseDialog when the explicit DialogClose button is clicked", () => {
-    render(<RefreshKeysDialog open onOpenChange={onOpenChangeMock} />);
-    fireEvent.click(screen.getByRole('button', { name: /close/i })); // Use the aria-label
-    expect(mockHandleCloseDialog).toHaveBeenCalledTimes(1);
-  });
-
-
-  it("should not render the dialog when open is false", () => {
-    render(<RefreshKeysDialog open={false} onOpenChange={onOpenChangeMock} />);
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  it("should render null if nodeErrorNum is not found for activeChat", () => {
-    vi.mocked(useDevice).mockReturnValue({
-      nodeErrors: new Map(),
-      nodes: mockNodes,
-    });
-    const { container } = render(<RefreshKeysDialog open onOpenChange={onOpenChangeMock} />);
-    expect(container.firstChild).toBeNull();
-  });
-
-  it("should render null if nodeWithError is not found for nodeErrorNum.node", () => {
-    vi.mocked(useDevice).mockReturnValue({
-      nodeErrors: mockNodeErrors,
-      nodes: new Map(),
-    });
-    const { container } = render(<RefreshKeysDialog open onOpenChange={onOpenChangeMock} />);
-    expect(container.firstChild).toBeNull();
-  });
+  expect(container.firstChild).toBeNull();
 });

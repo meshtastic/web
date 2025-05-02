@@ -71,7 +71,7 @@ export function Checkbox({
           >
             {isChecked && (
               <div className="animate-fade-in scale-100 opacity-100">
-                <Check className="w-4 h-4 text-slate-900 dark:text-slate-900" />
+                <Check className="w-4 h-4 text-slate-900 dark:text-slate-200" />
               </div>
             )}
           </div>

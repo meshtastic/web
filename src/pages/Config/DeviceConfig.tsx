@@ -52,7 +52,7 @@ export const DeviceConfig = () => {
 
   return (
     <Tabs defaultValue="Device">
-      <TabsList className="dark:bg-slate-800">
+      <TabsList className="dark:bg-slate-700">
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.label}

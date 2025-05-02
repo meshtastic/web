@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { AlertTriangleIcon } from "lucide-react";
-import { useMessageStore } from "@core/stores/messageStore.ts";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export interface DeleteMessagesDialogProps {
   open: boolean;
@@ -29,7 +29,7 @@ export const DeleteMessagesDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogClose onClick={handleCloseDialog} />
+        <DialogClose data-testid="dialog-close-button" />
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangleIcon className="h-5 w-5 text-warning" />

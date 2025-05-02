@@ -109,7 +109,6 @@ export const ImportDialog = ({
           <Input
             value={importDialogInput}
             suffix={validUrl ? "✅" : "❌"}
-            className="dark:text-slate-900"
             onChange={(e) => {
               setImportDialogInput(e.target.value);
             }}

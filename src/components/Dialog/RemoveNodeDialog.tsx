@@ -21,7 +21,7 @@ export const RemoveNodeDialog = ({
   open,
   onOpenChange,
 }: RemoveNodeDialogProps) => {
-  const { connection, nodes, removeNode } = useDevice();
+  const { connection, getNode, removeNode } = useDevice();
   const { nodeNumToBeRemoved } = useAppStore();
 
   const onSubmit = () => {
@@ -42,7 +42,7 @@ export const RemoveNodeDialog = ({
         </DialogHeader>
         <div className="gap-4">
           <form onSubmit={onSubmit}>
-            <Label>{nodes.get(nodeNumToBeRemoved)?.user?.longName}</Label>
+            <Label>{getNode(nodeNumToBeRemoved)?.user?.longName}</Label>
           </form>
         </div>
         <DialogFooter>
