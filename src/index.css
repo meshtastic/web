@@ -71,6 +71,23 @@
   }
 }
 
+html {
+  overflow: hidden;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+.app-container {
+  height: 100%;
+}
+
 @layer base {
 
   *,
@@ -79,10 +96,6 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-slate-200, currentColor);
-  }
-
-  body {
-    font-family: var(--font-sans);
   }
 }
 
