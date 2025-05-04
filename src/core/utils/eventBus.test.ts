@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { eventBus } from "@core/utils/eventBus.ts";
 
 describe("EventBus", () => {
   beforeEach(() => {
     // Reset event listeners before each test
-    (eventBus as any).listeners = {};
+    eventBus.listeners = {};
   });
 
   it("should register an event listener and trigger it on emit", () => {

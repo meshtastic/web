@@ -9,7 +9,7 @@ export default function ThemeSwitcher({
 }: {
   className?: string;
 }) {
-  const { theme, preference, setPreference } = useTheme();
+  const { preference, setPreference } = useTheme();
 
   const themeIcons = {
     light: <Sun className="size-6" />,

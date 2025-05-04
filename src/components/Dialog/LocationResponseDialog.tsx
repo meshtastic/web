@@ -43,8 +43,9 @@ export const LocationResponseDialog = ({
                 Coordinates:{" "}
                 <a
                   className="text-blue-500 dark:text-blue-400"
-                  href={`https://www.openstreetmap.org/?mlat=${location?.data.latitudeI / 1e7
-                    }&mlon=${location?.data.longitudeI / 1e7}&layers=N`}
+                  href={`https://www.openstreetmap.org/?mlat=${
+                    location?.data.latitudeI / 1e7
+                  }&mlon=${location?.data.longitudeI / 1e7}&layers=N`}
                   target="_blank"
                   rel="noreferrer"
                 >

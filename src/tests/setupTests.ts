@@ -1,24 +1,23 @@
-import { afterEach, vi } from 'vitest';
-import { cleanup } from '@testing-library/react';
+import { afterEach, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
 import { enableMapSet } from "immer";
 import "@testing-library/jest-dom";
-import '@testing-library/user-event';
+import "@testing-library/user-event";
 
 enableMapSet();
 
-vi.mock('idb-keyval', () => ({
-  get: vi.fn((key) => Promise.resolve(undefined)),
-  set: vi.fn((key, value) => Promise.resolve()),
-  del: vi.fn((key) => Promise.resolve()),
+vi.mock("idb-keyval", () => ({
+  get: vi.fn(() => Promise.resolve(undefined)),
+  set: vi.fn(() => Promise.resolve()),
+  del: vi.fn(() => Promise.resolve()),
   clear: vi.fn(() => Promise.resolve()),
   keys: vi.fn(() => Promise.resolve([])),
-  createStore: vi.fn((dbName, storeName) => ({
-  })),
+  createStore: vi.fn(() => ({})),
 }));
 globalThis.ResizeObserver = class {
-  observe() { }
-  unobserve() { }
-  disconnect() { }
+  observe() {}
+  unobserve() {}
+  disconnect() {}
 };
 
 afterEach(() => {

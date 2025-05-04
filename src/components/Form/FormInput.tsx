@@ -5,8 +5,7 @@ import type {
 import { Input } from "@components/UI/Input.tsx";
 import type { ChangeEventHandler } from "react";
 import { useState } from "react";
-import { useController, type FieldValues } from "react-hook-form";
-import { cn } from "@core/utils/cn.ts";
+import { type FieldValues, useController } from "react-hook-form";
 
 export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "text" | "number" | "password";
@@ -22,7 +21,7 @@ export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
       max?: number;
       currentValueLength?: number;
       showCharacterCount?: boolean;
-    },
+    };
     showPasswordToggle?: boolean;
     showCopyButton?: boolean;
   };
@@ -34,7 +33,9 @@ export function GenericInput<T extends FieldValues>({
   field,
 }: GenericFormElementProps<T, InputFieldProps<T>>) {
   const { fieldLength, ...restProperties } = field.properties || {};
-  const [currentLength, setCurrentLength] = useState<number>(fieldLength?.currentValueLength || 0);
+  const [currentLength, setCurrentLength] = useState<number>(
+    fieldLength?.currentValueLength || 0,
+  );
 
   const { field: controllerField } = useController({
     name: field.name,
@@ -44,27 +45,36 @@ export function GenericInput<T extends FieldValues>({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
 
-    if (field.properties?.fieldLength?.max && newValue.length > field.properties?.fieldLength?.max) {
+    if (
+      field.properties?.fieldLength?.max &&
+      newValue.length > field.properties?.fieldLength?.max
+    ) {
       return;
     }
     setCurrentLength(newValue.length);
 
     if (field.inputChange) field.inputChange(e);
 
-    controllerField.onChange(field.type === "number" ? Number.parseFloat(newValue).toString() : newValue);
+    controllerField.onChange(
+      field.type === "number"
+        ? Number.parseFloat(newValue).toString()
+        : newValue,
+    );
   };
-
 
   return (
     <div className="relative w-full">
       <Input
         type={field.type}
         step={field.properties?.step}
-        value={field.type === "number" ? String(controllerField.value) : controllerField.value}
+        value={field.type === "number"
+          ? String(controllerField.value)
+          : controllerField.value}
         id={field.name}
         onChange={handleInputChange}
         showCopyButton={field.properties?.showCopyButton}
-        showPasswordToggle={field.properties?.showPasswordToggle || field.type === "password"}
+        showPasswordToggle={field.properties?.showPasswordToggle ||
+          field.type === "password"}
         className={field.properties?.className}
         {...restProperties}
         disabled={disabled}

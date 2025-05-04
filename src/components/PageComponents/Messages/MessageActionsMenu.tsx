@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
 import { cn } from "@core/utils/cn.ts";
-import { SmilePlus, Reply } from "lucide-react";
+import { Reply, SmilePlus } from "lucide-react";
 
 interface MessageActionsMenuProps {
   onAddReaction?: () => void;
@@ -15,7 +15,7 @@ interface MessageActionsMenuProps {
 
 export const MessageActionsMenu = ({
   onAddReaction,
-  onReply
+  onReply,
 }: MessageActionsMenuProps) => {
   const hoverIconBarClass = cn(
     "absolute top-2 right-2",
@@ -25,7 +25,7 @@ export const MessageActionsMenu = ({
     "rounded-md shadow-sm p-1",
     "opacity-0 group-hover:opacity-100",
     "transition-opacity duration-100 ease-in-out",
-    "z-10"
+    "z-10",
   );
 
   const hoverIconButtonClass = cn(
@@ -33,13 +33,16 @@ export const MessageActionsMenu = ({
     "text-gray-500 dark:text-gray-400",
     "hover:text-gray-700 dark:hover:text-gray-300",
     "hover:bg-gray-100 dark:hover:bg-zinc-700",
-    "cursor-pointer"
+    "cursor-pointer",
   );
 
   const iconSizeClass = "size-4";
 
   return (
-    <div className={cn(hoverIconBarClass)} onClick={(e) => e.stopPropagation()}>
+    <div
+      className={cn(hoverIconBarClass)}
+      onClick={(e) => e.stopPropagation()}
+    >
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -47,7 +50,7 @@ export const MessageActionsMenu = ({
               type="button"
               aria-label="Add Reaction"
               onClick={(e) => {
-                e.stopPropagation()
+                e.stopPropagation();
                 if (onAddReaction) {
                   onAddReaction();
                 }
@@ -69,7 +72,7 @@ export const MessageActionsMenu = ({
               type="button"
               aria-label="Reply"
               onClick={(e) => {
-                e.stopPropagation()
+                e.stopPropagation();
                 if (onReply) {
                   onReply();
                 }
@@ -85,7 +88,6 @@ export const MessageActionsMenu = ({
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-
     </div>
   );
 };

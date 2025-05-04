@@ -17,7 +17,7 @@ export type DialogVariant = keyof Device["dialog"];
 type NodeError = {
   node: number;
   error: string;
-}
+};
 
 export interface Device {
   id: number;
@@ -92,7 +92,6 @@ export interface Device {
   ) => Protobuf.Mesh.NodeInfo[];
   getNodesLength: () => number;
   getNode: (nodeNum: number) => Protobuf.Mesh.NodeInfo | undefined;
-
 }
 
 export interface DeviceState {
@@ -110,7 +109,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
   remoteDevices: new Map(),
 
   addDevice: (id: number) => {
-
     set(
       produce<DeviceState>((draft) => {
         draft.devices.set(id, {
@@ -164,14 +162,37 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   switch (config.payloadVariant.case) {
-                    case "device": { device.config.device = config.payloadVariant.value; break; }
-                    case "position": { device.config.position = config.payloadVariant.value; break; }
-                    case "power": { device.config.power = config.payloadVariant.value; break; }
-                    case "network": { device.config.network = config.payloadVariant.value; break; }
-                    case "display": { device.config.display = config.payloadVariant.value; break; }
-                    case "lora": { device.config.lora = config.payloadVariant.value; break; }
-                    case "bluetooth": { device.config.bluetooth = config.payloadVariant.value; break; }
-                    case "security": { device.config.security = config.payloadVariant.value; }
+                    case "device": {
+                      device.config.device = config.payloadVariant.value;
+                      break;
+                    }
+                    case "position": {
+                      device.config.position = config.payloadVariant.value;
+                      break;
+                    }
+                    case "power": {
+                      device.config.power = config.payloadVariant.value;
+                      break;
+                    }
+                    case "network": {
+                      device.config.network = config.payloadVariant.value;
+                      break;
+                    }
+                    case "display": {
+                      device.config.display = config.payloadVariant.value;
+                      break;
+                    }
+                    case "lora": {
+                      device.config.lora = config.payloadVariant.value;
+                      break;
+                    }
+                    case "bluetooth": {
+                      device.config.bluetooth = config.payloadVariant.value;
+                      break;
+                    }
+                    case "security": {
+                      device.config.security = config.payloadVariant.value;
+                    }
                   }
                 }
               }),
@@ -183,18 +204,63 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   switch (config.payloadVariant.case) {
-                    case "mqtt": { device.moduleConfig.mqtt = config.payloadVariant.value; break; }
-                    case "serial": { device.moduleConfig.serial = config.payloadVariant.value; break; }
-                    case "externalNotification": { device.moduleConfig.externalNotification = config.payloadVariant.value; break; }
-                    case "storeForward": { device.moduleConfig.storeForward = config.payloadVariant.value; break; }
-                    case "rangeTest": { device.moduleConfig.rangeTest = config.payloadVariant.value; break; }
-                    case "telemetry": { device.moduleConfig.telemetry = config.payloadVariant.value; break; }
-                    case "cannedMessage": { device.moduleConfig.cannedMessage = config.payloadVariant.value; break; }
-                    case "audio": { device.moduleConfig.audio = config.payloadVariant.value; break; }
-                    case "neighborInfo": { device.moduleConfig.neighborInfo = config.payloadVariant.value; break; }
-                    case "ambientLighting": { device.moduleConfig.ambientLighting = config.payloadVariant.value; break; }
-                    case "detectionSensor": { device.moduleConfig.detectionSensor = config.payloadVariant.value; break; }
-                    case "paxcounter": { device.moduleConfig.paxcounter = config.payloadVariant.value; break; }
+                    case "mqtt": {
+                      device.moduleConfig.mqtt = config.payloadVariant.value;
+                      break;
+                    }
+                    case "serial": {
+                      device.moduleConfig.serial = config.payloadVariant.value;
+                      break;
+                    }
+                    case "externalNotification": {
+                      device.moduleConfig.externalNotification =
+                        config.payloadVariant.value;
+                      break;
+                    }
+                    case "storeForward": {
+                      device.moduleConfig.storeForward =
+                        config.payloadVariant.value;
+                      break;
+                    }
+                    case "rangeTest": {
+                      device.moduleConfig.rangeTest =
+                        config.payloadVariant.value;
+                      break;
+                    }
+                    case "telemetry": {
+                      device.moduleConfig.telemetry =
+                        config.payloadVariant.value;
+                      break;
+                    }
+                    case "cannedMessage": {
+                      device.moduleConfig.cannedMessage =
+                        config.payloadVariant.value;
+                      break;
+                    }
+                    case "audio": {
+                      device.moduleConfig.audio = config.payloadVariant.value;
+                      break;
+                    }
+                    case "neighborInfo": {
+                      device.moduleConfig.neighborInfo =
+                        config.payloadVariant.value;
+                      break;
+                    }
+                    case "ambientLighting": {
+                      device.moduleConfig.ambientLighting =
+                        config.payloadVariant.value;
+                      break;
+                    }
+                    case "detectionSensor": {
+                      device.moduleConfig.detectionSensor =
+                        config.payloadVariant.value;
+                      break;
+                    }
+                    case "paxcounter": {
+                      device.moduleConfig.paxcounter =
+                        config.payloadVariant.value;
+                      break;
+                    }
                   }
                 }
               }),
@@ -216,13 +282,17 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               }),
             );
           },
-          setWorkingModuleConfig: (moduleConfig: Protobuf.ModuleConfig.ModuleConfig) => {
+          setWorkingModuleConfig: (
+            moduleConfig: Protobuf.ModuleConfig.ModuleConfig,
+          ) => {
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) return;
                 const index = device.workingModuleConfig.findIndex(
-                  (wmc) => wmc.payloadVariant.case === moduleConfig.payloadVariant.case,
+                  (wmc) =>
+                    wmc.payloadVariant.case ===
+                      moduleConfig.payloadVariant.case,
                 );
                 if (index !== -1) {
                   device.workingModuleConfig[index] = moduleConfig;
@@ -277,7 +347,9 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
-                  const index = device.waypoints.findIndex((wp) => wp.id === waypoint.id);
+                  const index = device.waypoints.findIndex((wp) =>
+                    wp.id === waypoint.id
+                  );
                   if (index !== -1) {
                     device.waypoints[index] = waypoint;
                   } else {
@@ -288,8 +360,6 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             );
           },
           addNodeInfo: (nodeInfo) => {
-            console.log("Node Info", nodeInfo);
-
             set(
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -316,11 +386,12 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 if (!device) {
                   return;
                 }
-                const currentNode = device.nodesMap.get(user.from) ?? create(Protobuf.Mesh.NodeInfoSchema);
+                const currentNode = device.nodesMap.get(user.from) ??
+                  create(Protobuf.Mesh.NodeInfoSchema);
                 currentNode.user = user.data;
                 currentNode.num = user.from;
                 device.nodesMap.set(user.from, currentNode);
-              })
+              }),
             );
           },
           addPosition: (position) => {
@@ -330,11 +401,12 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 if (!device) {
                   return;
                 }
-                const currentNode = device.nodesMap.get(position.from) ?? create(Protobuf.Mesh.NodeInfoSchema);
+                const currentNode = device.nodesMap.get(position.from) ??
+                  create(Protobuf.Mesh.NodeInfoSchema);
                 currentNode.position = position.data;
                 currentNode.num = position.from;
                 device.nodesMap.set(position.from, currentNode);
-              })
+              }),
             );
           },
           addConnection: (connection) => {
@@ -373,10 +445,11 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               produce<DeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) {
-                  return
+                  return;
                 }
                 device.nodesMap.delete(nodeNum);
-              }))
+              }),
+            );
           },
           setDialogOpen: (dialog: DialogVariant, open: boolean) => {
             set(
@@ -463,7 +536,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 if (!device) return;
                 const currentCount = device.unreadCounts.get(nodeNum) ?? 0;
                 device.unreadCounts.set(nodeNum, currentCount + 1);
-              })
+              }),
             );
           },
           resetUnread: (nodeNum: number) => {
@@ -475,16 +548,19 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
                 if (device.unreadCounts.get(nodeNum) === 0) {
                   device.unreadCounts.delete(nodeNum);
                 }
-              })
+              }),
             );
           },
-          getNodes: (filter?: (node: Protobuf.Mesh.NodeInfo) => boolean): Protobuf.Mesh.NodeInfo[] => {
+          getNodes: (
+            filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
+          ): Protobuf.Mesh.NodeInfo[] => {
             const device = get().devices.get(id);
             if (!device) {
               return [];
             }
             const allNodes = Array.from(device.nodesMap.values()).filter(
-              (node) => node.num !== get().devices.get(id)?.hardware.myNodeNum);
+              (node) => node.num !== get().devices.get(id)?.hardware.myNodeNum,
+            );
             if (filter) {
               return allNodes.filter(filter);
             }
@@ -505,7 +581,7 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
             if (!device) {
               return 0;
             }
-            return device.nodesMap.size
+            return device.nodesMap.size;
           },
         });
       }),

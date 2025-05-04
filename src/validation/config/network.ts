@@ -1,8 +1,12 @@
 import { z } from "zod";
 import { Protobuf } from "@meshtastic/core";
 
-const AddressModeEnum = z.nativeEnum(Protobuf.Config.Config_NetworkConfig_AddressMode);
-const ProtocolFlagsEnum = z.nativeEnum(Protobuf.Config.Config_NetworkConfig_ProtocolFlags);
+const AddressModeEnum = z.nativeEnum(
+  Protobuf.Config.Config_NetworkConfig_AddressMode,
+);
+const ProtocolFlagsEnum = z.nativeEnum(
+  Protobuf.Config.Config_NetworkConfig_ProtocolFlags,
+);
 
 export const NetworkValidationIpV4ConfigSchema = z.object({
   ip: z.string().ip(),
@@ -24,4 +28,3 @@ export const NetworkValidationSchema = z.object({
 });
 
 export type NetworkValidation = z.infer<typeof NetworkValidationSchema>;
-

@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -38,7 +38,7 @@ describe("useRefreshKeysDialog Hook", () => {
     });
 
     vi.mocked(useMessageStore).mockReturnValue({
-      activeChat: "chat-123"
+      activeChat: "chat-123",
     });
   });
 
@@ -46,7 +46,9 @@ describe("useRefreshKeysDialog Hook", () => {
     getNodeErrorMock.mockReturnValue({ node: "node-abc" });
 
     const { result } = renderHook(() => useRefreshKeysDialog());
-    act(() => { result.current.handleNodeRemove(); });
+    act(() => {
+      result.current.handleNodeRemove();
+    });
 
     expect(getNodeErrorMock).toHaveBeenCalledTimes(1);
     expect(getNodeErrorMock).toHaveBeenCalledWith("chat-123");
@@ -60,7 +62,9 @@ describe("useRefreshKeysDialog Hook", () => {
 
   it("handleNodeRemove should do nothing if there is no error", () => {
     const { result } = renderHook(() => useRefreshKeysDialog());
-    act(() => { result.current.handleNodeRemove(); });
+    act(() => {
+      result.current.handleNodeRemove();
+    });
 
     expect(getNodeErrorMock).toHaveBeenCalledTimes(1);
     expect(getNodeErrorMock).toHaveBeenCalledWith("chat-123");

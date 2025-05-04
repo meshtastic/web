@@ -19,17 +19,24 @@ interface RoutePathProps {
   snr?: number[];
 }
 
-const RoutePath = ({ title, startNode, endNode, path, snr }: RoutePathProps) => {
+const RoutePath = (
+  { title, startNode, endNode, path, snr }: RoutePathProps,
+) => {
   const { getNode } = useDevice();
 
   return (
-    <span id={title} className="ml-4 border-l-2 border-l-background-primary pl-2 text-slate-900 dark:text-slate-900">
+    <span
+      id={title}
+      className="ml-4 border-l-2 border-l-background-primary pl-2 text-slate-900 dark:text-slate-900"
+    >
       <p className="font-semibold">{title}</p>
       <p>{startNode?.user?.longName}</p>
       <p>↓ {snr?.[0] ?? "??"}dB</p>
       {path.map((hop, i) => (
         <span key={getNode(hop)?.num ?? hop}>
-          <p>{getNode(hop)?.user?.longName ?? `!${numberToHexUnpadded(hop)}`}</p>
+          <p>
+            {getNode(hop)?.user?.longName ?? `!${numberToHexUnpadded(hop)}`}
+          </p>
           <p>↓ {snr?.[i + 1] ?? "??"}dB</p>
         </span>
       ))}

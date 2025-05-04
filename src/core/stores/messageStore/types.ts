@@ -21,13 +21,13 @@ interface GenericMessage<T extends MessageType> extends MessageBase {
   type: T;
 }
 
-type Message = GenericMessage<MessageType.Direct> | GenericMessage<MessageType.Broadcast>;
-
+type Message =
+  | GenericMessage<MessageType.Direct>
+  | GenericMessage<MessageType.Broadcast>;
 
 type GetMessagesParams =
   | { type: MessageType.Direct; nodeA: NodeNum; nodeB: NodeNum }
   | { type: MessageType.Broadcast; channelId: ChannelId };
-
 
 type SetMessageStateParams =
   | {
@@ -58,13 +58,13 @@ type ClearMessageParams =
   };
 
 export type {
-  Message,
-  ConversationId,
-  NodeNum,
-  MessageLogMap,
   ChannelId,
-  MessageId,
-  GetMessagesParams,
-  SetMessageStateParams,
   ClearMessageParams,
-}
+  ConversationId,
+  GetMessagesParams,
+  Message,
+  MessageId,
+  MessageLogMap,
+  NodeNum,
+  SetMessageStateParams,
+};

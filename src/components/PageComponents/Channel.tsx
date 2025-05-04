@@ -99,8 +99,12 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
               psk: pass,
               moduleSettings: {
                 ...channel?.settings?.moduleSettings,
-                positionPrecision: channel?.settings?.moduleSettings?.positionPrecision === undefined ? 10 : channel?.settings?.moduleSettings?.positionPrecision,
-              }
+                positionPrecision:
+                  channel?.settings?.moduleSettings?.positionPrecision ===
+                      undefined
+                    ? 10
+                    : channel?.settings?.moduleSettings?.positionPrecision,
+              },
             },
           },
         }}
@@ -125,7 +129,7 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
               {
                 type: "passwordGenerator",
                 name: "settings.psk",
-                id: 'channel-psk',
+                id: "channel-psk",
                 label: "Pre-Shared Key",
                 description:
                   "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
@@ -212,7 +216,8 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
         text={{
           button: "Regenerate",
           title: "Regenerate Pre-Shared Key?",
-          description: "Are you sure you want to regenerate the pre-shared key?",
+          description:
+            "Are you sure you want to regenerate the pre-shared key?",
         }}
         open={preSharedDialogOpen}
         onOpenChange={() => setPreSharedDialogOpen(false)}

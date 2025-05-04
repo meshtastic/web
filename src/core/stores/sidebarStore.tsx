@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useMemo } from 'react';
+import React, { createContext, useContext, useMemo, useState } from "react";
 
 interface SidebarContextProps {
   isCollapsed: boolean;
@@ -6,13 +6,17 @@ interface SidebarContextProps {
   toggleSidebar: () => void;
 }
 
-const SidebarContext = createContext<SidebarContextProps | undefined>(undefined);
+const SidebarContext = createContext<SidebarContextProps | undefined>(
+  undefined,
+);
 
-export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SidebarProvider: React.FC<{ children: React.ReactNode }> = (
+  { children },
+) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   const toggleSidebar = useMemo(() => () => {
-    setIsCollapsed(prev => !prev);
+    setIsCollapsed((prev) => !prev);
   }, []);
 
   const value = useMemo(() => ({
@@ -22,7 +26,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }), [isCollapsed, toggleSidebar]);
 
   return (
-    <SidebarContext.Provider value={value} >
+    <SidebarContext.Provider value={value}>
       {children}
     </SidebarContext.Provider>
   );
@@ -31,7 +35,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
 export const useSidebar = (): SidebarContextProps => {
   const context = useContext(SidebarContext);
   if (context === undefined) {
-    throw new Error('useSidebar must be used within a SidebarProvider');
+    throw new Error("useSidebar must be used within a SidebarProvider");
   }
   return context;
 };

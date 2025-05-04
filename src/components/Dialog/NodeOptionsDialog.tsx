@@ -13,7 +13,10 @@ import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { TrashIcon } from "lucide-react";
 
 import { Button } from "../UI/Button.tsx";
-import { MessageType, useMessageStore } from "../../core/stores/messageStore/index.ts";
+import {
+  MessageType,
+  useMessageStore,
+} from "../../core/stores/messageStore/index.ts";
 
 export interface NodeOptionsDialogProps {
   node: Protobuf.Mesh.NodeInfo | undefined;

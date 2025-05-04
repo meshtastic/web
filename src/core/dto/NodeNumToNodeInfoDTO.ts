@@ -3,7 +3,7 @@ import { Protobuf } from "@meshtastic/core";
 
 class NodeInfoFactory {
   private static createDefaultUser(num: number): Protobuf.Mesh.User {
-    const userIdHex = num.toString(16).toUpperCase().padStart(2, '0');
+    const userIdHex = num.toString(16).toUpperCase().padStart(2, "0");
     const userId = `!${userIdHex}`;
     const last4 = userIdHex.slice(-4);
     const longName = `Meshtastic ${last4}`;
@@ -19,14 +19,19 @@ class NodeInfoFactory {
     });
   }
 
-  public static ensureDefaultUser(node: Protobuf.Mesh.NodeInfo): Protobuf.Mesh.NodeInfo {
+  public static ensureDefaultUser(
+    node: Protobuf.Mesh.NodeInfo,
+  ): Protobuf.Mesh.NodeInfo {
     if (!node) {
       return node;
     }
 
     if (!node.user) {
       if (node.num === undefined || node.num === null) {
-        console.error(`NodeInfoFactory.ensureDefaultUser: Cannot create default user for node because 'num' is missing.`, node);
+        console.error(
+          `NodeInfoFactory.ensureDefaultUser: Cannot create default user for node because 'num' is missing.`,
+          node,
+        );
         return node;
       }
 

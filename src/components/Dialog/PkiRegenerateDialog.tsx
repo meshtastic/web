@@ -14,7 +14,7 @@ export interface PkiRegenerateDialogProps {
     title: string;
     description: string;
     button: string;
-  }
+  };
   open: boolean;
   onOpenChange: () => void;
   onSubmit: () => void;

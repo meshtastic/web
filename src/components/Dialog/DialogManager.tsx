@@ -12,7 +12,6 @@ import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshK
 import { RebootOTADialog } from "@components/Dialog/RebootOTADialog.tsx";
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
 
-
 export const DialogManager = () => {
   const { channels, config, dialog, setDialogOpen } = useDevice();
   return (

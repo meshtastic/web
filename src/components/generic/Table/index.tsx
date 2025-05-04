@@ -60,8 +60,12 @@ export const Table = ({ headings, rows }: TableProps) => {
     }
 
     if (sortColumn === "Connection") {
-      const aNumHops = numericHops(aValue instanceof Array ? aValue[0] : aValue);
-      const bNumHops = numericHops(bValue instanceof Array ? bValue[0] : bValue);
+      const aNumHops = numericHops(
+        aValue instanceof Array ? aValue[0] : aValue,
+      );
+      const bNumHops = numericHops(
+        bValue instanceof Array ? bValue[0] : bValue,
+      );
 
       if (aNumHops < bNumHops) {
         return sortOrder === "asc" ? -1 : 1;
@@ -89,10 +93,11 @@ export const Table = ({ headings, rows }: TableProps) => {
             <th
               key={heading.title}
               scope="col"
-              className={`py-2 pr-3 text-left ${heading.sortable
-                ? "cursor-pointer hover:brightness-hover active:brightness-press"
-                : ""
-                }`}
+              className={`py-2 pr-3 text-left ${
+                heading.sortable
+                  ? "cursor-pointer hover:brightness-hover active:brightness-press"
+                  : ""
+              }`}
               onClick={() => heading.sortable && headingSort(heading.title)}
               onKeyUp={() => heading.sortable && headingSort(heading.title)}
             >
@@ -110,24 +115,36 @@ export const Table = ({ headings, rows }: TableProps) => {
       <tbody className="max-w-fit">
         {sortedRows.map((row, index) => {
           // biome-ignore lint/suspicious/noArrayIndexKey: TODO: Once this table is sortable, this should get fixed.
-          return (<tr key={index} className={`${index % 2 ? 'bg-white dark:bg-white/2' : 'bg-slate-50/50 dark:bg-slate-50/5'} border-b-1 border-slate-200 dark:border-slate-900`}>
-            {row.map((item, index) => {
-              return (index === 0 ?
-                <th
-                  key={item.key ?? index}
-                  className="whitespace-nowrap py-2 text-sm text-text-secondary first:pl-2"
-                  scope="row"
-                >
-                  {item}
-                </th> :
-                <td
-                  key={item.key ?? index}
-                  className="whitespace-nowrap py-2 text-sm text-text-secondary first:pl-2"
-                >
-                  {item}
-                </td>)
-            })}
-          </tr>
+          return (
+            <tr
+              key={index}
+              className={`${
+                index % 2
+                  ? "bg-white dark:bg-white/2"
+                  : "bg-slate-50/50 dark:bg-slate-50/5"
+              } border-b-1 border-slate-200 dark:border-slate-900`}
+            >
+              {row.map((item, index) => {
+                return (index === 0
+                  ? (
+                    <th
+                      key={item.key ?? index}
+                      className="whitespace-nowrap py-2 text-sm text-text-secondary first:pl-2"
+                      scope="row"
+                    >
+                      {item}
+                    </th>
+                  )
+                  : (
+                    <td
+                      key={item.key ?? index}
+                      className="whitespace-nowrap py-2 text-sm text-text-secondary first:pl-2"
+                    >
+                      {item}
+                    </td>
+                  ));
+              })}
+            </tr>
           );
         })}
       </tbody>

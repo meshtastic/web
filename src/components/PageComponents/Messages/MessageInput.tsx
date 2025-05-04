@@ -22,7 +22,9 @@ export const MessageInput = ({
 
   const initialDraft = getDraft(to);
   const [localDraft, setLocalDraft] = useState(initialDraft);
-  const [messageBytes, setMessageBytes] = useState(() => calculateBytes(initialDraft));
+  const [messageBytes, setMessageBytes] = useState(() =>
+    calculateBytes(initialDraft)
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -63,7 +65,10 @@ export const MessageInput = ({
             />
           </label>
 
-          <label data-testid="byte-counter" className="flex items-center w-20 p-1 text-sm place-content-end">
+          <label
+            data-testid="byte-counter"
+            className="flex items-center w-20 p-1 text-sm place-content-end"
+          >
             {messageBytes}/{maxBytes}
           </label>
 

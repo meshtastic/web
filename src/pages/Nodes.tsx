@@ -10,7 +10,13 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
-import { type JSX, useCallback, useDeferredValue, useEffect, useState } from "react";
+import {
+  type JSX,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useState,
+} from "react";
 import { base16 } from "rfc4648";
 import { Input } from "@components/UI/Input.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
@@ -34,14 +40,14 @@ const NodesPage = (): JSX.Element => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const deferredSearch = useDeferredValue(searchTerm);
 
-  const filteredNodes = getNodes(node => {
+  const filteredNodes = getNodes((node) => {
     if (!node.user) return false;
     const lowerCaseSearchTerm = deferredSearch.toLowerCase();
     return (
       node.user?.longName?.toLowerCase().includes(lowerCaseSearchTerm) ||
       node.user?.shortName?.toLowerCase().includes(lowerCaseSearchTerm)
     );
-  })
+  });
 
   useEffect(() => {
     if (!connection) return;
@@ -76,7 +82,11 @@ const NodesPage = (): JSX.Element => {
 
   return (
     <>
-      <PageLayout label="" leftBar={<Sidebar />} className="flex flex-col w-full">
+      <PageLayout
+        label=""
+        leftBar={<Sidebar />}
+        className="flex flex-col w-full"
+      >
         <div className="p-2">
           <Input
             placeholder="Search nodes..."
@@ -118,7 +128,8 @@ const NodesPage = (): JSX.Element => {
                 {node.lastHeard !== 0
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
-                    : `${node.hopsAway?.toString()} ${node.hopsAway ?? 0 > 1 ? "hops" : "hop"
+                    : `${node.hopsAway?.toString()} ${
+                      node.hopsAway ?? 0 > 1 ? "hops" : "hop"
                     } away`
                   : "-"}
                 {node.viaMqtt === true ? ", via MQTT" : ""}

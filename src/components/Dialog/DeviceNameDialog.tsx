@@ -44,8 +44,14 @@ export const DeviceNameDialog = ({
     values: defaultValues,
   });
 
-  const { currentLength: currentLongNameLength } = validateMaxByteLength(getValues('longName'), MAX_LONG_NAME_BYTE_LENGTH);
-  const { currentLength: currentShortNameLength } = validateMaxByteLength(getValues('shortName'), MAX_SHORT_NAME_BYTE_LENGTH);
+  const { currentLength: currentLongNameLength } = validateMaxByteLength(
+    getValues("longName"),
+    MAX_LONG_NAME_BYTE_LENGTH,
+  );
+  const { currentLength: currentShortNameLength } = validateMaxByteLength(
+    getValues("shortName"),
+    MAX_SHORT_NAME_BYTE_LENGTH,
+  );
 
   const onSubmit = handleSubmit((data) => {
     connection?.setOwner(
@@ -83,7 +89,7 @@ export const DeviceNameDialog = ({
                 label: "Long Name",
                 type: "text",
                 properties: {
-                  className: 'text-slate-900 dark:text-slate-200',
+                  className: "text-slate-900 dark:text-slate-200",
                   fieldLength: {
                     currentValueLength: currentLongNameLength ?? 0,
                     max: MAX_LONG_NAME_BYTE_LENGTH,
@@ -113,7 +119,9 @@ export const DeviceNameDialog = ({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="destructive" onClick={handleReset}>Reset</Button>
+            <Button type="button" variant="destructive" onClick={handleReset}>
+              Reset
+            </Button>
             <Button type="submit">Save</Button>
           </DialogFooter>
         </form>

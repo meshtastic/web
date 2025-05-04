@@ -23,7 +23,10 @@ import {
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { MessageType, useMessageStore } from "../../../core/stores/messageStore/index.ts";
+import {
+  MessageType,
+  useMessageStore,
+} from "../../../core/stores/messageStore/index.ts";
 import BatteryStatus from "@components/BatteryStatus.tsx";
 
 export interface NodeDetailProps {
@@ -51,10 +54,12 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
           <Avatar text={shortName} size="sm" />
 
-          <div onFocusCapture={(e) => {
-            // Required to prevent DM tooltip auto-appearing on creation
-            e.stopPropagation();
-          }}>
+          <div
+            onFocusCapture={(e) => {
+              // Required to prevent DM tooltip auto-appearing on creation
+              e.stopPropagation();
+            }}
+          >
             {node.user?.publicKey && node.user?.publicKey.length > 0
               ? (
                 <LockIcon
@@ -177,7 +182,9 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         {!!node.deviceMetrics?.airUtilTx && (
           <div className="grow">
             <div>Airtime Util</div>
-            <Mono className="text-gray-500">{node.deviceMetrics?.airUtilTx.toPrecision(3)}%</Mono>
+            <Mono className="text-gray-500">
+              {node.deviceMetrics?.airUtilTx.toPrecision(3)}%
+            </Mono>
           </div>
         )}
       </div>

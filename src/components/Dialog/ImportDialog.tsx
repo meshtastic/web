@@ -51,7 +51,7 @@ export const ImportDialog = ({
       const paddedString = encodedChannelConfig
         .padEnd(
           encodedChannelConfig.length +
-          ((4 - (encodedChannelConfig.length % 4)) % 4),
+            ((4 - (encodedChannelConfig.length % 4)) % 4),
           "=",
         )
         .replace(/-/g, "+")

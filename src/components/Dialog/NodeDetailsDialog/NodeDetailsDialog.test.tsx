@@ -1,4 +1,4 @@
-import { describe, it, vi, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -10,7 +10,6 @@ vi.mock("@core/stores/appStore");
 
 const mockUseDevice = vi.mocked(useDevice);
 const mockUseAppStore = vi.mocked(useAppStore);
-
 
 describe("NodeDetailsDialog", () => {
   const mockDevice = {
@@ -54,30 +53,33 @@ describe("NodeDetailsDialog", () => {
   });
 
   it("renders node details correctly", () => {
-    render(<NodeDetailsDialog open={true} onOpenChange={() => { }} />);
+    render(<NodeDetailsDialog open onOpenChange={() => {}} />);
 
-    expect(screen.getByText(/Node Details for Test Node \(TN\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Node Details for Test Node \(TN\)/i))
+      .toBeInTheDocument();
 
     expect(screen.getByText("Node Number: 1234")).toBeInTheDocument();
     expect(screen.getByText(/Node Hex: !/i)).toBeInTheDocument();
     expect(screen.getByText(/Last Heard:/i)).toBeInTheDocument();
 
     expect(screen.getByText(/Coordinates:/i)).toBeInTheDocument();
-    const link = screen.getByRole('link', { name: /^45, -75$/ });
+    const link = screen.getByRole("link", { name: /^45, -75$/ });
 
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', expect.stringContaining('openstreetmap.org'));
+    expect(link).toHaveAttribute(
+      "href",
+      expect.stringContaining("openstreetmap.org"),
+    );
     expect(screen.getByText(/Altitude: 200m/i)).toBeInTheDocument();
 
-
     expect(screen.getByText(/Air TX utilization: 50.12%/i)).toBeInTheDocument();
-    expect(screen.getByText(/Channel utilization: 75.46%/i)).toBeInTheDocument();
+    expect(screen.getByText(/Channel utilization: 75.46%/i))
+      .toBeInTheDocument();
     expect(screen.getByText(/Battery level: 88.79%/i)).toBeInTheDocument();
     expect(screen.getByText(/Voltage: 4.20V/i)).toBeInTheDocument();
     expect(screen.getByText(/Uptime:/i)).toBeInTheDocument();
 
     expect(screen.getByText(/All Raw Metrics:/i)).toBeInTheDocument();
-
   });
 
   it("renders null if device is not found", () => {
@@ -99,7 +101,9 @@ describe("NodeDetailsDialog", () => {
       },
     });
 
-    const { container } = render(<NodeDetailsDialog open={true} onOpenChange={() => { }} />);
+    const { container } = render(
+      <NodeDetailsDialog open onOpenChange={() => {}} />,
+    );
 
     expect(container.firstChild).toBeNull();
     expect(screen.queryByText(/Node Details for/i)).not.toBeInTheDocument();
@@ -110,7 +114,7 @@ describe("NodeDetailsDialog", () => {
     mockUseDevice.mockReturnValue({ getNode: () => nodeWithoutPosition });
     mockUseAppStore.mockReturnValue({ nodeNumDetails: 1234 });
 
-    render(<NodeDetailsDialog open={true} onOpenChange={() => { }} />);
+    render(<NodeDetailsDialog open onOpenChange={() => {}} />);
 
     expect(screen.queryByText(/Coordinates:/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Altitude:/i)).not.toBeInTheDocument();
@@ -122,7 +126,7 @@ describe("NodeDetailsDialog", () => {
     mockUseDevice.mockReturnValue({ getNode: () => nodeWithoutMetrics });
     mockUseAppStore.mockReturnValue({ nodeNumDetails: 1234 });
 
-    render(<NodeDetailsDialog open={true} onOpenChange={() => { }} />);
+    render(<NodeDetailsDialog open onOpenChange={() => {}} />);
 
     expect(screen.queryByText(/Device Metrics:/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Air TX utilization:/i)).not.toBeInTheDocument();
@@ -134,9 +138,8 @@ describe("NodeDetailsDialog", () => {
     mockUseDevice.mockReturnValue({ getNode: () => nodeNeverHeard });
     mockUseAppStore.mockReturnValue({ nodeNumDetails: 1234 });
 
-    render(<NodeDetailsDialog open={true} onOpenChange={() => { }} />);
+    render(<NodeDetailsDialog open onOpenChange={() => {}} />);
 
     expect(screen.getByText(/Last Heard: Never/i)).toBeInTheDocument();
   });
-
 });

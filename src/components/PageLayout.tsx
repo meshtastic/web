@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { cn } from "@core/utils/cn.ts";
 import { type LucideIcon } from "lucide-react";
 import Footer from "@components/UI/Footer.tsx";
@@ -39,7 +39,7 @@ export const PageLayout = ({
   leftBarClassName,
   rightBarClassName,
   topBarClassName,
-  contentClassName
+  contentClassName,
 }: PageLayoutProps) => {
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
@@ -49,7 +49,7 @@ export const PageLayout = ({
           <aside
             className={cn(
               "px-2 pr-0 shrink-0 border-r-[0.5px] border-slate-300 dark:border-slate-700 ",
-              leftBarClassName
+              leftBarClassName,
             )}
           >
             {leftBar}
@@ -61,7 +61,7 @@ export const PageLayout = ({
           <header
             className={cn(
               "flex h-14 shrink-0 mt-2 p-2 items-center border-b border-slate-300 dark:border-slate-700",
-              topBarClassName
+              topBarClassName,
             )}
           >
             {/* Header Content */}
@@ -82,9 +82,7 @@ export const PageLayout = ({
                     aria-busy={action.isLoading}
                   >
                     <div className="mr-6">
-                      {action.isLoading ? (
-                        <Spinner size="md" />
-                      ) : (
+                      {action.isLoading ? <Spinner size="md" /> : (
                         <action.icon
                           className={cn("h-5 w-5", action.iconClasses)}
                         />
@@ -101,7 +99,7 @@ export const PageLayout = ({
               "flex-1 flex flex-col",
               "overflow-hidden",
               !noPadding && "px-2",
-              contentClassName
+              contentClassName,
             )}
           >
             {children}
@@ -114,7 +112,7 @@ export const PageLayout = ({
           <aside
             className={cn(
               "w-48 lg:w-[270px] shrink-0 border-l border-slate-300 dark:border-slate-700 px-2 overflow-hidden",
-              rightBarClassName
+              rightBarClassName,
             )}
           >
             {rightBar}

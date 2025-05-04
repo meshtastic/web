@@ -39,8 +39,9 @@ const buttonVariants = cva(
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-  VariantProps<typeof buttonVariants> {
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
   icon?: React.ReactNode;
   iconAlignment?: "left" | "right";
 }
@@ -65,7 +66,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           buttonVariants({ variant, size, className }),
           { "cursor-not-allowed": disabled },
-          "inline-flex items-center"
+          "inline-flex items-center",
         )}
         ref={ref}
         disabled={disabled}

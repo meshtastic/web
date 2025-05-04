@@ -1,13 +1,13 @@
-import { vi } from 'vitest'
+import { vi } from "vitest";
 
-vi.mock('@components/UI/Button.tsx', () => ({
+vi.mock("@components/UI/Button.tsx", () => ({
   Button: ({ children, name, disabled, onClick }: {
-    children: React.ReactNode,
-    variant: string,
-    name: string,
-    disabled?: boolean,
-    onClick: () => void
-  }) =>
+    children: React.ReactNode;
+    variant: string;
+    name: string;
+    disabled?: boolean;
+    onClick: () => void;
+  }) => (
     <button
       type="button"
       name={name}
@@ -17,4 +17,5 @@ vi.mock('@components/UI/Button.tsx', () => ({
     >
       {children}
     </button>
+  ),
 }));

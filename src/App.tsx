@@ -16,7 +16,6 @@ import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { SidebarProvider } from "@core/stores/sidebarStore.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
 
-
 export const App = (): JSX.Element => {
   const { getDevice } = useDeviceStore();
   const { selectedDevice, setConnectDialogOpen, connectDialogOpen } =
@@ -25,7 +24,7 @@ export const App = (): JSX.Element => {
   const device = getDevice(selectedDevice);
 
   // Sets up light/dark mode based on user preferences or system settings
-  useTheme()
+  useTheme();
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
@@ -37,28 +36,33 @@ export const App = (): JSX.Element => {
       />
       <Toaster />
       <DeviceWrapper device={device}>
-        <div className="flex h-screen flex-col bg-background-primary text-text-primary" style={{ scrollbarWidth: 'thin' }}>
+        <div
+          className="flex h-screen flex-col bg-background-primary text-text-primary"
+          style={{ scrollbarWidth: "thin" }}
+        >
           <SidebarProvider>
             <div className="h-full flex flex-col">
-              {device ? (
-                <div className="h-full flex w-full">
-                  <DialogManager />
-                  <KeyBackupReminder />
-                  <CommandPalette />
-                  <MapProvider>
-                    <PageRouter />
-                  </MapProvider>
-                </div>
-              ) : (
-                <>
-                  <Dashboard />
-                  <Footer />
-                </>
-              )}
+              {device
+                ? (
+                  <div className="h-full flex w-full">
+                    <DialogManager />
+                    <KeyBackupReminder />
+                    <CommandPalette />
+                    <MapProvider>
+                      <PageRouter />
+                    </MapProvider>
+                  </div>
+                )
+                : (
+                  <>
+                    <Dashboard />
+                    <Footer />
+                  </>
+                )}
             </div>
           </SidebarProvider>
         </div>
       </DeviceWrapper>
-    </ErrorBoundary >
+    </ErrorBoundary>
   );
 };
