@@ -86,7 +86,7 @@ const ConfigPage = () => {
         </SidebarSection>
       </Sidebar>
     ),
-    [],
+    [activeConfigSection],
   );
 
   return (
