@@ -155,7 +155,7 @@ export const NewDeviceDialog = ({
           {tabs.map((tab) => (
             <TabsContent key={tab.label} value={tab.label}>
               <fieldset disabled={tab.isDisabled}>
-                {tab.isDisabled
+                {(tab.label !== "HTTP" && tab.isDisabled)
                   ? <ErrorMessage missingFeatures={unsupported} />
                   : null}
                 <tab.element
