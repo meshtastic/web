@@ -51,14 +51,12 @@ const ConfigPage = () => {
                 description:
                   `The configuration change ${moduleConfig.payloadVariant.case} has been saved.`,
               })
-
             )
           ),
         );
         setIsSaving(false);
       }
       await connection?.commitEditSettings();
-
     } catch (_error) {
       toast({
         title: "Error Saving Config",
@@ -87,11 +85,12 @@ const ConfigPage = () => {
           />
         </SidebarSection>
       </Sidebar>
-    ), [])
+    ),
+    [activeConfigSection],
+  );
 
   return (
     <>
-
       <PageLayout
         contentClassName="overflow-auto"
         leftBar={leftSidebar}
