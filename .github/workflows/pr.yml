@@ -24,6 +24,9 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
           restore-keys: |
             ${{ runner.os }}-deno-
+      
+      - name: Install Dependencies
+        run: deno install
 
       - name: Cache Dependencies
         run: deno cache src/index.tsx
