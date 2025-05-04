@@ -3,11 +3,12 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { useMessageStore } from "@core/stores/messageStore/index.ts";
 
 export function useRefreshKeysDialog() {
-  const { removeNode, setDialogOpen, clearNodeError, getNodeError } = useDevice();
+  const { removeNode, setDialogOpen, clearNodeError, getNodeError } =
+    useDevice();
   const { activeChat } = useMessageStore();
 
   const handleCloseDialog = useCallback(() => {
-    setDialogOpen('refreshKeys', false);
+    setDialogOpen("refreshKeys", false);
   }, [setDialogOpen]);
 
   const handleNodeRemove = useCallback(() => {
@@ -22,6 +23,6 @@ export function useRefreshKeysDialog() {
 
   return {
     handleCloseDialog,
-    handleNodeRemove
+    handleNodeRemove,
   };
 }

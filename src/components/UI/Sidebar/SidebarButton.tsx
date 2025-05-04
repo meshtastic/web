@@ -36,8 +36,8 @@ export const SidebarButton = ({
       className={cn(
         "flex w-full items-center text-wrap",
         isButtonCollapsed
-          ? 'justify-center gap-0 px-2 h-9'
-          : 'justify-start gap-2 min-h-9'
+          ? "justify-center gap-0 px-2 h-9"
+          : "justify-start gap-2 min-h-9",
       )}
       disabled={disabled}
     >
@@ -52,13 +52,13 @@ export const SidebarButton = ({
 
       <span
         className={cn(
-          'flex flex-wrap justify-start text-left text-wrap break-all',
-          'min-w-0',
-          'px-1',
-          'transition-all duration-300 ease-in-out',
+          "flex flex-wrap justify-start text-left text-wrap break-all",
+          "min-w-0",
+          "px-1",
+          "transition-all duration-300 ease-in-out",
           isButtonCollapsed
-            ? 'opacity-0 max-w-0 invisible w-0 overflow-hidden'
-            : 'opacity-100 max-w-full visible flex-1 whitespace-normal'
+            ? "opacity-0 max-w-0 invisible w-0 overflow-hidden"
+            : "opacity-100 max-w-full visible flex-1 whitespace-normal",
         )}
       >
         {label}
@@ -70,7 +70,7 @@ export const SidebarButton = ({
             "ml-auto flex-shrink-0 justify-end text-white text-xs rounded-full px-1.5 py-0.5 bg-red-600",
             "flex-shrink-0",
             "transition-opacity duration-300 ease-in-out",
-            isButtonCollapsed ? 'opacity-0 invisible' : 'opacity-100 visible'
+            isButtonCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
           )}
         >
           {count}

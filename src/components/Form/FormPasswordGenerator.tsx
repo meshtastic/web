@@ -31,7 +31,7 @@ export function PasswordGenerator<T extends FieldValues>({
   field,
   disabled,
 }: GenericFormElementProps<T, PasswordGeneratorProps<T>>) {
-  const { isVisible } = usePasswordVisibilityToggle()
+  const { isVisible } = usePasswordVisibilityToggle();
 
   return (
     <Controller

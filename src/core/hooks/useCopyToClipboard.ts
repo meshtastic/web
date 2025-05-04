@@ -4,7 +4,9 @@ interface UseCopyToClipboardProps {
   timeout?: number;
 }
 
-export function useCopyToClipboard({ timeout = 2000 }: UseCopyToClipboardProps = {}) {
+export function useCopyToClipboard(
+  { timeout = 2000 }: UseCopyToClipboardProps = {},
+) {
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const timeoutRef = useRef<number | null>(null);
 
@@ -19,7 +21,7 @@ export function useCopyToClipboard({ timeout = 2000 }: UseCopyToClipboardProps =
   const copy = useCallback(
     async (text: string) => {
       if (!navigator?.clipboard) {
-        console.warn('Clipboard API not available');
+        console.warn("Clipboard API not available");
         setIsCopied(false);
         return false;
       }
@@ -39,12 +41,12 @@ export function useCopyToClipboard({ timeout = 2000 }: UseCopyToClipboardProps =
 
         return true;
       } catch (error) {
-        console.error('Failed to copy text to clipboard:', error);
+        console.error("Failed to copy text to clipboard:", error);
         setIsCopied(false);
         return false;
       }
     },
-    [timeout]
+    [timeout],
   );
 
   return { isCopied, copy };

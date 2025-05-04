@@ -19,7 +19,7 @@ export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
   const scrollContainerRef = useRef<HTMLUListElement>(null);
   const userScrolledUpRef = useRef(false);
 
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     requestAnimationFrame(() => {
       messagesEndRef.current?.scrollIntoView({ behavior });
     });
@@ -28,10 +28,12 @@ export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
-    const isScrolledToBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight <= 10;
+    const isScrolledToBottom =
+      scrollContainer.scrollHeight - scrollContainer.scrollTop -
+          scrollContainer.clientHeight <= 10;
 
     if (isScrolledToBottom || !userScrolledUpRef.current) {
-      scrollToBottom('smooth');
+      scrollToBottom("smooth");
     }
   }, [messages, scrollToBottom]);
 
@@ -39,12 +41,16 @@ export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
     const scrollContainer = scrollContainerRef.current;
     const handleScroll = () => {
       if (!scrollContainer) return;
-      const isAtBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight <= 10;
+      const isAtBottom =
+        scrollContainer.scrollHeight - scrollContainer.scrollTop -
+            scrollContainer.clientHeight <= 10;
       userScrolledUpRef.current = !isAtBottom;
     };
-    scrollContainer?.addEventListener('scroll', handleScroll, { passive: true });
+    scrollContainer?.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
     return () => {
-      scrollContainer?.removeEventListener('scroll', handleScroll);
+      scrollContainer?.removeEventListener("scroll", handleScroll);
     };
   }, []);
 

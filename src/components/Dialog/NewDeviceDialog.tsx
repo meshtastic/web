@@ -90,8 +90,8 @@ const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
             {browserFeatures.length > 0 && (
               <>
                 This connection type requires{" "}
-                {formatFeatureList(browserFeatures)}. Please use a
-                supported browser, like Chrome or Edge.
+                {formatFeatureList(browserFeatures)}. Please use a supported
+                browser, like Chrome or Edge.
               </>
             )}
             {needsSecureContext && (
@@ -114,10 +114,8 @@ export const NewDeviceDialog = ({
   open,
   onOpenChange,
 }: NewDeviceProps) => {
-  const [connectionInProgress, setConnectionInProgress] =
-    useState(false);
+  const [connectionInProgress, setConnectionInProgress] = useState(false);
   const { unsupported } = useBrowserFeatureDetection();
-
 
   const tabs: TabManifest[] = [
     {
@@ -160,7 +158,11 @@ export const NewDeviceDialog = ({
                 {tab.isDisabled
                   ? <ErrorMessage missingFeatures={unsupported} />
                   : null}
-                <tab.element closeDialog={() => onOpenChange(false)} setConnectionInProgress={setConnectionInProgress} connectionInProgress={connectionInProgress} />
+                <tab.element
+                  closeDialog={() => onOpenChange(false)}
+                  setConnectionInProgress={setConnectionInProgress}
+                  connectionInProgress={connectionInProgress}
+                />
               </fieldset>
             </TabsContent>
           ))}

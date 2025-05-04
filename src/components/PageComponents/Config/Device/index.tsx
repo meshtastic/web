@@ -16,7 +16,7 @@ export const Device = () => {
           case: "device",
           value: data,
         },
-      })
+      }),
     );
   };
   return (
@@ -83,16 +83,16 @@ export const Device = () => {
               description: "Disable triple click",
             },
             {
-              type: 'text',
-              name: 'tzdef',
-              label: 'POSIX Timezone',
-              description: 'The POSIX timezone string for the device',
+              type: "text",
+              name: "tzdef",
+              label: "POSIX Timezone",
+              description: "The POSIX timezone string for the device",
               properties: {
                 fieldLength: {
                   max: 64,
                   currentValueLength: config.device?.tzdef?.length,
                   showCharacterCount: true,
-                }
+                },
               },
             },
             {

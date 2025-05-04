@@ -1,4 +1,7 @@
-import { NetworkValidationSchema, type NetworkValidation } from "@app/validation/config/network.ts";
+import {
+  type NetworkValidation,
+  NetworkValidationSchema,
+} from "@app/validation/config/network.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -55,8 +58,8 @@ export const Network = () => {
           ),
           dns: convertIntToIpAddress(config.network?.ipv4Config?.dns ?? 0),
         },
-        enabledProtocols: config.network?.enabledProtocols ?? Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST
-
+        enabledProtocols: config.network?.enabledProtocols ??
+          Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
       }}
       fieldGroups={[
         {
@@ -183,10 +186,9 @@ export const Network = () => {
               name: "enabledProtocols",
               label: "Mesh via UDP",
               properties: {
-                enumValue:
-                  Protobuf.Config.Config_NetworkConfig_ProtocolFlags,
+                enumValue: Protobuf.Config.Config_NetworkConfig_ProtocolFlags,
                 formatEnumName: true,
-              }
+              },
             },
           ],
         },

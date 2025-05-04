@@ -26,8 +26,8 @@ export const TracerouteResponseDialog = ({
   const { getNode } = useDevice();
   const route: number[] = traceroute?.data.route ?? [];
   const routeBack: number[] = traceroute?.data.routeBack ?? [];
-  const snrTowards = (traceroute?.data.snrTowards ?? []).map(snr => snr / 4);
-  const snrBack = (traceroute?.data.snrBack ?? []).map(snr => snr / 4);
+  const snrTowards = (traceroute?.data.snrTowards ?? []).map((snr) => snr / 4);
+  const snrBack = (traceroute?.data.snrBack ?? []).map((snr) => snr / 4);
   const from = getNode(traceroute?.from ?? 0);
   const longName = from?.user?.longName ??
     (from ? `!${numberToHexUnpadded(from?.num)}` : "Unknown");

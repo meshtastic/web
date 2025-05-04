@@ -1,13 +1,13 @@
 import type { Device } from "@core/stores/deviceStore.ts";
 import { MeshDevice, Protobuf } from "@meshtastic/core";
-import { MessageState, MessageType, type MessageStore } from "./stores/messageStore/index.ts";
+import { type MessageStore, MessageType } from "./stores/messageStore/index.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
 import NodeInfoFactory from "@core/dto/NodeNumToNodeInfoDTO.ts";
 
 export const subscribeAll = (
   device: Device,
   connection: MeshDevice,
-  messageStore: MessageStore
+  messageStore: MessageStore,
 ) => {
   let myNodeNum = 0;
 
@@ -79,7 +79,6 @@ export const subscribeAll = (
     device.setModuleConfig(moduleConfig);
   });
 
-
   connection.events.onMessagePacket.subscribe((messagePacket) => {
     // incoming and outgoing messages are handled by this event listener
     console.log("Message Packet", messagePacket);
@@ -117,7 +116,6 @@ export const subscribeAll = (
     });
   });
 
-
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     if (routingPacket.data.variant.case === "errorReason") {
       switch (routingPacket.data.variant.value) {
@@ -126,19 +124,24 @@ export const subscribeAll = (
           break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);
+          device.setNodeError(
+            routingPacket.from,
+            Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value],
+          );
           device.setDialogOpen("refreshKeys", true);
           break;
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          device.setNodeError(routingPacket.from, Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value]);
+          device.setNodeError(
+            routingPacket.from,
+            Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value],
+          );
           device.setDialogOpen("refreshKeys", true);
           break;
         default: {
           break;
         }
       }
-
     }
   });
 };

@@ -9,10 +9,12 @@ import { BleConnection, ServiceUuid } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
-export const BLE = ({ setConnectionInProgress, closeDialog }: TabElementProps) => {
+export const BLE = (
+  { setConnectionInProgress, closeDialog }: TabElementProps,
+) => {
   const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);
   const { addDevice } = useDeviceStore();
-  const messageStore = useMessageStore()
+  const messageStore = useMessageStore();
   const { setSelectedDevice } = useAppStore();
 
   const updateBleDeviceList = useCallback(async (): Promise<void> => {
@@ -59,8 +61,6 @@ export const BLE = ({ setConnectionInProgress, closeDialog }: TabElementProps) =
       <Button
         variant="default"
         onClick={async () => {
-
-
           await navigator.bluetooth
             .requestDevice({
               filters: [{ services: [ServiceUuid] }],

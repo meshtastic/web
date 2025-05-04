@@ -1,5 +1,5 @@
-import { PersistStorage, StateStorage, } from "zustand/middleware"; // Added StorageValue for clarity, though not strictly needed in the final signature here
-import { get, set, del } from "idb-keyval";
+import { PersistStorage, StateStorage } from "zustand/middleware";
+import { del, get, set } from "idb-keyval";
 import { ChannelId, MessageLogMap } from "@core/stores/messageStore/types.ts";
 
 type PersistedMessageState = {
@@ -22,30 +22,31 @@ export const zustandIndexDBStorage: StateStorage = {
   },
 };
 
-
 type SerializedMap<K = unknown, V = unknown> = {
-  __dataType: 'Map';
+  __dataType: "Map";
   value: Array<[K, V]>;
 };
+// deno-lint-ignore no-explicit-any
 type JsonReplacer = (this: any, key: string, value: unknown) => unknown;
 const replacer: JsonReplacer = (_, value) => {
   if (value instanceof Map) {
     const map = value as Map<unknown, unknown>;
     const serialized: SerializedMap = {
-      __dataType: 'Map',
+      __dataType: "Map",
       value: Array.from(map.entries()),
     };
     return serialized;
   }
   return value;
 };
+// deno-lint-ignore no-explicit-any
 type JsonReviver = (this: any, key: string, value: unknown) => unknown;
 function isSerializedMap(value: unknown): value is SerializedMap {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return false;
   }
   const potentialMap = value as Partial<SerializedMap>;
-  return potentialMap.__dataType === 'Map' && Array.isArray(potentialMap.value);
+  return potentialMap.__dataType === "Map" && Array.isArray(potentialMap.value);
 }
 const reviver: JsonReviver = (_, value) => {
   if (isSerializedMap(value)) {
@@ -54,11 +55,10 @@ const reviver: JsonReviver = (_, value) => {
   return value;
 };
 
-
 export const storageWithMapSupport: PersistStorage<PersistedMessageState> = {
   getItem: async (name): Promise<PersistedMessageState | null> => {
     const str = await zustandIndexDBStorage.getItem(name);
-    if (!str) { return null; }
+    if (!str) return null;
     try {
       const parsed = JSON.parse(str, reviver) as PersistedMessageState;
       return parsed;
@@ -72,7 +72,10 @@ export const storageWithMapSupport: PersistStorage<PersistedMessageState> = {
       const str = JSON.stringify(newValue, replacer);
       await zustandIndexDBStorage.setItem(name, str);
     } catch (error) {
-      console.error(`Error stringifying or setting persisted state (${name}):`, error);
+      console.error(
+        `Error stringifying or setting persisted state (${name}):`,
+        error,
+      );
     }
   },
   removeItem: async (name): Promise<void> => {

@@ -1,5 +1,9 @@
 import type { Types } from "@meshtastic/js";
-import { Message, MessageType, MessageState } from "../stores/messageStore/index.ts";
+import {
+  Message,
+  MessageState,
+  MessageType,
+} from "../stores/messageStore/index.ts";
 
 class PacketToMessageDTO {
   channel: Types.ChannelNumber;
@@ -16,9 +20,13 @@ class PacketToMessageDTO {
     this.to = data.to;
     this.from = data.from;
     this.messageId = data.id;
-    this.state = data.from !== nodeNum ? MessageState.Ack : MessageState.Waiting;
+    this.state = data.from !== nodeNum
+      ? MessageState.Ack
+      : MessageState.Waiting;
     this.message = data.data;
-    this.type = (data.type === 'direct') ? MessageType.Direct : MessageType.Broadcast;
+    this.type = (data.type === "direct")
+      ? MessageType.Direct
+      : MessageType.Broadcast;
 
     let dateTimestamp = Date.now();
     if (data.rxTime instanceof Date) {
@@ -27,9 +35,11 @@ class PacketToMessageDTO {
       if (!isNaN(timeValue)) {
         dateTimestamp = timeValue;
       }
-    }
-    else if (data.rxTime != null) {
-      console.warn(`Received rxTime in PacketToMessageDTO was not a Date object as expected (type: ${typeof data.rxTime}, value: ${data.rxTime}). Using current time as fallback.`);
+    } else if (data.rxTime != null) {
+      console.warn(
+        `Received rxTime in PacketToMessageDTO was not a Date object as expected (type: ${typeof data
+          .rxTime}, value: ${data.rxTime}). Using current time as fallback.`,
+      );
     }
     this.date = dateTimestamp;
   }

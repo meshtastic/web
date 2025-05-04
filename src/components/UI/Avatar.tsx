@@ -1,5 +1,5 @@
 import { cn } from "@core/utils/cn.ts";
-import { LockKeyholeOpenIcon } from 'lucide-react';
+import { LockKeyholeOpenIcon } from "lucide-react";
 
 type RGBColor = {
   r: number;
@@ -88,15 +88,15 @@ export const Avatar = ({
         color: textColor,
       }}
     >
-      {showError ? (
-        <LockKeyholeOpenIcon
-          className="absolute bottom-0 right-0 z-10 size-4 text-red-500 stroke-3"
-          aria-hidden="true"
-        />
-      ) : null}
-      <p
-        className="p-1"
-      >
+      {showError
+        ? (
+          <LockKeyholeOpenIcon
+            className="absolute bottom-0 right-0 z-10 size-4 text-red-500 stroke-3"
+            aria-hidden="true"
+          />
+        )
+        : null}
+      <p className="p-1">
         {initials}
       </p>
     </div>

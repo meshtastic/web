@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 import {
-  PlugZapIcon,
   BatteryFullIcon,
-  BatteryMediumIcon,
   BatteryLowIcon,
-} from 'lucide-react';
+  BatteryMediumIcon,
+  PlugZapIcon,
+} from "lucide-react";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 
 interface DeviceMetrics {
@@ -25,50 +25,52 @@ interface BatteryStateConfig {
 
 const batteryStates: BatteryStateConfig[] = [
   {
-    condition: level => level > 100,
+    condition: (level) => level > 100,
     Icon: PlugZapIcon,
-    className: 'text-gray-500',
-    text: () => 'Plugged in',
+    className: "text-gray-500",
+    text: () => "Plugged in",
   },
   {
-    condition: level => level > 80,
+    condition: (level) => level > 80,
     Icon: BatteryFullIcon,
-    className: 'text-green-500',
-    text: level => `${level}% charging`,
+    className: "text-green-500",
+    text: (level) => `${level}% charging`,
   },
   {
-    condition: level => level > 20,
+    condition: (level) => level > 20,
     Icon: BatteryMediumIcon,
-    className: 'text-yellow-500',
-    text: level => `${level}% charging`,
+    className: "text-yellow-500",
+    text: (level) => `${level}% charging`,
   },
   {
     condition: () => true,
     Icon: BatteryLowIcon,
-    className: 'text-red-500',
-    text: level => `${level}% charging`,
+    className: "text-red-500",
+    text: (level) => `${level}% charging`,
   },
 ];
 
 const getBatteryState = (level: number) => {
-  return batteryStates.find(state => state.condition(level));
+  return batteryStates.find((state) => state.condition(level));
 };
 
-
 const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
-  if (deviceMetrics?.batteryLevel === undefined || deviceMetrics?.batteryLevel === null) {
+  if (
+    deviceMetrics?.batteryLevel === undefined ||
+    deviceMetrics?.batteryLevel === null
+  ) {
     return null;
   }
 
   const { batteryLevel, voltage } = deviceMetrics;
-  const currentState = getBatteryState(batteryLevel) ?? batteryStates[batteryStates.length - 1];
-
+  const currentState = getBatteryState(batteryLevel) ??
+    batteryStates[batteryStates.length - 1];
 
   const BatteryIcon = currentState.Icon;
   const iconClassName = currentState.className;
   const statusText = currentState.text(batteryLevel);
 
-  const voltageTitle = `${voltage?.toPrecision(3) ?? 'Unknown'} volts`;
+  const voltageTitle = `${voltage?.toPrecision(3) ?? "Unknown"} volts`;
 
   return (
     <div

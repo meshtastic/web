@@ -35,10 +35,18 @@ export interface LengthValidationResult {
   currentLength: number | null;
 }
 
-export function validateMaxByteLength(value: string | null | undefined, maxByteLength: number): LengthValidationResult {
+export function validateMaxByteLength(
+  value: string | null | undefined,
+  maxByteLength: number,
+): LengthValidationResult {
   // Ensure maxByteLength is valid
-  if (typeof maxByteLength !== 'number' || !Number.isInteger(maxByteLength) || maxByteLength < 0) {
-    console.warn('validateMaxByteLength: maxByteLength must be a non-negative integer.');
+  if (
+    typeof maxByteLength !== "number" || !Number.isInteger(maxByteLength) ||
+    maxByteLength < 0
+  ) {
+    console.warn(
+      "validateMaxByteLength: maxByteLength must be a non-negative integer.",
+    );
     return { isValid: false, currentLength: null }; // Cannot validate with invalid limit
   }
 
@@ -48,8 +56,10 @@ export function validateMaxByteLength(value: string | null | undefined, maxByteL
   }
 
   // Check for TextEncoder availability
-  if (typeof TextEncoder === 'undefined') {
-    console.error('validateMaxByteLength: TextEncoder API is not available in this environment.');
+  if (typeof TextEncoder === "undefined") {
+    console.error(
+      "validateMaxByteLength: TextEncoder API is not available in this environment.",
+    );
     return { isValid: false, currentLength: null }; // Cannot determine byte length
   }
 
@@ -64,8 +74,7 @@ export function validateMaxByteLength(value: string | null | undefined, maxByteL
     return { isValid, currentLength };
   } catch (error) {
     // Handle potential errors during encoding
-    console.error('validateMaxByteLength: Error encoding string:', error);
+    console.error("validateMaxByteLength: Error encoding string:", error);
     return { isValid: false, currentLength: null }; // Encoding failed
   }
 }
-

@@ -58,7 +58,9 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 const DialogClose = ({
   className,
   ...props
-}: DialogPrimitive.DialogCloseProps & React.RefAttributes<HTMLButtonElement> & { className?: string }) => (
+}: DialogPrimitive.DialogCloseProps & React.RefAttributes<HTMLButtonElement> & {
+  className?: string;
+}) => (
   <DialogPrimitive.Close
     aria-label="Close"
     data-testid="dialog-close-button"
@@ -107,7 +109,10 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn("text-lg font-semibold text-slate-900 dark:text-slate-100", className)}
+    className={cn(
+      "text-lg font-semibold text-slate-900 dark:text-slate-100",
+      className,
+    )}
     {...props}
   />
 ));
@@ -127,11 +132,11 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 export {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 };

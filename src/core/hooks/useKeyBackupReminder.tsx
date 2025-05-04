@@ -33,14 +33,16 @@ function isReminderExpired(expires?: string): boolean {
 export function useBackupReminder({
   enabled,
   message,
-  onAccept = () => { },
+  onAccept = () => {},
   reminderInDays = REMINDER_DAYS_ONE_WEEK,
 }: UseBackupReminderOptions) {
   const { toast } = useToast();
   const toastShownRef = useRef(false);
-  const [reminderState, setReminderState] = useLocalStorage<ReminderState | null>(
+  const [reminderState, setReminderState] = useLocalStorage<
+    ReminderState | null
+  >(
     STORAGE_KEY,
-    null
+    null,
   );
 
   const setReminderExpiry = useCallback((days: number) => {
@@ -73,7 +75,7 @@ export function useBackupReminder({
                 setReminderExpiry(reminderInDays);
               }}
             >
-              Remind me in {reminderInDays} day{reminderInDays > 1 ? 's' : ''}
+              Remind me in {reminderInDays} day{reminderInDays > 1 ? "s" : ""}
             </Button>
             <Button
               type="button"
@@ -108,6 +110,5 @@ export function useBackupReminder({
     enabled,
     message,
     onAccept,
-
   ]);
-};
+}

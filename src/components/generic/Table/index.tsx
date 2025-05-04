@@ -1,9 +1,10 @@
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { useState } from "react";
+import React from "react";
 
 export interface TableProps {
   headings: Heading[];
-  rows: [][];
+  rows: React.ReactNode[][];
 }
 
 export interface Heading {
@@ -12,18 +13,15 @@ export interface Heading {
   sortable: boolean;
 }
 
-/**
- * @param hopsAway String describing the number of hops away the node is from the current node
- * @returns number of hopsAway or `0` if hopsAway is 'Direct'
- */
-function numericHops(hopsAway: string): number {
+function numericHops(hopsAway: string | unknown): number {
+  if (typeof hopsAway !== "string") {
+    return Number.MAX_SAFE_INTEGER;
+  }
   if (hopsAway.match(/direct/i)) {
     return 0;
   }
-  if (hopsAway.match(/\d+\s+hop/gi)) {
-    return Number(hopsAway.match(/(\d+)\s+hop/i)?.[1]);
-  }
-  return Number.MAX_SAFE_INTEGER;
+  const match = hopsAway.match(/(\d+)\s+hop/i);
+  return Number(match?.[1] ?? Number.MAX_SAFE_INTEGER);
 }
 
 export const Table = ({ headings, rows }: TableProps) => {
@@ -39,45 +37,63 @@ export const Table = ({ headings, rows }: TableProps) => {
     }
   };
 
+  const getElement = (cell: React.ReactNode): React.ReactElement | null => {
+    if (!React.isValidElement(cell)) {
+      return null;
+    }
+    if (cell.type === React.Fragment) {
+      const childrenArray = React.Children.toArray(cell.props.children);
+      const firstElement = childrenArray.find((child) =>
+        React.isValidElement(child)
+      );
+      return (firstElement as React.ReactElement) ?? null;
+    }
+    // If not a fragment, return the element itself
+    return cell;
+  };
+
   const sortedRows = rows.slice().sort((a, b) => {
     if (!sortColumn) return 0;
 
     const columnIndex = headings.findIndex((h) => h.title === sortColumn);
-    const aValue = a[columnIndex].props.children;
-    const bValue = b[columnIndex].props.children;
+    if (columnIndex === -1) return 0;
+
+    const elementA = getElement(a[columnIndex]);
+    const elementB = getElement(b[columnIndex]);
 
     if (sortColumn === "Last Heard") {
-      const aTimestamp = aValue.props.timestamp ?? 0;
-      const bTimestamp = bValue.props.timestamp ?? 0;
-
-      if (aTimestamp < bTimestamp) {
-        return sortOrder === "asc" ? -1 : 1;
-      }
-      if (aTimestamp > bTimestamp) {
-        return sortOrder === "asc" ? 1 : -1;
-      }
+      const aTimestamp = elementA?.props?.timestamp ?? 0;
+      const bTimestamp = elementB?.props?.timestamp ?? 0;
+      if (aTimestamp < bTimestamp) return sortOrder === "asc" ? -1 : 1;
+      if (aTimestamp > bTimestamp) return sortOrder === "asc" ? 1 : -1;
       return 0;
     }
 
     if (sortColumn === "Connection") {
-      const aNumHops = numericHops(aValue instanceof Array ? aValue[0] : aValue);
-      const bNumHops = numericHops(bValue instanceof Array ? bValue[0] : bValue);
-
-      if (aNumHops < bNumHops) {
-        return sortOrder === "asc" ? -1 : 1;
-      }
-      if (aNumHops > bNumHops) {
-        return sortOrder === "asc" ? 1 : -1;
-      }
+      const aHopsStr = elementA?.props?.children;
+      const bHopsStr = elementB?.props?.children;
+      const aNumHops = numericHops(aHopsStr);
+      const bNumHops = numericHops(bHopsStr);
+      if (aNumHops < bNumHops) return sortOrder === "asc" ? -1 : 1;
+      if (aNumHops > bNumHops) return sortOrder === "asc" ? 1 : -1;
       return 0;
     }
 
-    if (aValue < bValue) {
-      return sortOrder === "asc" ? -1 : 1;
-    }
-    if (aValue > bValue) {
-      return sortOrder === "asc" ? 1 : -1;
-    }
+    const aValue = elementA?.props?.children;
+    const bValue = elementB?.props?.children;
+    const valA = aValue ?? "";
+    const valB = bValue ?? "";
+
+    // Ensure consistent comparison for potentially different types
+    const compareA = typeof valA === "string" || typeof valA === "number"
+      ? valA
+      : String(valA);
+    const compareB = typeof valB === "string" || typeof valB === "number"
+      ? valB
+      : String(valB);
+
+    if (compareA < compareB) return sortOrder === "asc" ? -1 : 1;
+    if (compareA > compareB) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
 
@@ -89,45 +105,73 @@ export const Table = ({ headings, rows }: TableProps) => {
             <th
               key={heading.title}
               scope="col"
-              className={`py-2 pr-3 text-left ${heading.sortable
-                ? "cursor-pointer hover:brightness-hover active:brightness-press"
-                : ""
-                }`}
+              className={`py-2 pr-3 text-left ${
+                heading.sortable
+                  ? "cursor-pointer hover:brightness-hover active:brightness-press"
+                  : ""
+              }`}
               onClick={() => heading.sortable && headingSort(heading.title)}
-              onKeyUp={() => heading.sortable && headingSort(heading.title)}
+              onKeyUp={(e) => {
+                if (heading.sortable && (e.key === "Enter" || e.key === " ")) {
+                  headingSort(heading.title);
+                }
+              }}
+              tabIndex={heading.sortable ? 0 : -1}
+              role="columnheader"
+              aria-sort={sortColumn === heading.title
+                ? sortOrder === "asc" ? "ascending" : "descending"
+                : "none"}
             >
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 {heading.title}
-                {sortColumn === heading.title &&
-                  (sortOrder === "asc"
-                    ? <ChevronUpIcon size={16} />
-                    : <ChevronDownIcon size={16} />)}
+                {heading.sortable && sortColumn === heading.title && (
+                  sortOrder === "asc"
+                    ? <ChevronUpIcon size={16} aria-hidden="true" />
+                    : <ChevronDownIcon size={16} aria-hidden="true" />
+                )}
               </div>
             </th>
           ))}
         </tr>
       </thead>
       <tbody className="max-w-fit">
-        {sortedRows.map((row, index) => {
-          // biome-ignore lint/suspicious/noArrayIndexKey: TODO: Once this table is sortable, this should get fixed.
-          return (<tr key={index} className={`${index % 2 ? 'bg-white dark:bg-white/2' : 'bg-slate-50/50 dark:bg-slate-50/5'} border-b-1 border-slate-200 dark:border-slate-900`}>
-            {row.map((item, index) => {
-              return (index === 0 ?
-                <th
-                  key={item.key ?? index}
-                  className="whitespace-nowrap py-2 text-sm text-text-secondary first:pl-2"
-                  scope="row"
-                >
-                  {item}
-                </th> :
-                <td
-                  key={item.key ?? index}
-                  className="whitespace-nowrap py-2 text-sm text-text-secondary first:pl-2"
-                >
-                  {item}
-                </td>)
-            })}
-          </tr>
+        {sortedRows.map((row) => {
+          const firstCellKey =
+            (React.isValidElement(row[0]) && row[0].key !== null)
+              ? String(row[0].key)
+              : null;
+          const rowKey = firstCellKey ?? Math.random().toString(); // Use random only as last resort
+
+          return (
+            <tr
+              key={rowKey}
+              className={`
+                bg-white dark:bg-white/10
+                odd:bg-slate-800/70 dark:even:bg-slate-900/70
+              `}
+            >
+              {row.map((item, cellIndex) => {
+                const cellKey = `${rowKey}_${cellIndex}`;
+                return cellIndex === 0
+                  ? (
+                    <th
+                      key={cellKey}
+                      className="whitespace-nowrap px-3 py-2 text-sm text-left text-text-secondary"
+                      scope="row"
+                    >
+                      {item}
+                    </th>
+                  )
+                  : (
+                    <td
+                      key={cellKey}
+                      className="whitespace-nowrap px-3 py-2 text-sm text-text-secondary"
+                    >
+                      {item}
+                    </td>
+                  );
+              })}
+            </tr>
           );
         })}
       </tbody>

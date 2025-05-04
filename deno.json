@@ -28,6 +28,19 @@
     ],
     "strictPropertyInitialization": false
   },
+  "fmt": {
+    "exclude": [
+      "*.test.ts",
+      "*.test.tsx"
+    ]
+  },
+  "lint": {
+    "exclude": [
+      "*.test.ts",
+      "*.test.tsx"
+    ],
+    "report": "pretty"
+  },
   "unstable": [
     "sloppy-imports"
   ]

@@ -21,7 +21,9 @@ export const useUnsafeRolesDialog = () => {
       setDialogOpen("unsafeRoles", true);
 
       return new Promise((resolve) => {
-        const handleResponse = ({ action }: { action: "confirm" | "dismiss" }) => {
+        const handleResponse = (
+          { action }: { action: "confirm" | "dismiss" },
+        ) => {
           eventBus.off("dialog:unsafeRoles", handleResponse);
           resolve(action === "confirm");
         };
@@ -29,7 +31,7 @@ export const useUnsafeRolesDialog = () => {
         eventBus.on("dialog:unsafeRoles", handleResponse);
       });
     },
-    [setDialogOpen]
+    [setDialogOpen],
   );
 
   return {

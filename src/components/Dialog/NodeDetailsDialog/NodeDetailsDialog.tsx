@@ -65,7 +65,7 @@ export const NodeDetailsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent >
+      <DialogContent>
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
@@ -78,9 +78,8 @@ export const NodeDetailsDialog = ({
             <div className="flex flex-col">
               <DeviceImage
                 className="w-32 h-32 mx-auto rounded-lg border-4 border-slate-200 dark:border-slate-800"
-                deviceType={
-                  Protobuf.Mesh.HardwareModel[device.user?.hwModel ?? 0]
-                }
+                deviceType={Protobuf.Mesh
+                  .HardwareModel[device.user?.hwModel ?? 0]}
               />
               <div className="bg-slate-100 text-slate-900 dark:text-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
                 <p className="text-lg font-semibold">Details:</p>
@@ -91,16 +90,14 @@ export const NodeDetailsDialog = ({
                 <p>Node Number: {device.num}</p>
                 <p>Node Hex: !{numberToHexUnpadded(device.num)}</p>
                 <p>
-                  Role:{" "}
-                  {
-                    Protobuf.Config.Config_DeviceConfig_Role[
+                  Role: {Protobuf.Config.Config_DeviceConfig_Role[
                     device.user?.role ?? 0
-                    ]
-                  }
+                  ]}
                 </p>
                 <p>
-                  Last Heard:{" "}
-                  {device.lastHeard === 0 ? "Never" : <TimeAgo timestamp={device.lastHeard * 1000} />}
+                  Last Heard: {device.lastHeard === 0
+                    ? "Never"
+                    : <TimeAgo timestamp={device.lastHeard * 1000} />}
                 </p>
               </div>
 
@@ -112,9 +109,9 @@ export const NodeDetailsDialog = ({
                       Coordinates:{" "}
                       <a
                         className="text-blue-500 dark:text-blue-400"
-                        href={`https://www.openstreetmap.org/?mlat=${device.position.latitudeI / 1e7
-                          }&mlon=${device.position.longitudeI / 1e7
-                          }&layers=N`}
+                        href={`https://www.openstreetmap.org/?mlat=${
+                          device.position.latitudeI / 1e7
+                        }&mlon=${device.position.longitudeI / 1e7}&layers=N`}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -140,7 +137,7 @@ export const NodeDetailsDialog = ({
                         <p key={metric.key}>
                           {metric.label}: {metric.format(metric.value)}
                         </p>
-                      )
+                      ),
                   )}
                   {device.deviceMetrics.uptimeSeconds && (
                     <p>
@@ -150,7 +147,6 @@ export const NodeDetailsDialog = ({
                   )}
                 </div>
               )}
-
             </div>
 
             <div className="text-slate-900 dark:text-slate-100 w-full max-w-[464px] bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">

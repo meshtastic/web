@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
-import { useController, type FieldValues } from "react-hook-form";
+import { type FieldValues, useController } from "react-hook-form";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select";
@@ -46,7 +46,8 @@ export function SelectInput<T extends FieldValues>({
     control,
   });
 
-  const { enumValue, formatEnumName, ...remainingProperties } = field.properties;
+  const { enumValue, formatEnumName, ...remainingProperties } =
+    field.properties;
   const valueToKeyMap: Record<string, string> = {};
   const optionsEnumValues: [string, number][] = [];
 

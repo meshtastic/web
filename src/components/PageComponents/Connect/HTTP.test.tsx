@@ -1,15 +1,17 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { HTTP } from "@components/PageComponents/Connect/HTTP.tsx";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
-import { vi, describe, it, expect } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@core/stores/appStore.ts", () => ({
   useAppStore: vi.fn(() => ({ setSelectedDevice: vi.fn() })),
 }));
 
 vi.mock("@core/stores/deviceStore.ts", () => ({
-  useDeviceStore: vi.fn(() => ({ addDevice: vi.fn(() => ({ addConnection: vi.fn() })) })),
+  useDeviceStore: vi.fn(() => ({
+    addDevice: vi.fn(() => ({ addConnection: vi.fn() })),
+  })),
 }));
 
 vi.mock("@core/utils/randId.ts", () => ({
@@ -28,13 +30,13 @@ vi.mock("@meshtastic/core", () => ({
   })),
 }));
 
-
 describe("HTTP Component", () => {
   it("renders correctly", () => {
     render(<HTTP closeDialog={vi.fn()} />);
     expect(screen.getByText("IP Address/Hostname")).toBeInTheDocument();
     expect(screen.getByRole("textbox")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("000.000.000.000 / meshtastic.local")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("000.000.000.000 / meshtastic.local"))
+      .toBeInTheDocument();
     expect(screen.getByText("Use HTTPS")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Connect" })).toBeInTheDocument();
   });
@@ -42,8 +44,9 @@ describe("HTTP Component", () => {
   it("allows input field to be updated", () => {
     render(<HTTP closeDialog={vi.fn()} />);
     const inputField = screen.getByRole("textbox");
-    fireEvent.change(inputField, { target: { value: 'meshtastic.local' } })
-    expect(screen.getByPlaceholderText("000.000.000.000 / meshtastic.local")).toBeInTheDocument();
+    fireEvent.change(inputField, { target: { value: "meshtastic.local" } });
+    expect(screen.getByPlaceholderText("000.000.000.000 / meshtastic.local"))
+      .toBeInTheDocument();
   });
 
   it("toggles HTTPS switch and updates prefix", () => {
@@ -52,10 +55,10 @@ describe("HTTP Component", () => {
     const switchInput = screen.getByRole("switch");
     expect(screen.getByText("http://")).toBeInTheDocument();
 
-    fireEvent.click(switchInput)
+    fireEvent.click(switchInput);
     expect(screen.getByText("https://")).toBeInTheDocument();
 
-    fireEvent.click(switchInput)
+    fireEvent.click(switchInput);
     expect(switchInput).not.toBeChecked();
     expect(screen.getByText("http://")).toBeInTheDocument();
   });
@@ -89,8 +92,7 @@ describe("HTTP Component", () => {
         expect(MeshDevice).toBeCalled();
       });
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   });
 });
-
