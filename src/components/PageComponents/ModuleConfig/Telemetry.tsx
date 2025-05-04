@@ -1,4 +1,4 @@
-import type { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.tsx";
+import type { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -30,8 +30,8 @@ export const Telemetry = () => {
             {
               type: "number",
               name: "deviceUpdateInterval",
-              label: "Query Interval",
-              description: "Interval to get telemetry data",
+              label: "Device Metrics",
+              description: "Device metrics update interval (seconds)",
               properties: {
                 suffix: "Seconds",
               },
@@ -39,8 +39,8 @@ export const Telemetry = () => {
             {
               type: "number",
               name: "environmentUpdateInterval",
-              label: "Update Interval",
-              description: "How often to send Metrics over the mesh",
+              label: "Environment metrics update interval (seconds)",
+              description: "",
               properties: {
                 suffix: "Seconds",
               },
