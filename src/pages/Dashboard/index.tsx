@@ -48,7 +48,7 @@ export const Dashboard = () => {
                       >
                         <div className="flex items-center justify-between">
                           <p className="truncate text-sm font-medium text-accent">
-                            {device.nodes.get(device.hardware.myNodeNum)?.user
+                            {device.getNode(device.hardware.myNodeNum)?.user
                               ?.longName ?? "UNK"}
                           </p>
                           <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
@@ -78,9 +78,9 @@ export const Dashboard = () => {
                                 className="text-slate-400"
                                 aria-hidden="true"
                               />
-                              {device.nodes.size === 0
+                              {device.getNodesLength() === 0
                                 ? 0
-                                : device.nodes.size - 1}
+                                : device.getNodesLength() - 1}
                             </div>
                           </div>
                         </div>
