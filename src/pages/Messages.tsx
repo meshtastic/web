@@ -19,6 +19,7 @@ import {
 } from "@core/stores/messageStore/index.ts";
 import { useSidebar } from "@core/stores/sidebarStore.tsx";
 import { Input } from "@components/UI/Input.tsx";
+import { randId } from "@core/utils/randId.ts";
 
 type NodeInfoWithUnread = Protobuf.Mesh.NodeInfo & { unreadCount: number };
 
@@ -113,8 +114,8 @@ export const MessagesPage = () => {
     } catch (e: any) {
       console.error("Failed to send message:", e);
       // Note: messageId might be undefined here if the error occurred before it was assigned
+      const failedId = messageId ?? randId();
       if (chatType === MessageType.Broadcast) {
-        const failedId = messageId ?? `failed-${Date.now()}`;
         setMessageState({
           type: chatType,
           channelId: channelValue,
@@ -122,7 +123,7 @@ export const MessagesPage = () => {
           newState: MessageState.Failed,
         });
       } else { // MessageType.Direct
-        const failedId = messageId ?? `failed-${Date.now()}`;
+        const failedId = messageId ?? randId();
         setMessageState({
           type: chatType,
           nodeA: getMyNodeNum(),
