@@ -146,8 +146,8 @@ export const Table = ({ headings, rows }: TableProps) => {
             <tr
               key={rowKey}
               className={`
-                bg-white dark:bg-white/10
-                odd:bg-slate-800/70 dark:even:bg-slate-900/70
+                bg-white dark:bg-slate-900
+                odd:bg-slate-200/40 dark:odd:bg-slate-800/40
               `}
             >
               {row.map((item, cellIndex) => {
