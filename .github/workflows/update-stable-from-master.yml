@@ -2,14 +2,10 @@ name: Update Stable Branch from Master on Latest Release
 
 on:
   release:
-    types: [published]
+      types: [released]
 
-# Only run if the published release is NOT a pre-release
-if: github.event.release.prerelease == false
-
-# Define permissions required for the job
 permissions:
-  contents: write # Needed to push to the stable branch
+  contents: write 
 
 jobs:
   update-stable-branch:
