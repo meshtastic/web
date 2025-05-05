@@ -22,12 +22,9 @@ import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { AlertCircle } from "lucide-react";
 import { Link } from "../UI/Typography/Link.tsx";
 import { Fragment } from "react/jsx-runtime";
-import { useState } from "react";
 
 export interface TabElementProps {
   closeDialog: () => void;
-  connectionInProgress: boolean;
-  setConnectionInProgress: (inProgress: boolean) => void;
 }
 
 export interface TabManifest {
@@ -114,26 +111,25 @@ export const NewDeviceDialog = ({
   open,
   onOpenChange,
 }: NewDeviceProps) => {
-  const [connectionInProgress, setConnectionInProgress] = useState(false);
   const { unsupported } = useBrowserFeatureDetection();
 
   const tabs: TabManifest[] = [
     {
       label: "HTTP",
       element: HTTP,
-      isDisabled: connectionInProgress,
+      isDisabled: false,
     },
     {
       label: "Bluetooth",
       element: BLE,
       isDisabled: unsupported.includes("Web Bluetooth") ||
-        unsupported.includes("Secure Context") || connectionInProgress,
+        unsupported.includes("Secure Context"),
     },
     {
       label: "Serial",
       element: Serial,
       isDisabled: unsupported.includes("Web Serial") ||
-        unsupported.includes("Secure Context") || connectionInProgress,
+        unsupported.includes("Secure Context"),
     },
   ];
 
@@ -160,8 +156,6 @@ export const NewDeviceDialog = ({
                   : null}
                 <tab.element
                   closeDialog={() => onOpenChange(false)}
-                  setConnectionInProgress={setConnectionInProgress}
-                  connectionInProgress={connectionInProgress}
                 />
               </fieldset>
             </TabsContent>

@@ -11,8 +11,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export const Serial = (
-  { setConnectionInProgress, closeDialog }: TabElementProps,
+  { closeDialog }: TabElementProps,
 ) => {
+  const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
   const { addDevice } = useDeviceStore();
   const messageStore = useMessageStore();
@@ -46,7 +47,10 @@ export const Serial = (
   };
 
   return (
-    <div className="flex w-full flex-col gap-2 p-4">
+    <fieldset
+      className="flex w-full flex-col gap-2 p-4"
+      disabled={connectionInProgress}
+    >
       <div className="flex h-48 flex-col gap-2 overflow-y-auto">
         {serialPorts.map((port, index) => {
           const { usbProductId, usbVendorId } = port.getInfo();
@@ -85,6 +89,6 @@ export const Serial = (
       >
         <span>New device</span>
       </Button>
-    </div>
+    </fieldset>
   );
 };
