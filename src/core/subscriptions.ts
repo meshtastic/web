@@ -81,8 +81,6 @@ export const subscribeAll = (
 
   connection.events.onMessagePacket.subscribe((messagePacket) => {
     // incoming and outgoing messages are handled by this event listener
-    console.log("Message Packet", messagePacket);
-
     const dto = new PacketToMessageDTO(messagePacket, myNodeNum);
     const message = dto.toMessage();
     messageStore.saveMessage(message);
