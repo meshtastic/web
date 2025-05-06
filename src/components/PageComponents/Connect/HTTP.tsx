@@ -21,9 +21,9 @@ interface FormData {
 }
 
 export const HTTP = (
-  { closeDialog, setConnectionInProgress, connectionInProgress }:
-    TabElementProps,
+  { closeDialog }: TabElementProps,
 ) => {
+  const [connectionInProgress, setConnectionInProgress] = useState(false);
   const isURLHTTPS = location.protocol === "https:";
 
   const { addDevice } = useDeviceStore();
@@ -73,7 +73,11 @@ export const HTTP = (
 
   return (
     <form className="flex w-full flex-col gap-2 p-4" onSubmit={onSubmit}>
-      <div className="flex flex-col gap-2" style={{ minHeight: "12rem" }}>
+      <fieldset
+        className="flex flex-col gap-2"
+        style={{ minHeight: "12rem" }}
+        disabled={connectionInProgress}
+      >
         <div>
           <Label>IP Address/Hostname</Label>
           <Input
@@ -132,7 +136,7 @@ export const HTTP = (
             </div>
           </div>
         )}
-      </div>
+      </fieldset>
       <Button
         type="submit"
         variant="default"

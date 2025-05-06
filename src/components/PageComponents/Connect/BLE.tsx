@@ -10,8 +10,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export const BLE = (
-  { setConnectionInProgress, closeDialog }: TabElementProps,
+  { closeDialog }: TabElementProps,
 ) => {
+  const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);
   const { addDevice } = useDeviceStore();
   const messageStore = useMessageStore();
@@ -40,7 +41,10 @@ export const BLE = (
   };
 
   return (
-    <div className="flex w-full flex-col gap-2 p-4">
+    <fieldset
+      className="flex w-full flex-col gap-2 p-4"
+      disabled={connectionInProgress}
+    >
       <div className="flex h-48 flex-col gap-2 overflow-y-auto">
         {bleDevices.map((device) => (
           <Button
@@ -80,6 +84,6 @@ export const BLE = (
       >
         <span>New device</span>
       </Button>
-    </div>
+    </fieldset>
   );
 };

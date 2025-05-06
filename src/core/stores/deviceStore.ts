@@ -92,19 +92,22 @@ export interface Device {
   ) => Protobuf.Mesh.NodeInfo[];
   getNodesLength: () => number;
   getNode: (nodeNum: number) => Protobuf.Mesh.NodeInfo | undefined;
+  getMyNode: () => Protobuf.Mesh.NodeInfo;
 }
 
 export interface DeviceState {
-  devices: Map<number, Device>;
-  remoteDevices: Map<number, undefined>;
-
   addDevice: (id: number) => Device;
   removeDevice: (id: number) => void;
   getDevices: () => Device[];
   getDevice: (id: number) => Device | undefined;
 }
 
-export const useDeviceStore = createStore<DeviceState>((set, get) => ({
+interface PrivateDeviceState extends DeviceState {
+  devices: Map<number, Device>;
+  remoteDevices: Map<number, undefined>;
+}
+
+export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
   devices: new Map(),
   remoteDevices: new Map(),
 
@@ -575,6 +578,14 @@ export const useDeviceStore = createStore<DeviceState>((set, get) => ({
               return undefined;
             }
             return device.nodesMap.get(nodeNum);
+          },
+          getMyNode: (): Protobuf.Mesh.NodeInfo => {
+            const device = get().devices.get(id);
+            if (!device) {
+              throw new Error(`Device ${id} not found`);
+            }
+            return device.nodesMap.get(device.hardware.myNodeNum) ??
+              create(Protobuf.Mesh.NodeInfoSchema);
           },
           getNodesLength: () => {
             const device = get().devices.get(id);

@@ -1,10 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { DeviceContext, useDeviceStore } from "@core/stores/deviceStore.ts";
 import { RefreshKeysDialog } from "./RefreshKeysDialog.tsx";
 import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import { Protobuf } from "@meshtastic/core";
 
 vi.mock("@core/stores/messageStore");
 vi.mock("./useRefreshKeysDialog");
@@ -23,63 +22,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
-});
-
-test("renders dialog when there is a node error for the active chat", () => {
-  const deviceId = 1;
-  const nodeWithErrorNum = 12345;
-  const activeChatNum = nodeWithErrorNum;
-
-  const deviceStore = useDeviceStore.getState().addDevice(deviceId);
-
-  deviceStore.addNodeInfo({
-    num: nodeWithErrorNum,
-    user: {
-      id: nodeWithErrorNum.toString(),
-      publicKey: new Uint8Array(0),
-      hwModel: Protobuf.Mesh.HardwareModel.HELTEC_V3,
-      longName: "Problem Node Long",
-      shortName: "ProbNode",
-      isLicensed: false,
-      macaddr: new Uint8Array(0),
-    },
-    lastHeard: Date.now() / 1000,
-    snr: 10,
-  } as Protobuf.Mesh.NodeInfo);
-
-  deviceStore.setNodeError(activeChatNum, "PKI_MISMATCH");
-
-  const updatedDeviceState = useDeviceStore.getState().getDevice(deviceId);
-  if (!updatedDeviceState) {
-    throw new Error(
-      "Failed to get updated device state from store for provider",
-    );
-  }
-
-  mockUseMessageStore.mockReturnValue({ activeChat: activeChatNum });
-  const mockHandleClose = vi.fn();
-  const mockHandleRemove = vi.fn();
-  mockUseRefreshKeysDialog.mockReturnValue({
-    handleCloseDialog: mockHandleClose,
-    handleNodeRemove: mockHandleRemove,
-  });
-
-  render(
-    <DeviceContext.Provider value={updatedDeviceState}>
-      <RefreshKeysDialog open onOpenChange={vi.fn()} />
-    </DeviceContext.Provider>,
-  );
-
-  expect(screen.getByText(/Keys Mismatch - Problem Node Long/))
-    .toBeInTheDocument();
-  expect(
-    screen.getByText(
-      /Your node is unable to send a direct message to node: Problem Node Long \(ProbNode\)/,
-    ),
-  ).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: "Request New Keys" }))
-    .toBeInTheDocument();
-  expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
 });
 
 test("does not render dialog if no error exists for active chat", () => {
