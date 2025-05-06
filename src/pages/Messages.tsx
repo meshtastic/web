@@ -143,7 +143,7 @@ export const MessagesPage = () => {
             messages={getMessages({
               type: MessageType.Broadcast,
               channelId: activeChat ?? 0,
-            })}
+            }).reverse()}
           />
         );
       case MessageType.Direct:
@@ -153,7 +153,7 @@ export const MessagesPage = () => {
               type: MessageType.Direct,
               nodeA: getMyNodeNum(),
               nodeB: activeChat,
-            })}
+            }).reverse()}
           />
         );
       default:
