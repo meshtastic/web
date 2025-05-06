@@ -50,11 +50,20 @@ docker run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshta
 podman run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshtastic/web
 ```
 
-## Nightly releases
+## Release Schedule
 
-Our nightly releases provide the latest development builds with cutting-edge
-features and fixes. These builds are automatically generated from the latest
-main branch every night and are available for testing and early adoption.
+Our release process follows these guidelines:
+
+- **Versioning:** We use Semantic Versioning (`Major.Minor.Patch`).
+- **Stable Releases:** Published around the beginning of each month (e.g.,
+  `v2.3.4`).
+- **Pre-releases:** A pre-release is typically issued mid-month for testing and
+  early adoption.
+- **Nightly Builds:** An experimental Docker image containing the latest
+  cutting-edge features and fixes is automatically built nightly from the
+  `master` branch.
+
+### Nightly Builds
 
 ```bash
 # With Docker
@@ -73,7 +82,7 @@ podman run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshta
 >   new features
 > - No guarantee of backward compatibility between nightly builds
 
-### Version Information
+#### Version Information
 
 Each nightly build is tagged with:
 
