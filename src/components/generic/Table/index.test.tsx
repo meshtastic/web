@@ -40,25 +40,46 @@ describe("Generic Table", () => {
 
   // A simplified version of the rows in pages/Nodes.tsx for testing purposes
   const mockDevicesWithShortNameAndConnection = [
-    { user: { shortName: "TST1" }, hopsAway: 1, lastHeard: Date.now() + 1000 },
-    { user: { shortName: "TST2" }, hopsAway: 0, lastHeard: Date.now() + 4000 },
-    { user: { shortName: "TST3" }, hopsAway: 4, lastHeard: Date.now() },
-    { user: { shortName: "TST4" }, hopsAway: 3, lastHeard: Date.now() + 2000 },
+    {
+      user: { shortName: "TST1" },
+      hopsAway: 1,
+      lastHeard: Date.now() + 1000,
+      viaMqtt: false,
+    },
+    {
+      user: { shortName: "TST2" },
+      hopsAway: 0,
+      lastHeard: Date.now() + 4000,
+      viaMqtt: true,
+    },
+    {
+      user: { shortName: "TST3" },
+      hopsAway: 4,
+      lastHeard: Date.now(),
+      viaMqtt: false,
+    },
+    {
+      user: { shortName: "TST4" },
+      hopsAway: 3,
+      lastHeard: Date.now() + 2000,
+      viaMqtt: true,
+    },
   ];
 
   const mockRows = mockDevicesWithShortNameAndConnection.map((node) => [
     <h1 data-testshortname key={node.user.shortName}>{node.user.shortName}</h1>,
-    <React.Fragment key={node.user.shortName}>
+    <Mono key="lastHeard" data-testheard>
       <TimeAgo timestamp={node.lastHeard * 1000} />
-    </React.Fragment>,
+    </Mono>,
     <Mono key="hops" data-testhops>
       {node.lastHeard !== 0
-        ? node.hopsAway === 0
+        ? node.viaMqtt === false && node.hopsAway === 0
           ? "Direct"
           : `${node.hopsAway?.toString()} ${
-            node.hopsAway > 1 ? "hops" : "hop"
+            node.hopsAway ?? 0 > 1 ? "hops" : "hop"
           } away`
         : "-"}
+      {node.viaMqtt === true ? ", via MQTT" : ""}
     </Mono>,
   ]);
 
