@@ -41,7 +41,10 @@ export const RefreshKeysDialog = (
   };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-8 flex flex-col gap-2">
+      <DialogContent
+        className="max-w-8 flex flex-col gap-2"
+        aria-describedby={undefined}
+      >
         <DialogClose onClick={handleCloseDialog} />
         <DialogHeader>
           <DialogTitle>{text.title}</DialogTitle>
@@ -77,7 +80,6 @@ export const RefreshKeysDialog = (
             </div>
           </li>
         </ul>
-        {/* </DialogDescription> */}
       </DialogContent>
     </Dialog>
   );

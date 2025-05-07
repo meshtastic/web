@@ -65,7 +65,7 @@ export const NodeDetailsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
