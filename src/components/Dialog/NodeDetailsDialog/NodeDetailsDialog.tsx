@@ -65,7 +65,7 @@ export const NodeDetailsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
@@ -128,7 +128,7 @@ export const NodeDetailsDialog = ({
 
               {device.deviceMetrics && (
                 <div className="text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
-                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-0">
+                  <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                     Device Metrics:
                   </p>
                   {deviceMetricsMap.map(

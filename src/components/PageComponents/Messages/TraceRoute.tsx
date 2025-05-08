@@ -27,7 +27,7 @@ const RoutePath = (
   return (
     <span
       id={title}
-      className="ml-4 border-l-2 border-l-background-primary pl-2 text-slate-900 dark:text-slate-900"
+      className="ml-4 border-l-2 pl-2 border-l-slate-900 text-slate-900 dark:text-slate-100 dark:border-l-slate-100"
     >
       <p className="font-semibold">{title}</p>
       <p>{startNode?.user?.longName}</p>

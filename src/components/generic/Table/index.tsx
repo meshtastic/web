@@ -62,16 +62,16 @@ export const Table = ({ headings, rows }: TableProps) => {
     const elementB = getElement(b[columnIndex]);
 
     if (sortColumn === "Last Heard") {
-      const aTimestamp = elementA?.props?.timestamp ?? 0;
-      const bTimestamp = elementB?.props?.timestamp ?? 0;
+      const aTimestamp = elementA?.props?.children?.props?.timestamp ?? 0;
+      const bTimestamp = elementB?.props?.children?.props?.timestamp ?? 0;
       if (aTimestamp < bTimestamp) return sortOrder === "asc" ? -1 : 1;
       if (aTimestamp > bTimestamp) return sortOrder === "asc" ? 1 : -1;
       return 0;
     }
 
     if (sortColumn === "Connection") {
-      const aHopsStr = elementA?.props?.children;
-      const bHopsStr = elementB?.props?.children;
+      const aHopsStr = elementA?.props?.children[0];
+      const bHopsStr = elementB?.props?.children[0];
       const aNumHops = numericHops(aHopsStr);
       const bNumHops = numericHops(bHopsStr);
       if (aNumHops < bNumHops) return sortOrder === "asc" ? -1 : 1;
