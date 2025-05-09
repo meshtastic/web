@@ -93,6 +93,7 @@ export interface Device {
   getNodesLength: () => number;
   getNode: (nodeNum: number) => Protobuf.Mesh.NodeInfo | undefined;
   getMyNode: () => Protobuf.Mesh.NodeInfo;
+  setFavorite: (nodeNum: number, isFavorite: boolean) => void;
 }
 
 export interface DeviceState {
@@ -593,6 +594,19 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               return 0;
             }
             return device.nodesMap.size;
+          },
+          setFavorite(nodeNum: number, isFavorite: boolean) {
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) throw new Error(`Device ${id} not found`);
+
+                const node = device.nodesMap.get(nodeNum);
+                if (!node) throw new Error(`Node ${nodeNum} not found`);
+
+                node.isFavorite = isFavorite;
+              }),
+            );
           },
         });
       }),

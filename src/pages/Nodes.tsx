@@ -1,5 +1,5 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
-import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog.tsx";
+import { NodeDetailsDialog } from "@app/components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
@@ -164,7 +164,7 @@ const NodesPage = (): JSX.Element => {
               </Mono>,
             ])}
           />
-          <NodeOptionsDialog
+          <NodeDetailsDialog
             node={selectedNode}
             open={!!selectedNode}
             onOpenChange={() => setSelectedNode(undefined)}
