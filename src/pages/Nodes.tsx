@@ -27,7 +27,7 @@ export interface DeleteNoteDialogProps {
 }
 
 const NodesPage = (): JSX.Element => {
-  const { getNodes, hardware, connection } = useDevice();
+  const { getNodes, hardware, connection, hasNodeError } = useDevice();
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);
@@ -110,7 +110,11 @@ const NodesPage = (): JSX.Element => {
             ]}
             rows={filteredNodes.map((node) => [
               <div key={node.num}>
-                <Avatar text={node.user?.shortName ?? "UNK "} />
+                <Avatar
+                  text={node.user?.shortName ?? "UNK "}
+                  showFavourite={node.isFavorite}
+                  showError={hasNodeError(node.num)}
+                />
               </div>,
               <h1
                 key="longName"
