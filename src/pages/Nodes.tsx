@@ -112,7 +112,7 @@ const NodesPage = (): JSX.Element => {
               <div key={node.num}>
                 <Avatar
                   text={node.user?.shortName ?? "UNK "}
-                  showFavourite={node.isFavorite}
+                  showFavorite={node.isFavorite}
                   showError={hasNodeError(node.num)}
                 />
               </div>,
