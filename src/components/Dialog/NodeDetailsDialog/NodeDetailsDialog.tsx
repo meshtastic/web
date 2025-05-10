@@ -12,6 +12,9 @@ import { DeviceImage } from "@components/generic/DeviceImage.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Uptime } from "@components/generic/Uptime.tsx";
 import { toast } from "@core/hooks/useToast.ts";
+import { useUpdateFavorite } from "../../../core/hooks/useUpdateFavorite.ts";
+import { useUpdateIgnored } from "../../../core/hooks/useUpdateIgnored.ts";
+import { cn } from "@core/utils/cn.ts";
 
 import {
   Accordion,
@@ -30,8 +33,8 @@ import {
 import { Button } from "@components/UI/Button.tsx";
 
 import {
-  EarIcon,
-  EarOffIcon,
+  BellIcon,
+  BellOffIcon,
   MapPinnedIcon,
   MessageSquareIcon,
   StarIcon,
@@ -58,20 +61,24 @@ export const NodeDetailsDialog = ({
   open,
   onOpenChange,
 }: NodeDetailsDialogProps) => {
-  const { setDialogOpen, connection, setActivePage, setFavorite } = useDevice();
+  const { setDialogOpen, connection, setActivePage } = useDevice();
   const { setNodeNumToBeRemoved } = useAppStore();
   const { setChatType, setActiveChat } = useMessageStore();
-  const [isFavouriteState, setIsFavoriteState] = useState<boolean>(false);
+  const { updateFavorite } = useUpdateFavorite();
+  const [isFavoriteState, setIsFavoriteState] = useState<boolean>(false);
+  const { updateIgnored } = useUpdateIgnored();
+  const [isIgnoredState, setIsIgnoredState] = useState<boolean>(false);
 
   useEffect(() => {
     if (!node) return;
     setIsFavoriteState(node?.isFavorite);
+    setIsIgnoredState(node?.isIgnored);
   }, [node]);
 
-  if (!node) return null;
+  if (!node) return;
 
   function handleDirectMessage() {
-    if (!node) return null;
+    if (!node) return;
 
     setChatType(MessageType.Direct);
     setActiveChat(node.num);
@@ -79,7 +86,7 @@ export const NodeDetailsDialog = ({
   }
 
   function handleRequestPosition() {
-    if (!node) return null;
+    if (!node) return;
 
     toast({
       title: "Requesting position, please wait...",
@@ -93,7 +100,7 @@ export const NodeDetailsDialog = ({
   }
 
   function handleTraceroute() {
-    if (!node) return null;
+    if (!node) return;
 
     toast({
       title: "Sending Traceroute, please wait...",
@@ -107,17 +114,25 @@ export const NodeDetailsDialog = ({
   }
 
   function handleNodeRemove() {
-    if (!node) return null;
+    if (!node) return;
 
     setNodeNumToBeRemoved(node?.num);
     setDialogOpen("nodeRemoval", true);
     onOpenChange(false);
   }
 
-  function handleToggleFavourite() {
-    if (!node) return null;
-    setFavorite(node.num, !isFavouriteState);
-    setIsFavoriteState(!isFavouriteState);
+  function handleToggleFavorite() {
+    if (!node) return;
+
+    updateFavorite({ nodeNum: node.num, isFavorite: !isFavoriteState });
+    setIsFavoriteState(!isFavoriteState);
+  }
+
+  function handleToggleIgnored() {
+    if (!node) return;
+
+    updateIgnored({ nodeNum: node.num, isIgnored: !isIgnoredState });
+    setIsIgnoredState(!isIgnoredState);
   }
 
   const deviceMetricsMap = [
@@ -168,9 +183,9 @@ export const NodeDetailsDialog = ({
                 <WaypointsIcon className="mr-2" />
                 Trace Route
               </Button>
-              <Button className="mr-1" onClick={handleToggleFavourite}>
+              <Button className="mr-1" onClick={handleToggleFavorite}>
                 <StarIcon
-                  className={isFavouriteState ? " fill-yellow-400" : ""}
+                  className={isFavoriteState ? " fill-yellow-400" : ""}
                 />
               </Button>
               <div className="flex flex-1 justify-start"></div>
@@ -179,14 +194,19 @@ export const NodeDetailsDialog = ({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      variant={node.isIgnored ? "default" : "destructive"}
-                      className="flex justify-end mr-1"
+                      className={cn(
+                        "flex justify-end mr-1 text-white",
+                        isIgnoredState
+                          ? ""
+                          : "bg-red-500 dark:bg-red-500 hover:bg-red-600 hover:dark:bg-red-600 text-white dark:text-white",
+                      )}
+                      onClick={handleToggleIgnored}
                     >
-                      {node.isIgnored ? <EarIcon /> : <EarOffIcon />}
+                      {isIgnoredState ? <BellIcon /> : <BellOffIcon />}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                    {node.isIgnored ? "Unignore node" : "Ignore node"}
+                    {isIgnoredState ? "Unignore node" : "Ignore node"}
                     <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
                   </TooltipContent>
                 </Tooltip>
@@ -273,7 +293,7 @@ export const NodeDetailsDialog = ({
                     </>
                   )
                   : <p>Unknown</p>}
-                <Button onClick={handleRequestPosition}>
+                <Button onClick={handleRequestPosition} className="mt-2">
                   <MapPinnedIcon className="mr-2" />
                   Request Position
                 </Button>

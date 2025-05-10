@@ -20,7 +20,7 @@ interface AvatarProps {
   size?: "sm" | "lg";
   className?: string;
   showError?: boolean;
-  showFavourite?: boolean;
+  showFavorite?: boolean;
 }
 
 class ColorUtils {
@@ -70,7 +70,7 @@ export const Avatar = ({
   text,
   size = "sm",
   showError = false,
-  showFavourite = false,
+  showFavorite = false,
   className,
 }: AvatarProps) => {
   const sizes = {
@@ -97,7 +97,7 @@ export const Avatar = ({
         color: textColor,
       }}
     >
-      {showFavourite
+      {showFavorite
         ? (
           <TooltipProvider delayDuration={300}>
             <Tooltip>
@@ -111,7 +111,7 @@ export const Avatar = ({
                 />
               </TooltipTrigger>
               <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                Favourite
+                Favorite
                 <TooltipArrow className="fill-slate-800" />
               </TooltipContent>
             </Tooltip>

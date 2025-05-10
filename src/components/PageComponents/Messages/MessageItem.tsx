@@ -150,7 +150,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
           size="sm"
           text={shortName}
           className="pt-0.5"
-          showFavourite={isFavorite}
+          showFavorite={isFavorite}
         />
 
         <div className="flex flex-col gap-0.5 min-w-0">

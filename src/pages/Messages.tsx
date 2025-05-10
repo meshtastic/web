@@ -239,7 +239,7 @@ export const MessagesPage = () => {
                 text={node.user?.shortName ?? "UNK"}
                 className={cn(hasNodeError(node.num) && "text-red-500")}
                 showError={hasNodeError(node.num)}
-                showFavourite={node.isFavorite}
+                showFavorite={node.isFavorite}
                 size="sm"
               />
             </SidebarButton>

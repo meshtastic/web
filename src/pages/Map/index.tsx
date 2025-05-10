@@ -147,7 +147,7 @@ const MapPage = () => {
               text={node.user?.shortName?.toString() ?? node.num.toString()}
               className="border-[1.5px] border-slate-600 shadow-xl shadow-slate-600"
               showError={hasNodeError(node.num)}
-              showFavourite={node.isFavorite}
+              showFavorite={node.isFavorite}
             />
           </Marker>
         );

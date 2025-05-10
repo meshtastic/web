@@ -1,18 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { Protobuf } from "@meshtastic/core";
 
-vi.mock("@core/stores/deviceStore");
+vi.mock("@core/stores/deviceStore", () => {
+  return {
+    useDevice: () => ({
+      setDialogOpen: vi.fn(),
+    }),
+  };
+});
 vi.mock("@core/stores/appStore");
 
-const mockUseDevice = vi.mocked(useDevice);
 const mockUseAppStore = vi.mocked(useAppStore);
 
 describe("NodeDetailsDialog", () => {
-  const mockDevice = {
+  const mockNode = {
     num: 1234,
     user: {
       longName: "Test Node",
@@ -38,22 +42,13 @@ describe("NodeDetailsDialog", () => {
   beforeEach(() => {
     vi.resetAllMocks();
 
-    mockUseDevice.mockReturnValue({
-      getNode: (nodeNum: number) => {
-        if (nodeNum === 1234) {
-          return mockDevice;
-        }
-        return undefined;
-      },
-    });
-
     mockUseAppStore.mockReturnValue({
       nodeNumDetails: 1234,
     });
   });
 
   it("renders node details correctly", () => {
-    render(<NodeDetailsDialog open onOpenChange={() => {}} />);
+    render(<NodeDetailsDialog open node={mockNode} onOpenChange={() => {}} />);
 
     expect(screen.getByText(/Node Details for Test Node \(TN\)/i))
       .toBeInTheDocument();
@@ -82,27 +77,11 @@ describe("NodeDetailsDialog", () => {
     expect(screen.getByText(/All Raw Metrics:/i)).toBeInTheDocument();
   });
 
-  it("renders null if device is not found", () => {
-    const requestedNodeNum = 5678;
-
-    mockUseAppStore.mockReturnValue({
-      nodeNumDetails: requestedNodeNum,
-    });
-
-    mockUseDevice.mockReturnValue({
-      getNode: (nodeNum: number) => {
-        if (nodeNum === requestedNodeNum) {
-          return undefined;
-        }
-        if (nodeNum === 1234) {
-          return mockDevice;
-        }
-        return undefined;
-      },
-    });
+  it("renders null if node is undefined", () => {
+    const mockNode = undefined;
 
     const { container } = render(
-      <NodeDetailsDialog open onOpenChange={() => {}} />,
+      <NodeDetailsDialog open node={mockNode} onOpenChange={() => {}} />,
     );
 
     expect(container.firstChild).toBeNull();
@@ -110,11 +89,15 @@ describe("NodeDetailsDialog", () => {
   });
 
   it("renders correctly when position is missing", () => {
-    const nodeWithoutPosition = { ...mockDevice, position: undefined };
-    mockUseDevice.mockReturnValue({ getNode: () => nodeWithoutPosition });
-    mockUseAppStore.mockReturnValue({ nodeNumDetails: 1234 });
+    const nodeWithoutPosition = { ...mockNode, position: undefined };
 
-    render(<NodeDetailsDialog open onOpenChange={() => {}} />);
+    render(
+      <NodeDetailsDialog
+        open
+        node={nodeWithoutPosition}
+        onOpenChange={() => {}}
+      />,
+    );
 
     expect(screen.queryByText(/Coordinates:/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Altitude:/i)).not.toBeInTheDocument();
@@ -122,11 +105,15 @@ describe("NodeDetailsDialog", () => {
   });
 
   it("renders correctly when deviceMetrics are missing", () => {
-    const nodeWithoutMetrics = { ...mockDevice, deviceMetrics: undefined };
-    mockUseDevice.mockReturnValue({ getNode: () => nodeWithoutMetrics });
-    mockUseAppStore.mockReturnValue({ nodeNumDetails: 1234 });
+    const nodeWithoutMetrics = { ...mockNode, deviceMetrics: undefined };
 
-    render(<NodeDetailsDialog open onOpenChange={() => {}} />);
+    render(
+      <NodeDetailsDialog
+        open
+        node={nodeWithoutMetrics}
+        onOpenChange={() => {}}
+      />,
+    );
 
     expect(screen.queryByText(/Device Metrics:/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Air TX utilization:/i)).not.toBeInTheDocument();
@@ -134,11 +121,11 @@ describe("NodeDetailsDialog", () => {
   });
 
   it("renders 'Never' for lastHeard when timestamp is 0", () => {
-    const nodeNeverHeard = { ...mockDevice, lastHeard: 0 };
-    mockUseDevice.mockReturnValue({ getNode: () => nodeNeverHeard });
-    mockUseAppStore.mockReturnValue({ nodeNumDetails: 1234 });
+    const nodeNeverHeard = { ...mockNode, lastHeard: 0 };
 
-    render(<NodeDetailsDialog open onOpenChange={() => {}} />);
+    render(
+      <NodeDetailsDialog open node={nodeNeverHeard} onOpenChange={() => {}} />,
+    );
 
     expect(screen.getByText(/Last Heard: Never/i)).toBeInTheDocument();
   });
