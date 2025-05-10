@@ -53,7 +53,7 @@ export function ErrorPage({ error }: { error: Error }) {
 
         <div className="hidden md:block md:max-w-64 lg:max-w-80 w-full aspect-suqare">
           <img
-            src="/images/chirpy.svg"
+            src="chirpy.svg"
             alt="Chirpy the Meshtastic error"
             className="max-w-full h-auto"
           />
