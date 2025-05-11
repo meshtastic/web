@@ -31,7 +31,6 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { Button } from "@components/UI/Button.tsx";
-
 import {
   BellIcon,
   BellOffIcon,
@@ -64,8 +63,10 @@ export const NodeDetailsDialog = ({
   const { setDialogOpen, connection, setActivePage } = useDevice();
   const { setNodeNumToBeRemoved } = useAppStore();
   const { setChatType, setActiveChat } = useMessageStore();
+
   const { updateFavorite } = useUpdateFavorite();
   const [isFavoriteState, setIsFavoriteState] = useState<boolean>(false);
+
   const { updateIgnored } = useUpdateIgnored();
   const [isIgnoredState, setIsIgnoredState] = useState<boolean>(false);
 
@@ -251,7 +252,8 @@ export const NodeDetailsDialog = ({
                   </p>
                   <p>
                     Hardware:{" "}
-                    {Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]
+                    {(Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
+                      "Unknown")
                       .replace(/_/g, " ")}
                   </p>
                 </div>
