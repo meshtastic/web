@@ -35,7 +35,7 @@ const NodesPage = (): JSX.Element => {
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
   >();
   const [selectedLocation, setSelectedLocation] = useState<
-    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
+    Types.PacketMetadata<Protobuf.Mesh.Position> | undefined
   >();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const deferredSearch = useDeferredValue(searchTerm);
@@ -85,7 +85,6 @@ const NodesPage = (): JSX.Element => {
       <PageLayout
         label=""
         leftBar={<Sidebar />}
-        className="flex flex-col w-full"
       >
         <div className="p-2">
           <Input
