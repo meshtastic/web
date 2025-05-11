@@ -125,7 +125,7 @@ const NodesPage = (): JSX.Element => {
                 {node.user?.longName ?? numberToHexUnpadded(node.num)}
               </h1>,
               <Mono key="hops" className="w-16">
-                {node.lastHeard !== 0
+                {node.lastHeard !== 0 && typeof node.hopsAway !== "undefined"
                   ? node.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
                     : `${node.hopsAway?.toString()} ${
