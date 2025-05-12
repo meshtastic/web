@@ -90,8 +90,7 @@ describe("useIgnoreNode hook", () => {
       result.current.updateIgnored({ nodeNum: 9999, isIgnored: false });
     });
 
-    expect(mockToast).toHaveBeenCalledWith({
-      title: "Removed node from ignore list",
-    });
+    expect(mockUpdateIgnore).not.toHaveBeenCalled();
+    expect(mockToast).not.toHaveBeenCalled();
   });
 });

@@ -13,9 +13,10 @@ export function useIgnoreNode() {
 
   const updateIgnoredCB = useCallback(
     ({ nodeNum, isIgnored }: IgnoreNodeOptions) => {
-      updateIgnored(nodeNum, isIgnored);
-
       const node = getNode(nodeNum);
+      if (!node) return;
+
+      updateIgnored(nodeNum, isIgnored);
 
       toast({
         title: `${isIgnored ? "Added" : "Removed"} ${

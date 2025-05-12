@@ -13,9 +13,10 @@ export function useFavoriteNode() {
 
   const updateFavoriteCB = useCallback(
     ({ nodeNum, isFavorite }: FavoriteNodeOptions) => {
-      updateFavorite(nodeNum, isFavorite);
-
       const node = getNode(nodeNum);
+      if (!node) return;
+
+      updateFavorite(nodeNum, isFavorite);
 
       toast({
         title: `${isFavorite ? "Added" : "Removed"} ${

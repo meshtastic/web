@@ -87,8 +87,7 @@ describe("useFavoriteNode hook", () => {
       result.current.updateFavorite({ nodeNum: 9999, isFavorite: false });
     });
 
-    expect(mockToast).toHaveBeenCalledWith({
-      title: "Removed node from favorites",
-    });
+    expect(mockUpdateFavorite).not.toHaveBeenCalled();
+    expect(mockToast).not.toHaveBeenCalled();
   });
 });
