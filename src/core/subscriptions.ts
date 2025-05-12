@@ -142,4 +142,8 @@ export const subscribeAll = (
       }
     }
   });
+
+  connection.events.onNeighborInfoPacket.subscribe((neighborInfo) => {
+    device.setNeighborInfo(neighborInfo.from, neighborInfo.data);
+  });
 };
