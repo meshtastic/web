@@ -22,6 +22,7 @@ import {
 import MapGl from "react-map-gl/maplibre";
 import { useNodeFilters } from "@core/hooks/useNodeFilters.ts";
 import { FilterControl } from "@pages/Map/FilterControl.tsx";
+import { cn } from "@core/utils/cn.ts";
 
 // taken from android client these probably should be moved into a shared file
 const SNR_GOOD_THRESHOLD = -7;
@@ -33,10 +34,16 @@ const LINE_FAIR_COLOR = "#ffe600";
 const LINE_BAD_COLOR = "#f7931a";
 
 const getSignalColor = (snr: number, rssi?: number) => {
-  if (snr > SNR_GOOD_THRESHOLD && (rssi == null || rssi > RSSI_GOOD_THRESHOLD))
+  if (
+    snr > SNR_GOOD_THRESHOLD && (rssi == null || rssi > RSSI_GOOD_THRESHOLD)
+  ) {
     return LINE_GOOD_COLOR;
-  if (snr > SNR_FAIR_THRESHOLD && (rssi == null || rssi > RSSI_FAIR_THRESHOLD))
+  }
+  if (
+    snr > SNR_FAIR_THRESHOLD && (rssi == null || rssi > RSSI_FAIR_THRESHOLD)
+  ) {
     return LINE_FAIR_COLOR;
+  }
   return LINE_BAD_COLOR;
 };
 
@@ -63,11 +70,12 @@ const generateNeighborLines = (
 ) => {
   const features = [];
   for (const { node, neighborInfo } of nodes) {
+    if (!node.position) continue;
     const start = convertToLatLng(node.position);
     if (!neighborInfo) continue;
     for (const neighbor of neighborInfo.neighbors) {
       const toNode = nodes.find((n) => n.node.num === neighbor.nodeId)?.node;
-      if (!toNode) continue;
+      if (!toNode || !toNode.position) continue;
       const end = convertToLatLng(toNode.position);
       features.push({
         type: "Feature",
@@ -90,8 +98,11 @@ const generateNeighborLines = (
     features,
   };
 };
-const generateDirectLines = (nodes: Protobuf.Mesh.NodeInfo[]) => {
-  const selfNode = nodes.find((n) => n.isFavorite);
+const generateDirectLines = (
+  myNode: Protobuf.Mesh.NodeInfo,
+  nodes: Protobuf.Mesh.NodeInfo[],
+) => {
+  // const selfNode = nodes.find((n) => n.isFavorite);
   const features: {
     type: string;
     geometry: {
@@ -103,15 +114,15 @@ const generateDirectLines = (nodes: Protobuf.Mesh.NodeInfo[]) => {
     };
   }[] = [];
 
-  if (!selfNode || !selfNode.position)
+  if (!myNode || !myNode.position) {
     return { type: "FeatureCollection", features };
+  }
 
   for (const node of nodes) {
-    if (!node.position) continue;
-    if (node.hopsAway > 0) continue;
+    if (!node.position || node.hopsAway !== 0) continue;
     if (Date.now() / 1000 - node.lastHeard > DIRECT_NODE_TIMEOUT) continue;
     const start = convertToLatLng(node.position);
-    const end = convertToLatLng(selfNode.position);
+    const end = convertToLatLng(myNode.position);
     features.push({
       type: "Feature",
       geometry: {
@@ -133,7 +144,7 @@ const generateDirectLines = (nodes: Protobuf.Mesh.NodeInfo[]) => {
   };
 };
 const MapPage = () => {
-  const { getNodes, waypoints, neighborInfo } = useDevice();
+  const { getNodes, getMyNode, waypoints, neighborInfo } = useDevice();
   const { theme } = useTheme();
   const { default: map } = useMap();
 
@@ -142,6 +153,12 @@ const MapPage = () => {
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | null
   >(null);
+
+  const [showSNRLines, setShowSNRLines] = useState(true);
+
+  const toggleSNRLines = () => {
+    setShowSNRLines((prev) => !prev);
+  };
 
   // Filter out nodes without a valid position
   const validNodes = useMemo(
@@ -152,7 +169,7 @@ const MapPage = () => {
       ),
     [getNodes],
   );
-
+  const myNode = useMemo(() => getMyNode(), [getMyNode]);
   const {
     filters,
     defaultState,
@@ -180,6 +197,7 @@ const MapPage = () => {
       setSelectedNode(node);
 
       if (map) {
+        if (!node.position) return;
         const position = convertToLatLng(node.position);
         map.easeTo({
           center: [position.longitude, position.latitude],
@@ -232,6 +250,7 @@ const MapPage = () => {
   const markers = useMemo(
     () =>
       filteredNodes.map((node) => {
+        if (!node.position) return null;
         const position = convertToLatLng(node.position);
         return (
           <Marker
@@ -252,17 +271,28 @@ const MapPage = () => {
   );
 
   const neighborLines = useMemo(() => {
+    if (!showSNRLines) return { type: "FeatureCollection", features: [] };
     return generateNeighborLines(
-      validNodes.map((vn) => ({
-        node: vn,
-        neighborInfo: neighborInfo.get(vn.num),
-      })),
+      filteredNodes
+        .map((vn) => ({
+          node: vn,
+          neighborInfo: neighborInfo.get(vn.num),
+        }))
+        .filter((
+          item,
+        ): item is {
+          node: Protobuf.Mesh.NodeInfo;
+          neighborInfo: Protobuf.Mesh.NeighborInfo;
+        } => item.neighborInfo !== undefined),
     );
-  }, [validNodes, neighborInfo]);
+  }, [filteredNodes, neighborInfo, showSNRLines]);
 
   const directLines = useMemo(
-    () => generateDirectLines(validNodes),
-    [validNodes],
+    () => {
+      if (!showSNRLines) return { type: "FeatureCollection", features: [] };
+      return generateDirectLines(myNode, filteredNodes);
+    },
+    [myNode, filteredNodes, showSNRLines],
   );
   useEffect(() => {
     map?.on("load", () => {
@@ -350,7 +380,19 @@ const MapPage = () => {
             )
             : null}
         </MapGl>
-
+        <button
+          type="button"
+          className={cn(
+            "fixed bottom-17 right-16 px-1 py-1 rounded shadow-md",
+            isDirty
+              ? " text-slate-100  bg-green-600 hover:bg-green-700 hover:text-slate-200 active:bg-green-800"
+              : "text-slate-600  bg-slate-100 hover:bg-slate-200 hover:text-slate-700 active:bg-slate-300",
+          )}
+          onClick={toggleSNRLines}
+          aria-label="SNR Lines"
+        >
+          SNR Lines
+        </button>
         <FilterControl
           groupedFilterConfigs={groupedFilterConfigs}
           values={filters}
