@@ -41,9 +41,9 @@ export const Security = () => {
     privateKeyDialogOpen: false,
   });
 
-  const stateRef = useRef(state);
+  const adminKeysRef = useRef(state);
   useEffect(() => {
-    stateRef.current = state;
+    adminKeysRef.current = state;
   }, [state]);
 
   const validateKey = (
@@ -97,7 +97,7 @@ export const Security = () => {
       return;
     }
 
-    const current = stateRef.current;
+    const current = adminKeysRef.current;
 
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
