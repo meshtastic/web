@@ -2,17 +2,17 @@ import { useCallback } from "react";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 
-interface UpdateFavoriteOptions {
+interface FavoriteNodeOptions {
   nodeNum: number;
   isFavorite: boolean;
 }
 
-export function useUpdateFavorite() {
+export function useFavoriteNode() {
   const { updateFavorite, getNode } = useDevice();
   const { toast } = useToast();
 
   const updateFavoriteCB = useCallback(
-    ({ nodeNum, isFavorite }: UpdateFavoriteOptions) => {
+    ({ nodeNum, isFavorite }: FavoriteNodeOptions) => {
       updateFavorite(nodeNum, isFavorite);
 
       const node = getNode(nodeNum);

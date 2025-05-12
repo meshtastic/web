@@ -7,13 +7,13 @@ interface FavoriteIconProps {
   showFavorite: boolean;
 }
 
-interface WrapperProps {
+interface AvatarCellProps {
   children: React.ReactElement<FavoriteIconProps>;
 }
 
 export interface TableProps {
   headings: Heading[];
-  rows: React.ReactElement<WrapperProps>[][];
+  rows: React.ReactElement<AvatarCellProps>[][];
 }
 
 export interface Heading {

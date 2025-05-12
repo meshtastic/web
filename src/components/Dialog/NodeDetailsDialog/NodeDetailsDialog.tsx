@@ -12,8 +12,8 @@ import { DeviceImage } from "@components/generic/DeviceImage.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Uptime } from "@components/generic/Uptime.tsx";
 import { toast } from "@core/hooks/useToast.ts";
-import { useUpdateFavorite } from "../../../core/hooks/useUpdateFavorite.ts";
-import { useUpdateIgnored } from "../../../core/hooks/useUpdateIgnored.ts";
+import { useFavoriteNode } from "../../../core/hooks/useFavoriteNode.ts";
+import { useIgnoreNode } from "../../../core/hooks/useIgnoreNode.ts";
 import { cn } from "@core/utils/cn.ts";
 
 import {
@@ -64,10 +64,10 @@ export const NodeDetailsDialog = ({
   const { setNodeNumToBeRemoved } = useAppStore();
   const { setChatType, setActiveChat } = useMessageStore();
 
-  const { updateFavorite } = useUpdateFavorite();
+  const { updateFavorite } = useFavoriteNode();
   const [isFavoriteState, setIsFavoriteState] = useState<boolean>(false);
 
-  const { updateIgnored } = useUpdateIgnored();
+  const { updateIgnored } = useIgnoreNode();
   const [isIgnoredState, setIsIgnoredState] = useState<boolean>(false);
 
   useEffect(() => {
@@ -186,7 +186,9 @@ export const NodeDetailsDialog = ({
               </Button>
               <Button className="mr-1" onClick={handleToggleFavorite}>
                 <StarIcon
-                  className={isFavoriteState ? " fill-yellow-400" : ""}
+                  className={cn(
+                    isFavoriteState ? " fill-yellow-400 stroke-yellow-400" : "",
+                  )}
                 />
               </Button>
               <div className="flex flex-1 justify-start"></div>
@@ -198,8 +200,8 @@ export const NodeDetailsDialog = ({
                       className={cn(
                         "flex justify-end mr-1 text-white",
                         isIgnoredState
-                          ? ""
-                          : "bg-red-500 dark:bg-red-500 hover:bg-red-600 hover:dark:bg-red-600 text-white dark:text-white",
+                          ? "bg-red-500 dark:bg-red-500 hover:bg-red-600 hover:dark:bg-red-600 text-white dark:text-white"
+                          : "",
                       )}
                       onClick={handleToggleIgnored}
                     >

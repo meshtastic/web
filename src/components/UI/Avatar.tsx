@@ -112,7 +112,7 @@ export const Avatar = ({
               </TooltipTrigger>
               <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
                 Favorite
-                <TooltipArrow className="fill-slate-800" />
+                <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -130,7 +130,7 @@ export const Avatar = ({
               </TooltipTrigger>
               <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
                 Node error
-                <TooltipArrow className="fill-slate-800" />
+                <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
