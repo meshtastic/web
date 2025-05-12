@@ -5,13 +5,25 @@ import { IsBoolean, IsString } from "class-validator";
 export class SecurityValidation implements
   Omit<
     Protobuf.Config.Config_SecurityConfig,
-    keyof Message | "adminKey" | "privateKey" | "publicKey"
+    | keyof Message
+    | "adminKey"
+    | "adminKey1"
+    | "adminKey2"
+    | "adminKey3"
+    | "privateKey"
+    | "publicKey"
   > {
   @IsBoolean()
   adminChannelEnabled: boolean;
 
   @IsString()
-  adminKey: string;
+  adminKey1: string;
+
+  @IsString()
+  adminKey2: string;
+
+  @IsString()
+  adminKey3: string;
 
   @IsBoolean()
   bluetoothLoggingEnabled: boolean;

@@ -15,8 +15,12 @@ export function securityReducer(
       return { ...state, privateKeyBitCount: action.payload };
     case "SET_PUBLIC_KEY":
       return { ...state, publicKey: action.payload };
-    case "SET_ADMIN_KEY":
-      return { ...state, adminKey: action.payload };
+    case "SET_ADMIN1_KEY":
+      return { ...state, adminKey1: action.payload };
+    case "SET_ADMIN2_KEY":
+      return { ...state, adminKey2: action.payload };
+    case "SET_ADMIN3_KEY":
+      return { ...state, adminKey3: action.payload };
     case "SHOW_PRIVATE_KEY_DIALOG":
       return { ...state, privateKeyDialogOpen: action.payload };
     case "REGENERATE_PRIV_PUB_KEY":
@@ -25,11 +29,6 @@ export function securityReducer(
         privateKey: action.payload.privateKey,
         publicKey: action.payload.publicKey,
         privateKeyDialogOpen: false,
-      };
-    case "REGENERATE_ADMIN_KEY":
-      return {
-        ...state,
-        adminKey: action.payload.adminKey,
       };
     default:
       return state;
