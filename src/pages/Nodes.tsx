@@ -79,7 +79,6 @@ const NodesPage = (): JSX.Element => {
     },
     [hardware.myNodeNum],
   );
-
   return (
     <>
       <PageLayout
@@ -125,14 +124,14 @@ const NodesPage = (): JSX.Element => {
                 {node.user?.longName ?? numberToHexUnpadded(node.num)}
               </h1>,
               <Mono key="hops" className="w-16">
-                {node.lastHeard !== 0 && typeof node.hopsAway !== "undefined"
-                  ? node.viaMqtt === false && node.hopsAway === 0
+                {node.hopsAway !== undefined
+                  ? node?.viaMqtt === false && node.hopsAway === 0
                     ? "Direct"
                     : `${node.hopsAway?.toString()} ${
                       node.hopsAway ?? 0 > 1 ? "hops" : "hop"
                     } away`
                   : "-"}
-                {node.viaMqtt === true ? ", via MQTT" : ""}
+                {node?.viaMqtt === true ? ", via MQTT" : ""}
               </Mono>,
               <Mono key="lastHeard">
                 {node.lastHeard === 0
