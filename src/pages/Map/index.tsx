@@ -47,8 +47,6 @@ const getSignalColor = (snr: number, rssi?: number) => {
   return LINE_BAD_COLOR;
 };
 
-const DIRECT_NODE_TIMEOUT = 60 * 20; // 60 seconds * ? minutes
-
 type NodePosition = {
   latitude: number;
   longitude: number;
@@ -120,7 +118,6 @@ const generateDirectLines = (
 
   for (const node of nodes) {
     if (!node.position || node.hopsAway !== 0) continue;
-    if (Date.now() / 1000 - node.lastHeard > DIRECT_NODE_TIMEOUT) continue;
     const start = convertToLatLng(node.position);
     const end = convertToLatLng(myNode.position);
     features.push({
