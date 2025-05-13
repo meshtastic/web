@@ -7,7 +7,7 @@ import { create } from "@bufbuild/protobuf";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
-import { useEffect, useReducer, useRef } from "react";
+import { useReducer } from "react";
 import { securityReducer } from "@components/PageComponents/Config/Security/securityReducer.tsx";
 
 export const Security = () => {
@@ -24,51 +24,39 @@ export const Security = () => {
   const [state, dispatch] = useReducer(securityReducer, {
     privateKey: fromByteArray(config.security?.privateKey ?? new Uint8Array(0)),
     privateKeyVisible: false,
-    adminKeyVisible: false,
-    adminKey2Visible: false,
-    adminKey3Visible: false,
+    adminKeyVisible: [false, false, false],
     privateKeyBitCount: config.security?.privateKey?.length ?? 32,
     publicKey: fromByteArray(config.security?.publicKey ?? new Uint8Array(0)),
-    adminKey1: fromByteArray(
-      config.security?.adminKey?.at(0) ?? new Uint8Array(0),
-    ),
-    adminKey2: fromByteArray(
-      config.security?.adminKey?.at(1) ?? new Uint8Array(0),
-    ),
-    adminKey3: fromByteArray(
-      config.security?.adminKey?.at(2) ?? new Uint8Array(0),
-    ),
+    adminKey: [
+      fromByteArray(config.security?.adminKey?.at(0) ?? new Uint8Array(0)),
+      fromByteArray(config.security?.adminKey?.at(1) ?? new Uint8Array(0)),
+      fromByteArray(config.security?.adminKey?.at(2) ?? new Uint8Array(0)),
+    ],
     privateKeyDialogOpen: false,
   });
-
-  const adminKeysRef = useRef(state);
-  useEffect(() => {
-    adminKeysRef.current = state;
-  }, [state]);
 
   const validateKey = (
     input: string,
     count: number,
-    fieldName: "privateKey" | "adminKey1" | "adminKey2" | "adminKey3",
+    fieldName: "privateKey" | "adminKey",
+    fieldIndex?: number,
   ) => {
+    const fieldNameKey = fieldName + (fieldIndex ?? "");
     try {
-      removeError(fieldName);
+      removeError(fieldNameKey);
 
       if (fieldName === "privateKey" && input === "") {
-        addError(fieldName, "Private Key is required");
+        addError(fieldNameKey, "Private Key is required");
         return;
       }
 
-      if (
-        (fieldName === "adminKey1" || fieldName === "adminKey2" ||
-          fieldName === "adminKey3") && input === ""
-      ) {
+      if (fieldName === "adminKey" && input === "") {
         return;
       }
 
       if (input.length % 4 !== 0) {
         addError(
-          fieldName,
+          fieldNameKey,
           `${
             fieldName === "privateKey" ? "Private" : "Admin"
           } Key is required to be a 256 bit pre-shared key (PSK)`,
@@ -78,13 +66,13 @@ export const Security = () => {
 
       const decoded = toByteArray(input);
       if (decoded.length !== count) {
-        addError(fieldName, `Please enter a valid ${count * 8} bit PSK`);
+        addError(fieldNameKey, `Please enter a valid ${count * 8} bit PSK`);
         return;
       }
     } catch (e) {
       console.error(e);
       addError(
-        fieldName,
+        fieldNameKey,
         `Invalid ${
           fieldName === "privateKey" ? "Private" : "Admin"
         } Key format`,
@@ -97,8 +85,6 @@ export const Security = () => {
       return;
     }
 
-    const current = adminKeysRef.current;
-
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
@@ -106,12 +92,12 @@ export const Security = () => {
           value: {
             ...data,
             adminKey: [
-              toByteArray(current.adminKey1),
-              toByteArray(current.adminKey2),
-              toByteArray(current.adminKey3),
+              toByteArray(state.adminKey[0]),
+              toByteArray(state.adminKey[1]),
+              toByteArray(state.adminKey[2]),
             ],
-            privateKey: toByteArray(current.privateKey),
-            publicKey: toByteArray(current.publicKey),
+            privateKey: toByteArray(state.privateKey),
+            publicKey: toByteArray(state.publicKey),
           },
         },
       }),
@@ -149,14 +135,21 @@ export const Security = () => {
     dispatch({ type: "SET_PUBLIC_KEY", payload: fromByteArray(publicKey) });
   };
 
-  const adminKeyInputChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const psk = e.currentTarget?.value;
-    const id = e.currentTarget?.id.match(/^adminKey(\d+)(?=Input$)/)?.[1];
+  const adminKeyInputChangeEvent = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldIndex?: number,
+  ) => {
+    if (fieldIndex === undefined) return;
+    const psk = e.target.value;
 
-    if (!(id === "1" || id === "2" || id === "3")) return;
+    const payload = [
+      fieldIndex === 0 ? psk : state.adminKey[0],
+      fieldIndex === 1 ? psk : state.adminKey[1],
+      fieldIndex === 2 ? psk : state.adminKey[2],
+    ] satisfies [string, string, string];
 
-    dispatch({ type: `SET_ADMIN${id}_KEY`, payload: psk });
-    validateKey(psk, state.privateKeyBitCount, `adminKey${id}`);
+    dispatch({ type: "SET_ADMIN_KEY", payload: payload });
+    validateKey(psk, state.privateKeyBitCount, "adminKey", fieldIndex);
   };
 
   const privateKeySelectChangeEvent = (e: string) => {
@@ -173,9 +166,7 @@ export const Security = () => {
         defaultValues={{
           ...config.security,
           ...{
-            adminKey1: state.adminKey1,
-            adminKey2: state.adminKey2,
-            adminKey3: state.adminKey3,
+            adminKey: state.adminKey,
             privateKey: state.privateKey,
             publicKey: state.publicKey,
             adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
@@ -245,75 +236,75 @@ export const Security = () => {
             fields: [
               {
                 type: "passwordGenerator",
-                name: "adminKey1",
-                id: "adminKey1Input",
+                name: "adminKey.0",
+                id: "adminKey0Input",
                 label: "Primary Admin Key",
                 description:
                   "The primary public key authorized to send admin messages to this node",
-                validationText: hasFieldError("adminKey1")
-                  ? getErrorMessage("adminKey1")
+                validationText: hasFieldError("adminKey0")
+                  ? getErrorMessage("adminKey0")
                   : "",
-                inputChange: adminKeyInputChangeEvent,
+                inputChange: (e) => adminKeyInputChangeEvent(e, 0),
                 selectChange: () => {},
                 bits: [{ text: "256 bit", value: "32", key: "bit256" }],
                 devicePSKBitCount: state.privateKeyBitCount,
-                hide: !state.adminKeyVisible,
+                hide: !state.adminKeyVisible[0],
                 actionButtons: [],
                 disabledBy: [
                   { fieldName: "adminChannelEnabled", invert: true },
                 ],
                 properties: {
-                  value: state.adminKey1,
+                  value: state.adminKey[0],
                   showCopyButton: true,
                   showPasswordToggle: true,
                 },
               },
               {
                 type: "passwordGenerator",
-                name: "adminKey2",
-                id: "adminKey2Input",
+                name: "adminKey.1",
+                id: "adminKey1Input",
                 label: "Secondary Admin Key",
                 description:
                   "The secondary public key authorized to send admin messages to this node",
-                validationText: hasFieldError("adminKey2")
-                  ? getErrorMessage("adminKey2")
+                validationText: hasFieldError("adminKey1")
+                  ? getErrorMessage("adminKey1")
                   : "",
-                inputChange: adminKeyInputChangeEvent,
+                inputChange: (e) => adminKeyInputChangeEvent(e, 1),
                 selectChange: () => {},
                 bits: [{ text: "256 bit", value: "32", key: "bit256" }],
                 devicePSKBitCount: state.privateKeyBitCount,
-                hide: !state.adminKey2Visible,
+                hide: !state.adminKeyVisible[1],
                 actionButtons: [],
                 disabledBy: [
                   { fieldName: "adminChannelEnabled", invert: true },
                 ],
                 properties: {
-                  value: state.adminKey2,
+                  value: state.adminKey[1],
                   showCopyButton: true,
                   showPasswordToggle: true,
                 },
               },
               {
                 type: "passwordGenerator",
-                name: "adminKey3",
-                id: "adminKey3Input",
+                name: "adminKey.2",
+                id: "adminKey2Input",
                 label: "Tertiary Admin Key",
                 description:
                   "The tertiary public key authorized to send admin messages to this node",
-                validationText: hasFieldError("adminKey3")
-                  ? getErrorMessage("adminKey3")
+                validationText: hasFieldError("adminKey2")
+                  ? getErrorMessage("adminKey2")
                   : "",
-                inputChange: adminKeyInputChangeEvent,
+                inputChange: (e) => adminKeyInputChangeEvent(e, 2),
                 selectChange: () => {},
                 bits: [{ text: "256 bit", value: "32", key: "bit256" }],
                 devicePSKBitCount: state.privateKeyBitCount,
-                hide: !state.adminKey3Visible,
+                hide: !state.adminKeyVisible[2],
                 actionButtons: [],
                 disabledBy: [
                   { fieldName: "adminChannelEnabled", invert: true },
                 ],
                 properties: {
-                  value: state.adminKey3,
+                  value: state.adminKey[2],
                   showCopyButton: true,
                   showPasswordToggle: true,
                 },
