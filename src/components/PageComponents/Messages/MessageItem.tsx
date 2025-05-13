@@ -87,14 +87,20 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   }, [getNode, message.from]);
 
   const myNodeNum = useMemo(() => getMyNodeNum(), [getMyNodeNum]);
-  const { displayName, shortName } = useMemo(() => {
+  const { displayName, shortName, isFavorite } = useMemo(() => {
     const userIdHex = message.from.toString(16).toUpperCase().padStart(2, "0");
     const last4 = userIdHex.slice(-4);
     const fallbackName = `Meshtastic ${last4}`;
     const longName = messageUser?.user?.longName;
     const derivedShortName = messageUser?.user?.shortName || fallbackName;
     const derivedDisplayName = longName || derivedShortName;
-    return { displayName: derivedDisplayName, shortName: derivedShortName };
+    const isFavorite = messageUser?.num !== myNodeNum &&
+      messageUser?.isFavorite;
+    return {
+      displayName: derivedDisplayName,
+      shortName: derivedShortName,
+      isFavorite: isFavorite,
+    };
   }, [messageUser, message.from]);
 
   const messageStatusInfo = getMessageStatusInfo(message.state);
@@ -140,7 +146,12 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   return (
     <li className={messageItemWrapperClass}>
       <div className="grid grid-cols-[auto_1fr] gap-x-2">
-        <Avatar size="sm" text={shortName} className="pt-0.5" />
+        <Avatar
+          size="sm"
+          text={shortName}
+          className="pt-0.5"
+          showFavorite={isFavorite}
+        />
 
         <div className="flex flex-col gap-0.5 min-w-0">
           <div className="flex items-center gap-1.5">

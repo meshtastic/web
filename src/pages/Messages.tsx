@@ -60,7 +60,11 @@ export const MessagesPage = () => {
         ...node,
         unreadCount: unreadCounts.get(node.num) ?? 0,
       }))
-      .sort((a, b) => b.unreadCount - a.unreadCount);
+      .sort((a, b) => {
+        const diff = b.unreadCount - a.unreadCount;
+        if (diff !== 0) return diff;
+        return Number(b.isFavorite) - Number(a.isFavorite);
+      });
   };
 
   const allChannels = Array.from(channels.values());
@@ -239,6 +243,7 @@ export const MessagesPage = () => {
                 text={node.user?.shortName ?? "UNK"}
                 className={cn(hasNodeError(node.num) && "text-red-500")}
                 showError={hasNodeError(node.num)}
+                showFavorite={node.isFavorite}
                 size="sm"
               />
             </SidebarButton>

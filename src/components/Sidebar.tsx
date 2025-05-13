@@ -34,6 +34,7 @@ interface NavLink {
   name: string;
   icon: LucideIcon;
   page: Page;
+  count?: number;
 }
 
 const CollapseToggleButton = () => {
@@ -71,6 +72,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
     getNodesLength,
     metadata,
     activePage,
+    unreadCounts,
     setActivePage,
     setDialogOpen,
   } = useDevice();
@@ -79,8 +81,15 @@ export const Sidebar = ({ children }: SidebarProps) => {
   const { isCollapsed } = useSidebar();
   const myMetadata = metadata.get(0);
 
+  const numUnread = [...unreadCounts.values()].reduce((sum, v) => sum + v, 0);
+
   const pages: NavLink[] = [
-    { name: "Messages", icon: MessageSquareIcon, page: "messages" },
+    {
+      name: "Messages",
+      icon: MessageSquareIcon,
+      page: "messages",
+      count: numUnread ? numUnread : undefined,
+    },
     { name: "Map", icon: MapIcon, page: "map" },
     { name: "Config", icon: SettingsIcon, page: "config" },
     { name: "Channels", icon: LayersIcon, page: "channels" },
@@ -130,6 +139,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         {pages.map((link) => (
           <SidebarButton
             key={link.name}
+            count={link.count}
             label={link.name}
             Icon={link.icon}
             onClick={() => {

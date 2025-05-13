@@ -1,10 +1,19 @@
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { useState } from "react";
 import React from "react";
+import { cn } from "@core/utils/cn.ts";
+
+interface FavoriteIconProps {
+  showFavorite: boolean;
+}
+
+interface AvatarCellProps {
+  children: React.ReactElement<FavoriteIconProps>;
+}
 
 export interface TableProps {
   headings: Heading[];
-  rows: React.ReactNode[][];
+  rows: React.ReactElement<AvatarCellProps>[][];
 }
 
 export interface Heading {
@@ -60,6 +69,13 @@ export const Table = ({ headings, rows }: TableProps) => {
 
     const elementA = getElement(a[columnIndex]);
     const elementB = getElement(b[columnIndex]);
+
+    // Avatar contains the prop showFavorite which indicates isFavorite
+    const favA = a[0]?.props?.children?.props?.showFavorite ?? false;
+    const favB = b[0]?.props?.children?.props?.showFavorite ?? false;
+
+    // Always put favorites at the top
+    if (favA !== favB) return favA ? -1 : 1;
 
     if (sortColumn === "Last Heard") {
       const aTimestamp = elementA?.props?.children?.props?.timestamp ?? 0;
@@ -142,13 +158,17 @@ export const Table = ({ headings, rows }: TableProps) => {
               : null;
           const rowKey = firstCellKey ?? Math.random().toString(); // Use random only as last resort
 
+          const isFavorite = row[0]?.props?.children?.props?.showFavorite ??
+            false;
           return (
             <tr
               key={rowKey}
-              className={`
-                bg-white dark:bg-slate-900
-                odd:bg-slate-200/40 dark:odd:bg-slate-800/40
-              `}
+              className={cn(
+                "",
+                isFavorite
+                  ? "bg-yellow-100/30 dark:bg-slate-800 odd:bg-yellow-200/30 dark:odd:bg-slate-600/40"
+                  : "bg-white dark:bg-slate-900 odd:bg-slate-200/40 dark:odd:bg-slate-800/40",
+              )}
             >
               {row.map((item, cellIndex) => {
                 const cellKey = `${rowKey}_${cellIndex}`;

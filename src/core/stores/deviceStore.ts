@@ -1,4 +1,4 @@
-import { create } from "@bufbuild/protobuf";
+import { create, toBinary } from "@bufbuild/protobuf";
 import { MeshDevice, Protobuf, Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { createContext, useContext } from "react";
@@ -93,6 +93,9 @@ export interface Device {
   getNodesLength: () => number;
   getNode: (nodeNum: number) => Protobuf.Mesh.NodeInfo | undefined;
   getMyNode: () => Protobuf.Mesh.NodeInfo;
+  sendAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
+  updateFavorite: (nodeNum: number, isFavorite: boolean) => void;
+  updateIgnored: (nodeNum: number, isIgnored: boolean) => void;
 }
 
 export interface DeviceState {
@@ -593,6 +596,60 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               return 0;
             }
             return device.nodesMap.size;
+          },
+
+          sendAdminMessage(message: Protobuf.Admin.AdminMessage) {
+            const device = get().devices.get(id);
+            if (!device) return;
+
+            device.connection?.sendPacket(
+              toBinary(Protobuf.Admin.AdminMessageSchema, message),
+              Protobuf.Portnums.PortNum.ADMIN_APP,
+              "self",
+            );
+          },
+
+          updateFavorite(nodeNum: number, isFavorite: boolean) {
+            const device = get().devices.get(id);
+            if (!device) return;
+            const node = device?.nodesMap.get(nodeNum);
+            if (!node) return;
+
+            device.sendAdminMessage(create(Protobuf.Admin.AdminMessageSchema, {
+              payloadVariant: {
+                case: isFavorite ? "setFavoriteNode" : "removeFavoriteNode",
+                value: nodeNum,
+              },
+            }));
+
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                const node = device?.nodesMap.get(nodeNum);
+                node.isFavorite = isFavorite;
+              }),
+            );
+          },
+          updateIgnored(nodeNum: number, isIgnored: boolean) {
+            const device = get().devices.get(id);
+            if (!device) return;
+            const node = device?.nodesMap.get(nodeNum);
+            if (!node) return;
+
+            device.sendAdminMessage(create(Protobuf.Admin.AdminMessageSchema, {
+              payloadVariant: {
+                case: isIgnored ? "setIgnoredNode" : "removeIgnoredNode",
+                value: nodeNum,
+              },
+            }));
+
+            set(
+              produce<DeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                const node = device?.nodesMap.get(nodeNum);
+                node.isIgnored = isIgnored;
+              }),
+            );
           },
         });
       }),

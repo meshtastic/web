@@ -35,7 +35,7 @@ const convertToLatLng = (position: {
 });
 
 const MapPage = () => {
-  const { getNodes, waypoints } = useDevice();
+  const { getNodes, waypoints, hasNodeError } = useDevice();
   const { theme } = useTheme();
   const { default: map } = useMap();
 
@@ -146,6 +146,8 @@ const MapPage = () => {
             <Avatar
               text={node.user?.shortName?.toString() ?? node.num.toString()}
               className="border-[1.5px] border-slate-600 shadow-xl shadow-slate-600"
+              showError={hasNodeError(node.num)}
+              showFavorite={node.isFavorite}
             />
           </Marker>
         );

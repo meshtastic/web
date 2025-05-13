@@ -1,5 +1,5 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
-import { NodeOptionsDialog } from "@app/components/Dialog/NodeOptionsDialog.tsx";
+import { NodeDetailsDialog } from "@app/components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
@@ -27,7 +27,7 @@ export interface DeleteNoteDialogProps {
 }
 
 const NodesPage = (): JSX.Element => {
-  const { getNodes, hardware, connection } = useDevice();
+  const { getNodes, hardware, connection, hasNodeError } = useDevice();
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);
@@ -35,7 +35,7 @@ const NodesPage = (): JSX.Element => {
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
   >();
   const [selectedLocation, setSelectedLocation] = useState<
-    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
+    Types.PacketMetadata<Protobuf.Mesh.Position> | undefined
   >();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const deferredSearch = useDeferredValue(searchTerm);
@@ -84,7 +84,6 @@ const NodesPage = (): JSX.Element => {
       <PageLayout
         label=""
         leftBar={<Sidebar />}
-        className="flex flex-col w-full"
       >
         <div className="p-2">
           <Input
@@ -109,7 +108,11 @@ const NodesPage = (): JSX.Element => {
             ]}
             rows={filteredNodes.map((node) => [
               <div key={node.num}>
-                <Avatar text={node.user?.shortName ?? "UNK "} />
+                <Avatar
+                  text={node.user?.shortName ?? "UNK "}
+                  showFavorite={node.isFavorite}
+                  showError={hasNodeError(node.num)}
+                />
               </div>,
               <h1
                 key="longName"
@@ -159,7 +162,7 @@ const NodesPage = (): JSX.Element => {
               </Mono>,
             ])}
           />
-          <NodeOptionsDialog
+          <NodeDetailsDialog
             node={selectedNode}
             open={!!selectedNode}
             onOpenChange={() => setSelectedNode(undefined)}
