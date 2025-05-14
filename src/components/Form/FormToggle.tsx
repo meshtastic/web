@@ -3,11 +3,11 @@ import type {
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
-import type { ChangeEvent } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
 
 export interface ToggleFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "toggle";
+  inputChange?: (value: boolean) => void;
 }
 
 export function ToggleInput<T extends FieldValues>({
@@ -15,16 +15,6 @@ export function ToggleInput<T extends FieldValues>({
   disabled,
   field,
 }: GenericFormElementProps<T, ToggleFieldProps<T>>) {
-  const onChangeHandler = (e: (event: ChangeEvent) => void) => {
-    return (value: boolean) => {
-      e({
-        target: {
-          value: value,
-        },
-      } as unknown as ChangeEvent);
-    };
-  };
-
   return (
     <Controller
       name={field.name}
@@ -32,7 +22,10 @@ export function ToggleInput<T extends FieldValues>({
       render={({ field: { value, onChange, ...rest } }) => (
         <Switch
           checked={value}
-          onCheckedChange={onChangeHandler(onChange)}
+          onCheckedChange={(v) => {
+            onChange(v);
+            field.inputChange?.(v);
+          }}
           id={field.name}
           disabled={disabled}
           {...field.properties}

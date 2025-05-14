@@ -9,6 +9,7 @@ import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useReducer } from "react";
 import { securityReducer } from "@components/PageComponents/Config/Security/securityReducer.tsx";
+import type { SecurityConfigInit } from "./types.ts";
 
 export const Security = () => {
   const { config, setWorkingConfig, setDialogOpen } = useDevice();
@@ -33,6 +34,10 @@ export const Security = () => {
       fromByteArray(config.security?.adminKey?.at(2) ?? new Uint8Array(0)),
     ],
     privateKeyDialogOpen: false,
+    isManaged: config.security?.isManaged ?? false,
+    adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
+    debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
+    serialEnabled: config.security?.serialEnabled ?? false,
   });
 
   const validateKey = (
@@ -44,7 +49,6 @@ export const Security = () => {
     const fieldNameKey = fieldName + (fieldIndex ?? "");
     try {
       removeError(fieldNameKey);
-
       if (fieldName === "privateKey" && input === "") {
         addError(fieldNameKey, "Private Key is required");
         return;
@@ -80,29 +84,24 @@ export const Security = () => {
     }
   };
 
-  const onSubmit = (data: SecurityValidation) => {
-    if (hasErrors()) {
-      return;
-    }
-
-    setWorkingConfig(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "security",
-          value: {
-            ...data,
-            adminKey: [
-              toByteArray(state.adminKey[0]),
-              toByteArray(state.adminKey[1]),
-              toByteArray(state.adminKey[2]),
-            ],
-            privateKey: toByteArray(state.privateKey),
-            publicKey: toByteArray(state.publicKey),
-          },
-        },
-      }),
-    );
-  };
+  function buildSecurityPayload(
+    overrides: SecurityConfigInit,
+  ) {
+    const base: SecurityConfigInit = {
+      isManaged: state.isManaged,
+      adminChannelEnabled: state.adminChannelEnabled,
+      debugLogApiEnabled: state.debugLogApiEnabled,
+      serialEnabled: state.serialEnabled,
+      privateKey: overrides?.privateKey ?? toByteArray(state.privateKey),
+      publicKey: overrides?.publicKey ?? toByteArray(state.publicKey),
+      adminKey: [
+        overrides?.adminKey?.[0] ?? toByteArray(state.adminKey[0]),
+        overrides?.adminKey?.[0] ?? toByteArray(state.adminKey[0]),
+        overrides?.adminKey?.[0] ?? toByteArray(state.adminKey[0]),
+      ],
+    };
+    return { ...base, ...overrides };
+  }
 
   const pkiRegenerate = () => {
     clearErrors();
@@ -122,6 +121,20 @@ export const Security = () => {
       state.privateKeyBitCount,
       "privateKey",
     );
+
+    if (!hasErrors()) {
+      setWorkingConfig(
+        create(Protobuf.Config.ConfigSchema, {
+          payloadVariant: {
+            case: "security",
+            value: buildSecurityPayload({
+              privateKey: privateKey,
+              publicKey: publicKey,
+            }),
+          },
+        }),
+      );
+    }
   };
 
   const privateKeyInputChangeEvent = (
@@ -133,6 +146,20 @@ export const Security = () => {
 
     const publicKey = getX25519PublicKey(toByteArray(privateKeyB64String));
     dispatch({ type: "SET_PUBLIC_KEY", payload: fromByteArray(publicKey) });
+
+    if (!hasErrors()) {
+      setWorkingConfig(
+        create(Protobuf.Config.ConfigSchema, {
+          payloadVariant: {
+            case: "security",
+            value: buildSecurityPayload({
+              privateKey: toByteArray(privateKeyB64String),
+              publicKey: publicKey,
+            }),
+          },
+        }),
+      );
+    }
   };
 
   const adminKeyInputChangeEvent = (
@@ -150,18 +177,62 @@ export const Security = () => {
 
     dispatch({ type: "SET_ADMIN_KEY", payload: payload });
     validateKey(psk, state.privateKeyBitCount, "adminKey", fieldIndex);
+
+    if (!hasErrors()) {
+      setWorkingConfig(
+        create(Protobuf.Config.ConfigSchema, {
+          payloadVariant: {
+            case: "security",
+            value: buildSecurityPayload({
+              adminKey: payload.map(toByteArray) as [
+                Uint8Array,
+                Uint8Array,
+                Uint8Array,
+              ],
+            }),
+          },
+        }),
+      );
+    }
   };
 
-  const privateKeySelectChangeEvent = (e: string) => {
-    const count = Number.parseInt(e);
-    dispatch({ type: "SET_PRIVATE_KEY_BIT_COUNT", payload: count });
-    validateKey(state.privateKey, count, "privateKey");
+  const onToggleChange = (
+    field:
+      | "isManaged"
+      | "adminChannelEnabled"
+      | "debugLogApiEnabled"
+      | "serialEnabled",
+    next: boolean,
+  ) => {
+    dispatch({ type: "SET_TOGGLE", field, payload: next });
+
+    if (!hasErrors()) {
+      setWorkingConfig(
+        create(Protobuf.Config.ConfigSchema, {
+          payloadVariant: {
+            case: "security",
+            value: buildSecurityPayload({
+              isManaged: field === "isManaged" ? next : state.isManaged,
+              adminChannelEnabled: field === "adminChannelEnabled"
+                ? next
+                : state.adminChannelEnabled,
+              debugLogApiEnabled: field === "debugLogApiEnabled"
+                ? next
+                : state.debugLogApiEnabled,
+              serialEnabled: field === "serialEnabled"
+                ? next
+                : state.serialEnabled,
+            }),
+          },
+        }),
+      );
+    }
   };
 
   return (
     <>
       <DynamicForm<SecurityValidation>
-        onSubmit={onSubmit}
+        onSubmit={() => {}}
         submitType="onChange"
         defaultValues={{
           ...config.security,
@@ -192,7 +263,7 @@ export const Security = () => {
                   : "",
                 devicePSKBitCount: state.privateKeyBitCount,
                 inputChange: privateKeyInputChangeEvent,
-                selectChange: privateKeySelectChangeEvent,
+                selectChange: () => {},
                 hide: !state.privateKeyVisible,
                 actionButtons: [
                   {
@@ -315,6 +386,10 @@ export const Security = () => {
                 label: "Managed",
                 description:
                   "If true, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless a suitable Remote Admin node has been setup, and the public key stored in the field below.",
+                inputChange: (e: boolean) => onToggleChange("isManaged", e),
+                properties: {
+                  checked: state.isManaged,
+                },
               },
               {
                 type: "toggle",
@@ -322,6 +397,11 @@ export const Security = () => {
                 label: "Allow Legacy Admin",
                 description:
                   "Allow incoming device control over the insecure legacy admin channel",
+                inputChange: (e: boolean) =>
+                  onToggleChange("adminChannelEnabled", e),
+                properties: {
+                  checked: state.adminChannelEnabled,
+                },
               },
             ],
           },
@@ -335,12 +415,21 @@ export const Security = () => {
                 label: "Enable Debug Log API",
                 description:
                   "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+                inputChange: (e: boolean) =>
+                  onToggleChange("debugLogApiEnabled", e),
+                properties: {
+                  checked: state.debugLogApiEnabled,
+                },
               },
               {
                 type: "toggle",
                 name: "serialEnabled",
                 label: "Serial Output Enabled",
                 description: "Serial Console over the Stream API",
+                inputChange: (e: boolean) => onToggleChange("serialEnabled", e),
+                properties: {
+                  checked: state.serialEnabled,
+                },
               },
             ],
           },

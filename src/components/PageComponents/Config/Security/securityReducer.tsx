@@ -7,8 +7,6 @@ export function securityReducer(
   switch (action.type) {
     case "SET_PRIVATE_KEY":
       return { ...state, privateKey: action.payload };
-    case "TOGGLE_PRIVATE_KEY_VISIBILITY":
-      return { ...state, privateKeyVisible: !state.privateKeyVisible };
     case "SET_PRIVATE_KEY_BIT_COUNT":
       return { ...state, privateKeyBitCount: action.payload };
     case "SET_PUBLIC_KEY":
@@ -24,6 +22,8 @@ export function securityReducer(
         publicKey: action.payload.publicKey,
         privateKeyDialogOpen: false,
       };
+    case "SET_TOGGLE":
+      return { ...state, [action.field]: action.payload };
     default:
       return state;
   }
