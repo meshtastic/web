@@ -55,6 +55,17 @@ export const Security = () => {
       }
 
       if (fieldName === "adminKey" && input === "") {
+        if (
+          state.isManaged && state.adminKey
+            .map((v, i) => i === fieldIndex ? input : v)
+            .every((s) => s === "")
+        ) {
+          addError(
+            "adminKey0",
+            "At least one admin key is requred if the node is managed.",
+          );
+        }
+
         return;
       }
 
@@ -84,7 +95,7 @@ export const Security = () => {
     }
   };
 
-  function buildSecurityPayload(
+  function setSecurityPayload(
     overrides: SecurityConfigInit,
   ) {
     const base: SecurityConfigInit = {
@@ -100,7 +111,15 @@ export const Security = () => {
         overrides?.adminKey?.[0] ?? toByteArray(state.adminKey[0]),
       ],
     };
-    return { ...base, ...overrides };
+
+    setWorkingConfig(
+      create(Protobuf.Config.ConfigSchema, {
+        payloadVariant: {
+          case: "security",
+          value: { ...base, ...overrides },
+        },
+      }),
+    );
   }
 
   const pkiRegenerate = () => {
@@ -123,17 +142,10 @@ export const Security = () => {
     );
 
     if (!hasErrors()) {
-      setWorkingConfig(
-        create(Protobuf.Config.ConfigSchema, {
-          payloadVariant: {
-            case: "security",
-            value: buildSecurityPayload({
-              privateKey: privateKey,
-              publicKey: publicKey,
-            }),
-          },
-        }),
-      );
+      setSecurityPayload({
+        privateKey: privateKey,
+        publicKey: publicKey,
+      });
     }
   };
 
@@ -148,17 +160,10 @@ export const Security = () => {
     dispatch({ type: "SET_PUBLIC_KEY", payload: fromByteArray(publicKey) });
 
     if (!hasErrors()) {
-      setWorkingConfig(
-        create(Protobuf.Config.ConfigSchema, {
-          payloadVariant: {
-            case: "security",
-            value: buildSecurityPayload({
-              privateKey: toByteArray(privateKeyB64String),
-              publicKey: publicKey,
-            }),
-          },
-        }),
-      );
+      setSecurityPayload({
+        privateKey: toByteArray(privateKeyB64String),
+        publicKey: publicKey,
+      });
     }
   };
 
@@ -179,20 +184,13 @@ export const Security = () => {
     validateKey(psk, state.privateKeyBitCount, "adminKey", fieldIndex);
 
     if (!hasErrors()) {
-      setWorkingConfig(
-        create(Protobuf.Config.ConfigSchema, {
-          payloadVariant: {
-            case: "security",
-            value: buildSecurityPayload({
-              adminKey: payload.map(toByteArray) as [
-                Uint8Array,
-                Uint8Array,
-                Uint8Array,
-              ],
-            }),
-          },
-        }),
-      );
+      setSecurityPayload({
+        adminKey: payload.map(toByteArray) as [
+          Uint8Array,
+          Uint8Array,
+          Uint8Array,
+        ],
+      });
     }
   };
 
@@ -206,26 +204,32 @@ export const Security = () => {
   ) => {
     dispatch({ type: "SET_TOGGLE", field, payload: next });
 
+    if (
+      field === "isManaged" && state.adminKey.every((s) => s === "")
+    ) {
+      if (next) {
+        addError(
+          "adminKey0",
+          "At least one admin key is requred if the node is managed.",
+        );
+      } else {
+        removeError("adminKey0");
+        removeError("adminKey1");
+        removeError("adminKey2");
+      }
+    }
+
     if (!hasErrors()) {
-      setWorkingConfig(
-        create(Protobuf.Config.ConfigSchema, {
-          payloadVariant: {
-            case: "security",
-            value: buildSecurityPayload({
-              isManaged: field === "isManaged" ? next : state.isManaged,
-              adminChannelEnabled: field === "adminChannelEnabled"
-                ? next
-                : state.adminChannelEnabled,
-              debugLogApiEnabled: field === "debugLogApiEnabled"
-                ? next
-                : state.debugLogApiEnabled,
-              serialEnabled: field === "serialEnabled"
-                ? next
-                : state.serialEnabled,
-            }),
-          },
-        }),
-      );
+      setSecurityPayload({
+        isManaged: field === "isManaged" ? next : state.isManaged,
+        adminChannelEnabled: field === "adminChannelEnabled"
+          ? next
+          : state.adminChannelEnabled,
+        debugLogApiEnabled: field === "debugLogApiEnabled"
+          ? next
+          : state.debugLogApiEnabled,
+        serialEnabled: field === "serialEnabled" ? next : state.serialEnabled,
+      });
     }
   };
 
@@ -233,7 +237,7 @@ export const Security = () => {
     <>
       <DynamicForm<SecurityValidation>
         onSubmit={() => {}}
-        submitType="onChange"
+        submitType="onSubmit"
         defaultValues={{
           ...config.security,
           ...{
@@ -385,11 +389,17 @@ export const Security = () => {
                 name: "isManaged",
                 label: "Managed",
                 description:
-                  "If true, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless a suitable Remote Admin node has been setup, and the public key stored in the field below.",
+                  "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
                 inputChange: (e: boolean) => onToggleChange("isManaged", e),
                 properties: {
                   checked: state.isManaged,
                 },
+                disabled: (
+                  (hasFieldError("adminKey0") ||
+                    hasFieldError("adminKey1") ||
+                    hasFieldError("adminKey2")) &&
+                  !state.adminKey.every((s) => s === "")
+                ),
               },
               {
                 type: "toggle",
