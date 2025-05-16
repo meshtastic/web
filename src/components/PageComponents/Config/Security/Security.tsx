@@ -9,6 +9,7 @@ import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useReducer } from "react";
 import { securityReducer } from "@components/PageComponents/Config/Security/securityReducer.tsx";
+import type { SecurityConfigInit } from "./types.ts";
 
 export const Security = () => {
   const { config, setWorkingConfig, setDialogOpen } = useDevice();
@@ -24,36 +25,53 @@ export const Security = () => {
   const [state, dispatch] = useReducer(securityReducer, {
     privateKey: fromByteArray(config.security?.privateKey ?? new Uint8Array(0)),
     privateKeyVisible: false,
-    adminKeyVisible: false,
+    adminKeyVisible: [false, false, false],
     privateKeyBitCount: config.security?.privateKey?.length ?? 32,
-    adminKeyBitCount: config.security?.adminKey?.at(0)?.length ?? 32,
     publicKey: fromByteArray(config.security?.publicKey ?? new Uint8Array(0)),
-    adminKey: fromByteArray(
-      config.security?.adminKey?.at(0) ?? new Uint8Array(0),
-    ),
+    adminKey: [
+      fromByteArray(config.security?.adminKey?.at(0) ?? new Uint8Array(0)),
+      fromByteArray(config.security?.adminKey?.at(1) ?? new Uint8Array(0)),
+      fromByteArray(config.security?.adminKey?.at(2) ?? new Uint8Array(0)),
+    ],
     privateKeyDialogOpen: false,
+    isManaged: config.security?.isManaged ?? false,
+    adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
+    debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
+    serialEnabled: config.security?.serialEnabled ?? false,
   });
 
   const validateKey = (
     input: string,
     count: number,
     fieldName: "privateKey" | "adminKey",
+    fieldIndex?: number,
   ) => {
+    const fieldNameKey = fieldName + (fieldIndex ?? "");
     try {
-      removeError(fieldName);
-
+      removeError(fieldNameKey);
       if (fieldName === "privateKey" && input === "") {
-        addError(fieldName, "Private Key is required");
+        addError(fieldNameKey, "Private Key is required");
         return;
       }
 
       if (fieldName === "adminKey" && input === "") {
+        if (
+          state.isManaged && state.adminKey
+            .map((v, i) => i === fieldIndex ? input : v)
+            .every((s) => s === "")
+        ) {
+          addError(
+            "adminKey0",
+            "At least one admin key is requred if the node is managed.",
+          );
+        }
+
         return;
       }
 
       if (input.length % 4 !== 0) {
         addError(
-          fieldName,
+          fieldNameKey,
           `${
             fieldName === "privateKey" ? "Private" : "Admin"
           } Key is required to be a 256 bit pre-shared key (PSK)`,
@@ -63,13 +81,13 @@ export const Security = () => {
 
       const decoded = toByteArray(input);
       if (decoded.length !== count) {
-        addError(fieldName, `Please enter a valid ${count * 8} bit PSK`);
+        addError(fieldNameKey, `Please enter a valid ${count * 8} bit PSK`);
         return;
       }
     } catch (e) {
       console.error(e);
       addError(
-        fieldName,
+        fieldNameKey,
         `Invalid ${
           fieldName === "privateKey" ? "Private" : "Admin"
         } Key format`,
@@ -77,24 +95,32 @@ export const Security = () => {
     }
   };
 
-  const onSubmit = (data: SecurityValidation) => {
-    if (hasErrors()) {
-      return;
-    }
+  function setSecurityPayload(
+    overrides: SecurityConfigInit,
+  ) {
+    const base: SecurityConfigInit = {
+      isManaged: state.isManaged,
+      adminChannelEnabled: state.adminChannelEnabled,
+      debugLogApiEnabled: state.debugLogApiEnabled,
+      serialEnabled: state.serialEnabled,
+      privateKey: overrides?.privateKey ?? toByteArray(state.privateKey),
+      publicKey: overrides?.publicKey ?? toByteArray(state.publicKey),
+      adminKey: [
+        overrides?.adminKey?.[0] ?? toByteArray(state.adminKey[0]),
+        overrides?.adminKey?.[0] ?? toByteArray(state.adminKey[0]),
+        overrides?.adminKey?.[0] ?? toByteArray(state.adminKey[0]),
+      ],
+    };
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "security",
-          value: {
-            ...data,
-            adminKey: [new Uint8Array(0)],
-            privateKey: toByteArray(state.privateKey),
-            publicKey: toByteArray(state.publicKey),
-          },
+          value: { ...base, ...overrides },
         },
       }),
     );
-  };
+  }
 
   const pkiRegenerate = () => {
     clearErrors();
@@ -114,6 +140,13 @@ export const Security = () => {
       state.privateKeyBitCount,
       "privateKey",
     );
+
+    if (!hasErrors()) {
+      setSecurityPayload({
+        privateKey: privateKey,
+        publicKey: publicKey,
+      });
+    }
   };
 
   const privateKeyInputChangeEvent = (
@@ -125,25 +158,86 @@ export const Security = () => {
 
     const publicKey = getX25519PublicKey(toByteArray(privateKeyB64String));
     dispatch({ type: "SET_PUBLIC_KEY", payload: fromByteArray(publicKey) });
+
+    if (!hasErrors()) {
+      setSecurityPayload({
+        privateKey: toByteArray(privateKeyB64String),
+        publicKey: publicKey,
+      });
+    }
   };
 
-  const adminKeyInputChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const psk = e.currentTarget?.value;
-    dispatch({ type: "SET_ADMIN_KEY", payload: psk });
-    validateKey(psk, state.privateKeyBitCount, "adminKey");
+  const adminKeyInputChangeEvent = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldIndex?: number,
+  ) => {
+    if (fieldIndex === undefined) return;
+    const psk = e.target.value;
+
+    const payload = [
+      fieldIndex === 0 ? psk : state.adminKey[0],
+      fieldIndex === 1 ? psk : state.adminKey[1],
+      fieldIndex === 2 ? psk : state.adminKey[2],
+    ] satisfies [string, string, string];
+
+    dispatch({ type: "SET_ADMIN_KEY", payload: payload });
+    validateKey(psk, state.privateKeyBitCount, "adminKey", fieldIndex);
+
+    if (!hasErrors()) {
+      setSecurityPayload({
+        adminKey: payload.map(toByteArray) as [
+          Uint8Array,
+          Uint8Array,
+          Uint8Array,
+        ],
+      });
+    }
   };
 
-  const privateKeySelectChangeEvent = (e: string) => {
-    const count = Number.parseInt(e);
-    dispatch({ type: "SET_PRIVATE_KEY_BIT_COUNT", payload: count });
-    validateKey(state.privateKey, count, "privateKey");
+  const onToggleChange = (
+    field:
+      | "isManaged"
+      | "adminChannelEnabled"
+      | "debugLogApiEnabled"
+      | "serialEnabled",
+    next: boolean,
+  ) => {
+    dispatch({ type: "SET_TOGGLE", field, payload: next });
+
+    if (
+      field === "isManaged" && state.adminKey.every((s) => s === "")
+    ) {
+      if (next) {
+        addError(
+          "adminKey0",
+          "At least one admin key is requred if the node is managed.",
+        );
+      } else {
+        removeError("adminKey0");
+        removeError("adminKey1");
+        removeError("adminKey2");
+      }
+    }
+
+    if (!hasErrors()) {
+      setSecurityPayload({
+        isManaged: field === "isManaged" ? next : state.isManaged,
+        adminChannelEnabled: field === "adminChannelEnabled"
+          ? next
+          : state.adminChannelEnabled,
+        debugLogApiEnabled: field === "debugLogApiEnabled"
+          ? next
+          : state.debugLogApiEnabled,
+        serialEnabled: field === "serialEnabled" ? next : state.serialEnabled,
+      });
+    }
   };
 
   return (
     <>
       <DynamicForm<SecurityValidation>
-        onSubmit={onSubmit}
-        submitType="onChange"
+        onSubmit={() => {}}
+        submitType="onSubmit"
         defaultValues={{
           ...config.security,
           ...{
@@ -173,7 +267,7 @@ export const Security = () => {
                   : "",
                 devicePSKBitCount: state.privateKeyBitCount,
                 inputChange: privateKeyInputChangeEvent,
-                selectChange: privateKeySelectChangeEvent,
+                selectChange: () => {},
                 hide: !state.privateKeyVisible,
                 actionButtons: [
                   {
@@ -216,58 +310,107 @@ export const Security = () => {
             description: "Settings for Admin",
             fields: [
               {
-                type: "toggle",
-                name: "adminChannelEnabled",
-                label: "Allow Legacy Admin",
+                type: "passwordGenerator",
+                name: "adminKey.0",
+                id: "adminKey0Input",
+                label: "Primary Admin Key",
                 description:
-                  "Allow incoming device control over the insecure legacy admin channel",
+                  "The primary public key authorized to send admin messages to this node",
+                validationText: hasFieldError("adminKey0")
+                  ? getErrorMessage("adminKey0")
+                  : "",
+                inputChange: (e) => adminKeyInputChangeEvent(e, 0),
+                selectChange: () => {},
+                bits: [{ text: "256 bit", value: "32", key: "bit256" }],
+                devicePSKBitCount: state.privateKeyBitCount,
+                hide: !state.adminKeyVisible[0],
+                actionButtons: [],
+                disabledBy: [
+                  { fieldName: "adminChannelEnabled", invert: true },
+                ],
+                properties: {
+                  value: state.adminKey[0],
+                  showCopyButton: true,
+                  showPasswordToggle: true,
+                },
+              },
+              {
+                type: "passwordGenerator",
+                name: "adminKey.1",
+                id: "adminKey1Input",
+                label: "Secondary Admin Key",
+                description:
+                  "The secondary public key authorized to send admin messages to this node",
+                validationText: hasFieldError("adminKey1")
+                  ? getErrorMessage("adminKey1")
+                  : "",
+                inputChange: (e) => adminKeyInputChangeEvent(e, 1),
+                selectChange: () => {},
+                bits: [{ text: "256 bit", value: "32", key: "bit256" }],
+                devicePSKBitCount: state.privateKeyBitCount,
+                hide: !state.adminKeyVisible[1],
+                actionButtons: [],
+                disabledBy: [
+                  { fieldName: "adminChannelEnabled", invert: true },
+                ],
+                properties: {
+                  value: state.adminKey[1],
+                  showCopyButton: true,
+                  showPasswordToggle: true,
+                },
+              },
+              {
+                type: "passwordGenerator",
+                name: "adminKey.2",
+                id: "adminKey2Input",
+                label: "Tertiary Admin Key",
+                description:
+                  "The tertiary public key authorized to send admin messages to this node",
+                validationText: hasFieldError("adminKey2")
+                  ? getErrorMessage("adminKey2")
+                  : "",
+                inputChange: (e) => adminKeyInputChangeEvent(e, 2),
+                selectChange: () => {},
+                bits: [{ text: "256 bit", value: "32", key: "bit256" }],
+                devicePSKBitCount: state.privateKeyBitCount,
+                hide: !state.adminKeyVisible[2],
+                actionButtons: [],
+                disabledBy: [
+                  { fieldName: "adminChannelEnabled", invert: true },
+                ],
+                properties: {
+                  value: state.adminKey[2],
+                  showCopyButton: true,
+                  showPasswordToggle: true,
+                },
               },
               {
                 type: "toggle",
                 name: "isManaged",
                 label: "Managed",
                 description:
-                  "If true, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless a suitable Remote Admin node has been setup, and the public key stored in the field below.",
+                  "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
+                inputChange: (e: boolean) => onToggleChange("isManaged", e),
+                properties: {
+                  checked: state.isManaged,
+                },
+                disabled: (
+                  (hasFieldError("adminKey0") ||
+                    hasFieldError("adminKey1") ||
+                    hasFieldError("adminKey2")) &&
+                  !state.adminKey.every((s) => s === "")
+                ),
               },
               {
-                type: "passwordGenerator",
-                name: "adminKey",
-                id: "adminKeyInput",
-                label: "Admin Key",
+                type: "toggle",
+                name: "adminChannelEnabled",
+                label: "Allow Legacy Admin",
                 description:
-                  "The public key authorized to send admin messages to this node",
-                validationText: hasFieldError("adminKey")
-                  ? getErrorMessage("adminKey")
-                  : "",
-                inputChange: adminKeyInputChangeEvent,
-                selectChange: () => {},
-                bits: [{ text: "256 bit", value: "32", key: "bit256" }],
-                devicePSKBitCount: state.privateKeyBitCount,
-                hide: !state.adminKeyVisible,
-                actionButtons: [
-                  {
-                    text: "Generate",
-                    variant: "success",
-                    onClick: () => {
-                      const adminKey = getX25519PrivateKey();
-                      dispatch({
-                        type: "REGENERATE_ADMIN_KEY",
-                        payload: { adminKey: fromByteArray(adminKey) },
-                      });
-                      validateKey(
-                        fromByteArray(adminKey),
-                        state.adminKeyBitCount,
-                        "adminKey",
-                      );
-                    },
-                  },
-                ],
-                disabledBy: [
-                  { fieldName: "adminChannelEnabled", invert: true },
-                ],
+                  "Allow incoming device control over the insecure legacy admin channel",
+                inputChange: (e: boolean) =>
+                  onToggleChange("adminChannelEnabled", e),
                 properties: {
-                  value: state.adminKey,
-                  showCopyButton: true,
+                  checked: state.adminChannelEnabled,
                 },
               },
             ],
@@ -282,12 +425,21 @@ export const Security = () => {
                 label: "Enable Debug Log API",
                 description:
                   "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+                inputChange: (e: boolean) =>
+                  onToggleChange("debugLogApiEnabled", e),
+                properties: {
+                  checked: state.debugLogApiEnabled,
+                },
               },
               {
                 type: "toggle",
                 name: "serialEnabled",
                 label: "Serial Output Enabled",
                 description: "Serial Console over the Stream API",
+                inputChange: (e: boolean) => onToggleChange("serialEnabled", e),
+                properties: {
+                  checked: state.serialEnabled,
+                },
               },
             ],
           },
