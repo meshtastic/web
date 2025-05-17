@@ -1,51 +1,41 @@
 import { NodeDetail } from "../../components/PageComponents/Map/NodeDetail.tsx";
 import { Avatar } from "../../components/UI/Avatar.tsx";
-import { useTheme } from "../../core/hooks/useTheme.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { bbox, lineString } from "@turf/turf";
 import { MapPinIcon } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  AttributionControl,
-  GeolocateControl,
-  Marker,
-  NavigationControl,
-  Popup,
-  ScaleControl,
-  useMap,
-} from "react-map-gl/maplibre";
-import MapGl from "react-map-gl/maplibre";
-import { useNodeFilters } from "@core/hooks/useNodeFilters.ts";
-import { FilterControl } from "@pages/Map/FilterControl.tsx";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
+import { Marker, Popup, useMap } from "react-map-gl/maplibre";
+import { Map } from "@components/Map.tsx";
+import { type FilterState, useFilterNode } from "@core/hooks/useFilterNode.ts";
+import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
+import { cn } from "@core/utils/cn.ts";
 
 type NodePosition = {
   latitude: number;
   longitude: number;
 };
 
-const convertToLatLng = (position: {
+const convertToLatLng = (position?: {
   latitudeI?: number;
   longitudeI?: number;
 }): NodePosition => ({
-  latitude: (position.latitudeI ?? 0) / 1e7,
-  longitude: (position.longitudeI ?? 0) / 1e7,
+  latitude: (position?.latitudeI ?? 0) / 1e7,
+  longitude: (position?.longitudeI ?? 0) / 1e7,
 });
 
 const MapPage = () => {
   const { getNodes, waypoints, hasNodeError } = useDevice();
-  const { theme } = useTheme();
-  const { default: map } = useMap();
+  const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
-  const darkMode = theme === "dark";
+  const { default: map } = useMap();
 
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | null
   >(null);
 
-  // Filter out nodes without a valid position
   const validNodes = useMemo(
     () =>
       getNodes(
@@ -55,25 +45,15 @@ const MapPage = () => {
     [getNodes],
   );
 
-  const {
-    filters,
-    defaultState,
-    onFilterChange,
-    resetFilters,
-    filteredNodes,
-    groupedFilterConfigs,
-  } = useNodeFilters(validNodes);
+  const [filterState, setFilterState] = useState<FilterState>(() =>
+    defaultFilterValues
+  );
+  const deferredFilterState = useDeferredValue(filterState);
 
-  const isDirty = useMemo(() => {
-    return Object.keys(filters).some((key) => {
-      const a = filters[key];
-      const b = defaultState[key];
-      // simple deep‐equal for primitives and [number,number]
-      return Array.isArray(a) && Array.isArray(b)
-        ? a[0] !== b[0] || a[1] !== b[1]
-        : a !== b;
-    });
-  }, [filters, defaultState]);
+  const filteredNodes = useMemo(
+    () => validNodes.filter((node) => nodeFilter(node, deferredFilterState)),
+    [validNodes, deferredFilterState],
+  );
 
   const handleMarkerClick = useCallback(
     (node: Protobuf.Mesh.NodeInfo, event: { originalEvent: MouseEvent }) => {
@@ -94,13 +74,8 @@ const MapPage = () => {
 
   // Get the bounds of the map based on the nodes furtherest away from center
   const getMapBounds = useCallback(() => {
-    if (!map) {
-      return;
-    }
+    if (!map || validNodes.length === 0) return;
 
-    if (!validNodes.length) {
-      return;
-    }
     if (validNodes.length === 1) {
       map.easeTo({
         zoom: map.getZoom(),
@@ -111,6 +86,7 @@ const MapPage = () => {
       });
       return;
     }
+
     const line = lineString(
       validNodes.map((n) => [
         (n.position?.latitudeI ?? 0) / 1e7,
@@ -128,7 +104,7 @@ const MapPage = () => {
     if (center) {
       map.easeTo(center);
     }
-  }, [filteredNodes, map]);
+  }, [map, validNodes]);
 
   // Generate all markers
   const markers = useMemo(
@@ -145,7 +121,7 @@ const MapPage = () => {
           >
             <Avatar
               text={node.user?.shortName?.toString() ?? node.num.toString()}
-              className="border-[1.5px] border-slate-600 shadow-xl shadow-slate-600"
+              className="border-[1.5px] border-slate-600 shadow-m shadow-slate-600"
               showError={hasNodeError(node.num)}
               showFavorite={node.isFavorite}
             />
@@ -155,45 +131,10 @@ const MapPage = () => {
     [filteredNodes, handleMarkerClick],
   );
 
-  useEffect(() => {
-    map?.on("load", () => {
-      getMapBounds();
-    });
-  }, [map, getMapBounds]);
-
   return (
     <>
       <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
-        <MapGl
-          mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
-          attributionControl={false}
-          renderWorldCopies={false}
-          maxPitch={0}
-          style={{
-            filter: darkMode ? "brightness(0.9)" : "",
-          }}
-          dragRotate={false}
-          touchZoomRotate={false}
-          initialViewState={{
-            zoom: 1.8,
-            latitude: 35,
-            longitude: 0,
-          }}
-        >
-          <AttributionControl
-            style={{
-              background: darkMode ? "#ffffff" : "",
-              color: darkMode ? "black" : "",
-            }}
-          />
-          <GeolocateControl
-            position="top-right"
-            positionOptions={{ enableHighAccuracy: true }}
-            trackUserLocation
-          />
-          <NavigationControl position="top-right" showCompass={false} />
-
-          <ScaleControl />
+        <Map onLoad={getMapBounds}>
           {waypoints.map((wp) => (
             <Marker
               key={wp.id}
@@ -207,27 +148,43 @@ const MapPage = () => {
             </Marker>
           ))}
           {markers}
-          {selectedNode
-            ? (
+          {selectedNode && (() => {
+            const position = convertToLatLng(selectedNode.position);
+            return (
               <Popup
+                key={selectedNode.num}
                 anchor="top"
-                longitude={convertToLatLng(selectedNode.position).longitude}
-                latitude={convertToLatLng(selectedNode.position).latitude}
+                longitude={position.longitude}
+                latitude={position.latitude}
                 onClose={() => setSelectedNode(null)}
                 className="w-full"
               >
                 <NodeDetail node={selectedNode} />
               </Popup>
-            )
-            : null}
-        </MapGl>
+            );
+          })()}
+        </Map>
 
         <FilterControl
-          groupedFilterConfigs={groupedFilterConfigs}
-          values={filters}
-          onChange={onFilterChange}
-          resetFilters={resetFilters}
-          isDirty={isDirty}
+          filterState={filterState}
+          defaultFilterValues={defaultFilterValues}
+          setFilterState={setFilterState}
+          isDirty={isFilterDirty(filterState)}
+          parameters={{
+            popoverContentProps: {
+              side: "bottom",
+              align: "end",
+              sideOffset: 12,
+            },
+            popoverTriggerClassName: cn(
+              "fixed bottom-17 right-2 px-1 py-1 rounded shadow-md",
+              "dark:text-slate-600 dark:hover:text-slate-700 dark:bg-slate-100 dark:hover:bg-slate-200 dark:active:bg-slate-300",
+              isFilterDirty(filterState)
+                ? "text-slate-100 dark:text-slate-100 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 hover:text-slate-200 dark:hover:text-slate-200 active:bg-green-800 dark:active:bg-green-800"
+                : "",
+            ),
+            showTextSearch: true,
+          }}
         />
       </PageLayout>
     </>

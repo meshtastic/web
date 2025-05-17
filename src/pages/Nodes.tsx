@@ -15,11 +15,14 @@ import {
   useCallback,
   useDeferredValue,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { base16 } from "rfc4648";
 import { Input } from "@components/UI/Input.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
+import { type FilterState, useFilterNode } from "@core/hooks/useFilterNode.ts";
+import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 
 export interface DeleteNoteDialogProps {
   open: boolean;
@@ -28,6 +31,7 @@ export interface DeleteNoteDialogProps {
 
 const NodesPage = (): JSX.Element => {
   const { getNodes, hardware, connection, hasNodeError } = useDevice();
+  const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
   const [selectedNode, setSelectedNode] = useState<
     Protobuf.Mesh.NodeInfo | undefined
   >(undefined);
@@ -37,17 +41,16 @@ const NodesPage = (): JSX.Element => {
   const [selectedLocation, setSelectedLocation] = useState<
     Types.PacketMetadata<Protobuf.Mesh.Position> | undefined
   >();
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const deferredSearch = useDeferredValue(searchTerm);
 
-  const filteredNodes = getNodes((node) => {
-    if (!node.user) return false;
-    const lowerCaseSearchTerm = deferredSearch.toLowerCase();
-    return (
-      node.user?.longName?.toLowerCase().includes(lowerCaseSearchTerm) ||
-      node.user?.shortName?.toLowerCase().includes(lowerCaseSearchTerm)
-    );
-  });
+  const [filterState, setFilterState] = useState<FilterState>(() =>
+    defaultFilterValues
+  );
+  const deferredFilterState = useDeferredValue(filterState);
+
+  const filteredNodes = useMemo(
+    () => getNodes((node) => nodeFilter(node, deferredFilterState)),
+    [deferredFilterState, getNodes, nodeFilter],
+  );
 
   useEffect(() => {
     if (!connection) return;
@@ -79,20 +82,44 @@ const NodesPage = (): JSX.Element => {
     },
     [hardware.myNodeNum],
   );
+
   return (
     <>
       <PageLayout
         label=""
         leftBar={<Sidebar />}
       >
-        <div className="p-2">
-          <Input
-            placeholder="Search nodes..."
-            value={searchTerm}
-            className="bg-transparent"
-            showClearButton={!!searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="pl-2 pt-2 flex flex-row">
+          <div className="flex-1 mr-2">
+            <Input
+              placeholder="Search nodes..."
+              value={filterState.nodeName}
+              className="bg-transparent"
+              showClearButton={!!filterState.nodeName}
+              onChange={(e) =>
+                setFilterState((prev) => ({
+                  ...prev,
+                  nodeName: e.target.value,
+                }))}
+            />
+          </div>
+          <div className="flex justify-end">
+            <FilterControl
+              filterState={filterState}
+              defaultFilterValues={defaultFilterValues}
+              setFilterState={setFilterState}
+              isDirty={isFilterDirty(filterState)}
+              parameters={{
+                popoverContentProps: {
+                  side: "bottom",
+                  align: "end",
+                  sideOffset: 12,
+                },
+                popoverTriggerClassName: "mr-1 p-2",
+                showTextSearch: false,
+              }}
+            />
+          </div>
         </div>
         <div className="overflow-y-auto">
           <Table
