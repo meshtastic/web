@@ -1,4 +1,4 @@
-import type { PaxcounterValidation } from "@app/validation/moduleConfig/paxcounter.tsx";
+import type { PaxcounterValidation } from "@app/validation/moduleConfig/paxcounter.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -42,6 +42,30 @@ export const Paxcounter = () => {
               properties: {
                 suffix: "Seconds",
               },
+              disabledBy: [
+                {
+                  fieldName: "enabled",
+                },
+              ],
+            },
+            {
+              type: "number",
+              name: "wifiThreshold",
+              label: "WiFi RSSI Threshold",
+              description:
+                "At what WiFi RSSI level should the counter increase. Defaults to -80.",
+              disabledBy: [
+                {
+                  fieldName: "enabled",
+                },
+              ],
+            },
+            {
+              type: "number",
+              name: "bleThreshold",
+              label: "BLE RSSI Threshold",
+              description:
+                "At what BLE RSSI level should the counter increase. Defaults to -80.",
               disabledBy: [
                 {
                   fieldName: "enabled",
