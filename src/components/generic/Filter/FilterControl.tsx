@@ -11,7 +11,13 @@ import { cn } from "@core/utils/cn.ts";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import type { FilterState } from "@core/hooks/useFilterNode.ts";
 import { FunnelIcon } from "lucide-react";
-import { type ComponentProps, ReactNode } from "react";
+import {
+  type ComponentProps,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   FilterAccordionItem,
   FilterMulti,
@@ -44,6 +50,17 @@ export function FilterControl({
   parameters,
   children,
 }: FilterControlProps) {
+  // Copy of the state that we only use for rendering sliders and their labels directly, rest is debounced
+  const [localFilterState, setLocalFilterState] = useState(filterState);
+  const skipNextSync = useRef(false);
+  useEffect(() => {
+    if (skipNextSync.current) {
+      skipNextSync.current = false;
+      return;
+    }
+    setLocalFilterState(filterState);
+  }, [filterState]);
+
   const handleTextChange =
     <K extends keyof FilterState>(key: K) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,10 +71,23 @@ export function FilterControl({
     };
   const handleRangeChange =
     <K extends keyof FilterState>(key: K) => (value: number[]) => {
-      setFilterState((prev) => ({
+      // immediate slider update
+      setLocalFilterState((prev) => ({
         ...prev,
         [key]: value,
       }));
+
+      // debounced write to filterState (table/map render)
+      debounce(
+        () => {
+          skipNextSync.current = true;
+          setFilterState((prev) => ({
+            ...prev,
+            [key]: value,
+          }));
+        },
+        250,
+      )();
     };
   const handleBoolChange = <K extends keyof FilterState>(
     key: K,
@@ -135,16 +165,17 @@ export function FilterControl({
               <FilterSlider
                 label="Number of hops"
                 filterKey="hopsAway"
-                filterState={filterState}
+                filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
                   <>
-                    Number of hops: {filterState.hopsAway[0] === 0
+                    Number of hops: {localFilterState.hopsAway[0] === 0
                       ? "Direct"
-                      : filterState.hopsAway[0]}
-                    {filterState.hopsAway[0] !== filterState.hopsAway[1]
-                      ? " - " + filterState.hopsAway[1]
+                      : localFilterState.hopsAway[0]}
+                    {localFilterState.hopsAway[0] !==
+                        localFilterState.hopsAway[1]
+                      ? " - " + localFilterState.hopsAway[1]
                       : ""}
                   </>
                 }
@@ -153,25 +184,26 @@ export function FilterControl({
               <FilterSlider
                 label="Last heard"
                 filterKey="lastHeard"
-                filterState={filterState}
+                filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
                   <>
                     Last heard: <br />
-                    {filterState.lastHeard[0] === 0 ? "Now" : (
+                    {localFilterState.lastHeard[0] === 0 ? "Now" : (
                       <>
-                        {filterState.lastHeard[0] ===
+                        {localFilterState.lastHeard[0] ===
                             defaultFilterValues.lastHeard[1] && ">"}
-                        {formatTS(filterState.lastHeard[0])}
+                        {formatTS(localFilterState.lastHeard[0])}
                       </>
                     )}
-                    {filterState.lastHeard[0] !== filterState.lastHeard[1] && (
+                    {localFilterState.lastHeard[0] !==
+                        localFilterState.lastHeard[1] && (
                       <>
                         {" – "}
-                        {filterState.lastHeard[1] ===
+                        {localFilterState.lastHeard[1] ===
                             defaultFilterValues.lastHeard[1] && ">"}
-                        {formatTS(filterState.lastHeard[1])}
+                        {formatTS(localFilterState.lastHeard[1])}
                       </>
                     )}
                   </>
@@ -197,42 +229,42 @@ export function FilterControl({
               <FilterSlider
                 label="SNR (db)"
                 filterKey="snr"
-                filterState={filterState}
+                filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
                 label="Channel Utilization (%)"
                 filterKey="channelUtilization"
-                filterState={filterState}
+                filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
                 label="Airtime Utilization (%)"
                 filterKey="airUtilTx"
-                filterState={filterState}
+                filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
                 label="Battery level (%)"
                 filterKey="batteryLevel"
-                filterState={filterState}
+                filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
                   <>
-                    Battery level (%): {filterState.batteryLevel[0] === 101
+                    Battery level (%): {localFilterState.batteryLevel[0] === 101
                       ? "Plugged in"
-                      : filterState.batteryLevel[0]}
-                    {filterState.batteryLevel[0] !==
-                        filterState.batteryLevel[1] && (
+                      : localFilterState.batteryLevel[0]}
+                    {localFilterState.batteryLevel[0] !==
+                        localFilterState.batteryLevel[1] && (
                       <>
                         {" – "}
-                        {filterState.batteryLevel[1] === 101
+                        {localFilterState.batteryLevel[1] === 101
                           ? "Plugged in"
-                          : filterState.batteryLevel[1]}
+                          : localFilterState.batteryLevel[1]}
                       </>
                     )}
                   </>
@@ -241,7 +273,7 @@ export function FilterControl({
               <FilterSlider
                 label="Battery voltage (V)"
                 filterKey="voltage"
-                filterState={filterState}
+                filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
