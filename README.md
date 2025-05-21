@@ -2,7 +2,7 @@
 
 <!--Project specific badges here-->
 
-[![CI](https://img.shields.io/github/actions/workflow/status/meshtastic/web/ci.yml?branch=master&label=actions&logo=github&color=yellow)](https://github.com/meshtastic/web/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/meshtastic/web/ci.yml?branch=main&label=actions&logo=github&color=yellow)](https://github.com/meshtastic/web/actions/workflows/ci.yml)
 [![CLA assistant](https://cla-assistant.io/readme/badge/meshtastic/web)](https://cla-assistant.io/meshtastic/web)
 [![Fiscal Contributors](https://opencollective.com/meshtastic/tiers/badge.svg?label=Fiscal%20Contributors&color=deeppink)](https://opencollective.com/meshtastic/)
 [![Vercel](https://img.shields.io/static/v1?label=Powered%20by&message=Vercel&style=flat&logo=vercel&color=000000)](https://vercel.com?utm_source=meshtastic&utm_campaign=oss)
@@ -61,7 +61,7 @@ Our release process follows these guidelines:
   early adoption.
 - **Nightly Builds:** An experimental Docker image containing the latest
   cutting-edge features and fixes is automatically built nightly from the
-  `master` branch.
+  `main` branch.
 
 ### Nightly Builds
 
@@ -170,6 +170,6 @@ requests:
   Meshtastic nodes.
 
 Please review our
-[Contribution Guidelines](https://github.com/meshtastic/web/blob/master/CONTRIBUTING.md)
+[Contribution Guidelines](https://github.com/meshtastic/web/blob/main/CONTRIBUTING.md)
 before submitting a pull request. We appreciate your help in making the project
 better!
