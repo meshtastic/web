@@ -5,11 +5,14 @@ import { Sidebar } from "@components/Sidebar.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { bbox, lineString } from "@turf/turf";
-import { MapPinIcon } from "lucide-react";
+import { FunnelIcon, MapPinIcon } from "lucide-react";
 import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { Marker, Popup, useMap } from "react-map-gl/maplibre";
 import { Map } from "@components/Map.tsx";
-import { type FilterState, useFilterNode } from "@core/hooks/useFilterNode.ts";
+import {
+  type FilterState,
+  useFilterNode,
+} from "@components/generic/Filter/useFilterNode.ts";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import { cn } from "@core/utils/cn.ts";
 
@@ -177,12 +180,13 @@ const MapPage = () => {
               sideOffset: 12,
             },
             popoverTriggerClassName: cn(
-              "fixed bottom-17 right-2 px-1 py-1 rounded shadow-md",
-              "dark:text-slate-600 dark:hover:text-slate-700 dark:bg-slate-100 dark:hover:bg-slate-200 dark:active:bg-slate-300",
+              "fixed top-45.5 right-2.5 w-[29px] px-1 py-1 rounded shadow-l outline-[2px] outline-stone-600/20 ",
+              "dark:text-slate-600 dark:hover:text-slate-700 bg-stone-50 hover:bg-stone-200 dark:bg-stone-50 dark:hover:bg-stone-200 dark:active:bg-stone-300",
               isFilterDirty(filterState)
-                ? "text-slate-100 dark:text-slate-100 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 hover:text-slate-200 dark:hover:text-slate-200 active:bg-green-800 dark:active:bg-green-800"
+                ? "text-slate-100 dark:text-slate-100 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 hover:text-slate-200 dark:hover:text-slate-200 active:bg-green-800 dark:active:bg-green-800 outline-green-600 dark:outline-green-700"
                 : "",
             ),
+            triggerIcon: <FunnelIcon className="w-5" />,
             showTextSearch: true,
           }}
         />

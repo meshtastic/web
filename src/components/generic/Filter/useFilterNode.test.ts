@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { useFilterNode } from "@core/hooks/useFilterNode.ts";
+import { useFilterNode } from "@components/generic/Filter/useFilterNode.ts";
 import { Protobuf } from "@meshtastic/core";
 import { renderHook } from "@testing-library/react";
 

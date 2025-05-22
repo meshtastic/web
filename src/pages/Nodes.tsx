@@ -21,7 +21,10 @@ import {
 import { base16 } from "rfc4648";
 import { Input } from "@components/UI/Input.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
-import { type FilterState, useFilterNode } from "@core/hooks/useFilterNode.ts";
+import {
+  type FilterState,
+  useFilterNode,
+} from "@components/generic/Filter/useFilterNode.ts";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 
 export interface DeleteNoteDialogProps {

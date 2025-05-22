@@ -1,16 +1,3 @@
-import { Protobuf } from "@meshtastic/core";
-import { debounce } from "@core/utils/debounce.ts";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@components/UI/Popover.tsx";
-import { Accordion } from "@components/UI/Accordion.tsx";
-import { cn } from "@core/utils/cn.ts";
-import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import type { FilterState } from "@core/hooks/useFilterNode.ts";
-import { FunnelIcon } from "lucide-react";
 import {
   type ComponentProps,
   ReactNode,
@@ -18,6 +5,21 @@ import {
   useRef,
   useState,
 } from "react";
+import { Protobuf } from "@meshtastic/core";
+import { debounce } from "@core/utils/debounce.ts";
+import { cn } from "@core/utils/cn.ts";
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
+import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@components/UI/Popover.tsx";
+import { Input } from "@components/UI/Input.tsx";
+import { Accordion } from "@components/UI/Accordion.tsx";
+import { FunnelIcon } from "lucide-react";
+
 import {
   FilterAccordionItem,
   FilterMulti,
@@ -152,12 +154,12 @@ export function FilterControl({
                   <label htmlFor="nodeName" className="font-medium text-sm">
                     Node name/number
                   </label>
-                  <input
+                  <Input
                     type="text"
                     value={filterState.nodeName}
                     onChange={handleTextChange("nodeName")}
-                    placeholder="Search phrase"
-                    className="w-full px-2 py-1 border rounded shadow-sm  dark:border-slate-600"
+                    showClearButton
+                    placeholder="Meshtastic 1234"
                   />
                 </div>
               )}
@@ -175,7 +177,7 @@ export function FilterControl({
                       : localFilterState.hopsAway[0]}
                     {localFilterState.hopsAway[0] !==
                         localFilterState.hopsAway[1]
-                      ? " - " + localFilterState.hopsAway[1]
+                      ? " — " + localFilterState.hopsAway[1]
                       : ""}
                   </>
                 }
@@ -200,7 +202,7 @@ export function FilterControl({
                     {localFilterState.lastHeard[0] !==
                         localFilterState.lastHeard[1] && (
                       <>
-                        {" – "}
+                        {" — "}
                         {localFilterState.lastHeard[1] ===
                             defaultFilterValues.lastHeard[1] && ">"}
                         {formatTS(localFilterState.lastHeard[1])}

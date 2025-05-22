@@ -10,7 +10,7 @@ import { ScrollArea } from "@components/UI/ScrollArea.tsx";
 import { ToggleGroup, ToggleGroupItem } from "@components/UI/ToggleGroup.tsx";
 
 import { ReactNode } from "react";
-import type { FilterState } from "@core/hooks/useFilterNode.ts";
+import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
 import { cn } from "@core/utils/cn.ts";
 
 interface FilterAccordionItemProps {
@@ -92,7 +92,7 @@ export const FilterSlider = <K extends RangeKeys<FilterState>>({
   const defaultLabel = (
     <>
       {label}: {value[0]}
-      {showRange ? ` – ${value[1]}` : ""}
+      {showRange ? ` — ${value[1]}` : ""}
     </>
   );
 
@@ -109,8 +109,8 @@ export const FilterSlider = <K extends RangeKeys<FilterState>>({
         onValueChange={onChange(filterKey)}
         className="w-full pb-3"
         trackClassName="h-1 bg-slate-200 dark:bg-slate-700"
-        rangeClassName="bg-blue-500 dark:bg-blue-700"
-        thumbClassName="w-3 h-3 bg-white dark:bg-slate-900 border border-slate-400 dark:border-slate-600"
+        rangeClassName="bg-blue-500 dark:bg-blue-600"
+        thumbClassName="w-3 h-3 bg-white dark:bg-slate-300 border border-slate-400 dark:border-slate-100"
         aria-label={label ?? String(filterKey)}
       />
     </div>
