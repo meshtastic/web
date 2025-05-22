@@ -114,7 +114,7 @@ export const Table = ({ headings, rows }: TableProps) => {
   });
 
   return (
-    <table className="min-w-full">
+    <table className="min-w-full" style={{ contentVisibility: "auto" }}>
       <thead className="text-xs font-semibold">
         <tr>
           {headings.map((heading) => (
@@ -128,7 +128,9 @@ export const Table = ({ headings, rows }: TableProps) => {
               }`}
               onClick={() => heading.sortable && headingSort(heading.title)}
               onKeyUp={(e) => {
-                if (heading.sortable && (e.key === "Enter" || e.key === " ")) {
+                if (
+                  heading.sortable && (e.key === "Enter" || e.key === " ")
+                ) {
                   headingSort(heading.title);
                 }
               }}

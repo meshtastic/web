@@ -1,0 +1,160 @@
+import { describe, expect, it } from "vitest";
+import { useFilterNode } from "@components/generic/Filter/useFilterNode.ts";
+import { Protobuf } from "@meshtastic/core";
+import { renderHook } from "@testing-library/react";
+
+export function createMockNode(): Protobuf.Mesh.NodeInfo {
+  return {
+    $typeName: "meshtastic.NodeInfo",
+    num: 1234567890,
+    snr: -10.2,
+    lastHeard: 1747519674,
+    channel: 0,
+    viaMqtt: false,
+    isFavorite: true,
+    isIgnored: false,
+    hopsAway: 2,
+    user: {
+      $typeName: "meshtastic.User",
+      id: "!12345678",
+      longName: "longName",
+      shortName: "lN",
+      macaddr: new Uint8Array(0),
+      hwModel: Protobuf.Mesh.HardwareModel.TLORA_T3_S3,
+      isLicensed: false,
+      role: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
+      publicKey: new Uint8Array(32),
+    },
+    deviceMetrics: {
+      $typeName: "meshtastic.DeviceMetrics",
+      batteryLevel: 101,
+      voltage: 4.21,
+      channelUtilization: 7.50,
+      airUtilTx: 2.57,
+      uptimeSeconds: 528092,
+    },
+  };
+}
+
+describe("useFilterNode", () => {
+  const { result } = renderHook(() => useFilterNode());
+  const { nodeFilter, defaultFilterValues, isFilterDirty } = result.current;
+
+  describe("nodeFilter", () => {
+    const node = createMockNode();
+
+    it("filters by nodeName", () => {
+      expect(nodeFilter(node, { nodeName: "lon" })).toBe(true);
+      expect(nodeFilter(node, { nodeName: "xxx" })).toBe(false);
+    });
+
+    it("filters by hopsAway", () => {
+      expect(nodeFilter(node, { hopsAway: [0, 1] })).toBe(false);
+      expect(nodeFilter(node, { hopsAway: [2, 2] })).toBe(true);
+    });
+
+    it("filters by snr", () => {
+      expect(nodeFilter(node, { snr: [-12, -10] })).toBe(true);
+      expect(nodeFilter(node, { snr: [-17, -16] })).toBe(false);
+    });
+
+    it("filters by batteryLevel", () => {
+      expect(nodeFilter(node, { batteryLevel: [0, 100] })).toBe(false);
+      expect(nodeFilter(node, { batteryLevel: [100, 101] })).toBe(true);
+    });
+
+    it("filters by isFavorite", () => {
+      expect(nodeFilter(node, { isFavorite: true })).toBe(true);
+      expect(nodeFilter(node, { isFavorite: false })).toBe(false);
+      expect(nodeFilter(node, { isFavorite: undefined })).toBe(true);
+    });
+
+    it("filters by viaMqtt", () => {
+      expect(nodeFilter(node, { viaMqtt: true })).toBe(false);
+      expect(nodeFilter(node, { viaMqtt: false })).toBe(true);
+      expect(nodeFilter(node, { viaMqtt: undefined })).toBe(true);
+    });
+
+    it("filters by airUtilTx", () => {
+      expect(nodeFilter(node, { airUtilTx: [2, 3] })).toBe(true);
+      expect(nodeFilter(node, { airUtilTx: [3, 4] })).toBe(false);
+    });
+
+    it("filters by channelUtilization", () => {
+      expect(nodeFilter(node, { channelUtilization: [7, 8] })).toBe(true);
+      expect(nodeFilter(node, { channelUtilization: [8, 9] })).toBe(false);
+    });
+
+    it("filters by voltage", () => {
+      expect(nodeFilter(node, { voltage: [4, 4.3] })).toBe(true);
+      expect(nodeFilter(node, { voltage: [4.3, 5] })).toBe(false);
+    });
+
+    it("filters by role", () => {
+      expect(
+        nodeFilter(node, {
+          role: [Protobuf.Config.Config_DeviceConfig_Role.CLIENT],
+        }),
+      ).toBe(true);
+      expect(
+        nodeFilter(node, {
+          role: [Protobuf.Config.Config_DeviceConfig_Role.REPEATER],
+        }),
+      ).toBe(false);
+    });
+
+    it("filters by hwModel", () => {
+      expect(
+        nodeFilter(node, {
+          hwModel: [Protobuf.Mesh.HardwareModel.TLORA_T3_S3],
+        }),
+      ).toBe(true);
+      expect(
+        nodeFilter(node, { hwModel: [Protobuf.Mesh.HardwareModel.HELTEC_V3] }),
+      ).toBe(false);
+    });
+
+    it("returns false when current matches defaults", () => {
+      expect(isFilterDirty(defaultFilterValues)).toBe(false);
+    });
+
+    it("detects dirty string field", () => {
+      const modified = { ...defaultFilterValues, nodeName: "abc" };
+      expect(isFilterDirty(modified)).toBe(true);
+    });
+
+    it("detects dirty numeric tuple field", () => {
+      const modified = {
+        ...defaultFilterValues,
+        snr: [-10, 5] as [number, number],
+      };
+      expect(isFilterDirty(modified)).toBe(true);
+    });
+
+    it("detects dirty boolean field (isFavorite)", () => {
+      const modified = { ...defaultFilterValues, isFavorite: true };
+      expect(isFilterDirty(modified)).toBe(true);
+    });
+
+    it("detects dirty boolean field (viaMqtt)", () => {
+      const modified = { ...defaultFilterValues, viaMqtt: true };
+      expect(isFilterDirty(modified)).toBe(true);
+    });
+
+    it("detects dirty enum array field (role)", () => {
+      const modified = {
+        ...defaultFilterValues,
+        role: [Protobuf.Config.Config_DeviceConfig_Role.REPEATER],
+      };
+      expect(isFilterDirty(modified)).toBe(true);
+    });
+
+    it("detects dirty enum array field (hwModel)", () => {
+      const modified = {
+        ...defaultFilterValues,
+        hwModel: [Protobuf.Mesh.HardwareModel.HELTEC_V3],
+      };
+      expect(isFilterDirty(modified)).toBe(true);
+    });
+  });
+});
