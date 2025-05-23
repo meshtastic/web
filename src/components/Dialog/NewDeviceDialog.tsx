@@ -53,7 +53,7 @@ const links: { [key: string]: string } = {
 };
 
 const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
 
   const listFormatter = useMemo(
     () =>
@@ -158,7 +158,7 @@ export const NewDeviceDialog = ({
         <DialogHeader>
           <DialogTitle>{t("dialog_newDeviceDialog_title")}</DialogTitle>
         </DialogHeader>
-        <Tabs defaultValue={t("dialog_newDeviceDialog_tabLabelHttp")}>
+        <Tabs defaultValue="HTTP">
           <TabsList>
             {tabs.map((tab) => (
               <TabsTrigger key={tab.label} value={tab.label}>
@@ -169,7 +169,7 @@ export const NewDeviceDialog = ({
           {tabs.map((tab) => (
             <TabsContent key={tab.label} value={tab.label}>
               <fieldset disabled={tab.isDisabled}>
-                {(tab.label !== t("dialog_newDeviceDialog_tabLabelHttp") &&
+                {(tab.label !== "HTTP" &&
                     tab.isDisabled)
                   ? <ErrorMessage missingFeatures={unsupported} />
                   : null}

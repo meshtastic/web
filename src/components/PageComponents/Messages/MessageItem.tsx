@@ -17,6 +17,7 @@ import {
 } from "@core/stores/messageStore/index.ts";
 import { Protobuf, Types } from "@meshtastic/js";
 import { Message } from "@core/stores/messageStore/types.ts";
+import { useTranslation } from "react-i18next";
 // import { MessageActionsMenu } from "@components/PageComponents/Messages/MessageActionsMenu.tsx"; // Uncomment if needed later
 
 interface MessageStatusInfo {
@@ -81,6 +82,7 @@ interface MessageItemProps {
 export const MessageItem = ({ message }: MessageItemProps) => {
   const { getNode } = useDevice();
   const { getMyNodeNum } = useMessageStore();
+  const { i18n } = useTranslation();
 
   const messageUser: Protobuf.Mesh.NodeInfo | null | undefined = useMemo(() => {
     return message.from != null ? getNode(message.from) : null;
@@ -110,7 +112,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     () => message.date ? new Date(message.date) : null,
     [message.date],
   );
-  const locale = "en-US"; // TODO: Make dynamic via props or context
+  const locale = i18n.language;
 
   const formattedTime = useMemo(
     () =>
