@@ -27,11 +27,11 @@ export const LocationResponseDialog = ({
 
   const from = getNode(location?.from ?? 0);
   const longName = from?.user?.longName ??
-    (from ? `!${numberToHexUnpadded(from?.num)}` : t("common.unknown"));
+    (from ? `!${numberToHexUnpadded(from?.num)}` : t("common_unknown"));
   const shortName = from?.user?.shortName ??
     (from
       ? `${numberToHexUnpadded(from?.num).substring(0, 4)}`
-      : t("common.unknown"));
+      : t("common_unknown"));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

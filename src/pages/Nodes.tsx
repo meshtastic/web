@@ -169,7 +169,7 @@ const NodesPage = (): JSX.Element => {
             rows={filteredNodes.map((node) => [
               <div key={node.num}>
                 <Avatar
-                  text={node.user?.shortName ?? t("common.unknown")}
+                  text={node.user?.shortName ?? t("common_unknown")}
                   showFavorite={node.isFavorite}
                   showError={hasNodeError(node.num)}
                 />
@@ -227,7 +227,7 @@ const NodesPage = (): JSX.Element => {
                 {base16
                   .stringify(node.user?.macaddr ?? [])
                   .match(/.{1,2}/g)
-                  ?.join(":") ?? t("common.unknown")}
+                  ?.join(":") ?? t("common_unknown")}
               </Mono>,
             ])}
           />

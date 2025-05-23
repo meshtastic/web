@@ -237,7 +237,7 @@ export const MessagesPage = () => {
             <SidebarButton
               key={node.num}
               preventCollapse
-              label={node.user?.longName ?? t("common.unknown")}
+              label={node.user?.longName ?? t("common_unknown")}
               count={node.unreadCount > 0 ? node.unreadCount : undefined}
               active={activeChat === node.num &&
                 chatType === MessageType.Direct}
@@ -248,7 +248,7 @@ export const MessagesPage = () => {
               }}
             >
               <Avatar
-                text={node.user?.shortName ?? t("common.unknown")}
+                text={node.user?.shortName ?? t("common_unknown")}
                 className={cn(hasNodeError(node.num) && "text-red-500")}
                 showError={hasNodeError(node.num)}
                 showFavorite={node.isFavorite}
@@ -274,7 +274,7 @@ export const MessagesPage = () => {
   const pageTitleChatName = useMemo(() => {
     if (isBroadcast && currentChannel) return getChannelName(currentChannel);
     if (isDirect && otherNode) {
-      return otherNode.user?.longName ?? t("common.unknown");
+      return otherNode.user?.longName ?? t("common_unknown");
     }
     return t("messages_title_default");
   }, [isBroadcast, currentChannel, isDirect, otherNode, t]);

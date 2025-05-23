@@ -50,7 +50,7 @@ export const MessageActionsMenu = ({
           <TooltipTrigger asChild>
             <button
               type="button"
-              aria-label={t("messages.actionsMenu.addReactionLabel")}
+              aria-label={t("messages_actionsMenu_addReactionLabel")}
               onClick={(e) => {
                 e.stopPropagation();
                 if (onAddReaction) {
@@ -63,7 +63,7 @@ export const MessageActionsMenu = ({
             </button>
           </TooltipTrigger>
           <TooltipContent className="bg-gray-800 text-white px-2 py-1 rounded text-xs">
-            {t("messages.actionsMenu.addReactionLabel")}
+            {t("messages_actionsMenu_addReactionLabel")}
             <TooltipArrow className="fill-gray-800" />
           </TooltipContent>
         </Tooltip>
@@ -72,7 +72,7 @@ export const MessageActionsMenu = ({
           <TooltipTrigger asChild>
             <button
               type="button"
-              aria-label={t("messages.actionsMenu.replyLabel")}
+              aria-label={t("messages_actionsMenu_replyLabel")}
               onClick={(e) => {
                 e.stopPropagation();
                 if (onReply) {
@@ -85,7 +85,7 @@ export const MessageActionsMenu = ({
             </button>
           </TooltipTrigger>
           <TooltipContent className="bg-gray-800 text-white px-2 py-1 rounded text-xs">
-            {t("messages.actionsMenu.replyLabel")}
+            {t("messages_actionsMenu_replyLabel")}
             <TooltipArrow className="fill-gray-800" />
           </TooltipContent>
         </Tooltip>

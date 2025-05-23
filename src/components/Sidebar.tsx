@@ -42,8 +42,8 @@ const CollapseToggleButton = () => {
   const { isCollapsed, toggleSidebar } = useSidebar();
   const { t } = useTranslation();
   const buttonLabel = isCollapsed
-    ? t("sidebar.collapseToggle.button_open")
-    : t("sidebar.collapseToggle.button_close");
+    ? t("sidebar_collapseToggle-button_open")
+    : t("sidebar_collapseToggle_button_close");
 
   return (
     <button
@@ -134,7 +134,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
       >
         <img
           src="Logo.svg"
-          alt="Meshtastic Logo"
+          alt={t("sidebar_app_title_alt")}
           className="size-10 flex-shrink-0 rounded-xl"
         />
         <h2
@@ -146,7 +146,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
               : "opacity-100 max-w-xs visible ml-2",
           )}
         >
-          {t("common.header")}
+          {t("common_header")}
         </h2>
       </div>
 
@@ -188,7 +188,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                   isCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
                 )}
               >
-                {t("common.loading")}
+                {t("common_loading")}
               </Subtle>
             </div>
           )
@@ -236,9 +236,9 @@ export const Sidebar = ({ children }: SidebarProps) => {
                     className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
                   />
                   <Subtle>
-                    {t("sidebar.deviceInfo.volts", {
+                    {t("sidebar_deviceInfo.volts", {
                       voltage: myNode.deviceMetrics?.voltage?.toPrecision(3) ??
-                        t("common.unknown"),
+                        t("common_unknown"),
                     })}
                   </Subtle>
                 </div>
@@ -248,9 +248,9 @@ export const Sidebar = ({ children }: SidebarProps) => {
                     className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
                   />
                   <Subtle>
-                    {t("sidebar.deviceInfo.firmwareVersion", {
+                    {t("sidebar_deviceInfo.firmwareVersion", {
                       version: myMetadata?.firmwareVersion ??
-                        t("common.unknown"),
+                        t("common_unknown"),
                     })}
                   </Subtle>
                 </div>
@@ -266,7 +266,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
               >
                 <button
                   type="button"
-                  aria-label={t("sidebar.deviceInfo.button_editDeviceName")}
+                  aria-label={t("sidebar_deviceInfo.button_editDeviceName")}
                   className="p-1 rounded transition-colors cursor-pointer  hover:text-accent"
                   onClick={() => setDialogOpen("deviceName", true)}
                 >

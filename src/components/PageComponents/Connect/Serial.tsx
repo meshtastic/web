@@ -56,8 +56,8 @@ export const Serial = (
       <div className="flex h-48 flex-col gap-2 overflow-y-auto">
         {serialPorts.map((port, index) => {
           const { usbProductId, usbVendorId } = port.getInfo();
-          const vendor = usbVendorId ?? t("common.unknown");
-          const product = usbProductId ?? t("common.unknown");
+          const vendor = usbVendorId ?? t("common_unknown");
+          const product = usbProductId ?? t("common_unknown");
           return (
             <Button
               key={`${vendor}-${product}-${index}`}

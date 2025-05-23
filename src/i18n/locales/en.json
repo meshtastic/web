@@ -1,6 +1,6 @@
 {
   "common_title": "Meshtastic Web",
-  "common_header": "Meshtastic",
+  "common_app": "Meshtastic",
   "common_description": "Meshtastic Web Client",
   "common_button_close": "Close",
   "common_button_ok": "OK",
@@ -147,6 +147,7 @@
 
   "sidebar_collapseToggle_button_open": "Open sidebar",
   "sidebar_collapseToggle_button_close": "Close sidebar",
+  "sidebar_app_title_alt": "Meshtastic Logo",
   "sidebar_deviceInfo_volts": "{{voltage}} volts",
   "sidebar_deviceInfo_firmwareVersion": "v{{version}}",
   "sidebar_deviceInfo_button_editDeviceName": "Edit device name",

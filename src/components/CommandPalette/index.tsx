@@ -120,11 +120,11 @@ export const CommandPalette = () => {
           icon: ArrowLeftRightIcon,
           subItems: getDevices().map((device) => ({
             label: getNode(device.hardware.myNodeNum)?.user?.longName ??
-              t("common.unknown"), // Or a more specific key for node name
+              t("common_unknown"), // Or a more specific key for node name
             icon: (
               <Avatar
                 text={getNode(device.hardware.myNodeNum)?.user?.shortName ??
-                  t("common.unknown")} // Or a more specific key
+                  t("common_unknown")} // Or a more specific key
               />
             ),
             action() {

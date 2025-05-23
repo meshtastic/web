@@ -38,15 +38,15 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
   const { setChatType, setActiveChat } = useMessageStore();
   const { t } = useTranslation();
   const { setActivePage } = useDevice();
-  const name = node.user?.longName ?? t("common.unknown");
-  const shortName = node.user?.shortName ?? t("common.unknown");
+  const name = node.user?.longName ?? t("common_unknown");
+  const shortName = node.user?.shortName ?? t("common_unknown");
   const hwModel = node.user?.hwModel ?? 0;
   const rawHardwareType = Protobuf.Mesh.HardwareModel[hwModel] as
     | keyof typeof Protobuf.Mesh.HardwareModel
     | undefined;
   const hardwareType = rawHardwareType
     ? rawHardwareType === "UNSET"
-      ? t("common.unset")
+      ? t("common_unset")
       : rawHardwareType.replaceAll("_", " ")
     : `${hwModel}`;
   function handleDirectMessage() {
@@ -121,7 +121,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
 
         <div>
           <Heading as="h5">{name}</Heading>
-          {hardwareType !== t("common.unset") && <Subtle>{hardwareType}
+          {hardwareType !== t("common_unset") && <Subtle>{hardwareType}
           </Subtle>}
 
           {!!node.deviceMetrics?.batteryLevel && (
@@ -223,7 +223,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%
             <Dot />
             {(node.snr + 10) * 5}
-            {t("common.rawUnit")}
+            {t("common_rawUnit")}
           </Mono>
         </div>
       )}

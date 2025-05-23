@@ -172,8 +172,8 @@ export const NodeDetailsDialog = ({
         <DialogHeader>
           <DialogTitle>
             {t("dialog_nodeDetails_titlePrefix")}
-            {node.user?.longName ?? t("common.unknown")} (
-            {node.user?.shortName ?? t("common.unknown")})
+            {node.user?.longName ?? t("common_unknown")} (
+            {node.user?.shortName ?? t("common_unknown")})
           </DialogTitle>
         </DialogHeader>
         <DialogFooter>
@@ -275,7 +275,7 @@ export const NodeDetailsDialog = ({
                   <p>
                     {t("dialog_nodeDetails_label_hardware")}
                     {(Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
-                      t("common.unknown"))
+                      t("common_unknown"))
                       .replace(/_/g, " ")}
                   </p>
                 </div>
@@ -322,7 +322,7 @@ export const NodeDetailsDialog = ({
                       )}
                     </>
                   )
-                  : <p>{t("common.unknown")}</p>}
+                  : <p>{t("common_unknown")}</p>}
                 <Button
                   onClick={handleRequestPosition}
                   name="requestPosition"

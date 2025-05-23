@@ -40,7 +40,7 @@ const ChannelsPage = () => {
           ? t("channel_page_title", {
             channelName: getChannelName(currentChannel),
           })
-          : t("common.loading")}
+          : t("common_loading")}
         actions={[
           {
             key: "search",
