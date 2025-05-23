@@ -81,9 +81,9 @@ const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
   const iconClassName = currentState.className;
   const statusText = currentState.text(batteryLevel);
 
-  const voltageTitle = `${voltage?.toPrecision(3) ?? t("common_unknown")} ${
-    t("common_unit_volts")
-  }`;
+  const voltageTitle = `${
+    voltage?.toPrecision(3) ?? t("common_unknown_short")
+  } ${t("common_unit_volts")}`;
 
   return (
     <div

@@ -38,8 +38,8 @@ export const DeviceNameDialog = ({
   const myNode = getNode(hardware.myNodeNum);
 
   const defaultValues = {
-    longName: myNode?.user?.longName ?? "Unknown",
-    shortName: myNode?.user?.shortName ?? "??",
+    longName: myNode?.user?.longName ?? t("common_unknown_long"),
+    shortName: myNode?.user?.shortName ?? t("common_unknown_short"),
   };
 
   const { getValues, setValue, reset, control, handleSubmit } = useForm<User>({

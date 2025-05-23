@@ -13,7 +13,8 @@
   "common_button_save": "Save",
   "common_label_primary": "Primary",
   "common_loading": "Loading...",
-  "common_unknown": "UNK",
+  "common_unknown_short": "UNK",
+  "common_unknown_long": "Unknown",
   "common_unset": "UNSET",
 
   "common_unit_volts": "Volts",

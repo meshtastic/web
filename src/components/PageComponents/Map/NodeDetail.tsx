@@ -38,8 +38,8 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
   const { setChatType, setActiveChat } = useMessageStore();
   const { t } = useTranslation();
   const { setActivePage } = useDevice();
-  const name = node.user?.longName ?? t("common_unknown");
-  const shortName = node.user?.shortName ?? t("common_unknown");
+  const name = node.user?.longName ?? t("common_unknown_short");
+  const shortName = node.user?.shortName ?? t("common_unknown_short");
   const hwModel = node.user?.hwModel ?? 0;
   const rawHardwareType = Protobuf.Mesh.HardwareModel[hwModel] as
     | keyof typeof Protobuf.Mesh.HardwareModel

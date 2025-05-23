@@ -238,7 +238,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                   <Subtle>
                     {t("sidebar_deviceInfo.volts", {
                       voltage: myNode.deviceMetrics?.voltage?.toPrecision(3) ??
-                        t("common_unknown"),
+                        t("common_unknown_short"),
                     })}
                   </Subtle>
                 </div>
@@ -250,7 +250,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                   <Subtle>
                     {t("sidebar_deviceInfo.firmwareVersion", {
                       version: myMetadata?.firmwareVersion ??
-                        t("common_unknown"),
+                        t("common_unknown_short"),
                     })}
                   </Subtle>
                 </div>
