@@ -9,7 +9,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { cn } from "@core/utils/cn.ts";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import type { IconNode, LucideIcon } from "lucide-react";
 import { ReactNode, useMemo } from "react";
 import {
   MessageState,
@@ -26,37 +26,6 @@ interface MessageStatusInfo {
   ariaLabel: string;
   iconClassName?: string;
 }
-
-const MESSAGE_STATUS_MAP: Record<MessageState, MessageStatusInfo> = {
-  [MessageState.Ack]: {
-    displayText: "Message delivered",
-    icon: CheckCircle2,
-    ariaLabel: "Message delivered",
-    iconClassName: "text-green-500",
-  },
-  [MessageState.Waiting]: {
-    displayText: "Waiting for delivery",
-    icon: CircleEllipsis,
-    ariaLabel: "Sending message",
-    iconClassName: "text-slate-400",
-  },
-  [MessageState.Failed]: {
-    displayText: "Delivery failed",
-    icon: AlertCircle,
-    ariaLabel: "Message delivery failed",
-    iconClassName: "text-red-500 dark:text-red-400",
-  },
-};
-
-const UNKNOWN_STATUS: MessageStatusInfo = {
-  displayText: "Unknown state",
-  icon: AlertCircle,
-  ariaLabel: "Message status unknown",
-  iconClassName: "text-red-500 dark:text-red-400",
-};
-
-const getMessageStatusInfo = (state: MessageState): MessageStatusInfo =>
-  MESSAGE_STATUS_MAP[state] ?? UNKNOWN_STATUS;
 
 const StatusTooltip = (
   { statusInfo, children }: {
@@ -82,17 +51,55 @@ interface MessageItemProps {
 export const MessageItem = ({ message }: MessageItemProps) => {
   const { getNode } = useDevice();
   const { getMyNodeNum } = useMessageStore();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const MESSAGE_STATUS_MAP = useMemo(
+    (): Record<MessageState, MessageStatusInfo> => ({
+      [MessageState.Ack]: {
+        displayText: t("message_item_status_delivered_displayText"),
+        icon: CheckCircle2,
+        ariaLabel: t("message_item_status_delivered_ariaLabel"),
+        iconClassName: "text-green-500",
+      },
+      [MessageState.Waiting]: {
+        displayText: t("message_item_status_waiting_displayText"),
+        icon: CircleEllipsis,
+        ariaLabel: t("message_item_status_waiting_ariaLabel"),
+        iconClassName: "text-slate-400",
+      },
+      [MessageState.Failed]: {
+        displayText: t("message_item_status_failed_displayText"),
+        icon: AlertCircle,
+        ariaLabel: t("message_item_status_failed_ariaLabel"),
+        iconClassName: "text-red-500 dark:text-red-400",
+      },
+    }),
+    [t],
+  );
+
+  const UNKNOWN_STATUS = useMemo((): MessageStatusInfo => ({
+    displayText: t("message_item_status_unknown_displayText"),
+    icon: AlertCircle,
+    ariaLabel: t("message_item_status_unknown_ariaLabel"),
+    iconClassName: "text-red-500 dark:text-red-400",
+  }), [t]);
+
+  const getMessageStatusInfo = useMemo(
+    () => (state: MessageState): MessageStatusInfo =>
+      MESSAGE_STATUS_MAP[state] ?? UNKNOWN_STATUS,
+    [MESSAGE_STATUS_MAP, UNKNOWN_STATUS],
+  );
 
   const messageUser: Protobuf.Mesh.NodeInfo | null | undefined = useMemo(() => {
     return message.from != null ? getNode(message.from) : null;
   }, [getNode, message.from]);
 
   const myNodeNum = useMemo(() => getMyNodeNum(), [getMyNodeNum]);
+
   const { displayName, shortName, isFavorite } = useMemo(() => {
     const userIdHex = message.from.toString(16).toUpperCase().padStart(2, "0");
     const last4 = userIdHex.slice(-4);
-    const fallbackName = `Meshtastic ${last4}`;
+    const fallbackName = t("message_item_fallbackName_withLastFour", { last4 });
     const longName = messageUser?.user?.longName;
     const derivedShortName = messageUser?.user?.shortName || fallbackName;
     const derivedDisplayName = longName || derivedShortName;
@@ -103,7 +110,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
       shortName: derivedShortName,
       isFavorite: isFavorite,
     };
-  }, [messageUser, message.from]);
+  }, [messageUser, message.from, t, myNodeNum]);
 
   const messageStatusInfo = getMessageStatusInfo(message.state);
   const StatusIconComponent = messageStatusInfo.icon;
