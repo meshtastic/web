@@ -1,6 +1,6 @@
 {
   "common_title": "Meshtastic Web",
-  "common_app": "Meshtastic",
+  "common_header": "Meshtastic",
   "common_description": "Meshtastic Web Client",
   "common_button_close": "Close",
   "common_button_ok": "OK",
@@ -31,6 +31,7 @@
   "navigation_title": "Navigation",
   "navigation_title_messages": "Messages",
   "navigation_title_map": "Map",
+  "navigation_title_config": "Config",
   "navigation_title_radioConfig": "Radio Config",
   "navigation_title_moduleConfig": "Module Config",
   "navigation_title_channels": "Channels",
@@ -583,5 +584,24 @@
   "filter_control_toggle_favorites_label": "Favorites",
   "filter_control_toggle_hide_label": "Hide",
   "filter_control_toggle_showOnly_label": "Show Only",
-  "filter_control_toggle_viaMqtt_label": "Connected via MQTT"
+  "filter_control_toggle_viaMqtt_label": "Connected via MQTT",
+
+  "position_flag_altitude": "Altitude",
+  "position_flag_altitude_geoidal_separation": "Altitude Geoidal Separation",
+  "position_flag_altitude_msl": "Altitude is Mean Sea Level",
+  "position_flag_dop": "Dilution of precision (DOP) PDOP used by default",
+  "position_flag_hdop_vdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
+  "position_flag_num_satellites": "Number of satellites",
+  "position_flag_sequence_number": "Sequence number",
+  "position_flag_timestamp": "Timestamp",
+  "position_flag_unset": "Unset",
+  "position_flag_vehicle_heading": "Vehicle heading",
+  "position_flag_vehicle_speed": "Vehicle speed",
+
+  "theme_preference_dark": "Dark",
+  "theme_preference_light": "Light",
+  "theme_preference_system": "System",
+  "theme_switcher_aria_change_theme": "Change current theme",
+
+  "footer_text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>"
 }

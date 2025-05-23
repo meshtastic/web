@@ -32,25 +32,25 @@ const getBatteryStates = (
       condition: (level) => level > 100,
       Icon: PlugZapIcon,
       className: "text-gray-500",
-      text: () => t("common_batteryStatus.pluggedIn"),
+      text: () => t("common_batteryStatus_pluggedIn"),
     },
     {
       condition: (level) => level > 80,
       Icon: BatteryFullIcon,
       className: "text-green-500",
-      text: (level) => t("common_batteryStatus.charging", { level }),
+      text: (level) => t("common_batteryStatus_charging", { level }),
     },
     {
       condition: (level) => level > 20,
       Icon: BatteryMediumIcon,
       className: "text-yellow-500",
-      text: (level) => t("common_batteryStatus.charging", { level }),
+      text: (level) => t("common_batteryStatus_charging", { level }),
     },
     {
       condition: () => true,
       Icon: BatteryLowIcon,
       className: "text-red-500",
-      text: (level) => t("common_batteryStatus.charging", { level }),
+      text: (level) => t("common_batteryStatus_charging", { level }),
     },
   ];
 };
@@ -91,7 +91,7 @@ const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
       title={voltageTitle}
     >
       <BatteryIcon size={22} className={iconClassName} />
-      <Subtle aria-label={t("common_batteryStatus.title")}>
+      <Subtle aria-label={t("common_batteryStatus_title")}>
         {statusText}
       </Subtle>
     </div>

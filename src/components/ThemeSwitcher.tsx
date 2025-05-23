@@ -1,6 +1,7 @@
 import { useTheme } from "../core/hooks/useTheme.ts";
 import { cn } from "../core/utils/cn.ts";
 import { Monitor, Moon, Sun } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type ThemePreference = "light" | "dark" | "system";
 
@@ -10,6 +11,7 @@ export default function ThemeSwitcher({
   className?: string;
 }) {
   const { preference, setPreference } = useTheme();
+  const { t } = useTranslation();
 
   const themeIcons = {
     light: <Sun className="size-6" />,
@@ -24,7 +26,13 @@ export default function ThemeSwitcher({
     setPreference(nextPreference);
   };
 
-  const [firstCharOfPreference = "", ...restOfPreference] = preference;
+  const preferenceDisplayMap: Record<ThemePreference, string> = {
+    light: t("theme_preference_light"),
+    dark: t("theme_preference_dark"),
+    system: t("theme_preference_system"),
+  };
+
+  const currentDisplayPreference = preferenceDisplayMap[preference];
 
   return (
     <button
@@ -34,14 +42,13 @@ export default function ThemeSwitcher({
         className,
       )}
       onClick={toggleTheme}
-      aria-description="Change current theme"
+      aria-description={t("theme_switcher_aria_change_theme")}
     >
       <span
         data-label
         className="transition-all block absolute w-full mb-auto mt-auto ml-0 mr-0 text-xs left-0 -top-3 opacity-0 rounded-lg"
       >
-        {firstCharOfPreference.toLocaleUpperCase() +
-          (restOfPreference ?? []).join("")}
+        {currentDisplayPreference}
       </span>
       {themeIcons[preference]}
     </button>

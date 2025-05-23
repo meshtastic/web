@@ -11,7 +11,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Types } from "@meshtastic/core";
 import type { Protobuf } from "@meshtastic/core";
 import i18next from "i18next";
-import { ImportIcon, QrCodeIcon } from "lucide-react";
+import { QrCodeIcon, UploadIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -43,14 +43,14 @@ const ChannelsPage = () => {
           : t("common_loading")}
         actions={[
           {
-            key: "search",
-            icon: ImportIcon,
+            key: "import",
+            icon: UploadIcon,
             onClick() {
               setDialogOpen("import", true);
             },
           },
           {
-            key: "import",
+            key: "qr",
             icon: QrCodeIcon,
             onClick() {
               setDialogOpen("QR", true);
@@ -59,7 +59,7 @@ const ChannelsPage = () => {
         ]}
       >
         <Tabs defaultValue="0">
-          <TabsList className="dark:bg-slate-800 ">
+          <TabsList className="dark:bg-slate-800">
             {allChannels.map((channel) => (
               <TabsTrigger
                 key={channel.index}

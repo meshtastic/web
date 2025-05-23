@@ -97,7 +97,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
     },
     { name: t("navigation_title_map"), icon: MapIcon, page: "map" },
     {
-      name: t("navigation_title_radioConfig"),
+      name: t("navigation_title_config"),
       icon: SettingsIcon,
       page: "config",
     },
@@ -236,7 +236,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                     className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
                   />
                   <Subtle>
-                    {t("sidebar_deviceInfo.volts", {
+                    {t("sidebar_deviceInfo_volts", {
                       voltage: myNode.deviceMetrics?.voltage?.toPrecision(3) ??
                         t("common_unknown_short"),
                     })}
@@ -248,7 +248,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                     className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
                   />
                   <Subtle>
-                    {t("sidebar_deviceInfo.firmwareVersion", {
+                    {t("sidebar_deviceInfo_firmwareVersion", {
                       version: myMetadata?.firmwareVersion ??
                         t("common_unknown_short"),
                     })}
@@ -266,7 +266,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
               >
                 <button
                   type="button"
-                  aria-label={t("sidebar_deviceInfo.button_editDeviceName")}
+                  aria-label={t("sidebar_deviceInfo_button_editDeviceName")}
                   className="p-1 rounded transition-colors cursor-pointer  hover:text-accent"
                   onClick={() => setDialogOpen("deviceName", true)}
                 >

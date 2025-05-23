@@ -278,7 +278,7 @@ export function FilterControl({
                   <>
                     {t("filter_control_slider_batteryLevel_labelText", {
                       value: localFilterState.batteryLevel[0] === 101
-                        ? t("common_batteryStatus.pluggedIn")
+                        ? t("common_batteryStatus_pluggedIn")
                         : localFilterState.batteryLevel[0],
                     })}
                     {localFilterState.batteryLevel[0] !==
@@ -286,7 +286,7 @@ export function FilterControl({
                       <>
                         {" – "}
                         {localFilterState.batteryLevel[1] === 101
-                          ? t("common_batteryStatus.pluggedIn")
+                          ? t("common_batteryStatus_pluggedIn")
                           : localFilterState.batteryLevel[1]}
                       </>
                     )}

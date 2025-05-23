@@ -69,7 +69,7 @@ export const Serial = (
                 // No need to setConnectionInProgress(false) here as closeDialog() unmounts.
               }}
             >
-              {t("serialConnection.deviceIdentifier", {
+              {t("serialConnection_deviceIdentifier", {
                 index,
                 vendorId: vendor,
                 productId: product,
@@ -79,7 +79,7 @@ export const Serial = (
         })}
         {serialPorts.length === 0 && (
           <Mono className="m-auto select-none">
-            {t("serialConnection.noDevicesPaired")}
+            {t("serialConnection_noDevicesPaired")}
           </Mono>
         )}
       </div>
@@ -96,7 +96,7 @@ export const Serial = (
           });
         }}
       >
-        <span>{t("serialConnection.newDeviceButton")}</span>
+        <span>{t("serialConnection_newDeviceButton")}</span>
       </Button>
     </fieldset>
   );
