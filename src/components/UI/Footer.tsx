@@ -1,5 +1,5 @@
 import { cn } from "@core/utils/cn.ts";
-import { Trans, useTranslation } from "react-i18next";
+import { Trans } from "react-i18next";
 
 type FooterProps = {
   className?: string;
