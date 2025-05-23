@@ -1,5 +1,5 @@
 import { useDevice } from "@core/stores/deviceStore.ts";
-import type { AmbientLightingValidation } from "@app/validation/moduleConfig/ambientLighting.tsx";
+import type { AmbientLightingValidation } from "@app/validation/moduleConfig/ambientLighting.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";

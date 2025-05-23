@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { Label } from "@components/UI/Label.tsx";
+import { useTranslation } from "react-i18next";
 
 export interface RemoveNodeDialogProps {
   open: boolean;
@@ -21,6 +22,7 @@ export const RemoveNodeDialog = ({
   open,
   onOpenChange,
 }: RemoveNodeDialogProps) => {
+  const { t } = useTranslation();
   const { connection, getNode, removeNode } = useDevice();
   const { nodeNumToBeRemoved } = useAppStore();
 
@@ -35,9 +37,9 @@ export const RemoveNodeDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>Remove Node?</DialogTitle>
+          <DialogTitle>{t("dialog_removeNode_title")}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to remove this Node?
+            {t("dialog_removeNode_description")}
           </DialogDescription>
         </DialogHeader>
         <div className="gap-4">
@@ -46,8 +48,12 @@ export const RemoveNodeDialog = ({
           </form>
         </div>
         <DialogFooter>
-          <Button variant="destructive" onClick={() => onSubmit()}>
-            Remove
+          <Button
+            variant="destructive"
+            name="remove"
+            onClick={() => onSubmit()}
+          >
+            {t("dialog_button_remove")}
           </Button>
         </DialogFooter>
       </DialogContent>

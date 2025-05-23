@@ -13,8 +13,10 @@ import {
   UsersIcon,
 } from "lucide-react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 export const Dashboard = () => {
+  const { t } = useTranslation();
   const { setConnectDialogOpen, setSelectedDevice } = useAppStore();
   const { getDevices } = useDeviceStore();
 
@@ -25,8 +27,12 @@ export const Dashboard = () => {
       <div className="flex flex-col gap-3 p-3">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <Heading as="h3">Connected Devices</Heading>
-            <Subtle>Manage, connect and disconnect devices</Subtle>
+            <Heading as="h3">
+              {t("dashboard_connectedDevicesSection_title")}
+            </Heading>
+            <Subtle>
+              {t("dashboard_connectedDevicesSection_description")}
+            </Subtle>
           </div>
         </div>
 
@@ -55,19 +61,25 @@ export const Dashboard = () => {
                             {device.connection?.connType === "ble" && (
                               <>
                                 <BluetoothIcon size={16} />
-                                BLE
+                                {t(
+                                  "dashboard_connectedDevicesSection_connectionType_ble",
+                                )}
                               </>
                             )}
                             {device.connection?.connType === "serial" && (
                               <>
                                 <UsbIcon size={16} />
-                                Serial
+                                {t(
+                                  "dashboard_connectedDevicesSection_connectionType_serial",
+                                )}
                               </>
                             )}
                             {device.connection?.connType === "http" && (
                               <>
                                 <NetworkIcon size={16} />
-                                Network
+                                {t(
+                                  "dashboard_connectedDevicesSection_connectionType_network",
+                                )}
                               </>
                             )}
                           </div>
@@ -96,15 +108,21 @@ export const Dashboard = () => {
                   size={48}
                   className="mx-auto text-text-secondary"
                 />
-                <Heading as="h3">No Devices</Heading>
-                <Subtle>Connect at least one device to get started</Subtle>
+                <Heading as="h3">
+                  {t("dashboard_connectedDevicesSection_noDevicesTitle")}
+                </Heading>
+                <Subtle>
+                  {t("dashboard_connectedDevicesSection_noDevicesDescription")}
+                </Subtle>
                 <Button
                   className="gap-2"
                   variant="default"
                   onClick={() => setConnectDialogOpen(true)}
                 >
                   <PlusIcon size={16} />
-                  New Connection
+                  {t(
+                    "dashboard_connectedDevicesSection_button_newConnection",
+                  )}
                 </Button>
               </div>
             )}

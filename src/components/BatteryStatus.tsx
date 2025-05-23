@@ -5,6 +5,7 @@ import {
   BatteryMediumIcon,
   PlugZapIcon,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 
 interface DeviceMetrics {
@@ -23,34 +24,41 @@ interface BatteryStateConfig {
   text: (level: number) => string;
 }
 
-const batteryStates: BatteryStateConfig[] = [
-  {
-    condition: (level) => level > 100,
-    Icon: PlugZapIcon,
-    className: "text-gray-500",
-    text: () => "Plugged in",
-  },
-  {
-    condition: (level) => level > 80,
-    Icon: BatteryFullIcon,
-    className: "text-green-500",
-    text: (level) => `${level}% charging`,
-  },
-  {
-    condition: (level) => level > 20,
-    Icon: BatteryMediumIcon,
-    className: "text-yellow-500",
-    text: (level) => `${level}% charging`,
-  },
-  {
-    condition: () => true,
-    Icon: BatteryLowIcon,
-    className: "text-red-500",
-    text: (level) => `${level}% charging`,
-  },
-];
+const getBatteryStates = (
+  t: (key: string, options?: object) => string,
+): BatteryStateConfig[] => {
+  return [
+    {
+      condition: (level) => level > 100,
+      Icon: PlugZapIcon,
+      className: "text-gray-500",
+      text: () => t("common.batteryStatus.pluggedIn"),
+    },
+    {
+      condition: (level) => level > 80,
+      Icon: BatteryFullIcon,
+      className: "text-green-500",
+      text: (level) => t("common.batteryStatus.charging", { level }),
+    },
+    {
+      condition: (level) => level > 20,
+      Icon: BatteryMediumIcon,
+      className: "text-yellow-500",
+      text: (level) => t("common.batteryStatus.charging", { level }),
+    },
+    {
+      condition: () => true,
+      Icon: BatteryLowIcon,
+      className: "text-red-500",
+      text: (level) => t("common.batteryStatus.charging", { level }),
+    },
+  ];
+};
 
-const getBatteryState = (level: number) => {
+const getBatteryState = (
+  level: number,
+  batteryStates: BatteryStateConfig[],
+) => {
   return batteryStates.find((state) => state.condition(level));
 };
 
@@ -62,15 +70,20 @@ const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
     return null;
   }
 
+  const { t } = useTranslation();
+  const batteryStates = getBatteryStates(t);
+
   const { batteryLevel, voltage } = deviceMetrics;
-  const currentState = getBatteryState(batteryLevel) ??
+  const currentState = getBatteryState(batteryLevel, batteryStates) ??
     batteryStates[batteryStates.length - 1];
 
   const BatteryIcon = currentState.Icon;
   const iconClassName = currentState.className;
   const statusText = currentState.text(batteryLevel);
 
-  const voltageTitle = `${voltage?.toPrecision(3) ?? "Unknown"} volts`;
+  const voltageTitle = `${voltage?.toPrecision(3) ?? t("common.unknown")} ${
+    t("common_unit_volts")
+  }`;
 
   return (
     <div
@@ -78,7 +91,7 @@ const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
       title={voltageTitle}
     >
       <BatteryIcon size={22} className={iconClassName} />
-      <Subtle aria-label="Battery">
+      <Subtle aria-label={t("common.batteryStatus.title")}>
         {statusText}
       </Subtle>
     </div>

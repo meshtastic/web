@@ -12,46 +12,48 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
+import { useTranslation } from "react-i18next";
 
 export const DeviceConfig = () => {
+  const { t } = useTranslation();
   const tabs = [
     {
-      label: "Device",
+      label: t("config_device_tab_device"),
       element: Device,
       count: 0,
     },
     {
-      label: "Position",
+      label: t("config_device_tab_position"),
       element: Position,
     },
     {
-      label: "Power",
+      label: t("config_device_tab_power"),
       element: Power,
     },
     {
-      label: "Network",
+      label: t("config_device_tab_network"),
       element: Network,
     },
     {
-      label: "Display",
+      label: t("config_device_tab_display"),
       element: Display,
     },
     {
-      label: "LoRa",
+      label: t("config_device_tab_lora"),
       element: LoRa,
     },
     {
-      label: "Bluetooth",
+      label: t("config_device_tab_bluetooth"),
       element: Bluetooth,
     },
     {
-      label: "Security",
+      label: t("config_device_tab_security"),
       element: Security,
     },
   ];
 
   return (
-    <Tabs defaultValue="Device">
+    <Tabs defaultValue={t("config_device_tab_device")}>
       <TabsList className="dark:bg-slate-700">
         {tabs.map((tab) => (
           <TabsTrigger

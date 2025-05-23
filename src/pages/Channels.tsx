@@ -10,17 +10,20 @@ import { Sidebar } from "@components/Sidebar.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Types } from "@meshtastic/core";
 import type { Protobuf } from "@meshtastic/core";
+import i18next from "i18next";
 import { ImportIcon, QrCodeIcon } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export const getChannelName = (channel: Protobuf.Channel.Channel) =>
   channel.settings?.name.length
     ? channel.settings?.name
     : channel.index === 0
-    ? "Primary"
-    : `Ch ${channel.index}`;
+    ? i18next.t("channel_name_primary")
+    : i18next.t("channel_name_prefix", { index: channel.index });
 
 const ChannelsPage = () => {
+  const { t } = useTranslation();
   const { channels, setDialogOpen } = useDevice();
   const [activeChannel] = useState<Types.ChannelNumber>(
     Types.ChannelNumber.Primary,
@@ -33,9 +36,11 @@ const ChannelsPage = () => {
     <>
       <PageLayout
         leftBar={<Sidebar />}
-        label={`Channel: ${
-          currentChannel ? getChannelName(currentChannel) : "Loading..."
-        }`}
+        label={currentChannel
+          ? t("channel_page_title", {
+            channelName: getChannelName(currentChannel),
+          })
+          : t("common.loading")}
         actions={[
           {
             key: "search",

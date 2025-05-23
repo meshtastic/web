@@ -48,6 +48,7 @@ import {
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
+import { useTranslation } from "react-i18next";
 
 export interface NodeDetailsDialogProps {
   node: Protobuf.Mesh.NodeInfo | undefined;
@@ -60,6 +61,7 @@ export const NodeDetailsDialog = ({
   open,
   onOpenChange,
 }: NodeDetailsDialogProps) => {
+  const { t } = useTranslation();
   const { setDialogOpen, connection, setActivePage } = useDevice();
   const { setNodeNumToBeRemoved } = useAppStore();
   const { setChatType, setActiveChat } = useMessageStore();
@@ -90,11 +92,11 @@ export const NodeDetailsDialog = ({
     if (!node) return;
 
     toast({
-      title: "Requesting position, please wait...",
+      title: t("toast_requestingPosition"),
     });
     connection?.requestPosition(node.num).then(() =>
       toast({
-        title: "Position request sent.",
+        title: t("toast_positionRequestSent"),
       })
     );
     onOpenChange(false);
@@ -104,11 +106,11 @@ export const NodeDetailsDialog = ({
     if (!node) return;
 
     toast({
-      title: "Sending Traceroute, please wait...",
+      title: t("toast_sendingTraceroute"),
     });
     connection?.traceRoute(node.num).then(() =>
       toast({
-        title: "Traceroute sent.",
+        title: t("toast_tracerouteSent"),
       })
     );
     onOpenChange(false);
@@ -139,25 +141,25 @@ export const NodeDetailsDialog = ({
   const deviceMetricsMap = [
     {
       key: "airUtilTx",
-      label: "Air TX utilization",
+      label: t("dialog_nodeDetails_label_airTxUtilization"),
       value: node.deviceMetrics?.airUtilTx,
       format: (val: number) => `${val.toFixed(2)}%`,
     },
     {
       key: "channelUtilization",
-      label: "Channel utilization",
+      label: t("dialog_nodeDetails_label_channelUtilization"),
       value: node.deviceMetrics?.channelUtilization,
       format: (val: number) => `${val.toFixed(2)}%`,
     },
     {
       key: "batteryLevel",
-      label: "Battery level",
+      label: t("dialog_nodeDetails_label_batteryLevel"),
       value: node.deviceMetrics?.batteryLevel,
       format: (val: number) => `${val.toFixed(2)}%`,
     },
     {
       key: "voltage",
-      label: "Voltage",
+      label: t("dialog_nodeDetails_label_voltage"),
       value: node.deviceMetrics?.voltage,
       format: (val: number) => `${val.toFixed(2)}V`,
     },
@@ -169,20 +171,29 @@ export const NodeDetailsDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
-            Node Details for {node.user?.longName ?? "UNKNOWN"} (
-            {node.user?.shortName ?? "UNK"})
+            {t("dialog_nodeDetails_titlePrefix")}
+            {node.user?.longName ?? t("common.unknown")} (
+            {node.user?.shortName ?? t("common.unknown")})
           </DialogTitle>
         </DialogHeader>
         <DialogFooter>
           <div className="w-full">
             <div className="flex flex-row flex-wrap space-y-1">
-              <Button className="mr-1" onClick={handleDirectMessage}>
+              <Button
+                className="mr-1"
+                name="message"
+                onClick={handleDirectMessage}
+              >
                 <MessageSquareIcon className="mr-2" />
-                Message
+                {t("dialog_nodeDetails_button_message")}
               </Button>
-              <Button className="mr-1" onClick={handleTraceroute}>
+              <Button
+                className="mr-1"
+                name="traceRoute"
+                onClick={handleTraceroute}
+              >
                 <WaypointsIcon className="mr-2" />
-                Trace Route
+                {t("dialog_nodeDetails_button_traceRoute")}
               </Button>
               <Button className="mr-1" onClick={handleToggleFavorite}>
                 <StarIcon
@@ -209,7 +220,9 @@ export const NodeDetailsDialog = ({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                    {isIgnoredState ? "Unignore node" : "Ignore node"}
+                    {isIgnoredState
+                      ? t("dialog_nodeDetails_tooltip_unignoreNode")
+                      : t("dialog_nodeDetails_tooltip_ignoreNode")}
                     <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
                   </TooltipContent>
                 </Tooltip>
@@ -227,7 +240,7 @@ export const NodeDetailsDialog = ({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                    Remove node
+                    {t("dialog_nodeDetails_tooltip_removeNode")}
                     <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
                   </TooltipContent>
                 </Tooltip>
@@ -239,23 +252,30 @@ export const NodeDetailsDialog = ({
             <div className="flex flex-col flex-wrap space-x-1 space-y-1">
               <div className="flex flex-row space-x-2">
                 <div className="w-full bg-slate-100 text-slate-900 dark:text-slate-100 dark:bg-slate-800 p-3  rounded-lg">
-                  <p className="text-lg font-semibold">Details:</p>
-                  <p>Node Number: {node.num}</p>
-                  <p>Node Hex: !{numberToHexUnpadded(node.num)}</p>
+                  <p className="text-lg font-semibold">
+                    {t("dialog_nodeDetails_label_details")}
+                  </p>
+                  <p>{t("dialog_nodeDetails_label_nodeNumber")}{node.num}</p>
                   <p>
-                    Role: {Protobuf.Config.Config_DeviceConfig_Role[
+                    {t("dialog_nodeDetails_label_nodeHexPrefix")}
+                    {numberToHexUnpadded(node.num)}
+                  </p>
+                  <p>
+                    {t("dialog_nodeDetails_label_role")}
+                    {Protobuf.Config.Config_DeviceConfig_Role[
                       node.user?.role ?? 0
                     ].replace(/_/g, " ")}
                   </p>
                   <p>
-                    Last Heard: {node.lastHeard === 0
-                      ? "Never"
+                    {t("dialog_nodeDetails_label_lastHeard")}
+                    {node.lastHeard === 0
+                      ? t("nodes_table_lastHeardStatus_never")
                       : <TimeAgo timestamp={node.lastHeard * 1000} />}
                   </p>
                   <p>
-                    Hardware:{" "}
+                    {t("dialog_nodeDetails_label_hardware")}
                     {(Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
-                      "Unknown")
+                      t("common.unknown"))
                       .replace(/_/g, " ")}
                   </p>
                 </div>
@@ -269,7 +289,9 @@ export const NodeDetailsDialog = ({
 
             <div>
               <div className="text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
-                <p className="text-lg font-semibold">Position:</p>
+                <p className="text-lg font-semibold">
+                  {t("dialog_nodeDetails_label_position")}
+                </p>
 
                 {node.position
                   ? (
@@ -277,7 +299,7 @@ export const NodeDetailsDialog = ({
                       {node.position.latitudeI &&
                         node.position.longitudeI && (
                         <p>
-                          Coordinates:{" "}
+                          {t("dialog_locationResponse_label_coordinates")}
                           <a
                             className="text-blue-500 dark:text-blue-400"
                             href={`https://www.openstreetmap.org/?mlat=${
@@ -292,21 +314,29 @@ export const NodeDetailsDialog = ({
                         </p>
                       )}
                       {node.position.altitude && (
-                        <p>Altitude: {node.position.altitude}m</p>
+                        <p>
+                          {t("dialog_locationResponse_label_altitude")}
+                          {node.position.altitude}
+                          {t("dialog_locationResponse_unit_meter")}
+                        </p>
                       )}
                     </>
                   )
-                  : <p>Unknown</p>}
-                <Button onClick={handleRequestPosition} className="mt-2">
+                  : <p>{t("common.unknown")}</p>}
+                <Button
+                  onClick={handleRequestPosition}
+                  name="requestPosition"
+                  className="mt-2"
+                >
                   <MapPinnedIcon className="mr-2" />
-                  Request Position
+                  {t("dialog_nodeDetails_button_requestPosition")}
                 </Button>
               </div>
 
               {node.deviceMetrics && (
                 <div className="text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                    Device Metrics:
+                    {t("dialog_nodeDetails_label_deviceMetrics")}
                   </p>
                   {deviceMetricsMap.map(
                     (metric) =>
@@ -318,7 +348,7 @@ export const NodeDetailsDialog = ({
                   )}
                   {node.deviceMetrics.uptimeSeconds && (
                     <p>
-                      Uptime:{" "}
+                      {t("dialog_nodeDetails_label_uptime")}
                       <Uptime seconds={node.deviceMetrics.uptimeSeconds} />
                     </p>
                   )}
@@ -331,7 +361,7 @@ export const NodeDetailsDialog = ({
                 <AccordionItem className="AccordionItem" value="item-1">
                   <AccordionTrigger>
                     <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                      All Raw Metrics:
+                      {t("dialog_nodeDetails_label_allRawMetrics")}
                     </p>
                   </AccordionTrigger>
                   <AccordionContent className="overflow-x-scroll">

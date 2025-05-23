@@ -13,7 +13,8 @@ import { TransportHTTP } from "@meshtastic/transport-http";
 import { useState } from "react";
 import { useController, useForm } from "react-hook-form";
 import { AlertTriangle } from "lucide-react";
-import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
+import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { useTranslation } from "react-i18next";
 
 interface FormData {
   ip: string;
@@ -23,6 +24,7 @@ interface FormData {
 export const HTTP = (
   { closeDialog }: TabElementProps,
 ) => {
+  const { t } = useTranslation();
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const isURLHTTPS = location.protocol === "https:";
 
@@ -79,22 +81,24 @@ export const HTTP = (
         disabled={connectionInProgress}
       >
         <div>
-          <Label>IP Address/Hostname</Label>
+          <Label>{t("httpConnection.ipAddressLabel")}</Label>
           <Input
-            prefix={tlsValue ? "https://" : "http://"}
-            placeholder="000.000.000.000 / meshtastic.local"
+            prefix={tlsValue
+              ? `${t("httpConnection.https")}://`
+              : `${t("httpConnection.http")}://`}
+            placeholder={t("httpConnection.field_ipAddress_placeholder")}
             className="text-slate-900 dark:text-slate-100"
             {...register("ip")}
           />
         </div>
-        <div className="flex items-center gap-2 mt-2">
+        <div className="mt-2 flex items-center gap-2">
           <Switch
             onCheckedChange={setTLS}
             disabled={isURLHTTPS}
             checked={isURLHTTPS || tlsValue}
             {...register("tls")}
           />
-          <Label>Use HTTPS</Label>
+          <Label>{t("httpConnection.label_useHttps")}</Label>
         </div>
 
         {connectionError && (
@@ -106,30 +110,38 @@ export const HTTP = (
               />
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-800">
-                  Connection Failed
+                  {t("httpConnection.connectionFailedAlert.title")}
                 </p>
                 <p className="text-xs mt-1 text-amber-700 dark:text-amber-700">
-                  Could not connect to the device. {connectionError.secure &&
-                    "If using HTTPS, you may need to accept a self-signed certificate first. "}
-                  Please open{" "}
+                  {t("httpConnection.connectionFailedAlert.descriptionPrefix")}
+                  {connectionError.secure &&
+                    t("httpConnection.connectionFailedAlert.httpsHint")}
+                  {t("httpConnection.connectionFailedAlert.openLinkPrefix")}
                   <Link
                     href={`${
-                      connectionError.secure ? "https" : "http"
+                      connectionError.secure
+                        ? t("httpConnection.https")
+                        : t("httpConnection.http")
                     }://${connectionError.host}`}
                     className="underline font-medium text-amber-800 dark:text-amber-800"
                   >
                     {`${
-                      connectionError.secure ? "https" : "http"
+                      connectionError.secure
+                        ? t("httpConnection.https")
+                        : t("httpConnection.http")
                     }://${connectionError.host}`}
                   </Link>{" "}
-                  in a new tab{connectionError.secure
-                    ? ", accept any TLS warnings if prompted, then try again"
+                  {t("httpConnection.connectionFailedAlert.openLinkSuffix")}
+                  {connectionError.secure
+                    ? t(
+                      "httpConnection.connectionFailedAlert.acceptTlsWarningSuffix",
+                    )
                     : ""}.{" "}
                   <Link
                     href="https://meshtastic.org/docs/software/web-client/#http"
                     className="underline font-medium text-amber-800 dark:text-amber-800"
                   >
-                    Learn more
+                    {t("httpConnection.connectionFailedAlert.learnMoreLink")}
                   </Link>
                 </p>
               </div>
@@ -141,7 +153,11 @@ export const HTTP = (
         type="submit"
         variant="default"
       >
-        <span>{connectionInProgress ? "Connecting..." : "Connect"}</span>
+        <span>
+          {connectionInProgress
+            ? t("httpConnection.button_connecting")
+            : t("httpConnection.button_connect")}
+        </span>
       </Button>
     </form>
   );

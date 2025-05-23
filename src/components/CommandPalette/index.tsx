@@ -33,6 +33,7 @@ import {
 import { useEffect } from "react";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { cn } from "@core/utils/cn.ts";
+import { useTranslation } from "react-i18next";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
 
 export interface Group {
@@ -65,28 +66,29 @@ export const CommandPalette = () => {
   const { pinnedItems, togglePinnedItem } = usePinnedItems({
     storageName: "pinnedCommandMenuGroups",
   });
+  const { t } = useTranslation();
 
   const groups: Group[] = [
     {
-      label: "Goto",
+      label: t("command_palette_goto_label"),
       icon: LinkIcon,
       commands: [
         {
-          label: "Messages",
+          label: t("command_palette_goto_command_messages"),
           icon: MessageSquareIcon,
           action() {
             setActivePage("messages");
           },
         },
         {
-          label: "Map",
+          label: t("command_palette_goto_command_map"),
           icon: MapIcon,
           action() {
             setActivePage("map");
           },
         },
         {
-          label: "Config",
+          label: t("command_palette_goto_command_config"),
           icon: SettingsIcon,
           action() {
             setActivePage("config");
@@ -94,14 +96,14 @@ export const CommandPalette = () => {
           tags: ["settings"],
         },
         {
-          label: "Channels",
+          label: t("command_palette_goto_command_channels"),
           icon: LayersIcon,
           action() {
             setActivePage("channels");
           },
         },
         {
-          label: "Nodes",
+          label: t("command_palette_goto_command_nodes"),
           icon: UsersIcon,
           action() {
             setActivePage("nodes");
@@ -110,19 +112,19 @@ export const CommandPalette = () => {
       ],
     },
     {
-      label: "Manage",
+      label: t("command_palette_manage_label"),
       icon: SmartphoneIcon,
       commands: [
         {
-          label: "Switch Node",
+          label: t("command_palette_manage_command_switch_node"),
           icon: ArrowLeftRightIcon,
           subItems: getDevices().map((device) => ({
             label: getNode(device.hardware.myNodeNum)?.user?.longName ??
-              device.hardware.myNodeNum.toString(),
+              t("common.unknown"), // Or a more specific key for node name
             icon: (
               <Avatar
                 text={getNode(device.hardware.myNodeNum)?.user?.shortName ??
-                  device.hardware.myNodeNum.toString()}
+                  t("common.unknown")} // Or a more specific key
               />
             ),
             action() {
@@ -131,7 +133,7 @@ export const CommandPalette = () => {
           })),
         },
         {
-          label: "Connect New Node",
+          label: t("command_palette_manage_command_connect_new_node"),
           icon: PlusIcon,
           action() {
             setConnectDialogOpen(true);
@@ -140,22 +142,22 @@ export const CommandPalette = () => {
       ],
     },
     {
-      label: "Contextual",
+      label: t("command_palette_contextual_label"),
       icon: BoxSelectIcon,
       commands: [
         {
-          label: "QR Code",
+          label: t("command_palette_contextual_command_qr_code"),
           icon: QrCodeIcon,
           subItems: [
             {
-              label: "Generator",
+              label: t("command_palette_contextual_command_qr_generator"),
               icon: <QrCodeIcon size={16} />,
               action() {
                 setDialogOpen("QR", true);
               },
             },
             {
-              label: "Import",
+              label: t("command_palette_contextual_command_qr_import"),
               icon: <QrCodeIcon size={16} />,
               action() {
                 setDialogOpen("import", true);
@@ -164,42 +166,42 @@ export const CommandPalette = () => {
           ],
         },
         {
-          label: "Schedule Shutdown",
+          label: t("command_palette_contextual_command_schedule_shutdown"),
           icon: PowerIcon,
           action() {
             setDialogOpen("shutdown", true);
           },
         },
         {
-          label: "Schedule Reboot",
+          label: t("command_palette_contextual_command_schedule_reboot"),
           icon: RefreshCwIcon,
           action() {
             setDialogOpen("reboot", true);
           },
         },
         {
-          label: "Reboot To OTA Mode",
+          label: t("command_palette_contextual_command_reboot_to_ota_mode"),
           icon: RefreshCwIcon,
           action() {
             setDialogOpen("rebootOTA", true);
           },
         },
         {
-          label: "Reset Nodes",
+          label: t("command_palette_contextual_command_reset_nodes"),
           icon: TrashIcon,
           action() {
             connection?.resetNodes();
           },
         },
         {
-          label: "Factory Reset Device",
+          label: t("command_palette_contextual_command_factory_reset_device"),
           icon: FactoryIcon,
           action() {
             connection?.factoryResetDevice();
           },
         },
         {
-          label: "Factory Reset Config",
+          label: t("command_palette_contextual_command_factory_reset_config"),
           icon: FactoryIcon,
           action() {
             connection?.factoryResetConfig();
@@ -208,18 +210,18 @@ export const CommandPalette = () => {
       ],
     },
     {
-      label: "Debug",
+      label: t("command_palette_debug_label"),
       icon: BugIcon,
       commands: [
         {
-          label: "Reconfigure",
+          label: t("command_palette_debug_command_reconfigure"),
           icon: RefreshCwIcon,
           action() {
             void connection?.configure();
           },
         },
         {
-          label: "Clear All Stored Message",
+          label: t("command_palette_debug_command_clear_all_stored_messages"),
           icon: EraserIcon,
           action() {
             setDialogOpen("deleteMessages", true);
@@ -252,9 +254,9 @@ export const CommandPalette = () => {
       open={commandPaletteOpen}
       onOpenChange={setCommandPaletteOpen}
     >
-      <CommandInput placeholder="Type a command or search..." />
+      <CommandInput placeholder={t("command_palette_input_placeholder")} />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>{t("command_palette_empty_message")}</CommandEmpty>
         {sortedGroups.map((group) => (
           <CommandGroup
             key={group.label}
@@ -268,8 +270,8 @@ export const CommandPalette = () => {
                     "transition-all duration-300 scale-100 cursor-pointer p-2 focus:*:data-label:opacity-100",
                   )}
                   aria-description={pinnedItems.includes(group.label)
-                    ? "Unpin command group"
-                    : "Pin command group"}
+                    ? t("command_palette_unpin_group_aria_label")
+                    : t("command_palette_pin_group_aria_label")}
                 >
                   <span
                     data-label

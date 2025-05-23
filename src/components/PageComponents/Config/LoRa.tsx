@@ -1,11 +1,13 @@
-import type { LoRaValidation } from "@app/validation/config/lora.tsx";
+import type { LoRaValidation } from "@app/validation/config/lora.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const LoRa = () => {
   const { config, setWorkingConfig } = useDevice();
+  const { t } = useTranslation();
 
   const onSubmit = (data: LoRaValidation) => {
     setWorkingConfig(
@@ -24,14 +26,14 @@ export const LoRa = () => {
       defaultValues={config.lora}
       fieldGroups={[
         {
-          label: "Mesh Settings",
-          description: "Settings for the LoRa mesh",
+          label: t("config_lora_groupLabel_meshSettings"),
+          description: t("config_lora_groupDescription_meshSettings"),
           fields: [
             {
               type: "select",
               name: "region",
-              label: "Region",
-              description: "Sets the region for your node",
+              label: t("config_lora_fieldLabel_region"),
+              description: t("config_lora_fieldDescription_region"),
               properties: {
                 enumValue: Protobuf.Config.Config_LoRaConfig_RegionCode,
               },
@@ -39,8 +41,8 @@ export const LoRa = () => {
             {
               type: "select",
               name: "hopLimit",
-              label: "Hop Limit",
-              description: "Maximum number of hops",
+              label: t("config_lora_fieldLabel_hopLimit"),
+              description: t("config_lora_fieldDescription_hopLimit"),
               properties: {
                 enumValue: { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7 },
               },
@@ -48,39 +50,38 @@ export const LoRa = () => {
             {
               type: "number",
               name: "channelNum",
-              label: "Frequency Slot",
-              description: "LoRa frequency channel number",
+              label: t("config_lora_fieldLabel_frequencySlot"),
+              description: t("config_lora_fieldDescription_frequencySlot"),
             },
             {
               type: "toggle",
               name: "ignoreMqtt",
-              label: "Ignore MQTT",
-              description: "Don't forward MQTT messages over the mesh",
+              label: t("config_lora_fieldLabel_ignoreMqtt"),
+              description: t("config_lora_fieldDescription_ignoreMqtt"),
             },
             {
               type: "toggle",
               name: "configOkToMqtt",
-              label: "OK to MQTT",
-              description:
-                "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+              label: t("config_lora_fieldLabel_okToMqtt"),
+              description: t("config_lora_fieldDescription_okToMqtt"),
             },
           ],
         },
         {
-          label: "Waveform Settings",
-          description: "Settings for the LoRa waveform",
+          label: t("config_lora_groupLabel_waveformSettings"),
+          description: t("config_lora_groupDescription_waveformSettings"),
           fields: [
             {
               type: "toggle",
               name: "usePreset",
-              label: "Use Preset",
-              description: "Use one of the predefined modem presets",
+              label: t("config_lora_fieldLabel_usePreset"),
+              description: t("config_lora_fieldDescription_usePreset"),
             },
             {
               type: "select",
               name: "modemPreset",
-              label: "Modem Preset",
-              description: "Modem preset to use",
+              label: t("config_lora_fieldLabel_modemPreset"),
+              description: t("config_lora_fieldDescription_modemPreset"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -94,8 +95,8 @@ export const LoRa = () => {
             {
               type: "number",
               name: "bandwidth",
-              label: "Bandwidth",
-              description: "Channel bandwidth in MHz",
+              label: t("config_lora_fieldLabel_bandwidth"),
+              description: t("config_lora_fieldDescription_bandwidth"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -103,14 +104,14 @@ export const LoRa = () => {
                 },
               ],
               properties: {
-                suffix: "MHz",
+                suffix: t("common_unit_megahertz"),
               },
             },
             {
               type: "number",
               name: "spreadFactor",
-              label: "Spreading Factor",
-              description: "Indicates the number of chirps per symbol",
+              label: t("config_lora_fieldLabel_spreadingFactor"),
+              description: t("config_lora_fieldDescription_spreadingFactor"),
 
               disabledBy: [
                 {
@@ -119,14 +120,14 @@ export const LoRa = () => {
                 },
               ],
               properties: {
-                suffix: "CPS",
+                suffix: t("common_unit_cps"),
               },
             },
             {
               type: "number",
               name: "codingRate",
-              label: "Coding Rate",
-              description: "The denominator of the coding rate",
+              label: t("config_lora_fieldLabel_codingRate"),
+              description: t("config_lora_fieldDescription_codingRate"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -137,53 +138,52 @@ export const LoRa = () => {
           ],
         },
         {
-          label: "Radio Settings",
-          description: "Settings for the LoRa radio",
+          label: t("config_lora_groupLabel_radioSettings"),
+          description: t("config_lora_groupDescription_radioSettings"),
           fields: [
             {
               type: "toggle",
               name: "txEnabled",
-              label: "Transmit Enabled",
-              description: "Enable/Disable transmit (TX) from the LoRa radio",
+              label: t("config_lora_fieldLabel_transmitEnabled"),
+              description: t("config_lora_fieldDescription_transmitEnabled"),
             },
             {
               type: "number",
               name: "txPower",
-              label: "Transmit Power",
-              description: "Max transmit power",
+              label: t("config_lora_fieldLabel_transmitPower"),
+              description: t("config_lora_fieldDescription_transmitPower"),
               properties: {
-                suffix: "dBm",
+                suffix: t("common_unit_dbm"),
               },
             },
             {
               type: "toggle",
               name: "overrideDutyCycle",
-              label: "Override Duty Cycle",
-              description: "Override Duty Cycle",
+              label: t("config_lora_fieldLabel_overrideDutyCycle"),
+              description: t("config_lora_fieldDescription_overrideDutyCycle"),
             },
             {
               type: "number",
               name: "frequencyOffset",
-              label: "Frequency Offset",
-              description:
-                "Frequency offset to correct for crystal calibration errors",
+              label: t("config_lora_fieldLabel_frequencyOffset"),
+              description: t("config_lora_fieldDescription_frequencyOffset"),
               properties: {
-                suffix: "Hz",
+                suffix: t("common_unit_hertz"),
               },
             },
             {
               type: "toggle",
               name: "sx126xRxBoostedGain",
-              label: "Boosted RX Gain",
-              description: "Boosted RX gain",
+              label: t("config_lora_fieldLabel_boostedRxGain"),
+              description: t("config_lora_fieldDescription_boostedRxGain"),
             },
             {
               type: "number",
               name: "overrideFrequency",
-              label: "Override Frequency",
-              description: "Override frequency",
+              label: t("config_lora_fieldLabel_overrideFrequency"),
+              description: t("config_lora_fieldDescription_overrideFrequency"),
               properties: {
-                suffix: "MHz",
+                suffix: t("common_unit_megahertz"),
                 step: 0.001,
               },
             },

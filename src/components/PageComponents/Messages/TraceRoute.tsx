@@ -1,6 +1,7 @@
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { useTranslation } from "react-i18next";
 
 export interface TraceRouteProps {
   from?: Protobuf.Mesh.NodeInfo;
@@ -23,6 +24,7 @@ const RoutePath = (
   { title, startNode, endNode, path, snr }: RoutePathProps,
 ) => {
   const { getNode } = useDevice();
+  const { t } = useTranslation();
 
   return (
     <span
@@ -31,13 +33,20 @@ const RoutePath = (
     >
       <p className="font-semibold">{title}</p>
       <p>{startNode?.user?.longName}</p>
-      <p>↓ {snr?.[0] ?? "??"}dB</p>
+      <p>
+        ↓ {snr?.[0] ?? t("traceRoute_snrUnknown")}
+        {t("common.dbUnit")}
+      </p>
       {path.map((hop, i) => (
         <span key={getNode(hop)?.num ?? hop}>
           <p>
-            {getNode(hop)?.user?.longName ?? `!${numberToHexUnpadded(hop)}`}
+            {getNode(hop)?.user?.longName ??
+              `${t("traceRoute_nodeUnknownPrefix")}${numberToHexUnpadded(hop)}`}
           </p>
-          <p>↓ {snr?.[i + 1] ?? "??"}dB</p>
+          <p>
+            ↓ {snr?.[i + 1] ?? t("traceRoute_snrUnknown")}
+            {t("common.dbUnit")}
+          </p>
         </span>
       ))}
       <p>{endNode?.user?.longName}</p>
@@ -53,18 +62,19 @@ export const TraceRoute = ({
   snrTowards,
   snrBack,
 }: TraceRouteProps) => {
+  const { t } = useTranslation();
   return (
     <div className="ml-5 flex">
       <RoutePath
-        title="Route to destination:"
+        title={t("traceRoute_routeToDestinationTitle")}
         startNode={to}
         endNode={from}
         path={route}
         snr={snrTowards}
       />
-      {routeBack && (
+      {routeBack && routeBack.length > 0 && (
         <RoutePath
-          title="Route back:"
+          title={t("traceRoute_routeBackTitle")}
           startNode={from}
           endNode={to}
           path={routeBack}

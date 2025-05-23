@@ -17,6 +17,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export interface ImportDialogProps {
   open: boolean;
@@ -28,6 +29,7 @@ export const ImportDialog = ({
   open,
   onOpenChange,
 }: ImportDialogProps) => {
+  const { t } = useTranslation();
   const [importDialogInput, setImportDialogInput] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
   const [validUrl, setValidUrl] = useState<boolean>(false);
@@ -44,7 +46,7 @@ export const ImportDialog = ({
           channelsUrl.pathname !== "/e/") ||
         !channelsUrl.hash
       ) {
-        throw "Invalid Meshtastic URL";
+        throw t("dialog_import_error_invalidUrl");
       }
 
       const encodedChannelConfig = channelsUrl.hash.substring(1);
@@ -99,13 +101,13 @@ export const ImportDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>Import Channel Set</DialogTitle>
+          <DialogTitle>{t("dialog_import_title")}</DialogTitle>
           <DialogDescription>
-            The current LoRa configuration will be overridden.
+            {t("dialog_import_description")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
-          <Label>Channel Set/QR Code URL</Label>
+          <Label>{t("dialog_import_label_channelSetUrl")}</Label>
           <Input
             value={importDialogInput}
             suffix={validUrl ? "✅" : "❌"}
@@ -117,7 +119,7 @@ export const ImportDialog = ({
             <div className="flex flex-col gap-3">
               <div className="flex w-full gap-2">
                 <div className="w-36">
-                  <Label>Use Preset?</Label>
+                  <Label>{t("dialog_import_label_usePreset")}</Label>
                   <Switch
                     disabled
                     checked={channelSet?.loraConfig?.usePreset ?? true}
@@ -144,7 +146,7 @@ export const ImportDialog = ({
               }
 
               <span className="text-md block font-medium text-text-primary">
-                Channels:
+                {t("dialog_import_label_channels")}
               </span>
               <div className="flex w-40 flex-col gap-1">
                 {channelSet?.settings.map((channel) => (
@@ -152,7 +154,9 @@ export const ImportDialog = ({
                     <Label>
                       {channel.name.length
                         ? channel.name
-                        : `Channel: ${channel.id}`}
+                        : `${
+                          t("dialog_import_label_channelPrefix")
+                        }${channel.id}`}
                     </Label>
                     <Checkbox key={channel.id} />
                   </div>
@@ -162,8 +166,8 @@ export const ImportDialog = ({
           )}
         </div>
         <DialogFooter>
-          <Button onClick={apply} disabled={!validUrl}>
-            Apply
+          <Button onClick={apply} disabled={!validUrl} name="apply">
+            {t("dialog_button_apply")}
           </Button>
         </DialogFooter>
       </DialogContent>

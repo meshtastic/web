@@ -26,6 +26,7 @@ import {
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
+import { useTranslation } from "react-i18next";
 
 export interface DeleteNoteDialogProps {
   open: boolean;
@@ -33,6 +34,7 @@ export interface DeleteNoteDialogProps {
 }
 
 const NodesPage = (): JSX.Element => {
+  const { t } = useTranslation();
   const { getNodes, hardware, connection, hasNodeError } = useDevice();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
   const [selectedNode, setSelectedNode] = useState<
@@ -95,7 +97,7 @@ const NodesPage = (): JSX.Element => {
         <div className="pl-2 pt-2 flex flex-row">
           <div className="flex-1 mr-2">
             <Input
-              placeholder="Search nodes..."
+              placeholder={t("nodes_searchPlaceholder")}
               value={filterState.nodeName}
               className="bg-transparent"
               showClearButton={!!filterState.nodeName}
@@ -128,18 +130,46 @@ const NodesPage = (): JSX.Element => {
           <Table
             headings={[
               { title: "", type: "blank", sortable: false },
-              { title: "Long Name", type: "normal", sortable: true },
-              { title: "Connection", type: "normal", sortable: true },
-              { title: "Last Heard", type: "normal", sortable: true },
-              { title: "Encryption", type: "normal", sortable: false },
-              { title: "SNR", type: "normal", sortable: true },
-              { title: "Model", type: "normal", sortable: true },
-              { title: "MAC Address", type: "normal", sortable: true },
+              {
+                title: t("nodes_table_headings_longName"),
+                type: "normal",
+                sortable: true,
+              },
+              {
+                title: t("nodes_table_headings_connection"),
+                type: "normal",
+                sortable: true,
+              },
+              {
+                title: t("nodes_table_headings_lastHeard"),
+                type: "normal",
+                sortable: true,
+              },
+              {
+                title: t("nodes_table_headings_encryption"),
+                type: "normal",
+                sortable: false,
+              },
+              {
+                title: t("node_detail_snr_label"),
+                type: "normal",
+                sortable: true,
+              },
+              {
+                title: t("nodes_table_headings_model"),
+                type: "normal",
+                sortable: true,
+              },
+              {
+                title: t("nodes_table_headings_macAddress"),
+                type: "normal",
+                sortable: true,
+              },
             ]}
             rows={filteredNodes.map((node) => [
               <div key={node.num}>
                 <Avatar
-                  text={node.user?.shortName ?? "UNK "}
+                  text={node.user?.shortName ?? t("common.unknown")}
                   showFavorite={node.isFavorite}
                   showError={hasNodeError(node.num)}
                 />
@@ -159,16 +189,20 @@ const NodesPage = (): JSX.Element => {
               <Mono key="hops" className="w-16">
                 {node.hopsAway !== undefined
                   ? node?.viaMqtt === false && node.hopsAway === 0
-                    ? "Direct"
+                    ? t("nodes_table_connectionStatus_direct")
                     : `${node.hopsAway?.toString()} ${
-                      node.hopsAway ?? 0 > 1 ? "hops" : "hop"
-                    } away`
-                  : "-"}
-                {node?.viaMqtt === true ? ", via MQTT" : ""}
+                      node.hopsAway ?? 0 > 1
+                        ? t("nodes_table_connectionStatus_hops_other")
+                        : t("nodes_table_connectionStatus_hops_one")
+                    } ${t("nodes_table_connectionStatus_away")}`
+                  : t("nodes_table_connectionStatus_unknown")}
+                {node?.viaMqtt === true
+                  ? t("nodes_table_connectionStatus_viaMqtt")
+                  : ""}
               </Mono>,
               <Mono key="lastHeard">
                 {node.lastHeard === 0
-                  ? <p>Never</p>
+                  ? <p>{t("nodes_table_lastHeardStatus_never")}</p>
                   : <TimeAgo timestamp={node.lastHeard * 1000} />}
               </Mono>,
               <Mono key="pki">
@@ -177,9 +211,14 @@ const NodesPage = (): JSX.Element => {
                   : <LockOpenIcon className="text-yellow-300 mx-auto" />}
               </Mono>,
               <Mono key="snr">
-                {node.snr}db/
-                {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%/
-                {(node.snr + 10) * 5}raw
+                {node.snr}
+                {t("common_unit_dbm")}/
+                {Math.min(
+                  Math.max((node.snr + 10) * 5, 0),
+                  100,
+                )}%/{/* Percentage */}
+                {(node.snr + 10) * 5}
+                {t("common_unit_raw")}
               </Mono>,
               <Mono key="model">
                 {Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}
@@ -188,7 +227,7 @@ const NodesPage = (): JSX.Element => {
                 {base16
                   .stringify(node.user?.macaddr ?? [])
                   .match(/.{1,2}/g)
-                  ?.join(":") ?? "UNK"}
+                  ?.join(":") ?? t("common.unknown")}
               </Mono>,
             ])}
           />

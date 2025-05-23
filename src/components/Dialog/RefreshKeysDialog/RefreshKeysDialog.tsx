@@ -9,6 +9,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { LockKeyholeOpenIcon } from "lucide-react";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useTranslation } from "react-i18next";
 import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export interface RefreshKeysDialogProps {
@@ -19,6 +20,7 @@ export interface RefreshKeysDialogProps {
 export const RefreshKeysDialog = (
   { open, onOpenChange }: RefreshKeysDialogProps,
 ) => {
+  const { t } = useTranslation();
   const { activeChat } = useMessageStore();
   const { nodeErrors, getNode } = useDevice();
   const { handleCloseDialog, handleNodeRemove } = useRefreshKeysDialog();
@@ -32,13 +34,16 @@ export const RefreshKeysDialog = (
   const nodeWithError = getNode(nodeErrorNum.node);
 
   const text = {
-    title: `Keys Mismatch - ${nodeWithError?.user?.longName ?? ""}`,
-    description: `Your node is unable to send a direct message to node: ${
+    title: `${t("dialog_refreshKeys_titlePrefix")}${
       nodeWithError?.user?.longName ?? ""
-    } (${
-      nodeWithError?.user?.shortName ?? ""
-    }). This is due to the remote node's current public key does not match the previously stored key for this node.`,
+    }`,
+    description: `${t("dialog_refreshKeys_description_unableToSendDmPrefix")}${
+      nodeWithError?.user?.longName ?? ""
+    } (${nodeWithError?.user?.shortName ?? ""})${
+      t("dialog_refreshKeys_description_keyMismatchReasonSuffix")
+    }`,
   };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -60,22 +65,26 @@ export const RefreshKeysDialog = (
             </div>
             <div className="flex flex-col gap-2">
               <div>
-                <p className="font-bold mb-0.5">Accept New Keys</p>
+                <p className="font-bold mb-0.5">
+                  {t("dialog_refreshKeys_label_acceptNewKeys")}
+                </p>
                 <p>
-                  This will remove the node from device and request new keys.
+                  {t("dialog_refreshKeys_description_acceptNewKeys")}
                 </p>
               </div>
               <Button
                 variant="default"
+                name="requestNewKeys"
                 onClick={handleNodeRemove}
               >
-                Request New Keys
+                {t("dialog_button_requestNewKeys")}
               </Button>
               <Button
                 variant="outline"
+                name="dismiss"
                 onClick={handleCloseDialog}
               >
-                Dismiss
+                {t("dialog_button_dismiss")}
               </Button>
             </div>
           </li>

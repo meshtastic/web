@@ -26,6 +26,7 @@ import {
   FilterSlider,
   FilterToggle,
 } from "@components/generic/Filter/FilterComponents.tsx";
+import { useTranslation } from "react-i18next";
 
 type PopoverContentProps = ComponentProps<typeof PopoverContent>;
 
@@ -52,6 +53,7 @@ export function FilterControl({
   parameters,
   children,
 }: FilterControlProps) {
+  const { t } = useTranslation();
   // Copy of the state that we only use for rendering sliders and their labels directly, rest is debounced
   const [localFilterState, setLocalFilterState] = useState(filterState);
   const skipNextSync = useRef(false);
@@ -130,7 +132,7 @@ export function FilterControl({
               : "",
             parameters?.popoverTriggerClassName,
           )}
-          aria-label="Filter"
+          aria-label={t("filter_control_button_filter_ariaLabel")}
         >
           {parameters?.triggerIcon ?? <FunnelIcon />}
         </button>
@@ -145,60 +147,69 @@ export function FilterControl({
         <form className="space-y-4">
           <Accordion
             type="single"
-            defaultValue="General"
+            defaultValue={t("filter_control_accordion_general_label")}
             collapsible
           >
-            <FilterAccordionItem label="General">
+            <FilterAccordionItem
+              label={t("filter_control_accordion_general_label")}
+            >
               {(parameters?.showTextSearch ?? true) && (
                 <div className="flex flex-col space-y-1 pb-2">
                   <label htmlFor="nodeName" className="font-medium text-sm">
-                    Node name/number
+                    {t("filter_control_input_nodeName_label")}
                   </label>
                   <Input
                     type="text"
                     value={filterState.nodeName}
                     onChange={handleTextChange("nodeName")}
                     showClearButton
-                    placeholder="Meshtastic 1234"
+                    placeholder={t("filter_control_input_nodeName_placeholder")}
                   />
                 </div>
               )}
 
               <FilterSlider
-                label="Number of hops"
+                label={t("filter_control_slider_hops_label")}
                 filterKey="hopsAway"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
                   <>
-                    Number of hops: {localFilterState.hopsAway[0] === 0
-                      ? "Direct"
-                      : localFilterState.hopsAway[0]}
+                    {t("filter_control_slider_hops_labelText", {
+                      value: localFilterState.hopsAway[0] === 0
+                        ? t("filter_control_slider_hops_directLabel")
+                        : localFilterState.hopsAway[0],
+                    })}
                     {localFilterState.hopsAway[0] !==
                         localFilterState.hopsAway[1]
-                      ? " — " + localFilterState.hopsAway[1]
+                      ? ` — ${localFilterState.hopsAway[1]}`
                       : ""}
                   </>
                 }
               />
 
               <FilterSlider
-                label="Last heard"
+                label={t("filter_control_slider_lastHeard_label")}
                 filterKey="lastHeard"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
                   <>
-                    Last heard: <br />
-                    {localFilterState.lastHeard[0] === 0 ? "Now" : (
-                      <>
-                        {localFilterState.lastHeard[0] ===
-                            defaultFilterValues.lastHeard[1] && ">"}
-                        {formatTS(localFilterState.lastHeard[0])}
-                      </>
-                    )}
+                    {t("filter_control_slider_lastHeard_labelText", {
+                      value: "",
+                    })}
+                    <br />
+                    {localFilterState.lastHeard[0] === 0
+                      ? t("filter_control_slider_lastHeard_nowLabel")
+                      : (
+                        <>
+                          {localFilterState.lastHeard[0] ===
+                              defaultFilterValues.lastHeard[1] && ">"}
+                          {formatTS(localFilterState.lastHeard[0])}
+                        </>
+                      )}
                     {localFilterState.lastHeard[0] !==
                         localFilterState.lastHeard[1] && (
                       <>
@@ -212,60 +223,70 @@ export function FilterControl({
                 }
               />
               <FilterToggle
-                label="Favorites"
+                label={t("filter_control_toggle_favorites_label")}
                 filterKey="isFavorite"
-                alternativeLabels={["Hide", "Show Only"]}
+                alternativeLabels={[
+                  t("filter_control_toggle_hide_label"),
+                  t("filter_control_toggle_showOnly_label"),
+                ]}
                 filterState={filterState}
                 onChange={handleBoolChange}
               />
               <FilterToggle
-                label="Connected via MQTT"
+                label={t("filter_control_toggle_viaMqtt_label")}
                 filterKey="viaMqtt"
-                alternativeLabels={["Hide", "Show Only"]}
+                alternativeLabels={[
+                  t("filter_control_toggle_hide_label"),
+                  t("filter_control_toggle_showOnly_label"),
+                ]}
                 filterState={filterState}
                 onChange={handleBoolChange}
               />
             </FilterAccordionItem>
 
-            <FilterAccordionItem label="Metrics">
+            <FilterAccordionItem
+              label={t("filter_control_accordion_metrics_label")}
+            >
               <FilterSlider
-                label="SNR (db)"
+                label={t("filter_control_slider_snr_label")}
                 filterKey="snr"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
-                label="Channel Utilization (%)"
+                label={t("filter_control_slider_channelUtilization_label")}
                 filterKey="channelUtilization"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
-                label="Airtime Utilization (%)"
+                label={t("filter_control_slider_airtimeUtilization_label")}
                 filterKey="airUtilTx"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
-                label="Battery level (%)"
+                label={t("filter_control_slider_batteryLevel_label")}
                 filterKey="batteryLevel"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
                   <>
-                    Battery level (%): {localFilterState.batteryLevel[0] === 101
-                      ? "Plugged in"
-                      : localFilterState.batteryLevel[0]}
+                    {t("filter_control_slider_batteryLevel_labelText", {
+                      value: localFilterState.batteryLevel[0] === 101
+                        ? t("common.batteryStatus.pluggedIn")
+                        : localFilterState.batteryLevel[0],
+                    })}
                     {localFilterState.batteryLevel[0] !==
                         localFilterState.batteryLevel[1] && (
                       <>
                         {" – "}
                         {localFilterState.batteryLevel[1] === 101
-                          ? "Plugged in"
+                          ? t("common.batteryStatus.pluggedIn")
                           : localFilterState.batteryLevel[1]}
                       </>
                     )}
@@ -273,15 +294,16 @@ export function FilterControl({
                 }
               />
               <FilterSlider
-                label="Battery voltage (V)"
+                label={t("filter_control_slider_batteryVoltage_label")}
                 filterKey="voltage"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
             </FilterAccordionItem>
-
-            <FilterAccordionItem label="Role">
+            <FilterAccordionItem
+              label={t("filter_control_accordion_role_label")}
+            >
               <FilterMulti
                 filterKey="role"
                 filterState={filterState}
@@ -296,7 +318,9 @@ export function FilterControl({
                   )}
               />
             </FilterAccordionItem>
-            <FilterAccordionItem label="Hardware">
+            <FilterAccordionItem
+              label={t("filter_control_accordion_hardware_label")}
+            >
               <FilterMulti
                 filterKey="hwModel"
                 filterState={filterState}
@@ -315,7 +339,7 @@ export function FilterControl({
             onClick={resetFilters}
             className="w-full py-1 shadow-sm hover:shadow-md bg-slate-600 dark:bg-slate-900 text-white rounded text-sm  hover:text-slate-100 hover:bg-slate-700 active:bg-slate-950"
           >
-            Reset Filters
+            {t("filter_control_button_resetFilters_label")}
           </button>
           {children && (
             <div className="mt-4 border-t pt-4">

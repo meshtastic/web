@@ -11,6 +11,7 @@ import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 
 import { TraceRoute } from "../PageComponents/Messages/TraceRoute.tsx";
+import { useTranslation } from "react-i18next";
 
 export interface TracerouteResponseDialogProps {
   traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined;
@@ -23,6 +24,7 @@ export const TracerouteResponseDialog = ({
   open,
   onOpenChange,
 }: TracerouteResponseDialogProps) => {
+  const { t } = useTranslation();
   const { getNode } = useDevice();
   const route: number[] = traceroute?.data.route ?? [];
   const routeBack: number[] = traceroute?.data.routeBack ?? [];
@@ -30,16 +32,21 @@ export const TracerouteResponseDialog = ({
   const snrBack = (traceroute?.data.snrBack ?? []).map((snr) => snr / 4);
   const from = getNode(traceroute?.from ?? 0);
   const longName = from?.user?.longName ??
-    (from ? `!${numberToHexUnpadded(from?.num)}` : "Unknown");
+    (from ? `!${numberToHexUnpadded(from?.num)}` : t("common.unknown"));
   const shortName = from?.user?.shortName ??
-    (from ? `${numberToHexUnpadded(from?.num).substring(0, 4)}` : "UNK");
+    (from
+      ? `${numberToHexUnpadded(from?.num).substring(0, 4)}`
+      : t("common.unknown"));
   const to = getNode(traceroute?.to ?? 0);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>{`Traceroute: ${longName} (${shortName})`}</DialogTitle>
+          <DialogTitle>
+            {t("dialog_tracerouteResponse_titlePrefix")}
+            {longName} ({shortName})
+          </DialogTitle>
         </DialogHeader>
         <DialogDescription>
           <TraceRoute
