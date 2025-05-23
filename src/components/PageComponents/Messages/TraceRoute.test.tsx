@@ -48,9 +48,9 @@ describe("TraceRoute", () => {
     expect(screen.getByText("Node B")).toBeInTheDocument();
 
     expect(screen.getAllByText(/↓/)).toHaveLength(3);
-    expect(screen.getByText("↓ 10dB")).toBeInTheDocument();
-    expect(screen.getByText("↓ 20dB")).toBeInTheDocument();
-    expect(screen.getByText("↓ 30dB")).toBeInTheDocument();
+    expect(screen.getByText("↓ 10dBm")).toBeInTheDocument();
+    expect(screen.getByText("↓ 20dBm")).toBeInTheDocument();
+    expect(screen.getByText("↓ 30dBm")).toBeInTheDocument();
   });
 
   it("renders the route back when provided", () => {
@@ -74,11 +74,11 @@ describe("TraceRoute", () => {
     expect(screen.getByText("Node C")).toBeInTheDocument();
     expect(screen.getByText("Node A")).toBeInTheDocument();
 
-    expect(screen.getByText("↓ 35dB")).toBeInTheDocument();
-    expect(screen.getByText("↓ 45dB")).toBeInTheDocument();
+    expect(screen.getByText("↓ 35dBm")).toBeInTheDocument();
+    expect(screen.getByText("↓ 45dBm")).toBeInTheDocument();
 
-    expect(screen.getByText("↓ 15dB")).toBeInTheDocument();
-    expect(screen.getByText("↓ 25dB")).toBeInTheDocument();
+    expect(screen.getByText("↓ 15dBm")).toBeInTheDocument();
+    expect(screen.getByText("↓ 25dBm")).toBeInTheDocument();
   });
 
   it("renders '??' for missing SNR values", () => {
@@ -91,7 +91,7 @@ describe("TraceRoute", () => {
     );
 
     expect(screen.getByText("Node A")).toBeInTheDocument();
-    expect(screen.getAllByText("↓ ??dB")).toHaveLength(2);
+    expect(screen.getAllByText("↓ ??dBm")).toHaveLength(2);
   });
 
   it("renders hop hex if node is not found", () => {
@@ -105,7 +105,7 @@ describe("TraceRoute", () => {
     );
 
     expect(screen.getByText(/^!63$/)).toBeInTheDocument();
-    expect(screen.getByText("↓ 5dB")).toBeInTheDocument();
-    expect(screen.getByText("↓ 15dB")).toBeInTheDocument();
+    expect(screen.getByText("↓ 5dBm")).toBeInTheDocument();
+    expect(screen.getByText("↓ 15dBm")).toBeInTheDocument();
   });
 });

@@ -3,6 +3,8 @@ import type {
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.tsx";
 import type { FieldValues } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import type { FLAGS_CONFIG } from "@core/hooks/usePositionFlags.ts";
 import { MultiSelect, MultiSelectItem } from "../UI/MultiSelect.tsx";
 
 export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
@@ -12,51 +14,50 @@ export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
   isChecked: (name: string) => boolean;
   value: string[];
   properties: BaseFormBuilderProps<T>["properties"] & {
-    enumValue: {
-      [s: string]: string | number;
-    };
+    enumValue:
+      | { [s: string]: string | number }
+      | typeof FLAGS_CONFIG;
     formatEnumName?: boolean;
   };
 }
 
-const formatEnumDisplay = (name: string): string => {
-  return name
-    .replace(/_/g, " ")
-    .toLowerCase()
-    .split(" ")
-    .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-    .join(" ");
-};
-
 export function MultiSelectInput<T extends FieldValues>({
   field,
 }: GenericFormElementProps<T, MultiSelectFieldProps<T>>) {
-  const { enumValue, formatEnumName, ...remainingProperties } =
-    field.properties;
+  const { t } = useTranslation();
+  const { enumValue, ...remainingProperties } = field.properties;
 
-  const valueToKeyMap: Record<string, string> = {};
-  const optionsEnumValues: [string, number][] = [];
+  const isNewConfigStructure =
+    typeof Object.values(enumValue)[0] === "object" &&
+    Object.values(enumValue)[0] !== null &&
+    "i18nKey" in Object.values(enumValue)[0];
 
-  if (enumValue) {
-    Object.entries(enumValue).forEach(([key, val]) => {
-      if (typeof val === "number" && key !== "UNSET") {
-        valueToKeyMap[val.toString()] = key;
-        optionsEnumValues.push([key, val as number]);
+  const optionsToRender = Object.entries(enumValue).map(
+    ([key, configOrValue]) => {
+      if (isNewConfigStructure) {
+        const config =
+          configOrValue as typeof FLAGS_CONFIG[keyof typeof FLAGS_CONFIG];
+        return {
+          key,
+          display: t(config.i18nKey),
+          value: config.value,
+        };
       }
-    });
-  }
+      return { key, display: key, value: configOrValue as number };
+    },
+  );
 
   return (
     <MultiSelect {...remainingProperties}>
-      {optionsEnumValues.map(([name, value]) => (
+      {optionsToRender.map((option) => (
         <MultiSelectItem
-          key={name}
-          name={name}
-          value={value.toString()}
-          checked={field.isChecked(name)}
-          onCheckedChange={() => field.onValueChange(name)}
+          key={option.key}
+          name={option.key}
+          value={option.value.toString()}
+          checked={field.isChecked(option.key)}
+          onCheckedChange={() => field.onValueChange(option.key)}
         >
-          {formatEnumName ? formatEnumDisplay(name) : name}
+          {option.display}
         </MultiSelectItem>
       ))}
     </MultiSelect>

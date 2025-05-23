@@ -12,6 +12,7 @@ import {
 import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export interface PkiBackupDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ export const PkiBackupDialog = ({
   open,
   onOpenChange,
 }: PkiBackupDialogProps) => {
+  const { t } = useTranslation();
   const { config, setDialogOpen } = useDevice();
   const privateKey = config.security?.privateKey;
   const publicKey = config.security?.publicKey;
@@ -46,7 +48,7 @@ export const PkiBackupDialog = ({
       printWindow.document.write(`
         <html>
           <head>
-            <title>=== MESHTASTIC KEYS ===</title>
+            <title>${t("dialog_pkiBackup_print_header")}</title>
             <style>
               body { font-family: Arial, sans-serif; padding: 20px; }
               h1 { font-size: 18px; }
@@ -54,14 +56,14 @@ export const PkiBackupDialog = ({
             </style>
           </head>
           <body>
-            <h1>=== MESHTASTIC KEYS ===</h1>
+            <h1>${t("dialog_pkiBackup_print_header")}</h1>
             <br>
-            <h2>Public Key:</h2>
+            <h2>${t("dialog_pkiBackup_print_label_publicKey")}</h2>
             <p>${decodeKeyData(publicKey)}</p>
-            <h2>Private Key:</h2>
+            <h2>${t("dialog_pkiBackup_print_label_privateKey")}</h2>
             <p>${decodeKeyData(privateKey)}</p>
             <br>
-            <p>=== END OF KEYS ===</p>
+            <p>${t("dialog_pkiBackup_print_footer")}</p>
           </body>
         </html>
       `);
@@ -69,7 +71,7 @@ export const PkiBackupDialog = ({
       printWindow.print();
       closeDialog();
     }
-  }, [decodeKeyData, privateKey, publicKey, closeDialog]);
+  }, [decodeKeyData, privateKey, publicKey, closeDialog, t]);
 
   const createDownloadKeyFile = React.useCallback(() => {
     if (!privateKey || !publicKey) return;
@@ -78,12 +80,12 @@ export const PkiBackupDialog = ({
     const decodedPublicKey = decodeKeyData(publicKey);
 
     const formattedContent = [
-      "=== MESHTASTIC KEYS ===\n\n",
-      "Private Key:\n",
+      `${t("dialog_pkiBackup_print_header")}\n\n`,
+      `${t("dialog_pkiBackup_print_label_privateKey")}\n`,
       decodedPrivateKey,
-      "\n\nPublic Key:\n",
+      `\n\n${t("dialog_pkiBackup_print_label_publicKey")}\n`,
       decodedPublicKey,
-      "\n\n=== END OF KEYS ===",
+      `\n\n${t("dialog_pkiBackup_print_footer")}`,
     ].join("");
 
     const blob = new Blob([formattedContent], { type: "text/plain" });
@@ -98,36 +100,36 @@ export const PkiBackupDialog = ({
     document.body.removeChild(link);
     closeDialog();
     URL.revokeObjectURL(url);
-  }, [decodeKeyData, privateKey, publicKey, closeDialog]);
+  }, [decodeKeyData, privateKey, publicKey, closeDialog, t]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>Backup Keys</DialogTitle>
+          <DialogTitle>{t("dialog_pkiBackup_title")}</DialogTitle>
           <DialogDescription>
-            Its important to backup your public and private keys and store your
-            backup securely!
+            {t("dialog_pkiBackup_description_secureBackup")}
           </DialogDescription>
           <DialogDescription>
             <span className="font-bold break-before-auto">
-              If you lose your keys, you will need to reset your device.
+              {t("dialog_pkiBackup_description_loseKeysWarning")}
             </span>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-6">
           <Button
             variant="default"
+            name="download"
             onClick={() => createDownloadKeyFile()}
             className=""
           >
             <DownloadIcon size={20} className="mr-2" />
-            Download
+            {t("dialog_button_download")}
           </Button>
           <Button variant="default" onClick={() => renderPrintWindow()}>
             <PrinterIcon size={20} className="mr-2" />
-            Print
+            {t("dialog_button_print")}
           </Button>
         </DialogFooter>
       </DialogContent>

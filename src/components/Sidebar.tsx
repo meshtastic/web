@@ -25,6 +25,7 @@ import ThemeSwitcher from "@components/ThemeSwitcher.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import BatteryStatus from "@components/BatteryStatus.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -39,7 +40,10 @@ interface NavLink {
 
 const CollapseToggleButton = () => {
   const { isCollapsed, toggleSidebar } = useSidebar();
-  const buttonLabel = isCollapsed ? "Open sidebar" : "Close sidebar";
+  const { t } = useTranslation();
+  const buttonLabel = isCollapsed
+    ? t("sidebar_collapseToggle-button_open")
+    : t("sidebar_collapseToggle_button_close");
 
   return (
     <button
@@ -79,22 +83,33 @@ export const Sidebar = ({ children }: SidebarProps) => {
   const { setCommandPaletteOpen } = useAppStore();
   const myNode = getNode(hardware.myNodeNum);
   const { isCollapsed } = useSidebar();
+  const { t } = useTranslation();
   const myMetadata = metadata.get(0);
 
   const numUnread = [...unreadCounts.values()].reduce((sum, v) => sum + v, 0);
 
   const pages: NavLink[] = [
     {
-      name: "Messages",
+      name: t("navigation_title_messages"),
       icon: MessageSquareIcon,
       page: "messages",
       count: numUnread ? numUnread : undefined,
     },
-    { name: "Map", icon: MapIcon, page: "map" },
-    { name: "Config", icon: SettingsIcon, page: "config" },
-    { name: "Channels", icon: LayersIcon, page: "channels" },
+    { name: t("navigation_title_map"), icon: MapIcon, page: "map" },
     {
-      name: `Nodes (${Math.max(getNodesLength() - 1, 0)})`,
+      name: t("navigation_title_config"),
+      icon: SettingsIcon,
+      page: "config",
+    },
+    {
+      name: t("navigation_title_channels"),
+      icon: LayersIcon,
+      page: "channels",
+    },
+    {
+      name: `${t("navigation_title_nodes")} (${
+        Math.max(getNodesLength() - 1, 0)
+      })`,
       icon: UsersIcon,
       page: "nodes",
     },
@@ -119,7 +134,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
       >
         <img
           src="Logo.svg"
-          alt="Meshtastic Logo"
+          alt={t("sidebar_app_title_alt")}
           className="size-10 flex-shrink-0 rounded-xl"
         />
         <h2
@@ -131,11 +146,11 @@ export const Sidebar = ({ children }: SidebarProps) => {
               : "opacity-100 max-w-xs visible ml-2",
           )}
         >
-          Meshtastic
+          {t("common_header")}
         </h2>
       </div>
 
-      <SidebarSection label="Navigation" className="mt-4 px-0">
+      <SidebarSection label={t("navigation_title")} className="mt-4 px-0">
         {pages.map((link) => (
           <SidebarButton
             key={link.name}
@@ -173,7 +188,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                   isCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
                 )}
               >
-                Loading...
+                {t("common_loading")}
               </Subtle>
             </div>
           )
@@ -221,9 +236,10 @@ export const Sidebar = ({ children }: SidebarProps) => {
                     className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
                   />
                   <Subtle>
-                    {myNode.deviceMetrics?.voltage?.toPrecision(3) ?? "UNK"}
-                    {" "}
-                    volts
+                    {t("sidebar_deviceInfo_volts", {
+                      voltage: myNode.deviceMetrics?.voltage?.toPrecision(3) ??
+                        t("common_unknown_short"),
+                    })}
                   </Subtle>
                 </div>
                 <div className="inline-flex gap-2">
@@ -231,7 +247,12 @@ export const Sidebar = ({ children }: SidebarProps) => {
                     size={18}
                     className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
                   />
-                  <Subtle>v{myMetadata?.firmwareVersion ?? "UNK"}</Subtle>
+                  <Subtle>
+                    {t("sidebar_deviceInfo_firmwareVersion", {
+                      version: myMetadata?.firmwareVersion ??
+                        t("common_unknown_short"),
+                    })}
+                  </Subtle>
                 </div>
               </div>
               <div
@@ -245,8 +266,8 @@ export const Sidebar = ({ children }: SidebarProps) => {
               >
                 <button
                   type="button"
-                  aria-label="Edit device name"
-                  className="p-1 rounded transition-colors hover:text-accent"
+                  aria-label={t("sidebar_deviceInfo_button_editDeviceName")}
+                  className="p-1 rounded transition-colors cursor-pointer  hover:text-accent"
                   onClick={() => setDialogOpen("deviceName", true)}
                 >
                   <PenLine size={22} />
@@ -254,7 +275,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                 <ThemeSwitcher />
                 <button
                   type="button"
-                  className="transition-all hover:text-accent"
+                  className="transition-all cursor-pointer hover:text-accent"
                   onClick={() => setCommandPaletteOpen(true)}
                 >
                   <SearchIcon />

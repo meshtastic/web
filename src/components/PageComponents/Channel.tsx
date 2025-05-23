@@ -7,6 +7,7 @@ import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PkiRegenerateDialog } from "../Dialog/PkiRegenerateDialog.tsx";
 
 export interface SettingsPanelProps {
@@ -15,6 +16,7 @@ export interface SettingsPanelProps {
 
 export const Channel = ({ channel }: SettingsPanelProps) => {
   const { config, connection, addChannel } = useDevice();
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const [pass, setPass] = useState<string>(
@@ -42,7 +44,9 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
     });
     connection?.setChannel(channel).then(() => {
       toast({
-        title: `Saved Channel: ${channel.settings?.name}`,
+        title: t("channel_form_toast_saved", {
+          channelName: channel.settings?.name,
+        }),
       });
       addChannel(channel);
     });
@@ -67,7 +71,9 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
 
   const validatePass = (input: string, count: number) => {
     if (input.length % 4 !== 0 || toByteArray(input).length !== count) {
-      setValidationText(`Please enter a valid ${count * 8} bit PSK.`);
+      setValidationText(
+        t("channel_form_validation_psk_invalid", { bits: count * 8 }),
+      );
     } else {
       setValidationText(undefined);
     }
@@ -110,36 +116,37 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
         }}
         fieldGroups={[
           {
-            label: "Channel Settings",
-            description: "Crypto, MQTT & misc settings",
+            label: t("channel_form_field_group_settings_label"),
+            description: t("channel_form_field_group_settings_description"),
             fields: [
               {
                 type: "select",
                 name: "role",
-                label: "Role",
+                label: t("channel_form_field_role_label"),
                 disabled: channel.index === 0,
-                description:
-                  "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
+                description: t("channel_form_field_role_description"),
                 properties: {
                   enumValue: channel.index === 0
-                    ? { PRIMARY: 1 }
-                    : { DISABLED: 0, SECONDARY: 2 },
+                    ? { [t("channel_form_field_role_option_primary")]: 1 }
+                    : {
+                      [t("channel_form_field_role_option_disabled")]: 0,
+                      [t("channel_form_field_role_option_secondary")]: 2,
+                    },
                 },
               },
               {
                 type: "passwordGenerator",
                 name: "settings.psk",
                 id: "channel-psk",
-                label: "Pre-Shared Key",
-                description:
-                  "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
+                label: t("channel_form_field_psk_label"),
+                description: t("channel_form_field_psk_description"),
                 validationText: validationText,
                 devicePSKBitCount: bitCount ?? 0,
                 inputChange: inputChangeEvent,
                 selectChange: selectChangeEvent,
                 actionButtons: [
                   {
-                    text: "Generate",
+                    text: t("channel_form_field_psk_generate_button"),
                     variant: "success",
                     onClick: preSharedClickEvent,
                   },
@@ -154,57 +161,105 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
               {
                 type: "text",
                 name: "settings.name",
-                label: "Name",
-                description:
-                  "A unique name for the channel <12 bytes, leave blank for default",
+                label: t("channel_form_field_name_label"),
+                description: t("channel_form_field_name_description"),
               },
               {
                 type: "toggle",
                 name: "settings.uplinkEnabled",
-                label: "Uplink Enabled",
-                description: "Send messages from the local mesh to MQTT",
+                label: t("channel_form_field_uplink_enabled_label"),
+                description: t("channel_form_field_uplink_enabled_description"),
               },
               {
                 type: "toggle",
                 name: "settings.downlinkEnabled",
-                label: "Downlink Enabled",
-                description: "Send messages from MQTT to the local mesh",
+                label: t("channel_form_field_downlink_enabled_label"),
+                description: t(
+                  "channel_form_field_downlink_enabled_description",
+                ),
               },
               {
                 type: "select",
                 name: "settings.moduleSettings.positionPrecision",
-                label: "Location",
-                description:
-                  "The precision of the location to share with the channel. Can be disabled.",
+                label: t("channel_form_field_position_precision_label"),
+                description: t(
+                  "channel_form_field_position_precision_description",
+                ),
                 properties: {
                   enumValue: config.display?.units === 0
                     ? {
-                      "Do not share location": 0,
-                      "Within 23 kilometers": 10,
-                      "Within 12 kilometers": 11,
-                      "Within 5.8 kilometers": 12,
-                      "Within 2.9 kilometers": 13,
-                      "Within 1.5 kilometers": 14,
-                      "Within 700 meters": 15,
-                      "Within 350 meters": 16,
-                      "Within 200 meters": 17,
-                      "Within 90 meters": 18,
-                      "Within 50 meters": 19,
-                      "Precise Location": 32,
+                      [t("channel_form_field_position_precision_option_none")]:
+                        0,
+                      [
+                        t("channel_form_field_position_precision_option_metric_km23")
+                      ]: 10,
+                      [
+                        t("channel_form_field_position_precision_option_metric_km12")
+                      ]: 11,
+                      [
+                        t("channel_form_field_position_precision_option_metric_km5_8")
+                      ]: 12,
+                      [
+                        t("channel_form_field_position_precision_option_metric_km2_9")
+                      ]: 13,
+                      [
+                        t("channel_form_field_position_precision_option_metric_km1_5")
+                      ]: 14,
+                      [
+                        t("channel_form_field_position_precision_option_metric_m700")
+                      ]: 15,
+                      [
+                        t("channel_form_field_position_precision_option_metric_m350")
+                      ]: 16,
+                      [
+                        t("channel_form_field_position_precision_option_metric_m200")
+                      ]: 17,
+                      [
+                        t("channel_form_field_position_precision_option_metric_m90")
+                      ]: 18,
+                      [
+                        t("channel_form_field_position_precision_option_metric_m50")
+                      ]: 19,
+                      [
+                        t("channel_form_field_position_precision_option_precise")
+                      ]: 32,
                     }
                     : {
-                      "Do not share location": 0,
-                      "Within 15 miles": 10,
-                      "Within 7.3 miles": 11,
-                      "Within 3.6 miles": 12,
-                      "Within 1.8 miles": 13,
-                      "Within 0.9 miles": 14,
-                      "Within 0.5 miles": 15,
-                      "Within 0.2 miles": 16,
-                      "Within 600 feet": 17,
-                      "Within 300 feet": 18,
-                      "Within 150 feet": 19,
-                      "Precise Location": 32,
+                      [t("channel_form_field_position_precision_option_none")]:
+                        0,
+                      [
+                        t("channel_form_field_position_precision_option_imperial_mi15")
+                      ]: 10,
+                      [
+                        t("channel_form_field_position_precision_option_imperial_mi7_3")
+                      ]: 11,
+                      [
+                        t("channel_form_field_position_precision_option_imperial_mi3_6")
+                      ]: 12,
+                      [
+                        t("channel_form_field_position_precision_option_imperial_mi1_8")
+                      ]: 13,
+                      [
+                        t("channel_form_field_position_precision_option_imperial_mi0_9")
+                      ]: 14,
+                      [
+                        t("channel_form_field_position_precision_option_imperial_mi0_5")
+                      ]: 15,
+                      [
+                        t("channel_form_field_position_precision_option_imperial_mi0_2")
+                      ]: 16,
+                      [
+                        t("channel_form_field_position_precision_option_imperial_ft600")
+                      ]: 17,
+                      [
+                        t("channel_form_field_position_precision_option_imperial_ft300")
+                      ]: 18,
+                      [
+                        t("channel_form_field_position_precision_option_imperial_ft150")
+                      ]: 19,
+                      [
+                        t("channel_form_field_position_precision_option_precise")
+                      ]: 32,
                     },
                 },
               },
@@ -214,10 +269,9 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
       />
       <PkiRegenerateDialog
         text={{
-          button: "Regenerate",
-          title: "Regenerate Pre-Shared Key?",
-          description:
-            "Are you sure you want to regenerate the pre-shared key?",
+          button: t("dialog_pkiRegenerateDialog_buttonRegenerate"),
+          title: t("dialog_pkiRegenerateDialog_title"),
+          description: t("dialog_pkiRegenerateDialog_description"),
         }}
         open={preSharedDialogOpen}
         onOpenChange={() => setPreSharedDialogOpen(false)}

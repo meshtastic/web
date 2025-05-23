@@ -16,61 +16,63 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
+import { useTranslation } from "react-i18next";
 
 export const ModuleConfig = () => {
+  const { t } = useTranslation();
   const tabs = [
     {
-      label: "MQTT",
+      label: t("config_module_tab_mqtt"),
       element: MQTT,
     },
     {
-      label: "Serial",
+      label: t("config_module_tab_serial"),
       element: Serial,
     },
     {
-      label: "Ext Notif",
+      label: t("config_module_tab_externalNotification"),
       element: ExternalNotification,
     },
     {
-      label: "S&F",
+      label: t("config_module_tab_storeAndForward"),
       element: StoreForward,
     },
     {
-      label: "Range Test",
+      label: t("config_module_tab_rangeTest"),
       element: RangeTest,
     },
     {
-      label: "Telemetry",
+      label: t("config_module_tab_telemetry"),
       element: Telemetry,
     },
     {
-      label: "Canned",
+      label: t("config_module_tab_cannedMessage"),
       element: CannedMessage,
     },
     {
-      label: "Audio",
+      label: t("config_module_tab_audio"),
       element: Audio,
     },
     {
-      label: "Neighbor Info",
+      label: t("config_module_tab_neighborInfo"),
       element: NeighborInfo,
     },
     {
-      label: "Ambient Lighting",
+      label: t("config_module_tab_ambientLighting"),
       element: AmbientLighting,
     },
     {
-      label: "Detection Sensor",
+      label: t("config_module_tab_detectionSensor"),
       element: DetectionSensor,
     },
     {
-      label: "Paxcounter",
+      label: t("config_module_tab_paxcounter"),
       element: Paxcounter,
     },
   ];
 
   return (
-    <Tabs defaultValue="MQTT">
+    <Tabs defaultValue={t("config_module_tab_mqtt")}>
       <TabsList className="dark:bg-slate-800">
         {tabs.map((tab) => (
           <TabsTrigger

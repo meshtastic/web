@@ -1,11 +1,13 @@
-import type { PowerValidation } from "@app/validation/config/power.tsx";
+import type { PowerValidation } from "@app/validation/config/power.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const Power = () => {
   const { config, setWorkingConfig } = useDevice();
+  const { t } = useTranslation();
 
   const onSubmit = (data: PowerValidation) => {
     setWorkingConfig(
@@ -24,31 +26,35 @@ export const Power = () => {
       defaultValues={config.power}
       fieldGroups={[
         {
-          label: "Power Config",
-          description: "Settings for the power module",
+          label: t("config_power_groupLabel_powerConfig"),
+          description: t("config_power_groupDescription_powerConfig"),
           fields: [
             {
               type: "toggle",
               name: "isPowerSaving",
-              label: "Enable power saving mode",
-              description:
-                "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
+              label: t("config_power_fieldLabel_powerSavingEnabled"),
+              description: t(
+                "config_power_fieldDescription_powerSavingEnabled",
+              ),
             },
             {
               type: "number",
               name: "onBatteryShutdownAfterSecs",
-              label: "Shutdown on battery delay",
-              description:
-                "Automatically shutdown node after this long when on battery, 0 for indefinite",
+              label: t("config_power_fieldLabel_shutdownOnBatteryDelay"),
+              description: t(
+                "config_power_fieldDescription_shutdownOnBatteryDelay",
+              ),
               properties: {
-                suffix: "Seconds",
+                suffix: t("common_unit_seconds"),
               },
             },
             {
               type: "number",
               name: "adcMultiplierOverride",
-              label: "ADC Multiplier Override ratio",
-              description: "Used for tweaking battery voltage reading",
+              label: t("config_power_fieldLabel_adcMultiplierOverride"),
+              description: t(
+                "config_power_fieldDescription_adcMultiplierOverride",
+              ),
               properties: {
                 step: 0.0001,
               },
@@ -56,52 +62,55 @@ export const Power = () => {
             {
               type: "number",
               name: "waitBluetoothSecs",
-              label: "No Connection Bluetooth Disabled",
-              description:
-                "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
+              label: t("config_power_fieldLabel_noConnectionBluetoothDisabled"),
+              description: t(
+                "config_power_fieldDescription_noConnectionBluetoothDisabled",
+              ),
               properties: {
-                suffix: "Seconds",
+                suffix: t("common_unit_seconds"),
               },
             },
             {
               type: "number",
               name: "deviceBatteryInaAddress",
-              label: "INA219 Address",
-              description: "Address of the INA219 battery monitor",
+              label: t("config_power_fieldLabel_ina219Address"),
+              description: t("config_power_fieldDescription_ina219Address"),
             },
           ],
         },
         {
-          label: "Sleep Settings",
-          description: "Sleep settings for the power module",
+          label: t("config_power_groupLabel_sleepSettings"),
+          description: t("config_power_groupDescription_sleepSettings"),
           fields: [
             {
               type: "number",
               name: "sdsSecs",
-              label: "Super Deep Sleep Duration",
-              description:
-                "How long the device will be in super deep sleep for",
+              label: t("config_power_fieldLabel_superDeepSleepDuration"),
+              description: t(
+                "config_power_fieldDescription_superDeepSleepDuration",
+              ),
               properties: {
-                suffix: "Seconds",
+                suffix: t("common_unit_seconds"),
               },
             },
             {
               type: "number",
               name: "lsSecs",
-              label: "Light Sleep Duration",
-              description: "How long the device will be in light sleep for",
+              label: t("config_power_fieldLabel_lightSleepDuration"),
+              description: t(
+                "config_power_fieldDescription_lightSleepDuration",
+              ),
               properties: {
-                suffix: "Seconds",
+                suffix: t("common_unit_seconds"),
               },
             },
             {
               type: "number",
               name: "minWakeSecs",
-              label: "Minimum Wake Time",
-              description:
-                "Minimum amount of time the device will stay awake for after receiving a packet",
+              label: t("config_power_fieldLabel_minimumWakeTime"),
+              description: t("config_power_fieldDescription_minimumWakeTime"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("common_unit_seconds"),
               },
             },
           ],

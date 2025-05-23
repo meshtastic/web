@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
+import { useTranslation } from "react-i18next";
 
 export interface PkiRegenerateDialogProps {
   text: {
@@ -22,27 +23,38 @@ export interface PkiRegenerateDialogProps {
 
 export const PkiRegenerateDialog = ({
   text = {
-    title: "Regenerate Key Pair",
-    description: "Are you sure you want to regenerate key pair?",
-    button: "Regenerate",
+    title: "", // Default will be set by useTranslation
+    description: "", // Default will be set by useTranslation
+    button: "", // Default will be set by useTranslation
   },
   open,
   onOpenChange,
   onSubmit,
 }: PkiRegenerateDialogProps) => {
+  const { t } = useTranslation();
+  const dialogText = {
+    title: text.title || t("dialog_pkiRegenerate_title_keyPair"),
+    description: text.description ||
+      t("dialog_pkiRegenerate_description_keyPair"),
+    button: text.button || t("dialog_pkiRegenerateDialog_buttonRegenerate"),
+  };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>{text?.title}</DialogTitle>
+          <DialogTitle>{dialogText.title}</DialogTitle>
           <DialogDescription>
-            {text?.description}
+            {dialogText.description}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="destructive" onClick={() => onSubmit()}>
-            {text?.button}
+          <Button
+            variant="destructive"
+            name="regenerate"
+            onClick={() => onSubmit()}
+          >
+            {dialogText.button}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
+import { useTranslation } from "react-i18next";
 
 type RGBColor = {
   r: number;
@@ -73,6 +74,8 @@ export const Avatar = ({
   showFavorite = false,
   className,
 }: AvatarProps) => {
+  const { t } = useTranslation();
+
   const sizes = {
     sm: "size-10 text-xs font-light",
     lg: "size-16 text-lg",
@@ -82,7 +85,7 @@ export const Avatar = ({
   const bgColor = getColorFromText(safeText);
   const isLight = ColorUtils.isLight(bgColor);
   const textColor = isLight ? "#000000" : "#FFFFFF";
-  const initials = safeText?.slice(0, 4) ?? "UNK";
+  const initials = safeText?.slice(0, 4) ?? t("common_unknown_short");
 
   return (
     <div

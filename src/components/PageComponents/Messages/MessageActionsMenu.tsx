@@ -7,6 +7,7 @@ import {
 } from "@components/UI/Tooltip.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { Reply, SmilePlus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface MessageActionsMenuProps {
   onAddReaction?: () => void;
@@ -17,6 +18,7 @@ export const MessageActionsMenu = ({
   onAddReaction,
   onReply,
 }: MessageActionsMenuProps) => {
+  const { t } = useTranslation();
   const hoverIconBarClass = cn(
     "absolute top-2 right-2",
     "flex items-center gap-x-1",
@@ -48,7 +50,7 @@ export const MessageActionsMenu = ({
           <TooltipTrigger asChild>
             <button
               type="button"
-              aria-label="Add Reaction"
+              aria-label={t("messages_actionsMenu_addReactionLabel")}
               onClick={(e) => {
                 e.stopPropagation();
                 if (onAddReaction) {
@@ -61,7 +63,7 @@ export const MessageActionsMenu = ({
             </button>
           </TooltipTrigger>
           <TooltipContent className="bg-gray-800 text-white px-2 py-1 rounded text-xs">
-            Add Reaction
+            {t("messages_actionsMenu_addReactionLabel")}
             <TooltipArrow className="fill-gray-800" />
           </TooltipContent>
         </Tooltip>
@@ -70,7 +72,7 @@ export const MessageActionsMenu = ({
           <TooltipTrigger asChild>
             <button
               type="button"
-              aria-label="Reply"
+              aria-label={t("messages_actionsMenu_replyLabel")}
               onClick={(e) => {
                 e.stopPropagation();
                 if (onReply) {
@@ -83,7 +85,7 @@ export const MessageActionsMenu = ({
             </button>
           </TooltipTrigger>
           <TooltipContent className="bg-gray-800 text-white px-2 py-1 rounded text-xs">
-            Reply
+            {t("messages_actionsMenu_replyLabel")}
             <TooltipArrow className="fill-gray-800" />
           </TooltipContent>
         </Tooltip>

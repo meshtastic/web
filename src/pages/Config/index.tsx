@@ -9,6 +9,7 @@ import { DeviceConfig } from "@pages/Config/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.tsx";
 import { BoxesIcon, SaveIcon, SaveOff, SettingsIcon } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const ConfigPage = () => {
   const { workingConfig, workingModuleConfig, connection } = useDevice();
@@ -19,12 +20,13 @@ const ConfigPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
   const isError = hasErrors();
+  const { t } = useTranslation();
 
   const handleSave = async () => {
     if (hasErrors()) {
       return toast({
-        title: "Config Errors Exist",
-        description: "Please fix the configuration errors before saving.",
+        title: t("config_toast_errorsExist_title"),
+        description: t("config_toast_errorsExist_description"),
       });
     }
 
@@ -35,9 +37,10 @@ const ConfigPage = () => {
           workingConfig.map((config) =>
             connection?.setConfig(config).then(() =>
               toast({
-                title: "Saving Config",
-                description:
-                  `The configuration change ${config.payloadVariant.case} has been saved.`,
+                title: t("config_toast_saving_title"),
+                description: t("config_toast_saving_description", {
+                  case: config.payloadVariant.case,
+                }),
               })
             )
           ),
@@ -47,9 +50,10 @@ const ConfigPage = () => {
           workingModuleConfig.map((moduleConfig) =>
             connection?.setModuleConfig(moduleConfig).then(() =>
               toast({
-                title: "Saving Config",
-                description:
-                  `The configuration change ${moduleConfig.payloadVariant.case} has been saved.`,
+                title: t("config_toast_saving_title"),
+                description: t("config_toast_saving_description", {
+                  case: moduleConfig.payloadVariant.case,
+                }),
               })
             )
           ),
@@ -59,8 +63,8 @@ const ConfigPage = () => {
       await connection?.commitEditSettings();
     } catch (_error) {
       toast({
-        title: "Error Saving Config",
-        description: "An error occurred while saving the configuration.",
+        title: t("config_toast_errorSaving_title"),
+        description: t("config_toast_errorSaving_description"),
       });
     } finally {
       setIsSaving(false);
@@ -70,15 +74,15 @@ const ConfigPage = () => {
   const leftSidebar = useMemo(
     () => (
       <Sidebar>
-        <SidebarSection label="Modules">
+        <SidebarSection label={t("config_sidebar_section_modules_label")}>
           <SidebarButton
-            label="Radio Config"
+            label={t("navigation_title_radioConfig")}
             active={activeConfigSection === "device"}
             onClick={() => setActiveConfigSection("device")}
             Icon={SettingsIcon}
           />
           <SidebarButton
-            label="Module Config"
+            label={t("navigation_title_moduleConfig")}
             active={activeConfigSection === "module"}
             onClick={() => setActiveConfigSection("module")}
             Icon={BoxesIcon}
@@ -86,7 +90,7 @@ const ConfigPage = () => {
         </SidebarSection>
       </Sidebar>
     ),
-    [activeConfigSection],
+    [activeConfigSection, t],
   );
 
   return (
@@ -95,8 +99,8 @@ const ConfigPage = () => {
         contentClassName="overflow-auto"
         leftBar={leftSidebar}
         label={activeConfigSection === "device"
-          ? "Radio Config"
-          : "Module Config"}
+          ? t("navigation_title_radioConfig")
+          : t("navigation_title_moduleConfig")}
         actions={[
           {
             key: "save",
