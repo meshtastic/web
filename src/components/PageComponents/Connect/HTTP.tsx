@@ -81,12 +81,12 @@ export const HTTP = (
         disabled={connectionInProgress}
       >
         <div>
-          <Label>{t("httpConnection.ipAddressLabel")}</Label>
+          <Label>{t("httpConnection_ipAddressLabel")}</Label>
           <Input
             prefix={tlsValue
-              ? `${t("httpConnection.https")}://`
-              : `${t("httpConnection.http")}://`}
-            placeholder={t("httpConnection.field_ipAddress_placeholder")}
+              ? `${t("httpConnection_https")}://`
+              : `${t("httpConnection_http")}://`}
+            placeholder={t("httpConnection_field_ipAddress_placeholder")}
             className="text-slate-900 dark:text-slate-100"
             {...register("ip")}
           />
@@ -98,7 +98,7 @@ export const HTTP = (
             checked={isURLHTTPS || tlsValue}
             {...register("tls")}
           />
-          <Label>{t("httpConnection.label_useHttps")}</Label>
+          <Label>{t("httpConnection_label_useHttps")}</Label>
         </div>
 
         {connectionError && (
@@ -110,38 +110,38 @@ export const HTTP = (
               />
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-800">
-                  {t("httpConnection.connectionFailedAlert.title")}
+                  {t("httpConnection_connectionFailedAlert.title")}
                 </p>
                 <p className="text-xs mt-1 text-amber-700 dark:text-amber-700">
-                  {t("httpConnection.connectionFailedAlert.descriptionPrefix")}
+                  {t("httpConnection_connectionFailedAlert.descriptionPrefix")}
                   {connectionError.secure &&
-                    t("httpConnection.connectionFailedAlert.httpsHint")}
-                  {t("httpConnection.connectionFailedAlert.openLinkPrefix")}
+                    t("httpConnection_connectionFailedAlert.httpsHint")}
+                  {t("httpConnection_connectionFailedAlert.openLinkPrefix")}
                   <Link
                     href={`${
                       connectionError.secure
-                        ? t("httpConnection.https")
-                        : t("httpConnection.http")
+                        ? t("httpConnection_https")
+                        : t("httpConnection_http")
                     }://${connectionError.host}`}
                     className="underline font-medium text-amber-800 dark:text-amber-800"
                   >
                     {`${
                       connectionError.secure
-                        ? t("httpConnection.https")
-                        : t("httpConnection.http")
+                        ? t("httpConnection_https")
+                        : t("httpConnection_http")
                     }://${connectionError.host}`}
                   </Link>{" "}
-                  {t("httpConnection.connectionFailedAlert.openLinkSuffix")}
+                  {t("httpConnection_connectionFailedAlert.openLinkSuffix")}
                   {connectionError.secure
                     ? t(
-                      "httpConnection.connectionFailedAlert.acceptTlsWarningSuffix",
+                      "httpConnection_connectionFailedAlert.acceptTlsWarningSuffix",
                     )
                     : ""}.{" "}
                   <Link
                     href="https://meshtastic.org/docs/software/web-client/#http"
                     className="underline font-medium text-amber-800 dark:text-amber-800"
                   >
-                    {t("httpConnection.connectionFailedAlert.learnMoreLink")}
+                    {t("httpConnection_connectionFailedAlert.learnMoreLink")}
                   </Link>
                 </p>
               </div>
@@ -155,8 +155,8 @@ export const HTTP = (
       >
         <span>
           {connectionInProgress
-            ? t("httpConnection.button_connecting")
-            : t("httpConnection.button_connect")}
+            ? t("httpConnection_button_connecting")
+            : t("httpConnection_button_connect")}
         </span>
       </Button>
     </form>

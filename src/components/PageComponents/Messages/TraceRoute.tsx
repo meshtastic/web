@@ -35,7 +35,7 @@ const RoutePath = (
       <p>{startNode?.user?.longName}</p>
       <p>
         ↓ {snr?.[0] ?? t("traceRoute_snrUnknown")}
-        {t("common.dbUnit")}
+        {t("common_unit_dbm")}
       </p>
       {path.map((hop, i) => (
         <span key={getNode(hop)?.num ?? hop}>
@@ -45,7 +45,7 @@ const RoutePath = (
           </p>
           <p>
             ↓ {snr?.[i + 1] ?? t("traceRoute_snrUnknown")}
-            {t("common.dbUnit")}
+            {t("common_unit_dbm")}
           </p>
         </span>
       ))}

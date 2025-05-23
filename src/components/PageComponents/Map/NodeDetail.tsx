@@ -218,7 +218,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
           <div>{t("node_detail_snr_label")}</div>
           <Mono className="flex items-center text-xs text-gray-500">
             {node.snr}
-            {t("common.dbUnit")}
+            {t("common_unit_dbm")}
             <Dot />
             {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%
             <Dot />
