@@ -90,24 +90,24 @@ export const Sidebar = ({ children }: SidebarProps) => {
 
   const pages: NavLink[] = [
     {
-      name: t("navigation.title_messages"),
+      name: t("navigation_title_messages"),
       icon: MessageSquareIcon,
       page: "messages",
       count: numUnread ? numUnread : undefined,
     },
-    { name: t("navigation.title_map"), icon: MapIcon, page: "map" },
+    { name: t("navigation_title_map"), icon: MapIcon, page: "map" },
     {
-      name: t("navigation.title_radioConfig"),
+      name: t("navigation_title_radioConfig"),
       icon: SettingsIcon,
       page: "config",
     },
     {
-      name: t("navigation.title_channels"),
+      name: t("navigation_title_channels"),
       icon: LayersIcon,
       page: "channels",
     },
     {
-      name: `${t("navigation.title_nodes")} (${
+      name: `${t("navigation_title_nodes")} (${
         Math.max(getNodesLength() - 1, 0)
       })`,
       icon: UsersIcon,
@@ -150,7 +150,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         </h2>
       </div>
 
-      <SidebarSection label={t("navigation.title")} className="mt-4 px-0">
+      <SidebarSection label={t("navigation_title")} className="mt-4 px-0">
         {pages.map((link) => (
           <SidebarButton
             key={link.name}
