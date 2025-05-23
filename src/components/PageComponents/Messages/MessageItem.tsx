@@ -9,7 +9,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { cn } from "@core/utils/cn.ts";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
-import type { IconNode, LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { ReactNode, useMemo } from "react";
 import {
   MessageState,
