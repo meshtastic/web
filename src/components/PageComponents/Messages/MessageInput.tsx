@@ -60,6 +60,7 @@ export const MessageInput = ({
               minLength={1}
               name="messageInput"
               placeholder="Enter Message"
+              autocomplete="off"
               value={localDraft}
               onChange={handleInputChange}
             />
