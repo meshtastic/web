@@ -22,7 +22,7 @@ export const RemoveNodeDialog = ({
   open,
   onOpenChange,
 }: RemoveNodeDialogProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const { connection, getNode, removeNode } = useDevice();
   const { nodeNumToBeRemoved } = useAppStore();
 
@@ -37,9 +37,9 @@ export const RemoveNodeDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>{t("dialog_removeNode_title")}</DialogTitle>
+          <DialogTitle>{t("removeNode.title")}</DialogTitle>
           <DialogDescription>
-            {t("dialog_removeNode_description")}
+            {t("removeNode.description")}
           </DialogDescription>
         </DialogHeader>
         <div className="gap-4">
@@ -53,7 +53,7 @@ export const RemoveNodeDialog = ({
             name="remove"
             onClick={() => onSubmit()}
           >
-            {t("dialog_button_remove")}
+            {t("button.remove")}
           </Button>
         </DialogFooter>
       </DialogContent>

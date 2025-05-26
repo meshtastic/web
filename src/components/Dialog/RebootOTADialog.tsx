@@ -23,7 +23,7 @@ const DEFAULT_REBOOT_DELAY = 5; // seconds
 export const RebootOTADialog = (
   { open, onOpenChange }: RebootOTADialogProps,
 ) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const { connection } = useDevice();
   const [time, setTime] = useState<number>(DEFAULT_REBOOT_DELAY);
   const [isScheduled, setIsScheduled] = useState(false);
@@ -52,7 +52,6 @@ export const RebootOTADialog = (
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
-        console.log("Rebooting...");
         resolve();
       }, delay * 1000);
     }).finally(() => {
@@ -76,10 +75,10 @@ export const RebootOTADialog = (
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
-            {t("command_palette_contextual_command_reboot_to_ota_mode")}
+            {t("rebootOta.title")}
           </DialogTitle>
           <DialogDescription>
-            {t("dialog_rebootOta_description")}
+            {t("rebootOta.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -91,7 +90,7 @@ export const RebootOTADialog = (
             className="dark:text-slate-900 appearance-none"
             value={inputValue}
             onChange={handleSetTime}
-            placeholder={t("dialog_rebootOta_placeholder_enterDelay")}
+            placeholder={t("rebootOta.enterDelay")}
           />
           <Button
             onClick={() => handleRebootWithTimeout()}
@@ -99,9 +98,7 @@ export const RebootOTADialog = (
             className="w-9/12"
           >
             <ClockIcon className="mr-2" size={18} />
-            {isScheduled
-              ? t("dialog_rebootOta_status_scheduled")
-              : t("command_palette_contextual_command_schedule_reboot")}
+            {isScheduled ? t("rebootOta.scheduled") : t("rebootOta.title")}
           </Button>
         </div>
 
@@ -111,7 +108,7 @@ export const RebootOTADialog = (
           onClick={() => handleInstantReboot()}
         >
           <RefreshCwIcon className="mr-2" size={16} />
-          {t("dialog_button_rebootOtaNow")}
+          {t("button.rebootOtaNow")}
         </Button>
       </DialogContent>
     </Dialog>

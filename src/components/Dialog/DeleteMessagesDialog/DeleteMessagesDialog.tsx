@@ -21,7 +21,7 @@ export const DeleteMessagesDialog = ({
   open,
   onOpenChange,
 }: DeleteMessagesDialogProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const { deleteAllMessages } = useMessageStore();
   const handleCloseDialog = () => {
     onOpenChange(false);
@@ -34,10 +34,10 @@ export const DeleteMessagesDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangleIcon className="h-5 w-5 text-warning" />
-            {t("dialog_deleteMessages_title")}
+            {t("deleteMessages.title")}
           </DialogTitle>
           <DialogDescription>
-            {t("dialog_deleteMessages_description")}
+            {t("deleteMessages.description")}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4">
@@ -46,7 +46,7 @@ export const DeleteMessagesDialog = ({
             onClick={handleCloseDialog}
             name="dismiss"
           >
-            {t("dialog_button_dismiss")}
+            {t("button.dismiss")}
           </Button>
           <Button
             variant="destructive"
@@ -56,7 +56,7 @@ export const DeleteMessagesDialog = ({
             }}
             name="clearMessages"
           >
-            {t("dialog_button_clearMessages")}
+            {t("button.clearMessages")}
           </Button>
         </DialogFooter>
       </DialogContent>

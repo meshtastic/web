@@ -62,7 +62,7 @@ export const BLE = (
         ))}
         {bleDevices.length === 0 && (
           <Mono className="m-auto select-none">
-            {t("bluetoothConnection_noDevicesPaired")}
+            {t("newDeviceDialog.bluetoothConnection.noDevicesPaired")}
           </Mono>
         )}
       </div>
@@ -86,7 +86,7 @@ export const BLE = (
             });
         }}
       >
-        <span>{t("bluetoothConnection_newDeviceButton")}</span>
+        <span>{t("newDeviceDialog.bluetoothConnection.newDeviceButton")}</span>
       </Button>
     </fieldset>
   );

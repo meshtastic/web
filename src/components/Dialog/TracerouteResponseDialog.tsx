@@ -24,7 +24,7 @@ export const TracerouteResponseDialog = ({
   open,
   onOpenChange,
 }: TracerouteResponseDialogProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const { getNode } = useDevice();
   const route: number[] = traceroute?.data.route ?? [];
   const routeBack: number[] = traceroute?.data.routeBack ?? [];
@@ -32,11 +32,11 @@ export const TracerouteResponseDialog = ({
   const snrBack = (traceroute?.data.snrBack ?? []).map((snr) => snr / 4);
   const from = getNode(traceroute?.from ?? 0);
   const longName = from?.user?.longName ??
-    (from ? `!${numberToHexUnpadded(from?.num)}` : t("common_unknown_short"));
+    (from ? `!${numberToHexUnpadded(from?.num)}` : t("unknown.shortName"));
   const shortName = from?.user?.shortName ??
     (from
       ? `${numberToHexUnpadded(from?.num).substring(0, 4)}`
-      : t("common_unknown_short"));
+      : t("unknown.shortName"));
   const to = getNode(traceroute?.to ?? 0);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -44,8 +44,9 @@ export const TracerouteResponseDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
-            {t("dialog_tracerouteResponse_titlePrefix")}
-            {longName} ({shortName})
+            {t("tracerouteResponse.title", {
+              identifier: `${longName} (${shortName})`,
+            })}
           </DialogTitle>
         </DialogHeader>
         <DialogDescription>

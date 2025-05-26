@@ -11,7 +11,7 @@ export default function ThemeSwitcher({
   className?: string;
 }) {
   const { preference, setPreference } = useTheme();
-  const { t } = useTranslation();
+  const { t } = useTranslation("ui");
 
   const themeIcons = {
     light: <Sun className="size-6" />,
@@ -27,9 +27,9 @@ export default function ThemeSwitcher({
   };
 
   const preferenceDisplayMap: Record<ThemePreference, string> = {
-    light: t("theme_preference_light"),
-    dark: t("theme_preference_dark"),
-    system: t("theme_preference_system"),
+    light: t("theme.light"),
+    dark: t("theme.dark"),
+    system: t("theme.system"),
   };
 
   const currentDisplayPreference = preferenceDisplayMap[preference];
@@ -42,7 +42,7 @@ export default function ThemeSwitcher({
         className,
       )}
       onClick={toggleTheme}
-      aria-description={t("theme_switcher_aria_change_theme")}
+      aria-description={t("theme.changeTheme")}
     >
       <span
         data-label

@@ -1,4 +1,4 @@
-import { useDevice } from "../../core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import {
   Dialog,
   DialogClose,
@@ -22,16 +22,16 @@ export const LocationResponseDialog = ({
   open,
   onOpenChange,
 }: LocationResponseDialogProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const { getNode } = useDevice();
 
   const from = getNode(location?.from ?? 0);
   const longName = from?.user?.longName ??
-    (from ? `!${numberToHexUnpadded(from?.num)}` : t("common_unknown_short"));
+    (from ? `!${numberToHexUnpadded(from?.num)}` : t("unknown.shortName"));
   const shortName = from?.user?.shortName ??
     (from
       ? `${numberToHexUnpadded(from?.num).substring(0, 4)}`
-      : t("common_unknown_short"));
+      : t("unknown.shortName"));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -39,15 +39,16 @@ export const LocationResponseDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
-            {t("dialog_locationResponse_titlePrefix")}
-            {longName} ({shortName})
+            {t("locationResponse.title", {
+              identifier: `${longName} (${shortName})`,
+            })}
           </DialogTitle>
         </DialogHeader>
         <DialogDescription>
           <div className="ml-5 flex">
             <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
               <p>
-                {t("dialog_locationResponse_label_coordinates")}
+                {t("locationResponse.coordinates")}
                 <a
                   className="text-blue-500 dark:text-blue-400"
                   href={`https://www.openstreetmap.org/?mlat=${
@@ -61,9 +62,11 @@ export const LocationResponseDialog = ({
                 </a>
               </p>
               <p>
-                {t("dialog_locationResponse_label_altitude")}
+                {t("locationResponse.altitude")}
                 {location?.data.altitude}
-                {t("dialog_locationResponse_unit_meter")}
+                {location?.data.altitde < 1
+                  ? t("unit.meter.one")
+                  : t("unit.meter.plural")}
               </p>
             </span>
           </div>

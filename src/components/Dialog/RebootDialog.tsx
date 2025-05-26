@@ -22,7 +22,7 @@ export const RebootDialog = ({
   open,
   onOpenChange,
 }: RebootDialogProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const { connection } = useDevice();
 
   const [time, setTime] = useState<number>(5);
@@ -33,10 +33,10 @@ export const RebootDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
-            {t("command_palette_contextual_command_schedule_reboot")}
+            {t("reboot.title")}
           </DialogTitle>
           <DialogDescription>
-            {t("dialog_reboot_description")}
+            {t("reboot.description")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex gap-2 p-4">
@@ -60,7 +60,7 @@ export const RebootDialog = ({
             }}
           >
             <RefreshCwIcon className="mr-2" size={16} />
-            {t("dialog_button_now")}
+            {t("button.now")}
           </Button>
         </div>
       </DialogContent>

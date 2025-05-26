@@ -8,11 +8,11 @@ export interface ChannelChatProps {
 }
 
 const EmptyState = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("messages");
   return (
     <div className="flex flex-1 flex-col place-content-center place-items-center p-8 text-slate-500 dark:text-slate-400">
       <InboxIcon className="mb-2 h-8 w-8" />
-      <span className="text-sm">{t("messages_empty")}</span>
+      <span className="text-sm">{t("emptyState.text")}</span>
     </div>
   );
 };

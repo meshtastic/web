@@ -31,7 +31,7 @@ export const QRDialog = ({
   loraConfig,
   channels,
 }: QRDialogProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [qrCodeAdd, setQrCodeAdd] = useState<boolean>();
@@ -67,9 +67,9 @@ export const QRDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>{t("dialog_qr_title")}</DialogTitle>
+          <DialogTitle>{t("qr.title")}</DialogTitle>
           <DialogDescription>
-            {t("dialog_qr_description")}
+            {t("qr.description")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -81,9 +81,12 @@ export const QRDialog = ({
                     {channel.settings?.name.length
                       ? channel.settings.name
                       : channel.role === Protobuf.Channel.Channel_Role.PRIMARY
-                      ? t("channel_name_primary")
+                      ? t("page.broadcastLabel", { ns: "channels" })
                       : `${
-                        t("dialog_import_label_channelPrefix")
+                        t("page.channelIndex", {
+                          ns: "channels",
+                          index: channel.index,
+                        })
                       }${channel.index}`}
                   </Label>
                   <Checkbox
@@ -120,7 +123,7 @@ export const QRDialog = ({
               name="addChannels"
               onClick={() => setQrCodeAdd(true)}
             >
-              {t("dialog_qr_button_addChannels")}
+              {t("qr.addChannels")}
             </button>
             <button
               type="button"
@@ -132,12 +135,12 @@ export const QRDialog = ({
               name="replaceChannels"
               onClick={() => setQrCodeAdd(false)}
             >
-              {t("dialog_qr_button_replaceChannels")}
+              {t("qr.replaceChannels")}
             </button>
           </div>
         </div>
         <DialogFooter>
-          <Label>{t("dialog_qr_label_sharableUrl")}</Label>
+          <Label>{t("qr.sharableUrl")}</Label>
           <Input
             value={qrCodeUrl}
             disabled

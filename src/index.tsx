@@ -5,7 +5,7 @@ import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 
 import { App } from "@app/App.tsx";
-import "@app/i18n.ts";
+import "./i18n/config.ts";
 
 const container = document.getElementById("root") as HTMLElement;
 const root = createRoot(container);

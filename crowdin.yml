@@ -1,10 +1,10 @@
-"project_id_env": "CROWDIN_PROJECT_ID"
-"api_token_env": "CROWDIN_PERSONAL_TOKEN"
-"base_path": "."
-"base_url": "https://meshtastic.crowdin.com/api/v2"
+project_id_env: CROWDIN_PROJECT_ID
+api_token_env: CROWDIN_PERSONAL_TOKEN
+base_path: "."
+base_url: "https://meshtastic.crowdin.com/api/v2"
 
-"preserve_hierarchy": true
+preserve_hierarchy: true
 
 files:
-  - source: /src/i18n/locales/en.json
-    translation: /src/i18n/locales/%two_letters_code%.json
+  - source: "/src/i18n/locales/en/**/*.json"
+    translation: "/src/i18n/locales/%locale%/%original_file_name%"

@@ -36,17 +36,17 @@ export interface NodeDetailProps {
 
 export const NodeDetail = ({ node }: NodeDetailProps) => {
   const { setChatType, setActiveChat } = useMessageStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation("nodes");
   const { setActivePage } = useDevice();
-  const name = node.user?.longName ?? t("common_unknown_short");
-  const shortName = node.user?.shortName ?? t("common_unknown_short");
+  const name = node.user?.longName ?? t("unknown.shortName");
+  const shortName = node.user?.shortName ?? t("unknown.shortName");
   const hwModel = node.user?.hwModel ?? 0;
   const rawHardwareType = Protobuf.Mesh.HardwareModel[hwModel] as
     | keyof typeof Protobuf.Mesh.HardwareModel
     | undefined;
   const hardwareType = rawHardwareType
     ? rawHardwareType === "UNSET"
-      ? t("common_unset")
+      ? t("unset")
       : rawHardwareType.replaceAll("_", " ")
     : `${hwModel}`;
   function handleDirectMessage() {
@@ -101,7 +101,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
                     align="center"
                     sideOffset={5}
                   >
-                    {t("node_detail_direct_message_tooltip", {
+                    {t("nodeDetail.directMessage.label", {
                       shortName,
                     })}
                   </TooltipContent>
@@ -113,29 +113,22 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
               fill={node.isFavorite ? "black" : "none"}
               size={15}
               aria-label={node.isFavorite
-                ? t("node_detail_favorite_aria_label")
-                : t("node_detail_not_favorite_aria_label")}
+                ? t("nodeDetail.favorite.label")
+                : t("nodeDetail.notFavorite.label")}
             />
           </div>
         </div>
 
         <div>
           <Heading as="h5">{name}</Heading>
-          {hardwareType !== t("common_unset") && <Subtle>{hardwareType}
-          </Subtle>}
+          {hardwareType !== t("unset") && <Subtle>{hardwareType}</Subtle>}
 
           {!!node.deviceMetrics?.batteryLevel && (
             <BatteryStatus deviceMetrics={node.deviceMetrics} />
           )}
 
           <div className="flex gap-2 items-center">
-            {node.user?.shortName && (
-              <div>
-                {t("node_detail_short_name_display_format", {
-                  name: node.user?.shortName,
-                })}
-              </div>
-            )}
+            {node.user?.shortName && <div>"{node.user?.shortName}"</div>}
             {node.user?.id && <div>{node.user?.id}</div>}
           </div>
 
@@ -148,14 +141,14 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             <div>
               {node.lastHeard > 0 && (
                 <div>
-                  {t("node_detail_status_heard")}{" "}
+                  {t("nodeDetail.status.heard")}{" "}
                   <TimeAgo timestamp={node.lastHeard * 1000} />
                 </div>
               )}
             </div>
             {node.viaMqtt && (
               <div style={{ color: "#660066" }} className="font-medium">
-                {t("node_detail_status_mqtt")}
+                {t("nodeDetail.status.mqtt")}
               </div>
             )}
           </div>
@@ -168,13 +161,11 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         <div className="flex items-center grow">
           <div className="border-2 border-slate-900 rounded-sm px-0.5 mr-1">
             {Number.isNaN(node.hopsAway)
-              ? t("node_detail_hops_unknown")
+              ? t("unit.hopsAway.unknown")
               : node.hopsAway}
           </div>
           <div>
-            {node.hopsAway === 1
-              ? t("node_detail_hops_label_one")
-              : t("node_detail_hops_label_other")}
+            {node.hopsAway === 1 ? t("unit.hops.one") : t("unit.hop.plural")}
           </div>
         </div>
         {node.position?.altitude && (
@@ -186,8 +177,8 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             />
             <div>
               {formatQuantity(node.position?.altitude, {
-                one: t("node_detail_altitude_unit_one"),
-                other: t("node_detail_altitude_unit_other"),
+                one: t("unit.meter.one"),
+                other: t("unit.meter.plural"),
               })}
             </div>
           </div>
@@ -197,7 +188,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       <div className="flex mt-2">
         {!!node.deviceMetrics?.channelUtilization && (
           <div className="grow">
-            <div>{t("node_detail_channel_util_label")}</div>
+            <div>{t("nodeDetail.channelUtilization")}</div>
             <Mono>
               {node.deviceMetrics?.channelUtilization.toPrecision(3)}%
             </Mono>
@@ -205,7 +196,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         )}
         {!!node.deviceMetrics?.airUtilTx && (
           <div className="grow">
-            <div>{t("node_detail_airtime_util_label")}</div>
+            <div>{t("nodeDetail.airTxUtilization")}</div>
             <Mono className="text-gray-500">
               {node.deviceMetrics?.airUtilTx.toPrecision(3)}%
             </Mono>
@@ -215,15 +206,15 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
 
       {node.snr !== 0 && (
         <div className="mt-2">
-          <div>{t("node_detail_snr_label")}</div>
+          <div>{t("unit.snr")}</div>
           <Mono className="flex items-center text-xs text-gray-500">
             {node.snr}
-            {t("common_unit_dbm")}
+            {t("unit.dbm")}
             <Dot />
             {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%
             <Dot />
             {(node.snr + 10) * 5}
-            {t("common_rawUnit")}
+            {t("unit.raw")}
           </Mono>
         </div>
       )}

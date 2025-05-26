@@ -46,7 +46,7 @@ export const MessagesPage = () => {
   const { toast } = useToast();
   const { isCollapsed } = useSidebar();
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const { t } = useTranslation();
+  const { t } = useTranslation(["messages", "channels", "ui"]);
   const deferredSearch = useDeferredValue(searchTerm);
 
   const filteredNodes = (): NodeInfoWithUnread[] => {
@@ -165,7 +165,7 @@ export const MessagesPage = () => {
       default:
         return (
           <div className="flex-1 flex items-center justify-center text-slate-500 p-4">
-            {t("messages_selectChatPrompt")}
+            {t("messagesPage.selectChatPrompt")}
           </div>
         );
     }
@@ -174,18 +174,20 @@ export const MessagesPage = () => {
   const leftSidebar = useMemo(() => (
     <Sidebar>
       <SidebarSection
-        label={t("messages_channelsSection_title")}
+        label={t("navigation.channels")}
         className="py-2 px-0"
       >
         {filteredChannels?.map((channel) => (
           <SidebarButton
             key={channel.index}
             count={unreadCounts.get(channel.index)}
-            label={channel.settings?.name || (channel.index === 0
-              ? t("messages_channelsSection_primaryChannelName")
-              : t("messages_channelsSection_channelName", {
-                index: channel.index,
-              }))}
+            label={channel.settings?.name ||
+              (channel.index === 0
+                ? t("page.broadcastLabel", { ns: "channels" })
+                : t("page.channelLabel", {
+                  index: channel.index,
+                  ns: "channels",
+                }))}
             active={activeChat === channel.index &&
               chatType === MessageType.Broadcast}
             onClick={() => {
@@ -222,7 +224,7 @@ export const MessagesPage = () => {
         <label className="p-2 block">
           <Input
             type="text"
-            placeholder={t("messages_nodesSection_searchPlaceholder")}
+            placeholder={t("search.nodes")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             showClearButton={!!searchTerm}
@@ -237,7 +239,8 @@ export const MessagesPage = () => {
             <SidebarButton
               key={node.num}
               preventCollapse
-              label={node.user?.longName ?? t("common_unknown_short")}
+              label={node.user?.longName ??
+                t("unknown.shortName")}
               count={node.unreadCount > 0 ? node.unreadCount : undefined}
               active={activeChat === node.num &&
                 chatType === MessageType.Direct}
@@ -248,7 +251,8 @@ export const MessagesPage = () => {
               }}
             >
               <Avatar
-                text={node.user?.shortName ?? t("common_unknown_short")}
+                text={node.user?.shortName ??
+                  t("unknown.shortName")}
                 className={cn(hasNodeError(node.num) && "text-red-500")}
                 showError={hasNodeError(node.num)}
                 showFavorite={node.isFavorite}
@@ -271,19 +275,15 @@ export const MessagesPage = () => {
     ],
   );
 
-  const pageTitleChatName = useMemo(() => {
-    if (isBroadcast && currentChannel) return getChannelName(currentChannel);
-    if (isDirect && otherNode) {
-      return otherNode.user?.longName ?? t("common_unknown_short");
-    }
-    return t("messages_title_default");
-  }, [isBroadcast, currentChannel, isDirect, otherNode, t]);
-
   return (
     <PageLayout
-      label={t("messages_title", {
-        chatName: pageTitleChatName,
-      })}
+      label={`Messages: ${
+        isBroadcast && currentChannel
+          ? getChannelName(currentChannel)
+          : isDirect && otherNode
+          ? (otherNode.user?.longName ?? t("unknown.longName"))
+          : t("emptyState.title")
+      }`}
       rightBar={rightSidebar}
       leftBar={leftSidebar}
       actions={isDirect && otherNode
@@ -297,8 +297,8 @@ export const MessagesPage = () => {
             onClick() {
               toast({
                 title: otherNode.user?.publicKey?.length
-                  ? t("toast_messages_pkiEncryption")
-                  : t("toast_messages_pskEncryption"),
+                  ? t("toast.pkiEncryption")
+                  : t("toast.pskEncryption"),
               });
             },
           },
@@ -319,7 +319,7 @@ export const MessagesPage = () => {
             )
             : (
               <div className="p-4 text-center text-slate-400 italic">
-                {t("messages_sendMessagePrompt")}
+                {t("messagesPage.sendMessagePrompt")}
               </div>
             )}
         </div>

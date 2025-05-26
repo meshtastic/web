@@ -15,15 +15,16 @@ import { QrCodeIcon, UploadIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-export const getChannelName = (channel: Protobuf.Channel.Channel) =>
-  channel.settings?.name.length
+export const getChannelName = (channel: Protobuf.Channel.Channel) => {
+  return channel.settings?.name.length
     ? channel.settings?.name
     : channel.index === 0
-    ? i18next.t("channel_name_primary")
-    : i18next.t("channel_name_prefix", { index: channel.index });
+    ? i18next.t("page.broadcastLabel")
+    : i18next.t("page.channelIndex", { ns: "channels", index: channel.index });
+};
 
 const ChannelsPage = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("channels");
   const { channels, setDialogOpen } = useDevice();
   const [activeChannel] = useState<Types.ChannelNumber>(
     Types.ChannelNumber.Primary,
@@ -35,12 +36,11 @@ const ChannelsPage = () => {
   return (
     <>
       <PageLayout
+        contentClassName="overflow-auto"
         leftBar={<Sidebar />}
         label={currentChannel
-          ? t("channel_page_title", {
-            channelName: getChannelName(currentChannel),
-          })
-          : t("common_loading")}
+          ? getChannelName(currentChannel)
+          : t("loading", { ns: "common" })}
         actions={[
           {
             key: "import",

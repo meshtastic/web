@@ -63,7 +63,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ) => {
     const { isVisible, toggleVisibility } = usePasswordVisibilityToggle();
     const { copy, isCopied } = useCopyToClipboard({ timeout: 1500 });
-    const { t } = useTranslation();
+    const { t } = useTranslation("ui");
 
     const potentialActions: InputActionType[] = [
       {
@@ -82,8 +82,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref.current.focus();
           }
         },
-        ariaLabel: t("input_action_clearInput_label"),
-        tooltip: t("input_action_clearInput_label"),
+        ariaLabel: t("filters.clearInput.label"),
+        tooltip: t("filters.clearInput.label"),
         condition: !!showClearButton && !!value,
       },
       {
@@ -94,11 +94,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           toggleVisibility();
         },
         ariaLabel: isVisible
-          ? t("input_action_hidePassword_label")
-          : t("input_action_showPassword_label"),
+          ? t("notifications.hidePassword.label")
+          : t("notifications.showPassword.label"),
         tooltip: isVisible
-          ? t("input_action_hidePassword_label")
-          : t("input_action_showPassword_label"),
+          ? t("notifications.hidePassword.label")
+          : t("notifications.showPassword.label"),
         condition: !!showPasswordToggle && type === "password",
       },
       {
@@ -111,11 +111,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           }
         },
         ariaLabel: isCopied
-          ? t("input_action_copied_label")
-          : t("input_action_copyToClipboard_label"),
+          ? t("notifications.copied.label")
+          : t("notifications.copyToClipboard.label"),
         tooltip: isCopied
-          ? t("input_action_copied_label")
-          : t("input_action_copyToClipboard_label"),
+          ? t("notifications.copied.label")
+          : t("notifications.copyToClipboard.label"),
         condition: !!showCopyButton,
       },
     ];

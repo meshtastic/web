@@ -16,7 +16,7 @@ export interface SettingsPanelProps {
 
 export const Channel = ({ channel }: SettingsPanelProps) => {
   const { config, connection, addChannel } = useDevice();
-  const { t } = useTranslation();
+  const { t } = useTranslation(["channels", "ui", "dialog"]);
   const { toast } = useToast();
 
   const [pass, setPass] = useState<string>(
@@ -44,7 +44,8 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
     });
     connection?.setChannel(channel).then(() => {
       toast({
-        title: t("channel_form_toast_saved", {
+        title: t("toast.savedChannel", {
+          ns: "ui",
           channelName: channel.settings?.name,
         }),
       });
@@ -72,7 +73,7 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
   const validatePass = (input: string, count: number) => {
     if (input.length % 4 !== 0 || toByteArray(input).length !== count) {
       setValidationText(
-        t("channel_form_validation_psk_invalid", { bits: count * 8 }),
+        t("validation.pskInvalid", { bits: count * 8 }),
       );
     } else {
       setValidationText(undefined);
@@ -116,21 +117,21 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
         }}
         fieldGroups={[
           {
-            label: t("channel_form_field_group_settings_label"),
-            description: t("channel_form_field_group_settings_description"),
+            label: t("settings.label"),
+            description: t("settings.description"),
             fields: [
               {
                 type: "select",
                 name: "role",
-                label: t("channel_form_field_role_label"),
+                label: t("role.label"),
                 disabled: channel.index === 0,
-                description: t("channel_form_field_role_description"),
+                description: t("role.description"),
                 properties: {
                   enumValue: channel.index === 0
-                    ? { [t("channel_form_field_role_option_primary")]: 1 }
+                    ? { [t("role.options.primary")]: 1 }
                     : {
-                      [t("channel_form_field_role_option_disabled")]: 0,
-                      [t("channel_form_field_role_option_secondary")]: 2,
+                      [t("role.options.disabled")]: 0,
+                      [t("role.options.secondary")]: 2,
                     },
                 },
               },
@@ -138,15 +139,15 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                 type: "passwordGenerator",
                 name: "settings.psk",
                 id: "channel-psk",
-                label: t("channel_form_field_psk_label"),
-                description: t("channel_form_field_psk_description"),
+                label: t("psk.label"),
+                description: t("psk.description"),
                 validationText: validationText,
                 devicePSKBitCount: bitCount ?? 0,
                 inputChange: inputChangeEvent,
                 selectChange: selectChangeEvent,
                 actionButtons: [
                   {
-                    text: t("channel_form_field_psk_generate_button"),
+                    text: t("psk.generate"),
                     variant: "success",
                     onClick: preSharedClickEvent,
                   },
@@ -161,104 +162,98 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
               {
                 type: "text",
                 name: "settings.name",
-                label: t("channel_form_field_name_label"),
-                description: t("channel_form_field_name_description"),
+                label: t("name.label"),
+                description: t("name.description"),
               },
               {
                 type: "toggle",
                 name: "settings.uplinkEnabled",
-                label: t("channel_form_field_uplink_enabled_label"),
-                description: t("channel_form_field_uplink_enabled_description"),
+                label: t("uplinkEnabled.label"),
+                description: t("uplinkEnabled.description"),
               },
               {
                 type: "toggle",
                 name: "settings.downlinkEnabled",
-                label: t("channel_form_field_downlink_enabled_label"),
-                description: t(
-                  "channel_form_field_downlink_enabled_description",
-                ),
+                label: t("downlinkEnabled.label"),
+                description: t("downlinkEnabled.description"),
               },
               {
                 type: "select",
                 name: "settings.moduleSettings.positionPrecision",
-                label: t("channel_form_field_position_precision_label"),
-                description: t(
-                  "channel_form_field_position_precision_description",
-                ),
+                label: t("positionPrecision.label"),
+                description: t("positionPrecision.description"),
                 properties: {
                   enumValue: config.display?.units === 0
                     ? {
-                      [t("channel_form_field_position_precision_option_none")]:
-                        0,
+                      [t("positionPrecision.options.none")]: 0,
                       [
-                        t("channel_form_field_position_precision_option_metric_km23")
+                        t("positionPrecision.options.metric_km23")
                       ]: 10,
                       [
-                        t("channel_form_field_position_precision_option_metric_km12")
+                        t("positionPrecision.options.metric_km12")
                       ]: 11,
                       [
-                        t("channel_form_field_position_precision_option_metric_km5_8")
+                        t("positionPrecision.options.metric_km5_8")
                       ]: 12,
                       [
-                        t("channel_form_field_position_precision_option_metric_km2_9")
+                        t("positionPrecision.options.metric_km2_9")
                       ]: 13,
                       [
-                        t("channel_form_field_position_precision_option_metric_km1_5")
+                        t("positionPrecision.options.metric_km1_5")
                       ]: 14,
                       [
-                        t("channel_form_field_position_precision_option_metric_m700")
+                        t("positionPrecision.options.metric_m700")
                       ]: 15,
                       [
-                        t("channel_form_field_position_precision_option_metric_m350")
+                        t("positionPrecision.options.metric_m350")
                       ]: 16,
                       [
-                        t("channel_form_field_position_precision_option_metric_m200")
+                        t("positionPrecision.options.metric_m200")
                       ]: 17,
                       [
-                        t("channel_form_field_position_precision_option_metric_m90")
+                        t("positionPrecision.options.metric_m90")
                       ]: 18,
                       [
-                        t("channel_form_field_position_precision_option_metric_m50")
+                        t("positionPrecision.options.metric_m50")
                       ]: 19,
                       [
-                        t("channel_form_field_position_precision_option_precise")
+                        t("positionPrecision.options.precise")
                       ]: 32,
                     }
                     : {
-                      [t("channel_form_field_position_precision_option_none")]:
-                        0,
+                      [t("positionPrecision.options.none")]: 0,
                       [
-                        t("channel_form_field_position_precision_option_imperial_mi15")
+                        t("positionPrecision.options.imperial_mi15")
                       ]: 10,
                       [
-                        t("channel_form_field_position_precision_option_imperial_mi7_3")
+                        t("positionPrecision.options.imperial_mi7_3")
                       ]: 11,
                       [
-                        t("channel_form_field_position_precision_option_imperial_mi3_6")
+                        t("positionPrecision.options.imperial_mi3_6")
                       ]: 12,
                       [
-                        t("channel_form_field_position_precision_option_imperial_mi1_8")
+                        t("positionPrecision.options.imperial_mi1_8")
                       ]: 13,
                       [
-                        t("channel_form_field_position_precision_option_imperial_mi0_9")
+                        t("positionPrecision.options.imperial_mi0_9")
                       ]: 14,
                       [
-                        t("channel_form_field_position_precision_option_imperial_mi0_5")
+                        t("positionPrecision.options.imperial_mi0_5")
                       ]: 15,
                       [
-                        t("channel_form_field_position_precision_option_imperial_mi0_2")
+                        t("positionPrecision.options.imperial_mi0_2")
                       ]: 16,
                       [
-                        t("channel_form_field_position_precision_option_imperial_ft600")
+                        t("positionPrecision.options.imperial_ft600")
                       ]: 17,
                       [
-                        t("channel_form_field_position_precision_option_imperial_ft300")
+                        t("positionPrecision.options.imperial_ft300")
                       ]: 18,
                       [
-                        t("channel_form_field_position_precision_option_imperial_ft150")
+                        t("positionPrecision.options.imperial_ft150")
                       ]: 19,
                       [
-                        t("channel_form_field_position_precision_option_precise")
+                        t("positionPrecision.options.precise")
                       ]: 32,
                     },
                 },
@@ -269,9 +264,9 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
       />
       <PkiRegenerateDialog
         text={{
-          button: t("dialog_pkiRegenerateDialog_buttonRegenerate"),
-          title: t("dialog_pkiRegenerateDialog_title"),
-          description: t("dialog_pkiRegenerateDialog_description"),
+          button: t("pkiRegenerateDialog.regenerate", { ns: "dialog" }),
+          title: t("pkiRegenerateDialog.title", { ns: "dialog" }),
+          description: t("pkiRegenerateDialog.description", { ns: "dialog" }),
         }}
         open={preSharedDialogOpen}
         onOpenChange={() => setPreSharedDialogOpen(false)}

@@ -20,13 +20,13 @@ const ConfigPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
   const isError = hasErrors();
-  const { t } = useTranslation();
+  const { t } = useTranslation("deviceConfig");
 
   const handleSave = async () => {
     if (hasErrors()) {
       return toast({
-        title: t("config_toast_errorsExist_title"),
-        description: t("config_toast_errorsExist_description"),
+        title: t("toast.validationError.title"),
+        description: t("toast.validationError.description"),
       });
     }
 
@@ -37,8 +37,8 @@ const ConfigPage = () => {
           workingConfig.map((config) =>
             connection?.setConfig(config).then(() =>
               toast({
-                title: t("config_toast_saving_title"),
-                description: t("config_toast_saving_description", {
+                title: t("toast.saveSuccess.title"),
+                description: t("toast.saveSuccess.description", {
                   case: config.payloadVariant.case,
                 }),
               })
@@ -50,8 +50,8 @@ const ConfigPage = () => {
           workingModuleConfig.map((moduleConfig) =>
             connection?.setModuleConfig(moduleConfig).then(() =>
               toast({
-                title: t("config_toast_saving_title"),
-                description: t("config_toast_saving_description", {
+                title: t("toast.saveSuccess.title"),
+                description: t("toast.saveSuccess.description", {
                   case: moduleConfig.payloadVariant.case,
                 }),
               })
@@ -63,8 +63,8 @@ const ConfigPage = () => {
       await connection?.commitEditSettings();
     } catch (_error) {
       toast({
-        title: t("config_toast_errorSaving_title"),
-        description: t("config_toast_errorSaving_description"),
+        title: t("toast.configSaveError.title"),
+        description: t("toast.configSaveError.description"),
       });
     } finally {
       setIsSaving(false);
@@ -74,15 +74,18 @@ const ConfigPage = () => {
   const leftSidebar = useMemo(
     () => (
       <Sidebar>
-        <SidebarSection label={t("config_sidebar_section_modules_label")}>
+        <SidebarSection
+          label={t("sidebar.label")}
+          className="py-2 px-0"
+        >
           <SidebarButton
-            label={t("navigation_title_radioConfig")}
+            label={t("navigation.radioConfig")}
             active={activeConfigSection === "device"}
             onClick={() => setActiveConfigSection("device")}
             Icon={SettingsIcon}
           />
           <SidebarButton
-            label={t("navigation_title_moduleConfig")}
+            label={t("navigation.moduleConfig")}
             active={activeConfigSection === "module"}
             onClick={() => setActiveConfigSection("module")}
             Icon={BoxesIcon}
@@ -90,7 +93,7 @@ const ConfigPage = () => {
         </SidebarSection>
       </Sidebar>
     ),
-    [activeConfigSection, t],
+    [activeConfigSection],
   );
 
   return (
@@ -99,8 +102,8 @@ const ConfigPage = () => {
         contentClassName="overflow-auto"
         leftBar={leftSidebar}
         label={activeConfigSection === "device"
-          ? t("navigation_title_radioConfig")
-          : t("navigation_title_moduleConfig")}
+          ? t("navigation.radioConfig")
+          : t("navigation.moduleConfig")}
         actions={[
           {
             key: "save",

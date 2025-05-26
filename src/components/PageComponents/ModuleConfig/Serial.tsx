@@ -1,11 +1,13 @@
-import type { SerialValidation } from "@app/validation/moduleConfig/serial.tsx";
+import type { SerialValidation } from "@app/validation/moduleConfig/serial.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const Serial = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: SerialValidation) => {
     setWorkingModuleConfig(
@@ -24,21 +26,20 @@ export const Serial = () => {
       defaultValues={moduleConfig.serial}
       fieldGroups={[
         {
-          label: "Serial Settings",
-          description: "Settings for the Serial module",
+          label: t("serial.title"),
+          description: t("serial.description"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Module Enabled",
-              description: "Enable Serial output",
+              label: t("serial.enabled.label"),
+              description: t("serial.enabled.description"),
             },
             {
               type: "toggle",
               name: "echo",
-              label: "Echo",
-              description:
-                "Any packets you send will be echoed back to your device",
+              label: t("serial.echo.label"),
+              description: t("serial.echo.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -48,8 +49,8 @@ export const Serial = () => {
             {
               type: "number",
               name: "rxd",
-              label: "Receive Pin",
-              description: "Set the GPIO pin to the RXD pin you have set up.",
+              label: t("serial.rxd.label"),
+              description: t("serial.rxd.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -59,8 +60,8 @@ export const Serial = () => {
             {
               type: "number",
               name: "txd",
-              label: "Transmit Pin",
-              description: "Set the GPIO pin to the TXD pin you have set up.",
+              label: t("serial.txd.label"),
+              description: t("serial.txd.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -70,8 +71,8 @@ export const Serial = () => {
             {
               type: "select",
               name: "baud",
-              label: "Baud Rate",
-              description: "The serial baud rate",
+              label: t("serial.baud.label"),
+              description: t("serial.baud.description"),
 
               disabledBy: [
                 {
@@ -86,24 +87,22 @@ export const Serial = () => {
             {
               type: "number",
               name: "timeout",
-              label: "Timeout",
-
-              description:
-                "Seconds to wait before we consider your packet as 'done'",
+              label: t("serial.timeout.label"),
+              description: t("serial.timeout.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
                 },
               ],
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
             },
             {
               type: "select",
               name: "mode",
-              label: "Mode",
-              description: "Select Mode",
+              label: t("serial.mode.label"),
+              description: t("serial.mode.description"),
 
               disabledBy: [
                 {
@@ -119,9 +118,8 @@ export const Serial = () => {
             {
               type: "toggle",
               name: "overrideConsoleSerialPort",
-              label: "Override Console Serial Port",
-              description:
-                "If you have a serial port connected to the console, this will override it.",
+              label: t("serial.overrideConsoleSerialPort.label"),
+              description: t("serial.overrideConsoleSerialPort.description"),
             },
           ],
         },

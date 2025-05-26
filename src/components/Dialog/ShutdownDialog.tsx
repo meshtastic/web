@@ -22,7 +22,7 @@ export const ShutdownDialog = ({
   open,
   onOpenChange,
 }: ShutdownDialogProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const { connection } = useDevice();
 
   const [time, setTime] = useState<number>(5);
@@ -33,10 +33,10 @@ export const ShutdownDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
-            {t("command_palette_contextual_command_schedule_shutdown")}
+            {t("shutdown.title")}
           </DialogTitle>
           <DialogDescription>
-            {t("dialog_shutdown_description")}
+            {t("shutdown.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -45,7 +45,7 @@ export const ShutdownDialog = ({
             type="number"
             value={time}
             onChange={(e) => setTime(Number.parseInt(e.target.value))}
-            suffix={t("dialog_shutdown_suffix_minutes")}
+            suffix={t("unit.minute.plural")}
           />
           <Button
             className="w-24"
@@ -63,7 +63,7 @@ export const ShutdownDialog = ({
             }}
           >
             <PowerIcon className="mr-2" size={16} />
-            {t("dialog_button_now")}
+            {t("button.now")}
           </Button>
         </div>
       </DialogContent>

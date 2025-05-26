@@ -32,25 +32,25 @@ const getBatteryStates = (
       condition: (level) => level > 100,
       Icon: PlugZapIcon,
       className: "text-gray-500",
-      text: () => t("common_batteryStatus_pluggedIn"),
+      text: () => t("batteryStatus.pluggedIn"),
     },
     {
       condition: (level) => level > 80,
       Icon: BatteryFullIcon,
       className: "text-green-500",
-      text: (level) => t("common_batteryStatus_charging", { level }),
+      text: (level) => t("batteryStatus.charging", { level }),
     },
     {
       condition: (level) => level > 20,
       Icon: BatteryMediumIcon,
       className: "text-yellow-500",
-      text: (level) => t("common_batteryStatus_charging", { level }),
+      text: (level) => t("batteryStatus.charging", { level }),
     },
     {
       condition: () => true,
       Icon: BatteryLowIcon,
       className: "text-red-500",
-      text: (level) => t("common_batteryStatus_charging", { level }),
+      text: (level) => t("batteryStatus.charging", { level }),
     },
   ];
 };
@@ -81,9 +81,9 @@ const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
   const iconClassName = currentState.className;
   const statusText = currentState.text(batteryLevel);
 
-  const voltageTitle = `${
-    voltage?.toPrecision(3) ?? t("common_unknown_short")
-  } ${t("common_unit_volts")}`;
+  const voltageTitle = `${voltage?.toPrecision(3) ?? t("unknown.shortName")} ${
+    t("unit.volts")
+  }`;
 
   return (
     <div
@@ -91,7 +91,7 @@ const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
       title={voltageTitle}
     >
       <BatteryIcon size={22} className={iconClassName} />
-      <Subtle aria-label={t("common_batteryStatus_title")}>
+      <Subtle aria-label={t("batteryStatus.title")}>
         {statusText}
       </Subtle>
     </div>

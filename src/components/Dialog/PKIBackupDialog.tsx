@@ -23,8 +23,8 @@ export const PkiBackupDialog = ({
   open,
   onOpenChange,
 }: PkiBackupDialogProps) => {
-  const { t } = useTranslation();
-  const { config, setDialogOpen } = useDevice();
+  const { t } = useTranslation("dialog");
+  const { config, setDialogOpen, getMyNode } = useDevice();
   const privateKey = config.security?.privateKey;
   const publicKey = config.security?.publicKey;
 
@@ -48,7 +48,12 @@ export const PkiBackupDialog = ({
       printWindow.document.write(`
         <html>
           <head>
-            <title>${t("dialog_pkiBackup_print_header")}</title>
+            <title>${
+        t("pkiBackup.header", {
+          shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
+          longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+        })
+      }</title>
             <style>
               body { font-family: Arial, sans-serif; padding: 20px; }
               h1 { font-size: 18px; }
@@ -56,14 +61,18 @@ export const PkiBackupDialog = ({
             </style>
           </head>
           <body>
-            <h1>${t("dialog_pkiBackup_print_header")}</h1>
-            <br>
-            <h2>${t("dialog_pkiBackup_print_label_publicKey")}</h2>
+            <h1>${
+        t("pkiBackup.header", {
+          shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
+          longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+        })
+      }</h1>
+            <h3>${t("pkiBackup.secureBackup")}</h3>
+            <h3>${t("pkiBackup.publicKey")}</h3>
             <p>${decodeKeyData(publicKey)}</p>
-            <h2>${t("dialog_pkiBackup_print_label_privateKey")}</h2>
+            <h3>${t("pkiBackup.privateKey")}</h3>
             <p>${decodeKeyData(privateKey)}</p>
-            <br>
-            <p>${t("dialog_pkiBackup_print_footer")}</p>
+            <p>${t("pkiBackup.footer")}</p>
           </body>
         </html>
       `);
@@ -80,12 +89,12 @@ export const PkiBackupDialog = ({
     const decodedPublicKey = decodeKeyData(publicKey);
 
     const formattedContent = [
-      `${t("dialog_pkiBackup_print_header")}\n\n`,
-      `${t("dialog_pkiBackup_print_label_privateKey")}\n`,
+      `${t("pkiBackup.header")}\n\n`,
+      `${t("pkiBackup.privateKey")}\n`,
       decodedPrivateKey,
-      `\n\n${t("dialog_pkiBackup_print_label_publicKey")}\n`,
+      `\n\n${t("pkiBackup.publicKey")}\n`,
       decodedPublicKey,
-      `\n\n${t("dialog_pkiBackup_print_footer")}`,
+      `\n\n${t("pkiBackup.footer")}`,
     ].join("");
 
     const blob = new Blob([formattedContent], { type: "text/plain" });
@@ -93,7 +102,11 @@ export const PkiBackupDialog = ({
 
     const link = document.createElement("a");
     link.href = url;
-    link.download = "meshtastic_keys.txt";
+    link.download = t("pkiBackup.fileName", {
+      shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
+      longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+    });
+
     link.style.display = "none";
     document.body.appendChild(link);
     link.click();
@@ -107,13 +120,13 @@ export const PkiBackupDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>{t("dialog_pkiBackup_title")}</DialogTitle>
+          <DialogTitle>{t("pkiBackup.title")}</DialogTitle>
           <DialogDescription>
-            {t("dialog_pkiBackup_description_secureBackup")}
+            {t("pkiBackup.secureBackup")}
           </DialogDescription>
           <DialogDescription>
             <span className="font-bold break-before-auto">
-              {t("dialog_pkiBackup_description_loseKeysWarning")}
+              {t("pkiBackup.loseKeysWarning")}
             </span>
           </DialogDescription>
         </DialogHeader>
@@ -125,11 +138,11 @@ export const PkiBackupDialog = ({
             className=""
           >
             <DownloadIcon size={20} className="mr-2" />
-            {t("dialog_button_download")}
+            {t("button.download")}
           </Button>
           <Button variant="default" onClick={() => renderPrintWindow()}>
             <PrinterIcon size={20} className="mr-2" />
-            {t("dialog_button_print")}
+            {t("button.print")}
           </Button>
         </DialogFooter>
       </DialogContent>

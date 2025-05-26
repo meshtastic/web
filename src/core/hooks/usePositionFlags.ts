@@ -1,35 +1,35 @@
 import { useCallback, useMemo, useState } from "react";
 
 export const FLAGS_CONFIG = {
-  UNSET: { value: 0, i18nKey: "position_flag_unset" },
-  ALTITUDE: { value: 1, i18nKey: "position_flag_altitude" },
-  ALTITUDE_MSL: { value: 2, i18nKey: "position_flag_altitude_msl" },
+  UNSET: { value: 0, i18nKey: "position.flags.unset" },
+  ALTITUDE: { value: 1, i18nKey: "position.flags.altitude" },
+  ALTITUDE_MSL: { value: 2, i18nKey: "position.flags.altitudeMsl" },
   ALTITUDE_GEOIDAL_SEPARATION: {
     value: 4,
-    i18nKey: "position_flag_altitude_geoidal_separation",
+    i18nKey: "position.flags.altitudeGeoidalSeparation",
   },
   DOP: {
     value: 8,
-    i18nKey: "position_flag_dop",
+    i18nKey: "position.flags.dop",
   },
   HDOP_VDOP: {
     value: 16,
-    i18nKey: "position_flag_hdop_vdop",
+    i18nKey: "position.flags.hdopVdop",
   },
   NUM_SATELLITES: {
     value: 32,
-    i18nKey: "position_flag_num_satellites",
+    i18nKey: "position.flags.numSatellites",
   },
   SEQUENCE_NUMBER: {
     value: 64,
-    i18nKey: "position_flag_sequence_number",
+    i18nKey: "position.flags.sequenceNumber",
   },
-  TIMESTAMP: { value: 128, i18nKey: "position_flag_timestamp" },
+  TIMESTAMP: { value: 128, i18nKey: "position.flags.timestamp" },
   VEHICLE_HEADING: {
     value: 256,
-    i18nKey: "position_flag_vehicle_heading",
+    i18nKey: "position.flags.vehicleHeading",
   },
-  VEHICLE_SPEED: { value: 512, i18nKey: "position_flag_vehicle_speed" },
+  VEHICLE_SPEED: { value: 512, i18nKey: "position.flags.vehicleSpeed" },
 } as const;
 
 export type FlagName = keyof typeof FLAGS_CONFIG;

@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 
 export const KeyBackupReminder = () => {
   const { setDialogOpen } = useDevice();
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
 
   useBackupReminder({
-    message: t("dialog_pkiBackup_message"),
+    message: t("pkiBackup.description"),
     onAccept: () => setDialogOpen("pkiBackup", true),
     enabled: true,
   });

@@ -16,7 +16,7 @@ const Footer = ({ className, ...props }: FooterProps) => {
     >
       <p>
         <Trans
-          i18nKey="footer_text"
+          i18nKey="footer.text"
           components={[
             <a
               key="vercel"

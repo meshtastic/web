@@ -24,7 +24,7 @@ interface FormData {
 export const HTTP = (
   { closeDialog }: TabElementProps,
 ) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const isURLHTTPS = location.protocol === "https:";
 
@@ -81,12 +81,12 @@ export const HTTP = (
         disabled={connectionInProgress}
       >
         <div>
-          <Label>{t("httpConnection_ipAddressLabel")}</Label>
+          <Label>{t("newDeviceDialog.httpConnection.label")}</Label>
           <Input
             prefix={tlsValue
-              ? `${t("httpConnection_https")}://`
-              : `${t("httpConnection_http")}://`}
-            placeholder={t("httpConnection_field_ipAddress_placeholder")}
+              ? `${t("newDeviceDialog.https")}://`
+              : `${t("newDeviceDialog.http")}://`}
+            placeholder={t("newDeviceDialog.httpConnection.placeholder")}
             className="text-slate-900 dark:text-slate-100"
             {...register("ip")}
           />
@@ -98,7 +98,7 @@ export const HTTP = (
             checked={isURLHTTPS || tlsValue}
             {...register("tls")}
           />
-          <Label>{t("httpConnection_label_useHttps")}</Label>
+          <Label>{t("newDeviceDialog.useHttps")}</Label>
         </div>
 
         {connectionError && (
@@ -110,38 +110,38 @@ export const HTTP = (
               />
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-800">
-                  {t("httpConnection_connectionFailedAlert.title")}
+                  {t("newDeviceDialog.connectionFailedAlert.title")}
                 </p>
                 <p className="text-xs mt-1 text-amber-700 dark:text-amber-700">
-                  {t("httpConnection_connectionFailedAlert.descriptionPrefix")}
+                  {t("newDeviceDialog.connectionFailedAlert.descriptionPrefix")}
                   {connectionError.secure &&
-                    t("httpConnection_connectionFailedAlert.httpsHint")}
-                  {t("httpConnection_connectionFailedAlert.openLinkPrefix")}
+                    t("newDeviceDialog.connectionFailedAlert.httpsHint")}
+                  {t("newDeviceDialog.connectionFailedAlert.openLinkPrefix")}
                   <Link
                     href={`${
                       connectionError.secure
-                        ? t("httpConnection_https")
-                        : t("httpConnection_http")
+                        ? t("newDeviceDialog.https")
+                        : t("newDeviceDialog.http")
                     }://${connectionError.host}`}
                     className="underline font-medium text-amber-800 dark:text-amber-800"
                   >
                     {`${
                       connectionError.secure
-                        ? t("httpConnection_https")
-                        : t("httpConnection_http")
+                        ? t("newDeviceDialog.https")
+                        : t("newDeviceDialog.http")
                     }://${connectionError.host}`}
                   </Link>{" "}
-                  {t("httpConnection_connectionFailedAlert.openLinkSuffix")}
+                  {t("newDeviceDialog.connectionFailedAlert.openLinkSuffix")}
                   {connectionError.secure
                     ? t(
-                      "httpConnection_connectionFailedAlert.acceptTlsWarningSuffix",
+                      "newDeviceDialog.connectionFailedAlert.acceptTlsWarningSuffix",
                     )
                     : ""}.{" "}
                   <Link
                     href="https://meshtastic.org/docs/software/web-client/#http"
                     className="underline font-medium text-amber-800 dark:text-amber-800"
                   >
-                    {t("httpConnection_connectionFailedAlert.learnMoreLink")}
+                    {t("newDeviceDialog.connectionFailedAlert.learnMoreLink")}
                   </Link>
                 </p>
               </div>
@@ -155,8 +155,8 @@ export const HTTP = (
       >
         <span>
           {connectionInProgress
-            ? t("httpConnection_button_connecting")
-            : t("httpConnection_button_connect")}
+            ? t("newDeviceDialog.connecting")
+            : t("newDeviceDialog.connect")}
         </span>
       </Button>
     </form>

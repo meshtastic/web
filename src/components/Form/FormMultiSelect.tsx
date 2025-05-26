@@ -24,7 +24,7 @@ export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
 export function MultiSelectInput<T extends FieldValues>({
   field,
 }: GenericFormElementProps<T, MultiSelectFieldProps<T>>) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("deviceConfig");
   const { enumValue, ...remainingProperties } = field.properties;
 
   const isNewConfigStructure =
@@ -49,17 +49,19 @@ export function MultiSelectInput<T extends FieldValues>({
 
   return (
     <MultiSelect {...remainingProperties}>
-      {optionsToRender.map((option) => (
-        <MultiSelectItem
-          key={option.key}
-          name={option.key}
-          value={option.value.toString()}
-          checked={field.isChecked(option.key)}
-          onCheckedChange={() => field.onValueChange(option.key)}
-        >
-          {option.display}
-        </MultiSelectItem>
-      ))}
+      {optionsToRender.map((option) => {
+        return (
+          <MultiSelectItem
+            key={option.key}
+            name={option.key}
+            value={option.value.toString()}
+            checked={field.isChecked(option.key)}
+            onCheckedChange={() => field.onValueChange(option.key)}
+          >
+            {option.display}
+          </MultiSelectItem>
+        );
+      })}
     </MultiSelect>
   );
 }

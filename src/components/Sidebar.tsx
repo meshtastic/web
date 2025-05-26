@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -25,7 +25,7 @@ import ThemeSwitcher from "@components/ThemeSwitcher.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import BatteryStatus from "@components/BatteryStatus.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -40,10 +40,10 @@ interface NavLink {
 
 const CollapseToggleButton = () => {
   const { isCollapsed, toggleSidebar } = useSidebar();
-  const { t } = useTranslation();
+  const { t } = useTranslation("ui");
   const buttonLabel = isCollapsed
-    ? t("sidebar_collapseToggle-button_open")
-    : t("sidebar_collapseToggle_button_close");
+    ? t("sidebar.collapseToggle.button.open")
+    : t("sidebar.collapseToggle.button.close");
 
   return (
     <button
@@ -83,33 +83,47 @@ export const Sidebar = ({ children }: SidebarProps) => {
   const { setCommandPaletteOpen } = useAppStore();
   const myNode = getNode(hardware.myNodeNum);
   const { isCollapsed } = useSidebar();
-  const { t } = useTranslation();
+  const { t } = useTranslation("ui");
   const myMetadata = metadata.get(0);
 
   const numUnread = [...unreadCounts.values()].reduce((sum, v) => sum + v, 0);
 
+  const [displayedNodeCount, setDisplayedNodeCount] = useState(() =>
+    Math.max(getNodesLength() - 1, 0)
+  );
+
+  const [_, startNodeCountTransition] = useTransition();
+
+  const currentNodeCountValue = Math.max(getNodesLength() - 1, 0);
+
+  useEffect(() => {
+    if (currentNodeCountValue !== displayedNodeCount) {
+      startNodeCountTransition(() => {
+        setDisplayedNodeCount(currentNodeCountValue);
+      });
+    }
+  }, [currentNodeCountValue, displayedNodeCount, startNodeCountTransition]);
+
   const pages: NavLink[] = [
     {
-      name: t("navigation_title_messages"),
+      name: t("navigation.messages"),
       icon: MessageSquareIcon,
       page: "messages",
       count: numUnread ? numUnread : undefined,
     },
-    { name: t("navigation_title_map"), icon: MapIcon, page: "map" },
+    { name: t("navigation.map"), icon: MapIcon, page: "map" },
     {
-      name: t("navigation_title_config"),
+      name: t("navigation.config"),
       icon: SettingsIcon,
       page: "config",
     },
     {
-      name: t("navigation_title_channels"),
+      name: t("navigation.channels"),
       icon: LayersIcon,
       page: "channels",
     },
     {
-      name: `${t("navigation_title_nodes")} (${
-        Math.max(getNodesLength() - 1, 0)
-      })`,
+      name: `${t("navigation.nodes")} (${displayedNodeCount})`,
       icon: UsersIcon,
       page: "nodes",
     },
@@ -134,7 +148,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
       >
         <img
           src="Logo.svg"
-          alt={t("sidebar_app_title_alt")}
+          alt={t("app.logo")}
           className="size-10 flex-shrink-0 rounded-xl"
         />
         <h2
@@ -146,11 +160,14 @@ export const Sidebar = ({ children }: SidebarProps) => {
               : "opacity-100 max-w-xs visible ml-2",
           )}
         >
-          {t("common_header")}
+          {t("app.title")}
         </h2>
       </div>
 
-      <SidebarSection label={t("navigation_title")} className="mt-4 px-0">
+      <SidebarSection
+        label={t("navigation.title")}
+        className="mt-4 px-0"
+      >
         {pages.map((link) => (
           <SidebarButton
             key={link.name}
@@ -188,7 +205,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                   isCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
                 )}
               >
-                {t("common_loading")}
+                {t("loading")}
               </Subtle>
             </div>
           )
@@ -201,7 +218,8 @@ export const Sidebar = ({ children }: SidebarProps) => {
                 )}
               >
                 <Avatar
-                  text={myNode.user?.shortName ?? myNode.num.toString()}
+                  text={myNode.user?.shortName ??
+                    t("unknown.shortName")}
                   className={cn("flex-shrink-0 ml-2", isCollapsed && "ml-0")}
                   size="sm"
                 />
@@ -236,9 +254,9 @@ export const Sidebar = ({ children }: SidebarProps) => {
                     className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
                   />
                   <Subtle>
-                    {t("sidebar_deviceInfo_volts", {
+                    {t("sidebar.deviceInfo.volts", {
                       voltage: myNode.deviceMetrics?.voltage?.toPrecision(3) ??
-                        t("common_unknown_short"),
+                        t("unknown.shortName"),
                     })}
                   </Subtle>
                 </div>
@@ -248,9 +266,9 @@ export const Sidebar = ({ children }: SidebarProps) => {
                     className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
                   />
                   <Subtle>
-                    {t("sidebar_deviceInfo_firmwareVersion", {
+                    {t("sidebar.deviceInfo.firmwareVersion", {
                       version: myMetadata?.firmwareVersion ??
-                        t("common_unknown_short"),
+                        t("unknown.shortName"),
                     })}
                   </Subtle>
                 </div>
@@ -266,7 +284,9 @@ export const Sidebar = ({ children }: SidebarProps) => {
               >
                 <button
                   type="button"
-                  aria-label={t("sidebar_deviceInfo_button_editDeviceName")}
+                  aria-label={t(
+                    "sidebar.deviceInfo.button.editDeviceName",
+                  )}
                   className="p-1 rounded transition-colors cursor-pointer  hover:text-accent"
                   onClick={() => setDialogOpen("deviceName", true)}
                 >

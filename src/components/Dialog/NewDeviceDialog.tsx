@@ -53,7 +53,7 @@ const links: { [key: string]: string } = {
 };
 
 const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
-  const { i18n } = useTranslation();
+  const { i18n } = useTranslation("dialog");
 
   const listFormatter = useMemo(
     () =>
@@ -95,7 +95,7 @@ const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
           <p className="text-sm text-white">
             {browserFeatures.length > 0 && (
               <Trans
-                i18nKey="dialog_newDeviceDialog_errorMessage_requiresFeatures"
+                i18nKey="newDeviceDialog.validation.requiresFeatures"
                 components={{
                   "0": <>{featureNodes}</>,
                 }}
@@ -105,8 +105,8 @@ const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
             {needsSecureContext && (
               <Trans
                 i18nKey={browserFeatures.length > 0
-                  ? "dialog_newDeviceDialog_errorMessage_additionallyRequiresSecureContext"
-                  : "dialog_newDeviceDialog_errorMessage_requiresSecureContext"}
+                  ? "newDeviceDialog.validation.additionallyRequiresSecureContext"
+                  : "newDeviceDialog.validation.requiresSecureContext"}
                 components={{
                   "0": (
                     <Link
@@ -128,23 +128,23 @@ export const NewDeviceDialog = ({
   open,
   onOpenChange,
 }: NewDeviceProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const { unsupported } = useBrowserFeatureDetection();
 
   const tabs: TabManifest[] = [
     {
-      label: t("dialog_newDeviceDialog_tabLabelHttp"),
+      label: t("newDeviceDialog.tabHttp"),
       element: HTTP,
       isDisabled: false,
     },
     {
-      label: t("dialog_newDeviceDialog_tabLabelBluetooth"),
+      label: t("newDeviceDialog.tabBluetooth"),
       element: BLE,
       isDisabled: unsupported.includes("Web Bluetooth") ||
         unsupported.includes("Secure Context"),
     },
     {
-      label: t("dialog_newDeviceDialog_tabLabelSerial"),
+      label: t("newDeviceDialog.tabSerial"),
       element: Serial,
       isDisabled: unsupported.includes("Web Serial") ||
         unsupported.includes("Secure Context"),
@@ -156,7 +156,7 @@ export const NewDeviceDialog = ({
       <DialogContent aria-describedby={undefined}>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>{t("dialog_newDeviceDialog_title")}</DialogTitle>
+          <DialogTitle>{t("newDeviceDialog.title")}</DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="HTTP">
           <TabsList>

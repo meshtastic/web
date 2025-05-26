@@ -3,9 +3,11 @@ import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const Telemetry = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: TelemetryValidation) => {
     setWorkingModuleConfig(
@@ -24,74 +26,78 @@ export const Telemetry = () => {
       defaultValues={moduleConfig.telemetry}
       fieldGroups={[
         {
-          label: "Telemetry Settings",
-          description: "Settings for the Telemetry module",
+          label: t("telemetry.title"),
+          description: t("telemetry.description"),
           fields: [
             {
               type: "number",
               name: "deviceUpdateInterval",
-              label: "Device Metrics",
-              description: "Device metrics update interval (seconds)",
+              label: t("telemetry.deviceUpdateInterval.label"),
+              description: t("telemetry.deviceUpdateInterval.description"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
             },
             {
               type: "number",
               name: "environmentUpdateInterval",
-              label: "Environment metrics update interval (seconds)",
-              description: "",
+              label: t("telemetry.environmentUpdateInterval.label"),
+              description: t("telemetry.environmentUpdateInterval.description"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
             },
             {
               type: "toggle",
               name: "environmentMeasurementEnabled",
-              label: "Module Enabled",
-              description: "Enable the Environment Telemetry",
+              label: t("telemetry.environmentMeasurementEnabled.label"),
+              description: t(
+                "telemetry.environmentMeasurementEnabled.description",
+              ),
             },
             {
               type: "toggle",
               name: "environmentScreenEnabled",
-              label: "Displayed on Screen",
-              description: "Show the Telemetry Module on the OLED",
+              label: t("telemetry.environmentScreenEnabled.label"),
+              description: t("telemetry.environmentScreenEnabled.description"),
             },
             {
               type: "toggle",
               name: "environmentDisplayFahrenheit",
-              label: "Display Fahrenheit",
-              description: "Display temp in Fahrenheit",
+              label: t("telemetry.environmentDisplayFahrenheit.label"),
+              description: t(
+                "telemetry.environmentDisplayFahrenheit.description",
+              ),
             },
             {
               type: "toggle",
               name: "airQualityEnabled",
-              label: "Air Quality Enabled",
-              description: "Enable the Air Quality Telemetry",
+              label: t("telemetry.airQualityEnabled.label"),
+              description: t("telemetry.airQualityEnabled.description"),
             },
             {
               type: "number",
               name: "airQualityInterval",
-              label: "Air Quality Update Interval",
-              description: "How often to send Air Quality data over the mesh",
+              label: t("telemetry.airQualityInterval.label"),
+              description: t("telemetry.airQualityInterval.description"),
             },
             {
               type: "toggle",
               name: "powerMeasurementEnabled",
-              label: "Power Measurement Enabled",
-              description: "Enable the Power Measurement Telemetry",
+              label: t("telemetry.powerMeasurementEnabled.label"),
+              description: t("telemetry.powerMeasurementEnabled.description"),
             },
             {
               type: "number",
               name: "powerUpdateInterval",
-              label: "Power Update Interval",
-              description: "How often to send Power data over the mesh",
+              label: t("telemetry.powerUpdateInterval.label"),
+              description: t("telemetry.powerUpdateInterval.description"),
             },
             {
               type: "toggle",
               name: "powerScreenEnabled",
-              label: "Power Screen Enabled",
-              description: "Enable the Power Telemetry Screen",
+              label: t("telemetry.powerScreenEnabled.label"),
+              description: t("telemetry.powerScreenEnabled.description"),
             },
           ],
         },

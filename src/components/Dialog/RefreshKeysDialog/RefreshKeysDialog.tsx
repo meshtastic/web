@@ -20,7 +20,7 @@ export interface RefreshKeysDialogProps {
 export const RefreshKeysDialog = (
   { open, onOpenChange }: RefreshKeysDialogProps,
 ) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const { activeChat } = useMessageStore();
   const { nodeErrors, getNode } = useDevice();
   const { handleCloseDialog, handleNodeRemove } = useRefreshKeysDialog();
@@ -34,13 +34,13 @@ export const RefreshKeysDialog = (
   const nodeWithError = getNode(nodeErrorNum.node);
 
   const text = {
-    title: `${t("dialog_refreshKeys_titlePrefix")}${
-      nodeWithError?.user?.longName ?? ""
-    }`,
-    description: `${t("dialog_refreshKeys_description_unableToSendDmPrefix")}${
+    title: t("refreshKeys.title", {
+      identifier: nodeWithError?.user?.longName ?? "",
+    }),
+    description: `${t("refreshKeys.description.unableToSendDmPrefix")}${
       nodeWithError?.user?.longName ?? ""
     } (${nodeWithError?.user?.shortName ?? ""})${
-      t("dialog_refreshKeys_description_keyMismatchReasonSuffix")
+      t("refreshKeys.description.keyMismatchReasonSuffix")
     }`,
   };
 
@@ -66,10 +66,10 @@ export const RefreshKeysDialog = (
             <div className="flex flex-col gap-2">
               <div>
                 <p className="font-bold mb-0.5">
-                  {t("dialog_refreshKeys_label_acceptNewKeys")}
+                  {t("refreshKeys.label.acceptNewKeys")}
                 </p>
                 <p>
-                  {t("dialog_refreshKeys_description_acceptNewKeys")}
+                  {t("refreshKeys.description.acceptNewKeys")}
                 </p>
               </div>
               <Button
@@ -77,14 +77,14 @@ export const RefreshKeysDialog = (
                 name="requestNewKeys"
                 onClick={handleNodeRemove}
               >
-                {t("dialog_button_requestNewKeys")}
+                {t("button.requestNewKeys")}
               </Button>
               <Button
                 variant="outline"
                 name="dismiss"
                 onClick={handleCloseDialog}
               >
-                {t("dialog_button_dismiss")}
+                {t("button.dismiss")}
               </Button>
             </div>
           </li>

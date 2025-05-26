@@ -34,18 +34,18 @@ const RoutePath = (
       <p className="font-semibold">{title}</p>
       <p>{startNode?.user?.longName}</p>
       <p>
-        ↓ {snr?.[0] ?? t("traceRoute_snrUnknown")}
-        {t("common_unit_dbm")}
+        ↓ {snr?.[0] ?? t("traceRoute.snrUnknown")}
+        {t("unit.dbm")}
       </p>
       {path.map((hop, i) => (
         <span key={getNode(hop)?.num ?? hop}>
           <p>
             {getNode(hop)?.user?.longName ??
-              `${t("traceRoute_nodeUnknownPrefix")}${numberToHexUnpadded(hop)}`}
+              `${t("traceRoute.nodeUnknownPrefix")}${numberToHexUnpadded(hop)}`}
           </p>
           <p>
-            ↓ {snr?.[i + 1] ?? t("traceRoute_snrUnknown")}
-            {t("common_unit_dbm")}
+            ↓ {snr?.[i + 1] ?? t("traceRoute.snrUnknown")}
+            {t("unit.dbm")}
           </p>
         </span>
       ))}
@@ -62,11 +62,11 @@ export const TraceRoute = ({
   snrTowards,
   snrBack,
 }: TraceRouteProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   return (
     <div className="ml-5 flex">
       <RoutePath
-        title={t("traceRoute_routeToDestinationTitle")}
+        title={t("traceRoute.routeToDestination")}
         startNode={to}
         endNode={from}
         path={route}
@@ -74,7 +74,7 @@ export const TraceRoute = ({
       />
       {routeBack && routeBack.length > 0 && (
         <RoutePath
-          title={t("traceRoute_routeBackTitle")}
+          title={t("traceRoute.routeBack")}
           startNode={from}
           endNode={to}
           path={routeBack}

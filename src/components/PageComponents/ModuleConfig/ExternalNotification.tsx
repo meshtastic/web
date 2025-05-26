@@ -1,11 +1,13 @@
-import type { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.tsx";
+import type { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const ExternalNotification = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: ExternalNotificationValidation) => {
     setWorkingModuleConfig(
@@ -24,20 +26,20 @@ export const ExternalNotification = () => {
       defaultValues={moduleConfig.externalNotification}
       fieldGroups={[
         {
-          label: "External Notification Settings",
-          description: "Configure the external notification module",
+          label: t("externalNotification.title"),
+          description: t("externalNotification.description"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Module Enabled",
-              description: "Enable External Notification",
+              label: t("externalNotification.enabled.label"),
+              description: t("externalNotification.enabled.description"),
             },
             {
               type: "number",
               name: "outputMs",
-              label: "Output MS",
-              description: "Output MS",
+              label: t("externalNotification.outputMs.label"),
+              description: t("externalNotification.outputMs.description"),
 
               disabledBy: [
                 {
@@ -45,14 +47,14 @@ export const ExternalNotification = () => {
                 },
               ],
               properties: {
-                suffix: "ms",
+                suffix: t("unit.ms", { ns: "common" }),
               },
             },
             {
               type: "number",
               name: "output",
-              label: "Output",
-              description: "Output",
+              label: t("externalNotification.output.label"),
+              description: t("externalNotification.output.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -62,8 +64,8 @@ export const ExternalNotification = () => {
             {
               type: "number",
               name: "outputVibra",
-              label: "Output Vibrate",
-              description: "Output Vibrate",
+              label: t("externalNotification.outputVibra.label"),
+              description: t("externalNotification.outputVibra.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -73,8 +75,8 @@ export const ExternalNotification = () => {
             {
               type: "number",
               name: "outputBuzzer",
-              label: "Output Buzzer",
-              description: "Output Buzzer",
+              label: t("externalNotification.outputBuzzer.label"),
+              description: t("externalNotification.outputBuzzer.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -84,8 +86,8 @@ export const ExternalNotification = () => {
             {
               type: "toggle",
               name: "active",
-              label: "Active",
-              description: "Active",
+              label: t("externalNotification.active.label"),
+              description: t("externalNotification.active.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -95,8 +97,8 @@ export const ExternalNotification = () => {
             {
               type: "toggle",
               name: "alertMessage",
-              label: "Alert Message",
-              description: "Alert Message",
+              label: t("externalNotification.alertMessage.label"),
+              description: t("externalNotification.alertMessage.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -106,8 +108,10 @@ export const ExternalNotification = () => {
             {
               type: "toggle",
               name: "alertMessageVibra",
-              label: "Alert Message Vibrate",
-              description: "Alert Message Vibrate",
+              label: t("externalNotification.alertMessageVibra.label"),
+              description: t(
+                "externalNotification.alertMessageVibra.description",
+              ),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -117,8 +121,10 @@ export const ExternalNotification = () => {
             {
               type: "toggle",
               name: "alertMessageBuzzer",
-              label: "Alert Message Buzzer",
-              description: "Alert Message Buzzer",
+              label: t("externalNotification.alertMessageBuzzer.label"),
+              description: t(
+                "externalNotification.alertMessageBuzzer.description",
+              ),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -128,9 +134,8 @@ export const ExternalNotification = () => {
             {
               type: "toggle",
               name: "alertBell",
-              label: "Alert Bell",
-              description:
-                "Should an alert be triggered when receiving an incoming bell?",
+              label: t("externalNotification.alertBell.label"),
+              description: t("externalNotification.alertBell.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -140,8 +145,8 @@ export const ExternalNotification = () => {
             {
               type: "toggle",
               name: "alertBellVibra",
-              label: "Alert Bell Vibrate",
-              description: "Alert Bell Vibrate",
+              label: t("externalNotification.alertBellVibra.label"),
+              description: t("externalNotification.alertBellVibra.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -151,8 +156,10 @@ export const ExternalNotification = () => {
             {
               type: "toggle",
               name: "alertBellBuzzer",
-              label: "Alert Bell Buzzer",
-              description: "Alert Bell Buzzer",
+              label: t("externalNotification.alertBellBuzzer.label"),
+              description: t(
+                "externalNotification.alertBellBuzzer.description",
+              ),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -162,8 +169,8 @@ export const ExternalNotification = () => {
             {
               type: "toggle",
               name: "usePwm",
-              label: "Use PWM",
-              description: "Use PWM",
+              label: t("externalNotification.usePwm.label"),
+              description: t("externalNotification.usePwm.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -173,8 +180,8 @@ export const ExternalNotification = () => {
             {
               type: "number",
               name: "nagTimeout",
-              label: "Nag Timeout",
-              description: "Nag Timeout",
+              label: t("externalNotification.nagTimeout.label"),
+              description: t("externalNotification.nagTimeout.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -184,8 +191,8 @@ export const ExternalNotification = () => {
             {
               type: "toggle",
               name: "useI2sAsBuzzer",
-              label: "Use I²S Pin as Buzzer",
-              description: "Designate I²S Pin as Buzzer Output",
+              label: t("externalNotification.useI2sAsBuzzer.label"),
+              description: t("externalNotification.useI2sAsBuzzer.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",

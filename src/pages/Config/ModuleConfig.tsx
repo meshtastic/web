@@ -19,60 +19,60 @@ import {
 import { useTranslation } from "react-i18next";
 
 export const ModuleConfig = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("moduleConfig");
   const tabs = [
     {
-      label: t("config_module_tab_mqtt"),
+      label: t("page.tabMqtt"),
       element: MQTT,
     },
     {
-      label: t("config_module_tab_serial"),
+      label: t("page.tabSerial"),
       element: Serial,
     },
     {
-      label: t("config_module_tab_externalNotification"),
+      label: t("page.tabExternalNotification"),
       element: ExternalNotification,
     },
     {
-      label: t("config_module_tab_storeAndForward"),
+      label: t("page.tabStoreAndForward"),
       element: StoreForward,
     },
     {
-      label: t("config_module_tab_rangeTest"),
+      label: t("page.tabRangeTest"),
       element: RangeTest,
     },
     {
-      label: t("config_module_tab_telemetry"),
+      label: t("page.tabTelemetry"),
       element: Telemetry,
     },
     {
-      label: t("config_module_tab_cannedMessage"),
+      label: t("page.tabCannedMessage"),
       element: CannedMessage,
     },
     {
-      label: t("config_module_tab_audio"),
+      label: t("page.tabAudio"),
       element: Audio,
     },
     {
-      label: t("config_module_tab_neighborInfo"),
+      label: t("page.tabNeighborInfo"),
       element: NeighborInfo,
     },
     {
-      label: t("config_module_tab_ambientLighting"),
+      label: t("page.tabAmbientLighting"),
       element: AmbientLighting,
     },
     {
-      label: t("config_module_tab_detectionSensor"),
+      label: t("page.tabDetectionSensor"),
       element: DetectionSensor,
     },
     {
-      label: t("config_module_tab_paxcounter"),
+      label: t("page.tabPaxcounter"),
       element: Paxcounter,
     },
   ];
 
   return (
-    <Tabs defaultValue={t("config_module_tab_mqtt")}>
+    <Tabs defaultValue={t("page.tabMqtt")}>
       <TabsList className="dark:bg-slate-800">
         {tabs.map((tab) => (
           <TabsTrigger

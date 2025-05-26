@@ -56,8 +56,8 @@ export const Serial = (
       <div className="flex h-48 flex-col gap-2 overflow-y-auto">
         {serialPorts.map((port, index) => {
           const { usbProductId, usbVendorId } = port.getInfo();
-          const vendor = usbVendorId ?? t("common_unknown_short");
-          const product = usbProductId ?? t("common_unknown_short");
+          const vendor = usbVendorId ?? t("unknown.shortName");
+          const product = usbProductId ?? t("unknown.shortName");
           return (
             <Button
               key={`${vendor}-${product}-${index}`}
@@ -69,8 +69,8 @@ export const Serial = (
                 // No need to setConnectionInProgress(false) here as closeDialog() unmounts.
               }}
             >
-              {t("serialConnection_deviceIdentifier", {
-                index,
+              {t("newDeviceDialog.serialConnection.deviceIdentifier", {
+                index: index,
                 vendorId: vendor,
                 productId: product,
               })}
@@ -79,7 +79,7 @@ export const Serial = (
         })}
         {serialPorts.length === 0 && (
           <Mono className="m-auto select-none">
-            {t("serialConnection_noDevicesPaired")}
+            {t("newDeviceDialog.serialConnection.noDevicesPaired")}
           </Mono>
         )}
       </div>
@@ -96,7 +96,7 @@ export const Serial = (
           });
         }}
       >
-        <span>{t("serialConnection_newDeviceButton")}</span>
+        <span>{t("newDeviceDialog.serialConnection.newDeviceButton")}</span>
       </Button>
     </fieldset>
   );

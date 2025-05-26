@@ -1,11 +1,13 @@
-import type { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.tsx";
+import type { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const RangeTest = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: RangeTestValidation) => {
     setWorkingModuleConfig(
@@ -24,22 +26,22 @@ export const RangeTest = () => {
       defaultValues={moduleConfig.rangeTest}
       fieldGroups={[
         {
-          label: "Range Test Settings",
-          description: "Settings for the Range Test module",
+          label: t("rangeTest.title"),
+          description: t("rangeTest.description"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Module Enabled",
-              description: "Enable Range Test",
+              label: t("rangeTest.enabled.label"),
+              description: t("rangeTest.enabled.description"),
             },
             {
               type: "number",
               name: "sender",
-              label: "Message Interval",
-              description: "How long to wait between sending test packets",
+              label: t("rangeTest.sender.label"),
+              description: t("rangeTest.sender.description"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
               disabledBy: [
                 {
@@ -50,8 +52,8 @@ export const RangeTest = () => {
             {
               type: "toggle",
               name: "save",
-              label: "Save CSV to storage",
-              description: "ESP32 Only",
+              label: t("rangeTest.save.label"),
+              description: t("rangeTest.save.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",

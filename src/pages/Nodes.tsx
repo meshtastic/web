@@ -34,7 +34,7 @@ export interface DeleteNoteDialogProps {
 }
 
 const NodesPage = (): JSX.Element => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("nodes");
   const { getNodes, hardware, connection, hasNodeError } = useDevice();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
   const [selectedNode, setSelectedNode] = useState<
@@ -97,7 +97,7 @@ const NodesPage = (): JSX.Element => {
         <div className="pl-2 pt-2 flex flex-row">
           <div className="flex-1 mr-2">
             <Input
-              placeholder={t("nodes_searchPlaceholder")}
+              placeholder={t("search.nodes")}
               value={filterState.nodeName}
               className="bg-transparent"
               showClearButton={!!filterState.nodeName}
@@ -131,37 +131,37 @@ const NodesPage = (): JSX.Element => {
             headings={[
               { title: "", type: "blank", sortable: false },
               {
-                title: t("nodes_table_headings_longName"),
+                title: t("nodesTable.headings.longName"),
                 type: "normal",
                 sortable: true,
               },
               {
-                title: t("nodes_table_headings_connection"),
+                title: t("nodesTable.headings.connection"),
                 type: "normal",
                 sortable: true,
               },
               {
-                title: t("nodes_table_headings_lastHeard"),
+                title: t("nodesTable.headings.lastHeard"),
                 type: "normal",
                 sortable: true,
               },
               {
-                title: t("nodes_table_headings_encryption"),
+                title: t("nodesTable.headings.encryption"),
                 type: "normal",
                 sortable: false,
               },
               {
-                title: t("node_detail_snr_label"),
+                title: t("unit.snr"),
                 type: "normal",
                 sortable: true,
               },
               {
-                title: t("nodes_table_headings_model"),
+                title: t("nodesTable.headings.model"),
                 type: "normal",
                 sortable: true,
               },
               {
-                title: t("nodes_table_headings_macAddress"),
+                title: t("nodesTable.headings.macAddress"),
                 type: "normal",
                 sortable: true,
               },
@@ -169,7 +169,7 @@ const NodesPage = (): JSX.Element => {
             rows={filteredNodes.map((node) => [
               <div key={node.num}>
                 <Avatar
-                  text={node.user?.shortName ?? t("common_unknown_short")}
+                  text={node.user?.shortName ?? t("unknown.shortName")}
                   showFavorite={node.isFavorite}
                   showError={hasNodeError(node.num)}
                 />
@@ -189,20 +189,20 @@ const NodesPage = (): JSX.Element => {
               <Mono key="hops" className="w-16">
                 {node.hopsAway !== undefined
                   ? node?.viaMqtt === false && node.hopsAway === 0
-                    ? t("nodes_table_connectionStatus_direct")
+                    ? t("nodesTable.connectionStatus.direct")
                     : `${node.hopsAway?.toString()} ${
                       node.hopsAway ?? 0 > 1
-                        ? t("nodes_table_connectionStatus_hops_other")
-                        : t("nodes_table_connectionStatus_hops_one")
-                    } ${t("nodes_table_connectionStatus_away")}`
-                  : t("nodes_table_connectionStatus_unknown")}
+                        ? t("unit.hop.plural")
+                        : t("unit.hops_one")
+                    } ${t("nodesTable.connectionStatus.away")}`
+                  : t("nodesTable.connectionStatus.unknown")}
                 {node?.viaMqtt === true
-                  ? t("nodes_table_connectionStatus_viaMqtt")
+                  ? t("nodesTable.connectionStatus.viaMqtt")
                   : ""}
               </Mono>,
               <Mono key="lastHeard">
                 {node.lastHeard === 0
-                  ? <p>{t("nodes_table_lastHeardStatus_never")}</p>
+                  ? <p>{t("nodesTable.lastHeardStatus.never")}</p>
                   : <TimeAgo timestamp={node.lastHeard * 1000} />}
               </Mono>,
               <Mono key="pki">
@@ -212,13 +212,13 @@ const NodesPage = (): JSX.Element => {
               </Mono>,
               <Mono key="snr">
                 {node.snr}
-                {t("common_unit_dbm")}/
+                {t("unit.dbm")}/
                 {Math.min(
                   Math.max((node.snr + 10) * 5, 0),
                   100,
                 )}%/{/* Percentage */}
                 {(node.snr + 10) * 5}
-                {t("common_unit_raw")}
+                {t("unit.raw")}
               </Mono>,
               <Mono key="model">
                 {Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}
@@ -227,7 +227,7 @@ const NodesPage = (): JSX.Element => {
                 {base16
                   .stringify(node.user?.macaddr ?? [])
                   .match(/.{1,2}/g)
-                  ?.join(":") ?? t("common_unknown_short")}
+                  ?.join(":") ?? t("unknown.shortName")}
               </Mono>,
             ])}
           />

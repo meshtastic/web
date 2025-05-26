@@ -29,7 +29,7 @@ export const ImportDialog = ({
   open,
   onOpenChange,
 }: ImportDialogProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const [importDialogInput, setImportDialogInput] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
   const [validUrl, setValidUrl] = useState<boolean>(false);
@@ -46,7 +46,7 @@ export const ImportDialog = ({
           channelsUrl.pathname !== "/e/") ||
         !channelsUrl.hash
       ) {
-        throw t("dialog_import_error_invalidUrl");
+        throw t("import.error.invalidUrl");
       }
 
       const encodedChannelConfig = channelsUrl.hash.substring(1);
@@ -101,13 +101,13 @@ export const ImportDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>{t("dialog_import_title")}</DialogTitle>
+          <DialogTitle>{t("import.title")}</DialogTitle>
           <DialogDescription>
-            {t("dialog_import_description")}
+            {t("import.description")}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
-          <Label>{t("dialog_import_label_channelSetUrl")}</Label>
+          <Label>{t("import.channelSetUrl")}</Label>
           <Input
             value={importDialogInput}
             suffix={validUrl ? "✅" : "❌"}
@@ -119,7 +119,7 @@ export const ImportDialog = ({
             <div className="flex flex-col gap-3">
               <div className="flex w-full gap-2">
                 <div className="w-36">
-                  <Label>{t("dialog_import_label_usePreset")}</Label>
+                  <Label>{t("import.usePreset")}</Label>
                   <Switch
                     disabled
                     checked={channelSet?.loraConfig?.usePreset ?? true}
@@ -146,7 +146,7 @@ export const ImportDialog = ({
               }
 
               <span className="text-md block font-medium text-text-primary">
-                {t("dialog_import_label_channels")}
+                {t("import.channels")}
               </span>
               <div className="flex w-40 flex-col gap-1">
                 {channelSet?.settings.map((channel) => (
@@ -154,9 +154,7 @@ export const ImportDialog = ({
                     <Label>
                       {channel.name.length
                         ? channel.name
-                        : `${
-                          t("dialog_import_label_channelPrefix")
-                        }${channel.id}`}
+                        : `${t("import.channelPrefix")}${channel.id}`}
                     </Label>
                     <Checkbox key={channel.id} />
                   </div>
@@ -167,7 +165,7 @@ export const ImportDialog = ({
         </div>
         <DialogFooter>
           <Button onClick={apply} disabled={!validUrl} name="apply">
-            {t("dialog_button_apply")}
+            {t("button.apply")}
           </Button>
         </DialogFooter>
       </DialogContent>

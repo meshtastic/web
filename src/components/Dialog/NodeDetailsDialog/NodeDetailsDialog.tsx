@@ -61,8 +61,9 @@ export const NodeDetailsDialog = ({
   open,
   onOpenChange,
 }: NodeDetailsDialogProps) => {
-  const { t } = useTranslation();
-  const { setDialogOpen, connection, setActivePage } = useDevice();
+  const { t } = useTranslation("dialog");
+  const { setDialogOpen, connection, setActivePage, getNodeError } =
+    useDevice();
   const { setNodeNumToBeRemoved } = useAppStore();
   const { setChatType, setActiveChat } = useMessageStore();
 
@@ -92,11 +93,11 @@ export const NodeDetailsDialog = ({
     if (!node) return;
 
     toast({
-      title: t("toast_requestingPosition"),
+      title: t("toast.requestingPosition.title", { ns: "ui" }),
     });
     connection?.requestPosition(node.num).then(() =>
       toast({
-        title: t("toast_positionRequestSent"),
+        title: t("toast.positionRequestSent.title", { ns: "ui" }),
       })
     );
     onOpenChange(false);
@@ -106,11 +107,11 @@ export const NodeDetailsDialog = ({
     if (!node) return;
 
     toast({
-      title: t("toast_sendingTraceroute"),
+      title: t("toast.sendingTraceroute.title", { ns: "ui" }),
     });
     connection?.traceRoute(node.num).then(() =>
       toast({
-        title: t("toast_tracerouteSent"),
+        title: t("toast.tracerouteSent.title", { ns: "ui" }),
       })
     );
     onOpenChange(false);
@@ -141,25 +142,25 @@ export const NodeDetailsDialog = ({
   const deviceMetricsMap = [
     {
       key: "airUtilTx",
-      label: t("dialog_nodeDetails_label_airTxUtilization"),
+      label: t("nodeDetails.airTxUtilization"),
       value: node.deviceMetrics?.airUtilTx,
       format: (val: number) => `${val.toFixed(2)}%`,
     },
     {
       key: "channelUtilization",
-      label: t("dialog_nodeDetails_label_channelUtilization"),
+      label: t("nodeDetails.channelUtilization"),
       value: node.deviceMetrics?.channelUtilization,
       format: (val: number) => `${val.toFixed(2)}%`,
     },
     {
       key: "batteryLevel",
-      label: t("dialog_nodeDetails_label_batteryLevel"),
+      label: t("nodeDetails.batteryLevel"),
       value: node.deviceMetrics?.batteryLevel,
       format: (val: number) => `${val.toFixed(2)}%`,
     },
     {
       key: "voltage",
-      label: t("dialog_nodeDetails_label_voltage"),
+      label: t("nodeDetails.voltage"),
       value: node.deviceMetrics?.voltage,
       format: (val: number) => `${val.toFixed(2)}V`,
     },
@@ -171,9 +172,11 @@ export const NodeDetailsDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>
-            {t("dialog_nodeDetails_titlePrefix")}
-            {node.user?.longName ?? t("common_unknown_short")} (
-            {node.user?.shortName ?? t("common_unknown_short")})
+            {t("nodeDetails.title", {
+              identifier: `${node.user?.longName ?? t("unknown.shortName")} (${
+                node.user?.shortName ?? t("unknown.shortName")
+              })`,
+            })}
           </DialogTitle>
         </DialogHeader>
         <DialogFooter>
@@ -185,7 +188,7 @@ export const NodeDetailsDialog = ({
                 onClick={handleDirectMessage}
               >
                 <MessageSquareIcon className="mr-2" />
-                {t("dialog_nodeDetails_button_message")}
+                {t("nodeDetails.message")}
               </Button>
               <Button
                 className="mr-1"
@@ -193,7 +196,7 @@ export const NodeDetailsDialog = ({
                 onClick={handleTraceroute}
               >
                 <WaypointsIcon className="mr-2" />
-                {t("dialog_nodeDetails_button_traceRoute")}
+                {t("nodeDetails.traceRoute")}
               </Button>
               <Button className="mr-1" onClick={handleToggleFavorite}>
                 <StarIcon
@@ -221,8 +224,8 @@ export const NodeDetailsDialog = ({
                   </TooltipTrigger>
                   <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
                     {isIgnoredState
-                      ? t("dialog_nodeDetails_tooltip_unignoreNode")
-                      : t("dialog_nodeDetails_tooltip_ignoreNode")}
+                      ? t("nodeDetails.unignoreNode")
+                      : t("nodeDetails.ignoreNode")}
                     <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
                   </TooltipContent>
                 </Tooltip>
@@ -240,7 +243,7 @@ export const NodeDetailsDialog = ({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                    {t("dialog_nodeDetails_tooltip_removeNode")}
+                    {t("nodeDetails.removeNode")}
                     <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
                   </TooltipContent>
                 </Tooltip>
@@ -253,29 +256,29 @@ export const NodeDetailsDialog = ({
               <div className="flex flex-row space-x-2">
                 <div className="w-full bg-slate-100 text-slate-900 dark:text-slate-100 dark:bg-slate-800 p-3  rounded-lg">
                   <p className="text-lg font-semibold">
-                    {t("dialog_nodeDetails_label_details")}
+                    {t("nodeDetails.details")}
                   </p>
-                  <p>{t("dialog_nodeDetails_label_nodeNumber")}{node.num}</p>
+                  <p>{t("nodeDetails.nodeNumber")}{node.num}</p>
                   <p>
-                    {t("dialog_nodeDetails_label_nodeHexPrefix")}
+                    {t("nodeDetails.nodeHexPrefix")}
                     {numberToHexUnpadded(node.num)}
                   </p>
                   <p>
-                    {t("dialog_nodeDetails_label_role")}
+                    {t("nodeDetails.role")}
                     {Protobuf.Config.Config_DeviceConfig_Role[
                       node.user?.role ?? 0
                     ].replace(/_/g, " ")}
                   </p>
                   <p>
-                    {t("dialog_nodeDetails_label_lastHeard")}
+                    {t("nodeDetails.lastHeard")}
                     {node.lastHeard === 0
-                      ? t("nodes_table_lastHeardStatus_never")
+                      ? t("nodesTable.lastHeardStatus.never", { ns: "nodes" })
                       : <TimeAgo timestamp={node.lastHeard * 1000} />}
                   </p>
                   <p>
-                    {t("dialog_nodeDetails_label_hardware")}
+                    {t("nodeDetails.hardware")}
                     {(Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
-                      t("common_unknown_short"))
+                      t("unknown.shortName"))
                       .replace(/_/g, " ")}
                   </p>
                 </div>
@@ -290,7 +293,7 @@ export const NodeDetailsDialog = ({
             <div>
               <div className="text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
                 <p className="text-lg font-semibold">
-                  {t("dialog_nodeDetails_label_position")}
+                  {t("nodeDetails.position")}
                 </p>
 
                 {node.position
@@ -299,7 +302,7 @@ export const NodeDetailsDialog = ({
                       {node.position.latitudeI &&
                         node.position.longitudeI && (
                         <p>
-                          {t("dialog_locationResponse_label_coordinates")}
+                          {t("locationResponse.coordinates")}
                           <a
                             className="text-blue-500 dark:text-blue-400"
                             href={`https://www.openstreetmap.org/?mlat=${
@@ -315,28 +318,28 @@ export const NodeDetailsDialog = ({
                       )}
                       {node.position.altitude && (
                         <p>
-                          {t("dialog_locationResponse_label_altitude")}
+                          {t("locationResponse.altitude")}
                           {node.position.altitude}
-                          {t("dialog_locationResponse_unit_meter")}
+                          {t("unit.meter")}
                         </p>
                       )}
                     </>
                   )
-                  : <p>{t("common_unknown_short")}</p>}
+                  : <p>{t("unknown.shortName")}</p>}
                 <Button
                   onClick={handleRequestPosition}
                   name="requestPosition"
                   className="mt-2"
                 >
                   <MapPinnedIcon className="mr-2" />
-                  {t("dialog_nodeDetails_button_requestPosition")}
+                  {t("nodeDetails.requestPosition")}
                 </Button>
               </div>
 
               {node.deviceMetrics && (
                 <div className="text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                    {t("dialog_nodeDetails_label_deviceMetrics")}
+                    {t("nodeDetails.deviceMetrics")}
                   </p>
                   {deviceMetricsMap.map(
                     (metric) =>
@@ -348,7 +351,7 @@ export const NodeDetailsDialog = ({
                   )}
                   {node.deviceMetrics.uptimeSeconds && (
                     <p>
-                      {t("dialog_nodeDetails_label_uptime")}
+                      {t("nodeDetails.uptime")}
                       <Uptime seconds={node.deviceMetrics.uptimeSeconds} />
                     </p>
                   )}
@@ -361,7 +364,7 @@ export const NodeDetailsDialog = ({
                 <AccordionItem className="AccordionItem" value="item-1">
                   <AccordionTrigger>
                     <p className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-                      {t("dialog_nodeDetails_label_allRawMetrics")}
+                      {t("nodeDetails.allRawMetrics")}
                     </p>
                   </AccordionTrigger>
                   <AccordionContent className="overflow-x-scroll">

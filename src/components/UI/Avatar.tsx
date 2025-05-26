@@ -85,7 +85,7 @@ export const Avatar = ({
   const bgColor = getColorFromText(safeText);
   const isLight = ColorUtils.isLight(bgColor);
   const textColor = isLight ? "#000000" : "#FFFFFF";
-  const initials = safeText?.slice(0, 4) ?? t("common_unknown_short");
+  const initials = safeText?.slice(0, 4) ?? t("unknown.shortName");
 
   return (
     <div

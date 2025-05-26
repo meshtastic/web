@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { eventBus } from "@core/utils/eventBus.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
 
-export const UNSAFE_ROLES = ["ROUTER", "REPEATER"];
+export const UNSAFE_ROLES = ["ROUTER", "ROUTER_LATE", "REPEATER"];
 export type UnsafeRole = typeof UNSAFE_ROLES[number];
 
 export const useUnsafeRolesDialog = () => {

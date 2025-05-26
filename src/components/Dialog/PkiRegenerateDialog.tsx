@@ -23,20 +23,20 @@ export interface PkiRegenerateDialogProps {
 
 export const PkiRegenerateDialog = ({
   text = {
-    title: "", // Default will be set by useTranslation
-    description: "", // Default will be set by useTranslation
-    button: "", // Default will be set by useTranslation
+    title: "",
+    description: "",
+    button: "",
   },
   open,
   onOpenChange,
   onSubmit,
 }: PkiRegenerateDialogProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("dialog");
   const dialogText = {
-    title: text.title || t("dialog_pkiRegenerate_title_keyPair"),
+    title: text.title || t("pkiRegenerate.title"),
     description: text.description ||
-      t("dialog_pkiRegenerate_description_keyPair"),
-    button: text.button || t("dialog_pkiRegenerateDialog_buttonRegenerate"),
+      t("pkiRegenerate.description"),
+    button: text.button || t("button.regenerate"),
   };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

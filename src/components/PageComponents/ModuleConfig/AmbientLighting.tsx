@@ -3,9 +3,11 @@ import type { AmbientLightingValidation } from "@app/validation/moduleConfig/amb
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const AmbientLighting = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AmbientLightingValidation) => {
     setWorkingModuleConfig(
@@ -24,38 +26,38 @@ export const AmbientLighting = () => {
       defaultValues={moduleConfig.ambientLighting}
       fieldGroups={[
         {
-          label: "Ambient Lighting Settings",
-          description: "Settings for the Ambient Lighting module",
+          label: t("ambientLighting.title"),
+          description: t("ambientLighting.description"),
           fields: [
             {
               type: "toggle",
               name: "ledState",
-              label: "LED State",
-              description: "Sets LED to on or off",
+              label: t("ambientLighting.ledState.label"),
+              description: t("ambientLighting.ledState.description"),
             },
             {
               type: "number",
               name: "current",
-              label: "Current",
-              description: "Sets the current for the LED output. Default is 10",
+              label: t("ambientLighting.current.label"),
+              description: t("ambientLighting.current.description"),
             },
             {
               type: "number",
               name: "red",
-              label: "Red",
-              description: "Sets the red LED level. Values are 0-255",
+              label: t("ambientLighting.red.label"),
+              description: t("ambientLighting.red.description"),
             },
             {
               type: "number",
               name: "green",
-              label: "Green",
-              description: "Sets the green LED level. Values are 0-255",
+              label: t("ambientLighting.green.label"),
+              description: t("ambientLighting.green.description"),
             },
             {
               type: "number",
               name: "blue",
-              label: "Blue",
-              description: "Sets the blue LED level. Values are 0-255",
+              label: t("ambientLighting.blue.label"),
+              description: t("ambientLighting.blue.description"),
             },
           ],
         },

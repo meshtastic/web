@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 export const LoRa = () => {
   const { config, setWorkingConfig } = useDevice();
-  const { t } = useTranslation();
+  const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: LoRaValidation) => {
     setWorkingConfig(
@@ -26,14 +26,14 @@ export const LoRa = () => {
       defaultValues={config.lora}
       fieldGroups={[
         {
-          label: t("config_lora_groupLabel_meshSettings"),
-          description: t("config_lora_groupDescription_meshSettings"),
+          label: t("lora.title"),
+          description: t("lora.description"),
           fields: [
             {
               type: "select",
               name: "region",
-              label: t("config_lora_fieldLabel_region"),
-              description: t("config_lora_fieldDescription_region"),
+              label: t("lora.region.label"),
+              description: t("lora.region.description"),
               properties: {
                 enumValue: Protobuf.Config.Config_LoRaConfig_RegionCode,
               },
@@ -41,8 +41,8 @@ export const LoRa = () => {
             {
               type: "select",
               name: "hopLimit",
-              label: t("config_lora_fieldLabel_hopLimit"),
-              description: t("config_lora_fieldDescription_hopLimit"),
+              label: t("lora.hopLimit.label"),
+              description: t("lora.hopLimit.description"),
               properties: {
                 enumValue: { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7 },
               },
@@ -50,38 +50,38 @@ export const LoRa = () => {
             {
               type: "number",
               name: "channelNum",
-              label: t("config_lora_fieldLabel_frequencySlot"),
-              description: t("config_lora_fieldDescription_frequencySlot"),
+              label: t("lora.frequencySlot.label"),
+              description: t("lora.frequencySlot.description"),
             },
             {
               type: "toggle",
               name: "ignoreMqtt",
-              label: t("config_lora_fieldLabel_ignoreMqtt"),
-              description: t("config_lora_fieldDescription_ignoreMqtt"),
+              label: t("lora.ignoreMqtt.label"),
+              description: t("lora.ignoreMqtt.description"),
             },
             {
               type: "toggle",
               name: "configOkToMqtt",
-              label: t("config_lora_fieldLabel_okToMqtt"),
-              description: t("config_lora_fieldDescription_okToMqtt"),
+              label: t("lora.okToMqtt.label"),
+              description: t("lora.okToMqtt.description"),
             },
           ],
         },
         {
-          label: t("config_lora_groupLabel_waveformSettings"),
-          description: t("config_lora_groupDescription_waveformSettings"),
+          label: t("lora.waveformSettings.label"),
+          description: t("lora.waveformSettings.description"),
           fields: [
             {
               type: "toggle",
               name: "usePreset",
-              label: t("config_lora_fieldLabel_usePreset"),
-              description: t("config_lora_fieldDescription_usePreset"),
+              label: t("lora.usePreset.label"),
+              description: t("lora.usePreset.description"),
             },
             {
               type: "select",
               name: "modemPreset",
-              label: t("config_lora_fieldLabel_modemPreset"),
-              description: t("config_lora_fieldDescription_modemPreset"),
+              label: t("lora.modemPreset.label"),
+              description: t("lora.modemPreset.description"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -95,8 +95,8 @@ export const LoRa = () => {
             {
               type: "number",
               name: "bandwidth",
-              label: t("config_lora_fieldLabel_bandwidth"),
-              description: t("config_lora_fieldDescription_bandwidth"),
+              label: t("lora.bandwidth.label"),
+              description: t("lora.bandwidth.description"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -104,14 +104,14 @@ export const LoRa = () => {
                 },
               ],
               properties: {
-                suffix: t("common_unit_megahertz"),
+                suffix: t("unit.megahertz"),
               },
             },
             {
               type: "number",
               name: "spreadFactor",
-              label: t("config_lora_fieldLabel_spreadingFactor"),
-              description: t("config_lora_fieldDescription_spreadingFactor"),
+              label: t("lora.spreadingFactor.label"),
+              description: t("lora.spreadingFactor.description"),
 
               disabledBy: [
                 {
@@ -120,14 +120,14 @@ export const LoRa = () => {
                 },
               ],
               properties: {
-                suffix: t("common_unit_cps"),
+                suffix: t("unit.cps"),
               },
             },
             {
               type: "number",
               name: "codingRate",
-              label: t("config_lora_fieldLabel_codingRate"),
-              description: t("config_lora_fieldDescription_codingRate"),
+              label: t("lora.codingRate.label"),
+              description: t("lora.codingRate.description"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -138,52 +138,52 @@ export const LoRa = () => {
           ],
         },
         {
-          label: t("config_lora_groupLabel_radioSettings"),
-          description: t("config_lora_groupDescription_radioSettings"),
+          label: t("lora.radioSettings.label"),
+          description: t("lora.radioSettings.description"),
           fields: [
             {
               type: "toggle",
               name: "txEnabled",
-              label: t("config_lora_fieldLabel_transmitEnabled"),
-              description: t("config_lora_fieldDescription_transmitEnabled"),
+              label: t("lora.transmitEnabled.label"),
+              description: t("lora.transmitEnabled.description"),
             },
             {
               type: "number",
               name: "txPower",
-              label: t("config_lora_fieldLabel_transmitPower"),
-              description: t("config_lora_fieldDescription_transmitPower"),
+              label: t("lora.transmitPower.label"),
+              description: t("lora.transmitPower.description"),
               properties: {
-                suffix: t("common_unit_dbm"),
+                suffix: t("unit.dbm"),
               },
             },
             {
               type: "toggle",
               name: "overrideDutyCycle",
-              label: t("config_lora_fieldLabel_overrideDutyCycle"),
-              description: t("config_lora_fieldDescription_overrideDutyCycle"),
+              label: t("lora.overrideDutyCycle.label"),
+              description: t("lora.overrideDutyCycle.description"),
             },
             {
               type: "number",
               name: "frequencyOffset",
-              label: t("config_lora_fieldLabel_frequencyOffset"),
-              description: t("config_lora_fieldDescription_frequencyOffset"),
+              label: t("lora.frequencyOffset.label"),
+              description: t("lora.frequencyOffset.description"),
               properties: {
-                suffix: t("common_unit_hertz"),
+                suffix: t("unit.hertz"),
               },
             },
             {
               type: "toggle",
               name: "sx126xRxBoostedGain",
-              label: t("config_lora_fieldLabel_boostedRxGain"),
-              description: t("config_lora_fieldDescription_boostedRxGain"),
+              label: t("lora.boostedRxGain.label"),
+              description: t("lora.boostedRxGain.description"),
             },
             {
               type: "number",
               name: "overrideFrequency",
-              label: t("config_lora_fieldLabel_overrideFrequency"),
-              description: t("config_lora_fieldDescription_overrideFrequency"),
+              label: t("lora.overrideFrequency.label"),
+              description: t("lora.overrideFrequency.description"),
               properties: {
-                suffix: t("common_unit_megahertz"),
+                suffix: t("unit.megahertz"),
                 step: 0.001,
               },
             },
