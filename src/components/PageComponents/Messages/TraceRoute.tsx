@@ -34,7 +34,7 @@ const RoutePath = (
       <p className="font-semibold">{title}</p>
       <p>{startNode?.user?.longName}</p>
       <p>
-        ↓ {snr?.[0] ?? t("traceRoute.snrUnknown")}
+        ↓ {snr?.[0] ?? t("unknown.num")}
         {t("unit.dbm")}
       </p>
       {path.map((hop, i) => (
@@ -44,7 +44,7 @@ const RoutePath = (
               `${t("traceRoute.nodeUnknownPrefix")}${numberToHexUnpadded(hop)}`}
           </p>
           <p>
-            ↓ {snr?.[i + 1] ?? t("traceRoute.snrUnknown")}
+            ↓ {snr?.[i + 1] ?? t("unknown.num")}
             {t("unit.dbm")}
           </p>
         </span>

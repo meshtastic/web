@@ -94,7 +94,7 @@ export const RebootOTADialog = (
           />
           <Button
             onClick={() => handleRebootWithTimeout()}
-            name="scheduleReboot"
+            data-testid="scheduleRebootBtn"
             className="w-9/12"
           >
             <ClockIcon className="mr-2" size={18} />

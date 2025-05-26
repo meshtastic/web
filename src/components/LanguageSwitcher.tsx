@@ -12,7 +12,7 @@ function LanguageSwitcher() {
 
   return (
     <DropdownMenu
-      i18nIsDynamicList={true}
+      i18nIsDynamicList
       data-testid="language-list"
     >
       <DropdownMenuTrigger>asdlkfj</DropdownMenuTrigger>

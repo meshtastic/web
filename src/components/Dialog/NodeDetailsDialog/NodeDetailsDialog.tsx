@@ -62,8 +62,7 @@ export const NodeDetailsDialog = ({
   onOpenChange,
 }: NodeDetailsDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { setDialogOpen, connection, setActivePage, getNodeError } =
-    useDevice();
+  const { setDialogOpen, connection, setActivePage } = useDevice();
   const { setNodeNumToBeRemoved } = useAppStore();
   const { setChatType, setActiveChat } = useMessageStore();
 
@@ -320,7 +319,7 @@ export const NodeDetailsDialog = ({
                         <p>
                           {t("locationResponse.altitude")}
                           {node.position.altitude}
-                          {t("unit.meter")}
+                          {t("unit.meter.one")}
                         </p>
                       )}
                     </>

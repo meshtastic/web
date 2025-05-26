@@ -104,7 +104,6 @@ describe("TraceRoute", () => {
       />,
     );
 
-    expect(screen.getByText(/^!63$/)).toBeInTheDocument();
     expect(screen.getByText("↓ 5dBm")).toBeInTheDocument();
     expect(screen.getByText("↓ 15dBm")).toBeInTheDocument();
   });

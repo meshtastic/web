@@ -63,9 +63,9 @@
   },
   "unknown": {
     "longName": "Unknown",
-    "shortName": "UNK"
+    "shortName": "UNK",
+    "num": "??"
   },
-  "snrUnknown": "??",
   "nodeUnknownPrefix": "!",
   "unset": "UNSET",
   "fallbackName": "Meshtastic {{last4}}"

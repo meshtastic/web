@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "@components/LanguageSwitcher.tsx";
 
 export const Dashboard = () => {
   const { t } = useTranslation("dashboard");
