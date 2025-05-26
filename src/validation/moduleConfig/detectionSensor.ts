@@ -1,33 +1,16 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsInt, Length } from "class-validator";
+import { z } from "zod/v4";
 
-export class DetectionSensorValidation implements
-  Omit<
-    Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig,
-    keyof Message
-  > {
-  @IsBoolean()
-  enabled: boolean;
+export const DetectionSensorValidationSchema = z.object({
+  enabled: z.boolean(),
+  minimumBroadcastSecs: z.int(),
+  stateBroadcastSecs: z.int(),
+  sendBell: z.boolean(),
+  name: z.string().min(0).max(20),
+  monitorPin: z.int(),
+  detectionTriggeredHigh: z.boolean(),
+  usePullup: z.boolean(),
+});
 
-  @IsInt()
-  minimumBroadcastSecs: number;
-
-  @IsInt()
-  stateBroadcastSecs: number;
-
-  @IsBoolean()
-  sendBell: boolean;
-
-  @Length(0, 20)
-  name: string;
-
-  @IsInt()
-  monitorPin: number;
-
-  @IsBoolean()
-  detectionTriggeredHigh: boolean;
-
-  @IsBoolean()
-  usePullup: boolean;
-}
+export type DetectionSensorValidation = z.infer<
+  typeof DetectionSensorValidationSchema
+>;

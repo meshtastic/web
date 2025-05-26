@@ -1,39 +1,34 @@
-import type { Message } from "@bufbuild/protobuf";
+import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
-export class DisplayValidation
-  implements Omit<Protobuf.Config.Config_DisplayConfig, keyof Message> {
-  @IsInt()
-  screenOnSecs: number;
+const GpsCoordinateEnum = z.enum(
+  Protobuf.Config.Config_DisplayConfig_GpsCoordinateFormat,
+);
+const DisplayUnitsEnum = z.enum(
+  Protobuf.Config.Config_DisplayConfig_DisplayUnits,
+);
+const OledTypeEnum = z.enum(
+  Protobuf.Config.Config_DisplayConfig_OledType,
+);
+const DisplayModeEnum = z.enum(
+  Protobuf.Config.Config_DisplayConfig_DisplayMode,
+);
+const CompassOrientationEnum = z.enum(
+  Protobuf.Config.Config_DisplayConfig_CompassOrientation,
+);
 
-  @IsEnum(Protobuf.Config.Config_DisplayConfig_GpsCoordinateFormat)
-  gpsFormat: Protobuf.Config.Config_DisplayConfig_GpsCoordinateFormat;
+export const DisplayValidationSchema = z.object({
+  screenOnSecs: z.int(),
+  gpsFormat: GpsCoordinateEnum,
+  autoScreenCarouselSecs: z.int(),
+  compassNorthTop: z.boolean(),
+  flipScreen: z.boolean(),
+  units: DisplayUnitsEnum,
+  oled: OledTypeEnum,
+  displaymode: DisplayModeEnum,
+  headingBold: z.boolean(),
+  wakeOnTapOrMotion: z.boolean(),
+  compassOrientation: CompassOrientationEnum,
+});
 
-  @IsInt()
-  autoScreenCarouselSecs: number;
-
-  @IsBoolean()
-  compassNorthTop: boolean;
-
-  @IsBoolean()
-  flipScreen: boolean;
-
-  @IsEnum(Protobuf.Config.Config_DisplayConfig_DisplayUnits)
-  units: Protobuf.Config.Config_DisplayConfig_DisplayUnits;
-
-  @IsEnum(Protobuf.Config.Config_DisplayConfig_OledType)
-  oled: Protobuf.Config.Config_DisplayConfig_OledType;
-
-  @IsEnum(Protobuf.Config.Config_DisplayConfig_DisplayMode)
-  displaymode: Protobuf.Config.Config_DisplayConfig_DisplayMode;
-
-  @IsBoolean()
-  headingBold: boolean;
-
-  @IsBoolean()
-  wakeOnTapOrMotion: boolean;
-
-  @IsEnum(Protobuf.Config.Config_DisplayConfig_CompassOrientation)
-  compassOrientation: Protobuf.Config.Config_DisplayConfig_CompassOrientation;
-}
+export type DisplayValidation = z.infer<typeof DisplayValidationSchema>;

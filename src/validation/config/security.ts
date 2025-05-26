@@ -1,36 +1,14 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsString } from "class-validator";
+import { z } from "zod/v4";
 
-export class SecurityValidation implements
-  Omit<
-    Protobuf.Config.Config_SecurityConfig,
-    | keyof Message
-    | "adminKey"
-    | "privateKey"
-    | "publicKey"
-  > {
-  @IsBoolean()
-  adminChannelEnabled: boolean;
+export const SecurityValidationSchema = z.object({
+  adminChannelEnabled: z.boolean(),
+  adminKey: z.string().array().length(3),
+  bluetoothLoggingEnabled: z.boolean(),
+  debugLogApiEnabled: z.boolean(),
+  isManaged: z.boolean(),
+  privateKey: z.string(),
+  publicKey: z.string(),
+  serialEnabled: z.boolean(),
+});
 
-  @IsString()
-  adminKey: [string, string, string];
-
-  @IsBoolean()
-  bluetoothLoggingEnabled: boolean;
-
-  @IsBoolean()
-  debugLogApiEnabled: boolean;
-
-  @IsBoolean()
-  isManaged: boolean;
-
-  @IsString()
-  privateKey: string;
-
-  @IsString()
-  publicKey: string;
-
-  @IsBoolean()
-  serialEnabled: boolean;
-}
+export type SecurityValidation = z.infer<typeof SecurityValidationSchema>;

@@ -1,16 +1,9 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsInt } from "class-validator";
+import { z } from "zod/v4";
 
-export class RangeTestValidation
-  implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_RangeTestConfig, keyof Message> {
-  @IsBoolean()
-  enabled: boolean;
+export const RangeTestValidationSchema = z.object({
+  enabled: z.boolean(),
+  sender: z.int(),
+  save: z.boolean(),
+});
 
-  @IsInt()
-  sender: number;
-
-  @IsBoolean()
-  save: boolean;
-}
+export type RangeTestValidation = z.infer<typeof RangeTestValidationSchema>;

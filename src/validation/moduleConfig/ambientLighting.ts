@@ -1,24 +1,13 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsInt } from "class-validator";
+import { z } from "zod/v4";
 
-export class AmbientLightingValidation implements
-  Omit<
-    Protobuf.ModuleConfig.ModuleConfig_AmbientLightingConfig,
-    keyof Message
-  > {
-  @IsBoolean()
-  ledState: boolean;
+export const AmbientLightingValidationSchema = z.object({
+  ledState: z.boolean(),
+  current: z.int(),
+  red: z.int(),
+  green: z.int(),
+  blue: z.int(),
+});
 
-  @IsInt()
-  current: number;
-
-  @IsInt()
-  red: number;
-
-  @IsInt()
-  green: number;
-
-  @IsInt()
-  blue: number;
-}
+export type AmbientLightingValidation = z.infer<
+  typeof AmbientLightingValidationSchema
+>;

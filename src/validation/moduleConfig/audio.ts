@@ -1,28 +1,18 @@
-import type { Message } from "@bufbuild/protobuf";
+import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
-export class AudioValidation
-  implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_AudioConfig, keyof Message> {
-  @IsBoolean()
-  codec2Enabled: boolean;
+const Audio_BaudEnum = z.enum(
+  Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud,
+);
 
-  @IsInt()
-  pttPin: number;
+export const AudioValidationSchema = z.object({
+  codec2Enabled: z.boolean(),
+  pttPin: z.int(),
+  bitrate: Audio_BaudEnum,
+  i2sWs: z.int(),
+  i2sSd: z.int(),
+  i2sDin: z.int(),
+  i2sSck: z.int(),
+});
 
-  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud)
-  bitrate: Protobuf.ModuleConfig.ModuleConfig_AudioConfig_Audio_Baud;
-
-  @IsInt()
-  i2sWs: number;
-
-  @IsInt()
-  i2sSd: number;
-
-  @IsInt()
-  i2sDin: number;
-
-  @IsInt()
-  i2sSck: number;
-}
+export type AudioValidation = z.infer<typeof AudioValidationSchema>;

@@ -1,42 +1,26 @@
-import type { Message } from "@bufbuild/protobuf";
+import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsEnum, IsInt, IsString } from "class-validator";
 
-export class DeviceValidation
-  implements Omit<Protobuf.Config.Config_DeviceConfig, keyof Message> {
-  @IsEnum(Protobuf.Config.Config_DeviceConfig_Role)
-  role: Protobuf.Config.Config_DeviceConfig_Role;
+const RoleEnum = z.enum(
+  Protobuf.Config.Config_DeviceConfig_Role,
+);
+const RebroadcastModeEnum = z.enum(
+  Protobuf.Config.Config_DeviceConfig_RebroadcastMode,
+);
 
-  @IsBoolean()
-  serialEnabled: boolean;
+export const DeviceValidationSchema = z.object({
+  role: RoleEnum,
+  serialEnabled: z.boolean(),
+  debugLogEnabled: z.boolean(),
+  buttonGpio: z.int(),
+  buzzerGpio: z.int(),
+  rebroadcastMode: RebroadcastModeEnum,
+  nodeInfoBroadcastSecs: z.int(),
+  doubleTapAsButtonPress: z.boolean(),
+  isManaged: z.boolean(),
+  disableTripleClick: z.boolean(),
+  ledHeartbeatDisabled: z.boolean(),
+  tzdef: z.string(),
+});
 
-  @IsBoolean()
-  debugLogEnabled: boolean;
-
-  @IsInt()
-  buttonGpio: number;
-
-  @IsInt()
-  buzzerGpio: number;
-
-  @IsEnum(Protobuf.Config.Config_DeviceConfig_RebroadcastMode)
-  rebroadcastMode: Protobuf.Config.Config_DeviceConfig_RebroadcastMode;
-
-  @IsInt()
-  nodeInfoBroadcastSecs: number;
-
-  @IsBoolean()
-  doubleTapAsButtonPress: boolean;
-
-  @IsBoolean()
-  isManaged: boolean;
-
-  @IsBoolean()
-  disableTripleClick: boolean;
-
-  @IsBoolean()
-  ledHeartbeatDisabled: boolean;
-
-  @IsString()
-  tzdef: string;
-}
+export type DeviceValidation = z.infer<typeof DeviceValidationSchema>;

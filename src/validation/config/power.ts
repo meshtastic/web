@@ -1,35 +1,14 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsInt, IsNumber, Max, Min } from "class-validator";
+import { z } from "zod/v4";
 
-export class PowerValidation implements
-  Omit<
-    Protobuf.Config.Config_PowerConfig,
-    keyof Message | "powermonEnables"
-  > {
-  @IsBoolean()
-  isPowerSaving: boolean;
+export const PowerValidationSchema = z.object({
+  isPowerSaving: z.boolean(),
+  onBatteryShutdownAfterSecs: z.int(),
+  adcMultiplierOverride: z.number().min(2).max(4),
+  waitBluetoothSecs: z.int(),
+  sdsSecs: z.int(),
+  lsSecs: z.int(),
+  minWakeSecs: z.int(),
+  deviceBatteryInaAddress: z.int(),
+});
 
-  @IsInt()
-  onBatteryShutdownAfterSecs: number;
-
-  @IsNumber()
-  @Min(2)
-  @Max(4)
-  adcMultiplierOverride: number;
-
-  @IsInt()
-  waitBluetoothSecs: number;
-
-  @IsInt()
-  sdsSecs: number;
-
-  @IsInt()
-  lsSecs: number;
-
-  @IsInt()
-  minWakeSecs: number;
-
-  @IsInt()
-  deviceBatteryInaAddress: number;
-}
+export type PowerValidation = z.infer<typeof PowerValidationSchema>;

@@ -1,7 +1,7 @@
-import { ZodError, ZodSchema } from "zod";
+import { ZodError, ZodType } from "zod/v4";
 
 export function validateSchema<T>(
-  schema: ZodSchema<T>,
+  schema: ZodType<T>,
   data: unknown,
 ): { success: true; data: T } | { success: false; errors: ZodError["issues"] } {
   const result = schema.safeParse(data);

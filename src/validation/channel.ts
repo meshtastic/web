@@ -1,51 +1,26 @@
-import type { Message } from "@bufbuild/protobuf";
+import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
-import {
-  IsBoolean,
-  IsEnum,
-  IsInt,
-  IsNumber,
-  IsString,
-  Length,
-} from "class-validator";
 
-export class ChannelValidation
-  implements Omit<Protobuf.Channel.Channel, keyof Message | "settings"> {
-  @IsNumber()
-  index: number;
+const RoleEnum = z.enum(
+  Protobuf.Channel.Channel_Role,
+);
 
-  settings: Channel_SettingsValidation;
+export const Channel_SettingsValidationSchema = z.object({
+  channelNum: z.number(),
+  psk: z.string(),
+  name: z.string().min(0).max(11),
+  id: z.int(),
+  uplinkEnabled: z.boolean(),
+  downlinkEnabled: z.boolean(),
+  positionEnabled: z.boolean(),
+  preciseLocation: z.boolean(),
+  positionPrecision: z.boolean(),
+});
 
-  @IsEnum(Protobuf.Channel.Channel_Role)
-  role: Protobuf.Channel.Channel_Role;
-}
+export const ChannelValidationSchema = z.object({
+  index: z.number(),
+  settings: Channel_SettingsValidationSchema,
+  role: RoleEnum,
+});
 
-export class Channel_SettingsValidation
-  implements Omit<Protobuf.Channel.ChannelSettings, keyof Message | "psk"> {
-  @IsNumber()
-  channelNum: number;
-
-  @IsString()
-  psk: string;
-
-  @Length(0, 11)
-  name: string;
-
-  @IsInt()
-  id: number;
-
-  @IsBoolean()
-  uplinkEnabled: boolean;
-
-  @IsBoolean()
-  downlinkEnabled: boolean;
-
-  @IsBoolean()
-  positionEnabled: boolean;
-
-  @IsBoolean()
-  preciseLocation: boolean;
-
-  @IsInt()
-  positionPrecision: number;
-}
+export type ChannelValidation = z.infer<typeof ChannelValidationSchema>;

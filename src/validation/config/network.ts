@@ -1,18 +1,18 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
 
-const AddressModeEnum = z.nativeEnum(
+const AddressModeEnum = z.enum(
   Protobuf.Config.Config_NetworkConfig_AddressMode,
 );
-const ProtocolFlagsEnum = z.nativeEnum(
+const ProtocolFlagsEnum = z.enum(
   Protobuf.Config.Config_NetworkConfig_ProtocolFlags,
 );
 
 export const NetworkValidationIpV4ConfigSchema = z.object({
-  ip: z.string().ip(),
-  gateway: z.string().ip(),
-  subnet: z.string().ip(),
-  dns: z.string().ip(),
+  ip: z.ipv4(),
+  gateway: z.ipv4(),
+  subnet: z.ipv4(),
+  dns: z.ipv4(),
 });
 
 export const NetworkValidationSchema = z.object({

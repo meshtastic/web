@@ -1,24 +1,13 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsInt } from "class-validator";
+import { z } from "zod/v4";
 
-export class StoreForwardValidation implements
-  Omit<
-    Protobuf.ModuleConfig.ModuleConfig_StoreForwardConfig,
-    keyof Message | "isServer"
-  > {
-  @IsBoolean()
-  enabled: boolean;
+export const StoreForwardValidationSchema = z.object({
+  enabled: z.boolean(),
+  heartbeat: z.boolean(),
+  records: z.int(),
+  historyReturnMax: z.int(),
+  historyReturnWindow: z.int(),
+});
 
-  @IsBoolean()
-  heartbeat: boolean;
-
-  @IsInt()
-  records: number;
-
-  @IsInt()
-  historyReturnMax: number;
-
-  @IsInt()
-  historyReturnWindow: number;
-}
+export type StoreForwardValidation = z.infer<
+  typeof StoreForwardValidationSchema
+>;

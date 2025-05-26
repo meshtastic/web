@@ -1,54 +1,23 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsInt } from "class-validator";
+import { z } from "zod/v4";
 
-export class ExternalNotificationValidation implements
-  Omit<
-    Protobuf.ModuleConfig.ModuleConfig_ExternalNotificationConfig,
-    keyof Message
-  > {
-  @IsBoolean()
-  enabled: boolean;
+export const DetectionSensorValidationSchema = z.object({
+  enabled: z.boolean(),
+  outputMs: z.int(),
+  output: z.int(),
+  outputVibra: z.int(),
+  outputBuzzer: z.int(),
+  active: z.boolean(),
+  alertMessage: z.boolean(),
+  alertMessageVibra: z.boolean(),
+  alertMessageBuzzer: z.boolean(),
+  alertBell: z.boolean(),
+  alertBellVibra: z.boolean(),
+  alertBellBuzzer: z.boolean(),
+  usePwm: z.boolean(),
+  nagTimeout: z.int(),
+  useI2sAsBuzzer: z.boolean(),
+});
 
-  @IsInt()
-  outputMs: number;
-
-  @IsInt()
-  output: number;
-
-  @IsInt()
-  outputVibra: number;
-
-  @IsInt()
-  outputBuzzer: number;
-
-  @IsBoolean()
-  active: boolean;
-
-  @IsBoolean()
-  alertMessage: boolean;
-
-  @IsBoolean()
-  alertMessageVibra: boolean;
-
-  @IsBoolean()
-  alertMessageBuzzer: boolean;
-
-  @IsBoolean()
-  alertBell: boolean;
-
-  @IsBoolean()
-  alertBellVibra: boolean;
-
-  @IsBoolean()
-  alertBellBuzzer: boolean;
-
-  @IsBoolean()
-  usePwm: boolean;
-
-  @IsInt()
-  nagTimeout: number;
-
-  @IsBoolean()
-  useI2sAsBuzzer: boolean;
-}
+export type DetectionSensorValidation = z.infer<
+  typeof DetectionSensorValidationSchema
+>;

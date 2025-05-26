@@ -1,19 +1,10 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsInt } from "class-validator";
+import { z } from "zod/v4";
 
-export class PaxcounterValidation
-  implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_PaxcounterConfig, keyof Message> {
-  @IsBoolean()
-  enabled: boolean;
+export const PaxcounterValidationSchema = z.object({
+  enabled: z.boolean(),
+  paxcounterUpdateInterval: z.int(),
+  bleThreshold: z.int(),
+  wifiThreshold: z.int(),
+});
 
-  @IsInt()
-  paxcounterUpdateInterval: number;
-
-  @IsInt()
-  bleThreshold: number;
-
-  @IsInt()
-  wifiThreshold: number;
-}
+export type PaxcounterValidation = z.infer<typeof PaxcounterValidationSchema>;

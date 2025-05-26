@@ -1,22 +1,14 @@
-import { IsArray, IsBoolean, IsNumber, IsString, IsUrl } from "class-validator";
+import { z } from "zod/v4";
 
-import type { RasterSource } from "@core/stores/appStore.ts";
+export const MapValidation_RasterSourcesSchema = z.object({
+  enabled: z.boolean(),
+  title: z.string(),
+  tiles: z.url(),
+  tileSize: z.number(),
+});
 
-export class MapValidation {
-  @IsArray()
-  rasterSources: MapValidation_RasterSources[];
-}
+export const MapValidationSchema = z.object({
+  rasterSources: MapValidation_RasterSourcesSchema.array(),
+});
 
-export class MapValidation_RasterSources implements RasterSource {
-  @IsBoolean()
-  enabled: boolean;
-
-  @IsString()
-  title: string;
-
-  @IsUrl()
-  tiles: string;
-
-  @IsNumber()
-  tileSize: number;
-}
+export type MapValidation = z.infer<typeof MapValidationSchema>;
