@@ -76,7 +76,7 @@ export const Position = () => {
                 activeFlags?.includes(name as FlagName) ?? false,
               onValueChange: onPositonFlagChange,
               label: t("position.positionFlags.label"),
-              placeholder: t("position.positionFlags.placeholder"),
+              placeholder: t("position.flags.placeholder"),
               description: t("position.positionFlags.description"),
               properties: {
                 enumValue: getAllFlags(),

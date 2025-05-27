@@ -1,60 +1,91 @@
-import clsx from "clsx";
+import { Check, Languages } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { LangCode, supportedLanguages } from "../i18n/config.ts";
 import useLang from "@core/hooks/useLang.ts";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./UI/DropdownMenu.tsx";
+import { Subtle } from "./UI/Typography/Subtle.tsx";
+import { cn } from "@core/utils/cn.ts";
 import { Button } from "./UI/Button.tsx";
-import { supportedLanguages } from "../i18n/config.ts";
-import { DropdownMenu, DropdownMenuContent } from "./UI/DropdownMenu.tsx";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
-function LanguageSwitcher() {
-  const { t, i18n } = useTranslation();
-  const { set } = useLang();
+interface LanguageSwitcherProps {
+  disableHover?: boolean;
+}
+
+export default function LanguageSwitcher(
+  { disableHover = false }: LanguageSwitcherProps,
+) {
+  const { i18n } = useTranslation("ui");
+  const { set: setLanguage } = useLang();
+
+  const currentLanguage =
+    supportedLanguages.find((lang) => lang.code === i18n.language) ||
+    supportedLanguages[0];
+
+  const handleLanguageChange = async (languageCode: LangCode) => {
+    await setLanguage(languageCode, true);
+  };
 
   return (
-    <DropdownMenu
-      i18nIsDynamicList
-      data-testid="language-list"
-    >
-      <DropdownMenuTrigger>asdlkfj</DropdownMenuTrigger>
-      <DropdownMenuContent className="flex border border-b-2 border-b-gray-700 flex-col w-full items-stretch gap-1">
-        {supportedLanguages?.map((lang) => (
-          <li
-            key={lang.code}
-            className="list-none w-full"
-            data-testid={`language-item-${lang.code}`}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className={cn(
+            "group flex items-center justify-start",
+            "transition-colors duration-150 gap-2.5 p-1.5 rounded-md",
+            !disableHover && "hover:bg-gray-100 dark:hover:bg-gray-700",
+          )}
+        >
+          <Languages
+            size={16}
+            className={cn(
+              "text-gray-500 dark:text-gray-400 w-4 flex-shrink-0 transition-colors duration-150",
+              !disableHover &&
+                "group-hover:text-gray-700 dark:group-hover:text-gray-200",
+            )}
+          />
+          <Subtle
+            className={cn(
+              "text-sm text-gray-600 dark:text-gray-100 transition-colors duration-150",
+              !disableHover &&
+                "group-hover:text-gray-800 dark:group-hover:text-gray-100",
+            )}
           >
-            <Button
-              role="presentation"
-              className={clsx([
-                "flex flex-row justify-between items-center w-full",
-                "rounded-lg px-3 py-1 transition duration-75 cursor-default",
-              ])}
-              onClick={() => set(lang.code)}
-              data-testid={`language-button-${lang.code}`}
-              data-selected={i18n.language === lang.code}
-            >
-              <div
-                className="flex flex-row items-center m-1 gap-3 p-1 overflow-hidden"
-                data-testid={`language-name-${lang.code}`}
-              >
-                {lang.name}
-              </div>
-              <div
-                className={clsx([
-                  "pr-4 ml-2 flex items-center font-medium text-xs",
-                  "text-iron dark:text-bombay",
-                ])}
-                data-testid={`language-selected-indicator-${lang.code}`}
-              >
-                {i18n.language === lang.code &&
-                  t("selected", { ns: "glossary" })}
-              </div>
-            </Button>
-          </li>
+            {`${i18n.t("language.changeLanguage")}:`}
+          </Subtle>
+          <Subtle
+            className={cn(
+              "text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors duration-150",
+              !disableHover &&
+                "group-hover:text-gray-900 dark:group-hover:text-white",
+            )}
+          >
+            {currentLanguage.code.toUpperCase()}
+          </Subtle>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="center" className="w-64">
+        {supportedLanguages.map((language) => (
+          <DropdownMenuItem
+            key={language.code}
+            onClick={() => handleLanguageChange(language.code as LangCode)}
+            className="flex items-center justify-between cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <span>{language.flag}</span>
+              <span>{language.name}</span>
+            </div>
+            {i18n.language === language.code && (
+              <Check className="h-4 w-4 text-primary" />
+            )}
+          </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
-
-export default LanguageSwitcher;

@@ -7,21 +7,17 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-
-interface DeviceMetrics {
-  batteryLevel?: number | null;
-  voltage?: number | null;
-}
-
-interface BatteryStatusProps {
-  deviceMetrics?: DeviceMetrics | null;
-}
+import { DeviceMetrics } from "./types.ts";
 
 interface BatteryStateConfig {
   condition: (level: number) => boolean;
   Icon: React.ElementType;
   className: string;
   text: (level: number) => string;
+}
+
+interface BatteryStatusProps {
+  deviceMetrics?: DeviceMetrics | null;
 }
 
 const getBatteryStates = (
@@ -73,7 +69,7 @@ const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
   const { t } = useTranslation();
   const batteryStates = getBatteryStates(t);
 
-  const { batteryLevel, voltage } = deviceMetrics;
+  const { batteryLevel } = deviceMetrics;
   const currentState = getBatteryState(batteryLevel, batteryStates) ??
     batteryStates[batteryStates.length - 1];
 
@@ -81,19 +77,13 @@ const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
   const iconClassName = currentState.className;
   const statusText = currentState.text(batteryLevel);
 
-  const voltageTitle = `${voltage?.toPrecision(3) ?? t("unknown.shortName")} ${
-    t("unit.volts")
-  }`;
-
   return (
     <div
-      className="flex items-center gap-1 mt-0.5 text-gray-500"
-      title={voltageTitle}
+      className="flex items-center gap-1 mt-0.5 "
+      aria-label={t("batteryStatus.title")}
     >
       <BatteryIcon size={22} className={iconClassName} />
-      <Subtle aria-label={t("batteryStatus.title")}>
-        {statusText}
-      </Subtle>
+      {statusText}
     </div>
   );
 };

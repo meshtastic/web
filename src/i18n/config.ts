@@ -3,14 +3,15 @@ import { initReactI18next } from "react-i18next";
 import Backend from "i18next-http-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-export type Lang = { code: string; name: string };
+export type Lang = { code: string; name: string; flag: string };
 export type LangCode = Lang["code"];
 
 export const supportedLanguages: Lang[] = [
-  // { code: "de", name: "Deutsch" },
-  { code: "en", name: "English" },
-  // { code: "es", name: "Español" },
-  // { code: "fr", name: "Français" },
+  // { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "en", name: "English", flag: "🇺🇸" },
+  // { code: "es", name: "Español", flag: "🇪🇸" },
+  // { code: "fr", name: "Français", flag: "🇫🇷" },
+  // { code: "zh", name: "中文", flag: "🇨🇳" },
 ];
 
 i18next

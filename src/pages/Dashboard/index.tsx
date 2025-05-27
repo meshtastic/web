@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@components/LanguageSwitcher.tsx";
 
 export const Dashboard = () => {
   const { t } = useTranslation("dashboard");
@@ -24,7 +25,7 @@ export const Dashboard = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-3 p-3">
+      <div className="flex flex-col gap-3 p-3 px-8">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <Heading as="h3">
@@ -34,6 +35,7 @@ export const Dashboard = () => {
               {t("dashboard.description")}
             </Subtle>
           </div>
+          <LanguageSwitcher />
         </div>
 
         <Separator />

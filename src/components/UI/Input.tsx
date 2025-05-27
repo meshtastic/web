@@ -82,8 +82,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref.current.focus();
           }
         },
-        ariaLabel: t("filters.clearInput.label"),
-        tooltip: t("filters.clearInput.label"),
+        ariaLabel: t("clearInput.label"),
+        tooltip: t("clearInput.label"),
         condition: !!showClearButton && !!value,
       },
       {

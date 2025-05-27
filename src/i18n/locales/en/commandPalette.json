@@ -1,5 +1,8 @@
 {
   "emptyState": "No results found.",
+  "page": {
+    "title": "Command Palette"
+  },
   "pinGroup": {
     "label": "Pin command group"
   },

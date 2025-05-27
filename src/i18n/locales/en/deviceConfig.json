@@ -78,7 +78,7 @@
   "display": {
     "description": "Settings for the device display",
     "title": "Display Settings",
-    "boldHeading": {
+    "headingBold": {
       "description": "Bolden the heading text",
       "label": "Bold Heading"
     },
@@ -320,12 +320,12 @@
       "description": "GPS module TX pin override",
       "label": "Transmit Pin"
     },
-    "fieldPlaceholder_selectPositionFlags": "Select position flags...",
     "intervalsSettings": {
       "description": "How often to send position updates",
       "label": "Intervals"
     },
     "flags": {
+      "placeholder": "Select position flags...",
       "altitude": "Altitude",
       "altitudeGeoidalSeparation": "Altitude Geoidal Separation",
       "altitudeMsl": "Altitude is Mean Sea Level",

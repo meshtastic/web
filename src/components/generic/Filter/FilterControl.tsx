@@ -62,8 +62,8 @@ function HopsLabelContent({ hopsAway, t }: HopsLabelProps) {
 
   return (
     <>
-      {t("filters.hops.text", {
-        value: startHops === 0 ? t("filters.hops.direct") : startHops,
+      {t("hops.text", {
+        value: startHops === 0 ? t("hops.direct") : startHops,
       })}
       {startHops !== endHops ? ` — ${endHops}` : ""}
     </>
@@ -82,11 +82,11 @@ function LastHeardLabelContent(
   const [start, end] = lastHeardRange;
   return (
     <>
-      {t("filters.lastHeard.labelText", { value: "" })}
+      {t("lastHeard.labelText", { value: "" })}
       <br />
       {start === 0
         ? (
-          t("filters.lastHeard.nowLabel")
+          t("lastHeard.nowLabel")
         )
         : (
           <>
@@ -123,7 +123,7 @@ function BatteryLevelLabelContent(
 
   return (
     <>
-      {t("filters.batteryLevel.labelText", {
+      {t("batteryLevel.labelText", {
         value: formatBatteryValue(start),
       })}
       {start !== end && typeof end !== "undefined" && (
@@ -231,7 +231,7 @@ export function FilterControl({
               : "",
             parameters?.popoverTriggerClassName,
           )}
-          aria-label={t("filters.filter.label")}
+          aria-label={t("filter.label")}
         >
           {parameters?.triggerIcon ?? <FunnelIcon />}
         </button>
@@ -246,14 +246,14 @@ export function FilterControl({
         <form className="space-y-4">
           <Accordion
             type="single"
-            defaultValue={t("filters.general.label")}
+            defaultValue={t("general.label")}
             collapsible
           >
-            <FilterAccordionItem label={t("filters.general.label")}>
+            <FilterAccordionItem label={t("general.label")}>
               {(parameters?.showTextSearch ?? true) && (
                 <div className="flex flex-col space-y-1 pb-2">
                   <label htmlFor="nodeName" className="font-medium text-sm">
-                    {t("filters.nodeName.label")}
+                    {t("nodeName.label")}
                   </label>
                   <Input
                     type="text"
@@ -261,12 +261,12 @@ export function FilterControl({
                     value={filterState.nodeName}
                     onChange={handleTextChange("nodeName")}
                     showClearButton
-                    placeholder={t("filters.nodeName.placeholder")}
+                    placeholder={t("nodeName.placeholder")}
                   />
                 </div>
               )}
               <FilterSlider
-                label={t("filters.hops.label")}
+                label={t("hops.label")}
                 filterKey="hopsAway"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
@@ -279,7 +279,7 @@ export function FilterControl({
                 }
               />
               <FilterSlider
-                label={t("filters.lastHeard.label")}
+                label={t("lastHeard.label")}
                 filterKey="lastHeard"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
@@ -294,51 +294,51 @@ export function FilterControl({
                 }
               />
               <FilterToggle
-                label={t("filters.favorites.label")}
+                label={t("favorites.label")}
                 filterKey="isFavorite"
                 alternativeLabels={[
-                  t("filters.hide.label"),
-                  t("filters.showOnly.label"),
+                  t("hide.label"),
+                  t("showOnly.label"),
                 ]}
                 filterState={filterState}
                 onChange={handleBoolChange}
               />
               <FilterToggle
-                label={t("filters.viaMqtt.label")}
+                label={t("viaMqtt.label")}
                 filterKey="viaMqtt"
                 alternativeLabels={[
-                  t("filters.hide.label"),
-                  t("filters.showOnly.label"),
+                  t("hide.label"),
+                  t("showOnly.label"),
                 ]}
                 filterState={filterState}
                 onChange={handleBoolChange}
               />
             </FilterAccordionItem>
 
-            <FilterAccordionItem label={t("filters.metrics.label")}>
+            <FilterAccordionItem label={t("metrics.label")}>
               <FilterSlider
-                label={t("filters.snr.label")}
+                label={t("snr.label")}
                 filterKey="snr"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
-                label={t("filters.channelUtilization.label")}
+                label={t("channelUtilization.label")}
                 filterKey="channelUtilization"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
-                label={t("filters.airtimeUtilization.label")}
+                label={t("airtimeUtilization.label")}
                 filterKey="airUtilTx"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
-                label={t("filters.batteryLevel.label")}
+                label={t("batteryLevel.label")}
                 filterKey="batteryLevel"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
@@ -351,7 +351,7 @@ export function FilterControl({
                 }
               />
               <FilterSlider
-                label={t("filters.batteryVoltage.label")}
+                label={t("batteryVoltage.label")}
                 filterKey="voltage"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
@@ -359,7 +359,7 @@ export function FilterControl({
               />
             </FilterAccordionItem>
 
-            <FilterAccordionItem label={t("filters.role.label")}>
+            <FilterAccordionItem label={t("role.label")}>
               <FilterMulti
                 filterKey="role"
                 filterState={filterState}
@@ -374,7 +374,7 @@ export function FilterControl({
               />
             </FilterAccordionItem>
 
-            <FilterAccordionItem label={t("filters.hardware.label")}>
+            <FilterAccordionItem label={t("hardware.label")}>
               <FilterMulti
                 filterKey="hwModel"
                 filterState={filterState}
@@ -392,7 +392,7 @@ export function FilterControl({
             onClick={resetFilters}
             className="w-full py-1 shadow-sm hover:shadow-md bg-slate-600 dark:bg-slate-900 text-white rounded text-sm hover:text-slate-100 hover:bg-slate-700 active:bg-slate-950"
           >
-            {t("filters.resetFilters.label")}
+            {t("button.reset")}
           </button>
           {children && <div className="mt-4 border-t pt-4">{children}</div>}
         </form>

@@ -22,10 +22,17 @@
     },
     "deviceInfo": {
       "volts": "{{voltage}} volts",
-      "firmwareVersion": "v{{version}}",
-      "button": {
-        "editDeviceName": "Edit device name"
-      }
+      "firmware": {
+        "title": "Firmware",
+        "version": "v{{version}}",
+        "buildDate": "Build date: {{date}}"
+      },
+      "deviceName": {
+        "title": "Device Name",
+        "changeName": "Change Device Name",
+        "placeholder": "Enter device name"
+      },
+      "editDeviceName": "Edit device name"
     }
   },
   "batteryStatus": {
@@ -75,76 +82,79 @@
       "label": "Show password"
     }
   },
-  "filters": {
-    "general": {
-      "label": "General"
-    },
-    "hardware": {
-      "label": "Hardware"
-    },
-    "metrics": {
-      "label": "Metrics"
-    },
-    "role": {
-      "label": "Role"
-    },
-    "filter": {
-      "label": "Filter"
-    },
-    "clearInput": {
-      "label": "Clear input"
-    },
-    "resetFilters": {
-      "label": "Reset Filters"
-    },
-    "nodeName": {
-      "label": "Node name/number",
-      "placeholder": "Meshtastic 1234"
-    },
-    "airtimeUtilization": {
-      "label": "Airtime Utilization (%)"
-    },
-    "batteryLevel": {
-      "label": "Battery level (%)",
-      "labelText": "Battery level (%): {{value}}"
-    },
-    "batteryVoltage": {
-      "label": "Battery voltage (V)"
-    },
-    "channelUtilization": {
-      "label": "Channel Utilization (%)"
-    },
-    "hops": {
-      "direct": "Direct",
-      "label": "Number of hops",
-      "text": "Number of hops: {{value}}"
-    },
-    "lastHeard": {
-      "label": "Last heard",
-      "labelText": "Last heard: {{value}}",
-      "nowLabel": "Now"
-    },
-    "snr": {
-      "label": "SNR (db)"
-    },
-    "favorites": {
-      "label": "Favorites"
-    },
-    "hide": {
-      "label": "Hide"
-    },
-    "showOnly": {
-      "label": "Show Only"
-    },
-    "viaMqtt": {
-      "label": "Connected via MQTT"
-    }
+  "general": {
+    "label": "General"
+  },
+  "hardware": {
+    "label": "Hardware"
+  },
+  "metrics": {
+    "label": "Metrics"
+  },
+  "role": {
+    "label": "Role"
+  },
+  "filter": {
+    "label": "Filter"
+  },
+  "clearInput": {
+    "label": "Clear input"
+  },
+  "resetFilters": {
+    "label": "Reset Filters"
+  },
+  "nodeName": {
+    "label": "Node name/number",
+    "placeholder": "Meshtastic 1234"
+  },
+  "airtimeUtilization": {
+    "label": "Airtime Utilization (%)"
+  },
+  "batteryLevel": {
+    "label": "Battery level (%)",
+    "labelText": "Battery level (%): {{value}}"
+  },
+  "batteryVoltage": {
+    "label": "Battery voltage (V)",
+    "title": "Voltage"
+  },
+  "channelUtilization": {
+    "label": "Channel Utilization (%)"
+  },
+  "hops": {
+    "direct": "Direct",
+    "label": "Number of hops",
+    "text": "Number of hops: {{value}}"
+  },
+  "lastHeard": {
+    "label": "Last heard",
+    "labelText": "Last heard: {{value}}",
+    "nowLabel": "Now"
+  },
+  "snr": {
+    "label": "SNR (db)"
+  },
+  "favorites": {
+    "label": "Favorites"
+  },
+  "hide": {
+    "label": "Hide"
+  },
+  "showOnly": {
+    "label": "Show Only"
+  },
+  "viaMqtt": {
+    "label": "Connected via MQTT"
+  },
+  "language": {
+    "label": "Language",
+    "changeLanguage": "Change Language"
   },
   "theme": {
     "dark": "Dark",
     "light": "Light",
     "system": "Automatic",
-    "changeTheme": "Change current theme"
+    "changeTheme": "Change Color Scheme"
   },
   "footer": {
     "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>"

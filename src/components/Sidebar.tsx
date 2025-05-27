@@ -4,7 +4,6 @@ import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Page } from "@core/stores/deviceStore.ts";
 import { Spinner } from "@components/UI/Spinner.tsx";
-import { Avatar } from "@components/UI/Avatar.tsx";
 
 import {
   CircleChevronLeft,
@@ -13,19 +12,15 @@ import {
   type LucideIcon,
   MapIcon,
   MessageSquareIcon,
-  PenLine,
-  SearchIcon,
   SettingsIcon,
   UsersIcon,
-  ZapIcon,
 } from "lucide-react";
 import { cn } from "@core/utils/cn.ts";
 import { useSidebar } from "@core/stores/sidebarStore.tsx";
-import ThemeSwitcher from "@components/ThemeSwitcher.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
-import BatteryStatus from "@components/BatteryStatus.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { useTranslation } from "react-i18next";
+import { DeviceInfoPanel } from "./DeviceInfoPanel.tsx";
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -210,98 +205,21 @@ export const Sidebar = ({ children }: SidebarProps) => {
             </div>
           )
           : (
-            <>
-              <div
-                className={cn(
-                  "flex place-items-center gap-2",
-                  isCollapsed && "justify-center",
-                )}
-              >
-                <Avatar
-                  text={myNode.user?.shortName ??
-                    t("unknown.shortName")}
-                  className={cn("flex-shrink-0 ml-2", isCollapsed && "ml-0")}
-                  size="sm"
-                />
-                <p
-                  className={cn(
-                    "max-w-[20ch] text-wrap text-sm font-medium",
-                    "transition-all duration-300 ease-in-out overflow-hidden",
-                    isCollapsed
-                      ? "opacity-0 max-w-0 invisible"
-                      : "opacity-100 max-w-full visible",
-                  )}
-                >
-                  {myNode.user?.longName}
-                </p>
-              </div>
-
-              <div
-                className={cn(
-                  "flex flex-col gap-0.5 ml-2 mt-2",
-                  "transition-all duration-300 ease-in-out",
-                  isCollapsed
-                    ? "opacity-0 max-w-0 h-0 invisible"
-                    : "opacity-100 max-w-xs h-auto visible",
-                )}
-              >
-                <div className="inline-flex gap-2">
-                  <BatteryStatus deviceMetrics={myNode.deviceMetrics} />
-                </div>
-                <div className="inline-flex gap-2">
-                  <ZapIcon
-                    size={18}
-                    className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
-                  />
-                  <Subtle>
-                    {t("sidebar.deviceInfo.volts", {
-                      voltage: myNode.deviceMetrics?.voltage?.toPrecision(3) ??
-                        t("unknown.shortName"),
-                    })}
-                  </Subtle>
-                </div>
-                <div className="inline-flex gap-2">
-                  <CpuIcon
-                    size={18}
-                    className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
-                  />
-                  <Subtle>
-                    {t("sidebar.deviceInfo.firmwareVersion", {
-                      version: myMetadata?.firmwareVersion ??
-                        t("unknown.shortName"),
-                    })}
-                  </Subtle>
-                </div>
-              </div>
-              <div
-                className={cn(
-                  "flex items-center flex-shrink-0 ml-2",
-                  "transition-all duration-300 ease-in-out",
-                  isCollapsed
-                    ? "opacity-0 max-w-0 invisible pointer-events-none"
-                    : "opacity-100 max-w-xs visible",
-                )}
-              >
-                <button
-                  type="button"
-                  aria-label={t(
-                    "sidebar.deviceInfo.button.editDeviceName",
-                  )}
-                  className="p-1 rounded transition-colors cursor-pointer  hover:text-accent"
-                  onClick={() => setDialogOpen("deviceName", true)}
-                >
-                  <PenLine size={22} />
-                </button>
-                <ThemeSwitcher />
-                <button
-                  type="button"
-                  className="transition-all cursor-pointer hover:text-accent"
-                  onClick={() => setCommandPaletteOpen(true)}
-                >
-                  <SearchIcon />
-                </button>
-              </div>
-            </>
+            <DeviceInfoPanel
+              isCollapsed={isCollapsed}
+              setCommandPaletteOpen={() => setCommandPaletteOpen(true)}
+              setDialogOpen={() => setDialogOpen("deviceName", true)}
+              user={{
+                longName: myNode?.user?.longName ?? t("unknown.longName"),
+                shortName: myNode?.user?.shortName ?? t("unknown.shortName"),
+              }}
+              firmwareVersion={myMetadata?.firmwareVersion ??
+                t("unknown.firmwareVersion")}
+              deviceMetrics={{
+                batteryLevel: myNode.deviceMetrics?.batteryLevel,
+                voltage: myNode.deviceMetrics?.voltage,
+              }}
+            />
           )}
       </div>
     </div>

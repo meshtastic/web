@@ -98,7 +98,7 @@ export const Display = () => {
               type: "select",
               name: "displaymode",
               label: t("display.displayMode.label"),
-              description: t("display.displayMode.descriptio"),
+              description: t("display.displayMode.description"),
               properties: {
                 enumValue: Protobuf.Config.Config_DisplayConfig_DisplayMode,
                 formatEnumName: true,

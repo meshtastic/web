@@ -47,7 +47,7 @@ export const ExternalNotification = () => {
                 },
               ],
               properties: {
-                suffix: t("unit.ms", { ns: "common" }),
+                suffix: t("unit.millisecond.suffix"),
               },
             },
             {

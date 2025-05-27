@@ -55,7 +55,7 @@
     },
     "second": { "one": "Second", "plural": "Seconds" },
     "snr": "SNR",
-    "volts": "Volts",
+    "volt": { "one": "Volt", "plural": "Volts", "suffix": "V" },
     "record": { "one": "Records", "plural": "Records" }
   },
   "security": {
@@ -64,6 +64,7 @@
   "unknown": {
     "longName": "Unknown",
     "shortName": "UNK",
+    "notAvailable": "N/A",
     "num": "??"
   },
   "nodeUnknownPrefix": "!",
