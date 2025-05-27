@@ -136,7 +136,7 @@ export const Avatar = ({
           </TooltipProvider>
         )
         : null}
-      <p className="p-1">
+      <p className="p-1 text-nowrap">
         {initials}
       </p>
     </div>
