@@ -10,6 +10,7 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { AlertTriangleIcon } from "lucide-react";
 import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
+import { useTranslation } from "react-i18next";
 
 export interface DeleteMessagesDialogProps {
   open: boolean;
@@ -20,6 +21,7 @@ export const DeleteMessagesDialog = ({
   open,
   onOpenChange,
 }: DeleteMessagesDialogProps) => {
+  const { t } = useTranslation("dialog");
   const { deleteAllMessages } = useMessageStore();
   const handleCloseDialog = () => {
     onOpenChange(false);
@@ -32,19 +34,19 @@ export const DeleteMessagesDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangleIcon className="h-5 w-5 text-warning" />
-            Clear All Messages
+            {t("deleteMessages.title")}
           </DialogTitle>
           <DialogDescription>
-            This action will clear all message history. This cannot be undone.
-            Are you sure you want to continue?
+            {t("deleteMessages.description")}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4">
           <Button
             variant="outline"
             onClick={handleCloseDialog}
+            name="dismiss"
           >
-            Dismiss
+            {t("button.dismiss")}
           </Button>
           <Button
             variant="destructive"
@@ -52,8 +54,9 @@ export const DeleteMessagesDialog = ({
               deleteAllMessages();
               handleCloseDialog();
             }}
+            name="clearMessages"
           >
-            Clear Messages
+            {t("button.clearMessages")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,11 +1,13 @@
 import { useDevice } from "@core/stores/deviceStore.ts";
-import type { MqttValidation } from "@app/validation/moduleConfig/mqtt.tsx";
+import type { MqttValidation } from "@app/validation/moduleConfig/mqtt.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const MQTT = () => {
   const { config, moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: MqttValidation) => {
     setWorkingModuleConfig(
@@ -30,21 +32,20 @@ export const MQTT = () => {
       defaultValues={moduleConfig.mqtt}
       fieldGroups={[
         {
-          label: "MQTT Settings",
-          description: "Settings for the MQTT module",
+          label: t("mqtt.title"),
+          description: t("mqtt.description"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Enabled",
-              description: "Enable or disable MQTT",
+              label: t("mqtt.enabled.label"),
+              description: t("mqtt.enabled.description"),
             },
             {
               type: "text",
               name: "address",
-              label: "MQTT Server Address",
-              description:
-                "MQTT server address to use for default/custom servers",
+              label: t("mqtt.address.label"),
+              description: t("mqtt.address.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -54,8 +55,8 @@ export const MQTT = () => {
             {
               type: "text",
               name: "username",
-              label: "MQTT Username",
-              description: "MQTT username to use for default/custom servers",
+              label: t("mqtt.username.label"),
+              description: t("mqtt.username.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -65,8 +66,8 @@ export const MQTT = () => {
             {
               type: "password",
               name: "password",
-              label: "MQTT Password",
-              description: "MQTT password to use for default/custom servers",
+              label: t("mqtt.password.label"),
+              description: t("mqtt.password.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -76,9 +77,8 @@ export const MQTT = () => {
             {
               type: "toggle",
               name: "encryptionEnabled",
-              label: "Encryption Enabled",
-              description:
-                "Enable or disable MQTT encryption. Note: All messages are sent to the MQTT broker unencrypted if this option is not enabled, even when your uplink channels have encryption keys set. This includes position data.",
+              label: t("mqtt.encryptionEnabled.label"),
+              description: t("mqtt.encryptionEnabled.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -88,8 +88,8 @@ export const MQTT = () => {
             {
               type: "toggle",
               name: "jsonEnabled",
-              label: "JSON Enabled",
-              description: "Whether to send/consume JSON packets on MQTT",
+              label: t("mqtt.jsonEnabled.label"),
+              description: t("mqtt.jsonEnabled.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -99,8 +99,8 @@ export const MQTT = () => {
             {
               type: "toggle",
               name: "tlsEnabled",
-              label: "TLS Enabled",
-              description: "Enable or disable TLS",
+              label: t("mqtt.tlsEnabled.label"),
+              description: t("mqtt.tlsEnabled.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -110,8 +110,8 @@ export const MQTT = () => {
             {
               type: "text",
               name: "root",
-              label: "Root topic",
-              description: "MQTT root topic to use for default/custom servers",
+              label: t("mqtt.root.label"),
+              description: t("mqtt.root.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -121,9 +121,8 @@ export const MQTT = () => {
             {
               type: "toggle",
               name: "proxyToClientEnabled",
-              label: "Proxy to Client Enabled",
-              description:
-                "Use the client's internet connection for MQTT (feature only active in mobile apps)",
+              label: t("mqtt.proxyToClientEnabled.label"),
+              description: t("mqtt.proxyToClientEnabled.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -133,8 +132,8 @@ export const MQTT = () => {
             {
               type: "toggle",
               name: "mapReportingEnabled",
-              label: "Map Reporting Enabled",
-              description: "Enable or disable map reporting",
+              label: t("mqtt.mapReportingEnabled.label"),
+              description: t("mqtt.mapReportingEnabled.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -144,10 +143,12 @@ export const MQTT = () => {
             {
               type: "number",
               name: "mapReportSettings.publishIntervalSecs",
-              label: "Map Report Publish Interval (s)",
-              description: "Interval in seconds to publish map reports",
+              label: t("mqtt.mapReportSettings.publishIntervalSecs.label"),
+              description: t(
+                "mqtt.mapReportSettings.publishIntervalSecs.description",
+              ),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
               disabledBy: [
                 {
@@ -161,34 +162,77 @@ export const MQTT = () => {
             {
               type: "select",
               name: "mapReportSettings.positionPrecision",
-              label: "Approximate Location",
-              description:
-                "Position shared will be accurate within this distance",
+              label: t(
+                "mqtt.mapReportSettings.positionPrecision.label",
+              ),
+              description: t(
+                "mqtt.mapReportSettings.positionPrecision.description",
+              ),
               properties: {
                 enumValue: config.display?.units === 0
                   ? {
-                    "Within 23 km": 10,
-                    "Within 12 km": 11,
-                    "Within 5.8 km": 12,
-                    "Within 2.9 km": 13,
-                    "Within 1.5 km": 14,
-                    "Within 700 m": 15,
-                    "Within 350 m": 16,
-                    "Within 200 m": 17,
-                    "Within 90 m": 18,
-                    "Within 50 m": 19,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.metric_km23")
+                    ]: 10,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.metric_km12")
+                    ]: 11,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.metric_km5_8")
+                    ]: 12,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.metric_km2_9")
+                    ]: 13,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.metric_km1_5")
+                    ]: 14,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.metric_m700")
+                    ]: 15,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.metric_m350")
+                    ]: 16,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.metric_m200")
+                    ]: 17,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.metric_m90")
+                    ]: 18,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.metric_m50")
+                    ]: 19,
                   }
                   : {
-                    "Within 15 miles": 10,
-                    "Within 7.3 miles": 11,
-                    "Within 3.6 miles": 12,
-                    "Within 1.8 miles": 13,
-                    "Within 0.9 miles": 14,
-                    "Within 0.5 miles": 15,
-                    "Within 0.2 miles": 16,
-                    "Within 600 feet": 17,
-                    "Within 300 feet": 18,
-                    "Within 150 feet": 19,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi15")
+                    ]: 10,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi7_3")
+                    ]: 11,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi3_6")
+                    ]: 12,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi1_8")
+                    ]: 13,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_9")
+                    ]: 14,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_5")
+                    ]: 15,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_2")
+                    ]: 16,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft600")
+                    ]: 17,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft300")
+                    ]: 18,
+                    [
+                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft150")
+                    ]: 19,
                   },
               },
               disabledBy: [

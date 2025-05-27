@@ -1,12 +1,13 @@
 import { useBackupReminder } from "@core/hooks/useKeyBackupReminder.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useTranslation } from "react-i18next";
 
 export const KeyBackupReminder = () => {
   const { setDialogOpen } = useDevice();
+  const { t } = useTranslation("dialog");
 
   useBackupReminder({
-    message:
-      "We recommend backing up your key data regularly. Would you like to back up now?",
+    message: t("pkiBackup.description"),
     onAccept: () => setDialogOpen("pkiBackup", true),
     enabled: true,
   });

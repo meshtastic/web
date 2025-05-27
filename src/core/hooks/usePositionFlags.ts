@@ -1,27 +1,44 @@
 import { useCallback, useMemo, useState } from "react";
 
-const FLAGS = {
-  UNSET: 0,
-  Altitude: 1,
-  "Altitude is Mean Sea Level": 2,
-  "Altitude Geoidal Seperation": 4,
-  "Dilution of precision (DOP) PDOP used by default": 8,
-  "If DOP is set, use HDOP / VDOP values instead of PDOP": 16,
-  "Number of satellites": 32,
-  "Sequence number": 64,
-  Timestamp: 128,
-  "Vehicle heading": 256,
-  "Vehicle speed": 512,
+export const FLAGS_CONFIG = {
+  UNSET: { value: 0, i18nKey: "position.flags.unset" },
+  ALTITUDE: { value: 1, i18nKey: "position.flags.altitude" },
+  ALTITUDE_MSL: { value: 2, i18nKey: "position.flags.altitudeMsl" },
+  ALTITUDE_GEOIDAL_SEPARATION: {
+    value: 4,
+    i18nKey: "position.flags.altitudeGeoidalSeparation",
+  },
+  DOP: {
+    value: 8,
+    i18nKey: "position.flags.dop",
+  },
+  HDOP_VDOP: {
+    value: 16,
+    i18nKey: "position.flags.hdopVdop",
+  },
+  NUM_SATELLITES: {
+    value: 32,
+    i18nKey: "position.flags.numSatellites",
+  },
+  SEQUENCE_NUMBER: {
+    value: 64,
+    i18nKey: "position.flags.sequenceNumber",
+  },
+  TIMESTAMP: { value: 128, i18nKey: "position.flags.timestamp" },
+  VEHICLE_HEADING: {
+    value: 256,
+    i18nKey: "position.flags.vehicleHeading",
+  },
+  VEHICLE_SPEED: { value: 512, i18nKey: "position.flags.vehicleSpeed" },
 } as const;
 
-export type FlagName = keyof typeof FLAGS;
-type FlagsObject = typeof FLAGS;
+export type FlagName = keyof typeof FLAGS_CONFIG;
 
 type UsePositionFlagsProps = {
   decode: (value: number) => FlagName[];
   encode: (flagNames: FlagName[]) => number;
   hasFlag: (value: number, flagName: FlagName) => boolean;
-  getAllFlags: () => FlagsObject;
+  getAllFlags: () => typeof FLAGS_CONFIG;
   isValidValue: (value: number) => boolean;
   flagsValue: number;
   activeFlags: FlagName[];
@@ -34,41 +51,52 @@ type UsePositionFlagsProps = {
 export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
   const [flagsValue, setFlagsValue] = useState<number>(initialValue);
 
+  const FLAGS_BITMASKS = useMemo(() => {
+    return Object.fromEntries(
+      Object.entries(FLAGS_CONFIG).map(([key, conf]) => [key, conf.value]),
+    ) as { [K in FlagName]: typeof FLAGS_CONFIG[K]["value"] };
+  }, []);
+
   const utils = useMemo(() => {
     const decode = (value: number): FlagName[] => {
-      if (value === 0) return ["UNSET"];
+      if (value === FLAGS_CONFIG.UNSET.value) return ["UNSET"];
 
       const activeFlags: FlagName[] = [];
-      for (const [name, flagValue] of Object.entries(FLAGS)) {
-        if (flagValue !== 0 && (value & flagValue) === flagValue) {
-          activeFlags.push(name as FlagName);
+      for (const key in FLAGS_CONFIG) {
+        const flagName = key as FlagName;
+        const flagConfig = FLAGS_CONFIG[flagName];
+        if (
+          flagConfig.value !== 0 &&
+          (value & flagConfig.value) === flagConfig.value
+        ) {
+          activeFlags.push(flagName);
         }
       }
       return activeFlags;
     };
 
     const encode = (flagNames: FlagName[]): number => {
-      if (flagNames.includes("UNSET")) {
-        return 0;
+      if (flagNames.includes("UNSET") && flagNames.length === 1) {
+        return FLAGS_CONFIG.UNSET.value;
       }
       return flagNames.reduce((acc, name) => {
-        const value = FLAGS[name];
-        return acc | value;
+        if (name === "UNSET") return acc;
+        return acc | FLAGS_CONFIG[name].value;
       }, 0);
     };
 
     const hasFlag = (value: number, flagName: FlagName): boolean => {
-      const flagValue = FLAGS[flagName];
-      return (value & flagValue) === flagValue;
+      return (value & FLAGS_CONFIG[flagName].value) ===
+        FLAGS_CONFIG[flagName].value;
     };
 
-    const getAllFlags = (): FlagsObject => {
-      return FLAGS;
+    const getAllFlags = (): typeof FLAGS_CONFIG => {
+      return FLAGS_CONFIG;
     };
 
     const isValidValue = (value: number): boolean => {
-      const maxValue = Object.values(FLAGS)
-        .filter((val) => val !== 0) // Exclude UNSET (0) from the calculation
+      const maxValue = Object.values(FLAGS_BITMASKS)
+        .filter((val) => val !== 0)
         .reduce((acc, val) => acc | val, 0);
       return Number.isInteger(value) && value >= 0 && value <= maxValue;
     };
@@ -80,16 +108,17 @@ export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
       getAllFlags,
       isValidValue,
     };
-  }, []);
+  }, [FLAGS_BITMASKS]);
 
   const toggleFlag = useCallback((flagName: FlagName) => {
-    const flagValue = FLAGS[flagName];
-    setFlagsValue((prev) => prev ^ flagValue);
+    setFlagsValue((prev) => prev ^ FLAGS_CONFIG[flagName].value);
   }, []);
 
   const setFlag = useCallback((flagName: FlagName, enabled: boolean) => {
-    const flagValue = FLAGS[flagName];
-    setFlagsValue((prev) => (enabled ? prev | flagValue : prev & ~flagValue));
+    const currentFlagValue = FLAGS_CONFIG[flagName].value;
+    setFlagsValue((prev) =>
+      enabled ? prev | currentFlagValue : prev & ~currentFlagValue
+    );
   }, []);
 
   const setFlags = useCallback(
@@ -103,7 +132,7 @@ export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
   );
 
   const clearFlags = useCallback(() => {
-    setFlagsValue(0);
+    setFlagsValue(FLAGS_CONFIG.UNSET.value);
   }, []);
 
   const activeFlags = utils.decode(flagsValue);

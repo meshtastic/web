@@ -13,8 +13,11 @@ import {
   UsersIcon,
 } from "lucide-react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@components/LanguageSwitcher.tsx";
 
 export const Dashboard = () => {
+  const { t } = useTranslation("dashboard");
   const { setConnectDialogOpen, setSelectedDevice } = useAppStore();
   const { getDevices } = useDeviceStore();
 
@@ -22,12 +25,17 @@ export const Dashboard = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-3 p-3">
+      <div className="flex flex-col gap-3 p-3 px-8">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <Heading as="h3">Connected Devices</Heading>
-            <Subtle>Manage, connect and disconnect devices</Subtle>
+            <Heading as="h3">
+              {t("dashboard.title")}
+            </Heading>
+            <Subtle>
+              {t("dashboard.description")}
+            </Subtle>
           </div>
+          <LanguageSwitcher />
         </div>
 
         <Separator />
@@ -49,25 +57,32 @@ export const Dashboard = () => {
                         <div className="flex items-center justify-between">
                           <p className="truncate text-sm font-medium text-accent">
                             {device.getNode(device.hardware.myNodeNum)?.user
-                              ?.longName ?? "UNK"}
+                              ?.longName ??
+                              t("unknown.shortName")}
                           </p>
                           <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
                             {device.connection?.connType === "ble" && (
                               <>
                                 <BluetoothIcon size={16} />
-                                BLE
+                                {t(
+                                  "dashboard.connectionType_ble",
+                                )}
                               </>
                             )}
                             {device.connection?.connType === "serial" && (
                               <>
                                 <UsbIcon size={16} />
-                                Serial
+                                {t(
+                                  "dashboard.connectionType_serial",
+                                )}
                               </>
                             )}
                             {device.connection?.connType === "http" && (
                               <>
                                 <NetworkIcon size={16} />
-                                Network
+                                {t(
+                                  "dashboard.connectionType_network",
+                                )}
                               </>
                             )}
                           </div>
@@ -96,15 +111,22 @@ export const Dashboard = () => {
                   size={48}
                   className="mx-auto text-text-secondary"
                 />
-                <Heading as="h3">No Devices</Heading>
-                <Subtle>Connect at least one device to get started</Subtle>
+                <Heading as="h3">
+                  {t("dashboard.noDevicesTitle")}
+                </Heading>
+                {/* <LanguageSwitcher /> */}
+                <Subtle>
+                  {t("dashboard.noDevicesDescription")}
+                </Subtle>
                 <Button
                   className="gap-2"
                   variant="default"
                   onClick={() => setConnectDialogOpen(true)}
                 >
                   <PlusIcon size={16} />
-                  New Connection
+                  {t(
+                    "dashboard.button_newConnection",
+                  )}
                 </Button>
               </div>
             )}

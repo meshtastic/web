@@ -12,6 +12,7 @@ import {
 import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export interface PkiBackupDialogProps {
   open: boolean;
@@ -22,7 +23,8 @@ export const PkiBackupDialog = ({
   open,
   onOpenChange,
 }: PkiBackupDialogProps) => {
-  const { config, setDialogOpen } = useDevice();
+  const { t } = useTranslation("dialog");
+  const { config, setDialogOpen, getMyNode } = useDevice();
   const privateKey = config.security?.privateKey;
   const publicKey = config.security?.publicKey;
 
@@ -46,7 +48,12 @@ export const PkiBackupDialog = ({
       printWindow.document.write(`
         <html>
           <head>
-            <title>=== MESHTASTIC KEYS ===</title>
+            <title>${
+        t("pkiBackup.header", {
+          shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
+          longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+        })
+      }</title>
             <style>
               body { font-family: Arial, sans-serif; padding: 20px; }
               h1 { font-size: 18px; }
@@ -54,14 +61,18 @@ export const PkiBackupDialog = ({
             </style>
           </head>
           <body>
-            <h1>=== MESHTASTIC KEYS ===</h1>
-            <br>
-            <h2>Public Key:</h2>
+            <h1>${
+        t("pkiBackup.header", {
+          shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
+          longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+        })
+      }</h1>
+            <h3>${t("pkiBackup.secureBackup")}</h3>
+            <h3>${t("pkiBackup.publicKey")}</h3>
             <p>${decodeKeyData(publicKey)}</p>
-            <h2>Private Key:</h2>
+            <h3>${t("pkiBackup.privateKey")}</h3>
             <p>${decodeKeyData(privateKey)}</p>
-            <br>
-            <p>=== END OF KEYS ===</p>
+            <p>${t("pkiBackup.footer")}</p>
           </body>
         </html>
       `);
@@ -69,7 +80,7 @@ export const PkiBackupDialog = ({
       printWindow.print();
       closeDialog();
     }
-  }, [decodeKeyData, privateKey, publicKey, closeDialog]);
+  }, [decodeKeyData, privateKey, publicKey, closeDialog, t]);
 
   const createDownloadKeyFile = React.useCallback(() => {
     if (!privateKey || !publicKey) return;
@@ -78,12 +89,12 @@ export const PkiBackupDialog = ({
     const decodedPublicKey = decodeKeyData(publicKey);
 
     const formattedContent = [
-      "=== MESHTASTIC KEYS ===\n\n",
-      "Private Key:\n",
+      `${t("pkiBackup.header")}\n\n`,
+      `${t("pkiBackup.privateKey")}\n`,
       decodedPrivateKey,
-      "\n\nPublic Key:\n",
+      `\n\n${t("pkiBackup.publicKey")}\n`,
       decodedPublicKey,
-      "\n\n=== END OF KEYS ===",
+      `\n\n${t("pkiBackup.footer")}`,
     ].join("");
 
     const blob = new Blob([formattedContent], { type: "text/plain" });
@@ -91,43 +102,47 @@ export const PkiBackupDialog = ({
 
     const link = document.createElement("a");
     link.href = url;
-    link.download = "meshtastic_keys.txt";
+    link.download = t("pkiBackup.fileName", {
+      shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
+      longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+    });
+
     link.style.display = "none";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     closeDialog();
     URL.revokeObjectURL(url);
-  }, [decodeKeyData, privateKey, publicKey, closeDialog]);
+  }, [decodeKeyData, privateKey, publicKey, closeDialog, t]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>Backup Keys</DialogTitle>
+          <DialogTitle>{t("pkiBackup.title")}</DialogTitle>
           <DialogDescription>
-            Its important to backup your public and private keys and store your
-            backup securely!
+            {t("pkiBackup.secureBackup")}
           </DialogDescription>
           <DialogDescription>
             <span className="font-bold break-before-auto">
-              If you lose your keys, you will need to reset your device.
+              {t("pkiBackup.loseKeysWarning")}
             </span>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-6">
           <Button
             variant="default"
+            name="download"
             onClick={() => createDownloadKeyFile()}
             className=""
           >
             <DownloadIcon size={20} className="mr-2" />
-            Download
+            {t("button.download")}
           </Button>
           <Button variant="default" onClick={() => renderPrintWindow()}>
             <PrinterIcon size={20} className="mr-2" />
-            Print
+            {t("button.print")}
           </Button>
         </DialogFooter>
       </DialogContent>

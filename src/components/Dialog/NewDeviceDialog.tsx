@@ -1,7 +1,7 @@
 import {
   type BrowserFeature,
   useBrowserFeatureDetection,
-} from "../../core/hooks/useBrowserFeatureDetection.ts";
+} from "@core/hooks/useBrowserFeatureDetection.ts";
 import { BLE } from "@components/PageComponents/Connect/BLE.tsx";
 import { HTTP } from "@components/PageComponents/Connect/HTTP.tsx";
 import { Serial } from "@components/PageComponents/Connect/Serial.tsx";
@@ -20,8 +20,9 @@ import {
 } from "@components/UI/Tabs.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { AlertCircle } from "lucide-react";
+import { useMemo } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Link } from "../UI/Typography/Link.tsx";
-import { Fragment } from "react/jsx-runtime";
 
 export interface TabElementProps {
   closeDialog: () => void;
@@ -51,12 +52,18 @@ const links: { [key: string]: string } = {
     "https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts",
 };
 
-const listFormatter = new Intl.ListFormat("en", {
-  style: "long",
-  type: "disjunction",
-});
-
 const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
+  const { i18n } = useTranslation("dialog");
+
+  const listFormatter = useMemo(
+    () =>
+      new Intl.ListFormat(i18n.language, {
+        style: "long",
+        type: "disjunction",
+      }),
+    [i18n.language],
+  );
+
   if (missingFeatures.length === 0) return null;
 
   const browserFeatures = missingFeatures.filter(
@@ -74,9 +81,11 @@ const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
           </Link>
         );
       }
-      return <Fragment key={part.value}>{part.value}</Fragment>;
+      return <span key={part.value}>{part.value}</span>;
     });
   };
+
+  const featureNodes = formatFeatureList(browserFeatures);
 
   return (
     <Subtle className="flex flex-col items-start gap-2 bg-red-500 p-4 rounded-md">
@@ -85,20 +94,28 @@ const ErrorMessage = ({ missingFeatures }: FeatureErrorProps) => {
         <div className="flex flex-col gap-3">
           <p className="text-sm text-white">
             {browserFeatures.length > 0 && (
-              <>
-                This connection type requires{" "}
-                {formatFeatureList(browserFeatures)}. Please use a supported
-                browser, like Chrome or Edge.
-              </>
+              <Trans
+                i18nKey="newDeviceDialog.validation.requiresFeatures"
+                components={{
+                  "0": <>{featureNodes}</>,
+                }}
+              />
             )}
+            {browserFeatures.length > 0 && needsSecureContext && " "}
             {needsSecureContext && (
-              <>
-                {browserFeatures.length > 0 && " Additionally, it"}
-                {browserFeatures.length === 0 && "This application"} requires a
-                {" "}
-                <Link href={links["Secure Context"]}>secure context</Link>.
-                Please connect using HTTPS or localhost.
-              </>
+              <Trans
+                i18nKey={browserFeatures.length > 0
+                  ? "newDeviceDialog.validation.additionallyRequiresSecureContext"
+                  : "newDeviceDialog.validation.requiresSecureContext"}
+                components={{
+                  "0": (
+                    <Link
+                      href={links["Secure Context"]}
+                      className="underline hover:text-slate-200"
+                    />
+                  ),
+                }}
+              />
             )}
           </p>
         </div>
@@ -111,22 +128,23 @@ export const NewDeviceDialog = ({
   open,
   onOpenChange,
 }: NewDeviceProps) => {
+  const { t } = useTranslation("dialog");
   const { unsupported } = useBrowserFeatureDetection();
 
   const tabs: TabManifest[] = [
     {
-      label: "HTTP",
+      label: t("newDeviceDialog.tabHttp"),
       element: HTTP,
       isDisabled: false,
     },
     {
-      label: "Bluetooth",
+      label: t("newDeviceDialog.tabBluetooth"),
       element: BLE,
       isDisabled: unsupported.includes("Web Bluetooth") ||
         unsupported.includes("Secure Context"),
     },
     {
-      label: "Serial",
+      label: t("newDeviceDialog.tabSerial"),
       element: Serial,
       isDisabled: unsupported.includes("Web Serial") ||
         unsupported.includes("Secure Context"),
@@ -138,7 +156,7 @@ export const NewDeviceDialog = ({
       <DialogContent aria-describedby={undefined}>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>Connect New Device</DialogTitle>
+          <DialogTitle>{t("newDeviceDialog.title")}</DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="HTTP">
           <TabsList>
@@ -151,7 +169,8 @@ export const NewDeviceDialog = ({
           {tabs.map((tab) => (
             <TabsContent key={tab.label} value={tab.label}>
               <fieldset disabled={tab.isDisabled}>
-                {(tab.label !== "HTTP" && tab.isDisabled)
+                {(tab.label !== "HTTP" &&
+                    tab.isDisabled)
                   ? <ErrorMessage missingFeatures={unsupported} />
                   : null}
                 <tab.element

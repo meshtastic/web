@@ -3,9 +3,11 @@ import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const Paxcounter = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: PaxcounterValidation) => {
     setWorkingModuleConfig(
@@ -24,23 +26,22 @@ export const Paxcounter = () => {
       defaultValues={moduleConfig.paxcounter}
       fieldGroups={[
         {
-          label: "Paxcounter Settings",
-          description: "Settings for the Paxcounter module",
+          label: t("paxcounter.title"),
+          description: t("paxcounter.description"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Module Enabled",
-              description: "Enable Paxcounter",
+              label: t("paxcounter.enabled.label"),
+              description: t("paxcounter.enabled.description"),
             },
             {
               type: "number",
               name: "paxcounterUpdateInterval",
-              label: "Update Interval (seconds)",
-              description:
-                "How long to wait between sending paxcounter packets",
+              label: t("paxcounter.paxcounterUpdateInterval.label"),
+              description: t("paxcounter.paxcounterUpdateInterval.description"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
               disabledBy: [
                 {
@@ -51,9 +52,8 @@ export const Paxcounter = () => {
             {
               type: "number",
               name: "wifiThreshold",
-              label: "WiFi RSSI Threshold",
-              description:
-                "At what WiFi RSSI level should the counter increase. Defaults to -80.",
+              label: t("paxcounter.wifiThreshold.label"),
+              description: t("paxcounter.wifiThreshold.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -63,9 +63,8 @@ export const Paxcounter = () => {
             {
               type: "number",
               name: "bleThreshold",
-              label: "BLE RSSI Threshold",
-              description:
-                "At what BLE RSSI level should the counter increase. Defaults to -80.",
+              label: t("paxcounter.bleThreshold.label"),
+              description: t("paxcounter.bleThreshold.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",

@@ -1,30 +1,25 @@
-import React from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import type { Page } from "@core/stores/deviceStore.ts";
 import { Spinner } from "@components/UI/Spinner.tsx";
-import { Avatar } from "@components/UI/Avatar.tsx";
 
 import {
   CircleChevronLeft,
-  CpuIcon,
   LayersIcon,
   type LucideIcon,
   MapIcon,
   MessageSquareIcon,
-  PenLine,
-  SearchIcon,
   SettingsIcon,
   UsersIcon,
-  ZapIcon,
 } from "lucide-react";
 import { cn } from "@core/utils/cn.ts";
 import { useSidebar } from "@core/stores/sidebarStore.tsx";
-import ThemeSwitcher from "@components/ThemeSwitcher.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
-import BatteryStatus from "@components/BatteryStatus.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
+import { useTranslation } from "react-i18next";
+import { DeviceInfoPanel } from "./DeviceInfoPanel.tsx";
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -39,7 +34,10 @@ interface NavLink {
 
 const CollapseToggleButton = () => {
   const { isCollapsed, toggleSidebar } = useSidebar();
-  const buttonLabel = isCollapsed ? "Open sidebar" : "Close sidebar";
+  const { t } = useTranslation("ui");
+  const buttonLabel = isCollapsed
+    ? t("sidebar.collapseToggle.button.open")
+    : t("sidebar.collapseToggle.button.close");
 
   return (
     <button
@@ -79,22 +77,47 @@ export const Sidebar = ({ children }: SidebarProps) => {
   const { setCommandPaletteOpen } = useAppStore();
   const myNode = getNode(hardware.myNodeNum);
   const { isCollapsed } = useSidebar();
+  const { t } = useTranslation("ui");
   const myMetadata = metadata.get(0);
 
   const numUnread = [...unreadCounts.values()].reduce((sum, v) => sum + v, 0);
 
+  const [displayedNodeCount, setDisplayedNodeCount] = useState(() =>
+    Math.max(getNodesLength() - 1, 0)
+  );
+
+  const [_, startNodeCountTransition] = useTransition();
+
+  const currentNodeCountValue = Math.max(getNodesLength() - 1, 0);
+
+  useEffect(() => {
+    if (currentNodeCountValue !== displayedNodeCount) {
+      startNodeCountTransition(() => {
+        setDisplayedNodeCount(currentNodeCountValue);
+      });
+    }
+  }, [currentNodeCountValue, displayedNodeCount, startNodeCountTransition]);
+
   const pages: NavLink[] = [
     {
-      name: "Messages",
+      name: t("navigation.messages"),
       icon: MessageSquareIcon,
       page: "messages",
       count: numUnread ? numUnread : undefined,
     },
-    { name: "Map", icon: MapIcon, page: "map" },
-    { name: "Config", icon: SettingsIcon, page: "config" },
-    { name: "Channels", icon: LayersIcon, page: "channels" },
+    { name: t("navigation.map"), icon: MapIcon, page: "map" },
     {
-      name: `Nodes (${Math.max(getNodesLength() - 1, 0)})`,
+      name: t("navigation.config"),
+      icon: SettingsIcon,
+      page: "config",
+    },
+    {
+      name: t("navigation.channels"),
+      icon: LayersIcon,
+      page: "channels",
+    },
+    {
+      name: `${t("navigation.nodes")} (${displayedNodeCount})`,
       icon: UsersIcon,
       page: "nodes",
     },
@@ -119,7 +142,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
       >
         <img
           src="Logo.svg"
-          alt="Meshtastic Logo"
+          alt={t("app.logo")}
           className="size-10 flex-shrink-0 rounded-xl"
         />
         <h2
@@ -131,11 +154,14 @@ export const Sidebar = ({ children }: SidebarProps) => {
               : "opacity-100 max-w-xs visible ml-2",
           )}
         >
-          Meshtastic
+          {t("app.title")}
         </h2>
       </div>
 
-      <SidebarSection label="Navigation" className="mt-4 px-0">
+      <SidebarSection
+        label={t("navigation.title")}
+        className="mt-4 px-0"
+      >
         {pages.map((link) => (
           <SidebarButton
             key={link.name}
@@ -173,94 +199,26 @@ export const Sidebar = ({ children }: SidebarProps) => {
                   isCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
                 )}
               >
-                Loading...
+                {t("loading")}
               </Subtle>
             </div>
           )
           : (
-            <>
-              <div
-                className={cn(
-                  "flex place-items-center gap-2",
-                  isCollapsed && "justify-center",
-                )}
-              >
-                <Avatar
-                  text={myNode.user?.shortName ?? myNode.num.toString()}
-                  className={cn("flex-shrink-0 ml-2", isCollapsed && "ml-0")}
-                  size="sm"
-                />
-                <p
-                  className={cn(
-                    "max-w-[20ch] text-wrap text-sm font-medium",
-                    "transition-all duration-300 ease-in-out overflow-hidden",
-                    isCollapsed
-                      ? "opacity-0 max-w-0 invisible"
-                      : "opacity-100 max-w-full visible",
-                  )}
-                >
-                  {myNode.user?.longName}
-                </p>
-              </div>
-
-              <div
-                className={cn(
-                  "flex flex-col gap-0.5 ml-2 mt-2",
-                  "transition-all duration-300 ease-in-out",
-                  isCollapsed
-                    ? "opacity-0 max-w-0 h-0 invisible"
-                    : "opacity-100 max-w-xs h-auto visible",
-                )}
-              >
-                <div className="inline-flex gap-2">
-                  <BatteryStatus deviceMetrics={myNode.deviceMetrics} />
-                </div>
-                <div className="inline-flex gap-2">
-                  <ZapIcon
-                    size={18}
-                    className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
-                  />
-                  <Subtle>
-                    {myNode.deviceMetrics?.voltage?.toPrecision(3) ?? "UNK"}
-                    {" "}
-                    volts
-                  </Subtle>
-                </div>
-                <div className="inline-flex gap-2">
-                  <CpuIcon
-                    size={18}
-                    className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
-                  />
-                  <Subtle>v{myMetadata?.firmwareVersion ?? "UNK"}</Subtle>
-                </div>
-              </div>
-              <div
-                className={cn(
-                  "flex items-center flex-shrink-0 ml-2",
-                  "transition-all duration-300 ease-in-out",
-                  isCollapsed
-                    ? "opacity-0 max-w-0 invisible pointer-events-none"
-                    : "opacity-100 max-w-xs visible",
-                )}
-              >
-                <button
-                  type="button"
-                  aria-label="Edit device name"
-                  className="p-1 rounded transition-colors hover:text-accent"
-                  onClick={() => setDialogOpen("deviceName", true)}
-                >
-                  <PenLine size={22} />
-                </button>
-                <ThemeSwitcher />
-                <button
-                  type="button"
-                  className="transition-all hover:text-accent"
-                  onClick={() => setCommandPaletteOpen(true)}
-                >
-                  <SearchIcon />
-                </button>
-              </div>
-            </>
+            <DeviceInfoPanel
+              isCollapsed={isCollapsed}
+              setCommandPaletteOpen={() => setCommandPaletteOpen(true)}
+              setDialogOpen={() => setDialogOpen("deviceName", true)}
+              user={{
+                longName: myNode?.user?.longName ?? t("unknown.longName"),
+                shortName: myNode?.user?.shortName ?? t("unknown.shortName"),
+              }}
+              firmwareVersion={myMetadata?.firmwareVersion ??
+                t("unknown.firmwareVersion")}
+              deviceMetrics={{
+                batteryLevel: myNode.deviceMetrics?.batteryLevel,
+                voltage: myNode.deviceMetrics?.voltage,
+              }}
+            />
           )}
       </div>
     </div>

@@ -1,0 +1,162 @@
+{
+  "navigation": {
+    "title": "Navigation",
+    "messages": "Messages",
+    "map": "Map",
+    "config": "Config",
+    "radioConfig": "Radio Config",
+    "moduleConfig": "Module Config",
+    "channels": "Channels",
+    "nodes": "Nodes"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "logo": "Meshtastic Logo"
+  },
+  "sidebar": {
+    "collapseToggle": {
+      "button": {
+        "open": "Open sidebar",
+        "close": "Close sidebar"
+      }
+    },
+    "deviceInfo": {
+      "volts": "{{voltage}} volts",
+      "firmware": {
+        "title": "Firmware",
+        "version": "v{{version}}",
+        "buildDate": "Build date: {{date}}"
+      },
+      "deviceName": {
+        "title": "Device Name",
+        "changeName": "Change Device Name",
+        "placeholder": "Enter device name"
+      },
+      "editDeviceName": "Edit device name"
+    }
+  },
+  "batteryStatus": {
+    "charging": "{{level}}% charging",
+    "pluggedIn": "Plugged in",
+    "title": "Battery"
+  },
+  "search": {
+    "nodes": "Search nodes...",
+    "channels": "Search channels...",
+    "commandPalette": "Search commands..."
+  },
+  "toast": {
+    "positionRequestSent": { "title": "Position request sent." },
+    "requestingPosition": { "title": "Requesting position, please wait..." },
+    "sendingTraceroute": { "title": "Sending Traceroute, please wait..." },
+    "tracerouteSent": { "title": "Traceroute sent." },
+    "savedChannel": { "title": "Saved Channel: {{channelName}}" },
+    "messages": {
+      "pkiEncryption": { "title": "Chat is using PKI encryption." },
+      "pskEncryption": { "title": "Chat is using PSK encryption." }
+    },
+    "configSaveError": {
+      "title": "Error Saving Config",
+      "description": "An error occurred while saving the configuration."
+    },
+    "validationError": {
+      "title": "Config Errors Exist",
+      "description": "Please fix the configuration errors before saving."
+    },
+    "saveSuccess": {
+      "title": "Saving Config",
+      "description": "The configuration change {{case}} has been saved."
+    }
+  },
+  "notifications": {
+    "copied": {
+      "label": "Copied!"
+    },
+    "copyToClipboard": {
+      "label": "Copy to clipboard"
+    },
+    "hidePassword": {
+      "label": "Hide password"
+    },
+    "showPassword": {
+      "label": "Show password"
+    }
+  },
+  "general": {
+    "label": "General"
+  },
+  "hardware": {
+    "label": "Hardware"
+  },
+  "metrics": {
+    "label": "Metrics"
+  },
+  "role": {
+    "label": "Role"
+  },
+  "filter": {
+    "label": "Filter"
+  },
+  "clearInput": {
+    "label": "Clear input"
+  },
+  "resetFilters": {
+    "label": "Reset Filters"
+  },
+  "nodeName": {
+    "label": "Node name/number",
+    "placeholder": "Meshtastic 1234"
+  },
+  "airtimeUtilization": {
+    "label": "Airtime Utilization (%)"
+  },
+  "batteryLevel": {
+    "label": "Battery level (%)",
+    "labelText": "Battery level (%): {{value}}"
+  },
+  "batteryVoltage": {
+    "label": "Battery voltage (V)",
+    "title": "Voltage"
+  },
+  "channelUtilization": {
+    "label": "Channel Utilization (%)"
+  },
+  "hops": {
+    "direct": "Direct",
+    "label": "Number of hops",
+    "text": "Number of hops: {{value}}"
+  },
+  "lastHeard": {
+    "label": "Last heard",
+    "labelText": "Last heard: {{value}}",
+    "nowLabel": "Now"
+  },
+  "snr": {
+    "label": "SNR (db)"
+  },
+  "favorites": {
+    "label": "Favorites"
+  },
+  "hide": {
+    "label": "Hide"
+  },
+  "showOnly": {
+    "label": "Show Only"
+  },
+  "viaMqtt": {
+    "label": "Connected via MQTT"
+  },
+  "language": {
+    "label": "Language",
+    "changeLanguage": "Change Language"
+  },
+  "theme": {
+    "dark": "Dark",
+    "light": "Light",
+    "system": "Automatic",
+    "changeTheme": "Change Color Scheme"
+  },
+  "footer": {
+    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>"
+  }
+}

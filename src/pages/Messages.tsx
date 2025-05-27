@@ -20,6 +20,7 @@ import {
 import { useSidebar } from "@core/stores/sidebarStore.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { randId } from "@core/utils/randId.ts";
+import { useTranslation } from "react-i18next";
 
 type NodeInfoWithUnread = Protobuf.Mesh.NodeInfo & { unreadCount: number };
 
@@ -45,6 +46,7 @@ export const MessagesPage = () => {
   const { toast } = useToast();
   const { isCollapsed } = useSidebar();
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const { t } = useTranslation(["messages", "channels", "ui"]);
   const deferredSearch = useDeferredValue(searchTerm);
 
   const filteredNodes = (): NodeInfoWithUnread[] => {
@@ -163,7 +165,7 @@ export const MessagesPage = () => {
       default:
         return (
           <div className="flex-1 flex items-center justify-center text-slate-500 p-4">
-            Select a channel or node to start messaging.
+            {t("messagesPage.selectChatPrompt")}
           </div>
         );
     }
@@ -171,13 +173,21 @@ export const MessagesPage = () => {
 
   const leftSidebar = useMemo(() => (
     <Sidebar>
-      <SidebarSection label="Channels" className="py-2 px-0">
+      <SidebarSection
+        label={t("navigation.channels")}
+        className="py-2 px-0"
+      >
         {filteredChannels?.map((channel) => (
           <SidebarButton
             key={channel.index}
             count={unreadCounts.get(channel.index)}
             label={channel.settings?.name ||
-              (channel.index === 0 ? "Primary" : `Ch ${channel.index}`)}
+              (channel.index === 0
+                ? t("page.broadcastLabel", { ns: "channels" })
+                : t("page.channelLabel", {
+                  index: channel.index,
+                  ns: "channels",
+                }))}
             active={activeChat === channel.index &&
               chatType === MessageType.Broadcast}
             onClick={() => {
@@ -214,7 +224,7 @@ export const MessagesPage = () => {
         <label className="p-2 block">
           <Input
             type="text"
-            placeholder="Search nodes..."
+            placeholder={t("search.nodes")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             showClearButton={!!searchTerm}
@@ -229,7 +239,8 @@ export const MessagesPage = () => {
             <SidebarButton
               key={node.num}
               preventCollapse
-              label={node.user?.longName ?? `UNK`}
+              label={node.user?.longName ??
+                t("unknown.shortName")}
               count={node.unreadCount > 0 ? node.unreadCount : undefined}
               active={activeChat === node.num &&
                 chatType === MessageType.Direct}
@@ -240,7 +251,8 @@ export const MessagesPage = () => {
               }}
             >
               <Avatar
-                text={node.user?.shortName ?? "UNK"}
+                text={node.user?.shortName ??
+                  t("unknown.shortName")}
                 className={cn(hasNodeError(node.num) && "text-red-500")}
                 showError={hasNodeError(node.num)}
                 showFavorite={node.isFavorite}
@@ -262,14 +274,15 @@ export const MessagesPage = () => {
       hasNodeError,
     ],
   );
+
   return (
     <PageLayout
       label={`Messages: ${
         isBroadcast && currentChannel
           ? getChannelName(currentChannel)
           : isDirect && otherNode
-          ? (otherNode.user?.longName ?? "Unknown")
-          : "Select a Chat"
+          ? (otherNode.user?.longName ?? t("unknown.longName"))
+          : t("emptyState.title")
       }`}
       rightBar={rightSidebar}
       leftBar={leftSidebar}
@@ -284,8 +297,8 @@ export const MessagesPage = () => {
             onClick() {
               toast({
                 title: otherNode.user?.publicKey?.length
-                  ? "Chat is using PKI encryption."
-                  : "Chat is using PSK encryption.",
+                  ? t("toast.pkiEncryption")
+                  : t("toast.pskEncryption"),
               });
             },
           },
@@ -306,7 +319,7 @@ export const MessagesPage = () => {
             )
             : (
               <div className="p-4 text-center text-slate-400 italic">
-                Select a chat to send a message.
+                {t("messagesPage.sendMessagePrompt")}
               </div>
             )}
         </div>

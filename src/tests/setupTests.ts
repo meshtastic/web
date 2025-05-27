@@ -3,6 +3,18 @@ import { cleanup } from "@testing-library/react";
 import { enableMapSet } from "immer";
 import "@testing-library/jest-dom";
 import "@testing-library/user-event";
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import channelsEN from "@app/i18n/locales/en/channels.json";
+import commandPaletteEN from "@app/i18n/locales/en/commandPalette.json";
+import commonEN from "@app/i18n/locales/en/common.json";
+import deviceConfigEN from "@app/i18n/locales/en/deviceConfig.json";
+import moduleConfigEN from "@app/i18n/locales/en/moduleConfig.json";
+import dashboardEN from "@app/i18n/locales/en/dashboard.json";
+import dialogEN from "@app/i18n/locales/en/dialog.json";
+import messagesEN from "@app/i18n/locales/en/messages.json";
+import nodesEN from "@app/i18n/locales/en/nodes.json";
+import uiEN from "@app/i18n/locales/en/ui.json";
 
 enableMapSet();
 
@@ -14,11 +26,64 @@ vi.mock("idb-keyval", () => ({
   keys: vi.fn(() => Promise.resolve([])),
   createStore: vi.fn(() => ({})),
 }));
+
 globalThis.ResizeObserver = class {
   observe() {}
   unobserve() {}
   disconnect() {}
 };
+
+const appNamespaces = [
+  "channels",
+  "commandPalette",
+  "common",
+  "deviceConfig",
+  "moduleConfig",
+  "dashboard",
+  "dialog",
+  "messages",
+  "nodes",
+  "ui",
+];
+const appFallbackNS = ["common", "ui", "dialog"];
+const appDefaultNS = "common";
+
+i18n
+  .use(initReactI18next)
+  .init({
+    lng: "en",
+    fallbackLng: "en",
+
+    ns: appNamespaces,
+    defaultNS: appDefaultNS,
+    fallbackNS: appFallbackNS,
+
+    supportedLngs: ["en"],
+
+    resources: {
+      en: {
+        channels: channelsEN,
+        commandPalette: commandPaletteEN,
+        common: commonEN,
+        deviceConfig: deviceConfigEN,
+        moduleConfig: moduleConfigEN,
+        dashboard: dashboardEN,
+        dialog: dialogEN,
+        messages: messagesEN,
+        nodes: nodesEN,
+        ui: uiEN,
+      },
+    },
+
+    interpolation: {
+      escapeValue: false,
+    },
+
+    react: {
+      useSuspense: false,
+    },
+    debug: false,
+  });
 
 afterEach(() => {
   cleanup();

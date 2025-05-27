@@ -1,15 +1,19 @@
 import {
   type ComponentProps,
   ReactNode,
+  useCallback,
   useEffect,
   useRef,
   useState,
 } from "react";
+
 import { Protobuf } from "@meshtastic/core";
+import { FunnelIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
+
 import { debounce } from "@core/utils/debounce.ts";
 import { cn } from "@core/utils/cn.ts";
-import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
 
 import {
   Popover,
@@ -18,14 +22,19 @@ import {
 } from "@components/UI/Popover.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Accordion } from "@components/UI/Accordion.tsx";
-import { FunnelIcon } from "lucide-react";
 
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import {
   FilterAccordionItem,
   FilterMulti,
   FilterSlider,
   FilterToggle,
 } from "@components/generic/Filter/FilterComponents.tsx";
+
+import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
+
+const DEBOUNCE_DELAY_MS = 250;
+const BATTERY_STATUS_PLUGGED_IN_VALUE = 101;
 
 type PopoverContentProps = ComponentProps<typeof PopoverContent>;
 
@@ -40,8 +49,91 @@ interface FilterControlProps {
     popoverTriggerClassName?: string;
     showTextSearch?: boolean;
   };
-
   children?: ReactNode;
+}
+
+interface HopsLabelProps {
+  hopsAway: number[];
+  t: TFunction<"ui", undefined>;
+}
+function HopsLabelContent({ hopsAway, t }: HopsLabelProps) {
+  const startHops = hopsAway[0];
+  const endHops = hopsAway[1];
+
+  return (
+    <>
+      {t("hops.text", {
+        value: startHops === 0 ? t("hops.direct") : startHops,
+      })}
+      {startHops !== endHops ? ` — ${endHops}` : ""}
+    </>
+  );
+}
+
+interface LastHeardLabelProps {
+  lastHeardRange: number[];
+  defaultMaxLastHeard: number;
+  formatTS: (ts: number) => ReactNode;
+  t: TFunction<"ui", undefined>;
+}
+function LastHeardLabelContent(
+  { lastHeardRange, defaultMaxLastHeard, formatTS, t }: LastHeardLabelProps,
+) {
+  const [start, end] = lastHeardRange;
+  return (
+    <>
+      {t("lastHeard.labelText", { value: "" })}
+      <br />
+      {start === 0
+        ? (
+          t("lastHeard.nowLabel")
+        )
+        : (
+          <>
+            {start === defaultMaxLastHeard && ">"}
+            {formatTS(start)}
+          </>
+        )}
+      {start !== end && (
+        <>
+          {" — "}
+          {end === defaultMaxLastHeard && ">"}
+          {formatTS(end)}
+        </>
+      )}
+    </>
+  );
+}
+
+interface BatteryLevelLabelProps {
+  batteryLevelRange: (number | undefined)[];
+  t: TFunction<"ui", undefined>;
+}
+function BatteryLevelLabelContent(
+  { batteryLevelRange, t }: BatteryLevelLabelProps,
+) {
+  const [start, end] = batteryLevelRange;
+
+  const formatBatteryValue = (value: number | undefined) => {
+    if (value === undefined) return "";
+    return value === BATTERY_STATUS_PLUGGED_IN_VALUE
+      ? t("batteryStatus.pluggedIn")
+      : `${value}%`;
+  };
+
+  return (
+    <>
+      {t("batteryLevel.labelText", {
+        value: formatBatteryValue(start),
+      })}
+      {start !== end && typeof end !== "undefined" && (
+        <>
+          {" – "}
+          {formatBatteryValue(end)}
+        </>
+      )}
+    </>
+  );
 }
 
 export function FilterControl({
@@ -52,69 +144,78 @@ export function FilterControl({
   parameters,
   children,
 }: FilterControlProps) {
-  // Copy of the state that we only use for rendering sliders and their labels directly, rest is debounced
+  const { t } = useTranslation("ui");
   const [localFilterState, setLocalFilterState] = useState(filterState);
-  const skipNextSync = useRef(false);
+  const skipNextFilterStateSync = useRef(false);
+
   useEffect(() => {
-    if (skipNextSync.current) {
-      skipNextSync.current = false;
+    if (skipNextFilterStateSync.current) {
+      skipNextFilterStateSync.current = false;
       return;
     }
     setLocalFilterState(filterState);
   }, [filterState]);
 
-  const handleTextChange =
+  const handleTextChange = useCallback(
     <K extends keyof FilterState>(key: K) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setFilterState((prev) => ({
         ...prev,
         [key]: e.target.value,
       }));
-    };
-  const handleRangeChange =
+    },
+    [setFilterState],
+  );
+
+  const debouncedSetFilterState = useCallback(
+    debounce(<K extends keyof FilterState>(key: K, value: number[]) => {
+      skipNextFilterStateSync.current = true;
+      setFilterState((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
+    }, DEBOUNCE_DELAY_MS),
+    [setFilterState],
+  );
+
+  const handleRangeChange = useCallback(
     <K extends keyof FilterState>(key: K) => (value: number[]) => {
-      // immediate slider update
       setLocalFilterState((prev) => ({
         ...prev,
         [key]: value,
       }));
+      debouncedSetFilterState(key, value);
+    },
+    [debouncedSetFilterState],
+  );
 
-      // debounced write to filterState (table/map render)
-      debounce(
-        () => {
-          skipNextSync.current = true;
-          setFilterState((prev) => ({
-            ...prev,
-            [key]: value,
-          }));
-        },
-        250,
-      )();
-    };
-  const handleBoolChange = <K extends keyof FilterState>(
-    key: K,
-    value: string,
-  ) => {
-    const typedValue = value === ""
-      ? undefined
-      : JSON.parse(value.toLowerCase());
+  const handleBoolChange = useCallback(
+    <K extends keyof FilterState>(key: K, value: string) => {
+      const typedValue = value === ""
+        ? undefined
+        : JSON.parse(value.toLowerCase());
 
-    setFilterState((prev) => ({
-      ...prev,
-      [key]: typedValue,
-    }));
-  };
+      setFilterState((prev) => ({
+        ...prev,
+        [key]: typedValue,
+      }));
+    },
+    [setFilterState],
+  );
 
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setFilterState(defaultFilterValues);
-  };
+  }, [defaultFilterValues, setFilterState]);
 
-  function formatTS(ts: number): ReactNode {
-    return <TimeAgo timestamp={Date.now() - ts * 1000} />;
-  }
-  function formatEnumLabel(label: string): string {
-    return label.replace(/_/g, " ");
-  }
+  const formatTS = useCallback(
+    (ts: number): ReactNode => <TimeAgo timestamp={Date.now() - ts * 1000} />,
+    [],
+  );
+
+  const formatEnumLabel = useCallback(
+    (label: string): string => label.replace(/_/g, " "),
+    [],
+  );
 
   return (
     <Popover>
@@ -130,7 +231,7 @@ export function FilterControl({
               : "",
             parameters?.popoverTriggerClassName,
           )}
-          aria-label="Filter"
+          aria-label={t("filter.label")}
         >
           {parameters?.triggerIcon ?? <FunnelIcon />}
         </button>
@@ -145,135 +246,112 @@ export function FilterControl({
         <form className="space-y-4">
           <Accordion
             type="single"
-            defaultValue="General"
+            defaultValue={t("general.label")}
             collapsible
           >
-            <FilterAccordionItem label="General">
+            <FilterAccordionItem label={t("general.label")}>
               {(parameters?.showTextSearch ?? true) && (
                 <div className="flex flex-col space-y-1 pb-2">
                   <label htmlFor="nodeName" className="font-medium text-sm">
-                    Node name/number
+                    {t("nodeName.label")}
                   </label>
                   <Input
                     type="text"
+                    id="nodeName"
                     value={filterState.nodeName}
                     onChange={handleTextChange("nodeName")}
                     showClearButton
-                    placeholder="Meshtastic 1234"
+                    placeholder={t("nodeName.placeholder")}
                   />
                 </div>
               )}
-
               <FilterSlider
-                label="Number of hops"
+                label={t("hops.label")}
                 filterKey="hopsAway"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
-                  <>
-                    Number of hops: {localFilterState.hopsAway[0] === 0
-                      ? "Direct"
-                      : localFilterState.hopsAway[0]}
-                    {localFilterState.hopsAway[0] !==
-                        localFilterState.hopsAway[1]
-                      ? " — " + localFilterState.hopsAway[1]
-                      : ""}
-                  </>
+                  <HopsLabelContent
+                    hopsAway={localFilterState.hopsAway}
+                    t={t}
+                  />
                 }
               />
-
               <FilterSlider
-                label="Last heard"
+                label={t("lastHeard.label")}
                 filterKey="lastHeard"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
-                  <>
-                    Last heard: <br />
-                    {localFilterState.lastHeard[0] === 0 ? "Now" : (
-                      <>
-                        {localFilterState.lastHeard[0] ===
-                            defaultFilterValues.lastHeard[1] && ">"}
-                        {formatTS(localFilterState.lastHeard[0])}
-                      </>
-                    )}
-                    {localFilterState.lastHeard[0] !==
-                        localFilterState.lastHeard[1] && (
-                      <>
-                        {" — "}
-                        {localFilterState.lastHeard[1] ===
-                            defaultFilterValues.lastHeard[1] && ">"}
-                        {formatTS(localFilterState.lastHeard[1])}
-                      </>
-                    )}
-                  </>
+                  <LastHeardLabelContent
+                    lastHeardRange={localFilterState.lastHeard}
+                    defaultMaxLastHeard={defaultFilterValues.lastHeard[1]}
+                    formatTS={formatTS}
+                    t={t}
+                  />
                 }
               />
               <FilterToggle
-                label="Favorites"
+                label={t("favorites.label")}
                 filterKey="isFavorite"
-                alternativeLabels={["Hide", "Show Only"]}
+                alternativeLabels={[
+                  t("hide.label"),
+                  t("showOnly.label"),
+                ]}
                 filterState={filterState}
                 onChange={handleBoolChange}
               />
               <FilterToggle
-                label="Connected via MQTT"
+                label={t("viaMqtt.label")}
                 filterKey="viaMqtt"
-                alternativeLabels={["Hide", "Show Only"]}
+                alternativeLabels={[
+                  t("hide.label"),
+                  t("showOnly.label"),
+                ]}
                 filterState={filterState}
                 onChange={handleBoolChange}
               />
             </FilterAccordionItem>
 
-            <FilterAccordionItem label="Metrics">
+            <FilterAccordionItem label={t("metrics.label")}>
               <FilterSlider
-                label="SNR (db)"
+                label={t("snr.label")}
                 filterKey="snr"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
-                label="Channel Utilization (%)"
+                label={t("channelUtilization.label")}
                 filterKey="channelUtilization"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
-                label="Airtime Utilization (%)"
+                label={t("airtimeUtilization.label")}
                 filterKey="airUtilTx"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
               />
               <FilterSlider
-                label="Battery level (%)"
+                label={t("batteryLevel.label")}
                 filterKey="batteryLevel"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
-                  <>
-                    Battery level (%): {localFilterState.batteryLevel[0] === 101
-                      ? "Plugged in"
-                      : localFilterState.batteryLevel[0]}
-                    {localFilterState.batteryLevel[0] !==
-                        localFilterState.batteryLevel[1] && (
-                      <>
-                        {" – "}
-                        {localFilterState.batteryLevel[1] === 101
-                          ? "Plugged in"
-                          : localFilterState.batteryLevel[1]}
-                      </>
-                    )}
-                  </>
+                  <BatteryLevelLabelContent
+                    batteryLevelRange={localFilterState.batteryLevel}
+                    t={t}
+                  />
                 }
               />
               <FilterSlider
-                label="Battery voltage (V)"
+                label={t("batteryVoltage.label")}
                 filterKey="voltage"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
@@ -281,30 +359,29 @@ export function FilterControl({
               />
             </FilterAccordionItem>
 
-            <FilterAccordionItem label="Role">
+            <FilterAccordionItem label={t("role.label")}>
               <FilterMulti
                 filterKey="role"
                 filterState={filterState}
                 setFilterState={setFilterState}
-                options={Object.values(Protobuf.Config.Config_DeviceConfig_Role)
-                  .filter(
-                    (v): v is number => typeof v === "number",
-                  )}
+                options={Object.values(
+                  Protobuf.Config.Config_DeviceConfig_Role,
+                ).filter((v): v is number => typeof v === "number")}
                 getLabel={(val) =>
                   formatEnumLabel(
                     Protobuf.Config.Config_DeviceConfig_Role[val],
                   )}
               />
             </FilterAccordionItem>
-            <FilterAccordionItem label="Hardware">
+
+            <FilterAccordionItem label={t("hardware.label")}>
               <FilterMulti
                 filterKey="hwModel"
                 filterState={filterState}
                 setFilterState={setFilterState}
-                options={Object.values(Protobuf.Mesh.HardwareModel)
-                  .filter(
-                    (v): v is number => typeof v === "number",
-                  )}
+                options={Object.values(Protobuf.Mesh.HardwareModel).filter(
+                  (v): v is number => typeof v === "number",
+                )}
                 getLabel={(val) =>
                   formatEnumLabel(Protobuf.Mesh.HardwareModel[val])}
               />
@@ -313,15 +390,11 @@ export function FilterControl({
           <button
             type="button"
             onClick={resetFilters}
-            className="w-full py-1 shadow-sm hover:shadow-md bg-slate-600 dark:bg-slate-900 text-white rounded text-sm  hover:text-slate-100 hover:bg-slate-700 active:bg-slate-950"
+            className="w-full py-1 shadow-sm hover:shadow-md bg-slate-600 dark:bg-slate-900 text-white rounded text-sm hover:text-slate-100 hover:bg-slate-700 active:bg-slate-950"
           >
-            Reset Filters
+            {t("button.reset")}
           </button>
-          {children && (
-            <div className="mt-4 border-t pt-4">
-              {children}
-            </div>
-          )}
+          {children && <div className="mt-4 border-t pt-4">{children}</div>}
         </form>
       </PopoverContent>
     </Popover>

@@ -5,6 +5,7 @@ import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export const Bluetooth = () => {
   const { config, setWorkingConfig } = useDevice();
@@ -16,6 +17,7 @@ export const Bluetooth = () => {
     removeError,
     clearErrors,
   } = useAppStore();
+  const { t } = useTranslation("deviceConfig");
 
   const [bluetoothPin, setBluetoothPin] = useState(
     config?.bluetooth?.fixedPin.toString() ?? "",
@@ -24,7 +26,7 @@ export const Bluetooth = () => {
   const validateBluetoothPin = (pin: string) => {
     // if empty show error they need a pin set
     if (pin === "") {
-      return addError("fixedPin", "Bluetooth Pin is required");
+      return addError("fixedPin", t("bluetooth.validation.pinRequired"));
     }
 
     // clear any existing errors
@@ -32,11 +34,14 @@ export const Bluetooth = () => {
 
     // if it starts with 0 show error
     if (pin[0] === "0") {
-      return addError("fixedPin", "Bluetooth Pin cannot start with 0");
+      return addError(
+        "fixedPin",
+        t("bluetooth.validation.pinCannotStartWithZero"),
+      );
     }
     // if it's not 6 digits show error
     if (pin.length < 6) {
-      return addError("fixedPin", "Pin must be 6 digits");
+      return addError("fixedPin", t("bluetooth.validation.pinMustBeSixDigits"));
     }
 
     removeError("fixedPin");
@@ -69,22 +74,21 @@ export const Bluetooth = () => {
       defaultValues={config.bluetooth}
       fieldGroups={[
         {
-          label: "Bluetooth Settings",
-          description: "Settings for the Bluetooth module ",
-          notes:
-            "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+          label: t("bluetooth.title"),
+          description: t("bluetooth.description"),
+          notes: t("bluetooth.note"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Enabled",
-              description: "Enable or disable Bluetooth",
+              label: t("bluetooth.enabled.label"),
+              description: t("bluetooth.enabled.description"),
             },
             {
               type: "select",
               name: "mode",
-              label: "Pairing mode",
-              description: "Pin selection behaviour.",
+              label: t("bluetooth.pairingMode.label"),
+              description: t("bluetooth.pairingMode.description"),
               selectChange: (e) => {
                 if (e !== "1") {
                   setBluetoothPin("");
@@ -104,8 +108,8 @@ export const Bluetooth = () => {
             {
               type: "number",
               name: "fixedPin",
-              label: "Pin",
-              description: "Pin to use when pairing",
+              label: t("bluetooth.pin.label"),
+              description: t("bluetooth.pin.description"),
               validationText: hasFieldError("fixedPin")
                 ? getErrorMessage("fixedPin")
                 : "",

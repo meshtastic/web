@@ -10,11 +10,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { Label } from "@components/UI/Label.tsx";
 import { Protobuf } from "@meshtastic/core";
 import { useForm } from "react-hook-form";
 import { GenericInput } from "@components/Form/FormInput.tsx";
+import { useTranslation } from "react-i18next";
 import { validateMaxByteLength } from "@core/utils/string.ts";
+import { Label } from "../UI/Label.tsx";
 
 export interface User {
   longName: string;
@@ -32,12 +33,13 @@ export const DeviceNameDialog = ({
   open,
   onOpenChange,
 }: DeviceNameDialogProps) => {
+  const { t } = useTranslation("dialog");
   const { hardware, getNode, connection } = useDevice();
   const myNode = getNode(hardware.myNodeNum);
 
   const defaultValues = {
-    longName: myNode?.user?.longName ?? "Unknown",
-    shortName: myNode?.user?.shortName ?? "??",
+    longName: myNode?.user?.longName ?? t("unknown.longName"),
+    shortName: myNode?.user?.shortName ?? t("unknown.shortName"),
   };
 
   const { getValues, setValue, reset, control, handleSubmit } = useForm<User>({
@@ -74,19 +76,21 @@ export const DeviceNameDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>Change Device Name</DialogTitle>
+          <DialogTitle>{t("deviceName.title")}</DialogTitle>
           <DialogDescription>
-            The Device will restart once the config is saved.
+            {t("deviceName.description")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <div>
-            <Label htmlFor="longName">Long Name</Label>
+            <Label htmlFor="longName">
+              {t("deviceName.longName")}
+            </Label>
             <GenericInput
               control={control}
               field={{
                 name: "longName",
-                label: "Long Name",
+                label: t("deviceName.longName"),
                 type: "text",
                 properties: {
                   className: "text-slate-900 dark:text-slate-200",
@@ -100,12 +104,14 @@ export const DeviceNameDialog = ({
             />
           </div>
           <div>
-            <Label htmlFor="shortName">Short Name</Label>
+            <Label htmlFor="shortName">
+              {t("deviceName.shortName")}
+            </Label>
             <GenericInput
               control={control}
               field={{
                 name: "shortName",
-                label: "Short Name",
+                label: t("deviceName.shortName"),
                 type: "text",
                 properties: {
                   fieldLength: {
@@ -119,10 +125,15 @@ export const DeviceNameDialog = ({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="destructive" onClick={handleReset}>
-              Reset
+            <Button
+              type="button"
+              variant="destructive"
+              name="reset"
+              onClick={handleReset}
+            >
+              {t("button.reset")}
             </Button>
-            <Button type="submit">Save</Button>
+            <Button type="submit" name="save">{t("button.save")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

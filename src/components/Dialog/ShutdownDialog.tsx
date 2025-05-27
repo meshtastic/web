@@ -10,6 +10,7 @@ import {
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { ClockIcon, PowerIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 export interface ShutdownDialogProps {
@@ -21,6 +22,7 @@ export const ShutdownDialog = ({
   open,
   onOpenChange,
 }: ShutdownDialogProps) => {
+  const { t } = useTranslation("dialog");
   const { connection } = useDevice();
 
   const [time, setTime] = useState<number>(5);
@@ -30,9 +32,11 @@ export const ShutdownDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>Schedule Shutdown</DialogTitle>
+          <DialogTitle>
+            {t("shutdown.title")}
+          </DialogTitle>
           <DialogDescription>
-            Turn off the connected node after x minutes.
+            {t("shutdown.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -41,7 +45,7 @@ export const ShutdownDialog = ({
             type="number"
             value={time}
             onChange={(e) => setTime(Number.parseInt(e.target.value))}
-            suffix="Minutes"
+            suffix={t("unit.minute.plural")}
           />
           <Button
             className="w-24"
@@ -53,12 +57,13 @@ export const ShutdownDialog = ({
           </Button>
           <Button
             className="w-24"
+            name="now"
             onClick={() => {
               connection?.shutdown(2).then(() => () => onOpenChange(false));
             }}
           >
             <PowerIcon className="mr-2" size={16} />
-            Now
+            {t("button.now")}
           </Button>
         </div>
       </DialogContent>

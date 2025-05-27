@@ -1,20 +1,35 @@
-import { useTheme } from "../core/hooks/useTheme.ts";
-import { cn } from "../core/utils/cn.ts";
+import { useTheme } from "@core/hooks/useTheme.ts";
+import { cn } from "@core/utils/cn.ts";
 import { Monitor, Moon, Sun } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Subtle } from "./UI/Typography/Subtle.tsx";
+import { Button } from "./UI/Button.tsx";
 
 type ThemePreference = "light" | "dark" | "system";
 
-export default function ThemeSwitcher({
-  className = "",
-}: {
+interface ThemeSwitcherProps {
   className?: string;
-}) {
+  disableHover?: boolean;
+}
+
+export default function ThemeSwitcher({
+  className: passedClassName = "",
+  disableHover = false,
+}: ThemeSwitcherProps) {
   const { preference, setPreference } = useTheme();
+  const { t } = useTranslation("ui");
+
+  const iconBaseClass =
+    "size-4 flex-shrink-0 text-gray-500 dark:text-gray-400 transition-colors duration-150";
+  const iconHoverClass = !disableHover
+    ? "group-hover:text-gray-700 dark:group-hover:text-gray-200"
+    : "";
+  const combinedIconClass = cn(iconBaseClass, iconHoverClass);
 
   const themeIcons = {
-    light: <Sun className="size-6" />,
-    dark: <Moon className="size-6" />,
-    system: <Monitor className="size-6" />,
+    light: <Sun className={combinedIconClass} />,
+    dark: <Moon className={combinedIconClass} />,
+    system: <Monitor className={combinedIconClass} />,
   };
 
   const toggleTheme = () => {
@@ -24,26 +39,55 @@ export default function ThemeSwitcher({
     setPreference(nextPreference);
   };
 
-  const [firstCharOfPreference = "", ...restOfPreference] = preference;
+  const preferenceDisplayMap: Record<ThemePreference, string> = {
+    light: t("theme.light"),
+    dark: t("theme.dark"),
+    system: t("theme.system"),
+  };
+
+  const currentDisplayPreference = preferenceDisplayMap[preference];
 
   return (
-    <button
-      type="button"
-      className={cn(
-        "transition-all duration-300 scale-100 cursor-pointer m-3 p-2 focus:*:data-label:opacity-100",
-        className,
-      )}
+    <Button
+      variant="ghost"
       onClick={toggleTheme}
-      aria-description="Change current theme"
+      id="theme-switcher"
+      aria-label={t("theme.changeTheme")}
+      className={cn(
+        "group relative flex justify-start",
+        "gap-2.5 p-1.5 rounded-md transition-colors duration-150",
+        "cursor-pointer",
+        !disableHover && "hover:bg-gray-100 dark:hover:bg-gray-700",
+        "focus:*:data-label:opacity-100",
+        passedClassName,
+      )}
     >
       <span
-        data-label
-        className="transition-all block absolute w-full mb-auto mt-auto ml-0 mr-0 text-xs left-0 -top-3 opacity-0 rounded-lg"
+        data-label="theme-preference-tooltip"
+        className={cn(
+          "transition-opacity duration-150",
+          "block absolute w-max max-w-xs",
+          "p-1 text-xs text-white dark:text-black bg-black dark:bg-white",
+          "rounded-md shadow-lg",
+          "left-1/2 -translate-x-1/2 -top-8",
+          "opacity-0",
+        )}
       >
-        {firstCharOfPreference.toLocaleUpperCase() +
-          (restOfPreference ?? []).join("")}
+        {currentDisplayPreference}
       </span>
+
       {themeIcons[preference]}
-    </button>
+      <Subtle
+        className={cn(
+          "text-sm",
+          "text-gray-600 dark:text-gray-300",
+          "transition-colors duration-150",
+          !disableHover &&
+            "group-hover:text-gray-800 dark:group-hover:text-gray-100",
+        )}
+      >
+        {t("theme.changeTheme")}
+      </Subtle>
+    </Button>
   );
 }

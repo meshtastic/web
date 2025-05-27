@@ -1,4 +1,4 @@
-name: Update Stable Branch from Master on Latest Release
+name: Update Stable Branch from Main on Latest Release
 
 on:
   release:
@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   update-stable-branch:
-    name: Update Stable Branch from Master
+    name: Update Stable Branch from Main 
     runs-on: ubuntu-latest
 
     steps:
@@ -24,14 +24,14 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Fetch latest master and stable branches
+      - name: Fetch latest main and stable branches
         run: |
-          git fetch origin master:master
+          git fetch origin main:main
           git fetch origin stable:stable || echo "Stable branch not found remotely, will create."
 
-      - name: Get latest master commit SHA
-        id: get_master_sha
-        run: echo "MASTER_SHA=$(git rev-parse master)" >> $GITHUB_ENV
+      - name: Get latest main commit SHA
+        id: get_main_sha
+        run: echo "MAIN_SHA=$(git rev-parse main)" >> $GITHUB_ENV
 
       - name: Check out stable branch
         run: |
@@ -39,12 +39,12 @@ jobs:
             git checkout stable
             git pull origin stable # Sync with remote stable if it exists
           else
-            echo "Creating local stable branch based on master HEAD."
-            git checkout -b stable ${{ env.MASTER_SHA }}
+            echo "Creating local stable branch based on main HEAD."
+            git checkout -b stable ${{ env.MAIN_SHA }}
           fi
 
-      - name: Reset stable branch to latest master
-        run: git reset --hard ${{ env.MASTER_SHA }}
+      - name: Reset stable branch to latest main 
+        run: git reset --hard ${{ env.MAIN_SHA }}
 
       - name: Force push stable branch
         run: git push origin stable --force
