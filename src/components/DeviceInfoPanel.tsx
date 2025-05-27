@@ -17,7 +17,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import ThemeSwitcher from "./ThemeSwitcher.tsx";
 import LanguageSwitcher from "./LanguageSwitcher.tsx";
-import { Code } from "./UI/Typography/Code.tsx";
 
 interface DeviceInfoPanelProps {
   isCollapsed: boolean;

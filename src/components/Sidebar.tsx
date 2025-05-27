@@ -7,7 +7,6 @@ import { Spinner } from "@components/UI/Spinner.tsx";
 
 import {
   CircleChevronLeft,
-  CpuIcon,
   LayersIcon,
   type LucideIcon,
   MapIcon,

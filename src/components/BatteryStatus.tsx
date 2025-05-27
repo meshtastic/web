@@ -6,7 +6,6 @@ import {
   PlugZapIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { DeviceMetrics } from "./types.ts";
 
 interface BatteryStateConfig {
