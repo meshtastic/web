@@ -11,10 +11,10 @@ const Serial_ModeEnum = z.enum(
 export const SerialValidationSchema = z.object({
   enabled: z.boolean(),
   echo: z.boolean(),
-  rxd: z.int(),
-  txd: z.int(),
+  rxd: z.coerce.number().int().min(0),
+  txd: z.coerce.number().int().min(0),
   baud: Serial_BaudEnum,
-  timeout: z.int(),
+  timeout: z.coerce.number().int().min(0),
   mode: Serial_ModeEnum,
   overrideConsoleSerialPort: z.boolean(),
 });

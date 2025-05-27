@@ -10,20 +10,12 @@ import {
   convertIpAddressToInt,
 } from "@core/utils/ip.ts";
 import { Protobuf } from "@meshtastic/core";
-import { validateSchema } from "@app/validation/validate.ts";
 import { useTranslation } from "react-i18next";
 
 export const Network = () => {
   const { config, setWorkingConfig } = useDevice();
   const { t } = useTranslation("deviceConfig");
-
   const onSubmit = (data: NetworkValidation) => {
-    const result = validateSchema(NetworkValidationSchema, data);
-
-    if (!result.success) {
-      console.error("Validation errors:", result.errors);
-    }
-
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
@@ -48,6 +40,8 @@ export const Network = () => {
   return (
     <DynamicForm<NetworkValidation>
       onSubmit={onSubmit}
+      validationSchema={NetworkValidationSchema}
+      formId="Config_NetworkConfig"
       defaultValues={{
         ...config.network,
         ipv4Config: {

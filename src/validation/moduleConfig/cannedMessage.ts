@@ -7,15 +7,15 @@ const InputEventCharEnum = z.enum(
 
 export const CannedMessageValidationSchema = z.object({
   rotary1Enabled: z.boolean(),
-  inputbrokerPinA: z.int(),
-  inputbrokerPinB: z.int(),
-  inputbrokerPinPress: z.int(),
+  inputbrokerPinA: z.coerce.number().int().min(0),
+  inputbrokerPinB: z.coerce.number().int().min(0),
+  inputbrokerPinPress: z.coerce.number().int().min(0),
   inputbrokerEventCw: InputEventCharEnum,
   inputbrokerEventCcw: InputEventCharEnum,
   inputbrokerEventPress: InputEventCharEnum,
   updown1Enabled: z.boolean(),
   enabled: z.boolean(),
-  allowInputSource: z.string().min(2).max(30),
+  allowInputSource: z.string().max(30),
   sendBell: z.boolean(),
 });
 

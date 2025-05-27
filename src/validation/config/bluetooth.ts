@@ -8,7 +8,7 @@ const PairingModeEnum = z.enum(
 export const BluetoothValidationSchema = z.object({
   enabled: z.boolean(),
   mode: PairingModeEnum,
-  fixedPin: z.int(),
+  fixedPin: z.coerce.number().int().min(100000).max(999999),
 });
 
 export type BluetoothValidation = z.infer<typeof BluetoothValidationSchema>;

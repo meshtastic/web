@@ -1,4 +1,7 @@
-import type { SerialValidation } from "@app/validation/moduleConfig/serial.ts";
+import {
+  type SerialValidation,
+  SerialValidationSchema,
+} from "@app/validation/moduleConfig/serial.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const Serial = () => {
   return (
     <DynamicForm<SerialValidation>
       onSubmit={onSubmit}
+      validationSchema={SerialValidationSchema}
+      formId="ModuleConfig_SerialConfig"
       defaultValues={moduleConfig.serial}
       fieldGroups={[
         {

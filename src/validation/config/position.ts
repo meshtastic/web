@@ -6,16 +6,16 @@ const GpsModeEnum = z.enum(
 );
 
 export const PositionValidationSchema = z.object({
-  positionBroadcastSecs: z.int(),
+  positionBroadcastSecs: z.coerce.number().int().min(0),
   positionBroadcastSmartEnabled: z.boolean(),
   fixedPosition: z.boolean(),
-  gpsUpdateInterval: z.int(),
-  positionFlags: z.int(),
-  rxGpio: z.int(),
-  txGpio: z.int(),
-  broadcastSmartMinimumDistance: z.int(),
-  broadcastSmartMinimumIntervalSecs: z.int(),
-  gpsEnGpio: z.int(),
+  gpsUpdateInterval: z.coerce.number().int().min(0),
+  positionFlags: z.coerce.number().int().min(0),
+  rxGpio: z.coerce.number().int().min(0),
+  txGpio: z.coerce.number().int().min(0),
+  broadcastSmartMinimumDistance: z.coerce.number().int().min(0),
+  broadcastSmartMinimumIntervalSecs: z.coerce.number().int().min(0),
+  gpsEnGpio: z.coerce.number().int().min(0),
   gpsMode: GpsModeEnum,
 });
 

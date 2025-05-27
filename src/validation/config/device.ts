@@ -11,16 +11,15 @@ const RebroadcastModeEnum = z.enum(
 export const DeviceValidationSchema = z.object({
   role: RoleEnum,
   serialEnabled: z.boolean(),
-  debugLogEnabled: z.boolean(),
-  buttonGpio: z.int(),
-  buzzerGpio: z.int(),
+  buttonGpio: z.coerce.number().int().min(0),
+  buzzerGpio: z.coerce.number().int().min(0),
   rebroadcastMode: RebroadcastModeEnum,
-  nodeInfoBroadcastSecs: z.int(),
+  nodeInfoBroadcastSecs: z.coerce.number().int().min(0),
   doubleTapAsButtonPress: z.boolean(),
   isManaged: z.boolean(),
   disableTripleClick: z.boolean(),
   ledHeartbeatDisabled: z.boolean(),
-  tzdef: z.string(),
+  tzdef: z.string().max(65),
 });
 
 export type DeviceValidation = z.infer<typeof DeviceValidationSchema>;
