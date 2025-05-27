@@ -1,5 +1,4 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
-import { NodeDetailsDialog } from "@app/components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
@@ -7,6 +6,7 @@ import { Mono } from "@components/generic/Mono.tsx";
 import { Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useAppStore } from "@core/stores/appStore.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
@@ -35,11 +35,11 @@ export interface DeleteNoteDialogProps {
 
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
-  const { getNodes, hardware, connection, hasNodeError } = useDevice();
+  const { getNodes, hardware, connection, hasNodeError, setDialogOpen } =
+    useDevice();
+  const { setNodeNumDetails } = useAppStore();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
-  const [selectedNode, setSelectedNode] = useState<
-    Protobuf.Mesh.NodeInfo | undefined
-  >(undefined);
+
   const [selectedTraceroute, setSelectedTraceroute] = useState<
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
   >();
@@ -87,6 +87,11 @@ const NodesPage = (): JSX.Element => {
     },
     [hardware.myNodeNum],
   );
+
+  function handleNodeInfoDialog(nodeNum: number): void {
+    setNodeNumDetails(nodeNum);
+    setDialogOpen("nodeDetails", true);
+  }
 
   return (
     <>
@@ -176,9 +181,9 @@ const NodesPage = (): JSX.Element => {
               </div>,
               <h1
                 key="longName"
-                onMouseDown={() => setSelectedNode(node)}
+                onMouseDown={() => handleNodeInfoDialog(node.num)}
                 onKeyUp={(evt) => {
-                  evt.key === "Enter" && setSelectedNode(node);
+                  evt.key === "Enter" && handleNodeInfoDialog(node.num);
                 }}
                 className="cursor-pointer underline ml-2 whitespace-break-spaces"
                 tabIndex={0}
@@ -230,11 +235,6 @@ const NodesPage = (): JSX.Element => {
                   ?.join(":") ?? t("unknown.shortName")}
               </Mono>,
             ])}
-          />
-          <NodeDetailsDialog
-            node={selectedNode}
-            open={!!selectedNode}
-            onOpenChange={() => setSelectedNode(undefined)}
           />
           <TracerouteResponseDialog
             traceroute={selectedTraceroute}

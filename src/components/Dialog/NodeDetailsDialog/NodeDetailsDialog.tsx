@@ -51,26 +51,29 @@ import { Separator } from "@components/UI/Seperator.tsx";
 import { useTranslation } from "react-i18next";
 
 export interface NodeDetailsDialogProps {
-  node: Protobuf.Mesh.NodeInfo | undefined;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export const NodeDetailsDialog = ({
-  node,
   open,
   onOpenChange,
 }: NodeDetailsDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { setDialogOpen, connection, setActivePage } = useDevice();
-  const { setNodeNumToBeRemoved } = useAppStore();
+  const { setDialogOpen, connection, setActivePage, getNode } = useDevice();
+  const { setNodeNumToBeRemoved, nodeNumDetails } = useAppStore();
   const { setChatType, setActiveChat } = useMessageStore();
-
   const { updateFavorite } = useFavoriteNode();
-  const [isFavoriteState, setIsFavoriteState] = useState<boolean>(false);
-
   const { updateIgnored } = useIgnoreNode();
-  const [isIgnoredState, setIsIgnoredState] = useState<boolean>(false);
+
+  const node = getNode(nodeNumDetails);
+
+  const [isFavoriteState, setIsFavoriteState] = useState<boolean>(
+    node?.isFavorite ?? false,
+  );
+  const [isIgnoredState, setIsIgnoredState] = useState<boolean>(
+    node?.isIgnored ?? false,
+  );
 
   useEffect(() => {
     if (!node) return;
