@@ -16,6 +16,7 @@ import { fromByteArray } from "base64-js";
 import { ClipboardIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
+import { useTranslation } from "react-i18next";
 
 export interface QRDialogProps {
   open: boolean;
@@ -30,6 +31,7 @@ export const QRDialog = ({
   loraConfig,
   channels,
 }: QRDialogProps) => {
+  const { t } = useTranslation("dialog");
   const [selectedChannels, setSelectedChannels] = useState<number[]>([0]);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [qrCodeAdd, setQrCodeAdd] = useState<boolean>();
@@ -65,9 +67,9 @@ export const QRDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>Generate QR Code</DialogTitle>
+          <DialogTitle>{t("qr.title")}</DialogTitle>
           <DialogDescription>
-            The current LoRa configuration will also be shared.
+            {t("qr.description")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -79,8 +81,13 @@ export const QRDialog = ({
                     {channel.settings?.name.length
                       ? channel.settings.name
                       : channel.role === Protobuf.Channel.Channel_Role.PRIMARY
-                      ? "Primary"
-                      : `Channel: ${channel.index}`}
+                      ? t("page.broadcastLabel", { ns: "channels" })
+                      : `${
+                        t("page.channelIndex", {
+                          ns: "channels",
+                          index: channel.index,
+                        })
+                      }${channel.index}`}
                   </Label>
                   <Checkbox
                     key={channel.index}
@@ -113,9 +120,10 @@ export const QRDialog = ({
                   ? "focus:ring-green-800 bg-green-800 text-white"
                   : "focus:ring-slate-400 bg-slate-400 hover:bg-green-600"
               }`}
+              name="addChannels"
               onClick={() => setQrCodeAdd(true)}
             >
-              Add Channels
+              {t("qr.addChannels")}
             </button>
             <button
               type="button"
@@ -124,14 +132,15 @@ export const QRDialog = ({
                   ? "focus:ring-green-800 bg-green-800 text-white"
                   : "focus:ring-slate-400 bg-slate-400 hover:bg-green-600"
               }`}
+              name="replaceChannels"
               onClick={() => setQrCodeAdd(false)}
             >
-              Replace Channels
+              {t("qr.replaceChannels")}
             </button>
           </div>
         </div>
         <DialogFooter>
-          <Label>Sharable URL</Label>
+          <Label>{t("qr.sharableUrl")}</Label>
           <Input
             value={qrCodeUrl}
             disabled

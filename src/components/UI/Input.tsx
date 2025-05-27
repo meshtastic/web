@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Check, Copy, Eye, EyeOff, type LucideIcon, X } from "lucide-react";
 import { useCopyToClipboard } from "@core/hooks/useCopyToClipboard.ts";
 import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
+import { useTranslation } from "react-i18next";
 
 const inputVariants = cva(
   "flex h-10 w-full rounded-md border border-slate-300 bg-transparent py-2 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-500 dark:bg-transparet dark:text-slate-100 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-600",
@@ -62,6 +63,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ) => {
     const { isVisible, toggleVisibility } = usePasswordVisibilityToggle();
     const { copy, isCopied } = useCopyToClipboard({ timeout: 1500 });
+    const { t } = useTranslation("ui");
 
     const potentialActions: InputActionType[] = [
       {
@@ -80,8 +82,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref.current.focus();
           }
         },
-        ariaLabel: "Clear input",
-        tooltip: "Clear input",
+        ariaLabel: t("clearInput.label"),
+        tooltip: t("clearInput.label"),
         condition: !!showClearButton && !!value,
       },
       {
@@ -91,8 +93,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           e.stopPropagation();
           toggleVisibility();
         },
-        ariaLabel: isVisible ? "Hide password" : "Show password",
-        tooltip: isVisible ? "Hide password" : "Show password",
+        ariaLabel: isVisible
+          ? t("notifications.hidePassword.label")
+          : t("notifications.showPassword.label"),
+        tooltip: isVisible
+          ? t("notifications.hidePassword.label")
+          : t("notifications.showPassword.label"),
         condition: !!showPasswordToggle && type === "password",
       },
       {
@@ -104,8 +110,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             copy(String(value));
           }
         },
-        ariaLabel: isCopied ? "Copied!" : "Copy to clipboard",
-        tooltip: isCopied ? "Copied!" : "Copy to clipboard",
+        ariaLabel: isCopied
+          ? t("notifications.copied.label")
+          : t("notifications.copyToClipboard.label"),
+        tooltip: isCopied
+          ? t("notifications.copied.label")
+          : t("notifications.copyToClipboard.label"),
         condition: !!showCopyButton,
       },
     ];

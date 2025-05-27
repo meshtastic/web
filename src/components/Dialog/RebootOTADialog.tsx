@@ -11,6 +11,7 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { useTranslation } from "react-i18next";
 
 export interface RebootOTADialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ const DEFAULT_REBOOT_DELAY = 5; // seconds
 export const RebootOTADialog = (
   { open, onOpenChange }: RebootOTADialogProps,
 ) => {
+  const { t } = useTranslation("dialog");
   const { connection } = useDevice();
   const [time, setTime] = useState<number>(DEFAULT_REBOOT_DELAY);
   const [isScheduled, setIsScheduled] = useState(false);
@@ -50,7 +52,6 @@ export const RebootOTADialog = (
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
-        console.log("Rebooting...");
         resolve();
       }, delay * 1000);
     }).finally(() => {
@@ -73,10 +74,11 @@ export const RebootOTADialog = (
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>Reboot to OTA Mode</DialogTitle>
+          <DialogTitle>
+            {t("rebootOta.title")}
+          </DialogTitle>
           <DialogDescription>
-            Reboot the connected node after a delay into OTA (Over-the-Air)
-            mode.
+            {t("rebootOta.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -88,17 +90,25 @@ export const RebootOTADialog = (
             className="dark:text-slate-900 appearance-none"
             value={inputValue}
             onChange={handleSetTime}
-            placeholder="Enter delay (sec)"
+            placeholder={t("rebootOta.enterDelay")}
           />
-          <Button onClick={() => handleRebootWithTimeout()} className="w-9/12">
+          <Button
+            onClick={() => handleRebootWithTimeout()}
+            data-testid="scheduleRebootBtn"
+            className="w-9/12"
+          >
             <ClockIcon className="mr-2" size={18} />
-            {isScheduled ? "Reboot has been scheduled" : "Schedule Reboot"}
+            {isScheduled ? t("rebootOta.scheduled") : t("rebootOta.title")}
           </Button>
         </div>
 
-        <Button variant="destructive" onClick={() => handleInstantReboot()}>
+        <Button
+          variant="destructive"
+          name="rebootNow"
+          onClick={() => handleInstantReboot()}
+        >
           <RefreshCwIcon className="mr-2" size={16} />
-          Reboot to OTA Mode Now
+          {t("button.rebootOtaNow")}
         </Button>
       </DialogContent>
     </Dialog>

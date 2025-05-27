@@ -11,9 +11,11 @@ import {
 } from "@core/utils/ip.ts";
 import { Protobuf } from "@meshtastic/core";
 import { validateSchema } from "@app/validation/validate.ts";
+import { useTranslation } from "react-i18next";
 
 export const Network = () => {
   const { config, setWorkingConfig } = useDevice();
+  const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: NetworkValidation) => {
     const result = validateSchema(NetworkValidationSchema, data);
@@ -63,22 +65,21 @@ export const Network = () => {
       }}
       fieldGroups={[
         {
-          label: "WiFi Config",
-          description: "WiFi radio configuration",
-          notes:
-            "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+          label: t("network.title"),
+          description: t("network.description"),
+          notes: t("network.note"),
           fields: [
             {
               type: "toggle",
               name: "wifiEnabled",
-              label: "Enabled",
-              description: "Enable or disable the WiFi radio",
+              label: t("network.wifiEnabled.label"),
+              description: t("network.wifiEnabled.description"),
             },
             {
               type: "text",
               name: "wifiSsid",
-              label: "SSID",
-              description: "Network name",
+              label: t("network.ssid.label"),
+              description: t("network.ssid.label"),
               disabledBy: [
                 {
                   fieldName: "wifiEnabled",
@@ -88,8 +89,8 @@ export const Network = () => {
             {
               type: "password",
               name: "wifiPsk",
-              label: "PSK",
-              description: "Network password",
+              label: t("network.psk.label"),
+              description: t("network.psk.description"),
               disabledBy: [
                 {
                   fieldName: "wifiEnabled",
@@ -99,26 +100,26 @@ export const Network = () => {
           ],
         },
         {
-          label: "Ethernet Config",
-          description: "Ethernet port configuration",
+          label: t("network.ethernetConfigSettings.label"),
+          description: t("network.ethernetConfigSettings.description"),
           fields: [
             {
               type: "toggle",
               name: "ethEnabled",
-              label: "Enabled",
-              description: "Enable or disable the Ethernet port",
+              label: t("network.ethernetEnabled.label"),
+              description: t("network.ethernetEnabled.description"),
             },
           ],
         },
         {
-          label: "IP Config",
-          description: "IP configuration",
+          label: t("network.ipConfigSettings.label"),
+          description: t("network.ipConfigSettings.description"),
           fields: [
             {
               type: "select",
               name: "addressMode",
-              label: "Address Mode",
-              description: "Address assignment selection",
+              label: t("network.addressMode.label"),
+              description: t("network.addressMode.description"),
               properties: {
                 enumValue: Protobuf.Config.Config_NetworkConfig_AddressMode,
               },
@@ -126,8 +127,8 @@ export const Network = () => {
             {
               type: "text",
               name: "ipv4Config.ip",
-              label: "IP",
-              description: "IP Address",
+              label: t("network.ip.label"),
+              description: t("network.ip.description"),
               disabledBy: [
                 {
                   fieldName: "addressMode",
@@ -139,8 +140,8 @@ export const Network = () => {
             {
               type: "text",
               name: "ipv4Config.gateway",
-              label: "Gateway",
-              description: "Default Gateway",
+              label: t("network.gateway.label"),
+              description: t("network.gateway.description"),
               disabledBy: [
                 {
                   fieldName: "addressMode",
@@ -152,8 +153,8 @@ export const Network = () => {
             {
               type: "text",
               name: "ipv4Config.subnet",
-              label: "Subnet",
-              description: "Subnet Mask",
+              label: t("network.subnet.label"),
+              description: t("network.subnet.description"),
               disabledBy: [
                 {
                   fieldName: "addressMode",
@@ -165,8 +166,8 @@ export const Network = () => {
             {
               type: "text",
               name: "ipv4Config.dns",
-              label: "DNS",
-              description: "DNS Server",
+              label: t("network.dns.label"),
+              description: t("network.dns.description"),
               disabledBy: [
                 {
                   fieldName: "addressMode",
@@ -178,13 +179,13 @@ export const Network = () => {
           ],
         },
         {
-          label: "UDP Config",
-          description: "UDP over Mesh configuration",
+          label: t("network.udpConfigSettings.label"),
+          description: t("network.udpConfigSettings.description"),
           fields: [
             {
               type: "select",
               name: "enabledProtocols",
-              label: "Mesh via UDP",
+              label: t("network.meshViaUdp.label"),
               properties: {
                 enumValue: Protobuf.Config.Config_NetworkConfig_ProtocolFlags,
                 formatEnumName: true,
@@ -193,24 +194,24 @@ export const Network = () => {
           ],
         },
         {
-          label: "NTP Config",
-          description: "NTP configuration",
+          label: t("network.ntpConfigSettings.label"),
+          description: t("network.ntpConfigSettings.description"),
           fields: [
             {
               type: "text",
               name: "ntpServer",
-              label: "NTP Server",
+              label: t("network.ntpServer.label"),
             },
           ],
         },
         {
-          label: "Rsyslog Config",
-          description: "Rsyslog configuration",
+          label: t("network.rsyslogConfigSettings.label"),
+          description: t("network.rsyslogConfigSettings.description"),
           fields: [
             {
               type: "text",
               name: "rsyslogServer",
-              label: "Rsyslog Server",
+              label: t("network.rsyslogServer.label"),
             },
           ],
         },

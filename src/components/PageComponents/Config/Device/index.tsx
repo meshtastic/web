@@ -4,9 +4,11 @@ import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
+import { useTranslation } from "react-i18next";
 
 export const Device = () => {
   const { config, setWorkingConfig } = useDevice();
+  const { t } = useTranslation("deviceConfig");
   const { validateRoleSelection } = useUnsafeRolesDialog();
 
   const onSubmit = (data: DeviceValidation) => {
@@ -25,14 +27,14 @@ export const Device = () => {
       defaultValues={config.device}
       fieldGroups={[
         {
-          label: "Device Settings",
-          description: "Settings for the device",
+          label: t("device.title"),
+          description: t("device.description"),
           fields: [
             {
               type: "select",
               name: "role",
-              label: "Role",
-              description: "What role the device performs on the mesh",
+              label: t("device.role.label"),
+              description: t("device.role.description"),
               validate: validateRoleSelection,
               properties: {
                 enumValue: Protobuf.Config.Config_DeviceConfig_Role,
@@ -42,20 +44,20 @@ export const Device = () => {
             {
               type: "number",
               name: "buttonGpio",
-              label: "Button Pin",
-              description: "Button pin override",
+              label: t("device.buttonPin.label"),
+              description: t("device.buttonPin.description"),
             },
             {
               type: "number",
               name: "buzzerGpio",
-              label: "Buzzer Pin",
-              description: "Buzzer pin override",
+              label: t("device.buzzerPin.label"),
+              description: t("device.buzzerPin.description"),
             },
             {
               type: "select",
               name: "rebroadcastMode",
-              label: "Rebroadcast Mode",
-              description: "How to handle rebroadcasting",
+              label: t("device.rebroadcastMode.label"),
+              description: t("device.rebroadcastMode.description"),
               properties: {
                 enumValue: Protobuf.Config.Config_DeviceConfig_RebroadcastMode,
                 formatEnumName: true,
@@ -64,29 +66,29 @@ export const Device = () => {
             {
               type: "number",
               name: "nodeInfoBroadcastSecs",
-              label: "Node Info Broadcast Interval",
-              description: "How often to broadcast node info",
+              label: t("device.nodeInfoBroadcastInterval.label"),
+              description: t("device.nodeInfoBroadcastInterval.description"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
             },
             {
               type: "toggle",
               name: "doubleTapAsButtonPress",
-              label: "Double Tap as Button Press",
-              description: "Treat double tap as button press",
+              label: t("device.doubleTapAsButtonPress.label"),
+              description: t("device.doubleTapAsButtonPress.description"),
             },
             {
               type: "toggle",
               name: "disableTripleClick",
-              label: "Disable Triple Click",
-              description: "Disable triple click",
+              label: t("device.disableTripleClick.label"),
+              description: t("device.disableTripleClick.description"),
             },
             {
               type: "text",
               name: "tzdef",
-              label: "POSIX Timezone",
-              description: "The POSIX timezone string for the device",
+              label: t("device.posixTimezone.label"),
+              description: t("device.posixTimezone.description"),
               properties: {
                 fieldLength: {
                   max: 64,
@@ -98,8 +100,8 @@ export const Device = () => {
             {
               type: "toggle",
               name: "ledHeartbeatDisabled",
-              label: "LED Heartbeat Disabled",
-              description: "Disable default blinking LED",
+              label: t("device.ledHeartbeatDisabled.label"),
+              description: t("device.ledHeartbeatDisabled.description"),
             },
           ],
         },

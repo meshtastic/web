@@ -1,11 +1,13 @@
-import type { DisplayValidation } from "@app/validation/config/display.tsx";
+import type { DisplayValidation } from "@app/validation/config/display.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const Display = () => {
   const { config, setWorkingConfig } = useDevice();
+  const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: DisplayValidation) => {
     setWorkingConfig(
@@ -24,23 +26,23 @@ export const Display = () => {
       defaultValues={config.display}
       fieldGroups={[
         {
-          label: "Display Settings",
-          description: "Settings for the device display",
+          label: t("display.title"),
+          description: t("display.description"),
           fields: [
             {
               type: "number",
               name: "screenOnSecs",
-              label: "Screen Timeout",
-              description: "Turn off the display after this long",
+              label: t("display.screenTimeout.label"),
+              description: t("display.screenTimeout.description"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
             },
             {
               type: "select",
               name: "gpsFormat",
-              label: "GPS Display Units",
-              description: "Coordinate display format",
+              label: t("display.gpsDisplayUnits.label"),
+              description: t("display.gpsDisplayUnits.description"),
               properties: {
                 enumValue:
                   Protobuf.Config.Config_DisplayConfig_GpsCoordinateFormat,
@@ -49,35 +51,35 @@ export const Display = () => {
             {
               type: "number",
               name: "autoScreenCarouselSecs",
-              label: "Carousel Delay",
-              description: "How fast to cycle through windows",
+              label: t("display.carouselDelay.label"),
+              description: t("display.carouselDelay.description"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
             },
             {
               type: "toggle",
               name: "compassNorthTop",
-              label: "Compass North Top",
-              description: "Fix north to the top of compass",
+              label: t("display.compassNorthTop.label"),
+              description: t("display.compassNorthTop.description"),
             },
             {
               type: "toggle",
               name: "use12hClock",
-              label: "12-Hour Clock",
-              description: "Use 12-hour clock format",
+              label: t("display.twelveHourClock.label"),
+              description: t("display.twelveHourClock.description"),
             },
             {
               type: "toggle",
               name: "flipScreen",
-              label: "Flip Screen",
-              description: "Flip display 180 degrees",
+              label: t("display.flipScreen.label"),
+              description: t("display.flipScreen.description"),
             },
             {
               type: "select",
               name: "units",
-              label: "Display Units",
-              description: "Display metric or imperial units",
+              label: t("display.displayUnits.label"),
+              description: t("display.displayUnits.description"),
               properties: {
                 enumValue: Protobuf.Config.Config_DisplayConfig_DisplayUnits,
                 formatEnumName: true,
@@ -86,17 +88,17 @@ export const Display = () => {
             {
               type: "select",
               name: "oled",
-              label: "OLED Type",
-              description: "Type of OLED screen attached to the device",
+              label: t("display.oledType.label"),
+              description: t("display.oledType.description"),
               properties: {
-                enumValue: Protobuf.Config.Config_DisplayConfig_OledType,
+                enumValue: Protobuf.Config.Config_Displayjonfig_OledType,
               },
             },
             {
               type: "select",
               name: "displaymode",
-              label: "Display Mode",
-              description: "Screen layout variant",
+              label: t("display.displayMode.label"),
+              description: t("display.displayMode.description"),
               properties: {
                 enumValue: Protobuf.Config.Config_DisplayConfig_DisplayMode,
                 formatEnumName: true,
@@ -105,14 +107,14 @@ export const Display = () => {
             {
               type: "toggle",
               name: "headingBold",
-              label: "Bold Heading",
-              description: "Bolden the heading text",
+              label: t("display.headingBold.label"),
+              description: t("display.headingBold.description"),
             },
             {
               type: "toggle",
               name: "wakeOnTapOrMotion",
-              label: "Wake on Tap or Motion",
-              description: "Wake the device on tap or motion",
+              label: t("display.wakeOnTapOrMotion.label"),
+              description: t("display.wakeOnTapOrMotion.description"),
             },
           ],
         },

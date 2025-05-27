@@ -60,7 +60,8 @@ describe("RebootOTADialog", () => {
   it("renders dialog with default input value", () => {
     render(<RebootOTADialog open onOpenChange={() => {}} />);
     expect(screen.getByPlaceholderText(/enter delay/i)).toHaveValue(5);
-    expect(screen.getByText(/schedule reboot/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /schedule reboot/i, level: 1 }))
+      .toBeInTheDocument();
     expect(screen.getByText(/reboot to ota mode now/i)).toBeInTheDocument();
   });
 
@@ -72,7 +73,7 @@ describe("RebootOTADialog", () => {
       target: { value: "3" },
     });
 
-    fireEvent.click(screen.getByText(/schedule reboot/i));
+    fireEvent.click(screen.getByTestId("scheduleRebootBtn"));
 
     expect(screen.getByText(/reboot has been scheduled/i)).toBeInTheDocument();
 
@@ -99,12 +100,11 @@ describe("RebootOTADialog", () => {
   it("does not call reboot if connection is undefined", async () => {
     const onOpenChangeMock = vi.fn();
 
-    // simulate no connection
     mockConnection = undefined;
 
     render(<RebootOTADialog open onOpenChange={onOpenChangeMock} />);
 
-    fireEvent.click(screen.getByText(/schedule reboot/i));
+    fireEvent.click(screen.getByTestId("scheduleRebootBtn"));
     vi.advanceTimersByTime(5000);
 
     await waitFor(() => {
@@ -112,7 +112,6 @@ describe("RebootOTADialog", () => {
       expect(onOpenChangeMock).not.toHaveBeenCalled();
     });
 
-    // reset connection for other tests
     mockConnection = { rebootOta: rebootOtaMock };
   });
 });

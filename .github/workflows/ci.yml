@@ -1,10 +1,9 @@
-name: Push to Master/Main CI
+name: Push to Main CI
 
 on:
   push:
     branches:
       - main
-      - master
 
 permissions:
   contents: write

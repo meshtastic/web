@@ -1,11 +1,13 @@
 import { useDevice } from "@core/stores/deviceStore.ts";
-import type { NeighborInfoValidation } from "@app/validation/moduleConfig/neighborInfo.tsx";
+import type { NeighborInfoValidation } from "@app/validation/moduleConfig/neighborInfo.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const NeighborInfo = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: NeighborInfoValidation) => {
     setWorkingModuleConfig(
@@ -24,23 +26,22 @@ export const NeighborInfo = () => {
       defaultValues={moduleConfig.neighborInfo}
       fieldGroups={[
         {
-          label: "Neighbor Info Settings",
-          description: "Settings for the Neighbor Info module",
+          label: t("neighborInfo.title"),
+          description: t("neighborInfo.description"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Enabled",
-              description: "Enable or disable Neighbor Info Module",
+              label: t("neighborInfo.enabled.label"),
+              description: t("neighborInfo.enabled.description"),
             },
             {
               type: "number",
               name: "updateInterval",
-              label: "Update Interval",
-              description:
-                "Interval in seconds of how often we should try to send our Neighbor Info to the mesh",
+              label: t("neighborInfo.updateInterval.label"),
+              description: t("neighborInfo.updateInterval.description"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
               disabledBy: [
                 {

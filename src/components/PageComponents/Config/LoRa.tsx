@@ -1,11 +1,13 @@
-import type { LoRaValidation } from "@app/validation/config/lora.tsx";
+import type { LoRaValidation } from "@app/validation/config/lora.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const LoRa = () => {
   const { config, setWorkingConfig } = useDevice();
+  const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: LoRaValidation) => {
     setWorkingConfig(
@@ -24,14 +26,14 @@ export const LoRa = () => {
       defaultValues={config.lora}
       fieldGroups={[
         {
-          label: "Mesh Settings",
-          description: "Settings for the LoRa mesh",
+          label: t("lora.title"),
+          description: t("lora.description"),
           fields: [
             {
               type: "select",
               name: "region",
-              label: "Region",
-              description: "Sets the region for your node",
+              label: t("lora.region.label"),
+              description: t("lora.region.description"),
               properties: {
                 enumValue: Protobuf.Config.Config_LoRaConfig_RegionCode,
               },
@@ -39,8 +41,8 @@ export const LoRa = () => {
             {
               type: "select",
               name: "hopLimit",
-              label: "Hop Limit",
-              description: "Maximum number of hops",
+              label: t("lora.hopLimit.label"),
+              description: t("lora.hopLimit.description"),
               properties: {
                 enumValue: { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7 },
               },
@@ -48,39 +50,38 @@ export const LoRa = () => {
             {
               type: "number",
               name: "channelNum",
-              label: "Frequency Slot",
-              description: "LoRa frequency channel number",
+              label: t("lora.frequencySlot.label"),
+              description: t("lora.frequencySlot.description"),
             },
             {
               type: "toggle",
               name: "ignoreMqtt",
-              label: "Ignore MQTT",
-              description: "Don't forward MQTT messages over the mesh",
+              label: t("lora.ignoreMqtt.label"),
+              description: t("lora.ignoreMqtt.description"),
             },
             {
               type: "toggle",
               name: "configOkToMqtt",
-              label: "OK to MQTT",
-              description:
-                "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+              label: t("lora.okToMqtt.label"),
+              description: t("lora.okToMqtt.description"),
             },
           ],
         },
         {
-          label: "Waveform Settings",
-          description: "Settings for the LoRa waveform",
+          label: t("lora.waveformSettings.label"),
+          description: t("lora.waveformSettings.description"),
           fields: [
             {
               type: "toggle",
               name: "usePreset",
-              label: "Use Preset",
-              description: "Use one of the predefined modem presets",
+              label: t("lora.usePreset.label"),
+              description: t("lora.usePreset.description"),
             },
             {
               type: "select",
               name: "modemPreset",
-              label: "Modem Preset",
-              description: "Modem preset to use",
+              label: t("lora.modemPreset.label"),
+              description: t("lora.modemPreset.description"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -94,8 +95,8 @@ export const LoRa = () => {
             {
               type: "number",
               name: "bandwidth",
-              label: "Bandwidth",
-              description: "Channel bandwidth in MHz",
+              label: t("lora.bandwidth.label"),
+              description: t("lora.bandwidth.description"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -103,14 +104,14 @@ export const LoRa = () => {
                 },
               ],
               properties: {
-                suffix: "MHz",
+                suffix: t("unit.megahertz"),
               },
             },
             {
               type: "number",
               name: "spreadFactor",
-              label: "Spreading Factor",
-              description: "Indicates the number of chirps per symbol",
+              label: t("lora.spreadingFactor.label"),
+              description: t("lora.spreadingFactor.description"),
 
               disabledBy: [
                 {
@@ -119,14 +120,14 @@ export const LoRa = () => {
                 },
               ],
               properties: {
-                suffix: "CPS",
+                suffix: t("unit.cps"),
               },
             },
             {
               type: "number",
               name: "codingRate",
-              label: "Coding Rate",
-              description: "The denominator of the coding rate",
+              label: t("lora.codingRate.label"),
+              description: t("lora.codingRate.description"),
               disabledBy: [
                 {
                   fieldName: "usePreset",
@@ -137,53 +138,52 @@ export const LoRa = () => {
           ],
         },
         {
-          label: "Radio Settings",
-          description: "Settings for the LoRa radio",
+          label: t("lora.radioSettings.label"),
+          description: t("lora.radioSettings.description"),
           fields: [
             {
               type: "toggle",
               name: "txEnabled",
-              label: "Transmit Enabled",
-              description: "Enable/Disable transmit (TX) from the LoRa radio",
+              label: t("lora.transmitEnabled.label"),
+              description: t("lora.transmitEnabled.description"),
             },
             {
               type: "number",
               name: "txPower",
-              label: "Transmit Power",
-              description: "Max transmit power",
+              label: t("lora.transmitPower.label"),
+              description: t("lora.transmitPower.description"),
               properties: {
-                suffix: "dBm",
+                suffix: t("unit.dbm"),
               },
             },
             {
               type: "toggle",
               name: "overrideDutyCycle",
-              label: "Override Duty Cycle",
-              description: "Override Duty Cycle",
+              label: t("lora.overrideDutyCycle.label"),
+              description: t("lora.overrideDutyCycle.description"),
             },
             {
               type: "number",
               name: "frequencyOffset",
-              label: "Frequency Offset",
-              description:
-                "Frequency offset to correct for crystal calibration errors",
+              label: t("lora.frequencyOffset.label"),
+              description: t("lora.frequencyOffset.description"),
               properties: {
-                suffix: "Hz",
+                suffix: t("unit.hertz"),
               },
             },
             {
               type: "toggle",
               name: "sx126xRxBoostedGain",
-              label: "Boosted RX Gain",
-              description: "Boosted RX gain",
+              label: t("lora.boostedRxGain.label"),
+              description: t("lora.boostedRxGain.description"),
             },
             {
               type: "number",
               name: "overrideFrequency",
-              label: "Override Frequency",
-              description: "Override frequency",
+              label: t("lora.overrideFrequency.label"),
+              description: t("lora.overrideFrequency.description"),
               properties: {
-                suffix: "MHz",
+                suffix: t("unit.megahertz"),
                 step: 0.001,
               },
             },

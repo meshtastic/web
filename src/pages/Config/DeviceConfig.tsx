@@ -1,57 +1,59 @@
 import { Bluetooth } from "@components/PageComponents/Config/Bluetooth.tsx";
-import { Device } from "../../components/PageComponents/Config/Device/index.tsx";
+import { Device } from "@components/PageComponents/Config/Device/index.tsx";
 import { Display } from "@components/PageComponents/Config/Display.tsx";
 import { LoRa } from "@components/PageComponents/Config/LoRa.tsx";
-import { Network } from "../../components/PageComponents/Config/Network/index.tsx";
+import { Network } from "@components/PageComponents/Config/Network/index.tsx";
 import { Position } from "@components/PageComponents/Config/Position.tsx";
 import { Power } from "@components/PageComponents/Config/Power.tsx";
-import { Security } from "../../components/PageComponents/Config/Security/Security.tsx";
+import { Security } from "@components/PageComponents/Config/Security/Security.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
+import { useTranslation } from "react-i18next";
 
 export const DeviceConfig = () => {
+  const { t } = useTranslation("deviceConfig");
   const tabs = [
     {
-      label: "Device",
+      label: t("page.tabDevice"),
       element: Device,
       count: 0,
     },
     {
-      label: "Position",
+      label: t("page.tabPosition"),
       element: Position,
     },
     {
-      label: "Power",
+      label: t("page.tabPower"),
       element: Power,
     },
     {
-      label: "Network",
+      label: t("page.tabNetwork"),
       element: Network,
     },
     {
-      label: "Display",
+      label: t("page.tabDisplay"),
       element: Display,
     },
     {
-      label: "LoRa",
+      label: t("page.tabLora"),
       element: LoRa,
     },
     {
-      label: "Bluetooth",
+      label: t("page.tabBluetooth"),
       element: Bluetooth,
     },
     {
-      label: "Security",
+      label: t("page.tabSecurity"),
       element: Security,
     },
   ];
 
   return (
-    <Tabs defaultValue="Device">
+    <Tabs defaultValue={t("page.tabDevice")}>
       <TabsList className="dark:bg-slate-700">
         {tabs.map((tab) => (
           <TabsTrigger

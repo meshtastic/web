@@ -1,17 +1,21 @@
 import { MessageItem } from "@components/PageComponents/Messages/MessageItem.tsx";
 import { InboxIcon } from "lucide-react";
 import { Message } from "@core/stores/messageStore/types.ts";
+import { useTranslation } from "react-i18next";
 
 export interface ChannelChatProps {
   messages?: Message[];
 }
 
-const EmptyState = () => (
-  <div className="flex flex-1 flex-col place-content-center place-items-center p-8 text-slate-500 dark:text-slate-400">
-    <InboxIcon className="mb-2 h-8 w-8" />
-    <span className="text-sm">No Messages</span>
-  </div>
-);
+const EmptyState = () => {
+  const { t } = useTranslation("messages");
+  return (
+    <div className="flex flex-1 flex-col place-content-center place-items-center p-8 text-slate-500 dark:text-slate-400">
+      <InboxIcon className="mb-2 h-8 w-8" />
+      <span className="text-sm">{t("emptyState.text")}</span>
+    </div>
+  );
+};
 
 export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
   if (!messages?.length) {

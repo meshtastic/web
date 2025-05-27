@@ -1,11 +1,13 @@
-import type { CannedMessageValidation } from "@app/validation/moduleConfig/cannedMessage.tsx";
+import type { CannedMessageValidation } from "@app/validation/moduleConfig/cannedMessage.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const CannedMessage = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: CannedMessageValidation) => {
     setWorkingModuleConfig(
@@ -24,44 +26,44 @@ export const CannedMessage = () => {
       defaultValues={moduleConfig.cannedMessage}
       fieldGroups={[
         {
-          label: "Canned Message Settings",
-          description: "Settings for the Canned Message module",
+          label: t("cannedMessage.title"),
+          description: t("cannedMessage.description"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Module Enabled",
-              description: "Enable Canned Message",
+              label: t("cannedMessage.moduleEnabled.label"),
+              description: t("cannedMessage.moduleEnabled.description"),
             },
             {
               type: "toggle",
               name: "rotary1Enabled",
-              label: "Rotary Encoder #1 Enabled",
-              description: "Enable the rotary encoder",
+              label: t("cannedMessage.rotary1Enabled.label"),
+              description: t("cannedMessage.rotary1Enabled.description"),
             },
             {
               type: "number",
               name: "inputbrokerPinA",
-              label: "Encoder Pin A",
-              description: "GPIO Pin Value (1-39) For encoder port A",
+              label: t("cannedMessage.inputbrokerPinA.label"),
+              description: t("cannedMessage.inputbrokerPinA.description"),
             },
             {
               type: "number",
               name: "inputbrokerPinB",
-              label: "Encoder Pin B",
-              description: "GPIO Pin Value (1-39) For encoder port B",
+              label: t("cannedMessage.inputbrokerPinB.label"),
+              description: t("cannedMessage.inputbrokerPinB.description"),
             },
             {
               type: "number",
               name: "inputbrokerPinPress",
-              label: "Encoder Pin Press",
-              description: "GPIO Pin Value (1-39) For encoder Press",
+              label: t("cannedMessage.inputbrokerPinPress.label"),
+              description: t("cannedMessage.inputbrokerPinPress.description"),
             },
             {
               type: "select",
               name: "inputbrokerEventCw",
-              label: "Clockwise event",
-              description: "Select input event.",
+              label: t("cannedMessage.inputbrokerEventCw.label"),
+              description: t("cannedMessage.inputbrokerEventCw.description"),
               properties: {
                 enumValue: Protobuf.ModuleConfig
                   .ModuleConfig_CannedMessageConfig_InputEventChar,
@@ -70,8 +72,8 @@ export const CannedMessage = () => {
             {
               type: "select",
               name: "inputbrokerEventCcw",
-              label: "Counter Clockwise event",
-              description: "Select input event.",
+              label: t("cannedMessage.inputbrokerEventCcw.label"),
+              description: t("cannedMessage.inputbrokerEventCcw.description"),
               properties: {
                 enumValue: Protobuf.ModuleConfig
                   .ModuleConfig_CannedMessageConfig_InputEventChar,
@@ -80,8 +82,8 @@ export const CannedMessage = () => {
             {
               type: "select",
               name: "inputbrokerEventPress",
-              label: "Press event",
-              description: "Select input event",
+              label: t("cannedMessage.inputbrokerEventPress.label"),
+              description: t("cannedMessage.inputbrokerEventPress.description"),
               properties: {
                 enumValue: Protobuf.ModuleConfig
                   .ModuleConfig_CannedMessageConfig_InputEventChar,
@@ -90,21 +92,20 @@ export const CannedMessage = () => {
             {
               type: "toggle",
               name: "updown1Enabled",
-              label: "Up Down enabled",
-              description: "Enable the up / down encoder",
+              label: t("cannedMessage.updown1Enabled.label"),
+              description: t("cannedMessage.updown1Enabled.description"),
             },
             {
               type: "text",
               name: "allowInputSource",
-              label: "Allow Input Source",
-              description:
-                "Select from: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'",
+              label: t("cannedMessage.allowInputSource.label"),
+              description: t("cannedMessage.allowInputSource.description"),
             },
             {
               type: "toggle",
               name: "sendBell",
-              label: "Send Bell",
-              description: "Sends a bell character with each message",
+              label: t("cannedMessage.sendBell.label"),
+              description: t("cannedMessage.sendBell.description"),
             },
           ],
         },

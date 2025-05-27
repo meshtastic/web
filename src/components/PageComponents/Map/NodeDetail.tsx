@@ -26,8 +26,9 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import {
   MessageType,
   useMessageStore,
-} from "../../../core/stores/messageStore/index.ts";
+} from "@core/stores/messageStore/index.ts";
 import BatteryStatus from "@components/BatteryStatus.tsx";
+import { useTranslation } from "react-i18next";
 
 export interface NodeDetailProps {
   node: ProtobufType.Mesh.NodeInfo;
@@ -35,13 +36,19 @@ export interface NodeDetailProps {
 
 export const NodeDetail = ({ node }: NodeDetailProps) => {
   const { setChatType, setActiveChat } = useMessageStore();
+  const { t } = useTranslation("nodes");
   const { setActivePage } = useDevice();
-  const name = node.user?.longName ?? `UNK`;
-  const shortName = node.user?.shortName ?? "UNK";
+  const name = node.user?.longName ?? t("unknown.shortName");
+  const shortName = node.user?.shortName ?? t("unknown.shortName");
   const hwModel = node.user?.hwModel ?? 0;
-  const hardwareType =
-    Protobuf.Mesh.HardwareModel[hwModel]?.replaceAll("_", " ") ?? `${hwModel}`;
-
+  const rawHardwareType = Protobuf.Mesh.HardwareModel[hwModel] as
+    | keyof typeof Protobuf.Mesh.HardwareModel
+    | undefined;
+  const hardwareType = rawHardwareType
+    ? rawHardwareType === "UNSET"
+      ? t("unset")
+      : rawHardwareType.replaceAll("_", " ")
+    : `${hwModel}`;
   function handleDirectMessage() {
     setChatType(MessageType.Direct);
     setActiveChat(node.num);
@@ -66,7 +73,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
                   className="text-green-600 mb-1.5"
                   size={12}
                   strokeWidth={3}
-                  aria-label="Public Key Enabled"
+                  aria-label={t("node_detail_public_key_enabled_aria_label")}
                 />
               )
               : (
@@ -74,7 +81,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
                   className="text-yellow-500 mb-1.5"
                   size={12}
                   strokeWidth={3}
-                  aria-label="No Public Key"
+                  aria-label={t("node_detail_no_public_key_aria_label")}
                 />
               )}
 
@@ -94,7 +101,9 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
                     align="center"
                     sideOffset={5}
                   >
-                    Direct Message {shortName}
+                    {t("nodeDetail.directMessage.label", {
+                      shortName,
+                    })}
                   </TooltipContent>
                 </TooltipPortal>
               </Tooltip>
@@ -103,15 +112,16 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             <Star
               fill={node.isFavorite ? "black" : "none"}
               size={15}
-              aria-label={node.isFavorite ? "Favorite" : "Not a Favorite"}
+              aria-label={node.isFavorite
+                ? t("nodeDetail.favorite.label")
+                : t("nodeDetail.notFavorite.label")}
             />
           </div>
         </div>
 
         <div>
           <Heading as="h5">{name}</Heading>
-
-          {hardwareType !== "UNSET" && <Subtle>{hardwareType}</Subtle>}
+          {hardwareType !== t("unset") && <Subtle>{hardwareType}</Subtle>}
 
           {!!node.deviceMetrics?.batteryLevel && (
             <BatteryStatus deviceMetrics={node.deviceMetrics} />
@@ -131,13 +141,14 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             <div>
               {node.lastHeard > 0 && (
                 <div>
-                  Heard <TimeAgo timestamp={node.lastHeard * 1000} />
+                  {t("nodeDetail.status.heard")}{" "}
+                  <TimeAgo timestamp={node.lastHeard * 1000} />
                 </div>
               )}
             </div>
             {node.viaMqtt && (
               <div style={{ color: "#660066" }} className="font-medium">
-                MQTT
+                {t("nodeDetail.status.mqtt")}
               </div>
             )}
           </div>
@@ -149,21 +160,25 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       <div className="flex mt-2 text-sm">
         <div className="flex items-center grow">
           <div className="border-2 border-slate-900 rounded-sm px-0.5 mr-1">
-            {Number.isNaN(node.hopsAway) ? "?" : node.hopsAway}
+            {Number.isNaN(node.hopsAway)
+              ? t("unit.hopsAway.unknown")
+              : node.hopsAway}
           </div>
-          <div>{node.hopsAway === 1 ? "Hop" : "Hops"}</div>
+          <div>
+            {node.hopsAway === 1 ? t("unit.hops.one") : t("unit.hop.plural")}
+          </div>
         </div>
         {node.position?.altitude && (
           <div className="flex items-center grow">
             <MountainSnow
               size={15}
               className="ml-2 mr-1"
-              aria-label="Elevation"
+              aria-label={t("node_detail_elevation_aria_label")}
             />
             <div>
               {formatQuantity(node.position?.altitude, {
-                one: "meter",
-                other: "meters",
+                one: t("unit.meter.one"),
+                other: t("unit.meter.plural"),
               })}
             </div>
           </div>
@@ -173,7 +188,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       <div className="flex mt-2">
         {!!node.deviceMetrics?.channelUtilization && (
           <div className="grow">
-            <div>Channel Util</div>
+            <div>{t("nodeDetail.channelUtilization")}</div>
             <Mono>
               {node.deviceMetrics?.channelUtilization.toPrecision(3)}%
             </Mono>
@@ -181,7 +196,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         )}
         {!!node.deviceMetrics?.airUtilTx && (
           <div className="grow">
-            <div>Airtime Util</div>
+            <div>{t("nodeDetail.airTxUtilization")}</div>
             <Mono className="text-gray-500">
               {node.deviceMetrics?.airUtilTx.toPrecision(3)}%
             </Mono>
@@ -191,13 +206,15 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
 
       {node.snr !== 0 && (
         <div className="mt-2">
-          <div>SNR</div>
+          <div>{t("unit.snr")}</div>
           <Mono className="flex items-center text-xs text-gray-500">
-            {node.snr}db
+            {node.snr}
+            {t("unit.dbm")}
             <Dot />
             {Math.min(Math.max((node.snr + 10) * 5, 0), 100)}%
             <Dot />
-            {(node.snr + 10) * 5}raw
+            {(node.snr + 10) * 5}
+            {t("unit.raw")}
           </Mono>
         </div>
       )}

@@ -8,6 +8,7 @@ import { randId } from "@core/utils/randId.ts";
 import { BleConnection, ServiceUuid } from "@meshtastic/js";
 import { useCallback, useEffect, useState } from "react";
 import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
+import { useTranslation } from "react-i18next";
 
 export const BLE = (
   { closeDialog }: TabElementProps,
@@ -17,6 +18,7 @@ export const BLE = (
   const { addDevice } = useDeviceStore();
   const messageStore = useMessageStore();
   const { setSelectedDevice } = useAppStore();
+  const { t } = useTranslation();
 
   const updateBleDeviceList = useCallback(async (): Promise<void> => {
     setBleDevices(await navigator.bluetooth.getDevices());
@@ -59,7 +61,9 @@ export const BLE = (
           </Button>
         ))}
         {bleDevices.length === 0 && (
-          <Mono className="m-auto select-none">No devices paired yet.</Mono>
+          <Mono className="m-auto select-none">
+            {t("newDeviceDialog.bluetoothConnection.noDevicesPaired")}
+          </Mono>
         )}
       </div>
       <Button
@@ -82,7 +86,7 @@ export const BLE = (
             });
         }}
       >
-        <span>New device</span>
+        <span>{t("newDeviceDialog.bluetoothConnection.newDeviceButton")}</span>
       </Button>
     </fieldset>
   );

@@ -10,17 +10,21 @@ import { Sidebar } from "@components/Sidebar.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Types } from "@meshtastic/core";
 import type { Protobuf } from "@meshtastic/core";
-import { ImportIcon, QrCodeIcon } from "lucide-react";
+import i18next from "i18next";
+import { QrCodeIcon, UploadIcon } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-export const getChannelName = (channel: Protobuf.Channel.Channel) =>
-  channel.settings?.name.length
+export const getChannelName = (channel: Protobuf.Channel.Channel) => {
+  return channel.settings?.name.length
     ? channel.settings?.name
     : channel.index === 0
-    ? "Primary"
-    : `Ch ${channel.index}`;
+    ? i18next.t("page.broadcastLabel")
+    : i18next.t("page.channelIndex", { ns: "channels", index: channel.index });
+};
 
 const ChannelsPage = () => {
+  const { t } = useTranslation("channels");
   const { channels, setDialogOpen } = useDevice();
   const [activeChannel] = useState<Types.ChannelNumber>(
     Types.ChannelNumber.Primary,
@@ -32,20 +36,21 @@ const ChannelsPage = () => {
   return (
     <>
       <PageLayout
+        contentClassName="overflow-auto"
         leftBar={<Sidebar />}
-        label={`Channel: ${
-          currentChannel ? getChannelName(currentChannel) : "Loading..."
-        }`}
+        label={currentChannel
+          ? getChannelName(currentChannel)
+          : t("loading", { ns: "common" })}
         actions={[
           {
-            key: "search",
-            icon: ImportIcon,
+            key: "import",
+            icon: UploadIcon,
             onClick() {
               setDialogOpen("import", true);
             },
           },
           {
-            key: "import",
+            key: "qr",
             icon: QrCodeIcon,
             onClick() {
               setDialogOpen("QR", true);
@@ -54,7 +59,7 @@ const ChannelsPage = () => {
         ]}
       >
         <Tabs defaultValue="0">
-          <TabsList className="dark:bg-slate-800 ">
+          <TabsList className="dark:bg-slate-800">
             {allChannels.map((channel) => (
               <TabsTrigger
                 key={channel.index}

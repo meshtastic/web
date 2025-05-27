@@ -16,61 +16,63 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
+import { useTranslation } from "react-i18next";
 
 export const ModuleConfig = () => {
+  const { t } = useTranslation("moduleConfig");
   const tabs = [
     {
-      label: "MQTT",
+      label: t("page.tabMqtt"),
       element: MQTT,
     },
     {
-      label: "Serial",
+      label: t("page.tabSerial"),
       element: Serial,
     },
     {
-      label: "Ext Notif",
+      label: t("page.tabExternalNotification"),
       element: ExternalNotification,
     },
     {
-      label: "S&F",
+      label: t("page.tabStoreAndForward"),
       element: StoreForward,
     },
     {
-      label: "Range Test",
+      label: t("page.tabRangeTest"),
       element: RangeTest,
     },
     {
-      label: "Telemetry",
+      label: t("page.tabTelemetry"),
       element: Telemetry,
     },
     {
-      label: "Canned",
+      label: t("page.tabCannedMessage"),
       element: CannedMessage,
     },
     {
-      label: "Audio",
+      label: t("page.tabAudio"),
       element: Audio,
     },
     {
-      label: "Neighbor Info",
+      label: t("page.tabNeighborInfo"),
       element: NeighborInfo,
     },
     {
-      label: "Ambient Lighting",
+      label: t("page.tabAmbientLighting"),
       element: AmbientLighting,
     },
     {
-      label: "Detection Sensor",
+      label: t("page.tabDetectionSensor"),
       element: DetectionSensor,
     },
     {
-      label: "Paxcounter",
+      label: t("page.tabPaxcounter"),
       element: Paxcounter,
     },
   ];
 
   return (
-    <Tabs defaultValue="MQTT">
+    <Tabs defaultValue={t("page.tabMqtt")}>
       <TabsList className="dark:bg-slate-800">
         {tabs.map((tab) => (
           <TabsTrigger

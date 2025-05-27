@@ -13,6 +13,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { useState } from "react";
 import { eventBus } from "@core/utils/eventBus.ts";
+import { useTranslation } from "react-i18next";
 
 export interface RouterRoleDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ export interface RouterRoleDialogProps {
 export const UnsafeRolesDialog = (
   { open, onOpenChange }: RouterRoleDialogProps,
 ) => {
+  const { t } = useTranslation("dialog");
   const [confirmState, setConfirmState] = useState(false);
   const { setDialogOpen } = useDevice();
 
@@ -41,26 +43,27 @@ export const UnsafeRolesDialog = (
       <DialogContent className="max-w-8 flex flex-col">
         <DialogClose onClick={() => handleCloseDialog("dismiss")} />
         <DialogHeader>
-          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogTitle>{t("unsafeRoles.title")}</DialogTitle>
         </DialogHeader>
         <DialogDescription className="text-md">
-          I have read the{" "}
+          {t("unsafeRoles.preamble")}
           <Link href={deviceRoleLink} className="">
-            Device Role Documentation
-          </Link>{" "}
-          and the blog post about{" "}
+            {t("unsafeRoles.deviceRoleDocumentation")}
+          </Link>
+          {t("unsafeRoles.conjunction")}
           <Link href={choosingTheRightDeviceRoleLink}>
-            Choosing The Right Device Role
-          </Link>{" "}
-          and understand the implications of changing the role.
+            {t("unsafeRoles.choosingRightDeviceRole")}
+          </Link>
+          {t("unsafeRoles.postamble")}
         </DialogDescription>
         <div className="flex items-center gap-2">
           <Checkbox
             id="routerRole"
             checked={confirmState}
             onChange={() => setConfirmState(!confirmState)}
+            name="confirmUnderstanding"
           >
-            Yes, I know what I'm doing
+            {t("unsafeRoles.confirmUnderstanding")}
           </Checkbox>
         </div>
         <DialogFooter className="mt-6">
@@ -69,7 +72,7 @@ export const UnsafeRolesDialog = (
             name="dismiss"
             onClick={() => handleCloseDialog("dismiss")}
           >
-            Dismiss
+            {t("button.dismiss")}
           </Button>
           <Button
             variant="default"
@@ -77,7 +80,7 @@ export const UnsafeRolesDialog = (
             disabled={!confirmState}
             onClick={() => handleCloseDialog("confirm")}
           >
-            Confirm
+            {t("button.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

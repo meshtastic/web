@@ -8,12 +8,14 @@ import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 export const Position = () => {
   const { config, setWorkingConfig } = useDevice();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     config?.position?.positionFlags ?? 0,
   );
+  const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: PositionValidation) => {
     return setWorkingConfig(
@@ -42,22 +44,20 @@ export const Position = () => {
       defaultValues={config.position}
       fieldGroups={[
         {
-          label: "Position Settings",
-          description: "Settings for the position module",
+          label: t("position.title"),
+          description: t("position.description"),
           fields: [
             {
               type: "toggle",
               name: "positionBroadcastSmartEnabled",
-              label: "Enable Smart Position",
-              description:
-                "Only send position when there has been a meaningful change in location",
+              label: t("position.smartPositionEnabled.label"),
+              description: t("position.smartPositionEnabled.description"),
             },
             {
               type: "select",
               name: "gpsMode",
-              label: "GPS Mode",
-              description:
-                "Configure whether device GPS is Enabled, Disabled, or Not Present",
+              label: t("position.gpsMode.label"),
+              description: t("position.gpsMode.description"),
               properties: {
                 enumValue: Protobuf.Config.Config_PositionConfig_GpsMode,
               },
@@ -65,9 +65,8 @@ export const Position = () => {
             {
               type: "toggle",
               name: "fixedPosition",
-              label: "Fixed Position",
-              description:
-                "Don't report GPS position, but a manually-specified one",
+              label: t("position.fixedPosition.label"),
+              description: t("position.fixedPosition.description"),
             },
             {
               type: "multiSelect",
@@ -76,10 +75,9 @@ export const Position = () => {
               isChecked: (name: string) =>
                 activeFlags?.includes(name as FlagName) ?? false,
               onValueChange: onPositonFlagChange,
-              label: "Position Flags",
-              placeholder: "Select position flags...",
-              description:
-                "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
+              label: t("position.positionFlags.label"),
+              placeholder: t("position.flags.placeholder"),
+              description: t("position.positionFlags.description"),
               properties: {
                 enumValue: getAllFlags(),
               },
@@ -87,51 +85,50 @@ export const Position = () => {
             {
               type: "number",
               name: "rxGpio",
-              label: "Receive Pin",
-              description: "GPS module RX pin override",
+              label: t("position.receivePin.label"),
+              description: t("position.receivePin.description"),
             },
             {
               type: "number",
               name: "txGpio",
-              label: "Transmit Pin",
-              description: "GPS module TX pin override",
+              label: t("position.transmitPin.label"),
+              description: t("position.transmitPin.description"),
             },
             {
               type: "number",
               name: "gpsEnGpio",
-              label: "Enable Pin",
-              description: "GPS module enable pin override",
+              label: t("position.enablePin.label"),
+              description: t("position.enablePin.description"),
             },
           ],
         },
         {
-          label: "Intervals",
-          description: "How often to send position updates",
+          label: t("position.intervalsSettings.label"),
+          description: t("position.intervalsSettings.description"),
           fields: [
             {
               type: "number",
               name: "positionBroadcastSecs",
-              label: "Broadcast Interval",
-              description: "How often your position is sent out over the mesh",
+              label: t("position.broadcastInterval.label"),
+              description: t("position.broadcastInterval.description"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
             },
             {
               type: "number",
               name: "gpsUpdateInterval",
-              label: "GPS Update Interval",
-              description: "How often a GPS fix should be acquired",
+              label: t("position.gpsUpdateInterval.label"),
+              description: t("position.gpsUpdateInterval.description"),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
             },
             {
               type: "number",
               name: "broadcastSmartMinimumDistance",
-              label: "Smart Position Minimum Distance",
-              description:
-                "Minimum distance (in meters) that must be traveled before a position update is sent",
+              label: t("position.smartPositionMinDistance.label"),
+              description: t("position.smartPositionMinDistance.description"),
               disabledBy: [
                 {
                   fieldName: "positionBroadcastSmartEnabled",
@@ -141,9 +138,8 @@ export const Position = () => {
             {
               type: "number",
               name: "broadcastSmartMinimumIntervalSecs",
-              label: "Smart Position Minimum Interval",
-              description:
-                "Minimum interval (in seconds) that must pass before a position update is sent",
+              label: t("position.smartPositionMinInterval.label"),
+              description: t("position.smartPositionMinInterval.description"),
               disabledBy: [
                 {
                   fieldName: "positionBroadcastSmartEnabled",

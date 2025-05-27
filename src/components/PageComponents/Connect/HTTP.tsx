@@ -13,7 +13,8 @@ import { TransportHTTP } from "@meshtastic/transport-http";
 import { useState } from "react";
 import { useController, useForm } from "react-hook-form";
 import { AlertTriangle } from "lucide-react";
-import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
+import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { useTranslation } from "react-i18next";
 
 interface FormData {
   ip: string;
@@ -23,6 +24,7 @@ interface FormData {
 export const HTTP = (
   { closeDialog }: TabElementProps,
 ) => {
+  const { t } = useTranslation("dialog");
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const isURLHTTPS = location.protocol === "https:";
 
@@ -79,22 +81,24 @@ export const HTTP = (
         disabled={connectionInProgress}
       >
         <div>
-          <Label>IP Address/Hostname</Label>
+          <Label>{t("newDeviceDialog.httpConnection.label")}</Label>
           <Input
-            prefix={tlsValue ? "https://" : "http://"}
-            placeholder="000.000.000.000 / meshtastic.local"
+            prefix={tlsValue
+              ? `${t("newDeviceDialog.https")}://`
+              : `${t("newDeviceDialog.http")}://`}
+            placeholder={t("newDeviceDialog.httpConnection.placeholder")}
             className="text-slate-900 dark:text-slate-100"
             {...register("ip")}
           />
         </div>
-        <div className="flex items-center gap-2 mt-2">
+        <div className="mt-2 flex items-center gap-2">
           <Switch
             onCheckedChange={setTLS}
             disabled={isURLHTTPS}
             checked={isURLHTTPS || tlsValue}
             {...register("tls")}
           />
-          <Label>Use HTTPS</Label>
+          <Label>{t("newDeviceDialog.useHttps")}</Label>
         </div>
 
         {connectionError && (
@@ -106,30 +110,38 @@ export const HTTP = (
               />
               <div>
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-800">
-                  Connection Failed
+                  {t("newDeviceDialog.connectionFailedAlert.title")}
                 </p>
                 <p className="text-xs mt-1 text-amber-700 dark:text-amber-700">
-                  Could not connect to the device. {connectionError.secure &&
-                    "If using HTTPS, you may need to accept a self-signed certificate first. "}
-                  Please open{" "}
+                  {t("newDeviceDialog.connectionFailedAlert.descriptionPrefix")}
+                  {connectionError.secure &&
+                    t("newDeviceDialog.connectionFailedAlert.httpsHint")}
+                  {t("newDeviceDialog.connectionFailedAlert.openLinkPrefix")}
                   <Link
                     href={`${
-                      connectionError.secure ? "https" : "http"
+                      connectionError.secure
+                        ? t("newDeviceDialog.https")
+                        : t("newDeviceDialog.http")
                     }://${connectionError.host}`}
                     className="underline font-medium text-amber-800 dark:text-amber-800"
                   >
                     {`${
-                      connectionError.secure ? "https" : "http"
+                      connectionError.secure
+                        ? t("newDeviceDialog.https")
+                        : t("newDeviceDialog.http")
                     }://${connectionError.host}`}
                   </Link>{" "}
-                  in a new tab{connectionError.secure
-                    ? ", accept any TLS warnings if prompted, then try again"
+                  {t("newDeviceDialog.connectionFailedAlert.openLinkSuffix")}
+                  {connectionError.secure
+                    ? t(
+                      "newDeviceDialog.connectionFailedAlert.acceptTlsWarningSuffix",
+                    )
                     : ""}.{" "}
                   <Link
                     href="https://meshtastic.org/docs/software/web-client/#http"
                     className="underline font-medium text-amber-800 dark:text-amber-800"
                   >
-                    Learn more
+                    {t("newDeviceDialog.connectionFailedAlert.learnMoreLink")}
                   </Link>
                 </p>
               </div>
@@ -141,7 +153,11 @@ export const HTTP = (
         type="submit"
         variant="default"
       >
-        <span>{connectionInProgress ? "Connecting..." : "Connect"}</span>
+        <span>
+          {connectionInProgress
+            ? t("newDeviceDialog.connecting")
+            : t("newDeviceDialog.connect")}
+        </span>
       </Button>
     </form>
   );

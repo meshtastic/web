@@ -1,11 +1,13 @@
 import { useDevice } from "@core/stores/deviceStore.ts";
-import type { DetectionSensorValidation } from "@app/validation/moduleConfig/detectionSensor.tsx";
+import type { DetectionSensorValidation } from "@app/validation/moduleConfig/detectionSensor.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 export const DetectionSensor = () => {
   const { moduleConfig, setWorkingModuleConfig } = useDevice();
+  const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: DetectionSensorValidation) => {
     setWorkingModuleConfig(
@@ -24,23 +26,24 @@ export const DetectionSensor = () => {
       defaultValues={moduleConfig.detectionSensor}
       fieldGroups={[
         {
-          label: "Detection Sensor Settings",
-          description: "Settings for the Detection Sensor module",
+          label: t("detectionSensor.title"),
+          description: t("detectionSensor.description"),
           fields: [
             {
               type: "toggle",
               name: "enabled",
-              label: "Enabled",
-              description: "Enable or disable Detection Sensor Module",
+              label: t("detectionSensor.enabled.label"),
+              description: t("detectionSensor.enabled.description"),
             },
             {
               type: "number",
               name: "minimumBroadcastSecs",
-              label: "Minimum Broadcast Seconds",
-              description:
-                "The interval in seconds of how often we can send a message to the mesh when a state change is detected",
+              label: t("detectionSensor.minimumBroadcastSecs.label"),
+              description: t(
+                "detectionSensor.minimumBroadcastSecs.description",
+              ),
               properties: {
-                suffix: "Seconds",
+                suffix: t("unit.second.plural"),
               },
               disabledBy: [
                 {
@@ -51,9 +54,8 @@ export const DetectionSensor = () => {
             {
               type: "number",
               name: "stateBroadcastSecs",
-              label: "State Broadcast Seconds",
-              description:
-                "The interval in seconds of how often we should send a message to the mesh with the current state regardless of changes",
+              label: t("detectionSensor.stateBroadcastSecs.label"),
+              description: t("detectionSensor.stateBroadcastSecs.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -63,8 +65,8 @@ export const DetectionSensor = () => {
             {
               type: "toggle",
               name: "sendBell",
-              label: "Send Bell",
-              description: "Send ASCII bell with alert message",
+              label: t("detectionSensor.sendBell.label"),
+              description: t("detectionSensor.sendBell.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -74,9 +76,8 @@ export const DetectionSensor = () => {
             {
               type: "text",
               name: "name",
-              label: "Friendly Name",
-              description:
-                "Used to format the message sent to mesh, max 20 Characters",
+              label: t("detectionSensor.name.label"),
+              description: t("detectionSensor.name.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -86,8 +87,8 @@ export const DetectionSensor = () => {
             {
               type: "number",
               name: "monitorPin",
-              label: "Monitor Pin",
-              description: "The GPIO pin to monitor for state changes",
+              label: t("detectionSensor.monitorPin.label"),
+              description: t("detectionSensor.monitorPin.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -97,9 +98,10 @@ export const DetectionSensor = () => {
             {
               type: "toggle",
               name: "detectionTriggeredHigh",
-              label: "Detection Triggered High",
-              description:
-                "Whether or not the GPIO pin state detection is triggered on HIGH (1), otherwise LOW (0)",
+              label: t("detectionSensor.detectionTriggeredHigh.label"),
+              description: t(
+                "detectionSensor.detectionTriggeredHigh.description",
+              ),
               disabledBy: [
                 {
                   fieldName: "enabled",
@@ -109,8 +111,8 @@ export const DetectionSensor = () => {
             {
               type: "toggle",
               name: "usePullup",
-              label: "Use Pullup",
-              description: "Whether or not use INPUT_PULLUP mode for GPIO pin",
+              label: t("detectionSensor.usePullup.label"),
+              description: t("detectionSensor.usePullup.description"),
               disabledBy: [
                 {
                   fieldName: "enabled",
