@@ -37,6 +37,7 @@ import { useTranslation } from "react-i18next";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
 
 export interface Group {
+  id: string;
   label: string;
   icon: LucideIcon;
   commands: Command[];
@@ -70,6 +71,7 @@ export const CommandPalette = () => {
 
   const groups: Group[] = [
     {
+      id: "gotoGroup",
       label: t("goto.label"),
       icon: LinkIcon,
       commands: [
@@ -112,6 +114,7 @@ export const CommandPalette = () => {
       ],
     },
     {
+      id: "manageGroup",
       label: t("manage.label"),
       icon: SmartphoneIcon,
       commands: [
@@ -142,6 +145,7 @@ export const CommandPalette = () => {
       ],
     },
     {
+      id: "contextualGroup",
       label: t("contextual.label"),
       icon: BoxSelectIcon,
       commands: [
@@ -210,6 +214,7 @@ export const CommandPalette = () => {
       ],
     },
     {
+      id: "debugGroup",
       label: t("debug.label"),
       icon: BugIcon,
       commands: [
@@ -232,8 +237,8 @@ export const CommandPalette = () => {
   ];
 
   const sortedGroups = [...groups].sort((a, b) => {
-    const aPinned = pinnedItems.includes(a.label) ? 1 : 0;
-    const bPinned = pinnedItems.includes(b.label) ? 1 : 0;
+    const aPinned = pinnedItems.includes(a.id) ? 1 : 0;
+    const bPinned = pinnedItems.includes(b.id) ? 1 : 0;
     return bPinned - aPinned;
   });
 
@@ -265,7 +270,7 @@ export const CommandPalette = () => {
                 <span>{group.label}</span>
                 <button
                   type="button"
-                  onClick={() => togglePinnedItem(group.label)}
+                  onClick={() => togglePinnedItem(group.id)}
                   className={cn(
                     "transition-all duration-300 scale-100 cursor-pointer p-2 focus:*:data-label:opacity-100",
                   )}
@@ -281,7 +286,7 @@ export const CommandPalette = () => {
                     size={16}
                     className={cn(
                       "transition-opacity",
-                      pinnedItems.includes(group.label)
+                      pinnedItems.includes(group.id)
                         ? "opacity-100 text-red-500"
                         : "opacity-40 hover:opacity-70",
                     )}
