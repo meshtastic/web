@@ -1,4 +1,7 @@
-import type { AudioValidation } from "@app/validation/moduleConfig/audio.ts";
+import {
+  type AudioValidation,
+  AudioValidationSchema,
+} from "@app/validation/moduleConfig/audio.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const Audio = () => {
   return (
     <DynamicForm<AudioValidation>
       onSubmit={onSubmit}
+      validationSchema={AudioValidationSchema}
+      formId="ModuleConfig_AudioConfig"
       defaultValues={moduleConfig.audio}
       fieldGroups={[
         {

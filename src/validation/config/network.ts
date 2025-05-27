@@ -17,14 +17,14 @@ export const NetworkValidationIpV4ConfigSchema = z.object({
 
 export const NetworkValidationSchema = z.object({
   wifiEnabled: z.boolean(),
-  wifiSsid: z.string().min(0).max(33).optional(),
-  wifiPsk: z.string().min(0).max(64).optional(),
-  ntpServer: z.string().min(2).max(30),
+  wifiSsid: z.string().max(33),
+  wifiPsk: z.string().max(64),
+  ntpServer: z.string().min(2).max(33),
   ethEnabled: z.boolean(),
   addressMode: AddressModeEnum,
-  ipv4Config: NetworkValidationIpV4ConfigSchema.optional(),
+  ipv4Config: NetworkValidationIpV4ConfigSchema,
   enabledProtocols: ProtocolFlagsEnum,
-  rsyslogServer: z.string(),
+  rsyslogServer: z.string().max(33),
 });
 
 export type NetworkValidation = z.infer<typeof NetworkValidationSchema>;

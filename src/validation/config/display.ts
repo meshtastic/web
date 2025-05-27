@@ -18,9 +18,9 @@ const CompassOrientationEnum = z.enum(
 );
 
 export const DisplayValidationSchema = z.object({
-  screenOnSecs: z.int(),
+  screenOnSecs: z.coerce.number().int().min(0),
   gpsFormat: GpsCoordinateEnum,
-  autoScreenCarouselSecs: z.int(),
+  autoScreenCarouselSecs: z.coerce.number().int().min(0),
   compassNorthTop: z.boolean(),
   flipScreen: z.boolean(),
   units: DisplayUnitsEnum,
@@ -29,6 +29,7 @@ export const DisplayValidationSchema = z.object({
   headingBold: z.boolean(),
   wakeOnTapOrMotion: z.boolean(),
   compassOrientation: CompassOrientationEnum,
+  use12hClock: z.boolean(),
 });
 
 export type DisplayValidation = z.infer<typeof DisplayValidationSchema>;

@@ -1,5 +1,8 @@
 import { useDevice } from "@core/stores/deviceStore.ts";
-import type { DetectionSensorValidation } from "@app/validation/moduleConfig/detectionSensor.ts";
+import {
+  type DetectionSensorValidation,
+  DetectionSensorValidationSchema,
+} from "@app/validation/moduleConfig/detectionSensor.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
@@ -23,6 +26,8 @@ export const DetectionSensor = () => {
   return (
     <DynamicForm<DetectionSensorValidation>
       onSubmit={onSubmit}
+      validationSchema={DetectionSensorValidationSchema}
+      formId="ModuleConfig_DetectionSensorConfig"
       defaultValues={moduleConfig.detectionSensor}
       fieldGroups={[
         {

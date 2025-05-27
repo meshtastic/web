@@ -1,4 +1,7 @@
-import type { RangeTestValidation } from "@app/validation/moduleConfig/rangeTest.ts";
+import {
+  type RangeTestValidation,
+  RangeTestValidationSchema,
+} from "@app/validation/moduleConfig/rangeTest.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const RangeTest = () => {
   return (
     <DynamicForm<RangeTestValidation>
       onSubmit={onSubmit}
+      validationSchema={RangeTestValidationSchema}
+      formId="ModuleConfig_RangeTestConfig"
       defaultValues={moduleConfig.rangeTest}
       fieldGroups={[
         {

@@ -1,11 +1,11 @@
 import { z } from "zod/v4";
 
-export const DetectionSensorValidationSchema = z.object({
+export const ExternalNotificationValidationSchema = z.object({
   enabled: z.boolean(),
-  outputMs: z.int(),
-  output: z.int(),
-  outputVibra: z.int(),
-  outputBuzzer: z.int(),
+  outputMs: z.coerce.number().int().min(0),
+  output: z.coerce.number().int().min(0),
+  outputVibra: z.coerce.number().int().min(0),
+  outputBuzzer: z.coerce.number().int().min(0),
   active: z.boolean(),
   alertMessage: z.boolean(),
   alertMessageVibra: z.boolean(),
@@ -14,10 +14,10 @@ export const DetectionSensorValidationSchema = z.object({
   alertBellVibra: z.boolean(),
   alertBellBuzzer: z.boolean(),
   usePwm: z.boolean(),
-  nagTimeout: z.int(),
+  nagTimeout: z.coerce.number().int().min(0),
   useI2sAsBuzzer: z.boolean(),
 });
 
-export type DetectionSensorValidation = z.infer<
-  typeof DetectionSensorValidationSchema
+export type ExternalNotificationValidation = z.infer<
+  typeof ExternalNotificationValidationSchema
 >;

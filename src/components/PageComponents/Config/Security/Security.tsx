@@ -2,116 +2,46 @@ import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx"
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
-import type { SecurityValidation } from "@app/validation/config/security.ts";
+import {
+  type ParsedSecurity,
+  type RawSecurity,
+  RawSecuritySchema,
+} from "@app/validation/config/security.ts";
+import { useState } from "react";
 import { create } from "@bufbuild/protobuf";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
-import { useReducer } from "react";
-import { securityReducer } from "@components/PageComponents/Config/Security/securityReducer.tsx";
-import type { SecurityConfigInit } from "./types.ts";
 import { useTranslation } from "react-i18next";
+
+type KeyState = {
+  publicKey: string;
+  privateKey: string;
+  privateKeyDialogOpen: boolean;
+};
 
 export const Security = () => {
   const { config, setWorkingConfig, setDialogOpen } = useDevice();
-  const {
-    hasErrors,
-    getErrorMessage,
-    hasFieldError,
-    addError,
-    removeError,
-    clearErrors,
-  } = useAppStore();
+  const { removeError } = useAppStore();
   const { t } = useTranslation("deviceConfig");
 
-  const [state, dispatch] = useReducer(securityReducer, {
-    privateKey: fromByteArray(config.security?.privateKey ?? new Uint8Array(0)),
-    privateKeyVisible: false,
-    adminKeyVisible: [false, false, false],
-    privateKeyBitCount: config.security?.privateKey?.length ?? 32,
-    publicKey: fromByteArray(config.security?.publicKey ?? new Uint8Array(0)),
-    adminKey: [
-      fromByteArray(config.security?.adminKey?.at(0) ?? new Uint8Array(0)),
-      fromByteArray(config.security?.adminKey?.at(1) ?? new Uint8Array(0)),
-      fromByteArray(config.security?.adminKey?.at(2) ?? new Uint8Array(0)),
-    ],
+  const [keyState, setKeyState] = useState<KeyState>(() => ({
+    publicKey: fromByteArray(config?.security?.publicKey ?? new Uint8Array(0)),
+    privateKey: fromByteArray(
+      config?.security?.privateKey ?? new Uint8Array(0),
+    ),
     privateKeyDialogOpen: false,
-    isManaged: config.security?.isManaged ?? false,
-    adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
-    debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
-    serialEnabled: config.security?.serialEnabled ?? false,
-  });
+  }));
 
-  const validateKey = (
-    input: string,
-    count: number,
-    fieldName: "privateKey" | "adminKey",
-    fieldIndex?: number,
-  ) => {
-    const fieldNameKey = fieldName + (fieldIndex ?? "");
-    try {
-      removeError(fieldNameKey);
-      if (fieldName === "privateKey" && input === "") {
-        addError(fieldNameKey, t("security.validation.privateKeyRequired"));
-        return;
-      }
-
-      if (fieldName === "adminKey" && input === "") {
-        if (
-          state.isManaged &&
-          state.adminKey
-            .map((v, i) => (i === fieldIndex ? input : v))
-            .every((s) => s === "")
-        ) {
-          addError("adminKey0", t("security."));
-        }
-
-        return;
-      }
-
-      if (input.length % 4 !== 0) {
-        addError(
-          fieldNameKey,
-          fieldName === "privateKey"
-            ? t("security.validation.privateKeyMustBe256BitPsk")
-            : t("security.validation.adminKeyMustBe256BitPsk"),
-        );
-        return;
-      }
-
-      const decoded = toByteArray(input);
-      if (decoded.length !== count) {
-        addError(
-          fieldNameKey,
-          t("security.validation.enterValid256BitPsk", {
-            bits: count * 8,
-          }),
-        );
-        return;
-      }
-    } catch (e) {
-      console.error(e);
-      addError(
-        fieldNameKey,
-        fieldName === "privateKey"
-          ? t("security.validation.invalidPrivateKeyFormat")
-          : t("security.validation.invalidAdminKeyFormat"),
-      );
-    }
-  };
-
-  function setSecurityPayload(overrides: SecurityConfigInit) {
-    const base: SecurityConfigInit = {
-      isManaged: state.isManaged,
-      adminChannelEnabled: state.adminChannelEnabled,
-      debugLogApiEnabled: state.debugLogApiEnabled,
-      serialEnabled: state.serialEnabled,
-      privateKey: overrides?.privateKey ?? toByteArray(state.privateKey),
-      publicKey: overrides?.publicKey ?? toByteArray(state.publicKey),
+  const onSubmit = (data: RawSecurity) => {
+    const payload: ParsedSecurity = {
+      ...data,
+      privateKey: toByteArray(keyState.privateKey),
+      publicKey: toByteArray(keyState.publicKey),
       adminKey: [
-        overrides?.adminKey?.[0] ?? toByteArray(state.adminKey[0]),
-        overrides?.adminKey?.[0] ?? toByteArray(state.adminKey[0]),
-        overrides?.adminKey?.[0] ?? toByteArray(state.adminKey[0]),
+        toByteArray(data.adminKey.at(0) ?? ""),
+        toByteArray(data.adminKey.at(1) ?? ""),
+        toByteArray(data.adminKey.at(2) ?? ""),
       ],
     };
 
@@ -119,137 +49,79 @@ export const Security = () => {
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "security",
-          value: { ...base, ...overrides },
+          value: payload,
         },
       }),
     );
-  }
-
+  };
   const pkiRegenerate = () => {
-    clearErrors();
     const privateKey = getX25519PrivateKey();
-    const publicKey = getX25519PublicKey(privateKey);
 
-    dispatch({
-      type: "REGENERATE_PRIV_PUB_KEY",
-      payload: {
-        privateKey: fromByteArray(privateKey),
-        publicKey: fromByteArray(publicKey),
-      },
-    });
+    updatePublicKey(fromByteArray(privateKey));
 
-    validateKey(
-      fromByteArray(privateKey),
-      state.privateKeyBitCount,
-      "privateKey",
-    );
+    setKeyState((prev) => ({
+      ...prev,
+      privateKey: fromByteArray(privateKey),
+      privateKeyDialogOpen: false,
+    }));
 
-    if (!hasErrors()) {
-      setSecurityPayload({
+    removeError("privateKey");
+  };
+
+  const updatePublicKey = (privateKey: string) => {
+    try {
+      const publicKey = fromByteArray(
+        getX25519PublicKey(toByteArray(privateKey)),
+      );
+      setKeyState((prev) => ({
+        ...prev,
         privateKey: privateKey,
         publicKey: publicKey,
-      });
+      }));
+
+      removeError("publicKey");
+    } catch (_e) {
+      setKeyState((prev) => ({
+        ...prev,
+        privateKey: privateKey,
+      }));
     }
   };
 
-  const privateKeyInputChangeEvent = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const privateKeyB64String = e.target.value;
-    dispatch({ type: "SET_PRIVATE_KEY", payload: privateKeyB64String });
-    validateKey(privateKeyB64String, state.privateKeyBitCount, "privateKey");
-
-    const publicKey = getX25519PublicKey(toByteArray(privateKeyB64String));
-    dispatch({ type: "SET_PUBLIC_KEY", payload: fromByteArray(publicKey) });
-
-    if (!hasErrors()) {
-      setSecurityPayload({
-        privateKey: toByteArray(privateKeyB64String),
-        publicKey: publicKey,
-      });
-    }
-  };
-
-  const adminKeyInputChangeEvent = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    fieldIndex?: number,
-  ) => {
-    if (fieldIndex === undefined) return;
-    const psk = e.target.value;
-
-    const payload = [
-      fieldIndex === 0 ? psk : state.adminKey[0],
-      fieldIndex === 1 ? psk : state.adminKey[1],
-      fieldIndex === 2 ? psk : state.adminKey[2],
-    ] satisfies [string, string, string];
-
-    dispatch({ type: "SET_ADMIN_KEY", payload: payload });
-    validateKey(psk, state.privateKeyBitCount, "adminKey", fieldIndex);
-
-    if (!hasErrors()) {
-      setSecurityPayload({
-        adminKey: payload.map(toByteArray) as [
-          Uint8Array,
-          Uint8Array,
-          Uint8Array,
-        ],
-      });
-    }
-  };
-
-  const onToggleChange = (
-    field:
-      | "isManaged"
-      | "adminChannelEnabled"
-      | "debugLogApiEnabled"
-      | "serialEnabled",
-    next: boolean,
-  ) => {
-    dispatch({ type: "SET_TOGGLE", field, payload: next });
-
-    if (field === "isManaged" && state.adminKey.every((s) => s === "")) {
-      if (next) {
-        // If enabling 'managed' and no admin keys are set
-        addError(
-          "adminKey0",
-          t("security.validation.adminKeyRequiredWhenManaged"),
-        );
-      } else {
-        removeError("adminKey0");
-        removeError("adminKey1");
-        removeError("adminKey2");
-      }
-    }
-
-    if (!hasErrors()) {
-      setSecurityPayload({
-        isManaged: field === "isManaged" ? next : state.isManaged,
-        adminChannelEnabled: field === "adminChannelEnabled"
-          ? next
-          : state.adminChannelEnabled,
-        debugLogApiEnabled: field === "debugLogApiEnabled"
-          ? next
-          : state.debugLogApiEnabled,
-        serialEnabled: field === "serialEnabled" ? next : state.serialEnabled,
-      });
-    }
-  };
+  const bits = [
+    {
+      text: t("security.256bit"),
+      value: "32",
+      key: "bit256",
+    },
+  ];
 
   return (
     <>
-      <DynamicForm<SecurityValidation>
-        onSubmit={() => {}}
-        submitType="onSubmit"
+      <DynamicForm<RawSecurity>
+        onSubmit={onSubmit}
+        validationSchema={RawSecuritySchema}
+        formId="Config_SecurityConfig"
         defaultValues={{
           ...config.security,
           ...{
-            adminKey: state.adminKey,
-            privateKey: state.privateKey,
-            publicKey: state.publicKey,
-            adminChannelEnabled: config.security?.adminChannelEnabled ?? false,
-            isManaged: config.security?.isManaged ?? false,
-            debugLogApiEnabled: config.security?.debugLogApiEnabled ?? false,
-            serialEnabled: config.security?.serialEnabled ?? false,
+            privateKey: fromByteArray(
+              config?.security?.privateKey ?? new Uint8Array(0),
+            ),
+            publicKey: fromByteArray(
+              config?.security?.publicKey ?? new Uint8Array(0),
+            ),
+            adminKey: [
+              fromByteArray(
+                config?.security?.adminKey.at(0) ?? new Uint8Array(0),
+              ),
+              fromByteArray(
+                config?.security?.adminKey.at(1) ?? new Uint8Array(0),
+              ),
+              fromByteArray(
+                config?.security?.adminKey.at(2) ?? new Uint8Array(0),
+              ),
+            ],
           },
         }}
         fieldGroups={[
@@ -263,28 +135,20 @@ export const Security = () => {
                 name: "privateKey",
                 label: t("security.privateKey.label"),
                 description: t("security.privateKey.description"),
-                bits: [
-                  {
-                    text: t("security.256bit"),
-                    value: "32",
-                    key: "bit256",
-                  },
-                ],
-                validationText: hasFieldError("privateKey")
-                  ? getErrorMessage("privateKey")
-                  : "",
-                devicePSKBitCount: state.privateKeyBitCount,
-                inputChange: privateKeyInputChangeEvent,
-                selectChange: () => {},
-                hide: !state.privateKeyVisible,
+                bits,
+                devicePSKBitCount: 32,
+                hide: true,
+                inputChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                  updatePublicKey(e.target.value);
+                },
                 actionButtons: [
                   {
                     text: t("button.generate"),
                     onClick: () =>
-                      dispatch({
-                        type: "SHOW_PRIVATE_KEY_DIALOG",
-                        payload: true,
-                      }),
+                      setKeyState((prev) => ({
+                        ...prev,
+                        privateKeyDialogOpen: true,
+                      })),
                     variant: "success",
                   },
                   {
@@ -294,9 +158,10 @@ export const Security = () => {
                   },
                 ],
                 properties: {
-                  value: state.privateKey,
                   showCopyButton: true,
                   showPasswordToggle: true,
+
+                  value: keyState.privateKey,
                 },
               },
               {
@@ -306,8 +171,8 @@ export const Security = () => {
                 disabled: true,
                 description: t("security.publicKey.description"),
                 properties: {
-                  value: state.publicKey,
                   showCopyButton: true,
+                  value: keyState.publicKey,
                 },
               },
             ],
@@ -322,26 +187,14 @@ export const Security = () => {
                 id: "adminKey0Input",
                 label: t("security.primaryAdminKey.label"),
                 description: t("security.primaryAdminKey.description"),
-                validationText: hasFieldError("adminKey0")
-                  ? getErrorMessage("adminKey0")
-                  : "",
-                inputChange: (e) => adminKeyInputChangeEvent(e, 0),
-                selectChange: () => {},
-                bits: [
-                  {
-                    text: t("security.256bit"),
-                    value: "32",
-                    key: "bit256",
-                  },
-                ],
-                devicePSKBitCount: state.privateKeyBitCount,
-                hide: !state.adminKeyVisible[0],
+                bits,
+                devicePSKBitCount: 32,
+                hide: true,
                 actionButtons: [],
                 disabledBy: [
                   { fieldName: "adminChannelEnabled", invert: true },
                 ],
                 properties: {
-                  value: state.adminKey[0],
                   showCopyButton: true,
                   showPasswordToggle: true,
                 },
@@ -352,26 +205,14 @@ export const Security = () => {
                 id: "adminKey1Input",
                 label: t("security.secondaryAdminKey.label"),
                 description: t("security.secondaryAdminKey.description"),
-                validationText: hasFieldError("adminKey1")
-                  ? getErrorMessage("adminKey1")
-                  : "",
-                inputChange: (e) => adminKeyInputChangeEvent(e, 1),
-                selectChange: () => {},
-                bits: [
-                  {
-                    text: t("security.256bit"),
-                    value: "32",
-                    key: "bit256",
-                  },
-                ],
-                devicePSKBitCount: state.privateKeyBitCount,
-                hide: !state.adminKeyVisible[1],
+                bits,
+                devicePSKBitCount: 32,
+                hide: true,
                 actionButtons: [],
                 disabledBy: [
                   { fieldName: "adminChannelEnabled", invert: true },
                 ],
                 properties: {
-                  value: state.adminKey[1],
                   showCopyButton: true,
                   showPasswordToggle: true,
                 },
@@ -382,26 +223,14 @@ export const Security = () => {
                 id: "adminKey2Input",
                 label: t("security.tertiaryAdminKey.label"),
                 description: t("security.tertiaryAdminKey.description"),
-                validationText: hasFieldError("adminKey2")
-                  ? getErrorMessage("adminKey2")
-                  : "",
-                inputChange: (e) => adminKeyInputChangeEvent(e, 2),
-                selectChange: () => {},
-                bits: [
-                  {
-                    text: t("security.256bit"),
-                    value: "32",
-                    key: "bit256",
-                  },
-                ],
-                devicePSKBitCount: state.privateKeyBitCount,
-                hide: !state.adminKeyVisible[2],
+                bits,
+                devicePSKBitCount: 32,
+                hide: true,
                 actionButtons: [],
                 disabledBy: [
                   { fieldName: "adminChannelEnabled", invert: true },
                 ],
                 properties: {
-                  value: state.adminKey[2],
                   showCopyButton: true,
                   showPasswordToggle: true,
                 },
@@ -411,25 +240,12 @@ export const Security = () => {
                 name: "isManaged",
                 label: t("security.managed.label"),
                 description: t("security.managed.description"),
-                inputChange: (e: boolean) => onToggleChange("isManaged", e),
-                properties: {
-                  checked: state.isManaged,
-                },
-                disabled: (hasFieldError("adminKey0") ||
-                  hasFieldError("adminKey1") ||
-                  hasFieldError("adminKey2")) &&
-                  !state.adminKey.every((s) => s === ""),
               },
               {
                 type: "toggle",
                 name: "adminChannelEnabled",
                 label: t("security.adminChannelEnabled.label"),
                 description: t("security.adminChannelEnabled.description"),
-                inputChange: (e: boolean) =>
-                  onToggleChange("adminChannelEnabled", e),
-                properties: {
-                  checked: state.adminChannelEnabled,
-                },
               },
             ],
           },
@@ -442,21 +258,12 @@ export const Security = () => {
                 name: "debugLogApiEnabled",
                 label: t("security.enableDebugLogApi.label"),
                 description: t("security.enableDebugLogApi.description"),
-                inputChange: (e: boolean) =>
-                  onToggleChange("debugLogApiEnabled", e),
-                properties: {
-                  checked: state.debugLogApiEnabled,
-                },
               },
               {
                 type: "toggle",
                 name: "serialEnabled",
                 label: t("security.serialOutputEnabled.label"),
                 description: t("security.serialOutputEnabled.description"),
-                inputChange: (e: boolean) => onToggleChange("serialEnabled", e),
-                properties: {
-                  checked: state.serialEnabled,
-                },
               },
             ],
           },
@@ -468,9 +275,12 @@ export const Security = () => {
           title: t("pkiRegenerate.title"),
           description: t("pkiRegenerate.description"),
         }}
-        open={state.privateKeyDialogOpen}
+        open={keyState.privateKeyDialogOpen}
         onOpenChange={() =>
-          dispatch({ type: "SHOW_PRIVATE_KEY_DIALOG", payload: false })}
+          setKeyState((prev) => ({
+            ...prev,
+            privateKeyDialogOpen: false,
+          }))}
         onSubmit={pkiRegenerate}
       />
     </>

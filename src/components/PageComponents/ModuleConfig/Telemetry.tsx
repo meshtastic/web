@@ -1,4 +1,7 @@
-import type { TelemetryValidation } from "@app/validation/moduleConfig/telemetry.ts";
+import {
+  type TelemetryValidation,
+  TelemetryValidationSchema,
+} from "@app/validation/moduleConfig/telemetry.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const Telemetry = () => {
   return (
     <DynamicForm<TelemetryValidation>
       onSubmit={onSubmit}
+      validationSchema={TelemetryValidationSchema}
+      formId="ModuleConfig_TelemetryConfig"
       defaultValues={moduleConfig.telemetry}
       fieldGroups={[
         {

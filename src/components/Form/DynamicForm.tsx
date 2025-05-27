@@ -9,11 +9,17 @@ import {
   type Control,
   type DefaultValues,
   type FieldValues,
+  get,
   type Path,
   type SubmitHandler,
   useForm,
 } from "react-hook-form";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
+import { ZodType } from "zod/v4";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { createZodResolver } from "@components/Form/createZodResolver.ts";
+import { useAppStore } from "@core/stores/appStore.ts";
 
 interface DisabledBy<T> {
   fieldName: Path<T>;
@@ -51,6 +57,8 @@ export interface DynamicFormProps<T extends FieldValues> {
     validationText?: string;
     fields: FieldProps<T>[];
   }[];
+  validationSchema?: ZodType<T>;
+  formId?: string;
 }
 
 export function DynamicForm<T extends FieldValues>({
@@ -59,11 +67,55 @@ export function DynamicForm<T extends FieldValues>({
   hasSubmitButton,
   defaultValues,
   fieldGroups,
+  validationSchema,
+  formId,
 }: DynamicFormProps<T>) {
-  const { handleSubmit, control, getValues } = useForm<T>({
+  const { t } = useTranslation("common");
+  const {
+    addError,
+    removeError,
+  } = useAppStore();
+
+  const { handleSubmit, control, getValues, formState } = useForm<
+    T
+  >({
     mode: submitType,
     defaultValues: defaultValues,
+    resolver: validationSchema
+      ? createZodResolver(validationSchema)
+      : undefined,
+    shouldFocusError: false,
   });
+
+  // deno-lint-ignore no-explicit-any
+  const dotPaths = <T extends Record<string, any>>(
+    obj: T,
+    prefix = "",
+  ): string[] =>
+    Object.entries(obj).flatMap(([k, v]) =>
+      v && typeof v === "object"
+        ? dotPaths(v, `${prefix}${k}.`)
+        : [`${prefix}${k}`]
+    );
+
+  useEffect(() => {
+    const errorKeys = Object.keys(formState.errors);
+    if (formId) {
+      if (
+        errorKeys.length === 0
+      ) {
+        dotPaths(getValues()).forEach((key) => {
+          removeError(key);
+        });
+        removeError(formId);
+      } else {
+        errorKeys.forEach((key) => {
+          addError(key, "");
+        });
+        addError(formId, "");
+      }
+    }
+  }, [formState.errors]);
 
   const isDisabled = (
     disabledBy?: DisabledBy<T>[],
@@ -88,9 +140,9 @@ export function DynamicForm<T extends FieldValues>({
   return (
     <form
       className="space-y-8"
-      {...(submitType === "onSubmit" ? { onSubmit: handleSubmit(onSubmit) } : {
-        onChange: handleSubmit(onSubmit),
-      })}
+      {...(submitType === "onSubmit"
+        ? { onSubmit: handleSubmit(onSubmit) }
+        : { onChange: handleSubmit(onSubmit) })}
     >
       {fieldGroups.map((fieldGroup) => (
         <div key={fieldGroup.label} className="space-y-8 sm:space-y-5">
@@ -103,15 +155,27 @@ export function DynamicForm<T extends FieldValues>({
           </div>
 
           {fieldGroup.fields.map((field) => {
+            const error = get(formState.errors, field.name as string);
             return (
               <FieldWrapper
                 key={field.label}
                 label={field.label}
                 fieldName={field.name}
                 description={field.description}
-                valid={field.validationText === undefined ||
-                  field.validationText === ""}
-                validationText={field.validationText}
+                valid={validationSchema // keep backwards compat with not updated cfg pages
+                  ? !error
+                  : field.validationText === undefined ||
+                    field.validationText === ""}
+                validationText={validationSchema
+                  ? (error
+                    ? String(
+                      t([`formValidation.${error.type}`, error.message], {
+                        returnObjects: false,
+                        ...error.params,
+                      }),
+                    )
+                    : "")
+                  : field.validationText}
               >
                 <DynamicFormField
                   field={field}

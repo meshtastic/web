@@ -7,12 +7,12 @@ const Audio_BaudEnum = z.enum(
 
 export const AudioValidationSchema = z.object({
   codec2Enabled: z.boolean(),
-  pttPin: z.int(),
+  pttPin: z.coerce.number().int().min(0),
   bitrate: Audio_BaudEnum,
-  i2sWs: z.int(),
-  i2sSd: z.int(),
-  i2sDin: z.int(),
-  i2sSck: z.int(),
+  i2sWs: z.coerce.number().int().min(0),
+  i2sSd: z.coerce.number().int().min(0),
+  i2sDin: z.coerce.number().int().min(0),
+  i2sSck: z.coerce.number().int().min(0),
 });
 
 export type AudioValidation = z.infer<typeof AudioValidationSchema>;

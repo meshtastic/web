@@ -1,4 +1,7 @@
-import type { PaxcounterValidation } from "@app/validation/moduleConfig/paxcounter.ts";
+import {
+  type PaxcounterValidation,
+  PaxcounterValidationSchema,
+} from "@app/validation/moduleConfig/paxcounter.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const Paxcounter = () => {
   return (
     <DynamicForm<PaxcounterValidation>
       onSubmit={onSubmit}
+      validationSchema={PaxcounterValidationSchema}
+      formId="ModuleConfig_PaxcounterConfig"
       defaultValues={moduleConfig.paxcounter}
       fieldGroups={[
         {
