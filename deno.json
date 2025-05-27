@@ -4,7 +4,8 @@
     "@pages/": "./src/pages/",
     "@components/": "./src/components/",
     "@core/": "./src/core/",
-    "@layouts/": "./src/layouts/"
+    "@layouts/": "./src/layouts/",
+    "@std/path": "jsr:@std/path@^1.1.0"
   },
   "compilerOptions": {
     "lib": [

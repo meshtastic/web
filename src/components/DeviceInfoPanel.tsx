@@ -13,7 +13,7 @@ import { Subtle } from "./UI/Typography/Subtle.tsx";
 import { Avatar } from "./UI/Avatar.tsx";
 import { DeviceMetrics } from "./types.ts";
 import { Button } from "./UI/Button.tsx";
-import React from "react";
+import React, { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import ThemeSwitcher from "./ThemeSwitcher.tsx";
 import LanguageSwitcher from "./LanguageSwitcher.tsx";
@@ -188,7 +188,11 @@ export const DeviceInfoPanel = ({
           {actionButtons.map((buttonItem) => {
             const Icon = buttonItem.icon;
             if (buttonItem.render) {
-              return buttonItem.render();
+              return (
+                <Fragment key={buttonItem.id}>
+                  {buttonItem.render()}
+                </Fragment>
+              );
             }
             return (
               <Button

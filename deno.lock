@@ -2,6 +2,7 @@
   "version": "5",
   "specifiers": {
     "jsr:@std/path@*": "1.0.6",
+    "jsr:@std/path@^1.1.0": "1.1.0",
     "npm:@bufbuild/protobuf@^2.2.5": "2.2.5",
     "npm:@jsr/meshtastic__core@2.6.2": "2.6.2",
     "npm:@jsr/meshtastic__js@2.6.0-0": "2.6.0-0",
@@ -83,6 +84,9 @@
   "jsr": {
     "@std/path@1.0.6": {
       "integrity": "ab2c55f902b380cf28e0eec501b4906e4c1960d13f00e11cfbcd21de15f18fed"
+    },
+    "@std/path@1.1.0": {
+      "integrity": "ddc94f8e3c275627281cbc23341df6b8bcc874d70374f75fec2533521e3d6886"
     }
   },
   "npm": {
@@ -7294,6 +7298,9 @@
     }
   },
   "workspace": {
+    "dependencies": [
+      "jsr:@std/path@^1.1.0"
+    ],
     "packageJson": {
       "dependencies": [
         "npm:@bufbuild/protobuf@^2.2.5",

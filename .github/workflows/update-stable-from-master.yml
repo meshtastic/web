@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   update-stable-branch:
-    name: Update Stable Branch fromMain 
+    name: Update Stable Branch from Main 
     runs-on: ubuntu-latest
 
     steps:
