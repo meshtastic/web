@@ -20,7 +20,7 @@ i18next
   .use(LanguageDetector)
   .init({
     backend: {
-      // this will lazy load resources from the i8n folder
+      // this will lazy load resources from the i18n folder
       loadPath: "/src/i18n/locales/{{lng}}/{{ns}}.json",
     },
     react: {
@@ -42,7 +42,7 @@ i18next
       "commandPalette",
       "common",
       "deviceConfig",
-      "configModules",
+      "moduleConfig",
       "dashboard",
       "dialog",
       "messages",
