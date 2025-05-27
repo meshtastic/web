@@ -213,7 +213,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                 shortName: myNode?.user?.shortName ?? t("unknown.shortName"),
               }}
               firmwareVersion={myMetadata?.firmwareVersion ??
-                t("unknown.firmwareVersion")}
+                t("unknown.notAvailable")}
               deviceMetrics={{
                 batteryLevel: myNode.deviceMetrics?.batteryLevel,
                 voltage: myNode.deviceMetrics?.voltage,
