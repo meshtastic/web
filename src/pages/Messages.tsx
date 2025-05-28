@@ -297,8 +297,8 @@ export const MessagesPage = () => {
             onClick() {
               toast({
                 title: otherNode.user?.publicKey?.length
-                  ? t("toast.pkiEncryption")
-                  : t("toast.pskEncryption"),
+                  ? t("toast.messages.pkiEncryption.title")
+                  : t("toast.messages.pskEncryption.title"),
               });
             },
           },
