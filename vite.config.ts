@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 import { execSync } from "node:child_process";
 import process from "node:process";
 import path from "node:path";
@@ -26,6 +27,14 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         sourcemap: true,
       },
+    }),
+    viteStaticCopy({
+      targets: [
+        {
+          src: "src/i18n/locales/**/*",
+          dest: "src/i18n/locales"
+        }
+      ]
     }),
   ],
   define: {
