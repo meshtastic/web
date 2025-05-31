@@ -1,59 +1,22 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import {
-  IsBoolean,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Length,
-} from "class-validator";
+import { z } from "zod/v4";
 
-export class MqttValidation implements
-  Omit<
-    Protobuf.ModuleConfig.ModuleConfig_MQTTConfig,
-    keyof Message | "mapReportSettings"
-  > {
-  @IsBoolean()
-  enabled: boolean;
+export const MqttValidationMapReportSettingsSchema = z.object({
+  publishIntervalSecs: z.number().optional(),
+  positionPrecision: z.number().optional(),
+});
 
-  @Length(0, 30)
-  address: string;
+export const MqttValidationSchema = z.object({
+  enabled: z.boolean(),
+  address: z.string().min(0).max(30),
+  username: z.string().min(0).max(30),
+  password: z.string().min(0).max(30),
+  encryptionEnabled: z.boolean(),
+  jsonEnabled: z.boolean(),
+  tlsEnabled: z.boolean(),
+  root: z.string(),
+  proxyToClientEnabled: z.boolean(),
+  mapReportingEnabled: z.boolean(),
+  mapReportSettings: MqttValidationMapReportSettingsSchema,
+});
 
-  @Length(0, 30)
-  username: string;
-
-  @Length(0, 30)
-  password: string;
-
-  @IsBoolean()
-  encryptionEnabled: boolean;
-
-  @IsBoolean()
-  jsonEnabled: boolean;
-
-  @IsBoolean()
-  tlsEnabled: boolean;
-
-  @IsString()
-  root: string;
-
-  @IsBoolean()
-  proxyToClientEnabled: boolean;
-
-  @IsBoolean()
-  mapReportingEnabled: boolean;
-
-  mapReportSettings: MqttValidationMapReportSettings;
-}
-
-export class MqttValidationMapReportSettings
-  implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_MapReportSettings, keyof Message> {
-  @IsNumber()
-  @IsOptional()
-  publishIntervalSecs: number;
-
-  @IsNumber()
-  @IsOptional()
-  positionPrecision: number;
-}
+export type MqttValidation = z.infer<typeof MqttValidationSchema>;

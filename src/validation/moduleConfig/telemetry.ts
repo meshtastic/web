@@ -1,37 +1,18 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsInt } from "class-validator";
+import { z } from "zod/v4";
 
-export class TelemetryValidation
-  implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_TelemetryConfig, keyof Message> {
-  @IsInt()
-  deviceUpdateInterval: number;
+export const TelemetryValidationSchema = z.object({
+  deviceUpdateInterval: z.coerce.number().int().min(0),
+  environmentUpdateInterval: z.coerce.number().int().min(0),
+  environmentMeasurementEnabled: z.boolean(),
+  environmentScreenEnabled: z.boolean(),
+  environmentDisplayFahrenheit: z.boolean(),
+  airQualityEnabled: z.boolean(),
+  airQualityInterval: z.coerce.number().int().min(0),
+  powerMeasurementEnabled: z.boolean(),
+  powerUpdateInterval: z.coerce.number().int().min(0),
+  powerScreenEnabled: z.boolean(),
+});
 
-  @IsInt()
-  environmentUpdateInterval: number;
-
-  @IsBoolean()
-  environmentMeasurementEnabled: boolean;
-
-  @IsBoolean()
-  environmentScreenEnabled: boolean;
-
-  @IsBoolean()
-  environmentDisplayFahrenheit: boolean;
-
-  @IsBoolean()
-  airQualityEnabled: boolean;
-
-  @IsInt()
-  airQualityInterval: number;
-
-  @IsBoolean()
-  powerMeasurementEnabled: boolean;
-
-  @IsInt()
-  powerUpdateInterval: number;
-
-  @IsBoolean()
-  powerScreenEnabled: boolean;
-}
+export type TelemetryValidation = z.infer<
+  typeof TelemetryValidationSchema
+>;

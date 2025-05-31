@@ -1,13 +1,10 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsInt } from "class-validator";
+import { z } from "zod/v4";
 
-export class NeighborInfoValidation
-  implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_NeighborInfoConfig, keyof Message> {
-  @IsBoolean()
-  enabled: boolean;
+export const NeighborInfoValidationSchema = z.object({
+  enabled: z.boolean(),
+  updateInterval: z.coerce.number().int().min(0),
+});
 
-  @IsInt()
-  updateInterval: number;
-}
+export type NeighborInfoValidation = z.infer<
+  typeof NeighborInfoValidationSchema
+>;

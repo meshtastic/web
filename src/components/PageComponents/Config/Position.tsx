@@ -2,7 +2,10 @@ import {
   type FlagName,
   usePositionFlags,
 } from "@core/hooks/usePositionFlags.ts";
-import type { PositionValidation } from "@app/validation/config/position.ts";
+import {
+  type PositionValidation,
+  PositionValidationSchema,
+} from "@app/validation/config/position.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -41,6 +44,8 @@ export const Position = () => {
         data.positionFlags = flagsValue;
         return onSubmit(data);
       }}
+      validationSchema={PositionValidationSchema}
+      formId="Config_PositionConfig"
       defaultValues={config.position}
       fieldGroups={[
         {

@@ -1,44 +1,22 @@
-import type { Message } from "@bufbuild/protobuf";
+import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
-const DeprecatedPositionValidationFields = ["gpsEnabled", "gpsAttemptTime"];
+const GpsModeEnum = z.enum(
+  Protobuf.Config.Config_PositionConfig_GpsMode,
+);
 
-export class PositionValidation implements
-  Omit<
-    Protobuf.Config.Config_PositionConfig,
-    keyof Message | (typeof DeprecatedPositionValidationFields)[number]
-  > {
-  @IsInt()
-  positionBroadcastSecs: number;
+export const PositionValidationSchema = z.object({
+  positionBroadcastSecs: z.coerce.number().int().min(0),
+  positionBroadcastSmartEnabled: z.boolean(),
+  fixedPosition: z.boolean(),
+  gpsUpdateInterval: z.coerce.number().int().min(0),
+  positionFlags: z.coerce.number().int().min(0),
+  rxGpio: z.coerce.number().int().min(0),
+  txGpio: z.coerce.number().int().min(0),
+  broadcastSmartMinimumDistance: z.coerce.number().int().min(0),
+  broadcastSmartMinimumIntervalSecs: z.coerce.number().int().min(0),
+  gpsEnGpio: z.coerce.number().int().min(0),
+  gpsMode: GpsModeEnum,
+});
 
-  @IsBoolean()
-  positionBroadcastSmartEnabled: boolean;
-
-  @IsBoolean()
-  fixedPosition: boolean;
-
-  @IsInt()
-  gpsUpdateInterval: number;
-
-  @IsInt()
-  positionFlags: number;
-
-  @IsInt()
-  rxGpio: number;
-
-  @IsInt()
-  txGpio: number;
-
-  @IsInt()
-  broadcastSmartMinimumDistance: number;
-
-  @IsInt()
-  broadcastSmartMinimumIntervalSecs: number;
-
-  @IsInt()
-  gpsEnGpio: number;
-
-  @IsEnum(Protobuf.Config.Config_PositionConfig_GpsMode)
-  gpsMode: Protobuf.Config.Config_PositionConfig_GpsMode;
-}
+export type PositionValidation = z.infer<typeof PositionValidationSchema>;

@@ -1,5 +1,8 @@
 import { useDevice } from "@core/stores/deviceStore.ts";
-import type { NeighborInfoValidation } from "@app/validation/moduleConfig/neighborInfo.ts";
+import {
+  type NeighborInfoValidation,
+  NeighborInfoValidationSchema,
+} from "@app/validation/moduleConfig/neighborInfo.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
@@ -23,6 +26,8 @@ export const NeighborInfo = () => {
   return (
     <DynamicForm<NeighborInfoValidation>
       onSubmit={onSubmit}
+      validationSchema={NeighborInfoValidationSchema}
+      formId="ModuleConfig_NeighborInfoConfig"
       defaultValues={moduleConfig.neighborInfo}
       fieldGroups={[
         {

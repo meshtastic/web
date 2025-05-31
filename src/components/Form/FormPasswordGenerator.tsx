@@ -4,7 +4,6 @@ import type {
 } from "@components/Form/DynamicForm.tsx";
 import type { ButtonVariant } from "../UI/Button.tsx";
 import { Generator } from "@components/UI/Generator.tsx";
-import type { ChangeEventHandler } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
 import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
 
@@ -14,8 +13,8 @@ export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
   hide?: boolean;
   bits?: { text: string; value: string; key: string }[];
   devicePSKBitCount: number;
-  inputChange: ChangeEventHandler<HTMLInputElement> | undefined;
-  selectChange: (event: string) => void;
+  inputChange?: React.ChangeEventHandler<HTMLInputElement>;
+  selectChange?: (event: string) => void;
   actionButtons: {
     text: string;
     onClick: React.MouseEventHandler<HTMLButtonElement>;
@@ -37,14 +36,17 @@ export function PasswordGenerator<T extends FieldValues>({
     <Controller
       name={field.name}
       control={control}
-      render={({ field: { value, ...rest } }) => (
+      render={({ field: { value, onChange, ...rest } }) => (
         <Generator
           type={field.hide && !isVisible ? "password" : "text"}
           id={field.id}
           devicePSKBitCount={field.devicePSKBitCount}
           bits={field.bits}
-          inputChange={field.inputChange}
-          selectChange={field.selectChange}
+          inputChange={(e) => {
+            if (field.inputChange) field.inputChange(e);
+            onChange(e);
+          }}
+          selectChange={field.selectChange ?? (() => {})}
           value={value}
           variant={field.validationText ? "invalid" : "default"}
           actionButtons={field.actionButtons}

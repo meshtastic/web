@@ -1,4 +1,7 @@
-import type { LoRaValidation } from "@app/validation/config/lora.ts";
+import {
+  type LoRaValidation,
+  LoRaValidationSchema,
+} from "@app/validation/config/lora.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const LoRa = () => {
   return (
     <DynamicForm<LoRaValidation>
       onSubmit={onSubmit}
+      validationSchema={LoRaValidationSchema}
+      formId="Config_LoRaConfig"
       defaultValues={config.lora}
       fieldGroups={[
         {

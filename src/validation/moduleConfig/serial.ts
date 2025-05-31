@@ -1,31 +1,22 @@
-import type { Message } from "@bufbuild/protobuf";
+import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
-export class SerialValidation
-  implements
-    Omit<Protobuf.ModuleConfig.ModuleConfig_SerialConfig, keyof Message> {
-  @IsBoolean()
-  enabled: boolean;
+const Serial_BaudEnum = z.enum(
+  Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud,
+);
+const Serial_ModeEnum = z.enum(
+  Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode,
+);
 
-  @IsBoolean()
-  echo: boolean;
+export const SerialValidationSchema = z.object({
+  enabled: z.boolean(),
+  echo: z.boolean(),
+  rxd: z.coerce.number().int().min(0),
+  txd: z.coerce.number().int().min(0),
+  baud: Serial_BaudEnum,
+  timeout: z.coerce.number().int().min(0),
+  mode: Serial_ModeEnum,
+  overrideConsoleSerialPort: z.boolean(),
+});
 
-  @IsInt()
-  rxd: number;
-
-  @IsInt()
-  txd: number;
-
-  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud)
-  baud: Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Baud;
-
-  @IsInt()
-  timeout: number;
-
-  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode)
-  mode: Protobuf.ModuleConfig.ModuleConfig_SerialConfig_Serial_Mode;
-
-  @IsBoolean()
-  overrideConsoleSerialPort: boolean;
-}
+export type SerialValidation = z.infer<typeof SerialValidationSchema>;

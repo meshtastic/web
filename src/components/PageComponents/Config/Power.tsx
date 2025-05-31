@@ -1,4 +1,7 @@
-import type { PowerValidation } from "@app/validation/config/power.ts";
+import {
+  type PowerValidation,
+  PowerValidationSchema,
+} from "@app/validation/config/power.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const Power = () => {
   return (
     <DynamicForm<PowerValidation>
       onSubmit={onSubmit}
+      validationSchema={PowerValidationSchema}
+      formId="Config_PowerConfig"
       defaultValues={config.power}
       fieldGroups={[
         {

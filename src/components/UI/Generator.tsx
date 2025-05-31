@@ -1,5 +1,4 @@
-import * as React from "react";
-
+import { useEffect, useRef } from "react";
 import { Button, type ButtonVariant } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import {
@@ -27,9 +26,7 @@ export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   actionButtons: ActionButton[];
   bits?: { text: string; value: string; key: string }[];
   selectChange: (event: string) => void;
-  inputChange: (
-    event: React.ChangeEventHandler<HTMLInputElement> | undefined,
-  ) => void;
+  inputChange: React.ChangeEventHandler<HTMLInputElement>;
   showPasswordToggle?: boolean;
   showCopyButton?: boolean;
   disabled?: boolean;
@@ -57,10 +54,10 @@ const Generator = (
     ...props
   }: GeneratorProps,
 ) => {
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Invokes onChange event on the input element when the value changes from the parent component
-  React.useEffect(() => {
+  useEffect(() => {
     if (!inputRef.current) return;
     const setValue = Object.getOwnPropertyDescriptor(
       HTMLInputElement.prototype,

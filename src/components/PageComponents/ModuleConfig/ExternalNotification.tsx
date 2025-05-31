@@ -1,4 +1,7 @@
-import type { ExternalNotificationValidation } from "@app/validation/moduleConfig/externalNotification.ts";
+import {
+  type ExternalNotificationValidation,
+  ExternalNotificationValidationSchema,
+} from "@app/validation/moduleConfig/externalNotification.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const ExternalNotification = () => {
   return (
     <DynamicForm<ExternalNotificationValidation>
       onSubmit={onSubmit}
+      validationSchema={ExternalNotificationValidationSchema}
+      formId="ModuleConfig_ExternalNotificationConfig"
       defaultValues={moduleConfig.externalNotification}
       fieldGroups={[
         {

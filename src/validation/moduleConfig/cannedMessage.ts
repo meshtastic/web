@@ -1,45 +1,24 @@
-import type { Message } from "@bufbuild/protobuf";
+import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsEnum, IsInt, Length } from "class-validator";
 
-export class CannedMessageValidation implements
-  Omit<
-    Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig,
-    keyof Message
-  > {
-  @IsBoolean()
-  rotary1Enabled: boolean;
+const InputEventCharEnum = z.enum(
+  Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar,
+);
 
-  @IsInt()
-  inputbrokerPinA: number;
+export const CannedMessageValidationSchema = z.object({
+  rotary1Enabled: z.boolean(),
+  inputbrokerPinA: z.coerce.number().int().min(0),
+  inputbrokerPinB: z.coerce.number().int().min(0),
+  inputbrokerPinPress: z.coerce.number().int().min(0),
+  inputbrokerEventCw: InputEventCharEnum,
+  inputbrokerEventCcw: InputEventCharEnum,
+  inputbrokerEventPress: InputEventCharEnum,
+  updown1Enabled: z.boolean(),
+  enabled: z.boolean(),
+  allowInputSource: z.string().max(30),
+  sendBell: z.boolean(),
+});
 
-  @IsInt()
-  inputbrokerPinB: number;
-
-  @IsInt()
-  inputbrokerPinPress: number;
-
-  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar)
-  inputbrokerEventCw:
-    Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar;
-
-  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar)
-  inputbrokerEventCcw:
-    Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar;
-
-  @IsEnum(Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar)
-  inputbrokerEventPress:
-    Protobuf.ModuleConfig.ModuleConfig_CannedMessageConfig_InputEventChar;
-
-  @IsBoolean()
-  updown1Enabled: boolean;
-
-  @IsBoolean()
-  enabled: boolean;
-
-  @Length(2, 30)
-  allowInputSource: string;
-
-  @IsBoolean()
-  sendBell: boolean;
-}
+export type CannedMessageValidation = z.infer<
+  typeof CannedMessageValidationSchema
+>;
