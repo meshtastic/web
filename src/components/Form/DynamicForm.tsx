@@ -70,7 +70,7 @@ export function DynamicForm<T extends FieldValues>({
   validationSchema,
   formId,
 }: DynamicFormProps<T>) {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation();
   const {
     addError,
     removeError,

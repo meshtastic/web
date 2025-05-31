@@ -71,13 +71,23 @@
   "unset": "UNSET",
   "fallbackName": "Meshtastic {{last4}}",
   "formValidation": {
-    "too_big": "Too big, expected less than or equal to {{maximum}}",
-    "too_small": "Too small, expected more than or equal to {{minimum}}",
-    "invalid_format": "Invalid {{format}} format",
-    "invalid_type": "Wrong type, expected {{expected}}",
-    "keyMustBe256BitPsk": "Key is required to be a {{params.bits}} bit pre-shared key (PSK)",
+    "tooBig": {
+      "string": "Too long, expected less than or equal to {{maximum}} characters.",
+      "number": "Too big, expected a number smaller than or equal to {{maximum}}."
+    },
+    "tooSmall": {
+      "string": "Too short, expected more than or equal to {{minimum}} characters.",
+      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+    },
+    "invalidFormat": {
+      "ipv4": "Invalid format, expected an IPv4 address."
+    },
+    "invalidType": {
+      "number": "Invalid type, expected a number."
+    },
+    "keyMustBe256BitPsk": "Key is required to be a {{params.bits}} bit pre-shared key (PSK).",
     "adminKeyRequiredWhenManaged": "At least one admin key is requred if the node is managed.",
-    "invalidKeyFormat": "Invalid Key format",
-    "keyRequired": "Key is required"
+    "invalidKeyFormat": "Invalid Key format.",
+    "keyRequired": "A Key is required."
   }
 }

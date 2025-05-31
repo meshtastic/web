@@ -32,8 +32,21 @@ export function createZodResolver<T extends FieldValues>(
       const { path, code, message, ...params } = issue;
       const key = path.join(".");
 
+      const suffix = "format" in params
+        ? params.format
+        : "origin" in params
+        ? params.origin
+        : "expected" in params
+        ? params.expected
+        : "";
+
+      const newCode = code.replace(
+        /_([a-z])/g,
+        (_, char) => char.toUpperCase(),
+      ) + (suffix ? `.${suffix}` : "");
+
       const fieldError: FieldError & { params?: Record<string, unknown> } = {
-        type: code,
+        type: newCode,
         message: message,
         ...(Object.keys(params).length ? { params } : {}),
       };

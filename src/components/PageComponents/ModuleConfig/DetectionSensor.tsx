@@ -101,17 +101,22 @@ export const DetectionSensor = () => {
               ],
             },
             {
-              type: "toggle",
-              name: "detectionTriggeredHigh",
-              label: t("detectionSensor.detectionTriggeredHigh.label"),
+              type: "select",
+              name: "detectionTriggerType",
+              label: t("detectionSensor.detectionTriggerType.label"),
               description: t(
-                "detectionSensor.detectionTriggeredHigh.description",
+                "detectionSensor.detectionTriggerType.description",
               ),
               disabledBy: [
                 {
                   fieldName: "enabled",
                 },
               ],
+              properties: {
+                enumValue:
+                  Protobuf.ModuleConfig
+                    .ModuleConfig_DetectionSensorConfig_TriggerType,
+              },
             },
             {
               type: "toggle",

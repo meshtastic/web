@@ -1,4 +1,9 @@
 import { z } from "zod/v4";
+import { Protobuf } from "@meshtastic/core";
+
+const detectionTriggerTypeEnum = z.enum(
+  Protobuf.ModuleConfig.ModuleConfig_DetectionSensorConfig_TriggerType,
+);
 
 export const DetectionSensorValidationSchema = z.object({
   enabled: z.boolean(),
@@ -7,7 +12,7 @@ export const DetectionSensorValidationSchema = z.object({
   sendBell: z.boolean(),
   name: z.string().min(0).max(20),
   monitorPin: z.coerce.number().int().min(0),
-  detectionTriggeredHigh: z.boolean(),
+  detectionTriggerType: detectionTriggerTypeEnum,
   usePullup: z.boolean(),
 });
 

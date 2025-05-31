@@ -11,7 +11,6 @@ const RebroadcastModeEnum = z.enum(
 export const DeviceValidationSchema = z.object({
   role: RoleEnum,
   serialEnabled: z.boolean(),
-  debugLogEnabled: z.boolean(),
   buttonGpio: z.coerce.number().int().min(0),
   buzzerGpio: z.coerce.number().int().min(0),
   rebroadcastMode: RebroadcastModeEnum,
