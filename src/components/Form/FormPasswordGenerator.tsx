@@ -36,7 +36,7 @@ export function PasswordGenerator<T extends FieldValues>({
     <Controller
       name={field.name}
       control={control}
-      render={({ field: { value, onChange, onBlur, ...rest } }) => (
+      render={({ field: { value, onChange, ...rest } }) => (
         <Generator
           type={field.hide && !isVisible ? "password" : "text"}
           id={field.id}
@@ -46,7 +46,7 @@ export function PasswordGenerator<T extends FieldValues>({
             if (field.inputChange) field.inputChange(e);
             onChange(e);
           }}
-          selectChange={field.selectChange ?? onBlur}
+          selectChange={field.selectChange ?? (() => {})}
           value={value}
           variant={field.validationText ? "invalid" : "default"}
           actionButtons={field.actionButtons}

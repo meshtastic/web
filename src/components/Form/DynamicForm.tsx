@@ -20,6 +20,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
 import { useAppStore } from "@core/stores/appStore.ts";
+import { dotPaths } from "@core/utils/dotPath.ts";
 
 interface DisabledBy<T> {
   fieldName: Path<T>;
@@ -79,24 +80,13 @@ export function DynamicForm<T extends FieldValues>({
   const { handleSubmit, control, getValues, formState } = useForm<
     T
   >({
-    mode: submitType,
+    mode: "onChange",
     defaultValues: defaultValues,
     resolver: validationSchema
       ? createZodResolver(validationSchema)
       : undefined,
     shouldFocusError: false,
   });
-
-  // deno-lint-ignore no-explicit-any
-  const dotPaths = <T extends Record<string, any>>(
-    obj: T,
-    prefix = "",
-  ): string[] =>
-    Object.entries(obj).flatMap(([k, v]) =>
-      v && typeof v === "object"
-        ? dotPaths(v, `${prefix}${k}.`)
-        : [`${prefix}${k}`]
-    );
 
   useEffect(() => {
     const errorKeys = Object.keys(formState.errors);
