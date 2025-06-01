@@ -1,5 +1,6 @@
 import { cn } from "@core/utils/cn.ts";
 import { Trans } from "react-i18next";
+import { Subtle } from "./Typography/Subtle.tsx";
 
 type FooterProps = {
   className?: string;
@@ -14,7 +15,15 @@ const Footer = ({ className, ...props }: FooterProps) => {
       )}
       {...props}
     >
-      <p>
+      <div className="justify-start">
+        <Subtle className="flex place-items-center gap-1 p-1.5 text-gray-500/40 dark:text-gray-400/40">
+          Commit SHA:
+          <span className="truncate">
+            {String(import.meta.env.VITE_COMMIT_HASH).toUpperCase()}
+          </span>
+        </Subtle>
+      </div>
+      <p className="ml-auto mr-auto text-gray-500 dark:text-gray-400">
         <Trans
           i18nKey="footer.text"
           components={[

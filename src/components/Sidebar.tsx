@@ -128,7 +128,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
       className={cn(
         "relative border-slate-300 dark:border-slate-700",
         "transition-all duration-300 ease-in-out flex-shrink-0",
-        isCollapsed ? "w-24" : "w-46 lg:w-64",
+        isCollapsed ? "w-24" : "w-52 lg:w-64",
       )}
     >
       <CollapseToggleButton />
@@ -188,7 +188,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         {children}
       </div>
 
-      <div className="pt-4 border-t-[0.5px] bg-background-primary border-slate-300 dark:border-slate-700 flex-shrink-0">
+      <div className=" pt-4 border-t-[0.5px] bg-background-primary border-slate-300 dark:border-slate-700 h-full flex-1">
         {myNode === undefined
           ? (
             <div className="flex flex-col items-center justify-center py-6">
