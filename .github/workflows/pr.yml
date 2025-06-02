@@ -9,6 +9,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: "true"
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -24,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
           restore-keys: |
             ${{ runner.os }}-deno-
-      
+
       - name: Install Dependencies
         run: deno install
 

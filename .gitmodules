@@ -1,0 +1,4 @@
+[submodule "meshtastic-js"]
+	path = meshtastic-js
+	url = https://github.com/meshtastic/js
+	branch = main

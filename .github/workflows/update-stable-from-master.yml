@@ -2,14 +2,14 @@ name: Update Stable Branch from Main on Latest Release
 
 on:
   release:
-      types: [released]
+    types: [released]
 
 permissions:
-  contents: write 
+  contents: write
 
 jobs:
   update-stable-branch:
-    name: Update Stable Branch from Main 
+    name: Update Stable Branch from Main
     runs-on: ubuntu-latest
 
     steps:
@@ -17,6 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: "true"
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Git
@@ -43,7 +44,7 @@ jobs:
             git checkout -b stable ${{ env.MAIN_SHA }}
           fi
 
-      - name: Reset stable branch to latest main 
+      - name: Reset stable branch to latest main
         run: git reset --hard ${{ env.MAIN_SHA }}
 
       - name: Force push stable branch

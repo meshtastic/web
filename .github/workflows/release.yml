@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: "true"
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -22,7 +24,7 @@ jobs:
 
       - name: Install Dependencies
         run: deno install
-      
+
       - name: Run tests
         run: deno task test
 
