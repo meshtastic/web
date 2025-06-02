@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@core/utils/test";
-import { DynamicForm } from "./DynamicForm";
+import { fireEvent, render, screen, waitFor } from "@core/utils/test.tsx";
+import { DynamicForm } from "./DynamicForm.tsx";
 import { z } from "zod/v4";
 import { useAppStore } from "@core/stores/appStore.ts";
 
@@ -121,7 +121,7 @@ describe("DynamicForm", () => {
       <DynamicForm<z.infer<typeof schema>>
         onSubmit={onSubmit}
         submitType="onSubmit"
-        hasSubmitButton={true}
+        hasSubmitButton
         validationSchema={schema}
         defaultValues={{ name: "" }}
         fieldGroups={fieldGroups}
