@@ -1,11 +1,4 @@
 {
-  "workspace": [
-    "./meshtastic-js/packages/core",
-    "./meshtastic-js/packages/transport-deno",
-    "./meshtastic-js/packages/transport-http",
-    "./meshtastic-js/packages/transport-web-bluetooth",
-    "./meshtastic-js/packages/transport-web-serial"
-  ],
   "imports": {
     "@app/": "./src/",
     "@pages/": "./src/pages/",
