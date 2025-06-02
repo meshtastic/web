@@ -52,13 +52,13 @@ export const SidebarButton = ({
 
       <span
         className={cn(
-          "flex flex-wrap justify-start text-left text-wrap break-all",
+          "flex flex-wrap justify-start text-left text-balance break-all",
           "min-w-0",
           "px-1",
           "transition-all duration-300 ease-in-out",
           isButtonCollapsed
             ? "opacity-0 max-w-0 invisible w-0 overflow-hidden"
-            : "opacity-100 max-w-full visible flex-1 whitespace-normal",
+            : "opacity-100 max-w-full visible whitespace-normal",
         )}
       >
         {label}
