@@ -36,7 +36,6 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.5",
     "@meshtastic/core": "npm:@jsr/meshtastic__core@2.6.2",
-    "@meshtastic/js": "npm:@jsr/meshtastic__js@2.6.0-0",
     "@meshtastic/transport-http": "npm:@jsr/meshtastic__transport-http",
     "@meshtastic/transport-web-bluetooth": "npm:@jsr/meshtastic__transport-web-bluetooth",
     "@meshtastic/transport-web-serial": "npm:@jsr/meshtastic__transport-web-serial",

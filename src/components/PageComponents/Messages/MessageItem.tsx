@@ -15,7 +15,7 @@ import {
   MessageState,
   useMessageStore,
 } from "@core/stores/messageStore/index.ts";
-import { Protobuf, Types } from "@meshtastic/js";
+import { Protobuf, Types } from "@meshtastic/core";
 import { Message } from "@core/stores/messageStore/types.ts";
 import { useTranslation } from "react-i18next";
 // import { MessageActionsMenu } from "@components/PageComponents/Messages/MessageActionsMenu.tsx"; // Uncomment if needed later
