@@ -20,6 +20,7 @@ import { useAppStore } from "@core/stores/appStore.ts";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { useTranslation } from "react-i18next";
 import { DeviceInfoPanel } from "./DeviceInfoPanel.tsx";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -69,15 +70,19 @@ export const Sidebar = ({ children }: SidebarProps) => {
     getNode,
     getNodesLength,
     metadata,
-    activePage,
     unreadCounts,
-    setActivePage,
     setDialogOpen,
   } = useDevice();
   const { setCommandPaletteOpen } = useAppStore();
   const myNode = getNode(hardware.myNodeNum);
   const { isCollapsed } = useSidebar();
   const { t } = useTranslation("ui");
+  const navigate = useNavigate({ from: "/" });
+
+  const pathname = useLocation({
+    select: (location) => location.pathname.replace(/^\//, ""),
+  });
+
   const myMetadata = metadata.get(0);
 
   const numUnread = [...unreadCounts.values()].reduce((sum, v) => sum + v, 0);
@@ -162,21 +167,23 @@ export const Sidebar = ({ children }: SidebarProps) => {
         label={t("navigation.title")}
         className="mt-4 px-0"
       >
-        {pages.map((link) => (
-          <SidebarButton
-            key={link.name}
-            count={link.count}
-            label={link.name}
-            Icon={link.icon}
-            onClick={() => {
-              if (myNode !== undefined) {
-                setActivePage(link.page);
-              }
-            }}
-            active={link.page === activePage}
-            disabled={myNode === undefined}
-          />
-        ))}
+        {pages.map((link) => {
+          return (
+            <SidebarButton
+              key={link.name}
+              count={link.count}
+              label={link.name}
+              Icon={link.icon}
+              onClick={() => {
+                if (myNode !== undefined) {
+                  navigate({ to: `/${link.page}` });
+                }
+              }}
+              active={link.page === pathname}
+              disabled={myNode === undefined}
+            />
+          );
+        })}
       </SidebarSection>
 
       <div

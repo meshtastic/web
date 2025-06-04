@@ -31,12 +31,14 @@
   },
   "fmt": {
     "exclude": [
+      "src/*.gen.ts",
       "*.test.ts",
       "*.test.tsx"
     ]
   },
   "lint": {
     "exclude": [
+      "src/*.gen.ts",
       "*.test.ts",
       "*.test.tsx"
     ],

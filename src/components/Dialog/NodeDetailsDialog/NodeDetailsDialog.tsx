@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import {
@@ -12,8 +11,8 @@ import { DeviceImage } from "@components/generic/DeviceImage.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Uptime } from "@components/generic/Uptime.tsx";
 import { toast } from "@core/hooks/useToast.ts";
-import { useFavoriteNode } from "../../../core/hooks/useFavoriteNode.ts";
-import { useIgnoreNode } from "../../../core/hooks/useIgnoreNode.ts";
+import { useFavoriteNode } from "@core/hooks/useFavoriteNode.ts";
+import { useIgnoreNode } from "@core/hooks/useIgnoreNode.ts";
 import { cn } from "@core/utils/cn.ts";
 
 import {
@@ -49,6 +48,7 @@ import {
 } from "@components/UI/Tooltip.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "@tanstack/react-router";
 
 export interface NodeDetailsDialogProps {
   open: boolean;
@@ -60,7 +60,8 @@ export const NodeDetailsDialog = ({
   onOpenChange,
 }: NodeDetailsDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { setDialogOpen, connection, setActivePage, getNode } = useDevice();
+  const { setDialogOpen, connection, getNode } = useDevice();
+  const navigate = useNavigate();
   const { setNodeNumToBeRemoved, nodeNumDetails } = useAppStore();
   const { setChatType, setActiveChat } = useMessageStore();
   const { updateFavorite } = useFavoriteNode();
@@ -88,7 +89,7 @@ export const NodeDetailsDialog = ({
 
     setChatType(MessageType.Direct);
     setActiveChat(node.num);
-    setActivePage("messages");
+    navigate({ to: "/messages" });
   }
 
   function handleRequestPosition() {

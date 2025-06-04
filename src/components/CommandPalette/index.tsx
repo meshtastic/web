@@ -35,6 +35,7 @@ import { Avatar } from "@components/UI/Avatar.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { useTranslation } from "react-i18next";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
+import { useNavigate } from "@tanstack/react-router";
 
 export interface Group {
   id: string;
@@ -63,11 +64,12 @@ export const CommandPalette = () => {
     setSelectedDevice,
   } = useAppStore();
   const { getDevices } = useDeviceStore();
-  const { setDialogOpen, setActivePage, getNode, connection } = useDevice();
+  const { setDialogOpen, getNode, connection } = useDevice();
   const { pinnedItems, togglePinnedItem } = usePinnedItems({
     storageName: "pinnedCommandMenuGroups",
   });
   const { t } = useTranslation("commandPalette");
+  const navigate = useNavigate({ from: "/" });
 
   const groups: Group[] = [
     {
@@ -79,21 +81,21 @@ export const CommandPalette = () => {
           label: t("goto.command.messages"),
           icon: MessageSquareIcon,
           action() {
-            setActivePage("messages");
+            navigate({ to: "/messages" });
           },
         },
         {
           label: t("goto.command.map"),
           icon: MapIcon,
           action() {
-            setActivePage("map");
+            navigate({ to: "/map" });
           },
         },
         {
           label: t("goto.command.config"),
           icon: SettingsIcon,
           action() {
-            setActivePage("config");
+            navigate({ to: "/config" });
           },
           tags: ["settings"],
         },
@@ -101,14 +103,14 @@ export const CommandPalette = () => {
           label: t("goto.command.channels"),
           icon: LayersIcon,
           action() {
-            setActivePage("channels");
+            navigate({ to: "/channels" });
           },
         },
         {
           label: t("goto.command.nodes"),
           icon: UsersIcon,
           action() {
-            setActivePage("nodes");
+            navigate({ to: "/nodes" });
           },
         },
       ],
