@@ -9,7 +9,13 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, Types } from "@meshtastic/core";
 import { getChannelName } from "@pages/Channels.tsx";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
-import { useCallback, useDeferredValue, useMemo, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import { cn } from "@core/utils/cn.ts";
 import {
@@ -21,6 +27,7 @@ import { useSidebar } from "@core/stores/sidebarStore.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { randId } from "@core/utils/randId.ts";
 import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "@tanstack/react-router";
 
 type NodeInfoWithUnread = Protobuf.Mesh.NodeInfo & { unreadCount: number };
 
@@ -37,17 +44,45 @@ export const MessagesPage = () => {
   const {
     getMyNodeNum,
     getMessages,
-    setActiveChat,
-    chatType,
-    activeChat,
-    setChatType,
     setMessageState,
   } = useMessageStore();
+  const params = useParams({ strict: false });
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { isCollapsed } = useSidebar();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const { t } = useTranslation(["messages", "channels", "ui"]);
   const deferredSearch = useDeferredValue(searchTerm);
+
+  const chatType = params.type === "direct"
+    ? MessageType.Direct
+    : params.type === "broadcast"
+    ? MessageType.Broadcast
+    : undefined;
+  const activeChat = params.chatId ? Number(params.chatId) : undefined;
+
+  const allChannels = Array.from(channels.values());
+  const filteredChannels = allChannels.filter(
+    (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
+  );
+  const currentChannel = channels.get(activeChat);
+  const otherNode = getNode(activeChat);
+
+  const isDirect = chatType === MessageType.Direct;
+  const isBroadcast = chatType === MessageType.Broadcast;
+
+  const navigateToChat = useCallback((type: MessageType, chatId: number) => {
+    const typeParam = type === MessageType.Direct ? "direct" : "broadcast";
+    navigate({ to: `/messages/${typeParam}/${chatId}` });
+  }, [navigate]);
+
+  // Redirect to default chat if no params are provided
+  useEffect(() => {
+    if (!params.type && !params.chatId && filteredChannels.length > 0) {
+      const defaultChannel = filteredChannels[0];
+      navigateToChat(MessageType.Broadcast, defaultChannel.index);
+    }
+  }, [params.type, params.chatId, filteredChannels, navigateToChat]);
 
   const filteredNodes = (): NodeInfoWithUnread[] => {
     const lowerCaseSearchTerm = deferredSearch.toLowerCase();
@@ -68,16 +103,6 @@ export const MessagesPage = () => {
         return Number(b.isFavorite) - Number(a.isFavorite);
       });
   };
-
-  const allChannels = Array.from(channels.values());
-  const filteredChannels = allChannels.filter(
-    (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
-  );
-  const currentChannel = channels.get(activeChat);
-  const otherNode = getNode(activeChat);
-
-  const isDirect = chatType === MessageType.Direct;
-  const isBroadcast = chatType === MessageType.Broadcast;
 
   const sendText = useCallback(async (message: string) => {
     const isDirect = chatType === MessageType.Direct;
@@ -191,8 +216,7 @@ export const MessagesPage = () => {
             active={activeChat === channel.index &&
               chatType === MessageType.Broadcast}
             onClick={() => {
-              setChatType(MessageType.Broadcast);
-              setActiveChat(channel.index);
+              navigateToChat(MessageType.Broadcast, channel.index);
               resetUnread(channel.index);
             }}
           >
@@ -210,8 +234,7 @@ export const MessagesPage = () => {
     activeChat,
     chatType,
     isCollapsed,
-    setActiveChat,
-    setChatType,
+    navigateToChat,
     resetUnread,
   ]);
 
@@ -245,8 +268,7 @@ export const MessagesPage = () => {
               active={activeChat === node.num &&
                 chatType === MessageType.Direct}
               onClick={() => {
-                setChatType(MessageType.Direct);
-                setActiveChat(node.num);
+                navigateToChat(MessageType.Direct, node.num);
                 resetUnread(node.num);
               }}
             >
@@ -268,8 +290,7 @@ export const MessagesPage = () => {
       searchTerm,
       activeChat,
       chatType,
-      setActiveChat,
-      setChatType,
+      navigateToChat,
       resetUnread,
       hasNodeError,
     ],

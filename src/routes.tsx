@@ -24,6 +24,12 @@ const messagesRoute = createRoute({
   component: MessagesPage,
 });
 
+const messagesWithParamsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/messages/$type/$chatId",
+  component: MessagesPage,
+});
+
 const mapRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/map",
@@ -51,6 +57,7 @@ const nodesRoute = createRoute({
 export const routeTree = rootRoute.addChildren([
   indexRoute,
   messagesRoute,
+  messagesWithParamsRoute,
   mapRoute,
   configRoute,
   channelsRoute,
