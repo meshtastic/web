@@ -144,9 +144,9 @@
       "label": "Monitor Pin",
       "description": "The GPIO pin to monitor for state changes"
     },
-    "detectionTriggeredHigh": {
-      "label": "Detection Triggered High",
-      "description": "Whether or not the GPIO pin state detection is triggered on HIGH (1), otherwise LOW (0)"
+    "detectionTriggerType": {
+      "label": "Detection Triggered Type",
+      "description": "The type of trigger event to be used"
     },
     "usePullup": {
       "label": "Use Pullup",

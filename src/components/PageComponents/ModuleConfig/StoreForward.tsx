@@ -1,4 +1,7 @@
-import type { StoreForwardValidation } from "@app/validation/moduleConfig/storeForward.ts";
+import {
+  type StoreForwardValidation,
+  StoreForwardValidationSchema,
+} from "@app/validation/moduleConfig/storeForward.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const StoreForward = () => {
   return (
     <DynamicForm<StoreForwardValidation>
       onSubmit={onSubmit}
+      validationSchema={StoreForwardValidationSchema}
+      formId="ModuleConfig_StoreForwardConfig"
       defaultValues={moduleConfig.storeForward}
       fieldGroups={[
         {

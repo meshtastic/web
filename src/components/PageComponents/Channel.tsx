@@ -1,4 +1,4 @@
-import type { ChannelValidation } from "@app/validation/channel.ts";
+import { makeChannelSchema } from "@app/validation/channel.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
@@ -6,9 +6,10 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { PkiRegenerateDialog } from "../Dialog/PkiRegenerateDialog.tsx";
+import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
+import { infer as zodInfer } from "zod/v4";
 
 export interface SettingsPanelProps {
   channel: Protobuf.Channel.Channel;
@@ -19,16 +20,24 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
   const { t } = useTranslation(["channels", "ui", "dialog"]);
   const { toast } = useToast();
 
-  const [pass, setPass] = useState<string>(
-    fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
-  );
-  const [bitCount, setBits] = useState<number>(
-    channel?.settings?.psk.length ?? 16,
-  );
-  const [validationText, setValidationText] = useState<string>();
   const [preSharedDialogOpen, setPreSharedDialogOpen] = useState<boolean>(
     false,
   );
+  const [pass, setPass] = useState<string>(
+    fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
+  );
+  const [byteCount, setBytes] = useState<number>(
+    channel?.settings?.psk.length ?? 16,
+  );
+
+  const ChannelValidationSchema = useMemo(
+    () => {
+      return makeChannelSchema(byteCount);
+    },
+    [byteCount],
+  );
+
+  type ChannelValidation = zodInfer<typeof ChannelValidationSchema>;
 
   const onSubmit = (data: ChannelValidation) => {
     const channel = create(Protobuf.Channel.ChannelSchema, {
@@ -43,8 +52,12 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
       },
     });
     connection?.setChannel(channel).then(() => {
+      console.debug(t("toast.savedChannel.title", {
+        ns: "ui",
+        channelName: channel.settings?.name,
+      }));
       toast({
-        title: t("toast.savedChannel", {
+        title: t("toast.savedChannel.title", {
           ns: "ui",
           channelName: channel.settings?.name,
         }),
@@ -54,15 +67,14 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
   };
 
   const preSharedKeyRegenerate = () => {
-    setPass(
-      btoa(
-        cryptoRandomString({
-          length: bitCount ?? 0,
-          type: "alphanumeric",
-        }),
-      ),
+    const newPsk = btoa(
+      cryptoRandomString({
+        length: byteCount ?? 0,
+        type: "alphanumeric",
+      }),
     );
-    setValidationText(undefined);
+    setPass(newPsk);
+
     setPreSharedDialogOpen(false);
   };
 
@@ -70,26 +82,13 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
     setPreSharedDialogOpen(true);
   };
 
-  const validatePass = (input: string, count: number) => {
-    if (input.length % 4 !== 0 || toByteArray(input).length !== count) {
-      setValidationText(
-        t("validation.pskInvalid", { bits: count * 8 }),
-      );
-    } else {
-      setValidationText(undefined);
-    }
-  };
-
   const inputChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const psk = e.currentTarget?.value;
-    setPass(psk);
-    validatePass(psk, bitCount);
+    setPass(e.currentTarget?.value);
   };
 
   const selectChangeEvent = (e: string) => {
     const count = Number.parseInt(e);
-    setBits(count);
-    validatePass(pass, count);
+    setBytes(count);
   };
 
   return (
@@ -97,6 +96,7 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
       <DynamicForm<ChannelValidation>
         onSubmit={onSubmit}
         submitType="onSubmit"
+        validationSchema={ChannelValidationSchema}
         hasSubmitButton
         defaultValues={{
           ...channel,
@@ -141,8 +141,7 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                 id: "channel-psk",
                 label: t("psk.label"),
                 description: t("psk.description"),
-                validationText: validationText,
-                devicePSKBitCount: bitCount ?? 0,
+                devicePSKBitCount: byteCount ?? 0,
                 inputChange: inputChangeEvent,
                 selectChange: selectChangeEvent,
                 actionButtons: [

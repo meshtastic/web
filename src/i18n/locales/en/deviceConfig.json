@@ -68,11 +68,6 @@
     "pin": {
       "description": "Pin to use when pairing",
       "label": "Pin"
-    },
-    "validation": {
-      "pinCannotStartWithZero": "Bluetooth Pin cannot start with 0",
-      "pinMustBeSixDigits": "Pin must be 6 digits",
-      "pinRequired": "Bluetooth Pin is required"
     }
   },
   "display": {
@@ -428,15 +423,6 @@
     "loggingSettings": {
       "description": "Settings for Logging",
       "label": "Logging Settings"
-    },
-    "validation": {
-      "adminKeyMustBe256BitPsk": "Admin Key is required to be a 256 bit pre-shared key (PSK)",
-      "adminKeyRequiredWhenManaged": "At least one admin key is requred if the node is managed.",
-      "enterValid256BitPsk": "Please enter a valid 256 bit PSK",
-      "invalidAdminKeyFormat": "Invalid Admin Key format",
-      "invalidPrivateKeyFormat": "Invalid Private Key format",
-      "privateKeyMustBe256BitPsk": "Private Key is required to be a 256 bit pre-shared key (PSK)",
-      "privateKeyRequired": "Private Key is required"
     }
   }
 }

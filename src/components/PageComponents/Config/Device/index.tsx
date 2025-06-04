@@ -1,4 +1,7 @@
-import type { DeviceValidation } from "@app/validation/config/device.ts";
+import {
+  type DeviceValidation,
+  DeviceValidationSchema,
+} from "@app/validation/config/device.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -24,6 +27,8 @@ export const Device = () => {
   return (
     <DynamicForm<DeviceValidation>
       onSubmit={onSubmit}
+      validationSchema={DeviceValidationSchema}
+      formId="Config_DeviceConfig"
       defaultValues={config.device}
       fieldGroups={[
         {

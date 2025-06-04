@@ -1,65 +1,31 @@
-import type { Message } from "@bufbuild/protobuf";
+import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
-import { IsArray, IsBoolean, IsEnum, IsInt, Max, Min } from "class-validator";
 
-export class LoRaValidation
-  implements
-    Omit<Protobuf.Config.Config_LoRaConfig, keyof Message | "paFanDisabled"> {
-  @IsBoolean()
-  usePreset: boolean;
+const ModemPresetEnum = z.enum(
+  Protobuf.Config.Config_LoRaConfig_ModemPreset,
+);
+const RegionCodeEnum = z.enum(
+  Protobuf.Config.Config_LoRaConfig_RegionCode,
+);
 
-  @IsEnum(Protobuf.Config.Config_LoRaConfig_ModemPreset)
-  modemPreset: Protobuf.Config.Config_LoRaConfig_ModemPreset;
+export const LoRaValidationSchema = z.object({
+  usePreset: z.boolean(),
+  modemPreset: ModemPresetEnum,
+  bandwidth: z.coerce.number().int(),
+  spreadFactor: z.coerce.number().int().max(12),
+  codingRate: z.coerce.number().int().min(0).max(10),
+  frequencyOffset: z.coerce.number().int(),
+  region: RegionCodeEnum,
+  hopLimit: z.coerce.number().int().min(0).max(7),
+  txEnabled: z.boolean(),
+  txPower: z.coerce.number().int().min(0),
+  channelNum: z.coerce.number().int(),
+  overrideDutyCycle: z.boolean(),
+  sx126xRxBoostedGain: z.boolean(),
+  overrideFrequency: z.coerce.number().int(),
+  ignoreIncoming: z.coerce.number().array(),
+  ignoreMqtt: z.boolean(),
+  configOkToMqtt: z.boolean(),
+});
 
-  @IsInt()
-  bandwidth: number;
-
-  @IsInt()
-  // @Min(7)
-  @Max(12)
-  spreadFactor: number;
-
-  @IsInt()
-  @Min(0)
-  @Max(10)
-  codingRate: number;
-
-  @IsInt()
-  frequencyOffset: number;
-
-  @IsEnum(Protobuf.Config.Config_LoRaConfig_RegionCode)
-  region: Protobuf.Config.Config_LoRaConfig_RegionCode;
-
-  @IsInt()
-  @Min(1)
-  @Max(7)
-  hopLimit: number;
-
-  @IsBoolean()
-  txEnabled: boolean;
-
-  @IsInt()
-  @Min(0)
-  txPower: number;
-
-  @IsInt()
-  channelNum: number;
-
-  @IsBoolean()
-  overrideDutyCycle: boolean;
-
-  @IsBoolean()
-  sx126xRxBoostedGain: boolean;
-
-  @IsInt()
-  overrideFrequency: number;
-
-  @IsArray()
-  ignoreIncoming: number[];
-
-  @IsBoolean()
-  ignoreMqtt: boolean;
-
-  @IsBoolean()
-  configOkToMqtt: boolean;
-}
+export type LoRaValidation = z.infer<typeof LoRaValidationSchema>;

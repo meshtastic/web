@@ -1,5 +1,8 @@
 import { useDevice } from "@core/stores/deviceStore.ts";
-import type { AmbientLightingValidation } from "@app/validation/moduleConfig/ambientLighting.ts";
+import {
+  type AmbientLightingValidation,
+  AmbientLightingValidationSchema,
+} from "@app/validation/moduleConfig/ambientLighting.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
@@ -23,6 +26,8 @@ export const AmbientLighting = () => {
   return (
     <DynamicForm<AmbientLightingValidation>
       onSubmit={onSubmit}
+      validationSchema={AmbientLightingValidationSchema}
+      formId="ModuleConfig_AmbientLightingConfig"
       defaultValues={moduleConfig.ambientLighting}
       fieldGroups={[
         {
