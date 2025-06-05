@@ -52,7 +52,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
   function handleDirectMessage() {
     setChatType(MessageType.Direct);
     setActiveChat(node.num);
-    navigate({ to: "/messages" });
+    navigate({ to: `/messages/direct/${node.num}` });
   }
 
   return (
