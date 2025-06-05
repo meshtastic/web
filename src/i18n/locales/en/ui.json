@@ -167,7 +167,7 @@
       "step3": "What actually happened",
       "step4": "Any other relevant information"
     },
-    "reportLink": "You can report the issue to our <0>Github</0>",
+    "reportLink": "You can report the issue to our <0>GitHub</0>",
     "dashboardLink": "Return to the <0>dashboard</0>",
     "detailsSummary": "Error Details",
     "errorMessageLabel": "Error message:",
