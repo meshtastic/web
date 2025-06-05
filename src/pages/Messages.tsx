@@ -28,6 +28,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { randId } from "@core/utils/randId.ts";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "@tanstack/react-router";
+import { useLocation } from "@tanstack/react-router";
 
 type NodeInfoWithUnread = Protobuf.Mesh.NodeInfo & { unreadCount: number };
 
@@ -46,7 +47,7 @@ export const MessagesPage = () => {
     getMessages,
     setMessageState,
   } = useMessageStore();
-  const params = useParams({ strict: false });
+  const params = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isCollapsed } = useSidebar();

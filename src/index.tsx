@@ -5,6 +5,7 @@ import { StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./i18n/config.ts";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { routeTree } from "@app/routes.tsx";
 
 declare module "@tanstack/react-router" {
@@ -26,6 +27,7 @@ root.render(
   <StrictMode>
     <Suspense fallback={null}>
       <RouterProvider router={router} />
+      <TanStackRouterDevtools position="bottom-right" />
     </Suspense>
   </StrictMode>,
 );

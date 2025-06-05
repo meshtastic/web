@@ -1,10 +1,29 @@
-import { afterEach, beforeEach, describe, expect, it, Mock, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from "vitest";
 import { renderHook } from "@testing-library/react";
 import {
   UNSAFE_ROLES,
   useUnsafeRolesDialog,
 } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
 import { eventBus } from "@core/utils/eventBus.ts";
+
+const mockNavigate = vi.fn();
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import("@tanstack/react-router")
+  >();
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 vi.mock("@core/utils/eventBus", () => ({
   eventBus: {
@@ -27,6 +46,7 @@ vi.mock("@core/stores/deviceStore", () => ({
 describe("useUnsafeRolesDialog", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    mockNavigate.mockClear();
   });
 
   afterEach(() => {
