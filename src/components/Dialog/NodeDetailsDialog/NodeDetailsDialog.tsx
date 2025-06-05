@@ -89,7 +89,7 @@ export const NodeDetailsDialog = ({
 
     setChatType(MessageType.Direct);
     setActiveChat(node.num);
-    navigate({ to: "/messages" });
+    navigate({ to: `/messages/direct/${node.num}` });
   }
 
   function handleRequestPosition() {
