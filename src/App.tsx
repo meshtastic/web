@@ -1,5 +1,4 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
-import { PageRouter } from "@app/PageRouter.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.tsx";
 import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
@@ -8,15 +7,16 @@ import Footer from "@components/UI/Footer.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
-import type { JSX } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import { MapProvider } from "react-map-gl/maplibre";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { SidebarProvider } from "@core/stores/sidebarStore.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
+import { Outlet } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-export const App = (): JSX.Element => {
+export function App() {
   const { getDevice } = useDeviceStore();
   const { selectedDevice, setConnectDialogOpen, connectDialogOpen } =
     useAppStore();
@@ -35,6 +35,7 @@ export const App = (): JSX.Element => {
         }}
       />
       <Toaster />
+      <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper device={device}>
         <div
           className="flex h-screen flex-col bg-background-primary text-text-primary"
@@ -49,7 +50,7 @@ export const App = (): JSX.Element => {
                     <KeyBackupReminder />
                     <CommandPalette />
                     <MapProvider>
-                      <PageRouter />
+                      <Outlet />
                     </MapProvider>
                   </div>
                 )
@@ -65,4 +66,4 @@ export const App = (): JSX.Element => {
       </DeviceWrapper>
     </ErrorBoundary>
   );
-};
+}

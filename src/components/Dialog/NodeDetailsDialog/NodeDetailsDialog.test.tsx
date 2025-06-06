@@ -3,13 +3,17 @@ import { render, screen } from "@testing-library/react";
 import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { useAppStore } from "@core/stores/appStore.ts";
-import { Protobuf } from "@meshtastic/core";
+import type { Protobuf } from "@meshtastic/core";
 
 vi.mock("@core/stores/deviceStore");
 vi.mock("@core/stores/appStore");
 
 const mockUseDevice = vi.mocked(useDevice);
 const mockUseAppStore = vi.mocked(useAppStore);
+
+vi.mock("@tanstack/react-router", () => ({
+  useNavigate: vi.fn(),
+}));
 
 describe("NodeDetailsDialog", () => {
   const mockNode = {

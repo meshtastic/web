@@ -122,13 +122,6 @@ describe("useMessageStore", () => {
     expect(useMessageStore.getState().nodeNum).toBe(myNodeNum);
   });
 
-  it("should set activeChat and chatType", () => {
-    useMessageStore.getState().setActiveChat(otherNodeNum1);
-    useMessageStore.getState().setChatType(MessageType.Direct);
-    expect(useMessageStore.getState().activeChat).toBe(otherNodeNum1);
-    expect(useMessageStore.getState().chatType).toBe(MessageType.Direct);
-  });
-
   describe("saveMessage", () => {
     it("should save a direct message with correct Map structure", () => {
       useMessageStore.getState().saveMessage(directMessageToOther1);

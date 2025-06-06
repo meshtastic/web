@@ -35,7 +35,6 @@ export interface Device {
   >;
   nodeErrors: Map<number, NodeError>;
   connection?: MeshDevice;
-  activePage: Page;
   activeNode: number;
   waypoints: Protobuf.Mesh.Waypoint[];
   pendingSettingsChanges: boolean;
@@ -63,7 +62,6 @@ export interface Device {
   setWorkingConfig: (config: Protobuf.Config.Config) => void;
   setWorkingModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
-  setActivePage: (page: Page) => void;
   setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
   addChannel: (channel: Protobuf.Channel.Channel) => void;
@@ -129,7 +127,6 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           metadata: new Map(),
           traceroutes: new Map(),
           connection: undefined,
-          activePage: "messages",
           activeNode: 0,
           waypoints: [],
           dialog: {
@@ -314,16 +311,6 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
                 const device = draft.devices.get(id);
                 if (device) {
                   device.hardware = hardware;
-                }
-              }),
-            );
-          },
-          setActivePage: (page) => {
-            set(
-              produce<DeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.activePage = page;
                 }
               }),
             );
