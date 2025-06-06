@@ -14,6 +14,7 @@ import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { SidebarProvider } from "@core/stores/sidebarStore.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
 import { Outlet } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 export function App() {
   const { getDevice } = useDeviceStore();
@@ -34,6 +35,7 @@ export function App() {
         }}
       />
       <Toaster />
+      <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper device={device}>
         <div
           className="flex h-screen flex-col bg-background-primary text-text-primary"

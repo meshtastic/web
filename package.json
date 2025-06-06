@@ -58,6 +58,7 @@
     "@radix-ui/react-toggle-group": "^1.1.9",
     "@radix-ui/react-tooltip": "^1.2.4",
     "@tanstack/react-router": "^1.120.15",
+    "@tanstack/react-router-devtools": "^1.120.16",
     "@tanstack/router-devtools": "^1.120.15",
     "@turf/turf": "^7.2.0",
     "base64-js": "^1.5.1",
