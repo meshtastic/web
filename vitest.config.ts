@@ -25,6 +25,6 @@ export default defineConfig({
     restoreMocks: true,
     root: path.resolve(process.cwd(), "./src"),
     include: ["**/*.{test,spec}.{ts,tsx}"],
-    setupFiles: ["./src/tests/setupTests.ts"],
+    setupFiles: ["./src/tests/setupTests.ts", "./src/core/utils/test.tsx"],
   },
 });
