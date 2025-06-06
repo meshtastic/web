@@ -9,6 +9,10 @@
   "selectChatPrompt": {
     "text": "Select a channel or node to start messaging."
   },
+  "sendMessage": {
+    "placeholder": "Type your message here...",
+    "sendButton": "Send"
+  },
   "actionsMenu": {
     "addReactionLabel": "Add Reaction",
     "replyLabel": "Reply"

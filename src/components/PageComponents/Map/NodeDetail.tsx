@@ -22,10 +22,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@radix-ui/react-tooltip";
-import {
-  MessageType,
-  useMessageStore,
-} from "@core/stores/messageStore/index.ts";
 import BatteryStatus from "@components/BatteryStatus.tsx";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
@@ -35,7 +31,6 @@ export interface NodeDetailProps {
 }
 
 export const NodeDetail = ({ node }: NodeDetailProps) => {
-  const { setChatType, setActiveChat } = useMessageStore();
   const navigate = useNavigate();
   const { t } = useTranslation("nodes");
   const name = node.user?.longName ?? t("unknown.shortName");
@@ -50,8 +45,6 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       : rawHardwareType.replaceAll("_", " ")
     : `${hwModel}`;
   function handleDirectMessage() {
-    setChatType(MessageType.Direct);
-    setActiveChat(node.num);
     navigate({ to: `/messages/direct/${node.num}` });
   }
 

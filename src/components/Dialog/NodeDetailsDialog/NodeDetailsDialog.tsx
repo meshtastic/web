@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import {
-  MessageType,
-  useMessageStore,
-} from "@core/stores/messageStore/index.ts";
 import { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { DeviceImage } from "@components/generic/DeviceImage.tsx";
@@ -63,7 +59,6 @@ export const NodeDetailsDialog = ({
   const { setDialogOpen, connection, getNode } = useDevice();
   const navigate = useNavigate();
   const { setNodeNumToBeRemoved, nodeNumDetails } = useAppStore();
-  const { setChatType, setActiveChat } = useMessageStore();
   const { updateFavorite } = useFavoriteNode();
   const { updateIgnored } = useIgnoreNode();
 
@@ -86,9 +81,6 @@ export const NodeDetailsDialog = ({
 
   function handleDirectMessage() {
     if (!node) return;
-
-    setChatType(MessageType.Direct);
-    setActiveChat(node.num);
     navigate({ to: `/messages/direct/${node.num}` });
   }
 

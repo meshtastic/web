@@ -28,6 +28,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { randId } from "@core/utils/randId.ts";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "@tanstack/react-router";
+
 type NodeInfoWithUnread = Protobuf.Mesh.NodeInfo & { unreadCount: number };
 
 export const MessagesPage = () => {
@@ -45,7 +46,7 @@ export const MessagesPage = () => {
     getMessages,
     setMessageState,
   } = useMessageStore();
-  const params = useParams();
+  const params = useParams({ from: "", shouldThrow: false });
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isCollapsed } = useSidebar();
@@ -75,7 +76,6 @@ export const MessagesPage = () => {
     navigate({ to: `/messages/${typeParam}/${chatId}` });
   }, [navigate]);
 
-  // Redirect to default chat if no params are provided
   useEffect(() => {
     if (!params.type && !params.chatId && filteredChannels.length > 0) {
       const defaultChannel = filteredChannels[0];
@@ -140,10 +140,8 @@ export const MessagesPage = () => {
       } else {
         console.warn("sendText completed but messageId is undefined");
       }
-      // deno-lint-ignore no-explicit-any
     } catch (e: any) {
       console.error("Failed to send message:", e);
-      // Note: messageId might be undefined here if the error occurred before it was assigned
       const failedId = messageId ?? randId();
       if (chatType === MessageType.Broadcast) {
         setMessageState({
@@ -189,7 +187,7 @@ export const MessagesPage = () => {
       default:
         return (
           <div className="flex-1 flex items-center justify-center text-slate-500 p-4">
-            {t("messagesPage.selectChatPrompt")}
+            {t("selectChatPrompt.text", { ns: "messages" })}
           </div>
         );
     }
@@ -339,7 +337,7 @@ export const MessagesPage = () => {
             )
             : (
               <div className="p-4 text-center text-slate-400 italic">
-                {t("messagesPage.sendMessagePrompt")}
+                {t("sendMessage.sendButton", { ns: "messages" })}
               </div>
             )}
         </div>

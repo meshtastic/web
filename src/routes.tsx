@@ -1,4 +1,4 @@
-import { createRoute } from "@tanstack/react-router";
+import { createRoute, redirect } from "@tanstack/react-router";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import MapPage from "@pages/Map/index.tsx";
@@ -7,6 +7,7 @@ import ChannelsPage from "@pages/Channels.tsx";
 import NodesPage from "@pages/Nodes.tsx";
 import { createRootRoute } from "@tanstack/react-router";
 import { App } from "./App.tsx";
+import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 
 const rootRoute = createRootRoute({
   component: App,
@@ -16,6 +17,10 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: Dashboard,
+  loader: () => {
+    // Redirect to the broadcast messages page on initial load
+    return redirect({ to: `/messages/broadcast/0`, replace: true });
+  },
 });
 
 const messagesRoute = createRoute({
@@ -54,6 +59,12 @@ const nodesRoute = createRoute({
   component: NodesPage,
 });
 
+const dialogWithParamsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/dialog/$dialogId",
+  component: DialogManager,
+});
+
 export const routeTree = rootRoute.addChildren([
   indexRoute,
   messagesRoute,
@@ -62,6 +73,7 @@ export const routeTree = rootRoute.addChildren([
   configRoute,
   channelsRoute,
   nodesRoute,
+  dialogWithParamsRoute,
 ]);
 
 export { rootRoute };

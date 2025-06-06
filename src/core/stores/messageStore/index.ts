@@ -48,8 +48,6 @@ export interface MessageStore {
 
   setNodeNum: (nodeNum: number) => void;
   getMyNodeNum: () => number;
-  setActiveChat: (chat: number) => void;
-  setChatType: (type: MessageType) => void;
   saveMessage: (message: Message) => void;
   setMessageState: (params: SetMessageStateParams) => void;
   getMessages: (params: GetMessagesParams) => Message[];
@@ -79,16 +77,6 @@ export const useMessageStore = create<MessageStore>()(
       }));
     },
     getMyNodeNum: () => get().nodeNum,
-    setActiveChat: (chat) => {
-      set(produce((state: MessageStore) => {
-        state.activeChat = chat;
-      }));
-    },
-    setChatType: (type) => {
-      set(produce((state: MessageStore) => {
-        state.chatType = type;
-      }));
-    },
     saveMessage: (message: Message) => {
       set(
         produce((state: MessageStore) => {
