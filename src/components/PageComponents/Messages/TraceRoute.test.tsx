@@ -70,7 +70,7 @@ describe("TraceRoute", () => {
       getNode: (nodeNum: number): Protobuf.Mesh.NodeInfo | undefined => {
         return mockNodes.get(nodeNum);
       },
-    });
+    } as any);
   });
 
   it("renders the route to destination with SNR values", () => {
@@ -106,8 +106,10 @@ describe("TraceRoute", () => {
       />,
     );
 
+    // Check for the translated title
     expect(screen.getByText("Route back:")).toBeInTheDocument();
 
+    // With route back, both names appear twice
     expect(screen.getAllByText("Source Node")).toHaveLength(2);
     expect(screen.getAllByText("Destination Node")).toHaveLength(2);
 
