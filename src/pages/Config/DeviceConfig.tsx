@@ -13,44 +13,74 @@ import {
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
 import { useTranslation } from "react-i18next";
+import { useDevice, type ValidConfigType } from "@core/stores/deviceStore.ts";
+import { useMemo } from "react";
+import type { ComponentType } from "react";
+import type { UseFormReturn } from "react-hook-form";
 
-export const DeviceConfig = () => {
+interface ConfigProps {
+  // We can get rid of this exception if we import every config schema and pass the union type
+  // deno-lint-ignore no-explicit-any
+  onFormInit: (methods: UseFormReturn<any>) => void;
+}
+type TabItem = {
+  case: ValidConfigType;
+  label: string;
+  element: ComponentType<ConfigProps>;
+  count?: number;
+};
+
+export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
+  const { getWorkingConfig } = useDevice();
   const { t } = useTranslation("deviceConfig");
-  const tabs = [
+  const tabs: TabItem[] = [
     {
+      case: "device",
       label: t("page.tabDevice"),
       element: Device,
       count: 0,
     },
     {
+      case: "position",
       label: t("page.tabPosition"),
       element: Position,
     },
     {
+      case: "power",
       label: t("page.tabPower"),
       element: Power,
     },
     {
+      case: "network",
       label: t("page.tabNetwork"),
       element: Network,
     },
     {
+      case: "display",
       label: t("page.tabDisplay"),
       element: Display,
     },
     {
+      case: "lora",
       label: t("page.tabLora"),
       element: LoRa,
     },
     {
+      case: "bluetooth",
       label: t("page.tabBluetooth"),
       element: Bluetooth,
     },
     {
+      case: "security",
       label: t("page.tabSecurity"),
       element: Security,
     },
-  ];
+  ] as const;
+
+  const flags = useMemo(
+    () => new Map(tabs.map((tab) => [tab.case, getWorkingConfig(tab.case)])),
+    [tabs, getWorkingConfig],
+  );
 
   return (
     <Tabs defaultValue={t("page.tabDevice")}>
@@ -59,15 +89,23 @@ export const DeviceConfig = () => {
           <TabsTrigger
             key={tab.label}
             value={tab.label}
-            className="dark:text-white"
+            className="dark:text-white relative"
           >
             {tab.label}
+            {flags.get(tab.case) && (
+              <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25">
+                </span>
+                <span className="relative inline-flex size-3 rounded-full bg-sky-500">
+                </span>
+              </span>
+            )}
           </TabsTrigger>
         ))}
       </TabsList>
       {tabs.map((tab) => (
         <TabsContent key={tab.label} value={tab.label}>
-          <tab.element />
+          <tab.element onFormInit={onFormInit} />
         </TabsContent>
       ))}
     </Tabs>

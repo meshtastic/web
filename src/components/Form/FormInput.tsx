@@ -37,10 +37,11 @@ export function GenericInput<T extends FieldValues>({
     fieldLength?.currentValueLength || 0,
   );
 
-  const { field: controllerField } = useController({
-    name: field.name,
-    control,
-  });
+  const { field: controllerField, fieldState: { invalid, isDirty } } =
+    useController({
+      name: field.name,
+      control,
+    });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -78,6 +79,7 @@ export function GenericInput<T extends FieldValues>({
         className={field.properties?.className}
         {...restProperties}
         disabled={disabled}
+        variant={invalid ? "invalid" : isDirty ? "dirty" : "default"}
       />
 
       {fieldLength?.showCharacterCount && fieldLength?.max && (

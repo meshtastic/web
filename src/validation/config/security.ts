@@ -7,7 +7,7 @@ const {
   isValidKey,
 } = makePskHelpers([32]); // 256-bit
 
-const isManagedRequiredMsg = "formValidation.adminKeyRequiredWhenManaged";
+const isManagedRequiredMsg = "formValidation.required.managed";
 
 function makeSecuritySchema<KeyT>(
   keyMaker: (optional: boolean) => ZodType<KeyT>,

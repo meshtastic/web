@@ -3,7 +3,10 @@ import {
   NetworkValidationSchema,
 } from "@app/validation/config/network.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import {
   convertIntToIpAddress,
@@ -12,9 +15,15 @@ import {
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
 
-export const Network = () => {
-  const { config, setWorkingConfig } = useDevice();
+interface NetworkConfigProps {
+  onFormInit: DynamicFormFormInit<NetworkValidation>;
+}
+export const Network = ({ onFormInit }: NetworkConfigProps) => {
+  const { config, setWorkingConfig, getEffectiveConfig } = useDevice();
   const { t } = useTranslation("deviceConfig");
+
+  const networkConfig = getEffectiveConfig("network");
+
   const onSubmit = (data: NetworkValidation) => {
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
@@ -36,10 +45,10 @@ export const Network = () => {
       }),
     );
   };
-
   return (
     <DynamicForm<NetworkValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={NetworkValidationSchema}
       formId="Config_NetworkConfig"
       defaultValues={{
@@ -57,6 +66,21 @@ export const Network = () => {
         enabledProtocols: config.network?.enabledProtocols ??
           Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
       }}
+      values={{
+        ...networkConfig,
+        ipv4Config: {
+          ip: convertIntToIpAddress(networkConfig?.ipv4Config?.ip ?? 0),
+          gateway: convertIntToIpAddress(
+            networkConfig?.ipv4Config?.gateway ?? 0,
+          ),
+          subnet: convertIntToIpAddress(
+            networkConfig?.ipv4Config?.subnet ?? 0,
+          ),
+          dns: convertIntToIpAddress(networkConfig?.ipv4Config?.dns ?? 0),
+        },
+        enabledProtocols: networkConfig?.enabledProtocols ??
+          Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
+      } as NetworkValidation}
       fieldGroups={[
         {
           label: t("network.title"),

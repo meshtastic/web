@@ -3,13 +3,18 @@ import {
   BluetoothValidationSchema,
 } from "@app/validation/config/bluetooth.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
-
-export const Bluetooth = () => {
-  const { config, setWorkingConfig } = useDevice();
+interface BluetoothConfigProps {
+  onFormInit: DynamicFormFormInit<BluetoothValidation>;
+}
+export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
+  const { config, setWorkingConfig, getEffectiveConfig } = useDevice();
   const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: BluetoothValidation) => {
@@ -26,9 +31,11 @@ export const Bluetooth = () => {
   return (
     <DynamicForm<BluetoothValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={BluetoothValidationSchema}
       formId="Config_BluetoothConfig"
       defaultValues={config.bluetooth}
+      values={getEffectiveConfig("bluetooth")}
       fieldGroups={[
         {
           label: t("bluetooth.title"),

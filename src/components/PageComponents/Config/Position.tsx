@@ -7,16 +7,22 @@ import {
   PositionValidationSchema,
 } from "@app/validation/config/position.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
-export const Position = () => {
-  const { config, setWorkingConfig } = useDevice();
+interface PositionConfigProps {
+  onFormInit: DynamicFormFormInit<PositionValidation>;
+}
+export const Position = ({ onFormInit }: PositionConfigProps) => {
+  const { setWorkingConfig, config, getEffectiveConfig } = useDevice();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
-    config?.position?.positionFlags ?? 0,
+    getEffectiveConfig("position")?.positionFlags ?? 0,
   );
   const { t } = useTranslation("deviceConfig");
 
@@ -44,9 +50,11 @@ export const Position = () => {
         data.positionFlags = flagsValue;
         return onSubmit(data);
       }}
+      onFormInit={onFormInit}
       validationSchema={PositionValidationSchema}
       formId="Config_PositionConfig"
       defaultValues={config.position}
+      values={getEffectiveConfig("position")}
       fieldGroups={[
         {
           label: t("position.title"),
