@@ -44,13 +44,13 @@ const mockUseDevice = {
 
 describe.skip("Messages Page", () => {
   beforeEach(() => {
-    vi.mocked(useDevice).mockReturnValue(mockUseDevice);
+    vi.mocked(useDevice).mockReturnValue(mockUseDevice as any);
   });
 
   it("sorts unreads to the top", () => {
     render(<MessagesPage />);
     const buttonOrder = screen.getAllByRole("button").filter((b) =>
-      b.textContent.includes("Test Node")
+      b.textContent?.includes("Test Node")
     );
     expect(buttonOrder[0].textContent).toContain("TN2Test Node 210");
     expect(buttonOrder[1].textContent).toContain("TN1Test Node 13");
@@ -62,7 +62,7 @@ describe.skip("Messages Page", () => {
     render(<MessagesPage />);
     const nodeButton =
       screen.getAllByRole("button").filter((b) =>
-        b.textContent.includes("TN1Test Node 13")
+        b.textContent?.includes("TN1Test Node 13")
       )[0];
     fireEvent.click(nodeButton);
     expect(mockUseDevice.resetUnread).toHaveBeenCalledWith(1111, 0);
@@ -72,7 +72,7 @@ describe.skip("Messages Page", () => {
     render(<MessagesPage />);
     const nodeButton =
       screen.getAllByRole("button").filter((b) =>
-        b.textContent.includes("TN1Test Node 1")
+        b.textContent?.includes("TN1Test Node 1")
       )[0];
     fireEvent.click(nodeButton);
     expect(mockUseDevice.resetUnread).toHaveBeenCalledWith(1111, 0);

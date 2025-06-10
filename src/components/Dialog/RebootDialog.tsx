@@ -9,7 +9,7 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { ClockIcon, RefreshCwIcon } from "lucide-react";
+import { RefreshCwIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
@@ -45,12 +45,6 @@ export const RebootDialog = ({
             className="dark:text-slate-900"
             value={time}
             onChange={(e) => setTime(Number.parseInt(e.target.value))}
-            action={{
-              icon: ClockIcon,
-              onClick() {
-                connection?.reboot(time * 60).then(() => onOpenChange(false));
-              },
-            }}
           />
           <Button
             className="w-24"

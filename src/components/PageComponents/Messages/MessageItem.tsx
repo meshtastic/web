@@ -56,21 +56,21 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   const MESSAGE_STATUS_MAP = useMemo(
     (): Record<MessageState, MessageStatusInfo> => ({
       [MessageState.Ack]: {
-        displayText: t("message_item_status_delivered_displayText"),
+        displayText: t("deliveryStatus.deliveryStatus."),
         icon: CheckCircle2,
-        ariaLabel: t("message_item_status_delivered_ariaLabel"),
+        ariaLabel: t("deliveryStatus.delivered"),
         iconClassName: "text-green-500",
       },
       [MessageState.Waiting]: {
-        displayText: t("message_item_status_waiting_displayText"),
+        displayText: t("deliveryStatus.waiting"),
         icon: CircleEllipsis,
-        ariaLabel: t("message_item_status_waiting_ariaLabel"),
+        ariaLabel: t("deliveryStatus.waiting"),
         iconClassName: "text-slate-400",
       },
       [MessageState.Failed]: {
-        displayText: t("message_item_status_failed_displayText"),
+        displayText: t("deliveryStatus.failed"),
         icon: AlertCircle,
-        ariaLabel: t("message_item_status_failed_ariaLabel"),
+        ariaLabel: t("deliveryStatus.failed"),
         iconClassName: "text-red-500 dark:text-red-400",
       },
     }),
@@ -78,9 +78,9 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   );
 
   const UNKNOWN_STATUS = useMemo((): MessageStatusInfo => ({
-    displayText: t("message_item_status_unknown_displayText"),
+    displayText: t("delveryStatus.unknown"),
     icon: AlertCircle,
-    ariaLabel: t("message_item_status_unknown_ariaLabel"),
+    ariaLabel: t("deliveryStatus.unknown"),
     iconClassName: "text-red-500 dark:text-red-400",
   }), [t]);
 

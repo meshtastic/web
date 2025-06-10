@@ -7,6 +7,7 @@
     "@layouts/": "./src/layouts/",
     "@std/path": "jsr:@std/path@^1.1.0"
   },
+  "include": ["src", "./vite-env.d.ts"],
   "compilerOptions": {
     "lib": [
       "DOM",
@@ -24,8 +25,8 @@
     "types": [
       "vite/client",
       "node",
-      "@types/web-bluetooth",
-      "@types/w3c-web-serial"
+      "npm:@types/w3c-web-serial",
+      "npm:@types/web-bluetooth"
     ],
     "strictPropertyInitialization": false
   },
@@ -44,6 +45,14 @@
     ],
     "report": "pretty"
   },
+  "exclude": [
+    "node_modules/",
+    "dist",
+    "build",
+    "coverage",
+    "out",
+    ".vscode-test"
+  ],
   "unstable": [
     "sloppy-imports"
   ]

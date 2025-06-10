@@ -4,7 +4,7 @@ import { eventBus } from "@core/utils/eventBus.ts";
 describe("EventBus", () => {
   beforeEach(() => {
     // Reset event listeners before each test
-    eventBus.listeners = {};
+    eventBus.offAll();
   });
 
   it("should register an event listener and trigger it on emit", () => {

@@ -13,7 +13,6 @@ import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
-import { ClipboardIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
 import { useTranslation } from "react-i18next";
@@ -92,7 +91,7 @@ export const QRDialog = ({
                   <Checkbox
                     key={channel.index}
                     checked={selectedChannels.includes(channel.index)}
-                    onCheckedChange={() => {
+                    onChange={() => {
                       if (selectedChannels.includes(channel.index)) {
                         setSelectedChannels(
                           selectedChannels.filter((c) =>
@@ -144,13 +143,6 @@ export const QRDialog = ({
           <Input
             value={qrCodeUrl}
             disabled
-            action={{
-              key: "copy-value",
-              icon: ClipboardIcon,
-              onClick() {
-                void navigator.clipboard.writeText(qrCodeUrl);
-              },
-            }}
           />
         </DialogFooter>
       </DialogContent>
