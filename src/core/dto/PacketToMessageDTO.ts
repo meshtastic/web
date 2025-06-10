@@ -1,9 +1,6 @@
 import type { Types } from "@meshtastic/js";
-import {
-  Message,
-  MessageState,
-  MessageType,
-} from "../stores/messageStore/index.ts";
+import { MessageState, MessageType } from "../stores/messageStore/index.ts";
+import type { Message } from "../stores/messageStore/types.ts";
 
 class PacketToMessageDTO {
   channel: Types.ChannelNumber;

@@ -34,6 +34,14 @@ class EventBus {
     }
   }
 
+  public offAll<T extends EventName>(event?: T): void {
+    if (event) {
+      this.listeners[event] = [];
+    } else {
+      this.listeners = {};
+    }
+  }
+
   public emit<T extends EventName>(event: T, data: EventMap[T]): void {
     if (!this.listeners[event]) return;
 

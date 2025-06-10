@@ -51,7 +51,7 @@ export const Table = ({ headings, rows }: TableProps) => {
       return null;
     }
     if (cell.type === React.Fragment) {
-      const childrenArray = React.Children.toArray(cell.props.children);
+      const childrenArray = React.Children.toArray((cell.props as any).children);
       const firstElement = childrenArray.find((child) =>
         React.isValidElement(child)
       );
@@ -71,23 +71,23 @@ export const Table = ({ headings, rows }: TableProps) => {
     const elementB = getElement(b[columnIndex]);
 
     // Avatar contains the prop showFavorite which indicates isFavorite
-    const favA = a[0]?.props?.children?.props?.showFavorite ?? false;
-    const favB = b[0]?.props?.children?.props?.showFavorite ?? false;
+    const favA = (a[0] as any)?.props?.children?.props?.showFavorite ?? false;
+    const favB = (b[0] as any)?.props?.children?.props?.showFavorite ?? false;
 
     // Always put favorites at the top
     if (favA !== favB) return favA ? -1 : 1;
 
     if (sortColumn === "Last Heard") {
-      const aTimestamp = elementA?.props?.children?.props?.timestamp ?? 0;
-      const bTimestamp = elementB?.props?.children?.props?.timestamp ?? 0;
+      const aTimestamp = (elementA?.props as any)?.children?.props?.timestamp ?? 0;
+      const bTimestamp = (elementB?.props as any)?.children?.props?.timestamp ?? 0;
       if (aTimestamp < bTimestamp) return sortOrder === "asc" ? -1 : 1;
       if (aTimestamp > bTimestamp) return sortOrder === "asc" ? 1 : -1;
       return 0;
     }
 
     if (sortColumn === "Connection") {
-      const aHopsStr = elementA?.props?.children[0];
-      const bHopsStr = elementB?.props?.children[0];
+      const aHopsStr = (elementA?.props as any)?.children?.[0];
+      const bHopsStr = (elementB?.props as any)?.children?.[0];
       const aNumHops = numericHops(aHopsStr);
       const bNumHops = numericHops(bHopsStr);
       if (aNumHops < bNumHops) return sortOrder === "asc" ? -1 : 1;
@@ -95,8 +95,8 @@ export const Table = ({ headings, rows }: TableProps) => {
       return 0;
     }
 
-    const aValue = elementA?.props?.children;
-    const bValue = elementB?.props?.children;
+    const aValue = (elementA?.props as any)?.children;
+    const bValue = (elementB?.props as any)?.children;
     const valA = aValue ?? "";
     const valB = bValue ?? "";
 

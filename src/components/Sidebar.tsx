@@ -141,7 +141,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         )}
       >
         <img
-          src="Logo.svg"
+          src="/Logo.svg"
           alt={t("app.logo")}
           className="size-10 flex-shrink-0 rounded-xl"
         />

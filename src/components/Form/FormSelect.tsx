@@ -40,13 +40,14 @@ export function SelectInput<T extends FieldValues>({
   field,
 }: GenericFormElementProps<T, SelectFieldProps<T>>) {
   const {
-    field: { value, onChange, ...rest },
+    field: { value, onChange, ref, onBlur, ...rest },
   } = useController({
     name: field.name,
     control,
+    defaultValue: field.properties.defaultValue,
   });
 
-  const { enumValue, formatEnumName, ...remainingProperties } =
+  const { enumValue, formatEnumName, defaultValue, ...remainingProperties } =
     field.properties;
   const valueToKeyMap: Record<string, string> = {};
   const optionsEnumValues: [string, number][] = [];
@@ -77,10 +78,15 @@ export function SelectInput<T extends FieldValues>({
       onValueChange={handleValueChange}
       disabled={disabled}
       value={value?.toString()}
-      {...remainingProperties}
+      defaultValue={defaultValue?.toString()}
       {...rest}
     >
-      <SelectTrigger id={field.name}>
+      <SelectTrigger
+        id={field.name}
+        ref={ref}
+        onBlur={onBlur}
+        {...remainingProperties}
+      >
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

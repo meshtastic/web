@@ -3,7 +3,7 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import ChannelsPage from "@pages/Channels.tsx";
 import ConfigPage from "@pages/Config/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
-import NodesPage from "@pages/Nodes.tsx";
+import NodesPage from "./pages/Nodes/index.tsx";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 

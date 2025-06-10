@@ -1,8 +1,8 @@
-import { cn } from "../../../core/utils/cn.ts";
+import { cn } from "@core/utils/cn.ts";
 
 export interface LinkProps {
   href: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }
 

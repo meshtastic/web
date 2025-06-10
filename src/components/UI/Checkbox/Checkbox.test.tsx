@@ -24,7 +24,7 @@ vi.mock("@components/UI/Label.tsx", () => ({
 }));
 
 vi.mock("@core/utils/cn.ts", () => ({
-  cn: (...args) => args.filter(Boolean).join(" "),
+  cn: (...args: any[]) => args.filter(Boolean).join(" "),
 }));
 
 vi.mock("react", async () => {

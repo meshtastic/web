@@ -6,7 +6,7 @@ const mockSetPinnedItems = vi.fn();
 const mockUseLocalStorage = vi.fn();
 
 vi.mock("@core/hooks/useLocalStorage.ts", () => ({
-  default: (...args) => mockUseLocalStorage(...args),
+  default: (...args: any[]) => mockUseLocalStorage(...args),
 }));
 
 describe("usePinnedItems", () => {

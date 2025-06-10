@@ -1,4 +1,4 @@
-import { PersistStorage, StateStorage } from "zustand/middleware";
+import { PersistStorage, StateStorage, StorageValue } from "zustand/middleware";
 import { del, get, set } from "idb-keyval";
 import { ChannelId, MessageLogMap } from "@core/stores/messageStore/types.ts";
 
@@ -56,18 +56,18 @@ const reviver: JsonReviver = (_, value) => {
 };
 
 export const storageWithMapSupport: PersistStorage<PersistedMessageState> = {
-  getItem: async (name): Promise<PersistedMessageState | null> => {
+  getItem: async (name): Promise<StorageValue<PersistedMessageState> | null> => {
     const str = await zustandIndexDBStorage.getItem(name);
     if (!str) return null;
     try {
-      const parsed = JSON.parse(str, reviver) as PersistedMessageState;
+      const parsed = JSON.parse(str, reviver) as StorageValue<PersistedMessageState>;
       return parsed;
     } catch (error) {
       console.error(`Error parsing persisted state (${name}):`, error);
       return null;
     }
   },
-  setItem: async (name, newValue: PersistedMessageState): Promise<void> => {
+  setItem: async (name, newValue: StorageValue<PersistedMessageState>): Promise<void> => {
     try {
       const str = JSON.stringify(newValue, replacer);
       await zustandIndexDBStorage.setItem(name, str);

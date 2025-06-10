@@ -1,4 +1,4 @@
-import { useDevice } from "../../core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import {
   Dialog,
   DialogClose,
@@ -31,13 +31,19 @@ export const TracerouteResponseDialog = ({
   const snrTowards = (traceroute?.data.snrTowards ?? []).map((snr) => snr / 4);
   const snrBack = (traceroute?.data.snrBack ?? []).map((snr) => snr / 4);
   const from = getNode(traceroute?.from ?? 0);
-  const longName = from?.user?.longName ??
+  const fromLongName = from?.user?.longName ??
     (from ? `!${numberToHexUnpadded(from?.num)}` : t("unknown.shortName"));
-  const shortName = from?.user?.shortName ??
+  const fromShortName = from?.user?.shortName ??
     (from
       ? `${numberToHexUnpadded(from?.num).substring(0, 4)}`
       : t("unknown.shortName"));
-  const to = getNode(traceroute?.to ?? 0);
+
+  const toUser = getNode(traceroute?.to ?? 0);
+
+  if (!toUser || !from) {
+    return null;
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -45,7 +51,7 @@ export const TracerouteResponseDialog = ({
         <DialogHeader>
           <DialogTitle>
             {t("tracerouteResponse.title", {
-              identifier: `${longName} (${shortName})`,
+              identifier: `${fromLongName} (${fromShortName})`,
             })}
           </DialogTitle>
         </DialogHeader>
@@ -53,8 +59,8 @@ export const TracerouteResponseDialog = ({
           <TraceRoute
             route={route}
             routeBack={routeBack}
-            from={from}
-            to={to}
+            from={{ user: from.user }}
+            to={{ user: toUser.user }}
             snrTowards={snrTowards}
             snrBack={snrBack}
           />
