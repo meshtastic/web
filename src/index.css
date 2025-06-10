@@ -93,6 +93,7 @@ body {
 }
 
 @layer base {
+
   *,
   ::after,
   ::before,
