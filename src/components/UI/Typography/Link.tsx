@@ -1,14 +1,18 @@
-import { cn } from "../../../core/utils/cn.ts";
+import { cn } from "@core/utils/cn.ts";
+import {
+  Link as RouterLink,
+  LinkProps as RouterLinkProps,
+} from "@tanstack/react-router";
 
-export interface LinkProps {
+export interface LinkProps extends RouterLinkProps {
   href: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }
 
 export const Link = ({ href, children, className }: LinkProps) => (
-  <a
-    href={href}
+  <RouterLink
+    to={href}
     target="_blank"
     rel="noopener noreferrer"
     className={cn(
@@ -17,5 +21,5 @@ export const Link = ({ href, children, className }: LinkProps) => (
     )}
   >
     {children}
-  </a>
+  </RouterLink>
 );

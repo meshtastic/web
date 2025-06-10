@@ -1,36 +1,47 @@
-import type { Message } from "@bufbuild/protobuf";
-import type { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsString } from "class-validator";
+import { z, ZodType } from "zod/v4";
+import { makePskHelpers } from "./../pskSchema.ts";
 
-export class SecurityValidation implements
-  Omit<
-    Protobuf.Config.Config_SecurityConfig,
-    | keyof Message
-    | "adminKey"
-    | "privateKey"
-    | "publicKey"
-  > {
-  @IsBoolean()
-  adminChannelEnabled: boolean;
+const {
+  stringSchema,
+  bytesSchema,
+  isValidKey,
+} = makePskHelpers([32]); // 256-bit
 
-  @IsString()
-  adminKey: [string, string, string];
+const isManagedRequiredMsg = "formValidation.adminKeyRequiredWhenManaged";
 
-  @IsBoolean()
-  bluetoothLoggingEnabled: boolean;
+function makeSecuritySchema<KeyT>(
+  keyMaker: (optional: boolean) => ZodType<KeyT>,
+) {
+  return z
+    .object({
+      isManaged: z.boolean(),
+      adminChannelEnabled: z.boolean(),
+      debugLogApiEnabled: z.boolean(),
+      serialEnabled: z.boolean(),
 
-  @IsBoolean()
-  debugLogApiEnabled: boolean;
-
-  @IsBoolean()
-  isManaged: boolean;
-
-  @IsString()
-  privateKey: string;
-
-  @IsString()
-  publicKey: string;
-
-  @IsBoolean()
-  serialEnabled: boolean;
+      privateKey: keyMaker(false),
+      publicKey: keyMaker(false),
+      adminKey: z.tuple([keyMaker(true), keyMaker(true), keyMaker(true)]),
+    })
+    .check((ctx) => {
+      if (ctx.value.isManaged) {
+        const hasAdmin = ctx.value.adminKey.some(isValidKey);
+        if (!hasAdmin) {
+          for (const path of [["isManaged"], ["adminKey", 0]] as const) {
+            ctx.issues.push({
+              code: "custom",
+              message: isManagedRequiredMsg,
+              path: [...path],
+              input: ctx.value,
+            });
+          }
+        }
+      }
+    });
 }
+
+export const RawSecuritySchema = makeSecuritySchema(stringSchema);
+export type RawSecurity = z.infer<typeof RawSecuritySchema>;
+
+export const ParsedSecuritySchema = makeSecuritySchema(bytesSchema);
+export type ParsedSecurity = z.infer<typeof ParsedSecuritySchema>;

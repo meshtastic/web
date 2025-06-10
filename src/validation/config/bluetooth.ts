@@ -1,18 +1,14 @@
-import type { Message } from "@bufbuild/protobuf";
+import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
-import { IsBoolean, IsEnum, IsInt } from "class-validator";
 
-export class BluetoothValidation implements
-  Omit<
-    Protobuf.Config.Config_BluetoothConfig,
-    keyof Message | "deviceLoggingEnabled"
-  > {
-  @IsBoolean()
-  enabled: boolean;
+const PairingModeEnum = z.enum(
+  Protobuf.Config.Config_BluetoothConfig_PairingMode,
+);
 
-  @IsEnum(Protobuf.Config.Config_BluetoothConfig_PairingMode)
-  mode: Protobuf.Config.Config_BluetoothConfig_PairingMode;
+export const BluetoothValidationSchema = z.object({
+  enabled: z.boolean(),
+  mode: PairingModeEnum,
+  fixedPin: z.coerce.number().int().min(100000).max(999999),
+});
 
-  @IsInt()
-  fixedPin: number;
-}
+export type BluetoothValidation = z.infer<typeof BluetoothValidationSchema>;

@@ -1,4 +1,7 @@
-import type { DisplayValidation } from "@app/validation/config/display.ts";
+import {
+  type DisplayValidation,
+  DisplayValidationSchema,
+} from "@app/validation/config/display.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const Display = () => {
   return (
     <DynamicForm<DisplayValidation>
       onSubmit={onSubmit}
+      validationSchema={DisplayValidationSchema}
+      formId="Config_DisplayConfig"
       defaultValues={config.display}
       fieldGroups={[
         {
@@ -91,7 +96,7 @@ export const Display = () => {
               label: t("display.oledType.label"),
               description: t("display.oledType.description"),
               properties: {
-                enumValue: Protobuf.Config.Config_Displayjonfig_OledType,
+                enumValue: Protobuf.Config.Config_DisplayConfig_OledType,
               },
             },
             {

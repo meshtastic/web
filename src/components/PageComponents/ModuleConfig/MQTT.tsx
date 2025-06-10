@@ -1,5 +1,8 @@
 import { useDevice } from "@core/stores/deviceStore.ts";
-import type { MqttValidation } from "@app/validation/moduleConfig/mqtt.ts";
+import {
+  type MqttValidation,
+  MqttValidationSchema,
+} from "@app/validation/moduleConfig/mqtt.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
@@ -29,6 +32,8 @@ export const MQTT = () => {
   return (
     <DynamicForm<MqttValidation>
       onSubmit={onSubmit}
+      validationSchema={MqttValidationSchema}
+      formId="ModuleConfig_MqttConfig"
       defaultValues={moduleConfig.mqtt}
       fieldGroups={[
         {

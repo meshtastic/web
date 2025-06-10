@@ -1,4 +1,7 @@
-import type { CannedMessageValidation } from "@app/validation/moduleConfig/cannedMessage.ts";
+import {
+  type CannedMessageValidation,
+  CannedMessageValidationSchema,
+} from "@app/validation/moduleConfig/cannedMessage.ts";
 import { create } from "@bufbuild/protobuf";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -23,6 +26,8 @@ export const CannedMessage = () => {
   return (
     <DynamicForm<CannedMessageValidation>
       onSubmit={onSubmit}
+      validationSchema={CannedMessageValidationSchema}
+      formId="ModuleConfig_CannedMessageConfig"
       defaultValues={moduleConfig.cannedMessage}
       fieldGroups={[
         {
