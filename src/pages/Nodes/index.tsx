@@ -1,86 +1,252 @@
-// @/pages/NodesPage.tsx (abbreviated)
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { JSX, useCallback, useDeferredValue, useRef, useState } from "react";
-import { NodeRow } from "./NodeRow.tsx";
+import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
+import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
+import { Sidebar } from "@components/Sidebar.tsx";
+import { Avatar } from "@components/UI/Avatar.tsx";
+import { Mono } from "@components/generic/Mono.tsx";
+import { Table } from "@components/generic/Table/index.tsx";
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { Protobuf, type Types } from "@meshtastic/core";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { LockIcon, LockOpenIcon } from "lucide-react";
 import {
-  FilterState,
+  type JSX,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { base16 } from "rfc4648";
+import { Input } from "@components/UI/Input.tsx";
+import { PageLayout } from "@components/PageLayout.tsx";
+import {
+  type FilterState,
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
-import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
-import { useAppStore } from "@core/stores/appStore.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
-// ... other imports
+import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
+import { useTranslation } from "react-i18next";
+
+export interface DeleteNoteDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
 
 const NodesPage = (): JSX.Element => {
-  const { getNodes, hasNodeError, setDialogOpen } = useDevice();
+  const { t } = useTranslation("nodes");
+  const { getNodes, hardware, connection, hasNodeError, setDialogOpen } =
+    useDevice();
   const { setNodeNumDetails } = useAppStore();
-  const { nodeFilter, defaultFilterValues } = useFilterNode();
+  const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
-  // No changes to filtering logic, `useDeferredValue` is still a great choice
+  const [selectedTraceroute, setSelectedTraceroute] = useState<
+    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
+  >();
+  const [selectedLocation, setSelectedLocation] = useState<
+    Types.PacketMetadata<Protobuf.Mesh.Position> | undefined
+  >();
+
   const [filterState, setFilterState] = useState<FilterState>(() =>
     defaultFilterValues
   );
   const deferredFilterState = useDeferredValue(filterState);
-  const filteredNodes = getNodes((node) =>
-    nodeFilter(node, deferredFilterState)
+
+  const filteredNodes = useMemo(
+    () => getNodes((node) => nodeFilter(node, deferredFilterState)),
+    [deferredFilterState, getNodes, nodeFilter],
   );
 
-  const parentRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!connection) return;
+    connection.events.onTraceRoutePacket.subscribe(handleTraceroute);
+    return () => {
+      connection.events.onTraceRoutePacket.unsubscribe(handleTraceroute);
+    };
+  }, [connection]);
 
-  const rowVirtualizer = useVirtualizer({
-    count: filteredNodes.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 64, // Estimate row height in pixels
-    overscan: 5, // Render 5 extra items in each direction
-  });
-
-  const handleNodeInfoDialog = useCallback(
-    (nodeNum: number): void => {
-      setNodeNumDetails(nodeNum);
-      setDialogOpen("nodeDetails", true);
+  const handleTraceroute = useCallback(
+    (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
+      setSelectedTraceroute(traceroute);
     },
-    [setNodeNumDetails, setDialogOpen],
+    [],
   );
+
+  useEffect(() => {
+    if (!connection) return;
+    connection.events.onPositionPacket.subscribe(handleLocation);
+    return () => {
+      connection.events.onPositionPacket.subscribe(handleLocation);
+    };
+  }, [connection]);
+
+  const handleLocation = useCallback(
+    (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
+      if (location.to.valueOf() !== hardware.myNodeNum) return;
+      setSelectedLocation(location);
+    },
+    [hardware.myNodeNum],
+  );
+
+  function handleNodeInfoDialog(nodeNum: number): void {
+    setNodeNumDetails(nodeNum);
+    setDialogOpen("nodeDetails", true);
+  }
 
   return (
     <>
-      <PageLayout label="" leftBar={<Sidebar />}>
-        {/* ... Filter controls ... */}
-
-        {/* Your scrollable container with the ref */}
-        <div ref={parentRef} className="overflow-y-auto h-[calc(100vh-200px)]">
-          {/* Adjust height as needed */}
-          {/* A container to set the total size of the virtual list */}
-          <div
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              position: "relative",
-            }}
-          >
-            {/* Map over the virtual items, not the full filteredNodes array */}
-            {rowVirtualizer.getVirtualItems().map((virtualItem) => {
-              const node = filteredNodes[virtualItem.index];
-              return (
-                <NodeRow
-                  key={node.num}
-                  node={node}
-                  hasNodeError={hasNodeError}
-                  onNodeInfo={handleNodeInfoDialog}
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: `${virtualItem.size}px`,
-                    transform: `translateY(${virtualItem.start}px)`,
-                  }}
-                />
-              );
-            })}
+      <PageLayout
+        label=""
+        leftBar={<Sidebar />}
+      >
+        <div className="pl-2 pt-2 flex flex-row">
+          <div className="flex-1 mr-2">
+            <Input
+              placeholder={t("search.nodes")}
+              value={filterState.nodeName}
+              className="bg-transparent"
+              showClearButton={!!filterState.nodeName}
+              onChange={(e) =>
+                setFilterState((prev) => ({
+                  ...prev,
+                  nodeName: e.target.value,
+                }))}
+            />
+          </div>
+          <div className="flex justify-end">
+            <FilterControl
+              filterState={filterState}
+              defaultFilterValues={defaultFilterValues}
+              setFilterState={setFilterState}
+              isDirty={isFilterDirty(filterState)}
+              parameters={{
+                popoverContentProps: {
+                  side: "bottom",
+                  align: "end",
+                  sideOffset: 12,
+                },
+                popoverTriggerClassName: "mr-1 p-2",
+                showTextSearch: false,
+              }}
+            />
           </div>
         </div>
-        {/* ... Dialogs ... */}
+        <div className="overflow-y-auto">
+          <Table
+            headings={[
+              { title: "", type: "blank", sortable: false },
+              {
+                title: t("nodesTable.headings.longName"),
+                type: "normal",
+                sortable: true,
+              },
+              {
+                title: t("nodesTable.headings.connection"),
+                type: "normal",
+                sortable: true,
+              },
+              {
+                title: t("nodesTable.headings.lastHeard"),
+                type: "normal",
+                sortable: true,
+              },
+              {
+                title: t("nodesTable.headings.encryption"),
+                type: "normal",
+                sortable: false,
+              },
+              {
+                title: t("unit.snr"),
+                type: "normal",
+                sortable: true,
+              },
+              {
+                title: t("nodesTable.headings.model"),
+                type: "normal",
+                sortable: true,
+              },
+              {
+                title: t("nodesTable.headings.macAddress"),
+                type: "normal",
+                sortable: true,
+              },
+            ]}
+            rows={filteredNodes.map((node) => [
+              <div key={node.num}>
+                <Avatar
+                  text={node.user?.shortName ?? t("unknown.shortName")}
+                  showFavorite={node.isFavorite}
+                  showError={hasNodeError(node.num)}
+                />
+              </div>,
+              <h1
+                key="longName"
+                onMouseDown={() => handleNodeInfoDialog(node.num)}
+                onKeyUp={(evt) => {
+                  evt.key === "Enter" && handleNodeInfoDialog(node.num);
+                }}
+                className="cursor-pointer underline ml-2 whitespace-break-spaces"
+                tabIndex={0}
+                role="button"
+              >
+                {node.user?.longName ?? numberToHexUnpadded(node.num)}
+              </h1>,
+              <Mono key="hops" className="w-16">
+                {node.hopsAway !== undefined
+                  ? node?.viaMqtt === false && node.hopsAway === 0
+                    ? t("nodesTable.connectionStatus.direct")
+                    : `${node.hopsAway?.toString()} ${
+                      node.hopsAway ?? 0 > 1
+                        ? t("unit.hop.plural")
+                        : t("unit.hops_one")
+                    } ${t("nodesTable.connectionStatus.away")}`
+                  : t("nodesTable.connectionStatus.unknown")}
+                {node?.viaMqtt === true
+                  ? t("nodesTable.connectionStatus.viaMqtt")
+                  : ""}
+              </Mono>,
+              <Mono key="lastHeard">
+                {node.lastHeard === 0
+                  ? <p>{t("nodesTable.lastHeardStatus.never")}</p>
+                  : <TimeAgo timestamp={node.lastHeard * 1000} />}
+              </Mono>,
+              <Mono key="pki">
+                {node.user?.publicKey && node.user?.publicKey.length > 0
+                  ? <LockIcon className="text-green-600 mx-auto" />
+                  : <LockOpenIcon className="text-yellow-300 mx-auto" />}
+              </Mono>,
+              <Mono key="snr">
+                {node.snr}
+                {t("unit.dbm")}/
+                {Math.min(
+                  Math.max((node.snr + 10) * 5, 0),
+                  100,
+                )}%/{/* Percentage */}
+                {(node.snr + 10) * 5}
+                {t("unit.raw")}
+              </Mono>,
+              <Mono key="model">
+                {Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}
+              </Mono>,
+              <Mono key="addr">
+                {base16
+                  .stringify(node.user?.macaddr ?? [])
+                  .match(/.{1,2}/g)
+                  ?.join(":") ?? t("unknown.shortName")}
+              </Mono>,
+            ])}
+          />
+          <TracerouteResponseDialog
+            traceroute={selectedTraceroute}
+            open={!!selectedTraceroute}
+            onOpenChange={() => setSelectedTraceroute(undefined)}
+          />
+          <LocationResponseDialog
+            location={selectedLocation}
+            open={!!selectedLocation}
+            onOpenChange={() => setSelectedLocation(undefined)}
+          />
+        </div>
       </PageLayout>
     </>
   );
