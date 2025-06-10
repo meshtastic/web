@@ -1,5 +1,5 @@
-import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
-import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
+import { LocationResponseDialog } from "@components/Dialog/LocationResponseDialog.tsx";
+import { TracerouteResponseDialog } from "@components/Dialog/TracerouteResponseDialog.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
