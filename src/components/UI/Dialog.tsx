@@ -58,9 +58,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 const DialogClose = ({
   className,
   ...props
-}: DialogPrimitive.DialogCloseProps & React.RefAttributes<HTMLButtonElement> & {
-  className?: string;
-}) => (
+}: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close>) => (
   <DialogPrimitive.Close
     aria-label="Close"
     data-testid="dialog-close-button"

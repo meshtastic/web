@@ -46,7 +46,7 @@
     "report": "pretty"
   },
   "exclude": [
-    "*.gen.ts",
+    "routeTree.gen.ts",
     "node_modules/",
     "dist",
     "build",
