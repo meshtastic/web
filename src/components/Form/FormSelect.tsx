@@ -15,7 +15,6 @@ export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select";
   selectChange?: (e: string, name: string) => void;
   validate?: (newValue: string) => Promise<boolean>;
-  defaultValue?: string;
   properties: BaseFormBuilderProps<T>["properties"] & {
     defaultValue?: T;
     enumValue: {
@@ -44,7 +43,6 @@ export function SelectInput<T extends FieldValues>({
   } = useController({
     name: field.name,
     control,
-    defaultValue: field.properties.defaultValue,
   });
 
   const { enumValue, formatEnumName, defaultValue, ...remainingProperties } =

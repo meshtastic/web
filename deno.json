@@ -32,20 +32,21 @@
   },
   "fmt": {
     "exclude": [
-      "src/*.gen.ts",
+      "*.gen.ts",
       "*.test.ts",
       "*.test.tsx"
     ]
   },
   "lint": {
     "exclude": [
-      "src/*.gen.ts",
+      "*.gen.ts",
       "*.test.ts",
       "*.test.tsx"
     ],
     "report": "pretty"
   },
   "exclude": [
+    "*.gen.ts",
     "node_modules/",
     "dist",
     "build",

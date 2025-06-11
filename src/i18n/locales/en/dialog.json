@@ -79,6 +79,7 @@
     "channelUtilization": "Channel utilization",
     "details": "Details:",
     "deviceMetrics": "Device Metrics:",
+    "elevation": "Elevation:",
     "hardware": "Hardware: ",
     "lastHeard": "Last Heard: ",
     "nodeHexPrefix": "Node Hex: !",

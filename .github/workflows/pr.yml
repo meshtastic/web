@@ -9,6 +9,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -30,6 +32,18 @@ jobs:
 
       - name: Cache Dependencies
         run: deno cache src/index.tsx
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            **/*.ts
+            **/*.tsx
+
+      - name: Type check changed files
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: deno check ${{ steps.changed-files.outputs.all_changed_files }}
 
       - name: Run linter
         run: deno task lint

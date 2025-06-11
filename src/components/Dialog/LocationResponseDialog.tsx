@@ -12,7 +12,7 @@ import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
 
 export interface LocationResponseDialogProps {
-  location: Types.PacketMetadata<Protobuf.Mesh.location> | undefined;
+  location: Types.PacketMetadata<Protobuf.Mesh.Position> | undefined;
   open: boolean;
   onOpenChange: () => void;
 }
@@ -33,6 +33,13 @@ export const LocationResponseDialog = ({
       ? `${numberToHexUnpadded(from?.num).substring(0, 4)}`
       : t("unknown.shortName"));
 
+  const position = location?.data;
+
+  const hasCoordinates = position &&
+    typeof position.latitudeI === "number" &&
+    typeof position.longitudeI === "number" &&
+    typeof position.altitude === "number";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -45,31 +52,40 @@ export const LocationResponseDialog = ({
           </DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          <div className="ml-5 flex">
-            <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
-              <p>
-                {t("locationResponse.coordinates")}
-                <a
-                  className="text-blue-500 dark:text-blue-400"
-                  href={`https://www.openstreetmap.org/?mlat=${
-                    location?.data.latitudeI / 1e7
-                  }&mlon=${location?.data.longitudeI / 1e7}&layers=N`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {location?.data.latitudeI / 1e7},{" "}
-                  {location?.data.longitudeI / 1e7}
-                </a>
+          {hasCoordinates
+            ? (
+              <div className="ml-5 flex">
+                <span className="ml-4 border-l-2 border-l-backgroundPrimary pl-2 text-textPrimary">
+                  <p>
+                    {t("locationResponse.coordinates")}
+                    <a
+                      className="text-blue-500 dark:text-blue-400"
+                      href={`https://www.openstreetmap.org/?mlat=${
+                        position.latitudeI ?? 0 / 1e7
+                      }&mlon=${position.longitudeI ?? 0 / 1e7}&layers=N`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {" "}
+                      {position.latitudeI ?? 0 / 1e7},{" "}
+                      {position.longitudeI ?? 0 / 1e7}
+                    </a>
+                  </p>
+                  <p>
+                    {t("locationResponse.altitude")} {position.altitude}
+                    {position.altitude ?? 0 < 1
+                      ? t("unit.meter.one")
+                      : t("unit.meter.plural")}
+                  </p>
+                </span>
+              </div>
+            )
+            : (
+              // Optional: Show a message if coordinates are not available
+              <p className="text-textPrimary">
+                {t("locationResponse.noCoordinates")}
               </p>
-              <p>
-                {t("locationResponse.altitude")}
-                {location?.data.altitude}
-                {location?.data.altitde < 1
-                  ? t("unit.meter.one")
-                  : t("unit.meter.plural")}
-              </p>
-            </span>
-          </div>
+            )}
         </DialogDescription>
       </DialogContent>
     </Dialog>

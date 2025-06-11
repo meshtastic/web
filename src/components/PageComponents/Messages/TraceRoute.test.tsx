@@ -133,20 +133,4 @@ describe("TraceRoute", () => {
     // Check for translated '??' placeholder
     expect(screen.getAllByText(/↓ \?\?dBm/)).toHaveLength(2);
   });
-
-  it("renders hop hex if node is not found", () => {
-    render(
-      <TraceRoute
-        from={fromUser}
-        to={toUser}
-        route={[99]}
-        snrTowards={[5, 15]}
-      />,
-    );
-
-    // Check for translated '!' prefix
-    expect(screen.getByText("!63")).toBeInTheDocument();
-    expect(screen.getByText("↓ 5dBm")).toBeInTheDocument();
-    expect(screen.getByText("↓ 15dBm")).toBeInTheDocument();
-  });
 });

@@ -28,8 +28,18 @@ import { Input } from "@components/UI/Input.tsx";
 import { randId } from "@core/utils/randId.ts";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "@tanstack/react-router";
+import { messagesWithParamsRoute } from "@app/routes.tsx";
 
 type NodeInfoWithUnread = Protobuf.Mesh.NodeInfo & { unreadCount: number };
+
+function SelectMessageChat() {
+  const { t } = useTranslation("messages");
+  return (
+    <div className="flex-1 flex items-center justify-center text-slate-500 p-4">
+      {t("selectChatPrompt.text", { ns: "messages" })}
+    </div>
+  );
+}
 
 export const MessagesPage = () => {
   const {
@@ -46,7 +56,9 @@ export const MessagesPage = () => {
     getMessages,
     setMessageState,
   } = useMessageStore();
-  const params = useParams({ from: "", shouldThrow: false });
+
+  const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });
+
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isCollapsed } = useSidebar();
@@ -54,34 +66,33 @@ export const MessagesPage = () => {
   const { t } = useTranslation(["messages", "channels", "ui"]);
   const deferredSearch = useDeferredValue(searchTerm);
 
-  const chatType = params.type === "direct"
+  const navigateToChat = useCallback((type: MessageType, id: string) => {
+    const typeParam = type === MessageType.Direct ? "direct" : "broadcast";
+    navigate({ to: `/messages/${typeParam}/${id}` });
+  }, [navigate]);
+
+  const chatType = type === "direct"
     ? MessageType.Direct
-    : params.type === "broadcast"
-    ? MessageType.Broadcast
-    : undefined;
-  const activeChat = params.chatId ? Number(params.chatId) : undefined;
+    : MessageType.Broadcast;
+  const numericChatId = Number(chatId);
 
   const allChannels = Array.from(channels.values());
   const filteredChannels = allChannels.filter(
     (ch) => ch.role !== Protobuf.Channel.Channel_Role.DISABLED,
   );
-  const currentChannel = channels.get(activeChat);
-  const otherNode = getNode(activeChat);
+
+  useEffect(() => {
+    if (!type && !chatId && filteredChannels.length > 0) {
+      const defaultChannel = filteredChannels[0];
+      navigateToChat(MessageType.Broadcast, defaultChannel.index.toString());
+    }
+  }, [type, chatId, filteredChannels, navigateToChat]);
+
+  const currentChannel = channels.get(numericChatId);
+  const otherNode = getNode(numericChatId);
 
   const isDirect = chatType === MessageType.Direct;
   const isBroadcast = chatType === MessageType.Broadcast;
-
-  const navigateToChat = useCallback((type: MessageType, chatId: number) => {
-    const typeParam = type === MessageType.Direct ? "direct" : "broadcast";
-    navigate({ to: `/messages/${typeParam}/${chatId}` });
-  }, [navigate]);
-
-  useEffect(() => {
-    if (!params.type && !params.chatId && filteredChannels.length > 0) {
-      const defaultChannel = filteredChannels[0];
-      navigateToChat(MessageType.Broadcast, defaultChannel.index);
-    }
-  }, [params.type, params.chatId, filteredChannels, navigateToChat]);
 
   const filteredNodes = (): NodeInfoWithUnread[] => {
     const lowerCaseSearchTerm = deferredSearch.toLowerCase();
@@ -104,14 +115,25 @@ export const MessagesPage = () => {
   };
 
   const sendText = useCallback(async (message: string) => {
-    const isDirect = chatType === MessageType.Direct;
-    const toValue = isDirect ? activeChat : MessageType.Broadcast;
-
-    const channelValue = isDirect
-      ? Types.ChannelNumber.Primary
-      : activeChat ?? 0;
+    const toValue = isDirect ? numericChatId : MessageType.Broadcast;
+    const channelValue = isDirect ? Types.ChannelNumber.Primary : numericChatId;
 
     let messageId: number | undefined;
+
+    //   type SetMessageStateParams =
+    // | {
+    //   type: MessageType.Direct;
+    //   nodeA: NodeNum;
+    //   nodeB: NodeNum;
+    //   messageId: MessageId; // ID of the message within that chat
+    //   newState?: MessageState; // Optional new state, defaults to Ack
+    // }
+    // | {
+    //   type: MessageType.Broadcast;
+    //   channelId: ChannelId;
+    //   messageId: MessageId;
+    //   newState?: MessageState; // Optional new state, defaults to Ack
+    // };
 
     try {
       messageId = await connection?.sendText(
@@ -123,16 +145,16 @@ export const MessagesPage = () => {
       if (messageId !== undefined) {
         if (chatType === MessageType.Broadcast) {
           setMessageState({
-            type: chatType,
+            type: MessageType.Broadcast,
             channelId: channelValue,
             messageId,
             newState: MessageState.Ack,
           });
         } else {
           setMessageState({
-            type: chatType,
+            type: MessageType.Direct,
             nodeA: getMyNodeNum(),
-            nodeB: activeChat,
+            nodeB: numericChatId,
             messageId,
             newState: MessageState.Ack,
           });
@@ -140,28 +162,34 @@ export const MessagesPage = () => {
       } else {
         console.warn("sendText completed but messageId is undefined");
       }
-    } catch (e: any) {
+    } catch (e) {
       console.error("Failed to send message:", e);
       const failedId = messageId ?? randId();
       if (chatType === MessageType.Broadcast) {
         setMessageState({
-          type: chatType,
+          type: MessageType.Broadcast,
           channelId: channelValue,
           messageId: failedId,
           newState: MessageState.Failed,
         });
-      } else { // MessageType.Direct
-        const failedId = messageId ?? randId();
+      } else {
         setMessageState({
-          type: chatType,
+          type: MessageType.Direct,
           nodeA: getMyNodeNum(),
-          nodeB: activeChat,
+          nodeB: numericChatId,
           messageId: failedId,
           newState: MessageState.Failed,
         });
       }
     }
-  }, [activeChat, chatType, connection, getMyNodeNum, setMessageState]);
+  }, [
+    numericChatId,
+    chatId,
+    chatType,
+    connection,
+    getMyNodeNum,
+    setMessageState,
+  ]);
 
   const renderChatContent = () => {
     switch (chatType) {
@@ -170,7 +198,7 @@ export const MessagesPage = () => {
           <ChannelChat
             messages={getMessages({
               type: MessageType.Broadcast,
-              channelId: activeChat ?? 0,
+              channelId: numericChatId,
             }).reverse()}
           />
         );
@@ -180,16 +208,12 @@ export const MessagesPage = () => {
             messages={getMessages({
               type: MessageType.Direct,
               nodeA: getMyNodeNum(),
-              nodeB: activeChat,
+              nodeB: numericChatId,
             }).reverse()}
           />
         );
       default:
-        return (
-          <div className="flex-1 flex items-center justify-center text-slate-500 p-4">
-            {t("selectChatPrompt.text", { ns: "messages" })}
-          </div>
-        );
+        return <SelectMessageChat />;
     }
   };
 
@@ -210,10 +234,10 @@ export const MessagesPage = () => {
                   index: channel.index,
                   ns: "channels",
                 }))}
-            active={activeChat === channel.index &&
+            active={numericChatId === channel.index &&
               chatType === MessageType.Broadcast}
             onClick={() => {
-              navigateToChat(MessageType.Broadcast, channel.index);
+              navigateToChat(MessageType.Broadcast, channel.index.toString());
               resetUnread(channel.index);
             }}
           >
@@ -228,11 +252,12 @@ export const MessagesPage = () => {
   ), [
     filteredChannels,
     unreadCounts,
-    activeChat,
+    numericChatId,
     chatType,
     isCollapsed,
     navigateToChat,
     resetUnread,
+    t,
   ]);
 
   const rightSidebar = useMemo(
@@ -262,10 +287,10 @@ export const MessagesPage = () => {
               label={node.user?.longName ??
                 t("unknown.shortName")}
               count={node.unreadCount > 0 ? node.unreadCount : undefined}
-              active={activeChat === node.num &&
+              active={numericChatId === node.num &&
                 chatType === MessageType.Direct}
               onClick={() => {
-                navigateToChat(MessageType.Direct, node.num);
+                navigateToChat(MessageType.Direct, node.num.toString());
                 resetUnread(node.num);
               }}
             >
@@ -285,11 +310,12 @@ export const MessagesPage = () => {
     [
       filteredNodes,
       searchTerm,
-      activeChat,
+      numericChatId,
       chatType,
       navigateToChat,
       resetUnread,
       hasNodeError,
+      t,
     ],
   );
 
@@ -330,7 +356,7 @@ export const MessagesPage = () => {
           {(isBroadcast || isDirect)
             ? (
               <MessageInput
-                to={isDirect ? activeChat : MessageType.Broadcast}
+                to={isDirect ? numericChatId : MessageType.Broadcast}
                 onSend={sendText}
                 maxBytes={200}
               />

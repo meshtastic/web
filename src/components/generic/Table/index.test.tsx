@@ -3,7 +3,6 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
-// @ts-types="react"
 
 describe("Generic Table", () => {
   it("Can render an empty table.", () => {

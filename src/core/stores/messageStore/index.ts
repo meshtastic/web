@@ -184,13 +184,13 @@ export const useMessageStore = create<MessageStore>()(
             const deleted = messageLog.delete(params.messageId);
 
             if (deleted) {
-              console.log(
+              console.info(
                 `Deleted message ${params.messageId} from ${params.type} message ${parentKey}`,
               );
               // Clean up empty MessageLogMap and its entry in the parent map
               if (messageLog.size === 0) {
                 parentMap.delete(parentKey);
-                console.log(`Cleaned up empty message entry for ${parentKey}`);
+                console.info(`Cleaned up empty message entry for ${parentKey}`);
               }
             } else {
               console.warn(

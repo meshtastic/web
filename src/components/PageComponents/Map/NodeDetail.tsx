@@ -94,7 +94,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
                     align="center"
                     sideOffset={5}
                   >
-                    {t("nodeDetail.directMessage.label", {
+                    {t("nodeDetails.directMessage.label", {
                       shortName,
                     })}
                   </TooltipContent>
@@ -106,8 +106,8 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
               fill={node.isFavorite ? "black" : "none"}
               size={15}
               aria-label={node.isFavorite
-                ? t("nodeDetail.favorite.label")
-                : t("nodeDetail.notFavorite.label")}
+                ? t("nodeDetails.favorite.label")
+                : t("nodeDetails.notFavorite.label")}
             />
           </div>
         </div>
@@ -134,14 +134,14 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             <div>
               {node.lastHeard > 0 && (
                 <div>
-                  {t("nodeDetail.status.heard")}{" "}
+                  {t("nodeDetails.lastHeard")}{" "}
                   <TimeAgo timestamp={node.lastHeard * 1000} />
                 </div>
               )}
             </div>
             {node.viaMqtt && (
               <div style={{ color: "#660066" }} className="font-medium">
-                {t("nodeDetail.status.mqtt")}
+                {t("nodeDetails.status.mqtt")}
               </div>
             )}
           </div>
@@ -166,7 +166,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             <MountainSnow
               size={15}
               className="ml-2 mr-1"
-              aria-label={t("node_detail_elevation_aria_label")}
+              aria-label={t("nodeDetails.elevation")}
             />
             <div>
               {formatQuantity(node.position?.altitude, {
@@ -181,15 +181,15 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       <div className="flex mt-2">
         {!!node.deviceMetrics?.channelUtilization && (
           <div className="grow">
-            <div>{t("nodeDetail.channelUtilization")}</div>
-            <Mono>
+            <div>{t("nodeDetails.channelUtilization")}</div>
+            <Mono className="text-gray-500">
               {node.deviceMetrics?.channelUtilization.toPrecision(3)}%
             </Mono>
           </div>
         )}
         {!!node.deviceMetrics?.airUtilTx && (
           <div className="grow">
-            <div>{t("nodeDetail.airTxUtilization")}</div>
+            <div>{t("nodeDetails.airTxUtilization")}</div>
             <Mono className="text-gray-500">
               {node.deviceMetrics?.airUtilTx.toPrecision(3)}%
             </Mono>

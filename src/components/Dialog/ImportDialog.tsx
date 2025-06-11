@@ -72,17 +72,19 @@ export const ImportDialog = ({
   }, [importDialogInput]);
 
   const apply = () => {
-    channelSet?.settings.map((ch: unknown, index: number) => {
-      connection?.setChannel(
-        create(Protobuf.Channel.ChannelSchema, {
-          index,
-          role: index === 0
-            ? Protobuf.Channel.Channel_Role.PRIMARY
-            : Protobuf.Channel.Channel_Role.SECONDARY,
-          settings: ch,
-        }),
-      );
-    });
+    channelSet?.settings.map(
+      (ch: Protobuf.Channel.ChannelSettings, index: number) => {
+        connection?.setChannel(
+          create(Protobuf.Channel.ChannelSchema, {
+            index,
+            role: index === 0
+              ? Protobuf.Channel.Channel_Role.PRIMARY
+              : Protobuf.Channel.Channel_Role.SECONDARY,
+            settings: ch,
+          }),
+        );
+      },
+    );
 
     if (channelSet?.loraConfig) {
       connection?.setConfig(
