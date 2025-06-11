@@ -43,7 +43,6 @@ export function SelectInput<T extends FieldValues>({
   } = useController({
     name: field.name,
     control,
-    defaultValue: field.properties.defaultValue,
   });
 
   const { enumValue, formatEnumName, defaultValue, ...remainingProperties } =
