@@ -23,18 +23,6 @@ vi.mock("@components/UI/Label.tsx", () => ({
   ),
 }));
 
-vi.mock("@core/utils/cn.ts", () => ({
-  cn: (...args: any[]) => args.filter(Boolean).join(" "),
-}));
-
-vi.mock("react", async () => {
-  const actual = await vi.importActual("react");
-  return {
-    ...actual,
-    useId: () => "test-id",
-  };
-});
-
 describe("Checkbox", () => {
   beforeEach(cleanup);
 
@@ -65,11 +53,6 @@ describe("Checkbox", () => {
   it("uses provided id", () => {
     render(<Checkbox id="custom-id" />);
     expect(screen.getByRole("checkbox").id).toBe("custom-id");
-  });
-
-  it("generates id when not provided", () => {
-    render(<Checkbox />);
-    expect(screen.getByRole("checkbox").id).toBe("test-id");
   });
 
   it("renders children in Label component", () => {

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { mockDeviceStore } from "@core/stores/deviceStore.mock.ts";
 import { Protobuf } from "@meshtastic/core";
 
 vi.mock("@core/stores/deviceStore");
@@ -65,10 +66,11 @@ describe("TraceRoute", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     vi.mocked(useDevice).mockReturnValue({
+      ...mockDeviceStore,
       getNode: (nodeNum: number): Protobuf.Mesh.NodeInfo | undefined => {
         return mockNodes.get(nodeNum);
       },
-    } as any);
+    });
   });
 
   it("renders the route to destination with SNR values", () => {

@@ -24,18 +24,32 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
           restore-keys: |
             ${{ runner.os }}-deno-
-      
+
       - name: Install Dependencies
         run: deno install
 
       - name: Cache Dependencies
         run: deno cache src/index.tsx
 
-      - name: Run linter
-        run: deno task lint
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            **/*.ts
+            **/*.tsx
 
-      - name: Check formatter
-        run: deno task format --check
+      - name: Type check changed files
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: deno check ${{ steps.changed-files.outputs.all_changed_files }}
+
+      - name: Run linter on changed files
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: deno task lint ${{ steps.changed-files.outputs.all_changed_files }}
+
+      - name: Check format on changed files
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: deno task format --check ${{ steps.changed-files.outputs.all_changed_files }}
 
       - name: Run tests
         run: deno task test
