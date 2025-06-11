@@ -70,7 +70,7 @@ describe("TraceRoute", () => {
       getNode: (nodeNum: number): Protobuf.Mesh.NodeInfo | undefined => {
         return mockNodes.get(nodeNum);
       },
-    } as any);
+    });
   });
 
   it("renders the route to destination with SNR values", () => {
