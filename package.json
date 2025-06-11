@@ -13,6 +13,7 @@
     "dev": "deno task dev:ui",
     "dev:ui": "VITE_APP_VERSION=development deno run -A npm:vite dev",
     "test": "deno run -A npm:vitest",
+    "check": "deno check",
     "preview": "deno run -A npm:vite preview",
     "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
   },
