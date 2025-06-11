@@ -2,12 +2,11 @@
   "version": "5",
   "specifiers": {
     "jsr:@std/path@^1.1.0": "1.1.0",
-    "npm:@bufbuild/protobuf@^2.5.2": "2.5.2",
-    "npm:@jsr/meshtastic__core@2.6.4": "2.6.4",
-    "npm:@jsr/meshtastic__js@2.6.0-0": "2.6.0-0",
-    "npm:@jsr/meshtastic__transport-http@*": "0.2.1",
-    "npm:@jsr/meshtastic__transport-web-bluetooth@*": "0.1.2",
-    "npm:@jsr/meshtastic__transport-web-serial@*": "0.2.1",
+    "npm:@bufbuild/protobuf@^2.2.5": "2.5.2",
+    "npm:@jsr/meshtastic__core@2.6.2": "2.6.2",
+    "npm:@jsr/meshtastic__transport-http@0.2.1": "0.2.1",
+    "npm:@jsr/meshtastic__transport-web-bluetooth@0.1.2": "0.1.2",
+    "npm:@jsr/meshtastic__transport-web-serial@0.2.1": "0.2.1",
     "npm:@noble/curves@^1.9.2": "1.9.2",
     "npm:@radix-ui/react-accordion@^1.2.11": "1.2.11_@types+react@19.1.7_@types+react-dom@19.1.6__@types+react@19.1.7_react@19.1.0_react-dom@19.1.0__react@19.1.0",
     "npm:@radix-ui/react-checkbox@^1.3.2": "1.3.2_@types+react@19.1.7_@types+react-dom@19.1.6__@types+react@19.1.7_react@19.1.0_react-dom@19.1.0__react@19.1.0",
@@ -1119,6 +1118,17 @@
         "@jridgewell/sourcemap-codec"
       ]
     },
+    "@jsr/meshtastic__core@2.6.2": {
+      "integrity": "sha512-mzsxs9hQeVimQd/tj15Ojw5FYY8Iko3EbDviFZoEw3bmXgiySG53GvQsNA9wV13lFbDu96SM3uK/LI3EHMFY9w==",
+      "dependencies": [
+        "@bufbuild/protobuf",
+        "@jsr/meshtastic__protobufs",
+        "crc",
+        "ste-simple-events",
+        "tslog"
+      ],
+      "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.2.tgz"
+    },
     "@jsr/meshtastic__core@2.6.4": {
       "integrity": "sha512-1Kz5DK6peFxluHOJR38vFwfgeJzMXTz+3p6TvibjILVhSQC2U1nu8aJbn6w5zhRqS+j79OmtrRvdzL6VNsTkkQ==",
       "dependencies": [
@@ -1130,17 +1140,6 @@
       ],
       "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.4.tgz"
     },
-    "@jsr/meshtastic__js@2.6.0-0": {
-      "integrity": "sha512-+xpZpxK6oUIVOuEs7C+LyxRr2druvc7UNNNTK9Rl8ioXj63Jz1uQXlYe2Gj0xjnRAiSQLR7QVaPef21BR/YTxA==",
-      "dependencies": [
-        "@bufbuild/protobuf",
-        "@jsr/meshtastic__protobufs",
-        "crc",
-        "ste-simple-events",
-        "tslog"
-      ],
-      "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__js/2.6.0-0.tgz"
-    },
     "@jsr/meshtastic__protobufs@2.6.2": {
       "integrity": "sha512-bIENtFnUEru28GrAeSdiBS9skp0hN/3HZunMbF/IjvUrXOlx2fptKVj3b+pzjOWnLBZxllrByV/W+XDmrxqJ6g==",
       "dependencies": [
@@ -1151,21 +1150,21 @@
     "@jsr/meshtastic__transport-http@0.2.1": {
       "integrity": "sha512-lmQKr3aIINKvtGROU4HchmSVqbZSbkIHqajowRRC8IAjsnR0zNTyxz210QyY4pFUF9hpcW3GRjwq5h/VO2JuGg==",
       "dependencies": [
-        "@jsr/meshtastic__core"
+        "@jsr/meshtastic__core@2.6.2"
       ],
       "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-http/0.2.1.tgz"
     },
     "@jsr/meshtastic__transport-web-bluetooth@0.1.2": {
       "integrity": "sha512-Z+5pv9RXNgY0/crKExOH3pZ6LT0HIXFmnBL7NX5AO2knOFRn+4lmxQEhhmiTTlkUfqyEfAvbjuY5u4mq9TPTdQ==",
       "dependencies": [
-        "@jsr/meshtastic__core"
+        "@jsr/meshtastic__core@2.6.4"
       ],
       "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-web-bluetooth/0.1.2.tgz"
     },
     "@jsr/meshtastic__transport-web-serial@0.2.1": {
       "integrity": "sha512-yumjEGLkAuJYOC3aWKvZzbQqi/LnqaKfNpVCY7Ki7oLtAshNiZrBLiwiFhN7+ZR9FfMdJThyBMqREBDRRWTO1Q==",
       "dependencies": [
-        "@jsr/meshtastic__core"
+        "@jsr/meshtastic__core@2.6.4"
       ],
       "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-web-serial/0.2.1.tgz"
     },
@@ -7557,12 +7556,11 @@
     ],
     "packageJson": {
       "dependencies": [
-        "npm:@bufbuild/protobuf@^2.5.2",
-        "npm:@jsr/meshtastic__core@2.6.4",
-        "npm:@jsr/meshtastic__js@2.6.0-0",
-        "npm:@jsr/meshtastic__transport-http@*",
-        "npm:@jsr/meshtastic__transport-web-bluetooth@*",
-        "npm:@jsr/meshtastic__transport-web-serial@*",
+        "npm:@bufbuild/protobuf@^2.2.5",
+        "npm:@jsr/meshtastic__core@2.6.2",
+        "npm:@jsr/meshtastic__transport-http@0.2.1",
+        "npm:@jsr/meshtastic__transport-web-bluetooth@0.1.2",
+        "npm:@jsr/meshtastic__transport-web-serial@0.2.1",
         "npm:@noble/curves@^1.9.2",
         "npm:@radix-ui/react-accordion@^1.2.11",
         "npm:@radix-ui/react-checkbox@^1.3.2",

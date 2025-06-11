@@ -120,21 +120,6 @@ export const MessagesPage = () => {
 
     let messageId: number | undefined;
 
-    //   type SetMessageStateParams =
-    // | {
-    //   type: MessageType.Direct;
-    //   nodeA: NodeNum;
-    //   nodeB: NodeNum;
-    //   messageId: MessageId; // ID of the message within that chat
-    //   newState?: MessageState; // Optional new state, defaults to Ack
-    // }
-    // | {
-    //   type: MessageType.Broadcast;
-    //   channelId: ChannelId;
-    //   messageId: MessageId;
-    //   newState?: MessageState; // Optional new state, defaults to Ack
-    // };
-
     try {
       messageId = await connection?.sendText(
         message,
@@ -162,7 +147,7 @@ export const MessagesPage = () => {
       } else {
         console.warn("sendText completed but messageId is undefined");
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error("Failed to send message:", e);
       const failedId = messageId ?? randId();
       if (chatType === MessageType.Broadcast) {
