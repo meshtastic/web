@@ -1,30 +1,32 @@
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import React from "react";
 import { cn } from "@core/utils/cn.ts";
 
-interface FavoriteIconProps {
-  showFavorite: boolean;
+export interface Heading {
+  title: string;
+  sortable: boolean;
 }
 
-interface AvatarCellProps {
-  children: React.ReactElement<FavoriteIconProps>;
+interface Cell {
+  content: React.ReactNode;
+  sortValue: string | number;
+}
+
+export interface DataRow {
+  id: string | number;
+  isFavorite?: boolean;
+  cells: Cell[];
 }
 
 export interface TableProps {
   headings: Heading[];
-  rows: React.ReactElement<AvatarCellProps>[][];
+  rows: DataRow[];
 }
 
-export interface Heading {
-  title: string;
-  type: "blank" | "normal";
-  sortable: boolean;
-}
-
-function numericHops(hopsAway: string | unknown): number {
-  if (typeof hopsAway !== "string") {
-    return Number.MAX_SAFE_INTEGER;
+function numericHops(hopsAway: string | number): number {
+  if (typeof hopsAway === "number") {
+    return hopsAway;
   }
   if (hopsAway.match(/direct/i)) {
     return 0;
@@ -37,7 +39,7 @@ export const Table = ({ headings, rows }: TableProps) => {
   const [sortColumn, setSortColumn] = useState<string | null>("Last Heard");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const headingSort = (title: string) => {
+  const handleSort = (title: string) => {
     if (sortColumn === title) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -46,72 +48,36 @@ export const Table = ({ headings, rows }: TableProps) => {
     }
   };
 
-  const getElement = (cell: React.ReactNode): React.ReactElement | null => {
-    if (!React.isValidElement(cell)) {
-      return null;
-    }
-    if (cell.type === React.Fragment) {
-      const childrenArray = React.Children.toArray((cell.props as any).children);
-      const firstElement = childrenArray.find((child) =>
-        React.isValidElement(child)
-      );
-      return (firstElement as React.ReactElement) ?? null;
-    }
-    // If not a fragment, return the element itself
-    return cell;
-  };
-
-  const sortedRows = rows.slice().sort((a, b) => {
-    if (!sortColumn) return 0;
+  const sortedRows = useMemo(() => {
+    if (!sortColumn) return rows;
 
     const columnIndex = headings.findIndex((h) => h.title === sortColumn);
-    if (columnIndex === -1) return 0;
+    if (columnIndex === -1) return rows;
 
-    const elementA = getElement(a[columnIndex]);
-    const elementB = getElement(b[columnIndex]);
+    return [...rows].sort((a, b) => {
+      if (a.isFavorite !== b.isFavorite) {
+        return a.isFavorite ? -1 : 1;
+      }
 
-    // Avatar contains the prop showFavorite which indicates isFavorite
-    const favA = (a[0] as any)?.props?.children?.props?.showFavorite ?? false;
-    const favB = (b[0] as any)?.props?.children?.props?.showFavorite ?? false;
+      const aCell = a.cells[columnIndex];
+      const bCell = b.cells[columnIndex];
 
-    // Always put favorites at the top
-    if (favA !== favB) return favA ? -1 : 1;
+      let aValue: string | number;
+      let bValue: string | number;
 
-    if (sortColumn === "Last Heard") {
-      const aTimestamp = (elementA?.props as any)?.children?.props?.timestamp ?? 0;
-      const bTimestamp = (elementB?.props as any)?.children?.props?.timestamp ?? 0;
-      if (aTimestamp < bTimestamp) return sortOrder === "asc" ? -1 : 1;
-      if (aTimestamp > bTimestamp) return sortOrder === "asc" ? 1 : -1;
+      if (sortColumn === "Connection") {
+        aValue = numericHops(aCell.sortValue);
+        bValue = numericHops(bCell.sortValue);
+      } else {
+        aValue = aCell.sortValue;
+        bValue = bCell.sortValue;
+      }
+
+      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
       return 0;
-    }
-
-    if (sortColumn === "Connection") {
-      const aHopsStr = (elementA?.props as any)?.children?.[0];
-      const bHopsStr = (elementB?.props as any)?.children?.[0];
-      const aNumHops = numericHops(aHopsStr);
-      const bNumHops = numericHops(bHopsStr);
-      if (aNumHops < bNumHops) return sortOrder === "asc" ? -1 : 1;
-      if (aNumHops > bNumHops) return sortOrder === "asc" ? 1 : -1;
-      return 0;
-    }
-
-    const aValue = (elementA?.props as any)?.children;
-    const bValue = (elementB?.props as any)?.children;
-    const valA = aValue ?? "";
-    const valB = bValue ?? "";
-
-    // Ensure consistent comparison for potentially different types
-    const compareA = typeof valA === "string" || typeof valA === "number"
-      ? valA
-      : String(valA);
-    const compareB = typeof valB === "string" || typeof valB === "number"
-      ? valB
-      : String(valB);
-
-    if (compareA < compareB) return sortOrder === "asc" ? -1 : 1;
-    if (compareA > compareB) return sortOrder === "asc" ? 1 : -1;
-    return 0;
-  });
+    });
+  }, [rows, sortColumn, sortOrder, headings]);
 
   return (
     <table className="min-w-full" style={{ contentVisibility: "auto" }}>
@@ -121,17 +87,15 @@ export const Table = ({ headings, rows }: TableProps) => {
             <th
               key={heading.title}
               scope="col"
-              className={`py-2 pr-3 text-left ${
-                heading.sortable
-                  ? "cursor-pointer hover:brightness-hover active:brightness-press"
-                  : ""
-              }`}
-              onClick={() => heading.sortable && headingSort(heading.title)}
+              className={cn(
+                "py-2 pr-3 text-left",
+                heading.sortable &&
+                  "cursor-pointer hover:brightness-hover active:brightness-press",
+              )}
+              onClick={() => heading.sortable && handleSort(heading.title)}
               onKeyUp={(e) => {
-                if (
-                  heading.sortable && (e.key === "Enter" || e.key === " ")
-                ) {
-                  headingSort(heading.title);
+                if (heading.sortable && (e.key === "Enter" || e.key === " ")) {
+                  handleSort(heading.title);
                 }
               }}
               tabIndex={heading.sortable ? 0 : -1}
@@ -153,49 +117,37 @@ export const Table = ({ headings, rows }: TableProps) => {
         </tr>
       </thead>
       <tbody className="max-w-fit">
-        {sortedRows.map((row) => {
-          const firstCellKey =
-            (React.isValidElement(row[0]) && row[0].key !== null)
-              ? String(row[0].key)
-              : null;
-          const rowKey = firstCellKey ?? Math.random().toString(); // Use random only as last resort
-
-          const isFavorite = row[0]?.props?.children?.props?.showFavorite ??
-            false;
-          return (
-            <tr
-              key={rowKey}
-              className={cn(
-                "",
-                isFavorite
-                  ? "bg-yellow-100/30 dark:bg-slate-800 odd:bg-yellow-200/30 dark:odd:bg-slate-600/40"
-                  : "bg-white dark:bg-slate-900 odd:bg-slate-200/40 dark:odd:bg-slate-800/40",
-              )}
-            >
-              {row.map((item, cellIndex) => {
-                const cellKey = `${rowKey}_${cellIndex}`;
-                return cellIndex === 0
-                  ? (
-                    <th
-                      key={cellKey}
-                      className="whitespace-nowrap px-3 py-2 text-sm text-left text-text-secondary"
-                      scope="row"
-                    >
-                      {item}
-                    </th>
-                  )
-                  : (
-                    <td
-                      key={cellKey}
-                      className="whitespace-nowrap px-3 py-2 text-sm text-text-secondary"
-                    >
-                      {item}
-                    </td>
-                  );
-              })}
-            </tr>
-          );
-        })}
+        {sortedRows.map((row) => (
+          <tr
+            key={row.id}
+            className={cn(
+              row.isFavorite
+                ? "bg-yellow-100/30 dark:bg-slate-800 odd:bg-yellow-200/30 dark:odd:bg-slate-600/40"
+                : "bg-white dark:bg-slate-900 odd:bg-slate-200/40 dark:odd:bg-slate-800/40",
+            )}
+          >
+            {row.cells.map((cell, cellIndex) =>
+              cellIndex === 0
+                ? (
+                  <th
+                    key={`${row.id}_${cellIndex}`}
+                    className="whitespace-nowrap px-3 py-2 text-sm text-left text-text-secondary"
+                    scope="row"
+                  >
+                    {cell.content}
+                  </th>
+                )
+                : (
+                  <td
+                    key={`${row.id}_${cellIndex}`}
+                    className="whitespace-nowrap px-3 py-2 text-sm text-text-secondary"
+                  >
+                    {cell.content}
+                  </td>
+                )
+            )}
+          </tr>
+        ))}
       </tbody>
     </table>
   );

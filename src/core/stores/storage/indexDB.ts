@@ -56,18 +56,25 @@ const reviver: JsonReviver = (_, value) => {
 };
 
 export const storageWithMapSupport: PersistStorage<PersistedMessageState> = {
-  getItem: async (name): Promise<StorageValue<PersistedMessageState> | null> => {
+  getItem: async (
+    name,
+  ): Promise<StorageValue<PersistedMessageState> | null> => {
     const str = await zustandIndexDBStorage.getItem(name);
     if (!str) return null;
     try {
-      const parsed = JSON.parse(str, reviver) as StorageValue<PersistedMessageState>;
+      const parsed = JSON.parse(str, reviver) as StorageValue<
+        PersistedMessageState
+      >;
       return parsed;
     } catch (error) {
       console.error(`Error parsing persisted state (${name}):`, error);
       return null;
     }
   },
-  setItem: async (name, newValue: StorageValue<PersistedMessageState>): Promise<void> => {
+  setItem: async (
+    name,
+    newValue: StorageValue<PersistedMessageState>,
+  ): Promise<void> => {
     try {
       const str = JSON.stringify(newValue, replacer);
       await zustandIndexDBStorage.setItem(name, str);

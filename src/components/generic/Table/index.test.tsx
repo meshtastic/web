@@ -1,141 +1,127 @@
 import { describe, expect, it } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { Table } from "@components/generic/Table/index.tsx";
+import { DataRow, Heading, Table } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 
 describe("Generic Table", () => {
   it("Can render an empty table.", () => {
-    render(
-      <Table
-        headings={[]}
-        rows={[]}
-      />,
-    );
+    render(<Table headings={[]} rows={[]} />);
     expect(screen.getByRole("table")).toBeInTheDocument();
   });
 
   it("Can render a table with headers and no rows.", async () => {
-    render(
-      <Table
-        headings={[
-          { title: "", type: "blank", sortable: false },
-          { title: "Short Name", type: "normal", sortable: true },
-          { title: "Long Name", type: "normal", sortable: true },
-          { title: "Model", type: "normal", sortable: true },
-          { title: "MAC Address", type: "normal", sortable: true },
-          { title: "Last Heard", type: "normal", sortable: true },
-          { title: "SNR", type: "normal", sortable: true },
-          { title: "Encryption", type: "normal", sortable: false },
-          { title: "Connection", type: "normal", sortable: true },
-        ]}
-        rows={[]}
-      />,
-    );
+    const headings: Heading[] = [
+      { title: "Short Name", sortable: true },
+      { title: "Last Heard", sortable: true },
+      { title: "Connection", sortable: true },
+    ];
+    render(<Table headings={headings} rows={[]} />);
     await screen.findByRole("table");
-    expect(screen.getAllByRole("columnheader")).toHaveLength(9);
+    expect(screen.getAllByRole("columnheader")).toHaveLength(3);
   });
 
-  // A simplified version of the rows in pages/Nodes.tsx for testing purposes
-  const mockDevicesWithShortNameAndConnection = [
+  // Mock data representing devices
+  const mockDevices = [
     {
-      user: { shortName: "TST1" },
+      id: "TST1",
+      shortName: "TST1",
       hopsAway: 1,
-      lastHeard: Date.now() + 1000,
+      lastHeard: Date.now() - 3000,
       viaMqtt: false,
     },
     {
-      user: { shortName: "TST2" },
+      id: "TST2",
+      shortName: "TST2",
       hopsAway: 0,
-      lastHeard: Date.now() + 4000,
+      lastHeard: Date.now() - 1000,
       viaMqtt: true,
+      isFavorite: true, // Favorite device
     },
     {
-      user: { shortName: "TST3" },
+      id: "TST3",
+      shortName: "TST3",
       hopsAway: 4,
-      lastHeard: Date.now(),
+      lastHeard: Date.now() - 5000,
       viaMqtt: false,
     },
     {
-      user: { shortName: "TST4" },
+      id: "TST4",
+      shortName: "TST4",
       hopsAway: 3,
-      lastHeard: Date.now() + 2000,
+      lastHeard: Date.now() - 2000,
       viaMqtt: true,
     },
   ];
 
-  const mockRows = mockDevicesWithShortNameAndConnection.map((node) => [
-    <h1 data-testshortname key={node.user.shortName}>{node.user.shortName}</h1>,
-    <Mono key="lastHeard" data-testheard>
-      <TimeAgo timestamp={node.lastHeard * 1000} />
-    </Mono>,
-    <Mono key="hops" data-testhops>
-      {node.lastHeard !== 0
-        ? node.viaMqtt === false && node.hopsAway === 0
-          ? "Direct"
-          : `${node.hopsAway?.toString()} ${
-            node.hopsAway ?? 0 > 1 ? "hops" : "hop"
-          } away`
-        : "-"}
-      {node.viaMqtt === true ? ", via MQTT" : ""}
-    </Mono>,
-  ]);
+  // Transform mock data into the format expected by the Table component
+  const mockRows: DataRow[] = mockDevices.map((node) => ({
+    id: node.id,
+    isFavorite: node.isFavorite,
+    cells: [
+      {
+        content: <b data-testid="short-name">{node.shortName}</b>,
+        sortValue: node.shortName,
+      },
+      {
+        content: (
+          <Mono>
+            <TimeAgo timestamp={node.lastHeard} />
+          </Mono>
+        ),
+        sortValue: node.lastHeard,
+      },
+      {
+        content: (
+          <Mono>
+            {node.lastHeard !== 0
+              ? node.viaMqtt === false && node.hopsAway === 0
+                ? "Direct"
+                : `${node.hopsAway} ${node.hopsAway > 1 ? "hops" : "hop"} away`
+              : "-"}
+            {node.viaMqtt ? ", via MQTT" : ""}
+          </Mono>
+        ),
+        sortValue: node.hopsAway,
+      },
+    ],
+  }));
 
-  it("Can sort rows appropriately.", async () => {
-    render(
-      <Table
-        headings={[
-          { title: "Short Name", type: "normal", sortable: true },
-          { title: "Last Heard", type: "normal", sortable: true },
-          { title: "Connection", type: "normal", sortable: true },
-        ]}
-        rows={mockRows}
-      />,
-    );
+  const headings: Heading[] = [
+    { title: "Short Name", sortable: true },
+    { title: "Last Heard", sortable: true },
+    { title: "Connection", sortable: true },
+  ];
+
+  it("Can sort rows, keeping favorites at the top", async () => {
+    render(<Table headings={headings} rows={mockRows} />);
     const renderedTable = await screen.findByRole("table");
     const columnHeaders = screen.getAllByRole("columnheader");
     expect(columnHeaders).toHaveLength(3);
 
-    // Will be sorted "Last heard" "asc" by default
-    expect(
-      [...renderedTable.querySelectorAll("[data-testshortname]")]
-        .map((el) => el.textContent)
-        .map((v) => v?.trim())
-        .join(","),
-    )
-      .toMatch("TST2,TST4,TST1,TST3");
+    const getRenderedOrder = () =>
+      [...renderedTable.querySelectorAll("[data-testid='short-name']")].map(
+        (el) => el.textContent?.trim(),
+      );
 
+    // Default sort: "Last Heard" desc. TST2 is favorite, so it's first.
+    // Then the rest are sorted by lastHeard timestamp (most recent first).
+    // Order of timestamps: TST2 (latest, but favorite), TST4, TST1, TST3 (oldest).
+    expect(getRenderedOrder()).toEqual(["TST2", "TST4", "TST1", "TST3"]);
+
+    // Click "Short Name" to sort asc
     fireEvent.click(columnHeaders[0]);
+    // TST2 is favorite, so it's first. Then TST1, TST3, TST4 alphabetically.
+    expect(getRenderedOrder()).toEqual(["TST2", "TST1", "TST3", "TST4"]);
 
-    // Re-sort by Short Name asc
-    expect(
-      [...renderedTable.querySelectorAll("[data-testshortname]")]
-        .map((el) => el.textContent)
-        .map((v) => v?.trim())
-        .join(","),
-    )
-      .toMatch("TST1,TST2,TST3,TST4");
-
+    // Click "Short Name" again to sort desc
     fireEvent.click(columnHeaders[0]);
+    // TST2 is favorite, so it's first. Then TST4, TST3, TST1 reverse alphabetically.
+    expect(getRenderedOrder()).toEqual(["TST2", "TST4", "TST3", "TST1"]);
 
-    // Re-sort by Short Name desc
-    expect(
-      [...renderedTable.querySelectorAll("[data-testshortname]")]
-        .map((el) => el.textContent)
-        .map((v) => v?.trim())
-        .join(","),
-    )
-      .toMatch("TST4,TST3,TST2,TST1");
-
+    // Click "Connection" to sort by hops asc
     fireEvent.click(columnHeaders[2]);
-
-    // Re-sort by Hops Away
-    expect(
-      [...renderedTable.querySelectorAll("[data-testshortname]")]
-        .map((el) => el.textContent)
-        .map((v) => v?.trim())
-        .join(","),
-    )
-      .toMatch("TST2,TST1,TST4,TST3");
+    // TST2 is favorite (and also has 0 hops). Then sorted by hops: TST1 (1), TST4 (3), TST3 (4).
+    expect(getRenderedOrder()).toEqual(["TST2", "TST1", "TST4", "TST3"]);
   });
 });

@@ -17,8 +17,17 @@ export type FilterState = {
   hwModel: Protobuf.Mesh.HardwareModel[];
 };
 
-const shallowEqualArray = (a: any[], b: any[]) =>
-  a.length === b.length && a.every((v, i) => v === b[i]);
+const shallowEqualArray = <T>(a: T[], b: T[]): boolean => {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+  return true;
+};
 
 export function useFilterNode() {
   const defaultFilterValues = useMemo<FilterState>(
@@ -154,13 +163,20 @@ export function useFilterNode() {
         ? { ...defaultFilterValues, ...overrides }
         : defaultFilterValues;
 
-      return (Object.keys(base) as (keyof FilterState)[]).some((key) => {
-        const curr = current[key];
-        const def = base[key];
-        return Array.isArray(def) && Array.isArray(curr)
-          ? !shallowEqualArray(curr, def)
-          : curr !== def;
-      });
+      for (const key of Object.keys(base) as (keyof FilterState)[]) {
+        const currentValue = current[key];
+        const defaultValue = base[key];
+
+        if (Array.isArray(defaultValue) && Array.isArray(currentValue)) {
+          if (!shallowEqualArray(currentValue, defaultValue)) {
+            return true;
+          }
+        } else if (currentValue !== defaultValue) {
+          return true;
+        }
+      }
+
+      return false;
     },
     [defaultFilterValues],
   );

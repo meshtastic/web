@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
           restore-keys: |
             ${{ runner.os }}-deno-
-      
+
       - name: Install Dependencies
         run: deno install
 
@@ -45,11 +45,13 @@ jobs:
         if: steps.changed-files.outputs.all_changed_files != ''
         run: deno check ${{ steps.changed-files.outputs.all_changed_files }}
 
-      - name: Run linter
-        run: deno task lint
+      - name: Run linter on changed files
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: deno task lint ${{ steps.changed-files.outputs.all_changed_files }}
 
-      - name: Check formatter
-        run: deno task format --check
+      - name: Check format on changed files
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: deno task format --check ${{ steps.changed-files.outputs.all_changed_files }}
 
       - name: Run tests
         run: deno task test
