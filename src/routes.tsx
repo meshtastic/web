@@ -1,4 +1,4 @@
-import { createRoute, redirect } from "@tanstack/react-router";
+import { createRoute } from "@tanstack/react-router";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import MapPage from "@pages/Map/index.tsx";
@@ -17,10 +17,6 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: Dashboard,
-  loader: () => {
-    // Redirect to the broadcast messages page on initial load
-    return redirect({ to: `/messages/broadcast/0`, replace: true });
-  },
 });
 
 const messagesRoute = createRoute({

@@ -1,5 +1,5 @@
 {
-  "name": "meshtastic-web",
+  "name": "@meshtastic/web",
   "version": "2.6.0-0",
   "type": "module",
   "description": "Meshtastic web client",
@@ -36,10 +36,9 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.5",
     "@meshtastic/core": "npm:@jsr/meshtastic__core@2.6.2",
-    "@meshtastic/js": "npm:@jsr/meshtastic__js@2.6.0-0",
-    "@meshtastic/transport-http": "npm:@jsr/meshtastic__transport-http",
-    "@meshtastic/transport-web-bluetooth": "npm:@jsr/meshtastic__transport-web-bluetooth",
-    "@meshtastic/transport-web-serial": "npm:@jsr/meshtastic__transport-web-serial",
+    "@meshtastic/transport-http": "npm:@jsr/meshtastic__transport-http@0.2.1",
+    "@meshtastic/transport-web-bluetooth": "npm:@jsr/meshtastic__transport-web-bluetooth@0.1.2",
+    "@meshtastic/transport-web-serial": "npm:@jsr/meshtastic__transport-web-serial@0.2.1",
     "@noble/curves": "^1.9.0",
     "@radix-ui/react-accordion": "^1.2.8",
     "@radix-ui/react-checkbox": "^1.2.3",
@@ -66,6 +65,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "crypto-random-string": "^5.0.0",
+    "deno": "^2.3.5",
     "i18next": "^25.2.0",
     "i18next-browser-languagedetector": "^8.1.0",
     "i18next-http-backend": "^3.0.2",

@@ -60,8 +60,8 @@ Our release process follows these guidelines:
 - **Pre-releases:** A pre-release is typically issued mid-month for testing and
   early adoption.
 - **Nightly Builds:** An experimental Docker image containing the latest
-  cutting-edge features and fixes is automatically built nightly from the
-  `main` branch.
+  cutting-edge features and fixes is automatically built nightly from the `main`
+  branch.
 
 ### Nightly Builds
 

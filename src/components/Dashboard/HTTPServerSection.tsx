@@ -1,4 +1,4 @@
-import type { TabElementProps } from "@components/Dialog/NewDeviceDialog.tsx";
+import { useEffect, useState } from "react";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
@@ -15,7 +15,6 @@ import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   AlertTriangle,
@@ -23,7 +22,6 @@ import {
   Clock,
   Lock,
   LockOpen,
-  MessageCircle,
   Plus,
   Server,
   Trash2,
@@ -38,7 +36,11 @@ interface AddServerFormData {
   secure: boolean;
 }
 
-export const HTTP = ({ closeDialog }: TabElementProps) => {
+interface HTTPServerSectionProps {
+  onConnect?: () => void;
+}
+
+export const HTTPServerSection = ({ onConnect }: HTTPServerSectionProps) => {
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [connectingToServer, setConnectingToServer] = useState<string | null>(
     null,
@@ -91,7 +93,6 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-      // Try to get actual device info from fromradio endpoint
       const response = await fetch(`${server.url}/api/v1/fromradio?all=false`, {
         method: "GET",
         mode: "cors",
@@ -101,39 +102,17 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        // Try to get basic device info if available
-        try {
-          // First check if we can get a simple status response
-          const statusResponse = await fetch(`${server.url}/api/v1/fromradio`, {
-            method: "GET",
-            mode: "cors",
-            signal: AbortSignal.timeout(3000),
-          });
-
-          if (statusResponse.ok) {
-            // For now, just mark as online - we could parse protobuf later for device details
-            updateServerStatus(server.url, "online");
-
-            // TODO: Parse protobuf response to get device info
-            // This would require proper protobuf decoding which is complex
-            // For now, we'll show it as online and get device info after connection
-          } else {
-            updateServerStatus(server.url, "offline");
-          }
-        } catch {
-          // If fromradio fails, try the simpler status endpoint
-          const fallbackResponse = await fetch(`${server.url}/`, {
-            method: "GET",
-            mode: "cors",
-            signal: AbortSignal.timeout(3000),
-          });
-          updateServerStatus(
-            server.url,
-            fallbackResponse.ok ? "online" : "offline",
-          );
-        }
+        updateServerStatus(server.url, "online");
       } else {
-        updateServerStatus(server.url, "offline");
+        const fallbackResponse = await fetch(`${server.url}/`, {
+          method: "GET",
+          mode: "cors",
+          signal: AbortSignal.timeout(3000),
+        });
+        updateServerStatus(
+          server.url,
+          fallbackResponse.ok ? "online" : "offline",
+        );
       }
     } catch {
       updateServerStatus(server.url, "offline");
@@ -157,11 +136,10 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
       device.addConnection(connection);
       subscribeAll(device, connection, messageStore);
 
-      // Update last used time
       addSavedServer(server.host, server.protocol);
       updateServerStatus(server.url, "online");
 
-      closeDialog();
+      onConnect?.();
     } catch (error) {
       console.error("Connection error:", error);
       setConnectionError(`Failed to connect to ${server.host}`);
@@ -186,12 +164,11 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
       device.addConnection(connection);
       subscribeAll(device, connection, messageStore);
 
-      // Save to history
       addSavedServer(data.hostname, protocol);
 
       setAddServerOpen(false);
       reset();
-      closeDialog();
+      onConnect?.();
     } catch (error) {
       console.error("Connection error:", error);
       setConnectionError(`Failed to connect to ${data.hostname}`);
@@ -236,53 +213,43 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
 
   return (
     <>
-      <div
-        className="flex w-full flex-col gap-3 p-4"
-        style={{ minHeight: "12rem" }}
-      >
-        {/* Server List Header */}
+      <div className="space-y-3">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Server className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Meshtastic Servers
-            </span>
+            <Server className="h-5 w-5 text-blue-600" />
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+              HTTP Servers
+            </h3>
           </div>
           {savedServers.length > 0 && (
             <Button
-              type="button"
               variant="ghost"
               size="sm"
               onClick={clearSavedServers}
-              className="h-7 px-2 text-xs text-red-600 hover:text-red-700"
+              className="text-red-600 hover:text-red-700"
             >
-              <Trash2 className="h-3 w-3 mr-1" />
               Clear All
             </Button>
           )}
         </div>
 
         {/* Server List */}
-        <div className="flex-1 space-y-2 max-h-48 overflow-y-auto">
+        <div className="space-y-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
           {savedServers.length === 0
             ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <Server className="h-8 w-8 text-slate-300 mb-2" />
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  No saved servers yet
-                </p>
-                <p className="text-xs text-slate-400 dark:text-slate-500">
-                  Add your first Meshtastic node to get started
-                </p>
+              <div className="text-center py-4 text-slate-500 dark:text-slate-400">
+                <Server className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+                <p className="text-sm">No HTTP servers added yet</p>
               </div>
             )
             : (
               savedServers.slice(0, 5).map((server) => (
                 <div
                   key={server.url}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:shadow-sm transition-shadow"
                 >
-                  {/* Status Indicator */}
+                  {/* Status */}
                   <div className="flex-shrink-0">
                     {getStatusIcon(server.status)}
                   </div>
@@ -297,24 +264,12 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
                     </div>
 
                     <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      <span className="flex items-center gap-1">
-                        <span
-                          className={`w-2 h-2 rounded-full ${
-                            server.status === "online"
-                              ? "bg-green-500"
-                              : server.status === "offline"
-                              ? "bg-red-500"
-                              : "bg-yellow-500"
-                          }`}
-                        />
-                        {getStatusText(server.status)}
-                      </span>
+                      <span>{getStatusText(server.status)}</span>
 
-                      {/* Device info if available */}
                       {server.deviceInfo?.model && (
                         <>
                           <span>•</span>
-                          <span className="font-mono text-xs bg-slate-200 dark:bg-slate-700 px-1 rounded">
+                          <span className="font-mono bg-slate-200 dark:bg-slate-600 px-1 rounded">
                             {server.deviceInfo.model}
                           </span>
                         </>
@@ -329,28 +284,15 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
                           </span>
                         </>
                       )}
-
-                      {server.deviceInfo?.unreadCount &&
-                        server.deviceInfo.unreadCount > 0 && (
-                        <>
-                          <span>•</span>
-                          <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                            <MessageCircle className="h-3 w-3" />
-                            {server.deviceInfo.unreadCount}
-                          </span>
-                        </>
-                      )}
                     </div>
                   </div>
 
                   {/* Actions */}
                   <div className="flex items-center gap-1">
                     <Button
-                      variant="default"
                       size="sm"
                       onClick={() => connectToServer(server)}
                       disabled={connectingToServer === server.url}
-                      className="h-8 px-3"
                     >
                       {connectingToServer === server.url
                         ? <Clock className="h-3 w-3 mr-1 animate-spin" />
@@ -362,7 +304,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
                       variant="ghost"
                       size="sm"
                       onClick={() => removeSavedServer(server.url)}
-                      className="h-8 w-8 p-0 text-slate-400 hover:text-red-600"
+                      className="text-slate-400 hover:text-red-600 p-1"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
@@ -370,29 +312,29 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
                 </div>
               ))
             )}
-        </div>
 
-        {/* Add New Server Button */}
-        <Button
-          variant="outline"
-          onClick={() => setAddServerOpen(true)}
-          className="w-full h-10 border-dashed border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Server
-        </Button>
+          {/* Add Server Button */}
+          <Button
+            variant="outline"
+            onClick={() => setAddServerOpen(true)}
+            className="w-full border-dashed hover:border-solid"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add HTTP Server
+          </Button>
 
-        {/* Connection Error */}
-        {connectionError && (
-          <div className="p-3 rounded-md bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800">
-            <div className="flex gap-2 items-start">
-              <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-              <p className="text-sm text-red-800 dark:text-red-200">
-                {connectionError}
-              </p>
+          {/* Connection Error */}
+          {connectionError && (
+            <div className="p-3 rounded-md bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800">
+              <div className="flex gap-2 items-start">
+                <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                <p className="text-sm text-red-800 dark:text-red-200">
+                  {connectionError}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Add Server Dialog */}
@@ -401,7 +343,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
-              Add New Server
+              Add HTTP Server
             </DialogTitle>
           </DialogHeader>
 

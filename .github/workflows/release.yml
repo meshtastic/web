@@ -22,7 +22,7 @@ jobs:
 
       - name: Install Dependencies
         run: deno install
-      
+
       - name: Run tests
         run: deno task test
 

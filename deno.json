@@ -46,5 +46,17 @@
   },
   "unstable": [
     "sloppy-imports"
-  ]
+  ],
+  "tasks": {
+    "dev": "deno task dev:ui",
+    "dev:ui": "VITE_APP_VERSION=development deno run -A npm:vite dev",
+    "build": "deno run -A npm:vite build",
+    "build:analyze": "BUNDLE_ANALYZE=true deno task build",
+    "lint": "deno lint src/",
+    "lint:fix": "deno lint --fix src/",
+    "format": "deno fmt src/",
+    "test": "deno run -A npm:vitest",
+    "preview": "deno run -A npm:vite preview",
+    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
+  }
 }

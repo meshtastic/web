@@ -34,7 +34,7 @@ describe.skip("UnsafeRolesDialog", () => {
 
   it("renders the dialog when open is true", () => {
     renderWithProviders(
-      <UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />,
+      <UnsafeRolesDialog open onOpenChange={vi.fn()} />,
     );
 
     const dialog = screen.getByRole("dialog");
@@ -52,7 +52,7 @@ describe.skip("UnsafeRolesDialog", () => {
 
   it("displays the correct links", () => {
     renderWithProviders(
-      <UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />,
+      <UnsafeRolesDialog open onOpenChange={vi.fn()} />,
     );
 
     const docLink = screen.getByRole("link", {
@@ -74,7 +74,7 @@ describe.skip("UnsafeRolesDialog", () => {
 
   it("does not allow confirmation until checkbox is checked", () => {
     renderWithProviders(
-      <UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />,
+      <UnsafeRolesDialog open onOpenChange={vi.fn()} />,
     );
 
     const confirmButton = screen.getByRole("button", { name: /confirm/i });
@@ -90,7 +90,7 @@ describe.skip("UnsafeRolesDialog", () => {
   it("emits the correct event when closing via close button", () => {
     const eventSpy = vi.spyOn(eventBus, "emit");
     renderWithProviders(
-      <UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />,
+      <UnsafeRolesDialog open onOpenChange={vi.fn()} />,
     );
 
     const dismissButton = screen.getByRole("button", { name: /close/i });
@@ -104,7 +104,7 @@ describe.skip("UnsafeRolesDialog", () => {
   it("emits the correct event when dismissing", () => {
     const eventSpy = vi.spyOn(eventBus, "emit");
     renderWithProviders(
-      <UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />,
+      <UnsafeRolesDialog open onOpenChange={vi.fn()} />,
     );
 
     const dismissButton = screen.getByRole("button", { name: /dismiss/i });
@@ -118,7 +118,7 @@ describe.skip("UnsafeRolesDialog", () => {
   it("emits the correct event when confirming", () => {
     const eventSpy = vi.spyOn(eventBus, "emit");
     renderWithProviders(
-      <UnsafeRolesDialog open={true} onOpenChange={vi.fn()} />,
+      <UnsafeRolesDialog open onOpenChange={vi.fn()} />,
     );
 
     const checkbox = screen.getByRole("checkbox");

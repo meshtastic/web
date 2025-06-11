@@ -1,6 +1,5 @@
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
-import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.tsx";
 import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
 import { Toaster } from "@components/Toaster.tsx";
 import Footer from "@components/UI/Footer.tsx";
@@ -13,27 +12,30 @@ import { MapProvider } from "react-map-gl/maplibre";
 import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { SidebarProvider } from "@core/stores/sidebarStore.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
-import { Outlet } from "@tanstack/react-router";
+import { Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { useEffect } from "react";
 
 export function App() {
   const { getDevice } = useDeviceStore();
-  const { selectedDevice, setConnectDialogOpen, connectDialogOpen } =
-    useAppStore();
+  const { selectedDevice } = useAppStore();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const device = getDevice(selectedDevice);
 
   // Sets up light/dark mode based on user preferences or system settings
   useTheme();
 
+  // Redirect to messages when a device connects and we're on the dashboard
+  useEffect(() => {
+    if (device && location.pathname === "/") {
+      navigate({ to: "/messages/broadcast/0", replace: true });
+    }
+  }, [device, location.pathname, navigate]);
+
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      <NewDeviceDialog
-        open={connectDialogOpen}
-        onOpenChange={(open) => {
-          setConnectDialogOpen(open);
-        }}
-      />
       <Toaster />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper device={device}>

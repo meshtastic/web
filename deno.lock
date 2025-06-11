@@ -5,10 +5,6 @@
     "jsr:@std/path@^1.1.0": "1.1.0",
     "npm:@bufbuild/protobuf@^2.2.5": "2.2.5",
     "npm:@jsr/meshtastic__core@2.6.2": "2.6.2",
-    "npm:@jsr/meshtastic__js@2.6.0-0": "2.6.0-0",
-    "npm:@jsr/meshtastic__transport-http@*": "0.2.1",
-    "npm:@jsr/meshtastic__transport-web-bluetooth@*": "0.1.1",
-    "npm:@jsr/meshtastic__transport-web-serial@*": "0.2.1",
     "npm:@noble/curves@^1.9.0": "1.9.0",
     "npm:@radix-ui/react-accordion@^1.2.8": "1.2.8_@types+react@19.1.2_@types+react-dom@19.1.3__@types+react@19.1.2_react@19.1.0_react-dom@19.1.0__react@19.1.0",
     "npm:@radix-ui/react-checkbox@^1.2.3": "1.2.3_@types+react@19.1.2_@types+react-dom@19.1.3__@types+react@19.1.2_react@19.1.0_react-dom@19.1.0__react@19.1.0",
@@ -46,7 +42,6 @@
     "npm:@vitejs/plugin-react@^4.4.1": "4.4.1_vite@6.3.4__@types+node@22.15.3__picomatch@4.0.2_@babel+core@7.27.1_@types+node@22.15.3",
     "npm:autoprefixer@^10.4.21": "10.4.21_postcss@8.5.3",
     "npm:base64-js@^1.5.1": "1.5.1",
-    "npm:class-validator@~0.14.2": "0.14.2",
     "npm:class-variance-authority@~0.7.1": "0.7.1",
     "npm:clsx@^2.1.1": "2.1.1",
     "npm:cmdk@^1.1.1": "1.1.1_react@19.1.0_react-dom@19.1.0__react@19.1.0_@types+react@19.1.2_@types+react-dom@19.1.3__@types+react@19.1.2",
@@ -1131,44 +1126,12 @@
       ],
       "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.2.tgz"
     },
-    "@jsr/meshtastic__js@2.6.0-0": {
-      "integrity": "sha512-+xpZpxK6oUIVOuEs7C+LyxRr2druvc7UNNNTK9Rl8ioXj63Jz1uQXlYe2Gj0xjnRAiSQLR7QVaPef21BR/YTxA==",
-      "dependencies": [
-        "@bufbuild/protobuf",
-        "@jsr/meshtastic__protobufs",
-        "crc",
-        "ste-simple-events",
-        "tslog"
-      ],
-      "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__js/2.6.0-0.tgz"
-    },
     "@jsr/meshtastic__protobufs@2.6.2": {
       "integrity": "sha512-bIENtFnUEru28GrAeSdiBS9skp0hN/3HZunMbF/IjvUrXOlx2fptKVj3b+pzjOWnLBZxllrByV/W+XDmrxqJ6g==",
       "dependencies": [
         "@bufbuild/protobuf"
       ],
       "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__protobufs/2.6.2.tgz"
-    },
-    "@jsr/meshtastic__transport-http@0.2.1": {
-      "integrity": "sha512-lmQKr3aIINKvtGROU4HchmSVqbZSbkIHqajowRRC8IAjsnR0zNTyxz210QyY4pFUF9hpcW3GRjwq5h/VO2JuGg==",
-      "dependencies": [
-        "@jsr/meshtastic__core"
-      ],
-      "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-http/0.2.1.tgz"
-    },
-    "@jsr/meshtastic__transport-web-bluetooth@0.1.1": {
-      "integrity": "sha512-eAj23n/Pxe8hMjO/uYbI/C+l1s0tLm41EzvcLWQtLQyEKJpPP+/Eqc5lUmDeF7FVPS2IYhllFJvV8Ili7okHtQ==",
-      "dependencies": [
-        "@jsr/meshtastic__core"
-      ],
-      "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-web-bluetooth/0.1.1.tgz"
-    },
-    "@jsr/meshtastic__transport-web-serial@0.2.1": {
-      "integrity": "sha512-yumjEGLkAuJYOC3aWKvZzbQqi/LnqaKfNpVCY7Ki7oLtAshNiZrBLiwiFhN7+ZR9FfMdJThyBMqREBDRRWTO1Q==",
-      "dependencies": [
-        "@jsr/meshtastic__core"
-      ],
-      "tarball": "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-web-serial/0.2.1.tgz"
     },
     "@mapbox/geojson-rewind@0.5.2": {
       "integrity": "sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA==",
@@ -4000,9 +3963,6 @@
     "@types/trusted-types@2.0.7": {
       "integrity": "sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw=="
     },
-    "@types/validator@13.15.0": {
-      "integrity": "sha512-nh7nrWhLr6CBq9ldtw0wx+z9wKnnv/uTVLA9g/3/TcOYxbpOSZE+MhKPmWqU+K0NvThjhv12uD8MuqijB0WzEA=="
-    },
     "@types/w3c-web-serial@1.0.8": {
       "integrity": "sha512-QQOT+bxQJhRGXoZDZGLs3ksLud1dMNnMiSQtBA0w8KXvLpXX4oM4TZb6J0GgJ8UbCaHo5s9/4VQT8uXy9JER2A=="
     },
@@ -4483,14 +4443,6 @@
       "dependencies": [
         "inherits",
         "safe-buffer@5.2.1"
-      ]
-    },
-    "class-validator@0.14.2": {
-      "integrity": "sha512-3kMVRF2io8N8pY1IFIXlho9r8IPUUIfHe2hYVtiebvAzU2XeQFXTv+XI4WX+TnXmtwXMDcjngcpkiPM0O9PvLw==",
-      "dependencies": [
-        "@types/validator",
-        "libphonenumber-js",
-        "validator"
       ]
     },
     "class-variance-authority@0.7.1": {
@@ -5638,9 +5590,6 @@
     },
     "leven@3.1.0": {
       "integrity": "sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A=="
-    },
-    "libphonenumber-js@1.12.7": {
-      "integrity": "sha512-0nYZSNj/QEikyhcM5RZFXGlCB/mr4PVamnT1C2sKBnDDTYndrvbybYjvg+PMqAndQHlLbwQ3socolnL3WWTUFA=="
     },
     "lightningcss-darwin-arm64@1.29.2": {
       "integrity": "sha512-cK/eMabSViKn/PG8U/a7aCorpeKLMlK0bQeNHmdb7qUnBkNPnL+oV5DjJUo0kqWsJUapZsM4jCfYItbqBDvlcA==",
@@ -7174,9 +7123,6 @@
         "which-typed-array"
       ]
     },
-    "validator@13.15.0": {
-      "integrity": "sha512-36B2ryl4+oL5QxZ3AzD0t5SsMNGvTtQHpjgFO5tbNxfXbMFkY822ktCDe1MnlqV3301QQI9SLHDNJokDI+Z9pA=="
-    },
     "vite-node@3.1.2_@types+node@22.15.3": {
       "integrity": "sha512-/8iMryv46J3aK13iUXsei5G/A3CUlW4665THCPS+K8xAaqrVWiGB4RfXMQXCLjpK9P2eK//BczrVkn5JLAk6DA==",
       "dependencies": [
@@ -7581,10 +7527,9 @@
       "dependencies": [
         "npm:@bufbuild/protobuf@^2.2.5",
         "npm:@jsr/meshtastic__core@2.6.2",
-        "npm:@jsr/meshtastic__js@2.6.0-0",
-        "npm:@jsr/meshtastic__transport-http@*",
-        "npm:@jsr/meshtastic__transport-web-bluetooth@*",
-        "npm:@jsr/meshtastic__transport-web-serial@*",
+        "npm:@jsr/meshtastic__transport-http@0.2.1",
+        "npm:@jsr/meshtastic__transport-web-bluetooth@0.1.2",
+        "npm:@jsr/meshtastic__transport-web-serial@0.2.1",
         "npm:@noble/curves@^1.9.0",
         "npm:@radix-ui/react-accordion@^1.2.8",
         "npm:@radix-ui/react-checkbox@^1.2.3",
@@ -7622,11 +7567,11 @@
         "npm:@vitejs/plugin-react@^4.4.1",
         "npm:autoprefixer@^10.4.21",
         "npm:base64-js@^1.5.1",
-        "npm:class-validator@~0.14.2",
         "npm:class-variance-authority@~0.7.1",
         "npm:clsx@^2.1.1",
         "npm:cmdk@^1.1.1",
         "npm:crypto-random-string@5",
+        "npm:deno@^2.3.5",
         "npm:gzipper@^8.2.1",
         "npm:happy-dom@^17.4.6",
         "npm:i18next-browser-languagedetector@^8.1.0",
@@ -7659,7 +7604,7 @@
         "npm:vite-plugin-static-copy@3",
         "npm:vite@^6.3.4",
         "npm:vitest@^3.1.2",
-        "npm:zod@^3.24.3",
+        "npm:zod@^3.25.0",
         "npm:zustand@5.0.4"
       ]
     }
