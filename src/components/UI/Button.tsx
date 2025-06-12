@@ -46,44 +46,36 @@ export interface ButtonProps
   iconAlignment?: "left" | "right";
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      className,
-      variant,
-      size,
-      disabled,
-      icon,
-      iconAlignment = "left",
-      children,
-      ...props
-    },
-    ref,
-  ) => {
-    return (
-      <button
-        type="button"
-        className={cn(
-          buttonVariants({ variant, size, className }),
-          { "cursor-not-allowed": disabled },
-          "inline-flex items-center",
-        )}
-        ref={ref}
-        disabled={disabled}
-        {...props}
-      >
-        {icon && iconAlignment === "left" && (
-          <span className={cn({ "mr-2": !!children })}>{icon}</span>
-        )}
-        {children}
-
-        {icon && iconAlignment === "right" && (
-          <span className={cn({ "ml-2": !!children })}>{icon}</span>
-        )}
-      </button>
-    );
-  },
-);
-Button.displayName = "Button";
+const Button = ({
+  className,
+  variant,
+  size,
+  disabled,
+  icon,
+  iconAlignment = "left",
+  children,
+  ...props
+}: ButtonProps) => {
+  return (
+    <button
+      type="button"
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        { "cursor-not-allowed": disabled },
+        "inline-flex items-center",
+      )}
+      disabled={disabled}
+      {...props}
+    >
+      {icon && iconAlignment === "left" && (
+        <span className={cn({ "mr-2": !!children })}>{icon}</span>
+      )}
+      {children}
+      {icon && iconAlignment === "right" && (
+        <span className={cn({ "ml-2": !!children })}>{icon}</span>
+      )}
+    </button>
+  );
+};
 
 export { Button, buttonVariants };

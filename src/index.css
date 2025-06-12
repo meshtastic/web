@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+@view-transition {
+  navigation: auto;
+}
+
 @theme {
   --font-mono:
     Cascadia Code, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,

@@ -1,0 +1,82 @@
+import { vi } from "vitest";
+import { type Device } from "./deviceStore.ts";
+import { Protobuf } from "@meshtastic/core";
+
+/**
+ * You can spread this base mock in your tests and override only the
+ * properties relevant to a specific test case.
+ *
+ * @example
+ * vi.mocked(useDevice).mockReturnValue({
+ * ...mockDeviceStore,
+ * getNode: (nodeNum) => mockNodes.get(nodeNum),
+ * });
+ */
+export const mockDeviceStore: Device = {
+  id: 0,
+  status: 5 as const,
+  channels: new Map(),
+  config: {} as Protobuf.LocalOnly.LocalConfig,
+  moduleConfig: {} as Protobuf.LocalOnly.LocalModuleConfig,
+  workingConfig: [],
+  workingModuleConfig: [],
+  hardware: {} as Protobuf.Mesh.MyNodeInfo,
+  metadata: new Map(),
+  traceroutes: new Map(),
+  nodeErrors: new Map(),
+  connection: undefined,
+  activeNode: 0,
+  waypoints: [],
+  pendingSettingsChanges: false,
+  messageDraft: "",
+  unreadCounts: new Map(),
+  nodesMap: new Map(),
+  dialog: {
+    import: false,
+    QR: false,
+    shutdown: false,
+    reboot: false,
+    rebootOTA: false,
+    deviceName: false,
+    nodeRemoval: false,
+    pkiBackup: false,
+    nodeDetails: false,
+    unsafeRoles: false,
+    refreshKeys: false,
+    deleteMessages: false,
+  },
+  setStatus: vi.fn(),
+  setConfig: vi.fn(),
+  setModuleConfig: vi.fn(),
+  setWorkingConfig: vi.fn(),
+  setWorkingModuleConfig: vi.fn(),
+  setHardware: vi.fn(),
+  setActiveNode: vi.fn(),
+  setPendingSettingsChanges: vi.fn(),
+  addChannel: vi.fn(),
+  addWaypoint: vi.fn(),
+  addNodeInfo: vi.fn(),
+  addUser: vi.fn(),
+  addPosition: vi.fn(),
+  addConnection: vi.fn(),
+  addTraceRoute: vi.fn(),
+  addMetadata: vi.fn(),
+  removeNode: vi.fn(),
+  setDialogOpen: vi.fn(),
+  getDialogOpen: vi.fn().mockReturnValue(false),
+  processPacket: vi.fn(),
+  setMessageDraft: vi.fn(),
+  setNodeError: vi.fn(),
+  clearNodeError: vi.fn(),
+  getNodeError: vi.fn().mockReturnValue(undefined),
+  hasNodeError: vi.fn().mockReturnValue(false),
+  incrementUnread: vi.fn(),
+  resetUnread: vi.fn(),
+  getNodes: vi.fn().mockReturnValue([]),
+  getNodesLength: vi.fn().mockReturnValue(0),
+  getNode: vi.fn().mockReturnValue(undefined),
+  getMyNode: vi.fn(),
+  sendAdminMessage: vi.fn(),
+  updateFavorite: vi.fn(),
+  updateIgnored: vi.fn(),
+};

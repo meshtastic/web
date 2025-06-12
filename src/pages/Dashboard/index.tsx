@@ -4,14 +4,7 @@ import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import {
-  BluetoothIcon,
-  ListPlusIcon,
-  NetworkIcon,
-  PlusIcon,
-  UsbIcon,
-  UsersIcon,
-} from "lucide-react";
+import { ListPlusIcon, PlusIcon, UsersIcon } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@components/LanguageSwitcher.tsx";
@@ -60,32 +53,6 @@ export const Dashboard = () => {
                               ?.longName ??
                               t("unknown.shortName")}
                           </p>
-                          <div className="inline-flex w-24 justify-center gap-2 rounded-full bg-slate-100 py-1 text-xs font-semibold text-slate-900 transition-colors hover:bg-slate-700 hover:text-slate-50">
-                            {device.connection?.connType === "ble" && (
-                              <>
-                                <BluetoothIcon size={16} />
-                                {t(
-                                  "dashboard.connectionType_ble",
-                                )}
-                              </>
-                            )}
-                            {device.connection?.connType === "serial" && (
-                              <>
-                                <UsbIcon size={16} />
-                                {t(
-                                  "dashboard.connectionType_serial",
-                                )}
-                              </>
-                            )}
-                            {device.connection?.connType === "http" && (
-                              <>
-                                <NetworkIcon size={16} />
-                                {t(
-                                  "dashboard.connectionType_network",
-                                )}
-                              </>
-                            )}
-                          </div>
                           <div className="mt-2 sm:flex sm:justify-between">
                             <div className="flex gap-2 text-sm text-slate-500">
                               <UsersIcon
@@ -114,7 +81,6 @@ export const Dashboard = () => {
                 <Heading as="h3">
                   {t("dashboard.noDevicesTitle")}
                 </Heading>
-                {/* <LanguageSwitcher /> */}
                 <Subtle>
                   {t("dashboard.noDevicesDescription")}
                 </Subtle>

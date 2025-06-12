@@ -32,9 +32,9 @@ export default defineConfig({
       targets: [
         {
           src: "src/i18n/locales/**/*",
-          dest: "src/i18n/locales"
-        }
-      ]
+          dest: "src/i18n/locales",
+        },
+      ],
     }),
   ],
   define: {

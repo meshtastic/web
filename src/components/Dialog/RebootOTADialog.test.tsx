@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { RebootOTADialog } from "./RebootOTADialog.tsx";
-import { ReactNode } from "react";
+import {
+  ButtonHTMLAttributes,
+  ClassAttributes,
+  InputHTMLAttributes,
+  ReactNode,
+} from "react";
+import { JSX } from "react/jsx-runtime";
 
 const rebootOtaMock = vi.fn();
 let mockConnection: { rebootOta: (delay: number) => void } | undefined = {
@@ -18,7 +24,12 @@ vi.mock("@components/UI/Button.tsx", async () => {
   const actual = await vi.importActual("@components/UI/Button.tsx");
   return {
     ...actual,
-    Button: (props) => <button {...props} />,
+    Button: (
+      props:
+        & JSX.IntrinsicAttributes
+        & ClassAttributes<HTMLButtonElement>
+        & ButtonHTMLAttributes<HTMLButtonElement>,
+    ) => <button {...props} />,
   };
 });
 
@@ -26,7 +37,12 @@ vi.mock("@components/UI/Input.tsx", async () => {
   const actual = await vi.importActual("@components/UI/Input.tsx");
   return {
     ...actual,
-    Input: (props) => <input {...props} />,
+    Input: (
+      props:
+        & JSX.IntrinsicAttributes
+        & ClassAttributes<HTMLInputElement>
+        & InputHTMLAttributes<HTMLInputElement>,
+    ) => <input {...props} />,
   };
 });
 
