@@ -109,8 +109,6 @@ describe("Network component", () => {
   it("should enable SSID and PSK when wifi is toggled on", async () => {
     render(<Network />);
     const toggle = screen.getByLabelText("WiFi Enabled");
-    screen.debug();
-
     fireEvent.click(toggle); // turns wifiEnabled = true
 
     await waitFor(() => {
