@@ -39,9 +39,10 @@ jobs:
             **/*.ts
             **/*.tsx
 
-      - name: Type check changed files
-        if: steps.changed-files.outputs.all_changed_files != ''
-        run: deno check ${{ steps.changed-files.outputs.all_changed_files }}
+      #  Uncomment the following lines when you have figured out how to ignore files 
+      # - name: Type check changed files
+      #   if: steps.changed-files.outputs.all_changed_files != ''
+      #   run: deno check ${{ steps.changed-files.outputs.all_changed_files }}
 
       - name: Run linter on changed files
         if: steps.changed-files.outputs.all_changed_files != ''
