@@ -4,27 +4,37 @@ import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { Button } from "@components/UI/Button.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { NewConnectionDialog } from "@components/Dialog/NewConnectionDialog.tsx";
+import { ConnectionTabs } from "@components/ConnectionTabs/ConnectionTabs.tsx";
 import {
   BluetoothIcon,
-  ListPlusIcon,
   NetworkIcon,
   PlusIcon,
   UsbIcon,
   UsersIcon,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@components/LanguageSwitcher.tsx";
 
 export const Dashboard = () => {
   const { t } = useTranslation("dashboard");
-  const { setConnectDialogOpen, setSelectedDevice } = useAppStore();
+  const { setSelectedDevice } = useAppStore();
   const { getDevices } = useDeviceStore();
+  const [connectionDialogOpen, setConnectionDialogOpen] = useState(false);
 
   const devices = useMemo(() => getDevices(), [getDevices]);
 
+  // Show connection dialog only if user explicitly opens it
+  // When no devices exist, we show inline connection tabs instead
+
   return (
     <>
+      <NewConnectionDialog
+        open={connectionDialogOpen}
+        onOpenChange={setConnectionDialogOpen}
+      />
+
       <div className="flex flex-col gap-3 p-3 px-8">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
@@ -40,9 +50,9 @@ export const Dashboard = () => {
 
         <Separator />
 
-        <div className="flex h-[450px] rounded-md border border-dashed border-slate-200 p-3 dark:border-slate-700">
-          {devices.length
-            ? (
+        {devices.length > 0
+          ? (
+            <div className="flex h-[450px] rounded-md border border-dashed border-slate-200 p-3 dark:border-slate-700">
               <ul className="grow divide-y divide-slate-200">
                 {devices.map((device) => {
                   return (
@@ -104,33 +114,31 @@ export const Dashboard = () => {
                   );
                 })}
               </ul>
-            )
-            : (
-              <div className="m-auto flex flex-col gap-3 text-center">
-                <ListPlusIcon
-                  size={48}
-                  className="mx-auto text-text-secondary"
-                />
+              <div className="flex items-end">
+                <Button
+                  className="gap-2"
+                  variant="outline"
+                  onClick={() => setConnectionDialogOpen(true)}
+                >
+                  <PlusIcon size={16} />
+                  {t("dashboard.button_newConnection")}
+                </Button>
+              </div>
+            </div>
+          )
+          : (
+            <div className="space-y-6">
+              <div className="text-center">
                 <Heading as="h3">
                   {t("dashboard.noDevicesTitle")}
                 </Heading>
-                {/* <LanguageSwitcher /> */}
                 <Subtle>
                   {t("dashboard.noDevicesDescription")}
                 </Subtle>
-                <Button
-                  className="gap-2"
-                  variant="default"
-                  onClick={() => setConnectDialogOpen(true)}
-                >
-                  <PlusIcon size={16} />
-                  {t(
-                    "dashboard.button_newConnection",
-                  )}
-                </Button>
               </div>
-            )}
-        </div>
+              <ConnectionTabs />
+            </div>
+          )}
       </div>
     </>
   );

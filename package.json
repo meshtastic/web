@@ -1,5 +1,5 @@
 {
-  "name": "meshtastic-web",
+  "name": "@meshtastic/web",
   "version": "2.6.0-0",
   "type": "module",
   "description": "Meshtastic web client",
@@ -65,6 +65,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "crypto-random-string": "^5.0.0",
+    "deno": "^2.3.5",
     "i18next": "^25.2.0",
     "i18next-browser-languagedetector": "^8.1.0",
     "i18next-http-backend": "^3.0.2",
