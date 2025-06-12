@@ -33,7 +33,6 @@
     "npm:@tanstack/router-devtools@^1.120.15": "1.120.15_@tanstack+react-router@1.120.15__react@19.1.0__react-dom@19.1.0___react@19.1.0_react@19.1.0_react-dom@19.1.0__react@19.1.0",
     "npm:@tanstack/router-plugin@^1.120.15": "1.120.15_@tanstack+react-router@1.120.15__react@19.1.0__react-dom@19.1.0___react@19.1.0_vite@6.3.4__@types+node@22.15.3__picomatch@4.0.2_@babel+core@7.27.1_react@19.1.0_react-dom@19.1.0__react@19.1.0_@types+node@22.15.3",
     "npm:@testing-library/jest-dom@^6.6.3": "6.6.3",
-    "npm:@testing-library/react-hooks@^8.0.1": "8.0.1_@types+react@19.1.2_react@19.1.0_react-dom@19.1.0__react@19.1.0",
     "npm:@testing-library/react@^16.3.0": "16.3.0_@testing-library+dom@10.4.0_@types+react@19.1.2_@types+react-dom@19.1.3__@types+react@19.1.2_react@19.1.0_react-dom@19.1.0__react@19.1.0",
     "npm:@testing-library/user-event@^14.6.1": "14.6.1_@testing-library+dom@10.4.0",
     "npm:@turf/turf@^7.2.0": "7.2.0",
@@ -2500,20 +2499,6 @@
         "dom-accessibility-api@0.6.3",
         "lodash",
         "redent"
-      ]
-    },
-    "@testing-library/react-hooks@8.0.1_@types+react@19.1.2_react@19.1.0_react-dom@19.1.0__react@19.1.0": {
-      "integrity": "sha512-Aqhl2IVmLt8IovEVarNDFuJDVWVvhnr9/GCU6UUnrYXwgDFF9h2L2o2P9KBni1AST5sT6riAyoukFLyjQUgD/g==",
-      "dependencies": [
-        "@babel/runtime",
-        "@types/react",
-        "react",
-        "react-dom",
-        "react-error-boundary@3.1.4_react@19.1.0"
-      ],
-      "optionalPeers": [
-        "@types/react",
-        "react-dom"
       ]
     },
     "@testing-library/react@16.3.0_@testing-library+dom@10.4.0_@types+react@19.1.2_@types+react-dom@19.1.3__@types+react@19.1.2_react@19.1.0_react-dom@19.1.0__react@19.1.0": {
@@ -5689,13 +5674,6 @@
         "scheduler"
       ]
     },
-    "react-error-boundary@3.1.4_react@19.1.0": {
-      "integrity": "sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==",
-      "dependencies": [
-        "@babel/runtime",
-        "react"
-      ]
-    },
     "react-error-boundary@6.0.0_react@19.1.0": {
       "integrity": "sha512-gdlJjD7NWr0IfkPlaREN2d9uUZUlksrfOx7SX62VRerwXbMY6ftGCIZua1VG1aXFNOimhISsTq+Owp725b9SiA==",
       "dependencies": [
@@ -6988,7 +6966,6 @@
         "npm:@tanstack/router-devtools@^1.120.15",
         "npm:@tanstack/router-plugin@^1.120.15",
         "npm:@testing-library/jest-dom@^6.6.3",
-        "npm:@testing-library/react-hooks@^8.0.1",
         "npm:@testing-library/react@^16.3.0",
         "npm:@testing-library/user-event@^14.6.1",
         "npm:@turf/turf@^7.2.0",
