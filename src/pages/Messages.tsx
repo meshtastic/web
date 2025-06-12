@@ -140,7 +140,7 @@ export const MessagesPage = () => {
       } else {
         console.warn("sendText completed but messageId is undefined");
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Failed to send message:", e);
       const failedId = messageId ?? randId();
       if (chatType === MessageType.Broadcast) {
