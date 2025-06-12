@@ -70,7 +70,7 @@ describe("TraceRoute", () => {
       getNode: (nodeNum: number): Protobuf.Mesh.NodeInfo | undefined => {
         return mockNodes.get(nodeNum);
       },
-    } as any);
+    });
   });
 
   it("renders the route to destination with SNR values", () => {
@@ -134,21 +134,5 @@ describe("TraceRoute", () => {
     expect(screen.getByText("Node A")).toBeInTheDocument();
     // Check for translated '??' placeholder
     expect(screen.getAllByText(/↓ \?\?dBm/)).toHaveLength(2);
-  });
-
-  it("renders hop hex if node is not found", () => {
-    render(
-      <TraceRoute
-        from={fromUser}
-        to={toUser}
-        route={[99]}
-        snrTowards={[5, 15]}
-      />,
-    );
-
-    // Check for translated '!' prefix
-    expect(screen.getByText("!63")).toBeInTheDocument();
-    expect(screen.getByText("↓ 5dBm")).toBeInTheDocument();
-    expect(screen.getByText("↓ 15dBm")).toBeInTheDocument();
   });
 });

@@ -5,8 +5,9 @@ import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
-import { BleConnection, ServiceUuid } from "@meshtastic/js";
-import { BluetoothDevice } from "web-bluetooth";
+import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
+import { MeshDevice } from "@meshtastic/core";
+import type { BluetoothDevice } from "web-bluetooth";
 import { useCallback, useEffect, useState } from "react";
 import { useMessageStore } from "@core/stores/messageStore/index.ts";
 import { useTranslation } from "react-i18next";
@@ -31,15 +32,13 @@ export const BLE = (
 
   const onConnect = async (bleDevice: BluetoothDevice) => {
     const id = randId();
+    const transport = await TransportWebBluetooth.createFromDevice(bleDevice);
     const device = addDevice(id);
+    const connection = new MeshDevice(transport, id);
+    connection.configure();
     setSelectedDevice(id);
-    const connection = new BleConnection(id);
-    await connection.connect({
-      device: bleDevice,
-    });
     device.addConnection(connection);
     subscribeAll(device, connection, messageStore);
-
     closeDialog();
   };
 
@@ -72,7 +71,7 @@ export const BLE = (
         onClick={async () => {
           await navigator.bluetooth
             .requestDevice({
-              filters: [{ services: [ServiceUuid] }],
+              filters: [{ services: [TransportWebBluetooth.ServiceUuid] }],
             })
             .then((device) => {
               const exists = bleDevices.findIndex((d) => d.id === device.id);

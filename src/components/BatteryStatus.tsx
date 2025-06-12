@@ -8,56 +8,45 @@ import {
 import { useTranslation } from "react-i18next";
 import { DeviceMetrics } from "./types.ts";
 
-interface BatteryStateConfig {
-  condition: (level: number) => boolean;
-  Icon: React.ElementType;
-  className: string;
-  text: (level: number) => string;
+type BatteryStatusKey = keyof typeof BATTERY_STATUS;
+
+interface BatteryStatusProps {
+  deviceMetrics?: DeviceMetrics | null;
 }
 
 interface BatteryStatusProps {
   deviceMetrics?: DeviceMetrics | null;
 }
 
-const getBatteryStates = (
-  t: (key: string, options?: object) => string,
-): BatteryStateConfig[] => {
-  return [
-    {
-      condition: (level) => level > 100,
-      Icon: PlugZapIcon,
-      className: "text-gray-500",
-      text: () => t("batteryStatus.pluggedIn"),
-    },
-    {
-      condition: (level) => level > 80,
-      Icon: BatteryFullIcon,
-      className: "text-green-500",
-      text: (level) => t("batteryStatus.charging", { level }),
-    },
-    {
-      condition: (level) => level > 20,
-      Icon: BatteryMediumIcon,
-      className: "text-yellow-500",
-      text: (level) => t("batteryStatus.charging", { level }),
-    },
-    {
-      condition: () => true,
-      Icon: BatteryLowIcon,
-      className: "text-red-500",
-      text: (level) => t("batteryStatus.charging", { level }),
-    },
-  ];
-};
+interface StatusConfig {
+  Icon: React.ElementType;
+  className: string;
+  text: string;
+}
 
-const getBatteryState = (
-  level: number,
-  batteryStates: BatteryStateConfig[],
-) => {
-  return batteryStates.find((state) => state.condition(level));
+const BATTERY_STATUS = {
+  PLUGGED_IN: "PLUGGED_IN",
+  FULL: "FULL",
+  MEDIUM: "MEDIUM",
+  LOW: "LOW",
+} as const;
+
+export const getBatteryStatus = (level: number): BatteryStatusKey => {
+  if (level > 100) {
+    return BATTERY_STATUS.PLUGGED_IN;
+  }
+  if (level > 80) {
+    return BATTERY_STATUS.FULL;
+  }
+  if (level > 20) {
+    return BATTERY_STATUS.MEDIUM;
+  }
+  return BATTERY_STATUS.LOW;
 };
 
 const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
+  const { t } = useTranslation();
+
   if (
     deviceMetrics?.batteryLevel === undefined ||
     deviceMetrics?.batteryLevel === null
@@ -65,16 +54,39 @@ const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
     return null;
   }
 
-  const { t } = useTranslation();
-  const batteryStates = getBatteryStates(t);
-
   const { batteryLevel } = deviceMetrics;
-  const currentState = getBatteryState(batteryLevel, batteryStates) ??
-    batteryStates[batteryStates.length - 1];
 
-  const BatteryIcon = currentState.Icon;
-  const iconClassName = currentState.className;
-  const statusText = currentState.text(batteryLevel);
+  const statusKey = getBatteryStatus(batteryLevel);
+
+  const statusConfigMap: Record<BatteryStatusKey, StatusConfig> = {
+    [BATTERY_STATUS.PLUGGED_IN]: {
+      Icon: PlugZapIcon,
+      className: "text-gray-500",
+      text: t("batteryStatus.pluggedIn"),
+    },
+    [BATTERY_STATUS.FULL]: {
+      Icon: BatteryFullIcon,
+      className: "text-green-500",
+      text: t("batteryStatus.charging", { level: batteryLevel }),
+    },
+    [BATTERY_STATUS.MEDIUM]: {
+      Icon: BatteryMediumIcon,
+      className: "text-yellow-500",
+      text: t("batteryStatus.charging", { level: batteryLevel }),
+    },
+    [BATTERY_STATUS.LOW]: {
+      Icon: BatteryLowIcon,
+      className: "text-red-500",
+      text: t("batteryStatus.charging", { level: batteryLevel }),
+    },
+  };
+
+  // 3. Use the key to get the current state configuration
+  const {
+    Icon: BatteryIcon,
+    className: iconClassName,
+    text: statusText,
+  } = statusConfigMap[statusKey];
 
   return (
     <div
