@@ -15,12 +15,14 @@ import {
   Trash2,
 } from "lucide-react";
 import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { useTranslation } from "react-i18next";
 
 interface BluetoothTabProps {
   closeDialog: () => void;
 }
 
 export const BluetoothTab = ({ closeDialog }: BluetoothTabProps) => {
+  const { t } = useTranslation("dialog");
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [connectingToDevice, setConnectingToDevice] = useState<string | null>(
     null,
@@ -120,8 +122,12 @@ export const BluetoothTab = ({ closeDialog }: BluetoothTabProps) => {
   };
 
   const getStatusText = (device: BluetoothDevice) => {
-    if (connectingToDevice === device.id) return "Connecting...";
-    return device.gatt?.connected ? "Connected" : "Paired";
+    if (connectingToDevice === device.id) {
+      return t("newDeviceDialog.tabs.status.connecting");
+    }
+    return device.gatt?.connected
+      ? t("newDeviceDialog.tabs.status.connected")
+      : t("newDeviceDialog.tabs.status.paired");
   };
 
   return (
@@ -130,7 +136,7 @@ export const BluetoothTab = ({ closeDialog }: BluetoothTabProps) => {
       <div className="flex items-center gap-2">
         <Bluetooth className="h-5 w-5 text-blue-600" />
         <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-          Bluetooth Devices
+          {t("newDeviceDialog.tabs.bluetooth.title")}
         </h3>
       </div>
 
@@ -140,9 +146,11 @@ export const BluetoothTab = ({ closeDialog }: BluetoothTabProps) => {
           ? (
             <div className="text-center py-12 text-slate-500 dark:text-slate-400">
               <Bluetooth className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-              <p className="text-sm mb-2">No Bluetooth devices paired</p>
+              <p className="text-sm mb-2">
+                {t("newDeviceDialog.tabs.bluetooth.noDevices")}
+              </p>
               <p className="text-xs text-slate-400">
-                Pair your first Meshtastic device
+                {t("newDeviceDialog.tabs.bluetooth.pairFirst")}
               </p>
             </div>
           )
@@ -182,7 +190,9 @@ export const BluetoothTab = ({ closeDialog }: BluetoothTabProps) => {
                     {connectingToDevice === device.id
                       ? <Clock className="h-3 w-3 mr-1 animate-spin" />
                       : <Bluetooth className="h-3 w-3 mr-1" />}
-                    {device.gatt?.connected ? "Connected" : "Connect"}
+                    {device.gatt?.connected
+                      ? t("newDeviceDialog.tabs.status.connected")
+                      : t("newDeviceDialog.tabs.actions.connect")}
                   </Button>
 
                   <Button
@@ -209,13 +219,13 @@ export const BluetoothTab = ({ closeDialog }: BluetoothTabProps) => {
             ? (
               <>
                 <Clock className="h-4 w-4 mr-2 animate-spin" />
-                Pairing...
+                {t("newDeviceDialog.tabs.bluetooth.pairing")}
               </>
             )
             : (
               <>
                 <Plus className="h-4 w-4 mr-2" />
-                Pair New Device
+                {t("newDeviceDialog.tabs.bluetooth.pairDevice")}
               </>
             )}
         </Button>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
@@ -14,12 +14,16 @@ import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
+import {
+  formatHostnameForConnection,
+  formatHostnameForTransport,
+  parseHostname,
+} from "@core/utils/hostname.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { useForm } from "react-hook-form";
 import {
   AlertTriangle,
-  Circle,
   Clock,
   Edit,
   Lock,
@@ -32,6 +36,7 @@ import {
 } from "lucide-react";
 import { useMessageStore } from "@core/stores/messageStore/index.ts";
 import type { SavedServer } from "@core/stores/appStore.ts";
+import { useTranslation } from "react-i18next";
 
 interface AddServerFormData {
   hostname: string;
@@ -48,6 +53,7 @@ interface HTTPTabProps {
 }
 
 export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
+  const { t } = useTranslation("dialog");
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [connectingToServer, setConnectingToServer] = useState<string | null>(
     null,
@@ -69,7 +75,6 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
     addSavedServer,
     removeSavedServer,
     clearSavedServers,
-    updateServerStatus,
     getSavedServers,
   } = useAppStore();
 
@@ -88,7 +93,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
         )
         ? "meshtastic.local"
         : globalThis.location.host,
-      secure: isURLHTTPS,
+      secure: true,
     },
   });
 
@@ -107,15 +112,6 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
 
   const secureValueAdd = watchAdd("secure");
   const secureValueEdit = watchEdit("secure");
-
-  // Auto-check server status on component mount
-  useEffect(() => {
-    for (const server of savedServers) {
-      if (server.status !== "checking") {
-        checkServerStatus(server);
-      }
-    }
-  }, [savedServers]);
 
   const retryCertConnection = () => {
     if (!pendingConnection) return;
@@ -139,62 +135,48 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
   };
 
   const attemptConnection = async (data: AddServerFormData) => {
-    const protocol = data.secure ? "https" : "http";
+    const parsed = parseHostname(data.hostname);
 
-    // Add default ports if not specified
-    let hostname = data.hostname;
-    if (!hostname.includes(":")) {
-      const defaultPort = data.secure ? "443" : "4403";
-      hostname = `${hostname}:${defaultPort}`;
+    if (!parsed.isValid) {
+      throw new Error(parsed.error ?? "Invalid hostname");
     }
 
-    const id = randId();
-    const transport = await TransportHTTP.create(hostname, data.secure);
-    const device = addDevice(id);
-    const connection = new MeshDevice(transport, id);
-    connection.configure();
-    setSelectedDevice(id);
-    device.addConnection(connection);
-    subscribeAll(device, connection, messageStore);
+    // Use explicit secure setting if provided, otherwise use parsed protocol
+    const secure = data.secure || parsed.secure;
+    const protocol = secure ? "https" : "http";
+    const transportHostname = formatHostnameForTransport({
+      ...parsed,
+      secure,
+    });
+    const displayHostname = formatHostnameForConnection({
+      ...parsed,
+      secure,
+    });
 
-    addSavedServer(hostname, protocol);
-
-    setAddServerOpen(false);
-    resetAdd();
-    closeDialog();
-  };
-
-  const checkServerStatus = async (server: SavedServer) => {
-    updateServerStatus(server.url, "checking");
+    // Set up connection timeout (20 seconds for initial connection)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 20000);
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const id = randId();
+      const transport = await TransportHTTP.create(transportHostname, secure);
+      const device = addDevice(id);
+      const connection = new MeshDevice(transport, id);
+      (connection as MeshDevice & { connType?: string }).connType = "http"; // Add connection type for Dashboard
+      connection.configure();
+      setSelectedDevice(id);
+      device.addConnection(connection);
+      subscribeAll(device, connection, messageStore);
 
-      const response = await fetch(`${server.url}/api/v1/fromradio?all=false`, {
-        method: "GET",
-        mode: "cors",
-        signal: controller.signal,
-      });
+      addSavedServer(displayHostname, protocol);
 
+      setAddServerOpen(false);
+      resetAdd();
+      closeDialog();
+    } finally {
       clearTimeout(timeoutId);
-
-      if (response.ok) {
-        updateServerStatus(server.url, "online");
-      } else {
-        const fallbackResponse = await fetch(`${server.url}/`, {
-          method: "GET",
-          mode: "cors",
-          signal: AbortSignal.timeout(3000),
-        });
-        updateServerStatus(
-          server.url,
-          fallbackResponse.ok ? "online" : "offline",
-        );
-      }
-    } catch (error) {
-      console.error(`Failed to check server status for ${server.url}:`, error);
-      updateServerStatus(server.url, "offline");
     }
   };
 
@@ -202,36 +184,46 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
     setConnectingToServer(server.url);
     setConnectionError(null);
 
+    // Set up connection timeout (20 seconds)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 20000);
+
     try {
+      // Ensure saved server host includes port for transport
+      const parsed = parseHostname(server.host);
+      const secure = server.protocol === "https";
+      const transportHostname = parsed.isValid
+        ? formatHostnameForTransport({ ...parsed, secure })
+        : server.host;
+
       const id = randId();
       const transport = await TransportHTTP.create(
-        server.host,
-        server.protocol === "https",
+        transportHostname,
+        secure,
       );
       const device = addDevice(id);
       const connection = new MeshDevice(transport, id);
+      (connection as MeshDevice & { connType?: string }).connType = "http"; // Add connection type for Dashboard
       connection.configure();
       setSelectedDevice(id);
       device.addConnection(connection);
       subscribeAll(device, connection, messageStore);
 
       addSavedServer(server.host, server.protocol);
-      updateServerStatus(server.url, "online");
 
       closeDialog();
     } catch (error) {
       console.error("Connection error:", error);
-      setConnectionError(`Failed to connect to ${server.host}`);
-      updateServerStatus(server.url, "offline");
+      const errorMessage = controller.signal.aborted
+        ? `Connection timed out after 20 seconds connecting to ${server.host}`
+        : `Failed to connect to ${server.host}`;
+      setConnectionError(errorMessage);
     } finally {
+      clearTimeout(timeoutId);
       setConnectingToServer(null);
     }
-  };
-
-  const formatHostname = (hostname: string, secure: boolean) => {
-    if (hostname.includes(":")) return hostname;
-    const defaultPort = secure ? "443" : "4403";
-    return `${hostname}:${defaultPort}`;
   };
 
   const isCertificateError = (errorMessage: string, isSecure: boolean) => {
@@ -249,22 +241,37 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
       errorMessage.includes("CONNECTION_REFUSED");
   };
 
+  const isTimeoutError = (error: unknown) => {
+    if (error instanceof Error) {
+      return error.name === "AbortError" ||
+        error.message.includes("aborted") ||
+        error.message.includes("timeout");
+    }
+    return false;
+  };
+
   const handleConnectionError = (error: unknown, data: AddServerFormData) => {
     const errorMessage = error instanceof Error
       ? error.message
       : `Failed to connect to ${data.hostname}`;
-    const hostname = formatHostname(data.hostname, data.secure);
 
-    if (isCertificateError(errorMessage, data.secure)) {
+    const parsed = parseHostname(data.hostname);
+    const secure = data.secure || parsed.secure;
+    const hostname = parsed.isValid
+      ? formatHostnameForConnection({ ...parsed, secure })
+      : data.hostname;
+
+    if (isTimeoutError(error)) {
+      setAddServerError(
+        `Connection timed out after 20 seconds connecting to ${hostname}. Check that the device is powered on and accessible.`,
+      );
+    } else if (isCertificateError(errorMessage, secure)) {
       setPendingConnection(data);
       setAddServerError(
         `SSL certificate error connecting to ${hostname}. Click "Open Device Page" to accept the certificate, then "Retry Connection".`,
       );
     } else if (isNetworkError(errorMessage)) {
-      const defaultPort = data.secure ? "443" : "4403";
-      const port = hostname.includes(":")
-        ? hostname.split(":")[1]
-        : defaultPort;
+      const port = parsed.port ?? (secure ? 443 : 80);
       setAddServerError(
         `Network error connecting to ${hostname}. Check that the device is accessible and running on port ${port}.`,
       );
@@ -308,38 +315,10 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
     resetEdit();
   });
 
-  const getStatusIcon = (status?: string) => {
-    switch (status) {
-      case "online":
-        return <Circle className="h-3 w-3 fill-green-500 text-green-500" />;
-      case "offline":
-        return <Circle className="h-3 w-3 fill-red-500 text-red-500" />;
-      case "checking":
-        return (
-          <Circle className="h-3 w-3 fill-yellow-500 text-yellow-500 animate-spin" />
-        );
-      default:
-        return <Circle className="h-3 w-3 fill-slate-300 text-slate-300" />;
-    }
-  };
-
   const getSecurityIcon = (protocol: "http" | "https") => {
     return protocol === "https"
       ? <Lock className="h-4 w-4 text-green-600" />
       : <LockOpen className="h-4 w-4 text-yellow-600" />;
-  };
-
-  const getStatusText = (status?: string) => {
-    switch (status) {
-      case "online":
-        return "Online";
-      case "offline":
-        return "Offline";
-      case "checking":
-        return "Checking...";
-      default:
-        return "Unknown";
-    }
   };
 
   return (
@@ -350,7 +329,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
           <div className="flex items-center gap-2">
             <Server className="h-5 w-5 text-blue-600" />
             <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-              HTTP Servers
+              {t("newDeviceDialog.tabs.http.title")}
             </h3>
           </div>
           {savedServers.length > 0 && (
@@ -360,7 +339,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
               onClick={clearSavedServers}
               className="text-red-600 hover:text-red-700"
             >
-              Clear All
+              {t("newDeviceDialog.tabs.http.clearAll")}
             </Button>
           )}
         </div>
@@ -371,9 +350,11 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
             ? (
               <div className="text-center py-12 text-slate-500 dark:text-slate-400">
                 <Server className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-                <p className="text-sm mb-2">No HTTP servers added yet</p>
+                <p className="text-sm mb-2">
+                  {t("newDeviceDialog.tabs.http.noServers")}
+                </p>
                 <p className="text-xs text-slate-400">
-                  Add your first Meshtastic server to get started
+                  {t("newDeviceDialog.tabs.http.addFirstServer")}
                 </p>
               </div>
             )
@@ -383,11 +364,6 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
                   key={server.url}
                   className="flex items-center gap-3 p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
-                  {/* Status */}
-                  <div className="flex-shrink-0">
-                    {getStatusIcon(server.status)}
-                  </div>
-
                   {/* Server Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -398,8 +374,6 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
                     </div>
 
                     <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      <span>{getStatusText(server.status)}</span>
-
                       {server.deviceInfo?.model && (
                         <>
                           <span>•</span>
@@ -433,7 +407,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
                       {connectingToServer === server.url
                         ? <Clock className="h-3 w-3 mr-1 animate-spin" />
                         : <Wifi className="h-3 w-3 mr-1" />}
-                      Connect
+                      {t("newDeviceDialog.tabs.actions.connect")}
                     </Button>
 
                     <Button
@@ -442,7 +416,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
                       onClick={() => handleEditServer(server)}
                       className="text-slate-400 hover:text-blue-600 p-1"
                     >
-                      <Edit className="h-3 w-3" />
+                      <Edit className="h-5 w-5" />
                     </Button>
 
                     <Button
@@ -451,7 +425,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
                       onClick={() => removeSavedServer(server.url)}
                       className="text-slate-400 hover:text-red-600 p-1"
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2 className="h-5 w-5" />
                     </Button>
                   </div>
                 </div>
@@ -468,7 +442,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
             className="w-full border-dashed hover:border-solid"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add HTTP Server
+            {t("newDeviceDialog.tabs.http.addNewDevice")}
           </Button>
 
           {/* Connection Error */}
@@ -491,7 +465,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
-              Add HTTP Server
+              {t("newDeviceDialog.tabs.http.addServer")}
             </DialogTitle>
             <DialogDescription>
               Enter the hostname or IP address of your Meshtastic device to
@@ -541,16 +515,19 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            const protocol = pendingConnection.secure
-                              ? "https"
-                              : "http";
-                            let hostname = pendingConnection.hostname;
-                            if (!hostname.includes(":")) {
-                              const defaultPort = pendingConnection.secure
-                                ? "443"
-                                : "4403";
-                              hostname = `${hostname}:${defaultPort}`;
-                            }
+                            const parsed = parseHostname(
+                              pendingConnection.hostname,
+                            );
+                            const secure = pendingConnection.secure ||
+                              parsed.secure;
+                            const protocol = secure ? "https" : "http";
+                            const hostname = parsed.isValid
+                              ? formatHostnameForConnection({
+                                ...parsed,
+                                secure,
+                              })
+                              : pendingConnection.hostname;
+
                             // Open the node directly to accept certificate
                             const nodeUrl = `${protocol}://${hostname}`;
                             globalThis.open(
@@ -585,7 +562,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
                 onClick={() => setAddServerOpen(false)}
                 className="flex-1"
               >
-                Cancel
+                {t("newDeviceDialog.tabs.actions.cancel")}
               </Button>
               <Button
                 type="submit"
@@ -617,7 +594,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Edit className="h-4 w-4" />
-              Edit HTTP Server
+              {t("newDeviceDialog.tabs.http.editServer")}
             </DialogTitle>
             <DialogDescription>
               Update the hostname or connection settings for this Meshtastic
@@ -657,13 +634,13 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
                 onClick={() => setEditServerOpen(false)}
                 className="flex-1"
               >
-                Cancel
+                {t("newDeviceDialog.tabs.actions.cancel")}
               </Button>
               <Button
                 type="submit"
                 className="flex-1"
               >
-                Save Changes
+                {t("newDeviceDialog.tabs.actions.saveChanges")}
               </Button>
             </div>
           </form>

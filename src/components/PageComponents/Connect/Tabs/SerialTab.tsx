@@ -8,12 +8,14 @@ import { MeshDevice } from "@meshtastic/core";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { AlertTriangle, Circle, Clock, Plus, Trash2, Usb } from "lucide-react";
 import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { useTranslation } from "react-i18next";
 
 interface SerialTabProps {
   closeDialog: () => void;
 }
 
 export const SerialTab = ({ closeDialog }: SerialTabProps) => {
+  const { t } = useTranslation("dialog");
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [connectingToPort, setConnectingToPort] = useState<SerialPort | null>(
     null,
@@ -27,7 +29,7 @@ export const SerialTab = ({ closeDialog }: SerialTabProps) => {
 
   const updateSerialPortList = useCallback(async () => {
     try {
-      setSerialPorts(await navigator?.serial?.getPorts() || []);
+      setSerialPorts((await navigator?.serial?.getPorts()) ?? []);
     } catch (error) {
       console.error("Error getting serial ports:", error);
     }
@@ -124,16 +126,20 @@ export const SerialTab = ({ closeDialog }: SerialTabProps) => {
       return (
         <Circle className="h-3 w-3 fill-yellow-500 text-yellow-500 animate-spin" />
       );
-    } else if (isConnected) {
-      return <Circle className="h-3 w-3 fill-green-500 text-green-500" />;
-    } else {
-      return <Circle className="h-3 w-3 fill-slate-400 text-slate-400" />;
     }
+    if (isConnected) {
+      return <Circle className="h-3 w-3 fill-green-500 text-green-500" />;
+    }
+    return <Circle className="h-3 w-3 fill-slate-400 text-slate-400" />;
   };
 
   const getStatusText = (port: SerialPort) => {
-    if (connectingToPort === port) return "Connecting...";
-    return port.readable !== null ? "Connected" : "Available";
+    if (connectingToPort === port) {
+      return t("newDeviceDialog.tabs.status.connecting");
+    }
+    return port.readable !== null
+      ? t("newDeviceDialog.tabs.status.connected")
+      : t("newDeviceDialog.tabs.status.available");
   };
 
   return (
@@ -142,7 +148,7 @@ export const SerialTab = ({ closeDialog }: SerialTabProps) => {
       <div className="flex items-center gap-2">
         <Usb className="h-5 w-5 text-green-600" />
         <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-          Serial Devices
+          {t("newDeviceDialog.tabs.serial.title")}
         </h3>
       </div>
 
@@ -152,16 +158,20 @@ export const SerialTab = ({ closeDialog }: SerialTabProps) => {
           ? (
             <div className="text-center py-12 text-slate-500 dark:text-slate-400">
               <Usb className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-              <p className="text-sm mb-2">No serial devices connected</p>
+              <p className="text-sm mb-2">
+                {t("newDeviceDialog.tabs.serial.noDevices")}
+              </p>
               <p className="text-xs text-slate-400">
-                Connect your first Meshtastic device via USB
+                {t("newDeviceDialog.tabs.serial.connectFirst")}
               </p>
             </div>
           )
           : (
             serialPorts.map((port, index) => (
               <div
-                key={`${port}-${index}`}
+                key={`serial-${port.getInfo().usbVendorId ?? "unknown"}-${
+                  port.getInfo().usbProductId ?? "unknown"
+                }`}
                 className="flex items-center gap-3 p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 {/* Status */}
@@ -194,7 +204,9 @@ export const SerialTab = ({ closeDialog }: SerialTabProps) => {
                     {connectingToPort === port
                       ? <Clock className="h-3 w-3 mr-1 animate-spin" />
                       : <Usb className="h-3 w-3 mr-1" />}
-                    {port.readable !== null ? "Connected" : "Connect"}
+                    {port.readable !== null
+                      ? t("newDeviceDialog.tabs.status.connected")
+                      : t("newDeviceDialog.tabs.actions.connect")}
                   </Button>
 
                   <Button
@@ -221,13 +233,13 @@ export const SerialTab = ({ closeDialog }: SerialTabProps) => {
             ? (
               <>
                 <Clock className="h-4 w-4 mr-2 animate-spin" />
-                Adding...
+                {t("newDeviceDialog.tabs.serial.adding")}
               </>
             )
             : (
               <>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Serial Device
+                {t("newDeviceDialog.tabs.serial.addDevice")}
               </>
             )}
         </Button>

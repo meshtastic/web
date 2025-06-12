@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { HTTP } from "@components/PageComponents/Connect/HTTP.tsx";
+import { HTTP as Http } from "./HTTP.tsx";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { describe, expect, it, vi } from "vitest";
@@ -32,7 +32,7 @@ vi.mock("@meshtastic/core", () => ({
 
 describe("HTTP Component", () => {
   it("renders correctly", () => {
-    render(<HTTP closeDialog={vi.fn()} />);
+    render(<Http closeDialog={vi.fn()} />);
     expect(screen.getByText("IP Address/Hostname")).toBeInTheDocument();
     expect(screen.getByRole("textbox")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("000.000.000.000 / meshtastic.local"))
@@ -42,7 +42,7 @@ describe("HTTP Component", () => {
   });
 
   it("allows input field to be updated", () => {
-    render(<HTTP closeDialog={vi.fn()} />);
+    render(<Http closeDialog={vi.fn()} />);
     const inputField = screen.getByRole("textbox");
     fireEvent.change(inputField, { target: { value: "meshtastic.local" } });
     expect(screen.getByPlaceholderText("000.000.000.000 / meshtastic.local"))
@@ -50,7 +50,7 @@ describe("HTTP Component", () => {
   });
 
   it("toggles HTTPS switch and updates prefix", () => {
-    render(<HTTP closeDialog={vi.fn()} />);
+    render(<Http closeDialog={vi.fn()} />);
 
     const switchInput = screen.getByRole("switch");
     expect(screen.getByText("http://")).toBeInTheDocument();
@@ -69,7 +69,7 @@ describe("HTTP Component", () => {
       writable: true,
     });
 
-    render(<HTTP closeDialog={vi.fn()} />);
+    render(<Http closeDialog={vi.fn()} />);
 
     const switchInput = screen.getByRole("switch");
     expect(switchInput).toBeChecked();
@@ -79,7 +79,7 @@ describe("HTTP Component", () => {
 
   it.skip("submits form and triggers connection process", async () => {
     const closeDialog = vi.fn();
-    render(<HTTP closeDialog={closeDialog} />);
+    render(<Http closeDialog={closeDialog} />);
     const button = screen.getByRole("button", { name: "Connect" });
     expect(button).not.toBeDisabled();
 
