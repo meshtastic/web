@@ -84,7 +84,9 @@
     "npm:vite-plugin-static-copy@3": "3.0.0_vite@6.3.4__@types+node@22.15.3__picomatch@4.0.2_@types+node@22.15.3",
     "npm:vite@^6.3.4": "6.3.4_@types+node@22.15.3_picomatch@4.0.2",
     "npm:vitest@^3.1.2": "3.1.2_@types+node@22.15.3_happy-dom@17.4.6_vite@6.3.4__@types+node@22.15.3__picomatch@4.0.2",
-    "npm:zod@^3.25.0": "3.25.49"
+    "npm:zod@^3.25.0": "3.25.49",
+    "npm:zod@^3.25.62": "3.25.62",
+    "npm:zustand@5.0.5": "5.0.5_@types+react@19.1.2_immer@10.1.1_react@19.1.0"
   },
   "jsr": {
     "@std/path@1.0.6": {
@@ -2426,7 +2428,7 @@
         "@tanstack/virtual-file-routes",
         "prettier",
         "tsx",
-        "zod"
+        "zod@3.25.49"
       ],
       "optionalPeers": [
         "@tanstack/react-router"
@@ -2453,7 +2455,7 @@
         "chokidar",
         "unplugin",
         "vite",
-        "zod"
+        "zod@3.25.49"
       ],
       "optionalPeers": [
         "@tanstack/react-router",
@@ -6929,8 +6931,24 @@
     "zod@3.25.49": {
       "integrity": "sha512-JMMPMy9ZBk3XFEdbM3iL1brx4NUSejd6xr3ELrrGEfGb355gjhiAWtG3K5o+AViV/3ZfkIrCzXsZn6SbLwTR8Q=="
     },
+    "zod@3.25.62": {
+      "integrity": "sha512-YCxsr4DmhPcrKPC9R1oBHQNlQzlJEyPAId//qTau/vBee9uO8K6prmRq4eMkOyxvBfH4wDPIPdLx9HVMWIY3xA=="
+    },
     "zone.js@0.8.29": {
       "integrity": "sha512-mla2acNCMkWXBD+c+yeUrBUrzOxYMNFdQ6FGfigGGtEVBPJx07BQeJekjt9DmH1FtZek4E9rE1eRR9qQpxACOQ=="
+    },
+    "zustand@5.0.5_@types+react@19.1.2_immer@10.1.1_react@19.1.0": {
+      "integrity": "sha512-mILtRfKW9xM47hqxGIxCv12gXusoY/xTSHBYApXozR0HmQv299whhBeeAcRy+KrPPybzosvJBCOmVjq6x12fCg==",
+      "dependencies": [
+        "@types/react",
+        "immer",
+        "react"
+      ],
+      "optionalPeers": [
+        "@types/react",
+        "immer",
+        "react"
+      ]
     }
   },
   "workspace": {
