@@ -251,12 +251,21 @@ export const useAppStore = create<AppState>()((set, get) => ({
   updateServerStatus: (
     url: string,
     status: "online" | "offline" | "checking",
+    deviceInfo?: {
+      model?: string;
+      nodeCount?: number;
+      unreadCount?: number;
+      firmwareVersion?: string;
+    },
   ) => {
     set(
       produce<AppState>((draft) => {
         const server = draft.savedServers.find((s) => s.url === url);
         if (server) {
           server.status = status;
+          if (deviceInfo) {
+            server.deviceInfo = deviceInfo;
+          }
           localStorage.setItem(
             "meshtastic-saved-servers",
             JSON.stringify(draft.savedServers),

@@ -67,6 +67,46 @@
       "requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
       "requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
       "additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
+    },
+    "tabs": {
+      "http": {
+        "title": "HTTP Servers",
+        "clearAll": "Clear All",
+        "noServers": "No HTTP servers added yet",
+        "addFirstServer": "Add your first Meshtastic server to get started",
+        "addNewDevice": "Add New Device",
+        "addServer": "Add HTTP Server",
+        "editServer": "Edit HTTP Server"
+      },
+      "serial": {
+        "title": "Serial Devices",
+        "adding": "Adding...",
+        "addDevice": "Add Serial Device",
+        "noDevices": "No serial devices connected",
+        "connectFirst": "Connect your first Meshtastic device via USB"
+      },
+      "bluetooth": {
+        "title": "Bluetooth Devices",
+        "pairing": "Pairing...",
+        "pairDevice": "Pair New Device",
+        "noDevices": "No Bluetooth devices paired",
+        "pairFirst": "Pair your first Meshtastic device"
+      },
+      "status": {
+        "online": "Online",
+        "offline": "Offline",
+        "checking": "Checking...",
+        "connecting": "Connecting...",
+        "connected": "Connected",
+        "available": "Available",
+        "paired": "Paired",
+        "unknown": "Unknown"
+      },
+      "actions": {
+        "connect": "Connect",
+        "cancel": "Cancel",
+        "saveChanges": "Save Changes"
+      }
     }
   },
   "nodeDetails": {
