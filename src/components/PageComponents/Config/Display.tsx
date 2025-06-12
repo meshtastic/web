@@ -10,15 +10,22 @@ import {
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface DisplayConfigProps {
   onFormInit: DynamicFormFormInit<DisplayValidation>;
 }
 export const Display = ({ onFormInit }: DisplayConfigProps) => {
-  const { config, setWorkingConfig, getEffectiveConfig } = useDevice();
+  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: DisplayValidation) => {
+    if (deepCompareConfig(config.display, data, true)) {
+      removeWorkingConfig("display");
+      return;
+    }
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {

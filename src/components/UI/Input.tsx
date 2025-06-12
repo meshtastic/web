@@ -13,9 +13,9 @@ const inputVariants = cva(
       variant: {
         default: "border-slate-300 dark:border-slate-500",
         invalid:
-          "border-red-500 dark:border-red-500 focus:ring-red-500 dark:focus:ring-red-500",
+          "border-2 border-red-500 dark:border-red-500 focus:ring-red-500 dark:focus:ring-red-500",
         dirty:
-          "border-sky-500 dark:border-sky-500 focus:ring-sky-500 dark:focus:ring-sky-500",
+          "border-2 border-sky-500 dark:border-sky-500 focus:ring-sky-500 dark:focus:ring-sky-500",
       },
     },
     defaultVariants: {
@@ -165,8 +165,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <span
               className={cn(
                 "inline-flex items-center border border-l-0 border-slate-300 bg-slate-100/80 px-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-700 dark:text-slate-300",
-                variant === "invalid" && "border-red-500 dark:border-red-500",
-                variant === "dirty" && "border-sky-500 dark:border-sky-500",
+                variant === "invalid" &&
+                  "border-2 border-l-0 border-red-500 dark:border-red-500",
+                variant === "dirty" &&
+                  "border-2 border-l-0 border-sky-500 dark:border-sky-500",
                 !hasActions && "rounded-r-md",
               )}
             >
@@ -178,8 +180,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <div
               className={cn(
                 "flex items-center divide-x divide-slate-300 border border-l-0 border-slate-300 dark:divide-slate-700 dark:border-slate-500",
-                variant === "invalid" && "border-red-500 dark:border-red-500",
-                variant === "dirty" && "border-sky-500 dark:border-sky-500",
+                variant === "invalid" &&
+                  "border-2 border-l-0 border-red-500 dark:border-red-500",
+                variant === "dirty" &&
+                  "border-2 border-l-0 border-sky-500 dark:border-sky-500",
                 disabled &&
                   "border-slate-200 dark:border-slate-700 divide-slate-200",
                 !hasSuffix && "rounded-r-md",

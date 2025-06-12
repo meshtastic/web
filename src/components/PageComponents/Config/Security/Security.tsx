@@ -18,14 +18,18 @@ import { fromByteArray, toByteArray } from "base64-js";
 import { useTranslation } from "react-i18next";
 import { type DefaultValues, useForm } from "react-hook-form";
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+
 interface SecurityConfigProps {
   onFormInit: DynamicFormFormInit<RawSecurity>;
 }
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
   const {
+    config,
     setWorkingConfig,
     setDialogOpen,
     getEffectiveConfig,
+    removeWorkingConfig,
   } = useDevice();
 
   const { removeError } = useAppStore();
@@ -85,6 +89,11 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
         toByteArray(data.adminKey.at(2) ?? ""),
       ],
     };
+
+    if (deepCompareConfig(config.security, payload, true)) {
+      removeWorkingConfig("security");
+      return;
+    }
 
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {

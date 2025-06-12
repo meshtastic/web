@@ -58,40 +58,36 @@ const ConfigPage = () => {
 
     setIsSaving(true);
     try {
-      if (activeConfigSection === "device") {
-        await Promise.all(
-          workingConfig.map((config) =>
-            connection?.setConfig(config).then(() =>
-              toast({
-                title: t("toast.saveSuccess.title"),
-                description: t("toast.saveSuccess.description", {
-                  case: config.payloadVariant.case,
-                }),
-              })
-            )
-          ),
-        );
-      } else {
-        await Promise.all(
-          workingModuleConfig.map((moduleConfig) =>
-            connection?.setModuleConfig(moduleConfig).then(() =>
-              toast({
-                title: t("toast.saveSuccess.title"),
-                description: t("toast.saveSuccess.description", {
-                  case: moduleConfig.payloadVariant.case,
-                }),
-              })
-            )
-          ),
-        );
-        setIsSaving(false);
-      }
+      await Promise.all(
+        workingConfig.map((config) =>
+          connection?.setConfig(config).then(() =>
+            toast({
+              title: t("toast.saveSuccess.title"),
+              description: t("toast.saveSuccess.description", {
+                case: config.payloadVariant.case,
+              }),
+            })
+          )
+        ),
+      );
+
+      await Promise.all(
+        workingModuleConfig.map((moduleConfig) =>
+          connection?.setModuleConfig(moduleConfig).then(() =>
+            toast({
+              title: t("toast.saveSuccess.title"),
+              description: t("toast.saveSuccess.description", {
+                case: moduleConfig.payloadVariant.case,
+              }),
+            })
+          )
+        ),
+      );
+
       await connection?.commitEditSettings().then(() => {
-        if (activeConfigSection === "device") {
-          removeWorkingConfig();
-        } else {
-          removeWorkingModuleConfig();
-        }
+        removeWorkingConfig();
+        removeWorkingModuleConfig();
+
         if (formMethods) {
           formMethods.reset({
             keepDefaultValues: true,
@@ -115,11 +111,8 @@ const ConfigPage = () => {
       formMethods.reset();
     }
 
-    if (activeConfigSection === "device") {
-      removeWorkingConfig();
-    } else {
-      removeWorkingModuleConfig();
-    }
+    removeWorkingConfig();
+    removeWorkingModuleConfig();
   };
 
   const leftSidebar = useMemo(
@@ -134,23 +127,26 @@ const ConfigPage = () => {
             active={activeConfigSection === "device"}
             onClick={() => setActiveConfigSection("device")}
             Icon={SettingsIcon}
+            isDirty={workingConfig.length > 0}
+            count={workingConfig.length}
           />
           <SidebarButton
             label={t("navigation.moduleConfig")}
             active={activeConfigSection === "module"}
             onClick={() => setActiveConfigSection("module")}
             Icon={BoxesIcon}
+            isDirty={workingModuleConfig.length > 0}
+            count={workingModuleConfig.length}
           />
         </SidebarSection>
       </Sidebar>
     ),
-    [activeConfigSection],
+    [activeConfigSection, workingConfig, workingModuleConfig],
   );
 
   const buttonOpacity = useMemo(
     () => (formMethods?.formState.isDirty ||
-        (activeConfigSection === "device" && workingConfig.length > 0) ||
-        (activeConfigSection === "module" && workingModuleConfig.length > 0)
+        workingConfig.length > 0 || workingModuleConfig.length > 0
       ? "opacity-100"
       : "opacity-0"),
     [formMethods?.formState.isDirty, workingConfig, workingModuleConfig],
@@ -179,8 +175,7 @@ const ConfigPage = () => {
       icon: isError ? SaveOff : SaveIcon,
       isLoading: isSaving,
       disabled: isSaving ||
-        (activeConfigSection === "device" && workingConfig.length === 0) ||
-        (activeConfigSection === "module" && workingModuleConfig.length === 0),
+        (workingConfig.length === 0 && workingModuleConfig.length === 0),
       iconClasses: isError ? "text-red-400 cursor-not-allowed" : "",
       onClick: handleSave,
       label: t("common:button.save"),
@@ -204,7 +199,7 @@ const ConfigPage = () => {
       >
         {activeConfigSection === "device"
           ? <DeviceConfig onFormInit={onFormInit} />
-          : <ModuleConfig />}
+          : <ModuleConfig onFormInit={onFormInit} />}
       </PageLayout>
     </>
   );

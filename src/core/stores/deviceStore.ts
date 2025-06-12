@@ -308,15 +308,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
                   (wc) => wc.payloadVariant.case === config.payloadVariant.case,
                 );
 
-                if (
-                  // This doesn't quite work as expected, but it is a workaround for now.
-                  JSON.stringify(
-                    current(device.config[config.payloadVariant.case]),
-                  ) ===
-                    JSON.stringify(config.payloadVariant.value)
-                ) {
-                  device.workingConfig.splice(index, 1);
-                } else if (index !== -1) {
+                if (index !== -1) {
                   device.workingConfig[index] = config;
                 } else {
                   device.workingConfig.push(config);
@@ -336,16 +328,8 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
                     wmc.payloadVariant.case ===
                       moduleConfig.payloadVariant.case,
                 );
-                if (
-                  JSON.stringify(
-                    current(
-                      device.moduleConfig[moduleConfig.payloadVariant.case],
-                    ),
-                  ) ===
-                    JSON.stringify(moduleConfig.payloadVariant.value)
-                ) {
-                  device.workingModuleConfig.splice(index, 1);
-                } else if (index !== -1) {
+
+                if (index !== -1) {
                   device.workingModuleConfig[index] = moduleConfig;
                 } else {
                   device.workingModuleConfig.push(moduleConfig);

@@ -45,6 +45,8 @@ export interface GenericFormElementProps<T extends FieldValues, Y> {
   control: Control<T>;
   disabled?: boolean;
   field: Y;
+  isDirty?: boolean;
+  invalid?: boolean;
 }
 
 export interface DynamicFormProps<T extends FieldValues> {
@@ -104,7 +106,8 @@ export function DynamicForm<T extends FieldValues>({
       values,
     });
   }
-  const { handleSubmit, control, getValues, formState } = methods;
+  const { handleSubmit, control, getValues, formState, getFieldState } =
+    methods;
 
   useEffect(() => {
     if (!propMethods) {
@@ -130,10 +133,7 @@ export function DynamicForm<T extends FieldValues>({
       }
     }
   }, [formState.errors]);
-  console.debug(
-    `DynamicForm: ${formId} - Form state:`,
-    formState.isDirty,
-  );
+
   const isDisabled = (
     disabledBy?: DisabledBy<T>[],
     disabled?: boolean,
@@ -194,6 +194,8 @@ export function DynamicForm<T extends FieldValues>({
                     field={field}
                     control={control}
                     disabled={isDisabled(field.disabledBy, field.disabled)}
+                    isDirty={getFieldState(field.name).isDirty}
+                    invalid={getFieldState(field.name).invalid}
                   />
                 </FieldWrapper>
               );

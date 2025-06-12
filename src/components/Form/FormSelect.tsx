@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@components/UI/Select.tsx";
 import { type FieldValues, useController } from "react-hook-form";
+import { cn } from "@core/utils/cn.ts";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select";
@@ -38,6 +39,8 @@ export function SelectInput<T extends FieldValues>({
   control,
   disabled,
   field,
+  isDirty,
+  invalid,
 }: GenericFormElementProps<T, SelectFieldProps<T>>) {
   const {
     field: { value, onChange, ...rest },
@@ -80,7 +83,16 @@ export function SelectInput<T extends FieldValues>({
       {...remainingProperties}
       {...rest}
     >
-      <SelectTrigger id={field.name}>
+      <SelectTrigger
+        id={field.name}
+        className={cn([
+          field.properties?.className,
+          isDirty ? "focus:ring-sky-500 ring-sky-500 ring-2 ring-offset-2" : "",
+          invalid
+            ? "focus:ring-red-500 ring-red-500 ring-2 outline-offset-2"
+            : "",
+        ])}
+      >
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

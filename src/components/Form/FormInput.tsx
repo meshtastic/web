@@ -31,17 +31,18 @@ export function GenericInput<T extends FieldValues>({
   control,
   disabled,
   field,
+  isDirty,
+  invalid,
 }: GenericFormElementProps<T, InputFieldProps<T>>) {
   const { fieldLength, ...restProperties } = field.properties || {};
   const [currentLength, setCurrentLength] = useState<number>(
     fieldLength?.currentValueLength || 0,
   );
 
-  const { field: controllerField, fieldState: { invalid, isDirty } } =
-    useController({
-      name: field.name,
-      control,
-    });
+  const { field: controllerField } = useController({
+    name: field.name,
+    control,
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;

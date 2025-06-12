@@ -30,6 +30,8 @@ export function PasswordGenerator<T extends FieldValues>({
   control,
   field,
   disabled,
+  isDirty,
+  invalid,
 }: GenericFormElementProps<T, PasswordGeneratorProps<T>>) {
   const { isVisible } = usePasswordVisibilityToggle();
   const { trigger } = useFormContext();
@@ -45,7 +47,6 @@ export function PasswordGenerator<T extends FieldValues>({
       render={(
         {
           field: { value, onChange, ...rest },
-          fieldState: { invalid, isDirty },
         },
       ) => (
         <Generator

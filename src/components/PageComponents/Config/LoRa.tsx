@@ -10,15 +10,22 @@ import {
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface LoRaConfigProps {
   onFormInit: DynamicFormFormInit<LoRaValidation>;
 }
 export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
-  const { config, setWorkingConfig, getEffectiveConfig } = useDevice();
+  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: LoRaValidation) => {
+    if (deepCompareConfig(config.lora, data, true)) {
+      removeWorkingConfig("lora");
+      return;
+    }
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {

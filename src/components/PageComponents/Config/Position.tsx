@@ -15,18 +15,25 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface PositionConfigProps {
   onFormInit: DynamicFormFormInit<PositionValidation>;
 }
 export const Position = ({ onFormInit }: PositionConfigProps) => {
-  const { setWorkingConfig, config, getEffectiveConfig } = useDevice();
+  const { setWorkingConfig, config, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     getEffectiveConfig("position")?.positionFlags ?? 0,
   );
   const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: PositionValidation) => {
+    if (deepCompareConfig(config.position, data, true)) {
+      removeWorkingConfig("position");
+      return;
+    }
+
     return setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {

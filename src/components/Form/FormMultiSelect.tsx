@@ -6,6 +6,7 @@ import type { FieldValues } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import type { FLAGS_CONFIG } from "@core/hooks/usePositionFlags.ts";
 import { MultiSelect, MultiSelectItem } from "../UI/MultiSelect.tsx";
+import { cn } from "@core/utils/cn.ts";
 
 export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "multiSelect";
@@ -23,9 +24,11 @@ export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
 
 export function MultiSelectInput<T extends FieldValues>({
   field,
+  isDirty,
+  invalid,
 }: GenericFormElementProps<T, MultiSelectFieldProps<T>>) {
   const { t } = useTranslation("deviceConfig");
-  const { enumValue, ...remainingProperties } = field.properties;
+  const { enumValue, className, ...remainingProperties } = field.properties;
 
   const isNewConfigStructure =
     typeof Object.values(enumValue)[0] === "object" &&
@@ -48,7 +51,15 @@ export function MultiSelectInput<T extends FieldValues>({
   );
 
   return (
-    <MultiSelect {...remainingProperties}>
+    <MultiSelect
+      className={cn([
+        className,
+        "rounded-md",
+        isDirty ? "focus:ring-sky-500 ring-sky-500 ring-2 ring-offset-5" : "",
+        invalid ? "focus:ring-red-500 ring-red-500 ring-2 ring-offset-5" : "",
+      ])}
+      {...remainingProperties}
+    >
       {optionsToRender.map((option) => {
         return (
           <MultiSelectItem

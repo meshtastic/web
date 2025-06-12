@@ -10,14 +10,22 @@ import {
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+
 interface BluetoothConfigProps {
   onFormInit: DynamicFormFormInit<BluetoothValidation>;
 }
 export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
-  const { config, setWorkingConfig, getEffectiveConfig } = useDevice();
+  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: BluetoothValidation) => {
+    if (deepCompareConfig(config.bluetooth, data, true)) {
+      removeWorkingConfig("bluetooth");
+      return;
+    }
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {

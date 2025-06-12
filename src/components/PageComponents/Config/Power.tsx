@@ -10,15 +10,22 @@ import {
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface PowerConfigProps {
   onFormInit: DynamicFormFormInit<PowerValidation>;
 }
 export const Power = ({ onFormInit }: PowerConfigProps) => {
-  const { setWorkingConfig, config, getEffectiveConfig } = useDevice();
+  const { setWorkingConfig, config, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: PowerValidation) => {
+    if (deepCompareConfig(config.power, data, true)) {
+      removeWorkingConfig("power");
+      return;
+    }
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {

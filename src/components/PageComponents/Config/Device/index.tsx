@@ -11,16 +11,23 @@ import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface DeviceConfigProps {
   onFormInit: DynamicFormFormInit<DeviceValidation>;
 }
 export const Device = ({ onFormInit }: DeviceConfigProps) => {
-  const { config, setWorkingConfig, getEffectiveConfig } = useDevice();
+  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { t } = useTranslation("deviceConfig");
   const { validateRoleSelection } = useUnsafeRolesDialog();
 
   const onSubmit = (data: DeviceValidation) => {
+    if (deepCompareConfig(config.device, data, true)) {
+      removeWorkingConfig("device");
+      return;
+    }
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {

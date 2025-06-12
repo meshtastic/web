@@ -14,33 +14,42 @@ import {
 } from "@core/utils/ip.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface NetworkConfigProps {
   onFormInit: DynamicFormFormInit<NetworkValidation>;
 }
 export const Network = ({ onFormInit }: NetworkConfigProps) => {
-  const { config, setWorkingConfig, getEffectiveConfig } = useDevice();
+  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { t } = useTranslation("deviceConfig");
 
   const networkConfig = getEffectiveConfig("network");
 
   const onSubmit = (data: NetworkValidation) => {
+    const payload = {
+      ...data,
+      ipv4Config: create(
+        Protobuf.Config.Config_NetworkConfig_IpV4ConfigSchema,
+        {
+          ip: convertIpAddressToInt(data.ipv4Config?.ip ?? ""),
+          gateway: convertIpAddressToInt(data.ipv4Config?.gateway ?? ""),
+          subnet: convertIpAddressToInt(data.ipv4Config?.subnet ?? ""),
+          dns: convertIpAddressToInt(data.ipv4Config?.dns ?? ""),
+        },
+      ),
+    };
+
+    if (deepCompareConfig(config.network, payload, true)) {
+      removeWorkingConfig("network");
+      return;
+    }
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
           case: "network",
-          value: {
-            ...data,
-            ipv4Config: create(
-              Protobuf.Config.Config_NetworkConfig_IpV4ConfigSchema,
-              {
-                ip: convertIpAddressToInt(data.ipv4Config?.ip ?? ""),
-                gateway: convertIpAddressToInt(data.ipv4Config?.gateway ?? ""),
-                subnet: convertIpAddressToInt(data.ipv4Config?.subnet ?? ""),
-                dns: convertIpAddressToInt(data.ipv4Config?.dns ?? ""),
-              },
-            ),
-          },
+          value: payload,
         },
       }),
     );
