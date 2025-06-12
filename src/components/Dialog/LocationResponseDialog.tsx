@@ -73,7 +73,7 @@ export const LocationResponseDialog = ({
                   </p>
                   <p>
                     {t("locationResponse.altitude")} {position.altitude}
-                    {position.altitude ?? 0 < 1
+                    {(position.altitude ?? 0) < 1
                       ? t("unit.meter.one")
                       : t("unit.meter.plural")}
                   </p>
