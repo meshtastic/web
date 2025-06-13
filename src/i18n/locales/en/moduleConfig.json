@@ -253,12 +253,12 @@
       "description": "MQTT root topic to use for default/custom servers"
     },
     "proxyToClientEnabled": {
-      "label": "Proxy to Client Enabled",
-      "description": "Use the client's internet connection for MQTT (feature only active in mobile apps)"
+      "label": "MQTT Client Proxy Enabled",
+      "description": "Utilizes the network connection to proxy MQTT messages to the client."
     },
     "mapReportingEnabled": {
       "label": "Map Reporting Enabled",
-      "description": "Enable or disable map reporting"
+      "description": "Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, short and long name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name."
     },
     "mapReportSettings": {
       "publishIntervalSecs": {

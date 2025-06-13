@@ -114,7 +114,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
 
   addDevice: (id: number) => {
     set(
-      produce<DeviceState>((draft) => {
+      produce<PrivateDeviceState>((draft) => {
         draft.devices.set(id, {
           id,
           status: Types.DeviceStatusEnum.DeviceDisconnected,
@@ -151,7 +151,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
 
           setStatus: (status: Types.DeviceStatusEnum) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.status = status;
@@ -161,7 +161,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           setConfig: (config: Protobuf.Config.Config) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   switch (config.payloadVariant.case) {
@@ -203,7 +203,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   switch (config.payloadVariant.case) {
@@ -271,7 +271,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           setWorkingConfig: (config: Protobuf.Config.Config) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) return;
                 const index = device.workingConfig.findIndex(
@@ -289,7 +289,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             moduleConfig: Protobuf.ModuleConfig.ModuleConfig,
           ) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) return;
                 const index = device.workingModuleConfig.findIndex(
@@ -307,7 +307,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.hardware = hardware;
@@ -317,7 +317,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           setPendingSettingsChanges: (state) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.pendingSettingsChanges = state;
@@ -327,7 +327,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           addChannel: (channel: Protobuf.Channel.Channel) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.channels.set(channel.index, channel);
@@ -337,7 +337,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           addWaypoint: (waypoint: Protobuf.Mesh.Waypoint) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   const index = device.waypoints.findIndex((wp) =>
@@ -354,7 +354,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           addNodeInfo: (nodeInfo) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
 
                 if (!device) return;
@@ -364,7 +364,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           setActiveNode: (node) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.activeNode = node;
@@ -374,7 +374,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           addUser: (user) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) {
                   return;
@@ -389,7 +389,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           addPosition: (position) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) {
                   return;
@@ -404,7 +404,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           addConnection: (connection) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.connection = connection;
@@ -414,7 +414,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           addMetadata: (from, metadata) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.metadata.set(from, metadata);
@@ -424,7 +424,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           addTraceRoute: (traceroute) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) return;
                 const routes = device.traceroutes.get(traceroute.from) ?? [];
@@ -433,9 +433,9 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               }),
             );
           },
-          removeNode: (nodeNum) => {
+          removeNode: (nodeNum: number) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) {
                   return;
@@ -446,7 +446,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           setDialogOpen: (dialog: DialogVariant, open: boolean) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.dialog[dialog] = open;
@@ -461,7 +461,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           processPacket(data: ProcessPacketParams) {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) return;
                 const node = device.nodesMap.get(data.from);
@@ -484,7 +484,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           setMessageDraft: (message: string) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.messageDraft = message;
@@ -492,9 +492,9 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               }),
             );
           },
-          setNodeError: (nodeNum, error) => {
+          setNodeError: (nodeNum: number, error: string) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.nodeErrors.set(nodeNum, { node: nodeNum, error });
@@ -504,7 +504,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           clearNodeError: (nodeNum: number) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
                   device.nodeErrors.delete(nodeNum);
@@ -524,7 +524,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           incrementUnread: (nodeNum: number) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) return;
                 const currentCount = device.unreadCounts.get(nodeNum) ?? 0;
@@ -534,7 +534,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           resetUnread: (nodeNum: number) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) return;
                 device.unreadCounts.set(nodeNum, 0);
@@ -610,10 +610,12 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             }));
 
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 const node = device?.nodesMap.get(nodeNum);
-                node.isFavorite = isFavorite;
+                if (node) {
+                  node.isFavorite = isFavorite;
+                }
               }),
             );
           },
@@ -631,10 +633,12 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             }));
 
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 const node = device?.nodesMap.get(nodeNum);
-                node.isIgnored = isIgnored;
+                if (node) {
+                  node.isIgnored = isIgnored;
+                }
               }),
             );
           },
@@ -651,7 +655,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
 
   removeDevice: (id) => {
     set(
-      produce<DeviceState>((draft) => {
+      produce<PrivateDeviceState>((draft) => {
         draft.devices.delete(id);
       }),
     );

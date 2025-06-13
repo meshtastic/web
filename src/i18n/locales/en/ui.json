@@ -80,6 +80,12 @@
     },
     "showPassword": {
       "label": "Show password"
+    },
+    "deliveryStatus": {
+      "delivered": "Delivered",
+      "failed": "Delivery Failed",
+      "waiting": "Waiting",
+      "unknown": "Unknown"
     }
   },
   "general": {

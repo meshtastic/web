@@ -1,9 +1,9 @@
-import Cookies, { type CookieAttributes } from "js-cookie";
+import Cookies from "js-cookie";
 import { useCallback, useState } from "react";
 
 interface CookieHookResult<T> {
   value: T | undefined;
-  setCookie: (value: T, options?: CookieAttributes) => void;
+  setCookie: (value: T, options?: Cookies.CookieAttributes) => void;
   removeCookie: () => void;
 }
 
@@ -22,7 +22,7 @@ function useCookie<T extends object>(
   });
 
   const setCookie = useCallback(
-    (value: T, options?: CookieAttributes) => {
+    (value: T, options?: Cookies.CookieAttributes) => {
       try {
         Cookies.set(cookieName, JSON.stringify(value), options);
         setCookieValue(value);

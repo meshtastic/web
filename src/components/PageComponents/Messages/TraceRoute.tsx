@@ -3,9 +3,11 @@ import type { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
 
+type NodeUser = Pick<Protobuf.Mesh.NodeInfo, "user">;
+
 export interface TraceRouteProps {
-  from?: Protobuf.Mesh.NodeInfo;
-  to?: Protobuf.Mesh.NodeInfo;
+  from: NodeUser;
+  to: NodeUser;
   route: Array<number>;
   routeBack?: Array<number>;
   snrTowards?: Array<number>;
@@ -14,14 +16,14 @@ export interface TraceRouteProps {
 
 interface RoutePathProps {
   title: string;
-  startNode?: Protobuf.Mesh.NodeInfo;
-  endNode?: Protobuf.Mesh.NodeInfo;
+  from: NodeUser;
+  to: NodeUser;
   path: number[];
   snr?: number[];
 }
 
 const RoutePath = (
-  { title, startNode, endNode, path, snr }: RoutePathProps,
+  { title, from, to, path, snr }: RoutePathProps,
 ) => {
   const { getNode } = useDevice();
   const { t } = useTranslation();
@@ -32,7 +34,7 @@ const RoutePath = (
       className="ml-4 border-l-2 pl-2 border-l-slate-900 text-slate-900 dark:text-slate-100 dark:border-l-slate-100"
     >
       <p className="font-semibold">{title}</p>
-      <p>{startNode?.user?.longName}</p>
+      <p>{from?.user?.longName}</p>
       <p>
         ↓ {snr?.[0] ?? t("unknown.num")}
         {t("unit.dbm")}
@@ -49,7 +51,7 @@ const RoutePath = (
           </p>
         </span>
       ))}
-      <p>{endNode?.user?.longName}</p>
+      <p>{to?.user?.longName}</p>
     </span>
   );
 };
@@ -67,16 +69,16 @@ export const TraceRoute = ({
     <div className="ml-5 flex">
       <RoutePath
         title={t("traceRoute.routeToDestination")}
-        startNode={to}
-        endNode={from}
+        to={to}
+        from={from}
         path={route}
         snr={snrTowards}
       />
       {routeBack && routeBack.length > 0 && (
         <RoutePath
           title={t("traceRoute.routeBack")}
-          startNode={from}
-          endNode={to}
+          to={from}
+          from={to}
           path={routeBack}
           snr={snrBack}
         />
