@@ -15,7 +15,7 @@ import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   AlertTriangle,
@@ -54,7 +54,6 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
     addSavedServer,
     removeSavedServer,
     clearSavedServers,
-    updateServerStatus,
     getSavedServers,
   } = useAppStore();
 
@@ -75,80 +74,6 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
 
   const secureValue = watch("secure");
 
-  const checkServerStatus = useCallback(
-    async (server: SavedServer) => {
-      updateServerStatus(server.url, "checking");
-
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-        // Try to get actual device info from fromradio endpoint
-        const response = await fetch(
-          `${server.url}/api/v1/fromradio?all=false`,
-          {
-            method: "GET",
-            mode: "cors",
-            signal: controller.signal,
-          },
-        );
-
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          // Try to get basic device info if available
-          try {
-            // First check if we can get a simple status response
-            const statusResponse = await fetch(
-              `${server.url}/api/v1/fromradio`,
-              {
-                method: "GET",
-                mode: "cors",
-                signal: AbortSignal.timeout(3000),
-              },
-            );
-
-            if (statusResponse.ok) {
-              // For now, just mark as online - we could parse protobuf later for device details
-              updateServerStatus(server.url, "online");
-
-              // TODO: Parse protobuf response to get device info
-              // This would require proper protobuf decoding which is complex
-              // For now, we'll show it as online and get device info after connection
-            } else {
-              updateServerStatus(server.url, "offline");
-            }
-          } catch {
-            // If fromradio fails, try the simpler status endpoint
-            const fallbackResponse = await fetch(`${server.url}/`, {
-              method: "GET",
-              mode: "cors",
-              signal: AbortSignal.timeout(3000),
-            });
-            updateServerStatus(
-              server.url,
-              fallbackResponse.ok ? "online" : "offline",
-            );
-          }
-        } else {
-          updateServerStatus(server.url, "offline");
-        }
-      } catch {
-        updateServerStatus(server.url, "offline");
-      }
-    },
-    [updateServerStatus],
-  );
-
-  // Auto-check server status on component mount
-  useEffect(() => {
-    for (const server of savedServers) {
-      if (server.status !== "checking") {
-        checkServerStatus(server);
-      }
-    }
-  }, [savedServers, checkServerStatus]);
-
   const connectToServer = async (server: SavedServer) => {
     setConnectingToServer(server.url);
     setConnectionError(null);
@@ -168,13 +93,11 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
 
       // Update last used time
       addSavedServer(server.host, server.protocol);
-      updateServerStatus(server.url, "online");
 
       closeDialog();
     } catch (error) {
       console.error("Connection error:", error);
       setConnectionError(`Failed to connect to ${server.host}`);
-      updateServerStatus(server.url, "offline");
     } finally {
       setConnectingToServer(null);
     }

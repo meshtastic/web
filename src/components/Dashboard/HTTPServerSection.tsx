@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
@@ -18,14 +18,12 @@ import { TransportHTTP } from "@meshtastic/transport-http";
 import { useForm } from "react-hook-form";
 import {
   AlertTriangle,
-  Circle,
   Clock,
   Lock,
   LockOpen,
   Plus,
   Server,
   Trash2,
-  Users,
   Wifi,
 } from "lucide-react";
 import { useMessageStore } from "@core/stores/messageStore/index.ts";
@@ -56,7 +54,6 @@ export const HTTPServerSection = ({ onConnect }: HTTPServerSectionProps) => {
     addSavedServer,
     removeSavedServer,
     clearSavedServers,
-    updateServerStatus,
     getSavedServers,
   } = useAppStore();
 
@@ -77,48 +74,6 @@ export const HTTPServerSection = ({ onConnect }: HTTPServerSectionProps) => {
 
   const secureValue = watch("secure");
 
-  // Auto-check server status on component mount
-  useEffect(() => {
-    savedServers.forEach((server) => {
-      if (server.status !== "checking") {
-        checkServerStatus(server);
-      }
-    });
-  }, []);
-
-  const checkServerStatus = async (server: SavedServer) => {
-    updateServerStatus(server.url, "checking");
-
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-      const response = await fetch(`${server.url}/api/v1/fromradio?all=false`, {
-        method: "GET",
-        mode: "cors",
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        updateServerStatus(server.url, "online");
-      } else {
-        const fallbackResponse = await fetch(`${server.url}/`, {
-          method: "GET",
-          mode: "cors",
-          signal: AbortSignal.timeout(3000),
-        });
-        updateServerStatus(
-          server.url,
-          fallbackResponse.ok ? "online" : "offline",
-        );
-      }
-    } catch {
-      updateServerStatus(server.url, "offline");
-    }
-  };
-
   const connectToServer = async (server: SavedServer) => {
     setConnectingToServer(server.url);
     setConnectionError(null);
@@ -137,13 +92,11 @@ export const HTTPServerSection = ({ onConnect }: HTTPServerSectionProps) => {
       subscribeAll(device, connection, messageStore);
 
       addSavedServer(server.host, server.protocol);
-      updateServerStatus(server.url, "online");
 
       onConnect?.();
     } catch (error) {
       console.error("Connection error:", error);
       setConnectionError(`Failed to connect to ${server.host}`);
-      updateServerStatus(server.url, "offline");
     } finally {
       setConnectingToServer(null);
     }
@@ -177,38 +130,10 @@ export const HTTPServerSection = ({ onConnect }: HTTPServerSectionProps) => {
     }
   });
 
-  const getStatusIcon = (status?: string) => {
-    switch (status) {
-      case "online":
-        return <Circle className="h-3 w-3 fill-green-500 text-green-500" />;
-      case "offline":
-        return <Circle className="h-3 w-3 fill-red-500 text-red-500" />;
-      case "checking":
-        return (
-          <Circle className="h-3 w-3 fill-yellow-500 text-yellow-500 animate-spin" />
-        );
-      default:
-        return <Circle className="h-3 w-3 fill-slate-300 text-slate-300" />;
-    }
-  };
-
   const getSecurityIcon = (protocol: "http" | "https") => {
     return protocol === "https"
       ? <Lock className="h-4 w-4 text-green-600" />
       : <LockOpen className="h-4 w-4 text-yellow-600" />;
-  };
-
-  const getStatusText = (status?: string) => {
-    switch (status) {
-      case "online":
-        return "Online";
-      case "offline":
-        return "Offline";
-      case "checking":
-        return "Checking...";
-      default:
-        return "Unknown";
-    }
   };
 
   return (
@@ -249,11 +174,6 @@ export const HTTPServerSection = ({ onConnect }: HTTPServerSectionProps) => {
                   key={server.url}
                   className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:shadow-sm transition-shadow"
                 >
-                  {/* Status */}
-                  <div className="flex-shrink-0">
-                    {getStatusIcon(server.status)}
-                  </div>
-
                   {/* Server Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -261,29 +181,6 @@ export const HTTPServerSection = ({ onConnect }: HTTPServerSectionProps) => {
                         {server.host}
                       </span>
                       {getSecurityIcon(server.protocol)}
-                    </div>
-
-                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      <span>{getStatusText(server.status)}</span>
-
-                      {server.deviceInfo?.model && (
-                        <>
-                          <span>•</span>
-                          <span className="font-mono bg-slate-200 dark:bg-slate-600 px-1 rounded">
-                            {server.deviceInfo.model}
-                          </span>
-                        </>
-                      )}
-
-                      {server.deviceInfo?.nodeCount && (
-                        <>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
-                            {server.deviceInfo.nodeCount}
-                          </span>
-                        </>
-                      )}
                     </div>
                   </div>
 

@@ -27,7 +27,7 @@ export const SerialSection = ({ onConnect }: SerialSectionProps) => {
 
   const updateSerialPortList = useCallback(async () => {
     try {
-      setSerialPorts(await navigator?.serial?.getPorts() || []);
+      setSerialPorts((await navigator?.serial?.getPorts()) ?? []);
     } catch (error) {
       console.error("Error getting serial ports:", error);
     }
@@ -111,11 +111,11 @@ export const SerialSection = ({ onConnect }: SerialSectionProps) => {
       return (
         <Circle className="h-3 w-3 fill-yellow-500 text-yellow-500 animate-spin" />
       );
-    } else if (isConnected) {
-      return <Circle className="h-3 w-3 fill-green-500 text-green-500" />;
-    } else {
-      return <Circle className="h-3 w-3 fill-slate-400 text-slate-400" />;
     }
+    if (isConnected) {
+      return <Circle className="h-3 w-3 fill-green-500 text-green-500" />;
+    }
+    return <Circle className="h-3 w-3 fill-slate-400 text-slate-400" />;
   };
 
   const getStatusText = (port: SerialPort) => {
@@ -145,7 +145,9 @@ export const SerialSection = ({ onConnect }: SerialSectionProps) => {
           : (
             serialPorts.map((port, index) => (
               <div
-                key={`${port}-${index}`}
+                key={`serial-${port.getInfo().usbVendorId ?? "unknown"}-${
+                  port.getInfo().usbProductId ?? "unknown"
+                }`}
                 className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:shadow-sm transition-shadow"
               >
                 {/* Status */}

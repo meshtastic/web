@@ -61,7 +61,7 @@ export const BluetoothSection = ({ onConnect }: BluetoothSectionProps) => {
       onConnect?.();
     } catch (error) {
       console.error("Bluetooth connection error:", error);
-      setConnectionError(`Failed to connect to ${bleDevice.name || "device"}`);
+      setConnectionError(`Failed to connect to ${bleDevice.name ?? "device"}`);
     } finally {
       setConnectingToDevice(null);
     }
@@ -102,11 +102,11 @@ export const BluetoothSection = ({ onConnect }: BluetoothSectionProps) => {
       return (
         <Circle className="h-3 w-3 fill-yellow-500 text-yellow-500 animate-spin" />
       );
-    } else if (isConnected) {
-      return <Circle className="h-3 w-3 fill-blue-500 text-blue-500" />;
-    } else {
-      return <Circle className="h-3 w-3 fill-slate-300 text-slate-300" />;
     }
+    if (isConnected) {
+      return <Circle className="h-3 w-3 fill-blue-500 text-blue-500" />;
+    }
+    return <Circle className="h-3 w-3 fill-slate-300 text-slate-300" />;
   };
 
   const getStatusText = (device: BluetoothDevice) => {
@@ -148,7 +148,7 @@ export const BluetoothSection = ({ onConnect }: BluetoothSectionProps) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-slate-900 dark:text-slate-100 truncate">
-                      {device.name || "Unknown Device"}
+                      {device.name ?? "Unknown Device"}
                     </span>
                     <Bluetooth className="h-4 w-4 text-blue-500" />
                   </div>

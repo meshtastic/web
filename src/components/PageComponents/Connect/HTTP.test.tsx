@@ -5,7 +5,13 @@ import { TransportHTTP } from "@meshtastic/transport-http";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@core/stores/appStore.ts", () => ({
-  useAppStore: vi.fn(() => ({ setSelectedDevice: vi.fn() })),
+  useAppStore: vi.fn(() => ({
+    setSelectedDevice: vi.fn(),
+    addSavedServer: vi.fn(),
+    removeSavedServer: vi.fn(),
+    clearSavedServers: vi.fn(),
+    getSavedServers: vi.fn(() => []),
+  })),
 }));
 
 vi.mock("@core/stores/deviceStore.ts", () => ({
@@ -14,8 +20,16 @@ vi.mock("@core/stores/deviceStore.ts", () => ({
   })),
 }));
 
+vi.mock("@core/stores/messageStore/index.ts", () => ({
+  useMessageStore: vi.fn(() => ({})),
+}));
+
 vi.mock("@core/utils/randId.ts", () => ({
   randId: vi.fn(() => "mock-id"),
+}));
+
+vi.mock("@core/subscriptions.ts", () => ({
+  subscribeAll: vi.fn(),
 }));
 
 vi.mock("@meshtastic/transport-http", () => ({
@@ -33,34 +47,35 @@ vi.mock("@meshtastic/core", () => ({
 describe("HTTP Component", () => {
   it("renders correctly", () => {
     render(<Http closeDialog={vi.fn()} />);
-    expect(screen.getByText("IP Address/Hostname")).toBeInTheDocument();
-    expect(screen.getByRole("textbox")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("000.000.000.000 / meshtastic.local"))
-      .toBeInTheDocument();
-    expect(screen.getByText("Use HTTPS")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Connect" })).toBeInTheDocument();
+    expect(screen.getByText("Meshtastic Servers")).toBeInTheDocument();
+    expect(screen.getByText("Add New Server")).toBeInTheDocument();
+    expect(screen.getByText("No saved servers yet")).toBeInTheDocument();
   });
 
-  it("allows input field to be updated", () => {
+  it("opens dialog when add new server is clicked", () => {
     render(<Http closeDialog={vi.fn()} />);
-    const inputField = screen.getByRole("textbox");
-    fireEvent.change(inputField, { target: { value: "meshtastic.local" } });
-    expect(screen.getByPlaceholderText("000.000.000.000 / meshtastic.local"))
+    const addButton = screen.getByText("Add New Server");
+    fireEvent.click(addButton);
+    expect(screen.getByText("Hostname or IP Address")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("meshtastic.local or 192.168.1.100"))
       .toBeInTheDocument();
   });
 
-  it("toggles HTTPS switch and updates prefix", () => {
+  it("toggles HTTPS switch in dialog", () => {
     render(<Http closeDialog={vi.fn()} />);
+
+    // Open the dialog first
+    const addButton = screen.getByText("Add New Server");
+    fireEvent.click(addButton);
 
     const switchInput = screen.getByRole("switch");
-    expect(screen.getByText("http://")).toBeInTheDocument();
+    expect(screen.getByText("Use HTTPS (Secure)")).toBeInTheDocument();
 
     fireEvent.click(switchInput);
-    expect(screen.getByText("https://")).toBeInTheDocument();
+    expect(switchInput).toBeChecked();
 
     fireEvent.click(switchInput);
     expect(switchInput).not.toBeChecked();
-    expect(screen.getByText("http://")).toBeInTheDocument();
   });
 
   it("enables HTTPS toggle when location protocol is https", () => {
@@ -71,10 +86,12 @@ describe("HTTP Component", () => {
 
     render(<Http closeDialog={vi.fn()} />);
 
+    // Open the dialog first
+    const addButton = screen.getByText("Add New Server");
+    fireEvent.click(addButton);
+
     const switchInput = screen.getByRole("switch");
     expect(switchInput).toBeChecked();
-
-    expect(screen.getByText("https://")).toBeInTheDocument();
   });
 
   it.skip("submits form and triggers connection process", async () => {
