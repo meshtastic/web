@@ -35,7 +35,7 @@ i18next
       "default": ["en"],
     },
     fallbackNS: ["common", "ui", "dialog"],
-    debug: import.meta.env.DEV,
+    debug: import.meta.env.MODE === "development",
     supportedLngs: supportedLanguages?.map((lang) => lang.code),
     ns: [
       "channels",

@@ -7,6 +7,7 @@ import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { MeshDevice } from "@meshtastic/core";
+import type { BluetoothDevice } from "web-bluetooth";
 import { useCallback, useEffect, useState } from "react";
 import { useMessageStore } from "@core/stores/messageStore/index.ts";
 import { useTranslation } from "react-i18next";
@@ -77,7 +78,7 @@ export const BLE = (
               if (exists === -1) {
                 setBleDevices(bleDevices.concat(device));
               }
-            }).catch((error) => {
+            }).catch((error: Error) => {
               console.error("Error requesting device:", error);
               setConnectionInProgress(false);
             }).finally(() => {

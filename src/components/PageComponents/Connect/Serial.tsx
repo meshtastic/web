@@ -9,7 +9,8 @@ import { MeshDevice } from "@meshtastic/core";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
+import type { SerialPort } from "w3c-web-serial";
+import { useMessageStore } from "@core/stores/messageStore/index.ts";
 
 export const Serial = (
   { closeDialog }: TabElementProps,
@@ -22,13 +23,13 @@ export const Serial = (
   const { t } = useTranslation();
 
   const updateSerialPortList = useCallback(async () => {
-    setSerialPorts(await navigator?.serial.getPorts());
+    setSerialPorts(await navigator.serial.getPorts());
   }, []);
 
-  navigator?.serial?.addEventListener("connect", () => {
+  navigator.serial.addEventListener("connect", () => {
     updateSerialPortList();
   });
-  navigator?.serial?.addEventListener("disconnect", () => {
+  navigator.serial.addEventListener("disconnect", () => {
     updateSerialPortList();
   });
   useEffect(() => {
@@ -89,7 +90,7 @@ export const Serial = (
           await navigator.serial.requestPort().then((port) => {
             setSerialPorts(serialPorts.concat(port));
             // No need to setConnectionInProgress(false) here if requestPort is quick
-          }).catch((error) => {
+          }).catch((error: Error) => {
             console.error("Error requesting port:", error);
           }).finally(() => {
             setConnectionInProgress(false);

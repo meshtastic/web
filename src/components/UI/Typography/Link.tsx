@@ -6,7 +6,11 @@ import {
 
 export interface LinkProps extends RouterLinkProps {
   href: string;
-  children?: React.ReactNode;
+  children?:
+    | React.ReactNode
+    | ((
+      state: { isActive: boolean; isTransitioning: boolean },
+    ) => React.ReactNode);
   className?: string;
 }
 

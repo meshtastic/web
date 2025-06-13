@@ -55,10 +55,14 @@ export const DeviceNameDialog = ({
     MAX_SHORT_NAME_BYTE_LENGTH,
   );
 
+  if (!myNode?.user) {
+    console.warn("DeviceNameDialog: No user data available");
+    return null;
+  }
+
   const onSubmit = handleSubmit((data) => {
     connection?.setOwner(
       create(Protobuf.Mesh.UserSchema, {
-        ...(myNode?.user ?? {}),
         ...data,
       }),
     );

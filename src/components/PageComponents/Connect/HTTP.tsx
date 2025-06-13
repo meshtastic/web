@@ -66,7 +66,9 @@ export const HTTP = (
       subscribeAll(device, connection, messageStore);
       closeDialog();
     } catch (error) {
-      console.error("Connection error:", error);
+      if (error instanceof Error) {
+        console.error("Connection error:", error);
+      }
       // Capture all connection errors regardless of type
       setConnectionError({ host: data.ip, secure: data.tls });
       setConnectionInProgress(false);

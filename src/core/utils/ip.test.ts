@@ -60,7 +60,7 @@ describe("IP Address Conversion Functions", () => {
       for (const ip of testIps) {
         const int = convertIpAddressToInt(ip);
         expect(int).not.toBeNull();
-        if (int !== null) {
+        if (int !== null && typeof int === "number") {
           const convertedBack = convertIntToIpAddress(int);
           expect(convertedBack).toBe(ip);
         }
