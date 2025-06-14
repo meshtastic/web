@@ -53,7 +53,7 @@ describe("RawSecuritySchema", () => {
     if (!result.success) {
       expect(
         result.error.issues.some((i) =>
-          i.message === "formValidation.adminKeyRequiredWhenManaged"
+          i.message === "formValidation.required.managed"
         ),
       ).toBe(true);
     }
@@ -103,7 +103,7 @@ describe("ParsedSecuritySchema", () => {
     if (!result.success) {
       expect(
         result.error.issues.some((i) =>
-          i.message === "formValidation.adminKeyRequiredWhenManaged"
+          i.message === "formValidation.required.managed"
         ),
       ).toBe(true);
     }

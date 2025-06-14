@@ -1,6 +1,6 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import { MeshDevice, Protobuf, Types } from "@meshtastic/core";
-import { current, produce } from "immer";
+import { produce } from "immer";
 import { createContext, useContext } from "react";
 import { create as createStore } from "zustand";
 
@@ -69,7 +69,6 @@ export interface Device {
   setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
   setWorkingConfig: (config: Protobuf.Config.Config) => void;
   setWorkingModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
-
   getWorkingConfig: (
     payloadVariant: ValidConfigType,
   ) =>
@@ -90,7 +89,6 @@ export interface Device {
   getEffectiveModuleConfig<K extends ValidModuleConfigType>(
     payloadVariant: K,
   ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
-
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
   setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
@@ -194,6 +192,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
+                  console.debug("Setting config for device", id, config);
                   switch (config.payloadVariant.case) {
                     case "device": {
                       device.config.device = config.payloadVariant.value;
@@ -342,9 +341,16 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             const device = get().devices.get(id);
             if (!device) return;
 
-            return device.workingConfig.find(
+            const workingConfig = device.workingConfig.find(
               (c) => c.payloadVariant.case === payloadVariant,
-            )?.payloadVariant.value;
+            );
+
+            if (
+              workingConfig?.payloadVariant.case === "deviceUi" ||
+              workingConfig?.payloadVariant.case === "sessionkey"
+            ) return;
+
+            return workingConfig?.payloadVariant.value;
           },
           getWorkingModuleConfig: (payloadVariant: ValidModuleConfigType) => {
             const device = get().devices.get(id);
@@ -357,7 +363,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
 
           removeWorkingConfig: (payloadVariant?: ValidConfigType) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) return;
 
@@ -381,7 +387,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             payloadVariant?: ValidModuleConfigType,
           ) => {
             set(
-              produce<DeviceState>((draft) => {
+              produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (!device) return;
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deepCompareConfig } from "./deepCompareConfig";
+import { deepCompareConfig } from "./deepCompareConfig.ts";
 
 describe("deepCompareConfig", () => {
   it("returns true for identical primitives", () => {
