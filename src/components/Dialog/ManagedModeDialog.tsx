@@ -48,7 +48,9 @@ export const ManagedModeDialog = ({
             onChange={() => setConfirmState(!confirmState)}
             name="confirmUnderstanding"
           >
-            {t("managedMode.confirmUnderstanding")}
+            <p className="dark:text-white pt-1">
+              {t("managedMode.confirmUnderstanding")}
+            </p>
           </Checkbox>
         </div>
         <DialogFooter>

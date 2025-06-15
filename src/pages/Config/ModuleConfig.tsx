@@ -16,14 +16,16 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
+import { Spinner } from "@components/UI/Spinner.tsx";
 import { useTranslation } from "react-i18next";
 import {
   useDevice,
   type ValidModuleConfigType,
 } from "@core/stores/deviceStore.ts";
 import { useMemo } from "react";
-import type { ComponentType } from "react";
+import { type ComponentType, Suspense } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { ConfigSuspender } from "@components/PageComponents/Config/ConfigSuspender.tsx";
 
 interface ConfigProps {
   // We can get rid of this exception if we import every config schema and pass the union type
@@ -128,7 +130,11 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
       </TabsList>
       {tabs.map((tab) => (
         <TabsContent key={tab.label} value={tab.label}>
-          <tab.element onFormInit={onFormInit} />
+          <Suspense fallback={<Spinner size="lg" className="my-5" />}>
+            <ConfigSuspender moduleConfigCase={tab.case}>
+              <tab.element onFormInit={onFormInit} />
+            </ConfigSuspender>
+          </Suspense>
         </TabsContent>
       ))}
     </Tabs>
