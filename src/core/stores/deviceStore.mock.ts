@@ -44,6 +44,7 @@ export const mockDeviceStore: Device = {
     unsafeRoles: false,
     refreshKeys: false,
     deleteMessages: false,
+    managedMode: false,
   },
   setStatus: vi.fn(),
   setConfig: vi.fn(),

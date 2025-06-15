@@ -62,6 +62,7 @@ export interface Device {
     unsafeRoles: boolean;
     refreshKeys: boolean;
     deleteMessages: boolean;
+    managedMode: boolean;
   };
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -170,6 +171,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             refreshKeys: false,
             rebootOTA: false,
             deleteMessages: false,
+            managedMode: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",

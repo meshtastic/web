@@ -2,6 +2,9 @@ export type EventMap = {
   "dialog:unsafeRoles": {
     action: "confirm" | "dismiss";
   };
+  "dialog:managedMode": {
+    action: "confirm" | "dismiss";
+  };
 };
 
 export type EventName = keyof EventMap;

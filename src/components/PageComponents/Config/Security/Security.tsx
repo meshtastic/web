@@ -1,4 +1,5 @@
 import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
+import { ManagedModeDialog } from "@components/Dialog/ManagedModeDialog.tsx";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -73,6 +74,9 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
   }, [onFormInit, formMethods]);
 
   const [privateKeyDialogOpen, setPrivateKeyDialogOpen] = useState<boolean>(
+    false,
+  );
+  const [managedModeDialogOpen, setManagedModeDialogOpen] = useState<boolean>(
     false,
   );
 
@@ -249,6 +253,13 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 name: "isManaged",
                 label: t("security.managed.label"),
                 description: t("security.managed.description"),
+                inputChange: (checked) => {
+                  if (checked) {
+                    setManagedModeDialogOpen(true);
+                  }
+
+                  setValue("isManaged", false);
+                },
               },
               {
                 type: "toggle",
@@ -285,8 +296,17 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
           description: t("pkiRegenerate.description"),
         }}
         open={privateKeyDialogOpen}
-        onOpenChange={() => setPrivateKeyDialogOpen(true)}
+        onOpenChange={() => setPrivateKeyDialogOpen((prev) => !prev)}
         onSubmit={pkiRegenerate}
+      />
+
+      <ManagedModeDialog
+        open={managedModeDialogOpen}
+        onOpenChange={() => setManagedModeDialogOpen((prev) => !prev)}
+        onSubmit={() => {
+          setValue("isManaged", true);
+          setManagedModeDialogOpen(false);
+        }}
       />
     </>
   );
