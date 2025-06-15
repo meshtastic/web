@@ -4,15 +4,35 @@ import {
   DetectionSensorValidationSchema,
 } from "@app/validation/moduleConfig/detectionSensor.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const DetectionSensor = () => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+interface DetectionSensorModuleConfigProps {
+  onFormInit: DynamicFormFormInit<DetectionSensorValidation>;
+}
+
+export const DetectionSensor = (
+  { onFormInit }: DetectionSensorModuleConfigProps,
+) => {
+  const {
+    moduleConfig,
+    setWorkingModuleConfig,
+    getEffectiveModuleConfig,
+    removeWorkingModuleConfig,
+  } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: DetectionSensorValidation) => {
+    if (deepCompareConfig(moduleConfig.detectionSensor, data, true)) {
+      removeWorkingModuleConfig("detectionSensor");
+      return;
+    }
+
     setWorkingModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
@@ -26,9 +46,11 @@ export const DetectionSensor = () => {
   return (
     <DynamicForm<DetectionSensorValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={DetectionSensorValidationSchema}
       formId="ModuleConfig_DetectionSensorConfig"
       defaultValues={moduleConfig.detectionSensor}
+      values={getEffectiveModuleConfig("detectionSensor")}
       fieldGroups={[
         {
           label: t("detectionSensor.title"),

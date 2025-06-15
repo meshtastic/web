@@ -3,18 +3,31 @@ import {
   DeviceValidationSchema,
 } from "@app/validation/config/device.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const Device = () => {
-  const { config, setWorkingConfig } = useDevice();
+interface DeviceConfigProps {
+  onFormInit: DynamicFormFormInit<DeviceValidation>;
+}
+export const Device = ({ onFormInit }: DeviceConfigProps) => {
+  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { t } = useTranslation("deviceConfig");
   const { validateRoleSelection } = useUnsafeRolesDialog();
 
   const onSubmit = (data: DeviceValidation) => {
+    if (deepCompareConfig(config.device, data, true)) {
+      removeWorkingConfig("device");
+      return;
+    }
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
@@ -24,12 +37,15 @@ export const Device = () => {
       }),
     );
   };
+
   return (
     <DynamicForm<DeviceValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={DeviceValidationSchema}
       formId="Config_DeviceConfig"
       defaultValues={config.device}
+      values={getEffectiveConfig("device")}
       fieldGroups={[
         {
           label: t("device.title"),
@@ -97,7 +113,8 @@ export const Device = () => {
               properties: {
                 fieldLength: {
                   max: 64,
-                  currentValueLength: config.device?.tzdef?.length,
+                  currentValueLength: getEffectiveConfig("device")?.tzdef
+                    ?.length,
                   showCharacterCount: true,
                 },
               },

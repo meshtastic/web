@@ -16,60 +16,96 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
+import { Spinner } from "@components/UI/Spinner.tsx";
 import { useTranslation } from "react-i18next";
+import {
+  useDevice,
+  type ValidModuleConfigType,
+} from "@core/stores/deviceStore.ts";
+import { useMemo } from "react";
+import { type ComponentType, Suspense } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { ConfigSuspender } from "@components/PageComponents/Config/ConfigSuspender.tsx";
 
-export const ModuleConfig = () => {
+interface ConfigProps {
+  // We can get rid of this exception if we import every config schema and pass the union type
+  // deno-lint-ignore no-explicit-any
+  onFormInit: (methods: UseFormReturn<any>) => void;
+}
+type TabItem = {
+  case: ValidModuleConfigType;
+  label: string;
+  element: ComponentType<ConfigProps>;
+  count?: number;
+};
+
+export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
+  const { getWorkingModuleConfig } = useDevice();
   const { t } = useTranslation("moduleConfig");
-  const tabs = [
+  const tabs: TabItem[] = [
     {
+      case: "mqtt",
       label: t("page.tabMqtt"),
       element: MQTT,
     },
     {
+      case: "serial",
       label: t("page.tabSerial"),
       element: Serial,
     },
     {
+      case: "externalNotification",
       label: t("page.tabExternalNotification"),
       element: ExternalNotification,
     },
     {
+      case: "storeForward",
       label: t("page.tabStoreAndForward"),
       element: StoreForward,
     },
     {
+      case: "rangeTest",
       label: t("page.tabRangeTest"),
       element: RangeTest,
     },
     {
+      case: "telemetry",
       label: t("page.tabTelemetry"),
       element: Telemetry,
     },
     {
+      case: "cannedMessage",
       label: t("page.tabCannedMessage"),
       element: CannedMessage,
     },
     {
+      case: "audio",
       label: t("page.tabAudio"),
       element: Audio,
     },
     {
+      case: "neighborInfo",
       label: t("page.tabNeighborInfo"),
       element: NeighborInfo,
     },
     {
+      case: "ambientLighting",
       label: t("page.tabAmbientLighting"),
       element: AmbientLighting,
     },
     {
+      case: "detectionSensor",
       label: t("page.tabDetectionSensor"),
       element: DetectionSensor,
     },
-    {
-      label: t("page.tabPaxcounter"),
-      element: Paxcounter,
-    },
-  ];
+    { case: "paxcounter", label: t("page.tabPaxcounter"), element: Paxcounter },
+  ] as const;
+
+  const flags = useMemo(
+    () =>
+      new Map(tabs.map((tab) => [tab.case, getWorkingModuleConfig(tab.case)])),
+    [tabs, getWorkingModuleConfig],
+  );
 
   return (
     <Tabs defaultValue={t("page.tabMqtt")}>
@@ -78,15 +114,27 @@ export const ModuleConfig = () => {
           <TabsTrigger
             key={tab.label}
             value={tab.label}
-            className="dark:text-white"
+            className="dark:text-white relative"
           >
             {tab.label}
+            {flags.get(tab.case) && (
+              <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25">
+                </span>
+                <span className="relative inline-flex size-3 rounded-full bg-sky-500">
+                </span>
+              </span>
+            )}
           </TabsTrigger>
         ))}
       </TabsList>
       {tabs.map((tab) => (
         <TabsContent key={tab.label} value={tab.label}>
-          <tab.element />
+          <Suspense fallback={<Spinner size="lg" className="my-5" />}>
+            <ConfigSuspender moduleConfigCase={tab.case}>
+              <tab.element onFormInit={onFormInit} />
+            </ConfigSuspender>
+          </Suspense>
         </TabsContent>
       ))}
     </Tabs>

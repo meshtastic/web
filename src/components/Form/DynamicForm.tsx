@@ -14,6 +14,7 @@ import {
   type Path,
   type SubmitHandler,
   useForm,
+  type UseFormReturn,
 } from "react-hook-form";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { ZodType } from "zod/v4";
@@ -44,13 +45,18 @@ export interface GenericFormElementProps<T extends FieldValues, Y> {
   control: Control<T>;
   disabled?: boolean;
   field: Y;
+  isDirty?: boolean;
+  invalid?: boolean;
 }
 
 export interface DynamicFormProps<T extends FieldValues> {
+  propMethods?: UseFormReturn<T, T, T>;
   onSubmit: SubmitHandler<T>;
+  onFormInit?: DynamicFormFormInit<T>;
   submitType?: "onChange" | "onSubmit";
   hasSubmitButton?: boolean;
   defaultValues?: DefaultValues<T>;
+  values?: T;
   fieldGroups: {
     label: string;
     description: string;
@@ -63,11 +69,18 @@ export interface DynamicFormProps<T extends FieldValues> {
   formId?: string;
 }
 
+export type DynamicFormFormInit<T extends FieldValues> = (
+  methods: UseFormReturn<T, T, T>,
+) => void;
+
 export function DynamicForm<T extends FieldValues>({
+  propMethods,
   onSubmit,
+  onFormInit,
   submitType = "onChange",
   hasSubmitButton,
   defaultValues,
+  values,
   fieldGroups,
   validationSchema,
   formId,
@@ -78,17 +91,29 @@ export function DynamicForm<T extends FieldValues>({
     removeError,
   } = useAppStore();
 
-  const methods = useForm<
-    T
-  >({
-    mode: "onChange",
-    defaultValues: defaultValues,
-    resolver: validationSchema
-      ? createZodResolver(validationSchema)
-      : undefined,
-    shouldFocusError: false,
-  });
-  const { handleSubmit, control, getValues, formState } = methods;
+  let methods = propMethods;
+  if (!methods) {
+    methods = useForm<
+      T
+    >({
+      mode: "onChange",
+      defaultValues: defaultValues,
+      resolver: validationSchema
+        ? createZodResolver(validationSchema)
+        : undefined,
+      shouldFocusError: false,
+      resetOptions: { keepDefaultValues: true },
+      values,
+    });
+  }
+  const { handleSubmit, control, getValues, formState, getFieldState } =
+    methods;
+
+  useEffect(() => {
+    if (!propMethods) {
+      onFormInit?.(methods);
+    }
+  }, [onFormInit, propMethods, methods]);
 
   useEffect(() => {
     const errorKeys = Object.keys(formState.errors);
@@ -155,25 +180,22 @@ export function DynamicForm<T extends FieldValues>({
                   label={field.label}
                   fieldName={field.name}
                   description={field.description}
-                  valid={validationSchema // keep backwards compat with not updated cfg pages
-                    ? !error
-                    : field.validationText === undefined ||
-                      field.validationText === ""}
-                  validationText={validationSchema
-                    ? (error
-                      ? String(
-                        t([`formValidation.${error.type}`, error.message], {
-                          returnObjects: false,
-                          ...error.params,
-                        }),
-                      )
-                      : "")
-                    : field.validationText}
+                  valid={!error}
+                  validationText={error
+                    ? String(
+                      t([`formValidation.${error.type}`, error.message], {
+                        returnObjects: false,
+                        ...error.params,
+                      }),
+                    )
+                    : ""}
                 >
                   <DynamicFormField
                     field={field}
                     control={control}
                     disabled={isDisabled(field.disabledBy, field.disabled)}
+                    isDirty={getFieldState(field.name).isDirty}
+                    invalid={getFieldState(field.name).invalid}
                   />
                 </FieldWrapper>
               );

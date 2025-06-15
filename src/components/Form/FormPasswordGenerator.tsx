@@ -30,6 +30,8 @@ export function PasswordGenerator<T extends FieldValues>({
   control,
   field,
   disabled,
+  isDirty,
+  invalid,
 }: GenericFormElementProps<T, PasswordGeneratorProps<T>>) {
   const { isVisible } = usePasswordVisibilityToggle();
   const { trigger } = useFormContext();
@@ -42,7 +44,11 @@ export function PasswordGenerator<T extends FieldValues>({
     <Controller
       name={field.name}
       control={control}
-      render={({ field: { value, onChange, ...rest } }) => (
+      render={(
+        {
+          field: { value, onChange, ...rest },
+        },
+      ) => (
         <Generator
           type={field.hide && !isVisible ? "password" : "text"}
           id={field.id}
@@ -54,7 +60,7 @@ export function PasswordGenerator<T extends FieldValues>({
           }}
           selectChange={field.selectChange ?? (() => {})}
           value={value}
-          variant={field.validationText ? "invalid" : "default"}
+          variant={invalid ? "invalid" : isDirty ? "dirty" : "default"}
           actionButtons={field.actionButtons}
           showPasswordToggle={field.showPasswordToggle}
           showCopyButton={field.showCopyButton}

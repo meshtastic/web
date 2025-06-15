@@ -4,15 +4,35 @@ import {
   AmbientLightingValidationSchema,
 } from "@app/validation/moduleConfig/ambientLighting.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const AmbientLighting = () => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+interface AmbientLightingModuleConfigProps {
+  onFormInit: DynamicFormFormInit<AmbientLightingValidation>;
+}
+
+export const AmbientLighting = (
+  { onFormInit }: AmbientLightingModuleConfigProps,
+) => {
+  const {
+    moduleConfig,
+    setWorkingModuleConfig,
+    getEffectiveModuleConfig,
+    removeWorkingModuleConfig,
+  } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AmbientLightingValidation) => {
+    if (deepCompareConfig(moduleConfig.ambientLighting, data, true)) {
+      removeWorkingModuleConfig("ambientLighting");
+      return;
+    }
+
     setWorkingModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
@@ -26,9 +46,11 @@ export const AmbientLighting = () => {
   return (
     <DynamicForm<AmbientLightingValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={AmbientLightingValidationSchema}
       formId="ModuleConfig_AmbientLightingConfig"
       defaultValues={moduleConfig.ambientLighting}
+      values={getEffectiveModuleConfig("ambientLighting")}
       fieldGroups={[
         {
           label: t("ambientLighting.title"),

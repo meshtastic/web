@@ -13,6 +13,7 @@ export interface SidebarButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   preventCollapse?: boolean;
+  isDirty?: boolean;
 }
 
 export const SidebarButton = ({
@@ -24,6 +25,7 @@ export const SidebarButton = ({
   onClick,
   disabled = false,
   preventCollapse = false,
+  isDirty,
 }: SidebarButtonProps) => {
   const { isCollapsed: isSidebarCollapsed } = useSidebar();
   const isButtonCollapsed = isSidebarCollapsed && !preventCollapse;
@@ -64,13 +66,14 @@ export const SidebarButton = ({
         {label}
       </span>
 
-      {!isButtonCollapsed && !active && count && count > 0 && (
+      {!isButtonCollapsed && ((!active && count && count > 0) || isDirty) && (
         <div
           className={cn(
-            "ml-auto flex-shrink-0 justify-end text-white text-xs rounded-full px-1.5 py-0.5 bg-red-600",
+            "ml-auto flex-shrink-0 justify-end text-white text-xs rounded-full px-1.5 py-0.5",
             "flex-shrink-0",
             "transition-opacity duration-300 ease-in-out",
             isButtonCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
+            isDirty ? "bg-sky-500" : "bg-red-600",
           )}
         >
           {count}

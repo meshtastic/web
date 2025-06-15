@@ -4,37 +4,72 @@ import {
   MqttValidationSchema,
 } from "@app/validation/moduleConfig/mqtt.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const MQTT = () => {
-  const { config, moduleConfig, setWorkingModuleConfig } = useDevice();
+interface MqttModuleConfigProps {
+  onFormInit: DynamicFormFormInit<MqttValidation>;
+}
+
+export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
+  const {
+    config,
+    moduleConfig,
+    setWorkingModuleConfig,
+    getEffectiveModuleConfig,
+    removeWorkingModuleConfig,
+  } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: MqttValidation) => {
+    const payload = {
+      ...data,
+      mapReportSettings: create(
+        Protobuf.ModuleConfig.ModuleConfig_MapReportSettingsSchema,
+        data.mapReportSettings,
+      ),
+    };
+
+    if (deepCompareConfig(moduleConfig.mqtt, payload, true)) {
+      removeWorkingModuleConfig("mqtt");
+      return;
+    }
+
     setWorkingModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
           case: "mqtt",
-          value: {
-            ...data,
-            mapReportSettings: create(
-              Protobuf.ModuleConfig.ModuleConfig_MapReportSettingsSchema,
-              data.mapReportSettings,
-            ),
-          },
+          value: payload,
         },
       }),
     );
   };
 
+  const populateDefaultValues = (
+    cfg: Protobuf.ModuleConfig.ModuleConfig_MQTTConfig | undefined,
+  ) => {
+    return cfg
+      ? {
+        ...cfg,
+        mapReportSettings: cfg.mapReportSettings ??
+          { publishIntervalSecs: 0, positionPrecision: 10 },
+      }
+      : undefined;
+  };
+
   return (
     <DynamicForm<MqttValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={MqttValidationSchema}
       formId="ModuleConfig_MqttConfig"
-      defaultValues={moduleConfig.mqtt}
+      defaultValues={populateDefaultValues(moduleConfig.mqtt)}
+      values={populateDefaultValues(getEffectiveModuleConfig("mqtt"))}
       fieldGroups={[
         {
           label: t("mqtt.title"),

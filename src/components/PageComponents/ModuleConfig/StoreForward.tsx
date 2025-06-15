@@ -3,16 +3,34 @@ import {
   StoreForwardValidationSchema,
 } from "@app/validation/moduleConfig/storeForward.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const StoreForward = () => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+interface StoreForwardModuleConfigProps {
+  onFormInit: DynamicFormFormInit<StoreForwardValidation>;
+}
+
+export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
+  const {
+    moduleConfig,
+    setWorkingModuleConfig,
+    getEffectiveModuleConfig,
+    removeWorkingModuleConfig,
+  } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: StoreForwardValidation) => {
+    if (deepCompareConfig(moduleConfig.storeForward, data, true)) {
+      removeWorkingModuleConfig("storeForward");
+      return;
+    }
+
     setWorkingModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
@@ -26,9 +44,11 @@ export const StoreForward = () => {
   return (
     <DynamicForm<StoreForwardValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={StoreForwardValidationSchema}
       formId="ModuleConfig_StoreForwardConfig"
       defaultValues={moduleConfig.storeForward}
+      values={getEffectiveModuleConfig("storeForward")}
       fieldGroups={[
         {
           label: t("storeForward.title"),

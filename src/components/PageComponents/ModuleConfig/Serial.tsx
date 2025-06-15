@@ -3,16 +3,34 @@ import {
   SerialValidationSchema,
 } from "@app/validation/moduleConfig/serial.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const Serial = () => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+interface SerialModuleConfigProps {
+  onFormInit: DynamicFormFormInit<SerialValidation>;
+}
+
+export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
+  const {
+    moduleConfig,
+    setWorkingModuleConfig,
+    getEffectiveModuleConfig,
+    removeWorkingModuleConfig,
+  } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: SerialValidation) => {
+    if (deepCompareConfig(moduleConfig.serial, data, true)) {
+      removeWorkingModuleConfig("serial");
+      return;
+    }
+
     setWorkingModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
@@ -26,9 +44,11 @@ export const Serial = () => {
   return (
     <DynamicForm<SerialValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={SerialValidationSchema}
       formId="ModuleConfig_SerialConfig"
       defaultValues={moduleConfig.serial}
+      values={getEffectiveModuleConfig("serial")}
       fieldGroups={[
         {
           label: t("serial.title"),

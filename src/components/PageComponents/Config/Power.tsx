@@ -3,16 +3,29 @@ import {
   PowerValidationSchema,
 } from "@app/validation/config/power.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const Power = () => {
-  const { config, setWorkingConfig } = useDevice();
+interface PowerConfigProps {
+  onFormInit: DynamicFormFormInit<PowerValidation>;
+}
+export const Power = ({ onFormInit }: PowerConfigProps) => {
+  const { setWorkingConfig, config, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: PowerValidation) => {
+    if (deepCompareConfig(config.power, data, true)) {
+      removeWorkingConfig("power");
+      return;
+    }
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
@@ -26,9 +39,11 @@ export const Power = () => {
   return (
     <DynamicForm<PowerValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={PowerValidationSchema}
       formId="Config_PowerConfig"
       defaultValues={config.power}
+      values={getEffectiveConfig("power")}
       fieldGroups={[
         {
           label: t("power.powerConfigSettings.label"),

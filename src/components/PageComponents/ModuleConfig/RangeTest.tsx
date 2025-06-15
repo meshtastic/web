@@ -3,16 +3,34 @@ import {
   RangeTestValidationSchema,
 } from "@app/validation/moduleConfig/rangeTest.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const RangeTest = () => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+interface RangeTestModuleConfigProps {
+  onFormInit: DynamicFormFormInit<RangeTestValidation>;
+}
+
+export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
+  const {
+    moduleConfig,
+    setWorkingModuleConfig,
+    getEffectiveModuleConfig,
+    removeWorkingModuleConfig,
+  } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: RangeTestValidation) => {
+    if (deepCompareConfig(moduleConfig.rangeTest, data, true)) {
+      removeWorkingModuleConfig("rangeTest");
+      return;
+    }
+
     setWorkingModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
@@ -26,9 +44,11 @@ export const RangeTest = () => {
   return (
     <DynamicForm<RangeTestValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={RangeTestValidationSchema}
       formId="ModuleConfig_RangeTestConfig"
       defaultValues={moduleConfig.rangeTest}
+      values={getEffectiveModuleConfig("rangeTest")}
       fieldGroups={[
         {
           label: t("rangeTest.title"),

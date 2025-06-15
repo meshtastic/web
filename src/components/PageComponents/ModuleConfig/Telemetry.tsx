@@ -3,16 +3,34 @@ import {
   TelemetryValidationSchema,
 } from "@app/validation/moduleConfig/telemetry.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const Telemetry = () => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+interface TelemetryModuleConfigProps {
+  onFormInit: DynamicFormFormInit<TelemetryValidation>;
+}
+
+export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
+  const {
+    moduleConfig,
+    setWorkingModuleConfig,
+    getEffectiveModuleConfig,
+    removeWorkingModuleConfig,
+  } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: TelemetryValidation) => {
+    if (deepCompareConfig(moduleConfig.telemetry, data, true)) {
+      removeWorkingModuleConfig("telemetry");
+      return;
+    }
+
     setWorkingModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
@@ -26,9 +44,11 @@ export const Telemetry = () => {
   return (
     <DynamicForm<TelemetryValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={TelemetryValidationSchema}
       formId="ModuleConfig_TelemetryConfig"
       defaultValues={moduleConfig.telemetry}
+      values={getEffectiveModuleConfig("telemetry")}
       fieldGroups={[
         {
           label: t("telemetry.title"),

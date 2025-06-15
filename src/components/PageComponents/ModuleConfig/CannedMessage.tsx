@@ -3,16 +3,36 @@ import {
   CannedMessageValidationSchema,
 } from "@app/validation/moduleConfig/cannedMessage.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const CannedMessage = () => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+interface CannedMessageModuleConfigProps {
+  onFormInit: DynamicFormFormInit<CannedMessageValidation>;
+}
+
+export const CannedMessage = (
+  { onFormInit }: CannedMessageModuleConfigProps,
+) => {
+  const {
+    moduleConfig,
+    setWorkingModuleConfig,
+    getEffectiveModuleConfig,
+    removeWorkingModuleConfig,
+  } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: CannedMessageValidation) => {
+    if (deepCompareConfig(moduleConfig.cannedMessage, data, true)) {
+      removeWorkingModuleConfig("cannedMessage");
+      return;
+    }
+
     setWorkingModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
@@ -26,9 +46,11 @@ export const CannedMessage = () => {
   return (
     <DynamicForm<CannedMessageValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={CannedMessageValidationSchema}
       formId="ModuleConfig_CannedMessageConfig"
       defaultValues={moduleConfig.cannedMessage}
+      values={getEffectiveModuleConfig("cannedMessage")}
       fieldGroups={[
         {
           label: t("cannedMessage.title"),

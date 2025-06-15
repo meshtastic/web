@@ -4,15 +4,33 @@ import {
   NeighborInfoValidationSchema,
 } from "@app/validation/moduleConfig/neighborInfo.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const NeighborInfo = () => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+interface NeighborInfoModuleConfigProps {
+  onFormInit: DynamicFormFormInit<NeighborInfoValidation>;
+}
+
+export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
+  const {
+    moduleConfig,
+    setWorkingModuleConfig,
+    getEffectiveModuleConfig,
+    removeWorkingModuleConfig,
+  } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: NeighborInfoValidation) => {
+    if (deepCompareConfig(moduleConfig.neighborInfo, data, true)) {
+      removeWorkingModuleConfig("neighborInfo");
+      return;
+    }
+
     setWorkingModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
@@ -26,9 +44,11 @@ export const NeighborInfo = () => {
   return (
     <DynamicForm<NeighborInfoValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={NeighborInfoValidationSchema}
       formId="ModuleConfig_NeighborInfoConfig"
       defaultValues={moduleConfig.neighborInfo}
+      values={getEffectiveModuleConfig("neighborInfo")}
       fieldGroups={[
         {
           label: t("neighborInfo.title"),

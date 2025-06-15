@@ -8,12 +8,14 @@ import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 
 export interface ActionItem {
   key: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
   iconClasses?: string;
   onClick: () => void;
   disabled?: boolean;
   isLoading?: boolean;
   ariaLabel?: string;
+  label?: string;
+  className?: string;
 }
 
 export interface PageLayoutProps {
@@ -69,27 +71,39 @@ export const PageLayout = ({
               <span className="text-lg font-medium text-foreground truncate px-2">
                 {label}
               </span>
-              <div className="flex items-center space-x-3 md:space-x-4 shrink-0">
-                {actions?.map((action) => (
-                  <button
-                    key={action.key}
-                    type="button"
-                    disabled={action.disabled || action.isLoading}
-                    className="text-foreground transition-colors hover:text-accent disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={action.onClick}
-                    aria-label={action.ariaLabel || `Action ${action.key}`}
-                    aria-disabled={action.disabled}
-                    aria-busy={action.isLoading}
-                  >
-                    <div className="mr-6">
-                      {action.isLoading ? <Spinner size="md" /> : (
-                        <action.icon
-                          className={cn("h-5 w-5", action.iconClasses)}
-                        />
+              <div className="flex items-center space-x-1 md:space-x-2 shrink-0 pr-6">
+                {actions?.map((action) => {
+                  return (
+                    <button
+                      key={action.key}
+                      type="button"
+                      disabled={action.disabled || action.isLoading}
+                      className={cn(
+                        "flex items-center space-x-2 py-2 px-3 rounded-md",
+                        "text-foreground transition-colors hover:text-accent",
+                        "hover:bg-slate-200 disabled:hover:bg-white",
+                        "disabled:opacity-50 disabled:cursor-not-allowed",
+                        action.className,
                       )}
-                    </div>
-                  </button>
-                ))}
+                      onClick={action.onClick}
+                      aria-label={action.ariaLabel || `Action ${action.key}`}
+                      aria-disabled={action.disabled}
+                      aria-busy={action.isLoading}
+                    >
+                      {action.icon &&
+                        (action.isLoading ? <Spinner size="md" /> : (
+                          <action.icon
+                            className={cn("h-5 w-5", action.iconClasses)}
+                          />
+                        ))}
+                      {action.label && (
+                        <span className="text-sm px-1 pt-0.5">
+                          {action.label}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </header>

@@ -3,16 +3,29 @@ import {
   DisplayValidationSchema,
 } from "@app/validation/config/display.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const Display = () => {
-  const { config, setWorkingConfig } = useDevice();
+interface DisplayConfigProps {
+  onFormInit: DynamicFormFormInit<DisplayValidation>;
+}
+export const Display = ({ onFormInit }: DisplayConfigProps) => {
+  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: DisplayValidation) => {
+    if (deepCompareConfig(config.display, data, true)) {
+      removeWorkingConfig("display");
+      return;
+    }
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
@@ -26,9 +39,11 @@ export const Display = () => {
   return (
     <DynamicForm<DisplayValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={DisplayValidationSchema}
       formId="Config_DisplayConfig"
       defaultValues={config.display}
+      values={getEffectiveConfig("display")}
       fieldGroups={[
         {
           label: t("display.title"),

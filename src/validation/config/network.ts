@@ -19,7 +19,7 @@ export const NetworkValidationSchema = z.object({
   wifiEnabled: z.boolean(),
   wifiSsid: z.string().max(33),
   wifiPsk: z.string().max(64),
-  ntpServer: z.string().min(2).max(33),
+  ntpServer: z.string().min(0).max(33),
   ethEnabled: z.boolean(),
   addressMode: AddressModeEnum,
   ipv4Config: NetworkValidationIpV4ConfigSchema,

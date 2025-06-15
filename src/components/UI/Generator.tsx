@@ -22,7 +22,7 @@ export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   devicePSKBitCount?: number;
   value: string;
   id: string;
-  variant: "default" | "invalid";
+  variant: "default" | "invalid" | "dirty";
   actionButtons: ActionButton[];
   bits?: { text: string; value: string; key: string }[];
   selectChange: (event: string) => void;
