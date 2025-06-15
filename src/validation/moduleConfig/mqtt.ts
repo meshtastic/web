@@ -1,8 +1,8 @@
 import { z } from "zod/v4";
 
 export const MqttValidationMapReportSettingsSchema = z.object({
-  publishIntervalSecs: z.number().optional(),
-  positionPrecision: z.number().optional(),
+  publishIntervalSecs: z.coerce.number().int(),
+  positionPrecision: z.coerce.number().int(),
 });
 
 export const MqttValidationSchema = z.object({

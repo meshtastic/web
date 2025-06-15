@@ -27,6 +27,8 @@ const ConfigPage = () => {
     connection,
     removeWorkingConfig,
     removeWorkingModuleConfig,
+    setConfig,
+    setModuleConfig,
   } = useDevice();
   const { hasErrors } = useAppStore();
 
@@ -35,9 +37,7 @@ const ConfigPage = () => {
   >("device");
   const [isSaving, setIsSaving] = useState(false);
   const [formMethods, setFormMethods] = useState<UseFormReturn | null>(null);
-
   const { toast } = useToast();
-  const isError = hasErrors();
   const { t } = useTranslation("deviceConfig");
 
   const onFormInit = (methods: UseFormReturn) => {
@@ -51,33 +51,30 @@ const ConfigPage = () => {
         description: t("toast.validationError.description"),
       });
     }
-    if (
-      (activeConfigSection === "device" && workingConfig.length === 0) ||
-      (activeConfigSection === "module" && workingModuleConfig.length === 0)
-    ) return;
 
     setIsSaving(true);
+
     try {
       await Promise.all(
-        workingConfig.map((config) =>
-          connection?.setConfig(config).then(() =>
+        workingConfig.map((newConfig) =>
+          connection?.setConfig(newConfig).then(() => {
             toast({
               title: t("toast.saveSuccess.title"),
               description: t("toast.saveSuccess.description", {
-                case: config.payloadVariant.case,
+                case: newConfig.payloadVariant.case,
               }),
-            })
-          )
+            });
+          })
         ),
       );
 
       await Promise.all(
-        workingModuleConfig.map((moduleConfig) =>
-          connection?.setModuleConfig(moduleConfig).then(() =>
+        workingModuleConfig.map((newModuleConfig) =>
+          connection?.setModuleConfig(newModuleConfig).then(() =>
             toast({
               title: t("toast.saveSuccess.title"),
               description: t("toast.saveSuccess.description", {
-                case: moduleConfig.payloadVariant.case,
+                case: newModuleConfig.payloadVariant.case,
               }),
             })
           )
@@ -85,16 +82,19 @@ const ConfigPage = () => {
       );
 
       await connection?.commitEditSettings().then(() => {
-        removeWorkingConfig();
-        removeWorkingModuleConfig();
-
         if (formMethods) {
-          formMethods.reset({
-            keepDefaultValues: true,
-            keepDirty: false,
-            keepDirtyValues: true,
+          formMethods.reset({}, {
+            keepValues: true,
           });
         }
+
+        workingConfig.map((newConfig) => setConfig(newConfig));
+        workingModuleConfig.map((newModuleConfig) =>
+          setModuleConfig(newModuleConfig)
+        );
+
+        removeWorkingConfig();
+        removeWorkingModuleConfig();
       });
     } catch (_error) {
       toast({
@@ -145,12 +145,22 @@ const ConfigPage = () => {
   );
 
   const buttonOpacity = useMemo(
-    () => (formMethods?.formState.isDirty ||
+    () => (formMethods?.formState.isDirty &&
+          Object.keys(formMethods?.formState.dirtyFields ?? {}).length > 0 ||
         workingConfig.length > 0 || workingModuleConfig.length > 0
       ? "opacity-100"
       : "opacity-0"),
-    [formMethods?.formState.isDirty, workingConfig, workingModuleConfig],
+    [
+      formMethods?.formState.isDirty,
+      formMethods?.formState.dirtyFields,
+      workingConfig,
+      workingModuleConfig,
+    ],
   );
+
+  const isValid = useMemo(() => {
+    return Object.keys(formMethods?.formState.errors ?? {}).length === 0;
+  }, [formMethods?.formState.errors]);
 
   const actions = useMemo(() => [
     {
@@ -172,19 +182,22 @@ const ConfigPage = () => {
     },
     {
       key: "save",
-      icon: isError ? SaveOff : SaveIcon,
+      icon: !isValid ? SaveOff : SaveIcon,
       isLoading: isSaving,
       disabled: isSaving ||
+        !isValid ||
         (workingConfig.length === 0 && workingModuleConfig.length === 0),
-      iconClasses: isError ? "text-red-400 cursor-not-allowed" : "",
+      iconClasses: !isValid ? "text-red-400 cursor-not-allowed" : "",
       onClick: handleSave,
       label: t("common:button.save"),
     },
   ], [
     activeConfigSection,
-    isError,
     isSaving,
+    isValid,
     buttonOpacity,
+    workingConfig,
+    workingModuleConfig,
   ]);
 
   return (

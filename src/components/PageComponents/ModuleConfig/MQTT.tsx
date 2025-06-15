@@ -50,19 +50,26 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
     );
   };
 
+  const populateDefaultValues = (
+    cfg: Protobuf.ModuleConfig.ModuleConfig_MQTTConfig | undefined,
+  ) => {
+    return cfg
+      ? {
+        ...cfg,
+        mapReportSettings: cfg.mapReportSettings ??
+          { publishIntervalSecs: 0, positionPrecision: 10 },
+      }
+      : undefined;
+  };
+
   return (
     <DynamicForm<MqttValidation>
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={MqttValidationSchema}
       formId="ModuleConfig_MqttConfig"
-      defaultValues={moduleConfig.mqtt}
-      values={(() => {
-        const cfg = getEffectiveModuleConfig("mqtt");
-        return cfg
-          ? { ...cfg, mapReportSettings: cfg.mapReportSettings ?? {} }
-          : undefined;
-      })()}
+      defaultValues={populateDefaultValues(moduleConfig.mqtt)}
+      values={populateDefaultValues(getEffectiveModuleConfig("mqtt"))}
       fieldGroups={[
         {
           label: t("mqtt.title"),
