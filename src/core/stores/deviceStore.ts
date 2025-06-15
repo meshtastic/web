@@ -194,7 +194,6 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
                 if (device) {
-                  console.debug("Setting config for device", id, config);
                   switch (config.payloadVariant.case) {
                     case "device": {
                       device.config.device = config.payloadVariant.value;
