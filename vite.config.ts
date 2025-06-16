@@ -17,17 +17,17 @@ try {
 export default defineConfig({
   plugins: [
     react(),
-    VitePWA({
-      registerType: "autoUpdate",
-      strategies: "generateSW",
-      devOptions: {
-        enabled: false,
-      },
-      workbox: {
-        cleanupOutdatedCaches: true,
-        sourcemap: true,
-      },
-    }),
+    // VitePWA({
+    //   registerType: "autoUpdate",
+    //   strategies: "generateSW",
+    //   devOptions: {
+    //     enabled: true,
+    //   },
+    //   workbox: {
+    //     cleanupOutdatedCaches: true,
+    //     sourcemap: true,
+    //   },
+    // }),
     viteStaticCopy({
       targets: [
         {
