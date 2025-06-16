@@ -11,6 +11,11 @@ export type Lang = {
 
 export type LangCode = Lang["code"];
 
+/**
+ * Generates a flag emoji from a two-letter country code.
+ * @param regionCode - The two-letter, uppercase country code (e.g., "US", "FI").
+ * @returns A string containing the flag emoji.
+ */
 function getFlagEmoji(regionCode: string): string {
   const A_LETTER_CODE = 0x1F1E6;
   const a_char_code = "A".charCodeAt(0);
@@ -22,10 +27,10 @@ function getFlagEmoji(regionCode: string): string {
 }
 
 export const supportedLanguages: Lang[] = [
-  { code: "de", name: "German", flag: getFlagEmoji("de") },
-  { code: "en", name: "English", flag: getFlagEmoji("us") },
-  { code: "fi", name: "Finnish", flag: getFlagEmoji("fi") },
-  { code: "sv", name: "Swedish", flag: getFlagEmoji("se") },
+  { code: "de-DE", name: "Deutschland", flag: getFlagEmoji("DE") },
+  { code: "en-US", name: "English", flag: getFlagEmoji("US") },
+  { code: "fi-FI", name: "Suomi", flag: getFlagEmoji("FI") },
+  { code: "sv-SE", name: "Svenska", flag: getFlagEmoji("SE") },
 ];
 
 i18next
@@ -34,19 +39,18 @@ i18next
   .use(LanguageDetector)
   .init({
     backend: {
-      // this will lazy load resources from the i18n folder
+      // With this setup, {{lng}} will correctly resolve to 'en-US', 'fi-FI', etc.
       loadPath: "/src/i18n/locales/{{lng}}/{{ns}}.json",
     },
     react: {
       useSuspense: true,
     },
+    nonExplicitSupportedLngs: true,
     detection: {
-      order: ["navigator", "localStorage"],
+      order: ["localStorage", "navigator"],
       caches: ["localStorage"],
     },
-    fallbackLng: {
-      "default": ["en"],
-    },
+    fallbackLng: "en-US", // Default to US English if detection fails
     fallbackNS: ["common", "ui", "dialog"],
     debug: import.meta.env.MODE === "development",
     ns: [
