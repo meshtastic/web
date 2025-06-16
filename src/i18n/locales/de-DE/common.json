@@ -1,0 +1,119 @@
+{
+  "button": {
+    "apply": "Anwenden",
+    "backupKey": "Schlüssel sichern",
+    "cancel": "Abbrechen",
+    "clearMessages": "Nachrichten löschen",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "delete": "Löschen",
+    "dismiss": "Tastatur ausblenden",
+    "download": "Herunterladen",
+    "export": "Exportieren",
+    "generate": "Erzeugen",
+    "regenerate": "Neu erzeugen",
+    "import": "Importieren",
+    "message": "Nachricht",
+    "now": "Jetzt",
+    "ok": "Ok",
+    "print": "Drucken",
+    "rebootOtaNow": "Neustart in den OTA Modus",
+    "remove": "Entfernen",
+    "requestNewKeys": "Neue Schlüssel anfordern",
+    "requestPosition": "Standort anfordern",
+    "reset": "Zurücksetzen",
+    "save": "Speichern",
+    "scanQr": "QR Code scannen",
+    "traceRoute": "Route verfolgen"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "fullTitle": "Meshtastic Web-Applikation"
+  },
+  "loading": "Wird geladen...",
+  "unit": {
+    "cps": "CPS",
+    "dbm": "dBm",
+    "hertz": "Hz",
+    "hop": {
+      "one": "Sprung",
+      "plural": "Sprünge"
+    },
+    "hopsAway": {
+      "one": "{{count}} Sprung entfernt",
+      "plural": "{{count}} Sprünge entfernt",
+      "unknown": "Sprungweite unbekannt"
+    },
+    "megahertz": "MHz",
+    "raw": "Einheitslos",
+    "meter": {
+      "one": "Meter",
+      "plural": "Meter",
+      "suffix": "m"
+    },
+    "minute": {
+      "one": "Minute",
+      "plural": "Minuten"
+    },
+    "millisecond": {
+      "one": "Millisekunde",
+      "plural": "Millisekunden",
+      "suffix": "ms"
+    },
+    "second": {
+      "one": "Sekunde",
+      "plural": "Sekunden"
+    },
+    "snr": "SNR",
+    "volt": {
+      "one": "Volt",
+      "plural": "Volt",
+      "suffix": "V"
+    },
+    "record": {
+      "one": "Datensatz",
+      "plural": "Datensätze"
+    }
+  },
+  "security": {
+    "256bit": "256 Bit"
+  },
+  "unknown": {
+    "longName": "Unbekannt",
+    "shortName": "UNB",
+    "notAvailable": "Keine Angaben",
+    "num": "???"
+  },
+  "nodeUnknownPrefix": "!",
+  "unset": "NICHT GESETZT",
+  "fallbackName": "Meshtastic {{last4}}",
+  "formValidation": {
+    "tooBig": {
+      "string": "Zu lang, erwarte maximal {{maximum}} Zeichen.",
+      "number": "Zu groß, erwartete eine Zahl kleiner oder gleich {{maximum}}.",
+      "bytes": "Zu groß, erwarte maximal {{params.maximum}} Bytes."
+    },
+    "tooSmall": {
+      "string": "Zu kurz, erwartete mindestens {{minimum}} Zeichen.",
+      "number": "Zu klein, erwartete eine Zahl größer oder gleich {{minimum}}."
+    },
+    "invalidFormat": {
+      "ipv4": "Ungültiges Format, erwartete eine IPv4 Adresse.",
+      "key": "Ungültiges Format, erwartet einen Base64-kodierten vor verteilten Schlüssel (PSK)."
+    },
+    "invalidType": {
+      "number": "Ungültiger Typ, erwartete eine Zahl."
+    },
+    "pskLength": {
+      "0bit": "Der Schlüssel muss leer sein.",
+      "8bit": "Der administrative Schlüssel muss ein vor verteilter 8 Bit Schlüssel (PSK) sein.",
+      "128bit": "Der administrative Schlüssel muss ein vor verteilter 128 Bit Schlüssel (PSK) sein.",
+      "256bit": "Der administrative Schlüssel muss ein vor verteilter 256 Bit Schlüssel (PSK) sein."
+    },
+    "required": {
+      "generic": "Dies ist ein Pflichtfeld.",
+      "managed": "Mindestens ein administrativer Schlüssel wird benötigt, um diesen Knoten zu verwalten",
+      "key": "Schlüssel erforderlich."
+    }
+  }
+}

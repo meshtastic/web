@@ -1,0 +1,51 @@
+{
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Publik nyckel aktiverad"
+    },
+    "noPublicKey": {
+      "label": "Publik nyckel saknas"
+    },
+    "directMessage": {
+      "label": "Direktmeddelande {{shortName}}"
+    },
+    "favorite": {
+      "label": "Favorit"
+    },
+    "notFavorite": {
+      "label": "Inte en favorit"
+    },
+    "status": {
+      "heard": "Hörd",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Höjd"
+    },
+    "channelUtil": {
+      "label": "Kanalutnyttjande"
+    },
+    "airtimeUtil": {
+      "label": "Sändningstidsutnyttjande"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "Långt namn",
+      "connection": "Anslutning",
+      "lastHeard": "Senast hörd",
+      "encryption": "Kryptering",
+      "model": "Modell",
+      "macAddress": "MAC-adress"
+    },
+    "connectionStatus": {
+      "direct": "Direkt",
+      "away": "bort",
+      "unknown": "-",
+      "viaMqtt": ", via MQTT"
+    },
+    "lastHeardStatus": {
+      "never": "Aldrig"
+    }
+  }
+}

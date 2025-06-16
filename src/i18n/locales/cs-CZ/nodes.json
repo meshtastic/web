@@ -1,0 +1,51 @@
+{
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Public Key Enabled"
+    },
+    "noPublicKey": {
+      "label": "No Public Key"
+    },
+    "directMessage": {
+      "label": "Direct Message {{shortName}}"
+    },
+    "favorite": {
+      "label": "Oblíbené"
+    },
+    "notFavorite": {
+      "label": "Not a Favorite"
+    },
+    "status": {
+      "heard": "Heard",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Elevation"
+    },
+    "channelUtil": {
+      "label": "Channel Util"
+    },
+    "airtimeUtil": {
+      "label": "Airtime Util"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "Long Name",
+      "connection": "Connection",
+      "lastHeard": "Last Heard",
+      "encryption": "Encryption",
+      "model": "Model",
+      "macAddress": "MAC Address"
+    },
+    "connectionStatus": {
+      "direct": "Přímý",
+      "away": "away",
+      "unknown": "-",
+      "viaMqtt": ", via MQTT"
+    },
+    "lastHeardStatus": {
+      "never": "Never"
+    }
+  }
+}

@@ -1,0 +1,448 @@
+{
+  "page": {
+    "tabAmbientLighting": "Omgivande belysning",
+    "tabAudio": "Ljud",
+    "tabCannedMessage": "Fördefinierade meddelanden",
+    "tabDetectionSensor": "Detekteringssensor",
+    "tabExternalNotification": "Extern avisering",
+    "tabMqtt": "MQTT",
+    "tabNeighborInfo": "Granninformation",
+    "tabPaxcounter": "Paxcounter",
+    "tabRangeTest": "Räckvidd",
+    "tabSerial": "Seriell kommunikation",
+    "tabStoreAndForward": "Lagra & vidarebefodra",
+    "tabTelemetry": "Telemetri"
+  },
+  "ambientLighting": {
+    "title": "Inställningar för omgivande belysning",
+    "description": "Inställningar för modulen för omgivande belysning",
+    "ledState": {
+      "label": "LED-läge",
+      "description": "Anger om lysdioden ska vara på eller av"
+    },
+    "current": {
+      "label": "Ström",
+      "description": "Ställer in strömmen för LED-utgången. Standardvärdet är 10"
+    },
+    "red": {
+      "label": "Rött",
+      "description": "Anger nivån för den röda lysdioden. Värdena är 0-255"
+    },
+    "green": {
+      "label": "Grönt",
+      "description": "Anger nivån för den gröna lysdioden. Värdena är 0-255"
+    },
+    "blue": {
+      "label": "Blått",
+      "description": "Anger nivån för den blåa lysdioden. Värdena är 0-255"
+    }
+  },
+  "audio": {
+    "title": "Ljudinställningar",
+    "description": "Inställningar för ljudmodulen",
+    "codec2Enabled": {
+      "label": "Codec 2 aktiverad",
+      "description": "Aktivera Codec 2-ljudkodning"
+    },
+    "pttPin": {
+      "label": "PTT-stift",
+      "description": "GPIO-stift för PTT"
+    },
+    "bitrate": {
+      "label": "Bitrate",
+      "description": "Bitrate att använda för ljudkodning"
+    },
+    "i2sWs": {
+      "label": "i2S WS",
+      "description": "GPIO-stift att använda för i2S WS"
+    },
+    "i2sSd": {
+      "label": "i2S SD",
+      "description": "GPIO-stift att använda för i2S SD"
+    },
+    "i2sDin": {
+      "label": "i2S DIN",
+      "description": "GPIO-stift att använda för i2S DIN"
+    },
+    "i2sSck": {
+      "label": "i2S SCK",
+      "description": "GPIO-stift att använda för i2S SCK"
+    }
+  },
+  "cannedMessage": {
+    "title": "Inställningar för fördefinierade meddelanden",
+    "description": "Inställningar för modulen för fördefinierade meddelanden",
+    "moduleEnabled": {
+      "label": "Modul aktiverad",
+      "description": "Aktivera fördefinierade meddelanden"
+    },
+    "rotary1Enabled": {
+      "label": "Vridomkopplare #1 aktiverad",
+      "description": "Aktivera vridomkopplare"
+    },
+    "inputbrokerPinA": {
+      "label": "Vridomkopplarstift A",
+      "description": "GPIO-stift (1-39) för vridomkopplarens A-stift"
+    },
+    "inputbrokerPinB": {
+      "label": "Vridomkopplarstift B",
+      "description": "GPIO-stift (1-39) för vridomkopplarens B-stift"
+    },
+    "inputbrokerPinPress": {
+      "label": "Vridomkopplarens knappstift",
+      "description": "GPIO-stift (1-39) för vridomkopplarens knapp-stift"
+    },
+    "inputbrokerEventCw": {
+      "label": "Medurs inmatningshändelse",
+      "description": "Välj inmatningshändelse."
+    },
+    "inputbrokerEventCcw": {
+      "label": "Moturs inmatningshändelse",
+      "description": "Välj inmatningshändelse."
+    },
+    "inputbrokerEventPress": {
+      "label": "Inmatningshändelse för tryck",
+      "description": "Välj inmatningshändelse."
+    },
+    "updown1Enabled": {
+      "label": "Upp/ned aktiverad",
+      "description": "Aktivera upp/ner vridomkopplaren"
+    },
+    "allowInputSource": {
+      "label": "Tillåten inmatningskälla",
+      "description": "Välj från: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
+    },
+    "sendBell": {
+      "label": "Skicka klocka",
+      "description": "Skickar det speciella klock-tecknet med varje meddelande"
+    }
+  },
+  "detectionSensor": {
+    "title": "Inställningar för detekteringssensor",
+    "description": "Inställningar för detekteringssensor-modulen",
+    "enabled": {
+      "label": "Aktiverad",
+      "description": "Aktivera eller inaktivera detekteringssensor-modulen"
+    },
+    "minimumBroadcastSecs": {
+      "label": "Minsta sändningsintervall",
+      "description": "Tidsintervall i sekunder hur ofta vi kan skicka ett meddelande till nätet när en tillståndsändring upptäckts"
+    },
+    "stateBroadcastSecs": {
+      "label": "Högsta sändningsintervall",
+      "description": "Tidsintervall i sekunder hur ofta vi ska skicka ett meddelande till nätet med nuvarande tillstånd oavsett eventuella förändringar"
+    },
+    "sendBell": {
+      "label": "Skicka klocka",
+      "description": "Skicka det speciella klock-tecknet med meddelandet"
+    },
+    "name": {
+      "label": "Visningsnamn",
+      "description": "Används för att formatera meddelandet som skickas till nätet, max 20 tecken"
+    },
+    "monitorPin": {
+      "label": "Stift att övervaka",
+      "description": "GPIO-stiftet att övervaka för tillståndsändringar"
+    },
+    "detectionTriggerType": {
+      "label": "Typ för utlösande händelse",
+      "description": "Typ av utlösande händelse som ska användas"
+    },
+    "usePullup": {
+      "label": "Använd Pullup",
+      "description": "Huruvida INPUT_PULLUP-läget ska användas för GPIO-stiftet "
+    }
+  },
+  "externalNotification": {
+    "title": "Inställningar för extern avisering",
+    "description": "Konfigurera modulen för extern avisering",
+    "enabled": {
+      "label": "Modul aktiverad",
+      "description": "Aktivera extern avisering"
+    },
+    "outputMs": {
+      "label": "Längd",
+      "description": "Hur länge ska notifikationen vara aktiverad"
+    },
+    "output": {
+      "label": "Utgång",
+      "description": "GPIO-stift för utgång"
+    },
+    "outputVibra": {
+      "label": "Vibrationsutgång",
+      "description": "GPIO-stift för vibrationsutgång"
+    },
+    "outputBuzzer": {
+      "label": "Summerutgång",
+      "description": "GPIO-stift för summerutgång"
+    },
+    "active": {
+      "label": "Aktiv",
+      "description": "Aktiv"
+    },
+    "alertMessage": {
+      "label": "Meddelande-utgång",
+      "description": "Aktivera utgång när nytt meddelande tas emot"
+    },
+    "alertMessageVibra": {
+      "label": "Meddelande-vibrationsutgång",
+      "description": "Aktivera vibrationsutgång när nytt meddelande tas emot"
+    },
+    "alertMessageBuzzer": {
+      "label": "Meddelande-summer",
+      "description": "Aktivera summerutgång när nytt meddelande tas emot"
+    },
+    "alertBell": {
+      "label": "Klock-tecken-utgång",
+      "description": "Aktivera utgång när ett inkommande meddelande innehåller det speciella klock-tecknet?"
+    },
+    "alertBellVibra": {
+      "label": "Klock-tecken-vibration",
+      "description": "Aktivera vibrationsutgång när ett inkommande meddelande innehåller det speciella klock-tecknet"
+    },
+    "alertBellBuzzer": {
+      "label": "Klock-tecken-summer",
+      "description": "Aktivera summerutgång när ett inkommande meddelande innehåller det speciella klock-tecknet"
+    },
+    "usePwm": {
+      "label": "Använd PWM",
+      "description": "Använd pulsbreddsmodulering (PWM)"
+    },
+    "nagTimeout": {
+      "label": "Time-out för påminnelse",
+      "description": "Time-out för påminnelse"
+    },
+    "useI2sAsBuzzer": {
+      "label": "Använd I²S-stift som summer",
+      "description": "Ange I²S-stift som summerutgång"
+    }
+  },
+  "mqtt": {
+    "title": "MQTT Inställningar",
+    "description": "Inställningar för MQTT-modulen",
+    "enabled": {
+      "label": "Aktiverad",
+      "description": "Aktivera eller inaktivera MQTT"
+    },
+    "address": {
+      "label": "MQTT-serveradress",
+      "description": "MQTT-serveradress att använda för standard/anpassade servrar"
+    },
+    "username": {
+      "label": "MQTT-användarnamn",
+      "description": "MQTT-användarnamn att använda för standard/anpassade servrar"
+    },
+    "password": {
+      "label": "MQTT-lösenord",
+      "description": "MQTT-lösenord att använda för standard/anpassade servrar"
+    },
+    "encryptionEnabled": {
+      "label": "Aktivera kryptering ",
+      "description": "Aktivera eller inaktivera MQTT-kryptering. OBS: Alla meddelanden skickas okrypterade till MQTT-servern om det här alternativet inte är aktiverat, även när dina kanaler med aktiverad MQTT-upplänk har krypteringsnycklar. Detta inkluderar positionsdata."
+    },
+    "jsonEnabled": {
+      "label": "JSON aktiverat",
+      "description": "Om du vill skicka/ta emot JSON-paket på MQTT"
+    },
+    "tlsEnabled": {
+      "label": "TLS aktiverat",
+      "description": "Aktivera eller inaktivera TLS"
+    },
+    "root": {
+      "label": "Rotämne (root topic)",
+      "description": "MQTT rotämne (root topic) att använda för standard/anpassade servrar "
+    },
+    "proxyToClientEnabled": {
+      "label": "MQTT-klientproxy aktiverad",
+      "description": "Utnyttja nätverksanslutningen för att vidarebefodra MQTT-meddelanden till klienten."
+    },
+    "mapReportingEnabled": {
+      "label": "Kartrapportering aktiverad",
+      "description": "Din nod kommer periodvis skicka ett okrypterat paket till den konfigurerade MQTT-servern som inkluderar id, kort och långt namn, ungefärlig plats, hardvarumodell, enhetsroll, mjukvaru-version, LoRa-region, modeminställning och den primära kanalens namn."
+    },
+    "mapReportSettings": {
+      "publishIntervalSecs": {
+        "label": "Intervall för kartrapportering",
+        "description": "Intervall i sekunder för hur ofta kartrapportering ska ske"
+      },
+      "positionPrecision": {
+        "label": "Ungefärlig plats",
+        "description": "Den delade platsen kommer att avrundas till denna noggrannhet",
+        "options": {
+          "metric_km23": "Inom 23 km",
+          "metric_km12": "Inom 12 km",
+          "metric_km5_8": "Inom 5,8 km",
+          "metric_km2_9": "Inom 2,9 km",
+          "metric_km1_5": "Inom 1,5 km",
+          "metric_m700": "Inom 700 m",
+          "metric_m350": "Inom 350 m",
+          "metric_m200": "Inom 200 m",
+          "metric_m90": "Inom 90 meter",
+          "metric_m50": "inom 50 m",
+          "imperial_mi15": "Inom 15 engelska mil",
+          "imperial_mi7_3": "Inom 7,3 engelska mil",
+          "imperial_mi3_6": "Inom 3,6 engelska mil",
+          "imperial_mi1_8": "Inom 1,8 engelska mil",
+          "imperial_mi0_9": "Inom 0,9 engelska mil",
+          "imperial_mi0_5": "Inom 0,5 engelska mil",
+          "imperial_mi0_2": "Inom 0,2 engelska mil",
+          "imperial_ft600": "Inom 600 fot",
+          "imperial_ft300": "Inom 300 fot",
+          "imperial_ft150": "Inom 150 fot"
+        }
+      }
+    }
+  },
+  "neighborInfo": {
+    "title": "Inställningar för granninformation",
+    "description": "Inställningar för granninformation-modulen",
+    "enabled": {
+      "label": "Aktiverad",
+      "description": "Aktivera eller inaktivera granninformation-modulen"
+    },
+    "updateInterval": {
+      "label": "Uppdateringsintervall",
+      "description": "Intervall i sekunder av hur ofta granninformation ska försöka skickas till nätet"
+    }
+  },
+  "paxcounter": {
+    "title": "Inställningar för Paxcounter",
+    "description": "Inställningar för Paxcounter-modulen",
+    "enabled": {
+      "label": "Modul aktiverad",
+      "description": "Aktivera Paxcounter"
+    },
+    "paxcounterUpdateInterval": {
+      "label": "Uppdateringsintervall (sekunder)",
+      "description": "Hur lång tid mellan paxcounter paket skickas"
+    },
+    "wifiThreshold": {
+      "label": "Tröskelvärde för WiFi RSSI ",
+      "description": "På vilken WiFi RSSI-nivå ska räknaren öka. Standardvärdet är -80."
+    },
+    "bleThreshold": {
+      "label": "Tröskelvärde för Bluetooth RSSI ",
+      "description": "På vilken Bluetooth RSSI-nivå ska räknaren öka. Standardvärdet är -80."
+    }
+  },
+  "rangeTest": {
+    "title": "Inställningar för räckviddstest",
+    "description": "Inställningar för räckviddstest-modulen",
+    "enabled": {
+      "label": "Modul aktiverad",
+      "description": "Aktivera räckviddstest"
+    },
+    "sender": {
+      "label": "Meddelandeintervall",
+      "description": "Hur lång tid mellan utsändning av testpaket"
+    },
+    "save": {
+      "label": "Spara CSV till lagring",
+      "description": "Spara CSV till enhetens egna flashminne. Endast tillgängligt på ESP32-enheter."
+    }
+  },
+  "serial": {
+    "title": "Inställningar för seriell kommunikation",
+    "description": "Inställningar för den seriella modulen",
+    "enabled": {
+      "label": "Modul aktiverad",
+      "description": "Aktivera seriell utmatning"
+    },
+    "echo": {
+      "label": "Eko",
+      "description": "Alla paket du skickar kommer att upprepas tillbaka till din enhet"
+    },
+    "rxd": {
+      "label": "Stift för mottagning",
+      "description": "Ställ in GPIO-stift till det RXD-stift du har konfigurerat."
+    },
+    "txd": {
+      "label": "Stift för sändning",
+      "description": "Ställ in GPIO-stift till det TXD-stift du har konfigurerat."
+    },
+    "baud": {
+      "label": "Hastighet",
+      "description": "Den seriella kommunikationens hastighet"
+    },
+    "timeout": {
+      "label": "Timeout",
+      "description": "Tid att vänta innan ditt paket betraktas som \"klart\"."
+    },
+    "mode": {
+      "label": "Typ",
+      "description": "Välj typ av paket"
+    },
+    "overrideConsoleSerialPort": {
+      "label": "Åsidosätt konsolens serieport",
+      "description": "Om du har en seriell port ansluten till konsolen kommer detta att ersätta den."
+    }
+  },
+  "storeForward": {
+    "title": "Inställningar för lagra & vidarebefodra",
+    "description": "Inställningar för lagra & vidarebefodra-modulen",
+    "enabled": {
+      "label": "Modul aktiverad",
+      "description": "Aktivera lagra & vidarebefodra-modulen"
+    },
+    "heartbeat": {
+      "label": "Puls aktiverad",
+      "description": "Aktivera sändning av lagra & vidarebefodra-puls "
+    },
+    "records": {
+      "label": "Antal poster",
+      "description": "Antal poster att lagra"
+    },
+    "historyReturnMax": {
+      "label": "Maxstorlek för historik",
+      "description": "Maximalt antal poster att returnera"
+    },
+    "historyReturnWindow": {
+      "label": "Returfönstrets storlek för historik",
+      "description": "Maximalt antal poster att returnera"
+    }
+  },
+  "telemetry": {
+    "title": "Inställningar för telemetri",
+    "description": "Inställningar för telemetrimodulen",
+    "deviceUpdateInterval": {
+      "label": "Enhetens mätvärden",
+      "description": "Uppdateringsintervall för enhetsdata"
+    },
+    "environmentUpdateInterval": {
+      "label": "Uppdateringsintervall för miljömätningar",
+      "description": ""
+    },
+    "environmentMeasurementEnabled": {
+      "label": "Modul aktiverad",
+      "description": "Aktivera miljötelemetri"
+    },
+    "environmentScreenEnabled": {
+      "label": "Visa på display",
+      "description": "Visa telemetri-värden på OLED-displayen"
+    },
+    "environmentDisplayFahrenheit": {
+      "label": "Visa Fahrenheit",
+      "description": "Visa temperatur i Fahrenheit"
+    },
+    "airQualityEnabled": {
+      "label": "Aktivera luftkvalitet ",
+      "description": "Aktivera telemetri för luftkvalitet"
+    },
+    "airQualityInterval": {
+      "label": "Intervall för uppdatering av luftkvalitet",
+      "description": "Hur ofta att skicka data om luftkvalitet över nätet"
+    },
+    "powerMeasurementEnabled": {
+      "label": "Effektmätning aktiverad",
+      "description": "Aktivera telemetri för effektmätning"
+    },
+    "powerUpdateInterval": {
+      "label": "Intervall för effektuppdatering",
+      "description": "Hur ofta ska effektdata skickas över nätet"
+    },
+    "powerScreenEnabled": {
+      "label": "Aktivera strömskärm",
+      "description": "Aktivera skärmen för strömdata"
+    }
+  }
+}
