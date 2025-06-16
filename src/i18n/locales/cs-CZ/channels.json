@@ -1,15 +1,15 @@
 {
   "page": {
-    "sectionLabel": "Channels",
+    "sectionLabel": "Kanály",
     "channelName": "Channel: {{channelName}}",
-    "broadcastLabel": "Primary",
+    "broadcastLabel": "Primární",
     "channelIndex": "Ch {{index}}"
   },
   "validation": {
     "pskInvalid": "Please enter a valid {{bits}} bit PSK."
   },
   "settings": {
-    "label": "Channel Settings",
+    "label": "Nastavení kanálu",
     "description": "Crypto, MQTT & misc settings"
   },
   "role": {
@@ -27,7 +27,7 @@
     "generate": "Generate"
   },
   "name": {
-    "label": "Name",
+    "label": "Jméno",
     "description": "A unique name for the channel <12 bytes, leave blank for default"
   },
   "uplinkEnabled": {

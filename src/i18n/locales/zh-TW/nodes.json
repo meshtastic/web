@@ -10,7 +10,7 @@
       "label": "Direct Message {{shortName}}"
     },
     "favorite": {
-      "label": "Favorite"
+      "label": "收藏"
     },
     "notFavorite": {
       "label": "Not a Favorite"
@@ -39,7 +39,7 @@
       "macAddress": "MAC Address"
     },
     "connectionStatus": {
-      "direct": "Direct",
+      "direct": "直線",
       "away": "away",
       "unknown": "-",
       "viaMqtt": ", via MQTT"

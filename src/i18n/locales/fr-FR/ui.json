@@ -2,12 +2,12 @@
   "navigation": {
     "title": "Navigation",
     "messages": "Messages",
-    "map": "Map",
+    "map": "Carte",
     "config": "Config",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
-    "nodes": "Nodes"
+    "channels": "Canaux",
+    "nodes": "Noeuds"
   },
   "app": {
     "title": "Meshtastic",
@@ -38,7 +38,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "title": "Batterie"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -90,32 +90,32 @@
       "label": "Copy to clipboard"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "Masquer le mot de passe"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "Afficher le mot de passe"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
       "failed": "Delivery Failed",
-      "waiting": "Waiting",
-      "unknown": "Unknown"
+      "waiting": "En attente . . .",
+      "unknown": "Inconnu"
     }
   },
   "general": {
     "label": "General"
   },
   "hardware": {
-    "label": "Hardware"
+    "label": "Matériel"
   },
   "metrics": {
     "label": "Metrics"
   },
   "role": {
-    "label": "Role"
+    "label": "Rôle"
   },
   "filter": {
-    "label": "Filter"
+    "label": "Filtre"
   },
   "clearInput": {
     "label": "Clear input"
@@ -136,18 +136,18 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "title": "Tension"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
   },
   "hops": {
-    "direct": "Direct",
+    "direct": "Direk",
     "label": "Number of hops",
     "text": "Number of hops: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
+    "label": "Dernière écoute",
     "labelText": "Last heard: {{value}}",
     "nowLabel": "Now"
   },
@@ -167,12 +167,12 @@
     "label": "Connected via MQTT"
   },
   "language": {
-    "label": "Language",
+    "label": "Langue",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "Sombre",
+    "light": "Clair",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

@@ -1,8 +1,8 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
+    "messages": "Повідомлення",
+    "map": "Мапа",
     "config": "Config",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
@@ -115,7 +115,7 @@
     "label": "Role"
   },
   "filter": {
-    "label": "Filter"
+    "label": "Фільтри"
   },
   "clearInput": {
     "label": "Clear input"
@@ -167,12 +167,12 @@
     "label": "Connected via MQTT"
   },
   "language": {
-    "label": "Language",
+    "label": "Мова",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "Темна",
+    "light": "Світла",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

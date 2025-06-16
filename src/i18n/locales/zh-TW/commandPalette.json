@@ -12,24 +12,24 @@
   "goto": {
     "label": "Goto",
     "command": {
-      "messages": "Messages",
-      "map": "Map",
+      "messages": "訊息",
+      "map": "地圖",
       "config": "Config",
-      "channels": "Channels",
-      "nodes": "Nodes"
+      "channels": "頻道",
+      "nodes": "節點"
     }
   },
   "manage": {
     "label": "Manage",
     "command": {
-      "switchNode": "Switch Node",
+      "switchNode": "切換節點",
       "connectNewNode": "Connect New Node"
     }
   },
   "contextual": {
     "label": "Contextual",
     "command": {
-      "qrCode": "QR Code",
+      "qrCode": "QR 代碼",
       "qrGenerator": "Generator",
       "qrImport": "Import",
       "scheduleShutdown": "Schedule Shutdown",
@@ -41,9 +41,9 @@
     }
   },
   "debug": {
-    "label": "Debug",
+    "label": "调试",
     "command": {
-      "reconfigure": "Reconfigure",
+      "reconfigure": "重新設定",
       "clearAllStoredMessages": "Clear All Stored Message"
     }
   }

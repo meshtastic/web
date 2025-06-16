@@ -27,7 +27,7 @@
     "generate": "Generate"
   },
   "name": {
-    "label": "Name",
+    "label": "Ім'я",
     "description": "A unique name for the channel <12 bytes, leave blank for default"
   },
   "uplinkEnabled": {

@@ -36,10 +36,10 @@
     "http": "http",
     "tabHttp": "HTTP",
     "tabBluetooth": "Bluetooth",
-    "tabSerial": "Serial",
+    "tabSerial": "Serieel",
     "useHttps": "Use HTTPS",
     "connecting": "Connecting...",
-    "connect": "Connect",
+    "connect": "Verbinding maken",
     "connectionFailedAlert": {
       "title": "Connection Failed",
       "descriptionPrefix": "Could not connect to the device. ",
@@ -69,7 +69,7 @@
     }
   },
   "nodeDetails": {
-    "message": "Message",
+    "message": "Bericht",
     "requestPosition": "Request Position",
     "traceRoute": "Trace Route",
     "airTxUtilization": "Air TX utilization",
@@ -85,7 +85,7 @@
     "position": "Position:",
     "role": "Role: ",
     "uptime": "Uptime: ",
-    "voltage": "Voltage",
+    "voltage": "Spanning",
     "title": "Node Details for {{identifier}}",
     "ignoreNode": "Ignore node",
     "removeNode": "Remove node",
@@ -154,6 +154,6 @@
     "preamble": "I have read the ",
     "choosingRightDeviceRole": "Choosing The Right Device Role",
     "deviceRoleDocumentation": "Device Role Documentation",
-    "title": "Are you sure?"
+    "title": "Weet u het zeker?"
   }
 }

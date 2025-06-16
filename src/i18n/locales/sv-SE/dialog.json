@@ -1,159 +1,159 @@
 {
   "deleteMessages": {
-    "description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-    "title": "Clear All Messages"
+    "description": "Den här åtgärden kommer att rensa all meddelandehistorik. Detta kan inte ångras. Är du säker på att du vill fortsätta?",
+    "title": "Rensa alla meddelanden"
   },
   "deviceName": {
-    "description": "The Device will restart once the config is saved.",
-    "longName": "Long Name",
-    "shortName": "Short Name",
-    "title": "Change Device Name"
+    "description": "Enheten kommer att starta om när inställningarna har sparats.",
+    "longName": "Långt namn",
+    "shortName": "Kort namn",
+    "title": "Ändra enhetens namn"
   },
   "import": {
-    "description": "The current LoRa configuration will be overridden.",
+    "description": "Den aktuella LoRa konfigurationen kommer att skrivas över.",
     "error": {
-      "invalidUrl": "Invalid Meshtastic URL"
+      "invalidUrl": "Ogiltig Meshtastic URL"
     },
-    "channelPrefix": "Channel: ",
-    "channelSetUrl": "Channel Set/QR Code URL",
-    "channels": "Channels:",
-    "usePreset": "Use Preset?",
-    "title": "Import Channel Set"
+    "channelPrefix": "Kanal: ",
+    "channelSetUrl": "Kanalinställning/QR-kod URL",
+    "channels": "Kanaler:",
+    "usePreset": "Använd förinställning?",
+    "title": "Importera kanaluppsättning"
   },
   "locationResponse": {
-    "altitude": "Altitude: ",
-    "coordinates": "Coordinates: ",
-    "title": "Location: {{identifier}}"
+    "altitude": "Höjd:",
+    "coordinates": "Koordinater: ",
+    "title": "Plats: {{identifier}}"
   },
   "pkiRegenerateDialog": {
-    "title": "Regenerate Pre-Shared Key?",
-    "description": "Are you sure you want to regenerate the pre-shared key?",
-    "regenerate": "Regenerate"
+    "title": "Förnya nyckel?",
+    "description": "Är du säker på att du vill förnya den fördelade nyckeln?",
+    "regenerate": "Förnya"
   },
   "newDeviceDialog": {
-    "title": "Connect New Device",
+    "title": "Anslut ny enhet",
     "https": "https",
     "http": "http",
     "tabHttp": "HTTP",
     "tabBluetooth": "Bluetooth",
-    "tabSerial": "Serial",
-    "useHttps": "Use HTTPS",
-    "connecting": "Connecting...",
-    "connect": "Connect",
+    "tabSerial": "Seriell kommunikation",
+    "useHttps": "Använd HTTPS",
+    "connecting": "Ansluter...",
+    "connect": "Anslut",
     "connectionFailedAlert": {
-      "title": "Connection Failed",
-      "descriptionPrefix": "Could not connect to the device. ",
-      "httpsHint": "If using HTTPS, you may need to accept a self-signed certificate first. ",
-      "openLinkPrefix": "Please open ",
-      "openLinkSuffix": " in a new tab",
-      "acceptTlsWarningSuffix": ", accept any TLS warnings if prompted, then try again",
-      "learnMoreLink": "Learn more"
+      "title": "Anslutningen misslyckades",
+      "descriptionPrefix": "Kunde inte ansluta till enheten. ",
+      "httpsHint": "Om du använder HTTPS kan du behöva godkänna ett självsignerat certifikat först. ",
+      "openLinkPrefix": "Vänligen öppna ",
+      "openLinkSuffix": " i en ny flik",
+      "acceptTlsWarningSuffix": ", acceptera eventuella TLS-varningar om du uppmanas och försök igen",
+      "learnMoreLink": "Läs mer"
     },
     "httpConnection": {
-      "label": "IP Address/Hostname",
-      "placeholder": "000.000.000.000 / meshtastic.local"
+      "label": "IP-adress/värdnamn",
+      "placeholder": "000.000.000.000 / meshtastic.lokal"
     },
     "serialConnection": {
-      "noDevicesPaired": "No devices paired yet.",
-      "newDeviceButton": "New device",
+      "noDevicesPaired": "Inga enheter parkopplade ännu.",
+      "newDeviceButton": "Ny enhet",
       "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
     },
     "bluetoothConnection": {
-      "noDevicesPaired": "No devices paired yet.",
-      "newDeviceButton": "New device"
+      "noDevicesPaired": "Inga enheter parkopplade ännu.",
+      "newDeviceButton": "Ny enhet"
     },
     "validation": {
-      "requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
-      "requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
-      "additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
+      "requiresFeatures": "Den här anslutningstypen kräver <0></0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
+      "requiresSecureContext": "Denna applikation kräver en <0>säker kontext</0>. Anslut med HTTPS eller localhost.",
+      "additionallyRequiresSecureContext": "Dessutom kräver den ett <0>säker kontext</0>. Vänligen anslut med HTTPS eller localhost."
     }
   },
   "nodeDetails": {
-    "message": "Message",
-    "requestPosition": "Request Position",
-    "traceRoute": "Trace Route",
-    "airTxUtilization": "Air TX utilization",
-    "allRawMetrics": "All Raw Metrics:",
-    "batteryLevel": "Battery level",
-    "channelUtilization": "Channel utilization",
-    "details": "Details:",
-    "deviceMetrics": "Device Metrics:",
-    "hardware": "Hardware: ",
-    "lastHeard": "Last Heard: ",
-    "nodeHexPrefix": "Node Hex: !",
-    "nodeNumber": "Node Number: ",
-    "position": "Position:",
-    "role": "Role: ",
-    "uptime": "Uptime: ",
-    "voltage": "Voltage",
-    "title": "Node Details for {{identifier}}",
-    "ignoreNode": "Ignore node",
-    "removeNode": "Remove node",
-    "unignoreNode": "Unignore node"
+    "message": "Meddelande",
+    "requestPosition": "Begär plats",
+    "traceRoute": "Spåra rutt",
+    "airTxUtilization": "Sändningsutnyttjande",
+    "allRawMetrics": "All oformaterad data",
+    "batteryLevel": "Batterinivå",
+    "channelUtilization": "Kanalutnyttjande",
+    "details": "Detaljer:",
+    "deviceMetrics": "Enhetens mätvärden:",
+    "hardware": "Hårdvara: ",
+    "lastHeard": "Senast hörd: ",
+    "nodeHexPrefix": "Nod-hex: !",
+    "nodeNumber": "Nodnummer: ",
+    "position": "Plats:",
+    "role": "Roll: ",
+    "uptime": "Drifttid: ",
+    "voltage": "Spänning",
+    "title": "Nodinformation för {{identifier}}",
+    "ignoreNode": "Ignorera nod",
+    "removeNode": "Ta bort nod",
+    "unignoreNode": "Ta bort favoritmarkering"
   },
   "pkiBackup": {
-    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
-    "loseKeysWarning": "If you lose your keys, you will need to reset your device.",
-    "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
+    "description": "Vi rekommenderar att du säkerhetskopierar dina nycklar regelbundet. Vill du säkerhetskopiera nu?",
+    "loseKeysWarning": "Om du förlorar dina nycklar måste du återställa din enhet.",
+    "secureBackup": "Det är viktigt att säkerhetskopiera dina publika och privata nycklar och förvara din säkerhetskopia säkert.",
     "footer": "=== END OF KEYS ===",
     "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-    "privateKey": "Private Key:",
-    "publicKey": "Public Key:",
+    "privateKey": "Privat nyckel:",
+    "publicKey": "Publik nyckel:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-    "title": "Backup Keys"
+    "title": "Säkerhetskopiera nycklar"
   },
   "pkiRegenerate": {
-    "description": "Are you sure you want to regenerate key pair?",
-    "title": "Regenerate Key Pair"
+    "description": "Är du säker på att du vill förnya nyckelpar?",
+    "title": "Förnya nyckelpar"
   },
   "qr": {
-    "addChannels": "Add Channels",
-    "replaceChannels": "Replace Channels",
-    "description": "The current LoRa configuration will also be shared.",
-    "sharableUrl": "Sharable URL",
-    "title": "Generate QR Code"
+    "addChannels": "Lägg till kanaler",
+    "replaceChannels": "Ersätt kanaler",
+    "description": "Den aktuella LoRa-konfigurationen kommer också att delas.",
+    "sharableUrl": "Delbar URL",
+    "title": "Generera QR-kod"
   },
   "rebootOta": {
-    "title": "Schedule Reboot",
-    "description": "Reboot the connected node after a delay into OTA (Over-the-Air) mode.",
-    "enterDelay": "Enter delay (sec)",
-    "scheduled": "Reboot has been scheduled"
+    "title": "Schemalägg omstart",
+    "description": "Starta om den anslutna noden till OTA- (Over-the-Air) läge efter en fördröjning.",
+    "enterDelay": "Ange fördröjning (sekunder)",
+    "scheduled": "Omstart har schemalagts"
   },
   "reboot": {
-    "title": "Schedule Reboot",
-    "description": "Reboot the connected node after x minutes."
+    "title": "Schemalägg omstart",
+    "description": "Starta om den anslutna noden efter x minuter."
   },
   "refreshKeys": {
     "description": {
-      "acceptNewKeys": "This will remove the node from device and request new keys.",
-      "keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
-      "unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
+      "acceptNewKeys": "Detta kommer att ta bort noden från enheten och begära nya nycklar.",
+      "keyMismatchReasonSuffix": ". Detta beror på att fjärrnodens nuvarande publika nyckel inte matchar den tidigare lagrade nyckeln för den här noden.",
+      "unableToSendDmPrefix": "Din nod kan inte skicka ett direkt meddelande till noden: "
     },
-    "acceptNewKeys": "Accept New Keys",
-    "title": "Keys Mismatch - {{identifier}}"
+    "acceptNewKeys": "Godkänn nya nycklar",
+    "title": "Nycklarna matchar inte - {{identifier}}"
   },
   "removeNode": {
-    "description": "Are you sure you want to remove this Node?",
-    "title": "Remove Node?"
+    "description": "Är du säker på att du vill ta bort den här noden?",
+    "title": "Ta bort noden?"
   },
   "shutdown": {
-    "title": "Schedule Shutdown",
-    "description": "Turn off the connected node after x minutes."
+    "title": "Schemalägg avstängning",
+    "description": "Stäng av den anslutna noden efter x minuter."
   },
   "traceRoute": {
-    "routeToDestination": "Route to destination:",
-    "routeBack": "Route back:"
+    "routeToDestination": "Rutt till destination:",
+    "routeBack": "Rutt tillbaka:"
   },
   "tracerouteResponse": {
-    "title": "Traceroute: {{identifier}}"
+    "title": "Spåra rutt: {{identifier}}"
   },
   "unsafeRoles": {
-    "confirmUnderstanding": "Yes, I know what I'm doing",
-    "conjunction": " and the blog post about ",
-    "postamble": " and understand the implications of changing the role.",
-    "preamble": "I have read the ",
-    "choosingRightDeviceRole": "Choosing The Right Device Role",
-    "deviceRoleDocumentation": "Device Role Documentation",
-    "title": "Are you sure?"
+    "confirmUnderstanding": "Ja, jag vet vad jag gör",
+    "conjunction": " och blogginlägget om ",
+    "postamble": " och förstår konsekvenserna av att ändra roll.",
+    "preamble": "Jag har läst ",
+    "choosingRightDeviceRole": "Att välja rätt enhetsroll",
+    "deviceRoleDocumentation": "Dokumentation för enhetsroll",
+    "title": "Är du säker?"
   }
 }

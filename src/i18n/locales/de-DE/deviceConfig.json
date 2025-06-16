@@ -219,7 +219,7 @@
       "label": "Gateway"
     },
     "ip": {
-      "description": "IP Address",
+      "description": "IP Adresse",
       "label": "IP"
     },
     "psk": {
@@ -381,11 +381,11 @@
     "title": "Sicherheitseinstellungen",
     "button_backupKey": "Schlüssel sichern",
     "adminChannelEnabled": {
-      "description": "Allow incoming device control over the insecure legacy admin channel",
+      "description": "Erlaubt die Gerätesteuerung über den unsicheren, veralteten administrativen Kanal",
       "label": "Veraltete Administrierung erlauben"
     },
     "enableDebugLogApi": {
-      "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+      "description": "Ausgabe von Fehlerprotokollen in Echtzeit über die serielle Schnittstelle, Anzeige und Export von Standort reduzierten Geräteprotokollen über Bluetooth",
       "label": "Debug-Protokoll API aktivieren"
     },
     "managed": {
@@ -397,23 +397,23 @@
       "label": "Privater Schlüssel"
     },
     "publicKey": {
-      "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+      "description": "Wird an andere Knoten im Netz gesendet, damit diese einen gemeinsamen geheimen Schlüssel berechnen können",
       "label": "Öffentlicher Schlüssel"
     },
     "primaryAdminKey": {
-      "description": "The primary public key authorized to send admin messages to this node",
+      "description": "Erster öffentlicher Schlüssel, der berechtigt ist, administrative Nachrichten an diesen Knoten zu senden",
       "label": "Erster Admin-Schlüssel"
     },
     "secondaryAdminKey": {
-      "description": "The secondary public key authorized to send admin messages to this node",
+      "description": "Zweiter öffentlicher Schlüssel, der berechtigt ist, administrative Nachrichten an diesen Knoten zu senden",
       "label": "Zweiter Admin-Schlüssel"
     },
     "serialOutputEnabled": {
-      "description": "Serial Console over the Stream API",
+      "description": "Serielle Konsole über die Stream-API",
       "label": "Serielle Ausgabe aktiviert"
     },
     "tertiaryAdminKey": {
-      "description": "The tertiary public key authorized to send admin messages to this node",
+      "description": "Dritter öffentlicher Schlüssel, der berechtigt ist, administrative Nachrichten an diesen Knoten zu senden",
       "label": "Dritter Admin-Schlüssel"
     },
     "adminSettings": {

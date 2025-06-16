@@ -53,67 +53,67 @@
     },
     "minute": {
       "one": "Minute",
-      "plural": "Minutes"
+      "plural": "Minuten"
     },
     "millisecond": {
-      "one": "Millisecond",
-      "plural": "Milliseconds",
+      "one": "Millisekunde",
+      "plural": "Millisekunden",
       "suffix": "ms"
     },
     "second": {
-      "one": "Second",
-      "plural": "Seconds"
+      "one": "Sekunde",
+      "plural": "Sekunden"
     },
     "snr": "SNR",
     "volt": {
       "one": "Volt",
-      "plural": "Volts",
+      "plural": "Volt",
       "suffix": "V"
     },
     "record": {
-      "one": "Records",
-      "plural": "Records"
+      "one": "Datensatz",
+      "plural": "Datensätze"
     }
   },
   "security": {
-    "256bit": "256 bit"
+    "256bit": "256 Bit"
   },
   "unknown": {
-    "longName": "Unknown",
-    "shortName": "UNK",
-    "notAvailable": "N/A",
-    "num": "??"
+    "longName": "Unbekannt",
+    "shortName": "UNB",
+    "notAvailable": "Keine Angaben",
+    "num": "???"
   },
   "nodeUnknownPrefix": "!",
-  "unset": "UNSET",
+  "unset": "NICHT GESETZT",
   "fallbackName": "Meshtastic {{last4}}",
   "formValidation": {
     "tooBig": {
-      "string": "Too long, expected less than or equal to {{maximum}} characters.",
-      "number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-      "bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+      "string": "Zu lang, erwarte maximal {{maximum}} Zeichen.",
+      "number": "Zu groß, erwartete eine Zahl kleiner oder gleich {{maximum}}.",
+      "bytes": "Zu groß, erwarte maximal {{params.maximum}} Bytes."
     },
     "tooSmall": {
-      "string": "Too short, expected more than or equal to {{minimum}} characters.",
-      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+      "string": "Zu kurz, erwartete mindestens {{minimum}} Zeichen.",
+      "number": "Zu klein, erwartete eine Zahl größer oder gleich {{minimum}}."
     },
     "invalidFormat": {
-      "ipv4": "Invalid format, expected an IPv4 address.",
-      "key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+      "ipv4": "Ungültiges Format, erwartete eine IPv4 Adresse.",
+      "key": "Ungültiges Format, erwartet einen Base64-kodierten vor verteilten Schlüssel (PSK)."
     },
     "invalidType": {
-      "number": "Invalid type, expected a number."
+      "number": "Ungültiger Typ, erwartete eine Zahl."
     },
     "pskLength": {
-      "0bit": "Key is required to be empty.",
-      "8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-      "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-      "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+      "0bit": "Der Schlüssel muss leer sein.",
+      "8bit": "Der administrative Schlüssel muss ein vor verteilter 8 Bit Schlüssel (PSK) sein.",
+      "128bit": "Der administrative Schlüssel muss ein vor verteilter 128 Bit Schlüssel (PSK) sein.",
+      "256bit": "Der administrative Schlüssel muss ein vor verteilter 256 Bit Schlüssel (PSK) sein."
     },
     "required": {
-      "generic": "This field is required.",
-      "managed": "At least one admin key is requred if the node is managed.",
-      "key": "Key is required."
+      "generic": "Dies ist ein Pflichtfeld.",
+      "managed": "Mindestens ein administrativer Schlüssel wird benötigt, um diesen Knoten zu verwalten",
+      "key": "Schlüssel erforderlich."
     }
   }
 }

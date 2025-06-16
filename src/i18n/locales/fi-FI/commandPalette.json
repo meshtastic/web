@@ -1,50 +1,50 @@
 {
-  "emptyState": "No results found.",
+  "emptyState": "Tuloksia ei löytynyt.",
   "page": {
-    "title": "Command Menu"
+    "title": "Komentovalikko"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "label": "Kiinnitä komentoryhmä"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "label": "Irroita komentoryhmä"
   },
   "goto": {
-    "label": "Goto",
+    "label": "Siirry",
     "command": {
-      "messages": "Messages",
-      "map": "Map",
-      "config": "Config",
-      "channels": "Channels",
-      "nodes": "Nodes"
+      "messages": "Viestit",
+      "map": "Kartta",
+      "config": "Asetukset",
+      "channels": "Kanavat",
+      "nodes": "Laitteet"
     }
   },
   "manage": {
-    "label": "Manage",
+    "label": "Hallinnoi",
     "command": {
-      "switchNode": "Switch Node",
-      "connectNewNode": "Connect New Node"
+      "switchNode": "Vaihda laitetta",
+      "connectNewNode": "Yhdistä uusi laite"
     }
   },
   "contextual": {
-    "label": "Contextual",
+    "label": "Kontekstin mukainen",
     "command": {
-      "qrCode": "QR Code",
-      "qrGenerator": "Generator",
-      "qrImport": "Import",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Schedule Reboot",
-      "rebootToOtaMode": "Reboot To OTA Mode",
-      "resetNodeDb": "Reset Node DB",
-      "factoryResetDevice": "Factory Reset Device",
-      "factoryResetConfig": "Factory Reset Config"
+      "qrCode": "QR-koodi",
+      "qrGenerator": "QR-koodigeneraattori",
+      "qrImport": "Tuo",
+      "scheduleShutdown": "Ajasta sammutus",
+      "scheduleReboot": "Ajasta uudelleenkäynnistys",
+      "rebootToOtaMode": "Uudelleenkäynnistä OTA-tilaan",
+      "resetNodeDb": "Nollaa laitteen DB-tietokanta",
+      "factoryResetDevice": "Palauta tehdasasetukset",
+      "factoryResetConfig": "Tehdasasetusten palautusasetukset"
     }
   },
   "debug": {
-    "label": "Debug",
+    "label": "Vianetsintä",
     "command": {
-      "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "reconfigure": "Määritä uudelleen",
+      "clearAllStoredMessages": "Tyhjennä kaikki tallennetut viesti"
     }
   }
 }

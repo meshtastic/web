@@ -14,15 +14,15 @@
     "error": {
       "invalidUrl": "Ungültige Meshtastic URL"
     },
-    "channelPrefix": "Channel: ",
+    "channelPrefix": "Kanal: ",
     "channelSetUrl": "Kanalsammlung / QR-Code URL",
-    "channels": "Channels:",
+    "channels": "Kanäle:",
     "usePreset": "Voreinstellung verwenden?",
     "title": "Kanalsammlung importieren"
   },
   "locationResponse": {
-    "altitude": "Altitude: ",
-    "coordinates": "Coordinates: ",
+    "altitude": "Höhe: ",
+    "coordinates": "Koordinaten: ",
     "title": "Standort: {{identifier}}"
   },
   "pkiRegenerateDialog": {
@@ -38,7 +38,7 @@
     "tabBluetooth": "Bluetooth",
     "tabSerial": "Seriell",
     "useHttps": "HTTPS verwenden",
-    "connecting": "Connecting...",
+    "connecting": "Wird verbunden...",
     "connect": "Verbindung herstellen",
     "connectionFailedAlert": {
       "title": "Verbindung fehlgeschlagen",
@@ -81,10 +81,10 @@
     "hardware": "Hardware: ",
     "lastHeard": "Zuletzt gehört: ",
     "nodeHexPrefix": "Knoten ID: !",
-    "nodeNumber": "Node Number: ",
-    "position": "Position:",
-    "role": "Role: ",
-    "uptime": "Uptime: ",
+    "nodeNumber": "Knotennummer: ",
+    "position": "Standort:",
+    "role": "Rolle: ",
+    "uptime": "Laufzeit: ",
     "voltage": "Spannung",
     "title": "Knotendetails für {{identifier}}",
     "ignoreNode": "Knoten ignorieren",
@@ -97,8 +97,8 @@
     "secureBackup": "Es ist wichtig, dass Sie Ihre öffentlichen und privaten Schlüssel sichern und diese sicher speichern!",
     "footer": "=== END OF KEYS ===",
     "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-    "privateKey": "Private Key:",
-    "publicKey": "Public Key:",
+    "privateKey": "Privater Schlüssel:",
+    "publicKey": "Öffentlicher Schlüssel:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
     "title": "Schlüssel sichern"
   },

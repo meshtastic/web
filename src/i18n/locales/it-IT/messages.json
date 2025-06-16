@@ -11,11 +11,11 @@
   },
   "sendMessage": {
     "placeholder": "Type your message here...",
-    "sendButton": "Send"
+    "sendButton": "Invia"
   },
   "actionsMenu": {
     "addReactionLabel": "Add Reaction",
-    "replyLabel": "Reply"
+    "replyLabel": "Rispondi"
   },
   "item": {
     "status": {

@@ -1,13 +1,13 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
+    "messages": "Zprávy",
+    "map": "Mapa",
     "config": "Config",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
-    "nodes": "Nodes"
+    "channels": "Kanály",
+    "nodes": "Uzly"
   },
   "app": {
     "title": "Meshtastic",
@@ -38,7 +38,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "title": "Baterie"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -90,10 +90,10 @@
       "label": "Copy to clipboard"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "Skrýt heslo"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "Zobrazit heslo"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
@@ -109,13 +109,13 @@
     "label": "Hardware"
   },
   "metrics": {
-    "label": "Metrics"
+    "label": "Metriky"
   },
   "role": {
     "label": "Role"
   },
   "filter": {
-    "label": "Filter"
+    "label": "Filtr"
   },
   "clearInput": {
     "label": "Clear input"
@@ -136,18 +136,18 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "title": "Napětí"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
   },
   "hops": {
-    "direct": "Direct",
+    "direct": "Přímý",
     "label": "Number of hops",
     "text": "Number of hops: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
+    "label": "Naposledy slyšen",
     "labelText": "Last heard: {{value}}",
     "nowLabel": "Now"
   },
@@ -167,12 +167,12 @@
     "label": "Connected via MQTT"
   },
   "language": {
-    "label": "Language",
+    "label": "Jazyk",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "Tmavý",
+    "light": "Světlý",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

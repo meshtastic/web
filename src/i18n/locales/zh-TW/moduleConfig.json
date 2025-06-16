@@ -1,15 +1,15 @@
 {
   "page": {
-    "tabAmbientLighting": "Ambient Lighting",
-    "tabAudio": "Audio",
+    "tabAmbientLighting": "周圍光照",
+    "tabAudio": "音頻",
     "tabCannedMessage": "Canned",
-    "tabDetectionSensor": "Detection Sensor",
+    "tabDetectionSensor": "檢測傳感器",
     "tabExternalNotification": "Ext Notif",
     "tabMqtt": "MQTT",
-    "tabNeighborInfo": "Neighbor Info",
-    "tabPaxcounter": "Paxcounter",
-    "tabRangeTest": "Range Test",
-    "tabSerial": "Serial",
+    "tabNeighborInfo": "相鄰設備資訊",
+    "tabPaxcounter": "客流量計數",
+    "tabRangeTest": "範圍測試",
+    "tabSerial": "序號",
     "tabStoreAndForward": "S&F",
     "tabTelemetry": "Telemetry"
   },
@@ -21,19 +21,19 @@
       "description": "Sets LED to on or off"
     },
     "current": {
-      "label": "Current",
+      "label": "當前",
       "description": "Sets the current for the LED output. Default is 10"
     },
     "red": {
-      "label": "Red",
+      "label": "紅色",
       "description": "Sets the red LED level. Values are 0-255"
     },
     "green": {
-      "label": "Green",
+      "label": "綠色",
       "description": "Sets the green LED level. Values are 0-255"
     },
     "blue": {
-      "label": "Blue",
+      "label": "藍色",
       "description": "Sets the blue LED level. Values are 0-255"
     }
   },
@@ -249,7 +249,7 @@
       "description": "Enable or disable TLS"
     },
     "root": {
-      "label": "Root topic",
+      "label": "根話題",
       "description": "MQTT root topic to use for default/custom servers"
     },
     "proxyToClientEnabled": {
@@ -365,7 +365,7 @@
       "description": "The serial baud rate"
     },
     "timeout": {
-      "label": "Timeout",
+      "label": "逾時",
       "description": "Seconds to wait before we consider your packet as 'done'"
     },
     "mode": {

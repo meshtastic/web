@@ -11,7 +11,7 @@
   },
   "sendMessage": {
     "placeholder": "Type your message here...",
-    "sendButton": "Send"
+    "sendButton": "Надіслати"
   },
   "actionsMenu": {
     "addReactionLabel": "Add Reaction",

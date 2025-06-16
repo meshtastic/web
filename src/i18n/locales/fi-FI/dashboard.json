@@ -1,12 +1,12 @@
 {
   "dashboard": {
-    "title": "Connected Devices",
-    "description": "Manage your connected Meshtastic devices.",
+    "title": "Yhdistetyt laitteet",
+    "description": "Hallitse yhdistettyjä Meshtastic laitteitasi.",
     "connectionType_ble": "BLE",
-    "connectionType_serial": "Serial",
-    "connectionType_network": "Network",
-    "noDevicesTitle": "No devices connected",
-    "noDevicesDescription": "Connect a new device to get started.",
-    "button_newConnection": "New Connection"
+    "connectionType_serial": "Sarjaliitäntä",
+    "connectionType_network": "Verkko",
+    "noDevicesTitle": "Ei laitteita yhdistettynä",
+    "noDevicesDescription": "Yhdistä uusi laite aloittaaksesi.",
+    "button_newConnection": "Uusi yhteys"
   }
 }

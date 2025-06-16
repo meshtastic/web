@@ -1,48 +1,48 @@
 {
   "page": {
-    "title": "Configuration",
+    "title": "Konfiguration",
     "tabBluetooth": "Bluetooth",
     "tabDevice": "Enhet",
     "tabDisplay": "Display",
     "tabLora": "LoRa",
-    "tabNetwork": "Network",
-    "tabPosition": "Position",
-    "tabPower": "Power",
-    "tabSecurity": "Security"
+    "tabNetwork": "Nätverk",
+    "tabPosition": "Plats",
+    "tabPower": "Ström",
+    "tabSecurity": "Säkerhet"
   },
   "sidebar": {
     "label": "Moduler"
   },
   "device": {
     "title": "Enhetsinställningar",
-    "description": "Settings for the device",
+    "description": "Inställningar för enheten",
     "buttonPin": {
       "description": "Stift för knapp",
-      "label": "Button Pin"
+      "label": "Knapp-stift"
     },
     "buzzerPin": {
       "description": "Stift för summer",
-      "label": "Buzzer Pin"
+      "label": "Summer-stift"
     },
     "disableTripleClick": {
       "description": "Inaktivera trippeltryck",
       "label": "Inaktivera trippeltryck"
     },
     "doubleTapAsButtonPress": {
-      "description": "Treat double tap as button press",
-      "label": "Double Tap as Button Press"
+      "description": "Behandla dubbeltryck som knapptryck",
+      "label": "Dubbeltryck som knapptryck"
     },
     "ledHeartbeatDisabled": {
       "description": "Inaktivera blinkande LED",
-      "label": "LED Heartbeat Disabled"
+      "label": "LED-puls inaktiverad"
     },
     "nodeInfoBroadcastInterval": {
       "description": "Hur ofta nod-info ska sändas",
-      "label": "Node Info Broadcast Interval"
+      "label": "Sändningsintervall för nod-info"
     },
     "posixTimezone": {
       "description": "POSIX-tidszonsträng för enheten",
-      "label": "POSIX Timezone"
+      "label": "POSIX-tidszon"
     },
     "rebroadcastMode": {
       "description": "Hur enheten hanterar återutsändning",
@@ -50,379 +50,379 @@
     },
     "role": {
       "description": "Vilken roll enheten har på nätet",
-      "label": "Role"
+      "label": "Roll"
     }
   },
   "bluetooth": {
     "title": "Bluetooth-inställningar",
-    "description": "Settings for the Bluetooth module",
-    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "description": "Inställningar för Bluetooth-modulen",
+    "note": "OBS! Vissa enheter (ESP32) kan inte använda både Bluetooth och WiFi samtidigt.",
     "enabled": {
       "description": "Aktivera eller inaktivera Bluetooth",
-      "label": "Enabled"
+      "label": "Aktiverad"
     },
     "pairingMode": {
       "description": "Metod för parkoppling",
-      "label": "Pairing mode"
+      "label": "Parkopplingsläge"
     },
     "pin": {
-      "description": "Pin to use when pairing",
-      "label": "Pin"
+      "description": "Pinkod för parkoppling",
+      "label": "Pinkod"
     }
   },
   "display": {
-    "description": "Settings for the device display",
-    "title": "Display Settings",
+    "description": "Inställningar för enhetens display",
+    "title": "Displayinställningar",
     "headingBold": {
-      "description": "Bolden the heading text",
-      "label": "Bold Heading"
+      "description": "Visa rubriktexten i fetstil",
+      "label": "Fetstil för rubriktext"
     },
     "carouselDelay": {
-      "description": "How fast to cycle through windows",
-      "label": "Carousel Delay"
+      "description": "Tid mellan automatiskt byte av sida",
+      "label": "Karusellfördröjning"
     },
     "compassNorthTop": {
-      "description": "Fix north to the top of compass",
-      "label": "Compass North Top"
+      "description": "Fixera norr till toppen av kompassen",
+      "label": "Kompassens norrläge"
     },
     "displayMode": {
       "description": "Variant på displaylayout",
-      "label": "Display Mode"
+      "label": "Visningsläge"
     },
     "displayUnits": {
-      "description": "Display metric or imperial units",
-      "label": "Display Units"
+      "description": "Visa metriska eller Brittiska enheter",
+      "label": "Enheter"
     },
     "flipScreen": {
-      "description": "Flip display 180 degrees",
+      "description": "Vänd displayen 180 grader",
       "label": "Vänd skärmen"
     },
     "gpsDisplayUnits": {
-      "description": "Coordinate display format",
+      "description": "Koordinatformat för visning",
       "label": "Koordinatformat"
     },
     "oledType": {
-      "description": "Type of OLED screen attached to the device",
-      "label": "OLED Type"
+      "description": "Typ av OLED-skärm ansluten till enheten",
+      "label": "OLED-typ"
     },
     "screenTimeout": {
-      "description": "Turn off the display after this long",
-      "label": "Screen Timeout"
+      "description": "Stäng av skärmen efter denna tid",
+      "label": "Tidsgräns för display"
     },
     "twelveHourClock": {
-      "description": "Use 12-hour clock format",
-      "label": "12-Hour Clock"
+      "description": "Använd 12-timmarsformat",
+      "label": "12-timmars klocka"
     },
     "wakeOnTapOrMotion": {
-      "description": "Wake the device on tap or motion",
-      "label": "Wake on Tap or Motion"
+      "description": "Väck enheten när rörelse upptäcks av enhetens accelerometer",
+      "label": "Vakna vid rörelse"
     }
   },
   "lora": {
-    "title": "Mesh Settings",
-    "description": "Settings for the LoRa mesh",
+    "title": "Inställningar för nät",
+    "description": "Inställningar för LoRa-nätet",
     "bandwidth": {
-      "description": "Channel bandwidth in MHz",
-      "label": "Bandwidth"
+      "description": "Kanalens bandbredd i MHz",
+      "label": "Bandbredd"
     },
     "boostedRxGain": {
-      "description": "Boosted RX gain",
-      "label": "Boosted RX Gain"
+      "description": "Ökad RX-förstärkning",
+      "label": "Ökad RX-förstärkning"
     },
     "codingRate": {
-      "description": "The denominator of the coding rate",
-      "label": "Coding Rate"
+      "description": "Nämnaren för kodningshastighet",
+      "label": "Kodningshastighet"
     },
     "frequencyOffset": {
-      "description": "Frequency offset to correct for crystal calibration errors",
-      "label": "Frequency Offset"
+      "description": "Frekvensförskjutning för att korrigera vid kalibreringsfel i kristallen",
+      "label": "Frekvensförskjutning"
     },
     "frequencySlot": {
-      "description": "LoRa frequency channel number",
-      "label": "Frequency Slot"
+      "description": "LoRa-kanalnummer för frekvens",
+      "label": "Frekvens-slot"
     },
     "hopLimit": {
-      "description": "Maximum number of hops",
-      "label": "Hop Limit"
+      "description": "Maximalt antal hopp",
+      "label": "Hoppgräns"
     },
     "ignoreMqtt": {
-      "description": "Don't forward MQTT messages over the mesh",
-      "label": "Ignore MQTT"
+      "description": "Vidarebefordra inte MQTT-meddelanden över nätet",
+      "label": "Ignorera MQTT"
     },
     "modemPreset": {
-      "description": "Modem preset to use",
-      "label": "Modem Preset"
+      "description": "Modem-förinställningar som enheten använder",
+      "label": "Modem-förinställningar"
     },
     "okToMqtt": {
-      "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
-      "label": "OK to MQTT"
+      "description": "När den är aktiverad anger denna konfiguration att användaren godkänner att paketet sänds till MQTT. Om avaktiverad uppmanas andra noder att inte vidarebefordra enhetens paket till MQTT",
+      "label": "OK till MQTT"
     },
     "overrideDutyCycle": {
-      "description": "Override Duty Cycle",
-      "label": "Override Duty Cycle"
+      "description": "Ersätt gräns för driftsperiod",
+      "label": "Åsidosätt gräns för driftsperiod"
     },
     "overrideFrequency": {
-      "description": "Override frequency",
-      "label": "Override Frequency"
+      "description": "Åsidosätt frekvens",
+      "label": "Åsidosätt frekvens"
     },
     "region": {
-      "description": "Sets the region for your node",
+      "description": "Anger regionen för din nod",
       "label": "Region"
     },
     "spreadingFactor": {
-      "description": "Indicates the number of chirps per symbol",
-      "label": "Spreading Factor"
+      "description": "Indikerar antalet chirps per symbol",
+      "label": "Spridningsfaktor"
     },
     "transmitEnabled": {
-      "description": "Enable/Disable transmit (TX) from the LoRa radio",
-      "label": "Transmit Enabled"
+      "description": "Aktivera/inaktivera sändning (TX) från LoRa-radion",
+      "label": "Sändning aktiverad"
     },
     "transmitPower": {
-      "description": "Max transmit power",
-      "label": "Transmit Power"
+      "description": "Max sändningseffekt",
+      "label": "Sändningseffekt"
     },
     "usePreset": {
-      "description": "Use one of the predefined modem presets",
-      "label": "Use Preset"
+      "description": "Använd en av de fördefinierade modeminställningarna",
+      "label": "Använd förinställning"
     },
     "meshSettings": {
-      "description": "Settings for the LoRa mesh",
-      "label": "Mesh Settings"
+      "description": "Inställningar för LoRa-nät",
+      "label": "Inställningar för nät"
     },
     "waveformSettings": {
-      "description": "Settings for the LoRa waveform",
-      "label": "Waveform Settings"
+      "description": "Inställningar för LoRa-vågformen",
+      "label": "Inställningar för vågform"
     },
     "radioSettings": {
-      "label": "Radio Settings",
-      "description": "Settings for the LoRa radio"
+      "label": "Radioinställningar",
+      "description": "Inställningar för LoRa-radio"
     }
   },
   "network": {
-    "title": "WiFi Config",
-    "description": "WiFi radio configuration",
-    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "title": "Wifi-konfiguration",
+    "description": "Konfiguration av WiFi-radio",
+    "note": "OBS! Vissa enheter (ESP32) kan inte använda både Bluetooth och WiFi samtidigt.",
     "addressMode": {
-      "description": "Address assignment selection",
-      "label": "Address Mode"
+      "description": "Val för tilldelning av IP-adress",
+      "label": "Adress-läge"
     },
     "dns": {
-      "description": "DNS Server",
+      "description": "DNS-server",
       "label": "DNS"
     },
     "ethernetEnabled": {
-      "description": "Enable or disable the Ethernet port",
-      "label": "Enabled"
+      "description": "Aktivera eller inaktivera Ethernet-porten",
+      "label": "Aktiverad"
     },
     "gateway": {
-      "description": "Default Gateway",
+      "description": "Standard-gateway",
       "label": "Gateway"
     },
     "ip": {
-      "description": "IP Address",
-      "label": "IP"
+      "description": "IP-adress",
+      "label": "Ip-adress"
     },
     "psk": {
-      "description": "Network password",
+      "description": "Nätverkslösenord",
       "label": "PSK"
     },
     "ssid": {
-      "description": "Network name",
+      "description": "Nätverksnamn",
       "label": "SSID"
     },
     "subnet": {
-      "description": "Subnet Mask",
-      "label": "Subnet"
+      "description": "Subnätmask",
+      "label": "Subnät"
     },
     "wifiEnabled": {
-      "description": "Enable or disable the WiFi radio",
-      "label": "Enabled"
+      "description": "Aktivera eller inaktivera WiFi-radio",
+      "label": "Aktiverad"
     },
     "meshViaUdp": {
       "label": "Mesh via UDP"
     },
     "ntpServer": {
-      "label": "NTP Server"
+      "label": "NTP-server"
     },
     "rsyslogServer": {
-      "label": "Rsyslog Server"
+      "label": "Rsyslog-server"
     },
     "ethernetConfigSettings": {
-      "description": "Ethernet port configuration",
-      "label": "Ethernet Config"
+      "description": "Ethernet-portens konfiguration",
+      "label": "Ethernet-konfiguration"
     },
     "ipConfigSettings": {
-      "description": "IP configuration",
-      "label": "IP Config"
+      "description": "IP-konfiguration",
+      "label": "IP-konfiguration"
     },
     "ntpConfigSettings": {
-      "description": "NTP configuration",
-      "label": "NTP Config"
+      "description": "NTP-konfiguration",
+      "label": "NTP-konfiguration"
     },
     "rsyslogConfigSettings": {
-      "description": "Rsyslog configuration",
-      "label": "Rsyslog Config"
+      "description": "Rsyslog-konfiguration",
+      "label": "Rsyslog-konfiguration"
     },
     "udpConfigSettings": {
-      "description": "UDP over Mesh configuration",
-      "label": "UDP Config"
+      "description": "UDP över nät-konfiguration",
+      "label": "UDP-konfiguration"
     }
   },
   "position": {
-    "title": "Position Settings",
-    "description": "Settings for the position module",
+    "title": "Platsinställningar",
+    "description": "Inställningar för platsmodulen",
     "broadcastInterval": {
-      "description": "How often your position is sent out over the mesh",
-      "label": "Broadcast Interval"
+      "description": "Hur ofta din plats skickas ut över nätet",
+      "label": "Sändningsintervall"
     },
     "enablePin": {
-      "description": "GPS module enable pin override",
-      "label": "Enable Pin"
+      "description": "Stift för aktivering av GPS-modulen",
+      "label": "Stift för aktivering"
     },
     "fixedPosition": {
-      "description": "Don't report GPS position, but a manually-specified one",
-      "label": "Fixed Position"
+      "description": "Rapportera inte den inhämtade GPS-positionen, utan en manuellt angiven sådan",
+      "label": "Fast plats"
     },
     "gpsMode": {
-      "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
-      "label": "GPS Mode"
+      "description": "Konfigurera om enhetens GPS är aktiverad, inaktiverad eller saknas",
+      "label": "GPS-läge"
     },
     "gpsUpdateInterval": {
-      "description": "How often a GPS fix should be acquired",
-      "label": "GPS Update Interval"
+      "description": "Hur ofta en GPS-position ska inhämtas",
+      "label": "Intervall för GPS-uppdatering"
     },
     "positionFlags": {
-      "description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
-      "label": "Position Flags"
+      "description": "Valfria fält att inkludera vid sammansättning av positionsmeddelanden. Ju fler fält som väljs, desto större kommer meddelandet att bli. Längre meddelanden leder till högre sändningsutnyttnande och en högre risk för paketförlust.",
+      "label": "Positionsflaggor"
     },
     "receivePin": {
-      "description": "GPS module RX pin override",
-      "label": "Receive Pin"
+      "description": "RX-stift för GPS-modulen",
+      "label": "RX-stift"
     },
     "smartPositionEnabled": {
-      "description": "Only send position when there has been a meaningful change in location",
-      "label": "Enable Smart Position"
+      "description": "Sänd bara positionsuppdatering när det har skett en tillräckligt stor förändring av positionen",
+      "label": "Aktivera smart position"
     },
     "smartPositionMinDistance": {
-      "description": "Minimum distance (in meters) that must be traveled before a position update is sent",
-      "label": "Smart Position Minimum Distance"
+      "description": "Minsta avstånd (i meter) som enheten måste förflyttas innan en positionsuppdatering sänds",
+      "label": "Minimiavstånd för smart position"
     },
     "smartPositionMinInterval": {
-      "description": "Minimum interval (in seconds) that must pass before a position update is sent",
-      "label": "Smart Position Minimum Interval"
+      "description": "Minsta tidsintervall (i sekunder) som måste passera innan en positionsuppdatering skickas",
+      "label": "Minimiintervall för smart position"
     },
     "transmitPin": {
-      "description": "GPS module TX pin override",
-      "label": "Transmit Pin"
+      "description": "TX-stift för GPS-modulen",
+      "label": "TX-stift"
     },
     "intervalsSettings": {
-      "description": "How often to send position updates",
-      "label": "Intervals"
+      "description": "Hur ofta enheten skickar positionsuppdateringar",
+      "label": "Intervall"
     },
     "flags": {
-      "placeholder": "Select position flags...",
-      "altitude": "Altitude",
-      "altitudeGeoidalSeparation": "Altitude Geoidal Separation",
-      "altitudeMsl": "Altitude is Mean Sea Level",
-      "dop": "Dilution of precision (DOP) PDOP used by default",
-      "hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
-      "numSatellites": "Number of satellites",
-      "sequenceNumber": "Sequence number",
-      "timestamp": "Timestamp",
-      "unset": "Unset",
-      "vehicleHeading": "Vehicle heading",
-      "vehicleSpeed": "Vehicle speed"
+      "placeholder": "Välj positionsflaggor...",
+      "altitude": "Altitud",
+      "altitudeGeoidalSeparation": "Geoidhöjd",
+      "altitudeMsl": "Altitud är medelhavsnivå",
+      "dop": "Bidrag till osäkerhet i precision (DOP) PDOP används som standard",
+      "hdopVdop": "Om DOP är satt, använd HDOP / VDOP värden istället för PDOP",
+      "numSatellites": "Antal satelliter",
+      "sequenceNumber": "Sekvensnummer",
+      "timestamp": "Tidsstämpel",
+      "unset": "Ej inställd",
+      "vehicleHeading": "Rörelseriktning",
+      "vehicleSpeed": "Rörelsehastighet"
     }
   },
   "power": {
     "adcMultiplierOverride": {
-      "description": "Used for tweaking battery voltage reading",
-      "label": "ADC Multiplier Override ratio"
+      "description": "Används för att justera batterispänningsavläsning",
+      "label": "ADC faktor"
     },
     "ina219Address": {
-      "description": "Address of the INA219 battery monitor",
-      "label": "INA219 Address"
+      "description": "I2C-adress till INA219 batterimonitorn",
+      "label": "INA219-adress"
     },
     "lightSleepDuration": {
-      "description": "How long the device will be in light sleep for",
-      "label": "Light Sleep Duration"
+      "description": "Hur länge enheten kommer att vara i lätt strömsparläge",
+      "label": "Tid för lätt strömsparläge"
     },
     "minimumWakeTime": {
-      "description": "Minimum amount of time the device will stay awake for after receiving a packet",
-      "label": "Minimum Wake Time"
+      "description": "Minsta tid enheten kommer att vara vaken efter att ha tagit emot ett paket",
+      "label": "Minsta vakna tid"
     },
     "noConnectionBluetoothDisabled": {
-      "description": "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
-      "label": "No Connection Bluetooth Disabled"
+      "description": "Om enheten inte har en aktiv Bluetooth-anslutning inaktiveras Bluetooth-radion efter så här lång tid",
+      "label": "Bluetooth inaktiverad vid frånkoppling"
     },
     "powerSavingEnabled": {
-      "description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
-      "label": "Enable power saving mode"
+      "description": "Välj om du strömmatar enheten från en lågströmkälla (sol) för att minimera strömförbrukningen så mycket som möjligt.",
+      "label": "Aktivera strömsparläge"
     },
     "shutdownOnBatteryDelay": {
-      "description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
-      "label": "Shutdown on battery delay"
+      "description": "Automatisk avstängning av enheten efter att ha strömmatats från batteri så här lång tid, 0 för obestämd tid",
+      "label": "Fördröjd avstängning vid batteridrift"
     },
     "superDeepSleepDuration": {
-      "description": "How long the device will be in super deep sleep for",
-      "label": "Super Deep Sleep Duration"
+      "description": "Hur länge enheten kommer att vara i djupt strömsparläge",
+      "label": "Tid för djupt strömsparläge"
     },
     "powerConfigSettings": {
-      "description": "Settings for the power module",
-      "label": "Power Config"
+      "description": "Inställningar för strömmodulen",
+      "label": "Ströminställningar"
     },
     "sleepSettings": {
-      "description": "Sleep settings for the power module",
-      "label": "Sleep Settings"
+      "description": "Strömsparlägesinställningar för strömmodulen",
+      "label": "Inställningar för strömsparläge"
     }
   },
   "security": {
-    "description": "Settings for the Security configuration",
-    "title": "Security Settings",
-    "button_backupKey": "Backup Key",
+    "description": "Inställningar för säkerhet",
+    "title": "Säkerhetsinställningar",
+    "button_backupKey": "Säkerhetskopiera nyckel",
     "adminChannelEnabled": {
-      "description": "Allow incoming device control over the insecure legacy admin channel",
-      "label": "Allow Legacy Admin"
+      "description": "Tillåt inkommande styrning via den förlegade, osäkra, administrationskanalen",
+      "label": "Tillåt förlegad administration"
     },
     "enableDebugLogApi": {
-      "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
-      "label": "Enable Debug Log API"
+      "description": "Skriv felsökningsloggar över seriell kommunikation samt visa och exportera positions-rensade loggar över Bluetooth",
+      "label": "Aktivera API för felsökningslogg"
     },
     "managed": {
-      "description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
-      "label": "Managed"
+      "description": "Om aktiverad, kan enhetens konfigurationsalternativ bara ändras på distans av en fjärradministratörsnod via administratörsmeddelanden. Aktivera inte detta alternativ om inte minst en lämplig fjärradministratörsnod har konfigurerats och den publika nyckeln matats in i något av fälten ovan.",
+      "label": "Fjärrhanterad"
     },
     "privateKey": {
-      "description": "Used to create a shared key with a remote device",
-      "label": "Private Key"
+      "description": "Används för att skapa en delad nyckel med en fjärrnod",
+      "label": "Privat nyckel"
     },
     "publicKey": {
-      "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
-      "label": "Public Key"
+      "description": "Sänds ut till andra noder på nätet för att de ska kunna beräkna en delad hemlig nyckel",
+      "label": "Publik nyckel"
     },
     "primaryAdminKey": {
-      "description": "The primary public key authorized to send admin messages to this node",
-      "label": "Primary Admin Key"
+      "description": "Den primära publika nyckeln hos en fjärradministratörsnod auktoriserad att skicka administratörsmeddelanden till den här noden",
+      "label": "Primär administratörsnyckel"
     },
     "secondaryAdminKey": {
-      "description": "The secondary public key authorized to send admin messages to this node",
-      "label": "Secondary Admin Key"
+      "description": "Den sekundära publika nyckeln hos en fjärradministratörsnod auktoriserad att skicka administratörsmeddelanden till den här noden",
+      "label": "Sekundär administratörsnyckel"
     },
     "serialOutputEnabled": {
-      "description": "Serial Console over the Stream API",
-      "label": "Serial Output Enabled"
+      "description": "Seriell kommunikation över Stream API",
+      "label": "Seriell kommunikation aktiverad"
     },
     "tertiaryAdminKey": {
-      "description": "The tertiary public key authorized to send admin messages to this node",
-      "label": "Tertiary Admin Key"
+      "description": "Den tertiära publika nyckeln hos en fjärradministratörsnod auktoriserad att skicka administratörsmeddelanden till den här noden",
+      "label": "Tertiär administratörsnyckel"
     },
     "adminSettings": {
-      "description": "Settings for Admin",
-      "label": "Admin Settings"
+      "description": "Inställningar för fjärradministration",
+      "label": "Fjärradministrationsinställningar"
     },
     "loggingSettings": {
-      "description": "Settings for Logging",
-      "label": "Logging Settings"
+      "description": "Inställningar för loggning",
+      "label": "Loggningsinställningar"
     }
   }
 }

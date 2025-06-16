@@ -5,8 +5,8 @@
   },
   "deviceName": {
     "description": "The Device will restart once the config is saved.",
-    "longName": "Long Name",
-    "shortName": "Short Name",
+    "longName": "长名称",
+    "shortName": "短名称",
     "title": "Change Device Name"
   },
   "import": {
@@ -35,11 +35,11 @@
     "https": "https",
     "http": "http",
     "tabHttp": "HTTP",
-    "tabBluetooth": "Bluetooth",
-    "tabSerial": "Serial",
+    "tabBluetooth": "蓝牙",
+    "tabSerial": "串口",
     "useHttps": "Use HTTPS",
     "connecting": "Connecting...",
-    "connect": "Connect",
+    "connect": "连接",
     "connectionFailedAlert": {
       "title": "Connection Failed",
       "descriptionPrefix": "Could not connect to the device. ",
@@ -69,7 +69,7 @@
     }
   },
   "nodeDetails": {
-    "message": "Message",
+    "message": "信息",
     "requestPosition": "Request Position",
     "traceRoute": "Trace Route",
     "airTxUtilization": "Air TX utilization",
@@ -85,7 +85,7 @@
     "position": "Position:",
     "role": "Role: ",
     "uptime": "Uptime: ",
-    "voltage": "Voltage",
+    "voltage": "电压",
     "title": "Node Details for {{identifier}}",
     "ignoreNode": "Ignore node",
     "removeNode": "Remove node",
@@ -111,7 +111,7 @@
     "replaceChannels": "Replace Channels",
     "description": "The current LoRa configuration will also be shared.",
     "sharableUrl": "Sharable URL",
-    "title": "Generate QR Code"
+    "title": "生成二维码"
   },
   "rebootOta": {
     "title": "Schedule Reboot",
@@ -154,6 +154,6 @@
     "preamble": "I have read the ",
     "choosingRightDeviceRole": "Choosing The Right Device Role",
     "deviceRoleDocumentation": "Device Role Documentation",
-    "title": "Are you sure?"
+    "title": "是否确认？"
   }
 }

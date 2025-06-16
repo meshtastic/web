@@ -1,13 +1,13 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
+    "messages": "メッセージ",
+    "map": "地図",
     "config": "Config",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
-    "nodes": "Nodes"
+    "channels": "チャンネル",
+    "nodes": "ノード"
   },
   "app": {
     "title": "Meshtastic",
@@ -23,7 +23,7 @@
     "deviceInfo": {
       "volts": "{{voltage}} volts",
       "firmware": {
-        "title": "Firmware",
+        "title": "ファームウェア",
         "version": "v{{version}}",
         "buildDate": "Build date: {{date}}"
       },
@@ -38,7 +38,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "title": "バッテリー"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -90,10 +90,10 @@
       "label": "Copy to clipboard"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "パスワードを非表示"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "パスワードを表示"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
@@ -106,16 +106,16 @@
     "label": "General"
   },
   "hardware": {
-    "label": "Hardware"
+    "label": "ハードウェア"
   },
   "metrics": {
     "label": "Metrics"
   },
   "role": {
-    "label": "Role"
+    "label": "役割"
   },
   "filter": {
-    "label": "Filter"
+    "label": "絞り込み"
   },
   "clearInput": {
     "label": "Clear input"
@@ -136,18 +136,18 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "title": "電圧"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
   },
   "hops": {
-    "direct": "Direct",
+    "direct": "直接",
     "label": "Number of hops",
     "text": "Number of hops: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
+    "label": "最後の通信",
     "labelText": "Last heard: {{value}}",
     "nowLabel": "Now"
   },
@@ -167,12 +167,12 @@
     "label": "Connected via MQTT"
   },
   "language": {
-    "label": "Language",
+    "label": "言語設定",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "ダーク",
+    "light": "ライト",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

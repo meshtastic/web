@@ -1,6 +1,6 @@
 {
   "page": {
-    "sectionLabel": "Channels",
+    "sectionLabel": "Canales",
     "channelName": "Channel: {{channelName}}",
     "broadcastLabel": "Primary",
     "channelIndex": "Ch {{index}}"
@@ -9,7 +9,7 @@
     "pskInvalid": "Please enter a valid {{bits}} bit PSK."
   },
   "settings": {
-    "label": "Channel Settings",
+    "label": "Ajustes del canal",
     "description": "Crypto, MQTT & misc settings"
   },
   "role": {
@@ -27,7 +27,7 @@
     "generate": "Generate"
   },
   "name": {
-    "label": "Name",
+    "label": "Nombre",
     "description": "A unique name for the channel <12 bytes, leave blank for default"
   },
   "uplinkEnabled": {

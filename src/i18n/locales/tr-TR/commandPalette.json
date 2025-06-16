@@ -12,10 +12,10 @@
   "goto": {
     "label": "Goto",
     "command": {
-      "messages": "Messages",
-      "map": "Map",
+      "messages": "Mesajlar",
+      "map": "Harita",
       "config": "Config",
-      "channels": "Channels",
+      "channels": "Kanallar",
       "nodes": "Nodes"
     }
   },
@@ -31,7 +31,7 @@
     "command": {
       "qrCode": "QR Code",
       "qrGenerator": "Generator",
-      "qrImport": "Import",
+      "qrImport": "İçeri aktar",
       "scheduleShutdown": "Schedule Shutdown",
       "scheduleReboot": "Schedule Reboot",
       "rebootToOtaMode": "Reboot To OTA Mode",
@@ -41,7 +41,7 @@
     }
   },
   "debug": {
-    "label": "Debug",
+    "label": "Hata Ayıklama",
     "command": {
       "reconfigure": "Reconfigure",
       "clearAllStoredMessages": "Clear All Stored Message"

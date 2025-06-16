@@ -1,13 +1,13 @@
 {
   "navigation": {
-    "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
-    "config": "Config",
-    "radioConfig": "Radio Config",
-    "moduleConfig": "Module Config",
-    "channels": "Channels",
-    "nodes": "Nodes"
+    "title": "Navigointi",
+    "messages": "Viestit",
+    "map": "Kartta",
+    "config": "Asetukset",
+    "radioConfig": "Radion asetukset",
+    "moduleConfig": "Moduulin asetukset",
+    "channels": "Kanavat",
+    "nodes": "Laitteet"
   },
   "app": {
     "title": "Meshtastic",
@@ -16,186 +16,186 @@
   "sidebar": {
     "collapseToggle": {
       "button": {
-        "open": "Open sidebar",
-        "close": "Close sidebar"
+        "open": "Avaa sivupalkki",
+        "close": "Sulje sivupalkki"
       }
     },
     "deviceInfo": {
-      "volts": "{{voltage}} volts",
+      "volts": "{{voltage}} volttia",
       "firmware": {
-        "title": "Firmware",
+        "title": "Laiteohjelmisto",
         "version": "v{{version}}",
-        "buildDate": "Build date: {{date}}"
+        "buildDate": "Koontipäivä: {{date}}"
       },
       "deviceName": {
-        "title": "Device Name",
-        "changeName": "Change Device Name",
-        "placeholder": "Enter device name"
+        "title": "Laitteen nimi",
+        "changeName": "Vaihda laitteen nimi",
+        "placeholder": "Anna laitteelle nimi"
       },
-      "editDeviceName": "Edit device name"
+      "editDeviceName": "Muokkaa laitteen nimeä"
     }
   },
   "batteryStatus": {
-    "charging": "{{level}}% charging",
-    "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "charging": "{{level}} % latauksessa",
+    "pluggedIn": "Kytketty verkkovirtaan",
+    "title": "Akku"
   },
   "search": {
-    "nodes": "Search nodes...",
-    "channels": "Search channels...",
-    "commandPalette": "Search commands..."
+    "nodes": "Etsi laitteita...",
+    "channels": "Etsi kanavia...",
+    "commandPalette": "Etsi komentoja..."
   },
   "toast": {
     "positionRequestSent": {
-      "title": "Position request sent."
+      "title": "Sijaintipyyntö lähetetty."
     },
     "requestingPosition": {
-      "title": "Requesting position, please wait..."
+      "title": "Pyydetään sijaintia, odota..."
     },
     "sendingTraceroute": {
-      "title": "Sending Traceroute, please wait..."
+      "title": "Reitinselvitys lähetetty, odota..."
     },
     "tracerouteSent": {
-      "title": "Traceroute sent."
+      "title": "Reitinselvitys lähetetty."
     },
     "savedChannel": {
-      "title": "Saved Channel: {{channelName}}"
+      "title": "Tallennettu Kanava: {{channelName}}"
     },
     "messages": {
       "pkiEncryption": {
-        "title": "Chat is using PKI encryption."
+        "title": "Keskustelu käyttää PKI-salausta."
       },
       "pskEncryption": {
-        "title": "Chat is using PSK encryption."
+        "title": "Keskustelu käyttää PKI-salausta."
       }
     },
     "configSaveError": {
-      "title": "Error Saving Config",
-      "description": "An error occurred while saving the configuration."
+      "title": "Virhe asetusten tallentamisessa",
+      "description": "Asetusten tallennuksessa tapahtui virhe."
     },
     "validationError": {
-      "title": "Config Errors Exist",
-      "description": "Please fix the configuration errors before saving."
+      "title": "Asetuksissa on virheitä",
+      "description": "Ole hyvä ja korjaa asetusvirheet ennen tallentamista."
     },
     "saveSuccess": {
-      "title": "Saving Config",
-      "description": "The configuration change {{case}} has been saved."
+      "title": "Tallennetaan asetukset",
+      "description": "Asetuksien muutos {{case}} on tallennettu."
     }
   },
   "notifications": {
     "copied": {
-      "label": "Copied!"
+      "label": "Kopioitu!"
     },
     "copyToClipboard": {
-      "label": "Copy to clipboard"
+      "label": "Kopioi leikepöydälle"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "Piilota salasana"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "Näytä salasana"
     },
     "deliveryStatus": {
-      "delivered": "Delivered",
-      "failed": "Delivery Failed",
-      "waiting": "Waiting",
-      "unknown": "Unknown"
+      "delivered": "Toimitettu",
+      "failed": "Toimitus epäonnistui",
+      "waiting": "Odottaa",
+      "unknown": "Tuntematon"
     }
   },
   "general": {
-    "label": "General"
+    "label": "Yleinen"
   },
   "hardware": {
-    "label": "Hardware"
+    "label": "Laite"
   },
   "metrics": {
-    "label": "Metrics"
+    "label": "Mittaustiedot"
   },
   "role": {
-    "label": "Role"
+    "label": "Rooli"
   },
   "filter": {
-    "label": "Filter"
+    "label": "Suodatus"
   },
   "clearInput": {
-    "label": "Clear input"
+    "label": "Tyhjennä kenttä"
   },
   "resetFilters": {
-    "label": "Reset Filters"
+    "label": "Tyhjennä suodattimet"
   },
   "nodeName": {
-    "label": "Node name/number",
+    "label": "Laitteen nimi tai numero",
     "placeholder": "Meshtastic 1234"
   },
   "airtimeUtilization": {
-    "label": "Airtime Utilization (%)"
+    "label": "Ajan käyttöaste (%)"
   },
   "batteryLevel": {
-    "label": "Battery level (%)",
-    "labelText": "Battery level (%): {{value}}"
+    "label": "Akun varaus (%)",
+    "labelText": "Akun varaus (%): {{value}}"
   },
   "batteryVoltage": {
-    "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "label": "Akun jännite (V)",
+    "title": "Jännite"
   },
   "channelUtilization": {
-    "label": "Channel Utilization (%)"
+    "label": "Kanavan käyttö (%)"
   },
   "hops": {
-    "direct": "Direct",
-    "label": "Number of hops",
-    "text": "Number of hops: {{value}}"
+    "direct": "Suora",
+    "label": "Hyppyjen määrä",
+    "text": "Hyppyjen määrä: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
-    "labelText": "Last heard: {{value}}",
-    "nowLabel": "Now"
+    "label": "Viimeksi kuultu",
+    "labelText": "Viimeksi kuultu: {{value}}",
+    "nowLabel": "Nyt"
   },
   "snr": {
     "label": "SNR (db)"
   },
   "favorites": {
-    "label": "Favorites"
+    "label": "Suosikit"
   },
   "hide": {
-    "label": "Hide"
+    "label": "Piilota"
   },
   "showOnly": {
-    "label": "Show Only"
+    "label": "Näytä pelkästään"
   },
   "viaMqtt": {
-    "label": "Connected via MQTT"
+    "label": "Yhdistetty MQTT-yhteydellä"
   },
   "language": {
-    "label": "Language",
-    "changeLanguage": "Change Language"
+    "label": "Kieli",
+    "changeLanguage": "Vaihda kieli"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
-    "system": "Automatic",
-    "changeTheme": "Change Color Scheme"
+    "dark": "Tumma",
+    "light": "Vaalea",
+    "system": "Automaattinen",
+    "changeTheme": "Vaihda väriteema"
   },
   "errorPage": {
-    "title": "This is a little embarrassing...",
-    "description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
-    "description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
-    "reportInstructions": "Please include the following information in your report:",
+    "title": "Tämä on hieman noloa...",
+    "description1": "Pahoittelemme, mutta verkkosovelluksessa tapahtui virhe, joka aiheutti kaatumisen.<br /> \nTämän ei pitäisi tapahtua ja me työskentelemme ahkerasti ongelman korjaamiseksi.",
+    "description2": "Paras tapa estää tämän tapahtuminen uudelleen sinulle tai kenellekään muulle, on ilmoittaa meille ongelmasta.",
+    "reportInstructions": "Lisääthän raporttiisi seuraavat tiedot:",
     "reportSteps": {
-      "step1": "What you were doing when the error occurred",
-      "step2": "What you expected to happen",
-      "step3": "What actually happened",
-      "step4": "Any other relevant information"
+      "step1": "Mitä olit tekemässä virheen tapahtuessa",
+      "step2": "Mitä odotit tapahtuvan",
+      "step3": "Mitä todellisuudessa tapahtui",
+      "step4": "Muut mahdollisesti oleelliset tiedot"
     },
-    "reportLink": "You can report the issue to our <0>GitHub</0>",
-    "dashboardLink": "Return to the <0>dashboard</0>",
-    "detailsSummary": "Error Details",
-    "errorMessageLabel": "Error message:",
-    "stackTraceLabel": "Stack trace:",
+    "reportLink": "Voit raportoida ongelmasta <0>GitHubissa</0>",
+    "dashboardLink": "Palaa takaisin <0>dashboard</0>",
+    "detailsSummary": "Virheen tiedot",
+    "errorMessageLabel": "Virheilmoitus:",
+    "stackTraceLabel": "Virheen jäljityslista:",
     "fallbackError": "{{error}}"
   },
   "footer": {
-    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
-    "commitSha": "Commit SHA: {{sha}}"
+    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® on Meshtastic LLC:n rekisteröity tavaramerkki. | <1>Oikeudelliset tiedot</1>",
+    "commitSha": "Versiokomentoviestin SHA-tunniste: {{sha}}"
   }
 }

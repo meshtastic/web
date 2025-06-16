@@ -1,13 +1,13 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
+    "messages": "Messaggi",
+    "map": "Mappa",
     "config": "Config",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
-    "nodes": "Nodes"
+    "channels": "Canali",
+    "nodes": "Nodi"
   },
   "app": {
     "title": "Meshtastic",
@@ -38,7 +38,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "title": "Batteria"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -90,10 +90,10 @@
       "label": "Copy to clipboard"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "Nascondi password"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "Visualizza password"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
@@ -109,13 +109,13 @@
     "label": "Hardware"
   },
   "metrics": {
-    "label": "Metrics"
+    "label": "Statistiche"
   },
   "role": {
-    "label": "Role"
+    "label": "Ruolo"
   },
   "filter": {
-    "label": "Filter"
+    "label": "Filtro"
   },
   "clearInput": {
     "label": "Clear input"
@@ -136,18 +136,18 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "title": "Tensione"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
   },
   "hops": {
-    "direct": "Direct",
+    "direct": "Diretto",
     "label": "Number of hops",
     "text": "Number of hops: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
+    "label": "Ricevuto più di recente",
     "labelText": "Last heard: {{value}}",
     "nowLabel": "Now"
   },
@@ -167,12 +167,12 @@
     "label": "Connected via MQTT"
   },
   "language": {
-    "label": "Language",
+    "label": "Lingua",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "Scuro",
+    "light": "Chiaro",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

@@ -10,13 +10,13 @@
       "label": "Direct Message {{shortName}}"
     },
     "favorite": {
-      "label": "Favorite"
+      "label": "收藏"
     },
     "notFavorite": {
       "label": "Not a Favorite"
     },
     "status": {
-      "heard": "Heard",
+      "heard": "收到",
       "mqtt": "MQTT"
     },
     "elevation": {
@@ -31,15 +31,15 @@
   },
   "nodesTable": {
     "headings": {
-      "longName": "Long Name",
+      "longName": "长名称",
       "connection": "Connection",
       "lastHeard": "Last Heard",
       "encryption": "Encryption",
-      "model": "Model",
+      "model": "模型",
       "macAddress": "MAC Address"
     },
     "connectionStatus": {
-      "direct": "Direct",
+      "direct": "直频",
       "away": "away",
       "unknown": "-",
       "viaMqtt": ", via MQTT"
