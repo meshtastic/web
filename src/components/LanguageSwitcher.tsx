@@ -65,7 +65,7 @@ export default function LanguageSwitcher(
                 "group-hover:text-gray-900 dark:group-hover:text-white",
             )}
           >
-            {currentLanguage.code.toUpperCase()}
+            {currentLanguage.name}
           </Subtle>
         </Button>
       </DropdownMenuTrigger>
@@ -73,7 +73,7 @@ export default function LanguageSwitcher(
         {supportedLanguages.map((language) => (
           <DropdownMenuItem
             key={language.code}
-            onClick={() => handleLanguageChange(language.code as LangCode)}
+            onClick={() => handleLanguageChange(language.code)}
             className="flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center gap-2">

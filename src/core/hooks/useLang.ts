@@ -36,20 +36,22 @@ function useLang() {
    * Sets the i18n language.
    *
    * @param lng - The language tag to set
+   * @param persist - Whether to persist the language setting in local storage
    */
   const set = useCallback(
     async (lng: LangCode, persist = true) => {
       if (i18n.language === lng) {
         return;
       }
-      console.info("set language:", lng);
-      if (persist) {
-        try {
+
+      try {
+        console.info("setting language:", lng);
+        if (persist) {
           setLanguage({ language: lng });
-        } catch (e) {
-          console.warn(e);
         }
         await i18n.changeLanguage(lng);
+      } catch (e) {
+        console.warn(e);
       }
     },
     [i18n],
