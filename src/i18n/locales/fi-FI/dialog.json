@@ -1,0 +1,159 @@
+{
+  "deleteMessages": {
+    "description": "Tämä toiminto poistaa kaiken viestihistorian. Toimintoa ei voi perua. Haluatko varmasti jatkaa?",
+    "title": "Tyhjennä kaikki viestit"
+  },
+  "deviceName": {
+    "description": "Laite käynnistyy uudelleen, kun asetus on tallennettu.",
+    "longName": "Pitkä nimi",
+    "shortName": "Lyhytnimi",
+    "title": "Vaihda laitteen nimi"
+  },
+  "import": {
+    "description": "Nykyinen LoRa-asetus ylikirjoitetaan.",
+    "error": {
+      "invalidUrl": "Virheellinen Meshtastic verkko-osoite"
+    },
+    "channelPrefix": "Kanava: ",
+    "channelSetUrl": "Kanavan asetus / QR-koodin URL-osoite",
+    "channels": "Kanavat:",
+    "usePreset": "Käytä esiasetusta?",
+    "title": "Tuo kanava-asetukset"
+  },
+  "locationResponse": {
+    "altitude": "Korkeus: ",
+    "coordinates": "Koordinaatit: ",
+    "title": "Sijainti: {{identifier}}"
+  },
+  "pkiRegenerateDialog": {
+    "title": "Luodaanko ennalta jaettu avain uudelleen?",
+    "description": "Haluatko varmasti luoda ennalta jaetun avaimen uudelleen?",
+    "regenerate": "Luo uudelleen"
+  },
+  "newDeviceDialog": {
+    "title": "Yhdistä uuteen laitteeseen",
+    "https": "https",
+    "http": "http",
+    "tabHttp": "HTTP",
+    "tabBluetooth": "Bluetooth",
+    "tabSerial": "Sarjaliitäntä",
+    "useHttps": "Käytä HTTPS",
+    "connecting": "Yhdistetään...",
+    "connect": "Yhdistä",
+    "connectionFailedAlert": {
+      "title": "Yhteys epäonnistui",
+      "descriptionPrefix": "Laitteeseen ei saatu yhteyttä. ",
+      "httpsHint": "Jos käytät HTTPS:ää, sinun on ehkä ensin hyväksyttävä itse allekirjoitettu varmenne. ",
+      "openLinkPrefix": "Avaa ",
+      "openLinkSuffix": " uuteen välilehteen",
+      "acceptTlsWarningSuffix": ", hyväksy mahdolliset TLS-varoitukset, jos niitä ilmenee ja yritä sitten uudelleen.",
+      "learnMoreLink": "Lue lisää"
+    },
+    "httpConnection": {
+      "label": "IP-osoite / isäntänimi",
+      "placeholder": "000.000.000 / meshtastinen.paikallinen"
+    },
+    "serialConnection": {
+      "noDevicesPaired": "Yhtään laitetta ei ole vielä yhdistetty.",
+      "newDeviceButton": "Uusi laite",
+      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
+    },
+    "bluetoothConnection": {
+      "noDevicesPaired": "Yhtään laitetta ei ole vielä yhdistetty.",
+      "newDeviceButton": "Uusi laite"
+    },
+    "validation": {
+      "requiresFeatures": "Tämä yhteystyyppi vaatii <0></0>. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
+      "requiresSecureContext": "Tämä sovellus vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia.",
+      "additionallyRequiresSecureContext": "Lisäksi se vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia."
+    }
+  },
+  "nodeDetails": {
+    "message": "Viesti",
+    "requestPosition": "Pyydä sijaintia",
+    "traceRoute": "Reitinselvitys",
+    "airTxUtilization": "Ilmatien TX käyttöaste",
+    "allRawMetrics": "Kaikki raakatiedot:",
+    "batteryLevel": "Akun varaus",
+    "channelUtilization": "Kanavan käyttöaste",
+    "details": "Tiedot:",
+    "deviceMetrics": "Laitteen mittausloki:",
+    "hardware": "Laitteisto: ",
+    "lastHeard": "Viimeksi kuultu: ",
+    "nodeHexPrefix": "Laitteen Hex: !",
+    "nodeNumber": "Laitteen numero: ",
+    "position": "Sijainti:",
+    "role": "Rooli: ",
+    "uptime": "Käyttöaika: ",
+    "voltage": "Jännite",
+    "title": "Tiedot laitteelle {{identifier}}",
+    "ignoreNode": "Älä huomioi laitetta",
+    "removeNode": "Poista laite",
+    "unignoreNode": "Poista laitteen ohitus käytöstä"
+  },
+  "pkiBackup": {
+    "description": "Suosittelemme avaintietojen säännöllistä varmuuskopiointia. Haluatko varmuuskopioida nyt?",
+    "loseKeysWarning": "Jos menetät avaimesi, sinun täytyy palauttaa laite tehdasasetuksiin.",
+    "secureBackup": "On tärkeää varmuuskopioida julkiset ja yksityiset avaimet ja säilyttää niiden varmuuskopioita turvallisesti!",
+    "footer": "=== AVAIMIEN LOPPU ===",
+    "header": "=== MESHTASTIC AVAIMET  {{longName}} ({{shortName}}) LAITTEELLE ===",
+    "privateKey": "Yksityinen avain:",
+    "publicKey": "Julkinen avain:",
+    "fileName": "meshtastic_avaimet_{{longName}}_{{shortName}}.txt",
+    "title": "Varmuuskopioi avaimet"
+  },
+  "pkiRegenerate": {
+    "description": "Haluatko varmasti luoda avainparin uudelleen?",
+    "title": "Luo avainpari uudelleen"
+  },
+  "qr": {
+    "addChannels": "Lisää kanavia",
+    "replaceChannels": "Korvaa kanavia",
+    "description": "Nykyinen LoRa-kokoonpano tullaan myös jakamaan.",
+    "sharableUrl": "Jaettava URL",
+    "title": "Generoi QR-koodi"
+  },
+  "rebootOta": {
+    "title": "Ajasta uudelleenkäynnistys",
+    "description": "Käynnistä yhdistetty laite uudelleen viiveen jälkeen OTA-tilaan (langaton päivitys).",
+    "enterDelay": "Anna viive (sekuntia)",
+    "scheduled": "Uudelleenkäynnistys on ajastettu"
+  },
+  "reboot": {
+    "title": "Ajasta uudelleenkäynnistys",
+    "description": "Käynnistä yhdistetty laite x minuutin jälkeen."
+  },
+  "refreshKeys": {
+    "description": {
+      "acceptNewKeys": "Tämä poistaa laitteen laitteesta ja pyytää uusia avaimia.",
+      "keyMismatchReasonSuffix": ". Tämä johtuu siitä, että etälaitteen nykyinen julkinen avain ei vastaa aiemmin tallennettua avainta tälle laitteelle.",
+      "unableToSendDmPrefix": "Laitteesi ei pysty lähettämään suoraa viestiä laitteelle: "
+    },
+    "acceptNewKeys": "Hyväksy uudet avaimet",
+    "title": "Avaimet eivät täsmää - {{identifier}}"
+  },
+  "removeNode": {
+    "description": "Haluatko varmasti poistaa tämän laitteen?",
+    "title": "Poista laite?"
+  },
+  "shutdown": {
+    "title": "Ajasta sammutus",
+    "description": "Sammuta yhdistetty laite x minuutin päästä."
+  },
+  "traceRoute": {
+    "routeToDestination": "Reitin määränpää:",
+    "routeBack": "Reitti takaisin:"
+  },
+  "tracerouteResponse": {
+    "title": "Reitinselvitys: {{identifier}}"
+  },
+  "unsafeRoles": {
+    "confirmUnderstanding": "Kyllä, tiedän mitä teen",
+    "conjunction": " ja blogikirjoitukset ",
+    "postamble": " ja ymmärrän roolin muuttamisen vaikutukset.",
+    "preamble": "Olen lukenut ",
+    "choosingRightDeviceRole": "Valitse laitteelle oikea rooli",
+    "deviceRoleDocumentation": "Roolien dokumentaatio laitteelle",
+    "title": "Oletko varma?"
+  }
+}

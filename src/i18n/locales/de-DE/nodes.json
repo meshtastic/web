@@ -1,0 +1,51 @@
+{
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Öffentlicher Schlüssel aktiviert"
+    },
+    "noPublicKey": {
+      "label": "Kein öffentlicher Schlüssel"
+    },
+    "directMessage": {
+      "label": "Direktnachricht {{shortName}}"
+    },
+    "favorite": {
+      "label": "Favorit"
+    },
+    "notFavorite": {
+      "label": "Kein Favorit"
+    },
+    "status": {
+      "heard": "Gehört",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Höhe"
+    },
+    "channelUtil": {
+      "label": "Kanal-Auslastung"
+    },
+    "airtimeUtil": {
+      "label": "Sendezeit-Auslastung"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "Langer Name",
+      "connection": "Verbindung",
+      "lastHeard": "Zuletzt gehört",
+      "encryption": "Verschlüsselung",
+      "model": "Modell",
+      "macAddress": "MAC Adresse"
+    },
+    "connectionStatus": {
+      "direct": "Direkt",
+      "away": "abwesend",
+      "unknown": "-",
+      "viaMqtt": ", über MQTT"
+    },
+    "lastHeardStatus": {
+      "never": "Nie"
+    }
+  }
+}

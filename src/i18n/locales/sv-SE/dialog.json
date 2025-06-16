@@ -1,0 +1,159 @@
+{
+  "deleteMessages": {
+    "description": "Den här åtgärden kommer att rensa all meddelandehistorik. Detta kan inte ångras. Är du säker på att du vill fortsätta?",
+    "title": "Rensa alla meddelanden"
+  },
+  "deviceName": {
+    "description": "Enheten kommer att starta om när inställningarna har sparats.",
+    "longName": "Långt namn",
+    "shortName": "Kort namn",
+    "title": "Ändra enhetens namn"
+  },
+  "import": {
+    "description": "Den aktuella LoRa konfigurationen kommer att skrivas över.",
+    "error": {
+      "invalidUrl": "Ogiltig Meshtastic URL"
+    },
+    "channelPrefix": "Kanal: ",
+    "channelSetUrl": "Kanalinställning/QR-kod URL",
+    "channels": "Kanaler:",
+    "usePreset": "Använd förinställning?",
+    "title": "Importera kanaluppsättning"
+  },
+  "locationResponse": {
+    "altitude": "Höjd:",
+    "coordinates": "Koordinater: ",
+    "title": "Plats: {{identifier}}"
+  },
+  "pkiRegenerateDialog": {
+    "title": "Förnya nyckel?",
+    "description": "Är du säker på att du vill förnya den fördelade nyckeln?",
+    "regenerate": "Förnya"
+  },
+  "newDeviceDialog": {
+    "title": "Anslut ny enhet",
+    "https": "https",
+    "http": "http",
+    "tabHttp": "HTTP",
+    "tabBluetooth": "Bluetooth",
+    "tabSerial": "Seriell kommunikation",
+    "useHttps": "Använd HTTPS",
+    "connecting": "Ansluter...",
+    "connect": "Anslut",
+    "connectionFailedAlert": {
+      "title": "Anslutningen misslyckades",
+      "descriptionPrefix": "Kunde inte ansluta till enheten. ",
+      "httpsHint": "Om du använder HTTPS kan du behöva godkänna ett självsignerat certifikat först. ",
+      "openLinkPrefix": "Vänligen öppna ",
+      "openLinkSuffix": " i en ny flik",
+      "acceptTlsWarningSuffix": ", acceptera eventuella TLS-varningar om du uppmanas och försök igen",
+      "learnMoreLink": "Läs mer"
+    },
+    "httpConnection": {
+      "label": "IP-adress/värdnamn",
+      "placeholder": "000.000.000.000 / meshtastic.lokal"
+    },
+    "serialConnection": {
+      "noDevicesPaired": "Inga enheter parkopplade ännu.",
+      "newDeviceButton": "Ny enhet",
+      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
+    },
+    "bluetoothConnection": {
+      "noDevicesPaired": "Inga enheter parkopplade ännu.",
+      "newDeviceButton": "Ny enhet"
+    },
+    "validation": {
+      "requiresFeatures": "Den här anslutningstypen kräver <0></0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
+      "requiresSecureContext": "Denna applikation kräver en <0>säker kontext</0>. Anslut med HTTPS eller localhost.",
+      "additionallyRequiresSecureContext": "Dessutom kräver den ett <0>säker kontext</0>. Vänligen anslut med HTTPS eller localhost."
+    }
+  },
+  "nodeDetails": {
+    "message": "Meddelande",
+    "requestPosition": "Begär plats",
+    "traceRoute": "Spåra rutt",
+    "airTxUtilization": "Sändningsutnyttjande",
+    "allRawMetrics": "All oformaterad data",
+    "batteryLevel": "Batterinivå",
+    "channelUtilization": "Kanalutnyttjande",
+    "details": "Detaljer:",
+    "deviceMetrics": "Enhetens mätvärden:",
+    "hardware": "Hårdvara: ",
+    "lastHeard": "Senast hörd: ",
+    "nodeHexPrefix": "Nod-hex: !",
+    "nodeNumber": "Nodnummer: ",
+    "position": "Plats:",
+    "role": "Roll: ",
+    "uptime": "Drifttid: ",
+    "voltage": "Spänning",
+    "title": "Nodinformation för {{identifier}}",
+    "ignoreNode": "Ignorera nod",
+    "removeNode": "Ta bort nod",
+    "unignoreNode": "Ta bort favoritmarkering"
+  },
+  "pkiBackup": {
+    "description": "Vi rekommenderar att du säkerhetskopierar dina nycklar regelbundet. Vill du säkerhetskopiera nu?",
+    "loseKeysWarning": "Om du förlorar dina nycklar måste du återställa din enhet.",
+    "secureBackup": "Det är viktigt att säkerhetskopiera dina publika och privata nycklar och förvara din säkerhetskopia säkert.",
+    "footer": "=== END OF KEYS ===",
+    "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
+    "privateKey": "Privat nyckel:",
+    "publicKey": "Publik nyckel:",
+    "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
+    "title": "Säkerhetskopiera nycklar"
+  },
+  "pkiRegenerate": {
+    "description": "Är du säker på att du vill förnya nyckelpar?",
+    "title": "Förnya nyckelpar"
+  },
+  "qr": {
+    "addChannels": "Lägg till kanaler",
+    "replaceChannels": "Ersätt kanaler",
+    "description": "Den aktuella LoRa-konfigurationen kommer också att delas.",
+    "sharableUrl": "Delbar URL",
+    "title": "Generera QR-kod"
+  },
+  "rebootOta": {
+    "title": "Schemalägg omstart",
+    "description": "Starta om den anslutna noden till OTA- (Over-the-Air) läge efter en fördröjning.",
+    "enterDelay": "Ange fördröjning (sekunder)",
+    "scheduled": "Omstart har schemalagts"
+  },
+  "reboot": {
+    "title": "Schemalägg omstart",
+    "description": "Starta om den anslutna noden efter x minuter."
+  },
+  "refreshKeys": {
+    "description": {
+      "acceptNewKeys": "Detta kommer att ta bort noden från enheten och begära nya nycklar.",
+      "keyMismatchReasonSuffix": ". Detta beror på att fjärrnodens nuvarande publika nyckel inte matchar den tidigare lagrade nyckeln för den här noden.",
+      "unableToSendDmPrefix": "Din nod kan inte skicka ett direkt meddelande till noden: "
+    },
+    "acceptNewKeys": "Godkänn nya nycklar",
+    "title": "Nycklarna matchar inte - {{identifier}}"
+  },
+  "removeNode": {
+    "description": "Är du säker på att du vill ta bort den här noden?",
+    "title": "Ta bort noden?"
+  },
+  "shutdown": {
+    "title": "Schemalägg avstängning",
+    "description": "Stäng av den anslutna noden efter x minuter."
+  },
+  "traceRoute": {
+    "routeToDestination": "Rutt till destination:",
+    "routeBack": "Rutt tillbaka:"
+  },
+  "tracerouteResponse": {
+    "title": "Spåra rutt: {{identifier}}"
+  },
+  "unsafeRoles": {
+    "confirmUnderstanding": "Ja, jag vet vad jag gör",
+    "conjunction": " och blogginlägget om ",
+    "postamble": " och förstår konsekvenserna av att ändra roll.",
+    "preamble": "Jag har läst ",
+    "choosingRightDeviceRole": "Att välja rätt enhetsroll",
+    "deviceRoleDocumentation": "Dokumentation för enhetsroll",
+    "title": "Är du säker?"
+  }
+}

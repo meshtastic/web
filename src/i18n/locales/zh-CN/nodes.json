@@ -1,0 +1,51 @@
+{
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Public Key Enabled"
+    },
+    "noPublicKey": {
+      "label": "No Public Key"
+    },
+    "directMessage": {
+      "label": "Direct Message {{shortName}}"
+    },
+    "favorite": {
+      "label": "收藏"
+    },
+    "notFavorite": {
+      "label": "Not a Favorite"
+    },
+    "status": {
+      "heard": "收到",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Elevation"
+    },
+    "channelUtil": {
+      "label": "Channel Util"
+    },
+    "airtimeUtil": {
+      "label": "Airtime Util"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "长名称",
+      "connection": "Connection",
+      "lastHeard": "Last Heard",
+      "encryption": "Encryption",
+      "model": "模型",
+      "macAddress": "MAC Address"
+    },
+    "connectionStatus": {
+      "direct": "直频",
+      "away": "away",
+      "unknown": "-",
+      "viaMqtt": ", via MQTT"
+    },
+    "lastHeardStatus": {
+      "never": "Never"
+    }
+  }
+}
