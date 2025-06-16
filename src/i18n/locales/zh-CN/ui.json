@@ -1,13 +1,13 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
-    "config": "Config",
+    "messages": "消息",
+    "map": "地图",
+    "config": "配置",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
-    "nodes": "Nodes"
+    "channels": "频道",
+    "nodes": "节点"
   },
   "app": {
     "title": "Meshtastic",
@@ -23,7 +23,7 @@
     "deviceInfo": {
       "volts": "{{voltage}} volts",
       "firmware": {
-        "title": "Firmware",
+        "title": "固件",
         "version": "v{{version}}",
         "buildDate": "Build date: {{date}}"
       },
@@ -38,7 +38,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "title": "电池"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -90,32 +90,32 @@
       "label": "Copy to clipboard"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "隐藏密码"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "显示密码"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
       "failed": "Delivery Failed",
-      "waiting": "Waiting",
-      "unknown": "Unknown"
+      "waiting": "等待中...",
+      "unknown": "未知"
     }
   },
   "general": {
     "label": "General"
   },
   "hardware": {
-    "label": "Hardware"
+    "label": "硬件"
   },
   "metrics": {
     "label": "Metrics"
   },
   "role": {
-    "label": "Role"
+    "label": "角色"
   },
   "filter": {
-    "label": "Filter"
+    "label": "筛选器csvfganw"
   },
   "clearInput": {
     "label": "Clear input"
@@ -136,18 +136,18 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "title": "电压"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
   },
   "hops": {
-    "direct": "Direct",
+    "direct": "直频",
     "label": "Number of hops",
     "text": "Number of hops: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
+    "label": "最后听到",
     "labelText": "Last heard: {{value}}",
     "nowLabel": "Now"
   },
@@ -167,12 +167,12 @@
     "label": "Connected via MQTT"
   },
   "language": {
-    "label": "Language",
+    "label": "语言",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "深色",
+    "light": "浅色",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

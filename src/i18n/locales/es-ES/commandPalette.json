@@ -12,10 +12,10 @@
   "goto": {
     "label": "Goto",
     "command": {
-      "messages": "Messages",
-      "map": "Map",
+      "messages": "Mensajes",
+      "map": "Mapa",
       "config": "Config",
-      "channels": "Channels",
+      "channels": "Canales",
       "nodes": "Nodes"
     }
   },

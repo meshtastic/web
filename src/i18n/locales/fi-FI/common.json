@@ -45,75 +45,75 @@
       "unknown": "Hyppyjen määrä tuntematon"
     },
     "megahertz": "MHz",
-    "raw": "raw",
+    "raw": "raakatieto",
     "meter": {
-      "one": "Meter",
-      "plural": "Meters",
+      "one": "Metri",
+      "plural": "Metriä",
       "suffix": "m"
     },
     "minute": {
-      "one": "Minute",
-      "plural": "Minutes"
+      "one": "Minuutti",
+      "plural": "Minuuttia"
     },
     "millisecond": {
-      "one": "Millisecond",
-      "plural": "Milliseconds",
+      "one": "Millisekunti",
+      "plural": "Millisekuntia",
       "suffix": "ms"
     },
     "second": {
-      "one": "Second",
-      "plural": "Seconds"
+      "one": "Sekunti",
+      "plural": "Sekuntia"
     },
     "snr": "SNR",
     "volt": {
-      "one": "Volt",
-      "plural": "Volts",
+      "one": "Voltti",
+      "plural": "Voltit",
       "suffix": "V"
     },
     "record": {
-      "one": "Records",
-      "plural": "Records"
+      "one": "Tiedot",
+      "plural": "Tiedot"
     }
   },
   "security": {
-    "256bit": "256 bit"
+    "256bit": "256 bittiä"
   },
   "unknown": {
-    "longName": "Unknown",
+    "longName": "Tuntematon",
     "shortName": "UNK",
     "notAvailable": "N/A",
     "num": "??"
   },
   "nodeUnknownPrefix": "!",
-  "unset": "UNSET",
+  "unset": "EI ASETETTU",
   "fallbackName": "Meshtastic {{last4}}",
   "formValidation": {
     "tooBig": {
-      "string": "Too long, expected less than or equal to {{maximum}} characters.",
-      "number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-      "bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+      "string": "Teksti on liian pitkä – sallittu enimmäispituus on {{maximum}} merkkiä.",
+      "number": "Arvo on liian suuri – sallittu enimmäisarvo on {{maximum}}.",
+      "bytes": "Liian suuri koko – sallittu enimmäismäärä on {{params.maximum}} tavua."
     },
     "tooSmall": {
-      "string": "Too short, expected more than or equal to {{minimum}} characters.",
-      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+      "string": "Teksti on liian lyhyt – vähimmäispituus on {{minimum}} merkkiä.",
+      "number": "Arvo on liian pieni – pienin sallittu arvo on {{minimum}}."
     },
     "invalidFormat": {
-      "ipv4": "Invalid format, expected an IPv4 address.",
-      "key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+      "ipv4": "Virheellinen muoto – odotettu muoto on IPv4-osoite.",
+      "key": "Virheellinen muoto – odotettu muoto on Base64-koodattu jaettu avain (PSK)."
     },
     "invalidType": {
-      "number": "Invalid type, expected a number."
+      "number": "Virheellinen tyyppi – arvon tulee olla numero."
     },
     "pskLength": {
-      "0bit": "Key is required to be empty.",
-      "8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-      "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-      "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+      "0bit": "Avainkentän on oltava tyhjä.",
+      "8bit": "Avaimen on oltava 8-bittinen jaettu avain (PSK).",
+      "128bit": "Avaimen on oltava 128-bittinen jaettu avain (PSK).",
+      "256bit": "Avaimen on oltava 256-bittinen jaettu avain (PSK)."
     },
     "required": {
-      "generic": "This field is required.",
-      "managed": "At least one admin key is requred if the node is managed.",
-      "key": "Key is required."
+      "generic": "Tämä kenttä on pakollinen.",
+      "managed": "Vähintään yksi hallinta-avain vaaditaan, jos laitetta hallitaan.",
+      "key": "Avain on pakollinen."
     }
   }
 }

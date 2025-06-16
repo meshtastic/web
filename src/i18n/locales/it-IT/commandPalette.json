@@ -12,11 +12,11 @@
   "goto": {
     "label": "Goto",
     "command": {
-      "messages": "Messages",
-      "map": "Map",
+      "messages": "Messaggi",
+      "map": "Mappa",
       "config": "Config",
-      "channels": "Channels",
-      "nodes": "Nodes"
+      "channels": "Canali",
+      "nodes": "Nodi"
     }
   },
   "manage": {
@@ -31,7 +31,7 @@
     "command": {
       "qrCode": "QR Code",
       "qrGenerator": "Generator",
-      "qrImport": "Import",
+      "qrImport": "Importa",
       "scheduleShutdown": "Schedule Shutdown",
       "scheduleReboot": "Schedule Reboot",
       "rebootToOtaMode": "Reboot To OTA Mode",

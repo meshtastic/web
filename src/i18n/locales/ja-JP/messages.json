@@ -11,11 +11,11 @@
   },
   "sendMessage": {
     "placeholder": "Type your message here...",
-    "sendButton": "Send"
+    "sendButton": "送信"
   },
   "actionsMenu": {
     "addReactionLabel": "Add Reaction",
-    "replyLabel": "Reply"
+    "replyLabel": "返信"
   },
   "item": {
     "status": {

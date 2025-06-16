@@ -1,12 +1,12 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
+    "messages": "Mensagens",
+    "map": "Mapa",
     "config": "Config",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
+    "channels": "Canal",
     "nodes": "Nodes"
   },
   "app": {
@@ -38,7 +38,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "title": "Bateria"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -90,10 +90,10 @@
       "label": "Copy to clipboard"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "Ocultar palavra-passe"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "Mostrar palavra-passe"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
@@ -112,10 +112,10 @@
     "label": "Metrics"
   },
   "role": {
-    "label": "Role"
+    "label": "Papel"
   },
   "filter": {
-    "label": "Filter"
+    "label": "Filtrar"
   },
   "clearInput": {
     "label": "Clear input"
@@ -136,18 +136,18 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "title": "Voltagem"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
   },
   "hops": {
-    "direct": "Direct",
+    "direct": "Direto",
     "label": "Number of hops",
     "text": "Number of hops: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
+    "label": "Último recebido",
     "labelText": "Last heard: {{value}}",
     "nowLabel": "Now"
   },
@@ -167,12 +167,12 @@
     "label": "Connected via MQTT"
   },
   "language": {
-    "label": "Language",
+    "label": "Idioma",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "Escuro",
+    "light": "Claro",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

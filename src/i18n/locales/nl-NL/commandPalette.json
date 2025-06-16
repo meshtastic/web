@@ -12,10 +12,10 @@
   "goto": {
     "label": "Goto",
     "command": {
-      "messages": "Messages",
-      "map": "Map",
+      "messages": "Berichten",
+      "map": "Kaart",
       "config": "Config",
-      "channels": "Channels",
+      "channels": "Kanalen",
       "nodes": "Nodes"
     }
   },
@@ -31,7 +31,7 @@
     "command": {
       "qrCode": "QR Code",
       "qrGenerator": "Generator",
-      "qrImport": "Import",
+      "qrImport": "Importeer",
       "scheduleShutdown": "Schedule Shutdown",
       "scheduleReboot": "Schedule Reboot",
       "rebootToOtaMode": "Reboot To OTA Mode",

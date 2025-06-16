@@ -21,7 +21,7 @@
       "description": "Sets LED to on or off"
     },
     "current": {
-      "label": "Current",
+      "label": "Intensidad",
       "description": "Sets the current for the LED output. Default is 10"
     },
     "red": {
@@ -365,7 +365,7 @@
       "description": "The serial baud rate"
     },
     "timeout": {
-      "label": "Timeout",
+      "label": "Tiempo agotado",
       "description": "Seconds to wait before we consider your packet as 'done'"
     },
     "mode": {

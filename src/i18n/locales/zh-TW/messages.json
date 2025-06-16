@@ -11,11 +11,11 @@
   },
   "sendMessage": {
     "placeholder": "Type your message here...",
-    "sendButton": "Send"
+    "sendButton": "傳送"
   },
   "actionsMenu": {
-    "addReactionLabel": "Add Reaction",
-    "replyLabel": "Reply"
+    "addReactionLabel": "新增反應",
+    "replyLabel": "回覆"
   },
   "item": {
     "status": {
@@ -29,7 +29,7 @@
       },
       "unknown": {
         "label": "Message status unknown",
-        "displayText": "Unknown state"
+        "displayText": "不明狀態"
       },
       "waiting": {
         "ariaLabel": "Sending message",

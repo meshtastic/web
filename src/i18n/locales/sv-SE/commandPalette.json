@@ -1,50 +1,50 @@
 {
-  "emptyState": "No results found.",
+  "emptyState": "Inga resultat hittades.",
   "page": {
-    "title": "Command Menu"
+    "title": "Snabbmeny"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "label": "Lägg till grupp i favoriter"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "label": "Ta bort grupp från favoriter"
   },
   "goto": {
-    "label": "Goto",
+    "label": "Gå till",
     "command": {
-      "messages": "Messages",
-      "map": "Map",
-      "config": "Config",
-      "channels": "Channels",
-      "nodes": "Nodes"
+      "messages": "Meddelanden",
+      "map": "Karta",
+      "config": "Inställningar",
+      "channels": "Kanaler",
+      "nodes": "Noder"
     }
   },
   "manage": {
-    "label": "Manage",
+    "label": "Hantera",
     "command": {
-      "switchNode": "Switch Node",
-      "connectNewNode": "Connect New Node"
+      "switchNode": "Byt nod",
+      "connectNewNode": "Anslut ny nod"
     }
   },
   "contextual": {
-    "label": "Contextual",
+    "label": "Kontextuell",
     "command": {
-      "qrCode": "QR Code",
+      "qrCode": "QR-kod",
       "qrGenerator": "Generator",
       "qrImport": "Import",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Schedule Reboot",
-      "rebootToOtaMode": "Reboot To OTA Mode",
-      "resetNodeDb": "Reset Node DB",
-      "factoryResetDevice": "Factory Reset Device",
-      "factoryResetConfig": "Factory Reset Config"
+      "scheduleShutdown": "Schemalägg avstängning",
+      "scheduleReboot": "Schemalägg omstart",
+      "rebootToOtaMode": "Starta om till OTA-läge",
+      "resetNodeDb": "Töm noddatabasen",
+      "factoryResetDevice": "Fabriksåterställ enhet",
+      "factoryResetConfig": "Fabriksåterställ konfigurationen"
     }
   },
   "debug": {
-    "label": "Debug",
+    "label": "Felsökning",
     "command": {
-      "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "reconfigure": "Konfigurera om",
+      "clearAllStoredMessages": "Radera alla sparade meddelanden"
     }
   }
 }

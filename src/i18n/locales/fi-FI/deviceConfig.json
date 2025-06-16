@@ -219,7 +219,7 @@
       "label": "Yhdyskäytävä"
     },
     "ip": {
-      "description": "IP Address",
+      "description": "IP-osoite",
       "label": "IP"
     },
     "psk": {

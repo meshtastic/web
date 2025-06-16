@@ -1,51 +1,51 @@
 {
   "nodeDetail": {
     "publicKeyEnabled": {
-      "label": "Public Key Enabled"
+      "label": "Öffentlicher Schlüssel aktiviert"
     },
     "noPublicKey": {
-      "label": "No Public Key"
+      "label": "Kein öffentlicher Schlüssel"
     },
     "directMessage": {
-      "label": "Direct Message {{shortName}}"
+      "label": "Direktnachricht {{shortName}}"
     },
     "favorite": {
-      "label": "Favorite"
+      "label": "Favorit"
     },
     "notFavorite": {
-      "label": "Not a Favorite"
+      "label": "Kein Favorit"
     },
     "status": {
-      "heard": "Heard",
+      "heard": "Gehört",
       "mqtt": "MQTT"
     },
     "elevation": {
-      "label": "Elevation"
+      "label": "Höhe"
     },
     "channelUtil": {
-      "label": "Channel Util"
+      "label": "Kanal-Auslastung"
     },
     "airtimeUtil": {
-      "label": "Airtime Util"
+      "label": "Sendezeit-Auslastung"
     }
   },
   "nodesTable": {
     "headings": {
-      "longName": "Long Name",
-      "connection": "Connection",
-      "lastHeard": "Last Heard",
-      "encryption": "Encryption",
-      "model": "Model",
-      "macAddress": "MAC Address"
+      "longName": "Langer Name",
+      "connection": "Verbindung",
+      "lastHeard": "Zuletzt gehört",
+      "encryption": "Verschlüsselung",
+      "model": "Modell",
+      "macAddress": "MAC Adresse"
     },
     "connectionStatus": {
-      "direct": "Direct",
-      "away": "away",
+      "direct": "Direkt",
+      "away": "abwesend",
       "unknown": "-",
       "viaMqtt": ", via MQTT"
     },
     "lastHeardStatus": {
-      "never": "Never"
+      "never": "Nie"
     }
   }
 }

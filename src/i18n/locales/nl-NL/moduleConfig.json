@@ -1,17 +1,17 @@
 {
   "page": {
-    "tabAmbientLighting": "Ambient Lighting",
-    "tabAudio": "Audio",
+    "tabAmbientLighting": "Sfeerverlichting",
+    "tabAudio": "Geluid",
     "tabCannedMessage": "Canned",
-    "tabDetectionSensor": "Detection Sensor",
+    "tabDetectionSensor": "Detectie Sensor",
     "tabExternalNotification": "Ext Notif",
     "tabMqtt": "MQTT",
     "tabNeighborInfo": "Neighbor Info",
     "tabPaxcounter": "Paxcounter",
-    "tabRangeTest": "Range Test",
-    "tabSerial": "Serial",
+    "tabRangeTest": "Bereik Test",
+    "tabSerial": "Serieel",
     "tabStoreAndForward": "S&F",
-    "tabTelemetry": "Telemetry"
+    "tabTelemetry": "Telemetrie"
   },
   "ambientLighting": {
     "title": "Ambient Lighting Settings",
@@ -21,19 +21,19 @@
       "description": "Sets LED to on or off"
     },
     "current": {
-      "label": "Current",
+      "label": "Huidige",
       "description": "Sets the current for the LED output. Default is 10"
     },
     "red": {
-      "label": "Red",
+      "label": "Rood",
       "description": "Sets the red LED level. Values are 0-255"
     },
     "green": {
-      "label": "Green",
+      "label": "Groen",
       "description": "Sets the green LED level. Values are 0-255"
     },
     "blue": {
-      "label": "Blue",
+      "label": "Blauw",
       "description": "Sets the blue LED level. Values are 0-255"
     }
   },
@@ -365,7 +365,7 @@
       "description": "The serial baud rate"
     },
     "timeout": {
-      "label": "Timeout",
+      "label": "Time-Out",
       "description": "Seconds to wait before we consider your packet as 'done'"
     },
     "mode": {
@@ -389,7 +389,7 @@
       "description": "Enable Store & Forward heartbeat"
     },
     "records": {
-      "label": "Number of records",
+      "label": "Aantal records",
       "description": "Number of records to store"
     },
     "historyReturnMax": {

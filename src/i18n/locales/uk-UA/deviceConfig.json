@@ -167,7 +167,7 @@
     },
     "region": {
       "description": "Sets the region for your node",
-      "label": "Region"
+      "label": "Регіон"
     },
     "spreadingFactor": {
       "description": "Indicates the number of chirps per symbol",
@@ -329,7 +329,7 @@
       "numSatellites": "Number of satellites",
       "sequenceNumber": "Sequence number",
       "timestamp": "Timestamp",
-      "unset": "Unset",
+      "unset": "Скинути",
       "vehicleHeading": "Vehicle heading",
       "vehicleSpeed": "Vehicle speed"
     }

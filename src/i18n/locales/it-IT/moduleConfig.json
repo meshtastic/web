@@ -1,17 +1,17 @@
 {
   "page": {
-    "tabAmbientLighting": "Ambient Lighting",
+    "tabAmbientLighting": "Luce Ambientale",
     "tabAudio": "Audio",
     "tabCannedMessage": "Canned",
-    "tabDetectionSensor": "Detection Sensor",
+    "tabDetectionSensor": "Sensore Di Rilevamento",
     "tabExternalNotification": "Ext Notif",
     "tabMqtt": "MQTT",
-    "tabNeighborInfo": "Neighbor Info",
+    "tabNeighborInfo": "Informazioni Vicinato",
     "tabPaxcounter": "Paxcounter",
-    "tabRangeTest": "Range Test",
-    "tabSerial": "Serial",
+    "tabRangeTest": "Test Distanza",
+    "tabSerial": "Seriale",
     "tabStoreAndForward": "S&F",
-    "tabTelemetry": "Telemetry"
+    "tabTelemetry": "Telemetria"
   },
   "ambientLighting": {
     "title": "Ambient Lighting Settings",
@@ -21,19 +21,19 @@
       "description": "Sets LED to on or off"
     },
     "current": {
-      "label": "Current",
+      "label": "Attuale",
       "description": "Sets the current for the LED output. Default is 10"
     },
     "red": {
-      "label": "Red",
+      "label": "Rosso",
       "description": "Sets the red LED level. Values are 0-255"
     },
     "green": {
-      "label": "Green",
+      "label": "Verde",
       "description": "Sets the green LED level. Values are 0-255"
     },
     "blue": {
-      "label": "Blue",
+      "label": "Blu",
       "description": "Sets the blue LED level. Values are 0-255"
     }
   },
@@ -389,15 +389,15 @@
       "description": "Enable Store & Forward heartbeat"
     },
     "records": {
-      "label": "Number of records",
+      "label": "Numero di record",
       "description": "Number of records to store"
     },
     "historyReturnMax": {
-      "label": "History return max",
+      "label": "Cronologia ritorno max",
       "description": "Max number of records to return"
     },
     "historyReturnWindow": {
-      "label": "History return window",
+      "label": "Finestra di ritorno cronologia",
       "description": "Max number of records to return"
     }
   },
@@ -406,10 +406,10 @@
     "description": "Settings for the Telemetry module",
     "deviceUpdateInterval": {
       "label": "Device Metrics",
-      "description": "Device metrics update interval (seconds)"
+      "description": "Intervallo aggiornamento metriche dispositivo (secondi)"
     },
     "environmentUpdateInterval": {
-      "label": "Environment metrics update interval (seconds)",
+      "label": "Intervallo aggiornamento metriche ambientali (secondi)",
       "description": ""
     },
     "environmentMeasurementEnabled": {

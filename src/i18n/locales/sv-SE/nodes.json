@@ -1,51 +1,51 @@
 {
   "nodeDetail": {
     "publicKeyEnabled": {
-      "label": "Public Key Enabled"
+      "label": "Publik nyckel aktiverad"
     },
     "noPublicKey": {
-      "label": "No Public Key"
+      "label": "Publik nyckel saknas"
     },
     "directMessage": {
-      "label": "Direct Message {{shortName}}"
+      "label": "Direktmeddelande {{shortName}}"
     },
     "favorite": {
-      "label": "Favorite"
+      "label": "Favorit"
     },
     "notFavorite": {
-      "label": "Not a Favorite"
+      "label": "Inte en favorit"
     },
     "status": {
-      "heard": "Heard",
+      "heard": "Hörd",
       "mqtt": "MQTT"
     },
     "elevation": {
-      "label": "Elevation"
+      "label": "Höjd"
     },
     "channelUtil": {
-      "label": "Channel Util"
+      "label": "Kanalutnyttjande"
     },
     "airtimeUtil": {
-      "label": "Airtime Util"
+      "label": "Sändningstidsutnyttjande"
     }
   },
   "nodesTable": {
     "headings": {
-      "longName": "Long Name",
-      "connection": "Connection",
-      "lastHeard": "Last Heard",
-      "encryption": "Encryption",
-      "model": "Model",
-      "macAddress": "MAC Address"
+      "longName": "Långt namn",
+      "connection": "Anslutning",
+      "lastHeard": "Senast hörd",
+      "encryption": "Kryptering",
+      "model": "Modell",
+      "macAddress": "MAC-adress"
     },
     "connectionStatus": {
-      "direct": "Direct",
-      "away": "away",
+      "direct": "Direkt",
+      "away": "bort",
       "unknown": "-",
       "viaMqtt": ", via MQTT"
     },
     "lastHeardStatus": {
-      "never": "Never"
+      "never": "Aldrig"
     }
   }
 }

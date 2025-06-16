@@ -1,51 +1,51 @@
 {
   "nodeDetail": {
     "publicKeyEnabled": {
-      "label": "Public Key Enabled"
+      "label": "Julkinen avain käytössä"
     },
     "noPublicKey": {
-      "label": "No Public Key"
+      "label": "Ei julkinen avain"
     },
     "directMessage": {
-      "label": "Direct Message {{shortName}}"
+      "label": "Suora Viesti {{shortName}}"
     },
     "favorite": {
-      "label": "Favorite"
+      "label": "Suosikki"
     },
     "notFavorite": {
-      "label": "Not a Favorite"
+      "label": "Ei suosikki"
     },
     "status": {
-      "heard": "Heard",
+      "heard": "Kuultu",
       "mqtt": "MQTT"
     },
     "elevation": {
-      "label": "Elevation"
+      "label": "Korkeus"
     },
     "channelUtil": {
-      "label": "Channel Util"
+      "label": "Kanavan käyttö"
     },
     "airtimeUtil": {
-      "label": "Airtime Util"
+      "label": "Lähetysajan käyttö"
     }
   },
   "nodesTable": {
     "headings": {
-      "longName": "Long Name",
-      "connection": "Connection",
-      "lastHeard": "Last Heard",
-      "encryption": "Encryption",
-      "model": "Model",
-      "macAddress": "MAC Address"
+      "longName": "Pitkä nimi",
+      "connection": "Yhteys",
+      "lastHeard": "Viimeksi kuultu",
+      "encryption": "Salaus",
+      "model": "Malli",
+      "macAddress": "MAC-osoite"
     },
     "connectionStatus": {
-      "direct": "Direct",
-      "away": "away",
+      "direct": "Suora",
+      "away": "poissa",
       "unknown": "-",
-      "viaMqtt": ", via MQTT"
+      "viaMqtt": ", MQTT välityksellä"
     },
     "lastHeardStatus": {
-      "never": "Never"
+      "never": "Ei koskaan"
     }
   }
 }

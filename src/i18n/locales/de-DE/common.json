@@ -53,36 +53,36 @@
     },
     "minute": {
       "one": "Minute",
-      "plural": "Minutes"
+      "plural": "Minuten"
     },
     "millisecond": {
-      "one": "Millisecond",
-      "plural": "Milliseconds",
+      "one": "Millisekunde",
+      "plural": "Millisekunden",
       "suffix": "ms"
     },
     "second": {
-      "one": "Second",
-      "plural": "Seconds"
+      "one": "Sekunde",
+      "plural": "Sekunden"
     },
     "snr": "SNR",
     "volt": {
       "one": "Volt",
-      "plural": "Volts",
+      "plural": "Volt",
       "suffix": "V"
     },
     "record": {
-      "one": "Records",
-      "plural": "Records"
+      "one": "Datensatz",
+      "plural": "Datensätze"
     }
   },
   "security": {
-    "256bit": "256 bit"
+    "256bit": "256 Bit"
   },
   "unknown": {
-    "longName": "Unknown",
-    "shortName": "UNK",
-    "notAvailable": "N/A",
-    "num": "??"
+    "longName": "Unbekannt",
+    "shortName": "UNB",
+    "notAvailable": "Keine Angaben",
+    "num": "???"
   },
   "nodeUnknownPrefix": "!",
   "unset": "UNSET",
@@ -112,7 +112,7 @@
     },
     "required": {
       "generic": "This field is required.",
-      "managed": "At least one admin key is requred if the node is managed.",
+      "managed": "Mindestens ein administrativer Schlüssel wird benötigt, um diesen Knoten zu verwalten",
       "key": "Key is required."
     }
   }

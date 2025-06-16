@@ -10,7 +10,7 @@
       "label": "Direct Message {{shortName}}"
     },
     "favorite": {
-      "label": "Favorite"
+      "label": "Favoriet"
     },
     "notFavorite": {
       "label": "Not a Favorite"

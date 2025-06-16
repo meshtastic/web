@@ -1,201 +1,201 @@
 {
   "navigation": {
-    "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
-    "config": "Config",
-    "radioConfig": "Radio Config",
-    "moduleConfig": "Module Config",
-    "channels": "Channels",
-    "nodes": "Nodes"
+    "title": "Navigering",
+    "messages": "Meddelanden",
+    "map": "Karta",
+    "config": "Inställningar",
+    "radioConfig": "Radioinställningar",
+    "moduleConfig": "Modulinställningar",
+    "channels": "Kanaler",
+    "nodes": "Noder"
   },
   "app": {
     "title": "Meshtastic",
-    "logo": "Meshtastic Logo"
+    "logo": "Meshtastic logotyp"
   },
   "sidebar": {
     "collapseToggle": {
       "button": {
-        "open": "Open sidebar",
-        "close": "Close sidebar"
+        "open": "Öppna sidopanel",
+        "close": "Stäng sidopanel"
       }
     },
     "deviceInfo": {
-      "volts": "{{voltage}} volts",
+      "volts": "{{voltage}} volt",
       "firmware": {
         "title": "Firmware",
         "version": "v{{version}}",
-        "buildDate": "Build date: {{date}}"
+        "buildDate": "Kompileringsdatum: {{date}}"
       },
       "deviceName": {
-        "title": "Device Name",
-        "changeName": "Change Device Name",
-        "placeholder": "Enter device name"
+        "title": "Enhetsnamn",
+        "changeName": "Ändra enhetens namn",
+        "placeholder": "Ange enhetsnamn"
       },
-      "editDeviceName": "Edit device name"
+      "editDeviceName": "Redigera enhetsnamn"
     }
   },
   "batteryStatus": {
-    "charging": "{{level}}% charging",
-    "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "charging": "{{level}}%, laddar",
+    "pluggedIn": "Ansluten",
+    "title": "Batteri"
   },
   "search": {
-    "nodes": "Search nodes...",
-    "channels": "Search channels...",
-    "commandPalette": "Search commands..."
+    "nodes": "Sök noder...",
+    "channels": "Sök kanaler...",
+    "commandPalette": "Sök kommandon..."
   },
   "toast": {
     "positionRequestSent": {
-      "title": "Position request sent."
+      "title": "Platsbegäran skickad."
     },
     "requestingPosition": {
-      "title": "Requesting position, please wait..."
+      "title": "Begär plats, var god vänta..."
     },
     "sendingTraceroute": {
-      "title": "Sending Traceroute, please wait..."
+      "title": "Skickar Traceroute (spåra rutt), vänligen vänta..."
     },
     "tracerouteSent": {
-      "title": "Traceroute sent."
+      "title": "Traceroute (spåra rutt) skickat.."
     },
     "savedChannel": {
-      "title": "Saved Channel: {{channelName}}"
+      "title": "Sparat kanal: {{channelName}}"
     },
     "messages": {
       "pkiEncryption": {
-        "title": "Chat is using PKI encryption."
+        "title": "Chatten använder PKI-kryptering."
       },
       "pskEncryption": {
-        "title": "Chat is using PSK encryption."
+        "title": "Chatten använder PSK-kryptering."
       }
     },
     "configSaveError": {
-      "title": "Error Saving Config",
-      "description": "An error occurred while saving the configuration."
+      "title": "Kunde inte spara inställningarna",
+      "description": "Ett fel inträffade när inställningarna sparades."
     },
     "validationError": {
-      "title": "Config Errors Exist",
-      "description": "Please fix the configuration errors before saving."
+      "title": "Det förekommer inställningsfel",
+      "description": "Vänligen åtgärda felen i inställningarna innan du sparar."
     },
     "saveSuccess": {
-      "title": "Saving Config",
-      "description": "The configuration change {{case}} has been saved."
+      "title": "Sparar inställningarna",
+      "description": "Ändrignarna av {{case}}-inställningarna har sparats."
     }
   },
   "notifications": {
     "copied": {
-      "label": "Copied!"
+      "label": "Kopierat!"
     },
     "copyToClipboard": {
-      "label": "Copy to clipboard"
+      "label": "Kopiera till Urklipp"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "Dölj lösenord"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "Visa lösenord"
     },
     "deliveryStatus": {
-      "delivered": "Delivered",
-      "failed": "Delivery Failed",
-      "waiting": "Waiting",
-      "unknown": "Unknown"
+      "delivered": "Levererad",
+      "failed": "Leverans misslyckades",
+      "waiting": "Väntar",
+      "unknown": "Okänd"
     }
   },
   "general": {
-    "label": "General"
+    "label": "Allmänt"
   },
   "hardware": {
-    "label": "Hardware"
+    "label": "Hårdvara"
   },
   "metrics": {
-    "label": "Metrics"
+    "label": "Telemetri"
   },
   "role": {
-    "label": "Role"
+    "label": "Roll"
   },
   "filter": {
     "label": "Filter"
   },
   "clearInput": {
-    "label": "Clear input"
+    "label": "Rensa inmatning"
   },
   "resetFilters": {
-    "label": "Reset Filters"
+    "label": "Återställ filter"
   },
   "nodeName": {
-    "label": "Node name/number",
+    "label": "Nodnamn/nummer",
     "placeholder": "Meshtastic 1234"
   },
   "airtimeUtilization": {
-    "label": "Airtime Utilization (%)"
+    "label": "Sändningstidsutnyttjande (%)"
   },
   "batteryLevel": {
-    "label": "Battery level (%)",
-    "labelText": "Battery level (%): {{value}}"
+    "label": "Batterinivå (%)",
+    "labelText": "Batterinivå (%): {{value}}"
   },
   "batteryVoltage": {
-    "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "label": "Batterispänning (V)",
+    "title": "Spänning"
   },
   "channelUtilization": {
-    "label": "Channel Utilization (%)"
+    "label": "Kanalutnyttjande (%)"
   },
   "hops": {
-    "direct": "Direct",
-    "label": "Number of hops",
-    "text": "Number of hops: {{value}}"
+    "direct": "Direkt",
+    "label": "Antal hopp",
+    "text": "Antal hopp: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
-    "labelText": "Last heard: {{value}}",
-    "nowLabel": "Now"
+    "label": "Senast hörd",
+    "labelText": "Senast hörd: {{value}}",
+    "nowLabel": "Nu"
   },
   "snr": {
     "label": "SNR (db)"
   },
   "favorites": {
-    "label": "Favorites"
+    "label": "Favoriter"
   },
   "hide": {
-    "label": "Hide"
+    "label": "Dölj"
   },
   "showOnly": {
-    "label": "Show Only"
+    "label": "Visa endast"
   },
   "viaMqtt": {
-    "label": "Connected via MQTT"
+    "label": "Ansluten via MQTT"
   },
   "language": {
-    "label": "Language",
-    "changeLanguage": "Change Language"
+    "label": "Språk",
+    "changeLanguage": "Ändra språk"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
-    "system": "Automatic",
-    "changeTheme": "Change Color Scheme"
+    "dark": "Mörkt",
+    "light": "Ljust",
+    "system": "Automatisk",
+    "changeTheme": "Ändra färgschema"
   },
   "errorPage": {
-    "title": "This is a little embarrassing...",
-    "description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
-    "description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
-    "reportInstructions": "Please include the following information in your report:",
+    "title": "Det här är lite pinsamt...",
+    "description1": "Vi är verkligen ledsna men ett fel inträffade i webbklienten som fick den att krascha. <br /> Detta var inte meningen, men vi arbetar hårt för att åtgärda det.",
+    "description2": "Det bästa sättet att förhindra att detta händer igen för dig eller någon annan är att rapportera problemet till oss.",
+    "reportInstructions": "Vänligen inkludera följande information i din rapport:",
     "reportSteps": {
-      "step1": "What you were doing when the error occurred",
-      "step2": "What you expected to happen",
-      "step3": "What actually happened",
-      "step4": "Any other relevant information"
+      "step1": "Vad du gjorde när felet inträffade",
+      "step2": "Vad du förväntade dig skulle hända",
+      "step3": "Vad som faktiskt hände",
+      "step4": "All annan relevant information"
     },
-    "reportLink": "You can report the issue to our <0>GitHub</0>",
-    "dashboardLink": "Return to the <0>dashboard</0>",
-    "detailsSummary": "Error Details",
-    "errorMessageLabel": "Error message:",
-    "stackTraceLabel": "Stack trace:",
+    "reportLink": "Du kan rapportera problemet på vår <0>GitHub</0>",
+    "dashboardLink": "Återvänd till <0>start</0>",
+    "detailsSummary": "Detaljer om felet",
+    "errorMessageLabel": "Felmeddelande:",
+    "stackTraceLabel": "Stackspårning:",
     "fallbackError": "{{error}}"
   },
   "footer": {
-    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
+    "text": "Drivs av <0>▲ Vercel</0> | Meshtastic® är ett registrerat varumärke som tillhör Meshtastic LLC. | <1>Juridisk information</1>",
     "commitSha": "Commit SHA: {{sha}}"
   }
 }

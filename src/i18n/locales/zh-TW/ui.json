@@ -1,12 +1,12 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
+    "messages": "訊息",
+    "map": "地圖",
     "config": "Config",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
+    "channels": "頻道",
     "nodes": "Nodes"
   },
   "app": {
@@ -23,7 +23,7 @@
     "deviceInfo": {
       "volts": "{{voltage}} volts",
       "firmware": {
-        "title": "Firmware",
+        "title": "固件",
         "version": "v{{version}}",
         "buildDate": "Build date: {{date}}"
       },
@@ -38,7 +38,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "title": "電池"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -90,10 +90,10 @@
       "label": "Copy to clipboard"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "隱藏密碼"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "顯示密碼"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
@@ -112,10 +112,10 @@
     "label": "Metrics"
   },
   "role": {
-    "label": "Role"
+    "label": "角色"
   },
   "filter": {
-    "label": "Filter"
+    "label": "過濾器"
   },
   "clearInput": {
     "label": "Clear input"
@@ -136,18 +136,18 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "title": "電壓"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
   },
   "hops": {
-    "direct": "Direct",
+    "direct": "直線",
     "label": "Number of hops",
     "text": "Number of hops: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
+    "label": "最近一次收到排序",
     "labelText": "Last heard: {{value}}",
     "nowLabel": "Now"
   },
@@ -167,12 +167,12 @@
     "label": "Connected via MQTT"
   },
   "language": {
-    "label": "Language",
+    "label": "语言",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "深色",
+    "light": "淺色",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

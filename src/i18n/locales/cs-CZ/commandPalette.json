@@ -12,11 +12,11 @@
   "goto": {
     "label": "Goto",
     "command": {
-      "messages": "Messages",
-      "map": "Map",
+      "messages": "Zprávy",
+      "map": "Mapa",
       "config": "Config",
-      "channels": "Channels",
-      "nodes": "Nodes"
+      "channels": "Kanály",
+      "nodes": "Uzly"
     }
   },
   "manage": {

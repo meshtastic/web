@@ -1,17 +1,17 @@
 {
   "page": {
-    "tabAmbientLighting": "Ambient Lighting",
-    "tabAudio": "Audio",
+    "tabAmbientLighting": "環境照明",
+    "tabAudio": "オーディオ",
     "tabCannedMessage": "Canned",
-    "tabDetectionSensor": "Detection Sensor",
+    "tabDetectionSensor": "検出センサー",
     "tabExternalNotification": "Ext Notif",
     "tabMqtt": "MQTT",
-    "tabNeighborInfo": "Neighbor Info",
+    "tabNeighborInfo": "隣接ノード情報",
     "tabPaxcounter": "Paxcounter",
-    "tabRangeTest": "Range Test",
-    "tabSerial": "Serial",
+    "tabRangeTest": "レンジテスト",
+    "tabSerial": "シリアル",
     "tabStoreAndForward": "S&F",
-    "tabTelemetry": "Telemetry"
+    "tabTelemetry": "テレメトリー"
   },
   "ambientLighting": {
     "title": "Ambient Lighting Settings",
@@ -21,19 +21,19 @@
       "description": "Sets LED to on or off"
     },
     "current": {
-      "label": "Current",
+      "label": "電流",
       "description": "Sets the current for the LED output. Default is 10"
     },
     "red": {
-      "label": "Red",
+      "label": "赤",
       "description": "Sets the red LED level. Values are 0-255"
     },
     "green": {
-      "label": "Green",
+      "label": "緑",
       "description": "Sets the green LED level. Values are 0-255"
     },
     "blue": {
-      "label": "Blue",
+      "label": "青",
       "description": "Sets the blue LED level. Values are 0-255"
     }
   },
@@ -249,7 +249,7 @@
       "description": "Enable or disable TLS"
     },
     "root": {
-      "label": "Root topic",
+      "label": "ルート トピック",
       "description": "MQTT root topic to use for default/custom servers"
     },
     "proxyToClientEnabled": {
@@ -365,7 +365,7 @@
       "description": "The serial baud rate"
     },
     "timeout": {
-      "label": "Timeout",
+      "label": "タイムアウト",
       "description": "Seconds to wait before we consider your packet as 'done'"
     },
     "mode": {
@@ -389,15 +389,15 @@
       "description": "Enable Store & Forward heartbeat"
     },
     "records": {
-      "label": "Number of records",
+      "label": "サーバーの最大保管レコード数  (デフォルト 約11,000レコード)",
       "description": "Number of records to store"
     },
     "historyReturnMax": {
-      "label": "History return max",
+      "label": "リクエスト可能な最大の履歴件数",
       "description": "Max number of records to return"
     },
     "historyReturnWindow": {
-      "label": "History return window",
+      "label": "リクエスト可能な履歴の期間  (分)",
       "description": "Max number of records to return"
     }
   },
@@ -406,10 +406,10 @@
     "description": "Settings for the Telemetry module",
     "deviceUpdateInterval": {
       "label": "Device Metrics",
-      "description": "Device metrics update interval (seconds)"
+      "description": "デバイスのメトリック更新間隔 (秒)"
     },
     "environmentUpdateInterval": {
-      "label": "Environment metrics update interval (seconds)",
+      "label": "環境メトリック更新間隔 (秒)",
       "description": ""
     },
     "environmentMeasurementEnabled": {

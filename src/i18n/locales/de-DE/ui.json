@@ -1,13 +1,13 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
-    "config": "Config",
-    "radioConfig": "Radio Config",
-    "moduleConfig": "Module Config",
-    "channels": "Channels",
-    "nodes": "Nodes"
+    "messages": "Nachrichten",
+    "map": "Karte",
+    "config": "Einstellungen",
+    "radioConfig": "Funkgerätekonfiguration",
+    "moduleConfig": "Moduleinstellungen",
+    "channels": "Kanäle",
+    "nodes": "Knoten"
   },
   "app": {
     "title": "Meshtastic",
@@ -16,165 +16,165 @@
   "sidebar": {
     "collapseToggle": {
       "button": {
-        "open": "Open sidebar",
-        "close": "Close sidebar"
+        "open": "Seitenleiste öffnen",
+        "close": "Seitenleiste schließen"
       }
     },
     "deviceInfo": {
-      "volts": "{{voltage}} volts",
+      "volts": "{{voltage}} Volt",
       "firmware": {
         "title": "Firmware",
         "version": "v{{version}}",
-        "buildDate": "Build date: {{date}}"
+        "buildDate": "Erstelldatum: {{date}}"
       },
       "deviceName": {
-        "title": "Device Name",
-        "changeName": "Change Device Name",
-        "placeholder": "Enter device name"
+        "title": "Gerätename",
+        "changeName": "Gerätename ändern",
+        "placeholder": "Gerätename eingeben"
       },
-      "editDeviceName": "Edit device name"
+      "editDeviceName": "Gerätename bearbeiten"
     }
   },
   "batteryStatus": {
-    "charging": "{{level}}% charging",
-    "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "charging": "{{level}}% Ladung",
+    "pluggedIn": "Wird geladen",
+    "title": "Batterie"
   },
   "search": {
-    "nodes": "Search nodes...",
-    "channels": "Search channels...",
-    "commandPalette": "Search commands..."
+    "nodes": "Knoten suchen...",
+    "channels": "Kanäle suchen...",
+    "commandPalette": "Befehle suchen..."
   },
   "toast": {
     "positionRequestSent": {
-      "title": "Position request sent."
+      "title": "Standortanfrage gesendet."
     },
     "requestingPosition": {
-      "title": "Requesting position, please wait..."
+      "title": "Standort wird angefordert, bitte warten..."
     },
     "sendingTraceroute": {
-      "title": "Sending Traceroute, please wait..."
+      "title": "Sende Traceroute, bitte warten..."
     },
     "tracerouteSent": {
-      "title": "Traceroute sent."
+      "title": "Traceroute gesendet."
     },
     "savedChannel": {
-      "title": "Saved Channel: {{channelName}}"
+      "title": "Gespeicherter Kanal: {{channelName}}"
     },
     "messages": {
       "pkiEncryption": {
-        "title": "Chat is using PKI encryption."
+        "title": "Der Chat verwendet PKI-Verschlüsselung."
       },
       "pskEncryption": {
-        "title": "Chat is using PSK encryption."
+        "title": "Chat verwendet PSK-Verschlüsselung."
       }
     },
     "configSaveError": {
-      "title": "Error Saving Config",
-      "description": "An error occurred while saving the configuration."
+      "title": "Fehler beim Speichern von Einstellung",
+      "description": "Beim Speichern der Einstellungen ist ein Fehler aufgetreten."
     },
     "validationError": {
-      "title": "Config Errors Exist",
-      "description": "Please fix the configuration errors before saving."
+      "title": "Einstellungsfehler vorhanden",
+      "description": "Bitte korrigieren Sie die Einstellungsfehler vor dem Speichern."
     },
     "saveSuccess": {
-      "title": "Saving Config",
-      "description": "The configuration change {{case}} has been saved."
+      "title": "Einstellungen speichern",
+      "description": "Die Einstellungsänderung {{case}} wurde gespeichert."
     }
   },
   "notifications": {
     "copied": {
-      "label": "Copied!"
+      "label": "Kopiert!"
     },
     "copyToClipboard": {
-      "label": "Copy to clipboard"
+      "label": "In die Zwischenablage kopieren"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "Passwort verbergen"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "Passwort anzeigen"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
       "failed": "Delivery Failed",
-      "waiting": "Waiting",
-      "unknown": "Unknown"
+      "waiting": "Warte...",
+      "unknown": "Unbekannt"
     }
   },
   "general": {
-    "label": "General"
+    "label": "Allgemein"
   },
   "hardware": {
     "label": "Hardware"
   },
   "metrics": {
-    "label": "Metrics"
+    "label": "Messgrößen"
   },
   "role": {
-    "label": "Role"
+    "label": "Rolle"
   },
   "filter": {
     "label": "Filter"
   },
   "clearInput": {
-    "label": "Clear input"
+    "label": "Eingabe löschen"
   },
   "resetFilters": {
-    "label": "Reset Filters"
+    "label": "Filter zurücksetzen"
   },
   "nodeName": {
-    "label": "Node name/number",
+    "label": "Knotenname/-nummer",
     "placeholder": "Meshtastic 1234"
   },
   "airtimeUtilization": {
-    "label": "Airtime Utilization (%)"
+    "label": "Sendezeit-Auslastung (%)"
   },
   "batteryLevel": {
-    "label": "Battery level (%)",
-    "labelText": "Battery level (%): {{value}}"
+    "label": "Akkustand (%)",
+    "labelText": "Akkustand (%): {{value}}"
   },
   "batteryVoltage": {
-    "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "label": "Batteriespannung (V)",
+    "title": "Spannung"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
   },
   "hops": {
-    "direct": "Direct",
-    "label": "Number of hops",
-    "text": "Number of hops: {{value}}"
+    "direct": "Direkt",
+    "label": "Anzahl Hops",
+    "text": "Sprungweite: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
-    "labelText": "Last heard: {{value}}",
-    "nowLabel": "Now"
+    "label": "Zuletzt gehört",
+    "labelText": "Zuletzt gehört: {{value}}",
+    "nowLabel": "Jetzt"
   },
   "snr": {
-    "label": "SNR (db)"
+    "label": "SNR (dB)"
   },
   "favorites": {
-    "label": "Favorites"
+    "label": "Favoriten"
   },
   "hide": {
-    "label": "Hide"
+    "label": "Ausblenden"
   },
   "showOnly": {
-    "label": "Show Only"
+    "label": "Zeige nur"
   },
   "viaMqtt": {
-    "label": "Connected via MQTT"
+    "label": "Über MQTT verbunden"
   },
   "language": {
-    "label": "Language",
-    "changeLanguage": "Change Language"
+    "label": "Sprache",
+    "changeLanguage": "Sprache ändern"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
-    "system": "Automatic",
-    "changeTheme": "Change Color Scheme"
+    "dark": "Dunkel",
+    "light": "Hell",
+    "system": "Automatisch",
+    "changeTheme": "Farbschema ändern"
   },
   "errorPage": {
     "title": "This is a little embarrassing...",
@@ -195,7 +195,7 @@
     "fallbackError": "{{error}}"
   },
   "footer": {
-    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
+    "text": "Powered by <0>▲ Vercel</0> | Meshtastic®️ ist eine eingetragene Marke der Meshtastic LLC. | <1>Rechtliche Informationen</1>",
     "commitSha": "Commit SHA: {{sha}}"
   }
 }

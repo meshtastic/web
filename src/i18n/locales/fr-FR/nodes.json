@@ -10,13 +10,13 @@
       "label": "Direct Message {{shortName}}"
     },
     "favorite": {
-      "label": "Favorite"
+      "label": "Favoris"
     },
     "notFavorite": {
       "label": "Not a Favorite"
     },
     "status": {
-      "heard": "Heard",
+      "heard": "Capté",
       "mqtt": "MQTT"
     },
     "elevation": {
@@ -39,7 +39,7 @@
       "macAddress": "MAC Address"
     },
     "connectionStatus": {
-      "direct": "Direct",
+      "direct": "Direk",
       "away": "away",
       "unknown": "-",
       "viaMqtt": ", via MQTT"

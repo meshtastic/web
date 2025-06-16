@@ -1,19 +1,19 @@
 {
   "page": {
-    "sectionLabel": "Channels",
+    "sectionLabel": "Canali",
     "channelName": "Channel: {{channelName}}",
-    "broadcastLabel": "Primary",
+    "broadcastLabel": "Principale",
     "channelIndex": "Ch {{index}}"
   },
   "validation": {
     "pskInvalid": "Please enter a valid {{bits}} bit PSK."
   },
   "settings": {
-    "label": "Channel Settings",
+    "label": "Impostazioni Canale",
     "description": "Crypto, MQTT & misc settings"
   },
   "role": {
-    "label": "Role",
+    "label": "Ruolo",
     "description": "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
     "options": {
       "primary": "PRIMARY",
@@ -27,7 +27,7 @@
     "generate": "Generate"
   },
   "name": {
-    "label": "Name",
+    "label": "Nome",
     "description": "A unique name for the channel <12 bytes, leave blank for default"
   },
   "uplinkEnabled": {

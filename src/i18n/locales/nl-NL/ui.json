@@ -1,12 +1,12 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
+    "messages": "Berichten",
+    "map": "Kaart",
     "config": "Config",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
+    "channels": "Kanalen",
     "nodes": "Nodes"
   },
   "app": {
@@ -38,7 +38,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "title": "Batterij"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -90,10 +90,10 @@
       "label": "Copy to clipboard"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "Wachtwoord verbergen"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "Wachtwoord tonen"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
@@ -112,7 +112,7 @@
     "label": "Metrics"
   },
   "role": {
-    "label": "Role"
+    "label": "Functie"
   },
   "filter": {
     "label": "Filter"
@@ -136,7 +136,7 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "title": "Spanning"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
@@ -147,7 +147,7 @@
     "text": "Number of hops: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
+    "label": "Laatst gehoord",
     "labelText": "Last heard: {{value}}",
     "nowLabel": "Now"
   },
@@ -167,12 +167,12 @@
     "label": "Connected via MQTT"
   },
   "language": {
-    "label": "Language",
+    "label": "Taal",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "Donker",
+    "light": "Licht",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

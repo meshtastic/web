@@ -1,12 +1,12 @@
 {
   "dashboard": {
-    "title": "Connected Devices",
+    "title": "已連線的裝置",
     "description": "Manage your connected Meshtastic devices.",
-    "connectionType_ble": "BLE",
-    "connectionType_serial": "Serial",
-    "connectionType_network": "Network",
-    "noDevicesTitle": "No devices connected",
+    "connectionType_ble": "低功耗藍牙",
+    "connectionType_serial": "序號",
+    "connectionType_network": "網路",
+    "noDevicesTitle": "沒有裝置連線",
     "noDevicesDescription": "Connect a new device to get started.",
-    "button_newConnection": "New Connection"
+    "button_newConnection": "新增連線"
   }
 }

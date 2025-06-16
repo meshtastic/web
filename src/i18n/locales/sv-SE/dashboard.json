@@ -1,12 +1,12 @@
 {
   "dashboard": {
-    "title": "Connected Devices",
-    "description": "Manage your connected Meshtastic devices.",
+    "title": "Anslutna enheter",
+    "description": "Hantera dina anslutna Meshtastic-enheter.",
     "connectionType_ble": "BLE",
-    "connectionType_serial": "Serial",
-    "connectionType_network": "Network",
-    "noDevicesTitle": "No devices connected",
-    "noDevicesDescription": "Connect a new device to get started.",
-    "button_newConnection": "New Connection"
+    "connectionType_serial": "Seriell kommunikation",
+    "connectionType_network": "Nätverk",
+    "noDevicesTitle": "Inga enheter anslutna",
+    "noDevicesDescription": "Anslut en ny enhet för att komma igång.",
+    "button_newConnection": "Ny anslutning"
   }
 }

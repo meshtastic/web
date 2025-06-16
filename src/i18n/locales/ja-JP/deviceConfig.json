@@ -42,7 +42,7 @@
     },
     "posixTimezone": {
       "description": "The POSIX timezone string for the device",
-      "label": "POSIX Timezone"
+      "label": "POSIX 時間帯"
     },
     "rebroadcastMode": {
       "description": "How to handle rebroadcasting",
@@ -50,7 +50,7 @@
     },
     "role": {
       "description": "What role the device performs on the mesh",
-      "label": "Role"
+      "label": "役割"
     }
   },
   "bluetooth": {
@@ -63,7 +63,7 @@
     },
     "pairingMode": {
       "description": "Pin selection behaviour.",
-      "label": "Pairing mode"
+      "label": "ペアリングモード"
     },
     "pin": {
       "description": "Pin to use when pairing",
@@ -123,7 +123,7 @@
     "description": "Settings for the LoRa mesh",
     "bandwidth": {
       "description": "Channel bandwidth in MHz",
-      "label": "Bandwidth"
+      "label": "帯域"
     },
     "boostedRxGain": {
       "description": "Boosted RX gain",
@@ -147,19 +147,19 @@
     },
     "ignoreMqtt": {
       "description": "Don't forward MQTT messages over the mesh",
-      "label": "Ignore MQTT"
+      "label": "MQTT を無視"
     },
     "modemPreset": {
       "description": "Modem preset to use",
-      "label": "Modem Preset"
+      "label": "モデムプリセット"
     },
     "okToMqtt": {
       "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
-      "label": "OK to MQTT"
+      "label": "MQTTを許可"
     },
     "overrideDutyCycle": {
-      "description": "Override Duty Cycle",
-      "label": "Override Duty Cycle"
+      "description": "デューティサイクルを上書き",
+      "label": "デューティサイクルを上書き"
     },
     "overrideFrequency": {
       "description": "Override frequency",
@@ -167,7 +167,7 @@
     },
     "region": {
       "description": "Sets the region for your node",
-      "label": "Region"
+      "label": "リージョン"
     },
     "spreadingFactor": {
       "description": "Indicates the number of chirps per symbol",
@@ -216,7 +216,7 @@
     },
     "gateway": {
       "description": "Default Gateway",
-      "label": "Gateway"
+      "label": "ゲートウェイ"
     },
     "ip": {
       "description": "IP Address",
@@ -232,7 +232,7 @@
     },
     "subnet": {
       "description": "Subnet Mask",
-      "label": "Subnet"
+      "label": "サブネット"
     },
     "wifiEnabled": {
       "description": "Enable or disable the WiFi radio",
@@ -328,8 +328,8 @@
       "hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
       "numSatellites": "Number of satellites",
       "sequenceNumber": "Sequence number",
-      "timestamp": "Timestamp",
-      "unset": "Unset",
+      "timestamp": "タイムスタンプ",
+      "unset": "削除",
       "vehicleHeading": "Vehicle heading",
       "vehicleSpeed": "Vehicle speed"
     }
@@ -357,7 +357,7 @@
     },
     "powerSavingEnabled": {
       "description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
-      "label": "Enable power saving mode"
+      "label": "省電力モードを有効化"
     },
     "shutdownOnBatteryDelay": {
       "description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
@@ -369,7 +369,7 @@
     },
     "powerConfigSettings": {
       "description": "Settings for the power module",
-      "label": "Power Config"
+      "label": "電源設定"
     },
     "sleepSettings": {
       "description": "Sleep settings for the power module",
@@ -394,11 +394,11 @@
     },
     "privateKey": {
       "description": "Used to create a shared key with a remote device",
-      "label": "Private Key"
+      "label": "秘密鍵"
     },
     "publicKey": {
       "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
-      "label": "Public Key"
+      "label": "公開鍵"
     },
     "primaryAdminKey": {
       "description": "The primary public key authorized to send admin messages to this node",

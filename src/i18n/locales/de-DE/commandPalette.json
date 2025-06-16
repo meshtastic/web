@@ -1,50 +1,50 @@
 {
-  "emptyState": "No results found.",
+  "emptyState": "Keine Ergebnisse gefunden.",
   "page": {
     "title": "Command Menu"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "label": "Befehlsgruppe anheften"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "label": "Befehlsgruppe lösen"
   },
   "goto": {
-    "label": "Goto",
+    "label": "Gehe zu",
     "command": {
-      "messages": "Messages",
-      "map": "Map",
-      "config": "Config",
-      "channels": "Channels",
-      "nodes": "Nodes"
+      "messages": "Nachrichten",
+      "map": "Karte",
+      "config": "Einstellungen",
+      "channels": "Kanäle",
+      "nodes": "Knoten"
     }
   },
   "manage": {
-    "label": "Manage",
+    "label": "Verwalten",
     "command": {
-      "switchNode": "Switch Node",
-      "connectNewNode": "Connect New Node"
+      "switchNode": "Knoten wechseln",
+      "connectNewNode": "Neuen Knoten verbinden"
     }
   },
   "contextual": {
-    "label": "Contextual",
+    "label": "Kontextabhängig",
     "command": {
       "qrCode": "QR Code",
       "qrGenerator": "Generator",
-      "qrImport": "Import",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Schedule Reboot",
-      "rebootToOtaMode": "Reboot To OTA Mode",
-      "resetNodeDb": "Reset Node DB",
-      "factoryResetDevice": "Factory Reset Device",
-      "factoryResetConfig": "Factory Reset Config"
+      "qrImport": "Importieren",
+      "scheduleShutdown": "Herunterfahren planen",
+      "scheduleReboot": "Neustarten planen",
+      "rebootToOtaMode": "Neustart in den OTA Modus",
+      "resetNodeDb": "Knotendatenbank zurücksetzen",
+      "factoryResetDevice": "Gerät auf Werkseinstellungen zurücksetzen",
+      "factoryResetConfig": "Auf Werkseinstellungen zurücksetzen"
     }
   },
   "debug": {
     "label": "Debug",
     "command": {
-      "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "reconfigure": "Neu einrichten",
+      "clearAllStoredMessages": "Alle gespeicherten Nachrichten löschen"
     }
   }
 }

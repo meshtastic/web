@@ -11,11 +11,11 @@
   },
   "sendMessage": {
     "placeholder": "Type your message here...",
-    "sendButton": "Send"
+    "sendButton": "传送"
   },
   "actionsMenu": {
     "addReactionLabel": "Add Reaction",
-    "replyLabel": "Reply"
+    "replyLabel": "回复"
   },
   "item": {
     "status": {

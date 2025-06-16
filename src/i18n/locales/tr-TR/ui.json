@@ -1,12 +1,12 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Messages",
-    "map": "Map",
+    "messages": "Mesajlar",
+    "map": "Harita",
     "config": "Config",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
+    "channels": "Kanallar",
     "nodes": "Nodes"
   },
   "app": {
@@ -23,7 +23,7 @@
     "deviceInfo": {
       "volts": "{{voltage}} volts",
       "firmware": {
-        "title": "Firmware",
+        "title": "Yazılım",
         "version": "v{{version}}",
         "buildDate": "Build date: {{date}}"
       },
@@ -38,7 +38,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "title": "Pil"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -90,10 +90,10 @@
       "label": "Copy to clipboard"
     },
     "hidePassword": {
-      "label": "Hide password"
+      "label": "Şifreyi gizle"
     },
     "showPassword": {
-      "label": "Show password"
+      "label": "Şifreyi göster"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
@@ -106,16 +106,16 @@
     "label": "General"
   },
   "hardware": {
-    "label": "Hardware"
+    "label": "Donanım"
   },
   "metrics": {
     "label": "Metrics"
   },
   "role": {
-    "label": "Role"
+    "label": "Rol"
   },
   "filter": {
-    "label": "Filter"
+    "label": "Filtre"
   },
   "clearInput": {
     "label": "Clear input"
@@ -136,18 +136,18 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "title": "Voltaj"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
   },
   "hops": {
-    "direct": "Direct",
+    "direct": "Doğrudan",
     "label": "Number of hops",
     "text": "Number of hops: {{value}}"
   },
   "lastHeard": {
-    "label": "Last heard",
+    "label": "Son duyulma",
     "labelText": "Last heard: {{value}}",
     "nowLabel": "Now"
   },
@@ -167,12 +167,12 @@
     "label": "Connected via MQTT"
   },
   "language": {
-    "label": "Language",
+    "label": "Dil",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Dark",
-    "light": "Light",
+    "dark": "Koyu",
+    "light": "Açık",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

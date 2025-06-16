@@ -12,8 +12,8 @@
   "goto": {
     "label": "Goto",
     "command": {
-      "messages": "Messages",
-      "map": "Map",
+      "messages": "Повідомлення",
+      "map": "Мапа",
       "config": "Config",
       "channels": "Channels",
       "nodes": "Nodes"

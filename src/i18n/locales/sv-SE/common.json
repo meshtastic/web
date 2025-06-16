@@ -1,119 +1,119 @@
 {
   "button": {
-    "apply": "Apply",
-    "backupKey": "Backup Key",
-    "cancel": "Cancel",
-    "clearMessages": "Clear Messages",
-    "close": "Close",
-    "confirm": "Confirm",
-    "delete": "Delete",
-    "dismiss": "Dismiss",
-    "download": "Download",
-    "export": "Export",
-    "generate": "Generate",
-    "regenerate": "Regenerate",
-    "import": "Import",
-    "message": "Message",
-    "now": "Now",
-    "ok": "OK",
-    "print": "Print",
-    "rebootOtaNow": "Reboot to OTA Mode Now",
-    "remove": "Remove",
-    "requestNewKeys": "Request New Keys",
-    "requestPosition": "Request Position",
-    "reset": "Reset",
-    "save": "Save",
-    "scanQr": "Scan QR Code",
-    "traceRoute": "Trace Route"
+    "apply": "Verkställ",
+    "backupKey": "Säkerhetskopiera nyckel",
+    "cancel": "Avbryt",
+    "clearMessages": "Ta bort meddelanden",
+    "close": "Stäng",
+    "confirm": "Bekräfta",
+    "delete": "Radera",
+    "dismiss": "Stäng",
+    "download": "Ladda ner",
+    "export": "Exportera",
+    "generate": "Generera",
+    "regenerate": "Förnya",
+    "import": "Importera",
+    "message": "Meddelande",
+    "now": "Nu",
+    "ok": "Okej",
+    "print": "Skriv ut",
+    "rebootOtaNow": "Starta om till OTA-läge nu",
+    "remove": "Ta bort",
+    "requestNewKeys": "Begär nya nycklar",
+    "requestPosition": "Begär position",
+    "reset": "Nollställ",
+    "save": "Spara",
+    "scanQr": "Skanna QR-kod",
+    "traceRoute": "Spåra rutt"
   },
   "app": {
     "title": "Meshtastic",
-    "fullTitle": "Meshtastic Web Client"
+    "fullTitle": "Meshtastic webbklient"
   },
-  "loading": "Loading...",
+  "loading": "Laddar...",
   "unit": {
     "cps": "CPS",
     "dbm": "dBm",
     "hertz": "Hz",
     "hop": {
-      "one": "Hop",
-      "plural": "Hops"
+      "one": "hopp",
+      "plural": "hopp"
     },
     "hopsAway": {
-      "one": "{{count}} hop away",
-      "plural": "{{count}} hops away",
-      "unknown": "Unknown hops away"
+      "one": "{{count}} hopp bort",
+      "plural": "{{count}} hopp bort",
+      "unknown": "Okänt antal hopp bort"
     },
     "megahertz": "MHz",
     "raw": "raw",
     "meter": {
       "one": "Meter",
-      "plural": "Meters",
+      "plural": "Meter",
       "suffix": "m"
     },
     "minute": {
-      "one": "Minute",
-      "plural": "Minutes"
+      "one": "minut",
+      "plural": "minuter"
     },
     "millisecond": {
-      "one": "Millisecond",
-      "plural": "Milliseconds",
+      "one": "millisekund",
+      "plural": "millisekunder",
       "suffix": "ms"
     },
     "second": {
-      "one": "Second",
-      "plural": "Seconds"
+      "one": "sekund",
+      "plural": "sekunder"
     },
     "snr": "SNR",
     "volt": {
       "one": "Volt",
-      "plural": "Volts",
+      "plural": "Volt",
       "suffix": "V"
     },
     "record": {
-      "one": "Records",
-      "plural": "Records"
+      "one": "Post",
+      "plural": "Poster"
     }
   },
   "security": {
-    "256bit": "256 bit"
+    "256bit": "256 bitar"
   },
   "unknown": {
-    "longName": "Unknown",
+    "longName": "Okänd",
     "shortName": "UNK",
-    "notAvailable": "N/A",
+    "notAvailable": "–",
     "num": "??"
   },
   "nodeUnknownPrefix": "!",
-  "unset": "UNSET",
+  "unset": "EJ SATT",
   "fallbackName": "Meshtastic {{last4}}",
   "formValidation": {
     "tooBig": {
-      "string": "Too long, expected less than or equal to {{maximum}} characters.",
-      "number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-      "bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+      "string": "Texten är för lång. Ange en text mindre än eller lika med {{maximum}} tecken långt.",
+      "number": "Värdet är för stort. Ange ett numeriskt värde mindre än eller lika med {{maximum}}.",
+      "bytes": "Värdet är för stort. En längd mindre än eller lika med {{params.maximum}} bytes krävs."
     },
     "tooSmall": {
-      "string": "Too short, expected more than or equal to {{minimum}} characters.",
-      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+      "string": "Texten är för kort. Ange en text längre än eller lika med {{minimum}} tecken långt.",
+      "number": "Värdet är för litet. Ange ett numeriskt värde större än eller lika med {{minimum}}."
     },
     "invalidFormat": {
-      "ipv4": "Invalid format, expected an IPv4 address.",
-      "key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+      "ipv4": "Ogiltigt format, en giltig IPv4-adress krävs.",
+      "key": "Ogiltigt format, en giltig Base64-kodad nyckel krävs (PSK)."
     },
     "invalidType": {
-      "number": "Invalid type, expected a number."
+      "number": "Ogiltig typ, fältet måste innehålla ett tal."
     },
     "pskLength": {
-      "0bit": "Key is required to be empty.",
-      "8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-      "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-      "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+      "0bit": "Fältet måste vara tomt.",
+      "8bit": "Nyckeln måste vara en 8-bitars nyckel (PSK).",
+      "128bit": "Nyckeln måste vara en 128-bitars nyckel (PSK).",
+      "256bit": "Nyckeln måste vara en 256-bitars nyckel (PSK)."
     },
     "required": {
-      "generic": "This field is required.",
-      "managed": "At least one admin key is requred if the node is managed.",
-      "key": "Key is required."
+      "generic": "Obligatoriskt fält.",
+      "managed": "Åtminstone en administratörsnyckel krävs om noden fjärrhanteras.",
+      "key": "En nyckel måste anges."
     }
   }
 }

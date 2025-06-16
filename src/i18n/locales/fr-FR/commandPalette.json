@@ -13,10 +13,10 @@
     "label": "Goto",
     "command": {
       "messages": "Messages",
-      "map": "Map",
+      "map": "Carte",
       "config": "Config",
-      "channels": "Channels",
-      "nodes": "Nodes"
+      "channels": "Canaux",
+      "nodes": "Noeuds"
     }
   },
   "manage": {
