@@ -114,6 +114,18 @@ describe("useFilterNode", () => {
       ).toBe(false);
     });
 
+    it("filters by hopsUnknown", () => {
+      expect(nodeFilter(node, { hopsUnknown: true })).toBe(false);
+      expect(nodeFilter(node, { hopsUnknown: false })).toBe(true);
+      expect(nodeFilter(node, { hopsUnknown: undefined })).toBe(true);
+    });
+
+    it("filters by showUnheard", () => {
+      expect(nodeFilter(node, { showUnheard: true })).toBe(false);
+      expect(nodeFilter(node, { showUnheard: false })).toBe(true);
+      expect(nodeFilter(node, { showUnheard: undefined })).toBe(true);
+    });
+
     it("returns false when current matches defaults", () => {
       expect(isFilterDirty(defaultFilterValues)).toBe(false);
     });
@@ -154,6 +166,16 @@ describe("useFilterNode", () => {
         ...defaultFilterValues,
         hwModel: [Protobuf.Mesh.HardwareModel.HELTEC_V3],
       };
+      expect(isFilterDirty(modified)).toBe(true);
+    });
+
+    it("detects dirty boolean field (hopsUnknown)", () => {
+      const modified = { ...defaultFilterValues, hopsUnknown: true };
+      expect(isFilterDirty(modified)).toBe(true);
+    });
+
+    it("detects dirty boolean field (showUnheard)", () => {
+      const modified = { ...defaultFilterValues, showUnheard: true };
       expect(isFilterDirty(modified)).toBe(true);
     });
   });
