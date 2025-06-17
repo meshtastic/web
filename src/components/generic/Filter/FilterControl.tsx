@@ -191,14 +191,11 @@ export function FilterControl({
 
   const handleBoolChange = useCallback(
     <K extends keyof FilterState>(key: K, value: string | boolean) => {
-      let typedValue: boolean | undefined;
-      if (typeof value === "boolean") {
-        typedValue = value;
-      } else if (value === "true" || value === "false") {
-        typedValue = value === "true";
-      } else {
-        typedValue = undefined;
-      }
+      const typedValue = value === true || value === "true"
+        ? true
+        : value === false || value === "false"
+        ? false
+        : undefined;
 
       setFilterState((prev) => ({
         ...prev,
