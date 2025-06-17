@@ -16,15 +16,11 @@ interface LanguageSwitcherProps {
   disableHover?: boolean;
 }
 
-export default function LanguageSwitcher(
-  { disableHover = false }: LanguageSwitcherProps,
-) {
+export default function LanguageSwitcher({
+  disableHover = false,
+}: LanguageSwitcherProps) {
   const { i18n } = useTranslation("ui");
-  const { set: setLanguage } = useLang();
-
-  const currentLanguage =
-    supportedLanguages.find((lang) => lang.code === i18n.language) ||
-    supportedLanguages[0];
+  const { set: setLanguage, currentLanguage } = useLang();
 
   const handleLanguageChange = async (languageCode: LangCode) => {
     await setLanguage(languageCode, true);
@@ -65,7 +61,7 @@ export default function LanguageSwitcher(
                 "group-hover:text-gray-900 dark:group-hover:text-white",
             )}
           >
-            {currentLanguage.name}
+            {currentLanguage?.name}
           </Subtle>
         </Button>
       </DropdownMenuTrigger>

@@ -7,31 +7,19 @@ export type Lang = {
   code: Intl.Locale["language"];
   name: string;
   flag: string;
+  region?: Intl.Locale["region"];
 };
 
 export type LangCode = Lang["code"];
 
-/**
- * Generates a flag emoji from a two-letter country code.
- * @param regionCode - The two-letter, uppercase country code (e.g., "US", "FI").
- * @returns A string containing the flag emoji.
- */
-function getFlagEmoji(regionCode: string): string {
-  const A_LETTER_CODE = 0x1F1E6;
-  const a_char_code = "A".charCodeAt(0);
-  const codePoints = regionCode
-    .toUpperCase()
-    .split("")
-    .map((char) => A_LETTER_CODE + char.charCodeAt(0) - a_char_code);
-  return String.fromCodePoint(...codePoints);
-}
-
 export const supportedLanguages: Lang[] = [
-  { code: "de-DE", name: "Deutschland", flag: getFlagEmoji("DE") },
-  { code: "en-US", name: "English", flag: getFlagEmoji("US") },
-  { code: "fi-FI", name: "Suomi", flag: getFlagEmoji("FI") },
-  { code: "sv-SE", name: "Svenska", flag: getFlagEmoji("SE") },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "fi", name: "Suomi", flag: "🇫🇮" },
+  { code: "sv", name: "Svenska", flag: "🇸🇪" },
 ];
+
+export const FALLBACK_LANGUAGE_CODE: LangCode = "en";
 
 i18next
   .use(Backend)
@@ -50,7 +38,13 @@ i18next
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],
     },
-    fallbackLng: "en-US", // Default to US English if detection fails
+    fallbackLng: {
+      default: [FALLBACK_LANGUAGE_CODE],
+      "en-GB": [FALLBACK_LANGUAGE_CODE],
+      "fi": ["fi-FI"],
+      "sv": ["sv-SE"],
+      "de": ["de-DE"],
+    },
     fallbackNS: ["common", "ui", "dialog"],
     debug: import.meta.env.MODE === "development",
     ns: [

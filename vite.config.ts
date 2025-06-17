@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { VitePWA } from "vite-plugin-pwa";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { execSync } from "node:child_process";
 import process from "node:process";

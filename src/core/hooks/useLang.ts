@@ -1,86 +1,55 @@
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { LangCode } from "@app/i18n/config.ts";
+import {
+  FALLBACK_LANGUAGE_CODE,
+  Lang,
+  LangCode,
+  supportedLanguages,
+} from "../../i18n/config.ts";
 import useLocalStorage from "./useLocalStorage.ts";
 
-/**
- * Hook to set the i18n language
- *
- * @returns The `set` function
- */
 const STORAGE_KEY = "language";
 
 type LanguageState = {
-  language: string;
+  language: LangCode;
 };
+
 function useLang() {
   const { i18n } = useTranslation();
-  const [_, setLanguage] = useLocalStorage<LanguageState | null>(
+  const [_, setLanguageInStorage] = useLocalStorage<LanguageState | null>(
     STORAGE_KEY,
     null,
   );
 
-  const regionNames = useMemo(() => {
-    return new Intl.DisplayNames(i18n.language, {
-      type: "region",
-      fallback: "none",
-      style: "long",
-    });
+  const currentLanguage = useMemo((): Lang | undefined => {
+    const lang = supportedLanguages.find((l) => l.code === i18n.language);
+    if (lang) {
+      return lang;
+    }
+    return supportedLanguages.find((l) => l.code === FALLBACK_LANGUAGE_CODE);
   }, [i18n.language]);
 
   const collator = useMemo(() => {
-    return new Intl.Collator(i18n.language, {});
+    return new Intl.Collator(i18n.language, { sensitivity: "base" });
   }, [i18n.language]);
 
-  /**
-   * Sets the i18n language.
-   *
-   * @param lng - The language tag to set
-   * @param persist - Whether to persist the language setting in local storage
-   */
   const set = useCallback(
     async (lng: LangCode, persist = true) => {
       if (i18n.language === lng) {
         return;
       }
-
       try {
-        console.info("setting language:", lng);
         if (persist) {
-          setLanguage({ language: lng });
+          setLanguageInStorage({ language: lng });
         }
         await i18n.changeLanguage(lng);
       } catch (e) {
-        console.warn(e);
+        console.warn("Failed to change language:", e);
       }
     },
-    [i18n],
+    [i18n, setLanguageInStorage],
   );
 
-  /**
-   * Get the localized country name
-   *
-   * @param code - Two-letter country code
-   */
-  const getCountryName = useCallback(
-    (code: LangCode) => {
-      let name = null;
-      try {
-        name = regionNames.of(code);
-      } catch (e) {
-        console.warn(e);
-      }
-      return name;
-    },
-    [regionNames],
-  );
-
-  /**
-   * Compare two strings according to the sort order of the current language
-   *
-   * @param a - The first string to compare
-   * @param b - The second string to compare
-   */
   const compare = useCallback(
     (a: string, b: string) => {
       return collator.compare(a, b);
@@ -88,7 +57,7 @@ function useLang() {
     [collator],
   );
 
-  return { compare, set, getCountryName };
+  return { compare, set, currentLanguage };
 }
 
 export default useLang;
