@@ -7,6 +7,7 @@ export type Lang = {
   code: Intl.Locale["language"];
   name: string;
   flag: string;
+  region: string;
 };
 
 export type LangCode = Lang["code"];
@@ -21,12 +22,26 @@ function getFlagEmoji(regionCode: string): string {
   return String.fromCodePoint(...codePoints);
 }
 
-export const supportedLanguages: Lang[] = [
-  { code: "de", name: "German", flag: getFlagEmoji("de") },
-  { code: "en", name: "English", flag: getFlagEmoji("us") },
-  { code: "fi", name: "Finnish", flag: getFlagEmoji("fi") },
-  { code: "sv", name: "Swedish", flag: getFlagEmoji("se") },
+const languageDefinitions = [
+  { code: "de", name: "Deutschland" },
+  { code: "en", name: "English", region: "us" },
+  { code: "fi", name: "Suomi" },
+  { code: "sv", name: "Svenska" },
 ];
+
+export const supportedLanguages: Lang[] = languageDefinitions.map(
+  ({ code, name, region }) => {
+    const regionCode = region ?? code;
+    return {
+      code,
+      name,
+      region: regionCode.toUpperCase(),
+      flag: getFlagEmoji(regionCode),
+    };
+  },
+);
+
+export const FALLBACK_LANGUAGE_CODE: LangCode = "en";
 
 i18next
   .use(Backend)
@@ -45,7 +60,11 @@ i18next
       caches: ["localStorage"],
     },
     fallbackLng: {
-      "default": ["en"],
+      default: [FALLBACK_LANGUAGE_CODE],
+      "en-GB": [FALLBACK_LANGUAGE_CODE],
+      "fi": ["fi-FI"],
+      "sv": ["sv-SE"],
+      "de": ["de-DE"],
     },
     fallbackNS: ["common", "ui", "dialog"],
     debug: import.meta.env.MODE === "development",
