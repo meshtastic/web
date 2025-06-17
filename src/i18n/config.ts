@@ -7,39 +7,17 @@ export type Lang = {
   code: Intl.Locale["language"];
   name: string;
   flag: string;
-  region: string;
+  region?: Intl.Locale["region"];
 };
 
 export type LangCode = Lang["code"];
 
-function getFlagEmoji(regionCode: string): string {
-  const A_LETTER_CODE = 0x1F1E6;
-  const a_char_code = "A".charCodeAt(0);
-  const codePoints = regionCode
-    .toUpperCase()
-    .split("")
-    .map((char) => A_LETTER_CODE + char.charCodeAt(0) - a_char_code);
-  return String.fromCodePoint(...codePoints);
-}
-
-const languageDefinitions: Partial<Lang>[] = [
-  { code: "de", name: "Deutschland" },
-  { code: "en", name: "English", region: "us" },
-  { code: "fi", name: "Suomi" },
-  { code: "sv", name: "Svenska" },
+export const supportedLanguages: Lang[] = [
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "fi", name: "Suomi", flag: "🇫🇮" },
+  { code: "sv", name: "Svenska", flag: "🇸🇪" },
 ];
-
-export const supportedLanguages: Lang[] = languageDefinitions.map(
-  ({ code, name, region }) => {
-    const regionCode = region ?? code;
-    return {
-      code,
-      name,
-      region: regionCode.toUpperCase(),
-      flag: getFlagEmoji(regionCode),
-    };
-  },
-);
 
 export const FALLBACK_LANGUAGE_CODE: LangCode = "en";
 
