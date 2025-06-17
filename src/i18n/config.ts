@@ -22,7 +22,7 @@ function getFlagEmoji(regionCode: string): string {
   return String.fromCodePoint(...codePoints);
 }
 
-const languageDefinitions = [
+const languageDefinitions: Partial<Lang>[] = [
   { code: "de", name: "Deutschland" },
   { code: "en", name: "English", region: "us" },
   { code: "fi", name: "Suomi" },
