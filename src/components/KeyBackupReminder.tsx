@@ -7,7 +7,7 @@ export const KeyBackupReminder = () => {
   const { t } = useTranslation("dialog");
 
   useBackupReminder({
-    message: t("pkiBackup.description"),
+    message: t("pkiBackupReminder.description"),
     onAccept: () => setDialogOpen("pkiBackup", true),
     enabled: true,
   });

@@ -26,8 +26,8 @@ function getFlagEmoji(regionCode: string): string {
   return String.fromCodePoint(...codePoints);
 }
 
-export const supportedLanguages: Lang[] = [
-  { code: "de-DE", name: "Deutschland", flag: getFlagEmoji("DE") },
+export const supportedLanguages: Lang[] = [ // en-US should be the first entry to ensure it's the default in the language selector
+  { code: "de-DE", name: "Deutsch", flag: getFlagEmoji("DE") },
   { code: "en-US", name: "English", flag: getFlagEmoji("US") },
   { code: "fi-FI", name: "Suomi", flag: getFlagEmoji("FI") },
   { code: "sv-SE", name: "Svenska", flag: getFlagEmoji("SE") },

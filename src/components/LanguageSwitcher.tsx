@@ -24,6 +24,7 @@ export default function LanguageSwitcher(
 
   const currentLanguage =
     supportedLanguages.find((lang) => lang.code === i18n.language) ||
+    supportedLanguages.find((lang) => lang.code === "en-US") ||
     supportedLanguages[0];
 
   const handleLanguageChange = async (languageCode: LangCode) => {
