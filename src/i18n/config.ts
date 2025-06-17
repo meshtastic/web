@@ -45,7 +45,6 @@ i18next
       "sv": ["sv-SE"],
       "de": ["de-DE"],
     },
-    fallbackLng: "en-US", // Default to US English if detection fails
     fallbackNS: ["common", "ui", "dialog"],
     debug: import.meta.env.MODE === "development",
     ns: [
