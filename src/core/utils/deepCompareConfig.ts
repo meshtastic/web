@@ -1,66 +1,56 @@
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 export function deepCompareConfig(
-  existing: unknown,
-  working: unknown,
+  a: unknown,
+  b: unknown,
   allowUndefined = false,
 ): boolean {
-  if (existing === working) return true;
+  if (a === b) {
+    return true;
+  }
 
-  if (
-    allowUndefined &&
-    (typeof existing === "undefined" || typeof working === "undefined")
-  ) return true;
+  // If allowUndefined is true, and one is undefined, they are considered equal. // This check is placed early to simplify subsequent logic.
+  if (allowUndefined && (a === undefined || b === undefined)) {
+    return true;
+  }
 
-  if (typeof existing !== typeof working) {
+  if (typeof a !== typeof b || a === null || b === null) {
     return false;
   }
 
-  if (existing === null || working === null) {
-    if (existing !== working) {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length && !allowUndefined) {
       return false;
     }
-    return true;
-  }
 
-  if (Array.isArray(existing) && Array.isArray(working)) {
-    if (existing.length !== working.length && !allowUndefined) {
-      return false;
-    }
-    for (let i = 0; i < existing.length; i++) {
-      if (
-        !deepCompareConfig(existing[i], working[i], allowUndefined)
-      ) {
+    const longestLength = Math.max(a.length, b.length);
+    for (let i = 0; i < longestLength; i++) {
+      if (!deepCompareConfig(a[i], b[i], allowUndefined)) {
         return false;
       }
     }
     return true;
   }
 
-  if (typeof existing === "object" && typeof working === "object") {
-    const exObj = existing as Record<string, unknown>;
-    const woObj = working as Record<string, unknown>;
-    const keys = new Set<string>([
-      ...Object.keys(exObj),
-      ...Object.keys(woObj),
-    ]);
+  if (isObject(a) && isObject(b)) {
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+    const allKeys = new Set([...aKeys, ...bKeys]);
 
-    for (const key of keys) {
-      if (key === "$typeName") continue;
-      const hasExisting = Object.prototype.hasOwnProperty.call(exObj, key);
-      const hasWorking = Object.prototype.hasOwnProperty.call(woObj, key);
-      const valExisting = exObj[key];
-      const valWorking = woObj[key];
-
-      if (!hasWorking && allowUndefined && hasExisting) {
+    for (const key of allKeys) {
+      if (key === "$typeName") {
         continue;
       }
 
-      if (
-        !deepCompareConfig(valExisting, valWorking, allowUndefined)
-      ) {
+      const aValue = a[key];
+      const bValue = b[key];
+
+      if (!deepCompareConfig(aValue, bValue, allowUndefined)) {
         return false;
       }
     }
-
     return true;
   }
 
