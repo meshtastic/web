@@ -93,7 +93,6 @@
     "unignoreNode": "Unignore node"
   },
   "pkiBackup": {
-    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
     "loseKeysWarning": "If you lose your keys, you will need to reset your device.",
     "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
     "footer": "=== END OF KEYS ===",
@@ -102,6 +101,13 @@
     "publicKey": "Public Key:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
     "title": "Backup Keys"
+  },
+  "pkiBackupReminder": {
+    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
+    "title": "Backup Reminder",
+    "remindLaterPrefix": "Remind me in",
+    "remindNever": "Never remind me",
+    "backupNow": "Back up now"
   },
   "pkiRegenerate": {
     "description": "Are you sure you want to regenerate key pair?",

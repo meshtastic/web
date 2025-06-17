@@ -27,14 +27,15 @@ i18next
   .use(LanguageDetector)
   .init({
     backend: {
-      // this will lazy load resources from the i18n folder
+      // With this setup, {{lng}} will correctly resolve to 'en-US', 'fi-FI', etc.
       loadPath: "/src/i18n/locales/{{lng}}/{{ns}}.json",
     },
     react: {
       useSuspense: true,
     },
+    nonExplicitSupportedLngs: true,
     detection: {
-      order: ["navigator", "localStorage"],
+      order: ["localStorage", "navigator"],
       caches: ["localStorage"],
     },
     fallbackLng: {
@@ -44,6 +45,7 @@ i18next
       "sv": ["sv-SE"],
       "de": ["de-DE"],
     },
+    fallbackLng: "en-US", // Default to US English if detection fails
     fallbackNS: ["common", "ui", "dialog"],
     debug: import.meta.env.MODE === "development",
     ns: [

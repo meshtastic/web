@@ -2,6 +2,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { useCallback, useEffect, useRef } from "react";
 import { useToast } from "@core/hooks/useToast.ts";
 import useLocalStorage from "@core/hooks/useLocalStorage.ts";
+import { useTranslation } from "react-i18next";
 
 interface UseBackupReminderOptions {
   reminderInDays?: number;
@@ -36,6 +37,8 @@ export function useBackupReminder({
   onAccept = () => {},
   reminderInDays = REMINDER_DAYS_ONE_WEEK,
 }: UseBackupReminderOptions) {
+  const { t } = useTranslation("dialog");
+
   const { toast } = useToast();
   const toastShownRef = useRef(false);
   const [reminderState, setReminderState] = useLocalStorage<
@@ -59,7 +62,7 @@ export function useBackupReminder({
     toastShownRef.current = true;
 
     const { dismiss } = toast({
-      title: "Backup Reminder",
+      title: t("pkiBackupReminder.title"),
       duration: TOAST_DURATION,
       delay: TOAST_APPEAR_DELAY,
       description: message,
@@ -75,7 +78,10 @@ export function useBackupReminder({
                 setReminderExpiry(reminderInDays);
               }}
             >
-              Remind me in {reminderInDays} day{reminderInDays > 1 ? "s" : ""}
+              {t("pkiBackupReminder.remindLaterPrefix")} {reminderInDays}{" "}
+              {reminderInDays > 1
+                ? t("common:unit.day.plural").toLowerCase()
+                : t("common:unit.day.one").toLowerCase()}
             </Button>
             <Button
               type="button"
@@ -86,7 +92,7 @@ export function useBackupReminder({
                 setReminderExpiry(REMINDER_DAYS_FOREVER);
               }}
             >
-              Never remind me
+              {t("pkiBackupReminder.remindNever")}
             </Button>
           </div>
           <Button
@@ -99,7 +105,7 @@ export function useBackupReminder({
               setReminderExpiry(REMINDER_DAYS_ONE_YEAR);
             }}
           >
-            Back up now
+            {t("pkiBackupReminder.backupNow")}
           </Button>
         </div>
       ),
