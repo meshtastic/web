@@ -54,6 +54,7 @@
       "suffix": "ms"
     },
     "second": { "one": "Second", "plural": "Seconds" },
+    "day": { "one": "Day", "plural": "Days" },
     "snr": "SNR",
     "volt": { "one": "Volt", "plural": "Volts", "suffix": "V" },
     "record": { "one": "Records", "plural": "Records" }
