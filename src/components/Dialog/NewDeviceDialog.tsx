@@ -157,13 +157,13 @@ export const NewDeviceDialog = ({
         <Tabs defaultValue="HTTP">
           <TabsList>
             {tabs.map((tab) => (
-              <TabsTrigger key={tab.id} value={tab.label}>
+              <TabsTrigger key={tab.id} value={tab.id}>
                 {tab.label}
               </TabsTrigger>
             ))}
           </TabsList>
           {tabs.map((tab) => (
-            <TabsContent key={tab.id} value={tab.label}>
+            <TabsContent key={tab.id} value={tab.id}>
               <fieldset disabled={tab.isDisabled}>
                 {(tab.id !== "HTTP" &&
                     tab.isDisabled)
