@@ -15,6 +15,8 @@ export type FilterState = {
   voltage: [number, number];
   role: Protobuf.Config.Config_DeviceConfig_Role[];
   hwModel: Protobuf.Mesh.HardwareModel[];
+  showUnheard: boolean | undefined;
+  hopsUnknown: boolean | undefined;
 };
 
 const shallowEqualArray = <T>(a: T[], b: T[]): boolean => {
@@ -49,6 +51,8 @@ export function useFilterNode() {
       hwModel: Object.values(Protobuf.Mesh.HardwareModel).filter(
         (v): v is Protobuf.Mesh.HardwareModel => typeof v === "number",
       ),
+      hopsUnknown: undefined,
+      showUnheard: undefined,
     }),
     [],
   );
@@ -83,11 +87,25 @@ export function useFilterNode() {
         return false;
       }
 
+      if (
+        (filterState.hopsUnknown === true && node.hopsAway !== undefined) ||
+        filterState.hopsUnknown === false && node.hopsAway === undefined
+      ) {
+        return false;
+      }
+
       const secondsAgo = Date.now() / 1000 - (node.lastHeard ?? 0);
       if (
         secondsAgo < filterState.lastHeard[0] ||
         (secondsAgo > filterState.lastHeard[1] &&
           filterState.lastHeard[1] !== defaultFilterValues.lastHeard[1])
+      ) {
+        return false;
+      }
+
+      if (
+        (filterState.showUnheard === true && (node.lastHeard ?? 0) !== 0) ||
+        filterState.showUnheard === false && (node.lastHeard ?? 0) === 0
       ) {
         return false;
       }

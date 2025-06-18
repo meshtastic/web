@@ -190,10 +190,12 @@ export function FilterControl({
   );
 
   const handleBoolChange = useCallback(
-    <K extends keyof FilterState>(key: K, value: string) => {
-      const typedValue = value === ""
-        ? undefined
-        : JSON.parse(value.toLowerCase());
+    <K extends keyof FilterState>(key: K, value: string | boolean) => {
+      const typedValue = value === true || value === "true"
+        ? true
+        : value === false || value === "false"
+        ? false
+        : undefined;
 
       setFilterState((prev) => ({
         ...prev,
@@ -384,6 +386,28 @@ export function FilterControl({
                 )}
                 getLabel={(val) =>
                   formatEnumLabel(Protobuf.Mesh.HardwareModel[val])}
+              />
+            </FilterAccordionItem>
+            <FilterAccordionItem label={t("advanced.label")}>
+              <FilterToggle
+                label={t("hopsUnknown.label")}
+                filterKey="hopsUnknown"
+                alternativeLabels={[
+                  t("hide.label"),
+                  t("showOnly.label"),
+                ]}
+                filterState={filterState}
+                onChange={handleBoolChange}
+              />
+              <FilterToggle
+                label={t("showUnheard.label")}
+                filterKey="showUnheard"
+                alternativeLabels={[
+                  t("hide.label"),
+                  t("showOnly.label"),
+                ]}
+                filterState={filterState}
+                onChange={handleBoolChange}
               />
             </FilterAccordionItem>
           </Accordion>

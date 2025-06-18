@@ -103,6 +103,9 @@
   "filter": {
     "label": "Filter"
   },
+  "advanced": {
+    "label": "Advanced"
+  },
   "clearInput": {
     "label": "Clear input"
   },
@@ -151,6 +154,12 @@
   },
   "viaMqtt": {
     "label": "Connected via MQTT"
+  },
+  "hopsUnknown": {
+    "label": "Unknown number of hops"
+  },
+  "showUnheard": {
+    "label": "Never heard"
   },
   "language": {
     "label": "Language",
