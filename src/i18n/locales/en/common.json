@@ -24,7 +24,8 @@
     "reset": "Reset",
     "save": "Save",
     "scanQr": "Scan QR Code",
-    "traceRoute": "Trace Route"
+    "traceRoute": "Trace Route",
+    "submit": "Submit"
   },
   "app": {
     "title": "Meshtastic",
@@ -48,6 +49,7 @@
     "raw": "raw",
     "meter": { "one": "Meter", "plural": "Meters", "suffix": "m" },
     "minute": { "one": "Minute", "plural": "Minutes" },
+    "hour": { "one": "Hour", "plural": "Hours" },
     "millisecond": {
       "one": "Millisecond",
       "plural": "Milliseconds",
@@ -55,11 +57,16 @@
     },
     "second": { "one": "Second", "plural": "Seconds" },
     "day": { "one": "Day", "plural": "Days" },
+    "month": { "one": "Month", "plural": "Months" },
+    "year": { "one": "Year", "plural": "Years" },
     "snr": "SNR",
     "volt": { "one": "Volt", "plural": "Volts", "suffix": "V" },
     "record": { "one": "Records", "plural": "Records" }
   },
   "security": {
+    "0bit": "Empty",
+    "8bit": "8 bit",
+    "128bit": "128 bit",
     "256bit": "256 bit"
   },
   "unknown": {
@@ -71,6 +78,7 @@
   "nodeUnknownPrefix": "!",
   "unset": "UNSET",
   "fallbackName": "Meshtastic {{last4}}",
+  "node": "Node",
   "formValidation": {
     "unsavedChanges": "Unsaved changes",
     "tooBig": {

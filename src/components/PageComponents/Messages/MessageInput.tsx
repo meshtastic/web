@@ -4,6 +4,7 @@ import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
 import { startTransition, useState } from "react";
 import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { useTranslation } from "react-i18next";
 
 export interface MessageInputProps {
   onSend: (message: string) => void;
@@ -17,6 +18,7 @@ export const MessageInput = ({
   maxBytes,
 }: MessageInputProps) => {
   const { setDraft, getDraft, clearDraft } = useMessageStore();
+  const { t } = useTranslation();
 
   const calculateBytes = (text: string) => new Blob([text]).size;
 
@@ -59,7 +61,7 @@ export const MessageInput = ({
               autoFocus
               minLength={1}
               name="messageInput"
-              placeholder="Enter Message"
+              placeholder={t("messages.sendMessage.placeholder")}
               autoComplete="off"
               value={localDraft}
               onChange={handleInputChange}

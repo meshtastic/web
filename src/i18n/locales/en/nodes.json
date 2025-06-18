@@ -47,5 +47,12 @@
     "lastHeardStatus": {
       "never": "Never"
     }
+  },
+  "actions": {
+    "added": "Added",
+    "removed": "Removed",
+    "ignoreNode": "Ignore Node",
+    "unignoreNode": "Unignore Node",
+    "requestPosition": "Request Position"
   }
 }

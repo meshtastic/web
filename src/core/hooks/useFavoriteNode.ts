@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { useToast } from "@core/hooks/useToast.ts";
+import { useTranslation } from "react-i18next";
 
 interface FavoriteNodeOptions {
   nodeNum: number;
@@ -9,6 +10,7 @@ interface FavoriteNodeOptions {
 
 export function useFavoriteNode() {
   const { updateFavorite, getNode } = useDevice();
+  const { t } = useTranslation("ui");
   const { toast } = useToast();
 
   const updateFavoriteCB = useCallback(
@@ -19,9 +21,11 @@ export function useFavoriteNode() {
       updateFavorite(nodeNum, isFavorite);
 
       toast({
-        title: `${isFavorite ? "Added" : "Removed"} ${
-          node?.user?.longName ?? "node"
-        } ${isFavorite ? "to" : "from"} favorites`,
+        title: t("toast.favoriteNode", {
+          action: isFavorite ? t("button.added") : t("button.removed"),
+          nodeName: node?.user?.longName ?? t("node"),
+          location: isFavorite ? t("to") : t("from"),
+        }),
       });
     },
     [updateFavorite, getNode],

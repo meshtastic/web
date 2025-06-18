@@ -31,6 +31,7 @@ import {
 } from "@components/generic/Filter/useFilterNode.ts";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import { useTranslation } from "react-i18next";
+import useLang from "@core/hooks/useLang.ts";
 
 export interface DeleteNoteDialogProps {
   open: boolean;
@@ -39,6 +40,7 @@ export interface DeleteNoteDialogProps {
 
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
+  const { currentLanguage } = useLang();
   const { getNodes, hardware, connection, hasNodeError, setDialogOpen } =
     useDevice();
   const { setNodeNumDetails } = useAppStore();
@@ -168,7 +170,12 @@ const NodesPage = (): JSX.Element => {
             <Mono>
               {node.lastHeard === 0
                 ? <p>{t("nodesTable.lastHeardStatus.never")}</p>
-                : <TimeAgo timestamp={node.lastHeard * 1000} />}
+                : (
+                  <TimeAgo
+                    timestamp={node.lastHeard * 1000}
+                    locale={currentLanguage?.code}
+                  />
+                )}
             </Mono>
           ),
           sortValue: node.lastHeard,

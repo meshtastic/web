@@ -66,6 +66,15 @@
     "saveSuccess": {
       "title": "Saving Config",
       "description": "The configuration change {{case}} has been saved."
+    },
+    "favoriteNode": {
+      "title": "Node {{nodeName}} {{action}} {{direction} favorites.",
+      "action": {
+        "added": "added",
+        "removed": "removed",
+        "to": "to",
+        "from": "from"
+      }
     }
   },
   "notifications": {

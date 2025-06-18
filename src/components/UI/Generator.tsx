@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
+import { useTranslation } from "react-i18next";
 
 export interface ActionButton {
   text: string;
@@ -40,12 +41,7 @@ const Generator = (
     variant,
     value,
     actionButtons,
-    bits = [
-      { text: "256 bit", value: "32", key: "bit256" },
-      { text: "128 bit", value: "16", key: "bit128" },
-      { text: "8 bit", value: "1", key: "bit8" },
-      { text: "Empty", value: "0", key: "empty" },
-    ],
+    bits,
     selectChange,
     inputChange,
     disabled,
@@ -55,6 +51,30 @@ const Generator = (
   }: GeneratorProps,
 ) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
+
+  const passwordRequiredBitSize = bits ? bits : [
+    {
+      text: t("security.256bit"),
+      value: "32",
+      key: "bit256",
+    },
+    {
+      text: t("security.128bit"),
+      value: "16",
+      key: "bit128",
+    },
+    {
+      text: t("security.8bit"),
+      value: "1",
+      key: "bit8",
+    },
+    {
+      text: t("security.empty"),
+      value: "0",
+      key: "bit0",
+    },
+  ];
 
   // Invokes onChange event on the input element when the value changes from the parent component
   useEffect(() => {
@@ -91,7 +111,7 @@ const Generator = (
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="w-36">
-          {bits.map(({ text, value, key }) => (
+          {passwordRequiredBitSize.map(({ text, value, key }) => (
             <SelectItem key={key} value={value} className="w-36">
               {text}
             </SelectItem>

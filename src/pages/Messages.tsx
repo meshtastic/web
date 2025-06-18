@@ -306,13 +306,16 @@ export const MessagesPage = () => {
 
   return (
     <PageLayout
-      label={`Messages: ${
-        isBroadcast && currentChannel
-          ? getChannelName(currentChannel)
-          : isDirect && otherNode
-          ? (otherNode.user?.longName ?? t("unknown.longName"))
-          : t("emptyState.title")
-      }`}
+      label={`${
+        t("page.title", {
+          chatName: isBroadcast && currentChannel
+            ? getChannelName(currentChannel)
+            : isDirect && otherNode
+            ? (otherNode.user?.longName ?? t("unknown.longName"))
+            : t("emptyState.title"),
+        })
+      } 
+      `}
       rightBar={rightSidebar}
       leftBar={leftSidebar}
       actions={isDirect && otherNode
