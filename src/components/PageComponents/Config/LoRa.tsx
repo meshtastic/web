@@ -3,16 +3,29 @@ import {
   LoRaValidationSchema,
 } from "@app/validation/config/lora.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const LoRa = () => {
-  const { config, setWorkingConfig } = useDevice();
+interface LoRaConfigProps {
+  onFormInit: DynamicFormFormInit<LoRaValidation>;
+}
+export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
+  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
+    useDevice();
   const { t } = useTranslation("deviceConfig");
 
   const onSubmit = (data: LoRaValidation) => {
+    if (deepCompareConfig(config.lora, data, true)) {
+      removeWorkingConfig("lora");
+      return;
+    }
+
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
         payloadVariant: {
@@ -26,9 +39,11 @@ export const LoRa = () => {
   return (
     <DynamicForm<LoRaValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={LoRaValidationSchema}
       formId="Config_LoRaConfig"
       defaultValues={config.lora}
+      values={getEffectiveConfig("lora")}
       fieldGroups={[
         {
           label: t("lora.title"),

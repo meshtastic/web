@@ -162,5 +162,10 @@
     "choosingRightDeviceRole": "Choosing The Right Device Role",
     "deviceRoleDocumentation": "Device Role Documentation",
     "title": "Are you sure?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Yes, I know what I'm doing",
+    "title": "Are you sure?",
+    "description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can <bold>only</bold> be changed through Remote Admin messages. This setting is not required for remote node administration."
   }
 }

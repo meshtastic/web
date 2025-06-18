@@ -6,14 +6,17 @@ import { useCopyToClipboard } from "@core/hooks/useCopyToClipboard.ts";
 import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
 import { useTranslation } from "react-i18next";
 
+const cnInvalidBase = "border-2 border-red-500 dark:border-red-500";
+const cnDirtyBase = "border-2 border-sky-500 dark:border-sky-500";
+
 const inputVariants = cva(
   "flex h-10 w-full rounded-md border border-slate-300 bg-transparent py-2 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-500 dark:bg-transparet dark:text-slate-100 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-600",
   {
     variants: {
       variant: {
         default: "border-slate-300 dark:border-slate-500",
-        invalid:
-          "border-red-500 dark:border-red-500 focus:ring-red-500 dark:focus:ring-red-500",
+        invalid: `${cnInvalidBase} focus:ring-red-500 dark:focus:ring-red-500`,
+        dirty: `${cnDirtyBase} focus:ring-sky-500 dark:focus:ring-sky-500`,
       },
     },
     defaultVariants: {
@@ -49,6 +52,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       className,
       containerClassName,
       variant,
+      disabled,
       type = "text",
       prefix,
       suffix,
@@ -137,6 +141,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       className,
     );
 
+    const extrasClassName = cn([
+      variant === "invalid" && `${cnInvalidBase} border-l-0`,
+      variant === "dirty" && `${cnDirtyBase} border-l-0`,
+    ]);
+
     return (
       <div
         className={cn("relative flex w-full items-stretch", containerClassName)}
@@ -153,6 +162,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           value={value}
           onChange={onChange}
+          disabled={disabled}
           {...props}
         />
 
@@ -161,6 +171,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <span
               className={cn(
                 "inline-flex items-center border border-l-0 border-slate-300 bg-slate-100/80 px-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-700 dark:text-slate-300",
+                extrasClassName,
                 !hasActions && "rounded-r-md",
               )}
             >
@@ -171,7 +182,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {hasActions && (
             <div
               className={cn(
-                "flex items-center divide-x divide-slate-300 border border-l-0 border-slate-300 dark:divide-slate-700 dark:border-slate-700",
+                "flex items-center divide-x divide-slate-300 border border-l-0 border-slate-300 dark:divide-slate-700 dark:border-slate-500",
+                extrasClassName,
+                disabled &&
+                  "border-slate-200 dark:border-slate-700 divide-slate-200",
                 !hasSuffix && "rounded-r-md",
                 "bg-white dark:bg-slate-800",
               )}
@@ -181,7 +195,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   key={action.id}
                   type="button"
                   className={cn(
-                    "inline-flex h-full items-center justify-center px-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:ring-offset-0 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 dark:focus:ring-slate-500 hover:rounded-md dark:hover:rounded-md",
+                    "inline-flex h-full items-center justify-center px-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:ring-offset-0 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 dark:focus:ring-slate-500 last:hover:rounded-r-md last:dark:hover:rounded-r-md",
+                    disabled && "text-slate-300 dark:text-slate-600",
                     action.id === "copy-value" && isCopied &&
                       "text-green-600 dark:text-green-500",
                   )}

@@ -3,16 +3,34 @@ import {
   AudioValidationSchema,
 } from "@app/validation/moduleConfig/audio.ts";
 import { create } from "@bufbuild/protobuf";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-export const Audio = () => {
-  const { moduleConfig, setWorkingModuleConfig } = useDevice();
+interface AudioModuleConfigProps {
+  onFormInit: DynamicFormFormInit<AudioValidation>;
+}
+
+export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
+  const {
+    moduleConfig,
+    setWorkingModuleConfig,
+    getEffectiveModuleConfig,
+    removeWorkingModuleConfig,
+  } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AudioValidation) => {
+    if (deepCompareConfig(moduleConfig.audio, data, true)) {
+      removeWorkingModuleConfig("audio");
+      return;
+    }
+
     setWorkingModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
@@ -26,9 +44,11 @@ export const Audio = () => {
   return (
     <DynamicForm<AudioValidation>
       onSubmit={onSubmit}
+      onFormInit={onFormInit}
       validationSchema={AudioValidationSchema}
       formId="ModuleConfig_AudioConfig"
       defaultValues={moduleConfig.audio}
+      values={getEffectiveModuleConfig("audio")}
       fieldGroups={[
         {
           label: t("audio.title"),

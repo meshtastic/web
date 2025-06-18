@@ -31,6 +31,8 @@ export function GenericInput<T extends FieldValues>({
   control,
   disabled,
   field,
+  isDirty,
+  invalid,
 }: GenericFormElementProps<T, InputFieldProps<T>>) {
   const { fieldLength, ...restProperties } = field.properties || {};
   const [currentLength, setCurrentLength] = useState<number>(
@@ -78,6 +80,7 @@ export function GenericInput<T extends FieldValues>({
         className={field.properties?.className}
         {...restProperties}
         disabled={disabled}
+        variant={invalid ? "invalid" : isDirty ? "dirty" : "default"}
       />
 
       {fieldLength?.showCharacterCount && fieldLength?.max && (

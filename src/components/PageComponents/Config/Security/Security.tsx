@@ -1,5 +1,9 @@
 import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
+import { ManagedModeDialog } from "@components/Dialog/ManagedModeDialog.tsx";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import {
@@ -7,43 +11,93 @@ import {
   type RawSecurity,
   RawSecuritySchema,
 } from "@app/validation/config/security.ts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { create } from "@bufbuild/protobuf";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useTranslation } from "react-i18next";
+import { type DefaultValues, useForm } from "react-hook-form";
+import { createZodResolver } from "@components/Form/createZodResolver.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
-type KeyState = {
-  publicKey: string;
-  privateKey: string;
-  privateKeyDialogOpen: boolean;
-};
+interface SecurityConfigProps {
+  onFormInit: DynamicFormFormInit<RawSecurity>;
+}
+export const Security = ({ onFormInit }: SecurityConfigProps) => {
+  const {
+    config,
+    setWorkingConfig,
+    setDialogOpen,
+    getEffectiveConfig,
+    removeWorkingConfig,
+  } = useDevice();
 
-export const Security = () => {
-  const { config, setWorkingConfig, setDialogOpen } = useDevice();
   const { removeError } = useAppStore();
   const { t } = useTranslation("deviceConfig");
 
-  const [keyState, setKeyState] = useState<KeyState>(() => ({
-    publicKey: fromByteArray(config?.security?.publicKey ?? new Uint8Array(0)),
-    privateKey: fromByteArray(
-      config?.security?.privateKey ?? new Uint8Array(0),
-    ),
-    privateKeyDialogOpen: false,
-  }));
+  const securityConfig = getEffectiveConfig("security");
+  const defaultValues = {
+    ...securityConfig,
+    ...{
+      privateKey: fromByteArray(
+        securityConfig?.privateKey ?? new Uint8Array(0),
+      ),
+      publicKey: fromByteArray(
+        securityConfig?.publicKey ?? new Uint8Array(0),
+      ),
+      adminKey: [
+        fromByteArray(
+          securityConfig?.adminKey?.at(0) ?? new Uint8Array(0),
+        ),
+        fromByteArray(
+          securityConfig?.adminKey?.at(1) ?? new Uint8Array(0),
+        ),
+        fromByteArray(
+          securityConfig?.adminKey?.at(2) ?? new Uint8Array(0),
+        ),
+      ],
+    },
+  };
+
+  const formMethods = useForm<RawSecurity>({
+    mode: "onChange",
+    defaultValues: defaultValues as DefaultValues<RawSecurity>,
+    resolver: createZodResolver(RawSecuritySchema),
+    shouldFocusError: false,
+    resetOptions: { keepDefaultValues: true },
+  });
+  const { setValue, formState } = formMethods;
+
+  useEffect(() => {
+    onFormInit?.(formMethods);
+  }, [onFormInit, formMethods]);
+
+  const [privateKeyDialogOpen, setPrivateKeyDialogOpen] = useState<boolean>(
+    false,
+  );
+  const [managedModeDialogOpen, setManagedModeDialogOpen] = useState<boolean>(
+    false,
+  );
 
   const onSubmit = (data: RawSecurity) => {
+    if (!formState.isReady) return;
+
     const payload: ParsedSecurity = {
       ...data,
-      privateKey: toByteArray(keyState.privateKey),
-      publicKey: toByteArray(keyState.publicKey),
+      privateKey: toByteArray(data.privateKey),
+      publicKey: toByteArray(data.publicKey),
       adminKey: [
         toByteArray(data.adminKey.at(0) ?? ""),
         toByteArray(data.adminKey.at(1) ?? ""),
         toByteArray(data.adminKey.at(2) ?? ""),
       ],
     };
+
+    if (deepCompareConfig(config.security, payload, true)) {
+      removeWorkingConfig("security");
+      return;
+    }
 
     setWorkingConfig(
       create(Protobuf.Config.ConfigSchema, {
@@ -54,18 +108,10 @@ export const Security = () => {
       }),
     );
   };
+
   const pkiRegenerate = () => {
     const privateKey = getX25519PrivateKey();
-
     updatePublicKey(fromByteArray(privateKey));
-
-    setKeyState((prev) => ({
-      ...prev,
-      privateKey: fromByteArray(privateKey),
-      privateKeyDialogOpen: false,
-    }));
-
-    removeError("privateKey");
   };
 
   const updatePublicKey = (privateKey: string) => {
@@ -73,18 +119,14 @@ export const Security = () => {
       const publicKey = fromByteArray(
         getX25519PublicKey(toByteArray(privateKey)),
       );
-      setKeyState((prev) => ({
-        ...prev,
-        privateKey: privateKey,
-        publicKey: publicKey,
-      }));
+      setValue("privateKey", privateKey);
+      setValue("publicKey", publicKey);
 
+      removeError("privateKey");
       removeError("publicKey");
+      setPrivateKeyDialogOpen(false);
     } catch (_e) {
-      setKeyState((prev) => ({
-        ...prev,
-        privateKey: privateKey,
-      }));
+      setValue("privateKey", privateKey);
     }
   };
 
@@ -99,31 +141,9 @@ export const Security = () => {
   return (
     <>
       <DynamicForm<RawSecurity>
+        propMethods={formMethods}
         onSubmit={onSubmit}
-        validationSchema={RawSecuritySchema}
         formId="Config_SecurityConfig"
-        defaultValues={{
-          ...config.security,
-          ...{
-            privateKey: fromByteArray(
-              config?.security?.privateKey ?? new Uint8Array(0),
-            ),
-            publicKey: fromByteArray(
-              config?.security?.publicKey ?? new Uint8Array(0),
-            ),
-            adminKey: [
-              fromByteArray(
-                config?.security?.adminKey.at(0) ?? new Uint8Array(0),
-              ),
-              fromByteArray(
-                config?.security?.adminKey.at(1) ?? new Uint8Array(0),
-              ),
-              fromByteArray(
-                config?.security?.adminKey.at(2) ?? new Uint8Array(0),
-              ),
-            ],
-          },
-        }}
         fieldGroups={[
           {
             label: t("security.title"),
@@ -144,11 +164,7 @@ export const Security = () => {
                 actionButtons: [
                   {
                     text: t("button.generate"),
-                    onClick: () =>
-                      setKeyState((prev) => ({
-                        ...prev,
-                        privateKeyDialogOpen: true,
-                      })),
+                    onClick: () => setPrivateKeyDialogOpen(true),
                     variant: "success",
                   },
                   {
@@ -160,8 +176,6 @@ export const Security = () => {
                 properties: {
                   showCopyButton: true,
                   showPasswordToggle: true,
-
-                  value: keyState.privateKey,
                 },
               },
               {
@@ -172,7 +186,6 @@ export const Security = () => {
                 description: t("security.publicKey.description"),
                 properties: {
                   showCopyButton: true,
-                  value: keyState.publicKey,
                 },
               },
             ],
@@ -240,6 +253,13 @@ export const Security = () => {
                 name: "isManaged",
                 label: t("security.managed.label"),
                 description: t("security.managed.description"),
+                inputChange: (checked) => {
+                  if (checked) {
+                    setManagedModeDialogOpen(true);
+                  }
+
+                  setValue("isManaged", false);
+                },
               },
               {
                 type: "toggle",
@@ -275,13 +295,18 @@ export const Security = () => {
           title: t("pkiRegenerate.title"),
           description: t("pkiRegenerate.description"),
         }}
-        open={keyState.privateKeyDialogOpen}
-        onOpenChange={() =>
-          setKeyState((prev) => ({
-            ...prev,
-            privateKeyDialogOpen: false,
-          }))}
+        open={privateKeyDialogOpen}
+        onOpenChange={() => setPrivateKeyDialogOpen((prev) => !prev)}
         onSubmit={pkiRegenerate}
+      />
+
+      <ManagedModeDialog
+        open={managedModeDialogOpen}
+        onOpenChange={() => setManagedModeDialogOpen((prev) => !prev)}
+        onSubmit={() => {
+          setValue("isManaged", true);
+          setManagedModeDialogOpen(false);
+        }}
       />
     </>
   );

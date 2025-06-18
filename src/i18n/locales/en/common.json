@@ -72,6 +72,7 @@
   "unset": "UNSET",
   "fallbackName": "Meshtastic {{last4}}",
   "formValidation": {
+    "unsavedChanges": "Unsaved changes",
     "tooBig": {
       "string": "Too long, expected less than or equal to {{maximum}} characters.",
       "number": "Too big, expected a number smaller than or equal to {{maximum}}.",

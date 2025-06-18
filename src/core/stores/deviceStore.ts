@@ -18,6 +18,14 @@ type NodeError = {
   node: number;
   error: string;
 };
+export type ValidConfigType = Exclude<
+  Protobuf.Config.Config["payloadVariant"]["case"],
+  "deviceUi" | "sessionkey" | undefined
+>;
+export type ValidModuleConfigType = Exclude<
+  Protobuf.ModuleConfig.ModuleConfig["payloadVariant"]["case"],
+  undefined
+>;
 
 export interface Device {
   id: number;
@@ -54,6 +62,7 @@ export interface Device {
     unsafeRoles: boolean;
     refreshKeys: boolean;
     deleteMessages: boolean;
+    managedMode: boolean;
   };
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
@@ -61,6 +70,26 @@ export interface Device {
   setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
   setWorkingConfig: (config: Protobuf.Config.Config) => void;
   setWorkingModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
+  getWorkingConfig: (
+    payloadVariant: ValidConfigType,
+  ) =>
+    | Protobuf.LocalOnly.LocalConfig[Exclude<ValidConfigType, undefined>]
+    | undefined;
+  getWorkingModuleConfig: (
+    payloadVariant: ValidModuleConfigType,
+  ) =>
+    | Protobuf.LocalOnly.LocalModuleConfig[
+      Exclude<ValidModuleConfigType, undefined>
+    ]
+    | undefined;
+  removeWorkingConfig: (payloadVariant?: ValidConfigType) => void;
+  removeWorkingModuleConfig: (payloadVariant?: ValidModuleConfigType) => void;
+  getEffectiveConfig<K extends ValidConfigType>(
+    payloadVariant: K,
+  ): Protobuf.LocalOnly.LocalConfig[K] | undefined;
+  getEffectiveModuleConfig<K extends ValidModuleConfigType>(
+    payloadVariant: K,
+  ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
   setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
@@ -142,6 +171,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             refreshKeys: false,
             rebootOTA: false,
             deleteMessages: false,
+            managedMode: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
@@ -277,6 +307,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
                 const index = device.workingConfig.findIndex(
                   (wc) => wc.payloadVariant.case === config.payloadVariant.case,
                 );
+
                 if (index !== -1) {
                   device.workingConfig[index] = config;
                 } else {
@@ -297,6 +328,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
                     wmc.payloadVariant.case ===
                       moduleConfig.payloadVariant.case,
                 );
+
                 if (index !== -1) {
                   device.workingModuleConfig[index] = moduleConfig;
                 } else {
@@ -305,6 +337,106 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               }),
             );
           },
+
+          getWorkingConfig: (payloadVariant: ValidConfigType) => {
+            const device = get().devices.get(id);
+            if (!device) return;
+
+            const workingConfig = device.workingConfig.find(
+              (c) => c.payloadVariant.case === payloadVariant,
+            );
+
+            if (
+              workingConfig?.payloadVariant.case === "deviceUi" ||
+              workingConfig?.payloadVariant.case === "sessionkey"
+            ) return;
+
+            return workingConfig?.payloadVariant.value;
+          },
+          getWorkingModuleConfig: (payloadVariant: ValidModuleConfigType) => {
+            const device = get().devices.get(id);
+            if (!device) return;
+
+            return device.workingModuleConfig.find(
+              (c) => c.payloadVariant.case === payloadVariant,
+            )?.payloadVariant.value;
+          },
+
+          removeWorkingConfig: (payloadVariant?: ValidConfigType) => {
+            set(
+              produce<PrivateDeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) return;
+
+                if (!payloadVariant) {
+                  device.workingConfig = [];
+                  return;
+                }
+
+                const index = device.workingConfig.findIndex(
+                  (wc: Protobuf.Config.Config) =>
+                    wc.payloadVariant.case === payloadVariant,
+                );
+
+                if (index !== -1) {
+                  device.workingConfig.splice(index, 1);
+                }
+              }),
+            );
+          },
+          removeWorkingModuleConfig: (
+            payloadVariant?: ValidModuleConfigType,
+          ) => {
+            set(
+              produce<PrivateDeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) return;
+
+                if (!payloadVariant) {
+                  device.workingModuleConfig = [];
+                  return;
+                }
+
+                const index = device.workingModuleConfig.findIndex(
+                  (wc: Protobuf.ModuleConfig.ModuleConfig) =>
+                    wc.payloadVariant.case === payloadVariant,
+                );
+
+                if (index !== -1) {
+                  device.workingModuleConfig.splice(index, 1);
+                }
+              }),
+            );
+          },
+
+          getEffectiveConfig<K extends ValidConfigType>(
+            payloadVariant: K,
+          ): Protobuf.LocalOnly.LocalConfig[K] | undefined {
+            if (!payloadVariant) return;
+            const device = get().devices.get(id);
+            if (!device) return;
+
+            return {
+              ...device.config[payloadVariant],
+              ...(device.workingConfig.find(
+                (c) => c.payloadVariant.case === payloadVariant,
+              )?.payloadVariant.value),
+            };
+          },
+          getEffectiveModuleConfig<K extends ValidModuleConfigType>(
+            payloadVariant: K,
+          ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined {
+            const device = get().devices.get(id);
+            if (!device) return;
+
+            return {
+              ...device.moduleConfig[payloadVariant],
+              ...(device.workingModuleConfig.find(
+                (c) => c.payloadVariant.case === payloadVariant,
+              )?.payloadVariant.value),
+            };
+          },
+
           setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => {
             set(
               produce<PrivateDeviceState>((draft) => {

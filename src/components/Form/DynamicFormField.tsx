@@ -31,19 +31,29 @@ export interface DynamicFormFieldProps<T extends FieldValues> {
   field: FieldProps<T>;
   control: Control<T>;
   disabled?: boolean;
+  isDirty?: boolean;
+  invalid?: boolean;
 }
 
 export function DynamicFormField<T extends FieldValues>({
   field,
   control,
   disabled,
+  isDirty,
+  invalid,
 }: DynamicFormFieldProps<T>) {
   switch (field.type) {
     case "text":
     case "password":
     case "number":
       return (
-        <GenericInput field={field} control={control} disabled={disabled} />
+        <GenericInput
+          field={field}
+          control={control}
+          disabled={disabled}
+          isDirty={isDirty}
+          invalid={invalid}
+        />
       );
 
     case "toggle":
@@ -52,6 +62,8 @@ export function DynamicFormField<T extends FieldValues>({
           field={field}
           control={control}
           disabled={disabled}
+          isDirty={isDirty}
+          invalid={invalid}
         />
       );
     case "select":
@@ -60,6 +72,8 @@ export function DynamicFormField<T extends FieldValues>({
           field={field}
           control={control}
           disabled={disabled}
+          isDirty={isDirty}
+          invalid={invalid}
         />
       );
     case "passwordGenerator":
@@ -68,11 +82,19 @@ export function DynamicFormField<T extends FieldValues>({
           field={field}
           control={control}
           disabled={disabled}
+          isDirty={isDirty}
+          invalid={invalid}
         />
       );
     case "multiSelect":
       return (
-        <MultiSelectInput field={field} control={control} disabled={disabled} />
+        <MultiSelectInput
+          field={field}
+          control={control}
+          disabled={disabled}
+          isDirty={isDirty}
+          invalid={invalid}
+        />
       );
   }
 }
