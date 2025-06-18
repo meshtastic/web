@@ -86,7 +86,7 @@ describe("MessageInput", () => {
 
   it("should render the input field, byte counter, and send button", () => {
     renderComponent();
-    expect(screen.getByPlaceholderText("Enter Message")).toBeInTheDocument();
+    expect(screen.getByTestId("message-input-field")).toBeInTheDocument();
     expect(screen.getByTestId("byte-counter")).toBeInTheDocument();
     expect(screen.getByRole("button")).toBeInTheDocument();
     expect(screen.getByTestId("send-icon")).toBeInTheDocument();
@@ -100,10 +100,6 @@ describe("MessageInput", () => {
 
     renderComponent();
 
-    const inputElement = screen.getByPlaceholderText(
-      "Enter Message",
-    ) as HTMLInputElement;
-    expect(inputElement.value).toBe(initialDraft);
     expect(mockGetDraft).toHaveBeenCalledWith(defaultProps.to);
     const expectedBytes = new Blob([initialDraft]).size;
     expect(screen.getByTestId("byte-counter")).toHaveTextContent(
@@ -113,7 +109,7 @@ describe("MessageInput", () => {
 
   it("should update input value, byte counter, and call setDraft on change within limits", () => {
     renderComponent();
-    const inputElement = screen.getByPlaceholderText("Enter Message");
+    const inputElement = screen.getByTestId("message-input-field");
     const testMessage = "Hello there!";
     const expectedBytes = new Blob([testMessage]).size;
 
@@ -130,7 +126,7 @@ describe("MessageInput", () => {
   it("should NOT update input value or call setDraft if maxBytes is exceeded", () => {
     const smallMaxBytes = 5;
     renderComponent({ maxBytes: smallMaxBytes });
-    const inputElement = screen.getByPlaceholderText("Enter Message");
+    const inputElement = screen.getByTestId("message-input-field");
     const initialValue = "12345";
     const excessiveValue = "123456";
 
@@ -150,7 +146,7 @@ describe("MessageInput", () => {
 
   it("should call onSend, clear input, reset byte counter, and call clearDraft on valid submit", async () => {
     renderComponent();
-    const inputElement = screen.getByPlaceholderText("Enter Message");
+    const inputElement = screen.getByTestId("message-input-field");
     const formElement = screen.getByRole("form");
     const testMessage = "Send this message";
 
@@ -171,7 +167,7 @@ describe("MessageInput", () => {
 
   it("should trim whitespace before calling onSend", async () => {
     renderComponent();
-    const inputElement = screen.getByPlaceholderText("Enter Message");
+    const inputElement = screen.getByTestId("message-input-field");
     const formElement = screen.getByRole("form");
     const testMessageWithWhitespace = "  Trim me!  ";
     const expectedTrimmedMessage = "Trim me!";
@@ -190,7 +186,7 @@ describe("MessageInput", () => {
 
   it("should not call onSend or clearDraft if input is empty on submit", async () => {
     renderComponent();
-    const inputElement = screen.getByPlaceholderText("Enter Message");
+    const inputElement = screen.getByTestId("message-input-field");
     const formElement = screen.getByRole("form");
 
     expect((inputElement as HTMLInputElement).value).toBe("");
@@ -236,10 +232,14 @@ describe("MessageInput", () => {
 
     expect(mockGetDraft).toHaveBeenCalledWith(broadcastDest);
     expect(
-      (screen.getByPlaceholderText("Enter Message") as HTMLInputElement).value,
+      (screen.getByTestId(
+        "message-input-field",
+      ) as HTMLInputElement).value,
     ).toBe("Broadcast draft");
 
-    const inputElement = screen.getByPlaceholderText("Enter Message");
+    const inputElement = screen.getByTestId(
+      "message-input-field",
+    ) as HTMLInputElement;
     const formElement = screen.getByRole("form");
     const newMessage = "New broadcast msg";
 

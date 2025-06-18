@@ -68,10 +68,19 @@
       "description": "The configuration change {{case}} has been saved."
     },
     "favoriteNode": {
-      "title": "Node {{nodeName}} {{action}} {{direction} favorites.",
+      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
       "action": {
-        "added": "added",
-        "removed": "removed",
+        "added": "Added",
+        "removed": "Removed",
+        "to": "to",
+        "from": "from"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "action": {
+        "added": "Added",
+        "removed": "Removed",
         "to": "to",
         "from": "from"
       }

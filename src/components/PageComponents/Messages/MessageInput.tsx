@@ -18,7 +18,7 @@ export const MessageInput = ({
   maxBytes,
 }: MessageInputProps) => {
   const { setDraft, getDraft, clearDraft } = useMessageStore();
-  const { t } = useTranslation();
+  const { t } = useTranslation("messages");
 
   const calculateBytes = (text: string) => new Blob([text]).size;
 
@@ -61,7 +61,7 @@ export const MessageInput = ({
               autoFocus
               minLength={1}
               name="messageInput"
-              placeholder={t("messages.sendMessage.placeholder")}
+              placeholder={t("sendMessage.placeholder")}
               autoComplete="off"
               value={localDraft}
               onChange={handleInputChange}

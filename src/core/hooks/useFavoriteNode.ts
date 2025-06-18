@@ -10,7 +10,7 @@ interface FavoriteNodeOptions {
 
 export function useFavoriteNode() {
   const { updateFavorite, getNode } = useDevice();
-  const { t } = useTranslation("ui");
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   const updateFavoriteCB = useCallback(
@@ -21,10 +21,14 @@ export function useFavoriteNode() {
       updateFavorite(nodeNum, isFavorite);
 
       toast({
-        title: t("toast.favoriteNode", {
-          action: isFavorite ? t("button.added") : t("button.removed"),
+        title: t("toast.favoriteNode.title", {
+          action: isFavorite
+            ? t("toast.favoriteNode.action.added")
+            : t("toast.favoriteNode.action.removed"),
           nodeName: node?.user?.longName ?? t("node"),
-          location: isFavorite ? t("to") : t("from"),
+          direction: isFavorite
+            ? t("toast.favoriteNode.action.to")
+            : t("toast.favoriteNode.action.from"),
         }),
       });
     },

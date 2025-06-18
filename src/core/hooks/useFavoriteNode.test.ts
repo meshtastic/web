@@ -43,7 +43,7 @@ describe("useFavoriteNode hook", () => {
     expect(mockUpdateFavorite).toHaveBeenCalledWith(1234, true);
     expect(mockGetNode).toHaveBeenCalledWith(1234);
     expect(mockToast).toHaveBeenCalledWith({
-      title: "Added Test Node to favorites",
+      title: "Added Test Node to favorites.",
     });
   });
 
@@ -57,7 +57,7 @@ describe("useFavoriteNode hook", () => {
     expect(mockUpdateFavorite).toHaveBeenCalledWith(1234, false);
     expect(mockGetNode).toHaveBeenCalledWith(1234);
     expect(mockToast).toHaveBeenCalledWith({
-      title: "Removed Test Node from favorites",
+      title: "Removed Test Node from favorites.",
     });
   });
 
@@ -74,7 +74,7 @@ describe("useFavoriteNode hook", () => {
     });
 
     expect(mockToast).toHaveBeenCalledWith({
-      title: "Added node to favorites",
+      title: "Added Node to favorites.",
     });
   });
 
