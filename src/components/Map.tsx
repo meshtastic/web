@@ -1,6 +1,5 @@
 import MapGl, {
   AttributionControl,
-  GeolocateControl,
   type MapRef,
   NavigationControl,
   ScaleControl,
@@ -45,11 +44,15 @@ export const Map = ({ children, onLoad }: MapProps) => {
           color: darkMode ? "black" : undefined,
         }}
       />
-      <GeolocateControl
+      {/* { Disabled for now until we can use i18n for the geolocate control} */}
+      {
+        /* <GeolocateControl
         position="top-right"
+        i18nIsDynamicList
         positionOptions={{ enableHighAccuracy: true }}
         trackUserLocation
-      />
+      />  */
+      }
       <NavigationControl position="top-right" showCompass={false} />
       <ScaleControl />
       {children}

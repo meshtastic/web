@@ -114,7 +114,7 @@ export const Avatar = ({
                 />
               </TooltipTrigger>
               <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                Favorite
+                {t("nodeDetail.favorite.label", { ns: "nodes" })}
                 <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
               </TooltipContent>
             </Tooltip>
@@ -132,7 +132,7 @@ export const Avatar = ({
                 />
               </TooltipTrigger>
               <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                Node error
+                {t("nodeDetail.error.label", { ns: "nodes" })}
                 <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
               </TooltipContent>
             </Tooltip>

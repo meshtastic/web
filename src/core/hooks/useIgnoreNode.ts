@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { useToast } from "@core/hooks/useToast.ts";
+import { useTranslation } from "react-i18next";
 
 interface IgnoreNodeOptions {
   nodeNum: number;
@@ -9,6 +10,8 @@ interface IgnoreNodeOptions {
 
 export function useIgnoreNode() {
   const { updateIgnored, getNode } = useDevice();
+  const { t } = useTranslation();
+
   const { toast } = useToast();
 
   const updateIgnoredCB = useCallback(
@@ -19,9 +22,15 @@ export function useIgnoreNode() {
       updateIgnored(nodeNum, isIgnored);
 
       toast({
-        title: `${isIgnored ? "Added" : "Removed"} ${
-          node?.user?.longName ?? "node"
-        } ${isIgnored ? "to" : "from"} ignore list`,
+        title: t("toast.ignoreNode.title", {
+          nodeName: node?.user?.longName ?? "node",
+          action: isIgnored
+            ? t("toast.ignoreNode.action.added")
+            : t("toast.ignoreNode.action.removed"),
+          direction: isIgnored
+            ? t("toast.ignoreNode.action.to")
+            : t("toast.ignoreNode.action.from"),
+        }),
       });
     },
     [updateIgnored, getNode],

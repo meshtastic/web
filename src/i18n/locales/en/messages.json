@@ -1,6 +1,7 @@
 {
   "page": {
-    "title": "Messages: {{chatName}}"
+    "title": "Messages: {{chatName}}",
+    "placeholder": "Enter Message"
   },
   "emptyState": {
     "title": "Select a Chat",
@@ -10,7 +11,7 @@
     "text": "Select a channel or node to start messaging."
   },
   "sendMessage": {
-    "placeholder": "Type your message here...",
+    "placeholder": "Enter your message here...",
     "sendButton": "Send"
   },
   "actionsMenu": {
@@ -18,24 +19,22 @@
     "replyLabel": "Reply"
   },
 
-  "item": {
-    "status": {
-      "delivered": {
-        "label": "Message delivered",
-        "displayText": "Message delivered"
-      },
-      "failed": {
-        "label": "Message delivery failed",
-        "displayText": "Delivery failed"
-      },
-      "unknown": {
-        "label": "Message status unknown",
-        "displayText": "Unknown state"
-      },
-      "waiting": {
-        "ariaLabel": "Sending message",
-        "displayText": "Waiting for delivery"
-      }
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Message delivered",
+      "displayText": "Message delivered"
+    },
+    "failed": {
+      "label": "Message delivery failed",
+      "displayText": "Delivery failed"
+    },
+    "unknown": {
+      "label": "Message status unknown",
+      "displayText": "Unknown state"
+    },
+    "waiting": {
+      "label": "Sending message",
+      "displayText": "Waiting for delivery"
     }
   }
 }

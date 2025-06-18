@@ -208,7 +208,7 @@ export function DynamicForm<T extends FieldValues>({
             variant="outline"
             disabled={!formState.isValid}
           >
-            Submit
+            {t("button.submit")}
           </Button>
         )}
       </form>
