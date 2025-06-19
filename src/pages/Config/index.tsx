@@ -144,19 +144,23 @@ const ConfigPage = () => {
     [activeConfigSection, workingConfig, workingModuleConfig],
   );
 
-  const buttonOpacity = useMemo(
-    () => (formMethods?.formState.isDirty &&
-          Object.keys(formMethods?.formState.dirtyFields ?? {}).length > 0 ||
-        workingConfig.length > 0 || workingModuleConfig.length > 0
-      ? "opacity-100"
-      : "opacity-0"),
-    [
-      formMethods?.formState.isDirty,
-      formMethods?.formState.dirtyFields,
-      workingConfig,
-      workingModuleConfig,
-    ],
-  );
+  const buttonOpacity = useMemo(() => {
+    const isFormDirty = formMethods?.formState.isDirty ?? false;
+    const hasDirtyFields =
+      (Object.keys(formMethods?.formState.dirtyFields ?? {}).length ?? 0) > 0;
+    const hasWorkingConfig = workingConfig.length > 0;
+    const hasWorkingModuleConfig = workingModuleConfig.length > 0;
+
+    const shouldShowButton = (isFormDirty && hasDirtyFields) ||
+      hasWorkingConfig || hasWorkingModuleConfig;
+
+    return shouldShowButton ? "opacity-100" : "opacity-0";
+  }, [
+    formMethods?.formState.isDirty,
+    formMethods?.formState.dirtyFields,
+    workingConfig,
+    workingModuleConfig,
+  ]);
 
   const isValid = useMemo(() => {
     return Object.keys(formMethods?.formState.errors ?? {}).length === 0;
@@ -168,7 +172,8 @@ const ConfigPage = () => {
       label: t("common:formValidation.unsavedChanges"),
       onClick: () => {},
       className: cn([
-        "bg-blue-500 hover:bg-blue-500 text-white hover:text-white",
+        "bg-blue-500 text-slate-900 hover:bg-initial",
+        "transition-colors duration-200",
         buttonOpacity,
         "transition-opacity",
       ]),
@@ -178,7 +183,11 @@ const ConfigPage = () => {
       icon: RefreshCwIcon,
       label: t("common:button.reset"),
       onClick: handleReset,
-      className: cn([buttonOpacity, "transition-opacity"]),
+      className: cn([
+        buttonOpacity,
+        "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
+        "hover:dark:bg-slate-300  hover:dark:text-black cursor-pointer",
+      ]),
     },
     {
       key: "save",
@@ -187,7 +196,13 @@ const ConfigPage = () => {
       disabled: isSaving ||
         !isValid ||
         (workingConfig.length === 0 && workingModuleConfig.length === 0),
-      iconClasses: !isValid ? "text-red-400 cursor-not-allowed" : "",
+      iconClasses: !isValid
+        ? "text-red-400 cursor-not-allowed"
+        : "cursor-pointer",
+      className: cn([
+        "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
+        "hover:dark:bg-slate-300  hover:dark:text-black cursor-pointer",
+      ]),
       onClick: handleSave,
       label: t("common:button.save"),
     },

@@ -80,8 +80,7 @@ export const PageLayout = ({
                       disabled={action.disabled || action.isLoading}
                       className={cn(
                         "flex items-center space-x-2 py-2 px-3 rounded-md",
-                        "text-foreground transition-colors hover:text-accent",
-                        "hover:bg-slate-200 disabled:hover:bg-white",
+                        "text-foreground transition-colors duration-200",
                         "disabled:opacity-50 disabled:cursor-not-allowed",
                         action.className,
                       )}
