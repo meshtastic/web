@@ -202,7 +202,7 @@ const ConfigPage = () => {
       className: cn([
         "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
         "hover:dark:bg-slate-300 hover:dark:text-black",
-        disabled ? "cursor-not-allowed" : "cursor-pointer",
+        "disabled:hover:cursor-not-allowed cursor-pointer",
       ]),
       onClick: handleSave,
       label: t("common:button.save"),
