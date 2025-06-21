@@ -9,7 +9,7 @@
     "shortName": "Short Name",
     "title": "Change Device Name",
     "validation": {
-      "longNameMax": "Long name must not be more than 40characters",
+      "longNameMax": "Long name must not be more than 40 characters",
       "shortNameMax": "Short name must not be more than 4 characters",
       "longNameMin": "Long name must have at least 1 character",
       "shortNameMin": "Short name must have at least 1 character"
