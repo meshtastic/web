@@ -14,8 +14,9 @@ import { Protobuf } from "@meshtastic/core";
 import { useForm } from "react-hook-form";
 import { GenericInput } from "@components/Form/FormInput.tsx";
 import { useTranslation } from "react-i18next";
-import { validateMaxByteLength } from "@core/utils/string.ts";
 import { Label } from "../UI/Label.tsx";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export interface User {
   longName: string;
@@ -26,8 +27,6 @@ export interface DeviceNameDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-const MAX_LONG_NAME_BYTE_LENGTH = 40;
-const MAX_SHORT_NAME_BYTE_LENGTH = 4;
 
 export const DeviceNameDialog = ({
   open,
@@ -38,29 +37,29 @@ export const DeviceNameDialog = ({
   const myNode = getNode(hardware.myNodeNum);
 
   const defaultValues = {
-    longName: myNode?.user?.longName ?? t("unknown.longName"),
-    shortName: myNode?.user?.shortName ?? t("unknown.shortName"),
+    shortName: myNode?.user?.shortName ?? "",
+    longName: myNode?.user?.longName ?? "",
   };
 
-  const { getValues, setValue, reset, control, handleSubmit } = useForm<User>({
-    values: defaultValues,
+  const deviceNameSchema = z.object({
+    longName: z
+      .string()
+      .min(2, t("deviceName.validation.longNameMin"))
+      .max(40, t("deviceName.validation.longNameMax")),
+    shortName: z
+      .string()
+      .min(2, t("deviceName.validation.shortNameMin"))
+      .max(4, t("deviceName.validation.shortNameMax")),
   });
 
-  const { currentLength: currentLongNameLength } = validateMaxByteLength(
-    getValues("longName"),
-    MAX_LONG_NAME_BYTE_LENGTH,
-  );
-  const { currentLength: currentShortNameLength } = validateMaxByteLength(
-    getValues("shortName"),
-    MAX_SHORT_NAME_BYTE_LENGTH,
-  );
-
-  if (!myNode?.user) {
-    console.warn("DeviceNameDialog: No user data available");
-    return null;
-  }
+  const { getValues, reset, control, handleSubmit } = useForm<User>({
+    values: defaultValues,
+    resolver: zodResolver(deviceNameSchema),
+  });
 
   const onSubmit = handleSubmit((data) => {
+    console.log("Submitted Data:", data);
+
     connection?.setOwner(
       create(Protobuf.Mesh.UserSchema, {
         ...data,
@@ -70,9 +69,7 @@ export const DeviceNameDialog = ({
   });
 
   const handleReset = () => {
-    reset({ longName: "", shortName: "" });
-    setValue("longName", "");
-    setValue("shortName", "");
+    reset(defaultValues);
   };
 
   return (
@@ -99,8 +96,9 @@ export const DeviceNameDialog = ({
                 properties: {
                   className: "text-slate-900 dark:text-slate-200",
                   fieldLength: {
-                    currentValueLength: currentLongNameLength ?? 0,
-                    max: MAX_LONG_NAME_BYTE_LENGTH,
+                    currentValueLength: getValues("longName").length,
+                    max: 40,
+                    min: 1,
                     showCharacterCount: true,
                   },
                 },
@@ -119,8 +117,9 @@ export const DeviceNameDialog = ({
                 type: "text",
                 properties: {
                   fieldLength: {
-                    currentValueLength: currentShortNameLength ?? 0,
-                    max: MAX_SHORT_NAME_BYTE_LENGTH,
+                    currentValueLength: getValues("shortName").length,
+                    max: 4,
+                    min: 1,
                     showCharacterCount: true,
                   },
                 },
@@ -137,7 +136,12 @@ export const DeviceNameDialog = ({
             >
               {t("button.reset")}
             </Button>
-            <Button type="submit" name="save">{t("button.save")}</Button>
+            <Button
+              type="submit"
+              name="save"
+            >
+              {t("button.save")}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
