@@ -24,7 +24,8 @@
     "reset": "Palauta",
     "save": "Tallenna",
     "scanQr": "Skannaa QR-koodi",
-    "traceRoute": "Reitinselvitys"
+    "traceRoute": "Reitinselvitys",
+    "submit": "Lähetä"
   },
   "app": {
     "title": "Meshtastic",
@@ -55,6 +56,10 @@
       "one": "Minuutti",
       "plural": "Minuuttia"
     },
+    "hour": {
+      "one": "Tunti",
+      "plural": "Tuntia"
+    },
     "millisecond": {
       "one": "Millisekunti",
       "plural": "Millisekuntia",
@@ -63,6 +68,18 @@
     "second": {
       "one": "Sekunti",
       "plural": "Sekuntia"
+    },
+    "day": {
+      "one": "Päivä",
+      "plural": "Päivää"
+    },
+    "month": {
+      "one": "Kuukausi",
+      "plural": "Kuukautta"
+    },
+    "year": {
+      "one": "Vuosi",
+      "plural": "Vuotta"
     },
     "snr": "SNR",
     "volt": {
@@ -76,6 +93,9 @@
     }
   },
   "security": {
+    "0bit": "Tyhjä",
+    "8bit": "8-bittiä",
+    "128bit": "128-bittiä",
     "256bit": "256 bittiä"
   },
   "unknown": {
@@ -87,7 +107,9 @@
   "nodeUnknownPrefix": "!",
   "unset": "EI ASETETTU",
   "fallbackName": "Meshtastic {{last4}}",
+  "node": "Laite",
   "formValidation": {
+    "unsavedChanges": "Tallentamattomat muutokset",
     "tooBig": {
       "string": "Teksti on liian pitkä – sallittu enimmäispituus on {{maximum}} merkkiä.",
       "number": "Arvo on liian suuri – sallittu enimmäisarvo on {{maximum}}.",

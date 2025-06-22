@@ -1,6 +1,7 @@
 {
   "page": {
-    "title": "Meddelanden: {{chatName}}"
+    "title": "Meddelanden: {{chatName}}",
+    "placeholder": "Ange meddelande"
   },
   "emptyState": {
     "title": "Välj en chatt",
@@ -10,31 +11,29 @@
     "text": "Välj en kanal eller nod för att börja chatta."
   },
   "sendMessage": {
-    "placeholder": "Skriv ditt meddelande här...",
+    "placeholder": "Ange ditt meddelande här...",
     "sendButton": "Skicka"
   },
   "actionsMenu": {
     "addReactionLabel": "Lägg till reaktion",
     "replyLabel": "Svara"
   },
-  "item": {
-    "status": {
-      "delivered": {
-        "label": "Meddelandet har levererats",
-        "displayText": "Meddelandet har levererats"
-      },
-      "failed": {
-        "label": "Meddelandeleverans misslyckades",
-        "displayText": "Leverans misslyckades"
-      },
-      "unknown": {
-        "label": "Okänd meddelandestatus",
-        "displayText": "Okänd status"
-      },
-      "waiting": {
-        "ariaLabel": "Skickar meddelande",
-        "displayText": "Väntar på leverans"
-      }
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Meddelandet har levererats",
+      "displayText": "Meddelandet har levererats"
+    },
+    "failed": {
+      "label": "Meddelandeleverans misslyckades",
+      "displayText": "Leverans misslyckades"
+    },
+    "unknown": {
+      "label": "Okänd meddelandestatus",
+      "displayText": "Okänd status"
+    },
+    "waiting": {
+      "label": "Skickar meddelande",
+      "displayText": "Väntar på leverans"
     }
   }
 }

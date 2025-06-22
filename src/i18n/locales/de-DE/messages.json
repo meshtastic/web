@@ -1,6 +1,7 @@
 {
   "page": {
-    "title": "Nachrichten: {{chatName}}"
+    "title": "Nachrichten: {{chatName}}",
+    "placeholder": "Nachricht eingeben"
   },
   "emptyState": {
     "title": "Einen Chat auswählen",
@@ -10,31 +11,29 @@
     "text": "Wählen Sie einen Kanal oder Knoten, um Nachrichten zu schreiben."
   },
   "sendMessage": {
-    "placeholder": "Geben Sie Ihre Nachricht hier ein...",
+    "placeholder": "Geben Sie hier Ihre Nachricht ein...",
     "sendButton": "Senden"
   },
   "actionsMenu": {
     "addReactionLabel": "Reaktion hinzufügen",
     "replyLabel": "Antworten"
   },
-  "item": {
-    "status": {
-      "delivered": {
-        "label": "Nachricht zugestellt",
-        "displayText": "Nachricht zugestellt"
-      },
-      "failed": {
-        "label": "Nachrichtenübermittlung fehlgeschlagen",
-        "displayText": "Zustellung fehlgeschlagen"
-      },
-      "unknown": {
-        "label": "Nachrichtenstatus unbekannt",
-        "displayText": "Unbekannter Status"
-      },
-      "waiting": {
-        "ariaLabel": "Nachricht wird gesendet",
-        "displayText": "Warte auf Zustellung"
-      }
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Nachricht zugestellt",
+      "displayText": "Nachricht zugestellt"
+    },
+    "failed": {
+      "label": "Nachrichtenübermittlung fehlgeschlagen",
+      "displayText": "Zustellung fehlgeschlagen"
+    },
+    "unknown": {
+      "label": "Nachrichtenstatus unbekannt",
+      "displayText": "Unbekannter Status"
+    },
+    "waiting": {
+      "label": "Nachricht wird gesendet",
+      "displayText": "Warte auf Zustellung"
     }
   }
 }

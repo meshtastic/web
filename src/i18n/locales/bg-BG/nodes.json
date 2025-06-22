@@ -1,19 +1,24 @@
 {
   "nodeDetail": {
     "publicKeyEnabled": {
-      "label": "Public Key Enabled"
+      "label": "Публичният ключ е активиран"
     },
     "noPublicKey": {
-      "label": "No Public Key"
+      "label": "Няма публичен ключ"
     },
     "directMessage": {
-      "label": "Direct Message {{shortName}}"
+      "label": "Директно съобщение {{shortName}}"
     },
     "favorite": {
-      "label": "Favorite"
+      "label": "Любим",
+      "tooltip": "Добавяне или премахване на този възел от любимите ви"
     },
     "notFavorite": {
-      "label": "Not a Favorite"
+      "label": "Не е любим"
+    },
+    "error": {
+      "label": "Грешка",
+      "text": "Възникна грешка при извличането на подробности за възела. Моля, опитайте отново по-късно."
     },
     "status": {
       "heard": "Heard",
@@ -31,21 +36,28 @@
   },
   "nodesTable": {
     "headings": {
-      "longName": "Long Name",
+      "longName": "Дълго име",
       "connection": "Connection",
-      "lastHeard": "Last Heard",
-      "encryption": "Encryption",
-      "model": "Model",
-      "macAddress": "MAC Address"
+      "lastHeard": "Последно чут",
+      "encryption": "Криптиране",
+      "model": "Модел",
+      "macAddress": "MAC адрес"
     },
     "connectionStatus": {
       "direct": "Direct",
       "away": "away",
       "unknown": "-",
-      "viaMqtt": ", via MQTT"
+      "viaMqtt": ", чрез MQTT"
     },
     "lastHeardStatus": {
-      "never": "Never"
+      "never": "Никога"
     }
+  },
+  "actions": {
+    "added": "Добавен",
+    "removed": "Премахнат",
+    "ignoreNode": "Ignore Node",
+    "unignoreNode": "Unignore Node",
+    "requestPosition": "Request Position"
   }
 }

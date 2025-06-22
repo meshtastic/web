@@ -1,51 +1,63 @@
 {
   "nodeDetail": {
     "publicKeyEnabled": {
-      "label": "Public Key Enabled"
+      "label": "Chiave Pubblica Abilitata"
     },
     "noPublicKey": {
-      "label": "No Public Key"
+      "label": "Nessuna Chiave Pubblica"
     },
     "directMessage": {
-      "label": "Direct Message {{shortName}}"
+      "label": "Messaggio Diretto {{shortName}}"
     },
     "favorite": {
-      "label": "Preferito"
+      "label": "Preferito",
+      "tooltip": "Add or remove this node from your favorites"
     },
     "notFavorite": {
-      "label": "Not a Favorite"
+      "label": "Non è un preferito"
+    },
+    "error": {
+      "label": "Errori",
+      "text": "An error occurred while fetching node details. Please try again later."
     },
     "status": {
-      "heard": "Heard",
+      "heard": "Sentito",
       "mqtt": "MQTT"
     },
     "elevation": {
-      "label": "Elevation"
+      "label": "Altezza"
     },
     "channelUtil": {
-      "label": "Channel Util"
+      "label": "Utilizzo Canale"
     },
     "airtimeUtil": {
-      "label": "Airtime Util"
+      "label": "Utilizzo Airtime"
     }
   },
   "nodesTable": {
     "headings": {
-      "longName": "Long Name",
-      "connection": "Connection",
-      "lastHeard": "Last Heard",
-      "encryption": "Encryption",
-      "model": "Model",
-      "macAddress": "MAC Address"
+      "longName": "Nome Lungo",
+      "connection": "Connessione",
+      "lastHeard": "Ultimo Contatto",
+      "encryption": "Crittografia",
+      "model": "Modello",
+      "macAddress": "Indirizzo MAC"
     },
     "connectionStatus": {
       "direct": "Diretto",
-      "away": "away",
+      "away": "assente",
       "unknown": "-",
-      "viaMqtt": ", via MQTT"
+      "viaMqtt": ", tramite MQTT"
     },
     "lastHeardStatus": {
-      "never": "Never"
+      "never": "Mai"
     }
+  },
+  "actions": {
+    "added": "Added",
+    "removed": "Removed",
+    "ignoreNode": "Ignore Node",
+    "unignoreNode": "Unignore Node",
+    "requestPosition": "Richiedi posizione"
   }
 }

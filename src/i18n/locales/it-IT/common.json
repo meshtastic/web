@@ -1,36 +1,37 @@
 {
   "button": {
     "apply": "Applica",
-    "backupKey": "Backup Key",
+    "backupKey": "Backup della chiave",
     "cancel": "Annulla",
-    "clearMessages": "Clear Messages",
+    "clearMessages": "Cancella Messaggi",
     "close": "Chiudi",
-    "confirm": "Confirm",
+    "confirm": "Conferma",
     "delete": "Elimina",
-    "dismiss": "Dismiss",
-    "download": "Download",
-    "export": "Export",
-    "generate": "Generate",
-    "regenerate": "Regenerate",
+    "dismiss": "Annulla",
+    "download": "Scarica",
+    "export": "Esporta",
+    "generate": "Genera",
+    "regenerate": "Rigenera",
     "import": "Importa",
     "message": "Messaggio",
-    "now": "Now",
+    "now": "Adesso",
     "ok": "Ok",
-    "print": "Print",
-    "rebootOtaNow": "Reboot to OTA Mode Now",
+    "print": "Stampa",
+    "rebootOtaNow": "Riavvia ora in modalità OTA",
     "remove": "Elimina",
-    "requestNewKeys": "Request New Keys",
-    "requestPosition": "Request Position",
+    "requestNewKeys": "Richiedi Nuove Chiavi",
+    "requestPosition": "Richiedi posizione",
     "reset": "Reset",
     "save": "Salva",
     "scanQr": "Scansiona codice QR",
-    "traceRoute": "Trace Route"
+    "traceRoute": "Trace Route",
+    "submit": "Submit"
   },
   "app": {
     "title": "Meshtastic",
     "fullTitle": "Meshtastic Web Client"
   },
-  "loading": "Loading...",
+  "loading": "Caricamento in corso...",
   "unit": {
     "cps": "CPS",
     "dbm": "dBm",
@@ -40,80 +41,101 @@
       "plural": "Hops"
     },
     "hopsAway": {
-      "one": "{{count}} hop away",
-      "plural": "{{count}} hops away",
-      "unknown": "Unknown hops away"
+      "one": "A {{count}} hop di distanza",
+      "plural": "A {{count}} hop di distanza",
+      "unknown": "Hop sconosciuti"
     },
     "megahertz": "MHz",
-    "raw": "raw",
+    "raw": "grezzo",
     "meter": {
-      "one": "Meter",
-      "plural": "Meters",
+      "one": "Metro",
+      "plural": "Metri",
       "suffix": "m"
     },
     "minute": {
-      "one": "Minute",
-      "plural": "Minutes"
+      "one": "Minuto",
+      "plural": "Minuti"
+    },
+    "hour": {
+      "one": "Hour",
+      "plural": "Hours"
     },
     "millisecond": {
-      "one": "Millisecond",
-      "plural": "Milliseconds",
+      "one": "Millisecondo",
+      "plural": "Millisecondi",
       "suffix": "ms"
     },
     "second": {
-      "one": "Second",
-      "plural": "Seconds"
+      "one": "Secondo",
+      "plural": "Secondi"
+    },
+    "day": {
+      "one": "Day",
+      "plural": "Days"
+    },
+    "month": {
+      "one": "Month",
+      "plural": "Months"
+    },
+    "year": {
+      "one": "Year",
+      "plural": "Years"
     },
     "snr": "SNR",
     "volt": {
       "one": "Volt",
-      "plural": "Volts",
+      "plural": "Volt",
       "suffix": "V"
     },
     "record": {
-      "one": "Records",
-      "plural": "Records"
+      "one": "Record",
+      "plural": "Record"
     }
   },
   "security": {
+    "0bit": "Empty",
+    "8bit": "8 bit",
+    "128bit": "128 bit",
     "256bit": "256 bit"
   },
   "unknown": {
-    "longName": "Unknown",
-    "shortName": "UNK",
-    "notAvailable": "N/A",
+    "longName": "Sconosciuto",
+    "shortName": "SCON",
+    "notAvailable": "N/D",
     "num": "??"
   },
   "nodeUnknownPrefix": "!",
-  "unset": "UNSET",
+  "unset": "ANNULLA",
   "fallbackName": "Meshtastic {{last4}}",
+  "node": "Node",
   "formValidation": {
+    "unsavedChanges": "Unsaved changes",
     "tooBig": {
-      "string": "Too long, expected less than or equal to {{maximum}} characters.",
-      "number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-      "bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+      "string": "Troppo lungo, atteso minore o uguale a {{maximum}} caratteri.",
+      "number": "Troppo grande, ci si aspetta un numero minore o uguale a {{maximum}}.",
+      "bytes": "Troppo grande, atteso inferiore o uguale a {{params.maximum}} byte."
     },
     "tooSmall": {
-      "string": "Too short, expected more than or equal to {{minimum}} characters.",
-      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+      "string": "Troppo breve, atteso più di o uguale a {{minimum}} caratteri.",
+      "number": "Troppo piccolo, atteso un numero maggiore o uguale a {{minimum}}."
     },
     "invalidFormat": {
-      "ipv4": "Invalid format, expected an IPv4 address.",
-      "key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+      "ipv4": "Formato non valido, previsto un indirizzo IPv4.",
+      "key": "Formato non valido, prevista una chiave pre-condivisa codificata Base64 (PSK)."
     },
     "invalidType": {
-      "number": "Invalid type, expected a number."
+      "number": "Tipo non valido, atteso un numero."
     },
     "pskLength": {
-      "0bit": "Key is required to be empty.",
-      "8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-      "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-      "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+      "0bit": "La chiave deve essere vuota.",
+      "8bit": "La chiave deve essere una chiave pre-condivisa a 8 bit (PSK).",
+      "128bit": "La chiave deve essere una chiave pre-condivisa a 128 bit (PSK).",
+      "256bit": "La chiave deve essere una chiave pre-condivisa a 256 bit (PSK)."
     },
     "required": {
-      "generic": "This field is required.",
-      "managed": "At least one admin key is requred if the node is managed.",
-      "key": "Key is required."
+      "generic": "Questo campo è obbligatorio.",
+      "managed": "Se il nodo è gestito, è richiesta almeno una chiave amministrativa.",
+      "key": "La chiave è obbligatoria."
     }
   }
 }

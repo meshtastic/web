@@ -1,29 +1,29 @@
 {
   "navigation": {
-    "title": "Navigation",
+    "title": "Навігація",
     "messages": "Повідомлення",
     "map": "Мапа",
     "config": "Config",
-    "radioConfig": "Radio Config",
+    "radioConfig": "Налаштування радіо",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
-    "nodes": "Nodes"
+    "channels": "Канали",
+    "nodes": "Вузли"
   },
   "app": {
     "title": "Meshtastic",
-    "logo": "Meshtastic Logo"
+    "logo": "Логотип Meshtastic"
   },
   "sidebar": {
     "collapseToggle": {
       "button": {
-        "open": "Open sidebar",
-        "close": "Close sidebar"
+        "open": "Відкрити бічну панель",
+        "close": "Закрити бічну панель"
       }
     },
     "deviceInfo": {
-      "volts": "{{voltage}} volts",
+      "volts": "{{voltage}} Вольт",
       "firmware": {
-        "title": "Firmware",
+        "title": "Прошивка",
         "version": "v{{version}}",
         "buildDate": "Build date: {{date}}"
       },
@@ -38,7 +38,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Battery"
+    "title": "Батарея"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -80,11 +80,29 @@
     "saveSuccess": {
       "title": "Saving Config",
       "description": "The configuration change {{case}} has been saved."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "action": {
+        "added": "Додано",
+        "removed": "Видалено",
+        "to": "до",
+        "from": "from"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "action": {
+        "added": "Додано",
+        "removed": "Видалено",
+        "to": "до",
+        "from": "from"
+      }
     }
   },
   "notifications": {
     "copied": {
-      "label": "Copied!"
+      "label": "Скопійовано!"
     },
     "copyToClipboard": {
       "label": "Copy to clipboard"
@@ -96,9 +114,9 @@
       "label": "Show password"
     },
     "deliveryStatus": {
-      "delivered": "Delivered",
+      "delivered": "Доставлено",
       "failed": "Delivery Failed",
-      "waiting": "Waiting",
+      "waiting": "Очікування",
       "unknown": "Unknown"
     }
   },
@@ -109,13 +127,16 @@
     "label": "Hardware"
   },
   "metrics": {
-    "label": "Metrics"
+    "label": "Метрики"
   },
   "role": {
     "label": "Role"
   },
   "filter": {
     "label": "Фільтри"
+  },
+  "advanced": {
+    "label": "Розширені"
   },
   "clearInput": {
     "label": "Clear input"
@@ -136,7 +157,7 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Voltage"
+    "title": "Напруга"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)"
@@ -149,16 +170,16 @@
   "lastHeard": {
     "label": "Last heard",
     "labelText": "Last heard: {{value}}",
-    "nowLabel": "Now"
+    "nowLabel": "Зараз"
   },
   "snr": {
-    "label": "SNR (db)"
+    "label": "SNR (дБ)"
   },
   "favorites": {
     "label": "Favorites"
   },
   "hide": {
-    "label": "Hide"
+    "label": "Сховати"
   },
   "showOnly": {
     "label": "Show Only"
@@ -166,15 +187,21 @@
   "viaMqtt": {
     "label": "Connected via MQTT"
   },
+  "hopsUnknown": {
+    "label": "Unknown number of hops"
+  },
+  "showUnheard": {
+    "label": "Never heard"
+  },
   "language": {
     "label": "Мова",
-    "changeLanguage": "Change Language"
+    "changeLanguage": "Змінити мову"
   },
   "theme": {
     "dark": "Темна",
     "light": "Світла",
     "system": "Automatic",
-    "changeTheme": "Change Color Scheme"
+    "changeTheme": "Змінити схему кольорів"
   },
   "errorPage": {
     "title": "This is a little embarrassing...",
@@ -189,8 +216,8 @@
     },
     "reportLink": "You can report the issue to our <0>GitHub</0>",
     "dashboardLink": "Return to the <0>dashboard</0>",
-    "detailsSummary": "Error Details",
-    "errorMessageLabel": "Error message:",
+    "detailsSummary": "Інформація про помилку",
+    "errorMessageLabel": "Помилка:",
     "stackTraceLabel": "Stack trace:",
     "fallbackError": "{{error}}"
   },
