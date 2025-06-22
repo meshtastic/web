@@ -1,17 +1,17 @@
 {
   "page": {
     "tabAmbientLighting": "Ambient Lighting",
-    "tabAudio": "Audio",
+    "tabAudio": "Аудіо",
     "tabCannedMessage": "Canned",
     "tabDetectionSensor": "Detection Sensor",
     "tabExternalNotification": "Ext Notif",
     "tabMqtt": "MQTT",
     "tabNeighborInfo": "Neighbor Info",
     "tabPaxcounter": "Paxcounter",
-    "tabRangeTest": "Range Test",
+    "tabRangeTest": "Тест дальності",
     "tabSerial": "Serial",
     "tabStoreAndForward": "S&F",
-    "tabTelemetry": "Telemetry"
+    "tabTelemetry": "Телеметрія"
   },
   "ambientLighting": {
     "title": "Ambient Lighting Settings",
@@ -25,15 +25,15 @@
       "description": "Sets the current for the LED output. Default is 10"
     },
     "red": {
-      "label": "Red",
+      "label": "Червоний",
       "description": "Sets the red LED level. Values are 0-255"
     },
     "green": {
-      "label": "Green",
+      "label": "Зелений",
       "description": "Sets the green LED level. Values are 0-255"
     },
     "blue": {
-      "label": "Blue",
+      "label": "Синій",
       "description": "Sets the blue LED level. Values are 0-255"
     }
   },
@@ -218,7 +218,7 @@
     }
   },
   "mqtt": {
-    "title": "MQTT Settings",
+    "title": "Налаштування MQTT",
     "description": "Settings for the MQTT module",
     "enabled": {
       "label": "Enabled",
@@ -229,11 +229,11 @@
       "description": "MQTT server address to use for default/custom servers"
     },
     "username": {
-      "label": "MQTT Username",
+      "label": "Ім'я користувача MQTT",
       "description": "MQTT username to use for default/custom servers"
     },
     "password": {
-      "label": "MQTT Password",
+      "label": "Пароль MQTT",
       "description": "MQTT password to use for default/custom servers"
     },
     "encryptionEnabled": {

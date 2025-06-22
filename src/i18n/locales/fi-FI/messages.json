@@ -1,6 +1,7 @@
 {
   "page": {
-    "title": "Viestit: {{chatName}}"
+    "title": "Viestit: {{chatName}}",
+    "placeholder": "Kirjoita viesti"
   },
   "emptyState": {
     "title": "Valitse keskustelu",
@@ -17,24 +18,22 @@
     "addReactionLabel": "Lisää reaktio",
     "replyLabel": "Vastaa"
   },
-  "item": {
-    "status": {
-      "delivered": {
-        "label": "Viesti toimitettu",
-        "displayText": "Viesti toimitettu"
-      },
-      "failed": {
-        "label": "Viestin toimitus epäonnistui",
-        "displayText": "Toimitus epäonnistui"
-      },
-      "unknown": {
-        "label": "Viestin tila tuntematon",
-        "displayText": "Tuntematon tila"
-      },
-      "waiting": {
-        "ariaLabel": "Lähetetään viestiä",
-        "displayText": "Odottaa toimitusta"
-      }
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Viesti toimitettu",
+      "displayText": "Viesti toimitettu"
+    },
+    "failed": {
+      "label": "Viestin toimitus epäonnistui",
+      "displayText": "Toimitus epäonnistui"
+    },
+    "unknown": {
+      "label": "Viestin tila tuntematon",
+      "displayText": "Tuntematon tila"
+    },
+    "waiting": {
+      "label": "Lähetetään viestiä",
+      "displayText": "Odottaa toimitusta"
     }
   }
 }

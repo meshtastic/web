@@ -63,7 +63,8 @@
       "newDeviceButton": "Ny enhet"
     },
     "validation": {
-      "requiresFeatures": "Den här anslutningstypen kräver <0></0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
+      "requiresWebBluetooth": "Den här anslutningstypen kräver <0>Web Bluetooth</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
+      "requiresWebSerial": "Den här anslutningstypen kräver <0>Web Serial</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
       "requiresSecureContext": "Denna applikation kräver en <0>säker kontext</0>. Anslut med HTTPS eller localhost.",
       "additionallyRequiresSecureContext": "Dessutom kräver den ett <0>säker kontext</0>. Vänligen anslut med HTTPS eller localhost."
     }
@@ -92,7 +93,6 @@
     "unignoreNode": "Ta bort favoritmarkering"
   },
   "pkiBackup": {
-    "description": "Vi rekommenderar att du säkerhetskopierar dina nycklar regelbundet. Vill du säkerhetskopiera nu?",
     "loseKeysWarning": "Om du förlorar dina nycklar måste du återställa din enhet.",
     "secureBackup": "Det är viktigt att säkerhetskopiera dina publika och privata nycklar och förvara din säkerhetskopia säkert.",
     "footer": "=== END OF KEYS ===",
@@ -101,6 +101,13 @@
     "publicKey": "Publik nyckel:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
     "title": "Säkerhetskopiera nycklar"
+  },
+  "pkiBackupReminder": {
+    "description": "Vi rekommenderar att du säkerhetskopierar dina nycklar regelbundet. Vill du säkerhetskopiera nu?",
+    "title": "Påminnelse om säkerhetskopiering",
+    "remindLaterPrefix": "Påminn mig om",
+    "remindNever": "Påminn mig aldrig",
+    "backupNow": "Säkerhetskopiera nu"
   },
   "pkiRegenerate": {
     "description": "Är du säker på att du vill förnya nyckelpar?",
@@ -155,5 +162,10 @@
     "choosingRightDeviceRole": "Att välja rätt enhetsroll",
     "deviceRoleDocumentation": "Dokumentation för enhetsroll",
     "title": "Är du säker?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Ja, jag vet vad jag gör",
+    "title": "Är du säker?",
+    "description": "Aktivering av fjärrhanterat läge blockerar klienter (inklusive webbklienten) från att skriva inställningar till en radio. När detta är aktiverat kan enhetens inställningar <bold>endast</bold> ändras via fjärradministratörsmeddelanden. Den här inställningen krävs inte för fjärradministration."
   }
 }

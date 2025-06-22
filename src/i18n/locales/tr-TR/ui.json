@@ -80,6 +80,24 @@
     "saveSuccess": {
       "title": "Saving Config",
       "description": "The configuration change {{case}} has been saved."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "action": {
+        "added": "Added",
+        "removed": "Removed",
+        "to": "to",
+        "from": "from"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "action": {
+        "added": "Added",
+        "removed": "Removed",
+        "to": "to",
+        "from": "from"
+      }
     }
   },
   "notifications": {
@@ -116,6 +134,9 @@
   },
   "filter": {
     "label": "Filtre"
+  },
+  "advanced": {
+    "label": "Advanced"
   },
   "clearInput": {
     "label": "Clear input"
@@ -165,6 +186,12 @@
   },
   "viaMqtt": {
     "label": "Connected via MQTT"
+  },
+  "hopsUnknown": {
+    "label": "Unknown number of hops"
+  },
+  "showUnheard": {
+    "label": "Never heard"
   },
   "language": {
     "label": "Dil",

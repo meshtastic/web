@@ -24,7 +24,8 @@
     "reset": "Zurücksetzen",
     "save": "Speichern",
     "scanQr": "QR Code scannen",
-    "traceRoute": "Route verfolgen"
+    "traceRoute": "Route verfolgen",
+    "submit": "Absenden"
   },
   "app": {
     "title": "Meshtastic",
@@ -55,6 +56,10 @@
       "one": "Minute",
       "plural": "Minuten"
     },
+    "hour": {
+      "one": "Stunde",
+      "plural": "Stunden"
+    },
     "millisecond": {
       "one": "Millisekunde",
       "plural": "Millisekunden",
@@ -63,6 +68,18 @@
     "second": {
       "one": "Sekunde",
       "plural": "Sekunden"
+    },
+    "day": {
+      "one": "Tag",
+      "plural": "Tage"
+    },
+    "month": {
+      "one": "Monat",
+      "plural": "Monate"
+    },
+    "year": {
+      "one": "Jahr",
+      "plural": "Jahre"
     },
     "snr": "SNR",
     "volt": {
@@ -76,6 +93,9 @@
     }
   },
   "security": {
+    "0bit": "Leer",
+    "8bit": "8 Bit",
+    "128bit": "128 Bit",
     "256bit": "256 Bit"
   },
   "unknown": {
@@ -87,7 +107,9 @@
   "nodeUnknownPrefix": "!",
   "unset": "NICHT GESETZT",
   "fallbackName": "Meshtastic {{last4}}",
+  "node": "Knoten",
   "formValidation": {
+    "unsavedChanges": "Ungespeicherte Änderungen",
     "tooBig": {
       "string": "Zu lang, erwarte maximal {{maximum}} Zeichen.",
       "number": "Zu groß, erwartete eine Zahl kleiner oder gleich {{maximum}}.",

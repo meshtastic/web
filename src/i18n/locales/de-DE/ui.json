@@ -80,6 +80,24 @@
     "saveSuccess": {
       "title": "Einstellungen speichern",
       "description": "Die Einstellungsänderung {{case}} wurde gespeichert."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} Favoriten.",
+      "action": {
+        "added": "Hinzugefügt",
+        "removed": "Entfernt",
+        "to": "bis",
+        "from": "von"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} Ignorierliste",
+      "action": {
+        "added": "Hinzugefügt",
+        "removed": "Entfernt",
+        "to": "bis",
+        "from": "von"
+      }
     }
   },
   "notifications": {
@@ -116,6 +134,9 @@
   },
   "filter": {
     "label": "Filter"
+  },
+  "advanced": {
+    "label": "Fortgeschritten"
   },
   "clearInput": {
     "label": "Eingabe löschen"
@@ -165,6 +186,12 @@
   },
   "viaMqtt": {
     "label": "Über MQTT verbunden"
+  },
+  "hopsUnknown": {
+    "label": "Unbekannte Sprungweite"
+  },
+  "showUnheard": {
+    "label": "Nie gehört"
   },
   "language": {
     "label": "Sprache",

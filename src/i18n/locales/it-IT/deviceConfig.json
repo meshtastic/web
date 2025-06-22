@@ -1,6 +1,6 @@
 {
   "page": {
-    "title": "Configuration",
+    "title": "Configurazione",
     "tabBluetooth": "Bluetooth",
     "tabDevice": "Dispositivo",
     "tabDisplay": "Schermo",
@@ -11,150 +11,150 @@
     "tabSecurity": "Sicurezza"
   },
   "sidebar": {
-    "label": "Modules"
+    "label": "Moduli"
   },
   "device": {
-    "title": "Device Settings",
-    "description": "Settings for the device",
+    "title": "Impostazioni del dispositivo",
+    "description": "Le impostazioni del dispositivo",
     "buttonPin": {
-      "description": "Button pin override",
-      "label": "Button Pin"
+      "description": "Sovrascrivi pin pulsante",
+      "label": "Pulsante Pin"
     },
     "buzzerPin": {
-      "description": "Buzzer pin override",
-      "label": "Buzzer Pin"
+      "description": "Sovrascrivi pin buzzer",
+      "label": "Pin Buzzer"
     },
     "disableTripleClick": {
-      "description": "Disable triple click",
-      "label": "Disable Triple Click"
+      "description": "Disabilita triplo-click",
+      "label": "Disabilita triplo-click"
     },
     "doubleTapAsButtonPress": {
-      "description": "Treat double tap as button press",
-      "label": "Double Tap as Button Press"
+      "description": "Tratta il doppio tocco come pressione pulsante",
+      "label": "Doppio tocco come pressione pulsante"
     },
     "ledHeartbeatDisabled": {
-      "description": "Disable default blinking LED",
-      "label": "LED Heartbeat Disabled"
+      "description": "Disabilita il LED lampeggiante predefinito",
+      "label": "LED Heartbeat Disabilitato"
     },
     "nodeInfoBroadcastInterval": {
-      "description": "How often to broadcast node info",
-      "label": "Node Info Broadcast Interval"
+      "description": "Quante volte trasmettere informazioni sul nodo",
+      "label": "Intervallo Di Trasmissione Info Nodo"
     },
     "posixTimezone": {
-      "description": "The POSIX timezone string for the device",
+      "description": "La stringa di fuso orario POSIX per il dispositivo",
       "label": "POSIX Timezone"
     },
     "rebroadcastMode": {
-      "description": "How to handle rebroadcasting",
-      "label": "Rebroadcast Mode"
+      "description": "Come gestire il rebroadcasting",
+      "label": "Modalità Rebroadcast"
     },
     "role": {
-      "description": "What role the device performs on the mesh",
+      "description": "Quale ruolo il dispositivo svolge sulla mesh",
       "label": "Ruolo"
     }
   },
   "bluetooth": {
-    "title": "Bluetooth Settings",
-    "description": "Settings for the Bluetooth module",
-    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "title": "Impostazioni Bluetooth",
+    "description": "Impostazioni per il modulo Bluetooth",
+    "note": "Nota: alcuni dispositivi (ESP32) non possono utilizzare contemporaneamente Bluetooth e WiFi.",
     "enabled": {
-      "description": "Enable or disable Bluetooth",
-      "label": "Enabled"
+      "description": "Abilita o disabilita Bluetooth",
+      "label": "Abilitato"
     },
     "pairingMode": {
-      "description": "Pin selection behaviour.",
+      "description": "Comportamento di selezione pin.",
       "label": "Modalità abbinamento"
     },
     "pin": {
-      "description": "Pin to use when pairing",
+      "description": "Pin da usare durante l'abbinamento",
       "label": "Pin"
     }
   },
   "display": {
-    "description": "Settings for the device display",
-    "title": "Display Settings",
+    "description": "Impostazioni per il display del dispositivo",
+    "title": "Impostazioni Display",
     "headingBold": {
-      "description": "Bolden the heading text",
-      "label": "Bold Heading"
+      "description": "Metti in grassetto il testo dell'intestazione",
+      "label": "Intestazione in grassetto"
     },
     "carouselDelay": {
-      "description": "How fast to cycle through windows",
-      "label": "Carousel Delay"
+      "description": "Quanto velocemente scorrere attraverso le finestre",
+      "label": "Ritardo Carosello"
     },
     "compassNorthTop": {
-      "description": "Fix north to the top of compass",
-      "label": "Compass North Top"
+      "description": "Fissare il nord fino alla parte superiore della bussola",
+      "label": "Bussola Nord In Alto"
     },
     "displayMode": {
-      "description": "Screen layout variant",
-      "label": "Display Mode"
+      "description": "Variante layout schermo",
+      "label": "Modalità di visualizzazione"
     },
     "displayUnits": {
-      "description": "Display metric or imperial units",
-      "label": "Display Units"
+      "description": "Mostra unità metriche o imperiali",
+      "label": "Mostra Unità"
     },
     "flipScreen": {
-      "description": "Flip display 180 degrees",
-      "label": "Flip Screen"
+      "description": "Rifletti la visualizzazione di 180 gradi",
+      "label": "Capovolgi schermo"
     },
     "gpsDisplayUnits": {
-      "description": "Coordinate display format",
-      "label": "GPS Display Units"
+      "description": "Formato coordinate",
+      "label": "Unità Display GPS"
     },
     "oledType": {
-      "description": "Type of OLED screen attached to the device",
-      "label": "OLED Type"
+      "description": "Tipo di schermo OLED collegato al dispositivo",
+      "label": "Tipo OLED"
     },
     "screenTimeout": {
-      "description": "Turn off the display after this long",
-      "label": "Screen Timeout"
+      "description": "Spegni lo schermo dopo questo lungo periodo",
+      "label": "Timeout Schermo"
     },
     "twelveHourClock": {
-      "description": "Use 12-hour clock format",
-      "label": "12-Hour Clock"
+      "description": "Usa formato orologio 12 ore",
+      "label": "Orologio 12 Ore"
     },
     "wakeOnTapOrMotion": {
-      "description": "Wake the device on tap or motion",
-      "label": "Wake on Tap or Motion"
+      "description": "Risveglia il dispositivo al tocco o al movimento",
+      "label": "Sveglia al tocco o al movimento"
     }
   },
   "lora": {
-    "title": "Mesh Settings",
-    "description": "Settings for the LoRa mesh",
+    "title": "Impostazioni Mesh",
+    "description": "Impostazioni per la mesh LoRa",
     "bandwidth": {
-      "description": "Channel bandwidth in MHz",
+      "description": "Larghezza di banda del canale in MHz",
       "label": "Larghezza di banda"
     },
     "boostedRxGain": {
-      "description": "Boosted RX gain",
-      "label": "Boosted RX Gain"
+      "description": "Guadagno RX potenziato",
+      "label": "Guadagno RX potenziato"
     },
     "codingRate": {
-      "description": "The denominator of the coding rate",
-      "label": "Coding Rate"
+      "description": "Il denominatore della velocità di codifica",
+      "label": "Velocità di codifica"
     },
     "frequencyOffset": {
-      "description": "Frequency offset to correct for crystal calibration errors",
-      "label": "Frequency Offset"
+      "description": "Offset di frequenza per correggere gli errori di calibrazione del cristallo",
+      "label": "Offset Di Frequenza"
     },
     "frequencySlot": {
-      "description": "LoRa frequency channel number",
-      "label": "Frequency Slot"
+      "description": "Numero canale di frequenza LoRa",
+      "label": "Slot di frequenza"
     },
     "hopLimit": {
-      "description": "Maximum number of hops",
-      "label": "Hop Limit"
+      "description": "Numero massimo di hop",
+      "label": "Limite di hop"
     },
     "ignoreMqtt": {
-      "description": "Don't forward MQTT messages over the mesh",
+      "description": "Non inoltrare i messaggi MQTT sulla mesh",
       "label": "Ignora MQTT"
     },
     "modemPreset": {
-      "description": "Modem preset to use",
+      "description": "Preimpostazione modem da usare",
       "label": "Configurazione Modem"
     },
     "okToMqtt": {
-      "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+      "description": "Quando impostato su true, questa configurazione indica che l'utente approva il caricamento del pacchetto su MQTT. Se impostato su false, ai nodi remoti viene richiesto di non inoltrare i pacchetti a MQTT",
       "label": "OK per MQTT"
     },
     "overrideDutyCycle": {
@@ -162,267 +162,267 @@
       "label": "Ignora limite di Duty Cycle"
     },
     "overrideFrequency": {
-      "description": "Override frequency",
-      "label": "Override Frequency"
+      "description": "Sovrascrivi frequenza",
+      "label": "Sovrascrivi frequenza"
     },
     "region": {
-      "description": "Sets the region for your node",
+      "description": "Imposta la regione del tuo nodo",
       "label": "Regione"
     },
     "spreadingFactor": {
-      "description": "Indicates the number of chirps per symbol",
+      "description": "Indica il numero di chirp per simbolo",
       "label": "Spreading Factor"
     },
     "transmitEnabled": {
-      "description": "Enable/Disable transmit (TX) from the LoRa radio",
-      "label": "Transmit Enabled"
+      "description": "Abilita/Disabilita la trasmissione (TX) dalla radio LoRa",
+      "label": "Trasmissione Abilitata"
     },
     "transmitPower": {
-      "description": "Max transmit power",
-      "label": "Transmit Power"
+      "description": "Potenza massima di trasmissione",
+      "label": "Potenza Di Trasmissione"
     },
     "usePreset": {
-      "description": "Use one of the predefined modem presets",
-      "label": "Use Preset"
+      "description": "Usa una delle preimpostazioni predefinite del modem",
+      "label": "Utilizza il preset"
     },
     "meshSettings": {
-      "description": "Settings for the LoRa mesh",
-      "label": "Mesh Settings"
+      "description": "Impostazioni per la mesh LoRa",
+      "label": "Impostazioni Mesh"
     },
     "waveformSettings": {
-      "description": "Settings for the LoRa waveform",
-      "label": "Waveform Settings"
+      "description": "Impostazioni per la forma d'onda LoRa",
+      "label": "Impostazioni Forma d'onda"
     },
     "radioSettings": {
-      "label": "Radio Settings",
-      "description": "Settings for the LoRa radio"
+      "label": "Impostazioni Radio",
+      "description": "Impostazioni per la radio LoRa"
     }
   },
   "network": {
-    "title": "WiFi Config",
-    "description": "WiFi radio configuration",
-    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "title": "Configurazione WiFi",
+    "description": "Configurazione radio WiFi",
+    "note": "Nota: alcuni dispositivi (ESP32) non possono utilizzare contemporaneamente Bluetooth e WiFi.",
     "addressMode": {
-      "description": "Address assignment selection",
-      "label": "Address Mode"
+      "description": "Selezione assegnazione indirizzo",
+      "label": "Modalità Indirizzo"
     },
     "dns": {
-      "description": "DNS Server",
+      "description": "Server DNS",
       "label": "DNS"
     },
     "ethernetEnabled": {
-      "description": "Enable or disable the Ethernet port",
-      "label": "Enabled"
+      "description": "Abilita o disabilita la porta Ethernet",
+      "label": "Abilitato"
     },
     "gateway": {
-      "description": "Default Gateway",
+      "description": "Gateway predefinito",
       "label": "Gateway"
     },
     "ip": {
-      "description": "IP Address",
+      "description": "Indirizzo IP",
       "label": "IP"
     },
     "psk": {
-      "description": "Network password",
+      "description": "Password di rete",
       "label": "PSK"
     },
     "ssid": {
-      "description": "Network name",
+      "description": "Nome rete",
       "label": "SSID"
     },
     "subnet": {
-      "description": "Subnet Mask",
+      "description": "Subnet mask",
       "label": "Subnet"
     },
     "wifiEnabled": {
-      "description": "Enable or disable the WiFi radio",
-      "label": "Enabled"
+      "description": "Abilita o disabilita la radio WiFi",
+      "label": "Abilitato"
     },
     "meshViaUdp": {
       "label": "Mesh via UDP"
     },
     "ntpServer": {
-      "label": "NTP Server"
+      "label": "Server NTP"
     },
     "rsyslogServer": {
-      "label": "Rsyslog Server"
+      "label": "Server rsyslog"
     },
     "ethernetConfigSettings": {
-      "description": "Ethernet port configuration",
-      "label": "Ethernet Config"
+      "description": "Configurazione porta Ethernet",
+      "label": "Configurazione Ethernet"
     },
     "ipConfigSettings": {
-      "description": "IP configuration",
-      "label": "IP Config"
+      "description": "Configurazione IP",
+      "label": "Configurazione IP"
     },
     "ntpConfigSettings": {
-      "description": "NTP configuration",
-      "label": "NTP Config"
+      "description": "Configurazione NTP",
+      "label": "Configurazione NTP"
     },
     "rsyslogConfigSettings": {
-      "description": "Rsyslog configuration",
-      "label": "Rsyslog Config"
+      "description": "Configurazione di Rsyslog",
+      "label": "Configurazione di Rsyslog"
     },
     "udpConfigSettings": {
-      "description": "UDP over Mesh configuration",
+      "description": "Configurazione UDP over Mesh",
       "label": "Configurazione UDP"
     }
   },
   "position": {
-    "title": "Position Settings",
-    "description": "Settings for the position module",
+    "title": "Impostazioni Posizione",
+    "description": "Impostazioni per il modulo di posizione",
     "broadcastInterval": {
-      "description": "How often your position is sent out over the mesh",
-      "label": "Broadcast Interval"
+      "description": "Quante volte la tua posizione viene inviata attraverso la mesh",
+      "label": "Intervallo Di Trasmissione"
     },
     "enablePin": {
-      "description": "GPS module enable pin override",
-      "label": "Enable Pin"
+      "description": "Modulo GPS abilita pin override",
+      "label": "Abilita Pin"
     },
     "fixedPosition": {
-      "description": "Don't report GPS position, but a manually-specified one",
-      "label": "Fixed Position"
+      "description": "Non segnalare la posizione GPS, ma specificane una manualmente",
+      "label": "Posizione Fissa"
     },
     "gpsMode": {
-      "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
-      "label": "GPS Mode"
+      "description": "Configura se il GPS del dispositivo è abilitato, disabilitato o non presente",
+      "label": "Modalità GPS"
     },
     "gpsUpdateInterval": {
-      "description": "How often a GPS fix should be acquired",
-      "label": "GPS Update Interval"
+      "description": "Quante volte una correzione GPS dovrebbe essere acquisita",
+      "label": "Intervallo di aggiornamento GPS"
     },
     "positionFlags": {
-      "description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
-      "label": "Position Flags"
+      "description": "Campi opzionali da includere quando si assemblano messaggi di posizione. Più i campi sono selezionati, più grande sarà il messaggio porterà a un utilizzo più lungo del tempo di volo e un rischio più elevato di perdite dei pacchetti.",
+      "label": "Flag Di Posizione"
     },
     "receivePin": {
-      "description": "GPS module RX pin override",
-      "label": "Receive Pin"
+      "description": "Sovrascrivi RX pin del Modulo GPS",
+      "label": "Pin di ricezione"
     },
     "smartPositionEnabled": {
-      "description": "Only send position when there has been a meaningful change in location",
-      "label": "Enable Smart Position"
+      "description": "Invia posizione solo quando c'è stato un cambiamento significativo nella posizione",
+      "label": "Abilita Posizione Intelligente"
     },
     "smartPositionMinDistance": {
-      "description": "Minimum distance (in meters) that must be traveled before a position update is sent",
-      "label": "Smart Position Minimum Distance"
+      "description": "Distanza minima (in metri) che deve essere percorsa prima di inviare un aggiornamento di posizione",
+      "label": "Distanza Minima Posizione Intelligente"
     },
     "smartPositionMinInterval": {
-      "description": "Minimum interval (in seconds) that must pass before a position update is sent",
-      "label": "Smart Position Minimum Interval"
+      "description": "Intervallo minimo (in secondi) che deve passare prima di inviare un aggiornamento della posizione",
+      "label": "Intervallo Minimo Posizione Intelligente"
     },
     "transmitPin": {
-      "description": "GPS module TX pin override",
-      "label": "Transmit Pin"
+      "description": "Sovrascrivi TX pin del Modulo GPS",
+      "label": "Pin di trasmissione"
     },
     "intervalsSettings": {
-      "description": "How often to send position updates",
-      "label": "Intervals"
+      "description": "Quante volte inviare aggiornamenti di posizione",
+      "label": "Intervalli"
     },
     "flags": {
-      "placeholder": "Select position flags...",
-      "altitude": "Altitude",
-      "altitudeGeoidalSeparation": "Altitude Geoidal Separation",
-      "altitudeMsl": "Altitude is Mean Sea Level",
-      "dop": "Dilution of precision (DOP) PDOP used by default",
-      "hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
-      "numSatellites": "Number of satellites",
-      "sequenceNumber": "Sequence number",
+      "placeholder": "Seleziona flag di posizione...",
+      "altitude": "Altitudine",
+      "altitudeGeoidalSeparation": "Altitudine Separazione Geoidale",
+      "altitudeMsl": "L'altitudine è riferita al livello medio del mare",
+      "dop": "Diluizione del PDOP di precisione (DOP) utilizzato per impostazione predefinita",
+      "hdopVdop": "Se DOP è impostato, usa i valori HDOP / VDOP invece di PDOP",
+      "numSatellites": "Numero di satelliti",
+      "sequenceNumber": "Numero sequenza",
       "timestamp": "Data e ora",
       "unset": "Non impostato",
-      "vehicleHeading": "Vehicle heading",
-      "vehicleSpeed": "Vehicle speed"
+      "vehicleHeading": "Direzione del veicolo",
+      "vehicleSpeed": "Velocità del veicolo"
     }
   },
   "power": {
     "adcMultiplierOverride": {
-      "description": "Used for tweaking battery voltage reading",
-      "label": "ADC Multiplier Override ratio"
+      "description": "Utilizzato per modificare la lettura della tensione della batteria",
+      "label": "Sovrascrivi rapporto moltiplicatore ADC"
     },
     "ina219Address": {
-      "description": "Address of the INA219 battery monitor",
-      "label": "INA219 Address"
+      "description": "Indirizzo del monitor batteria INA219",
+      "label": "Indirizzo INA219"
     },
     "lightSleepDuration": {
-      "description": "How long the device will be in light sleep for",
-      "label": "Light Sleep Duration"
+      "description": "Per quanto tempo il dispositivo sarà in light sleep",
+      "label": "Durata light sleep"
     },
     "minimumWakeTime": {
-      "description": "Minimum amount of time the device will stay awake for after receiving a packet",
-      "label": "Minimum Wake Time"
+      "description": "Quantità minima di tempo che il dispositivo rimarrà attivo per dopo aver ricevuto un pacchetto",
+      "label": "Tempo Di Risveglio Minimo"
     },
     "noConnectionBluetoothDisabled": {
-      "description": "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
-      "label": "No Connection Bluetooth Disabled"
+      "description": "Se il dispositivo non riceve una connessione Bluetooth, la radio BLE sarà disattivata dopo questo lungo periodo",
+      "label": "Nessuna Connessione Bluetooth Disabilitata"
     },
     "powerSavingEnabled": {
-      "description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
+      "description": "Selezionare se alimentato da una fonte a bassa corrente (cioè solare) per minimizzare il consumo energetico il più possibile.",
       "label": "Abilita modalità risparmio energetico"
     },
     "shutdownOnBatteryDelay": {
-      "description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
-      "label": "Shutdown on battery delay"
+      "description": "Spegnimento automatico del nodo dopo questo lungo quando la batteria, 0 per indefinito",
+      "label": "Arresto in ritardo della batteria"
     },
     "superDeepSleepDuration": {
-      "description": "How long the device will be in super deep sleep for",
-      "label": "Super Deep Sleep Duration"
+      "description": "Per quanto tempo il dispositivo sarà in deep sleep",
+      "label": "Durata Super Deep Sleep"
     },
     "powerConfigSettings": {
-      "description": "Settings for the power module",
+      "description": "Impostazioni per il modulo di alimentazione",
       "label": "Configurazione Alimentazione"
     },
     "sleepSettings": {
-      "description": "Sleep settings for the power module",
-      "label": "Sleep Settings"
+      "description": "Impostazioni di sospensione per il modulo di alimentazione",
+      "label": "Impostazioni Sleep"
     }
   },
   "security": {
-    "description": "Settings for the Security configuration",
-    "title": "Security Settings",
-    "button_backupKey": "Backup Key",
+    "description": "Impostazioni per la configurazione di sicurezza",
+    "title": "Impostazioni di Sicurezza",
+    "button_backupKey": "Chiave Di Backup",
     "adminChannelEnabled": {
-      "description": "Allow incoming device control over the insecure legacy admin channel",
-      "label": "Allow Legacy Admin"
+      "description": "Consenti il controllo del dispositivo in arrivo sul canale di amministrazione ereditato insicuro",
+      "label": "Consenti Amministrazione Legacy"
     },
     "enableDebugLogApi": {
-      "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
-      "label": "Enable Debug Log API"
+      "description": "Output live debug logging su seriale, visualizza ed esporta i log di posizione dei dispositivi redatti su Bluetooth",
+      "label": "Abilita Debug Log API"
     },
     "managed": {
-      "description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
-      "label": "Managed"
+      "description": "Se abilitata, le opzioni di configurazione del dispositivo possono essere modificate solo in remoto da un nodo di amministrazione remota tramite messaggi amministratori. Non abilitare questa opzione a meno che non sia stato configurato almeno un nodo Admin Remoto adatto, e la chiave pubblica è memorizzata in uno dei campi precedenti.",
+      "label": "Gestito"
     },
     "privateKey": {
-      "description": "Used to create a shared key with a remote device",
+      "description": "Usato per creare una chiave condivisa con un dispositivo remoto",
       "label": "Chiave Privata"
     },
     "publicKey": {
-      "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+      "description": "Inviato ad altri nodi sulla mesh per consentire loro di calcolare una chiave segreta condivisa",
       "label": "Chiave Pubblica"
     },
     "primaryAdminKey": {
-      "description": "The primary public key authorized to send admin messages to this node",
-      "label": "Primary Admin Key"
+      "description": "La chiave pubblica primaria autorizzata a inviare messaggi di amministrazione a questo nodo",
+      "label": "Chiave Primaria Dell'Amministratore"
     },
     "secondaryAdminKey": {
-      "description": "The secondary public key authorized to send admin messages to this node",
-      "label": "Secondary Admin Key"
+      "description": "La chiave pubblica secondaria autorizzata a inviare messaggi di amministrazione a questo nodo",
+      "label": "Chiave Secondaria Dell'Amministratore"
     },
     "serialOutputEnabled": {
-      "description": "Serial Console over the Stream API",
-      "label": "Serial Output Enabled"
+      "description": "Console seriale attraverso la Stream API",
+      "label": "Output Seriale Abilitato"
     },
     "tertiaryAdminKey": {
-      "description": "The tertiary public key authorized to send admin messages to this node",
-      "label": "Tertiary Admin Key"
+      "description": "La chiave pubblica terziaria autorizzata a inviare messaggi di amministrazione a questo nodo",
+      "label": "Chiave Di Amministrazione Terziaria"
     },
     "adminSettings": {
-      "description": "Settings for Admin",
-      "label": "Admin Settings"
+      "description": "Impostazioni per Amministratore",
+      "label": "Impostazioni Amministratore"
     },
     "loggingSettings": {
-      "description": "Settings for Logging",
-      "label": "Logging Settings"
+      "description": "Impostazioni per il logging",
+      "label": "Impostazioni Di Logging"
     }
   }
 }

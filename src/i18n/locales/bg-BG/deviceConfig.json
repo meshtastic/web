@@ -1,6 +1,6 @@
 {
   "page": {
-    "title": "Configuration",
+    "title": "Конфигурация",
     "tabBluetooth": "Bluetooth",
     "tabDevice": "Устройство",
     "tabDisplay": "Дисплей",
@@ -11,11 +11,11 @@
     "tabSecurity": "Сигурност"
   },
   "sidebar": {
-    "label": "Modules"
+    "label": "Модули"
   },
   "device": {
-    "title": "Device Settings",
-    "description": "Settings for the device",
+    "title": "Настройки на устройството",
+    "description": "Настройки за устройството",
     "buttonPin": {
       "description": "Button pin override",
       "label": "Button Pin"
@@ -54,31 +54,31 @@
     }
   },
   "bluetooth": {
-    "title": "Bluetooth Settings",
-    "description": "Settings for the Bluetooth module",
-    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "title": "Настройки за Bluetooth",
+    "description": "Настройки за Bluetooth модула",
+    "note": "Забележка: Някои устройства (ESP32) не могат да използват едновременно Bluetooth и WiFi.",
     "enabled": {
-      "description": "Enable or disable Bluetooth",
-      "label": "Enabled"
+      "description": "Активиране или дезактивиране на Bluetooth",
+      "label": "Активиран"
     },
     "pairingMode": {
-      "description": "Pin selection behaviour.",
+      "description": "Поведение при избор на ПИН.",
       "label": "Режим на сдвояване"
     },
     "pin": {
       "description": "Pin to use when pairing",
-      "label": "Pin"
+      "label": "ПИН"
     }
   },
   "display": {
-    "description": "Settings for the device display",
-    "title": "Display Settings",
+    "description": "Настройки за дисплея на устройството",
+    "title": "Настройки на дисплея",
     "headingBold": {
       "description": "Bolden the heading text",
       "label": "Bold Heading"
     },
     "carouselDelay": {
-      "description": "How fast to cycle through windows",
+      "description": "Колко бързо да се превключва между прозорците",
       "label": "Carousel Delay"
     },
     "compassNorthTop": {
@@ -90,7 +90,7 @@
       "label": "Display Mode"
     },
     "displayUnits": {
-      "description": "Display metric or imperial units",
+      "description": "Показване на метрични или имперски мерни единици",
       "label": "Display Units"
     },
     "flipScreen": {
@@ -110,8 +110,8 @@
       "label": "Screen Timeout"
     },
     "twelveHourClock": {
-      "description": "Use 12-hour clock format",
-      "label": "12-Hour Clock"
+      "description": "Използване на 12-часов формат на часовника",
+      "label": "12-часов часовник"
     },
     "wakeOnTapOrMotion": {
       "description": "Wake the device on tap or motion",
@@ -119,10 +119,10 @@
     }
   },
   "lora": {
-    "title": "Mesh Settings",
+    "title": "Настройки на Mesh",
     "description": "Settings for the LoRa mesh",
     "bandwidth": {
-      "description": "Channel bandwidth in MHz",
+      "description": "Широчина на канала в MHz",
       "label": "Широчина на честотната лента"
     },
     "boostedRxGain": {
@@ -135,11 +135,11 @@
     },
     "frequencyOffset": {
       "description": "Frequency offset to correct for crystal calibration errors",
-      "label": "Frequency Offset"
+      "label": "Отместване на честотата"
     },
     "frequencySlot": {
       "description": "LoRa frequency channel number",
-      "label": "Frequency Slot"
+      "label": "Честотен слот"
     },
     "hopLimit": {
       "description": "Maximum number of hops",
@@ -150,8 +150,8 @@
       "label": "Ignore MQTT"
     },
     "modemPreset": {
-      "description": "Modem preset to use",
-      "label": "Modem Preset"
+      "description": "Използване на предварително настроен модем",
+      "label": "Предварително настроен модем"
     },
     "okToMqtt": {
       "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
@@ -174,60 +174,60 @@
       "label": "Spreading Factor"
     },
     "transmitEnabled": {
-      "description": "Enable/Disable transmit (TX) from the LoRa radio",
-      "label": "Transmit Enabled"
+      "description": "Активиране/дезактивиране на предаването (TX) от LoRa радиото",
+      "label": "Предаването е активирано"
     },
     "transmitPower": {
-      "description": "Max transmit power",
-      "label": "Transmit Power"
+      "description": "Максимална мощност на предаване",
+      "label": "Мощност на предаване"
     },
     "usePreset": {
       "description": "Use one of the predefined modem presets",
-      "label": "Use Preset"
+      "label": "Използване на предварително зададени настройки"
     },
     "meshSettings": {
       "description": "Settings for the LoRa mesh",
-      "label": "Mesh Settings"
+      "label": "Настройки на Mesh"
     },
     "waveformSettings": {
       "description": "Settings for the LoRa waveform",
       "label": "Waveform Settings"
     },
     "radioSettings": {
-      "label": "Radio Settings",
-      "description": "Settings for the LoRa radio"
+      "label": "Настройки на радиото",
+      "description": "Настройки за LoRa радиото"
     }
   },
   "network": {
-    "title": "WiFi Config",
-    "description": "WiFi radio configuration",
-    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "title": "Конфигурация на WiFi",
+    "description": "Конфигурация на WiFi радиото",
+    "note": "Забележка: Някои устройства (ESP32) не могат да използват едновременно Bluetooth и WiFi.",
     "addressMode": {
       "description": "Address assignment selection",
       "label": "Address Mode"
     },
     "dns": {
-      "description": "DNS Server",
+      "description": "DNS сървър",
       "label": "DNS"
     },
     "ethernetEnabled": {
-      "description": "Enable or disable the Ethernet port",
-      "label": "Enabled"
+      "description": "Активиране или дезактивиране на Ethernet порта",
+      "label": "Активиран"
     },
     "gateway": {
-      "description": "Default Gateway",
+      "description": "Шлюз по подразбиране",
       "label": "Шлюз"
     },
     "ip": {
-      "description": "IP Address",
+      "description": "IP адрес",
       "label": "IP"
     },
     "psk": {
-      "description": "Network password",
+      "description": "Парола за мрежата",
       "label": "PSK"
     },
     "ssid": {
-      "description": "Network name",
+      "description": "Име на мрежата",
       "label": "SSID"
     },
     "subnet": {
@@ -235,29 +235,29 @@
       "label": "Subnet"
     },
     "wifiEnabled": {
-      "description": "Enable or disable the WiFi radio",
-      "label": "Enabled"
+      "description": "Активиране или дезактивиране на WiFi радиото",
+      "label": "Активиран"
     },
     "meshViaUdp": {
       "label": "Mesh via UDP"
     },
     "ntpServer": {
-      "label": "NTP Server"
+      "label": "NTP сървър"
     },
     "rsyslogServer": {
       "label": "Rsyslog Server"
     },
     "ethernetConfigSettings": {
       "description": "Ethernet port configuration",
-      "label": "Ethernet Config"
+      "label": "Конфигурация на Ethernet "
     },
     "ipConfigSettings": {
-      "description": "IP configuration",
-      "label": "IP Config"
+      "description": "Конфигуриране на IP",
+      "label": "Конфигурация на IP"
     },
     "ntpConfigSettings": {
-      "description": "NTP configuration",
-      "label": "NTP Config"
+      "description": "Конфигуриране на NTP",
+      "label": "Конфигурация на NTP"
     },
     "rsyslogConfigSettings": {
       "description": "Rsyslog configuration",
@@ -269,8 +269,8 @@
     }
   },
   "position": {
-    "title": "Position Settings",
-    "description": "Settings for the position module",
+    "title": "Настройки на позицията",
+    "description": "Настройки за модула за позиция",
     "broadcastInterval": {
       "description": "How often your position is sent out over the mesh",
       "label": "Broadcast Interval"
@@ -281,15 +281,15 @@
     },
     "fixedPosition": {
       "description": "Don't report GPS position, but a manually-specified one",
-      "label": "Fixed Position"
+      "label": "Фиксирана позиция"
     },
     "gpsMode": {
       "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
-      "label": "GPS Mode"
+      "label": "Режим на GPS"
     },
     "gpsUpdateInterval": {
       "description": "How often a GPS fix should be acquired",
-      "label": "GPS Update Interval"
+      "label": "Интервал на актуализиране на GPS"
     },
     "positionFlags": {
       "description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
@@ -317,11 +317,11 @@
     },
     "intervalsSettings": {
       "description": "How often to send position updates",
-      "label": "Intervals"
+      "label": "Интервали"
     },
     "flags": {
       "placeholder": "Select position flags...",
-      "altitude": "Altitude",
+      "altitude": "Надморска височина",
       "altitudeGeoidalSeparation": "Altitude Geoidal Separation",
       "altitudeMsl": "Altitude is Mean Sea Level",
       "dop": "Dilution of precision (DOP) PDOP used by default",
@@ -331,7 +331,7 @@
       "timestamp": "Времево клеймо",
       "unset": "Отказ",
       "vehicleHeading": "Vehicle heading",
-      "vehicleSpeed": "Vehicle speed"
+      "vehicleSpeed": "Скорост на превозното средство"
     }
   },
   "power": {
@@ -378,7 +378,7 @@
   },
   "security": {
     "description": "Settings for the Security configuration",
-    "title": "Security Settings",
+    "title": "Насртойки на сигурността",
     "button_backupKey": "Backup Key",
     "adminChannelEnabled": {
       "description": "Allow incoming device control over the insecure legacy admin channel",
@@ -417,7 +417,7 @@
       "label": "Tertiary Admin Key"
     },
     "adminSettings": {
-      "description": "Settings for Admin",
+      "description": "Настройки за Admin",
       "label": "Admin Settings"
     },
     "loggingSettings": {
