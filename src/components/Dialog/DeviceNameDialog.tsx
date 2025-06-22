@@ -44,7 +44,7 @@ export const DeviceNameDialog = ({
   const deviceNameSchema = z.object({
     longName: z
       .string()
-      .min(2, t("deviceName.validation.longNameMin"))
+      .min(1, t("deviceName.validation.longNameMin"))
       .max(40, t("deviceName.validation.longNameMax")),
     shortName: z
       .string()
