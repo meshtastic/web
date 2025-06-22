@@ -58,10 +58,6 @@ export const DeviceNameDialog = ({
   });
 
   const onSubmit = handleSubmit((data) => {
-    if (process.env.NODE_ENV === "development") {
-      console.log("Submitted Data:", data);
-    }
-
     connection?.setOwner(
       create(Protobuf.Mesh.UserSchema, {
         ...data,
