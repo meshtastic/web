@@ -36,6 +36,7 @@
   "homepage": "https://meshtastic.org",
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.5",
+    "@hookform/resolvers": "^5.1.1",
     "@meshtastic/core": "npm:@jsr/meshtastic__core@2.6.4",
     "@meshtastic/js": "npm:@jsr/meshtastic__js@2.6.0-0",
     "@meshtastic/transport-http": "npm:@jsr/meshtastic__transport-http",
@@ -84,7 +85,7 @@
     "react-map-gl": "8.0.4",
     "react-qrcode-logo": "^3.0.0",
     "rfc4648": "^1.5.4",
-    "zod": "^3.25.62",
+    "zod": "^3.25.67",
     "zustand": "5.0.5"
   },
   "devDependencies": {

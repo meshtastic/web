@@ -4,15 +4,14 @@ import type {
 } from "@components/Form/DynamicForm.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import type { ChangeEventHandler } from "react";
-import { useState } from "react";
 import { type FieldValues, useController } from "react-hook-form";
 
 export interface InputFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "text" | "number" | "password";
   inputChange?: ChangeEventHandler;
+  prefix?: string;
   properties?: {
-    value?: string;
-    prefix?: string;
+    id?: string;
     suffix?: string;
     step?: number;
     className?: string;
@@ -31,29 +30,33 @@ export function GenericInput<T extends FieldValues>({
   control,
   disabled,
   field,
-  isDirty,
   invalid,
 }: GenericFormElementProps<T, InputFieldProps<T>>) {
   const { fieldLength, ...restProperties } = field.properties || {};
-  const [currentLength, setCurrentLength] = useState<number>(
-    fieldLength?.currentValueLength || 0,
-  );
 
-  const { field: controllerField } = useController({
+  const {
+    field: controllerField,
+    fieldState: { error, isDirty },
+  } = useController({
     name: field.name,
     control,
+    rules: {
+      minLength: field.properties?.fieldLength?.min,
+      maxLength: field.properties?.fieldLength?.max,
+    },
   });
+
+  const isInvalid = invalid || Boolean(error?.message);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
 
     if (
       field.properties?.fieldLength?.max &&
-      newValue.length > field.properties?.fieldLength?.max
+      newValue.length > field.properties.fieldLength.max
     ) {
       return;
     }
-    setCurrentLength(newValue.length);
 
     if (field.inputChange) field.inputChange(e);
 
@@ -63,6 +66,10 @@ export function GenericInput<T extends FieldValues>({
         : newValue,
     );
   };
+
+  const currentLength = controllerField.value
+    ? String(controllerField.value).length
+    : 0;
 
   return (
     <div className="relative w-full">
@@ -80,12 +87,18 @@ export function GenericInput<T extends FieldValues>({
         className={field.properties?.className}
         {...restProperties}
         disabled={disabled}
-        variant={invalid ? "invalid" : isDirty ? "dirty" : "default"}
+        variant={error ? "invalid" : isDirty ? "dirty" : "default"}
       />
 
-      {fieldLength?.showCharacterCount && fieldLength?.max && (
+      {fieldLength?.showCharacterCount && fieldLength.max && (
         <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-sm text-slate-900 dark:text-slate-200">
-          {currentLength ?? fieldLength?.currentValueLength}/{fieldLength?.max}
+          {currentLength}/{fieldLength.max}
+        </div>
+      )}
+
+      {isInvalid && (
+        <div className="absolute inset-y-12 bottom-0 flex items-center pr-3">
+          <p className="text-sm text-red-500">{error?.message ?? ""}</p>
         </div>
       )}
     </div>

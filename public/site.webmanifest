@@ -1,11 +1,11 @@
 {
   "name": "Meshtastic",
-  "short_name": "Meshtastic",
+  "short_name": "Web Client",
   "start_url": ".",
-  "description": "Meshtastic web app",
+  "description": "Meshtastic Web App",
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "/Logo.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }
