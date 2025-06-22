@@ -1,5 +1,5 @@
 {
-  "emptyState": "No results found.",
+  "emptyState": "Няма намерени резултати.",
   "page": {
     "title": "Command Menu"
   },
@@ -14,37 +14,37 @@
     "command": {
       "messages": "Съобщения",
       "map": "Карта",
-      "config": "Config",
+      "config": "Конфигурация",
       "channels": "Канали",
       "nodes": "Възли"
     }
   },
   "manage": {
-    "label": "Manage",
+    "label": "Управление",
     "command": {
       "switchNode": "Switch Node",
-      "connectNewNode": "Connect New Node"
+      "connectNewNode": "Свързване на нов възел"
     }
   },
   "contextual": {
     "label": "Contextual",
     "command": {
-      "qrCode": "QR Code",
-      "qrGenerator": "Generator",
+      "qrCode": "QR код",
+      "qrGenerator": "Генератор",
       "qrImport": "Импортиране",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Schedule Reboot",
-      "rebootToOtaMode": "Reboot To OTA Mode",
-      "resetNodeDb": "Reset Node DB",
-      "factoryResetDevice": "Factory Reset Device",
-      "factoryResetConfig": "Factory Reset Config"
+      "scheduleShutdown": "Планирано изключване",
+      "scheduleReboot": "Планирано рестартиране",
+      "rebootToOtaMode": "Рестартиране в режим OTA",
+      "resetNodeDb": "Нулиране на базата данни с възли",
+      "factoryResetDevice": "Фабрично нулиране на устройството",
+      "factoryResetConfig": "Фабрично нулиране на конфигурацията"
     }
   },
   "debug": {
-    "label": "Debug",
+    "label": "Отстраняване на грешки",
     "command": {
-      "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "reconfigure": "Преконфигуриране",
+      "clearAllStoredMessages": "Изчистване на всички съхранени съобщения"
     }
   }
 }

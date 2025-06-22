@@ -80,6 +80,24 @@
     "saveSuccess": {
       "title": "Tallennetaan asetukset",
       "description": "Asetuksien muutos {{case}} on tallennettu."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} suosikit.",
+      "action": {
+        "added": "Lisätty",
+        "removed": "Poistettu",
+        "to": "saakka",
+        "from": "alkaen"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} estolista",
+      "action": {
+        "added": "Lisätty",
+        "removed": "Poistettu",
+        "to": "saakka",
+        "from": "alkaen"
+      }
     }
   },
   "notifications": {
@@ -116,6 +134,9 @@
   },
   "filter": {
     "label": "Suodatus"
+  },
+  "advanced": {
+    "label": "Lisäasetukset"
   },
   "clearInput": {
     "label": "Tyhjennä kenttä"
@@ -166,6 +187,12 @@
   "viaMqtt": {
     "label": "Yhdistetty MQTT-yhteydellä"
   },
+  "hopsUnknown": {
+    "label": "Tuntematon määrä hyppyjä"
+  },
+  "showUnheard": {
+    "label": "Ei koskaan kuultu"
+  },
   "language": {
     "label": "Kieli",
     "changeLanguage": "Vaihda kieli"
@@ -178,7 +205,7 @@
   },
   "errorPage": {
     "title": "Tämä on hieman noloa...",
-    "description1": "Pahoittelemme, mutta verkkosovelluksessa tapahtui virhe, joka aiheutti kaatumisen.<br /> \nTämän ei pitäisi tapahtua ja me työskentelemme ahkerasti ongelman korjaamiseksi.",
+    "description1": "Pahoittelemme, mutta verkkosovelluksessa tapahtui virhe, joka aiheutti kaatumisen. <br /> \nTällaista ei pitäisi tapahtua ja me työskentelemme ahkerasti ongelman korjaamiseksi.",
     "description2": "Paras tapa estää tämän tapahtuminen uudelleen sinulle tai kenellekään muulle, on ilmoittaa meille ongelmasta.",
     "reportInstructions": "Lisääthän raporttiisi seuraavat tiedot:",
     "reportSteps": {
@@ -188,7 +215,7 @@
       "step4": "Muut mahdollisesti oleelliset tiedot"
     },
     "reportLink": "Voit raportoida ongelmasta <0>GitHubissa</0>",
-    "dashboardLink": "Palaa takaisin <0>dashboard</0>",
+    "dashboardLink": "Palaa takaisin <0>hallintapaneeliin</0>",
     "detailsSummary": "Virheen tiedot",
     "errorMessageLabel": "Virheilmoitus:",
     "stackTraceLabel": "Virheen jäljityslista:",
@@ -196,6 +223,6 @@
   },
   "footer": {
     "text": "Powered by <0>▲ Vercel</0> | Meshtastic® on Meshtastic LLC:n rekisteröity tavaramerkki. | <1>Oikeudelliset tiedot</1>",
-    "commitSha": "Versiokomentoviestin SHA-tunniste: {{sha}}"
+    "commitSha": "Ohjelmistokehitysversion SHA-tunniste: {{sha}}"
   }
 }

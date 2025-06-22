@@ -15,8 +15,8 @@
       "messages": "Повідомлення",
       "map": "Мапа",
       "config": "Config",
-      "channels": "Channels",
-      "nodes": "Nodes"
+      "channels": "Канали",
+      "nodes": "Вузли"
     }
   },
   "manage": {
@@ -29,11 +29,11 @@
   "contextual": {
     "label": "Contextual",
     "command": {
-      "qrCode": "QR Code",
-      "qrGenerator": "Generator",
+      "qrCode": "QR-код",
+      "qrGenerator": "Генератор",
       "qrImport": "Import",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Schedule Reboot",
+      "scheduleShutdown": "Розклад вимкнення",
+      "scheduleReboot": "Розклад перезавантаження",
       "rebootToOtaMode": "Reboot To OTA Mode",
       "resetNodeDb": "Reset Node DB",
       "factoryResetDevice": "Factory Reset Device",

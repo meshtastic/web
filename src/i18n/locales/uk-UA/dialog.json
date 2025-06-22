@@ -1,34 +1,34 @@
 {
   "deleteMessages": {
     "description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-    "title": "Clear All Messages"
+    "title": "Очистити всі повідомлення"
   },
   "deviceName": {
     "description": "The Device will restart once the config is saved.",
-    "longName": "Long Name",
-    "shortName": "Short Name",
-    "title": "Change Device Name"
+    "longName": "Довга назва",
+    "shortName": "Коротка назва",
+    "title": "Змінити назву пристрою"
   },
   "import": {
     "description": "The current LoRa configuration will be overridden.",
     "error": {
       "invalidUrl": "Invalid Meshtastic URL"
     },
-    "channelPrefix": "Channel: ",
+    "channelPrefix": "Канал: ",
     "channelSetUrl": "Channel Set/QR Code URL",
-    "channels": "Channels:",
+    "channels": "Канали:",
     "usePreset": "Use Preset?",
     "title": "Import Channel Set"
   },
   "locationResponse": {
-    "altitude": "Altitude: ",
-    "coordinates": "Coordinates: ",
-    "title": "Location: {{identifier}}"
+    "altitude": "Висота: ",
+    "coordinates": "Координати: ",
+    "title": "Розташування: {{identifier}}"
   },
   "pkiRegenerateDialog": {
     "title": "Regenerate Pre-Shared Key?",
     "description": "Are you sure you want to regenerate the pre-shared key?",
-    "regenerate": "Regenerate"
+    "regenerate": "Перегенерувати"
   },
   "newDeviceDialog": {
     "title": "Connect New Device",
@@ -37,8 +37,8 @@
     "tabHttp": "HTTP",
     "tabBluetooth": "Bluetooth",
     "tabSerial": "Serial",
-    "useHttps": "Use HTTPS",
-    "connecting": "Connecting...",
+    "useHttps": "Використовувати HTTPS",
+    "connecting": "Підключення...",
     "connect": "Connect",
     "connectionFailedAlert": {
       "title": "Connection Failed",
@@ -60,10 +60,11 @@
     },
     "bluetoothConnection": {
       "noDevicesPaired": "No devices paired yet.",
-      "newDeviceButton": "New device"
+      "newDeviceButton": "Новий пристрій"
     },
     "validation": {
-      "requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
+      "requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
+      "requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
       "requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
       "additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
     }
@@ -92,7 +93,6 @@
     "unignoreNode": "Unignore node"
   },
   "pkiBackup": {
-    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
     "loseKeysWarning": "If you lose your keys, you will need to reset your device.",
     "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
     "footer": "=== END OF KEYS ===",
@@ -101,6 +101,13 @@
     "publicKey": "Public Key:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
     "title": "Backup Keys"
+  },
+  "pkiBackupReminder": {
+    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
+    "title": "Backup Reminder",
+    "remindLaterPrefix": "Remind me in",
+    "remindNever": "Never remind me",
+    "backupNow": "Back up now"
   },
   "pkiRegenerate": {
     "description": "Are you sure you want to regenerate key pair?",
@@ -111,16 +118,16 @@
     "replaceChannels": "Replace Channels",
     "description": "The current LoRa configuration will also be shared.",
     "sharableUrl": "Sharable URL",
-    "title": "Generate QR Code"
+    "title": "Згенерувати QR-код"
   },
   "rebootOta": {
-    "title": "Schedule Reboot",
+    "title": "Запланувати перезавантаження",
     "description": "Reboot the connected node after a delay into OTA (Over-the-Air) mode.",
-    "enterDelay": "Enter delay (sec)",
+    "enterDelay": "Введіть затримку (сек)",
     "scheduled": "Reboot has been scheduled"
   },
   "reboot": {
-    "title": "Schedule Reboot",
+    "title": "Запланувати перезавантаження",
     "description": "Reboot the connected node after x minutes."
   },
   "refreshKeys": {
@@ -154,6 +161,11 @@
     "preamble": "I have read the ",
     "choosingRightDeviceRole": "Choosing The Right Device Role",
     "deviceRoleDocumentation": "Device Role Documentation",
-    "title": "Are you sure?"
+    "title": "Ви впевнені?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Я знаю, що роблю",
+    "title": "Ви впевнені?",
+    "description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can <bold>only</bold> be changed through Remote Admin messages. This setting is not required for remote node administration."
   }
 }

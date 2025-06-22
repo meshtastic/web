@@ -24,7 +24,8 @@
     "reset": "Nollställ",
     "save": "Spara",
     "scanQr": "Skanna QR-kod",
-    "traceRoute": "Spåra rutt"
+    "traceRoute": "Spåra rutt",
+    "submit": "Spara"
   },
   "app": {
     "title": "Meshtastic",
@@ -55,6 +56,10 @@
       "one": "minut",
       "plural": "minuter"
     },
+    "hour": {
+      "one": "Timme",
+      "plural": "Timmar"
+    },
     "millisecond": {
       "one": "millisekund",
       "plural": "millisekunder",
@@ -63,6 +68,18 @@
     "second": {
       "one": "sekund",
       "plural": "sekunder"
+    },
+    "day": {
+      "one": "Dag",
+      "plural": "Dagar"
+    },
+    "month": {
+      "one": "Månad",
+      "plural": "Månader"
+    },
+    "year": {
+      "one": "År",
+      "plural": "År"
     },
     "snr": "SNR",
     "volt": {
@@ -76,6 +93,9 @@
     }
   },
   "security": {
+    "0bit": "Tom",
+    "8bit": "8 bitar",
+    "128bit": "128 bitar",
     "256bit": "256 bitar"
   },
   "unknown": {
@@ -87,7 +107,9 @@
   "nodeUnknownPrefix": "!",
   "unset": "EJ SATT",
   "fallbackName": "Meshtastic {{last4}}",
+  "node": "Nod",
   "formValidation": {
+    "unsavedChanges": "Osparade ändringar",
     "tooBig": {
       "string": "Texten är för lång. Ange en text mindre än eller lika med {{maximum}} tecken långt.",
       "number": "Värdet är för stort. Ange ett numeriskt värde mindre än eller lika med {{maximum}}.",

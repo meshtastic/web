@@ -1,20 +1,20 @@
 {
   "page": {
-    "title": "Configuration",
+    "title": "Налаштування",
     "tabBluetooth": "Bluetooth",
-    "tabDevice": "Device",
-    "tabDisplay": "Display",
+    "tabDevice": "Пристрій",
+    "tabDisplay": "Дисплей",
     "tabLora": "LoRa",
-    "tabNetwork": "Network",
+    "tabNetwork": "Мережа",
     "tabPosition": "Position",
-    "tabPower": "Power",
-    "tabSecurity": "Security"
+    "tabPower": "Живлення",
+    "tabSecurity": "Безпека"
   },
   "sidebar": {
-    "label": "Modules"
+    "label": "Модулі"
   },
   "device": {
-    "title": "Device Settings",
+    "title": "Налаштування пристрою",
     "description": "Settings for the device",
     "buttonPin": {
       "description": "Button pin override",
@@ -54,12 +54,12 @@
     }
   },
   "bluetooth": {
-    "title": "Bluetooth Settings",
+    "title": "Налаштування Bluetooth",
     "description": "Settings for the Bluetooth module",
     "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
     "enabled": {
-      "description": "Enable or disable Bluetooth",
-      "label": "Enabled"
+      "description": "Увімкнути або вимкнути Bluetooth",
+      "label": "Увімкнено"
     },
     "pairingMode": {
       "description": "Pin selection behaviour.",
@@ -147,7 +147,7 @@
     },
     "ignoreMqtt": {
       "description": "Don't forward MQTT messages over the mesh",
-      "label": "Ignore MQTT"
+      "label": "Ігнорувати MQTT"
     },
     "modemPreset": {
       "description": "Modem preset to use",
@@ -199,7 +199,7 @@
     }
   },
   "network": {
-    "title": "WiFi Config",
+    "title": "Налаштування WiFi",
     "description": "WiFi radio configuration",
     "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
     "addressMode": {
@@ -207,7 +207,7 @@
       "label": "Address Mode"
     },
     "dns": {
-      "description": "DNS Server",
+      "description": "DNS-сервер",
       "label": "DNS"
     },
     "ethernetEnabled": {
@@ -216,7 +216,7 @@
     },
     "gateway": {
       "description": "Default Gateway",
-      "label": "Gateway"
+      "label": "Шлюз"
     },
     "ip": {
       "description": "IP Address",
@@ -231,21 +231,21 @@
       "label": "SSID"
     },
     "subnet": {
-      "description": "Subnet Mask",
-      "label": "Subnet"
+      "description": "Маска підмережі",
+      "label": "Підмережа"
     },
     "wifiEnabled": {
-      "description": "Enable or disable the WiFi radio",
+      "description": "Увімкнути або вимкнути WiFi радіо",
       "label": "Enabled"
     },
     "meshViaUdp": {
       "label": "Mesh via UDP"
     },
     "ntpServer": {
-      "label": "NTP Server"
+      "label": "NTP-сервер"
     },
     "rsyslogServer": {
-      "label": "Rsyslog Server"
+      "label": "Rsyslog-сервер"
     },
     "ethernetConfigSettings": {
       "description": "Ethernet port configuration",
@@ -256,16 +256,16 @@
       "label": "IP Config"
     },
     "ntpConfigSettings": {
-      "description": "NTP configuration",
+      "description": "Налаштування NTP",
       "label": "NTP Config"
     },
     "rsyslogConfigSettings": {
       "description": "Rsyslog configuration",
-      "label": "Rsyslog Config"
+      "label": "Налаштування Rsyslog"
     },
     "udpConfigSettings": {
       "description": "UDP over Mesh configuration",
-      "label": "UDP Config"
+      "label": "Налаштування UDP"
     }
   },
   "position": {
@@ -321,7 +321,7 @@
     },
     "flags": {
       "placeholder": "Select position flags...",
-      "altitude": "Altitude",
+      "altitude": "Висота",
       "altitudeGeoidalSeparation": "Altitude Geoidal Separation",
       "altitudeMsl": "Altitude is Mean Sea Level",
       "dop": "Dilution of precision (DOP) PDOP used by default",
@@ -369,16 +369,16 @@
     },
     "powerConfigSettings": {
       "description": "Settings for the power module",
-      "label": "Power Config"
+      "label": "Налаштування живлення"
     },
     "sleepSettings": {
       "description": "Sleep settings for the power module",
-      "label": "Sleep Settings"
+      "label": "Налаштування режиму сну"
     }
   },
   "security": {
     "description": "Settings for the Security configuration",
-    "title": "Security Settings",
+    "title": "Налаштування безпеки",
     "button_backupKey": "Backup Key",
     "adminChannelEnabled": {
       "description": "Allow incoming device control over the insecure legacy admin channel",

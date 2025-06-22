@@ -63,7 +63,8 @@
       "newDeviceButton": "Uusi laite"
     },
     "validation": {
-      "requiresFeatures": "Tämä yhteystyyppi vaatii <0></0>. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
+      "requiresWebBluetooth": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti bluetooth</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
+      "requiresWebSerial": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
       "requiresSecureContext": "Tämä sovellus vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia.",
       "additionallyRequiresSecureContext": "Lisäksi se vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia."
     }
@@ -92,7 +93,6 @@
     "unignoreNode": "Poista laitteen ohitus käytöstä"
   },
   "pkiBackup": {
-    "description": "Suosittelemme avaintietojen säännöllistä varmuuskopiointia. Haluatko varmuuskopioida nyt?",
     "loseKeysWarning": "Jos menetät avaimesi, sinun täytyy palauttaa laite tehdasasetuksiin.",
     "secureBackup": "On tärkeää varmuuskopioida julkiset ja yksityiset avaimet ja säilyttää niiden varmuuskopioita turvallisesti!",
     "footer": "=== AVAIMIEN LOPPU ===",
@@ -101,6 +101,13 @@
     "publicKey": "Julkinen avain:",
     "fileName": "meshtastic_avaimet_{{longName}}_{{shortName}}.txt",
     "title": "Varmuuskopioi avaimet"
+  },
+  "pkiBackupReminder": {
+    "description": "Suosittelemme avaintietojen säännöllistä varmuuskopiointia. Haluatko varmuuskopioida nyt?",
+    "title": "Varmuuskopion Muistutus",
+    "remindLaterPrefix": "Muistuta minua",
+    "remindNever": "Älä muistuta minua koskaan",
+    "backupNow": "Varmuuskopioi nyt"
   },
   "pkiRegenerate": {
     "description": "Haluatko varmasti luoda avainparin uudelleen?",
@@ -155,5 +162,10 @@
     "choosingRightDeviceRole": "Valitse laitteelle oikea rooli",
     "deviceRoleDocumentation": "Roolien dokumentaatio laitteelle",
     "title": "Oletko varma?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Kyllä, tiedän mitä teen",
+    "title": "Oletko varma?",
+    "description": "Hallintatilan käyttöönotto estää asiakassovelluksia (mukaan lukien verkkosovellus) kirjoittamasta asetuksia radioon. Kun tila on otettu käyttöön, radion asetuksia voidaan muuttaa <bold>vain</bold> etähallintaviestien kautta. Tämä asetus ei ole pakollinen etähallittavien laitteiden hallintaan."
   }
 }

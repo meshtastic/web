@@ -1,40 +1,39 @@
 {
   "page": {
-    "title": "Messages: {{chatName}}"
+    "title": "Повідомлення: {{chatName}}",
+    "placeholder": "Введіть повідомлення"
   },
   "emptyState": {
-    "title": "Select a Chat",
-    "text": "No messages yet."
+    "title": "Оберіть чат",
+    "text": "Поки немає повідомлень."
   },
   "selectChatPrompt": {
-    "text": "Select a channel or node to start messaging."
+    "text": "Виберіть канал або вузол для початку обміну повідомленнями."
   },
   "sendMessage": {
-    "placeholder": "Type your message here...",
+    "placeholder": "Введіть ваше повідомлення тут...",
     "sendButton": "Надіслати"
   },
   "actionsMenu": {
-    "addReactionLabel": "Add Reaction",
-    "replyLabel": "Reply"
+    "addReactionLabel": "Додати реакцію",
+    "replyLabel": "Відповісти"
   },
-  "item": {
-    "status": {
-      "delivered": {
-        "label": "Message delivered",
-        "displayText": "Message delivered"
-      },
-      "failed": {
-        "label": "Message delivery failed",
-        "displayText": "Delivery failed"
-      },
-      "unknown": {
-        "label": "Message status unknown",
-        "displayText": "Unknown state"
-      },
-      "waiting": {
-        "ariaLabel": "Sending message",
-        "displayText": "Waiting for delivery"
-      }
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Повідомлення доставлено",
+      "displayText": "Повідомлення доставлено"
+    },
+    "failed": {
+      "label": "Помилка доставлення повідомлення",
+      "displayText": "Надсилання не відбулося"
+    },
+    "unknown": {
+      "label": "Статус повідомлення невідомий",
+      "displayText": "Невідомий стан"
+    },
+    "waiting": {
+      "label": "Надсилання повідомлення",
+      "displayText": "Очікування доставки"
     }
   }
 }

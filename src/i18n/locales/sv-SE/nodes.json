@@ -10,10 +10,15 @@
       "label": "Direktmeddelande {{shortName}}"
     },
     "favorite": {
-      "label": "Favorit"
+      "label": "Favorit",
+      "tooltip": "Lägg till eller ta bort den här noden från dina favoriter"
     },
     "notFavorite": {
       "label": "Inte en favorit"
+    },
+    "error": {
+      "label": "Fel",
+      "text": "Ett fel inträffade vid hämtning av nodens detaljer. Försök igen senare."
     },
     "status": {
       "heard": "Hörd",
@@ -47,5 +52,12 @@
     "lastHeardStatus": {
       "never": "Aldrig"
     }
+  },
+  "actions": {
+    "added": "Tillagd",
+    "removed": "Borttagen",
+    "ignoreNode": "Ignorera nod",
+    "unignoreNode": "Ta bort ignorering",
+    "requestPosition": "Begär plats"
   }
 }

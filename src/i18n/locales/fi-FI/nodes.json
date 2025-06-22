@@ -10,10 +10,15 @@
       "label": "Suora Viesti {{shortName}}"
     },
     "favorite": {
-      "label": "Suosikki"
+      "label": "Suosikki",
+      "tooltip": "Lisää tai poista tämä laite suosikeistasi"
     },
     "notFavorite": {
       "label": "Ei suosikki"
+    },
+    "error": {
+      "label": "Virhe",
+      "text": "Tapahtui virhe haettaessa laitteen tietoja. Yritä uudelleen myöhemmin."
     },
     "status": {
       "heard": "Kuultu",
@@ -47,5 +52,12 @@
     "lastHeardStatus": {
       "never": "Ei koskaan"
     }
+  },
+  "actions": {
+    "added": "Lisätty",
+    "removed": "Poistettu",
+    "ignoreNode": "Älä huomioi laitetta",
+    "unignoreNode": "Huomioi laite uudelleen",
+    "requestPosition": "Pyydä sijaintia"
   }
 }

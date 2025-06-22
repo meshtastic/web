@@ -1,49 +1,49 @@
 {
   "navigation": {
-    "title": "Navigation",
+    "title": "Навигация",
     "messages": "Съобщения",
     "map": "Карта",
-    "config": "Config",
-    "radioConfig": "Radio Config",
-    "moduleConfig": "Module Config",
+    "config": "Конфигурация",
+    "radioConfig": "Конфигурация на радиото",
+    "moduleConfig": "Конфигурация на модула",
     "channels": "Канали",
     "nodes": "Възли"
   },
   "app": {
     "title": "Meshtastic",
-    "logo": "Meshtastic Logo"
+    "logo": "Лого на Meshtastic"
   },
   "sidebar": {
     "collapseToggle": {
       "button": {
-        "open": "Open sidebar",
-        "close": "Close sidebar"
+        "open": "Отваряне на страничната лента",
+        "close": "Затваряне на страничната лента"
       }
     },
     "deviceInfo": {
-      "volts": "{{voltage}} volts",
+      "volts": "{{voltage}} волта",
       "firmware": {
         "title": "Фърмуер",
         "version": "v{{version}}",
-        "buildDate": "Build date: {{date}}"
+        "buildDate": "Дата на компилация: {{date}}"
       },
       "deviceName": {
-        "title": "Device Name",
-        "changeName": "Change Device Name",
-        "placeholder": "Enter device name"
+        "title": "Име на устройството",
+        "changeName": "Промяна на името на устройството",
+        "placeholder": "Въвеждане на име на устройството"
       },
-      "editDeviceName": "Edit device name"
+      "editDeviceName": "Редактиране на името на устройство"
     }
   },
   "batteryStatus": {
-    "charging": "{{level}}% charging",
-    "pluggedIn": "Plugged in",
+    "charging": "{{level}}% зареждане",
+    "pluggedIn": "Включен в ел. мрежа",
     "title": "Батерия"
   },
   "search": {
-    "nodes": "Search nodes...",
-    "channels": "Search channels...",
-    "commandPalette": "Search commands..."
+    "nodes": "Търсене на възли...",
+    "channels": "Търсене на канали...",
+    "commandPalette": "Търсене на команди..."
   },
   "toast": {
     "positionRequestSent": {
@@ -59,35 +59,53 @@
       "title": "Traceroute sent."
     },
     "savedChannel": {
-      "title": "Saved Channel: {{channelName}}"
+      "title": "Запазен канал: {{channelName}}"
     },
     "messages": {
       "pkiEncryption": {
-        "title": "Chat is using PKI encryption."
+        "title": "Чатът използва PKI криптиране."
       },
       "pskEncryption": {
-        "title": "Chat is using PSK encryption."
+        "title": "Чатът използва PSK криптиране."
       }
     },
     "configSaveError": {
-      "title": "Error Saving Config",
-      "description": "An error occurred while saving the configuration."
+      "title": "Грешка при запазване на конфигурацията",
+      "description": "Възникна грешка при запазване на конфигурацията."
     },
     "validationError": {
-      "title": "Config Errors Exist",
-      "description": "Please fix the configuration errors before saving."
+      "title": "Съществуват грешки в конфигурацията",
+      "description": "Моля, коригирайте грешките в конфигурацията, преди да я запазите."
     },
     "saveSuccess": {
-      "title": "Saving Config",
-      "description": "The configuration change {{case}} has been saved."
+      "title": "Запазване на конфигурацията",
+      "description": "Промяната в конфигурацията {{case}} е запазена."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "action": {
+        "added": "Added",
+        "removed": "Removed",
+        "to": "to",
+        "from": "from"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "action": {
+        "added": "Added",
+        "removed": "Removed",
+        "to": "to",
+        "from": "from"
+      }
     }
   },
   "notifications": {
     "copied": {
-      "label": "Copied!"
+      "label": "Копирано!"
     },
     "copyToClipboard": {
-      "label": "Copy to clipboard"
+      "label": "Копиране в клипборда"
     },
     "hidePassword": {
       "label": "Скриване на паролата"
@@ -98,7 +116,7 @@
     "deliveryStatus": {
       "delivered": "Delivered",
       "failed": "Delivery Failed",
-      "waiting": "Waiting",
+      "waiting": "Изчакване",
       "unknown": "Unknown"
     }
   },
@@ -117,29 +135,32 @@
   "filter": {
     "label": "Филтър"
   },
+  "advanced": {
+    "label": "Advanced"
+  },
   "clearInput": {
     "label": "Clear input"
   },
   "resetFilters": {
-    "label": "Reset Filters"
+    "label": "Нулиране на филтрите"
   },
   "nodeName": {
-    "label": "Node name/number",
+    "label": "Име/номер на възел",
     "placeholder": "Meshtastic 1234"
   },
   "airtimeUtilization": {
     "label": "Airtime Utilization (%)"
   },
   "batteryLevel": {
-    "label": "Battery level (%)",
-    "labelText": "Battery level (%): {{value}}"
+    "label": "Ниво на батерията (%)",
+    "labelText": "Ниво на батерията (%): {{value}}"
   },
   "batteryVoltage": {
-    "label": "Battery voltage (V)",
+    "label": "Напрежение на батерията (V)",
     "title": "Напрежение"
   },
   "channelUtilization": {
-    "label": "Channel Utilization (%)"
+    "label": "Използване на канала (%)"
   },
   "hops": {
     "direct": "Direct",
@@ -149,13 +170,13 @@
   "lastHeard": {
     "label": "Последно чут",
     "labelText": "Last heard: {{value}}",
-    "nowLabel": "Now"
+    "nowLabel": "Сега"
   },
   "snr": {
     "label": "SNR (db)"
   },
   "favorites": {
-    "label": "Favorites"
+    "label": "Любими"
   },
   "hide": {
     "label": "Hide"
@@ -164,38 +185,44 @@
     "label": "Show Only"
   },
   "viaMqtt": {
-    "label": "Connected via MQTT"
+    "label": "Свързан чрез MQTT"
+  },
+  "hopsUnknown": {
+    "label": "Unknown number of hops"
+  },
+  "showUnheard": {
+    "label": "Never heard"
   },
   "language": {
     "label": "Език",
-    "changeLanguage": "Change Language"
+    "changeLanguage": "Промяна на езика"
   },
   "theme": {
     "dark": "Тъмна",
     "light": "Светла",
-    "system": "Automatic",
-    "changeTheme": "Change Color Scheme"
+    "system": "Автоматично",
+    "changeTheme": "Промяна на цветовата схема"
   },
   "errorPage": {
     "title": "This is a little embarrassing...",
     "description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
     "description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
-    "reportInstructions": "Please include the following information in your report:",
+    "reportInstructions": "Моля, включете следната информация в доклада си:",
     "reportSteps": {
-      "step1": "What you were doing when the error occurred",
-      "step2": "What you expected to happen",
-      "step3": "What actually happened",
-      "step4": "Any other relevant information"
+      "step1": "Какво правехте, когато възникна грешката",
+      "step2": "Какво очаквахте да се случи",
+      "step3": "Какво всъщност се случи",
+      "step4": "Всяка друга подходяща информация"
     },
-    "reportLink": "You can report the issue to our <0>GitHub</0>",
-    "dashboardLink": "Return to the <0>dashboard</0>",
-    "detailsSummary": "Error Details",
-    "errorMessageLabel": "Error message:",
+    "reportLink": "Можете да съобщите за проблема в нашия <0>GitHub</0>",
+    "dashboardLink": "Връщане към <0>таблото</0>",
+    "detailsSummary": "Подробности за грешката",
+    "errorMessageLabel": "Съобщение за грешка:",
     "stackTraceLabel": "Stack trace:",
     "fallbackError": "{{error}}"
   },
   "footer": {
-    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
+    "text": "Задвижвано от <0>▲ Vercel</0> | Meshtastic® е регистрирана търговска марка на Meshtastic LLC. | <1>Правна информация</1>",
     "commitSha": "Commit SHA: {{sha}}"
   }
 }

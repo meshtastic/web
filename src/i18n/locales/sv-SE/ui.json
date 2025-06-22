@@ -80,6 +80,24 @@
     "saveSuccess": {
       "title": "Sparar inställningarna",
       "description": "Ändrignarna av {{case}}-inställningarna har sparats."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} dina favoriter.",
+      "action": {
+        "added": "La till",
+        "removed": "Tog bort",
+        "to": "till",
+        "from": "från"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} dina ignorerade noder",
+      "action": {
+        "added": "La till",
+        "removed": "Tog bort",
+        "to": "till",
+        "from": "från"
+      }
     }
   },
   "notifications": {
@@ -116,6 +134,9 @@
   },
   "filter": {
     "label": "Filter"
+  },
+  "advanced": {
+    "label": "Advancerat"
   },
   "clearInput": {
     "label": "Rensa inmatning"
@@ -166,9 +187,15 @@
   "viaMqtt": {
     "label": "Ansluten via MQTT"
   },
+  "hopsUnknown": {
+    "label": "Okänt antal hopp"
+  },
+  "showUnheard": {
+    "label": "Aldrig hörd"
+  },
   "language": {
     "label": "Språk",
-    "changeLanguage": "Ändra språk"
+    "changeLanguage": "Byt språk"
   },
   "theme": {
     "dark": "Mörkt",

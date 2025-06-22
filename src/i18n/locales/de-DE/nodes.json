@@ -10,10 +10,15 @@
       "label": "Direktnachricht {{shortName}}"
     },
     "favorite": {
-      "label": "Favorit"
+      "label": "Favorit",
+      "tooltip": "Diesen Knoten zu Favoriten hinzufügen oder entfernen"
     },
     "notFavorite": {
       "label": "Kein Favorit"
+    },
+    "error": {
+      "label": "Fehler",
+      "text": "Beim Abrufen der Knotendetails ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
     },
     "status": {
       "heard": "Gehört",
@@ -47,5 +52,12 @@
     "lastHeardStatus": {
       "never": "Nie"
     }
+  },
+  "actions": {
+    "added": "Hinzugefügt",
+    "removed": "Entfernt",
+    "ignoreNode": "Knoten ignorieren",
+    "unignoreNode": "Knoten akzeptieren",
+    "requestPosition": "Standort anfordern"
   }
 }

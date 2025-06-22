@@ -63,7 +63,8 @@
       "newDeviceButton": "Neues Gerät"
     },
     "validation": {
-      "requiresFeatures": "Dieser Verbindungstyp erfordert <0></0>. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
+      "requiresWebBluetooth": "Dieser Verbindungstyp erfordert <0>Bluetooth</0> im Browser. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
+      "requiresWebSerial": "Dieser Verbindungstyp erfordert <0>Serielle Schnittstelle</0> im Browser. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
       "requiresSecureContext": "Diese Anwendung erfordert einen <0>sicheren Kontext</0>. Bitte verbinden Sie sich über HTTPS oder localhost.",
       "additionallyRequiresSecureContext": "Zusätzlich erfordert es einen <0>sicheren Kontext</0>. Bitte verbinden Sie sich über HTTPS oder localhost."
     }
@@ -92,7 +93,6 @@
     "unignoreNode": "Knoten akzeptieren"
   },
   "pkiBackup": {
-    "description": "Wir empfehlen die regelmäßige Sicherung Ihrer Schlüsseldaten. Möchten Sie jetzt sicheren?",
     "loseKeysWarning": "Wenn Sie Ihre Schlüssel verlieren, müssen Sie Ihr Gerät zurücksetzen.",
     "secureBackup": "Es ist wichtig, dass Sie Ihre öffentlichen und privaten Schlüssel sichern und diese sicher speichern!",
     "footer": "=== END OF KEYS ===",
@@ -101,6 +101,13 @@
     "publicKey": "Öffentlicher Schlüssel:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
     "title": "Schlüssel sichern"
+  },
+  "pkiBackupReminder": {
+    "description": "Wir empfehlen die regelmäßige Sicherung Ihrer Schlüsseldaten. Möchten Sie jetzt sicheren?",
+    "title": "Erinnerungen für Sicherungen",
+    "remindLaterPrefix": "Erinnerung in:",
+    "remindNever": "Nie erinnern",
+    "backupNow": "Jetzt sichern"
   },
   "pkiRegenerate": {
     "description": "Sind Sie sicher, dass Sie Schlüsselpaar neu erstellen möchten?",
@@ -155,5 +162,10 @@
     "choosingRightDeviceRole": "Wahl der richtigen Geräterolle",
     "deviceRoleDocumentation": "Dokumentation der Geräterolle",
     "title": "Bist Du sicher?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Ja, ich weiß, was ich tue!",
+    "title": "Bist Du sicher?",
+    "description": "Das Aktivieren des verwalteten Modus blockiert das Schreiben der Einstellungen in das Funkgerät durch alle Anwendungen (einschließlich der Webanwendung). Einmal aktiviert, können die Einstellungen <bold>nur</bold> durch administrative Nachrichten geändert werden. Diese Einstellung ist für die Fernverwaltung von abgesetzten Knoten nicht erforderlich."
   }
 }

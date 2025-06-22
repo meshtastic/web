@@ -1,69 +1,70 @@
 {
   "deleteMessages": {
-    "description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-    "title": "Clear All Messages"
+    "description": "Това действие ще изчисти цялата история на съобщенията. Това не може да бъде отменено. Сигурни ли сте, че искате да продължите?",
+    "title": "Изчистване на всички съобщения"
   },
   "deviceName": {
-    "description": "The Device will restart once the config is saved.",
-    "longName": "Long Name",
-    "shortName": "Short Name",
-    "title": "Change Device Name"
+    "description": "Устройството ще се рестартира, след като конфигурацията бъде запазена.",
+    "longName": "Дълго име",
+    "shortName": "Кратко име",
+    "title": "Промяна на името на устройството"
   },
   "import": {
     "description": "The current LoRa configuration will be overridden.",
     "error": {
-      "invalidUrl": "Invalid Meshtastic URL"
+      "invalidUrl": "Невалиден Meshtastic URL"
     },
-    "channelPrefix": "Channel: ",
+    "channelPrefix": "Канал: ",
     "channelSetUrl": "Channel Set/QR Code URL",
-    "channels": "Channels:",
+    "channels": "Канали:",
     "usePreset": "Use Preset?",
     "title": "Import Channel Set"
   },
   "locationResponse": {
-    "altitude": "Altitude: ",
-    "coordinates": "Coordinates: ",
-    "title": "Location: {{identifier}}"
+    "altitude": "Надморска височина: ",
+    "coordinates": "Координати:",
+    "title": "Местоположение: {{identifier}}"
   },
   "pkiRegenerateDialog": {
     "title": "Regenerate Pre-Shared Key?",
     "description": "Are you sure you want to regenerate the pre-shared key?",
-    "regenerate": "Regenerate"
+    "regenerate": "Регенериране"
   },
   "newDeviceDialog": {
-    "title": "Connect New Device",
+    "title": "Свързване на ново устройство",
     "https": "https",
     "http": "http",
     "tabHttp": "HTTP",
     "tabBluetooth": "Bluetooth",
     "tabSerial": "Serial",
-    "useHttps": "Use HTTPS",
-    "connecting": "Connecting...",
+    "useHttps": "Използване на HTTPS",
+    "connecting": "Свързване...",
     "connect": "Свързване",
     "connectionFailedAlert": {
-      "title": "Connection Failed",
-      "descriptionPrefix": "Could not connect to the device. ",
-      "httpsHint": "If using HTTPS, you may need to accept a self-signed certificate first. ",
-      "openLinkPrefix": "Please open ",
-      "openLinkSuffix": " in a new tab",
-      "acceptTlsWarningSuffix": ", accept any TLS warnings if prompted, then try again",
-      "learnMoreLink": "Learn more"
+      "title": "Връзката е неуспешна",
+      "descriptionPrefix": "Не може да се свърже с устройството.",
+      "httpsHint": "Ако използвате HTTPS, може да се наложи първо да приемете самоподписан сертификат. ",
+      "openLinkPrefix": "Моля, отворете",
+      "openLinkSuffix": "в нов раздел",
+      "acceptTlsWarningSuffix": "",
+      "learnMoreLink": "Научете повече"
     },
     "httpConnection": {
-      "label": "IP Address/Hostname",
+      "label": "IP адрес/Име на хост",
       "placeholder": "000.000.000.000 / meshtastic.local"
     },
     "serialConnection": {
-      "noDevicesPaired": "No devices paired yet.",
-      "newDeviceButton": "New device",
+      "noDevicesPaired": "Все още няма сдвоени устройства.",
+      "newDeviceButton": "Ново устройство",
       "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
     },
     "bluetoothConnection": {
-      "noDevicesPaired": "No devices paired yet.",
-      "newDeviceButton": "New device"
+      "noDevicesPaired": "Все още няма сдвоени устройства.",
+      "newDeviceButton": "Ново устройство"
     },
     "validation": {
-      "requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
+      "requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
+      "requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
       "requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
       "additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
     }
@@ -74,17 +75,17 @@
     "traceRoute": "Trace Route",
     "airTxUtilization": "Air TX utilization",
     "allRawMetrics": "All Raw Metrics:",
-    "batteryLevel": "Battery level",
-    "channelUtilization": "Channel utilization",
-    "details": "Details:",
+    "batteryLevel": "Ниво на батерията",
+    "channelUtilization": "Използване на канала",
+    "details": "Подробности:",
     "deviceMetrics": "Device Metrics:",
-    "hardware": "Hardware: ",
-    "lastHeard": "Last Heard: ",
+    "hardware": "Хардуер: ",
+    "lastHeard": "Последно чут: ",
     "nodeHexPrefix": "Node Hex: !",
-    "nodeNumber": "Node Number: ",
-    "position": "Position:",
-    "role": "Role: ",
-    "uptime": "Uptime: ",
+    "nodeNumber": "Номер на възела: ",
+    "position": "Позиция:",
+    "role": "Роля: ",
+    "uptime": "Време на работа: ",
     "voltage": "Напрежение",
     "title": "Node Details for {{identifier}}",
     "ignoreNode": "Ignore node",
@@ -92,36 +93,42 @@
     "unignoreNode": "Unignore node"
   },
   "pkiBackup": {
-    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
-    "loseKeysWarning": "If you lose your keys, you will need to reset your device.",
-    "secureBackup": "Its important to backup your public and private keys and store your backup securely!",
-    "footer": "=== END OF KEYS ===",
-    "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-    "privateKey": "Private Key:",
-    "publicKey": "Public Key:",
+    "loseKeysWarning": "Ако загубите ключовете си, ще трябва да нулирате устройството си.",
+    "secureBackup": "Важно е да направите резервно копие на публичните и частните си ключове и да съхранявате резервното си копие сигурно!",
+    "footer": "=== КРАЙ НА КЛЮЧОВЕТЕ ===",
+    "header": "=== MESHTASTIC КЛЮЧОВЕ ЗА {{longName}} ({{shortName}}) ===",
+    "privateKey": "Частен ключ:",
+    "publicKey": "Публичен ключ:",
     "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
     "title": "Backup Keys"
   },
+  "pkiBackupReminder": {
+    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
+    "title": "Backup Reminder",
+    "remindLaterPrefix": "Remind me in",
+    "remindNever": "Never remind me",
+    "backupNow": "Back up now"
+  },
   "pkiRegenerate": {
-    "description": "Are you sure you want to regenerate key pair?",
-    "title": "Regenerate Key Pair"
+    "description": "Сигурни ли сте, че искате да регенерирате двойката ключове?",
+    "title": "Регенериране на двойката ключове"
   },
   "qr": {
-    "addChannels": "Add Channels",
-    "replaceChannels": "Replace Channels",
-    "description": "The current LoRa configuration will also be shared.",
+    "addChannels": "Добавяне на канали",
+    "replaceChannels": "Замяна на канали",
+    "description": "Текущата конфигурация на LoRa също ще бъде споделена.",
     "sharableUrl": "Sharable URL",
-    "title": "Generate QR Code"
+    "title": "Генериране на QR код"
   },
   "rebootOta": {
-    "title": "Schedule Reboot",
+    "title": "Планирано рестартиране",
     "description": "Reboot the connected node after a delay into OTA (Over-the-Air) mode.",
-    "enterDelay": "Enter delay (sec)",
-    "scheduled": "Reboot has been scheduled"
+    "enterDelay": "Въведете забавяне (сек)",
+    "scheduled": "Насрочено е рестартиране"
   },
   "reboot": {
-    "title": "Schedule Reboot",
-    "description": "Reboot the connected node after x minutes."
+    "title": "Планирано рестартиране",
+    "description": "Рестартиране на свързания възел след x минути."
   },
   "refreshKeys": {
     "description": {
@@ -133,12 +140,12 @@
     "title": "Keys Mismatch - {{identifier}}"
   },
   "removeNode": {
-    "description": "Are you sure you want to remove this Node?",
-    "title": "Remove Node?"
+    "description": "Сигурни ли сте, че искате да премахнете този възел?",
+    "title": "Премахване на възела?"
   },
   "shutdown": {
-    "title": "Schedule Shutdown",
-    "description": "Turn off the connected node after x minutes."
+    "title": "Планирано изключване",
+    "description": "Изключване на свързания възел след x минути."
   },
   "traceRoute": {
     "routeToDestination": "Route to destination:",
@@ -148,12 +155,17 @@
     "title": "Traceroute: {{identifier}}"
   },
   "unsafeRoles": {
-    "confirmUnderstanding": "Yes, I know what I'm doing",
+    "confirmUnderstanding": "Да, знам какво правя",
     "conjunction": " and the blog post about ",
     "postamble": " and understand the implications of changing the role.",
     "preamble": "I have read the ",
     "choosingRightDeviceRole": "Choosing The Right Device Role",
     "deviceRoleDocumentation": "Device Role Documentation",
     "title": "Сигурни ли сте?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Да, знам какво правя",
+    "title": "Сигурни ли сте?",
+    "description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can <bold>only</bold> be changed through Remote Admin messages. This setting is not required for remote node administration."
   }
 }

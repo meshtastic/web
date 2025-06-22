@@ -1,7 +1,7 @@
 {
   "page": {
     "sectionLabel": "Канали",
-    "channelName": "Channel: {{channelName}}",
+    "channelName": "Канал: {{channelName}}",
     "broadcastLabel": "Primary",
     "channelIndex": "Ch {{index}}"
   },
@@ -24,7 +24,7 @@
   "psk": {
     "label": "Pre-Shared Key",
     "description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
-    "generate": "Generate"
+    "generate": "Генериране"
   },
   "name": {
     "label": "Име",
@@ -39,11 +39,11 @@
     "description": "Send messages from MQTT to the local mesh"
   },
   "positionPrecision": {
-    "label": "Location",
+    "label": "Местоположение",
     "description": "The precision of the location to share with the channel. Can be disabled.",
     "options": {
-      "none": "Do not share location",
-      "precise": "Precise Location",
+      "none": "Да не се споделя местоположението",
+      "precise": "Точно местоположение",
       "metric_km23": "Within 23 kilometers",
       "metric_km12": "Within 12 kilometers",
       "metric_km5_8": "Within 5.8 kilometers",
