@@ -51,7 +51,7 @@ interface MessageItemProps {
 export const MessageItem = ({ message }: MessageItemProps) => {
   const { getNode } = useDevice();
   const { getMyNodeNum } = useMessageStore();
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("messages");
 
   const MESSAGE_STATUS_MAP = useMemo(
     (): Record<MessageState, MessageStatusInfo> => ({
@@ -78,7 +78,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   );
 
   const UNKNOWN_STATUS = useMemo((): MessageStatusInfo => ({
-    displayText: t("delveryStatus.unknown.displayText"),
+    displayText: t("deliveryStatus.unknown.displayText"),
     icon: AlertCircle,
     ariaLabel: t("deliveryStatus.unknown.label"),
     iconClassName: "text-red-500 dark:text-red-400",
@@ -99,7 +99,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   const { displayName, shortName, isFavorite } = useMemo(() => {
     const userIdHex = message.from.toString(16).toUpperCase().padStart(2, "0");
     const last4 = userIdHex.slice(-4);
-    const fallbackName = t("message_item_fallbackName_withLastFour", { last4 });
+    const fallbackName = t("fallbackName", { last4 });
     const longName = messageUser?.user?.longName;
     const derivedShortName = messageUser?.user?.shortName || fallbackName;
     const derivedDisplayName = longName || derivedShortName;

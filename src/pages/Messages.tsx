@@ -47,7 +47,7 @@ export const MessagesPage = () => {
     getNodes,
     getNode,
     hasNodeError,
-    unreadCounts,
+    getUnreadCount,
     resetUnread,
     connection,
   } = useDevice();
@@ -105,7 +105,7 @@ export const MessagesPage = () => {
     })
       .map((node) => ({
         ...node,
-        unreadCount: unreadCounts.get(node.num) ?? 0,
+        unreadCount: getUnreadCount(node.num) ?? 0,
       }))
       .sort((a, b) => {
         const diff = b.unreadCount - a.unreadCount;
@@ -211,7 +211,7 @@ export const MessagesPage = () => {
         {filteredChannels?.map((channel) => (
           <SidebarButton
             key={channel.index}
-            count={unreadCounts.get(channel.index)}
+            count={getUnreadCount(channel.index)}
             label={channel.settings?.name ||
               (channel.index === 0
                 ? t("page.broadcastLabel", { ns: "channels" })
@@ -236,10 +236,10 @@ export const MessagesPage = () => {
     </Sidebar>
   ), [
     filteredChannels,
-    unreadCounts,
     numericChatId,
     chatType,
     isCollapsed,
+    getUnreadCount,
     navigateToChat,
     resetUnread,
     t,
@@ -249,7 +249,7 @@ export const MessagesPage = () => {
     () => (
       <SidebarSection
         label=""
-        className="px-0 flex flex-col h-full overflow-y-auto"
+        className="px-0 flex-col h-full overflow-y-auto"
       >
         <label className="p-2 block">
           <Input
