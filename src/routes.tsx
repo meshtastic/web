@@ -1,17 +1,32 @@
-import { createRoute, redirect } from "@tanstack/react-router";
+import {
+  createRootRouteWithContext,
+  createRoute,
+  createRouter,
+  redirect,
+} from "@tanstack/react-router";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import MapPage from "@pages/Map/index.tsx";
 import ConfigPage from "@pages/Config/index.tsx";
 import ChannelsPage from "@pages/Channels.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
-import { createRootRoute } from "@tanstack/react-router";
-import { App } from "./App.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { z } from "zod";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { App } from "./App.tsx";
+import { useTranslation } from "react-i18next";
 
-const rootRoute = createRootRoute({
-  component: App,
+interface AppContext {
+  stores: {
+    app: ReturnType<typeof useAppStore>;
+    message: ReturnType<typeof useMessageStore>;
+  };
+  i18n: ReturnType<typeof useTranslation>;
+}
+
+export const rootRoute = createRootRouteWithContext<AppContext>()({
+  component: () => <App />,
 });
 
 const indexRoute = createRoute({
@@ -96,7 +111,7 @@ const dialogWithParamsRoute = createRoute({
   component: DialogManager,
 });
 
-export const routeTree = rootRoute.addChildren([
+const routeTree = rootRoute.addChildren([
   indexRoute,
   messagesRoute,
   messagesWithParamsRoute,
@@ -107,4 +122,14 @@ export const routeTree = rootRoute.addChildren([
   dialogWithParamsRoute,
 ]);
 
-export { rootRoute };
+const router = createRouter({
+  routeTree,
+  context: {
+    stores: {
+      app: {} as ReturnType<typeof useAppStore>,
+      message: {} as ReturnType<typeof useMessageStore>,
+    },
+    i18n: {} as ReturnType<typeof import("react-i18next").useTranslation>,
+  },
+});
+export { router };

@@ -114,6 +114,8 @@ export interface Device {
   hasNodeError: (nodeNum: number) => boolean;
   incrementUnread: (nodeNum: number) => void;
   resetUnread: (nodeNum: number) => void;
+  getUnreadCount: (nodeNum: number) => number;
+  getAllUnreadCount: () => number;
   getNodes: (
     filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
   ) => Protobuf.Mesh.NodeInfo[];
@@ -663,6 +665,24 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
                 device.unreadCounts.set(nodeNum, currentCount + 1);
               }),
             );
+          },
+          getUnreadCount: (nodeNum: number): number => {
+            const device = get().devices.get(id);
+            if (!device) {
+              return 0;
+            }
+            return device.unreadCounts.get(nodeNum) ?? 0;
+          },
+          getAllUnreadCount: (): number => {
+            const device = get().devices.get(id);
+            if (!device) {
+              return 0;
+            }
+            let totalUnread = 0;
+            device.unreadCounts.forEach((count) => {
+              totalUnread += count;
+            });
+            return totalUnread;
           },
           resetUnread: (nodeNum: number) => {
             set(
