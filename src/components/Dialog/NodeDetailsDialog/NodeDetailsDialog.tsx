@@ -82,6 +82,7 @@ export const NodeDetailsDialog = ({
   function handleDirectMessage() {
     if (!node) return;
     navigate({ to: `/messages/direct/${node.num}` });
+    setDialogOpen("nodeDetails", false);
   }
 
   function handleRequestPosition() {

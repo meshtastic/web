@@ -70,7 +70,7 @@ const Generator = (
       key: "bit8",
     },
     {
-      text: t("security.empty"),
+      text: t("security.0bit"),
       value: "0",
       key: "bit0",
     },
