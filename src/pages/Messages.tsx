@@ -249,7 +249,7 @@ export const MessagesPage = () => {
     () => (
       <SidebarSection
         label=""
-        className="px-0 flex-col h-full overflow-y-auto"
+        className="px-0 flex flex-col h-full overflow-y-auto"
       >
         <label className="p-2 block">
           <Input

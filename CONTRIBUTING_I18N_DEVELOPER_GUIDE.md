@@ -13,8 +13,7 @@ your needs already exists. Many common labels like "Save," "Cancel," "Name,"
 "Description," "Loading...," or "Error" are likely already present, especially
 in the common.json namespace. Reusing existing keys prevents duplication and
 ensures consistency across the application. Using your code editor's search
-function across the /src/i18n/locales/en/ directory is an effective way to do
-this.
+function across the /i18n/locales/en/ directory is an effective way to do this.
 
 ### Key Naming and Structure Rules
 
@@ -58,7 +57,7 @@ when creating new keys in the JSON files.
 ### Namespace Rules
 
 We use namespaces to organize keys. All source keys are added to the English
-(`en`) files located at `/src/i18n/locales/en/`. Place your new keys in the
+(`en`) files located at `/i18n/locales/en/`. Place your new keys in the
 appropriate file based on these rules:
 
 - `common.json`:

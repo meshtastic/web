@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { viteStaticCopy } from "vite-plugin-static-copy";
 import { execSync } from "node:child_process";
 import process from "node:process";
 import path from "node:path";
@@ -27,14 +26,6 @@ export default defineConfig({
     //     sourcemap: true,
     //   },
     // }),
-    viteStaticCopy({
-      targets: [
-        {
-          src: "src/i18n/locales/**/*",
-          dest: "src/i18n/locales",
-        },
-      ],
-    }),
   ],
   define: {
     "import.meta.env.VITE_COMMIT_HASH": JSON.stringify(hash),

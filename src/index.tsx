@@ -4,7 +4,7 @@ import { enableMapSet } from "immer";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import "./i18n/config.ts";
+import "./i18n-config.ts";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { router } from "@app/routes.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
