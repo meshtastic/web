@@ -1,6 +1,6 @@
 import { Check, Languages } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { LangCode, supportedLanguages } from "../i18n/config.ts";
+import { LangCode, supportedLanguages } from "@app/i18n-config.ts";
 import useLang from "@core/hooks/useLang.ts";
 import {
   DropdownMenu,

@@ -5,7 +5,7 @@ import {
   Lang,
   LangCode,
   supportedLanguages,
-} from "../../i18n/config.ts";
+} from "@app/i18n-config.ts";
 import useLocalStorage from "./useLocalStorage.ts";
 
 const STORAGE_KEY = "language";

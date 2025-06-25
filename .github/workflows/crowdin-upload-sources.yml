@@ -2,10 +2,10 @@ name: Crowdin Upload Sources Action
 
 on:
   push:
-    # Monitor all .json files within the /src/i18n/locales/en/ directory.
+    # Monitor all .json files within the /i18n/locales/en/ directory.
     # This ensures the workflow triggers if any the English namespace files are modified on the main branch.
     paths:
-      - "/src/i18n/locales/en/*.json"
+      - "/i18n/locales/en/*.json"
     branches: [main]
   workflow_dispatch: # Allow manual triggering
 
