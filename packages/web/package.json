@@ -1,6 +1,6 @@
 {
   "name": "meshtastic-web",
-  "version": "2.6.0-0",
+  "version": "2.7.0-0",
   "type": "module",
   "description": "Meshtastic web client",
   "license": "GPL-3.0-only",
@@ -110,7 +110,6 @@
     "testing-library": "^0.0.2",
     "typescript": "^5.8.3",
     "vite": "^7.0.0",
-    "vite-plugin-pwa": "^1.0.0",
     "vitest": "^3.2.4"
   }
 }
