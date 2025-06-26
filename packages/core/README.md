@@ -9,7 +9,7 @@
 ## Overview
 
 `@meshtastic/core` Provides core functionality for interfacing with Meshtastic
-devices. Installation instructions are avaliable at
+devices. Installation instructions are available at
 [JSR](https://jsr.io/@meshtastic/core)
 
 ## Usage
