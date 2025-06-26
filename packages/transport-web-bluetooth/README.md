@@ -9,7 +9,7 @@
 ## Overview
 
 `@meshtastic/transport-web-bluetooth` Provides Web Bluetooth transport for
-Meshtastic devices. Installation instructions are avaliable at
+Meshtastic devices. Installation instructions are available at
 [JSR](https://jsr.io/@meshtastic/transport-web-bluetooth)
 
 ## Usage
