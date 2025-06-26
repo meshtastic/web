@@ -5,7 +5,7 @@ import {
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
-import "../i18n/config.ts";
+import "@app/i18n-config.ts";
 import { routeTree } from "../routeTree.gen.ts";
 
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";

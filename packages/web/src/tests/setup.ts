@@ -5,34 +5,34 @@ import "@testing-library/jest-dom";
 import "@testing-library/user-event";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import channelsEN from "../../public/i18n/locales/en/channels.json" with {
+import channelsEN from "@public/i18n/locales/en/channels.json" with {
   type: "json",
 };
-import commandPaletteEN from "../../public/i18n/locales/en/commandPalette.json" with {
+import commandPaletteEN from "@public/i18n/locales/en/commandPalette.json" with {
   type: "json",
 };
-import commonEN from "../../public/i18n/locales/en/common.json" with {
+import commonEN from "@public/i18n/locales/en/common.json" with {
   type: "json",
 };
-import deviceConfigEN from "../../public/i18n/locales/en/deviceConfig.json" with {
+import deviceConfigEN from "@public/i18n/locales/en/deviceConfig.json" with {
   type: "json",
 };
-import moduleConfigEN from "../../public/i18n/locales/en/moduleConfig.json" with {
+import moduleConfigEN from "@public/i18n/locales/en/moduleConfig.json" with {
   type: "json",
 };
-import dashboardEN from "../../public/i18n/locales/en/dashboard.json" with {
+import dashboardEN from "@public/i18n/locales/en/dashboard.json" with {
   type: "json",
 };
-import dialogEN from "../../public/i18n/locales/en/dialog.json" with {
+import dialogEN from "@public/i18n/locales/en/dialog.json" with {
   type: "json",
 };
-import messagesEN from "../../public/i18n/locales/en/messages.json" with {
+import messagesEN from "@public/i18n/locales/en/messages.json" with {
   type: "json",
 };
-import nodesEN from "../../public/i18n/locales/en/nodes.json" with {
+import nodesEN from "@public/i18n/locales/en/nodes.json" with {
   type: "json",
 };
-import uiEN from "../../public/i18n/locales/en/ui.json" with { type: "json" };
+import uiEN from "@public/i18n/locales/en/ui.json" with { type: "json" };
 
 enableMapSet();
 

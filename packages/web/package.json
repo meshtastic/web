@@ -15,7 +15,8 @@
     "test": "deno run -A npm:vitest",
     "check": "deno check",
     "preview": "deno run -A npm:vite preview",
-    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
+    "generate:routes": "deno run -A npm:@tanstack/router-cli generate --outDir src/ routes --rootRoutePath /",
+    "package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
   },
   "repository": {
     "type": "git",
@@ -26,12 +27,6 @@
   },
   "simple-git-hooks": {
     "pre-commit": "deno task lint:fix && deno task format"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "deno task lint:fix",
-      "deno task format"
-    ]
   },
   "homepage": "https://meshtastic.org",
   "dependencies": {
@@ -61,8 +56,10 @@
     "@radix-ui/react-tooltip": "^1.2.4",
     "@tanstack/react-router": "^1.120.15",
     "@tanstack/react-router-devtools": "^1.120.16",
+    "@tanstack/router-cli": "^1.121.37",
     "@tanstack/router-devtools": "^1.120.15",
     "@turf/turf": "^7.2.0",
+    "@types/node": "^24.0.4",
     "@types/web-bluetooth": "^0.0.21",
     "base64-js": "^1.5.1",
     "class-variance-authority": "^0.7.1",
@@ -95,7 +92,6 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/chrome": "^0.0.318",
-    "@types/node": "^22.15.3",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.3",
     "@types/serviceworker": "^0.0.133",
@@ -113,8 +109,8 @@
     "tar": "^7.4.3",
     "testing-library": "^0.0.2",
     "typescript": "^5.8.3",
-    "vite": "^6.3.4",
+    "vite": "^7.0.0",
     "vite-plugin-pwa": "^1.0.0",
-    "vitest": "^3.1.2"
+    "vitest": "^3.2.4"
   }
 }
