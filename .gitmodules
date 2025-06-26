@@ -1,3 +1,0 @@
-[submodule "src/core/connection"]
-	path = src/core/connection
-	url = https://github.com/meshtastic/js.git
