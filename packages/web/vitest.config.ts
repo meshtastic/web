@@ -13,6 +13,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@app": path.resolve(process.cwd(), "./src"),
+      "@public": path.resolve(process.cwd(), "./public"),
       "@core": path.resolve(process.cwd(), "./src/core"),
       "@pages": path.resolve(process.cwd(), "./src/pages"),
       "@components": path.resolve(process.cwd(), "./src/components"),

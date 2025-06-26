@@ -21,26 +21,30 @@ jobs:
           deno-version: v2.x
 
       - name: Install Dependencies
+        working-directory: packages/web
         run: deno install
       
       - name: Run tests
+        working-directory: packages/web
         run: deno task test
 
       - name: Build Package
+        working-directory: packages/web
         run: deno task build
 
       - name: Package Output
+        working-directory: packages/web
         run: deno task package
 
       - name: Archive compressed build
         uses: actions/upload-artifact@v4
         with:
           name: build
-          path: dist/build.tar
+          path: packages/web/dist/build.tar
 
       - name: Attach build.tar to release
         run: |
-          gh release upload ${{ github.event.release.tag_name }} dist/build.tar
+          gh release upload ${{ github.event.release.tag_name }} packages/web/dist/build.tar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

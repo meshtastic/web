@@ -1,59 +1,24 @@
 {
-  "imports": {
-    "@app/": "./src/",
-    "@pages/": "./src/pages/",
-    "@components/": "./src/components/",
-    "@core/": "./src/core/",
-    "@layouts/": "./src/layouts/",
-    "@std/path": "jsr:@std/path@^1.1.0"
-  },
-  "include": ["src", "./vite-env.d.ts"],
-  "compilerOptions": {
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext",
-      "deno.window",
-      "deno.ns"
-    ],
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "strictNullChecks": true,
-    "types": [
-      "vite/client",
-      "node",
-      "npm:@types/w3c-web-serial",
-      "npm:@types/web-bluetooth"
-    ],
-    "strictPropertyInitialization": false
-  },
-  "fmt": {
-    "exclude": [
-      "src/routeTree.gen.ts",
-      "*.test.ts",
-      "*.test.tsx"
-    ]
-  },
+  "workspace": [
+    "./packages/web"
+  ],
+  "imports": {},
+  "nodeModulesDir": "auto",
   "lint": {
     "exclude": [
-      "src/routeTree.gen.ts",
+      "*routeTree.gen.ts",
       "*.test.ts",
       "*.test.tsx"
     ],
     "report": "pretty"
   },
-  "exclude": [
-    "routeTree.gen.ts",
-    "node_modules/",
-    "dist",
-    "build",
-    "coverage",
-    "out",
-    ".vscode-test"
-  ],
+  "fmt": {
+    "exclude": [
+      "*routeTree.gen.ts",
+      "*.test.ts",
+      "*.test.tsx"
+    ]
+  },
   "unstable": [
     "sloppy-imports"
   ]

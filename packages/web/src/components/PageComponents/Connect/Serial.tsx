@@ -9,7 +9,6 @@ import { MeshDevice } from "@meshtastic/core";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { SerialPort } from "w3c-web-serial";
 import { useMessageStore } from "@core/stores/messageStore/index.ts";
 
 export const Serial = (

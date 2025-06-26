@@ -65,7 +65,7 @@ export default function LanguageSwitcher({
           </Subtle>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="center" className="w-64">
+      <DropdownMenuContent align="center" className="w-48">
         {supportedLanguages.map((language) => (
           <DropdownMenuItem
             key={language.code}

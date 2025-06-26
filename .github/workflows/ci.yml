@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-deno-
 
       - name: Cache Dependencies
-        run: deno cache src/index.tsx
+        run: deno cache /packages/web/src/index.tsx
 
       - name: Run linter
         run: deno task lint
