@@ -68,7 +68,7 @@ monorepo. Follow the installation instructions on their home page.
    ```
 2. **Install dependencies for all packages:**
    ```bash
-   deno i
+   deno task install:all 
    ```
    This command installs all necessary dependencies for all packages within the
    monorepo.
@@ -80,7 +80,7 @@ monorepo. Follow the installation instructions on their home page.
 To start the development server for the web client:
 
 ```bash
-deno task dev --filter packages/web
+deno task --filter web dev
 ```
 
 This will typically run the web client on http://localhost:3000 and requires a
@@ -93,18 +93,8 @@ specific development scripts if defined within their deno.json files. For
 example, to run tests for a specific package:
 
 ```bash
-deno test packages/core
+deno task --filter core test
 ```
-
-### Building All Projects
-
-To build all projects in this monorepo:
-
-```bash
-deno task build --filter .
-```
-
-This will build both the web client and all JS packages.
 
 ### Feedback
 
