@@ -47,7 +47,7 @@ const hardwareModelToFilename: { [key: string]: string } = {
 };
 
 export const DeviceImage = ({ deviceType, className }: DeviceImageProps) => {
-  const getPath = (device: string) => `/${device}`;
+  const getPath = (device: string) => `/devices/${device}`;
   const device = hardwareModelToFilename[deviceType] || "unknown.svg";
   return <img className={className} src={getPath(device)} alt={device} />;
 };

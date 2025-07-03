@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useTransition } from "react";
+import type React from "react";
+import { useEffect, useState, useTransition } from "react";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -101,7 +102,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         setDisplayedNodeCount(currentNodeCountValue);
       });
     }
-  }, [currentNodeCountValue, displayedNodeCount, startNodeCountTransition]);
+  }, [currentNodeCountValue, displayedNodeCount]);
 
   const pages: NavLink[] = [
     {
@@ -146,7 +147,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         )}
       >
         <img
-          src="/Logo.svg"
+          src="/logo.svg"
           alt={t("app.logo")}
           className="size-10 flex-shrink-0 rounded-xl"
         />
@@ -163,10 +164,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         </h2>
       </div>
 
-      <SidebarSection
-        label={t("navigation.title")}
-        className="mt-4 px-0"
-      >
+      <SidebarSection label={t("navigation.title")} className="mt-4 px-0">
         {pages.map((link) => {
           return (
             <SidebarButton
@@ -186,12 +184,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
         })}
       </SidebarSection>
 
-      <div
-        className={cn(
-          "flex-1 min-h-0",
-          isCollapsed && "overflow-hidden",
-        )}
-      >
+      <div className={cn("flex-1 min-h-0", isCollapsed && "overflow-hidden")}>
         {children}
       </div>
 
