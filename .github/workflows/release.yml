@@ -23,7 +23,7 @@ jobs:
       - name: Install Dependencies
         working-directory: packages/web
         run: deno install
-      
+
       - name: Run tests
         working-directory: packages/web
         run: deno task test

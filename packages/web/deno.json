@@ -8,6 +8,20 @@
     "@layouts/": "./src/layouts/",
     "@std/path": "jsr:@std/path@^1.1.0"
   },
+  "tasks": {
+    "build": "vite build",
+    "build:analyze": "BUNDLE_ANALYZE=true deno task build",
+    "lint": "deno lint src/",
+    "lint:fix": "deno lint --fix src/",
+    "format": "deno fmt src/",
+    "dev": "deno task dev:ui",
+    "dev:ui": "VITE_APP_VERSION=development deno run -A npm:vite dev",
+    "test": "deno run -A npm:vitest",
+    "check": "deno check",
+    "preview": "deno run -A npm:vite preview",
+    "generate:routes": "deno run -A npm:@tanstack/router-cli generate --outDir src/ routes --rootRoutePath /",
+    "package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
+  },
   "include": ["src", "./vite-env.d.ts"],
   "compilerOptions": {
     "lib": [

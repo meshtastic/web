@@ -1,4 +1,4 @@
-name: 'Nightly Release'
+name: "Nightly Release"
 
 on:
   schedule:

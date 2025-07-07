@@ -68,7 +68,7 @@ monorepo. Follow the installation instructions on their home page.
    ```
 2. **Install dependencies for all packages:**
    ```bash
-   deno task install:all 
+   deno task install:all
    ```
    This command installs all necessary dependencies for all packages within the
    monorepo.
