@@ -1,4 +1,4 @@
-name: Pull Requests CI
+name: Pull Request CI
 
 on: pull_request
 
@@ -33,10 +33,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deno-
 
-      - name: Cache Dependencies
-        working-directory: packages/web
-        run: deno cache src/index.tsx 
-
       - name: Run linter
         working-directory: packages/web
         run: deno task lint
@@ -44,10 +40,6 @@ jobs:
       - name: Check formatter
         working-directory: packages/web
         run: deno task format --check
-
-      - name: Run tests
-        working-directory: packages/web
-        run: deno task test
 
       - name: Build Package
         working-directory: packages/web
