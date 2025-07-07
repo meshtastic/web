@@ -36,10 +36,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deno-
 
-      - name: Cache Dependencies
-        working-directory: packages/web
-        run: deno cache src/index.tsx 
-
       - name: Run linter
         working-directory: packages/web
         run: deno task lint
