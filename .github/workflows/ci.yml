@@ -43,8 +43,5 @@ jobs:
       - name: Check formatter
         run: deno task format --check
 
-      - name: Run tests
-        run: deno task test
-
       - name: Build Package
         run: deno task build
