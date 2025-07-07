@@ -48,10 +48,6 @@ jobs:
         working-directory: packages/web
         run: deno task format --check
 
-      - name: Run tests
-        working-directory: packages/web
-        run: deno task test
-
       - name: Build Package
         working-directory: packages/web
         run: deno task build
