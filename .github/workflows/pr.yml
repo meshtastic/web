@@ -1,9 +1,6 @@
-name: Push to Main CI
+name: Pull Request CI
 
-on:
-  push:
-    branches:
-      - main
+on: pull_request
 
 permissions:
   contents: write
