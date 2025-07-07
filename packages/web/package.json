@@ -85,7 +85,6 @@
     "@types/js-cookie": "^3.0.6",
     "@types/w3c-web-serial": "^1.0.8",
     "@vitejs/plugin-react": "^4.6.0",
-    "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.5",
     "autoprefixer": "^10.4.21",
     "gzipper": "^8.2.1",
     "happy-dom": "^18.0.1",

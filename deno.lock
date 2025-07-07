@@ -6,7 +6,6 @@
     "jsr:@std/path@^1.1.0": "1.1.1",
     "npm:@bufbuild/protobuf@^2.2.3": "2.6.0",
     "npm:@bufbuild/protobuf@^2.6.0": "2.6.0",
-    "npm:@deno/vite-plugin@^1.0.5": "1.0.5_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@types+node@22.16.0",
     "npm:@hookform/resolvers@^5.1.1": "5.1.1_react-hook-form@7.60.0__react@19.1.0_react@19.1.0",
     "npm:@jsr/meshtastic__core@2.6.4": "2.6.4",
     "npm:@jsr/meshtastic__js@2.6.0-0": "2.6.0-0",
@@ -375,12 +374,6 @@
     },
     "@bufbuild/protobuf@2.6.0": {
       "integrity": "sha512-6cuonJVNOIL7lTj5zgo/Rc2bKAo4/GvN+rKCrUj7GdEHRzCk8zKOfFwUsL9nAVk5rSIsRmlgcpLzTRysopEeeg=="
-    },
-    "@deno/vite-plugin@1.0.5_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@types+node@22.16.0": {
-      "integrity": "sha512-tLja5n4dyMhcze1NzvSs2iiriBymfBlDCZIrjMTxb9O2ru0gvmV6mn5oBD2teNw5Sd92cj3YJzKwsAs8tMJXlg==",
-      "dependencies": [
-        "vite"
-      ]
     },
     "@emnapi/core@1.4.4": {
       "integrity": "sha512-A9CnAbC6ARNMKcIcrQwq6HeHCjpcBZ5wSx4U01WXCqEKlrzB9F9315WDNHkrs2xbx7YjjSxbUYxuN6EQzpcY2g==",
@@ -5143,7 +5136,6 @@
         "packageJson": {
           "dependencies": [
             "npm:@bufbuild/protobuf@^2.6.0",
-            "npm:@deno/vite-plugin@^1.0.5",
             "npm:@hookform/resolvers@^5.1.1",
             "npm:@jsr/meshtastic__core@2.6.4",
             "npm:@jsr/meshtastic__js@2.6.0-0",

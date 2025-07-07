@@ -39,7 +39,7 @@ jobs:
 
       - name: Check formatter
         working-directory: packages/web
-        run: deno format --check
+        run: deno fmt --check
 
       - name: Build Package
         working-directory: packages/web
