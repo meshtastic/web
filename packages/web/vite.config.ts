@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import deno from "@deno/vite-plugin";
 import { execSync } from "node:child_process";
 import process from "node:process";
 import path from "node:path";
@@ -16,7 +15,6 @@ try {
 export default defineConfig({
   plugins: [
     react(),
-    deno(),
     // VitePWA({
     //   registerType: "autoUpdate",
     //   strategies: "generateSW",
