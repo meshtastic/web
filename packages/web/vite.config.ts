@@ -27,6 +27,9 @@ export default defineConfig({
     //   },
     // }),
   ],
+  optimizeDeps: {
+    include: ["react/jsx-runtime"],
+  },
   define: {
     "import.meta.env.VITE_COMMIT_HASH": JSON.stringify(hash),
   },
