@@ -21,7 +21,7 @@ jobs:
 
       # --- Setup Deno ---
       - name: Setup Deno
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
@@ -61,7 +61,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          excluded=("packages/web")
+          excluded=("packages/web packages/transport-deno")
 
           for pkg_dir in ${{ steps.changed_packages.outputs.all_changed_and_modified_files }}; do
           echo "Processing package: $pkg_dir"
@@ -140,6 +140,7 @@ jobs:
           platforms: linux/amd64, linux/arm64
 
       - name: Push Container to GHCR
+        id: push-to-registry
         if: steps.web_changes.outputs.web_changed == 'true'
         uses: redhat-actions/push-to-registry@v2
         with:
