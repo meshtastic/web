@@ -71,7 +71,7 @@ jobs:
             fi
 
             echo "Building for NPM..."
-            deno task publish:npm "$pkg_dir"
+            deno task build:npm "$pkg_dir"
 
             echo "Publishing to NPM..."
             npm publish "$pkg_dir/npm" --access public

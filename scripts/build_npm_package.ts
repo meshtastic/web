@@ -73,7 +73,7 @@ try {
       name,
       version,
       description,
-      license: "MIT",
+      license: "GPL-3.0-only",
       repository: {
         type: "git",
         url: "git+https://github.com/meshtastic/web.git",
@@ -83,7 +83,7 @@ try {
       },
     },
     compilerOptions: {
-      lib: ["ES2022", "DOM"],
+      lib: ["DOM", "ESNext"],
     },
     postBuild() {
       Deno.copyFileSync("LICENSE", join(outDir, "LICENSE"));
@@ -99,34 +99,3 @@ try {
 }
 
 console.log(`✅ Successfully built ${name}@${version} to ${outDir}`);
-
-// // 5. Publish to NPM (only during adhoc runs)
-// // After a successful build, we publish the package to the npm registry.
-// if (Deno.env.get("GITHUB_ACTIONS") !== "true") {
-//   console.log(
-//     `\nPublishing ${name}@${version} to npm...`,
-//   );
-//   try {
-//     const command = new Deno.Command("npm", {
-//       args: ["publish", "--access", "public"],
-//       cwd: outDir, // Run the command in the output directory
-//     });
-//     const { code, stdout, stderr } = await command.output();
-
-//     // Write command output to the console
-//     await Deno.stdout.write(stdout);
-//     await Deno.stderr.write(stderr);
-
-//     if (code !== 0) {
-//       throw new Error(`'npm publish' failed with exit code: ${code}`);
-//     }
-//     console.log(`✅ Successfully published ${name}@${version} to npm.`);
-//   } catch (error) {
-//     if (error instanceof Deno.errors.NotFound) {
-//       console.error("\n❌ Publishing failed:", error.message);
-//       Deno.exit(1);
-//     }
-//   }
-// } else {
-//   console.log("\nSkipping publish step: Not running in GitHub Actions CI.");
-// }
