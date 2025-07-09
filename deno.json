@@ -3,7 +3,6 @@
     "./packages/web",
     "./packages/core",
     "./packages/transport-deno",
-    "./packages/transport-node",
     "./packages/transport-http",
     "./packages/transport-web-bluetooth",
     "./packages/transport-web-serial"

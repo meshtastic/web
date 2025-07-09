@@ -11,6 +11,7 @@
 `@meshtastic/transport-web-serial` Provides Web Serial transport for Meshtastic
 devices. Installation instructions are avaliable at
 [JSR](https://jsr.io/@meshtastic/transport-web-serial)
+[NPM](https://www.npmjs.com/package/@meshtastic/transport-web-serial)
 
 ## Usage
 

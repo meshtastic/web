@@ -25,8 +25,8 @@ All projects are located within the `packages/` directory:
 - **`packages/transport-web-bluetooth`:** Web Bluetooth Transport.
 - **`packages/transport-web-serial`:** Web Serial Transport.
 
-All `Meshtastic JS` packages (core and transports) are published to
-[JSR](https://jsr.io/@meshtastic).
+All `Meshtastic JS` packages (core and transports) are published both to
+[JSR](https://jsr.io/@meshtastic). [NPM](https://www.npmjs.com/org/meshtastic)
 
 ---
 
