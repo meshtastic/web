@@ -1,6 +1,6 @@
-# @meshtastic/transport-deno
+# @meshtastic/transport-node
 
-[![JSR](https://jsr.io/badges/@meshtastic/transport-deno)](https://jsr.io/@meshtastic/transport-deno)
+[![JSR](https://jsr.io/badges/@meshtastic/transport-node)](https://jsr.io/@meshtastic/transport-node)
 [![CI](https://img.shields.io/github/actions/workflow/status/meshtastic/js/ci.yml?branch=master&label=actions&logo=github&color=yellow)](https://github.com/meshtastic/js/actions/workflows/ci.yml)
 [![CLA assistant](https://cla-assistant.io/readme/badge/meshtastic/meshtastic.js)](https://cla-assistant.io/meshtastic/meshtastic.js)
 [![Fiscal Contributors](https://opencollective.com/meshtastic/tiers/badge.svg?label=Fiscal%20Contributors&color=deeppink)](https://opencollective.com/meshtastic/)
@@ -8,17 +8,18 @@
 
 ## Overview
 
-`@meshtastic/transport-deno` Provides TCP transport (Deno) for Meshtastic
+`@meshtastic/transport-node` Provides TCP transport (Node) for Meshtastic
 devices. Installation instructions are avaliable at
-[JSR](https://jsr.io/@meshtastic/transport-deno)
+[JSR](https://jsr.io/@meshtastic/transport-node)
+[NPM](https://www.npmjs.com/package/@meshtastic/transport-node)
 
 ## Usage
 
 ```ts
 import { MeshDevice } from "@meshtastic/core";
-import { TransportDeno } from "@meshtastic/transport-deno";
+import { TransportNode } from "@meshtastic/transport-node";
 
-const transport = await TransportDeno.create("10.10.0.57");
+const transport = await TransportNode.create("10.10.0.57");
 const device = new MeshDevice(transport);
 ```
 
