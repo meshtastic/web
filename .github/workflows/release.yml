@@ -40,6 +40,7 @@ jobs:
         with:
           dir_names: true
           files: packages/**
+          files_ignore: "packages/web/**,packages/transport-deno/npm/**"
 
       # --- Setup Node for NPM Publishing ---
       - name: Setup Node.js
@@ -64,11 +65,6 @@ jobs:
           excluded=("packages/web packages/transport-deno")
 
           for pkg_dir in ${{ steps.changed_packages.outputs.all_changed_and_modified_files }}; do
-          echo "Processing package: $pkg_dir"
-            if [[ " ${excluded[@]} " =~ " $pkg_dir " ]]; then
-             echo "Skipping $pkg_dir (excluded)"
-             continue
-            fi
 
             echo "Building for NPM..."
             deno task build:npm "$pkg_dir"
@@ -91,6 +87,7 @@ jobs:
       # --- Web Package Specific Tasks ---
       - name: Check for Web Package Changes
         id: web_changes
+
         run: |
           if [[ "${{ steps.changed_packages.outputs.all_changed_and_modified_files }}" == *"packages/web"* ]]; then
             echo "web_changed=true" >> $GITHUB_OUTPUT
