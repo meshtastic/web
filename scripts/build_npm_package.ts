@@ -20,9 +20,9 @@ async function getJson(filePath: string) {
 }
 
 if (Deno.args.length !== 1) {
-  console.error("Usage: deno task publish:npm <path-to-package>");
+  console.error("Usage: deno task build:npm <path-to-package>");
   console.error(
-    "Example: deno task publish:npm packages/core",
+    "Example: deno task build:npm packages/core",
   );
   Deno.exit(1);
 }
