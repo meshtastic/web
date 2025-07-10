@@ -308,6 +308,7 @@ export const MessagesPage = () => {
     <PageLayout
       label={`${
         t("page.title", {
+          interpolation: { escapeValue: false },
           chatName: isBroadcast && currentChannel
             ? getChannelName(currentChannel)
             : isDirect && otherNode

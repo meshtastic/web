@@ -178,6 +178,6 @@
   "managedMode": {
     "confirmUnderstanding": "Yes, I know what I'm doing",
     "title": "Are you sure?",
-    "description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can <bold>only</bold> be changed through Remote Admin messages. This setting is not required for remote node administration."
+    "description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
   }
 }
