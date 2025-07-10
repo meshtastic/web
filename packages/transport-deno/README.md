@@ -11,6 +11,7 @@
 `@meshtastic/transport-deno` Provides TCP transport (Deno) for Meshtastic
 devices. Installation instructions are avaliable at
 [JSR](https://jsr.io/@meshtastic/transport-deno)
+[NPM](https://www.npmjs.com/org/meshtastic/transport-deno)
 
 ## Usage
 

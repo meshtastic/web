@@ -1,6 +1,7 @@
 {
   "name": "@meshtastic/transport-web-bluetooth",
   "version": "0.1.2",
+  "description": "A transport layer for Meshtastic applications using Web Bluetooth.",
   "exports": {
     ".": "./mod.ts"
   },

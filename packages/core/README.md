@@ -11,6 +11,7 @@
 `@meshtastic/core` Provides core functionality for interfacing with Meshtastic
 devices. Installation instructions are available at
 [JSR](https://jsr.io/@meshtastic/core)
+[NPM](https://www.npmjs.com/org/meshtastic)
 
 ## Usage
 

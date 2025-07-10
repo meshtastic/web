@@ -11,6 +11,7 @@
 `@meshtastic/transport-http` Provides HTTP(S) transport for Meshtastic devices.
 Installation instructions are available at
 [JSR](https://jsr.io/@meshtastic/transport-http)
+[NPM](https://www.npmjs.com/package/@meshtastic/transport-http)
 
 ## Usage
 

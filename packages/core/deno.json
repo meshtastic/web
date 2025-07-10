@@ -1,6 +1,7 @@
 {
   "name": "@meshtastic/core",
   "version": "2.6.4",
+  "description": "Core functionalities for Meshtastic web applications.",
   "exports": {
     ".": "./mod.ts"
   },
