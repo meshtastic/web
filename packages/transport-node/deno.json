@@ -1,0 +1,8 @@
+{
+  "name": "@meshtastic/transport-node",
+  "version": "0.0.1",
+  "description": "NodeJS-specific transport layer for Meshtastic web applications.",
+  "exports": {
+    ".": "./mod.ts"
+  }
+}

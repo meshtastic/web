@@ -6,4 +6,5 @@ stats.html
 dev-dist
 __screenshots__*
 *.diff
-npm
+npm/
+
