@@ -54,7 +54,7 @@ jobs:
         if: steps.changed_packages.outputs.all_changed_and_modified_files != ''
         run: npm whoami
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # --- Build and Publish Packages to NPM & JSR ---
       - name: Build and Publish Changed Packages
@@ -78,7 +78,7 @@ jobs:
             (cd "$pkg_dir" && deno publish --allow-dirty)
           done
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: No Packages Changed
         if: steps.changed_packages.outputs.all_changed_and_modified_files == ''
