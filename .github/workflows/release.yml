@@ -36,7 +36,7 @@ jobs:
       # --- Determine Changed Packages ---
       - name: Get Changed Package Directories
         id: changed_packages
-        uses: tj-actions/changed-files@v44
+        uses: tj-actions/changed-files@v46
         with:
           dir_names: true
           files: packages/**
