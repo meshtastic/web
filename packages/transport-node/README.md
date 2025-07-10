@@ -9,7 +9,7 @@
 ## Overview
 
 `@meshtastic/transport-node` Provides TCP transport (Node) for Meshtastic
-devices. Installation instructions are avaliable at
+devices. Installation instructions are available at
 [JSR](https://jsr.io/@meshtastic/transport-node)
 [NPM](https://www.npmjs.com/package/@meshtastic/transport-node)
 
