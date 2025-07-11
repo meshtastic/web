@@ -5,6 +5,5 @@ stats.html
 .vite
 dev-dist
 __screenshots__*
-*.diff
 npm/
-
+*.diff
