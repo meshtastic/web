@@ -60,7 +60,7 @@ export const Serial = (
           const product = usbProductId ?? t("unknown.shortName");
           return (
             <Button
-              key={`${vendor}-${product}-${port.getInfo().usbVendorId}-${port.getInfo().usbProductId}`}
+              key={`${vendor}-${product}-${index}`}
               disabled={port.readable !== null}
               variant="default"
               onClick={async () => {
