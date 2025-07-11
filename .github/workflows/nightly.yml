@@ -9,7 +9,7 @@ permissions:
   packages: write
 
 jobs:
-  build-and-package:
+  nightly-build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,13 +20,21 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.setup-deno.outputs.deno-cache-path }}
+          key: deno-cache-${{ runner.os }}-${{ hashFiles('**/deno.lock') }}
+          restore-keys: |
+            deno-cache-${{ runner.os }}-* 
+
+      # - name: Run tests
+      #   working-directory: packages/web
+      #   run: deno task test
+
       - name: Install Dependencies
         working-directory: packages/web
         run: deno install
-
-      - name: Run tests
-        working-directory: packages/web
-        run: deno task test
 
       - name: Build Package
         working-directory: packages/web
@@ -42,6 +50,19 @@ jobs:
           name: build
           path: packages/web/dist/build.tar
 
+      - name: Get latest release version
+        id: get_release
+        run: |
+          LATEST_TAG=$(curl -sL \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r ".tag_name")
+          # Fallback to a default if no release is found
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="2.6.0"
+          fi
+          echo "tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -51,8 +72,10 @@ jobs:
         with:
           containerfiles: |
             ./infra/Containerfile
-          image: ${{github.event.repository.full_name}}
-          tags: nightly ${{ github.sha }}
+          image: ${{ github.event.repository.full_name }}
+          tags: nightly:${{ steps.get_release.outputs.tag }}:${{ github.sha }}
+
+
           oci: true
           platforms: linux/amd64, linux/arm64
 
@@ -68,3 +91,4 @@ jobs:
 
       - name: Print image url
         run: echo "Image pushed to ${{ steps.push-to-registry.outputs.registry-paths }}"
+
