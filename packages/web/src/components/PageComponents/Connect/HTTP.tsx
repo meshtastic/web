@@ -26,7 +26,7 @@ export const HTTP = (
 ) => {
   const { t } = useTranslation("dialog");
   const [connectionInProgress, setConnectionInProgress] = useState(false);
-  const isURLHTTPS = location.protocol === "https:";
+  // const isURLHTTPS = location.protocol === "https:";
 
   const { addDevice } = useDeviceStore();
   const messageStore = useMessageStore();
@@ -39,7 +39,7 @@ export const HTTP = (
         )
         ? "meshtastic.local"
         : globalThis.location.host,
-      tls: isURLHTTPS ? true : false,
+      tls: false,
     },
   });
 
