@@ -1,0 +1,39 @@
+{
+  "page": {
+    "title": "Повідомлення: {{chatName}}",
+    "placeholder": "Введіть повідомлення"
+  },
+  "emptyState": {
+    "title": "Оберіть чат",
+    "text": "Поки немає повідомлень."
+  },
+  "selectChatPrompt": {
+    "text": "Виберіть канал або вузол для початку обміну повідомленнями."
+  },
+  "sendMessage": {
+    "placeholder": "Введіть ваше повідомлення тут...",
+    "sendButton": "Надіслати"
+  },
+  "actionsMenu": {
+    "addReactionLabel": "Додати реакцію",
+    "replyLabel": "Відповісти"
+  },
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Повідомлення доставлено",
+      "displayText": "Повідомлення доставлено"
+    },
+    "failed": {
+      "label": "Помилка доставлення повідомлення",
+      "displayText": "Надсилання не відбулося"
+    },
+    "unknown": {
+      "label": "Статус повідомлення невідомий",
+      "displayText": "Невідомий стан"
+    },
+    "waiting": {
+      "label": "Надсилання повідомлення",
+      "displayText": "Очікування доставки"
+    }
+  }
+}

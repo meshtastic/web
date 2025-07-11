@@ -1,0 +1,12 @@
+{
+  "dashboard": {
+    "title": "Connected Devices",
+    "description": "Manage your connected Meshtastic devices.",
+    "connectionType_ble": "BLE",
+    "connectionType_serial": "Серійний порт",
+    "connectionType_network": "Мережа",
+    "noDevicesTitle": "No devices connected",
+    "noDevicesDescription": "Connect a new device to get started.",
+    "button_newConnection": "New Connection"
+  }
+}

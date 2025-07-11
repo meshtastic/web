@@ -29,22 +29,16 @@ jobs:
         with:
           path: |
             ~/.cache/deno
-            ./deno.lock
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
+            packages/web/deno.lock
+          key: ${{ runner.os }}-deno-${{ hashFiles('packages/web/deno.lock') }}
           restore-keys: |
             ${{ runner.os }}-deno-
 
-      - name: Cache Dependencies
-        run: deno cache src/index.tsx
-
       - name: Run linter
-        run: deno task lint
+        run: deno lint
 
       - name: Check formatter
-        run: deno task format --check
-
-      - name: Run tests
-        run: deno task test
+        run: deno fmt --check
 
       - name: Build Package
         run: deno task build

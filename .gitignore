@@ -5,4 +5,5 @@ stats.html
 .vite
 dev-dist
 __screenshots__*
-package-lock.json
+npm/
+*.diff

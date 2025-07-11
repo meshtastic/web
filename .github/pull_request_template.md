@@ -46,4 +46,5 @@ Check all that apply. If an item doesn't apply to your PR, you can leave it unch
 - [ ] Code follows project style guidelines
 - [ ] Documentation has been updated or added
 - [ ] Tests have been added or updated
-- [ ] All i18n translation labels have bee added
+- [ ] All i18n translation labels have been added (read
+      CONTRIBUTING_I18N_DEVELOPER_GUIDE.md for more details)

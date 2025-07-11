@@ -1,0 +1,50 @@
+{
+  "emptyState": "No results found.",
+  "page": {
+    "title": "Command Menu"
+  },
+  "pinGroup": {
+    "label": "Pin command group"
+  },
+  "unpinGroup": {
+    "label": "Unpin command group"
+  },
+  "goto": {
+    "label": "Goto",
+    "command": {
+      "messages": "메시지",
+      "map": "지도",
+      "config": "Config",
+      "channels": "채널",
+      "nodes": "Nodes"
+    }
+  },
+  "manage": {
+    "label": "Manage",
+    "command": {
+      "switchNode": "Switch Node",
+      "connectNewNode": "Connect New Node"
+    }
+  },
+  "contextual": {
+    "label": "Contextual",
+    "command": {
+      "qrCode": "QR Code",
+      "qrGenerator": "Generator",
+      "qrImport": "불러오기",
+      "scheduleShutdown": "Schedule Shutdown",
+      "scheduleReboot": "Schedule Reboot",
+      "rebootToOtaMode": "Reboot To OTA Mode",
+      "resetNodeDb": "Reset Node DB",
+      "factoryResetDevice": "Factory Reset Device",
+      "factoryResetConfig": "Factory Reset Config"
+    }
+  },
+  "debug": {
+    "label": "Debug",
+    "command": {
+      "reconfigure": "Reconfigure",
+      "clearAllStoredMessages": "Clear All Stored Message"
+    }
+  }
+}

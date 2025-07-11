@@ -1,0 +1,171 @@
+{
+  "deleteMessages": {
+    "description": "Questa azione cancellerà tutta la cronologia dei messaggi. Non può essere annullata. Sei sicuro di voler continuare?",
+    "title": "Cancella Tutti I Messaggi"
+  },
+  "deviceName": {
+    "description": "Il dispositivo verrà riavviato una volta salvata la configurazione.",
+    "longName": "Nome Lungo",
+    "shortName": "Nome Breve",
+    "title": "Cambia Nome Dispositivo"
+  },
+  "import": {
+    "description": "La configurazione attuale di LoRa sarà sovrascritta.",
+    "error": {
+      "invalidUrl": "URL Meshtastic non valido"
+    },
+    "channelPrefix": "Canale: ",
+    "channelSetUrl": "URL del Set di Canali/Codice QR",
+    "channels": "Canali:",
+    "usePreset": "Utilizza il preset?",
+    "title": "Importa Set Canale"
+  },
+  "locationResponse": {
+    "altitude": "Altitudine: ",
+    "coordinates": "Coordinate: ",
+    "title": "Posizione: {{identifier}}"
+  },
+  "pkiRegenerateDialog": {
+    "title": "Rigenerare La Chiave Pre-Condivisa?",
+    "description": "Sei sicuro di voler rigenerare la chiave pre-condivisa?",
+    "regenerate": "Rigenera"
+  },
+  "newDeviceDialog": {
+    "title": "Connetti Nuovo Dispositivo",
+    "https": "https",
+    "http": "http",
+    "tabHttp": "HTTP",
+    "tabBluetooth": "Bluetooth",
+    "tabSerial": "Seriale",
+    "useHttps": "Usa HTTPS",
+    "connecting": "Connessione in corso...",
+    "connect": "Connetti",
+    "connectionFailedAlert": {
+      "title": "Connessione fallita",
+      "descriptionPrefix": "Impossibile connettersi al dispositivo.",
+      "httpsHint": "Se si utilizza HTTPS, potrebbe essere necessario prima accettare un certificato autofirmato. ",
+      "openLinkPrefix": "Apri per favore ",
+      "openLinkSuffix": " in una nuova scheda",
+      "acceptTlsWarningSuffix": ", accetta eventuali avvisi TLS se richiesto, quindi riprova",
+      "learnMoreLink": "Maggiori informazioni"
+    },
+    "httpConnection": {
+      "label": "Indirizzo IP/Hostname",
+      "placeholder": "000.000.000.000 / meshtastic.local"
+    },
+    "serialConnection": {
+      "noDevicesPaired": "Nessun dispositivo ancora abbinato.",
+      "newDeviceButton": "Nuovo dispositivo",
+      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
+    },
+    "bluetoothConnection": {
+      "noDevicesPaired": "Nessun dispositivo ancora abbinato.",
+      "newDeviceButton": "Nuovo dispositivo"
+    },
+    "validation": {
+      "requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
+      "requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
+      "requiresSecureContext": "Questa applicazione richiede un <0>contesto sicuro</0>. Si prega di connettersi utilizzando HTTPS o localhost.",
+      "additionallyRequiresSecureContext": "Inoltre, richiede un <0>contesto sicuro</0>. Si prega di connettersi utilizzando HTTPS o localhost."
+    }
+  },
+  "nodeDetails": {
+    "message": "Messaggio",
+    "requestPosition": "Richiedi posizione",
+    "traceRoute": "Trace Route",
+    "airTxUtilization": "Tempo di Trasmissione Utilizzato",
+    "allRawMetrics": "Tutte Le Metriche Grezze:",
+    "batteryLevel": "Livello batteria",
+    "channelUtilization": "Utilizzo Canale",
+    "details": "Dettagli:",
+    "deviceMetrics": "Metriche Dispositivo:",
+    "hardware": "Hardware: ",
+    "lastHeard": "Ultimo Contatto: ",
+    "nodeHexPrefix": "Nodo Hex: !",
+    "nodeNumber": "Numero Nodo: ",
+    "position": "Posizione:",
+    "role": "Ruolo: ",
+    "uptime": "Tempo di attività: ",
+    "voltage": "Tensione",
+    "title": "Dettagli nodo per {{identifier}}",
+    "ignoreNode": "Ignora nodo",
+    "removeNode": "Rimuovi Nodo",
+    "unignoreNode": "Non ignorare più nodo"
+  },
+  "pkiBackup": {
+    "loseKeysWarning": "Se perdi le tue chiavi, dovrai reimpostare il tuo dispositivo.",
+    "secureBackup": "È importante eseguire il backup delle chiavi pubbliche e private e memorizzare il backup in modo sicuro!",
+    "footer": "=== END OF KEYS ===",
+    "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
+    "privateKey": "Chiave Privata:",
+    "publicKey": "Chiave Pubblica:",
+    "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
+    "title": "Backup chiavi"
+  },
+  "pkiBackupReminder": {
+    "description": "Ti consigliamo di eseguire regolarmente il backup delle tue chiavi. Vuoi eseguire un backup?",
+    "title": "Backup Reminder",
+    "remindLaterPrefix": "Remind me in",
+    "remindNever": "Never remind me",
+    "backupNow": "Back up now"
+  },
+  "pkiRegenerate": {
+    "description": "Sei sicuro di voler rigenerare la coppia di chiavi?",
+    "title": "Rigenera Coppia Chiavi"
+  },
+  "qr": {
+    "addChannels": "Aggiungi canali",
+    "replaceChannels": "Sostituisci Canali",
+    "description": "Anche l'attuale configurazione di LoRa verrà condivisa.",
+    "sharableUrl": "URL Condivisibile",
+    "title": "Genera codice QR"
+  },
+  "rebootOta": {
+    "title": "Pianifica Riavvio",
+    "description": "Riavvia il nodo connesso dopo un ritardo in modalità OTA (Over-the-Air).",
+    "enterDelay": "Inserisci ritardo (sec)",
+    "scheduled": "Il riavvio è stato pianificato"
+  },
+  "reboot": {
+    "title": "Pianifica Riavvio",
+    "description": "Riavvia il nodo connesso dopo x minuti."
+  },
+  "refreshKeys": {
+    "description": {
+      "acceptNewKeys": "Questo rimuoverà il nodo dal dispositivo e richiederà nuove chiavi.",
+      "keyMismatchReasonSuffix": ". Ciò è dovuto alla chiave pubblica corrente del nodo remoto che non corrisponde alla chiave precedentemente memorizzata per questo nodo.",
+      "unableToSendDmPrefix": "Il nodo non è in grado di inviare un messaggio diretto al nodo: "
+    },
+    "acceptNewKeys": "Accetta Nuove Chiavi",
+    "title": "Chiavi Non Corrispondenti - {{identifier}}"
+  },
+  "removeNode": {
+    "description": "Sei sicuro di voler rimuovere questo nodo?",
+    "title": "Rimuovi Nodo?"
+  },
+  "shutdown": {
+    "title": "Pianifica Spegnimento",
+    "description": "Spegni il nodo connesso dopo x minuti."
+  },
+  "traceRoute": {
+    "routeToDestination": "Percorso di destinazione:",
+    "routeBack": "Percorso indietro:"
+  },
+  "tracerouteResponse": {
+    "title": "Traceroute: {{identifier}}"
+  },
+  "unsafeRoles": {
+    "confirmUnderstanding": "Sì, so cosa sto facendo",
+    "conjunction": " e il blog post su ",
+    "postamble": " e capisco le implicazioni di un cambiamento di ruolo.",
+    "preamble": "Dichiaro di aver letto i ",
+    "choosingRightDeviceRole": "Scegliere il ruolo corretto del dispositivo",
+    "deviceRoleDocumentation": "Documentazione sul ruolo del dispositivo",
+    "title": "Sei sicuro?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Sì, so cosa sto facendo",
+    "title": "Sei sicuro?",
+    "description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can <bold>only</bold> be changed through Remote Admin messages. This setting is not required for remote node administration."
+  }
+}

@@ -1,0 +1,283 @@
+import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
+import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
+import { Sidebar } from "@components/Sidebar.tsx";
+import { Avatar } from "@components/UI/Avatar.tsx";
+import { Mono } from "@components/generic/Mono.tsx";
+import {
+  type DataRow,
+  type Heading,
+  Table,
+} from "@components/generic/Table/index.tsx";
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { Protobuf, type Types } from "@meshtastic/core";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { LockIcon, LockOpenIcon } from "lucide-react";
+import {
+  type JSX,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { base16 } from "rfc4648";
+import { Input } from "@components/UI/Input.tsx";
+import { PageLayout } from "@components/PageLayout.tsx";
+import {
+  type FilterState,
+  useFilterNode,
+} from "@components/generic/Filter/useFilterNode.ts";
+import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
+import { useTranslation } from "react-i18next";
+import useLang from "@core/hooks/useLang.ts";
+
+export interface DeleteNoteDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const NodesPage = (): JSX.Element => {
+  const { t } = useTranslation("nodes");
+  const { currentLanguage } = useLang();
+  const { getNodes, hardware, connection, hasNodeError, setDialogOpen } =
+    useDevice();
+  const { setNodeNumDetails } = useAppStore();
+  const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
+
+  const [selectedTraceroute, setSelectedTraceroute] = useState<
+    Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined
+  >();
+  const [selectedLocation, setSelectedLocation] = useState<
+    Types.PacketMetadata<Protobuf.Mesh.Position> | undefined
+  >();
+
+  const [filterState, setFilterState] = useState<FilterState>(() =>
+    defaultFilterValues
+  );
+  const deferredFilterState = useDeferredValue(filterState);
+
+  const filteredNodes = useMemo(
+    () => getNodes((node) => nodeFilter(node, deferredFilterState)),
+    [deferredFilterState, getNodes, nodeFilter],
+  );
+
+  useEffect(() => {
+    if (!connection) return;
+    connection.events.onTraceRoutePacket.subscribe(handleTraceroute);
+    return () => {
+      connection.events.onTraceRoutePacket.unsubscribe(handleTraceroute);
+    };
+  }, [connection]);
+
+  const handleTraceroute = useCallback(
+    (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
+      setSelectedTraceroute(traceroute);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!connection) return;
+    connection.events.onPositionPacket.subscribe(handleLocation);
+    return () => {
+      connection.events.onPositionPacket.subscribe(handleLocation);
+    };
+  }, [connection]);
+
+  const handleLocation = useCallback(
+    (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
+      if (location.to.valueOf() !== hardware.myNodeNum) return;
+      setSelectedLocation(location);
+    },
+    [hardware.myNodeNum],
+  );
+
+  function handleNodeInfoDialog(nodeNum: number): void {
+    setNodeNumDetails(nodeNum);
+    setDialogOpen("nodeDetails", true);
+  }
+
+  const tableHeadings: Heading[] = [
+    { title: "", sortable: false },
+    { title: t("nodesTable.headings.longName"), sortable: true },
+    { title: t("nodesTable.headings.connection"), sortable: true },
+    { title: t("nodesTable.headings.lastHeard"), sortable: true },
+    { title: t("nodesTable.headings.encryption"), sortable: false },
+    { title: t("unit.snr"), sortable: true },
+    { title: t("nodesTable.headings.model"), sortable: true },
+    { title: t("nodesTable.headings.macAddress"), sortable: true },
+  ];
+
+  const tableRows: DataRow[] = filteredNodes.map((node) => {
+    const macAddress = base16
+      .stringify(node.user?.macaddr ?? [])
+      .match(/.{1,2}/g)
+      ?.join(":") ?? t("unknown.shortName");
+
+    return {
+      id: node.num,
+      isFavorite: node.isFavorite,
+      cells: [
+        {
+          content: (
+            <Avatar
+              text={node.user?.shortName ?? t("unknown.shortName")}
+              showFavorite={node.isFavorite}
+              showError={hasNodeError(node.num)}
+            />
+          ),
+          sortValue: node.user?.shortName ?? "", // Non-sortable column
+        },
+        {
+          content: (
+            <h1
+              onMouseDown={() => handleNodeInfoDialog(node.num)}
+              onKeyUp={(evt) => {
+                evt.key === "Enter" && handleNodeInfoDialog(node.num);
+              }}
+              className="cursor-pointer underline ml-2 whitespace-break-spaces"
+              tabIndex={0}
+              role="button"
+            >
+              {node.user?.longName ?? numberToHexUnpadded(node.num)}
+            </h1>
+          ),
+          sortValue: node.user?.longName ?? numberToHexUnpadded(node.num),
+        },
+        {
+          content: (
+            <Mono className="w-16">
+              {node.hopsAway !== undefined
+                ? node?.viaMqtt === false && node.hopsAway === 0
+                  ? t("nodesTable.connectionStatus.direct")
+                  : `${node.hopsAway?.toString()} ${
+                    node.hopsAway ?? 0 > 1
+                      ? t("unit.hop.plural")
+                      : t("unit.hops_one")
+                  } ${t("nodesTable.connectionStatus.away")}`
+                : t("nodesTable.connectionStatus.unknown")}
+              {node?.viaMqtt === true
+                ? t("nodesTable.connectionStatus.viaMqtt")
+                : ""}
+            </Mono>
+          ),
+          sortValue: node.hopsAway ?? Number.MAX_SAFE_INTEGER,
+        },
+        {
+          content: (
+            <Mono>
+              {node.lastHeard === 0
+                ? <p>{t("nodesTable.lastHeardStatus.never")}</p>
+                : (
+                  <TimeAgo
+                    timestamp={node.lastHeard * 1000}
+                    locale={currentLanguage?.code}
+                  />
+                )}
+            </Mono>
+          ),
+          sortValue: node.lastHeard,
+        },
+        {
+          content: (
+            <Mono>
+              {node.user?.publicKey && node.user?.publicKey.length > 0
+                ? <LockIcon className="text-green-600 mx-auto" />
+                : <LockOpenIcon className="text-yellow-300 mx-auto" />}
+            </Mono>
+          ),
+          sortValue: "", // Non-sortable column
+        },
+        {
+          content: (
+            <Mono>
+              {node.snr}
+              {t("unit.dbm")}/
+              {Math.min(
+                Math.max((node.snr + 10) * 5, 0),
+                100,
+              )}%/{/* Percentage */}
+              {(node.snr + 10) * 5}
+              {t("unit.raw")}
+            </Mono>
+          ),
+          sortValue: node.snr,
+        },
+        {
+          content: (
+            <Mono>
+              {Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}
+            </Mono>
+          ),
+          sortValue: Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0],
+        },
+        {
+          content: <Mono>{macAddress}</Mono>,
+          sortValue: macAddress,
+        },
+      ],
+    };
+  });
+
+  return (
+    <>
+      <PageLayout
+        label=""
+        leftBar={<Sidebar />}
+      >
+        <div className="pl-2 pt-2 flex flex-row">
+          <div className="flex-1 mr-2">
+            <Input
+              placeholder={t("search.nodes")}
+              value={filterState.nodeName}
+              className="bg-transparent"
+              showClearButton={!!filterState.nodeName}
+              onChange={(e) =>
+                setFilterState((prev) => ({
+                  ...prev,
+                  nodeName: e.target.value,
+                }))}
+            />
+          </div>
+          <div className="flex justify-end">
+            <FilterControl
+              filterState={filterState}
+              defaultFilterValues={defaultFilterValues}
+              setFilterState={setFilterState}
+              isDirty={isFilterDirty(filterState)}
+              parameters={{
+                popoverContentProps: {
+                  side: "bottom",
+                  align: "end",
+                  sideOffset: 12,
+                },
+                popoverTriggerClassName: "mr-1 p-2",
+                showTextSearch: false,
+              }}
+            />
+          </div>
+        </div>
+        <div className="overflow-y-auto">
+          <Table
+            headings={tableHeadings}
+            rows={tableRows}
+          />
+          <TracerouteResponseDialog
+            traceroute={selectedTraceroute}
+            open={!!selectedTraceroute}
+            onOpenChange={() => setSelectedTraceroute(undefined)}
+          />
+          <LocationResponseDialog
+            location={selectedLocation}
+            open={!!selectedLocation}
+            onOpenChange={() => setSelectedLocation(undefined)}
+          />
+        </div>
+      </PageLayout>
+    </>
+  );
+};
+
+export default NodesPage;

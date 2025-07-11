@@ -1,0 +1,12 @@
+{
+  "dashboard": {
+    "title": "Dispositivi Connessi",
+    "description": "Gestisci i tuoi dispositivi Meshtastic collegati.",
+    "connectionType_ble": "BLE",
+    "connectionType_serial": "Seriale",
+    "connectionType_network": "Rete",
+    "noDevicesTitle": "Nessun dispositivo connesso",
+    "noDevicesDescription": "Connetti un nuovo dispositivo per iniziare.",
+    "button_newConnection": "Nuova connessione"
+  }
+}

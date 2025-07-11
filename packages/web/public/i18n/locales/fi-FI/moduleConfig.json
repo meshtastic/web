@@ -1,0 +1,448 @@
+{
+  "page": {
+    "tabAmbientLighting": "Ympäristövalaistus",
+    "tabAudio": "Ääni",
+    "tabCannedMessage": "Ennalta asetettu",
+    "tabDetectionSensor": "Havaitsemisanturi",
+    "tabExternalNotification": "Ext-ilmoitus",
+    "tabMqtt": "MQTT",
+    "tabNeighborInfo": "Naapuritieto",
+    "tabPaxcounter": "PAX-laskuri",
+    "tabRangeTest": "Kuuluvuustesti",
+    "tabSerial": "Sarjaliitäntä",
+    "tabStoreAndForward": "S&V",
+    "tabTelemetry": "Telemetria"
+  },
+  "ambientLighting": {
+    "title": "Ympäristövalaistuksen asetukset",
+    "description": "Ympäristövalaistuksen moduulin asetukset",
+    "ledState": {
+      "label": "Ledin tila",
+      "description": "Aseta ledi päälle tai pois päältä"
+    },
+    "current": {
+      "label": "Virta",
+      "description": "Asettaa nykyisen ledin ulostulon. Oletus on 10"
+    },
+    "red": {
+      "label": "Punainen",
+      "description": "Asettaa punaisen ledin tason. Arvot ovat 0-255"
+    },
+    "green": {
+      "label": "Vihreä",
+      "description": "Asettaa vihreän ledin tason. Arvot ovat 0-255"
+    },
+    "blue": {
+      "label": "Sininen",
+      "description": "Asettaa sinisen ledin tason. Arvot ovat 0-255"
+    }
+  },
+  "audio": {
+    "title": "Ääniasetukset",
+    "description": "Äänimoduulin asetukset",
+    "codec2Enabled": {
+      "label": "Codec 2 käytössä",
+      "description": "Ota Codec 2 äänenkoodaus käyttöön"
+    },
+    "pttPin": {
+      "label": "PTT pinni",
+      "description": "PTT:lle käytettävä GPIO-pinni"
+    },
+    "bitrate": {
+      "label": "Tiedonsiirtonopeus",
+      "description": "Tiedonsiirtonopeus äänenkoodaukselle"
+    },
+    "i2sWs": {
+      "label": "i2S WS",
+      "description": "GPIO-pinni jota käytetään i2S WS:ssä"
+    },
+    "i2sSd": {
+      "label": "i2S SD",
+      "description": "GPIO-pinni jota käytetään i2S SD:ssä"
+    },
+    "i2sDin": {
+      "label": "i2S DIN",
+      "description": "GPIO-pinni jota käytetään i2S DIN:ssä"
+    },
+    "i2sSck": {
+      "label": "i2S SD",
+      "description": "GPIO-pinni jota käytetään i2S SCK:ssa"
+    }
+  },
+  "cannedMessage": {
+    "title": "Välitettyjen viestien asetukset",
+    "description": "Asetukset välitettyjen viestien moduulissa",
+    "moduleEnabled": {
+      "label": "Moduuli Käytössä",
+      "description": "Ota käyttöön välitetyt viestit"
+    },
+    "rotary1Enabled": {
+      "label": "Kiertovalitsin #1 käytössä",
+      "description": "Ota kiertovalitsimen kooderi käyttöön"
+    },
+    "inputbrokerPinA": {
+      "label": "Kooderin pinni A",
+      "description": "GPIO-pinni (1–39) kooderin portille A"
+    },
+    "inputbrokerPinB": {
+      "label": "Kooderin pinni B",
+      "description": "GPIO-pinni (1–39) kooderin portille B"
+    },
+    "inputbrokerPinPress": {
+      "label": "Kooderin pinni painallukselle",
+      "description": "GPIO-pinni (1–39) kooderin painallukselle"
+    },
+    "inputbrokerEventCw": {
+      "label": "Myötäpäiväinen liike",
+      "description": "Valitse syöttötapahtuma."
+    },
+    "inputbrokerEventCcw": {
+      "label": "Myötäpäiväisen liikkeen laskuri",
+      "description": "Valitse syöttötapahtuma."
+    },
+    "inputbrokerEventPress": {
+      "label": "Painamisen tapahtuma",
+      "description": "Valitse syöttötapahtuma"
+    },
+    "updown1Enabled": {
+      "label": "Ylös alas käytössä",
+      "description": "Ota käyttöön ylös / alas-suuntaa tunnistava kooderi"
+    },
+    "allowInputSource": {
+      "label": "Salli syöttölaitteen lähde",
+      "description": "Valitse '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
+    },
+    "sendBell": {
+      "label": "Lähetä äänimerkki",
+      "description": "Lähettää äänimerkkimerkin jokaisen viestin mukana"
+    }
+  },
+  "detectionSensor": {
+    "title": "Tunnistinsensorin asetukset",
+    "description": "Tunnistinsensori-moduulin asetukset",
+    "enabled": {
+      "label": "Käytössä",
+      "description": "Ota käyttöön tai poista käytöstä tunnistinsensorin moduuli"
+    },
+    "minimumBroadcastSecs": {
+      "label": "Minimilähetys (sekuntia)",
+      "description": "Aikaväli sekunteina kuinka usein viestejä voi lähettää mesh-verkkoon tilamuutoksen havaitsemisen jälkeen"
+    },
+    "stateBroadcastSecs": {
+      "label": "Tilatiedon lähetys (sekuntia)",
+      "description": "Kuinka usein sekunteina lähetetään viesti mesh-verkkoon nykytilasta, vaikka tilassa ei olisi muutoksia"
+    },
+    "sendBell": {
+      "label": "Lähetä äänimerkki",
+      "description": "Lähetä ASCII-äänimerkki hälytyssanoman mukana"
+    },
+    "name": {
+      "label": "Käyttäjäystävälinen nimi",
+      "description": "Käytetään muotoilemaan mesh-verkkoon lähetettävä viesti, enintään 20 merkkiä"
+    },
+    "monitorPin": {
+      "label": "Valvonta pinni",
+      "description": "GPIO-pinni valvonnan tilan muutoksien seurantaan"
+    },
+    "detectionTriggerType": {
+      "label": "Tunnistuksen havaintotyyppi",
+      "description": "Käytettävän tunnistustapahtuman tyyppi"
+    },
+    "usePullup": {
+      "label": "Käytä vetokytkintä (pullup)",
+      "description": "Käytetäänkö GPIO-pinnin INPUT_PULLUP-tilaa"
+    }
+  },
+  "externalNotification": {
+    "title": "Ulkoisten ilmoituksien asetukset",
+    "description": "Määritä ulkoisten ilmoitusten moduulin asetukset",
+    "enabled": {
+      "label": "Moduuli käytössä",
+      "description": "Ota ulkoiset ilmoitukset käyttöön"
+    },
+    "outputMs": {
+      "label": "Ulostulo MS",
+      "description": "Ulostulo MS"
+    },
+    "output": {
+      "label": "Ulostulo",
+      "description": "Ulostulo"
+    },
+    "outputVibra": {
+      "label": "Värinän ulostulo",
+      "description": "Värinän ulostulo"
+    },
+    "outputBuzzer": {
+      "label": "Summerin ulostulo",
+      "description": "Summerin ulostulo"
+    },
+    "active": {
+      "label": "Käytössä",
+      "description": "Käytössä"
+    },
+    "alertMessage": {
+      "label": "Hälytysviesti",
+      "description": "Hälytysviesti"
+    },
+    "alertMessageVibra": {
+      "label": "Hälytysviestin värinä",
+      "description": "Hälytysviestin värinä"
+    },
+    "alertMessageBuzzer": {
+      "label": "Hälytysviestin summeri",
+      "description": "Hälytysviestin summeri"
+    },
+    "alertBell": {
+      "label": "Hälytysääni",
+      "description": "Pitäisikö hälytyksen aktivoitua, kun vastaanotetaan äänimerkki?"
+    },
+    "alertBellVibra": {
+      "label": "Hälytysäänen värinä",
+      "description": "Hälytysäänen värinä"
+    },
+    "alertBellBuzzer": {
+      "label": "Hälytysäänen summeri",
+      "description": "Hälytysäänen summeri"
+    },
+    "usePwm": {
+      "label": "Käytä PWM",
+      "description": "Käytä PWM"
+    },
+    "nagTimeout": {
+      "label": "Toistokehotuksen aikakatkaisu",
+      "description": "Toistokehotuksen aikakatkaisu"
+    },
+    "useI2sAsBuzzer": {
+      "label": "Use I²S pinniä summerille",
+      "description": "Määritä I²S-pinni summerin ulostuloon"
+    }
+  },
+  "mqtt": {
+    "title": "MQTT-asetukset",
+    "description": "MQTT-moduulin asetukset",
+    "enabled": {
+      "label": "Käytössä",
+      "description": "Ota MQTT käyttöön tai poista se käytöstä"
+    },
+    "address": {
+      "label": "MQTT-palvelimen osoite",
+      "description": "MQTT-palvelimen osoite, jota käytetään oletus- tai mukautetuissa palvelimissa"
+    },
+    "username": {
+      "label": "MQTT käyttäjänimi",
+      "description": "MQTT käyttäjänimi, jota käytetään oletus- tai mukautetuissa palvelimissa"
+    },
+    "password": {
+      "label": "MQTT salasana",
+      "description": "MQTT salasana, jota käytetään oletus- tai mukautetuissa palvelimissa"
+    },
+    "encryptionEnabled": {
+      "label": "Salaus käytössä",
+      "description": "Ota MQTT-salaus käyttöön tai pois käytöstä. Huom: Jos tämä asetus ei ole käytössä, kaikki viestit lähetetään MQTT-välittäjälle salaamattomina, vaikka lähetyskanavillasi olisi salausavaimet asetettuna. Tämä koskee myös sijaintitietoja."
+    },
+    "jsonEnabled": {
+      "label": "JSON käytössä",
+      "description": "Lähetetäänkö / otetaanko vastaan JSON-paketteja MQTT:llä"
+    },
+    "tlsEnabled": {
+      "label": "TLS käytössä",
+      "description": "Ota TLS käyttöön tai poista se käytöstä"
+    },
+    "root": {
+      "label": "Palvelimen osoite (root topic)",
+      "description": "MQTT-palvelimen osoite, jota käytetään oletus- tai mukautetuissa palvelimissa"
+    },
+    "proxyToClientEnabled": {
+      "label": "MQTT-välityspalvelin käytössä",
+      "description": "Käyttää verkkoyhteyttä välittämään MQTT-viestejä asiakkaalle."
+    },
+    "mapReportingEnabled": {
+      "label": "Karttaraportointi käytössä",
+      "description": "Laitteesi lähettää säännöllisin väliajoin salaamattoman karttaraporttipaketin määritettyyn MQTT-palvelimeen. Paketti sisältää tunnisteen, lyhyen ja pitkän nimen, likimääräisen sijainnin, laitteistomallin, roolin, laiteohjelmistoversion, LoRa-alueen, modeemin esiasetukset sekä ensisijaisen kanavan nimen."
+    },
+    "mapReportSettings": {
+      "publishIntervalSecs": {
+        "label": "Karttaraportoinnin aikaväli (s)",
+        "description": "Aikaväli sekunneissa karttaraporttien julkaisemiseksi"
+      },
+      "positionPrecision": {
+        "label": "Arvioitu sijainti",
+        "description": "Jaetun sijainnin tarkkuus on tämän etäisyyden rajoissa",
+        "options": {
+          "metric_km23": "23 kilometrin säteellä",
+          "metric_km12": "12 kilometrin säteellä",
+          "metric_km5_8": "5,8 kilometrin säteellä",
+          "metric_km2_9": "2,9 kilometrin säteellä",
+          "metric_km1_5": "1,5 kilometrin säteellä",
+          "metric_m700": "700 metrin säteellä",
+          "metric_m350": "350 metrin säteellä",
+          "metric_m200": "200 metrin säteellä",
+          "metric_m90": "90 metrin säteellä",
+          "metric_m50": "50 metrin säteellä",
+          "imperial_mi15": "15 mailin säteellä",
+          "imperial_mi7_3": "7,3 mailin säteellä",
+          "imperial_mi3_6": "3,6 mailin säteellä",
+          "imperial_mi1_8": "1,8 mailin säteellä",
+          "imperial_mi0_9": "0,9 mailin säteellä",
+          "imperial_mi0_5": "0,5 mailin säteellä",
+          "imperial_mi0_2": "0,2 mailin säteellä",
+          "imperial_ft600": "600 jalan säteellä",
+          "imperial_ft300": "300 jalan säteellä",
+          "imperial_ft150": "150 jalan säteellä"
+        }
+      }
+    }
+  },
+  "neighborInfo": {
+    "title": "Naapuritiedon asetukset",
+    "description": "Naapuritietojen moduulin asetukset",
+    "enabled": {
+      "label": "Käytössä",
+      "description": "Ota käyttöön tai poista käytöstä naapuruustietomoduuli"
+    },
+    "updateInterval": {
+      "label": "Päivitysväli",
+      "description": "Aikaväli sekunneissa siitä, kuinka usein mesh-verkossa lähetetään naapuritietoja verkkoon"
+    }
+  },
+  "paxcounter": {
+    "title": "Pax-laskurin asetukset",
+    "description": "Pax-laskurin moduulin asetukset",
+    "enabled": {
+      "label": "Moduuli käytössä",
+      "description": "Ota pax-laskuri käyttöön"
+    },
+    "paxcounterUpdateInterval": {
+      "label": "Päivityksen aikaväli (sekuntia)",
+      "description": "Kuinka kauan odotetaan pax-laskurin pakettien lähettämisen välillä"
+    },
+    "wifiThreshold": {
+      "label": "WiFi-RSSI kynnysarvo",
+      "description": "Millä WiFi RSSI tasolla laskurin täytyisi kasvaa. Oletus on -80."
+    },
+    "bleThreshold": {
+      "label": "WiFi-RSSI kynnysarvo",
+      "description": "Millä BLE RSSI-arvolla laskuri kasvaa. Oletus: -80."
+    }
+  },
+  "rangeTest": {
+    "title": "Kuuluvuustestin asetukset",
+    "description": "Kuuluvuustesti moduulin asetukset",
+    "enabled": {
+      "label": "Moduuli käytössä",
+      "description": "Ota kuuluvuustesti käytöön"
+    },
+    "sender": {
+      "label": "Viestin aikaväli",
+      "description": "Kuinka kauan odotetaan testipakettien lähettämisen välillä"
+    },
+    "save": {
+      "label": "Tallenna CSV tallennustilaan",
+      "description": "Vain ESP32"
+    }
+  },
+  "serial": {
+    "title": "Sarjaliitännän asetukset",
+    "description": "Sarjaliitäntä-moduulin asetukset",
+    "enabled": {
+      "label": "Sarjaliitäntä käytössä",
+      "description": "Ota sarjaliitäntä käyttöön"
+    },
+    "echo": {
+      "label": "Toista",
+      "description": "Kaikki lähettämäsi paketit toistetaan takaisin laitteellesi"
+    },
+    "rxd": {
+      "label": "Vastaanota PIN-koodi",
+      "description": "Määritä GPIO-pinni käyttämään aiemmin asetettua RXD-pinniä."
+    },
+    "txd": {
+      "label": "Lähetä PIN-koodi",
+      "description": "Määritä GPIO-pinni käyttämään aiemmin asetettua TXD-pinniä."
+    },
+    "baud": {
+      "label": "Baud-siirtonopeus",
+      "description": "Sarjaliitännän baud-siirtonopeus"
+    },
+    "timeout": {
+      "label": "Aikakatkaisu",
+      "description": "Kuinka monta sekuntia odotetaan, ennen kuin paketti merkitään valmiiksi"
+    },
+    "mode": {
+      "label": "Tila",
+      "description": "Valitse tila"
+    },
+    "overrideConsoleSerialPort": {
+      "label": "Ohita konsolin sarjaliitännän portti",
+      "description": "Jos sinulla on sarjaportti kytkettynä konsoliin, tämä ohittaa sen."
+    }
+  },
+  "storeForward": {
+    "title": "Varastoi & välitä asetukset",
+    "description": "Varastoi & välitä moduulin asetukset",
+    "enabled": {
+      "label": "Moduuli käytössä",
+      "description": "Ota varastoi & välitä käyttöön"
+    },
+    "heartbeat": {
+      "label": "Heartbeat käytössä",
+      "description": "Ota varastoi & välitä heartbeat käyttöön"
+    },
+    "records": {
+      "label": "Kirjausten määrä",
+      "description": "Tallennettavien tietueiden määrä"
+    },
+    "historyReturnMax": {
+      "label": "Historian maksimimäärä",
+      "description": "Enimmäismäärä tietueita palautettaviksi"
+    },
+    "historyReturnWindow": {
+      "label": "Historian aikamäärä",
+      "description": "Enimmäismäärä tietueita palautettaviksi"
+    }
+  },
+  "telemetry": {
+    "title": "Telemetrian asetukset",
+    "description": "Telemetria-moduulin asetukset",
+    "deviceUpdateInterval": {
+      "label": "Laitteen mittausloki",
+      "description": "Laitteen mittaustietojen päivitysväli (sekuntia)"
+    },
+    "environmentUpdateInterval": {
+      "label": "Ympäristötietojen päivitysväli (sekuntia)",
+      "description": ""
+    },
+    "environmentMeasurementEnabled": {
+      "label": "Moduuli käytössä",
+      "description": "Ota käyttöön ympäristön telemetria"
+    },
+    "environmentScreenEnabled": {
+      "label": "Näytetään näytöllä",
+      "description": "Näytä moduulin telemetriatiedot OLED-näytöllä"
+    },
+    "environmentDisplayFahrenheit": {
+      "label": "Näytä fahrenheitissa",
+      "description": "Näytä lämpötila fahrenheitissa"
+    },
+    "airQualityEnabled": {
+      "label": "Ilmanlaatu käytössä",
+      "description": "Ota ilmanlaadun telemetria käyttöön"
+    },
+    "airQualityInterval": {
+      "label": "Ilmanlaadun päivitysväli",
+      "description": "Kuinka usein ilmanlaadun tiedot lähetetään mesh-verkon kautta"
+    },
+    "powerMeasurementEnabled": {
+      "label": "Tehomittaus käytössä",
+      "description": "Ota tehomittauksen telemetria käyttöön"
+    },
+    "powerUpdateInterval": {
+      "label": "Tehomittauksen päivitysväli",
+      "description": "Kuinka usein tehomittauksen tiedot lähetetään mesh-verkon kautta"
+    },
+    "powerScreenEnabled": {
+      "label": "Tehomittauksen näyttö käytössä",
+      "description": "Ota tehomittauksen telemetrian näyttö käyttöön"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "page": {
+    "title": "Nachrichten: {{chatName}}",
+    "placeholder": "Nachricht eingeben"
+  },
+  "emptyState": {
+    "title": "Einen Chat auswählen",
+    "text": "Noch keine Nachrichten."
+  },
+  "selectChatPrompt": {
+    "text": "Wählen Sie einen Kanal oder Knoten, um Nachrichten zu schreiben."
+  },
+  "sendMessage": {
+    "placeholder": "Geben Sie hier Ihre Nachricht ein...",
+    "sendButton": "Senden"
+  },
+  "actionsMenu": {
+    "addReactionLabel": "Reaktion hinzufügen",
+    "replyLabel": "Antworten"
+  },
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Nachricht zugestellt",
+      "displayText": "Nachricht zugestellt"
+    },
+    "failed": {
+      "label": "Nachrichtenübermittlung fehlgeschlagen",
+      "displayText": "Zustellung fehlgeschlagen"
+    },
+    "unknown": {
+      "label": "Nachrichtenstatus unbekannt",
+      "displayText": "Unbekannter Status"
+    },
+    "waiting": {
+      "label": "Nachricht wird gesendet",
+      "displayText": "Warte auf Zustellung"
+    }
+  }
+}

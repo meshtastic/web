@@ -1,0 +1,428 @@
+{
+  "page": {
+    "title": "Конфигурация",
+    "tabBluetooth": "Bluetooth",
+    "tabDevice": "Устройство",
+    "tabDisplay": "Дисплей",
+    "tabLora": "LoRa",
+    "tabNetwork": "Мрежа",
+    "tabPosition": "Позиция",
+    "tabPower": "Захранване",
+    "tabSecurity": "Сигурност"
+  },
+  "sidebar": {
+    "label": "Модули"
+  },
+  "device": {
+    "title": "Настройки на устройството",
+    "description": "Настройки за устройството",
+    "buttonPin": {
+      "description": "Button pin override",
+      "label": "Button Pin"
+    },
+    "buzzerPin": {
+      "description": "Buzzer pin override",
+      "label": "Buzzer Pin"
+    },
+    "disableTripleClick": {
+      "description": "Disable triple click",
+      "label": "Disable Triple Click"
+    },
+    "doubleTapAsButtonPress": {
+      "description": "Treat double tap as button press",
+      "label": "Double Tap as Button Press"
+    },
+    "ledHeartbeatDisabled": {
+      "description": "Disable default blinking LED",
+      "label": "LED Heartbeat Disabled"
+    },
+    "nodeInfoBroadcastInterval": {
+      "description": "How often to broadcast node info",
+      "label": "Node Info Broadcast Interval"
+    },
+    "posixTimezone": {
+      "description": "The POSIX timezone string for the device",
+      "label": "POSIX часова зона"
+    },
+    "rebroadcastMode": {
+      "description": "How to handle rebroadcasting",
+      "label": "Rebroadcast Mode"
+    },
+    "role": {
+      "description": "What role the device performs on the mesh",
+      "label": "Роля"
+    }
+  },
+  "bluetooth": {
+    "title": "Настройки за Bluetooth",
+    "description": "Настройки за Bluetooth модула",
+    "note": "Забележка: Някои устройства (ESP32) не могат да използват едновременно Bluetooth и WiFi.",
+    "enabled": {
+      "description": "Активиране или дезактивиране на Bluetooth",
+      "label": "Активиран"
+    },
+    "pairingMode": {
+      "description": "Поведение при избор на ПИН.",
+      "label": "Режим на сдвояване"
+    },
+    "pin": {
+      "description": "Pin to use when pairing",
+      "label": "ПИН"
+    }
+  },
+  "display": {
+    "description": "Настройки за дисплея на устройството",
+    "title": "Настройки на дисплея",
+    "headingBold": {
+      "description": "Bolden the heading text",
+      "label": "Bold Heading"
+    },
+    "carouselDelay": {
+      "description": "Колко бързо да се превключва между прозорците",
+      "label": "Carousel Delay"
+    },
+    "compassNorthTop": {
+      "description": "Fix north to the top of compass",
+      "label": "Compass North Top"
+    },
+    "displayMode": {
+      "description": "Screen layout variant",
+      "label": "Display Mode"
+    },
+    "displayUnits": {
+      "description": "Показване на метрични или имперски мерни единици",
+      "label": "Display Units"
+    },
+    "flipScreen": {
+      "description": "Flip display 180 degrees",
+      "label": "Flip Screen"
+    },
+    "gpsDisplayUnits": {
+      "description": "Coordinate display format",
+      "label": "GPS Display Units"
+    },
+    "oledType": {
+      "description": "Type of OLED screen attached to the device",
+      "label": "OLED Type"
+    },
+    "screenTimeout": {
+      "description": "Turn off the display after this long",
+      "label": "Screen Timeout"
+    },
+    "twelveHourClock": {
+      "description": "Използване на 12-часов формат на часовника",
+      "label": "12-часов часовник"
+    },
+    "wakeOnTapOrMotion": {
+      "description": "Wake the device on tap or motion",
+      "label": "Wake on Tap or Motion"
+    }
+  },
+  "lora": {
+    "title": "Настройки на Mesh",
+    "description": "Settings for the LoRa mesh",
+    "bandwidth": {
+      "description": "Широчина на канала в MHz",
+      "label": "Широчина на честотната лента"
+    },
+    "boostedRxGain": {
+      "description": "Boosted RX gain",
+      "label": "Boosted RX Gain"
+    },
+    "codingRate": {
+      "description": "The denominator of the coding rate",
+      "label": "Coding Rate"
+    },
+    "frequencyOffset": {
+      "description": "Frequency offset to correct for crystal calibration errors",
+      "label": "Отместване на честотата"
+    },
+    "frequencySlot": {
+      "description": "LoRa frequency channel number",
+      "label": "Честотен слот"
+    },
+    "hopLimit": {
+      "description": "Maximum number of hops",
+      "label": "Hop Limit"
+    },
+    "ignoreMqtt": {
+      "description": "Don't forward MQTT messages over the mesh",
+      "label": "Ignore MQTT"
+    },
+    "modemPreset": {
+      "description": "Използване на предварително настроен модем",
+      "label": "Предварително настроен модем"
+    },
+    "okToMqtt": {
+      "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+      "label": "OK to MQTT"
+    },
+    "overrideDutyCycle": {
+      "description": "Override Duty Cycle",
+      "label": "Override Duty Cycle"
+    },
+    "overrideFrequency": {
+      "description": "Override frequency",
+      "label": "Override Frequency"
+    },
+    "region": {
+      "description": "Sets the region for your node",
+      "label": "Регион"
+    },
+    "spreadingFactor": {
+      "description": "Indicates the number of chirps per symbol",
+      "label": "Spreading Factor"
+    },
+    "transmitEnabled": {
+      "description": "Активиране/дезактивиране на предаването (TX) от LoRa радиото",
+      "label": "Предаването е активирано"
+    },
+    "transmitPower": {
+      "description": "Максимална мощност на предаване",
+      "label": "Мощност на предаване"
+    },
+    "usePreset": {
+      "description": "Use one of the predefined modem presets",
+      "label": "Използване на предварително зададени настройки"
+    },
+    "meshSettings": {
+      "description": "Settings for the LoRa mesh",
+      "label": "Настройки на Mesh"
+    },
+    "waveformSettings": {
+      "description": "Settings for the LoRa waveform",
+      "label": "Waveform Settings"
+    },
+    "radioSettings": {
+      "label": "Настройки на радиото",
+      "description": "Настройки за LoRa радиото"
+    }
+  },
+  "network": {
+    "title": "Конфигурация на WiFi",
+    "description": "Конфигурация на WiFi радиото",
+    "note": "Забележка: Някои устройства (ESP32) не могат да използват едновременно Bluetooth и WiFi.",
+    "addressMode": {
+      "description": "Address assignment selection",
+      "label": "Address Mode"
+    },
+    "dns": {
+      "description": "DNS сървър",
+      "label": "DNS"
+    },
+    "ethernetEnabled": {
+      "description": "Активиране или дезактивиране на Ethernet порта",
+      "label": "Активиран"
+    },
+    "gateway": {
+      "description": "Шлюз по подразбиране",
+      "label": "Шлюз"
+    },
+    "ip": {
+      "description": "IP адрес",
+      "label": "IP"
+    },
+    "psk": {
+      "description": "Парола за мрежата",
+      "label": "PSK"
+    },
+    "ssid": {
+      "description": "Име на мрежата",
+      "label": "SSID"
+    },
+    "subnet": {
+      "description": "Subnet Mask",
+      "label": "Subnet"
+    },
+    "wifiEnabled": {
+      "description": "Активиране или дезактивиране на WiFi радиото",
+      "label": "Активиран"
+    },
+    "meshViaUdp": {
+      "label": "Mesh via UDP"
+    },
+    "ntpServer": {
+      "label": "NTP сървър"
+    },
+    "rsyslogServer": {
+      "label": "Rsyslog Server"
+    },
+    "ethernetConfigSettings": {
+      "description": "Ethernet port configuration",
+      "label": "Конфигурация на Ethernet "
+    },
+    "ipConfigSettings": {
+      "description": "Конфигуриране на IP",
+      "label": "Конфигурация на IP"
+    },
+    "ntpConfigSettings": {
+      "description": "Конфигуриране на NTP",
+      "label": "Конфигурация на NTP"
+    },
+    "rsyslogConfigSettings": {
+      "description": "Rsyslog configuration",
+      "label": "Rsyslog Config"
+    },
+    "udpConfigSettings": {
+      "description": "UDP over Mesh configuration",
+      "label": "Конфигурация на UDP"
+    }
+  },
+  "position": {
+    "title": "Настройки на позицията",
+    "description": "Настройки за модула за позиция",
+    "broadcastInterval": {
+      "description": "How often your position is sent out over the mesh",
+      "label": "Broadcast Interval"
+    },
+    "enablePin": {
+      "description": "GPS module enable pin override",
+      "label": "Enable Pin"
+    },
+    "fixedPosition": {
+      "description": "Don't report GPS position, but a manually-specified one",
+      "label": "Фиксирана позиция"
+    },
+    "gpsMode": {
+      "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
+      "label": "Режим на GPS"
+    },
+    "gpsUpdateInterval": {
+      "description": "How often a GPS fix should be acquired",
+      "label": "Интервал на актуализиране на GPS"
+    },
+    "positionFlags": {
+      "description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
+      "label": "Position Flags"
+    },
+    "receivePin": {
+      "description": "GPS module RX pin override",
+      "label": "Receive Pin"
+    },
+    "smartPositionEnabled": {
+      "description": "Only send position when there has been a meaningful change in location",
+      "label": "Enable Smart Position"
+    },
+    "smartPositionMinDistance": {
+      "description": "Minimum distance (in meters) that must be traveled before a position update is sent",
+      "label": "Smart Position Minimum Distance"
+    },
+    "smartPositionMinInterval": {
+      "description": "Minimum interval (in seconds) that must pass before a position update is sent",
+      "label": "Smart Position Minimum Interval"
+    },
+    "transmitPin": {
+      "description": "GPS module TX pin override",
+      "label": "Transmit Pin"
+    },
+    "intervalsSettings": {
+      "description": "How often to send position updates",
+      "label": "Интервали"
+    },
+    "flags": {
+      "placeholder": "Select position flags...",
+      "altitude": "Надморска височина",
+      "altitudeGeoidalSeparation": "Altitude Geoidal Separation",
+      "altitudeMsl": "Altitude is Mean Sea Level",
+      "dop": "Dilution of precision (DOP) PDOP used by default",
+      "hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
+      "numSatellites": "Number of satellites",
+      "sequenceNumber": "Sequence number",
+      "timestamp": "Времево клеймо",
+      "unset": "Отказ",
+      "vehicleHeading": "Vehicle heading",
+      "vehicleSpeed": "Скорост на превозното средство"
+    }
+  },
+  "power": {
+    "adcMultiplierOverride": {
+      "description": "Used for tweaking battery voltage reading",
+      "label": "ADC Multiplier Override ratio"
+    },
+    "ina219Address": {
+      "description": "Address of the INA219 battery monitor",
+      "label": "INA219 Address"
+    },
+    "lightSleepDuration": {
+      "description": "How long the device will be in light sleep for",
+      "label": "Light Sleep Duration"
+    },
+    "minimumWakeTime": {
+      "description": "Minimum amount of time the device will stay awake for after receiving a packet",
+      "label": "Minimum Wake Time"
+    },
+    "noConnectionBluetoothDisabled": {
+      "description": "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
+      "label": "No Connection Bluetooth Disabled"
+    },
+    "powerSavingEnabled": {
+      "description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
+      "label": "Активиране на енергоспестяващ режим"
+    },
+    "shutdownOnBatteryDelay": {
+      "description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
+      "label": "Shutdown on battery delay"
+    },
+    "superDeepSleepDuration": {
+      "description": "How long the device will be in super deep sleep for",
+      "label": "Super Deep Sleep Duration"
+    },
+    "powerConfigSettings": {
+      "description": "Settings for the power module",
+      "label": "Конфигурация на захранването"
+    },
+    "sleepSettings": {
+      "description": "Sleep settings for the power module",
+      "label": "Sleep Settings"
+    }
+  },
+  "security": {
+    "description": "Settings for the Security configuration",
+    "title": "Насртойки на сигурността",
+    "button_backupKey": "Backup Key",
+    "adminChannelEnabled": {
+      "description": "Allow incoming device control over the insecure legacy admin channel",
+      "label": "Allow Legacy Admin"
+    },
+    "enableDebugLogApi": {
+      "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+      "label": "Enable Debug Log API"
+    },
+    "managed": {
+      "description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
+      "label": "Managed"
+    },
+    "privateKey": {
+      "description": "Used to create a shared key with a remote device",
+      "label": "Частен ключ"
+    },
+    "publicKey": {
+      "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+      "label": "Публичен ключ"
+    },
+    "primaryAdminKey": {
+      "description": "The primary public key authorized to send admin messages to this node",
+      "label": "Primary Admin Key"
+    },
+    "secondaryAdminKey": {
+      "description": "The secondary public key authorized to send admin messages to this node",
+      "label": "Secondary Admin Key"
+    },
+    "serialOutputEnabled": {
+      "description": "Serial Console over the Stream API",
+      "label": "Serial Output Enabled"
+    },
+    "tertiaryAdminKey": {
+      "description": "The tertiary public key authorized to send admin messages to this node",
+      "label": "Tertiary Admin Key"
+    },
+    "adminSettings": {
+      "description": "Настройки за Admin",
+      "label": "Admin Settings"
+    },
+    "loggingSettings": {
+      "description": "Settings for Logging",
+      "label": "Logging Settings"
+    }
+  }
+}

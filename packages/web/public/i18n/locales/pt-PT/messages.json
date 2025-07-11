@@ -1,0 +1,39 @@
+{
+  "page": {
+    "title": "Messages: {{chatName}}",
+    "placeholder": "Enter Message"
+  },
+  "emptyState": {
+    "title": "Select a Chat",
+    "text": "No messages yet."
+  },
+  "selectChatPrompt": {
+    "text": "Select a channel or node to start messaging."
+  },
+  "sendMessage": {
+    "placeholder": "Enter your message here...",
+    "sendButton": "Enviar"
+  },
+  "actionsMenu": {
+    "addReactionLabel": "Add Reaction",
+    "replyLabel": "Responder"
+  },
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Message delivered",
+      "displayText": "Message delivered"
+    },
+    "failed": {
+      "label": "Message delivery failed",
+      "displayText": "Delivery failed"
+    },
+    "unknown": {
+      "label": "Message status unknown",
+      "displayText": "Unknown state"
+    },
+    "waiting": {
+      "label": "Sending message",
+      "displayText": "Waiting for delivery"
+    }
+  }
+}

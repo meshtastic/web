@@ -1,0 +1,141 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@view-transition {
+  navigation: auto;
+}
+
+@theme {
+  --font-mono:
+    Cascadia Code, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --font-sans:
+    Inter var, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  --color-background-primary: var(--backgroundPrimary);
+  --color-background-secondary: var(--backgroundSecondary);
+  --color-accent: var(--accent);
+  --color-accent-muted: var(--accentMuted);
+  --color-text-primary: var(--textPrimary);
+  --color-text-secondary: var(--textSecondary);
+  --color-link: var(--link);
+
+  --brightness-hover: var(--brightnessHover);
+  --brightness-press: var(--brightnessPress);
+  --brightness-disabled: var(--brightnessDisabled);
+  --sidebar-width: @apply w-50 lg:w-64;
+}
+
+[data-theme="light"] {
+  --backgroundPrimary: #ffffff;
+  --textPrimary: #111132;
+  --textSecondary: #64748b;
+  --link: #0b69bf;
+
+  --brightnessHover: 0.95;
+  --brightnessPress: 1.05;
+  --brightnessDisabled: 0.75;
+}
+
+[data-theme="dark"] {
+  --backgroundPrimary: #0f172a;
+  --textPrimary: #ebebeb;
+  --textSecondary: #bdbdbd;
+  --link: #8ec9ff;
+
+  --brightnessHover: 1.1;
+  --brightnessPress: 0.9;
+  --brightnessDisabled: 0.75;
+}
+
+/* Accordion Animations */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+
+  to {
+    height: 0;
+  }
+}
+
+html {
+  overflow: hidden;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+.app-container {
+  height: 100%;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-slate-200, currentColor);
+  }
+}
+
+@layer components {
+  .maplibregl-popup-close-button {
+    padding: 4px 10px 8px 0;
+    font-size: 1.2rem;
+    color: #000;
+  }
+
+  .maplibregl-popup-close-button:hover {
+    background-color: transparent !important;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Prevent image dragging */
+img {
+  -webkit-user-drag: none;
+}
+
+@keyframes spin-slower {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slower 2s linear infinite;
+}

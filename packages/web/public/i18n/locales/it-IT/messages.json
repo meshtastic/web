@@ -1,0 +1,39 @@
+{
+  "page": {
+    "title": "Messaggi: {{chatName}}",
+    "placeholder": "Enter Message"
+  },
+  "emptyState": {
+    "title": "Seleziona una chat",
+    "text": "Ancora nessun messaggio."
+  },
+  "selectChatPrompt": {
+    "text": "Selezionare un canale o un nodo per iniziare a messaggiare."
+  },
+  "sendMessage": {
+    "placeholder": "Enter your message here...",
+    "sendButton": "Invia"
+  },
+  "actionsMenu": {
+    "addReactionLabel": "Aggiungi una Reazione",
+    "replyLabel": "Rispondi"
+  },
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Messaggio inviato",
+      "displayText": "Messaggio inviato"
+    },
+    "failed": {
+      "label": "Invio messaggio non riuscito",
+      "displayText": "Invio fallito"
+    },
+    "unknown": {
+      "label": "Stato messaggio sconosciuto",
+      "displayText": "Stato sconosciuto"
+    },
+    "waiting": {
+      "label": "Inviando il messaggio...",
+      "displayText": "In attesa della consegna"
+    }
+  }
+}

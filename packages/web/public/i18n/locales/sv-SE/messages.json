@@ -1,0 +1,39 @@
+{
+  "page": {
+    "title": "Meddelanden: {{chatName}}",
+    "placeholder": "Ange meddelande"
+  },
+  "emptyState": {
+    "title": "Välj en chatt",
+    "text": "Det finns inga meddelanden ännu."
+  },
+  "selectChatPrompt": {
+    "text": "Välj en kanal eller nod för att börja chatta."
+  },
+  "sendMessage": {
+    "placeholder": "Ange ditt meddelande här...",
+    "sendButton": "Skicka"
+  },
+  "actionsMenu": {
+    "addReactionLabel": "Lägg till reaktion",
+    "replyLabel": "Svara"
+  },
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Meddelandet har levererats",
+      "displayText": "Meddelandet har levererats"
+    },
+    "failed": {
+      "label": "Meddelandeleverans misslyckades",
+      "displayText": "Leverans misslyckades"
+    },
+    "unknown": {
+      "label": "Okänd meddelandestatus",
+      "displayText": "Okänd status"
+    },
+    "waiting": {
+      "label": "Skickar meddelande",
+      "displayText": "Väntar på leverans"
+    }
+  }
+}

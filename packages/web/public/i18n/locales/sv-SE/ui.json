@@ -1,0 +1,228 @@
+{
+  "navigation": {
+    "title": "Navigering",
+    "messages": "Meddelanden",
+    "map": "Karta",
+    "config": "Inställningar",
+    "radioConfig": "Radioinställningar",
+    "moduleConfig": "Modulinställningar",
+    "channels": "Kanaler",
+    "nodes": "Noder"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "logo": "Meshtastic logotyp"
+  },
+  "sidebar": {
+    "collapseToggle": {
+      "button": {
+        "open": "Öppna sidopanel",
+        "close": "Stäng sidopanel"
+      }
+    },
+    "deviceInfo": {
+      "volts": "{{voltage}} volt",
+      "firmware": {
+        "title": "Firmware",
+        "version": "v{{version}}",
+        "buildDate": "Kompileringsdatum: {{date}}"
+      },
+      "deviceName": {
+        "title": "Enhetsnamn",
+        "changeName": "Ändra enhetens namn",
+        "placeholder": "Ange enhetsnamn"
+      },
+      "editDeviceName": "Redigera enhetsnamn"
+    }
+  },
+  "batteryStatus": {
+    "charging": "{{level}}%, laddar",
+    "pluggedIn": "Ansluten",
+    "title": "Batteri"
+  },
+  "search": {
+    "nodes": "Sök noder...",
+    "channels": "Sök kanaler...",
+    "commandPalette": "Sök kommandon..."
+  },
+  "toast": {
+    "positionRequestSent": {
+      "title": "Platsbegäran skickad."
+    },
+    "requestingPosition": {
+      "title": "Begär plats, var god vänta..."
+    },
+    "sendingTraceroute": {
+      "title": "Skickar Traceroute (spåra rutt), vänligen vänta..."
+    },
+    "tracerouteSent": {
+      "title": "Traceroute (spåra rutt) skickat.."
+    },
+    "savedChannel": {
+      "title": "Sparat kanal: {{channelName}}"
+    },
+    "messages": {
+      "pkiEncryption": {
+        "title": "Chatten använder PKI-kryptering."
+      },
+      "pskEncryption": {
+        "title": "Chatten använder PSK-kryptering."
+      }
+    },
+    "configSaveError": {
+      "title": "Kunde inte spara inställningarna",
+      "description": "Ett fel inträffade när inställningarna sparades."
+    },
+    "validationError": {
+      "title": "Det förekommer inställningsfel",
+      "description": "Vänligen åtgärda felen i inställningarna innan du sparar."
+    },
+    "saveSuccess": {
+      "title": "Sparar inställningarna",
+      "description": "Ändrignarna av {{case}}-inställningarna har sparats."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} dina favoriter.",
+      "action": {
+        "added": "La till",
+        "removed": "Tog bort",
+        "to": "till",
+        "from": "från"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} dina ignorerade noder",
+      "action": {
+        "added": "La till",
+        "removed": "Tog bort",
+        "to": "till",
+        "from": "från"
+      }
+    }
+  },
+  "notifications": {
+    "copied": {
+      "label": "Kopierat!"
+    },
+    "copyToClipboard": {
+      "label": "Kopiera till Urklipp"
+    },
+    "hidePassword": {
+      "label": "Dölj lösenord"
+    },
+    "showPassword": {
+      "label": "Visa lösenord"
+    },
+    "deliveryStatus": {
+      "delivered": "Levererad",
+      "failed": "Leverans misslyckades",
+      "waiting": "Väntar",
+      "unknown": "Okänd"
+    }
+  },
+  "general": {
+    "label": "Allmänt"
+  },
+  "hardware": {
+    "label": "Hårdvara"
+  },
+  "metrics": {
+    "label": "Telemetri"
+  },
+  "role": {
+    "label": "Roll"
+  },
+  "filter": {
+    "label": "Filter"
+  },
+  "advanced": {
+    "label": "Advancerat"
+  },
+  "clearInput": {
+    "label": "Rensa inmatning"
+  },
+  "resetFilters": {
+    "label": "Återställ filter"
+  },
+  "nodeName": {
+    "label": "Nodnamn/nummer",
+    "placeholder": "Meshtastic 1234"
+  },
+  "airtimeUtilization": {
+    "label": "Sändningstidsutnyttjande (%)"
+  },
+  "batteryLevel": {
+    "label": "Batterinivå (%)",
+    "labelText": "Batterinivå (%): {{value}}"
+  },
+  "batteryVoltage": {
+    "label": "Batterispänning (V)",
+    "title": "Spänning"
+  },
+  "channelUtilization": {
+    "label": "Kanalutnyttjande (%)"
+  },
+  "hops": {
+    "direct": "Direkt",
+    "label": "Antal hopp",
+    "text": "Antal hopp: {{value}}"
+  },
+  "lastHeard": {
+    "label": "Senast hörd",
+    "labelText": "Senast hörd: {{value}}",
+    "nowLabel": "Nu"
+  },
+  "snr": {
+    "label": "SNR (db)"
+  },
+  "favorites": {
+    "label": "Favoriter"
+  },
+  "hide": {
+    "label": "Dölj"
+  },
+  "showOnly": {
+    "label": "Visa endast"
+  },
+  "viaMqtt": {
+    "label": "Ansluten via MQTT"
+  },
+  "hopsUnknown": {
+    "label": "Okänt antal hopp"
+  },
+  "showUnheard": {
+    "label": "Aldrig hörd"
+  },
+  "language": {
+    "label": "Språk",
+    "changeLanguage": "Byt språk"
+  },
+  "theme": {
+    "dark": "Mörkt",
+    "light": "Ljust",
+    "system": "Automatisk",
+    "changeTheme": "Ändra färgschema"
+  },
+  "errorPage": {
+    "title": "Det här är lite pinsamt...",
+    "description1": "Vi är verkligen ledsna men ett fel inträffade i webbklienten som fick den att krascha. <br /> Detta var inte meningen, men vi arbetar hårt för att åtgärda det.",
+    "description2": "Det bästa sättet att förhindra att detta händer igen för dig eller någon annan är att rapportera problemet till oss.",
+    "reportInstructions": "Vänligen inkludera följande information i din rapport:",
+    "reportSteps": {
+      "step1": "Vad du gjorde när felet inträffade",
+      "step2": "Vad du förväntade dig skulle hända",
+      "step3": "Vad som faktiskt hände",
+      "step4": "All annan relevant information"
+    },
+    "reportLink": "Du kan rapportera problemet på vår <0>GitHub</0>",
+    "dashboardLink": "Återvänd till <0>start</0>",
+    "detailsSummary": "Detaljer om felet",
+    "errorMessageLabel": "Felmeddelande:",
+    "stackTraceLabel": "Stackspårning:",
+    "fallbackError": "{{error}}"
+  },
+  "footer": {
+    "text": "Drivs av <0>▲ Vercel</0> | Meshtastic® är ett registrerat varumärke som tillhör Meshtastic LLC. | <1>Juridisk information</1>",
+    "commitSha": "Commit SHA: {{sha}}"
+  }
+}

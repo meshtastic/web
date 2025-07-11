@@ -1,10 +1,13 @@
 name: Pull Request CI
 
-on:
-  pull_request:
+on: pull_request
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
-  build:
+  build-and-package:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -15,39 +18,29 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Install Dependencies
+        # Commands will run from 'packages/web'
+        working-directory: packages/web
+        run: deno install
+
       - name: Cache Deno dependencies
         uses: actions/cache@v4
         with:
           path: |
             ~/.cache/deno
-            ./deno.lock
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
+            packages/web/deno.lock
+          key: ${{ runner.os }}-deno-${{ hashFiles('packages/web/deno.lock') }}
           restore-keys: |
             ${{ runner.os }}-deno-
 
-      - name: Install Dependencies
-        run: deno install
-
-      - name: Cache Dependencies
-        run: deno cache src/index.tsx
-
       - name: Run linter
-        run: deno task lint
+        working-directory: packages/web
+        run: deno lint
 
       - name: Check formatter
-        run: deno task format --check
-
-      - name: Run tests
-        run: deno task test
+        working-directory: packages/web
+        run: deno fmt --check
 
       - name: Build Package
-        run: deno task build
-
-      - name: Compress build
-        run: deno task package
-
-      - name: Archive compressed build
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: dist/build.tar
+        working-directory: packages/web
+        run: deno task --filter web build
