@@ -88,6 +88,7 @@
     "npm:testing-library@^0.0.2": "0.0.2_@angular+common@6.1.10__@angular+core@6.1.10___rxjs@6.6.7___zone.js@0.8.29__rxjs@6.6.7_@angular+core@6.1.10__rxjs@6.6.7__zone.js@0.8.29",
     "npm:tslog@^4.9.3": "4.9.3",
     "npm:typescript@^5.8.3": "5.8.3",
+    "npm:vite@*": "7.0.2_@types+node@22.16.0_picomatch@4.0.2",
     "npm:vite@7": "7.0.2_@types+node@22.16.0_picomatch@4.0.2",
     "npm:vitest@^3.2.4": "3.2.4_@types+node@22.16.0_happy-dom@18.0.1_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2",
     "npm:zod@^3.25.75": "3.25.75",
