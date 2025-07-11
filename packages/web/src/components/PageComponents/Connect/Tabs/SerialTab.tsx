@@ -170,8 +170,7 @@ export const SerialTab = ({ closeDialog }: SerialTabProps) => {
             serialPorts.map((port, index) => (
               <div
                 key={`serial-${port.getInfo().usbVendorId ?? "unknown"}-${
-                  port.getInfo().usbProductId ?? "unknown"
-                }`}
+                  port.getInfo().usbProductId ?? "unknown"}-${index}`}
                 className="flex items-center gap-3 p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 {/* Status */}
