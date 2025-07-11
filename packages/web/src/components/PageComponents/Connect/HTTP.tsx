@@ -96,8 +96,8 @@ export const HTTP = (
         <div className="mt-2 flex items-center gap-2">
           <Switch
             onCheckedChange={setTLS}
-            disabled={isURLHTTPS}
-            checked={isURLHTTPS || tlsValue}
+            // disabled={isURLHTTPS}
+            checked={tlsValue}
             {...register("tls")}
           />
           <Label>{t("newDeviceDialog.useHttps")}</Label>
