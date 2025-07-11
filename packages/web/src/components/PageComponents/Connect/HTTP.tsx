@@ -188,7 +188,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
               onClick={clearSavedServers}
               className="h-7 px-2 text-xs text-red-600 hover:text-red-700"
             >
-              <Trash2 className="h-3 w-3 mr-1" />
+              <Trash2 className="size-5 mr-1" />
               Clear All
             </Button>
           )}
@@ -302,7 +302,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
                       onClick={() => removeSavedServer(server.url)}
                       className="h-8 w-8 p-0 text-slate-400 hover:text-red-600"
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2 className="size-5" />
                     </Button>
                   </div>
                 </div>

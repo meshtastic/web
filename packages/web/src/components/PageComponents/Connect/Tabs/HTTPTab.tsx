@@ -425,7 +425,7 @@ export const HTTPTab = ({ closeDialog }: HTTPTabProps) => {
                       onClick={() => removeSavedServer(server.url)}
                       className="text-slate-400 hover:text-red-600 p-1"
                     >
-                      <Trash2 className="h-5 w-5" />
+                      <Trash2 className="size-5" />
                     </Button>
                   </div>
                 </div>

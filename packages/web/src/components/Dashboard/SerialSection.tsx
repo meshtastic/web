@@ -189,7 +189,7 @@ export const SerialSection = ({ onConnect }: SerialSectionProps) => {
                     onClick={() => removeSerialPort(port)}
                     className="text-slate-400 hover:text-red-600 p-1"
                   >
-                    <Trash2 className="h-3 w-3" />
+                    <Trash2 className="size-5" />
                   </Button>
                 </div>
               </div>
