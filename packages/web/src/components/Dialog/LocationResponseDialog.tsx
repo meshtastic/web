@@ -47,6 +47,7 @@ export const LocationResponseDialog = ({
         <DialogHeader>
           <DialogTitle>
             {t("locationResponse.title", {
+              interpolation: { escapeValue: false },
               identifier: `${longName} (${shortName})`,
             })}
           </DialogTitle>

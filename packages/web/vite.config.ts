@@ -12,6 +12,9 @@ try {
   hash = "DEV";
 }
 
+const CONTENT_SECURITY_POLICY =
+  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' data: https://rsms.me https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data: https://rsms.me https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self';";
+
 export default defineConfig({
   plugins: [
     react(),
@@ -49,6 +52,7 @@ export default defineConfig({
   server: {
     port: 3000,
     headers: {
+      "content-security-policy": CONTENT_SECURITY_POLICY,
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Embedder-Policy": "require-corp",
     },

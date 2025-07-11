@@ -50,6 +50,7 @@ export const PkiBackupDialog = ({
           <head>
             <title>${
         t("pkiBackup.header", {
+          interpolation: { escapeValue: false },
           shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
           longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
         })
@@ -63,6 +64,7 @@ export const PkiBackupDialog = ({
           <body>
             <h1>${
         t("pkiBackup.header", {
+          interpolation: { escapeValue: false },
           shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
           longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
         })
@@ -103,6 +105,7 @@ export const PkiBackupDialog = ({
     const link = document.createElement("a");
     link.href = url;
     link.download = t("pkiBackup.fileName", {
+      interpolation: { escapeValue: false },
       shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
       longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
     });
