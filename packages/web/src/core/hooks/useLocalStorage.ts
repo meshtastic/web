@@ -176,7 +176,7 @@ export default function useLocalStorage<T>(
       removeEventListener("storage", handleStorageChange);
       removeEventListener("local-storage", handleStorageChange);
     };
-  }, [handleStorageChange]);
+  }, []);
 
   return [storedValue, setValue, removeValue];
 }
