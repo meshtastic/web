@@ -20,13 +20,14 @@ All projects are located within the `packages/` directory:
   designed to be hosted or served directly from a Meshtastic node.
   - **[Hosted version](https://client.meshtastic.org)**
 - **`packages/core`:** Core functionality for Meshtastic JS.
+- **`packages/transport-node`:** TCP Transport for the NodeJS runtime.
 - **`packages/transport-deno`:** TCP Transport for the Deno runtime.
 - **`packages/transport-http`:** HTTP Transport.
 - **`packages/transport-web-bluetooth`:** Web Bluetooth Transport.
 - **`packages/transport-web-serial`:** Web Serial Transport.
 
-All `Meshtastic JS` packages (core and transports) are published to
-[JSR](https://jsr.io/@meshtastic).
+All `Meshtastic JS` packages (core and transports) are published both to
+[JSR](https://jsr.io/@meshtastic). [NPM](https://www.npmjs.com/org/meshtastic)
 
 ---
 
@@ -34,8 +35,7 @@ All `Meshtastic JS` packages (core and transports) are published to
 
 | Project               | Repobeats                                                                                                             |
 | :-------------------- | :-------------------------------------------------------------------------------------------------------------------- |
-| Meshtastic Web Client | ![Alt](https://repobeats.axiom.co/api/embed/e5b062db986cb005d83e81724c00cb2b9cce8e4c.svg "Repobeats analytics image") |
-| Meshtastic JS         | ![Alt](https://repobeats.axiom.co/api/embed/5330641586e92a2ec84676fedb98f6d4a7b25d69.svg "Repobeats analytics image") |
+| Meshtastic Web        | ![Alt](https://repobeats.axiom.co/api/embed/e5b062db986cb005d83e81724c00cb2b9cce8e4c.svg "Repobeats analytics image") |
 
 ---
 

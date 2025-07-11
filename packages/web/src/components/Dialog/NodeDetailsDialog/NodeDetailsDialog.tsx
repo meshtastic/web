@@ -169,6 +169,7 @@ export const NodeDetailsDialog = ({
         <DialogHeader>
           <DialogTitle>
             {t("nodeDetails.title", {
+              interpolation: { escapeValue: false },
               identifier: `${node.user?.longName ?? t("unknown.shortName")} (${
                 node.user?.shortName ?? t("unknown.shortName")
               })`,

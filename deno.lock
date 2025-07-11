@@ -1,9 +1,25 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@david/code-block-writer@^13.0.2": "13.0.3",
+    "jsr:@deno/cache-dir@0.20": "0.20.1",
+    "jsr:@deno/dnt@~0.42.1": "0.42.1",
+    "jsr:@deno/graph@0.86": "0.86.9",
     "jsr:@meshtastic/protobufs@^2.7.0": "2.7.0",
+    "jsr:@std/bytes@^1.0.5": "1.0.6",
+    "jsr:@std/fmt@1": "1.0.8",
+    "jsr:@std/fmt@^1.0.3": "1.0.8",
+    "jsr:@std/fs@1": "1.0.19",
+    "jsr:@std/fs@^1.0.6": "1.0.19",
     "jsr:@std/internal@^1.0.9": "1.0.9",
+    "jsr:@std/io@0.225": "0.225.2",
+    "jsr:@std/path@*": "1.1.1",
+    "jsr:@std/path@1": "1.1.1",
+    "jsr:@std/path@^1.0.8": "1.1.1",
     "jsr:@std/path@^1.1.0": "1.1.1",
+    "jsr:@std/path@^1.1.1": "1.1.1",
+    "jsr:@ts-morph/bootstrap@0.25": "0.25.0",
+    "jsr:@ts-morph/common@0.25": "0.25.0",
     "npm:@bufbuild/protobuf@^2.2.3": "2.6.0",
     "npm:@bufbuild/protobuf@^2.6.0": "2.6.0",
     "npm:@hookform/resolvers@^5.1.1": "5.1.1_react-hook-form@7.60.0__react@19.1.0_react@19.1.0",
@@ -95,19 +111,78 @@
     "npm:zustand@5.0.6": "5.0.6_@types+react@19.1.8_immer@10.1.1_react@19.1.0"
   },
   "jsr": {
+    "@david/code-block-writer@13.0.3": {
+      "integrity": "f98c77d320f5957899a61bfb7a9bead7c6d83ad1515daee92dbacc861e13bb7f"
+    },
+    "@deno/cache-dir@0.20.1": {
+      "integrity": "dc4f3add14307f3ff3b712441ea4acabcbfc9a13f67c5adc78c3aac16ac5e2a0",
+      "dependencies": [
+        "jsr:@deno/graph",
+        "jsr:@std/fmt@^1.0.3",
+        "jsr:@std/fs@^1.0.6",
+        "jsr:@std/io",
+        "jsr:@std/path@^1.0.8"
+      ]
+    },
+    "@deno/dnt@0.42.1": {
+      "integrity": "85322b38eb40d4e8c5216d62536152c35b1bda9dc47c8c60860610397b960223",
+      "dependencies": [
+        "jsr:@david/code-block-writer",
+        "jsr:@deno/cache-dir",
+        "jsr:@std/fmt@1",
+        "jsr:@std/fs@1",
+        "jsr:@std/path@1",
+        "jsr:@ts-morph/bootstrap"
+      ]
+    },
+    "@deno/graph@0.86.9": {
+      "integrity": "c4f353a695bcc5246c099602977dabc6534eacea9999a35a8cb24e807192e6a1"
+    },
     "@meshtastic/protobufs@2.7.0": {
       "integrity": "38357241bd8a7431c87366dbe12ce9e69f204ebb6ec23da12f7682765b6c8376",
       "dependencies": [
         "npm:@bufbuild/protobuf@^2.2.3"
       ]
     },
+    "@std/bytes@1.0.6": {
+      "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
+    },
+    "@std/fmt@1.0.8": {
+      "integrity": "71e1fc498787e4434d213647a6e43e794af4fd393ef8f52062246e06f7e372b7"
+    },
+    "@std/fs@1.0.19": {
+      "integrity": "051968c2b1eae4d2ea9f79a08a3845740ef6af10356aff43d3e2ef11ed09fb06",
+      "dependencies": [
+        "jsr:@std/internal",
+        "jsr:@std/path@^1.1.1"
+      ]
+    },
     "@std/internal@1.0.9": {
       "integrity": "bdfb97f83e4db7a13e8faab26fb1958d1b80cc64366501af78a0aee151696eb8"
+    },
+    "@std/io@0.225.2": {
+      "integrity": "3c740cd4ee4c082e6cfc86458f47e2ab7cb353dc6234d5e9b1f91a2de5f4d6c7",
+      "dependencies": [
+        "jsr:@std/bytes"
+      ]
     },
     "@std/path@1.1.1": {
       "integrity": "fe00026bd3a7e6a27f73709b83c607798be40e20c81dde655ce34052fd82ec76",
       "dependencies": [
         "jsr:@std/internal"
+      ]
+    },
+    "@ts-morph/bootstrap@0.25.0": {
+      "integrity": "3cd33ee80ac0aab8e5d2660c639a02187f0c8abfe454636ce86c00eb7e8407db",
+      "dependencies": [
+        "jsr:@ts-morph/common"
+      ]
+    },
+    "@ts-morph/common@0.25.0": {
+      "integrity": "e3ed1771e2fb61fbc3d2cb39ebbc4f89cd686d6d9bc6d91a71372be055ac1967",
+      "dependencies": [
+        "jsr:@std/fs@1",
+        "jsr:@std/path@1"
       ]
     }
   },
@@ -5106,6 +5181,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@deno/dnt@~0.42.1",
       "jsr:@meshtastic/protobufs@^2.7.0",
       "npm:@bufbuild/protobuf@^2.2.3",
       "npm:@types/node@^22.13.10",

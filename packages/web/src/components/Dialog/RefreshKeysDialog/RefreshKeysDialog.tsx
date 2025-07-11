@@ -10,7 +10,7 @@ import { LockKeyholeOpenIcon } from "lucide-react";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { useTranslation } from "react-i18next";
-import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
+import { useMessageStore } from "@core/stores/messageStore/index.ts";
 
 export interface RefreshKeysDialogProps {
   open: boolean;
@@ -35,6 +35,7 @@ export const RefreshKeysDialog = (
 
   const text = {
     title: t("refreshKeys.title", {
+      interpolation: { escapeValue: false },
       identifier: nodeWithError?.user?.longName ?? "",
     }),
     description: `${t("refreshKeys.description.unableToSendDmPrefix")}${

@@ -3,12 +3,17 @@
     "./packages/web",
     "./packages/core",
     "./packages/transport-deno",
+    "./packages/transport-node",
     "./packages/transport-http",
     "./packages/transport-web-bluetooth",
     "./packages/transport-web-serial"
   ],
+  "tasks": {
+    "build:npm": "deno run -A scripts/build_npm_package.ts"
+  },
   "imports": {
     "@bufbuild/protobuf": "npm:@bufbuild/protobuf@^2.2.3",
+    "@deno/dnt": "jsr:@deno/dnt@^0.42.1",
     "@meshtastic/protobufs": "jsr:@meshtastic/protobufs@^2.7.0",
     "@types/node": "npm:@types/node@^22.13.10",
     "ste-simple-events": "npm:ste-simple-events@^3.0.11",
@@ -33,16 +38,14 @@
   "unstable": [
     "sloppy-imports"
   ],
-  "tasks": {
-    "dev": "deno task dev:ui",
-    "dev:ui": "VITE_APP_VERSION=development deno run -A npm:vite dev",
-    "build": "deno run -A npm:vite build",
-    "build:analyze": "BUNDLE_ANALYZE=true deno task build",
-    "lint": "deno lint src/",
-    "lint:fix": "deno lint --fix src/",
-    "format": "deno fmt src/",
-    "test": "deno run -A npm:vitest",
-    "preview": "deno run -A npm:vite preview",
-    "package": "gzipper c -i html,js,css,png,ico,svg,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
-  }
+  "exclude": [
+    "node_modules",
+    "dist",
+    "npm",
+    "build",
+    "coverage",
+    "out",
+    ".vscode-test"
+  ]
+
 }

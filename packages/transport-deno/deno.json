@@ -1,6 +1,7 @@
 {
   "name": "@meshtastic/transport-deno",
   "version": "0.1.1",
+  "description": "Deno-specific transport layer for Meshtastic web applications.",
   "exports": {
     ".": "./mod.ts"
   }

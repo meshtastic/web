@@ -45,7 +45,6 @@
     ],
     "strictPropertyInitialization": false
   },
-
   "exclude": [
     "routeTree.gen.ts",
     "node_modules/",

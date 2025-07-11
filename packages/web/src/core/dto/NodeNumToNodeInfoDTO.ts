@@ -8,14 +8,11 @@ class NodeInfoFactory {
     const last4 = userIdHex.slice(-4);
     const longName = `Meshtastic ${last4}`;
     const shortName = last4;
-    const hwModel = Protobuf.Mesh.HardwareModel.UNSET;
 
     return create(Protobuf.Mesh.UserSchema, {
       id: userId,
-      longName: longName,
-      shortName: shortName,
-      hwModel: hwModel,
-      isLicensed: false,
+      longName: longName.toString(),
+      shortName: shortName.toString(),
     });
   }
 
