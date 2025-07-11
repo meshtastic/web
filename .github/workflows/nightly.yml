@@ -26,7 +26,7 @@ jobs:
           path: ${{ steps.setup-deno.outputs.deno-cache-path }}
           key: deno-cache-${{ runner.os }}-${{ hashFiles('**/deno.lock') }}
           restore-keys: |
-            deno-cache-${{ runner.os }}- 
+            deno-cache-${{ runner.os }}-* 
 
       # - name: Run tests
       #   working-directory: packages/web
