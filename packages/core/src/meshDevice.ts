@@ -818,6 +818,13 @@ export class MeshDevice {
     this.queue.clear();
   }
 
+  /**  Disconnects from the device **/
+  public async disconnect(): Promise<void> {
+    this.log.debug(Emitter[Emitter.Disconnect], "🔌 Disconnecting from device");
+    this.complete();
+    await this.transport.toDevice.close();
+  }
+
   /**
    * Gets called when a MeshPacket is received from device
    */

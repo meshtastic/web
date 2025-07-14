@@ -35,6 +35,7 @@
       "scheduleShutdown": "Schedule Shutdown",
       "scheduleReboot": "Schedule Reboot",
       "rebootToOtaMode": "Reboot To OTA Mode",
+      "disconnect": "Disconnect",
       "resetNodeDb": "Reset Node DB",
       "factoryResetDevice": "Factory Reset Device",
       "factoryResetConfig": "Factory Reset Config"
