@@ -151,7 +151,7 @@ export default function useLocalStorage<T>(
 
     // We dispatch a custom event so every similar useLocalStorage hook is notified
     globalThis.dispatchEvent(new StorageEvent("local-storage", { key }));
-  }, [key]);
+  }, [key, initialValue]);
 
   useEffect(() => {
     setStoredValue(readValue());
