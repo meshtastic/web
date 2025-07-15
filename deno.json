@@ -1,12 +1,12 @@
 {
   "workspace": [
-    "./packages/web",
-    "./packages/core",
-    "./packages/transport-deno",
-    "./packages/transport-node",
-    "./packages/transport-http",
-    "./packages/transport-web-bluetooth",
-    "./packages/transport-web-serial"
+    "packages/web",
+    "packages/core",
+    "packages/transport-deno",
+    "packages/transport-node",
+    "packages/transport-http",
+    "packages/transport-web-bluetooth",
+    "packages/transport-web-serial"
   ],
   "tasks": {
     "build:npm": "deno run -A scripts/build_npm_package.ts"
