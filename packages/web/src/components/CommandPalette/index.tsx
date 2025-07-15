@@ -13,6 +13,7 @@ import {
   ArrowLeftRightIcon,
   BoxSelectIcon,
   BugIcon,
+  CloudOff,
   EraserIcon,
   FactoryIcon,
   LayersIcon,
@@ -197,6 +198,15 @@ export const CommandPalette = () => {
           icon: TrashIcon,
           action() {
             connection?.resetNodes();
+          },
+        },
+        {
+          label: t("contextual.command.disconnect"),
+          icon: CloudOff,
+          action() {
+            connection?.disconnect().catch((error) => {
+              console.error("Failed to disconnect:", error);
+            });
           },
         },
         {

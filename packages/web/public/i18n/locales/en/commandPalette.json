@@ -37,7 +37,8 @@
       "rebootToOtaMode": "Reboot To OTA Mode",
       "resetNodeDb": "Reset Node DB",
       "factoryResetDevice": "Factory Reset Device",
-      "factoryResetConfig": "Factory Reset Config"
+      "factoryResetConfig": "Factory Reset Config",
+      "disconnect": "Disconnect"
     }
   },
   "debug": {

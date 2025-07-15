@@ -50,13 +50,14 @@
     "npm:@tanstack/react-router@^1.125.4": "1.125.6_react@19.1.0_react-dom@19.1.0__react@19.1.0",
     "npm:@tanstack/router-cli@^1.125.4": "1.125.4",
     "npm:@tanstack/router-devtools@^1.125.4": "1.125.6_@tanstack+react-router@1.125.6__react@19.1.0__react-dom@19.1.0___react@19.1.0_react@19.1.0_react-dom@19.1.0__react@19.1.0",
-    "npm:@tanstack/router-plugin@^1.125.5": "1.125.6_@tanstack+react-router@1.125.6__react@19.1.0__react-dom@19.1.0___react@19.1.0_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@babel+core@7.28.0_react@19.1.0_react-dom@19.1.0__react@19.1.0_@types+node@22.16.0",
+    "npm:@tanstack/router-plugin@^1.125.5": "1.125.6_@tanstack+react-router@1.125.6__react@19.1.0__react-dom@19.1.0___react@19.1.0_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@babel+core@7.28.0_react@19.1.0_react-dom@19.1.0__react@19.1.0_@types+node@22.16.0_@types+node@22.15.15",
     "npm:@testing-library/jest-dom@^6.6.3": "6.6.3",
     "npm:@testing-library/react@^16.3.0": "16.3.0_@testing-library+dom@10.4.0_@types+react@19.1.8_@types+react-dom@19.1.6__@types+react@19.1.8_react@19.1.0_react-dom@19.1.0__react@19.1.0",
     "npm:@testing-library/user-event@^14.6.1": "14.6.1_@testing-library+dom@10.4.0",
     "npm:@turf/turf@^7.2.0": "7.2.0",
     "npm:@types/chrome@^0.0.329": "0.0.329",
     "npm:@types/js-cookie@^3.0.6": "3.0.6",
+    "npm:@types/node@*": "22.15.15",
     "npm:@types/node@^22.13.10": "22.16.0",
     "npm:@types/node@^24.0.10": "24.0.10",
     "npm:@types/react-dom@^19.1.6": "19.1.6_@types+react@19.1.8",
@@ -68,7 +69,7 @@
     "npm:@types/web-bluetooth@*": "0.0.20",
     "npm:@types/web-bluetooth@^0.0.20": "0.0.20",
     "npm:@types/web-bluetooth@^0.0.21": "0.0.21",
-    "npm:@vitejs/plugin-react@^4.6.0": "4.6.0_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@babel+core@7.28.0_@types+node@22.16.0",
+    "npm:@vitejs/plugin-react@^4.6.0": "4.6.0_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@babel+core@7.28.0_@types+node@22.16.0_@types+node@22.15.15",
     "npm:autoprefixer@^10.4.21": "10.4.21_postcss@8.5.6",
     "npm:base64-js@^1.5.1": "1.5.1",
     "npm:class-variance-authority@~0.7.1": "0.7.1",
@@ -104,8 +105,8 @@
     "npm:testing-library@^0.0.2": "0.0.2_@angular+common@6.1.10__@angular+core@6.1.10___rxjs@6.6.7___zone.js@0.8.29__rxjs@6.6.7_@angular+core@6.1.10__rxjs@6.6.7__zone.js@0.8.29",
     "npm:tslog@^4.9.3": "4.9.3",
     "npm:typescript@^5.8.3": "5.8.3",
-    "npm:vite@7": "7.0.2_@types+node@22.16.0_picomatch@4.0.2",
-    "npm:vitest@^3.2.4": "3.2.4_@types+node@22.16.0_happy-dom@18.0.1_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2",
+    "npm:vite@7": "7.0.2_@types+node@22.16.0_picomatch@4.0.2_@types+node@22.15.15",
+    "npm:vitest@^3.2.4": "3.2.4_@types+node@22.16.0_happy-dom@18.0.1_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@types+node@22.15.15",
     "npm:zod@^3.25.75": "3.25.75",
     "npm:zustand@5.0.6": "5.0.6_@types+react@19.1.8_immer@10.1.1_react@19.1.0"
   },
@@ -1859,12 +1860,37 @@
         "babel-dead-code-elimination",
         "chokidar",
         "unplugin",
-        "vite",
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2",
         "zod"
       ],
       "optionalPeers": [
         "@tanstack/react-router",
-        "vite"
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2"
+      ]
+    },
+    "@tanstack/router-plugin@1.125.6_@tanstack+react-router@1.125.6__react@19.1.0__react-dom@19.1.0___react@19.1.0_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@babel+core@7.28.0_react@19.1.0_react-dom@19.1.0__react@19.1.0_@types+node@22.16.0_@types+node@22.15.15": {
+      "integrity": "sha512-SWfp++tkjb0grVqa/Xdvi9QAs93e9/fZMBZ6q0fvvQruMyciCmjWyE/qV3tS/Qh0WZdzIRP6yl8Gha2Lin4q1w==",
+      "dependencies": [
+        "@babel/core",
+        "@babel/plugin-syntax-jsx",
+        "@babel/plugin-syntax-typescript",
+        "@babel/template",
+        "@babel/traverse",
+        "@babel/types",
+        "@tanstack/react-router",
+        "@tanstack/router-core",
+        "@tanstack/router-generator",
+        "@tanstack/router-utils",
+        "@tanstack/virtual-file-routes",
+        "babel-dead-code-elimination",
+        "chokidar",
+        "unplugin",
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2_@types+node@22.15.15",
+        "zod"
+      ],
+      "optionalPeers": [
+        "@tanstack/react-router",
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2_@types+node@22.15.15"
       ]
     },
     "@tanstack/router-utils@1.121.21_@babel+core@7.28.0": {
@@ -3371,6 +3397,12 @@
         "undici-types@6.21.0"
       ]
     },
+    "@types/node@22.15.15": {
+      "integrity": "sha512-R5muMcZob3/Jjchn5LcO8jdKwSCbzqmPB6ruBxMcf9kbxtniZHP327s6C37iOfuw8mbKK3cAQa7sEl7afLrQ8A==",
+      "dependencies": [
+        "undici-types@6.21.0"
+      ]
+    },
     "@types/node@22.16.0": {
       "integrity": "sha512-B2egV9wALML1JCpv3VQoQ+yesQKAmNMBIAY7OteVrikcOcAkWm+dGL6qpeCktPjAv6N1JLnhbNiqS35UpFyBsQ==",
       "dependencies": [
@@ -3447,7 +3479,19 @@
         "@rolldown/pluginutils",
         "@types/babel__core",
         "react-refresh",
-        "vite"
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2"
+      ]
+    },
+    "@vitejs/plugin-react@4.6.0_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@babel+core@7.28.0_@types+node@22.16.0_@types+node@22.15.15": {
+      "integrity": "sha512-5Kgff+m8e2PB+9j51eGHEpn5kUzRKH2Ry0qGoe8ItJg7pqnkPrYPkDQZGgGmTa0EGarHrkjLvOdU3b1fzI8otQ==",
+      "dependencies": [
+        "@babel/core",
+        "@babel/plugin-transform-react-jsx-self",
+        "@babel/plugin-transform-react-jsx-source",
+        "@rolldown/pluginutils",
+        "@types/babel__core",
+        "react-refresh",
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2_@types+node@22.15.15"
       ]
     },
     "@vitest/expect@3.2.4": {
@@ -3466,10 +3510,22 @@
         "@vitest/spy",
         "estree-walker",
         "magic-string",
-        "vite"
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2"
       ],
       "optionalPeers": [
-        "vite"
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2"
+      ]
+    },
+    "@vitest/mocker@3.2.4_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@types+node@22.16.0_@types+node@22.15.15": {
+      "integrity": "sha512-46ryTE9RZO/rfDd7pEqFl7etuyzekzEhUbTW3BvmeO/BcCMEgq59BKhek3dXDWgAj4oMK6OZi+vRr1wPW6qjEQ==",
+      "dependencies": [
+        "@vitest/spy",
+        "estree-walker",
+        "magic-string",
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2_@types+node@22.15.15"
+      ],
+      "optionalPeers": [
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2_@types+node@22.15.15"
       ]
     },
     "@vitest/pretty-format@3.2.4": {
@@ -5020,7 +5076,18 @@
         "debug",
         "es-module-lexer",
         "pathe",
-        "vite"
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2"
+      ],
+      "bin": true
+    },
+    "vite-node@3.2.4_@types+node@22.16.0_@types+node@22.15.15": {
+      "integrity": "sha512-EbKSKh+bh1E1IFxeO0pg1n4dvoOTt0UDiXMd/qn++r98+jPO1xtJilvXldeuQ8giIB5IkpjCgMleHMNEsGH6pg==",
+      "dependencies": [
+        "cac",
+        "debug",
+        "es-module-lexer",
+        "pathe",
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2_@types+node@22.15.15"
       ],
       "bin": true
     },
@@ -5043,13 +5110,32 @@
       ],
       "bin": true
     },
+    "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2_@types+node@22.15.15": {
+      "integrity": "sha512-hxdyZDY1CM6SNpKI4w4lcUc3Mtkd9ej4ECWVHSMrOdSinVc2zYOAppHeGc/hzmRo3pxM5blMzkuWHOJA/3NiFw==",
+      "dependencies": [
+        "@types/node@22.15.15",
+        "esbuild",
+        "fdir",
+        "picomatch@4.0.2",
+        "postcss",
+        "rollup",
+        "tinyglobby"
+      ],
+      "optionalDependencies": [
+        "fsevents"
+      ],
+      "optionalPeers": [
+        "@types/node@22.15.15"
+      ],
+      "bin": true
+    },
     "vitest@3.2.4_@types+node@22.16.0_happy-dom@18.0.1_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2": {
       "integrity": "sha512-LUCP5ev3GURDysTWiP47wRRUpLKMOfPh+yKTx3kVIEiu5KOMeqzpnYNsKyOoVrULivR8tLcks4+lga33Whn90A==",
       "dependencies": [
         "@types/chai",
         "@types/node@22.16.0",
         "@vitest/expect",
-        "@vitest/mocker",
+        "@vitest/mocker@3.2.4_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@types+node@22.16.0",
         "@vitest/pretty-format",
         "@vitest/runner",
         "@vitest/snapshot",
@@ -5068,12 +5154,47 @@
         "tinyglobby",
         "tinypool",
         "tinyrainbow",
-        "vite",
-        "vite-node",
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2",
+        "vite-node@3.2.4_@types+node@22.16.0",
         "why-is-node-running"
       ],
       "optionalPeers": [
         "@types/node@22.16.0",
+        "happy-dom"
+      ],
+      "bin": true
+    },
+    "vitest@3.2.4_@types+node@22.16.0_happy-dom@18.0.1_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@types+node@22.15.15": {
+      "integrity": "sha512-LUCP5ev3GURDysTWiP47wRRUpLKMOfPh+yKTx3kVIEiu5KOMeqzpnYNsKyOoVrULivR8tLcks4+lga33Whn90A==",
+      "dependencies": [
+        "@types/chai",
+        "@types/node@22.15.15",
+        "@vitest/expect",
+        "@vitest/mocker@3.2.4_vite@7.0.2__@types+node@22.16.0__picomatch@4.0.2_@types+node@22.16.0_@types+node@22.15.15",
+        "@vitest/pretty-format",
+        "@vitest/runner",
+        "@vitest/snapshot",
+        "@vitest/spy",
+        "@vitest/utils",
+        "chai",
+        "debug",
+        "expect-type",
+        "happy-dom",
+        "magic-string",
+        "pathe",
+        "picomatch@4.0.2",
+        "std-env",
+        "tinybench",
+        "tinyexec",
+        "tinyglobby",
+        "tinypool",
+        "tinyrainbow",
+        "vite@7.0.2_@types+node@22.16.0_picomatch@4.0.2_@types+node@22.15.15",
+        "vite-node@3.2.4_@types+node@22.16.0_@types+node@22.15.15",
+        "why-is-node-running"
+      ],
+      "optionalPeers": [
+        "@types/node@22.15.15",
         "happy-dom"
       ],
       "bin": true
