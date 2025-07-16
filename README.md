@@ -33,9 +33,9 @@ All `Meshtastic JS` packages (core and transports) are published both to
 
 ## Stats
 
-| Project               | Repobeats                                                                                                             |
-| :-------------------- | :-------------------------------------------------------------------------------------------------------------------- |
-| Meshtastic Web        | ![Alt](https://repobeats.axiom.co/api/embed/e5b062db986cb005d83e81724c00cb2b9cce8e4c.svg "Repobeats analytics image") |
+| Project        | Repobeats                                                                                                             |
+| :------------- | :-------------------------------------------------------------------------------------------------------------------- |
+| Meshtastic Web | ![Alt](https://repobeats.axiom.co/api/embed/e5b062db986cb005d83e81724c00cb2b9cce8e4c.svg "Repobeats analytics image") |
 
 ---
 
