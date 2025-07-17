@@ -5,7 +5,7 @@ on:
     types: [released, prereleased]
 
 permissions:
-  id-token: write # This is required for requesting the JWT
+  id-token: write
   contents: write
   packages: write
 
@@ -13,7 +13,7 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
-      # --- Checkout code ---
+      # --- Checkout Code ---
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
@@ -25,12 +25,13 @@ jobs:
         with:
           bun-version: latest
 
-      # --- Setup Deno (for NPM package building) ---
+      # --- Setup Deno ---
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
+      # --- Cache Bun Dependencies ---
       - name: Cache Bun Dependencies
         uses: actions/cache@v4
         with:
@@ -40,6 +41,15 @@ jobs:
           key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
           restore-keys: |
             ${{ runner.os }}-bun-
+
+      # --- Cache Deno Dependencies ---
+      - name: Cache Deno Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock', '**/deno.json', '**/deno.jsonc') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
 
       # --- Determine Changed Packages ---
       - name: Get Changed Package Directories
@@ -64,38 +74,50 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # --- Build and Publish Packages to NPM & JSR ---
+      # --- Build and Publish Changed Packages ---
       - name: Build and Publish Changed Packages
         if: steps.changed_packages.outputs.all_changed_and_modified_files != ''
         run: |
           set -euo pipefail
 
-          excluded=("packages/web packages/transport-deno")
+          excluded=("packages/web" "packages/transport-deno")
 
           for pkg_dir in ${{ steps.changed_packages.outputs.all_changed_and_modified_files }}; do
+            echo "🔍 Inspecting $pkg_dir"
 
-            echo "Building for NPM..."
-            deno task build:npm "$pkg_dir"
+            if printf '%s\n' "${excluded[@]}" | grep -q "^$pkg_dir$"; then
+              echo "⏭️ Skipping excluded package: $pkg_dir"
+              continue
+            fi
 
-            echo "Publishing to NPM..."
-            npm publish "$pkg_dir/npm" --access public
+            if [[ -f "$pkg_dir/deno.json" ]]; then
+              echo "🦕 Building with Deno: $pkg_dir"
+              deno task build "$pkg_dir"
+              echo "📦 Publishing to JSR"
+              (cd "$pkg_dir" && deno publish --allow-dirty)
+            elif [[ -f "$pkg_dir/bun.lockb" ]]; then
+              echo "🥖 Building with Bun: $pkg_dir"
+              (cd "$pkg_dir" && bun install && bun run build)
+            else
+              echo "❓ No recognizable build config in $pkg_dir — skipping"
+              continue
+            fi
 
-            echo "Publishing to JSR..."
-            # We run this in a subshell to change directory just for this command.
-            # --allow-dirty is necessary because the 'npm' build directory is untracked.
-            (cd "$pkg_dir" && deno publish --allow-dirty)
+            if [[ -d "$pkg_dir/npm" ]]; then
+              echo "📤 Publishing to NPM: $pkg_dir"
+              npm publish "$pkg_dir/npm" --access public
+            fi
           done
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: No Packages Changed
         if: steps.changed_packages.outputs.all_changed_and_modified_files == ''
-        run: echo "No changed packages detected. Skipping publish."
+        run: echo "✅ No changed packages detected. Skipping publish."
 
       # --- Web Package Specific Tasks ---
       - name: Check for Web Package Changes
         id: web_changes
-
         run: |
           if [[ "${{ steps.changed_packages.outputs.all_changed_and_modified_files }}" == *"packages/web"* ]]; then
             echo "web_changed=true" >> $GITHUB_OUTPUT
@@ -111,7 +133,7 @@ jobs:
       - name: Create Web App Release Archive
         if: steps.web_changes.outputs.web_changed == 'true'
         working-directory: packages/web
-        run: bun run package # Generates dist/build.tar
+        run: bun run package
 
       - name: Upload Web App Archive
         if: steps.web_changes.outputs.web_changed == 'true'
@@ -145,8 +167,8 @@ jobs:
           platforms: linux/amd64, linux/arm64
 
       - name: Push Container to GHCR
-        id: push-to-registry
         if: steps.web_changes.outputs.web_changed == 'true'
+        id: push-to-registry
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-container.outputs.image }}
@@ -157,4 +179,4 @@ jobs:
 
       - name: Output Image URL
         if: steps.web_changes.outputs.web_changed == 'true'
-        run: echo "Image pushed to ${{ steps.push-to-registry.outputs.registry-paths }}"
+        run: echo "🖼️ Image pushed to ${{ steps.push-to-registry.outputs.registry-paths }}"
