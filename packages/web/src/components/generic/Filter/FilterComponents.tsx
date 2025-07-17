@@ -157,7 +157,7 @@ export const FilterMulti = <K extends EnumArrayKeys<FilterState>>({
   return (
     <div className="space-y-2">
       <ScrollArea className="h-64 border rounded-md dark:border-slate-700">
-        <div className="space-y-2 px-2 py-3">
+        <div className="flex flex-col space-y-2 px-2 py-3">
           <button
             type="button"
             className="w-full py-1 shadow-sm hover:shadow-md bg-slate-600 dark:bg-slate-900 text-white rounded text-sm  hover:text-slate-100 hover:bg-slate-700 active:bg-slate-950"
