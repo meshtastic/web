@@ -1,8 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
-import { DataRow, Heading, Table } from "@components/generic/Table/index.tsx";
-import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
+import {
+  type DataRow,
+  type Heading,
+  Table,
+} from "@components/generic/Table/index.tsx";
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
 // @ts-types="react"
 
 describe("Generic Table", () => {

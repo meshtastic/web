@@ -1,25 +1,27 @@
+import { useTheme } from "@core/hooks/useTheme.ts";
+import { useEffect, useRef } from "react";
 import MapGl, {
   AttributionControl,
   type MapRef,
   NavigationControl,
   ScaleControl,
 } from "react-map-gl/maplibre";
-import { useTheme } from "@core/hooks/useTheme.ts";
-import { useEffect, useRef } from "react";
 
 interface MapProps {
   children?: React.ReactNode;
   onLoad?: (map: MapRef) => void;
 }
 
-export const Map = ({ children, onLoad }: MapProps) => {
+export const BaseMap = ({ children, onLoad }: MapProps) => {
   const { theme } = useTheme();
   const darkMode = theme === "dark";
   const mapRef = useRef<MapRef | null>(null);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (map && onLoad) onLoad(map);
+    if (map && onLoad) {
+      onLoad(map);
+    }
   }, [onLoad]);
 
   return (
@@ -45,14 +47,12 @@ export const Map = ({ children, onLoad }: MapProps) => {
         }}
       />
       {/* { Disabled for now until we can use i18n for the geolocate control} */}
-      {
-        /* <GeolocateControl
+      {/* <GeolocateControl
         position="top-right"
         i18nIsDynamicList
         positionOptions={{ enableHighAccuracy: true }}
         trackUserLocation
-      />  */
-      }
+      />  */}
       <NavigationControl position="top-right" showCompass={false} />
       <ScaleControl />
       {children}

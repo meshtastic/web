@@ -41,7 +41,8 @@ export function validateMaxByteLength(
 ): LengthValidationResult {
   // Ensure maxByteLength is valid
   if (
-    typeof maxByteLength !== "number" || !Number.isInteger(maxByteLength) ||
+    typeof maxByteLength !== "number" ||
+    !Number.isInteger(maxByteLength) ||
     maxByteLength < 0
   ) {
     console.warn(

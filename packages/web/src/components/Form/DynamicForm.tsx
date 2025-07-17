@@ -1,10 +1,15 @@
+import { createZodResolver } from "@components/Form/createZodResolver.ts";
 import {
   DynamicFormField,
   type FieldProps,
 } from "@components/Form/DynamicFormField.tsx";
 import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { Button } from "@components/UI/Button.tsx";
+import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { dotPaths } from "@core/utils/dotPath.ts";
+import { useEffect } from "react";
 import {
   type Control,
   type DefaultValues,
@@ -13,16 +18,11 @@ import {
   get,
   type Path,
   type SubmitHandler,
-  useForm,
   type UseFormReturn,
+  useForm,
 } from "react-hook-form";
-import { Heading } from "@components/UI/Typography/Heading.tsx";
-import { ZodType } from "zod/v4";
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { createZodResolver } from "@components/Form/createZodResolver.ts";
-import { useAppStore } from "@core/stores/appStore.ts";
-import { dotPaths } from "@core/utils/dotPath.ts";
+import type { ZodType } from "zod/v4";
 
 interface DisabledBy<T> {
   fieldName: Path<T>;
@@ -86,41 +86,34 @@ export function DynamicForm<T extends FieldValues>({
   formId,
 }: DynamicFormProps<T>) {
   const { t } = useTranslation();
-  const {
-    addError,
-    removeError,
-  } = useAppStore();
+  const { addError, removeError } = useAppStore();
 
-  let methods = propMethods;
-  if (!methods) {
-    methods = useForm<
-      T
-    >({
-      mode: "onChange",
-      defaultValues: defaultValues,
-      resolver: validationSchema
-        ? createZodResolver(validationSchema)
-        : undefined,
-      shouldFocusError: false,
-      resetOptions: { keepDefaultValues: true },
-      values,
-    });
-  }
+  const internalMethods = useForm<T>({
+    mode: "onChange",
+    defaultValues: defaultValues,
+    resolver: validationSchema
+      ? createZodResolver(validationSchema)
+      : undefined,
+    shouldFocusError: false,
+    resetOptions: { keepDefaultValues: true },
+    values,
+  });
+
+  const methods = propMethods ?? internalMethods;
+
   const { handleSubmit, control, getValues, formState, getFieldState } =
     methods;
 
   useEffect(() => {
     if (!propMethods) {
-      onFormInit?.(methods);
+      onFormInit?.(internalMethods);
     }
-  }, [onFormInit, propMethods, methods]);
+  }, [onFormInit, propMethods, internalMethods]);
 
   useEffect(() => {
     const errorKeys = Object.keys(formState.errors);
     if (formId) {
-      if (
-        errorKeys.length === 0
-      ) {
+      if (errorKeys.length === 0) {
         dotPaths(getValues()).forEach((key) => {
           removeError(key);
         });
@@ -132,19 +125,27 @@ export function DynamicForm<T extends FieldValues>({
         addError(formId, "");
       }
     }
-  }, [formState.errors]);
+  }, [formState.errors, addError, formId, getValues, removeError]);
 
   const isDisabled = (
     disabledBy?: DisabledBy<T>[],
     disabled?: boolean,
   ): boolean => {
-    if (disabled) return true;
-    if (!disabledBy) return false;
+    if (disabled) {
+      return true;
+    }
+    if (!disabledBy) {
+      return false;
+    }
 
     return disabledBy.some((field) => {
       const value = getValues(field.fieldName);
-      if (value === "always") return true;
-      if (typeof value === "boolean") return field.invert ? value : !value;
+      if (value === "always") {
+        return true;
+      }
+      if (typeof value === "boolean") {
+        return field.invert ? value : !value;
+      }
       if (typeof value === "number") {
         return field.invert
           ? field.selector !== value
@@ -181,14 +182,16 @@ export function DynamicForm<T extends FieldValues>({
                   fieldName={field.name}
                   description={field.description}
                   valid={!error}
-                  validationText={error
-                    ? String(
-                      t([`formValidation.${error.type}`, error.message], {
-                        returnObjects: false,
-                        ...error.params,
-                      }),
-                    )
-                    : ""}
+                  validationText={
+                    error
+                      ? String(
+                          t([`formValidation.${error.type}`, error.message], {
+                            returnObjects: false,
+                            ...error.params,
+                          }),
+                        )
+                      : ""
+                  }
                 >
                   <DynamicFormField
                     field={field}
@@ -203,11 +206,7 @@ export function DynamicForm<T extends FieldValues>({
           </div>
         ))}
         {hasSubmitButton && (
-          <Button
-            type="submit"
-            variant="outline"
-            disabled={!formState.isValid}
-          >
+          <Button type="submit" variant="outline" disabled={!formState.isValid}>
             {t("button.submit")}
           </Button>
         )}

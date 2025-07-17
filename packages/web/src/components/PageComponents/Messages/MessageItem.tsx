@@ -1,3 +1,4 @@
+import { Avatar } from "@components/UI/Avatar.tsx";
 import {
   Tooltip,
   TooltipArrow,
@@ -6,18 +7,18 @@ import {
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { cn } from "@core/utils/cn.ts";
-import { Avatar } from "@components/UI/Avatar.tsx";
-import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { ReactNode, useMemo } from "react";
 import {
   MessageState,
   useMessageStore,
 } from "@core/stores/messageStore/index.ts";
-import { Protobuf, Types } from "@meshtastic/core";
-import { Message } from "@core/stores/messageStore/types.ts";
+import type { Message } from "@core/stores/messageStore/types.ts";
+import { cn } from "@core/utils/cn.ts";
+import { type Protobuf, Types } from "@meshtastic/core";
+import type { LucideIcon } from "lucide-react";
+import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
+import { type ReactNode, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+
 // import { MessageActionsMenu } from "@components/PageComponents/Messages/MessageActionsMenu.tsx"; // TODO: Uncomment when actions menu is implemented
 
 interface MessageStatusInfo {
@@ -27,12 +28,13 @@ interface MessageStatusInfo {
   iconClassName?: string;
 }
 
-const StatusTooltip = (
-  { statusInfo, children }: {
-    statusInfo: MessageStatusInfo;
-    children: ReactNode;
-  },
-) => (
+const StatusTooltip = ({
+  statusInfo,
+  children,
+}: {
+  statusInfo: MessageStatusInfo;
+  children: ReactNode;
+}) => (
   <TooltipProvider delayDuration={300}>
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
@@ -77,16 +79,20 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     [t],
   );
 
-  const UNKNOWN_STATUS = useMemo((): MessageStatusInfo => ({
-    displayText: t("deliveryStatus.unknown.displayText"),
-    icon: AlertCircle,
-    ariaLabel: t("deliveryStatus.unknown.label"),
-    iconClassName: "text-red-500 dark:text-red-400",
-  }), [t]);
+  const UNKNOWN_STATUS = useMemo(
+    (): MessageStatusInfo => ({
+      displayText: t("deliveryStatus.unknown.displayText"),
+      icon: AlertCircle,
+      ariaLabel: t("deliveryStatus.unknown.label"),
+      iconClassName: "text-red-500 dark:text-red-400",
+    }),
+    [t],
+  );
 
   const getMessageStatusInfo = useMemo(
-    () => (state: MessageState): MessageStatusInfo =>
-      MESSAGE_STATUS_MAP[state] ?? UNKNOWN_STATUS,
+    () =>
+      (state: MessageState): MessageStatusInfo =>
+        MESSAGE_STATUS_MAP[state] ?? UNKNOWN_STATUS,
     [MESSAGE_STATUS_MAP, UNKNOWN_STATUS],
   );
 
@@ -103,8 +109,8 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     const longName = messageUser?.user?.longName;
     const derivedShortName = messageUser?.user?.shortName || fallbackName;
     const derivedDisplayName = longName || derivedShortName;
-    const isFavorite = messageUser?.num !== myNodeNum &&
-      messageUser?.isFavorite;
+    const isFavorite =
+      messageUser?.num !== myNodeNum && messageUser?.isFavorite;
     return {
       displayName: derivedDisplayName,
       shortName: derivedShortName,
@@ -116,7 +122,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   const StatusIconComponent = messageStatusInfo.icon;
 
   const messageDate = useMemo(
-    () => message.date ? new Date(message.date) : null,
+    () => (message.date ? new Date(message.date) : null),
     [message.date],
   );
   const locale = i18n.language;
@@ -199,11 +205,9 @@ export const MessageItem = ({ message }: MessageItemProps) => {
         </div>
       </div>
       {/* Actions Menu Placeholder */}
-      {
-        /* <div className="absolute top-1 right-1">
+      {/* <div className="absolute top-1 right-1">
         <MessageActionsMenu onReply={() => console.log("Reply")} />
-       </div> */
-      }
+       </div> */}
     </li>
   );
 };

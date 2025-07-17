@@ -8,15 +8,16 @@ import {
   Search as SearchIcon,
   ZapIcon,
 } from "lucide-react";
-import BatteryStatus from "./BatteryStatus.tsx";
-import { Subtle } from "./UI/Typography/Subtle.tsx";
-import { Avatar } from "./UI/Avatar.tsx";
-import type { DeviceMetrics } from "./types.ts";
-import { Button } from "./UI/Button.tsx";
-import React, { Fragment } from "react";
+import type React from "react";
+import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
-import ThemeSwitcher from "./ThemeSwitcher.tsx";
+import BatteryStatus from "./BatteryStatus.tsx";
 import LanguageSwitcher from "./LanguageSwitcher.tsx";
+import ThemeSwitcher from "./ThemeSwitcher.tsx";
+import type { DeviceMetrics } from "./types.ts";
+import { Avatar } from "./UI/Avatar.tsx";
+import { Button } from "./UI/Button.tsx";
+import { Subtle } from "./UI/Typography/Subtle.tsx";
 
 interface DeviceInfoPanelProps {
   isCollapsed: boolean;
@@ -70,9 +71,10 @@ export const DeviceInfoPanel = ({
       id: "voltage",
       label: t("batteryVoltage.title"),
       icon: ZapIcon,
-      value: voltage !== undefined
-        ? `${voltage?.toPrecision(3)} V`
-        : t("unknown.notAvailable", "N/A"),
+      value:
+        voltage !== undefined
+          ? `${voltage?.toPrecision(3)} V`
+          : t("unknown.notAvailable", "N/A"),
     },
     {
       id: "firmware",
@@ -135,8 +137,7 @@ export const DeviceInfoPanel = ({
       </div>
 
       {!isCollapsed && (
-        <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0">
-        </div>
+        <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
       )}
 
       <div
@@ -151,10 +152,7 @@ export const DeviceInfoPanel = ({
         {deviceInfoItems.map((item) => {
           const IconComponent = item.icon;
           return (
-            <div
-              key={item.id}
-              className="flex items-center gap-2.5 text-sm"
-            >
+            <div key={item.id} className="flex items-center gap-2.5 text-sm">
               {IconComponent && (
                 <IconComponent
                   size={16}
@@ -173,8 +171,7 @@ export const DeviceInfoPanel = ({
       </div>
 
       {!isCollapsed && (
-        <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0">
-        </div>
+        <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
       )}
 
       <div
@@ -190,9 +187,7 @@ export const DeviceInfoPanel = ({
           const Icon = buttonItem.icon;
           if (buttonItem.render) {
             return (
-              <Fragment key={buttonItem.id}>
-                {buttonItem.render()}
-              </Fragment>
+              <Fragment key={buttonItem.id}>{buttonItem.render()}</Fragment>
             );
           }
           return (

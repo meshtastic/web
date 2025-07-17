@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
 import { mockDeviceStore } from "@core/stores/deviceStore.mock.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf } from "@meshtastic/core";
+import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@core/stores/deviceStore");
 
@@ -18,7 +18,7 @@ describe("TraceRoute", () => {
       macaddr: new Uint8Array([0x01, 0x02, 0x03, 0x04]),
       id: "source-node",
       isLicensed: false,
-      role: Protobuf.Config.Config_DeviceConfig_Role["CLIENT"],
+      role: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
     } as Protobuf.Mesh.NodeInfo["user"],
   };
 
@@ -32,7 +32,7 @@ describe("TraceRoute", () => {
       macaddr: new Uint8Array([0x05, 0x06, 0x07, 0x08]),
       id: "destination-node",
       isLicensed: false,
-      role: Protobuf.Config.Config_DeviceConfig_Role["CLIENT"],
+      role: Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
     } as Protobuf.Mesh.NodeInfo["user"],
   };
 
@@ -123,13 +123,7 @@ describe("TraceRoute", () => {
   });
 
   it("renders '??' for missing SNR values", () => {
-    render(
-      <TraceRoute
-        from={fromUser}
-        to={toUser}
-        route={[1]}
-      />,
-    );
+    render(<TraceRoute from={fromUser} to={toUser} route={[1]} />);
 
     expect(screen.getByText("Node A")).toBeInTheDocument();
     // Check for translated '??' placeholder

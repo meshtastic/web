@@ -1,3 +1,4 @@
+import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
 import {
   AccordionContent,
   AccordionHeader,
@@ -5,13 +6,12 @@ import {
   AccordionTrigger,
 } from "@components/UI/Accordion.tsx";
 import { Checkbox } from "@components/UI/Checkbox/index.tsx";
-import { Slider } from "@components/UI/Slider.tsx";
 import { ScrollArea } from "@components/UI/ScrollArea.tsx";
+import { Slider } from "@components/UI/Slider.tsx";
 import { ToggleGroup, ToggleGroupItem } from "@components/UI/ToggleGroup.tsx";
-
-import { ReactNode } from "react";
-import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
 import { cn } from "@core/utils/cn.ts";
+import type { ReactNode } from "react";
+import { useId } from "react";
 
 interface FilterAccordionItemProps {
   label: string;
@@ -66,9 +66,7 @@ export const FilterAccordionItem = ({
         </AccordionTrigger>
       </AccordionHeader>
       <AccordionContent
-        className={cn(
-          "px-1 pb-4 pt-2 space-y-3 dark:border-slate-700",
-        )}
+        className={cn("px-1 pb-4 pt-2 space-y-3 dark:border-slate-700")}
       >
         {children}
       </AccordionContent>
@@ -85,6 +83,7 @@ export const FilterSlider = <K extends RangeKeys<FilterState>>({
   label,
   step,
 }: FilterSliderProps<K>) => {
+  const sliderId = useId();
   const value: [number, number] = filterState[filterKey];
   const defaultValue: [number, number] = defaultFilterValues[filterKey];
 
@@ -98,7 +97,7 @@ export const FilterSlider = <K extends RangeKeys<FilterState>>({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium">
+      <label htmlFor={sliderId} className="block text-sm font-medium">
         {labelContent ?? defaultLabel}
       </label>
       <Slider
@@ -112,6 +111,7 @@ export const FilterSlider = <K extends RangeKeys<FilterState>>({
         rangeClassName="bg-blue-500 dark:bg-blue-600"
         thumbClassName="w-3 h-3 bg-white dark:bg-slate-300 border border-slate-400 dark:border-slate-100"
         aria-label={label ?? String(filterKey)}
+        id={sliderId}
       />
     </div>
   );
@@ -121,7 +121,7 @@ function getNumberArray<T extends FilterState, K extends EnumArrayKeys<T>>(
   state: T,
   key: K,
 ): number[] {
-  return state[key] as unknown as number[];
+  return state[key] as number[];
 }
 export const FilterMulti = <K extends EnumArrayKeys<FilterState>>({
   filterKey,
@@ -132,8 +132,8 @@ export const FilterMulti = <K extends EnumArrayKeys<FilterState>>({
 }: FilterMultiProps<K>) => {
   const selected = getNumberArray(filterState, filterKey);
 
-  const allSelected = options.length > 0 &&
-    options.every((opt) => selected.includes(opt));
+  const allSelected =
+    options.length > 0 && options.every((opt) => selected.includes(opt));
 
   const toggleAll = () => {
     setFilterState((prev) => ({
@@ -188,16 +188,19 @@ export const FilterToggle = <K extends keyof FilterState>({
   onChange,
 }: FilterToggleProps<K>) => (
   <div className="space-y-1 pb-1">
-    <label className="block text-sm font-medium">
+    <label htmlFor={label} className="block text-sm font-medium">
       {label}
     </label>
     <ToggleGroup
       type="single"
       aria-label={label}
+      id={label}
       onValueChange={(value) => onChange(filterKey, value)}
-      value={typeof filterState[filterKey] === "undefined"
-        ? ""
-        : filterState[filterKey].toString()}
+      value={
+        typeof filterState[filterKey] === "undefined"
+          ? ""
+          : String(filterState[filterKey])
+      }
     >
       <ToggleGroupItem
         value="false"

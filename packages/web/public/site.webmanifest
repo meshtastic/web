@@ -1,16 +1,16 @@
 {
-  "name": "Meshtastic",
-  "short_name": "Web Client",
-  "start_url": ".",
-  "description": "Meshtastic Web App",
-  "icons": [
-    {
-      "src": "/logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
-    }
-  ],
-  "theme_color": "#67ea94",
-  "background_color": "#67ea94",
-  "display": "standalone"
+	"name": "Meshtastic",
+	"short_name": "Web Client",
+	"start_url": ".",
+	"description": "Meshtastic Web App",
+	"icons": [
+		{
+			"src": "/logo.svg",
+			"sizes": "any",
+			"type": "image/svg+xml"
+		}
+	],
+	"theme_color": "#67ea94",
+	"background_color": "#67ea94",
+	"display": "standalone"
 }

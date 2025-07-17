@@ -2,11 +2,11 @@ import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.tsx";
-import type { ButtonVariant } from "../UI/Button.tsx";
 import { Generator } from "@components/UI/Generator.tsx";
-import { Controller, type FieldValues, useFormContext } from "react-hook-form";
 import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
 import { useEffect } from "react";
+import { Controller, type FieldValues, useFormContext } from "react-hook-form";
+import type { ButtonVariant } from "../UI/Button.tsx";
 
 export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
   type: "passwordGenerator";
@@ -38,24 +38,22 @@ export function PasswordGenerator<T extends FieldValues>({
 
   useEffect(() => {
     trigger(field.name);
-  }, [field.devicePSKBitCount, field.name, trigger]);
+  }, [field.name, trigger]);
 
   return (
     <Controller
       name={field.name}
       control={control}
-      render={(
-        {
-          field: { value, onChange, ...rest },
-        },
-      ) => (
+      render={({ field: { value, onChange, ...rest } }) => (
         <Generator
           type={field.hide && !isVisible ? "password" : "text"}
           id={field.id}
           devicePSKBitCount={field.devicePSKBitCount}
           bits={field.bits}
           inputChange={(e) => {
-            if (field.inputChange) field.inputChange(e);
+            if (field.inputChange) {
+              field.inputChange(e);
+            }
             onChange(e);
           }}
           selectChange={field.selectChange ?? (() => {})}

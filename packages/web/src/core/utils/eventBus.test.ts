@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { eventBus } from "@core/utils/eventBus.ts";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("EventBus", () => {
   beforeEach(() => {

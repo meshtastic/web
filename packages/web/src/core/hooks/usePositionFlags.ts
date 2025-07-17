@@ -54,12 +54,14 @@ export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
   const FLAGS_BITMASKS = useMemo(() => {
     return Object.fromEntries(
       Object.entries(FLAGS_CONFIG).map(([key, conf]) => [key, conf.value]),
-    ) as { [K in FlagName]: typeof FLAGS_CONFIG[K]["value"] };
+    ) as { [K in FlagName]: (typeof FLAGS_CONFIG)[K]["value"] };
   }, []);
 
   const utils = useMemo(() => {
     const decode = (value: number): FlagName[] => {
-      if (value === FLAGS_CONFIG.UNSET.value) return ["UNSET"];
+      if (value === FLAGS_CONFIG.UNSET.value) {
+        return ["UNSET"];
+      }
 
       const activeFlags: FlagName[] = [];
       for (const key in FLAGS_CONFIG) {
@@ -80,14 +82,17 @@ export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
         return FLAGS_CONFIG.UNSET.value;
       }
       return flagNames.reduce((acc, name) => {
-        if (name === "UNSET") return acc;
+        if (name === "UNSET") {
+          return acc;
+        }
         return acc | FLAGS_CONFIG[name].value;
       }, 0);
     };
 
     const hasFlag = (value: number, flagName: FlagName): boolean => {
-      return (value & FLAGS_CONFIG[flagName].value) ===
-        FLAGS_CONFIG[flagName].value;
+      return (
+        (value & FLAGS_CONFIG[flagName].value) === FLAGS_CONFIG[flagName].value
+      );
     };
 
     const getAllFlags = (): typeof FLAGS_CONFIG => {
@@ -117,7 +122,7 @@ export const usePositionFlags = (initialValue = 0): UsePositionFlagsProps => {
   const setFlag = useCallback((flagName: FlagName, enabled: boolean) => {
     const currentFlagValue = FLAGS_CONFIG[flagName].value;
     setFlagsValue((prev) =>
-      enabled ? prev | currentFlagValue : prev & ~currentFlagValue
+      enabled ? prev | currentFlagValue : prev & ~currentFlagValue,
     );
   }, []);
 

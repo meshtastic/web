@@ -1,4 +1,4 @@
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type MqttValidation,
   MqttValidationSchema,
@@ -8,15 +8,18 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface MqttModuleConfigProps {
   onFormInit: DynamicFormFormInit<MqttValidation>;
 }
 
 export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
+  useWaitForConfig({ moduleConfigCase: "mqtt" });
+
   const {
     config,
     moduleConfig,
@@ -55,10 +58,12 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
   ) => {
     return cfg
       ? {
-        ...cfg,
-        mapReportSettings: cfg.mapReportSettings ??
-          { publishIntervalSecs: 0, positionPrecision: 10 },
-      }
+          ...cfg,
+          mapReportSettings: cfg.mapReportSettings ?? {
+            publishIntervalSecs: 0,
+            positionPrecision: 10,
+          },
+        }
       : undefined;
   };
 
@@ -202,78 +207,77 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
             {
               type: "select",
               name: "mapReportSettings.positionPrecision",
-              label: t(
-                "mqtt.mapReportSettings.positionPrecision.label",
-              ),
+              label: t("mqtt.mapReportSettings.positionPrecision.label"),
               description: t(
                 "mqtt.mapReportSettings.positionPrecision.description",
               ),
               properties: {
-                enumValue: config.display?.units === 0
-                  ? {
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.metric_km23")
-                    ]: 10,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.metric_km12")
-                    ]: 11,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.metric_km5_8")
-                    ]: 12,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.metric_km2_9")
-                    ]: 13,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.metric_km1_5")
-                    ]: 14,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.metric_m700")
-                    ]: 15,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.metric_m350")
-                    ]: 16,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.metric_m200")
-                    ]: 17,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.metric_m90")
-                    ]: 18,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.metric_m50")
-                    ]: 19,
-                  }
-                  : {
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi15")
-                    ]: 10,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi7_3")
-                    ]: 11,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi3_6")
-                    ]: 12,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi1_8")
-                    ]: 13,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_9")
-                    ]: 14,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_5")
-                    ]: 15,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_2")
-                    ]: 16,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft600")
-                    ]: 17,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft300")
-                    ]: 18,
-                    [
-                      t("mqtt.mapReportSettings.positionPrecision.options.imperial_ft150")
-                    ]: 19,
-                  },
+                enumValue:
+                  config.display?.units === 0
+                    ? {
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.metric_km23",
+                        )]: 10,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.metric_km12",
+                        )]: 11,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.metric_km5_8",
+                        )]: 12,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.metric_km2_9",
+                        )]: 13,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.metric_km1_5",
+                        )]: 14,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.metric_m700",
+                        )]: 15,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.metric_m350",
+                        )]: 16,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.metric_m200",
+                        )]: 17,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.metric_m90",
+                        )]: 18,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.metric_m50",
+                        )]: 19,
+                      }
+                    : {
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi15",
+                        )]: 10,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi7_3",
+                        )]: 11,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi3_6",
+                        )]: 12,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi1_8",
+                        )]: 13,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_9",
+                        )]: 14,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_5",
+                        )]: 15,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.imperial_mi0_2",
+                        )]: 16,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.imperial_ft600",
+                        )]: 17,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.imperial_ft300",
+                        )]: 18,
+                        [t(
+                          "mqtt.mapReportSettings.positionPrecision.options.imperial_ft150",
+                        )]: 19,
+                      },
               },
               disabledBy: [
                 {

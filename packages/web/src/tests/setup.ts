@@ -1,10 +1,8 @@
-import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 import { enableMapSet } from "immer";
+import { afterEach, vi } from "vitest";
 import "@testing-library/jest-dom";
 import "@testing-library/user-event";
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
 import channelsEN from "@public/i18n/locales/en/channels.json" with {
   type: "json",
 };
@@ -14,13 +12,10 @@ import commandPaletteEN from "@public/i18n/locales/en/commandPalette.json" with 
 import commonEN from "@public/i18n/locales/en/common.json" with {
   type: "json",
 };
-import deviceConfigEN from "@public/i18n/locales/en/deviceConfig.json" with {
-  type: "json",
-};
-import moduleConfigEN from "@public/i18n/locales/en/moduleConfig.json" with {
-  type: "json",
-};
 import dashboardEN from "@public/i18n/locales/en/dashboard.json" with {
+  type: "json",
+};
+import deviceConfigEN from "@public/i18n/locales/en/deviceConfig.json" with {
   type: "json",
 };
 import dialogEN from "@public/i18n/locales/en/dialog.json" with {
@@ -29,10 +24,13 @@ import dialogEN from "@public/i18n/locales/en/dialog.json" with {
 import messagesEN from "@public/i18n/locales/en/messages.json" with {
   type: "json",
 };
-import nodesEN from "@public/i18n/locales/en/nodes.json" with {
+import moduleConfigEN from "@public/i18n/locales/en/moduleConfig.json" with {
   type: "json",
 };
+import nodesEN from "@public/i18n/locales/en/nodes.json" with { type: "json" };
 import uiEN from "@public/i18n/locales/en/ui.json" with { type: "json" };
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
 
 enableMapSet();
 
@@ -66,39 +64,37 @@ const appNamespaces = [
 const appFallbackNS = ["common", "ui", "dialog"];
 const appDefaultNS = "common";
 
-i18n
-  .use(initReactI18next)
-  .init({
-    lng: "en",
+i18n.use(initReactI18next).init({
+  lng: "en",
 
-    ns: appNamespaces,
-    defaultNS: appDefaultNS,
-    fallbackNS: appFallbackNS,
+  ns: appNamespaces,
+  defaultNS: appDefaultNS,
+  fallbackNS: appFallbackNS,
 
-    resources: {
-      en: {
-        channels: channelsEN,
-        commandPalette: commandPaletteEN,
-        common: commonEN,
-        deviceConfig: deviceConfigEN,
-        moduleConfig: moduleConfigEN,
-        dashboard: dashboardEN,
-        dialog: dialogEN,
-        messages: messagesEN,
-        nodes: nodesEN,
-        ui: uiEN,
-      },
+  resources: {
+    en: {
+      channels: channelsEN,
+      commandPalette: commandPaletteEN,
+      common: commonEN,
+      deviceConfig: deviceConfigEN,
+      moduleConfig: moduleConfigEN,
+      dashboard: dashboardEN,
+      dialog: dialogEN,
+      messages: messagesEN,
+      nodes: nodesEN,
+      ui: uiEN,
     },
+  },
 
-    interpolation: {
-      escapeValue: false,
-    },
+  interpolation: {
+    escapeValue: false,
+  },
 
-    react: {
-      useSuspense: false,
-    },
-    debug: false,
-  });
+  react: {
+    useSuspense: false,
+  },
+  debug: false,
+});
 
 afterEach(() => {
   cleanup();

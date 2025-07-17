@@ -1,5 +1,3 @@
-import { useAppStore } from "../../core/stores/appStore.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
 import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
@@ -11,7 +9,9 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { Label } from "@components/UI/Label.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { useTranslation } from "react-i18next";
+import { useAppStore } from "../../core/stores/appStore.ts";
 
 export interface RemoveNodeDialogProps {
   open: boolean;
@@ -38,9 +38,7 @@ export const RemoveNodeDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>{t("removeNode.title")}</DialogTitle>
-          <DialogDescription>
-            {t("removeNode.description")}
-          </DialogDescription>
+          <DialogDescription>{t("removeNode.description")}</DialogDescription>
         </DialogHeader>
         <div className="gap-4">
           <form onSubmit={onSubmit}>

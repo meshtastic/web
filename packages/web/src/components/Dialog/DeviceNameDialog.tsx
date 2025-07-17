@@ -1,5 +1,5 @@
-import { useDevice } from "@core/stores/deviceStore.ts";
 import { create } from "@bufbuild/protobuf";
+import { GenericInput } from "@components/Form/FormInput.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
@@ -10,13 +10,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Protobuf } from "@meshtastic/core";
 import { useForm } from "react-hook-form";
-import { GenericInput } from "@components/Form/FormInput.tsx";
 import { useTranslation } from "react-i18next";
-import { Label } from "../UI/Label.tsx";
 import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Label } from "../UI/Label.tsx";
 
 export interface User {
   longName: string;
@@ -76,15 +76,11 @@ export const DeviceNameDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>{t("deviceName.title")}</DialogTitle>
-          <DialogDescription>
-            {t("deviceName.description")}
-          </DialogDescription>
+          <DialogDescription>{t("deviceName.description")}</DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <div>
-            <Label htmlFor="longName">
-              {t("deviceName.longName")}
-            </Label>
+            <Label htmlFor="longName">{t("deviceName.longName")}</Label>
             <GenericInput
               control={control}
               field={{
@@ -104,9 +100,7 @@ export const DeviceNameDialog = ({
             />
           </div>
           <div>
-            <Label htmlFor="shortName">
-              {t("deviceName.shortName")}
-            </Label>
+            <Label htmlFor="shortName">{t("deviceName.shortName")}</Label>
             <GenericInput
               control={control}
               field={{
@@ -134,10 +128,7 @@ export const DeviceNameDialog = ({
             >
               {t("button.reset")}
             </Button>
-            <Button
-              type="submit"
-              name="save"
-            >
+            <Button type="submit" name="save">
               {t("button.save")}
             </Button>
           </DialogFooter>

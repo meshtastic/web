@@ -1,141 +1,141 @@
 {
-  "button": {
-    "apply": "Applica",
-    "backupKey": "Backup della chiave",
-    "cancel": "Annulla",
-    "clearMessages": "Cancella Messaggi",
-    "close": "Chiudi",
-    "confirm": "Conferma",
-    "delete": "Elimina",
-    "dismiss": "Annulla",
-    "download": "Scarica",
-    "export": "Esporta",
-    "generate": "Genera",
-    "regenerate": "Rigenera",
-    "import": "Importa",
-    "message": "Messaggio",
-    "now": "Adesso",
-    "ok": "Ok",
-    "print": "Stampa",
-    "rebootOtaNow": "Riavvia ora in modalità OTA",
-    "remove": "Elimina",
-    "requestNewKeys": "Richiedi Nuove Chiavi",
-    "requestPosition": "Richiedi posizione",
-    "reset": "Reset",
-    "save": "Salva",
-    "scanQr": "Scansiona codice QR",
-    "traceRoute": "Trace Route",
-    "submit": "Submit"
-  },
-  "app": {
-    "title": "Meshtastic",
-    "fullTitle": "Meshtastic Web Client"
-  },
-  "loading": "Caricamento in corso...",
-  "unit": {
-    "cps": "CPS",
-    "dbm": "dBm",
-    "hertz": "Hz",
-    "hop": {
-      "one": "Hop",
-      "plural": "Hops"
-    },
-    "hopsAway": {
-      "one": "A {{count}} hop di distanza",
-      "plural": "A {{count}} hop di distanza",
-      "unknown": "Hop sconosciuti"
-    },
-    "megahertz": "MHz",
-    "raw": "grezzo",
-    "meter": {
-      "one": "Metro",
-      "plural": "Metri",
-      "suffix": "m"
-    },
-    "minute": {
-      "one": "Minuto",
-      "plural": "Minuti"
-    },
-    "hour": {
-      "one": "Hour",
-      "plural": "Hours"
-    },
-    "millisecond": {
-      "one": "Millisecondo",
-      "plural": "Millisecondi",
-      "suffix": "ms"
-    },
-    "second": {
-      "one": "Secondo",
-      "plural": "Secondi"
-    },
-    "day": {
-      "one": "Day",
-      "plural": "Days"
-    },
-    "month": {
-      "one": "Month",
-      "plural": "Months"
-    },
-    "year": {
-      "one": "Year",
-      "plural": "Years"
-    },
-    "snr": "SNR",
-    "volt": {
-      "one": "Volt",
-      "plural": "Volt",
-      "suffix": "V"
-    },
-    "record": {
-      "one": "Record",
-      "plural": "Record"
-    }
-  },
-  "security": {
-    "0bit": "Empty",
-    "8bit": "8 bit",
-    "128bit": "128 bit",
-    "256bit": "256 bit"
-  },
-  "unknown": {
-    "longName": "Sconosciuto",
-    "shortName": "SCON",
-    "notAvailable": "N/D",
-    "num": "??"
-  },
-  "nodeUnknownPrefix": "!",
-  "unset": "ANNULLA",
-  "fallbackName": "Meshtastic {{last4}}",
-  "node": "Node",
-  "formValidation": {
-    "unsavedChanges": "Unsaved changes",
-    "tooBig": {
-      "string": "Troppo lungo, atteso minore o uguale a {{maximum}} caratteri.",
-      "number": "Troppo grande, ci si aspetta un numero minore o uguale a {{maximum}}.",
-      "bytes": "Troppo grande, atteso inferiore o uguale a {{params.maximum}} byte."
-    },
-    "tooSmall": {
-      "string": "Troppo breve, atteso più di o uguale a {{minimum}} caratteri.",
-      "number": "Troppo piccolo, atteso un numero maggiore o uguale a {{minimum}}."
-    },
-    "invalidFormat": {
-      "ipv4": "Formato non valido, previsto un indirizzo IPv4.",
-      "key": "Formato non valido, prevista una chiave pre-condivisa codificata Base64 (PSK)."
-    },
-    "invalidType": {
-      "number": "Tipo non valido, atteso un numero."
-    },
-    "pskLength": {
-      "0bit": "La chiave deve essere vuota.",
-      "8bit": "La chiave deve essere una chiave pre-condivisa a 8 bit (PSK).",
-      "128bit": "La chiave deve essere una chiave pre-condivisa a 128 bit (PSK).",
-      "256bit": "La chiave deve essere una chiave pre-condivisa a 256 bit (PSK)."
-    },
-    "required": {
-      "generic": "Questo campo è obbligatorio.",
-      "managed": "Se il nodo è gestito, è richiesta almeno una chiave amministrativa.",
-      "key": "La chiave è obbligatoria."
-    }
-  }
+	"button": {
+		"apply": "Applica",
+		"backupKey": "Backup della chiave",
+		"cancel": "Annulla",
+		"clearMessages": "Cancella Messaggi",
+		"close": "Chiudi",
+		"confirm": "Conferma",
+		"delete": "Elimina",
+		"dismiss": "Annulla",
+		"download": "Scarica",
+		"export": "Esporta",
+		"generate": "Genera",
+		"regenerate": "Rigenera",
+		"import": "Importa",
+		"message": "Messaggio",
+		"now": "Adesso",
+		"ok": "Ok",
+		"print": "Stampa",
+		"rebootOtaNow": "Riavvia ora in modalità OTA",
+		"remove": "Elimina",
+		"requestNewKeys": "Richiedi Nuove Chiavi",
+		"requestPosition": "Richiedi posizione",
+		"reset": "Reset",
+		"save": "Salva",
+		"scanQr": "Scansiona codice QR",
+		"traceRoute": "Trace Route",
+		"submit": "Submit"
+	},
+	"app": {
+		"title": "Meshtastic",
+		"fullTitle": "Meshtastic Web Client"
+	},
+	"loading": "Caricamento in corso...",
+	"unit": {
+		"cps": "CPS",
+		"dbm": "dBm",
+		"hertz": "Hz",
+		"hop": {
+			"one": "Hop",
+			"plural": "Hops"
+		},
+		"hopsAway": {
+			"one": "A {{count}} hop di distanza",
+			"plural": "A {{count}} hop di distanza",
+			"unknown": "Hop sconosciuti"
+		},
+		"megahertz": "MHz",
+		"raw": "grezzo",
+		"meter": {
+			"one": "Metro",
+			"plural": "Metri",
+			"suffix": "m"
+		},
+		"minute": {
+			"one": "Minuto",
+			"plural": "Minuti"
+		},
+		"hour": {
+			"one": "Hour",
+			"plural": "Hours"
+		},
+		"millisecond": {
+			"one": "Millisecondo",
+			"plural": "Millisecondi",
+			"suffix": "ms"
+		},
+		"second": {
+			"one": "Secondo",
+			"plural": "Secondi"
+		},
+		"day": {
+			"one": "Day",
+			"plural": "Days"
+		},
+		"month": {
+			"one": "Month",
+			"plural": "Months"
+		},
+		"year": {
+			"one": "Year",
+			"plural": "Years"
+		},
+		"snr": "SNR",
+		"volt": {
+			"one": "Volt",
+			"plural": "Volt",
+			"suffix": "V"
+		},
+		"record": {
+			"one": "Record",
+			"plural": "Record"
+		}
+	},
+	"security": {
+		"0bit": "Empty",
+		"8bit": "8 bit",
+		"128bit": "128 bit",
+		"256bit": "256 bit"
+	},
+	"unknown": {
+		"longName": "Sconosciuto",
+		"shortName": "SCON",
+		"notAvailable": "N/D",
+		"num": "??"
+	},
+	"nodeUnknownPrefix": "!",
+	"unset": "ANNULLA",
+	"fallbackName": "Meshtastic {{last4}}",
+	"node": "Node",
+	"formValidation": {
+		"unsavedChanges": "Unsaved changes",
+		"tooBig": {
+			"string": "Troppo lungo, atteso minore o uguale a {{maximum}} caratteri.",
+			"number": "Troppo grande, ci si aspetta un numero minore o uguale a {{maximum}}.",
+			"bytes": "Troppo grande, atteso inferiore o uguale a {{params.maximum}} byte."
+		},
+		"tooSmall": {
+			"string": "Troppo breve, atteso più di o uguale a {{minimum}} caratteri.",
+			"number": "Troppo piccolo, atteso un numero maggiore o uguale a {{minimum}}."
+		},
+		"invalidFormat": {
+			"ipv4": "Formato non valido, previsto un indirizzo IPv4.",
+			"key": "Formato non valido, prevista una chiave pre-condivisa codificata Base64 (PSK)."
+		},
+		"invalidType": {
+			"number": "Tipo non valido, atteso un numero."
+		},
+		"pskLength": {
+			"0bit": "La chiave deve essere vuota.",
+			"8bit": "La chiave deve essere una chiave pre-condivisa a 8 bit (PSK).",
+			"128bit": "La chiave deve essere una chiave pre-condivisa a 128 bit (PSK).",
+			"256bit": "La chiave deve essere una chiave pre-condivisa a 256 bit (PSK)."
+		},
+		"required": {
+			"generic": "Questo campo è obbligatorio.",
+			"managed": "Se il nodo è gestito, è richiesta almeno una chiave amministrativa.",
+			"key": "La chiave è obbligatoria."
+		}
+	}
 }

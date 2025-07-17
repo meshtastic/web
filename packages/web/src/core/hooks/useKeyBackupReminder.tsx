@@ -1,7 +1,7 @@
 import { Button } from "@components/UI/Button.tsx";
-import { useCallback, useEffect, useRef } from "react";
-import { useToast } from "@core/hooks/useToast.ts";
 import useLocalStorage from "@core/hooks/useLocalStorage.ts";
+import { useToast } from "@core/hooks/useToast.ts";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 interface UseBackupReminderOptions {
@@ -23,9 +23,13 @@ const REMINDER_DAYS_FOREVER = 3650;
 const STORAGE_KEY = "key_backup_reminder";
 
 function isReminderExpired(expires?: string): boolean {
-  if (!expires) return true;
+  if (!expires) {
+    return true;
+  }
   const expiryDate = new Date(expires);
-  if (isNaN(expiryDate.getTime())) return true; // Invalid date passed
+  if (Number.isNaN(expiryDate.getTime())) {
+    return true; // Invalid date passed
+  }
 
   const now = new Date();
   return now.getTime() >= expiryDate.getTime();
@@ -41,23 +45,26 @@ export function useBackupReminder({
 
   const { toast } = useToast();
   const toastShownRef = useRef(false);
-  const [reminderState, setReminderState] = useLocalStorage<
-    ReminderState | null
-  >(
-    STORAGE_KEY,
-    null,
+  const [reminderState, setReminderState] =
+    useLocalStorage<ReminderState | null>(STORAGE_KEY, null);
+
+  const setReminderExpiry = useCallback(
+    (days: number) => {
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + days);
+      setReminderState({ expires: expiryDate.toISOString() });
+    },
+    [setReminderState],
   );
 
-  const setReminderExpiry = useCallback((days: number) => {
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + days);
-    setReminderState({ expires: expiryDate.toISOString() });
-  }, [setReminderState]);
-
   useEffect(() => {
-    if (!enabled || toastShownRef.current) return;
+    if (!enabled || toastShownRef.current) {
+      return;
+    }
 
-    if (!isReminderExpired(reminderState?.expires)) return;
+    if (!isReminderExpired(reminderState?.expires)) {
+      return;
+    }
 
     toastShownRef.current = true;
 
@@ -116,5 +123,10 @@ export function useBackupReminder({
     enabled,
     message,
     onAccept,
+    reminderInDays,
+    reminderState?.expires,
+    setReminderExpiry,
+    t,
+    toast,
   ]);
 }

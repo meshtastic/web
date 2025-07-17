@@ -34,8 +34,7 @@ export const PkiRegenerateDialog = ({
   const { t } = useTranslation("dialog");
   const dialogText = {
     title: text.title || t("pkiRegenerate.title"),
-    description: text.description ||
-      t("pkiRegenerate.description"),
+    description: text.description || t("pkiRegenerate.description"),
     button: text.button || t("button.regenerate"),
   };
   return (
@@ -44,9 +43,7 @@ export const PkiRegenerateDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>{dialogText.title}</DialogTitle>
-          <DialogDescription>
-            {dialogText.description}
-          </DialogDescription>
+          <DialogDescription>{dialogText.description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button

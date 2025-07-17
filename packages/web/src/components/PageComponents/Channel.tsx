@@ -1,5 +1,6 @@
 import { makeChannelSchema } from "@app/validation/channel.ts";
 import { create } from "@bufbuild/protobuf";
+import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
@@ -8,8 +9,7 @@ import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
-import { infer as zodInfer } from "zod/v4";
+import type { infer as zodInfer } from "zod/v4";
 
 export interface SettingsPanelProps {
   channel: Protobuf.Channel.Channel;
@@ -20,9 +20,8 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
   const { t } = useTranslation(["channels", "ui", "dialog"]);
   const { toast } = useToast();
 
-  const [preSharedDialogOpen, setPreSharedDialogOpen] = useState<boolean>(
-    false,
-  );
+  const [preSharedDialogOpen, setPreSharedDialogOpen] =
+    useState<boolean>(false);
   const [pass, setPass] = useState<string>(
     fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
   );
@@ -30,12 +29,9 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
     channel?.settings?.psk.length ?? 16,
   );
 
-  const ChannelValidationSchema = useMemo(
-    () => {
-      return makeChannelSchema(byteCount);
-    },
-    [byteCount],
-  );
+  const ChannelValidationSchema = useMemo(() => {
+    return makeChannelSchema(byteCount);
+  }, [byteCount]);
 
   type ChannelValidation = zodInfer<typeof ChannelValidationSchema>;
 
@@ -52,10 +48,12 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
       },
     });
     connection?.setChannel(channel).then(() => {
-      console.debug(t("toast.savedChannel.title", {
-        ns: "ui",
-        channelName: channel.settings?.name,
-      }));
+      console.debug(
+        t("toast.savedChannel.title", {
+          ns: "ui",
+          channelName: channel.settings?.name,
+        }),
+      );
       toast({
         title: t("toast.savedChannel.title", {
           ns: "ui",
@@ -108,7 +106,7 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                 ...channel?.settings?.moduleSettings,
                 positionPrecision:
                   channel?.settings?.moduleSettings?.positionPrecision ===
-                      undefined
+                  undefined
                     ? 10
                     : channel?.settings?.moduleSettings?.positionPrecision,
               },
@@ -127,12 +125,13 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                 disabled: channel.index === 0,
                 description: t("role.description"),
                 properties: {
-                  enumValue: channel.index === 0
-                    ? { [t("role.options.primary")]: 1 }
-                    : {
-                      [t("role.options.disabled")]: 0,
-                      [t("role.options.secondary")]: 2,
-                    },
+                  enumValue:
+                    channel.index === 0
+                      ? { [t("role.options.primary")]: 1 }
+                      : {
+                          [t("role.options.disabled")]: 0,
+                          [t("role.options.secondary")]: 2,
+                        },
                 },
               },
               {
@@ -182,79 +181,36 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                 label: t("positionPrecision.label"),
                 description: t("positionPrecision.description"),
                 properties: {
-                  enumValue: config.display?.units === 0
-                    ? {
-                      [t("positionPrecision.options.none")]: 0,
-                      [
-                        t("positionPrecision.options.metric_km23")
-                      ]: 10,
-                      [
-                        t("positionPrecision.options.metric_km12")
-                      ]: 11,
-                      [
-                        t("positionPrecision.options.metric_km5_8")
-                      ]: 12,
-                      [
-                        t("positionPrecision.options.metric_km2_9")
-                      ]: 13,
-                      [
-                        t("positionPrecision.options.metric_km1_5")
-                      ]: 14,
-                      [
-                        t("positionPrecision.options.metric_m700")
-                      ]: 15,
-                      [
-                        t("positionPrecision.options.metric_m350")
-                      ]: 16,
-                      [
-                        t("positionPrecision.options.metric_m200")
-                      ]: 17,
-                      [
-                        t("positionPrecision.options.metric_m90")
-                      ]: 18,
-                      [
-                        t("positionPrecision.options.metric_m50")
-                      ]: 19,
-                      [
-                        t("positionPrecision.options.precise")
-                      ]: 32,
-                    }
-                    : {
-                      [t("positionPrecision.options.none")]: 0,
-                      [
-                        t("positionPrecision.options.imperial_mi15")
-                      ]: 10,
-                      [
-                        t("positionPrecision.options.imperial_mi7_3")
-                      ]: 11,
-                      [
-                        t("positionPrecision.options.imperial_mi3_6")
-                      ]: 12,
-                      [
-                        t("positionPrecision.options.imperial_mi1_8")
-                      ]: 13,
-                      [
-                        t("positionPrecision.options.imperial_mi0_9")
-                      ]: 14,
-                      [
-                        t("positionPrecision.options.imperial_mi0_5")
-                      ]: 15,
-                      [
-                        t("positionPrecision.options.imperial_mi0_2")
-                      ]: 16,
-                      [
-                        t("positionPrecision.options.imperial_ft600")
-                      ]: 17,
-                      [
-                        t("positionPrecision.options.imperial_ft300")
-                      ]: 18,
-                      [
-                        t("positionPrecision.options.imperial_ft150")
-                      ]: 19,
-                      [
-                        t("positionPrecision.options.precise")
-                      ]: 32,
-                    },
+                  enumValue:
+                    config.display?.units === 0
+                      ? {
+                          [t("positionPrecision.options.none")]: 0,
+                          [t("positionPrecision.options.metric_km23")]: 10,
+                          [t("positionPrecision.options.metric_km12")]: 11,
+                          [t("positionPrecision.options.metric_km5_8")]: 12,
+                          [t("positionPrecision.options.metric_km2_9")]: 13,
+                          [t("positionPrecision.options.metric_km1_5")]: 14,
+                          [t("positionPrecision.options.metric_m700")]: 15,
+                          [t("positionPrecision.options.metric_m350")]: 16,
+                          [t("positionPrecision.options.metric_m200")]: 17,
+                          [t("positionPrecision.options.metric_m90")]: 18,
+                          [t("positionPrecision.options.metric_m50")]: 19,
+                          [t("positionPrecision.options.precise")]: 32,
+                        }
+                      : {
+                          [t("positionPrecision.options.none")]: 0,
+                          [t("positionPrecision.options.imperial_mi15")]: 10,
+                          [t("positionPrecision.options.imperial_mi7_3")]: 11,
+                          [t("positionPrecision.options.imperial_mi3_6")]: 12,
+                          [t("positionPrecision.options.imperial_mi1_8")]: 13,
+                          [t("positionPrecision.options.imperial_mi0_9")]: 14,
+                          [t("positionPrecision.options.imperial_mi0_5")]: 15,
+                          [t("positionPrecision.options.imperial_mi0_2")]: 16,
+                          [t("positionPrecision.options.imperial_ft600")]: 17,
+                          [t("positionPrecision.options.imperial_ft300")]: 18,
+                          [t("positionPrecision.options.imperial_ft150")]: 19,
+                          [t("positionPrecision.options.precise")]: 32,
+                        },
                 },
               },
             ],

@@ -1,9 +1,9 @@
-import * as React from "react";
+import { useCopyToClipboard } from "@core/hooks/useCopyToClipboard.ts";
+import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
 import { cn } from "@core/utils/cn.ts";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Check, Copy, Eye, EyeOff, type LucideIcon, X } from "lucide-react";
-import { useCopyToClipboard } from "@core/hooks/useCopyToClipboard.ts";
-import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
+import * as React from "react";
 import { useTranslation } from "react-i18next";
 
 const cnInvalidBase = "border-2 border-red-500 dark:border-red-500";
@@ -35,8 +35,10 @@ type InputActionType = {
 };
 
 export interface InputProps
-  extends
-    Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix" | "suffix">,
+  extends Omit<
+      React.InputHTMLAttributes<HTMLInputElement>,
+      "prefix" | "suffix"
+    >,
     VariantProps<typeof inputVariants> {
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
@@ -127,7 +129,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const actions = potentialActions.filter((action) => action.condition);
 
     const inputType = showPasswordToggle
-      ? (isVisible ? "text" : "password")
+      ? isVisible
+        ? "text"
+        : "password"
       : type;
 
     const hasPrefix = !!prefix;
@@ -197,7 +201,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   className={cn(
                     "inline-flex h-full items-center justify-center px-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:ring-offset-0 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 dark:focus:ring-slate-500 last:hover:rounded-r-md last:dark:hover:rounded-r-md",
                     disabled && "text-slate-300 dark:text-slate-600",
-                    action.id === "copy-value" && isCopied &&
+                    action.id === "copy-value" &&
+                      isCopied &&
                       "text-green-600 dark:text-green-500",
                   )}
                   onClick={action.onClick}

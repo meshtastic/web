@@ -9,8 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
-import { type FieldValues, useController } from "react-hook-form";
 import { cn } from "@core/utils/cn.ts";
+import { type FieldValues, useController } from "react-hook-form";
 
 export interface SelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "select";
@@ -73,10 +73,14 @@ export function SelectInput<T extends FieldValues>({
 
     if (field.validate) {
       const isValid = await field.validate(selectedKey);
-      if (!isValid) return;
+      if (!isValid) {
+        return;
+      }
     }
 
-    if (field.selectChange) field.selectChange(newValue, selectedKey);
+    if (field.selectChange) {
+      field.selectChange(newValue, selectedKey);
+    }
     onChange(Number.parseInt(newValue));
   };
 

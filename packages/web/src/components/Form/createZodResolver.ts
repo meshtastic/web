@@ -1,4 +1,3 @@
-import type { ZodType } from "zod/v4";
 import type {
   FieldError,
   FieldValues,
@@ -6,6 +5,7 @@ import type {
   ResolverOptions,
   ResolverResult,
 } from "react-hook-form";
+import type { ZodType } from "zod/v4";
 
 export function createZodResolver<T extends FieldValues>(
   schema: ZodType<T, unknown>,
@@ -32,18 +32,18 @@ export function createZodResolver<T extends FieldValues>(
       const { path, code, message, ...params } = issue;
       const key = path.join(".");
 
-      const suffix = "format" in params
-        ? params.format
-        : "origin" in params
-        ? params.origin
-        : "expected" in params
-        ? params.expected
-        : "";
+      const suffix =
+        "format" in params
+          ? params.format
+          : "origin" in params
+            ? params.origin
+            : "expected" in params
+              ? params.expected
+              : "";
 
-      const newCode = code.replace(
-        /_([a-z])/g,
-        (_, char) => char.toUpperCase(),
-      ) + (suffix ? `.${suffix}` : "");
+      const newCode =
+        code.replace(/_([a-z])/g, (_, char) => char.toUpperCase()) +
+        (suffix ? `.${suffix}` : "");
 
       const fieldError: FieldError & { params?: Record<string, unknown> } = {
         type: newCode,

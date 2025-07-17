@@ -1,141 +1,141 @@
 {
-  "button": {
-    "apply": "Hyväksy",
-    "backupKey": "Varmuuskopioi avain",
-    "cancel": "Peruuta",
-    "clearMessages": "Tyhjennä viestit",
-    "close": "Sulje",
-    "confirm": "Vahvista",
-    "delete": "Poista",
-    "dismiss": "Hylkää",
-    "download": "Lataa",
-    "export": "Vie",
-    "generate": "Luo",
-    "regenerate": "Luo uudelleen",
-    "import": "Tuo",
-    "message": "Viesti",
-    "now": "Nyt",
-    "ok": "OK",
-    "print": "Tulosta",
-    "rebootOtaNow": "Käynnistä uudelleen OTA-tilaan nyt",
-    "remove": "Poista",
-    "requestNewKeys": "Pyydä uudet avaimet",
-    "requestPosition": "Pyydä sijaintia",
-    "reset": "Palauta",
-    "save": "Tallenna",
-    "scanQr": "Skannaa QR-koodi",
-    "traceRoute": "Reitinselvitys",
-    "submit": "Lähetä"
-  },
-  "app": {
-    "title": "Meshtastic",
-    "fullTitle": "Meshtastic Web Client"
-  },
-  "loading": "Ladataan...",
-  "unit": {
-    "cps": "CPS",
-    "dbm": "dBm",
-    "hertz": "Hz",
-    "hop": {
-      "one": "Hyppy",
-      "plural": "Hyppyä"
-    },
-    "hopsAway": {
-      "one": "{{count}} hypyn päässä",
-      "plural": "{{count}} hypyn päässä",
-      "unknown": "Hyppyjen määrä tuntematon"
-    },
-    "megahertz": "MHz",
-    "raw": "raakatieto",
-    "meter": {
-      "one": "Metri",
-      "plural": "Metriä",
-      "suffix": "m"
-    },
-    "minute": {
-      "one": "Minuutti",
-      "plural": "Minuuttia"
-    },
-    "hour": {
-      "one": "Tunti",
-      "plural": "Tuntia"
-    },
-    "millisecond": {
-      "one": "Millisekunti",
-      "plural": "Millisekuntia",
-      "suffix": "ms"
-    },
-    "second": {
-      "one": "Sekunti",
-      "plural": "Sekuntia"
-    },
-    "day": {
-      "one": "Päivä",
-      "plural": "Päivää"
-    },
-    "month": {
-      "one": "Kuukausi",
-      "plural": "Kuukautta"
-    },
-    "year": {
-      "one": "Vuosi",
-      "plural": "Vuotta"
-    },
-    "snr": "SNR",
-    "volt": {
-      "one": "Voltti",
-      "plural": "Voltit",
-      "suffix": "V"
-    },
-    "record": {
-      "one": "Tiedot",
-      "plural": "Tiedot"
-    }
-  },
-  "security": {
-    "0bit": "Tyhjä",
-    "8bit": "8-bittiä",
-    "128bit": "128-bittiä",
-    "256bit": "256 bittiä"
-  },
-  "unknown": {
-    "longName": "Tuntematon",
-    "shortName": "UNK",
-    "notAvailable": "N/A",
-    "num": "??"
-  },
-  "nodeUnknownPrefix": "!",
-  "unset": "EI ASETETTU",
-  "fallbackName": "Meshtastic {{last4}}",
-  "node": "Laite",
-  "formValidation": {
-    "unsavedChanges": "Tallentamattomat muutokset",
-    "tooBig": {
-      "string": "Teksti on liian pitkä – sallittu enimmäispituus on {{maximum}} merkkiä.",
-      "number": "Arvo on liian suuri – sallittu enimmäisarvo on {{maximum}}.",
-      "bytes": "Liian suuri koko – sallittu enimmäismäärä on {{params.maximum}} tavua."
-    },
-    "tooSmall": {
-      "string": "Teksti on liian lyhyt – vähimmäispituus on {{minimum}} merkkiä.",
-      "number": "Arvo on liian pieni – pienin sallittu arvo on {{minimum}}."
-    },
-    "invalidFormat": {
-      "ipv4": "Virheellinen muoto – odotettu muoto on IPv4-osoite.",
-      "key": "Virheellinen muoto – odotettu muoto on Base64-koodattu jaettu avain (PSK)."
-    },
-    "invalidType": {
-      "number": "Virheellinen tyyppi – arvon tulee olla numero."
-    },
-    "pskLength": {
-      "0bit": "Avainkentän on oltava tyhjä.",
-      "8bit": "Avaimen on oltava 8-bittinen jaettu avain (PSK).",
-      "128bit": "Avaimen on oltava 128-bittinen jaettu avain (PSK).",
-      "256bit": "Avaimen on oltava 256-bittinen jaettu avain (PSK)."
-    },
-    "required": {
-      "generic": "Tämä kenttä on pakollinen.",
-      "managed": "Vähintään yksi hallinta-avain vaaditaan, jos laitetta hallitaan.",
-      "key": "Avain on pakollinen."
-    }
-  }
+	"button": {
+		"apply": "Hyväksy",
+		"backupKey": "Varmuuskopioi avain",
+		"cancel": "Peruuta",
+		"clearMessages": "Tyhjennä viestit",
+		"close": "Sulje",
+		"confirm": "Vahvista",
+		"delete": "Poista",
+		"dismiss": "Hylkää",
+		"download": "Lataa",
+		"export": "Vie",
+		"generate": "Luo",
+		"regenerate": "Luo uudelleen",
+		"import": "Tuo",
+		"message": "Viesti",
+		"now": "Nyt",
+		"ok": "OK",
+		"print": "Tulosta",
+		"rebootOtaNow": "Käynnistä uudelleen OTA-tilaan nyt",
+		"remove": "Poista",
+		"requestNewKeys": "Pyydä uudet avaimet",
+		"requestPosition": "Pyydä sijaintia",
+		"reset": "Palauta",
+		"save": "Tallenna",
+		"scanQr": "Skannaa QR-koodi",
+		"traceRoute": "Reitinselvitys",
+		"submit": "Lähetä"
+	},
+	"app": {
+		"title": "Meshtastic",
+		"fullTitle": "Meshtastic Web Client"
+	},
+	"loading": "Ladataan...",
+	"unit": {
+		"cps": "CPS",
+		"dbm": "dBm",
+		"hertz": "Hz",
+		"hop": {
+			"one": "Hyppy",
+			"plural": "Hyppyä"
+		},
+		"hopsAway": {
+			"one": "{{count}} hypyn päässä",
+			"plural": "{{count}} hypyn päässä",
+			"unknown": "Hyppyjen määrä tuntematon"
+		},
+		"megahertz": "MHz",
+		"raw": "raakatieto",
+		"meter": {
+			"one": "Metri",
+			"plural": "Metriä",
+			"suffix": "m"
+		},
+		"minute": {
+			"one": "Minuutti",
+			"plural": "Minuuttia"
+		},
+		"hour": {
+			"one": "Tunti",
+			"plural": "Tuntia"
+		},
+		"millisecond": {
+			"one": "Millisekunti",
+			"plural": "Millisekuntia",
+			"suffix": "ms"
+		},
+		"second": {
+			"one": "Sekunti",
+			"plural": "Sekuntia"
+		},
+		"day": {
+			"one": "Päivä",
+			"plural": "Päivää"
+		},
+		"month": {
+			"one": "Kuukausi",
+			"plural": "Kuukautta"
+		},
+		"year": {
+			"one": "Vuosi",
+			"plural": "Vuotta"
+		},
+		"snr": "SNR",
+		"volt": {
+			"one": "Voltti",
+			"plural": "Voltit",
+			"suffix": "V"
+		},
+		"record": {
+			"one": "Tiedot",
+			"plural": "Tiedot"
+		}
+	},
+	"security": {
+		"0bit": "Tyhjä",
+		"8bit": "8-bittiä",
+		"128bit": "128-bittiä",
+		"256bit": "256 bittiä"
+	},
+	"unknown": {
+		"longName": "Tuntematon",
+		"shortName": "UNK",
+		"notAvailable": "N/A",
+		"num": "??"
+	},
+	"nodeUnknownPrefix": "!",
+	"unset": "EI ASETETTU",
+	"fallbackName": "Meshtastic {{last4}}",
+	"node": "Laite",
+	"formValidation": {
+		"unsavedChanges": "Tallentamattomat muutokset",
+		"tooBig": {
+			"string": "Teksti on liian pitkä – sallittu enimmäispituus on {{maximum}} merkkiä.",
+			"number": "Arvo on liian suuri – sallittu enimmäisarvo on {{maximum}}.",
+			"bytes": "Liian suuri koko – sallittu enimmäismäärä on {{params.maximum}} tavua."
+		},
+		"tooSmall": {
+			"string": "Teksti on liian lyhyt – vähimmäispituus on {{minimum}} merkkiä.",
+			"number": "Arvo on liian pieni – pienin sallittu arvo on {{minimum}}."
+		},
+		"invalidFormat": {
+			"ipv4": "Virheellinen muoto – odotettu muoto on IPv4-osoite.",
+			"key": "Virheellinen muoto – odotettu muoto on Base64-koodattu jaettu avain (PSK)."
+		},
+		"invalidType": {
+			"number": "Virheellinen tyyppi – arvon tulee olla numero."
+		},
+		"pskLength": {
+			"0bit": "Avainkentän on oltava tyhjä.",
+			"8bit": "Avaimen on oltava 8-bittinen jaettu avain (PSK).",
+			"128bit": "Avaimen on oltava 128-bittinen jaettu avain (PSK).",
+			"256bit": "Avaimen on oltava 256-bittinen jaettu avain (PSK)."
+		},
+		"required": {
+			"generic": "Tämä kenttä on pakollinen.",
+			"managed": "Vähintään yksi hallinta-avain vaaditaan, jos laitetta hallitaan.",
+			"key": "Avain on pakollinen."
+		}
+	}
 }

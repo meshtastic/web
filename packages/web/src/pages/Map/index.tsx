@@ -1,20 +1,20 @@
-import { NodeDetail } from "../../components/PageComponents/Map/NodeDetail.tsx";
-import { Avatar } from "../../components/UI/Avatar.tsx";
+import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
+import {
+  type FilterState,
+  useFilterNode,
+} from "@components/generic/Filter/useFilterNode.ts";
+import { BaseMap } from "@components/Map.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { cn } from "@core/utils/cn.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { bbox, lineString } from "@turf/turf";
 import { FunnelIcon, MapPinIcon } from "lucide-react";
 import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { Marker, Popup, useMap } from "react-map-gl/maplibre";
-import { Map } from "@components/Map.tsx";
-import {
-  type FilterState,
-  useFilterNode,
-} from "@components/generic/Filter/useFilterNode.ts";
-import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
-import { cn } from "@core/utils/cn.ts";
+import { NodeDetail } from "../../components/PageComponents/Map/NodeDetail.tsx";
+import { Avatar } from "../../components/UI/Avatar.tsx";
 
 type NodePosition = {
   latitude: number;
@@ -35,27 +35,25 @@ const MapPage = () => {
 
   const { default: map } = useMap();
 
-  const [selectedNode, setSelectedNode] = useState<
-    Protobuf.Mesh.NodeInfo | null
-  >(null);
+  const [selectedNode, setSelectedNode] =
+    useState<Protobuf.Mesh.NodeInfo | null>(null);
 
   const validNodes = useMemo(
     () =>
-      getNodes(
-        (node): node is Protobuf.Mesh.NodeInfo =>
-          Boolean(node.position?.latitudeI),
+      getNodes((node): node is Protobuf.Mesh.NodeInfo =>
+        Boolean(node.position?.latitudeI),
       ),
     [getNodes],
   );
 
-  const [filterState, setFilterState] = useState<FilterState>(() =>
-    defaultFilterValues
+  const [filterState, setFilterState] = useState<FilterState>(
+    () => defaultFilterValues,
   );
   const deferredFilterState = useDeferredValue(filterState);
 
   const filteredNodes = useMemo(
     () => validNodes.filter((node) => nodeFilter(node, deferredFilterState)),
-    [validNodes, deferredFilterState],
+    [validNodes, deferredFilterState, nodeFilter],
   );
 
   const handleMarkerClick = useCallback(
@@ -77,7 +75,9 @@ const MapPage = () => {
 
   // Get the bounds of the map based on the nodes furtherest away from center
   const getMapBounds = useCallback(() => {
-    if (!map || validNodes.length === 0) return;
+    if (!map || validNodes.length === 0) {
+      return;
+    }
 
     if (validNodes.length === 1) {
       map.easeTo({
@@ -131,27 +131,27 @@ const MapPage = () => {
           </Marker>
         );
       }),
-    [filteredNodes, handleMarkerClick],
+    [filteredNodes, handleMarkerClick, hasNodeError],
   );
 
   return (
-    <>
-      <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
-        <Map onLoad={getMapBounds}>
-          {waypoints.map((wp) => (
-            <Marker
-              key={wp.id}
-              longitude={(wp.longitudeI ?? 0) / 1e7}
-              latitude={(wp.latitudeI ?? 0) / 1e7}
-              anchor="bottom"
-            >
-              <div>
-                <MapPinIcon size={16} />
-              </div>
-            </Marker>
-          ))}
-          {markers}
-          {selectedNode && (() => {
+    <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
+      <BaseMap onLoad={getMapBounds}>
+        {waypoints.map((wp) => (
+          <Marker
+            key={wp.id}
+            longitude={(wp.longitudeI ?? 0) / 1e7}
+            latitude={(wp.latitudeI ?? 0) / 1e7}
+            anchor="bottom"
+          >
+            <div>
+              <MapPinIcon size={16} />
+            </div>
+          </Marker>
+        ))}
+        {markers}
+        {selectedNode &&
+          (() => {
             const position = convertToLatLng(selectedNode.position);
             return (
               <Popup
@@ -166,32 +166,31 @@ const MapPage = () => {
               </Popup>
             );
           })()}
-        </Map>
+      </BaseMap>
 
-        <FilterControl
-          filterState={filterState}
-          defaultFilterValues={defaultFilterValues}
-          setFilterState={setFilterState}
-          isDirty={isFilterDirty(filterState)}
-          parameters={{
-            popoverContentProps: {
-              side: "bottom",
-              align: "end",
-              sideOffset: 12,
-            },
-            popoverTriggerClassName: cn(
-              "fixed top-45.5 right-2.5 w-[29px] px-1 py-1 rounded shadow-l outline-[2px] outline-stone-600/20 ",
-              "dark:text-slate-600 dark:hover:text-slate-700 bg-stone-50 hover:bg-stone-200 dark:bg-stone-50 dark:hover:bg-stone-200 dark:active:bg-stone-300",
-              isFilterDirty(filterState)
-                ? "text-slate-100 dark:text-slate-100 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 hover:text-slate-200 dark:hover:text-slate-200 active:bg-green-800 dark:active:bg-green-800 outline-green-600 dark:outline-green-700"
-                : "",
-            ),
-            triggerIcon: <FunnelIcon className="w-5" />,
-            showTextSearch: true,
-          }}
-        />
-      </PageLayout>
-    </>
+      <FilterControl
+        filterState={filterState}
+        defaultFilterValues={defaultFilterValues}
+        setFilterState={setFilterState}
+        isDirty={isFilterDirty(filterState)}
+        parameters={{
+          popoverContentProps: {
+            side: "bottom",
+            align: "end",
+            sideOffset: 12,
+          },
+          popoverTriggerClassName: cn(
+            "fixed top-45.5 right-2.5 w-[29px] px-1 py-1 rounded shadow-l outline-[2px] outline-stone-600/20 ",
+            "dark:text-slate-600 dark:hover:text-slate-700 bg-stone-50 hover:bg-stone-200 dark:bg-stone-50 dark:hover:bg-stone-200 dark:active:bg-stone-300",
+            isFilterDirty(filterState)
+              ? "text-slate-100 dark:text-slate-100 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 hover:text-slate-200 dark:hover:text-slate-200 active:bg-green-800 dark:active:bg-green-800 outline-green-600 dark:outline-green-700"
+              : "",
+          ),
+          triggerIcon: <FunnelIcon className="w-5" />,
+          showTextSearch: true,
+        }}
+      />
+    </PageLayout>
   );
 };
 

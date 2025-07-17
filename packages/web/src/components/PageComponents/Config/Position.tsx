@@ -1,7 +1,4 @@
-import {
-  type FlagName,
-  usePositionFlags,
-} from "@core/hooks/usePositionFlags.ts";
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type PositionValidation,
   PositionValidationSchema,
@@ -11,16 +8,22 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import {
+  type FlagName,
+  usePositionFlags,
+} from "@core/hooks/usePositionFlags.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface PositionConfigProps {
   onFormInit: DynamicFormFormInit<PositionValidation>;
 }
 export const Position = ({ onFormInit }: PositionConfigProps) => {
+  useWaitForConfig({ configCase: "position" });
+
   const { setWorkingConfig, config, getEffectiveConfig, removeWorkingConfig } =
     useDevice();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(

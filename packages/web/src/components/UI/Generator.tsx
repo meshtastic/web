@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { Button, type ButtonVariant } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import {
@@ -8,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface ActionButton {
@@ -33,58 +33,62 @@ export interface GeneratorProps extends React.BaseHTMLAttributes<HTMLElement> {
   disabled?: boolean;
 }
 
-const Generator = (
-  {
-    type,
-    devicePSKBitCount,
-    id = "pskInput",
-    variant,
-    value,
-    actionButtons,
-    bits,
-    selectChange,
-    inputChange,
-    disabled,
-    showPasswordToggle,
-    showCopyButton,
-    ...props
-  }: GeneratorProps,
-) => {
+const Generator = ({
+  type,
+  devicePSKBitCount,
+  id = "pskInput",
+  variant,
+  value,
+  actionButtons,
+  bits,
+  selectChange,
+  inputChange,
+  disabled,
+  showPasswordToggle,
+  showCopyButton,
+  ...props
+}: GeneratorProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
-  const passwordRequiredBitSize = bits ? bits : [
-    {
-      text: t("security.256bit"),
-      value: "32",
-      key: "bit256",
-    },
-    {
-      text: t("security.128bit"),
-      value: "16",
-      key: "bit128",
-    },
-    {
-      text: t("security.8bit"),
-      value: "1",
-      key: "bit8",
-    },
-    {
-      text: t("security.0bit"),
-      value: "0",
-      key: "bit0",
-    },
-  ];
+  const passwordRequiredBitSize = bits
+    ? bits
+    : [
+        {
+          text: t("security.256bit"),
+          value: "32",
+          key: "bit256",
+        },
+        {
+          text: t("security.128bit"),
+          value: "16",
+          key: "bit128",
+        },
+        {
+          text: t("security.8bit"),
+          value: "1",
+          key: "bit8",
+        },
+        {
+          text: t("security.0bit"),
+          value: "0",
+          key: "bit0",
+        },
+      ];
 
   // Invokes onChange event on the input element when the value changes from the parent component
   useEffect(() => {
-    if (!inputRef.current) return;
+    if (!inputRef.current) {
+      return;
+    }
     const setValue = Object.getOwnPropertyDescriptor(
       HTMLInputElement.prototype,
       "value",
     )?.set;
 
-    if (!setValue) return;
+    if (!setValue) {
+      return;
+    }
     inputRef.current.value = "";
     setValue.call(inputRef.current, value);
     inputRef.current.dispatchEvent(new Event("input", { bubbles: true }));

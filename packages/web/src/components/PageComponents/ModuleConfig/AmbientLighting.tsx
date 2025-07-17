@@ -1,4 +1,4 @@
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type AmbientLightingValidation,
   AmbientLightingValidationSchema,
@@ -8,17 +8,19 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface AmbientLightingModuleConfigProps {
   onFormInit: DynamicFormFormInit<AmbientLightingValidation>;
 }
 
-export const AmbientLighting = (
-  { onFormInit }: AmbientLightingModuleConfigProps,
-) => {
+export const AmbientLighting = ({
+  onFormInit,
+}: AmbientLightingModuleConfigProps) => {
+  useWaitForConfig({ moduleConfigCase: "ambientLighting" });
   const {
     moduleConfig,
     setWorkingModuleConfig,

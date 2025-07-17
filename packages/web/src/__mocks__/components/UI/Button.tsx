@@ -1,7 +1,12 @@
 import { vi } from "vitest";
 
 vi.mock("@components/UI/Button.tsx", () => ({
-  Button: ({ children, name, disabled, onClick }: {
+  Button: ({
+    children,
+    name,
+    disabled,
+    onClick,
+  }: {
     children: React.ReactNode;
     variant: string;
     name: string;

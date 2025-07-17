@@ -1,3 +1,5 @@
+import { Button } from "@components/UI/Button.tsx";
+import { Checkbox } from "@components/UI/Checkbox/index.tsx";
 import {
   Dialog,
   DialogClose,
@@ -8,11 +10,9 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { Link } from "@components/UI/Typography/Link.tsx";
-import { Checkbox } from "@components/UI/Checkbox/index.tsx";
-import { Button } from "@components/UI/Button.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { useState } from "react";
 import { eventBus } from "@core/utils/eventBus.ts";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface RouterRoleDialogProps {
@@ -20,9 +20,10 @@ export interface RouterRoleDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export const UnsafeRolesDialog = (
-  { open, onOpenChange }: RouterRoleDialogProps,
-) => {
+export const UnsafeRolesDialog = ({
+  open,
+  onOpenChange,
+}: RouterRoleDialogProps) => {
   const { t } = useTranslation("dialog");
   const [confirmState, setConfirmState] = useState(false);
   const { setDialogOpen } = useDevice();

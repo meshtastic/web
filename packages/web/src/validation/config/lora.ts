@@ -1,12 +1,8 @@
-import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
+import { z } from "zod/v4";
 
-const ModemPresetEnum = z.enum(
-  Protobuf.Config.Config_LoRaConfig_ModemPreset,
-);
-const RegionCodeEnum = z.enum(
-  Protobuf.Config.Config_LoRaConfig_RegionCode,
-);
+const ModemPresetEnum = z.enum(Protobuf.Config.Config_LoRaConfig_ModemPreset);
+const RegionCodeEnum = z.enum(Protobuf.Config.Config_LoRaConfig_RegionCode);
 
 export const LoRaValidationSchema = z.object({
   usePreset: z.boolean(),

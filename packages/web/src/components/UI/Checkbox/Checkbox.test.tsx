@@ -1,17 +1,20 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { Checkbox } from "@components/UI/Checkbox/index.tsx";
-import React from "react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import type React from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@components/UI/Label.tsx", () => ({
-  Label: (
-    { children, className, htmlFor, id }: {
-      children: React.ReactNode;
-      className: string;
-      htmlFor: string;
-      id: string;
-    },
-  ) => (
+  Label: ({
+    children,
+    className,
+    htmlFor,
+    id,
+  }: {
+    children: React.ReactNode;
+    className: string;
+    htmlFor: string;
+    id: string;
+  }) => (
     <label
       data-testid="label-component"
       className={className}

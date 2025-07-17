@@ -1,7 +1,10 @@
-import { Check, Languages } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { LangCode, supportedLanguages } from "@app/i18n-config.ts";
+import { type LangCode, supportedLanguages } from "@app/i18n-config.ts";
 import useLang from "@core/hooks/useLang.ts";
+import { cn } from "@core/utils/cn.ts";
+import { Check, Languages } from "lucide-react";
+import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import { Button } from "./UI/Button.tsx";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "./UI/DropdownMenu.tsx";
 import { Subtle } from "./UI/Typography/Subtle.tsx";
-import { cn } from "@core/utils/cn.ts";
-import { Button } from "./UI/Button.tsx";
 
 interface LanguageSwitcherProps {
   disableHover?: boolean;
@@ -22,9 +23,12 @@ export default function LanguageSwitcher({
   const { i18n } = useTranslation("ui");
   const { set: setLanguage, currentLanguage } = useLang();
 
-  const handleLanguageChange = async (languageCode: LangCode) => {
-    await setLanguage(languageCode, true);
-  };
+  const handleLanguageChange = useCallback(
+    async (languageCode: LangCode) => {
+      await setLanguage(languageCode, true);
+    },
+    [setLanguage],
+  );
 
   return (
     <DropdownMenu>

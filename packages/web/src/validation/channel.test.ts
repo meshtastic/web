@@ -1,6 +1,6 @@
+import { fromByteArray } from "base64-js";
 import { describe, expect, it } from "vitest";
 import { makeChannelSchema } from "./channel.ts";
-import { fromByteArray } from "base64-js";
 
 const mockRole = 0;
 
@@ -42,8 +42,8 @@ describe("makeChannelSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(
-        result.error.issues.some((i) =>
-          i.path.includes("settings") && i.path.includes("psk")
+        result.error.issues.some(
+          (i) => i.path.includes("settings") && i.path.includes("psk"),
         ),
       ).toBe(true);
     }
@@ -59,8 +59,8 @@ describe("makeChannelSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(
-        result.error.issues.some((i) =>
-          i.path.includes("settings") && i.path.includes("psk")
+        result.error.issues.some(
+          (i) => i.path.includes("settings") && i.path.includes("psk"),
         ),
       ).toBe(true);
     }
@@ -76,8 +76,8 @@ describe("makeChannelSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(
-        result.error.issues.some((i) =>
-          i.path.includes("settings") && i.path.includes("name")
+        result.error.issues.some(
+          (i) => i.path.includes("settings") && i.path.includes("name"),
         ),
       ).toBe(true);
     }
@@ -92,8 +92,8 @@ describe("makeChannelSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(
-        result.error.issues.some((i) =>
-          i.path.includes("settings") && i.path.includes("channelNum")
+        result.error.issues.some(
+          (i) => i.path.includes("settings") && i.path.includes("channelNum"),
         ),
       ).toBe(true);
     }

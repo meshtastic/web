@@ -1,11 +1,11 @@
-import { useAppStore } from "@core/stores/appStore.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
-
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { cn } from "@core/utils/cn.ts";
 import { DeviceConfig } from "@pages/Config/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.tsx";
 import {
@@ -15,10 +15,9 @@ import {
   SaveOff,
   SettingsIcon,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { cn } from "@core/utils/cn.ts";
-import type { UseFormReturn } from "react-hook-form";
 
 const ConfigPage = () => {
   const {
@@ -40,11 +39,14 @@ const ConfigPage = () => {
   const { toast } = useToast();
   const { t } = useTranslation("deviceConfig");
 
-  const onFormInit = (methods: UseFormReturn) => {
-    setFormMethods(methods);
-  };
+  const onFormInit = useCallback(
+    <T extends FieldValues>(methods: UseFormReturn<T>) => {
+      setFormMethods(methods as UseFormReturn);
+    },
+    [],
+  );
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (hasErrors()) {
       return toast({
         title: t("toast.validationError.title"),
@@ -64,7 +66,7 @@ const ConfigPage = () => {
                 case: newConfig.payloadVariant.case,
               }),
             });
-          })
+          }),
         ),
       );
 
@@ -76,21 +78,24 @@ const ConfigPage = () => {
               description: t("toast.saveSuccess.description", {
                 case: newModuleConfig.payloadVariant.case,
               }),
-            })
-          )
+            }),
+          ),
         ),
       );
 
       await connection?.commitEditSettings().then(() => {
         if (formMethods) {
-          formMethods.reset({}, {
-            keepValues: true,
-          });
+          formMethods.reset(
+            {},
+            {
+              keepValues: true,
+            },
+          );
         }
 
         workingConfig.map((newConfig) => setConfig(newConfig));
         workingModuleConfig.map((newModuleConfig) =>
-          setModuleConfig(newModuleConfig)
+          setModuleConfig(newModuleConfig),
         );
 
         removeWorkingConfig();
@@ -104,24 +109,33 @@ const ConfigPage = () => {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [
+    hasErrors,
+    toast,
+    t,
+    workingConfig,
+    connection,
+    workingModuleConfig,
+    formMethods,
+    setConfig,
+    setModuleConfig,
+    removeWorkingConfig,
+    removeWorkingModuleConfig,
+  ]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     if (formMethods) {
       formMethods.reset();
     }
 
     removeWorkingConfig();
     removeWorkingModuleConfig();
-  };
+  }, [formMethods, removeWorkingConfig, removeWorkingModuleConfig]);
 
   const leftSidebar = useMemo(
     () => (
       <Sidebar>
-        <SidebarSection
-          label={t("sidebar.label")}
-          className="py-2 px-0"
-        >
+        <SidebarSection label={t("sidebar.label")} className="py-2 px-0">
           <SidebarButton
             label={t("navigation.radioConfig")}
             active={activeConfigSection === "device"}
@@ -141,7 +155,7 @@ const ConfigPage = () => {
         </SidebarSection>
       </Sidebar>
     ),
-    [activeConfigSection, workingConfig, workingModuleConfig],
+    [activeConfigSection, workingConfig, workingModuleConfig, t],
   );
 
   const buttonOpacity = useMemo(() => {
@@ -151,8 +165,10 @@ const ConfigPage = () => {
     const hasWorkingConfig = workingConfig.length > 0;
     const hasWorkingModuleConfig = workingModuleConfig.length > 0;
 
-    const shouldShowButton = (isFormDirty && hasDirtyFields) ||
-      hasWorkingConfig || hasWorkingModuleConfig;
+    const shouldShowButton =
+      (isFormDirty && hasDirtyFields) ||
+      hasWorkingConfig ||
+      hasWorkingModuleConfig;
 
     return shouldShowButton ? "opacity-100" : "opacity-0";
   }, [
@@ -166,71 +182,79 @@ const ConfigPage = () => {
     return Object.keys(formMethods?.formState.errors ?? {}).length === 0;
   }, [formMethods?.formState.errors]);
 
-  const actions = useMemo(() => [
-    {
-      key: "unsavedChanges",
-      label: t("common:formValidation.unsavedChanges"),
-      onClick: () => {},
-      className: cn([
-        "bg-blue-500 text-slate-900 hover:bg-initial",
-        "transition-colors duration-200",
-        buttonOpacity,
-        "transition-opacity",
-      ]),
-    },
-    {
-      key: "reset",
-      icon: RefreshCwIcon,
-      label: t("common:button.reset"),
-      onClick: handleReset,
-      className: cn([
-        buttonOpacity,
-        "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
-        "hover:dark:bg-slate-300  hover:dark:text-black cursor-pointer",
-      ]),
-    },
-    {
-      key: "save",
-      icon: !isValid ? SaveOff : SaveIcon,
-      isLoading: isSaving,
-      disabled: isSaving ||
-        !isValid ||
-        (workingConfig.length === 0 && workingModuleConfig.length === 0),
-      iconClasses: !isValid
-        ? "text-red-400 cursor-not-allowed"
-        : "cursor-pointer",
-      className: cn([
-        "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
-        "hover:dark:bg-slate-300 hover:dark:text-black",
-        "disabled:hover:cursor-not-allowed cursor-pointer",
-      ]),
-      onClick: handleSave,
-      label: t("common:button.save"),
-    },
-  ], [
-    activeConfigSection,
-    isSaving,
-    isValid,
-    buttonOpacity,
-    workingConfig,
-    workingModuleConfig,
-  ]);
+  const actions = useMemo(
+    () => [
+      {
+        key: "unsavedChanges",
+        label: t("common:formValidation.unsavedChanges"),
+        onClick: () => {},
+        className: cn([
+          "bg-blue-500 text-slate-900 hover:bg-initial",
+          "transition-colors duration-200",
+          buttonOpacity,
+          "transition-opacity",
+        ]),
+      },
+      {
+        key: "reset",
+        icon: RefreshCwIcon,
+        label: t("common:button.reset"),
+        onClick: handleReset,
+        className: cn([
+          buttonOpacity,
+          "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
+          "hover:dark:bg-slate-300  hover:dark:text-black cursor-pointer",
+        ]),
+      },
+      {
+        key: "save",
+        icon: !isValid ? SaveOff : SaveIcon,
+        isLoading: isSaving,
+        disabled:
+          isSaving ||
+          !isValid ||
+          (workingConfig.length === 0 && workingModuleConfig.length === 0),
+        iconClasses: !isValid
+          ? "text-red-400 cursor-not-allowed"
+          : "cursor-pointer",
+        className: cn([
+          "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
+          "hover:dark:bg-slate-300 hover:dark:text-black",
+          "disabled:hover:cursor-not-allowed cursor-pointer",
+        ]),
+        onClick: handleSave,
+        label: t("common:button.save"),
+      },
+    ],
+    [
+      isSaving,
+      isValid,
+      buttonOpacity,
+      workingConfig,
+      workingModuleConfig,
+      handleReset,
+      handleSave,
+      t,
+    ],
+  );
 
   return (
-    <>
-      <PageLayout
-        contentClassName="overflow-auto"
-        leftBar={leftSidebar}
-        label={activeConfigSection === "device"
+    <PageLayout
+      contentClassName="overflow-auto"
+      leftBar={leftSidebar}
+      label={
+        activeConfigSection === "device"
           ? t("navigation.radioConfig")
-          : t("navigation.moduleConfig")}
-        actions={actions}
-      >
-        {activeConfigSection === "device"
-          ? <DeviceConfig onFormInit={onFormInit} />
-          : <ModuleConfig onFormInit={onFormInit} />}
-      </PageLayout>
-    </>
+          : t("navigation.moduleConfig")
+      }
+      actions={actions}
+    >
+      {activeConfigSection === "device" ? (
+        <DeviceConfig onFormInit={onFormInit} />
+      ) : (
+        <ModuleConfig onFormInit={onFormInit} />
+      )}
+    </PageLayout>
   );
 };
 

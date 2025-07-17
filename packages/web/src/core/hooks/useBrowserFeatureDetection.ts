@@ -15,7 +15,7 @@ export function useBrowserFeatureDetection(): BrowserSupport {
       [
         "Secure Context",
         globalThis.location.protocol === "https:" ||
-        globalThis.location.hostname === "localhost",
+          globalThis.location.hostname === "localhost",
       ],
     ];
 

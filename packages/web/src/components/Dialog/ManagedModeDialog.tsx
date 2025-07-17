@@ -1,4 +1,5 @@
 import { Button } from "@components/UI/Button.tsx";
+import { Checkbox } from "@components/UI/Checkbox/index.tsx";
 import {
   Dialog,
   DialogClose,
@@ -8,9 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { Trans, useTranslation } from "react-i18next";
-import { Checkbox } from "@components/UI/Checkbox/index.tsx";
 import { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 
 export interface ManagedModeDialogProps {
   open: boolean;
@@ -36,7 +36,7 @@ export const ManagedModeDialog = ({
             <Trans
               i18nKey="managedMode.description"
               components={{
-                "bold": <p className="font-bold inline" />,
+                bold: <p className="font-bold inline" />,
               }}
             />
           </DialogDescription>

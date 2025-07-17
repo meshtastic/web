@@ -1,4 +1,4 @@
-import { ZodError, ZodType } from "zod/v4";
+import type { ZodError, ZodType } from "zod/v4";
 
 export function validateSchema<T>(
   schema: ZodType<T>,
@@ -7,7 +7,6 @@ export function validateSchema<T>(
   const result = schema.safeParse(data);
   if (result.success) {
     return { success: true, data: result.data };
-  } else {
-    return { success: false, errors: result.error.issues };
   }
+  return { success: false, errors: result.error.issues };
 }

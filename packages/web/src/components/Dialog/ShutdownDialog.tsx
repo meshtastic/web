@@ -10,18 +10,15 @@ import {
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { ClockIcon, PowerIcon } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export interface ShutdownDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const ShutdownDialog = ({
-  open,
-  onOpenChange,
-}: ShutdownDialogProps) => {
+export const ShutdownDialog = ({ open, onOpenChange }: ShutdownDialogProps) => {
   const { t } = useTranslation("dialog");
   const { connection } = useDevice();
 
@@ -32,12 +29,8 @@ export const ShutdownDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>
-            {t("shutdown.title")}
-          </DialogTitle>
-          <DialogDescription>
-            {t("shutdown.description")}
-          </DialogDescription>
+          <DialogTitle>{t("shutdown.title")}</DialogTitle>
+          <DialogDescription>{t("shutdown.description")}</DialogDescription>
         </DialogHeader>
 
         <div className="flex gap-2 p-4">

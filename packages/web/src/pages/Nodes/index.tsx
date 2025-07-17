@@ -1,7 +1,10 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
-import { Avatar } from "@components/UI/Avatar.tsx";
+import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
+import {
+  type FilterState,
+  useFilterNode,
+} from "@components/generic/Filter/useFilterNode.ts";
 import { Mono } from "@components/generic/Mono.tsx";
 import {
   type DataRow,
@@ -9,8 +12,13 @@ import {
   Table,
 } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { PageLayout } from "@components/PageLayout.tsx";
+import { Sidebar } from "@components/Sidebar.tsx";
+import { Avatar } from "@components/UI/Avatar.tsx";
+import { Input } from "@components/UI/Input.tsx";
+import useLang from "@core/hooks/useLang.ts";
 import { useAppStore } from "@core/stores/appStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
@@ -22,16 +30,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import { base16 } from "rfc4648";
-import { Input } from "@components/UI/Input.tsx";
-import { PageLayout } from "@components/PageLayout.tsx";
-import {
-  type FilterState,
-  useFilterNode,
-} from "@components/generic/Filter/useFilterNode.ts";
-import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import { useTranslation } from "react-i18next";
-import useLang from "@core/hooks/useLang.ts";
+import { base16 } from "rfc4648";
 
 export interface DeleteNoteDialogProps {
   open: boolean;
@@ -53,8 +53,8 @@ const NodesPage = (): JSX.Element => {
     Types.PacketMetadata<Protobuf.Mesh.Position> | undefined
   >();
 
-  const [filterState, setFilterState] = useState<FilterState>(() =>
-    defaultFilterValues
+  const [filterState, setFilterState] = useState<FilterState>(
+    () => defaultFilterValues,
   );
   const deferredFilterState = useDeferredValue(filterState);
 
@@ -63,14 +63,6 @@ const NodesPage = (): JSX.Element => {
     [deferredFilterState, getNodes, nodeFilter],
   );
 
-  useEffect(() => {
-    if (!connection) return;
-    connection.events.onTraceRoutePacket.subscribe(handleTraceroute);
-    return () => {
-      connection.events.onTraceRoutePacket.unsubscribe(handleTraceroute);
-    };
-  }, [connection]);
-
   const handleTraceroute = useCallback(
     (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
       setSelectedTraceroute(traceroute);
@@ -78,17 +70,11 @@ const NodesPage = (): JSX.Element => {
     [],
   );
 
-  useEffect(() => {
-    if (!connection) return;
-    connection.events.onPositionPacket.subscribe(handleLocation);
-    return () => {
-      connection.events.onPositionPacket.subscribe(handleLocation);
-    };
-  }, [connection]);
-
   const handleLocation = useCallback(
     (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
-      if (location.to.valueOf() !== hardware.myNodeNum) return;
+      if (location.to.valueOf() !== hardware.myNodeNum) {
+        return;
+      }
       setSelectedLocation(location);
     },
     [hardware.myNodeNum],
@@ -98,6 +84,26 @@ const NodesPage = (): JSX.Element => {
     setNodeNumDetails(nodeNum);
     setDialogOpen("nodeDetails", true);
   }
+
+  useEffect(() => {
+    if (!connection) {
+      return;
+    }
+    connection.events.onTraceRoutePacket.subscribe(handleTraceroute);
+    return () => {
+      connection.events.onTraceRoutePacket.unsubscribe(handleTraceroute);
+    };
+  }, [connection, handleTraceroute]);
+
+  useEffect(() => {
+    if (!connection) {
+      return;
+    }
+    connection.events.onPositionPacket.subscribe(handleLocation);
+    return () => {
+      connection.events.onPositionPacket.subscribe(handleLocation);
+    };
+  }, [connection, handleLocation]);
 
   const tableHeadings: Heading[] = [
     { title: "", sortable: false },
@@ -111,10 +117,11 @@ const NodesPage = (): JSX.Element => {
   ];
 
   const tableRows: DataRow[] = filteredNodes.map((node) => {
-    const macAddress = base16
-      .stringify(node.user?.macaddr ?? [])
-      .match(/.{1,2}/g)
-      ?.join(":") ?? t("unknown.shortName");
+    const macAddress =
+      base16
+        .stringify(node.user?.macaddr ?? [])
+        .match(/.{1,2}/g)
+        ?.join(":") ?? t("unknown.shortName");
 
     return {
       id: node.num,
@@ -138,8 +145,6 @@ const NodesPage = (): JSX.Element => {
                 evt.key === "Enter" && handleNodeInfoDialog(node.num);
               }}
               className="cursor-pointer underline ml-2 whitespace-break-spaces"
-              tabIndex={0}
-              role="button"
             >
               {node.user?.longName ?? numberToHexUnpadded(node.num)}
             </h1>
@@ -153,10 +158,10 @@ const NodesPage = (): JSX.Element => {
                 ? node?.viaMqtt === false && node.hopsAway === 0
                   ? t("nodesTable.connectionStatus.direct")
                   : `${node.hopsAway?.toString()} ${
-                    node.hopsAway ?? 0 > 1
-                      ? t("unit.hop.plural")
-                      : t("unit.hops_one")
-                  } ${t("nodesTable.connectionStatus.away")}`
+                      (node.hopsAway ?? 0 > 1)
+                        ? t("unit.hop.plural")
+                        : t("unit.hops_one")
+                    } ${t("nodesTable.connectionStatus.away")}`
                 : t("nodesTable.connectionStatus.unknown")}
               {node?.viaMqtt === true
                 ? t("nodesTable.connectionStatus.viaMqtt")
@@ -168,14 +173,14 @@ const NodesPage = (): JSX.Element => {
         {
           content: (
             <Mono>
-              {node.lastHeard === 0
-                ? <p>{t("nodesTable.lastHeardStatus.never")}</p>
-                : (
-                  <TimeAgo
-                    timestamp={node.lastHeard * 1000}
-                    locale={currentLanguage?.code}
-                  />
-                )}
+              {node.lastHeard === 0 ? (
+                <p>{t("nodesTable.lastHeardStatus.never")}</p>
+              ) : (
+                <TimeAgo
+                  timestamp={node.lastHeard * 1000}
+                  locale={currentLanguage?.code}
+                />
+              )}
             </Mono>
           ),
           sortValue: node.lastHeard,
@@ -183,9 +188,11 @@ const NodesPage = (): JSX.Element => {
         {
           content: (
             <Mono>
-              {node.user?.publicKey && node.user?.publicKey.length > 0
-                ? <LockIcon className="text-green-600 mx-auto" />
-                : <LockOpenIcon className="text-yellow-300 mx-auto" />}
+              {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
+                <LockIcon className="text-green-600 mx-auto" />
+              ) : (
+                <LockOpenIcon className="text-yellow-300 mx-auto" />
+              )}
             </Mono>
           ),
           sortValue: "", // Non-sortable column
@@ -194,11 +201,8 @@ const NodesPage = (): JSX.Element => {
           content: (
             <Mono>
               {node.snr}
-              {t("unit.dbm")}/
-              {Math.min(
-                Math.max((node.snr + 10) * 5, 0),
-                100,
-              )}%/{/* Percentage */}
+              {t("unit.dbm")}/{Math.min(Math.max((node.snr + 10) * 5, 0), 100)}
+              %/{/* Percentage */}
               {(node.snr + 10) * 5}
               {t("unit.raw")}
             </Mono>
@@ -207,9 +211,7 @@ const NodesPage = (): JSX.Element => {
         },
         {
           content: (
-            <Mono>
-              {Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}
-            </Mono>
+            <Mono>{Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}</Mono>
           ),
           sortValue: Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0],
         },
@@ -222,61 +224,54 @@ const NodesPage = (): JSX.Element => {
   });
 
   return (
-    <>
-      <PageLayout
-        label=""
-        leftBar={<Sidebar />}
-      >
-        <div className="pl-2 pt-2 flex flex-row">
-          <div className="flex-1 mr-2">
-            <Input
-              placeholder={t("search.nodes")}
-              value={filterState.nodeName}
-              className="bg-transparent"
-              showClearButton={!!filterState.nodeName}
-              onChange={(e) =>
-                setFilterState((prev) => ({
-                  ...prev,
-                  nodeName: e.target.value,
-                }))}
-            />
-          </div>
-          <div className="flex justify-end">
-            <FilterControl
-              filterState={filterState}
-              defaultFilterValues={defaultFilterValues}
-              setFilterState={setFilterState}
-              isDirty={isFilterDirty(filterState)}
-              parameters={{
-                popoverContentProps: {
-                  side: "bottom",
-                  align: "end",
-                  sideOffset: 12,
-                },
-                popoverTriggerClassName: "mr-1 p-2",
-                showTextSearch: false,
-              }}
-            />
-          </div>
-        </div>
-        <div className="overflow-y-auto">
-          <Table
-            headings={tableHeadings}
-            rows={tableRows}
-          />
-          <TracerouteResponseDialog
-            traceroute={selectedTraceroute}
-            open={!!selectedTraceroute}
-            onOpenChange={() => setSelectedTraceroute(undefined)}
-          />
-          <LocationResponseDialog
-            location={selectedLocation}
-            open={!!selectedLocation}
-            onOpenChange={() => setSelectedLocation(undefined)}
+    <PageLayout label="" leftBar={<Sidebar />}>
+      <div className="pl-2 pt-2 flex flex-row">
+        <div className="flex-1 mr-2">
+          <Input
+            placeholder={t("search.nodes")}
+            value={filterState.nodeName}
+            className="bg-transparent"
+            showClearButton={!!filterState.nodeName}
+            onChange={(e) =>
+              setFilterState((prev) => ({
+                ...prev,
+                nodeName: e.target.value,
+              }))
+            }
           />
         </div>
-      </PageLayout>
-    </>
+        <div className="flex justify-end">
+          <FilterControl
+            filterState={filterState}
+            defaultFilterValues={defaultFilterValues}
+            setFilterState={setFilterState}
+            isDirty={isFilterDirty(filterState)}
+            parameters={{
+              popoverContentProps: {
+                side: "bottom",
+                align: "end",
+                sideOffset: 12,
+              },
+              popoverTriggerClassName: "mr-1 p-2",
+              showTextSearch: false,
+            }}
+          />
+        </div>
+      </div>
+      <div className="overflow-y-auto">
+        <Table headings={tableHeadings} rows={tableRows} />
+        <TracerouteResponseDialog
+          traceroute={selectedTraceroute}
+          open={!!selectedTraceroute}
+          onOpenChange={() => setSelectedTraceroute(undefined)}
+        />
+        <LocationResponseDialog
+          location={selectedLocation}
+          open={!!selectedLocation}
+          onOpenChange={() => setSelectedLocation(undefined)}
+        />
+      </div>
+    </PageLayout>
   );
 };
 

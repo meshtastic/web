@@ -1,7 +1,6 @@
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import { useMemo, useState } from "react";
-import React from "react";
 import { cn } from "@core/utils/cn.ts";
+import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import React, { useMemo, useState } from "react";
 
 export interface Heading {
   title: string;
@@ -49,10 +48,14 @@ export const Table = ({ headings, rows }: TableProps) => {
   };
 
   const sortedRows = useMemo(() => {
-    if (!sortColumn) return rows;
+    if (!sortColumn) {
+      return rows;
+    }
 
     const columnIndex = headings.findIndex((h) => h.title === sortColumn);
-    if (columnIndex === -1) return rows;
+    if (columnIndex === -1) {
+      return rows;
+    }
 
     return [...rows].sort((a, b) => {
       if (a.isFavorite !== b.isFavorite) {
@@ -73,8 +76,12 @@ export const Table = ({ headings, rows }: TableProps) => {
         bValue = bCell.sortValue;
       }
 
-      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+      if (aValue < bValue) {
+        return sortOrder === "asc" ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortOrder === "asc" ? 1 : -1;
+      }
       return 0;
     });
   }, [rows, sortColumn, sortOrder, headings]);
@@ -99,18 +106,23 @@ export const Table = ({ headings, rows }: TableProps) => {
                 }
               }}
               tabIndex={heading.sortable ? 0 : -1}
-              role="columnheader"
-              aria-sort={sortColumn === heading.title
-                ? sortOrder === "asc" ? "ascending" : "descending"
-                : "none"}
+              aria-sort={
+                sortColumn === heading.title
+                  ? sortOrder === "asc"
+                    ? "ascending"
+                    : "descending"
+                  : "none"
+              }
             >
               <div className="flex items-center gap-2">
                 {heading.title}
-                {heading.sortable && sortColumn === heading.title && (
-                  sortOrder === "asc"
-                    ? <ChevronUpIcon size={16} aria-hidden="true" />
-                    : <ChevronDownIcon size={16} aria-hidden="true" />
-                )}
+                {heading.sortable &&
+                  sortColumn === heading.title &&
+                  (sortOrder === "asc" ? (
+                    <ChevronUpIcon size={16} aria-hidden="true" />
+                  ) : (
+                    <ChevronDownIcon size={16} aria-hidden="true" />
+                  ))}
               </div>
             </th>
           ))}
@@ -126,26 +138,25 @@ export const Table = ({ headings, rows }: TableProps) => {
                 : "bg-white dark:bg-slate-900 odd:bg-slate-200/40 dark:odd:bg-slate-800/40",
             )}
           >
-            {row.cells.map((cell, cellIndex) =>
-              cellIndex === 0
-                ? (
-                  <th
-                    key={`${row.id}_${cellIndex}`}
-                    className="whitespace-nowrap px-3 py-2 text-sm text-left text-text-secondary"
-                    scope="row"
-                  >
-                    {cell.content}
-                  </th>
-                )
-                : (
-                  <td
-                    key={`${row.id}_${cellIndex}`}
-                    className="whitespace-nowrap px-3 py-2 text-sm text-text-secondary"
-                  >
-                    {cell.content}
-                  </td>
-                )
-            )}
+            {row.cells.map((cell, cellIndex) => {
+              const key = `${row.id}_${cellIndex}`;
+              const isFirstCell = cellIndex === 0;
+
+              const cellElement = isFirstCell ? (
+                <th
+                  className="whitespace-nowrap px-3 py-2 text-sm text-left text-text-secondary"
+                  scope="row"
+                >
+                  {cell.content}
+                </th>
+              ) : (
+                <td className="whitespace-nowrap px-3 py-2 text-sm text-text-secondary">
+                  {cell.content}
+                </td>
+              );
+
+              return React.cloneElement(cellElement, { key });
+            })}
           </tr>
         ))}
       </tbody>

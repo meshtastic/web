@@ -1,19 +1,17 @@
-import type { TabElementProps } from "../../Dialog/NewDeviceDialog.tsx";
-import { Button } from "@components/UI/Button.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
+import { Button } from "@components/UI/Button.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
+import { useMessageStore } from "@core/stores/messageStore/index.ts";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
-import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { MeshDevice } from "@meshtastic/core";
+import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { useCallback, useEffect, useState } from "react";
-import { useMessageStore } from "@core/stores/messageStore/index.ts";
 import { useTranslation } from "react-i18next";
+import type { TabElementProps } from "../../Dialog/NewDeviceDialog.tsx";
 
-export const BLE = (
-  { closeDialog }: TabElementProps,
-) => {
+export const BLE = ({ closeDialog }: TabElementProps) => {
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);
   const { addDevice } = useDeviceStore();
@@ -77,10 +75,12 @@ export const BLE = (
               if (exists === -1) {
                 setBleDevices(bleDevices.concat(device));
               }
-            }).catch((error: Error) => {
+            })
+            .catch((error: Error) => {
               console.error("Error requesting device:", error);
               setConnectionInProgress(false);
-            }).finally(() => {
+            })
+            .finally(() => {
               setConnectionInProgress(false);
             });
         }}

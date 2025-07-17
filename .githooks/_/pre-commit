@@ -9,4 +9,4 @@ if [ -f "$SIMPLE_GIT_HOOKS_RC" ]; then
     . "$SIMPLE_GIT_HOOKS_RC"
 fi
 
-cd packages/web && deno task lint:fix && deno task format
+# cd packages/web && bun run lint && bun run format

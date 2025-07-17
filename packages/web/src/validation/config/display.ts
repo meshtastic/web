@@ -1,5 +1,5 @@
-import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
+import { z } from "zod/v4";
 
 const GpsCoordinateEnum = z.enum(
   Protobuf.Config.Config_DisplayConfig_GpsCoordinateFormat,
@@ -7,9 +7,7 @@ const GpsCoordinateEnum = z.enum(
 const DisplayUnitsEnum = z.enum(
   Protobuf.Config.Config_DisplayConfig_DisplayUnits,
 );
-const OledTypeEnum = z.enum(
-  Protobuf.Config.Config_DisplayConfig_OledType,
-);
+const OledTypeEnum = z.enum(Protobuf.Config.Config_DisplayConfig_OledType);
 const DisplayModeEnum = z.enum(
   Protobuf.Config.Config_DisplayConfig_DisplayMode,
 );

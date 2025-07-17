@@ -1,7 +1,7 @@
-import { z } from "zod/v4";
-import { Protobuf } from "@meshtastic/core";
-import { makePskHelpers } from "./pskSchema.ts";
 import { validateMaxByteLength } from "@core/utils/string.ts";
+import { Protobuf } from "@meshtastic/core";
+import { z } from "zod/v4";
+import { makePskHelpers } from "./pskSchema.ts";
 
 const RoleEnum = z.enum(Protobuf.Channel.Channel_Role);
 
@@ -19,11 +19,10 @@ export function makeChannelSchema(allowedBytes: number) {
   const ChannelSettingsSchema = z.object({
     channelNum: z.coerce.number().int().min(0).max(7),
     psk: stringSchema(false),
-    name: z.string()
-      .refine(
-        (s) => validateMaxByteLength(s, 12).isValid,
-        { message: "formValidation.tooBig.bytes", params: { maximum: 12 } },
-      ),
+    name: z.string().refine((s) => validateMaxByteLength(s, 12).isValid, {
+      message: "formValidation.tooBig.bytes",
+      params: { maximum: 12 },
+    }),
     id: z.coerce.number().int(),
     uplinkEnabled: z.boolean(),
     downlinkEnabled: z.boolean(),

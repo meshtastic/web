@@ -9,8 +9,8 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { AlertTriangleIcon } from "lucide-react";
-import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 import { useTranslation } from "react-i18next";
+import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export interface DeleteMessagesDialogProps {
   open: boolean;
@@ -41,11 +41,7 @@ export const DeleteMessagesDialog = ({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4">
-          <Button
-            variant="outline"
-            onClick={handleCloseDialog}
-            name="dismiss"
-          >
+          <Button variant="outline" onClick={handleCloseDialog} name="dismiss">
             {t("button.dismiss")}
           </Button>
           <Button

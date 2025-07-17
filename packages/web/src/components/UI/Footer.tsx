@@ -27,12 +27,14 @@ const Footer = ({ className, ...props }: FooterProps) => {
         <Trans
           i18nKey="footer.text"
           components={[
+            // biome-ignore lint/a11y/useAnchorContent: because I want to use the link component
             <a
               key="vercel"
               rel="noopener noreferrer"
               href="https://vercel.com/?utm_source=meshtastic&utm_campaign=oss"
               className="hover:underline text-link"
             />,
+            // biome-ignore lint/a11y/useAnchorContent: because I want to use the link component
             <a
               key="legal"
               rel="noopener noreferrer"

@@ -1,21 +1,21 @@
+import { DialogManager } from "@components/Dialog/DialogManager.tsx";
+import type { useAppStore } from "@core/stores/appStore.ts";
+import type { useMessageStore } from "@core/stores/messageStore/index.ts";
+import ChannelsPage from "@pages/Channels.tsx";
+import ConfigPage from "@pages/Config/index.tsx";
+import { Dashboard } from "@pages/Dashboard/index.tsx";
+import MapPage from "@pages/Map/index.tsx";
+import MessagesPage from "@pages/Messages.tsx";
+import NodesPage from "@pages/Nodes/index.tsx";
 import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
   redirect,
 } from "@tanstack/react-router";
-import { Dashboard } from "@pages/Dashboard/index.tsx";
-import MessagesPage from "@pages/Messages.tsx";
-import MapPage from "@pages/Map/index.tsx";
-import ConfigPage from "@pages/Config/index.tsx";
-import ChannelsPage from "@pages/Channels.tsx";
-import NodesPage from "@pages/Nodes/index.tsx";
-import { DialogManager } from "@components/Dialog/DialogManager.tsx";
+import type { useTranslation } from "react-i18next";
 import { z } from "zod";
-import { useAppStore } from "@core/stores/appStore.ts";
-import { useMessageStore } from "@core/stores/messageStore/index.ts";
 import { App } from "./App.tsx";
-import { useTranslation } from "react-i18next";
 
 interface AppContext {
   stores: {
@@ -35,7 +35,7 @@ const indexRoute = createRoute({
   component: Dashboard,
   loader: () => {
     // Redirect to the broadcast messages page on initial load
-    return redirect({ to: `/messages/broadcast/0`, replace: true });
+    return redirect({ to: "/messages/broadcast/0", replace: true });
   },
 });
 
@@ -55,28 +55,34 @@ const messagesRoute = createRoute({
   },
 });
 
-const chatIdSchema = z.string().refine((val) => {
-  const num = Number(val);
-  if (isNaN(num) || !Number.isInteger(num)) {
-    return false;
-  }
+const chatIdSchema = z.string().refine(
+  (val) => {
+    const num = Number(val);
+    if (Number.isNaN(num) || !Number.isInteger(num)) {
+      return false;
+    }
 
-  const isChannelId = num >= 0 && num <= 10;
-  const isNodeId = num >= 1000000000 && num <= 9999999999;
+    const isChannelId = num >= 0 && num <= 10;
+    const isNodeId = num >= 1000000000 && num <= 9999999999;
 
-  return isChannelId || isNodeId;
-}, {
-  message: "Chat ID must be a channel (0-10) or a valid node ID.",
-});
+    return isChannelId || isNodeId;
+  },
+  {
+    message: "Chat ID must be a channel (0-10) or a valid node ID.",
+  },
+);
 
 export const messagesWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages/$type/$chatId",
   component: MessagesPage,
   parseParams: (params) => ({
-    type: z.enum(["direct", "broadcast"], {
-      errorMap: () => ({ message: 'Type must be "direct" or "broadcast".' }),
-    }).parse(params.type),
+    type: z
+      .enum(["direct", "broadcast"])
+      .refine((val) => val === "direct" || val === "broadcast", {
+        message: 'Type must be "direct" or "broadcast".',
+      })
+      .parse(params.type),
     chatId: chatIdSchema.parse(params.chatId),
   }),
 });

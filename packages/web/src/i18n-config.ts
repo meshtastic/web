@@ -1,7 +1,7 @@
 import i18next from "i18next";
-import { initReactI18next } from "react-i18next";
-import Backend from "i18next-http-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
+import Backend from "i18next-http-backend";
+import { initReactI18next } from "react-i18next";
 
 export type Lang = {
   code: Intl.Locale["language"];
@@ -41,9 +41,9 @@ i18next
     fallbackLng: {
       default: [FALLBACK_LANGUAGE_CODE],
       "en-GB": [FALLBACK_LANGUAGE_CODE],
-      "fi": ["fi-FI", FALLBACK_LANGUAGE_CODE],
-      "sv": ["sv-SE", FALLBACK_LANGUAGE_CODE],
-      "de": ["de-DE", FALLBACK_LANGUAGE_CODE],
+      fi: ["fi-FI", FALLBACK_LANGUAGE_CODE],
+      sv: ["sv-SE", FALLBACK_LANGUAGE_CODE],
+      de: ["de-DE", FALLBACK_LANGUAGE_CODE],
     },
     fallbackNS: ["common", "ui", "dialog"],
     debug: import.meta.env.MODE === "development",

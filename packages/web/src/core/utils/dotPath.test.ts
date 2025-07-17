@@ -39,10 +39,7 @@ describe("dotPaths", () => {
 
   it("handles mixed nested structures", () => {
     const obj = {
-      a: [
-        { b: 1, c: [2, 3] },
-        { d: { e: 4 } },
-      ],
+      a: [{ b: 1, c: [2, 3] }, { d: { e: 4 } }],
       f: 5,
     };
     expect(dotPaths(obj)).toEqual([

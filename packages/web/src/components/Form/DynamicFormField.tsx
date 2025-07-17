@@ -1,8 +1,4 @@
 import {
-  type MultiSelectFieldProps,
-  MultiSelectInput,
-} from "./FormMultiSelect.tsx";
-import {
   GenericInput,
   type InputFieldProps,
 } from "@components/Form/FormInput.tsx";
@@ -19,6 +15,10 @@ import {
   ToggleInput,
 } from "@components/Form/FormToggle.tsx";
 import type { Control, FieldValues } from "react-hook-form";
+import {
+  type MultiSelectFieldProps,
+  MultiSelectInput,
+} from "./FormMultiSelect.tsx";
 
 export type FieldProps<T> =
   | InputFieldProps<T>

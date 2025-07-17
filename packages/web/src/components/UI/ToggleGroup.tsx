@@ -1,6 +1,6 @@
+import { cn } from "@core/utils/cn.ts";
 import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group";
 import * as React from "react";
-import { cn } from "@core/utils/cn.ts";
 
 const toggleGroupItemClasses = [
   "flex flex-1 h-10 items-center justify-center first:rounded-l last:rounded-r ",
@@ -34,10 +34,7 @@ const ToggleGroupItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <ToggleGroupPrimitive.Item
     ref={ref}
-    className={cn(
-      ...toggleGroupItemClasses,
-      className,
-    )}
+    className={cn(...toggleGroupItemClasses, className)}
     {...props}
   >
     {children}

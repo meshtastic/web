@@ -41,10 +41,7 @@ export const MessageActionsMenu = ({
   const iconSizeClass = "size-4";
 
   return (
-    <div
-      className={cn(hoverIconBarClass)}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className={cn(hoverIconBarClass)}>
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>

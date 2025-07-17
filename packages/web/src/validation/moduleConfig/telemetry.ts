@@ -13,6 +13,4 @@ export const TelemetryValidationSchema = z.object({
   powerScreenEnabled: z.boolean(),
 });
 
-export type TelemetryValidation = z.infer<
-  typeof TelemetryValidationSchema
->;
+export type TelemetryValidation = z.infer<typeof TelemetryValidationSchema>;

@@ -1,9 +1,6 @@
 {
-  "deno.enable": true,
-  "deno.suggest.imports.autoDiscover": true,
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "denoland.vscode-deno",
-  "[typescript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit",
   }
 }

@@ -1,16 +1,16 @@
-import newGithubIssueUrl from "@core/utils/github.ts";
-import { ExternalLink } from "lucide-react";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Link } from "@components/UI/Typography/Link.tsx";
 import { P } from "@components/UI/Typography/P.tsx";
+import newGithubIssueUrl from "@core/utils/github.ts";
+import { ExternalLink } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
 
 export function ErrorPage({ error }: { error: Error }) {
+  const { t } = useTranslation();
+
   if (!error) {
     return null;
   }
-
-  const { t } = useTranslation();
 
   return (
     <article className="w-full h-screen overflow-y-auto bg-background-primary text-text-primary">
@@ -19,12 +19,8 @@ export function ErrorPage({ error }: { error: Error }) {
           <Heading as="h2" className="text-text-primary">
             {t("errorPage.title")}
           </Heading>
-          <P>
-            {t("errorPage.description1")}
-          </P>
-          <P>
-            {t("errorPage.description2")}
-          </P>
+          <P>{t("errorPage.description1")}</P>
+          <P>{t("errorPage.description2")}</P>
           <P>Please include the following information in your report:</P>
           <ul className="list-disc list-inside text-sm">
             <li>{t("errorPage.reportSteps.step1")}</li>

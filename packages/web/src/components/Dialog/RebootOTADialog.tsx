@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { ClockIcon, RefreshCwIcon } from "lucide-react";
 import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
@@ -11,6 +9,8 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { ClockIcon, RefreshCwIcon } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface RebootOTADialogProps {
@@ -20,9 +20,10 @@ export interface RebootOTADialogProps {
 
 const DEFAULT_REBOOT_DELAY = 5; // seconds
 
-export const RebootOTADialog = (
-  { open, onOpenChange }: RebootOTADialogProps,
-) => {
+export const RebootOTADialog = ({
+  open,
+  onOpenChange,
+}: RebootOTADialogProps) => {
   const { t } = useTranslation("dialog");
   const { connection } = useDevice();
   const [time, setTime] = useState<number>(DEFAULT_REBOOT_DELAY);
@@ -39,13 +40,15 @@ export const RebootOTADialog = (
     setInputValue(val);
 
     const parsed = Number(val);
-    if (!isNaN(parsed) && parsed > 0) {
+    if (!Number.isNaN(parsed) && parsed > 0) {
       setTime(parsed);
     }
   };
 
   const handleRebootWithTimeout = async () => {
-    if (!connection) return;
+    if (!connection) {
+      return;
+    }
     setIsScheduled(true);
 
     const delay = time > 0 ? time : DEFAULT_REBOOT_DELAY;
@@ -63,7 +66,9 @@ export const RebootOTADialog = (
   };
 
   const handleInstantReboot = async () => {
-    if (!connection) return;
+    if (!connection) {
+      return;
+    }
 
     await connection.rebootOta(DEFAULT_REBOOT_DELAY);
     onOpenChange(false);
@@ -74,12 +79,8 @@ export const RebootOTADialog = (
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>
-            {t("rebootOta.title")}
-          </DialogTitle>
-          <DialogDescription>
-            {t("rebootOta.description")}
-          </DialogDescription>
+          <DialogTitle>{t("rebootOta.title")}</DialogTitle>
+          <DialogDescription>{t("rebootOta.description")}</DialogDescription>
         </DialogHeader>
 
         <div className="flex gap-2 p-2 items-center relative">

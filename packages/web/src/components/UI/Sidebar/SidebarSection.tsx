@@ -1,7 +1,7 @@
-import React from "react";
-import { cn } from "@core/utils/cn.ts";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { useSidebar } from "@core/stores/sidebarStore.tsx";
+import { cn } from "@core/utils/cn.ts";
+import type React from "react";
 
 interface SidebarSectionProps {
   label: string;
@@ -16,13 +16,7 @@ export const SidebarSection = ({
 }: SidebarSectionProps) => {
   const { isCollapsed } = useSidebar();
   return (
-    <div
-      className={cn(
-        "py-2",
-        isCollapsed ? "px-0" : "px-4",
-        className,
-      )}
-    >
+    <div className={cn("py-2", isCollapsed ? "px-0" : "px-4", className)}>
       <Heading
         as="h3"
         className={cn(
@@ -38,9 +32,7 @@ export const SidebarSection = ({
         {label}
       </Heading>
 
-      <div className="space-y-1">
-        {children}
-      </div>
+      <div className="space-y-1">{children}</div>
     </div>
   );
 };

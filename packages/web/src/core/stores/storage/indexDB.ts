@@ -1,6 +1,13 @@
-import { PersistStorage, StateStorage, StorageValue } from "zustand/middleware";
+import type {
+  ChannelId,
+  MessageLogMap,
+} from "@core/stores/messageStore/types.ts";
 import { del, get, set } from "idb-keyval";
-import { ChannelId, MessageLogMap } from "@core/stores/messageStore/types.ts";
+import type {
+  PersistStorage,
+  StateStorage,
+  StorageValue,
+} from "zustand/middleware";
 
 type PersistedMessageState = {
   messages: {
@@ -26,8 +33,8 @@ type SerializedMap<K = unknown, V = unknown> = {
   __dataType: "Map";
   value: Array<[K, V]>;
 };
-// deno-lint-ignore no-explicit-any
-type JsonReplacer = (this: any, key: string, value: unknown) => unknown;
+
+type JsonReplacer = (key: string, value: unknown) => unknown;
 const replacer: JsonReplacer = (_, value) => {
   if (value instanceof Map) {
     const map = value as Map<unknown, unknown>;
@@ -39,8 +46,8 @@ const replacer: JsonReplacer = (_, value) => {
   }
   return value;
 };
-// deno-lint-ignore no-explicit-any
-type JsonReviver = (this: any, key: string, value: unknown) => unknown;
+
+type JsonReviver = (key: string, value: unknown) => unknown;
 function isSerializedMap(value: unknown): value is SerializedMap {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return false;
@@ -60,11 +67,14 @@ export const storageWithMapSupport: PersistStorage<PersistedMessageState> = {
     name,
   ): Promise<StorageValue<PersistedMessageState> | null> => {
     const str = await zustandIndexDBStorage.getItem(name);
-    if (!str) return null;
+    if (!str) {
+      return null;
+    }
     try {
-      const parsed = JSON.parse(str, reviver) as StorageValue<
-        PersistedMessageState
-      >;
+      const parsed = JSON.parse(
+        str,
+        reviver,
+      ) as StorageValue<PersistedMessageState>;
       return parsed;
     } catch (error) {
       console.error(`Error parsing persisted state (${name}):`, error);

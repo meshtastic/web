@@ -1,30 +1,28 @@
-import { build, emptyDir } from "@deno/dnt";
 import { join } from "jsr:@std/path@1/join";
+import { build, emptyDir } from "@deno/dnt";
 
 interface DenoJsonConfig {
-  name: string;
-  version: string;
-  description: string;
-  imports?: Record<string, string>;
-  exports?: Record<string, string>;
+	name: string;
+	version: string;
+	description: string;
+	imports?: Record<string, string>;
+	exports?: Record<string, string>;
 }
 
 async function getJson(filePath: string) {
-  try {
-    return JSON.parse(await Deno.readTextFile(filePath));
-  } catch (e) {
-    if (e instanceof Error) {
-      throw new Error(`Error reading or parsing ${filePath}: ${e.message}`);
-    }
-  }
+	try {
+		return JSON.parse(await Deno.readTextFile(filePath));
+	} catch (e) {
+		if (e instanceof Error) {
+			throw new Error(`Error reading or parsing ${filePath}: ${e.message}`);
+		}
+	}
 }
 
 if (Deno.args.length !== 1) {
-  console.error("Usage: deno task build:npm <path-to-package>");
-  console.error(
-    "Example: deno task build:npm packages/core",
-  );
-  Deno.exit(1);
+	console.error("Usage: deno task build:npm <path-to-package>");
+	console.error("Example: deno task build:npm packages/core");
+	Deno.exit(1);
 }
 
 const packagePath = Deno.args[0];
@@ -35,25 +33,25 @@ const outDir = join(packagePath, "npm");
 let jsonContent: DenoJsonConfig;
 
 try {
-  jsonContent = await getJson(denoJsonPath);
+	jsonContent = await getJson(denoJsonPath);
 } catch (error) {
-  console.log(`Error reading or parsing ${denoJsonPath}:`, error);
+	console.log(`Error reading or parsing ${denoJsonPath}:`, error);
 
-  if (error instanceof Deno.errors.NotFound) {
-    console.error(`Error: Config file not found at ${denoJsonPath}`);
-  } else {
-    console.error(`Error reading or parsing ${denoJsonPath}:`, error);
-  }
-  Deno.exit(1);
+	if (error instanceof Deno.errors.NotFound) {
+		console.error(`Error: Config file not found at ${denoJsonPath}`);
+	} else {
+		console.error(`Error reading or parsing ${denoJsonPath}:`, error);
+	}
+	Deno.exit(1);
 }
 
 const { name, version, description } = jsonContent;
 
 if (!name || !version || !description) {
-  console.error(
-    `Error: 'name', 'version', and 'description' must be defined in ${denoJsonPath}`,
-  );
-  Deno.exit(1);
+	console.error(
+		`Error: 'name', 'version', and 'description' must be defined in ${denoJsonPath}`,
+	);
+	Deno.exit(1);
 }
 
 console.log(`Building ${name}@${version} from ${packagePath}...`);
@@ -62,40 +60,40 @@ console.log(`Building ${name}@${version} from ${packagePath}...`);
 await emptyDir(outDir);
 
 try {
-  await build({
-    entryPoints: [join(packagePath, "mod.ts")],
-    outDir,
-    test: false,
-    shims: {
-      deno: true,
-    },
-    package: {
-      name,
-      version,
-      description,
-      license: "GPL-3.0-only",
-      repository: {
-        type: "git",
-        url: "git+https://github.com/meshtastic/web.git",
-      },
-      bugs: {
-        url: "https://github.com/meshtastic/web/issues",
-      },
-    },
-    compilerOptions: {
-      lib: ["DOM", "ESNext"],
-    },
-    postBuild() {
-      Deno.copyFileSync("LICENSE", join(outDir, "LICENSE"));
-      Deno.copyFileSync(
-        join(packagePath, "README.md"),
-        join(outDir, "README.md"),
-      );
-    },
-  });
+	await build({
+		entryPoints: [join(packagePath, "mod.ts")],
+		outDir,
+		test: false,
+		shims: {
+			deno: true,
+		},
+		package: {
+			name,
+			version,
+			description,
+			license: "GPL-3.0-only",
+			repository: {
+				type: "git",
+				url: "git+https://github.com/meshtastic/web.git",
+			},
+			bugs: {
+				url: "https://github.com/meshtastic/web/issues",
+			},
+		},
+		compilerOptions: {
+			lib: ["DOM", "ESNext"],
+		},
+		postBuild() {
+			Deno.copyFileSync("LICENSE", join(outDir, "LICENSE"));
+			Deno.copyFileSync(
+				join(packagePath, "README.md"),
+				join(outDir, "README.md"),
+			);
+		},
+	});
 } catch (error) {
-  console.error(`Error building ${name}@${version}:`, error);
-  Deno.exit(1);
+	console.error(`Error building ${name}@${version}:`, error);
+	Deno.exit(1);
 }
 
 console.log(`✅ Successfully built ${name}@${version} to ${outDir}`);

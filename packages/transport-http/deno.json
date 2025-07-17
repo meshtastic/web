@@ -1,8 +1,8 @@
 {
-  "name": "@meshtastic/transport-http",
-  "version": "0.2.1",
-  "description": "A transport layer for Meshtastic applications using HTTP.",
-  "exports": {
-    ".": "./mod.ts"
-  }
+	"name": "@meshtastic/transport-http",
+	"version": "0.2.1",
+	"description": "A transport layer for Meshtastic applications using HTTP.",
+	"exports": {
+		".": "./mod.ts"
+	}
 }

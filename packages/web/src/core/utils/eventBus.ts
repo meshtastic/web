@@ -26,7 +26,9 @@ class EventBus {
   }
 
   public off<T extends EventName>(event: T, callback: EventCallback<T>): void {
-    if (!this.listeners[event]) return;
+    if (!this.listeners[event]) {
+      return;
+    }
 
     const callbackIndex = this.listeners[event]?.indexOf(callback);
     if (callbackIndex !== undefined && callbackIndex > -1) {
@@ -43,7 +45,9 @@ class EventBus {
   }
 
   public emit<T extends EventName>(event: T, data: EventMap[T]): void {
-    if (!this.listeners[event]) return;
+    if (!this.listeners[event]) {
+      return;
+    }
 
     this.listeners[event]?.forEach((callback) => {
       callback(data);

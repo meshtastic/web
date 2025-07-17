@@ -1,5 +1,5 @@
-import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
+import { z } from "zod/v4";
 
 const PairingModeEnum = z.enum(
   Protobuf.Config.Config_BluetoothConfig_PairingMode,

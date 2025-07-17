@@ -1,30 +1,33 @@
-import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
-import { ManagedModeDialog } from "@components/Dialog/ManagedModeDialog.tsx";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
-import { useAppStore } from "@core/stores/appStore.ts";
-import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type ParsedSecurity,
   type RawSecurity,
   RawSecuritySchema,
 } from "@app/validation/config/security.ts";
-import { useEffect, useState } from "react";
 import { create } from "@bufbuild/protobuf";
+import { ManagedModeDialog } from "@components/Dialog/ManagedModeDialog.tsx";
+import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
+import { createZodResolver } from "@components/Form/createZodResolver.ts";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
-import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 import { type DefaultValues, useForm } from "react-hook-form";
-import { createZodResolver } from "@components/Form/createZodResolver.ts";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+import { useTranslation } from "react-i18next";
 
 interface SecurityConfigProps {
   onFormInit: DynamicFormFormInit<RawSecurity>;
 }
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
+  useWaitForConfig({ configCase: "security" });
+
   const {
     config,
     setWorkingConfig,
@@ -43,19 +46,11 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
       privateKey: fromByteArray(
         securityConfig?.privateKey ?? new Uint8Array(0),
       ),
-      publicKey: fromByteArray(
-        securityConfig?.publicKey ?? new Uint8Array(0),
-      ),
+      publicKey: fromByteArray(securityConfig?.publicKey ?? new Uint8Array(0)),
       adminKey: [
-        fromByteArray(
-          securityConfig?.adminKey?.at(0) ?? new Uint8Array(0),
-        ),
-        fromByteArray(
-          securityConfig?.adminKey?.at(1) ?? new Uint8Array(0),
-        ),
-        fromByteArray(
-          securityConfig?.adminKey?.at(2) ?? new Uint8Array(0),
-        ),
+        fromByteArray(securityConfig?.adminKey?.at(0) ?? new Uint8Array(0)),
+        fromByteArray(securityConfig?.adminKey?.at(1) ?? new Uint8Array(0)),
+        fromByteArray(securityConfig?.adminKey?.at(2) ?? new Uint8Array(0)),
       ],
     },
   };
@@ -73,15 +68,15 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     onFormInit?.(formMethods);
   }, [onFormInit, formMethods]);
 
-  const [privateKeyDialogOpen, setPrivateKeyDialogOpen] = useState<boolean>(
-    false,
-  );
-  const [managedModeDialogOpen, setManagedModeDialogOpen] = useState<boolean>(
-    false,
-  );
+  const [privateKeyDialogOpen, setPrivateKeyDialogOpen] =
+    useState<boolean>(false);
+  const [managedModeDialogOpen, setManagedModeDialogOpen] =
+    useState<boolean>(false);
 
   const onSubmit = (data: RawSecurity) => {
-    if (!formState.isReady) return;
+    if (!formState.isReady) {
+      return;
+    }
 
     const payload: ParsedSecurity = {
       ...data,

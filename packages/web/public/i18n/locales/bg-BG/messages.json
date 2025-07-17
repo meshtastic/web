@@ -1,39 +1,39 @@
 {
-  "page": {
-    "title": "Съобщения: {{chatName}}",
-    "placeholder": "Enter Message"
-  },
-  "emptyState": {
-    "title": "Изберете чат",
-    "text": "Все още няма съобщения."
-  },
-  "selectChatPrompt": {
-    "text": "Select a channel or node to start messaging."
-  },
-  "sendMessage": {
-    "placeholder": "Въведете Вашето съобщение тук...",
-    "sendButton": "Изпрати"
-  },
-  "actionsMenu": {
-    "addReactionLabel": "Добавяне на реакция",
-    "replyLabel": "Отговор"
-  },
-  "deliveryStatus": {
-    "delivered": {
-      "label": "Съобщението е доставено",
-      "displayText": "Съобщението е доставено"
-    },
-    "failed": {
-      "label": "Message delivery failed",
-      "displayText": "Delivery failed"
-    },
-    "unknown": {
-      "label": "Статусът на съобщението е неизвестен",
-      "displayText": "Неизвестно състояние"
-    },
-    "waiting": {
-      "label": "Sending message",
-      "displayText": "Waiting for delivery"
-    }
-  }
+	"page": {
+		"title": "Съобщения: {{chatName}}",
+		"placeholder": "Enter Message"
+	},
+	"emptyState": {
+		"title": "Изберете чат",
+		"text": "Все още няма съобщения."
+	},
+	"selectChatPrompt": {
+		"text": "Select a channel or node to start messaging."
+	},
+	"sendMessage": {
+		"placeholder": "Въведете Вашето съобщение тук...",
+		"sendButton": "Изпрати"
+	},
+	"actionsMenu": {
+		"addReactionLabel": "Добавяне на реакция",
+		"replyLabel": "Отговор"
+	},
+	"deliveryStatus": {
+		"delivered": {
+			"label": "Съобщението е доставено",
+			"displayText": "Съобщението е доставено"
+		},
+		"failed": {
+			"label": "Message delivery failed",
+			"displayText": "Delivery failed"
+		},
+		"unknown": {
+			"label": "Статусът на съобщението е неизвестен",
+			"displayText": "Неизвестно състояние"
+		},
+		"waiting": {
+			"label": "Sending message",
+			"displayText": "Waiting for delivery"
+		}
+	}
 }
