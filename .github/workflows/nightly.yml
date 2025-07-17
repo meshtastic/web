@@ -75,7 +75,7 @@ jobs:
           containerfiles: |
             ./infra/Containerfile
           image: ${{ github.event.repository.full_name }}
-          tags: nightly:${{ steps.get_release.outputs.tag }}:${{ github.sha }}
+          tags: nightly-${{ steps.get_release.outputs.tag }}-${{ github.sha }}
 
 
           oci: true

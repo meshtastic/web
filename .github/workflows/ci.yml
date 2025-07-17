@@ -21,8 +21,18 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install Dependencies
-        run: bun install
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock', '**/deno.json', '**/deno.jsonc') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
 
       - name: Cache Bun dependencies
         uses: actions/cache@v4
@@ -30,15 +40,37 @@ jobs:
           path: |
             ~/.bun/install/cache
             packages/web/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('packages/web/bun.lockb') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
-      # - name: Run linter
-      #   run: bun run lint
+      # --- Detect changed packages ---
+      - name: Get Changed Package Directories
+        id: changed_packages
+        uses: tj-actions/changed-files@v46
+        with:
+          dir_names: true
+          files: packages/**
 
-      # - name: Check formatter
-      #   run: bun run check
+      - name: Build Changed Packages
+        if: steps.changed_packages.outputs.all_changed_and_modified_files != ''
+        run: |
+          set -euo pipefail
 
-      - name: Build Package
-        run: bun run build
+          for pkg_dir in ${{ steps.changed_packages.outputs.all_changed_and_modified_files }}; do
+            echo "🔍 Inspecting $pkg_dir..."
+
+            if [[ -f "$pkg_dir/deno.json" ]]; then
+              echo "🔧 Building with Deno: $pkg_dir"
+              deno task build "$pkg_dir"
+            elif [[ -f "$pkg_dir/bun.lockb" ]]; then
+              echo "🔧 Building with Bun: $pkg_dir"
+              (cd "$pkg_dir" && bun install && bun run build)
+            else
+              echo "⚠️ No recognizable build config in $pkg_dir — skipping"
+            fi
+          done
+
+      - name: No Changed Packages
+        if: steps.changed_packages.outputs.all_changed_and_modified_files == ''
+        run: echo "📦 No changed packages detected. Nothing to build."
