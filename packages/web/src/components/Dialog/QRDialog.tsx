@@ -1,5 +1,4 @@
 import { create, toBinary } from "@bufbuild/protobuf";
-import { Checkbox } from "../UI/Checkbox/index.tsx";
 import {
   Dialog,
   DialogClose,
@@ -14,8 +13,9 @@ import { Label } from "@components/UI/Label.tsx";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
 import { useEffect, useMemo, useState } from "react";
-import { QRCode } from "react-qrcode-logo";
 import { useTranslation } from "react-i18next";
+import { QRCode } from "react-qrcode-logo";
+import { Checkbox } from "../UI/Checkbox/index.tsx";
 
 export interface QRDialogProps {
   open: boolean;
@@ -67,9 +67,7 @@ export const QRDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>{t("qr.title")}</DialogTitle>
-          <DialogDescription>
-            {t("qr.description")}
-          </DialogDescription>
+          <DialogDescription>{t("qr.description")}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex gap-3 px-4 py-5 sm:p-6">
@@ -80,13 +78,11 @@ export const QRDialog = ({
                     {channel.settings?.name.length
                       ? channel.settings.name
                       : channel.role === Protobuf.Channel.Channel_Role.PRIMARY
-                      ? t("page.broadcastLabel", { ns: "channels" })
-                      : `${
-                        t("page.channelIndex", {
-                          ns: "channels",
-                          index: channel.index,
-                        })
-                      }${channel.index}`}
+                        ? t("page.broadcastLabel", { ns: "channels" })
+                        : `${t("page.channelIndex", {
+                            ns: "channels",
+                            index: channel.index,
+                          })}${channel.index}`}
                   </Label>
                   <Checkbox
                     key={channel.index}
@@ -94,9 +90,7 @@ export const QRDialog = ({
                     onChange={() => {
                       if (selectedChannels.includes(channel.index)) {
                         setSelectedChannels(
-                          selectedChannels.filter((c) =>
-                            c !== channel.index
-                          ),
+                          selectedChannels.filter((c) => c !== channel.index),
                         );
                       } else {
                         setSelectedChannels([
@@ -140,10 +134,7 @@ export const QRDialog = ({
         </div>
         <DialogFooter>
           <Label>{t("qr.sharableUrl")}</Label>
-          <Input
-            value={qrCodeUrl}
-            disabled
-          />
+          <Input value={qrCodeUrl} disabled />
         </DialogFooter>
       </DialogContent>
     </Dialog>

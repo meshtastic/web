@@ -1,12 +1,21 @@
+import BatteryStatus from "@components/BatteryStatus.tsx";
+import { Mono } from "@components/generic/Mono.tsx";
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
+import { Avatar } from "@components/UI/Avatar.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import { formatQuantity } from "@core/utils/string.ts";
-import { Avatar } from "@components/UI/Avatar.tsx";
-import { Mono } from "@components/generic/Mono.tsx";
-import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import { Protobuf } from "@meshtastic/core";
 import type { Protobuf as ProtobufType } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/core";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@radix-ui/react-tooltip";
+import { useNavigate } from "@tanstack/react-router";
 import {
   Dot,
   LockIcon,
@@ -15,16 +24,7 @@ import {
   MountainSnow,
   Star,
 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipPortal,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@radix-ui/react-tooltip";
-import BatteryStatus from "@components/BatteryStatus.tsx";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "@tanstack/react-router";
 
 export interface NodeDetailProps {
   node: ProtobufType.Mesh.NodeInfo;
@@ -60,23 +60,21 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
               e.stopPropagation();
             }}
           >
-            {node.user?.publicKey && node.user?.publicKey.length > 0
-              ? (
-                <LockIcon
-                  className="text-green-600 mb-1.5"
-                  size={12}
-                  strokeWidth={3}
-                  aria-label={t("node_detail_public_key_enabled_aria_label")}
-                />
-              )
-              : (
-                <LockOpenIcon
-                  className="text-yellow-500 mb-1.5"
-                  size={12}
-                  strokeWidth={3}
-                  aria-label={t("node_detail_no_public_key_aria_label")}
-                />
-              )}
+            {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
+              <LockIcon
+                className="text-green-600 mb-1.5"
+                size={12}
+                strokeWidth={3}
+                aria-label={t("node_detail_public_key_enabled_aria_label")}
+              />
+            ) : (
+              <LockOpenIcon
+                className="text-yellow-500 mb-1.5"
+                size={12}
+                strokeWidth={3}
+                aria-label={t("node_detail_no_public_key_aria_label")}
+              />
+            )}
 
             <TooltipProvider>
               <Tooltip>
@@ -105,9 +103,11 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             <Star
               fill={node.isFavorite ? "black" : "none"}
               size={15}
-              aria-label={node.isFavorite
-                ? t("nodeDetail.favorite.label")
-                : t("nodeDetail.notFavorite.label")}
+              aria-label={
+                node.isFavorite
+                  ? t("nodeDetail.favorite.label")
+                  : t("nodeDetail.notFavorite.label")
+              }
             />
           </div>
         </div>

@@ -1,37 +1,34 @@
 import { AmbientLighting } from "@components/PageComponents/ModuleConfig/AmbientLighting.tsx";
-import { DetectionSensor } from "@components/PageComponents/ModuleConfig/DetectionSensor.tsx";
-import { NeighborInfo } from "@components/PageComponents/ModuleConfig/NeighborInfo.tsx";
 import { Audio } from "@components/PageComponents/ModuleConfig/Audio.tsx";
 import { CannedMessage } from "@components/PageComponents/ModuleConfig/CannedMessage.tsx";
+import { DetectionSensor } from "@components/PageComponents/ModuleConfig/DetectionSensor.tsx";
 import { ExternalNotification } from "@components/PageComponents/ModuleConfig/ExternalNotification.tsx";
 import { MQTT } from "@components/PageComponents/ModuleConfig/MQTT.tsx";
+import { NeighborInfo } from "@components/PageComponents/ModuleConfig/NeighborInfo.tsx";
 import { Paxcounter } from "@components/PageComponents/ModuleConfig/Paxcounter.tsx";
 import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.tsx";
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.tsx";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
+import { Spinner } from "@components/UI/Spinner.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
-import { Spinner } from "@components/UI/Spinner.tsx";
-import { useTranslation } from "react-i18next";
 import {
   useDevice,
   type ValidModuleConfigType,
 } from "@core/stores/deviceStore.ts";
-import { useMemo } from "react";
-import { type ComponentType, Suspense } from "react";
+import { type ComponentType, Suspense, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { ConfigSuspender } from "@components/PageComponents/Config/ConfigSuspender.tsx";
+import { useTranslation } from "react-i18next";
 
 interface ConfigProps {
-  // We can get rid of this exception if we import every config schema and pass the union type
-  // deno-lint-ignore no-explicit-any
-  onFormInit: (methods: UseFormReturn<any>) => void;
+  onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
 }
+
 type TabItem = {
   case: ValidModuleConfigType;
   label: string;
@@ -119,10 +116,8 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
             {tab.label}
             {flags.get(tab.case) && (
               <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25">
-                </span>
-                <span className="relative inline-flex size-3 rounded-full bg-sky-500">
-                </span>
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
+                <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
               </span>
             )}
           </TabsTrigger>
@@ -131,9 +126,7 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
       {tabs.map((tab) => (
         <TabsContent key={tab.label} value={tab.label}>
           <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <ConfigSuspender moduleConfigCase={tab.case}>
-              <tab.element onFormInit={onFormInit} />
-            </ConfigSuspender>
+            <tab.element onFormInit={onFormInit} />
           </Suspense>
         </TabsContent>
       ))}

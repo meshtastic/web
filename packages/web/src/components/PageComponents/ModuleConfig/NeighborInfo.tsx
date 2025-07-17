@@ -1,4 +1,4 @@
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type NeighborInfoValidation,
   NeighborInfoValidationSchema,
@@ -8,15 +8,18 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface NeighborInfoModuleConfigProps {
   onFormInit: DynamicFormFormInit<NeighborInfoValidation>;
 }
 
 export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
+  useWaitForConfig({ moduleConfigCase: "neighborInfo" });
+
   const {
     moduleConfig,
     setWorkingModuleConfig,

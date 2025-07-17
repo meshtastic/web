@@ -13,7 +13,6 @@ const sizeClasses = {
 export function Spinner({ className, size = "md", ...props }: SpinnerProps) {
   return (
     <div
-      aria-label="Loading..."
       className={cn(
         "flex items-center justify-center fade-in-50 fade-out-50",
         className,

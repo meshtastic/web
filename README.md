@@ -43,7 +43,7 @@ All `Meshtastic JS` packages (core and transports) are published both to
 
 This monorepo leverages the following technologies:
 
-- **Runtime:** Deno
+- **Runtime:** Bun
 - **Web Client:** React.js
 - **Styling:** Tailwind CSS
 - **Bundling:** Vite
@@ -56,7 +56,7 @@ This monorepo leverages the following technologies:
 
 ### Prerequisites
 
-You'll need to have [Deno](https://deno.com/) installed to work with this
+You'll need to have [Bun](https://bun.sh/) installed to work with this
 monorepo. Follow the installation instructions on their home page.
 
 ### Development Setup
@@ -68,7 +68,7 @@ monorepo. Follow the installation instructions on their home page.
    ```
 2. **Install dependencies for all packages:**
    ```bash
-   deno task install:all
+   bun install
    ```
    This command installs all necessary dependencies for all packages within the
    monorepo.
@@ -80,7 +80,7 @@ monorepo. Follow the installation instructions on their home page.
 To start the development server for the web client:
 
 ```bash
-deno task --filter web dev
+bun run --filter web dev
 ```
 
 This will typically run the web client on http://localhost:3000 and requires a
@@ -89,11 +89,11 @@ Chromium browser
 ## Meshtastic JS Packages
 
 While the js packages are primarily libraries, you can run their tests or
-specific development scripts if defined within their deno.json files. For
+specific development scripts if defined within their package.json files. For
 example, to run tests for a specific package:
 
 ```bash
-deno task --filter core test
+bun run --filter core test
 ```
 
 ### Feedback
@@ -102,24 +102,24 @@ If you encounter any issues with nightly builds, please report them in our
 [issues tracker](https://github.com/meshtastic/web/issues). Your feedback helps
 improve the stability of future releases
 
-### Why Deno?
+### Why Bun?
 
-Meshtastic Web uses Deno as its development platform for several compelling
+Meshtastic Web uses Bun as its development platform for several compelling
 reasons:
 
-- **Built-in Security**: Deno's security-first approach requires explicit
-  permissions for file, network, and environment access, reducing vulnerability
-  risks.
+- **Fast Performance**: Bun is built from the ground up for speed, offering
+  significantly faster package installation and bundling compared to other
+  JavaScript runtimes.
 - **TypeScript Support**: Native TypeScript support without additional
   configuration, enhancing code quality and developer experience.
 - **Modern JavaScript**: First-class support for ESM imports, top-level await,
   and other modern JavaScript features.
-- **Simplified Tooling**: Built-in formatter, linter, test runner, and bundler
-  eliminate the need for multiple third-party tools.
+- **All-in-One Tooling**: Built-in package manager, bundler, test runner, and
+  transpiler eliminate the need for multiple third-party tools.
+- **Node.js Compatibility**: Drop-in replacement for Node.js with better
+  performance and built-in tooling.
 - **Reproducible Builds**: Lockfile ensures consistent builds across all
   environments.
-- **Web Standard APIs**: Uses browser-compatible APIs, making code more portable
-  between server and client environments.
 
 ### Contributing
 

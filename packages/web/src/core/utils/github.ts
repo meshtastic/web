@@ -62,7 +62,8 @@ export default function newGithubIssueUrl(
 }
 
 function validateOptions(options: GithubIssueUrlOptions): ValidatedOptions {
-  const repoUrl = options.repoUrl ??
+  const repoUrl =
+    options.repoUrl ??
     (options.user && options.repo
       ? `https://github.com/${options.user}/${options.repo}`
       : undefined);

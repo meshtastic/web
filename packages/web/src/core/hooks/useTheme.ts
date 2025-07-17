@@ -14,7 +14,7 @@ export function useTheme() {
   );
 
   const [preference, setPreference] = useState<Theme>(() =>
-    typeof window !== "undefined" ? getStoredPreference() : "light"
+    typeof window !== "undefined" ? getStoredPreference() : "light",
   );
 
   const theme = preference === "system" ? getSystemTheme() : preference;
@@ -24,7 +24,9 @@ export function useTheme() {
   }, [theme]);
 
   useEffect(() => {
-    if (preference !== "system") return;
+    if (preference !== "system") {
+      return;
+    }
 
     const media = globalThis.matchMedia("(prefers-color-scheme: dark)");
     const updateTheme = () => setPreference(getStoredPreference());

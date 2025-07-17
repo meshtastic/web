@@ -1,6 +1,6 @@
-import { useCallback } from "react";
-import { useDevice } from "@core/stores/deviceStore.ts";
 import { useToast } from "@core/hooks/useToast.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 interface IgnoreNodeOptions {
@@ -17,7 +17,9 @@ export function useIgnoreNode() {
   const updateIgnoredCB = useCallback(
     ({ nodeNum, isIgnored }: IgnoreNodeOptions) => {
       const node = getNode(nodeNum);
-      if (!node) return;
+      if (!node) {
+        return;
+      }
 
       updateIgnored(nodeNum, isIgnored);
 
@@ -33,7 +35,7 @@ export function useIgnoreNode() {
         }),
       });
     },
-    [updateIgnored, getNode],
+    [updateIgnored, getNode, t, toast],
   );
 
   return { updateIgnored: updateIgnoredCB };

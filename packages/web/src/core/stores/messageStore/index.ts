@@ -1,9 +1,5 @@
-import { create } from "zustand";
-// import { persist } from "zustand/middleware";
-import { produce } from "immer";
-import { Types } from "@meshtastic/core";
 // import { storageWithMapSupport } from "../storage/indexDB.ts";
-import {
+import type {
   ChannelId,
   ClearMessageParams,
   ConversationId,
@@ -14,6 +10,10 @@ import {
   NodeNum,
   SetMessageStateParams,
 } from "@core/stores/messageStore/types.ts";
+import type { Types } from "@meshtastic/core";
+// import { persist } from "zustand/middleware";
+import { produce } from "immer";
+import { create } from "zustand";
 
 export enum MessageState {
   Ack = "ack",
@@ -72,9 +72,11 @@ export const useMessageStore = create<MessageStore>()(
     chatType: MessageType.Broadcast,
     nodeNum: 0,
     setNodeNum: (nodeNum) => {
-      set(produce((state: MessageStore) => {
-        state.nodeNum = nodeNum;
-      }));
+      set(
+        produce((state: MessageStore) => {
+          state.nodeNum = nodeNum;
+        }),
+      );
     },
     getMyNodeNum: () => get().nodeNum,
     saveMessage: (message: Message) => {
@@ -88,10 +90,9 @@ export const useMessageStore = create<MessageStore>()(
                 new Map<MessageId, Message>(),
               );
             }
-            state.messages.direct.get(conversationId)!.set(
-              message.messageId,
-              message,
-            );
+            state.messages.direct
+              .get(conversationId)
+              ?.set(message.messageId, message);
           } else if (message.type === MessageType.Broadcast) {
             const channelId = message.channel as ChannelId;
             if (!state.messages.broadcast.has(channelId)) {
@@ -100,10 +101,9 @@ export const useMessageStore = create<MessageStore>()(
                 new Map<MessageId, Message>(),
               );
             }
-            state.messages.broadcast.get(channelId)!.set(
-              message.messageId,
-              message,
-            );
+            state.messages.broadcast
+              .get(channelId)
+              ?.set(message.messageId, message);
           }
         }),
       );
@@ -124,7 +124,8 @@ export const useMessageStore = create<MessageStore>()(
             if (messageLog) {
               targetMessage = messageLog.get(params.messageId);
             }
-          } else { // Broadcast
+          } else {
+            // Broadcast
             messageLog = state.messages.broadcast.get(params.channelId);
             if (messageLog) {
               targetMessage = messageLog.get(params.messageId);
@@ -135,9 +136,9 @@ export const useMessageStore = create<MessageStore>()(
             targetMessage.state = params.newState ?? MessageState.Ack;
           } else {
             console.warn(
-              `Message or conversation/channel not found for state update. Params: ${
-                JSON.stringify(params)
-              }`,
+              `Message or conversation/channel not found for state update. Params: ${JSON.stringify(
+                params,
+              )}`,
             );
           }
         }),
@@ -209,20 +210,26 @@ export const useMessageStore = create<MessageStore>()(
       return get().draft.get(key) ?? "";
     },
     setDraft: (key, message) => {
-      set(produce((state: MessageStore) => {
-        state.draft.set(key, message);
-      }));
+      set(
+        produce((state: MessageStore) => {
+          state.draft.set(key, message);
+        }),
+      );
     },
     clearDraft: (key) => {
-      set(produce((state: MessageStore) => {
-        state.draft.delete(key);
-      }));
+      set(
+        produce((state: MessageStore) => {
+          state.draft.delete(key);
+        }),
+      );
     },
     deleteAllMessages: () => {
-      set(produce((state: MessageStore) => {
-        state.messages.direct = new Map<ConversationId, MessageLogMap>();
-        state.messages.broadcast = new Map<ChannelId, MessageLogMap>();
-      }));
+      set(
+        produce((state: MessageStore) => {
+          state.messages.direct = new Map<ConversationId, MessageLogMap>();
+          state.messages.broadcast = new Map<ChannelId, MessageLogMap>();
+        }),
+      );
     },
   }),
   // {

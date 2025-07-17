@@ -1,7 +1,7 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { HTTP } from "@components/PageComponents/Connect/HTTP.tsx";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@core/stores/appStore.ts", () => ({
@@ -35,8 +35,9 @@ describe("HTTP Component", () => {
     render(<HTTP closeDialog={vi.fn()} />);
     expect(screen.getByText("IP Address/Hostname")).toBeInTheDocument();
     expect(screen.getByRole("textbox")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("000.000.000.000 / meshtastic.local"))
-      .toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("000.000.000.000 / meshtastic.local"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Use HTTPS")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Connect" })).toBeInTheDocument();
   });
@@ -45,8 +46,9 @@ describe("HTTP Component", () => {
     render(<HTTP closeDialog={vi.fn()} />);
     const inputField = screen.getByRole("textbox");
     fireEvent.change(inputField, { target: { value: "meshtastic.local" } });
-    expect(screen.getByPlaceholderText("000.000.000.000 / meshtastic.local"))
-      .toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("000.000.000.000 / meshtastic.local"),
+    ).toBeInTheDocument();
   });
 
   it("toggles HTTPS switch and updates prefix", () => {

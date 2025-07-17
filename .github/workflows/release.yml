@@ -19,19 +19,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      # --- Setup Deno ---
+      # --- Setup Bun ---
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # --- Setup Deno (for NPM package building) ---
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
-      - name: Cache Deno Dependencies
+      - name: Cache Bun Dependencies
         uses: actions/cache@v4
         with:
-          path: ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
+          path: |
+            ~/.bun/install/cache
+            packages/web/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
           restore-keys: |
-            ${{ runner.os }}-deno-
+            ${{ runner.os }}-bun-
 
       # --- Determine Changed Packages ---
       - name: Get Changed Package Directories
@@ -98,12 +106,12 @@ jobs:
       - name: Run Web App Tests
         if: steps.web_changes.outputs.web_changed == 'true'
         working-directory: packages/web
-        run: deno task test
+        run: bun run test
 
       - name: Create Web App Release Archive
         if: steps.web_changes.outputs.web_changed == 'true'
         working-directory: packages/web
-        run: deno task package # Generates dist/build.tar
+        run: bun run package # Generates dist/build.tar
 
       - name: Upload Web App Archive
         if: steps.web_changes.outputs.web_changed == 'true'

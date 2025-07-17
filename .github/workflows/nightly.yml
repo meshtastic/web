@@ -15,18 +15,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          deno-version: v2.x
+          bun-version: latest
 
-      - name: Cache Deno dependencies
+      - name: Cache Bun dependencies
         uses: actions/cache@v4
         with:
-          path: ${{ steps.setup-deno.outputs.deno-cache-path }}
-          key: deno-cache-${{ runner.os }}-${{ hashFiles('**/deno.lock') }}
+          path: |
+            ~/.bun/install/cache
+            packages/web/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('packages/web/bun.lockb') }}
           restore-keys: |
-            deno-cache-${{ runner.os }}-* 
+            ${{ runner.os }}-bun- 
 
       # - name: Run tests
       #   working-directory: packages/web
@@ -34,15 +36,15 @@ jobs:
 
       - name: Install Dependencies
         working-directory: packages/web
-        run: deno install
+        run: bun install
 
       - name: Build Package
         working-directory: packages/web
-        run: deno task build
+        run: bun run build
 
       - name: Package Output
         working-directory: packages/web
-        run: deno task package
+        run: bun run package
 
       - name: Archive compressed build
         uses: actions/upload-artifact@v4

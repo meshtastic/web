@@ -1,10 +1,10 @@
-import React from "react";
-import { cn } from "@core/utils/cn.ts";
-import { type LucideIcon } from "lucide-react";
+import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
+import { cn } from "@core/utils/cn.ts";
+import type { LucideIcon } from "lucide-react";
+import type React from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 
 export interface ActionItem {
   key: string;
@@ -90,7 +90,9 @@ export const PageLayout = ({
                       aria-busy={action.isLoading}
                     >
                       {action.icon &&
-                        (action.isLoading ? <Spinner size="md" /> : (
+                        (action.isLoading ? (
+                          <Spinner size="md" />
+                        ) : (
                           <action.icon
                             className={cn("h-5 w-5", action.iconClasses)}
                           />

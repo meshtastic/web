@@ -1,7 +1,7 @@
 export function intlSort<T extends PropertyKey>(
   arr: T[],
-  order: "asc" | "desc" = "asc",
   locale: Intl.Locale,
+  order: "asc" | "desc" = "asc",
 ): T[] {
   const collator = new Intl.Collator(locale, { sensitivity: "base" });
 
@@ -11,8 +11,7 @@ export function intlSort<T extends PropertyKey>(
 
     if (order === "asc") {
       return collator.compare(stringA, stringB);
-    } else {
-      return collator.compare(stringB, stringA);
     }
+    return collator.compare(stringB, stringA);
   });
 }

@@ -1,5 +1,3 @@
-import { useDevice } from "../../core/stores/deviceStore.ts";
-import { Button } from "../UI/Button.tsx";
 import {
   Dialog,
   DialogClose,
@@ -13,6 +11,8 @@ import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useDevice } from "../../core/stores/deviceStore.ts";
+import { Button } from "../UI/Button.tsx";
 
 export interface PkiBackupDialogProps {
   open: boolean;
@@ -30,7 +30,9 @@ export const PkiBackupDialog = ({
 
   const decodeKeyData = React.useCallback(
     (key: Uint8Array<ArrayBufferLike>) => {
-      if (!key) return "";
+      if (!key) {
+        return "";
+      }
       return fromByteArray(key ?? new Uint8Array(0));
     },
     [],
@@ -41,20 +43,20 @@ export const PkiBackupDialog = ({
   }, [setDialogOpen]);
 
   const renderPrintWindow = React.useCallback(() => {
-    if (!privateKey || !publicKey) return;
+    if (!privateKey || !publicKey) {
+      return;
+    }
 
     const printWindow = globalThis.open("", "_blank");
     if (printWindow) {
       printWindow.document.write(`
         <html>
           <head>
-            <title>${
-        t("pkiBackup.header", {
-          interpolation: { escapeValue: false },
-          shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
-          longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
-        })
-      }</title>
+            <title>${t("pkiBackup.header", {
+              interpolation: { escapeValue: false },
+              shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
+              longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+            })}</title>
             <style>
               body { font-family: Arial, sans-serif; padding: 20px; }
               h1 { font-size: 18px; }
@@ -62,13 +64,11 @@ export const PkiBackupDialog = ({
             </style>
           </head>
           <body>
-            <h1>${
-        t("pkiBackup.header", {
-          interpolation: { escapeValue: false },
-          shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
-          longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
-        })
-      }</h1>
+            <h1>${t("pkiBackup.header", {
+              interpolation: { escapeValue: false },
+              shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
+              longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+            })}</h1>
             <h3>${t("pkiBackup.secureBackup")}</h3>
             <h3>${t("pkiBackup.publicKey")}</h3>
             <p>${decodeKeyData(publicKey)}</p>
@@ -82,10 +82,12 @@ export const PkiBackupDialog = ({
       printWindow.print();
       closeDialog();
     }
-  }, [decodeKeyData, privateKey, publicKey, closeDialog, t]);
+  }, [decodeKeyData, privateKey, publicKey, closeDialog, t, getMyNode]);
 
   const createDownloadKeyFile = React.useCallback(() => {
-    if (!privateKey || !publicKey) return;
+    if (!privateKey || !publicKey) {
+      return;
+    }
 
     const decodedPrivateKey = decodeKeyData(privateKey);
     const decodedPublicKey = decodeKeyData(publicKey);
@@ -116,7 +118,7 @@ export const PkiBackupDialog = ({
     document.body.removeChild(link);
     closeDialog();
     URL.revokeObjectURL(url);
-  }, [decodeKeyData, privateKey, publicKey, closeDialog, t]);
+  }, [decodeKeyData, privateKey, publicKey, closeDialog, t, getMyNode]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -124,9 +126,7 @@ export const PkiBackupDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>{t("pkiBackup.title")}</DialogTitle>
-          <DialogDescription>
-            {t("pkiBackup.secureBackup")}
-          </DialogDescription>
+          <DialogDescription>{t("pkiBackup.secureBackup")}</DialogDescription>
           <DialogDescription>
             <span className="font-bold break-before-auto">
               {t("pkiBackup.loseKeysWarning")}

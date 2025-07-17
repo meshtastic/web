@@ -1,16 +1,14 @@
 {
-  "name": "@meshtastic/transport-web-bluetooth",
-  "version": "0.1.2",
-  "description": "A transport layer for Meshtastic applications using Web Bluetooth.",
-  "exports": {
-    ".": "./mod.ts"
-  },
-  "imports": {
-    "@types/web-bluetooth": "npm:@types/web-bluetooth@^0.0.20"
-  },
-  "compilerOptions": {
-    "types": [
-      "@types/web-bluetooth"
-    ]
-  }
+	"name": "@meshtastic/transport-web-bluetooth",
+	"version": "0.1.2",
+	"description": "A transport layer for Meshtastic applications using Web Bluetooth.",
+	"exports": {
+		".": "./mod.ts"
+	},
+	"imports": {
+		"@types/web-bluetooth": "npm:@types/web-bluetooth@^0.0.20"
+	},
+	"compilerOptions": {
+		"types": ["@types/web-bluetooth"]
+	}
 }

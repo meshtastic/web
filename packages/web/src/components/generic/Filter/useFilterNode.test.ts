@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
 import { useFilterNode } from "@components/generic/Filter/useFilterNode.ts";
 import { Protobuf } from "@meshtastic/core";
 import { renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
-export function createMockNode(): Protobuf.Mesh.NodeInfo {
+function createMockNode(): Protobuf.Mesh.NodeInfo {
   return {
     $typeName: "meshtastic.NodeInfo",
     num: 1234567890,
@@ -14,6 +14,7 @@ export function createMockNode(): Protobuf.Mesh.NodeInfo {
     isFavorite: true,
     isIgnored: false,
     hopsAway: 2,
+    isKeyManuallyVerified: false,
     user: {
       $typeName: "meshtastic.User",
       id: "!12345678",
@@ -29,7 +30,7 @@ export function createMockNode(): Protobuf.Mesh.NodeInfo {
       $typeName: "meshtastic.DeviceMetrics",
       batteryLevel: 101,
       voltage: 4.21,
-      channelUtilization: 7.50,
+      channelUtilization: 7.5,
       airUtilTx: 2.57,
       uptimeSeconds: 528092,
     },

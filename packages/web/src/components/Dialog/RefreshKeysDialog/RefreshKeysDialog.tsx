@@ -1,3 +1,4 @@
+import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
   DialogClose,
@@ -5,21 +6,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { Button } from "@components/UI/Button.tsx";
-import { LockKeyholeOpenIcon } from "lucide-react";
-import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { useTranslation } from "react-i18next";
 import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { LockKeyholeOpenIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 
 export interface RefreshKeysDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const RefreshKeysDialog = (
-  { open, onOpenChange }: RefreshKeysDialogProps,
-) => {
+export const RefreshKeysDialog = ({
+  open,
+  onOpenChange,
+}: RefreshKeysDialogProps) => {
   const { t } = useTranslation("dialog");
   const { activeChat } = useMessageStore();
   const { nodeErrors, getNode } = useDevice();
@@ -40,9 +41,9 @@ export const RefreshKeysDialog = (
     }),
     description: `${t("refreshKeys.description.unableToSendDmPrefix")}${
       nodeWithError?.user?.longName ?? ""
-    } (${nodeWithError?.user?.shortName ?? ""})${
-      t("refreshKeys.description.keyMismatchReasonSuffix")
-    }`,
+    } (${nodeWithError?.user?.shortName ?? ""})${t(
+      "refreshKeys.description.keyMismatchReasonSuffix",
+    )}`,
   };
 
   return (
@@ -69,9 +70,7 @@ export const RefreshKeysDialog = (
                 <p className="font-bold mb-0.5">
                   {t("refreshKeys.label.acceptNewKeys")}
                 </p>
-                <p>
-                  {t("refreshKeys.description.acceptNewKeys")}
-                </p>
+                <p>{t("refreshKeys.description.acceptNewKeys")}</p>
               </div>
               <Button
                 variant="default"

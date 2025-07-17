@@ -1,14 +1,14 @@
-import { ReactElement } from "react";
-import { render, RenderOptions } from "@testing-library/react";
 import {
   createMemoryHistory,
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
+import { type RenderOptions, render } from "@testing-library/react";
+import type { ReactElement } from "react";
 import "@app/i18n-config.ts";
-import { routeTree } from "../routeTree.gen.ts";
 
 import { DeviceWrapper } from "@app/DeviceWrapper.tsx";
+import { routeTree } from "../routeTree.gen.ts";
 
 const Providers = () => {
   const memoryHistory = createMemoryHistory({

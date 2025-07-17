@@ -1,6 +1,5 @@
 import { create, fromBinary } from "@bufbuild/protobuf";
 import { Button } from "@components/UI/Button.tsx";
-import { Checkbox } from "../UI/Checkbox/index.tsx";
 import {
   Dialog,
   DialogClose,
@@ -18,6 +17,7 @@ import { Protobuf } from "@meshtastic/core";
 import { toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Checkbox } from "../UI/Checkbox/index.tsx";
 
 export interface ImportDialogProps {
   open: boolean;
@@ -25,10 +25,7 @@ export interface ImportDialogProps {
   loraConfig?: Protobuf.Config.Config_LoRaConfig;
 }
 
-export const ImportDialog = ({
-  open,
-  onOpenChange,
-}: ImportDialogProps) => {
+export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
   const { t } = useTranslation("dialog");
   const [importDialogInput, setImportDialogInput] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
@@ -69,7 +66,7 @@ export const ImportDialog = ({
       setValidUrl(false);
       setChannelSet(undefined);
     }
-  }, [importDialogInput]);
+  }, [importDialogInput, t]);
 
   const apply = () => {
     channelSet?.settings.map(
@@ -77,9 +74,10 @@ export const ImportDialog = ({
         connection?.setChannel(
           create(Protobuf.Channel.ChannelSchema, {
             index,
-            role: index === 0
-              ? Protobuf.Channel.Channel_Role.PRIMARY
-              : Protobuf.Channel.Channel_Role.SECONDARY,
+            role:
+              index === 0
+                ? Protobuf.Channel.Channel_Role.PRIMARY
+                : Protobuf.Channel.Channel_Role.SECONDARY,
             settings: ch,
           }),
         );
@@ -104,9 +102,7 @@ export const ImportDialog = ({
         <DialogClose />
         <DialogHeader>
           <DialogTitle>{t("import.title")}</DialogTitle>
-          <DialogDescription>
-            {t("import.description")}
-          </DialogDescription>
+          <DialogDescription>{t("import.description")}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
           <Label>{t("import.channelSetUrl")}</Label>
@@ -127,25 +123,21 @@ export const ImportDialog = ({
                     checked={channelSet?.loraConfig?.usePreset ?? true}
                   />
                 </div>
-                {
-                  /* <Select
+                {/* <Select
                   label="Modem Preset"
                   disabled
                   value={channelSet?.loraConfig?.modemPreset}
                 >
                   {renderOptions(Protobuf.Config_LoRaConfig_ModemPreset)}
-                </Select> */
-                }
+                </Select> */}
               </div>
-              {
-                /* <Select
+              {/* <Select
                 label="Region"
                 disabled
                 value={channelSet?.loraConfig?.region}
               >
                 {renderOptions(Protobuf.Config_LoRaConfig_RegionCode)}
-              </Select> */
-              }
+              </Select> */}
 
               <span className="text-md block font-medium text-text-primary">
                 {t("import.channels")}

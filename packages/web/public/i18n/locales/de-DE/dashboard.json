@@ -1,12 +1,12 @@
 {
-  "dashboard": {
-    "title": "Verbundene Geräte",
-    "description": "Verwalten Sie Ihre verbundenen Meshtastic Geräte.",
-    "connectionType_ble": "BLE",
-    "connectionType_serial": "Seriell",
-    "connectionType_network": "Netzwerk",
-    "noDevicesTitle": "Keine Geräte verbunden",
-    "noDevicesDescription": "Verbinden Sie ein neues Gerät, um zu beginnen.",
-    "button_newConnection": "Neue Verbindung"
-  }
+	"dashboard": {
+		"title": "Verbundene Geräte",
+		"description": "Verwalten Sie Ihre verbundenen Meshtastic Geräte.",
+		"connectionType_ble": "BLE",
+		"connectionType_serial": "Seriell",
+		"connectionType_network": "Netzwerk",
+		"noDevicesTitle": "Keine Geräte verbunden",
+		"noDevicesDescription": "Verbinden Sie ein neues Gerät, um zu beginnen.",
+		"button_newConnection": "Neue Verbindung"
+	}
 }

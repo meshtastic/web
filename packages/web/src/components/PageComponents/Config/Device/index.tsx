@@ -1,22 +1,25 @@
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type DeviceValidation,
   DeviceValidationSchema,
 } from "@app/validation/config/device.ts";
 import { create } from "@bufbuild/protobuf";
+import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/core";
-import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
-import { useTranslation } from "react-i18next";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+import { Protobuf } from "@meshtastic/core";
+import { useTranslation } from "react-i18next";
 
 interface DeviceConfigProps {
   onFormInit: DynamicFormFormInit<DeviceValidation>;
 }
 export const Device = ({ onFormInit }: DeviceConfigProps) => {
+  useWaitForConfig({ configCase: "device" });
+
   const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
     useDevice();
   const { t } = useTranslation("deviceConfig");
@@ -113,8 +116,8 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
               properties: {
                 fieldLength: {
                   max: 64,
-                  currentValueLength: getEffectiveConfig("device")?.tzdef
-                    ?.length,
+                  currentValueLength:
+                    getEffectiveConfig("device")?.tzdef?.length,
                   showCharacterCount: true,
                 },
               },

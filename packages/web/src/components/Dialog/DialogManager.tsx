@@ -1,16 +1,16 @@
-import { useDevice } from "@core/stores/deviceStore.ts";
-import { RemoveNodeDialog } from "@components/Dialog/RemoveNodeDialog.tsx";
+import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
 import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.tsx";
 import { ImportDialog } from "@components/Dialog/ImportDialog.tsx";
+import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog.tsx";
 import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
-import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
-import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
-import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
-import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
 import { RebootOTADialog } from "@components/Dialog/RebootOTADialog.tsx";
-import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
+import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
+import { RemoveNodeDialog } from "@components/Dialog/RemoveNodeDialog.tsx";
+import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
+import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
 
 export const DialogManager = () => {
   const { channels, config, dialog, setDialogOpen } = useDevice();

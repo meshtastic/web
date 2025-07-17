@@ -1,9 +1,9 @@
-import { useCallback } from "react";
-import { eventBus } from "@core/utils/eventBus.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { eventBus } from "@core/utils/eventBus.ts";
+import { useCallback } from "react";
 
 export const UNSAFE_ROLES = ["ROUTER", "ROUTER_LATE", "REPEATER"];
-export type UnsafeRole = typeof UNSAFE_ROLES[number];
+export type UnsafeRole = (typeof UNSAFE_ROLES)[number];
 
 export const useUnsafeRolesDialog = () => {
   const { setDialogOpen } = useDevice();
@@ -21,9 +21,11 @@ export const useUnsafeRolesDialog = () => {
       setDialogOpen("unsafeRoles", true);
 
       return new Promise((resolve) => {
-        const handleResponse = (
-          { action }: { action: "confirm" | "dismiss" },
-        ) => {
+        const handleResponse = ({
+          action,
+        }: {
+          action: "confirm" | "dismiss";
+        }) => {
           eventBus.off("dialog:unsafeRoles", handleResponse);
           resolve(action === "confirm");
         };

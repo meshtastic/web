@@ -1,3 +1,4 @@
+import type { Types } from "@meshtastic/core";
 import {
   act,
   fireEvent,
@@ -6,13 +7,10 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { MessageInput, MessageInputProps } from "./MessageInput.tsx";
-import { Types } from "@meshtastic/core";
+import { MessageInput, type MessageInputProps } from "./MessageInput.tsx";
 
 vi.mock("@components/UI/Button.tsx", () => ({
-  Button: vi.fn((
-    { type, className, children, onClick, onSubmit, ...rest },
-  ) => (
+  Button: vi.fn(({ type, className, children, onClick, onSubmit, ...rest }) => (
     <button
       type={type}
       className={className}
@@ -26,11 +24,8 @@ vi.mock("@components/UI/Button.tsx", () => ({
 }));
 
 vi.mock("@components/UI/Input.tsx", () => ({
-  Input: vi.fn((
-    { autoFocus, minLength, name, placeholder, value, onChange },
-  ) => (
+  Input: vi.fn(({ minLength, name, placeholder, value, onChange }) => (
     <input
-      autoFocus={autoFocus}
       minLength={minLength}
       name={name}
       placeholder={placeholder}
@@ -225,16 +220,14 @@ describe("MessageInput", () => {
   it("should work with broadcast destination for drafts", () => {
     const broadcastDest: Types.Destination = "broadcast";
     mockGetDraft.mockImplementation((key) =>
-      key === broadcastDest ? "Broadcast draft" : ""
+      key === broadcastDest ? "Broadcast draft" : "",
     );
 
     renderComponent({ to: broadcastDest });
 
     expect(mockGetDraft).toHaveBeenCalledWith(broadcastDest);
     expect(
-      (screen.getByTestId(
-        "message-input-field",
-      ) as HTMLInputElement).value,
+      (screen.getByTestId("message-input-field") as HTMLInputElement).value,
     ).toBe("Broadcast draft");
 
     const inputElement = screen.getByTestId(

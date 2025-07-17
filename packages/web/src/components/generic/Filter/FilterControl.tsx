@@ -1,37 +1,32 @@
 import {
-  type ComponentProps,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-
-import { Protobuf } from "@meshtastic/core";
-import { FunnelIcon } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import type { TFunction } from "i18next";
-
-import { debounce } from "@core/utils/debounce.ts";
-import { cn } from "@core/utils/cn.ts";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@components/UI/Popover.tsx";
-import { Input } from "@components/UI/Input.tsx";
-import { Accordion } from "@components/UI/Accordion.tsx";
-
-import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import {
   FilterAccordionItem,
   FilterMulti,
   FilterSlider,
   FilterToggle,
 } from "@components/generic/Filter/FilterComponents.tsx";
-
 import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
+import { TimeAgo } from "@components/generic/TimeAgo.tsx";
+import { Accordion } from "@components/UI/Accordion.tsx";
+import { Input } from "@components/UI/Input.tsx";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@components/UI/Popover.tsx";
+import { cn } from "@core/utils/cn.ts";
+import { debounce } from "@core/utils/debounce.ts";
+import { Protobuf } from "@meshtastic/core";
+import type { TFunction } from "i18next";
+import { FunnelIcon } from "lucide-react";
+import {
+  type ComponentProps,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useTranslation } from "react-i18next";
 
 const DEBOUNCE_DELAY_MS = 250;
 const BATTERY_STATUS_PLUGGED_IN_VALUE = 101;
@@ -76,24 +71,25 @@ interface LastHeardLabelProps {
   formatTS: (ts: number) => ReactNode;
   t: TFunction<"ui", undefined>;
 }
-function LastHeardLabelContent(
-  { lastHeardRange, defaultMaxLastHeard, formatTS, t }: LastHeardLabelProps,
-) {
+function LastHeardLabelContent({
+  lastHeardRange,
+  defaultMaxLastHeard,
+  formatTS,
+  t,
+}: LastHeardLabelProps) {
   const [start, end] = lastHeardRange;
   return (
     <>
       {t("lastHeard.labelText", { value: "" })}
       <br />
-      {start === 0
-        ? (
-          t("lastHeard.nowLabel")
-        )
-        : (
-          <>
-            {start === defaultMaxLastHeard && ">"}
-            {formatTS(start)}
-          </>
-        )}
+      {start === 0 ? (
+        t("lastHeard.nowLabel")
+      ) : (
+        <>
+          {start === defaultMaxLastHeard && ">"}
+          {formatTS(start)}
+        </>
+      )}
       {start !== end && (
         <>
           {" — "}
@@ -109,13 +105,16 @@ interface BatteryLevelLabelProps {
   batteryLevelRange: (number | undefined)[];
   t: TFunction<"ui", undefined>;
 }
-function BatteryLevelLabelContent(
-  { batteryLevelRange, t }: BatteryLevelLabelProps,
-) {
+function BatteryLevelLabelContent({
+  batteryLevelRange,
+  t,
+}: BatteryLevelLabelProps) {
   const [start, end] = batteryLevelRange;
 
   const formatBatteryValue = (value: number | undefined) => {
-    if (value === undefined) return "";
+    if (value === undefined) {
+      return "";
+    }
     return value === BATTERY_STATUS_PLUGGED_IN_VALUE
       ? t("batteryStatus.pluggedIn")
       : `${value}%`;
@@ -158,12 +157,12 @@ export function FilterControl({
 
   const handleTextChange = useCallback(
     <K extends keyof FilterState>(key: K) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFilterState((prev) => ({
-        ...prev,
-        [key]: e.target.value,
-      }));
-    },
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFilterState((prev) => ({
+          ...prev,
+          [key]: e.target.value,
+        }));
+      },
     [setFilterState],
   );
 
@@ -175,27 +174,29 @@ export function FilterControl({
         [key]: value,
       }));
     }, DEBOUNCE_DELAY_MS),
-    [setFilterState],
+    [],
   );
 
   const handleRangeChange = useCallback(
-    <K extends keyof FilterState>(key: K) => (value: number[]) => {
-      setLocalFilterState((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
-      debouncedSetFilterState(key, value);
-    },
+    <K extends keyof FilterState>(key: K) =>
+      (value: number[]) => {
+        setLocalFilterState((prev) => ({
+          ...prev,
+          [key]: value,
+        }));
+        debouncedSetFilterState(key, value);
+      },
     [debouncedSetFilterState],
   );
 
   const handleBoolChange = useCallback(
     <K extends keyof FilterState>(key: K, value: string | boolean) => {
-      const typedValue = value === true || value === "true"
-        ? true
-        : value === false || value === "false"
-        ? false
-        : undefined;
+      const typedValue =
+        value === true || value === "true"
+          ? true
+          : value === false || value === "false"
+            ? false
+            : undefined;
 
       setFilterState((prev) => ({
         ...prev,
@@ -298,20 +299,14 @@ export function FilterControl({
               <FilterToggle
                 label={t("favorites.label")}
                 filterKey="isFavorite"
-                alternativeLabels={[
-                  t("hide.label"),
-                  t("showOnly.label"),
-                ]}
+                alternativeLabels={[t("hide.label"), t("showOnly.label")]}
                 filterState={filterState}
                 onChange={handleBoolChange}
               />
               <FilterToggle
                 label={t("viaMqtt.label")}
                 filterKey="viaMqtt"
-                alternativeLabels={[
-                  t("hide.label"),
-                  t("showOnly.label"),
-                ]}
+                alternativeLabels={[t("hide.label"), t("showOnly.label")]}
                 filterState={filterState}
                 onChange={handleBoolChange}
               />
@@ -370,9 +365,8 @@ export function FilterControl({
                   Protobuf.Config.Config_DeviceConfig_Role,
                 ).filter((v): v is number => typeof v === "number")}
                 getLabel={(val) =>
-                  formatEnumLabel(
-                    Protobuf.Config.Config_DeviceConfig_Role[val],
-                  )}
+                  formatEnumLabel(Protobuf.Config.Config_DeviceConfig_Role[val])
+                }
               />
             </FilterAccordionItem>
 
@@ -385,27 +379,22 @@ export function FilterControl({
                   (v): v is number => typeof v === "number",
                 )}
                 getLabel={(val) =>
-                  formatEnumLabel(Protobuf.Mesh.HardwareModel[val])}
+                  formatEnumLabel(Protobuf.Mesh.HardwareModel[val])
+                }
               />
             </FilterAccordionItem>
             <FilterAccordionItem label={t("advanced.label")}>
               <FilterToggle
                 label={t("hopsUnknown.label")}
                 filterKey="hopsUnknown"
-                alternativeLabels={[
-                  t("hide.label"),
-                  t("showOnly.label"),
-                ]}
+                alternativeLabels={[t("hide.label"), t("showOnly.label")]}
                 filterState={filterState}
                 onChange={handleBoolChange}
               />
               <FilterToggle
                 label={t("showUnheard.label")}
                 filterKey="showUnheard"
-                alternativeLabels={[
-                  t("hide.label"),
-                  t("showOnly.label"),
-                ]}
+                alternativeLabels={[t("hide.label"), t("showOnly.label")]}
                 filterState={filterState}
                 onChange={handleBoolChange}
               />

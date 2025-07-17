@@ -2,8 +2,8 @@ import { useTheme } from "@core/hooks/useTheme.ts";
 import { cn } from "@core/utils/cn.ts";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Subtle } from "./UI/Typography/Subtle.tsx";
 import { Button } from "./UI/Button.tsx";
+import { Subtle } from "./UI/Typography/Subtle.tsx";
 
 type ThemePreference = "light" | "dark" | "system";
 

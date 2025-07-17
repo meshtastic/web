@@ -1,4 +1,4 @@
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type DetectionSensorValidation,
   DetectionSensorValidationSchema,
@@ -8,17 +8,20 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface DetectionSensorModuleConfigProps {
   onFormInit: DynamicFormFormInit<DetectionSensorValidation>;
 }
 
-export const DetectionSensor = (
-  { onFormInit }: DetectionSensorModuleConfigProps,
-) => {
+export const DetectionSensor = ({
+  onFormInit,
+}: DetectionSensorModuleConfigProps) => {
+  useWaitForConfig({ moduleConfigCase: "detectionSensor" });
+
   const {
     moduleConfig,
     setWorkingModuleConfig,
@@ -135,8 +138,9 @@ export const DetectionSensor = (
                 },
               ],
               properties: {
-                enumValue: Protobuf.ModuleConfig
-                  .ModuleConfig_DetectionSensorConfig_TriggerType,
+                enumValue:
+                  Protobuf.ModuleConfig
+                    .ModuleConfig_DetectionSensorConfig_TriggerType,
               },
             },
             {

@@ -11,6 +11,5 @@ export const KeyBackupReminder = () => {
     onAccept: () => setDialogOpen("pkiBackup", true),
     enabled: true,
   });
-  // deno-lint-ignore jsx-no-useless-fragment
-  return <></>;
+  return null;
 };

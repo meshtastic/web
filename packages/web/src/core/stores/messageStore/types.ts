@@ -1,5 +1,8 @@
-import { Types } from "@meshtastic/core";
-import { MessageState, MessageType } from "@core/stores/messageStore/index.ts";
+import type {
+  MessageState,
+  MessageType,
+} from "@core/stores/messageStore/index.ts";
+import type { Types } from "@meshtastic/core";
 
 type NodeNum = number;
 type MessageId = number;
@@ -31,31 +34,31 @@ type GetMessagesParams =
 
 type SetMessageStateParams =
   | {
-    type: MessageType.Direct;
-    nodeA: NodeNum;
-    nodeB: NodeNum;
-    messageId: MessageId; // ID of the message within that chat
-    newState?: MessageState; // Optional new state, defaults to Ack
-  }
+      type: MessageType.Direct;
+      nodeA: NodeNum;
+      nodeB: NodeNum;
+      messageId: MessageId; // ID of the message within that chat
+      newState?: MessageState; // Optional new state, defaults to Ack
+    }
   | {
-    type: MessageType.Broadcast;
-    channelId: ChannelId;
-    messageId: MessageId;
-    newState?: MessageState; // Optional new state, defaults to Ack
-  };
+      type: MessageType.Broadcast;
+      channelId: ChannelId;
+      messageId: MessageId;
+      newState?: MessageState; // Optional new state, defaults to Ack
+    };
 
 type ClearMessageParams =
   | {
-    type: MessageType.Direct;
-    nodeA: NodeNum;
-    nodeB: NodeNum;
-    messageId: MessageId;
-  }
+      type: MessageType.Direct;
+      nodeA: NodeNum;
+      nodeB: NodeNum;
+      messageId: MessageId;
+    }
   | {
-    type: MessageType.Broadcast;
-    channelId: ChannelId;
-    messageId: MessageId;
-  };
+      type: MessageType.Broadcast;
+      channelId: ChannelId;
+      messageId: MessageId;
+    };
 
 export type {
   ChannelId,

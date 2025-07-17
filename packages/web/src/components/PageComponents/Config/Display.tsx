@@ -1,3 +1,4 @@
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type DisplayValidation,
   DisplayValidationSchema,
@@ -8,14 +9,15 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface DisplayConfigProps {
   onFormInit: DynamicFormFormInit<DisplayValidation>;
 }
 export const Display = ({ onFormInit }: DisplayConfigProps) => {
+  useWaitForConfig({ configCase: "display" });
   const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
     useDevice();
   const { t } = useTranslation("deviceConfig");

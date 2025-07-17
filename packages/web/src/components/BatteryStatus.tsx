@@ -1,18 +1,14 @@
-import React from "react";
 import {
   BatteryFullIcon,
   BatteryLowIcon,
   BatteryMediumIcon,
   PlugZapIcon,
 } from "lucide-react";
+import type React from "react";
 import { useTranslation } from "react-i18next";
-import { DeviceMetrics } from "./types.ts";
+import type { DeviceMetrics } from "./types.ts";
 
 type BatteryStatusKey = keyof typeof BATTERY_STATUS;
-
-interface BatteryStatusProps {
-  deviceMetrics?: DeviceMetrics | null;
-}
 
 interface BatteryStatusProps {
   deviceMetrics?: DeviceMetrics | null;
@@ -89,10 +85,7 @@ const BatteryStatus: React.FC<BatteryStatusProps> = ({ deviceMetrics }) => {
   } = statusConfigMap[statusKey];
 
   return (
-    <div
-      className="flex items-center gap-1 mt-0.5 "
-      aria-label={t("batteryStatus.title")}
-    >
+    <div className="flex items-center gap-1 mt-0.5">
       <BatteryIcon size={22} className={iconClassName} />
       {statusText}
     </div>

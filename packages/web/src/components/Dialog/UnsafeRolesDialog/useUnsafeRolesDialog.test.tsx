@@ -1,4 +1,10 @@
 import {
+  UNSAFE_ROLES,
+  useUnsafeRolesDialog,
+} from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
+import { eventBus } from "@core/utils/eventBus.ts";
+import { renderHook } from "@testing-library/react";
+import {
   afterEach,
   beforeEach,
   describe,
@@ -7,18 +13,11 @@ import {
   type Mock,
   vi,
 } from "vitest";
-import { renderHook } from "@testing-library/react";
-import {
-  UNSAFE_ROLES,
-  useUnsafeRolesDialog,
-} from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
-import { eventBus } from "@core/utils/eventBus.ts";
 
 const mockNavigate = vi.fn();
 vi.mock("@tanstack/react-router", async (importOriginal) => {
-  const actual = await importOriginal<
-    typeof import("@tanstack/react-router")
-  >();
+  const actual =
+    await importOriginal<typeof import("@tanstack/react-router")>();
   return {
     ...actual,
     useNavigate: () => mockNavigate,
@@ -75,9 +74,8 @@ describe("useUnsafeRolesDialog", () => {
       const { result } = renderUnsafeRolesHook();
       const safeRole = "SAFE_ROLE";
 
-      const validationResult = await result.current.validateRoleSelection(
-        safeRole,
-      );
+      const validationResult =
+        await result.current.validateRoleSelection(safeRole);
 
       expect(validationResult).toBe(true);
       expect(mockDevice.setDialogOpen).not.toHaveBeenCalled();
@@ -151,9 +149,8 @@ describe("useUnsafeRolesDialog", () => {
       mockDevice.setDialogOpen.mockClear();
       (eventBus.on as Mock).mockClear();
 
-      const validationPromise = result.current.validateRoleSelection(
-        unsafeRole,
-      );
+      const validationPromise =
+        result.current.validateRoleSelection(unsafeRole);
 
       expect(mockDevice.setDialogOpen).toHaveBeenCalledWith(
         "unsafeRoles",

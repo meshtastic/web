@@ -1,7 +1,7 @@
+import type { Protobuf } from "@meshtastic/core";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useFavoriteNode } from "./useFavoriteNode.ts";
-import { Protobuf } from "@meshtastic/core";
 
 const mockNode = {
   num: 1234,

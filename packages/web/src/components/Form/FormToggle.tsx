@@ -3,8 +3,8 @@ import type {
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
-import { Controller, type FieldValues } from "react-hook-form";
 import { cn } from "@core/utils/cn.ts";
+import { Controller, type FieldValues } from "react-hook-form";
 
 export interface ToggleFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "toggle";
@@ -22,9 +22,7 @@ export function ToggleInput<T extends FieldValues>({
     <Controller
       name={field.name}
       control={control}
-      render={(
-        { field: { value, onChange, ...rest } },
-      ) => (
+      render={({ field: { value, onChange, ...rest } }) => (
         <Switch
           checked={value}
           onCheckedChange={(v) => {

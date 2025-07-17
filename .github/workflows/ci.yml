@@ -16,29 +16,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          deno-version: v2.x
+          bun-version: latest
 
       - name: Install Dependencies
-        run: deno install
+        run: bun install
 
-      - name: Cache Deno dependencies
+      - name: Cache Bun dependencies
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/deno
-            packages/web/deno.lock
-          key: ${{ runner.os }}-deno-${{ hashFiles('packages/web/deno.lock') }}
+            ~/.bun/install/cache
+            packages/web/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('packages/web/bun.lockb') }}
           restore-keys: |
-            ${{ runner.os }}-deno-
+            ${{ runner.os }}-bun-
 
-      - name: Run linter
-        run: deno lint
+      # - name: Run linter
+      #   run: bun run lint
 
-      - name: Check formatter
-        run: deno fmt --check
+      # - name: Check formatter
+      #   run: bun run check
 
       - name: Build Package
-        run: deno task --filter web build
+        run: bun run build

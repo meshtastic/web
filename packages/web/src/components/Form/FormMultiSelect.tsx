@@ -2,11 +2,11 @@ import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
 } from "@components/Form/DynamicForm.tsx";
+import type { FLAGS_CONFIG } from "@core/hooks/usePositionFlags.ts";
+import { cn } from "@core/utils/cn.ts";
 import type { FieldValues } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import type { FLAGS_CONFIG } from "@core/hooks/usePositionFlags.ts";
 import { MultiSelect, MultiSelectItem } from "../UI/MultiSelect.tsx";
-import { cn } from "@core/utils/cn.ts";
 
 export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
   type: "multiSelect";
@@ -15,9 +15,7 @@ export interface MultiSelectFieldProps<T> extends BaseFormBuilderProps<T> {
   isChecked: (name: string) => boolean;
   value: string[];
   properties: BaseFormBuilderProps<T>["properties"] & {
-    enumValue:
-      | { [s: string]: string | number }
-      | typeof FLAGS_CONFIG;
+    enumValue: { [s: string]: string | number } | typeof FLAGS_CONFIG;
     formatEnumName?: boolean;
   };
 }
@@ -39,7 +37,7 @@ export function MultiSelectInput<T extends FieldValues>({
     ([key, configOrValue]) => {
       if (isNewConfigStructure) {
         const config =
-          configOrValue as typeof FLAGS_CONFIG[keyof typeof FLAGS_CONFIG];
+          configOrValue as (typeof FLAGS_CONFIG)[keyof typeof FLAGS_CONFIG];
         return {
           key,
           display: t(config.i18nKey),

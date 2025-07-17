@@ -1,3 +1,4 @@
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type SerialValidation,
   SerialValidationSchema,
@@ -8,15 +9,17 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface SerialModuleConfigProps {
   onFormInit: DynamicFormFormInit<SerialValidation>;
 }
 
 export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
+  useWaitForConfig({ moduleConfigCase: "serial" });
+
   const {
     moduleConfig,
     setWorkingModuleConfig,

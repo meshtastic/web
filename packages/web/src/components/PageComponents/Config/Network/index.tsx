@@ -1,3 +1,4 @@
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type NetworkValidation,
   NetworkValidationSchema,
@@ -8,18 +9,20 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import {
   convertIntToIpAddress,
   convertIpAddressToInt,
 } from "@core/utils/ip.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface NetworkConfigProps {
   onFormInit: DynamicFormFormInit<NetworkValidation>;
 }
 export const Network = ({ onFormInit }: NetworkConfigProps) => {
+  useWaitForConfig({ configCase: "network" });
+
   const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
     useDevice();
   const { t } = useTranslation("deviceConfig");
@@ -72,24 +75,28 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
           ),
           dns: convertIntToIpAddress(config.network?.ipv4Config?.dns ?? 0),
         },
-        enabledProtocols: config.network?.enabledProtocols ??
+        enabledProtocols:
+          config.network?.enabledProtocols ??
           Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
       }}
-      values={{
-        ...networkConfig,
-        ipv4Config: {
-          ip: convertIntToIpAddress(networkConfig?.ipv4Config?.ip ?? 0),
-          gateway: convertIntToIpAddress(
-            networkConfig?.ipv4Config?.gateway ?? 0,
-          ),
-          subnet: convertIntToIpAddress(
-            networkConfig?.ipv4Config?.subnet ?? 0,
-          ),
-          dns: convertIntToIpAddress(networkConfig?.ipv4Config?.dns ?? 0),
-        },
-        enabledProtocols: networkConfig?.enabledProtocols ??
-          Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
-      } as NetworkValidation}
+      values={
+        {
+          ...networkConfig,
+          ipv4Config: {
+            ip: convertIntToIpAddress(networkConfig?.ipv4Config?.ip ?? 0),
+            gateway: convertIntToIpAddress(
+              networkConfig?.ipv4Config?.gateway ?? 0,
+            ),
+            subnet: convertIntToIpAddress(
+              networkConfig?.ipv4Config?.subnet ?? 0,
+            ),
+            dns: convertIntToIpAddress(networkConfig?.ipv4Config?.dns ?? 0),
+          },
+          enabledProtocols:
+            networkConfig?.enabledProtocols ??
+            Protobuf.Config.Config_NetworkConfig_ProtocolFlags.NO_BROADCAST,
+        } as NetworkValidation
+      }
       fieldGroups={[
         {
           label: t("network.title"),

@@ -1,6 +1,6 @@
-import { useId, useState } from "react";
-import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "@core/utils/cn.ts";
+import * as SliderPrimitive from "@radix-ui/react-slider";
+import { useId, useState } from "react";
 
 export interface SliderProps {
   value: number[];
@@ -9,6 +9,7 @@ export interface SliderProps {
   max: number;
   onValueChange?: (value: number[]) => void;
   onValueCommit?: (value: number[]) => void;
+  id?: string;
   disabled?: boolean;
   className?: string;
   trackClassName?: string;
@@ -21,6 +22,7 @@ export function Slider({
   step = 1,
   min = 0,
   max,
+  id,
   onValueChange,
   onValueCommit,
   disabled = false,
@@ -28,15 +30,19 @@ export function Slider({
   trackClassName,
   rangeClassName,
   thumbClassName,
+
   ...props
 }: SliderProps) {
   const [internalValue, setInternalValue] = useState<number[]>(value);
   const isControlled = value !== undefined;
-  const currentValue = isControlled ? value! : internalValue;
-  const id = useId();
+  const currentValue = isControlled ? value : internalValue;
+  const generatedId = useId();
+  const internalId = id ? id : generatedId;
 
   const handleValueChange = (newValue: number[]) => {
-    if (!isControlled) setInternalValue(newValue);
+    if (!isControlled) {
+      setInternalValue(newValue);
+    }
     onValueChange?.(newValue);
   };
 
@@ -50,6 +56,7 @@ export function Slider({
         "relative flex items-center select-none touch-none",
         className,
       )}
+      id={internalId}
       value={currentValue}
       step={step}
       min={min}
@@ -72,14 +79,14 @@ export function Slider({
           )}
         />
       </SliderPrimitive.Track>
-      {currentValue.map((_, i) => (
+      {currentValue.map((_) => (
         <SliderPrimitive.Thumb
-          key={`${id}-thumb-${i}`}
+          key={`${internalId}-thumb`}
           className={cn(
             "block w-4 h-4 rounded-full bg-white border border-slate-400 shadow-md",
             thumbClassName,
           )}
-          aria-label={`Thumb ${i + 1}`}
+          aria-label={`Thumb ${internalId}`}
         />
       ))}
     </SliderPrimitive.Root>

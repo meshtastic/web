@@ -1,8 +1,8 @@
-import React from "react";
 import { Button } from "@components/UI/Button.tsx";
-import type { LucideIcon } from "lucide-react";
-import { cn } from "@core/utils/cn.ts";
 import { useSidebar } from "@core/stores/sidebarStore.tsx";
+import { cn } from "@core/utils/cn.ts";
+import type { LucideIcon } from "lucide-react";
+import type React from "react";
 
 export interface SidebarButtonProps {
   label: string;
@@ -44,10 +44,7 @@ export const SidebarButton = ({
       disabled={disabled}
     >
       {Icon && (
-        <Icon
-          size={isButtonCollapsed ? 20 : 18}
-          className="flex-shrink-0"
-        />
+        <Icon size={isButtonCollapsed ? 20 : 18} className="flex-shrink-0" />
       )}
 
       {children}

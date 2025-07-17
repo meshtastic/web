@@ -1,6 +1,6 @@
 import { MessageItem } from "@components/PageComponents/Messages/MessageItem.tsx";
+import type { Message } from "@core/stores/messageStore/types.ts";
 import { InboxIcon } from "lucide-react";
-import { Message } from "@core/stores/messageStore/types.ts";
 import { useTranslation } from "react-i18next";
 
 export interface ChannelChatProps {

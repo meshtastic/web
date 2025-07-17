@@ -1,11 +1,11 @@
-import { useCallback, useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import {
   FALLBACK_LANGUAGE_CODE,
-  Lang,
-  LangCode,
+  type Lang,
+  type LangCode,
   supportedLanguages,
 } from "@app/i18n-config.ts";
+import { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import useLocalStorage from "./useLocalStorage.ts";
 
 const STORAGE_KEY = "language";
@@ -47,7 +47,7 @@ function useLang() {
         console.warn("Failed to change language:", e);
       }
     },
-    [i18n, setLanguageInStorage],
+    [i18n.language, i18n.changeLanguage, setLanguageInStorage],
   );
 
   const compare = useCallback(

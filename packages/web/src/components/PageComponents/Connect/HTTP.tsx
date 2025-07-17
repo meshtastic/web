@@ -1,19 +1,19 @@
 import type { TabElementProps } from "@components/Dialog/NewDeviceDialog.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
-import { Link } from "@components/UI/Typography/Link.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
+import { Link } from "@components/UI/Typography/Link.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
+import { useMessageStore } from "@core/stores/messageStore/index.ts";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
+import { AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { useController, useForm } from "react-hook-form";
-import { AlertTriangle } from "lucide-react";
-import { useMessageStore } from "@core/stores/messageStore/index.ts";
 import { useTranslation } from "react-i18next";
 
 interface FormData {
@@ -21,9 +21,7 @@ interface FormData {
   tls: boolean;
 }
 
-export const HTTP = (
-  { closeDialog }: TabElementProps,
-) => {
+export const HTTP = ({ closeDialog }: TabElementProps) => {
   const { t } = useTranslation("dialog");
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const isURLHTTPS = location.protocol === "https:";
@@ -35,11 +33,11 @@ export const HTTP = (
   const { control, handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
-          globalThis.location.hostname,
-        )
+        globalThis.location.hostname,
+      )
         ? "meshtastic.local"
         : globalThis.location.host,
-      tls: isURLHTTPS ? true : false,
+      tls: !!isURLHTTPS,
     },
   });
 
@@ -47,9 +45,10 @@ export const HTTP = (
     field: { value: tlsValue, onChange: setTLS },
   } = useController({ name: "tls", control });
 
-  const [connectionError, setConnectionError] = useState<
-    { host: string; secure: boolean } | null
-  >(null);
+  const [connectionError, setConnectionError] = useState<{
+    host: string;
+    secure: boolean;
+  } | null>(null);
 
   const onSubmit = handleSubmit(async (data) => {
     setConnectionInProgress(true);
@@ -85,9 +84,11 @@ export const HTTP = (
         <div>
           <Label>{t("newDeviceDialog.httpConnection.label")}</Label>
           <Input
-            prefix={tlsValue
-              ? `${t("newDeviceDialog.https")}://`
-              : `${t("newDeviceDialog.http")}://`}
+            prefix={
+              tlsValue
+                ? `${t("newDeviceDialog.https")}://`
+                : `${t("newDeviceDialog.http")}://`
+            }
             placeholder={t("newDeviceDialog.httpConnection.placeholder")}
             className="text-slate-900 dark:text-slate-100"
             {...register("ip")}
@@ -136,9 +137,10 @@ export const HTTP = (
                   {t("newDeviceDialog.connectionFailedAlert.openLinkSuffix")}
                   {connectionError.secure
                     ? t(
-                      "newDeviceDialog.connectionFailedAlert.acceptTlsWarningSuffix",
-                    )
-                    : ""}.{" "}
+                        "newDeviceDialog.connectionFailedAlert.acceptTlsWarningSuffix",
+                      )
+                    : ""}
+                  .{" "}
                   <Link
                     href="https://meshtastic.org/docs/software/web-client/#http"
                     className="underline font-medium text-amber-800 dark:text-amber-800"
@@ -151,10 +153,7 @@ export const HTTP = (
           </div>
         )}
       </fieldset>
-      <Button
-        type="submit"
-        variant="default"
-      >
+      <Button type="submit" variant="default">
         <span>
           {connectionInProgress
             ? t("newDeviceDialog.connecting")

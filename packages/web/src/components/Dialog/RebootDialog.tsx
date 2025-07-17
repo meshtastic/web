@@ -10,18 +10,15 @@ import {
 import { Input } from "@components/UI/Input.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
 import { RefreshCwIcon } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export interface RebootDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const RebootDialog = ({
-  open,
-  onOpenChange,
-}: RebootDialogProps) => {
+export const RebootDialog = ({ open, onOpenChange }: RebootDialogProps) => {
   const { t } = useTranslation("dialog");
   const { connection } = useDevice();
 
@@ -32,12 +29,8 @@ export const RebootDialog = ({
       <DialogContent>
         <DialogClose />
         <DialogHeader>
-          <DialogTitle>
-            {t("reboot.title")}
-          </DialogTitle>
-          <DialogDescription>
-            {t("reboot.description")}
-          </DialogDescription>
+          <DialogTitle>{t("reboot.title")}</DialogTitle>
+          <DialogDescription>{t("reboot.description")}</DialogDescription>
         </DialogHeader>
         <div className="flex gap-2 p-4">
           <Input

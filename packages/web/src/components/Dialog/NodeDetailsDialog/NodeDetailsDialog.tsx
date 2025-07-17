@@ -1,22 +1,13 @@
-import { useEffect, useState } from "react";
-import { useAppStore } from "@core/stores/appStore.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf } from "@meshtastic/core";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { DeviceImage } from "@components/generic/DeviceImage.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Uptime } from "@components/generic/Uptime.tsx";
-import { toast } from "@core/hooks/useToast.ts";
-import { useFavoriteNode } from "@core/hooks/useFavoriteNode.ts";
-import { useIgnoreNode } from "@core/hooks/useIgnoreNode.ts";
-import { cn } from "@core/utils/cn.ts";
-
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@components/UI/Accordion.tsx";
+import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
   DialogClose,
@@ -25,7 +16,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { Button } from "@components/UI/Button.tsx";
+import { Separator } from "@components/UI/Seperator.tsx";
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@components/UI/Tooltip.tsx";
+import { useFavoriteNode } from "@core/hooks/useFavoriteNode.ts";
+import { useIgnoreNode } from "@core/hooks/useIgnoreNode.ts";
+import { toast } from "@core/hooks/useToast.ts";
+import { useAppStore } from "@core/stores/appStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { cn } from "@core/utils/cn.ts";
+import { Protobuf } from "@meshtastic/core";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { useNavigate } from "@tanstack/react-router";
 import {
   BellIcon,
   BellOffIcon,
@@ -35,16 +42,8 @@ import {
   TrashIcon,
   WaypointsIcon,
 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipArrow,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@components/UI/Tooltip.tsx";
-import { Separator } from "@components/UI/Seperator.tsx";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "@tanstack/react-router";
 
 export interface NodeDetailsDialogProps {
   open: boolean;
@@ -72,21 +71,29 @@ export const NodeDetailsDialog = ({
   );
 
   useEffect(() => {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
     setIsFavoriteState(node?.isFavorite);
     setIsIgnoredState(node?.isIgnored);
   }, [node]);
 
-  if (!node) return;
+  if (!node) {
+    return;
+  }
 
   function handleDirectMessage() {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
     navigate({ to: `/messages/direct/${node.num}` });
     setDialogOpen("nodeDetails", false);
   }
 
   function handleRequestPosition() {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     toast({
       title: t("toast.requestingPosition.title", { ns: "ui" }),
@@ -94,13 +101,15 @@ export const NodeDetailsDialog = ({
     connection?.requestPosition(node.num).then(() =>
       toast({
         title: t("toast.positionRequestSent.title", { ns: "ui" }),
-      })
+      }),
     );
     onOpenChange(false);
   }
 
   function handleTraceroute() {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     toast({
       title: t("toast.sendingTraceroute.title", { ns: "ui" }),
@@ -108,13 +117,15 @@ export const NodeDetailsDialog = ({
     connection?.traceRoute(node.num).then(() =>
       toast({
         title: t("toast.tracerouteSent.title", { ns: "ui" }),
-      })
+      }),
     );
     onOpenChange(false);
   }
 
   function handleNodeRemove() {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     setNodeNumToBeRemoved(node?.num);
     setDialogOpen("nodeRemoval", true);
@@ -122,14 +133,18 @@ export const NodeDetailsDialog = ({
   }
 
   function handleToggleFavorite() {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     updateFavorite({ nodeNum: node.num, isFavorite: !isFavoriteState });
     setIsFavoriteState(!isFavoriteState);
   }
 
   function handleToggleIgnored() {
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     updateIgnored({ nodeNum: node.num, isIgnored: !isIgnoredState });
     setIsIgnoredState(!isIgnoredState);
@@ -202,7 +217,7 @@ export const NodeDetailsDialog = ({
                   )}
                 />
               </Button>
-              <div className="flex flex-1 justify-start"></div>
+              <div className="flex flex-1 justify-start" />
 
               <TooltipProvider delayDuration={300}>
                 <Tooltip>
@@ -255,7 +270,10 @@ export const NodeDetailsDialog = ({
                   <p className="text-lg font-semibold">
                     {t("nodeDetails.details")}
                   </p>
-                  <p>{t("nodeDetails.nodeNumber")}{node.num}</p>
+                  <p>
+                    {t("nodeDetails.nodeNumber")}
+                    {node.num}
+                  </p>
                   <p>
                     {t("nodeDetails.nodeHexPrefix")}
                     {numberToHexUnpadded(node.num)}
@@ -268,21 +286,25 @@ export const NodeDetailsDialog = ({
                   </p>
                   <p>
                     {t("nodeDetails.lastHeard")}
-                    {node.lastHeard === 0
-                      ? t("nodesTable.lastHeardStatus.never", { ns: "nodes" })
-                      : <TimeAgo timestamp={node.lastHeard * 1000} />}
+                    {node.lastHeard === 0 ? (
+                      t("nodesTable.lastHeardStatus.never", { ns: "nodes" })
+                    ) : (
+                      <TimeAgo timestamp={node.lastHeard * 1000} />
+                    )}
                   </p>
                   <p>
                     {t("nodeDetails.hardware")}
-                    {(Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
-                      t("unknown.shortName"))
-                      .replace(/_/g, " ")}
+                    {(
+                      Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
+                      t("unknown.shortName")
+                    ).replace(/_/g, " ")}
                   </p>
                 </div>
                 <DeviceImage
                   className="h-45 w-45 p-2 rounded-lg border-4 border-slate-200 dark:border-slate-800"
-                  deviceType={Protobuf.Mesh
-                    .HardwareModel[node.user?.hwModel ?? 0]}
+                  deviceType={
+                    Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]
+                  }
                 />
               </div>
             </div>
@@ -293,36 +315,35 @@ export const NodeDetailsDialog = ({
                   {t("nodeDetails.position")}
                 </p>
 
-                {node.position
-                  ? (
-                    <>
-                      {node.position.latitudeI &&
-                        node.position.longitudeI && (
-                        <p>
-                          {t("locationResponse.coordinates")}
-                          <a
-                            className="text-blue-500 dark:text-blue-400"
-                            href={`https://www.openstreetmap.org/?mlat=${
-                              node.position.latitudeI / 1e7
-                            }&mlon=${node.position.longitudeI / 1e7}&layers=N`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {node.position.latitudeI / 1e7},{" "}
-                            {node.position.longitudeI / 1e7}
-                          </a>
-                        </p>
-                      )}
-                      {node.position.altitude && (
-                        <p>
-                          {t("locationResponse.altitude")}
-                          {node.position.altitude}
-                          {t("unit.meter.one")}
-                        </p>
-                      )}
-                    </>
-                  )
-                  : <p>{t("unknown.shortName")}</p>}
+                {node.position ? (
+                  <>
+                    {node.position.latitudeI && node.position.longitudeI && (
+                      <p>
+                        {t("locationResponse.coordinates")}
+                        <a
+                          className="text-blue-500 dark:text-blue-400"
+                          href={`https://www.openstreetmap.org/?mlat=${
+                            node.position.latitudeI / 1e7
+                          }&mlon=${node.position.longitudeI / 1e7}&layers=N`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {node.position.latitudeI / 1e7},{" "}
+                          {node.position.longitudeI / 1e7}
+                        </a>
+                      </p>
+                    )}
+                    {node.position.altitude && (
+                      <p>
+                        {t("locationResponse.altitude")}
+                        {node.position.altitude}
+                        {t("unit.meter.one")}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p>{t("unknown.shortName")}</p>
+                )}
                 <Button
                   onClick={handleRequestPosition}
                   name="requestPosition"
@@ -338,14 +359,13 @@ export const NodeDetailsDialog = ({
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                     {t("nodeDetails.deviceMetrics")}
                   </p>
-                  {deviceMetricsMap.map(
-                    (metric) =>
-                      metric.value !== undefined && (
-                        <p key={metric.key}>
-                          {metric.label}: {metric.format(metric.value)}
-                        </p>
-                      ),
-                  )}
+                  {deviceMetricsMap
+                    .filter((metric) => metric.value !== undefined)
+                    .map((metric) => (
+                      <p key={metric.key}>
+                        {metric.label}: {metric.format(metric?.value ?? 0)}
+                      </p>
+                    ))}
                   {node.deviceMetrics.uptimeSeconds && (
                     <p>
                       {t("nodeDetails.uptime")}

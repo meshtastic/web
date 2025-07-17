@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import type React from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
 interface SidebarContextProps {
   isCollapsed: boolean;
@@ -10,25 +11,29 @@ const SidebarContext = createContext<SidebarContextProps | undefined>(
   undefined,
 );
 
-export const SidebarProvider: React.FC<{ children: React.ReactNode }> = (
-  { children },
-) => {
+export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
-  const toggleSidebar = useMemo(() => () => {
-    setIsCollapsed((prev) => !prev);
-  }, []);
+  const toggleSidebar = useMemo(
+    () => () => {
+      setIsCollapsed((prev) => !prev);
+    },
+    [],
+  );
 
-  const value = useMemo(() => ({
-    isCollapsed,
-    setIsCollapsed,
-    toggleSidebar,
-  }), [isCollapsed, toggleSidebar]);
+  const value = useMemo(
+    () => ({
+      isCollapsed,
+      setIsCollapsed,
+      toggleSidebar,
+    }),
+    [isCollapsed, toggleSidebar],
+  );
 
   return (
-    <SidebarContext.Provider value={value}>
-      {children}
-    </SidebarContext.Provider>
+    <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>
   );
 };
 

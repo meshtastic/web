@@ -1,9 +1,7 @@
-import { z } from "zod/v4";
 import { Protobuf } from "@meshtastic/core";
+import { z } from "zod/v4";
 
-const RoleEnum = z.enum(
-  Protobuf.Config.Config_DeviceConfig_Role,
-);
+const RoleEnum = z.enum(Protobuf.Config.Config_DeviceConfig_Role);
 const RebroadcastModeEnum = z.enum(
   Protobuf.Config.Config_DeviceConfig_RebroadcastMode,
 );

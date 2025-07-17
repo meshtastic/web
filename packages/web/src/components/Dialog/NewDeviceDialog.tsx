@@ -1,7 +1,3 @@
-import {
-  type BrowserFeature,
-  useBrowserFeatureDetection,
-} from "@core/hooks/useBrowserFeatureDetection.ts";
 import { BLE } from "@components/PageComponents/Connect/BLE.tsx";
 import { HTTP } from "@components/PageComponents/Connect/HTTP.tsx";
 import { Serial } from "@components/PageComponents/Connect/Serial.tsx";
@@ -18,6 +14,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
+import {
+  type BrowserFeature,
+  useBrowserFeatureDetection,
+} from "@core/hooks/useBrowserFeatureDetection.ts";
 import { AlertCircle } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
 import { Link } from "../UI/Typography/Link.tsx";
@@ -45,24 +45,23 @@ interface FeatureErrorProps {
 
 const errors: Record<BrowserFeature, { href: string; i18nKey: string }> = {
   "Web Bluetooth": {
-    href:
-      "https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility",
+    href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility",
     i18nKey: "newDeviceDialog.validation.requiresWebBluetooth",
   },
   "Web Serial": {
-    href:
-      "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
+    href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
     i18nKey: "newDeviceDialog.validation.requiresWebSerial",
   },
   "Secure Context": {
-    href:
-      "https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts",
+    href: "https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts",
     i18nKey: "newDeviceDialog.validation.requiresSecureContext",
   },
 };
 
 const ErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
-  if (missingFeatures.length === 0) return null;
+  if (missingFeatures.length === 0) {
+    return null;
+  }
 
   const browserFeatures = missingFeatures.filter(
     (feature) => feature !== "Secure Context",
@@ -70,11 +69,11 @@ const ErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
   const needsSecureContext = missingFeatures.includes("Secure Context");
 
   const needsFeature =
-    (tabId === "BLE" && browserFeatures.includes("Web Bluetooth"))
+    tabId === "BLE" && browserFeatures.includes("Web Bluetooth")
       ? "Web Bluetooth"
-      : (tabId === "Serial" && browserFeatures.includes("Web Serial"))
-      ? "Web Serial"
-      : undefined;
+      : tabId === "Serial" && browserFeatures.includes("Web Serial")
+        ? "Web Serial"
+        : undefined;
 
   return (
     <div className="flex flex-col items-start gap-2 bg-red-500 p-4 rounded-md text-sm text-slate-500 dark:text-slate-400">
@@ -97,9 +96,11 @@ const ErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
             {needsFeature && needsSecureContext && " "}
             {needsSecureContext && (
               <Trans
-                i18nKey={browserFeatures.length > 0
-                  ? "newDeviceDialog.validation.additionallyRequiresSecureContext"
-                  : "newDeviceDialog.validation.requiresSecureContext"}
+                i18nKey={
+                  browserFeatures.length > 0
+                    ? "newDeviceDialog.validation.additionallyRequiresSecureContext"
+                    : "newDeviceDialog.validation.requiresSecureContext"
+                }
                 components={{
                   "0": (
                     <Link
@@ -117,10 +118,7 @@ const ErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
   );
 };
 
-export const NewDeviceDialog = ({
-  open,
-  onOpenChange,
-}: NewDeviceProps) => {
+export const NewDeviceDialog = ({ open, onOpenChange }: NewDeviceProps) => {
   const { t } = useTranslation("dialog");
   const { unsupported } = useBrowserFeatureDetection();
 
@@ -135,14 +133,16 @@ export const NewDeviceDialog = ({
       id: "BLE",
       label: t("newDeviceDialog.tabBluetooth"),
       element: BLE,
-      isDisabled: unsupported.includes("Web Bluetooth") ||
+      isDisabled:
+        unsupported.includes("Web Bluetooth") ||
         unsupported.includes("Secure Context"),
     },
     {
       id: "Serial",
       label: t("newDeviceDialog.tabSerial"),
       element: Serial,
-      isDisabled: unsupported.includes("Web Serial") ||
+      isDisabled:
+        unsupported.includes("Web Serial") ||
         unsupported.includes("Secure Context"),
     },
   ];
@@ -165,19 +165,11 @@ export const NewDeviceDialog = ({
           {tabs.map((tab) => (
             <TabsContent key={tab.id} value={tab.id}>
               <fieldset disabled={tab.isDisabled}>
-                {(tab.id !== "HTTP" &&
-                    tab.isDisabled)
-                  ? (
-                    <ErrorMessage
-                      missingFeatures={unsupported}
-                      tabId={tab.id}
-                    />
-                  )
-                  : (
-                    <tab.element
-                      closeDialog={() => onOpenChange(false)}
-                    />
-                  )}
+                {tab.id !== "HTTP" && tab.isDisabled ? (
+                  <ErrorMessage missingFeatures={unsupported} tabId={tab.id} />
+                ) : (
+                  <tab.element closeDialog={() => onOpenChange(false)} />
+                )}
               </fieldset>
             </TabsContent>
           ))}

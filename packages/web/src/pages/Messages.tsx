@@ -1,13 +1,25 @@
+import { messagesWithParamsRoute } from "@app/routes.tsx";
 import { ChannelChat } from "@components/PageComponents/Messages/ChannelChat.tsx";
+import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
+import { Input } from "@components/UI/Input.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
+import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import {
+  MessageState,
+  MessageType,
+  useMessageStore,
+} from "@core/stores/messageStore/index.ts";
+import { useSidebar } from "@core/stores/sidebarStore.tsx";
+import { cn } from "@core/utils/cn.ts";
+import { randId } from "@core/utils/randId.ts";
 import { Protobuf, Types } from "@meshtastic/core";
 import { getChannelName } from "@pages/Channels.tsx";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { HashIcon, LockIcon, LockOpenIcon } from "lucide-react";
 import {
   useCallback,
@@ -16,19 +28,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { MessageInput } from "@components/PageComponents/Messages/MessageInput.tsx";
-import { cn } from "@core/utils/cn.ts";
-import {
-  MessageState,
-  MessageType,
-  useMessageStore,
-} from "@core/stores/messageStore/index.ts";
-import { useSidebar } from "@core/stores/sidebarStore.tsx";
-import { Input } from "@components/UI/Input.tsx";
-import { randId } from "@core/utils/randId.ts";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "@tanstack/react-router";
-import { messagesWithParamsRoute } from "@app/routes.tsx";
 
 type NodeInfoWithUnread = Protobuf.Mesh.NodeInfo & { unreadCount: number };
 
@@ -51,11 +51,7 @@ export const MessagesPage = () => {
     resetUnread,
     connection,
   } = useDevice();
-  const {
-    getMyNodeNum,
-    getMessages,
-    setMessageState,
-  } = useMessageStore();
+  const { getMyNodeNum, getMessages, setMessageState } = useMessageStore();
 
   const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });
 
@@ -66,14 +62,16 @@ export const MessagesPage = () => {
   const { t } = useTranslation(["messages", "channels", "ui"]);
   const deferredSearch = useDeferredValue(searchTerm);
 
-  const navigateToChat = useCallback((type: MessageType, id: string) => {
-    const typeParam = type === MessageType.Direct ? "direct" : "broadcast";
-    navigate({ to: `/messages/${typeParam}/${id}` });
-  }, [navigate]);
+  const navigateToChat = useCallback(
+    (type: MessageType, id: string) => {
+      const typeParam = type === MessageType.Direct ? "direct" : "broadcast";
+      navigate({ to: `/messages/${typeParam}/${id}` });
+    },
+    [navigate],
+  );
 
-  const chatType = type === "direct"
-    ? MessageType.Direct
-    : MessageType.Broadcast;
+  const chatType =
+    type === "direct" ? MessageType.Direct : MessageType.Broadcast;
   const numericChatId = Number(chatId);
 
   const allChannels = Array.from(channels.values());
@@ -94,87 +92,96 @@ export const MessagesPage = () => {
   const isDirect = chatType === MessageType.Direct;
   const isBroadcast = chatType === MessageType.Broadcast;
 
-  const filteredNodes = (): NodeInfoWithUnread[] => {
+  const filteredNodes = useCallback((): NodeInfoWithUnread[] => {
     const lowerCaseSearchTerm = deferredSearch.toLowerCase();
 
-    return getNodes((node) => {
+    return getNodes((node: Protobuf.Mesh.NodeInfo) => {
       const longName = node.user?.longName?.toLowerCase() ?? "";
       const shortName = node.user?.shortName?.toLowerCase() ?? "";
-      return longName.includes(lowerCaseSearchTerm) ||
-        shortName.includes(lowerCaseSearchTerm);
+      return (
+        longName.includes(lowerCaseSearchTerm) ||
+        shortName.includes(lowerCaseSearchTerm)
+      );
     })
-      .map((node) => ({
+      .map((node: Protobuf.Mesh.NodeInfo) => ({
         ...node,
         unreadCount: getUnreadCount(node.num) ?? 0,
       }))
-      .sort((a, b) => {
+      .sort((a: NodeInfoWithUnread, b: NodeInfoWithUnread) => {
         const diff = b.unreadCount - a.unreadCount;
-        if (diff !== 0) return diff;
+        if (diff !== 0) {
+          return diff;
+        }
         return Number(b.isFavorite) - Number(a.isFavorite);
       });
-  };
+  }, [deferredSearch, getNodes, getUnreadCount]);
 
-  const sendText = useCallback(async (message: string) => {
-    const toValue = isDirect ? numericChatId : MessageType.Broadcast;
-    const channelValue = isDirect ? Types.ChannelNumber.Primary : numericChatId;
+  const sendText = useCallback(
+    async (message: string) => {
+      const toValue = isDirect ? numericChatId : MessageType.Broadcast;
+      const channelValue = isDirect
+        ? Types.ChannelNumber.Primary
+        : numericChatId;
 
-    let messageId: number | undefined;
+      let messageId: number | undefined;
 
-    try {
-      messageId = await connection?.sendText(
-        message,
-        toValue,
-        true,
-        channelValue,
-      );
-      if (messageId !== undefined) {
+      try {
+        messageId = await connection?.sendText(
+          message,
+          toValue,
+          true,
+          channelValue,
+        );
+        if (messageId !== undefined) {
+          if (chatType === MessageType.Broadcast) {
+            setMessageState({
+              type: MessageType.Broadcast,
+              channelId: channelValue,
+              messageId,
+              newState: MessageState.Ack,
+            });
+          } else {
+            setMessageState({
+              type: MessageType.Direct,
+              nodeA: getMyNodeNum(),
+              nodeB: numericChatId,
+              messageId,
+              newState: MessageState.Ack,
+            });
+          }
+        } else {
+          console.warn("sendText completed but messageId is undefined");
+        }
+      } catch (e: unknown) {
+        console.error("Failed to send message:", e);
+        const failedId = messageId ?? randId();
         if (chatType === MessageType.Broadcast) {
           setMessageState({
             type: MessageType.Broadcast,
             channelId: channelValue,
-            messageId,
-            newState: MessageState.Ack,
+            messageId: failedId,
+            newState: MessageState.Failed,
           });
         } else {
           setMessageState({
             type: MessageType.Direct,
             nodeA: getMyNodeNum(),
             nodeB: numericChatId,
-            messageId,
-            newState: MessageState.Ack,
+            messageId: failedId,
+            newState: MessageState.Failed,
           });
         }
-      } else {
-        console.warn("sendText completed but messageId is undefined");
       }
-    } catch (e: unknown) {
-      console.error("Failed to send message:", e);
-      const failedId = messageId ?? randId();
-      if (chatType === MessageType.Broadcast) {
-        setMessageState({
-          type: MessageType.Broadcast,
-          channelId: channelValue,
-          messageId: failedId,
-          newState: MessageState.Failed,
-        });
-      } else {
-        setMessageState({
-          type: MessageType.Direct,
-          nodeA: getMyNodeNum(),
-          nodeB: numericChatId,
-          messageId: failedId,
-          newState: MessageState.Failed,
-        });
-      }
-    }
-  }, [
-    numericChatId,
-    chatId,
-    chatType,
-    connection,
-    getMyNodeNum,
-    setMessageState,
-  ]);
+    },
+    [
+      numericChatId,
+      chatType,
+      connection,
+      getMyNodeNum,
+      setMessageState,
+      isDirect,
+    ],
+  );
 
   const renderChatContent = () => {
     switch (chatType) {
@@ -202,48 +209,52 @@ export const MessagesPage = () => {
     }
   };
 
-  const leftSidebar = useMemo(() => (
-    <Sidebar>
-      <SidebarSection
-        label={t("navigation.channels")}
-        className="py-2 px-0"
-      >
-        {filteredChannels?.map((channel) => (
-          <SidebarButton
-            key={channel.index}
-            count={getUnreadCount(channel.index)}
-            label={channel.settings?.name ||
-              (channel.index === 0
-                ? t("page.broadcastLabel", { ns: "channels" })
-                : t("page.channelLabel", {
-                  index: channel.index,
-                  ns: "channels",
-                }))}
-            active={numericChatId === channel.index &&
-              chatType === MessageType.Broadcast}
-            onClick={() => {
-              navigateToChat(MessageType.Broadcast, channel.index.toString());
-              resetUnread(channel.index);
-            }}
-          >
-            <HashIcon
-              size={16}
-              className={cn(isCollapsed ? "mr-0 mt-2" : "mr-2")}
-            />
-          </SidebarButton>
-        ))}
-      </SidebarSection>
-    </Sidebar>
-  ), [
-    filteredChannels,
-    numericChatId,
-    chatType,
-    isCollapsed,
-    getUnreadCount,
-    navigateToChat,
-    resetUnread,
-    t,
-  ]);
+  const leftSidebar = useMemo(
+    () => (
+      <Sidebar>
+        <SidebarSection label={t("navigation.channels")} className="py-2 px-0">
+          {filteredChannels?.map((channel) => (
+            <SidebarButton
+              key={channel.index}
+              count={getUnreadCount(channel.index)}
+              label={
+                channel.settings?.name ||
+                (channel.index === 0
+                  ? t("page.broadcastLabel", { ns: "channels" })
+                  : t("page.channelLabel", {
+                      index: channel.index,
+                      ns: "channels",
+                    }))
+              }
+              active={
+                numericChatId === channel.index &&
+                chatType === MessageType.Broadcast
+              }
+              onClick={() => {
+                navigateToChat(MessageType.Broadcast, channel.index.toString());
+                resetUnread(channel.index);
+              }}
+            >
+              <HashIcon
+                size={16}
+                className={cn(isCollapsed ? "mr-0 mt-2" : "mr-2")}
+              />
+            </SidebarButton>
+          ))}
+        </SidebarSection>
+      </Sidebar>
+    ),
+    [
+      filteredChannels,
+      numericChatId,
+      chatType,
+      isCollapsed,
+      getUnreadCount,
+      navigateToChat,
+      resetUnread,
+      t,
+    ],
+  );
 
   const rightSidebar = useMemo(
     () => (
@@ -251,9 +262,10 @@ export const MessagesPage = () => {
         label=""
         className="px-0 flex flex-col h-full overflow-y-auto"
       >
-        <label className="p-2 block">
+        <label className="p-2 block" htmlFor="nodeSearch">
           <Input
             type="text"
+            name="nodeSearch"
             placeholder={t("search.nodes")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -269,19 +281,18 @@ export const MessagesPage = () => {
             <SidebarButton
               key={node.num}
               preventCollapse
-              label={node.user?.longName ??
-                t("unknown.shortName")}
+              label={node.user?.longName ?? t("unknown.shortName")}
               count={node.unreadCount > 0 ? node.unreadCount : undefined}
-              active={numericChatId === node.num &&
-                chatType === MessageType.Direct}
+              active={
+                numericChatId === node.num && chatType === MessageType.Direct
+              }
               onClick={() => {
                 navigateToChat(MessageType.Direct, node.num.toString());
                 resetUnread(node.num);
               }}
             >
               <Avatar
-                text={node.user?.shortName ??
-                  t("unknown.shortName")}
+                text={node.user?.shortName ?? t("unknown.shortName")}
                 className={cn(hasNodeError(node.num) && "text-red-500")}
                 showError={hasNodeError(node.num)}
                 showFavorite={node.isFavorite}
@@ -306,55 +317,56 @@ export const MessagesPage = () => {
 
   return (
     <PageLayout
-      label={`${
-        t("page.title", {
-          interpolation: { escapeValue: false },
-          chatName: isBroadcast && currentChannel
+      label={`${t("page.title", {
+        interpolation: { escapeValue: false },
+        chatName:
+          isBroadcast && currentChannel
             ? getChannelName(currentChannel)
             : isDirect && otherNode
-            ? (otherNode.user?.longName ?? t("unknown.longName"))
-            : t("emptyState.title"),
-        })
-      } 
+              ? (otherNode.user?.longName ?? t("unknown.longName"))
+              : t("emptyState.title"),
+      })} 
       `}
       rightBar={rightSidebar}
       leftBar={leftSidebar}
-      actions={isDirect && otherNode
-        ? [
-          {
-            key: "encryption",
-            icon: otherNode.user?.publicKey?.length ? LockIcon : LockOpenIcon,
-            iconClasses: otherNode.user?.publicKey?.length
-              ? "text-green-600"
-              : "text-yellow-300",
-            onClick() {
-              toast({
-                title: otherNode.user?.publicKey?.length
-                  ? t("toast.messages.pkiEncryption.title")
-                  : t("toast.messages.pskEncryption.title"),
-              });
-            },
-          },
-        ]
-        : []}
+      actions={
+        isDirect && otherNode
+          ? [
+              {
+                key: "encryption",
+                icon: otherNode.user?.publicKey?.length
+                  ? LockIcon
+                  : LockOpenIcon,
+                iconClasses: otherNode.user?.publicKey?.length
+                  ? "text-green-600"
+                  : "text-yellow-300",
+                onClick() {
+                  toast({
+                    title: otherNode.user?.publicKey?.length
+                      ? t("toast.messages.pkiEncryption.title")
+                      : t("toast.messages.pskEncryption.title"),
+                  });
+                },
+              },
+            ]
+          : []
+      }
     >
       <div className="flex flex-1 flex-col overflow-hidden">
         {renderChatContent()}
 
         <div className="flex-none dark:bg-slate-900 p-2">
-          {(isBroadcast || isDirect)
-            ? (
-              <MessageInput
-                to={isDirect ? numericChatId : MessageType.Broadcast}
-                onSend={sendText}
-                maxBytes={200}
-              />
-            )
-            : (
-              <div className="p-4 text-center text-slate-400 italic">
-                {t("sendMessage.sendButton", { ns: "messages" })}
-              </div>
-            )}
+          {isBroadcast || isDirect ? (
+            <MessageInput
+              to={isDirect ? numericChatId : MessageType.Broadcast}
+              onSend={sendText}
+              maxBytes={200}
+            />
+          ) : (
+            <div className="p-4 text-center text-slate-400 italic">
+              {t("sendMessage.sendButton", { ns: "messages" })}
+            </div>
+          )}
         </div>
       </div>
     </PageLayout>

@@ -7,11 +7,16 @@ export function usePinnedItems({ storageName }: { storageName: string }) {
     [],
   );
 
-  const togglePinnedItem = useCallback((label: string) => {
-    setPinnedItems((prev) =>
-      prev.includes(label) ? prev.filter((g) => g !== label) : [...prev, label]
-    );
-  }, []);
+  const togglePinnedItem = useCallback(
+    (label: string) => {
+      setPinnedItems((prev) =>
+        prev.includes(label)
+          ? prev.filter((g) => g !== label)
+          : [...prev, label],
+      );
+    },
+    [setPinnedItems],
+  );
 
   return {
     pinnedItems,

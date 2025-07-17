@@ -22,9 +22,7 @@ interface RoutePathProps {
   snr?: number[];
 }
 
-const RoutePath = (
-  { title, from, to, path, snr }: RoutePathProps,
-) => {
+const RoutePath = ({ title, from, to, path, snr }: RoutePathProps) => {
   const { getNode } = useDevice();
   const { t } = useTranslation();
 

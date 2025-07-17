@@ -1,13 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { RebootOTADialog } from "./RebootOTADialog.tsx";
-import {
+import type {
   ButtonHTMLAttributes,
   ClassAttributes,
   InputHTMLAttributes,
   ReactNode,
 } from "react";
-import { JSX } from "react/jsx-runtime";
+import type { JSX } from "react/jsx-runtime";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { RebootOTADialog } from "./RebootOTADialog.tsx";
 
 const rebootOtaMock = vi.fn();
 let mockConnection: { rebootOta: (delay: number) => void } | undefined = {
@@ -25,10 +25,9 @@ vi.mock("@components/UI/Button.tsx", async () => {
   return {
     ...actual,
     Button: (
-      props:
-        & JSX.IntrinsicAttributes
-        & ClassAttributes<HTMLButtonElement>
-        & ButtonHTMLAttributes<HTMLButtonElement>,
+      props: JSX.IntrinsicAttributes &
+        ClassAttributes<HTMLButtonElement> &
+        ButtonHTMLAttributes<HTMLButtonElement>,
     ) => <button {...props} />,
   };
 });
@@ -38,10 +37,9 @@ vi.mock("@components/UI/Input.tsx", async () => {
   return {
     ...actual,
     Input: (
-      props:
-        & JSX.IntrinsicAttributes
-        & ClassAttributes<HTMLInputElement>
-        & InputHTMLAttributes<HTMLInputElement>,
+      props: JSX.IntrinsicAttributes &
+        ClassAttributes<HTMLInputElement> &
+        InputHTMLAttributes<HTMLInputElement>,
     ) => <input {...props} />,
   };
 });
@@ -76,8 +74,9 @@ describe("RebootOTADialog", () => {
   it("renders dialog with default input value", () => {
     render(<RebootOTADialog open onOpenChange={() => {}} />);
     expect(screen.getByPlaceholderText(/enter delay/i)).toHaveValue(5);
-    expect(screen.getByRole("heading", { name: /schedule reboot/i, level: 1 }))
-      .toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /schedule reboot/i, level: 1 }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/reboot to ota mode now/i)).toBeInTheDocument();
   });
 

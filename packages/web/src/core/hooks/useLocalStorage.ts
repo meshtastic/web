@@ -1,13 +1,9 @@
-// taken from https://react-hooked.vercel.app/docs/useLocalStorage/
-
-import { useCallback, useEffect, useState } from "react";
-
 import type { Dispatch, SetStateAction } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 declare global {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface WindowEventMap {
-    "local-storage": CustomEvent;
+    "local-storage": CustomEvent<{ key: string }>;
   }
 }
 
@@ -19,14 +15,6 @@ type UseLocalStorageOptions<T> = {
 
 const IS_SERVER = typeof window === "undefined";
 
-/**
- * Hook for persisting state to localStorage.
- *
- * @param {string} key - The key to use for localStorage.
- * @param {T | (() => T)} initialValue - The initial value to use, if not found in localStorage.
- * @param {UseLocalStorageOptions<T>} options - Options for the hook.
- * @returns A tuple of [storedValue, setValue, removeValue].
- */
 export default function useLocalStorage<T>(
   key: string,
   initialValue: T | (() => T),
@@ -34,149 +22,114 @@ export default function useLocalStorage<T>(
 ): [T, Dispatch<SetStateAction<T>>, () => void] {
   const { initializeWithValue = true } = options;
 
-  const serializer = useCallback<(value: T) => string>(
-    (value) => {
-      if (options.serializer) {
-        return options.serializer(value);
-      }
+  const serializerRef = useRef(options.serializer ?? JSON.stringify);
+  const deserializerRef = useRef(options.deserializer ?? JSON.parse);
 
-      return JSON.stringify(value);
-    },
-    [options],
+  const initialValueRef = useRef<T>(
+    typeof initialValue === "function"
+      ? (initialValue as () => T)()
+      : initialValue,
   );
 
-  const deserializer = useCallback<(value: string) => T>(
-    (value) => {
-      if (options.deserializer) {
-        return options.deserializer(value);
-      }
-      // Support 'undefined' as a value
-      if (value === "undefined") {
-        return undefined as unknown as T;
-      }
+  const getInitialValue = useCallback(() => initialValueRef.current, []);
 
-      const defaultValue = initialValue instanceof Function
-        ? initialValue()
-        : initialValue;
-
-      let parsed: unknown;
-      try {
-        parsed = JSON.parse(value);
-      } catch (error) {
-        console.error("Error parsing JSON:", error);
-        return defaultValue; // Return initialValue if parsing fails
-      }
-
-      return parsed as T;
-    },
-    [options, initialValue],
-  );
-
-  // Get from local storage then
-  // parse stored json or return initialValue
-  const readValue = useCallback((): T => {
-    const initialValueToUse = initialValue instanceof Function
-      ? initialValue()
-      : initialValue;
-
-    // Prevent build error "window is undefined" but keep working
-    if (IS_SERVER) {
-      return initialValueToUse;
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (!initializeWithValue || IS_SERVER) {
+      return getInitialValue();
     }
 
     try {
-      const raw = globalThis.localStorage.getItem(key);
-      return raw ? deserializer(raw) : initialValueToUse;
-    } catch (error) {
-      console.warn(`Error reading localStorage key “${key}”:`, error);
-      return initialValueToUse;
+      const item = window.localStorage.getItem(key);
+      return item ? deserializerRef.current(item) : getInitialValue();
+    } catch (err) {
+      console.warn(`Error reading localStorage key “${key}”:`, err);
+      return getInitialValue();
     }
-  }, [initialValue, key, deserializer]);
-
-  const [storedValue, setStoredValue] = useState(() => {
-    if (initializeWithValue) {
-      return readValue();
-    }
-
-    return initialValue instanceof Function ? initialValue() : initialValue;
   });
 
-  // Return a wrapped version of useState's setter function that ...
-  // ... persists the new value to localStorage.
   const setValue: Dispatch<SetStateAction<T>> = useCallback(
     (value) => {
-      // Prevent build error "window is undefined" but keeps working
       if (IS_SERVER) {
         console.warn(
-          `Tried setting localStorage key “${key}” even though environment is not a client`,
+          `Tried setting localStorage key “${key}” in a non-client environment.`,
         );
+        return;
       }
 
       try {
-        // Allow value to be a function so we have the same API as useState
-        const newValue = value instanceof Function ? value(readValue()) : value;
-
-        // Save to local storage
-        globalThis.localStorage.setItem(key, serializer(newValue));
-
-        // Save state
-        setStoredValue(newValue);
-
-        // We dispatch a custom event so every similar useLocalStorage hook is notified
-        globalThis.dispatchEvent(new StorageEvent("local-storage", { key }));
-      } catch (error) {
-        console.warn(`Error setting localStorage key “${key}”:`, error);
+        setStoredValue((prev) => {
+          const newValue =
+            typeof value === "function"
+              ? (value as (prev: T) => T)(prev)
+              : value;
+          window.localStorage.setItem(key, serializerRef.current(newValue));
+          window.dispatchEvent(
+            new CustomEvent("local-storage", { detail: { key } }),
+          );
+          return newValue;
+        });
+      } catch (err) {
+        console.warn(`Error setting localStorage key “${key}”:`, err);
       }
     },
-    [key, serializer, readValue],
+    [key],
   );
 
   const removeValue = useCallback(() => {
-    // Prevent build error "window is undefined" but keeps working
     if (IS_SERVER) {
       console.warn(
-        `Tried removing localStorage key “${key}” even though environment is not a client`,
+        `Tried removing localStorage key “${key}” in a non-client environment.`,
       );
+      return;
+    }
+    try {
+      window.localStorage.removeItem(key);
+      setStoredValue(getInitialValue());
+      window.dispatchEvent(
+        new CustomEvent("local-storage", { detail: { key } }),
+      );
+    } catch (err) {
+      console.warn(`Error removing localStorage key “${key}”:`, err);
+    }
+  }, [key, getInitialValue]);
+
+  useEffect(() => {
+    if (IS_SERVER) {
+      return;
     }
 
-    const defaultValue = initialValue instanceof Function
-      ? initialValue()
-      : initialValue;
+    const handleStorageChange = (
+      event: StorageEvent | CustomEvent<{ key: string }>,
+    ) => {
+      const eventKey = "key" in event ? event.key : event.detail?.key;
 
-    // Remove the key from local storage
-    globalThis.localStorage.removeItem(key);
-
-    // Save state with default value
-    setStoredValue(defaultValue);
-
-    // We dispatch a custom event so every similar useLocalStorage hook is notified
-    globalThis.dispatchEvent(new StorageEvent("local-storage", { key }));
-  }, [key]);
-
-  useEffect(() => {
-    setStoredValue(readValue());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
-
-  const handleStorageChange = useCallback(
-    (event: StorageEvent | CustomEvent) => {
-      if ((event as StorageEvent).key && (event as StorageEvent).key !== key) {
-        return;
+      if (eventKey === key) {
+        try {
+          const item = window.localStorage.getItem(key);
+          setStoredValue(
+            item ? deserializerRef.current(item) : getInitialValue(),
+          );
+        } catch (err) {
+          console.warn(`Error syncing localStorage key “${key}”:`, err);
+          setStoredValue(getInitialValue());
+        }
       }
-      setStoredValue(readValue());
-    },
-    [key, readValue],
-  );
-
-  useEffect(() => {
-    addEventListener("storage", handleStorageChange);
-    // this is a custom event, triggered in writeValueToLocalStorage
-    addEventListener("local-storage", handleStorageChange);
-    return () => {
-      removeEventListener("storage", handleStorageChange);
-      removeEventListener("local-storage", handleStorageChange);
     };
-  }, []);
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener(
+      "local-storage",
+      handleStorageChange as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener(
+        "local-storage",
+        handleStorageChange as EventListener,
+      );
+    };
+  }, [key, getInitialValue]);
 
   return [storedValue, setValue, removeValue];
 }

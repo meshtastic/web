@@ -58,7 +58,9 @@ export function GenericInput<T extends FieldValues>({
       return;
     }
 
-    if (field.inputChange) field.inputChange(e);
+    if (field.inputChange) {
+      field.inputChange(e);
+    }
 
     controllerField.onChange(
       field.type === "number"
@@ -76,14 +78,17 @@ export function GenericInput<T extends FieldValues>({
       <Input
         type={field.type}
         step={field.properties?.step}
-        value={field.type === "number"
-          ? String(controllerField.value)
-          : controllerField.value}
+        value={
+          field.type === "number"
+            ? String(controllerField.value)
+            : controllerField.value
+        }
         id={field.name}
         onChange={handleInputChange}
         showCopyButton={field.properties?.showCopyButton}
-        showPasswordToggle={field.properties?.showPasswordToggle ||
-          field.type === "password"}
+        showPasswordToggle={
+          field.properties?.showPasswordToggle || field.type === "password"
+        }
         className={field.properties?.className}
         {...restProperties}
         disabled={disabled}

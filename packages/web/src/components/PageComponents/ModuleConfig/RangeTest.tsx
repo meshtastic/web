@@ -1,3 +1,4 @@
+import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
 import {
   type RangeTestValidation,
   RangeTestValidationSchema,
@@ -8,21 +9,24 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores/deviceStore.ts";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 
 interface RangeTestModuleConfigProps {
   onFormInit: DynamicFormFormInit<RangeTestValidation>;
 }
 
 export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
+  useWaitForConfig({ moduleConfigCase: "rangeTest" });
+
   const {
     moduleConfig,
     setWorkingModuleConfig,
     getEffectiveModuleConfig,
     removeWorkingModuleConfig,
   } = useDevice();
+
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: RangeTestValidation) => {

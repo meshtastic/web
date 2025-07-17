@@ -67,7 +67,9 @@ export function useFilterNode() {
         ...filterOverrides,
       };
 
-      if (!node.user) return false;
+      if (!node.user) {
+        return false;
+      }
 
       const nodeName = filterState.nodeName.toLowerCase();
       if (
@@ -89,7 +91,7 @@ export function useFilterNode() {
 
       if (
         (filterState.hopsUnknown === true && node.hopsAway !== undefined) ||
-        filterState.hopsUnknown === false && node.hopsAway === undefined
+        (filterState.hopsUnknown === false && node.hopsAway === undefined)
       ) {
         return false;
       }
@@ -105,7 +107,7 @@ export function useFilterNode() {
 
       if (
         (filterState.showUnheard === true && (node.lastHeard ?? 0) !== 0) ||
-        filterState.showUnheard === false && (node.lastHeard ?? 0) === 0
+        (filterState.showUnheard === false && (node.lastHeard ?? 0) === 0)
       ) {
         return false;
       }
@@ -125,7 +127,9 @@ export function useFilterNode() {
       }
 
       const snr = node.snr ?? -20;
-      if (snr < filterState.snr[0] || snr > filterState.snr[1]) return false;
+      if (snr < filterState.snr[0] || snr > filterState.snr[1]) {
+        return false;
+      }
 
       const channelUtilization = node.deviceMetrics?.channelUtilization ?? 0;
       if (
@@ -159,13 +163,17 @@ export function useFilterNode() {
         return false;
       }
 
-      const role: Protobuf.Config.Config_DeviceConfig_Role = node.user.role ??
-        Protobuf.Config.Config_DeviceConfig_Role.CLIENT;
-      if (!filterState.role.includes(role)) return false;
+      const role: Protobuf.Config.Config_DeviceConfig_Role =
+        node.user.role ?? Protobuf.Config.Config_DeviceConfig_Role.CLIENT;
+      if (!filterState.role.includes(role)) {
+        return false;
+      }
 
-      const hwModel: Protobuf.Mesh.HardwareModel = node.user.hwModel ??
-        Protobuf.Mesh.HardwareModel.UNSET;
-      if (!filterState.hwModel.includes(hwModel)) return false;
+      const hwModel: Protobuf.Mesh.HardwareModel =
+        node.user.hwModel ?? Protobuf.Mesh.HardwareModel.UNSET;
+      if (!filterState.hwModel.includes(hwModel)) {
+        return false;
+      }
 
       return true;
     },
@@ -173,10 +181,7 @@ export function useFilterNode() {
   );
 
   const isFilterDirty = useCallback(
-    (
-      current: FilterState,
-      overrides?: Partial<FilterState>,
-    ): boolean => {
+    (current: FilterState, overrides?: Partial<FilterState>): boolean => {
       const base: FilterState = overrides
         ? { ...defaultFilterValues, ...overrides }
         : defaultFilterValues;

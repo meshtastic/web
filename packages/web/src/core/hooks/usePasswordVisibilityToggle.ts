@@ -9,9 +9,9 @@ interface UsePasswordVisibilityToggleProps {
  * @param {boolean} [options.initialVisible=false]
  * @returns {{isVisible: boolean, toggleVisibility: () => void}}
  */
-export function usePasswordVisibilityToggle(
-  { initialVisible = false }: UsePasswordVisibilityToggleProps = {},
-) {
+export function usePasswordVisibilityToggle({
+  initialVisible = false,
+}: UsePasswordVisibilityToggleProps = {}) {
   const [isVisible, setIsVisible] = useState<boolean>(initialVisible);
 
   const toggleVisibility = useCallback(() => {

@@ -1,19 +1,17 @@
-import type { TabElementProps } from "../../Dialog/NewDeviceDialog.tsx";
-import { Button } from "@components/UI/Button.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
+import { Button } from "@components/UI/Button.tsx";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDeviceStore } from "@core/stores/deviceStore.ts";
+import { useMessageStore } from "@core/stores/messageStore/index.ts";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import type { TabElementProps } from "../../Dialog/NewDeviceDialog.tsx";
 
-export const Serial = (
-  { closeDialog }: TabElementProps,
-) => {
+export const Serial = ({ closeDialog }: TabElementProps) => {
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
   const { addDevice } = useDeviceStore();
@@ -54,13 +52,13 @@ export const Serial = (
       disabled={connectionInProgress}
     >
       <div className="flex h-48 flex-col gap-2 overflow-y-auto">
-        {serialPorts.map((port, index) => {
+        {serialPorts.map((port) => {
           const { usbProductId, usbVendorId } = port.getInfo();
           const vendor = usbVendorId ?? t("unknown.shortName");
           const product = usbProductId ?? t("unknown.shortName");
           return (
             <Button
-              key={`${vendor}-${product}-${index}`}
+              key={`${vendor}-${product}`}
               disabled={port.readable !== null}
               variant="default"
               onClick={async () => {
@@ -70,7 +68,6 @@ export const Serial = (
               }}
             >
               {t("newDeviceDialog.serialConnection.deviceIdentifier", {
-                index: index,
                 vendorId: vendor,
                 productId: product,
               })}
@@ -86,14 +83,18 @@ export const Serial = (
       <Button
         variant="default"
         onClick={async () => {
-          await navigator.serial.requestPort().then((port) => {
-            setSerialPorts(serialPorts.concat(port));
-            // No need to setConnectionInProgress(false) here if requestPort is quick
-          }).catch((error: Error) => {
-            console.error("Error requesting port:", error);
-          }).finally(() => {
-            setConnectionInProgress(false);
-          });
+          await navigator.serial
+            .requestPort()
+            .then((port) => {
+              setSerialPorts(serialPorts.concat(port));
+              // No need to setConnectionInProgress(false) here if requestPort is quick
+            })
+            .catch((error: Error) => {
+              console.error("Error requesting port:", error);
+            })
+            .finally(() => {
+              setConnectionInProgress(false);
+            });
         }}
       >
         <span>{t("newDeviceDialog.serialConnection.newDeviceButton")}</span>

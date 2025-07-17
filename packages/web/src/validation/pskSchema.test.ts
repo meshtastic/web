@@ -1,6 +1,6 @@
+import { fromByteArray } from "base64-js";
 import { describe, expect, it } from "vitest";
 import { makePskHelpers } from "./pskSchema.ts";
-import { fromByteArray } from "base64-js";
 
 function makeBase64OfLength(len: number): string {
   return fromByteArray(new Uint8Array(len));
@@ -71,7 +71,7 @@ describe("stringSchema", () => {
 
   it("rejects base64 string with correct length but extra padding", () => {
     const { stringSchema, msgs } = makePskHelpers([16]);
-    const valid = makeBase64OfLength(16) + "==";
+    const valid = `${makeBase64OfLength(16)}==`;
     const result = stringSchema().safeParse(valid);
     expect(result.success).toBe(false);
     if (!result.success) {

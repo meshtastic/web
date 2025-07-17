@@ -98,7 +98,7 @@ improve the stability of future releases
 ## Development & Building
 
 You'll need to download the package manager used with this repo. You can install
-it by visiting [deno.com](https://deno.com/) and following the installation
+it by visiting [bun.sh](https://bun.sh/) and following the installation
 instructions listed on the home page.
 
 ### Development
@@ -106,13 +106,13 @@ instructions listed on the home page.
 Install the dependencies.
 
 ```bash
-deno i
+bun install
 ```
 
 Start the development server:
 
 ```bash
-deno task dev
+bun run dev
 ```
 
 ### Building and Packaging
@@ -120,33 +120,33 @@ deno task dev
 Build the project:
 
 ```bash
-deno task build
+bun run build
 ```
 
 GZip the output:
 
 ```bash
-deno task package
+bun run package
 ```
 
-### Why Deno?
+### Why Bun?
 
-Meshtastic Web uses Deno as its development platform for several compelling
+Meshtastic Web uses Bun as its development platform for several compelling
 reasons:
 
-- **Built-in Security**: Deno's security-first approach requires explicit
-  permissions for file, network, and environment access, reducing vulnerability
-  risks.
+- **Fast Performance**: Bun is built from the ground up for speed, offering
+  significantly faster package installation and bundling compared to other
+  JavaScript runtimes.
 - **TypeScript Support**: Native TypeScript support without additional
   configuration, enhancing code quality and developer experience.
 - **Modern JavaScript**: First-class support for ESM imports, top-level await,
   and other modern JavaScript features.
-- **Simplified Tooling**: Built-in formatter, linter, test runner, and bundler
-  eliminate the need for multiple third-party tools.
+- **All-in-One Tooling**: Built-in package manager, bundler, test runner, and
+  transpiler eliminate the need for multiple third-party tools.
+- **Node.js Compatibility**: Drop-in replacement for Node.js with better
+  performance and built-in tooling.
 - **Reproducible Builds**: Lockfile ensures consistent builds across all
   environments.
-- **Web Standard APIs**: Uses browser-compatible APIs, making code more portable
-  between server and client environments.
 
 ### Contributing
 

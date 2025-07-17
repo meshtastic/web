@@ -1,0 +1,24 @@
+{
+	"name": "meshtastic-web",
+	"version": "2.7.0-0",
+	"type": "module",
+	"description": "Meshtastic web client monorepo",
+	"license": "GPL-3.0-only",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/meshtastic/web.git"
+	},
+	"bugs": {
+		"url": "https://github.com/meshtastic/web/issues"
+	},
+	"homepage": "https://meshtastic.org",
+	"workspaces": ["packages/web"],
+	"scripts": {
+		"build:npm": "deno run -A scripts/build_npm_package.ts"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.8.3",
+		"bun": "^1.1.18",
+		"typescript": "^5.8.3"
+	}
+}

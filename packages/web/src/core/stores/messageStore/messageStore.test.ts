@@ -1,3 +1,4 @@
+import { Types } from "@meshtastic/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getConversationId,
@@ -11,14 +12,13 @@ import type {
   Message,
   MessageLogMap,
 } from "./types.ts";
-import { Types } from "@meshtastic/core";
 
 vi.mock("../storage/indexDB.ts", () => {
   const memoryStorage: Record<string, string> = {};
   return {
     storageWithMapSupport: {
       getItem: vi.fn(async (name: string): Promise<string | null> => {
-        return await memoryStorage[name] ?? null;
+        return (await memoryStorage[name]) ?? null;
       }),
       setItem: vi.fn(async (name: string, value: string): Promise<void> => {
         memoryStorage[name] = await value;
@@ -94,14 +94,17 @@ describe("useMessageStore", () => {
   const initialState = useMessageStore.getState();
 
   beforeEach(() => {
-    useMessageStore.setState({
-      ...initialState,
-      messages: {
-        direct: new Map<ConversationId, MessageLogMap>(),
-        broadcast: new Map<ChannelId, MessageLogMap>(),
+    useMessageStore.setState(
+      {
+        ...initialState,
+        messages: {
+          direct: new Map<ConversationId, MessageLogMap>(),
+          broadcast: new Map<ChannelId, MessageLogMap>(),
+        },
+        draft: new Map<Types.Destination, string>(),
       },
-      draft: new Map<Types.Destination, string>(),
-    }, true);
+      true,
+    );
   });
 
   it("should have correct initial state", () => {
@@ -167,22 +170,22 @@ describe("useMessageStore", () => {
 
       const convId1 = getConversationId(myNodeNum, otherNodeNum1);
       expect(
-        state.messages.direct.get(convId1)?.get(
-          directMessageToOther1.messageId,
-        ),
+        state.messages.direct
+          .get(convId1)
+          ?.get(directMessageToOther1.messageId),
       ).toEqual(directMessageToOther1);
 
       expect(
-        state.messages.direct.get(convId1)?.get(
-          directMessageFromOther1.messageId,
-        ),
+        state.messages.direct
+          .get(convId1)
+          ?.get(directMessageFromOther1.messageId),
       ).toEqual(directMessageFromOther1);
 
       const channelId = broadcastMessage1.channel;
       expect(
-        state.messages.broadcast.get(channelId)?.get(
-          broadcastMessage1.messageId,
-        ),
+        state.messages.broadcast
+          .get(channelId)
+          ?.get(broadcastMessage1.messageId),
       ).toEqual(broadcastMessage1);
     });
   });
@@ -266,9 +269,10 @@ describe("useMessageStore", () => {
         directMessageToOther1.from,
         directMessageToOther1.to,
       );
-      const message = useMessageStore.getState().messages.direct.get(
-        conversationId,
-      )?.get(directMessageToOther1.messageId);
+      const message = useMessageStore
+        .getState()
+        .messages.direct.get(conversationId)
+        ?.get(directMessageToOther1.messageId);
       expect(message?.state).toBe(MessageState.Ack);
     });
 
@@ -284,9 +288,10 @@ describe("useMessageStore", () => {
         directMessageFromOther1.from,
         directMessageFromOther1.to,
       );
-      const message = useMessageStore.getState().messages.direct.get(
-        conversationId,
-      )?.get(directMessageFromOther1.messageId);
+      const message = useMessageStore
+        .getState()
+        .messages.direct.get(conversationId)
+        ?.get(directMessageFromOther1.messageId);
       expect(message?.state).toBe(MessageState.Failed);
     });
 
@@ -297,9 +302,10 @@ describe("useMessageStore", () => {
         messageId: broadcastMessage1.messageId,
         newState: MessageState.Ack,
       });
-      const message = useMessageStore.getState().messages.broadcast.get(
-        broadcastChannel,
-      )?.get(broadcastMessage1.messageId);
+      const message = useMessageStore
+        .getState()
+        .messages.broadcast.get(broadcastChannel)
+        ?.get(broadcastMessage1.messageId);
       expect(message?.state).toBe(MessageState.Ack);
     });
 
@@ -422,8 +428,9 @@ describe("useMessageStore", () => {
       });
 
       const state = useMessageStore.getState();
-      expect(state.messages.broadcast.get(channelId)?.get(messageIdToDelete))
-        .toBeUndefined();
+      expect(
+        state.messages.broadcast.get(channelId)?.get(messageIdToDelete),
+      ).toBeUndefined();
     });
 
     it("should clean up empty conversation/channel Maps", () => {
@@ -462,8 +469,9 @@ describe("useMessageStore", () => {
         messageId: broadcastMessage1.messageId,
       });
 
-      expect(useMessageStore.getState().messages.broadcast.has(broadcastChanId))
-        .toBe(false);
+      expect(
+        useMessageStore.getState().messages.broadcast.has(broadcastChanId),
+      ).toBe(false);
     });
 
     it("should not error when trying to delete non-existent message", () => {
@@ -556,8 +564,9 @@ describe("useMessageStore", () => {
       expect(useMessageStore.getState().messages.direct.size).toBeGreaterThan(
         0,
       );
-      expect(useMessageStore.getState().messages.broadcast.size)
-        .toBeGreaterThan(0);
+      expect(
+        useMessageStore.getState().messages.broadcast.size,
+      ).toBeGreaterThan(0);
 
       useMessageStore.getState().deleteAllMessages();
 

@@ -1,11 +1,7 @@
-import { z, ZodType } from "zod/v4";
+import { type ZodType, z } from "zod/v4";
 import { makePskHelpers } from "./../pskSchema.ts";
 
-const {
-  stringSchema,
-  bytesSchema,
-  isValidKey,
-} = makePskHelpers([32]); // 256-bit
+const { stringSchema, bytesSchema, isValidKey } = makePskHelpers([32]); // 256-bit
 
 const isManagedRequiredMsg = "formValidation.required.managed";
 

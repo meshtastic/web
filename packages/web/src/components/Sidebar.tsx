@@ -1,11 +1,13 @@
-import type React from "react";
-import { useEffect, useState, useTransition } from "react";
+import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
-import type { Page } from "@core/stores/deviceStore.ts";
 import { Spinner } from "@components/UI/Spinner.tsx";
-
+import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { useAppStore } from "@core/stores/appStore.ts";
+import type { Page } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores/deviceStore.ts";
+import { useSidebar } from "@core/stores/sidebarStore.tsx";
+import { cn } from "@core/utils/cn.ts";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CircleChevronLeft,
   LayersIcon,
@@ -15,13 +17,10 @@ import {
   SettingsIcon,
   UsersIcon,
 } from "lucide-react";
-import { cn } from "@core/utils/cn.ts";
-import { useSidebar } from "@core/stores/sidebarStore.tsx";
-import { useAppStore } from "@core/stores/appStore.ts";
-import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
+import type React from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import { DeviceInfoPanel } from "./DeviceInfoPanel.tsx";
-import { useLocation, useNavigate } from "@tanstack/react-router";
 
 export interface SidebarProps {
   children?: React.ReactNode;
@@ -89,7 +88,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
   const numUnread = [...unreadCounts.values()].reduce((sum, v) => sum + v, 0);
 
   const [displayedNodeCount, setDisplayedNodeCount] = useState(() =>
-    Math.max(getNodesLength() - 1, 0)
+    Math.max(getNodesLength() - 1, 0),
   );
 
   const [_, startNodeCountTransition] = useTransition();
@@ -189,37 +188,36 @@ export const Sidebar = ({ children }: SidebarProps) => {
       </div>
 
       <div className=" pt-4 border-t-[0.5px] bg-background-primary border-slate-300 dark:border-slate-700 h-full flex-1">
-        {myNode === undefined
-          ? (
-            <div className="flex flex-col items-center justify-center py-6">
-              <Spinner />
-              <Subtle
-                className={cn(
-                  "mt-4 transition-opacity duration-300",
-                  isCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
-                )}
-              >
-                {t("loading")}
-              </Subtle>
-            </div>
-          )
-          : (
-            <DeviceInfoPanel
-              isCollapsed={isCollapsed}
-              setCommandPaletteOpen={() => setCommandPaletteOpen(true)}
-              setDialogOpen={() => setDialogOpen("deviceName", true)}
-              user={{
-                longName: myNode?.user?.longName ?? t("unknown.longName"),
-                shortName: myNode?.user?.shortName ?? t("unknown.shortName"),
-              }}
-              firmwareVersion={myMetadata?.firmwareVersion ??
-                t("unknown.notAvailable")}
-              deviceMetrics={{
-                batteryLevel: myNode.deviceMetrics?.batteryLevel,
-                voltage: myNode.deviceMetrics?.voltage,
-              }}
-            />
-          )}
+        {myNode === undefined ? (
+          <div className="flex flex-col items-center justify-center py-6">
+            <Spinner />
+            <Subtle
+              className={cn(
+                "mt-4 transition-opacity duration-300",
+                isCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
+              )}
+            >
+              {t("loading")}
+            </Subtle>
+          </div>
+        ) : (
+          <DeviceInfoPanel
+            isCollapsed={isCollapsed}
+            setCommandPaletteOpen={() => setCommandPaletteOpen(true)}
+            setDialogOpen={() => setDialogOpen("deviceName", true)}
+            user={{
+              longName: myNode?.user?.longName ?? t("unknown.longName"),
+              shortName: myNode?.user?.shortName ?? t("unknown.shortName"),
+            }}
+            firmwareVersion={
+              myMetadata?.firmwareVersion ?? t("unknown.notAvailable")
+            }
+            deviceMetrics={{
+              batteryLevel: myNode.deviceMetrics?.batteryLevel,
+              voltage: myNode.deviceMetrics?.voltage,
+            }}
+          />
+        )}
       </div>
     </div>
   );
