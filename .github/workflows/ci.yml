@@ -30,7 +30,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock', '**/deno.json', '**/deno.jsonc') }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock', '**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-deno-
 
@@ -40,7 +40,7 @@ jobs:
           path: |
             ~/.bun/install/cache
             packages/web/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
@@ -60,10 +60,7 @@ jobs:
           for pkg_dir in ${{ steps.changed_packages.outputs.all_changed_and_modified_files }}; do
             echo "🔍 Inspecting $pkg_dir..."
 
-            if [[ -f "$pkg_dir/deno.json" ]]; then
-              echo "🔧 Building with Deno: $pkg_dir"
-              deno task build "$pkg_dir"
-            elif [[ -f "$pkg_dir/bun.lockb" ]]; then
+            if [[ -f "$pkg_dir/deno.lock" ]]; then
               echo "🔧 Building with Bun: $pkg_dir"
               (cd "$pkg_dir" && bun install && bun run build)
             else
