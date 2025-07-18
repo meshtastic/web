@@ -45,9 +45,9 @@ export class TransportNode implements Types.Transport {
     ) as ReadableStream<Uint8Array>;
     this._fromDevice = fromDeviceSource.pipeThrough(Utils.fromDeviceStream());
 
-    // Stream for data going FROM the application TO the Meshtastic device.
-    const toDeviceTransform = new TransformStream<Uint8Array, Uint8Array>();
-    this._toDevice = toDeviceTransform.writable;
+		// Stream for data going FROM the application TO the Meshtastic device.
+		const toDeviceTransform = Utils.toDeviceStream;
+		this._toDevice = toDeviceTransform.writable;
 
     // The readable end of the transform is then piped to the Node.js socket.
     // A similar assertion is needed here because `Writable.toWeb` also returns
