@@ -18,23 +18,6 @@ or served from a node
 
 ![Alt](https://repobeats.axiom.co/api/embed/e5b062db986cb005d83e81724c00cb2b9cce8e4c.svg "Repobeats analytics image")
 
-## Progress Web App Support (PWA)
-
-Meshtastic Web Client now includes Progressive Web App (PWA) functionality,
-allowing users to:
-
-- Install the app on desktop and mobile devices
-- Access the interface offline
-- Receive updates automatically
-- Experience faster load times with caching
-
-To install as a PWA:
-
-- On desktop: Look for the install icon in your browser's address bar
-- On mobile: Use "Add to Home Screen" option in your browser menu
-
-PWA functionality works with both the hosted version and self-hosted instances.
-
 ## Self-host
 
 The client can be self hosted using the precompiled container images with an OCI
@@ -56,7 +39,7 @@ Our release process follows these guidelines:
 
 - **Versioning:** We use Semantic Versioning (`Major.Minor.Patch`).
 - **Stable Releases:** Published around the beginning of each month (e.g.,
-  `v2.3.4`).
+  `v2.6.1`).
 - **Pre-releases:** A pre-release is typically issued mid-month for testing and
   early adoption.
 - **Nightly Builds:** An experimental Docker image containing the latest
@@ -106,6 +89,7 @@ instructions listed on the home page.
 Install the dependencies.
 
 ```bash
+cd packages/web &&
 bun install
 ```
 
@@ -141,8 +125,6 @@ reasons:
   configuration, enhancing code quality and developer experience.
 - **Modern JavaScript**: First-class support for ESM imports, top-level await,
   and other modern JavaScript features.
-- **All-in-One Tooling**: Built-in package manager, bundler, test runner, and
-  transpiler eliminate the need for multiple third-party tools.
 - **Node.js Compatibility**: Drop-in replacement for Node.js with better
   performance and built-in tooling.
 - **Reproducible Builds**: Lockfile ensures consistent builds across all

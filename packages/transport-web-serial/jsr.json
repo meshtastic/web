@@ -1,0 +1,5 @@
+{
+  "name": "@meshtastic/transport-web-serial",
+  "version": "0.2.2",
+  "exports": "./mod.ts"
+}

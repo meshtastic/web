@@ -12,13 +12,28 @@
 		"url": "https://github.com/meshtastic/web/issues"
 	},
 	"homepage": "https://meshtastic.org",
-	"workspaces": ["packages/web"],
+	"workspaces": ["packages/*"],
+		"simple-git-hooks": {
+		"pre-commit": "bun run check:fix"
+	},
 	"scripts": {
+		"lint": "biome lint",
+		"lint:fix": "biome lint --write",
+  	"format": "biome format",
+  	"format:fix": "biome format . --write",
+  	"check": "biome check",
+  	"check:fix": "biome check --write",
 		"build:npm": "deno run -A scripts/build_npm_package.ts"
 	},
+	"dependencies": {
+		"@bufbuild/protobuf": "^2.6.1",
+		"@meshtastic/protobufs": "npm:@jsr/meshtastic__protobufs",
+		"ste-simple-events": "^3.0.11",
+		"tslog": "^4.9.3"
+	},
 	"devDependencies": {
-		"@biomejs/biome": "^1.8.3",
-		"bun": "^1.1.18",
-		"typescript": "^5.8.3"
+		"bun": "^1.2.18",
+		"typescript": "^5.8.3",
+		"@types/node": "^22.16.4"
 	}
 }

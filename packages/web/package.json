@@ -11,9 +11,7 @@
 	"bugs": {
 		"url": "https://github.com/meshtastic/web/issues"
 	},
-	"simple-git-hooks": {
-		"pre-commit": "bun run check:fix"
-	},
+
 	"homepage": "https://meshtastic.org",
 	"scripts": {
 		"build": "bunx --bun vite build",
