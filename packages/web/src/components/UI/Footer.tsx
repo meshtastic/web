@@ -1,13 +1,11 @@
 import { cn } from "@core/utils/cn.ts";
-import { Trans, useTranslation } from "react-i18next";
+import { Trans } from "react-i18next";
 
 type FooterProps = {
   className?: string;
 };
 
 const Footer = ({ className, ...props }: FooterProps) => {
-  const { t } = useTranslation();
-
   return (
     <footer
       className={cn(
@@ -16,11 +14,15 @@ const Footer = ({ className, ...props }: FooterProps) => {
       )}
       {...props}
     >
-      <div className="justify-start px-2">
+      <div className="px-2">
         <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
-          {t("footer.commitSha", {
-            sha: String(import.meta.env.VITE_COMMIT_HASH)?.toUpperCase(),
-          })}
+          {String(import.meta.env.VITE_VERSION)?.toUpperCase()}
+        </span>
+        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40 mx-2">
+          -
+        </span>
+        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
+          {`#${String(import.meta.env.VITE_COMMIT_HASH)?.toUpperCase()}`}
         </span>
       </div>
       <p className="ml-auto mr-auto text-gray-500 dark:text-gray-400">
