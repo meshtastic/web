@@ -3,6 +3,7 @@
 interface ImportMetaEnv {
   readonly env: {
     readonly VITE_COMMIT_HASH: string;
+    readonly VITE_VERSION: string;
   };
 }
 

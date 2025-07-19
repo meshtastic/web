@@ -6,11 +6,20 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 let hash = "";
+let version = "v0.0.0";
 try {
   hash = execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim();
 } catch (error) {
   console.error("Error getting git hash:", error);
   hash = "DEV";
+}
+
+try {
+  version = execSync("git describe --tags --abbrev=0", {
+    encoding: "utf8",
+  }).trim();
+} catch (error) {
+  console.error("Error getting git version:", error);
 }
 
 const CONTENT_SECURITY_POLICY =
@@ -37,6 +46,7 @@ export default defineConfig({
   },
   define: {
     "import.meta.env.VITE_COMMIT_HASH": JSON.stringify(hash),
+    "import.meta.env.VITE_VERSION": JSON.stringify(version),
   },
   build: {
     emptyOutDir: true,
