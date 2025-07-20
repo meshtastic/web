@@ -56,8 +56,8 @@ This monorepo leverages the following technologies:
 
 ### Prerequisites
 
-You'll need to have [Bun](https://bun.sh/) installed to work with this
-monorepo. Follow the installation instructions on their home page.
+You'll need to have [Bun](https://bun.sh/) installed to work with this monorepo.
+Follow the installation instructions on their home page.
 
 ### Development Setup
 
@@ -80,21 +80,11 @@ monorepo. Follow the installation instructions on their home page.
 To start the development server for the web client:
 
 ```bash
-bun run --filter web dev
+cd ./packages/web && bun run dev
 ```
 
 This will typically run the web client on http://localhost:3000 and requires a
 Chromium browser
-
-## Meshtastic JS Packages
-
-While the js packages are primarily libraries, you can run their tests or
-specific development scripts if defined within their package.json files. For
-example, to run tests for a specific package:
-
-```bash
-bun run --filter core test
-```
 
 ### Feedback
 

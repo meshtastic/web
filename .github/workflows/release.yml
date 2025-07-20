@@ -47,7 +47,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock', '**/deno.json', '**/deno.jsonc') }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
           restore-keys: |
             ${{ runner.os }}-deno-
 
@@ -80,7 +80,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          excluded=("packages/web" "packages/transport-deno")
+          excluded=("packages/web" "packages/transport-deno" "packages/transport-node")
 
           for pkg_dir in ${{ steps.changed_packages.outputs.all_changed_and_modified_files }}; do
             echo "🔍 Inspecting $pkg_dir"
@@ -90,12 +90,12 @@ jobs:
               continue
             fi
 
-            if [[ -f "$pkg_dir/deno.json" ]]; then
-              echo "🦕 Building with Deno: $pkg_dir"
-              deno task build "$pkg_dir"
+            if [[ -f "$pkg_dir/jsr.json" ]]; then
+              echo "🦕 Publishing to NPM: $pkg_dir"
+              bun run build:npm $pkg_dir
               echo "📦 Publishing to JSR"
               (cd "$pkg_dir" && deno publish --allow-dirty)
-            elif [[ -f "$pkg_dir/bun.lockb" ]]; then
+            elif [[ -f "$pkg_dir/bun.lock" ]]; then
               echo "🥖 Building with Bun: $pkg_dir"
               (cd "$pkg_dir" && bun install && bun run build)
             else

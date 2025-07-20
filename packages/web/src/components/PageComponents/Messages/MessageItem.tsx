@@ -51,7 +51,7 @@ interface MessageItemProps {
 }
 
 export const MessageItem = ({ message }: MessageItemProps) => {
-  const { getNode } = useDevice();
+  const { config, getNode } = useDevice();
   const { getMyNodeNum } = useMessageStore();
   const { t, i18n } = useTranslation("messages");
 
@@ -132,7 +132,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
       messageDate?.toLocaleTimeString(locale, {
         hour: "numeric",
         minute: "2-digit",
-        hour12: true,
+        hour12: config?.display?.use12hClock ?? true,
       }) ?? "",
     [messageDate, locale],
   );
