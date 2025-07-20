@@ -52,7 +52,7 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
       disabled={connectionInProgress}
     >
       <div className="flex h-48 flex-col gap-2 overflow-y-auto">
-        {serialPorts.map((port) => {
+        {serialPorts.map((port, idx) => {
           const { usbProductId, usbVendorId } = port.getInfo();
           const vendor = usbVendorId ?? t("unknown.shortName");
           const product = usbProductId ?? t("unknown.shortName");
@@ -70,6 +70,7 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
               {t("newDeviceDialog.serialConnection.deviceIdentifier", {
                 vendorId: vendor,
                 productId: product,
+                index: idx,
               })}
             </Button>
           );
