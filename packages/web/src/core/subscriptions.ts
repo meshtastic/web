@@ -114,6 +114,12 @@ export const subscribeAll = (
     });
   });
 
+  connection.events.onClientNotificationPacket.subscribe(
+    (clientNotificationPacket) => {
+      console.debug(clientNotificationPacket.message);
+    },
+  );
+
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     if (routingPacket.data.variant.case === "errorReason") {
       switch (routingPacket.data.variant.value) {
