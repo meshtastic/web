@@ -746,7 +746,7 @@ export class MeshDevice {
    * Initializes the heartbeat interval, which sends a heartbeat ping every interval milliseconds.
    */
   public setHeartbeatInterval(interval: number): void {
-    if (this._heartbeatIntervalId) {
+    if (this._heartbeatIntervalId !== undefined) {
       clearInterval(this._heartbeatIntervalId);
     }
     this._heartbeatIntervalId = setInterval(() => {
