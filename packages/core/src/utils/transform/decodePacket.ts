@@ -1,6 +1,6 @@
 import { fromBinary } from "@bufbuild/protobuf";
-import { Constants, Protobuf, Types } from "../../../mod.ts";
 import type { MeshDevice } from "../../../mod.ts";
+import { Constants, Protobuf, Types } from "../../../mod.ts";
 import type { DeviceOutput } from "../../types.ts";
 
 export const decodePacket = (device: MeshDevice) =>
@@ -206,6 +206,18 @@ export const decodePacket = (device: MeshDevice) =>
             }
 
             case "mqttClientProxyMessage": {
+              break;
+            }
+
+            case "clientNotification": {
+              device.log.trace(
+                Types.Emitter[Types.Emitter.HandleFromRadio],
+                `📣 Received ClientNotification: ${decodedMessage.payloadVariant.value.message}`,
+              );
+
+              device.events.onClientNotificationPacket.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
               break;
             }
 
