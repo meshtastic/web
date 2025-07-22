@@ -14,7 +14,7 @@ import {
   redirect,
 } from "@tanstack/react-router";
 import type { useTranslation } from "react-i18next";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { App } from "./App.tsx";
 
 interface AppContext {
@@ -55,23 +55,6 @@ const messagesRoute = createRoute({
   },
 });
 
-const chatIdSchema = z.string().refine(
-  (val) => {
-    const num = Number(val);
-    if (Number.isNaN(num) || !Number.isInteger(num)) {
-      return false;
-    }
-
-    const isChannelId = num >= 0 && num <= 10;
-    const isNodeId = num >= 1000000000 && num <= 9999999999;
-
-    return isChannelId || isNodeId;
-  },
-  {
-    message: "Chat ID must be a channel (0-10) or a valid node ID.",
-  },
-);
-
 export const messagesWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages/$type/$chatId",
@@ -83,7 +66,7 @@ export const messagesWithParamsRoute = createRoute({
         message: 'Type must be "direct" or "broadcast".',
       })
       .parse(params.type),
-    chatId: chatIdSchema.parse(params.chatId),
+    chatId: z.coerce.number().int().min(0).max(4294967294).parse(params.chatId), // max is 0xffffffff - 1
   }),
 });
 
