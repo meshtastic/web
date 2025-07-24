@@ -44,6 +44,16 @@ export class Queue {
           if (this.queue.findIndex((qi) => qi.id === item.id) !== -1) {
             this.remove(item.id);
             const decoded = fromBinary(Protobuf.Mesh.ToRadioSchema, item.data);
+
+            if (
+              decoded.payloadVariant.case === "heartbeat" ||
+              decoded.payloadVariant.case === "wantConfigId"
+            ) {
+              // heartbeat and wantConfigId packets are not acknowledged by the device, assume success after timeout
+              resolve(item.id);
+              return;
+            }
+
             console.warn(
               `Packet ${item.id} of type ${decoded.payloadVariant.case} timed out`,
             );
