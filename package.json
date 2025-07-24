@@ -13,8 +13,8 @@
 	},
 	"homepage": "https://meshtastic.org",
 	"workspaces": ["packages/*"],
-		"simple-git-hooks": {
-		"pre-commit": "bun run check:fix"
+	"simple-git-hooks": {
+	"pre-commit": "bun run check:fix"
 	},
 	"scripts": {
 		"lint": "biome lint",
