@@ -1,7 +1,7 @@
 import { useTheme } from "@core/hooks/useTheme.ts";
+import { useToggleVisibility } from "@core/hooks/useToggleVisiblility.ts";
 import { cn } from "@core/utils/cn.ts";
 import { Monitor, Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "./UI/Button.tsx";
 import { Subtle } from "./UI/Typography/Subtle.tsx";
@@ -19,7 +19,9 @@ export default function ThemeSwitcher({
   className: passedClassName = "",
   disableHover = false,
 }: ThemeSwitcherProps) {
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [showTooltip, toggleShowTooltip] = useToggleVisibility({
+    timeout: TOOLTIP_TIMEOUT,
+  });
 
   const { preference, setPreference } = useTheme();
   const { t } = useTranslation("ui");
@@ -43,7 +45,7 @@ export default function ThemeSwitcher({
     const nextPreference =
       preferences[(currentIndex + 1) % preferences.length] ?? "system";
     setPreference(nextPreference);
-    setShowTooltip(true);
+    toggleShowTooltip();
   };
 
   const preferenceDisplayMap: Record<ThemePreference, string> = {
@@ -53,18 +55,6 @@ export default function ThemeSwitcher({
   };
 
   const currentDisplayPreference = preferenceDisplayMap[preference];
-
-  useEffect(() => {
-    if (!showTooltip) {
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      setShowTooltip(false);
-    }, TOOLTIP_TIMEOUT);
-
-    return () => clearTimeout(timeout);
-  }, [showTooltip]);
 
   return (
     <Button
