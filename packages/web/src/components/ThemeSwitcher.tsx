@@ -1,8 +1,8 @@
-import { useTheme } from "@core/hooks/useTheme.ts";
-import { useToggleVisibility } from "@core/hooks/useToggleVisiblility.ts";
-import { cn } from "@core/utils/cn.ts";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../core/hooks/useTheme.ts";
+import { useToggleVisibility } from "../core/hooks/useToggleVisiblility.ts";
+import { cn } from "../core/utils/cn.ts";
 import { Button } from "./UI/Button.tsx";
 import { Subtle } from "./UI/Typography/Subtle.tsx";
 
