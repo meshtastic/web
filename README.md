@@ -63,7 +63,7 @@ Follow the installation instructions on their home page.
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/meshtastic/meshtastic-web.git](https://github.com/meshtastic/meshtastic-web.git) 
+   git clone https://github.com/meshtastic/meshtastic-web.git
    cd meshtastic-web
    ```
 2. **Install dependencies for all packages:**
