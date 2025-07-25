@@ -1,7 +1,8 @@
-import { useTheme } from "@core/hooks/useTheme.ts";
-import { cn } from "@core/utils/cn.ts";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../core/hooks/useTheme.ts";
+import { useToggleVisibility } from "../core/hooks/useToggleVisiblility.ts";
+import { cn } from "../core/utils/cn.ts";
 import { Button } from "./UI/Button.tsx";
 import { Subtle } from "./UI/Typography/Subtle.tsx";
 
@@ -12,10 +13,16 @@ interface ThemeSwitcherProps {
   disableHover?: boolean;
 }
 
+const TOOLTIP_TIMEOUT = 2000; // 2 seconds
+
 export default function ThemeSwitcher({
   className: passedClassName = "",
   disableHover = false,
 }: ThemeSwitcherProps) {
+  const [showTooltip, toggleShowTooltip] = useToggleVisibility({
+    timeout: TOOLTIP_TIMEOUT,
+  });
+
   const { preference, setPreference } = useTheme();
   const { t } = useTranslation("ui");
 
@@ -35,8 +42,10 @@ export default function ThemeSwitcher({
   const toggleTheme = () => {
     const preferences: ThemePreference[] = ["light", "dark", "system"];
     const currentIndex = preferences.indexOf(preference);
-    const nextPreference = preferences[(currentIndex + 1) % preferences.length];
+    const nextPreference =
+      preferences[(currentIndex + 1) % preferences.length] ?? "system";
     setPreference(nextPreference);
+    toggleShowTooltip();
   };
 
   const preferenceDisplayMap: Record<ThemePreference, string> = {
@@ -65,12 +74,12 @@ export default function ThemeSwitcher({
       <span
         data-label="theme-preference-tooltip"
         className={cn(
-          "transition-opacity duration-150",
+          "transition-opacity duration-150 hidden",
           "block absolute w-max max-w-xs",
           "p-1 text-xs text-white dark:text-black bg-black dark:bg-white",
           "rounded-md shadow-lg",
           "left-1/2 -translate-x-1/2 -top-8",
-          "opacity-0",
+          showTooltip ? "visible" : "hidden opacity-0",
         )}
       >
         {currentDisplayPreference}
