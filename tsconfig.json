@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.base.json",
+
+  "files": [],
+  "references": [
+    { "path": "packages/web" },
+    { "path": "packages/transport-deno" },
+    { "path": "packages/transport-node" },
+    { "path": "packages/transport-web-serial" },
+    { "path": "packages/transport-web-bluetooth" },
+    { "path": "packages/transport-http" }
+  ]
+}
