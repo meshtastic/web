@@ -41,7 +41,7 @@ const RoutePath = ({ title, from, to, path, snr }: RoutePathProps) => {
         <span key={getNode(hop)?.num ?? hop}>
           <p>
             {getNode(hop)?.user?.longName ??
-              `${t("traceRoute.nodeUnknownPrefix")}${numberToHexUnpadded(hop)}`}
+              `${t("unknown.longName")} (!${numberToHexUnpadded(hop)})`}
           </p>
           <p>
             ↓ {snr?.[i + 1] ?? t("unknown.num")}

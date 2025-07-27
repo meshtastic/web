@@ -12,7 +12,9 @@ export class TransportHTTP implements Types.Transport {
     tls?: boolean,
   ): Promise<TransportHTTP> {
     const connectionUrl = `${tls ? "https" : "http"}://${address}`;
-    await fetch(`${connectionUrl}/json/report`);
+    await fetch(`${connectionUrl}/api/v1/toradio`, {
+      method: "OPTIONS",
+    });
     await Promise.resolve();
     return new TransportHTTP(connectionUrl);
   }

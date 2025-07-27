@@ -1,7 +1,6 @@
-import { Logger } from "tslog";
-
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
+import { Logger } from "tslog";
 
 import { Constants } from "./constants.ts";
 import type { Destination, PacketMetadata, Transport } from "./types.ts";
@@ -39,6 +38,8 @@ export class MeshDevice {
   public events: EventSystem;
 
   public xModem: Xmodem;
+
+  private _heartbeatIntervalId: ReturnType<typeof setInterval> | undefined;
 
   constructor(transport: Transport, configId?: number) {
     this.log = new Logger({
@@ -742,6 +743,18 @@ export class MeshDevice {
   }
 
   /**
+   * Initializes the heartbeat interval, which sends a heartbeat ping every interval milliseconds.
+   */
+  public setHeartbeatInterval(interval: number): void {
+    if (this._heartbeatIntervalId !== undefined) {
+      clearInterval(this._heartbeatIntervalId);
+    }
+    this._heartbeatIntervalId = setInterval(() => {
+      this.heartbeat();
+    }, interval);
+  }
+
+  /**
    * Sends a trace route packet to the designated node
    */
   public async traceRoute(destination: number): Promise<number> {
@@ -798,6 +811,11 @@ export class MeshDevice {
   /**  Disconnects from the device **/
   public async disconnect(): Promise<void> {
     this.log.debug(Emitter[Emitter.Disconnect], "🔌 Disconnecting from device");
+
+    if (this._heartbeatIntervalId !== undefined) {
+      clearInterval(this._heartbeatIntervalId);
+    }
+
     this.complete();
     await this.transport.toDevice.close();
   }

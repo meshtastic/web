@@ -14,14 +14,14 @@
 
 	"homepage": "https://meshtastic.org",
 	"scripts": {
-		"build": "bunx --bun vite build",
+		"build": "vite build",
 		"build:analyze": "BUNDLE_ANALYZE=true bun run build",
 		"check": "biome check src/",
 		"check:fix": "biome check --write src/",
-		"dev": "bunx --bun vite",
-		"test": "bunx --bun vitest",
+		"dev": "vite",
+		"test": "vitest",
 		"ts:check": "bun run tsc --noEmit",
-		"preview": "bunx --bun vite preview",
+		"preview": "vite preview",
 		"generate:routes": "bun @tanstack/router-cli generate --outDir src/ routes --rootRoutePath /",
 		"package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
 	},
