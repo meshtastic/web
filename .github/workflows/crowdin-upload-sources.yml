@@ -5,7 +5,7 @@ on:
     # Monitor all .json files within the /i18n/locales/en/ directory.
     # This ensures the workflow triggers if any the English namespace files are modified on the main branch.
     paths:
-      - "/i18n/locales/en/*.json"
+      - "/packages/web/public/i18n/locales/en/*.json"
     branches: [main]
   workflow_dispatch: # Allow manual triggering
 

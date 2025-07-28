@@ -6,5 +6,5 @@ base_url: "https://meshtastic.crowdin.com/api/v2"
 preserve_hierarchy: true
 
 files:
-  - source: "/i18n/locales/en/*.json"
-    translation: "/i18n/locales/%locale%/%original_file_name%"
+  - source: "/public/i18n/locales/en/*.json"
+    translation: "/public/i18n/locales/%locale%/%original_file_name%"
