@@ -134,7 +134,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
         minute: "2-digit",
         hour12: config?.display?.use12hClock ?? true,
       }) ?? "",
-    [messageDate, locale],
+    [messageDate, locale, config?.display?.use12hClock],
   );
 
   const fullDateTime = useMemo(

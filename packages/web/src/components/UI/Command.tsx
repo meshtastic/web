@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogTitle } from "@components/UI/Dialog.tsx";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { cn } from "@core/utils/cn.ts";
 import type { DialogProps } from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
 import * as React from "react";

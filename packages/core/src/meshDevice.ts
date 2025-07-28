@@ -202,7 +202,7 @@ export class MeshDevice {
     });
 
     if (echoResponse) {
-      meshPacket.rxTime = Math.trunc(new Date().getTime() / 1000);
+      meshPacket.rxTime = Math.trunc(Date.now() / 1000);
       this.handleMeshPacket(meshPacket);
     }
     return await this.sendRaw(

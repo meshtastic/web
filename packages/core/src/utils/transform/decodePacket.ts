@@ -1,6 +1,6 @@
 import { fromBinary } from "@bufbuild/protobuf";
-import { Constants, Protobuf, Types } from "../../../mod.ts";
 import type { MeshDevice } from "../../../mod.ts";
+import { Constants, Protobuf, Types } from "../../../mod.ts";
 import type { DeviceOutput } from "../../types.ts";
 
 export const decodePacket = (device: MeshDevice) =>
