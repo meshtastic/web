@@ -1,13 +1,13 @@
 {
 	"deleteMessages": {
 		"description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-		"title": "Очистити всі повідомлення"
+		"title": "Clear All Messages"
 	},
 	"deviceName": {
 		"description": "The Device will restart once the config is saved.",
-		"longName": "Довга назва",
-		"shortName": "Коротка назва",
-		"title": "Змінити назву пристрою",
+		"longName": "Long Name",
+		"shortName": "Short Name",
+		"title": "Change Device Name",
 		"validation": {
 			"longNameMax": "Long name must not be more than 40 characters",
 			"shortNameMax": "Short name must not be more than 4 characters",
@@ -20,22 +20,22 @@
 		"error": {
 			"invalidUrl": "Invalid Meshtastic URL"
 		},
-		"channelPrefix": "Канал: ",
+		"channelPrefix": "Channel: ",
 		"channelSetUrl": "Channel Set/QR Code URL",
-		"channels": "Канали:",
+		"channels": "Channels:",
 		"usePreset": "Use Preset?",
 		"title": "Import Channel Set"
 	},
 	"locationResponse": {
-		"title": "Розташування: {{identifier}}",
-		"altitude": "Висота: ",
-		"coordinates": "Координати: ",
+		"title": "Location: {{identifier}}",
+		"altitude": "Altitude: ",
+		"coordinates": "Coordinates: ",
 		"noCoordinates": "No Coordinates"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Regenerate Pre-Shared Key?",
 		"description": "Are you sure you want to regenerate the pre-shared key?",
-		"regenerate": "Перегенерувати"
+		"regenerate": "Regenerate"
 	},
 	"newDeviceDialog": {
 		"title": "Connect New Device",
@@ -43,9 +43,9 @@
 		"http": "http",
 		"tabHttp": "HTTP",
 		"tabBluetooth": "Bluetooth",
-		"tabSerial": "Серійний порт",
-		"useHttps": "Використовувати HTTPS",
-		"connecting": "Підключення...",
+		"tabSerial": "Serial",
+		"useHttps": "Use HTTPS",
+		"connecting": "Connecting...",
 		"connect": "Connect",
 		"connectionFailedAlert": {
 			"title": "Connection Failed",
@@ -62,12 +62,12 @@
 		},
 		"serialConnection": {
 			"noDevicesPaired": "No devices paired yet.",
-			"newDeviceButton": "Новий пристрій",
+			"newDeviceButton": "New device",
 			"deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
 		},
 		"bluetoothConnection": {
 			"noDevicesPaired": "No devices paired yet.",
-			"newDeviceButton": "Новий пристрій",
+			"newDeviceButton": "New device",
 			"connectionFailed": "Connection failed",
 			"deviceDisconnected": "Device disconnected",
 			"unknownDevice": "Unknown Device",
@@ -81,8 +81,8 @@
 		}
 	},
 	"nodeDetails": {
-		"message": "Повідомлення",
-		"requestPosition": "Запитати позицію",
+		"message": "Mensagem",
+		"requestPosition": "Request Position",
 		"traceRoute": "Trace Route",
 		"airTxUtilization": "Air TX utilization",
 		"allRawMetrics": "All Raw Metrics:",
@@ -97,7 +97,7 @@
 		"position": "Position:",
 		"role": "Role: ",
 		"uptime": "Uptime: ",
-		"voltage": "Напруга",
+		"voltage": "Voltagem",
 		"title": "Node Details for {{identifier}}",
 		"ignoreNode": "Ignore node",
 		"removeNode": "Remove node",
@@ -129,16 +129,16 @@
 		"replaceChannels": "Replace Channels",
 		"description": "The current LoRa configuration will also be shared.",
 		"sharableUrl": "Sharable URL",
-		"title": "Згенерувати QR-код"
+		"title": "Generate QR Code"
 	},
 	"rebootOta": {
-		"title": "Запланувати перезавантаження",
+		"title": "Schedule Reboot",
 		"description": "Reboot the connected node after a delay into OTA (Over-the-Air) mode.",
-		"enterDelay": "Введіть затримку (сек)",
+		"enterDelay": "Enter delay (sec)",
 		"scheduled": "Reboot has been scheduled"
 	},
 	"reboot": {
-		"title": "Запланувати перезавантаження",
+		"title": "Schedule Reboot",
 		"description": "Reboot the connected node after x minutes."
 	},
 	"refreshKeys": {
@@ -155,7 +155,7 @@
 		"title": "Remove Node?"
 	},
 	"shutdown": {
-		"title": "Розклад вимкнення",
+		"title": "Schedule Shutdown",
 		"description": "Turn off the connected node after x minutes."
 	},
 	"traceRoute": {
@@ -166,17 +166,17 @@
 		"title": "Traceroute: {{identifier}}"
 	},
 	"unsafeRoles": {
-		"confirmUnderstanding": "Я знаю, що роблю",
+		"confirmUnderstanding": "Yes, I know what I'm doing",
 		"conjunction": " and the blog post about ",
 		"postamble": " and understand the implications of changing the role.",
 		"preamble": "I have read the ",
 		"choosingRightDeviceRole": "Choosing The Right Device Role",
 		"deviceRoleDocumentation": "Device Role Documentation",
-		"title": "Ви впевнені?"
+		"title": "Você tem certeza?"
 	},
 	"managedMode": {
-		"confirmUnderstanding": "Я знаю, що роблю",
-		"title": "Ви впевнені?",
+		"confirmUnderstanding": "Yes, I know what I'm doing",
+		"title": "Você tem certeza?",
 		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
 	}
 }

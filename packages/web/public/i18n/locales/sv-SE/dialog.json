@@ -7,7 +7,13 @@
 		"description": "Enheten kommer att starta om när inställningarna har sparats.",
 		"longName": "Långt namn",
 		"shortName": "Kort namn",
-		"title": "Ändra enhetens namn"
+		"title": "Ändra enhetens namn",
+		"validation": {
+			"longNameMax": "Long name must not be more than 40 characters",
+			"shortNameMax": "Short name must not be more than 4 characters",
+			"longNameMin": "Long name must have at least 1 character",
+			"shortNameMin": "Short name must have at least 1 character"
+		}
 	},
 	"import": {
 		"description": "Den aktuella LoRa konfigurationen kommer att skrivas över.",
@@ -21,9 +27,10 @@
 		"title": "Importera kanaluppsättning"
 	},
 	"locationResponse": {
+		"title": "Plats: {{identifier}}",
 		"altitude": "Höjd:",
 		"coordinates": "Koordinater: ",
-		"title": "Plats: {{identifier}}"
+		"noCoordinates": "No Coordinates"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Förnya nyckel?",
@@ -60,11 +67,15 @@
 		},
 		"bluetoothConnection": {
 			"noDevicesPaired": "Inga enheter parkopplade ännu.",
-			"newDeviceButton": "Ny enhet"
+			"newDeviceButton": "Ny enhet",
+			"connectionFailed": "Connection failed",
+			"deviceDisconnected": "Device disconnected",
+			"unknownDevice": "Unknown Device",
+			"errorLoadingDevices": "Error loading devices",
+			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
 		"validation": {
-			"requiresWebBluetooth": "Den här anslutningstypen kräver <0>Web Bluetooth</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
-			"requiresWebSerial": "Den här anslutningstypen kräver <0>Web Serial</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
+			"requiresFeatures": "Den här anslutningstypen kräver <0></0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
 			"requiresSecureContext": "Denna applikation kräver en <0>säker kontext</0>. Anslut med HTTPS eller localhost.",
 			"additionallyRequiresSecureContext": "Dessutom kräver den ett <0>säker kontext</0>. Vänligen anslut med HTTPS eller localhost."
 		}
@@ -166,6 +177,6 @@
 	"managedMode": {
 		"confirmUnderstanding": "Ja, jag vet vad jag gör",
 		"title": "Är du säker?",
-		"description": "Aktivering av fjärrhanterat läge blockerar klienter (inklusive webbklienten) från att skriva inställningar till en radio. När detta är aktiverat kan enhetens inställningar <bold>endast</bold> ändras via fjärradministratörsmeddelanden. Den här inställningen krävs inte för fjärradministration."
+		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
 	}
 }

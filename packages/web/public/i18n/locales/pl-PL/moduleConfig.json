@@ -25,15 +25,15 @@
 			"description": "Sets the current for the LED output. Default is 10"
 		},
 		"red": {
-			"label": "Red",
+			"label": "Czerwony",
 			"description": "Sets the red LED level. Values are 0-255"
 		},
 		"green": {
-			"label": "Green",
+			"label": "Zielony",
 			"description": "Sets the green LED level. Values are 0-255"
 		},
 		"blue": {
-			"label": "Blue",
+			"label": "Niebieski",
 			"description": "Sets the blue LED level. Values are 0-255"
 		}
 	},
@@ -279,16 +279,16 @@
 					"metric_m200": "Within 200 m",
 					"metric_m90": "Within 90 m",
 					"metric_m50": "Within 50 m",
-					"imperial_mi15": "Within 15 miles",
-					"imperial_mi7_3": "Within 7.3 miles",
-					"imperial_mi3_6": "Within 3.6 miles",
-					"imperial_mi1_8": "Within 1.8 miles",
-					"imperial_mi0_9": "Within 0.9 miles",
-					"imperial_mi0_5": "Within 0.5 miles",
-					"imperial_mi0_2": "Within 0.2 miles",
-					"imperial_ft600": "Within 600 feet",
-					"imperial_ft300": "Within 300 feet",
-					"imperial_ft150": "Within 150 feet"
+					"imperial_mi15": "W zasięgu 15 mil",
+					"imperial_mi7_3": "W zasięgu 7,3 mil",
+					"imperial_mi3_6": "W zasięgu 3,6 mil",
+					"imperial_mi1_8": "W zasięgu 1,8 mil",
+					"imperial_mi0_9": "W zasięgu 0,9 mil",
+					"imperial_mi0_5": "W zasięgu 0,5 mili",
+					"imperial_mi0_2": "W zasięgu 0,2 mil",
+					"imperial_ft600": "W zasięgu 600 stóp",
+					"imperial_ft300": "W zasięgu 300 stóp",
+					"imperial_ft150": "W zasięgu 150 stóp"
 				}
 			}
 		}

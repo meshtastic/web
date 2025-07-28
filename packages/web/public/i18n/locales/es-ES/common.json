@@ -12,7 +12,7 @@
 		"export": "Export",
 		"generate": "Generate",
 		"regenerate": "Regenerate",
-		"import": "Import",
+		"import": "Importar",
 		"message": "Mensaje",
 		"now": "Now",
 		"ok": "Vale",
@@ -23,7 +23,7 @@
 		"requestPosition": "Request Position",
 		"reset": "Reiniciar",
 		"save": "Guardar",
-		"scanQr": "Scan QR Code",
+		"scanQr": "Escanear el código QR",
 		"traceRoute": "Trace Route",
 		"submit": "Submit"
 	},

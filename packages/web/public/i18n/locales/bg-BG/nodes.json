@@ -25,7 +25,7 @@
 			"mqtt": "MQTT"
 		},
 		"elevation": {
-			"label": "Elevation"
+			"label": "Височина"
 		},
 		"channelUtil": {
 			"label": "Channel Util"
@@ -44,7 +44,7 @@
 			"macAddress": "MAC адрес"
 		},
 		"connectionStatus": {
-			"direct": "Direct",
+			"direct": "Директно",
 			"away": "away",
 			"unknown": "-",
 			"viaMqtt": ", чрез MQTT"

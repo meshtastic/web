@@ -23,7 +23,7 @@
 		"deviceInfo": {
 			"volts": "{{voltage}} volts",
 			"firmware": {
-				"title": "Firmware",
+				"title": "Oprogramowanie",
 				"version": "v{{version}}",
 				"buildDate": "Build date: {{date}}"
 			},
@@ -84,8 +84,8 @@
 		"favoriteNode": {
 			"title": "{{action}} {{nodeName}} {{direction}} favorites.",
 			"action": {
-				"added": "Added",
-				"removed": "Removed",
+				"added": "Dodano",
+				"removed": "Usunięto",
 				"to": "to",
 				"from": "from"
 			}
@@ -93,8 +93,8 @@
 		"ignoreNode": {
 			"title": "{{action}} {{nodeName}} {{direction}} ignore list",
 			"action": {
-				"added": "Added",
-				"removed": "Removed",
+				"added": "Dodano",
+				"removed": "Usunięto",
 				"to": "to",
 				"from": "from"
 			}

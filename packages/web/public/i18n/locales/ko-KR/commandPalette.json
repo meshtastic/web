@@ -1,50 +1,51 @@
 {
-	"emptyState": "No results found.",
-	"page": {
-		"title": "Command Menu"
-	},
-	"pinGroup": {
-		"label": "Pin command group"
-	},
-	"unpinGroup": {
-		"label": "Unpin command group"
-	},
-	"goto": {
-		"label": "Goto",
-		"command": {
-			"messages": "메시지",
-			"map": "지도",
-			"config": "Config",
-			"channels": "채널",
-			"nodes": "Nodes"
-		}
-	},
-	"manage": {
-		"label": "Manage",
-		"command": {
-			"switchNode": "Switch Node",
-			"connectNewNode": "Connect New Node"
-		}
-	},
-	"contextual": {
-		"label": "Contextual",
-		"command": {
-			"qrCode": "QR Code",
-			"qrGenerator": "Generator",
-			"qrImport": "불러오기",
-			"scheduleShutdown": "Schedule Shutdown",
-			"scheduleReboot": "Schedule Reboot",
-			"rebootToOtaMode": "Reboot To OTA Mode",
-			"resetNodeDb": "Reset Node DB",
-			"factoryResetDevice": "Factory Reset Device",
-			"factoryResetConfig": "Factory Reset Config"
-		}
-	},
-	"debug": {
-		"label": "Debug",
-		"command": {
-			"reconfigure": "Reconfigure",
-			"clearAllStoredMessages": "Clear All Stored Message"
-		}
-	}
+  "emptyState": "검색된 결과 없음.",
+  "page": {
+    "title": "명령 메뉴"
+  },
+  "pinGroup": {
+    "label": "명령 그룹 고정"
+  },
+  "unpinGroup": {
+    "label": "명령 그룹 고정 해제"
+  },
+  "goto": {
+    "label": "메뉴",
+    "command": {
+      "messages": "메시지기기",
+      "map": "지도",
+      "config": "설정",
+      "channels": "채널",
+      "nodes": "노드"
+    }
+  },
+  "manage": {
+    "label": "관리",
+    "command": {
+      "switchNode": "노드 변경",
+      "connectNewNode": "새로운 노드 연결"
+    }
+  },
+  "contextual": {
+    "label": "관련 기능",
+    "command": {
+      "qrCode": "QR 코드",
+      "qrGenerator": "생성",
+      "qrImport": "불러오기",
+      "scheduleShutdown": "종료 예약",
+      "scheduleReboot": "재부팅 예약",
+      "rebootToOtaMode": "OTA 모드로 재부팅",
+      "resetNodeDb": "노드 목록 초기화",
+      "factoryResetDevice": "공장 초기화",
+      "factoryResetConfig": "설정 초기",
+      "disconnect": "연결 끊기"
+    }
+  },
+  "debug": {
+    "label": "디버그",
+    "command": {
+      "reconfigure": "재설정",
+      "clearAllStoredMessages": "저장된 모든 메시지 삭제"
+    }
+  }
 }

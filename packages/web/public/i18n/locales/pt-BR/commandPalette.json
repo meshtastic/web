@@ -12,11 +12,11 @@
   "goto": {
     "label": "Goto",
     "command": {
-      "messages": "Zprávy",
+      "messages": "Mensagens",
       "map": "Mapa",
       "config": "Config",
-      "channels": "Kanály",
-      "nodes": "Uzly"
+      "channels": "Canais",
+      "nodes": "Nós"
     }
   },
   "manage": {
@@ -31,14 +31,14 @@
     "command": {
       "qrCode": "QR Code",
       "qrGenerator": "Generator",
-      "qrImport": "Import",
+      "qrImport": "Importar",
       "scheduleShutdown": "Schedule Shutdown",
       "scheduleReboot": "Schedule Reboot",
       "rebootToOtaMode": "Reboot To OTA Mode",
       "resetNodeDb": "Reset Node DB",
       "factoryResetDevice": "Factory Reset Device",
       "factoryResetConfig": "Factory Reset Config",
-      "disconnect": "Disconnect"
+      "disconnect": "Desconectar"
     }
   },
   "debug": {

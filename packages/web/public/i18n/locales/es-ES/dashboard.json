@@ -3,8 +3,8 @@
 		"title": "Connected Devices",
 		"description": "Manage your connected Meshtastic devices.",
 		"connectionType_ble": "BLE",
-		"connectionType_serial": "Serial",
-		"connectionType_network": "Red",
+		"connectionType_serial": "Conexión Serial",
+		"connectionType_network": "Conexión Red",
 		"noDevicesTitle": "No devices connected",
 		"noDevicesDescription": "Connect a new device to get started.",
 		"button_newConnection": "New Connection"

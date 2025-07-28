@@ -1,50 +1,51 @@
 {
-	"emptyState": "No results found.",
-	"page": {
-		"title": "Command Menu"
-	},
-	"pinGroup": {
-		"label": "Pin command group"
-	},
-	"unpinGroup": {
-		"label": "Unpin command group"
-	},
-	"goto": {
-		"label": "Goto",
-		"command": {
-			"messages": "Mensajes",
-			"map": "Mapa",
-			"config": "Config",
-			"channels": "Canales",
-			"nodes": "Nodes"
-		}
-	},
-	"manage": {
-		"label": "Manage",
-		"command": {
-			"switchNode": "Switch Node",
-			"connectNewNode": "Connect New Node"
-		}
-	},
-	"contextual": {
-		"label": "Contextual",
-		"command": {
-			"qrCode": "QR Code",
-			"qrGenerator": "Generator",
-			"qrImport": "Import",
-			"scheduleShutdown": "Schedule Shutdown",
-			"scheduleReboot": "Schedule Reboot",
-			"rebootToOtaMode": "Reboot To OTA Mode",
-			"resetNodeDb": "Reset Node DB",
-			"factoryResetDevice": "Factory Reset Device",
-			"factoryResetConfig": "Factory Reset Config"
-		}
-	},
-	"debug": {
-		"label": "Debug",
-		"command": {
-			"reconfigure": "Reconfigure",
-			"clearAllStoredMessages": "Clear All Stored Message"
-		}
-	}
+  "emptyState": "No results found.",
+  "page": {
+    "title": "Command Menu"
+  },
+  "pinGroup": {
+    "label": "Pin command group"
+  },
+  "unpinGroup": {
+    "label": "Unpin command group"
+  },
+  "goto": {
+    "label": "Goto",
+    "command": {
+      "messages": "Mensajes",
+      "map": "Mapa",
+      "config": "Config",
+      "channels": "Canales",
+      "nodes": "Nodos"
+    }
+  },
+  "manage": {
+    "label": "Manage",
+    "command": {
+      "switchNode": "Switch Node",
+      "connectNewNode": "Connect New Node"
+    }
+  },
+  "contextual": {
+    "label": "Contextual",
+    "command": {
+      "qrCode": "QR Code",
+      "qrGenerator": "Generator",
+      "qrImport": "Importar",
+      "scheduleShutdown": "Schedule Shutdown",
+      "scheduleReboot": "Schedule Reboot",
+      "rebootToOtaMode": "Reboot To OTA Mode",
+      "resetNodeDb": "Reset Node DB",
+      "factoryResetDevice": "Factory Reset Device",
+      "factoryResetConfig": "Factory Reset Config",
+      "disconnect": "Desconectar"
+    }
+  },
+  "debug": {
+    "label": "Depuración",
+    "command": {
+      "reconfigure": "Reconfigure",
+      "clearAllStoredMessages": "Clear All Stored Message"
+    }
+  }
 }

@@ -1,29 +1,29 @@
 {
 	"button": {
-		"apply": "申请",
+		"apply": "Aplicar",
 		"backupKey": "Backup Key",
-		"cancel": "取消",
+		"cancel": "Cancelar",
 		"clearMessages": "Clear Messages",
-		"close": "关闭",
+		"close": "Fechar",
 		"confirm": "Confirm",
-		"delete": "删除",
-		"dismiss": "收起键盘",
-		"download": "下载",
+		"delete": "Excluir",
+		"dismiss": "Ignorar",
+		"download": "Baixar",
 		"export": "Export",
 		"generate": "Generate",
 		"regenerate": "Regenerate",
-		"import": "导入",
-		"message": "信息",
+		"import": "Importar",
+		"message": "Mensagem",
 		"now": "Now",
-		"ok": "确定",
+		"ok": "Ok",
 		"print": "Print",
 		"rebootOtaNow": "Reboot to OTA Mode Now",
-		"remove": "移除",
+		"remove": "Excluir",
 		"requestNewKeys": "Request New Keys",
 		"requestPosition": "Request Position",
-		"reset": "重置",
-		"save": "保存",
-		"scanQr": "扫描二维码",
+		"reset": "Redefinir",
+		"save": "Salvar",
+		"scanQr": "Escanear Código QR",
 		"traceRoute": "Trace Route",
 		"submit": "Submit"
 	},
@@ -57,7 +57,7 @@
 			"plural": "Minutes"
 		},
 		"hour": {
-			"one": "小时",
+			"one": "Hour",
 			"plural": "Hours"
 		},
 		"millisecond": {
@@ -93,13 +93,13 @@
 		}
 	},
 	"security": {
-		"0bit": "空",
+		"0bit": "Empty",
 		"8bit": "8 bit",
 		"128bit": "128 bit",
 		"256bit": "256 bit"
 	},
 	"unknown": {
-		"longName": "未知",
+		"longName": "Desconhecido",
 		"shortName": "UNK",
 		"notAvailable": "N/A",
 		"num": "??"

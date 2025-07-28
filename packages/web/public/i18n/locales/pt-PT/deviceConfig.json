@@ -1,6 +1,6 @@
 {
 	"page": {
-		"title": "Configuration",
+		"title": "Configuração",
 		"tabBluetooth": "Bluetooth",
 		"tabDevice": "Dispositivo",
 		"tabDisplay": "Ecrã",
@@ -11,11 +11,11 @@
 		"tabSecurity": "Segurança"
 	},
 	"sidebar": {
-		"label": "Modules"
+		"label": "Módulos"
 	},
 	"device": {
-		"title": "Device Settings",
-		"description": "Settings for the device",
+		"title": "Definições do dispositivo",
+		"description": "Configurações para o dispositivo",
 		"buttonPin": {
 			"description": "Button pin override",
 			"label": "Button Pin"
@@ -111,7 +111,7 @@
 		},
 		"twelveHourClock": {
 			"description": "Use 12-hour clock format",
-			"label": "12-Hour Clock"
+			"label": "Relógio 12-Horas"
 		},
 		"wakeOnTapOrMotion": {
 			"description": "Wake the device on tap or motion",

@@ -1,50 +1,51 @@
 {
-	"emptyState": "Няма намерени резултати.",
-	"page": {
-		"title": "Command Menu"
-	},
-	"pinGroup": {
-		"label": "Pin command group"
-	},
-	"unpinGroup": {
-		"label": "Unpin command group"
-	},
-	"goto": {
-		"label": "Goto",
-		"command": {
-			"messages": "Съобщения",
-			"map": "Карта",
-			"config": "Конфигурация",
-			"channels": "Канали",
-			"nodes": "Възли"
-		}
-	},
-	"manage": {
-		"label": "Управление",
-		"command": {
-			"switchNode": "Switch Node",
-			"connectNewNode": "Свързване на нов възел"
-		}
-	},
-	"contextual": {
-		"label": "Contextual",
-		"command": {
-			"qrCode": "QR код",
-			"qrGenerator": "Генератор",
-			"qrImport": "Импортиране",
-			"scheduleShutdown": "Планирано изключване",
-			"scheduleReboot": "Планирано рестартиране",
-			"rebootToOtaMode": "Рестартиране в режим OTA",
-			"resetNodeDb": "Нулиране на базата данни с възли",
-			"factoryResetDevice": "Фабрично нулиране на устройството",
-			"factoryResetConfig": "Фабрично нулиране на конфигурацията"
-		}
-	},
-	"debug": {
-		"label": "Отстраняване на грешки",
-		"command": {
-			"reconfigure": "Преконфигуриране",
-			"clearAllStoredMessages": "Изчистване на всички съхранени съобщения"
-		}
-	}
+  "emptyState": "Няма намерени резултати.",
+  "page": {
+    "title": "Command Menu"
+  },
+  "pinGroup": {
+    "label": "Pin command group"
+  },
+  "unpinGroup": {
+    "label": "Unpin command group"
+  },
+  "goto": {
+    "label": "Goto",
+    "command": {
+      "messages": "Съобщения",
+      "map": "Карта",
+      "config": "Конфигурация",
+      "channels": "Канали",
+      "nodes": "Възли"
+    }
+  },
+  "manage": {
+    "label": "Управление",
+    "command": {
+      "switchNode": "Switch Node",
+      "connectNewNode": "Свързване на нов възел"
+    }
+  },
+  "contextual": {
+    "label": "Contextual",
+    "command": {
+      "qrCode": "QR код",
+      "qrGenerator": "Генератор",
+      "qrImport": "Импортиране",
+      "scheduleShutdown": "Планирано изключване",
+      "scheduleReboot": "Планирано рестартиране",
+      "rebootToOtaMode": "Рестартиране в режим OTA",
+      "resetNodeDb": "Нулиране на базата данни с възли",
+      "factoryResetDevice": "Фабрично нулиране на устройството",
+      "factoryResetConfig": "Фабрично нулиране на конфигурацията",
+      "disconnect": "Прекъсване"
+    }
+  },
+  "debug": {
+    "label": "Отстраняване на грешки",
+    "command": {
+      "reconfigure": "Преконфигуриране",
+      "clearAllStoredMessages": "Изчистване на всички съхранени съобщения"
+    }
+  }
 }

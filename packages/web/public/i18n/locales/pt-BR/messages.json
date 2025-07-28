@@ -12,11 +12,11 @@
 	},
 	"sendMessage": {
 		"placeholder": "Enter your message here...",
-		"sendButton": "Gönder"
+		"sendButton": "Enviar"
 	},
 	"actionsMenu": {
 		"addReactionLabel": "Add Reaction",
-		"replyLabel": "Yanıtla"
+		"replyLabel": "Responder"
 	},
 	"deliveryStatus": {
 		"delivered": {

@@ -82,21 +82,21 @@
 			"description": "Промяната в конфигурацията {{case}} е запазена."
 		},
 		"favoriteNode": {
-			"title": "{{action}} {{nodeName}} {{direction}} favorites.",
+			"title": "{{action}} {{nodeName}} {{direction}} любими.",
 			"action": {
-				"added": "Added",
-				"removed": "Removed",
-				"to": "to",
-				"from": "from"
+				"added": "Добавен",
+				"removed": "Премахнат",
+				"to": "в",
+				"from": "от"
 			}
 		},
 		"ignoreNode": {
-			"title": "{{action}} {{nodeName}} {{direction}} ignore list",
+			"title": "{{action}} {{nodeName}} {{direction}} списък с игнорирани",
 			"action": {
-				"added": "Added",
-				"removed": "Removed",
-				"to": "to",
-				"from": "from"
+				"added": "Добавен",
+				"removed": "Премахнат",
+				"to": "в",
+				"from": "от"
 			}
 		}
 	},
@@ -114,10 +114,10 @@
 			"label": "Показване на паролата"
 		},
 		"deliveryStatus": {
-			"delivered": "Delivered",
-			"failed": "Delivery Failed",
+			"delivered": "Доставено",
+			"failed": "Неуспешна доставка",
 			"waiting": "Изчакване",
-			"unknown": "Unknown"
+			"unknown": "Неизвестно"
 		}
 	},
 	"general": {
@@ -163,13 +163,13 @@
 		"label": "Използване на канала (%)"
 	},
 	"hops": {
-		"direct": "Direct",
+		"direct": "Директно",
 		"label": "Number of hops",
 		"text": "Number of hops: {{value}}"
 	},
 	"lastHeard": {
 		"label": "Последно чут",
-		"labelText": "Last heard: {{value}}",
+		"labelText": "Последно чут: {{value}}",
 		"nowLabel": "Сега"
 	},
 	"snr": {
@@ -204,9 +204,9 @@
 		"changeTheme": "Промяна на цветовата схема"
 	},
 	"errorPage": {
-		"title": "This is a little embarrassing...",
-		"description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
-		"description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
+		"title": "Това е малко смущаващо...",
+		"description1": "Наистина съжаляваме, но възникна грешка в web клиента, която доведе до срив. <br /> Това не би трябвало да се случва и работим усилено, за да го поправим.",
+		"description2": "Най-добрият начин да предотвратите това да се случи отново с вас или с някой друг е да ни съобщите за проблема.",
 		"reportInstructions": "Моля, включете следната информация в доклада си:",
 		"reportSteps": {
 			"step1": "Какво правехте, когато възникна грешката",

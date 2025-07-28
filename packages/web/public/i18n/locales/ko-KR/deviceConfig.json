@@ -1,8 +1,8 @@
 {
 	"page": {
-		"title": "Configuration",
+		"title": "설정",
 		"tabBluetooth": "블루투스",
-		"tabDevice": "기기",
+		"tabDevice": "장치",
 		"tabDisplay": "화면",
 		"tabLora": "LoRa",
 		"tabNetwork": "네트워크",
@@ -11,150 +11,150 @@
 		"tabSecurity": "보안"
 	},
 	"sidebar": {
-		"label": "Modules"
+		"label": "모듈"
 	},
 	"device": {
-		"title": "Device Settings",
-		"description": "Settings for the device",
+		"title": "장치 설정",
+		"description": "장치 설정",
 		"buttonPin": {
-			"description": "Button pin override",
-			"label": "Button Pin"
+			"description": "버튼 핀 오버라이드",
+			"label": "버튼 핀"
 		},
 		"buzzerPin": {
-			"description": "Buzzer pin override",
-			"label": "Buzzer Pin"
+			"description": "부저 핀 오버라이드",
+			"label": "부저 핀"
 		},
 		"disableTripleClick": {
-			"description": "Disable triple click",
-			"label": "Disable Triple Click"
+			"description": "세 번 클릭 끄기",
+			"label": "세 번 클릭 끄기"
 		},
 		"doubleTapAsButtonPress": {
-			"description": "Treat double tap as button press",
-			"label": "Double Tap as Button Press"
+			"description": "더블 탭하여 버튼 누름",
+			"label": "더블 탭하여 버튼 누름"
 		},
 		"ledHeartbeatDisabled": {
-			"description": "Disable default blinking LED",
-			"label": "LED Heartbeat Disabled"
+			"description": "기본 깜빡이는 LED를 비활성화",
+			"label": "LED 깜빡임 비활성화"
 		},
 		"nodeInfoBroadcastInterval": {
-			"description": "How often to broadcast node info",
-			"label": "Node Info Broadcast Interval"
+			"description": "노드 정보의 발송 주기를 설정",
+			"label": "노드 정보 발송 주기"
 		},
 		"posixTimezone": {
-			"description": "The POSIX timezone string for the device",
+			"description": "장치의 Posix Timezone String 입력",
 			"label": "POSIX 시간대"
 		},
 		"rebroadcastMode": {
-			"description": "How to handle rebroadcasting",
-			"label": "Rebroadcast Mode"
+			"description": "중계를 처리하는 방법 설정",
+			"label": "중계 모드"
 		},
 		"role": {
-			"description": "What role the device performs on the mesh",
+			"description": "해당 장치가 메쉬에서 수행하는 역할을 설정",
 			"label": "역할"
 		}
 	},
 	"bluetooth": {
-		"title": "Bluetooth Settings",
-		"description": "Settings for the Bluetooth module",
-		"note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+		"title": "블루투스 설정",
+		"description": "블루투스 설정",
+		"note": "참고: 일부 장치(ESP32)는 블루투스와 와이파이를 동시에 사용할 수 없습니다.",
 		"enabled": {
-			"description": "Enable or disable Bluetooth",
-			"label": "Enabled"
+			"description": "블루투스를 켜거나 끕니다.",
+			"label": "활성화"
 		},
 		"pairingMode": {
-			"description": "Pin selection behaviour.",
+			"description": "핀 선택",
 			"label": "페어링 모드"
 		},
 		"pin": {
-			"description": "Pin to use when pairing",
-			"label": "Pin"
+			"description": "페어링에 사용할 핀",
+			"label": "핀"
 		}
 	},
 	"display": {
-		"description": "Settings for the device display",
-		"title": "Display Settings",
+		"description": "장치의 디스플레이 설정",
+		"title": "디스플레이 설정",
 		"headingBold": {
-			"description": "Bolden the heading text",
-			"label": "Bold Heading"
+			"description": "상태표시줄 볼드체 적용하기",
+			"label": "상태표시줄 볼드체"
 		},
 		"carouselDelay": {
-			"description": "How fast to cycle through windows",
-			"label": "Carousel Delay"
+			"description": "화면 전환 사이클 시간을 입력",
+			"label": "전환 시간"
 		},
 		"compassNorthTop": {
-			"description": "Fix north to the top of compass",
-			"label": "Compass North Top"
+			"description": "나침반 상단을 북쪽으로 고정",
+			"label": "나침반 북쪽 고정"
 		},
 		"displayMode": {
-			"description": "Screen layout variant",
-			"label": "Display Mode"
+			"description": "스크린 레이아웃 변형",
+			"label": "디스플레이 모드"
 		},
 		"displayUnits": {
-			"description": "Display metric or imperial units",
-			"label": "Display Units"
+			"description": "단위 표시 형식",
+			"label": "단위 표시"
 		},
 		"flipScreen": {
-			"description": "Flip display 180 degrees",
-			"label": "Flip Screen"
+			"description": "화면 180도 뒤집기",
+			"label": "화면 뒤집기"
 		},
 		"gpsDisplayUnits": {
-			"description": "Coordinate display format",
-			"label": "GPS Display Units"
+			"description": "좌표 표시 형식",
+			"label": "GPS 표시 단위"
 		},
 		"oledType": {
-			"description": "Type of OLED screen attached to the device",
-			"label": "OLED Type"
+			"description": "장치에 부착된 OLED 화면의 유형",
+			"label": "OLED 타입"
 		},
 		"screenTimeout": {
-			"description": "Turn off the display after this long",
-			"label": "Screen Timeout"
+			"description": "디스플레이가 꺼지기까지 걸리는 시간",
+			"label": "화면 끄기 시간"
 		},
 		"twelveHourClock": {
-			"description": "Use 12-hour clock format",
-			"label": "12-Hour Clock"
+			"description": "12시간제 보기",
+			"label": "12시간제"
 		},
 		"wakeOnTapOrMotion": {
-			"description": "Wake the device on tap or motion",
-			"label": "Wake on Tap or Motion"
+			"description": "탭하거나 모션으로 깨우기",
+			"label": "탭하거나 모션으로 깨우기"
 		}
 	},
 	"lora": {
-		"title": "Mesh Settings",
-		"description": "Settings for the LoRa mesh",
+		"title": "Mesh 설정",
+		"description": "LoRa mesh 설정",
 		"bandwidth": {
-			"description": "Channel bandwidth in MHz",
+			"description": "채널 대역폭 MHz",
 			"label": "대역폭"
 		},
 		"boostedRxGain": {
-			"description": "Boosted RX gain",
-			"label": "Boosted RX Gain"
+			"description": "수신 부스트 gain",
+			"label": "수신 부스트 Gain"
 		},
 		"codingRate": {
-			"description": "The denominator of the coding rate",
-			"label": "Coding Rate"
+			"description": "Coding rate의 분모",
+			"label": "Coding rate"
 		},
 		"frequencyOffset": {
-			"description": "Frequency offset to correct for crystal calibration errors",
-			"label": "Frequency Offset"
+			"description": "크리스탈 교정 오차를 보정하기 위한 주파수 오프셋",
+			"label": "주파수 오프셋"
 		},
 		"frequencySlot": {
-			"description": "LoRa frequency channel number",
-			"label": "Frequency Slot"
+			"description": "LoRa 주파수 채널 번호",
+			"label": "주파수 슬롯"
 		},
 		"hopLimit": {
-			"description": "Maximum number of hops",
-			"label": "Hop Limit"
+			"description": "최고 hops 수",
+			"label": "Hop  제한"
 		},
 		"ignoreMqtt": {
-			"description": "Don't forward MQTT messages over the mesh",
+			"description": "MQTT로 부터 mesh로 메시지를를 전달하지 않습니다",
 			"label": "MQTT로 부터 수신 무시"
 		},
 		"modemPreset": {
-			"description": "Modem preset to use",
+			"description": "모뎀 프리셋 사용",
 			"label": "모뎀 프리셋"
 		},
 		"okToMqtt": {
-			"description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+			"description": "이 설정을 true로 하면 사용자가 패킷을 MQTT에 업로드하는 것을 허용하고, false 이면 원격 노드들은 패킷을 MQTT로 전달하지 않도록 요청됩니다",
 			"label": "MQTT로 전송 허용"
 		},
 		"overrideDutyCycle": {
@@ -162,118 +162,118 @@
 			"label": "Duty Cycle 무시"
 		},
 		"overrideFrequency": {
-			"description": "Override frequency",
-			"label": "Override Frequency"
+			"description": "해당 주파수 강제 설정",
+			"label": "주파수 오버라이드"
 		},
 		"region": {
-			"description": "Sets the region for your node",
+			"description": "당신의 노드의 지역을 설정하세요",
 			"label": "지역"
 		},
 		"spreadingFactor": {
 			"description": "Indicates the number of chirps per symbol",
-			"label": "Spreading Factor"
+			"label": "Spread factor"
 		},
 		"transmitEnabled": {
-			"description": "Enable/Disable transmit (TX) from the LoRa radio",
-			"label": "Transmit Enabled"
+			"description": "LoRa 전송(TX)을 활성화/비활성화합니다",
+			"label": "전송 활성화"
 		},
 		"transmitPower": {
-			"description": "Max transmit power",
-			"label": "Transmit Power"
+			"description": "최대 전송 출력",
+			"label": "전송 출력"
 		},
 		"usePreset": {
-			"description": "Use one of the predefined modem presets",
-			"label": "Use Preset"
+			"description": "사전 정의된 모뎀프리셋을 사용하세요",
+			"label": "프리셋 사용"
 		},
 		"meshSettings": {
-			"description": "Settings for the LoRa mesh",
-			"label": "Mesh Settings"
+			"description": "LoRa mesh 설정",
+			"label": "Mesh 설정"
 		},
 		"waveformSettings": {
-			"description": "Settings for the LoRa waveform",
-			"label": "Waveform Settings"
+			"description": "LoRa 파형 설정",
+			"label": "파형 설정"
 		},
 		"radioSettings": {
-			"label": "Radio Settings",
-			"description": "Settings for the LoRa radio"
+			"label": "무선 설정",
+			"description": "LoRa 무선 설정"
 		}
 	},
 	"network": {
-		"title": "WiFi Config",
-		"description": "WiFi radio configuration",
-		"note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+		"title": "WiFi 설정",
+		"description": "WiFi 설정",
+		"note": "참고: 일부 장치(ESP32)는 블루투스와 와이파이를 동시에 사용할 수 없습니다.",
 		"addressMode": {
-			"description": "Address assignment selection",
-			"label": "Address Mode"
+			"description": "주소 할당 선택",
+			"label": "주소 모드"
 		},
 		"dns": {
-			"description": "DNS Server",
+			"description": "DNS 서버",
 			"label": "DNS"
 		},
 		"ethernetEnabled": {
-			"description": "Enable or disable the Ethernet port",
-			"label": "Enabled"
+			"description": "이더넷 포트 활성화하거나 비활성화",
+			"label": "활성화"
 		},
 		"gateway": {
-			"description": "Default Gateway",
+			"description": "기본 게이트웨이",
 			"label": "게이트웨이"
 		},
 		"ip": {
-			"description": "IP Address",
+			"description": "IP 주소",
 			"label": "IP"
 		},
 		"psk": {
-			"description": "Network password",
+			"description": "네트워크 암호",
 			"label": "PSK"
 		},
 		"ssid": {
-			"description": "Network name",
+			"description": "네트워크 이름",
 			"label": "SSID"
 		},
 		"subnet": {
-			"description": "Subnet Mask",
+			"description": "서브넷 마스크",
 			"label": "서브넷"
 		},
 		"wifiEnabled": {
-			"description": "Enable or disable the WiFi radio",
-			"label": "Enabled"
+			"description": "WiFi를 활성화하거나 비활성화",
+			"label": "활성화"
 		},
 		"meshViaUdp": {
-			"label": "Mesh via UDP"
+			"label": "UDP를 통한 Mesh"
 		},
 		"ntpServer": {
-			"label": "NTP Server"
+			"label": "NTP 서버"
 		},
 		"rsyslogServer": {
-			"label": "Rsyslog Server"
+			"label": "Rsyslog 서버"
 		},
 		"ethernetConfigSettings": {
-			"description": "Ethernet port configuration",
-			"label": "Ethernet Config"
+			"description": "이더넷 포트 설정",
+			"label": "이더넷 설정"
 		},
 		"ipConfigSettings": {
-			"description": "IP configuration",
-			"label": "IP Config"
+			"description": "IP 설정",
+			"label": "IP 설정"
 		},
 		"ntpConfigSettings": {
-			"description": "NTP configuration",
-			"label": "NTP Config"
+			"description": "NTP 설정",
+			"label": "NTP 설정"
 		},
 		"rsyslogConfigSettings": {
-			"description": "Rsyslog configuration",
-			"label": "Rsyslog Config"
+			"description": "Rsyslog 설정",
+			"label": "Rsyslog 설정"
 		},
 		"udpConfigSettings": {
-			"description": "UDP over Mesh configuration",
+			"description": "UDP over Mesh 설정",
 			"label": "UDP 설정"
 		}
 	},
 	"position": {
-		"title": "Position Settings",
-		"description": "Settings for the position module",
+		"title": "위치 설정",
+		"description": "위치 설정",
 		"broadcastInterval": {
-			"description": "How often your position is sent out over the mesh",
-			"label": "Broadcast Interval"
+			"description": "메쉬를 통해 당신의 위치 정보가 전송되는 빈도",
+			"label": "전송 간격"
 		},
 		"enablePin": {
 			"description": "GPS module enable pin override",
@@ -357,7 +357,7 @@
 		},
 		"powerSavingEnabled": {
 			"description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
-			"label": "저젼력 모드 설정"
+			"label": "저전력 모드 설정"
 		},
 		"shutdownOnBatteryDelay": {
 			"description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
@@ -379,7 +379,7 @@
 	"security": {
 		"description": "Settings for the Security configuration",
 		"title": "Security Settings",
-		"button_backupKey": "Backup Key",
+		"button_backupKey": "백업 키",
 		"adminChannelEnabled": {
 			"description": "Allow incoming device control over the insecure legacy admin channel",
 			"label": "Allow Legacy Admin"

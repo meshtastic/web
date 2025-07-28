@@ -9,7 +9,7 @@
 		"tabNeighborInfo": "Neighbor Info",
 		"tabPaxcounter": "Paxcounter",
 		"tabRangeTest": "Тест дальності",
-		"tabSerial": "Serial",
+		"tabSerial": "Серійний порт",
 		"tabStoreAndForward": "S&F",
 		"tabTelemetry": "Телеметрія"
 	},
@@ -121,7 +121,7 @@
 		"title": "Detection Sensor Settings",
 		"description": "Settings for the Detection Sensor module",
 		"enabled": {
-			"label": "Enabled",
+			"label": "Увімкнено",
 			"description": "Enable or disable Detection Sensor Module"
 		},
 		"minimumBroadcastSecs": {
@@ -221,7 +221,7 @@
 		"title": "Налаштування MQTT",
 		"description": "Settings for the MQTT module",
 		"enabled": {
-			"label": "Enabled",
+			"label": "Увімкнено",
 			"description": "Enable or disable MQTT"
 		},
 		"address": {
@@ -279,16 +279,16 @@
 					"metric_m200": "Within 200 m",
 					"metric_m90": "Within 90 m",
 					"metric_m50": "Within 50 m",
-					"imperial_mi15": "Within 15 miles",
-					"imperial_mi7_3": "Within 7.3 miles",
-					"imperial_mi3_6": "Within 3.6 miles",
-					"imperial_mi1_8": "Within 1.8 miles",
-					"imperial_mi0_9": "Within 0.9 miles",
-					"imperial_mi0_5": "Within 0.5 miles",
-					"imperial_mi0_2": "Within 0.2 miles",
-					"imperial_ft600": "Within 600 feet",
-					"imperial_ft300": "Within 300 feet",
-					"imperial_ft150": "Within 150 feet"
+					"imperial_mi15": "У межах 15 миль",
+					"imperial_mi7_3": "У межах 7,3 милі",
+					"imperial_mi3_6": "У межах 3,6 милі",
+					"imperial_mi1_8": "У межах 1,8 милі",
+					"imperial_mi0_9": "У межах 0,9 милі",
+					"imperial_mi0_5": "У межах 0,5 милі",
+					"imperial_mi0_2": "У межах 0,2 милі",
+					"imperial_ft600": "У межах 600 фт",
+					"imperial_ft300": "У межах 300 фт",
+					"imperial_ft150": "У межах 150 фт"
 				}
 			}
 		}
@@ -297,7 +297,7 @@
 		"title": "Neighbor Info Settings",
 		"description": "Settings for the Neighbor Info module",
 		"enabled": {
-			"label": "Enabled",
+			"label": "Увімкнено",
 			"description": "Enable or disable Neighbor Info Module"
 		},
 		"updateInterval": {
@@ -365,7 +365,7 @@
 			"description": "The serial baud rate"
 		},
 		"timeout": {
-			"label": "Timeout",
+			"label": "Таймаут",
 			"description": "Seconds to wait before we consider your packet as 'done'"
 		},
 		"mode": {

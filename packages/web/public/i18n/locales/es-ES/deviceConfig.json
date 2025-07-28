@@ -1,129 +1,129 @@
 {
 	"page": {
-		"title": "Configuration",
+		"title": "Configuración",
 		"tabBluetooth": "Bluetooth",
 		"tabDevice": "Dispositivo",
 		"tabDisplay": "Pantalla",
 		"tabLora": "LoRa",
-		"tabNetwork": "Red",
+		"tabNetwork": "Conexión Red",
 		"tabPosition": "Posición",
-		"tabPower": "Energía",
+		"tabPower": "Consumo",
 		"tabSecurity": "Seguridad"
 	},
 	"sidebar": {
-		"label": "Modules"
+		"label": "Módulos"
 	},
 	"device": {
-		"title": "Device Settings",
-		"description": "Settings for the device",
+		"title": "Ajustes del dispositivo",
+		"description": "Ajustes del dispositivo",
 		"buttonPin": {
-			"description": "Button pin override",
-			"label": "Button Pin"
+			"description": "Sobrescribir pin de botón",
+			"label": "Pin del botón"
 		},
 		"buzzerPin": {
-			"description": "Buzzer pin override",
-			"label": "Buzzer Pin"
+			"description": "Sobrescribir pin del zumbador",
+			"label": "Pin del zumbador"
 		},
 		"disableTripleClick": {
-			"description": "Disable triple click",
-			"label": "Disable Triple Click"
+			"description": "Deshabilitar clic triple",
+			"label": "Deshabilitar clic triple"
 		},
 		"doubleTapAsButtonPress": {
-			"description": "Treat double tap as button press",
-			"label": "Double Tap as Button Press"
+			"description": "Tratar doble toque como botón presionado",
+			"label": "Doble toque como botón presionado"
 		},
 		"ledHeartbeatDisabled": {
-			"description": "Disable default blinking LED",
-			"label": "LED Heartbeat Disabled"
+			"description": "Deshabilitar parpadeo del LED predeterminado",
+			"label": "Deshabilitar LED de estado"
 		},
 		"nodeInfoBroadcastInterval": {
-			"description": "How often to broadcast node info",
-			"label": "Node Info Broadcast Interval"
+			"description": "Cada cuanto se transmite la información del nodo",
+			"label": "Intervalo de transmisión de información del nodo"
 		},
 		"posixTimezone": {
-			"description": "The POSIX timezone string for the device",
-			"label": "POSIX Timezone"
+			"description": "La zona horaria para el dispositivo en formato de cadena POSIX",
+			"label": "Zona horaria POSIX"
 		},
 		"rebroadcastMode": {
-			"description": "How to handle rebroadcasting",
-			"label": "Rebroadcast Mode"
+			"description": "Cómo manejar la retransmisión",
+			"label": "Modo de retransmisión"
 		},
 		"role": {
-			"description": "What role the device performs on the mesh",
-			"label": "Role"
+			"description": "Qué role realiza el dispositivo en la malla",
+			"label": "Rol"
 		}
 	},
 	"bluetooth": {
-		"title": "Bluetooth Settings",
-		"description": "Settings for the Bluetooth module",
-		"note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+		"title": "Ajustes de Bluetooth",
+		"description": "Ajustes del módulo de Bluetooth",
+		"note": "Nota: Algunos dispositivos (ESP32) no pueden usar Bluetooth y Wifi al mismo tiempo.",
 		"enabled": {
-			"description": "Enable or disable Bluetooth",
-			"label": "Enabled"
+			"description": "Habilitar o deshabilitar Bluetooth",
+			"label": "Habilitado"
 		},
 		"pairingMode": {
-			"description": "Pin selection behaviour.",
+			"description": "Selección del comportamiento del Pin.",
 			"label": "Modo de emparejamiento"
 		},
 		"pin": {
-			"description": "Pin to use when pairing",
+			"description": "Pin a usar al emparejar",
 			"label": "Pin"
 		}
 	},
 	"display": {
-		"description": "Settings for the device display",
-		"title": "Display Settings",
+		"description": "Ajustes de la pantalla del dispositivo",
+		"title": "Ajustes de pantalla",
 		"headingBold": {
-			"description": "Bolden the heading text",
-			"label": "Bold Heading"
+			"description": "Negrita en el texto del encabezado",
+			"label": "Encabezado en negrita"
 		},
 		"carouselDelay": {
-			"description": "How fast to cycle through windows",
-			"label": "Carousel Delay"
+			"description": "Que tan rápido cambiar entre pantallas",
+			"label": "Retraso del carrusel"
 		},
 		"compassNorthTop": {
-			"description": "Fix north to the top of compass",
-			"label": "Compass North Top"
+			"description": "Fijar el norte en la parte superior de la brújula",
+			"label": "Norte arriba de la brújula"
 		},
 		"displayMode": {
-			"description": "Screen layout variant",
-			"label": "Display Mode"
+			"description": "Variante del diseño de la pantalla",
+			"label": "Modo de visualización"
 		},
 		"displayUnits": {
-			"description": "Display metric or imperial units",
-			"label": "Display Units"
+			"description": "Mostrar unidades de medidas métricas o imperiales",
+			"label": "Unidades de medidas"
 		},
 		"flipScreen": {
-			"description": "Flip display 180 degrees",
-			"label": "Flip Screen"
+			"description": "Rotar pantalla 180 grados",
+			"label": "Rotar pantalla"
 		},
 		"gpsDisplayUnits": {
-			"description": "Coordinate display format",
-			"label": "GPS Display Units"
+			"description": "Formato de visualización de las coordenadas",
+			"label": "Unidades de visualización del GPS"
 		},
 		"oledType": {
-			"description": "Type of OLED screen attached to the device",
-			"label": "OLED Type"
+			"description": "Tipo de pantalla OLED conectada al dispositivo",
+			"label": "Tipo de OLED"
 		},
 		"screenTimeout": {
-			"description": "Turn off the display after this long",
-			"label": "Screen Timeout"
+			"description": "Apagar la pantalla después de este tiempo",
+			"label": "Tiempo de espera de la pantalla"
 		},
 		"twelveHourClock": {
-			"description": "Use 12-hour clock format",
-			"label": "12-Hour Clock"
+			"description": "Usar reloj con formato de 12 horas",
+			"label": "Reloj de 12 horas"
 		},
 		"wakeOnTapOrMotion": {
-			"description": "Wake the device on tap or motion",
-			"label": "Wake on Tap or Motion"
+			"description": "Despertar dispositivo al tocar o mover",
+			"label": "Despertar al mover o tocar"
 		}
 	},
 	"lora": {
-		"title": "Mesh Settings",
+		"title": "Ajustes de la Red",
 		"description": "Settings for the LoRa mesh",
 		"bandwidth": {
 			"description": "Channel bandwidth in MHz",
-			"label": "Bandwidth"
+			"label": "Ancho de Banda"
 		},
 		"boostedRxGain": {
 			"description": "Boosted RX gain",
@@ -147,7 +147,7 @@
 		},
 		"ignoreMqtt": {
 			"description": "Don't forward MQTT messages over the mesh",
-			"label": "Ignore MQTT"
+			"label": "Ignorar Paquetes MQTT"
 		},
 		"modemPreset": {
 			"description": "Modem preset to use",
@@ -155,11 +155,11 @@
 		},
 		"okToMqtt": {
 			"description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
-			"label": "OK to MQTT"
+			"label": "Permitir Subir Paquetes al MQTT"
 		},
 		"overrideDutyCycle": {
-			"description": "Override Duty Cycle",
-			"label": "Override Duty Cycle"
+			"description": "Sobreescribir el Tiempo de Trabajo",
+			"label": "Sobreescribir el Tiempo de Trabajo"
 		},
 		"overrideFrequency": {
 			"description": "Override frequency",
@@ -187,7 +187,7 @@
 		},
 		"meshSettings": {
 			"description": "Settings for the LoRa mesh",
-			"label": "Mesh Settings"
+			"label": "Ajustes de la Red"
 		},
 		"waveformSettings": {
 			"description": "Settings for the LoRa waveform",
@@ -201,7 +201,7 @@
 	"network": {
 		"title": "WiFi Config",
 		"description": "WiFi radio configuration",
-		"note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+		"note": "Nota: Algunos dispositivos (ESP32) no pueden usar Bluetooth y Wifi al mismo tiempo.",
 		"addressMode": {
 			"description": "Address assignment selection",
 			"label": "Address Mode"
@@ -212,11 +212,11 @@
 		},
 		"ethernetEnabled": {
 			"description": "Enable or disable the Ethernet port",
-			"label": "Enabled"
+			"label": "Habilitado"
 		},
 		"gateway": {
 			"description": "Default Gateway",
-			"label": "Gateway"
+			"label": "Puerta enlace"
 		},
 		"ip": {
 			"description": "IP Address",
@@ -224,19 +224,19 @@
 		},
 		"psk": {
 			"description": "Network password",
-			"label": "PSK"
+			"label": "PSK (Contraseña)"
 		},
 		"ssid": {
 			"description": "Network name",
-			"label": "SSID"
+			"label": "SSID (Nombre la Red)"
 		},
 		"subnet": {
 			"description": "Subnet Mask",
-			"label": "Subnet"
+			"label": "Subred"
 		},
 		"wifiEnabled": {
 			"description": "Enable or disable the WiFi radio",
-			"label": "Enabled"
+			"label": "Habilitado"
 		},
 		"meshViaUdp": {
 			"label": "Mesh via UDP"
@@ -328,7 +328,7 @@
 			"hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
 			"numSatellites": "Number of satellites",
 			"sequenceNumber": "Sequence number",
-			"timestamp": "Timestamp",
+			"timestamp": "Fecha",
 			"unset": "Sin configurar",
 			"vehicleHeading": "Vehicle heading",
 			"vehicleSpeed": "Vehicle speed"
@@ -357,7 +357,7 @@
 		},
 		"powerSavingEnabled": {
 			"description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
-			"label": "Enable power saving mode"
+			"label": "Activar el modo ahorro de energía"
 		},
 		"shutdownOnBatteryDelay": {
 			"description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
@@ -369,7 +369,7 @@
 		},
 		"powerConfigSettings": {
 			"description": "Settings for the power module",
-			"label": "Power Config"
+			"label": "Configuración de elecenergía "
 		},
 		"sleepSettings": {
 			"description": "Sleep settings for the power module",
