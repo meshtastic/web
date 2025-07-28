@@ -7,4 +7,4 @@ dev-dist
 __screenshots__*
 *.diff
 npm/
-
+.idea
