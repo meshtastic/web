@@ -6,6 +6,7 @@
       "dependencies": {
         "@bufbuild/protobuf": "^2.6.1",
         "@meshtastic/protobufs": "npm:@jsr/meshtastic__protobufs",
+        "@radix-ui/react-visually-hidden": "^1.2.3",
         "ste-simple-events": "^3.0.11",
         "tslog": "^4.9.3",
       },
@@ -54,7 +55,7 @@
       "dependencies": {
         "@bufbuild/protobuf": "^2.6.0",
         "@hookform/resolvers": "^5.1.1",
-        "@meshtastic/core": "workspace:*",
+        "@meshtastic/core": "npm:@jsr/meshtastic__core@2.6.4",
         "@meshtastic/transport-http": "npm:@jsr/meshtastic__transport-http",
         "@meshtastic/transport-web-bluetooth": "npm:@jsr/meshtastic__transport-web-bluetooth",
         "@meshtastic/transport-web-serial": "npm:@jsr/meshtastic__transport-web-serial",
@@ -1702,6 +1703,8 @@
 
     "lru-cache/yallist": ["yallist@3.1.1", "", {}, "sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g=="],
 
+    "meshtastic-web/@meshtastic/core": ["@jsr/meshtastic__core@2.6.4", "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.4.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3", "@jsr/meshtastic__protobufs": "^2.6.2", "crc": "^4.3.2", "ste-simple-events": "^3.0.11", "tslog": "^4.9.3" } }, "sha512-1Kz5DK6peFxluHOJR38vFwfgeJzMXTz+3p6TvibjILVhSQC2U1nu8aJbn6w5zhRqS+j79OmtrRvdzL6VNsTkkQ=="],
+
     "meshtastic-web/@meshtastic/transport-http": ["@jsr/meshtastic__transport-http@0.2.1", "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-http/0.2.1.tgz", { "dependencies": { "@jsr/meshtastic__core": "^2.6.0" } }, "sha512-lmQKr3aIINKvtGROU4HchmSVqbZSbkIHqajowRRC8IAjsnR0zNTyxz210QyY4pFUF9hpcW3GRjwq5h/VO2JuGg=="],
 
     "meshtastic-web/@meshtastic/transport-web-bluetooth": ["@jsr/meshtastic__transport-web-bluetooth@0.1.2", "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-web-bluetooth/0.1.2.tgz", { "dependencies": { "@jsr/meshtastic__core": "^2.6.4" } }, "sha512-Z+5pv9RXNgY0/crKExOH3pZ6LT0HIXFmnBL7NX5AO2knOFRn+4lmxQEhhmiTTlkUfqyEfAvbjuY5u4mq9TPTdQ=="],
@@ -1755,6 +1758,8 @@
     "duplexify/readable-stream/string_decoder": ["string_decoder@1.1.1", "", { "dependencies": { "safe-buffer": "~5.1.0" } }, "sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg=="],
 
     "geojson-polygon-self-intersections/rbush/quickselect": ["quickselect@1.1.1", "", {}, "sha512-qN0Gqdw4c4KGPsBOQafj6yj/PA6c/L63f6CaZ/DCF/xF4Esu3jVmKLUDYxghFx8Kb/O7y9tI7x2RjTSXwdK1iQ=="],
+
+    "meshtastic-web/@meshtastic/core/@bufbuild/protobuf": ["@bufbuild/protobuf@2.6.0", "", {}, "sha512-6cuonJVNOIL7lTj5zgo/Rc2bKAo4/GvN+rKCrUj7GdEHRzCk8zKOfFwUsL9nAVk5rSIsRmlgcpLzTRysopEeeg=="],
 
     "meshtastic-web/@types/node/undici-types": ["undici-types@7.8.0", "", {}, "sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw=="],
 
