@@ -1,7 +1,7 @@
 import { Socket } from "node:net";
 import { Readable, Writable } from "node:stream";
-import { Utils } from "@meshtastic/core";
 import type { Types } from "@meshtastic/core";
+import { Utils } from "@meshtastic/core";
 
 export class TransportNode implements Types.Transport {
   private readonly _toDevice: WritableStream<Uint8Array>;
@@ -45,9 +45,9 @@ export class TransportNode implements Types.Transport {
     ) as ReadableStream<Uint8Array>;
     this._fromDevice = fromDeviceSource.pipeThrough(Utils.fromDeviceStream());
 
-		// Stream for data going FROM the application TO the Meshtastic device.
-		const toDeviceTransform = Utils.toDeviceStream;
-		this._toDevice = toDeviceTransform.writable;
+    // Stream for data going FROM the application TO the Meshtastic device.
+    const toDeviceTransform = Utils.toDeviceStream;
+    this._toDevice = toDeviceTransform.writable;
 
     // The readable end of the transform is then piped to the Node.js socket.
     // A similar assertion is needed here because `Writable.toWeb` also returns

@@ -89,6 +89,7 @@ export class TransportWebBluetooth implements Types.Transport {
 
         if (this._isFirstWrite && this._fromDeviceController) {
           this._isFirstWrite = false;
+
           setTimeout(() => {
             this.readFromRadio(this._fromDeviceController!);
           }, 50);

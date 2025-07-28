@@ -37,7 +37,7 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
     device.addConnection(connection);
     subscribeAll(device, connection, messageStore);
 
-    const HEARTBEAT_INTERVAL = 5*60*1000;
+    const HEARTBEAT_INTERVAL = 5 * 60 * 1000;
     connection.setHeartbeatInterval(HEARTBEAT_INTERVAL);
 
     closeDialog();

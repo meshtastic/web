@@ -1,7 +1,7 @@
 import type * as Protobuf from "@meshtastic/protobufs";
 import { SimpleEventDispatcher } from "ste-simple-events";
-import type { PacketMetadata } from "../types.ts";
 import type * as Types from "../types.ts";
+import type { PacketMetadata } from "../types.ts";
 
 export class EventSystem {
   /**

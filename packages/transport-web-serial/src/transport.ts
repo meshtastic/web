@@ -1,5 +1,5 @@
-import { Utils } from "@meshtastic/core";
 import type { Types } from "@meshtastic/core";
+import { Utils } from "@meshtastic/core";
 
 export class TransportWebSerial implements Types.Transport {
   private _toDevice: WritableStream<Uint8Array>;
