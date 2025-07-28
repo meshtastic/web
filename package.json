@@ -28,7 +28,6 @@
 	"dependencies": {
 		"@bufbuild/protobuf": "^2.6.1",
 		"@meshtastic/protobufs": "npm:@jsr/meshtastic__protobufs",
-		"@radix-ui/react-visually-hidden": "^1.2.3",
 		"ste-simple-events": "^3.0.11",
 		"tslog": "^4.9.3"
 	},
