@@ -57,7 +57,7 @@ when creating new keys in the JSON files.
 ### Namespace Rules
 
 We use namespaces to organize keys. All source keys are added to the English
-(`en`) files located at `/i18n/locales/en/`. Place your new keys in the
+(`en`) files located at `/packages/web/public/i18n/locales/en/`. Place your new keys in the
 appropriate file based on these rules:
 
 - `common.json`:

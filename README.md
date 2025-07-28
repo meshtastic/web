@@ -77,10 +77,10 @@ Follow the installation instructions on their home page.
 
 #### Meshtastic Web Client
 
-To start the development server for the web client:
+To start the development server for the web client, while inside the packages/web folder:
 
 ```bash
-cd ./packages/web && bun run dev
+bun run dev
 ```
 
 This will typically run the web client on http://localhost:3000 and requires a
