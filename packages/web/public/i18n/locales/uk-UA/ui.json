@@ -25,14 +25,14 @@
 			"firmware": {
 				"title": "Прошивка",
 				"version": "v{{version}}",
-				"buildDate": "Build date: {{date}}"
+				"buildDate": "Дата збірки: {{date}}"
 			},
 			"deviceName": {
-				"title": "Device Name",
-				"changeName": "Change Device Name",
-				"placeholder": "Enter device name"
+				"title": "Назва пристрою",
+				"changeName": "Змінити назву пристрою",
+				"placeholder": "Уведіть назву пристрою"
 			},
-			"editDeviceName": "Edit device name"
+			"editDeviceName": "Змінити назву пристрою"
 		}
 	},
 	"batteryStatus": {
@@ -41,13 +41,13 @@
 		"title": "Батарея"
 	},
 	"search": {
-		"nodes": "Search nodes...",
-		"channels": "Search channels...",
-		"commandPalette": "Search commands..."
+		"nodes": "Пошук вузлів...",
+		"channels": "Пошук каналів...",
+		"commandPalette": "Пошук команд..."
 	},
 	"toast": {
 		"positionRequestSent": {
-			"title": "Position request sent."
+			"title": "Запит на позицію надіслано."
 		},
 		"requestingPosition": {
 			"title": "Requesting position, please wait..."
@@ -63,14 +63,14 @@
 		},
 		"messages": {
 			"pkiEncryption": {
-				"title": "Chat is using PKI encryption."
+				"title": "Чат використовує шифрування PKI."
 			},
 			"pskEncryption": {
-				"title": "Chat is using PSK encryption."
+				"title": "Чат використовує PSK шифрування."
 			}
 		},
 		"configSaveError": {
-			"title": "Error Saving Config",
+			"title": "Помилка збереження налаштувань",
 			"description": "An error occurred while saving the configuration."
 		},
 		"validationError": {
@@ -87,7 +87,7 @@
 				"added": "Додано",
 				"removed": "Видалено",
 				"to": "до",
-				"from": "from"
+				"from": "від"
 			}
 		},
 		"ignoreNode": {
@@ -96,7 +96,7 @@
 				"added": "Додано",
 				"removed": "Видалено",
 				"to": "до",
-				"from": "from"
+				"from": "від"
 			}
 		}
 	},
@@ -105,13 +105,13 @@
 			"label": "Скопійовано!"
 		},
 		"copyToClipboard": {
-			"label": "Copy to clipboard"
+			"label": "Копіювати до буфера обміну"
 		},
 		"hidePassword": {
-			"label": "Hide password"
+			"label": "Приховати пароль"
 		},
 		"showPassword": {
-			"label": "Show password"
+			"label": "Показати пароль"
 		},
 		"deliveryStatus": {
 			"delivered": "Доставлено",
@@ -130,7 +130,7 @@
 		"label": "Метрики"
 	},
 	"role": {
-		"label": "Role"
+		"label": "Роль"
 	},
 	"filter": {
 		"label": "Фільтри"
@@ -142,7 +142,7 @@
 		"label": "Clear input"
 	},
 	"resetFilters": {
-		"label": "Reset Filters"
+		"label": "Скинути фільтри"
 	},
 	"nodeName": {
 		"label": "Node name/number",
@@ -152,11 +152,11 @@
 		"label": "Airtime Utilization (%)"
 	},
 	"batteryLevel": {
-		"label": "Battery level (%)",
-		"labelText": "Battery level (%): {{value}}"
+		"label": "Рівень заряду батареї (%)",
+		"labelText": "Рівень заряду батареї (%): {{value}}"
 	},
 	"batteryVoltage": {
-		"label": "Battery voltage (V)",
+		"label": "Напруга батареї (В)",
 		"title": "Напруга"
 	},
 	"channelUtilization": {
@@ -176,7 +176,7 @@
 		"label": "SNR (дБ)"
 	},
 	"favorites": {
-		"label": "Favorites"
+		"label": "Обране"
 	},
 	"hide": {
 		"label": "Сховати"
@@ -185,7 +185,7 @@
 		"label": "Show Only"
 	},
 	"viaMqtt": {
-		"label": "Connected via MQTT"
+		"label": "Під'єднано за допомогою MQTT"
 	},
 	"hopsUnknown": {
 		"label": "Unknown number of hops"
@@ -214,8 +214,8 @@
 			"step3": "What actually happened",
 			"step4": "Any other relevant information"
 		},
-		"reportLink": "You can report the issue to our <0>GitHub</0>",
-		"dashboardLink": "Return to the <0>dashboard</0>",
+		"reportLink": "Ви можете повідомити про проблему на нашому <0>GitHub</0>",
+		"dashboardLink": "Поверніться до <0>панелі</0>",
 		"detailsSummary": "Інформація про помилку",
 		"errorMessageLabel": "Помилка:",
 		"stackTraceLabel": "Stack trace:",
@@ -223,6 +223,6 @@
 	},
 	"footer": {
 		"text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
-		"commitSha": "Commit SHA: {{sha}}"
+		"commitSha": "SHA коміту: {{sha}}"
 	}
 }

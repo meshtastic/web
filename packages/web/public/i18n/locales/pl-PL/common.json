@@ -10,7 +10,7 @@
 		"dismiss": "Zamknij",
 		"download": "Download",
 		"export": "Export",
-		"generate": "Generate",
+		"generate": "Wygeneruj",
 		"regenerate": "Regenerate",
 		"import": "Import",
 		"message": "Wiadomość",
@@ -20,7 +20,7 @@
 		"rebootOtaNow": "Reboot to OTA Mode Now",
 		"remove": "Usuń",
 		"requestNewKeys": "Request New Keys",
-		"requestPosition": "Request Position",
+		"requestPosition": "Poproś o pozycję",
 		"reset": "Zresetuj",
 		"save": "Zapisz",
 		"scanQr": "Scan QR Code",
@@ -88,15 +88,15 @@
 			"suffix": "V"
 		},
 		"record": {
-			"one": "Records",
-			"plural": "Records"
+			"one": "Rekordy",
+			"plural": "Rekordy"
 		}
 	},
 	"security": {
-		"0bit": "Empty",
-		"8bit": "8 bit",
-		"128bit": "128 bit",
-		"256bit": "256 bit"
+		"0bit": "Pusty",
+		"8bit": "8-bitowy",
+		"128bit": "128-bitowy",
+		"256bit": "256-bitowy"
 	},
 	"unknown": {
 		"longName": "Nieznany",
@@ -107,9 +107,9 @@
 	"nodeUnknownPrefix": "!",
 	"unset": "UNSET",
 	"fallbackName": "Meshtastic {{last4}}",
-	"node": "Node",
+	"node": "Węzeł",
 	"formValidation": {
-		"unsavedChanges": "Unsaved changes",
+		"unsavedChanges": "Niezapisane zmiany",
 		"tooBig": {
 			"string": "Too long, expected less than or equal to {{maximum}} characters.",
 			"number": "Too big, expected a number smaller than or equal to {{maximum}}.",
@@ -120,22 +120,22 @@
 			"number": "Too small, expected a number larger than or equal to {{minimum}}."
 		},
 		"invalidFormat": {
-			"ipv4": "Invalid format, expected an IPv4 address.",
+			"ipv4": "Nieprawidłowy format, oczekiwany adres IPv4.",
 			"key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
 		},
 		"invalidType": {
-			"number": "Invalid type, expected a number."
+			"number": "Nieprawidłowy typ, oczekiwana liczba."
 		},
 		"pskLength": {
-			"0bit": "Key is required to be empty.",
+			"0bit": "Klucz musi być pusty.",
 			"8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
 			"128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
 			"256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
 		},
 		"required": {
-			"generic": "This field is required.",
-			"managed": "At least one admin key is requred if the node is managed.",
-			"key": "Key is required."
+			"generic": "To pole jest wymagane.",
+			"managed": "Co najmniej jeden klucz administratora jest wymagany, jeśli węzeł jest zarządzany.",
+			"key": "Klucz jest wymagany."
 		}
 	}
 }

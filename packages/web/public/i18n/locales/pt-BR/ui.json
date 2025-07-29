@@ -1,13 +1,13 @@
 {
 	"navigation": {
 		"title": "Navigation",
-		"messages": "Mesajlar",
-		"map": "Harita",
+		"messages": "Mensagens",
+		"map": "Mapa",
 		"config": "Config",
 		"radioConfig": "Radio Config",
 		"moduleConfig": "Module Config",
-		"channels": "Kanallar",
-		"nodes": "Düğümler"
+		"channels": "Canais",
+		"nodes": "Nós"
 	},
 	"app": {
 		"title": "Meshtastic",
@@ -23,7 +23,7 @@
 		"deviceInfo": {
 			"volts": "{{voltage}} volts",
 			"firmware": {
-				"title": "Yazılım",
+				"title": "Firmware",
 				"version": "v{{version}}",
 				"buildDate": "Build date: {{date}}"
 			},
@@ -38,7 +38,7 @@
 	"batteryStatus": {
 		"charging": "{{level}}% charging",
 		"pluggedIn": "Plugged in",
-		"title": "Pil"
+		"title": "Bateria"
 	},
 	"search": {
 		"nodes": "Search nodes...",
@@ -108,32 +108,32 @@
 			"label": "Copy to clipboard"
 		},
 		"hidePassword": {
-			"label": "Şifreyi gizle"
+			"label": "Ocultar senha"
 		},
 		"showPassword": {
-			"label": "Şifreyi göster"
+			"label": "Mostrar senha"
 		},
 		"deliveryStatus": {
 			"delivered": "Delivered",
 			"failed": "Delivery Failed",
 			"waiting": "Waiting",
-			"unknown": "Unknown"
+			"unknown": "Desconhecido"
 		}
 	},
 	"general": {
 		"label": "General"
 	},
 	"hardware": {
-		"label": "Donanım"
+		"label": "Hardware"
 	},
 	"metrics": {
 		"label": "Metrics"
 	},
 	"role": {
-		"label": "Rol"
+		"label": "Função"
 	},
 	"filter": {
-		"label": "Filtre"
+		"label": "Filtro"
 	},
 	"advanced": {
 		"label": "Advanced"
@@ -157,18 +157,18 @@
 	},
 	"batteryVoltage": {
 		"label": "Battery voltage (V)",
-		"title": "Voltaj"
+		"title": "Voltagem"
 	},
 	"channelUtilization": {
 		"label": "Channel Utilization (%)"
 	},
 	"hops": {
-		"direct": "Doğrudan",
+		"direct": "Direto",
 		"label": "Number of hops",
 		"text": "Number of hops: {{value}}"
 	},
 	"lastHeard": {
-		"label": "Son duyulma",
+		"label": "Visto pela última vez",
 		"labelText": "Last heard: {{value}}",
 		"nowLabel": "Now"
 	},
@@ -194,12 +194,12 @@
 		"label": "Never heard"
 	},
 	"language": {
-		"label": "Dil",
+		"label": "Idioma",
 		"changeLanguage": "Change Language"
 	},
 	"theme": {
-		"dark": "Koyu",
-		"light": "Açık",
+		"dark": "Escuro",
+		"light": "Claro",
 		"system": "Automatic",
 		"changeTheme": "Change Color Scheme"
 	},

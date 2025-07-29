@@ -42,7 +42,7 @@
 		},
 		"posixTimezone": {
 			"description": "The POSIX timezone string for the device",
-			"label": "POSIX Timezone"
+			"label": "Часова зона POSIX"
 		},
 		"rebroadcastMode": {
 			"description": "How to handle rebroadcasting",
@@ -50,7 +50,7 @@
 		},
 		"role": {
 			"description": "What role the device performs on the mesh",
-			"label": "Role"
+			"label": "Роль"
 		}
 	},
 	"bluetooth": {
@@ -212,7 +212,7 @@
 		},
 		"ethernetEnabled": {
 			"description": "Enable or disable the Ethernet port",
-			"label": "Enabled"
+			"label": "Увімкнено"
 		},
 		"gateway": {
 			"description": "Default Gateway",
@@ -220,7 +220,7 @@
 		},
 		"ip": {
 			"description": "IP Address",
-			"label": "IP"
+			"label": "IP-адреса"
 		},
 		"psk": {
 			"description": "Network password",
@@ -236,7 +236,7 @@
 		},
 		"wifiEnabled": {
 			"description": "Увімкнути або вимкнути WiFi радіо",
-			"label": "Enabled"
+			"label": "Увімкнено"
 		},
 		"meshViaUdp": {
 			"label": "Mesh via UDP"
@@ -328,7 +328,7 @@
 			"hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
 			"numSatellites": "Number of satellites",
 			"sequenceNumber": "Sequence number",
-			"timestamp": "Timestamp",
+			"timestamp": "Мітка часу",
 			"unset": "Скинути",
 			"vehicleHeading": "Vehicle heading",
 			"vehicleSpeed": "Vehicle speed"
@@ -357,7 +357,7 @@
 		},
 		"powerSavingEnabled": {
 			"description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
-			"label": "Enable power saving mode"
+			"label": "Увімкнути енергоощадний режим"
 		},
 		"shutdownOnBatteryDelay": {
 			"description": "Automatically shutdown node after this long when on battery, 0 for indefinite",

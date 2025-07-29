@@ -2,16 +2,16 @@
 	"page": {
 		"title": "Configuration",
 		"tabBluetooth": "Bluetooth",
-		"tabDevice": "Cihaz",
-		"tabDisplay": "Ekran",
+		"tabDevice": "Dispositivo",
+		"tabDisplay": "Tela",
 		"tabLora": "LoRa",
-		"tabNetwork": "Ağ",
-		"tabPosition": "Konum",
-		"tabPower": "Güç",
-		"tabSecurity": "Güvenlik"
+		"tabNetwork": "Rede",
+		"tabPosition": "Posição",
+		"tabPower": "Energia",
+		"tabSecurity": "Segurança"
 	},
 	"sidebar": {
-		"label": "Modüller"
+		"label": "Modules"
 	},
 	"device": {
 		"title": "Device Settings",
@@ -42,7 +42,7 @@
 		},
 		"posixTimezone": {
 			"description": "The POSIX timezone string for the device",
-			"label": "POSIX Zaman Dilimi"
+			"label": "Fuso horário POSIX"
 		},
 		"rebroadcastMode": {
 			"description": "How to handle rebroadcasting",
@@ -50,7 +50,7 @@
 		},
 		"role": {
 			"description": "What role the device performs on the mesh",
-			"label": "Rol"
+			"label": "Função"
 		}
 	},
 	"bluetooth": {
@@ -63,7 +63,7 @@
 		},
 		"pairingMode": {
 			"description": "Pin selection behaviour.",
-			"label": "Eşleştirme Modu"
+			"label": "Modo de pareamento"
 		},
 		"pin": {
 			"description": "Pin to use when pairing",
@@ -123,7 +123,7 @@
 		"description": "Settings for the LoRa mesh",
 		"bandwidth": {
 			"description": "Channel bandwidth in MHz",
-			"label": "Bant genişliği"
+			"label": "Largura da banda"
 		},
 		"boostedRxGain": {
 			"description": "Boosted RX gain",
@@ -147,19 +147,19 @@
 		},
 		"ignoreMqtt": {
 			"description": "Don't forward MQTT messages over the mesh",
-			"label": "MQTT'yi Yoksay"
+			"label": "Ignorar MQTT"
 		},
 		"modemPreset": {
 			"description": "Modem preset to use",
-			"label": "Modem Ön Ayarı"
+			"label": "Predefinição do modem"
 		},
 		"okToMqtt": {
 			"description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
-			"label": "MQTT'ye Tamam"
+			"label": "OK para MQTT"
 		},
 		"overrideDutyCycle": {
-			"description": "Görev Döngüsünü Geçersiz Kıl",
-			"label": "Görev Döngüsünü Geçersiz Kıl"
+			"description": "Ignorar ciclo de trabalho",
+			"label": "Ignorar ciclo de trabalho"
 		},
 		"overrideFrequency": {
 			"description": "Override frequency",
@@ -167,7 +167,7 @@
 		},
 		"region": {
 			"description": "Sets the region for your node",
-			"label": "Bölge"
+			"label": "Região"
 		},
 		"spreadingFactor": {
 			"description": "Indicates the number of chirps per symbol",
@@ -216,7 +216,7 @@
 		},
 		"gateway": {
 			"description": "Default Gateway",
-			"label": "Ağ geçidi"
+			"label": "Gateway"
 		},
 		"ip": {
 			"description": "IP Address",
@@ -232,7 +232,7 @@
 		},
 		"subnet": {
 			"description": "Subnet Mask",
-			"label": "Alt ağ"
+			"label": "Subnet"
 		},
 		"wifiEnabled": {
 			"description": "Enable or disable the WiFi radio",
@@ -265,7 +265,7 @@
 		},
 		"udpConfigSettings": {
 			"description": "UDP over Mesh configuration",
-			"label": "UDP Ayarları"
+			"label": "Configuração UDP"
 		}
 	},
 	"position": {
@@ -328,8 +328,8 @@
 			"hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
 			"numSatellites": "Number of satellites",
 			"sequenceNumber": "Sequence number",
-			"timestamp": "Zaman Damgası",
-			"unset": "Ayarlanmamış",
+			"timestamp": "Data e hora",
+			"unset": "Não definido",
 			"vehicleHeading": "Vehicle heading",
 			"vehicleSpeed": "Vehicle speed"
 		}
@@ -357,7 +357,7 @@
 		},
 		"powerSavingEnabled": {
 			"description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
-			"label": "Güç tasarrufu modunu etkinleştir"
+			"label": "Ativar modo de economia de energia"
 		},
 		"shutdownOnBatteryDelay": {
 			"description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
@@ -369,7 +369,7 @@
 		},
 		"powerConfigSettings": {
 			"description": "Settings for the power module",
-			"label": "Güç Ayarı"
+			"label": "Configuração de Energia"
 		},
 		"sleepSettings": {
 			"description": "Sleep settings for the power module",
@@ -394,11 +394,11 @@
 		},
 		"privateKey": {
 			"description": "Used to create a shared key with a remote device",
-			"label": "Özel Anahtar"
+			"label": "Chave Privada"
 		},
 		"publicKey": {
 			"description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
-			"label": "Genel Anahtar"
+			"label": "Chave Publica"
 		},
 		"primaryAdminKey": {
 			"description": "The primary public key authorized to send admin messages to this node",

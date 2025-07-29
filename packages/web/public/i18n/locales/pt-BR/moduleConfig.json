@@ -1,17 +1,17 @@
 {
 	"page": {
-		"tabAmbientLighting": "Ambientní osvětlení",
-		"tabAudio": "Zvuk",
+		"tabAmbientLighting": "Luz Ambiente",
+		"tabAudio": "Áudio",
 		"tabCannedMessage": "Canned",
-		"tabDetectionSensor": "Detekční senzor",
+		"tabDetectionSensor": "Sensor de Detecção",
 		"tabExternalNotification": "Ext Notif",
 		"tabMqtt": "MQTT",
-		"tabNeighborInfo": "Informace o sousedech",
-		"tabPaxcounter": "Paxcounter",
-		"tabRangeTest": "Zkouška dosahu",
-		"tabSerial": "Sériový",
+		"tabNeighborInfo": "Informações do Vizinho",
+		"tabPaxcounter": "Medidor de Fluxo de Pessoas",
+		"tabRangeTest": "Teste de Alcance",
+		"tabSerial": "Serial",
 		"tabStoreAndForward": "S&F",
-		"tabTelemetry": "Telemetrie"
+		"tabTelemetry": "Telemetria"
 	},
 	"ambientLighting": {
 		"title": "Ambient Lighting Settings",
@@ -21,19 +21,19 @@
 			"description": "Sets LED to on or off"
 		},
 		"current": {
-			"label": "Proud",
+			"label": "Atual",
 			"description": "Sets the current for the LED output. Default is 10"
 		},
 		"red": {
-			"label": "Červená",
+			"label": "Vermelho",
 			"description": "Sets the red LED level. Values are 0-255"
 		},
 		"green": {
-			"label": "Zelená",
+			"label": "Verde",
 			"description": "Sets the green LED level. Values are 0-255"
 		},
 		"blue": {
-			"label": "Modrá",
+			"label": "Azul",
 			"description": "Sets the blue LED level. Values are 0-255"
 		}
 	},
@@ -121,7 +121,7 @@
 		"title": "Detection Sensor Settings",
 		"description": "Settings for the Detection Sensor module",
 		"enabled": {
-			"label": "Povoleno",
+			"label": "Enabled",
 			"description": "Enable or disable Detection Sensor Module"
 		},
 		"minimumBroadcastSecs": {
@@ -221,7 +221,7 @@
 		"title": "MQTT Settings",
 		"description": "Settings for the MQTT module",
 		"enabled": {
-			"label": "Povoleno",
+			"label": "Enabled",
 			"description": "Enable or disable MQTT"
 		},
 		"address": {
@@ -245,11 +245,11 @@
 			"description": "Whether to send/consume JSON packets on MQTT"
 		},
 		"tlsEnabled": {
-			"label": "TLS povoleno",
+			"label": "TLS Enabled",
 			"description": "Enable or disable TLS"
 		},
 		"root": {
-			"label": "Kořenové téma",
+			"label": "Tópico principal",
 			"description": "MQTT root topic to use for default/custom servers"
 		},
 		"proxyToClientEnabled": {
@@ -297,7 +297,7 @@
 		"title": "Neighbor Info Settings",
 		"description": "Settings for the Neighbor Info module",
 		"enabled": {
-			"label": "Povoleno",
+			"label": "Enabled",
 			"description": "Enable or disable Neighbor Info Module"
 		},
 		"updateInterval": {
@@ -365,7 +365,7 @@
 			"description": "The serial baud rate"
 		},
 		"timeout": {
-			"label": "Vypršel čas spojení",
+			"label": "Tempo esgotado",
 			"description": "Seconds to wait before we consider your packet as 'done'"
 		},
 		"mode": {
@@ -389,15 +389,15 @@
 			"description": "Enable Store & Forward heartbeat"
 		},
 		"records": {
-			"label": "Počet záznamů",
+			"label": "Número de registros",
 			"description": "Number of records to store"
 		},
 		"historyReturnMax": {
-			"label": "History return max",
+			"label": "Histórico de retorno máximo",
 			"description": "Max number of records to return"
 		},
 		"historyReturnWindow": {
-			"label": "History return window",
+			"label": "Janela de retorno do histórico",
 			"description": "Max number of records to return"
 		}
 	},
@@ -406,10 +406,10 @@
 		"description": "Settings for the Telemetry module",
 		"deviceUpdateInterval": {
 			"label": "Device Metrics",
-			"description": "Interval aktualizace metrik zařízení (v sekundách)"
+			"description": "Intervalo de atualização das métricas do dispositivo (segundos)"
 		},
 		"environmentUpdateInterval": {
-			"label": "Interval aktualizace metrik životního prostředí (v sekundách)",
+			"label": "Intervalo de atualização das métricas de ambiente (segundos)",
 			"description": ""
 		},
 		"environmentMeasurementEnabled": {

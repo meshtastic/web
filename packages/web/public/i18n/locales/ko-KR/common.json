@@ -1,37 +1,37 @@
 {
 	"button": {
 		"apply": "적용",
-		"backupKey": "Backup Key",
+		"backupKey": "백업 키",
 		"cancel": "취소",
-		"clearMessages": "Clear Messages",
+		"clearMessages": "메시지 삭제",
 		"close": "닫기",
-		"confirm": "Confirm",
+		"confirm": "확인",
 		"delete": "삭제",
-		"dismiss": "Dismiss",
-		"download": "Download",
-		"export": "Export",
-		"generate": "Generate",
-		"regenerate": "Regenerate",
+		"dismiss": "취소",
+		"download": "다운로드",
+		"export": "내보내기",
+		"generate": "생성",
+		"regenerate": "재생성",
 		"import": "불러오기",
 		"message": "메시지",
-		"now": "Now",
+		"now": "지금",
 		"ok": "확인",
-		"print": "Print",
-		"rebootOtaNow": "Reboot to OTA Mode Now",
+		"print": "인쇄",
+		"rebootOtaNow": "지금 OTA 모드로 재부팅",
 		"remove": "지우기",
-		"requestNewKeys": "Request New Keys",
-		"requestPosition": "Request Position",
+		"requestNewKeys": "새로운 키 요청",
+		"requestPosition": "위치 요청",
 		"reset": "초기화",
 		"save": "저장",
 		"scanQr": " QR코드 스캔",
-		"traceRoute": "Trace Route",
-		"submit": "Submit"
+		"traceRoute": "추적 루트",
+		"submit": "제출"
 	},
 	"app": {
 		"title": "Meshtastic",
-		"fullTitle": "Meshtastic Web Client"
+		"fullTitle": "Meshtastic 웹 클라이언트"
 	},
-	"loading": "Loading...",
+	"loading": "로딩 중...",
 	"unit": {
 		"cps": "CPS",
 		"dbm": "dBm",
@@ -41,55 +41,55 @@
 			"plural": "Hops"
 		},
 		"hopsAway": {
-			"one": "{{count}} hop away",
-			"plural": "{{count}} hops away",
-			"unknown": "Unknown hops away"
+			"one": "{{count}} hop 떨어짐",
+			"plural": "{{count}} hops 떨어짐",
+			"unknown": "알 수 없는 hops 떨어짐"
 		},
 		"megahertz": "MHz",
 		"raw": "raw",
 		"meter": {
-			"one": "Meter",
-			"plural": "Meters",
+			"one": "미터",
+			"plural": "미터",
 			"suffix": "m"
 		},
 		"minute": {
-			"one": "Minute",
-			"plural": "Minutes"
+			"one": "분",
+			"plural": "분"
 		},
 		"hour": {
-			"one": "Hour",
-			"plural": "Hours"
+			"one": "시",
+			"plural": "시"
 		},
 		"millisecond": {
-			"one": "Millisecond",
-			"plural": "Milliseconds",
+			"one": "밀리초",
+			"plural": "밀리초",
 			"suffix": "ms"
 		},
 		"second": {
-			"one": "Second",
-			"plural": "Seconds"
+			"one": "초",
+			"plural": "초"
 		},
 		"day": {
-			"one": "Day",
-			"plural": "Days"
+			"one": "일",
+			"plural": "일"
 		},
 		"month": {
-			"one": "Month",
-			"plural": "Months"
+			"one": "월",
+			"plural": "달"
 		},
 		"year": {
-			"one": "Year",
-			"plural": "Years"
+			"one": "년",
+			"plural": "년"
 		},
 		"snr": "SNR",
 		"volt": {
-			"one": "Volt",
-			"plural": "Volts",
+			"one": "볼트",
+			"plural": "볼트",
 			"suffix": "V"
 		},
 		"record": {
-			"one": "Records",
-			"plural": "Records"
+			"one": "레코드",
+			"plural": "레코드"
 		}
 	},
 	"security": {
@@ -99,7 +99,7 @@
 		"256bit": "256 bit"
 	},
 	"unknown": {
-		"longName": "Unknown",
+		"longName": "알 수 없는",
 		"shortName": "UNK",
 		"notAvailable": "N/A",
 		"num": "??"
@@ -107,35 +107,35 @@
 	"nodeUnknownPrefix": "!",
 	"unset": "UNSET",
 	"fallbackName": "Meshtastic {{last4}}",
-	"node": "Node",
+	"node": "노드",
 	"formValidation": {
-		"unsavedChanges": "Unsaved changes",
+		"unsavedChanges": "변경 내용이 저장되지 않았습니다",
 		"tooBig": {
-			"string": "Too long, expected less than or equal to {{maximum}} characters.",
-			"number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-			"bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+			"string": "너무 깁니다. {{maximum}} 문자 이하",
+			"number": "너무 큽니다. {{maximum}} 이하",
+			"bytes": "너무 큽니다. {{params.maximum}} 바이트  이하"
 		},
 		"tooSmall": {
-			"string": "Too short, expected more than or equal to {{minimum}} characters.",
-			"number": "Too small, expected a number larger than or equal to {{minimum}}."
+			"string": "너무 짧습니다. {{minimum}} 이상",
+			"number": "너무 작습니다. {{minimum}} 이상"
 		},
 		"invalidFormat": {
-			"ipv4": "Invalid format, expected an IPv4 address.",
-			"key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+			"ipv4": "잘못된 형식입니다. IPv4 주소",
+			"key": "잘못된 형식입니다. Base64로 인코딩된 사전 공유키 (PSK)"
 		},
 		"invalidType": {
-			"number": "Invalid type, expected a number."
+			"number": "잘못된 타입입니다. 숫자"
 		},
 		"pskLength": {
-			"0bit": "Key is required to be empty.",
-			"8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-			"128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-			"256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+			"0bit": "키는 비어있어야 합니다.",
+			"8bit": "8 bit 사전공유키 (PSK) 가 필요합니다.",
+			"128bit": "128 bit 사전공유키 (PSK) 가 필요합니다.",
+			"256bit": "256 bit 사전공유키 (PSK) 가 필요합니다."
 		},
 		"required": {
-			"generic": "This field is required.",
-			"managed": "At least one admin key is requred if the node is managed.",
-			"key": "Key is required."
+			"generic": "필수 입력 사항입니다.",
+			"managed": "노드 관리를 위해 최소 한 개의 관리자 키가 필요합니다.",
+			"key": "키가 필요합니다."
 		}
 	}
 }

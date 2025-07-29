@@ -7,7 +7,7 @@
 		"tabLora": "LoRa",
 		"tabNetwork": "Netzwerk",
 		"tabPosition": "Standort",
-		"tabPower": "Leistung",
+		"tabPower": "Energie",
 		"tabSecurity": "Sicherheit"
 	},
 	"sidebar": {
@@ -369,7 +369,7 @@
 		},
 		"powerConfigSettings": {
 			"description": "Einstellungen für das Energiemodul",
-			"label": "Power Konfiguration"
+			"label": "Energie Einstellungen"
 		},
 		"sleepSettings": {
 			"description": "Einstellungen Ruhezustand für das Energiemodul",

@@ -1,50 +1,51 @@
 {
-	"emptyState": "Inga resultat hittades.",
-	"page": {
-		"title": "Snabbmeny"
-	},
-	"pinGroup": {
-		"label": "Lägg till grupp i favoriter"
-	},
-	"unpinGroup": {
-		"label": "Ta bort grupp från favoriter"
-	},
-	"goto": {
-		"label": "Gå till",
-		"command": {
-			"messages": "Meddelanden",
-			"map": "Karta",
-			"config": "Inställningar",
-			"channels": "Kanaler",
-			"nodes": "Noder"
-		}
-	},
-	"manage": {
-		"label": "Hantera",
-		"command": {
-			"switchNode": "Byt nod",
-			"connectNewNode": "Anslut ny nod"
-		}
-	},
-	"contextual": {
-		"label": "Kontextuell",
-		"command": {
-			"qrCode": "QR-kod",
-			"qrGenerator": "Generator",
-			"qrImport": "Import",
-			"scheduleShutdown": "Schemalägg avstängning",
-			"scheduleReboot": "Schemalägg omstart",
-			"rebootToOtaMode": "Starta om till OTA-läge",
-			"resetNodeDb": "Töm noddatabasen",
-			"factoryResetDevice": "Fabriksåterställ enhet",
-			"factoryResetConfig": "Fabriksåterställ konfigurationen"
-		}
-	},
-	"debug": {
-		"label": "Felsökning",
-		"command": {
-			"reconfigure": "Konfigurera om",
-			"clearAllStoredMessages": "Radera alla sparade meddelanden"
-		}
-	}
+  "emptyState": "Inga resultat hittades.",
+  "page": {
+    "title": "Snabbmeny"
+  },
+  "pinGroup": {
+    "label": "Lägg till grupp i favoriter"
+  },
+  "unpinGroup": {
+    "label": "Ta bort grupp från favoriter"
+  },
+  "goto": {
+    "label": "Gå till",
+    "command": {
+      "messages": "Meddelanden",
+      "map": "Karta",
+      "config": "Inställningar",
+      "channels": "Kanaler",
+      "nodes": "Noder"
+    }
+  },
+  "manage": {
+    "label": "Hantera",
+    "command": {
+      "switchNode": "Byt nod",
+      "connectNewNode": "Anslut ny nod"
+    }
+  },
+  "contextual": {
+    "label": "Kontextuell",
+    "command": {
+      "qrCode": "QR-kod",
+      "qrGenerator": "Generator",
+      "qrImport": "Import",
+      "scheduleShutdown": "Schemalägg avstängning",
+      "scheduleReboot": "Schemalägg omstart",
+      "rebootToOtaMode": "Starta om till OTA-läge",
+      "resetNodeDb": "Töm noddatabasen",
+      "factoryResetDevice": "Fabriksåterställ enhet",
+      "factoryResetConfig": "Fabriksåterställ konfigurationen",
+      "disconnect": "Koppla från"
+    }
+  },
+  "debug": {
+    "label": "Felsökning",
+    "command": {
+      "reconfigure": "Konfigurera om",
+      "clearAllStoredMessages": "Radera alla sparade meddelanden"
+    }
+  }
 }

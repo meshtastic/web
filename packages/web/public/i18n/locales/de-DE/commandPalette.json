@@ -1,50 +1,51 @@
 {
-	"emptyState": "Keine Ergebnisse gefunden.",
-	"page": {
-		"title": "Befehlsmenü"
-	},
-	"pinGroup": {
-		"label": "Befehlsgruppe anheften"
-	},
-	"unpinGroup": {
-		"label": "Befehlsgruppe lösen"
-	},
-	"goto": {
-		"label": "Gehe zu",
-		"command": {
-			"messages": "Nachrichten",
-			"map": "Karte",
-			"config": "Einstellungen",
-			"channels": "Kanäle",
-			"nodes": "Knoten"
-		}
-	},
-	"manage": {
-		"label": "Verwalten",
-		"command": {
-			"switchNode": "Knoten wechseln",
-			"connectNewNode": "Neuen Knoten verbinden"
-		}
-	},
-	"contextual": {
-		"label": "Kontextabhängig",
-		"command": {
-			"qrCode": "QR Code",
-			"qrGenerator": "Generator",
-			"qrImport": "Importieren",
-			"scheduleShutdown": "Herunterfahren planen",
-			"scheduleReboot": "Neustarten planen",
-			"rebootToOtaMode": "Neustart in den OTA Modus",
-			"resetNodeDb": "Knotendatenbank zurücksetzen",
-			"factoryResetDevice": "Gerät auf Werkseinstellungen zurücksetzen",
-			"factoryResetConfig": "Auf Werkseinstellungen zurücksetzen"
-		}
-	},
-	"debug": {
-		"label": "Debug",
-		"command": {
-			"reconfigure": "Neu einrichten",
-			"clearAllStoredMessages": "Alle gespeicherten Nachrichten löschen"
-		}
-	}
+  "emptyState": "Keine Ergebnisse gefunden.",
+  "page": {
+    "title": "Befehlsmenü"
+  },
+  "pinGroup": {
+    "label": "Befehlsgruppe anheften"
+  },
+  "unpinGroup": {
+    "label": "Befehlsgruppe lösen"
+  },
+  "goto": {
+    "label": "Gehe zu",
+    "command": {
+      "messages": "Nachrichten",
+      "map": "Karte",
+      "config": "Einstellungen",
+      "channels": "Kanäle",
+      "nodes": "Knoten"
+    }
+  },
+  "manage": {
+    "label": "Verwalten",
+    "command": {
+      "switchNode": "Knoten wechseln",
+      "connectNewNode": "Neuen Knoten verbinden"
+    }
+  },
+  "contextual": {
+    "label": "Kontextabhängig",
+    "command": {
+      "qrCode": "QR Code",
+      "qrGenerator": "Generator",
+      "qrImport": "Importieren",
+      "scheduleShutdown": "Herunterfahren planen",
+      "scheduleReboot": "Neustarten planen",
+      "rebootToOtaMode": "Neustart in den OTA Modus",
+      "resetNodeDb": "Knotendatenbank zurücksetzen",
+      "factoryResetDevice": "Gerät auf Werkseinstellungen zurücksetzen",
+      "factoryResetConfig": "Auf Werkseinstellungen zurücksetzen",
+      "disconnect": "Verbindung trennen"
+    }
+  },
+  "debug": {
+    "label": "Debug",
+    "command": {
+      "reconfigure": "Neu einrichten",
+      "clearAllStoredMessages": "Alle gespeicherten Nachrichten löschen"
+    }
+  }
 }

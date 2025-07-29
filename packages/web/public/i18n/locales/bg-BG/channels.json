@@ -2,68 +2,68 @@
 	"page": {
 		"sectionLabel": "Канали",
 		"channelName": "Канал: {{channelName}}",
-		"broadcastLabel": "Primary",
+		"broadcastLabel": "Първичен",
 		"channelIndex": "Ch {{index}}"
 	},
 	"validation": {
-		"pskInvalid": "Please enter a valid {{bits}} bit PSK."
+		"pskInvalid": "Моля, въведете валиден {{bits}} bit PSK."
 	},
 	"settings": {
 		"label": "Настройки на канала",
-		"description": "Crypto, MQTT & misc settings"
+		"description": "Крипто, MQTT и други настройки"
 	},
 	"role": {
 		"label": "Роля",
-		"description": "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
+		"description": "Телеметрията на устройството се изпраща през ПЪРВИЧЕН. Разрешен е само един ПЪРВИЧЕН.",
 		"options": {
-			"primary": "PRIMARY",
-			"disabled": "DISABLED",
-			"secondary": "SECONDARY"
+			"primary": "ПЪРВИЧЕН",
+			"disabled": "ДЕЗАКТИВИРАН",
+			"secondary": "ВТОРИЧЕН"
 		}
 	},
 	"psk": {
-		"label": "Pre-Shared Key",
-		"description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
+		"label": "Предварително споделен ключ",
+		"description": "Поддържани дължини на PSK: 256-битова, 128-битова, 8-битова, празна (0-битова)",
 		"generate": "Генериране"
 	},
 	"name": {
 		"label": "Име",
-		"description": "A unique name for the channel <12 bytes, leave blank for default"
+		"description": "Уникално име за канала <12 байта, оставете празно за подразбиране"
 	},
 	"uplinkEnabled": {
 		"label": "Uplink Enabled",
-		"description": "Send messages from the local mesh to MQTT"
+		"description": "Изпращане на съобщения от локалната mesh към MQTT"
 	},
 	"downlinkEnabled": {
 		"label": "Downlink Enabled",
-		"description": "Send messages from MQTT to the local mesh"
+		"description": "Изпращане на съобщения от MQTT към локалната mesh"
 	},
 	"positionPrecision": {
 		"label": "Местоположение",
-		"description": "The precision of the location to share with the channel. Can be disabled.",
+		"description": "Точността на местоположението, което да се споделя с канала. Може да бъде дезактивирано.",
 		"options": {
 			"none": "Да не се споделя местоположението",
 			"precise": "Точно местоположение",
-			"metric_km23": "Within 23 kilometers",
-			"metric_km12": "Within 12 kilometers",
-			"metric_km5_8": "Within 5.8 kilometers",
-			"metric_km2_9": "Within 2.9 kilometers",
-			"metric_km1_5": "Within 1.5 kilometers",
-			"metric_m700": "Within 700 meters",
-			"metric_m350": "Within 350 meters",
-			"metric_m200": "Within 200 meters",
-			"metric_m90": "Within 90 meters",
-			"metric_m50": "Within 50 meters",
-			"imperial_mi15": "Within 15 miles",
-			"imperial_mi7_3": "Within 7.3 miles",
-			"imperial_mi3_6": "Within 3.6 miles",
-			"imperial_mi1_8": "Within 1.8 miles",
-			"imperial_mi0_9": "Within 0.9 miles",
-			"imperial_mi0_5": "Within 0.5 miles",
-			"imperial_mi0_2": "Within 0.2 miles",
-			"imperial_ft600": "Within 600 feet",
-			"imperial_ft300": "Within 300 feet",
-			"imperial_ft150": "Within 150 feet"
+			"metric_km23": "В рамките на 23 километра",
+			"metric_km12": "В рамките на 12 километра",
+			"metric_km5_8": "В рамките на 5.8 километра",
+			"metric_km2_9": "В рамките на 2.9 километра",
+			"metric_km1_5": "В рамките на 1.5 километра",
+			"metric_m700": "В рамките на 700 метра",
+			"metric_m350": "В рамките на 350 метра",
+			"metric_m200": "В рамките на 200 метра",
+			"metric_m90": "В рамките на 90 метра",
+			"metric_m50": "В рамките на 50 метра",
+			"imperial_mi15": "В рамките на 15 мили",
+			"imperial_mi7_3": "В рамките на 7.3 мили",
+			"imperial_mi3_6": "В рамките на 3.6 мили",
+			"imperial_mi1_8": "В рамките на 1.8 мили",
+			"imperial_mi0_9": "В рамките на 0.9 мили",
+			"imperial_mi0_5": "В рамките на 0.5 мили",
+			"imperial_mi0_2": "В рамките на 0.2 мили",
+			"imperial_ft600": "В рамките на 600 фута",
+			"imperial_ft300": "В рамките на 300 фута",
+			"imperial_ft150": "В рамките на 150 фута"
 		}
 	}
 }

@@ -7,7 +7,13 @@
 		"description": "Das Gerät wird neu gestartet, sobald die Einstellung gespeichert ist.",
 		"longName": "Langer Name",
 		"shortName": "Kurzname",
-		"title": "Gerätename ändern"
+		"title": "Gerätename ändern",
+		"validation": {
+			"longNameMax": "Lange Name darf nicht mehr als 40 Zeichen lang sein",
+			"shortNameMax": "Kurzname darf nicht mehr als 4 Zeichen lang sein",
+			"longNameMin": "Langer Name muss mindestens 1 Zeichen lang sein",
+			"shortNameMin": "Kurzname muss mindestens 1 Zeichen lang sein"
+		}
 	},
 	"import": {
 		"description": "Die aktuelle LoRa Einstellung wird überschrieben.",
@@ -21,9 +27,10 @@
 		"title": "Kanalsammlung importieren"
 	},
 	"locationResponse": {
+		"title": "Standort: {{identifier}}",
 		"altitude": "Höhe: ",
 		"coordinates": "Koordinaten: ",
-		"title": "Standort: {{identifier}}"
+		"noCoordinates": "Keine Koordinaten"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Vorab verteilten Schlüssel (PSK) neu erstellen?",
@@ -60,11 +67,15 @@
 		},
 		"bluetoothConnection": {
 			"noDevicesPaired": "Noch keine Geräte gekoppelt.",
-			"newDeviceButton": "Neues Gerät"
+			"newDeviceButton": "Neues Gerät",
+			"connectionFailed": "Verbindung fehlgeschlagen",
+			"deviceDisconnected": "Verbindung getrennt",
+			"unknownDevice": "Unbekanntes Gerät",
+			"errorLoadingDevices": "Fehler beim Laden der Geräte",
+			"unknownErrorLoadingDevices": "Unbekannter Fehler beim Laden der Geräte"
 		},
 		"validation": {
-			"requiresWebBluetooth": "Dieser Verbindungstyp erfordert <0>Bluetooth</0> im Browser. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
-			"requiresWebSerial": "Dieser Verbindungstyp erfordert <0>Serielle Schnittstelle</0> im Browser. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
+			"requiresFeatures": "Dieser Verbindungstyp erfordert <0></0>. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
 			"requiresSecureContext": "Diese Anwendung erfordert einen <0>sicheren Kontext</0>. Bitte verbinden Sie sich über HTTPS oder localhost.",
 			"additionallyRequiresSecureContext": "Zusätzlich erfordert es einen <0>sicheren Kontext</0>. Bitte verbinden Sie sich über HTTPS oder localhost."
 		}
@@ -161,11 +172,11 @@
 		"preamble": "Ich habe die",
 		"choosingRightDeviceRole": "Wahl der richtigen Geräterolle",
 		"deviceRoleDocumentation": "Dokumentation der Geräterolle",
-		"title": "Bist Du sicher?"
+		"title": "Sind Sie sicher?"
 	},
 	"managedMode": {
 		"confirmUnderstanding": "Ja, ich weiß, was ich tue!",
-		"title": "Bist Du sicher?",
-		"description": "Das Aktivieren des verwalteten Modus blockiert das Schreiben der Einstellungen in das Funkgerät durch alle Anwendungen (einschließlich der Webanwendung). Einmal aktiviert, können die Einstellungen <bold>nur</bold> durch administrative Nachrichten geändert werden. Diese Einstellung ist für die Fernverwaltung von abgesetzten Knoten nicht erforderlich."
+		"title": "Sind Sie sicher?",
+		"description": "Das Aktivieren des verwalteten Modus blockiert das Schreiben der Einstellungen in das Funkgerät durch alle Anwendungen (einschließlich der Webanwendung). Einmal aktiviert, können die Einstellungen nur durch administrative Nachrichten geändert werden. Diese Einstellung ist für die Fernverwaltung von abgesetzten Knoten nicht erforderlich."
 	}
 }

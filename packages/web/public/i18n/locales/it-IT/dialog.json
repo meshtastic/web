@@ -7,7 +7,13 @@
 		"description": "Il dispositivo verrà riavviato una volta salvata la configurazione.",
 		"longName": "Nome Lungo",
 		"shortName": "Nome Breve",
-		"title": "Cambia Nome Dispositivo"
+		"title": "Cambia Nome Dispositivo",
+		"validation": {
+			"longNameMax": "Long name must not be more than 40 characters",
+			"shortNameMax": "Short name must not be more than 4 characters",
+			"longNameMin": "Long name must have at least 1 character",
+			"shortNameMin": "Short name must have at least 1 character"
+		}
 	},
 	"import": {
 		"description": "La configurazione attuale di LoRa sarà sovrascritta.",
@@ -21,9 +27,10 @@
 		"title": "Importa Set Canale"
 	},
 	"locationResponse": {
+		"title": "Posizione: {{identifier}}",
 		"altitude": "Altitudine: ",
 		"coordinates": "Coordinate: ",
-		"title": "Posizione: {{identifier}}"
+		"noCoordinates": "No Coordinates"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Rigenerare La Chiave Pre-Condivisa?",
@@ -60,11 +67,15 @@
 		},
 		"bluetoothConnection": {
 			"noDevicesPaired": "Nessun dispositivo ancora abbinato.",
-			"newDeviceButton": "Nuovo dispositivo"
+			"newDeviceButton": "Nuovo dispositivo",
+			"connectionFailed": "Connection failed",
+			"deviceDisconnected": "Device disconnected",
+			"unknownDevice": "Unknown Device",
+			"errorLoadingDevices": "Error loading devices",
+			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
 		"validation": {
-			"requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
-			"requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
+			"requiresFeatures": "Questo tipo di connessione richiede <0></0>. Si prega di utilizzare un browser supportato, come Chrome o Edge.",
 			"requiresSecureContext": "Questa applicazione richiede un <0>contesto sicuro</0>. Si prega di connettersi utilizzando HTTPS o localhost.",
 			"additionallyRequiresSecureContext": "Inoltre, richiede un <0>contesto sicuro</0>. Si prega di connettersi utilizzando HTTPS o localhost."
 		}
@@ -166,6 +177,6 @@
 	"managedMode": {
 		"confirmUnderstanding": "Sì, so cosa sto facendo",
 		"title": "Sei sicuro?",
-		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can <bold>only</bold> be changed through Remote Admin messages. This setting is not required for remote node administration."
+		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
 	}
 }

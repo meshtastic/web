@@ -1,171 +1,182 @@
 {
 	"deleteMessages": {
-		"description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-		"title": "Clear All Messages"
+		"description": "Cette action effacera tout l’historique des messages. Cette opération est irréversible. Voulez-vous vraiment continuer ?",
+		"title": "Supprimer tous les messages"
 	},
 	"deviceName": {
-		"description": "The Device will restart once the config is saved.",
-		"longName": "Long Name",
-		"shortName": "Short Name",
-		"title": "Change Device Name"
+		"description": "L’appareil redémarrera une fois la configuration enregistrée.",
+		"longName": "Nom long",
+		"shortName": "Nom court",
+		"title": "Changer le nom de l’appareil",
+		"validation": {
+			"longNameMax": "Long name must not be more than 40 characters",
+			"shortNameMax": "Short name must not be more than 4 characters",
+			"longNameMin": "Long name must have at least 1 character",
+			"shortNameMin": "Short name must have at least 1 character"
+		}
 	},
 	"import": {
-		"description": "The current LoRa configuration will be overridden.",
+		"description": "La configuration LoRa actuelle sera écrasée.",
 		"error": {
-			"invalidUrl": "Invalid Meshtastic URL"
+			"invalidUrl": "URL Meshtastic invalide"
 		},
-		"channelPrefix": "Channel: ",
-		"channelSetUrl": "Channel Set/QR Code URL",
-		"channels": "Channels:",
-		"usePreset": "Use Preset?",
-		"title": "Import Channel Set"
+		"channelPrefix": "Canal: ",
+		"channelSetUrl": "URL du set de canaux ou du QR code",
+		"channels": "Canaux:",
+		"usePreset": "Utiliser un préréglage?",
+		"title": "Importer un ensemble de canaux"
 	},
 	"locationResponse": {
+		"title": "Position : {{identifier}}",
 		"altitude": "Altitude: ",
-		"coordinates": "Coordinates: ",
-		"title": "Location: {{identifier}}"
+		"coordinates": "Coordonnées : ",
+		"noCoordinates": "No Coordinates"
 	},
 	"pkiRegenerateDialog": {
-		"title": "Regenerate Pre-Shared Key?",
-		"description": "Are you sure you want to regenerate the pre-shared key?",
-		"regenerate": "Regenerate"
+		"title": "Régénérer la clé pré-partagée ?",
+		"description": "Êtes-vous sûr de vouloir régénérer la clé pré-partagée ?",
+		"regenerate": "Régénérer"
 	},
 	"newDeviceDialog": {
-		"title": "Connect New Device",
+		"title": "Connecter un nouvel appareil",
 		"https": "https",
 		"http": "http",
 		"tabHttp": "HTTP",
 		"tabBluetooth": "Bluetooth",
 		"tabSerial": "Série",
-		"useHttps": "Use HTTPS",
-		"connecting": "Connecting...",
-		"connect": "Connect",
+		"useHttps": "Utiliser HTTPS",
+		"connecting": "Connexion...",
+		"connect": "Connecter",
 		"connectionFailedAlert": {
-			"title": "Connection Failed",
-			"descriptionPrefix": "Could not connect to the device. ",
-			"httpsHint": "If using HTTPS, you may need to accept a self-signed certificate first. ",
-			"openLinkPrefix": "Please open ",
-			"openLinkSuffix": " in a new tab",
-			"acceptTlsWarningSuffix": ", accept any TLS warnings if prompted, then try again",
-			"learnMoreLink": "Learn more"
+			"title": "Échec de la connexion",
+			"descriptionPrefix": "Vous ne pouvez pas connecter l'appareil. ",
+			"httpsHint": "Si vous utilisez HTTPS, vous devrez peut-être accepter un certificat auto-signé. ",
+			"openLinkPrefix": "Veuillez ouvrir ",
+			"openLinkSuffix": " dans un nouvel onglet",
+			"acceptTlsWarningSuffix": ", acceptez les avertissements TLS si vous y êtes invité, puis réessayez",
+			"learnMoreLink": "En savoir plus"
 		},
 		"httpConnection": {
-			"label": "IP Address/Hostname",
+			"label": "Adresse IP / nom d'hôte",
 			"placeholder": "000.000.000.000 / meshtastic.local"
 		},
 		"serialConnection": {
-			"noDevicesPaired": "No devices paired yet.",
-			"newDeviceButton": "New device",
+			"noDevicesPaired": "Aucun appareil appairé pour l’instant.",
+			"newDeviceButton": "Nouvel appareil",
 			"deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
 		},
 		"bluetoothConnection": {
-			"noDevicesPaired": "No devices paired yet.",
-			"newDeviceButton": "New device"
+			"noDevicesPaired": "Aucun appareil appairé pour l’instant.",
+			"newDeviceButton": "Nouvel appareil",
+			"connectionFailed": "Connection failed",
+			"deviceDisconnected": "Device disconnected",
+			"unknownDevice": "Unknown Device",
+			"errorLoadingDevices": "Error loading devices",
+			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
 		"validation": {
-			"requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
-			"requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
-			"requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
-			"additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
+			"requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
+			"requiresSecureContext": "Cette application nécessite un <0>contexte sécurisé</0>. Veuillez vous connecter via HTTPS ou localhost.",
+			"additionallyRequiresSecureContext": "Elle nécessite également un <0>contexte sécurisé</0>. Veuillez vous connecter via HTTPS ou localhost."
 		}
 	},
 	"nodeDetails": {
 		"message": "Message",
-		"requestPosition": "Request Position",
-		"traceRoute": "Trace Route",
-		"airTxUtilization": "Air TX utilization",
-		"allRawMetrics": "All Raw Metrics:",
-		"batteryLevel": "Battery level",
-		"channelUtilization": "Channel utilization",
-		"details": "Details:",
-		"deviceMetrics": "Device Metrics:",
-		"hardware": "Hardware: ",
-		"lastHeard": "Last Heard: ",
-		"nodeHexPrefix": "Node Hex: !",
-		"nodeNumber": "Node Number: ",
+		"requestPosition": "Demander la position",
+		"traceRoute": "Tracer la route",
+		"airTxUtilization": "Utilisation TX sur l’air",
+		"allRawMetrics": "Toutes les métriques brutes :",
+		"batteryLevel": "Niveau de batterie",
+		"channelUtilization": "Utilisation du canal",
+		"details": "Détails :",
+		"deviceMetrics": "Métriques de l’appareil :",
+		"hardware": "Matériel : ",
+		"lastHeard": "Dernière écoute: ",
+		"nodeHexPrefix": "Hexa du nœud : !",
+		"nodeNumber": "Numéro de nœud: ",
 		"position": "Position:",
-		"role": "Role: ",
-		"uptime": "Uptime: ",
+		"role": "Rôle: ",
+		"uptime": "Temps de fonctionnement :",
 		"voltage": "Tension",
-		"title": "Node Details for {{identifier}}",
-		"ignoreNode": "Ignore node",
-		"removeNode": "Remove node",
-		"unignoreNode": "Unignore node"
+		"title": "Détails du nœud pour {{identifier}}",
+		"ignoreNode": "Ignorer le nœud",
+		"removeNode": "Supprimer le nœud",
+		"unignoreNode": "Ne plus ignorer le nœud"
 	},
 	"pkiBackup": {
-		"loseKeysWarning": "If you lose your keys, you will need to reset your device.",
-		"secureBackup": "Its important to backup your public and private keys and store your backup securely!",
-		"footer": "=== END OF KEYS ===",
-		"header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-		"privateKey": "Private Key:",
-		"publicKey": "Public Key:",
-		"fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-		"title": "Backup Keys"
+		"loseKeysWarning": "Si vous perdez vos clés, vous devrez réinitialiser votre appareil.",
+		"secureBackup": "Il est important de sauvegarder vos clés publique et privée, et de stocker cette sauvegarde en lieu sûr !",
+		"footer": "=== FIN DES CLÉS ===",
+		"header": "=== CLÉS MESHTASTIC POUR {{longName}} ({{shortName}}) ===",
+		"privateKey": "Clé privée :",
+		"publicKey": "Clé publique :",
+		"fileName": "meshtastic_cles_{{longName}}_{{shortName}}.txt",
+		"title": "Sauvegarder les clés"
 	},
 	"pkiBackupReminder": {
-		"description": "We recommend backing up your key data regularly. Would you like to back up now?",
-		"title": "Backup Reminder",
-		"remindLaterPrefix": "Remind me in",
-		"remindNever": "Never remind me",
-		"backupNow": "Back up now"
+		"description": "Nous vous recommandons de sauvegarder régulièrement vos clés. Souhaitez-vous effectuer une sauvegarde maintenant ?",
+		"title": "Rappel de sauvegarde",
+		"remindLaterPrefix": "Me le rappeler dans",
+		"remindNever": "Ne plus me le rappeler",
+		"backupNow": "Sauvegarder maintenant"
 	},
 	"pkiRegenerate": {
-		"description": "Are you sure you want to regenerate key pair?",
-		"title": "Regenerate Key Pair"
+		"description": "Êtes-vous sûr de vouloir régénérer la paire de clés ?",
+		"title": "Régénérer la paire de clés"
 	},
 	"qr": {
-		"addChannels": "Add Channels",
-		"replaceChannels": "Replace Channels",
-		"description": "The current LoRa configuration will also be shared.",
-		"sharableUrl": "Sharable URL",
+		"addChannels": "Ajouter des canaux",
+		"replaceChannels": "Remplacer les canaux",
+		"description": "La configuration LoRa actuelle sera également partagée.",
+		"sharableUrl": "URL partageable",
 		"title": "Générer un QR Code"
 	},
 	"rebootOta": {
-		"title": "Schedule Reboot",
-		"description": "Reboot the connected node after a delay into OTA (Over-the-Air) mode.",
-		"enterDelay": "Enter delay (sec)",
-		"scheduled": "Reboot has been scheduled"
+		"title": "Programmer un redémarrage",
+		"description": "Redémarrer le nœud connecté après un délai en mode OTA (Over-the-Air).",
+		"enterDelay": "Entrer le délai (sec)",
+		"scheduled": "Le redémarrage a été programmé"
 	},
 	"reboot": {
-		"title": "Schedule Reboot",
-		"description": "Reboot the connected node after x minutes."
+		"title": "Programmer un redémarrage",
+		"description": "Redémarrer le nœud connecté après x minutes."
 	},
 	"refreshKeys": {
 		"description": {
-			"acceptNewKeys": "This will remove the node from device and request new keys.",
-			"keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
-			"unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
+			"acceptNewKeys": "Cela supprimera le nœud de l’appareil et demandera de nouvelles clés.",
+			"keyMismatchReasonSuffix": ". Cela est dû au fait que la clé publique actuelle du nœud distant ne correspond pas à celle précédemment enregistrée pour ce nœud.",
+			"unableToSendDmPrefix": "Accepter les nouvelles clés"
 		},
-		"acceptNewKeys": "Accept New Keys",
-		"title": "Keys Mismatch - {{identifier}}"
+		"acceptNewKeys": "Accepter les nouvelles clés",
+		"title": "Clés non concordantes – {{identifier}}"
 	},
 	"removeNode": {
-		"description": "Are you sure you want to remove this Node?",
-		"title": "Remove Node?"
+		"description": "Êtes-vous sûr de vouloir supprimer ce nœud ?",
+		"title": "Supprimer le nœud ?"
 	},
 	"shutdown": {
-		"title": "Schedule Shutdown",
-		"description": "Turn off the connected node after x minutes."
+		"title": "Programmer un arrêt",
+		"description": "Éteindre le nœud connecté après x minutes."
 	},
 	"traceRoute": {
-		"routeToDestination": "Route to destination:",
-		"routeBack": "Route back:"
+		"routeToDestination": "Route vers la destination :",
+		"routeBack": "Route de retour :"
 	},
 	"tracerouteResponse": {
-		"title": "Traceroute: {{identifier}}"
+		"title": "Traceroute : {{identifier}}"
 	},
 	"unsafeRoles": {
-		"confirmUnderstanding": "Yes, I know what I'm doing",
-		"conjunction": " and the blog post about ",
-		"postamble": " and understand the implications of changing the role.",
-		"preamble": "I have read the ",
-		"choosingRightDeviceRole": "Choosing The Right Device Role",
-		"deviceRoleDocumentation": "Device Role Documentation",
+		"confirmUnderstanding": "Oui, je sais ce que je fais",
+		"conjunction": " et l’article de blog sur le ",
+		"postamble": " et je comprends les implications du changement de rôle.",
+		"preamble": "J'ai lu les",
+		"choosingRightDeviceRole": "Choisir le rôle d’appareil approprié",
+		"deviceRoleDocumentation": "Documentation sur les rôles d’appareil",
 		"title": "Êtes-vous sûr ?"
 	},
 	"managedMode": {
-		"confirmUnderstanding": "Yes, I know what I'm doing",
+		"confirmUnderstanding": "Oui, je sais ce que je fais",
 		"title": "Êtes-vous sûr ?",
-		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can <bold>only</bold> be changed through Remote Admin messages. This setting is not required for remote node administration."
+		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
 	}
 }

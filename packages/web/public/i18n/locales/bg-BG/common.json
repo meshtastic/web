@@ -1,7 +1,7 @@
 {
 	"button": {
 		"apply": "Приложи",
-		"backupKey": "Backup Key",
+		"backupKey": "Резервно копие на ключа",
 		"cancel": "Отказ",
 		"clearMessages": "Изчистване на съобщенията",
 		"close": "Затвори",
@@ -19,7 +19,7 @@
 		"print": "Отпечатване",
 		"rebootOtaNow": "Reboot to OTA Mode Now",
 		"remove": "Изтрий",
-		"requestNewKeys": "Request New Keys",
+		"requestNewKeys": "Заявка за нови ключове",
 		"requestPosition": "Request Position",
 		"reset": "Нулиране",
 		"save": "Запис",
@@ -93,7 +93,7 @@
 		}
 	},
 	"security": {
-		"0bit": "Empty",
+		"0bit": "Празен",
 		"8bit": "8 bit",
 		"128bit": "128 bit",
 		"256bit": "256 bit"
@@ -109,32 +109,32 @@
 	"fallbackName": "Meshtastic {{last4}}",
 	"node": "Възел",
 	"formValidation": {
-		"unsavedChanges": "Unsaved changes",
+		"unsavedChanges": "Незапазени промени",
 		"tooBig": {
-			"string": "Too long, expected less than or equal to {{maximum}} characters.",
-			"number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-			"bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+			"string": "Твърде дълъг, очаква се по-малко или равно на {{maximum}} знака.",
+			"number": "Твърде голям, очаква се число по-малко или равно на {{maximum}}.",
+			"bytes": "Твърде голям, очаква се по-малък или равен на {{params.maximum}} байта."
 		},
 		"tooSmall": {
-			"string": "Too short, expected more than or equal to {{minimum}} characters.",
-			"number": "Too small, expected a number larger than or equal to {{minimum}}."
+			"string": "Твърде кратък, очаква се повече или равно на {{minimum}} знака.",
+			"number": "Твърде малък, очаква се число, по-голямо или равно на {{minimum}}."
 		},
 		"invalidFormat": {
 			"ipv4": "Невалиден формат, очаква се IPv4 адрес.",
-			"key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+			"key": "Невалиден формат, очаква се предварително споделен ключ (PSK), кодиран с Base64."
 		},
 		"invalidType": {
 			"number": "Невалиден тип, очаква се число."
 		},
 		"pskLength": {
 			"0bit": "Ключът трябва да е празен.",
-			"8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-			"128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-			"256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+			"8bit": "Ключът трябва да бъде 8-битов предварително споделен ключ (PSK).",
+			"128bit": "Ключът трябва да бъде 128-битов предварително споделен ключ (PSK).",
+			"256bit": "Ключът трябва да бъде 256-битов предварително споделен ключ (PSK)."
 		},
 		"required": {
 			"generic": "Това поле е задължително.",
-			"managed": "At least one admin key is requred if the node is managed.",
+			"managed": "Изисква се поне един администраторски ключ, ако възелът е управляван.",
 			"key": "Ключът е задължителен."
 		}
 	}

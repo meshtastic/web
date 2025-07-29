@@ -1,50 +1,51 @@
 {
-	"emptyState": "Nessun risultato trovato.",
-	"page": {
-		"title": "Menu Comandi"
-	},
-	"pinGroup": {
-		"label": "Fissa gruppo comandi"
-	},
-	"unpinGroup": {
-		"label": "Rimuovi gruppo comandi"
-	},
-	"goto": {
-		"label": "Vai a",
-		"command": {
-			"messages": "Messaggi",
-			"map": "Mappa",
-			"config": "Configurazione",
-			"channels": "Canali",
-			"nodes": "Nodi"
-		}
-	},
-	"manage": {
-		"label": "Gestisci",
-		"command": {
-			"switchNode": "Cambia Nodo",
-			"connectNewNode": "Connetti Nuovo Nodo"
-		}
-	},
-	"contextual": {
-		"label": "Contestuale",
-		"command": {
-			"qrCode": "Codice QR",
-			"qrGenerator": "Generatore",
-			"qrImport": "Importa",
-			"scheduleShutdown": "Pianifica Spegnimento",
-			"scheduleReboot": "Pianifica Riavvio",
-			"rebootToOtaMode": "Riavvia In Modalità OTA",
-			"resetNodeDb": "Resetta DB dei Nodi",
-			"factoryResetDevice": "Factory reset dispositivo",
-			"factoryResetConfig": "Factory reset impostazioni"
-		}
-	},
-	"debug": {
-		"label": "Debug",
-		"command": {
-			"reconfigure": "Riconfigura",
-			"clearAllStoredMessages": "Cancella Tutti i Messaggi Memorizzati"
-		}
-	}
+  "emptyState": "Nessun risultato trovato.",
+  "page": {
+    "title": "Menu Comandi"
+  },
+  "pinGroup": {
+    "label": "Fissa gruppo comandi"
+  },
+  "unpinGroup": {
+    "label": "Rimuovi gruppo comandi"
+  },
+  "goto": {
+    "label": "Vai a",
+    "command": {
+      "messages": "Messaggi",
+      "map": "Mappa",
+      "config": "Configurazione",
+      "channels": "Canali",
+      "nodes": "Nodi"
+    }
+  },
+  "manage": {
+    "label": "Gestisci",
+    "command": {
+      "switchNode": "Cambia Nodo",
+      "connectNewNode": "Connetti Nuovo Nodo"
+    }
+  },
+  "contextual": {
+    "label": "Contestuale",
+    "command": {
+      "qrCode": "Codice QR",
+      "qrGenerator": "Generatore",
+      "qrImport": "Importa",
+      "scheduleShutdown": "Pianifica Spegnimento",
+      "scheduleReboot": "Pianifica Riavvio",
+      "rebootToOtaMode": "Riavvia In Modalità OTA",
+      "resetNodeDb": "Resetta DB dei Nodi",
+      "factoryResetDevice": "Factory reset dispositivo",
+      "factoryResetConfig": "Factory reset impostazioni",
+      "disconnect": "Disconnetti"
+    }
+  },
+  "debug": {
+    "label": "Debug",
+    "command": {
+      "reconfigure": "Riconfigura",
+      "clearAllStoredMessages": "Cancella Tutti i Messaggi Memorizzati"
+    }
+  }
 }

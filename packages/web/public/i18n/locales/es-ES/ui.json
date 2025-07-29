@@ -7,7 +7,7 @@
 		"radioConfig": "Radio Config",
 		"moduleConfig": "Module Config",
 		"channels": "Canales",
-		"nodes": "Nodes"
+		"nodes": "Nodos"
 	},
 	"app": {
 		"title": "Meshtastic",
@@ -23,7 +23,7 @@
 		"deviceInfo": {
 			"volts": "{{voltage}} volts",
 			"firmware": {
-				"title": "Firmware",
+				"title": "Software",
 				"version": "v{{version}}",
 				"buildDate": "Build date: {{date}}"
 			},
@@ -108,7 +108,7 @@
 			"label": "Copy to clipboard"
 		},
 		"hidePassword": {
-			"label": "Hide password"
+			"label": "Ocultar contraseña"
 		},
 		"showPassword": {
 			"label": "Mostrar contraseña"
@@ -130,7 +130,7 @@
 		"label": "Metrics"
 	},
 	"role": {
-		"label": "Role"
+		"label": "Rol"
 	},
 	"filter": {
 		"label": "Filtro"

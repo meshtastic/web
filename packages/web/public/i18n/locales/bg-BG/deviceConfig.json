@@ -102,8 +102,8 @@
 			"label": "GPS Display Units"
 		},
 		"oledType": {
-			"description": "Type of OLED screen attached to the device",
-			"label": "OLED Type"
+			"description": "Тип на OLED екрана, прикрепен към устройството",
+			"label": "Тип OLED"
 		},
 		"screenTimeout": {
 			"description": "Turn off the display after this long",
@@ -120,7 +120,7 @@
 	},
 	"lora": {
 		"title": "Настройки на Mesh",
-		"description": "Settings for the LoRa mesh",
+		"description": "Настройки за LoRa mesh",
 		"bandwidth": {
 			"description": "Широчина на канала в MHz",
 			"label": "Широчина на честотната лента"
@@ -146,8 +146,8 @@
 			"label": "Hop Limit"
 		},
 		"ignoreMqtt": {
-			"description": "Don't forward MQTT messages over the mesh",
-			"label": "Ignore MQTT"
+			"description": "Да не се препращат MQTT съобщения през mesh",
+			"label": "Игнориране на MQTT"
 		},
 		"modemPreset": {
 			"description": "Използване на предварително настроен модем",
@@ -186,7 +186,7 @@
 			"label": "Използване на предварително зададени настройки"
 		},
 		"meshSettings": {
-			"description": "Settings for the LoRa mesh",
+			"description": "Настройки за LoRa mesh",
 			"label": "Настройки на Mesh"
 		},
 		"waveformSettings": {
@@ -329,7 +329,7 @@
 			"numSatellites": "Number of satellites",
 			"sequenceNumber": "Sequence number",
 			"timestamp": "Времево клеймо",
-			"unset": "Отказ",
+			"unset": "Не е зададен",
 			"vehicleHeading": "Vehicle heading",
 			"vehicleSpeed": "Скорост на превозното средство"
 		}
@@ -379,7 +379,7 @@
 	"security": {
 		"description": "Settings for the Security configuration",
 		"title": "Насртойки на сигурността",
-		"button_backupKey": "Backup Key",
+		"button_backupKey": "Резервно копие на ключа",
 		"adminChannelEnabled": {
 			"description": "Allow incoming device control over the insecure legacy admin channel",
 			"label": "Allow Legacy Admin"

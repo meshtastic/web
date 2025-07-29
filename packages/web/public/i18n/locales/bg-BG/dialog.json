@@ -7,10 +7,16 @@
 		"description": "Устройството ще се рестартира, след като конфигурацията бъде запазена.",
 		"longName": "Дълго име",
 		"shortName": "Кратко име",
-		"title": "Промяна на името на устройството"
+		"title": "Промяна на името на устройството",
+		"validation": {
+			"longNameMax": "Long name must not be more than 40 characters",
+			"shortNameMax": "Short name must not be more than 4 characters",
+			"longNameMin": "Long name must have at least 1 character",
+			"shortNameMin": "Short name must have at least 1 character"
+		}
 	},
 	"import": {
-		"description": "The current LoRa configuration will be overridden.",
+		"description": "Текущата конфигурация на LoRa ще бъде презаписана.",
 		"error": {
 			"invalidUrl": "Невалиден Meshtastic URL"
 		},
@@ -21,13 +27,14 @@
 		"title": "Import Channel Set"
 	},
 	"locationResponse": {
+		"title": "Местоположение: {{identifier}}",
 		"altitude": "Надморска височина: ",
 		"coordinates": "Координати:",
-		"title": "Местоположение: {{identifier}}"
+		"noCoordinates": "No Coordinates"
 	},
 	"pkiRegenerateDialog": {
-		"title": "Regenerate Pre-Shared Key?",
-		"description": "Are you sure you want to regenerate the pre-shared key?",
+		"title": "Регенериране на предварително споделения ключ?",
+		"description": "Сигурни ли сте, че искате да регенерирате предварително споделения ключ?",
 		"regenerate": "Регенериране"
 	},
 	"newDeviceDialog": {
@@ -36,7 +43,7 @@
 		"http": "http",
 		"tabHttp": "HTTP",
 		"tabBluetooth": "Bluetooth",
-		"tabSerial": "Serial",
+		"tabSerial": "Серийна",
 		"useHttps": "Използване на HTTPS",
 		"connecting": "Свързване...",
 		"connect": "Свързване",
@@ -46,7 +53,7 @@
 			"httpsHint": "Ако използвате HTTPS, може да се наложи първо да приемете самоподписан сертификат. ",
 			"openLinkPrefix": "Моля, отворете",
 			"openLinkSuffix": "в нов раздел",
-			"acceptTlsWarningSuffix": "",
+			"acceptTlsWarningSuffix": ", accept any TLS warnings if prompted, then try again",
 			"learnMoreLink": "Научете повече"
 		},
 		"httpConnection": {
@@ -60,13 +67,17 @@
 		},
 		"bluetoothConnection": {
 			"noDevicesPaired": "Все още няма сдвоени устройства.",
-			"newDeviceButton": "Ново устройство"
+			"newDeviceButton": "Ново устройство",
+			"connectionFailed": "Connection failed",
+			"deviceDisconnected": "Device disconnected",
+			"unknownDevice": "Unknown Device",
+			"errorLoadingDevices": "Error loading devices",
+			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
 		"validation": {
-			"requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
-			"requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
-			"requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
-			"additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
+			"requiresFeatures": "Този тип връзка изисква <0></0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
+			"requiresSecureContext": "Това приложение изисква <0>secure context</0>. Моля, свържете се чрез HTTPS или localhost.",
+			"additionallyRequiresSecureContext": "Освен това, изисква <0>secure context</0>. Моля, свържете се чрез HTTPS или localhost."
 		}
 	},
 	"nodeDetails": {
@@ -103,11 +114,11 @@
 		"title": "Backup Keys"
 	},
 	"pkiBackupReminder": {
-		"description": "We recommend backing up your key data regularly. Would you like to back up now?",
-		"title": "Backup Reminder",
+		"description": "Препоръчваме редовно да правите резервни копия на данните с вашите ключове. Искате ли да направите резервно копие сега?",
+		"title": "Напомняне за резервно копие",
 		"remindLaterPrefix": "Remind me in",
-		"remindNever": "Never remind me",
-		"backupNow": "Back up now"
+		"remindNever": "Никога не ми напомняй",
+		"backupNow": "Създаване на резервно копие сега"
 	},
 	"pkiRegenerate": {
 		"description": "Сигурни ли сте, че искате да регенерирате двойката ключове?",
@@ -136,7 +147,7 @@
 			"keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
 			"unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
 		},
-		"acceptNewKeys": "Accept New Keys",
+		"acceptNewKeys": "риемане на нови ключове",
 		"title": "Keys Mismatch - {{identifier}}"
 	},
 	"removeNode": {
@@ -159,13 +170,13 @@
 		"conjunction": " and the blog post about ",
 		"postamble": " and understand the implications of changing the role.",
 		"preamble": "I have read the ",
-		"choosingRightDeviceRole": "Choosing The Right Device Role",
-		"deviceRoleDocumentation": "Device Role Documentation",
+		"choosingRightDeviceRole": "Избор на правилната роля на устройството",
+		"deviceRoleDocumentation": "Документация за ролите на устройството",
 		"title": "Сигурни ли сте?"
 	},
 	"managedMode": {
 		"confirmUnderstanding": "Да, знам какво правя",
 		"title": "Сигурни ли сте?",
-		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can <bold>only</bold> be changed through Remote Admin messages. This setting is not required for remote node administration."
+		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
 	}
 }
