@@ -55,9 +55,9 @@
         "@bufbuild/protobuf": "^2.6.0",
         "@hookform/resolvers": "^5.1.1",
         "@meshtastic/core": "workspace:*",
-        "@meshtastic/transport-http": "workspace:*",
-        "@meshtastic/transport-web-bluetooth": "workspace:*",
-        "@meshtastic/transport-web-serial": "workspace:*",
+        "@meshtastic/transport-http": "npm:@jsr/meshtastic__transport-http",
+        "@meshtastic/transport-web-bluetooth": "npm:@jsr/meshtastic__transport-web-bluetooth",
+        "@meshtastic/transport-web-serial": "npm:@jsr/meshtastic__transport-web-serial",
         "@noble/curves": "^1.9.2",
         "@radix-ui/react-accordion": "^1.2.11",
         "@radix-ui/react-checkbox": "^1.3.2",
@@ -300,6 +300,10 @@
     "@jridgewell/sourcemap-codec": ["@jridgewell/sourcemap-codec@1.5.4", "", {}, "sha512-VT2+G1VQs/9oz078bLrYbecdZKs912zQlkelYpuf+SXF+QvZDYJlbx/LSx+meSAwdDFnF8FVXW92AVjjkVmgFw=="],
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.29", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-uw6guiW/gcAGPDhLmd77/6lW8QLeiV5RUTsAX46Db6oLhGaVj4lhnPwb184s1bkc8kdVg/+h988dro8GRDpmYQ=="],
+
+    "@jsr/meshtastic__core": ["@jsr/meshtastic__core@2.6.5", "https://npm.jsr.io/~/11/@jsr/meshtastic__core/2.6.5.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.6.1", "@jsr/meshtastic__protobufs": "2.7.0", "crc": "^4.3.2", "ste-simple-events": "^3.0.11", "tslog": "^4.9.3" } }, "sha512-CFVdhdPRc2styk+A7XVk18ayhXArZ7Av8NLnltSl5UzthKoY2KXSqYsXOPpaloSg1aemtvlRGXilW4SQ3C4jjg=="],
+
+    "@jsr/meshtastic__protobufs": ["@jsr/meshtastic__protobufs@2.7.0", "https://npm.jsr.io/~/11/@jsr/meshtastic__protobufs/2.7.0.tgz", { "dependencies": { "@bufbuild/protobuf": "^2.2.3" } }, "sha512-ndZhUyB/ADSyjJI+iSeSOoIKqNGZ2+ERVjfY0qnh4jgF740tFTwefC5mzZhOqDLbreGFYS79+429NtH5Ujdzdg=="],
 
     "@mapbox/geojson-rewind": ["@mapbox/geojson-rewind@0.5.2", "", { "dependencies": { "get-stream": "^6.0.1", "minimist": "^1.2.6" }, "bin": { "geojson-rewind": "geojson-rewind" } }, "sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA=="],
 
@@ -1678,6 +1682,12 @@
     "happy-dom/@types/node": ["@types/node@20.19.9", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-cuVNgarYWZqxRJDQHEB58GEONhOK79QVR/qYx4S7kcUObQvUwvFnYxJuuHUKm2aieN9X3yZB4LZsuYNU1Qphsw=="],
 
     "lru-cache/yallist": ["yallist@3.1.1", "", {}, "sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g=="],
+
+    "meshtastic-web/@meshtastic/transport-http": ["@jsr/meshtastic__transport-http@0.2.1", "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-http/0.2.1.tgz", { "dependencies": { "@jsr/meshtastic__core": "^2.6.0" } }, "sha512-lmQKr3aIINKvtGROU4HchmSVqbZSbkIHqajowRRC8IAjsnR0zNTyxz210QyY4pFUF9hpcW3GRjwq5h/VO2JuGg=="],
+
+    "meshtastic-web/@meshtastic/transport-web-bluetooth": ["@jsr/meshtastic__transport-web-bluetooth@0.1.2", "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-web-bluetooth/0.1.2.tgz", { "dependencies": { "@jsr/meshtastic__core": "^2.6.4" } }, "sha512-Z+5pv9RXNgY0/crKExOH3pZ6LT0HIXFmnBL7NX5AO2knOFRn+4lmxQEhhmiTTlkUfqyEfAvbjuY5u4mq9TPTdQ=="],
+
+    "meshtastic-web/@meshtastic/transport-web-serial": ["@jsr/meshtastic__transport-web-serial@0.2.1", "https://npm.jsr.io/~/11/@jsr/meshtastic__transport-web-serial/0.2.1.tgz", { "dependencies": { "@jsr/meshtastic__core": "^2.6.0" } }, "sha512-yumjEGLkAuJYOC3aWKvZzbQqi/LnqaKfNpVCY7Ki7oLtAshNiZrBLiwiFhN7+ZR9FfMdJThyBMqREBDRRWTO1Q=="],
 
     "meshtastic-web/@types/node": ["@types/node@24.1.0", "", { "dependencies": { "undici-types": "~7.8.0" } }, "sha512-ut5FthK5moxFKH2T1CUOC6ctR67rQRvvHdFLCD2Ql6KXmMuCrjsSsRI9UsLCm9M18BMwClv4pn327UvB7eeO1w=="],
 
