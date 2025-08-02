@@ -15,6 +15,7 @@ export type DeviceOutput = Packet | DebugLog;
 export interface Transport {
   toDevice: WritableStream<Uint8Array>;
   fromDevice: ReadableStream<DeviceOutput>;
+  disconnect(): Promise<void>;
 }
 
 export interface QueueItem {

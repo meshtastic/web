@@ -9,6 +9,7 @@ export class TransportWebBluetooth implements Types.Transport {
   private toRadioCharacteristic: BluetoothRemoteGATTCharacteristic;
   private fromRadioCharacteristic: BluetoothRemoteGATTCharacteristic;
   private fromNumCharacteristic: BluetoothRemoteGATTCharacteristic;
+  private gattServer: BluetoothRemoteGATTServer;
 
   static ToRadioUuid = "f75c76d2-129e-4dad-a1dd-7866124401e7";
   static FromRadioUuid = "2c55e69e-4993-11ed-b878-0242ac120002";
@@ -65,6 +66,7 @@ export class TransportWebBluetooth implements Types.Transport {
       toRadioCharacteristic,
       fromRadioCharacteristic,
       fromNumCharacteristic,
+      gattServer,
     );
   }
 
@@ -72,10 +74,12 @@ export class TransportWebBluetooth implements Types.Transport {
     toRadioCharacteristic: BluetoothRemoteGATTCharacteristic,
     fromRadioCharacteristic: BluetoothRemoteGATTCharacteristic,
     fromNumCharacteristic: BluetoothRemoteGATTCharacteristic,
+    gattServer: BluetoothRemoteGATTServer,
   ) {
     this.toRadioCharacteristic = toRadioCharacteristic;
     this.fromRadioCharacteristic = fromRadioCharacteristic;
     this.fromNumCharacteristic = fromNumCharacteristic;
+    this.gattServer = gattServer;
 
     this._fromDevice = new ReadableStream({
       start: (ctrl) => {
@@ -132,5 +136,10 @@ export class TransportWebBluetooth implements Types.Transport {
         data: new Uint8Array(value.buffer),
       });
     }
+  }
+
+  disconnect() : Promise<void> {
+    this.gattServer.disconnect();
+    return Promise.resolve();
   }
 }

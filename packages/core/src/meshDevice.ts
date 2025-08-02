@@ -818,6 +818,7 @@ export class MeshDevice {
 
     this.complete();
     await this.transport.toDevice.close();
+    await this.transport.disconnect();
   }
 
   /**

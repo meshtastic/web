@@ -4,6 +4,7 @@ import { Utils } from "@meshtastic/core";
 export class TransportWebSerial implements Types.Transport {
   private _toDevice: WritableStream<Uint8Array>;
   private _fromDevice: ReadableStream<Types.DeviceOutput>;
+  private connection: SerialPort;
 
   public static async create(baudRate?: number): Promise<TransportWebSerial> {
     const port = await navigator.serial.requestPort();
@@ -24,6 +25,8 @@ export class TransportWebSerial implements Types.Transport {
       throw new Error("Stream not accessible");
     }
 
+    this.connection = connection;
+
     Utils.toDeviceStream.readable.pipeTo(connection.writable);
 
     this._toDevice = Utils.toDeviceStream.writable;
@@ -38,5 +41,9 @@ export class TransportWebSerial implements Types.Transport {
 
   get fromDevice(): ReadableStream<Types.DeviceOutput> {
     return this._fromDevice;
+  }
+
+  disconnect() {
+    return this.connection.close();
   }
 }
