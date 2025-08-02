@@ -7,6 +7,7 @@ export class TransportHTTP implements Types.Transport {
   private receiveBatchRequests: boolean;
   private fetchInterval: number;
   private fetching: boolean;
+  private interval: number | undefined;
 
   public static async create(
     address: string,
@@ -40,7 +41,7 @@ export class TransportHTTP implements Types.Transport {
       },
     });
 
-    setInterval(async () => {
+    this.interval = setInterval(async () => {
       if (this.fetching) {
         // We still have the previous request open
         return;
@@ -99,5 +100,14 @@ export class TransportHTTP implements Types.Transport {
 
   get fromDevice(): ReadableStream<Types.DeviceOutput> {
     return this._fromDevice;
+  }
+
+  disconnect() : Promise<void> {
+    this.fetching = false;
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    this.interval = undefined;
+    return Promise.resolve();
   }
 }
