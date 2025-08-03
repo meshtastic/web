@@ -1,12 +1,12 @@
 {
 	"dashboard": {
-		"title": "Connected Devices",
-		"description": "Manage your connected Meshtastic devices.",
+		"title": "Bağlanan Cihazlar",
+		"description": "Bağlanan Meshtastic cihazlarını yönet.",
 		"connectionType_ble": "BLE",
 		"connectionType_serial": "Seri",
 		"connectionType_network": "Ağ",
-		"noDevicesTitle": "No devices connected",
-		"noDevicesDescription": "Connect a new device to get started.",
-		"button_newConnection": "New Connection"
+		"noDevicesTitle": "Bağlı cihaz yok",
+		"noDevicesDescription": "Başlamak için yeni cihaz bağla.",
+		"button_newConnection": "Yeni Bağlantı"
 	}
 }

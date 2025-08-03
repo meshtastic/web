@@ -56,8 +56,8 @@
 	"actions": {
 		"added": "Добавен",
 		"removed": "Премахнат",
-		"ignoreNode": "Ignore Node",
-		"unignoreNode": "Unignore Node",
+		"ignoreNode": "Игнориране на възела",
+		"unignoreNode": "Премахване на игнорирането на възела",
 		"requestPosition": "Request Position"
 	}
 }

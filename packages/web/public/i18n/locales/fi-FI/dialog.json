@@ -9,10 +9,10 @@
 		"shortName": "Lyhytnimi",
 		"title": "Vaihda laitteen nimi",
 		"validation": {
-			"longNameMax": "Long name must not be more than 40 characters",
-			"shortNameMax": "Short name must not be more than 4 characters",
-			"longNameMin": "Long name must have at least 1 character",
-			"shortNameMin": "Short name must have at least 1 character"
+			"longNameMax": "Pitkässä nimessä saa olla enintään 40 merkkiä",
+			"shortNameMax": "Lyhytnimessä ei saa olla enempää kuin 4 merkkiä",
+			"longNameMin": "Pitkässä nimessä täytyy olla vähintään yksi merkki",
+			"shortNameMin": "Lyhytnimessä täytyy olla vähintään ykis merkki"
 		}
 	},
 	"import": {
@@ -30,7 +30,7 @@
 		"title": "Sijainti: {{identifier}}",
 		"altitude": "Korkeus: ",
 		"coordinates": "Koordinaatit: ",
-		"noCoordinates": "No Coordinates"
+		"noCoordinates": "Ei koordinaatteja"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Luodaanko ennalta jaettu avain uudelleen?",
@@ -68,11 +68,11 @@
 		"bluetoothConnection": {
 			"noDevicesPaired": "Yhtään laitetta ei ole vielä yhdistetty.",
 			"newDeviceButton": "Uusi laite",
-			"connectionFailed": "Connection failed",
-			"deviceDisconnected": "Device disconnected",
-			"unknownDevice": "Unknown Device",
-			"errorLoadingDevices": "Error loading devices",
-			"unknownErrorLoadingDevices": "Unknown error loading devices"
+			"connectionFailed": "Yhdistäminen epäonnistui",
+			"deviceDisconnected": "Yhteys laitteeseen katkaistu",
+			"unknownDevice": "Tuntematon laite",
+			"errorLoadingDevices": "Virhe ladattaessa laitteita",
+			"unknownErrorLoadingDevices": "Tuntematon virhe laitteita ladattaessa"
 		},
 		"validation": {
 			"requiresFeatures": "Tämä yhteystyyppi vaatii <0></0>. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
@@ -177,6 +177,6 @@
 	"managedMode": {
 		"confirmUnderstanding": "Kyllä, tiedän mitä teen",
 		"title": "Oletko varma?",
-		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+		"description": "Hallintatilan käyttöönotto estää asiakassovelluksia (mukaan lukien verkkoselain) tekemästä muutoksia laitteen asetuksiin. Kun hallintatila on käytössä, laitteen asetuksia voidaan muuttaa ainoastaan etähallintaviesteillä (Remote Admin). Tämä asetus ei ole pakollinen etähallintaan."
 	}
 }

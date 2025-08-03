@@ -37,8 +37,8 @@
 		"dbm": "dBm",
 		"hertz": "Hz",
 		"hop": {
-			"one": "Hop",
-			"plural": "Hops"
+			"one": "Хоп",
+			"plural": "Хопа"
 		},
 		"hopsAway": {
 			"one": "{{count}} hop away",
