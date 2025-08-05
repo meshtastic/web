@@ -1,6 +1,6 @@
 {
 	"page": {
-		"title": "Configuration",
+		"title": "Yapılandırma",
 		"tabBluetooth": "Bluetooth",
 		"tabDevice": "Cihaz",
 		"tabDisplay": "Ekran",
@@ -14,8 +14,8 @@
 		"label": "Modüller"
 	},
 	"device": {
-		"title": "Device Settings",
-		"description": "Settings for the device",
+		"title": "Cihaz Ayarları",
+		"description": "Cihazınız için ayar",
 		"buttonPin": {
 			"description": "Button pin override",
 			"label": "Button Pin"

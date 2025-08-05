@@ -21,7 +21,7 @@
 			}
 		},
 		"deviceInfo": {
-			"volts": "{{voltage}} volts",
+			"volts": "{{voltage}} volt",
 			"firmware": {
 				"title": "Yazılım",
 				"version": "v{{version}}",

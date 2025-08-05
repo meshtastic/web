@@ -1,90 +1,90 @@
 {
 	"button": {
 		"apply": "Uygula",
-		"backupKey": "Backup Key",
+		"backupKey": "Yedekleme Anahtarı",
 		"cancel": "İptal",
-		"clearMessages": "Clear Messages",
+		"clearMessages": "Mesajları Sil",
 		"close": "Kapat",
-		"confirm": "Confirm",
+		"confirm": "Onayla",
 		"delete": "Sil",
-		"dismiss": "Dismiss",
-		"download": "Download",
-		"export": "Export",
-		"generate": "Generate",
-		"regenerate": "Regenerate",
+		"dismiss": "Vazgeç",
+		"download": "Yükle",
+		"export": "Dışa Aktar",
+		"generate": "Oluştur",
+		"regenerate": "Yeniden Oluştur",
 		"import": "İçeri aktar",
 		"message": "Mesaj",
-		"now": "Now",
+		"now": "Şimdi",
 		"ok": "Tamam",
-		"print": "Print",
-		"rebootOtaNow": "Reboot to OTA Mode Now",
+		"print": "Yazdır",
+		"rebootOtaNow": "Şimdi OTA Moduna Yeniden Başlat",
 		"remove": "Kaldır",
-		"requestNewKeys": "Request New Keys",
-		"requestPosition": "Request Position",
+		"requestNewKeys": "Yeni Anahtar İste",
+		"requestPosition": "Konum İste",
 		"reset": "Sıfırla",
 		"save": "Kaydet",
 		"scanQr": "QR Kodu Tara",
-		"traceRoute": "Trace Route",
-		"submit": "Submit"
+		"traceRoute": "Rotayı Takip Et",
+		"submit": "Gönder"
 	},
 	"app": {
 		"title": "Meshtastic",
-		"fullTitle": "Meshtastic Web Client"
+		"fullTitle": "Meshtastic Web İstemci"
 	},
-	"loading": "Loading...",
+	"loading": "Yükleniyor...",
 	"unit": {
 		"cps": "CPS",
 		"dbm": "dBm",
 		"hertz": "Hz",
 		"hop": {
 			"one": "Hop",
-			"plural": "Hops"
+			"plural": "Hop"
 		},
 		"hopsAway": {
-			"one": "{{count}} hop away",
-			"plural": "{{count}} hops away",
-			"unknown": "Unknown hops away"
+			"one": "{{count}} hop uzaklıkta",
+			"plural": "{{count}} hop uzaklıkta",
+			"unknown": "Hop uzaklığı bilinmiyor"
 		},
 		"megahertz": "MHz",
-		"raw": "raw",
+		"raw": "ham",
 		"meter": {
-			"one": "Meter",
-			"plural": "Meters",
+			"one": "Metre",
+			"plural": "Metre",
 			"suffix": "m"
 		},
 		"minute": {
-			"one": "Minute",
-			"plural": "Minutes"
+			"one": "Dakika",
+			"plural": "Dakika"
 		},
 		"hour": {
-			"one": "Hour",
-			"plural": "Hours"
+			"one": "Saat",
+			"plural": "Saat"
 		},
 		"millisecond": {
-			"one": "Millisecond",
-			"plural": "Milliseconds",
+			"one": "Milisaniye",
+			"plural": "Milisaniye",
 			"suffix": "ms"
 		},
 		"second": {
-			"one": "Second",
-			"plural": "Seconds"
+			"one": "Saniye",
+			"plural": "Saniye"
 		},
 		"day": {
-			"one": "Day",
-			"plural": "Days"
+			"one": "Gün",
+			"plural": "Gün"
 		},
 		"month": {
-			"one": "Month",
-			"plural": "Months"
+			"one": "Ay",
+			"plural": "Ay"
 		},
 		"year": {
-			"one": "Year",
-			"plural": "Years"
+			"one": "Yıl",
+			"plural": "Yıl"
 		},
 		"snr": "SNR",
 		"volt": {
 			"one": "Volt",
-			"plural": "Volts",
+			"plural": "Volt",
 			"suffix": "V"
 		},
 		"record": {
@@ -93,15 +93,15 @@
 		}
 	},
 	"security": {
-		"0bit": "Empty",
+		"0bit": "Boş",
 		"8bit": "8 bit",
 		"128bit": "128 bit",
 		"256bit": "256 bit"
 	},
 	"unknown": {
-		"longName": "Unknown",
+		"longName": "Bilinmeyen",
 		"shortName": "UNK",
-		"notAvailable": "N/A",
+		"notAvailable": "Müsait Değil",
 		"num": "??"
 	},
 	"nodeUnknownPrefix": "!",
@@ -109,10 +109,10 @@
 	"fallbackName": "Meshtastic {{last4}}",
 	"node": "Node",
 	"formValidation": {
-		"unsavedChanges": "Unsaved changes",
+		"unsavedChanges": "Kaydedilmemiş değişiklikler",
 		"tooBig": {
-			"string": "Too long, expected less than or equal to {{maximum}} characters.",
-			"number": "Too big, expected a number smaller than or equal to {{maximum}}.",
+			"string": "Çok uzun, {{maximum}} karaktere eşit yada daha az olması gerek.",
+			"number": "Çok büyük, {{maximum}} sayıya eşit yada daha az olması gerek.",
 			"bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
 		},
 		"tooSmall": {
@@ -127,15 +127,15 @@
 			"number": "Invalid type, expected a number."
 		},
 		"pskLength": {
-			"0bit": "Key is required to be empty.",
+			"0bit": "Anahtarın boş olması gerekiyor.",
 			"8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
 			"128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
 			"256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
 		},
 		"required": {
-			"generic": "This field is required.",
-			"managed": "At least one admin key is requred if the node is managed.",
-			"key": "Key is required."
+			"generic": "Bu alan zorunludur.",
+			"managed": "Nodeun yönetilmesi için en az bir tane yönetici anahtarı gerekli.",
+			"key": "Anahtar gerekli."
 		}
 	}
 }

@@ -164,8 +164,8 @@
 	},
 	"hops": {
 		"direct": "Директно",
-		"label": "Number of hops",
-		"text": "Number of hops: {{value}}"
+		"label": "Брой хопове",
+		"text": "Брой хопове: {{value}}"
 	},
 	"lastHeard": {
 		"label": "Последно чут",

@@ -1,13 +1,13 @@
 {
 	"deleteMessages": {
-		"description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-		"title": "Clear All Messages"
+		"description": "Bu işlem tüm mesaj geçmişini temizleyecektir. Bu işlem geri alınamaz. Devam etmek istediğinizden emin misiniz?",
+		"title": "Tüm Mesajları Sil"
 	},
 	"deviceName": {
-		"description": "The Device will restart once the config is saved.",
-		"longName": "Long Name",
-		"shortName": "Short Name",
-		"title": "Change Device Name",
+		"description": "Yapılandırma kaydedildikten sonra Cihaz yeniden başlatılacaktır.",
+		"longName": "Uzun Ad",
+		"shortName": "Kısa Ad",
+		"title": "Cihazın Adını Değiştir",
 		"validation": {
 			"longNameMax": "Long name must not be more than 40 characters",
 			"shortNameMax": "Short name must not be more than 4 characters",
@@ -70,12 +70,12 @@
 			"newDeviceButton": "New device",
 			"connectionFailed": "Connection failed",
 			"deviceDisconnected": "Device disconnected",
-			"unknownDevice": "Unknown Device",
-			"errorLoadingDevices": "Error loading devices",
-			"unknownErrorLoadingDevices": "Unknown error loading devices"
+			"unknownDevice": "Bilinmeyen Cihaz",
+			"errorLoadingDevices": "Cihazları yüklerken hata oluştu",
+			"unknownErrorLoadingDevices": "Cihazları yüklerken bilinmeyen hata oluştu"
 		},
 		"validation": {
-			"requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
+			"requiresFeatures": "Bu bağlantı tipi <0></0> gerektirir. Lütfen desteklenen bir tarayıcı kullan, Chrome yada Edge gibi.",
 			"requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
 			"additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
 		}
@@ -90,28 +90,28 @@
 		"channelUtilization": "Channel utilization",
 		"details": "Details:",
 		"deviceMetrics": "Device Metrics:",
-		"hardware": "Hardware: ",
+		"hardware": "Donanım: ",
 		"lastHeard": "Last Heard: ",
 		"nodeHexPrefix": "Node Hex: !",
 		"nodeNumber": "Node Number: ",
 		"position": "Position:",
-		"role": "Role: ",
-		"uptime": "Uptime: ",
+		"role": "Rol: ",
+		"uptime": "Çalışma süresi: ",
 		"voltage": "Voltaj",
-		"title": "Node Details for {{identifier}}",
-		"ignoreNode": "Ignore node",
-		"removeNode": "Remove node",
-		"unignoreNode": "Unignore node"
+		"title": "{{identifier}} Node Detayları",
+		"ignoreNode": "Node yoksay",
+		"removeNode": "Node sil",
+		"unignoreNode": "Node yoksaymayı bırak"
 	},
 	"pkiBackup": {
-		"loseKeysWarning": "If you lose your keys, you will need to reset your device.",
-		"secureBackup": "Its important to backup your public and private keys and store your backup securely!",
-		"footer": "=== END OF KEYS ===",
-		"header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-		"privateKey": "Private Key:",
-		"publicKey": "Public Key:",
+		"loseKeysWarning": "Eğer anahtarınızı kaybederseniz cihazınızı sıfırlamalısınız.",
+		"secureBackup": "Açık ve gizli anahtarınızı yedekleyin ve güvenli bir şekilde depolayın!",
+		"footer": "=== ANAHTAR SONU ===",
+		"header": "=== MESHTASTIC ANAHTARI {{longName}} ({{shortName}}) İÇİN ===",
+		"privateKey": "Gizli Anahtar:",
+		"publicKey": "Açık Anahtar:",
 		"fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-		"title": "Backup Keys"
+		"title": "Anahtarları Yedekle"
 	},
 	"pkiBackupReminder": {
 		"description": "We recommend backing up your key data regularly. Would you like to back up now?",
@@ -125,20 +125,20 @@
 		"title": "Regenerate Key Pair"
 	},
 	"qr": {
-		"addChannels": "Add Channels",
-		"replaceChannels": "Replace Channels",
-		"description": "The current LoRa configuration will also be shared.",
-		"sharableUrl": "Sharable URL",
-		"title": "Generate QR Code"
+		"addChannels": "Kanal Ekle",
+		"replaceChannels": "Kanalları Değiştir",
+		"description": "Mevcut LoRa yapılandırması da paylaşılacak.",
+		"sharableUrl": "Paylaşılabilir URL",
+		"title": "QR kod oluştur"
 	},
 	"rebootOta": {
-		"title": "Schedule Reboot",
+		"title": "Yeniden Başlatmayı Planla",
 		"description": "Reboot the connected node after a delay into OTA (Over-the-Air) mode.",
 		"enterDelay": "Enter delay (sec)",
 		"scheduled": "Reboot has been scheduled"
 	},
 	"reboot": {
-		"title": "Schedule Reboot",
+		"title": "Yeniden Başlatmayı Planla",
 		"description": "Reboot the connected node after x minutes."
 	},
 	"refreshKeys": {
@@ -155,7 +155,7 @@
 		"title": "Remove Node?"
 	},
 	"shutdown": {
-		"title": "Schedule Shutdown",
+		"title": "Kapatmayı Planla",
 		"description": "Turn off the connected node after x minutes."
 	},
 	"traceRoute": {
@@ -166,17 +166,17 @@
 		"title": "Traceroute: {{identifier}}"
 	},
 	"unsafeRoles": {
-		"confirmUnderstanding": "Yes, I know what I'm doing",
+		"confirmUnderstanding": "Evet, ne yaptığımı biliyorum",
 		"conjunction": " and the blog post about ",
 		"postamble": " and understand the implications of changing the role.",
-		"preamble": "I have read the ",
-		"choosingRightDeviceRole": "Choosing The Right Device Role",
-		"deviceRoleDocumentation": "Device Role Documentation",
+		"preamble": "Okudum ",
+		"choosingRightDeviceRole": "Doğru Cihaz Rolünü Seç",
+		"deviceRoleDocumentation": "Cihaz Rolü Dökümanları",
 		"title": "Emin misiniz?"
 	},
 	"managedMode": {
-		"confirmUnderstanding": "Yes, I know what I'm doing",
+		"confirmUnderstanding": "Evet, ne yaptığımı biliyorum",
 		"title": "Emin misiniz?",
-		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+		"description": "Yönetilen Modun etkinleştirilmesi, istemci uygulamalarının (web istemcisi dahil) bir radyoya yapılandırma yazmasını engeller. Etkinleştirildikten sonra, radyo yapılandırmaları yalnızca Uzak Yönetici mesajları aracılığıyla değiştirilebilir. Bu ayar, uzak düğüm yönetimi için gerekli değildir."
 	}
 }

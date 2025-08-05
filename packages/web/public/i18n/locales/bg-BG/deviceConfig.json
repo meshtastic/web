@@ -83,7 +83,7 @@
 		},
 		"compassNorthTop": {
 			"description": "Fix north to the top of compass",
-			"label": "Compass North Top"
+			"label": "Север на компаса отгоре"
 		},
 		"displayMode": {
 			"description": "Screen layout variant",
@@ -142,8 +142,8 @@
 			"label": "Честотен слот"
 		},
 		"hopLimit": {
-			"description": "Maximum number of hops",
-			"label": "Hop Limit"
+			"description": "Максимален брой хопове",
+			"label": "Лимит на хопове"
 		},
 		"ignoreMqtt": {
 			"description": "Да не се препращат MQTT съобщения през mesh",
@@ -166,7 +166,7 @@
 			"label": "Override Frequency"
 		},
 		"region": {
-			"description": "Sets the region for your node",
+			"description": "Задаване на региона за вашия възел",
 			"label": "Регион"
 		},
 		"spreadingFactor": {
@@ -239,16 +239,16 @@
 			"label": "Активиран"
 		},
 		"meshViaUdp": {
-			"label": "Mesh via UDP"
+			"label": "Mesh чрез UDP"
 		},
 		"ntpServer": {
 			"label": "NTP сървър"
 		},
 		"rsyslogServer": {
-			"label": "Rsyslog Server"
+			"label": "Сървър Rsyslog"
 		},
 		"ethernetConfigSettings": {
-			"description": "Ethernet port configuration",
+			"description": "Конфигурация на Ethernet порта",
 			"label": "Конфигурация на Ethernet "
 		},
 		"ipConfigSettings": {
@@ -260,11 +260,11 @@
 			"label": "Конфигурация на NTP"
 		},
 		"rsyslogConfigSettings": {
-			"description": "Rsyslog configuration",
-			"label": "Rsyslog Config"
+			"description": "Конфигурация на Rsyslog",
+			"label": "Конфиг. на Rsyslog"
 		},
 		"udpConfigSettings": {
-			"description": "UDP over Mesh configuration",
+			"description": "Конфигурация на UDP през Mesh",
 			"label": "Конфигурация на UDP"
 		}
 	},
@@ -326,7 +326,7 @@
 			"altitudeMsl": "Altitude is Mean Sea Level",
 			"dop": "Dilution of precision (DOP) PDOP used by default",
 			"hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
-			"numSatellites": "Number of satellites",
+			"numSatellites": "Брой сателити",
 			"sequenceNumber": "Sequence number",
 			"timestamp": "Времево клеймо",
 			"unset": "Не е зададен",

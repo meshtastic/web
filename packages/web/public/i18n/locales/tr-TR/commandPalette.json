@@ -1,51 +1,51 @@
 {
-  "emptyState": "No results found.",
+  "emptyState": "Sonuç bulunamadı.",
   "page": {
-    "title": "Command Menu"
+    "title": "Komut Menüsü"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "label": "Komut grubunu sabitle"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "label": "Komut grubunun sabitlemesini kaldır"
   },
   "goto": {
-    "label": "Goto",
+    "label": "Git",
     "command": {
       "messages": "Mesajlar",
       "map": "Harita",
-      "config": "Config",
+      "config": "Yapılandır",
       "channels": "Kanallar",
       "nodes": "Düğümler"
     }
   },
   "manage": {
-    "label": "Manage",
+    "label": "Yönet",
     "command": {
-      "switchNode": "Switch Node",
-      "connectNewNode": "Connect New Node"
+      "switchNode": "Node değiştir",
+      "connectNewNode": "Yeni Node Ekle"
     }
   },
   "contextual": {
-    "label": "Contextual",
+    "label": "Bağlamsal",
     "command": {
-      "qrCode": "QR Code",
-      "qrGenerator": "Generator",
+      "qrCode": "QR Kodu",
+      "qrGenerator": "Oluşturucu",
       "qrImport": "İçeri aktar",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Schedule Reboot",
-      "rebootToOtaMode": "Reboot To OTA Mode",
-      "resetNodeDb": "Reset Node DB",
-      "factoryResetDevice": "Factory Reset Device",
-      "factoryResetConfig": "Factory Reset Config",
+      "scheduleShutdown": "Kapatmayı Planla",
+      "scheduleReboot": "Yeniden Başlatmayı Planla",
+      "rebootToOtaMode": "OTA Moduna Yeniden Başlat",
+      "resetNodeDb": "Node Veri Tabanını Sıfırla",
+      "factoryResetDevice": "Cihazı Fabrika Ayarlarına Sıfırlayın",
+      "factoryResetConfig": "Fabrika Ayarları Yapılandırması",
       "disconnect": "Bağlantıyı Kes"
     }
   },
   "debug": {
     "label": "Hata Ayıklama",
     "command": {
-      "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "reconfigure": "Yeniden yapılandır",
+      "clearAllStoredMessages": "Depolanan Tüm Mesajları Sil"
     }
   }
 }

@@ -269,16 +269,16 @@
 				"label": "Приблизително местоположение",
 				"description": "Position shared will be accurate within this distance",
 				"options": {
-					"metric_km23": "Within 23 km",
-					"metric_km12": "Within 12 km",
+					"metric_km23": "В рамките на 23 км",
+					"metric_km12": "В рамките на 12 км",
 					"metric_km5_8": "Within 5.8 km",
 					"metric_km2_9": "Within 2.9 km",
 					"metric_km1_5": "Within 1.5 km",
-					"metric_m700": "Within 700 m",
-					"metric_m350": "Within 350 m",
-					"metric_m200": "Within 200 m",
-					"metric_m90": "Within 90 m",
-					"metric_m50": "Within 50 m",
+					"metric_m700": "В рамките на 700 м",
+					"metric_m350": "В рамките на 350 м",
+					"metric_m200": "В рамките на 200 м",
+					"metric_m90": "В рамките на 90 м",
+					"metric_m50": "В рамките на 50 м",
 					"imperial_mi15": "В рамките на 15 мили",
 					"imperial_mi7_3": "В рамките на 7.3 мили",
 					"imperial_mi3_6": "В рамките на 3.6 мили",
@@ -405,7 +405,7 @@
 		"title": "Настройки на телеметрията",
 		"description": "Настройки за модула за телеметрия",
 		"deviceUpdateInterval": {
-			"label": "Device Metrics",
+			"label": "Метрики на устройството",
 			"description": "Интервал на актуализиране на показателите на устройството (секунди)"
 		},
 		"environmentUpdateInterval": {
@@ -417,7 +417,7 @@
 			"description": "Enable the Environment Telemetry"
 		},
 		"environmentScreenEnabled": {
-			"label": "Displayed on Screen",
+			"label": "Показва се на екрана",
 			"description": "Show the Telemetry Module on the OLED"
 		},
 		"environmentDisplayFahrenheit": {

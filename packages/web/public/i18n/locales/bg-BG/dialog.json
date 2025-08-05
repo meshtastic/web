@@ -30,7 +30,7 @@
 		"title": "Местоположение: {{identifier}}",
 		"altitude": "Надморска височина: ",
 		"coordinates": "Координати:",
-		"noCoordinates": "No Coordinates"
+		"noCoordinates": "Няма координати"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Регенериране на предварително споделения ключ?",
@@ -70,7 +70,7 @@
 			"newDeviceButton": "Ново устройство",
 			"connectionFailed": "Connection failed",
 			"deviceDisconnected": "Device disconnected",
-			"unknownDevice": "Unknown Device",
+			"unknownDevice": "Неизвестно устройство",
 			"errorLoadingDevices": "Error loading devices",
 			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
@@ -99,9 +99,9 @@
 		"uptime": "Време на работа: ",
 		"voltage": "Напрежение",
 		"title": "Node Details for {{identifier}}",
-		"ignoreNode": "Ignore node",
-		"removeNode": "Remove node",
-		"unignoreNode": "Unignore node"
+		"ignoreNode": "Игнориране на възела",
+		"removeNode": "Премахване на възела",
+		"unignoreNode": "Премахване на игнорирането на възела"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "Ако загубите ключовете си, ще трябва да нулирате устройството си.",
@@ -169,7 +169,7 @@
 		"confirmUnderstanding": "Да, знам какво правя",
 		"conjunction": " and the blog post about ",
 		"postamble": " and understand the implications of changing the role.",
-		"preamble": "I have read the ",
+		"preamble": "Аз прочетох ",
 		"choosingRightDeviceRole": "Избор на правилната роля на устройството",
 		"deviceRoleDocumentation": "Документация за ролите на устройството",
 		"title": "Сигурни ли сте?"
