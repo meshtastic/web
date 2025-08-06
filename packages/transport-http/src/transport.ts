@@ -6,6 +6,8 @@ export class TransportHTTP implements Types.Transport {
   private url: string;
   private receiveBatchRequests: boolean;
   private fetchInterval: number;
+  private fetching: boolean;
+  private interval: number | undefined;
 
   public static async create(
     address: string,
@@ -23,6 +25,7 @@ export class TransportHTTP implements Types.Transport {
     this.url = url;
     this.receiveBatchRequests = false;
     this.fetchInterval = 3000;
+    this.fetching = false;
 
     this._toDevice = new WritableStream<Uint8Array>({
       write: async (chunk) => {
@@ -38,8 +41,18 @@ export class TransportHTTP implements Types.Transport {
       },
     });
 
-    setInterval(async () => {
-      await this.readFromRadio(controller);
+    this.interval = setInterval(async () => {
+      if (this.fetching) {
+        // We still have the previous request open
+        return;
+      }
+      this.fetching = true;
+      try {
+        await this.readFromRadio(controller);
+      } catch (e) {
+        // TODO: Emit disconnection events for certain types of errors
+      }
+      this.fetching = false;
     }, this.fetchInterval);
   }
 
@@ -87,5 +100,14 @@ export class TransportHTTP implements Types.Transport {
 
   get fromDevice(): ReadableStream<Types.DeviceOutput> {
     return this._fromDevice;
+  }
+
+  disconnect() : Promise<void> {
+    this.fetching = false;
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+    this.interval = undefined;
+    return Promise.resolve();
   }
 }

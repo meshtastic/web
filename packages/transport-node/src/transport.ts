@@ -6,6 +6,7 @@ import { Utils } from "@meshtastic/core";
 export class TransportNode implements Types.Transport {
   private readonly _toDevice: WritableStream<Uint8Array>;
   private readonly _fromDevice: ReadableStream<Types.DeviceOutput>;
+  private socket: Socket | undefined;
 
   /**
    * Creates and connects a new TransportNode instance.
@@ -36,7 +37,8 @@ export class TransportNode implements Types.Transport {
    * @param connection - An active Node.js net.Socket connection.
    */
   constructor(connection: Socket) {
-    connection.on("error", (err) => {
+    this.socket = connection;
+    this.socket.on("error", (err) => {
       console.error("Socket connection error:", err);
     });
 
@@ -56,7 +58,7 @@ export class TransportNode implements Types.Transport {
       .pipeTo(Writable.toWeb(connection) as WritableStream<Uint8Array>)
       .catch((err) => {
         console.error("Error piping data to socket:", err);
-        connection.destroy(err as Error);
+        this.socket.destroy(err as Error);
       });
   }
 
@@ -72,5 +74,11 @@ export class TransportNode implements Types.Transport {
    */
   public get fromDevice(): ReadableStream<Types.DeviceOutput> {
     return this._fromDevice;
+  }
+
+  disconnect() {
+    this.socket.destroy();
+    this.socket = undefined;
+    return Promise.resolve();
   }
 }
