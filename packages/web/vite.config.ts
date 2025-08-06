@@ -29,6 +29,9 @@ const CONTENT_SECURITY_POLICY =
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
 
+  const isProd = mode === "production";
+  const isTest = mode === "test";
+
   return {
     plugins: [
       react(),
@@ -37,8 +40,9 @@ export default defineConfig(({ mode }) => {
       createHtmlPlugin({
         inject: {
           data: {
+            title: isTest ? "Meshtastic Web (TEST)" : "Meshtastic Web",
             cookieYesScript:
-              mode === "production" && env.VITE_COOKIEYES_CLIENT_ID
+              isProd && env.VITE_COOKIEYES_CLIENT_ID
                 ? `<script async src="https://cdn-cookieyes.com/client_data/${env.VITE_COOKIEYES_CLIENT_ID}/script.js"></script>`
                 : "",
           },
