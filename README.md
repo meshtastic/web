@@ -43,7 +43,7 @@ All `Meshtastic JS` packages (core and transports) are published both to
 
 This monorepo leverages the following technologies:
 
-- **Runtime:** Bun
+- **Runtime:** Bun / Deno
 - **Web Client:** React.js
 - **Styling:** Tailwind CSS
 - **Bundling:** Vite
@@ -77,39 +77,13 @@ Follow the installation instructions on their home page.
 
 #### Meshtastic Web Client
 
-To start the development server for the web client, while inside the packages/web folder:
-
-```bash
-bun run dev
-```
-
-This will typically run the web client on http://localhost:3000 and requires a
-Chromium browser
+Please refer to the [Meshtastic Web README](packages/web/README.md) for setup and usage.
 
 ### Feedback
 
-If you encounter any issues with nightly builds, please report them in our
+If you encounter any issues, please report them in our
 [issues tracker](https://github.com/meshtastic/web/issues). Your feedback helps
 improve the stability of future releases
-
-### Why Bun?
-
-Meshtastic Web uses Bun as its development platform for several compelling
-reasons:
-
-- **Fast Performance**: Bun is built from the ground up for speed, offering
-  significantly faster package installation and bundling compared to other
-  JavaScript runtimes.
-- **TypeScript Support**: Native TypeScript support without additional
-  configuration, enhancing code quality and developer experience.
-- **Modern JavaScript**: First-class support for ESM imports, top-level await,
-  and other modern JavaScript features.
-- **All-in-One Tooling**: Built-in package manager, bundler, test runner, and
-  transpiler eliminate the need for multiple third-party tools.
-- **Node.js Compatibility**: Drop-in replacement for Node.js with better
-  performance and built-in tooling.
-- **Reproducible Builds**: Lockfile ensures consistent builds across all
-  environments.
 
 ### Contributing
 
