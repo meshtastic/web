@@ -4,6 +4,7 @@ import process from "node:process";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { createHtmlPlugin } from "vite-plugin-html";
 
 let hash = "";
 let version = "v0.0.0";
@@ -29,6 +30,16 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    // adding CookieYes script if VITE_COOKIEYES_CLIENT_ID is set (it only runs while in Vercel) for GDPR/CCPA compliance
+    createHtmlPlugin({
+      inject: {
+        data: {
+          cookieScript: process.env.VITE_COOKIEYES_CLIENT_ID
+            ? `<script async src="https://cdn-cookieyes.com/client_data/${process.env.VITE_COOKIEYES_CLIENT_ID}/script.js"></script>`
+            : "",
+        },
+      },
+    }),
     // VitePWA({
     //   registerType: "autoUpdate",
     //   strategies: "generateSW",
