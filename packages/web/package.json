@@ -14,7 +14,6 @@
 	"homepage": "https://meshtastic.org",
 	"scripts": {
 		"build": "vite build",
-		"build:test": "vite build --mode test",
 		"build:analyze": "BUNDLE_ANALYZE=true bun run build",
 		"check": "biome check src/",
 		"check:fix": "biome check --write src/",

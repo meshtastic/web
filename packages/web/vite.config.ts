@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
 
   const isProd = mode === "production";
-  const isTest = mode === "test";
+  const isTest = env.VITE_IS_TEST;
 
   return {
     plugins: [
