@@ -22,7 +22,7 @@
 			"@layouts/*": ["./src/layouts/*"]
 		}
 	},
-	"include": ["src", "./vite-env.d.ts"],
+	"include": ["src", ".d.ts"],
 	"exclude": [
 		"routeTree.gen.ts",
 		"node_modules",
