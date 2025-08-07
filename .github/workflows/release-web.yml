@@ -1,37 +1,26 @@
-name: Release
+name: Release Web
 
 on:
   release:
     types: [released, prereleased]
 
 permissions:
-  id-token: write
   contents: write
-  packages: write
 
 jobs:
-  build-and-deploy:
+  release-web:
     runs-on: ubuntu-latest
     steps:
-      # --- Checkout Code ---
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # --- Setup Bun ---
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      # --- Setup Deno ---
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
-      # --- Cache Bun Dependencies ---
       - name: Cache Bun Dependencies
         uses: actions/cache@v4
         with:
@@ -42,49 +31,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-
 
-      # --- Cache Deno Dependencies ---
-      - name: Cache Deno Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-
-
-
-      # --- Build All Packages ---
-      - name: Build All Packages
-        run: |
-          set -euo pipefail
-
-          for pkg_dir in packages/*/; do
-            pkg_dir=${pkg_dir%/}  # Remove trailing slash
-            echo "🔍 Inspecting $pkg_dir"
-
-            # Skip web package and transport-deno
-            if [[ "$pkg_dir" == "packages/web" ]] || [[ "$pkg_dir" == "packages/transport-deno" ]]; then
-              echo "⏭️ Skipping $pkg_dir package"
-              continue
-            fi
-
-            # Build npm package for all other packages
-            if [[ -f "$pkg_dir/package.json" ]]; then
-              echo "📦 Building npm package: $pkg_dir"
-              (cd "$pkg_dir" && pnpm install && pnpm run build:npm)
-              echo "📦 Package built successfully: $pkg_dir"
-            else
-              echo "❓ No package.json found in $pkg_dir — skipping"
-            fi
-          done
-
-      # --- Web Package Specific Tasks ---
       - name: Run Web App Tests
         working-directory: packages/web
-        run: pnpm run test
+        run: bun run test
 
       - name: Create Web App Release Archive
         working-directory: packages/web
-        run: pnpm run package
+        run: bun run package
 
       - name: Upload Web App Archive
         uses: actions/upload-artifact@v4
@@ -98,7 +51,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # --- Build & Push Container Image ---
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
