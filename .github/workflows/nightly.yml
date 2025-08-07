@@ -73,7 +73,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            ./infra/Containerfile
+            ./packages/web/infra/Containerfile
           image: ${{ github.event.repository.full_name }}
           tags: nightly-${{ steps.get_release.outputs.tag }}-${{ github.sha }}
 

@@ -1,0 +1,79 @@
+name: Release Web
+
+on:
+  release:
+    types: [released, prereleased]
+
+permissions:
+  contents: write
+
+jobs:
+  release-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            packages/web/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Run Web App Tests
+        working-directory: packages/web
+        run: bun run test
+
+      - name: Create Web App Release Archive
+        working-directory: packages/web
+        run: bun run package
+
+      - name: Upload Web App Archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          if-no-files-found: error
+          path: packages/web/dist/build.tar
+
+      - name: Attach Web Archive to GitHub Release
+        run: gh release upload ${{ github.event.release.tag_name }} packages/web/dist/build.tar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Build Container Image
+        id: build-container
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: |
+            ./infra/Containerfile
+          image: ghcr.io/${{ github.repository }}
+          tags: latest, ${{ github.event.release.tag_name }}
+          oci: true
+          platforms: linux/amd64, linux/arm64
+
+      - name: Push Container to GHCR
+        id: push-to-registry
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-container.outputs.image }}
+          tags: ${{ steps.build-container.outputs.tags }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output Image URL
+        run: echo "🖼️ Image pushed to ${{ steps.push-to-registry.outputs.registry-paths }}"

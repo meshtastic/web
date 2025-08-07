@@ -1,0 +1,83 @@
+name: Release Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release version (e.g. v1.2.3)'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # --- Setup Bun ---
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # --- Setup Deno ---
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      # --- Cache Bun Dependencies ---
+      - name: Cache Bun Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            packages/web/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      # --- Cache Deno Dependencies ---
+      - name: Cache Deno Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
+
+      - name: Setup Node for npm publish
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Configure npm auth
+        run: npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+
+      - name: Publish packages to npm and JSR
+        run: |
+          for dir in packages/*; do
+            echo "Processing $dir"
+
+            cd $dir
+
+            # Publish to npm if package.json exists
+            if [ -f "package.json" ]; then
+              echo "Publishing $dir to npm..."
+              npm publish --access public || echo "npm publish failed for $dir"
+            fi
+
+            # Publish to JSR if jsr.json exists
+            if [ -f "jsr.json" ]; then
+              echo "Publishing $dir to jsr..."
+              deno publish || echo "JSR publish failed for $dir"
+            fi
+
+            cd - > /dev/null
+          done
+
+      - name: Tag release
+        run: |
+          git tag ${{ github.event.inputs.tag }}
+          git push origin ${{ github.event.inputs.tag }}
