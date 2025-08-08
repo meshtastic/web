@@ -13,6 +13,7 @@
 	},
 	"homepage": "https://meshtastic.org",
 	"scripts": {
+		"preinstall": "npx only-allow pnpm",
 		"build": "vite build",
 		"build:analyze": "BUNDLE_ANALYZE=true bun run build",
 		"check": "biome check src/",

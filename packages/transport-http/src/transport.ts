@@ -7,7 +7,7 @@ export class TransportHTTP implements Types.Transport {
   private receiveBatchRequests: boolean;
   private fetchInterval: number;
   private fetching: boolean;
-  private interval: number | undefined;
+  private interval: ReturnType<typeof setInterval> | undefined;
 
   public static async create(
     address: string,
@@ -49,7 +49,7 @@ export class TransportHTTP implements Types.Transport {
       this.fetching = true;
       try {
         await this.readFromRadio(controller);
-      } catch (e) {
+      } catch {
         // TODO: Emit disconnection events for certain types of errors
       }
       this.fetching = false;
@@ -102,7 +102,7 @@ export class TransportHTTP implements Types.Transport {
     return this._fromDevice;
   }
 
-  disconnect() : Promise<void> {
+  disconnect(): Promise<void> {
     this.fetching = false;
     if (this.interval) {
       clearInterval(this.interval);
