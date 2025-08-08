@@ -35,6 +35,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^22.16.4",
+		"biome": "^0.3.3",
 		"tsdown": "^0.13.4",
 		"typescript": "^5.8.3"
 	}
