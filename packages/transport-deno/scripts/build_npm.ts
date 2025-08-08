@@ -11,7 +11,7 @@ await build({
   },
   package: {
     // package.json properties
-    name: "your-package",
+    name: "@meshtastic/transport-deno",
     version: Deno.args[0],
     description: "Your package.",
     license: "MIT",
