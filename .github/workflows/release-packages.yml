@@ -69,7 +69,7 @@ jobs:
             if [ -f "package.json" ]; then
               echo "Building and publishing $dir to npm..."
               pnpm run build:npm
-              pnpm publish:npm || echo "npm publish failed for $dir"
+              pnpm run publish:npm || echo "npm publish failed for $dir"
             fi
 
             pnpm run prepare:jsr
