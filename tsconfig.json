@@ -4,5 +4,6 @@
   "files": [],
   "references": [
     { "path": "packages/web" },
+    { "path": "packages/transport-http" }
   ]
 }

@@ -1,0 +1,19 @@
+  {
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2020",
+    "declaration": true,
+    "outDir": "./dist",
+    "moduleResolution": "bundler",
+    "emitDeclarationOnly": false,
+    "esModuleInterop": true,
+		"types": ["@types/w3c-web-serial"],
+  },
+  "include": ["src"]
+}
+
+
+
+
+

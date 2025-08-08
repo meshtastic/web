@@ -43,7 +43,7 @@ All `Meshtastic JS` packages (core and transports) are published both to
 
 This monorepo leverages the following technologies:
 
-- **Runtime:** Bun / Deno
+- **Runtime:** pnpm / Deno
 - **Web Client:** React.js
 - **Styling:** Tailwind CSS
 - **Bundling:** Vite
@@ -56,7 +56,7 @@ This monorepo leverages the following technologies:
 
 ### Prerequisites
 
-You'll need to have [Bun](https://bun.sh/) installed to work with this monorepo.
+You'll need to have [pnpm](https://pnpm.io/) installed to work with this monorepo.
 Follow the installation instructions on their home page.
 
 ### Development Setup
@@ -68,7 +68,7 @@ Follow the installation instructions on their home page.
    ```
 2. **Install dependencies for all packages:**
    ```bash
-   bun install
+   pnpm install
    ```
    This command installs all necessary dependencies for all packages within the
    monorepo.

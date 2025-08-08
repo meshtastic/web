@@ -138,7 +138,7 @@ export class TransportWebBluetooth implements Types.Transport {
     }
   }
 
-  disconnect() : Promise<void> {
+  disconnect(): Promise<void> {
     this.gattServer.disconnect();
     return Promise.resolve();
   }
