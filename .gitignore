@@ -1,5 +1,5 @@
-dist
 node_modules
+dist
 stats.html
 .vercel
 .vite

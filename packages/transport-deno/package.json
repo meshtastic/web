@@ -4,5 +4,19 @@
 	"description": "Deno-specific transport layer for Meshtastic web applications.",
 	"exports": {
 		".": "./mod.ts"
-	}
+	},
+	"main": "./dist/mod.mjs",       
+  "module": "./dist/mod.mjs",     
+  "types": "./dist/mod.d.mts",    
+  "files": ["dist/*", "mod.ts", "README.md", "../../LICENSE"],
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "prepack": "cp ../../LICENSE ./LICENSE",
+    "clean": "rm -rf dist LICENSE",
+    "build:npm": "tsdown",
+    "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public",
+    "prepare:jsr": "rm -rf dist && pnpm dlx pkg-to-jsr",
+    "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
+  }
 }

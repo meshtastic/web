@@ -81,7 +81,7 @@ improve the stability of future releases
 ## Development & Building
 
 You'll need to download the package manager used with this repo. You can install
-it by visiting [bun.sh](https://bun.sh/) and following the installation
+it by visiting [pnpm.io](https://pnpm.io/) and following the installation
 instructions listed on the home page.
 
 ### Development
@@ -90,13 +90,13 @@ Install the dependencies.
 
 ```bash
 cd packages/web &&
-bun install
+pnpm install
 ```
 
 Start the development server:
 
 ```bash
-bun run dev
+pnpm run dev
 ```
 
 ### Building and Packaging
@@ -104,29 +104,28 @@ bun run dev
 Build the project:
 
 ```bash
-bun run build
+pnpm run build
 ```
 
 GZip the output:
 
 ```bash
-bun run package
+pnpm run package
 ```
 
-### Why Bun?
+### Why pnpm?
 
-Meshtastic Web uses Bun as its development platform for several compelling
+Meshtastic Web uses pnpm as its package manager for several compelling
 reasons:
 
-- **Fast Performance**: Bun is built from the ground up for speed, offering
-  significantly faster package installation and bundling compared to other
-  JavaScript runtimes.
-- **TypeScript Support**: Native TypeScript support without additional
-  configuration, enhancing code quality and developer experience.
-- **Modern JavaScript**: First-class support for ESM imports, top-level await,
-  and other modern JavaScript features.
-- **Node.js Compatibility**: Drop-in replacement for Node.js with better
-  performance and built-in tooling.
+- **Efficient Storage**: pnpm uses content-addressable storage, avoiding duplication
+  of packages across projects and saving significant disk space.
+- **Fast Performance**: Faster package installation compared to other package
+  managers through symlinks and efficient dependency resolution.
+- **Strict Dependency Management**: Prevents access to unlisted dependencies,
+  ensuring better project reliability and security.
+- **Workspace Support**: Excellent monorepo support with workspaces for managing
+  multiple packages efficiently.
 - **Reproducible Builds**: Lockfile ensures consistent builds across all
   environments.
 

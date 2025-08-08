@@ -1,10 +1,30 @@
 {
   "name": "@meshtastic/core",
-	"version": "2.6.5",
+	"version": "2.6.6",
 	"description": "Core functionalities for Meshtastic web applications.",
   "exports": {
 		".": "./mod.ts"
 	},
+  "main": "./dist/mod.mjs",       
+  "module": "./dist/mod.mjs",     
+  "types": "./dist/index.d.ts",    
+  "license": "GPL-3.0-only",
+  "tsdown": {
+    "entry": ["mod.ts"],
+    "dts": true,
+    "format": ["esm"],
+    "splitting": false,
+    "clean": true
+  },
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "prepack": "cp ../../LICENSE ./LICENSE",
+    "clean": "rm -rf dist LICENSE",
+    "build:npm": "tsdown",
+    "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public",
+    "prepare:jsr": "rm -rf dist && pnpm dlx pkg-to-jsr",
+    "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
+  },
   "dependencies": {
     "crc": "npm:crc@^4.3.2"
   }
