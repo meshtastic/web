@@ -20,7 +20,7 @@ await build({
       url: "git+https://github.com/username/repo.git",
     },
     bugs: {
-      url: "https://github.com/username/repo/issues",
+      url: "https://github.com/meshtastic/web/issues",
     },
   },
   postBuild() {
