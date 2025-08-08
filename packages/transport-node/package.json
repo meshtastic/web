@@ -10,7 +10,7 @@
   "types": "./dist/mod.d.mts",    
    
   "license": "GPL-3.0-only",
-  "tsup": {
+  "tsdown": {
     "entry": ["mod.ts"],
     "dts": true,
     "format": ["esm"],
