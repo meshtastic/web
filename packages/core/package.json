@@ -7,7 +7,7 @@
 	},
   "main": "./dist/mod.mjs",       
   "module": "./dist/mod.mjs",     
-  "types": "./dist/index.d.ts",    
+  "types": "./dist/mod.d.mts",    
   "license": "GPL-3.0-only",
   "tsdown": {
     "entry": ["mod.ts"],
