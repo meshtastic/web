@@ -93,7 +93,7 @@
 		"deviceMetrics": "Device Metrics:",
 		"hardware": "Hardware: ",
 		"lastHeard": "Last Heard: ",
-		"nodeHexPrefix": "Node Hex: !",
+		"nodeHexPrefix": "Node Hex: ",
 		"nodeNumber": "Node Number: ",
 		"position": "Position:",
 		"role": "Role: ",
@@ -102,7 +102,12 @@
 		"title": "Node Details for {{identifier}}",
 		"ignoreNode": "Ignore node",
 		"removeNode": "Remove node",
-		"unignoreNode": "Unignore node"
+		"unignoreNode": "Unignore node",
+		"security": "Security:",
+		"publicKey": "Public Key: ",
+		"messageable": "Messageable: ",
+		"KeyManuallyVerifiedTrue": "Public Key has been manually verified",
+		"KeyManuallyVerifiedFalse": "Public Key is not manually verified"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "If you lose your keys, you will need to reset your device.",
