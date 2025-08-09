@@ -1,3 +1,4 @@
+import { base64Encode } from "@bufbuild/protobuf/wire";
 import { DeviceImage } from "@components/generic/DeviceImage.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Uptime } from "@components/generic/Uptime.tsx";
@@ -167,7 +168,8 @@ export const NodeDetailsDialog = ({
       key: "batteryLevel",
       label: t("nodeDetails.batteryLevel"),
       value: node.deviceMetrics?.batteryLevel,
-      format: (val: number) => `${val.toFixed(2)}%`,
+      format: (val: number) =>
+        val === 101 ? t("batteryStatus.pluggedIn") : `${val.toFixed(2)}%`,
     },
     {
       key: "voltage",
@@ -176,6 +178,9 @@ export const NodeDetailsDialog = ({
       format: (val: number) => `${val.toFixed(2)}V`,
     },
   ];
+
+  const sectionClassName =
+    "text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-4 rounded-lg mt-3";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -192,7 +197,7 @@ export const NodeDetailsDialog = ({
           </DialogTitle>
         </DialogHeader>
         <DialogFooter>
-          <div className="w-full">
+          <div className="w-full ">
             <div className="flex flex-row flex-wrap space-y-1">
               <Button
                 className="mr-1"
@@ -270,79 +275,134 @@ export const NodeDetailsDialog = ({
                   <p className="text-lg font-semibold">
                     {t("nodeDetails.details")}
                   </p>
-                  <p>
-                    {t("nodeDetails.nodeNumber")}
-                    {node.num}
-                  </p>
-                  <p>
-                    {t("nodeDetails.nodeHexPrefix")}
-                    {numberToHexUnpadded(node.num)}
-                  </p>
-                  <p>
-                    {t("nodeDetails.role")}
-                    {Protobuf.Config.Config_DeviceConfig_Role[
-                      node.user?.role ?? 0
-                    ].replace(/_/g, " ")}
-                  </p>
-                  <p>
-                    {t("nodeDetails.lastHeard")}
-                    {node.lastHeard === 0 ? (
-                      t("nodesTable.lastHeardStatus.never", { ns: "nodes" })
-                    ) : (
-                      <TimeAgo timestamp={node.lastHeard * 1000} />
-                    )}
-                  </p>
-                  <p>
-                    {t("nodeDetails.hardware")}
-                    {(
-                      Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
-                      t("unknown.shortName")
-                    ).replace(/_/g, " ")}
-                  </p>
+                  <table className="table-fixed w-full">
+                    <tbody>
+                      <tr>
+                        <td>{t("nodeDetails.nodeNumber")}</td>
+                        <td>{node.num}</td>
+                      </tr>
+                      <tr>
+                        <td>{t("nodeDetails.nodeHexPrefix")}</td>
+                        <td>!{numberToHexUnpadded(node.num)}</td>
+                      </tr>
+                      <tr>
+                        <td>{t("nodeDetails.role")}</td>
+                        <td>
+                          {Protobuf.Config.Config_DeviceConfig_Role[
+                            node.user?.role ?? 0
+                          ]?.replace(/_/g, " ")}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>{t("nodeDetails.lastHeard")}</td>
+                        <td>
+                          {node.lastHeard === 0 ? (
+                            t("nodesTable.lastHeardStatus.never", {
+                              ns: "nodes",
+                            })
+                          ) : (
+                            <TimeAgo timestamp={node.lastHeard * 1000} />
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>{t("nodeDetails.hardware")}</td>
+                        <td>
+                          {(
+                            Protobuf.Mesh.HardwareModel[
+                              node.user?.hwModel ?? 0
+                            ] ?? t("unknown.shortName")
+                          ).replace(/_/g, " ")}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>{t("nodeDetails.messageable")}</td>
+                        <td>
+                          {node.user?.isUnmessagable ? t("no") : t("yes")}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
                 <DeviceImage
-                  className="h-45 w-45 p-2 rounded-lg border-4 border-slate-200 dark:border-slate-800"
+                  className="w-40 p-2 rounded-lg border-4 border-slate-200 dark:border-slate-800"
                   deviceType={
-                    Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]
+                    Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ??
+                    "UNKNOWN"
                   }
                 />
               </div>
             </div>
 
             <div>
-              <div className="text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
+              <div className={sectionClassName}>
+                <p className="text-lg font-semibold">
+                  {t("nodeDetails.security")}
+                </p>
+                <table className="table-auto w-full">
+                  <tbody>
+                    <tr>
+                      <td className="pr-2">{t("nodeDetails.publicKey")}</td>
+                      <td>
+                        <pre className="text-xs pt-0.5">
+                          {node.user?.publicKey &&
+                          node.user?.publicKey.length > 0
+                            ? base64Encode(node.user.publicKey)
+                            : t("unknown.longName")}
+                        </pre>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>
+                        {node.isKeyManuallyVerified
+                          ? t("nodeDetails.KeyManuallyVerifiedTrue")
+                          : t("nodeDetails.KeyManuallyVerifiedFalse")}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className={sectionClassName}>
                 <p className="text-lg font-semibold">
                   {t("nodeDetails.position")}
                 </p>
 
                 {node.position ? (
-                  <>
-                    {node.position.latitudeI && node.position.longitudeI && (
-                      <p>
-                        {t("locationResponse.coordinates")}
-                        <a
-                          className="text-blue-500 dark:text-blue-400"
-                          href={`https://www.openstreetmap.org/?mlat=${
-                            node.position.latitudeI / 1e7
-                          }&mlon=${node.position.longitudeI / 1e7}&layers=N`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {node.position.latitudeI / 1e7},{" "}
-                          {node.position.longitudeI / 1e7}
-                        </a>
-                      </p>
-                    )}
-                    {node.position.altitude && (
-                      <p>
-                        {t("locationResponse.altitude")}
-                        {node.position.altitude}
-                        {t("unit.meter.one")}
-                      </p>
-                    )}
-                  </>
+                  <table className="table-auto w-full">
+                    <tbody>
+                      {node.position.latitudeI && node.position.longitudeI && (
+                        <tr>
+                          <td>{t("locationResponse.coordinates")}</td>
+                          <td>
+                            <a
+                              className="text-blue-500 dark:text-blue-400"
+                              href={`https://www.openstreetmap.org/?mlat=${
+                                node.position.latitudeI / 1e7
+                              }&mlon=${node.position.longitudeI / 1e7}&layers=N`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {node.position.latitudeI / 1e7},{" "}
+                              {node.position.longitudeI / 1e7}
+                            </a>
+                          </td>
+                        </tr>
+                      )}
+                      {node.position.altitude && (
+                        <tr>
+                          <td>{t("locationResponse.altitude")}</td>
+                          <td>
+                            {node.position.altitude}
+                            {t("unit.meter.suffix")}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 ) : (
-                  <p>{t("unknown.shortName")}</p>
+                  <p>{t("unknown.longName")}</p>
                 )}
                 <Button
                   onClick={handleRequestPosition}
@@ -355,28 +415,37 @@ export const NodeDetailsDialog = ({
               </div>
 
               {node.deviceMetrics && (
-                <div className="text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
+                <div className={sectionClassName}>
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                     {t("nodeDetails.deviceMetrics")}
                   </p>
-                  {deviceMetricsMap
-                    .filter((metric) => metric.value !== undefined)
-                    .map((metric) => (
-                      <p key={metric.key}>
-                        {metric.label}: {metric.format(metric?.value ?? 0)}
-                      </p>
-                    ))}
-                  {node.deviceMetrics.uptimeSeconds && (
-                    <p>
-                      {t("nodeDetails.uptime")}
-                      <Uptime seconds={node.deviceMetrics.uptimeSeconds} />
-                    </p>
-                  )}
+                  <table className="table-fixed w-full">
+                    <tbody>
+                      {deviceMetricsMap
+                        .filter((metric) => metric.value !== undefined)
+                        .map((metric) => (
+                          <tr key={metric.key}>
+                            <td>{metric.label}: </td>
+                            <td>{metric.format(metric?.value ?? 0)}</td>
+                          </tr>
+                        ))}
+                      {node.deviceMetrics.uptimeSeconds && (
+                        <tr>
+                          <td>{t("nodeDetails.uptime")}</td>
+                          <td>
+                            <Uptime
+                              seconds={node.deviceMetrics.uptimeSeconds}
+                            />
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
 
-            <div className="text-slate-900 dark:text-slate-100 w-full max-w-[464px] bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mt-3">
+            <div className="text-slate-900 dark:text-slate-100 w-full max-w-[464px] bg-slate-100 dark:bg-slate-800 rounded-lg mt-3">
               <Accordion className="AccordionRoot" type="single" collapsible>
                 <AccordionItem className="AccordionItem" value="item-1">
                   <AccordionTrigger>
