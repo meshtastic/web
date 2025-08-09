@@ -170,6 +170,7 @@ export const FilterMulti = <K extends EnumArrayKeys<FilterState>>({
               key={val}
               checked={selected.includes(val)}
               onChange={(checked) => toggleValue(val, checked)}
+              className="flex items-center gap-2"
             >
               <span className="dark:text-slate-200">{getLabel(val)}</span>
             </Checkbox>
