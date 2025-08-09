@@ -626,7 +626,7 @@ export class MeshDevice {
   public async reboot(time: number): Promise<number> {
     this.log.debug(
       Emitter[Emitter.Reboot],
-      `🔌 Rebooting node ${time > 0 ? "now" : `in ${time} seconds`}`,
+      `🔌 Rebooting node ${time === 0 ? "now" : `in ${time} seconds`}`,
     );
 
     const reboot = create(Protobuf.Admin.AdminMessageSchema, {
@@ -649,7 +649,7 @@ export class MeshDevice {
   public async rebootOta(time: number): Promise<number> {
     this.log.debug(
       Emitter[Emitter.RebootOta],
-      `🔌 Rebooting into OTA mode ${time > 0 ? "now" : `in ${time} seconds`}`,
+      `🔌 Rebooting into OTA mode ${time === 0 ? "now" : `in ${time} seconds`}`,
     );
 
     const rebootOta = create(Protobuf.Admin.AdminMessageSchema, {
