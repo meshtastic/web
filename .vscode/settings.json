@@ -2,5 +2,8 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.biome": "explicit",
-  }
+  },
+  "search.exclude": {
+    "**/i18n/locales/*-*/**": true,
+  },
 }
