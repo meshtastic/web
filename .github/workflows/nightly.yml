@@ -15,20 +15,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 22
 
-      - name: Cache Bun dependencies
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Cache pnpm dependencies
         uses: actions/cache@v4
         with:
           path: |
-            ~/.bun/install/cache
+            ~/.pnpm-store
             packages/web/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('packages/web/bun.lockb') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('packages/web/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-bun- 
+            ${{ runner.os }}-pnpm- 
 
       # - name: Run tests
       #   working-directory: packages/web
@@ -36,15 +41,15 @@ jobs:
 
       - name: Install Dependencies
         working-directory: packages/web
-        run: bun install
+        run: pnpm install
 
       - name: Build Package
         working-directory: packages/web
-        run: bun run build
+        run: pnpm run build
 
       - name: Package Output
         working-directory: packages/web
-        run: bun run package
+        run: pnpm run package
 
       - name: Archive compressed build
         uses: actions/upload-artifact@v4
@@ -73,7 +78,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            ./infra/Containerfile
+            ./packages/web/infra/Containerfile
           image: ${{ github.event.repository.full_name }}
           tags: nightly-${{ steps.get_release.outputs.tag }}-${{ github.sha }}
 

@@ -1,24 +1,24 @@
 {
 	"page": {
 		"sectionLabel": "Canales",
-		"channelName": "Channel: {{channelName}}",
-		"broadcastLabel": "Primary",
-		"channelIndex": "Ch {{index}}"
+		"channelName": "Canal: {{channelName}}",
+		"broadcastLabel": "Primario",
+		"channelIndex": "Cnl {{index}}"
 	},
 	"validation": {
-		"pskInvalid": "Please enter a valid {{bits}} bit PSK."
+		"pskInvalid": "Por favor, introduzca un PSK de {{bits}} bit válido."
 	},
 	"settings": {
 		"label": "Ajustes del canal",
-		"description": "Crypto, MQTT & misc settings"
+		"description": "Criptografía, MQTT y otros ajustes"
 	},
 	"role": {
-		"label": "Role",
-		"description": "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
+		"label": "Rol",
+		"description": "La telemetría del dispositivo se envía sobre PRIMARY. Solo se permite un PRIMARIO",
 		"options": {
-			"primary": "PRIMARY",
-			"disabled": "DISABLED",
-			"secondary": "SECONDARY"
+			"primary": "PRIMARIO",
+			"disabled": "DESHABILITADO",
+			"secondary": "SECUNDARIO"
 		}
 	},
 	"psk": {

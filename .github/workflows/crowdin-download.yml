@@ -17,7 +17,7 @@ jobs:
         uses: crowdin/github-action@v2
         with:
           base_url: "https://meshtastic.crowdin.com/api/v2"
-          config: "crowdin.yml"
+          config: "./packages/web/crowdin.yml"
           upload_sources: false
           upload_translations: false
           download_translations: true

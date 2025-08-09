@@ -1,69 +1,69 @@
 {
 	"page": {
 		"sectionLabel": "채널",
-		"channelName": "Channel: {{channelName}}",
-		"broadcastLabel": "Primary",
+		"channelName": "채널 {{channelName}}",
+		"broadcastLabel": "주 채널",
 		"channelIndex": "Ch {{index}}"
 	},
 	"validation": {
-		"pskInvalid": "Please enter a valid {{bits}} bit PSK."
+		"pskInvalid": "유효한 {{bits}} bit PSK를 입력해 주세요."
 	},
 	"settings": {
 		"label": "채널 설정",
-		"description": "Crypto, MQTT & misc settings"
+		"description": "암호화, MQTT 및 기타 설정"
 	},
 	"role": {
 		"label": "역할",
-		"description": "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
+		"description": "장치 텔레메트리 데이터는 주 채널을 통해 전송됩니다. 주 채널은 하나만 허용됩니다",
 		"options": {
-			"primary": "PRIMARY",
-			"disabled": "DISABLED",
-			"secondary": "SECONDARY"
+			"primary": "주 채널",
+			"disabled": "비활성화",
+			"secondary": "보조 채널"
 		}
 	},
 	"psk": {
-		"label": "Pre-Shared Key",
-		"description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
-		"generate": "Generate"
+		"label": "사전 공유 키",
+		"description": "지원되는 PSK 길이: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
+		"generate": "생성"
 	},
 	"name": {
 		"label": "이름",
-		"description": "A unique name for the channel <12 bytes, leave blank for default"
+		"description": "채널의 고유 이름 12 바이트 미만, 기본 값을 사용하려면 빈칸으로 두세요"
 	},
 	"uplinkEnabled": {
-		"label": "Uplink Enabled",
-		"description": "Send messages from the local mesh to MQTT"
+		"label": "업링크 활성화",
+		"description": "로컬 메쉬에서 MQTT로 메시지를 전송합니다"
 	},
 	"downlinkEnabled": {
-		"label": "Downlink Enabled",
-		"description": "Send messages from MQTT to the local mesh"
+		"label": "다운링크 활성화",
+		"description": "MQTT를 통해 로컬 메쉬로 메시지를 전송합니다"
 	},
 	"positionPrecision": {
-		"label": "Location",
-		"description": "The precision of the location to share with the channel. Can be disabled.",
+		"label": "위치",
+		"description": "채널에 공유할 위치 정확도. 비활성화 할 수 있습니다.",
 		"options": {
-			"none": "Do not share location",
-			"precise": "Precise Location",
-			"metric_km23": "Within 23 kilometers",
-			"metric_km12": "Within 12 kilometers",
-			"metric_km5_8": "Within 5.8 kilometers",
-			"metric_km2_9": "Within 2.9 kilometers",
-			"metric_km1_5": "Within 1.5 kilometers",
-			"metric_m700": "Within 700 meters",
-			"metric_m350": "Within 350 meters",
-			"metric_m200": "Within 200 meters",
-			"metric_m90": "Within 90 meters",
-			"metric_m50": "Within 50 meters",
-			"imperial_mi15": "Within 15 miles",
-			"imperial_mi7_3": "Within 7.3 miles",
-			"imperial_mi3_6": "Within 3.6 miles",
-			"imperial_mi1_8": "Within 1.8 miles",
-			"imperial_mi0_9": "Within 0.9 miles",
-			"imperial_mi0_5": "Within 0.5 miles",
-			"imperial_mi0_2": "Within 0.2 miles",
-			"imperial_ft600": "Within 600 feet",
-			"imperial_ft300": "Within 300 feet",
-			"imperial_ft150": "Within 150 feet"
+			"none": "위치를 공유하지 않습니다",
+			"precise": "정확한 위치",
+			"metric_km23": "23 km 이내",
+			"metric_km12": "12 km 이내",
+			"metric_km5_8": "5.8 km 이내",
+			"metric_km2_9": "2.9 km 이내",
+			"metric_km1_5": "1.5 km 이내",
+			"metric_m700": "700 m 이내",
+			"metric_m350": "350 m 이내",
+			"metric_m200": "200 m 이내",
+			"metric_m90": "90 m 이내",
+			"metric_m50": "50 m 이내",
+			"imperial_mi15": "15 miles 이내",
+			"imperial_mi7_3": "7.3 miles 이내",
+			"imperial_mi3_6": "3.6 miles 이내",
+			"imperial_mi1_8": "1.8 miles 이내",
+			"imperial_mi0_9": "0.9 miles 이내",
+			"imperial_mi0_5": "0.5 miles 이내",
+			"imperial_mi0_2": "0.2 miles 이내",
+			"imperial_ft600": "600 feet 이내",
+			"imperial_ft300": "300 feet 이내",
+			"imperial_ft150": "150 feet 이내"
 		}
 	}
 }

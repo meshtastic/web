@@ -10,7 +10,7 @@
 			"label": "Direct Message {{shortName}}"
 		},
 		"favorite": {
-			"label": "Favorite",
+			"label": "Обране",
 			"tooltip": "Add or remove this node from your favorites"
 		},
 		"notFavorite": {

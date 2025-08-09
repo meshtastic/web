@@ -9,7 +9,7 @@
 		"tabNeighborInfo": "Informace o sousedech",
 		"tabPaxcounter": "Paxcounter",
 		"tabRangeTest": "Zkouška dosahu",
-		"tabSerial": "Sériová komunikace",
+		"tabSerial": "Sériový",
 		"tabStoreAndForward": "S&F",
 		"tabTelemetry": "Telemetrie"
 	},
@@ -406,10 +406,10 @@
 		"description": "Settings for the Telemetry module",
 		"deviceUpdateInterval": {
 			"label": "Device Metrics",
-			"description": "Interval aktualizace měření spotřeby (v sekundách)"
+			"description": "Interval aktualizace metrik zařízení (v sekundách)"
 		},
 		"environmentUpdateInterval": {
-			"label": "Interval aktualizace měření životního prostředí (v sekundách)",
+			"label": "Interval aktualizace metrik životního prostředí (v sekundách)",
 			"description": ""
 		},
 		"environmentMeasurementEnabled": {

@@ -16,10 +16,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -34,40 +39,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deno-
 
-      - name: Cache Bun dependencies
+      - name: Cache pnpm dependencies
         uses: actions/cache@v4
         with:
           path: |
-            ~/.bun/install/cache
+            ~/.pnpm-store
             packages/web/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-bun-
+            ${{ runner.os }}-pnpm-
 
-      # --- Detect changed packages ---
-      - name: Get Changed Package Directories
-        id: changed_packages
-        uses: tj-actions/changed-files@v46
-        with:
-          dir_names: true
-          files: packages/**
-
-      - name: Build Changed Packages
-        if: steps.changed_packages.outputs.all_changed_and_modified_files != ''
+      - name: Build All Packages
         run: |
           set -euo pipefail
 
-          for pkg_dir in ${{ steps.changed_packages.outputs.all_changed_and_modified_files }}; do
+          for pkg_dir in packages/*/; do
+            pkg_dir=${pkg_dir%/}  # Remove trailing slash
             echo "🔍 Inspecting $pkg_dir..."
 
-            if [[ -f "$pkg_dir/deno.lock" ]]; then
-              echo "🔧 Building with Bun: $pkg_dir"
-              (cd "$pkg_dir" && bun install && bun run build)
+            if [[ -f "$pkg_dir/package.json" ]] && [[ "$pkg_dir" != "packages/web" ]]; then
+              echo "🔧 Building with pnpm: $pkg_dir"
+              (cd "$pkg_dir" && pnpm install && pnpm run build:npm)
             else
-              echo "⚠️ No recognizable build config in $pkg_dir — skipping"
+              echo "⚠️ Skipping $pkg_dir (web package or no package.json)"
             fi
           done
-
-      - name: No Changed Packages
-        if: steps.changed_packages.outputs.all_changed_and_modified_files == ''
-        run: echo "📦 No changed packages detected. Nothing to build."

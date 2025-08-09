@@ -2,410 +2,410 @@
 	"page": {
 		"tabAmbientLighting": "Lumière ambiante",
 		"tabAudio": "Audio",
-		"tabCannedMessage": "Canned",
+		"tabCannedMessage": "Message pré-enregistré",
 		"tabDetectionSensor": "Capteur de détection",
-		"tabExternalNotification": "Ext Notif",
+		"tabExternalNotification": "Notification externe",
 		"tabMqtt": "MQTT",
 		"tabNeighborInfo": "Informations sur les voisins",
 		"tabPaxcounter": "Paxcounter",
 		"tabRangeTest": "Test de portée",
 		"tabSerial": "Série",
-		"tabStoreAndForward": "S&F",
+		"tabStoreAndForward": "Stocker & Relayer",
 		"tabTelemetry": "Télémetrie (Capteurs)"
 	},
 	"ambientLighting": {
-		"title": "Ambient Lighting Settings",
-		"description": "Settings for the Ambient Lighting module",
+		"title": "Paramètres de l’éclairage ambiant",
+		"description": "Paramètres du module d’éclairage ambiant",
 		"ledState": {
-			"label": "LED State",
-			"description": "Sets LED to on or off"
+			"label": "État des LED",
+			"description": "Définit les LED sur allumées ou éteintes"
 		},
 		"current": {
 			"label": "Actif",
-			"description": "Sets the current for the LED output. Default is 10"
+			"description": "Définit le courant de sortie des LED. Par défaut : 10"
 		},
 		"red": {
 			"label": "Rouge",
-			"description": "Sets the red LED level. Values are 0-255"
+			"description": "Définit le niveau de LED rouge (valeurs 0–255)"
 		},
 		"green": {
 			"label": "Vert",
-			"description": "Sets the green LED level. Values are 0-255"
+			"description": "Définit le niveau de LED vert (valeurs 0–255)"
 		},
 		"blue": {
 			"label": "Bleu",
-			"description": "Sets the blue LED level. Values are 0-255"
+			"description": "Définit le niveau de LED bleu (valeurs 0–255)"
 		}
 	},
 	"audio": {
-		"title": "Audio Settings",
-		"description": "Settings for the Audio module",
+		"title": "Paramètres audio",
+		"description": "Paramètres du module audio",
 		"codec2Enabled": {
-			"label": "Codec 2 Enabled",
-			"description": "Enable Codec 2 audio encoding"
+			"label": "Codec 2 activé",
+			"description": "Active l'encodage audio Codec 2"
 		},
 		"pttPin": {
-			"label": "PTT Pin",
-			"description": "GPIO pin to use for PTT"
+			"label": "Broche PTT",
+			"description": "Broche GPIO utilisée pour le PTT"
 		},
 		"bitrate": {
-			"label": "Bitrate",
-			"description": "Bitrate to use for audio encoding"
+			"label": "Débit",
+			"description": "Débit utilisé pour l’encodage audio"
 		},
 		"i2sWs": {
 			"label": "i2S WS",
-			"description": "GPIO pin to use for i2S WS"
+			"description": "Broche GPIO utilisée pour i2S WS"
 		},
 		"i2sSd": {
 			"label": "i2S SD",
-			"description": "GPIO pin to use for i2S SD"
+			"description": "Broche GPIO utilisée pour i2S SD"
 		},
 		"i2sDin": {
 			"label": "i2S DIN",
-			"description": "GPIO pin to use for i2S DIN"
+			"description": "Broche GPIO utilisée pour i2S DIN"
 		},
 		"i2sSck": {
 			"label": "i2S SCK",
-			"description": "GPIO pin to use for i2S SCK"
+			"description": "Broche GPIO utilisée pour i2S SCK"
 		}
 	},
 	"cannedMessage": {
-		"title": "Canned Message Settings",
-		"description": "Settings for the Canned Message module",
+		"title": "Paramètres des messages pré-enregistrés",
+		"description": "Paramètres du module de messages pré-enregistrés\n",
 		"moduleEnabled": {
-			"label": "Module Enabled",
-			"description": "Enable Canned Message"
+			"label": "Module activé",
+			"description": "Active les messages pré-enregistrés"
 		},
 		"rotary1Enabled": {
-			"label": "Rotary Encoder #1 Enabled",
-			"description": "Enable the rotary encoder"
+			"label": "Encodeur rotatif #1 activé",
+			"description": "Active l’encodeur rotatif"
 		},
 		"inputbrokerPinA": {
-			"label": "Encoder Pin A",
-			"description": "GPIO Pin Value (1-39) For encoder port A"
+			"label": "Broche A de l’encodeur",
+			"description": "Valeur GPIO (1-39) pour le port A de l’encodeur"
 		},
 		"inputbrokerPinB": {
-			"label": "Encoder Pin B",
-			"description": "GPIO Pin Value (1-39) For encoder port B"
+			"label": "Broche B de l’encodeur",
+			"description": "Valeur GPIO (1-39) pour le port B de l’encodeur"
 		},
 		"inputbrokerPinPress": {
-			"label": "Encoder Pin Press",
-			"description": "GPIO Pin Value (1-39) For encoder Press"
+			"label": "Broche de pression de l’encodeur",
+			"description": "Valeur GPIO (1-39) pour la pression sur l’encodeur"
 		},
 		"inputbrokerEventCw": {
-			"label": "Clockwise event",
-			"description": "Select input event."
+			"label": "Événement horaire",
+			"description": "Sélectionner l’événement d’entrée"
 		},
 		"inputbrokerEventCcw": {
-			"label": "Counter Clockwise event",
-			"description": "Select input event."
+			"label": "Événement antihoraire",
+			"description": "Sélectionner l’événement d’entrée"
 		},
 		"inputbrokerEventPress": {
-			"label": "Press event",
-			"description": "Select input event"
+			"label": "Événement pression",
+			"description": "Sélectionner l’événement d’entrée"
 		},
 		"updown1Enabled": {
-			"label": "Up Down enabled",
-			"description": "Enable the up / down encoder"
+			"label": "Encodeur haut/bas activé",
+			"description": "Active l’encodeur haut/bas"
 		},
 		"allowInputSource": {
-			"label": "Allow Input Source",
-			"description": "Select from: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
+			"label": "Autoriser la source d’entrée",
+			"description": "Sélectionner parmi : '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
 		},
 		"sendBell": {
-			"label": "Send Bell",
-			"description": "Sends a bell character with each message"
+			"label": "Envoyer un bip",
+			"description": "Envoie un caractère de cloche avec chaque message"
 		}
 	},
 	"detectionSensor": {
-		"title": "Detection Sensor Settings",
-		"description": "Settings for the Detection Sensor module",
+		"title": "Paramètres du capteur de détection",
+		"description": "Paramètres du module de capteur de détection",
 		"enabled": {
 			"label": "Activé",
-			"description": "Enable or disable Detection Sensor Module"
+			"description": "Activer ou désactiver le module de détection"
 		},
 		"minimumBroadcastSecs": {
-			"label": "Minimum Broadcast Seconds",
-			"description": "The interval in seconds of how often we can send a message to the mesh when a state change is detected"
+			"label": "Intervalle minimum d’émission (s)",
+			"description": "L'intervalle en secondes de la fréquence à laquelle nous pouvons envoyer un message au maillage quand un changement d'état est détecté"
 		},
 		"stateBroadcastSecs": {
-			"label": "State Broadcast Seconds",
-			"description": "The interval in seconds of how often we should send a message to the mesh with the current state regardless of changes"
+			"label": "Intervalle d’état (s)",
+			"description": "Temps entre deux messages d’état envoyés, même sans changement"
 		},
 		"sendBell": {
-			"label": "Send Bell",
-			"description": "Send ASCII bell with alert message"
+			"label": "Envoyer un bip",
+			"description": "Envoyer un caractère ASCII 'bell' avec le message d’alerte"
 		},
 		"name": {
-			"label": "Friendly Name",
-			"description": "Used to format the message sent to mesh, max 20 Characters"
+			"label": "Nom convivial",
+			"description": "Utilisé pour formater le message envoyé au réseau, max. 20 caractères"
 		},
 		"monitorPin": {
-			"label": "Monitor Pin",
-			"description": "The GPIO pin to monitor for state changes"
+			"label": "Broche de monitoring",
+			"description": "Broche GPIO pour surveiller les changements d'état"
 		},
 		"detectionTriggerType": {
-			"label": "Detection Triggered Type",
-			"description": "The type of trigger event to be used"
+			"label": "Type du déclencheur de détection",
+			"description": "Le type d'événement déclencheur à utiliser"
 		},
 		"usePullup": {
-			"label": "Use Pullup",
-			"description": "Whether or not use INPUT_PULLUP mode for GPIO pin"
+			"label": "Utiliser Pullup",
+			"description": "Utiliser ou non le mode INPUT_PULLUP pour la broche GPIO"
 		}
 	},
 	"externalNotification": {
-		"title": "External Notification Settings",
-		"description": "Configure the external notification module",
+		"title": "Paramètres de la notification extérieure",
+		"description": "Configurer le module de notification externe",
 		"enabled": {
-			"label": "Module Enabled",
-			"description": "Enable External Notification"
+			"label": "Module activé",
+			"description": "Activer les notifications externes"
 		},
 		"outputMs": {
-			"label": "Output MS",
-			"description": "Output MS"
+			"label": "Sortie MS",
+			"description": "Sortie MS"
 		},
 		"output": {
-			"label": "Output",
-			"description": "Output"
+			"label": "Sortie",
+			"description": "Sortie"
 		},
 		"outputVibra": {
-			"label": "Output Vibrate",
-			"description": "Output Vibrate"
+			"label": "Sortie vibreur",
+			"description": "Sortie vibreur"
 		},
 		"outputBuzzer": {
-			"label": "Output Buzzer",
-			"description": "Output Buzzer"
+			"label": "Sortie buzzer",
+			"description": "Sortie buzzer"
 		},
 		"active": {
-			"label": "Active",
-			"description": "Active"
+			"label": "Actif",
+			"description": "Actif"
 		},
 		"alertMessage": {
-			"label": "Alert Message",
-			"description": "Alert Message"
+			"label": "Message d'alerte",
+			"description": "Message d'alerte"
 		},
 		"alertMessageVibra": {
-			"label": "Alert Message Vibrate",
-			"description": "Alert Message Vibrate"
+			"label": "Message d'alerte vibreur",
+			"description": "Message d'alerte vibreur"
 		},
 		"alertMessageBuzzer": {
-			"label": "Alert Message Buzzer",
-			"description": "Alert Message Buzzer"
+			"label": "Message d'alerte buzzer",
+			"description": "Message d'alerte buzzer"
 		},
 		"alertBell": {
-			"label": "Alert Bell",
-			"description": "Should an alert be triggered when receiving an incoming bell?"
+			"label": "Bip d'alerte",
+			"description": "Une alerte doit-elle être déclenchée lors de la réception d'un bip entrant ?"
 		},
 		"alertBellVibra": {
-			"label": "Alert Bell Vibrate",
-			"description": "Alert Bell Vibrate"
+			"label": "Bip d'alerte vibreur",
+			"description": "Bip d'alerte vibreur"
 		},
 		"alertBellBuzzer": {
-			"label": "Alert Bell Buzzer",
-			"description": "Alert Bell Buzzer"
+			"label": "Bip d'alerte buzzer",
+			"description": "Bip d'alerte buzzer"
 		},
 		"usePwm": {
-			"label": "Use PWM",
-			"description": "Use PWM"
+			"label": "Utiliser PWM",
+			"description": "Utiliser PWM"
 		},
 		"nagTimeout": {
-			"label": "Nag Timeout",
-			"description": "Nag Timeout"
+			"label": "Délai d'expiration du message",
+			"description": "Délai d'expiration du message"
 		},
 		"useI2sAsBuzzer": {
-			"label": "Use I²S Pin as Buzzer",
-			"description": "Designate I²S Pin as Buzzer Output"
+			"label": "Utiliser la broche I2S comme Buzzer",
+			"description": "Désigner la broche I2S comme sortie Buzzer"
 		}
 	},
 	"mqtt": {
-		"title": "MQTT Settings",
-		"description": "Settings for the MQTT module",
+		"title": "Paramètres MQTT",
+		"description": "Paramètres du module MQTT",
 		"enabled": {
 			"label": "Activé",
-			"description": "Enable or disable MQTT"
+			"description": "Activer ou désactiver MQTT"
 		},
 		"address": {
-			"label": "MQTT Server Address",
-			"description": "MQTT server address to use for default/custom servers"
+			"label": "Adresse du serveur MQTT",
+			"description": "Adresse du serveur MQTT à utiliser pour les serveurs par défaut/personnalisés"
 		},
 		"username": {
-			"label": "MQTT Username",
-			"description": "MQTT username to use for default/custom servers"
+			"label": "Nom d'utilisateur MQTT",
+			"description": "Nom d'utilisateur MQTT à utiliser pour les serveurs par défaut/personnalisés"
 		},
 		"password": {
-			"label": "MQTT Password",
-			"description": "MQTT password to use for default/custom servers"
+			"label": "Mot de passe MQTT",
+			"description": "Mot de passe MQTT à utiliser pour les serveurs par défaut/personnalisés"
 		},
 		"encryptionEnabled": {
-			"label": "Encryption Enabled",
-			"description": "Enable or disable MQTT encryption. Note: All messages are sent to the MQTT broker unencrypted if this option is not enabled, even when your uplink channels have encryption keys set. This includes position data."
+			"label": "Chiffrement activé",
+			"description": "Activer ou désactiver le chiffrement MQTT. Remarque : Tous les messages sont envoyés au broker MQTT non chiffré si cette option n'est pas activée, même si vos canaux uplink ont des clés de chiffrement. Cela inclut les données de position."
 		},
 		"jsonEnabled": {
-			"label": "JSON Enabled",
-			"description": "Whether to send/consume JSON packets on MQTT"
+			"label": "JSON activé",
+			"description": "S'il faut envoyer/consommer des paquets JSON sur MQTT"
 		},
 		"tlsEnabled": {
-			"label": "TLS Enabled",
-			"description": "Enable or disable TLS"
+			"label": "TLS activé",
+			"description": "Activer ou désactiver TLS"
 		},
 		"root": {
 			"label": "Sujet principal",
-			"description": "MQTT root topic to use for default/custom servers"
+			"description": "Sujet racine MQTT à utiliser pour les serveurs par défaut/personnalisés"
 		},
 		"proxyToClientEnabled": {
-			"label": "MQTT Client Proxy Enabled",
-			"description": "Utilizes the network connection to proxy MQTT messages to the client."
+			"label": "Proxy client MQTT activé",
+			"description": "Utilise la connexion réseau pour transmettre les messages MQTT au client."
 		},
 		"mapReportingEnabled": {
-			"label": "Map Reporting Enabled",
-			"description": "Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, short and long name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name."
+			"label": "Rapport cartographique activé",
+			"description": "Votre nœud enverra périodiquement un paquet de rapport de position non chiffré au serveur MQTT configuré. Ce paquet inclut l'identifiant, les noms long et court, la position approximative, le modèle matériel, le rôle, la version du micrologiciel, la région LoRa, le préréglage du modem et le nom du canal principal."
 		},
 		"mapReportSettings": {
 			"publishIntervalSecs": {
-				"label": "Map Report Publish Interval (s)",
-				"description": "Interval in seconds to publish map reports"
+				"label": "Intervalles de publication du rapport de carte",
+				"description": "Intervalle en secondes pour publier les rapports de carte"
 			},
 			"positionPrecision": {
-				"label": "Approximate Location",
-				"description": "Position shared will be accurate within this distance",
+				"label": "Position approximative",
+				"description": "La position partagée sera précise dans cette distance",
 				"options": {
-					"metric_km23": "Within 23 km",
-					"metric_km12": "Within 12 km",
-					"metric_km5_8": "Within 5.8 km",
-					"metric_km2_9": "Within 2.9 km",
-					"metric_km1_5": "Within 1.5 km",
-					"metric_m700": "Within 700 m",
-					"metric_m350": "Within 350 m",
-					"metric_m200": "Within 200 m",
-					"metric_m90": "Within 90 m",
-					"metric_m50": "Within 50 m",
-					"imperial_mi15": "Within 15 miles",
-					"imperial_mi7_3": "Within 7.3 miles",
-					"imperial_mi3_6": "Within 3.6 miles",
-					"imperial_mi1_8": "Within 1.8 miles",
-					"imperial_mi0_9": "Within 0.9 miles",
-					"imperial_mi0_5": "Within 0.5 miles",
-					"imperial_mi0_2": "Within 0.2 miles",
-					"imperial_ft600": "Within 600 feet",
-					"imperial_ft300": "Within 300 feet",
-					"imperial_ft150": "Within 150 feet"
+					"metric_km23": "A moins de 23 km",
+					"metric_km12": "A moins de 12 km",
+					"metric_km5_8": "A moins de 5.8 km",
+					"metric_km2_9": "A moins de 2.9 km",
+					"metric_km1_5": "A moins de 1.5 km",
+					"metric_m700": "A moins de 700 m",
+					"metric_m350": "A moins de 350 m",
+					"metric_m200": "À moins de 200 m",
+					"metric_m90": "A moins de 90 m",
+					"metric_m50": "A moins de 50 m",
+					"imperial_mi15": "À moins de 15 miles",
+					"imperial_mi7_3": "À moins de 7,3 miles",
+					"imperial_mi3_6": "À moins de 3,6 miles",
+					"imperial_mi1_8": "À moins de 1,8 miles",
+					"imperial_mi0_9": "À moins de 0,9 miles",
+					"imperial_mi0_5": "À moins de 0,5 miles",
+					"imperial_mi0_2": "À moins de 0,2 miles",
+					"imperial_ft600": "À moins de 600 pieds",
+					"imperial_ft300": "À moins de 300 pieds",
+					"imperial_ft150": "À moins de 150 pieds"
 				}
 			}
 		}
 	},
 	"neighborInfo": {
-		"title": "Neighbor Info Settings",
-		"description": "Settings for the Neighbor Info module",
+		"title": "Paramètres des informations du voisinage",
+		"description": "Paramètres pour le module informations du voisinage",
 		"enabled": {
 			"label": "Activé",
-			"description": "Enable or disable Neighbor Info Module"
+			"description": "Activer ou désactiver le module informations du voisinage"
 		},
 		"updateInterval": {
-			"label": "Update Interval",
-			"description": "Interval in seconds of how often we should try to send our Neighbor Info to the mesh"
+			"label": "Intervalle de mise à jour",
+			"description": "Intervalle en secondes de la fréquence à laquelle nous devrions essayer d'envoyer nos informations de Voisinage au maillage"
 		}
 	},
 	"paxcounter": {
-		"title": "Paxcounter Settings",
-		"description": "Settings for the Paxcounter module",
+		"title": "Paramètres Paxcounter",
+		"description": "Paramètres du module Paxcounter",
 		"enabled": {
-			"label": "Module Enabled",
-			"description": "Enable Paxcounter"
+			"label": "Module activé",
+			"description": "Activer Paxcounter"
 		},
 		"paxcounterUpdateInterval": {
-			"label": "Update Interval (seconds)",
-			"description": "How long to wait between sending paxcounter packets"
+			"label": "Intervalle de mise à jour (secondes)",
+			"description": "Durée d'attente entre l'envoi de paquets paxcounter"
 		},
 		"wifiThreshold": {
-			"label": "WiFi RSSI Threshold",
-			"description": "At what WiFi RSSI level should the counter increase. Defaults to -80."
+			"label": "Seuil RSSI WiFi",
+			"description": "A quel niveau de WiFi RSSI devrait augmenter le compteur. Par défaut, -80."
 		},
 		"bleThreshold": {
-			"label": "BLE RSSI Threshold",
-			"description": "At what BLE RSSI level should the counter increase. Defaults to -80."
+			"label": "Seuil RSSI BLE",
+			"description": "A quel niveau de BLE RSSI devrait augmenter le compteur. Par défaut, -80."
 		}
 	},
 	"rangeTest": {
-		"title": "Range Test Settings",
-		"description": "Settings for the Range Test module",
+		"title": "Paramètres de test de portée",
+		"description": "Paramètres du module de test de portée",
 		"enabled": {
-			"label": "Module Enabled",
-			"description": "Enable Range Test"
+			"label": "Module activé",
+			"description": "Activer le test de portée"
 		},
 		"sender": {
-			"label": "Message Interval",
-			"description": "How long to wait between sending test packets"
+			"label": "Intervalle de message",
+			"description": "Durée d'attente entre l'envoi de paquets de test"
 		},
 		"save": {
-			"label": "Save CSV to storage",
-			"description": "ESP32 Only"
+			"label": "Enregistrer le CSV dans le stockage",
+			"description": "ESP32 seulement"
 		}
 	},
 	"serial": {
-		"title": "Serial Settings",
-		"description": "Settings for the Serial module",
+		"title": "Paramètres série",
+		"description": "Paramètres du module série",
 		"enabled": {
-			"label": "Module Enabled",
-			"description": "Enable Serial output"
+			"label": "Module activé",
+			"description": "Activer la sortie série"
 		},
 		"echo": {
 			"label": "Écho",
-			"description": "Any packets you send will be echoed back to your device"
+			"description": "Tous les paquets que vous envoyez seront renvoyés vers votre appareil"
 		},
 		"rxd": {
-			"label": "Receive Pin",
-			"description": "Set the GPIO pin to the RXD pin you have set up."
+			"label": "Broche de réception",
+			"description": "Réglez la broche GPIO sur la broche RXD que vous avez configurée."
 		},
 		"txd": {
-			"label": "Transmit Pin",
-			"description": "Set the GPIO pin to the TXD pin you have set up."
+			"label": "Broche de transmission",
+			"description": "Réglez la broche GPIO sur la broche TXD que vous avez configurée."
 		},
 		"baud": {
-			"label": "Baud Rate",
-			"description": "The serial baud rate"
+			"label": "Vitesse en bauds",
+			"description": "Vitesse de transmission série"
 		},
 		"timeout": {
 			"label": "Délai d'expiration",
-			"description": "Seconds to wait before we consider your packet as 'done'"
+			"description": "Secondes à attendre avant de considérer votre paquet comme \"fini\""
 		},
 		"mode": {
 			"label": "Mode",
-			"description": "Select Mode"
+			"description": "Sélection de mode"
 		},
 		"overrideConsoleSerialPort": {
-			"label": "Override Console Serial Port",
-			"description": "If you have a serial port connected to the console, this will override it."
+			"label": "Outrepasser le port série de la console",
+			"description": "Si vous avez un port série connecté à la console, cela va le remplacer."
 		}
 	},
 	"storeForward": {
-		"title": "Store & Forward Settings",
-		"description": "Settings for the Store & Forward module",
+		"title": "Paramètres de stockage et transfert",
+		"description": "Paramètres du module stockage et transfert",
 		"enabled": {
-			"label": "Module Enabled",
-			"description": "Enable Store & Forward"
+			"label": "Module activé",
+			"description": "Activer  stockage et transfert"
 		},
 		"heartbeat": {
-			"label": "Heartbeat Enabled",
-			"description": "Enable Store & Forward heartbeat"
+			"label": "Pulsations activées",
+			"description": "Activer les pulsations stockage et transfert"
 		},
 		"records": {
 			"label": "Nombre d'enregistrements",
-			"description": "Number of records to store"
+			"description": "Nombre d'enregistrements à stocker"
 		},
 		"historyReturnMax": {
-			"label": "History return max",
-			"description": "Max number of records to return"
+			"label": "Limite d’historique renvoyé",
+			"description": "Nombre maximum d'enregistrements à retourner"
 		},
 		"historyReturnWindow": {
-			"label": "History return window",
-			"description": "Max number of records to return"
+			"label": "Fenêtre de retour d’historique",
+			"description": "Nombre maximum d'enregistrements à retourner"
 		}
 	},
 	"telemetry": {
-		"title": "Telemetry Settings",
-		"description": "Settings for the Telemetry module",
+		"title": "Paramètres de télémétrie",
+		"description": "Paramètres du module télémétrie",
 		"deviceUpdateInterval": {
-			"label": "Device Metrics",
+			"label": "Métriques de l’appareil",
 			"description": "Intervalle de mise à jour des métriques de l'appareil (secondes)"
 		},
 		"environmentUpdateInterval": {
@@ -413,36 +413,36 @@
 			"description": ""
 		},
 		"environmentMeasurementEnabled": {
-			"label": "Module Enabled",
-			"description": "Enable the Environment Telemetry"
+			"label": "Module activé",
+			"description": "Activer la télémétrie d'environnement"
 		},
 		"environmentScreenEnabled": {
-			"label": "Displayed on Screen",
-			"description": "Show the Telemetry Module on the OLED"
+			"label": "Affiché à l'écran",
+			"description": "Afficher le module de télémétrie sur OLED"
 		},
 		"environmentDisplayFahrenheit": {
-			"label": "Display Fahrenheit",
-			"description": "Display temp in Fahrenheit"
+			"label": "Afficher en Fahrenheit",
+			"description": "Afficher la température en Fahrenheit"
 		},
 		"airQualityEnabled": {
-			"label": "Air Quality Enabled",
-			"description": "Enable the Air Quality Telemetry"
+			"label": "Qualité de l'air activée",
+			"description": "Activer la télémétrie de qualité de l'air"
 		},
 		"airQualityInterval": {
-			"label": "Air Quality Update Interval",
-			"description": "How often to send Air Quality data over the mesh"
+			"label": "Intervalle de mise à jour de la qualité de l'air",
+			"description": "Fréquence d'envoi des données de qualité de l'air sur le maillage"
 		},
 		"powerMeasurementEnabled": {
-			"label": "Power Measurement Enabled",
-			"description": "Enable the Power Measurement Telemetry"
+			"label": "Mesure de puissance activée",
+			"description": "Activer la télémétrie de mesure d'énergie"
 		},
 		"powerUpdateInterval": {
-			"label": "Power Update Interval",
-			"description": "How often to send Power data over the mesh"
+			"label": "Intervalle de mise à jour de l'alimentation",
+			"description": "Fréquence d'envoi de données d'alimentation sur le maillage"
 		},
 		"powerScreenEnabled": {
-			"label": "Power Screen Enabled",
-			"description": "Enable the Power Telemetry Screen"
+			"label": "Écran d'alimentation activé",
+			"description": "Activer l'écran de télémétrie d'alimentation"
 		}
 	}
 }

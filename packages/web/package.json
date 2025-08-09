@@ -11,9 +11,9 @@
 	"bugs": {
 		"url": "https://github.com/meshtastic/web/issues"
 	},
-
 	"homepage": "https://meshtastic.org",
 	"scripts": {
+		"preinstall": "npx only-allow pnpm",
 		"build": "vite build",
 		"build:analyze": "BUNDLE_ANALYZE=true bun run build",
 		"check": "biome check src/",
@@ -28,7 +28,7 @@
 	"dependencies": {
 		"@bufbuild/protobuf": "^2.6.0",
 		"@hookform/resolvers": "^5.1.1",
-		"@meshtastic/core": "npm:@jsr/meshtastic__core@2.6.4",
+		"@meshtastic/core": "workspace:*",
 		"@meshtastic/transport-http": "npm:@jsr/meshtastic__transport-http",
 		"@meshtastic/transport-web-bluetooth": "npm:@jsr/meshtastic__transport-web-bluetooth",
 		"@meshtastic/transport-web-serial": "npm:@jsr/meshtastic__transport-web-serial",
@@ -49,6 +49,7 @@
 		"@radix-ui/react-toast": "^1.2.14",
 		"@radix-ui/react-toggle-group": "^1.1.10",
 		"@radix-ui/react-tooltip": "^1.2.7",
+		"@radix-ui/react-visually-hidden": "^1.2.3",
 		"@tailwindcss/vite": "^4.1.11",
 		"@tanstack/react-router": "^1.127.9",
 		"@tanstack/react-router-devtools": "^1.127.9",
@@ -78,6 +79,8 @@
 		"react-map-gl": "8.0.4",
 		"react-qrcode-logo": "^3.0.0",
 		"rfc4648": "^1.5.4",
+		"vite-plugin-html": "^3.2.2",
+		"vite": "^7.0.4",
 		"zod": "^4.0.5",
 		"zustand": "5.0.6"
 	},
@@ -104,7 +107,6 @@
 		"tar": "^7.4.3",
 		"testing-library": "^0.0.2",
 		"typescript": "^5.8.3",
-		"vite": "^7.0.4",
 		"vitest": "^3.2.4"
 	}
 }

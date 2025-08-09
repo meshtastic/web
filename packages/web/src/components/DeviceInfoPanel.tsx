@@ -86,6 +86,12 @@ export const DeviceInfoPanel = ({
 
   const actionButtons: ActionButtonConfig[] = [
     {
+      id: "theme",
+      label: t("theme.changeTheme"),
+      icon: Palette,
+      render: () => <ThemeSwitcher />,
+    },
+    {
       id: "changeName",
       label: t("sidebar.deviceInfo.deviceName.changeName"),
       icon: PenLine,
@@ -97,12 +103,7 @@ export const DeviceInfoPanel = ({
       icon: SearchIcon,
       onClick: setCommandPaletteOpen,
     },
-    {
-      id: "theme",
-      label: t("theme.changeTheme"),
-      icon: Palette,
-      render: () => <ThemeSwitcher />,
-    },
+
     {
       id: "language",
       label: t("language.changeLanguage"),

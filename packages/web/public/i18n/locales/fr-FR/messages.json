@@ -1,39 +1,39 @@
 {
 	"page": {
 		"title": "Messages: {{chatName}}",
-		"placeholder": "Enter Message"
+		"placeholder": "Saisir message"
 	},
 	"emptyState": {
-		"title": "Select a Chat",
-		"text": "No messages yet."
+		"title": "Sélectionnez un chat",
+		"text": "Aucun message pour le moment."
 	},
 	"selectChatPrompt": {
-		"text": "Select a channel or node to start messaging."
+		"text": "Sélectionnez un canal ou un nœud pour commencer à envoyer des messages."
 	},
 	"sendMessage": {
-		"placeholder": "Enter your message here...",
+		"placeholder": "Entrez votre message ici...",
 		"sendButton": "Envoyer"
 	},
 	"actionsMenu": {
-		"addReactionLabel": "Add Reaction",
+		"addReactionLabel": "Ajouter une réaction",
 		"replyLabel": "Répondre"
 	},
 	"deliveryStatus": {
 		"delivered": {
-			"label": "Message delivered",
-			"displayText": "Message delivered"
+			"label": "Message délivré",
+			"displayText": "Message délivré"
 		},
 		"failed": {
-			"label": "Message delivery failed",
-			"displayText": "Delivery failed"
+			"label": "La transmission du message a échoué",
+			"displayText": "Échec de l'envoi"
 		},
 		"unknown": {
-			"label": "Message status unknown",
-			"displayText": "Unknown state"
+			"label": "Statut du message inconnu",
+			"displayText": "Statut inconnu"
 		},
 		"waiting": {
-			"label": "Sending message",
-			"displayText": "Waiting for delivery"
+			"label": "Envoi du message",
+			"displayText": "En attente de réception"
 		}
 	}
 }

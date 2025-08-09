@@ -1,63 +1,63 @@
 {
 	"nodeDetail": {
 		"publicKeyEnabled": {
-			"label": "Public Key Enabled"
+			"label": "공개 키 활성화"
 		},
 		"noPublicKey": {
-			"label": "No Public Key"
+			"label": "공개 키 없음"
 		},
 		"directMessage": {
-			"label": "Direct Message {{shortName}}"
+			"label": "DM {{shortName}}"
 		},
 		"favorite": {
 			"label": "즐겨찾기",
-			"tooltip": "Add or remove this node from your favorites"
+			"tooltip": "이 노드를 즐겨찾기에 추가하거나 삭제"
 		},
 		"notFavorite": {
-			"label": "Not a Favorite"
+			"label": "즐겨찾기 아님"
 		},
 		"error": {
-			"label": "오류",
-			"text": "An error occurred while fetching node details. Please try again later."
+			"label": "Error",
+			"text": "노드 정보를 가져오는 과정에서 오류가 발생했습니다. 나중에 다시 시도해 주세요."
 		},
 		"status": {
-			"heard": "Heard",
+			"heard": "수신",
 			"mqtt": "MQTT"
 		},
 		"elevation": {
-			"label": "Elevation"
+			"label": "고도"
 		},
 		"channelUtil": {
-			"label": "Channel Util"
+			"label": "채널 사용률"
 		},
 		"airtimeUtil": {
-			"label": "Airtime Util"
+			"label": "통신 사용률"
 		}
 	},
 	"nodesTable": {
 		"headings": {
-			"longName": "Long Name",
-			"connection": "Connection",
-			"lastHeard": "Last Heard",
-			"encryption": "Encryption",
-			"model": "Model",
-			"macAddress": "MAC Address"
+			"longName": "긴 이름",
+			"connection": "연결",
+			"lastHeard": "최근 수신",
+			"encryption": "암호화",
+			"model": "하드웨어",
+			"macAddress": "MAC 주소"
 		},
 		"connectionStatus": {
 			"direct": "직접 연결",
-			"away": "away",
+			"away": "떨어짐",
 			"unknown": "-",
-			"viaMqtt": ", via MQTT"
+			"viaMqtt": ", MQTT 경유"
 		},
 		"lastHeardStatus": {
-			"never": "Never"
+			"never": "수신 된 적 없음"
 		}
 	},
 	"actions": {
-		"added": "Added",
-		"removed": "Removed",
-		"ignoreNode": "Ignore Node",
-		"unignoreNode": "Unignore Node",
-		"requestPosition": "Request Position"
+		"added": "추가됨",
+		"removed": "삭제됨",
+		"ignoreNode": "노드 무시하기",
+		"unignoreNode": "노드 무시 해제",
+		"requestPosition": "위치 요청"
 	}
 }

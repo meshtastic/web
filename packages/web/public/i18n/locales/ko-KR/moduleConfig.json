@@ -121,7 +121,7 @@
 		"title": "Detection Sensor Settings",
 		"description": "Settings for the Detection Sensor module",
 		"enabled": {
-			"label": "Enabled",
+			"label": "활성화",
 			"description": "Enable or disable Detection Sensor Module"
 		},
 		"minimumBroadcastSecs": {
@@ -221,7 +221,7 @@
 		"title": "MQTT Settings",
 		"description": "Settings for the MQTT module",
 		"enabled": {
-			"label": "Enabled",
+			"label": "활성화",
 			"description": "Enable or disable MQTT"
 		},
 		"address": {
@@ -279,16 +279,16 @@
 					"metric_m200": "Within 200 m",
 					"metric_m90": "Within 90 m",
 					"metric_m50": "Within 50 m",
-					"imperial_mi15": "Within 15 miles",
-					"imperial_mi7_3": "Within 7.3 miles",
-					"imperial_mi3_6": "Within 3.6 miles",
-					"imperial_mi1_8": "Within 1.8 miles",
-					"imperial_mi0_9": "Within 0.9 miles",
-					"imperial_mi0_5": "Within 0.5 miles",
-					"imperial_mi0_2": "Within 0.2 miles",
-					"imperial_ft600": "Within 600 feet",
-					"imperial_ft300": "Within 300 feet",
-					"imperial_ft150": "Within 150 feet"
+					"imperial_mi15": "15 miles 이내",
+					"imperial_mi7_3": "7.3 miles 이내",
+					"imperial_mi3_6": "3.6 miles 이내",
+					"imperial_mi1_8": "1.8 miles 이내",
+					"imperial_mi0_9": "0.9 miles 이내",
+					"imperial_mi0_5": "0.5 miles 이내",
+					"imperial_mi0_2": "0.2 miles 이내",
+					"imperial_ft600": "600 feet 이내",
+					"imperial_ft300": "300 feet 이내",
+					"imperial_ft150": "150 feet 이내"
 				}
 			}
 		}
@@ -297,7 +297,7 @@
 		"title": "Neighbor Info Settings",
 		"description": "Settings for the Neighbor Info module",
 		"enabled": {
-			"label": "Enabled",
+			"label": "활성화",
 			"description": "Enable or disable Neighbor Info Module"
 		},
 		"updateInterval": {
@@ -365,7 +365,7 @@
 			"description": "The serial baud rate"
 		},
 		"timeout": {
-			"label": "시간 초과됨",
+			"label": "시간 초과",
 			"description": "Seconds to wait before we consider your packet as 'done'"
 		},
 		"mode": {
@@ -406,7 +406,7 @@
 		"description": "Settings for the Telemetry module",
 		"deviceUpdateInterval": {
 			"label": "Device Metrics",
-			"description": "기기 메트릭 업데이트 간격 (초)"
+			"description": "장치 메트릭 업데이트 간격 (초)"
 		},
 		"environmentUpdateInterval": {
 			"label": "환경 메트릭 업데이트 간격 (초)",

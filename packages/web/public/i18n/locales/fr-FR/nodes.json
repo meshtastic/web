@@ -1,63 +1,63 @@
 {
 	"nodeDetail": {
 		"publicKeyEnabled": {
-			"label": "Public Key Enabled"
+			"label": "Clé publique activée"
 		},
 		"noPublicKey": {
-			"label": "No Public Key"
+			"label": "Aucune clé publique"
 		},
 		"directMessage": {
-			"label": "Direct Message {{shortName}}"
+			"label": "Message direct à {{shortName}}"
 		},
 		"favorite": {
 			"label": "Favoris",
-			"tooltip": "Add or remove this node from your favorites"
+			"tooltip": "Ajouter ou retirer ce nœud de vos favoris"
 		},
 		"notFavorite": {
-			"label": "Not a Favorite"
+			"label": "Non favori"
 		},
 		"error": {
 			"label": "Erreur",
-			"text": "An error occurred while fetching node details. Please try again later."
+			"text": "Une erreur est survenue lors du chargement des détails du nœud. Veuillez réessayer."
 		},
 		"status": {
 			"heard": "Capté",
 			"mqtt": "MQTT"
 		},
 		"elevation": {
-			"label": "Elevation"
+			"label": "Altitude"
 		},
 		"channelUtil": {
-			"label": "Channel Util"
+			"label": "Utilisation du canal"
 		},
 		"airtimeUtil": {
-			"label": "Airtime Util"
+			"label": "Utilisation du temps d’antenne"
 		}
 	},
 	"nodesTable": {
 		"headings": {
-			"longName": "Long Name",
-			"connection": "Connection",
-			"lastHeard": "Last Heard",
-			"encryption": "Encryption",
-			"model": "Model",
-			"macAddress": "MAC Address"
+			"longName": "Nom long",
+			"connection": "Connexion",
+			"lastHeard": "Dernière écoute",
+			"encryption": "Chiffrement",
+			"model": "Modèle",
+			"macAddress": "Adresse MAC"
 		},
 		"connectionStatus": {
 			"direct": "Direk",
-			"away": "away",
+			"away": "distant",
 			"unknown": "-",
 			"viaMqtt": ", via MQTT"
 		},
 		"lastHeardStatus": {
-			"never": "Never"
+			"never": "Jamais"
 		}
 	},
 	"actions": {
-		"added": "Added",
-		"removed": "Removed",
-		"ignoreNode": "Ignore Node",
-		"unignoreNode": "Unignore Node",
-		"requestPosition": "Request Position"
+		"added": "Ajouté",
+		"removed": "Supprimé",
+		"ignoreNode": "Ignorer le nœud",
+		"unignoreNode": "Ne plus ignorer le nœud",
+		"requestPosition": "Demander la position"
 	}
 }

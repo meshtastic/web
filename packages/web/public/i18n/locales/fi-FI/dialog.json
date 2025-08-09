@@ -7,7 +7,13 @@
 		"description": "Laite käynnistyy uudelleen, kun asetus on tallennettu.",
 		"longName": "Pitkä nimi",
 		"shortName": "Lyhytnimi",
-		"title": "Vaihda laitteen nimi"
+		"title": "Vaihda laitteen nimi",
+		"validation": {
+			"longNameMax": "Pitkässä nimessä saa olla enintään 40 merkkiä",
+			"shortNameMax": "Lyhytnimessä ei saa olla enempää kuin 4 merkkiä",
+			"longNameMin": "Pitkässä nimessä täytyy olla vähintään yksi merkki",
+			"shortNameMin": "Lyhytnimessä täytyy olla vähintään ykis merkki"
+		}
 	},
 	"import": {
 		"description": "Nykyinen LoRa-asetus ylikirjoitetaan.",
@@ -21,9 +27,10 @@
 		"title": "Tuo kanava-asetukset"
 	},
 	"locationResponse": {
+		"title": "Sijainti: {{identifier}}",
 		"altitude": "Korkeus: ",
 		"coordinates": "Koordinaatit: ",
-		"title": "Sijainti: {{identifier}}"
+		"noCoordinates": "Ei koordinaatteja"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Luodaanko ennalta jaettu avain uudelleen?",
@@ -60,11 +67,15 @@
 		},
 		"bluetoothConnection": {
 			"noDevicesPaired": "Yhtään laitetta ei ole vielä yhdistetty.",
-			"newDeviceButton": "Uusi laite"
+			"newDeviceButton": "Uusi laite",
+			"connectionFailed": "Yhdistäminen epäonnistui",
+			"deviceDisconnected": "Yhteys laitteeseen katkaistu",
+			"unknownDevice": "Tuntematon laite",
+			"errorLoadingDevices": "Virhe ladattaessa laitteita",
+			"unknownErrorLoadingDevices": "Tuntematon virhe laitteita ladattaessa"
 		},
 		"validation": {
-			"requiresWebBluetooth": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti bluetooth</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
-			"requiresWebSerial": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
+			"requiresFeatures": "Tämä yhteystyyppi vaatii <0></0>. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
 			"requiresSecureContext": "Tämä sovellus vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia.",
 			"additionallyRequiresSecureContext": "Lisäksi se vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia."
 		}
@@ -166,6 +177,6 @@
 	"managedMode": {
 		"confirmUnderstanding": "Kyllä, tiedän mitä teen",
 		"title": "Oletko varma?",
-		"description": "Hallintatilan käyttöönotto estää asiakassovelluksia (mukaan lukien verkkosovellus) kirjoittamasta asetuksia radioon. Kun tila on otettu käyttöön, radion asetuksia voidaan muuttaa <bold>vain</bold> etähallintaviestien kautta. Tämä asetus ei ole pakollinen etähallittavien laitteiden hallintaan."
+		"description": "Hallintatilan käyttöönotto estää asiakassovelluksia (mukaan lukien verkkoselain) tekemästä muutoksia laitteen asetuksiin. Kun hallintatila on käytössä, laitteen asetuksia voidaan muuttaa ainoastaan etähallintaviesteillä (Remote Admin). Tämä asetus ei ole pakollinen etähallintaan."
 	}
 }

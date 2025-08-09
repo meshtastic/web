@@ -1,0 +1,86 @@
+name: Release Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: 'Packages to release (comma-separated, or "all" for all packages)'
+        required: false
+        default: 'all'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # --- Setup Node.js and pnpm ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # --- Setup Deno ---
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      # --- Cache pnpm Dependencies ---
+      - name: Cache pnpm Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            packages/web/node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      # --- Cache Deno Dependencies ---
+      - name: Cache Deno Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
+
+      - name: Configure pnpm registry
+        run: pnpm config set registry https://registry.npmjs.org/
+
+      - name: Configure pnpm auth
+        run: pnpm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+
+      - name: Publish packages to npm and JSR
+        run: |
+          for dir in packages/*; do
+            echo "Processing $dir"
+
+            cd $dir
+
+            # Build and publish to npm if package.json exists
+            if [ -f "package.json" ]; then
+              echo "Building and publishing $dir to npm..."
+              pnpm run build:npm
+              pnpm run publish:npm || echo "npm publish failed for $dir"
+            fi
+
+            pnpm run prepare:jsr
+
+            # Publish to JSR if jsr.json exists
+            if [ -f "jsr.json" ]; then
+              echo "Publishing $dir to jsr..."
+              deno publish || echo "JSR publish failed for $dir"
+            fi
+
+            cd - > /dev/null
+          done
+
+    

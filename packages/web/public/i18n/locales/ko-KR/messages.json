@@ -1,39 +1,39 @@
 {
 	"page": {
-		"title": "Messages: {{chatName}}",
-		"placeholder": "Enter Message"
+		"title": "메시지: {{chatName}}",
+		"placeholder": "메시지 입력"
 	},
 	"emptyState": {
-		"title": "Select a Chat",
-		"text": "No messages yet."
+		"title": "채팅 선택",
+		"text": "아직 메시지가 없습니다."
 	},
 	"selectChatPrompt": {
-		"text": "Select a channel or node to start messaging."
+		"text": "채널 또는 노드를 선택하여 메시지 전송을 시작하세요."
 	},
 	"sendMessage": {
-		"placeholder": "Enter your message here...",
+		"placeholder": "여기에 메시지를 입력하세요...",
 		"sendButton": "보내기"
 	},
 	"actionsMenu": {
-		"addReactionLabel": "Add Reaction",
-		"replyLabel": "Reply"
+		"addReactionLabel": "반응 추가",
+		"replyLabel": "답장"
 	},
 	"deliveryStatus": {
 		"delivered": {
-			"label": "Message delivered",
-			"displayText": "Message delivered"
+			"label": "메시지 전송",
+			"displayText": "메시지 전송됨"
 		},
 		"failed": {
-			"label": "Message delivery failed",
-			"displayText": "Delivery failed"
+			"label": "메시지 전송 실패",
+			"displayText": "전송 실패"
 		},
 		"unknown": {
-			"label": "Message status unknown",
-			"displayText": "Unknown state"
+			"label": "메시지 상태 알 수 없음",
+			"displayText": "알 수 없는 상태"
 		},
 		"waiting": {
-			"label": "Sending message",
-			"displayText": "Waiting for delivery"
+			"label": "메시지 전송 중",
+			"displayText": "전송 대기 중"
 		}
 	}
 }

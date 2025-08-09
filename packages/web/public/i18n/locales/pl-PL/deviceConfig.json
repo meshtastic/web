@@ -1,6 +1,6 @@
 {
 	"page": {
-		"title": "Configuration",
+		"title": "Konfiguracja",
 		"tabBluetooth": "Bluetooth",
 		"tabDevice": "Urządzenie",
 		"tabDisplay": "Wyświetlacz",
@@ -11,10 +11,10 @@
 		"tabSecurity": "Bezpieczeństwo"
 	},
 	"sidebar": {
-		"label": "Modules"
+		"label": "Moduły"
 	},
 	"device": {
-		"title": "Device Settings",
+		"title": "Ustawienia Urządzenia",
 		"description": "Settings for the device",
 		"buttonPin": {
 			"description": "Button pin override",
@@ -54,7 +54,7 @@
 		}
 	},
 	"bluetooth": {
-		"title": "Bluetooth Settings",
+		"title": "Ustawienia Bluetooth",
 		"description": "Settings for the Bluetooth module",
 		"note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
 		"enabled": {
@@ -63,7 +63,7 @@
 		},
 		"pairingMode": {
 			"description": "Pin selection behaviour.",
-			"label": "Pairing mode"
+			"label": "Tryb parowania"
 		},
 		"pin": {
 			"description": "Pin to use when pairing",

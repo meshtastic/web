@@ -1,0 +1,228 @@
+{
+	"navigation": {
+		"title": "Navigation",
+		"messages": "Mensagens",
+		"map": "Mapa",
+		"config": "Config",
+		"radioConfig": "Radio Config",
+		"moduleConfig": "Module Config",
+		"channels": "Canais",
+		"nodes": "Nós"
+	},
+	"app": {
+		"title": "Meshtastic",
+		"logo": "Meshtastic Logo"
+	},
+	"sidebar": {
+		"collapseToggle": {
+			"button": {
+				"open": "Open sidebar",
+				"close": "Close sidebar"
+			}
+		},
+		"deviceInfo": {
+			"volts": "{{voltage}} volts",
+			"firmware": {
+				"title": "Firmware",
+				"version": "v{{version}}",
+				"buildDate": "Build date: {{date}}"
+			},
+			"deviceName": {
+				"title": "Device Name",
+				"changeName": "Change Device Name",
+				"placeholder": "Enter device name"
+			},
+			"editDeviceName": "Edit device name"
+		}
+	},
+	"batteryStatus": {
+		"charging": "{{level}}% charging",
+		"pluggedIn": "Plugged in",
+		"title": "Bateria"
+	},
+	"search": {
+		"nodes": "Search nodes...",
+		"channels": "Search channels...",
+		"commandPalette": "Search commands..."
+	},
+	"toast": {
+		"positionRequestSent": {
+			"title": "Position request sent."
+		},
+		"requestingPosition": {
+			"title": "Requesting position, please wait..."
+		},
+		"sendingTraceroute": {
+			"title": "Sending Traceroute, please wait..."
+		},
+		"tracerouteSent": {
+			"title": "Traceroute sent."
+		},
+		"savedChannel": {
+			"title": "Saved Channel: {{channelName}}"
+		},
+		"messages": {
+			"pkiEncryption": {
+				"title": "Chat is using PKI encryption."
+			},
+			"pskEncryption": {
+				"title": "Chat is using PSK encryption."
+			}
+		},
+		"configSaveError": {
+			"title": "Error Saving Config",
+			"description": "An error occurred while saving the configuration."
+		},
+		"validationError": {
+			"title": "Config Errors Exist",
+			"description": "Please fix the configuration errors before saving."
+		},
+		"saveSuccess": {
+			"title": "Saving Config",
+			"description": "The configuration change {{case}} has been saved."
+		},
+		"favoriteNode": {
+			"title": "{{action}} {{nodeName}} {{direction}} favorites.",
+			"action": {
+				"added": "Added",
+				"removed": "Removed",
+				"to": "to",
+				"from": "from"
+			}
+		},
+		"ignoreNode": {
+			"title": "{{action}} {{nodeName}} {{direction}} ignore list",
+			"action": {
+				"added": "Added",
+				"removed": "Removed",
+				"to": "to",
+				"from": "from"
+			}
+		}
+	},
+	"notifications": {
+		"copied": {
+			"label": "Copied!"
+		},
+		"copyToClipboard": {
+			"label": "Copy to clipboard"
+		},
+		"hidePassword": {
+			"label": "Ocultar senha"
+		},
+		"showPassword": {
+			"label": "Mostrar senha"
+		},
+		"deliveryStatus": {
+			"delivered": "Delivered",
+			"failed": "Delivery Failed",
+			"waiting": "Waiting",
+			"unknown": "Desconhecido"
+		}
+	},
+	"general": {
+		"label": "General"
+	},
+	"hardware": {
+		"label": "Hardware"
+	},
+	"metrics": {
+		"label": "Metrics"
+	},
+	"role": {
+		"label": "Função"
+	},
+	"filter": {
+		"label": "Filtro"
+	},
+	"advanced": {
+		"label": "Advanced"
+	},
+	"clearInput": {
+		"label": "Clear input"
+	},
+	"resetFilters": {
+		"label": "Reset Filters"
+	},
+	"nodeName": {
+		"label": "Node name/number",
+		"placeholder": "Meshtastic 1234"
+	},
+	"airtimeUtilization": {
+		"label": "Airtime Utilization (%)"
+	},
+	"batteryLevel": {
+		"label": "Battery level (%)",
+		"labelText": "Battery level (%): {{value}}"
+	},
+	"batteryVoltage": {
+		"label": "Battery voltage (V)",
+		"title": "Voltagem"
+	},
+	"channelUtilization": {
+		"label": "Channel Utilization (%)"
+	},
+	"hops": {
+		"direct": "Direto",
+		"label": "Number of hops",
+		"text": "Number of hops: {{value}}"
+	},
+	"lastHeard": {
+		"label": "Visto pela última vez",
+		"labelText": "Last heard: {{value}}",
+		"nowLabel": "Now"
+	},
+	"snr": {
+		"label": "SNR (db)"
+	},
+	"favorites": {
+		"label": "Favorites"
+	},
+	"hide": {
+		"label": "Hide"
+	},
+	"showOnly": {
+		"label": "Show Only"
+	},
+	"viaMqtt": {
+		"label": "Connected via MQTT"
+	},
+	"hopsUnknown": {
+		"label": "Unknown number of hops"
+	},
+	"showUnheard": {
+		"label": "Never heard"
+	},
+	"language": {
+		"label": "Idioma",
+		"changeLanguage": "Change Language"
+	},
+	"theme": {
+		"dark": "Escuro",
+		"light": "Claro",
+		"system": "Automatic",
+		"changeTheme": "Change Color Scheme"
+	},
+	"errorPage": {
+		"title": "This is a little embarrassing...",
+		"description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
+		"description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
+		"reportInstructions": "Please include the following information in your report:",
+		"reportSteps": {
+			"step1": "What you were doing when the error occurred",
+			"step2": "What you expected to happen",
+			"step3": "What actually happened",
+			"step4": "Any other relevant information"
+		},
+		"reportLink": "You can report the issue to our <0>GitHub</0>",
+		"dashboardLink": "Return to the <0>dashboard</0>",
+		"detailsSummary": "Error Details",
+		"errorMessageLabel": "Error message:",
+		"stackTraceLabel": "Stack trace:",
+		"fallbackError": "{{error}}"
+	},
+	"footer": {
+		"text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
+		"commitSha": "Commit SHA: {{sha}}"
+	}
+}

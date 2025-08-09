@@ -1,50 +1,51 @@
 {
-	"emptyState": "No results found.",
-	"page": {
-		"title": "Command Menu"
-	},
-	"pinGroup": {
-		"label": "Pin command group"
-	},
-	"unpinGroup": {
-		"label": "Unpin command group"
-	},
-	"goto": {
-		"label": "Goto",
-		"command": {
-			"messages": "Messages",
-			"map": "Carte",
-			"config": "Config",
-			"channels": "Canaux",
-			"nodes": "Noeuds"
-		}
-	},
-	"manage": {
-		"label": "Manage",
-		"command": {
-			"switchNode": "Switch Node",
-			"connectNewNode": "Connect New Node"
-		}
-	},
-	"contextual": {
-		"label": "Contextual",
-		"command": {
-			"qrCode": "QR Code",
-			"qrGenerator": "Generator",
-			"qrImport": "Import",
-			"scheduleShutdown": "Schedule Shutdown",
-			"scheduleReboot": "Schedule Reboot",
-			"rebootToOtaMode": "Reboot To OTA Mode",
-			"resetNodeDb": "Reset Node DB",
-			"factoryResetDevice": "Factory Reset Device",
-			"factoryResetConfig": "Factory Reset Config"
-		}
-	},
-	"debug": {
-		"label": "Debug",
-		"command": {
-			"reconfigure": "Reconfigure",
-			"clearAllStoredMessages": "Clear All Stored Message"
-		}
-	}
+  "emptyState": "Aucun résultat trouvé.",
+  "page": {
+    "title": "Menu des commandes"
+  },
+  "pinGroup": {
+    "label": "Attacher le groupe de commandes"
+  },
+  "unpinGroup": {
+    "label": "Détacher le groupe de commandes"
+  },
+  "goto": {
+    "label": "Aller à",
+    "command": {
+      "messages": "Messages",
+      "map": "Carte",
+      "config": "Config",
+      "channels": "Canaux",
+      "nodes": "Noeuds"
+    }
+  },
+  "manage": {
+    "label": "Gérer",
+    "command": {
+      "switchNode": "Changer de nœud ",
+      "connectNewNode": "Connecter un nouveau noeud"
+    }
+  },
+  "contextual": {
+    "label": "Contextuel",
+    "command": {
+      "qrCode": "Code QR",
+      "qrGenerator": "Générateur",
+      "qrImport": "Importer",
+      "scheduleShutdown": "Planifier l'arrêt",
+      "scheduleReboot": "Effacer tous les messages stockés",
+      "rebootToOtaMode": "Redémarrer en mode OTA",
+      "resetNodeDb": "Réinitialiser la DB des nœuds",
+      "factoryResetDevice": "Réinitialisation d'usine de l'appareil",
+      "factoryResetConfig": "Réinitialisation d'usine de la config",
+      "disconnect": "Déconnecter"
+    }
+  },
+  "debug": {
+    "label": "Debug",
+    "command": {
+      "reconfigure": "Reconfigurer",
+      "clearAllStoredMessages": "Effacer tous les messages stockés"
+    }
+  }
 }

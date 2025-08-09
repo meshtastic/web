@@ -1,50 +1,51 @@
 {
-	"emptyState": "Tuloksia ei löytynyt.",
-	"page": {
-		"title": "Komentovalikko"
-	},
-	"pinGroup": {
-		"label": "Kiinnitä komentoryhmä"
-	},
-	"unpinGroup": {
-		"label": "Irroita komentoryhmä"
-	},
-	"goto": {
-		"label": "Siirry",
-		"command": {
-			"messages": "Viestit",
-			"map": "Kartta",
-			"config": "Asetukset",
-			"channels": "Kanavat",
-			"nodes": "Laitteet"
-		}
-	},
-	"manage": {
-		"label": "Hallinnoi",
-		"command": {
-			"switchNode": "Vaihda laitetta",
-			"connectNewNode": "Yhdistä uusi laite"
-		}
-	},
-	"contextual": {
-		"label": "Kontekstin mukainen",
-		"command": {
-			"qrCode": "QR-koodi",
-			"qrGenerator": "QR-koodigeneraattori",
-			"qrImport": "Tuo",
-			"scheduleShutdown": "Ajasta sammutus",
-			"scheduleReboot": "Ajasta uudelleenkäynnistys",
-			"rebootToOtaMode": "Uudelleenkäynnistä OTA-tilaan",
-			"resetNodeDb": "Nollaa laitteen DB-tietokanta",
-			"factoryResetDevice": "Palauta tehdasasetukset",
-			"factoryResetConfig": "Tehdasasetusten palautusasetukset"
-		}
-	},
-	"debug": {
-		"label": "Vianetsintä",
-		"command": {
-			"reconfigure": "Määritä uudelleen",
-			"clearAllStoredMessages": "Tyhjennä kaikki tallennetut viesti"
-		}
-	}
+  "emptyState": "Tuloksia ei löytynyt.",
+  "page": {
+    "title": "Komentovalikko"
+  },
+  "pinGroup": {
+    "label": "Kiinnitä komentoryhmä"
+  },
+  "unpinGroup": {
+    "label": "Irroita komentoryhmä"
+  },
+  "goto": {
+    "label": "Siirry",
+    "command": {
+      "messages": "Viestit",
+      "map": "Kartta",
+      "config": "Asetukset",
+      "channels": "Kanavat",
+      "nodes": "Laitteet"
+    }
+  },
+  "manage": {
+    "label": "Hallinnoi",
+    "command": {
+      "switchNode": "Vaihda laitetta",
+      "connectNewNode": "Yhdistä uusi laite"
+    }
+  },
+  "contextual": {
+    "label": "Kontekstin mukainen",
+    "command": {
+      "qrCode": "QR-koodi",
+      "qrGenerator": "QR-koodigeneraattori",
+      "qrImport": "Tuo",
+      "scheduleShutdown": "Ajasta sammutus",
+      "scheduleReboot": "Ajasta uudelleenkäynnistys",
+      "rebootToOtaMode": "Uudelleenkäynnistä OTA-tilaan",
+      "resetNodeDb": "Nollaa laitteen DB-tietokanta",
+      "factoryResetDevice": "Palauta tehdasasetukset",
+      "factoryResetConfig": "Tehdasasetusten palautusasetukset",
+      "disconnect": "Katkaise yhteys"
+    }
+  },
+  "debug": {
+    "label": "Vianetsintä",
+    "command": {
+      "reconfigure": "Määritä uudelleen",
+      "clearAllStoredMessages": "Tyhjennä kaikki tallennetut viesti"
+    }
+  }
 }

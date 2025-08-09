@@ -13,34 +13,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
 
       - name: Install Dependencies
         # Commands will run from 'packages/web'
         working-directory: packages/web
-        run: bun install
+        run: pnpm install
 
-      - name: Cache Bun dependencies
+      - name: Cache pnpm dependencies
         uses: actions/cache@v4
         with:
           path: |
-            ~/.bun/install/cache
+            ~/.pnpm-store
             packages/web/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('packages/web/bun.lockb') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('packages/web/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-bun-
+            ${{ runner.os }}-pnpm-
 
-      # - name: Run linter
-      #   working-directory: packages/web
-      #   run: bun run lint
+      - name: Run linter
+        run: pnpm run lint
 
-      # - name: Check formatter
-      #   working-directory: packages/web
-      #   run: bun run check
+      - name: Check formatter  
+        run: pnpm run check
 
       - name: Build Package
         working-directory: packages/web
-        run: bun run build
+        run: pnpm run build

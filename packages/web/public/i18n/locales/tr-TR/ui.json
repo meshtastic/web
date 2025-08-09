@@ -7,7 +7,7 @@
 		"radioConfig": "Radio Config",
 		"moduleConfig": "Module Config",
 		"channels": "Kanallar",
-		"nodes": "Nodes"
+		"nodes": "Düğümler"
 	},
 	"app": {
 		"title": "Meshtastic",
@@ -21,7 +21,7 @@
 			}
 		},
 		"deviceInfo": {
-			"volts": "{{voltage}} volts",
+			"volts": "{{voltage}} volt",
 			"firmware": {
 				"title": "Yazılım",
 				"version": "v{{version}}",

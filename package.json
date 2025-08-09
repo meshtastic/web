@@ -12,28 +12,31 @@
 		"url": "https://github.com/meshtastic/web/issues"
 	},
 	"homepage": "https://meshtastic.org",
-	"workspaces": ["packages/*"],
-		"simple-git-hooks": {
-		"pre-commit": "bun run check:fix"
+	"simple-git-hooks": {
+		"pre-commit": "pnpm run check:fix"
 	},
 	"scripts": {
+		"preinstall": "npx only-allow pnpm",
 		"lint": "biome lint",
 		"lint:fix": "biome lint --write",
-  	"format": "biome format",
-  	"format:fix": "biome format . --write",
-  	"check": "biome check",
-  	"check:fix": "biome check --write",
-		"build:npm": "deno run -A scripts/build_npm_package.ts"
+		"format": "biome format",
+		"format:fix": "biome format . --write",
+		"check": "biome check",
+		"check:fix": "biome check --write",
+		"build:all": "pnpm run --filter '*' build",
+		"clean:all": "pnpm run --filter '*' clean",
+		"publish:packages": "pnpm run --filter 'packages/transport-* packages/core' build"
 	},
 	"dependencies": {
 		"@bufbuild/protobuf": "^2.6.1",
-		"@meshtastic/protobufs": "npm:@jsr/meshtastic__protobufs",
+		"@meshtastic/protobufs": "npm:@jsr/meshtastic__protobufs@^2.7.0",
 		"ste-simple-events": "^3.0.11",
 		"tslog": "^4.9.3"
 	},
 	"devDependencies": {
-		"bun": "^1.2.18",
-		"typescript": "^5.8.3",
-		"@types/node": "^22.16.4"
+		"@types/node": "^22.16.4",
+		"biome": "^0.3.3",
+		"tsdown": "^0.13.4",
+		"typescript": "^5.8.3"
 	}
 }

@@ -7,7 +7,13 @@
 		"description": "The Device will restart once the config is saved.",
 		"longName": "Довга назва",
 		"shortName": "Коротка назва",
-		"title": "Змінити назву пристрою"
+		"title": "Змінити назву пристрою",
+		"validation": {
+			"longNameMax": "Long name must not be more than 40 characters",
+			"shortNameMax": "Short name must not be more than 4 characters",
+			"longNameMin": "Long name must have at least 1 character",
+			"shortNameMin": "Short name must have at least 1 character"
+		}
 	},
 	"import": {
 		"description": "The current LoRa configuration will be overridden.",
@@ -21,9 +27,10 @@
 		"title": "Import Channel Set"
 	},
 	"locationResponse": {
+		"title": "Розташування: {{identifier}}",
 		"altitude": "Висота: ",
 		"coordinates": "Координати: ",
-		"title": "Розташування: {{identifier}}"
+		"noCoordinates": "No Coordinates"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Regenerate Pre-Shared Key?",
@@ -36,7 +43,7 @@
 		"http": "http",
 		"tabHttp": "HTTP",
 		"tabBluetooth": "Bluetooth",
-		"tabSerial": "Serial",
+		"tabSerial": "Серійний порт",
 		"useHttps": "Використовувати HTTPS",
 		"connecting": "Підключення...",
 		"connect": "Connect",
@@ -55,23 +62,27 @@
 		},
 		"serialConnection": {
 			"noDevicesPaired": "No devices paired yet.",
-			"newDeviceButton": "New device",
+			"newDeviceButton": "Новий пристрій",
 			"deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
 		},
 		"bluetoothConnection": {
 			"noDevicesPaired": "No devices paired yet.",
-			"newDeviceButton": "Новий пристрій"
+			"newDeviceButton": "Новий пристрій",
+			"connectionFailed": "Connection failed",
+			"deviceDisconnected": "Device disconnected",
+			"unknownDevice": "Unknown Device",
+			"errorLoadingDevices": "Error loading devices",
+			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
 		"validation": {
-			"requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
-			"requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
+			"requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
 			"requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
 			"additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
 		}
 	},
 	"nodeDetails": {
 		"message": "Повідомлення",
-		"requestPosition": "Request Position",
+		"requestPosition": "Запитати позицію",
 		"traceRoute": "Trace Route",
 		"airTxUtilization": "Air TX utilization",
 		"allRawMetrics": "All Raw Metrics:",
@@ -86,7 +97,7 @@
 		"position": "Position:",
 		"role": "Role: ",
 		"uptime": "Uptime: ",
-		"voltage": "Voltage",
+		"voltage": "Напруга",
 		"title": "Node Details for {{identifier}}",
 		"ignoreNode": "Ignore node",
 		"removeNode": "Remove node",
@@ -144,7 +155,7 @@
 		"title": "Remove Node?"
 	},
 	"shutdown": {
-		"title": "Schedule Shutdown",
+		"title": "Розклад вимкнення",
 		"description": "Turn off the connected node after x minutes."
 	},
 	"traceRoute": {
@@ -155,7 +166,7 @@
 		"title": "Traceroute: {{identifier}}"
 	},
 	"unsafeRoles": {
-		"confirmUnderstanding": "Yes, I know what I'm doing",
+		"confirmUnderstanding": "Я знаю, що роблю",
 		"conjunction": " and the blog post about ",
 		"postamble": " and understand the implications of changing the role.",
 		"preamble": "I have read the ",
@@ -166,6 +177,6 @@
 	"managedMode": {
 		"confirmUnderstanding": "Я знаю, що роблю",
 		"title": "Ви впевнені?",
-		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can <bold>only</bold> be changed through Remote Admin messages. This setting is not required for remote node administration."
+		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
 	}
 }

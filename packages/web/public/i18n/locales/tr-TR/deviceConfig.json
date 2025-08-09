@@ -1,6 +1,6 @@
 {
 	"page": {
-		"title": "Configuration",
+		"title": "Yapılandırma",
 		"tabBluetooth": "Bluetooth",
 		"tabDevice": "Cihaz",
 		"tabDisplay": "Ekran",
@@ -14,8 +14,8 @@
 		"label": "Modüller"
 	},
 	"device": {
-		"title": "Device Settings",
-		"description": "Settings for the device",
+		"title": "Cihaz Ayarları",
+		"description": "Cihazınız için ayar",
 		"buttonPin": {
 			"description": "Button pin override",
 			"label": "Button Pin"
@@ -151,7 +151,7 @@
 		},
 		"modemPreset": {
 			"description": "Modem preset to use",
-			"label": "Modem Preset"
+			"label": "Modem Ön Ayarı"
 		},
 		"okToMqtt": {
 			"description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",

@@ -1,13 +1,19 @@
 {
 	"deleteMessages": {
-		"description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-		"title": "Clear All Messages"
+		"description": "이 작업은 모든 메시지 기록을 삭제합니다. 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?",
+		"title": "모든 메시지 삭제"
 	},
 	"deviceName": {
 		"description": "The Device will restart once the config is saved.",
-		"longName": "Long Name",
-		"shortName": "Short Name",
-		"title": "Change Device Name"
+		"longName": "긴 이름",
+		"shortName": "짧은 이름",
+		"title": "장치 이름 변경",
+		"validation": {
+			"longNameMax": "Long name must not be more than 40 characters",
+			"shortNameMax": "Short name must not be more than 4 characters",
+			"longNameMin": "Long name must have at least 1 character",
+			"shortNameMin": "Short name must have at least 1 character"
+		}
 	},
 	"import": {
 		"description": "The current LoRa configuration will be overridden.",
@@ -21,14 +27,15 @@
 		"title": "Import Channel Set"
 	},
 	"locationResponse": {
+		"title": "Location: {{identifier}}",
 		"altitude": "Altitude: ",
 		"coordinates": "Coordinates: ",
-		"title": "Location: {{identifier}}"
+		"noCoordinates": "No Coordinates"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Regenerate Pre-Shared Key?",
 		"description": "Are you sure you want to regenerate the pre-shared key?",
-		"regenerate": "Regenerate"
+		"regenerate": "재생성"
 	},
 	"newDeviceDialog": {
 		"title": "Connect New Device",
@@ -39,7 +46,7 @@
 		"tabSerial": "시리얼",
 		"useHttps": "Use HTTPS",
 		"connecting": "Connecting...",
-		"connect": "Connect",
+		"connect": "연결",
 		"connectionFailedAlert": {
 			"title": "Connection Failed",
 			"descriptionPrefix": "Could not connect to the device. ",
@@ -60,19 +67,23 @@
 		},
 		"bluetoothConnection": {
 			"noDevicesPaired": "No devices paired yet.",
-			"newDeviceButton": "New device"
+			"newDeviceButton": "New device",
+			"connectionFailed": "Connection failed",
+			"deviceDisconnected": "Device disconnected",
+			"unknownDevice": "Unknown Device",
+			"errorLoadingDevices": "Error loading devices",
+			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
 		"validation": {
-			"requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
-			"requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
+			"requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
 			"requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
 			"additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
 		}
 	},
 	"nodeDetails": {
 		"message": "메시지",
-		"requestPosition": "Request Position",
-		"traceRoute": "Trace Route",
+		"requestPosition": "위치 요청",
+		"traceRoute": "추적 루트",
 		"airTxUtilization": "Air TX utilization",
 		"allRawMetrics": "All Raw Metrics:",
 		"batteryLevel": "Battery level",
@@ -121,13 +132,13 @@
 		"title": "Generate QR Code"
 	},
 	"rebootOta": {
-		"title": "Schedule Reboot",
+		"title": "재부팅 예약",
 		"description": "Reboot the connected node after a delay into OTA (Over-the-Air) mode.",
 		"enterDelay": "Enter delay (sec)",
 		"scheduled": "Reboot has been scheduled"
 	},
 	"reboot": {
-		"title": "Schedule Reboot",
+		"title": "재부팅 예약",
 		"description": "Reboot the connected node after x minutes."
 	},
 	"refreshKeys": {
@@ -144,7 +155,7 @@
 		"title": "Remove Node?"
 	},
 	"shutdown": {
-		"title": "Schedule Shutdown",
+		"title": "종료 예약",
 		"description": "Turn off the connected node after x minutes."
 	},
 	"traceRoute": {
@@ -166,6 +177,6 @@
 	"managedMode": {
 		"confirmUnderstanding": "Yes, I know what I'm doing",
 		"title": "확실합니까?",
-		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can <bold>only</bold> be changed through Remote Admin messages. This setting is not required for remote node administration."
+		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
 	}
 }

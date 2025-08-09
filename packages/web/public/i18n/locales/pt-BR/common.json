@@ -1,0 +1,141 @@
+{
+	"button": {
+		"apply": "Aplicar",
+		"backupKey": "Backup Key",
+		"cancel": "Cancelar",
+		"clearMessages": "Clear Messages",
+		"close": "Fechar",
+		"confirm": "Confirm",
+		"delete": "Excluir",
+		"dismiss": "Ignorar",
+		"download": "Baixar",
+		"export": "Export",
+		"generate": "Generate",
+		"regenerate": "Regenerate",
+		"import": "Importar",
+		"message": "Mensagem",
+		"now": "Now",
+		"ok": "Ok",
+		"print": "Print",
+		"rebootOtaNow": "Reboot to OTA Mode Now",
+		"remove": "Excluir",
+		"requestNewKeys": "Request New Keys",
+		"requestPosition": "Request Position",
+		"reset": "Redefinir",
+		"save": "Salvar",
+		"scanQr": "Escanear Código QR",
+		"traceRoute": "Trace Route",
+		"submit": "Submit"
+	},
+	"app": {
+		"title": "Meshtastic",
+		"fullTitle": "Meshtastic Web Client"
+	},
+	"loading": "Loading...",
+	"unit": {
+		"cps": "CPS",
+		"dbm": "dBm",
+		"hertz": "Hz",
+		"hop": {
+			"one": "Hop",
+			"plural": "Hops"
+		},
+		"hopsAway": {
+			"one": "{{count}} hop away",
+			"plural": "{{count}} hops away",
+			"unknown": "Unknown hops away"
+		},
+		"megahertz": "MHz",
+		"raw": "raw",
+		"meter": {
+			"one": "Meter",
+			"plural": "Meters",
+			"suffix": "m"
+		},
+		"minute": {
+			"one": "Minute",
+			"plural": "Minutes"
+		},
+		"hour": {
+			"one": "Hour",
+			"plural": "Hours"
+		},
+		"millisecond": {
+			"one": "Millisecond",
+			"plural": "Milliseconds",
+			"suffix": "ms"
+		},
+		"second": {
+			"one": "Second",
+			"plural": "Seconds"
+		},
+		"day": {
+			"one": "Day",
+			"plural": "Days"
+		},
+		"month": {
+			"one": "Month",
+			"plural": "Months"
+		},
+		"year": {
+			"one": "Year",
+			"plural": "Years"
+		},
+		"snr": "SNR",
+		"volt": {
+			"one": "Volt",
+			"plural": "Volts",
+			"suffix": "V"
+		},
+		"record": {
+			"one": "Records",
+			"plural": "Records"
+		}
+	},
+	"security": {
+		"0bit": "Empty",
+		"8bit": "8 bit",
+		"128bit": "128 bit",
+		"256bit": "256 bit"
+	},
+	"unknown": {
+		"longName": "Desconhecido",
+		"shortName": "UNK",
+		"notAvailable": "N/A",
+		"num": "??"
+	},
+	"nodeUnknownPrefix": "!",
+	"unset": "UNSET",
+	"fallbackName": "Meshtastic {{last4}}",
+	"node": "Node",
+	"formValidation": {
+		"unsavedChanges": "Unsaved changes",
+		"tooBig": {
+			"string": "Too long, expected less than or equal to {{maximum}} characters.",
+			"number": "Too big, expected a number smaller than or equal to {{maximum}}.",
+			"bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+		},
+		"tooSmall": {
+			"string": "Too short, expected more than or equal to {{minimum}} characters.",
+			"number": "Too small, expected a number larger than or equal to {{minimum}}."
+		},
+		"invalidFormat": {
+			"ipv4": "Invalid format, expected an IPv4 address.",
+			"key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+		},
+		"invalidType": {
+			"number": "Invalid type, expected a number."
+		},
+		"pskLength": {
+			"0bit": "Key is required to be empty.",
+			"8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
+			"128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
+			"256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+		},
+		"required": {
+			"generic": "This field is required.",
+			"managed": "At least one admin key is requred if the node is managed.",
+			"key": "Key is required."
+		}
+	}
+}
