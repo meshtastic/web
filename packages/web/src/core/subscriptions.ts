@@ -116,7 +116,8 @@ export const subscribeAll = (
 
   connection.events.onClientNotificationPacket.subscribe(
     (clientNotificationPacket) => {
-      console.debug(clientNotificationPacket.message);
+      device.addClientNotification(clientNotificationPacket);
+      device.setDialogOpen("clientNotification", true);
     },
   );
 

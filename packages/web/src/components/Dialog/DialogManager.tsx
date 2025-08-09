@@ -1,3 +1,4 @@
+import { ClientNotificationDialog } from "@components/Dialog/ClientNotificationDialog/ClientNotificationDialog.tsx";
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
 import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.tsx";
 import { ImportDialog } from "@components/Dialog/ImportDialog.tsx";
@@ -89,6 +90,12 @@ export const DialogManager = () => {
         open={dialog.deleteMessages}
         onOpenChange={(open) => {
           setDialogOpen("deleteMessages", open);
+        }}
+      />
+      <ClientNotificationDialog
+        open={dialog.clientNotification}
+        onOpenChange={(open) => {
+          setDialogOpen("clientNotification", open);
         }}
       />
     </>
