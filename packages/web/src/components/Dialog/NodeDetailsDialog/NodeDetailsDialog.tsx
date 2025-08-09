@@ -1,4 +1,3 @@
-import { base64Encode } from "@bufbuild/protobuf/wire";
 import { DeviceImage } from "@components/generic/DeviceImage.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Uptime } from "@components/generic/Uptime.tsx";
@@ -34,6 +33,7 @@ import { cn } from "@core/utils/cn.ts";
 import { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useNavigate } from "@tanstack/react-router";
+import { fromByteArray } from "base64-js";
 import {
   BellIcon,
   BellOffIcon,
@@ -347,7 +347,7 @@ export const NodeDetailsDialog = ({
                         <pre className="text-xs pt-0.5">
                           {node.user?.publicKey &&
                           node.user?.publicKey.length > 0
-                            ? base64Encode(node.user.publicKey)
+                            ? fromByteArray(node.user.publicKey)
                             : t("unknown.longName")}
                         </pre>
                       </td>
