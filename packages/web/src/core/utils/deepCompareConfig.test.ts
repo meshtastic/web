@@ -57,4 +57,49 @@ describe("deepCompareConfig", () => {
     expect(deepCompareConfig([1, 2, 3, 4], [1, 2], true)).toBe(true);
     expect(deepCompareConfig([1, 2, 3, 4], [1, 2], false)).toBe(false);
   });
+
+  it("compares Uint8Array strictly: equal bytes -> true", () => {
+    const a = new Uint8Array([1, 2, 3]);
+    const b = new Uint8Array([1, 2, 3]);
+    expect(deepCompareConfig(a, b)).toBe(true);
+  });
+
+  it("compares Uint8Array strictly: different bytes -> false", () => {
+    const a = new Uint8Array([1, 2, 3]);
+    const b = new Uint8Array([1, 2, 4]);
+    expect(deepCompareConfig(a, b)).toBe(false);
+  });
+
+  it("Uint8Array vs undefined is false even when allowUndefined is true", () => {
+    const a = new Uint8Array([1, 2, 3]);
+    expect(deepCompareConfig(a, undefined, true)).toBe(false);
+    expect(deepCompareConfig(undefined, a, true)).toBe(false);
+  });
+
+  it("nested Uint8Array fields must match exactly", () => {
+    const existing = { data: new Uint8Array([9, 8, 7]) };
+    const workingEqual = { data: new Uint8Array([9, 8, 7]) };
+    const workingDiff = { data: new Uint8Array([9, 8, 6]) };
+    const workingUndef = { data: undefined as unknown };
+
+    expect(deepCompareConfig(existing, workingEqual)).toBe(true);
+    expect(deepCompareConfig(existing, workingDiff)).toBe(false);
+    // still false even with allowUndefined
+    expect(deepCompareConfig(existing, workingUndef, true)).toBe(false);
+  });
+
+  it("arrays containing Uint8Array: element must match exactly", () => {
+    const a = [new Uint8Array([1, 2]), new Uint8Array([3, 4])];
+    const b = [new Uint8Array([1, 2]), new Uint8Array([3, 4])];
+    const c = [new Uint8Array([1, 2]), new Uint8Array([3, 9])];
+
+    expect(deepCompareConfig(a, b)).toBe(true);
+    expect(deepCompareConfig(a, c)).toBe(false);
+  });
+
+  it("shorter working array with missing Uint8Array element -> false even with allowUndefined", () => {
+    const existing = [new Uint8Array([1, 2]), new Uint8Array([3, 4])];
+    const workingShort = [new Uint8Array([1, 2])]; // missing the second byte array
+    expect(deepCompareConfig(existing, workingShort, true)).toBe(false);
+  });
 });
