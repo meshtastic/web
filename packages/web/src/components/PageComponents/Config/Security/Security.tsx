@@ -197,14 +197,12 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 description: t("security.primaryAdminKey.description"),
                 bits,
                 devicePSKBitCount: 32,
-                hide: true,
                 actionButtons: [],
                 disabledBy: [
                   { fieldName: "adminChannelEnabled", invert: true },
                 ],
                 properties: {
                   showCopyButton: true,
-                  showPasswordToggle: true,
                 },
               },
               {
@@ -215,14 +213,12 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 description: t("security.secondaryAdminKey.description"),
                 bits,
                 devicePSKBitCount: 32,
-                hide: true,
                 actionButtons: [],
                 disabledBy: [
                   { fieldName: "adminChannelEnabled", invert: true },
                 ],
                 properties: {
                   showCopyButton: true,
-                  showPasswordToggle: true,
                 },
               },
               {
@@ -233,14 +229,12 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
                 description: t("security.tertiaryAdminKey.description"),
                 bits,
                 devicePSKBitCount: 32,
-                hide: true,
                 actionButtons: [],
                 disabledBy: [
                   { fieldName: "adminChannelEnabled", invert: true },
                 ],
                 properties: {
                   showCopyButton: true,
-                  showPasswordToggle: true,
                 },
               },
               {

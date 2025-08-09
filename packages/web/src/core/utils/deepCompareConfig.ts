@@ -2,6 +2,22 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function isUint8Array(v: unknown): v is Uint8Array {
+  return v instanceof Uint8Array;
+}
+
+function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.byteLength !== b.byteLength) {
+    return false;
+  }
+  for (let i = 0; i < a.byteLength; i++) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function deepCompareConfig(
   a: unknown,
   b: unknown,
@@ -11,7 +27,10 @@ export function deepCompareConfig(
     return true;
   }
 
-  // If allowUndefined is true, and one is undefined, they are considered equal. // This check is placed early to simplify subsequent logic.
+  if (isUint8Array(a) || isUint8Array(b)) {
+    return isUint8Array(a) && isUint8Array(b) && bytesEqual(a, b);
+  }
+
   if (allowUndefined && (a === undefined || b === undefined)) {
     return true;
   }
