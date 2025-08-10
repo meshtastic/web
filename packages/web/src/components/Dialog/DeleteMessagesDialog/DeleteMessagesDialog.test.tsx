@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Ensure the path is correct for import
 import { useMessageStore } from "@core/stores";
 
-vi.mock("@core/stores/messageStore", () => ({
+vi.mock("@core/stores", () => ({
   useMessageStore: vi.fn(() => ({
     deleteAllMessages: vi.fn(),
   })),

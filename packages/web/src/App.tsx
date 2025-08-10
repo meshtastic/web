@@ -6,7 +6,7 @@ import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
-import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores/";
+import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
 import { Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
