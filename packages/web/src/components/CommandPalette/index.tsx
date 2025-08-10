@@ -189,13 +189,6 @@ export const CommandPalette = () => {
           },
         },
         {
-          label: t("contextual.command.rebootToOtaMode"),
-          icon: RefreshCwIcon,
-          action() {
-            setDialogOpen("rebootOTA", true);
-          },
-        },
-        {
           label: t("contextual.command.resetNodeDb"),
           icon: TrashIcon,
           action() {

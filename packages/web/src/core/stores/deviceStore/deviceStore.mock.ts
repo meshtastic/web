@@ -36,7 +36,6 @@ export const mockDeviceStore: Device = {
     QR: false,
     shutdown: false,
     reboot: false,
-    rebootOTA: false,
     deviceName: false,
     nodeRemoval: false,
     pkiBackup: false,
@@ -86,4 +85,6 @@ export const mockDeviceStore: Device = {
   sendAdminMessage: vi.fn(),
   updateFavorite: vi.fn(),
   updateIgnored: vi.fn(),
+  getAllUnreadCount: vi.fn().mockReturnValue(0),
+  getUnreadCount: vi.fn().mockReturnValue(0),
 };
