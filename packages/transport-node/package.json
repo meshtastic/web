@@ -11,7 +11,7 @@
    
   "license": "GPL-3.0-only",
   "tsdown": {
-    "entry": ["mod.ts"],
+    "entry": "mod.ts",
     "dts": true,
     "format": ["esm"],
     "splitting": false,
@@ -31,5 +31,8 @@
     "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public",
     "prepare:jsr": "rm -rf dist && pnpm dlx pkg-to-jsr",
     "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
+  },
+  "dependencies": {
+    "@meshtastic/core": "workspace:*"
   }
 }

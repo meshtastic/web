@@ -25,7 +25,8 @@
 		"check:fix": "biome check --write",
 		"build:all": "pnpm run --filter '*' build",
 		"clean:all": "pnpm run --filter '*' clean",
-		"publish:packages": "pnpm run --filter 'packages/transport-* packages/core' build"
+		"publish:packages": "pnpm run --filter 'packages/transport-* packages/core' build",
+		"test": "vitest"
 	},
 	"dependencies": {
 		"@bufbuild/protobuf": "^2.6.1",
@@ -37,6 +38,7 @@
 		"@types/node": "^22.16.4",
 		"biome": "^0.3.3",
 		"tsdown": "^0.13.4",
-		"typescript": "^5.8.3"
+		"typescript": "^5.8.3",
+		"vitest": "^3.2.4" 
 	}
 }

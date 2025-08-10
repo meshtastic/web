@@ -1,12 +1,12 @@
 FROM nginx:1.27-alpine
 
 RUN rm -r /usr/share/nginx/html \
- && mkdir -p /usr/share/nginx/html \
- && mkdir -p /etc/nginx/conf.d
+    && mkdir -p /usr/share/nginx/html \
+    && mkdir -p /etc/nginx/conf.d
 
 WORKDIR /usr/share/nginx/html
 
-ADD dist .
+ADD ./dist .
 
 COPY ./infra/default.conf /etc/nginx/conf.d/default.conf
 
