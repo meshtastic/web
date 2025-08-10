@@ -22,10 +22,10 @@ export const ClientNotificationDialog = ({
   const { getClientNotification, removeClientNotification } = useDevice();
 
   const localOnOpenChange = (open: boolean) => {
-    if (!getClientNotification(1)) {
+    removeClientNotification(0);
+    if (!getClientNotification(0)) {
       onOpenChange(open);
     }
-    removeClientNotification(0);
   };
 
   const dialogContent = (() => {
@@ -51,7 +51,10 @@ export const ClientNotificationDialog = ({
           <DialogHeader>
             <DialogTitle>{t("clientNotification.title")}</DialogTitle>
             <DialogDescription>
-              {t(`clientNotification.${getClientNotification(0)?.message}`)}
+              {t([
+                `clientNotification.${getClientNotification(0)?.message}`,
+                getClientNotification(0)?.message ?? "",
+              ])}
             </DialogDescription>
           </DialogHeader>
         );
