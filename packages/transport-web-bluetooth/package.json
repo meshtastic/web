@@ -1,10 +1,10 @@
 {
   "name": "@meshtastic/transport-web-bluetooth",
-	"version": "0.1.4",
-	"description": "A transport layer for Meshtastic applications using Web Bluetooth.",
-	"exports": {
-		".": "./mod.ts"
-	},
+  "version": "0.1.4",
+  "description": "A transport layer for Meshtastic applications using Web Bluetooth.",
+  "exports": {
+    ".": "./mod.ts"
+  },
   "main": "./dist/mod.mjs",       
   "module": "./dist/mod.mjs",     
   "types": "./dist/mod.d.mts",    
