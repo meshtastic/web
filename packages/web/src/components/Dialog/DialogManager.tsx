@@ -6,7 +6,6 @@ import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDeta
 import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog.tsx";
 import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
-import { RebootOTADialog } from "@components/Dialog/RebootOTADialog.tsx";
 import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
 import { RemoveNodeDialog } from "@components/Dialog/RemoveNodeDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
@@ -78,12 +77,6 @@ export const DialogManager = () => {
         open={dialog.refreshKeys}
         onOpenChange={(open) => {
           setDialogOpen("refreshKeys", open);
-        }}
-      />
-      <RebootOTADialog
-        open={dialog.rebootOTA}
-        onOpenChange={(open) => {
-          setDialogOpen("rebootOTA", open);
         }}
       />
       <DeleteMessagesDialog

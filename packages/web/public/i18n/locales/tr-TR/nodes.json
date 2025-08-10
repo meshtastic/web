@@ -7,7 +7,7 @@
 			"label": "No Public Key"
 		},
 		"directMessage": {
-			"label": "Direct Message {{shortName}}"
+			"label": "Direk Mesaj {{shortName}}"
 		},
 		"favorite": {
 			"label": "Favori",
@@ -50,12 +50,12 @@
 			"viaMqtt": ", via MQTT"
 		},
 		"lastHeardStatus": {
-			"never": "Never"
+			"never": "Hiçbir zaman"
 		}
 	},
 	"actions": {
-		"added": "Added",
-		"removed": "Removed",
+		"added": "Eklendi",
+		"removed": "Kaldırıldı",
 		"ignoreNode": "Ignore Node",
 		"unignoreNode": "Unignore Node",
 		"requestPosition": "Request Position"

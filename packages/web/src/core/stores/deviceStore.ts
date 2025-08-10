@@ -54,7 +54,6 @@ export interface Device {
     QR: boolean;
     shutdown: boolean;
     reboot: boolean;
-    rebootOTA: boolean;
     deviceName: boolean;
     nodeRemoval: boolean;
     pkiBackup: boolean;
@@ -181,7 +180,6 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             nodeDetails: false,
             unsafeRoles: false,
             refreshKeys: false,
-            rebootOTA: false,
             deleteMessages: false,
             managedMode: false,
             clientNotification: false,
