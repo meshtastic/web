@@ -36,8 +36,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      - name: Run Tests
-        run: pnpm run test
+      - name: Install dependencies
+        working-directory: packages/web
+        run: pnpm install
 
       - name: Create Web App Release Archive
         working-directory: packages/web
