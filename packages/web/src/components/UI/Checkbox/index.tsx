@@ -1,9 +1,10 @@
 import { cn } from "@core/utils/cn.ts";
 import { Check } from "lucide-react";
-import { useId } from "react";
+import { useId, useState } from "react";
 
 interface CheckboxProps {
   checked?: boolean;
+  defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
   className?: string;
   labelClassName?: string;
@@ -15,7 +16,8 @@ interface CheckboxProps {
 }
 
 export function Checkbox({
-  checked = false,
+  checked,
+  defaultChecked = false,
   onChange,
   className,
   id: propId,
@@ -28,10 +30,21 @@ export function Checkbox({
   const generatedId = useId();
   const id = propId || generatedId;
 
-  const handleToggle = (): void => {
-    if (!disabled) {
-      onChange?.(!checked);
+  const isControlled = checked !== undefined;
+  const [internal, setInternal] = useState<boolean>(defaultChecked);
+  const value = checked ?? internal;
+
+  const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) {
+      return;
     }
+
+    const next = e.target.checked;
+
+    if (!isControlled) {
+      setInternal(next);
+    }
+    onChange?.(next);
   };
 
   return (
@@ -41,11 +54,12 @@ export function Checkbox({
         disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
         className,
       )}
+      data-testid="label-component"
     >
       <input
         type="checkbox"
         id={id}
-        checked={checked}
+        checked={value}
         onChange={handleToggle}
         disabled={disabled}
         required={required}
@@ -57,10 +71,12 @@ export function Checkbox({
         className={cn(
           "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-gray-500 transition-colors",
           "peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500 peer-focus-visible:ring-offset-2",
-          { "border-slate-500 bg-slate-500": checked },
+          { "border-slate-500 bg-slate-500": value },
+          { "opacity-50": disabled },
         )}
+        role="presentation"
       >
-        {checked && (
+        {value && (
           <div className="animate-fade-in">
             <Check className="h-4 w-4 text-white" />
           </div>
