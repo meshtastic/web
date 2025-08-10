@@ -1,4 +1,4 @@
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 import { eventBus } from "@core/utils/eventBus.ts";
 import { useCallback } from "react";
 

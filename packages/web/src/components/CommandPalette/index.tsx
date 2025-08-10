@@ -8,8 +8,7 @@ import {
   CommandList,
 } from "@components/UI/Command.tsx";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
-import { useAppStore } from "@core/stores/appStore.ts";
-import { useDevice, useDeviceStore } from "@core/stores/deviceStore.ts";
+import { useAppStore, useDevice, useDeviceStore } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { useNavigate } from "@tanstack/react-router";
 import { useCommandState } from "cmdk";

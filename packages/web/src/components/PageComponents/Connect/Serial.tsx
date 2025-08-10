@@ -1,8 +1,6 @@
 import { Mono } from "@components/generic/Mono.tsx";
 import { Button } from "@components/UI/Button.tsx";
-import { useAppStore } from "@core/stores/appStore.ts";
-import { useDeviceStore } from "@core/stores/deviceStore.ts";
-import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { useAppStore, useDeviceStore, useMessageStore } from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";

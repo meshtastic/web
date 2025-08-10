@@ -6,8 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
-import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { useDevice, useMessageStore } from "@core/stores";
 import { LockKeyholeOpenIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";

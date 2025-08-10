@@ -17,10 +17,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
-import {
-  useDevice,
-  type ValidModuleConfigType,
-} from "@core/stores/deviceStore.ts";
+import { useDevice, type ValidModuleConfigType } from "@core/stores";
 import { type ComponentType, Suspense, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";

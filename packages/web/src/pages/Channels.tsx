@@ -7,7 +7,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/UI/Tabs.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 import type { Protobuf } from "@meshtastic/core";
 import { Types } from "@meshtastic/core";
 import i18next from "i18next";

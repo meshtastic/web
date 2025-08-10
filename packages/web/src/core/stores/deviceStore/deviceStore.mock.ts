@@ -1,6 +1,6 @@
 import type { Protobuf } from "@meshtastic/core";
 import { vi } from "vitest";
-import type { Device } from "./deviceStore.ts";
+import type { Device } from "./index.ts";
 
 /**
  * You can spread this base mock in your tests and override only the

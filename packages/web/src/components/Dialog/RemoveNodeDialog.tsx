@@ -9,9 +9,8 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { Label } from "@components/UI/Label.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useAppStore, useDevice } from "@core/stores";
 import { useTranslation } from "react-i18next";
-import { useAppStore } from "../../core/stores/appStore.ts";
 
 export interface RemoveNodeDialogProps {
   open: boolean;

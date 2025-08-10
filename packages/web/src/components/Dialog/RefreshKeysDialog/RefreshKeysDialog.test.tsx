@@ -1,11 +1,16 @@
-import { DeviceContext, useDeviceStore } from "@core/stores/deviceStore.ts";
+import { DeviceContext, useDeviceStore, useMessageStore } from "@core/stores";
 import { render } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 import { RefreshKeysDialog } from "./RefreshKeysDialog.tsx";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
 
-vi.mock("@core/stores/messageStore");
+vi.mock("@core/stores", async () => {
+  const actual = (await vi.importActual("@core/stores")) as typeof import("@core/stores");
+  return {
+    ...actual,
+    useMessageStore: vi.fn(),
+  };
+});
 vi.mock("./useRefreshKeysDialog");
 
 const mockUseMessageStore = vi.mocked(useMessageStore);

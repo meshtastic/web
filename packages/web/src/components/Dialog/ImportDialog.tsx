@@ -12,7 +12,7 @@ import {
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
 import { toByteArray } from "base64-js";
 import { useEffect, useState } from "react";

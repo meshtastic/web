@@ -4,14 +4,12 @@ import { TransportHTTP } from "@meshtastic/transport-http";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@core/stores/appStore.ts", () => ({
+vi.mock("@core/stores", () => ({
   useAppStore: vi.fn(() => ({ setSelectedDevice: vi.fn() })),
-}));
-
-vi.mock("@core/stores/deviceStore.ts", () => ({
   useDeviceStore: vi.fn(() => ({
     addDevice: vi.fn(() => ({ addConnection: vi.fn() })),
   })),
+  useMessageStore: vi.fn()
 }));
 
 vi.mock("@core/utils/randId.ts", () => ({

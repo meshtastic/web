@@ -6,11 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
-import {
-  MessageState,
-  useMessageStore,
-} from "@core/stores/messageStore/index.ts";
+import { MessageState, useDevice, useMessageStore } from "@core/stores";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
 import { type Protobuf, Types } from "@meshtastic/core";

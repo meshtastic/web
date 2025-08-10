@@ -8,7 +8,7 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import {
   convertIntToIpAddress,

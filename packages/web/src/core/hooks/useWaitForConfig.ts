@@ -2,7 +2,7 @@ import {
   useDevice,
   type ValidConfigType,
   type ValidModuleConfigType,
-} from "@core/stores/deviceStore.ts";
+} from "@core/stores";
 
 type UseWaitForConfigProps =
   | { configCase: ValidConfigType; moduleConfigCase?: never }

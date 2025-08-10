@@ -14,7 +14,7 @@ let mockConnection: { rebootOta: (delay: number) => void } | undefined = {
   rebootOta: rebootOtaMock,
 };
 
-vi.mock("@core/stores/deviceStore.ts", () => ({
+vi.mock("@core/stores", () => ({
   useDevice: () => ({
     connection: mockConnection,
   }),

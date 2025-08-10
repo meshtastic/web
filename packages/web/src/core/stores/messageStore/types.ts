@@ -1,7 +1,4 @@
-import type {
-  MessageState,
-  MessageType,
-} from "@core/stores/messageStore/index.ts";
+import type { MessageState, MessageType } from "@core/stores";
 import type { Types } from "@meshtastic/core";
 
 type NodeNum = number;

@@ -10,7 +10,7 @@ import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshK
 import { RemoveNodeDialog } from "@components/Dialog/RemoveNodeDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 
 export const DialogManager = () => {
   const { channels, config, dialog, setDialogOpen } = useDevice();

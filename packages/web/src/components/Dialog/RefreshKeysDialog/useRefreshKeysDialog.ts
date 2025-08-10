@@ -1,5 +1,4 @@
-import { useDevice } from "@core/stores/deviceStore.ts";
-import { useMessageStore } from "@core/stores/messageStore/index.ts";
+import { useDevice, useMessageStore } from "@core/stores";
 import { useCallback } from "react";
 
 export function useRefreshKeysDialog() {
