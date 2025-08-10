@@ -1,27 +1,24 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
+import { ColumnVisibilityControl } from "@components/generic/ColumnVisibilityControl/index.tsx";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import {
   type FilterState,
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
-import { Mono } from "@components/generic/Mono.tsx";
 import {
   type DataRow,
   type Heading,
   Table,
 } from "@components/generic/Table/index.tsx";
-import { TimeAgo } from "@components/generic/TimeAgo.tsx";
+import { getNodeCellData } from "@components/generic/Table/NodeCellHelpers.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
-import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
 import { useAppStore } from "@core/stores/appStore.ts";
 import { useDevice } from "@core/stores/deviceStore.ts";
-import { Protobuf, type Types } from "@meshtastic/core";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { LockIcon, LockOpenIcon } from "lucide-react";
+import type { Protobuf, Types } from "@meshtastic/core";
 import {
   type JSX,
   useCallback,
@@ -31,7 +28,6 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { base16 } from "rfc4648";
 
 export interface DeleteNoteDialogProps {
   open: boolean;
@@ -43,7 +39,7 @@ const NodesPage = (): JSX.Element => {
   const { currentLanguage } = useLang();
   const { getNodes, hardware, connection, hasNodeError, setDialogOpen } =
     useDevice();
-  const { setNodeNumDetails } = useAppStore();
+  const { setNodeNumDetails, nodesTableColumns } = useAppStore();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
   const [selectedTraceroute, setSelectedTraceroute] = useState<
@@ -105,121 +101,29 @@ const NodesPage = (): JSX.Element => {
     };
   }, [connection, handleLocation]);
 
-  const tableHeadings: Heading[] = [
-    { title: "", sortable: false },
-    { title: t("nodesTable.headings.longName"), sortable: true },
-    { title: t("nodesTable.headings.connection"), sortable: true },
-    { title: t("nodesTable.headings.lastHeard"), sortable: true },
-    { title: t("nodesTable.headings.encryption"), sortable: false },
-    { title: t("unit.snr"), sortable: true },
-    { title: t("nodesTable.headings.model"), sortable: true },
-    { title: t("nodesTable.headings.macAddress"), sortable: true },
-  ];
+  // Get visible columns and create table headings
+  const visibleColumns = nodesTableColumns.filter((col) => col.visible);
+  const tableHeadings: Heading[] = visibleColumns.map((col) => ({
+    title: col.title.includes(".") ? t(col.title) : col.title,
+    sortable: col.sortable,
+  }));
 
   const tableRows: DataRow[] = filteredNodes.map((node) => {
-    const macAddress =
-      base16
-        .stringify(node.user?.macaddr ?? [])
-        .match(/.{1,2}/g)
-        ?.join(":") ?? t("unknown.shortName");
+    const cells = visibleColumns.map((column) =>
+      getNodeCellData(
+        node,
+        column.key,
+        t,
+        currentLanguage,
+        hasNodeError,
+        handleNodeInfoDialog,
+      ),
+    );
 
     return {
       id: node.num,
       isFavorite: node.isFavorite,
-      cells: [
-        {
-          content: (
-            <Avatar
-              text={node.user?.shortName ?? t("unknown.shortName")}
-              showFavorite={node.isFavorite}
-              showError={hasNodeError(node.num)}
-            />
-          ),
-          sortValue: node.user?.shortName ?? "", // Non-sortable column
-        },
-        {
-          content: (
-            <h1
-              onMouseDown={() => handleNodeInfoDialog(node.num)}
-              onKeyUp={(evt) => {
-                evt.key === "Enter" && handleNodeInfoDialog(node.num);
-              }}
-              className="cursor-pointer underline ml-2 whitespace-break-spaces"
-            >
-              {node.user?.longName ?? numberToHexUnpadded(node.num)}
-            </h1>
-          ),
-          sortValue: node.user?.longName ?? numberToHexUnpadded(node.num),
-        },
-        {
-          content: (
-            <Mono className="w-16">
-              {node.hopsAway !== undefined
-                ? node?.viaMqtt === false && node.hopsAway === 0
-                  ? t("nodesTable.connectionStatus.direct")
-                  : `${node.hopsAway?.toString()} ${
-                      (node.hopsAway ?? 0 > 1)
-                        ? t("unit.hop.plural")
-                        : t("unit.hops_one")
-                    } ${t("nodesTable.connectionStatus.away")}`
-                : t("nodesTable.connectionStatus.unknown")}
-              {node?.viaMqtt === true
-                ? t("nodesTable.connectionStatus.viaMqtt")
-                : ""}
-            </Mono>
-          ),
-          sortValue: node.hopsAway ?? Number.MAX_SAFE_INTEGER,
-        },
-        {
-          content: (
-            <Mono>
-              {node.lastHeard === 0 ? (
-                <p>{t("nodesTable.lastHeardStatus.never")}</p>
-              ) : (
-                <TimeAgo
-                  timestamp={node.lastHeard * 1000}
-                  locale={currentLanguage?.code}
-                />
-              )}
-            </Mono>
-          ),
-          sortValue: node.lastHeard,
-        },
-        {
-          content: (
-            <Mono>
-              {node.user?.publicKey && node.user?.publicKey.length > 0 ? (
-                <LockIcon className="text-green-600 mx-auto" />
-              ) : (
-                <LockOpenIcon className="text-yellow-300 mx-auto" />
-              )}
-            </Mono>
-          ),
-          sortValue: "", // Non-sortable column
-        },
-        {
-          content: (
-            <Mono>
-              {node.snr}
-              {t("unit.dbm")}/{Math.min(Math.max((node.snr + 10) * 5, 0), 100)}
-              %/{/* Percentage */}
-              {(node.snr + 10) * 5}
-              {t("unit.raw")}
-            </Mono>
-          ),
-          sortValue: node.snr,
-        },
-        {
-          content: (
-            <Mono>{Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}</Mono>
-          ),
-          sortValue: Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0],
-        },
-        {
-          content: <Mono>{macAddress}</Mono>,
-          sortValue: macAddress,
-        },
-      ],
+      cells,
     };
   });
 
@@ -241,6 +145,7 @@ const NodesPage = (): JSX.Element => {
           />
         </div>
         <div className="flex justify-end">
+          <ColumnVisibilityControl />
           <FilterControl
             filterState={filterState}
             defaultFilterValues={defaultFilterValues}
