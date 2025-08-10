@@ -1,21 +1,9 @@
-import type {
-  ChannelId,
-  MessageLogMap,
-} from "@core/stores/messageStore/types.ts";
 import { del, get, set } from "idb-keyval";
 import type {
   PersistStorage,
   StateStorage,
   StorageValue,
 } from "zustand/middleware";
-
-type PersistedMessageState = {
-  messages: {
-    direct: Map<string, MessageLogMap>;
-    broadcast: Map<ChannelId, MessageLogMap>;
-  };
-  nodeNum: number;
-};
 
 export const zustandIndexDBStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -62,40 +50,34 @@ const reviver: JsonReviver = (_, value) => {
   return value;
 };
 
-export const storageWithMapSupport: PersistStorage<PersistedMessageState> = {
-  getItem: async (
-    name,
-  ): Promise<StorageValue<PersistedMessageState> | null> => {
-    const str = await zustandIndexDBStorage.getItem(name);
-    if (!str) {
-      return null;
-    }
-    try {
-      const parsed = JSON.parse(
-        str,
-        reviver,
-      ) as StorageValue<PersistedMessageState>;
-      return parsed;
-    } catch (error) {
-      console.error(`Error parsing persisted state (${name}):`, error);
-      return null;
-    }
-  },
-  setItem: async (
-    name,
-    newValue: StorageValue<PersistedMessageState>,
-  ): Promise<void> => {
-    try {
-      const str = JSON.stringify(newValue, replacer);
-      await zustandIndexDBStorage.setItem(name, str);
-    } catch (error) {
-      console.error(
-        `Error stringifying or setting persisted state (${name}):`,
-        error,
-      );
-    }
-  },
-  removeItem: async (name): Promise<void> => {
-    await zustandIndexDBStorage.removeItem(name);
-  },
-};
+export function createStorageWithMapSupport<T>(): PersistStorage<T> {
+  return {
+    getItem: async (name): Promise<StorageValue<T> | null> => {
+      const str = await zustandIndexDBStorage.getItem(name);
+      if (!str) {
+        return null;
+      }
+      try {
+        const parsed = JSON.parse(str, reviver) as StorageValue<T>;
+        return parsed;
+      } catch (error) {
+        console.error(`Error parsing persisted state (${name}):`, error);
+        return null;
+      }
+    },
+    setItem: async (name, newValue: StorageValue<T>): Promise<void> => {
+      try {
+        const str = JSON.stringify(newValue, replacer);
+        await zustandIndexDBStorage.setItem(name, str);
+      } catch (error) {
+        console.error(
+          `Error stringifying or setting persisted state (${name}):`,
+          error,
+        );
+      }
+    },
+    removeItem: async (name): Promise<void> => {
+      await zustandIndexDBStorage.removeItem(name);
+    },
+  };
+}
