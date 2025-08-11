@@ -114,6 +114,13 @@ export const subscribeAll = (
     });
   });
 
+  connection.events.onClientNotificationPacket.subscribe(
+    (clientNotificationPacket) => {
+      device.addClientNotification(clientNotificationPacket);
+      device.setDialogOpen("clientNotification", true);
+    },
+  );
+
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     if (routingPacket.data.variant.case === "errorReason") {
       switch (routingPacket.data.variant.value) {

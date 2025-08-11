@@ -184,5 +184,10 @@
 		"confirmUnderstanding": "Yes, I know what I'm doing",
 		"title": "Are you sure?",
 		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+	},
+	"clientNotification": {
+		"title": "Client Notification",
+		"TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
+		"Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
 	}
 }
