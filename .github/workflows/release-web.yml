@@ -3,9 +3,28 @@ name: Release Web
 on:
   release:
     types: [released, prereleased]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref (branch, tag, or SHA) to build"
+        required: false
+        default: ""
+      tag_name:
+        description: "Tag to use for artifacts/images (defaults to adhoc-<sha>)"
+        required: false
+        default: ""
+      attach_to_release:
+        description: "Upload build.tar to an existing GitHub Release (requires tag_name)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
+  packages: write
+
+env:
+  REGISTRY_IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
   release-web:
@@ -13,6 +32,24 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          # For manual runs, allow building a chosen ref (branch/tag/SHA)
+          ref: ${{ inputs.ref != '' && inputs.ref || github.ref }}
+
+      - name: Determine tag for this run
+        id: meta
+        run: |
+          # tag from release event, or user input, or fallback to adhoc-<shortsha>
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ github.event.release.tag_name }}"
+          elif [ -n "${{ inputs.tag_name }}" ]; then
+            TAG="${{ inputs.tag_name }}"
+          else
+            SHA="$(git rev-parse --short=12 HEAD)"
+            TAG="adhoc-${SHA}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Resolved tag: $TAG"
 
       # --- Setup Node.js and pnpm ---
       - name: Setup Node.js
@@ -38,13 +75,13 @@ jobs:
 
       - name: Install dependencies
         working-directory: packages/web
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Create Web App Release Archive
         working-directory: packages/web
         run: pnpm run package
 
-      - name: Upload Web App Archive
+      - name: Upload Web App Archive (artifact)
         uses: actions/upload-artifact@v4
         with:
           name: web-build
@@ -52,9 +89,20 @@ jobs:
           path: packages/web/dist/build.tar
 
       - name: Attach Web Archive to GitHub Release
-        run: gh release upload ${{ github.event.release.tag_name }} packages/web/dist/build.tar
+        if: ${{ github.event_name == 'release' || inputs.attach_to_release == true }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ steps.meta.outputs.tag }}"
+          else
+            if [ -z "${{ inputs.tag_name }}" ]; then
+              echo "attach_to_release requested but no tag_name provided." >&2
+              exit 1
+            fi
+            TAG="${{ inputs.tag_name }}"
+          fi
+          gh release upload "$TAG" packages/web/dist/build.tar --clobber
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -65,8 +113,8 @@ jobs:
         with:
           containerfiles: |
             ./packages/web/infra/Containerfile
-          image: ghcr.io/${{ github.repository }}
-          tags: latest, ${{ github.event.release.tag_name }}
+          image: ${{ env.REGISTRY_IMAGE }}
+          tags: latest, ${{ steps.meta.outputs.tag }}
           oci: true
           platforms: linux/amd64, linux/arm64
 
