@@ -77,8 +77,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Create Web App Release Archive
-        working-directory: packages/web
-        run: pnpm run package
+        run: pnpm --filter "meshtastic-web" run package
 
       - name: Upload Web App Archive (artifact)
         uses: actions/upload-artifact@v4
