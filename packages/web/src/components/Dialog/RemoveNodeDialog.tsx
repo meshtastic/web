@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { Label } from "@components/UI/Label.tsx";
-import { useAppStore, useDevice } from "@core/stores";
+import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { useTranslation } from "react-i18next";
 
 export interface RemoveNodeDialogProps {
@@ -22,7 +22,8 @@ export const RemoveNodeDialog = ({
   onOpenChange,
 }: RemoveNodeDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { connection, getNode, removeNode } = useDevice();
+  const { connection } = useDevice();
+  const { getNode, removeNode } = useNodeDB();
   const { nodeNumToBeRemoved } = useAppStore();
 
   const onSubmit = () => {

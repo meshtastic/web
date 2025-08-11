@@ -1,4 +1,4 @@
-import { useDevice } from "@core/stores";
+import { useNodeDB } from "@core/stores";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
@@ -25,7 +25,7 @@ export const TracerouteResponseDialog = ({
   onOpenChange,
 }: TracerouteResponseDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { getNode } = useDevice();
+  const { getNode } = useNodeDB();
   const route: number[] = traceroute?.data.route ?? [];
   const routeBack: number[] = traceroute?.data.routeBack ?? [];
   const snrTowards = (traceroute?.data.snrTowards ?? []).map((snr) => snr / 4);

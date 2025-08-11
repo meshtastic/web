@@ -1,13 +1,15 @@
-import { type Device, DeviceContext } from "@core/stores";
+import { CurrentDeviceContext } from "@core/stores";
 import type { ReactNode } from "react";
 
 export interface DeviceWrapperProps {
   children: ReactNode;
-  device?: Device;
+  deviceId: number;
 }
 
-export const DeviceWrapper = ({ children, device }: DeviceWrapperProps) => {
+export const DeviceWrapper = ({ children, deviceId }: DeviceWrapperProps) => {
   return (
-    <DeviceContext.Provider value={device}>{children}</DeviceContext.Provider>
+    <CurrentDeviceContext.Provider value={{ deviceId }}>
+      {children}
+    </CurrentDeviceContext.Provider>
   );
 };

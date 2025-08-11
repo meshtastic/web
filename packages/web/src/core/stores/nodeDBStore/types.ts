@@ -3,4 +3,10 @@ type NodeError = {
   error: string;
 };
 
-export type { NodeError };
+type ProcessPacketParams = {
+  from: number;
+  snr: number;
+  time: number;
+};
+
+export type { NodeError, ProcessPacketParams };

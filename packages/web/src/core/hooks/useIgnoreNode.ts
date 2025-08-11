@@ -1,5 +1,7 @@
+import { create } from "@bufbuild/protobuf";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useDevice } from "@core/stores";
+import { useDevice, useNodeDB } from "@core/stores";
+import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -9,7 +11,9 @@ interface IgnoreNodeOptions {
 }
 
 export function useIgnoreNode() {
-  const { updateIgnored, getNode } = useDevice();
+  const { sendAdminMessage } = useDevice();
+  const { getNode, updateIgnore } = useNodeDB();
+
   const { t } = useTranslation();
 
   const { toast } = useToast();
@@ -21,7 +25,17 @@ export function useIgnoreNode() {
         return;
       }
 
-      updateIgnored(nodeNum, isIgnored);
+      sendAdminMessage(
+        create(Protobuf.Admin.AdminMessageSchema, {
+          payloadVariant: {
+            case: isIgnored ? "setFavoriteNode" : "removeFavoriteNode",
+            value: nodeNum,
+          },
+        }),
+      );
+
+      // TODO: Wait for response before changing the store
+      updateIgnore(nodeNum, isIgnored);
 
       toast({
         title: t("toast.ignoreNode.title", {
@@ -35,7 +49,7 @@ export function useIgnoreNode() {
         }),
       });
     },
-    [updateIgnored, getNode, t, toast],
+    [sendAdminMessage, updateIgnore, getNode, t, toast],
   );
 
   return { updateIgnored: updateIgnoredCB };

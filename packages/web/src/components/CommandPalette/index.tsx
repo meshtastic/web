@@ -8,7 +8,12 @@ import {
   CommandList,
 } from "@components/UI/Command.tsx";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
-import { useAppStore, useDevice, useDeviceStore } from "@core/stores";
+import {
+  useAppStore,
+  useDevice,
+  useDeviceStore,
+  useNodeDB,
+} from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { useNavigate } from "@tanstack/react-router";
 import { useCommandState } from "cmdk";
@@ -64,7 +69,8 @@ export const CommandPalette = () => {
     setSelectedDevice,
   } = useAppStore();
   const { getDevices } = useDeviceStore();
-  const { setDialogOpen, getNode, connection } = useDevice();
+  const { setDialogOpen, connection } = useDevice();
+  const { getNode } = useNodeDB();
   const { pinnedItems, togglePinnedItem } = usePinnedItems({
     storageName: "pinnedCommandMenuGroups",
   });

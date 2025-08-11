@@ -1,12 +1,18 @@
 import { ensureDefaultUser } from "@core/dto/NodeNumToNodeInfoDTO.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
-import { type Device, type MessageStore, MessageType } from "@core/stores";
+import {
+  type Device,
+  type MessageStore,
+  MessageType,
+  type NodeDB,
+} from "@core/stores";
 import { type MeshDevice, Protobuf } from "@meshtastic/core";
 
 export const subscribeAll = (
   device: Device,
   connection: MeshDevice,
   messageStore: MessageStore,
+  nodeDB: NodeDB,
 ) => {
   let myNodeNum = 0;
 
@@ -52,20 +58,21 @@ export const subscribeAll = (
   connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
     device.setHardware(nodeInfo);
     messageStore.setNodeNum(nodeInfo.myNodeNum);
+    nodeDB.setNodeNum(nodeInfo.myNodeNum);
     myNodeNum = nodeInfo.myNodeNum;
   });
 
   connection.events.onUserPacket.subscribe((user) => {
-    device.addUser(user);
+    nodeDB.addUser(user);
   });
 
   connection.events.onPositionPacket.subscribe((position) => {
-    device.addPosition(position);
+    nodeDB.addPosition(position);
   });
 
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
     const nodeWithUser = ensureDefaultUser(nodeInfo);
-    device.addNodeInfo(nodeWithUser);
+    nodeDB.addNode(nodeWithUser);
   });
 
   connection.events.onChannelPacket.subscribe((channel) => {
@@ -106,7 +113,7 @@ export const subscribeAll = (
   });
 
   connection.events.onMeshPacket.subscribe((meshPacket) => {
-    device.processPacket({
+    nodeDB.processPacket({
       from: meshPacket.from,
       snr: meshPacket.rxSnr,
       time: meshPacket.rxTime,
@@ -128,7 +135,7 @@ export const subscribeAll = (
           break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          device.setNodeError(
+          nodeDB.setNodeError(
             routingPacket.from,
             Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value],
           );
@@ -136,7 +143,7 @@ export const subscribeAll = (
           break;
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          device.setNodeError(
+          nodeDB.setNodeError(
             routingPacket.from,
             Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value],
           );

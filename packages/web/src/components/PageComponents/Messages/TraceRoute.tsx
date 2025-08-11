@@ -1,4 +1,4 @@
-import { useDevice } from "@core/stores";
+import { useNodeDB } from "@core/stores";
 import type { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,7 @@ interface RoutePathProps {
 }
 
 const RoutePath = ({ title, from, to, path, snr }: RoutePathProps) => {
-  const { getNode } = useDevice();
+  const { getNode } = useNodeDB();
   const { t } = useTranslation();
 
   return (
