@@ -44,6 +44,9 @@ jobs:
       - name: Check formatter  
         run: pnpm run check
 
+      - name: Run tests
+        run: pnpm run test
+
       - name: Build Package
         working-directory: packages/web
         run: pnpm run build

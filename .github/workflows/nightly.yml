@@ -35,9 +35,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm- 
 
-      # - name: Run tests
-      #   working-directory: packages/web
-      #   run: deno task test
+      - name: Run tests
+        run: pnpm run test
 
       - name: Install Dependencies
         working-directory: packages/web
