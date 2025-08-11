@@ -3,7 +3,7 @@ import { create } from "@bufbuild/protobuf";
 import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
 import { DynamicForm } from "@components/Form/DynamicForm.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";

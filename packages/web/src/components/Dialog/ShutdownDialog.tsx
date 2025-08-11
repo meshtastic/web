@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 import { ClockIcon, PowerIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";

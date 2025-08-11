@@ -11,7 +11,7 @@ import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useDevice } from "../../core/stores/deviceStore.ts";
+import { useDevice } from "../../core/stores";
 import { Button } from "../UI/Button.tsx";
 
 export interface PkiBackupDialogProps {

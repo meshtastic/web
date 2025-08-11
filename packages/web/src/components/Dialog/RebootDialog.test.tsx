@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type {
   ButtonHTMLAttributes,
   ClassAttributes,
@@ -19,7 +19,7 @@ let mockConnection: {
   rebootOta: rebootOtaMock,
 };
 
-vi.mock("@core/stores/deviceStore.ts", () => ({
+vi.mock("@core/stores", () => ({
   useDevice: () => ({
     connection: mockConnection,
   }),

@@ -12,8 +12,7 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
-import { useAppStore } from "@core/stores/appStore.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useAppStore, useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@meshtastic/core";

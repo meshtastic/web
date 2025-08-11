@@ -15,7 +15,7 @@ const mockUpdateIgnore = vi.fn();
 const mockGetNode = vi.fn(() => mockNode);
 const mockToast = vi.fn();
 
-vi.mock("@core/stores/deviceStore.ts", () => ({
+vi.mock("@core/stores", () => ({
   useDevice: () => ({
     updateIgnored: mockUpdateIgnore,
     getNode: mockGetNode,

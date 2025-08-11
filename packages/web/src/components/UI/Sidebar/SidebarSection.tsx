@@ -1,5 +1,5 @@
 import { Heading } from "@components/UI/Typography/Heading.tsx";
-import { useSidebar } from "@core/stores/sidebarStore.tsx";
+import { useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import type React from "react";
 

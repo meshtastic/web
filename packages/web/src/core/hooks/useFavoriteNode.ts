@@ -1,5 +1,5 @@
 import { useToast } from "@core/hooks/useToast.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 

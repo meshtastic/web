@@ -12,7 +12,7 @@ import {
   type FlagName,
   usePositionFlags,
 } from "@core/hooks/usePositionFlags.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";

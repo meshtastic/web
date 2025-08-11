@@ -8,13 +8,13 @@ import { Input } from "@components/UI/Input.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
 import {
   MessageState,
   MessageType,
+  useDevice,
   useMessageStore,
-} from "@core/stores/messageStore/index.ts";
-import { useSidebar } from "@core/stores/sidebarStore.tsx";
+  useSidebar,
+} from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { randId } from "@core/utils/randId.ts";
 import { Protobuf, Types } from "@meshtastic/core";

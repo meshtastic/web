@@ -1,5 +1,5 @@
 import { Button } from "@components/UI/Button.tsx";
-import { useSidebar } from "@core/stores/sidebarStore.tsx";
+import { useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import type { LucideIcon } from "lucide-react";
 import type React from "react";

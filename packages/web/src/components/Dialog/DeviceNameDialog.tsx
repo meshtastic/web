@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Protobuf } from "@meshtastic/core";
 import { useForm } from "react-hook-form";

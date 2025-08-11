@@ -2,10 +2,7 @@ import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { useAppStore } from "@core/stores/appStore.ts";
-import type { Page } from "@core/stores/deviceStore.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
-import { useSidebar } from "@core/stores/sidebarStore.tsx";
+import { type Page, useAppStore, useDevice, useSidebar } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {

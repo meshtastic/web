@@ -1,6 +1,5 @@
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
-import type { useAppStore } from "@core/stores/appStore.ts";
-import type { useMessageStore } from "@core/stores/messageStore/index.ts";
+import type { useAppStore, useMessageStore } from "@core/stores";
 import ChannelsPage from "@pages/Channels.tsx";
 import ConfigPage from "@pages/Config/index.tsx";
 import { Dashboard } from "@pages/Dashboard/index.tsx";

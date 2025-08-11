@@ -1,11 +1,11 @@
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
-import { mockDeviceStore } from "@core/stores/deviceStore.mock.ts";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { mockDeviceStore } from "@core/stores/deviceStore/deviceStore.mock.ts";
+import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@core/stores/deviceStore");
+vi.mock("@core/stores");
 
 describe("TraceRoute", () => {
   const fromUser = {

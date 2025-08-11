@@ -8,9 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
+import { useMessageStore } from "@core/stores";
 import { AlertTriangleIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useMessageStore } from "../../../core/stores/messageStore/index.ts";
 
 export interface DeleteMessagesDialogProps {
   open: boolean;

@@ -1,4 +1,4 @@
-import { MessageState, MessageType } from "@core/stores/messageStore/index.ts";
+import { MessageState, MessageType } from "@core/stores";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import type { Types } from "@meshtastic/core";
 

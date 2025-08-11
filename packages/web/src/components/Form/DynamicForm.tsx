@@ -7,7 +7,7 @@ import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { useAppStore } from "@core/stores/appStore.ts";
+import { useAppStore } from "@core/stores";
 import { dotPaths } from "@core/utils/dotPath.ts";
 import { useEffect } from "react";
 import {

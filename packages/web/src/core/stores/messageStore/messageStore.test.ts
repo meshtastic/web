@@ -13,7 +13,7 @@ import type {
   MessageLogMap,
 } from "./types.ts";
 
-vi.mock("../storage/indexDB.ts", () => {
+vi.mock("../utils/indexDB.ts", () => {
   const memoryStorage: Record<string, string> = {};
   return {
     storageWithMapSupport: {

@@ -1,4 +1,5 @@
 import { Button } from "@components/UI/Button.tsx";
+import { Checkbox } from "@components/UI/Checkbox/index.tsx";
 import {
   Dialog,
   DialogClose,
@@ -10,11 +11,10 @@ import {
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
-import { useDevice } from "@core/stores/deviceStore.ts";
+import { useDevice } from "@core/stores";
 import { ClockIcon, OctagonXIcon, RefreshCwIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Checkbox } from "../UI/Checkbox/index.tsx";
 
 export interface RebootDialogProps {
   open: boolean;
