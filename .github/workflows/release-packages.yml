@@ -61,26 +61,31 @@ jobs:
       - name: Publish packages to npm and JSR
         run: |
           for dir in packages/*; do
-            echo "Processing $dir"
+            if [ "$dir" != "packages/web" ]; then
+              echo "Processing $dir"
 
-            cd $dir
+              cd $dir
 
-            # Build and publish to npm if package.json exists
-            if [ -f "package.json" ]; then
-              echo "Building and publishing $dir to npm..."
-              pnpm run build:npm
-              pnpm run publish:npm || echo "npm publish failed for $dir"
+              # Build and publish to npm if package.json exists
+              if [ -f "package.json" ]; then
+                echo "Building and publishing $dir to npm..."
+                pnpm install
+                pnpm run build:npm
+                pnpm run publish:npm || echo "npm publish failed for $dir"
+              fi
+
+              pnpm run prepare:jsr
+
+              # Publish to JSR if jsr.json exists
+              if [ -f "jsr.json" ]; then
+                echo "Publishing $dir to jsr..."
+                deno publish || echo "JSR publish failed for $dir"
+              fi
+
+              cd - > /dev/null
+            else
+              echo "Skipping $dir"
             fi
-
-            pnpm run prepare:jsr
-
-            # Publish to JSR if jsr.json exists
-            if [ -f "jsr.json" ]; then
-              echo "Publishing $dir to jsr..."
-              deno publish || echo "JSR publish failed for $dir"
-            fi
-
-            cd - > /dev/null
           done
 
     

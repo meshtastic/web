@@ -209,6 +209,18 @@ export const decodePacket = (device: MeshDevice) =>
               break;
             }
 
+            case "clientNotification": {
+              device.log.trace(
+                Types.Emitter[Types.Emitter.HandleFromRadio],
+                `📣 Received ClientNotification: ${decodedMessage.payloadVariant.value.message}`,
+              );
+
+              device.events.onClientNotificationPacket.dispatch(
+                decodedMessage.payloadVariant.value,
+              );
+              break;
+            }
+
             default: {
               device.log.warn(
                 Types.Emitter[Types.Emitter.HandleFromRadio],
