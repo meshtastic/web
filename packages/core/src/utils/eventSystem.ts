@@ -331,6 +331,15 @@ export class EventSystem {
   > = new SimpleEventDispatcher<PacketMetadata<Uint8Array>>();
 
   /**
+   * Fires when a new MeshPacket message containing a ClientNotification packet has been
+   * received from device
+   *
+   * @event onClientNotificationPacket
+   */
+  public readonly onClientNotificationPacket: SimpleEventDispatcher<Protobuf.Mesh.ClientNotification> =
+    new SimpleEventDispatcher<Protobuf.Mesh.ClientNotification>();
+
+  /**
    * Fires when the devices connection or configuration status changes
    *
    * @event onDeviceStatus

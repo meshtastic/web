@@ -44,7 +44,10 @@ export const mockDeviceStore: Device = {
     refreshKeys: false,
     deleteMessages: false,
     managedMode: false,
+    clientNotification: false,
   },
+  clientNotifications: [],
+
   setStatus: vi.fn(),
   setConfig: vi.fn(),
   setModuleConfig: vi.fn(),
@@ -85,6 +88,9 @@ export const mockDeviceStore: Device = {
   sendAdminMessage: vi.fn(),
   updateFavorite: vi.fn(),
   updateIgnored: vi.fn(),
+  addClientNotification: vi.fn(),
+  removeClientNotification: vi.fn(),
+  getClientNotification: vi.fn(),
   getAllUnreadCount: vi.fn().mockReturnValue(0),
   getUnreadCount: vi.fn().mockReturnValue(0),
 };

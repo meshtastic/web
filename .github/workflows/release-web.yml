@@ -13,31 +13,36 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      # --- Setup Node.js and pnpm ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 22
 
-      - name: Cache Bun Dependencies
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # --- Cache pnpm Dependencies ---
+      - name: Cache pnpm Dependencies
         uses: actions/cache@v4
         with:
           path: |
-            ~/.bun/install/cache
+            ~/.pnpm-store
             packages/web/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-bun-
+            ${{ runner.os }}-pnpm-
 
-      - name: Run Web App Tests
+      - name: Install dependencies
         working-directory: packages/web
-        run: bun run test
+        run: pnpm install
 
       - name: Create Web App Release Archive
         working-directory: packages/web
-        run: bun run package
+        run: pnpm run package
 
       - name: Upload Web App Archive
         uses: actions/upload-artifact@v4
@@ -59,7 +64,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            ./infra/Containerfile
+            ./packages/web/infra/Containerfile
           image: ghcr.io/${{ github.repository }}
           tags: latest, ${{ github.event.release.tag_name }}
           oci: true

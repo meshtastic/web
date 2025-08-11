@@ -71,7 +71,10 @@ const NodesPage = (): JSX.Element => {
 
   const handleLocation = useCallback(
     (location: Types.PacketMetadata<Protobuf.Mesh.Position>) => {
-      if (location.to.valueOf() !== hardware.myNodeNum) {
+      if (
+        location.to.valueOf() !== hardware.myNodeNum ||
+        location.from.valueOf() === hardware.myNodeNum
+      ) {
         return;
       }
       setSelectedLocation(location);
@@ -212,7 +215,8 @@ const NodesPage = (): JSX.Element => {
           content: (
             <Mono>{Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0]}</Mono>
           ),
-          sortValue: Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0],
+          sortValue:
+            Protobuf.Mesh.HardwareModel[node.user?.hwModel ?? 0] ?? "UNSET",
         },
         {
           content: <Mono>{macAddress}</Mono>,
