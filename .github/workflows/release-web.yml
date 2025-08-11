@@ -74,7 +74,6 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
-        working-directory: packages/web
         run: pnpm install --frozen-lockfile
 
       - name: Create Web App Release Archive
