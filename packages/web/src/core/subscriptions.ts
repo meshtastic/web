@@ -7,6 +7,7 @@ import {
   type NodeDB,
 } from "@core/stores";
 import { type MeshDevice, Protobuf } from "@meshtastic/core";
+import { fromByteArray } from "base64-js";
 
 export const subscribeAll = (
   device: Device,
@@ -72,6 +73,22 @@ export const subscribeAll = (
 
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
     const nodeWithUser = ensureDefaultUser(nodeInfo);
+
+    if (
+      nodeWithUser.num !== myNodeNum && // Ignore my own node
+      nodeDB.getNode(nodeWithUser.num)?.user?.publicKey !== undefined && // Only flag if the old key is not undefined
+      fromByteArray(
+        nodeDB.getNode(nodeWithUser.num)?.user?.publicKey ?? new Uint8Array(), // ... and equal to the new key
+      ) !== fromByteArray(nodeWithUser.user?.publicKey ?? new Uint8Array())
+    ) {
+      console.warn(
+        `Node ${nodeWithUser.num} has a different public key than expected`,
+      );
+      nodeDB.setNodeError(nodeWithUser.num, "MISMATCH_PKI");
+
+      // TODO: Handle this error case properly (refactor PKI dialog?)
+    }
+
     nodeDB.addNode(nodeWithUser);
   });
 
@@ -131,21 +148,21 @@ export const subscribeAll = (
     if (routingPacket.data.variant.case === "errorReason") {
       switch (routingPacket.data.variant.value) {
         case Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT:
-          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
+          console.error(`Routing Error: $routingPacket.data.variant.value`);
           break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
-          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
+          console.error(`Routing Error: $routingPacket.data.variant.value`);
           nodeDB.setNodeError(
             routingPacket.from,
-            Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value],
+            routingPacket?.data?.variant?.value,
           );
           device.setDialogOpen("refreshKeys", true);
           break;
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
-          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
+          console.error(`Routing Error: $routingPacket.data.variant.value`);
           nodeDB.setNodeError(
             routingPacket.from,
-            Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value],
+            routingPacket?.data?.variant?.value,
           );
           device.setDialogOpen("refreshKeys", true);
           break;

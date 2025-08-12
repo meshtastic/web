@@ -1,6 +1,10 @@
+import type { Protobuf } from "@meshtastic/core";
+
+type NodeErrorType = Protobuf.Mesh.Routing_Error | "MISMATCH_PKI";
+
 type NodeError = {
   node: number;
-  error: string;
+  error: NodeErrorType;
 };
 
 type ProcessPacketParams = {
@@ -9,4 +13,4 @@ type ProcessPacketParams = {
   time: number;
 };
 
-export type { NodeError, ProcessPacketParams };
+export type { NodeError, ProcessPacketParams, NodeErrorType };

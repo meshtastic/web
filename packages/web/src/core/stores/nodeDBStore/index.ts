@@ -4,7 +4,7 @@ import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore } from "zustand";
 import { persist } from "zustand/middleware";
-import type { NodeError, ProcessPacketParams } from "./types";
+import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types";
 
 const CURRENT_STORE_VERSION = 0;
 
@@ -22,7 +22,7 @@ export interface NodeDB {
   updateFavorite: (nodeNum: number, isFavorite: boolean) => void;
   updateIgnore: (nodeNum: number, isIgnored: boolean) => void;
   setNodeNum: (nodeNum: number) => void;
-  setNodeError: (nodeNum: number, error: string) => void;
+  setNodeError: (nodeNum: number, error: NodeErrorType) => void;
   clearNodeError: (nodeNum: number) => void;
 
   getNodesLength: () => number;
@@ -58,17 +58,16 @@ type NodeDBPersisted = {
   nodeDBs: Map<number, NodeDBData>;
 };
 
-function mergeIntoCurrent(target: NodeDB, incoming: NodeDB) {
-  for (const [n, info] of incoming.nodeMap) {
-    if (!target.nodeMap.has(n)) {
-      target.nodeMap.set(n, info);
+export function equalBytes(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.byteLength !== b.byteLength) {
+    return false;
+  }
+  for (let i = 0; i < a.byteLength; i++) {
+    if (a[i] !== b[i]) {
+      return false;
     }
   }
-  for (const [n, err] of incoming.nodeErrors) {
-    if (!target.nodeErrors.has(n)) {
-      target.nodeErrors.set(n, err);
-    }
-  }
+  return true;
 }
 
 function nodeDBFactory(
@@ -79,7 +78,7 @@ function nodeDBFactory(
 ): NodeDB {
   const nodeMap = data?.nodeMap ?? new Map<number, Protobuf.Mesh.NodeInfo>();
   const nodeErrors = data?.nodeErrors ?? new Map<number, NodeError>();
-  let myNodeNum = data?.myNodeNum;
+  const myNodeNum = data?.myNodeNum;
 
   return {
     id,
@@ -205,26 +204,30 @@ function nodeDBFactory(
     setNodeNum: (nodeNum) =>
       set(
         produce<PrivateNodeDBState>((draft) => {
-          console.debug(
-            `Setting myNodeNum for nodeDB with id: ${id} to ${nodeNum}`,
-          );
-          const current = draft.nodeDBs.get(id);
-          if (!current) {
+          const newDB = draft.nodeDBs.get(id);
+          if (!newDB) {
             throw new Error(`No nodeDB found for id: ${id}`);
           }
 
-          // There might already be an entry for this nodeNum, so we need to merge
-          // it into the current nodeDB.
-          myNodeNum = nodeNum;
-          current.myNodeNum = nodeNum;
+          newDB.myNodeNum = nodeNum;
 
-          for (const [k, other] of draft.nodeDBs) {
-            if (k === id) {
+          for (const [key, oldDB] of draft.nodeDBs) {
+            if (key === id) {
               continue;
             }
-            if (other.myNodeNum === nodeNum) {
-              mergeIntoCurrent(current, other); // current wins on conflicts
-              draft.nodeDBs.delete(k);
+            if (oldDB.myNodeNum === nodeNum) {
+              // The new DB is typically empty when nodenum is set, so we can safely copy over from the old DB
+              // otherwise, discard the old DB completely
+              if (newDB.nodeMap.size === 0) {
+                newDB.nodeMap = oldDB.nodeMap;
+                newDB.nodeErrors = oldDB.nodeErrors;
+              } else {
+                console.error(
+                  `NodeDB with id: ${id} already has nodes, not merging with old DB`,
+                );
+              }
+
+              draft.nodeDBs.delete(key);
             }
           }
         }),
@@ -384,7 +387,12 @@ export const useNodeDBStore = createStore<PrivateNodeDBState>()(
         if (!state) {
           return;
         }
-        console.debug("NodeDBStore: Rehydrating state", state);
+        console.debug(
+          "NodeDBStore: Rehydrating state with ",
+          state.nodeDBs.size,
+          " nodeDBs -",
+          state.nodeDBs,
+        );
 
         useNodeDBStore.setState(
           produce<PrivateNodeDBState>((draft) => {
@@ -392,15 +400,18 @@ export const useNodeDBStore = createStore<PrivateNodeDBState>()(
             for (const [id, data] of (
               draft.nodeDBs as unknown as Map<number, NodeDBData>
             ).entries()) {
-              rebuilt.set(
-                id,
-                nodeDBFactory(
+              if (data.myNodeNum !== undefined) {
+                // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
+                rebuilt.set(
                   id,
-                  useNodeDBStore.getState,
-                  useNodeDBStore.setState,
-                  data,
-                ),
-              );
+                  nodeDBFactory(
+                    id,
+                    useNodeDBStore.getState,
+                    useNodeDBStore.setState,
+                    data,
+                  ),
+                );
+              }
             }
             draft.nodeDBs = rebuilt;
           }),
