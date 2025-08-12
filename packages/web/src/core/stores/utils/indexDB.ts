@@ -94,7 +94,7 @@ function makeJson<H extends Handler<unknown, string, unknown>>(
   return { replacer, reviver };
 }
 
-export function createStorageWithMapSupport<
+export function createStorage<
   T,
   H extends Handler<unknown, string, unknown> = never,
 >(extraHandlers: readonly H[] = [] as const): PersistStorage<T> {

@@ -1,5 +1,5 @@
 import { create } from "@bufbuild/protobuf";
-import { createStorageWithMapSupport } from "@core/stores/utils/indexDB.ts";
+import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore } from "zustand";
@@ -7,6 +7,8 @@ import { persist } from "zustand/middleware";
 import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types";
 
 const CURRENT_STORE_VERSION = 0;
+
+const NODEDB_RETENTION_NUM = 10;
 
 export interface NodeDB {
   id: number;
@@ -91,9 +93,7 @@ function nodeDBFactory(
         produce<PrivateNodeDBState>((draft) => {
           const nodeDB = draft.nodeDBs.get(id);
           if (!nodeDB) {
-            throw new Error(
-              `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-            );
+            throw new Error(`No nodeDB found (id: ${id})`);
           }
           nodeDB.nodeMap.set(node.num, node);
         }),
@@ -104,9 +104,7 @@ function nodeDBFactory(
         produce<PrivateNodeDBState>((draft) => {
           const nodeDB = draft.nodeDBs.get(id);
           if (!nodeDB) {
-            throw new Error(
-              `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-            );
+            throw new Error(`No nodeDB found (id: ${id})`);
           }
           nodeDB.nodeMap.delete(nodeNum);
         }),
@@ -117,9 +115,7 @@ function nodeDBFactory(
         produce<PrivateNodeDBState>((draft) => {
           const nodeDB = draft.nodeDBs.get(id);
           if (!nodeDB) {
-            throw new Error(
-              `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-            );
+            throw new Error(`No nodeDB found (id: ${id})`);
           }
           nodeDB.nodeErrors.set(nodeNum, { node: nodeNum, error });
         }),
@@ -130,9 +126,7 @@ function nodeDBFactory(
         produce<PrivateNodeDBState>((draft) => {
           const nodeDB = draft.nodeDBs.get(id);
           if (!nodeDB) {
-            throw new Error(
-              `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-            );
+            throw new Error(`No nodeDB found (id: ${id})`);
           }
           nodeDB.nodeErrors.delete(nodeNum);
         }),
@@ -143,9 +137,7 @@ function nodeDBFactory(
         produce<PrivateNodeDBState>((draft) => {
           const nodeDB = draft.nodeDBs.get(id);
           if (!nodeDB) {
-            throw new Error(
-              `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-            );
+            throw new Error(`No nodeDB found (id: ${id})`);
           }
           const node = nodeDB.nodeMap.get(data.from);
           if (node) {
@@ -170,9 +162,7 @@ function nodeDBFactory(
         produce<PrivateNodeDBState>((draft) => {
           const nodeDB = draft.nodeDBs.get(id);
           if (!nodeDB) {
-            throw new Error(
-              `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-            );
+            throw new Error(`No nodeDB found (id: ${id})`);
           }
           const current =
             nodeDB.nodeMap.get(user.from) ??
@@ -188,9 +178,7 @@ function nodeDBFactory(
         produce<PrivateNodeDBState>((draft) => {
           const nodeDB = draft.nodeDBs.get(id);
           if (!nodeDB) {
-            throw new Error(
-              `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-            );
+            throw new Error(`No nodeDB found (id: ${id})`);
           }
           const current =
             nodeDB.nodeMap.get(position.from) ??
@@ -238,9 +226,7 @@ function nodeDBFactory(
         produce<PrivateNodeDBState>((draft) => {
           const nodeDB = draft.nodeDBs.get(id);
           if (!nodeDB) {
-            throw new Error(
-              `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-            );
+            throw new Error(`No nodeDB found (id: ${id})`);
           }
 
           const node = nodeDB.nodeMap.get(nodeNum);
@@ -255,9 +241,7 @@ function nodeDBFactory(
         produce<PrivateNodeDBState>((draft) => {
           const nodeDB = draft.nodeDBs.get(id);
           if (!nodeDB) {
-            throw new Error(
-              `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-            );
+            throw new Error(`No nodeDB found (id: ${id})`);
           }
 
           const node = nodeDB.nodeMap.get(nodeNum);
@@ -270,9 +254,7 @@ function nodeDBFactory(
     getNodesLength: () => {
       const nodeDB = get().nodeDBs.get(id);
       if (!nodeDB) {
-        throw new Error(
-          `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-        );
+        throw new Error(`No nodeDB found (id: ${id})`);
       }
       return nodeDB.nodeMap.size;
     },
@@ -280,9 +262,7 @@ function nodeDBFactory(
     getNode: (nodeNum) => {
       const nodeDB = get().nodeDBs.get(id);
       if (!nodeDB) {
-        throw new Error(
-          `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-        );
+        throw new Error(`No nodeDB found (id: ${id})`);
       }
       return nodeDB.nodeMap.get(nodeNum);
     },
@@ -290,12 +270,10 @@ function nodeDBFactory(
     getNodes: (filter) => {
       const nodeDB = get().nodeDBs.get(id);
       if (!nodeDB) {
-        throw new Error(
-          `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-        );
+        throw new Error(`No nodeDB found (id: ${id})`);
       }
       const all = Array.from(nodeDB.nodeMap.values()).filter(
-        (n) => n.num !== myNodeNum,
+        (n) => n.num !== nodeDB.myNodeNum,
       );
       return filter ? all.filter(filter) : all;
     },
@@ -303,24 +281,21 @@ function nodeDBFactory(
     getMyNode: () => {
       const nodeDB = get().nodeDBs.get(id);
       if (!nodeDB) {
-        throw new Error(
-          `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-        );
+        throw new Error(`No nodeDB found (id: ${id})`);
       }
-      if (!myNodeNum) {
+      if (!nodeDB.myNodeNum) {
         throw new Error(`No myNodeNum set for nodeDB with id: ${id}`);
       }
       return (
-        nodeDB.nodeMap.get(myNodeNum) ?? create(Protobuf.Mesh.NodeInfoSchema)
+        nodeDB.nodeMap.get(nodeDB.myNodeNum) ??
+        create(Protobuf.Mesh.NodeInfoSchema)
       );
     },
 
     getNodeError: (nodeNum) => {
       const nodeDB = get().nodeDBs.get(id);
       if (!nodeDB) {
-        throw new Error(
-          `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-        );
+        throw new Error(`No nodeDB found (id: ${id})`);
       }
       return nodeDB.nodeErrors.get(nodeNum);
     },
@@ -328,9 +303,7 @@ function nodeDBFactory(
     hasNodeError: (nodeNum) => {
       const nodeDB = get().nodeDBs.get(id);
       if (!nodeDB) {
-        throw new Error(
-          `No nodeDB found for myNodeNum: ${myNodeNum} (id: ${id})`,
-        );
+        throw new Error(`No nodeDB found (id: ${id})`);
       }
       return nodeDB.nodeErrors.has(nodeNum);
     },
@@ -352,8 +325,17 @@ export const useNodeDBStore = createStore<PrivateNodeDBState>()(
         set(
           produce<PrivateNodeDBState>((draft) => {
             draft.nodeDBs.set(id, nodeDB);
+
+            // If over limit, remove oldest inserted. FIFO
+            if (draft.nodeDBs.size > NODEDB_RETENTION_NUM) {
+              const firstKey = draft.nodeDBs.keys().next().value;
+              if (firstKey !== undefined) {
+                draft.nodeDBs.delete(firstKey);
+              }
+            }
           }),
         );
+
         return nodeDB;
       },
       removeNodeDB: (userId) => {
@@ -368,7 +350,7 @@ export const useNodeDBStore = createStore<PrivateNodeDBState>()(
     }),
     {
       name: "meshtastic-nodedb-store",
-      storage: createStorageWithMapSupport<NodeDBPersisted>(),
+      storage: createStorage<NodeDBPersisted>(),
       version: CURRENT_STORE_VERSION,
       partialize: (s): NodeDBPersisted => ({
         nodeDBs: new Map(
