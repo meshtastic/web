@@ -61,6 +61,15 @@ importers:
         specifier: workspace:*
         version: link:../core
 
+  packages/transport-node-serial:
+    dependencies:
+      '@meshtastic/core':
+        specifier: workspace:*
+        version: link:../core
+      'serialport':
+        specifier: npm:serialport@^13.0.0
+        version: 13.0.0
+
   packages/transport-web-bluetooth:
     dependencies:
       '@meshtastic/core':
