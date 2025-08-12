@@ -148,10 +148,10 @@ export const subscribeAll = (
     if (routingPacket.data.variant.case === "errorReason") {
       switch (routingPacket.data.variant.value) {
         case Protobuf.Mesh.Routing_Error.MAX_RETRANSMIT:
-          console.error(`Routing Error: $routingPacket.data.variant.value`);
+          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
           break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
-          console.error(`Routing Error: $routingPacket.data.variant.value`);
+          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
           nodeDB.setNodeError(
             routingPacket.from,
             routingPacket?.data?.variant?.value,
@@ -159,7 +159,7 @@ export const subscribeAll = (
           device.setDialogOpen("refreshKeys", true);
           break;
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
-          console.error(`Routing Error: $routingPacket.data.variant.value`);
+          console.error(`Routing Error: ${routingPacket.data.variant.value}`);
           nodeDB.setNodeError(
             routingPacket.from,
             routingPacket?.data?.variant?.value,

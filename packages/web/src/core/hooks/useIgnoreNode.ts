@@ -28,7 +28,7 @@ export function useIgnoreNode() {
       sendAdminMessage(
         create(Protobuf.Admin.AdminMessageSchema, {
           payloadVariant: {
-            case: isIgnored ? "setFavoriteNode" : "removeFavoriteNode",
+            case: isIgnored ? "setIgnoredNode" : "removeIgnoredNode",
             value: nodeNum,
           },
         }),
