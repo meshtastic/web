@@ -37,7 +37,7 @@ export class TransportNodeSerial implements Types.Transport {
 
   /**
    * Constructs a new TransportNode.
-   * @param connection - An active Node.js net.Socket connection.
+   * @param port - An active Node.js SerialPort connection.
    */
   constructor(port: SerialPort) {
     this.port = port;
@@ -54,13 +54,13 @@ export class TransportNodeSerial implements Types.Transport {
     const toDeviceTransform = Utils.toDeviceStream;
     this._toDevice = toDeviceTransform.writable;
 
-    // The readable end of the transform is then piped to the Node.js socket.
+    // The readable end of the transform is then piped to the Node.js SerialPort connection.
     // A similar assertion is needed here because `Writable.toWeb` also returns
     // a generically typed stream (`WritableStream<any>`).
     toDeviceTransform.readable
       .pipeTo(Writable.toWeb(port) as WritableStream<Uint8Array>)
       .catch((err) => {
-        console.error("Error piping data to socket:", err);
+        console.error("Error piping data to serial port:", err);
         this.port.close(err as Error);
       });
   }
