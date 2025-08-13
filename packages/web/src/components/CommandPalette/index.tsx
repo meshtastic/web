@@ -194,7 +194,7 @@ export const CommandPalette = () => {
           icon: HardDriveUpload,
           action() {
             connection?.enterDfuMode()
-          }
+          },
         },
         {
           label: t("contextual.command.resetNodeDb"),
