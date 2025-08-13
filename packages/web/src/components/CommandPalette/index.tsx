@@ -19,6 +19,7 @@ import {
   CloudOff,
   EraserIcon,
   FactoryIcon,
+  HardDriveUpload,
   LayersIcon,
   LinkIcon,
   type LucideIcon,
@@ -187,6 +188,13 @@ export const CommandPalette = () => {
           action() {
             setDialogOpen("reboot", true);
           },
+        },
+        {
+          label: t("contextual.command.dfuMode"),
+          icon: HardDriveUpload,
+          action() {
+            connection?.enterDfuMode()
+          }
         },
         {
           label: t("contextual.command.resetNodeDb"),
