@@ -11,81 +11,92 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # <-- required for JSR OIDC
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # --- Setup Node.js and pnpm ---
-      - name: Setup Node.js
+      # Node + pnpm (with cache)
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: latest
 
-      # --- Setup Deno ---
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
-      # --- Cache pnpm Dependencies ---
-      - name: Cache pnpm Dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.pnpm-store
-            packages/web/node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
-      # --- Cache Deno Dependencies ---
-      - name: Cache Deno Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-
-
-      - name: Configure pnpm registry
-        run: pnpm config set registry https://registry.npmjs.org/
-
-      - name: Configure pnpm auth
-        run: pnpm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-
-      - name: Publish packages to npm and JSR
+      - name: Configure npm auth
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          for dir in packages/*; do
-            if [ "$dir" != "packages/web" ]; then
-              echo "Processing $dir"
+          pnpm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+          pnpm config set registry https://registry.npmjs.org/
 
-              cd $dir
+      - name: Install deps (root)
+        run: pnpm install
 
-              # Build and publish to npm if package.json exists
-              if [ -f "package.json" ]; then
-                echo "Building and publishing $dir to npm..."
-                pnpm install
-                pnpm run build:npm
-                pnpm run publish:npm || echo "npm publish failed for $dir"
-              fi
+      - name: Resolve package list
+        id: pkgs
+        shell: bash
+        run: |
+          if [ "${{ github.event.inputs.packages }}" = "all" ] || [ -z "${{ github.event.inputs.packages }}" ]; then
+            mapfile -t TARGETS < <(ls -d packages/* | grep -v 'packages/web')
+          else
+            IFS=',' read -ra TARGETS <<< "${{ github.event.inputs.packages }}"
+            TARGETS=("${TARGETS[@]/#/packages/}")
+          fi
+          printf '%s\n' "${TARGETS[@]}" | paste -sd, - > targets.txt
+          echo "list=$(cat targets.txt)" >> "$GITHUB_OUTPUT"
 
-              pnpm run prepare:jsr
+      - name: Build selected packages (tsdown)
+        run: |
+          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          for dir in "${TARGETS[@]}"; do
+            echo "Building $dir"
+            pnpm --filter "./$dir" run build
+          done
 
-              # Publish to JSR if jsr.json exists
-              if [ -f "jsr.json" ]; then
-                echo "Publishing $dir to jsr..."
-                deno publish || echo "JSR publish failed for $dir"
-              fi
-
-              cd - > /dev/null
-            else
-              echo "Skipping $dir"
+      - name: Publish to npm
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          for dir in "${TARGETS[@]}"; do
+            if [ -f "$dir/package.json" ]; then
+              echo "Publishing $dir to npm…"
+              cd "$dir"
+              [ -d dist ] || pnpm run build
+              npm publish --access public || echo "npm publish failed for $dir"
+              cd - >/dev/null
             fi
           done
 
-    
+      - name: Sync jsr.json version from package.json
+        run: |
+          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          for dir in "${TARGETS[@]}"; do
+            if [ -f "$dir/jsr.json" ] && [ -f "$dir/package.json" ]; then
+              PKG_VER=$(jq -r .version "$dir/package.json")
+              jq --arg v "$PKG_VER" '.version = $v' "$dir/jsr.json" > "$dir/jsr.json.tmp" && mv "$dir/jsr.json.tmp" "$dir/jsr.json"
+              echo "Updated $dir/jsr.json to version $PKG_VER"
+            fi
+          done
+
+      - name: Publish to JSR (OIDC)
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          for dir in "${TARGETS[@]}"; do
+            if [ -f "$dir/jsr.json" ]; then
+              echo "Publishing $dir to JSR via OIDC…"
+              cd "$dir"
+              [ -d dist ] || pnpm run build
+              npx --yes jsr publish || echo "JSR publish failed for $dir"
+              cd - >/dev/null
+            fi
+          done
