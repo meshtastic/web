@@ -74,19 +74,22 @@ export const subscribeAll = (
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
     const nodeWithUser = ensureDefaultUser(nodeInfo);
 
-    if (
-      nodeWithUser.num !== myNodeNum && // Ignore my own node
-      nodeDB.getNode(nodeWithUser.num)?.user?.publicKey !== undefined && // Only flag if the old key is not undefined
-      fromByteArray(
-        nodeDB.getNode(nodeWithUser.num)?.user?.publicKey ?? new Uint8Array(), // ... and equal to the new key
-      ) !== fromByteArray(nodeWithUser.user?.publicKey ?? new Uint8Array())
-    ) {
-      console.warn(
-        `Node ${nodeWithUser.num} has a different public key than expected`,
+    if (nodeWithUser.num !== myNodeNum && nodeDB.getNode(nodeWithUser.num)) {
+      const oldPublicKey = fromByteArray(
+        nodeDB.getNode(nodeWithUser.num)?.user?.publicKey ?? new Uint8Array(),
       );
-      nodeDB.setNodeError(nodeWithUser.num, "MISMATCH_PKI");
+      const newPublicKey = fromByteArray(
+        nodeWithUser.user?.publicKey ?? new Uint8Array(),
+      );
 
-      // TODO: Handle this error case properly (refactor PKI dialog?)
+      if (oldPublicKey !== newPublicKey) {
+        console.warn(
+          `Node ${nodeWithUser.user?.longName} (${nodeWithUser.num}) has a different public key than expected: Expected ${oldPublicKey} but got ${newPublicKey}`,
+        );
+        nodeDB.setNodeError(nodeWithUser.num, "MISMATCH_PKI");
+
+        // TODO: Handle this error case properly (refactor PKI dialog?)
+      }
     }
 
     nodeDB.addNode(nodeWithUser);
