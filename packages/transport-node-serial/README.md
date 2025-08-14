@@ -1,6 +1,6 @@
 # @meshtastic/transport-node-serial
 
-[![JSR](https://jsr.io/badges/@meshtastic/transport-node)](https://jsr.io/@meshtastic/transport-node-serial)
+[![JSR](https://jsr.io/badges/@meshtastic/transport-node-serial)](https://jsr.io/@meshtastic/transport-node-serial)
 [![CI](https://img.shields.io/github/actions/workflow/status/meshtastic/js/ci.yml?branch=master&label=actions&logo=github&color=yellow)](https://github.com/meshtastic/js/actions/workflows/ci.yml)
 [![CLA assistant](https://cla-assistant.io/readme/badge/meshtastic/meshtastic.js)](https://cla-assistant.io/meshtastic/meshtastic.js)
 [![Fiscal Contributors](https://opencollective.com/meshtastic/tiers/badge.svg?label=Fiscal%20Contributors&color=deeppink)](https://opencollective.com/meshtastic/)
