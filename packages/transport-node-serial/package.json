@@ -1,9 +1,9 @@
 {
-  "name": "@meshtastic/transport-nodeserial",
+  "name": "@meshtastic/transport-node-serial",
   "version": "0.0.1",
   "description": "NodeJS-specific serial transport layer for Meshtastic web applications.",
   "exports": {
-    ".": "./mod.ts"
+    ".": "./dist/mod.mjs"
   },
   "main": "./dist/mod.mjs",       
   "module": "./dist/mod.mjs",     
