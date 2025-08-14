@@ -35,6 +35,7 @@
       "scheduleShutdown": "Schedule Shutdown",
       "scheduleReboot": "Reboot Device",
       "resetNodeDb": "Reset Node DB",
+      "dfuMode": "Enter DFU Mode",
       "factoryResetDevice": "Factory Reset Device",
       "factoryResetConfig": "Factory Reset Config",
       "disconnect": "Disconnect"
