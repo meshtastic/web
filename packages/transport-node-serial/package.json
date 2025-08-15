@@ -1,0 +1,39 @@
+{
+  "name": "@meshtastic/transport-node-serial",
+  "version": "0.0.1",
+  "description": "NodeJS-specific serial transport layer for Meshtastic web applications.",
+  "exports": {
+    ".": "./dist/mod.mjs"
+  },
+  "main": "./dist/mod.mjs",       
+  "module": "./dist/mod.mjs",     
+  "types": "./dist/mod.d.mts",    
+   
+  "license": "GPL-3.0-only",
+  "tsdown": {
+    "entry": "mod.ts",
+    "dts": true,
+    "format": ["esm"],
+    "splitting": false,
+    "clean": true
+  },
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
+  "scripts": {
+  "preinstall": "npx only-allow pnpm",
+    "prepack": "cp ../../LICENSE ./LICENSE",
+    "clean": "rm -rf dist LICENSE",
+    "build:npm": "tsdown",
+    "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public",
+    "prepare:jsr": "rm -rf dist && pnpm dlx pkg-to-jsr",
+    "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
+  },
+  "dependencies": {
+    "@meshtastic/core": "workspace:*",
+    "serialport": "^13.0.0"
+  }
+}
