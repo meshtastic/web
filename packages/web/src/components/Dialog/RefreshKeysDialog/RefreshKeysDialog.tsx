@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { useDevice, useMessageStore } from "@core/stores";
+import { useMessageStore, useNodeDB } from "@core/stores";
 import { LockKeyholeOpenIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRefreshKeysDialog } from "./useRefreshKeysDialog.ts";
@@ -22,7 +22,8 @@ export const RefreshKeysDialog = ({
 }: RefreshKeysDialogProps) => {
   const { t } = useTranslation("dialog");
   const { activeChat } = useMessageStore();
-  const { nodeErrors, getNode } = useDevice();
+  const { nodeErrors, getNode } = useNodeDB();
+
   const { handleCloseDialog, handleNodeRemove } = useRefreshKeysDialog();
 
   const nodeErrorNum = nodeErrors.get(activeChat);

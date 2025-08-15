@@ -1,4 +1,4 @@
-import { DeviceContext, useDeviceStore, useMessageStore } from "@core/stores";
+import { CurrentDeviceContext, useDeviceStore, useMessageStore } from "@core/stores";
 import { render } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { RefreshKeysDialog } from "./RefreshKeysDialog.tsx";
@@ -37,11 +37,6 @@ test("does not render dialog if no error exists for active chat", () => {
 
   useDeviceStore.getState().addDevice(deviceId);
 
-  const currentDeviceState = useDeviceStore.getState().getDevice(deviceId);
-  if (!currentDeviceState) {
-    throw new Error("Device not found");
-  }
-
   mockUseMessageStore.mockReturnValue({ activeChat: activeChatNum });
   mockUseRefreshKeysDialog.mockReturnValue({
     handleCloseDialog: vi.fn(),
@@ -49,9 +44,9 @@ test("does not render dialog if no error exists for active chat", () => {
   });
 
   const { container } = render(
-    <DeviceContext.Provider value={currentDeviceState}>
+    <CurrentDeviceContext.Provider value={{ deviceId }}>
       <RefreshKeysDialog open onOpenChange={vi.fn()} />
-    </DeviceContext.Provider>,
+    </CurrentDeviceContext.Provider>,
   );
 
   expect(container.firstChild).toBeNull();

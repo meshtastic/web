@@ -1,12 +1,19 @@
 import { ensureDefaultUser } from "@core/dto/NodeNumToNodeInfoDTO.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
-import { type Device, type MessageStore, MessageType } from "@core/stores";
+import {
+  type Device,
+  type MessageStore,
+  MessageType,
+  type NodeDB,
+} from "@core/stores";
 import { type MeshDevice, Protobuf } from "@meshtastic/core";
+import { fromByteArray } from "base64-js";
 
 export const subscribeAll = (
   device: Device,
   connection: MeshDevice,
   messageStore: MessageStore,
+  nodeDB: NodeDB,
 ) => {
   let myNodeNum = 0;
 
@@ -52,20 +59,40 @@ export const subscribeAll = (
   connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
     device.setHardware(nodeInfo);
     messageStore.setNodeNum(nodeInfo.myNodeNum);
+    nodeDB.setNodeNum(nodeInfo.myNodeNum);
     myNodeNum = nodeInfo.myNodeNum;
   });
 
   connection.events.onUserPacket.subscribe((user) => {
-    device.addUser(user);
+    nodeDB.addUser(user);
   });
 
   connection.events.onPositionPacket.subscribe((position) => {
-    device.addPosition(position);
+    nodeDB.addPosition(position);
   });
 
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
     const nodeWithUser = ensureDefaultUser(nodeInfo);
-    device.addNodeInfo(nodeWithUser);
+
+    if (nodeWithUser.num !== myNodeNum && nodeDB.getNode(nodeWithUser.num)) {
+      const oldPublicKey = fromByteArray(
+        nodeDB.getNode(nodeWithUser.num)?.user?.publicKey ?? new Uint8Array(),
+      );
+      const newPublicKey = fromByteArray(
+        nodeWithUser.user?.publicKey ?? new Uint8Array(),
+      );
+
+      if (oldPublicKey !== newPublicKey) {
+        console.warn(
+          `Node ${nodeWithUser.user?.longName} (${nodeWithUser.num}) has a different public key than expected: Expected ${oldPublicKey} but got ${newPublicKey}`,
+        );
+        nodeDB.setNodeError(nodeWithUser.num, "MISMATCH_PKI");
+
+        // TODO: Handle this error case properly (refactor PKI dialog?)
+      }
+    }
+
+    nodeDB.addNode(nodeWithUser);
   });
 
   connection.events.onChannelPacket.subscribe((channel) => {
@@ -106,7 +133,7 @@ export const subscribeAll = (
   });
 
   connection.events.onMeshPacket.subscribe((meshPacket) => {
-    device.processPacket({
+    nodeDB.processPacket({
       from: meshPacket.from,
       snr: meshPacket.rxSnr,
       time: meshPacket.rxTime,
@@ -128,17 +155,17 @@ export const subscribeAll = (
           break;
         case Protobuf.Mesh.Routing_Error.NO_CHANNEL:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          device.setNodeError(
+          nodeDB.setNodeError(
             routingPacket.from,
-            Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value],
+            routingPacket?.data?.variant?.value,
           );
           device.setDialogOpen("refreshKeys", true);
           break;
         case Protobuf.Mesh.Routing_Error.PKI_UNKNOWN_PUBKEY:
           console.error(`Routing Error: ${routingPacket.data.variant.value}`);
-          device.setNodeError(
+          nodeDB.setNodeError(
             routingPacket.from,
-            Protobuf.Mesh.Routing_Error[routingPacket?.data?.variant?.value],
+            routingPacket?.data?.variant?.value,
           );
           device.setDialogOpen("refreshKeys", true);
           break;

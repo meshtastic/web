@@ -6,7 +6,7 @@ import {
 import { BaseMap } from "@components/Map.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
-import { useDevice } from "@core/stores";
+import { useDevice, useNodeDB } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { bbox, lineString } from "@turf/turf";
@@ -30,7 +30,8 @@ const convertToLatLng = (position?: {
 });
 
 const MapPage = () => {
-  const { getNodes, waypoints, hasNodeError } = useDevice();
+  const { waypoints } = useDevice();
+  const { getNodes, hasNodeError } = useNodeDB();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
   const { default: map } = useMap();
@@ -79,7 +80,7 @@ const MapPage = () => {
       return;
     }
 
-    if (validNodes.length === 1) {
+    if (validNodes.length === 1 && validNodes[0]) {
       map.easeTo({
         zoom: map.getZoom(),
         center: [

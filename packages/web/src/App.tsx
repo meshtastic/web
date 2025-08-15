@@ -15,10 +15,10 @@ import { MapProvider } from "react-map-gl/maplibre";
 
 export function App() {
   const { getDevice } = useDeviceStore();
-  const { selectedDevice, setConnectDialogOpen, connectDialogOpen } =
+  const { selectedDeviceId, setConnectDialogOpen, connectDialogOpen } =
     useAppStore();
 
-  const device = getDevice(selectedDevice);
+  const device = getDevice(selectedDeviceId);
 
   // Sets up light/dark mode based on user preferences or system settings
   useTheme();
@@ -33,7 +33,7 @@ export function App() {
       />
       {/* <Toaster /> */}
       <TanStackRouterDevtools position="bottom-right" />
-      <DeviceWrapper device={device}>
+      <DeviceWrapper deviceId={selectedDeviceId}>
         <div
           className="flex h-screen flex-col bg-background-primary text-text-primary"
           style={{ scrollbarWidth: "thin" }}

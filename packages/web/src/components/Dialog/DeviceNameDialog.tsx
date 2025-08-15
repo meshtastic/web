@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { useDevice } from "@core/stores";
+import { useDevice, useNodeDB } from "@core/stores";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Protobuf } from "@meshtastic/core";
 import { useForm } from "react-hook-form";
@@ -33,7 +33,8 @@ export const DeviceNameDialog = ({
   onOpenChange,
 }: DeviceNameDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { hardware, getNode, connection } = useDevice();
+  const { hardware, connection } = useDevice();
+  const { getNode } = useNodeDB();
   const myNode = getNode(hardware.myNodeNum);
 
   const defaultValues = {

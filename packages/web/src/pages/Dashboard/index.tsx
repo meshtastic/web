@@ -3,7 +3,7 @@ import { Button } from "@components/UI/Button.tsx";
 import { Separator } from "@components/UI/Seperator.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { useAppStore, useDeviceStore } from "@core/stores";
+import { useAppStore, useDeviceStore, useNodeDBStore } from "@core/stores";
 import { ListPlusIcon, PlusIcon, UsersIcon } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ export const Dashboard = () => {
   const { t } = useTranslation("dashboard");
   const { setConnectDialogOpen, setSelectedDevice } = useAppStore();
   const { getDevices } = useDeviceStore();
+  const { getNodeDB } = useNodeDBStore();
 
   const devices = useMemo(() => getDevices(), [getDevices]);
 
@@ -31,6 +32,11 @@ export const Dashboard = () => {
         {devices.length ? (
           <ul className="grow divide-y divide-slate-200">
             {devices.map((device) => {
+              const nodeDB = getNodeDB(device.id);
+              if (!nodeDB) {
+                return;
+              }
+
               return (
                 <li key={device.id}>
                   <button
@@ -42,7 +48,7 @@ export const Dashboard = () => {
                   >
                     <div className="flex items-center justify-between">
                       <p className="truncate text-sm font-medium text-accent">
-                        {device.getNode(device.hardware.myNodeNum)?.user
+                        {nodeDB.getNode(device.hardware.myNodeNum)?.user
                           ?.longName ?? t("unknown.shortName")}
                       </p>
                       <div className="mt-2 sm:flex sm:justify-between">
@@ -52,9 +58,9 @@ export const Dashboard = () => {
                             className="text-slate-400"
                             aria-hidden="true"
                           />
-                          {device.getNodesLength() === 0
+                          {nodeDB.getNodesLength() === 0
                             ? 0
-                            : device.getNodesLength() - 1}
+                            : nodeDB.getNodesLength() - 1}
                         </div>
                       </div>
                     </div>

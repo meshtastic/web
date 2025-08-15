@@ -13,6 +13,7 @@ import {
   MessageType,
   useDevice,
   useMessageStore,
+  useNodeDB,
   useSidebar,
 } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
@@ -42,15 +43,9 @@ function SelectMessageChat() {
 }
 
 export const MessagesPage = () => {
-  const {
-    channels,
-    getNodes,
-    getNode,
-    hasNodeError,
-    getUnreadCount,
-    resetUnread,
-    connection,
-  } = useDevice();
+  const { channels, getUnreadCount, resetUnread, connection } = useDevice();
+  const { getNodes, getNode, hasNodeError } = useNodeDB();
+
   const { getMyNodeNum, getMessages, setMessageState } = useMessageStore();
 
   const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });

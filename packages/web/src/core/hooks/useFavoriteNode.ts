@@ -1,5 +1,7 @@
+import { create } from "@bufbuild/protobuf";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useDevice } from "@core/stores";
+import { useDevice, useNodeDB } from "@core/stores";
+import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -9,7 +11,8 @@ interface FavoriteNodeOptions {
 }
 
 export function useFavoriteNode() {
-  const { updateFavorite, getNode } = useDevice();
+  const { sendAdminMessage } = useDevice();
+  const { getNode, updateFavorite } = useNodeDB();
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -20,6 +23,16 @@ export function useFavoriteNode() {
         return;
       }
 
+      sendAdminMessage(
+        create(Protobuf.Admin.AdminMessageSchema, {
+          payloadVariant: {
+            case: isFavorite ? "setFavoriteNode" : "removeFavoriteNode",
+            value: nodeNum,
+          },
+        }),
+      );
+
+      // TODO: Wait for response before changing the store
       updateFavorite(nodeNum, isFavorite);
 
       toast({
@@ -34,7 +47,7 @@ export function useFavoriteNode() {
         }),
       });
     },
-    [updateFavorite, getNode, t, toast],
+    [updateFavorite, sendAdminMessage, getNode, t, toast],
   );
 
   return { updateFavorite: updateFavoriteCB };
