@@ -10,7 +10,7 @@ on:
         required: false
         default: ""
       tag_name:
-        description: "Tag to use for artifacts/images (defaults to adhoc-<sha>)"
+        description: "Tag to use for artifacts/images (defaults to <sha>)"
         required: false
         default: ""
       attach_to_release:

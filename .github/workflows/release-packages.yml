@@ -62,20 +62,6 @@ jobs:
             pnpm --filter "./$dir" run build
           done
 
-      - name: Publish to npm
-        run: |
-          set -euo pipefail
-          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
-          for dir in "${TARGETS[@]}"; do
-            if [ -f "$dir/package.json" ]; then
-              echo "Publishing $dir to npm…"
-              cd "$dir"
-              [ -d dist ] || pnpm run build
-              PUBLISH_OUTPUT=$(npm publish --access public 2>&1); PUBLISH_EXIT=$?; if [ $PUBLISH_EXIT -ne 0 ]; then echo "npm publish failed for $dir (exit code: $PUBLISH_EXIT)"; echo "$PUBLISH_OUTPUT"; fi
-              cd - >/dev/null
-            fi
-          done
-
       - name: Sync jsr.json version from package.json
         run: |
           IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
@@ -103,3 +89,25 @@ jobs:
               cd - >/dev/null
             fi
           done
+
+      - name: Replace exports entry in package.json
+        run: |
+          tmp=$(mktemp)
+          jq '.exports["."] = "./dist/mod.mjs"' package.json > "$tmp" \
+          && mv "$tmp" package.json
+
+      - name: Publish to npm
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          for dir in "${TARGETS[@]}"; do
+            if [ -f "$dir/package.json" ]; then
+              echo "Publishing $dir to npm…"
+              cd "$dir"
+              [ -d dist ] || pnpm run build
+              npm publish --access public || echo "npm publish failed for $dir"
+              cd - >/dev/null
+            fi
+          done
+
+
