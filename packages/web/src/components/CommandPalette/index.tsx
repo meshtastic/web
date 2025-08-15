@@ -70,7 +70,7 @@ export const CommandPalette = () => {
   } = useAppStore();
   const { getDevices } = useDeviceStore();
   const { setDialogOpen, connection } = useDevice();
-  const { getNode } = useNodeDB();
+  const { getNode, removeAllNodeErrors, removeAllNodes } = useNodeDB();
   const { pinnedItems, togglePinnedItem } = usePinnedItems({
     storageName: "pinnedCommandMenuGroups",
   });
@@ -199,6 +199,8 @@ export const CommandPalette = () => {
           icon: TrashIcon,
           action() {
             connection?.resetNodes();
+            removeAllNodeErrors();
+            removeAllNodes(true);
           },
         },
         {
@@ -215,6 +217,8 @@ export const CommandPalette = () => {
           icon: FactoryIcon,
           action() {
             connection?.factoryResetDevice();
+            removeAllNodeErrors();
+            removeAllNodes();
           },
         },
         {

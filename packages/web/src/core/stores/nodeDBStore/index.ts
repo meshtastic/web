@@ -18,6 +18,7 @@ export interface NodeDB {
 
   addNode: (nodeInfo: Protobuf.Mesh.NodeInfo) => void;
   removeNode: (nodeNum: number) => void;
+  removeAllNodes: (keepMyNode?: boolean) => void;
   processPacket: (data: ProcessPacketParams) => void;
   addUser: (user: Types.PacketMetadata<Protobuf.Mesh.User>) => void;
   addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
@@ -26,6 +27,7 @@ export interface NodeDB {
   setNodeNum: (nodeNum: number) => void;
   setNodeError: (nodeNum: number, error: NodeErrorType) => void;
   clearNodeError: (nodeNum: number) => void;
+  removeAllNodeErrors: () => void;
 
   getNodesLength: () => number;
   getNode: (nodeNum: number) => Protobuf.Mesh.NodeInfo | undefined;
@@ -98,6 +100,29 @@ function nodeDBFactory(
         }),
       ),
 
+    removeAllNodes: (keepMyNode) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          const newNodeMap = new Map<number, Protobuf.Mesh.NodeInfo>();
+          if (
+            keepMyNode &&
+            nodeDB.myNodeNum !== undefined &&
+            nodeDB.nodeMap.has(nodeDB.myNodeNum)
+          ) {
+            newNodeMap.set(
+              nodeDB.myNodeNum,
+              nodeDB.nodeMap.get(nodeDB.myNodeNum) ??
+                create(Protobuf.Mesh.NodeInfoSchema),
+            );
+          }
+          nodeDB.nodeMap = newNodeMap;
+        }),
+      ),
+
     setNodeError: (nodeNum, error) =>
       set(
         produce<PrivateNodeDBState>((draft) => {
@@ -117,6 +142,17 @@ function nodeDBFactory(
             throw new Error(`No nodeDB found (id: ${id})`);
           }
           nodeDB.nodeErrors.delete(nodeNum);
+        }),
+      ),
+
+    removeAllNodeErrors: () =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          nodeDB.nodeErrors = new Map<number, NodeError>();
         }),
       ),
 
@@ -326,10 +362,10 @@ export const useNodeDBStore = createStore<PrivateNodeDBState>()(
 
         return nodeDB;
       },
-      removeNodeDB: (userId) => {
+      removeNodeDB: (id) => {
         set(
           produce<PrivateNodeDBState>((draft) => {
-            draft.nodeDBs.delete(userId);
+            draft.nodeDBs.delete(id);
           }),
         );
       },
