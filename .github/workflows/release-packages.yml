@@ -71,7 +71,7 @@ jobs:
               echo "Publishing $dir to npm…"
               cd "$dir"
               [ -d dist ] || pnpm run build
-              npm publish --access public || echo "npm publish failed for $dir"
+              PUBLISH_OUTPUT=$(npm publish --access public 2>&1); PUBLISH_EXIT=$?; if [ $PUBLISH_EXIT -ne 0 ]; then echo "npm publish failed for $dir (exit code: $PUBLISH_EXIT)"; echo "$PUBLISH_OUTPUT"; fi
               cd - >/dev/null
             fi
           done
