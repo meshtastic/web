@@ -59,7 +59,7 @@ jobs:
 
             if [[ -f "$pkg_dir/package.json" ]] && [[ "$pkg_dir" != "packages/web" ]]; then
               echo "🔧 Building with pnpm: $pkg_dir"
-              (cd "$pkg_dir" && pnpm install && pnpm run build:npm)
+              (cd "$pkg_dir" && pnpm install --frozen-lockfile && pnpm run build:npm)
             else
               echo "⚠️ Skipping $pkg_dir (web package or no package.json)"
             fi

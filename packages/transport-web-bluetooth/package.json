@@ -1,14 +1,20 @@
 {
   "name": "@meshtastic/transport-web-bluetooth",
-  "version": "0.1.4",
+  "version": "0.1.4-1",
   "description": "A transport layer for Meshtastic applications using Web Bluetooth.",
   "exports": {
     ".": "./mod.ts"
   },
+  "type": "module", 
   "main": "./dist/mod.mjs",       
   "module": "./dist/mod.mjs",     
   "types": "./dist/mod.d.mts",    
-  "files": ["dist/*", "mod.ts", "README.md", "../../LICENSE"],
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
   "license": "GPL-3.0-only",
   "tsdown": {
     "entry": "mod.ts",
@@ -22,7 +28,7 @@
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rm -rf dist LICENSE",
     "build:npm": "tsdown",
-    "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public",
+    "publish:npm": "pnpm clean && pnpm build:npm && pnpm publish --access public --no-git-checks",
     "prepare:jsr": "rm -rf dist && pnpm dlx pkg-to-jsr",
     "publish:jsr": "pnpm run prepack && pnpm prepare:jsr && deno publish --allow-dirty --no-check"
   },
