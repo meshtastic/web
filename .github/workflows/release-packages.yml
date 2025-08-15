@@ -96,7 +96,10 @@ jobs:
               echo "Publishing $dir to JSR via OIDC…"
               cd "$dir"
               [ -d dist ] || pnpm run build
-              npx --yes jsr publish || echo "JSR publish failed for $dir"
+              if ! npx --yes jsr publish 2>&1 | tee jsr_publish.log; then
+                echo "JSR publish failed for $dir. Error output:"
+                cat jsr_publish.log
+              fi
               cd - >/dev/null
             fi
           done
