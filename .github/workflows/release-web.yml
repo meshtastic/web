@@ -118,7 +118,12 @@ jobs:
           else
             echo "list=${{ steps.meta.outputs.tag }}" >> "$GITHUB_OUTPUT"
           fi
-          echo "Using image tags: ${{ steps.tags.outputs.list }}"
+            TAGS="latest, ${{ steps.meta.outputs.tag }}"
+          else
+            TAGS="${{ steps.meta.outputs.tag }}"
+          fi
+          echo "list=$TAGS" >> "$GITHUB_OUTPUT"
+          echo "Using image tags: $TAGS"
 
       - name: Build Container Image
         id: build-container
