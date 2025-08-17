@@ -147,4 +147,4 @@ Join the conversation:
 ---
 
 ## 📜 License
-By contributing, you agree that your contributions will be licensed under the [GPL-3.0-only License](../LICENSE).  
+By contributing, you agree that your contributions will be licensed under the [GPL-3.0-only License](../../LICENSE).  
