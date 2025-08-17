@@ -45,8 +45,8 @@
 			"description": "Enable Codec 2 audio encoding"
 		},
 		"pttPin": {
-			"label": "PTT Pin",
-			"description": "GPIO pin to use for PTT"
+			"label": "Пин за РТТ",
+			"description": "GPIO пин, който да се използва за PTT"
 		},
 		"bitrate": {
 			"label": "Bitrate",
