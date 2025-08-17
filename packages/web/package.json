@@ -1,5 +1,5 @@
 {
-	"name": "meshtastic-web",
+	"name": "@meshtastic/web",
 	"version": "2.7.0-0",
 	"type": "module",
 	"description": "Meshtastic web client",
