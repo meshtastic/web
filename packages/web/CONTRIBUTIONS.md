@@ -72,7 +72,7 @@ Meshtastic Web uses a **monorepo** setup managed with **pnpm workspaces**:
 
 3. **Commit your changes** with a descriptive commit message that follows the [Conventional Commits](https://www.conventionalcommits.org/) style.  
 
-4. **Open a Pull Request (PR)** on GitHub against your fork and branch:
+4. **Open a Pull Request (PR)** from your fork's branch to the main repository's `main` branch on GitHub:
    - Clearly describe the problem and solution.  
    - Reference related issues (e.g., `Fixes #123`).  
    - Keep PRs focused on a single feature or fix.  
