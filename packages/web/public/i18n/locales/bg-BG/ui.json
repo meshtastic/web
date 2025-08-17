@@ -136,7 +136,7 @@
 		"label": "Филтър"
 	},
 	"advanced": {
-		"label": "Advanced"
+		"label": "Разширени"
 	},
 	"clearInput": {
 		"label": "Clear input"
@@ -149,7 +149,7 @@
 		"placeholder": "Meshtastic 1234"
 	},
 	"airtimeUtilization": {
-		"label": "Airtime Utilization (%)"
+		"label": "Използване на ефира (%)"
 	},
 	"batteryLevel": {
 		"label": "Ниво на батерията (%)",
@@ -179,16 +179,16 @@
 		"label": "Любими"
 	},
 	"hide": {
-		"label": "Hide"
+		"label": "Скриване"
 	},
 	"showOnly": {
-		"label": "Show Only"
+		"label": "Показване само"
 	},
 	"viaMqtt": {
 		"label": "Свързан чрез MQTT"
 	},
 	"hopsUnknown": {
-		"label": "Unknown number of hops"
+		"label": "Неизвестен брой хопове"
 	},
 	"showUnheard": {
 		"label": "Never heard"

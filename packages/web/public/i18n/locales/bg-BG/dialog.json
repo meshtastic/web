@@ -9,10 +9,10 @@
 		"shortName": "Кратко име",
 		"title": "Промяна на името на устройството",
 		"validation": {
-			"longNameMax": "Long name must not be more than 40 characters",
-			"shortNameMax": "Short name must not be more than 4 characters",
-			"longNameMin": "Long name must have at least 1 character",
-			"shortNameMin": "Short name must have at least 1 character"
+			"longNameMax": "Дългото име не трябва да е повече от 40 знака",
+			"shortNameMax": "Краткото име не трябва да е повече от 4 знака",
+			"longNameMin": "Дългото име трябва да съдържа поне 1 символ",
+			"shortNameMin": "Краткото име трябва да съдържа поне 1 символ"
 		}
 	},
 	"import": {
@@ -23,7 +23,7 @@
 		"channelPrefix": "Канал: ",
 		"channelSetUrl": "Channel Set/QR Code URL",
 		"channels": "Канали:",
-		"usePreset": "Use Preset?",
+		"usePreset": "Използване на предварително зададени настройки?",
 		"title": "Import Channel Set"
 	},
 	"locationResponse": {
@@ -68,11 +68,11 @@
 		"bluetoothConnection": {
 			"noDevicesPaired": "Все още няма сдвоени устройства.",
 			"newDeviceButton": "Ново устройство",
-			"connectionFailed": "Connection failed",
-			"deviceDisconnected": "Device disconnected",
+			"connectionFailed": "Връзката е неуспешна",
+			"deviceDisconnected": "Устройството не е свързано",
 			"unknownDevice": "Неизвестно устройство",
-			"errorLoadingDevices": "Error loading devices",
-			"unknownErrorLoadingDevices": "Unknown error loading devices"
+			"errorLoadingDevices": "Грешка при зареждане на устройствата",
+			"unknownErrorLoadingDevices": "Неизвестна грешка при зареждане на устройствата"
 		},
 		"validation": {
 			"requiresFeatures": "Този тип връзка изисква <0></0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
@@ -116,7 +116,7 @@
 	"pkiBackupReminder": {
 		"description": "Препоръчваме редовно да правите резервни копия на данните с вашите ключове. Искате ли да направите резервно копие сега?",
 		"title": "Напомняне за резервно копие",
-		"remindLaterPrefix": "Remind me in",
+		"remindLaterPrefix": "Напомни ми в",
 		"remindNever": "Никога не ми напомняй",
 		"backupNow": "Създаване на резервно копие сега"
 	},

@@ -28,10 +28,10 @@
 			"label": "Височина"
 		},
 		"channelUtil": {
-			"label": "Channel Util"
+			"label": "Използване на канала"
 		},
 		"airtimeUtil": {
-			"label": "Airtime Util"
+			"label": "Използване на ефирно време"
 		}
 	},
 	"nodesTable": {

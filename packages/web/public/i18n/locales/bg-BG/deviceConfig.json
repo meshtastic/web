@@ -18,22 +18,22 @@
 		"description": "Настройки за устройството",
 		"buttonPin": {
 			"description": "Button pin override",
-			"label": "Button Pin"
+			"label": "Пин за бутон"
 		},
 		"buzzerPin": {
 			"description": "Buzzer pin override",
-			"label": "Buzzer Pin"
+			"label": "Пин за зумер"
 		},
 		"disableTripleClick": {
-			"description": "Disable triple click",
-			"label": "Disable Triple Click"
+			"description": "Дезактивиране на трикратното щракване",
+			"label": "Дезактивиране на трикратното щракване"
 		},
 		"doubleTapAsButtonPress": {
 			"description": "Treat double tap as button press",
 			"label": "Double Tap as Button Press"
 		},
 		"ledHeartbeatDisabled": {
-			"description": "Disable default blinking LED",
+			"description": "Дезактивиране на мигащия светодиод по подразбиране",
 			"label": "LED Heartbeat Disabled"
 		},
 		"nodeInfoBroadcastInterval": {
@@ -138,7 +138,7 @@
 			"label": "Отместване на честотата"
 		},
 		"frequencySlot": {
-			"description": "LoRa frequency channel number",
+			"description": "Номер на LoRa честотен канал",
 			"label": "Честотен слот"
 		},
 		"hopLimit": {
@@ -277,7 +277,7 @@
 		},
 		"enablePin": {
 			"description": "GPS module enable pin override",
-			"label": "Enable Pin"
+			"label": "Активиране на пин"
 		},
 		"fixedPosition": {
 			"description": "Don't report GPS position, but a manually-specified one",
@@ -341,7 +341,7 @@
 		},
 		"ina219Address": {
 			"description": "Address of the INA219 battery monitor",
-			"label": "INA219 Address"
+			"label": "INA219 адрес"
 		},
 		"lightSleepDuration": {
 			"description": "How long the device will be in light sleep for",
@@ -353,7 +353,7 @@
 		},
 		"noConnectionBluetoothDisabled": {
 			"description": "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
-			"label": "No Connection Bluetooth Disabled"
+			"label": "Няма връзка Bluetooth е дезактивиран"
 		},
 		"powerSavingEnabled": {
 			"description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
@@ -390,10 +390,10 @@
 		},
 		"managed": {
 			"description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
-			"label": "Managed"
+			"label": "Управляван"
 		},
 		"privateKey": {
-			"description": "Used to create a shared key with a remote device",
+			"description": "Използва се за създаване на споделен ключ с отдалечено устройство",
 			"label": "Частен ключ"
 		},
 		"publicKey": {
@@ -418,7 +418,7 @@
 		},
 		"adminSettings": {
 			"description": "Настройки за Admin",
-			"label": "Admin Settings"
+			"label": "Администраторски настройки"
 		},
 		"loggingSettings": {
 			"description": "Settings for Logging",
