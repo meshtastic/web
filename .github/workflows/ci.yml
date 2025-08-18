@@ -15,16 +15,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
+          cache: pnpm
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -59,7 +61,7 @@ jobs:
 
             if [[ -f "$pkg_dir/package.json" ]] && [[ "$pkg_dir" != "packages/web" ]]; then
               echo "🔧 Building with pnpm: $pkg_dir"
-              (cd "$pkg_dir" && pnpm install && pnpm run build:npm)
+              (cd "$pkg_dir" && pnpm install --frozen-lockfile && pnpm run build:npm)
             else
               echo "⚠️ Skipping $pkg_dir (web package or no package.json)"
             fi
