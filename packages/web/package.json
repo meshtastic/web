@@ -22,6 +22,7 @@
 		"test": "vitest",
 		"ts:check": "bun run tsc --noEmit",
 		"preview": "vite preview",
+		"docker:build": "docker build -t meshtastic-web:latest -f ./infra/Containerfile .",
 		"generate:routes": "bun @tanstack/router-cli generate --outDir src/ routes --rootRoutePath /",
 		"package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
 	},
