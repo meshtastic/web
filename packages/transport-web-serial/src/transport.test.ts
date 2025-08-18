@@ -40,8 +40,6 @@ function stubCoreTransforms() {
   };
 }
 
-type SerialDisconnectHandler = (ev: { port?: any }) => void;
-
 function stubNavigatorSerial() {
   type SerialDisconnectHandler = (ev: { port?: any }) => void;
   const handlers = new Set<SerialDisconnectHandler>();

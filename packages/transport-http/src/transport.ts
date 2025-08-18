@@ -2,6 +2,7 @@ import { Types } from "@meshtastic/core";
 
 const FETCH_INTERVAL_MS = 3000;
 const READ_TIMEOUT_MS = 7000;
+const READ_TIMEOUT_BUFFER_MS = 250;
 const WRITE_TIMEOUT_MS = 4000;
 
 function toArrayBuffer(uint8array: Uint8Array): ArrayBuffer {
@@ -134,7 +135,8 @@ export class TransportHTTP implements Types.Transport {
       if (this.fetching) {
         if (
           this._inflightReadController &&
-          Date.now() - this._inflightReadStartedAt > READ_TIMEOUT_MS + 250
+          Date.now() - this._inflightReadStartedAt >
+            READ_TIMEOUT_MS + READ_TIMEOUT_BUFFER_MS
         ) {
           try {
             this._inflightReadController.abort();

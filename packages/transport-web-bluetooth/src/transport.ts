@@ -223,8 +223,9 @@ export class TransportWebBluetooth implements Types.Transport {
           data: new Uint8Array(value.buffer),
         });
       }
-    } catch {
+    } catch (error) {
       this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "read-error");
+      throw error;
     }
   }
 
