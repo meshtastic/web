@@ -76,8 +76,9 @@
 			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
 		"validation": {
-			"requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
-			"requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
+			"requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
+			"requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
+	  		"requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
 			"additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
 		}
 	},

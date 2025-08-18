@@ -1,5 +1,5 @@
 {
-	"name": "meshtastic-web",
+	"name": "@meshtastic/web",
 	"version": "2.7.0-0",
 	"type": "module",
 	"description": "Meshtastic web client monorepo",
@@ -25,7 +25,7 @@
 		"check:fix": "biome check --write",
 		"build:all": "pnpm run --filter '*' build",
 		"clean:all": "pnpm run --filter '*' clean",
-		"publish:packages": "pnpm run --filter 'packages/transport-* packages/core' build",
+		"publish:packages": "pnpm run build --filter 'packages/transport-*'",
 		"test": "vitest"
 	},
 	"dependencies": {
@@ -41,5 +41,13 @@
 		"typescript": "^5.8.3",
 		"vitest": "^3.2.4",
 		"@meshtastic/core": "workspace:*"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@tailwindcss/oxide",
+			"core-js",
+			"esbuild",
+			"simple-git-hooks"
+		]
 	}
 }

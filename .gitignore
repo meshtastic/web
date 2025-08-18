@@ -8,3 +8,4 @@ __screenshots__*
 *.diff
 npm/
 .idea
+**/LICENSE
