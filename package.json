@@ -39,8 +39,7 @@
 		"biome": "^0.3.3",
 		"tsdown": "^0.13.4",
 		"typescript": "^5.8.3",
-		"vitest": "^3.2.4",
-		"@meshtastic/core": "workspace:*"
+		"vitest": "^3.2.4"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
