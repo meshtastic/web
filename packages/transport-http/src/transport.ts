@@ -2,7 +2,6 @@ import { Types } from "@meshtastic/core";
 
 const FETCH_INTERVAL_MS = 3000;
 const READ_TIMEOUT_MS = 7000;
-const READ_TIMEOUT_BUFFER_MS = 250;
 const WRITE_TIMEOUT_MS = 4000;
 
 function toArrayBuffer(uint8array: Uint8Array): ArrayBuffer {
@@ -14,38 +13,6 @@ function toArrayBuffer(uint8array: Uint8Array): ArrayBuffer {
     return uint8array.buffer;
   }
   return uint8array.slice().buffer;
-}
-
-function createTimeoutController(ms: number): {
-  controller: AbortController;
-  clear: () => void;
-} {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), ms);
-  const clear = () => clearTimeout(id);
-  return { controller, clear };
-}
-
-function composeAbortSignals(
-  a: AbortSignal,
-  b: AbortSignal,
-): { signal: AbortSignal; cleanup: () => void } {
-  const controller = new AbortController();
-  const abortIfNeeded = () => controller.abort();
-
-  if (a.aborted || b.aborted) {
-    controller.abort();
-  }
-
-  a.addEventListener("abort", abortIfNeeded);
-  b.addEventListener("abort", abortIfNeeded);
-
-  const cleanup = () => {
-    a.removeEventListener("abort", abortIfNeeded);
-    b.removeEventListener("abort", abortIfNeeded);
-  };
-
-  return { signal: controller.signal, cleanup };
 }
 
 /**
@@ -108,7 +75,8 @@ export class TransportHTTP implements Types.Transport {
           if (!this._closingByUser) {
             this.emitStatus(
               Types.DeviceStatusEnum.DeviceDisconnected,
-              error instanceof DOMException && error.name === "AbortError"
+              error instanceof DOMException &&
+                (error.name === "AbortError" || error.name === "TimeoutError")
                 ? "write-timeout"
                 : "write-error",
             );
@@ -133,15 +101,6 @@ export class TransportHTTP implements Types.Transport {
 
     this.interval = setInterval(async () => {
       if (this.fetching) {
-        if (
-          this._inflightReadController &&
-          Date.now() - this._inflightReadStartedAt >
-            READ_TIMEOUT_MS + READ_TIMEOUT_BUFFER_MS
-        ) {
-          try {
-            this._inflightReadController.abort();
-          } catch {}
-        }
         return;
       }
 
@@ -152,7 +111,8 @@ export class TransportHTTP implements Types.Transport {
         if (!this._closingByUser) {
           this.emitStatus(
             Types.DeviceStatusEnum.DeviceDisconnected,
-            error instanceof DOMException && error.name === "AbortError"
+            error instanceof DOMException &&
+              (error.name === "AbortError" || error.name === "TimeoutError")
               ? "read-timeout"
               : "read-error",
           );
@@ -172,13 +132,10 @@ export class TransportHTTP implements Types.Transport {
       this._inflightReadController = inflight;
       this._inflightReadStartedAt = Date.now();
 
-      const { controller: timeoutCtrl, clear } =
-        createTimeoutController(READ_TIMEOUT_MS);
-
-      const { signal, cleanup } = composeAbortSignals(
+      const signal = AbortSignal.any([
         inflight.signal,
-        timeoutCtrl.signal,
-      );
+        AbortSignal.timeout(READ_TIMEOUT_MS),
+      ]);
 
       try {
         const response = await fetch(
@@ -208,8 +165,6 @@ export class TransportHTTP implements Types.Transport {
           });
         }
       } finally {
-        cleanup();
-        clear();
         this._inflightReadController = undefined;
       }
     }
@@ -217,15 +172,12 @@ export class TransportHTTP implements Types.Transport {
 
   /** Write a protobuf-encoded request to `/api/v1/toradio`. */
   private async writeToRadio(data: Uint8Array): Promise<void> {
-    const { controller: timeoutCtrl, clear } =
-      createTimeoutController(WRITE_TIMEOUT_MS);
-
     try {
       const response = await fetch(`${this.url}/api/v1/toradio`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-protobuf" },
         body: toArrayBuffer(data),
-        signal: timeoutCtrl.signal,
+        signal: AbortSignal.timeout(WRITE_TIMEOUT_MS),
       });
       if (!response.ok) {
         throw new Error(`toradio ${response.status} ${response.statusText}`);
@@ -234,14 +186,13 @@ export class TransportHTTP implements Types.Transport {
       if (!this._closingByUser) {
         this.emitStatus(
           Types.DeviceStatusEnum.DeviceDisconnected,
-          error instanceof DOMException && error.name === "AbortError"
+          error instanceof DOMException &&
+            (error.name === "AbortError" || error.name === "TimeoutError")
             ? "write-timeout"
             : "write-error",
         );
       }
       throw error;
-    } finally {
-      clear();
     }
   }
 

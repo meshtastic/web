@@ -1,6 +1,25 @@
-import { describe, vi, expect, it, beforeEach, afterEach } from "vitest";
+import { describe, vi, expect, it, beforeEach, afterEach, type MockInstance } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract";
 import { TransportHTTP } from "./transport";
+
+let abortTimeoutSpy: MockInstance | undefined;
+beforeEach(() => {
+  abortTimeoutSpy = vi.spyOn(
+      globalThis.AbortSignal as unknown as { timeout(ms: number): AbortSignal },
+      "timeout",
+    ).mockImplementation((ms: number) => {
+      const ctrl = new AbortController();
+      const abort = () =>
+        ctrl.abort(new DOMException("Timeout reached", "TimeoutError"));
+      // Uses setTimeout so vi.useFakeTimers() can fast-forward it
+      setTimeout(abort, ms);
+      return ctrl.signal;
+    });
+});
+
+afterEach(() => {
+  abortTimeoutSpy?.mockRestore();
+});
 
 function stubFetch() {
   const inbox: Uint8Array[] = [];

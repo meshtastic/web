@@ -94,13 +94,18 @@ export class TransportNode implements Types.Transport {
               ctrl.enqueue(value);
             }
           }
-        } catch {
+          ctrl.close();
+        } catch (error) {
           if (!this._closingByUser) {
             this.emitStatus(
               Types.DeviceStatusEnum.DeviceDisconnected,
               "read-error",
             );
           }
+          ctrl.error(error instanceof Error ? error : new Error(String(error)));
+          try {
+            await transformed.cancel();
+          } catch {}
         } finally {
           reader.releaseLock();
         }
