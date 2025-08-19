@@ -81,6 +81,10 @@ jobs:
         working-directory: packages/web
         run: pnpm run build
 
+      - name: Build web package
+        working-directory: packages/web
+        run: pnpm run build
+
       - name: Create Web App Release Archive
         working-directory: packages/web
         run: pnpm run package
