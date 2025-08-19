@@ -1,14 +1,14 @@
 {
 	"page": {
 		"title": "Съобщения: {{chatName}}",
-		"placeholder": "Enter Message"
+		"placeholder": "Въведете съобщение"
 	},
 	"emptyState": {
 		"title": "Изберете чат",
 		"text": "Все още няма съобщения."
 	},
 	"selectChatPrompt": {
-		"text": "Select a channel or node to start messaging."
+		"text": "Изберете канал или възел, за да стартирате съобщения."
 	},
 	"sendMessage": {
 		"placeholder": "Въведете Вашето съобщение тук...",
@@ -24,16 +24,16 @@
 			"displayText": "Съобщението е доставено"
 		},
 		"failed": {
-			"label": "Message delivery failed",
-			"displayText": "Delivery failed"
+			"label": "Доставката на съобщението не е успешна",
+			"displayText": "Неуспешна доставка"
 		},
 		"unknown": {
 			"label": "Статусът на съобщението е неизвестен",
 			"displayText": "Неизвестно състояние"
 		},
 		"waiting": {
-			"label": "Sending message",
-			"displayText": "Waiting for delivery"
+			"label": "Изпращане на съобщение",
+			"displayText": "Чака доставка"
 		}
 	}
 }

@@ -25,7 +25,7 @@
 		"save": "Запис",
 		"scanQr": "Сканиране на QR кода",
 		"traceRoute": "Trace Route",
-		"submit": "Submit"
+		"submit": "Изпращане"
 	},
 	"app": {
 		"title": "Meshtastic",

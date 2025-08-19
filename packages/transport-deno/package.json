@@ -8,7 +8,6 @@
 	"main": "./dist/mod.mjs",       
   "module": "./dist/mod.mjs",     
   "types": "./dist/mod.d.mts",    
-  "files": ["dist/*", "mod.ts", "README.md", "../../LICENSE"],
   "license": "GPL-3.0-only",
   "tsdown": {
     "entry": "mod.ts",
@@ -17,6 +16,12 @@
     "splitting": false,
     "clean": true
   },
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepack": "cp ../../LICENSE ./LICENSE",
