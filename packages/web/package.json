@@ -1,6 +1,6 @@
 {
 	"name": "meshtastic-web",
-	"version": "2.7.0-0",
+	"version": "2.6.6-0",
 	"type": "module",
 	"description": "Meshtastic web client",
 	"license": "GPL-3.0-only",
@@ -86,7 +86,6 @@
 		"zustand": "5.0.6"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.0.6",
 		"@tanstack/router-plugin": "^1.127.9",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/react": "^16.3.0",

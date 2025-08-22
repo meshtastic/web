@@ -14,7 +14,10 @@ export class TransportNodeSerial implements Types.Transport {
    * @param baudRate - The port number for the TCP connection (defaults to 4403).
    * @returns A promise that resolves with a connected TransportNode instance.
    */
-  public static create(path: string, baudRate = 115200): Promise<TransportNodeSerial> {
+  public static create(
+    path: string,
+    baudRate = 115200,
+  ): Promise<TransportNodeSerial> {
     return new Promise((resolve, reject) => {
       const port = new SerialPort({
         path,
@@ -45,9 +48,7 @@ export class TransportNodeSerial implements Types.Transport {
       console.error("Serial port connection error:", err);
     });
 
-    const fromDeviceSource = Readable.toWeb(
-      port,
-    ) as ReadableStream<Uint8Array>;
+    const fromDeviceSource = Readable.toWeb(port) as ReadableStream<Uint8Array>;
     this._fromDevice = fromDeviceSource.pipeThrough(Utils.fromDeviceStream());
 
     // Stream for data going FROM the application TO the Meshtastic device.
