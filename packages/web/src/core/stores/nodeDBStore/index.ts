@@ -1,13 +1,13 @@
 import { create } from "@bufbuild/protobuf";
+import { featureFlags } from "@core/services/featureFlags";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
-import { create as createStore } from "zustand";
-import { persist } from "zustand/middleware";
+import { create as createStore, type StateCreator } from "zustand";
+import { type PersistOptions, persist } from "zustand/middleware";
 import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types";
 
 const CURRENT_STORE_VERSION = 0;
-
 const NODEDB_RETENTION_NUM = 10;
 
 export interface NodeDB {
@@ -334,95 +334,107 @@ function nodeDBFactory(
   };
 }
 
-export const useNodeDBStore = createStore<PrivateNodeDBState>()(
-  persist(
-    (set, get) => ({
-      nodeDBs: new Map(),
+export const nodeDBInitializer: StateCreator<PrivateNodeDBState> = (
+  set,
+  get,
+) => ({
+  nodeDBs: new Map(),
 
-      addNodeDB: (id) => {
-        const existing = get().nodeDBs.get(id);
-        if (existing) {
-          return existing;
+  addNodeDB: (id) => {
+    const existing = get().nodeDBs.get(id);
+    if (existing) {
+      return existing;
+    }
+
+    const nodeDB = nodeDBFactory(id, get, set);
+    set(
+      produce<PrivateNodeDBState>((draft) => {
+        draft.nodeDBs.set(id, nodeDB);
+
+        // If over limit, remove oldest inserted. FIFO
+        if (draft.nodeDBs.size > NODEDB_RETENTION_NUM) {
+          const firstKey = draft.nodeDBs.keys().next().value;
+          if (firstKey !== undefined) {
+            draft.nodeDBs.delete(firstKey);
+          }
         }
-
-        const nodeDB = nodeDBFactory(id, get, set);
-        set(
-          produce<PrivateNodeDBState>((draft) => {
-            draft.nodeDBs.set(id, nodeDB);
-
-            // If over limit, remove oldest inserted. FIFO
-            if (draft.nodeDBs.size > NODEDB_RETENTION_NUM) {
-              const firstKey = draft.nodeDBs.keys().next().value;
-              if (firstKey !== undefined) {
-                draft.nodeDBs.delete(firstKey);
-              }
-            }
-          }),
-        );
-
-        return nodeDB;
-      },
-      removeNodeDB: (id) => {
-        set(
-          produce<PrivateNodeDBState>((draft) => {
-            draft.nodeDBs.delete(id);
-          }),
-        );
-      },
-      getNodeDBs: () => Array.from(get().nodeDBs.values()),
-      getNodeDB: (id) => get().nodeDBs.get(id),
-    }),
-    {
-      name: "meshtastic-nodedb-store",
-      storage: createStorage<NodeDBPersisted>(),
-      version: CURRENT_STORE_VERSION,
-      partialize: (s): NodeDBPersisted => ({
-        nodeDBs: new Map(
-          Array.from(s.nodeDBs.entries()).map(([id, db]) => [
-            id,
-            {
-              id: db.id,
-              myNodeNum: db.myNodeNum,
-              nodeMap: db.nodeMap,
-              nodeErrors: db.nodeErrors,
-            },
-          ]),
-        ),
       }),
-      onRehydrateStorage: () => (state) => {
-        if (!state) {
-          return;
-        }
-        console.debug(
-          "NodeDBStore: Rehydrating state with ",
-          state.nodeDBs.size,
-          " nodeDBs -",
-          state.nodeDBs,
-        );
+    );
 
-        useNodeDBStore.setState(
-          produce<PrivateNodeDBState>((draft) => {
-            const rebuilt = new Map<number, NodeDB>();
-            for (const [id, data] of (
-              draft.nodeDBs as unknown as Map<number, NodeDBData>
-            ).entries()) {
-              if (data.myNodeNum !== undefined) {
-                // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
-                rebuilt.set(
-                  id,
-                  nodeDBFactory(
-                    id,
-                    useNodeDBStore.getState,
-                    useNodeDBStore.setState,
-                    data,
-                  ),
-                );
-              }
-            }
-            draft.nodeDBs = rebuilt;
-          }),
-        );
-      },
-    },
-  ),
+    return nodeDB;
+  },
+  removeNodeDB: (id) => {
+    set(
+      produce<PrivateNodeDBState>((draft) => {
+        draft.nodeDBs.delete(id);
+      }),
+    );
+  },
+  getNodeDBs: () => Array.from(get().nodeDBs.values()),
+  getNodeDB: (id) => get().nodeDBs.get(id),
+});
+
+const persistOptions: PersistOptions<PrivateNodeDBState, NodeDBPersisted> = {
+  name: "meshtastic-nodedb-store",
+  storage: createStorage<NodeDBPersisted>(),
+  version: CURRENT_STORE_VERSION,
+  partialize: (s): NodeDBPersisted => ({
+    nodeDBs: new Map(
+      Array.from(s.nodeDBs.entries()).map(([id, db]) => [
+        id,
+        {
+          id: db.id,
+          myNodeNum: db.myNodeNum,
+          nodeMap: db.nodeMap,
+          nodeErrors: db.nodeErrors,
+        },
+      ]),
+    ),
+  }),
+  onRehydrateStorage: () => (state) => {
+    if (!state) {
+      return;
+    }
+    console.debug(
+      "NodeDBStore: Rehydrating state with ",
+      state.nodeDBs.size,
+      " nodeDBs -",
+      state.nodeDBs,
+    );
+
+    useNodeDBStore.setState(
+      produce<PrivateNodeDBState>((draft) => {
+        const rebuilt = new Map<number, NodeDB>();
+        for (const [id, data] of (
+          draft.nodeDBs as unknown as Map<number, NodeDBData>
+        ).entries()) {
+          if (data.myNodeNum !== undefined) {
+            // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
+            rebuilt.set(
+              id,
+              nodeDBFactory(
+                id,
+                useNodeDBStore.getState,
+                useNodeDBStore.setState,
+                data,
+              ),
+            );
+          }
+        }
+        draft.nodeDBs = rebuilt;
+      }),
+    );
+  },
+};
+
+// Add persist middleware on the store if the feature flag is enabled
+const persistNodes = featureFlags.get("persistNodeDB");
+console.debug(
+  `NodeDBStore: Persisting nodes is ${persistNodes ? "enabled" : "disabled"}`,
 );
+
+export const useNodeDBStore = persistNodes
+  ? createStore<PrivateNodeDBState, [["zustand/persist", NodeDBPersisted]]>(
+      persist(nodeDBInitializer, persistOptions),
+    )
+  : createStore<PrivateNodeDBState>()(nodeDBInitializer);

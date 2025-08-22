@@ -12,8 +12,6 @@ import { Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { ErrorBoundary } from "react-error-boundary";
 import { MapProvider } from "react-map-gl/maplibre";
-// Import feature flags and dev overrides
-import "@core/services/dev-overrides.ts";
 
 export function App() {
   const { getDevice } = useDeviceStore();
