@@ -193,7 +193,7 @@ export const CommandPalette = () => {
           label: t("contextual.command.dfuMode"),
           icon: HardDriveUpload,
           action() {
-            connection?.enterDfuMode()
+            connection?.enterDfuMode();
           },
         },
         {
