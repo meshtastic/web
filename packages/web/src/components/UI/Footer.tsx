@@ -1,4 +1,5 @@
 import { cn } from "@core/utils/cn.ts";
+import React from "react";
 import { Trans } from "react-i18next";
 
 type FooterProps = {
@@ -6,6 +7,18 @@ type FooterProps = {
 };
 
 const Footer = ({ className, ...props }: FooterProps) => {
+  const version = React.useMemo(
+    () => String(import.meta.env.VITE_VERSION)?.toUpperCase() || "",
+    [],
+  );
+  const commitHash = React.useMemo(
+    () =>
+      String(import.meta.env.VITE_COMMIT_HASH)
+        ?.toUpperCase()
+        .slice(0, 7) || "unk",
+    [],
+  );
+
   return (
     <footer
       className={cn(
@@ -16,13 +29,13 @@ const Footer = ({ className, ...props }: FooterProps) => {
     >
       <div className="px-2">
         <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
-          {String(import.meta.env.VITE_VERSION)?.toUpperCase()}
+          {version}
         </span>
         <span className="font-semibold text-gray-500/40 dark:text-gray-400/40 mx-2">
           -
         </span>
         <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
-          {`#${String(import.meta.env.VITE_COMMIT_HASH)?.toUpperCase()}`}
+          {`#${commitHash}`}
         </span>
       </div>
       <p className="ml-auto mr-auto text-gray-500 dark:text-gray-400">
