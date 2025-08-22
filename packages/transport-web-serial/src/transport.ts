@@ -10,18 +10,18 @@ import { Types, Utils } from "@meshtastic/core";
 export class TransportWebSerial implements Types.Transport {
   private _toDevice: WritableStream<Uint8Array>;
   private _fromDevice: ReadableStream<Types.DeviceOutput>;
-  private _fromDeviceController?: ReadableStreamDefaultController<Types.DeviceOutput>;
-
+  private fromDeviceController?: ReadableStreamDefaultController<Types.DeviceOutput>;
   private connection: SerialPort;
-  private _portReadable: ReadableStream<Uint8Array>;
-  private _portWritable: WritableStream<Uint8Array>;
+  private pipePromise: Promise<void> | null = null;
+  private abortController: AbortController;
+  private portReadable: ReadableStream<Uint8Array>;
 
-  private _lastStatus: Types.DeviceStatusEnum =
+  private lastStatus: Types.DeviceStatusEnum =
     Types.DeviceStatusEnum.DeviceDisconnected;
-  private _closingByUser = false;
+  private closingByUser = false;
 
   /**
-   * Prompts the user to select a serial port, opens it, and returns a transport.
+   * Create a new TransportWebSerial instance using a serial port.
    */
   public static async create(baudRate?: number): Promise<TransportWebSerial> {
     const port = await navigator.serial.requestPort();
@@ -30,13 +30,16 @@ export class TransportWebSerial implements Types.Transport {
   }
 
   /**
-   * Creates a transport from an existing, user-provided {@link SerialPort}.
+   * Creates a new TransportWebSerial instance from an existing, provided {@link SerialPort}.
+   * Opens it if not already open.
    */
   public static async createFromPort(
     port: SerialPort,
     baudRate?: number,
   ): Promise<TransportWebSerial> {
-    await port.open({ baudRate: baudRate || 115200 });
+    if (!port.readable || !port.writable) {
+      await port.open({ baudRate: baudRate || 115200 });
+    }
     return new TransportWebSerial(port);
   }
 
@@ -45,26 +48,41 @@ export class TransportWebSerial implements Types.Transport {
    * @throws If the port lacks readable or writable streams.
    */
   constructor(connection: SerialPort) {
-    const readable = connection.readable;
-    const writable = connection.writable;
-    if (!readable || !writable) {
+    if (!connection.readable || !connection.writable) {
       throw new Error("Stream not accessible");
     }
 
     this.connection = connection;
-    this._portReadable = readable;
-    this._portWritable = writable;
+    this.portReadable = connection.readable;
+    this.abortController = new AbortController();
+    const abortController = this.abortController;
 
-    Utils.toDeviceStream.readable.pipeTo(this._portWritable);
+    // Set up the pipe with abort signal for clean cancellation
+    this.pipePromise = Utils.toDeviceStream.readable
+      .pipeTo(connection.writable, { signal: this.abortController.signal })
+      .catch((err) => {
+        // Ignore expected rejection when we cancel it via the AbortController.
+        if (abortController.signal.aborted) {
+          return;
+        }
+        console.error("Error piping data to serial port:", err);
+        this.connection.close().catch(() => {});
+        this.emitStatus(
+          Types.DeviceStatusEnum.DeviceDisconnected,
+          "write-error",
+        );
+      });
+
     this._toDevice = Utils.toDeviceStream.writable;
 
+    // Wrap + capture controller to inject status packets
     this._fromDevice = new ReadableStream<Types.DeviceOutput>({
       start: async (ctrl) => {
-        this._fromDeviceController = ctrl;
+        this.fromDeviceController = ctrl;
 
         this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting);
 
-        const transformed = this._portReadable.pipeThrough(
+        const transformed = this.portReadable.pipeThrough(
           Utils.fromDeviceStream(),
         );
         const reader = transformed.getReader();
@@ -72,9 +90,6 @@ export class TransportWebSerial implements Types.Transport {
         const onOsDisconnect = (ev: Event) => {
           const { port } = ev as unknown as { port?: SerialPort };
           if (port && port === this.connection) {
-            if (this._closingByUser) {
-              return;
-            }
             this.emitStatus(
               Types.DeviceStatusEnum.DeviceDisconnected,
               "serial-disconnected",
@@ -91,15 +106,20 @@ export class TransportWebSerial implements Types.Transport {
             if (done) {
               break;
             }
-            if (value) {
-              ctrl.enqueue(value);
-            }
+            ctrl.enqueue(value);
           }
-        } catch {
-          this.emitStatus(
-            Types.DeviceStatusEnum.DeviceDisconnected,
-            "read-error",
-          );
+          ctrl.close();
+        } catch (error) {
+          if (!this.closingByUser) {
+            this.emitStatus(
+              Types.DeviceStatusEnum.DeviceDisconnected,
+              "read-error",
+            );
+          }
+          ctrl.error(error instanceof Error ? error : new Error(String(error)));
+          try {
+            await transformed.cancel();
+          } catch {}
         } finally {
           reader.releaseLock();
           navigator.serial.removeEventListener("disconnect", onOsDisconnect);
@@ -109,25 +129,21 @@ export class TransportWebSerial implements Types.Transport {
   }
 
   /** Writable stream of bytes to the device. */
-  get toDevice(): WritableStream<Uint8Array> {
+  public get toDevice(): WritableStream<Uint8Array> {
     return this._toDevice;
   }
 
   /** Readable stream of {@link Types.DeviceOutput} from the device. */
-  get fromDevice(): ReadableStream<Types.DeviceOutput> {
+  public get fromDevice(): ReadableStream<Types.DeviceOutput> {
     return this._fromDevice;
   }
 
-  private enqueue(output: Types.DeviceOutput): void {
-    this._fromDeviceController?.enqueue(output);
-  }
-
   private emitStatus(next: Types.DeviceStatusEnum, reason?: string): void {
-    if (next === this._lastStatus) {
+    if (next === this.lastStatus) {
       return;
     }
-    this._lastStatus = next;
-    this._fromDeviceController?.enqueue({
+    this.lastStatus = next;
+    this.fromDeviceController?.enqueue({
       type: "status",
       data: { status: next, reason },
     });
@@ -136,13 +152,76 @@ export class TransportWebSerial implements Types.Transport {
   /**
    * Closes the serial port and emits `DeviceDisconnected("user")`.
    */
-  async disconnect(): Promise<void> {
+  public async disconnect(): Promise<void> {
     try {
-      this._closingByUser = true;
+      this.closingByUser = true;
+
+      // Stop outbound piping
+      this.abortController.abort();
+      if (this.pipePromise) {
+        await this.pipePromise;
+      }
+
+      // Cancel any remaining streams
+      if (this._fromDevice && !this._fromDevice.locked) {
+        try {
+          await this._fromDevice.cancel();
+        } catch {
+          // Stream cancellation might fail if already cancelled
+        }
+      }
+
       await this.connection.close();
+    } catch (error) {
+      // If we can't close cleanly, let the browser handle cleanup
+      console.warn("Could not cleanly disconnect serial port:", error);
     } finally {
       this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "user");
-      this._closingByUser = false;
+      this.closingByUser = false;
+    }
+  }
+
+  /**
+   * Reconnects the transport by creating a new AbortController and re-establishing
+   * the pipe connection. Only call this after disconnect() or if the connection failed.
+   */
+  public async reconnect() {
+    this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting, "reconnect");
+
+    try {
+      if (!this.connection.readable || !this.connection.writable) {
+        throw new Error("Stream not accessible");
+      }
+      this.portReadable = this.connection.readable;
+
+      // Create a new AbortController for the new connection
+      this.abortController = new AbortController();
+      const abortController = this.abortController;
+
+      // Re-establish the pipe connection
+      this.pipePromise = Utils.toDeviceStream.readable
+        .pipeTo(this.connection.writable, {
+          signal: this.abortController.signal,
+        })
+        .catch((error) => {
+          if (abortController.signal.aborted) {
+            return;
+          }
+          console.error("Error piping data to serial port (reconnect):", error);
+          this.emitStatus(
+            Types.DeviceStatusEnum.DeviceDisconnected,
+            "write-error",
+          );
+        });
+
+      this.emitStatus(Types.DeviceStatusEnum.DeviceConnected, "reconnected");
+    } catch (error) {
+      // Couldn’t re-pipe
+      this.emitStatus(
+        Types.DeviceStatusEnum.DeviceDisconnected,
+        "reconnect-failed",
+      );
+      throw error;
     }
   }
 }

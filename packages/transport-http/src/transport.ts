@@ -24,7 +24,7 @@ function toArrayBuffer(uint8array: Uint8Array): ArrayBuffer {
 export class TransportHTTP implements Types.Transport {
   private _toDevice: WritableStream<Uint8Array>;
   private _fromDevice: ReadableStream<Types.DeviceOutput>;
-  private _fromDeviceController?: ReadableStreamDefaultController<Types.DeviceOutput>;
+  private fromDeviceController?: ReadableStreamDefaultController<Types.DeviceOutput>;
 
   private url: string;
   private receiveBatchRequests: boolean;
@@ -32,12 +32,11 @@ export class TransportHTTP implements Types.Transport {
   private fetching: boolean;
   private interval: ReturnType<typeof setInterval> | undefined;
 
-  private _inflightReadController?: AbortController;
-  private _inflightReadStartedAt = 0;
+  private inflightReadController?: AbortController;
 
-  private _lastStatus: Types.DeviceStatusEnum =
+  private lastStatus: Types.DeviceStatusEnum =
     Types.DeviceStatusEnum.DeviceDisconnected;
-  private _closingByUser = false;
+  private closingByUser = false;
 
   /**
    * Probe the device and return a connected HTTP transport.
@@ -72,13 +71,10 @@ export class TransportHTTP implements Types.Transport {
         try {
           await this.writeToRadio(chunk);
         } catch (error) {
-          if (!this._closingByUser) {
+          if (!this.closingByUser) {
             this.emitStatus(
               Types.DeviceStatusEnum.DeviceDisconnected,
-              error instanceof DOMException &&
-                (error.name === "AbortError" || error.name === "TimeoutError")
-                ? "write-timeout"
-                : "write-error",
+              this.isTimeoutOrAbort(error) ? "write-timeout" : "write-error",
             );
           }
           throw error;
@@ -88,8 +84,15 @@ export class TransportHTTP implements Types.Transport {
 
     this._fromDevice = new ReadableStream<Types.DeviceOutput>({
       start: (ctrl) => {
-        this._fromDeviceController = ctrl;
+        this.fromDeviceController = ctrl;
         this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting);
+
+        // Start polling immediately
+        void this.safePoll();
+        this.interval = setInterval(
+          () => void this.safePoll(),
+          this.fetchInterval,
+        );
       },
       cancel: () => {
         if (this.interval) {
@@ -98,29 +101,6 @@ export class TransportHTTP implements Types.Transport {
         this.interval = undefined;
       },
     });
-
-    this.interval = setInterval(async () => {
-      if (this.fetching) {
-        return;
-      }
-
-      this.fetching = true;
-      try {
-        await this.readFromRadio();
-      } catch (error) {
-        if (!this._closingByUser) {
-          this.emitStatus(
-            Types.DeviceStatusEnum.DeviceDisconnected,
-            error instanceof DOMException &&
-              (error.name === "AbortError" || error.name === "TimeoutError")
-              ? "read-timeout"
-              : "read-error",
-          );
-        }
-      } finally {
-        this.fetching = false;
-      }
-    }, this.fetchInterval);
   }
 
   /** Poll `/api/v1/fromradio` and enqueue incoming packets. */
@@ -129,8 +109,7 @@ export class TransportHTTP implements Types.Transport {
 
     while (readBuffer.byteLength > 0) {
       const inflight = new AbortController();
-      this._inflightReadController = inflight;
-      this._inflightReadStartedAt = Date.now();
+      this.inflightReadController = inflight;
 
       const signal = AbortSignal.any([
         inflight.signal,
@@ -152,20 +131,18 @@ export class TransportHTTP implements Types.Transport {
           );
         }
 
-        if (this._lastStatus === Types.DeviceStatusEnum.DeviceDisconnected) {
-          this.emitStatus(Types.DeviceStatusEnum.DeviceConnected);
-        }
+        this.emitStatus(Types.DeviceStatusEnum.DeviceConnected);
 
         readBuffer = await response.arrayBuffer();
 
         if (readBuffer.byteLength > 0) {
-          this._fromDeviceController?.enqueue({
+          this.fromDeviceController?.enqueue({
             type: "packet",
             data: new Uint8Array(readBuffer),
           });
         }
       } finally {
-        this._inflightReadController = undefined;
+        this.inflightReadController = undefined;
       }
     }
   }
@@ -183,13 +160,10 @@ export class TransportHTTP implements Types.Transport {
         throw new Error(`toradio ${response.status} ${response.statusText}`);
       }
     } catch (error) {
-      if (!this._closingByUser) {
+      if (!this.closingByUser) {
         this.emitStatus(
           Types.DeviceStatusEnum.DeviceDisconnected,
-          error instanceof DOMException &&
-            (error.name === "AbortError" || error.name === "TimeoutError")
-            ? "write-timeout"
-            : "write-error",
+          this.isTimeoutOrAbort(error) ? "write-timeout" : "write-error",
         );
       }
       throw error;
@@ -210,7 +184,7 @@ export class TransportHTTP implements Types.Transport {
    * Stop polling and emit `DeviceDisconnected("user")`.
    */
   disconnect(): Promise<void> {
-    this._closingByUser = true;
+    this.closingByUser = true;
 
     if (this.interval) {
       clearInterval(this.interval);
@@ -219,9 +193,9 @@ export class TransportHTTP implements Types.Transport {
     this.fetching = false;
 
     try {
-      this._inflightReadController?.abort();
+      this.inflightReadController?.abort();
     } catch {}
-    this._inflightReadController = undefined;
+    this.inflightReadController = undefined;
 
     this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "user");
 
@@ -229,13 +203,41 @@ export class TransportHTTP implements Types.Transport {
   }
 
   private emitStatus(next: Types.DeviceStatusEnum, reason?: string): void {
-    if (next === this._lastStatus) {
+    if (next === this.lastStatus) {
       return;
     }
-    this._lastStatus = next;
-    this._fromDeviceController?.enqueue({
+    this.lastStatus = next;
+    this.fromDeviceController?.enqueue({
       type: "status",
       data: { status: next, reason },
     });
+  }
+
+  private isTimeoutOrAbort(err: unknown): boolean {
+    return (
+      (err instanceof DOMException &&
+        (err.name === "AbortError" || err.name === "TimeoutError")) ||
+      (err instanceof Error &&
+        (err.name === "AbortError" || err.name === "TimeoutError"))
+    );
+  }
+
+  private async safePoll(): Promise<void> {
+    if (this.fetching) {
+      return;
+    }
+    this.fetching = true;
+    try {
+      await this.readFromRadio();
+    } catch (error) {
+      if (!this.closingByUser) {
+        this.emitStatus(
+          Types.DeviceStatusEnum.DeviceDisconnected,
+          this.isTimeoutOrAbort(error) ? "read-timeout" : "read-error",
+        );
+      }
+    } finally {
+      this.fetching = false;
+    }
   }
 }

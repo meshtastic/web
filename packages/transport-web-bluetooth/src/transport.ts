@@ -21,19 +21,18 @@ function toArrayBuffer(uint8array: Uint8Array): ArrayBuffer {
 export class TransportWebBluetooth implements Types.Transport {
   private _toDevice: WritableStream<Uint8Array>;
   private _fromDevice: ReadableStream<Types.DeviceOutput>;
-  private _fromDeviceController?: ReadableStreamDefaultController<Types.DeviceOutput>;
-  private _isFirstWrite = true;
+  private fromDeviceController?: ReadableStreamDefaultController<Types.DeviceOutput>;
 
   private toRadioCharacteristic: BluetoothRemoteGATTCharacteristic;
   private fromRadioCharacteristic: BluetoothRemoteGATTCharacteristic;
   private fromNumCharacteristic: BluetoothRemoteGATTCharacteristic;
   private gattServer: BluetoothRemoteGATTServer;
 
-  private _lastStatus: Types.DeviceStatusEnum =
+  private lastStatus: Types.DeviceStatusEnum =
     Types.DeviceStatusEnum.DeviceDisconnected;
 
-  private _closingByUser = false;
-
+  private closingByUser = false;
+  private reading = false;
   /** UUID for the "toRadio" write characteristic. */
   static ToRadioUuid = "f75c76d2-129e-4dad-a1dd-7866124401e7";
   /** UUID for the "fromRadio" read characteristic. */
@@ -42,6 +41,19 @@ export class TransportWebBluetooth implements Types.Transport {
   static FromNumUuid = "ed9da18c-a800-4f66-a670-aa7547e34453";
   /** UUID for the Meshtastic GATT service. */
   static ServiceUuid = "6ba1b218-15a8-461f-9fa8-5dcae273eafd";
+
+  private onGattDisconnected = () => {
+    if (this.closingByUser) {
+      return;
+    }
+    this.emitStatus(
+      Types.DeviceStatusEnum.DeviceDisconnected,
+      "gatt-disconnected",
+    );
+  };
+  private onFromNumChanged = () => {
+    void this.readFromRadio();
+  };
 
   /**
    * Prompts the user to select a Bluetooth device, connects it, and returns a transport.
@@ -121,22 +133,34 @@ export class TransportWebBluetooth implements Types.Transport {
     this.gattServer = gattServer;
 
     this._fromDevice = new ReadableStream<Types.DeviceOutput>({
-      start: (ctrl) => {
-        this._fromDeviceController = ctrl;
+      start: async (ctrl) => {
+        this.fromDeviceController = ctrl;
         this.emitStatus(Types.DeviceStatusEnum.DeviceConnecting);
 
         this.gattServer.device.addEventListener(
           "gattserverdisconnected",
-          () => {
-            if (this._closingByUser) {
-              return;
-            }
-            this.emitStatus(
-              Types.DeviceStatusEnum.DeviceDisconnected,
-              "gatt-disconnected",
-            );
-          },
+          this.onGattDisconnected,
         );
+
+        try {
+          await this.fromNumCharacteristic.startNotifications();
+          this.fromNumCharacteristic.addEventListener(
+            "characteristicvaluechanged",
+            this.onFromNumChanged,
+          );
+          this.emitStatus(Types.DeviceStatusEnum.DeviceConnected);
+          // prime once in case data already queued
+          void this.readFromRadio();
+        } catch {
+          this.emitStatus(
+            Types.DeviceStatusEnum.DeviceDisconnected,
+            "notify-failed",
+          );
+          this.gattServer.device.removeEventListener(
+            "gattserverdisconnected",
+            this.onGattDisconnected,
+          );
+        }
       },
     });
 
@@ -145,11 +169,7 @@ export class TransportWebBluetooth implements Types.Transport {
         try {
           const ab = toArrayBuffer(chunk);
           await this.toRadioCharacteristic.writeValue(ab);
-
-          if (this._isFirstWrite) {
-            this._isFirstWrite = false;
-            setTimeout(() => this.readFromRadio(), 50);
-          }
+          void this.readFromRadio(); // ensure we read any response
         } catch (error) {
           this.emitStatus(
             Types.DeviceStatusEnum.DeviceDisconnected,
@@ -159,25 +179,6 @@ export class TransportWebBluetooth implements Types.Transport {
         }
       },
     });
-
-    this.fromNumCharacteristic.addEventListener(
-      "characteristicvaluechanged",
-      () => {
-        this.readFromRadio();
-      },
-    );
-
-    this.fromNumCharacteristic
-      .startNotifications()
-      .then(() => {
-        this.emitStatus(Types.DeviceStatusEnum.DeviceConnected);
-      })
-      .catch(() => {
-        this.emitStatus(
-          Types.DeviceStatusEnum.DeviceDisconnected,
-          "notify-failed",
-        );
-      });
   }
 
   /** Writable stream of bytes to the device. */
@@ -195,20 +196,32 @@ export class TransportWebBluetooth implements Types.Transport {
    */
   disconnect(): Promise<void> {
     try {
-      this._closingByUser = true;
+      this.closingByUser = true;
+      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "user");
+      try {
+        this.fromNumCharacteristic.stopNotifications?.();
+      } catch {}
+      this.fromNumCharacteristic.removeEventListener(
+        "characteristicvaluechanged",
+        this.onFromNumChanged,
+      );
+      this.gattServer.device.removeEventListener(
+        "gattserverdisconnected",
+        this.onGattDisconnected,
+      );
+
       this.gattServer.disconnect();
     } finally {
-      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "user");
-      this._closingByUser = false;
+      this.closingByUser = false;
     }
     return Promise.resolve();
   }
 
   private async readFromRadio(): Promise<void> {
-    const controller = this._fromDeviceController;
-    if (!controller) {
+    if (this.reading) {
       return;
     }
+    this.reading = true;
 
     try {
       let hasMoreData = true;
@@ -224,23 +237,30 @@ export class TransportWebBluetooth implements Types.Transport {
         });
       }
     } catch (error) {
-      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "read-error");
+      if (!this.closingByUser) {
+        this.emitStatus(
+          Types.DeviceStatusEnum.DeviceDisconnected,
+          "read-error",
+        );
+      }
       throw error;
+    } finally {
+      this.reading = false;
     }
   }
 
   private emitStatus(next: Types.DeviceStatusEnum, reason?: string): void {
-    if (next === this._lastStatus) {
+    if (next === this.lastStatus) {
       return;
     }
-    this._lastStatus = next;
-    this._fromDeviceController?.enqueue({
+    this.lastStatus = next;
+    this.fromDeviceController?.enqueue({
       type: "status",
       data: { status: next, reason },
     });
   }
 
   private enqueue(output: Types.DeviceOutput): void {
-    this._fromDeviceController?.enqueue(output);
+    this.fromDeviceController?.enqueue(output);
   }
 }
