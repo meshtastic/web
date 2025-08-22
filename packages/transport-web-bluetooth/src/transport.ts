@@ -95,6 +95,7 @@ export class TransportWebBluetooth implements Types.Transport {
           this._isFirstWrite = false;
 
           setTimeout(() => {
+            // biome-ignore lint/style/noNonNullAssertion: we know this will be set
             this.readFromRadio(this._fromDeviceController!);
           }, 50);
         }

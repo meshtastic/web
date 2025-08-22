@@ -33,7 +33,7 @@ export class TransportWebSerial implements Types.Transport {
     // Set up the pipe with abort signal for clean cancellation
     this.pipePromise = Utils.toDeviceStream.readable.pipeTo(
       connection.writable,
-      { signal: this.abortController.signal }
+      { signal: this.abortController.signal },
     );
 
     this._toDevice = Utils.toDeviceStream.writable;
@@ -58,31 +58,30 @@ export class TransportWebSerial implements Types.Transport {
   async disconnect() {
     try {
       this.abortController.abort();
-      
+
       if (this.pipePromise) {
         try {
           await this.pipePromise;
         } catch (error) {
-          if (error instanceof Error && error.name !== 'AbortError') {
+          if (error instanceof Error && error.name !== "AbortError") {
             throw error;
           }
         }
       }
 
       // Cancel any remaining streams
-      if (this._fromDevice && this._fromDevice.locked) {
+      if (this._fromDevice?.locked) {
         try {
           await this._fromDevice.cancel();
-        } catch (error) {
+        } catch {
           // Stream cancellation might fail if already cancelled
         }
       }
 
       await this.connection.close();
-      
     } catch (error) {
       // If we can't close cleanly, let the browser handle cleanup
-      console.warn('Could not cleanly disconnect serial port:', error);
+      console.warn("Could not cleanly disconnect serial port:", error);
     }
   }
 
@@ -93,11 +92,11 @@ export class TransportWebSerial implements Types.Transport {
   async reconnect() {
     // Create a new AbortController for the new connection
     this.abortController = new AbortController();
-    
+
     // Re-establish the pipe connection
     this.pipePromise = Utils.toDeviceStream.readable.pipeTo(
       this.connection.writable,
-      { signal: this.abortController.signal }
+      { signal: this.abortController.signal },
     );
   }
 }
