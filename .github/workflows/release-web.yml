@@ -62,7 +62,11 @@ jobs:
           echo "push_latest=$PUSH_LATEST" >> "$GITHUB_OUTPUT"
           echo "Resolved tag: $TAG (push_latest=$PUSH_LATEST)"
 
-      # --- Setup Node.js and pnpm (with cache) ---
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -70,13 +74,16 @@ jobs:
           cache: pnpm
           cache-dependency-path: '**/pnpm-lock.yaml'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Build web package
+        working-directory: packages/web
+        run: pnpm run build
+
+      - name: Build web package
+        working-directory: packages/web
+        run: pnpm run build
 
       - name: Create Web App Release Archive
         working-directory: packages/web

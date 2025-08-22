@@ -1,6 +1,6 @@
 {
   "name": "@meshtastic/transport-web-serial",
-  "version": "0.2.3-1",
+  "version": "0.2.4-0",
 	"description": "A transport layer for Meshtastic applications using Web Serial API.",
 	"exports": {
 		".": "./mod.ts"
