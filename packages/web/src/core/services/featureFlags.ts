@@ -54,7 +54,13 @@ class FeatureFlags {
   setOverrides(partial: Partial<Flags>) {
     for (const [k, v] of Object.entries(partial)) {
       this.setOverride(k as FlagKey, v as boolean);
+      if (v === null) {
+        delete this.overrides[k as FlagKey];
+      } else {
+        this.overrides[k as FlagKey] = v as boolean;
+      }
     }
+    this.emit();
   }
 
   subscribe(fn: Listener) {
