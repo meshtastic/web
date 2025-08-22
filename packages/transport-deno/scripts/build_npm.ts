@@ -13,7 +13,8 @@ await build({
     // package.json properties
     name: "@meshtastic/transport-deno",
     version: Deno.args[0],
-    description: "A Deno transport layer for your project, enabling seamless integration with npm.",
+    description:
+      "A Deno transport layer for your project, enabling seamless integration with npm.",
     license: "GPL-3.0-only",
     repository: {
       type: "git",
