@@ -406,6 +406,26 @@ export class MeshDevice {
   }
 
   /**
+   * Remove the fixed position of a device
+   */
+  public async removeFixedPosition(): Promise<number> {
+    const removePositionMessage = create(Protobuf.Admin.AdminMessageSchema, {
+      payloadVariant: {
+        case: 'removeFixedPosition',
+        value: true,
+      },
+    });
+    return await this.sendPacket(
+      toBinary(Protobuf.Admin.AdminMessageSchema, removePositionMessage),
+      Protobuf.Portnums.PortNum.ADMIN_APP,
+      "self",
+      0,
+      true,
+      false,
+    );
+  }
+
+  /**
    * Gets specified channel information from the radio
    */
   public async getChannel(index: number): Promise<number> {
