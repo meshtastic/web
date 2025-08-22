@@ -163,7 +163,7 @@ export class TransportWebSerial implements Types.Transport {
       }
 
       // Cancel any remaining streams
-      if (this._fromDevice && this._fromDevice.locked) {
+      if (this._fromDevice?.locked) {
         try {
           await this._fromDevice.cancel();
         } catch {
