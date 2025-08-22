@@ -136,6 +136,9 @@
 			"generic": "This field is required.",
 			"managed": "At least one admin key is requred if the node is managed.",
 			"key": "Key is required."
+		},
+		"invalidOverrideFreq": {
+			"number": "Neplatný formát, očekáváno 430-930 MHz, s maximálně 3 desetinnými místy."
 		}
 	}
 }

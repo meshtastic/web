@@ -136,6 +136,9 @@
 			"generic": "Dies ist ein Pflichtfeld.",
 			"managed": "Mindestens ein administrativer Schlüssel wird benötigt, um diesen Knoten zu verwalten",
 			"key": "Schlüssel erforderlich."
+		},
+		"invalidOverrideFreq": {
+			"number": "Ungültiges Format, erwartet 430-930 MHz, mit höchstens 3 Dezimalstellen."
 		}
 	}
 }

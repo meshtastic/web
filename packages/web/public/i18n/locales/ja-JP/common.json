@@ -136,6 +136,9 @@
 			"generic": "This field is required.",
 			"managed": "At least one admin key is requred if the node is managed.",
 			"key": "Key is required."
+		},
+		"invalidOverrideFreq": {
+		  "number": "無効な形式です。430-930 MHz、3桁以内の小数で入力してください。"
 		}
 	}
 }

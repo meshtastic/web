@@ -136,6 +136,9 @@
 			"generic": "This field is required.",
 			"managed": "At least one admin key is requred if the node is managed.",
 			"key": "Key is required."
+		},
+		"invalidOverrideFreq": {
+			"number": "Formato inválido, se esperaba 430-930 MHz, con no más de 3 decimales."
 		}
 	}
 }

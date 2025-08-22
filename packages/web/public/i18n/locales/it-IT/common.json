@@ -136,6 +136,9 @@
 			"generic": "Questo campo è obbligatorio.",
 			"managed": "Se il nodo è gestito, è richiesta almeno una chiave amministrativa.",
 			"key": "La chiave è obbligatoria."
+		},
+		"invalidOverrideFreq": {
+			"number": "Formato non valido, previsto 430-930 MHz, con non più di 3 decimali."
 		}
 	}
 }

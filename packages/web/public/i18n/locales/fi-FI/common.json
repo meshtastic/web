@@ -136,6 +136,9 @@
 			"generic": "Tämä kenttä on pakollinen.",
 			"managed": "Vähintään yksi hallinta-avain vaaditaan, jos laitetta hallitaan.",
 			"key": "Avain on pakollinen."
+		},
+		"invalidOverrideFreq": {
+			"number": "Virheellinen muoto, odotettu 430-930 MHz, korkeintaan 3 desimaalia."
 		}
 	}
 }

@@ -136,6 +136,9 @@
 			"generic": "Ce champ est obligatoire.",
 			"managed": "Au moins une clé d’administration est requise si le nœud est géré.",
 			"key": "Clé requise."
+		},
+		"invalidOverrideFreq": {
+			"number": "Format invalide, attendu 430-930 MHz, avec pas plus de 3 décimales."
 		}
 	}
 }

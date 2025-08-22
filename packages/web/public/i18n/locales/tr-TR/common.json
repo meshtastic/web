@@ -136,6 +136,9 @@
 			"generic": "Bu alan zorunludur.",
 			"managed": "Nodeun yönetilmesi için en az bir tane yönetici anahtarı gerekli.",
 			"key": "Anahtar gerekli."
+		},
+		"invalidOverrideFreq": {
+			"number": "Geçersiz format, beklenen 430-930 MHz, en fazla 3 ondalık basamak."
 		}
 	}
 }
