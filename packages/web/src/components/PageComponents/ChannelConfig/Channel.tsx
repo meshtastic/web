@@ -1,118 +1,160 @@
-import { makeChannelSchema } from "@app/validation/channel.ts";
+import {
+  type ChannelValidation,
+  makeChannelSchema,
+} from "@app/validation/channel.ts";
 import { create } from "@bufbuild/protobuf";
 import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
-import { DynamicForm } from "@components/Form/DynamicForm.tsx";
-import { useToast } from "@core/hooks/useToast.ts";
+import { createZodResolver } from "@components/Form/createZodResolver.ts";
+import {
+  DynamicForm,
+  type DynamicFormFormInit,
+} from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { type DefaultValues, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import type { infer as zodInfer } from "zod/v4";
 
 export interface SettingsPanelProps {
+  onFormInit: DynamicFormFormInit<ChannelValidation>;
   channel: Protobuf.Channel.Channel;
 }
 
-export const Channel = ({ channel }: SettingsPanelProps) => {
-  const { config, connection, addChannel } = useDevice();
+export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
+  const {
+    config,
+    setWorkingChannelConfig,
+    getWorkingChannelConfig,
+    removeWorkingChannelConfig,
+  } = useDevice();
   const { t } = useTranslation(["channels", "ui", "dialog"]);
-  const { toast } = useToast();
+
+  const defaultConfig = channel;
+  const defaultValues = {
+    ...defaultConfig,
+    ...{
+      settings: {
+        ...defaultConfig?.settings,
+        psk: fromByteArray(defaultConfig?.settings?.psk ?? new Uint8Array(0)),
+        moduleSettings: {
+          ...defaultConfig?.settings?.moduleSettings,
+          positionPrecision:
+            defaultConfig?.settings?.moduleSettings?.positionPrecision ===
+            undefined
+              ? 10
+              : defaultConfig?.settings?.moduleSettings?.positionPrecision,
+        },
+      },
+    },
+  };
+
+  const effectiveConfig = getWorkingChannelConfig(channel.index) ?? channel;
+  const formValues = {
+    ...effectiveConfig,
+    ...{
+      settings: {
+        ...effectiveConfig?.settings,
+        psk: fromByteArray(effectiveConfig?.settings?.psk ?? new Uint8Array(0)),
+        moduleSettings: {
+          ...effectiveConfig?.settings?.moduleSettings,
+          positionPrecision:
+            effectiveConfig?.settings?.moduleSettings?.positionPrecision ===
+            undefined
+              ? 10
+              : effectiveConfig?.settings?.moduleSettings?.positionPrecision,
+        },
+      },
+    },
+  };
 
   const [preSharedDialogOpen, setPreSharedDialogOpen] =
     useState<boolean>(false);
-  const [pass, setPass] = useState<string>(
-    fromByteArray(channel?.settings?.psk ?? new Uint8Array(0)),
-  );
   const [byteCount, setBytes] = useState<number>(
-    channel?.settings?.psk.length ?? 16,
+    effectiveConfig?.settings?.psk.length ?? 16,
   );
-
   const ChannelValidationSchema = useMemo(() => {
     return makeChannelSchema(byteCount);
   }, [byteCount]);
 
-  type ChannelValidation = zodInfer<typeof ChannelValidationSchema>;
+  const formMethods = useForm<ChannelValidation>({
+    mode: "onChange",
+    defaultValues: defaultValues as DefaultValues<ChannelValidation>,
+    resolver: createZodResolver(ChannelValidationSchema),
+    shouldFocusError: false,
+    resetOptions: { keepDefaultValues: true },
+    values: formValues as ChannelValidation,
+  });
+  const { setValue, trigger, handleSubmit, formState } = formMethods;
+
+  useEffect(() => {
+    onFormInit?.(formMethods);
+  }, [onFormInit, formMethods]);
+
+  // Since byteCount is an independent state, we need to use the effective value
+  // from the channel config to ensure the form updates when the setting changes
+  const effectiveByteCount = effectiveConfig.settings?.psk.length ?? 16;
+  useEffect(() => {
+    setBytes(effectiveByteCount);
+    trigger("settings.psk");
+  }, [effectiveByteCount, trigger]);
 
   const onSubmit = (data: ChannelValidation) => {
-    const channel = create(Protobuf.Channel.ChannelSchema, {
+    if (!formState.isReady) {
+      return;
+    }
+
+    const payload = {
       ...data,
       settings: {
         ...data.settings,
-        psk: toByteArray(pass),
+        psk: toByteArray(data.settings.psk),
         moduleSettings: create(Protobuf.Channel.ModuleSettingsSchema, {
           ...data.settings.moduleSettings,
           positionPrecision: data.settings.moduleSettings.positionPrecision,
         }),
       },
-    });
-    connection?.setChannel(channel).then(() => {
-      console.debug(
-        t("toast.savedChannel.title", {
-          ns: "ui",
-          channelName: channel.settings?.name,
-        }),
-      );
-      toast({
-        title: t("toast.savedChannel.title", {
-          ns: "ui",
-          channelName: channel.settings?.name,
-        }),
-      });
-      addChannel(channel);
-    });
+    };
+
+    if (deepCompareConfig(channel, payload, true)) {
+      removeWorkingChannelConfig(channel.index);
+      return;
+    }
+
+    setWorkingChannelConfig(create(Protobuf.Channel.ChannelSchema, payload));
   };
 
-  const preSharedKeyRegenerate = () => {
+  const preSharedKeyRegenerate = async () => {
     const newPsk = btoa(
       cryptoRandomString({
-        length: byteCount ?? 0,
+        length: byteCount ?? 16,
         type: "alphanumeric",
       }),
     );
-    setPass(newPsk);
-
+    setValue("settings.psk", newPsk, { shouldDirty: true });
     setPreSharedDialogOpen(false);
-  };
 
-  const preSharedClickEvent = () => {
-    setPreSharedDialogOpen(true);
-  };
-
-  const inputChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPass(e.currentTarget?.value);
+    const valid = await trigger("settings.psk");
+    if (valid) {
+      handleSubmit(onSubmit)(); // manually invoke form submit
+    }
   };
 
   const selectChangeEvent = (e: string) => {
     const count = Number.parseInt(e);
-    setBytes(count);
+    if (!Number.isNaN(count)) {
+      setBytes(count);
+      trigger("settings.psk");
+    }
   };
 
   return (
     <>
       <DynamicForm<ChannelValidation>
+        propMethods={formMethods}
         onSubmit={onSubmit}
-        submitType="onSubmit"
-        validationSchema={ChannelValidationSchema}
-        hasSubmitButton
-        defaultValues={{
-          ...channel,
-          ...{
-            settings: {
-              ...channel?.settings,
-              psk: pass,
-              moduleSettings: {
-                ...channel?.settings?.moduleSettings,
-                positionPrecision:
-                  channel?.settings?.moduleSettings?.positionPrecision ===
-                  undefined
-                    ? 10
-                    : channel?.settings?.moduleSettings?.positionPrecision,
-              },
-            },
-          },
-        }}
         fieldGroups={[
           {
             label: t("settings.label"),
@@ -140,19 +182,17 @@ export const Channel = ({ channel }: SettingsPanelProps) => {
                 id: "channel-psk",
                 label: t("psk.label"),
                 description: t("psk.description"),
-                devicePSKBitCount: byteCount ?? 0,
-                inputChange: inputChangeEvent,
+                devicePSKBitCount: byteCount ?? 16,
                 selectChange: selectChangeEvent,
                 actionButtons: [
                   {
                     text: t("psk.generate"),
                     variant: "success",
-                    onClick: preSharedClickEvent,
+                    onClick: () => setPreSharedDialogOpen(true),
                   },
                 ],
                 hide: true,
                 properties: {
-                  value: pass,
                   showPasswordToggle: true,
                   showCopyButton: true,
                 },

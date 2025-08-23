@@ -50,7 +50,6 @@ export const AmbientLighting = ({
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={AmbientLightingValidationSchema}
-      formId="ModuleConfig_AmbientLightingConfig"
       defaultValues={moduleConfig.ambientLighting}
       values={getEffectiveModuleConfig("ambientLighting")}
       fieldGroups={[

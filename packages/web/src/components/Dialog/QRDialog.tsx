@@ -82,7 +82,7 @@ export const QRDialog = ({
                         : `${t("page.channelIndex", {
                             ns: "channels",
                             index: channel.index,
-                          })}${channel.index}`}
+                          })}`}
                   </Label>
                   <Checkbox
                     key={channel.index}

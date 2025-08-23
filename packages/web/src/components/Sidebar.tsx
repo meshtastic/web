@@ -7,7 +7,6 @@ import { cn } from "@core/utils/cn.ts";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CircleChevronLeft,
-  LayersIcon,
   type LucideIcon,
   MapIcon,
   MessageSquareIcon,
@@ -112,11 +111,6 @@ export const Sidebar = ({ children }: SidebarProps) => {
       name: t("navigation.config"),
       icon: SettingsIcon,
       page: "config",
-    },
-    {
-      name: t("navigation.channels"),
-      icon: LayersIcon,
-      page: "channels",
     },
     {
       name: `${t("navigation.nodes")} (${displayedNodeCount})`,

@@ -35,6 +35,7 @@ export interface Device {
   moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
   workingConfig: Protobuf.Config.Config[];
   workingModuleConfig: Protobuf.ModuleConfig.ModuleConfig[];
+  workingChannelConfig: Protobuf.Channel.Channel[];
   hardware: Protobuf.Mesh.MyNodeInfo;
   metadata: Map<number, Protobuf.Mesh.DeviceMetadata>;
   traceroutes: Map<
@@ -92,6 +93,11 @@ export interface Device {
   getEffectiveModuleConfig<K extends ValidModuleConfigType>(
     payloadVariant: K,
   ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
+  setWorkingChannelConfig: (channelNum: Protobuf.Channel.Channel) => void;
+  getWorkingChannelConfig: (
+    index: Types.ChannelNumber,
+  ) => Protobuf.Channel.Channel | undefined;
+  removeWorkingChannelConfig: (channelNum?: Types.ChannelNumber) => void;
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
   setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
@@ -163,6 +169,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           moduleConfig: create(Protobuf.LocalOnly.LocalModuleConfigSchema),
           workingConfig: [],
           workingModuleConfig: [],
+          workingChannelConfig: [],
           hardware: create(Protobuf.Mesh.MyNodeInfoSchema),
           metadata: new Map(),
           traceroutes: new Map(),
@@ -467,6 +474,61 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
                 (c) => c.payloadVariant.case === payloadVariant,
               )?.payloadVariant.value,
             };
+          },
+
+          setWorkingChannelConfig: (config: Protobuf.Channel.Channel) => {
+            set(
+              produce<PrivateDeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+                const index = device.workingChannelConfig.findIndex(
+                  (wcc) => wcc.index === config.index,
+                );
+
+                if (index !== -1) {
+                  device.workingChannelConfig[index] = config;
+                } else {
+                  device.workingChannelConfig.push(config);
+                }
+              }),
+            );
+          },
+          getWorkingChannelConfig: (channelNum: Types.ChannelNumber) => {
+            const device = get().devices.get(id);
+            if (!device) {
+              return;
+            }
+
+            const workingChannelConfig = device.workingChannelConfig.find(
+              (c) => c.index === channelNum,
+            );
+
+            return workingChannelConfig;
+          },
+          removeWorkingChannelConfig: (channelNum?: Types.ChannelNumber) => {
+            set(
+              produce<PrivateDeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+
+                if (channelNum === undefined) {
+                  device.workingChannelConfig = [];
+                  return;
+                }
+
+                const index = device.workingChannelConfig.findIndex(
+                  (wcc: Protobuf.Channel.Channel) => wcc.index === channelNum,
+                );
+
+                if (index !== -1) {
+                  device.workingChannelConfig.splice(index, 1);
+                }
+              }),
+            );
           },
 
           setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => {

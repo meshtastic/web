@@ -8,11 +8,6 @@ export interface RasterSource {
   tileSize: number;
 }
 
-interface ErrorState {
-  field: string;
-  message: string;
-}
-
 interface AppState {
   selectedDevice: number;
   devices: {
@@ -24,7 +19,8 @@ interface AppState {
   nodeNumToBeRemoved: number;
   connectDialogOpen: boolean;
   nodeNumDetails: number;
-  errors: ErrorState[];
+  validForm: boolean;
+  dirtyForm: boolean;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -38,13 +34,11 @@ interface AppState {
   setNodeNumDetails: (nodeNum: number) => void;
 
   // Error management
-  hasErrors: () => boolean;
-  getErrorMessage: (field: string) => string | undefined;
-  hasFieldError: (field: string) => boolean;
-  addError: (field: string, message: string) => void;
-  removeError: (field: string) => void;
-  clearErrors: () => void;
-  setNewErrors: (newErrors: ErrorState[]) => void;
+  isValidForm: () => boolean;
+  setValidForm: (valid: boolean) => void;
+
+  isDirtyForm: () => boolean;
+  setDirtyForm: (unsaved: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
@@ -56,7 +50,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
   nodeNumDetails: 0,
-  errors: [],
+  validForm: true,
+  dirtyForm: true,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -114,46 +109,27 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set(() => ({
       nodeNumDetails: nodeNum,
     })),
-  hasErrors: () => {
+
+  isValidForm: () => {
     const state = get();
-    return state.errors.length > 0;
+    return state.validForm;
   },
-  getErrorMessage: (field: string) => {
-    const state = get();
-    return state.errors.find((err) => err.field === field)?.message;
-  },
-  hasFieldError: (field: string) => {
-    const state = get();
-    return state.errors.some((err) => err.field === field);
-  },
-  addError: (field: string, message: string) => {
+  setValidForm: (valid: boolean) => {
     set(
       produce<AppState>((draft) => {
-        draft.errors = [
-          ...draft.errors.filter((e) => e.field !== field),
-          { field, message },
-        ];
+        draft.validForm = valid;
       }),
     );
   },
-  removeError: (field: string) => {
-    set(
-      produce<AppState>((draft) => {
-        draft.errors = draft.errors.filter((e) => e.field !== field);
-      }),
-    );
+
+  isDirtyForm: () => {
+    const state = get();
+    return state.dirtyForm;
   },
-  clearErrors: () => {
+  setDirtyForm: (saved: boolean) => {
     set(
       produce<AppState>((draft) => {
-        draft.errors = [];
-      }),
-    );
-  },
-  setNewErrors: (newErrors: ErrorState[]) => {
-    set(
-      produce<AppState>((draft) => {
-        draft.errors = newErrors;
+        draft.dirtyForm = saved;
       }),
     );
   },

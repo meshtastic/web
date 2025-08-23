@@ -12,7 +12,7 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
-import { useAppStore, useDevice } from "@core/stores";
+import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { Protobuf } from "@meshtastic/core";
@@ -35,21 +35,34 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     removeWorkingConfig,
   } = useDevice();
 
-  const { removeError } = useAppStore();
   const { t } = useTranslation("deviceConfig");
 
-  const securityConfig = getEffectiveConfig("security");
+  const defaultConfig = config.security;
   const defaultValues = {
-    ...securityConfig,
+    ...defaultConfig,
+    ...{
+      privateKey: fromByteArray(defaultConfig?.privateKey ?? new Uint8Array(0)),
+      publicKey: fromByteArray(defaultConfig?.publicKey ?? new Uint8Array(0)),
+      adminKey: [
+        fromByteArray(defaultConfig?.adminKey?.at(0) ?? new Uint8Array(0)),
+        fromByteArray(defaultConfig?.adminKey?.at(1) ?? new Uint8Array(0)),
+        fromByteArray(defaultConfig?.adminKey?.at(2) ?? new Uint8Array(0)),
+      ],
+    },
+  };
+
+  const effectiveConfig = getEffectiveConfig("security");
+  const formValues = {
+    ...effectiveConfig,
     ...{
       privateKey: fromByteArray(
-        securityConfig?.privateKey ?? new Uint8Array(0),
+        effectiveConfig?.privateKey ?? new Uint8Array(0),
       ),
-      publicKey: fromByteArray(securityConfig?.publicKey ?? new Uint8Array(0)),
+      publicKey: fromByteArray(effectiveConfig?.publicKey ?? new Uint8Array(0)),
       adminKey: [
-        fromByteArray(securityConfig?.adminKey?.at(0) ?? new Uint8Array(0)),
-        fromByteArray(securityConfig?.adminKey?.at(1) ?? new Uint8Array(0)),
-        fromByteArray(securityConfig?.adminKey?.at(2) ?? new Uint8Array(0)),
+        fromByteArray(effectiveConfig?.adminKey?.at(0) ?? new Uint8Array(0)),
+        fromByteArray(effectiveConfig?.adminKey?.at(1) ?? new Uint8Array(0)),
+        fromByteArray(effectiveConfig?.adminKey?.at(2) ?? new Uint8Array(0)),
       ],
     },
   };
@@ -60,8 +73,9 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     resolver: createZodResolver(RawSecuritySchema),
     shouldFocusError: false,
     resetOptions: { keepDefaultValues: true },
+    values: formValues as RawSecurity,
   });
-  const { setValue, formState } = formMethods;
+  const { setValue, trigger, handleSubmit, formState } = formMethods;
 
   useEffect(() => {
     onFormInit?.(formMethods);
@@ -108,19 +122,21 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     updatePublicKey(fromByteArray(privateKey));
   };
 
-  const updatePublicKey = (privateKey: string) => {
+  const updatePublicKey = async (privateKey: string) => {
     try {
       const publicKey = fromByteArray(
         getX25519PublicKey(toByteArray(privateKey)),
       );
-      setValue("privateKey", privateKey);
-      setValue("publicKey", publicKey);
+      setValue("privateKey", privateKey, { shouldDirty: true });
+      setValue("publicKey", publicKey, { shouldDirty: true });
 
-      removeError("privateKey");
-      removeError("publicKey");
       setPrivateKeyDialogOpen(false);
     } catch (_e) {
-      setValue("privateKey", privateKey);
+      setValue("privateKey", privateKey, { shouldDirty: true });
+    }
+    const valid = await trigger(["privateKey", "publicKey"]);
+    if (valid) {
+      handleSubmit(onSubmit)(); // manually invoke form submit
     }
   };
 
@@ -137,7 +153,6 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
       <DynamicForm<RawSecurity>
         propMethods={formMethods}
         onSubmit={onSubmit}
-        formId="Config_SecurityConfig"
         fieldGroups={[
           {
             label: t("security.title"),

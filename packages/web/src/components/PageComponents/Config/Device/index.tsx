@@ -46,7 +46,6 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={DeviceValidationSchema}
-      formId="Config_DeviceConfig"
       defaultValues={config.device}
       values={getEffectiveConfig("device")}
       fieldGroups={[

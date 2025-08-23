@@ -44,7 +44,6 @@ export const Power = ({ onFormInit }: PowerConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={PowerValidationSchema}
-      formId="Config_PowerConfig"
       defaultValues={config.power}
       values={getEffectiveConfig("power")}
       fieldGroups={[

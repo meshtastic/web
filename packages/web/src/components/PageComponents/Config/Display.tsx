@@ -43,7 +43,6 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={DisplayValidationSchema}
-      formId="Config_DisplayConfig"
       defaultValues={config.display}
       values={getEffectiveConfig("display")}
       fieldGroups={[
