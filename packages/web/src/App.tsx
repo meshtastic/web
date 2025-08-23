@@ -3,6 +3,7 @@ import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.tsx";
 import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
+import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
@@ -33,6 +34,7 @@ export function App() {
           setConnectDialogOpen(open);
         }}
       />
+      <Toaster />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper device={device}>
         <div
