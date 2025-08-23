@@ -20,6 +20,17 @@ async function freshStore() {
   return mod;
 }
 
+vi.mock("@core/services/featureFlags", () => {
+  return {
+    featureFlags: {
+      get: vi.fn((key: string) => {
+        if (key === "persistNodeDB") return true;
+        return false;
+      }),
+    },
+  };
+});
+
 function makeNode(num: number, extras: Record<string, any> = {}) {
   return { num, ...extras } as any;
 }
