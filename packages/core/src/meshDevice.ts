@@ -388,7 +388,7 @@ export class MeshDevice {
   ): Promise<number> {
     const setPositionMessage = create(Protobuf.Admin.AdminMessageSchema, {
       payloadVariant: {
-        case: 'setFixedPosition',
+        case: "setFixedPosition",
         value: create(Protobuf.Mesh.PositionSchema, {
           latitudeI: Math.floor(latitude / 1e-7),
           longitudeI: Math.floor(longitude / 1e-7),
@@ -411,7 +411,7 @@ export class MeshDevice {
   public async removeFixedPosition(): Promise<number> {
     const removePositionMessage = create(Protobuf.Admin.AdminMessageSchema, {
       payloadVariant: {
-        case: 'removeFixedPosition',
+        case: "removeFixedPosition",
         value: true,
       },
     });
