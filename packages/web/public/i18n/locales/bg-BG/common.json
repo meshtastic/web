@@ -17,7 +17,6 @@
 		"now": "Сега",
 		"ok": "Добре",
 		"print": "Отпечатване",
-		"rebootOtaNow": "Reboot to OTA Mode Now",
 		"remove": "Изтрий",
 		"requestNewKeys": "Заявка за нови ключове",
 		"requestPosition": "Request Position",
@@ -137,5 +136,7 @@
 			"managed": "Изисква се поне един администраторски ключ, ако възелът е управляван.",
 			"key": "Ключът е задължителен."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }

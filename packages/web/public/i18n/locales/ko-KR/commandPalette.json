@@ -33,9 +33,9 @@
       "qrGenerator": "생성",
       "qrImport": "불러오기",
       "scheduleShutdown": "종료 예약",
-      "scheduleReboot": "재부팅 예약",
-      "rebootToOtaMode": "OTA 모드로 재부팅",
+      "scheduleReboot": "Reboot Device",
       "resetNodeDb": "노드 목록 초기화",
+      "dfuMode": "DFU 모드 진입",
       "factoryResetDevice": "공장 초기화",
       "factoryResetConfig": "설정 초기",
       "disconnect": "연결 끊기"

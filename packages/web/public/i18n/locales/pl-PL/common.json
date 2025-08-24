@@ -17,7 +17,6 @@
 		"now": "Now",
 		"ok": "OK",
 		"print": "Print",
-		"rebootOtaNow": "Reboot to OTA Mode Now",
 		"remove": "Usuń",
 		"requestNewKeys": "Request New Keys",
 		"requestPosition": "Poproś o pozycję",
@@ -137,5 +136,7 @@
 			"managed": "Co najmniej jeden klucz administratora jest wymagany, jeśli węzeł jest zarządzany.",
 			"key": "Klucz jest wymagany."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }

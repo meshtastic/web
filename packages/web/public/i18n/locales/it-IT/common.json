@@ -17,7 +17,6 @@
 		"now": "Adesso",
 		"ok": "Ok",
 		"print": "Stampa",
-		"rebootOtaNow": "Riavvia ora in modalità OTA",
 		"remove": "Elimina",
 		"requestNewKeys": "Richiedi Nuove Chiavi",
 		"requestPosition": "Richiedi posizione",
@@ -137,5 +136,7 @@
 			"managed": "Se il nodo è gestito, è richiesta almeno una chiave amministrativa.",
 			"key": "La chiave è obbligatoria."
 		}
-	}
+	},
+	"yes": "Sì",
+	"no": "No"
 }

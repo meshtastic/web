@@ -17,7 +17,6 @@
 		"now": "Maintenant",
 		"ok": "D'accord",
 		"print": "Imprimer",
-		"rebootOtaNow": "Redémarrer en mode OTA",
 		"remove": "Supprimer",
 		"requestNewKeys": "Demander de nouvelles clés",
 		"requestPosition": "Demander la position",
@@ -137,5 +136,7 @@
 			"managed": "Au moins une clé d’administration est requise si le nœud est géré.",
 			"key": "Clé requise."
 		}
-	}
+	},
+	"yes": "Oui",
+	"no": "Non"
 }

@@ -17,7 +17,6 @@
 		"now": "Jetzt",
 		"ok": "Ok",
 		"print": "Drucken",
-		"rebootOtaNow": "Neustart in den OTA Modus",
 		"remove": "Entfernen",
 		"requestNewKeys": "Neue Schlüssel anfordern",
 		"requestPosition": "Standort anfordern",
@@ -137,5 +136,7 @@
 			"managed": "Mindestens ein administrativer Schlüssel wird benötigt, um diesen Knoten zu verwalten",
 			"key": "Schlüssel erforderlich."
 		}
-	}
+	},
+	"yes": "Ja",
+	"no": "Nein"
 }

@@ -75,7 +75,8 @@
 			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
 		"validation": {
-			"requiresFeatures": "Questo tipo di connessione richiede <0></0>. Si prega di utilizzare un browser supportato, come Chrome o Edge.",
+			"requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
+			"requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
 			"requiresSecureContext": "Questa applicazione richiede un <0>contesto sicuro</0>. Si prega di connettersi utilizzando HTTPS o localhost.",
 			"additionallyRequiresSecureContext": "Inoltre, richiede un <0>contesto sicuro</0>. Si prega di connettersi utilizzando HTTPS o localhost."
 		}
@@ -92,7 +93,7 @@
 		"deviceMetrics": "Metriche Dispositivo:",
 		"hardware": "Hardware: ",
 		"lastHeard": "Ultimo Contatto: ",
-		"nodeHexPrefix": "Nodo Hex: !",
+		"nodeHexPrefix": "Node Hex: ",
 		"nodeNumber": "Numero Nodo: ",
 		"position": "Posizione:",
 		"role": "Ruolo: ",
@@ -101,7 +102,12 @@
 		"title": "Dettagli nodo per {{identifier}}",
 		"ignoreNode": "Ignora nodo",
 		"removeNode": "Rimuovi Nodo",
-		"unignoreNode": "Non ignorare più nodo"
+		"unignoreNode": "Non ignorare più nodo",
+		"security": "Security:",
+		"publicKey": "Public Key: ",
+		"messageable": "Messageable: ",
+		"KeyManuallyVerifiedTrue": "Public Key has been manually verified",
+		"KeyManuallyVerifiedFalse": "Public Key is not manually verified"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "Se perdi le tue chiavi, dovrai reimpostare il tuo dispositivo.",
@@ -131,15 +137,15 @@
 		"sharableUrl": "URL Condivisibile",
 		"title": "Genera codice QR"
 	},
-	"rebootOta": {
-		"title": "Pianifica Riavvio",
-		"description": "Riavvia il nodo connesso dopo un ritardo in modalità OTA (Over-the-Air).",
-		"enterDelay": "Inserisci ritardo (sec)",
-		"scheduled": "Il riavvio è stato pianificato"
-	},
 	"reboot": {
-		"title": "Pianifica Riavvio",
-		"description": "Riavvia il nodo connesso dopo x minuti."
+		"title": "Reboot device",
+		"description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
+		"ota": "Reboot into OTA mode",
+		"enterDelay": "Enter delay",
+		"scheduled": "Il riavvio è stato pianificato",
+		"schedule": "Schedule reboot",
+		"now": "Reboot now",
+		"cancel": "Cancel scheduled reboot"
 	},
 	"refreshKeys": {
 		"description": {
@@ -178,5 +184,10 @@
 		"confirmUnderstanding": "Sì, so cosa sto facendo",
 		"title": "Sei sicuro?",
 		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+	},
+	"clientNotification": {
+		"title": "Notifiche Client",
+		"TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
+		"Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
 	}
 }

@@ -17,7 +17,6 @@
 		"now": "지금",
 		"ok": "확인",
 		"print": "인쇄",
-		"rebootOtaNow": "지금 OTA 모드로 재부팅",
 		"remove": "지우기",
 		"requestNewKeys": "새로운 키 요청",
 		"requestPosition": "위치 요청",
@@ -137,5 +136,7 @@
 			"managed": "노드 관리를 위해 최소 한 개의 관리자 키가 필요합니다.",
 			"key": "키가 필요합니다."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }
