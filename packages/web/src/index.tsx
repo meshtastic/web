@@ -1,5 +1,8 @@
 import React from "react";
 import "@app/index.css";
+
+// Import feature flags and dev overrides
+import "@core/services/dev-overrides.ts";
 import { enableMapSet } from "immer";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Suspense } from "react";

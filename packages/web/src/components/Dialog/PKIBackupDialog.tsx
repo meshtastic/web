@@ -1,3 +1,4 @@
+import { Button } from "@components/UI/Button.tsx";
 import {
   Dialog,
   DialogClose,
@@ -7,12 +8,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
+import { useDevice, useNodeDB } from "@core/stores";
 import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useDevice } from "../../core/stores";
-import { Button } from "../UI/Button.tsx";
 
 export interface PkiBackupDialogProps {
   open: boolean;
@@ -24,7 +24,8 @@ export const PkiBackupDialog = ({
   onOpenChange,
 }: PkiBackupDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { config, setDialogOpen, getMyNode } = useDevice();
+  const { config, setDialogOpen } = useDevice();
+  const { getMyNode } = useNodeDB();
   const privateKey = config.security?.privateKey;
   const publicKey = config.security?.publicKey;
 

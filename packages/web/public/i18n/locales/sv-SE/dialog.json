@@ -75,7 +75,8 @@
 			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
 		"validation": {
-			"requiresFeatures": "Den här anslutningstypen kräver <0></0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
+			"requiresWebBluetooth": "Den här anslutningstypen kräver <0>Web Bluetooth</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
+			"requiresWebSerial": "Den här anslutningstypen kräver <0>Web Serial</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
 			"requiresSecureContext": "Denna applikation kräver en <0>säker kontext</0>. Anslut med HTTPS eller localhost.",
 			"additionallyRequiresSecureContext": "Dessutom kräver den ett <0>säker kontext</0>. Vänligen anslut med HTTPS eller localhost."
 		}
@@ -92,7 +93,7 @@
 		"deviceMetrics": "Enhetens mätvärden:",
 		"hardware": "Hårdvara: ",
 		"lastHeard": "Senast hörd: ",
-		"nodeHexPrefix": "Nod-hex: !",
+		"nodeHexPrefix": "Node Hex: ",
 		"nodeNumber": "Nodnummer: ",
 		"position": "Plats:",
 		"role": "Roll: ",
@@ -101,7 +102,12 @@
 		"title": "Nodinformation för {{identifier}}",
 		"ignoreNode": "Ignorera nod",
 		"removeNode": "Ta bort nod",
-		"unignoreNode": "Ta bort favoritmarkering"
+		"unignoreNode": "Ta bort favoritmarkering",
+		"security": "Security:",
+		"publicKey": "Public Key: ",
+		"messageable": "Messageable: ",
+		"KeyManuallyVerifiedTrue": "Public Key has been manually verified",
+		"KeyManuallyVerifiedFalse": "Public Key is not manually verified"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "Om du förlorar dina nycklar måste du återställa din enhet.",
@@ -131,15 +137,15 @@
 		"sharableUrl": "Delbar URL",
 		"title": "Generera QR-kod"
 	},
-	"rebootOta": {
-		"title": "Schemalägg omstart",
-		"description": "Starta om den anslutna noden till OTA- (Over-the-Air) läge efter en fördröjning.",
-		"enterDelay": "Ange fördröjning (sekunder)",
-		"scheduled": "Omstart har schemalagts"
-	},
 	"reboot": {
-		"title": "Schemalägg omstart",
-		"description": "Starta om den anslutna noden efter x minuter."
+		"title": "Reboot device",
+		"description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
+		"ota": "Reboot into OTA mode",
+		"enterDelay": "Enter delay",
+		"scheduled": "Omstart har schemalagts",
+		"schedule": "Schedule reboot",
+		"now": "Reboot now",
+		"cancel": "Cancel scheduled reboot"
 	},
 	"refreshKeys": {
 		"description": {
@@ -178,5 +184,10 @@
 		"confirmUnderstanding": "Ja, jag vet vad jag gör",
 		"title": "Är du säker?",
 		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+	},
+	"clientNotification": {
+		"title": "Client Notification",
+		"TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
+		"Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
 	}
 }

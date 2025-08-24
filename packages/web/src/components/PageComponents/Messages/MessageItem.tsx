@@ -6,7 +6,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import { MessageState, useDevice, useMessageStore } from "@core/stores";
+import {
+  MessageState,
+  useDevice,
+  useMessageStore,
+  useNodeDB,
+} from "@core/stores";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
 import { type Protobuf, Types } from "@meshtastic/core";
@@ -47,7 +52,8 @@ interface MessageItemProps {
 }
 
 export const MessageItem = ({ message }: MessageItemProps) => {
-  const { config, getNode } = useDevice();
+  const { config } = useDevice();
+  const { getNode } = useNodeDB();
   const { getMyNodeNum } = useMessageStore();
   const { t, i18n } = useTranslation("messages");
 

@@ -17,7 +17,6 @@
 		"now": "Şimdi",
 		"ok": "Tamam",
 		"print": "Yazdır",
-		"rebootOtaNow": "Şimdi OTA Moduna Yeniden Başlat",
 		"remove": "Kaldır",
 		"requestNewKeys": "Yeni Anahtar İste",
 		"requestPosition": "Konum İste",
@@ -137,5 +136,7 @@
 			"managed": "Nodeun yönetilmesi için en az bir tane yönetici anahtarı gerekli.",
 			"key": "Anahtar gerekli."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }

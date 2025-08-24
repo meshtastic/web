@@ -17,7 +17,6 @@
 		"now": "Now",
 		"ok": "Ok",
 		"print": "Print",
-		"rebootOtaNow": "Reboot to OTA Mode Now",
 		"remove": "Excluir",
 		"requestNewKeys": "Request New Keys",
 		"requestPosition": "Request Position",
@@ -137,5 +136,7 @@
 			"managed": "At least one admin key is requred if the node is managed.",
 			"key": "Key is required."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }

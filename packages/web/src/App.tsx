@@ -3,6 +3,7 @@ import { CommandPalette } from "@components/CommandPalette/index.tsx";
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import { NewDeviceDialog } from "@components/Dialog/NewDeviceDialog.tsx";
 import { KeyBackupReminder } from "@components/KeyBackupReminder.tsx";
+import { Toaster } from "@components/Toaster.tsx";
 import { ErrorPage } from "@components/UI/ErrorPage.tsx";
 import Footer from "@components/UI/Footer.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
@@ -12,15 +13,13 @@ import { Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { ErrorBoundary } from "react-error-boundary";
 import { MapProvider } from "react-map-gl/maplibre";
-// Import feature flags and dev overrides
-import "@core/services/dev-overrides.ts";
 
 export function App() {
   const { getDevice } = useDeviceStore();
-  const { selectedDevice, setConnectDialogOpen, connectDialogOpen } =
+  const { selectedDeviceId, setConnectDialogOpen, connectDialogOpen } =
     useAppStore();
 
-  const device = getDevice(selectedDevice);
+  const device = getDevice(selectedDeviceId);
 
   // Sets up light/dark mode based on user preferences or system settings
   useTheme();
@@ -33,8 +32,9 @@ export function App() {
           setConnectDialogOpen(open);
         }}
       />
+      <Toaster />
       <TanStackRouterDevtools position="bottom-right" />
-      <DeviceWrapper device={device}>
+      <DeviceWrapper deviceId={selectedDeviceId}>
         <div
           className="flex h-screen flex-col bg-background-primary text-text-primary"
           style={{ scrollbarWidth: "thin" }}

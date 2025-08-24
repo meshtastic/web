@@ -1,4 +1,4 @@
-import { useDevice } from "@core/stores";
+import { useNodeDB } from "@core/stores";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,7 @@ export const LocationResponseDialog = ({
   onOpenChange,
 }: LocationResponseDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { getNode } = useDevice();
+  const { getNode } = useNodeDB();
 
   const from = getNode(location?.from ?? 0);
   const longName =
