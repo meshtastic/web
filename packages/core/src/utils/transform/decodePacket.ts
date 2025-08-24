@@ -7,6 +7,19 @@ export const decodePacket = (device: MeshDevice) =>
   new WritableStream<DeviceOutput>({
     write(chunk) {
       switch (chunk.type) {
+        case "status": {
+          const { status, reason } = chunk.data as {
+            status: Types.DeviceStatusEnum;
+            reason?: string;
+          };
+
+          device.updateDeviceStatus(status);
+          device.log.info(
+            Types.Emitter[Types.Emitter.ConnectionStatus],
+            `🔗 ${Types.DeviceStatusEnum[status]} ${reason ? `(${reason})` : ""}`,
+          );
+          break;
+        }
         case "debug": {
           break;
         }

@@ -6,4 +6,5 @@
   "search.exclude": {
     "**/i18n/locales/*-*/**": true,
   },
+  "vitest.workspaceConfig": "vitest.config.ts",
 }
