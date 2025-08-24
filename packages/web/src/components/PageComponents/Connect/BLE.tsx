@@ -1,6 +1,11 @@
 import { Mono } from "@components/generic/Mono.tsx";
 import { Button } from "@components/UI/Button.tsx";
-import { useAppStore, useDeviceStore, useMessageStore } from "@core/stores";
+import {
+  useAppStore,
+  useDeviceStore,
+  useMessageStore,
+  useNodeDBStore,
+} from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
@@ -12,7 +17,9 @@ import type { TabElementProps } from "../../Dialog/NewDeviceDialog.tsx";
 export const BLE = ({ closeDialog }: TabElementProps) => {
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [bleDevices, setBleDevices] = useState<BluetoothDevice[]>([]);
+
   const { addDevice } = useDeviceStore();
+  const { addNodeDB } = useNodeDBStore();
   const messageStore = useMessageStore();
   const { setSelectedDevice } = useAppStore();
   const { t } = useTranslation();
@@ -29,11 +36,13 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
     const id = randId();
     const transport = await TransportWebBluetooth.createFromDevice(bleDevice);
     const device = addDevice(id);
+    const nodeDB = addNodeDB(id);
+
     const connection = new MeshDevice(transport, id);
     connection.configure();
     setSelectedDevice(id);
     device.addConnection(connection);
-    subscribeAll(device, connection, messageStore);
+    subscribeAll(device, connection, messageStore, nodeDB);
 
     const HEARTBEAT_INTERVAL = 5 * 60 * 1000;
     connection.setHeartbeatInterval(HEARTBEAT_INTERVAL);

@@ -14,7 +14,7 @@ interface ErrorState {
 }
 
 interface AppState {
-  selectedDevice: number;
+  selectedDeviceId: number;
   devices: {
     id: number;
     num: number;
@@ -48,7 +48,7 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
-  selectedDevice: 0,
+  selectedDeviceId: 0,
   devices: [],
   currentPage: "messages",
   rasterSources: [],
@@ -81,7 +81,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
   setSelectedDevice: (deviceId) =>
     set(() => ({
-      selectedDevice: deviceId,
+      selectedDeviceId: deviceId,
     })),
   addDevice: (device) =>
     set((state) => ({
