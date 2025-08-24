@@ -17,7 +17,6 @@
 		"now": "Nyt",
 		"ok": "OK",
 		"print": "Tulosta",
-		"rebootOtaNow": "Käynnistä uudelleen OTA-tilaan nyt",
 		"remove": "Poista",
 		"requestNewKeys": "Pyydä uudet avaimet",
 		"requestPosition": "Pyydä sijaintia",
@@ -137,5 +136,7 @@
 			"managed": "Vähintään yksi hallinta-avain vaaditaan, jos laitetta hallitaan.",
 			"key": "Avain on pakollinen."
 		}
-	}
+	},
+	"yes": "Kyllä",
+	"no": "Ei"
 }

@@ -33,9 +33,9 @@
       "qrGenerator": "Oluşturucu",
       "qrImport": "İçeri aktar",
       "scheduleShutdown": "Kapatmayı Planla",
-      "scheduleReboot": "Yeniden Başlatmayı Planla",
-      "rebootToOtaMode": "OTA Moduna Yeniden Başlat",
+      "scheduleReboot": "Reboot Device",
       "resetNodeDb": "Node Veri Tabanını Sıfırla",
+      "dfuMode": "DFU Moduna Gir",
       "factoryResetDevice": "Cihazı Fabrika Ayarlarına Sıfırlayın",
       "factoryResetConfig": "Fabrika Ayarları Yapılandırması",
       "disconnect": "Bağlantıyı Kes"

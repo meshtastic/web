@@ -75,7 +75,8 @@
 			"unknownErrorLoadingDevices": "Tuntematon virhe laitteita ladattaessa"
 		},
 		"validation": {
-			"requiresFeatures": "Tämä yhteystyyppi vaatii <0></0>. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
+			"requiresWebBluetooth": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti bluetooth</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
+			"requiresWebSerial": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
 			"requiresSecureContext": "Tämä sovellus vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia.",
 			"additionallyRequiresSecureContext": "Lisäksi se vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia."
 		}
@@ -92,7 +93,7 @@
 		"deviceMetrics": "Laitteen mittausloki:",
 		"hardware": "Laitteisto: ",
 		"lastHeard": "Viimeksi kuultu: ",
-		"nodeHexPrefix": "Laitteen Hex: !",
+		"nodeHexPrefix": "Laitteen Hex: ",
 		"nodeNumber": "Laitteen numero: ",
 		"position": "Sijainti:",
 		"role": "Rooli: ",
@@ -101,7 +102,12 @@
 		"title": "Tiedot laitteelle {{identifier}}",
 		"ignoreNode": "Älä huomioi laitetta",
 		"removeNode": "Poista laite",
-		"unignoreNode": "Poista laitteen ohitus käytöstä"
+		"unignoreNode": "Poista laitteen ohitus käytöstä",
+		"security": "Turvallisuus:",
+		"publicKey": "Julkinen avain: ",
+		"messageable": "Viestittävissä: ",
+		"KeyManuallyVerifiedTrue": "Julkinen avain on vahvistettu manuaalisesti",
+		"KeyManuallyVerifiedFalse": "Julkista avainta ei ole vahvistettu manuaalisesti"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "Jos menetät avaimesi, sinun täytyy palauttaa laite tehdasasetuksiin.",
@@ -131,15 +137,15 @@
 		"sharableUrl": "Jaettava URL",
 		"title": "Generoi QR-koodi"
 	},
-	"rebootOta": {
-		"title": "Ajasta uudelleenkäynnistys",
-		"description": "Käynnistä yhdistetty laite uudelleen viiveen jälkeen OTA-tilaan (langaton päivitys).",
-		"enterDelay": "Anna viive (sekuntia)",
-		"scheduled": "Uudelleenkäynnistys on ajastettu"
-	},
 	"reboot": {
-		"title": "Ajasta uudelleenkäynnistys",
-		"description": "Käynnistä yhdistetty laite x minuutin jälkeen."
+		"title": "Käynnistä laite uudelleen",
+		"description": "Käynnistä laite uudelleen heti tai ajasta sen uudelleenkäynnistys. Halutessasi voit valita käynnistyksen OTA-tilaan (Over-the-Air ohjelmistopäivitystilaan).",
+		"ota": "Käynnistä uudelleen OTA-tilaan",
+		"enterDelay": "Aseta viive",
+		"scheduled": "Uudelleenkäynnistys on ajastettu",
+		"schedule": "Ajasta uudelleen käynnistys",
+		"now": "Uudelleen käynnistä nyt",
+		"cancel": "Peruuta ajastettu uudelleen käynnistys"
 	},
 	"refreshKeys": {
 		"description": {
@@ -178,5 +184,10 @@
 		"confirmUnderstanding": "Kyllä, tiedän mitä teen",
 		"title": "Oletko varma?",
 		"description": "Hallintatilan käyttöönotto estää asiakassovelluksia (mukaan lukien verkkoselain) tekemästä muutoksia laitteen asetuksiin. Kun hallintatila on käytössä, laitteen asetuksia voidaan muuttaa ainoastaan etähallintaviesteillä (Remote Admin). Tämä asetus ei ole pakollinen etähallintaan."
+	},
+	"clientNotification": {
+		"title": "Sovellusilmoitukset",
+		"TraceRoute can only be sent once every 30 seconds": "Reitinselvityksen voi tehdä kerran 30:ssä sekunnissa",
+		"Compromised keys were detected and regenerated.": "Turvallisuudeltaan vaarantuneet avaimet havaittiin ja ne generoitiin uudestaan."
 	}
 }

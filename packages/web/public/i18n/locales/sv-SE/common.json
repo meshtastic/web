@@ -17,7 +17,6 @@
 		"now": "Nu",
 		"ok": "Okej",
 		"print": "Skriv ut",
-		"rebootOtaNow": "Starta om till OTA-läge nu",
 		"remove": "Ta bort",
 		"requestNewKeys": "Begär nya nycklar",
 		"requestPosition": "Begär position",
@@ -137,5 +136,7 @@
 			"managed": "Åtminstone en administratörsnyckel krävs om noden fjärrhanteras.",
 			"key": "En nyckel måste anges."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }

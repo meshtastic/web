@@ -75,7 +75,8 @@
 			"unknownErrorLoadingDevices": "Unbekannter Fehler beim Laden der Geräte"
 		},
 		"validation": {
-			"requiresFeatures": "Dieser Verbindungstyp erfordert <0></0>. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
+			"requiresWebBluetooth": "Dieser Verbindungstyp erfordert <0>Bluetooth</0> im Browser. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
+			"requiresWebSerial": "Dieser Verbindungstyp erfordert <0>Serielle Schnittstelle</0> im Browser. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
 			"requiresSecureContext": "Diese Anwendung erfordert einen <0>sicheren Kontext</0>. Bitte verbinden Sie sich über HTTPS oder localhost.",
 			"additionallyRequiresSecureContext": "Zusätzlich erfordert es einen <0>sicheren Kontext</0>. Bitte verbinden Sie sich über HTTPS oder localhost."
 		}
@@ -92,7 +93,7 @@
 		"deviceMetrics": "Gerätekennzahlen:",
 		"hardware": "Hardware: ",
 		"lastHeard": "Zuletzt gehört: ",
-		"nodeHexPrefix": "Knoten ID: !",
+		"nodeHexPrefix": "Knoten ID:",
 		"nodeNumber": "Knotennummer: ",
 		"position": "Standort:",
 		"role": "Rolle: ",
@@ -101,7 +102,12 @@
 		"title": "Knotendetails für {{identifier}}",
 		"ignoreNode": "Knoten ignorieren",
 		"removeNode": "Knoten entfernen",
-		"unignoreNode": "Knoten akzeptieren"
+		"unignoreNode": "Knoten akzeptieren",
+		"security": "Sicherheit:",
+		"publicKey": "Öffentlicher Schlüssel:",
+		"messageable": "Ansprechbar:",
+		"KeyManuallyVerifiedTrue": "Öffentlicher Schlüssel wurde manuell geprüft",
+		"KeyManuallyVerifiedFalse": "Öffentlicher Schlüssel ist nicht manuell geprüft"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "Wenn Sie Ihre Schlüssel verlieren, müssen Sie Ihr Gerät zurücksetzen.",
@@ -131,15 +137,15 @@
 		"sharableUrl": "Teilbare URL",
 		"title": "QR Code Erzeugen"
 	},
-	"rebootOta": {
-		"title": "Neustart planen",
-		"description": "Startet den verbundenen Knoten nach einer Verzögerung in den OTA (Over-the-Air) Modus.",
-		"enterDelay": "Verzögerung eingeben (Sek.)",
-		"scheduled": "Neustart wurde geplant"
-	},
 	"reboot": {
-		"title": "Neustart planen",
-		"description": "Startet den verbundenen Knoten nach x Minuten neu."
+		"title": "Gerät neustarten",
+		"description": "Starten Sie jetzt neu oder planen Sie einen Neustart des verbundenen Knotens. Optional können Sie einen Neustart in den OTA (Over-the-Air) Modus wählen.",
+		"ota": "Neustart in den OTA Modus",
+		"enterDelay": "Verzögerung eingeben",
+		"scheduled": "Neustart wurde geplant",
+		"schedule": "Neustart planen",
+		"now": "Jetzt neustarten",
+		"cancel": "Geplanten Neustart abbrechen"
 	},
 	"refreshKeys": {
 		"description": {
@@ -178,5 +184,10 @@
 		"confirmUnderstanding": "Ja, ich weiß, was ich tue!",
 		"title": "Sind Sie sicher?",
 		"description": "Das Aktivieren des verwalteten Modus blockiert das Schreiben der Einstellungen in das Funkgerät durch alle Anwendungen (einschließlich der Webanwendung). Einmal aktiviert, können die Einstellungen nur durch administrative Nachrichten geändert werden. Diese Einstellung ist für die Fernverwaltung von abgesetzten Knoten nicht erforderlich."
+	},
+	"clientNotification": {
+		"title": "Warnmeldung",
+		"TraceRoute can only be sent once every 30 seconds": "TraceRoute kann nur einmal alle 30 Sekunden versendet werden.",
+		"Compromised keys were detected and regenerated.": "Kompromittierte Schlüssel wurden erkannt und neu generiert."
 	}
 }

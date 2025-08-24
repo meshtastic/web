@@ -17,7 +17,6 @@
 		"now": "Зараз",
 		"ok": "Гаразд",
 		"print": "Print",
-		"rebootOtaNow": "Reboot to OTA Mode Now",
 		"remove": "Видалити",
 		"requestNewKeys": "Request New Keys",
 		"requestPosition": "Запитати позицію",
@@ -137,5 +136,7 @@
 			"managed": "At least one admin key is requred if the node is managed.",
 			"key": "Key is required."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }
