@@ -20,6 +20,7 @@ import {
 } from "@components/UI/Select.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
 import { useDevice } from "@core/stores";
+import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
@@ -32,7 +33,7 @@ export interface ImportDialogProps {
 }
 
 export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
-  const { config } = useDevice();
+  const { config, channels } = useDevice();
   const { t } = useTranslation("dialog");
   const [importDialogInput, setImportDialogInput] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
@@ -89,31 +90,45 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
           return;
         }
 
-        setWorkingChannelConfig(
-          create(Protobuf.Channel.ChannelSchema, {
-            index: importIndex[index],
-            role:
-              importIndex[index] === 0
-                ? Protobuf.Channel.Channel_Role.PRIMARY
-                : Protobuf.Channel.Channel_Role.SECONDARY,
-            settings: ch,
-          }),
-        );
+        const payload = create(Protobuf.Channel.ChannelSchema, {
+          index: importIndex[index],
+          role:
+            importIndex[index] === 0
+              ? Protobuf.Channel.Channel_Role.PRIMARY
+              : Protobuf.Channel.Channel_Role.SECONDARY,
+          settings: ch,
+        });
+
+        if (
+          deepCompareConfig(
+            channels.get(importIndex[index] ?? 0),
+            payload,
+            true,
+          )
+        ) {
+          return;
+        }
+
+        setWorkingChannelConfig(payload);
       },
     );
 
     if (channelSet?.loraConfig && updateConfig) {
-      setWorkingConfig(
-        create(Protobuf.Config.ConfigSchema, {
-          payloadVariant: {
-            case: "lora",
-            value: {
-              ...config.lora,
-              ...channelSet.loraConfig,
-            },
+      const payload = create(Protobuf.Config.ConfigSchema, {
+        payloadVariant: {
+          case: "lora",
+          value: {
+            ...config.lora,
+            ...channelSet.loraConfig,
           },
-        }),
-      );
+        },
+      });
+
+      if (deepCompareConfig(config.lora, payload, true)) {
+        return;
+      }
+
+      setWorkingConfig(payload);
     }
     // Reset state after import
     setImportDialogInput("");
@@ -180,7 +195,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
                 {channelSet?.settings.map((channel, index) => (
                   <div
                     className="flex items-center"
-                    key={`channel_${channel.id}`}
+                    key={`channel_${channel.id}_${index}`}
                   >
                     <Label className="flex-1">
                       {channel.name.length
@@ -207,7 +222,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
                           </SelectItem>
                         ))}
                         <SelectItem value="-1">
-                          {t("import.noNotImport")}
+                          {t("import.doNotImport")}
                         </SelectItem>
                       </SelectContent>
                     </Select>

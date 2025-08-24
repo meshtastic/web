@@ -214,7 +214,7 @@ const ConfigPage = () => {
     workingChannelConfig.length > 0;
   const isValid = isValidForm();
   const isDirty = isDirtyForm();
-  const hasPending = hasDrafts || isDirty;
+  const hasPending = formMethods?.formState.isReady && (hasDrafts || isDirty);
   const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
   const saveDisabled = isSaving || !isValid || !hasPending;
 
@@ -247,9 +247,10 @@ const ConfigPage = () => {
         icon: !isValid ? SaveOff : SaveIcon,
         isLoading: isSaving,
         disabled: saveDisabled,
-        iconClasses: !isValid
-          ? "text-red-400 cursor-not-allowed"
-          : "cursor-pointer",
+        iconClasses:
+          isDirty && !isValid
+            ? "text-red-400 cursor-not-allowed"
+            : "cursor-pointer",
         className: cn([
           "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
           "hover:dark:bg-slate-300 hover:dark:text-black",
@@ -262,6 +263,7 @@ const ConfigPage = () => {
     [
       isSaving,
       isValid,
+      isDirty,
       saveDisabled,
       buttonOpacity,
       handleReset,
