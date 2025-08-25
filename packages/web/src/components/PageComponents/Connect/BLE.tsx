@@ -20,7 +20,7 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
 
   const { addDevice } = useDeviceStore();
   const { addNodeDB } = useNodeDBStore();
-  const messageStore = useMessageStore();
+  const { addMessageStore } = useMessageStore();
   const { setSelectedDevice } = useAppStore();
   const { t } = useTranslation();
 
@@ -37,6 +37,7 @@ export const BLE = ({ closeDialog }: TabElementProps) => {
     const transport = await TransportWebBluetooth.createFromDevice(bleDevice);
     const device = addDevice(id);
     const nodeDB = addNodeDB(id);
+    const messageStore = addMessageStore(id);
 
     const connection = new MeshDevice(transport, id);
     connection.configure();

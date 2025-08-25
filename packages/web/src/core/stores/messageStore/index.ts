@@ -1,4 +1,4 @@
-// import { storageWithMapSupport } from "../storage/indexDB.ts";
+import { featureFlags } from "@core/services/featureFlags";
 import type {
   ChannelId,
   ClearMessageParams,
@@ -10,10 +10,15 @@ import type {
   NodeNum,
   SetMessageStateParams,
 } from "@core/stores/messageStore/types.ts";
+import { createStorage } from "@core/stores/utils/indexDB.ts";
 import type { Types } from "@meshtastic/core";
-// import { persist } from "zustand/middleware";
 import { produce } from "immer";
-import { create } from "zustand";
+import { create as createStore, type StateCreator } from "zustand";
+import { type PersistOptions, persist } from "zustand/middleware";
+
+const CURRENT_STORE_VERSION = 0;
+const MESSAGESTORE_RETENTION_NUM = 10;
+const MESSAGELOG_RETENTION_NUM = 1000; // Max messages per conversation/channel
 
 export enum MessageState {
   Ack = "ack",
@@ -33,55 +38,127 @@ export function getConversationId(
   return [node1, node2].sort((a, b) => a - b).join(":");
 }
 
-export interface MessageStore {
-  messages: {
-    direct: Map<ConversationId, MessageLogMap>;
-    broadcast: Map<ChannelId, MessageLogMap>;
-  };
+export interface MessageBuckets {
+  direct: Map<ConversationId, MessageLogMap>;
+  broadcast: Map<ChannelId, MessageLogMap>;
 }
 export interface MessageStore {
-  messages: MessageStore["messages"];
-  draft: Map<Types.Destination, string>;
-  nodeNum: number; // This device's node number
-  activeChat: number; // Represents otherNodeNum for Direct, or channel for Broadcast
+  id: number;
+  myNodeNum: number | undefined;
+
+  messages: MessageBuckets;
+  drafts: Map<Types.Destination, string>;
+
+  // Ephemeral UI state (not persisted)
+  activeChat: number;
   chatType: MessageType;
 
   setNodeNum: (nodeNum: number) => void;
-  getMyNodeNum: () => number;
   saveMessage: (message: Message) => void;
   setMessageState: (params: SetMessageStateParams) => void;
   getMessages: (params: GetMessagesParams) => Message[];
+
   getDraft: (key: Types.Destination) => string;
   setDraft: (key: Types.Destination, message: string) => void;
+  clearDraft: (key: Types.Destination) => void;
+  //clearAllDrafts: (key: Types.Destination) => void;
+
   deleteAllMessages: () => void;
   clearMessageByMessageId: (params: ClearMessageParams) => void;
-  clearDraft: (key: Types.Destination) => void;
 }
 
-// const CURRENT_STORE_VERSION = 0;
+export interface MessageStoreState {
+  addMessageStore: (id: number) => MessageStore;
+  removeMessageStore: (id: number) => void;
+  getMessageStore: (id: number) => MessageStore | undefined;
+  getMessageStores: () => MessageStore[];
+}
+interface PrivateMessageStoreState extends MessageStoreState {
+  messageStores: Map<number, MessageStore>;
+}
 
-export const useMessageStore = create<MessageStore>()(
-  // persist(
-  (set, get) => ({
-    messages: {
-      direct: new Map<ConversationId, MessageLogMap>(),
-      broadcast: new Map<ChannelId, MessageLogMap>(),
-    },
-    draft: new Map<number, string>(),
-    activeChat: 0,
-    chatType: MessageType.Broadcast,
-    nodeNum: 0,
+type MessageStoreData = {
+  id: number;
+  myNodeNum: number | undefined;
+
+  messages: MessageBuckets;
+  drafts: Map<Types.Destination, string>;
+};
+
+type MessageStorePersisted = {
+  messageStores: Map<number, MessageStoreData>;
+};
+
+function messageStoreFactory(
+  id: number,
+  get: () => PrivateMessageStoreState,
+  set: typeof useMessageStore.setState,
+  data?: Partial<MessageStoreData>,
+): MessageStore {
+  const messages = data?.messages ?? {
+    direct: new Map<ConversationId, MessageLogMap>(),
+    broadcast: new Map<ChannelId, MessageLogMap>(),
+  };
+  const drafts = data?.drafts ?? new Map<Types.Destination, string>();
+  const myNodeNum = data?.myNodeNum;
+  const activeChat = 0;
+  const chatType = MessageType.Broadcast;
+
+  return {
+    id,
+    myNodeNum,
+    messages,
+    drafts,
+    activeChat,
+    chatType,
+
     setNodeNum: (nodeNum) => {
       set(
-        produce((state: MessageStore) => {
-          state.nodeNum = nodeNum;
+        produce<PrivateMessageStoreState>((draft) => {
+          const newStore = draft.messageStores.get(id);
+          if (!newStore) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
+          newStore.myNodeNum = nodeNum;
+
+          for (const [otherId, oldStore] of draft.messageStores) {
+            if (otherId === id || oldStore.myNodeNum !== nodeNum) {
+              continue;
+            }
+
+            // Adopt broadcast conversations (reuses inner Map references)
+            for (const [channelId, logMap] of oldStore.messages.broadcast) {
+              newStore.messages.broadcast.set(channelId, logMap);
+            }
+
+            // Adopt direct conversations
+            for (const [conversationId, logMap] of oldStore.messages.direct) {
+              newStore.messages.direct.set(conversationId, logMap);
+            }
+
+            // Adopt drafts
+            for (const [destination, draftText] of oldStore.drafts) {
+              newStore.drafts.set(destination, draftText);
+            }
+
+            // Drop old store
+            draft.messageStores.delete(otherId);
+          }
         }),
       );
     },
-    getMyNodeNum: () => get().nodeNum,
+
+    // TODO: Cycle out old messages based on retention policy
     saveMessage: (message: Message) => {
       set(
-        produce((state: MessageStore) => {
+        produce<PrivateMessageStoreState>((draft) => {
+          const state = draft.messageStores.get(id);
+          if (!state) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
+          let log: MessageLogMap | undefined;
           if (message.type === MessageType.Direct) {
             const conversationId = getConversationId(message.from, message.to);
             if (!state.messages.direct.has(conversationId)) {
@@ -90,9 +167,9 @@ export const useMessageStore = create<MessageStore>()(
                 new Map<MessageId, Message>(),
               );
             }
-            state.messages.direct
-              .get(conversationId)
-              ?.set(message.messageId, message);
+
+            log = state.messages.direct.get(conversationId);
+            log?.set(message.messageId, message);
           } else if (message.type === MessageType.Broadcast) {
             const channelId = message.channel as ChannelId;
             if (!state.messages.broadcast.has(channelId)) {
@@ -101,9 +178,16 @@ export const useMessageStore = create<MessageStore>()(
                 new Map<MessageId, Message>(),
               );
             }
-            state.messages.broadcast
-              .get(channelId)
-              ?.set(message.messageId, message);
+
+            log = state.messages.broadcast.get(channelId);
+            log?.set(message.messageId, message);
+          }
+
+          while (log && log.size > MESSAGELOG_RETENTION_NUM) {
+            const firstKey = log.keys().next().value; // maps keep insertion order, so this is oldest
+            if (firstKey !== undefined) {
+              log.delete(firstKey);
+            }
           }
         }),
       );
@@ -111,7 +195,12 @@ export const useMessageStore = create<MessageStore>()(
 
     setMessageState: (params: SetMessageStateParams) => {
       set(
-        produce((state: MessageStore) => {
+        produce<PrivateMessageStoreState>((draft) => {
+          const state = draft.messageStores.get(id);
+          if (!state) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
           let messageLog: MessageLogMap | undefined;
           let targetMessage: Message | undefined;
 
@@ -144,8 +233,13 @@ export const useMessageStore = create<MessageStore>()(
         }),
       );
     },
+
     getMessages: (params: GetMessagesParams): Message[] => {
-      const state = get();
+      const state = get().messageStores.get(id);
+      if (!state) {
+        throw new Error(`No MessageStore found for id: ${id}`);
+      }
+
       let messageMap: MessageLogMap | undefined;
 
       if (params.type === MessageType.Direct) {
@@ -164,9 +258,61 @@ export const useMessageStore = create<MessageStore>()(
       return messagesArray;
     },
 
+    getDraft: (key) => {
+      const state = get().messageStores.get(id);
+      if (!state) {
+        throw new Error(`No MessageStore found for id: ${id}`);
+      }
+
+      return state.drafts.get(key) ?? "";
+    },
+    setDraft: (key, message) => {
+      set(
+        produce<PrivateMessageStoreState>((draft) => {
+          const state = draft.messageStores.get(id);
+          if (!state) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
+          state.drafts.set(key, message);
+        }),
+      );
+    },
+    clearDraft: (key) => {
+      set(
+        produce<PrivateMessageStoreState>((draft) => {
+          const state = draft.messageStores.get(id);
+          if (!state) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
+          state.drafts.delete(key);
+        }),
+      );
+    },
+
+    deleteAllMessages: () => {
+      set(
+        produce<PrivateMessageStoreState>((draft) => {
+          const state = draft.messageStores.get(id);
+          if (!state) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
+          state.messages.direct = new Map<ConversationId, MessageLogMap>();
+          state.messages.broadcast = new Map<ChannelId, MessageLogMap>();
+        }),
+      );
+    },
+
     clearMessageByMessageId: (params: ClearMessageParams) => {
       set(
-        produce((state: MessageStore) => {
+        produce<PrivateMessageStoreState>((draft) => {
+          const state = draft.messageStores.get(id);
+          if (!state) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
           let messageLog: MessageLogMap | undefined;
           let parentMap: Map<ConversationId | ChannelId, MessageLogMap>;
           let parentKey: ConversationId | ChannelId;
@@ -176,6 +322,7 @@ export const useMessageStore = create<MessageStore>()(
             parentMap = state.messages.direct;
             messageLog = parentMap.get(parentKey);
           } else {
+            // Broadcast
             parentKey = params.channelId;
             parentMap = state.messages.broadcast;
             messageLog = parentMap.get(parentKey);
@@ -206,39 +353,114 @@ export const useMessageStore = create<MessageStore>()(
         }),
       );
     },
-    getDraft: (key) => {
-      return get().draft.get(key) ?? "";
-    },
-    setDraft: (key, message) => {
-      set(
-        produce((state: MessageStore) => {
-          state.draft.set(key, message);
-        }),
-      );
-    },
-    clearDraft: (key) => {
-      set(
-        produce((state: MessageStore) => {
-          state.draft.delete(key);
-        }),
-      );
-    },
-    deleteAllMessages: () => {
-      set(
-        produce((state: MessageStore) => {
-          state.messages.direct = new Map<ConversationId, MessageLogMap>();
-          state.messages.broadcast = new Map<ChannelId, MessageLogMap>();
-        }),
-      );
-    },
+  };
+}
+
+export const messageStoreInitializer: StateCreator<PrivateMessageStoreState> = (
+  set,
+  get,
+) => ({
+  messageStores: new Map(),
+
+  addMessageStore: (id) => {
+    const existing = get().messageStores.get(id);
+    if (existing) {
+      return existing;
+    }
+
+    const nodeStore = messageStoreFactory(id, get, set);
+    set(
+      produce<PrivateMessageStoreState>((draft) => {
+        draft.messageStores.set(id, nodeStore);
+
+        // If over limit, remove oldest inserted. FIFO
+        if (draft.messageStores.size > MESSAGESTORE_RETENTION_NUM) {
+          const firstKey = draft.messageStores.keys().next().value;
+          if (firstKey !== undefined) {
+            draft.messageStores.delete(firstKey);
+          }
+        }
+      }),
+    );
+
+    return nodeStore;
+  },
+  removeMessageStore: (id) => {
+    set(
+      produce<PrivateMessageStoreState>((draft) => {
+        draft.messageStores.delete(id);
+      }),
+    );
+  },
+  getMessageStores: () => Array.from(get().messageStores.values()),
+  getMessageStore: (id) => get().messageStores.get(id),
+});
+
+const persistOptions: PersistOptions<
+  PrivateMessageStoreState,
+  MessageStorePersisted
+> = {
+  name: "meshtastic-MessageStore-store",
+  storage: createStorage<MessageStorePersisted>(),
+  version: CURRENT_STORE_VERSION,
+  partialize: (s): MessageStorePersisted => ({
+    messageStores: new Map(
+      Array.from(s.messageStores.entries()).map(([id, db]) => [
+        id,
+        {
+          id: db.id,
+          myNodeNum: db.myNodeNum,
+          messages: db.messages,
+          drafts: db.drafts,
+        },
+      ]),
+    ),
   }),
-  // {
-  //   name: 'meshtastic-message-store',
-  //   storage: storageWithMapSupport,
-  //   version: CURRENT_STORE_VERSION,
-  //   partialize: (state) => ({
-  //     messages: state.messages,
-  //     nodeNum: state.nodeNum,
-  //   }),
-  // })
+  onRehydrateStorage: () => (state) => {
+    if (!state) {
+      return;
+    }
+    console.debug(
+      "MessageStoreStore: Rehydrating state with ",
+      state.messageStores.size,
+      " MessageStores -",
+      state.messageStores,
+    );
+
+    useMessageStore.setState(
+      produce<PrivateMessageStoreState>((draft) => {
+        const rebuilt = new Map<number, MessageStore>();
+        for (const [id, data] of (
+          draft.messageStores as unknown as Map<number, MessageStoreData>
+        ).entries()) {
+          if (data.myNodeNum !== undefined) {
+            // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
+            rebuilt.set(
+              id,
+              messageStoreFactory(
+                id,
+                useMessageStore.getState,
+                useMessageStore.setState,
+                data,
+              ),
+            );
+          }
+        }
+        draft.messageStores = rebuilt;
+      }),
+    );
+  },
+};
+
+// Add persist middleware on the store if the feature flag is enabled
+const persistMessages = featureFlags.get("persistMessages");
+console.debug(
+  `MessageStore: Persisting messages is ${persistMessages ? "enabled" : "disabled"}`,
 );
+
+export const useMessageStore = persistMessages
+  ? createStore<
+      PrivateMessageStoreState,
+      [["zustand/persist", MessageStorePersisted]]
+    >(persist(messageStoreInitializer, persistOptions))
+  : createStore<PrivateMessageStoreState>()(messageStoreInitializer);
