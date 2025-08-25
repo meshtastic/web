@@ -24,7 +24,7 @@ export const decodePacket = (device: MeshDevice) =>
           break;
         }
         case "packet": {
-          let decodedMessage;
+          let decodedMessage: Protobuf.Mesh.FromRadio;
           try {
             decodedMessage = fromBinary(
               Protobuf.Mesh.FromRadioSchema,
