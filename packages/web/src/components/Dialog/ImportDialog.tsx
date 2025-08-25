@@ -100,35 +100,33 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
         });
 
         if (
-          deepCompareConfig(
+          !deepCompareConfig(
             channels.get(importIndex[index] ?? 0),
             payload,
             true,
           )
         ) {
-          return;
+          setWorkingChannelConfig(payload);
         }
-
-        setWorkingChannelConfig(payload);
       },
     );
 
     if (channelSet?.loraConfig && updateConfig) {
-      const payload = create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "lora",
-          value: {
-            ...config.lora,
-            ...channelSet.loraConfig,
-          },
-        },
-      });
+      const payload = {
+        ...config.lora,
+        ...channelSet.loraConfig,
+      };
 
-      if (deepCompareConfig(config.lora, payload, true)) {
-        return;
+      if (!deepCompareConfig(config.lora, payload, true)) {
+        setWorkingConfig(
+          create(Protobuf.Config.ConfigSchema, {
+            payloadVariant: {
+              case: "lora",
+              value: payload,
+            },
+          }),
+        );
       }
-
-      setWorkingConfig(payload);
     }
     // Reset state after import
     setImportDialogInput("");

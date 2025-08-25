@@ -46,8 +46,8 @@ export function PasswordGenerator<T extends FieldValues>({
           bits={field.bits}
           inputChange={(e) => {
             const value = e.target.value;
-            controllerField.onChange(value); // ensure RHF receives just the value
             field.inputChange?.(e); // call any external handler
+            controllerField.onChange(value); // ensure RHF receives just the value
           }}
           selectChange={field.selectChange ?? (() => {})}
           variant={invalid ? "invalid" : isDirty ? "dirty" : "default"}

@@ -14,7 +14,7 @@ import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { type DefaultValues, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -96,9 +96,14 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
   // Since byteCount is an independent state, we need to use the effective value
   // from the channel config to ensure the form updates when the setting changes
   const effectiveByteCount = effectiveConfig.settings?.psk.length ?? 16;
+  const lastEffectiveRef = useRef<number>(effectiveByteCount);
   useEffect(() => {
-    setBytes(effectiveByteCount);
-    trigger("settings.psk");
+    if (effectiveByteCount !== lastEffectiveRef.current) {
+      lastEffectiveRef.current = effectiveByteCount;
+
+      setBytes(effectiveByteCount);
+      trigger("settings.psk");
+    }
   }, [effectiveByteCount, trigger]);
 
   const onSubmit = (data: ChannelValidation) => {

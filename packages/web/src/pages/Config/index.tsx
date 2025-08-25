@@ -95,29 +95,31 @@ const ConfigPage = () => {
         ),
       );
 
-      await connection?.commitEditSettings().then(() => {
-        if (formMethods) {
-          formMethods.reset(undefined, {
-            keepDirty: false,
-            keepErrors: false,
-            keepTouched: false,
-            keepValues: false,
-          });
+      if (workingConfig.length > 0 || workingModuleConfig.length > 0) {
+        await connection?.commitEditSettings();
+      }
 
-          // Force RHF to re-validate and emit state
-          formMethods.trigger();
-        }
+      workingChannelConfig.forEach((newChannel) => addChannel(newChannel));
+      workingConfig.forEach((newConfig) => setConfig(newConfig));
+      workingModuleConfig.forEach((newModuleConfig) =>
+        setModuleConfig(newModuleConfig),
+      );
 
-        workingChannelConfig.map((newChannel) => addChannel(newChannel));
-        workingConfig.map((newConfig) => setConfig(newConfig));
-        workingModuleConfig.map((newModuleConfig) =>
-          setModuleConfig(newModuleConfig),
-        );
+      removeWorkingChannelConfig();
+      removeWorkingConfig();
+      removeWorkingModuleConfig();
 
-        removeWorkingChannelConfig();
-        removeWorkingConfig();
-        removeWorkingModuleConfig();
-      });
+      if (formMethods) {
+        formMethods.reset(formMethods.getValues(), {
+          keepDirty: false,
+          keepErrors: false,
+          keepTouched: false,
+          keepValues: false,
+        });
+
+        // Force RHF to re-validate and emit state
+        formMethods.trigger();
+      }
     } catch (_error) {
       toast({
         title: t("toast.configSaveError.title"),
