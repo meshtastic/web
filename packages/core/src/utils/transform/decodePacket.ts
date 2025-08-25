@@ -43,7 +43,15 @@ export const decodePacket = (device: MeshDevice) =>
           /** @todo Add map here when `all=true` gets fixed. */
           switch (decodedMessage.payloadVariant.case) {
             case "packet": {
-              device.handleMeshPacket(decodedMessage.payloadVariant.value);
+              try {
+                device.handleMeshPacket(decodedMessage.payloadVariant.value);
+              } catch (e) {
+                device.log.error(
+                  Types.Emitter[Types.Emitter.HandleFromRadio],
+                  "⚠️  Unable to handle mesh packet",
+                  e,
+                );
+              }
               break;
             }
 
