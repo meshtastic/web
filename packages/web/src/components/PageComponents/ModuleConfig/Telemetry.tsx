@@ -49,7 +49,6 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={TelemetryValidationSchema}
-      formId="ModuleConfig_TelemetryConfig"
       defaultValues={moduleConfig.telemetry}
       values={getEffectiveModuleConfig("telemetry")}
       fieldGroups={[

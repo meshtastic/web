@@ -44,7 +44,6 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={LoRaValidationSchema}
-      formId="Config_LoRaConfig"
       defaultValues={config.lora}
       values={getEffectiveConfig("lora")}
       fieldGroups={[

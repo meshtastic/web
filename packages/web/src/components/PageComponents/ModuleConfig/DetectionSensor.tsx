@@ -51,7 +51,6 @@ export const DetectionSensor = ({
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={DetectionSensorValidationSchema}
-      formId="ModuleConfig_DetectionSensorConfig"
       defaultValues={moduleConfig.detectionSensor}
       values={getEffectiveModuleConfig("detectionSensor")}
       fieldGroups={[

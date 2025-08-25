@@ -51,7 +51,6 @@ export const ExternalNotification = ({
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={ExternalNotificationValidationSchema}
-      formId="ModuleConfig_ExternalNotificationConfig"
       defaultValues={moduleConfig.externalNotification}
       values={getEffectiveModuleConfig("externalNotification")}
       fieldGroups={[

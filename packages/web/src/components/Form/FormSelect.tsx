@@ -70,6 +70,9 @@ export function SelectInput<T extends FieldValues>({
 
   const handleValueChange = async (newValue: string) => {
     const selectedKey = valueToKeyMap[newValue];
+    if (!selectedKey) {
+      return;
+    }
 
     if (field.validate) {
       const isValid = await field.validate(selectedKey);

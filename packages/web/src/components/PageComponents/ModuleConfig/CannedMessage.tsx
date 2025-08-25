@@ -51,7 +51,6 @@ export const CannedMessage = ({
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={CannedMessageValidationSchema}
-      formId="ModuleConfig_CannedMessageConfig"
       defaultValues={moduleConfig.cannedMessage}
       values={getEffectiveModuleConfig("cannedMessage")}
       fieldGroups={[

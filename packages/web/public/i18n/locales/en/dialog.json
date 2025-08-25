@@ -16,14 +16,18 @@
 		}
 	},
 	"import": {
-		"description": "The current LoRa configuration will be overridden.",
+		"description": "Import a Channel Set from a Meshtastic URL.",
 		"error": {
 			"invalidUrl": "Invalid Meshtastic URL"
 		},
-		"channelPrefix": "Channel: ",
+		"channelPrefix": "Channel ",
+		"primary": "Primary ",
+		"doNotImport": "No not import",
+		"channelName": "Name",
+		"channelSlot": "Slot",
 		"channelSetUrl": "Channel Set/QR Code URL",
-		"channels": "Channels:",
-		"usePreset": "Use Preset?",
+		"usePreset": "Import LoRa Preset",
+		"presetDescription": "The current LoRa configuration will be overridden.",
 		"title": "Import Channel Set"
 	},
 	"locationResponse": {
