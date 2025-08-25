@@ -1,6 +1,6 @@
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
-import { useMessageStore } from "@core/stores";
+import { useMessages } from "@core/stores";
 import type { Types } from "@meshtastic/core";
 import { SendIcon } from "lucide-react";
 import { startTransition, useState } from "react";
@@ -13,7 +13,7 @@ export interface MessageInputProps {
 }
 
 export const MessageInput = ({ onSend, to, maxBytes }: MessageInputProps) => {
-  const { setDraft, getDraft, clearDraft } = useMessageStore();
+  const { setDraft, getDraft, clearDraft } = useMessages();
   const { t } = useTranslation("messages");
 
   const calculateBytes = (text: string) => new Blob([text]).size;

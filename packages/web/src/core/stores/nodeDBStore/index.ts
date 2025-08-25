@@ -1,6 +1,7 @@
 import { create } from "@bufbuild/protobuf";
 import { featureFlags } from "@core/services/featureFlags";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
+import { mergeNodeInfo } from "@core/stores/utils/mergeNodeInfo";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
@@ -85,7 +86,15 @@ function nodeDBFactory(
           if (!nodeDB) {
             throw new Error(`No nodeDB found (id: ${id})`);
           }
-          nodeDB.nodeMap.set(node.num, node);
+          const prev =
+            nodeDB.nodeMap.get(node.num) ??
+            create(Protobuf.Mesh.NodeInfoSchema); // defaults if first time
+
+          const next = mergeNodeInfo(prev, node, (num, err) => {
+            nodeDB.setNodeError(num, err);
+          });
+
+          nodeDB.nodeMap.set(node.num, next);
         }),
       ),
 
@@ -228,18 +237,37 @@ function nodeDBFactory(
               continue;
             }
             if (oldDB.myNodeNum === nodeNum) {
-              // The new DB is typically empty when nodenum is set, so we can safely copy over from the old DB
-              // otherwise, discard the old DB completely
-              if (newDB.nodeMap.size === 0) {
-                newDB.nodeMap = oldDB.nodeMap;
-                newDB.nodeErrors = oldDB.nodeErrors;
-              } else {
-                console.error(
-                  `NodeDB with id: ${id} already has nodes, not merging with old DB`,
+              // We found the oldDB (same myNodeNum). Merge node-by-node.
+              const mergedNodeMap = new Map<number, Protobuf.Mesh.NodeInfo>(
+                oldDB.nodeMap,
+              );
+              const mergedErrors = new Map<number, NodeError>(oldDB.nodeErrors);
+
+              for (const [num, newNode] of newDB.nodeMap.entries()) {
+                const oldNode = mergedNodeMap.get(num);
+                if (!oldNode) {
+                  // brand new node → add directly
+                  mergedNodeMap.set(num, newNode);
+                  continue;
+                }
+                // Merge fields; user conflicts will be flagged and old.user retained
+                const m = mergeNodeInfo(oldNode, newNode, (n, err) =>
+                  mergedErrors.set(n, { node: n, error: err }),
                 );
+                mergedNodeMap.set(num, m);
               }
 
-              draft.nodeDBs.delete(key);
+              // bring over any new errors that old didn't have
+              for (const [n, err] of newDB.nodeErrors.entries()) {
+                if (!mergedErrors.has(n)) {
+                  mergedErrors.set(n, err);
+                }
+              }
+
+              // finalize: move merged data into newDB and drop oldDB entry
+              newDB.nodeMap = mergedNodeMap;
+              newDB.nodeErrors = mergedErrors;
+              draft.nodeDBs.delete(oldDB.id);
             }
           }
         }),
@@ -352,8 +380,8 @@ export const nodeDBInitializer: StateCreator<PrivateNodeDBState> = (
         draft.nodeDBs.set(id, nodeDB);
 
         // If over limit, remove oldest inserted. FIFO
-        if (draft.nodeDBs.size > NODEDB_RETENTION_NUM) {
-          const firstKey = draft.nodeDBs.keys().next().value;
+        while (draft.nodeDBs.size > NODEDB_RETENTION_NUM) {
+          const firstKey = draft.nodeDBs.keys().next().value; // maps keep insertion order, so this is oldest
           if (firstKey !== undefined) {
             draft.nodeDBs.delete(firstKey);
           }

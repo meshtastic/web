@@ -12,7 +12,7 @@ import {
   MessageState,
   MessageType,
   useDevice,
-  useMessageStore,
+  useMessages,
   useNodeDB,
   useSidebar,
 } from "@core/stores";
@@ -44,9 +44,9 @@ function SelectMessageChat() {
 
 export const MessagesPage = () => {
   const { channels, getUnreadCount, resetUnread, connection } = useDevice();
-  const { getNodes, getNode, hasNodeError } = useNodeDB();
+  const { getNodes, getNode, getMyNode, hasNodeError } = useNodeDB();
 
-  const { getMyNodeNum, getMessages, setMessageState } = useMessageStore();
+  const { getMessages, setMessageState } = useMessages();
 
   const { type, chatId } = useParams({ from: messagesWithParamsRoute.id });
 
@@ -77,7 +77,10 @@ export const MessagesPage = () => {
   useEffect(() => {
     if (!type && !chatId && filteredChannels.length > 0) {
       const defaultChannel = filteredChannels[0];
-      navigateToChat(MessageType.Broadcast, defaultChannel.index.toString());
+      navigateToChat(
+        MessageType.Broadcast,
+        defaultChannel?.index.toString() ?? "0",
+      );
     }
   }, [type, chatId, filteredChannels, navigateToChat]);
 
@@ -138,7 +141,7 @@ export const MessagesPage = () => {
           } else {
             setMessageState({
               type: MessageType.Direct,
-              nodeA: getMyNodeNum(),
+              nodeA: getMyNode().num,
               nodeB: numericChatId,
               messageId,
               newState: MessageState.Ack,
@@ -160,7 +163,7 @@ export const MessagesPage = () => {
         } else {
           setMessageState({
             type: MessageType.Direct,
-            nodeA: getMyNodeNum(),
+            nodeA: getMyNode().num,
             nodeB: numericChatId,
             messageId: failedId,
             newState: MessageState.Failed,
@@ -168,14 +171,7 @@ export const MessagesPage = () => {
         }
       }
     },
-    [
-      numericChatId,
-      chatType,
-      connection,
-      getMyNodeNum,
-      setMessageState,
-      isDirect,
-    ],
+    [numericChatId, chatType, connection, getMyNode, setMessageState, isDirect],
   );
 
   const renderChatContent = () => {
@@ -194,7 +190,7 @@ export const MessagesPage = () => {
           <ChannelChat
             messages={getMessages({
               type: MessageType.Direct,
-              nodeA: getMyNodeNum(),
+              nodeA: getMyNode().num,
               nodeB: numericChatId,
             }).reverse()}
           />

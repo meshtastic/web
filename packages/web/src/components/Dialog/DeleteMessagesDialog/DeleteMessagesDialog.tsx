@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { useMessageStore } from "@core/stores";
+import { useMessages } from "@core/stores";
 import { AlertTriangleIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -22,7 +22,7 @@ export const DeleteMessagesDialog = ({
   onOpenChange,
 }: DeleteMessagesDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { deleteAllMessages } = useMessageStore();
+  const { deleteAllMessages } = useMessages();
   const handleCloseDialog = () => {
     onOpenChange(false);
   };

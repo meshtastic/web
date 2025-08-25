@@ -6,12 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import {
-  MessageState,
-  useDevice,
-  useMessageStore,
-  useNodeDB,
-} from "@core/stores";
+import { MessageState, useDevice, useNodeDB } from "@core/stores";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
 import { type Protobuf, Types } from "@meshtastic/core";
@@ -53,8 +48,7 @@ interface MessageItemProps {
 
 export const MessageItem = ({ message }: MessageItemProps) => {
   const { config } = useDevice();
-  const { getNode } = useNodeDB();
-  const { getMyNodeNum } = useMessageStore();
+  const { getNode, getMyNode } = useNodeDB();
   const { t, i18n } = useTranslation("messages");
 
   const MESSAGE_STATUS_MAP = useMemo(
@@ -102,7 +96,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     return message.from != null ? getNode(message.from) : null;
   }, [getNode, message.from]);
 
-  const myNodeNum = useMemo(() => getMyNodeNum(), [getMyNodeNum]);
+  const myNodeNum = useMemo(() => getMyNode().num, [getMyNode]);
 
   const { displayName, shortName, isFavorite } = useMemo(() => {
     const userIdHex = message.from.toString(16).toUpperCase().padStart(2, "0");
