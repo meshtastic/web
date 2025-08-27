@@ -379,6 +379,53 @@ export class MeshDevice {
   }
 
   /**
+   * Sets the fixed position of a device. Can be used to
+   * position GPS-less devices.
+   */
+  public async setFixedPosition(
+    latitude: number,
+    longitude: number,
+  ): Promise<number> {
+    const setPositionMessage = create(Protobuf.Admin.AdminMessageSchema, {
+      payloadVariant: {
+        case: "setFixedPosition",
+        value: create(Protobuf.Mesh.PositionSchema, {
+          latitudeI: Math.floor(latitude / 1e-7),
+          longitudeI: Math.floor(longitude / 1e-7),
+        }),
+      },
+    });
+    return await this.sendPacket(
+      toBinary(Protobuf.Admin.AdminMessageSchema, setPositionMessage),
+      Protobuf.Portnums.PortNum.ADMIN_APP,
+      "self",
+      0,
+      true,
+      false,
+    );
+  }
+
+  /**
+   * Remove the fixed position of a device
+   */
+  public async removeFixedPosition(): Promise<number> {
+    const removePositionMessage = create(Protobuf.Admin.AdminMessageSchema, {
+      payloadVariant: {
+        case: "removeFixedPosition",
+        value: true,
+      },
+    });
+    return await this.sendPacket(
+      toBinary(Protobuf.Admin.AdminMessageSchema, removePositionMessage),
+      Protobuf.Portnums.PortNum.ADMIN_APP,
+      "self",
+      0,
+      true,
+      false,
+    );
+  }
+
+  /**
    * Gets specified channel information from the radio
    */
   public async getChannel(index: number): Promise<number> {
