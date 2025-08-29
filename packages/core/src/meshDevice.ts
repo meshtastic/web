@@ -808,7 +808,7 @@ export class MeshDevice {
       clearInterval(this._heartbeatIntervalId);
     }
     this._heartbeatIntervalId = setInterval(() => {
-      this.heartbeat();
+      this.heartbeat().catch(() => {});
     }, interval);
   }
 
