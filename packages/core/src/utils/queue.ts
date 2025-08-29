@@ -117,6 +117,11 @@ export class Queue {
             await writer.write(item.data);
             item.sent = true;
           } catch (error) {
+            if (error?.code === 'ECONNRESET') {
+              writer.releaseLock();
+              this.lock = false;
+              throw error;
+            }
             console.error(`Error sending packet ${item.id}`, error);
           }
         }
