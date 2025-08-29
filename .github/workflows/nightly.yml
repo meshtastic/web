@@ -73,7 +73,7 @@ jobs:
             TAG="nightly-${DATE}-${SHORTSHA}"
           fi
           echo "tag=$TAG"        >> "$GITHUB_OUTPUT"
-          echo "tags=nightly, $TAG" >> "$GITHUB_OUTPUT"
+          echo "tags=nightly,$TAG" >> "$GITHUB_OUTPUT"
           echo "Resolved nightly tags: nightly, $TAG"
 
       - name: Set up QEMU
@@ -88,11 +88,12 @@ jobs:
           image: ${{ env.REGISTRY_IMAGE }}
           tags: ${{ steps.meta.outputs.tags }}
           oci: true
-          platforms: linux/amd64, linux/arm64
+          platforms: linux/amd64,linux/arm64
           labels: |
             org.opencontainers.image.source=${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.created=${{ github.run_id }}
+            org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
+
 
       - name: Push To GHCR
         id: push-to-registry
