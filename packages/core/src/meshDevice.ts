@@ -64,6 +64,11 @@ export class MeshDevice {
         this.isConfigured = true;
       } else if (status === DeviceStatusEnum.DeviceConfiguring) {
         this.isConfigured = false;
+      } else if (status === DeviceStatusEnum.DeviceDisconnected) {
+        if (this._heartbeatIntervalId !== undefined) {
+          clearInterval(this._heartbeatIntervalId);
+        }
+        this.complete();
       }
     });
 
