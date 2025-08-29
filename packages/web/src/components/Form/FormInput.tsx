@@ -100,12 +100,7 @@ export function GenericInput<T extends FieldValues>({
           {currentLength}/{fieldLength.max}
         </div>
       )}
-
-      {isInvalid && (
-        <div className="absolute inset-y-12 bottom-0 flex items-center pr-3">
-          <p className="text-sm text-red-500">{error?.message ?? ""}</p>
-        </div>
-      )}
+      
     </div>
   );
 }
