@@ -775,7 +775,13 @@ export class MeshDevice {
       },
     });
 
-    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio));
+    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio))
+      .catch((e) => {
+        if (this.deviceStatus === DeviceStatusEnum.DeviceDisconnected) {
+          throw new Error('Device connection lost');
+        }
+        throw e;
+      });
   }
 
   /**
