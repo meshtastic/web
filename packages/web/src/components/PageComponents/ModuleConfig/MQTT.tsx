@@ -72,7 +72,6 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={MqttValidationSchema}
-      formId="ModuleConfig_MqttConfig"
       defaultValues={populateDefaultValues(moduleConfig.mqtt)}
       values={populateDefaultValues(getEffectiveModuleConfig("mqtt"))}
       fieldGroups={[

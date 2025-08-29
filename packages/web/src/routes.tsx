@@ -1,6 +1,5 @@
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import type { useAppStore, useMessageStore } from "@core/stores";
-import ChannelsPage from "@pages/Channels.tsx";
 import ConfigPage from "@pages/Config/index.tsx";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
@@ -81,12 +80,6 @@ const configRoute = createRoute({
   component: ConfigPage,
 });
 
-const channelsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/channels",
-  component: ChannelsPage,
-});
-
 const nodesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/nodes",
@@ -105,7 +98,6 @@ const routeTree = rootRoute.addChildren([
   messagesWithParamsRoute,
   mapRoute,
   configRoute,
-  channelsRoute,
   nodesRoute,
   dialogWithParamsRoute,
 ]);

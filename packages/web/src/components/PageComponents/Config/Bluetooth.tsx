@@ -44,7 +44,6 @@ export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={BluetoothValidationSchema}
-      formId="Config_BluetoothConfig"
       defaultValues={config.bluetooth}
       values={getEffectiveConfig("bluetooth")}
       fieldGroups={[

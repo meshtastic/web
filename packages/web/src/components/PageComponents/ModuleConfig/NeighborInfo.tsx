@@ -49,7 +49,6 @@ export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={NeighborInfoValidationSchema}
-      formId="ModuleConfig_NeighborInfoConfig"
       defaultValues={moduleConfig.neighborInfo}
       values={getEffectiveModuleConfig("neighborInfo")}
       fieldGroups={[

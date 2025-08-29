@@ -62,7 +62,6 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       }}
       onFormInit={onFormInit}
       validationSchema={PositionValidationSchema}
-      formId="Config_PositionConfig"
       defaultValues={config.position}
       values={getEffectiveConfig("position")}
       fieldGroups={[

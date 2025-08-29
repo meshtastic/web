@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/UI/Select.tsx";
-import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface ActionButton {
@@ -48,7 +47,6 @@ const Generator = ({
   showCopyButton,
   ...props
 }: GeneratorProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
   const passwordRequiredBitSize = bits
@@ -76,23 +74,6 @@ const Generator = ({
         },
       ];
 
-  // Invokes onChange event on the input element when the value changes from the parent component
-  useEffect(() => {
-    if (!inputRef.current) {
-      return;
-    }
-    const setValue = Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      "value",
-    )?.set;
-
-    if (!setValue) {
-      return;
-    }
-    inputRef.current.value = "";
-    setValue.call(inputRef.current, value);
-    inputRef.current.dispatchEvent(new Event("input", { bubbles: true }));
-  }, [value]);
   return (
     <>
       <Input
@@ -102,7 +83,6 @@ const Generator = ({
         value={value}
         onChange={inputChange}
         disabled={disabled}
-        ref={inputRef}
         showCopyButton={showCopyButton}
         showPasswordToggle={showPasswordToggle}
       />

@@ -103,7 +103,7 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
 
   return (
     <Tabs defaultValue={t("page.tabMqtt")}>
-      <TabsList className="dark:bg-slate-800">
+      <TabsList className="w-full dark:bg-slate-800">
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.label}
