@@ -3,7 +3,7 @@ import { Sidebar } from "@components/Sidebar.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useAppStore, useDevice } from "@core/stores";
+import { useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { ChannelConfig } from "@pages/Config/ChannelConfig.tsx";
 import { DeviceConfig } from "@pages/Config/DeviceConfig.tsx";
@@ -16,7 +16,7 @@ import {
   SaveOff,
   SettingsIcon,
 } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -33,13 +33,13 @@ const ConfigPage = () => {
     setModuleConfig,
     addChannel,
   } = useDevice();
-  const { isDirtyForm, isValidForm, setDirtyForm, setValidForm } =
-    useAppStore();
 
   const [activeConfigSection, setActiveConfigSection] = useState<
     "device" | "module" | "channel"
   >("device");
   const [isSaving, setIsSaving] = useState(false);
+  const [rhfState, setRhfState] = useState({ isDirty: false, isValid: true });
+  const unsubRef = useRef<(() => void) | null>(null);
   const [formMethods, setFormMethods] = useState<UseFormReturn | null>(null);
   const { toast } = useToast();
   const { t } = useTranslation("deviceConfig");
@@ -47,9 +47,32 @@ const ConfigPage = () => {
   const onFormInit = useCallback(
     <T extends FieldValues>(methods: UseFormReturn<T>) => {
       setFormMethods(methods as UseFormReturn);
+
+      setRhfState({
+        // Assume defailt on init, changes will be caught by subscription
+        isDirty: false,
+        isValid: true,
+      });
+
+      // Unsubscribe from previous subscriptions & subscribe to form changes
+      unsubRef.current?.();
+      unsubRef.current = methods.subscribe({
+        formState: { isDirty: true, isValid: true },
+        callback: ({ isValid, isDirty }) => {
+          setRhfState({
+            isDirty: isDirty ?? false,
+            isValid: isValid ?? true,
+          });
+        },
+      });
     },
     [],
   );
+
+  // Cleanup subscription on unmount
+  useEffect(() => {
+    return () => unsubRef.current?.();
+  }, []);
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
@@ -114,7 +137,7 @@ const ConfigPage = () => {
           keepDirty: false,
           keepErrors: false,
           keepTouched: false,
-          keepValues: false,
+          keepValues: true,
         });
 
         // Force RHF to re-validate and emit state
@@ -127,8 +150,6 @@ const ConfigPage = () => {
       });
     } finally {
       setIsSaving(false);
-      setDirtyForm(false);
-      setValidForm(true);
       toast({
         title: t("toast.saveAllSuccess.title"),
         description: t("toast.saveAllSuccess.description"),
@@ -148,16 +169,12 @@ const ConfigPage = () => {
     removeWorkingConfig,
     removeWorkingModuleConfig,
     removeWorkingChannelConfig,
-    setDirtyForm,
-    setValidForm,
   ]);
 
   const handleReset = useCallback(() => {
     if (formMethods) {
       formMethods.reset();
     }
-    setDirtyForm(false);
-    setValidForm(true);
     removeWorkingChannelConfig();
     removeWorkingConfig();
     removeWorkingModuleConfig();
@@ -166,8 +183,6 @@ const ConfigPage = () => {
     removeWorkingConfig,
     removeWorkingModuleConfig,
     removeWorkingChannelConfig,
-    setDirtyForm,
-    setValidForm,
   ]);
 
   const leftSidebar = useMemo(
@@ -214,11 +229,9 @@ const ConfigPage = () => {
     workingConfig.length > 0 ||
     workingModuleConfig.length > 0 ||
     workingChannelConfig.length > 0;
-  const isValid = isValidForm();
-  const isDirty = isDirtyForm();
-  const hasPending = formMethods?.formState.isReady && (hasDrafts || isDirty);
+  const hasPending = hasDrafts || rhfState.isDirty;
   const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
-  const saveDisabled = isSaving || !isValid || !hasPending;
+  const saveDisabled = isSaving || !rhfState.isValid || !hasPending;
 
   const actions = useMemo(
     () => [
@@ -246,11 +259,11 @@ const ConfigPage = () => {
       },
       {
         key: "save",
-        icon: !isValid ? SaveOff : SaveIcon,
+        icon: !hasPending ? SaveOff : SaveIcon,
         isLoading: isSaving,
         disabled: saveDisabled,
         iconClasses:
-          isDirty && !isValid
+          !rhfState.isValid && hasPending
             ? "text-red-400 cursor-not-allowed"
             : "cursor-pointer",
         className: cn([
@@ -264,8 +277,8 @@ const ConfigPage = () => {
     ],
     [
       isSaving,
-      isValid,
-      isDirty,
+      hasPending,
+      rhfState.isValid,
       saveDisabled,
       buttonOpacity,
       handleReset,

@@ -19,8 +19,6 @@ interface AppState {
   nodeNumToBeRemoved: number;
   connectDialogOpen: boolean;
   nodeNumDetails: number;
-  validForm: boolean;
-  dirtyForm: boolean;
 
   setRasterSources: (sources: RasterSource[]) => void;
   addRasterSource: (source: RasterSource) => void;
@@ -32,13 +30,6 @@ interface AppState {
   setNodeNumToBeRemoved: (nodeNum: number) => void;
   setConnectDialogOpen: (open: boolean) => void;
   setNodeNumDetails: (nodeNum: number) => void;
-
-  // Error management
-  isValidForm: () => boolean;
-  setValidForm: (valid: boolean) => void;
-
-  isDirtyForm: () => boolean;
-  setDirtyForm: (unsaved: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
@@ -50,8 +41,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
   connectDialogOpen: false,
   nodeNumToBeRemoved: 0,
   nodeNumDetails: 0,
-  validForm: true,
-  dirtyForm: true,
 
   setRasterSources: (sources: RasterSource[]) => {
     set(
@@ -109,28 +98,4 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set(() => ({
       nodeNumDetails: nodeNum,
     })),
-
-  isValidForm: () => {
-    const state = get();
-    return state.validForm;
-  },
-  setValidForm: (valid: boolean) => {
-    set(
-      produce<AppState>((draft) => {
-        draft.validForm = valid;
-      }),
-    );
-  },
-
-  isDirtyForm: () => {
-    const state = get();
-    return state.dirtyForm;
-  },
-  setDirtyForm: (saved: boolean) => {
-    set(
-      produce<AppState>((draft) => {
-        draft.dirtyForm = saved;
-      }),
-    );
-  },
 }));

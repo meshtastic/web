@@ -69,8 +69,8 @@
 			"description": "The configuration change {{case}} has been saved."
 		},
 		"saveAllSuccess": {
-			"title": "Save complete",
-			"description": "The configuration changes have been saved."
+			"title": "Saved",
+			"description": "All configuration changes have been saved."
 		},
 		"favoriteNode": {
 			"title": "{{action}} {{nodeName}} {{direction}} favorites.",

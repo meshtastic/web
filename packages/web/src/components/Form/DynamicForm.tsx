@@ -7,7 +7,6 @@ import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { useAppStore } from "@core/stores";
 import { useEffect } from "react";
 import {
   type Control,
@@ -83,7 +82,6 @@ export function DynamicForm<T extends FieldValues>({
   validationSchema,
 }: DynamicFormProps<T>) {
   const { t } = useTranslation();
-  const { setDirtyForm, setValidForm } = useAppStore();
 
   const internalMethods = useForm<T>({
     mode: "onChange",
@@ -92,6 +90,7 @@ export function DynamicForm<T extends FieldValues>({
       ? createZodResolver(validationSchema)
       : undefined,
     shouldFocusError: false,
+    shouldUnregister: true,
     resetOptions: { keepDefaultValues: true },
     values,
   });
@@ -106,19 +105,6 @@ export function DynamicForm<T extends FieldValues>({
       onFormInit?.(internalMethods);
     }
   }, [onFormInit, propMethods, internalMethods]);
-
-  useEffect(() => {
-    setValidForm(formState.isValid);
-    setDirtyForm(formState.isDirty);
-  }, [formState.isDirty, formState.isValid, setValidForm, setDirtyForm]);
-
-  useEffect(
-    () => () => {
-      setValidForm(true);
-      setDirtyForm(false);
-    },
-    [setValidForm, setDirtyForm],
-  );
 
   const isDisabled = (
     disabledBy?: DisabledBy<T>[],

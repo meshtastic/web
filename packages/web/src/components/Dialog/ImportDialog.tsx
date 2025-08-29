@@ -24,7 +24,7 @@ import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 
 export interface ImportDialogProps {
   open: boolean;
@@ -150,7 +150,12 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
         <DialogClose />
         <DialogHeader>
           <DialogTitle>{t("import.title")}</DialogTitle>
-          <DialogDescription>{t("import.description")}</DialogDescription>
+          <DialogDescription>
+            <Trans
+              i18nKey={"import.description"}
+              components={{ italic: <i />, br: <br /> }}
+            />
+          </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">
           <Label>{t("import.channelSetUrl")}</Label>
@@ -177,7 +182,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
                     onCheckedChange={(next) => setUpdateConfig(next)}
                   />
                   <Label className="">
-                    {t("import.usePreset")}
+                    {t("import.useLoraConfig")}
                     <span className="block pt-2 font-normal text-s">
                       {t("import.presetDescription")}
                     </span>
