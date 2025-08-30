@@ -1,11 +1,13 @@
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-// Ensure the path is correct for import
-import { useMessageStore } from "@core/stores";
+import { useMessages, type MessageStore } from "@core/stores";
 
 vi.mock("@core/stores", () => ({
-  useMessageStore: vi.fn(() => ({
+  CurrentDeviceContext: {
+      _currentValue: { deviceId: 1234 },
+  },
+  useMessages: vi.fn(() => ({
     deleteAllMessages: vi.fn(),
   })),
 }));
@@ -18,11 +20,11 @@ describe("DeleteMessagesDialog", () => {
     mockOnOpenChange.mockClear();
     mockClearAllMessages.mockClear();
 
-    const mockedUseMessageStore = vi.mocked(useMessageStore);
-    mockedUseMessageStore.mockImplementation(() => ({
+    const mockedUseMessages = vi.mocked(useMessages);
+    mockedUseMessages.mockImplementation(() => ({
       deleteAllMessages: mockClearAllMessages,
-    }));
-    mockedUseMessageStore.mockClear();
+    } as unknown as MessageStore));
+    mockedUseMessages.mockClear();
   });
 
   it("calls onOpenChange with false when the close button (X) is clicked", () => {

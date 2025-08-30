@@ -40,8 +40,11 @@ const mockSetDraft = vi.fn();
 const mockGetDraft = vi.fn();
 const mockClearDraft = vi.fn();
 
-vi.mock("@core/stores/messageStore", () => ({
-  useMessageStore: vi.fn(() => ({
+vi.mock("@core/stores", () => ({
+  CurrentDeviceContext: {
+      _currentValue: { deviceId: 1234 },
+  },
+  useMessages: vi.fn(() => ({
     setDraft: mockSetDraft,
     getDraft: mockGetDraft,
     clearDraft: mockClearDraft,

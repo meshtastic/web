@@ -149,7 +149,6 @@ function messageStoreFactory(
       );
     },
 
-    // TODO: Cycle out old messages based on retention policy
     saveMessage: (message: Message) => {
       set(
         produce<PrivateMessageStoreState>((draft) => {
