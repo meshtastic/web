@@ -1,7 +1,7 @@
+import { validateIncomingNode } from "@app/core/stores/nodeDBStore/nodeValidation";
 import { create } from "@bufbuild/protobuf";
 import { featureFlags } from "@core/services/featureFlags";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
-import { mergeNodeInfo } from "@core/stores/utils/mergeNodeInfo";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
@@ -34,6 +34,7 @@ export interface NodeDB {
   getNode: (nodeNum: number) => Protobuf.Mesh.NodeInfo | undefined;
   getNodes: (
     filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
+    includeSelf?: boolean,
   ) => Protobuf.Mesh.NodeInfo[];
   getMyNode: () => Protobuf.Mesh.NodeInfo;
 
@@ -86,14 +87,20 @@ function nodeDBFactory(
           if (!nodeDB) {
             throw new Error(`No nodeDB found (id: ${id})`);
           }
-          const prev =
-            nodeDB.nodeMap.get(node.num) ??
-            create(Protobuf.Mesh.NodeInfoSchema); // defaults if first time
+          // Use validation to check the new node before adding
+          const next = validateIncomingNode(
+            node,
+            (nodeNum: number, err: NodeErrorType) => {
+              nodeDB.setNodeError(nodeNum, err);
+            },
+            (filter?: (node: Protobuf.Mesh.NodeInfo) => boolean) =>
+              nodeDB.getNodes(filter, true),
+          );
 
-          const next = mergeNodeInfo(prev, node, (num, err) => {
-            nodeDB.setNodeError(num, err);
-          });
-
+          if (!next) {
+            // Validation failed and error has been set inside validateIncomingNode
+            return;
+          }
           nodeDB.nodeMap.set(node.num, next);
         }),
       ),
@@ -174,7 +181,7 @@ function nodeDBFactory(
           }
           const node = nodeDB.nodeMap.get(data.from);
           if (node) {
-            node.lastHeard = data.time;
+            node.lastHeard = data.time > 0 ? data.time : Date.now(); // fallback to now if time is 0 or negative
             node.snr = data.snr;
             nodeDB.nodeMap.set(data.from, node);
           } else {
@@ -182,7 +189,7 @@ function nodeDBFactory(
               data.from,
               create(Protobuf.Mesh.NodeInfoSchema, {
                 num: data.from,
-                lastHeard: data.time,
+                lastHeard: data.time > 0 ? data.time : Date.now(), // fallback to now if time is 0 or negative,
                 snr: data.snr,
               }),
             );
@@ -234,38 +241,44 @@ function nodeDBFactory(
 
           for (const [key, oldDB] of draft.nodeDBs) {
             if (key === id) {
+              // short-circuit self
               continue;
             }
             if (oldDB.myNodeNum === nodeNum) {
-              // We found the oldDB (same myNodeNum). Merge node-by-node.
-              const mergedNodeMap = new Map<number, Protobuf.Mesh.NodeInfo>(
-                oldDB.nodeMap,
-              );
-              const mergedErrors = new Map<number, NodeError>(oldDB.nodeErrors);
+              // We found the oldDB (same myNodeNum). Merge node-by-node as if the new nodes are added with addNode
 
-              for (const [num, newNode] of newDB.nodeMap.entries()) {
-                const oldNode = mergedNodeMap.get(num);
-                if (!oldNode) {
-                  // brand new node → add directly
-                  mergedNodeMap.set(num, newNode);
-                  continue;
-                }
-                // Merge fields; user conflicts will be flagged and old.user retained
-                const m = mergeNodeInfo(oldNode, newNode, (n, err) =>
-                  mergedErrors.set(n, { node: n, error: err }),
+              const mergedNodes = new Map(oldDB.nodeMap);
+              const mergedErrors = new Map(oldDB.nodeErrors);
+
+              const getNodesProxy = (
+                filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
+              ): Protobuf.Mesh.NodeInfo[] => {
+                const arr = Array.from(mergedNodes.values());
+                return filter ? arr.filter(filter) : arr;
+              };
+
+              const setErrorProxy = (nodeNum: number, err: NodeErrorType) => {
+                mergedErrors.set(nodeNum, { error: err } as NodeError);
+              };
+
+              for (const [nodeNum, newNode] of newDB.nodeMap) {
+                const next = validateIncomingNode(
+                  newNode,
+                  setErrorProxy,
+                  getNodesProxy,
                 );
-                mergedNodeMap.set(num, m);
-              }
+                if (next) {
+                  mergedNodes.set(nodeNum, next);
+                }
 
-              // bring over any new errors that old didn't have
-              for (const [n, err] of newDB.nodeErrors.entries()) {
-                if (!mergedErrors.has(n)) {
-                  mergedErrors.set(n, err);
+                const err = newDB.getNodeError(nodeNum);
+                if (err && !oldDB.hasNodeError(nodeNum)) {
+                  mergedErrors.set(nodeNum, err);
                 }
               }
 
-              // finalize: move merged data into newDB and drop oldDB entry
-              newDB.nodeMap = mergedNodeMap;
+              // finalize: move maps into newDB and drop oldDB entry
+              newDB.nodeMap = mergedNodes;
               newDB.nodeErrors = mergedErrors;
               draft.nodeDBs.delete(oldDB.id);
             }
@@ -319,14 +332,15 @@ function nodeDBFactory(
       return nodeDB.nodeMap.get(nodeNum);
     },
 
-    getNodes: (filter) => {
+    getNodes: (filter, includeSelf) => {
       const nodeDB = get().nodeDBs.get(id);
       if (!nodeDB) {
         throw new Error(`No nodeDB found (id: ${id})`);
       }
-      const all = Array.from(nodeDB.nodeMap.values()).filter(
-        (n) => n.num !== nodeDB.myNodeNum,
+      const all = Array.from(nodeDB.nodeMap.values()).filter((n) =>
+        includeSelf ? true : n.num !== nodeDB.myNodeNum,
       );
+
       return filter ? all.filter(filter) : all;
     },
 
