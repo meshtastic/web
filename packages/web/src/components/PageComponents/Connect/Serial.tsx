@@ -20,7 +20,7 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
 
   const { addDevice } = useDeviceStore();
   const { addNodeDB } = useNodeDBStore();
-  const messageStore = useMessageStore();
+  const { addMessageStore } = useMessageStore();
   const { setSelectedDevice } = useAppStore();
   const { t } = useTranslation();
 
@@ -42,6 +42,7 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
     const id = randId();
     const device = addDevice(id);
     const nodeDB = addNodeDB(id);
+    const messageStore = addMessageStore(id);
 
     setSelectedDevice(id);
     const transport = await TransportWebSerial.createFromPort(port);
