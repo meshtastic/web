@@ -76,6 +76,7 @@ export class TransportHTTP implements Types.Transport {
               Types.DeviceStatusEnum.DeviceDisconnected,
               this.isTimeoutOrAbort(error) ? "write-timeout" : "write-error",
             );
+            return;
           }
           throw error;
         }
@@ -165,6 +166,7 @@ export class TransportHTTP implements Types.Transport {
           Types.DeviceStatusEnum.DeviceDisconnected,
           this.isTimeoutOrAbort(error) ? "write-timeout" : "write-error",
         );
+        return;
       }
       throw error;
     }
