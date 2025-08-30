@@ -15,6 +15,7 @@ import type { Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist } from "zustand/middleware";
+import { evictOldestEntries } from "../utils/evictOldestEntries";
 
 const CURRENT_STORE_VERSION = 0;
 const MESSAGESTORE_RETENTION_NUM = 10;
@@ -182,11 +183,9 @@ function messageStoreFactory(
             log?.set(message.messageId, message);
           }
 
-          while (log && log.size > MESSAGELOG_RETENTION_NUM) {
-            const firstKey = log.keys().next().value; // maps keep insertion order, so this is oldest
-            if (firstKey !== undefined) {
-              log.delete(firstKey);
-            }
+          if (log) {
+            // Enforce retention limit
+            evictOldestEntries(log, MESSAGELOG_RETENTION_NUM);
           }
         }),
       );
@@ -372,13 +371,8 @@ export const messageStoreInitializer: StateCreator<PrivateMessageStoreState> = (
       produce<PrivateMessageStoreState>((draft) => {
         draft.messageStores.set(id, nodeStore);
 
-        // If over limit, remove oldest inserted. FIFO
-        if (draft.messageStores.size > MESSAGESTORE_RETENTION_NUM) {
-          const firstKey = draft.messageStores.keys().next().value;
-          if (firstKey !== undefined) {
-            draft.messageStores.delete(firstKey);
-          }
-        }
+        // Enforce retention limit
+        evictOldestEntries(draft.messageStores, MESSAGESTORE_RETENTION_NUM);
       }),
     );
 

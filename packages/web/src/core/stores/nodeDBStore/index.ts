@@ -6,6 +6,7 @@ import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist } from "zustand/middleware";
+import { evictOldestEntries } from "../utils/evictOldestEntries";
 import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types";
 
 const CURRENT_STORE_VERSION = 0;
@@ -393,13 +394,8 @@ export const nodeDBInitializer: StateCreator<PrivateNodeDBState> = (
       produce<PrivateNodeDBState>((draft) => {
         draft.nodeDBs.set(id, nodeDB);
 
-        // If over limit, remove oldest inserted. FIFO
-        while (draft.nodeDBs.size > NODEDB_RETENTION_NUM) {
-          const firstKey = draft.nodeDBs.keys().next().value; // maps keep insertion order, so this is oldest
-          if (firstKey !== undefined) {
-            draft.nodeDBs.delete(firstKey);
-          }
-        }
+        // Enforce retention limit
+        evictOldestEntries(draft.nodeDBs, NODEDB_RETENTION_NUM);
       }),
     );
 

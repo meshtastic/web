@@ -17,7 +17,10 @@ export function validateIncomingNode(
     // No existing node with this node number.
     // Check if the new node's public key (if present and not empty)
     // is already claimed by another existing node.
-    if (newNode.user?.publicKey !== undefined) {
+    if (
+      newNode.user?.publicKey !== undefined &&
+      newNode.user?.publicKey.length > 0
+    ) {
       const nodesWithSameKey = getNodes(
         (node) => node.user?.publicKey === newNode.user?.publicKey,
       );
