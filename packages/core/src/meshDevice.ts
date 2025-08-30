@@ -808,7 +808,12 @@ export class MeshDevice {
       clearInterval(this._heartbeatIntervalId);
     }
     this._heartbeatIntervalId = setInterval(() => {
-      this.heartbeat().catch(() => {});
+      this.heartbeat().catch((err) => {
+        this.log.error(
+          Emitter[Emitter.Ping], 
+          `⚠️ Unable to send heartbeat: ${err.message}`
+        );
+      });
     }, interval);
   }
 
