@@ -73,8 +73,8 @@ jobs:
             TAG="nightly-${DATE}-${SHORTSHA}"
           fi
           echo "tag=$TAG"        >> "$GITHUB_OUTPUT"
-          echo "tags=nightly,$TAG" >> "$GITHUB_OUTPUT"
-          echo "Resolved nightly tags: nightly, $TAG"
+          echo "tags=nightly-$TAG" >> "$GITHUB_OUTPUT"
+          echo "Resolved nightly tags: nightly-$TAG"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
