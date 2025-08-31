@@ -180,4 +180,56 @@ describe("useFilterNode", () => {
       expect(isFilterDirty(modified)).toBe(true);
     });
   });
+
+  describe("default-boundary semantics", () => {
+    const node = createMockNode();
+
+    it("lastHeard: end at default max means 'any age'", () => {
+      const {
+        lastHeard: [lastHeardMin, lastHeardMax],
+      } = defaultFilterValues;
+      const veryOld = { ...node, lastHeard: lastHeardMax + 1 }; // older than slider max
+      expect(
+        nodeFilter(veryOld, { lastHeard: [lastHeardMin, lastHeardMax] }),
+      ).toBe(true); // open upper
+      expect(
+        nodeFilter(veryOld, { lastHeard: [lastHeardMin, lastHeardMax - 1] }),
+      ).toBe(false); // now bounded
+    });
+
+    it("snr: max at default means no upper bound", () => {
+      const {
+        snr: [snrMin, snrMax],
+      } = defaultFilterValues;
+      const hiSnr = { ...node, snr: snrMax + 1 }; // above slider max
+      expect(nodeFilter(hiSnr, { snr: [snrMin, snrMax] })).toBe(true); // open upper
+      expect(nodeFilter(hiSnr, { snr: [snrMin, snrMax - 1] })).toBe(false); // bounded
+    });
+
+    it("snr: min at default means no lower bound", () => {
+      const {
+        snr: [snrMin, snrMax],
+      } = defaultFilterValues;
+      const loSnr = { ...node, snr: snrMin - 1 }; // below slider min
+      expect(nodeFilter(loSnr, { snr: [snrMin, snrMax] })).toBe(true); // open lower
+      expect(nodeFilter(loSnr, { snr: [snrMin + 1, snrMax] })).toBe(false); // bounded
+    });
+
+    it("voltage: max at default means no upper bound", () => {
+      const {
+        voltage: [voltageMin, voltageMax],
+      } = defaultFilterValues;
+      const hiV = {
+        ...node,
+        deviceMetrics: {
+          ...node.deviceMetrics!,
+          voltage: voltageMax + 1,
+        },
+      } satisfies Protobuf.Mesh.NodeInfo;
+      expect(nodeFilter(hiV, { voltage: [voltageMin, voltageMax] })).toBe(true); // open upper
+      expect(
+        nodeFilter(hiV, { voltage: [voltageMin, voltageMax - 0.01] }),
+      ).toBe(false); // bounded
+    });
+  });
 });

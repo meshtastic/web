@@ -127,7 +127,12 @@ export function useFilterNode() {
       }
 
       const snr = node.snr ?? -20;
-      if (snr < filterState.snr[0] || snr > filterState.snr[1]) {
+      if (
+        (snr < filterState.snr[0] &&
+          filterState.snr[0] !== defaultFilterValues.snr[0]) ||
+        (snr > filterState.snr[1] &&
+          filterState.snr[1] !== defaultFilterValues.snr[1])
+      ) {
         return false;
       }
 
@@ -158,7 +163,8 @@ export function useFilterNode() {
       const voltage = node.deviceMetrics?.voltage ?? 0;
       if (
         voltage < filterState.voltage[0] ||
-        voltage > filterState.voltage[1]
+        (voltage > filterState.voltage[1] &&
+          filterState.voltage[1] !== defaultFilterValues.voltage[1])
       ) {
         return false;
       }
