@@ -114,8 +114,8 @@
 			"label": "12-часов часовник"
 		},
 		"wakeOnTapOrMotion": {
-			"description": "Wake the device on tap or motion",
-			"label": "Wake on Tap or Motion"
+			"description": "Събуждане на устройството при докосване или движение",
+			"label": "Събуждане при докосване или движение"
 		}
 	},
 	"lora": {
@@ -204,7 +204,7 @@
 		"note": "Забележка: Някои устройства (ESP32) не могат да използват едновременно Bluetooth и WiFi.",
 		"addressMode": {
 			"description": "Address assignment selection",
-			"label": "Address Mode"
+			"label": "Режим на адреса"
 		},
 		"dns": {
 			"description": "DNS сървър",

@@ -33,7 +33,7 @@
       "qrGenerator": "Генератор",
       "qrImport": "Импортиране",
       "scheduleShutdown": "Планирано изключване",
-      "scheduleReboot": "Reboot Device",
+      "scheduleReboot": "Рестартиране на устройството",
       "resetNodeDb": "Нулиране на базата данни с възли",
       "dfuMode": "Влизане в DFU режим",
       "factoryResetDevice": "Фабрично нулиране на устройството",

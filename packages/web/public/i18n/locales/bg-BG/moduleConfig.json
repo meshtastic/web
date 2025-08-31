@@ -271,9 +271,9 @@
 				"options": {
 					"metric_km23": "В рамките на 23 км",
 					"metric_km12": "В рамките на 12 км",
-					"metric_km5_8": "Within 5.8 km",
-					"metric_km2_9": "Within 2.9 km",
-					"metric_km1_5": "Within 1.5 km",
+					"metric_km5_8": "В рамките на 5.8 км",
+					"metric_km2_9": "В рамките на 2.9 км",
+					"metric_km1_5": "В рамките на 1.5 км",
 					"metric_m700": "В рамките на 700 м",
 					"metric_m350": "В рамките на 350 м",
 					"metric_m200": "В рамките на 200 м",
@@ -326,27 +326,27 @@
 		}
 	},
 	"rangeTest": {
-		"title": "Range Test Settings",
-		"description": "Settings for the Range Test module",
+		"title": "Настройки за тест на обхвата",
+		"description": "Настройки на модула за тестване на обхвата",
 		"enabled": {
 			"label": "Модулът е активиран",
 			"description": "Enable Range Test"
 		},
 		"sender": {
-			"label": "Message Interval",
-			"description": "How long to wait between sending test packets"
+			"label": "Интервал на съобщенията",
+			"description": "Колко време да се чака между изпращането на тестови пакети"
 		},
 		"save": {
-			"label": "Save CSV to storage",
+			"label": "Запазване на CSV в хранилището",
 			"description": "Само ESP32"
 		}
 	},
 	"serial": {
-		"title": "Serial Settings",
-		"description": "Settings for the Serial module",
+		"title": "Серийни настройки",
+		"description": "Настройки на серийния модул",
 		"enabled": {
 			"label": "Модулът е активиран",
-			"description": "Enable Serial output"
+			"description": "Активиране на сериен изход"
 		},
 		"echo": {
 			"label": "Echo",

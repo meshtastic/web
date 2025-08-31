@@ -22,48 +22,48 @@
 		}
 	},
 	"psk": {
-		"label": "Pre-Shared Key",
-		"description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
-		"generate": "Generate"
+		"label": "Clave pre-compartida",
+		"description": "Longitudes PSK soportadas: 256-bit, 128-bit, 8-bit, Vacío (0-bit)",
+		"generate": "Generar Nombre"
 	},
 	"name": {
 		"label": "Nombre",
-		"description": "A unique name for the channel <12 bytes, leave blank for default"
+		"description": "Un nombre único para el canal <12 bytes, dejar en blanco por defecto"
 	},
 	"uplinkEnabled": {
-		"label": "Uplink Enabled",
-		"description": "Send messages from the local mesh to MQTT"
+		"label": "Subida de Paquetes Permitida",
+		"description": "Enviar mensajes de la malla local a MQTT"
 	},
 	"downlinkEnabled": {
-		"label": "Downlink Enabled",
-		"description": "Send messages from MQTT to the local mesh"
+		"label": "Baja de Paquetes Permitida",
+		"description": "Enviar mensajes de MQTT a la malla local"
 	},
 	"positionPrecision": {
-		"label": "Location",
-		"description": "The precision of the location to share with the channel. Can be disabled.",
+		"label": "Ubicación",
+		"description": "La precisión de la ubicación a compartir con el canal. Se puede desactivar.",
 		"options": {
-			"none": "Do not share location",
-			"precise": "Precise Location",
-			"metric_km23": "Within 23 kilometers",
-			"metric_km12": "Within 12 kilometers",
-			"metric_km5_8": "Within 5.8 kilometers",
-			"metric_km2_9": "Within 2.9 kilometers",
-			"metric_km1_5": "Within 1.5 kilometers",
-			"metric_m700": "Within 700 meters",
-			"metric_m350": "Within 350 meters",
-			"metric_m200": "Within 200 meters",
-			"metric_m90": "Within 90 meters",
-			"metric_m50": "Within 50 meters",
-			"imperial_mi15": "Within 15 miles",
-			"imperial_mi7_3": "Within 7.3 miles",
-			"imperial_mi3_6": "Within 3.6 miles",
-			"imperial_mi1_8": "Within 1.8 miles",
-			"imperial_mi0_9": "Within 0.9 miles",
-			"imperial_mi0_5": "Within 0.5 miles",
-			"imperial_mi0_2": "Within 0.2 miles",
-			"imperial_ft600": "Within 600 feet",
-			"imperial_ft300": "Within 300 feet",
-			"imperial_ft150": "Within 150 feet"
+			"none": "No compartir la ubicación",
+			"precise": "Ubicación precisa",
+			"metric_km23": "En 23 kilómetros",
+			"metric_km12": "En 12 kilómetros",
+			"metric_km5_8": "En 5,8 kilómetros",
+			"metric_km2_9": "En 2.9 kilómetros",
+			"metric_km1_5": "En 1,5 kilómetros",
+			"metric_m700": "En 700 metros",
+			"metric_m350": "En 350 metros",
+			"metric_m200": "En 200 metros",
+			"metric_m90": "En 90 metros",
+			"metric_m50": "En 50 metros",
+			"imperial_mi15": "En 15 millas",
+			"imperial_mi7_3": "En 7.3 millas",
+			"imperial_mi3_6": "En 3.6 millas",
+			"imperial_mi1_8": "En 1.8 millas",
+			"imperial_mi0_9": "En 0.9 millas",
+			"imperial_mi0_5": "En 0.5 millas",
+			"imperial_mi0_2": "En 0.2 millas",
+			"imperial_ft600": "En 600 pies",
+			"imperial_ft300": "En 300 pies",
+			"imperial_ft150": "En 150 pies"
 		}
 	}
 }
