@@ -1,14 +1,14 @@
 {
   "name": "@meshtastic/transport-web-serial",
   "version": "0.2.4-0",
-	"description": "A transport layer for Meshtastic applications using Web Serial API.",
-	"exports": {
-		".": "./mod.ts"
-	},
-  "type": "module", 
-  "main": "./dist/mod.mjs",       
-  "module": "./dist/mod.mjs",     
-  "types": "./dist/mod.d.mts",    
+  "description": "A transport layer for Meshtastic applications using Web Serial API.",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "type": "module",
+  "main": "./dist/mod.mjs",
+  "module": "./dist/mod.mjs",
+  "types": "./dist/mod.d.mts",
   "files": [
     "package.json",
     "README.md",
@@ -19,7 +19,9 @@
   "tsdown": {
     "entry": "mod.ts",
     "dts": true,
-    "format": ["esm"],
+    "format": [
+      "esm"
+    ],
     "splitting": false,
     "clean": true
   },

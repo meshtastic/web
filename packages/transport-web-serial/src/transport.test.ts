@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { TransportWebSerial } from "./transport";
 import { Types, Utils } from "@meshtastic/core";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract";
+import { TransportWebSerial } from "./transport";
 
 function stubCoreTransforms() {
   const toDevice = new TransformStream<Uint8Array, Uint8Array>({
@@ -45,14 +45,26 @@ function stubNavigatorSerial() {
   const handlers = new Set<SerialDisconnectHandler>();
 
   const serialStub = {
-    addEventListener: (type: string, handler: EventListenerOrEventListenerObject) => {
-      if (type === "disconnect") handlers.add(handler as any as SerialDisconnectHandler);
+    addEventListener: (
+      type: string,
+      handler: EventListenerOrEventListenerObject,
+    ) => {
+      if (type === "disconnect") {
+        handlers.add(handler as any as SerialDisconnectHandler);
+      }
     },
-    removeEventListener: (type: string, handler: EventListenerOrEventListenerObject) => {
-      if (type === "disconnect") handlers.delete(handler as any as SerialDisconnectHandler);
+    removeEventListener: (
+      type: string,
+      handler: EventListenerOrEventListenerObject,
+    ) => {
+      if (type === "disconnect") {
+        handlers.delete(handler as any as SerialDisconnectHandler);
+      }
     },
     dispatchDisconnect(port: any) {
-      for (const h of handlers) h({ port });
+      for (const h of handlers) {
+        h({ port });
+      }
     },
     requestPort: vi.fn(async () => new FakeSerialPort()),
   };
@@ -201,8 +213,12 @@ describe("TransportWebSerial (extras)", () => {
     // drain statuses until connected
     for (let i = 0; i < 3; i++) {
       const { value } = await reader.read();
-      if (!value || value.type !== "status") break;
-      if (value.data.status === Types.DeviceStatusEnum.DeviceConnected) break;
+      if (!value || value.type !== "status") {
+        break;
+      }
+      if (value.data.status === Types.DeviceStatusEnum.DeviceConnected) {
+        break;
+      }
     }
 
     // fire OS-level disconnect
@@ -212,7 +228,10 @@ describe("TransportWebSerial (extras)", () => {
     let saw = false;
     for (let i = 0; i < 6; i++) {
       const { value } = await reader.read();
-      if (value?.type === "status" && value.data.reason === "serial-disconnected") {
+      if (
+        value?.type === "status" &&
+        value.data.reason === "serial-disconnected"
+      ) {
         saw = true;
         break;
       }

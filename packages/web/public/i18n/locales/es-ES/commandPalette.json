@@ -1,51 +1,51 @@
 {
-  "emptyState": "No results found.",
+  "emptyState": "No se encontraron resultados.",
   "page": {
-    "title": "Command Menu"
+    "title": "Menú de comandos"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "label": "Anclar grupo de comandos"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "label": "Desanclar grupo de comandos"
   },
   "goto": {
-    "label": "Goto",
+    "label": "Ir a",
     "command": {
       "messages": "Mensajes",
       "map": "Mapa",
-      "config": "Config",
+      "config": "Configuración",
       "channels": "Canales",
       "nodes": "Nodos"
     }
   },
   "manage": {
-    "label": "Manage",
+    "label": "Gestiona",
     "command": {
-      "switchNode": "Switch Node",
-      "connectNewNode": "Connect New Node"
+      "switchNode": "Cambiar nodo",
+      "connectNewNode": "Conectar nodo nuevo"
     }
   },
   "contextual": {
     "label": "Contextual",
     "command": {
-      "qrCode": "QR Code",
-      "qrGenerator": "Generator",
+      "qrCode": "Código QR",
+      "qrGenerator": "Generador",
       "qrImport": "Importar",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Reboot Device",
-      "resetNodeDb": "Reset Node DB",
+      "scheduleShutdown": "Programar apagado",
+      "scheduleReboot": "Reiniciar dispositivo",
+      "resetNodeDb": "Restablece DB",
       "dfuMode": "Entrar en modo DFU",
-      "factoryResetDevice": "Factory Reset Device",
-      "factoryResetConfig": "Factory Reset Config",
+      "factoryResetDevice": "Reiniciar dispositivo de fábrica",
+      "factoryResetConfig": "Configuración de reinicio de fábrica",
       "disconnect": "Desconectar"
     }
   },
   "debug": {
     "label": "Depuración",
     "command": {
-      "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "reconfigure": "Volver a configurar",
+      "clearAllStoredMessages": "Borrar mensajes guardados"
     }
   }
 }

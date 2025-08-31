@@ -1,27 +1,27 @@
 {
 	"deleteMessages": {
 		"description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-		"title": "Clear All Messages"
+		"title": "Borrar todos los mensajes"
 	},
 	"deviceName": {
-		"description": "The Device will restart once the config is saved.",
-		"longName": "Long Name",
-		"shortName": "Short Name",
-		"title": "Change Device Name",
+		"description": "El dispositivo se reiniciará una vez que se guarde la configuración.",
+		"longName": "Nombre largo",
+		"shortName": "Nombre Corto",
+		"title": "Cambiar nombre del dispositivo",
 		"validation": {
-			"longNameMax": "Long name must not be more than 40 characters",
-			"shortNameMax": "Short name must not be more than 4 characters",
-			"longNameMin": "Long name must have at least 1 character",
-			"shortNameMin": "Short name must have at least 1 character"
+			"longNameMax": "El nombre largo no debe tener más de 40 caracteres",
+			"shortNameMax": "El nombre corto no debe tener más de 4 caracteres",
+			"longNameMin": "El nombre largo debe tener al menos 1 carácter",
+			"shortNameMin": "El nombre corto debe tener al menos 1 carácter"
 		}
 	},
 	"import": {
-		"description": "The current LoRa configuration will be overridden.",
+		"description": "Se anulará la configuración actual de LoRa.",
 		"error": {
-			"invalidUrl": "Invalid Meshtastic URL"
+			"invalidUrl": "URL Meshtastic no válida"
 		},
 		"channelPrefix": "Channel: ",
-		"channelSetUrl": "Channel Set/QR Code URL",
+		"channelSetUrl": "Fijar canal/código QR URL",
 		"channels": "Channels:",
 		"usePreset": "Use Preset?",
 		"title": "Import Channel Set"

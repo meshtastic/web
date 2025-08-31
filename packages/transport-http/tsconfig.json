@@ -7,7 +7,7 @@
     "outDir": "./dist",
     "moduleResolution": "bundler",
     "emitDeclarationOnly": false,
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
   "include": ["src"]
 }

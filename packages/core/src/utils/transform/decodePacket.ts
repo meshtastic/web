@@ -24,16 +24,34 @@ export const decodePacket = (device: MeshDevice) =>
           break;
         }
         case "packet": {
-          const decodedMessage = fromBinary(
-            Protobuf.Mesh.FromRadioSchema,
-            chunk.data,
-          );
+          let decodedMessage: Protobuf.Mesh.FromRadio;
+          try {
+            decodedMessage = fromBinary(
+              Protobuf.Mesh.FromRadioSchema,
+              chunk.data,
+            );
+          } catch (e) {
+            device.log.error(
+              Types.Emitter[Types.Emitter.HandleFromRadio],
+              "⚠️  Received undecodable packet",
+              e,
+            );
+            break;
+          }
           device.events.onFromRadio.dispatch(decodedMessage);
 
           /** @todo Add map here when `all=true` gets fixed. */
           switch (decodedMessage.payloadVariant.case) {
             case "packet": {
-              device.handleMeshPacket(decodedMessage.payloadVariant.value);
+              try {
+                device.handleMeshPacket(decodedMessage.payloadVariant.value);
+              } catch (e) {
+                device.log.error(
+                  Types.Emitter[Types.Emitter.HandleFromRadio],
+                  "⚠️  Unable to handle mesh packet",
+                  e,
+                );
+              }
               break;
             }
 

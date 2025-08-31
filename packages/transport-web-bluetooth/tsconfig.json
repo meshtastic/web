@@ -1,4 +1,4 @@
-  {
+{
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
@@ -8,12 +8,7 @@
     "moduleResolution": "bundler",
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
-		"types": ["@types/web-bluetooth"],
+    "types": ["@types/web-bluetooth"]
   },
   "include": ["src"]
 }
-
-
-
-
-
