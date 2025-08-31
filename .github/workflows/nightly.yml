@@ -87,6 +87,7 @@ jobs:
             ./packages/web/infra/Containerfile
           image: ${{ env.REGISTRY_IMAGE }}
           tags: ${{ steps.meta.outputs.tags }}
+          working-directory: packages/web
           oci: true
           platforms: linux/amd64,linux/arm64
           labels: |
