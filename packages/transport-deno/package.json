@@ -1,18 +1,20 @@
 {
-	"name": "@meshtastic/transport-deno",
-	"version": "0.1.1",
-	"description": "Deno-specific transport layer for Meshtastic web applications.",
-	"exports": {
-		".": "./mod.ts"
-	},
-	"main": "./dist/mod.mjs",       
-  "module": "./dist/mod.mjs",     
-  "types": "./dist/mod.d.mts",    
+  "name": "@meshtastic/transport-deno",
+  "version": "0.1.1",
+  "description": "Deno-specific transport layer for Meshtastic web applications.",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "main": "./dist/mod.mjs",
+  "module": "./dist/mod.mjs",
+  "types": "./dist/mod.d.mts",
   "license": "GPL-3.0-only",
   "tsdown": {
     "entry": "mod.ts",
     "dts": true,
-    "format": ["esm"],
+    "format": [
+      "esm"
+    ],
     "splitting": false,
     "clean": true
   },

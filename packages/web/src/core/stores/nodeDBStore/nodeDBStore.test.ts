@@ -24,7 +24,9 @@ vi.mock("@core/services/featureFlags", () => {
   return {
     featureFlags: {
       get: vi.fn((key: string) => {
-        if (key === "persistNodeDB") return true;
+        if (key === "persistNodeDB") {
+          return true;
+        }
         return false;
       }),
     },
@@ -64,7 +66,7 @@ describe("NodeDB store", () => {
     expect(db.getNode(10)?.num).toBe(10);
 
     const all = db.getNodes();
-    expect(all.map(n => n.num).sort()).toEqual([10, 11]);
+    expect(all.map((n) => n.num).sort()).toEqual([10, 11]);
 
     db.removeNode(10);
     expect(db.getNodesLength()).toBe(1);
@@ -128,7 +130,6 @@ describe("NodeDB store", () => {
     const { useNodeDBStore } = await freshStore();
     const st = useNodeDBStore.getState();
 
-    
     const oldDB = st.addNodeDB(10);
     oldDB.setNodeNum(999);
     oldDB.addNode(makeNode(200));
@@ -161,7 +162,7 @@ describe("NodeDB store", () => {
     expect(newDB.getNode(300)).toBeTruthy();
     expect(newDB.getNode(200)).toBeUndefined();
   });
-  
+
   it("partialize persists only data, and onRehydrateStorage rebuilds methods", async () => {
     {
       const { useNodeDBStore } = await freshStore();
@@ -202,7 +203,9 @@ describe("NodeDB store", () => {
   it("when exceeding cap, evicts earliest inserted, not the newly added", async () => {
     const { useNodeDBStore } = await freshStore();
     const st = useNodeDBStore.getState();
-    for (let i = 1; i <= 10; i++) st.addNodeDB(i);
+    for (let i = 1; i <= 10; i++) {
+      st.addNodeDB(i);
+    }
     st.addNodeDB(11);
     expect(st.getNodeDB(1)).toBeUndefined();
     expect(st.getNodeDB(11)).toBeDefined();

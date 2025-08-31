@@ -1,52 +1,52 @@
 {
-	"name": "@meshtastic/web",
-	"version": "2.7.0-0",
-	"type": "module",
-	"description": "Meshtastic web client monorepo",
-	"license": "GPL-3.0-only",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/meshtastic/web.git"
-	},
-	"bugs": {
-		"url": "https://github.com/meshtastic/web/issues"
-	},
-	"homepage": "https://meshtastic.org",
-	"simple-git-hooks": {
-		"pre-commit": "pnpm run check:fix"
-	},
-	"scripts": {
-		"preinstall": "npx only-allow pnpm",
-		"lint": "biome lint",
-		"lint:fix": "biome lint --write",
-		"format": "biome format",
-		"format:fix": "biome format . --write",
-		"check": "biome check",
-		"check:fix": "biome check --write",
-		"build:all": "pnpm run --filter '*' build",
-		"clean:all": "pnpm run --filter '*' clean",
-		"publish:packages": "pnpm run build --filter 'packages/transport-*'",
-		"test": "vitest"
-	},
-	"dependencies": {
-		"@bufbuild/protobuf": "^2.6.1",
-		"@meshtastic/protobufs": "npm:@jsr/meshtastic__protobufs@^2.7.0",
-		"ste-simple-events": "^3.0.11",
-		"tslog": "^4.9.3"
-	},
-	"devDependencies": {
-		"@types/node": "^22.16.4",
-		"@biomejs/biome": "2.0.6",
-		"tsdown": "^0.13.4",
-		"typescript": "^5.8.3",
-		"vitest": "^3.2.4"
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@tailwindcss/oxide",
-			"core-js",
-			"esbuild",
-			"simple-git-hooks"
-		]
-	}
+  "name": "@meshtastic/web",
+  "version": "2.7.0-0",
+  "type": "module",
+  "description": "Meshtastic web client monorepo",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meshtastic/web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/meshtastic/web/issues"
+  },
+  "homepage": "https://meshtastic.org",
+  "simple-git-hooks": {
+    "pre-commit": "pnpm run check:fix"
+  },
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --write",
+    "format": "biome format",
+    "format:fix": "biome format . --write",
+    "check": "biome check",
+    "check:fix": "biome check --write",
+    "build:all": "pnpm run --filter '*' build",
+    "clean:all": "pnpm run --filter '*' clean",
+    "publish:packages": "pnpm run build --filter 'packages/transport-*'",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.6.1",
+    "@meshtastic/protobufs": "npm:@jsr/meshtastic__protobufs@^2.7.0",
+    "ste-simple-events": "^3.0.11",
+    "tslog": "^4.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.16.4",
+    "@biomejs/biome": "2.0.6",
+    "tsdown": "^0.13.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@tailwindcss/oxide",
+      "core-js",
+      "esbuild",
+      "simple-git-hooks"
+    ]
+  }
 }

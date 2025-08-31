@@ -1,4 +1,4 @@
-  {
+{
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
@@ -8,12 +8,7 @@
     "moduleResolution": "bundler",
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
-		"types": ["@types/w3c-web-serial"],
+    "types": ["@types/w3c-web-serial"]
   },
   "include": ["src"]
 }
-
-
-
-
-

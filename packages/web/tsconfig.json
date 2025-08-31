@@ -1,35 +1,35 @@
 {
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"strictNullChecks": true,
-		"strictPropertyInitialization": false,
-		"allowImportingTsExtensions": true,
-		"types": [
-			"vite/client",
-			"node",
-			"@types/w3c-web-serial",
-			"@types/web-bluetooth"
-		],
-		"baseUrl": ".",
-		"paths": {
-			"@app/*": ["./src/*"],
-			"@public/*": ["./public/*"],
-			"@pages/*": ["./src/pages/*"],
-			"@components/*": ["./src/components/*"],
-			"@core/*": ["./src/core/*"],
-			"@layouts/*": ["./src/layouts/*"]
-		}
-	},
-	"include": ["src", ".d.ts"],
-	"exclude": [
-		"routeTree.gen.ts",
-		"node_modules",
-		"dist",
-		"build",
-		"coverage",
-		"out",
-		".vscode-test"
-	]
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": false,
+    "allowImportingTsExtensions": true,
+    "types": [
+      "vite/client",
+      "node",
+      "@types/w3c-web-serial",
+      "@types/web-bluetooth"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["./src/*"],
+      "@public/*": ["./public/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@components/*": ["./src/components/*"],
+      "@core/*": ["./src/core/*"],
+      "@layouts/*": ["./src/layouts/*"]
+    }
+  },
+  "include": ["src", ".d.ts"],
+  "exclude": [
+    "routeTree.gen.ts",
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "out",
+    ".vscode-test"
+  ]
 }
