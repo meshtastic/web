@@ -99,15 +99,15 @@
 		"role": "Роля: ",
 		"uptime": "Време на работа: ",
 		"voltage": "Напрежение",
-		"title": "Node Details for {{identifier}}",
+		"title": "Подробности за възел за {{identifier}}",
 		"ignoreNode": "Игнориране на възела",
 		"removeNode": "Премахване на възела",
 		"unignoreNode": "Премахване на игнорирането на възела",
-		"security": "Security:",
+		"security": "Сигурност:",
 		"publicKey": "Public Key: ",
 		"messageable": "Messageable: ",
-		"KeyManuallyVerifiedTrue": "Public Key has been manually verified",
-		"KeyManuallyVerifiedFalse": "Public Key is not manually verified"
+		"KeyManuallyVerifiedTrue": "Публичният ключ е проверен ръчно",
+		"KeyManuallyVerifiedFalse": "Публичният ключ не е проверен ръчно"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "Ако загубите ключовете си, ще трябва да нулирате устройството си.",
@@ -138,13 +138,13 @@
 		"title": "Генериране на QR код"
 	},
 	"reboot": {
-		"title": "Reboot device",
+		"title": "Рестартиране на устройството",
 		"description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
 		"ota": "Reboot into OTA mode",
 		"enterDelay": "Enter delay",
 		"scheduled": "Насрочено е рестартиране",
-		"schedule": "Schedule reboot",
-		"now": "Reboot now",
+		"schedule": "Планиране на рестартиране",
+		"now": "Рестартиране сега",
 		"cancel": "Cancel scheduled reboot"
 	},
 	"refreshKeys": {
@@ -173,8 +173,8 @@
 	},
 	"unsafeRoles": {
 		"confirmUnderstanding": "Да, знам какво правя",
-		"conjunction": " and the blog post about ",
-		"postamble": " and understand the implications of changing the role.",
+		"conjunction": "и публикацията в блога за ",
+		"postamble": " и разберам последиците от промяната на ролята.",
 		"preamble": "Аз прочетох ",
 		"choosingRightDeviceRole": "Избор на правилната роля на устройството",
 		"deviceRoleDocumentation": "Документация за ролите на устройството",
@@ -188,6 +188,6 @@
 	"clientNotification": {
 		"title": "Client Notification",
 		"TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
-		"Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
+		"Compromised keys were detected and regenerated.": "Бяха открити и регенерирани компрометирани ключове."
 	}
 }

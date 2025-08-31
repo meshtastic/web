@@ -120,41 +120,41 @@
 	},
 	"lora": {
 		"title": "Ajustes de la Red",
-		"description": "Settings for the LoRa mesh",
+		"description": "Opciones de la malla LoRa",
 		"bandwidth": {
-			"description": "Channel bandwidth in MHz",
+			"description": "Ancho de banda de canal en MHz",
 			"label": "Ancho de Banda"
 		},
 		"boostedRxGain": {
-			"description": "Boosted RX gain",
-			"label": "Boosted RX Gain"
+			"description": "Aumentada la ganancia RX",
+			"label": "Aumentada la ganancia RX"
 		},
 		"codingRate": {
-			"description": "The denominator of the coding rate",
-			"label": "Coding Rate"
+			"description": "El denominador de la tasa de codificación",
+			"label": "Tasa de codificación"
 		},
 		"frequencyOffset": {
-			"description": "Frequency offset to correct for crystal calibration errors",
-			"label": "Frequency Offset"
+			"description": "Desplazamiento de frecuencia para corregir los errores de calibración del cristal",
+			"label": "Desplazamiento de la Frecuencia"
 		},
 		"frequencySlot": {
-			"description": "LoRa frequency channel number",
-			"label": "Frequency Slot"
+			"description": "Número de canal de frecuencia LoRa",
+			"label": "Slot de frecuencia"
 		},
 		"hopLimit": {
-			"description": "Maximum number of hops",
-			"label": "Hop Limit"
+			"description": "Número máximo de saltos",
+			"label": "Límite de Saltos"
 		},
 		"ignoreMqtt": {
-			"description": "Don't forward MQTT messages over the mesh",
+			"description": "No reenviar mensajes MQTT sobre la malla",
 			"label": "Ignorar Paquetes MQTT"
 		},
 		"modemPreset": {
-			"description": "Modem preset to use",
-			"label": "Modem Preset"
+			"description": "Modem predefinido para usar",
+			"label": "Modem predefinido"
 		},
 		"okToMqtt": {
-			"description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+			"description": "Cuando se establece en true, esta configuración indica que el usuario aprueba el paquete para ser subido a MQTT. Si se establece a false, los nodos remotos son solicitados no reenviar paquetes a MQTT",
 			"label": "Permitir Subir Paquetes al MQTT"
 		},
 		"overrideDutyCycle": {
@@ -162,169 +162,169 @@
 			"label": "Sobreescribir el Tiempo de Trabajo"
 		},
 		"overrideFrequency": {
-			"description": "Override frequency",
-			"label": "Override Frequency"
+			"description": "Reemplazar frecuencia",
+			"label": "Reemplazar frecuencia"
 		},
 		"region": {
-			"description": "Sets the region for your node",
+			"description": "Establece la región para su nodo",
 			"label": "Región"
 		},
 		"spreadingFactor": {
-			"description": "Indicates the number of chirps per symbol",
-			"label": "Spreading Factor"
+			"description": "Indica el número de chirps por símbolo",
+			"label": "Factor de dispersión"
 		},
 		"transmitEnabled": {
-			"description": "Enable/Disable transmit (TX) from the LoRa radio",
-			"label": "Transmit Enabled"
+			"description": "Activar/Desactivar transmisión (TX) desde la radio LoRa",
+			"label": "Transmisión Activa"
 		},
 		"transmitPower": {
-			"description": "Max transmit power",
-			"label": "Transmit Power"
+			"description": "Máxima potencia de transmisión",
+			"label": "Potencia de transmisión"
 		},
 		"usePreset": {
-			"description": "Use one of the predefined modem presets",
-			"label": "Use Preset"
+			"description": "Utilice uno de los ajustes predefinidos del módem",
+			"label": "Usar ajuste"
 		},
 		"meshSettings": {
-			"description": "Settings for the LoRa mesh",
+			"description": "Opciones de la malla LoRa",
 			"label": "Ajustes de la Red"
 		},
 		"waveformSettings": {
-			"description": "Settings for the LoRa waveform",
-			"label": "Waveform Settings"
+			"description": "Configuración de la forma de onda LoRa",
+			"label": "Ajustes de forma de onda"
 		},
 		"radioSettings": {
-			"label": "Radio Settings",
-			"description": "Settings for the LoRa radio"
+			"label": "Ajustes de radio",
+			"description": "Configuración de la forma de onda LoRa"
 		}
 	},
 	"network": {
-		"title": "WiFi Config",
-		"description": "WiFi radio configuration",
+		"title": "Configuración WiFi",
+		"description": "Configuración de radio WiFi",
 		"note": "Nota: Algunos dispositivos (ESP32) no pueden usar Bluetooth y Wifi al mismo tiempo.",
 		"addressMode": {
-			"description": "Address assignment selection",
-			"label": "Address Mode"
+			"description": "Selección de asignación de dirección",
+			"label": "Modo de dirección"
 		},
 		"dns": {
-			"description": "DNS Server",
+			"description": "Servidor DNS",
 			"label": "DNS"
 		},
 		"ethernetEnabled": {
-			"description": "Enable or disable the Ethernet port",
+			"description": "Activar o desactivar el puerto Ethernet",
 			"label": "Habilitado"
 		},
 		"gateway": {
-			"description": "Default Gateway",
+			"description": "Puerta de Entrada Predeterminada",
 			"label": "Puerta enlace"
 		},
 		"ip": {
-			"description": "IP Address",
+			"description": "Dirección IP",
 			"label": "IP"
 		},
 		"psk": {
-			"description": "Network password",
+			"description": "Contraseña de red",
 			"label": "PSK (Contraseña)"
 		},
 		"ssid": {
-			"description": "Network name",
+			"description": "Nombre de red",
 			"label": "SSID (Nombre la Red)"
 		},
 		"subnet": {
-			"description": "Subnet Mask",
+			"description": "Máscara de subred",
 			"label": "Subred"
 		},
 		"wifiEnabled": {
-			"description": "Enable or disable the WiFi radio",
+			"description": "Activar o desactivar la radio WiFi",
 			"label": "Habilitado"
 		},
 		"meshViaUdp": {
-			"label": "Mesh via UDP"
+			"label": "Malla via UDP"
 		},
 		"ntpServer": {
-			"label": "NTP Server"
+			"label": "Servidor NTP"
 		},
 		"rsyslogServer": {
-			"label": "Rsyslog Server"
+			"label": "Servidor Rsyslog"
 		},
 		"ethernetConfigSettings": {
-			"description": "Ethernet port configuration",
-			"label": "Ethernet Config"
+			"description": "Configuración del puerto Ethernet",
+			"label": "Configuración Ethernet"
 		},
 		"ipConfigSettings": {
-			"description": "IP configuration",
-			"label": "IP Config"
+			"description": "Configuración de IP",
+			"label": "Configuración de IP"
 		},
 		"ntpConfigSettings": {
-			"description": "NTP configuration",
-			"label": "NTP Config"
+			"description": "Configuración NTP",
+			"label": "Configuración NTP"
 		},
 		"rsyslogConfigSettings": {
-			"description": "Rsyslog configuration",
-			"label": "Rsyslog Config"
+			"description": "Configuración Rsyslog",
+			"label": "Configuración Rsyslog"
 		},
 		"udpConfigSettings": {
-			"description": "UDP over Mesh configuration",
+			"description": "Configuración de UDP sobre Malla",
 			"label": "Configuración UDP"
 		}
 	},
 	"position": {
-		"title": "Position Settings",
-		"description": "Settings for the position module",
+		"title": "Ajustes de posición",
+		"description": "Configuración del módulo de posición",
 		"broadcastInterval": {
-			"description": "How often your position is sent out over the mesh",
-			"label": "Broadcast Interval"
+			"description": "Con qué frecuencia se envía tu posición sobre la malla",
+			"label": "Intervalo de transmisión"
 		},
 		"enablePin": {
-			"description": "GPS module enable pin override",
-			"label": "Enable Pin"
+			"description": "Módulo GPS activar anulación de pin",
+			"label": "Activar pin"
 		},
 		"fixedPosition": {
-			"description": "Don't report GPS position, but a manually-specified one",
-			"label": "Fixed Position"
+			"description": "No informar de la posición del GPS, pero una especificada manualmente",
+			"label": "Posición Fijada"
 		},
 		"gpsMode": {
-			"description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
-			"label": "GPS Mode"
+			"description": "Configurar si el dispositivo GPS está activado, desactivado o no está presente",
+			"label": "Modo del GPS"
 		},
 		"gpsUpdateInterval": {
-			"description": "How often a GPS fix should be acquired",
-			"label": "GPS Update Interval"
+			"description": "Con qué frecuencia debe adquirirse una posición GPS",
+			"label": "Intervalo de actualización GPS"
 		},
 		"positionFlags": {
-			"description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
-			"label": "Position Flags"
+			"description": "Campos opcionales para incluir al ensamblar mensajes de posición. Cuantos más campos se seleccionen, más grande será el mensaje que llevará a un mayor uso del tiempo de aire y un mayor riesgo de pérdida de paquetes.",
+			"label": "Marcas de posición"
 		},
 		"receivePin": {
-			"description": "GPS module RX pin override",
+			"description": "Módulo RX del GPS ignorar Pin",
 			"label": "Receive Pin"
 		},
 		"smartPositionEnabled": {
-			"description": "Only send position when there has been a meaningful change in location",
-			"label": "Enable Smart Position"
+			"description": "Sólo enviar posición cuando haya habido un cambio significativo en la ubicación",
+			"label": "Habilitar posición inteligente"
 		},
 		"smartPositionMinDistance": {
-			"description": "Minimum distance (in meters) that must be traveled before a position update is sent",
-			"label": "Smart Position Minimum Distance"
+			"description": "Distancia mínima (en metros) que debe ser recorrida antes de que se envíe una actualización de posición",
+			"label": "Distancia mínima de posición inteligente"
 		},
 		"smartPositionMinInterval": {
-			"description": "Minimum interval (in seconds) that must pass before a position update is sent",
-			"label": "Smart Position Minimum Interval"
+			"description": "Intervalo mínimo (en s.) que debe pasar antes de enviar una actualización de posición",
+			"label": "Intervalo Mínimo de Posición Inteligente"
 		},
 		"transmitPin": {
-			"description": "GPS module TX pin override",
-			"label": "Transmit Pin"
+			"description": "Módulo TX del GPS ignorar Pin",
+			"label": "Transmitir Pin"
 		},
 		"intervalsSettings": {
-			"description": "How often to send position updates",
-			"label": "Intervals"
+			"description": "Con qué frecuencia enviar actualizaciones de posición",
+			"label": "Intervalos"
 		},
 		"flags": {
-			"placeholder": "Select position flags...",
-			"altitude": "Altitude",
-			"altitudeGeoidalSeparation": "Altitude Geoidal Separation",
-			"altitudeMsl": "Altitude is Mean Sea Level",
-			"dop": "Dilution of precision (DOP) PDOP used by default",
+			"placeholder": "Seleccionar marcadores de posición...",
+			"altitude": "Altitud",
+			"altitudeGeoidalSeparation": "Separación Geoidal de Altitud",
+			"altitudeMsl": "Altitud es Nivel Medio del Mar",
+			"dop": "Dilución de precisión (DOP) PDOP usada por defecto",
 			"hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
 			"numSatellites": "Number of satellites",
 			"sequenceNumber": "Sequence number",
@@ -344,8 +344,8 @@
 			"label": "INA219 Address"
 		},
 		"lightSleepDuration": {
-			"description": "How long the device will be in light sleep for",
-			"label": "Light Sleep Duration"
+			"description": "",
+			"label": "Duración de la "
 		},
 		"minimumWakeTime": {
 			"description": "Minimum amount of time the device will stay awake for after receiving a packet",
