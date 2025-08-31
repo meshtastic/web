@@ -58,7 +58,9 @@ describe("Checkbox", () => {
 
   it("controlled: reflects external prop changes after onChange", () => {
     const onChange = vi.fn();
-    const { rerender } = render(<Checkbox checked={false} onChange={onChange} />);
+    const { rerender } = render(
+      <Checkbox checked={false} onChange={onChange} />,
+    );
 
     const checkbox = screen.getByRole("checkbox");
     const presentation = screen.getByRole("presentation");
@@ -79,7 +81,9 @@ describe("Checkbox", () => {
 
   it("renders children inside the label", () => {
     render(<Checkbox>Test Label</Checkbox>);
-    expect(screen.getByTestId("label-component")).toHaveTextContent("Test Label");
+    expect(screen.getByTestId("label-component")).toHaveTextContent(
+      "Test Label",
+    );
   });
 
   it("applies custom className to wrapper label", () => {
@@ -112,7 +116,10 @@ describe("Checkbox", () => {
 
   it("passes through additional props to the input", () => {
     render(<Checkbox data-testid="extra-prop" />);
-    expect(screen.getByRole("checkbox")).toHaveAttribute("data-testid", "extra-prop");
+    expect(screen.getByRole("checkbox")).toHaveAttribute(
+      "data-testid",
+      "extra-prop",
+    );
   });
 
   it("uncontrolled: toggles checked state when clicking the visual box", () => {
