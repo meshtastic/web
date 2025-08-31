@@ -1,11 +1,13 @@
-import { describe, vi, expect, beforeEach, afterEach } from "vitest";
+import { describe, expect, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract";
 import { TransportWebBluetooth } from "./transport";
 
 class MiniEmitter {
   private listeners = new Map<string, Set<(e: Event) => void>>();
   addEventListener(type: string, listener: (e: Event) => void) {
-    if (!this.listeners.has(type)) this.listeners.set(type, new Set());
+    if (!this.listeners.has(type)) {
+      this.listeners.set(type, new Set());
+    }
     this.listeners.get(type)!.add(listener);
   }
   removeEventListener(type: string, listener: (e: Event) => void) {
@@ -66,10 +68,16 @@ function stubWebBluetooth() {
   // Primary service returns our three characteristics by UUID
   const primaryService: BluetoothRemoteGATTService = {
     async getCharacteristic(uuid: string) {
-      if (uuid === TransportWebBluetooth.ToRadioUuid) return toRadioCharacteristic;
-      if (uuid === TransportWebBluetooth.FromRadioUuid) return fromRadioCharacteristic;
-      if (uuid === TransportWebBluetooth.FromNumUuid) return fromNumCharacteristic;
-      throw new Error("Unknown characteristic: " + uuid);
+      if (uuid === TransportWebBluetooth.ToRadioUuid) {
+        return toRadioCharacteristic;
+      }
+      if (uuid === TransportWebBluetooth.FromRadioUuid) {
+        return fromRadioCharacteristic;
+      }
+      if (uuid === TransportWebBluetooth.FromNumUuid) {
+        return fromNumCharacteristic;
+      }
+      throw new Error(`Unknown characteristic: ${uuid}`);
     },
   } as unknown as BluetoothRemoteGATTService;
 
@@ -94,10 +102,20 @@ function stubWebBluetooth() {
       return primaryService;
     },
     device: {
-      addEventListener: (...args: Parameters<EventTarget["addEventListener"]>) =>
-        deviceEmitter.addEventListener(args[0] as string, args[1] as (e: Event) => void),
-      removeEventListener: (...args: Parameters<EventTarget["removeEventListener"]>) =>
-        deviceEmitter.removeEventListener(args[0] as string, args[1] as (e: Event) => void),
+      addEventListener: (
+        ...args: Parameters<EventTarget["addEventListener"]>
+      ) =>
+        deviceEmitter.addEventListener(
+          args[0] as string,
+          args[1] as (e: Event) => void,
+        ),
+      removeEventListener: (
+        ...args: Parameters<EventTarget["removeEventListener"]>
+      ) =>
+        deviceEmitter.removeEventListener(
+          args[0] as string,
+          args[1] as (e: Event) => void,
+        ),
     } as unknown as BluetoothDevice,
   } as unknown as BluetoothRemoteGATTServer;
 
@@ -114,7 +132,10 @@ function stubWebBluetooth() {
     },
   };
 
-  vi.stubGlobal("navigator", Object.assign({}, globalThis.navigator, fakeNavigator));
+  vi.stubGlobal(
+    "navigator",
+    Object.assign({}, globalThis.navigator, fakeNavigator),
+  );
 
   // helper actions for tests/contract
   return {
@@ -142,24 +163,36 @@ describe("TransportWebBluetooth (contract)", () => {
     name: "TransportWebBluetooth",
     setup: () => {},
     teardown: () => {
-      (globalThis as unknown as { __ble?: ReturnType<typeof stubWebBluetooth> }).__ble?.cleanup();
-      (globalThis as unknown as { __ble?: ReturnType<typeof stubWebBluetooth> }).__ble = undefined;
+      (
+        globalThis as unknown as { __ble?: ReturnType<typeof stubWebBluetooth> }
+      ).__ble?.cleanup();
+      (
+        globalThis as unknown as { __ble?: ReturnType<typeof stubWebBluetooth> }
+      ).__ble = undefined;
       vi.restoreAllMocks();
       vi.unstubAllGlobals();
     },
     create: async () => {
-      (globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }).__ble = stubWebBluetooth();
+      (
+        globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }
+      ).__ble = stubWebBluetooth();
       return await TransportWebBluetooth.create();
     },
     pushIncoming: async (bytes) => {
-      (globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }).__ble.pushIncoming(bytes);
+      (
+        globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }
+      ).__ble.pushIncoming(bytes);
       await Promise.resolve();
     },
     assertLastWritten: (bytes) => {
-      (globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }).__ble.assertLastWritten(bytes);
+      (
+        globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }
+      ).__ble.assertLastWritten(bytes);
     },
     triggerDisconnect: async () => {
-      (globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }).__ble.triggerGattDisconnect();
+      (
+        globalThis as unknown as { __ble: ReturnType<typeof stubWebBluetooth> }
+      ).__ble.triggerGattDisconnect();
       await Promise.resolve();
     },
   });
