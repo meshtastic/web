@@ -1,14 +1,13 @@
 import { ensureDefaultUser } from "@core/dto/NodeNumToNodeInfoDTO.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
+import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
 import {
   type Device,
   type MessageStore,
   MessageType,
   type NodeDB,
-  useNewNodeNum,
 } from "@core/stores";
 import { type MeshDevice, Protobuf } from "@meshtastic/core";
-
 export const subscribeAll = (
   device: Device,
   connection: MeshDevice,

@@ -42,7 +42,7 @@ const mockClearDraft = vi.fn();
 
 vi.mock("@core/stores", () => ({
   CurrentDeviceContext: {
-      _currentValue: { deviceId: 1234 },
+    _currentValue: { deviceId: 1234 },
   },
   useMessages: vi.fn(() => ({
     setDraft: mockSetDraft,
