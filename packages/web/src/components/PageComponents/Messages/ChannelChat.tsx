@@ -41,7 +41,7 @@ type DayGroup = { dayKey: number; label: string; items: Message[] };
 
 function groupMessagesByDay(
   messages: Message[],
-  t: TFunction<"ui", undefined>,
+  t: TFunction<"common", undefined>,
   fmt: Intl.DateTimeFormat,
 ): DayGroup[] {
   const out: DayGroup[] = [];
