@@ -1,13 +1,23 @@
-import { describe, vi, expect, it, beforeEach, afterEach, type MockInstance } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type MockInstance,
+  vi,
+} from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract";
 import { TransportHTTP } from "./transport";
 
 let abortTimeoutSpy: MockInstance | undefined;
 beforeEach(() => {
-  abortTimeoutSpy = vi.spyOn(
+  abortTimeoutSpy = vi
+    .spyOn(
       globalThis.AbortSignal as unknown as { timeout(ms: number): AbortSignal },
       "timeout",
-    ).mockImplementation((ms: number) => {
+    )
+    .mockImplementation((ms: number) => {
       const ctrl = new AbortController();
       const abort = () =>
         ctrl.abort(new DOMException("Timeout reached", "TimeoutError"));
@@ -118,20 +128,28 @@ describe("TransportHTTP (contract)", () => {
       vi.unstubAllGlobals();
     },
     create: async () => {
-      (globalThis as unknown as { __http: ReturnType<typeof stubFetch> }).__http = stubFetch();
+      (
+        globalThis as unknown as { __http: ReturnType<typeof stubFetch> }
+      ).__http = stubFetch();
       const transport = await TransportHTTP.create("127.0.0.1:80", false);
       await tickNextTimer();
       return transport;
     },
     pushIncoming: async (bytes) => {
-      (globalThis as unknown as { __http: ReturnType<typeof stubFetch> }).__http.pushIncoming(bytes);
+      (
+        globalThis as unknown as { __http: ReturnType<typeof stubFetch> }
+      ).__http.pushIncoming(bytes);
       await tickNextTimer();
     },
     assertLastWritten: (bytes) => {
-      (globalThis as unknown as { __http: ReturnType<typeof stubFetch> }).__http.assertLastWritten(bytes);
+      (
+        globalThis as unknown as { __http: ReturnType<typeof stubFetch> }
+      ).__http.assertLastWritten(bytes);
     },
     triggerDisconnect: async () => {
-      (globalThis as unknown as { __http: ReturnType<typeof stubFetch> }).__http.forceReadErrorOnce();
+      (
+        globalThis as unknown as { __http: ReturnType<typeof stubFetch> }
+      ).__http.forceReadErrorOnce();
       await tickNextTimer();
     },
   });

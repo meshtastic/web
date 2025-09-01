@@ -28,7 +28,7 @@ describe("useToast", () => {
       vi.runAllTimers();
     });
 
-    const toast = result.current.toasts[0];
+    const toast = result.current.toasts[0]!;
     expect(result.current.toasts.length).toBe(1);
     expect(toast.title).toBe("Backup Reminder");
     expect(toast.description).toBe("Don't forget to backup!");

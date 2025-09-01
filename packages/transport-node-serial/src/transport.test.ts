@@ -1,7 +1,7 @@
-import { describe, vi, expect, beforeEach, afterEach, it } from "vitest";
 import { Duplex } from "node:stream";
-import type { SerialPort } from "serialport";
 import { Types, Utils } from "@meshtastic/core";
+import type { SerialPort } from "serialport";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract";
 import { TransportNodeSerial } from "./transport";
 
@@ -112,21 +112,21 @@ describe("TransportNodeSerial (contract)", () => {
       return transport;
     },
     pushIncoming: async (bytes) => {
-      (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort.pushIncoming(
-        bytes,
-      );
+      (
+        globalThis as unknown as { __fakePort: FakeSerialPort }
+      ).__fakePort.pushIncoming(bytes);
       await Promise.resolve();
     },
     assertLastWritten: (bytes) => {
-      const port =
-        (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort;
+      const port = (globalThis as unknown as { __fakePort: FakeSerialPort })
+        .__fakePort;
       expect(port.lastWritten).toBeDefined();
       expect(port.lastWritten).toEqual(bytes);
     },
     triggerDisconnect: async () => {
-      (globalThis as unknown as { __fakePort: FakeSerialPort }).__fakePort.emitErrorOnce(
-        "test-disconnect",
-      );
+      (
+        globalThis as unknown as { __fakePort: FakeSerialPort }
+      ).__fakePort.emitErrorOnce("test-disconnect");
       await Promise.resolve();
     },
   });

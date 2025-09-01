@@ -38,7 +38,7 @@ const mockDevice = {
 
 vi.mock("@core/stores", () => ({
   CurrentDeviceContext: {
-      _currentValue: { deviceId: 123 },
+    _currentValue: { deviceId: 123 },
   },
   useDevice: () => ({
     setDialogOpen: mockDevice.setDialogOpen,

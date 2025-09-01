@@ -18,7 +18,7 @@ const mockSendAdminMessage = vi.fn();
 
 vi.mock("@core/stores", () => ({
   CurrentDeviceContext: {
-      _currentValue: { deviceId: 1234 },
+    _currentValue: { deviceId: 1234 },
   },
   useNodeDB: () => ({
     updateFavorite: mockUpdateFavorite,
