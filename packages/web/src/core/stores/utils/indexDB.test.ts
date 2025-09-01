@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as idb from "idb-keyval";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createStorage } from "./indexDB";
 
 type PersistStorage<T> = ReturnType<typeof createStorage<T>>;
@@ -109,7 +109,7 @@ describe("indexDB.ts persistence (steps 1–5)", () => {
     const out = await roundTrip({ state: { m }, version: 0 });
     const m2 = out!.state.m as Map<number, { key: Uint8Array }>;
     expect(m2 instanceof Map).toBe(true);
-    
+
     const got = m2.get(42)!;
     expect(got.key instanceof Uint8Array).toBe(true);
     expect(Array.from(got.key)).toEqual([7, 8]);
