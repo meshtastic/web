@@ -1,11 +1,11 @@
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
+import { type MessageStore, useMessages } from "@core/stores";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useMessages, type MessageStore } from "@core/stores";
 
 vi.mock("@core/stores", () => ({
   CurrentDeviceContext: {
-      _currentValue: { deviceId: 1234 },
+    _currentValue: { deviceId: 1234 },
   },
   useMessages: vi.fn(() => ({
     deleteAllMessages: vi.fn(),
@@ -21,9 +21,12 @@ describe("DeleteMessagesDialog", () => {
     mockClearAllMessages.mockClear();
 
     const mockedUseMessages = vi.mocked(useMessages);
-    mockedUseMessages.mockImplementation(() => ({
-      deleteAllMessages: mockClearAllMessages,
-    } as unknown as MessageStore));
+    mockedUseMessages.mockImplementation(
+      () =>
+        ({
+          deleteAllMessages: mockClearAllMessages,
+        }) as unknown as MessageStore,
+    );
     mockedUseMessages.mockClear();
   });
 

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, act } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import type {
   ButtonHTMLAttributes,
   ClassAttributes,
@@ -11,10 +11,12 @@ import { RebootDialog } from "./RebootDialog.tsx";
 
 const rebootMock = vi.fn();
 const rebootOtaMock = vi.fn();
-let mockConnection: { 
-  rebootOta: (delay: number) => void,
-  reboot: (delay: number) => void
- } | undefined = {
+let mockConnection:
+  | {
+      rebootOta: (delay: number) => void;
+      reboot: (delay: number) => void;
+    }
+  | undefined = {
   reboot: rebootMock,
   rebootOta: rebootOtaMock,
 };
@@ -82,42 +84,44 @@ describe("RebootDialog", () => {
     expect(
       screen.getByRole("heading", { name: /reboot device/i, level: 1 }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /reboot now/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /reboot now/i }),
+    ).toBeInTheDocument();
   });
 
-    it("calls correct reboot function based on OTA checkbox state", () => {
-      render(<RebootDialog open onOpenChange={() => {}} />);
+  it("calls correct reboot function based on OTA checkbox state", () => {
+    render(<RebootDialog open onOpenChange={() => {}} />);
 
-      // Schedule non-OTA reboot
-      act(() => {
-        fireEvent.click(screen.getByTestId("scheduleRebootBtn"));
-      });
-      expect(rebootMock).toHaveBeenCalledWith(5);
-      expect(rebootOtaMock).not.toHaveBeenCalled();
-
-      rebootMock.mockClear();
-      rebootOtaMock.mockClear();
-
-      // Cancel scheduled
-      act(() => {
-        fireEvent.click(screen.getByTestId("cancelRebootBtn"));
-      });
-      expect(rebootMock).toHaveBeenCalledWith(-1);
-      expect(rebootOtaMock).not.toHaveBeenCalled();
-
-      rebootMock.mockClear();
-      rebootOtaMock.mockClear();
-
-      // Schedule OTA reboot
-      act(() => {
-        fireEvent.click(screen.getByText(/reboot into ota mode/i));
-      });
-      act(() => {
-        fireEvent.click(screen.getByTestId("scheduleRebootBtn"));
-      });
-      expect(rebootOtaMock).toHaveBeenCalledWith(5);
-      expect(rebootMock).not.toHaveBeenCalled();
+    // Schedule non-OTA reboot
+    act(() => {
+      fireEvent.click(screen.getByTestId("scheduleRebootBtn"));
     });
+    expect(rebootMock).toHaveBeenCalledWith(5);
+    expect(rebootOtaMock).not.toHaveBeenCalled();
+
+    rebootMock.mockClear();
+    rebootOtaMock.mockClear();
+
+    // Cancel scheduled
+    act(() => {
+      fireEvent.click(screen.getByTestId("cancelRebootBtn"));
+    });
+    expect(rebootMock).toHaveBeenCalledWith(-1);
+    expect(rebootOtaMock).not.toHaveBeenCalled();
+
+    rebootMock.mockClear();
+    rebootOtaMock.mockClear();
+
+    // Schedule OTA reboot
+    act(() => {
+      fireEvent.click(screen.getByText(/reboot into ota mode/i));
+    });
+    act(() => {
+      fireEvent.click(screen.getByTestId("scheduleRebootBtn"));
+    });
+    expect(rebootOtaMock).toHaveBeenCalledWith(5);
+    expect(rebootMock).not.toHaveBeenCalled();
+  });
 
   it("schedules a reboot with delay and calls rebootOta", async () => {
     const onOpenChangeMock = vi.fn();
@@ -132,7 +136,7 @@ describe("RebootDialog", () => {
     act(() => {
       fireEvent.click(screen.getByTestId("scheduleRebootBtn"));
     });
-    
+
     expect(rebootMock).toHaveBeenCalledWith(3);
 
     expect(screen.getByText(/reboot has been scheduled/i)).toBeInTheDocument();
@@ -142,7 +146,6 @@ describe("RebootDialog", () => {
     });
 
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
-
   });
 
   it("triggers an instant reboot", async () => {
@@ -196,6 +199,8 @@ describe("RebootDialog", () => {
       fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
     });
     expect(rebootMock).toHaveBeenCalledWith(-1);
-    expect(screen.queryByText(/reboot has been scheduled/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/reboot has been scheduled/i),
+    ).not.toBeInTheDocument();
   });
 });

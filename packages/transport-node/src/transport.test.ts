@@ -1,9 +1,9 @@
-import { describe, vi, expect, beforeEach, afterEach, it } from "vitest";
-import { Duplex } from "node:stream";
 import type { Socket } from "node:net";
+import { Duplex } from "node:stream";
+import { Types, Utils } from "@meshtastic/core";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runTransportContract } from "../../../tests/utils/transportContract";
 import { TransportNode } from "./transport";
-import { Utils, Types } from "@meshtastic/core";
 
 function isStatusEvent(
   out: Types.DeviceOutput | undefined,
@@ -71,15 +71,13 @@ function stubCoreTransforms() {
     toDevice as unknown as typeof Utils.toDeviceStream,
   );
 
-  vi
-    .spyOn(Utils, "fromDeviceStream")
-    .mockImplementation(
-      () =>
-        fromDeviceFactory() as unknown as TransformStream<
-          Uint8Array,
-          Types.DeviceOutput
-        >,
-    );
+  vi.spyOn(Utils, "fromDeviceStream").mockImplementation(
+    () =>
+      fromDeviceFactory() as unknown as TransformStream<
+        Uint8Array,
+        Types.DeviceOutput
+      >,
+  );
 
   return {
     restore: () => vi.restoreAllMocks(),
@@ -112,9 +110,9 @@ describe("TransportNode (contract)", () => {
       return transport;
     },
     pushIncoming: async (bytes) => {
-      (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock.pushIncoming(
-        bytes,
-      );
+      (
+        globalThis as unknown as { __nodeSock: FakeSocket }
+      ).__nodeSock.pushIncoming(bytes);
       await Promise.resolve();
     },
     assertLastWritten: (bytes) => {
@@ -124,9 +122,9 @@ describe("TransportNode (contract)", () => {
       expect(sock.lastWritten).toEqual(bytes);
     },
     triggerDisconnect: async () => {
-      (globalThis as unknown as { __nodeSock: FakeSocket }).__nodeSock.emitErrorOnce(
-        "test-disconnect",
-      );
+      (
+        globalThis as unknown as { __nodeSock: FakeSocket }
+      ).__nodeSock.emitErrorOnce("test-disconnect");
       await Promise.resolve();
     },
   });
@@ -182,5 +180,4 @@ describe("TransportNode (extras)", () => {
     reader.releaseLock();
     await transport.disconnect();
   });
-
 });
