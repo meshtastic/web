@@ -16,20 +16,19 @@ import {
 import { cn } from "@core/utils/cn.ts";
 import { debounce } from "@core/utils/debounce.ts";
 import { Protobuf } from "@meshtastic/core";
-import type { TFunction } from "i18next";
 import { FunnelIcon } from "lucide-react";
 import {
   type ComponentProps,
   type ReactNode,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
 
 const DEBOUNCE_DELAY_MS = 250;
-const BATTERY_STATUS_PLUGGED_IN_VALUE = 101;
 
 type PopoverContentProps = ComponentProps<typeof PopoverContent>;
 
@@ -47,88 +46,57 @@ interface FilterControlProps {
   children?: ReactNode;
 }
 
-interface HopsLabelProps {
-  hopsAway: number[];
-  t: TFunction<"ui", undefined>;
+interface RangeLabelContentProps {
+  range: [number, number];
+  defaultRange: [number, number];
+  format?: (ts: number) => ReactNode;
+  initialLabel?: ReactNode;
+  customLabel?: { start?: string; end?: string };
 }
-function HopsLabelContent({ hopsAway, t }: HopsLabelProps) {
-  const startHops = hopsAway[0];
-  const endHops = hopsAway[1];
+
+function RangeLabelContent({
+  range,
+  defaultRange,
+  format,
+  initialLabel,
+  customLabel,
+}: RangeLabelContentProps) {
+  const [start, end] = range;
+  const [min, max] = defaultRange;
+  const unequal = start !== end;
+
+  const fmtStart = format ? format(start) : start;
+  const fmtEnd = format ? format(end) : end;
 
   return (
     <>
-      {t("hops.text", {
-        value: startHops === 0 ? t("hops.direct") : startHops,
-      })}
-      {startHops !== endHops ? ` — ${endHops}` : ""}
-    </>
-  );
-}
-
-interface LastHeardLabelProps {
-  lastHeardRange: number[];
-  defaultMaxLastHeard: number;
-  formatTS: (ts: number) => ReactNode;
-  t: TFunction<"ui", undefined>;
-}
-function LastHeardLabelContent({
-  lastHeardRange,
-  defaultMaxLastHeard,
-  formatTS,
-  t,
-}: LastHeardLabelProps) {
-  const [start, end] = lastHeardRange;
-  return (
-    <>
-      {t("lastHeard.labelText", { value: "" })}
-      <br />
-      {start === 0 ? (
-        t("lastHeard.nowLabel")
-      ) : (
-        <>
-          {start === defaultMaxLastHeard && ">"}
-          {formatTS(start)}
-        </>
-      )}
-      {start !== end && (
+      {initialLabel}
+      {start === min
+        ? (customLabel?.start ?? (
+            <>
+              {"<"}
+              {fmtStart}
+            </>
+          ))
+        : start === max
+          ? (customLabel?.end ?? (
+              <>
+                {">"}
+                {fmtEnd}
+              </>
+            ))
+          : fmtStart}
+      {unequal && (
         <>
           {" — "}
-          {end === defaultMaxLastHeard && ">"}
-          {formatTS(end)}
-        </>
-      )}
-    </>
-  );
-}
-
-interface BatteryLevelLabelProps {
-  batteryLevelRange: (number | undefined)[];
-  t: TFunction<"ui", undefined>;
-}
-function BatteryLevelLabelContent({
-  batteryLevelRange,
-  t,
-}: BatteryLevelLabelProps) {
-  const [start, end] = batteryLevelRange;
-
-  const formatBatteryValue = (value: number | undefined) => {
-    if (value === undefined) {
-      return "";
-    }
-    return value === BATTERY_STATUS_PLUGGED_IN_VALUE
-      ? t("batteryStatus.pluggedIn")
-      : `${value}%`;
-  };
-
-  return (
-    <>
-      {t("batteryLevel.labelText", {
-        value: formatBatteryValue(start),
-      })}
-      {start !== end && typeof end !== "undefined" && (
-        <>
-          {" – "}
-          {formatBatteryValue(end)}
+          {end === max
+            ? (customLabel?.end ?? (
+                <>
+                  {">"}
+                  {fmtEnd}
+                </>
+              ))
+            : fmtEnd}
         </>
       )}
     </>
@@ -190,18 +158,20 @@ export function FilterControl({
   );
 
   const handleBoolChange = useCallback(
-    <K extends keyof FilterState>(key: K, value: string | boolean) => {
-      const typedValue =
-        value === true || value === "true"
-          ? true
-          : value === false || value === "false"
-            ? false
-            : undefined;
+    <K extends keyof FilterState>(
+      key: K,
+      value: string | boolean | undefined,
+    ) => {
+      let typedValue: boolean | undefined;
+      if (value === true || value === "true") {
+        typedValue = true;
+      } else if (value === false || value === "false") {
+        typedValue = false;
+      } else {
+        typedValue = undefined;
+      }
 
-      setFilterState((prev) => ({
-        ...prev,
-        [key]: typedValue,
-      }));
+      setFilterState((prev) => ({ ...prev, [key]: typedValue }));
     },
     [setFilterState],
   );
@@ -220,6 +190,21 @@ export function FilterControl({
     [],
   );
 
+  const roleOptions = useMemo(
+    () =>
+      Object.values(Protobuf.Config.Config_DeviceConfig_Role).filter(
+        (v): v is number => typeof v === "number",
+      ),
+    [],
+  );
+  const hwModelOptions = useMemo(
+    () =>
+      Object.values(Protobuf.Mesh.HardwareModel).filter(
+        (v): v is number => typeof v === "number",
+      ),
+    [],
+  );
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -229,9 +214,8 @@ export function FilterControl({
             "rounded",
             "text-slate-600 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 active:bg-slate-300",
             "dark:text-slate-400 hover:dark:text-slate-400 dark:bg-slate-700 hover:dark:bg-slate-800 dark:active:bg-slate-950",
-            isDirty
-              ? "text-slate-100 dark:text-slate-300 bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 hover:text-slate-200 dark:hover:text-slate-300 active:bg-green-800 dark:active:bg-green-900"
-              : "",
+            isDirty &&
+              "text-slate-100 dark:text-slate-300 bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 hover:text-slate-200 dark:hover:text-slate-300 active:bg-green-800 dark:active:bg-green-900",
             parameters?.popoverTriggerClassName,
           )}
           aria-label={t("filter.label")}
@@ -269,30 +253,31 @@ export function FilterControl({
                 </div>
               )}
               <FilterSlider
-                label={t("hops.label")}
                 filterKey="hopsAway"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
-                  <HopsLabelContent
-                    hopsAway={localFilterState.hopsAway}
-                    t={t}
+                  <RangeLabelContent
+                    range={localFilterState.hopsAway}
+                    defaultRange={defaultFilterValues.hopsAway}
+                    initialLabel={`${t("hops.label")}: `}
+                    customLabel={{ start: "0", end: "7" }}
                   />
                 }
               />
               <FilterSlider
-                label={t("lastHeard.label")}
                 filterKey="lastHeard"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
-                  <LastHeardLabelContent
-                    lastHeardRange={localFilterState.lastHeard}
-                    defaultMaxLastHeard={defaultFilterValues.lastHeard[1]}
-                    formatTS={formatTS}
-                    t={t}
+                  <RangeLabelContent
+                    range={localFilterState.lastHeard}
+                    defaultRange={defaultFilterValues.lastHeard}
+                    format={formatTS}
+                    initialLabel={`${t("lastHeard.label")}: `}
+                    customLabel={{ start: t("lastHeard.nowLabel") }}
                   />
                 }
               />
@@ -314,11 +299,17 @@ export function FilterControl({
 
             <FilterAccordionItem label={t("metrics.label")}>
               <FilterSlider
-                label={t("snr.label")}
                 filterKey="snr"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
+                labelContent={
+                  <RangeLabelContent
+                    range={localFilterState.snr}
+                    defaultRange={defaultFilterValues.snr}
+                    initialLabel={`${t("snr.label")}: `}
+                  />
+                }
               />
               <FilterSlider
                 label={t("channelUtilization.label")}
@@ -335,24 +326,36 @@ export function FilterControl({
                 onChange={handleRangeChange}
               />
               <FilterSlider
-                label={t("batteryLevel.label")}
                 filterKey="batteryLevel"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
                 labelContent={
-                  <BatteryLevelLabelContent
-                    batteryLevelRange={localFilterState.batteryLevel}
-                    t={t}
+                  <RangeLabelContent
+                    range={localFilterState.batteryLevel}
+                    defaultRange={defaultFilterValues.batteryLevel}
+                    initialLabel={`${t("batteryLevel.label")}: `}
+                    customLabel={{
+                      start: "0",
+                      end: t("batteryStatus.pluggedIn"),
+                    }}
                   />
                 }
               />
               <FilterSlider
-                label={t("batteryVoltage.label")}
                 filterKey="voltage"
                 filterState={localFilterState}
                 defaultFilterValues={defaultFilterValues}
                 onChange={handleRangeChange}
+                step={0.1}
+                labelContent={
+                  <RangeLabelContent
+                    range={localFilterState.voltage}
+                    defaultRange={defaultFilterValues.voltage}
+                    initialLabel={`${t("batteryVoltage.label")}: `}
+                    customLabel={{ start: "0" }}
+                  />
+                }
               />
             </FilterAccordionItem>
 
@@ -361,11 +364,11 @@ export function FilterControl({
                 filterKey="role"
                 filterState={filterState}
                 setFilterState={setFilterState}
-                options={Object.values(
-                  Protobuf.Config.Config_DeviceConfig_Role,
-                ).filter((v): v is number => typeof v === "number")}
+                options={roleOptions}
                 getLabel={(val) =>
-                  formatEnumLabel(Protobuf.Config.Config_DeviceConfig_Role[val])
+                  formatEnumLabel(
+                    Protobuf.Config.Config_DeviceConfig_Role[val] ?? "UNSET",
+                  )
                 }
               />
             </FilterAccordionItem>
@@ -375,11 +378,9 @@ export function FilterControl({
                 filterKey="hwModel"
                 filterState={filterState}
                 setFilterState={setFilterState}
-                options={Object.values(Protobuf.Mesh.HardwareModel).filter(
-                  (v): v is number => typeof v === "number",
-                )}
+                options={hwModelOptions}
                 getLabel={(val) =>
-                  formatEnumLabel(Protobuf.Mesh.HardwareModel[val])
+                  formatEnumLabel(Protobuf.Mesh.HardwareModel[val] ?? "UNKNOWN")
                 }
               />
             </FilterAccordionItem>
