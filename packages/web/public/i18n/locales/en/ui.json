@@ -4,9 +4,10 @@
     "messages": "Messages",
     "map": "Map",
     "config": "Config",
+    "channels": "Channels",
     "radioConfig": "Radio Config",
     "moduleConfig": "Module Config",
-    "channels": "Channels",
+    "channelConfig": "Channel Config",
     "nodes": "Nodes"
   },
   "app": {
@@ -66,6 +67,10 @@
     "saveSuccess": {
       "title": "Saving Config",
       "description": "The configuration change {{case}} has been saved."
+    },
+    "saveAllSuccess": {
+      "title": "Saved",
+      "description": "All configuration changes have been saved."
     },
     "favoriteNode": {
       "title": "{{action}} {{nodeName}} {{direction}} favorites.",

@@ -48,7 +48,6 @@ export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={AudioValidationSchema}
-      formId="ModuleConfig_AudioConfig"
       defaultValues={moduleConfig.audio}
       values={getEffectiveModuleConfig("audio")}
       fieldGroups={[

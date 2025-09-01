@@ -49,7 +49,6 @@ export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={SerialValidationSchema}
-      formId="ModuleConfig_SerialConfig"
       defaultValues={moduleConfig.serial}
       values={getEffectiveModuleConfig("serial")}
       fieldGroups={[

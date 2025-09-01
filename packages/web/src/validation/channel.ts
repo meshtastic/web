@@ -35,3 +35,6 @@ export function makeChannelSchema(allowedBytes: number) {
     role: RoleEnum,
   });
 }
+
+const ChannelValidationSchema = makeChannelSchema(0); // generate a schema that doesn't validate PSK length, just structure, for type purposes
+export type ChannelValidation = z.infer<typeof ChannelValidationSchema>;

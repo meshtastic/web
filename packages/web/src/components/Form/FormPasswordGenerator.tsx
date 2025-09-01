@@ -4,8 +4,7 @@ import type {
 } from "@components/Form/DynamicForm.tsx";
 import { Generator } from "@components/UI/Generator.tsx";
 import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";
-import { useEffect } from "react";
-import { Controller, type FieldValues, useFormContext } from "react-hook-form";
+import { Controller, type FieldValues } from "react-hook-form";
 import type { ButtonVariant } from "../UI/Button.tsx";
 
 export interface PasswordGeneratorProps<T> extends BaseFormBuilderProps<T> {
@@ -34,36 +33,29 @@ export function PasswordGenerator<T extends FieldValues>({
   invalid,
 }: GenericFormElementProps<T, PasswordGeneratorProps<T>>) {
   const { isVisible } = usePasswordVisibilityToggle();
-  const { trigger } = useFormContext();
-
-  useEffect(() => {
-    trigger(field.name);
-  }, [field.name, trigger]);
 
   return (
     <Controller
       name={field.name}
       control={control}
-      render={({ field: { value, onChange, ...rest } }) => (
+      render={({ field: controllerField }) => (
         <Generator
           type={field.hide && !isVisible ? "password" : "text"}
           id={field.id}
           devicePSKBitCount={field.devicePSKBitCount}
           bits={field.bits}
           inputChange={(e) => {
-            if (field.inputChange) {
-              field.inputChange(e);
-            }
-            onChange(e);
+            const value = e.target.value;
+            field.inputChange?.(e); // call any external handler
+            controllerField.onChange(value); // ensure RHF receives just the value
           }}
           selectChange={field.selectChange ?? (() => {})}
-          value={value}
           variant={invalid ? "invalid" : isDirty ? "dirty" : "default"}
           actionButtons={field.actionButtons}
           showPasswordToggle={field.showPasswordToggle}
           showCopyButton={field.showCopyButton}
           {...field.properties}
-          {...rest}
+          {...controllerField}
           disabled={disabled}
         />
       )}

@@ -3,18 +3,20 @@ import { Sidebar } from "@components/Sidebar.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useAppStore, useDevice } from "@core/stores";
+import { useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
+import { ChannelConfig } from "@pages/Config/ChannelConfig.tsx";
 import { DeviceConfig } from "@pages/Config/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Config/ModuleConfig.tsx";
 import {
   BoxesIcon,
+  LayersIcon,
   RefreshCwIcon,
   SaveIcon,
   SaveOff,
   SettingsIcon,
 } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -22,18 +24,22 @@ const ConfigPage = () => {
   const {
     workingConfig,
     workingModuleConfig,
+    workingChannelConfig,
     connection,
     removeWorkingConfig,
     removeWorkingModuleConfig,
+    removeWorkingChannelConfig,
     setConfig,
     setModuleConfig,
+    addChannel,
   } = useDevice();
-  const { hasErrors } = useAppStore();
 
   const [activeConfigSection, setActiveConfigSection] = useState<
-    "device" | "module"
+    "device" | "module" | "channel"
   >("device");
   const [isSaving, setIsSaving] = useState(false);
+  const [rhfState, setRhfState] = useState({ isDirty: false, isValid: true });
+  const unsubRef = useRef<(() => void) | null>(null);
   const [formMethods, setFormMethods] = useState<UseFormReturn | null>(null);
   const { toast } = useToast();
   const { t } = useTranslation("deviceConfig");
@@ -41,21 +47,51 @@ const ConfigPage = () => {
   const onFormInit = useCallback(
     <T extends FieldValues>(methods: UseFormReturn<T>) => {
       setFormMethods(methods as UseFormReturn);
+
+      setRhfState({
+        // Assume defailt on init, changes will be caught by subscription
+        isDirty: false,
+        isValid: true,
+      });
+
+      // Unsubscribe from previous subscriptions & subscribe to form changes
+      unsubRef.current?.();
+      unsubRef.current = methods.subscribe({
+        formState: { isDirty: true, isValid: true },
+        callback: ({ isValid, isDirty }) => {
+          setRhfState({
+            isDirty: isDirty ?? false,
+            isValid: isValid ?? true,
+          });
+        },
+      });
     },
     [],
   );
 
-  const handleSave = useCallback(async () => {
-    if (hasErrors()) {
-      return toast({
-        title: t("toast.validationError.title"),
-        description: t("toast.validationError.description"),
-      });
-    }
+  // Cleanup subscription on unmount
+  useEffect(() => {
+    return () => unsubRef.current?.();
+  }, []);
 
+  const handleSave = useCallback(async () => {
     setIsSaving(true);
 
     try {
+      // Save all working channel configs first, doesn't require a commit/reboot
+      await Promise.all(
+        workingChannelConfig.map((channel) =>
+          connection?.setChannel(channel).then(() => {
+            toast({
+              title: t("toast.savedChannel.title", {
+                ns: "ui",
+                channelName: channel.settings?.name,
+              }),
+            });
+          }),
+        ),
+      );
+
       await Promise.all(
         workingConfig.map((newConfig) =>
           connection?.setConfig(newConfig).then(() => {
@@ -82,24 +118,31 @@ const ConfigPage = () => {
         ),
       );
 
-      await connection?.commitEditSettings().then(() => {
-        if (formMethods) {
-          formMethods.reset(
-            {},
-            {
-              keepValues: true,
-            },
-          );
-        }
+      if (workingConfig.length > 0 || workingModuleConfig.length > 0) {
+        await connection?.commitEditSettings();
+      }
 
-        workingConfig.map((newConfig) => setConfig(newConfig));
-        workingModuleConfig.map((newModuleConfig) =>
-          setModuleConfig(newModuleConfig),
-        );
+      workingChannelConfig.forEach((newChannel) => addChannel(newChannel));
+      workingConfig.forEach((newConfig) => setConfig(newConfig));
+      workingModuleConfig.forEach((newModuleConfig) =>
+        setModuleConfig(newModuleConfig),
+      );
 
-        removeWorkingConfig();
-        removeWorkingModuleConfig();
-      });
+      removeWorkingChannelConfig();
+      removeWorkingConfig();
+      removeWorkingModuleConfig();
+
+      if (formMethods) {
+        formMethods.reset(formMethods.getValues(), {
+          keepDirty: false,
+          keepErrors: false,
+          keepTouched: false,
+          keepValues: true,
+        });
+
+        // Force RHF to re-validate and emit state
+        formMethods.trigger();
+      }
     } catch (_error) {
       toast({
         title: t("toast.configSaveError.title"),
@@ -107,29 +150,40 @@ const ConfigPage = () => {
       });
     } finally {
       setIsSaving(false);
+      toast({
+        title: t("toast.saveAllSuccess.title"),
+        description: t("toast.saveAllSuccess.description"),
+      });
     }
   }, [
-    hasErrors,
     toast,
     t,
     workingConfig,
     connection,
     workingModuleConfig,
+    workingChannelConfig,
     formMethods,
+    addChannel,
     setConfig,
     setModuleConfig,
     removeWorkingConfig,
     removeWorkingModuleConfig,
+    removeWorkingChannelConfig,
   ]);
 
   const handleReset = useCallback(() => {
     if (formMethods) {
       formMethods.reset();
     }
-
+    removeWorkingChannelConfig();
     removeWorkingConfig();
     removeWorkingModuleConfig();
-  }, [formMethods, removeWorkingConfig, removeWorkingModuleConfig]);
+  }, [
+    formMethods,
+    removeWorkingConfig,
+    removeWorkingModuleConfig,
+    removeWorkingChannelConfig,
+  ]);
 
   const leftSidebar = useMemo(
     () => (
@@ -151,35 +205,33 @@ const ConfigPage = () => {
             isDirty={workingModuleConfig.length > 0}
             count={workingModuleConfig.length}
           />
+          <SidebarButton
+            label={t("navigation.channelConfig")}
+            active={activeConfigSection === "channel"}
+            onClick={() => setActiveConfigSection("channel")}
+            Icon={LayersIcon}
+            isDirty={workingChannelConfig.length > 0}
+            count={workingChannelConfig.length}
+          />
         </SidebarSection>
       </Sidebar>
     ),
-    [activeConfigSection, workingConfig, workingModuleConfig, t],
+    [
+      activeConfigSection,
+      workingConfig,
+      workingModuleConfig,
+      workingChannelConfig,
+      t,
+    ],
   );
 
-  const buttonOpacity = useMemo(() => {
-    const isFormDirty = formMethods?.formState.isDirty ?? false;
-    const hasDirtyFields =
-      (Object.keys(formMethods?.formState.dirtyFields ?? {}).length ?? 0) > 0;
-    const hasWorkingConfig = workingConfig.length > 0;
-    const hasWorkingModuleConfig = workingModuleConfig.length > 0;
-
-    const shouldShowButton =
-      (isFormDirty && hasDirtyFields) ||
-      hasWorkingConfig ||
-      hasWorkingModuleConfig;
-
-    return shouldShowButton ? "opacity-100" : "opacity-0";
-  }, [
-    formMethods?.formState.isDirty,
-    formMethods?.formState.dirtyFields,
-    workingConfig,
-    workingModuleConfig,
-  ]);
-
-  const isValid = useMemo(() => {
-    return Object.keys(formMethods?.formState.errors ?? {}).length === 0;
-  }, [formMethods?.formState.errors]);
+  const hasDrafts =
+    workingConfig.length > 0 ||
+    workingModuleConfig.length > 0 ||
+    workingChannelConfig.length > 0;
+  const hasPending = hasDrafts || rhfState.isDirty;
+  const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
+  const saveDisabled = isSaving || !rhfState.isValid || !hasPending;
 
   const actions = useMemo(
     () => [
@@ -207,15 +259,13 @@ const ConfigPage = () => {
       },
       {
         key: "save",
-        icon: !isValid ? SaveOff : SaveIcon,
+        icon: !hasPending ? SaveOff : SaveIcon,
         isLoading: isSaving,
-        disabled:
-          isSaving ||
-          !isValid ||
-          (workingConfig.length === 0 && workingModuleConfig.length === 0),
-        iconClasses: !isValid
-          ? "text-red-400 cursor-not-allowed"
-          : "cursor-pointer",
+        disabled: saveDisabled,
+        iconClasses:
+          !rhfState.isValid && hasPending
+            ? "text-red-400 cursor-not-allowed"
+            : "cursor-pointer",
         className: cn([
           "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
           "hover:dark:bg-slate-300 hover:dark:text-black",
@@ -227,10 +277,10 @@ const ConfigPage = () => {
     ],
     [
       isSaving,
-      isValid,
+      hasPending,
+      rhfState.isValid,
+      saveDisabled,
       buttonOpacity,
-      workingConfig,
-      workingModuleConfig,
       handleReset,
       handleSave,
       t,
@@ -244,14 +294,18 @@ const ConfigPage = () => {
       label={
         activeConfigSection === "device"
           ? t("navigation.radioConfig")
-          : t("navigation.moduleConfig")
+          : activeConfigSection === "module"
+            ? t("navigation.moduleConfig")
+            : t("navigation.channelConfig")
       }
       actions={actions}
     >
       {activeConfigSection === "device" ? (
         <DeviceConfig onFormInit={onFormInit} />
-      ) : (
+      ) : activeConfigSection === "module" ? (
         <ModuleConfig onFormInit={onFormInit} />
+      ) : (
+        <ChannelConfig onFormInit={onFormInit} />
       )}
     </PageLayout>
   );
