@@ -120,15 +120,12 @@ jobs:
         id: tags
         shell: bash
         run: |
+          TAGS="${{ steps.meta.outputs.tag }}"
+          
           if [ "${{ steps.meta.outputs.push_latest }}" = "true" ]; then
-            echo "list=latest, ${{ steps.meta.outputs.tag }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "list=${{ steps.meta.outputs.tag }}" >> "$GITHUB_OUTPUT"
+            TAGS="latest,${TAGS}"
           fi
-            TAGS="latest, ${{ steps.meta.outputs.tag }}"
-          else
-            TAGS="${{ steps.meta.outputs.tag }}"
-          fi
+
           echo "list=$TAGS" >> "$GITHUB_OUTPUT"
           echo "Using image tags: $TAGS"
 
