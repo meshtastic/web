@@ -1,5 +1,5 @@
 import { MessageItem } from "@components/PageComponents/Messages/MessageItem.tsx";
-import { Separator } from "@components/UI/Seperator";
+import { Separator } from "@components/UI/Separator";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import type { TFunction } from "i18next";
 import { InboxIcon } from "lucide-react";
