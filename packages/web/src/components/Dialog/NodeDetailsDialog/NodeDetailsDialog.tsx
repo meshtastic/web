@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { Separator } from "@components/UI/Separator";
+import { Separator } from "@components/UI/Seperator.tsx";
 import {
   Tooltip,
   TooltipArrow,
