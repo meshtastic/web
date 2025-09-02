@@ -10,7 +10,7 @@ import {
 } from "@components/UI/Dialog.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
-import { Separator } from "@components/UI/Seperator.tsx";
+import { Separator } from "@components/UI/Separator";
 import { useDevice } from "@core/stores";
 import { ClockIcon, OctagonXIcon, RefreshCwIcon } from "lucide-react";
 import { useState } from "react";
