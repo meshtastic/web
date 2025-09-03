@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: <tests> */
 import { Types } from "@meshtastic/core";
+import { setAutoFreeze } from "immer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getConversationId, MessageState, MessageType } from "./index.ts";
 import type { ChannelId, Message } from "./types.ts";
@@ -17,24 +18,26 @@ vi.mock("idb-keyval", () => ({
   }),
 }));
 
-async function freshStore() {
+async function freshStore(persist = false) {
   vi.resetModules();
+
+  // suppress console output from the store during tests (for github actions)
+  vi.spyOn(console, "debug").mockImplementation(() => {});
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  vi.spyOn(console, "info").mockImplementation(() => {});
+
+  // Mock feature flag for persistence
+  vi.doMock("@core/services/featureFlags", () => ({
+    featureFlags: {
+      get: vi.fn((key: string) =>
+        key === "persistMessages" ? persist : false,
+      ),
+    },
+  }));
+
   const mod = await import("../messageStore");
   return mod;
 }
-
-vi.mock("@core/services/featureFlags", () => {
-  return {
-    featureFlags: {
-      get: vi.fn((key: string) => {
-        if (key === "persistMessages") {
-          return true;
-        }
-        return false;
-      }),
-    },
-  };
-});
 
 const myNodeNum = 111;
 const otherNodeNum1 = 222;
@@ -615,7 +618,7 @@ describe("MessageStore persistence & rehydrate", () => {
   describe("persistence", () => {
     it("partialize persists data; onRehydrateStorage rebuilds methods (messages + drafts survive)", async () => {
       {
-        const { useMessageStore } = await freshStore();
+        const { useMessageStore } = await freshStore(true);
         const state = useMessageStore.getState();
 
         const store = state.addMessageStore(123);
@@ -641,7 +644,7 @@ describe("MessageStore persistence & rehydrate", () => {
         ).toBe("draft-text");
       }
       {
-        const { useMessageStore } = await freshStore();
+        const { useMessageStore } = await freshStore(true);
         const state = useMessageStore.getState();
 
         const store = state.getMessageStore(123)!; // rebuilt instance
@@ -679,7 +682,7 @@ describe("MessageStore persistence & rehydrate", () => {
 
     it("removeMessageStore persists removal across reload", async () => {
       {
-        const { useMessageStore } = await freshStore();
+        const { useMessageStore } = await freshStore(true);
         const state = useMessageStore.getState();
         const store = state.addMessageStore(99);
 
@@ -690,7 +693,7 @@ describe("MessageStore persistence & rehydrate", () => {
         expect(state.getMessageStore(99)).toBeUndefined();
       }
       {
-        const { useMessageStore } = await freshStore();
+        const { useMessageStore } = await freshStore(true);
         const state = useMessageStore.getState();
         expect(state.getMessageStore(99)).toBeUndefined(); // still gone
       }
@@ -698,7 +701,7 @@ describe("MessageStore persistence & rehydrate", () => {
 
     it("rehydrate only rebuilds stores with myNodeNum set (orphans dropped)", async () => {
       {
-        const { useMessageStore } = await freshStore();
+        const { useMessageStore } = await freshStore(true);
         const state = useMessageStore.getState();
 
         // Orphan (no myNodeNum)
@@ -711,7 +714,7 @@ describe("MessageStore persistence & rehydrate", () => {
         good.saveMessage(broadcastMessage2);
       }
       {
-        const { useMessageStore } = await freshStore();
+        const { useMessageStore } = await freshStore(true);
         const state = useMessageStore.getState();
 
         expect(state.getMessageStore(500)).toBeUndefined(); // orphan dropped
@@ -740,36 +743,42 @@ describe("MessageStore persistence & rehydrate", () => {
     });
 
     it("keeps only the latest 1000 messages in a broadcast channel (oldest trimmed)", async () => {
-      const { useMessageStore, MessageType, MessageState } = await freshStore();
-      const state = useMessageStore.getState();
+      setAutoFreeze(false); // Disable immer auto-freeze for performance in this test
+      try {
+        const { useMessageStore, MessageType, MessageState } =
+          await freshStore();
+        const state = useMessageStore.getState();
 
-      const store = state.addMessageStore(123);
+        const store = state.addMessageStore(123);
 
-      const channelId = 0 as number;
-      const total = 1005;
+        const channelId = 0 as number;
+        const total = 1005;
 
-      for (let i = 1; i <= total; i++) {
-        store.saveMessage({
-          type: MessageType.Broadcast,
-          from: 123,
-          to: 0xffffffff,
-          channel: channelId,
-          date: Date.now() + i,
-          messageId: i,
-          state: MessageState.Waiting,
-          message: `m${i}`,
-        });
-      }
+        for (let i = 1; i <= total; i++) {
+          store.saveMessage({
+            type: MessageType.Broadcast,
+            from: 123,
+            to: 0xffffffff,
+            channel: channelId,
+            date: Date.now() + i,
+            messageId: i,
+            state: MessageState.Waiting,
+            message: `m${i}`,
+          });
+        }
 
-      const fresh = useMessageStore.getState().getMessageStore(123)!;
-      const log = fresh.messages.broadcast.get(channelId)!;
+        const fresh = useMessageStore.getState().getMessageStore(123)!;
+        const log = fresh.messages.broadcast.get(channelId)!;
 
-      expect(log.size).toBe(1000); // capped
-      for (let i = 1; i <= 5; i++) {
-        expect(log.has(i)).toBe(false); // oldest removed
-      }
-      for (let i = 6; i <= 1005; i++) {
-        expect(log.has(i)).toBe(true); // newest kept
+        expect(log.size).toBe(1000); // capped
+        for (let i = 1; i <= 5; i++) {
+          expect(log.has(i)).toBe(false); // oldest removed
+        }
+        for (let i = 6; i <= 1005; i++) {
+          expect(log.has(i)).toBe(true); // newest kept
+        }
+      } finally {
+        setAutoFreeze(true); // Restore immer auto-freeze
       }
     });
   });

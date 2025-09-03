@@ -19,24 +19,23 @@ vi.mock("idb-keyval", () => ({
 }));
 
 // import a fresh copy of the store module (because the store is created at import time)
-async function freshStore() {
+async function freshStore(persist = false) {
   vi.resetModules();
+
+  // suppress console output from the store during tests (for github actions)
+  vi.spyOn(console, "debug").mockImplementation(() => {});
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  vi.spyOn(console, "info").mockImplementation(() => {});
+
+  vi.doMock("@core/services/featureFlags", () => ({
+    featureFlags: {
+      get: vi.fn((key: string) => (key === "persistNodeDB" ? persist : false)),
+    },
+  }));
+
   const mod = await import("../nodeDBStore");
   return mod;
 }
-
-vi.mock("@core/services/featureFlags", () => {
-  return {
-    featureFlags: {
-      get: vi.fn((key: string) => {
-        if (key === "persistNodeDB") {
-          return true;
-        }
-        return false;
-      }),
-    },
-  };
-});
 
 function makeNode(num: number, extras: Record<string, any> = {}) {
   return create(Protobuf.Mesh.NodeInfoSchema, { num, ...extras });
@@ -162,7 +161,7 @@ describe("NodeDB store", () => {
 
   it("partialize persists only data, and onRehydrateStorage rebuilds methods", async () => {
     {
-      const { useNodeDBStore } = await freshStore();
+      const { useNodeDBStore } = await freshStore(true); // with persistence
       const st = useNodeDBStore.getState();
       const db = st.addNodeDB(123);
       db.setNodeNum(321);
@@ -170,7 +169,7 @@ describe("NodeDB store", () => {
       db.setNodeError(50, "ERROR" as any);
     }
     {
-      const { useNodeDBStore } = await freshStore();
+      const { useNodeDBStore } = await freshStore(true); // with persistence
       const st = useNodeDBStore.getState();
       const db = st.getNodeDB(123)!;
 
@@ -210,7 +209,7 @@ describe("NodeDB store", () => {
 
   it("removeNodeDB persists removal across reload", async () => {
     {
-      const { useNodeDBStore } = await freshStore();
+      const { useNodeDBStore } = await freshStore(true); // with persistence
       const st = useNodeDBStore.getState();
       st.addNodeDB(99);
       expect(st.getNodeDB(99)).toBeDefined();
@@ -218,7 +217,7 @@ describe("NodeDB store", () => {
       expect(st.getNodeDB(99)).toBeUndefined();
     }
     {
-      const { useNodeDBStore } = await freshStore();
+      const { useNodeDBStore } = await freshStore(true); // with persistence
       const st = useNodeDBStore.getState();
       expect(st.getNodeDB(99)).toBeUndefined(); // still gone
     }
@@ -226,7 +225,7 @@ describe("NodeDB store", () => {
 
   it("on rehydrate only rebuilds DBs with myNodeNum set (orphans dropped)", async () => {
     {
-      const { useNodeDBStore } = await freshStore();
+      const { useNodeDBStore } = await freshStore(true); // with persistence
       const st = useNodeDBStore.getState();
 
       const orphan = st.addNodeDB(500); // no setNodeNum
@@ -237,7 +236,7 @@ describe("NodeDB store", () => {
       good.addNode(makeNode(2));
     }
     {
-      const { useNodeDBStore } = await freshStore();
+      const { useNodeDBStore } = await freshStore(true); // with persistence
       const st = useNodeDBStore.getState();
       expect(st.getNodeDB(500)).toBeUndefined(); // orphan dropped
       expect(st.getNodeDB(501)).toBeDefined(); // kept
@@ -418,7 +417,7 @@ describe("NodeDB – merge semantics, PKI checks & extras", () => {
 
   it("removeAllNodes (optionally keeping my node) and removeAllNodeErrors persist across reload", async () => {
     {
-      const { useNodeDBStore } = await freshStore();
+      const { useNodeDBStore } = await freshStore(true); // with persistence
       const st = useNodeDBStore.getState();
       const db = st.addNodeDB(1000);
       db.setNodeNum(55);
@@ -429,7 +428,7 @@ describe("NodeDB – merge semantics, PKI checks & extras", () => {
       db.removeAllNodeErrors();
     }
     {
-      const { useNodeDBStore } = await freshStore();
+      const { useNodeDBStore } = await freshStore(true); // with persistence
       const st = useNodeDBStore.getState();
       const db = st.getNodeDB(1000)!;
       expect(db.getNode(55)).toBeTruthy(); // kept me
