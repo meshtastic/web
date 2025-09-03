@@ -2,8 +2,8 @@ import { Duplex } from "node:stream";
 import { Types, Utils } from "@meshtastic/core";
 import type { SerialPort } from "serialport";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { runTransportContract } from "../../../tests/utils/transportContract";
-import { TransportNodeSerial } from "./transport";
+import { runTransportContract } from "../../../tests/utils/transportContract.ts";
+import { TransportNodeSerial } from "./transport.ts";
 
 function isStatusEvent(
   output: Types.DeviceOutput | undefined,

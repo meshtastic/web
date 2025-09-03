@@ -62,7 +62,6 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={NetworkValidationSchema}
-      formId="Config_NetworkConfig"
       defaultValues={{
         ...config.network,
         ipv4Config: {

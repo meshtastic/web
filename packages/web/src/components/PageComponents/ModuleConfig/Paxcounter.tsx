@@ -49,7 +49,6 @@ export const Paxcounter = ({ onFormInit }: PaxcounterModuleConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={PaxcounterValidationSchema}
-      formId="ModuleConfig_PaxcounterConfig"
       defaultValues={moduleConfig.paxcounter}
       values={getEffectiveModuleConfig("paxcounter")}
       fieldGroups={[

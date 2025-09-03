@@ -49,7 +49,6 @@ export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={StoreForwardValidationSchema}
-      formId="ModuleConfig_StoreForwardConfig"
       defaultValues={moduleConfig.storeForward}
       values={getEffectiveModuleConfig("storeForward")}
       fieldGroups={[

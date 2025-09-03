@@ -55,7 +55,12 @@
       "suffix": "ms"
     },
     "second": { "one": "Second", "plural": "Seconds" },
-    "day": { "one": "Day", "plural": "Days" },
+    "day": {
+      "one": "Day",
+      "plural": "Days",
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
     "month": { "one": "Month", "plural": "Months" },
     "year": { "one": "Year", "plural": "Years" },
     "snr": "SNR",

@@ -1,6 +1,6 @@
 import { describe, expect, vi } from "vitest";
-import { runTransportContract } from "../../../tests/utils/transportContract";
-import { TransportWebBluetooth } from "./transport";
+import { runTransportContract } from "../../../tests/utils/transportContract.ts";
+import { TransportWebBluetooth } from "./transport.ts";
 
 class MiniEmitter {
   private listeners = new Map<string, Set<(e: Event) => void>>();

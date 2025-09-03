@@ -2,8 +2,8 @@ import type { Socket } from "node:net";
 import { Duplex } from "node:stream";
 import { Types, Utils } from "@meshtastic/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { runTransportContract } from "../../../tests/utils/transportContract";
-import { TransportNode } from "./transport";
+import { runTransportContract } from "../../../tests/utils/transportContract.ts";
+import { TransportNode } from "./transport.ts";
 
 function isStatusEvent(
   out: Types.DeviceOutput | undefined,
