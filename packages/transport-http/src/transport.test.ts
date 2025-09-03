@@ -7,8 +7,8 @@ import {
   type MockInstance,
   vi,
 } from "vitest";
-import { runTransportContract } from "../../../tests/utils/transportContract";
-import { TransportHTTP } from "./transport";
+import { runTransportContract } from "../../../tests/utils/transportContract.ts";
+import { TransportHTTP } from "./transport.ts";
 
 let abortTimeoutSpy: MockInstance | undefined;
 beforeEach(() => {
