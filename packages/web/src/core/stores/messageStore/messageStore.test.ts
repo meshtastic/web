@@ -35,7 +35,7 @@ async function freshStore(persist = false) {
     },
   }));
 
-  const mod = await import("../messageStore");
+  const mod = await import("./index.ts");
   return mod;
 }
 

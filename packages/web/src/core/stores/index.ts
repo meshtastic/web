@@ -1,4 +1,4 @@
-import { useDeviceContext } from "@app/core/hooks/useDeviceContext";
+import { useDeviceContext } from "@core/hooks/useDeviceContext";
 import { type Device, useDeviceStore } from "@core/stores/deviceStore";
 import { type MessageStore, useMessageStore } from "@core/stores/messageStore";
 import { type NodeDB, useNodeDBStore } from "@core/stores/nodeDBStore";
@@ -7,7 +7,7 @@ export {
   CurrentDeviceContext,
   type DeviceContext,
   useDeviceContext,
-} from "@app/core/hooks/useDeviceContext";
+} from "@core/hooks/useDeviceContext";
 export { useAppStore } from "@core/stores/appStore";
 export {
   type Device,

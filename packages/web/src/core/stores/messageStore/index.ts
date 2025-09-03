@@ -10,12 +10,12 @@ import type {
   NodeNum,
   SetMessageStateParams,
 } from "@core/stores/messageStore/types.ts";
+import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
 import type { Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist } from "zustand/middleware";
-import { evictOldestEntries } from "../utils/evictOldestEntries";
 
 const CURRENT_STORE_VERSION = 0;
 const MESSAGESTORE_RETENTION_NUM = 10;

@@ -1,16 +1,13 @@
-import { validateIncomingNode } from "@app/core/stores/nodeDBStore/nodeValidation";
 import { create } from "@bufbuild/protobuf";
 import { featureFlags } from "@core/services/featureFlags";
+import { validateIncomingNode } from "@core/stores/nodeDBStore/nodeValidation";
+import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist } from "zustand/middleware";
-import { evictOldestEntries } from "../utils/evictOldestEntries";
-import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types";
-import { evictOldestEntries } from "../utils/evictOldestEntries.ts";
 import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types.ts";
-
 
 const CURRENT_STORE_VERSION = 0;
 const NODEDB_RETENTION_NUM = 10;
