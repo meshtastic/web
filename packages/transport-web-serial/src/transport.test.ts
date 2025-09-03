@@ -1,7 +1,7 @@
 import { Types, Utils } from "@meshtastic/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { runTransportContract } from "../../../tests/utils/transportContract";
-import { TransportWebSerial } from "./transport";
+import { runTransportContract } from "../../../tests/utils/transportContract.ts";
+import { TransportWebSerial } from "./transport.ts";
 
 function stubCoreTransforms() {
   const toDevice = new TransformStream<Uint8Array, Uint8Array>({
