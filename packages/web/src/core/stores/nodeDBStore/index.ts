@@ -5,7 +5,7 @@ import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist } from "zustand/middleware";
-import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types";
+import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types.ts";
 
 const CURRENT_STORE_VERSION = 0;
 const NODEDB_RETENTION_NUM = 10;

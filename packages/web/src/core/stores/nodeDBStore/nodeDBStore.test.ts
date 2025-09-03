@@ -16,7 +16,7 @@ vi.mock("idb-keyval", () => ({
 // import a fresh copy of the store module (because the store is created at import time)
 async function freshStore() {
   vi.resetModules();
-  const mod = await import("../nodeDBStore");
+  const mod = await import("../nodeDBStore/index.ts");
   return mod;
 }
 
