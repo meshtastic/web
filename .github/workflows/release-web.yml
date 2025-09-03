@@ -81,10 +81,6 @@ jobs:
         working-directory: packages/web
         run: pnpm run build
 
-      - name: Build web package
-        working-directory: packages/web
-        run: pnpm run build
-
       - name: Create Web App Release Archive
         working-directory: packages/web
         run: pnpm run package
@@ -116,22 +112,6 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Compute image tags
-        id: tags
-        shell: bash
-        run: |
-          if [ "${{ steps.meta.outputs.push_latest }}" = "true" ]; then
-            echo "list=latest, ${{ steps.meta.outputs.tag }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "list=${{ steps.meta.outputs.tag }}" >> "$GITHUB_OUTPUT"
-          fi
-            TAGS="latest, ${{ steps.meta.outputs.tag }}"
-          else
-            TAGS="${{ steps.meta.outputs.tag }}"
-          fi
-          echo "list=$TAGS" >> "$GITHUB_OUTPUT"
-          echo "Using image tags: $TAGS"
-
       - name: Build Container Image
         id: build-container
         uses: redhat-actions/buildah-build@v2
@@ -139,12 +119,13 @@ jobs:
           containerfiles: |
             ./packages/web/infra/Containerfile
           image: ${{ env.REGISTRY_IMAGE }}
-          tags: ${{ steps.tags.outputs.list }}
+          tags: latest,${{ steps.meta.outputs.tag }}
           oci: true
-          platforms: linux/amd64, linux/arm64
+          platforms: linux/amd64,linux/arm64
 
       - name: Push Container to GHCR
         id: push-to-registry
+        if: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-container.outputs.image }}
@@ -154,4 +135,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Output Image URL
+        if: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
         run: echo "🖼️ Image pushed to ${{ steps.push-to-registry.outputs.registry-paths }}"
+
+      - name: Explain no image URL
+        if: ${{ !(github.event_name == 'release' && github.event.release.prerelease == false) }}
+        run: echo "ℹ️ No image pushed (this was a prerelease or manual run)."
