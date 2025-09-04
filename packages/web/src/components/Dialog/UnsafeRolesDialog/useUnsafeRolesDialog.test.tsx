@@ -36,7 +36,10 @@ const mockDevice = {
   setDialogOpen: vi.fn(),
 };
 
-vi.mock("@core/stores/deviceStore", () => ({
+vi.mock("@core/stores", () => ({
+  CurrentDeviceContext: {
+    _currentValue: { deviceId: 123 },
+  },
   useDevice: () => ({
     setDialogOpen: mockDevice.setDialogOpen,
   }),
@@ -85,7 +88,7 @@ describe("useUnsafeRolesDialog", () => {
       const { result } = renderUnsafeRolesHook();
 
       const validationPromise = result.current.validateRoleSelection(
-        UNSAFE_ROLES[0],
+        UNSAFE_ROLES[0]!,
       );
 
       expect(mockDevice.setDialogOpen).toHaveBeenCalledWith(
@@ -97,7 +100,7 @@ describe("useUnsafeRolesDialog", () => {
         expect.any(Function),
       );
 
-      const onHandler = (eventBus.on as Mock).mock.calls[0][1];
+      const onHandler = (eventBus.on as Mock).mock.calls[0]![1];
       onHandler({ action: "confirm" });
       const validationResult = await validationPromise;
 
@@ -111,9 +114,9 @@ describe("useUnsafeRolesDialog", () => {
     it("should resolve with false when user dismisses the dialog", async () => {
       const { result } = renderUnsafeRolesHook();
       const validationPromise = result.current.validateRoleSelection(
-        UNSAFE_ROLES[0],
+        UNSAFE_ROLES[0]!,
       );
-      const onHandler = (eventBus.on as Mock).mock.calls[0][1];
+      const onHandler = (eventBus.on as Mock).mock.calls[0]![1];
       onHandler({ action: "dismiss" });
 
       const validationResult = await validationPromise;
@@ -128,9 +131,9 @@ describe("useUnsafeRolesDialog", () => {
       const { result } = renderUnsafeRolesHook();
 
       const validationPromise = result.current.validateRoleSelection(
-        UNSAFE_ROLES[1],
+        UNSAFE_ROLES[1]!,
       );
-      const onHandler = (eventBus.on as Mock).mock.calls[0][1];
+      const onHandler = (eventBus.on as Mock).mock.calls[0]![1];
 
       onHandler({ action: "confirm" });
       await validationPromise;
@@ -157,7 +160,7 @@ describe("useUnsafeRolesDialog", () => {
         true,
       );
 
-      const onHandler = (eventBus.on as Mock).mock.calls[0][1];
+      const onHandler = (eventBus.on as Mock).mock.calls[0]![1];
       onHandler({ action: "confirm" });
 
       const validationResult = await validationPromise;

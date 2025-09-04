@@ -33,9 +33,9 @@
       "qrGenerator": "Generator",
       "qrImport": "Import",
       "scheduleShutdown": "Schemalägg avstängning",
-      "scheduleReboot": "Schemalägg omstart",
-      "rebootToOtaMode": "Starta om till OTA-läge",
+      "scheduleReboot": "Reboot Device",
       "resetNodeDb": "Töm noddatabasen",
+      "dfuMode": "Starta DFU-läge",
       "factoryResetDevice": "Fabriksåterställ enhet",
       "factoryResetConfig": "Fabriksåterställ konfigurationen",
       "disconnect": "Koppla från"

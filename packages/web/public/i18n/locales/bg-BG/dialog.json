@@ -75,7 +75,8 @@
 			"unknownErrorLoadingDevices": "Неизвестна грешка при зареждане на устройствата"
 		},
 		"validation": {
-			"requiresFeatures": "Този тип връзка изисква <0></0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
+			"requiresWebBluetooth": "Този тип връзка изисква <0>Web Bluetooth</0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
+			"requiresWebSerial": "Този тип връзка изисква <0>Web Serial</0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
 			"requiresSecureContext": "Това приложение изисква <0>secure context</0>. Моля, свържете се чрез HTTPS или localhost.",
 			"additionallyRequiresSecureContext": "Освен това, изисква <0>secure context</0>. Моля, свържете се чрез HTTPS или localhost."
 		}
@@ -92,16 +93,21 @@
 		"deviceMetrics": "Device Metrics:",
 		"hardware": "Хардуер: ",
 		"lastHeard": "Последно чут: ",
-		"nodeHexPrefix": "Node Hex: !",
+		"nodeHexPrefix": "Node Hex: ",
 		"nodeNumber": "Номер на възела: ",
 		"position": "Позиция:",
 		"role": "Роля: ",
 		"uptime": "Време на работа: ",
 		"voltage": "Напрежение",
-		"title": "Node Details for {{identifier}}",
+		"title": "Подробности за възел за {{identifier}}",
 		"ignoreNode": "Игнориране на възела",
 		"removeNode": "Премахване на възела",
-		"unignoreNode": "Премахване на игнорирането на възела"
+		"unignoreNode": "Премахване на игнорирането на възела",
+		"security": "Сигурност:",
+		"publicKey": "Public Key: ",
+		"messageable": "Messageable: ",
+		"KeyManuallyVerifiedTrue": "Публичният ключ е проверен ръчно",
+		"KeyManuallyVerifiedFalse": "Публичният ключ не е проверен ръчно"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "Ако загубите ключовете си, ще трябва да нулирате устройството си.",
@@ -131,15 +137,15 @@
 		"sharableUrl": "Sharable URL",
 		"title": "Генериране на QR код"
 	},
-	"rebootOta": {
-		"title": "Планирано рестартиране",
-		"description": "Reboot the connected node after a delay into OTA (Over-the-Air) mode.",
-		"enterDelay": "Въведете забавяне (сек)",
-		"scheduled": "Насрочено е рестартиране"
-	},
 	"reboot": {
-		"title": "Планирано рестартиране",
-		"description": "Рестартиране на свързания възел след x минути."
+		"title": "Рестартиране на устройството",
+		"description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
+		"ota": "Reboot into OTA mode",
+		"enterDelay": "Enter delay",
+		"scheduled": "Насрочено е рестартиране",
+		"schedule": "Планиране на рестартиране",
+		"now": "Рестартиране сега",
+		"cancel": "Cancel scheduled reboot"
 	},
 	"refreshKeys": {
 		"description": {
@@ -167,8 +173,8 @@
 	},
 	"unsafeRoles": {
 		"confirmUnderstanding": "Да, знам какво правя",
-		"conjunction": " and the blog post about ",
-		"postamble": " and understand the implications of changing the role.",
+		"conjunction": "и публикацията в блога за ",
+		"postamble": " и разберам последиците от промяната на ролята.",
 		"preamble": "Аз прочетох ",
 		"choosingRightDeviceRole": "Избор на правилната роля на устройството",
 		"deviceRoleDocumentation": "Документация за ролите на устройството",
@@ -178,5 +184,10 @@
 		"confirmUnderstanding": "Да, знам какво правя",
 		"title": "Сигурни ли сте?",
 		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+	},
+	"clientNotification": {
+		"title": "Client Notification",
+		"TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
+		"Compromised keys were detected and regenerated.": "Бяха открити и регенерирани компрометирани ключове."
 	}
 }

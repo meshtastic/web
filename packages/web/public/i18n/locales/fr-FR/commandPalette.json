@@ -33,9 +33,9 @@
       "qrGenerator": "Générateur",
       "qrImport": "Importer",
       "scheduleShutdown": "Planifier l'arrêt",
-      "scheduleReboot": "Effacer tous les messages stockés",
-      "rebootToOtaMode": "Redémarrer en mode OTA",
+      "scheduleReboot": "Redémarrer l'appareil",
       "resetNodeDb": "Réinitialiser la DB des nœuds",
+      "dfuMode": "Passer en mode DFU",
       "factoryResetDevice": "Réinitialisation d'usine de l'appareil",
       "factoryResetConfig": "Réinitialisation d'usine de la config",
       "disconnect": "Déconnecter"

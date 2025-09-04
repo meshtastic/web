@@ -17,7 +17,6 @@
 		"now": "Maintenant",
 		"ok": "D'accord",
 		"print": "Imprimer",
-		"rebootOtaNow": "Redémarrer en mode OTA",
 		"remove": "Supprimer",
 		"requestNewKeys": "Demander de nouvelles clés",
 		"requestPosition": "Demander la position",
@@ -140,5 +139,7 @@
 		"invalidOverrideFreq": {
 			"number": "Invalid format, expected between 430-930 MHz."
 		}
-	}
+	},
+	"yes": "Oui",
+	"no": "Non"
 }

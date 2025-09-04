@@ -17,7 +17,6 @@
 		"now": "Nu",
 		"ok": "Okej",
 		"print": "Skriv ut",
-		"rebootOtaNow": "Starta om till OTA-läge nu",
 		"remove": "Ta bort",
 		"requestNewKeys": "Begär nya nycklar",
 		"requestPosition": "Begär position",
@@ -140,5 +139,7 @@
 		"invalidOverrideFreq": {
 			"number": "Invalid format, expected between 430-930 MHz."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }

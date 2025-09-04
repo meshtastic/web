@@ -9,10 +9,10 @@
 		"shortName": "Nom court",
 		"title": "Changer le nom de l’appareil",
 		"validation": {
-			"longNameMax": "Long name must not be more than 40 characters",
-			"shortNameMax": "Short name must not be more than 4 characters",
-			"longNameMin": "Long name must have at least 1 character",
-			"shortNameMin": "Short name must have at least 1 character"
+			"longNameMax": "Le nom long ne doit pas contenir plus de 40 caractères",
+			"shortNameMax": "Le nom court ne doit pas contenir plus de 4 caractères",
+			"longNameMin": "Le nom long doit contenir au moins 1 caractère",
+			"shortNameMin": "Le nom court doit contenir au moins 1 caractère"
 		}
 	},
 	"import": {
@@ -30,7 +30,7 @@
 		"title": "Position : {{identifier}}",
 		"altitude": "Altitude: ",
 		"coordinates": "Coordonnées : ",
-		"noCoordinates": "No Coordinates"
+		"noCoordinates": "Pas de coordonnées"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Régénérer la clé pré-partagée ?",
@@ -68,14 +68,15 @@
 		"bluetoothConnection": {
 			"noDevicesPaired": "Aucun appareil appairé pour l’instant.",
 			"newDeviceButton": "Nouvel appareil",
-			"connectionFailed": "Connection failed",
-			"deviceDisconnected": "Device disconnected",
-			"unknownDevice": "Unknown Device",
-			"errorLoadingDevices": "Error loading devices",
-			"unknownErrorLoadingDevices": "Unknown error loading devices"
+			"connectionFailed": "Échec de la connexion",
+			"deviceDisconnected": "Périphérique déconnecté",
+			"unknownDevice": "Périphérique inconnu",
+			"errorLoadingDevices": "Erreur lors du chargement des périphériques",
+			"unknownErrorLoadingDevices": "Erreur inconnue lors du chargement des périphériques"
 		},
 		"validation": {
-			"requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
+			"requiresWebBluetooth": "Ce type de connexion nécessite <0>Web Bluetooth</0>. Veuillez utiliser un navigateur compatible, comme Chrome ou Edge.<0>",
+			"requiresWebSerial": "Ce type de connexion nécessite <0>Web Serial</0>. Veuillez utiliser un navigateur compatible, comme Chrome ou Edge.",
 			"requiresSecureContext": "Cette application nécessite un <0>contexte sécurisé</0>. Veuillez vous connecter via HTTPS ou localhost.",
 			"additionallyRequiresSecureContext": "Elle nécessite également un <0>contexte sécurisé</0>. Veuillez vous connecter via HTTPS ou localhost."
 		}
@@ -92,7 +93,7 @@
 		"deviceMetrics": "Métriques de l’appareil :",
 		"hardware": "Matériel : ",
 		"lastHeard": "Dernière écoute: ",
-		"nodeHexPrefix": "Hexa du nœud : !",
+		"nodeHexPrefix": "Hex du nœud: ",
 		"nodeNumber": "Numéro de nœud: ",
 		"position": "Position:",
 		"role": "Rôle: ",
@@ -101,7 +102,12 @@
 		"title": "Détails du nœud pour {{identifier}}",
 		"ignoreNode": "Ignorer le nœud",
 		"removeNode": "Supprimer le nœud",
-		"unignoreNode": "Ne plus ignorer le nœud"
+		"unignoreNode": "Ne plus ignorer le nœud",
+		"security": "Sécurité:",
+		"publicKey": "Clé publique: ",
+		"messageable": "Messageable ",
+		"KeyManuallyVerifiedTrue": "La clé publique a été vérifiée manuellement",
+		"KeyManuallyVerifiedFalse": "La clé publique n'est pas vérifiée manuellement"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "Si vous perdez vos clés, vous devrez réinitialiser votre appareil.",
@@ -131,15 +137,15 @@
 		"sharableUrl": "URL partageable",
 		"title": "Générer un QR Code"
 	},
-	"rebootOta": {
-		"title": "Programmer un redémarrage",
-		"description": "Redémarrer le nœud connecté après un délai en mode OTA (Over-the-Air).",
-		"enterDelay": "Entrer le délai (sec)",
-		"scheduled": "Le redémarrage a été programmé"
-	},
 	"reboot": {
-		"title": "Programmer un redémarrage",
-		"description": "Redémarrer le nœud connecté après x minutes."
+		"title": "Redémarrer l'appareil",
+		"description": "Redémarrez maintenant ou programmez un redémarrage du nœud connecté. Vous pouvez éventuellement choisir de redémarrer en mode OTA (Over-the-Air).",
+		"ota": "Redémarrer en mode OTA",
+		"enterDelay": "Entrez le délai",
+		"scheduled": "Le redémarrage a été programmé",
+		"schedule": "Programmer le redémarrage",
+		"now": "Redémarrer maintenant",
+		"cancel": "Annuler le redémarrage planifié"
 	},
 	"refreshKeys": {
 		"description": {
@@ -177,6 +183,11 @@
 	"managedMode": {
 		"confirmUnderstanding": "Oui, je sais ce que je fais",
 		"title": "Êtes-vous sûr ?",
-		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+		"description": "Activer le mode géré empêche les applications clientes (y compris l’interface web) de modifier la configuration d’une radio. Une fois activé, la configuration ne peut être changée que via des messages d’administration à distance. Ce paramètre n’est pas nécessaire pour l’administration distante des nœuds."
+	},
+	"clientNotification": {
+		"title": "Notification client",
+		"TraceRoute can only be sent once every 30 seconds": "TraceRoute ne peut être envoyée qu'une fois toutes les 30 secondes",
+		"Compromised keys were detected and regenerated.": "Les clés compromises ont été détectées et régénérées."
 	}
 }

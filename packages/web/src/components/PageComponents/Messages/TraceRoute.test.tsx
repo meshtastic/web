@@ -1,6 +1,6 @@
 import { TraceRoute } from "@components/PageComponents/Messages/TraceRoute.tsx";
-import { mockDeviceStore } from "@core/stores/deviceStore/deviceStore.mock.ts";
-import { useDevice } from "@core/stores";
+import { useNodeDB } from "@core/stores";
+import { mockNodeDBStore } from "@core/stores/nodeDBStore/nodeDBStore.mock.ts";
 import { Protobuf } from "@meshtastic/core";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -65,8 +65,8 @@ describe("TraceRoute", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.mocked(useDevice).mockReturnValue({
-      ...mockDeviceStore,
+    vi.mocked(useNodeDB).mockReturnValue({
+      ...mockNodeDBStore,
       getNode: (nodeNum: number): Protobuf.Mesh.NodeInfo | undefined => {
         return mockNodes.get(nodeNum);
       },

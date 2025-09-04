@@ -17,7 +17,6 @@
 		"now": "지금",
 		"ok": "확인",
 		"print": "인쇄",
-		"rebootOtaNow": "지금 OTA 모드로 재부팅",
 		"remove": "지우기",
 		"requestNewKeys": "새로운 키 요청",
 		"requestPosition": "위치 요청",
@@ -140,5 +139,7 @@
 		"invalidOverrideFreq": {
 			"number": "Invalid format, expected between 430-930 MHz."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }

@@ -50,7 +50,6 @@ export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={RangeTestValidationSchema}
-      formId="ModuleConfig_RangeTestConfig"
       defaultValues={moduleConfig.rangeTest}
       values={getEffectiveModuleConfig("rangeTest")}
       fieldGroups={[

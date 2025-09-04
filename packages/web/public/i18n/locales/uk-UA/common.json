@@ -17,7 +17,6 @@
 		"now": "Зараз",
 		"ok": "Гаразд",
 		"print": "Print",
-		"rebootOtaNow": "Reboot to OTA Mode Now",
 		"remove": "Видалити",
 		"requestNewKeys": "Request New Keys",
 		"requestPosition": "Запитати позицію",
@@ -140,5 +139,7 @@
 		"invalidOverrideFreq": {
 			"number": "Invalid format, expected between 430-930 MHz."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }

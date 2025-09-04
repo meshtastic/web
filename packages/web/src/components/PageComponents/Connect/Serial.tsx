@@ -1,6 +1,11 @@
 import { Mono } from "@components/generic/Mono.tsx";
 import { Button } from "@components/UI/Button.tsx";
-import { useAppStore, useDeviceStore, useMessageStore } from "@core/stores";
+import {
+  useAppStore,
+  useDeviceStore,
+  useMessageStore,
+  useNodeDBStore,
+} from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
@@ -12,8 +17,10 @@ import type { TabElementProps } from "../../Dialog/NewDeviceDialog.tsx";
 export const Serial = ({ closeDialog }: TabElementProps) => {
   const [connectionInProgress, setConnectionInProgress] = useState(false);
   const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
+
   const { addDevice } = useDeviceStore();
-  const messageStore = useMessageStore();
+  const { addNodeDB } = useNodeDBStore();
+  const { addMessageStore } = useMessageStore();
   const { setSelectedDevice } = useAppStore();
   const { t } = useTranslation();
 
@@ -34,12 +41,15 @@ export const Serial = ({ closeDialog }: TabElementProps) => {
   const onConnect = async (port: SerialPort) => {
     const id = randId();
     const device = addDevice(id);
+    const nodeDB = addNodeDB(id);
+    const messageStore = addMessageStore(id);
+
     setSelectedDevice(id);
     const transport = await TransportWebSerial.createFromPort(port);
     const connection = new MeshDevice(transport, id);
     connection.configure();
     device.addConnection(connection);
-    subscribeAll(device, connection, messageStore);
+    subscribeAll(device, connection, messageStore, nodeDB);
 
     const HEARTBEAT_INTERVAL = 5 * 60 * 1000;
     connection.setHeartbeatInterval(HEARTBEAT_INTERVAL);

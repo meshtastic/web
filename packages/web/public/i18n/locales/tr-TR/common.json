@@ -17,7 +17,6 @@
 		"now": "Şimdi",
 		"ok": "Tamam",
 		"print": "Yazdır",
-		"rebootOtaNow": "Şimdi OTA Moduna Yeniden Başlat",
 		"remove": "Kaldır",
 		"requestNewKeys": "Yeni Anahtar İste",
 		"requestPosition": "Konum İste",
@@ -140,5 +139,7 @@
 		"invalidOverrideFreq": {
 			"number": "Invalid format, expected between 430-930 MHz."
 		}
-	}
+	},
+	"yes": "Yes",
+	"no": "No"
 }

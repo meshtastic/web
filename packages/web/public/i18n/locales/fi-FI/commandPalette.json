@@ -33,9 +33,9 @@
       "qrGenerator": "QR-koodigeneraattori",
       "qrImport": "Tuo",
       "scheduleShutdown": "Ajasta sammutus",
-      "scheduleReboot": "Ajasta uudelleenkäynnistys",
-      "rebootToOtaMode": "Uudelleenkäynnistä OTA-tilaan",
+      "scheduleReboot": "Käynnistä laite uudelleen",
       "resetNodeDb": "Nollaa laitteen DB-tietokanta",
+      "dfuMode": "Syötä DFU-tila",
       "factoryResetDevice": "Palauta tehdasasetukset",
       "factoryResetConfig": "Tehdasasetusten palautusasetukset",
       "disconnect": "Katkaise yhteys"

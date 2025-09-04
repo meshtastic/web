@@ -17,7 +17,6 @@
 		"now": "Nyt",
 		"ok": "OK",
 		"print": "Tulosta",
-		"rebootOtaNow": "Käynnistä uudelleen OTA-tilaan nyt",
 		"remove": "Poista",
 		"requestNewKeys": "Pyydä uudet avaimet",
 		"requestPosition": "Pyydä sijaintia",
@@ -140,5 +139,7 @@
 		"invalidOverrideFreq": {
 			"number": "Invalid format, expected between 430-930 MHz."
 		}
-	}
+	},
+	"yes": "Kyllä",
+	"no": "Ei"
 }

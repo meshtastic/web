@@ -1,9 +1,10 @@
 {
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.biome": "explicit",
+    "source.fixAll.biome": "explicit"
   },
   "search.exclude": {
-    "**/i18n/locales/*-*/**": true,
+    "**/i18n/locales/*-*/**": true
   },
+  "vitest.workspaceConfig": "vitest.config.ts"
 }

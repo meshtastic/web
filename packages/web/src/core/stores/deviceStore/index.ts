@@ -1,7 +1,6 @@
 import { create, toBinary } from "@bufbuild/protobuf";
 import { type MeshDevice, Protobuf, Types } from "@meshtastic/core";
 import { produce } from "immer";
-import { createContext, useContext } from "react";
 import { create as createStore } from "zustand";
 
 export type Page = "messages" | "map" | "config" | "channels" | "nodes";
@@ -14,10 +13,6 @@ export interface ProcessPacketParams {
 
 export type DialogVariant = keyof Device["dialog"];
 
-type NodeError = {
-  node: number;
-  error: string;
-};
 export type ValidConfigType = Exclude<
   Protobuf.Config.Config["payloadVariant"]["case"],
   "deviceUi" | "sessionkey" | undefined
@@ -35,20 +30,19 @@ export interface Device {
   moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
   workingConfig: Protobuf.Config.Config[];
   workingModuleConfig: Protobuf.ModuleConfig.ModuleConfig[];
+  workingChannelConfig: Protobuf.Channel.Channel[];
   hardware: Protobuf.Mesh.MyNodeInfo;
   metadata: Map<number, Protobuf.Mesh.DeviceMetadata>;
   traceroutes: Map<
     number,
     Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>[]
   >;
-  nodeErrors: Map<number, NodeError>;
   connection?: MeshDevice;
   activeNode: number;
   waypoints: Protobuf.Mesh.Waypoint[];
   pendingSettingsChanges: boolean;
   messageDraft: string;
   unreadCounts: Map<number, number>;
-  nodesMap: Map<number, Protobuf.Mesh.NodeInfo>; // dont access directly, use getNodes, or getNode
   dialog: {
     import: boolean;
     QR: boolean;
@@ -92,41 +86,29 @@ export interface Device {
   getEffectiveModuleConfig<K extends ValidModuleConfigType>(
     payloadVariant: K,
   ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
+  setWorkingChannelConfig: (channelNum: Protobuf.Channel.Channel) => void;
+  getWorkingChannelConfig: (
+    index: Types.ChannelNumber,
+  ) => Protobuf.Channel.Channel | undefined;
+  removeWorkingChannelConfig: (channelNum?: Types.ChannelNumber) => void;
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
   setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
   addChannel: (channel: Protobuf.Channel.Channel) => void;
   addWaypoint: (waypoint: Protobuf.Mesh.Waypoint) => void;
-  addNodeInfo: (nodeInfo: Protobuf.Mesh.NodeInfo) => void;
-  addUser: (user: Types.PacketMetadata<Protobuf.Mesh.User>) => void;
-  addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
   addConnection: (connection: MeshDevice) => void;
   addTraceRoute: (
     traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
   ) => void;
   addMetadata: (from: number, metadata: Protobuf.Mesh.DeviceMetadata) => void;
-  removeNode: (nodeNum: number) => void;
   setDialogOpen: (dialog: DialogVariant, open: boolean) => void;
   getDialogOpen: (dialog: DialogVariant) => boolean;
-  processPacket: (data: ProcessPacketParams) => void;
   setMessageDraft: (message: string) => void;
-  setNodeError: (nodeNum: number, error: string) => void;
-  clearNodeError: (nodeNum: number) => void;
-  getNodeError: (nodeNum: number) => NodeError | undefined;
-  hasNodeError: (nodeNum: number) => boolean;
   incrementUnread: (nodeNum: number) => void;
   resetUnread: (nodeNum: number) => void;
   getUnreadCount: (nodeNum: number) => number;
   getAllUnreadCount: () => number;
-  getNodes: (
-    filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
-  ) => Protobuf.Mesh.NodeInfo[];
-  getNodesLength: () => number;
-  getNode: (nodeNum: number) => Protobuf.Mesh.NodeInfo | undefined;
-  getMyNode: () => Protobuf.Mesh.NodeInfo;
   sendAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
-  updateFavorite: (nodeNum: number, isFavorite: boolean) => void;
-  updateIgnored: (nodeNum: number, isIgnored: boolean) => void;
   addClientNotification: (
     clientNotificationPacket: Protobuf.Mesh.ClientNotification,
   ) => void;
@@ -163,6 +145,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           moduleConfig: create(Protobuf.LocalOnly.LocalModuleConfigSchema),
           workingConfig: [],
           workingModuleConfig: [],
+          workingChannelConfig: [],
           hardware: create(Protobuf.Mesh.MyNodeInfoSchema),
           metadata: new Map(),
           traceroutes: new Map(),
@@ -186,9 +169,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           },
           pendingSettingsChanges: false,
           messageDraft: "",
-          nodeErrors: new Map(),
           unreadCounts: new Map(),
-          nodesMap: new Map(),
           clientNotifications: [],
 
           setStatus: (status: Types.DeviceStatusEnum) => {
@@ -469,6 +450,61 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             };
           },
 
+          setWorkingChannelConfig: (config: Protobuf.Channel.Channel) => {
+            set(
+              produce<PrivateDeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+                const index = device.workingChannelConfig.findIndex(
+                  (wcc) => wcc.index === config.index,
+                );
+
+                if (index !== -1) {
+                  device.workingChannelConfig[index] = config;
+                } else {
+                  device.workingChannelConfig.push(config);
+                }
+              }),
+            );
+          },
+          getWorkingChannelConfig: (channelNum: Types.ChannelNumber) => {
+            const device = get().devices.get(id);
+            if (!device) {
+              return;
+            }
+
+            const workingChannelConfig = device.workingChannelConfig.find(
+              (c) => c.index === channelNum,
+            );
+
+            return workingChannelConfig;
+          },
+          removeWorkingChannelConfig: (channelNum?: Types.ChannelNumber) => {
+            set(
+              produce<PrivateDeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+
+                if (channelNum === undefined) {
+                  device.workingChannelConfig = [];
+                  return;
+                }
+
+                const index = device.workingChannelConfig.findIndex(
+                  (wcc: Protobuf.Channel.Channel) => wcc.index === channelNum,
+                );
+
+                if (index !== -1) {
+                  device.workingChannelConfig.splice(index, 1);
+                }
+              }),
+            );
+          },
+
           setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => {
             set(
               produce<PrivateDeviceState>((draft) => {
@@ -516,18 +552,6 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               }),
             );
           },
-          addNodeInfo: (nodeInfo) => {
-            set(
-              produce<PrivateDeviceState>((draft) => {
-                const device = draft.devices.get(id);
-
-                if (!device) {
-                  return;
-                }
-                device.nodesMap.set(nodeInfo.num, nodeInfo);
-              }),
-            );
-          },
           setActiveNode: (node) => {
             set(
               produce<PrivateDeviceState>((draft) => {
@@ -535,38 +559,6 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
                 if (device) {
                   device.activeNode = node;
                 }
-              }),
-            );
-          },
-          addUser: (user) => {
-            set(
-              produce<PrivateDeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (!device) {
-                  return;
-                }
-                const currentNode =
-                  device.nodesMap.get(user.from) ??
-                  create(Protobuf.Mesh.NodeInfoSchema);
-                currentNode.user = user.data;
-                currentNode.num = user.from;
-                device.nodesMap.set(user.from, currentNode);
-              }),
-            );
-          },
-          addPosition: (position) => {
-            set(
-              produce<PrivateDeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (!device) {
-                  return;
-                }
-                const currentNode =
-                  device.nodesMap.get(position.from) ??
-                  create(Protobuf.Mesh.NodeInfoSchema);
-                currentNode.position = position.data;
-                currentNode.num = position.from;
-                device.nodesMap.set(position.from, currentNode);
               }),
             );
           },
@@ -603,17 +595,6 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               }),
             );
           },
-          removeNode: (nodeNum: number) => {
-            set(
-              produce<PrivateDeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (!device) {
-                  return;
-                }
-                device.nodesMap.delete(nodeNum);
-              }),
-            );
-          },
           setDialogOpen: (dialog: DialogVariant, open: boolean) => {
             set(
               produce<PrivateDeviceState>((draft) => {
@@ -631,31 +612,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             }
             return device.dialog[dialog];
           },
-          processPacket(data: ProcessPacketParams) {
-            set(
-              produce<PrivateDeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (!device) {
-                  return;
-                }
-                const node = device.nodesMap.get(data.from);
-                if (node) {
-                  node.lastHeard = data.time;
-                  node.snr = data.snr;
-                  device.nodesMap.set(data.from, node);
-                } else {
-                  device.nodesMap.set(
-                    data.from,
-                    create(Protobuf.Mesh.NodeInfoSchema, {
-                      num: data.from,
-                      lastHeard: data.time,
-                      snr: data.snr,
-                    }),
-                  );
-                }
-              }),
-            );
-          },
+
           setMessageDraft: (message: string) => {
             set(
               produce<PrivateDeviceState>((draft) => {
@@ -665,40 +622,6 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
                 }
               }),
             );
-          },
-          setNodeError: (nodeNum: number, error: string) => {
-            set(
-              produce<PrivateDeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.nodeErrors.set(nodeNum, { node: nodeNum, error });
-                }
-              }),
-            );
-          },
-          clearNodeError: (nodeNum: number) => {
-            set(
-              produce<PrivateDeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                if (device) {
-                  device.nodeErrors.delete(nodeNum);
-                }
-              }),
-            );
-          },
-          getNodeError: (nodeNum: number) => {
-            const device = get().devices.get(id);
-            if (!device) {
-              throw new Error(`Device ${id} not found`);
-            }
-            return device.nodeErrors.get(nodeNum);
-          },
-          hasNodeError: (nodeNum: number) => {
-            const device = get().devices.get(id);
-            if (!device) {
-              throw new Error(`Device ${id} not found`);
-            }
-            return device.nodeErrors.has(nodeNum);
           },
           incrementUnread: (nodeNum: number) => {
             set(
@@ -744,48 +667,6 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               }),
             );
           },
-          getNodes: (
-            filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
-          ): Protobuf.Mesh.NodeInfo[] => {
-            const device = get().devices.get(id);
-            if (!device) {
-              return [];
-            }
-            const allNodes = Array.from(device.nodesMap.values()).filter(
-              (node) => node.num !== get().devices.get(id)?.hardware.myNodeNum,
-            );
-            if (filter) {
-              return allNodes.filter(filter);
-            }
-            return allNodes;
-          },
-          getNode: (nodeNum: number): Protobuf.Mesh.NodeInfo | undefined => {
-            const device = get().devices.get(id);
-            if (!device) {
-              return;
-            }
-            if (!device.nodesMap.has(nodeNum)) {
-              return undefined;
-            }
-            return device.nodesMap.get(nodeNum);
-          },
-          getMyNode: (): Protobuf.Mesh.NodeInfo => {
-            const device = get().devices.get(id);
-            if (!device) {
-              throw new Error(`Device ${id} not found`);
-            }
-            return (
-              device.nodesMap.get(device.hardware.myNodeNum) ??
-              create(Protobuf.Mesh.NodeInfoSchema)
-            );
-          },
-          getNodesLength: () => {
-            const device = get().devices.get(id);
-            if (!device) {
-              return 0;
-            }
-            return device.nodesMap.size;
-          },
 
           sendAdminMessage(message: Protobuf.Admin.AdminMessage) {
             const device = get().devices.get(id);
@@ -800,64 +681,6 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             );
           },
 
-          updateFavorite(nodeNum: number, isFavorite: boolean) {
-            const device = get().devices.get(id);
-            if (!device) {
-              return;
-            }
-            const node = device?.nodesMap.get(nodeNum);
-            if (!node) {
-              return;
-            }
-
-            device.sendAdminMessage(
-              create(Protobuf.Admin.AdminMessageSchema, {
-                payloadVariant: {
-                  case: isFavorite ? "setFavoriteNode" : "removeFavoriteNode",
-                  value: nodeNum,
-                },
-              }),
-            );
-
-            set(
-              produce<PrivateDeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                const node = device?.nodesMap.get(nodeNum);
-                if (node) {
-                  node.isFavorite = isFavorite;
-                }
-              }),
-            );
-          },
-          updateIgnored(nodeNum: number, isIgnored: boolean) {
-            const device = get().devices.get(id);
-            if (!device) {
-              return;
-            }
-            const node = device?.nodesMap.get(nodeNum);
-            if (!node) {
-              return;
-            }
-
-            device.sendAdminMessage(
-              create(Protobuf.Admin.AdminMessageSchema, {
-                payloadVariant: {
-                  case: isIgnored ? "setIgnoredNode" : "removeIgnoredNode",
-                  value: nodeNum,
-                },
-              }),
-            );
-
-            set(
-              produce<PrivateDeviceState>((draft) => {
-                const device = draft.devices.get(id);
-                const node = device?.nodesMap.get(nodeNum);
-                if (node) {
-                  node.isIgnored = isIgnored;
-                }
-              }),
-            );
-          },
           addClientNotification: (
             clientNotificationPacket: Protobuf.Mesh.ClientNotification,
           ) => {
@@ -912,13 +735,3 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
 
   getDevice: (id) => get().devices.get(id),
 }));
-
-export const DeviceContext = createContext<Device | undefined>(undefined);
-
-export const useDevice = (): Device => {
-  const context = useContext(DeviceContext);
-  if (context === undefined) {
-    throw new Error("useDevice must be used within a DeviceProvider");
-  }
-  return context;
-};

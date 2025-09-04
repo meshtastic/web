@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
-import { Separator } from "@components/UI/Seperator.tsx";
+import { Separator } from "@components/UI/Separator.tsx";
 import {
   Tooltip,
   TooltipArrow,
@@ -27,7 +27,7 @@ import {
 import { useFavoriteNode } from "@core/hooks/useFavoriteNode.ts";
 import { useIgnoreNode } from "@core/hooks/useIgnoreNode.ts";
 import { toast } from "@core/hooks/useToast.ts";
-import { useAppStore, useDevice } from "@core/stores";
+import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
@@ -55,7 +55,8 @@ export const NodeDetailsDialog = ({
   onOpenChange,
 }: NodeDetailsDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { setDialogOpen, connection, getNode } = useDevice();
+  const { setDialogOpen, connection } = useDevice();
+  const { getNode } = useNodeDB();
   const navigate = useNavigate();
   const { setNodeNumToBeRemoved, nodeNumDetails } = useAppStore();
   const { updateFavorite } = useFavoriteNode();

@@ -33,9 +33,9 @@
       "qrGenerator": "Generator",
       "qrImport": "Importeer",
       "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Schedule Reboot",
-      "rebootToOtaMode": "Reboot To OTA Mode",
+      "scheduleReboot": "Reboot Device",
       "resetNodeDb": "Reset Node DB",
+      "dfuMode": "DFU-modus activeren",
       "factoryResetDevice": "Factory Reset Device",
       "factoryResetConfig": "Factory Reset Config",
       "disconnect": "Verbinding verbreken"

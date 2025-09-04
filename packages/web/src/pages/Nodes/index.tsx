@@ -17,7 +17,7 @@ import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
-import { useAppStore, useDevice } from "@core/stores";
+import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { LockIcon, LockOpenIcon } from "lucide-react";
@@ -40,8 +40,8 @@ export interface DeleteNoteDialogProps {
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
   const { currentLanguage } = useLang();
-  const { getNodes, hardware, connection, hasNodeError, setDialogOpen } =
-    useDevice();
+  const { hardware, connection, setDialogOpen } = useDevice();
+  const { getNodes, hasNodeError } = useNodeDB();
   const { setNodeNumDetails } = useAppStore();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 

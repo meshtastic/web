@@ -7,20 +7,51 @@ export const decodePacket = (device: MeshDevice) =>
   new WritableStream<DeviceOutput>({
     write(chunk) {
       switch (chunk.type) {
+        case "status": {
+          const { status, reason } = chunk.data as {
+            status: Types.DeviceStatusEnum;
+            reason?: string;
+          };
+
+          device.updateDeviceStatus(status);
+          device.log.info(
+            Types.Emitter[Types.Emitter.ConnectionStatus],
+            `🔗 ${Types.DeviceStatusEnum[status]} ${reason ? `(${reason})` : ""}`,
+          );
+          break;
+        }
         case "debug": {
           break;
         }
         case "packet": {
-          const decodedMessage = fromBinary(
-            Protobuf.Mesh.FromRadioSchema,
-            chunk.data,
-          );
+          let decodedMessage: Protobuf.Mesh.FromRadio;
+          try {
+            decodedMessage = fromBinary(
+              Protobuf.Mesh.FromRadioSchema,
+              chunk.data,
+            );
+          } catch (e) {
+            device.log.error(
+              Types.Emitter[Types.Emitter.HandleFromRadio],
+              "⚠️  Received undecodable packet",
+              e,
+            );
+            break;
+          }
           device.events.onFromRadio.dispatch(decodedMessage);
 
           /** @todo Add map here when `all=true` gets fixed. */
           switch (decodedMessage.payloadVariant.case) {
             case "packet": {
-              device.handleMeshPacket(decodedMessage.payloadVariant.value);
+              try {
+                device.handleMeshPacket(decodedMessage.payloadVariant.value);
+              } catch (e) {
+                device.log.error(
+                  Types.Emitter[Types.Emitter.HandleFromRadio],
+                  "⚠️  Unable to handle mesh packet",
+                  e,
+                );
+              }
               break;
             }
 

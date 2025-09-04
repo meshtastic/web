@@ -4,7 +4,12 @@ import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
 import { Switch } from "@components/UI/Switch.tsx";
 import { Link } from "@components/UI/Typography/Link.tsx";
-import { useAppStore, useDeviceStore, useMessageStore } from "@core/stores";
+import {
+  useAppStore,
+  useDeviceStore,
+  useMessageStore,
+  useNodeDBStore,
+} from "@core/stores";
 import { subscribeAll } from "@core/subscriptions.ts";
 import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
@@ -25,7 +30,8 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   const isURLHTTPS = location.protocol === "https:";
 
   const { addDevice } = useDeviceStore();
-  const messageStore = useMessageStore();
+  const { addNodeDB } = useNodeDBStore();
+  const { addMessageStore } = useMessageStore();
   const { setSelectedDevice } = useAppStore();
 
   const { control, handleSubmit, register } = useForm<FormData>({
@@ -56,11 +62,14 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
       const id = randId();
       const transport = await TransportHTTP.create(data.ip, data.tls);
       const device = addDevice(id);
+      const nodeDB = addNodeDB(id);
+      const messageStore = addMessageStore(id);
+
       const connection = new MeshDevice(transport, id);
       connection.configure();
       setSelectedDevice(id);
       device.addConnection(connection);
-      subscribeAll(device, connection, messageStore);
+      subscribeAll(device, connection, messageStore, nodeDB);
       closeDialog();
     } catch (error) {
       if (error instanceof Error) {

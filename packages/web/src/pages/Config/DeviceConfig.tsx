@@ -83,7 +83,7 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
 
   return (
     <Tabs defaultValue={t("page.tabDevice")}>
-      <TabsList className="dark:bg-slate-700">
+      <TabsList className="w-full dark:bg-slate-700">
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.label}
@@ -103,9 +103,7 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
       {tabs.map((tab) => (
         <TabsContent key={tab.label} value={tab.label}>
           <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-              <tab.element onFormInit={onFormInit} />
-            </Suspense>
+            <tab.element onFormInit={onFormInit} />
           </Suspense>
         </TabsContent>
       ))}

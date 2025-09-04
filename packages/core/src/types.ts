@@ -10,7 +10,12 @@ interface DebugLog {
   data: string;
 }
 
-export type DeviceOutput = Packet | DebugLog;
+interface StatusEvent {
+  type: "status";
+  data: { status: DeviceStatusEnum; reason?: string };
+}
+
+export type DeviceOutput = Packet | DebugLog | StatusEvent;
 
 export interface Transport {
   toDevice: WritableStream<Uint8Array>;
@@ -101,6 +106,7 @@ export enum Emitter {
   RemoveNodeByNum = 32,
   SetCannedMessages = 33,
   Disconnect = 34,
+  ConnectionStatus = 35,
 }
 
 export interface LogEvent {

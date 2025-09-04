@@ -2,12 +2,17 @@ import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { type Page, useAppStore, useDevice, useSidebar } from "@core/stores";
+import {
+  type Page,
+  useAppStore,
+  useDevice,
+  useNodeDB,
+  useSidebar,
+} from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CircleChevronLeft,
-  LayersIcon,
   type LucideIcon,
   MapIcon,
   MessageSquareIcon,
@@ -62,14 +67,8 @@ const CollapseToggleButton = () => {
 };
 
 export const Sidebar = ({ children }: SidebarProps) => {
-  const {
-    hardware,
-    getNode,
-    getNodesLength,
-    metadata,
-    unreadCounts,
-    setDialogOpen,
-  } = useDevice();
+  const { hardware, metadata, unreadCounts, setDialogOpen } = useDevice();
+  const { getNode, getNodesLength } = useNodeDB();
   const { setCommandPaletteOpen } = useAppStore();
   const myNode = getNode(hardware.myNodeNum);
   const { isCollapsed } = useSidebar();
@@ -112,11 +111,6 @@ export const Sidebar = ({ children }: SidebarProps) => {
       name: t("navigation.config"),
       icon: SettingsIcon,
       page: "config",
-    },
-    {
-      name: t("navigation.channels"),
-      icon: LayersIcon,
-      page: "channels",
     },
     {
       name: `${t("navigation.nodes")} (${displayedNodeCount})`,

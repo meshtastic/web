@@ -1,0 +1,478 @@
+import { create } from "@bufbuild/protobuf";
+import { featureFlags } from "@core/services/featureFlags";
+import { validateIncomingNode } from "@core/stores/nodeDBStore/nodeValidation";
+import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
+import { createStorage } from "@core/stores/utils/indexDB.ts";
+import { Protobuf, type Types } from "@meshtastic/core";
+import { produce } from "immer";
+import { create as createStore, type StateCreator } from "zustand";
+import { type PersistOptions, persist } from "zustand/middleware";
+import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types.ts";
+
+const CURRENT_STORE_VERSION = 0;
+const NODEDB_RETENTION_NUM = 10;
+
+export interface NodeDB {
+  id: number;
+  myNodeNum: number | undefined;
+  nodeMap: Map<number, Protobuf.Mesh.NodeInfo>;
+  nodeErrors: Map<number, NodeError>;
+
+  addNode: (nodeInfo: Protobuf.Mesh.NodeInfo) => void;
+  removeNode: (nodeNum: number) => void;
+  removeAllNodes: (keepMyNode?: boolean) => void;
+  processPacket: (data: ProcessPacketParams) => void;
+  addUser: (user: Types.PacketMetadata<Protobuf.Mesh.User>) => void;
+  addPosition: (position: Types.PacketMetadata<Protobuf.Mesh.Position>) => void;
+  updateFavorite: (nodeNum: number, isFavorite: boolean) => void;
+  updateIgnore: (nodeNum: number, isIgnored: boolean) => void;
+  setNodeNum: (nodeNum: number) => void;
+  setNodeError: (nodeNum: number, error: NodeErrorType) => void;
+  clearNodeError: (nodeNum: number) => void;
+  removeAllNodeErrors: () => void;
+
+  getNodesLength: () => number;
+  getNode: (nodeNum: number) => Protobuf.Mesh.NodeInfo | undefined;
+  getNodes: (
+    filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
+    includeSelf?: boolean,
+  ) => Protobuf.Mesh.NodeInfo[];
+  getMyNode: () => Protobuf.Mesh.NodeInfo;
+
+  getNodeError: (nodeNum: number) => NodeError | undefined;
+  hasNodeError: (nodeNum: number) => boolean;
+}
+
+export interface nodeDBState {
+  addNodeDB: (id: number) => NodeDB;
+  removeNodeDB: (id: number) => void;
+  getNodeDBs: () => NodeDB[];
+  getNodeDB: (id: number) => NodeDB | undefined;
+}
+
+interface PrivateNodeDBState extends nodeDBState {
+  nodeDBs: Map<number, NodeDB>;
+}
+
+type NodeDBData = {
+  id: number;
+  myNodeNum: number | undefined;
+  nodeMap: Map<number, Protobuf.Mesh.NodeInfo>;
+  nodeErrors: Map<number, NodeError>;
+};
+
+type NodeDBPersisted = {
+  nodeDBs: Map<number, NodeDBData>;
+};
+
+function nodeDBFactory(
+  id: number,
+  get: () => PrivateNodeDBState,
+  set: typeof useNodeDBStore.setState,
+  data?: Partial<NodeDBData>,
+): NodeDB {
+  const nodeMap = data?.nodeMap ?? new Map<number, Protobuf.Mesh.NodeInfo>();
+  const nodeErrors = data?.nodeErrors ?? new Map<number, NodeError>();
+  const myNodeNum = data?.myNodeNum;
+
+  return {
+    id,
+    myNodeNum,
+    nodeMap,
+    nodeErrors,
+
+    addNode: (node) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          // Use validation to check the new node before adding
+          const next = validateIncomingNode(
+            node,
+            (nodeNum: number, err: NodeErrorType) => {
+              nodeDB.setNodeError(nodeNum, err);
+            },
+            (filter?: (node: Protobuf.Mesh.NodeInfo) => boolean) =>
+              nodeDB.getNodes(filter, true),
+          );
+
+          if (!next) {
+            // Validation failed and error has been set inside validateIncomingNode
+            return;
+          }
+          nodeDB.nodeMap.set(node.num, next);
+        }),
+      ),
+
+    removeNode: (nodeNum) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          nodeDB.nodeMap.delete(nodeNum);
+        }),
+      ),
+
+    removeAllNodes: (keepMyNode) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          const newNodeMap = new Map<number, Protobuf.Mesh.NodeInfo>();
+          if (
+            keepMyNode &&
+            nodeDB.myNodeNum !== undefined &&
+            nodeDB.nodeMap.has(nodeDB.myNodeNum)
+          ) {
+            newNodeMap.set(
+              nodeDB.myNodeNum,
+              nodeDB.nodeMap.get(nodeDB.myNodeNum) ??
+                create(Protobuf.Mesh.NodeInfoSchema),
+            );
+          }
+          nodeDB.nodeMap = newNodeMap;
+        }),
+      ),
+
+    setNodeError: (nodeNum, error) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          nodeDB.nodeErrors.set(nodeNum, { node: nodeNum, error });
+        }),
+      ),
+
+    clearNodeError: (nodeNum) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          nodeDB.nodeErrors.delete(nodeNum);
+        }),
+      ),
+
+    removeAllNodeErrors: () =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          nodeDB.nodeErrors = new Map<number, NodeError>();
+        }),
+      ),
+
+    processPacket: (data) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          const node = nodeDB.nodeMap.get(data.from);
+          if (node) {
+            node.lastHeard = data.time > 0 ? data.time : Date.now(); // fallback to now if time is 0 or negative
+            node.snr = data.snr;
+            nodeDB.nodeMap.set(data.from, node);
+          } else {
+            nodeDB.nodeMap.set(
+              data.from,
+              create(Protobuf.Mesh.NodeInfoSchema, {
+                num: data.from,
+                lastHeard: data.time > 0 ? data.time : Date.now(), // fallback to now if time is 0 or negative,
+                snr: data.snr,
+              }),
+            );
+          }
+        }),
+      ),
+
+    addUser: (user) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          const current =
+            nodeDB.nodeMap.get(user.from) ??
+            create(Protobuf.Mesh.NodeInfoSchema);
+          current.user = user.data;
+          current.num = user.from;
+          nodeDB.nodeMap.set(user.from, current);
+        }),
+      ),
+
+    addPosition: (position) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+          const current =
+            nodeDB.nodeMap.get(position.from) ??
+            create(Protobuf.Mesh.NodeInfoSchema);
+          current.position = position.data;
+          current.num = position.from;
+          nodeDB.nodeMap.set(position.from, current);
+        }),
+      ),
+
+    setNodeNum: (nodeNum) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const newDB = draft.nodeDBs.get(id);
+          if (!newDB) {
+            throw new Error(`No nodeDB found for id: ${id}`);
+          }
+
+          newDB.myNodeNum = nodeNum;
+
+          for (const [key, oldDB] of draft.nodeDBs) {
+            if (key === id) {
+              // short-circuit self
+              continue;
+            }
+            if (oldDB.myNodeNum === nodeNum) {
+              // We found the oldDB (same myNodeNum). Merge node-by-node as if the new nodes are added with addNode
+
+              const mergedNodes = new Map(oldDB.nodeMap);
+              const mergedErrors = new Map(oldDB.nodeErrors);
+
+              const getNodesProxy = (
+                filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
+              ): Protobuf.Mesh.NodeInfo[] => {
+                const arr = Array.from(mergedNodes.values());
+                return filter ? arr.filter(filter) : arr;
+              };
+
+              const setErrorProxy = (nodeNum: number, err: NodeErrorType) => {
+                mergedErrors.set(nodeNum, { error: err } as NodeError);
+              };
+
+              for (const [nodeNum, newNode] of newDB.nodeMap) {
+                const next = validateIncomingNode(
+                  newNode,
+                  setErrorProxy,
+                  getNodesProxy,
+                );
+                if (next) {
+                  mergedNodes.set(nodeNum, next);
+                }
+
+                const err = newDB.getNodeError(nodeNum);
+                if (err && !oldDB.hasNodeError(nodeNum)) {
+                  mergedErrors.set(nodeNum, err);
+                }
+              }
+
+              // finalize: move maps into newDB and drop oldDB entry
+              newDB.nodeMap = mergedNodes;
+              newDB.nodeErrors = mergedErrors;
+              draft.nodeDBs.delete(oldDB.id);
+            }
+          }
+        }),
+      ),
+
+    updateFavorite: (nodeNum, isFavorite) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+
+          const node = nodeDB.nodeMap.get(nodeNum);
+          if (node) {
+            node.isFavorite = isFavorite;
+          }
+        }),
+      ),
+
+    updateIgnore: (nodeNum, isIgnored) =>
+      set(
+        produce<PrivateNodeDBState>((draft) => {
+          const nodeDB = draft.nodeDBs.get(id);
+          if (!nodeDB) {
+            throw new Error(`No nodeDB found (id: ${id})`);
+          }
+
+          const node = nodeDB.nodeMap.get(nodeNum);
+          if (node) {
+            node.isIgnored = isIgnored;
+          }
+        }),
+      ),
+
+    getNodesLength: () => {
+      const nodeDB = get().nodeDBs.get(id);
+      if (!nodeDB) {
+        throw new Error(`No nodeDB found (id: ${id})`);
+      }
+      return nodeDB.nodeMap.size;
+    },
+
+    getNode: (nodeNum) => {
+      const nodeDB = get().nodeDBs.get(id);
+      if (!nodeDB) {
+        throw new Error(`No nodeDB found (id: ${id})`);
+      }
+      return nodeDB.nodeMap.get(nodeNum);
+    },
+
+    getNodes: (filter, includeSelf) => {
+      const nodeDB = get().nodeDBs.get(id);
+      if (!nodeDB) {
+        throw new Error(`No nodeDB found (id: ${id})`);
+      }
+      const all = Array.from(nodeDB.nodeMap.values()).filter((n) =>
+        includeSelf ? true : n.num !== nodeDB.myNodeNum,
+      );
+
+      return filter ? all.filter(filter) : all;
+    },
+
+    getMyNode: () => {
+      const nodeDB = get().nodeDBs.get(id);
+      if (!nodeDB) {
+        throw new Error(`No nodeDB found (id: ${id})`);
+      }
+      if (!nodeDB.myNodeNum) {
+        throw new Error(`No myNodeNum set for nodeDB with id: ${id}`);
+      }
+      return (
+        nodeDB.nodeMap.get(nodeDB.myNodeNum) ??
+        create(Protobuf.Mesh.NodeInfoSchema)
+      );
+    },
+
+    getNodeError: (nodeNum) => {
+      const nodeDB = get().nodeDBs.get(id);
+      if (!nodeDB) {
+        throw new Error(`No nodeDB found (id: ${id})`);
+      }
+      return nodeDB.nodeErrors.get(nodeNum);
+    },
+
+    hasNodeError: (nodeNum) => {
+      const nodeDB = get().nodeDBs.get(id);
+      if (!nodeDB) {
+        throw new Error(`No nodeDB found (id: ${id})`);
+      }
+      return nodeDB.nodeErrors.has(nodeNum);
+    },
+  };
+}
+
+export const nodeDBInitializer: StateCreator<PrivateNodeDBState> = (
+  set,
+  get,
+) => ({
+  nodeDBs: new Map(),
+
+  addNodeDB: (id) => {
+    const existing = get().nodeDBs.get(id);
+    if (existing) {
+      return existing;
+    }
+
+    const nodeDB = nodeDBFactory(id, get, set);
+    set(
+      produce<PrivateNodeDBState>((draft) => {
+        draft.nodeDBs.set(id, nodeDB);
+
+        // Enforce retention limit
+        evictOldestEntries(draft.nodeDBs, NODEDB_RETENTION_NUM);
+      }),
+    );
+
+    return nodeDB;
+  },
+  removeNodeDB: (id) => {
+    set(
+      produce<PrivateNodeDBState>((draft) => {
+        draft.nodeDBs.delete(id);
+      }),
+    );
+  },
+  getNodeDBs: () => Array.from(get().nodeDBs.values()),
+  getNodeDB: (id) => get().nodeDBs.get(id),
+});
+
+const persistOptions: PersistOptions<PrivateNodeDBState, NodeDBPersisted> = {
+  name: "meshtastic-nodedb-store",
+  storage: createStorage<NodeDBPersisted>(),
+  version: CURRENT_STORE_VERSION,
+  partialize: (s): NodeDBPersisted => ({
+    nodeDBs: new Map(
+      Array.from(s.nodeDBs.entries()).map(([id, db]) => [
+        id,
+        {
+          id: db.id,
+          myNodeNum: db.myNodeNum,
+          nodeMap: db.nodeMap,
+          nodeErrors: db.nodeErrors,
+        },
+      ]),
+    ),
+  }),
+  onRehydrateStorage: () => (state) => {
+    if (!state) {
+      return;
+    }
+    console.debug(
+      "NodeDBStore: Rehydrating state with ",
+      state.nodeDBs.size,
+      " nodeDBs -",
+      state.nodeDBs,
+    );
+
+    useNodeDBStore.setState(
+      produce<PrivateNodeDBState>((draft) => {
+        const rebuilt = new Map<number, NodeDB>();
+        for (const [id, data] of (
+          draft.nodeDBs as unknown as Map<number, NodeDBData>
+        ).entries()) {
+          if (data.myNodeNum !== undefined) {
+            // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
+            rebuilt.set(
+              id,
+              nodeDBFactory(
+                id,
+                useNodeDBStore.getState,
+                useNodeDBStore.setState,
+                data,
+              ),
+            );
+          }
+        }
+        draft.nodeDBs = rebuilt;
+      }),
+    );
+  },
+};
+
+// Add persist middleware on the store if the feature flag is enabled
+const persistNodes = featureFlags.get("persistNodeDB");
+console.debug(
+  `NodeDBStore: Persisting nodes is ${persistNodes ? "enabled" : "disabled"}`,
+);
+
+export const useNodeDBStore = persistNodes
+  ? createStore<PrivateNodeDBState, [["zustand/persist", NodeDBPersisted]]>(
+      persist(nodeDBInitializer, persistOptions),
+    )
+  : createStore<PrivateNodeDBState>()(nodeDBInitializer);

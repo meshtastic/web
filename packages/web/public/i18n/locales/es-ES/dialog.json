@@ -1,27 +1,27 @@
 {
 	"deleteMessages": {
 		"description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
-		"title": "Clear All Messages"
+		"title": "Borrar todos los mensajes"
 	},
 	"deviceName": {
-		"description": "The Device will restart once the config is saved.",
-		"longName": "Long Name",
-		"shortName": "Short Name",
-		"title": "Change Device Name",
+		"description": "El dispositivo se reiniciará una vez que se guarde la configuración.",
+		"longName": "Nombre largo",
+		"shortName": "Nombre Corto",
+		"title": "Cambiar nombre del dispositivo",
 		"validation": {
-			"longNameMax": "Long name must not be more than 40 characters",
-			"shortNameMax": "Short name must not be more than 4 characters",
-			"longNameMin": "Long name must have at least 1 character",
-			"shortNameMin": "Short name must have at least 1 character"
+			"longNameMax": "El nombre largo no debe tener más de 40 caracteres",
+			"shortNameMax": "El nombre corto no debe tener más de 4 caracteres",
+			"longNameMin": "El nombre largo debe tener al menos 1 carácter",
+			"shortNameMin": "El nombre corto debe tener al menos 1 carácter"
 		}
 	},
 	"import": {
-		"description": "The current LoRa configuration will be overridden.",
+		"description": "Se anulará la configuración actual de LoRa.",
 		"error": {
-			"invalidUrl": "Invalid Meshtastic URL"
+			"invalidUrl": "URL Meshtastic no válida"
 		},
 		"channelPrefix": "Channel: ",
-		"channelSetUrl": "Channel Set/QR Code URL",
+		"channelSetUrl": "Fijar canal/código QR URL",
 		"channels": "Channels:",
 		"usePreset": "Use Preset?",
 		"title": "Import Channel Set"
@@ -75,7 +75,8 @@
 			"unknownErrorLoadingDevices": "Unknown error loading devices"
 		},
 		"validation": {
-			"requiresFeatures": "This connection type requires <0></0>. Please use a supported browser, like Chrome or Edge.",
+			"requiresWebBluetooth": "This connection type requires <0>Web Bluetooth</0>. Please use a supported browser, like Chrome or Edge.",
+			"requiresWebSerial": "This connection type requires <0>Web Serial</0>. Please use a supported browser, like Chrome or Edge.",
 			"requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
 			"additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
 		}
@@ -92,7 +93,7 @@
 		"deviceMetrics": "Device Metrics:",
 		"hardware": "Hardware: ",
 		"lastHeard": "Last Heard: ",
-		"nodeHexPrefix": "Node Hex: !",
+		"nodeHexPrefix": "Node Hex: ",
 		"nodeNumber": "Node Number: ",
 		"position": "Position:",
 		"role": "Role: ",
@@ -101,7 +102,12 @@
 		"title": "Node Details for {{identifier}}",
 		"ignoreNode": "Ignore node",
 		"removeNode": "Remove node",
-		"unignoreNode": "Unignore node"
+		"unignoreNode": "Unignore node",
+		"security": "Security:",
+		"publicKey": "Public Key: ",
+		"messageable": "Messageable: ",
+		"KeyManuallyVerifiedTrue": "Public Key has been manually verified",
+		"KeyManuallyVerifiedFalse": "Public Key is not manually verified"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "If you lose your keys, you will need to reset your device.",
@@ -131,15 +137,15 @@
 		"sharableUrl": "Sharable URL",
 		"title": "Generate QR Code"
 	},
-	"rebootOta": {
-		"title": "Schedule Reboot",
-		"description": "Reboot the connected node after a delay into OTA (Over-the-Air) mode.",
-		"enterDelay": "Enter delay (sec)",
-		"scheduled": "Reboot has been scheduled"
-	},
 	"reboot": {
-		"title": "Schedule Reboot",
-		"description": "Reboot the connected node after x minutes."
+		"title": "Reboot device",
+		"description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
+		"ota": "Reboot into OTA mode",
+		"enterDelay": "Enter delay",
+		"scheduled": "Reboot has been scheduled",
+		"schedule": "Schedule reboot",
+		"now": "Reboot now",
+		"cancel": "Cancel scheduled reboot"
 	},
 	"refreshKeys": {
 		"description": {
@@ -178,5 +184,10 @@
 		"confirmUnderstanding": "Yes, I know what I'm doing",
 		"title": "¿Estás seguro?",
 		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+	},
+	"clientNotification": {
+		"title": "Client Notification",
+		"TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
+		"Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
 	}
 }

@@ -7,8 +7,6 @@ import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
-import { useAppStore } from "@core/stores";
-import { dotPaths } from "@core/utils/dotPath.ts";
 import { useEffect } from "react";
 import {
   type Control,
@@ -66,7 +64,6 @@ export interface DynamicFormProps<T extends FieldValues> {
     fields: FieldProps<T>[];
   }[];
   validationSchema?: ZodType<T>;
-  formId?: string;
 }
 
 export type DynamicFormFormInit<T extends FieldValues> = (
@@ -83,10 +80,8 @@ export function DynamicForm<T extends FieldValues>({
   values,
   fieldGroups,
   validationSchema,
-  formId,
 }: DynamicFormProps<T>) {
   const { t } = useTranslation();
-  const { addError, removeError } = useAppStore();
 
   const internalMethods = useForm<T>({
     mode: "onChange",
@@ -95,6 +90,7 @@ export function DynamicForm<T extends FieldValues>({
       ? createZodResolver(validationSchema)
       : undefined,
     shouldFocusError: false,
+    shouldUnregister: true,
     resetOptions: { keepDefaultValues: true },
     values,
   });
@@ -109,23 +105,6 @@ export function DynamicForm<T extends FieldValues>({
       onFormInit?.(internalMethods);
     }
   }, [onFormInit, propMethods, internalMethods]);
-
-  useEffect(() => {
-    const errorKeys = Object.keys(formState.errors);
-    if (formId) {
-      if (errorKeys.length === 0) {
-        dotPaths(getValues()).forEach((key) => {
-          removeError(key);
-        });
-        removeError(formId);
-      } else {
-        errorKeys.forEach((key) => {
-          addError(key, "");
-        });
-        addError(formId, "");
-      }
-    }
-  }, [formState.errors, addError, formId, getValues, removeError]);
 
   const isDisabled = (
     disabledBy?: DisabledBy<T>[],

@@ -14,11 +14,18 @@ const mockNode = {
 const mockUpdateIgnore = vi.fn();
 const mockGetNode = vi.fn(() => mockNode);
 const mockToast = vi.fn();
+const mockSendAdminMessage = vi.fn();
 
 vi.mock("@core/stores", () => ({
-  useDevice: () => ({
-    updateIgnored: mockUpdateIgnore,
+  CurrentDeviceContext: {
+    _currentValue: { deviceId: 1234 },
+  },
+  useNodeDB: () => ({
+    updateIgnore: mockUpdateIgnore,
     getNode: mockGetNode,
+  }),
+  useDevice: () => ({
+    sendAdminMessage: mockSendAdminMessage,
   }),
 }));
 

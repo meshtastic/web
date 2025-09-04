@@ -33,9 +33,9 @@
       "qrGenerator": "Генератор",
       "qrImport": "Импортиране",
       "scheduleShutdown": "Планирано изключване",
-      "scheduleReboot": "Планирано рестартиране",
-      "rebootToOtaMode": "Рестартиране в режим OTA",
+      "scheduleReboot": "Рестартиране на устройството",
       "resetNodeDb": "Нулиране на базата данни с възли",
+      "dfuMode": "Влизане в DFU режим",
       "factoryResetDevice": "Фабрично нулиране на устройството",
       "factoryResetConfig": "Фабрично нулиране на конфигурацията",
       "disconnect": "Прекъсване"

@@ -1,10 +1,10 @@
-import { useDevice, useMessageStore } from "@core/stores";
+import { useDevice, useMessages, useNodeDB } from "@core/stores";
 import { useCallback } from "react";
 
 export function useRefreshKeysDialog() {
-  const { removeNode, setDialogOpen, clearNodeError, getNodeError } =
-    useDevice();
-  const { activeChat } = useMessageStore();
+  const { setDialogOpen } = useDevice();
+  const { removeNode, clearNodeError, getNodeError } = useNodeDB();
+  const { activeChat } = useMessages();
 
   const handleCloseDialog = useCallback(() => {
     setDialogOpen("refreshKeys", false);
