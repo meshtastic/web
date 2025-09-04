@@ -31,7 +31,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
 
   const { addDevice } = useDeviceStore();
   const { addNodeDB } = useNodeDBStore();
-  const messageStore = useMessageStore();
+  const { addMessageStore } = useMessageStore();
   const { setSelectedDevice } = useAppStore();
 
   const { control, handleSubmit, register } = useForm<FormData>({
@@ -63,6 +63,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
       const transport = await TransportHTTP.create(data.ip, data.tls);
       const device = addDevice(id);
       const nodeDB = addNodeDB(id);
+      const messageStore = addMessageStore(id);
 
       const connection = new MeshDevice(transport, id);
       connection.configure();

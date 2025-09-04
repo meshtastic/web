@@ -1,12 +1,13 @@
-import { useDeviceContext } from "@app/core/stores/utils/useDeviceContext";
+import { useDeviceContext } from "@core/hooks/useDeviceContext";
 import { type Device, useDeviceStore } from "@core/stores/deviceStore";
+import { type MessageStore, useMessageStore } from "@core/stores/messageStore";
 import { type NodeDB, useNodeDBStore } from "@core/stores/nodeDBStore";
 
 export {
   CurrentDeviceContext,
   type DeviceContext,
   useDeviceContext,
-} from "@app/core/stores/utils/useDeviceContext";
+} from "@core/hooks/useDeviceContext";
 export { useAppStore } from "@core/stores/appStore";
 export {
   type Device,
@@ -19,9 +20,10 @@ export {
   MessageState,
   type MessageStore,
   MessageType,
-  useMessageStore, // TODO: Bring hook into this file
+  useMessageStore,
 } from "@core/stores/messageStore";
 export { type NodeDB, useNodeDBStore } from "@core/stores/nodeDBStore";
+export type { NodeErrorType } from "@core/stores/nodeDBStore/types";
 export {
   SidebarProvider,
   useSidebar, // TODO: Bring hook into this file
@@ -40,6 +42,14 @@ export const useDevice = (): Device => {
 
   const device = useDeviceStore(
     (s) => s.getDevice(deviceId) ?? s.addDevice(deviceId),
+  );
+  return device;
+};
+export const useMessages = (): MessageStore => {
+  const { deviceId } = useDeviceContext();
+
+  const device = useMessageStore(
+    (s) => s.getMessageStore(deviceId) ?? s.addMessageStore(deviceId),
   );
   return device;
 };

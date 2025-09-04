@@ -9,7 +9,9 @@ vi.mock("@core/stores", () => ({
   useDeviceStore: vi.fn(() => ({
     addDevice: vi.fn(() => ({ addConnection: vi.fn() })),
   })),
-  useMessageStore: vi.fn(),
+  useMessageStore: vi.fn(() => ({
+    addMessageStore: vi.fn(),
+  })),
   useNodeDBStore: vi.fn(() => ({
     addNodeDB: vi.fn(),
   })),

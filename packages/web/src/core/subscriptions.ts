@@ -1,5 +1,6 @@
 import { ensureDefaultUser } from "@core/dto/NodeNumToNodeInfoDTO.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
+import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
 import {
   type Device,
   type MessageStore,
@@ -7,8 +8,6 @@ import {
   type NodeDB,
 } from "@core/stores";
 import { type MeshDevice, Protobuf } from "@meshtastic/core";
-import { fromByteArray } from "base64-js";
-
 export const subscribeAll = (
   device: Device,
   connection: MeshDevice,
@@ -57,9 +56,7 @@ export const subscribeAll = (
   });
 
   connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
-    device.setHardware(nodeInfo);
-    messageStore.setNodeNum(nodeInfo.myNodeNum);
-    nodeDB.setNodeNum(nodeInfo.myNodeNum);
+    useNewNodeNum(device.id, nodeInfo);
     myNodeNum = nodeInfo.myNodeNum;
   });
 
@@ -74,24 +71,7 @@ export const subscribeAll = (
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
     const nodeWithUser = ensureDefaultUser(nodeInfo);
 
-    if (nodeWithUser.num !== myNodeNum && nodeDB.getNode(nodeWithUser.num)) {
-      const oldPublicKey = fromByteArray(
-        nodeDB.getNode(nodeWithUser.num)?.user?.publicKey ?? new Uint8Array(),
-      );
-      const newPublicKey = fromByteArray(
-        nodeWithUser.user?.publicKey ?? new Uint8Array(),
-      );
-
-      if (oldPublicKey !== newPublicKey) {
-        console.warn(
-          `Node ${nodeWithUser.user?.longName} (${nodeWithUser.num}) has a different public key than expected: Expected ${oldPublicKey} but got ${newPublicKey}`,
-        );
-        nodeDB.setNodeError(nodeWithUser.num, "MISMATCH_PKI");
-
-        // TODO: Handle this error case properly (refactor PKI dialog?)
-      }
-    }
-
+    // PKI sanity check is handled inside nodeDB.addNode
     nodeDB.addNode(nodeWithUser);
   });
 
