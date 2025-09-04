@@ -187,9 +187,7 @@ export class TransportNode implements Types.Transport {
       if (this.pipePromise) {
         await this.pipePromise;
       }
-
-      this.socket?.removeAllListeners();
-      this.socket?.end();
+      this.socket?.destroy();
     } finally {
       this.socket = undefined;
       this.closingByUser = false;
