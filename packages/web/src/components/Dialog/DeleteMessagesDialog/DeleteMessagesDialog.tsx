@@ -1,7 +1,7 @@
-import { DialogWrapper } from "../DialogWrapper.tsx";
 import { useMessageStore } from "@core/stores";
 import { AlertTriangleIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { DialogWrapper } from "../DialogWrapper.tsx";
 
 export interface DeleteMessagesDialogProps {
   open: boolean;
