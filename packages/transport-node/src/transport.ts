@@ -20,28 +20,36 @@ export class TransportNode implements Types.Transport {
     Types.DeviceStatusEnum.DeviceDisconnected;
 
   private closingByUser = false;
+  private errored = false;
 
   /**
    * Creates and connects a new TransportNode instance.
    * @param hostname - The IP address or hostname of the Meshtastic device.
    * @param port - The port number for the TCP connection (defaults to 4403).
+   * @param timeout - TCP socket timeout in milliseconds (defaults to 60000).
    * @returns A promise that resolves with a connected TransportNode instance.
    */
-  public static create(hostname: string, port = 4403): Promise<TransportNode> {
+  public static create(
+    hostname: string,
+    port = 4403,
+    timeout = 60000,
+  ): Promise<TransportNode> {
     return new Promise((resolve, reject) => {
       const socket = new Socket();
 
       const onError = (err: Error) => {
         socket.destroy();
+        socket.removeAllListeners();
         reject(err);
       };
 
       socket.once("error", onError);
-
-      socket.connect(port, hostname, () => {
+      socket.once("ready", () => {
         socket.removeListener("error", onError);
         resolve(new TransportNode(socket));
       });
+      socket.setTimeout(timeout);
+      socket.connect(port, hostname);
     });
   }
 
@@ -52,14 +60,34 @@ export class TransportNode implements Types.Transport {
   constructor(connection: Socket) {
     this.socket = connection;
 
-    this.socket.on("error", (err) => {
-      console.error("Socket connection error:", err);
+    this.socket.on("error", () => {
+      this.errored = true;
+      this.socket?.removeAllListeners();
+      this.socket?.destroy();
       if (!this.closingByUser) {
         this.emitStatus(
           Types.DeviceStatusEnum.DeviceDisconnected,
           "socket-error",
         );
       }
+    });
+
+    this.socket.on("end", () => {
+      if (this.closingByUser) {
+        return; // suppress close-derived disconnect in user flow
+      }
+      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "socket-end");
+      this.socket?.removeAllListeners();
+      this.socket?.destroy();
+    });
+
+    this.socket.on("timeout", () => {
+      this.emitStatus(
+        Types.DeviceStatusEnum.DeviceDisconnected,
+        "socket-timeout",
+      );
+      this.socket?.removeAllListeners();
+      this.socket?.destroy();
     });
 
     this.socket.on("close", () => {
@@ -98,7 +126,7 @@ export class TransportNode implements Types.Transport {
           }
           ctrl.close();
         } catch (error) {
-          if (this.closingByUser) {
+          if (this.closingByUser || this.errored) {
             ctrl.close();
           } else {
             this.emitStatus(
@@ -120,7 +148,7 @@ export class TransportNode implements Types.Transport {
     });
 
     // Stream for data going FROM the application TO the Meshtastic device.
-    const toDeviceTransform = Utils.toDeviceStream;
+    const toDeviceTransform = Utils.toDeviceStream();
     this._toDevice = toDeviceTransform.writable;
 
     this.pipePromise = toDeviceTransform.readable
@@ -128,10 +156,9 @@ export class TransportNode implements Types.Transport {
         signal: abortController.signal,
       })
       .catch((err) => {
-        if (abortController.signal.aborted) {
+        if (abortController.signal.aborted || this.socket?.destroyed) {
           return;
         }
-        console.error("Error piping data to socket:", err);
         const error = err instanceof Error ? err : new Error(String(err));
         this.socket?.destroy(error);
       });
@@ -160,11 +187,11 @@ export class TransportNode implements Types.Transport {
       if (this.pipePromise) {
         await this.pipePromise;
       }
-
       this.socket?.destroy();
     } finally {
       this.socket = undefined;
       this.closingByUser = false;
+      this.errored = false;
     }
   }
 
@@ -173,9 +200,13 @@ export class TransportNode implements Types.Transport {
       return;
     }
     this.lastStatus = next;
-    this.fromDeviceController?.enqueue({
-      type: "status",
-      data: { status: next, reason },
-    });
+    try {
+      this.fromDeviceController?.enqueue({
+        type: "status",
+        data: { status: next, reason },
+      });
+    } catch (e) {
+      console.error("Enqueue fail", e);
+    }
   }
 }

@@ -16,9 +16,10 @@ export class TransportDeno implements Types.Transport {
 
   constructor(connection: Deno.Conn) {
     this.connection = connection;
-    Utils.toDeviceStream.readable.pipeTo(this.connection.writable);
+    const toDeviceStream = Utils.toDeviceStream();
+    toDeviceStream.readable.pipeTo(this.connection.writable);
 
-    this._toDevice = Utils.toDeviceStream.writable;
+    this._toDevice = toDeviceStream.writable;
     this._fromDevice = this.connection.readable.pipeThrough(
       Utils.fromDeviceStream(),
     );

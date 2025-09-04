@@ -64,6 +64,11 @@ export class MeshDevice {
         this.isConfigured = true;
       } else if (status === DeviceStatusEnum.DeviceConfiguring) {
         this.isConfigured = false;
+      } else if (status === DeviceStatusEnum.DeviceDisconnected) {
+        if (this._heartbeatIntervalId !== undefined) {
+          clearInterval(this._heartbeatIntervalId);
+        }
+        this.complete();
       }
     });
 
@@ -770,7 +775,14 @@ export class MeshDevice {
       },
     });
 
-    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio));
+    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio)).catch(
+      (e) => {
+        if (this.deviceStatus === DeviceStatusEnum.DeviceDisconnected) {
+          throw new Error("Device connection lost");
+        }
+        throw e;
+      },
+    );
   }
 
   /**
@@ -797,7 +809,12 @@ export class MeshDevice {
       clearInterval(this._heartbeatIntervalId);
     }
     this._heartbeatIntervalId = setInterval(() => {
-      this.heartbeat();
+      this.heartbeat().catch((err) => {
+        this.log.error(
+          Emitter[Emitter.Ping],
+          `⚠️ Unable to send heartbeat: ${err.message}`,
+        );
+      });
     }, interval);
   }
 

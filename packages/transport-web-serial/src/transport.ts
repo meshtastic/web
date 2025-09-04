@@ -58,7 +58,8 @@ export class TransportWebSerial implements Types.Transport {
     const abortController = this.abortController;
 
     // Set up the pipe with abort signal for clean cancellation
-    this.pipePromise = Utils.toDeviceStream.readable
+    const toDeviceTransform = Utils.toDeviceStream();
+    this.pipePromise = toDeviceTransform.readable
       .pipeTo(connection.writable, { signal: this.abortController.signal })
       .catch((err) => {
         // Ignore expected rejection when we cancel it via the AbortController.
@@ -73,7 +74,7 @@ export class TransportWebSerial implements Types.Transport {
         );
       });
 
-    this._toDevice = Utils.toDeviceStream.writable;
+    this._toDevice = toDeviceTransform.writable;
 
     // Wrap + capture controller to inject status packets
     this._fromDevice = new ReadableStream<Types.DeviceOutput>({
@@ -199,7 +200,8 @@ export class TransportWebSerial implements Types.Transport {
       const abortController = this.abortController;
 
       // Re-establish the pipe connection
-      this.pipePromise = Utils.toDeviceStream.readable
+      const toDeviceTransform = Utils.toDeviceStream();
+      this.pipePromise = toDeviceTransform.readable
         .pipeTo(this.connection.writable, {
           signal: this.abortController.signal,
         })
