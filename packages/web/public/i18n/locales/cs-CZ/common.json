@@ -138,7 +138,7 @@
 			"key": "Key is required."
 		},
 		"invalidOverrideFreq": {
-			"number": "Neplatný formát, očekáváno 430-930 MHz, s maximálně 3 desetinnými místy."
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }

@@ -138,7 +138,7 @@
 			"key": "Ключът е задължителен."
 		},
 		"invalidOverrideFreq": {
-			"number": "Невалиден формат, очаквано 430-930 MHz, с не повече от 3 десетични знака."
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }

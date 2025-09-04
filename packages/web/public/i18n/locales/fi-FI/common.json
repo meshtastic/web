@@ -138,7 +138,7 @@
 			"key": "Avain on pakollinen."
 		},
 		"invalidOverrideFreq": {
-			"number": "Virheellinen muoto, odotettu 430-930 MHz, korkeintaan 3 desimaalia."
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }

@@ -138,7 +138,7 @@
 			"key": "Key is required."
 		},
 		"invalidOverrideFreq": {
-			"number": "格式无效，预期 430-930 MHz，最多 3 位小数。"
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }

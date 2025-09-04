@@ -138,7 +138,7 @@
 			"key": "Key is required."
 		},
 		"invalidOverrideFreq": {
-			"number": "Неправильний формат, очікувано 430-930 МГц, не більше 3 десяткових знаків."
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }

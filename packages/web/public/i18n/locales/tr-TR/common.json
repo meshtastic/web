@@ -138,7 +138,7 @@
 			"key": "Anahtar gerekli."
 		},
 		"invalidOverrideFreq": {
-			"number": "Geçersiz format, beklenen 430-930 MHz, en fazla 3 ondalık basamak."
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }

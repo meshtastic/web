@@ -138,7 +138,7 @@
 			"key": "Key is required."
 		},
 		"invalidOverrideFreq": {
-			"number": "Ongeldig formaat, verwacht 430-930 MHz, met maximaal 3 decimalen."
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }

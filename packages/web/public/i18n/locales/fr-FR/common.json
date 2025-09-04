@@ -138,7 +138,7 @@
 			"key": "Clé requise."
 		},
 		"invalidOverrideFreq": {
-			"number": "Format invalide, attendu 430-930 MHz, avec pas plus de 3 décimales."
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }

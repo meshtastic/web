@@ -138,7 +138,7 @@
 			"key": "Klucz jest wymagany."
 		},
 		"invalidOverrideFreq": {
-			"number": "Nieprawidłowy format, oczekiwano 430-930 MHz, maksymalnie 3 miejsca po przecinku."
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }

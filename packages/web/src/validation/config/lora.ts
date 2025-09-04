@@ -18,14 +18,9 @@ export const LoRaValidationSchema = z.object({
   channelNum: z.coerce.number().int(),
   overrideDutyCycle: z.boolean(),
   sx126xRxBoostedGain: z.boolean(),
-  overrideFrequency: z.coerce
-    .number()
-    .min(410)
-    .max(930)
-    .refine(
-      (val) => Number(val.toFixed(3)) === val,
-      { message: "formValidation.invalidOverrideFreq.number"}
-    ),
+  overrideFrequency: z.coerce.number().refine(
+    (val) => val >= 410 && val <= 930,
+    {message: "formValidation.invalidOverrideFreq.number"}),
   ignoreIncoming: z.coerce.number().array(),
   ignoreMqtt: z.boolean(),
   configOkToMqtt: z.boolean(),

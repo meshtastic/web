@@ -138,7 +138,7 @@
 			"key": "Schlüssel erforderlich."
 		},
 		"invalidOverrideFreq": {
-			"number": "Ungültiges Format, erwartet 430-930 MHz, mit höchstens 3 Dezimalstellen."
+			"number": "Ungültiges Format, erwartet 430-930 MHz."
 		}
 	}
 }

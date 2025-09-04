@@ -138,7 +138,7 @@
 			"key": "키가 필요합니다."
 		},
 		"invalidOverrideFreq": {
-			"number": "잘못된 형식입니다. 430-930 MHz, 소수점 3자리 이하로 입력하세요."
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }

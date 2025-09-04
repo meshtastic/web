@@ -138,7 +138,7 @@
 			"key": "La chiave è obbligatoria."
 		},
 		"invalidOverrideFreq": {
-			"number": "Formato non valido, previsto 430-930 MHz, con non più di 3 decimali."
+			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	}
 }
