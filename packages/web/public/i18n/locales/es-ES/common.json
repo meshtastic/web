@@ -135,9 +135,6 @@
 			"generic": "Este campo es obligatorio.",
 			"managed": "Se solicita al menos una clave de administración si se administra el nodo.",
 			"key": "Se requiere clave."
-		},
-		"invalidOverrideFreq": {
-			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	},
 	"yes": "Sí",

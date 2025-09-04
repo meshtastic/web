@@ -52,7 +52,6 @@ export function DynamicFormField<T extends FieldValues>({
           control={control}
           disabled={disabled}
           isDirty={isDirty}
-          invalid={invalid}
         />
       );
 

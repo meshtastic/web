@@ -30,7 +30,6 @@ export function GenericInput<T extends FieldValues>({
   control,
   disabled,
   field,
-  invalid,
 }: GenericFormElementProps<T, InputFieldProps<T>>) {
   const { fieldLength, ...restProperties } = field.properties || {};
 
@@ -45,8 +44,6 @@ export function GenericInput<T extends FieldValues>({
       maxLength: field.properties?.fieldLength?.max,
     },
   });
-
-  const isInvalid = invalid || Boolean(error?.message);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -100,7 +97,6 @@ export function GenericInput<T extends FieldValues>({
           {currentLength}/{fieldLength.max}
         </div>
       )}
-      
     </div>
   );
 }

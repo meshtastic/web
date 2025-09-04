@@ -135,9 +135,6 @@
 			"generic": "To pole jest wymagane.",
 			"managed": "Co najmniej jeden klucz administratora jest wymagany, jeśli węzeł jest zarządzany.",
 			"key": "Klucz jest wymagany."
-		},
-		"invalidOverrideFreq": {
-			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	},
 	"yes": "Yes",

@@ -135,9 +135,6 @@
 			"generic": "Obligatoriskt fält.",
 			"managed": "Åtminstone en administratörsnyckel krävs om noden fjärrhanteras.",
 			"key": "En nyckel måste anges."
-		},
-		"invalidOverrideFreq": {
-			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	},
 	"yes": "Yes",

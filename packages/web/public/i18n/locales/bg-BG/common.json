@@ -135,9 +135,6 @@
 			"generic": "Това поле е задължително.",
 			"managed": "Изисква се поне един администраторски ключ, ако възелът е управляван.",
 			"key": "Ключът е задължителен."
-		},
-		"invalidOverrideFreq": {
-			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	},
 	"yes": "Да",

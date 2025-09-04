@@ -135,9 +135,6 @@
 			"generic": "필수 입력 사항입니다.",
 			"managed": "노드 관리를 위해 최소 한 개의 관리자 키가 필요합니다.",
 			"key": "키가 필요합니다."
-		},
-		"invalidOverrideFreq": {
-			"number": "Invalid format, expected between 430-930 MHz."
 		}
 	},
 	"yes": "Yes",
