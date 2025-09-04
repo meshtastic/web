@@ -112,9 +112,10 @@ export class TransportNodeSerial implements Types.Transport {
     });
 
     // Stream for data going FROM the application TO the Meshtastic device.
-    this._toDevice = Utils.toDeviceStream.writable;
+    const toDeviceTransform = Utils.toDeviceStream();
+    this._toDevice = toDeviceTransform.writable;
 
-    this.pipePromise = Utils.toDeviceStream.readable
+    this.pipePromise = toDeviceTransform.readable
       .pipeTo(Writable.toWeb(port) as WritableStream<Uint8Array>, {
         signal: controller.signal,
       })

@@ -148,7 +148,7 @@ export class TransportNode implements Types.Transport {
     });
 
     // Stream for data going FROM the application TO the Meshtastic device.
-    const toDeviceTransform = Utils.toDeviceStream;
+    const toDeviceTransform = Utils.toDeviceStream();
     this._toDevice = toDeviceTransform.writable;
 
     this.pipePromise = toDeviceTransform.readable

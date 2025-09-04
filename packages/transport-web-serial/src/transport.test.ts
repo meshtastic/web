@@ -18,9 +18,10 @@ function stubCoreTransforms() {
       },
     });
 
+  const transform = Utils.toDeviceStream();
   const restoreTo = vi
     .spyOn(Utils, "toDeviceStream", "get")
-    .mockReturnValue(toDevice as unknown as typeof Utils.toDeviceStream);
+    .mockReturnValue(toDevice as unknown as typeof transform);
 
   const restoreFrom = vi
     .spyOn(Utils, "fromDeviceStream")

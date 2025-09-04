@@ -67,8 +67,9 @@ function stubCoreTransforms() {
     });
 
   // Utils.toDeviceStream is a getter
+  const transform = Utils.toDeviceStream();
   vi.spyOn(Utils, "toDeviceStream", "get").mockReturnValue(
-    toDevice as unknown as typeof Utils.toDeviceStream,
+    toDevice as unknown as typeof transform,
   );
 
   vi.spyOn(Utils, "fromDeviceStream").mockImplementation(
