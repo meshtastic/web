@@ -29,7 +29,11 @@ export class TransportNode implements Types.Transport {
    * @param timeout - TCP socket timeout in milliseconds (defaults to 60000).
    * @returns A promise that resolves with a connected TransportNode instance.
    */
-  public static create(hostname: string, port = 4403, timeout = 60000): Promise<TransportNode> {
+  public static create(
+    hostname: string,
+    port = 4403,
+    timeout = 60000,
+  ): Promise<TransportNode> {
     return new Promise((resolve, reject) => {
       const socket = new Socket();
 
@@ -72,10 +76,7 @@ export class TransportNode implements Types.Transport {
       if (this.closingByUser) {
         return; // suppress close-derived disconnect in user flow
       }
-      this.emitStatus(
-        Types.DeviceStatusEnum.DeviceDisconnected,
-        "socket-end",
-      );
+      this.emitStatus(Types.DeviceStatusEnum.DeviceDisconnected, "socket-end");
       this.socket?.removeAllListeners();
       this.socket?.destroy();
     });
@@ -207,7 +208,7 @@ export class TransportNode implements Types.Transport {
         data: { status: next, reason },
       });
     } catch (e) {
-      console.error('Enqueue fail', e);
+      console.error("Enqueue fail", e);
     }
   }
 }

@@ -775,13 +775,14 @@ export class MeshDevice {
       },
     });
 
-    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio))
-      .catch((e) => {
+    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio)).catch(
+      (e) => {
         if (this.deviceStatus === DeviceStatusEnum.DeviceDisconnected) {
-          throw new Error('Device connection lost');
+          throw new Error("Device connection lost");
         }
         throw e;
-      });
+      },
+    );
   }
 
   /**
@@ -810,8 +811,8 @@ export class MeshDevice {
     this._heartbeatIntervalId = setInterval(() => {
       this.heartbeat().catch((err) => {
         this.log.error(
-          Emitter[Emitter.Ping], 
-          `⚠️ Unable to send heartbeat: ${err.message}`
+          Emitter[Emitter.Ping],
+          `⚠️ Unable to send heartbeat: ${err.message}`,
         );
       });
     }, interval);

@@ -117,7 +117,10 @@ export class Queue {
             await writer.write(item.data);
             item.sent = true;
           } catch (error) {
-            if (error?.code === 'ECONNRESET' || error?.code === 'ERR_INVALID_STATE') {
+            if (
+              error?.code === "ECONNRESET" ||
+              error?.code === "ERR_INVALID_STATE"
+            ) {
               writer.releaseLock();
               this.lock = false;
               throw error;
