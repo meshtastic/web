@@ -30,37 +30,10 @@ jobs:
   release-web:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # For manual runs, allow building a chosen ref (branch/tag/SHA)
           ref: ${{ inputs.ref != '' && inputs.ref || github.ref }}
-
-      - name: Determine tag & latest flag
-        id: meta
-        shell: bash
-        run: |
-          # Determine TAG
-          if [ "${{ github.event_name }}" = "release" ]; then
-            TAG="${{ github.event.release.tag_name }}"
-            # Push "latest" only for full releases (not prereleases)
-            if [ "${{ github.event.release.prerelease }}" = "true" ]; then
-              PUSH_LATEST="false"
-            else
-              PUSH_LATEST="true"
-            fi
-          elif [ -n "${{ inputs.tag_name }}" ]; then
-            TAG="${{ inputs.tag_name }}"
-            PUSH_LATEST="false"
-          else
-            SHA="$(git rev-parse --short=12 HEAD)"
-            TAG="adhoc-${SHA}"
-            PUSH_LATEST="false"
-          fi
-
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "push_latest=$PUSH_LATEST" >> "$GITHUB_OUTPUT"
-          echo "Resolved tag: $TAG (push_latest=$PUSH_LATEST)"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -81,63 +54,62 @@ jobs:
         working-directory: packages/web
         run: pnpm run build
 
-      - name: Create Web App Release Archive
+      - name: Create release archive
         working-directory: packages/web
         run: pnpm run package
 
-      - name: Upload Web App Archive (artifact)
+      - name: Upload archive (artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: web-build-${{ steps.meta.outputs.tag }}
-          if-no-files-found: error
+          name: web-build
           path: packages/web/dist/build.tar
+          if-no-files-found: error
 
-      - name: Attach Web Archive to GitHub Release
+      - name: Attach archive to GitHub Release
         if: ${{ github.event_name == 'release' || inputs.attach_to_release == true }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packages/web/dist/build.tar
+          tag_name: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag_name }}
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
-            TAG="${{ steps.meta.outputs.tag }}"
-          else
-            if [ -z "${{ inputs.tag_name }}" ]; then
-              echo "attach_to_release requested but no tag_name provided." >&2
-              exit 1
-            fi
-            TAG="${{ inputs.tag_name }}"
-          fi
-          gh release upload "$TAG" packages/web/dist/build.tar --clobber
+
+      - name: Docker metadata (tags & labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_IMAGE }}
+          tags: |
+            # For release events, use the release tag (e.g. v1.2.3)
+            type=raw,value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
+            # For manual runs with a provided tag_name
+            type=raw,value=${{ inputs.tag_name }},enable=${{ github.event_name == 'workflow_dispatch' && inputs.tag_name != '' }}
+            # For manual runs without tag_name, fall back to adhoc-<shortsha>
+            type=sha,format=short,prefix=adhoc-,enable=${{ github.event_name == 'workflow_dispatch' && inputs.tag_name == '' }}
+            # Add "latest" only for full releases (not prereleases)
+            type=raw,value=latest,enable=${{ github.event_name == 'release' && github.event.release.prerelease == false }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Build Container Image
-        id: build-container
-        uses: redhat-actions/buildah-build@v2
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and (maybe) push image
+        uses: docker/build-push-action@v6
         with:
-          containerfiles: |
-            ./packages/web/infra/Containerfile
-          image: ${{ env.REGISTRY_IMAGE }}
-          tags: latest,${{ steps.meta.outputs.tag }}
-          oci: true
+          context: .
+          file: ./packages/web/infra/Containerfile
           platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Push Container to GHCR
-        id: push-to-registry
+      - name: Output image refs
         if: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ steps.build-container.outputs.image }}
-          tags: ${{ steps.build-container.outputs.tags }}
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+        run: "echo \"🖼️ Pushed: ${{ steps.meta.outputs.tags }}\""
 
-      - name: Output Image URL
-        if: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
-        run: echo "🖼️ Image pushed to ${{ steps.push-to-registry.outputs.registry-paths }}"
-
-      - name: Explain no image URL
+      - name: Explain no image push
         if: ${{ !(github.event_name == 'release' && github.event.release.prerelease == false) }}
-        run: echo "ℹ️ No image pushed (this was a prerelease or manual run)."
+        run: echo "ℹ️ No image pushed (prerelease or manual run)."

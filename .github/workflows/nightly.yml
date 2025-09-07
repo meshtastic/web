@@ -86,8 +86,7 @@ jobs:
           containerfiles: |
             ./packages/web/infra/Containerfile
           image: ${{ env.REGISTRY_IMAGE }}
-          tags: ${{ steps.meta.outputs.tags }}
-          working-directory: packages/web
+          tags: ${{ steps.tag.outputs.tag }}
           oci: true
           platforms: linux/amd64,linux/arm64
           labels: |
@@ -95,16 +94,16 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
 
-
       - name: Push To GHCR
         id: push-to-registry
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-container.outputs.image }}
-          tags: ${{ steps.build-container.outputs.tags }}
+          tags: ${{ steps.build-container.outputs.tags || steps.tag.outputs.tag }}
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Print image URL
         run: echo "Image pushed to ${{ steps.push-to-registry.outputs.registry-paths }}"

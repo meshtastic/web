@@ -4,16 +4,22 @@ on:
   workflow_dispatch:
     inputs:
       packages:
-        description: 'Packages to release (comma-separated, or "all" for all packages)'
+        description: 'Packages to release (comma-separated, or "all")'
         required: false
         default: 'all'
+      bump:
+        description: 'Semver bump (patch | minor | major)'
+        required: false
+        default: 'patch'
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write   # <-- required for JSR OIDC
+      contents: write        # we commit the bumped versions back
+      id-token: write        # required for JSR OIDC
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,21 +35,16 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: '**/pnpm-lock.yaml'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Configure npm auth
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          pnpm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
-          pnpm config set registry https://registry.npmjs.org/
 
       - name: Resolve package list
         id: pkgs
         shell: bash
         run: |
+          set -euo pipefail
           if [ "${{ github.event.inputs.packages }}" = "all" ] || [ -z "${{ github.event.inputs.packages }}" ]; then
             mapfile -t TARGETS < <(ls -d packages/* | grep -v 'packages/web')
           else
@@ -52,61 +53,91 @@ jobs:
           fi
           printf '%s\n' "${TARGETS[@]}" | paste -sd, - > targets.txt
           echo "list=$(cat targets.txt)" >> "$GITHUB_OUTPUT"
+          echo "Targets: $(cat targets.txt)"
 
-      - name: Build selected packages (tsdown)
+      - name: Bump package.json versions (no git tag)
+        shell: bash
         run: |
+          set -euo pipefail
+          BUMP="${{ github.event.inputs.bump }}"
+          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          for dir in "${TARGETS[@]}"; do
+            if [ -f "$dir/package.json" ]; then
+              echo "Bumping $dir -> $BUMP"
+              (cd "$dir" && npm version "$BUMP" --no-git-tag-version --allow-same-version)
+            fi
+          done
+
+      - name: Generate jsr.json from package.json (pkg-to-jsr)
+        shell: bash
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
+          for dir in "${TARGETS[@]}"; do
+            if [ -f "$dir/package.json" ]; then
+              echo "Generating jsr.json for $dir"
+              pnpm dlx pkg-to-jsr --root "$dir"
+              # # Optional: show result
+              # jq -C . "$dir/jsr.json" || cat "$dir/jsr.json"
+            fi
+          done
+
+
+      - name: Commit version bumps
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/*/package.json packages/*/jsr.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(release): bump package versions (${{ github.event.inputs.bump }})"
+            git push
+          else
+            echo "No changes to commit."
+          fi
+
+      - name: Build selected packages
+        shell: bash
+        run: |
+          set -euo pipefail
           IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
           for dir in "${TARGETS[@]}"; do
             echo "Building $dir"
             pnpm --filter "./$dir" run build
           done
 
-      - name: Sync jsr.json version from package.json
-        run: |
-          IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
-          for dir in "${TARGETS[@]}"; do
-            if [ -f "$dir/jsr.json" ] && [ -f "$dir/package.json" ]; then
-              PKG_VER=$(jq -r .version "$dir/package.json")
-              jq --arg v "$PKG_VER" '.version = $v' "$dir/jsr.json" > "$dir/jsr.json.tmp" && mv "$dir/jsr.json.tmp" "$dir/jsr.json"
-              echo "Updated $dir/jsr.json to version $PKG_VER"
-            fi
-          done
-
       - name: Publish to JSR (OIDC)
+        shell: bash
         run: |
           set -euo pipefail
           IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
           for dir in "${TARGETS[@]}"; do
             if [ -f "$dir/jsr.json" ]; then
               echo "Publishing $dir to JSR via OIDC…"
-              cd "$dir"
-              [ -d dist ] || pnpm run build
-              if ! npx --yes jsr publish 2>&1 | tee jsr_publish.log; then
-                echo "JSR publish failed for $dir. Error output:"
-                cat jsr_publish.log
-              fi
-              cd - >/dev/null
+              ( cd "$dir"
+                [ -d dist ] || pnpm run build
+                npx --yes jsr publish
+              )
             fi
           done
 
-      - name: Replace exports entry in package.json
+      - name: Configure npm auth
         run: |
-          tmp=$(mktemp)
-          jq '.exports["."] = "./dist/mod.mjs"' package.json > "$tmp" \
-          && mv "$tmp" package.json
+          pnpm config set //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+          pnpm config set registry https://registry.npmjs.org/
 
       - name: Publish to npm
+        shell: bash
         run: |
           set -euo pipefail
           IFS=',' read -ra TARGETS <<< "${{ steps.pkgs.outputs.list }}"
           for dir in "${TARGETS[@]}"; do
             if [ -f "$dir/package.json" ]; then
               echo "Publishing $dir to npm…"
-              cd "$dir"
-              [ -d dist ] || pnpm run build
-              npm publish --access public || echo "npm publish failed for $dir"
-              cd - >/dev/null
+              ( cd "$dir"
+                [ -d dist ] || pnpm run build
+                npm publish --access public
+              )
             fi
           done
-
-
