@@ -6,7 +6,11 @@ import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
-import { type PersistOptions, persist } from "zustand/middleware";
+import {
+  type PersistOptions,
+  persist,
+  subscribeWithSelector,
+} from "zustand/middleware";
 import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types.ts";
 
 const CURRENT_STORE_VERSION = 0;
@@ -102,7 +106,8 @@ function nodeDBFactory(
             // Validation failed and error has been set inside validateIncomingNode
             return;
           }
-          nodeDB.nodeMap.set(node.num, next);
+
+          nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(node.num, next);
         }),
       ),
 
@@ -113,7 +118,9 @@ function nodeDBFactory(
           if (!nodeDB) {
             throw new Error(`No nodeDB found (id: ${id})`);
           }
-          nodeDB.nodeMap.delete(nodeNum);
+          const updated = new Map(nodeDB.nodeMap);
+          updated.delete(nodeNum);
+          nodeDB.nodeMap = updated;
         }),
       ),
 
@@ -147,7 +154,10 @@ function nodeDBFactory(
           if (!nodeDB) {
             throw new Error(`No nodeDB found (id: ${id})`);
           }
-          nodeDB.nodeErrors.set(nodeNum, { node: nodeNum, error });
+          nodeDB.nodeErrors = new Map(nodeDB.nodeErrors).set(nodeNum, {
+            node: nodeNum,
+            error,
+          });
         }),
       ),
 
@@ -158,7 +168,9 @@ function nodeDBFactory(
           if (!nodeDB) {
             throw new Error(`No nodeDB found (id: ${id})`);
           }
-          nodeDB.nodeErrors.delete(nodeNum);
+          const updated = new Map(nodeDB.nodeErrors);
+          updated.delete(nodeNum);
+          nodeDB.nodeErrors = updated;
         }),
       ),
 
@@ -181,16 +193,21 @@ function nodeDBFactory(
             throw new Error(`No nodeDB found (id: ${id})`);
           }
           const node = nodeDB.nodeMap.get(data.from);
+          const nowSec = Math.floor(Date.now() / 1000); // lastHeard is in seconds(!)
+
           if (node) {
-            node.lastHeard = data.time > 0 ? data.time : Date.now(); // fallback to now if time is 0 or negative
-            node.snr = data.snr;
-            nodeDB.nodeMap.set(data.from, node);
+            const updated = {
+              ...node,
+              lastHeard: data.time > 0 ? data.time : nowSec,
+              snr: data.snr,
+            };
+            nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(data.from, updated);
           } else {
-            nodeDB.nodeMap.set(
+            nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(
               data.from,
               create(Protobuf.Mesh.NodeInfoSchema, {
                 num: data.from,
-                lastHeard: data.time > 0 ? data.time : Date.now(), // fallback to now if time is 0 or negative,
+                lastHeard: data.time > 0 ? data.time : nowSec, // fallback to now if time is 0 or negative,
                 snr: data.snr,
               }),
             );
@@ -208,9 +225,8 @@ function nodeDBFactory(
           const current =
             nodeDB.nodeMap.get(user.from) ??
             create(Protobuf.Mesh.NodeInfoSchema);
-          current.user = user.data;
-          current.num = user.from;
-          nodeDB.nodeMap.set(user.from, current);
+          const updated = { ...current, user: user.data, num: user.from };
+          nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(user.from, updated);
         }),
       ),
 
@@ -224,9 +240,12 @@ function nodeDBFactory(
           const current =
             nodeDB.nodeMap.get(position.from) ??
             create(Protobuf.Mesh.NodeInfoSchema);
-          current.position = position.data;
-          current.num = position.from;
-          nodeDB.nodeMap.set(position.from, current);
+          const updated = {
+            ...current,
+            position: position.data,
+            num: position.from,
+          };
+          nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(position.from, updated);
         }),
       ),
 
@@ -259,22 +278,25 @@ function nodeDBFactory(
               };
 
               const setErrorProxy = (nodeNum: number, err: NodeErrorType) => {
-                mergedErrors.set(nodeNum, { error: err } as NodeError);
+                mergedErrors.set(nodeNum, {
+                  node: nodeNum,
+                  error: err,
+                });
               };
 
-              for (const [nodeNum, newNode] of newDB.nodeMap) {
+              for (const [num, newNode] of newDB.nodeMap) {
                 const next = validateIncomingNode(
                   newNode,
                   setErrorProxy,
                   getNodesProxy,
                 );
                 if (next) {
-                  mergedNodes.set(nodeNum, next);
+                  mergedNodes.set(num, next);
                 }
 
-                const err = newDB.getNodeError(nodeNum);
-                if (err && !oldDB.hasNodeError(nodeNum)) {
-                  mergedErrors.set(nodeNum, err);
+                const err = newDB.getNodeError(num);
+                if (err && !oldDB.hasNodeError(num)) {
+                  mergedErrors.set(num, err);
                 }
               }
 
@@ -297,7 +319,10 @@ function nodeDBFactory(
 
           const node = nodeDB.nodeMap.get(nodeNum);
           if (node) {
-            node.isFavorite = isFavorite;
+            nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(nodeNum, {
+              ...node,
+              isFavorite: isFavorite,
+            });
           }
         }),
       ),
@@ -312,7 +337,10 @@ function nodeDBFactory(
 
           const node = nodeDB.nodeMap.get(nodeNum);
           if (node) {
-            node.isIgnored = isIgnored;
+            nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(nodeNum, {
+              ...node,
+              isIgnored: isIgnored,
+            });
           }
         }),
       ),
@@ -392,7 +420,7 @@ export const nodeDBInitializer: StateCreator<PrivateNodeDBState> = (
     const nodeDB = nodeDBFactory(id, get, set);
     set(
       produce<PrivateNodeDBState>((draft) => {
-        draft.nodeDBs.set(id, nodeDB);
+        draft.nodeDBs = new Map(draft.nodeDBs).set(id, nodeDB);
 
         // Enforce retention limit
         evictOldestEntries(draft.nodeDBs, NODEDB_RETENTION_NUM);
@@ -404,7 +432,9 @@ export const nodeDBInitializer: StateCreator<PrivateNodeDBState> = (
   removeNodeDB: (id) => {
     set(
       produce<PrivateNodeDBState>((draft) => {
-        draft.nodeDBs.delete(id);
+        const updated = new Map(draft.nodeDBs);
+        updated.delete(id);
+        draft.nodeDBs = updated;
       }),
     );
   },
@@ -472,7 +502,7 @@ console.debug(
 );
 
 export const useNodeDBStore = persistNodes
-  ? createStore<PrivateNodeDBState, [["zustand/persist", NodeDBPersisted]]>(
-      persist(nodeDBInitializer, persistOptions),
+  ? createStore(
+      subscribeWithSelector(persist(nodeDBInitializer, persistOptions)),
     )
-  : createStore<PrivateNodeDBState>()(nodeDBInitializer);
+  : createStore(subscribeWithSelector(nodeDBInitializer));

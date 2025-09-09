@@ -182,7 +182,7 @@
     "label": "Unknown number of hops"
   },
   "showUnheard": {
-    "label": "Never heard"
+    "label": "Unknown last heard"
   },
   "language": {
     "label": "Language",

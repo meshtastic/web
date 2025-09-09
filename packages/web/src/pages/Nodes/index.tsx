@@ -26,11 +26,12 @@ import {
   useCallback,
   useDeferredValue,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { base16 } from "rfc4648";
+
+const NODEDB_DEBOUNCE_MS = 250;
 
 export interface DeleteNoteDialogProps {
   open: boolean;
@@ -41,7 +42,7 @@ const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
   const { currentLanguage } = useLang();
   const { hardware, connection, setDialogOpen } = useDevice();
-  const { getNodes, hasNodeError } = useNodeDB();
+
   const { setNodeNumDetails } = useAppStore();
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
@@ -57,11 +58,21 @@ const NodesPage = (): JSX.Element => {
   );
   const deferredFilterState = useDeferredValue(filterState);
 
-  const filteredNodes = useMemo(
-    () => getNodes((node) => nodeFilter(node, deferredFilterState)),
-    [deferredFilterState, getNodes, nodeFilter],
+  // stable predicate so the selector identity doesn’t thrash
+  const predicate = useCallback(
+    (node: Protobuf.Mesh.NodeInfo) => nodeFilter(node, deferredFilterState),
+    [nodeFilter, deferredFilterState],
   );
 
+  // subscribe to actual data (nodes array) and to nodeErrors ref for badge updates
+  const { nodes: filteredNodes, hasNodeError } = useNodeDB(
+    (db) => ({
+      nodes: db.getNodes(predicate, false),
+      hasNodeError: db.hasNodeError,
+      _errorsRef: db.nodeErrors, // include the Map ref so UI also re-renders on error changes
+    }),
+    { debounce: NODEDB_DEBOUNCE_MS },
+  );
   const handleTraceroute = useCallback(
     (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
       setSelectedTraceroute(traceroute);
@@ -103,7 +114,7 @@ const NodesPage = (): JSX.Element => {
     }
     connection.events.onPositionPacket.subscribe(handleLocation);
     return () => {
-      connection.events.onPositionPacket.subscribe(handleLocation);
+      connection.events.onPositionPacket.unsubscribe(handleLocation);
     };
   }, [connection, handleLocation]);
 
@@ -125,6 +136,15 @@ const NodesPage = (): JSX.Element => {
         .match(/.{1,2}/g)
         ?.join(":") ?? t("unknown.shortName");
 
+    const shortName =
+      node.user?.shortName ??
+      numberToHexUnpadded(node.num).slice(-4).toUpperCase();
+    const longName =
+      node.user?.longName ??
+      t("fallbackName", {
+        last4: shortName,
+      });
+
     return {
       id: node.num,
       isFavorite: node.isFavorite,
@@ -132,12 +152,12 @@ const NodesPage = (): JSX.Element => {
         {
           content: (
             <Avatar
-              text={node.user?.shortName ?? t("unknown.shortName")}
+              text={shortName}
               showFavorite={node.isFavorite}
               showError={hasNodeError(node.num)}
             />
           ),
-          sortValue: node.user?.shortName ?? "", // Non-sortable column
+          sortValue: shortName, // Non-sortable column
         },
         {
           content: (
@@ -148,10 +168,10 @@ const NodesPage = (): JSX.Element => {
               }}
               className="cursor-pointer underline ml-2 whitespace-break-spaces"
             >
-              {node.user?.longName ?? numberToHexUnpadded(node.num)}
+              {longName}
             </h1>
           ),
-          sortValue: node.user?.longName ?? numberToHexUnpadded(node.num),
+          sortValue: longName,
         },
         {
           content: (
@@ -176,7 +196,7 @@ const NodesPage = (): JSX.Element => {
           content: (
             <Mono>
               {node.lastHeard === 0 ? (
-                <p>{t("nodesTable.lastHeardStatus.never")}</p>
+                t("nodesTable.lastHeardStatus.unknown")
               ) : (
                 <TimeAgo
                   timestamp={node.lastHeard * 1000}

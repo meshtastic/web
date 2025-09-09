@@ -2,6 +2,7 @@ import { useDeviceContext } from "@core/hooks/useDeviceContext";
 import { type Device, useDeviceStore } from "@core/stores/deviceStore";
 import { type MessageStore, useMessageStore } from "@core/stores/messageStore";
 import { type NodeDB, useNodeDBStore } from "@core/stores/nodeDBStore";
+import { bindStoreToDevice } from "@core/stores/utils/bindStoreToDevice";
 
 export {
   CurrentDeviceContext,
@@ -30,13 +31,11 @@ export {
 } from "@core/stores/sidebarStore";
 
 // Define hooks to access the stores
-export const useNodeDB = (): NodeDB => {
-  const { deviceId } = useDeviceContext();
-  const nodeDB = useNodeDBStore(
-    (s) => s.getNodeDB(deviceId) ?? s.addNodeDB(deviceId),
-  );
-  return nodeDB;
-};
+export const useNodeDB = bindStoreToDevice(
+  useNodeDBStore,
+  (s, deviceId): NodeDB => s.getNodeDB(deviceId) ?? s.addNodeDB(deviceId),
+);
+
 export const useDevice = (): Device => {
   const { deviceId } = useDeviceContext();
 
@@ -45,6 +44,7 @@ export const useDevice = (): Device => {
   );
   return device;
 };
+
 export const useMessages = (): MessageStore => {
   const { deviceId } = useDeviceContext();
 

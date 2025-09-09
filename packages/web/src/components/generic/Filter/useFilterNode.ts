@@ -67,25 +67,33 @@ export function useFilterNode() {
         ...filterOverrides,
       };
 
-      if (!node.user) {
-        return false;
-      }
-
       const nodeName = filterState.nodeName.toLowerCase();
-      if (
-        nodeName &&
-        !(
-          node.user?.shortName.toLowerCase().includes(nodeName) ||
-          node.user?.longName.toLowerCase().includes(nodeName) ||
-          node.num.toString().includes(nodeName) ||
-          numberToHexUnpadded(node.num).includes(nodeName.replace(/!/g, ""))
-        )
-      ) {
-        return false;
+      if (nodeName) {
+        const short = node.user?.shortName?.toLowerCase() ?? "";
+        const long = node.user?.longName?.toLowerCase() ?? "";
+        const numStr = node.num.toString();
+        const hex = numberToHexUnpadded(node.num);
+
+        if (
+          !short.includes(nodeName) &&
+          !long.includes(nodeName) &&
+          !numStr.includes(nodeName) &&
+          !hex.includes(nodeName.replace(/!/g, ""))
+        ) {
+          return false;
+        }
       }
 
       const hops = node.hopsAway ?? 7;
-      if (hops < filterState.hopsAway[0] || hops > filterState.hopsAway[1]) {
+      if (
+        (node.hopsAway === undefined &&
+          !shallowEqualArray(
+            filterState.hopsAway,
+            defaultFilterValues.hopsAway,
+          )) || // If hops are unknown, hide node if state is not default
+        hops < filterState.hopsAway[0] ||
+        hops > filterState.hopsAway[1]
+      ) {
         return false;
       }
 
@@ -96,8 +104,13 @@ export function useFilterNode() {
         return false;
       }
 
-      const secondsAgo = Date.now() / 1000 - (node.lastHeard ?? 0);
+      const secondsAgo = Math.max(0, Date.now() / 1000 - (node.lastHeard ?? 0));
       if (
+        (node.lastHeard === 0 &&
+          !shallowEqualArray(
+            filterState.lastHeard,
+            defaultFilterValues.lastHeard,
+          )) || // If lastHeard is unknown (0), hide node if state is not default
         secondsAgo < filterState.lastHeard[0] ||
         (secondsAgo > filterState.lastHeard[1] &&
           filterState.lastHeard[1] !== defaultFilterValues.lastHeard[1])
@@ -128,6 +141,8 @@ export function useFilterNode() {
 
       const snr = node.snr ?? -20;
       if (
+        (node.snr === undefined &&
+          !shallowEqualArray(filterState.snr, defaultFilterValues.snr)) ||
         (snr < filterState.snr[0] &&
           filterState.snr[0] !== defaultFilterValues.snr[0]) ||
         (snr > filterState.snr[1] &&
@@ -138,6 +153,11 @@ export function useFilterNode() {
 
       const channelUtilization = node.deviceMetrics?.channelUtilization ?? 0;
       if (
+        (node.deviceMetrics?.channelUtilization === undefined &&
+          !shallowEqualArray(
+            filterState.channelUtilization,
+            defaultFilterValues.channelUtilization,
+          )) ||
         channelUtilization < filterState.channelUtilization[0] ||
         channelUtilization > filterState.channelUtilization[1]
       ) {
@@ -146,6 +166,11 @@ export function useFilterNode() {
 
       const airUtilTx = node.deviceMetrics?.airUtilTx ?? 0;
       if (
+        (node.deviceMetrics?.airUtilTx === undefined &&
+          !shallowEqualArray(
+            filterState.airUtilTx,
+            defaultFilterValues.airUtilTx,
+          )) ||
         airUtilTx < filterState.airUtilTx[0] ||
         airUtilTx > filterState.airUtilTx[1]
       ) {
@@ -154,14 +179,24 @@ export function useFilterNode() {
 
       const batt = node.deviceMetrics?.batteryLevel ?? 101;
       if (
+        (node.deviceMetrics?.batteryLevel === undefined &&
+          !shallowEqualArray(
+            filterState.batteryLevel,
+            defaultFilterValues.batteryLevel,
+          )) ||
         batt < filterState.batteryLevel[0] ||
         batt > filterState.batteryLevel[1]
       ) {
         return false;
       }
 
-      const voltage = node.deviceMetrics?.voltage ?? 0;
+      const voltage = Math.abs(node.deviceMetrics?.voltage ?? 0);
       if (
+        (node.deviceMetrics?.voltage === undefined &&
+          !shallowEqualArray(
+            filterState.voltage,
+            defaultFilterValues.voltage,
+          )) ||
         voltage < filterState.voltage[0] ||
         (voltage > filterState.voltage[1] &&
           filterState.voltage[1] !== defaultFilterValues.voltage[1])
@@ -170,14 +205,25 @@ export function useFilterNode() {
       }
 
       const role: Protobuf.Config.Config_DeviceConfig_Role =
-        node.user.role ?? Protobuf.Config.Config_DeviceConfig_Role.CLIENT;
-      if (!filterState.role.includes(role)) {
+        node.user?.role ?? Protobuf.Config.Config_DeviceConfig_Role.CLIENT;
+      if (
+        (node.user?.role === undefined &&
+          !shallowEqualArray(filterState.role, defaultFilterValues.role)) ||
+        !filterState.role.includes(role)
+      ) {
         return false;
       }
 
       const hwModel: Protobuf.Mesh.HardwareModel =
-        node.user.hwModel ?? Protobuf.Mesh.HardwareModel.UNSET;
-      if (!filterState.hwModel.includes(hwModel)) {
+        node.user?.hwModel ?? Protobuf.Mesh.HardwareModel.UNSET;
+      if (
+        (node.user?.hwModel === undefined &&
+          !shallowEqualArray(
+            filterState.hwModel,
+            defaultFilterValues.hwModel,
+          )) ||
+        !filterState.hwModel.includes(hwModel)
+      ) {
         return false;
       }
 
