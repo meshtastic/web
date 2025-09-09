@@ -99,7 +99,7 @@ jobs:
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-container.outputs.image }}
-          tags: ${{ steps.build-container.outputs.tags || steps.tag.outputs.tag }}
+          tags: ${{ steps.build-container.outputs.tags || steps.meta.outputs.tag }}
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
