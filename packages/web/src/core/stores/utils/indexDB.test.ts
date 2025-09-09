@@ -1,6 +1,6 @@
 import * as idb from "idb-keyval";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createStorage } from "./indexDB";
+import { createStorage } from "./indexDB.ts";
 
 type PersistStorage<T> = ReturnType<typeof createStorage<T>>;
 

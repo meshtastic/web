@@ -1,11 +1,13 @@
 import { create } from "@bufbuild/protobuf";
 import { featureFlags } from "@core/services/featureFlags";
+import { validateIncomingNode } from "@core/stores/nodeDBStore/nodeValidation";
+import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist } from "zustand/middleware";
-import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types";
+import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types.ts";
 
 const CURRENT_STORE_VERSION = 0;
 const NODEDB_RETENTION_NUM = 10;
@@ -33,6 +35,7 @@ export interface NodeDB {
   getNode: (nodeNum: number) => Protobuf.Mesh.NodeInfo | undefined;
   getNodes: (
     filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
+    includeSelf?: boolean,
   ) => Protobuf.Mesh.NodeInfo[];
   getMyNode: () => Protobuf.Mesh.NodeInfo;
 
@@ -85,7 +88,21 @@ function nodeDBFactory(
           if (!nodeDB) {
             throw new Error(`No nodeDB found (id: ${id})`);
           }
-          nodeDB.nodeMap.set(node.num, node);
+          // Use validation to check the new node before adding
+          const next = validateIncomingNode(
+            node,
+            (nodeNum: number, err: NodeErrorType) => {
+              nodeDB.setNodeError(nodeNum, err);
+            },
+            (filter?: (node: Protobuf.Mesh.NodeInfo) => boolean) =>
+              nodeDB.getNodes(filter, true),
+          );
+
+          if (!next) {
+            // Validation failed and error has been set inside validateIncomingNode
+            return;
+          }
+          nodeDB.nodeMap.set(node.num, next);
         }),
       ),
 
@@ -165,7 +182,7 @@ function nodeDBFactory(
           }
           const node = nodeDB.nodeMap.get(data.from);
           if (node) {
-            node.lastHeard = data.time;
+            node.lastHeard = data.time > 0 ? data.time : Date.now(); // fallback to now if time is 0 or negative
             node.snr = data.snr;
             nodeDB.nodeMap.set(data.from, node);
           } else {
@@ -173,7 +190,7 @@ function nodeDBFactory(
               data.from,
               create(Protobuf.Mesh.NodeInfoSchema, {
                 num: data.from,
-                lastHeard: data.time,
+                lastHeard: data.time > 0 ? data.time : Date.now(), // fallback to now if time is 0 or negative,
                 snr: data.snr,
               }),
             );
@@ -225,21 +242,46 @@ function nodeDBFactory(
 
           for (const [key, oldDB] of draft.nodeDBs) {
             if (key === id) {
+              // short-circuit self
               continue;
             }
             if (oldDB.myNodeNum === nodeNum) {
-              // The new DB is typically empty when nodenum is set, so we can safely copy over from the old DB
-              // otherwise, discard the old DB completely
-              if (newDB.nodeMap.size === 0) {
-                newDB.nodeMap = oldDB.nodeMap;
-                newDB.nodeErrors = oldDB.nodeErrors;
-              } else {
-                console.error(
-                  `NodeDB with id: ${id} already has nodes, not merging with old DB`,
+              // We found the oldDB (same myNodeNum). Merge node-by-node as if the new nodes are added with addNode
+
+              const mergedNodes = new Map(oldDB.nodeMap);
+              const mergedErrors = new Map(oldDB.nodeErrors);
+
+              const getNodesProxy = (
+                filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
+              ): Protobuf.Mesh.NodeInfo[] => {
+                const arr = Array.from(mergedNodes.values());
+                return filter ? arr.filter(filter) : arr;
+              };
+
+              const setErrorProxy = (nodeNum: number, err: NodeErrorType) => {
+                mergedErrors.set(nodeNum, { error: err } as NodeError);
+              };
+
+              for (const [nodeNum, newNode] of newDB.nodeMap) {
+                const next = validateIncomingNode(
+                  newNode,
+                  setErrorProxy,
+                  getNodesProxy,
                 );
+                if (next) {
+                  mergedNodes.set(nodeNum, next);
+                }
+
+                const err = newDB.getNodeError(nodeNum);
+                if (err && !oldDB.hasNodeError(nodeNum)) {
+                  mergedErrors.set(nodeNum, err);
+                }
               }
 
-              draft.nodeDBs.delete(key);
+              // finalize: move maps into newDB and drop oldDB entry
+              newDB.nodeMap = mergedNodes;
+              newDB.nodeErrors = mergedErrors;
+              draft.nodeDBs.delete(oldDB.id);
             }
           }
         }),
@@ -291,14 +333,15 @@ function nodeDBFactory(
       return nodeDB.nodeMap.get(nodeNum);
     },
 
-    getNodes: (filter) => {
+    getNodes: (filter, includeSelf) => {
       const nodeDB = get().nodeDBs.get(id);
       if (!nodeDB) {
         throw new Error(`No nodeDB found (id: ${id})`);
       }
-      const all = Array.from(nodeDB.nodeMap.values()).filter(
-        (n) => n.num !== nodeDB.myNodeNum,
+      const all = Array.from(nodeDB.nodeMap.values()).filter((n) =>
+        includeSelf ? true : n.num !== nodeDB.myNodeNum,
       );
+
       return filter ? all.filter(filter) : all;
     },
 
@@ -351,13 +394,8 @@ export const nodeDBInitializer: StateCreator<PrivateNodeDBState> = (
       produce<PrivateNodeDBState>((draft) => {
         draft.nodeDBs.set(id, nodeDB);
 
-        // If over limit, remove oldest inserted. FIFO
-        if (draft.nodeDBs.size > NODEDB_RETENTION_NUM) {
-          const firstKey = draft.nodeDBs.keys().next().value;
-          if (firstKey !== undefined) {
-            draft.nodeDBs.delete(firstKey);
-          }
-        }
+        // Enforce retention limit
+        evictOldestEntries(draft.nodeDBs, NODEDB_RETENTION_NUM);
       }),
     );
 

@@ -2,8 +2,8 @@ import type { Socket } from "node:net";
 import { Duplex } from "node:stream";
 import { Types, Utils } from "@meshtastic/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { runTransportContract } from "../../../tests/utils/transportContract";
-import { TransportNode } from "./transport";
+import { runTransportContract } from "../../../tests/utils/transportContract.ts";
+import { TransportNode } from "./transport.ts";
 
 function isStatusEvent(
   out: Types.DeviceOutput | undefined,
@@ -54,11 +54,12 @@ class FakeSocket extends Duplex {
 }
 
 function stubCoreTransforms() {
-  const toDevice = new TransformStream<Uint8Array, Uint8Array>({
-    transform(chunk, controller) {
-      controller.enqueue(chunk);
-    },
-  });
+  const toDevice = () =>
+    new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, controller) {
+        controller.enqueue(chunk);
+      },
+    });
 
   const fromDeviceFactory = () =>
     new TransformStream<Uint8Array, Types.DeviceOutput>({
@@ -67,8 +68,9 @@ function stubCoreTransforms() {
       },
     });
 
+  const transform = Utils.toDeviceStream;
   vi.spyOn(Utils, "toDeviceStream", "get").mockReturnValue(
-    toDevice as unknown as typeof Utils.toDeviceStream,
+    toDevice as unknown as typeof transform,
   );
 
   vi.spyOn(Utils, "fromDeviceStream").mockImplementation(

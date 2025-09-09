@@ -1,4 +1,14 @@
 import { useMessageStore } from "@core/stores";
+import { Button } from "@components/UI/Button.tsx";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@components/UI/Dialog.tsx";
 import { AlertTriangleIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
@@ -17,6 +27,8 @@ export const DeleteMessagesDialog = ({
 
   const handleConfirm = () => {
     deleteAllMessages();
+  const handleCloseDialog = () => {
+    onOpenChange(false);
   };
 
   return (

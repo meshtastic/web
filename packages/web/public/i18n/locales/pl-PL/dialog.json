@@ -30,7 +30,7 @@
 		"title": "Location: {{identifier}}",
 		"altitude": "Altitude: ",
 		"coordinates": "Coordinates: ",
-		"noCoordinates": "No Coordinates"
+		"noCoordinates": "Brak współrzędnych"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Regenerate Pre-Shared Key?",

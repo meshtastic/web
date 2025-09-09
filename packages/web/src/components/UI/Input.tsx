@@ -10,7 +10,7 @@ const cnInvalidBase = "border-2 border-red-500 dark:border-red-500";
 const cnDirtyBase = "border-2 border-sky-500 dark:border-sky-500";
 
 const inputVariants = cva(
-  "flex h-10 w-full rounded-md border border-slate-300 bg-transparent py-2 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-500 dark:bg-transparet dark:text-slate-100 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-600",
+  "flex h-10 w-full rounded-md border border-slate-300 bg-transparent py-2 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-500 dark:bg-transparent dark:text-slate-100 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-600",
   {
     variants: {
       variant: {

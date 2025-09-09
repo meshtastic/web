@@ -1,14 +1,15 @@
 import { Types, Utils } from "@meshtastic/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { runTransportContract } from "../../../tests/utils/transportContract";
-import { TransportWebSerial } from "./transport";
+import { runTransportContract } from "../../../tests/utils/transportContract.ts";
+import { TransportWebSerial } from "./transport.ts";
 
 function stubCoreTransforms() {
-  const toDevice = new TransformStream<Uint8Array, Uint8Array>({
-    transform(chunk, controller) {
-      controller.enqueue(chunk);
-    },
-  });
+  const toDevice = () =>
+    new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, controller) {
+        controller.enqueue(chunk);
+      },
+    });
 
   // maps raw bytes -> DeviceOutput.packet
   const fromDeviceFactory = () =>
@@ -18,9 +19,10 @@ function stubCoreTransforms() {
       },
     });
 
+  const transform = Utils.toDeviceStream;
   const restoreTo = vi
     .spyOn(Utils, "toDeviceStream", "get")
-    .mockReturnValue(toDevice as unknown as typeof Utils.toDeviceStream);
+    .mockReturnValue(toDevice as unknown as typeof transform);
 
   const restoreFrom = vi
     .spyOn(Utils, "fromDeviceStream")

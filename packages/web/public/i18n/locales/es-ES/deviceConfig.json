@@ -297,7 +297,7 @@
 		},
 		"receivePin": {
 			"description": "Módulo RX del GPS ignorar Pin",
-			"label": "Receive Pin"
+			"label": "Recibir Pin"
 		},
 		"smartPositionEnabled": {
 			"description": "Sólo enviar posición cuando haya habido un cambio significativo en la ubicación",
@@ -325,61 +325,61 @@
 			"altitudeGeoidalSeparation": "Separación Geoidal de Altitud",
 			"altitudeMsl": "Altitud es Nivel Medio del Mar",
 			"dop": "Dilución de precisión (DOP) PDOP usada por defecto",
-			"hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
-			"numSatellites": "Number of satellites",
-			"sequenceNumber": "Sequence number",
+			"hdopVdop": "Si DOP está definido, usar valores HDOP / VDOP en lugar de PDOP",
+			"numSatellites": "Cantidad de satélites",
+			"sequenceNumber": "Número de secuencia",
 			"timestamp": "Fecha",
 			"unset": "Sin configurar",
-			"vehicleHeading": "Vehicle heading",
-			"vehicleSpeed": "Vehicle speed"
+			"vehicleHeading": "Rumbo del vehículo",
+			"vehicleSpeed": "Velocidad de vehículo"
 		}
 	},
 	"power": {
 		"adcMultiplierOverride": {
-			"description": "Used for tweaking battery voltage reading",
-			"label": "ADC Multiplier Override ratio"
+			"description": "Utilizado para ajustar la lectura del voltaje de la batería",
+			"label": "Ratio de sobrescritura del multiplicador ADC"
 		},
 		"ina219Address": {
-			"description": "Address of the INA219 battery monitor",
-			"label": "INA219 Address"
+			"description": "Dirección del monitor de la batería INA219",
+			"label": "Dirección INA219"
 		},
 		"lightSleepDuration": {
 			"description": "",
 			"label": "Duración de la "
 		},
 		"minimumWakeTime": {
-			"description": "Minimum amount of time the device will stay awake for after receiving a packet",
-			"label": "Minimum Wake Time"
+			"description": "Cantidad mínima de tiempo que el dispositivo permanecerá despierto después de recibir un paquete",
+			"label": "Tiempo mínimo activo"
 		},
 		"noConnectionBluetoothDisabled": {
-			"description": "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
+			"description": "Si el dispositivo no recibe una conexión Bluetooth, la radio BLE se desactivará después de este tiempo",
 			"label": "No Connection Bluetooth Disabled"
 		},
 		"powerSavingEnabled": {
-			"description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
+			"description": "Seleccione si está alimentado de una fuente de corriente de poca potencia (es decir, solar), para minimizar el consumo de energía tanto como sea posible.",
 			"label": "Activar el modo ahorro de energía"
 		},
 		"shutdownOnBatteryDelay": {
-			"description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
-			"label": "Shutdown on battery delay"
+			"description": "Apagar automáticamente el nodo después de este largo durante la batería, 0 para indefinido",
+			"label": "Apagado en retraso de batería"
 		},
 		"superDeepSleepDuration": {
-			"description": "How long the device will be in super deep sleep for",
-			"label": "Super Deep Sleep Duration"
+			"description": "Cuánto tiempo durará el dispositivo en suspensión profunda",
+			"label": "Duración de suspensión superprofunda"
 		},
 		"powerConfigSettings": {
-			"description": "Settings for the power module",
+			"description": "Configuración del módulo de alimentación",
 			"label": "Configuración de elecenergía "
 		},
 		"sleepSettings": {
-			"description": "Sleep settings for the power module",
-			"label": "Sleep Settings"
+			"description": "Configuración de suspensión para el módulo de alimentación",
+			"label": "Ajustes de suspensión"
 		}
 	},
 	"security": {
-		"description": "Settings for the Security configuration",
-		"title": "Security Settings",
-		"button_backupKey": "Backup Key",
+		"description": "Ajustes para la configuración de seguridad",
+		"title": "Configuraciones de Seguridad",
+		"button_backupKey": "Clave de la copia de seguridad",
 		"adminChannelEnabled": {
 			"description": "Allow incoming device control over the insecure legacy admin channel",
 			"label": "Allow Legacy Admin"

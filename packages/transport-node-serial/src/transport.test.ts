@@ -2,8 +2,8 @@ import { Duplex } from "node:stream";
 import { Types, Utils } from "@meshtastic/core";
 import type { SerialPort } from "serialport";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { runTransportContract } from "../../../tests/utils/transportContract";
-import { TransportNodeSerial } from "./transport";
+import { runTransportContract } from "../../../tests/utils/transportContract.ts";
+import { TransportNodeSerial } from "./transport.ts";
 
 function isStatusEvent(
   output: Types.DeviceOutput | undefined,
@@ -53,11 +53,12 @@ class FakeSerialPort extends Duplex {
 }
 
 function stubCoreTransforms() {
-  const toDevice = new TransformStream<Uint8Array, Uint8Array>({
-    transform(chunk, controller) {
-      controller.enqueue(chunk);
-    },
-  });
+  const toDevice = () =>
+    new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, controller) {
+        controller.enqueue(chunk);
+      },
+    });
 
   const fromDeviceFactory = () =>
     new TransformStream<Uint8Array, Types.DeviceOutput>({
@@ -67,8 +68,9 @@ function stubCoreTransforms() {
     });
 
   // Utils.toDeviceStream is a getter
+  const transform = Utils.toDeviceStream;
   vi.spyOn(Utils, "toDeviceStream", "get").mockReturnValue(
-    toDevice as unknown as typeof Utils.toDeviceStream,
+    toDevice as unknown as typeof transform,
   );
 
   vi.spyOn(Utils, "fromDeviceStream").mockImplementation(

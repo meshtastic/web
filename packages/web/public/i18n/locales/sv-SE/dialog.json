@@ -9,10 +9,10 @@
 		"shortName": "Kort namn",
 		"title": "Ändra enhetens namn",
 		"validation": {
-			"longNameMax": "Long name must not be more than 40 characters",
-			"shortNameMax": "Short name must not be more than 4 characters",
-			"longNameMin": "Long name must have at least 1 character",
-			"shortNameMin": "Short name must have at least 1 character"
+			"longNameMax": "Långt namn får inte vara längre än 40 tecken",
+			"shortNameMax": "Kort namn får inte vara längre än 4 tecken",
+			"longNameMin": "Långt namn måste ha minst 1 tecken",
+			"shortNameMin": "Kort namn måste ha minst 1 tecken"
 		}
 	},
 	"import": {
@@ -30,7 +30,7 @@
 		"title": "Plats: {{identifier}}",
 		"altitude": "Höjd:",
 		"coordinates": "Koordinater: ",
-		"noCoordinates": "No Coordinates"
+		"noCoordinates": "Koordinater saknas"
 	},
 	"pkiRegenerateDialog": {
 		"title": "Förnya nyckel?",
@@ -68,11 +68,11 @@
 		"bluetoothConnection": {
 			"noDevicesPaired": "Inga enheter parkopplade ännu.",
 			"newDeviceButton": "Ny enhet",
-			"connectionFailed": "Connection failed",
-			"deviceDisconnected": "Device disconnected",
-			"unknownDevice": "Unknown Device",
-			"errorLoadingDevices": "Error loading devices",
-			"unknownErrorLoadingDevices": "Unknown error loading devices"
+			"connectionFailed": "Anslutningen misslyckades",
+			"deviceDisconnected": "Enheten frånkopplad",
+			"unknownDevice": "Okänd enhet",
+			"errorLoadingDevices": "Fel vid inläsning av enheter",
+			"unknownErrorLoadingDevices": "Okänt fel vid inläsning av enheter"
 		},
 		"validation": {
 			"requiresWebBluetooth": "Den här anslutningstypen kräver <0>Web Bluetooth</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
@@ -93,7 +93,7 @@
 		"deviceMetrics": "Enhetens mätvärden:",
 		"hardware": "Hårdvara: ",
 		"lastHeard": "Senast hörd: ",
-		"nodeHexPrefix": "Node Hex: ",
+		"nodeHexPrefix": "Nod-hex: ",
 		"nodeNumber": "Nodnummer: ",
 		"position": "Plats:",
 		"role": "Roll: ",
@@ -103,11 +103,11 @@
 		"ignoreNode": "Ignorera nod",
 		"removeNode": "Ta bort nod",
 		"unignoreNode": "Ta bort favoritmarkering",
-		"security": "Security:",
-		"publicKey": "Public Key: ",
-		"messageable": "Messageable: ",
-		"KeyManuallyVerifiedTrue": "Public Key has been manually verified",
-		"KeyManuallyVerifiedFalse": "Public Key is not manually verified"
+		"security": "Säkerhet:",
+		"publicKey": "Publik nyckel: ",
+		"messageable": "Övervakad: ",
+		"KeyManuallyVerifiedTrue": "Den publika nyckeln har verifierats manuellt",
+		"KeyManuallyVerifiedFalse": "Den publika nyckeln är inte manuellt verifierad"
 	},
 	"pkiBackup": {
 		"loseKeysWarning": "Om du förlorar dina nycklar måste du återställa din enhet.",
@@ -138,14 +138,14 @@
 		"title": "Generera QR-kod"
 	},
 	"reboot": {
-		"title": "Reboot device",
-		"description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
-		"ota": "Reboot into OTA mode",
-		"enterDelay": "Enter delay",
+		"title": "Starta om enhet",
+		"description": "Starta om nu eller schemalägga en omstart av den anslutna noden. Alternativt kan du välja att starta om till OTA (Over-the-Air) läge.",
+		"ota": "Starta om till OTA-läge",
+		"enterDelay": "Ange fördröjning",
 		"scheduled": "Omstart har schemalagts",
-		"schedule": "Schedule reboot",
-		"now": "Reboot now",
-		"cancel": "Cancel scheduled reboot"
+		"schedule": "Schemalägg omstart",
+		"now": "Starta om nu",
+		"cancel": "Avbryt schemalagd omstart"
 	},
 	"refreshKeys": {
 		"description": {
@@ -183,11 +183,11 @@
 	"managedMode": {
 		"confirmUnderstanding": "Ja, jag vet vad jag gör",
 		"title": "Är du säker?",
-		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+		"description": "Aktivering av fjärrhanterat läge blockerar klienter (inklusive webbklienten) från att skriva inställningar till en radio. När detta är aktiverat kan enhetens inställningar endast ändras via fjärradministratörsmeddelanden. Den här inställningen krävs inte för fjärradministration."
 	},
 	"clientNotification": {
-		"title": "Client Notification",
-		"TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
-		"Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
+		"title": "Meddelande från enheten",
+		"TraceRoute can only be sent once every 30 seconds": "Ruttspårning kan bara skickas en gång per 30 sekunder",
+		"Compromised keys were detected and regenerated.": "Komprometterade nycklar upptäcktes på enheten och nya har genererats."
 	}
 }
