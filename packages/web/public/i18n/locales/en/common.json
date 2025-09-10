@@ -113,7 +113,7 @@
       "key": "Key is required."
     },
     "invalidOverrideFreq": {
-      "number": "Invalid format, expected between 430-930 MHz."
+      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
     }
   },
   "yes": "Yes",
