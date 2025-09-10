@@ -97,6 +97,7 @@ export function validateIncomingNode(
       console.warn(
         `Node ${num} rejected: incoming node has no public key, but existing does.`,
       );
+      return oldNode; // drop newNode fields and return old
     }
   } else {
     // Multiple existing nodes with the same node number
