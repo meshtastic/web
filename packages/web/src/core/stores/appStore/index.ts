@@ -32,7 +32,7 @@ interface AppState {
   setNodeNumDetails: (nodeNum: number) => void;
 }
 
-export const useAppStore = create<AppState>()((set, get) => ({
+export const useAppStore = create<AppState>()((set, _get) => ({
   selectedDeviceId: 0,
   devices: [],
   currentPage: "messages",
