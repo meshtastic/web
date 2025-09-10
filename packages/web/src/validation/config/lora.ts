@@ -20,7 +20,7 @@ export const LoRaValidationSchema = z.object({
   sx126xRxBoostedGain: z.boolean(),
   overrideFrequency: z.coerce
     .number()
-    .refine((val) => val >= 410 && val <= 930, {
+    .refine((val) => val === 0 || (val >= 410 && val <= 930), {
       message: "formValidation.invalidOverrideFreq.number",
     }),
   ignoreIncoming: z.coerce.number().array(),
