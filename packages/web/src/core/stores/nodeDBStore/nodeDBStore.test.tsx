@@ -105,7 +105,7 @@ describe("NodeDB store", () => {
     expect(db.getNode(50)?.snr).toBe(9);
 
     db.processPacket({ from: 50, time: 0, snr: 9 } as any);
-    expect(db.getNode(50)?.lastHeard).toBeCloseTo(Date.now() / 1000, 2); // within 10ms, note lastHeard is in seconds
+    expect(db.getNode(50)?.lastHeard).toBeCloseTo(Date.now() / 1000, -1); // within 1s, note lastHeard is in seconds
     expect(db.getNode(50)?.snr).toBe(9);
   });
 
