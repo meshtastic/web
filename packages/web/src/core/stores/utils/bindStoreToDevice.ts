@@ -55,36 +55,38 @@ export function bindStoreToDevice<S, DB>(
     const snapRef = useRef<Selected>(storeSelector(store.getState()));
     snapRef.current = storeSelector(store.getState()); // this ensures rerenders with a new selector (new deviceId) see the right initial value
 
+    const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+      undefined,
+    );
+
     const subscribe = useMemo(() => {
       return (onChange: () => void) => {
-        let timer: ReturnType<typeof setTimeout> | undefined;
-
         const unsubscribe = store.subscribe(
           storeSelector,
           (next: Selected, prev: Selected) => {
+            const emit = () => {
+              snapRef.current = next;
+              onChange();
+            };
+
             if (equality(next, prev)) {
               return;
             }
-
             if (wait > 0) {
-              if (timer) {
-                clearTimeout(timer);
+              if (timerRef.current) {
+                clearTimeout(timerRef.current);
               }
-              timer = setTimeout(() => {
-                snapRef.current = next;
-                onChange();
-              }, wait);
+              timerRef.current = setTimeout(emit, wait);
             } else {
-              snapRef.current = next;
-              onChange();
+              emit();
             }
           },
           { equalityFn: equality, fireImmediately },
         );
 
         return () => {
-          if (timer) {
-            clearTimeout(timer);
+          if (timerRef.current) {
+            clearTimeout(timerRef.current);
           }
           unsubscribe();
         };

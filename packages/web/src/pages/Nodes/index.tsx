@@ -184,7 +184,7 @@ const NodesPage = (): JSX.Element => {
                         ? t("unit.hop.plural")
                         : t("unit.hops_one")
                     } ${t("nodesTable.connectionStatus.away")}`
-                : t("nodesTable.connectionStatus.unknown")}
+                : t("unknown.longName")}
               {node?.viaMqtt === true
                 ? t("nodesTable.connectionStatus.viaMqtt")
                 : ""}
@@ -196,7 +196,7 @@ const NodesPage = (): JSX.Element => {
           content: (
             <Mono>
               {node.lastHeard === 0 ? (
-                t("nodesTable.lastHeardStatus.unknown")
+                t("unknown.longName")
               ) : (
                 <TimeAgo
                   timestamp={node.lastHeard * 1000}
