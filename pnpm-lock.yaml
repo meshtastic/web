@@ -12,8 +12,8 @@ importers:
         specifier: ^2.6.1
         version: 2.6.3
       '@meshtastic/protobufs':
-        specifier: ^2.7.0
-        version: 2.7.0
+        specifier: ^2.7.8
+        version: 2.7.8
       ste-simple-events:
         specifier: ^3.0.11
         version: 3.0.11
@@ -1392,8 +1392,8 @@ packages:
     resolution: {integrity: sha512-IGJtuBbaGzOUgODdBRg66p8stnwj9iDXkgbYKoYcNiiQmaez5WVRfXm4b03MCDwmZyX93csbfHFWEJJYHnn5oA==}
     hasBin: true
 
-  '@meshtastic/protobufs@2.7.0':
-    resolution: {integrity: sha512-felUnx8ftVoX99CkZDFbEp+SnqgF74pE8ZUf+X/8OY+/Qct0X57nufCptj2MNM4UkW75X5zMayXqp2P5WuJRUA==}
+  '@meshtastic/protobufs@2.7.8':
+    resolution: {integrity: sha512-Itn6sNVDvmSA6jsbqZWDScGbXkUUF3+bfJWKbdx5aA3+1tJiXas7I6aeC/aJPa1HelxLvBT3KO63jSgS1Pk83w==}
 
   '@napi-rs/wasm-runtime@1.0.3':
     resolution: {integrity: sha512-rZxtMsLwjdXkMUGC3WwsPwLNVqVqnTJT6MNIB6e+5fhMcSCPP0AOsNWuMQ5mdCq6HNjs/ZeWAEchpqeprqBD2Q==}
@@ -6506,7 +6506,7 @@ snapshots:
       rw: 1.3.3
       tinyqueue: 3.0.0
 
-  '@meshtastic/protobufs@2.7.0':
+  '@meshtastic/protobufs@2.7.8':
     dependencies:
       '@bufbuild/protobuf': 2.6.3
 
