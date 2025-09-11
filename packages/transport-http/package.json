@@ -12,9 +12,9 @@
     "LICENSE",
     "dist"
   ],
-  "main": "./dist/mod.mjs",
-  "module": "./dist/mod.mjs",
-  "types": "./dist/mod.d.mts",
+  "main": "./dist/mod.js",
+  "module": "./dist/mod.js",
+  "types": "./dist/mod.d.ts",
   "license": "GPL-3.0-only",
   "tsdown": {
     "entry": "mod.ts",

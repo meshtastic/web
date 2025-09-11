@@ -3,12 +3,18 @@
   "version": "0.0.1",
   "description": "NodeJS-specific serial transport layer for Meshtastic web applications.",
   "exports": {
-    ".": "./dist/mod.mjs"
+    ".": "./mod.ts"
   },
-  "main": "./dist/mod.mjs",
-  "module": "./dist/mod.mjs",
-  "types": "./dist/mod.d.mts",
-
+  "type": "module",
+  "main": "./dist/mod.js",
+  "module": "./dist/mod.js",
+  "types": "./dist/mod.d.ts",
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
   "license": "GPL-3.0-only",
   "tsdown": {
     "entry": "mod.ts",
@@ -19,12 +25,6 @@
     "splitting": false,
     "clean": true
   },
-  "files": [
-    "package.json",
-    "README.md",
-    "LICENSE",
-    "dist"
-  ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepack": "cp ../../LICENSE ./LICENSE",
