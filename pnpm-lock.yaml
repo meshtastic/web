@@ -12,8 +12,8 @@ importers:
         specifier: ^2.6.1
         version: 2.6.3
       '@meshtastic/protobufs':
-        specifier: npm:@jsr/meshtastic__protobufs@^2.7.0
-        version: '@jsr/meshtastic__protobufs@2.7.0'
+        specifier: ^2.7.8
+        version: 2.7.8
       ste-simple-events:
         specifier: ^3.0.11
         version: 3.0.11
@@ -1360,9 +1360,6 @@ packages:
   '@jridgewell/trace-mapping@0.3.30':
     resolution: {integrity: sha512-GQ7Nw5G2lTu/BtHTKfXhKHok2WGetd4XYcVKGx00SjAk8GMwgJM3zr6zORiPGuOE+/vkc90KtTosSSvaCjKb2Q==}
 
-  '@jsr/meshtastic__protobufs@2.7.0':
-    resolution: {integrity: sha512-ndZhUyB/ADSyjJI+iSeSOoIKqNGZ2+ERVjfY0qnh4jgF740tFTwefC5mzZhOqDLbreGFYS79+429NtH5Ujdzdg==, tarball: https://npm.jsr.io/~/11/@jsr/meshtastic__protobufs/2.7.0.tgz}
-
   '@mapbox/geojson-rewind@0.5.2':
     resolution: {integrity: sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA==}
     hasBin: true
@@ -1394,6 +1391,9 @@ packages:
   '@maplibre/maplibre-gl-style-spec@23.3.0':
     resolution: {integrity: sha512-IGJtuBbaGzOUgODdBRg66p8stnwj9iDXkgbYKoYcNiiQmaez5WVRfXm4b03MCDwmZyX93csbfHFWEJJYHnn5oA==}
     hasBin: true
+
+  '@meshtastic/protobufs@2.7.8':
+    resolution: {integrity: sha512-Itn6sNVDvmSA6jsbqZWDScGbXkUUF3+bfJWKbdx5aA3+1tJiXas7I6aeC/aJPa1HelxLvBT3KO63jSgS1Pk83w==}
 
   '@napi-rs/wasm-runtime@1.0.3':
     resolution: {integrity: sha512-rZxtMsLwjdXkMUGC3WwsPwLNVqVqnTJT6MNIB6e+5fhMcSCPP0AOsNWuMQ5mdCq6HNjs/ZeWAEchpqeprqBD2Q==}
@@ -6468,10 +6468,6 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@jsr/meshtastic__protobufs@2.7.0':
-    dependencies:
-      '@bufbuild/protobuf': 2.6.3
-
   '@mapbox/geojson-rewind@0.5.2':
     dependencies:
       get-stream: 6.0.1
@@ -6509,6 +6505,10 @@ snapshots:
       quickselect: 3.0.0
       rw: 1.3.3
       tinyqueue: 3.0.0
+
+  '@meshtastic/protobufs@2.7.8':
+    dependencies:
+      '@bufbuild/protobuf': 2.6.3
 
   '@napi-rs/wasm-runtime@1.0.3':
     dependencies:
