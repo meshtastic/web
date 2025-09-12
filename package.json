@@ -29,16 +29,16 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.6.1",
+    "@bufbuild/protobuf": "^2.8.0",
     "@meshtastic/protobufs": "^2.7.8",
     "ste-simple-events": "^3.0.11",
     "tslog": "^4.9.3"
   },
   "devDependencies": {
-    "@types/node": "^22.16.4",
-    "@biomejs/biome": "2.0.6",
-    "tsdown": "^0.13.4",
-    "typescript": "^5.8.3",
+    "@types/node": "^24.3.1",
+    "@biomejs/biome": "2.2.4",
+    "tsdown": "^0.15.0",
+    "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
   "pnpm": {
