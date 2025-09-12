@@ -1,7 +1,21 @@
 {
-  "name": "@meshtastic/core",
-  "version": "2.6.6",
-  "exports": {
-    ".": "./mod.ts"
-  }
+	"name": "@meshtastic/core",
+	"version": "2.6.7",
+	"license": "GPL-3.0-only",
+	"exports": {
+		".": "./mod.ts"
+	},
+	"publish": {
+		"include": [
+			"mod.ts",
+			"src",
+			"README.md",
+			"LICENSE",
+			"package.json",
+			"dist"
+		],
+		"exclude": [
+			"src/**/*.test.ts"
+		]
+	}
 }
