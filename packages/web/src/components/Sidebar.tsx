@@ -205,7 +205,10 @@ export const Sidebar = ({ children }: SidebarProps) => {
             }
             deviceMetrics={{
               batteryLevel: myNode.deviceMetrics?.batteryLevel,
-              voltage: myNode.deviceMetrics?.voltage,
+              voltage:
+                typeof myNode.deviceMetrics?.voltage === "number"
+                  ? Math.abs(myNode.deviceMetrics?.voltage)
+                  : undefined,
             }}
           />
         )}

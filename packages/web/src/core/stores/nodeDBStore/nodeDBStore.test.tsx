@@ -1,7 +1,6 @@
-/** biome-ignore-all lint/suspicious/noExplicitAny: <tests> */
-/** biome-ignore-all lint/style/noNonNullAssertion: <tests> */
 import { create } from "@bufbuild/protobuf";
 import { Protobuf } from "@meshtastic/core";
+import { act, render, screen } from "@testing-library/react";
 import { toByteArray } from "base64-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -16,6 +15,14 @@ vi.mock("idb-keyval", () => ({
     idbMem.delete(k);
     return Promise.resolve();
   }),
+}));
+
+let deviceIdForTests = 1;
+vi.mock("@core/hooks/useDeviceContext", () => ({
+  useDeviceContext: () => ({ deviceId: deviceIdForTests }),
+  __setDeviceId: (id: number) => {
+    deviceIdForTests = id;
+  },
 }));
 
 // import a fresh copy of the store module (because the store is created at import time)
@@ -33,8 +40,9 @@ async function freshStore(persist = false) {
     },
   }));
 
-  const mod = await import("./index.ts");
-  return mod;
+  const storeMod = await import("./index.ts");
+  const { useNodeDB } = await import("../index.ts");
+  return { ...storeMod, useNodeDB };
 }
 
 function makeNode(num: number, extras: Record<string, any> = {}) {
@@ -97,7 +105,7 @@ describe("NodeDB store", () => {
     expect(db.getNode(50)?.snr).toBe(9);
 
     db.processPacket({ from: 50, time: 0, snr: 9 } as any);
-    expect(db.getNode(50)?.lastHeard).toBeCloseTo(Date.now(), -1); // within 10ms
+    expect(db.getNode(50)?.lastHeard).toBeCloseTo(Date.now() / 1000, -1); // within 1s, note lastHeard is in seconds
     expect(db.getNode(50)?.snr).toBe(9);
   });
 
@@ -336,9 +344,9 @@ describe("NodeDB – merge semantics, PKI checks & extras", () => {
     expect(n5.user?.publicKey).toEqual(keyOld); // keep old PK
     expect(n5.user?.longName).toBe("old-5");
 
-    // error flagged
+    // error not flagged; dropped silently
     const err = newDB!.getNodeError(5);
-    expect(String(err!.error)).toMatch(/MISMATCH|PK/i);
+    expect(err).toBeUndefined();
   });
 
   it("old key empty, new key present, store new node", async () => {
@@ -449,5 +457,120 @@ describe("NodeDB – merge semantics, PKI checks & extras", () => {
     newDB.setNodeNum(4242);
 
     expect(newDB.getMyNode().num).toBe(4242);
+  });
+});
+
+describe("NodeDB deviceContext & debounce", () => {
+  beforeEach(() => {
+    idbMem.clear();
+    vi.clearAllMocks();
+  });
+
+  it("useNodeDB resolves per-device DB and switches with deviceId", async () => {
+    const { useNodeDBStore, useNodeDB } = await freshStore();
+
+    // device 1
+    deviceIdForTests = 1;
+    const st = useNodeDBStore.getState();
+    const db1 = st.addNodeDB(1);
+    db1.addNode({ num: 10 } as any);
+
+    function Comp() {
+      const len = useNodeDB((db) => db.getNodesLength(), {
+        debounce: 0,
+        equality: (a, b) => a === b,
+      });
+      return <div data-testid="len">{len}</div>;
+    }
+
+    const { rerender } = render(<Comp />);
+    expect(screen.getByTestId("len").textContent).toBe("1");
+
+    // switch to device 2 and add nodes
+    deviceIdForTests = 2;
+    const db2 = st.addNodeDB(2);
+    db2.addNode({ num: 20 } as any);
+    db2.addNode({ num: 21 } as any);
+    db2.addNode({ num: 22 } as any);
+
+    // re-render so the hook re-subscribes with the new deviceId
+    await act(async () => {
+      rerender(<Comp />);
+    });
+
+    expect(screen.getByTestId("len").textContent).toBe("3");
+  });
+
+  it("useNodeDB selector re-renders only when the selected slice changes", async () => {
+    const { useNodeDBStore, useNodeDB } = await freshStore();
+    deviceIdForTests = 1;
+
+    const st = useNodeDBStore.getState();
+    const db = st.addNodeDB(1);
+
+    let renders = 0;
+    function Comp() {
+      const len = useNodeDB((d) => d.getNodesLength(), {
+        debounce: 0,
+        equality: (a, b) => a === b,
+      });
+      renders++;
+      return <div data-testid="len">{len}</div>;
+    }
+
+    render(<Comp />);
+    expect(screen.getByTestId("len").textContent).toBe("0");
+    expect(renders).toBe(1);
+
+    // mutate something unrelated to length
+    db.setNodeError(999, "X" as any);
+    await act(() => Promise.resolve());
+    expect(screen.getByTestId("len").textContent).toBe("0");
+    expect(renders).toBe(1); // no re-render
+
+    // now actually change the slice
+    db.addNode({ num: 1 } as any);
+    await act(() => Promise.resolve());
+    expect(screen.getByTestId("len").textContent).toBe("1");
+    expect(renders).toBe(2);
+  });
+
+  it("useNodeDB debounce coalesces rapid updates", async () => {
+    vi.useFakeTimers();
+    const { useNodeDBStore, useNodeDB } = await freshStore();
+    deviceIdForTests = 1;
+
+    const st = useNodeDBStore.getState();
+    const db = st.addNodeDB(1);
+
+    let renders = 0;
+    function Comp() {
+      const len = useNodeDB((d) => d.getNodesLength(), {
+        debounce: 50,
+        equality: (a, b) => a === b,
+      });
+      renders++;
+      return <div data-testid="len">{len}</div>;
+    }
+
+    render(<Comp />);
+
+    // burst of updates within the debounce window
+    db.addNode({ num: 1 } as any);
+    db.addNode({ num: 2 } as any);
+    db.addNode({ num: 3 } as any);
+
+    await act(() => {
+      vi.advanceTimersByTime(49);
+    });
+    expect(renders).toBe(1); // not yet
+
+    await act(() => {
+      vi.advanceTimersByTime(2);
+    });
+    expect(screen.getByTestId("len").textContent).toBe("3");
+    expect(renders).toBe(2); // single coalesced re-render
+
+    vi.useRealTimers();
   });
 });

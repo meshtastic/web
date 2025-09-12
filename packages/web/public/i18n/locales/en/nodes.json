@@ -46,11 +46,7 @@
     "connectionStatus": {
       "direct": "Direct",
       "away": "away",
-      "unknown": "-",
       "viaMqtt": ", via MQTT"
-    },
-    "lastHeardStatus": {
-      "never": "Never"
     }
   },
 

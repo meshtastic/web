@@ -50,6 +50,8 @@ export function Slider({
     onValueCommit?.(newValue);
   };
 
+  const thumbIds = currentValue.map((_, idx) => `${internalId}-thumb-${idx}`); // Unique IDs for each thumb, pregenerated to please the linter
+
   return (
     <SliderPrimitive.Root
       className={cn(
@@ -79,14 +81,14 @@ export function Slider({
           )}
         />
       </SliderPrimitive.Track>
-      {currentValue.map((_) => (
+      {currentValue.map((_, idx) => (
         <SliderPrimitive.Thumb
-          key={`${internalId}-thumb`}
+          key={thumbIds[idx]}
           className={cn(
             "block w-4 h-4 rounded-full bg-white border border-slate-400 shadow-md",
             thumbClassName,
           )}
-          aria-label={`Thumb ${internalId}`}
+          aria-label={`Thumb ${idx + 1}`}
         />
       ))}
     </SliderPrimitive.Root>

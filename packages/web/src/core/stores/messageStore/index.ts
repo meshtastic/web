@@ -393,7 +393,7 @@ const persistOptions: PersistOptions<
   PrivateMessageStoreState,
   MessageStorePersisted
 > = {
-  name: "meshtastic-MessageStore-store",
+  name: "meshtastic-message-store",
   storage: createStorage<MessageStorePersisted>(),
   version: CURRENT_STORE_VERSION,
   partialize: (s): MessageStorePersisted => ({

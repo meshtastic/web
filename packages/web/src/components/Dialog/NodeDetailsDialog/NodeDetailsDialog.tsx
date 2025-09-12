@@ -174,7 +174,10 @@ export const NodeDetailsDialog = ({
     {
       key: "voltage",
       label: t("nodeDetails.voltage"),
-      value: node.deviceMetrics?.voltage,
+      value:
+        typeof node.deviceMetrics?.voltage === "number"
+          ? Math.abs(node.deviceMetrics?.voltage)
+          : undefined,
       format: (val: number) => `${val.toFixed(2)}V`,
     },
   ];

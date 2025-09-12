@@ -11,10 +11,18 @@ import { cn } from "@core/utils/cn.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { bbox, lineString } from "@turf/turf";
 import { FunnelIcon, MapPinIcon } from "lucide-react";
-import { useCallback, useDeferredValue, useMemo, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Marker, Popup, useMap } from "react-map-gl/maplibre";
 import { NodeDetail } from "../../components/PageComponents/Map/NodeDetail.tsx";
 import { Avatar } from "../../components/UI/Avatar.tsx";
+
+const NODEDB_DEBOUNCE_MS = 250;
 
 type NodePosition = {
   latitude: number;
@@ -31,21 +39,25 @@ const convertToLatLng = (position?: {
 
 const MapPage = () => {
   const { waypoints } = useDevice();
-  const { getNodes, hasNodeError } = useNodeDB();
+  const { nodes: validNodes, hasNodeError } = useNodeDB(
+    (db) => ({
+      // only nodes with a position
+      nodes: db.getNodes((n): n is Protobuf.Mesh.NodeInfo =>
+        Boolean(n.position?.latitudeI),
+      ),
+      hasNodeError: db.hasNodeError,
+      // include the Map reference so error badges update when nodeErrors changes
+      _errorsRef: db.nodeErrors,
+    }),
+    { debounce: NODEDB_DEBOUNCE_MS },
+  );
+
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
 
   const { default: map } = useMap();
 
   const [selectedNode, setSelectedNode] =
     useState<Protobuf.Mesh.NodeInfo | null>(null);
-
-  const validNodes = useMemo(
-    () =>
-      getNodes((node): node is Protobuf.Mesh.NodeInfo =>
-        Boolean(node.position?.latitudeI),
-      ),
-    [getNodes],
-  );
 
   const [filterState, setFilterState] = useState<FilterState>(
     () => defaultFilterValues,
@@ -56,6 +68,8 @@ const MapPage = () => {
     () => validNodes.filter((node) => nodeFilter(node, deferredFilterState)),
     [validNodes, deferredFilterState, nodeFilter],
   );
+
+  const hasFitBoundsOnce = useRef(false);
 
   const handleMarkerClick = useCallback(
     (node: Protobuf.Mesh.NodeInfo, event: { originalEvent: MouseEvent }) => {
@@ -76,7 +90,7 @@ const MapPage = () => {
 
   // Get the bounds of the map based on the nodes furtherest away from center
   const getMapBounds = useCallback(() => {
-    if (!map || validNodes.length === 0) {
+    if (hasFitBoundsOnce.current || !map || validNodes.length === 0) {
       return;
     }
 
@@ -108,6 +122,7 @@ const MapPage = () => {
     if (center) {
       map.easeTo(center);
     }
+    hasFitBoundsOnce.current = true;
   }, [map, validNodes]);
 
   // Generate all markers
