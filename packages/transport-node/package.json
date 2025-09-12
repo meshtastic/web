@@ -1,11 +1,17 @@
 {
   "name": "@meshtastic/transport-node",
-  "version": "0.0.1-1",
+  "version": "0.0.2",
   "description": "NodeJS-specific transport layer for Meshtastic web applications.",
   "exports": {
     ".": "./mod.ts"
   },
   "type": "module",
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
   "main": "./dist/mod.js",
   "module": "./dist/mod.js",
   "types": "./dist/mod.d.ts",
@@ -20,11 +26,14 @@
     "splitting": false,
     "clean": true
   },
-  "files": [
-    "package.json",
+  "jsrInclude": [
+    "mod.ts",
+    "src",
     "README.md",
-    "LICENSE",
-    "dist"
+    "LICENSE"
+  ],
+  "jsrExclude": [
+    "src/**/*.test.ts"
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",

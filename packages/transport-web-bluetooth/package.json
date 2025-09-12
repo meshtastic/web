@@ -1,6 +1,6 @@
 {
   "name": "@meshtastic/transport-web-bluetooth",
-  "version": "0.1.4-1",
+  "version": "0.1.5",
   "description": "A transport layer for Meshtastic applications using Web Bluetooth.",
   "exports": {
     ".": "./mod.ts"
@@ -25,6 +25,15 @@
     "splitting": false,
     "clean": true
   },
+  "jsrInclude": [
+    "mod.ts",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "jsrExclude": [
+    "src/**/*.test.ts"
+  ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepack": "cp ../../LICENSE ./LICENSE",
