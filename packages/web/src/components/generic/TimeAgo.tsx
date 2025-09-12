@@ -90,7 +90,7 @@ export const TimeAgo = ({
 
   useEffect(() => {
     const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
-    let timerId: number;
+    let timerId: NodeJS.Timeout;
 
     const update = () => {
       const { value, unit } = getRelativeTimeParts(date);

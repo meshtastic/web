@@ -47,6 +47,7 @@
     "megahertz": "MHz",
     "raw": "raw",
     "meter": { "one": "Meter", "plural": "Meters", "suffix": "m" },
+    "kilometer": { "one": "Kilometer", "plural": "Kilometers", "suffix": "km" },
     "minute": { "one": "Minute", "plural": "Minutes" },
     "hour": { "one": "Hour", "plural": "Hours" },
     "millisecond": {

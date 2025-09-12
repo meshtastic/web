@@ -16,6 +16,7 @@ export {
   useDeviceStore,
   type ValidConfigType,
   type ValidModuleConfigType,
+  type WaypointWithMetadata,
 } from "@core/stores/deviceStore";
 export {
   MessageState,

@@ -65,14 +65,14 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
                 className="text-green-600 mb-1.5"
                 size={12}
                 strokeWidth={3}
-                aria-label={t("node_detail_public_key_enabled_aria_label")}
+                aria-label={t("nodeDetail.publicKeyEnabled.label")}
               />
             ) : (
               <LockOpenIcon
                 className="text-yellow-500 mb-1.5"
                 size={12}
                 strokeWidth={3}
-                aria-label={t("node_detail_no_public_key_aria_label")}
+                aria-label={t("nodeDetail.noPublicKey.label")}
               />
             )}
 
@@ -158,7 +158,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
               : node.hopsAway}
           </div>
           <div>
-            {node.hopsAway === 1 ? t("unit.hops.one") : t("unit.hop.plural")}
+            {node.hopsAway === 1 ? t("unit.hop.one") : t("unit.hop.plural")}
           </div>
         </div>
         {node.position?.altitude && (
@@ -166,7 +166,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
             <MountainSnow
               size={15}
               className="ml-2 mr-1"
-              aria-label={t("node_detail_elevation_aria_label")}
+              aria-label={t("nodeDetail.elevation.label")}
             />
             <div>
               {formatQuantity(node.position?.altitude, {
@@ -181,7 +181,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
       <div className="flex mt-2">
         {!!node.deviceMetrics?.channelUtilization && (
           <div className="grow">
-            <div>{t("nodeDetail.channelUtilization")}</div>
+            <div>{t("channelUtilization.short")}</div>
             <Mono>
               {node.deviceMetrics?.channelUtilization.toPrecision(3)}%
             </Mono>
@@ -189,7 +189,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         )}
         {!!node.deviceMetrics?.airUtilTx && (
           <div className="grow">
-            <div>{t("nodeDetail.airTxUtilization")}</div>
+            <div>{t("airtimeUtilization.short")}</div>
             <Mono className="text-gray-500">
               {node.deviceMetrics?.airUtilTx.toPrecision(3)}%
             </Mono>

@@ -1,64 +1,78 @@
+import {
+  defaultVisibilityState,
+  MapLayerTool,
+  type VisibilityState,
+} from "@app/components/PageComponents/Map/Tools/MapLayerTool.tsx";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import {
   type FilterState,
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
 import { BaseMap } from "@components/Map.tsx";
+import { NodesLayer } from "@components/PageComponents/Map/Layers/NodesLayer.tsx";
+import { PrecisionLayer } from "@components/PageComponents/Map/Layers/PrecisionLayer.tsx";
+import {
+  SNRLayer,
+  SNRTooltip,
+  type SNRTooltipProps,
+} from "@components/PageComponents/Map/Layers/SNRLayer.tsx";
+import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
+import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
-import { useDevice, useNodeDB } from "@core/stores";
+import { useMapFitting } from "@core/hooks/useMapFitting.ts";
+import { useNodeDB } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
+import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/core";
-import { bbox, lineString } from "@turf/turf";
-import { FunnelIcon, MapPinIcon } from "lucide-react";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {
   useCallback,
   useDeferredValue,
+  useId,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { Marker, Popup, useMap } from "react-map-gl/maplibre";
-import { NodeDetail } from "../../components/PageComponents/Map/NodeDetail.tsx";
-import { Avatar } from "../../components/UI/Avatar.tsx";
+import { useTranslation } from "react-i18next";
+import { type MapLayerMouseEvent, useMap } from "react-map-gl/maplibre";
 
 const NODEDB_DEBOUNCE_MS = 250;
 
-type NodePosition = {
-  latitude: number;
-  longitude: number;
-};
-
-const convertToLatLng = (position?: {
-  latitudeI?: number;
-  longitudeI?: number;
-}): NodePosition => ({
-  latitude: (position?.latitudeI ?? 0) / 1e7,
-  longitude: (position?.longitudeI ?? 0) / 1e7,
-});
-
 const MapPage = () => {
-  const { waypoints } = useDevice();
-  const { nodes: validNodes, hasNodeError } = useNodeDB(
+  const { t } = useTranslation("map");
+  const { getNode } = useNodeDB();
+  const { nodes: validNodes, myNode } = useNodeDB(
     (db) => ({
       // only nodes with a position
       nodes: db.getNodes((n): n is Protobuf.Mesh.NodeInfo =>
         Boolean(n.position?.latitudeI),
       ),
-      hasNodeError: db.hasNodeError,
-      // include the Map reference so error badges update when nodeErrors changes
+      myNode: db.getMyNode(),
+
+      // References to cause re-render on change
       _errorsRef: db.nodeErrors,
+      _nodeNumRef: db.myNodeNum,
     }),
     { debounce: NODEDB_DEBOUNCE_MS },
   );
-
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
+  const { default: mapRef } = useMap();
+  const { focusLngLat, fitToNodes } = useMapFitting(mapRef);
 
-  const { default: map } = useMap();
+  const hasFitBoundsOnce = useRef(false);
+  const [snrHover, setSnrHover] = useState<SNRTooltipProps>();
+  const [expandedCluster, setExpandedCluster] = useState<string | undefined>();
+  const [popupState, setPopupState] = useState<PopupState | undefined>();
 
-  const [selectedNode, setSelectedNode] =
-    useState<Protobuf.Mesh.NodeInfo | null>(null);
+  const [visibilityState, setVisibilityState] = useState<VisibilityState>(
+    () => defaultVisibilityState,
+  );
 
+  //const myNode = useMemo(() => getMyNode(), [getMyNode]);
+
+  // Filters
   const [filterState, setFilterState] = useState<FilterState>(
     () => defaultFilterValues,
   );
@@ -69,143 +83,187 @@ const MapPage = () => {
     [validNodes, deferredFilterState, nodeFilter],
   );
 
-  const hasFitBoundsOnce = useRef(false);
+  // Map fitting
+  const getMapBounds = useCallback(() => {
+    if (!hasFitBoundsOnce.current) {
+      fitToNodes(validNodes);
+      hasFitBoundsOnce.current = true;
+    }
+  }, [fitToNodes, validNodes]);
 
-  const handleMarkerClick = useCallback(
-    (node: Protobuf.Mesh.NodeInfo, event: { originalEvent: MouseEvent }) => {
-      event?.originalEvent?.stopPropagation();
-
-      setSelectedNode(node);
-
-      if (map) {
-        const position = convertToLatLng(node.position);
-        map.easeTo({
-          center: [position.longitude, position.latitude],
-          zoom: map?.getZoom(),
-        });
-      }
-    },
-    [map],
+  // SNR lines
+  const snrLayerElementId = useId();
+  const snrLayerElement = useMemo(
+    () => (
+      <SNRLayer
+        id={snrLayerElementId}
+        filteredNodes={filteredNodes}
+        myNode={myNode}
+        visibilityState={visibilityState}
+      />
+    ),
+    [filteredNodes, myNode, visibilityState, snrLayerElementId],
   );
 
-  // Get the bounds of the map based on the nodes furtherest away from center
-  const getMapBounds = useCallback(() => {
-    if (hasFitBoundsOnce.current || !map || validNodes.length === 0) {
-      return;
-    }
+  const onMouseMove = useCallback(
+    (event: MapLayerMouseEvent) => {
+      const {
+        features,
+        point: { x, y },
+      } = event;
+      const hoveredFeature = features?.[0];
 
-    if (validNodes.length === 1 && validNodes[0]) {
-      map.easeTo({
-        zoom: map.getZoom(),
-        center: [
-          (validNodes[0].position?.longitudeI ?? 0) / 1e7,
-          (validNodes[0].position?.latitudeI ?? 0) / 1e7,
-        ],
-      });
-      return;
-    }
+      if (hoveredFeature) {
+        const { from, to, snr } = hoveredFeature.properties;
 
-    const line = lineString(
-      validNodes.map((n) => [
-        (n.position?.latitudeI ?? 0) / 1e7,
-        (n.position?.longitudeI ?? 0) / 1e7,
-      ]),
-    );
-    const bounds = bbox(line);
-    const center = map.cameraForBounds(
-      [
-        [bounds[1], bounds[0]],
-        [bounds[3], bounds[2]],
-      ],
-      { padding: { top: 10, bottom: 10, left: 10, right: 10 } },
-    );
-    if (center) {
-      map.easeTo(center);
-    }
-    hasFitBoundsOnce.current = true;
-  }, [map, validNodes]);
+        const fromLong =
+          getNode(from)?.user?.longName ??
+          t("fallbackName", {
+            last4: numberToHexUnpadded(from).slice(-4).toUpperCase(),
+          });
 
-  // Generate all markers
-  const markers = useMemo(
-    () =>
-      filteredNodes.map((node) => {
-        const position = convertToLatLng(node.position);
-        return (
-          <Marker
-            key={`marker-${node.num}`}
-            longitude={position.longitude}
-            latitude={position.latitude}
-            anchor="bottom"
-            onClick={(e) => handleMarkerClick(node, e)}
-          >
-            <Avatar
-              text={node.user?.shortName?.toString() ?? node.num.toString()}
-              className="border-[1.5px] border-slate-600 shadow-m shadow-slate-600"
-              showError={hasNodeError(node.num)}
-              showFavorite={node.isFavorite}
-            />
-          </Marker>
-        );
-      }),
-    [filteredNodes, handleMarkerClick, hasNodeError],
+        const toLong =
+          getNode(to)?.user?.longName ??
+          t("fallbackName", {
+            last4: numberToHexUnpadded(to).slice(-4).toUpperCase(),
+          });
+
+        setSnrHover({ pos: { x, y }, snr, from: fromLong, to: toLong });
+      } else {
+        setSnrHover(undefined);
+      }
+    },
+    [getNode, t],
+  );
+
+  // Node markers & clusters
+  const onMapBackgroundClick = useCallback(() => {
+    setExpandedCluster(undefined);
+  }, []);
+
+  const markerElements = useMemo(
+    () => (
+      <NodesLayer
+        mapRef={mapRef}
+        filteredNodes={filteredNodes}
+        myNode={myNode}
+        expandedCluster={expandedCluster}
+        setExpandedCluster={setExpandedCluster}
+        popupState={popupState}
+        setPopupState={setPopupState}
+        isVisible={visibilityState.nodeMarkers}
+      />
+    ),
+    [
+      filteredNodes,
+      expandedCluster,
+      mapRef,
+      myNode,
+      popupState,
+      visibilityState.nodeMarkers,
+    ],
+  );
+
+  // Precision circles
+  const precisionCirclesElementId = useId();
+  const precisionCirclesElement = useMemo(
+    () => (
+      <PrecisionLayer
+        id={precisionCirclesElementId}
+        filteredNodes={filteredNodes}
+        isVisible={visibilityState.positionPrecision}
+      />
+    ),
+    [
+      filteredNodes,
+      visibilityState.positionPrecision,
+      precisionCirclesElementId,
+    ],
+  );
+
+  // Waypoints
+  const waypointLayerElement = useMemo(
+    () => (
+      <WaypointLayer
+        mapRef={mapRef}
+        myNode={myNode}
+        isVisible={visibilityState.waypoints}
+        popupState={popupState}
+        setPopupState={setPopupState}
+      />
+    ),
+    [mapRef, myNode, visibilityState.waypoints, popupState],
   );
 
   return (
     <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
-      <BaseMap onLoad={getMapBounds}>
-        {waypoints.map((wp) => (
-          <Marker
-            key={wp.id}
-            longitude={(wp.longitudeI ?? 0) / 1e7}
-            latitude={(wp.latitudeI ?? 0) / 1e7}
-            anchor="bottom"
-          >
-            <div>
-              <MapPinIcon size={16} />
-            </div>
-          </Marker>
-        ))}
-        {markers}
-        {selectedNode &&
-          (() => {
-            const position = convertToLatLng(selectedNode.position);
-            return (
-              <Popup
-                key={selectedNode.num}
-                anchor="top"
-                longitude={position.longitude}
-                latitude={position.latitude}
-                onClose={() => setSelectedNode(null)}
-                className="w-full"
-              >
-                <NodeDetail node={selectedNode} />
-              </Popup>
-            );
-          })()}
-      </BaseMap>
+      <BaseMap
+        onLoad={getMapBounds}
+        onMouseMove={onMouseMove}
+        onClick={onMapBackgroundClick}
+        interactiveLayerIds={[snrLayerElementId]}
+      >
+        {markerElements}
+        {snrLayerElement}
+        {precisionCirclesElement}
+        {waypointLayerElement}
 
-      <FilterControl
-        filterState={filterState}
-        defaultFilterValues={defaultFilterValues}
-        setFilterState={setFilterState}
-        isDirty={isFilterDirty(filterState)}
-        parameters={{
-          popoverContentProps: {
-            side: "bottom",
-            align: "end",
-            sideOffset: 12,
-          },
-          popoverTriggerClassName: cn(
-            "fixed top-45.5 right-2.5 w-[29px] px-1 py-1 rounded shadow-l outline-[2px] outline-stone-600/20 ",
-            "dark:text-slate-600 dark:hover:text-slate-700 bg-stone-50 hover:bg-stone-200 dark:bg-stone-50 dark:hover:bg-stone-200 dark:active:bg-stone-300",
-            isFilterDirty(filterState)
-              ? "text-slate-100 dark:text-slate-100 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 hover:text-slate-200 dark:hover:text-slate-200 active:bg-green-800 dark:active:bg-green-800 outline-green-600 dark:outline-green-700"
-              : "",
-          ),
-          triggerIcon: <FunnelIcon className="w-5" />,
-          showTextSearch: true,
-        }}
-      />
+        {snrHover && (
+          <SNRTooltip
+            pos={snrHover.pos}
+            snr={snrHover.snr}
+            from={snrHover.from}
+            to={snrHover.to}
+          />
+        )}
+      </BaseMap>
+      <div className="flex flex-col space-y-1 fixed top-35 right-2.5">
+        {myNode && hasPos(myNode?.position) && (
+          <button
+            type="button"
+            className={cn(
+              "rounded align-center",
+              "w-[29px] px-1 py-1 shadow-l outline-[2px] outline-stone-600/20",
+              "bg-stone-50 hover:bg-stone-200 dark:bg-stone-200 dark:hover:bg-stone-300 ",
+              "text-slate-600 hover:text-slate-700",
+              "dark:text-slate-600 hover:dark:text-slate-700",
+            )}
+            aria-label={t("mapMenu.locateAria")}
+            onClick={() => focusLngLat(toLngLat(myNode.position))}
+          >
+            {" "}
+            <LocateFixedIcon className="w-[21px]" />
+          </button>
+        )}
+
+        <FilterControl
+          filterState={filterState}
+          defaultFilterValues={defaultFilterValues}
+          setFilterState={setFilterState}
+          isDirty={isFilterDirty(filterState)}
+          parameters={{
+            popoverContentProps: {
+              side: "bottom",
+              align: "end",
+              sideOffset: 7,
+            },
+            popoverTriggerClassName: cn(
+              "w-[29px] px-1 py-1 rounded shadow-l outline-[2px] outline-stone-600/20 ",
+              "dark:text-slate-600 dark:hover:text-slate-700 bg-stone-50 hover:bg-stone-200 dark:bg-stone-200 dark:hover:bg-stone-300 dark:active:bg-stone-300",
+              isFilterDirty(filterState)
+                ? "text-slate-100 dark:text-slate-100 bg-green-600 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-700 hover:text-slate-200 dark:hover:text-slate-200 active:bg-green-800 dark:active:bg-green-800 outline-green-600 dark:outline-green-700"
+                : "",
+            ),
+            triggerIcon: <FunnelIcon className="w-[21px]" />,
+            showTextSearch: true,
+          }}
+        />
+
+        <MapLayerTool
+          visibilityState={visibilityState}
+          setVisibilityState={setVisibilityState}
+        />
+      </div>
     </PageLayout>
   );
 };

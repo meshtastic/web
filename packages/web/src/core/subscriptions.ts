@@ -51,8 +51,8 @@ export const subscribeAll = (
   });
 
   connection.events.onWaypointPacket.subscribe((waypoint) => {
-    const { data } = waypoint;
-    device.addWaypoint(data);
+    const { data, channel, from, rxTime } = waypoint;
+    device.addWaypoint(data, channel, from, rxTime);
   });
 
   connection.events.onMyNodeInfo.subscribe((nodeInfo) => {
@@ -126,6 +126,10 @@ export const subscribeAll = (
       device.setDialogOpen("clientNotification", true);
     },
   );
+
+  connection.events.onNeighborInfoPacket.subscribe((neighborInfo) => {
+    device.addNeighborInfo(neighborInfo.from, neighborInfo.data);
+  });
 
   connection.events.onRoutingPacket.subscribe((routingPacket) => {
     if (routingPacket.data.variant.case === "errorReason") {
