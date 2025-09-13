@@ -67,7 +67,7 @@ jobs:
           # Try to use latest release tag if it exists; fallback to package version; else date
           LATEST_TAG="$(gh release view --json tagName --jq .tagName 2>/dev/null || true)"
           if [ -z "$LATEST_TAG" ] && [ -f packages/web/package.json ]; then
-            LATEST_TAG="$(jq -r .version packages/web/package.json)"
+            LATEST_TAG="v$(jq -r .version packages/web/package.json)"
           fi
 
           if [ -n "${LATEST_TAG:-}" ] && [ "$LATEST_TAG" != "vnull" ]; then
