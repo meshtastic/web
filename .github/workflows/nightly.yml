@@ -53,7 +53,7 @@ jobs:
           path: packages/web/dist/build.tar
           if-no-files-found: error
 
-      - name: Determine nightly tag
+      - name: Compute tags and labels
         id: meta
         shell: bash
         env:
@@ -61,20 +61,27 @@ jobs:
         run: |
           set -euo pipefail
           DATE="$(date -u +%Y%m%d)"
+          ISO_CREATED="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           SHORTSHA="$(git rev-parse --short=12 HEAD)"
+
           # Try to use latest release tag if it exists; fallback to package version; else date
           LATEST_TAG="$(gh release view --json tagName --jq .tagName 2>/dev/null || true)"
           if [ -z "$LATEST_TAG" ] && [ -f packages/web/package.json ]; then
-            LATEST_TAG="v$(jq -r .version packages/web/package.json)"
+            LATEST_TAG="$(jq -r .version packages/web/package.json)"
           fi
-          if [ -n "$LATEST_TAG" ] && [ "$LATEST_TAG" != "vnull" ]; then
-            TAG="nightly-${LATEST_TAG}-${SHORTSHA}"
+
+          if [ -n "${LATEST_TAG:-}" ] && [ "$LATEST_TAG" != "vnull" ]; then
+            IMMUTABLE="nightly-${LATEST_TAG}-${SHORTSHA}"
           else
-            TAG="nightly-${DATE}-${SHORTSHA}"
+            IMMUTABLE="nightly-${DATE}-${SHORTSHA}"
           fi
-          echo "tag=$TAG"        >> "$GITHUB_OUTPUT"
-          echo "tags=nightly-$TAG" >> "$GITHUB_OUTPUT"
-          echo "Resolved nightly tags: nightly-$TAG"
+
+          # Outputs
+          echo "immutable_tag=${IMMUTABLE}"        >> "$GITHUB_OUTPUT"
+          echo "moving_tag=nightly"                >> "$GITHUB_OUTPUT"
+          echo "all_tags=nightly,${IMMUTABLE}"     >> "$GITHUB_OUTPUT"
+          echo "created=${ISO_CREATED}"            >> "$GITHUB_OUTPUT"
+          echo "Resolved tags: nightly and ${IMMUTABLE}"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -86,24 +93,26 @@ jobs:
           containerfiles: |
             ./packages/web/infra/Containerfile
           image: ${{ env.REGISTRY_IMAGE }}
-          tags: ${{ steps.meta.outputs.tag }}
+          tags: ${{ steps.meta.outputs.all_tags }}
           oci: true
           platforms: linux/amd64,linux/arm64
           labels: |
             org.opencontainers.image.source=${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.created }}
 
       - name: Push To GHCR
         id: push-to-registry
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-container.outputs.image }}
-          tags: ${{ steps.build-container.outputs.tags || steps.meta.outputs.tag }}
+          # Push the same tags used at build time:
+          tags: ${{ steps.meta.outputs.all_tags }}
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-
-      - name: Print image URL
-        run: echo "Image pushed to ${{ steps.push-to-registry.outputs.registry-paths }}"
+      - name: Print image URLs
+        run: |
+          echo "Moving tag:   ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.moving_tag }}"
+          echo "Immutable tag: ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.immutable_tag }}"
