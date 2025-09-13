@@ -75,20 +75,44 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Compute created timestamp & short SHA for labels/tags
+      - name: Compute meta
+        id: gen
+        shell: bash
+        run: |
+          echo "created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+          echo "shortsha=$(git rev-parse --short=12 HEAD)" >> "$GITHUB_OUTPUT"
+
+      # Build/tag matrix:
+      # - For release events: vX.Y.Z, semver helpers, and latest (only if NOT prerelease)
+      # - For prerelease events: vX.Y.Z and semver helpers (NO latest)
+      # - For manual runs:
+      #     * if tag_name set: that raw tag
+      #     * else: adhoc-<shortsha>
       - name: Docker metadata (tags & labels)
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY_IMAGE }}
+          labels: |
+            org.opencontainers.image.source=${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.gen.outputs.created }}
           tags: |
-            # For release events, use the release tag (e.g. v1.2.3)
+            # Full release (semantic tag)
             type=raw,value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
-            # For manual runs with a provided tag_name
-            type=raw,value=${{ inputs.tag_name }},enable=${{ github.event_name == 'workflow_dispatch' && inputs.tag_name != '' }}
-            # For manual runs without tag_name, fall back to adhoc-<shortsha>
-            type=sha,format=short,prefix=adhoc-,enable=${{ github.event_name == 'workflow_dispatch' && inputs.tag_name == '' }}
-            # Add "latest" only for full releases (not prereleases)
+            # Semver helpers (major, major.minor) for releases/prereleases
+            type=semver,pattern={{version}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' && github.event.release.prerelease == false }}
+            type=semver,pattern={{major}},value=${{ github.event.release.tag_name }},enable=${{ github.event_name == 'release' && github.event.release.prerelease == false }}
+            # Latest only for full releases (not prereleases)
             type=raw,value=latest,enable=${{ github.event_name == 'release' && github.event.release.prerelease == false }}
+            # Manual: provided tag_name
+            type=raw,value=${{ inputs.tag_name }},enable=${{ github.event_name == 'workflow_dispatch' && inputs.tag_name != '' }}
+            # Manual: fallback to adhoc-<shortsha>
+            type=raw,value=adhoc-${{ steps.gen.outputs.shortsha }},enable=${{ github.event_name == 'workflow_dispatch' && inputs.tag_name == '' }}
+            # Always add immutable sha tag for traceability
+            type=raw,value=sha-${{ steps.gen.outputs.shortsha }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -96,20 +120,41 @@ jobs:
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and (maybe) push image
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Push images for:
+      # - release (released or prereleased)
+      # - manual with a tag_name (adhoc builds can still be pushed by name)
+      - name: Build and push image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./packages/web/infra/Containerfile
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
+          push: ${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag_name != '') }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          provenance: false 
 
       - name: Output image refs
-        if: ${{ github.event_name == 'release' && github.event.release.prerelease == false }}
-        run: "echo \"🖼️ Pushed: ${{ steps.meta.outputs.tags }}\""
+        if: ${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag_name != '') }}
+        run: |
+          echo "🖼️ Pushed tags:"
+          echo "${{ steps.meta.outputs.tags }}"
+          echo
+          echo "Pull examples:"
+          if [[ "${{ github.event_name }}" == "release" && "${{ github.event.release.prerelease }}" == "false" ]]; then
+            echo "  docker pull ${{ env.REGISTRY_IMAGE }}:latest"
+          fi
+          # Always available:
+          echo "  docker pull ${{ env.REGISTRY_IMAGE }}:${{ github.event.release.tag_name || inputs.tag_name || format('adhoc-{0}', steps.gen.outputs.shortsha) }}"
+          echo "  docker pull ${{ env.REGISTRY_IMAGE }}:sha-${{ steps.gen.outputs.shortsha }}"
 
       - name: Explain no image push
-        if: ${{ !(github.event_name == 'release' && github.event.release.prerelease == false) }}
-        run: echo "ℹ️ No image pushed (prerelease or manual run)."
+        if: ${{ !(github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag_name != '')) }}
+        run: echo "ℹ️ No image pushed (manual run without tag_name)."
