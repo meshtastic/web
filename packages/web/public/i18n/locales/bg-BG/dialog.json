@@ -141,7 +141,7 @@
 		"title": "Рестартиране на устройството",
 		"description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
 		"ota": "Reboot into OTA mode",
-		"enterDelay": "Enter delay",
+		"enterDelay": "Въведете забавяне",
 		"scheduled": "Насрочено е рестартиране",
 		"schedule": "Планиране на рестартиране",
 		"now": "Рестартиране сега",
