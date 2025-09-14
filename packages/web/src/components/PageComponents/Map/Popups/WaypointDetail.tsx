@@ -145,15 +145,17 @@ export const WaypointDetail = ({
         }
         icon={<UserPenIcon size="14" />}
       />
-      {waypoint.lockedTo ? (
-        <RowElement
-          label={t("waypointDetail.lockedTo")}
-          value={
-            getNode(waypoint.lockedTo)?.user?.longName ?? t("unknown.longName")
-          }
-          icon={<UserLockIcon size="14" />}
-        />
-      ) : (
+      {
+        waypoint.lockedTo ? (
+          <RowElement
+            label={t("waypointDetail.lockedTo")}
+            value={
+              getNode(waypoint.lockedTo)?.user?.longName ??
+              t("unknown.longName")
+            }
+            icon={<UserLockIcon size="14" />}
+          />
+        ) : null /*(
         <div className="flex justify-end  ">
           <button
             type="button"
@@ -164,7 +166,8 @@ export const WaypointDetail = ({
             {t("waypointDetail.edit")}
           </button>
         </div>
-      )}
+      )*/
+      }
     </div>
   );
 };

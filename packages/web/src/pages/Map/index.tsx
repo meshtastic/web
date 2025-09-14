@@ -70,8 +70,6 @@ const MapPage = () => {
     () => defaultVisibilityState,
   );
 
-  //const myNode = useMemo(() => getMyNode(), [getMyNode]);
-
   // Filters
   const [filterState, setFilterState] = useState<FilterState>(
     () => defaultFilterValues,
