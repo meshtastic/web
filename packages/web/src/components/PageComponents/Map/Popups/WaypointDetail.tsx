@@ -13,7 +13,7 @@ import {
   ClockFadingIcon,
   ClockPlusIcon,
   CompassIcon,
-  Edit3Icon,
+  //Edit3Icon,
   MapPinnedIcon,
   MoveHorizontalIcon,
   NavigationIcon,
@@ -35,7 +35,7 @@ const RowElement: React.FC<{
   icon?: React.ReactNode;
 }> = ({ label, value, icon }) => (
   <div className="flex justify-between">
-    <span className="inline-flex items-center gap-2 text-slate-500 dark:text-slate-400">
+    <span className="inline-flex items-center gap-2 text-slate-500 dark:text-slate-500">
       {icon} {label}
     </span>
     <span className="inline-flex items-center gap-1">{value}</span>
@@ -45,7 +45,7 @@ const RowElement: React.FC<{
 export const WaypointDetail = ({
   waypoint,
   myNode,
-  onEdit,
+  //onEdit,
 }: WaypointDetailProps) => {
   const { t } = useTranslation("map");
   const { getNode } = useNodeDB();
@@ -64,9 +64,9 @@ export const WaypointDetail = ({
     : undefined;
 
   return (
-    <div className="flex flex-col gap-2 px-1 text-sm">
+    <div className="flex flex-col gap-2 px-1 text-sm dark:text-slate-900">
       <div className="flex items-center my-1 justify-between">
-        <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
+        <div className="flex items-center gap-2 font-semibold text-slate-900 ">
           {String.fromCodePoint(waypoint.icon) ?? "📍"}
           <span>{waypoint.name}</span>
         </div>
@@ -78,9 +78,9 @@ export const WaypointDetail = ({
           </span>
         </div>
       )}
-      <Separator />
+      <Separator className="dark:bg-slate-200" />
       <div className="flex justify-between">
-        <span className="inline-flex items-start gap-2 text-slate-500 dark:text-slate-400">
+        <span className="inline-flex items-start gap-2 text-slate-500 dark:text-slate-500">
           <MapPinnedIcon size="20" />
           <span>
             {t("waypointDetail.longitude")} {t("waypointDetail.latitude")}
@@ -105,11 +105,7 @@ export const WaypointDetail = ({
       {waypoint.expire !== 0 && (
         <RowElement
           label={t("waypointDetail.expires")}
-          value={
-            new Date(
-              waypoint.expire * 1000,
-            ).toLocaleString() /* TODO: create "TimeAhead" component or refactor TimeAgo to allow future dates */
-          }
+          value={<TimeAgo timestamp={waypoint.expire * 1000} />}
           icon={<ClockFadingIcon size="14" />}
         />
       )}
