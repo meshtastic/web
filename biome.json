@@ -3,9 +3,9 @@
     "includes": [
       "**/*.ts",
       "**/*.tsx",
-      "!npm_modules/**",
-      "!dist/**",
-      "!npm/**",
+      "!npm_modules",
+      "!dist",
+      "!npm",
       "**/*.json",
       "!**/locales/*-*/*.json"
     ],

@@ -13,7 +13,7 @@ export function convertIpAddressToInt(ip: string): number | undefined {
       .split(".")
       .reverse()
       .reduce((ipnum, octet) => {
-        return (ipnum << 8) + Number.parseInt(octet);
+        return (ipnum << 8) + Number.parseInt(octet, 10);
       }, 0) >>> 0
   );
 }

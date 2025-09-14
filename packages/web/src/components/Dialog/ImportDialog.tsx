@@ -84,7 +84,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
   }, [importDialogInput, t]);
 
   const apply = () => {
-    channelSet?.settings.map(
+    channelSet?.settings.forEach(
       (ch: Protobuf.Channel.ChannelSettings, index: number) => {
         if (importIndex[index] === -1) {
           return;
@@ -140,7 +140,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
 
   const onSelectChange = (value: string, index: number) => {
     const newImportIndex = [...importIndex];
-    newImportIndex[index] = Number.parseInt(value);
+    newImportIndex[index] = Number.parseInt(value, 10);
     setImportIndex(newImportIndex);
   };
 

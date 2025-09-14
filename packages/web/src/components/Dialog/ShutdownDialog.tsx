@@ -37,7 +37,7 @@ export const ShutdownDialog = ({ open, onOpenChange }: ShutdownDialogProps) => {
         <Input
           type="number"
           value={time}
-          onChange={(e) => setTime(Number.parseInt(e.target.value))}
+          onChange={(e) => setTime(Number.parseInt(e.target.value, 10))}
           suffix={t("unit.minute.plural")}
         />
         <Button className="w-24" onClick={handleScheduledShutdown}>

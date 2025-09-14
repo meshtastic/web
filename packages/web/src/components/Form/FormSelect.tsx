@@ -84,7 +84,7 @@ export function SelectInput<T extends FieldValues>({
     if (field.selectChange) {
       field.selectChange(newValue, selectedKey);
     }
-    onChange(Number.parseInt(newValue));
+    onChange(Number.parseInt(newValue, 10));
   };
 
   return (

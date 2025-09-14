@@ -244,7 +244,6 @@ export function FilterControl({
                   </label>
                   <Input
                     type="text"
-                    id="nodeName"
                     value={filterState.nodeName}
                     onChange={handleTextChange("nodeName")}
                     showClearButton

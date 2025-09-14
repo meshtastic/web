@@ -59,7 +59,6 @@ export const UnsafeRolesDialog = ({
         </DialogDescription>
         <div className="flex items-center gap-2">
           <Checkbox
-            id="routerRole"
             checked={confirmState}
             onChange={() => setConfirmState(!confirmState)}
             name="confirmUnderstanding"
