@@ -214,7 +214,6 @@ function generateNeighborLines(
     }
 
     if (pair.ab && pair.ba) {
-      console.debug("Both directions", pair);
       // both directions → two arcs
       const feat1 = makeFeature(pair.a, pair.b, aPos, bPos, pair.ab, true);
       const feat2 = makeFeature(pair.b, pair.a, bPos, aPos, pair.ba, true);
