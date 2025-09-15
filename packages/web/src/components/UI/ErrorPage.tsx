@@ -72,10 +72,7 @@ export function ErrorPage({ error }: { error: Error }) {
               <label htmlFor="message">
                 {t("errorPage.errorMessageLabel")}
               </label>
-              <p
-                id="message"
-                className="text-slate-400 break-words overflow-wrap"
-              >
+              <p className="text-slate-400 break-words overflow-wrap">
                 {error.message}
               </p>
             </> // TODO: Use Trans for the label and message together?
@@ -83,10 +80,7 @@ export function ErrorPage({ error }: { error: Error }) {
           {error?.stack && (
             <>
               <label htmlFor="stack">{t("errorPage.stackTraceLabel")}</label>
-              <p
-                id="stack"
-                className="text-slate-400 break-words overflow-wrap"
-              >
+              <p className="text-slate-400 break-words overflow-wrap">
                 {error.stack}
               </p>
             </>

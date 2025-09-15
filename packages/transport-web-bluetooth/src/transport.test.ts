@@ -14,7 +14,9 @@ class MiniEmitter {
     this.listeners.get(type)?.delete(listener);
   }
   dispatchEvent(event: Event) {
-    this.listeners.get(event.type)?.forEach((l) => l(event));
+    this.listeners.get(event.type)?.forEach((l) => {
+      l(event);
+    });
   }
 }
 

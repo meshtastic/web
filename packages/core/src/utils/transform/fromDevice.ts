@@ -14,7 +14,7 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
         byteBuffer = new Uint8Array([...byteBuffer, ...chunk]);
         let processingExhausted = false;
         while (byteBuffer.length !== 0 && !processingExhausted) {
-          const framingIndex = byteBuffer.findIndex((byte) => byte === 0x94);
+          const framingIndex = byteBuffer.indexOf(0x94);
           const framingByte2 = byteBuffer[framingIndex + 1];
           if (framingByte2 === 0xc3) {
             if (byteBuffer.subarray(0, framingIndex).length) {
@@ -35,9 +35,7 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
             ) {
               const packet = byteBuffer.subarray(4, 4 + (msb << 8) + lsb);
 
-              const malformedDetectorIndex = packet.findIndex(
-                (byte) => byte === 0x94,
-              );
+              const malformedDetectorIndex = packet.indexOf(0x94);
               if (
                 malformedDetectorIndex !== -1 &&
                 packet[malformedDetectorIndex + 1] === 0xc3

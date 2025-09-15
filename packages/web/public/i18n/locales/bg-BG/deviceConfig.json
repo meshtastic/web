@@ -231,8 +231,8 @@
 			"label": "SSID"
 		},
 		"subnet": {
-			"description": "Subnet Mask",
-			"label": "Subnet"
+			"description": "Подмрежова маска",
+			"label": "Подмрежа"
 		},
 		"wifiEnabled": {
 			"description": "Активиране или дезактивиране на WiFi радиото",
@@ -401,20 +401,20 @@
 			"label": "Публичен ключ"
 		},
 		"primaryAdminKey": {
-			"description": "The primary public key authorized to send admin messages to this node",
-			"label": "Primary Admin Key"
+			"description": "Основният публичен ключ, оторизиран за изпращане на администраторски съобщения до този възел",
+			"label": "Основен администраторски ключ"
 		},
 		"secondaryAdminKey": {
-			"description": "The secondary public key authorized to send admin messages to this node",
-			"label": "Secondary Admin Key"
+			"description": "Вторичният публичен ключ, оторизиран за изпращане на администраторски съобщения до този възел",
+			"label": "Вторичен администраторски ключ"
 		},
 		"serialOutputEnabled": {
 			"description": "Serial Console over the Stream API",
 			"label": "Serial Output Enabled"
 		},
 		"tertiaryAdminKey": {
-			"description": "The tertiary public key authorized to send admin messages to this node",
-			"label": "Tertiary Admin Key"
+			"description": "Третичният публичен ключ, оторизиран за изпращане на администраторски съобщения до този възел",
+			"label": "Третичен администраторски ключ"
 		},
 		"adminSettings": {
 			"description": "Настройки за Admin",

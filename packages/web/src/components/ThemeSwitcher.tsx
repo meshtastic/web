@@ -60,7 +60,6 @@ export default function ThemeSwitcher({
     <Button
       variant="ghost"
       onClick={toggleTheme}
-      id="theme-switcher"
       aria-label={t("theme.changeTheme")}
       className={cn(
         "group relative flex justify-start",

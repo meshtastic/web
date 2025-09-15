@@ -34,7 +34,7 @@ export const Dashboard = () => {
             {devices.map((device) => {
               const nodeDB = getNodeDB(device.id);
               if (!nodeDB) {
-                return;
+                return undefined;
               }
 
               return (
