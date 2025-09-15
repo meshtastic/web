@@ -1,3 +1,4 @@
+import { toast } from "@core/hooks/useToast.ts";
 import { useDevice, useMessages, useNodeDB } from "@core/stores";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
@@ -17,11 +18,19 @@ export const ResetNodeDbDialog = ({
   const { deleteAllMessages } = useMessages();
 
   const handleResetNodeDb = () => {
-    connection?.resetNodes().then(() => {
-      deleteAllMessages();
-      removeAllNodeErrors();
-      removeAllNodes(true);
-    });
+    connection
+      ?.resetNodes()
+      .catch((error) => {
+        toast({
+          title: t("resetNodeDb.failedTitle"),
+        });
+        console.error("Failed to reset Node DB:", error);
+      })
+      .finally(() => {
+        deleteAllMessages();
+        removeAllNodeErrors();
+        removeAllNodes(true);
+      });
   };
 
   return (

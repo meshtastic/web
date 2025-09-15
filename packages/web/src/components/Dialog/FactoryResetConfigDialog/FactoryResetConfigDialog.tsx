@@ -1,3 +1,4 @@
+import { toast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
@@ -15,7 +16,12 @@ export const FactoryResetConfigDialog = ({
   const { connection } = useDevice();
 
   const handleFactoryResetConfig = () => {
-    connection?.factoryResetConfig();
+    connection?.factoryResetConfig().catch((error) => {
+      toast({
+        title: t("factoryResetConfig.failedTitle"),
+      });
+      console.error("Failed to factory reset config:", error);
+    });
   };
 
   return (

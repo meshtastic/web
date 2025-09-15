@@ -1,3 +1,4 @@
+import { toast } from "@core/hooks/useToast.ts";
 import { useDevice, useMessages, useNodeDB } from "@core/stores";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
@@ -17,11 +18,19 @@ export const FactoryResetDeviceDialog = ({
   const { deleteAllMessages } = useMessages();
 
   const handleFactoryResetDevice = () => {
-    connection?.factoryResetDevice().then(() => {
-      deleteAllMessages();
-      removeAllNodeErrors();
-      removeAllNodes();
-    });
+    connection
+      ?.factoryResetDevice()
+      .catch((error) => {
+        toast({
+          title: t("factoryResetDevice.failedTitle"),
+        });
+        console.error("Failed to factory reset device:", error);
+      })
+      .finally(() => {
+        deleteAllMessages();
+        removeAllNodeErrors();
+        removeAllNodes();
+      });
   };
 
   return (
