@@ -45,7 +45,8 @@
     "label": "Debug",
     "command": {
       "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "clearAllStoredMessages": "Clear All Stored Messages",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }

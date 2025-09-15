@@ -194,5 +194,25 @@
     "title": "Client Notification",
     "TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
     "Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
+  },
+  "resetNodeDb": {
+    "title": "Reset Node Database",
+    "description": "This will clear all nodes from the connected device's node database and clear all message history in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Reset Node Database"
+  },
+  "clearAllStores": {
+    "title": "Clear All Local Storage",
+    "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
+    "confirm": "Clear all local storage"
+  },
+  "factoryResetDevice": {
+    "title": "Factory Reset Device",
+    "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Factory Reset Device"
+  },
+  "factoryResetConfig": {
+    "title": "Factory Reset Config",
+    "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Factory Reset Config"
   }
 }
