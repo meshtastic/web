@@ -148,7 +148,7 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
   };
 
   const selectChangeEvent = (e: string) => {
-    const count = Number.parseInt(e);
+    const count = Number.parseInt(e, 10);
     if (!Number.isNaN(count)) {
       setBytes(count);
       trigger("settings.psk");

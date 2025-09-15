@@ -43,7 +43,6 @@ export const ManagedModeDialog = ({
         </DialogHeader>
         <div className="flex items-center gap-2">
           <Checkbox
-            id="managedMode"
             checked={confirmState}
             onChange={() => setConfirmState(!confirmState)}
             name="confirmUnderstanding"

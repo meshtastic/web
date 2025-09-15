@@ -122,11 +122,15 @@ const ConfigPage = () => {
         await connection?.commitEditSettings();
       }
 
-      workingChannelConfig.forEach((newChannel) => addChannel(newChannel));
-      workingConfig.forEach((newConfig) => setConfig(newConfig));
-      workingModuleConfig.forEach((newModuleConfig) =>
-        setModuleConfig(newModuleConfig),
-      );
+      workingChannelConfig.forEach((newChannel) => {
+        addChannel(newChannel);
+      });
+      workingConfig.forEach((newConfig) => {
+        setConfig(newConfig);
+      });
+      workingModuleConfig.forEach((newModuleConfig) => {
+        setModuleConfig(newModuleConfig);
+      });
 
       removeWorkingChannelConfig();
       removeWorkingConfig();
