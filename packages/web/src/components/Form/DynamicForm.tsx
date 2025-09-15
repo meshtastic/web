@@ -90,7 +90,6 @@ export function DynamicForm<T extends FieldValues>({
       ? createZodResolver(validationSchema)
       : undefined,
     shouldFocusError: false,
-    shouldUnregister: true,
     resetOptions: { keepDefaultValues: true },
     values,
   });
