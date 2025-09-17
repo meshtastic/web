@@ -26,23 +26,6 @@ vi.mock("@core/stores", () => ({
   }),
 }));
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
-      switch (key) {
-        case "resetNodeDb.title":
-          return "Reset Node DB";
-        case "resetNodeDb.description":
-          return "This will reset the device NodeDB and clear local data.";
-        case "resetNodeDb.confirm":
-          return "Reset NodeDB";
-        default:
-          return key;
-      }
-    },
-  }),
-}));
-
 describe("ResetNodeDbDialog", () => {
   const mockOnOpenChange = vi.fn();
 
@@ -65,7 +48,9 @@ describe("ResetNodeDbDialog", () => {
     );
 
     render(<ResetNodeDbDialog open onOpenChange={mockOnOpenChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Reset NodeDB" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Reset Node Database" }),
+    );
 
     // Called immediately
     expect(mockResetNodes).toHaveBeenCalledTimes(1);
@@ -95,7 +80,7 @@ describe("ResetNodeDbDialog", () => {
 
   it("calls onOpenChange(false) and does not call resetNodes when cancel is clicked", async () => {
     render(<ResetNodeDbDialog open onOpenChange={mockOnOpenChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "button.cancel" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     await waitFor(() => {
       expect(mockOnOpenChange).toHaveBeenCalledTimes(1);

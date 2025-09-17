@@ -20,16 +20,16 @@ export const ResetNodeDbDialog = ({
   const handleResetNodeDb = () => {
     connection
       ?.resetNodes()
+      .then(() => {
+        deleteAllMessages();
+        removeAllNodeErrors();
+        removeAllNodes(true);
+      })
       .catch((error) => {
         toast({
           title: t("resetNodeDb.failedTitle"),
         });
         console.error("Failed to reset Node DB:", error);
-      })
-      .finally(() => {
-        deleteAllMessages();
-        removeAllNodeErrors();
-        removeAllNodes(true);
       });
   };
 

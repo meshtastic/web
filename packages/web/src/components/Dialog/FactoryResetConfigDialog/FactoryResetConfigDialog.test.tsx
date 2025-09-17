@@ -20,25 +20,6 @@ vi.mock("@core/hooks/useToast.ts", () => ({
   toast: (...args: unknown[]) => mockToast(...args),
 }));
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
-      switch (key) {
-        case "factoryResetConfig.title":
-          return "Factory Reset Config";
-        case "factoryResetConfig.description":
-          return "This will reset device configuration to factory defaults.";
-        case "factoryResetConfig.confirm":
-          return "Factory Reset";
-        case "factoryResetConfig.failedTitle":
-          return "Reset failed";
-        default:
-          return key; // e.g. "button.cancel"
-      }
-    },
-  }),
-}));
-
 describe("FactoryResetConfigDialog", () => {
   const mockOnOpenChange = vi.fn();
 
@@ -52,7 +33,9 @@ describe("FactoryResetConfigDialog", () => {
   it("calls factoryResetConfig and then closes the dialog on confirm", async () => {
     render(<FactoryResetConfigDialog open onOpenChange={mockOnOpenChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Factory Reset" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Factory Reset Config" }),
+    );
 
     expect(mockFactoryReset).toHaveBeenCalledTimes(1);
 
@@ -68,7 +51,7 @@ describe("FactoryResetConfigDialog", () => {
   it("calls onOpenChange(false) and does not call factoryResetConfig when cancel is clicked", async () => {
     render(<FactoryResetConfigDialog open onOpenChange={mockOnOpenChange} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "button.cancel" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     await waitFor(() => {
       expect(mockOnOpenChange).toHaveBeenCalledTimes(1);

@@ -25,7 +25,6 @@ import {
   EraserIcon,
   FactoryIcon,
   HardDriveUpload,
-  LayersIcon,
   LinkIcon,
   type LucideIcon,
   MapIcon,
@@ -105,13 +104,6 @@ export const CommandPalette = () => {
             navigate({ to: "/config" });
           },
           tags: ["settings"],
-        },
-        {
-          label: t("goto.command.channels"),
-          icon: LayersIcon,
-          action() {
-            navigate({ to: "/channels" });
-          },
         },
         {
           label: t("goto.command.nodes"),

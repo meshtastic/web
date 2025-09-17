@@ -11,23 +11,6 @@ vi.mock("@core/stores", () => ({
   clearAllStores: () => mockClearAllStores(),
 }));
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
-      switch (key) {
-        case "clearAllStores.title":
-          return "Clear All Data";
-        case "clearAllStores.description":
-          return "This will erase all data.";
-        case "clearAllStores.confirm":
-          return "Clear Everything";
-        default:
-          return key;
-      }
-    },
-  }),
-}));
-
 describe("ClearAllStoresDialog", () => {
   const mockOnOpenChange = vi.fn();
 
@@ -64,7 +47,9 @@ describe("ClearAllStoresDialog", () => {
 
   it("calls clearAllStores and navigates to '/' when confirm is clicked", () => {
     render(<ClearAllStoresDialog open onOpenChange={mockOnOpenChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Clear Everything" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Clear all local storage" }),
+    );
 
     expect(mockClearAllStores).toHaveBeenCalledTimes(1);
     expect(assignedHref).toBe("/"); // forced reload target
@@ -74,7 +59,7 @@ describe("ClearAllStoresDialog", () => {
 
   it("calls onOpenChange with false when cancel is clicked", () => {
     render(<ClearAllStoresDialog open onOpenChange={mockOnOpenChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "button.cancel" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     expect(mockClearAllStores).not.toHaveBeenCalled();
     expect(assignedHref).toBeUndefined(); // no navigation

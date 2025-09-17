@@ -20,16 +20,16 @@ export const FactoryResetDeviceDialog = ({
   const handleFactoryResetDevice = () => {
     connection
       ?.factoryResetDevice()
+      .then(() => {
+        deleteAllMessages();
+        removeAllNodeErrors();
+        removeAllNodes();
+      })
       .catch((error) => {
         toast({
           title: t("factoryResetDevice.failedTitle"),
         });
         console.error("Failed to factory reset device:", error);
-      })
-      .finally(() => {
-        deleteAllMessages();
-        removeAllNodeErrors();
-        removeAllNodes();
       });
   };
 

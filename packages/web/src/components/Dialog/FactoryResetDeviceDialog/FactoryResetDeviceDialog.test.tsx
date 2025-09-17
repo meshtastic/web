@@ -26,23 +26,6 @@ vi.mock("@core/stores", () => ({
   }),
 }));
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
-      switch (key) {
-        case "factoryResetDevice.title":
-          return "Factory Reset Device";
-        case "factoryResetDevice.description":
-          return "This will reset the device and clear local data.";
-        case "factoryResetDevice.confirm":
-          return "Reset Device";
-        default:
-          return key;
-      }
-    },
-  }),
-}));
-
 describe("FactoryResetDeviceDialog", () => {
   const mockOnOpenChange = vi.fn();
 
@@ -65,7 +48,9 @@ describe("FactoryResetDeviceDialog", () => {
     );
 
     render(<FactoryResetDeviceDialog open onOpenChange={mockOnOpenChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Reset Device" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Factory Reset Device" }),
+    );
 
     // Called immediately
     expect(mockFactoryResetDevice).toHaveBeenCalledTimes(1);
@@ -94,7 +79,7 @@ describe("FactoryResetDeviceDialog", () => {
 
   it("calls onOpenChange(false) and does not call factoryResetDevice when cancel is clicked", async () => {
     render(<FactoryResetDeviceDialog open onOpenChange={mockOnOpenChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "button.cancel" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     await waitFor(() => {
       expect(mockOnOpenChange).toHaveBeenCalledTimes(1);
