@@ -165,6 +165,21 @@ function makeFeature(
   };
 }
 
+function pushIfFeature(
+  a: number,
+  b: number,
+  aPos: LngLat,
+  bPos: LngLat,
+  snr: number,
+  curved: boolean,
+  features: Feature[],
+) {
+  const feat = makeFeature(a, b, aPos, bPos, snr, curved);
+  if (feat) {
+    features.push(feat);
+  }
+}
+
 function generateNeighborLines(
   neighborInfos: NeighborInfos[],
 ): FeatureCollection {
@@ -215,26 +230,15 @@ function generateNeighborLines(
 
     if (pair.ab && pair.ba) {
       // both directions → two arcs
-      const feat1 = makeFeature(pair.a, pair.b, aPos, bPos, pair.ab, true);
-      const feat2 = makeFeature(pair.b, pair.a, bPos, aPos, pair.ba, true);
-
-      if (feat1) {
-        features.push(feat1);
+      pushIfFeature(pair.a, pair.b, aPos, bPos, pair.ab, true, features);
+      pushIfFeature(pair.b, pair.a, bPos, aPos, pair.ba, true, features);
+    } else {
+      // only one direction → straight
+      if (pair.ab) {
+        pushIfFeature(pair.a, pair.b, aPos, bPos, pair.ab, false, features);
       }
-      if (feat2) {
-        features.push(feat2);
-      }
-    } else if (pair.ab) {
-      // only a->b, straight
-      const feat = makeFeature(pair.a, pair.b, aPos, bPos, pair.ab, false);
-      if (feat) {
-        features.push(feat);
-      }
-    } else if (pair.ba) {
-      // only b->a, straight
-      const feat = makeFeature(pair.b, pair.a, bPos, aPos, pair.ba, false);
-      if (feat) {
-        features.push(feat);
+      if (pair.ba) {
+        pushIfFeature(pair.b, pair.a, bPos, aPos, pair.ba, false, features);
       }
     }
   }

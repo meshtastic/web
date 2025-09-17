@@ -83,7 +83,7 @@ export const NodesLayer = ({
       : undefined;
 
     // Always render all node markers in the cluster
-    nodes.forEach((node, i) => {
+    for (const [i, node] of nodes.entries()) {
       const isHead = i === 0;
 
       rendered.push(
@@ -109,7 +109,7 @@ export const NodesLayer = ({
           }}
         />,
       );
-    });
+    }
 
     if (nodes.length > 1) {
       rendered.push(

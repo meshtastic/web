@@ -66,7 +66,8 @@
     "year": { "one": "Year", "plural": "Years" },
     "snr": "SNR",
     "volt": { "one": "Volt", "plural": "Volts", "suffix": "V" },
-    "record": { "one": "Records", "plural": "Records" }
+    "record": { "one": "Records", "plural": "Records" },
+    "degree": { "one": "Degree", "plural": "Degrees", "suffix": "°" }
   },
   "security": {
     "0bit": "Empty",

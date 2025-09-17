@@ -13,13 +13,11 @@ import {
   ClockFadingIcon,
   ClockPlusIcon,
   CompassIcon,
-  //Edit3Icon,
   MapPinnedIcon,
   MoveHorizontalIcon,
   NavigationIcon,
   RotateCwIcon,
   UserLockIcon,
-  UserPenIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -29,24 +27,7 @@ interface WaypointDetailProps {
   onEdit: () => void;
 }
 
-const RowElement: React.FC<{
-  label: string;
-  value: React.ReactNode | string | number | undefined;
-  icon?: React.ReactNode;
-}> = ({ label, value, icon }) => (
-  <div className="flex justify-between">
-    <span className="inline-flex items-center gap-2 text-slate-500 dark:text-slate-500">
-      {icon} {label}
-    </span>
-    <span className="inline-flex items-center gap-1">{value}</span>
-  </div>
-);
-
-export const WaypointDetail = ({
-  waypoint,
-  myNode,
-  //onEdit,
-}: WaypointDetailProps) => {
+export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
   const { t } = useTranslation("map");
   const { getNode } = useNodeDB();
 
@@ -64,106 +45,147 @@ export const WaypointDetail = ({
     : undefined;
 
   return (
-    <div className="flex flex-col gap-2 px-1 text-sm dark:text-slate-900">
-      <div className="flex items-center my-1 justify-between">
-        <div className="flex items-center gap-2 font-semibold text-slate-900 ">
-          {String.fromCodePoint(waypoint.icon) ?? "📍"}
+    <article
+      aria-labelledby={`wp-${waypoint.id}-title`}
+      className="flex flex-col gap-2 px-1 text-sm dark:text-slate-900"
+    >
+      <header className="flex items-center my-1 justify-between">
+        <h3
+          id={`wp-${waypoint.id}-title`}
+          className="flex items-center gap-2 font-semibold text-slate-900"
+        >
+          <span aria-hidden>{String.fromCodePoint(waypoint.icon) ?? "📍"}</span>
           <span>{waypoint.name}</span>
-        </div>
-      </div>
+        </h3>
+      </header>
+
       {waypoint.description && (
-        <div>
-          <span className="inline-flex items-center gap-1">
-            {waypoint.description}
-          </span>
-        </div>
+        <p className="inline-flex items-center gap-1">{waypoint.description}</p>
       )}
-      <Separator className="dark:bg-slate-200" />
-      <div className="flex justify-between">
-        <span className="inline-flex items-start gap-2 text-slate-500 dark:text-slate-500">
-          <MapPinnedIcon size="20" />
-          <span>
-            {t("waypointDetail.longitude")} {t("waypointDetail.latitude")}
-          </span>
-        </span>
-        <span className="text-right">
-          {waypointLngLat[0]} {waypointLngLat[1]}
-        </span>
-      </div>
-      <RowElement
-        label={t("waypointDetail.createdDate")}
-        value={<TimeAgo timestamp={waypoint.metadata.created} />}
-        icon={<ClockPlusIcon size="14" />}
-      />
-      {waypoint.metadata.updated && (
-        <RowElement
-          label={t("waypointDetail.updated")}
-          value={<TimeAgo timestamp={waypoint.metadata.updated} />}
-          icon={<RotateCwIcon size="14" />}
-        />
-      )}
-      {waypoint.expire !== 0 && (
-        <RowElement
-          label={t("waypointDetail.expires")}
-          value={<TimeAgo timestamp={waypoint.expire * 1000} />}
-          icon={<ClockFadingIcon size="14" />}
-        />
-      )}
-      {distance && (
-        <RowElement
-          label={t("waypointDetail.distance")}
-          value={`${Math.round(distance)} ${distance === 1 ? t("unit.meter.one") : t("unit.meter.plural")}`}
-          icon={<MoveHorizontalIcon size="14" />}
-        />
-      )}
-      {bearing && (
-        <RowElement
-          label={t("waypointDetail.bearing")}
-          value={
-            <>
-              <NavigationIcon
-                size="16"
-                aria-hidden
-                className="shrink-0 origin-center transition-transform"
-                style={{ transform: `rotate(${bearing - 45}deg)` }}
-              />
-              {Math.round(bearing)}°
-            </>
-          }
-          icon={<CompassIcon size="14" />}
-        />
-      )}
-      <RowElement
-        label={t("waypointDetail.createdBy")}
-        value={
-          getNode(waypoint.metadata.from)?.user?.longName ??
-          t("unknown.longName")
-        }
-        icon={<UserPenIcon size="14" />}
-      />
-      {
-        waypoint.lockedTo ? (
-          <RowElement
-            label={t("waypointDetail.lockedTo")}
-            value={
-              getNode(waypoint.lockedTo)?.user?.longName ??
-              t("unknown.longName")
-            }
-            icon={<UserLockIcon size="14" />}
-          />
-        ) : null /*(
-        <div className="flex justify-end  ">
-          <button
-            type="button"
-            onClick={onEdit}
-            className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
-          >
-            <Edit3Icon className="h-4 w-4" />
-            {t("waypointDetail.edit")}
-          </button>
-        </div>
-      )*/
-      }
-    </div>
+
+      <Separator className="dark:bg-slate-200" role="separator" />
+
+      <section aria-label={t("waypointDetail.details")}>
+        <dl className="space-y-1.5">
+          {/* Coordinates */}
+          <div className="flex flex-wrap items-start gap-x-3">
+            <dt className="inline-flex items-top gap-2 text-slate-500 min-w-0">
+              <MapPinnedIcon size={14} aria-hidden className="mt-1" />
+              <span className="truncate">
+                {t("waypointDetail.longitude")}
+                <br />
+                {t("waypointDetail.latitude")}
+              </span>
+            </dt>
+            <dd className="ms-auto text-right">
+              <data value={waypointLngLat[0]}>{waypointLngLat[0]}</data>
+              <br />
+              <data value={waypointLngLat[1]}>{waypointLngLat[1]}</data>
+            </dd>
+          </div>
+
+          {/* Created */}
+          <div className="flex flex-wrap items-start gap-x-3">
+            <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
+              <ClockPlusIcon size={14} aria-hidden />
+              <span className="truncate">
+                {t("waypointDetail.createdDate")}
+              </span>
+            </dt>
+            <dd className="ms-auto text-right">
+              <time
+                dateTime={new Date(waypoint.metadata.created).toISOString()}
+              >
+                <TimeAgo timestamp={waypoint.metadata.created} />
+              </time>
+            </dd>
+          </div>
+
+          {/* Updated */}
+          {waypoint.metadata.updated && (
+            <div className="flex flex-wrap items-start gap-x-3">
+              <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
+                <RotateCwIcon size={14} aria-hidden />
+                <span className="truncate">{t("waypointDetail.updated")}</span>
+              </dt>
+              <dd className="ms-auto text-right">
+                <time
+                  dateTime={new Date(waypoint.metadata.updated).toISOString()}
+                >
+                  <TimeAgo timestamp={waypoint.metadata.updated} />
+                </time>
+              </dd>
+            </div>
+          )}
+
+          {/* Expires */}
+          {waypoint.expire !== 0 && (
+            <div className="flex flex-wrap items-start gap-x-3">
+              <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
+                <ClockFadingIcon size={14} aria-hidden />
+                <span className="truncate">{t("waypointDetail.expires")}</span>
+              </dt>
+              <dd className="ms-auto text-right">
+                <time dateTime={new Date(waypoint.expire * 1000).toISOString()}>
+                  <TimeAgo timestamp={waypoint.expire * 1000} />
+                </time>
+              </dd>
+            </div>
+          )}
+
+          {/* Distance */}
+          {distance != null && (
+            <div className="flex flex-wrap items-start gap-x-3">
+              <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
+                <MoveHorizontalIcon size={14} aria-hidden />
+                <span className="truncate">{t("waypointDetail.distance")}</span>
+              </dt>
+              <dd className="ms-auto text-right">
+                <data value={Math.round(distance)}>
+                  {Math.round(distance)}{" "}
+                  {distance === 1
+                    ? t("unit.meter.one")
+                    : t("unit.meter.plural")}
+                </data>
+              </dd>
+            </div>
+          )}
+
+          {/* Bearing */}
+          {bearing != null && (
+            <div className="flex flex-wrap items-start gap-x-3">
+              <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
+                <CompassIcon size={14} aria-hidden />
+                <span className="truncate">{t("waypointDetail.bearing")}</span>
+              </dt>
+              <dd className="ms-auto text-right inline-flex items-center ">
+                <NavigationIcon
+                  size={16}
+                  aria-hidden
+                  className="shrink-0 origin-center transition-transform mr-2"
+                  style={{ transform: `rotate(${bearing - 45}deg)` }}
+                />
+                <data value={Math.round(bearing)}>{Math.round(bearing)}</data>
+                <span aria-hidden>{t("unit.degree.suffix")}</span>
+              </dd>
+            </div>
+          )}
+
+          {/* Locked To */}
+          {waypoint.lockedTo && (
+            <div className="flex flex-wrap items-start gap-x-3">
+              <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
+                <UserLockIcon size={14} aria-hidden />
+                <span className="truncate">{t("waypointDetail.lockedTo")}</span>
+              </dt>
+              <dd className="ms-auto text-right">
+                {getNode(waypoint.lockedTo)?.user?.longName ??
+                  t("unknown.longName")}
+              </dd>
+            </div>
+          )}
+        </dl>
+      </section>
+    </article>
   );
 };

@@ -49,7 +49,7 @@ export const WaypointLayer = ({
     return rendered;
   }
 
-  waypoints.forEach((waypoint) => {
+  for (const waypoint of waypoints) {
     const [lng, lat] = toLngLat({
       latitudeI: waypoint.latitudeI,
       longitudeI: waypoint.longitudeI,
@@ -66,7 +66,7 @@ export const WaypointLayer = ({
         onClick={(_, e) => onMarkerClick(waypoint, e)}
       />,
     );
-  });
+  }
 
   if (popupState?.type === "waypoint") {
     const [lng, lat] = toLngLat({
