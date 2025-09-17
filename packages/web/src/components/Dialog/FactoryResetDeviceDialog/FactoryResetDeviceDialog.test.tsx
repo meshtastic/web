@@ -1,29 +1,41 @@
-// FactoryResetDeviceDialog.test.tsx
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FactoryResetDeviceDialog } from "./FactoryResetDeviceDialog.tsx";
 
 const mockFactoryResetDevice = vi.fn();
-const mockDeleteAllMessages = vi.fn();
-const mockRemoveAllNodeErrors = vi.fn();
-const mockRemoveAllNodes = vi.fn();
+const mockRemoveDevice = vi.fn();
+const mockRemoveMessageStore = vi.fn();
+const mockRemoveNodeDB = vi.fn();
+const mockToast = vi.fn();
 
-vi.mock("@core/stores", () => ({
-  CurrentDeviceContext: {
-    _currentValue: { deviceId: 1234 },
-  },
-  useDevice: () => ({
-    connection: {
-      factoryResetDevice: mockFactoryResetDevice,
+vi.mock("@core/stores", () => {
+  // Make each store a callable fn (like a Zustand hook), and attach .getState()
+  const useDeviceStore = Object.assign(vi.fn(), {
+    getState: () => ({ removeDevice: mockRemoveDevice }),
+  });
+  const useMessageStore = Object.assign(vi.fn(), {
+    getState: () => ({ removeMessageStore: mockRemoveMessageStore }),
+  });
+  const useNodeDBStore = Object.assign(vi.fn(), {
+    getState: () => ({ removeNodeDB: mockRemoveNodeDB }),
+  });
+
+  return {
+    CurrentDeviceContext: {
+      _currentValue: { deviceId: 1234 },
     },
-  }),
-  useMessages: () => ({
-    deleteAllMessages: mockDeleteAllMessages,
-  }),
-  useNodeDB: () => ({
-    removeAllNodeErrors: mockRemoveAllNodeErrors,
-    removeAllNodes: mockRemoveAllNodes,
-  }),
+    useDevice: () => ({
+      id: 42,
+      connection: { factoryResetDevice: mockFactoryResetDevice },
+    }),
+    useDeviceStore,
+    useMessageStore,
+    useNodeDBStore,
+  };
+});
+
+vi.mock("@core/hooks/useToast.ts", () => ({
+  toast: (...args: unknown[]) => mockToast(...args),
 }));
 
 describe("FactoryResetDeviceDialog", () => {
@@ -31,10 +43,11 @@ describe("FactoryResetDeviceDialog", () => {
 
   beforeEach(() => {
     mockOnOpenChange.mockClear();
-    mockFactoryResetDevice.mockClear();
-    mockDeleteAllMessages.mockClear();
-    mockRemoveAllNodeErrors.mockClear();
-    mockRemoveAllNodes.mockClear();
+    mockFactoryResetDevice.mockReset();
+    mockRemoveDevice.mockClear();
+    mockRemoveMessageStore.mockClear();
+    mockRemoveNodeDB.mockClear();
+    mockToast.mockClear();
   });
 
   it("calls factoryResetDevice, closes dialog, and after reset resolves clears messages and node DB", async () => {
@@ -61,20 +74,12 @@ describe("FactoryResetDeviceDialog", () => {
       expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     });
 
-    // Nothing else should have happened yet (the promise hasn't resolved)
-    expect(mockDeleteAllMessages).not.toHaveBeenCalled();
-    expect(mockRemoveAllNodeErrors).not.toHaveBeenCalled();
-    expect(mockRemoveAllNodes).not.toHaveBeenCalled();
-
     // Resolve the reset
     resolveReset?.();
 
-    // Now the .then() chain should fire
-    await waitFor(() => {
-      expect(mockDeleteAllMessages).toHaveBeenCalledTimes(1);
-      expect(mockRemoveAllNodeErrors).toHaveBeenCalledTimes(1);
-      expect(mockRemoveAllNodes).toHaveBeenCalledTimes(1);
-    });
+    expect(mockRemoveDevice).toHaveBeenCalledTimes(1);
+    expect(mockRemoveMessageStore).toHaveBeenCalledTimes(1);
+    expect(mockRemoveNodeDB).toHaveBeenCalledTimes(1);
   });
 
   it("calls onOpenChange(false) and does not call factoryResetDevice when cancel is clicked", async () => {
@@ -87,8 +92,8 @@ describe("FactoryResetDeviceDialog", () => {
     });
 
     expect(mockFactoryResetDevice).not.toHaveBeenCalled();
-    expect(mockDeleteAllMessages).not.toHaveBeenCalled();
-    expect(mockRemoveAllNodeErrors).not.toHaveBeenCalled();
-    expect(mockRemoveAllNodes).not.toHaveBeenCalled();
+    expect(mockRemoveDevice).not.toHaveBeenCalled();
+    expect(mockRemoveMessageStore).not.toHaveBeenCalled();
+    expect(mockRemoveNodeDB).not.toHaveBeenCalled();
   });
 });

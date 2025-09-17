@@ -14,6 +14,7 @@ import type { Device } from "./index.ts";
  */
 export const mockDeviceStore: Device = {
   id: 0,
+  myNodeNum: 123456,
   status: 5 as const,
   channels: new Map(),
   config: {} as Protobuf.LocalOnly.LocalConfig,

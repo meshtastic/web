@@ -1,14 +1,24 @@
-export function evictOldestEntries<K, V>(
-  map: Map<K, V>,
+export function evictOldestEntries<T>(arr: T[], maxSize: number): void;
+export function evictOldestEntries<K, V>(map: Map<K, V>, maxSize: number): void;
+
+export function evictOldestEntries<T, K, V>(
+  collection: T[] | Map<K, V>,
   maxSize: number,
 ): void {
-  // while loop in case maxSize is ever changed to be lower, to trim all the way down
-  while (map.size > maxSize) {
-    const firstKey = map.keys().next().value; // maps keep insertion order, so this is oldest
-    if (firstKey !== undefined) {
-      map.delete(firstKey);
-    } else {
-      break; // should not happen, but just in case
+  if (Array.isArray(collection)) {
+    // Trim array from the front (assuming oldest entries are at the start)
+    while (collection.length > maxSize) {
+      collection.shift();
+    }
+  } else if (collection instanceof Map) {
+    // Trim map by insertion order
+    while (collection.size > maxSize) {
+      const firstKey = collection.keys().next().value;
+      if (firstKey !== undefined) {
+        collection.delete(firstKey);
+      } else {
+        break;
+      }
     }
   }
 }
