@@ -346,7 +346,7 @@ export const MessagesPage = () => {
       <div className="flex flex-1 flex-col overflow-hidden">
         {renderChatContent()}
 
-        <div className="flex-none dark:bg-slate-900 p-2">
+        <div className="flex-none  p-2">
           {isBroadcast || isDirect ? (
             <MessageInput
               to={isDirect ? numericChatId : MessageType.Broadcast}

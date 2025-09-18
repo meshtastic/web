@@ -1,11 +1,11 @@
-import { getColorFromText, isLightColor } from "@app/core/utils/color";
 import {
   Tooltip,
   TooltipArrow,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@components/UI/Tooltip.tsx";
+} from "@app/components/UI/tooltip";
+import { getColorFromText, isLightColor } from "@app/core/utils/color";
 import { cn } from "@core/utils/cn.ts";
 import { LockKeyholeOpenIcon, StarIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";

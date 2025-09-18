@@ -1,31 +1,30 @@
-import { cn } from "@core/utils/cn.ts";
+import { cn } from "@app/lib/utils";
+import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-slate-400 disabled:cursor-not-allowed dark:focus:ring-offset-slate-900 cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
         default:
-          "bg-slate-900 text-white dark:bg-slate-50 hover:dark:bg-slate-200 dark:text-slate-900 hover:bg-slate-500",
+          "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
         destructive:
-          "bg-red-500 text-white hover:bg-red-600 dark:hover:bg-red-600",
-        success:
-          "bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600",
+          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
-          "bg-transparent border border-slate-400 hover:text-slate-400 dark:hover:text-slate-300 dark:border-slate-400 dark:text-slate-100 ",
-        subtle:
-          "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-500 dark:text-white dark:hover:bg-slate-400",
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
         ghost:
-          "bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-100 dark:hover:text-slate-100 data-[state=open]:bg-transparent dark:data-[state=open]:bg-transparent",
-        link: "bg-transparent underline-offset-4 hover:underline text-slate-900 dark:text-slate-100 hover:bg-transparent dark:hover:bg-transparent",
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 py-2 px-4",
-        sm: "h-9 px-2 rounded-md",
-        lg: "h-11 px-8 rounded-md",
-        icon: "h-10 w-10",
+        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-9",
       },
     },
     defaultVariants: {
@@ -35,45 +34,25 @@ const buttonVariants = cva(
   },
 );
 
-export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
-
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  icon?: React.ReactNode;
-  iconAlignment?: "left" | "right";
-}
-
-const Button = ({
+function Button({
   className,
   variant,
   size,
-  disabled,
-  icon,
-  iconAlignment = "left",
-  children,
+  asChild = false,
   ...props
-}: ButtonProps) => {
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+  }) {
+  const Comp = asChild ? Slot : "button";
+
   return (
-    <button
-      type="button"
-      className={cn(
-        buttonVariants({ variant, size, className }),
-        { "cursor-not-allowed": disabled },
-        "inline-flex items-center",
-      )}
-      disabled={disabled}
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
       {...props}
-    >
-      {icon && iconAlignment === "left" && (
-        <span className={cn({ "mr-2": !!children })}>{icon}</span>
-      )}
-      {children}
-      {icon && iconAlignment === "right" && (
-        <span className={cn({ "ml-2": !!children })}>{icon}</span>
-      )}
-    </button>
+    />
   );
-};
+}
 
 export { Button, buttonVariants };

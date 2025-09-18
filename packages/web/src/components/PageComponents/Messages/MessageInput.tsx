@@ -75,6 +75,7 @@ export const MessageInput = ({ onSend, to, maxBytes }: MessageInputProps) => {
 
           <Button type="submit" variant="default">
             <SendIcon size={16} />
+            <span className="sr-only">Send message</span>
           </Button>
         </div>
       </form>

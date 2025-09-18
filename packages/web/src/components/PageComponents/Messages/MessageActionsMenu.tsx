@@ -4,7 +4,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@components/UI/Tooltip.tsx";
+} from "@app/components/UI/tooltip";
 import { cn } from "@core/utils/cn.ts";
 import { Reply, SmilePlus } from "lucide-react";
 import { useTranslation } from "react-i18next";

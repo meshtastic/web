@@ -67,7 +67,8 @@ const CollapseToggleButton = () => {
 };
 
 export const Sidebar = ({ children }: SidebarProps) => {
-  const { hardware, metadata, unreadCounts, setDialogOpen } = useDevice();
+  const { hardware, metadata, unreadCounts, setDialogOpen, status } =
+    useDevice();
   const { getNode, getNodesLength } = useNodeDB();
   const { setCommandPaletteOpen } = useAppStore();
   const myNode = getNode(hardware.myNodeNum);
@@ -204,6 +205,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
               myMetadata?.firmwareVersion ?? t("unknown.notAvailable")
             }
             deviceMetrics={{
+              connectionStatus: status,
               batteryLevel: myNode.deviceMetrics?.batteryLevel,
               voltage:
                 typeof myNode.deviceMetrics?.voltage === "number"

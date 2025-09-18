@@ -1,5 +1,6 @@
 import { cn } from "@core/utils/cn.ts";
 import {
+  CableIcon,
   CpuIcon,
   Languages,
   type LucideIcon,
@@ -8,16 +9,24 @@ import {
   Search as SearchIcon,
   ZapIcon,
 } from "lucide-react";
+import type { DeviceStatusEnum } from "node_modules/@meshtastic/core/src/types";
 import type React from "react";
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import BatteryStatus from "./BatteryStatus.tsx";
 import LanguageSwitcher from "./LanguageSwitcher.tsx";
 import ThemeSwitcher from "./ThemeSwitcher.tsx";
-import type { DeviceMetrics } from "./types.ts";
+import { ThemeModeToggle } from "./theme-mode-toggle.tsx";
 import { Avatar } from "./UI/Avatar.tsx";
 import { Button } from "./UI/Button.tsx";
+import { Separator } from "./UI/Separator.tsx";
 import { Subtle } from "./UI/Typography/Subtle.tsx";
+
+export type DeviceMetrics = {
+  connectionStatus: DeviceStatusEnum;
+  batteryLevel?: number | null;
+  voltage?: number | null;
+};
 
 interface DeviceInfoPanelProps {
   isCollapsed: boolean;
@@ -62,6 +71,12 @@ export const DeviceInfoPanel = ({
 
   const deviceInfoItems: InfoDisplayItem[] = [
     {
+      id: "deviceConnectionStatus",
+      label: t("sidebar.deviceInfo.connectionStatus.title"),
+      icon: CableIcon,
+      value: deviceMetrics.connectionStatus || t("unknown.notAvailable", "N/A"),
+    },
+    {
       id: "battery",
       label: t("batteryStatus.title"),
       customComponent: <BatteryStatus deviceMetrics={deviceMetrics} />,
@@ -89,7 +104,7 @@ export const DeviceInfoPanel = ({
       id: "theme",
       label: t("theme.changeTheme"),
       icon: Palette,
-      render: () => <ThemeSwitcher />,
+      render: () => <ThemeModeToggle />,
     },
     {
       id: "changeName",
@@ -137,9 +152,7 @@ export const DeviceInfoPanel = ({
         )}
       </div>
 
-      {!isCollapsed && (
-        <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
-      )}
+      {!isCollapsed && <Separator />}
 
       <div
         className={cn(
@@ -155,14 +168,11 @@ export const DeviceInfoPanel = ({
           return (
             <div key={item.id} className="flex items-center gap-2.5 text-sm">
               {IconComponent && (
-                <IconComponent
-                  size={16}
-                  className="text-gray-500 dark:text-gray-400 w-4 flex-shrink-0"
-                />
+                <IconComponent size={16} className=" w-4 flex-shrink-0" />
               )}
               {item.customComponent}
               {item.id !== "battery" && (
-                <Subtle className="text-gray-600 dark:text-gray-300">
+                <Subtle className="">
                   {item.label}: {item.value}
                 </Subtle>
               )}
@@ -171,9 +181,7 @@ export const DeviceInfoPanel = ({
         })}
       </div>
 
-      {!isCollapsed && (
-        <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
-      )}
+      {!isCollapsed && <Separator />}
 
       <div
         className={cn(
@@ -202,27 +210,17 @@ export const DeviceInfoPanel = ({
                 "flex w-full items-center justify-start text-sm p-1.5 rounded-md",
                 "gap-2.5",
                 "transition-colors duration-150",
-                !disableHover && "hover:bg-gray-100 dark:hover:bg-gray-700",
               )}
             >
               <Icon
                 size={16}
                 className={cn(
                   "flex-shrink-0 w-4",
-                  "text-gray-500 dark:text-gray-400",
                   "transition-colors duration-150",
-                  !disableHover &&
-                    "group-hover:text-gray-700 dark:group-hover:text-gray-200",
                 )}
               />
               <Subtle
-                className={cn(
-                  "text-sm",
-                  "text-gray-600 dark:text-gray-300",
-                  "transition-colors duration-150",
-                  !disableHover &&
-                    "group-hover:text-gray-800 dark:group-hover:text-gray-100",
-                )}
+                className={cn("text-sm", "transition-colors duration-150")}
               >
                 {buttonItem.label}
               </Subtle>

@@ -83,12 +83,12 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
 
   return (
     <Tabs defaultValue={t("page.tabDevice")}>
-      <TabsList className="w-full dark:bg-slate-700">
+      <TabsList className="w-full dark:bg-slate-800 bg-slate-700">
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.label}
             value={tab.label}
-            className="dark:text-white relative"
+            className="relative not-active:text-white"
           >
             {tab.label}
             {flags.get(tab.case) && (

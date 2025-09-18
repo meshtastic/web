@@ -64,14 +64,12 @@ function groupMessagesByDay(
 }
 
 const DateDelimiter = ({ label }: { label: string }) => (
-  <li aria-label={label}>
-    <div className="my-2 flex h-3 items-center justify-center">
-      <Separator className="bg-slate-100 dark:bg-slate-800" />
-      <div className="mx-5 whitespace-nowrap text-center text-xs text-slate-400">
-        {label}
-      </div>
-      <Separator className="bg-slate-100 dark:bg-slate-800" />
-    </div>
+  <li className="my-2 flex items-center gap-2" aria-label={label}>
+    <Separator className="flex-1 basis-0 min-w-0 bg-slate-100 dark:bg-slate-800" />
+    <span className="mx-3 shrink-0 whitespace-nowrap text-center text-xs text-slate-400">
+      {label}
+    </span>
+    <Separator className="flex-1 basis-0 min-w-0 bg-slate-100 dark:bg-slate-800" />
   </li>
 );
 
@@ -125,7 +123,7 @@ export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
   }
 
   return (
-    <ul className="flex flex-col-reverse flex-grow overflow-y-auto px-3 py-2">
+    <ul className="flex flex-col-reverse flex-grow overflow-y-auto px-3 py-2 w-full">
       {groups.map(({ dayKey, label, items }) => (
         <Fragment key={dayKey}>
           {/* Render messages first, then delimiter — with flex-col-reverse this shows the delimiter above that day's messages */}

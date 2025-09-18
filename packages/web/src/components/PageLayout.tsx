@@ -45,12 +45,12 @@ export const PageLayout = ({
 }: PageLayoutProps) => {
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      <div className="flex flex-1 bg-background text-foreground overflow-hidden">
+      <div className="flex flex-1 text-foreground overflow-hidden">
         {/* Left Sidebar */}
         {leftBar && (
           <aside
             className={cn(
-              "px-2 pr-0 shrink-0 border-r-[0.5px] border-slate-300 dark:border-slate-700 ",
+              "px-2 pr-0 shrink-0 border-r-[0.5px] border-slate-300 ",
               leftBarClassName,
             )}
           >
@@ -126,7 +126,7 @@ export const PageLayout = ({
         {rightBar && (
           <aside
             className={cn(
-              "w-56 lg:w-[270px] text-balance shrink-0 border-l border-slate-300 dark:border-slate-700 px-2 overflow-hidden",
+              "w-56 lg:w-[270px] text-balance shrink-0 border-l border-slate-300 px-2 overflow-hidden",
               rightBarClassName,
             )}
           >

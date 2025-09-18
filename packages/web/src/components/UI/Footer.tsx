@@ -28,13 +28,13 @@ const Footer = ({ className, ...props }: FooterProps) => {
       {...props}
     >
       <div className="px-2">
-        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
+        <span className="font-semibold text-gray-500/40 dark:text-gray-100">
           {version}
         </span>
-        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40 mx-2">
+        <span className="font-semibold text-gray-500/40 dark:text-gray-100  mx-2">
           -
         </span>
-        <span className="font-semibold text-gray-500/40 dark:text-gray-400/40">
+        <span className="font-semibold text-gray-500/40 dark:text-gray-100">
           {`#${commitHash}`}
         </span>
       </div>
@@ -42,20 +42,23 @@ const Footer = ({ className, ...props }: FooterProps) => {
         <Trans
           i18nKey="footer.text"
           components={[
-            // biome-ignore lint/a11y/useAnchorContent: because I want to use the link component
             <a
+              title="Vercel sponsors Meshtastic Web Hosting"
               key="vercel"
               rel="noopener noreferrer"
               href="https://vercel.com/?utm_source=meshtastic&utm_campaign=oss"
               className="hover:underline text-link"
-            />,
-            // biome-ignore lint/a11y/useAnchorContent: because I want to use the link component
+            >
+              <span className="sr-only">Vercel homepage</span>
+            </a>,
             <a
               key="legal"
               rel="noopener noreferrer"
               href="https://meshtastic.org/docs/legal"
               className="hover:underline text-link"
-            />,
+            >
+              <span className="sr-only">Meshtastic terms and conditions</span>
+            </a>,
           ]}
         />
       </p>

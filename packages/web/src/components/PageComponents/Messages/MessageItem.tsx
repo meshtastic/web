@@ -1,11 +1,11 @@
-import { Avatar } from "@components/UI/Avatar.tsx";
 import {
   Tooltip,
   TooltipArrow,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@components/UI/Tooltip.tsx";
+} from "@app/components/UI/tooltip";
+import { Avatar } from "@components/UI/Avatar.tsx";
 import { MessageState, useDevice, useNodeDB } from "@core/stores";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import { cn } from "@core/utils/cn.ts";

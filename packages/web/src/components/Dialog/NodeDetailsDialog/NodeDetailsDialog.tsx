@@ -1,3 +1,10 @@
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@app/components/UI/tooltip";
 import { DeviceImage } from "@components/generic/DeviceImage.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Uptime } from "@components/generic/Uptime.tsx";
@@ -17,13 +24,6 @@ import {
   DialogTitle,
 } from "@components/UI/Dialog.tsx";
 import { Separator } from "@components/UI/Separator.tsx";
-import {
-  Tooltip,
-  TooltipArrow,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@components/UI/Tooltip.tsx";
 import { useFavoriteNode } from "@core/hooks/useFavoriteNode.ts";
 import { useIgnoreNode } from "@core/hooks/useIgnoreNode.ts";
 import { toast } from "@core/hooks/useToast.ts";
