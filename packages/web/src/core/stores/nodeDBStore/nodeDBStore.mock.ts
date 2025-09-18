@@ -27,4 +27,6 @@ export const mockNodeDBStore: NodeDB = {
   updateFavorite: vi.fn(),
   updateIgnore: vi.fn(),
   setNodeNum: vi.fn(),
+  removeAllNodeErrors: vi.fn(),
+  removeAllNodes: vi.fn(),
 };
