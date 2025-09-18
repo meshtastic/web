@@ -110,7 +110,7 @@ const persistOptions: PersistOptions<AppState, AppData> = {
 // Add persist middleware on the store if the feature flag is enabled
 const persistApps = featureFlags.get("persistApp");
 console.debug(
-  `AppStore: Persisting devices is ${persistApps ? "enabled" : "disabled"}`,
+  `AppStore: Persisting app is ${persistApps ? "enabled" : "disabled"}`,
 );
 
 export const useAppStore = persistApps
