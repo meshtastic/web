@@ -34,7 +34,7 @@ export const FactoryResetDeviceDialog = ({
     useMessageStore.getState().removeMessageStore(id);
     useNodeDBStore.getState().removeNodeDB(id);
 
-    // Reload the app to ensure all esphemeral state is cleared
+    // Reload the app to ensure all ephemeral state is cleared
     window.location.href = "/";
   };
 
