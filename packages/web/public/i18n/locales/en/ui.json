@@ -140,7 +140,8 @@
     "placeholder": "Meshtastic 1234"
   },
   "airtimeUtilization": {
-    "label": "Airtime Utilization (%)"
+    "label": "Airtime Utilization (%)",
+    "short": "Airtime Util. (%)"
   },
   "batteryLevel": {
     "label": "Battery level (%)",
@@ -151,7 +152,8 @@
     "title": "Voltage"
   },
   "channelUtilization": {
-    "label": "Channel Utilization (%)"
+    "label": "Channel Utilization (%)",
+    "short": "Channel Util. (%)"
   },
   "hops": {
     "direct": "Direct",

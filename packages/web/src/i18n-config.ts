@@ -58,5 +58,6 @@ i18next
       "messages",
       "nodes",
       "ui",
+      "map",
     ],
   });

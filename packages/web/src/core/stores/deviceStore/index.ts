@@ -22,6 +22,15 @@ export type ValidModuleConfigType = Exclude<
   undefined
 >;
 
+export type WaypointWithMetadata = Protobuf.Mesh.Waypoint & {
+  metadata: {
+    channel: number; // Channel on which the waypoint was received
+    created: Date; // Timestamp when the waypoint was received
+    updated?: Date; // Timestamp when the waypoint was last updated
+    from: number; // Node number of the device that sent the waypoint
+  };
+};
+
 export interface Device {
   id: number;
   status: Types.DeviceStatusEnum;
@@ -39,7 +48,8 @@ export interface Device {
   >;
   connection?: MeshDevice;
   activeNode: number;
-  waypoints: Protobuf.Mesh.Waypoint[];
+  waypoints: WaypointWithMetadata[];
+  neighborInfo: Map<number, Protobuf.Mesh.NeighborInfo>;
   pendingSettingsChanges: boolean;
   messageDraft: string;
   unreadCounts: Map<number, number>;
@@ -99,7 +109,12 @@ export interface Device {
   setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
   addChannel: (channel: Protobuf.Channel.Channel) => void;
-  addWaypoint: (waypoint: Protobuf.Mesh.Waypoint) => void;
+  addWaypoint: (
+    waypoint: Protobuf.Mesh.Waypoint,
+    channel: Types.ChannelNumber,
+    from: number,
+    rxTime: Date,
+  ) => void;
   addConnection: (connection: MeshDevice) => void;
   addTraceRoute: (
     traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
@@ -120,6 +135,11 @@ export interface Device {
   getClientNotification: (
     index: number,
   ) => Protobuf.Mesh.ClientNotification | undefined;
+  addNeighborInfo: (
+    nodeNum: number,
+    neighborInfo: Protobuf.Mesh.NeighborInfo,
+  ) => void;
+  getNeighborInfo: (nodeNum: number) => Protobuf.Mesh.NeighborInfo | undefined;
 }
 
 export interface DeviceState {
@@ -156,6 +176,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
           connection: undefined,
           activeNode: 0,
           waypoints: [],
+          neighborInfo: new Map(),
           dialog: {
             import: false,
             QR: false,
@@ -543,7 +564,7 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               }),
             );
           },
-          addWaypoint: (waypoint: Protobuf.Mesh.Waypoint) => {
+          addWaypoint: (waypoint, channel, from, rxTime) => {
             set(
               produce<PrivateDeviceState>((draft) => {
                 const device = draft.devices.get(id);
@@ -552,9 +573,19 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
                     (wp) => wp.id === waypoint.id,
                   );
                   if (index !== -1) {
-                    device.waypoints[index] = waypoint;
+                    const created =
+                      device.waypoints[index]?.metadata.created ?? new Date();
+                    const updatedWaypoint = {
+                      ...waypoint,
+                      metadata: { created, updated: rxTime, from, channel },
+                    };
+
+                    device.waypoints[index] = updatedWaypoint;
                   } else {
-                    device.waypoints.push(waypoint);
+                    device.waypoints.push({
+                      ...waypoint,
+                      metadata: { created: rxTime, from, channel },
+                    });
                   }
                 }
               }),
@@ -719,6 +750,30 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
               return;
             }
             return device.clientNotifications[index];
+          },
+          addNeighborInfo: (
+            nodeId: number,
+            neighborInfo: Protobuf.Mesh.NeighborInfo,
+          ) => {
+            set(
+              produce<PrivateDeviceState>((draft) => {
+                const device = draft.devices.get(id);
+                if (!device) {
+                  return;
+                }
+
+                // Replace any existing neighbor info for this nodeId
+                device.neighborInfo.set(nodeId, neighborInfo);
+              }),
+            );
+          },
+
+          getNeighborInfo: (nodeNum: number) => {
+            const device = get().devices.get(id);
+            if (!device) {
+              return;
+            }
+            return device.neighborInfo.get(nodeNum);
           },
         });
       }),

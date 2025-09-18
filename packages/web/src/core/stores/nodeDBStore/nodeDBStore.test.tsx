@@ -136,16 +136,16 @@ describe("NodeDB store", () => {
     expect(db.getNodeError(10)).toBeUndefined();
   });
 
-  it("getMyNode throws before setNodeNum; works after", async () => {
+  it("getMyNode returns undefined before setNodeNum; works after", async () => {
     const { useNodeDBStore } = await freshStore();
     const db = useNodeDBStore.getState().addNodeDB(1);
     db.addNode(makeNode(123));
 
-    expect(() => db.getMyNode()).toThrow();
+    expect(db.getMyNode()).toBeUndefined();
     db.setNodeNum(123);
 
     const me = db.getMyNode();
-    expect(me.num).toBe(123);
+    expect(me?.num).toBe(123);
   });
 
   it("setNodeNum merges with existing DB with same myNodeNum", async () => {

@@ -74,6 +74,12 @@
   }
 }
 
+.animate-fan-out {
+  transform: translate(var(--dx), var(--dy));
+  transition: transform 200ms ease-out; /* expand AND collapse */
+}
+
+
 html {
   overflow: hidden;
 }

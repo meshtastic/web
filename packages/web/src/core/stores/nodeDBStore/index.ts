@@ -41,7 +41,7 @@ export interface NodeDB {
     filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
     includeSelf?: boolean,
   ) => Protobuf.Mesh.NodeInfo[];
-  getMyNode: () => Protobuf.Mesh.NodeInfo;
+  getMyNode: () => Protobuf.Mesh.NodeInfo | undefined;
 
   getNodeError: (nodeNum: number) => NodeError | undefined;
   hasNodeError: (nodeNum: number) => boolean;
@@ -378,13 +378,12 @@ function nodeDBFactory(
       if (!nodeDB) {
         throw new Error(`No nodeDB found (id: ${id})`);
       }
-      if (!nodeDB.myNodeNum) {
-        throw new Error(`No myNodeNum set for nodeDB with id: ${id}`);
+      if (nodeDB.myNodeNum) {
+        return (
+          nodeDB.nodeMap.get(nodeDB.myNodeNum) ??
+          create(Protobuf.Mesh.NodeInfoSchema)
+        );
       }
-      return (
-        nodeDB.nodeMap.get(nodeDB.myNodeNum) ??
-        create(Protobuf.Mesh.NodeInfoSchema)
-      );
     },
 
     getNodeError: (nodeNum) => {

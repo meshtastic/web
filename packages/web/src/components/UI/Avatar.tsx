@@ -44,12 +44,17 @@ export const Avatar = ({
         `relative flex items-center justify-center rounded-full font-semibold 
 `,
         sizes[size],
+        "bg-[rgb(var(--bg-r),var(--bg-g),var(--bg-b))]", // allow override with className
         className,
       )}
-      style={{
-        backgroundColor: `rgb(${bgColor.r}, ${bgColor.g}, ${bgColor.b})`,
-        color: textColor,
-      }}
+      style={
+        {
+          "--bg-r": bgColor.r,
+          "--bg-g": bgColor.g,
+          "--bg-b": bgColor.b,
+          color: textColor,
+        } as React.CSSProperties
+      }
     >
       {showFavorite ? (
         <TooltipProvider delayDuration={300}>
