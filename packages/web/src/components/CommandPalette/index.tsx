@@ -25,7 +25,6 @@ import {
   EraserIcon,
   FactoryIcon,
   HardDriveUpload,
-  LayersIcon,
   LinkIcon,
   type LucideIcon,
   MapIcon,
@@ -71,7 +70,7 @@ export const CommandPalette = () => {
   } = useAppStore();
   const { getDevices } = useDeviceStore();
   const { setDialogOpen, connection } = useDevice();
-  const { getNode, removeAllNodeErrors, removeAllNodes } = useNodeDB();
+  const { getNode } = useNodeDB();
   const { pinnedItems, togglePinnedItem } = usePinnedItems({
     storageName: "pinnedCommandMenuGroups",
   });
@@ -105,13 +104,6 @@ export const CommandPalette = () => {
             navigate({ to: "/config" });
           },
           tags: ["settings"],
-        },
-        {
-          label: t("goto.command.channels"),
-          icon: LayersIcon,
-          action() {
-            navigate({ to: "/channels" });
-          },
         },
         {
           label: t("goto.command.nodes"),
@@ -206,9 +198,7 @@ export const CommandPalette = () => {
           label: t("contextual.command.resetNodeDb"),
           icon: TrashIcon,
           action() {
-            connection?.resetNodes();
-            removeAllNodeErrors();
-            removeAllNodes(true);
+            setDialogOpen("resetNodeDb", true);
           },
         },
         {
@@ -224,16 +214,14 @@ export const CommandPalette = () => {
           label: t("contextual.command.factoryResetDevice"),
           icon: FactoryIcon,
           action() {
-            connection?.factoryResetDevice();
-            removeAllNodeErrors();
-            removeAllNodes();
+            setDialogOpen("factoryResetDevice", true);
           },
         },
         {
           label: t("contextual.command.factoryResetConfig"),
           icon: FactoryIcon,
           action() {
-            connection?.factoryResetConfig();
+            setDialogOpen("factoryResetConfig", true);
           },
         },
       ],
@@ -255,6 +243,13 @@ export const CommandPalette = () => {
           icon: EraserIcon,
           action() {
             setDialogOpen("deleteMessages", true);
+          },
+        },
+        {
+          label: t("debug.command.clearAllStores"),
+          icon: EraserIcon,
+          action() {
+            setDialogOpen("clearAllStores", true);
           },
         },
       ],

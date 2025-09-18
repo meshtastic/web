@@ -1,3 +1,6 @@
+import { FactoryResetConfigDialog } from "@app/components/Dialog/FactoryResetConfigDialog/FactoryResetConfigDialog";
+import { FactoryResetDeviceDialog } from "@app/components/Dialog/FactoryResetDeviceDialog/FactoryResetDeviceDialog";
+import { ClearAllStoresDialog } from "@components/Dialog/ClearAllStoresDialog/ClearAllStoresDialog.tsx";
 import { ClientNotificationDialog } from "@components/Dialog/ClientNotificationDialog/ClientNotificationDialog.tsx";
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
 import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.tsx";
@@ -8,6 +11,7 @@ import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
 import { RefreshKeysDialog } from "@components/Dialog/RefreshKeysDialog/RefreshKeysDialog.tsx";
 import { RemoveNodeDialog } from "@components/Dialog/RemoveNodeDialog.tsx";
+import { ResetNodeDbDialog } from "@components/Dialog/ResetNodeDbDialog/ResetNodeDbDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
 import { useDevice } from "@core/stores";
@@ -89,6 +93,30 @@ export const DialogManager = () => {
         open={dialog.clientNotification}
         onOpenChange={(open) => {
           setDialogOpen("clientNotification", open);
+        }}
+      />
+      <ResetNodeDbDialog
+        open={dialog.resetNodeDb}
+        onOpenChange={(open) => {
+          setDialogOpen("resetNodeDb", open);
+        }}
+      />
+      <ClearAllStoresDialog
+        open={dialog.clearAllStores}
+        onOpenChange={(open) => {
+          setDialogOpen("clearAllStores", open);
+        }}
+      />
+      <FactoryResetDeviceDialog
+        open={dialog.factoryResetDevice}
+        onOpenChange={(open) => {
+          setDialogOpen("factoryResetDevice", open);
+        }}
+      />
+      <FactoryResetConfigDialog
+        open={dialog.factoryResetConfig}
+        onOpenChange={(open) => {
+          setDialogOpen("factoryResetConfig", open);
         }}
       />
     </>

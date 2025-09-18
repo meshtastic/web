@@ -57,6 +57,10 @@ export interface Device {
     deleteMessages: boolean;
     managedMode: boolean;
     clientNotification: boolean;
+    resetNodeDb: boolean;
+    clearAllStores: boolean;
+    factoryResetDevice: boolean;
+    factoryResetConfig: boolean;
   };
   clientNotifications: Protobuf.Mesh.ClientNotification[];
 
@@ -166,6 +170,10 @@ export const useDeviceStore = createStore<PrivateDeviceState>((set, get) => ({
             deleteMessages: false,
             managedMode: false,
             clientNotification: false,
+            resetNodeDb: false,
+            clearAllStores: false,
+            factoryResetDevice: false,
+            factoryResetConfig: false,
           },
           pendingSettingsChanges: false,
           messageDraft: "",
