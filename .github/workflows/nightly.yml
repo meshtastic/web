@@ -79,6 +79,7 @@ jobs:
           # Outputs
           echo "moving_tag=nightly"            >> "$GITHUB_OUTPUT"
           echo "immutable_tag=${IMMUTABLE}"    >> "$GITHUB_OUTPUT"
+          echo "all_tags=nightly ${IMMUTABLE}" >> "$GITHUB_OUTPUT"
           echo "created=${ISO_CREATED}"            >> "$GITHUB_OUTPUT"
           echo "Resolved tags: nightly and ${IMMUTABLE}"
 
