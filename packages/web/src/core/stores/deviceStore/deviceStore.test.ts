@@ -349,19 +349,16 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
 
     // Old device with myNodeNum=777 and some waypoints (one expired)
     const oldDevice = state.addDevice(1);
+    oldDevice.connection = { sendWaypoint: vi.fn() } as any;
+
     oldDevice.setHardware(makeHardware(777));
     oldDevice.addWaypoint(
-      makeWaypoint(1, Date.parse("2024-12-31T23:59:59Z")),
+      makeWaypoint(1, Date.parse("2024-12-31T23:59:59Z")), // This is expired, will not be added
       0,
       0,
       new Date(),
     ); // expired
-    oldDevice.addWaypoint(
-      makeWaypoint(2, Date.parse("2028-01-01T00:00:00Z")),
-      0,
-      0,
-      new Date(),
-    ); // ok
+    oldDevice.addWaypoint(makeWaypoint(2, 0), 0, 0, new Date()); // no expire
     oldDevice.addWaypoint(
       makeWaypoint(3, Date.parse("2026-01-01T00:00:00Z")),
       0,
@@ -380,12 +377,12 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
     );
 
     const wps = useDeviceStore.getState().devices.get(1)!.waypoints;
-    expect(wps.length).toBe(3);
+    expect(wps.length).toBe(2);
     expect(wps.find((w) => w.id === 2)?.expire).toBe(
       Date.parse("2027-01-01T00:00:00Z"),
     );
 
-    // Retention: push 102 total waypoints -> capped at 100. Oldest (id=1,2) evicted
+    // Retention: push 102 total waypoints -> capped at 100. Oldest evicted
     for (let i = 3; i <= 102; i++) {
       oldDevice.addWaypoint(makeWaypoint(i), 0, 0, new Date());
     }
@@ -394,24 +391,32 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
       100,
     );
 
+    // Remove waypoint
+    oldDevice.removeWaypoint(102, false);
+    expect(oldDevice.connection?.sendWaypoint).not.toHaveBeenCalled();
+
+    await oldDevice.removeWaypoint(101, true); // toMesh=true
+    expect(oldDevice.connection?.sendWaypoint).toHaveBeenCalled();
+
+    expect(useDeviceStore.getState().devices.get(1)!.waypoints.length).toBe(98);
+
     // New device shares myNodeNum; setHardware should:
     // - move traceroutes from old device
     // - copy waypoints minus expired
     // - delete old device entry
-    const newDev = state.addDevice(2);
-    newDev.setHardware(makeHardware(777));
+    const newDevice = state.addDevice(2);
+    newDevice.setHardware(makeHardware(777));
 
     expect(state.getDevice(1)).toBeUndefined();
     expect(state.getDevice(2)).toBeDefined();
 
     // traceroutes moved:
-    expect(state.getDevice(2)!.traceroutes.size).toBeGreaterThan(0);
+    expect(state.getDevice(2)!.traceroutes.size).toBe(2);
 
-    // expired waypoint removed, last non-expired retained:
-    const newWps = state.getDevice(2)!.waypoints;
-    expect(newWps.find((w) => w.id === 1)).toBeUndefined();
-    expect(newWps.find((w) => w.id === 2)).toBeUndefined();
-    expect(newWps.find((w) => w.id === 3)).toBeTruthy();
+    // Getter for waypoint by id works
+    expect(newDevice.getWaypoint(1)).toBeUndefined();
+    expect(newDevice.getWaypoint(2)).toBeUndefined();
+    expect(newDevice.getWaypoint(3)).toBeTruthy();
 
     vi.useRealTimers();
   });

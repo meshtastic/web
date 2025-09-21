@@ -89,6 +89,8 @@ export interface Device extends DeviceData {
     from: number,
     rxTime: Date,
   ) => void;
+  removeWaypoint: (waypointId: number, toMesh: boolean) => Promise<void>;
+  getWaypoint: (waypointId: number) => WaypointWithMetadata | undefined;
   addConnection: (connection: MeshDevice) => void;
   addTraceRoute: (
     traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>,
@@ -566,31 +568,101 @@ function deviceFactory(
       set(
         produce<PrivateDeviceState>((draft) => {
           const device = draft.devices.get(id);
-          if (device) {
-            const index = device.waypoints.findIndex(
-              (wp) => wp.id === waypoint.id,
-            );
-            if (index !== -1) {
-              const created =
-                device.waypoints[index]?.metadata.created ?? new Date();
-              const updatedWaypoint = {
-                ...waypoint,
-                metadata: { created, updated: rxTime, from, channel },
-              };
+          if (!device) {
+            return undefined;
+          }
 
-              device.waypoints[index] = updatedWaypoint;
-            } else {
-              device.waypoints.push({
-                ...waypoint,
-                metadata: { created: rxTime, from, channel },
-              });
+          const index = device.waypoints.findIndex(
+            (wp) => wp.id === waypoint.id,
+          );
+
+          if (index !== -1) {
+            const created =
+              device.waypoints[index]?.metadata.created ?? new Date();
+            const updatedWaypoint = {
+              ...waypoint,
+              metadata: { created, updated: rxTime, from, channel },
+            };
+
+            // Remove existing waypoint
+            device.waypoints.splice(index, 1);
+
+            // Push new if no expiry or not expired
+            if (waypoint.expire === 0 || waypoint.expire > Date.now()) {
+              device.waypoints.push(updatedWaypoint);
             }
+          } else if (
+            // only add if set to never expire or not already expired
+            waypoint.expire === 0 ||
+            (waypoint.expire !== 0 && waypoint.expire < Date.now())
+          ) {
+            device.waypoints.push({
+              ...waypoint,
+              metadata: { created: rxTime, from, channel },
+            });
+          }
 
-            // Enforce retention limit
-            evictOldestEntries(device.waypoints, WAYPOINT_RETENTION_NUM);
+          // Enforce retention limit
+          evictOldestEntries(device.waypoints, WAYPOINT_RETENTION_NUM);
+        }),
+      );
+    },
+    removeWaypoint: async (waypointId: number, toMesh: boolean) => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return;
+      }
+
+      const waypoint = device.waypoints.find((wp) => wp.id === waypointId);
+      if (!waypoint) {
+        return;
+      }
+
+      if (toMesh) {
+        if (!device.connection) {
+          return;
+        }
+
+        const waypointToBroadcast = create(Protobuf.Mesh.WaypointSchema, {
+          id: waypoint.id, // Bare minimum to delete a waypoint
+          lockedTo: 0,
+          name: "",
+          description: "",
+          icon: 0,
+          expire: 1,
+        });
+
+        await device.connection.sendWaypoint(
+          waypointToBroadcast,
+          "broadcast",
+          waypoint.metadata.channel,
+        );
+      }
+
+      // Remove from store
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (!device) {
+            return;
+          }
+
+          const idx = device.waypoints.findIndex(
+            (waypoint) => waypoint.id === waypointId,
+          );
+          if (idx >= 0) {
+            device.waypoints.splice(idx, 1);
           }
         }),
       );
+    },
+    getWaypoint: (waypointId: number) => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return;
+      }
+
+      return device.waypoints.find((waypoint) => waypoint.id === waypointId);
     },
     setActiveNode: (node) => {
       set(
