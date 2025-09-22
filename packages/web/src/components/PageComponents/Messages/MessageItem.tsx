@@ -1,3 +1,5 @@
+import { MeshAvatar } from "@app/components/MeshAvatar";
+import { Avatar } from "@app/components/UI/avatar";
 import {
   Tooltip,
   TooltipArrow,
@@ -5,7 +7,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@app/components/UI/tooltip";
-import { Avatar } from "@components/UI/Avatar.tsx";
 import { MessageState, useDevice, useNodeDB } from "@core/stores";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
@@ -157,7 +158,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   return (
     <li className={messageItemWrapperClass}>
       <div className="grid grid-cols-[auto_1fr] gap-x-2">
-        <Avatar
+        <MeshAvatar
           size="sm"
           text={shortName}
           className="pt-0.5"

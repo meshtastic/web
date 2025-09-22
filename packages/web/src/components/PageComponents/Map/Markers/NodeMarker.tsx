@@ -1,6 +1,7 @@
+import { MeshAvatar } from "@app/components/MeshAvatar";
+import { Avatar } from "@app/components/UI/avatar";
 import { cn } from "@app/core/utils/cn";
 import type { PxOffset } from "@components/PageComponents/Map/cluster.ts";
-import { Avatar } from "@components/UI/Avatar.tsx";
 import {
   Tooltip,
   TooltipArrow,
@@ -67,7 +68,7 @@ export const NodeMarker = memo(function NodeMarker({
               style={style}
               onClick={(e) => onClick(id, { originalEvent: e.nativeEvent })}
             >
-              <Avatar
+              <MeshAvatar
                 text={label}
                 className={cn(
                   "border-[1.5px] border-slate-600 shadow-m shadow-slate-600",

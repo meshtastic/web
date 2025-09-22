@@ -3,7 +3,7 @@ import type { useAppStore, useMessageStore } from "@core/stores";
 import ConfigPage from "@pages/Config/index.tsx";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
-import MessagesPage from "@pages/Messages.tsx";
+import MessagesPage from "@app/pages/Messages/index.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
 import {
   createRootRouteWithContext,

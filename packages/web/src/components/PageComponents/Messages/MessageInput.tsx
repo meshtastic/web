@@ -53,9 +53,10 @@ export const MessageInput = ({ onSend, to, maxBytes }: MessageInputProps) => {
   return (
     <div className="flex gap-2">
       <form className="w-full" name="messageInput" onSubmit={handleSubmit}>
-        <div className="flex grow gap-1">
+        <div className="flex grow gap-1 flex-1">
           <label className="w-full" htmlFor="messageInput">
             <Input
+              className="bg-background flex"
               minLength={1}
               name="messageInput"
               placeholder={t("sendMessage.placeholder")}
@@ -73,8 +74,8 @@ export const MessageInput = ({ onSend, to, maxBytes }: MessageInputProps) => {
             {messageBytes}/{maxBytes}
           </label>
 
-          <Button type="submit" variant="default">
-            <SendIcon size={16} />
+          <Button type="submit" size="icon" className="shrink-0">
+            <SendIcon className="h-4 w-4" />
             <span className="sr-only">Send message</span>
           </Button>
         </div>

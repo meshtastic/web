@@ -1,5 +1,4 @@
 import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
@@ -189,45 +188,45 @@ const ConfigPage = () => {
     removeWorkingChannelConfig,
   ]);
 
-  const leftSidebar = useMemo(
-    () => (
-      <Sidebar>
-        <SidebarSection label={t("sidebar.label")} className="py-2 px-0">
-          <SidebarButton
-            label={t("navigation.radioConfig")}
-            active={activeConfigSection === "device"}
-            onClick={() => setActiveConfigSection("device")}
-            Icon={SettingsIcon}
-            isDirty={workingConfig.length > 0}
-            count={workingConfig.length}
-          />
-          <SidebarButton
-            label={t("navigation.moduleConfig")}
-            active={activeConfigSection === "module"}
-            onClick={() => setActiveConfigSection("module")}
-            Icon={BoxesIcon}
-            isDirty={workingModuleConfig.length > 0}
-            count={workingModuleConfig.length}
-          />
-          <SidebarButton
-            label={t("navigation.channelConfig")}
-            active={activeConfigSection === "channel"}
-            onClick={() => setActiveConfigSection("channel")}
-            Icon={LayersIcon}
-            isDirty={workingChannelConfig.length > 0}
-            count={workingChannelConfig.length}
-          />
-        </SidebarSection>
-      </Sidebar>
-    ),
-    [
-      activeConfigSection,
-      workingConfig,
-      workingModuleConfig,
-      workingChannelConfig,
-      t,
-    ],
-  );
+  // const leftSidebar = useMemo(
+  //   () => (
+  //     <div>
+  //       <SidebarSection label={t("sidebar.label")} className="py-2 px-0">
+  //         <SidebarButton
+  //           label={t("navigation.radioConfig")}
+  //           active={activeConfigSection === "device"}
+  //           onClick={() => setActiveConfigSection("device")}
+  //           Icon={SettingsIcon}
+  //           isDirty={workingConfig.length > 0}
+  //           count={workingConfig.length}
+  //         />
+  //         <SidebarButton
+  //           label={t("navigation.moduleConfig")}
+  //           active={activeConfigSection === "module"}
+  //           onClick={() => setActiveConfigSection("module")}
+  //           Icon={BoxesIcon}
+  //           isDirty={workingModuleConfig.length > 0}
+  //           count={workingModuleConfig.length}
+  //         />
+  //         <SidebarButton
+  //           label={t("navigation.channelConfig")}
+  //           active={activeConfigSection === "channel"}
+  //           onClick={() => setActiveConfigSection("channel")}
+  //           Icon={LayersIcon}
+  //           isDirty={workingChannelConfig.length > 0}
+  //           count={workingChannelConfig.length}
+  //         />
+  //       </SidebarSection>
+  //     </div>
+  //   ),
+  //   [
+  //     activeConfigSection,
+  //     workingConfig,
+  //     workingModuleConfig,
+  //     workingChannelConfig,
+  //     t,
+  //   ],
+  // );
 
   const hasDrafts =
     workingConfig.length > 0 ||

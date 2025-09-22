@@ -18,6 +18,7 @@ export {
   type ValidModuleConfigType,
   type WaypointWithMetadata,
 } from "@core/stores/deviceStore";
+export { type ActionItem, useHeaderStore } from "@core/stores/headerStore";
 export {
   MessageState,
   type MessageStore,
@@ -26,10 +27,6 @@ export {
 } from "@core/stores/messageStore";
 export { type NodeDB, useNodeDBStore } from "@core/stores/nodeDBStore";
 export type { NodeErrorType } from "@core/stores/nodeDBStore/types";
-export {
-  SidebarProvider,
-  useSidebar, // TODO: Bring hook into this file
-} from "@core/stores/sidebarStore";
 
 // Re-export idb-keyval functions for clearing all stores, expand this if we add more local storage types
 export { clear as clearAllStores } from "idb-keyval";

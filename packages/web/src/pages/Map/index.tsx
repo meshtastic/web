@@ -8,7 +8,7 @@ import {
   type FilterState,
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
-import { BaseMap } from "@components/Map.tsx";
+import { MeshMap } from "@app/components/MeshMap";
 import { NodesLayer } from "@components/PageComponents/Map/Layers/NodesLayer.tsx";
 import { PrecisionLayer } from "@components/PageComponents/Map/Layers/PrecisionLayer.tsx";
 import {
@@ -19,7 +19,6 @@ import {
 import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
 import { useNodeDB } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
@@ -194,8 +193,9 @@ const MapPage = () => {
   );
 
   return (
-    <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
-      <BaseMap
+    // <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
+    <>
+      <MeshMap
         onLoad={getMapBounds}
         onMouseMove={onMouseMove}
         onClick={onMapBackgroundClick}
@@ -214,7 +214,7 @@ const MapPage = () => {
             to={snrHover.to}
           />
         )}
-      </BaseMap>
+      </MeshMap>
       <div className="flex flex-col space-y-1 fixed top-35 right-2.5">
         {myNode && hasPos(myNode?.position) && (
           <button
@@ -262,7 +262,7 @@ const MapPage = () => {
           setVisibilityState={setVisibilityState}
         />
       </div>
-    </PageLayout>
+    </>
   );
 };
 

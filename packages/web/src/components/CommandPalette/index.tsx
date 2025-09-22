@@ -1,4 +1,4 @@
-import { Avatar } from "@components/UI/Avatar.tsx";
+import { Avatar } from "@app/components/UI/avatar";
 import {
   CommandDialog,
   CommandEmpty,
@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { MeshAvatar } from "../MeshAvatar.tsx";
 
 export interface Group {
   id: string;
@@ -127,7 +128,7 @@ export const CommandPalette = () => {
               getNode(device.hardware.myNodeNum)?.user?.longName ??
               t("unknown.shortName"),
             icon: (
-              <Avatar
+              <MeshAvatar
                 text={
                   getNode(device.hardware.myNodeNum)?.user?.shortName ??
                   t("unknown.shortName")

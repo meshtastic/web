@@ -1,5 +1,7 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
+import { MeshAvatar } from "@app/components/MeshAvatar";
+import { Avatar } from "@app/components/UI/avatar";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import {
   type FilterState,
@@ -13,8 +15,6 @@ import {
 } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
-import { Avatar } from "@components/UI/Avatar.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import useLang from "@core/hooks/useLang.ts";
 import { useAppStore, useDevice, useNodeDB } from "@core/stores";
@@ -151,7 +151,7 @@ const NodesPage = (): JSX.Element => {
       cells: [
         {
           content: (
-            <Avatar
+            <MeshAvatar
               text={shortName}
               showFavorite={node.isFavorite}
               showError={hasNodeError(node.num)}
@@ -247,14 +247,13 @@ const NodesPage = (): JSX.Element => {
   });
 
   return (
-    <PageLayout label="" leftBar={<Sidebar />}>
+    <PageLayout label="">
       <div className="pl-2 pt-2 flex flex-row">
         <div className="flex-1 mr-2">
           <Input
             placeholder={t("search.nodes")}
             value={filterState.nodeName}
             className="bg-transparent"
-            showClearButton={!!filterState.nodeName}
             onChange={(e) =>
               setFilterState((prev) => ({
                 ...prev,

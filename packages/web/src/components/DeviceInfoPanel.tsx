@@ -17,7 +17,7 @@ import BatteryStatus from "./BatteryStatus.tsx";
 import LanguageSwitcher from "./LanguageSwitcher.tsx";
 import ThemeSwitcher from "./ThemeSwitcher.tsx";
 import { ThemeModeToggle } from "./theme-mode-toggle.tsx";
-import { Avatar } from "./UI/Avatar.tsx";
+import { Avatar } from "./UI/avatar.tsx";
 import { Button } from "./UI/Button.tsx";
 import { Separator } from "./UI/Separator.tsx";
 import { Subtle } from "./UI/Typography/Subtle.tsx";

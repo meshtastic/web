@@ -1,7 +1,8 @@
+import { MeshAvatar } from "@app/components/MeshAvatar";
+import { Avatar } from "@app/components/UI/avatar";
 import BatteryStatus from "@components/BatteryStatus.tsx";
 import { Mono } from "@components/generic/Mono.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import { Avatar } from "@components/UI/Avatar.tsx";
 import { Separator } from "@components/UI/Separator.tsx";
 import { Heading } from "@components/UI/Typography/Heading.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
@@ -52,7 +53,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
     <div className="p-1 text-slate-900">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
-          <Avatar text={shortName} size="sm" />
+          <MeshAvatar text={shortName} size="sm" />
 
           <div
             onFocusCapture={(e) => {
@@ -113,7 +114,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
         </div>
 
         <div>
-          <Heading as="h5">{name}</Heading>
+          <Heading as="h4">{name}</Heading>
           {hardwareType !== t("unset") && <Subtle>{hardwareType}</Subtle>}
 
           {!!node.deviceMetrics?.batteryLevel && (
