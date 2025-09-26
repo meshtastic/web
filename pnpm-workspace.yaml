@@ -1,2 +1,5 @@
+minimumReleaseAge: 2880 # package dependency library must be at least 2 days old
+minimumReleaseAgeExclude:
+- '@meshtastic/*'
 packages:
   - "packages/*"
