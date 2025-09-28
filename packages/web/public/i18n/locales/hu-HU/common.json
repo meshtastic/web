@@ -5,39 +5,39 @@
 		"cancel": "Megszakítani",
 		"clearMessages": "Clear Messages",
 		"close": "Bezárás",
-		"confirm": "Confirm",
+		"confirm": "Megerősítés",
 		"delete": "Törlés",
 		"dismiss": "Bezárás",
 		"download": "Letöltés",
-		"export": "Export",
-		"generate": "Generate",
-		"regenerate": "Regenerate",
+		"export": "Exportálás",
+		"generate": "Generálás",
+		"regenerate": "Újragenerálás",
 		"import": "Importálás",
 		"message": "Üzenet",
-		"now": "Now",
+		"now": "Most",
 		"ok": "OK",
 		"print": "Print",
 		"remove": "Törlés",
 		"requestNewKeys": "Request New Keys",
-		"requestPosition": "Request Position",
+		"requestPosition": "Pozíció kérése",
 		"reset": "Újraindítás",
 		"save": "Mentés",
 		"scanQr": "QR-kód beolvasása",
 		"traceRoute": "Trace Route",
-		"submit": "Submit"
+		"submit": "Mentés"
 	},
 	"app": {
 		"title": "Meshtastic",
-		"fullTitle": "Meshtastic Web Client"
+		"fullTitle": "Meshtastic Web Kliens"
 	},
-	"loading": "Loading...",
+	"loading": "Töltés...",
 	"unit": {
 		"cps": "CPS",
 		"dbm": "dBm",
 		"hertz": "Hz",
 		"hop": {
-			"one": "Hop",
-			"plural": "Hops"
+			"one": "Ugrás",
+			"plural": "Ugrások"
 		},
 		"hopsAway": {
 			"one": "{{count}} hop away",
@@ -45,18 +45,18 @@
 			"unknown": "Unknown hops away"
 		},
 		"megahertz": "MHz",
-		"raw": "raw",
+		"raw": "nyers",
 		"meter": {
-			"one": "Meter",
-			"plural": "Meters",
+			"one": "Méter",
+			"plural": "Méter",
 			"suffix": "m"
 		},
 		"minute": {
-			"one": "Minute",
-			"plural": "Minutes"
+			"one": "Perc",
+			"plural": "Percek"
 		},
 		"hour": {
-			"one": "Hour",
+			"one": "Óra",
 			"plural": "Hours"
 		},
 		"millisecond": {
@@ -65,20 +65,20 @@
 			"suffix": "ms"
 		},
 		"second": {
-			"one": "Second",
-			"plural": "Seconds"
+			"one": "Másodperc",
+			"plural": "Másodpercek"
 		},
 		"day": {
-			"one": "Day",
-			"plural": "Days"
+			"one": "Nap",
+			"plural": "Napok"
 		},
 		"month": {
-			"one": "Month",
-			"plural": "Months"
+			"one": "Hónap",
+			"plural": "Hónapok"
 		},
 		"year": {
-			"one": "Year",
-			"plural": "Years"
+			"one": "Év",
+			"plural": "Évek"
 		},
 		"snr": "SNR",
 		"volt": {
@@ -87,12 +87,12 @@
 			"suffix": "V"
 		},
 		"record": {
-			"one": "Records",
-			"plural": "Records"
+			"one": "Bejegyzések",
+			"plural": "Bejegyzések"
 		}
 	},
 	"security": {
-		"0bit": "Empty",
+		"0bit": "Üres",
 		"8bit": "8 bit",
 		"128bit": "128 bit",
 		"256bit": "256 bit"
@@ -100,15 +100,15 @@
 	"unknown": {
 		"longName": "Ismeretlen",
 		"shortName": "UNK",
-		"notAvailable": "N/A",
+		"notAvailable": "Nincs adat",
 		"num": "??"
 	},
 	"nodeUnknownPrefix": "!",
-	"unset": "UNSET",
+	"unset": "NEM BEÁLLÍTOTT",
 	"fallbackName": "Meshtastic {{last4}}",
-	"node": "Node",
+	"node": "Csomópont",
 	"formValidation": {
-		"unsavedChanges": "Unsaved changes",
+		"unsavedChanges": "Nem mentett módosítások",
 		"tooBig": {
 			"string": "Too long, expected less than or equal to {{maximum}} characters.",
 			"number": "Too big, expected a number smaller than or equal to {{maximum}}.",
@@ -132,11 +132,11 @@
 			"256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
 		},
 		"required": {
-			"generic": "This field is required.",
+			"generic": "A mező kitöltése kötelező.",
 			"managed": "At least one admin key is requred if the node is managed.",
-			"key": "Key is required."
+			"key": "Kulcs megadása kötelező."
 		}
 	},
-	"yes": "Yes",
-	"no": "No"
+	"yes": "Igen",
+	"no": "Nem"
 }
