@@ -183,7 +183,7 @@
 		},
 		"usePreset": {
 			"description": "Utilice uno de los ajustes predefinidos del módem",
-			"label": "Usar ajuste"
+			"label": "Usar predefinido"
 		},
 		"meshSettings": {
 			"description": "Opciones de la malla LoRa",
@@ -195,7 +195,7 @@
 		},
 		"radioSettings": {
 			"label": "Ajustes de radio",
-			"description": "Configuración de la forma de onda LoRa"
+			"description": "Configuración para LoRa radio"
 		}
 	},
 	"network": {
@@ -353,7 +353,7 @@
 		},
 		"noConnectionBluetoothDisabled": {
 			"description": "Si el dispositivo no recibe una conexión Bluetooth, la radio BLE se desactivará después de este tiempo",
-			"label": "No Connection Bluetooth Disabled"
+			"label": "No hay conexión Bluetooth desactivado"
 		},
 		"powerSavingEnabled": {
 			"description": "Seleccione si está alimentado de una fuente de corriente de poca potencia (es decir, solar), para minimizar el consumo de energía tanto como sea posible.",
@@ -381,19 +381,19 @@
 		"title": "Configuraciones de Seguridad",
 		"button_backupKey": "Clave de la copia de seguridad",
 		"adminChannelEnabled": {
-			"description": "Allow incoming device control over the insecure legacy admin channel",
-			"label": "Allow Legacy Admin"
+			"description": "Permitir el control del dispositivo entrante mediante el canal inseguro de administración legado",
+			"label": "Permitir Administrador Legado"
 		},
 		"enableDebugLogApi": {
 			"description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
-			"label": "Enable Debug Log API"
+			"label": "Habilitar API de registro de depuración"
 		},
 		"managed": {
 			"description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
-			"label": "Managed"
+			"label": "Administrado"
 		},
 		"privateKey": {
-			"description": "Used to create a shared key with a remote device",
+			"description": "Utilizado para crear una clave compartida con un dispositivo remoto",
 			"label": "Clave privada"
 		},
 		"publicKey": {
@@ -402,7 +402,7 @@
 		},
 		"primaryAdminKey": {
 			"description": "The primary public key authorized to send admin messages to this node",
-			"label": "Primary Admin Key"
+			"label": "Clave principal de administrador"
 		},
 		"secondaryAdminKey": {
 			"description": "The secondary public key authorized to send admin messages to this node",
@@ -410,15 +410,15 @@
 		},
 		"serialOutputEnabled": {
 			"description": "Serial Console over the Stream API",
-			"label": "Serial Output Enabled"
+			"label": "Salida Serial Activada"
 		},
 		"tertiaryAdminKey": {
 			"description": "The tertiary public key authorized to send admin messages to this node",
 			"label": "Tertiary Admin Key"
 		},
 		"adminSettings": {
-			"description": "Settings for Admin",
-			"label": "Admin Settings"
+			"description": "Opciones para administradores",
+			"label": "Ajustes de administrador"
 		},
 		"loggingSettings": {
 			"description": "Settings for Logging",
