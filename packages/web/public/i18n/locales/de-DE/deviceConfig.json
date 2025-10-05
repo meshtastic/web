@@ -25,15 +25,15 @@
 			"label": "GPIO Summer"
 		},
 		"disableTripleClick": {
-			"description": "Dreifachklicken deaktivieren",
-			"label": "Dreifachklicken deaktivieren"
+			"description": "Dreifachklick deaktivieren",
+			"label": "Dreifachklick deaktivieren"
 		},
 		"doubleTapAsButtonPress": {
 			"description": "Doppeltes Tippen als Taste verwenden",
 			"label": "Doppelklick als Tastendruck"
 		},
 		"ledHeartbeatDisabled": {
-			"description": "Die Herzschlag LED deaktivieren",
+			"description": "Puls LED deaktivieren",
 			"label": "Herzschlag LED deaktivieren"
 		},
 		"nodeInfoBroadcastInterval": {
@@ -79,7 +79,7 @@
 		},
 		"carouselDelay": {
 			"description": "Bestimmt wie schnell die Fenster durch gewechselt werden",
-			"label": "Karussellverzögerung"
+			"label": "Karussellintervall"
 		},
 		"compassNorthTop": {
 			"description": "Norden im Kompass immer oben anzeigen",
@@ -336,7 +336,7 @@
 	},
 	"power": {
 		"adcMultiplierOverride": {
-			"description": "Zur Optimierung der Genauigkeit bei der Akkuspannunsmessung",
+			"description": "Zur Optimierung der Genauigkeit bei der Akkuspannungsmessung",
 			"label": "ADC Multiplikationsfaktor"
 		},
 		"ina219Address": {
@@ -352,11 +352,11 @@
 			"label": "Minimale Aufwachzeit"
 		},
 		"noConnectionBluetoothDisabled": {
-			"description": "Wenn das Gerät keine Bluetooth Verbindung erhält, wird der BLE Funk nach dieser Zeit deaktiviert",
+			"description": "Wenn das Gerät keine Bluetooth-Verbindung erhält, wird BLE nach dieser Zeit deaktiviert",
 			"label": "Keine Verbindung, Bluetooth deaktiviert"
 		},
 		"powerSavingEnabled": {
-			"description": "Auswählen, wenn aus einer Stromquelle mit niedriger Kapazität (z.B Solar) betrieben wird, um den Stromverbrauch so weit wie möglich zu minimieren.",
+			"description": "Auswählen, wenn aus einer Stromquelle mit niedriger Kapazität (z.B. Solar) betrieben wird, um den Stromverbrauch so weit wie möglich zu minimieren.",
 			"label": "Energiesparmodus aktivieren"
 		},
 		"shutdownOnBatteryDelay": {
@@ -389,7 +389,7 @@
 			"label": "Debug-Protokoll API aktivieren"
 		},
 		"managed": {
-			"description": "Wenn aktiviert, können die Geräteeinstellungen nur von einem entfernten Administratorknoten über administrative Nachrichten geändert werden. Aktivieren Sie diese Option nur, wenn mindestens ein geeigneter Administratorknoten eingerichtet, und desen öffentlicher Schlüssel wird in einem der obigen Felder gespeichert wurde.",
+			"description": "Wenn aktiviert, können die Geräteeinstellungen nur von einem entfernten Administratorknoten über administrative Nachrichten geändert werden. Aktivieren Sie diese Option nur, wenn mindestens ein geeigneter Administratorknoten eingerichtet wurde, und dessen öffentlicher Schlüssel in einem der obigen Felder gespeichert wurde.\n",
 			"label": "Verwaltet"
 		},
 		"privateKey": {

@@ -45,7 +45,7 @@
 		},
 		"connectionStatus": {
 			"direct": "Direkt",
-			"away": "abwesend",
+			"away": "entfernt",
 			"unknown": "-",
 			"viaMqtt": ", über MQTT"
 		},

@@ -29,10 +29,10 @@
 			},
 			"deviceName": {
 				"title": "Gerätename",
-				"changeName": "Gerätename ändern",
-				"placeholder": "Gerätename eingeben"
+				"changeName": "Gerätenamen ändern",
+				"placeholder": "Gerätenamen eingeben"
 			},
-			"editDeviceName": "Gerätename bearbeiten"
+			"editDeviceName": "Gerätenamen bearbeiten"
 		}
 	},
 	"batteryStatus": {
