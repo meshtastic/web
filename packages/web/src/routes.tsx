@@ -2,6 +2,7 @@ import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import type { useAppStore, useMessageStore } from "@core/stores";
 import ConfigPage from "@pages/Config/index.tsx";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
+import GPSPage from "@pages/GPS/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
@@ -68,6 +69,12 @@ export const messagesWithParamsRoute = createRoute({
   }),
 });
 
+const gpsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/gps",
+  component: GPSPage,
+});
+
 const mapRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/map",
@@ -96,6 +103,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   messagesRoute,
   messagesWithParamsRoute,
+  gpsRoute,
   mapRoute,
   configRoute,
   nodesRoute,
