@@ -4,10 +4,25 @@ import http from 'http';
 
 const execAsync = promisify(exec);
 
-let lastPosition = null;
+interface GPSCoords {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  altitude: number | null;
+  altitudeAccuracy: number | null;
+  heading: number | null;
+  speed: number | null;
+}
+
+interface GPSPosition {
+  coords: GPSCoords;
+  timestamp: number;
+}
+
+let lastPosition: GPSPosition | null = null;
 let isEnabled = true; // Can be controlled via /control endpoint
 
-async function getAndroidGPS() {
+async function getAndroidGPS(): Promise<GPSPosition | null> {
   if (!isEnabled) {
     lastPosition = null;
     return null;
@@ -39,7 +54,7 @@ async function getAndroidGPS() {
   return lastPosition;
 }
 
-const server = http.createServer(async (req, res) => {
+const server = http.createServer(async (req: http.IncomingMessage, res: http.ServerResponse) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
