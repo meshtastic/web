@@ -130,7 +130,7 @@ export const MessagesPage = () => {
           true,
           channelValue,
         );
-        if (messageId !== undefined && getMyNode() !== undefined) {
+        if (messageId !== undefined) {
           if (chatType === MessageType.Broadcast) {
             setMessageState({
               type: MessageType.Broadcast,
