@@ -67,7 +67,7 @@ const NodesPage = (): JSX.Element => {
   // subscribe to actual data (nodes array) and to nodeErrors ref for badge updates
   const { nodes: filteredNodes, hasNodeError } = useNodeDB(
     (db) => ({
-      nodes: db.getNodes(predicate, false),
+      nodes: db.getNodes(predicate, true),
       hasNodeError: db.hasNodeError,
       _errorsRef: db.nodeErrors, // include the Map ref so UI also re-renders on error changes
     }),

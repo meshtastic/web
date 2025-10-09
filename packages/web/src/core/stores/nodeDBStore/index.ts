@@ -41,7 +41,7 @@ export interface NodeDB {
     filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
     includeSelf?: boolean,
   ) => Protobuf.Mesh.NodeInfo[];
-  getMyNode: () => Protobuf.Mesh.NodeInfo | undefined;
+  getMyNode: () => Protobuf.Mesh.NodeInfo;
 
   getNodeError: (nodeNum: number) => NodeError | undefined;
   hasNodeError: (nodeNum: number) => boolean;

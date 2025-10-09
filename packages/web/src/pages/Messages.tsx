@@ -100,7 +100,7 @@ export const MessagesPage = () => {
         longName.includes(lowerCaseSearchTerm) ||
         shortName.includes(lowerCaseSearchTerm)
       );
-    })
+    }, true)
       .map((node: Protobuf.Mesh.NodeInfo) => ({
         ...node,
         unreadCount: getUnreadCount(node.num) ?? 0,
@@ -130,7 +130,7 @@ export const MessagesPage = () => {
           true,
           channelValue,
         );
-        if (messageId !== undefined) {
+        if (messageId !== undefined && getMyNode() !== undefined) {
           if (chatType === MessageType.Broadcast) {
             setMessageState({
               type: MessageType.Broadcast,
