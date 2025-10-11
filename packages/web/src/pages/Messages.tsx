@@ -100,7 +100,7 @@ export const MessagesPage = () => {
         longName.includes(lowerCaseSearchTerm) ||
         shortName.includes(lowerCaseSearchTerm)
       );
-    })
+    }, true)
       .map((node: Protobuf.Mesh.NodeInfo) => ({
         ...node,
         unreadCount: getUnreadCount(node.num) ?? 0,
