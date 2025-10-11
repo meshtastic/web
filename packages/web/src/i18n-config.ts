@@ -40,7 +40,6 @@ i18next
     },
     fallbackLng: {
       default: [FALLBACK_LANGUAGE_CODE],
-      "en-GB": [FALLBACK_LANGUAGE_CODE],
       fi: ["fi-FI", FALLBACK_LANGUAGE_CODE],
       sv: ["sv-SE", FALLBACK_LANGUAGE_CODE],
       de: ["de-DE", FALLBACK_LANGUAGE_CODE],
