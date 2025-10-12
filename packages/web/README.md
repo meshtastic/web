@@ -37,14 +37,14 @@ podman run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshta
 
 Our release process follows these guidelines:
 
-- **Versioning:** We use Semantic Versioning (`Major.Minor.Patch`).
-- **Stable Releases:** Published around the beginning of each month (e.g.,
-  `v2.6.1`).
-- **Pre-releases:** A pre-release is typically issued mid-month for testing and
-  early adoption.
-- **Nightly Builds:** An experimental Docker image containing the latest
-  cutting-edge features and fixes is automatically built nightly from the `main`
-  branch.
+-   **Versioning:** We use Semantic Versioning (`Major.Minor.Patch`).
+-   **Stable Releases:** Published around the beginning of each month (e.g.,
+    `v2.6.1`).
+-   **Pre-releases:** A pre-release is typically issued mid-month for testing and
+    early adoption.
+-   **Nightly Builds:** An experimental Docker image containing the latest
+    cutting-edge features and fixes is automatically built nightly from the `main`
+    branch.
 
 ### Nightly Builds
 
@@ -57,20 +57,20 @@ podman run -d -p 8080:8080 --restart always --name Meshtastic-Web ghcr.io/meshta
 
 > [!WARNING]
 >
-> - Nightly builds represent the latest development state and may contain
->   breaking changes
-> - These builds undergo automated testing but may be less stable than tagged
->   release versions
-> - Not recommended for production environments unless you are actively testing
->   new features
-> - No guarantee of backward compatibility between nightly builds
+> -   Nightly builds represent the latest development state and may contain
+>     breaking changes
+> -   These builds undergo automated testing but may be less stable than tagged
+>     release versions
+> -   Not recommended for production environments unless you are actively testing
+>     new features
+> -   No guarantee of backward compatibility between nightly builds
 
 #### Version Information
 
 Each nightly build is tagged with:
 
-- The nightly tag for the latest build
-- A specific SHA for build reproducibility
+-   The nightly tag for the latest build
+-   A specific SHA for build reproducibility
 
 ### Feedback
 
@@ -118,39 +118,39 @@ pnpm run package
 Meshtastic Web uses pnpm as its package manager for several compelling
 reasons:
 
-- **Efficient Storage**: pnpm uses content-addressable storage, avoiding duplication
-  of packages across projects and saving significant disk space.
-- **Fast Performance**: Faster package installation compared to other package
-  managers through symlinks and efficient dependency resolution.
-- **Strict Dependency Management**: Prevents access to unlisted dependencies,
-  ensuring better project reliability and security.
-- **Workspace Support**: Excellent monorepo support with workspaces for managing
-  multiple packages efficiently.
-- **Reproducible Builds**: Lockfile ensures consistent builds across all
-  environments.
+-   **Efficient Storage**: pnpm uses content-addressable storage, avoiding duplication
+    of packages across projects and saving significant disk space.
+-   **Fast Performance**: Faster package installation compared to other package
+    managers through symlinks and efficient dependency resolution.
+-   **Strict Dependency Management**: Prevents access to unlisted dependencies,
+    ensuring better project reliability and security.
+-   **Workspace Support**: Excellent monorepo support with workspaces for managing
+    multiple packages efficiently.
+-   **Reproducible Builds**: Lockfile ensures consistent builds across all
+    environments.
 
 ### Contributing
 
 We welcome contributions! Here’s how the deployment flow works for pull
 requests:
 
-- **Preview Deployments:**\
-  Every pull request automatically generates a preview deployment on Vercel.
-  This allows you and reviewers to easily preview changes before merging.
+-   **Preview Deployments:**\
+    Every pull request automatically generates a preview deployment on Vercel.
+    This allows you and reviewers to easily preview changes before merging.
 
-- **Staging Environment (`client-test`):**\
-  Once your PR is merged, your changes will be available on our staging site:
-  [client-test.meshtastic.org](https://client-test.meshtastic.org/).\
-  This environment supports rapid feature iteration and testing without
-  impacting the production site.
+-   **Staging Environment (`client-test`):**\
+    Once your PR is merged, your changes will be available on our staging site:
+    [client-test.meshtastic.org](https://client-test.meshtastic.org/).\
+    This environment supports rapid feature iteration and testing without
+    impacting the production site.
 
-- **Production Releases:**\
-  At regular intervals, stable and fully tested releases are promoted to our
-  production site: [client.meshtastic.org](https://client.meshtastic.org/).\
-  This is the primary interface used by the public to connect with their
-  Meshtastic nodes.
+-   **Production Releases:**\
+    At regular intervals, stable and fully tested releases are promoted to our
+    production site: [client.meshtastic.org](https://client.meshtastic.org/).\
+    This is the primary interface used by the public to connect with their
+    Meshtastic nodes.
 
 Please review our
-[Contribution Guidelines](https://github.com/meshtastic/web/blob/main/CONTRIBUTING.md)
+[Contribution Guidelines](https://github.com/meshtastic/web/blob/main/packages/web/CONTRIBUTIONS.md)
 before submitting a pull request. We appreciate your help in making the project
 better!
