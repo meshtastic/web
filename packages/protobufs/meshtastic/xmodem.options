@@ -1,0 +1,6 @@
+# options for nanopb
+# https://jpa.kapsi.fi/nanopb/docs/reference.html#proto-file-options
+
+*XModem.buffer max_size:128
+*XModem.seq int_size:16
+*XModem.crc16 int_size:16

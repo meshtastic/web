@@ -1,0 +1,4 @@
+*DeviceProfile.long_name max_size:40
+*DeviceProfile.short_name max_size:5
+*DeviceProfile.ringtone max_size:231
+*DeviceProfile.canned_messages max_size:201

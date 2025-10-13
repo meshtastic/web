@@ -1,0 +1,92 @@
+# options for nanopb
+# https://jpa.kapsi.fi/nanopb/docs/reference.html#proto-file-options
+
+*macaddr max_size:6 fixed_length:true # macaddrs
+*id max_size:16 # node id strings
+*public_key max_size:32 # public key
+
+*User.long_name max_size:40
+*User.short_name max_size:5
+
+*RouteDiscovery.route max_count:8
+*RouteDiscovery.snr_towards max_count:8
+*RouteDiscovery.snr_towards int_size:8
+*RouteDiscovery.route_back max_count:8
+*RouteDiscovery.snr_back max_count:8
+*RouteDiscovery.snr_back int_size:8
+
+# note: this payload length is ONLY the bytes that are sent inside of the Data protobuf (excluding protobuf overhead). The 16 byte header is
+# outside of this envelope
+*Data.payload max_size:233
+*Data.bitfield int_size:8
+
+*NodeInfo.channel int_size:8
+*NodeInfo.hops_away int_size:8
+
+# Big enough for 1.2.28.568032c-d
+*MyNodeInfo.firmware_version max_size:18
+*MyNodeInfo.device_id max_size:16
+*MyNodeInfo.pio_env max_size:40
+
+*MyNodeInfo.air_period_tx       max_count:8
+*MyNodeInfo.air_period_rx       max_count:8
+
+*MyNodeInfo.firmware_edition int_size:8
+*MyNodeInfo.nodedb_count int_size:16
+
+# Note: the actual limit (because of header bytes) on the size of encrypted payloads is 251 bytes, but I use 256
+# here because we might need to fill with zeros for padding to encryption block size (16 bytes per block)
+*MeshPacket.encrypted max_size:256
+*MeshPacket.payload_variant anonymous_oneof:true
+*MeshPacket.hop_limit int_size:8
+*MeshPacket.hop_start int_size:8
+*MeshPacket.channel int_size:8
+*MeshPacket.next_hop int_size:8
+*MeshPacket.relay_node int_size:8
+
+*QueueStatus.res int_size:8
+*QueueStatus.free int_size:8
+*QueueStatus.maxlen int_size:8
+
+*ToRadio.payload_variant anonymous_oneof:true
+
+*FromRadio.payload_variant anonymous_oneof:true
+
+*Routing.variant anonymous_oneof:true
+
+*LogRecord.message max_size:384
+*LogRecord.source max_size:32
+
+*FileInfo.file_name max_size:228
+
+*ClientNotification.message max_size:400
+
+*KeyVerificationNumberInform.remote_longname max_size:40
+*KeyVerificationNumberRequest.remote_longname max_size:40
+*KeyVerificationFinal.remote_longname max_size:40
+*KeyVerificationFinal.verification_characters max_size:10
+
+*KeyVerification.hash1 max_size:32
+*KeyVerification.hash2 max_size:32
+
+
+# MyMessage.name         max_size:40 
+# or fixed_length or fixed_count, or max_count
+
+#This value may want to be a few bytes smaller to compensate for the parent fields.
+*Compressed.data max_size:233
+
+*Waypoint.name         max_size:30
+*Waypoint.description  max_size:100
+
+*NeighborInfo.neighbors max_count:10
+
+*DeviceMetadata.firmware_version max_size:18
+
+*MqttClientProxyMessage.topic max_size:60
+*MqttClientProxyMessage.data max_size:435
+*MqttClientProxyMessage.text max_size:435
+
+*ChunkedPayload.chunk_count int_size:16
+*ChunkedPayload.chunk_index int_size:16
+*ChunkedPayload.payload_chunk max_size:228

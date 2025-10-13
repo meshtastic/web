@@ -1,0 +1,24 @@
+# longest current is 45 chars, plan with a bit of buffer
+*DeviceConfig.tzdef max_size:65
+*DeviceConfig.buzzer_mode int_size:8
+
+
+*NetworkConfig.wifi_ssid max_size:33
+*NetworkConfig.wifi_psk max_size:65
+*NetworkConfig.ntp_server max_size:33
+*NetworkConfig.rsyslog_server max_size:33
+
+# Max of three ignored nodes for our testing
+*LoRaConfig.ignore_incoming max_count:3
+
+*LoRaConfig.tx_power int_size:8
+*LoRaConfig.bandwidth int_size:16
+*LoRaConfig.coding_rate int_size:8
+*LoRaConfig.channel_num int_size:16
+
+*PowerConfig.device_battery_ina_address int_size:8
+
+*SecurityConfig.public_key max_size:32
+*SecurityConfig.private_key max_size:32
+*SecurityConfig.admin_key max_size:32
+*SecurityConfig.admin_key max_count:3

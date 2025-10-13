@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "ConnStatusProtos";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+message DeviceConnectionStatus {
+  /*
+   * WiFi Status
+   */
+  optional WifiConnectionStatus wifi = 1;
+  /*
+   * WiFi Status
+   */
+  optional EthernetConnectionStatus ethernet = 2;
+
+  /*
+   * Bluetooth Status
+   */
+  optional BluetoothConnectionStatus bluetooth = 3;
+
+  /*
+   * Serial Status
+   */
+  optional SerialConnectionStatus serial = 4;
+}
+
+/*
+ * WiFi connection status
+ */
+message WifiConnectionStatus {
+  /*
+   * Connection status
+   */
+  NetworkConnectionStatus status = 1;
+
+  /*
+   * WiFi access point SSID
+   */
+  string ssid = 2;
+
+  /*
+   * RSSI of wireless connection
+   */
+  int32 rssi = 3;
+}
+
+/*
+ * Ethernet connection status
+ */
+message EthernetConnectionStatus {
+  /*
+   * Connection status
+   */
+  NetworkConnectionStatus status = 1;
+}
+
+/*
+ * Ethernet or WiFi connection status
+ */
+message NetworkConnectionStatus {
+  /*
+   * IP address of device
+   */
+  fixed32 ip_address = 1;
+
+  /*
+   * Whether the device has an active connection or not
+   */
+  bool is_connected = 2;
+
+  /*
+   * Whether the device has an active connection to an MQTT broker or not
+   */
+  bool is_mqtt_connected = 3;
+
+  /*
+   * Whether the device is actively remote syslogging or not
+   */
+  bool is_syslog_connected = 4;
+}
+
+/*
+ * Bluetooth connection status
+ */
+message BluetoothConnectionStatus {
+  /*
+   * The pairing PIN for bluetooth
+   */
+  uint32 pin = 1;
+
+  /*
+   * RSSI of bluetooth connection
+   */
+  int32 rssi = 2;
+
+  /*
+   * Whether the device has an active connection or not
+   */
+  bool is_connected = 3;
+}
+
+/*
+ * Serial connection status
+ */
+message SerialConnectionStatus {
+  /*
+   * Serial baud rate
+   */
+  uint32 baud = 1;
+
+  /*
+   * Whether the device has an active connection or not
+   */
+  bool is_connected = 2;
+}

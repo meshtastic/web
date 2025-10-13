@@ -1,0 +1,12 @@
+*DeviceUIConfig.screen_brightness int_size:8
+*DeviceUIConfig.screen_timeout int_size:16
+*DeviceUIConfig.ring_tone_id int_size:8
+*DeviceUIConfig.calibration_data max_size:16
+*DeviceUIConfig.compass_mode int_size:8
+*DeviceUIConfig.gps_format int_size:8
+*NodeFilter.node_name max_size:16
+*NodeFilter.hops_away int_size:8
+*NodeFilter.channel int_size:8
+*NodeHighlight.node_name max_size:16
+*GeoPoint.zoom int_size:8
+*Map.style max_size:20

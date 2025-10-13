@@ -1,0 +1,218 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "StoreAndForwardProtos";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+/*
+ * TODO: REPLACE
+ */
+message StoreAndForward {
+  /*
+   * 001 - 063 = From Router
+   * 064 - 127 = From Client
+   */
+  enum RequestResponse {
+    /*
+     * Unset/unused
+     */
+    UNSET = 0;
+
+    /*
+     * Router is an in error state.
+     */
+    ROUTER_ERROR = 1;
+
+    /*
+     * Router heartbeat
+     */
+    ROUTER_HEARTBEAT = 2;
+
+    /*
+     * Router has requested the client respond. This can work as a
+     * "are you there" message.
+     */
+    ROUTER_PING = 3;
+
+    /*
+     * The response to a "Ping"
+     */
+    ROUTER_PONG = 4;
+
+    /*
+     * Router is currently busy. Please try again later.
+     */
+    ROUTER_BUSY = 5;
+
+    /*
+     * Router is responding to a request for history.
+     */
+    ROUTER_HISTORY = 6;
+
+    /*
+     * Router is responding to a request for stats.
+     */
+    ROUTER_STATS = 7;
+
+    /*
+     * Router sends a text message from its history that was a direct message.
+     */
+    ROUTER_TEXT_DIRECT = 8;
+
+    /*
+     * Router sends a text message from its history that was a broadcast.
+     */
+    ROUTER_TEXT_BROADCAST = 9;
+
+    /*
+     * Client is an in error state.
+     */
+    CLIENT_ERROR = 64;
+
+    /*
+     * Client has requested a replay from the router.
+     */
+    CLIENT_HISTORY = 65;
+
+    /*
+     * Client has requested stats from the router.
+     */
+    CLIENT_STATS = 66;
+
+    /*
+     * Client has requested the router respond. This can work as a
+     * "are you there" message.
+     */
+    CLIENT_PING = 67;
+
+    /*
+     * The response to a "Ping"
+     */
+    CLIENT_PONG = 68;
+
+    /*
+     * Client has requested that the router abort processing the client's request
+     */
+    CLIENT_ABORT = 106;
+  }
+
+  /*
+   * TODO: REPLACE
+   */
+  message Statistics {
+    /*
+     * Number of messages we have ever seen
+     */
+    uint32 messages_total = 1;
+
+    /*
+     * Number of messages we have currently saved our history.
+     */
+    uint32 messages_saved = 2;
+
+    /*
+     * Maximum number of messages we will save
+     */
+    uint32 messages_max = 3;
+
+    /*
+     * Router uptime in seconds
+     */
+    uint32 up_time = 4;
+
+    /*
+     * Number of times any client sent a request to the S&F.
+     */
+    uint32 requests = 5;
+
+    /*
+     * Number of times the history was requested.
+     */
+    uint32 requests_history = 6;
+
+    /*
+     * Is the heartbeat enabled on the server?
+     */
+    bool heartbeat = 7;
+
+    /*
+     * Maximum number of messages the server will return.
+     */
+    uint32 return_max = 8;
+
+    /*
+     * Maximum history window in minutes the server will return messages from.
+     */
+    uint32 return_window = 9;
+  }
+
+  /*
+   * TODO: REPLACE
+   */
+  message History {
+    /*
+     * Number of that will be sent to the client
+     */
+    uint32 history_messages = 1;
+
+    /*
+     * The window of messages that was used to filter the history client requested
+     */
+    uint32 window = 2;
+
+    /*
+     * Index in the packet history of the last message sent in a previous request to the server.
+     * Will be sent to the client before sending the history and can be set in a subsequent request to avoid getting packets the server already sent to the client.
+     */
+    uint32 last_request = 3;
+  }
+
+  /*
+   * TODO: REPLACE
+   */
+  message Heartbeat {
+    /*
+     * Period in seconds that the heartbeat is sent out that will be sent to the client
+     */
+    uint32 period = 1;
+
+    /*
+     * If set, this is not the primary Store & Forward router on the mesh
+     */
+    uint32 secondary = 2;
+  }
+
+  /*
+   * TODO: REPLACE
+   */
+  RequestResponse rr = 1;
+
+  /*
+   * TODO: REPLACE
+   */
+  oneof variant {
+    /*
+     * TODO: REPLACE
+     */
+    Statistics stats = 2;
+
+    /*
+     * TODO: REPLACE
+     */
+    History history = 3;
+
+    /*
+     * TODO: REPLACE
+     */
+    Heartbeat heartbeat = 4;
+
+    /*
+     * Text from history message.
+     */
+    bytes text = 5;
+  }
+}

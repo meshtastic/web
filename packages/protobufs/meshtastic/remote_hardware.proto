@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "RemoteHardware";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+/*
+ * An example app to show off the module system. This message is used for
+ * REMOTE_HARDWARE_APP PortNums.
+ * Also provides easy remote access to any GPIO.
+ * In the future other remote hardware operations can be added based on user interest
+ * (i.e. serial output, spi/i2c input/output).
+ * FIXME - currently this feature is turned on by default which is dangerous
+ * because no security yet (beyond the channel mechanism).
+ * It should be off by default and then protected based on some TBD mechanism
+ * (a special channel once multichannel support is included?)
+ */
+message HardwareMessage {
+  /*
+   * TODO: REPLACE
+   */
+  enum Type {
+    /*
+     * Unset/unused
+     */
+    UNSET = 0;
+
+    /*
+     * Set gpio gpios based on gpio_mask/gpio_value
+     */
+    WRITE_GPIOS = 1;
+
+    /*
+     * We are now interested in watching the gpio_mask gpios.
+     * If the selected gpios change, please broadcast GPIOS_CHANGED.
+     * Will implicitly change the gpios requested to be INPUT gpios.
+     */
+    WATCH_GPIOS = 2;
+
+    /*
+     * The gpios listed in gpio_mask have changed, the new values are listed in gpio_value
+     */
+    GPIOS_CHANGED = 3;
+
+    /*
+     * Read the gpios specified in gpio_mask, send back a READ_GPIOS_REPLY reply with gpio_value populated
+     */
+    READ_GPIOS = 4;
+
+    /*
+     * A reply to READ_GPIOS. gpio_mask and gpio_value will be populated
+     */
+    READ_GPIOS_REPLY = 5;
+  }
+
+  /*
+   * What type of HardwareMessage is this?
+   */
+  Type type = 1;
+
+  /*
+   * What gpios are we changing. Not used for all MessageTypes, see MessageType for details
+   */
+  uint64 gpio_mask = 2;
+
+  /*
+   * For gpios that were listed in gpio_mask as valid, what are the signal levels for those gpios.
+   * Not used for all MessageTypes, see MessageType for details
+   */
+  uint64 gpio_value = 3;
+}

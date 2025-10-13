@@ -1,0 +1,263 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "ATAKProtos";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+/*
+ * Packets for the official ATAK Plugin
+ */
+message TAKPacket {
+  /*
+   * Are the payloads strings compressed for LoRA transport?
+   */
+  bool is_compressed = 1;
+  /*
+   * The contact / callsign for ATAK user
+   */
+  Contact contact = 2;
+  /*
+   * The group for ATAK user
+   */
+  Group group = 3;
+  /*
+   * The status of the ATAK EUD
+   */
+  Status status = 4;
+  /*
+   * The payload of the packet
+   */
+  oneof payload_variant {
+    /*
+     * TAK position report
+     */
+    PLI pli = 5;
+    /*
+     * ATAK GeoChat message
+     */
+    GeoChat chat = 6;
+
+    /*
+     * Generic CoT detail XML
+     * May be compressed / truncated by the sender (EUD)
+     */
+    bytes detail = 7;
+  }
+}
+
+/*
+ * ATAK GeoChat message
+ */
+message GeoChat {
+  /*
+   * The text message
+   */
+  string message = 1;
+
+  /*
+   * Uid recipient of the message
+   */
+  optional string to = 2;
+
+  /*
+   * Callsign of the recipient for the message
+   */
+  optional string to_callsign = 3;
+}
+
+/*
+ * ATAK Group
+ * <__group role='Team Member' name='Cyan'/>
+ */
+message Group {
+  /*
+   * Role of the group member
+   */
+  MemberRole role = 1;
+  /*
+   * Team (color)
+   * Default Cyan
+   */
+  Team team = 2;
+}
+
+enum Team {
+  /*
+   * Unspecifed
+   */
+  Unspecifed_Color = 0;
+  /*
+   * White
+   */
+  White = 1;
+  /*
+   * Yellow
+   */
+  Yellow = 2;
+  /*
+   * Orange
+   */
+  Orange = 3;
+  /*
+   * Magenta
+   */
+  Magenta = 4;
+  /*
+   * Red
+   */
+  Red = 5;
+  /*
+   * Maroon
+   */
+  Maroon = 6;
+  /*
+   * Purple
+   */
+  Purple = 7;
+  /*
+   * Dark Blue
+   */
+  Dark_Blue = 8;
+  /*
+   * Blue
+   */
+  Blue = 9;
+  /*
+   * Cyan
+   */
+  Cyan = 10;
+  /*
+   * Teal
+   */
+  Teal = 11;
+  /*
+   * Green
+   */
+  Green = 12;
+  /*
+   * Dark Green
+   */
+  Dark_Green = 13;
+  /*
+   * Brown
+   */
+  Brown = 14;
+}
+
+/*
+ * Role of the group member
+ */
+enum MemberRole {
+  /*
+   * Unspecifed
+   */
+  Unspecifed = 0;
+  /*
+   * Team Member
+   */
+  TeamMember = 1;
+  /*
+   * Team Lead
+   */
+  TeamLead = 2;
+  /*
+   * Headquarters
+   */
+  HQ = 3;
+  /*
+   * Airsoft enthusiast
+   */
+  Sniper = 4;
+  /*
+   * Medic
+   */
+  Medic = 5;
+  /*
+   * ForwardObserver
+   */
+  ForwardObserver = 6;
+  /*
+   * Radio Telephone Operator
+   */
+  RTO = 7;
+  /*
+   * Doggo
+   */
+  K9 = 8;
+}
+
+/*
+ * ATAK EUD Status
+ * <status battery='100' />
+ */
+message Status {
+  /*
+   * Battery level
+   */
+  uint32 battery = 1;
+}
+
+/*
+ * ATAK Contact
+ * <contact endpoint='0.0.0.0:4242:tcp' phone='+12345678' callsign='FALKE'/>
+ */
+message Contact {
+  /*
+   * Callsign
+   */
+  string callsign = 1;
+
+  /*
+   * Device callsign
+   */
+  string device_callsign = 2;
+  /*
+   * IP address of endpoint in integer form (0.0.0.0 default)
+   */
+  // fixed32 enpoint_address = 3;
+  /*
+   * Port of endpoint (4242 default)
+   */
+  // uint32 endpoint_port = 4;
+  /*
+   * Phone represented as integer
+   * Terrible practice, but we really need the wire savings
+   */
+  // uint32 phone = 4;
+}
+
+/*
+ * Position Location Information from ATAK
+ */
+message PLI {
+  /*
+   * The new preferred location encoding, multiply by 1e-7 to get degrees
+   * in floating point
+   */
+  sfixed32 latitude_i = 1;
+
+  /*
+   * The new preferred location encoding, multiply by 1e-7 to get degrees
+   * in floating point
+   */
+  sfixed32 longitude_i = 2;
+
+  /*
+   * Altitude (ATAK prefers HAE)
+   */
+  int32 altitude = 3;
+
+  /*
+   * Speed
+   */
+  uint32 speed = 4;
+
+  /*
+   * Course in degrees
+   */
+  uint32 course = 5;
+}

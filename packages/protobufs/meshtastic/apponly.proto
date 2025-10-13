@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package meshtastic;
+
+import "meshtastic/channel.proto";
+import "meshtastic/config.proto";
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "AppOnlyProtos";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+/*
+ * This is the most compact possible representation for a set of channels.
+ * It includes only one PRIMARY channel (which must be first) and
+ * any SECONDARY channels.
+ * No DISABLED channels are included.
+ * This abstraction is used only on the the 'app side' of the world (ie python, javascript and android etc) to show a group of Channels as a (long) URL
+ */
+message ChannelSet {
+  /*
+   * Channel list with settings
+   */
+  repeated ChannelSettings settings = 1;
+
+  /*
+   * LoRa config
+   */
+  Config.LoRaConfig lora_config = 2;
+}

@@ -1,0 +1,29 @@
+*CannedMessageConfig.allow_input_source max_size:16
+
+*MQTTConfig.address max_size:64
+*MQTTConfig.username max_size:64
+*MQTTConfig.password max_size:32
+*MQTTConfig.root max_size:32
+
+*AudioConfig.ptt_pin int_size:8
+*AudioConfig.i2s_ws int_size:8
+*AudioConfig.i2s_sd int_size:8
+*AudioConfig.i2s_din int_size:8
+*AudioConfig.i2s_sck int_size:8
+
+*ExternalNotificationConfig.output_vibra int_size:8
+*ExternalNotificationConfig.output_buzzer int_size:8
+*ExternalNotificationConfig.nag_timeout int_size:16
+
+*RemoteHardwareConfig.available_pins max_count:4
+*RemoteHardwarePin.name max_size:15
+*RemoteHardwarePin.gpio_pin int_size:8
+
+*AmbientLightingConfig.current int_size:8
+*AmbientLightingConfig.red int_size:8
+*AmbientLightingConfig.green int_size:8
+*AmbientLightingConfig.blue int_size:8
+
+*DetectionSensorConfig.monitor_pin int_size:8
+*DetectionSensorConfig.name max_size:20
+*DetectionSensorConfig.detection_trigger_type max_size:8
