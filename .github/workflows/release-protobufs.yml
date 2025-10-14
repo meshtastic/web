@@ -16,7 +16,7 @@ on:
 permissions: write-all
 
 env:
-  PROTOBUF_DIR: ./packages/protobufs  # 👈 single source of truth
+  PROTOBUF_DIR: ./packages/protobufs 
 
 jobs:
   codegen:
@@ -74,7 +74,7 @@ jobs:
           version: latest
 
       - name: Generate code
-        run: pnpm --filter @meshtastic/protobufs build
+        run: pnpm --filter @meshtastic/protobufs-ws build
 
       - name: Move generated .ts files and clean up
         run: |
