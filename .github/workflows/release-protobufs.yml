@@ -67,7 +67,8 @@ jobs:
           github_token: ${{ github.token }}
 
       - name: Generate code
-        run: buf generate
+        run: pnpm --filter @meshtastic/protobufs build
+
 
       - name: Move generated .ts files and clean up
         run: |

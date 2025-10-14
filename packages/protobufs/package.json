@@ -1,25 +1,25 @@
 {
   "name": "@meshtastic/protobufs",
-  "version": "v1.2.3",
+  "version": "__PACKAGE_VERSION__",
   "private": false,
   "type": "module",
   "license": "GPL-3.0-only",
   "files": [
-    "dist/"
+    "./packages/ts/dist/"
   ],
   "exports": {
     ".": {
-      "types": "./mod.ts",
-      "default": "./mod.ts"
+      "types": "./packages/ts/dist/mod.d.ts",
+      "default": "./packages/ts/dist/mod.js"
     },
-    "./*": "./dist/*"
+    "./*": "./packages/ts/dist/*"
   },
-  "types": "./dist/index.d.ts",
+  "types": "./packages/ts/dist/mod.d.ts",
   "sideEffects": false,
   "scripts": {
     "gen": "buf generate",
     "clean": "rimraf dist",
-    "prepare": "pnpm run clean && pnpm run gen"
+    "build": "pnpm run clean && pnpm run gen"
   },
   "dependencies": {},
   "devDependencies": {
