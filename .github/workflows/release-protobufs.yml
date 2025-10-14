@@ -15,6 +15,9 @@ on:
 
 permissions: write-all
 
+env:
+  PROTOBUF_DIR: ./packages/protobufs  # 👈 single source of truth
+
 jobs:
   codegen:
     runs-on: ubuntu-24.04
@@ -27,8 +30,8 @@ jobs:
       - name: Show files exist
         run: |
           set -euxo pipefail
-          ls -la packages/ts || true
-          cat packages/ts/deno.json
+          ls -la $PROTOBUF_DIR/packages/ts || true
+          cat $PROTOBUF_DIR/packages/ts/deno.json
 
       - name: Determine VERSION
         run: |
@@ -44,11 +47,10 @@ jobs:
           echo "Resolved VERSION=$STRIPPED"
 
       - name: Set Package Versions to current tag
-        working-directory: packages/ts
+        working-directory: ${{ env.PROTOBUF_DIR }}/packages/ts
         run: |
           set -euxo pipefail
           for f in deno.json; do
-            test -f "$f"
             jq --arg version "${VERSION//\//-}" '
               walk(
                 if type == "string" and test("__PACKAGE_VERSION__")
@@ -68,12 +70,11 @@ jobs:
       - name: Generate code
         run: pnpm --filter @meshtastic/protobufs build
 
-
       - name: Move generated .ts files and clean up
         run: |
           set -euxo pipefail
-          SRC_DIR="packages/protobufs/packages/ts/dist/meshtastic"
-          DEST_DIR="packages/protobufs/packages/ts/dist"
+          SRC_DIR="$PROTOBUF_DIR/packages/ts/dist/meshtastic"
+          DEST_DIR="$PROTOBUF_DIR/packages/ts/dist"
 
           if [ -d "$SRC_DIR" ]; then
             shopt -s nullglob
@@ -87,52 +88,11 @@ jobs:
             exit 1
           fi
 
-          # Remove nanopb_pb.ts if present
           if [ -f "$DEST_DIR/nanopb_pb.ts" ]; then
             rm "$DEST_DIR/nanopb_pb.ts"
           fi
 
       - name: Copy license & README
         run: |
-          cp LICENSE packages/ts
-          cp README.md packages/ts
-
-      - name: Upload TypeScript code
-        uses: actions/upload-artifact@v4
-        with:
-          name: ts_code
-          path: packages/ts
-
-      - name: Push to schema registry
-        env:
-          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
-        run: buf push --tag ${{ github.ref_name }}
-
-  publish-jsr:
-    runs-on: ubuntu-24.04
-    needs: codegen
-    permissions:
-      contents: read
-      id-token: write
-    env:
-      DRY_RUN: ${{ inputs.dry_run }}
-    steps:
-      - name: Download TypeScript code
-        uses: actions/download-artifact@v4
-        with:
-          name: ts_code
-
-      - name: Set up Deno
-        uses: denoland/setup-deno@main
-        with:
-          deno-version: rc
-
-      - name: Publish to JSR
-        run: |
-          set -euxo pipefail
-          FLAGS="--unstable-sloppy-imports"
-          if [ "${DRY_RUN}" = "true" ]; then
-            FLAGS="$FLAGS --dry-run"
-            echo "Running publish in dry-run mode..."
-          fi
-          deno publish $FLAGS
+          cp LICENSE $PROTOBUF_DIR/packages/ts
+          cp README.md $PROTOBUF_DIR/packages/ts
