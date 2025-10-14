@@ -2,7 +2,8 @@ version: v1
 name: buf.build/meshtastic/protobufs
 deps: []
 build:
-  excludes: []
+  excludes:
+    - node_modules
 breaking:
   use:
     - FILE
