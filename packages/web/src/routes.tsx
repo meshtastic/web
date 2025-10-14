@@ -74,6 +74,41 @@ const mapRoute = createRoute({
   component: MapPage,
 });
 
+const coordParamsSchema = z.object({
+  // Accept "strings" from the URL, coerce to number, then validate
+  long: z.coerce
+    .number()
+    .refine(
+      (n) => Number.isFinite(n) && n >= -180 && n <= 180,
+      "Invalid longitude (-180..180).",
+    ),
+  lat: z.coerce
+    .number()
+    .refine(
+      (n) => Number.isFinite(n) && n >= -90 && n <= 90,
+      "Invalid latitude (-90..90).",
+    ),
+  // Typical web map zoom levels ~0..22 (adjust if your map lib differs)
+  zoom: z.coerce
+    .number()
+    .int()
+    .min(0, "Zoom too small.")
+    .max(22, "Zoom too large."),
+});
+
+export const mapWithParamsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/map/$long/$lat/$zoom",
+  component: MapPage,
+  parseParams: (raw) => coordParamsSchema.parse(raw),
+  // // This controls how params are serialized when you navigate/link
+  // stringifyParams: (p) => ({
+  //   long: String(p.long),
+  //   lat: String(p.lat),
+  //   zoom: String(p.zoom),
+  // }),
+});
+
 const configRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/config",
@@ -97,6 +132,7 @@ const routeTree = rootRoute.addChildren([
   messagesRoute,
   messagesWithParamsRoute,
   mapRoute,
+  mapWithParamsRoute,
   configRoute,
   nodesRoute,
   dialogWithParamsRoute,

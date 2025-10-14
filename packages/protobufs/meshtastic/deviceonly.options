@@ -1,0 +1,18 @@
+# options for nanopb
+# https://jpa.kapsi.fi/nanopb/docs/reference.html#proto-file-options
+
+# FIXME - max_count is actually 32 but we save/load this as one long string of preencoded MeshPacket bytes - not a big array in RAM
+*DeviceState.receive_queue max_count:1
+
+*ChannelFile.channels max_count:8
+
+*DeviceState.node_remote_hardware_pins max_count:12
+
+*NodeInfoLite.channel int_size:8
+*NodeInfoLite.hops_away int_size:8
+*NodeInfoLite.next_hop int_size:8
+
+*UserLite.long_name max_size:40
+*UserLite.short_name max_size:5
+*UserLite.public_key max_size:32 # public key
+*UserLite.macaddr max_size:6 fixed_length:true

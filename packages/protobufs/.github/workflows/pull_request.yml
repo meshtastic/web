@@ -1,0 +1,23 @@
+name: pull-request
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on: pull_request
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Buf PR Checks
+        uses: bufbuild/buf-action@v1.2.0
+        with:
+          github_token: ${{ github.token }}
+          token: ${{ secrets.BUF_TOKEN }}
+          format: true
+          lint: true
+          breaking: true

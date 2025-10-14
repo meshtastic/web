@@ -1,0 +1,5 @@
+*Channel.index int_size:8
+
+# 256 bit or 128 bit psk key
+*ChannelSettings.psk max_size:32
+*ChannelSettings.name max_size:12

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "PaxcountProtos";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+/*
+ * TODO: REPLACE
+ */
+message Paxcount {
+  /*
+   * seen Wifi devices
+   */
+  uint32 wifi = 1;
+
+  /*
+   * Seen BLE devices
+   */
+  uint32 ble = 2;
+
+  /*
+   * Uptime in seconds
+   */
+  uint32 uptime = 3;
+}

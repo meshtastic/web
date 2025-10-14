@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package meshtastic;
+
+import "meshtastic/localonly.proto";
+import "meshtastic/mesh.proto";
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "ClientOnlyProtos";
+option java_package = "com.geeksville.mesh";
+option swift_prefix = "";
+
+/*
+ * This abstraction is used to contain any configuration for provisioning a node on any client.
+ * It is useful for importing and exporting configurations.
+ */
+message DeviceProfile {
+  /*
+   * Long name for the node
+   */
+  optional string long_name = 1;
+
+  /*
+   * Short name of the node
+   */
+  optional string short_name = 2;
+
+  /*
+   * The url of the channels from our node
+   */
+  optional string channel_url = 3;
+
+  /*
+   * The Config of the node
+   */
+  optional LocalConfig config = 4;
+
+  /*
+   * The ModuleConfig of the node
+   */
+  optional LocalModuleConfig module_config = 5;
+
+  /*
+   * Fixed position data
+   */
+  optional Position fixed_position = 6;
+
+  /*
+   * Ringtone for ExternalNotification
+   */
+  optional string ringtone = 7;
+
+  /*
+   * Predefined messages for CannedMessage
+   */
+  optional string canned_messages = 8;
+}

@@ -1,0 +1,8 @@
+*Contact.callsign max_size:120
+*Contact.device_callsign max_size:120
+*Status.battery int_size:8
+*PLI.course int_size:16
+*GeoChat.message max_size:200
+*GeoChat.to max_size:120
+*GeoChat.to_callsign max_size:120
+*TAKPacket.detail max_size:220

@@ -9,3 +9,5 @@ __screenshots__*
 npm/
 .idea
 **/LICENSE
+
+packages/protobufs/packages/ts/dist

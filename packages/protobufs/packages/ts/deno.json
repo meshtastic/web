@@ -1,0 +1,13 @@
+{
+  "name": "@meshtastic/protobufs",
+  "version": "__PACKAGE_VERSION__",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "@bufbuild/protobuf": "npm:@bufbuild/protobuf@^2.9.0"
+  },
+  "publish": {
+    "exclude": ["!dist"]
+  }
+}
