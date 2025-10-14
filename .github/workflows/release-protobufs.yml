@@ -1,4 +1,4 @@
-name: Create Protobuf Release for JSR
+name: Release Protobuf to JSR
 
 on:
   workflow_dispatch:
