@@ -5,7 +5,7 @@
     ".": "./mod.ts"
   },
   "imports": {
-    "@bufbuild/protobuf": "npm:@bufbuild/protobuf@^2.2.3"
+    "@bufbuild/protobuf": "npm:@bufbuild/protobuf@^2.9.0"
   },
   "publish": {
     "exclude": ["!dist"]
