@@ -21,10 +21,12 @@ All projects are located within the `packages/` directory:
   - **[Hosted version](https://client.meshtastic.org)**
 - **`packages/core`:** Core functionality for Meshtastic JS.
 - **`packages/transport-node`:** TCP Transport for the NodeJS runtime.
+- **`packages/transport-node-serial`:** NodeJS Serial Transport for the NodeJS runtime.
 - **`packages/transport-deno`:** TCP Transport for the Deno runtime.
 - **`packages/transport-http`:** HTTP Transport.
 - **`packages/transport-web-bluetooth`:** Web Bluetooth Transport.
 - **`packages/transport-web-serial`:** Web Serial Transport.
+- **`packages/protobufs`:** Git submodule containing Meshtastic’s shared protobuf definitions, used to generate and publish the JSR protobuf package.
 
 All `Meshtastic JS` packages (core and transports) are published both to
 [JSR](https://jsr.io/@meshtastic). [NPM](https://www.npmjs.com/org/meshtastic)

@@ -15,6 +15,9 @@ on:
 
 permissions: write-all
 
+env:
+  PROTOBUF_DIR: ./packages/protobufs  # 👈 single source of truth
+
 jobs:
   codegen:
     runs-on: ubuntu-24.04
@@ -27,8 +30,8 @@ jobs:
       - name: Show files exist
         run: |
           set -euxo pipefail
-          ls -la packages/ts || true
-          cat packages/ts/deno.json
+          ls -la $PROTOBUF_DIR/packages/ts || true
+          cat $PROTOBUF_DIR/packages/ts/deno.json
 
       - name: Determine VERSION
         run: |
@@ -44,7 +47,7 @@ jobs:
           echo "Resolved VERSION=$STRIPPED"
 
       - name: Set Package Versions to current tag
-        working-directory: packages/ts
+        working-directory: ${{ env.PROTOBUF_DIR }}/packages/ts
         run: |
           set -euxo pipefail
           for f in deno.json; do
@@ -68,12 +71,11 @@ jobs:
       - name: Generate code
         run: pnpm --filter @meshtastic/protobufs build
 
-
       - name: Move generated .ts files and clean up
         run: |
           set -euxo pipefail
-          SRC_DIR="packages/protobufs/packages/ts/dist/meshtastic"
-          DEST_DIR="packages/protobufs/packages/ts/dist"
+          SRC_DIR="$PROTOBUF_DIR/packages/ts/dist/meshtastic"
+          DEST_DIR="$PROTOBUF_DIR/packages/ts/dist"
 
           if [ -d "$SRC_DIR" ]; then
             shopt -s nullglob
@@ -94,14 +96,14 @@ jobs:
 
       - name: Copy license & README
         run: |
-          cp LICENSE packages/ts
-          cp README.md packages/ts
+          cp LICENSE $PROTOBUF_DIR/packages/ts
+          cp README.md $PROTOBUF_DIR/packages/ts
 
       - name: Upload TypeScript code
         uses: actions/upload-artifact@v4
         with:
           name: ts_code
-          path: packages/ts
+          path: ${{ env.PROTOBUF_DIR }}/packages/ts
 
       - name: Push to schema registry
         env:
