@@ -29,7 +29,6 @@ jobs:
           set -euxo pipefail
           ls -la packages/ts || true
           cat packages/ts/deno.json
-          cat packages/ts/package.json
 
       - name: Determine VERSION
         run: |
@@ -48,7 +47,7 @@ jobs:
         working-directory: packages/ts
         run: |
           set -euxo pipefail
-          for f in deno.json package.json; do
+          for f in deno.json; do
             test -f "$f"
             jq --arg version "${VERSION//\//-}" '
               walk(
@@ -122,9 +121,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ts_code
-
-      - name: Remove package.json (JSR doesn’t need it)
-        run: rm -f package.json
 
       - name: Set up Deno
         uses: denoland/setup-deno@main
