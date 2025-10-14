@@ -68,6 +68,11 @@ jobs:
         with:
           github_token: ${{ github.token }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
       - name: Generate code
         run: pnpm --filter @meshtastic/protobufs build
 
