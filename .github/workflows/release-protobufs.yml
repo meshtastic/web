@@ -1,4 +1,4 @@
-name: Release Protobuf to JSR
+name: Create Protobuf Release for JSR
 
 on:
   workflow_dispatch:
@@ -51,6 +51,7 @@ jobs:
         run: |
           set -euxo pipefail
           for f in deno.json; do
+            test -f "$f"
             jq --arg version "${VERSION//\//-}" '
               walk(
                 if type == "string" and test("__PACKAGE_VERSION__")
@@ -88,6 +89,7 @@ jobs:
             exit 1
           fi
 
+          # Remove nanopb_pb.ts if present
           if [ -f "$DEST_DIR/nanopb_pb.ts" ]; then
             rm "$DEST_DIR/nanopb_pb.ts"
           fi
@@ -96,3 +98,43 @@ jobs:
         run: |
           cp LICENSE $PROTOBUF_DIR/packages/ts
           cp README.md $PROTOBUF_DIR/packages/ts
+
+      - name: Upload TypeScript code
+        uses: actions/upload-artifact@v4
+        with:
+          name: ts_code
+          path: ${{ env.PROTOBUF_DIR }}/packages/ts
+
+      - name: Push to schema registry
+        env:
+          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
+        run: buf push --tag ${{ github.ref_name }}
+
+  publish-jsr:
+    runs-on: ubuntu-24.04
+    needs: codegen
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      DRY_RUN: ${{ inputs.dry_run }}
+    steps:
+      - name: Download TypeScript code
+        uses: actions/download-artifact@v4
+        with:
+          name: ts_code
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@main
+        with:
+          deno-version: rc
+
+      - name: Publish to JSR
+        run: |
+          set -euxo pipefail
+          FLAGS="--unstable-sloppy-imports"
+          if [ "${DRY_RUN}" = "true" ]; then
+            FLAGS="$FLAGS --dry-run"
+            echo "Running publish in dry-run mode..."
+          fi
+          deno publish $FLAGS
