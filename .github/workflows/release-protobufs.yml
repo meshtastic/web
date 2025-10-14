@@ -113,11 +113,6 @@ jobs:
           name: ts_code
           path: ${{ env.PROTOBUF_DIR }}/packages/ts
 
-      - name: Push to schema registry
-        env:
-          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
-        run: buf push --tag ${{ github.ref_name }}
-
   publish-jsr:
     runs-on: ubuntu-24.04
     needs: codegen
