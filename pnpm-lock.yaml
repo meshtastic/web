@@ -12,8 +12,8 @@ importers:
         specifier: ^2.9.0
         version: 2.9.0
       '@meshtastic/protobufs':
-        specifier: npm:@jsr/meshtastic__protobufs@^2.7.8
-        version: '@jsr/meshtastic__protobufs@2.7.8'
+        specifier: npm:@jsr/meshtastic__protobufs@^2.7.12-1
+        version: '@jsr/meshtastic__protobufs@2.7.12-1'
       ste-simple-events:
         specifier: ^3.0.11
         version: 3.0.11
@@ -1373,8 +1373,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@jsr/meshtastic__protobufs@2.7.8':
-    resolution: {integrity: sha512-KX6Ald9ZaZPiTMs0TveHGmUKY7RuHnI3B6CxBylfVIVo8VYZxTowxUymUZ86e1YiGFLZkZgki1BTp4W5O/Ting==, tarball: https://npm.jsr.io/~/11/@jsr/meshtastic__protobufs/2.7.8.tgz}
+  '@jsr/meshtastic__protobufs@2.7.12-1':
+    resolution: {integrity: sha512-B6m8ewPZX2Mi5phNmvJYwemLD4X8I9kDyQgRSlFFzUGhYkG1MX1rb1FRLUZh0t98qPrCBO4XH4CmYUPNywNWMg==, tarball: https://npm.jsr.io/~/11/@jsr/meshtastic__protobufs/2.7.12-1.tgz}
 
   '@mapbox/geojson-rewind@0.5.2':
     resolution: {integrity: sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA==}
@@ -6614,7 +6614,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@jsr/meshtastic__protobufs@2.7.8':
+  '@jsr/meshtastic__protobufs@2.7.12-1':
     dependencies:
       '@bufbuild/protobuf': 2.9.0
 
