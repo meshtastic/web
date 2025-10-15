@@ -2,7 +2,7 @@ import { Protobuf } from "@meshtastic/core";
 import { z } from "zod/v4";
 
 const GpsCoordinateEnum = z.enum(
-  Protobuf.Config.Config_DisplayConfig_GpsCoordinateFormat,
+  Protobuf.Config.Config_DisplayConfig_DeprecatedGpsCoordinateFormat,
 );
 const DisplayUnitsEnum = z.enum(
   Protobuf.Config.Config_DisplayConfig_DisplayUnits,
