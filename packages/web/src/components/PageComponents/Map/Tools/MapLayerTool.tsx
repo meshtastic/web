@@ -63,7 +63,7 @@ export function MapLayerTool({
   const { t } = useTranslation("map");
 
   const enabledCount = useMemo(() => {
-    return Object.values(visibilityState).filter(Boolean).length || 0;
+    return Object.values(visibilityState).filter(Boolean).length;
   }, [visibilityState]);
 
   const handleCheckboxChange = (key: keyof VisibilityState) => {
