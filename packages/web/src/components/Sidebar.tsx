@@ -16,6 +16,7 @@ import {
   type LucideIcon,
   MapIcon,
   MessageSquareIcon,
+  Satellite,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react";
@@ -106,6 +107,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
       page: "messages",
       count: numUnread ? numUnread : undefined,
     },
+    { name: "GPS", icon: Satellite, page: "gps" },
     { name: t("navigation.map"), icon: MapIcon, page: "map" },
     {
       name: t("navigation.config"),
