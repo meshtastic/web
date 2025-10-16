@@ -247,63 +247,52 @@ export const MessagesPage = () => {
     ],
   );
 
-  const rightSidebar = useMemo(
-    () => (
-      <SidebarSection
-        label=""
-        className="px-0 flex flex-col h-full overflow-y-auto"
+  const rightSidebar = (
+    <SidebarSection
+      label=""
+      className="px-0 flex flex-col h-full overflow-y-auto"
+    >
+      <label className="p-2 block" htmlFor="nodeSearch">
+        <Input
+          type="text"
+          name="nodeSearch"
+          placeholder={t("search.nodes")}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          showClearButton={!!searchTerm}
+        />
+      </label>
+      <div
+        className={cn(
+          "flex flex-col h-full flex-1 overflow-y-auto gap-2.5 pt-1 ",
+        )}
+        style={{ contentVisibility: "auto", containIntrinsicSize: "100px" }}
       >
-        <label className="p-2 block" htmlFor="nodeSearch">
-          <Input
-            type="text"
-            name="nodeSearch"
-            placeholder={t("search.nodes")}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            showClearButton={!!searchTerm}
-          />
-        </label>
-        <div
-          className={cn(
-            "flex flex-col h-full flex-1 overflow-y-auto gap-2.5 pt-1 ",
-          )}
-        >
-          {filteredNodes()?.map((node) => (
-            <SidebarButton
-              key={node.num}
-              preventCollapse
-              label={node.user?.longName ?? t("unknown.shortName")}
-              count={node.unreadCount > 0 ? node.unreadCount : undefined}
-              active={
-                numericChatId === node.num && chatType === MessageType.Direct
-              }
-              onClick={() => {
-                navigateToChat(MessageType.Direct, node.num.toString());
-                resetUnread(node.num);
-              }}
-            >
-              <Avatar
-                text={node.user?.shortName ?? t("unknown.shortName")}
-                className={cn(hasNodeError(node.num) && "text-red-500")}
-                showError={hasNodeError(node.num)}
-                showFavorite={node.isFavorite}
-                size="sm"
-              />
-            </SidebarButton>
-          ))}
-        </div>
-      </SidebarSection>
-    ),
-    [
-      filteredNodes,
-      searchTerm,
-      numericChatId,
-      chatType,
-      navigateToChat,
-      resetUnread,
-      hasNodeError,
-      t,
-    ],
+        {filteredNodes()?.map((node) => (
+          <SidebarButton
+            key={node.num}
+            preventCollapse
+            label={node.user?.longName ?? t("unknown.shortName")}
+            count={node.unreadCount > 0 ? node.unreadCount : undefined}
+            active={
+              numericChatId === node.num && chatType === MessageType.Direct
+            }
+            onClick={() => {
+              navigateToChat(MessageType.Direct, node.num.toString());
+              resetUnread(node.num);
+            }}
+          >
+            <Avatar
+              text={node.user?.shortName ?? t("unknown.shortName")}
+              className={cn(hasNodeError(node.num) && "text-red-500")}
+              showError={hasNodeError(node.num)}
+              showFavorite={node.isFavorite}
+              size="sm"
+            />
+          </SidebarButton>
+        ))}
+      </div>
+    </SidebarSection>
   );
 
   return (
