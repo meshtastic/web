@@ -73,6 +73,18 @@ export function MapLayerTool({
     });
   };
 
+  const layers = useMemo(
+    () => [
+      { key: "nodeMarkers", label: t("layerTool.nodeMarkers") },
+      { key: "waypoints", label: t("layerTool.waypoints") },
+      { key: "directNeighbors", label: t("layerTool.directNeighbors") },
+      { key: "remoteNeighbors", label: t("layerTool.remoteNeighbors") },
+      { key: "positionPrecision", label: t("layerTool.positionPrecision") },
+      // { key: "traceroutes", label: t("layerTool.traceroutes") },
+    ],
+    [t],
+  );
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -111,31 +123,14 @@ export function MapLayerTool({
         align="end"
         sideOffset={7}
       >
-        <CheckboxItem
-          label={t("layerTool.nodeMarkers")}
-          checked={visibilityState.nodeMarkers}
-          onChange={() => handleCheckboxChange("nodeMarkers")}
-        />
-        <CheckboxItem
-          label={t("layerTool.waypoints")}
-          checked={visibilityState.waypoints}
-          onChange={() => handleCheckboxChange("waypoints")}
-        />
-        <CheckboxItem
-          label={t("layerTool.directNeighbors")}
-          checked={visibilityState.directNeighbors}
-          onChange={() => handleCheckboxChange("directNeighbors")}
-        />
-        <CheckboxItem
-          label={t("layerTool.remoteNeighbors")}
-          checked={visibilityState.remoteNeighbors}
-          onChange={() => handleCheckboxChange("remoteNeighbors")}
-        />
-        <CheckboxItem
-          label={t("layerTool.positionPrecision")}
-          checked={visibilityState.positionPrecision}
-          onChange={() => handleCheckboxChange("positionPrecision")}
-        />
+        {layers.map(({ key, label }) => (
+          <CheckboxItem
+            key={key}
+            label={label}
+            checked={visibilityState[key as keyof VisibilityState]}
+            onChange={() => handleCheckboxChange(key as keyof VisibilityState)}
+          />
+        ))}
         {/*<CheckboxItem
           key="traceroutes"
           label={t("layerTool.traceroutes")}
