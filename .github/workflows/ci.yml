@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -28,41 +28,52 @@ jobs:
           cache: pnpm
           cache-dependency-path: '**/pnpm-lock.yaml'
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
+      - name: Prewarm & Install (workspace)
+        run: |
+          set -euo pipefail
+          pnpm fetch
+          pnpm install --frozen-lockfile --offline
 
-      - name: Cache Deno dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock', '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-
-
-      - name: Cache pnpm dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.pnpm-store
-            packages/web/node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
-      - name: Build All Packages
+      - name: Build All Packages (with exclusions)
+        shell: bash
         run: |
           set -euo pipefail
 
-          for pkg_dir in packages/*/; do
-            pkg_dir=${pkg_dir%/}  # Remove trailing slash
-            echo "🔍 Inspecting $pkg_dir..."
+          # List packages to exclude (full paths under repo root)
+          EXCLUDED_DIRS=("packages/protobufs" "packages/transport-deno")
 
-            if [[ -f "$pkg_dir/package.json" ]] && [[ "$pkg_dir" != "packages/web" ]]; then
-              echo "🔧 Building with pnpm: $pkg_dir"
-              (cd "$pkg_dir" && pnpm install --frozen-lockfile && pnpm run build:npm)
-            else
-              echo "⚠️ Skipping $pkg_dir (web package or no package.json)"
+          is_excluded() {
+            local dir="$1"
+            for ex in "${EXCLUDED_DIRS[@]}"; do
+              if [[ "$dir" == "$ex" ]]; then
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          for pkg_dir in packages/*/; do
+            pkg_dir="${pkg_dir%/}"  # trim trailing slash
+
+            # Must be a directory with a package.json
+            if [[ ! -f "$pkg_dir/package.json" ]]; then
+              echo "⚠️  Skipping $pkg_dir (no package.json)"
+              continue
             fi
+
+            # Allow for exclusions
+            if is_excluded "$pkg_dir"; then
+              echo "🚫 Skipping $pkg_dir (excluded)"
+              continue
+            fi
+
+            # Optionally skip Deno-first packages automatically
+            if [[ -f "$pkg_dir/deno.json" || -f "$pkg_dir/deno.jsonc" ]]; then
+              echo "🦕 Skipping $pkg_dir (deno project)"
+              continue
+            fi
+
+            echo "🔧 Building: $pkg_dir"
+            # No per-package install needed; workspace install already done
+            pnpm -C "$pkg_dir" run build:npm
           done
