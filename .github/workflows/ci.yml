@@ -43,7 +43,7 @@ jobs:
           set -euo pipefail
 
           # Add package folders you want to exclude here (space-separated)
-          EXCLUDED_DIRS=("packages/protobufs")
+          EXCLUDED_DIRS=("packages/protobufs" "packages/transport-deno")
 
           for pkg_dir in packages/*/; do
             pkg_dir=${pkg_dir%/}  # Remove trailing slash
