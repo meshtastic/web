@@ -70,7 +70,7 @@ export const SidebarButton = ({
             "flex-shrink-0",
             "transition-opacity duration-300 ease-in-out",
             isButtonCollapsed ? "opacity-0 invisible" : "opacity-100 visible",
-            isDirty ? "bg-sky-500" : "bg-red-600",
+            isDirty ? "bg-sky-500" : "bg-blue-500",
           )}
         >
           {count}
