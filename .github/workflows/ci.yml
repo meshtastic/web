@@ -28,25 +28,12 @@ jobs:
           cache: pnpm
           cache-dependency-path: '**/pnpm-lock.yaml'
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
-      - name: Cache Deno dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock', '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-
-
       - name: Cache pnpm dependencies
         uses: actions/cache@v4
         with:
           path: |
             ~/.pnpm-store
-            packages/web/node_modules
+            packages/*/node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
@@ -55,14 +42,25 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Add package folders you want to exclude here (space-separated)
+          EXCLUDED_DIRS=("packages/protobufs")
+
           for pkg_dir in packages/*/; do
             pkg_dir=${pkg_dir%/}  # Remove trailing slash
             echo "🔍 Inspecting $pkg_dir..."
 
-            if [[ -f "$pkg_dir/package.json" ]] && [[ "$pkg_dir" != "packages/web" ]]; then
+            # Check if directory is excluded
+            if [[ " ${EXCLUDED_DIRS[*]} " == *" $pkg_dir "* ]]; then
+              echo "🚫 Skipping $pkg_dir (excluded)"
+              continue
+            fi
+
+            # Build only if it has a package.json
+            if [[ -f "$pkg_dir/package.json" ]]; then
               echo "🔧 Building with pnpm: $pkg_dir"
               (cd "$pkg_dir" && pnpm install --frozen-lockfile && pnpm run build:npm)
             else
-              echo "⚠️ Skipping $pkg_dir (web package or no package.json)"
+              echo "⚠️ Skipping $pkg_dir (no package.json)"
             fi
           done
+
