@@ -6,7 +6,7 @@ import {
 } from "@components/UI/Popover.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { LayersIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface VisibilityState {
@@ -62,13 +62,36 @@ export function MapLayerTool({
 }: MapLayerToolProps): ReactNode {
   const { t } = useTranslation("map");
 
+  const enabledCount = useMemo(() => {
+    return Object.values(visibilityState).filter(Boolean).length;
+  }, [visibilityState]);
+
+  const handleCheckboxChange = (key: keyof VisibilityState) => {
+    setVisibilityState({
+      ...visibilityState,
+      [key]: !visibilityState[key],
+    });
+  };
+
+  const layers = useMemo(
+    () => [
+      { key: "nodeMarkers", label: t("layerTool.nodeMarkers") },
+      { key: "waypoints", label: t("layerTool.waypoints") },
+      { key: "directNeighbors", label: t("layerTool.directNeighbors") },
+      { key: "remoteNeighbors", label: t("layerTool.remoteNeighbors") },
+      { key: "positionPrecision", label: t("layerTool.positionPrecision") },
+      // { key: "traceroutes", label: t("layerTool.traceroutes") },
+    ],
+    [t],
+  );
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <button
           type="button"
           className={cn(
-            "rounded align-center",
+            "relative rounded align-center",
             "w-[29px] px-1 py-1 shadow-l outline-[2px] outline-stone-600/20",
             "bg-stone-50 hover:bg-stone-200 dark:bg-stone-200 dark:hover:bg-stone-300 ",
             "text-slate-600 hover:text-slate-700 active:bg-slate-300",
@@ -77,6 +100,21 @@ export function MapLayerTool({
           aria-label={t("mapMenu.layersAria")}
         >
           <LayersIcon className="w-[21px]" />
+          {enabledCount > 0 && (
+            <span
+              className={cn(
+                "absolute -bottom-2 -right-2",
+                "min-w-4 h-4 px-[3px]",
+                "rounded-full text-[10px] leading-4",
+                "bg-blue-500 text-white",
+                "flex items-center justify-center",
+                "ring-2 ring-white dark:ring-stone-200",
+              )}
+              aria-hidden="true"
+            >
+              {enabledCount}
+            </span>
+          )}
         </button>
       </PopoverTrigger>
       <PopoverContent
@@ -85,50 +123,14 @@ export function MapLayerTool({
         align="end"
         sideOffset={7}
       >
-        <CheckboxItem
-          label={t("layerTool.nodeMarkers")}
-          checked={visibilityState.nodeMarkers}
-          onChange={(checked) => {
-            setVisibilityState({ ...visibilityState, nodeMarkers: checked });
-          }}
-        />
-        <CheckboxItem
-          label={t("layerTool.waypoints")}
-          checked={visibilityState.waypoints}
-          onChange={(checked) => {
-            setVisibilityState({ ...visibilityState, waypoints: checked });
-          }}
-        />
-        <CheckboxItem
-          label={t("layerTool.directNeighbors")}
-          checked={visibilityState.directNeighbors}
-          onChange={(checked) => {
-            setVisibilityState({
-              ...visibilityState,
-              directNeighbors: checked,
-            });
-          }}
-        />
-        <CheckboxItem
-          label={t("layerTool.remoteNeighbors")}
-          checked={visibilityState.remoteNeighbors}
-          onChange={(checked) => {
-            setVisibilityState({
-              ...visibilityState,
-              remoteNeighbors: checked,
-            });
-          }}
-        />
-        <CheckboxItem
-          label={t("layerTool.positionPrecision")}
-          checked={visibilityState.positionPrecision}
-          onChange={(checked) => {
-            setVisibilityState({
-              ...visibilityState,
-              positionPrecision: checked,
-            });
-          }}
-        />
+        {layers.map(({ key, label }) => (
+          <CheckboxItem
+            key={key}
+            label={label}
+            checked={visibilityState[key as keyof VisibilityState]}
+            onChange={() => handleCheckboxChange(key as keyof VisibilityState)}
+          />
+        ))}
         {/*<CheckboxItem
           key="traceroutes"
           label={t("layerTool.traceroutes")}
