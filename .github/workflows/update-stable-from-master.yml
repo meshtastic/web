@@ -56,13 +56,11 @@ jobs:
           fi
 
           # 3) Fall back to main if present
-          for BR in main; do
-            if [ -z "${SHA}" ] && git ls-remote --exit-code --heads origin "${BR}" >/dev/null 2>&1; then
-              git fetch origin "${BR}:${BR}" --prune
-              SHA="$(git rev-parse "${BR}^{commit}")"
-              SRC_DESC="branch:${BR}"
-            fi
-          done
+          if [ -z "${SHA}" ] && git ls-remote --exit-code --heads origin "main" >/dev/null 2>&1; then
+            git fetch origin "main:main" --prune
+            SHA="$(git rev-parse "main^{commit}")"
+            SRC_DESC="branch:main"
+          fi
 
           if [ -z "${SHA}" ]; then
             echo "::error::Unable to resolve source commit from tag (${TAG}), target_commitish (${TARGET}), or main."
