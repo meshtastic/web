@@ -15,59 +15,81 @@ jobs:
   update-stable-branch:
     name: Update stable from latest release source
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # need full history for reset/push
+          fetch-depth: 0
+          fetch-tags: true  # IMPORTANT: we need tags to resolve the release commit
 
       - name: Configure Git author
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Determine source ref & SHA
+      - name: Determine source SHA (prefer tag)
         id: meta
         shell: bash
         run: |
           set -euo pipefail
-          SRC="${{ github.event.release.target_commitish }}"
-          if [ -z "$SRC" ] || ! git ls-remote --exit-code origin "refs/heads/$SRC" >/dev/null 2>&1; then
-            # Fallback to main if target_commitish is empty or not a branch
-            SRC="main"
+
+          TAG="${{ github.event.release.tag_name }}"
+          TARGET="${{ github.event.release.target_commitish || '' }}"
+
+          # Always ensure we have latest remote heads/tags
+          git fetch --tags --prune origin
+
+          SHA=""
+          SRC_DESC=""
+
+          # 1) Prefer the release tag commit
+          if [ -n "${TAG}" ] && git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            SHA="$(git rev-list -n1 "${TAG}")"
+            SRC_DESC="tag:${TAG}"
           fi
 
-          echo "Using source branch: $SRC"
-          git fetch origin "$SRC":"refs/remotes/origin/$SRC" --prune
-          SHA="$(git rev-parse "origin/$SRC")"
-          echo "sha=$SHA"   >> "$GITHUB_OUTPUT"
-          echo "src=$SRC"   >> "$GITHUB_OUTPUT"
+          # 2) Fall back to target_commitish if it points to a branch on origin
+          if [ -z "${SHA}" ] && [ -n "${TARGET}" ] && git ls-remote --exit-code --heads origin "${TARGET}" >/dev/null 2>&1; then
+            git fetch origin "${TARGET}:${TARGET}" --prune
+            SHA="$(git rev-parse "${TARGET}^{commit}")"
+            SRC_DESC="branch:${TARGET}"
+          fi
 
-      - name: Prepare local stable branch
+          # 3) Fall back to main if present
+          if [ -z "${SHA}" ] && git ls-remote --exit-code --heads origin "main" >/dev/null 2>&1; then
+            git fetch origin "main:main" --prune
+            SHA="$(git rev-parse "main^{commit}")"
+            SRC_DESC="branch:main"
+          fi
+
+          if [ -z "${SHA}" ]; then
+            echo "::error::Unable to resolve source commit from tag (${TAG}), target_commitish (${TARGET}), or main."
+            exit 1
+          fi
+
+          echo "Using source: ${SRC_DESC}"
+          echo "sha=${SHA}"      >> "$GITHUB_OUTPUT"
+          echo "source=${SRC_DESC}" >> "$GITHUB_OUTPUT"
+
+      - name: Create/reset local stable to SHA
         shell: bash
         run: |
           set -euo pipefail
-          # Ensure we have the remote stable ref if it exists
+          # Make sure we know if remote stable exists (non-fatal if not)
           git fetch origin stable:refs/remotes/origin/stable || true
 
-          if git show-ref --verify --quiet refs/heads/stable; then
-            echo "Local stable exists."
-          elif git show-ref --verify --quiet refs/remotes/origin/stable; then
-            echo "Creating local stable tracking branch from remote."
-            git checkout -b stable --track origin/stable
-          else
-            echo "Creating new local stable branch at source SHA."
-            git checkout -b stable "${{ steps.meta.outputs.sha }}"
-          fi
-
-      - name: Reset stable to source SHA
-        run: |
-          git checkout stable
-          git reset --hard "${{ steps.meta.outputs.sha }}"
+          # Create or reset local stable in one command
+          git checkout -B stable "${{ steps.meta.outputs.sha }}"
           git status --short --branch
 
       - name: Push stable (force-with-lease)
         run: |
-          # Safer than --force; refuses if remote moved unexpectedly
-          git push origin stable --force-with-lease
+          # Safer than --force; refuses if remote moved unexpectedly (protects against races)
+          REMOTE_STABLE_SHA="$(git rev-parse refs/remotes/origin/stable || echo '')"
+          if [ -z "$REMOTE_STABLE_SHA" ]; then
+            # If remote stable doesn't exist, just use --force-with-lease=stable (no SHA)
+            git push origin stable:stable --force-with-lease=stable
+          else
+            # Use the specific SHA for maximum safety
+            git push origin stable:stable --force-with-lease=stable:$REMOTE_STABLE_SHA
+          fi
