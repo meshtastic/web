@@ -85,4 +85,11 @@ jobs:
       - name: Push stable (force-with-lease)
         run: |
           # Safer than --force; refuses if remote moved unexpectedly (protects against races)
-          git push origin stable:stable --force-with-lease=stable
+          REMOTE_STABLE_SHA="$(git rev-parse refs/remotes/origin/stable || echo '')"
+          if [ -z "$REMOTE_STABLE_SHA" ]; then
+            # If remote stable doesn't exist, just use --force-with-lease=stable (no SHA)
+            git push origin stable:stable --force-with-lease=stable
+          else
+            # Use the specific SHA for maximum safety
+            git push origin stable:stable --force-with-lease=stable:$REMOTE_STABLE_SHA
+          fi
