@@ -172,7 +172,7 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
           )}
 
           {/* Locked To */}
-          {waypoint.lockedTo && (
+          {waypoint.lockedTo != null && waypoint.lockedTo !== 0 && (
             <div className="flex flex-wrap items-start gap-x-3">
               <dt className="inline-flex items-center gap-2 text-slate-500 min-w-0">
                 <UserLockIcon size={14} aria-hidden />
