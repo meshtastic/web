@@ -47,10 +47,10 @@
 	},
 	"toast": {
 		"positionRequestSent": {
-			"title": "Position request sent."
+			"title": "Заявката за позиция е изпратена."
 		},
 		"requestingPosition": {
-			"title": "Requesting position, please wait..."
+			"title": "Запитване за позиция, моля изчакайте..."
 		},
 		"sendingTraceroute": {
 			"title": "Sending Traceroute, please wait..."
