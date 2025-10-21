@@ -13,7 +13,7 @@ interface and its supporting JavaScript libraries. It aims to provide a unified
 development experience for interacting with Meshtastic devices.
 
 > [!NOTE]
-> You can find the main Meshtastic documentation, including installation guides, at https://web.app/.
+> You can find the main Meshtastic documentation at https://meshtastic.org/docs/introduction/.
 
 ### Projects within this Monorepo (`packages/`)
 
