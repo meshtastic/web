@@ -12,6 +12,9 @@ This monorepo consolidates the official [Meshtastic](https://meshtastic.org) web
 interface and its supporting JavaScript libraries. It aims to provide a unified
 development experience for interacting with Meshtastic devices.
 
+> [!NOTE]
+> You can find the main Meshtastic documentation at https://meshtastic.org/docs/introduction/.
+
 ### Projects within this Monorepo (`packages/`)
 
 All projects are located within the `packages/` directory:
@@ -33,7 +36,7 @@ All `Meshtastic JS` packages (core and transports) are published both to
 
 ---
 
-## Stats
+## Repository activity
 
 | Project        | Repobeats                                                                                                             |
 | :------------- | :-------------------------------------------------------------------------------------------------------------------- |
@@ -87,28 +90,18 @@ If you encounter any issues, please report them in our
 [issues tracker](https://github.com/meshtastic/web/issues). Your feedback helps
 improve the stability of future releases
 
-### Contributing
+## Star history
 
-We welcome contributions! Here’s how the deployment flow works for pull
-requests:
+<a href="https://star-history.com/#meshtastic/web&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=meshtastic/web&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=meshtastic/web&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=meshtastic/web&type=Date" width="100%" />
+ </picture>
+</a>
 
-- **Preview Deployments:**\
-  Every pull request automatically generates a preview deployment on Vercel.
-  This allows you and reviewers to easily preview changes before merging.
+## Contributors
 
-- **Staging Environment (`client-test`):**\
-  Once your PR is merged, your changes will be available on our staging site:
-  [client-test.meshtastic.org](https://client-test.meshtastic.org/).\
-  This environment supports rapid feature iteration and testing without
-  impacting the production site.
-
-- **Production Releases:**\
-  At regular intervals, stable and fully tested releases are promoted to our
-  production site: [client.meshtastic.org](https://client.meshtastic.org/).\
-  This is the primary interface used by the public to connect with their
-  Meshtastic nodes.
-
-Please review our
-[Contribution Guidelines](https://github.com/meshtastic/web/blob/main/CONTRIBUTING.md)
-before submitting a pull request. We appreciate your help in making the project
-better!
+<a href="https://github.com/meshtastic/web/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=meshtastic/web" width="100%"/>
+</a>
