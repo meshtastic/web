@@ -102,6 +102,6 @@ improve the stability of future releases
 
 ## Contributors
 
-<a href="https://github.com/alextran1502/meshtastic/graphs/contributors">
+<a href="https://github.com/meshtastic/web/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=meshtastic/web" width="100%"/>
 </a>
