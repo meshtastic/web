@@ -14,6 +14,7 @@ export type LangCode = Lang["code"];
 
 export const supportedLanguages: Lang[] = [
   { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "fr", name: "French", flag: "🇫🇷" },
   { code: "en", name: "English", flag: "🇺🇸" },
   { code: "fi", name: "Suomi", flag: "🇫🇮" },
   { code: "sv", name: "Svenska", flag: "🇸🇪" },
