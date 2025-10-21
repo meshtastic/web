@@ -21,7 +21,7 @@ export default function LanguageSwitcher({
   disableHover = false,
 }: LanguageSwitcherProps) {
   const { i18n } = useTranslation("ui");
-  const { set: setLanguage, currentLanguage } = useLang();
+  const { set: setLanguage, current, getSupportedLangs } = useLang();
 
   const handleLanguageChange = useCallback(
     async (languageCode: LangCode) => {
@@ -65,12 +65,12 @@ export default function LanguageSwitcher({
                 "group-hover:text-gray-900 dark:group-hover:text-white",
             )}
           >
-            {currentLanguage?.name}
+            {current?.name}
           </Subtle>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="center" className="w-48">
-        {supportedLanguages.map((language) => (
+        {getSupportedLangs.map((language) => (
           <DropdownMenuItem
             key={language.code}
             onClick={() => handleLanguageChange(language.code)}

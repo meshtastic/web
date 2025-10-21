@@ -50,6 +50,11 @@ function useLang() {
     [i18n.language, i18n.changeLanguage, setLanguageInStorage],
   );
 
+  const getSupportedLangs = useMemo(
+    () => supportedLanguages.toSorted((a, b) => a.name.localeCompare(b.name)),
+    [],
+  );
+
   const compare = useCallback(
     (a: string, b: string) => {
       return collator.compare(a, b);
@@ -57,7 +62,7 @@ function useLang() {
     [collator],
   );
 
-  return { compare, set, currentLanguage };
+  return { compare, set, current: currentLanguage, getSupportedLangs };
 }
 
 export default useLang;
