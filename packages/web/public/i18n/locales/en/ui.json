@@ -6,6 +6,7 @@
     "config": "Config",
     "channels": "Channels",
     "radioConfig": "Radio Config",
+    "deviceConfig": "Device Config",
     "moduleConfig": "Module Config",
     "channelConfig": "Channel Config",
     "nodes": "Nodes"
