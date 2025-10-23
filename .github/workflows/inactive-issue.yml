@@ -1,8 +1,8 @@
 name: Close inactive issues
 on:
   schedule:
-    - cron: "0 6 * * *"
-
+    - cron: "0 */4 * * *" # every 4 hours
+  workflow_dispatch: # allow manual runs
 jobs:
   close-issues:
     runs-on: ubuntu-latest
@@ -12,6 +12,7 @@ jobs:
     steps:
       - uses: actions/stale@v10
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-issue-stale: 60
           days-before-issue-close: 14
           stale-issue-label: "stale"
@@ -19,4 +20,5 @@ jobs:
           close-issue-message: "This issue was closed because it has been inactive for 14 days since being marked as stale."
           days-before-pr-stale: -1
           days-before-pr-close: -1
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          only-issue-labels: "Bug"
+          remove-stale-when-updated: true
