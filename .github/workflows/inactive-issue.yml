@@ -2,7 +2,7 @@ name: Close inactive issues
 on:
   schedule:
     - cron: "0 */4 * * *" # every 4 hours
-  workflow_dispatch: #allow manual runs
+  workflow_dispatch: # allow manual runs
 jobs:
   close-issues:
     runs-on: ubuntu-latest
