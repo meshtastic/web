@@ -4,6 +4,8 @@ import { z } from "zod";
 export const FLAG_ENV = {
   persistNodeDB: "VITE_PERSIST_NODE_DB",
   persistMessages: "VITE_PERSIST_MESSAGES",
+  persistDevices: "VITE_PERSIST_DEVICES",
+  persistApp: "VITE_PERSIST_APP",
 } as const;
 
 export type FlagKey = keyof typeof FLAG_ENV;

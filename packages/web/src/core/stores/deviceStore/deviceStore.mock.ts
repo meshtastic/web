@@ -14,6 +14,7 @@ import type { Device } from "./index.ts";
  */
 export const mockDeviceStore: Device = {
   id: 0,
+  myNodeNum: 123456,
   status: 5 as const,
   channels: new Map(),
   config: {} as Protobuf.LocalOnly.LocalConfig,
@@ -44,8 +45,13 @@ export const mockDeviceStore: Device = {
     deleteMessages: false,
     managedMode: false,
     clientNotification: false,
+    resetNodeDb: false,
+    clearAllStores: false,
+    factoryResetConfig: false,
+    factoryResetDevice: false,
   },
   clientNotifications: [],
+  neighborInfo: new Map(),
 
   setStatus: vi.fn(),
   setConfig: vi.fn(),
@@ -66,6 +72,8 @@ export const mockDeviceStore: Device = {
   setPendingSettingsChanges: vi.fn(),
   addChannel: vi.fn(),
   addWaypoint: vi.fn(),
+  removeWaypoint: vi.fn(),
+  getWaypoint: vi.fn(),
   addConnection: vi.fn(),
   addTraceRoute: vi.fn(),
   addMetadata: vi.fn(),
@@ -80,4 +88,6 @@ export const mockDeviceStore: Device = {
   getClientNotification: vi.fn(),
   getAllUnreadCount: vi.fn().mockReturnValue(0),
   getUnreadCount: vi.fn().mockReturnValue(0),
+  getNeighborInfo: vi.fn(),
+  addNeighborInfo: vi.fn(),
 };

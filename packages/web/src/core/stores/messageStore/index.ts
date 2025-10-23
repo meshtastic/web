@@ -17,6 +17,7 @@ import { produce } from "immer";
 import { create as createStore, type StateCreator } from "zustand";
 import { type PersistOptions, persist } from "zustand/middleware";
 
+const IDB_KEY_NAME = "meshtastic-message-store";
 const CURRENT_STORE_VERSION = 0;
 const MESSAGESTORE_RETENTION_NUM = 10;
 const MESSAGELOG_RETENTION_NUM = 1000; // Max messages per conversation/channel
@@ -43,14 +44,17 @@ export interface MessageBuckets {
   direct: Map<ConversationId, MessageLogMap>;
   broadcast: Map<ChannelId, MessageLogMap>;
 }
-export interface MessageStore {
+
+type MessageStoreData = {
+  // Persisted data
   id: number;
   myNodeNum: number | undefined;
-
   messages: MessageBuckets;
   drafts: Map<Types.Destination, string>;
+};
 
-  // Ephemeral UI state (not persisted)
+export interface MessageStore extends MessageStoreData {
+  // Ephemeral state (not persisted)
   activeChat: number;
   chatType: MessageType;
 
@@ -77,14 +81,6 @@ export interface MessageStoreState {
 interface PrivateMessageStoreState extends MessageStoreState {
   messageStores: Map<number, MessageStore>;
 }
-
-type MessageStoreData = {
-  id: number;
-  myNodeNum: number | undefined;
-
-  messages: MessageBuckets;
-  drafts: Map<Types.Destination, string>;
-};
 
 type MessageStorePersisted = {
   messageStores: Map<number, MessageStoreData>;
@@ -393,7 +389,7 @@ const persistOptions: PersistOptions<
   PrivateMessageStoreState,
   MessageStorePersisted
 > = {
-  name: "meshtastic-message-store",
+  name: IDB_KEY_NAME,
   storage: createStorage<MessageStorePersisted>(),
   version: CURRENT_STORE_VERSION,
   partialize: (s): MessageStorePersisted => ({

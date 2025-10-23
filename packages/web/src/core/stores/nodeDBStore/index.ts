@@ -13,15 +13,20 @@ import {
 } from "zustand/middleware";
 import type { NodeError, NodeErrorType, ProcessPacketParams } from "./types.ts";
 
+const IDB_KEY_NAME = "meshtastic-nodedb-store";
 const CURRENT_STORE_VERSION = 0;
 const NODEDB_RETENTION_NUM = 10;
 
-export interface NodeDB {
+type NodeDBData = {
+  // Persisted data
   id: number;
   myNodeNum: number | undefined;
   nodeMap: Map<number, Protobuf.Mesh.NodeInfo>;
   nodeErrors: Map<number, NodeError>;
+};
 
+export interface NodeDB extends NodeDBData {
+  // Ephemeral state (not persisted)
   addNode: (nodeInfo: Protobuf.Mesh.NodeInfo) => void;
   removeNode: (nodeNum: number) => void;
   removeAllNodes: (keepMyNode?: boolean) => void;
@@ -57,13 +62,6 @@ export interface nodeDBState {
 interface PrivateNodeDBState extends nodeDBState {
   nodeDBs: Map<number, NodeDB>;
 }
-
-type NodeDBData = {
-  id: number;
-  myNodeNum: number | undefined;
-  nodeMap: Map<number, Protobuf.Mesh.NodeInfo>;
-  nodeErrors: Map<number, NodeError>;
-};
 
 type NodeDBPersisted = {
   nodeDBs: Map<number, NodeDBData>;
@@ -442,7 +440,7 @@ export const nodeDBInitializer: StateCreator<PrivateNodeDBState> = (
 });
 
 const persistOptions: PersistOptions<PrivateNodeDBState, NodeDBPersisted> = {
-  name: "meshtastic-nodedb-store",
+  name: IDB_KEY_NAME,
   storage: createStorage<NodeDBPersisted>(),
   version: CURRENT_STORE_VERSION,
   partialize: (s): NodeDBPersisted => ({
