@@ -447,7 +447,7 @@
       }
     },
     "isUnmessageable": {
-      "label": "Unmessaageable",
+      "label": "Unmessageable",
       "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not avaliable to nodes that will never respond."
     },
     "isLicensed": {
