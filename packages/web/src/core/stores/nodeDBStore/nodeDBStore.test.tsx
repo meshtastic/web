@@ -456,7 +456,7 @@ describe("NodeDB – merge semantics, PKI checks & extras", () => {
     const newDB = st.addNodeDB(1101);
     newDB.setNodeNum(4242);
 
-    expect(newDB.getMyNode().num).toBe(4242);
+    expect(newDB.getMyNode()?.num).toBe(4242);
   });
 });
 

@@ -13,9 +13,10 @@ export type Lang = {
 export type LangCode = Lang["code"];
 
 export const supportedLanguages: Lang[] = [
+  { code: "fi", name: "Suomi", flag: "🇫🇮" },
   { code: "de", name: "Deutsch", flag: "🇩🇪" },
   { code: "en", name: "English", flag: "🇺🇸" },
-  { code: "fi", name: "Suomi", flag: "🇫🇮" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
   { code: "sv", name: "Svenska", flag: "🇸🇪" },
 ];
 
@@ -41,6 +42,7 @@ i18next
     fallbackLng: {
       default: [FALLBACK_LANGUAGE_CODE],
       fi: ["fi-FI", FALLBACK_LANGUAGE_CODE],
+      fr: ["fr-FR", FALLBACK_LANGUAGE_CODE],
       sv: ["sv-SE", FALLBACK_LANGUAGE_CODE],
       de: ["de-DE", FALLBACK_LANGUAGE_CODE],
     },
