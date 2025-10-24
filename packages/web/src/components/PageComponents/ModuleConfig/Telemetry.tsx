@@ -32,7 +32,11 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "telemetry" }, data, moduleConfig.telemetry);
+    setChange(
+      { type: "moduleConfig", variant: "telemetry" },
+      data,
+      moduleConfig.telemetry
+    );
   };
 
   return (
