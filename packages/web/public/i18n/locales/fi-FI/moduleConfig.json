@@ -398,7 +398,7 @@
 		},
 		"historyReturnWindow": {
 			"label": "Historian aikamäärä",
-			"description": "Enimmäismäärä tietueita palautettaviksi"
+			"description": "Palauta tietueet tästä aikaikkunasta (minuutit)"
 		}
 	},
 	"telemetry": {

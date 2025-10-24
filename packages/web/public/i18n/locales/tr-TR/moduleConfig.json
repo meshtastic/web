@@ -398,7 +398,7 @@
 		},
 		"historyReturnWindow": {
 			"label": "Geçmiş geri dönüş penceresi",
-			"description": "Max number of records to return"
+			"description": "Bu zaman penceresinden kayıtları döndür (dakika)"
 		}
 	},
 	"telemetry": {

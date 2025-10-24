@@ -397,8 +397,8 @@
 			"description": "Nombre maximum d'enregistrements à retourner"
 		},
 		"historyReturnWindow": {
-			"label": "Fenêtre de retour d’historique",
-			"description": "Nombre maximum d'enregistrements à retourner"
+			"label": "Fenêtre de retour d'historique",
+			"description": "Retourner les enregistrements de cette fenêtre de temps (minutes)"
 		}
 	},
 	"telemetry": {

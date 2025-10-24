@@ -398,7 +398,7 @@
 		},
 		"historyReturnWindow": {
 			"label": "Janela de retorno do histórico",
-			"description": "Max number of records to return"
+			"description": "Retornar registros desta janela de tempo (minutos)"
 		}
 	},
 	"telemetry": {

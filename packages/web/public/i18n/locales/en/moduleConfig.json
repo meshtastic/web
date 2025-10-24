@@ -398,7 +398,7 @@
     },
     "historyReturnWindow": {
       "label": "History return window",
-      "description": "Max number of records to return"
+      "description": "Return records from this time window (minutes)"
     }
   },
   "telemetry": {

@@ -398,7 +398,7 @@
 		},
 		"historyReturnWindow": {
 			"label": "リクエスト可能な履歴の期間  (分)",
-			"description": "Max number of records to return"
+			"description": "この時間枠内の記録を返す（分）"
 		}
 	},
 	"telemetry": {
