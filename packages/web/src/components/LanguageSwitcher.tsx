@@ -1,4 +1,4 @@
-import { type LangCode, supportedLanguages } from "@app/i18n-config.ts";
+import type { LangCode } from "@app/i18n-config.ts";
 import useLang from "@core/hooks/useLang.ts";
 import { cn } from "@core/utils/cn.ts";
 import { Check, Languages } from "lucide-react";

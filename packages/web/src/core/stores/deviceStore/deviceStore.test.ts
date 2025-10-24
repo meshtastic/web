@@ -52,25 +52,7 @@ function makeChannel(index: number) {
 function makeWaypoint(id: number, expire?: number) {
   return create(Protobuf.Mesh.WaypointSchema, { id, expire });
 }
-function makeConfig(fields: Record<string, any>) {
-  return create(Protobuf.Config.ConfigSchema, {
-    payloadVariant: {
-      case: "device",
-      value: create(Protobuf.Config.Config_DeviceConfigSchema, fields),
-    },
-  });
-}
-function makeModuleConfig(fields: Record<string, any>) {
-  return create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-    payloadVariant: {
-      case: "mqtt",
-      value: create(
-        Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema,
-        fields,
-      ),
-    },
-  });
-}
+
 function makeAdminMessage(fields: Record<string, any>) {
   return create(Protobuf.Admin.AdminMessageSchema, fields);
 }
@@ -114,13 +96,13 @@ describe("DeviceStore – basic map ops & retention", () => {
   });
 });
 
-describe("DeviceStore – working/effective config API", () => {
+describe("DeviceStore – change registry API", () => {
   beforeEach(() => {
     idbMem.clear();
     vi.clearAllMocks();
   });
 
-  it("setWorkingConfig/getWorkingConfig replaces by variant and getEffectiveConfig merges base + working", async () => {
+  it("setChange/hasChange/getChange for config and getEffectiveConfig merges base + working", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
     const device = state.addDevice(42);
@@ -138,14 +120,17 @@ describe("DeviceStore – working/effective config API", () => {
     );
 
     // working deviceConfig.role = ROUTER
-    device.setWorkingConfig(
-      makeConfig({
-        role: Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
-      }),
-    );
+    const routerConfig = create(Protobuf.Config.Config_DeviceConfigSchema, {
+      role: Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
+    });
+    device.setChange({ type: "config", variant: "device" }, routerConfig);
 
-    // expect working deviceConfig.role = ROUTER
-    const working = device.getWorkingConfig("device");
+    // expect change is tracked
+    expect(device.hasConfigChange("device")).toBe(true);
+    const working = device.getChange({
+      type: "config",
+      variant: "device",
+    }) as Protobuf.Config.Config_DeviceConfig;
     expect(working?.role).toBe(Protobuf.Config.Config_DeviceConfig_Role.ROUTER);
 
     // expect effective deviceConfig.role = ROUTER
@@ -154,30 +139,27 @@ describe("DeviceStore – working/effective config API", () => {
       Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
     );
 
-    // remove working, effective should equal base
-    device.removeWorkingConfig("device");
-    expect(device.getWorkingConfig("device")).toBeUndefined();
+    // remove change, effective should equal base
+    device.removeChange({ type: "config", variant: "device" });
+    expect(device.hasConfigChange("device")).toBe(false);
     expect(device.getEffectiveConfig("device")?.role).toBe(
       Protobuf.Config.Config_DeviceConfig_Role.CLIENT,
     );
 
     // add multiple, then clear all
-    device.setWorkingConfig(makeConfig({}));
-    device.setWorkingConfig(
-      makeConfig({
-        deviceRole: Protobuf.Config.Config_DeviceConfig_Role.ROUTER,
-      }),
-    );
-    device.removeWorkingConfig(); // clears all
-    expect(device.getWorkingConfig("device")).toBeUndefined();
+    device.setChange({ type: "config", variant: "device" }, routerConfig);
+    device.setChange({ type: "config", variant: "position" }, {});
+    device.clearAllChanges();
+    expect(device.hasConfigChange("device")).toBe(false);
+    expect(device.hasConfigChange("position")).toBe(false);
   });
 
-  it("setWorkingModuleConfig/getWorkingModuleConfig and getEffectiveModuleConfig", async () => {
+  it("setChange/hasChange for moduleConfig and getEffectiveModuleConfig", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
     const device = state.addDevice(7);
 
-    // base moduleConfig.mqtt empty; add working mqtt host
+    // base moduleConfig.mqtt with base address
     device.setModuleConfig(
       create(Protobuf.ModuleConfig.ModuleConfigSchema, {
         payloadVariant: {
@@ -188,58 +170,82 @@ describe("DeviceStore – working/effective config API", () => {
         },
       }),
     );
-    device.setWorkingModuleConfig(
-      makeModuleConfig({ address: "mqtt://working" }),
+
+    // working mqtt config
+    const workingMqtt = create(
+      Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema,
+      { address: "mqtt://working" },
+    );
+    device.setChange({ type: "moduleConfig", variant: "mqtt" }, workingMqtt);
+
+    expect(device.hasModuleConfigChange("mqtt")).toBe(true);
+    const mqtt = device.getChange({
+      type: "moduleConfig",
+      variant: "mqtt",
+    }) as Protobuf.ModuleConfig.ModuleConfig_MQTTConfig;
+    expect(mqtt?.address).toBe("mqtt://working");
+
+    // effective should return working value
+    expect(device.getEffectiveModuleConfig("mqtt")?.address).toBe(
+      "mqtt://working",
     );
 
-    const mqtt = device.getWorkingModuleConfig("mqtt");
-    expect(mqtt?.address).toBe("mqtt://working");
-    expect(mqtt?.address).toBe("mqtt://working");
-
-    device.removeWorkingModuleConfig("mqtt");
-    expect(device.getWorkingModuleConfig("mqtt")).toBeUndefined();
+    // remove change
+    device.removeChange({ type: "moduleConfig", variant: "mqtt" });
+    expect(device.hasModuleConfigChange("mqtt")).toBe(false);
     expect(device.getEffectiveModuleConfig("mqtt")?.address).toBe(
       "mqtt://base",
     );
 
     // Clear all
-    device.setWorkingModuleConfig(makeModuleConfig({ address: "x" }));
-    device.setWorkingModuleConfig(makeModuleConfig({ address: "y" }));
-    device.removeWorkingModuleConfig();
-    expect(device.getWorkingModuleConfig("mqtt")).toBeUndefined();
+    device.setChange({ type: "moduleConfig", variant: "mqtt" }, workingMqtt);
+    device.clearAllChanges();
+    expect(device.hasModuleConfigChange("mqtt")).toBe(false);
   });
 
-  it("channel working config add/update/remove/get", async () => {
+  it("channel change tracking add/update/remove/get", async () => {
     const { useDeviceStore } = await freshStore(false);
     const state = useDeviceStore.getState();
     const device = state.addDevice(9);
 
-    device.setWorkingChannelConfig(makeChannel(0));
-    device.setWorkingChannelConfig(
-      create(Protobuf.Channel.ChannelSchema, {
-        index: 1,
-        settings: { name: "one" },
-      }),
-    );
-    expect(device.getWorkingChannelConfig(0)?.index).toBe(0);
-    expect(device.getWorkingChannelConfig(1)?.settings?.name).toBe("one");
+    const channel0 = makeChannel(0);
+    const channel1 = create(Protobuf.Channel.ChannelSchema, {
+      index: 1,
+      settings: { name: "one" },
+    });
+
+    device.setChange({ type: "channel", index: 0 }, channel0);
+    device.setChange({ type: "channel", index: 1 }, channel1);
+
+    expect(device.hasChannelChange(0)).toBe(true);
+    expect(device.hasChannelChange(1)).toBe(true);
+    const ch0 = device.getChange({ type: "channel", index: 0 }) as
+      | Protobuf.Channel.Channel
+      | undefined;
+    expect(ch0?.index).toBe(0);
+    const ch1 = device.getChange({ type: "channel", index: 1 }) as
+      | Protobuf.Channel.Channel
+      | undefined;
+    expect(ch1?.settings?.name).toBe("one");
 
     // update channel 1
-    device.setWorkingChannelConfig(
-      create(Protobuf.Channel.ChannelSchema, {
-        index: 1,
-        settings: { name: "uno" },
-      }),
-    );
-    expect(device.getWorkingChannelConfig(1)?.settings?.name).toBe("uno");
+    const channel1Updated = create(Protobuf.Channel.ChannelSchema, {
+      index: 1,
+      settings: { name: "uno" },
+    });
+    device.setChange({ type: "channel", index: 1 }, channel1Updated);
+    const ch1Updated = device.getChange({ type: "channel", index: 1 }) as
+      | Protobuf.Channel.Channel
+      | undefined;
+    expect(ch1Updated?.settings?.name).toBe("uno");
 
     // remove specific
-    device.removeWorkingChannelConfig(1);
-    expect(device.getWorkingChannelConfig(1)).toBeUndefined();
+    device.removeChange({ type: "channel", index: 1 });
+    expect(device.hasChannelChange(1)).toBe(false);
 
     // remove all
-    device.removeWorkingChannelConfig();
-    expect(device.getWorkingChannelConfig(0)).toBeUndefined();
+    device.clearAllChanges();
+    expect(device.hasChannelChange(0)).toBe(false);
   });
 });
 
@@ -349,7 +355,8 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
 
     // Old device with myNodeNum=777 and some waypoints (one expired)
     const oldDevice = state.addDevice(1);
-    oldDevice.connection = { sendWaypoint: vi.fn() } as any;
+    const mockSendWaypoint = vi.fn();
+    oldDevice.addConnection({ sendWaypoint: mockSendWaypoint } as any);
 
     oldDevice.setHardware(makeHardware(777));
     oldDevice.addWaypoint(
@@ -393,10 +400,10 @@ describe("DeviceStore – traceroutes & waypoints retention + merge on setHardwa
 
     // Remove waypoint
     oldDevice.removeWaypoint(102, false);
-    expect(oldDevice.connection?.sendWaypoint).not.toHaveBeenCalled();
+    expect(mockSendWaypoint).not.toHaveBeenCalled();
 
     await oldDevice.removeWaypoint(101, true); // toMesh=true
-    expect(oldDevice.connection?.sendWaypoint).toHaveBeenCalled();
+    expect(mockSendWaypoint).toHaveBeenCalled();
 
     expect(useDeviceStore.getState().devices.get(1)!.waypoints.length).toBe(98);
 

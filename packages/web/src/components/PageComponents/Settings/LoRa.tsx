@@ -3,7 +3,6 @@ import {
   type LoRaValidation,
   LoRaValidationSchema,
 } from "@app/validation/config/lora.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -19,24 +18,16 @@ interface LoRaConfigProps {
 export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
   useWaitForConfig({ configCase: "lora" });
 
-  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
-    useDevice();
-  const { t } = useTranslation("deviceConfig");
+  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
+  const { t } = useTranslation("config");
 
   const onSubmit = (data: LoRaValidation) => {
     if (deepCompareConfig(config.lora, data, true)) {
-      removeWorkingConfig("lora");
+      removeChange({ type: "config", variant: "lora" });
       return;
     }
 
-    setWorkingConfig(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "lora",
-          value: data,
-        },
-      }),
-    );
+    setChange({ type: "config", variant: "lora" }, data, config.lora);
   };
 
   return (

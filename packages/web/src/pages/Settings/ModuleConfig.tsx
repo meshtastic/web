@@ -34,7 +34,7 @@ type TabItem = {
 };
 
 export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
-  const { getWorkingModuleConfig } = useDevice();
+  const { hasModuleConfigChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
   const tabs: TabItem[] = [
     {
@@ -97,8 +97,8 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
 
   const flags = useMemo(
     () =>
-      new Map(tabs.map((tab) => [tab.case, getWorkingModuleConfig(tab.case)])),
-    [tabs, getWorkingModuleConfig],
+      new Map(tabs.map((tab) => [tab.case, hasModuleConfigChange(tab.case)])),
+    [tabs, hasModuleConfigChange],
   );
 
   return (

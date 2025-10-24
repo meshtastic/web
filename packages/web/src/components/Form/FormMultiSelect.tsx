@@ -25,7 +25,7 @@ export function MultiSelectInput<T extends FieldValues>({
   isDirty,
   invalid,
 }: GenericFormElementProps<T, MultiSelectFieldProps<T>>) {
-  const { t } = useTranslation("deviceConfig");
+  const { t } = useTranslation("config");
   const { enumValue, className, ...remainingProperties } = field.properties;
 
   const isNewConfigStructure =

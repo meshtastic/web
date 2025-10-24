@@ -1,11 +1,10 @@
-import { Bluetooth } from "@components/PageComponents/Config/Bluetooth.tsx";
-import { Device } from "@components/PageComponents/Config/Device/index.tsx";
-import { Display } from "@components/PageComponents/Config/Display.tsx";
-import { LoRa } from "@components/PageComponents/Config/LoRa.tsx";
-import { Network } from "@components/PageComponents/Config/Network/index.tsx";
-import { Position } from "@components/PageComponents/Config/Position.tsx";
-import { Power } from "@components/PageComponents/Config/Power.tsx";
-import { Security } from "@components/PageComponents/Config/Security/Security.tsx";
+import { Bluetooth } from "@components/PageComponents/Settings/Bluetooth.tsx";
+import { Device } from "@components/PageComponents/Settings/Device/index.tsx";
+import { Display } from "@components/PageComponents/Settings/Display.tsx";
+import { Network } from "@components/PageComponents/Settings/Network/index.tsx";
+import { Position } from "@components/PageComponents/Settings/Position.tsx";
+import { Power } from "@components/PageComponents/Settings/Power.tsx";
+import { User } from "@components/PageComponents/Settings/User.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import {
   Tabs,
@@ -23,21 +22,25 @@ interface ConfigProps {
 }
 
 type TabItem = {
-  case: ValidConfigType;
+  case: ValidConfigType | "user";
   label: string;
   element: ComponentType<ConfigProps>;
   count?: number;
 };
 
 export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
-  const { getWorkingConfig } = useDevice();
-  const { t } = useTranslation("deviceConfig");
+  const { hasConfigChange, hasUserChange } = useDevice();
+  const { t } = useTranslation("config");
   const tabs: TabItem[] = [
+    {
+      case: "user",
+      label: t("page.tabUser"),
+      element: User,
+    },
     {
       case: "device",
       label: t("page.tabDevice"),
       element: Device,
-      count: 0,
     },
     {
       case: "position",
@@ -60,29 +63,27 @@ export const DeviceConfig = ({ onFormInit }: ConfigProps) => {
       element: Display,
     },
     {
-      case: "lora",
-      label: t("page.tabLora"),
-      element: LoRa,
-    },
-    {
       case: "bluetooth",
       label: t("page.tabBluetooth"),
       element: Bluetooth,
     },
-    {
-      case: "security",
-      label: t("page.tabSecurity"),
-      element: Security,
-    },
   ] as const;
 
   const flags = useMemo(
-    () => new Map(tabs.map((tab) => [tab.case, getWorkingConfig(tab.case)])),
-    [tabs, getWorkingConfig],
+    () =>
+      new Map(
+        tabs.map((tab) => [
+          tab.case,
+          tab.case === "user"
+            ? hasUserChange()
+            : hasConfigChange(tab.case as ValidConfigType),
+        ]),
+      ),
+    [tabs, hasConfigChange, hasUserChange],
   );
 
   return (
-    <Tabs defaultValue={t("page.tabDevice")}>
+    <Tabs defaultValue={t("page.tabUser")}>
       <TabsList className="w-full dark:bg-slate-700">
         {tabs.map((tab) => (
           <TabsTrigger

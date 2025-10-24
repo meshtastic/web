@@ -3,14 +3,12 @@ import {
   type StoreForwardValidation,
   StoreForwardValidationSchema,
 } from "@app/validation/moduleConfig/storeForward.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
-import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
 
 interface StoreForwardModuleConfigProps {
@@ -20,27 +18,20 @@ interface StoreForwardModuleConfigProps {
 export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "storeForward" });
 
-  const {
-    moduleConfig,
-    setWorkingModuleConfig,
-    getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: StoreForwardValidation) => {
     if (deepCompareConfig(moduleConfig.storeForward, data, true)) {
-      removeWorkingModuleConfig("storeForward");
+      removeChange({ type: "moduleConfig", variant: "storeForward" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "storeForward",
-          value: data,
-        },
-      }),
+    setChange(
+      { type: "moduleConfig", variant: "storeForward" },
+      data,
+      moduleConfig.storeForward,
     );
   };
 

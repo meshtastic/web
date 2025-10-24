@@ -1,4 +1,4 @@
-import { Channel } from "@app/components/PageComponents/ChannelConfig/Channel";
+import { Channel } from "@app/components/PageComponents/Channels/Channel";
 import { Button } from "@components/UI/Button.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import {
@@ -30,8 +30,8 @@ export const getChannelName = (channel: Protobuf.Channel.Channel) => {
         });
 };
 
-export const ChannelConfig = ({ onFormInit }: ConfigProps) => {
-  const { channels, getWorkingChannelConfig, setDialogOpen } = useDevice();
+export const Channels = ({ onFormInit }: ConfigProps) => {
+  const { channels, hasChannelChange, setDialogOpen } = useDevice();
   const { t } = useTranslation("channels");
 
   const allChannels = Array.from(channels.values());
@@ -40,10 +40,10 @@ export const ChannelConfig = ({ onFormInit }: ConfigProps) => {
       new Map(
         allChannels.map((channel) => [
           channel.index,
-          getWorkingChannelConfig(channel.index),
+          hasChannelChange(channel.index),
         ]),
       ),
-    [allChannels, getWorkingChannelConfig],
+    [allChannels, hasChannelChange],
   );
 
   return (

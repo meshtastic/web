@@ -3,7 +3,6 @@ import {
   type SerialValidation,
   SerialValidationSchema,
 } from "@app/validation/moduleConfig/serial.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -20,27 +19,20 @@ interface SerialModuleConfigProps {
 export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "serial" });
 
-  const {
-    moduleConfig,
-    setWorkingModuleConfig,
-    getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: SerialValidation) => {
     if (deepCompareConfig(moduleConfig.serial, data, true)) {
-      removeWorkingModuleConfig("serial");
+      removeChange({ type: "moduleConfig", variant: "serial" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "serial",
-          value: data,
-        },
-      }),
+    setChange(
+      { type: "moduleConfig", variant: "serial" },
+      data,
+      moduleConfig.serial,
     );
   };
 

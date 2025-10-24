@@ -4,7 +4,6 @@ import {
   Languages,
   type LucideIcon,
   Palette,
-  PenLine,
   Search as SearchIcon,
   ZapIcon,
 } from "lucide-react";
@@ -53,7 +52,6 @@ export const DeviceInfoPanel = ({
   firmwareVersion,
   user,
   isCollapsed,
-  setDialogOpen,
   setCommandPaletteOpen,
   disableHover = false,
 }: DeviceInfoPanelProps) => {
@@ -90,12 +88,6 @@ export const DeviceInfoPanel = ({
       label: t("theme.changeTheme"),
       icon: Palette,
       render: () => <ThemeSwitcher />,
-    },
-    {
-      id: "changeName",
-      label: t("sidebar.deviceInfo.deviceName.changeName"),
-      icon: PenLine,
-      onClick: setDialogOpen,
     },
     {
       id: "commandMenu",

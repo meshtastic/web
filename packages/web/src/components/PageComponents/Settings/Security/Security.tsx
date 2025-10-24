@@ -4,7 +4,6 @@ import {
   type RawSecurity,
   RawSecuritySchema,
 } from "@app/validation/config/security.ts";
-import { create } from "@bufbuild/protobuf";
 import { ManagedModeDialog } from "@components/Dialog/ManagedModeDialog.tsx";
 import { PkiRegenerateDialog } from "@components/Dialog/PkiRegenerateDialog.tsx";
 import { createZodResolver } from "@components/Form/createZodResolver.ts";
@@ -15,7 +14,6 @@ import {
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
-import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import { useEffect, useState } from "react";
 import { type DefaultValues, useForm } from "react-hook-form";
@@ -27,15 +25,10 @@ interface SecurityConfigProps {
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
   useWaitForConfig({ configCase: "security" });
 
-  const {
-    config,
-    setWorkingConfig,
-    setDialogOpen,
-    getEffectiveConfig,
-    removeWorkingConfig,
-  } = useDevice();
+  const { config, setChange, setDialogOpen, getEffectiveConfig, removeChange } =
+    useDevice();
 
-  const { t } = useTranslation("deviceConfig");
+  const { t } = useTranslation("config");
 
   const defaultConfig = config.security;
   const defaultValues = {
@@ -103,17 +96,14 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     };
 
     if (deepCompareConfig(config.security, payload, true)) {
-      removeWorkingConfig("security");
+      removeChange({ type: "config", variant: "security" });
       return;
     }
 
-    setWorkingConfig(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "security",
-          value: payload,
-        },
-      }),
+    setChange(
+      { type: "config", variant: "security" },
+      payload,
+      config.security,
     );
   };
 

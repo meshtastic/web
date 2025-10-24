@@ -1,3 +1,4 @@
+import { deviceRoute, moduleRoute, radioRoute } from "@app/routes";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
@@ -5,44 +6,84 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
-import { ChannelConfig } from "@pages/Config/ChannelConfig.tsx";
-import { DeviceConfig } from "@pages/Config/DeviceConfig.tsx";
-import { ModuleConfig } from "@pages/Config/ModuleConfig.tsx";
+import { DeviceConfig } from "@pages/Settings/DeviceConfig.tsx";
+import { ModuleConfig } from "@pages/Settings/ModuleConfig.tsx";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  BoxesIcon,
   LayersIcon,
+  RadioTowerIcon,
   RefreshCwIcon,
+  RouterIcon,
   SaveIcon,
   SaveOff,
-  SettingsIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { RadioConfig } from "./RadioConfig.tsx";
 
 const ConfigPage = () => {
   const {
-    workingConfig,
-    workingModuleConfig,
-    workingChannelConfig,
+    getAllConfigChanges,
+    getAllModuleConfigChanges,
+    getAllChannelChanges,
     connection,
-    removeWorkingConfig,
-    removeWorkingModuleConfig,
-    removeWorkingChannelConfig,
+    clearAllChanges,
     setConfig,
     setModuleConfig,
     addChannel,
+    getConfigChangeCount,
+    getModuleConfigChangeCount,
+    getChannelChangeCount,
   } = useDevice();
 
-  const [activeConfigSection, setActiveConfigSection] = useState<
-    "device" | "module" | "channel"
-  >("device");
   const [isSaving, setIsSaving] = useState(false);
   const [rhfState, setRhfState] = useState({ isDirty: false, isValid: true });
   const unsubRef = useRef<(() => void) | null>(null);
   const [formMethods, setFormMethods] = useState<UseFormReturn | null>(null);
   const { toast } = useToast();
-  const { t } = useTranslation("deviceConfig");
+  const navigate = useNavigate();
+  const routerState = useRouterState();
+  const { t } = useTranslation("config");
+
+  const configChangeCount = getConfigChangeCount();
+  const moduleConfigChangeCount = getModuleConfigChangeCount();
+  const channelChangeCount = getChannelChangeCount();
+
+  const sections = useMemo(
+    () => [
+      {
+        key: "radio",
+        route: radioRoute,
+        label: t("navigation.radioConfig"),
+        icon: RadioTowerIcon,
+        changeCount: configChangeCount,
+        component: RadioConfig,
+      },
+      {
+        key: "device",
+        route: deviceRoute,
+        label: t("navigation.deviceConfig"),
+        icon: RouterIcon,
+        changeCount: moduleConfigChangeCount,
+        component: DeviceConfig,
+      },
+      {
+        key: "module",
+        route: moduleRoute,
+        label: t("navigation.moduleConfig"),
+        icon: LayersIcon,
+        changeCount: channelChangeCount,
+        component: ModuleConfig,
+      },
+    ],
+    [t, configChangeCount, moduleConfigChangeCount, channelChangeCount],
+  );
+
+  const activeSection =
+    sections.find((section) =>
+      routerState.location.pathname.includes(`/settings/${section.key}`),
+    ) ?? sections[0];
 
   const onFormInit = useCallback(
     <T extends FieldValues>(methods: UseFormReturn<T>) => {
@@ -69,7 +110,6 @@ const ConfigPage = () => {
     [],
   );
 
-  // Cleanup subscription on unmount
   useEffect(() => {
     return () => unsubRef.current?.();
   }, []);
@@ -78,9 +118,12 @@ const ConfigPage = () => {
     setIsSaving(true);
 
     try {
-      // Save all working channel configs first, doesn't require a commit/reboot
+      const channelChanges = getAllChannelChanges();
+      const configChanges = getAllConfigChanges();
+      const moduleConfigChanges = getAllModuleConfigChanges();
+
       await Promise.all(
-        workingChannelConfig.map((channel) =>
+        channelChanges.map((channel) =>
           connection?.setChannel(channel).then(() => {
             toast({
               title: t("toast.savedChannel.title", {
@@ -93,7 +136,7 @@ const ConfigPage = () => {
       );
 
       await Promise.all(
-        workingConfig.map((newConfig) =>
+        configChanges.map((newConfig) =>
           connection?.setConfig(newConfig).then(() => {
             toast({
               title: t("toast.saveSuccess.title"),
@@ -106,7 +149,7 @@ const ConfigPage = () => {
       );
 
       await Promise.all(
-        workingModuleConfig.map((newModuleConfig) =>
+        moduleConfigChanges.map((newModuleConfig) =>
           connection?.setModuleConfig(newModuleConfig).then(() =>
             toast({
               title: t("toast.saveSuccess.title"),
@@ -118,23 +161,21 @@ const ConfigPage = () => {
         ),
       );
 
-      if (workingConfig.length > 0 || workingModuleConfig.length > 0) {
+      if (configChanges.length > 0 || moduleConfigChanges.length > 0) {
         await connection?.commitEditSettings();
       }
 
-      workingChannelConfig.forEach((newChannel) => {
+      channelChanges.forEach((newChannel) => {
         addChannel(newChannel);
       });
-      workingConfig.forEach((newConfig) => {
+      configChanges.forEach((newConfig) => {
         setConfig(newConfig);
       });
-      workingModuleConfig.forEach((newModuleConfig) => {
+      moduleConfigChanges.forEach((newModuleConfig) => {
         setModuleConfig(newModuleConfig);
       });
 
-      removeWorkingChannelConfig();
-      removeWorkingConfig();
-      removeWorkingModuleConfig();
+      clearAllChanges();
 
       if (formMethods) {
         formMethods.reset(formMethods.getValues(), {
@@ -144,7 +185,6 @@ const ConfigPage = () => {
           keepValues: true,
         });
 
-        // Force RHF to re-validate and emit state
         formMethods.trigger();
       }
     } catch (_error) {
@@ -162,77 +202,49 @@ const ConfigPage = () => {
   }, [
     toast,
     t,
-    workingConfig,
+    getAllConfigChanges,
     connection,
-    workingModuleConfig,
-    workingChannelConfig,
+    getAllModuleConfigChanges,
+    getAllChannelChanges,
     formMethods,
     addChannel,
     setConfig,
     setModuleConfig,
-    removeWorkingConfig,
-    removeWorkingModuleConfig,
-    removeWorkingChannelConfig,
+    clearAllChanges,
   ]);
 
   const handleReset = useCallback(() => {
     if (formMethods) {
       formMethods.reset();
     }
-    removeWorkingChannelConfig();
-    removeWorkingConfig();
-    removeWorkingModuleConfig();
-  }, [
-    formMethods,
-    removeWorkingConfig,
-    removeWorkingModuleConfig,
-    removeWorkingChannelConfig,
-  ]);
+    clearAllChanges();
+  }, [formMethods, clearAllChanges]);
 
   const leftSidebar = useMemo(
     () => (
       <Sidebar>
         <SidebarSection label={t("sidebar.label")} className="py-2 px-0">
-          <SidebarButton
-            label={t("navigation.radioConfig")}
-            active={activeConfigSection === "device"}
-            onClick={() => setActiveConfigSection("device")}
-            Icon={SettingsIcon}
-            isDirty={workingConfig.length > 0}
-            count={workingConfig.length}
-          />
-          <SidebarButton
-            label={t("navigation.moduleConfig")}
-            active={activeConfigSection === "module"}
-            onClick={() => setActiveConfigSection("module")}
-            Icon={BoxesIcon}
-            isDirty={workingModuleConfig.length > 0}
-            count={workingModuleConfig.length}
-          />
-          <SidebarButton
-            label={t("navigation.channelConfig")}
-            active={activeConfigSection === "channel"}
-            onClick={() => setActiveConfigSection("channel")}
-            Icon={LayersIcon}
-            isDirty={workingChannelConfig.length > 0}
-            count={workingChannelConfig.length}
-          />
+          {sections.map((section) => (
+            <SidebarButton
+              key={section.key}
+              label={section.label}
+              active={activeSection?.key === section.key}
+              onClick={() => navigate({ to: section.route.to })}
+              Icon={section.icon}
+              isDirty={section.changeCount > 0}
+              count={section.changeCount}
+            />
+          ))}
         </SidebarSection>
       </Sidebar>
     ),
-    [
-      activeConfigSection,
-      workingConfig,
-      workingModuleConfig,
-      workingChannelConfig,
-      t,
-    ],
+    [sections, activeSection?.key, navigate, t],
   );
 
   const hasDrafts =
-    workingConfig.length > 0 ||
-    workingModuleConfig.length > 0 ||
-    workingChannelConfig.length > 0;
+    getConfigChangeCount() > 0 ||
+    getModuleConfigChangeCount() > 0 ||
+    getChannelChangeCount() > 0;
   const hasPending = hasDrafts || rhfState.isDirty;
   const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
   const saveDisabled = isSaving || !rhfState.isValid || !hasPending;
@@ -291,26 +303,16 @@ const ConfigPage = () => {
     ],
   );
 
+  const ActiveComponent = activeSection?.component;
+
   return (
     <PageLayout
       contentClassName="overflow-auto"
       leftBar={leftSidebar}
-      label={
-        activeConfigSection === "device"
-          ? t("navigation.radioConfig")
-          : activeConfigSection === "module"
-            ? t("navigation.moduleConfig")
-            : t("navigation.channelConfig")
-      }
+      label={activeSection?.label ?? ""}
       actions={actions}
     >
-      {activeConfigSection === "device" ? (
-        <DeviceConfig onFormInit={onFormInit} />
-      ) : activeConfigSection === "module" ? (
-        <ModuleConfig onFormInit={onFormInit} />
-      ) : (
-        <ChannelConfig onFormInit={onFormInit} />
-      )}
+      <ActiveComponent onFormInit={onFormInit} />
     </PageLayout>
   );
 };

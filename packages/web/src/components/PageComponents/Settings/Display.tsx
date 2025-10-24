@@ -3,7 +3,6 @@ import {
   type DisplayValidation,
   DisplayValidationSchema,
 } from "@app/validation/config/display.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -18,24 +17,16 @@ interface DisplayConfigProps {
 }
 export const Display = ({ onFormInit }: DisplayConfigProps) => {
   useWaitForConfig({ configCase: "display" });
-  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
-    useDevice();
-  const { t } = useTranslation("deviceConfig");
+  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
+  const { t } = useTranslation("config");
 
   const onSubmit = (data: DisplayValidation) => {
     if (deepCompareConfig(config.display, data, true)) {
-      removeWorkingConfig("display");
+      removeChange({ type: "config", variant: "display" });
       return;
     }
 
-    setWorkingConfig(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "display",
-          value: data,
-        },
-      }),
-    );
+    setChange({ type: "config", variant: "display" }, data, config.display);
   };
 
   return (

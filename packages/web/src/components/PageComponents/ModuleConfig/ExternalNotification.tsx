@@ -3,14 +3,12 @@ import {
   type ExternalNotificationValidation,
   ExternalNotificationValidationSchema,
 } from "@app/validation/moduleConfig/externalNotification.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
-import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
 
 interface ExternalNotificationModuleConfigProps {
@@ -22,27 +20,20 @@ export const ExternalNotification = ({
 }: ExternalNotificationModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "externalNotification" });
 
-  const {
-    moduleConfig,
-    setWorkingModuleConfig,
-    getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: ExternalNotificationValidation) => {
     if (deepCompareConfig(moduleConfig.externalNotification, data, true)) {
-      removeWorkingModuleConfig("externalNotification");
+      removeChange({ type: "moduleConfig", variant: "externalNotification" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "externalNotification",
-          value: data,
-        },
-      }),
+    setChange(
+      { type: "moduleConfig", variant: "externalNotification" },
+      data,
+      moduleConfig.externalNotification,
     );
   };
 

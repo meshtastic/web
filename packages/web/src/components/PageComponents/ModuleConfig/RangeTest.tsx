@@ -3,14 +3,12 @@ import {
   type RangeTestValidation,
   RangeTestValidationSchema,
 } from "@app/validation/moduleConfig/rangeTest.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
-import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
 
 interface RangeTestModuleConfigProps {
@@ -20,28 +18,21 @@ interface RangeTestModuleConfigProps {
 export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "rangeTest" });
 
-  const {
-    moduleConfig,
-    setWorkingModuleConfig,
-    getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
 
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: RangeTestValidation) => {
     if (deepCompareConfig(moduleConfig.rangeTest, data, true)) {
-      removeWorkingModuleConfig("rangeTest");
+      removeChange({ type: "moduleConfig", variant: "rangeTest" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "rangeTest",
-          value: data,
-        },
-      }),
+    setChange(
+      { type: "moduleConfig", variant: "rangeTest" },
+      data,
+      moduleConfig.rangeTest,
     );
   };
 

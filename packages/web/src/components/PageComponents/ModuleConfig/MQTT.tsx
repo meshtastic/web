@@ -23,9 +23,9 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
   const {
     config,
     moduleConfig,
-    setWorkingModuleConfig,
+    setChange,
     getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
+    removeChange,
   } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
@@ -39,17 +39,14 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
     };
 
     if (deepCompareConfig(moduleConfig.mqtt, payload, true)) {
-      removeWorkingModuleConfig("mqtt");
+      removeChange({ type: "moduleConfig", variant: "mqtt" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "mqtt",
-          value: payload,
-        },
-      }),
+    setChange(
+      { type: "moduleConfig", variant: "mqtt" },
+      payload,
+      moduleConfig.mqtt,
     );
   };
 

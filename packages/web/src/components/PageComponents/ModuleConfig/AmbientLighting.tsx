@@ -3,14 +3,12 @@ import {
   type AmbientLightingValidation,
   AmbientLightingValidationSchema,
 } from "@app/validation/moduleConfig/ambientLighting.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
-import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
 
 interface AmbientLightingModuleConfigProps {
@@ -21,27 +19,20 @@ export const AmbientLighting = ({
   onFormInit,
 }: AmbientLightingModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "ambientLighting" });
-  const {
-    moduleConfig,
-    setWorkingModuleConfig,
-    getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AmbientLightingValidation) => {
     if (deepCompareConfig(moduleConfig.ambientLighting, data, true)) {
-      removeWorkingModuleConfig("ambientLighting");
+      removeChange({ type: "moduleConfig", variant: "ambientLighting" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "ambientLighting",
-          value: data,
-        },
-      }),
+    setChange(
+      { type: "moduleConfig", variant: "ambientLighting" },
+      data,
+      moduleConfig.ambientLighting,
     );
   };
 

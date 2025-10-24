@@ -52,7 +52,7 @@ i18next
       "channels",
       "commandPalette",
       "common",
-      "deviceConfig",
+      "config",
       "moduleConfig",
       "dashboard",
       "dialog",

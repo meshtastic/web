@@ -3,7 +3,6 @@ import {
   type AudioValidation,
   AudioValidationSchema,
 } from "@app/validation/moduleConfig/audio.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -19,27 +18,20 @@ interface AudioModuleConfigProps {
 
 export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "audio" });
-  const {
-    moduleConfig,
-    setWorkingModuleConfig,
-    getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AudioValidation) => {
     if (deepCompareConfig(moduleConfig.audio, data, true)) {
-      removeWorkingModuleConfig("audio");
+      removeChange({ type: "moduleConfig", variant: "audio" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "audio",
-          value: data,
-        },
-      }),
+    setChange(
+      { type: "moduleConfig", variant: "audio" },
+      data,
+      moduleConfig.audio,
     );
   };
 
