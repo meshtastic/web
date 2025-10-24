@@ -12,10 +12,10 @@ import commandPaletteEN from "@public/i18n/locales/en/commandPalette.json" with 
 import commonEN from "@public/i18n/locales/en/common.json" with {
   type: "json",
 };
-import dashboardEN from "@public/i18n/locales/en/dashboard.json" with {
+import configEN from "@public/i18n/locales/en/config.json" with {
   type: "json",
 };
-import configEN from "@public/i18n/locales/en/config.json" with {
+import dashboardEN from "@public/i18n/locales/en/dashboard.json" with {
   type: "json",
 };
 import dialogEN from "@public/i18n/locales/en/dialog.json" with {

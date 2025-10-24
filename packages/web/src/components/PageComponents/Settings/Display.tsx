@@ -17,8 +17,7 @@ interface DisplayConfigProps {
 }
 export const Display = ({ onFormInit }: DisplayConfigProps) => {
   useWaitForConfig({ configCase: "display" });
-  const { config, setChange, getEffectiveConfig, removeChange } =
-    useDevice();
+  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
   const { t } = useTranslation("config");
 
   const onSubmit = (data: DisplayValidation) => {

@@ -18,12 +18,8 @@ interface AudioModuleConfigProps {
 
 export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "audio" });
-  const {
-    moduleConfig,
-    setChange,
-    getEffectiveModuleConfig,
-    removeChange,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AudioValidation) => {
@@ -32,7 +28,11 @@ export const Audio = ({ onFormInit }: AudioModuleConfigProps) => {
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "audio" }, data, moduleConfig.audio);
+    setChange(
+      { type: "moduleConfig", variant: "audio" },
+      data,
+      moduleConfig.audio,
+    );
   };
 
   return (

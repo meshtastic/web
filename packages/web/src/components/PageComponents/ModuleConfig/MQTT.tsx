@@ -43,7 +43,11 @@ export const MQTT = ({ onFormInit }: MqttModuleConfigProps) => {
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "mqtt" }, payload, moduleConfig.mqtt);
+    setChange(
+      { type: "moduleConfig", variant: "mqtt" },
+      payload,
+      moduleConfig.mqtt,
+    );
   };
 
   const populateDefaultValues = (

@@ -18,12 +18,8 @@ interface NeighborInfoModuleConfigProps {
 export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "neighborInfo" });
 
-  const {
-    moduleConfig,
-    setChange,
-    getEffectiveModuleConfig,
-    removeChange,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: NeighborInfoValidation) => {
@@ -32,7 +28,11 @@ export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "neighborInfo" }, data, moduleConfig.neighborInfo);
+    setChange(
+      { type: "moduleConfig", variant: "neighborInfo" },
+      data,
+      moduleConfig.neighborInfo,
+    );
   };
 
   return (

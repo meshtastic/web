@@ -19,12 +19,8 @@ export const AmbientLighting = ({
   onFormInit,
 }: AmbientLightingModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "ambientLighting" });
-  const {
-    moduleConfig,
-    setChange,
-    getEffectiveModuleConfig,
-    removeChange,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: AmbientLightingValidation) => {
@@ -33,7 +29,11 @@ export const AmbientLighting = ({
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "ambientLighting" }, data, moduleConfig.ambientLighting);
+    setChange(
+      { type: "moduleConfig", variant: "ambientLighting" },
+      data,
+      moduleConfig.ambientLighting,
+    );
   };
 
   return (

@@ -21,12 +21,8 @@ export const DetectionSensor = ({
 }: DetectionSensorModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "detectionSensor" });
 
-  const {
-    moduleConfig,
-    setChange,
-    getEffectiveModuleConfig,
-    removeChange,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: DetectionSensorValidation) => {
@@ -35,7 +31,11 @@ export const DetectionSensor = ({
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "detectionSensor" }, data, moduleConfig.detectionSensor);
+    setChange(
+      { type: "moduleConfig", variant: "detectionSensor" },
+      data,
+      moduleConfig.detectionSensor,
+    );
   };
 
   return (

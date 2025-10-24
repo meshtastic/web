@@ -25,13 +25,8 @@ interface SecurityConfigProps {
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
   useWaitForConfig({ configCase: "security" });
 
-  const {
-    config,
-    setChange,
-    setDialogOpen,
-    getEffectiveConfig,
-    removeChange,
-  } = useDevice();
+  const { config, setChange, setDialogOpen, getEffectiveConfig, removeChange } =
+    useDevice();
 
   const { t } = useTranslation("config");
 
@@ -105,7 +100,11 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
       return;
     }
 
-    setChange({ type: "config", variant: "security" }, payload, config.security);
+    setChange(
+      { type: "config", variant: "security" },
+      payload,
+      config.security,
+    );
   };
 
   const pkiRegenerate = () => {

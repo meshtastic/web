@@ -23,8 +23,7 @@ interface NetworkConfigProps {
 export const Network = ({ onFormInit }: NetworkConfigProps) => {
   useWaitForConfig({ configCase: "network" });
 
-  const { config, setChange, getEffectiveConfig, removeChange } =
-    useDevice();
+  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
   const { t } = useTranslation("config");
 
   const networkConfig = getEffectiveConfig("network");

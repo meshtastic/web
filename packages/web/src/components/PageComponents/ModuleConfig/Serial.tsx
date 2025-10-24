@@ -19,12 +19,8 @@ interface SerialModuleConfigProps {
 export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "serial" });
 
-  const {
-    moduleConfig,
-    setChange,
-    getEffectiveModuleConfig,
-    removeChange,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: SerialValidation) => {
@@ -33,7 +29,11 @@ export const Serial = ({ onFormInit }: SerialModuleConfigProps) => {
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "serial" }, data, moduleConfig.serial);
+    setChange(
+      { type: "moduleConfig", variant: "serial" },
+      data,
+      moduleConfig.serial,
+    );
   };
 
   return (

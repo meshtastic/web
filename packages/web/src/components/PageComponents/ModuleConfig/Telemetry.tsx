@@ -18,12 +18,8 @@ interface TelemetryModuleConfigProps {
 export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "telemetry" });
 
-  const {
-    moduleConfig,
-    setChange,
-    getEffectiveModuleConfig,
-    removeChange,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: TelemetryValidation) => {
@@ -35,7 +31,7 @@ export const Telemetry = ({ onFormInit }: TelemetryModuleConfigProps) => {
     setChange(
       { type: "moduleConfig", variant: "telemetry" },
       data,
-      moduleConfig.telemetry
+      moduleConfig.telemetry,
     );
   };
 

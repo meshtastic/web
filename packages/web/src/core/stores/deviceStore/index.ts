@@ -834,8 +834,12 @@ function deviceFactory(
       const changes = getAllConfigChanges(device.changeRegistry);
       return changes
         .map((entry) => {
-          if (entry.key.type !== "config") return null;
-          if (!entry.value) return null;
+          if (entry.key.type !== "config") {
+            return null;
+          }
+          if (!entry.value) {
+            return null;
+          }
           return create(Protobuf.Config.ConfigSchema, {
             payloadVariant: {
               case: entry.key.variant,
@@ -855,8 +859,12 @@ function deviceFactory(
       const changes = getAllModuleConfigChanges(device.changeRegistry);
       return changes
         .map((entry) => {
-          if (entry.key.type !== "moduleConfig") return null;
-          if (!entry.value) return null;
+          if (entry.key.type !== "moduleConfig") {
+            return null;
+          }
+          if (!entry.value) {
+            return null;
+          }
           return create(Protobuf.ModuleConfig.ModuleConfigSchema, {
             payloadVariant: {
               case: entry.key.variant,

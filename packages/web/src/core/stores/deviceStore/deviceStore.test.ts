@@ -52,25 +52,7 @@ function makeChannel(index: number) {
 function makeWaypoint(id: number, expire?: number) {
   return create(Protobuf.Mesh.WaypointSchema, { id, expire });
 }
-function makeConfig(fields: Record<string, any>) {
-  return create(Protobuf.Config.ConfigSchema, {
-    payloadVariant: {
-      case: "device",
-      value: create(Protobuf.Config.Config_DeviceConfigSchema, fields),
-    },
-  });
-}
-function makeModuleConfig(fields: Record<string, any>) {
-  return create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-    payloadVariant: {
-      case: "mqtt",
-      value: create(
-        Protobuf.ModuleConfig.ModuleConfig_MQTTConfigSchema,
-        fields,
-      ),
-    },
-  });
-}
+
 function makeAdminMessage(fields: Record<string, any>) {
   return create(Protobuf.Admin.AdminMessageSchema, fields);
 }

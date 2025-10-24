@@ -18,12 +18,8 @@ interface StoreForwardModuleConfigProps {
 export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "storeForward" });
 
-  const {
-    moduleConfig,
-    setChange,
-    getEffectiveModuleConfig,
-    removeChange,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: StoreForwardValidation) => {
@@ -32,7 +28,11 @@ export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "storeForward" }, data, moduleConfig.storeForward);
+    setChange(
+      { type: "moduleConfig", variant: "storeForward" },
+      data,
+      moduleConfig.storeForward,
+    );
   };
 
   return (

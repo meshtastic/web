@@ -21,12 +21,8 @@ export const CannedMessage = ({
 }: CannedMessageModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "cannedMessage" });
 
-  const {
-    moduleConfig,
-    setChange,
-    getEffectiveModuleConfig,
-    removeChange,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: CannedMessageValidation) => {
@@ -35,7 +31,11 @@ export const CannedMessage = ({
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "cannedMessage" }, data, moduleConfig.cannedMessage);
+    setChange(
+      { type: "moduleConfig", variant: "cannedMessage" },
+      data,
+      moduleConfig.cannedMessage,
+    );
   };
 
   return (

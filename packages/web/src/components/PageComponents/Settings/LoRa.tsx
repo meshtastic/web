@@ -18,8 +18,7 @@ interface LoRaConfigProps {
 export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
   useWaitForConfig({ configCase: "lora" });
 
-  const { config, setChange, getEffectiveConfig, removeChange } =
-    useDevice();
+  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
   const { t } = useTranslation("config");
 
   const onSubmit = (data: LoRaValidation) => {

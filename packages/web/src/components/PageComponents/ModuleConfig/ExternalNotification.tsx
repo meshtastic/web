@@ -20,12 +20,8 @@ export const ExternalNotification = ({
 }: ExternalNotificationModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "externalNotification" });
 
-  const {
-    moduleConfig,
-    setChange,
-    getEffectiveModuleConfig,
-    removeChange,
-  } = useDevice();
+  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+    useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: ExternalNotificationValidation) => {
@@ -34,7 +30,11 @@ export const ExternalNotification = ({
       return;
     }
 
-    setChange({ type: "moduleConfig", variant: "externalNotification" }, data, moduleConfig.externalNotification);
+    setChange(
+      { type: "moduleConfig", variant: "externalNotification" },
+      data,
+      moduleConfig.externalNotification,
+    );
   };
 
   return (
