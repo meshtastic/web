@@ -42,12 +42,6 @@ export const User = ({ onFormInit }: UserConfigProps) => {
       }),
     );
 
-    // if (deepCompareConfig(defaultUser, payload, true)) {
-    //   removeChange({ type: "user" });
-    //   return;
-    // }
-
-    // setChange({ type: "user" }, payload, defaultUser);
   };
 
   return (
