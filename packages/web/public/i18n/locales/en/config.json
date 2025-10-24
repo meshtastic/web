@@ -13,7 +13,7 @@
     "tabSecurity": "Security"
   },
   "sidebar": {
-    "label": "Modules"
+    "label": "Configuration"
   },
   "device": {
     "title": "Device Settings",

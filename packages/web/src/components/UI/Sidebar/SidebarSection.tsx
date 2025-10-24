@@ -21,7 +21,7 @@ export const SidebarSection = ({
         as="h3"
         className={cn(
           "mb-2",
-          "uppercase tracking-wider text-md",
+          "capitalize tracking-wider text-sm",
           "transition-all duration-300 ease-in-out",
           "whitespace-nowrap overflow-hidden",
           isCollapsed
