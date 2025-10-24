@@ -41,7 +41,6 @@ export const User = ({ onFormInit }: UserConfigProps) => {
         ...data,
       }),
     );
-
   };
 
   return (
