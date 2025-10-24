@@ -108,9 +108,9 @@ export const Sidebar = ({ children }: SidebarProps) => {
     },
     { name: t("navigation.map"), icon: MapIcon, page: "map" },
     {
-      name: t("navigation.config"),
+      name: t("navigation.settings"),
       icon: SettingsIcon,
-      page: "config",
+      page: "settings",
     },
     {
       name: `${t("navigation.nodes")} (${displayedNodeCount})`,

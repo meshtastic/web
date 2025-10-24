@@ -24,26 +24,23 @@ interface PositionConfigProps {
 export const Position = ({ onFormInit }: PositionConfigProps) => {
   useWaitForConfig({ configCase: "position" });
 
-  const { setWorkingConfig, config, getEffectiveConfig, removeWorkingConfig } =
-    useDevice();
+  const { setChange, config, getEffectiveConfig, removeChange } = useDevice();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     getEffectiveConfig("position")?.positionFlags ?? 0,
   );
-  const { t } = useTranslation("deviceConfig");
+  const { t } = useTranslation("config");
 
   const onSubmit = (data: PositionValidation) => {
-    if (deepCompareConfig(config.position, data, true)) {
-      removeWorkingConfig("position");
+    const payload = { ...data, positionFlags: flagsValue };
+    if (deepCompareConfig(config.position, payload, true)) {
+      removeChange({ type: "config", variant: "position" });
       return;
     }
 
-    return setWorkingConfig(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "position",
-          value: { ...data, positionFlags: flagsValue },
-        },
-      }),
+    return setChange(
+      { type: "config", variant: "position" },
+      payload,
+      config.position,
     );
   };
 

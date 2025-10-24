@@ -33,15 +33,13 @@ export interface ImportDialogProps {
 }
 
 export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
-  const { config, channels } = useDevice();
+  const { setChange, channels, config } = useDevice();
   const { t } = useTranslation("dialog");
   const [importDialogInput, setImportDialogInput] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
   const [validUrl, setValidUrl] = useState<boolean>(false);
   const [updateConfig, setUpdateConfig] = useState<boolean>(true);
   const [importIndex, setImportIndex] = useState<number[]>([]);
-
-  const { setWorkingChannelConfig, setWorkingConfig } = useDevice();
 
   useEffect(() => {
     // the channel information is contained in the URL's fragment, which will be present after a
@@ -106,7 +104,11 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
             true,
           )
         ) {
-          setWorkingChannelConfig(payload);
+          setChange(
+            { type: "channel", index: importIndex[index] ?? 0 },
+            payload,
+            channels.get(importIndex[index] ?? 0),
+          );
         }
       },
     );
@@ -118,14 +120,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
       };
 
       if (!deepCompareConfig(config.lora, payload, true)) {
-        setWorkingConfig(
-          create(Protobuf.Config.ConfigSchema, {
-            payloadVariant: {
-              case: "lora",
-              value: payload,
-            },
-          }),
-        );
+        setChange({ type: "config", variant: "lora" }, payload, config.lora);
       }
     }
     // Reset state after import

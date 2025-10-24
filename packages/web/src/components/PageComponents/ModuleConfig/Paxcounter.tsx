@@ -3,14 +3,12 @@ import {
   type PaxcounterValidation,
   PaxcounterValidationSchema,
 } from "@app/validation/moduleConfig/paxcounter.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
-import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
 
 interface PaxcounterModuleConfigProps {
@@ -22,26 +20,19 @@ export const Paxcounter = ({ onFormInit }: PaxcounterModuleConfigProps) => {
 
   const {
     moduleConfig,
-    setWorkingModuleConfig,
+    setChange,
     getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
+    removeChange,
   } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: PaxcounterValidation) => {
     if (deepCompareConfig(moduleConfig.paxcounter, data, true)) {
-      removeWorkingModuleConfig("paxcounter");
+      removeChange({ type: "moduleConfig", variant: "paxcounter" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "paxcounter",
-          value: data,
-        },
-      }),
-    );
+    setChange({ type: "moduleConfig", variant: "paxcounter" }, data, moduleConfig.paxcounter);
   };
 
   return (

@@ -3,7 +3,6 @@ import {
   type BluetoothValidation,
   BluetoothValidationSchema,
 } from "@app/validation/config/bluetooth.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -19,24 +18,16 @@ interface BluetoothConfigProps {
 export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
   useWaitForConfig({ configCase: "bluetooth" });
 
-  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
-    useDevice();
-  const { t } = useTranslation("deviceConfig");
+  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
+  const { t } = useTranslation("config");
 
   const onSubmit = (data: BluetoothValidation) => {
     if (deepCompareConfig(config.bluetooth, data, true)) {
-      removeWorkingConfig("bluetooth");
+      removeChange({ type: "config", variant: "bluetooth" });
       return;
     }
 
-    setWorkingConfig(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "bluetooth",
-          value: data,
-        },
-      }),
-    );
+    setChange({ type: "config", variant: "bluetooth" }, data, config.bluetooth);
   };
 
   return (

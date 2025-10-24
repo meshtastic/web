@@ -3,7 +3,6 @@ import {
   type CannedMessageValidation,
   CannedMessageValidationSchema,
 } from "@app/validation/moduleConfig/cannedMessage.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -24,26 +23,19 @@ export const CannedMessage = ({
 
   const {
     moduleConfig,
-    setWorkingModuleConfig,
+    setChange,
     getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
+    removeChange,
   } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: CannedMessageValidation) => {
     if (deepCompareConfig(moduleConfig.cannedMessage, data, true)) {
-      removeWorkingModuleConfig("cannedMessage");
+      removeChange({ type: "moduleConfig", variant: "cannedMessage" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "cannedMessage",
-          value: data,
-        },
-      }),
-    );
+    setChange({ type: "moduleConfig", variant: "cannedMessage" }, data, moduleConfig.cannedMessage);
   };
 
   return (

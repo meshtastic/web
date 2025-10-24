@@ -1,6 +1,8 @@
 {
   "page": {
-    "title": "Configuration",
+    "title": "Settings",
+    "tabUser": "User",
+    "tabChannels": "Channels",
     "tabBluetooth": "Bluetooth",
     "tabDevice": "Device",
     "tabDisplay": "Display",
@@ -423,6 +425,34 @@
     "loggingSettings": {
       "description": "Settings for Logging",
       "label": "Logging Settings"
+    }
+  },
+  "user": {
+    "title": "User Settings",
+    "description": "Configure your device name and identity settings",
+    "longName": {
+      "label": "Long Name",
+      "description": "Your full display name (1-40 characters)",
+      "validation": {
+        "min": "Long name must be at least 1 character",
+        "max": "Long name must be at most 40 characters"
+      }
+    },
+    "shortName": {
+      "label": "Short Name",
+      "description": "Your abbreviated name (2-4 characters)",
+      "validation": {
+        "min": "Short name must be at least 2 characters",
+        "max": "Short name must be at most 4 characters"
+      }
+    },
+    "isUnmessageable": {
+      "label": "Unmessaageable",
+      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not avaliable to nodes that will never respond."
+    },
+    "isLicensed": {
+      "label": "Licensed amateur radio (HAM)",
+      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
     }
   }
 }

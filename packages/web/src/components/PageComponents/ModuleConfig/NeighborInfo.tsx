@@ -3,14 +3,12 @@ import {
   type NeighborInfoValidation,
   NeighborInfoValidationSchema,
 } from "@app/validation/moduleConfig/neighborInfo.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
-import { Protobuf } from "@meshtastic/core";
 import { useTranslation } from "react-i18next";
 
 interface NeighborInfoModuleConfigProps {
@@ -22,26 +20,19 @@ export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
 
   const {
     moduleConfig,
-    setWorkingModuleConfig,
+    setChange,
     getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
+    removeChange,
   } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: NeighborInfoValidation) => {
     if (deepCompareConfig(moduleConfig.neighborInfo, data, true)) {
-      removeWorkingModuleConfig("neighborInfo");
+      removeChange({ type: "moduleConfig", variant: "neighborInfo" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "neighborInfo",
-          value: data,
-        },
-      }),
-    );
+    setChange({ type: "moduleConfig", variant: "neighborInfo" }, data, moduleConfig.neighborInfo);
   };
 
   return (

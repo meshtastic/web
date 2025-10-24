@@ -19,24 +19,16 @@ interface PowerConfigProps {
 export const Power = ({ onFormInit }: PowerConfigProps) => {
   useWaitForConfig({ configCase: "power" });
 
-  const { setWorkingConfig, config, getEffectiveConfig, removeWorkingConfig } =
-    useDevice();
-  const { t } = useTranslation("deviceConfig");
+  const { setChange, config, getEffectiveConfig, removeChange } = useDevice();
+  const { t } = useTranslation("config");
 
   const onSubmit = (data: PowerValidation) => {
     if (deepCompareConfig(config.power, data, true)) {
-      removeWorkingConfig("power");
+      removeChange({ type: "config", variant: "power" });
       return;
     }
 
-    setWorkingConfig(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "power",
-          value: data,
-        },
-      }),
-    );
+    setChange({ type: "config", variant: "power" }, data, config.power);
   };
 
   return (

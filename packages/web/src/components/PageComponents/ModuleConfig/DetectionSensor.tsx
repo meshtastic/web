@@ -3,7 +3,6 @@ import {
   type DetectionSensorValidation,
   DetectionSensorValidationSchema,
 } from "@app/validation/moduleConfig/detectionSensor.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -24,26 +23,19 @@ export const DetectionSensor = ({
 
   const {
     moduleConfig,
-    setWorkingModuleConfig,
+    setChange,
     getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
+    removeChange,
   } = useDevice();
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: DetectionSensorValidation) => {
     if (deepCompareConfig(moduleConfig.detectionSensor, data, true)) {
-      removeWorkingModuleConfig("detectionSensor");
+      removeChange({ type: "moduleConfig", variant: "detectionSensor" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "detectionSensor",
-          value: data,
-        },
-      }),
-    );
+    setChange({ type: "moduleConfig", variant: "detectionSensor" }, data, moduleConfig.detectionSensor);
   };
 
   return (

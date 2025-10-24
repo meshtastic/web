@@ -23,9 +23,9 @@ interface NetworkConfigProps {
 export const Network = ({ onFormInit }: NetworkConfigProps) => {
   useWaitForConfig({ configCase: "network" });
 
-  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
+  const { config, setChange, getEffectiveConfig, removeChange } =
     useDevice();
-  const { t } = useTranslation("deviceConfig");
+  const { t } = useTranslation("config");
 
   const networkConfig = getEffectiveConfig("network");
 
@@ -44,18 +44,11 @@ export const Network = ({ onFormInit }: NetworkConfigProps) => {
     };
 
     if (deepCompareConfig(config.network, payload, true)) {
-      removeWorkingConfig("network");
+      removeChange({ type: "config", variant: "network" });
       return;
     }
 
-    setWorkingConfig(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "network",
-          value: payload,
-        },
-      }),
-    );
+    setChange({ type: "config", variant: "network" }, payload, config.network);
   };
   return (
     <DynamicForm<NetworkValidation>

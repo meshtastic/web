@@ -10,6 +10,21 @@ import {
   persist,
   subscribeWithSelector,
 } from "zustand/middleware";
+import type { ChangeRegistry, ConfigChangeKey } from "./changeRegistry.ts";
+import {
+  createChangeRegistry,
+  getAllChannelChanges,
+  getAllConfigChanges,
+  getAllModuleConfigChanges,
+  getChannelChangeCount,
+  getConfigChangeCount,
+  getModuleConfigChangeCount,
+  hasChannelChange,
+  hasConfigChange,
+  hasModuleConfigChange,
+  hasUserChange,
+  serializeKey,
+} from "./changeRegistry.ts";
 import type {
   Dialogs,
   DialogVariant,
@@ -42,9 +57,7 @@ export interface Device extends DeviceData {
   channels: Map<Types.ChannelNumber, Protobuf.Channel.Channel>;
   config: Protobuf.LocalOnly.LocalConfig;
   moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
-  workingConfig: Protobuf.Config.Config[];
-  workingModuleConfig: Protobuf.ModuleConfig.ModuleConfig[];
-  workingChannelConfig: Protobuf.Channel.Channel[];
+  changeRegistry: ChangeRegistry; // Unified change tracking
   hardware: Protobuf.Mesh.MyNodeInfo;
   metadata: Map<number, Protobuf.Mesh.DeviceMetadata>;
   connection?: MeshDevice;
@@ -58,27 +71,12 @@ export interface Device extends DeviceData {
   setStatus: (status: Types.DeviceStatusEnum) => void;
   setConfig: (config: Protobuf.Config.Config) => void;
   setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
-  setWorkingConfig: (config: Protobuf.Config.Config) => void;
-  setWorkingModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
-  getWorkingConfig<K extends ValidConfigType>(
-    payloadVariant: K,
-  ): Protobuf.LocalOnly.LocalConfig[K] | undefined;
-  getWorkingModuleConfig<K extends ValidModuleConfigType>(
-    payloadVariant: K,
-  ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
-  removeWorkingConfig: (payloadVariant?: ValidConfigType) => void;
-  removeWorkingModuleConfig: (payloadVariant?: ValidModuleConfigType) => void;
   getEffectiveConfig<K extends ValidConfigType>(
     payloadVariant: K,
   ): Protobuf.LocalOnly.LocalConfig[K] | undefined;
   getEffectiveModuleConfig<K extends ValidModuleConfigType>(
     payloadVariant: K,
   ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
-  setWorkingChannelConfig: (channelNum: Protobuf.Channel.Channel) => void;
-  getWorkingChannelConfig: (
-    index: Types.ChannelNumber,
-  ) => Protobuf.Channel.Channel | undefined;
-  removeWorkingChannelConfig: (channelNum?: Types.ChannelNumber) => void;
   setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => void;
   setActiveNode: (node: number) => void;
   setPendingSettingsChanges: (state: boolean) => void;
@@ -116,6 +114,27 @@ export interface Device extends DeviceData {
     neighborInfo: Protobuf.Mesh.NeighborInfo,
   ) => void;
   getNeighborInfo: (nodeNum: number) => Protobuf.Mesh.NeighborInfo | undefined;
+
+  // New unified change tracking methods
+  setChange: (
+    key: ConfigChangeKey,
+    value: unknown,
+    originalValue?: unknown,
+  ) => void;
+  removeChange: (key: ConfigChangeKey) => void;
+  hasChange: (key: ConfigChangeKey) => boolean;
+  getChange: (key: ConfigChangeKey) => unknown | undefined;
+  clearAllChanges: () => void;
+  hasConfigChange: (variant: ValidConfigType) => boolean;
+  hasModuleConfigChange: (variant: ValidModuleConfigType) => boolean;
+  hasChannelChange: (index: Types.ChannelNumber) => boolean;
+  hasUserChange: () => boolean;
+  getConfigChangeCount: () => number;
+  getModuleConfigChangeCount: () => number;
+  getChannelChangeCount: () => number;
+  getAllConfigChanges: () => Protobuf.Config.Config[];
+  getAllModuleConfigChanges: () => Protobuf.ModuleConfig.ModuleConfig[];
+  getAllChannelChanges: () => Protobuf.Channel.Channel[];
 }
 
 export interface deviceState {
@@ -157,9 +176,7 @@ function deviceFactory(
     channels: new Map(),
     config: create(Protobuf.LocalOnly.LocalConfigSchema),
     moduleConfig: create(Protobuf.LocalOnly.LocalModuleConfigSchema),
-    workingConfig: [],
-    workingModuleConfig: [],
-    workingChannelConfig: [],
+    changeRegistry: createChangeRegistry(),
     hardware: create(Protobuf.Mesh.MyNodeInfoSchema),
     metadata: new Map(),
     connection: undefined,
@@ -302,130 +319,6 @@ function deviceFactory(
         }),
       );
     },
-    setWorkingConfig: (config: Protobuf.Config.Config) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-          const index = device.workingConfig.findIndex(
-            (wc) => wc.payloadVariant.case === config.payloadVariant.case,
-          );
-
-          if (index !== -1) {
-            device.workingConfig[index] = config;
-          } else {
-            device.workingConfig.push(config);
-          }
-        }),
-      );
-    },
-    setWorkingModuleConfig: (
-      moduleConfig: Protobuf.ModuleConfig.ModuleConfig,
-    ) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-          const index = device.workingModuleConfig.findIndex(
-            (wmc) =>
-              wmc.payloadVariant.case === moduleConfig.payloadVariant.case,
-          );
-
-          if (index !== -1) {
-            device.workingModuleConfig[index] = moduleConfig;
-          } else {
-            device.workingModuleConfig.push(moduleConfig);
-          }
-        }),
-      );
-    },
-
-    getWorkingConfig<K extends ValidConfigType>(payloadVariant: K) {
-      const device = get().devices.get(id);
-      if (!device) {
-        return;
-      }
-
-      const workingConfig = device.workingConfig.find(
-        (c) => c.payloadVariant.case === payloadVariant,
-      );
-
-      if (
-        workingConfig?.payloadVariant.case === "deviceUi" ||
-        workingConfig?.payloadVariant.case === "sessionkey"
-      ) {
-        return;
-      }
-
-      return workingConfig?.payloadVariant
-        .value as Protobuf.LocalOnly.LocalConfig[K];
-    },
-    getWorkingModuleConfig<K extends ValidModuleConfigType>(
-      payloadVariant: K,
-    ): Protobuf.LocalOnly.LocalModuleConfig[K] | undefined {
-      const device = get().devices.get(id);
-      if (!device) {
-        return;
-      }
-
-      return device.workingModuleConfig.find(
-        (c) => c.payloadVariant.case === payloadVariant,
-      )?.payloadVariant.value as Protobuf.LocalOnly.LocalModuleConfig[K];
-    },
-
-    removeWorkingConfig: (payloadVariant?: ValidConfigType) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-
-          if (!payloadVariant) {
-            device.workingConfig = [];
-            return;
-          }
-
-          const index = device.workingConfig.findIndex(
-            (wc: Protobuf.Config.Config) =>
-              wc.payloadVariant.case === payloadVariant,
-          );
-
-          if (index !== -1) {
-            device.workingConfig.splice(index, 1);
-          }
-        }),
-      );
-    },
-    removeWorkingModuleConfig: (payloadVariant?: ValidModuleConfigType) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-
-          if (!payloadVariant) {
-            device.workingModuleConfig = [];
-            return;
-          }
-
-          const index = device.workingModuleConfig.findIndex(
-            (wc: Protobuf.ModuleConfig.ModuleConfig) =>
-              wc.payloadVariant.case === payloadVariant,
-          );
-
-          if (index !== -1) {
-            device.workingModuleConfig.splice(index, 1);
-          }
-        }),
-      );
-    },
-
     getEffectiveConfig<K extends ValidConfigType>(
       payloadVariant: K,
     ): Protobuf.LocalOnly.LocalConfig[K] | undefined {
@@ -437,11 +330,13 @@ function deviceFactory(
         return;
       }
 
+      const workingValue = device.changeRegistry.changes.get(
+        serializeKey({ type: "config", variant: payloadVariant }),
+      )?.value as Protobuf.LocalOnly.LocalConfig[K] | undefined;
+
       return {
         ...device.config[payloadVariant],
-        ...device.workingConfig.find(
-          (c) => c.payloadVariant.case === payloadVariant,
-        )?.payloadVariant.value,
+        ...workingValue,
       };
     },
     getEffectiveModuleConfig<K extends ValidModuleConfigType>(
@@ -452,67 +347,14 @@ function deviceFactory(
         return;
       }
 
+      const workingValue = device.changeRegistry.changes.get(
+        serializeKey({ type: "moduleConfig", variant: payloadVariant }),
+      )?.value as Protobuf.LocalOnly.LocalModuleConfig[K] | undefined;
+
       return {
         ...device.moduleConfig[payloadVariant],
-        ...device.workingModuleConfig.find(
-          (c) => c.payloadVariant.case === payloadVariant,
-        )?.payloadVariant.value,
+        ...workingValue,
       };
-    },
-
-    setWorkingChannelConfig: (config: Protobuf.Channel.Channel) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-          const index = device.workingChannelConfig.findIndex(
-            (wcc) => wcc.index === config.index,
-          );
-
-          if (index !== -1) {
-            device.workingChannelConfig[index] = config;
-          } else {
-            device.workingChannelConfig.push(config);
-          }
-        }),
-      );
-    },
-    getWorkingChannelConfig: (channelNum: Types.ChannelNumber) => {
-      const device = get().devices.get(id);
-      if (!device) {
-        return;
-      }
-
-      const workingChannelConfig = device.workingChannelConfig.find(
-        (c) => c.index === channelNum,
-      );
-
-      return workingChannelConfig;
-    },
-    removeWorkingChannelConfig: (channelNum?: Types.ChannelNumber) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (!device) {
-            return;
-          }
-
-          if (channelNum === undefined) {
-            device.workingChannelConfig = [];
-            return;
-          }
-
-          const index = device.workingChannelConfig.findIndex(
-            (wcc: Protobuf.Channel.Channel) => wcc.index === channelNum,
-          );
-
-          if (index !== -1) {
-            device.workingChannelConfig.splice(index, 1);
-          }
-        }),
-      );
     },
 
     setHardware: (hardware: Protobuf.Mesh.MyNodeInfo) => {
@@ -854,6 +696,187 @@ function deviceFactory(
         return;
       }
       return device.neighborInfo.get(nodeNum);
+    },
+
+    // New unified change tracking methods
+    setChange: (
+      key: ConfigChangeKey,
+      value: unknown,
+      originalValue?: unknown,
+    ) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (!device) {
+            return;
+          }
+
+          const keyStr = serializeKey(key);
+          device.changeRegistry.changes.set(keyStr, {
+            key,
+            value,
+            originalValue,
+            timestamp: Date.now(),
+          });
+        }),
+      );
+    },
+
+    removeChange: (key: ConfigChangeKey) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (!device) {
+            return;
+          }
+
+          device.changeRegistry.changes.delete(serializeKey(key));
+        }),
+      );
+    },
+
+    hasChange: (key: ConfigChangeKey) => {
+      const device = get().devices.get(id);
+      return device?.changeRegistry.changes.has(serializeKey(key)) ?? false;
+    },
+
+    getChange: (key: ConfigChangeKey) => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return;
+      }
+
+      return device.changeRegistry.changes.get(serializeKey(key))?.value;
+    },
+
+    clearAllChanges: () => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (!device) {
+            return;
+          }
+
+          device.changeRegistry.changes.clear();
+        }),
+      );
+    },
+
+    hasConfigChange: (variant: ValidConfigType) => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return false;
+      }
+
+      return hasConfigChange(device.changeRegistry, variant);
+    },
+
+    hasModuleConfigChange: (variant: ValidModuleConfigType) => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return false;
+      }
+
+      return hasModuleConfigChange(device.changeRegistry, variant);
+    },
+
+    hasChannelChange: (index: Types.ChannelNumber) => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return false;
+      }
+
+      return hasChannelChange(device.changeRegistry, index);
+    },
+
+    hasUserChange: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return false;
+      }
+
+      return hasUserChange(device.changeRegistry);
+    },
+
+    getConfigChangeCount: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return 0;
+      }
+
+      return getConfigChangeCount(device.changeRegistry);
+    },
+
+    getModuleConfigChangeCount: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return 0;
+      }
+
+      return getModuleConfigChangeCount(device.changeRegistry);
+    },
+
+    getChannelChangeCount: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return 0;
+      }
+
+      return getChannelChangeCount(device.changeRegistry);
+    },
+
+    getAllConfigChanges: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return [];
+      }
+
+      const changes = getAllConfigChanges(device.changeRegistry);
+      return changes
+        .map((entry) => {
+          if (entry.key.type !== "config") return null;
+          if (!entry.value) return null;
+          return create(Protobuf.Config.ConfigSchema, {
+            payloadVariant: {
+              case: entry.key.variant,
+              value: entry.value,
+            },
+          });
+        })
+        .filter((c): c is Protobuf.Config.Config => c !== null);
+    },
+
+    getAllModuleConfigChanges: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return [];
+      }
+
+      const changes = getAllModuleConfigChanges(device.changeRegistry);
+      return changes
+        .map((entry) => {
+          if (entry.key.type !== "moduleConfig") return null;
+          if (!entry.value) return null;
+          return create(Protobuf.ModuleConfig.ModuleConfigSchema, {
+            payloadVariant: {
+              case: entry.key.variant,
+              value: entry.value,
+            },
+          });
+        })
+        .filter((c): c is Protobuf.ModuleConfig.ModuleConfig => c !== null);
+    },
+
+    getAllChannelChanges: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return [];
+      }
+
+      const changes = getAllChannelChanges(device.changeRegistry);
+      return changes
+        .map((entry) => entry.value as Protobuf.Channel.Channel)
+        .filter((c): c is Protobuf.Channel.Channel => c !== undefined);
     },
   };
 }

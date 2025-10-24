@@ -1,4 +1,8 @@
 import type { Protobuf } from "@meshtastic/core";
+import type {
+  ValidConfigType,
+  ValidModuleConfigType,
+} from "./changeRegistry.ts";
 
 interface Dialogs {
   import: boolean;
@@ -22,16 +26,7 @@ interface Dialogs {
 
 type DialogVariant = keyof Dialogs;
 
-type ValidConfigType = Exclude<
-  Protobuf.Config.Config["payloadVariant"]["case"],
-  "deviceUi" | "sessionkey" | undefined
->;
-type ValidModuleConfigType = Exclude<
-  Protobuf.ModuleConfig.ModuleConfig["payloadVariant"]["case"],
-  undefined
->;
-
-type Page = "messages" | "map" | "config" | "channels" | "nodes";
+type Page = "messages" | "map" | "settings" | "channels" | "nodes";
 
 type WaypointWithMetadata = Protobuf.Mesh.Waypoint & {
   metadata: {

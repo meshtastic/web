@@ -3,11 +3,11 @@
     "title": "Navigation",
     "messages": "Messages",
     "map": "Map",
-    "config": "Config",
+    "settings": "Settings",
     "channels": "Channels",
     "radioConfig": "Radio Config",
+    "deviceConfig": "Device Config",
     "moduleConfig": "Module Config",
-    "channelConfig": "Channel Config",
     "nodes": "Nodes"
   },
   "app": {
@@ -27,13 +27,7 @@
         "title": "Firmware",
         "version": "v{{version}}",
         "buildDate": "Build date: {{date}}"
-      },
-      "deviceName": {
-        "title": "Device Name",
-        "changeName": "Change Device Name",
-        "placeholder": "Enter device name"
-      },
-      "editDeviceName": "Edit device name"
+      }
     }
   },
   "batteryStatus": {

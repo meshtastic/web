@@ -24,12 +24,7 @@ export interface SettingsPanelProps {
 }
 
 export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
-  const {
-    config,
-    setWorkingChannelConfig,
-    getWorkingChannelConfig,
-    removeWorkingChannelConfig,
-  } = useDevice();
+  const { config, setChange, getChange, removeChange } = useDevice();
   const { t } = useTranslation(["channels", "ui", "dialog"]);
 
   const defaultConfig = channel;
@@ -51,7 +46,11 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
     },
   };
 
-  const effectiveConfig = getWorkingChannelConfig(channel.index) ?? channel;
+  const workingChannel = getChange({
+    type: "channel",
+    index: channel.index,
+  }) as Protobuf.Channel.Channel | undefined;
+  const effectiveConfig = workingChannel ?? channel;
   const formValues = {
     ...effectiveConfig,
     ...{
@@ -111,7 +110,7 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
       return;
     }
 
-    const payload = {
+    const payload = create(Protobuf.Channel.ChannelSchema, {
       ...data,
       settings: {
         ...data.settings,
@@ -121,14 +120,14 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
           positionPrecision: data.settings.moduleSettings.positionPrecision,
         }),
       },
-    };
+    });
 
     if (deepCompareConfig(channel, payload, true)) {
-      removeWorkingChannelConfig(channel.index);
+      removeChange({ type: "channel", index: channel.index });
       return;
     }
 
-    setWorkingChannelConfig(create(Protobuf.Channel.ChannelSchema, payload));
+    setChange({ type: "channel", index: channel.index }, payload, channel);
   };
 
   const preSharedKeyRegenerate = async () => {

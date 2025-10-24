@@ -3,7 +3,6 @@ import {
   type RangeTestValidation,
   RangeTestValidationSchema,
 } from "@app/validation/moduleConfig/rangeTest.ts";
-import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -22,27 +21,20 @@ export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
 
   const {
     moduleConfig,
-    setWorkingModuleConfig,
+    setChange,
     getEffectiveModuleConfig,
-    removeWorkingModuleConfig,
+    removeChange,
   } = useDevice();
 
   const { t } = useTranslation("moduleConfig");
 
   const onSubmit = (data: RangeTestValidation) => {
     if (deepCompareConfig(moduleConfig.rangeTest, data, true)) {
-      removeWorkingModuleConfig("rangeTest");
+      removeChange({ type: "moduleConfig", variant: "rangeTest" });
       return;
     }
 
-    setWorkingModuleConfig(
-      create(Protobuf.ModuleConfig.ModuleConfigSchema, {
-        payloadVariant: {
-          case: "rangeTest",
-          value: data,
-        },
-      }),
-    );
+    setChange({ type: "moduleConfig", variant: "rangeTest" }, data, moduleConfig.rangeTest);
   };
 
   return (

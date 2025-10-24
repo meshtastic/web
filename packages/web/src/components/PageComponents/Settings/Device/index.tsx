@@ -20,25 +20,17 @@ interface DeviceConfigProps {
 export const Device = ({ onFormInit }: DeviceConfigProps) => {
   useWaitForConfig({ configCase: "device" });
 
-  const { config, setWorkingConfig, getEffectiveConfig, removeWorkingConfig } =
-    useDevice();
-  const { t } = useTranslation("deviceConfig");
+  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
+  const { t } = useTranslation("config");
   const { validateRoleSelection } = useUnsafeRolesDialog();
 
   const onSubmit = (data: DeviceValidation) => {
     if (deepCompareConfig(config.device, data, true)) {
-      removeWorkingConfig("device");
+      removeChange({ type: "config", variant: "device" });
       return;
     }
 
-    setWorkingConfig(
-      create(Protobuf.Config.ConfigSchema, {
-        payloadVariant: {
-          case: "device",
-          value: data,
-        },
-      }),
-    );
+    setChange({ type: "config", variant: "device" }, data, config.device);
   };
 
   return (
