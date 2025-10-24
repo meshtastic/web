@@ -1,10 +1,13 @@
 @import "tailwindcss";
-
+/* @import '@meshtastic/ui/theme/default.css'; */
+/* @source "../node_modules/@meshtastic/ui";  */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @view-transition {
   navigation: auto;
 }
+
+
 
 @theme {
   --font-mono:
@@ -76,7 +79,7 @@
 
 .animate-fan-out {
   transform: translate(var(--dx), var(--dy));
-  transition: transform 200ms ease-out; /* expand AND collapse */
+  transition: transform 200ms ease-out;
 }
 
 
@@ -91,11 +94,9 @@ body {
 
 body {
   font-family: var(--font-sans);
+
 }
 
-.app-container {
-  height: 100%;
-}
 
 @layer base {
 
@@ -105,6 +106,32 @@ body {
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-slate-200, currentColor);
+  }
+
+  ::-webkit-scrollbar {
+    @apply bg-transparent w-2;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-400;
+  }
+
+  ::-webkit-scrollbar-corner {
+    @apply bg-slate-200;
+  }
+
+  .dark {
+    ::-webkit-scrollbar {
+      @apply bg-transparent w-2;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      @apply bg-slate-600 rounded-4xl;
+    }
+
+    ::-webkit-scrollbar-corner {
+      @apply bg-slate-900;
+    }
   }
 }
 
