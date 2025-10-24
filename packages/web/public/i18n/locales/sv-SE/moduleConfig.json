@@ -398,7 +398,7 @@
 		},
 		"historyReturnWindow": {
 			"label": "Returfönstrets storlek för historik",
-			"description": "Maximalt antal poster att returnera"
+			"description": "Returnera poster från detta tidsfönster (minuter)"
 		}
 	},
 	"telemetry": {

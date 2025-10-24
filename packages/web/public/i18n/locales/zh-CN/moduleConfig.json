@@ -398,7 +398,7 @@
 		},
 		"historyReturnWindow": {
 			"label": "历史记录返回窗口",
-			"description": "Max number of records to return"
+			"description": "返回此时间窗口内的记录（分钟）"
 		}
 	},
 	"telemetry": {

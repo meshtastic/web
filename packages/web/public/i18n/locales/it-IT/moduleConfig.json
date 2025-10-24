@@ -398,7 +398,7 @@
 		},
 		"historyReturnWindow": {
 			"label": "Finestra di ritorno cronologia",
-			"description": "Numero massimo di record da restituire"
+			"description": "Restituisce i record da questa finestra temporale (minuti)"
 		}
 	},
 	"telemetry": {

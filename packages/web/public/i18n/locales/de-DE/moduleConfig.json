@@ -398,7 +398,7 @@
 		},
 		"historyReturnWindow": {
 			"label": "Zeitraum Rückgabewert",
-			"description": "Maximale Anzahl an zurückzugebenden Datensätzen"
+			"description": "Datensätze aus diesem Zeitfenster zurückgeben (Minuten)"
 		}
 	},
 	"telemetry": {

@@ -398,7 +398,7 @@
 		},
 		"historyReturnWindow": {
 			"label": "History return window",
-			"description": "Max number of records to return"
+			"description": "Retourneer records uit dit tijdvenster (minuten)"
 		}
 	},
 	"telemetry": {
