@@ -1,63 +1,59 @@
 {
-	"nodeDetail": {
-		"publicKeyEnabled": {
-			"label": "Chiave Pubblica Abilitata"
-		},
-		"noPublicKey": {
-			"label": "Nessuna Chiave Pubblica"
-		},
-		"directMessage": {
-			"label": "Messaggio Diretto {{shortName}}"
-		},
-		"favorite": {
-			"label": "Preferito",
-			"tooltip": "Add or remove this node from your favorites"
-		},
-		"notFavorite": {
-			"label": "Non è un preferito"
-		},
-		"error": {
-			"label": "Errori",
-			"text": "An error occurred while fetching node details. Please try again later."
-		},
-		"status": {
-			"heard": "Sentito",
-			"mqtt": "MQTT"
-		},
-		"elevation": {
-			"label": "Altezza"
-		},
-		"channelUtil": {
-			"label": "Utilizzo Canale"
-		},
-		"airtimeUtil": {
-			"label": "Utilizzo Airtime"
-		}
-	},
-	"nodesTable": {
-		"headings": {
-			"longName": "Nome Lungo",
-			"connection": "Connessione",
-			"lastHeard": "Ultimo Contatto",
-			"encryption": "Crittografia",
-			"model": "Modello",
-			"macAddress": "Indirizzo MAC"
-		},
-		"connectionStatus": {
-			"direct": "Diretto",
-			"away": "assente",
-			"unknown": "-",
-			"viaMqtt": ", tramite MQTT"
-		},
-		"lastHeardStatus": {
-			"never": "Mai"
-		}
-	},
-	"actions": {
-		"added": "Added",
-		"removed": "Removed",
-		"ignoreNode": "Ignore Node",
-		"unignoreNode": "Unignore Node",
-		"requestPosition": "Richiedi posizione"
-	}
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Chiave Pubblica Abilitata"
+    },
+    "noPublicKey": {
+      "label": "Nessuna Chiave Pubblica"
+    },
+    "directMessage": {
+      "label": "Messaggio Diretto {{shortName}}"
+    },
+    "favorite": {
+      "label": "Preferito",
+      "tooltip": "Add or remove this node from your favorites"
+    },
+    "notFavorite": {
+      "label": "Non è un preferito"
+    },
+    "error": {
+      "label": "Errori",
+      "text": "An error occurred while fetching node details. Please try again later."
+    },
+    "status": {
+      "heard": "Sentito",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Altezza"
+    },
+    "channelUtil": {
+      "label": "Utilizzo Canale"
+    },
+    "airtimeUtil": {
+      "label": "Utilizzo Airtime"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "Nome Lungo",
+      "connection": "Connessione",
+      "lastHeard": "Ultimo Contatto",
+      "encryption": "Crittografia",
+      "model": "Modello",
+      "macAddress": "Indirizzo MAC"
+    },
+    "connectionStatus": {
+      "direct": "Diretto",
+      "away": "assente",
+      "viaMqtt": ", tramite MQTT"
+    }
+  },
+  "actions": {
+    "added": "Added",
+    "removed": "Removed",
+    "ignoreNode": "Ignore Node",
+    "unignoreNode": "Unignore Node",
+    "requestPosition": "Richiedi posizione"
+  }
 }

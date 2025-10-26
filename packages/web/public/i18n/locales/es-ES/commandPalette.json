@@ -15,7 +15,6 @@
       "messages": "Mensajes",
       "map": "Mapa",
       "config": "Configuración",
-      "channels": "Canales",
       "nodes": "Nodos"
     }
   },
@@ -45,7 +44,8 @@
     "label": "Depuración",
     "command": {
       "reconfigure": "Volver a configurar",
-      "clearAllStoredMessages": "Borrar mensajes guardados"
+      "clearAllStoredMessages": "Borrar mensajes guardados",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }

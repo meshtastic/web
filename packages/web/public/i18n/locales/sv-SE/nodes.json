@@ -1,63 +1,59 @@
 {
-	"nodeDetail": {
-		"publicKeyEnabled": {
-			"label": "Publik nyckel aktiverad"
-		},
-		"noPublicKey": {
-			"label": "Publik nyckel saknas"
-		},
-		"directMessage": {
-			"label": "Direktmeddelande {{shortName}}"
-		},
-		"favorite": {
-			"label": "Favorit",
-			"tooltip": "Lägg till eller ta bort den här noden från dina favoriter"
-		},
-		"notFavorite": {
-			"label": "Inte en favorit"
-		},
-		"error": {
-			"label": "Fel",
-			"text": "Ett fel inträffade vid hämtning av nodens detaljer. Försök igen senare."
-		},
-		"status": {
-			"heard": "Hörd",
-			"mqtt": "MQTT"
-		},
-		"elevation": {
-			"label": "Höjd"
-		},
-		"channelUtil": {
-			"label": "Kanalutnyttjande"
-		},
-		"airtimeUtil": {
-			"label": "Sändningstidsutnyttjande"
-		}
-	},
-	"nodesTable": {
-		"headings": {
-			"longName": "Långt namn",
-			"connection": "Anslutning",
-			"lastHeard": "Senast hörd",
-			"encryption": "Kryptering",
-			"model": "Modell",
-			"macAddress": "MAC-adress"
-		},
-		"connectionStatus": {
-			"direct": "Direkt",
-			"away": "bort",
-			"unknown": "-",
-			"viaMqtt": ", via MQTT"
-		},
-		"lastHeardStatus": {
-			"never": "Aldrig"
-		}
-	},
-	"actions": {
-		"added": "Tillagd",
-		"removed": "Borttagen",
-		"ignoreNode": "Ignorera nod",
-		"unignoreNode": "Ta bort ignorering",
-		"requestPosition": "Begär plats"
-	}
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Publik nyckel aktiverad"
+    },
+    "noPublicKey": {
+      "label": "Publik nyckel saknas"
+    },
+    "directMessage": {
+      "label": "Direktmeddelande {{shortName}}"
+    },
+    "favorite": {
+      "label": "Favorit",
+      "tooltip": "Lägg till eller ta bort den här noden från dina favoriter"
+    },
+    "notFavorite": {
+      "label": "Inte en favorit"
+    },
+    "error": {
+      "label": "Fel",
+      "text": "Ett fel inträffade vid hämtning av nodens detaljer. Försök igen senare."
+    },
+    "status": {
+      "heard": "Hörd",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Höjd"
+    },
+    "channelUtil": {
+      "label": "Kanalutnyttjande"
+    },
+    "airtimeUtil": {
+      "label": "Sändningstidsutnyttjande"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "Långt namn",
+      "connection": "Anslutning",
+      "lastHeard": "Senast hörd",
+      "encryption": "Kryptering",
+      "model": "Modell",
+      "macAddress": "MAC-adress"
+    },
+    "connectionStatus": {
+      "direct": "Direkt",
+      "away": "bort",
+      "viaMqtt": ", via MQTT"
+    }
+  },
+  "actions": {
+    "added": "Tillagd",
+    "removed": "Borttagen",
+    "ignoreNode": "Ignorera nod",
+    "unignoreNode": "Ta bort ignorering",
+    "requestPosition": "Begär plats"
+  }
 }

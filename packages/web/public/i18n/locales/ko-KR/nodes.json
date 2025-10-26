@@ -1,63 +1,59 @@
 {
-	"nodeDetail": {
-		"publicKeyEnabled": {
-			"label": "공개 키 활성화"
-		},
-		"noPublicKey": {
-			"label": "공개 키 없음"
-		},
-		"directMessage": {
-			"label": "DM {{shortName}}"
-		},
-		"favorite": {
-			"label": "즐겨찾기",
-			"tooltip": "이 노드를 즐겨찾기에 추가하거나 삭제"
-		},
-		"notFavorite": {
-			"label": "즐겨찾기 아님"
-		},
-		"error": {
-			"label": "Error",
-			"text": "노드 정보를 가져오는 과정에서 오류가 발생했습니다. 나중에 다시 시도해 주세요."
-		},
-		"status": {
-			"heard": "수신",
-			"mqtt": "MQTT"
-		},
-		"elevation": {
-			"label": "고도"
-		},
-		"channelUtil": {
-			"label": "채널 사용률"
-		},
-		"airtimeUtil": {
-			"label": "통신 사용률"
-		}
-	},
-	"nodesTable": {
-		"headings": {
-			"longName": "긴 이름",
-			"connection": "연결",
-			"lastHeard": "최근 수신",
-			"encryption": "암호화",
-			"model": "하드웨어",
-			"macAddress": "MAC 주소"
-		},
-		"connectionStatus": {
-			"direct": "직접 연결",
-			"away": "떨어짐",
-			"unknown": "-",
-			"viaMqtt": ", MQTT 경유"
-		},
-		"lastHeardStatus": {
-			"never": "수신 된 적 없음"
-		}
-	},
-	"actions": {
-		"added": "추가됨",
-		"removed": "삭제됨",
-		"ignoreNode": "노드 무시하기",
-		"unignoreNode": "노드 무시 해제",
-		"requestPosition": "위치 요청"
-	}
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "공개 키 활성화"
+    },
+    "noPublicKey": {
+      "label": "공개 키 없음"
+    },
+    "directMessage": {
+      "label": "DM {{shortName}}"
+    },
+    "favorite": {
+      "label": "즐겨찾기",
+      "tooltip": "이 노드를 즐겨찾기에 추가하거나 삭제"
+    },
+    "notFavorite": {
+      "label": "즐겨찾기 아님"
+    },
+    "error": {
+      "label": "Error",
+      "text": "노드 정보를 가져오는 과정에서 오류가 발생했습니다. 나중에 다시 시도해 주세요."
+    },
+    "status": {
+      "heard": "수신",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "고도"
+    },
+    "channelUtil": {
+      "label": "채널 사용률"
+    },
+    "airtimeUtil": {
+      "label": "통신 사용률"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "긴 이름",
+      "connection": "연결",
+      "lastHeard": "최근 수신",
+      "encryption": "암호화",
+      "model": "하드웨어",
+      "macAddress": "MAC 주소"
+    },
+    "connectionStatus": {
+      "direct": "직접 연결",
+      "away": "떨어짐",
+      "viaMqtt": ", MQTT 경유"
+    }
+  },
+  "actions": {
+    "added": "추가됨",
+    "removed": "삭제됨",
+    "ignoreNode": "노드 무시하기",
+    "unignoreNode": "노드 무시 해제",
+    "requestPosition": "위치 요청"
+  }
 }

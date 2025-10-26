@@ -1,0 +1,38 @@
+{
+  "maplibre": {
+    "GeolocateControl.FindMyLocation": "Paikanna sijaintini",
+    "NavigationControl.ZoomIn": "Suurenna",
+    "NavigationControl.ZoomOut": "Pienennä",
+    "CooperativeGesturesHandler.WindowsHelpText": "Pidä Ctrl-näppäin painettuna ja rullaa hiirellä suurentaaksesi tai pienentääksesi karttaa",
+    "CooperativeGesturesHandler.MacHelpText": "Pidä ⌘-näppäin painettuna ja rullaa hiirellä suurentaaksesi tai pienentääksesi karttaa",
+    "CooperativeGesturesHandler.MobileHelpText": "Käytä kahta sormea siirtääksesi karttaa"
+  },
+  "layerTool": {
+    "nodeMarkers": "Näytä laitteet",
+    "directNeighbors": "Näytä suorat yhteydet",
+    "remoteNeighbors": "Näytä etäyhteydet",
+    "positionPrecision": "Näytä sijainnin tarkkuus",
+    "traceroutes": "Näytä reititykset",
+    "waypoints": "Näytä reittipisteet"
+  },
+  "mapMenu": {
+    "locateAria": "Paikanna laitteeni",
+    "layersAria": "Vaihda kartan tyyliä"
+  },
+  "waypointDetail": {
+    "edit": "Muokkaa",
+    "description": "Kuvaus:",
+    "createdBy": "Muokannut:",
+    "createdDate": "Luotu:",
+    "updated": "Päivitetty:",
+    "expires": "Vanhenee:",
+    "distance": "Etäisyys:",
+    "bearing": "Kompassisuunta kohteeseen:",
+    "lockedTo": "Lukinnut:",
+    "latitude": "Leveysaste:",
+    "longitude": "Pituusaste:"
+  },
+  "myNode": {
+    "tooltip": "Tämä laite"
+  }
+}

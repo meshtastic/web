@@ -1,69 +1,71 @@
 {
-	"page": {
-		"sectionLabel": "Kanallar",
-		"channelName": "Kanal: {{channelName}}",
-		"broadcastLabel": "Birincil",
-		"channelIndex": "Ch {{index}}"
-	},
-	"validation": {
-		"pskInvalid": "Lütfen geçerli bir {{bits}} bit PSK girin."
-	},
-	"settings": {
-		"label": "Kanal Ayarları",
-		"description": "Kripto ve MQTT genel ayarları"
-	},
-	"role": {
-		"label": "Rol",
-		"description": "Cihaz telemetrisi BİRİNCİL üzerinden gönderildi. Sadece bir BİRİNCİL izin verilir",
-		"options": {
-			"primary": "BİRİNCİL",
-			"disabled": "DEVRE DIŞI",
-			"secondary": "İKİNCİL"
-		}
-	},
-	"psk": {
-		"label": "Paylaşılan Anahtar",
-		"description": "Desteklenen PSK uzunlukları: 256 bit, 128 bit, 8 bit, Boş (0 bit)",
-		"generate": "Oluştur"
-	},
-	"name": {
-		"label": "İsmi",
-		"description": "12 bayt'tan küçük kanal için benzersiz bir ad, varsayılan olarak boş bırakın"
-	},
-	"uplinkEnabled": {
-		"label": "Uplink Etkin",
-		"description": "Yerel ağdan MQTT'ye mesaj gönderin"
-	},
-	"downlinkEnabled": {
-		"label": "Downlink Etkin",
-		"description": "MQTT'den yerel mesh ağa mesaj gönderin"
-	},
-	"positionPrecision": {
-		"label": "Konum",
-		"description": "Kanalla paylaşılacak konumun kesinliği. Devre dışı bırakılabilir.",
-		"options": {
-			"none": "Konumu paylaşma",
-			"precise": "Tam Konum",
-			"metric_km23": "23 kilometre içinde",
-			"metric_km12": "12 kilometre içinde",
-			"metric_km5_8": "5,8 kilometre içinde",
-			"metric_km2_9": "2,9 kilometre içinde",
-			"metric_km1_5": "1,5 kilometre içinde",
-			"metric_m700": "700 metre içinde",
-			"metric_m350": "350 metre içinde",
-			"metric_m200": "200 metre içinde",
-			"metric_m90": "90 metre içinde",
-			"metric_m50": "50 metre içinde",
-			"imperial_mi15": "15 mil içinde",
-			"imperial_mi7_3": "7,3 mil içinde",
-			"imperial_mi3_6": "3,6 mil içinde",
-			"imperial_mi1_8": "1,8 mil içinde",
-			"imperial_mi0_9": "0,9 mil içinde",
-			"imperial_mi0_5": "0,5 mil içinde",
-			"imperial_mi0_2": "0,2 mil içinde",
-			"imperial_ft600": "600 fit içinde",
-			"imperial_ft300": "300 fit içinde",
-			"imperial_ft150": "150 fit içinde"
-		}
-	}
+  "page": {
+    "sectionLabel": "Kanallar",
+    "channelName": "Kanal: {{channelName}}",
+    "broadcastLabel": "Birincil",
+    "channelIndex": "Ch {{index}}",
+    "import": "İçeri aktar",
+    "export": "Dışa Aktar"
+  },
+  "validation": {
+    "pskInvalid": "Lütfen geçerli bir {{bits}} bit PSK girin."
+  },
+  "settings": {
+    "label": "Kanal Ayarları",
+    "description": "Kripto ve MQTT genel ayarları"
+  },
+  "role": {
+    "label": "Rol",
+    "description": "Cihaz telemetrisi BİRİNCİL üzerinden gönderildi. Sadece bir BİRİNCİL izin verilir",
+    "options": {
+      "primary": "BİRİNCİL",
+      "disabled": "DEVRE DIŞI",
+      "secondary": "İKİNCİL"
+    }
+  },
+  "psk": {
+    "label": "Paylaşılan Anahtar",
+    "description": "Desteklenen PSK uzunlukları: 256 bit, 128 bit, 8 bit, Boş (0 bit)",
+    "generate": "Oluştur"
+  },
+  "name": {
+    "label": "İsmi",
+    "description": "12 bayt'tan küçük kanal için benzersiz bir ad, varsayılan olarak boş bırakın"
+  },
+  "uplinkEnabled": {
+    "label": "Uplink Etkin",
+    "description": "Yerel ağdan MQTT'ye mesaj gönderin"
+  },
+  "downlinkEnabled": {
+    "label": "Downlink Etkin",
+    "description": "MQTT'den yerel mesh ağa mesaj gönderin"
+  },
+  "positionPrecision": {
+    "label": "Konum",
+    "description": "Kanalla paylaşılacak konumun kesinliği. Devre dışı bırakılabilir.",
+    "options": {
+      "none": "Konumu paylaşma",
+      "precise": "Tam Konum",
+      "metric_km23": "23 kilometre içinde",
+      "metric_km12": "12 kilometre içinde",
+      "metric_km5_8": "5,8 kilometre içinde",
+      "metric_km2_9": "2,9 kilometre içinde",
+      "metric_km1_5": "1,5 kilometre içinde",
+      "metric_m700": "700 metre içinde",
+      "metric_m350": "350 metre içinde",
+      "metric_m200": "200 metre içinde",
+      "metric_m90": "90 metre içinde",
+      "metric_m50": "50 metre içinde",
+      "imperial_mi15": "15 mil içinde",
+      "imperial_mi7_3": "7,3 mil içinde",
+      "imperial_mi3_6": "3,6 mil içinde",
+      "imperial_mi1_8": "1,8 mil içinde",
+      "imperial_mi0_9": "0,9 mil içinde",
+      "imperial_mi0_5": "0,5 mil içinde",
+      "imperial_mi0_2": "0,2 mil içinde",
+      "imperial_ft600": "600 fit içinde",
+      "imperial_ft300": "300 fit içinde",
+      "imperial_ft150": "150 fit içinde"
+    }
+  }
 }

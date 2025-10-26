@@ -1,69 +1,71 @@
 {
-	"page": {
-		"sectionLabel": "Canali",
-		"channelName": "Canale {{channelName}}",
-		"broadcastLabel": "Principale",
-		"channelIndex": "Ch {{index}}"
-	},
-	"validation": {
-		"pskInvalid": "Per favore inserisci un PSK valido di {{bits}} bit."
-	},
-	"settings": {
-		"label": "Impostazioni Canale",
-		"description": "Impostazioni di Crypto, MQTT e varie"
-	},
-	"role": {
-		"label": "Ruolo",
-		"description": "La telemetria del dispositivo è inviata su PRIMARIO. Solo un PRIMARIO è consentito",
-		"options": {
-			"primary": "PRIMARIO",
-			"disabled": "DISABILITATO",
-			"secondary": "SECONDARIO"
-		}
-	},
-	"psk": {
-		"label": "Chiave Pre-Condivisa",
-		"description": "Lunghezze PSK supportate: 256-bit, 128-bit, 8-bit, Vuoto (0-bit)",
-		"generate": "Genera"
-	},
-	"name": {
-		"label": "Nome",
-		"description": "Un nome univoco per il canale <12 byte, lascia vuoto per default"
-	},
-	"uplinkEnabled": {
-		"label": "Uplink Abilitato",
-		"description": "Invia messaggi dalla mesh locale a MQTT"
-	},
-	"downlinkEnabled": {
-		"label": "Uplink Abilitato",
-		"description": "Invia messaggi da MQTT alla mesh locale"
-	},
-	"positionPrecision": {
-		"label": "Posizione",
-		"description": "La precisione della posizione da condividere con il canale. Può essere disabilitata.",
-		"options": {
-			"none": "Non condividere la posizione",
-			"precise": "Posizione precisa",
-			"metric_km23": "Entro 23 chilometri",
-			"metric_km12": "Entro 12 chilometri",
-			"metric_km5_8": "Entro 5,8 chilometri",
-			"metric_km2_9": "Entro 2,9 chilometri",
-			"metric_km1_5": "Entro 1,5 chilometri",
-			"metric_m700": "Entro 700 metri",
-			"metric_m350": "Entro 350 metri",
-			"metric_m200": "Entro 200 metri",
-			"metric_m90": "Entro 90 metri",
-			"metric_m50": "Entro 50 metri",
-			"imperial_mi15": "Entro 15 miglia",
-			"imperial_mi7_3": "Entro 7,3 miglia",
-			"imperial_mi3_6": "Entro 3,6 miglia",
-			"imperial_mi1_8": "Entro 1,8 miglia",
-			"imperial_mi0_9": "Entro 0,9 miglia",
-			"imperial_mi0_5": "Entro 0,5 miglia",
-			"imperial_mi0_2": "Entro 0,2 miglia",
-			"imperial_ft600": "Entro 600 piedi",
-			"imperial_ft300": "Entro 300 piedi",
-			"imperial_ft150": "Entro 150 piedi"
-		}
-	}
+  "page": {
+    "sectionLabel": "Canali",
+    "channelName": "Canale {{channelName}}",
+    "broadcastLabel": "Principale",
+    "channelIndex": "Ch {{index}}",
+    "import": "Importa",
+    "export": "Esporta"
+  },
+  "validation": {
+    "pskInvalid": "Per favore inserisci un PSK valido di {{bits}} bit."
+  },
+  "settings": {
+    "label": "Impostazioni Canale",
+    "description": "Impostazioni di Crypto, MQTT e varie"
+  },
+  "role": {
+    "label": "Ruolo",
+    "description": "La telemetria del dispositivo è inviata su PRIMARIO. Solo un PRIMARIO è consentito",
+    "options": {
+      "primary": "PRIMARIO",
+      "disabled": "DISABILITATO",
+      "secondary": "SECONDARIO"
+    }
+  },
+  "psk": {
+    "label": "Chiave Pre-Condivisa",
+    "description": "Lunghezze PSK supportate: 256-bit, 128-bit, 8-bit, Vuoto (0-bit)",
+    "generate": "Genera"
+  },
+  "name": {
+    "label": "Nome",
+    "description": "Un nome univoco per il canale <12 byte, lascia vuoto per default"
+  },
+  "uplinkEnabled": {
+    "label": "Uplink Abilitato",
+    "description": "Invia messaggi dalla mesh locale a MQTT"
+  },
+  "downlinkEnabled": {
+    "label": "Uplink Abilitato",
+    "description": "Invia messaggi da MQTT alla mesh locale"
+  },
+  "positionPrecision": {
+    "label": "Posizione",
+    "description": "La precisione della posizione da condividere con il canale. Può essere disabilitata.",
+    "options": {
+      "none": "Non condividere la posizione",
+      "precise": "Posizione precisa",
+      "metric_km23": "Entro 23 chilometri",
+      "metric_km12": "Entro 12 chilometri",
+      "metric_km5_8": "Entro 5,8 chilometri",
+      "metric_km2_9": "Entro 2,9 chilometri",
+      "metric_km1_5": "Entro 1,5 chilometri",
+      "metric_m700": "Entro 700 metri",
+      "metric_m350": "Entro 350 metri",
+      "metric_m200": "Entro 200 metri",
+      "metric_m90": "Entro 90 metri",
+      "metric_m50": "Entro 50 metri",
+      "imperial_mi15": "Entro 15 miglia",
+      "imperial_mi7_3": "Entro 7,3 miglia",
+      "imperial_mi3_6": "Entro 3,6 miglia",
+      "imperial_mi1_8": "Entro 1,8 miglia",
+      "imperial_mi0_9": "Entro 0,9 miglia",
+      "imperial_mi0_5": "Entro 0,5 miglia",
+      "imperial_mi0_2": "Entro 0,2 miglia",
+      "imperial_ft600": "Entro 600 piedi",
+      "imperial_ft300": "Entro 300 piedi",
+      "imperial_ft150": "Entro 150 piedi"
+    }
+  }
 }

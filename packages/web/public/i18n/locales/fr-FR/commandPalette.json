@@ -15,7 +15,6 @@
       "messages": "Messages",
       "map": "Carte",
       "config": "Config",
-      "channels": "Canaux",
       "nodes": "Noeuds"
     }
   },
@@ -45,7 +44,8 @@
     "label": "Debug",
     "command": {
       "reconfigure": "Reconfigurer",
-      "clearAllStoredMessages": "Effacer tous les messages stockés"
+      "clearAllStoredMessages": "Effacer tous les messages stockés",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }

@@ -1,193 +1,221 @@
 {
-	"deleteMessages": {
-		"description": "Cette action effacera tout l’historique des messages. Cette opération est irréversible. Voulez-vous vraiment continuer ?",
-		"title": "Supprimer tous les messages"
-	},
-	"deviceName": {
-		"description": "L’appareil redémarrera une fois la configuration enregistrée.",
-		"longName": "Nom long",
-		"shortName": "Nom court",
-		"title": "Changer le nom de l’appareil",
-		"validation": {
-			"longNameMax": "Le nom long ne doit pas contenir plus de 40 caractères",
-			"shortNameMax": "Le nom court ne doit pas contenir plus de 4 caractères",
-			"longNameMin": "Le nom long doit contenir au moins 1 caractère",
-			"shortNameMin": "Le nom court doit contenir au moins 1 caractère"
-		}
-	},
-	"import": {
-		"description": "La configuration LoRa actuelle sera écrasée.",
-		"error": {
-			"invalidUrl": "URL Meshtastic invalide"
-		},
-		"channelPrefix": "Canal: ",
-		"channelSetUrl": "URL du set de canaux ou du QR code",
-		"channels": "Canaux:",
-		"usePreset": "Utiliser un préréglage?",
-		"title": "Importer un ensemble de canaux"
-	},
-	"locationResponse": {
-		"title": "Position : {{identifier}}",
-		"altitude": "Altitude: ",
-		"coordinates": "Coordonnées : ",
-		"noCoordinates": "Pas de coordonnées"
-	},
-	"pkiRegenerateDialog": {
-		"title": "Régénérer la clé pré-partagée ?",
-		"description": "Êtes-vous sûr de vouloir régénérer la clé pré-partagée ?",
-		"regenerate": "Régénérer"
-	},
-	"newDeviceDialog": {
-		"title": "Connecter un nouvel appareil",
-		"https": "https",
-		"http": "http",
-		"tabHttp": "HTTP",
-		"tabBluetooth": "Bluetooth",
-		"tabSerial": "Série",
-		"useHttps": "Utiliser HTTPS",
-		"connecting": "Connexion...",
-		"connect": "Connecter",
-		"connectionFailedAlert": {
-			"title": "Échec de la connexion",
-			"descriptionPrefix": "Vous ne pouvez pas connecter l'appareil. ",
-			"httpsHint": "Si vous utilisez HTTPS, vous devrez peut-être accepter un certificat auto-signé. ",
-			"openLinkPrefix": "Veuillez ouvrir ",
-			"openLinkSuffix": " dans un nouvel onglet",
-			"acceptTlsWarningSuffix": ", acceptez les avertissements TLS si vous y êtes invité, puis réessayez",
-			"learnMoreLink": "En savoir plus"
-		},
-		"httpConnection": {
-			"label": "Adresse IP / nom d'hôte",
-			"placeholder": "000.000.000.000 / meshtastic.local"
-		},
-		"serialConnection": {
-			"noDevicesPaired": "Aucun appareil appairé pour l’instant.",
-			"newDeviceButton": "Nouvel appareil",
-			"deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
-		},
-		"bluetoothConnection": {
-			"noDevicesPaired": "Aucun appareil appairé pour l’instant.",
-			"newDeviceButton": "Nouvel appareil",
-			"connectionFailed": "Échec de la connexion",
-			"deviceDisconnected": "Périphérique déconnecté",
-			"unknownDevice": "Périphérique inconnu",
-			"errorLoadingDevices": "Erreur lors du chargement des périphériques",
-			"unknownErrorLoadingDevices": "Erreur inconnue lors du chargement des périphériques"
-		},
-		"validation": {
-			"requiresWebBluetooth": "Ce type de connexion nécessite <0>Web Bluetooth</0>. Veuillez utiliser un navigateur compatible, comme Chrome ou Edge.<0>",
-			"requiresWebSerial": "Ce type de connexion nécessite <0>Web Serial</0>. Veuillez utiliser un navigateur compatible, comme Chrome ou Edge.",
-			"requiresSecureContext": "Cette application nécessite un <0>contexte sécurisé</0>. Veuillez vous connecter via HTTPS ou localhost.",
-			"additionallyRequiresSecureContext": "Elle nécessite également un <0>contexte sécurisé</0>. Veuillez vous connecter via HTTPS ou localhost."
-		}
-	},
-	"nodeDetails": {
-		"message": "Message",
-		"requestPosition": "Demander la position",
-		"traceRoute": "Tracer la route",
-		"airTxUtilization": "Utilisation TX sur l’air",
-		"allRawMetrics": "Toutes les métriques brutes :",
-		"batteryLevel": "Niveau de batterie",
-		"channelUtilization": "Utilisation du canal",
-		"details": "Détails :",
-		"deviceMetrics": "Métriques de l’appareil :",
-		"hardware": "Matériel : ",
-		"lastHeard": "Dernière écoute: ",
-		"nodeHexPrefix": "Hex du nœud: ",
-		"nodeNumber": "Numéro de nœud: ",
-		"position": "Position:",
-		"role": "Rôle: ",
-		"uptime": "Temps de fonctionnement :",
-		"voltage": "Tension",
-		"title": "Détails du nœud pour {{identifier}}",
-		"ignoreNode": "Ignorer le nœud",
-		"removeNode": "Supprimer le nœud",
-		"unignoreNode": "Ne plus ignorer le nœud",
-		"security": "Sécurité:",
-		"publicKey": "Clé publique: ",
-		"messageable": "Messageable ",
-		"KeyManuallyVerifiedTrue": "La clé publique a été vérifiée manuellement",
-		"KeyManuallyVerifiedFalse": "La clé publique n'est pas vérifiée manuellement"
-	},
-	"pkiBackup": {
-		"loseKeysWarning": "Si vous perdez vos clés, vous devrez réinitialiser votre appareil.",
-		"secureBackup": "Il est important de sauvegarder vos clés publique et privée, et de stocker cette sauvegarde en lieu sûr !",
-		"footer": "=== FIN DES CLÉS ===",
-		"header": "=== CLÉS MESHTASTIC POUR {{longName}} ({{shortName}}) ===",
-		"privateKey": "Clé privée :",
-		"publicKey": "Clé publique :",
-		"fileName": "meshtastic_cles_{{longName}}_{{shortName}}.txt",
-		"title": "Sauvegarder les clés"
-	},
-	"pkiBackupReminder": {
-		"description": "Nous vous recommandons de sauvegarder régulièrement vos clés. Souhaitez-vous effectuer une sauvegarde maintenant ?",
-		"title": "Rappel de sauvegarde",
-		"remindLaterPrefix": "Me le rappeler dans",
-		"remindNever": "Ne plus me le rappeler",
-		"backupNow": "Sauvegarder maintenant"
-	},
-	"pkiRegenerate": {
-		"description": "Êtes-vous sûr de vouloir régénérer la paire de clés ?",
-		"title": "Régénérer la paire de clés"
-	},
-	"qr": {
-		"addChannels": "Ajouter des canaux",
-		"replaceChannels": "Remplacer les canaux",
-		"description": "La configuration LoRa actuelle sera également partagée.",
-		"sharableUrl": "URL partageable",
-		"title": "Générer un QR Code"
-	},
-	"reboot": {
-		"title": "Redémarrer l'appareil",
-		"description": "Redémarrez maintenant ou programmez un redémarrage du nœud connecté. Vous pouvez éventuellement choisir de redémarrer en mode OTA (Over-the-Air).",
-		"ota": "Redémarrer en mode OTA",
-		"enterDelay": "Entrez le délai",
-		"scheduled": "Le redémarrage a été programmé",
-		"schedule": "Programmer le redémarrage",
-		"now": "Redémarrer maintenant",
-		"cancel": "Annuler le redémarrage planifié"
-	},
-	"refreshKeys": {
-		"description": {
-			"acceptNewKeys": "Cela supprimera le nœud de l’appareil et demandera de nouvelles clés.",
-			"keyMismatchReasonSuffix": ". Cela est dû au fait que la clé publique actuelle du nœud distant ne correspond pas à celle précédemment enregistrée pour ce nœud.",
-			"unableToSendDmPrefix": "Accepter les nouvelles clés"
-		},
-		"acceptNewKeys": "Accepter les nouvelles clés",
-		"title": "Clés non concordantes – {{identifier}}"
-	},
-	"removeNode": {
-		"description": "Êtes-vous sûr de vouloir supprimer ce nœud ?",
-		"title": "Supprimer le nœud ?"
-	},
-	"shutdown": {
-		"title": "Programmer un arrêt",
-		"description": "Éteindre le nœud connecté après x minutes."
-	},
-	"traceRoute": {
-		"routeToDestination": "Route vers la destination :",
-		"routeBack": "Route de retour :"
-	},
-	"tracerouteResponse": {
-		"title": "Traceroute : {{identifier}}"
-	},
-	"unsafeRoles": {
-		"confirmUnderstanding": "Oui, je sais ce que je fais",
-		"conjunction": " et l’article de blog sur le ",
-		"postamble": " et je comprends les implications du changement de rôle.",
-		"preamble": "J'ai lu les",
-		"choosingRightDeviceRole": "Choisir le rôle d’appareil approprié",
-		"deviceRoleDocumentation": "Documentation sur les rôles d’appareil",
-		"title": "Êtes-vous sûr ?"
-	},
-	"managedMode": {
-		"confirmUnderstanding": "Oui, je sais ce que je fais",
-		"title": "Êtes-vous sûr ?",
-		"description": "Activer le mode géré empêche les applications clientes (y compris l’interface web) de modifier la configuration d’une radio. Une fois activé, la configuration ne peut être changée que via des messages d’administration à distance. Ce paramètre n’est pas nécessaire pour l’administration distante des nœuds."
-	},
-	"clientNotification": {
-		"title": "Notification client",
-		"TraceRoute can only be sent once every 30 seconds": "TraceRoute ne peut être envoyée qu'une fois toutes les 30 secondes",
-		"Compromised keys were detected and regenerated.": "Les clés compromises ont été détectées et régénérées."
-	}
+  "deleteMessages": {
+    "description": "Cette action effacera tout l’historique des messages. Cette opération est irréversible. Voulez-vous vraiment continuer ?",
+    "title": "Supprimer tous les messages"
+  },
+  "deviceName": {
+    "description": "L’appareil redémarrera une fois la configuration enregistrée.",
+    "longName": "Nom long",
+    "shortName": "Nom court",
+    "title": "Changer le nom de l’appareil",
+    "validation": {
+      "longNameMax": "Le nom long ne doit pas contenir plus de 40 caractères",
+      "shortNameMax": "Le nom court ne doit pas contenir plus de 4 caractères",
+      "longNameMin": "Le nom long doit contenir au moins 1 caractère",
+      "shortNameMin": "Le nom court doit contenir au moins 1 caractère"
+    }
+  },
+  "import": {
+    "description": "La configuration LoRa actuelle sera écrasée.",
+    "error": {
+      "invalidUrl": "URL Meshtastic invalide"
+    },
+    "channelPrefix": "Canal: ",
+    "primary": "Primary ",
+    "doNotImport": "No not import",
+    "channelName": "Nom",
+    "channelSlot": "Emplacement",
+    "channelSetUrl": "URL du set de canaux ou du QR code",
+    "useLoraConfig": "Import LoRa Config",
+    "presetDescription": "The current LoRa Config will be replaced.",
+    "title": "Importer un ensemble de canaux"
+  },
+  "locationResponse": {
+    "title": "Position : {{identifier}}",
+    "altitude": "Altitude: ",
+    "coordinates": "Coordonnées : ",
+    "noCoordinates": "Pas de coordonnées"
+  },
+  "pkiRegenerateDialog": {
+    "title": "Régénérer la clé pré-partagée ?",
+    "description": "Êtes-vous sûr de vouloir régénérer la clé pré-partagée ?",
+    "regenerate": "Régénérer"
+  },
+  "newDeviceDialog": {
+    "title": "Connecter un nouvel appareil",
+    "https": "https",
+    "http": "http",
+    "tabHttp": "HTTP",
+    "tabBluetooth": "Bluetooth",
+    "tabSerial": "Série",
+    "useHttps": "Utiliser HTTPS",
+    "connecting": "Connexion...",
+    "connect": "Connecter",
+    "connectionFailedAlert": {
+      "title": "Échec de la connexion",
+      "descriptionPrefix": "Vous ne pouvez pas connecter l'appareil. ",
+      "httpsHint": "Si vous utilisez HTTPS, vous devrez peut-être accepter un certificat auto-signé. ",
+      "openLinkPrefix": "Veuillez ouvrir ",
+      "openLinkSuffix": " dans un nouvel onglet",
+      "acceptTlsWarningSuffix": ", acceptez les avertissements TLS si vous y êtes invité, puis réessayez",
+      "learnMoreLink": "En savoir plus"
+    },
+    "httpConnection": {
+      "label": "Adresse IP / nom d'hôte",
+      "placeholder": "000.000.000.000 / meshtastic.local"
+    },
+    "serialConnection": {
+      "noDevicesPaired": "Aucun appareil appairé pour l’instant.",
+      "newDeviceButton": "Nouvel appareil",
+      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
+    },
+    "bluetoothConnection": {
+      "noDevicesPaired": "Aucun appareil appairé pour l’instant.",
+      "newDeviceButton": "Nouvel appareil",
+      "connectionFailed": "Échec de la connexion",
+      "deviceDisconnected": "Périphérique déconnecté",
+      "unknownDevice": "Périphérique inconnu",
+      "errorLoadingDevices": "Erreur lors du chargement des périphériques",
+      "unknownErrorLoadingDevices": "Erreur inconnue lors du chargement des périphériques"
+    },
+    "validation": {
+      "requiresWebBluetooth": "Ce type de connexion nécessite <0>Web Bluetooth</0>. Veuillez utiliser un navigateur compatible, comme Chrome ou Edge.<0>",
+      "requiresWebSerial": "Ce type de connexion nécessite <0>Web Serial</0>. Veuillez utiliser un navigateur compatible, comme Chrome ou Edge.",
+      "requiresSecureContext": "Cette application nécessite un <0>contexte sécurisé</0>. Veuillez vous connecter via HTTPS ou localhost.",
+      "additionallyRequiresSecureContext": "Elle nécessite également un <0>contexte sécurisé</0>. Veuillez vous connecter via HTTPS ou localhost."
+    }
+  },
+  "nodeDetails": {
+    "message": "Message",
+    "requestPosition": "Demander la position",
+    "traceRoute": "Tracer la route",
+    "airTxUtilization": "Utilisation TX sur l’air",
+    "allRawMetrics": "Toutes les métriques brutes :",
+    "batteryLevel": "Niveau de batterie",
+    "channelUtilization": "Utilisation du canal",
+    "details": "Détails :",
+    "deviceMetrics": "Métriques de l’appareil :",
+    "hardware": "Matériel : ",
+    "lastHeard": "Dernière écoute: ",
+    "nodeHexPrefix": "Hex du nœud: ",
+    "nodeNumber": "Numéro de nœud: ",
+    "position": "Position:",
+    "role": "Rôle: ",
+    "uptime": "Temps de fonctionnement :",
+    "voltage": "Tension",
+    "title": "Détails du nœud pour {{identifier}}",
+    "ignoreNode": "Ignorer le nœud",
+    "removeNode": "Supprimer le nœud",
+    "unignoreNode": "Ne plus ignorer le nœud",
+    "security": "Sécurité:",
+    "publicKey": "Clé publique: ",
+    "messageable": "Messageable ",
+    "KeyManuallyVerifiedTrue": "La clé publique a été vérifiée manuellement",
+    "KeyManuallyVerifiedFalse": "La clé publique n'est pas vérifiée manuellement"
+  },
+  "pkiBackup": {
+    "loseKeysWarning": "Si vous perdez vos clés, vous devrez réinitialiser votre appareil.",
+    "secureBackup": "Il est important de sauvegarder vos clés publique et privée, et de stocker cette sauvegarde en lieu sûr !",
+    "footer": "=== FIN DES CLÉS ===",
+    "header": "=== CLÉS MESHTASTIC POUR {{longName}} ({{shortName}}) ===",
+    "privateKey": "Clé privée :",
+    "publicKey": "Clé publique :",
+    "fileName": "meshtastic_cles_{{longName}}_{{shortName}}.txt",
+    "title": "Sauvegarder les clés"
+  },
+  "pkiBackupReminder": {
+    "description": "Nous vous recommandons de sauvegarder régulièrement vos clés. Souhaitez-vous effectuer une sauvegarde maintenant ?",
+    "title": "Rappel de sauvegarde",
+    "remindLaterPrefix": "Me le rappeler dans",
+    "remindNever": "Ne plus me le rappeler",
+    "backupNow": "Sauvegarder maintenant"
+  },
+  "pkiRegenerate": {
+    "description": "Êtes-vous sûr de vouloir régénérer la paire de clés ?",
+    "title": "Régénérer la paire de clés"
+  },
+  "qr": {
+    "addChannels": "Ajouter des canaux",
+    "replaceChannels": "Remplacer les canaux",
+    "description": "La configuration LoRa actuelle sera également partagée.",
+    "sharableUrl": "URL partageable",
+    "title": "Générer un QR Code"
+  },
+  "reboot": {
+    "title": "Redémarrer l'appareil",
+    "description": "Redémarrez maintenant ou programmez un redémarrage du nœud connecté. Vous pouvez éventuellement choisir de redémarrer en mode OTA (Over-the-Air).",
+    "ota": "Redémarrer en mode OTA",
+    "enterDelay": "Entrez le délai",
+    "scheduled": "Le redémarrage a été programmé",
+    "schedule": "Programmer le redémarrage",
+    "now": "Redémarrer maintenant",
+    "cancel": "Annuler le redémarrage planifié"
+  },
+  "refreshKeys": {
+    "description": {
+      "acceptNewKeys": "Cela supprimera le nœud de l’appareil et demandera de nouvelles clés.",
+      "keyMismatchReasonSuffix": ". Cela est dû au fait que la clé publique actuelle du nœud distant ne correspond pas à celle précédemment enregistrée pour ce nœud.",
+      "unableToSendDmPrefix": "Accepter les nouvelles clés"
+    },
+    "acceptNewKeys": "Accepter les nouvelles clés",
+    "title": "Clés non concordantes – {{identifier}}"
+  },
+  "removeNode": {
+    "description": "Êtes-vous sûr de vouloir supprimer ce nœud ?",
+    "title": "Supprimer le nœud ?"
+  },
+  "shutdown": {
+    "title": "Programmer un arrêt",
+    "description": "Éteindre le nœud connecté après x minutes."
+  },
+  "traceRoute": {
+    "routeToDestination": "Route vers la destination :",
+    "routeBack": "Route de retour :"
+  },
+  "tracerouteResponse": {
+    "title": "Traceroute : {{identifier}}"
+  },
+  "unsafeRoles": {
+    "confirmUnderstanding": "Oui, je sais ce que je fais",
+    "conjunction": " et l’article de blog sur le ",
+    "postamble": " et je comprends les implications du changement de rôle.",
+    "preamble": "J'ai lu les",
+    "choosingRightDeviceRole": "Choisir le rôle d’appareil approprié",
+    "deviceRoleDocumentation": "Documentation sur les rôles d’appareil",
+    "title": "Êtes-vous sûr ?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Oui, je sais ce que je fais",
+    "title": "Êtes-vous sûr ?",
+    "description": "Activer le mode géré empêche les applications clientes (y compris l’interface web) de modifier la configuration d’une radio. Une fois activé, la configuration ne peut être changée que via des messages d’administration à distance. Ce paramètre n’est pas nécessaire pour l’administration distante des nœuds."
+  },
+  "clientNotification": {
+    "title": "Notification client",
+    "TraceRoute can only be sent once every 30 seconds": "TraceRoute ne peut être envoyée qu'une fois toutes les 30 secondes",
+    "Compromised keys were detected and regenerated.": "Les clés compromises ont été détectées et régénérées."
+  },
+  "resetNodeDb": {
+    "title": "Reset Node Database",
+    "description": "This will clear all nodes from the connected device's node database and clear all message history in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Reset Node Database",
+    "failedTitle": "There was an error resetting the Node DB. Please try again."
+  },
+  "clearAllStores": {
+    "title": "Clear All Local Storage",
+    "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
+    "confirm": "Clear all local storage",
+    "failedTitle": "There was an error clearing local storage. Please try again."
+  },
+  "factoryResetDevice": {
+    "title": "Réinitialisation d'usine de l'appareil",
+    "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Réinitialisation d'usine de l'appareil",
+    "failedTitle": "There was an error performing the factory reset. Please try again."
+  },
+  "factoryResetConfig": {
+    "title": "Réinitialisation d'usine de la config",
+    "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Réinitialisation d'usine de la config",
+    "failedTitle": "There was an error performing the factory reset. Please try again."
+  }
 }

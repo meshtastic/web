@@ -1,142 +1,157 @@
 {
-	"button": {
-		"apply": "Застосувати",
-		"backupKey": "Backup Key",
-		"cancel": "Скасувати",
-		"clearMessages": "Clear Messages",
-		"close": "Закрити",
-		"confirm": "Confirm",
-		"delete": "Видалити",
-		"dismiss": "Dismiss",
-		"download": "Download",
-		"export": "Export",
-		"generate": "Згенерувати",
-		"regenerate": "Перегенерувати",
-		"import": "Імпортувати",
-		"message": "Повідомлення",
-		"now": "Зараз",
-		"ok": "Гаразд",
-		"print": "Print",
-		"remove": "Видалити",
-		"requestNewKeys": "Request New Keys",
-		"requestPosition": "Запитати позицію",
-		"reset": "Скинути",
-		"save": "Зберегти",
-		"scanQr": "Сканувати QR-код",
-		"traceRoute": "Trace Route",
-		"submit": "Submit"
-	},
-	"app": {
-		"title": "Meshtastic",
-		"fullTitle": "Meshtastic Web Client"
-	},
-	"loading": "Завантаження...",
-	"unit": {
-		"cps": "CPS",
-		"dbm": "дБм",
-		"hertz": "Гц",
-		"hop": {
-			"one": "Hop",
-			"plural": "Hops"
-		},
-		"hopsAway": {
-			"one": "{{count}} hop away",
-			"plural": "{{count}} hops away",
-			"unknown": "Unknown hops away"
-		},
-		"megahertz": "МГц",
-		"raw": "raw",
-		"meter": {
-			"one": "Метр",
-			"plural": "Meters",
-			"suffix": "м"
-		},
-		"minute": {
-			"one": "Minute",
-			"plural": "Хвилин"
-		},
-		"hour": {
-			"one": "Година",
-			"plural": "Годин"
-		},
-		"millisecond": {
-			"one": "Мілісекунда",
-			"plural": "Мілісекунди",
-			"suffix": "мс"
-		},
-		"second": {
-			"one": "Секунда",
-			"plural": "Секунд"
-		},
-		"day": {
-			"one": "День",
-			"plural": "Днів"
-		},
-		"month": {
-			"one": "Місяць",
-			"plural": "Місяців"
-		},
-		"year": {
-			"one": "Year",
-			"plural": "Years"
-		},
-		"snr": "SNR",
-		"volt": {
-			"one": "Вольт",
-			"plural": "Volts",
-			"suffix": "V"
-		},
-		"record": {
-			"one": "Records",
-			"plural": "Records"
-		}
-	},
-	"security": {
-		"0bit": "Empty",
-		"8bit": "8 bit",
-		"128bit": "128 bit",
-		"256bit": "256 bit"
-	},
-	"unknown": {
-		"longName": "Unknown",
-		"shortName": "UNK",
-		"notAvailable": "N/A",
-		"num": "??"
-	},
-	"nodeUnknownPrefix": "!",
-	"unset": "UNSET",
-	"fallbackName": "Meshtastic {{last4}}",
-	"node": "Node",
-	"formValidation": {
-		"unsavedChanges": "Unsaved changes",
-		"tooBig": {
-			"string": "Too long, expected less than or equal to {{maximum}} characters.",
-			"number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-			"bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
-		},
-		"tooSmall": {
-			"string": "Too short, expected more than or equal to {{minimum}} characters.",
-			"number": "Too small, expected a number larger than or equal to {{minimum}}."
-		},
-		"invalidFormat": {
-			"ipv4": "Невірний формат, потрібна IPv4-адреса.",
-			"key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
-		},
-		"invalidType": {
-			"number": "Invalid type, expected a number."
-		},
-		"pskLength": {
-			"0bit": "Ключ повинен бути пустим.",
-			"8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-			"128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-			"256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
-		},
-		"required": {
-			"generic": "Це поле є обов'язковим.",
-			"managed": "At least one admin key is requred if the node is managed.",
-			"key": "Key is required."
-		}
-	},
-	"yes": "Yes",
-	"no": "No"
+  "button": {
+    "apply": "Застосувати",
+    "backupKey": "Backup Key",
+    "cancel": "Скасувати",
+    "clearMessages": "Clear Messages",
+    "close": "Закрити",
+    "confirm": "Confirm",
+    "delete": "Видалити",
+    "dismiss": "Dismiss",
+    "download": "Download",
+    "export": "Export",
+    "generate": "Згенерувати",
+    "regenerate": "Перегенерувати",
+    "import": "Імпортувати",
+    "message": "Повідомлення",
+    "now": "Зараз",
+    "ok": "Гаразд",
+    "print": "Print",
+    "remove": "Видалити",
+    "requestNewKeys": "Request New Keys",
+    "requestPosition": "Запитати позицію",
+    "reset": "Скинути",
+    "save": "Зберегти",
+    "scanQr": "Сканувати QR-код",
+    "traceRoute": "Trace Route",
+    "submit": "Submit"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "fullTitle": "Meshtastic Web Client"
+  },
+  "loading": "Завантаження...",
+  "unit": {
+    "cps": "CPS",
+    "dbm": "дБм",
+    "hertz": "Гц",
+    "hop": {
+      "one": "Hop",
+      "plural": "Hops"
+    },
+    "hopsAway": {
+      "one": "{{count}} hop away",
+      "plural": "{{count}} hops away",
+      "unknown": "Unknown hops away"
+    },
+    "megahertz": "МГц",
+    "raw": "raw",
+    "meter": {
+      "one": "Метр",
+      "plural": "Meters",
+      "suffix": "м"
+    },
+    "kilometer": {
+      "one": "Kilometer",
+      "plural": "Kilometers",
+      "suffix": "km"
+    },
+    "minute": {
+      "one": "Minute",
+      "plural": "Хвилин"
+    },
+    "hour": {
+      "one": "Година",
+      "plural": "Годин"
+    },
+    "millisecond": {
+      "one": "Мілісекунда",
+      "plural": "Мілісекунди",
+      "suffix": "мс"
+    },
+    "second": {
+      "one": "Секунда",
+      "plural": "Секунд"
+    },
+    "day": {
+      "one": "День",
+      "plural": "Днів",
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "month": {
+      "one": "Місяць",
+      "plural": "Місяців"
+    },
+    "year": {
+      "one": "Year",
+      "plural": "Years"
+    },
+    "snr": "SNR",
+    "volt": {
+      "one": "Вольт",
+      "plural": "Volts",
+      "suffix": "V"
+    },
+    "record": {
+      "one": "Records",
+      "plural": "Records"
+    },
+    "degree": {
+      "one": "Degree",
+      "plural": "Degrees",
+      "suffix": "°"
+    }
+  },
+  "security": {
+    "0bit": "Empty",
+    "8bit": "8 bit",
+    "128bit": "128 bit",
+    "256bit": "256 bit"
+  },
+  "unknown": {
+    "longName": "Unknown",
+    "shortName": "UNK",
+    "notAvailable": "N/A",
+    "num": "??"
+  },
+  "nodeUnknownPrefix": "!",
+  "unset": "UNSET",
+  "fallbackName": "Meshtastic {{last4}}",
+  "node": "Node",
+  "formValidation": {
+    "unsavedChanges": "Unsaved changes",
+    "tooBig": {
+      "string": "Too long, expected less than or equal to {{maximum}} characters.",
+      "number": "Too big, expected a number smaller than or equal to {{maximum}}.",
+      "bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+    },
+    "tooSmall": {
+      "string": "Too short, expected more than or equal to {{minimum}} characters.",
+      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+    },
+    "invalidFormat": {
+      "ipv4": "Невірний формат, потрібна IPv4-адреса.",
+      "key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+    },
+    "invalidType": {
+      "number": "Invalid type, expected a number."
+    },
+    "pskLength": {
+      "0bit": "Ключ повинен бути пустим.",
+      "8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
+      "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
+      "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+    },
+    "required": {
+      "generic": "Це поле є обов'язковим.",
+      "managed": "At least one admin key is requred if the node is managed.",
+      "key": "Key is required."
+    },
+    "invalidOverrideFreq": {
+      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+    }
+  },
+  "yes": "Yes",
+  "no": "No"
 }

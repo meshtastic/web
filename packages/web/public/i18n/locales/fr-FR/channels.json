@@ -1,69 +1,71 @@
 {
-	"page": {
-		"sectionLabel": "Canaux",
-		"channelName": "Canal {{channelName}}",
-		"broadcastLabel": "Principal",
-		"channelIndex": "Ca {{index}}"
-	},
-	"validation": {
-		"pskInvalid": "Veuillez entrer une clé PSK valide de {{bits}} bits."
-	},
-	"settings": {
-		"label": "Paramètres du canal",
-		"description": "Paramètres Crypto, MQTT et divers"
-	},
-	"role": {
-		"label": "Rôle",
-		"description": "La télémétrie de l’appareil est envoyée via le canal PRINCIPAL. Un seul canal PRINCIPAL est autorisé.",
-		"options": {
-			"primary": "PRINCIPAL",
-			"disabled": "DÉSACTIVÉ",
-			"secondary": "SECONDAIRE"
-		}
-	},
-	"psk": {
-		"label": "Clé partagée",
-		"description": "Longueurs de clé PSK prises en charge : 256 bits, 128 bits, 8 bits, vide (0 bit)",
-		"generate": "Générer"
-	},
-	"name": {
-		"label": "Nom",
-		"description": "Un nom unique pour le canal (<12 octets), laisser vide pour utiliser la valeur par défaut"
-	},
-	"uplinkEnabled": {
-		"label": "Liaison montante activée",
-		"description": "Envoyer les messages du maillage local vers MQTT"
-	},
-	"downlinkEnabled": {
-		"label": "Liaison descendante activée",
-		"description": "Envoyer les messages de MQTT vers le maillage local"
-	},
-	"positionPrecision": {
-		"label": "Position",
-		"description": "La précision de la position à partager avec le canal. Peut être désactivée.",
-		"options": {
-			"none": "Ne pas partager la position",
-			"precise": "Position précise",
-			"metric_km23": "À moins de 23 kilomètres",
-			"metric_km12": "À moins de 12 kilomètres",
-			"metric_km5_8": "À moins de 5,8 kilomètres",
-			"metric_km2_9": "À moins de 2,9 kilomètres",
-			"metric_km1_5": "À moins de 1,5 kilomètres",
-			"metric_m700": "À moins de 700 mètres",
-			"metric_m350": "À moins de 350 mètres",
-			"metric_m200": "À moins de 200 mètres",
-			"metric_m90": "À moins de 90 mètres",
-			"metric_m50": "À moins de 50 mètres",
-			"imperial_mi15": "À moins de 15 miles",
-			"imperial_mi7_3": "À moins de 7,3 miles",
-			"imperial_mi3_6": "À moins de 3,6 miles",
-			"imperial_mi1_8": "À moins de 1,8 miles",
-			"imperial_mi0_9": "À moins de 0,9 miles",
-			"imperial_mi0_5": "À moins de 0,5 miles",
-			"imperial_mi0_2": "À moins de 0,2 miles",
-			"imperial_ft600": "À moins de 600 pieds",
-			"imperial_ft300": "À moins de 300 pieds",
-			"imperial_ft150": "À moins de 150 pieds"
-		}
-	}
+  "page": {
+    "sectionLabel": "Canaux",
+    "channelName": "Canal {{channelName}}",
+    "broadcastLabel": "Principal",
+    "channelIndex": "Ca {{index}}",
+    "import": "Importer",
+    "export": "Exporter"
+  },
+  "validation": {
+    "pskInvalid": "Veuillez entrer une clé PSK valide de {{bits}} bits."
+  },
+  "settings": {
+    "label": "Paramètres du canal",
+    "description": "Paramètres Crypto, MQTT et divers"
+  },
+  "role": {
+    "label": "Rôle",
+    "description": "La télémétrie de l’appareil est envoyée via le canal PRINCIPAL. Un seul canal PRINCIPAL est autorisé.",
+    "options": {
+      "primary": "PRINCIPAL",
+      "disabled": "DÉSACTIVÉ",
+      "secondary": "SECONDAIRE"
+    }
+  },
+  "psk": {
+    "label": "Clé partagée",
+    "description": "Longueurs de clé PSK prises en charge : 256 bits, 128 bits, 8 bits, vide (0 bit)",
+    "generate": "Générer"
+  },
+  "name": {
+    "label": "Nom",
+    "description": "Un nom unique pour le canal (<12 octets), laisser vide pour utiliser la valeur par défaut"
+  },
+  "uplinkEnabled": {
+    "label": "Liaison montante activée",
+    "description": "Envoyer les messages du maillage local vers MQTT"
+  },
+  "downlinkEnabled": {
+    "label": "Liaison descendante activée",
+    "description": "Envoyer les messages de MQTT vers le maillage local"
+  },
+  "positionPrecision": {
+    "label": "Position",
+    "description": "La précision de la position à partager avec le canal. Peut être désactivée.",
+    "options": {
+      "none": "Ne pas partager la position",
+      "precise": "Position précise",
+      "metric_km23": "À moins de 23 kilomètres",
+      "metric_km12": "À moins de 12 kilomètres",
+      "metric_km5_8": "À moins de 5,8 kilomètres",
+      "metric_km2_9": "À moins de 2,9 kilomètres",
+      "metric_km1_5": "À moins de 1,5 kilomètres",
+      "metric_m700": "À moins de 700 mètres",
+      "metric_m350": "À moins de 350 mètres",
+      "metric_m200": "À moins de 200 mètres",
+      "metric_m90": "À moins de 90 mètres",
+      "metric_m50": "À moins de 50 mètres",
+      "imperial_mi15": "À moins de 15 miles",
+      "imperial_mi7_3": "À moins de 7,3 miles",
+      "imperial_mi3_6": "À moins de 3,6 miles",
+      "imperial_mi1_8": "À moins de 1,8 miles",
+      "imperial_mi0_9": "À moins de 0,9 miles",
+      "imperial_mi0_5": "À moins de 0,5 miles",
+      "imperial_mi0_2": "À moins de 0,2 miles",
+      "imperial_ft600": "À moins de 600 pieds",
+      "imperial_ft300": "À moins de 300 pieds",
+      "imperial_ft150": "À moins de 150 pieds"
+    }
+  }
 }

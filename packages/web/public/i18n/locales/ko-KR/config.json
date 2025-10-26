@@ -1,0 +1,458 @@
+{
+  "page": {
+    "title": "설정",
+    "tabUser": "사용자",
+    "tabChannels": "채널",
+    "tabBluetooth": "블루투스",
+    "tabDevice": "장치",
+    "tabDisplay": "화면",
+    "tabLora": "LoRa",
+    "tabNetwork": "네트워크",
+    "tabPosition": "위치",
+    "tabPower": "전원",
+    "tabSecurity": "보안"
+  },
+  "sidebar": {
+    "label": "설정"
+  },
+  "device": {
+    "title": "장치 설정",
+    "description": "장치 설정",
+    "buttonPin": {
+      "description": "버튼 핀 오버라이드",
+      "label": "버튼 핀"
+    },
+    "buzzerPin": {
+      "description": "부저 핀 오버라이드",
+      "label": "부저 핀"
+    },
+    "disableTripleClick": {
+      "description": "세 번 클릭 끄기",
+      "label": "세 번 클릭 끄기"
+    },
+    "doubleTapAsButtonPress": {
+      "description": "더블 탭하여 버튼 누름",
+      "label": "더블 탭하여 버튼 누름"
+    },
+    "ledHeartbeatDisabled": {
+      "description": "기본 깜빡이는 LED를 비활성화",
+      "label": "LED 깜빡임 비활성화"
+    },
+    "nodeInfoBroadcastInterval": {
+      "description": "노드 정보의 발송 주기를 설정",
+      "label": "노드 정보 발송 주기"
+    },
+    "posixTimezone": {
+      "description": "장치의 Posix Timezone String 입력",
+      "label": "POSIX 시간대"
+    },
+    "rebroadcastMode": {
+      "description": "중계를 처리하는 방법 설정",
+      "label": "중계 모드"
+    },
+    "role": {
+      "description": "해당 장치가 메쉬에서 수행하는 역할을 설정",
+      "label": "역할"
+    }
+  },
+  "bluetooth": {
+    "title": "블루투스 설정",
+    "description": "블루투스 설정",
+    "note": "참고: 일부 장치(ESP32)는 블루투스와 와이파이를 동시에 사용할 수 없습니다.",
+    "enabled": {
+      "description": "블루투스를 켜거나 끕니다.",
+      "label": "활성화"
+    },
+    "pairingMode": {
+      "description": "핀 선택",
+      "label": "페어링 모드"
+    },
+    "pin": {
+      "description": "페어링에 사용할 핀",
+      "label": "핀"
+    }
+  },
+  "display": {
+    "description": "장치의 디스플레이 설정",
+    "title": "디스플레이 설정",
+    "headingBold": {
+      "description": "상태표시줄 볼드체 적용하기",
+      "label": "상태표시줄 볼드체"
+    },
+    "carouselDelay": {
+      "description": "화면 전환 사이클 시간을 입력",
+      "label": "전환 시간"
+    },
+    "compassNorthTop": {
+      "description": "나침반 상단을 북쪽으로 고정",
+      "label": "나침반 북쪽 고정"
+    },
+    "displayMode": {
+      "description": "스크린 레이아웃 변형",
+      "label": "디스플레이 모드"
+    },
+    "displayUnits": {
+      "description": "단위 표시 형식",
+      "label": "단위 표시"
+    },
+    "flipScreen": {
+      "description": "화면 180도 뒤집기",
+      "label": "화면 뒤집기"
+    },
+    "gpsDisplayUnits": {
+      "description": "좌표 표시 형식",
+      "label": "GPS 표시 단위"
+    },
+    "oledType": {
+      "description": "장치에 부착된 OLED 화면의 유형",
+      "label": "OLED 타입"
+    },
+    "screenTimeout": {
+      "description": "디스플레이가 꺼지기까지 걸리는 시간",
+      "label": "화면 끄기 시간"
+    },
+    "twelveHourClock": {
+      "description": "12시간제 보기",
+      "label": "12시간제"
+    },
+    "wakeOnTapOrMotion": {
+      "description": "탭하거나 모션으로 깨우기",
+      "label": "탭하거나 모션으로 깨우기"
+    }
+  },
+  "lora": {
+    "title": "Mesh 설정",
+    "description": "LoRa mesh 설정",
+    "bandwidth": {
+      "description": "채널 대역폭 MHz",
+      "label": "대역폭"
+    },
+    "boostedRxGain": {
+      "description": "수신 부스트 gain",
+      "label": "수신 부스트 Gain"
+    },
+    "codingRate": {
+      "description": "Coding rate의 분모",
+      "label": "Coding rate"
+    },
+    "frequencyOffset": {
+      "description": "크리스탈 교정 오차를 보정하기 위한 주파수 오프셋",
+      "label": "주파수 오프셋"
+    },
+    "frequencySlot": {
+      "description": "LoRa 주파수 채널 번호",
+      "label": "주파수 슬롯"
+    },
+    "hopLimit": {
+      "description": "최고 hops 수",
+      "label": "Hop  제한"
+    },
+    "ignoreMqtt": {
+      "description": "MQTT로 부터 mesh로 메시지를를 전달하지 않습니다",
+      "label": "MQTT로 부터 수신 무시"
+    },
+    "modemPreset": {
+      "description": "모뎀 프리셋 사용",
+      "label": "모뎀 프리셋"
+    },
+    "okToMqtt": {
+      "description": "이 설정을 true로 하면 사용자가 패킷을 MQTT에 업로드하는 것을 허용하고, false 이면 원격 노드들은 패킷을 MQTT로 전달하지 않도록 요청됩니다",
+      "label": "MQTT로 전송 허용"
+    },
+    "overrideDutyCycle": {
+      "description": "Duty Cycle 무시",
+      "label": "Duty Cycle 무시"
+    },
+    "overrideFrequency": {
+      "description": "해당 주파수 강제 설정",
+      "label": "주파수 오버라이드"
+    },
+    "region": {
+      "description": "당신의 노드의 지역을 설정하세요",
+      "label": "지역"
+    },
+    "spreadingFactor": {
+      "description": "Indicates the number of chirps per symbol",
+      "label": "Spread factor"
+    },
+    "transmitEnabled": {
+      "description": "LoRa 전송(TX)을 활성화/비활성화합니다",
+      "label": "전송 활성화"
+    },
+    "transmitPower": {
+      "description": "최대 전송 출력",
+      "label": "전송 출력"
+    },
+    "usePreset": {
+      "description": "사전 정의된 모뎀프리셋을 사용하세요",
+      "label": "프리셋 사용"
+    },
+    "meshSettings": {
+      "description": "LoRa mesh 설정",
+      "label": "Mesh 설정"
+    },
+    "waveformSettings": {
+      "description": "LoRa 파형 설정",
+      "label": "파형 설정"
+    },
+    "radioSettings": {
+      "label": "무선 설정",
+      "description": "LoRa 무선 설정"
+    }
+  },
+  "network": {
+    "title": "WiFi 설정",
+    "description": "WiFi 설정",
+    "note": "참고: 일부 장치(ESP32)는 블루투스와 와이파이를 동시에 사용할 수 없습니다.",
+    "addressMode": {
+      "description": "주소 할당 선택",
+      "label": "주소 모드"
+    },
+    "dns": {
+      "description": "DNS 서버",
+      "label": "DNS"
+    },
+    "ethernetEnabled": {
+      "description": "이더넷 포트 활성화하거나 비활성화",
+      "label": "활성화"
+    },
+    "gateway": {
+      "description": "기본 게이트웨이",
+      "label": "게이트웨이"
+    },
+    "ip": {
+      "description": "IP 주소",
+      "label": "IP"
+    },
+    "psk": {
+      "description": "네트워크 암호",
+      "label": "PSK"
+    },
+    "ssid": {
+      "description": "네트워크 이름",
+      "label": "SSID"
+    },
+    "subnet": {
+      "description": "서브넷 마스크",
+      "label": "서브넷"
+    },
+    "wifiEnabled": {
+      "description": "WiFi를 활성화하거나 비활성화",
+      "label": "활성화"
+    },
+    "meshViaUdp": {
+      "label": "UDP를 통한 Mesh"
+    },
+    "ntpServer": {
+      "label": "NTP 서버"
+    },
+    "rsyslogServer": {
+      "label": "Rsyslog 서버"
+    },
+    "ethernetConfigSettings": {
+      "description": "이더넷 포트 설정",
+      "label": "이더넷 설정"
+    },
+    "ipConfigSettings": {
+      "description": "IP 설정",
+      "label": "IP 설정"
+    },
+    "ntpConfigSettings": {
+      "description": "NTP 설정",
+      "label": "NTP 설정"
+    },
+    "rsyslogConfigSettings": {
+      "description": "Rsyslog 설정",
+      "label": "Rsyslog 설정"
+    },
+    "udpConfigSettings": {
+      "description": "UDP over Mesh 설정",
+      "label": "UDP 설정"
+    }
+  },
+  "position": {
+    "title": "위치 설정",
+    "description": "위치 설정",
+    "broadcastInterval": {
+      "description": "메쉬를 통해 당신의 위치 정보가 전송되는 빈도",
+      "label": "전송 간격"
+    },
+    "enablePin": {
+      "description": "GPS module enable pin override",
+      "label": "Enable Pin"
+    },
+    "fixedPosition": {
+      "description": "Don't report GPS position, but a manually-specified one",
+      "label": "Fixed Position"
+    },
+    "gpsMode": {
+      "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
+      "label": "GPS Mode"
+    },
+    "gpsUpdateInterval": {
+      "description": "How often a GPS fix should be acquired",
+      "label": "GPS Update Interval"
+    },
+    "positionFlags": {
+      "description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
+      "label": "Position Flags"
+    },
+    "receivePin": {
+      "description": "GPS module RX pin override",
+      "label": "Receive Pin"
+    },
+    "smartPositionEnabled": {
+      "description": "Only send position when there has been a meaningful change in location",
+      "label": "Enable Smart Position"
+    },
+    "smartPositionMinDistance": {
+      "description": "Minimum distance (in meters) that must be traveled before a position update is sent",
+      "label": "Smart Position Minimum Distance"
+    },
+    "smartPositionMinInterval": {
+      "description": "Minimum interval (in seconds) that must pass before a position update is sent",
+      "label": "Smart Position Minimum Interval"
+    },
+    "transmitPin": {
+      "description": "GPS module TX pin override",
+      "label": "Transmit Pin"
+    },
+    "intervalsSettings": {
+      "description": "How often to send position updates",
+      "label": "Intervals"
+    },
+    "flags": {
+      "placeholder": "Select position flags...",
+      "altitude": "Altitude",
+      "altitudeGeoidalSeparation": "Altitude Geoidal Separation",
+      "altitudeMsl": "Altitude is Mean Sea Level",
+      "dop": "Dilution of precision (DOP) PDOP used by default",
+      "hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
+      "numSatellites": "Number of satellites",
+      "sequenceNumber": "Sequence number",
+      "timestamp": "타임스탬프",
+      "unset": "해제",
+      "vehicleHeading": "Vehicle heading",
+      "vehicleSpeed": "Vehicle speed"
+    }
+  },
+  "power": {
+    "adcMultiplierOverride": {
+      "description": "Used for tweaking battery voltage reading",
+      "label": "ADC Multiplier Override ratio"
+    },
+    "ina219Address": {
+      "description": "Address of the INA219 battery monitor",
+      "label": "INA219 Address"
+    },
+    "lightSleepDuration": {
+      "description": "How long the device will be in light sleep for",
+      "label": "Light Sleep Duration"
+    },
+    "minimumWakeTime": {
+      "description": "Minimum amount of time the device will stay awake for after receiving a packet",
+      "label": "Minimum Wake Time"
+    },
+    "noConnectionBluetoothDisabled": {
+      "description": "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
+      "label": "No Connection Bluetooth Disabled"
+    },
+    "powerSavingEnabled": {
+      "description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
+      "label": "저전력 모드 설정"
+    },
+    "shutdownOnBatteryDelay": {
+      "description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
+      "label": "Shutdown on battery delay"
+    },
+    "superDeepSleepDuration": {
+      "description": "How long the device will be in super deep sleep for",
+      "label": "Super Deep Sleep Duration"
+    },
+    "powerConfigSettings": {
+      "description": "Settings for the power module",
+      "label": "전원 설정"
+    },
+    "sleepSettings": {
+      "description": "Sleep settings for the power module",
+      "label": "Sleep Settings"
+    }
+  },
+  "security": {
+    "description": "Settings for the Security configuration",
+    "title": "Security Settings",
+    "button_backupKey": "백업 키",
+    "adminChannelEnabled": {
+      "description": "Allow incoming device control over the insecure legacy admin channel",
+      "label": "Allow Legacy Admin"
+    },
+    "enableDebugLogApi": {
+      "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+      "label": "Enable Debug Log API"
+    },
+    "managed": {
+      "description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
+      "label": "Managed"
+    },
+    "privateKey": {
+      "description": "Used to create a shared key with a remote device",
+      "label": "개인 키"
+    },
+    "publicKey": {
+      "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+      "label": "공개 키"
+    },
+    "primaryAdminKey": {
+      "description": "The primary public key authorized to send admin messages to this node",
+      "label": "Primary Admin Key"
+    },
+    "secondaryAdminKey": {
+      "description": "The secondary public key authorized to send admin messages to this node",
+      "label": "Secondary Admin Key"
+    },
+    "serialOutputEnabled": {
+      "description": "Serial Console over the Stream API",
+      "label": "Serial Output Enabled"
+    },
+    "tertiaryAdminKey": {
+      "description": "The tertiary public key authorized to send admin messages to this node",
+      "label": "Tertiary Admin Key"
+    },
+    "adminSettings": {
+      "description": "Settings for Admin",
+      "label": "Admin Settings"
+    },
+    "loggingSettings": {
+      "description": "Settings for Logging",
+      "label": "Logging Settings"
+    }
+  },
+  "user": {
+    "title": "User Settings",
+    "description": "Configure your device name and identity settings",
+    "longName": {
+      "label": "긴 이름",
+      "description": "Your full display name (1-40 characters)",
+      "validation": {
+        "min": "Long name must be at least 1 character",
+        "max": "Long name must be at most 40 characters"
+      }
+    },
+    "shortName": {
+      "label": "짧은 이름",
+      "description": "Your abbreviated name (2-4 characters)",
+      "validation": {
+        "min": "Short name must be at least 2 characters",
+        "max": "Short name must be at most 4 characters"
+      }
+    },
+    "isUnmessageable": {
+      "label": "메시지 제한",
+      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+    },
+    "isLicensed": {
+      "label": "아마추어무선 자격 보유 (HAM)",
+      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+    }
+  }
+}

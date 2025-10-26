@@ -1,0 +1,458 @@
+{
+  "page": {
+    "title": "Ayarlar",
+    "tabUser": "Kullanıcı",
+    "tabChannels": "Kanallar",
+    "tabBluetooth": "Bluetooth",
+    "tabDevice": "Cihaz",
+    "tabDisplay": "Ekran",
+    "tabLora": "LoRa",
+    "tabNetwork": "Ağ",
+    "tabPosition": "Konum",
+    "tabPower": "Güç",
+    "tabSecurity": "Güvenlik"
+  },
+  "sidebar": {
+    "label": "Yapılandırma"
+  },
+  "device": {
+    "title": "Cihaz Ayarları",
+    "description": "Cihazınız için ayar",
+    "buttonPin": {
+      "description": "Buton pini geçersiz kılma",
+      "label": "Buton pini"
+    },
+    "buzzerPin": {
+      "description": "Buzzer pinini geçersiz kıl",
+      "label": "Buzer pini"
+    },
+    "disableTripleClick": {
+      "description": "Üçlü tıklamayı kapat",
+      "label": "Üçlü Tıklamayı Kapat"
+    },
+    "doubleTapAsButtonPress": {
+      "description": "Çift dokunuşu düğmeye basma olarak kabul edin",
+      "label": "Çift Dokunarak Düğmeye Bas"
+    },
+    "ledHeartbeatDisabled": {
+      "description": "Varsayılan LED yanıp sönmesini kapat",
+      "label": "LED Kalp Atışı Kapalı"
+    },
+    "nodeInfoBroadcastInterval": {
+      "description": "Ne sıklıkla node bilgi göndersin",
+      "label": "Node Bilgisi Yayın Aralığı"
+    },
+    "posixTimezone": {
+      "description": "The POSIX timezone string for the device",
+      "label": "POSIX Zaman Dilimi"
+    },
+    "rebroadcastMode": {
+      "description": "How to handle rebroadcasting",
+      "label": "Rebroadcast Mode"
+    },
+    "role": {
+      "description": "What role the device performs on the mesh",
+      "label": "Rol"
+    }
+  },
+  "bluetooth": {
+    "title": "Bluetooth Ayarları",
+    "description": "Bluetooth modül ayarları",
+    "note": "Not: Bazı cihazlar (ESP32) aynı anda Bluetooth ve WiFi kullanamazlar.",
+    "enabled": {
+      "description": "Bluetooth Aç ya da Kapat",
+      "label": "Etkin"
+    },
+    "pairingMode": {
+      "description": "Pin selection behaviour.",
+      "label": "Eşleştirme Modu"
+    },
+    "pin": {
+      "description": "Pin to use when pairing",
+      "label": "Pin"
+    }
+  },
+  "display": {
+    "description": "Settings for the device display",
+    "title": "Ekran Ayarları",
+    "headingBold": {
+      "description": "Bolden the heading text",
+      "label": "Bold Heading"
+    },
+    "carouselDelay": {
+      "description": "How fast to cycle through windows",
+      "label": "Carousel Delay"
+    },
+    "compassNorthTop": {
+      "description": "Fix north to the top of compass",
+      "label": "Compass North Top"
+    },
+    "displayMode": {
+      "description": "Screen layout variant",
+      "label": "Display Mode"
+    },
+    "displayUnits": {
+      "description": "Display metric or imperial units",
+      "label": "Display Units"
+    },
+    "flipScreen": {
+      "description": "Ekranı 180 derece dönder",
+      "label": "Ekranı Dönder"
+    },
+    "gpsDisplayUnits": {
+      "description": "Coordinate display format",
+      "label": "GPS format"
+    },
+    "oledType": {
+      "description": "Cihazın OLED ekran tipi",
+      "label": "OLED Tipi"
+    },
+    "screenTimeout": {
+      "description": "Turn off the display after this long",
+      "label": "Screen Timeout"
+    },
+    "twelveHourClock": {
+      "description": "12 saat formatını kullan",
+      "label": "12 saatlik zaman"
+    },
+    "wakeOnTapOrMotion": {
+      "description": "Cihazı uyandırmak için dokun veya hareket ettir",
+      "label": "Wake on Tap or Motion"
+    }
+  },
+  "lora": {
+    "title": "Mesh Ayarları",
+    "description": "Settings for the LoRa mesh",
+    "bandwidth": {
+      "description": "Channel bandwidth in MHz",
+      "label": "Bant genişliği"
+    },
+    "boostedRxGain": {
+      "description": "Boosted RX gain",
+      "label": "Boosted RX Gain"
+    },
+    "codingRate": {
+      "description": "The denominator of the coding rate",
+      "label": "Coding Rate"
+    },
+    "frequencyOffset": {
+      "description": "Frequency offset to correct for crystal calibration errors",
+      "label": "Frequency Offset"
+    },
+    "frequencySlot": {
+      "description": "LoRa kanal frekans numarası",
+      "label": "Frequency Slot"
+    },
+    "hopLimit": {
+      "description": "Maximum number of hops",
+      "label": "Hop Limiti"
+    },
+    "ignoreMqtt": {
+      "description": "Don't forward MQTT messages over the mesh",
+      "label": "MQTT'yi Yoksay"
+    },
+    "modemPreset": {
+      "description": "Modem preset to use",
+      "label": "Modem Ön Ayarı"
+    },
+    "okToMqtt": {
+      "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+      "label": "MQTT'ye Tamam"
+    },
+    "overrideDutyCycle": {
+      "description": "Görev Döngüsünü Geçersiz Kıl",
+      "label": "Görev Döngüsünü Geçersiz Kıl"
+    },
+    "overrideFrequency": {
+      "description": "Override frequency",
+      "label": "Override Frequency"
+    },
+    "region": {
+      "description": "Düğümün için bölge seç",
+      "label": "Bölge"
+    },
+    "spreadingFactor": {
+      "description": "Indicates the number of chirps per symbol",
+      "label": "Spreading Factor"
+    },
+    "transmitEnabled": {
+      "description": "Enable/Disable transmit (TX) from the LoRa radio",
+      "label": "Transmit Enabled"
+    },
+    "transmitPower": {
+      "description": "Max transmit power",
+      "label": "Transmit Power"
+    },
+    "usePreset": {
+      "description": "Use one of the predefined modem presets",
+      "label": "Use Preset"
+    },
+    "meshSettings": {
+      "description": "Settings for the LoRa mesh",
+      "label": "Mesh Ayarları"
+    },
+    "waveformSettings": {
+      "description": "Settings for the LoRa waveform",
+      "label": "Waveform Settings"
+    },
+    "radioSettings": {
+      "label": "Radyo Ayarları",
+      "description": "Settings for the LoRa radio"
+    }
+  },
+  "network": {
+    "title": "WiFi Ayarı",
+    "description": "WiFi radyo ayarı",
+    "note": "Not: Bazı cihazlar (ESP32) aynı anda Bluetooth ve WiFi kullanamazlar.",
+    "addressMode": {
+      "description": "Address assignment selection",
+      "label": "Address Mode"
+    },
+    "dns": {
+      "description": "DNS Sunucusu",
+      "label": "DNS"
+    },
+    "ethernetEnabled": {
+      "description": "Ethernet portunu aç ya da kapat",
+      "label": "Açık"
+    },
+    "gateway": {
+      "description": "Varsayılan Geçit",
+      "label": "Ağ geçidi"
+    },
+    "ip": {
+      "description": "IP Adresi",
+      "label": "IP"
+    },
+    "psk": {
+      "description": "Ağ şifresi",
+      "label": "PSK"
+    },
+    "ssid": {
+      "description": "Ağ adı",
+      "label": "SSID"
+    },
+    "subnet": {
+      "description": "Subnet Mask",
+      "label": "Alt ağ"
+    },
+    "wifiEnabled": {
+      "description": "Enable or disable the WiFi radio",
+      "label": "Açık"
+    },
+    "meshViaUdp": {
+      "label": "UDP ile Mesh"
+    },
+    "ntpServer": {
+      "label": "NTP Sunucusu"
+    },
+    "rsyslogServer": {
+      "label": "Rsyslog Server"
+    },
+    "ethernetConfigSettings": {
+      "description": "Ethernet port configuration",
+      "label": "Ethernet Config"
+    },
+    "ipConfigSettings": {
+      "description": "IP yapılandırması",
+      "label": "IP Ayarı"
+    },
+    "ntpConfigSettings": {
+      "description": "NTP configuration",
+      "label": "NTP Config"
+    },
+    "rsyslogConfigSettings": {
+      "description": "Rsyslog configuration",
+      "label": "Rsyslog Config"
+    },
+    "udpConfigSettings": {
+      "description": "UDP over Mesh configuration",
+      "label": "UDP Ayarları"
+    }
+  },
+  "position": {
+    "title": "Position Settings",
+    "description": "Settings for the position module",
+    "broadcastInterval": {
+      "description": "How often your position is sent out over the mesh",
+      "label": "Broadcast Interval"
+    },
+    "enablePin": {
+      "description": "GPS module enable pin override",
+      "label": "Enable Pin"
+    },
+    "fixedPosition": {
+      "description": "Don't report GPS position, but a manually-specified one",
+      "label": "Fixed Position"
+    },
+    "gpsMode": {
+      "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
+      "label": "GPS Modu"
+    },
+    "gpsUpdateInterval": {
+      "description": "How often a GPS fix should be acquired",
+      "label": "GPS Update Interval"
+    },
+    "positionFlags": {
+      "description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
+      "label": "Position Flags"
+    },
+    "receivePin": {
+      "description": "GPS module RX pin override",
+      "label": "Receive Pin"
+    },
+    "smartPositionEnabled": {
+      "description": "Only send position when there has been a meaningful change in location",
+      "label": "Enable Smart Position"
+    },
+    "smartPositionMinDistance": {
+      "description": "Minimum distance (in meters) that must be traveled before a position update is sent",
+      "label": "Smart Position Minimum Distance"
+    },
+    "smartPositionMinInterval": {
+      "description": "Minimum interval (in seconds) that must pass before a position update is sent",
+      "label": "Smart Position Minimum Interval"
+    },
+    "transmitPin": {
+      "description": "GPS module TX pin override",
+      "label": "Transmit Pin"
+    },
+    "intervalsSettings": {
+      "description": "How often to send position updates",
+      "label": "Intervals"
+    },
+    "flags": {
+      "placeholder": "Select position flags...",
+      "altitude": "Rakım",
+      "altitudeGeoidalSeparation": "Altitude Geoidal Separation",
+      "altitudeMsl": "Altitude is Mean Sea Level",
+      "dop": "Dilution of precision (DOP) PDOP used by default",
+      "hdopVdop": "If DOP is set, use HDOP / VDOP values instead of PDOP",
+      "numSatellites": "Uydu sayısı",
+      "sequenceNumber": "Sequence number",
+      "timestamp": "Zaman Damgası",
+      "unset": "Ayarlanmamış",
+      "vehicleHeading": "Vehicle heading",
+      "vehicleSpeed": "Vehicle speed"
+    }
+  },
+  "power": {
+    "adcMultiplierOverride": {
+      "description": "Used for tweaking battery voltage reading",
+      "label": "ADC Multiplier Override ratio"
+    },
+    "ina219Address": {
+      "description": "Address of the INA219 battery monitor",
+      "label": "INA219 Address"
+    },
+    "lightSleepDuration": {
+      "description": "How long the device will be in light sleep for",
+      "label": "Light Sleep Duration"
+    },
+    "minimumWakeTime": {
+      "description": "Minimum amount of time the device will stay awake for after receiving a packet",
+      "label": "Minimum Wake Time"
+    },
+    "noConnectionBluetoothDisabled": {
+      "description": "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
+      "label": "No Connection Bluetooth Disabled"
+    },
+    "powerSavingEnabled": {
+      "description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
+      "label": "Güç tasarrufu modunu etkinleştir"
+    },
+    "shutdownOnBatteryDelay": {
+      "description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
+      "label": "Shutdown on battery delay"
+    },
+    "superDeepSleepDuration": {
+      "description": "How long the device will be in super deep sleep for",
+      "label": "Super Deep Sleep Duration"
+    },
+    "powerConfigSettings": {
+      "description": "Settings for the power module",
+      "label": "Güç Ayarı"
+    },
+    "sleepSettings": {
+      "description": "Sleep settings for the power module",
+      "label": "Uyku Ayarları"
+    }
+  },
+  "security": {
+    "description": "Settings for the Security configuration",
+    "title": "Security Settings",
+    "button_backupKey": "Yedekleme Anahtarı",
+    "adminChannelEnabled": {
+      "description": "Gelen cihaza güvenli olmayan eski yönetici kanalı üzerinde kontrol izni verin",
+      "label": "Eski Yöneticiye İzin Ver"
+    },
+    "enableDebugLogApi": {
+      "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+      "label": "Enable Debug Log API"
+    },
+    "managed": {
+      "description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
+      "label": "Managed"
+    },
+    "privateKey": {
+      "description": "Used to create a shared key with a remote device",
+      "label": "Özel Anahtar"
+    },
+    "publicKey": {
+      "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+      "label": "Genel Anahtar"
+    },
+    "primaryAdminKey": {
+      "description": "The primary public key authorized to send admin messages to this node",
+      "label": "Primary Admin Key"
+    },
+    "secondaryAdminKey": {
+      "description": "The secondary public key authorized to send admin messages to this node",
+      "label": "Secondary Admin Key"
+    },
+    "serialOutputEnabled": {
+      "description": "Serial Console over the Stream API",
+      "label": "Serial Output Enabled"
+    },
+    "tertiaryAdminKey": {
+      "description": "The tertiary public key authorized to send admin messages to this node",
+      "label": "Tertiary Admin Key"
+    },
+    "adminSettings": {
+      "description": "Yönetici Ayarı",
+      "label": "Yönetici Ayarları"
+    },
+    "loggingSettings": {
+      "description": "Settings for Logging",
+      "label": "Logging Settings"
+    }
+  },
+  "user": {
+    "title": "User Settings",
+    "description": "Configure your device name and identity settings",
+    "longName": {
+      "label": "Uzun Ad",
+      "description": "Your full display name (1-40 characters)",
+      "validation": {
+        "min": "Long name must be at least 1 character",
+        "max": "Long name must be at most 40 characters"
+      }
+    },
+    "shortName": {
+      "label": "Kısa Ad",
+      "description": "Your abbreviated name (2-4 characters)",
+      "validation": {
+        "min": "Short name must be at least 2 characters",
+        "max": "Short name must be at most 4 characters"
+      }
+    },
+    "isUnmessageable": {
+      "label": "Mesaj gönderilemez",
+      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+    },
+    "isLicensed": {
+      "label": "Lisanslı amatör radyo",
+      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+    }
+  }
+}

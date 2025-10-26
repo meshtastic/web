@@ -15,7 +15,6 @@
       "messages": "Messaggi",
       "map": "Mappa",
       "config": "Configurazione",
-      "channels": "Canali",
       "nodes": "Nodi"
     }
   },
@@ -45,7 +44,8 @@
     "label": "Debug",
     "command": {
       "reconfigure": "Riconfigura",
-      "clearAllStoredMessages": "Cancella Tutti i Messaggi Memorizzati"
+      "clearAllStoredMessages": "Cancella Tutti i Messaggi Memorizzati",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }

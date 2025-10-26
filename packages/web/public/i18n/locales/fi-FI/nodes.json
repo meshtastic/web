@@ -1,63 +1,59 @@
 {
-	"nodeDetail": {
-		"publicKeyEnabled": {
-			"label": "Julkinen avain käytössä"
-		},
-		"noPublicKey": {
-			"label": "Ei julkinen avain"
-		},
-		"directMessage": {
-			"label": "Suora Viesti {{shortName}}"
-		},
-		"favorite": {
-			"label": "Suosikki",
-			"tooltip": "Lisää tai poista tämä laite suosikeistasi"
-		},
-		"notFavorite": {
-			"label": "Ei suosikki"
-		},
-		"error": {
-			"label": "Virhe",
-			"text": "Tapahtui virhe haettaessa laitteen tietoja. Yritä uudelleen myöhemmin."
-		},
-		"status": {
-			"heard": "Kuultu",
-			"mqtt": "MQTT"
-		},
-		"elevation": {
-			"label": "Korkeus"
-		},
-		"channelUtil": {
-			"label": "Kanavan käyttö"
-		},
-		"airtimeUtil": {
-			"label": "Lähetysajan käyttö"
-		}
-	},
-	"nodesTable": {
-		"headings": {
-			"longName": "Pitkä nimi",
-			"connection": "Yhteys",
-			"lastHeard": "Viimeksi kuultu",
-			"encryption": "Salaus",
-			"model": "Malli",
-			"macAddress": "MAC-osoite"
-		},
-		"connectionStatus": {
-			"direct": "Suora",
-			"away": "poissa",
-			"unknown": "-",
-			"viaMqtt": ", MQTT välityksellä"
-		},
-		"lastHeardStatus": {
-			"never": "Ei koskaan"
-		}
-	},
-	"actions": {
-		"added": "Lisätty",
-		"removed": "Poistettu",
-		"ignoreNode": "Älä huomioi laitetta",
-		"unignoreNode": "Huomioi laite uudelleen",
-		"requestPosition": "Pyydä sijaintia"
-	}
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Julkinen avain käytössä"
+    },
+    "noPublicKey": {
+      "label": "Ei julkinen avain"
+    },
+    "directMessage": {
+      "label": "Suora Viesti {{shortName}}"
+    },
+    "favorite": {
+      "label": "Suosikki",
+      "tooltip": "Lisää tai poista tämä laite suosikeistasi"
+    },
+    "notFavorite": {
+      "label": "Ei suosikki"
+    },
+    "error": {
+      "label": "Virhe",
+      "text": "Tapahtui virhe haettaessa laitteen tietoja. Yritä uudelleen myöhemmin."
+    },
+    "status": {
+      "heard": "Kuultu",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Korkeus"
+    },
+    "channelUtil": {
+      "label": "Kanavan käyttö"
+    },
+    "airtimeUtil": {
+      "label": "Lähetysajan käyttö"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "Pitkä nimi",
+      "connection": "Yhteys",
+      "lastHeard": "Viimeksi kuultu",
+      "encryption": "Salaus",
+      "model": "Malli",
+      "macAddress": "MAC-osoite"
+    },
+    "connectionStatus": {
+      "direct": "Suora",
+      "away": "poissa",
+      "viaMqtt": ", MQTT välityksellä"
+    }
+  },
+  "actions": {
+    "added": "Lisätty",
+    "removed": "Poistettu",
+    "ignoreNode": "Älä huomioi laitetta",
+    "unignoreNode": "Huomioi laite uudelleen",
+    "requestPosition": "Pyydä sijaintia"
+  }
 }

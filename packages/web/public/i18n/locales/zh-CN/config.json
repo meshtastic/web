@@ -1,0 +1,458 @@
+{
+  "page": {
+    "title": "设置",
+    "tabUser": "用户",
+    "tabChannels": "频道",
+    "tabBluetooth": "蓝牙",
+    "tabDevice": "设备",
+    "tabDisplay": "显示",
+    "tabLora": "LoRa",
+    "tabNetwork": "网络",
+    "tabPosition": "定位",
+    "tabPower": "电源",
+    "tabSecurity": "安全"
+  },
+  "sidebar": {
+    "label": "Configuration"
+  },
+  "device": {
+    "title": "Device Settings",
+    "description": "Settings for the device",
+    "buttonPin": {
+      "description": "Button pin override",
+      "label": "Button Pin"
+    },
+    "buzzerPin": {
+      "description": "Buzzer pin override",
+      "label": "Buzzer Pin"
+    },
+    "disableTripleClick": {
+      "description": "Disable triple click",
+      "label": "Disable Triple Click"
+    },
+    "doubleTapAsButtonPress": {
+      "description": "Treat double tap as button press",
+      "label": "Double Tap as Button Press"
+    },
+    "ledHeartbeatDisabled": {
+      "description": "Disable default blinking LED",
+      "label": "LED Heartbeat Disabled"
+    },
+    "nodeInfoBroadcastInterval": {
+      "description": "How often to broadcast node info",
+      "label": "Node Info Broadcast Interval"
+    },
+    "posixTimezone": {
+      "description": "The POSIX timezone string for the device",
+      "label": "POSIX 时区"
+    },
+    "rebroadcastMode": {
+      "description": "How to handle rebroadcasting",
+      "label": "转播模式"
+    },
+    "role": {
+      "description": "What role the device performs on the mesh",
+      "label": "角色"
+    }
+  },
+  "bluetooth": {
+    "title": "Bluetooth Settings",
+    "description": "Settings for the Bluetooth module",
+    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "enabled": {
+      "description": "Enable or disable Bluetooth",
+      "label": "启用"
+    },
+    "pairingMode": {
+      "description": "Pin selection behaviour.",
+      "label": "配对模式"
+    },
+    "pin": {
+      "description": "Pin to use when pairing",
+      "label": "Pin"
+    }
+  },
+  "display": {
+    "description": "Settings for the device display",
+    "title": "Display Settings",
+    "headingBold": {
+      "description": "Bolden the heading text",
+      "label": "Bold Heading"
+    },
+    "carouselDelay": {
+      "description": "How fast to cycle through windows",
+      "label": "Carousel Delay"
+    },
+    "compassNorthTop": {
+      "description": "Fix north to the top of compass",
+      "label": "Compass North Top"
+    },
+    "displayMode": {
+      "description": "Screen layout variant",
+      "label": "显示模式"
+    },
+    "displayUnits": {
+      "description": "Display metric or imperial units",
+      "label": "显示单位"
+    },
+    "flipScreen": {
+      "description": "Flip display 180 degrees",
+      "label": "Flip Screen"
+    },
+    "gpsDisplayUnits": {
+      "description": "Coordinate display format",
+      "label": "GPS Display Units"
+    },
+    "oledType": {
+      "description": "Type of OLED screen attached to the device",
+      "label": "OLED 类型"
+    },
+    "screenTimeout": {
+      "description": "Turn off the display after this long",
+      "label": "Screen Timeout"
+    },
+    "twelveHourClock": {
+      "description": "Use 12-hour clock format",
+      "label": "12-Hour Clock"
+    },
+    "wakeOnTapOrMotion": {
+      "description": "Wake the device on tap or motion",
+      "label": "Wake on Tap or Motion"
+    }
+  },
+  "lora": {
+    "title": "Mesh Settings",
+    "description": "Settings for the LoRa mesh",
+    "bandwidth": {
+      "description": "Channel bandwidth in MHz",
+      "label": "带宽"
+    },
+    "boostedRxGain": {
+      "description": "Boosted RX gain",
+      "label": "Boosted RX Gain"
+    },
+    "codingRate": {
+      "description": "The denominator of the coding rate",
+      "label": "编码率"
+    },
+    "frequencyOffset": {
+      "description": "Frequency offset to correct for crystal calibration errors",
+      "label": "Frequency Offset"
+    },
+    "frequencySlot": {
+      "description": "LoRa frequency channel number",
+      "label": "Frequency Slot"
+    },
+    "hopLimit": {
+      "description": "Maximum number of hops",
+      "label": "Hop Limit"
+    },
+    "ignoreMqtt": {
+      "description": "Don't forward MQTT messages over the mesh",
+      "label": "忽略 MQTT"
+    },
+    "modemPreset": {
+      "description": "Modem preset to use",
+      "label": "调制解调器预设"
+    },
+    "okToMqtt": {
+      "description": "When set to true, this configuration indicates that the user approves the packet to be uploaded to MQTT. If set to false, remote nodes are requested not to forward packets to MQTT",
+      "label": "使用MQTT"
+    },
+    "overrideDutyCycle": {
+      "description": "覆盖占空比",
+      "label": "覆盖占空比"
+    },
+    "overrideFrequency": {
+      "description": "Override frequency",
+      "label": "Override Frequency"
+    },
+    "region": {
+      "description": "Sets the region for your node",
+      "label": "区域"
+    },
+    "spreadingFactor": {
+      "description": "Indicates the number of chirps per symbol",
+      "label": "Spreading Factor"
+    },
+    "transmitEnabled": {
+      "description": "Enable/Disable transmit (TX) from the LoRa radio",
+      "label": "启用传输"
+    },
+    "transmitPower": {
+      "description": "Max transmit power",
+      "label": "Transmit Power"
+    },
+    "usePreset": {
+      "description": "Use one of the predefined modem presets",
+      "label": "使用预设"
+    },
+    "meshSettings": {
+      "description": "Settings for the LoRa mesh",
+      "label": "Mesh Settings"
+    },
+    "waveformSettings": {
+      "description": "Settings for the LoRa waveform",
+      "label": "Waveform Settings"
+    },
+    "radioSettings": {
+      "label": "Radio Settings",
+      "description": "Settings for the LoRa radio"
+    }
+  },
+  "network": {
+    "title": "WiFi Config",
+    "description": "WiFi radio configuration",
+    "note": "Note: Some devices (ESP32) cannot use both Bluetooth and WiFi at the same time.",
+    "addressMode": {
+      "description": "Address assignment selection",
+      "label": "Address Mode"
+    },
+    "dns": {
+      "description": "DNS Server",
+      "label": "DNS"
+    },
+    "ethernetEnabled": {
+      "description": "Enable or disable the Ethernet port",
+      "label": "启用"
+    },
+    "gateway": {
+      "description": "Default Gateway",
+      "label": "网关"
+    },
+    "ip": {
+      "description": "IP Address",
+      "label": "IP"
+    },
+    "psk": {
+      "description": "Network password",
+      "label": "共享密钥/PSK"
+    },
+    "ssid": {
+      "description": "Network name",
+      "label": "SSID"
+    },
+    "subnet": {
+      "description": "Subnet Mask",
+      "label": "子网"
+    },
+    "wifiEnabled": {
+      "description": "Enable or disable the WiFi radio",
+      "label": "启用"
+    },
+    "meshViaUdp": {
+      "label": "Mesh via UDP"
+    },
+    "ntpServer": {
+      "label": "NTP Server"
+    },
+    "rsyslogServer": {
+      "label": "Rsyslog Server"
+    },
+    "ethernetConfigSettings": {
+      "description": "Ethernet port configuration",
+      "label": "Ethernet Config"
+    },
+    "ipConfigSettings": {
+      "description": "IP configuration",
+      "label": "IP Config"
+    },
+    "ntpConfigSettings": {
+      "description": "NTP configuration",
+      "label": "NTP Config"
+    },
+    "rsyslogConfigSettings": {
+      "description": "Rsyslog configuration",
+      "label": "Rsyslog Config"
+    },
+    "udpConfigSettings": {
+      "description": "UDP over Mesh configuration",
+      "label": "UDP 设置"
+    }
+  },
+  "position": {
+    "title": "Position Settings",
+    "description": "Settings for the position module",
+    "broadcastInterval": {
+      "description": "How often your position is sent out over the mesh",
+      "label": "广播间隔"
+    },
+    "enablePin": {
+      "description": "GPS module enable pin override",
+      "label": "Enable Pin"
+    },
+    "fixedPosition": {
+      "description": "Don't report GPS position, but a manually-specified one",
+      "label": "Fixed Position"
+    },
+    "gpsMode": {
+      "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
+      "label": "GPS Mode"
+    },
+    "gpsUpdateInterval": {
+      "description": "How often a GPS fix should be acquired",
+      "label": "GPS Update Interval"
+    },
+    "positionFlags": {
+      "description": "Optional fields to include when assembling position messages. The more fields are selected, the larger the message will be leading to longer airtime usage and a higher risk of packet loss.",
+      "label": "Position Flags"
+    },
+    "receivePin": {
+      "description": "GPS module RX pin override",
+      "label": "Receive Pin"
+    },
+    "smartPositionEnabled": {
+      "description": "Only send position when there has been a meaningful change in location",
+      "label": "Enable Smart Position"
+    },
+    "smartPositionMinDistance": {
+      "description": "Minimum distance (in meters) that must be traveled before a position update is sent",
+      "label": "Smart Position Minimum Distance"
+    },
+    "smartPositionMinInterval": {
+      "description": "Minimum interval (in seconds) that must pass before a position update is sent",
+      "label": "Smart Position Minimum Interval"
+    },
+    "transmitPin": {
+      "description": "GPS module TX pin override",
+      "label": "Transmit Pin"
+    },
+    "intervalsSettings": {
+      "description": "How often to send position updates",
+      "label": "Intervals"
+    },
+    "flags": {
+      "placeholder": "Select position flags...",
+      "altitude": "Altitude",
+      "altitudeGeoidalSeparation": "Altitude Geoidal Separation",
+      "altitudeMsl": "Altitude is Mean Sea Level",
+      "dop": "Dilution of precision (DOP) PDOP used by default",
+      "hdopVdop": "如果设置了 DOP，则使用 HDOP / VDOP 值而不是 PDOP",
+      "numSatellites": "Number of satellites",
+      "sequenceNumber": "Sequence number",
+      "timestamp": "时间戳",
+      "unset": "未设置",
+      "vehicleHeading": "Vehicle heading",
+      "vehicleSpeed": "Vehicle speed"
+    }
+  },
+  "power": {
+    "adcMultiplierOverride": {
+      "description": "Used for tweaking battery voltage reading",
+      "label": "ADC Multiplier Override ratio"
+    },
+    "ina219Address": {
+      "description": "Address of the INA219 battery monitor",
+      "label": "INA219 Address"
+    },
+    "lightSleepDuration": {
+      "description": "How long the device will be in light sleep for",
+      "label": "Light Sleep Duration"
+    },
+    "minimumWakeTime": {
+      "description": "Minimum amount of time the device will stay awake for after receiving a packet",
+      "label": "Minimum Wake Time"
+    },
+    "noConnectionBluetoothDisabled": {
+      "description": "If the device does not receive a Bluetooth connection, the BLE radio will be disabled after this long",
+      "label": "No Connection Bluetooth Disabled"
+    },
+    "powerSavingEnabled": {
+      "description": "Select if powered from a low-current source (i.e. solar), to minimize power consumption as much as possible.",
+      "label": "启用节能模式"
+    },
+    "shutdownOnBatteryDelay": {
+      "description": "Automatically shutdown node after this long when on battery, 0 for indefinite",
+      "label": "Shutdown on battery delay"
+    },
+    "superDeepSleepDuration": {
+      "description": "How long the device will be in super deep sleep for",
+      "label": "Super Deep Sleep Duration"
+    },
+    "powerConfigSettings": {
+      "description": "Settings for the power module",
+      "label": "电源配置"
+    },
+    "sleepSettings": {
+      "description": "Sleep settings for the power module",
+      "label": "Sleep Settings"
+    }
+  },
+  "security": {
+    "description": "Settings for the Security configuration",
+    "title": "Security Settings",
+    "button_backupKey": "Backup Key",
+    "adminChannelEnabled": {
+      "description": "Allow incoming device control over the insecure legacy admin channel",
+      "label": "Allow Legacy Admin"
+    },
+    "enableDebugLogApi": {
+      "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+      "label": "Enable Debug Log API"
+    },
+    "managed": {
+      "description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
+      "label": "Managed"
+    },
+    "privateKey": {
+      "description": "Used to create a shared key with a remote device",
+      "label": "私钥"
+    },
+    "publicKey": {
+      "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+      "label": "公钥"
+    },
+    "primaryAdminKey": {
+      "description": "The primary public key authorized to send admin messages to this node",
+      "label": "一级管理员密钥"
+    },
+    "secondaryAdminKey": {
+      "description": "The secondary public key authorized to send admin messages to this node",
+      "label": "二级管理员密钥"
+    },
+    "serialOutputEnabled": {
+      "description": "Serial Console over the Stream API",
+      "label": "Serial Output Enabled"
+    },
+    "tertiaryAdminKey": {
+      "description": "The tertiary public key authorized to send admin messages to this node",
+      "label": "三级管理员密钥"
+    },
+    "adminSettings": {
+      "description": "Settings for Admin",
+      "label": "Admin Settings"
+    },
+    "loggingSettings": {
+      "description": "Settings for Logging",
+      "label": "Logging Settings"
+    }
+  },
+  "user": {
+    "title": "User Settings",
+    "description": "Configure your device name and identity settings",
+    "longName": {
+      "label": "长名称",
+      "description": "Your full display name (1-40 characters)",
+      "validation": {
+        "min": "Long name must be at least 1 character",
+        "max": "Long name must be at most 40 characters"
+      }
+    },
+    "shortName": {
+      "label": "短名称",
+      "description": "Your abbreviated name (2-4 characters)",
+      "validation": {
+        "min": "Short name must be at least 2 characters",
+        "max": "Short name must be at most 4 characters"
+      }
+    },
+    "isUnmessageable": {
+      "label": "无法发送消息",
+      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+    },
+    "isLicensed": {
+      "label": "业余无线电模式（HAM）",
+      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+    }
+  }
+}

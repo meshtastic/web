@@ -1,69 +1,71 @@
 {
-	"page": {
-		"sectionLabel": "Kanały",
-		"channelName": "Kanał: {{channelName}}",
-		"broadcastLabel": "Podstawowy",
-		"channelIndex": "Kan. {{index}}"
-	},
-	"validation": {
-		"pskInvalid": "Musisz wprowadzić prawidłowy {{bits}} bitowy klucz."
-	},
-	"settings": {
-		"label": "Ustawienia kanału",
-		"description": "Kryptografia, MQTT i inne ustawienia"
-	},
-	"role": {
-		"label": "Rola",
-		"description": "Telemetria urządzenia jest tylko wysyłania przez GŁOWNY. Tylko jeden GŁOWNY jest dozwolony",
-		"options": {
-			"primary": "GŁOWNY",
-			"disabled": "WYŁĄCZONY",
-			"secondary": "DODATKOWY"
-		}
-	},
-	"psk": {
-		"label": "Klucz współdzielony",
-		"description": "Wspierane długości klucza: 256, 128, 8, pusty (0) bitów",
-		"generate": "Wygeneruj"
-	},
-	"name": {
-		"label": "Nazwa",
-		"description": "Unikalna nazwa kanału mniejsza niż 12 bajtów, pusty jako domyślny"
-	},
-	"uplinkEnabled": {
-		"label": "Wysył włączony",
-		"description": "Wysyłaj wiadomości z lokalnej sieci do MQTT"
-	},
-	"downlinkEnabled": {
-		"label": "Odbiór włączony",
-		"description": "Wysyłaj wiadomości z MQTT to lokalnej sieci"
-	},
-	"positionPrecision": {
-		"label": "Lokalizacja",
-		"description": "Precyzja lokalizacji, która jest wysyłana na kanale. Może zostać wyłączona.",
-		"options": {
-			"none": "Nie udostępniaj lokalizacji",
-			"precise": "Precyzyjna lokalizacja",
-			"metric_km23": "W zasięgu 23 kilometrów",
-			"metric_km12": "W zasięgu 12 kilometrów",
-			"metric_km5_8": "W zasięgu 5,8 kilometrów",
-			"metric_km2_9": "W zasięgu 2,9 kilometrów",
-			"metric_km1_5": "W zasięgu 1,5 kilometra",
-			"metric_m700": "W zasięgu 700 metrów",
-			"metric_m350": "W zasięgu 350 metrów",
-			"metric_m200": "W zasięgu 200 metrów",
-			"metric_m90": "W zasięgu 90 metrów",
-			"metric_m50": "W zasięgu 50 metrów",
-			"imperial_mi15": "W zasięgu 15 mil",
-			"imperial_mi7_3": "W zasięgu 7,3 mil",
-			"imperial_mi3_6": "W zasięgu 3,6 mil",
-			"imperial_mi1_8": "W zasięgu 1,8 mil",
-			"imperial_mi0_9": "W zasięgu 0,9 mil",
-			"imperial_mi0_5": "W zasięgu 0,5 mili",
-			"imperial_mi0_2": "W zasięgu 0,2 mil",
-			"imperial_ft600": "W zasięgu 600 stóp",
-			"imperial_ft300": "W zasięgu 300 stóp",
-			"imperial_ft150": "W zasięgu 150 stóp"
-		}
-	}
+  "page": {
+    "sectionLabel": "Kanały",
+    "channelName": "Kanał: {{channelName}}",
+    "broadcastLabel": "Podstawowy",
+    "channelIndex": "Kan. {{index}}",
+    "import": "Import",
+    "export": "Eksport"
+  },
+  "validation": {
+    "pskInvalid": "Musisz wprowadzić prawidłowy {{bits}} bitowy klucz."
+  },
+  "settings": {
+    "label": "Ustawienia kanału",
+    "description": "Kryptografia, MQTT i inne ustawienia"
+  },
+  "role": {
+    "label": "Rola",
+    "description": "Telemetria urządzenia jest tylko wysyłania przez GŁOWNY. Tylko jeden GŁOWNY jest dozwolony",
+    "options": {
+      "primary": "GŁOWNY",
+      "disabled": "WYŁĄCZONY",
+      "secondary": "DODATKOWY"
+    }
+  },
+  "psk": {
+    "label": "Klucz współdzielony",
+    "description": "Wspierane długości klucza: 256, 128, 8, pusty (0) bitów",
+    "generate": "Wygeneruj"
+  },
+  "name": {
+    "label": "Nazwa",
+    "description": "Unikalna nazwa kanału mniejsza niż 12 bajtów, pusty jako domyślny"
+  },
+  "uplinkEnabled": {
+    "label": "Wysył włączony",
+    "description": "Wysyłaj wiadomości z lokalnej sieci do MQTT"
+  },
+  "downlinkEnabled": {
+    "label": "Odbiór włączony",
+    "description": "Wysyłaj wiadomości z MQTT to lokalnej sieci"
+  },
+  "positionPrecision": {
+    "label": "Lokalizacja",
+    "description": "Precyzja lokalizacji, która jest wysyłana na kanale. Może zostać wyłączona.",
+    "options": {
+      "none": "Nie udostępniaj lokalizacji",
+      "precise": "Precyzyjna lokalizacja",
+      "metric_km23": "W zasięgu 23 kilometrów",
+      "metric_km12": "W zasięgu 12 kilometrów",
+      "metric_km5_8": "W zasięgu 5,8 kilometrów",
+      "metric_km2_9": "W zasięgu 2,9 kilometrów",
+      "metric_km1_5": "W zasięgu 1,5 kilometra",
+      "metric_m700": "W zasięgu 700 metrów",
+      "metric_m350": "W zasięgu 350 metrów",
+      "metric_m200": "W zasięgu 200 metrów",
+      "metric_m90": "W zasięgu 90 metrów",
+      "metric_m50": "W zasięgu 50 metrów",
+      "imperial_mi15": "W zasięgu 15 mil",
+      "imperial_mi7_3": "W zasięgu 7,3 mil",
+      "imperial_mi3_6": "W zasięgu 3,6 mil",
+      "imperial_mi1_8": "W zasięgu 1,8 mil",
+      "imperial_mi0_9": "W zasięgu 0,9 mil",
+      "imperial_mi0_5": "W zasięgu 0,5 mili",
+      "imperial_mi0_2": "W zasięgu 0,2 mil",
+      "imperial_ft600": "W zasięgu 600 stóp",
+      "imperial_ft300": "W zasięgu 300 stóp",
+      "imperial_ft150": "W zasięgu 150 stóp"
+    }
+  }
 }

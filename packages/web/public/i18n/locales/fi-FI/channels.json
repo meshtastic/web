@@ -1,69 +1,71 @@
 {
-	"page": {
-		"sectionLabel": "Kanavat",
-		"channelName": "Kanava: {{channelName}}",
-		"broadcastLabel": "Ensisijainen",
-		"channelIndex": "Ch {{index}}"
-	},
-	"validation": {
-		"pskInvalid": "Syötä kelvollinen {{bits}} bittinen PSK."
-	},
-	"settings": {
-		"label": "Kanava-asetukset",
-		"description": "Crypto, MQTT ja muut asetukset"
-	},
-	"role": {
-		"label": "Rooli",
-		"description": "Laitteen telemetriatiedot lähetetään ENSISIJAISEN kanavan kautta. Vain yksi ENSISIJAINEN kanava sallitaan",
-		"options": {
-			"primary": "ENSISIJAISEN",
-			"disabled": "POIS KÄYTÖSTÄ",
-			"secondary": "TOISIJAINEN"
-		}
-	},
-	"psk": {
-		"label": "Esijaettu avain",
-		"description": "Tuetut PSK-pituudet: 256-bit, 128-bit, 8-bit, tyhjät (0-bit)",
-		"generate": "Luo"
-	},
-	"name": {
-		"label": "Nimi",
-		"description": "Kanavan yksilöllinen nimi (alle 12 merkkiä), jätä tyhjäksi käyttääksesi oletusta"
-	},
-	"uplinkEnabled": {
-		"label": "Lähetys käytössä",
-		"description": "Lähetä viestejä paikallisesta verkosta MQTT-verkkoon"
-	},
-	"downlinkEnabled": {
-		"label": "Vastaanotto käytössä",
-		"description": "Lähetä viestejä MQTT:stä paikalliseen verkkoon"
-	},
-	"positionPrecision": {
-		"label": "Sijainti",
-		"description": "Kanavalle jaettavan sijainnin tarkkuus. Voi poistaa käytöstä.",
-		"options": {
-			"none": "Älä jaa sijaintia",
-			"precise": "Tarkka Sijainti",
-			"metric_km23": "23 kilometrin säteellä",
-			"metric_km12": "12 kilometrin säteellä",
-			"metric_km5_8": "5,8 kilometrin säteellä",
-			"metric_km2_9": "2,9 kilometrin säteellä",
-			"metric_km1_5": "1,5 kilometrin säteellä",
-			"metric_m700": "700 metrin säteellä",
-			"metric_m350": "350 metrin säteellä",
-			"metric_m200": "200 metrin säteellä",
-			"metric_m90": "90 metrin säteellä",
-			"metric_m50": "50 metrin säteellä",
-			"imperial_mi15": "15 mailin säteellä",
-			"imperial_mi7_3": "7,3 mailin säteellä",
-			"imperial_mi3_6": "3,6 mailin säteellä",
-			"imperial_mi1_8": "1,8 mailin säteellä",
-			"imperial_mi0_9": "0,9 mailin säteellä",
-			"imperial_mi0_5": "0,5 mailin säteellä",
-			"imperial_mi0_2": "0,2 mailin säteellä",
-			"imperial_ft600": "600 jalan säteellä",
-			"imperial_ft300": "300 jalan säteellä",
-			"imperial_ft150": "150 jalan säteellä"
-		}
-	}
+  "page": {
+    "sectionLabel": "Kanavat",
+    "channelName": "Kanava: {{channelName}}",
+    "broadcastLabel": "Ensisijainen",
+    "channelIndex": "Ch {{index}}",
+    "import": "Tuo",
+    "export": "Vie"
+  },
+  "validation": {
+    "pskInvalid": "Syötä kelvollinen {{bits}} bittinen PSK."
+  },
+  "settings": {
+    "label": "Kanava-asetukset",
+    "description": "Crypto, MQTT ja muut asetukset"
+  },
+  "role": {
+    "label": "Rooli",
+    "description": "Laitteen telemetriatiedot lähetetään ENSISIJAISEN kanavan kautta. Vain yksi ENSISIJAINEN kanava sallitaan",
+    "options": {
+      "primary": "ENSISIJAISEN",
+      "disabled": "POIS KÄYTÖSTÄ",
+      "secondary": "TOISIJAINEN"
+    }
+  },
+  "psk": {
+    "label": "Esijaettu avain",
+    "description": "Tuetut PSK-pituudet: 256-bit, 128-bit, 8-bit, tyhjät (0-bit)",
+    "generate": "Luo"
+  },
+  "name": {
+    "label": "Nimi",
+    "description": "Kanavan yksilöllinen nimi (alle 12 merkkiä), jätä tyhjäksi käyttääksesi oletusta"
+  },
+  "uplinkEnabled": {
+    "label": "Lähetys käytössä",
+    "description": "Lähetä viestejä paikallisesta verkosta MQTT-verkkoon"
+  },
+  "downlinkEnabled": {
+    "label": "Vastaanotto käytössä",
+    "description": "Lähetä viestejä MQTT:stä paikalliseen verkkoon"
+  },
+  "positionPrecision": {
+    "label": "Sijainti",
+    "description": "Kanavalle jaettavan sijainnin tarkkuus. Voi poistaa käytöstä.",
+    "options": {
+      "none": "Älä jaa sijaintia",
+      "precise": "Tarkka Sijainti",
+      "metric_km23": "23 kilometrin säteellä",
+      "metric_km12": "12 kilometrin säteellä",
+      "metric_km5_8": "5,8 kilometrin säteellä",
+      "metric_km2_9": "2,9 kilometrin säteellä",
+      "metric_km1_5": "1,5 kilometrin säteellä",
+      "metric_m700": "700 metrin säteellä",
+      "metric_m350": "350 metrin säteellä",
+      "metric_m200": "200 metrin säteellä",
+      "metric_m90": "90 metrin säteellä",
+      "metric_m50": "50 metrin säteellä",
+      "imperial_mi15": "15 mailin säteellä",
+      "imperial_mi7_3": "7,3 mailin säteellä",
+      "imperial_mi3_6": "3,6 mailin säteellä",
+      "imperial_mi1_8": "1,8 mailin säteellä",
+      "imperial_mi0_9": "0,9 mailin säteellä",
+      "imperial_mi0_5": "0,5 mailin säteellä",
+      "imperial_mi0_2": "0,2 mailin säteellä",
+      "imperial_ft600": "600 jalan säteellä",
+      "imperial_ft300": "300 jalan säteellä",
+      "imperial_ft150": "150 jalan säteellä"
+    }
+  }
 }

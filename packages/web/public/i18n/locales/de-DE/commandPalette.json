@@ -15,7 +15,6 @@
       "messages": "Nachrichten",
       "map": "Karte",
       "config": "Einstellungen",
-      "channels": "Kanäle",
       "nodes": "Knoten"
     }
   },
@@ -45,7 +44,8 @@
     "label": "Debug",
     "command": {
       "reconfigure": "Neu einrichten",
-      "clearAllStoredMessages": "Alle gespeicherten Nachrichten löschen"
+      "clearAllStoredMessages": "Alle gespeicherten Nachrichten löschen",
+      "clearAllStores": "Lösche den gesamten lokalen Speicher"
     }
   }
 }

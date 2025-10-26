@@ -1,142 +1,157 @@
 {
-	"button": {
-		"apply": "Aplique",
-		"backupKey": "Clave de la copia de seguridad",
-		"cancel": "Cancelar",
-		"clearMessages": "Borrar mensajes",
-		"close": "Cerrar",
-		"confirm": "Confirmar",
-		"delete": "Eliminar",
-		"dismiss": "Descartar",
-		"download": "Descarga",
-		"export": "Exportar",
-		"generate": "Generar",
-		"regenerate": "Regenerar",
-		"import": "Importar",
-		"message": "Mensaje",
-		"now": "Ahora",
-		"ok": "Vale",
-		"print": "Imprimir",
-		"remove": "Quitar",
-		"requestNewKeys": "Solicitar nuevas claves",
-		"requestPosition": "Solicitar ubicación",
-		"reset": "Reiniciar",
-		"save": "Guardar",
-		"scanQr": "Escanear el código QR",
-		"traceRoute": "Trazar ruta",
-		"submit": "Enviar"
-	},
-	"app": {
-		"title": "Meshtastic",
-		"fullTitle": "Cliente Web Meshtastic"
-	},
-	"loading": "Cargando...",
-	"unit": {
-		"cps": "CPS",
-		"dbm": "dBm",
-		"hertz": "Hz",
-		"hop": {
-			"one": "Salto",
-			"plural": "Saltos"
-		},
-		"hopsAway": {
-			"one": "{{count}} salto lejos",
-			"plural": "{{count}} saltos lejos",
-			"unknown": "Saltos desconocidos"
-		},
-		"megahertz": "MHz",
-		"raw": "bruto",
-		"meter": {
-			"one": "Metro",
-			"plural": "Metros",
-			"suffix": "m"
-		},
-		"minute": {
-			"one": "Minuto",
-			"plural": "Minutos"
-		},
-		"hour": {
-			"one": "Hora",
-			"plural": "Horas"
-		},
-		"millisecond": {
-			"one": "Milisegundo",
-			"plural": "Milisegundos",
-			"suffix": " ms"
-		},
-		"second": {
-			"one": "Segundo",
-			"plural": "Segundos"
-		},
-		"day": {
-			"one": "Día",
-			"plural": "Días"
-		},
-		"month": {
-			"one": "Mes",
-			"plural": "Meses"
-		},
-		"year": {
-			"one": "Año",
-			"plural": "Años"
-		},
-		"snr": "SNR",
-		"volt": {
-			"one": "Voltio",
-			"plural": "Voltios",
-			"suffix": "V"
-		},
-		"record": {
-			"one": "Registros",
-			"plural": "Registros"
-		}
-	},
-	"security": {
-		"0bit": "Vacío",
-		"8bit": "8 bits",
-		"128bit": "128 bits",
-		"256bit": "256 bits"
-	},
-	"unknown": {
-		"longName": "Desconocido",
-		"shortName": "UNK",
-		"notAvailable": "N/A",
-		"num": "??"
-	},
-	"nodeUnknownPrefix": "!",
-	"unset": "No Configurado",
-	"fallbackName": "Meshtastic {{last4}}",
-	"node": "Nodo",
-	"formValidation": {
-		"unsavedChanges": "Cambios no guardados",
-		"tooBig": {
-			"string": "Demasiado largo, se esperaba menos o igual a {{maximum}} caracteres.",
-			"number": "Demasiado grande, se esperaba un número menor que o igual a {{maximum}}.",
-			"bytes": "Demasiado grande, se esperaba menos o igual a los bytes {{params.maximum}}."
-		},
-		"tooSmall": {
-			"string": "Demasiado corto, se esperaba más o igual a {{minimum}}. carácteres.",
-			"number": "Demasiado pequeño, esperaba un número mayor o igual a {{minimum}}."
-		},
-		"invalidFormat": {
-			"ipv4": "Formato no válido, se esperaba una dirección IPv4.",
-			"key": "Formato no válido, se esperaba una clave pre-compartida codificada en Base64 (PSK)."
-		},
-		"invalidType": {
-			"number": "Carácter no válido, se espera un número."
-		},
-		"pskLength": {
-			"0bit": "Es necesario que la clave esté vacía.",
-			"8bit": "Se requiere que la clave sea una clave pre-compartida de 8 bits (PSK).",
-			"128bit": "Se requiere que la clave sea una clave pre-compartida de 128 bits (PSK).",
-			"256bit": "Se requiere que la clave sea una clave pre-compartida de 256 bits (PSK)."
-		},
-		"required": {
-			"generic": "Este campo es obligatorio.",
-			"managed": "Se solicita al menos una clave de administración si se administra el nodo.",
-			"key": "Se requiere clave."
-		}
-	},
-	"yes": "Sí",
-	"no": "No"
+  "button": {
+    "apply": "Aplique",
+    "backupKey": "Clave de la copia de seguridad",
+    "cancel": "Cancelar",
+    "clearMessages": "Borrar mensajes",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "dismiss": "Descartar",
+    "download": "Descarga",
+    "export": "Exportar",
+    "generate": "Generar",
+    "regenerate": "Regenerar",
+    "import": "Importar",
+    "message": "Mensaje",
+    "now": "Ahora",
+    "ok": "Vale",
+    "print": "Imprimir",
+    "remove": "Quitar",
+    "requestNewKeys": "Solicitar nuevas claves",
+    "requestPosition": "Solicitar ubicación",
+    "reset": "Reiniciar",
+    "save": "Guardar",
+    "scanQr": "Escanear el código QR",
+    "traceRoute": "Trazar ruta",
+    "submit": "Enviar"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "fullTitle": "Cliente Web Meshtastic"
+  },
+  "loading": "Cargando...",
+  "unit": {
+    "cps": "CPS",
+    "dbm": "dBm",
+    "hertz": "Hz",
+    "hop": {
+      "one": "Salto",
+      "plural": "Saltos"
+    },
+    "hopsAway": {
+      "one": "{{count}} salto lejos",
+      "plural": "{{count}} saltos lejos",
+      "unknown": "Saltos desconocidos"
+    },
+    "megahertz": "MHz",
+    "raw": "bruto",
+    "meter": {
+      "one": "Metro",
+      "plural": "Metros",
+      "suffix": "m"
+    },
+    "kilometer": {
+      "one": "Kilometer",
+      "plural": "Kilometers",
+      "suffix": "km"
+    },
+    "minute": {
+      "one": "Minuto",
+      "plural": "Minutos"
+    },
+    "hour": {
+      "one": "Hora",
+      "plural": "Horas"
+    },
+    "millisecond": {
+      "one": "Milisegundo",
+      "plural": "Milisegundos",
+      "suffix": " ms"
+    },
+    "second": {
+      "one": "Segundo",
+      "plural": "Segundos"
+    },
+    "day": {
+      "one": "Día",
+      "plural": "Días",
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "month": {
+      "one": "Mes",
+      "plural": "Meses"
+    },
+    "year": {
+      "one": "Año",
+      "plural": "Años"
+    },
+    "snr": "SNR",
+    "volt": {
+      "one": "Voltio",
+      "plural": "Voltios",
+      "suffix": "V"
+    },
+    "record": {
+      "one": "Registros",
+      "plural": "Registros"
+    },
+    "degree": {
+      "one": "Degree",
+      "plural": "Degrees",
+      "suffix": "°"
+    }
+  },
+  "security": {
+    "0bit": "Vacío",
+    "8bit": "8 bits",
+    "128bit": "128 bits",
+    "256bit": "256 bits"
+  },
+  "unknown": {
+    "longName": "Desconocido",
+    "shortName": "UNK",
+    "notAvailable": "N/A",
+    "num": "??"
+  },
+  "nodeUnknownPrefix": "!",
+  "unset": "No Configurado",
+  "fallbackName": "Meshtastic {{last4}}",
+  "node": "Nodo",
+  "formValidation": {
+    "unsavedChanges": "Cambios no guardados",
+    "tooBig": {
+      "string": "Demasiado largo, se esperaba menos o igual a {{maximum}} caracteres.",
+      "number": "Demasiado grande, se esperaba un número menor que o igual a {{maximum}}.",
+      "bytes": "Demasiado grande, se esperaba menos o igual a los bytes {{params.maximum}}."
+    },
+    "tooSmall": {
+      "string": "Demasiado corto, se esperaba más o igual a {{minimum}}. carácteres.",
+      "number": "Demasiado pequeño, esperaba un número mayor o igual a {{minimum}}."
+    },
+    "invalidFormat": {
+      "ipv4": "Formato no válido, se esperaba una dirección IPv4.",
+      "key": "Formato no válido, se esperaba una clave pre-compartida codificada en Base64 (PSK)."
+    },
+    "invalidType": {
+      "number": "Carácter no válido, se espera un número."
+    },
+    "pskLength": {
+      "0bit": "Es necesario que la clave esté vacía.",
+      "8bit": "Se requiere que la clave sea una clave pre-compartida de 8 bits (PSK).",
+      "128bit": "Se requiere que la clave sea una clave pre-compartida de 128 bits (PSK).",
+      "256bit": "Se requiere que la clave sea una clave pre-compartida de 256 bits (PSK)."
+    },
+    "required": {
+      "generic": "Este campo es obligatorio.",
+      "managed": "Se solicita al menos una clave de administración si se administra el nodo.",
+      "key": "Se requiere clave."
+    },
+    "invalidOverrideFreq": {
+      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+    }
+  },
+  "yes": "Sí",
+  "no": "No"
 }

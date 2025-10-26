@@ -1,63 +1,59 @@
 {
-	"nodeDetail": {
-		"publicKeyEnabled": {
-			"label": "Öffentlicher Schlüssel aktiviert"
-		},
-		"noPublicKey": {
-			"label": "Kein öffentlicher Schlüssel"
-		},
-		"directMessage": {
-			"label": "Direktnachricht {{shortName}}"
-		},
-		"favorite": {
-			"label": "Favorit",
-			"tooltip": "Diesen Knoten zu Favoriten hinzufügen oder entfernen"
-		},
-		"notFavorite": {
-			"label": "Kein Favorit"
-		},
-		"error": {
-			"label": "Fehler",
-			"text": "Beim Abrufen der Knotendetails ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
-		},
-		"status": {
-			"heard": "Gehört",
-			"mqtt": "MQTT"
-		},
-		"elevation": {
-			"label": "Höhe"
-		},
-		"channelUtil": {
-			"label": "Kanal-Auslastung"
-		},
-		"airtimeUtil": {
-			"label": "Sendezeit-Auslastung"
-		}
-	},
-	"nodesTable": {
-		"headings": {
-			"longName": "Langer Name",
-			"connection": "Verbindung",
-			"lastHeard": "Zuletzt gehört",
-			"encryption": "Verschlüsselung",
-			"model": "Modell",
-			"macAddress": "MAC Adresse"
-		},
-		"connectionStatus": {
-			"direct": "Direkt",
-			"away": "entfernt",
-			"unknown": "-",
-			"viaMqtt": ", über MQTT"
-		},
-		"lastHeardStatus": {
-			"never": "Nie"
-		}
-	},
-	"actions": {
-		"added": "Hinzugefügt",
-		"removed": "Entfernt",
-		"ignoreNode": "Knoten ignorieren",
-		"unignoreNode": "Knoten akzeptieren",
-		"requestPosition": "Standort anfordern"
-	}
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Öffentlicher Schlüssel aktiviert"
+    },
+    "noPublicKey": {
+      "label": "Kein öffentlicher Schlüssel"
+    },
+    "directMessage": {
+      "label": "Direktnachricht {{shortName}}"
+    },
+    "favorite": {
+      "label": "Favorit",
+      "tooltip": "Diesen Knoten zu Favoriten hinzufügen oder entfernen"
+    },
+    "notFavorite": {
+      "label": "Kein Favorit"
+    },
+    "error": {
+      "label": "Fehler",
+      "text": "Beim Abrufen der Knotendetails ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
+    },
+    "status": {
+      "heard": "Gehört",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Höhe"
+    },
+    "channelUtil": {
+      "label": "Kanal-Auslastung"
+    },
+    "airtimeUtil": {
+      "label": "Sendezeit-Auslastung"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "Langer Name",
+      "connection": "Verbindung",
+      "lastHeard": "Zuletzt gehört",
+      "encryption": "Verschlüsselung",
+      "model": "Modell",
+      "macAddress": "MAC Adresse"
+    },
+    "connectionStatus": {
+      "direct": "Direkt",
+      "away": "entfernt",
+      "viaMqtt": ", über MQTT"
+    }
+  },
+  "actions": {
+    "added": "Hinzugefügt",
+    "removed": "Entfernt",
+    "ignoreNode": "Knoten ignorieren",
+    "unignoreNode": "Knoten akzeptieren",
+    "requestPosition": "Standort anfordern"
+  }
 }

@@ -1,69 +1,71 @@
 {
-	"page": {
-		"sectionLabel": "Kanaler",
-		"channelName": "Kanal: {channelName}",
-		"broadcastLabel": "Primär",
-		"channelIndex": "# {{index}}"
-	},
-	"validation": {
-		"pskInvalid": "Ange en giltig {{bits}}-bitars PSK."
-	},
-	"settings": {
-		"label": "Kanalinställningar",
-		"description": "Krypto, MQTT & diverse inställningar"
-	},
-	"role": {
-		"label": "Roll",
-		"description": "Enhetens telemetri skickas över PRIMÄR. Endast en PRIMÄR kanal tillåts",
-		"options": {
-			"primary": "PRIMÄR",
-			"disabled": "INAKTIVERAD",
-			"secondary": "SEKUNDÄR"
-		}
-	},
-	"psk": {
-		"label": "Delad nyckel (PSK)",
-		"description": "PSK-längder som stöds: 256-bit, 128-bit, 8-bit eller tom (0-bit)",
-		"generate": "Generera"
-	},
-	"name": {
-		"label": "Namn",
-		"description": "Ett unikt namn för kanalen, <12 bytes. Lämna tomt för standardnamn"
-	},
-	"uplinkEnabled": {
-		"label": "Upplänk aktiverad",
-		"description": "Skicka meddelanden från det lokala nätet till MQTT"
-	},
-	"downlinkEnabled": {
-		"label": "Nedlänk aktiverad",
-		"description": "Skicka meddelanden från MQTT till det lokala nätet"
-	},
-	"positionPrecision": {
-		"label": "Plats",
-		"description": "Platsprecisionen som kan delas med kanalen. Kan inaktiveras.",
-		"options": {
-			"none": "Dela inte plats",
-			"precise": "Exakt plats",
-			"metric_km23": "Inom 23 kilometer",
-			"metric_km12": "Inom 12 kilometer",
-			"metric_km5_8": "Inom 5,8 kilometer",
-			"metric_km2_9": "Inom 2,9 kilometer",
-			"metric_km1_5": "Inom 1,5 kilometer",
-			"metric_m700": "Inom 700 meter",
-			"metric_m350": "Inom 350 meter",
-			"metric_m200": "Inom 200 meter",
-			"metric_m90": "Inom 90 meter",
-			"metric_m50": "Inom 50 meter",
-			"imperial_mi15": "Inom 15 engelska mil",
-			"imperial_mi7_3": "Inom 7,3 engelska mil",
-			"imperial_mi3_6": "Inom 3,6 engelska mil",
-			"imperial_mi1_8": "Inom 1,8 engelska mil",
-			"imperial_mi0_9": "Inom 0,9 engelska mil",
-			"imperial_mi0_5": "Inom 0,5 engelska mil",
-			"imperial_mi0_2": "Inom 0,2 engelska mil",
-			"imperial_ft600": "Inom 600 fot",
-			"imperial_ft300": "Inom 300 fot",
-			"imperial_ft150": "Inom 150 fot"
-		}
-	}
+  "page": {
+    "sectionLabel": "Kanaler",
+    "channelName": "Kanal: {channelName}",
+    "broadcastLabel": "Primär",
+    "channelIndex": "# {{index}}",
+    "import": "Importera",
+    "export": "Exportera"
+  },
+  "validation": {
+    "pskInvalid": "Ange en giltig {{bits}}-bitars PSK."
+  },
+  "settings": {
+    "label": "Kanalinställningar",
+    "description": "Krypto, MQTT & diverse inställningar"
+  },
+  "role": {
+    "label": "Roll",
+    "description": "Enhetens telemetri skickas över PRIMÄR. Endast en PRIMÄR kanal tillåts",
+    "options": {
+      "primary": "PRIMÄR",
+      "disabled": "INAKTIVERAD",
+      "secondary": "SEKUNDÄR"
+    }
+  },
+  "psk": {
+    "label": "Delad nyckel (PSK)",
+    "description": "PSK-längder som stöds: 256-bit, 128-bit, 8-bit eller tom (0-bit)",
+    "generate": "Generera"
+  },
+  "name": {
+    "label": "Namn",
+    "description": "Ett unikt namn för kanalen, <12 bytes. Lämna tomt för standardnamn"
+  },
+  "uplinkEnabled": {
+    "label": "Upplänk aktiverad",
+    "description": "Skicka meddelanden från det lokala nätet till MQTT"
+  },
+  "downlinkEnabled": {
+    "label": "Nedlänk aktiverad",
+    "description": "Skicka meddelanden från MQTT till det lokala nätet"
+  },
+  "positionPrecision": {
+    "label": "Plats",
+    "description": "Platsprecisionen som kan delas med kanalen. Kan inaktiveras.",
+    "options": {
+      "none": "Dela inte plats",
+      "precise": "Exakt plats",
+      "metric_km23": "Inom 23 kilometer",
+      "metric_km12": "Inom 12 kilometer",
+      "metric_km5_8": "Inom 5,8 kilometer",
+      "metric_km2_9": "Inom 2,9 kilometer",
+      "metric_km1_5": "Inom 1,5 kilometer",
+      "metric_m700": "Inom 700 meter",
+      "metric_m350": "Inom 350 meter",
+      "metric_m200": "Inom 200 meter",
+      "metric_m90": "Inom 90 meter",
+      "metric_m50": "Inom 50 meter",
+      "imperial_mi15": "Inom 15 engelska mil",
+      "imperial_mi7_3": "Inom 7,3 engelska mil",
+      "imperial_mi3_6": "Inom 3,6 engelska mil",
+      "imperial_mi1_8": "Inom 1,8 engelska mil",
+      "imperial_mi0_9": "Inom 0,9 engelska mil",
+      "imperial_mi0_5": "Inom 0,5 engelska mil",
+      "imperial_mi0_2": "Inom 0,2 engelska mil",
+      "imperial_ft600": "Inom 600 fot",
+      "imperial_ft300": "Inom 300 fot",
+      "imperial_ft150": "Inom 150 fot"
+    }
+  }
 }

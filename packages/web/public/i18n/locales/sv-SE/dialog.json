@@ -1,193 +1,221 @@
 {
-	"deleteMessages": {
-		"description": "Den här åtgärden kommer att rensa all meddelandehistorik. Detta kan inte ångras. Är du säker på att du vill fortsätta?",
-		"title": "Rensa alla meddelanden"
-	},
-	"deviceName": {
-		"description": "Enheten kommer att starta om när inställningarna har sparats.",
-		"longName": "Långt namn",
-		"shortName": "Kort namn",
-		"title": "Ändra enhetens namn",
-		"validation": {
-			"longNameMax": "Långt namn får inte vara längre än 40 tecken",
-			"shortNameMax": "Kort namn får inte vara längre än 4 tecken",
-			"longNameMin": "Långt namn måste ha minst 1 tecken",
-			"shortNameMin": "Kort namn måste ha minst 1 tecken"
-		}
-	},
-	"import": {
-		"description": "Den aktuella LoRa konfigurationen kommer att skrivas över.",
-		"error": {
-			"invalidUrl": "Ogiltig Meshtastic URL"
-		},
-		"channelPrefix": "Kanal: ",
-		"channelSetUrl": "Kanalinställning/QR-kod URL",
-		"channels": "Kanaler:",
-		"usePreset": "Använd förinställning?",
-		"title": "Importera kanaluppsättning"
-	},
-	"locationResponse": {
-		"title": "Plats: {{identifier}}",
-		"altitude": "Höjd:",
-		"coordinates": "Koordinater: ",
-		"noCoordinates": "Koordinater saknas"
-	},
-	"pkiRegenerateDialog": {
-		"title": "Förnya nyckel?",
-		"description": "Är du säker på att du vill förnya den fördelade nyckeln?",
-		"regenerate": "Förnya"
-	},
-	"newDeviceDialog": {
-		"title": "Anslut ny enhet",
-		"https": "https",
-		"http": "http",
-		"tabHttp": "HTTP",
-		"tabBluetooth": "Bluetooth",
-		"tabSerial": "Seriell kommunikation",
-		"useHttps": "Använd HTTPS",
-		"connecting": "Ansluter...",
-		"connect": "Anslut",
-		"connectionFailedAlert": {
-			"title": "Anslutningen misslyckades",
-			"descriptionPrefix": "Kunde inte ansluta till enheten. ",
-			"httpsHint": "Om du använder HTTPS kan du behöva godkänna ett självsignerat certifikat först. ",
-			"openLinkPrefix": "Vänligen öppna ",
-			"openLinkSuffix": " i en ny flik",
-			"acceptTlsWarningSuffix": ", acceptera eventuella TLS-varningar om du uppmanas och försök igen",
-			"learnMoreLink": "Läs mer"
-		},
-		"httpConnection": {
-			"label": "IP-adress/värdnamn",
-			"placeholder": "000.000.000.000 / meshtastic.lokal"
-		},
-		"serialConnection": {
-			"noDevicesPaired": "Inga enheter parkopplade ännu.",
-			"newDeviceButton": "Ny enhet",
-			"deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
-		},
-		"bluetoothConnection": {
-			"noDevicesPaired": "Inga enheter parkopplade ännu.",
-			"newDeviceButton": "Ny enhet",
-			"connectionFailed": "Anslutningen misslyckades",
-			"deviceDisconnected": "Enheten frånkopplad",
-			"unknownDevice": "Okänd enhet",
-			"errorLoadingDevices": "Fel vid inläsning av enheter",
-			"unknownErrorLoadingDevices": "Okänt fel vid inläsning av enheter"
-		},
-		"validation": {
-			"requiresWebBluetooth": "Den här anslutningstypen kräver <0>Web Bluetooth</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
-			"requiresWebSerial": "Den här anslutningstypen kräver <0>Web Serial</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
-			"requiresSecureContext": "Denna applikation kräver en <0>säker kontext</0>. Anslut med HTTPS eller localhost.",
-			"additionallyRequiresSecureContext": "Dessutom kräver den ett <0>säker kontext</0>. Vänligen anslut med HTTPS eller localhost."
-		}
-	},
-	"nodeDetails": {
-		"message": "Meddelande",
-		"requestPosition": "Begär plats",
-		"traceRoute": "Spåra rutt",
-		"airTxUtilization": "Sändningsutnyttjande",
-		"allRawMetrics": "All oformaterad data",
-		"batteryLevel": "Batterinivå",
-		"channelUtilization": "Kanalutnyttjande",
-		"details": "Detaljer:",
-		"deviceMetrics": "Enhetens mätvärden:",
-		"hardware": "Hårdvara: ",
-		"lastHeard": "Senast hörd: ",
-		"nodeHexPrefix": "Nod-hex: ",
-		"nodeNumber": "Nodnummer: ",
-		"position": "Plats:",
-		"role": "Roll: ",
-		"uptime": "Drifttid: ",
-		"voltage": "Spänning",
-		"title": "Nodinformation för {{identifier}}",
-		"ignoreNode": "Ignorera nod",
-		"removeNode": "Ta bort nod",
-		"unignoreNode": "Ta bort favoritmarkering",
-		"security": "Säkerhet:",
-		"publicKey": "Publik nyckel: ",
-		"messageable": "Övervakad: ",
-		"KeyManuallyVerifiedTrue": "Den publika nyckeln har verifierats manuellt",
-		"KeyManuallyVerifiedFalse": "Den publika nyckeln är inte manuellt verifierad"
-	},
-	"pkiBackup": {
-		"loseKeysWarning": "Om du förlorar dina nycklar måste du återställa din enhet.",
-		"secureBackup": "Det är viktigt att säkerhetskopiera dina publika och privata nycklar och förvara din säkerhetskopia säkert.",
-		"footer": "=== END OF KEYS ===",
-		"header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
-		"privateKey": "Privat nyckel:",
-		"publicKey": "Publik nyckel:",
-		"fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-		"title": "Säkerhetskopiera nycklar"
-	},
-	"pkiBackupReminder": {
-		"description": "Vi rekommenderar att du säkerhetskopierar dina nycklar regelbundet. Vill du säkerhetskopiera nu?",
-		"title": "Påminnelse om säkerhetskopiering",
-		"remindLaterPrefix": "Påminn mig om",
-		"remindNever": "Påminn mig aldrig",
-		"backupNow": "Säkerhetskopiera nu"
-	},
-	"pkiRegenerate": {
-		"description": "Är du säker på att du vill förnya nyckelpar?",
-		"title": "Förnya nyckelpar"
-	},
-	"qr": {
-		"addChannels": "Lägg till kanaler",
-		"replaceChannels": "Ersätt kanaler",
-		"description": "Den aktuella LoRa-konfigurationen kommer också att delas.",
-		"sharableUrl": "Delbar URL",
-		"title": "Generera QR-kod"
-	},
-	"reboot": {
-		"title": "Starta om enhet",
-		"description": "Starta om nu eller schemalägga en omstart av den anslutna noden. Alternativt kan du välja att starta om till OTA (Over-the-Air) läge.",
-		"ota": "Starta om till OTA-läge",
-		"enterDelay": "Ange fördröjning",
-		"scheduled": "Omstart har schemalagts",
-		"schedule": "Schemalägg omstart",
-		"now": "Starta om nu",
-		"cancel": "Avbryt schemalagd omstart"
-	},
-	"refreshKeys": {
-		"description": {
-			"acceptNewKeys": "Detta kommer att ta bort noden från enheten och begära nya nycklar.",
-			"keyMismatchReasonSuffix": ". Detta beror på att fjärrnodens nuvarande publika nyckel inte matchar den tidigare lagrade nyckeln för den här noden.",
-			"unableToSendDmPrefix": "Din nod kan inte skicka ett direkt meddelande till noden: "
-		},
-		"acceptNewKeys": "Godkänn nya nycklar",
-		"title": "Nycklarna matchar inte - {{identifier}}"
-	},
-	"removeNode": {
-		"description": "Är du säker på att du vill ta bort den här noden?",
-		"title": "Ta bort noden?"
-	},
-	"shutdown": {
-		"title": "Schemalägg avstängning",
-		"description": "Stäng av den anslutna noden efter x minuter."
-	},
-	"traceRoute": {
-		"routeToDestination": "Rutt till destination:",
-		"routeBack": "Rutt tillbaka:"
-	},
-	"tracerouteResponse": {
-		"title": "Spåra rutt: {{identifier}}"
-	},
-	"unsafeRoles": {
-		"confirmUnderstanding": "Ja, jag vet vad jag gör",
-		"conjunction": " och blogginlägget om ",
-		"postamble": " och förstår konsekvenserna av att ändra roll.",
-		"preamble": "Jag har läst ",
-		"choosingRightDeviceRole": "Att välja rätt enhetsroll",
-		"deviceRoleDocumentation": "Dokumentation för enhetsroll",
-		"title": "Är du säker?"
-	},
-	"managedMode": {
-		"confirmUnderstanding": "Ja, jag vet vad jag gör",
-		"title": "Är du säker?",
-		"description": "Aktivering av fjärrhanterat läge blockerar klienter (inklusive webbklienten) från att skriva inställningar till en radio. När detta är aktiverat kan enhetens inställningar endast ändras via fjärradministratörsmeddelanden. Den här inställningen krävs inte för fjärradministration."
-	},
-	"clientNotification": {
-		"title": "Meddelande från enheten",
-		"TraceRoute can only be sent once every 30 seconds": "Ruttspårning kan bara skickas en gång per 30 sekunder",
-		"Compromised keys were detected and regenerated.": "Komprometterade nycklar upptäcktes på enheten och nya har genererats."
-	}
+  "deleteMessages": {
+    "description": "Den här åtgärden kommer att rensa all meddelandehistorik. Detta kan inte ångras. Är du säker på att du vill fortsätta?",
+    "title": "Rensa alla meddelanden"
+  },
+  "deviceName": {
+    "description": "Enheten kommer att starta om när inställningarna har sparats.",
+    "longName": "Långt namn",
+    "shortName": "Kort namn",
+    "title": "Ändra enhetens namn",
+    "validation": {
+      "longNameMax": "Långt namn får inte vara längre än 40 tecken",
+      "shortNameMax": "Kort namn får inte vara längre än 4 tecken",
+      "longNameMin": "Långt namn måste ha minst 1 tecken",
+      "shortNameMin": "Kort namn måste ha minst 1 tecken"
+    }
+  },
+  "import": {
+    "description": "Den aktuella LoRa konfigurationen kommer att skrivas över.",
+    "error": {
+      "invalidUrl": "Ogiltig Meshtastic URL"
+    },
+    "channelPrefix": "Kanal: ",
+    "primary": "Primary ",
+    "doNotImport": "No not import",
+    "channelName": "Namn",
+    "channelSlot": "Slot",
+    "channelSetUrl": "Kanalinställning/QR-kod URL",
+    "useLoraConfig": "Import LoRa Config",
+    "presetDescription": "The current LoRa Config will be replaced.",
+    "title": "Importera kanaluppsättning"
+  },
+  "locationResponse": {
+    "title": "Plats: {{identifier}}",
+    "altitude": "Höjd:",
+    "coordinates": "Koordinater: ",
+    "noCoordinates": "Koordinater saknas"
+  },
+  "pkiRegenerateDialog": {
+    "title": "Förnya nyckel?",
+    "description": "Är du säker på att du vill förnya den fördelade nyckeln?",
+    "regenerate": "Förnya"
+  },
+  "newDeviceDialog": {
+    "title": "Anslut ny enhet",
+    "https": "https",
+    "http": "http",
+    "tabHttp": "HTTP",
+    "tabBluetooth": "Bluetooth",
+    "tabSerial": "Seriell kommunikation",
+    "useHttps": "Använd HTTPS",
+    "connecting": "Ansluter...",
+    "connect": "Anslut",
+    "connectionFailedAlert": {
+      "title": "Anslutningen misslyckades",
+      "descriptionPrefix": "Kunde inte ansluta till enheten. ",
+      "httpsHint": "Om du använder HTTPS kan du behöva godkänna ett självsignerat certifikat först. ",
+      "openLinkPrefix": "Vänligen öppna ",
+      "openLinkSuffix": " i en ny flik",
+      "acceptTlsWarningSuffix": ", acceptera eventuella TLS-varningar om du uppmanas och försök igen",
+      "learnMoreLink": "Läs mer"
+    },
+    "httpConnection": {
+      "label": "IP-adress/värdnamn",
+      "placeholder": "000.000.000.000 / meshtastic.lokal"
+    },
+    "serialConnection": {
+      "noDevicesPaired": "Inga enheter parkopplade ännu.",
+      "newDeviceButton": "Ny enhet",
+      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
+    },
+    "bluetoothConnection": {
+      "noDevicesPaired": "Inga enheter parkopplade ännu.",
+      "newDeviceButton": "Ny enhet",
+      "connectionFailed": "Anslutningen misslyckades",
+      "deviceDisconnected": "Enheten frånkopplad",
+      "unknownDevice": "Okänd enhet",
+      "errorLoadingDevices": "Fel vid inläsning av enheter",
+      "unknownErrorLoadingDevices": "Okänt fel vid inläsning av enheter"
+    },
+    "validation": {
+      "requiresWebBluetooth": "Den här anslutningstypen kräver <0>Web Bluetooth</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
+      "requiresWebSerial": "Den här anslutningstypen kräver <0>Web Serial</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
+      "requiresSecureContext": "Denna applikation kräver en <0>säker kontext</0>. Anslut med HTTPS eller localhost.",
+      "additionallyRequiresSecureContext": "Dessutom kräver den ett <0>säker kontext</0>. Vänligen anslut med HTTPS eller localhost."
+    }
+  },
+  "nodeDetails": {
+    "message": "Meddelande",
+    "requestPosition": "Begär plats",
+    "traceRoute": "Spåra rutt",
+    "airTxUtilization": "Sändningsutnyttjande",
+    "allRawMetrics": "All oformaterad data",
+    "batteryLevel": "Batterinivå",
+    "channelUtilization": "Kanalutnyttjande",
+    "details": "Detaljer:",
+    "deviceMetrics": "Enhetens mätvärden:",
+    "hardware": "Hårdvara: ",
+    "lastHeard": "Senast hörd: ",
+    "nodeHexPrefix": "Nod-hex: ",
+    "nodeNumber": "Nodnummer: ",
+    "position": "Plats:",
+    "role": "Roll: ",
+    "uptime": "Drifttid: ",
+    "voltage": "Spänning",
+    "title": "Nodinformation för {{identifier}}",
+    "ignoreNode": "Ignorera nod",
+    "removeNode": "Ta bort nod",
+    "unignoreNode": "Ta bort favoritmarkering",
+    "security": "Säkerhet:",
+    "publicKey": "Publik nyckel: ",
+    "messageable": "Övervakad: ",
+    "KeyManuallyVerifiedTrue": "Den publika nyckeln har verifierats manuellt",
+    "KeyManuallyVerifiedFalse": "Den publika nyckeln är inte manuellt verifierad"
+  },
+  "pkiBackup": {
+    "loseKeysWarning": "Om du förlorar dina nycklar måste du återställa din enhet.",
+    "secureBackup": "Det är viktigt att säkerhetskopiera dina publika och privata nycklar och förvara din säkerhetskopia säkert.",
+    "footer": "=== END OF KEYS ===",
+    "header": "=== MESHTASTIC KEYS FOR {{longName}} ({{shortName}}) ===",
+    "privateKey": "Privat nyckel:",
+    "publicKey": "Publik nyckel:",
+    "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
+    "title": "Säkerhetskopiera nycklar"
+  },
+  "pkiBackupReminder": {
+    "description": "Vi rekommenderar att du säkerhetskopierar dina nycklar regelbundet. Vill du säkerhetskopiera nu?",
+    "title": "Påminnelse om säkerhetskopiering",
+    "remindLaterPrefix": "Påminn mig om",
+    "remindNever": "Påminn mig aldrig",
+    "backupNow": "Säkerhetskopiera nu"
+  },
+  "pkiRegenerate": {
+    "description": "Är du säker på att du vill förnya nyckelpar?",
+    "title": "Förnya nyckelpar"
+  },
+  "qr": {
+    "addChannels": "Lägg till kanaler",
+    "replaceChannels": "Ersätt kanaler",
+    "description": "Den aktuella LoRa-konfigurationen kommer också att delas.",
+    "sharableUrl": "Delbar URL",
+    "title": "Generera QR-kod"
+  },
+  "reboot": {
+    "title": "Starta om enhet",
+    "description": "Starta om nu eller schemalägga en omstart av den anslutna noden. Alternativt kan du välja att starta om till OTA (Over-the-Air) läge.",
+    "ota": "Starta om till OTA-läge",
+    "enterDelay": "Ange fördröjning",
+    "scheduled": "Omstart har schemalagts",
+    "schedule": "Schemalägg omstart",
+    "now": "Starta om nu",
+    "cancel": "Avbryt schemalagd omstart"
+  },
+  "refreshKeys": {
+    "description": {
+      "acceptNewKeys": "Detta kommer att ta bort noden från enheten och begära nya nycklar.",
+      "keyMismatchReasonSuffix": ". Detta beror på att fjärrnodens nuvarande publika nyckel inte matchar den tidigare lagrade nyckeln för den här noden.",
+      "unableToSendDmPrefix": "Din nod kan inte skicka ett direkt meddelande till noden: "
+    },
+    "acceptNewKeys": "Godkänn nya nycklar",
+    "title": "Nycklarna matchar inte - {{identifier}}"
+  },
+  "removeNode": {
+    "description": "Är du säker på att du vill ta bort den här noden?",
+    "title": "Ta bort noden?"
+  },
+  "shutdown": {
+    "title": "Schemalägg avstängning",
+    "description": "Stäng av den anslutna noden efter x minuter."
+  },
+  "traceRoute": {
+    "routeToDestination": "Rutt till destination:",
+    "routeBack": "Rutt tillbaka:"
+  },
+  "tracerouteResponse": {
+    "title": "Spåra rutt: {{identifier}}"
+  },
+  "unsafeRoles": {
+    "confirmUnderstanding": "Ja, jag vet vad jag gör",
+    "conjunction": " och blogginlägget om ",
+    "postamble": " och förstår konsekvenserna av att ändra roll.",
+    "preamble": "Jag har läst ",
+    "choosingRightDeviceRole": "Att välja rätt enhetsroll",
+    "deviceRoleDocumentation": "Dokumentation för enhetsroll",
+    "title": "Är du säker?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Ja, jag vet vad jag gör",
+    "title": "Är du säker?",
+    "description": "Aktivering av fjärrhanterat läge blockerar klienter (inklusive webbklienten) från att skriva inställningar till en radio. När detta är aktiverat kan enhetens inställningar endast ändras via fjärradministratörsmeddelanden. Den här inställningen krävs inte för fjärradministration."
+  },
+  "clientNotification": {
+    "title": "Meddelande från enheten",
+    "TraceRoute can only be sent once every 30 seconds": "Ruttspårning kan bara skickas en gång per 30 sekunder",
+    "Compromised keys were detected and regenerated.": "Komprometterade nycklar upptäcktes på enheten och nya har genererats."
+  },
+  "resetNodeDb": {
+    "title": "Reset Node Database",
+    "description": "This will clear all nodes from the connected device's node database and clear all message history in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Reset Node Database",
+    "failedTitle": "There was an error resetting the Node DB. Please try again."
+  },
+  "clearAllStores": {
+    "title": "Clear All Local Storage",
+    "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
+    "confirm": "Clear all local storage",
+    "failedTitle": "There was an error clearing local storage. Please try again."
+  },
+  "factoryResetDevice": {
+    "title": "Fabriksåterställ enhet",
+    "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Fabriksåterställ enhet",
+    "failedTitle": "There was an error performing the factory reset. Please try again."
+  },
+  "factoryResetConfig": {
+    "title": "Fabriksåterställ konfigurationen",
+    "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Fabriksåterställ konfigurationen",
+    "failedTitle": "There was an error performing the factory reset. Please try again."
+  }
 }

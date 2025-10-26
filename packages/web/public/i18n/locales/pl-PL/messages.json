@@ -1,39 +1,39 @@
 {
-	"page": {
-		"title": "Wiadomości: {{chatName}}",
-		"placeholder": "Wpisz wiadomość"
-	},
-	"emptyState": {
-		"title": "Wybierz czat",
-		"text": "Brak wiadomości."
-	},
-	"selectChatPrompt": {
-		"text": "Wybierz kanał lub węzeł do wysyłania wiadomości."
-	},
-	"sendMessage": {
-		"placeholder": "Wpisz tutaj swoją wiadomość...",
-		"sendButton": "Wyślij"
-	},
-	"actionsMenu": {
-		"addReactionLabel": "Dodaj reakcję",
-		"replyLabel": "Odpowiedz"
-	},
-	"deliveryStatus": {
-		"delivered": {
-			"label": "Wiadomość doręczona",
-			"displayText": "Wiadomość doręczona"
-		},
-		"failed": {
-			"label": "Nie udało się dostarczyć wiadomości",
-			"displayText": "Dostawa nie powiodła się"
-		},
-		"unknown": {
-			"label": "Status wiadomości nieznany",
-			"displayText": "Nieznany stan"
-		},
-		"waiting": {
-			"label": "Wysyłanie wiadomości",
-			"displayText": "Oczekiwanie na dostawę"
-		}
-	}
+  "page": {
+    "title": "Wiadomości: {{chatName}}",
+    "placeholder": "Wpisz wiadomość"
+  },
+  "emptyState": {
+    "title": "Wybierz czat",
+    "text": "Brak wiadomości."
+  },
+  "selectChatPrompt": {
+    "text": "Wybierz kanał lub węzeł do wysyłania wiadomości."
+  },
+  "sendMessage": {
+    "placeholder": "Wpisz tutaj swoją wiadomość...",
+    "sendButton": "Wyślij"
+  },
+  "actionsMenu": {
+    "addReactionLabel": "Dodaj reakcję",
+    "replyLabel": "Odpowiedz"
+  },
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Wiadomość doręczona",
+      "displayText": "Wiadomość doręczona"
+    },
+    "failed": {
+      "label": "Nie udało się dostarczyć wiadomości",
+      "displayText": "Dostawa nie powiodła się"
+    },
+    "unknown": {
+      "label": "Status wiadomości nieznany",
+      "displayText": "Nieznany stan"
+    },
+    "waiting": {
+      "label": "Wysyłanie wiadomości",
+      "displayText": "Oczekiwanie na dostawę"
+    }
+  }
 }

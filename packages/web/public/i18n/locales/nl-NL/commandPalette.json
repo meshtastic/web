@@ -15,7 +15,6 @@
       "messages": "Berichten",
       "map": "Kaart",
       "config": "Config",
-      "channels": "Kanalen",
       "nodes": "Nodes"
     }
   },
@@ -45,7 +44,8 @@
     "label": "Debug",
     "command": {
       "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "clearAllStoredMessages": "Clear All Stored Message",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }

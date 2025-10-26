@@ -1,0 +1,38 @@
+{
+  "maplibre": {
+    "GeolocateControl.FindMyLocation": "Find my location",
+    "NavigationControl.ZoomIn": "Zoom in",
+    "NavigationControl.ZoomOut": "Zoom out",
+    "CooperativeGesturesHandler.WindowsHelpText": "Use Ctrl + scroll to zoom the map",
+    "CooperativeGesturesHandler.MacHelpText": "Use ⌘ + scroll to zoom the map",
+    "CooperativeGesturesHandler.MobileHelpText": "Use two fingers to move the map"
+  },
+  "layerTool": {
+    "nodeMarkers": "Show nodes",
+    "directNeighbors": "Show direct connections",
+    "remoteNeighbors": "Show remote connections",
+    "positionPrecision": "Show position precision",
+    "traceroutes": "Show traceroutes",
+    "waypoints": "Show waypoints"
+  },
+  "mapMenu": {
+    "locateAria": "Locate my node",
+    "layersAria": "Change map style"
+  },
+  "waypointDetail": {
+    "edit": "Upravit",
+    "description": "Description:",
+    "createdBy": "Edited by:",
+    "createdDate": "Created:",
+    "updated": "Updated:",
+    "expires": "Expires:",
+    "distance": "Distance:",
+    "bearing": "Absolute bearing:",
+    "lockedTo": "Locked by:",
+    "latitude": "Latitude:",
+    "longitude": "Longitude:"
+  },
+  "myNode": {
+    "tooltip": "This device"
+  }
+}

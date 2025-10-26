@@ -1,448 +1,448 @@
 {
-	"page": {
-		"tabAmbientLighting": "Ambient Lighting",
-		"tabAudio": "Аудио",
-		"tabCannedMessage": "Canned",
-		"tabDetectionSensor": "Detection Sensor",
-		"tabExternalNotification": "Ext Notif",
-		"tabMqtt": "MQTT",
-		"tabNeighborInfo": "Neighbor Info",
-		"tabPaxcounter": "Paxcounter",
-		"tabRangeTest": "Тест на обхвата",
-		"tabSerial": "Серийна",
-		"tabStoreAndForward": "S&F",
-		"tabTelemetry": "Телеметрия"
-	},
-	"ambientLighting": {
-		"title": "Ambient Lighting Settings",
-		"description": "Settings for the Ambient Lighting module",
-		"ledState": {
-			"label": "LED State",
-			"description": "Sets LED to on or off"
-		},
-		"current": {
-			"label": "Текущ",
-			"description": "Sets the current for the LED output. Default is 10"
-		},
-		"red": {
-			"label": "Червен",
-			"description": "Sets the red LED level. Values are 0-255"
-		},
-		"green": {
-			"label": "Зелен",
-			"description": "Sets the green LED level. Values are 0-255"
-		},
-		"blue": {
-			"label": "Син",
-			"description": "Sets the blue LED level. Values are 0-255"
-		}
-	},
-	"audio": {
-		"title": "Настройки на аудиото",
-		"description": "Настройки за аудио модула",
-		"codec2Enabled": {
-			"label": "Codec 2 е активиран",
-			"description": "Enable Codec 2 audio encoding"
-		},
-		"pttPin": {
-			"label": "Пин за РТТ",
-			"description": "GPIO пин, който да се използва за PTT"
-		},
-		"bitrate": {
-			"label": "Bitrate",
-			"description": "Bitrate to use for audio encoding"
-		},
-		"i2sWs": {
-			"label": "i2S WS",
-			"description": "GPIO pin to use for i2S WS"
-		},
-		"i2sSd": {
-			"label": "i2S SD",
-			"description": "GPIO pin to use for i2S SD"
-		},
-		"i2sDin": {
-			"label": "i2S DIN",
-			"description": "GPIO pin to use for i2S DIN"
-		},
-		"i2sSck": {
-			"label": "i2S SCK",
-			"description": "GPIO pin to use for i2S SCK"
-		}
-	},
-	"cannedMessage": {
-		"title": "Canned Message Settings",
-		"description": "Settings for the Canned Message module",
-		"moduleEnabled": {
-			"label": "Модулът е активиран",
-			"description": "Enable Canned Message"
-		},
-		"rotary1Enabled": {
-			"label": "Ротационен енкодер #1 е активиран",
-			"description": "Активиране на ротационния енкодер"
-		},
-		"inputbrokerPinA": {
-			"label": "Encoder Pin A",
-			"description": "GPIO Pin Value (1-39) For encoder port A"
-		},
-		"inputbrokerPinB": {
-			"label": "Encoder Pin B",
-			"description": "GPIO Pin Value (1-39) For encoder port B"
-		},
-		"inputbrokerPinPress": {
-			"label": "Encoder Pin Press",
-			"description": "GPIO Pin Value (1-39) For encoder Press"
-		},
-		"inputbrokerEventCw": {
-			"label": "Clockwise event",
-			"description": "Select input event."
-		},
-		"inputbrokerEventCcw": {
-			"label": "Counter Clockwise event",
-			"description": "Select input event."
-		},
-		"inputbrokerEventPress": {
-			"label": "Press event",
-			"description": "Select input event"
-		},
-		"updown1Enabled": {
-			"label": "Up Down enabled",
-			"description": "Enable the up / down encoder"
-		},
-		"allowInputSource": {
-			"label": "Allow Input Source",
-			"description": "Изберете от: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
-		},
-		"sendBell": {
-			"label": "Send Bell",
-			"description": "Sends a bell character with each message"
-		}
-	},
-	"detectionSensor": {
-		"title": "Detection Sensor Settings",
-		"description": "Settings for the Detection Sensor module",
-		"enabled": {
-			"label": "Активиран",
-			"description": "Enable or disable Detection Sensor Module"
-		},
-		"minimumBroadcastSecs": {
-			"label": "Minimum Broadcast Seconds",
-			"description": "The interval in seconds of how often we can send a message to the mesh when a state change is detected"
-		},
-		"stateBroadcastSecs": {
-			"label": "State Broadcast Seconds",
-			"description": "The interval in seconds of how often we should send a message to the mesh with the current state regardless of changes"
-		},
-		"sendBell": {
-			"label": "Send Bell",
-			"description": "Send ASCII bell with alert message"
-		},
-		"name": {
-			"label": "Приятелско име",
-			"description": "Използва се за форматиране на съобщението, изпратено до mesh, максимум 20 знака"
-		},
-		"monitorPin": {
-			"label": "Monitor Pin",
-			"description": "The GPIO pin to monitor for state changes"
-		},
-		"detectionTriggerType": {
-			"label": "Detection Triggered Type",
-			"description": "The type of trigger event to be used"
-		},
-		"usePullup": {
-			"label": "Use Pullup",
-			"description": "Whether or not use INPUT_PULLUP mode for GPIO pin"
-		}
-	},
-	"externalNotification": {
-		"title": "External Notification Settings",
-		"description": "Configure the external notification module",
-		"enabled": {
-			"label": "Модулът е активиран",
-			"description": "Enable External Notification"
-		},
-		"outputMs": {
-			"label": "Output MS",
-			"description": "Output MS"
-		},
-		"output": {
-			"label": "Output",
-			"description": "Output"
-		},
-		"outputVibra": {
-			"label": "Output Vibrate",
-			"description": "Output Vibrate"
-		},
-		"outputBuzzer": {
-			"label": "Output Buzzer",
-			"description": "Output Buzzer"
-		},
-		"active": {
-			"label": "Активно",
-			"description": "Активно"
-		},
-		"alertMessage": {
-			"label": "Предупредително съобщение",
-			"description": "Предупредително съобщение"
-		},
-		"alertMessageVibra": {
-			"label": "Alert Message Vibrate",
-			"description": "Alert Message Vibrate"
-		},
-		"alertMessageBuzzer": {
-			"label": "Alert Message Buzzer",
-			"description": "Alert Message Buzzer"
-		},
-		"alertBell": {
-			"label": "Alert Bell",
-			"description": "Should an alert be triggered when receiving an incoming bell?"
-		},
-		"alertBellVibra": {
-			"label": "Alert Bell Vibrate",
-			"description": "Alert Bell Vibrate"
-		},
-		"alertBellBuzzer": {
-			"label": "Alert Bell Buzzer",
-			"description": "Alert Bell Buzzer"
-		},
-		"usePwm": {
-			"label": "Use PWM",
-			"description": "Use PWM"
-		},
-		"nagTimeout": {
-			"label": "Nag Timeout",
-			"description": "Nag Timeout"
-		},
-		"useI2sAsBuzzer": {
-			"label": "Use I²S Pin as Buzzer",
-			"description": "Designate I²S Pin as Buzzer Output"
-		}
-	},
-	"mqtt": {
-		"title": "Настройки на MQTT",
-		"description": "Настройки за MQTT модула",
-		"enabled": {
-			"label": "Активиран",
-			"description": "Активиране или дезактивиране на MQTT"
-		},
-		"address": {
-			"label": "Адрес на MQTT сървъра",
-			"description": "Адрес на MQTT сървъра, който да се използва за сървъри по подразбиране/персонализирани сървъри"
-		},
-		"username": {
-			"label": "Потребителско име за MQTT",
-			"description": "Потребителско име за MQTT, което да се използва за сървъри по подразбиране/персонализирани сървъри"
-		},
-		"password": {
-			"label": "Парола за MQTT",
-			"description": "Парола за MQTT, която да се използва за сървъри по подразбиране/персонализирани сървъри"
-		},
-		"encryptionEnabled": {
-			"label": "Криптирането е активирано",
-			"description": "Enable or disable MQTT encryption. Note: All messages are sent to the MQTT broker unencrypted if this option is not enabled, even when your uplink channels have encryption keys set. This includes position data."
-		},
-		"jsonEnabled": {
-			"label": "JSON е активиран",
-			"description": "Whether to send/consume JSON packets on MQTT"
-		},
-		"tlsEnabled": {
-			"label": "TLS е активиран",
-			"description": "Активиране или дезактивиране на TLS"
-		},
-		"root": {
-			"label": "Root topic",
-			"description": "MQTT root topic to use for default/custom servers"
-		},
-		"proxyToClientEnabled": {
-			"label": "MQTT Client Proxy Enabled",
-			"description": "Utilizes the network connection to proxy MQTT messages to the client."
-		},
-		"mapReportingEnabled": {
-			"label": "Map Reporting Enabled",
-			"description": "Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, short and long name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name."
-		},
-		"mapReportSettings": {
-			"publishIntervalSecs": {
-				"label": "Map Report Publish Interval (s)",
-				"description": "Interval in seconds to publish map reports"
-			},
-			"positionPrecision": {
-				"label": "Приблизително местоположение",
-				"description": "Position shared will be accurate within this distance",
-				"options": {
-					"metric_km23": "В рамките на 23 км",
-					"metric_km12": "В рамките на 12 км",
-					"metric_km5_8": "В рамките на 5.8 км",
-					"metric_km2_9": "В рамките на 2.9 км",
-					"metric_km1_5": "В рамките на 1.5 км",
-					"metric_m700": "В рамките на 700 м",
-					"metric_m350": "В рамките на 350 м",
-					"metric_m200": "В рамките на 200 м",
-					"metric_m90": "В рамките на 90 м",
-					"metric_m50": "В рамките на 50 м",
-					"imperial_mi15": "В рамките на 15 мили",
-					"imperial_mi7_3": "В рамките на 7.3 мили",
-					"imperial_mi3_6": "В рамките на 3.6 мили",
-					"imperial_mi1_8": "В рамките на 1.8 мили",
-					"imperial_mi0_9": "В рамките на 0.9 мили",
-					"imperial_mi0_5": "В рамките на 0.5 мили",
-					"imperial_mi0_2": "В рамките на 0.2 мили",
-					"imperial_ft600": "В рамките на 600 фута",
-					"imperial_ft300": "В рамките на 300 фута",
-					"imperial_ft150": "В рамките на 150 фута"
-				}
-			}
-		}
-	},
-	"neighborInfo": {
-		"title": "Neighbor Info Settings",
-		"description": "Settings for the Neighbor Info module",
-		"enabled": {
-			"label": "Активиран",
-			"description": "Enable or disable Neighbor Info Module"
-		},
-		"updateInterval": {
-			"label": "Интервал на актуализиране",
-			"description": "Interval in seconds of how often we should try to send our Neighbor Info to the mesh"
-		}
-	},
-	"paxcounter": {
-		"title": "Paxcounter Settings",
-		"description": "Настройки за модула Paxcounter",
-		"enabled": {
-			"label": "Модулът е активиран",
-			"description": "Активиране на Paxcounter"
-		},
-		"paxcounterUpdateInterval": {
-			"label": "Интервал на актуализиране (секунди)",
-			"description": "How long to wait between sending paxcounter packets"
-		},
-		"wifiThreshold": {
-			"label": "WiFi RSSI Threshold",
-			"description": "At what WiFi RSSI level should the counter increase. Defaults to -80."
-		},
-		"bleThreshold": {
-			"label": "BLE RSSI Threshold",
-			"description": "At what BLE RSSI level should the counter increase. Defaults to -80."
-		}
-	},
-	"rangeTest": {
-		"title": "Настройки за тест на обхвата",
-		"description": "Настройки на модула за тестване на обхвата",
-		"enabled": {
-			"label": "Модулът е активиран",
-			"description": "Enable Range Test"
-		},
-		"sender": {
-			"label": "Интервал на съобщенията",
-			"description": "Колко време да се чака между изпращането на тестови пакети"
-		},
-		"save": {
-			"label": "Запазване на CSV в хранилището",
-			"description": "Само ESP32"
-		}
-	},
-	"serial": {
-		"title": "Серийни настройки",
-		"description": "Настройки на серийния модул",
-		"enabled": {
-			"label": "Модулът е активиран",
-			"description": "Активиране на сериен изход"
-		},
-		"echo": {
-			"label": "Echo",
-			"description": "Any packets you send will be echoed back to your device"
-		},
-		"rxd": {
-			"label": "Receive Pin",
-			"description": "Set the GPIO pin to the RXD pin you have set up."
-		},
-		"txd": {
-			"label": "Transmit Pin",
-			"description": "Set the GPIO pin to the TXD pin you have set up."
-		},
-		"baud": {
-			"label": "Baud Rate",
-			"description": "The serial baud rate"
-		},
-		"timeout": {
-			"label": "Timeout",
-			"description": "Seconds to wait before we consider your packet as 'done'"
-		},
-		"mode": {
-			"label": "Режим",
-			"description": "Избор на режим"
-		},
-		"overrideConsoleSerialPort": {
-			"label": "Override Console Serial Port",
-			"description": "If you have a serial port connected to the console, this will override it."
-		}
-	},
-	"storeForward": {
-		"title": "Store & Forward Settings",
-		"description": "Settings for the Store & Forward module",
-		"enabled": {
-			"label": "Модулът е активиран",
-			"description": "Enable Store & Forward"
-		},
-		"heartbeat": {
-			"label": "Heartbeat Enabled",
-			"description": "Enable Store & Forward heartbeat"
-		},
-		"records": {
-			"label": "Брой записи",
-			"description": "Number of records to store"
-		},
-		"historyReturnMax": {
-			"label": "History return max",
-			"description": "Max number of records to return"
-		},
-		"historyReturnWindow": {
-			"label": "History return window",
-			"description": "Return records from this time window (minutes)"
-		}
-	},
-	"telemetry": {
-		"title": "Настройки на телеметрията",
-		"description": "Настройки за модула за телеметрия",
-		"deviceUpdateInterval": {
-			"label": "Метрики на устройството",
-			"description": "Интервал на актуализиране на показателите на устройството (секунди)"
-		},
-		"environmentUpdateInterval": {
-			"label": "Интервал на актуализиране на показателите на околната среда (секунди)",
-			"description": ""
-		},
-		"environmentMeasurementEnabled": {
-			"label": "Модулът е активиран",
-			"description": "Enable the Environment Telemetry"
-		},
-		"environmentScreenEnabled": {
-			"label": "Показва се на екрана",
-			"description": "Show the Telemetry Module on the OLED"
-		},
-		"environmentDisplayFahrenheit": {
-			"label": "Показване на Фаренхайт",
-			"description": "Показване на температурата във Фаренхайт"
-		},
-		"airQualityEnabled": {
-			"label": "Качество на въздуха е активирано",
-			"description": "Активиране на телеметрията за качеството на въздуха"
-		},
-		"airQualityInterval": {
-			"label": "Air Quality Update Interval",
-			"description": "How often to send Air Quality data over the mesh"
-		},
-		"powerMeasurementEnabled": {
-			"label": "Power Measurement Enabled",
-			"description": "Enable the Power Measurement Telemetry"
-		},
-		"powerUpdateInterval": {
-			"label": "Power Update Interval",
-			"description": "How often to send Power data over the mesh"
-		},
-		"powerScreenEnabled": {
-			"label": "Power Screen Enabled",
-			"description": "Enable the Power Telemetry Screen"
-		}
-	}
+  "page": {
+    "tabAmbientLighting": "Ambient Lighting",
+    "tabAudio": "Аудио",
+    "tabCannedMessage": "Canned",
+    "tabDetectionSensor": "Detection Sensor",
+    "tabExternalNotification": "Ext Notif",
+    "tabMqtt": "MQTT",
+    "tabNeighborInfo": "Neighbor Info",
+    "tabPaxcounter": "Paxcounter",
+    "tabRangeTest": "Тест на обхвата",
+    "tabSerial": "Серийна",
+    "tabStoreAndForward": "S&F",
+    "tabTelemetry": "Телеметрия"
+  },
+  "ambientLighting": {
+    "title": "Ambient Lighting Settings",
+    "description": "Settings for the Ambient Lighting module",
+    "ledState": {
+      "label": "LED State",
+      "description": "Sets LED to on or off"
+    },
+    "current": {
+      "label": "Текущ",
+      "description": "Sets the current for the LED output. Default is 10"
+    },
+    "red": {
+      "label": "Червен",
+      "description": "Sets the red LED level. Values are 0-255"
+    },
+    "green": {
+      "label": "Зелен",
+      "description": "Sets the green LED level. Values are 0-255"
+    },
+    "blue": {
+      "label": "Син",
+      "description": "Sets the blue LED level. Values are 0-255"
+    }
+  },
+  "audio": {
+    "title": "Настройки на аудиото",
+    "description": "Настройки за аудио модула",
+    "codec2Enabled": {
+      "label": "Codec 2 е активиран",
+      "description": "Enable Codec 2 audio encoding"
+    },
+    "pttPin": {
+      "label": "Пин за РТТ",
+      "description": "GPIO пин, който да се използва за PTT"
+    },
+    "bitrate": {
+      "label": "Bitrate",
+      "description": "Bitrate to use for audio encoding"
+    },
+    "i2sWs": {
+      "label": "i2S WS",
+      "description": "GPIO pin to use for i2S WS"
+    },
+    "i2sSd": {
+      "label": "i2S SD",
+      "description": "GPIO pin to use for i2S SD"
+    },
+    "i2sDin": {
+      "label": "i2S DIN",
+      "description": "GPIO pin to use for i2S DIN"
+    },
+    "i2sSck": {
+      "label": "i2S SCK",
+      "description": "GPIO pin to use for i2S SCK"
+    }
+  },
+  "cannedMessage": {
+    "title": "Canned Message Settings",
+    "description": "Settings for the Canned Message module",
+    "moduleEnabled": {
+      "label": "Модулът е активиран",
+      "description": "Enable Canned Message"
+    },
+    "rotary1Enabled": {
+      "label": "Ротационен енкодер #1 е активиран",
+      "description": "Активиране на ротационния енкодер"
+    },
+    "inputbrokerPinA": {
+      "label": "Encoder Pin A",
+      "description": "GPIO Pin Value (1-39) For encoder port A"
+    },
+    "inputbrokerPinB": {
+      "label": "Encoder Pin B",
+      "description": "GPIO Pin Value (1-39) For encoder port B"
+    },
+    "inputbrokerPinPress": {
+      "label": "Encoder Pin Press",
+      "description": "GPIO Pin Value (1-39) For encoder Press"
+    },
+    "inputbrokerEventCw": {
+      "label": "Clockwise event",
+      "description": "Select input event."
+    },
+    "inputbrokerEventCcw": {
+      "label": "Counter Clockwise event",
+      "description": "Select input event."
+    },
+    "inputbrokerEventPress": {
+      "label": "Press event",
+      "description": "Select input event"
+    },
+    "updown1Enabled": {
+      "label": "Up Down enabled",
+      "description": "Enable the up / down encoder"
+    },
+    "allowInputSource": {
+      "label": "Allow Input Source",
+      "description": "Изберете от: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
+    },
+    "sendBell": {
+      "label": "Send Bell",
+      "description": "Sends a bell character with each message"
+    }
+  },
+  "detectionSensor": {
+    "title": "Detection Sensor Settings",
+    "description": "Settings for the Detection Sensor module",
+    "enabled": {
+      "label": "Активиран",
+      "description": "Enable or disable Detection Sensor Module"
+    },
+    "minimumBroadcastSecs": {
+      "label": "Minimum Broadcast Seconds",
+      "description": "The interval in seconds of how often we can send a message to the mesh when a state change is detected"
+    },
+    "stateBroadcastSecs": {
+      "label": "State Broadcast Seconds",
+      "description": "The interval in seconds of how often we should send a message to the mesh with the current state regardless of changes"
+    },
+    "sendBell": {
+      "label": "Send Bell",
+      "description": "Send ASCII bell with alert message"
+    },
+    "name": {
+      "label": "Приятелско име",
+      "description": "Използва се за форматиране на съобщението, изпратено до mesh, максимум 20 знака"
+    },
+    "monitorPin": {
+      "label": "Monitor Pin",
+      "description": "The GPIO pin to monitor for state changes"
+    },
+    "detectionTriggerType": {
+      "label": "Detection Triggered Type",
+      "description": "The type of trigger event to be used"
+    },
+    "usePullup": {
+      "label": "Use Pullup",
+      "description": "Whether or not use INPUT_PULLUP mode for GPIO pin"
+    }
+  },
+  "externalNotification": {
+    "title": "External Notification Settings",
+    "description": "Configure the external notification module",
+    "enabled": {
+      "label": "Модулът е активиран",
+      "description": "Enable External Notification"
+    },
+    "outputMs": {
+      "label": "Output MS",
+      "description": "Output MS"
+    },
+    "output": {
+      "label": "Output",
+      "description": "Output"
+    },
+    "outputVibra": {
+      "label": "Output Vibrate",
+      "description": "Output Vibrate"
+    },
+    "outputBuzzer": {
+      "label": "Output Buzzer",
+      "description": "Output Buzzer"
+    },
+    "active": {
+      "label": "Активно",
+      "description": "Активно"
+    },
+    "alertMessage": {
+      "label": "Предупредително съобщение",
+      "description": "Предупредително съобщение"
+    },
+    "alertMessageVibra": {
+      "label": "Alert Message Vibrate",
+      "description": "Alert Message Vibrate"
+    },
+    "alertMessageBuzzer": {
+      "label": "Alert Message Buzzer",
+      "description": "Alert Message Buzzer"
+    },
+    "alertBell": {
+      "label": "Alert Bell",
+      "description": "Should an alert be triggered when receiving an incoming bell?"
+    },
+    "alertBellVibra": {
+      "label": "Alert Bell Vibrate",
+      "description": "Alert Bell Vibrate"
+    },
+    "alertBellBuzzer": {
+      "label": "Alert Bell Buzzer",
+      "description": "Alert Bell Buzzer"
+    },
+    "usePwm": {
+      "label": "Use PWM",
+      "description": "Use PWM"
+    },
+    "nagTimeout": {
+      "label": "Nag Timeout",
+      "description": "Nag Timeout"
+    },
+    "useI2sAsBuzzer": {
+      "label": "Use I²S Pin as Buzzer",
+      "description": "Designate I²S Pin as Buzzer Output"
+    }
+  },
+  "mqtt": {
+    "title": "Настройки на MQTT",
+    "description": "Настройки за MQTT модула",
+    "enabled": {
+      "label": "Активиран",
+      "description": "Активиране или дезактивиране на MQTT"
+    },
+    "address": {
+      "label": "Адрес на MQTT сървъра",
+      "description": "Адрес на MQTT сървъра, който да се използва за сървъри по подразбиране/персонализирани сървъри"
+    },
+    "username": {
+      "label": "Потребителско име за MQTT",
+      "description": "Потребителско име за MQTT, което да се използва за сървъри по подразбиране/персонализирани сървъри"
+    },
+    "password": {
+      "label": "Парола за MQTT",
+      "description": "Парола за MQTT, която да се използва за сървъри по подразбиране/персонализирани сървъри"
+    },
+    "encryptionEnabled": {
+      "label": "Криптирането е активирано",
+      "description": "Enable or disable MQTT encryption. Note: All messages are sent to the MQTT broker unencrypted if this option is not enabled, even when your uplink channels have encryption keys set. This includes position data."
+    },
+    "jsonEnabled": {
+      "label": "JSON е активиран",
+      "description": "Whether to send/consume JSON packets on MQTT"
+    },
+    "tlsEnabled": {
+      "label": "TLS е активиран",
+      "description": "Активиране или дезактивиране на TLS"
+    },
+    "root": {
+      "label": "Root topic",
+      "description": "MQTT root topic to use for default/custom servers"
+    },
+    "proxyToClientEnabled": {
+      "label": "MQTT Client Proxy Enabled",
+      "description": "Utilizes the network connection to proxy MQTT messages to the client."
+    },
+    "mapReportingEnabled": {
+      "label": "Map Reporting Enabled",
+      "description": "Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, short and long name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name."
+    },
+    "mapReportSettings": {
+      "publishIntervalSecs": {
+        "label": "Map Report Publish Interval (s)",
+        "description": "Interval in seconds to publish map reports"
+      },
+      "positionPrecision": {
+        "label": "Приблизително местоположение",
+        "description": "Position shared will be accurate within this distance",
+        "options": {
+          "metric_km23": "В рамките на 23 км",
+          "metric_km12": "В рамките на 12 км",
+          "metric_km5_8": "В рамките на 5.8 км",
+          "metric_km2_9": "В рамките на 2.9 км",
+          "metric_km1_5": "В рамките на 1.5 км",
+          "metric_m700": "В рамките на 700 м",
+          "metric_m350": "В рамките на 350 м",
+          "metric_m200": "В рамките на 200 м",
+          "metric_m90": "В рамките на 90 м",
+          "metric_m50": "В рамките на 50 м",
+          "imperial_mi15": "В рамките на 15 мили",
+          "imperial_mi7_3": "В рамките на 7.3 мили",
+          "imperial_mi3_6": "В рамките на 3.6 мили",
+          "imperial_mi1_8": "В рамките на 1.8 мили",
+          "imperial_mi0_9": "В рамките на 0.9 мили",
+          "imperial_mi0_5": "В рамките на 0.5 мили",
+          "imperial_mi0_2": "В рамките на 0.2 мили",
+          "imperial_ft600": "В рамките на 600 фута",
+          "imperial_ft300": "В рамките на 300 фута",
+          "imperial_ft150": "В рамките на 150 фута"
+        }
+      }
+    }
+  },
+  "neighborInfo": {
+    "title": "Neighbor Info Settings",
+    "description": "Settings for the Neighbor Info module",
+    "enabled": {
+      "label": "Активиран",
+      "description": "Enable or disable Neighbor Info Module"
+    },
+    "updateInterval": {
+      "label": "Интервал на актуализиране",
+      "description": "Interval in seconds of how often we should try to send our Neighbor Info to the mesh"
+    }
+  },
+  "paxcounter": {
+    "title": "Paxcounter Settings",
+    "description": "Настройки за модула Paxcounter",
+    "enabled": {
+      "label": "Модулът е активиран",
+      "description": "Активиране на Paxcounter"
+    },
+    "paxcounterUpdateInterval": {
+      "label": "Интервал на актуализиране (секунди)",
+      "description": "How long to wait between sending paxcounter packets"
+    },
+    "wifiThreshold": {
+      "label": "WiFi RSSI Threshold",
+      "description": "At what WiFi RSSI level should the counter increase. Defaults to -80."
+    },
+    "bleThreshold": {
+      "label": "BLE RSSI Threshold",
+      "description": "At what BLE RSSI level should the counter increase. Defaults to -80."
+    }
+  },
+  "rangeTest": {
+    "title": "Настройки за тест на обхвата",
+    "description": "Настройки на модула за тестване на обхвата",
+    "enabled": {
+      "label": "Модулът е активиран",
+      "description": "Enable Range Test"
+    },
+    "sender": {
+      "label": "Интервал на съобщенията",
+      "description": "Колко време да се чака между изпращането на тестови пакети"
+    },
+    "save": {
+      "label": "Запазване на CSV в хранилището",
+      "description": "Само ESP32"
+    }
+  },
+  "serial": {
+    "title": "Серийни настройки",
+    "description": "Настройки на серийния модул",
+    "enabled": {
+      "label": "Модулът е активиран",
+      "description": "Активиране на сериен изход"
+    },
+    "echo": {
+      "label": "Echo",
+      "description": "Any packets you send will be echoed back to your device"
+    },
+    "rxd": {
+      "label": "Receive Pin",
+      "description": "Set the GPIO pin to the RXD pin you have set up."
+    },
+    "txd": {
+      "label": "Transmit Pin",
+      "description": "Set the GPIO pin to the TXD pin you have set up."
+    },
+    "baud": {
+      "label": "Baud Rate",
+      "description": "The serial baud rate"
+    },
+    "timeout": {
+      "label": "Timeout",
+      "description": "Seconds to wait before we consider your packet as 'done'"
+    },
+    "mode": {
+      "label": "Режим",
+      "description": "Избор на режим"
+    },
+    "overrideConsoleSerialPort": {
+      "label": "Override Console Serial Port",
+      "description": "If you have a serial port connected to the console, this will override it."
+    }
+  },
+  "storeForward": {
+    "title": "Store & Forward Settings",
+    "description": "Settings for the Store & Forward module",
+    "enabled": {
+      "label": "Модулът е активиран",
+      "description": "Enable Store & Forward"
+    },
+    "heartbeat": {
+      "label": "Heartbeat Enabled",
+      "description": "Enable Store & Forward heartbeat"
+    },
+    "records": {
+      "label": "Брой записи",
+      "description": "Number of records to store"
+    },
+    "historyReturnMax": {
+      "label": "History return max",
+      "description": "Max number of records to return"
+    },
+    "historyReturnWindow": {
+      "label": "History return window",
+      "description": "Return records from this time window (minutes)"
+    }
+  },
+  "telemetry": {
+    "title": "Настройки на телеметрията",
+    "description": "Настройки за модула за телеметрия",
+    "deviceUpdateInterval": {
+      "label": "Метрики на устройството",
+      "description": "Интервал на актуализиране на показателите на устройството (секунди)"
+    },
+    "environmentUpdateInterval": {
+      "label": "Интервал на актуализиране на показателите на околната среда (секунди)",
+      "description": ""
+    },
+    "environmentMeasurementEnabled": {
+      "label": "Модулът е активиран",
+      "description": "Enable the Environment Telemetry"
+    },
+    "environmentScreenEnabled": {
+      "label": "Показва се на екрана",
+      "description": "Show the Telemetry Module on the OLED"
+    },
+    "environmentDisplayFahrenheit": {
+      "label": "Показване на Фаренхайт",
+      "description": "Показване на температурата във Фаренхайт"
+    },
+    "airQualityEnabled": {
+      "label": "Качество на въздуха е активирано",
+      "description": "Активиране на телеметрията за качеството на въздуха"
+    },
+    "airQualityInterval": {
+      "label": "Air Quality Update Interval",
+      "description": "How often to send Air Quality data over the mesh"
+    },
+    "powerMeasurementEnabled": {
+      "label": "Power Measurement Enabled",
+      "description": "Enable the Power Measurement Telemetry"
+    },
+    "powerUpdateInterval": {
+      "label": "Power Update Interval",
+      "description": "How often to send Power data over the mesh"
+    },
+    "powerScreenEnabled": {
+      "label": "Power Screen Enabled",
+      "description": "Enable the Power Telemetry Screen"
+    }
+  }
 }

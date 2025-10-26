@@ -1,193 +1,221 @@
 {
-	"deleteMessages": {
-		"description": "Bu işlem tüm mesaj geçmişini temizleyecektir. Bu işlem geri alınamaz. Devam etmek istediğinizden emin misiniz?",
-		"title": "Tüm Mesajları Sil"
-	},
-	"deviceName": {
-		"description": "Yapılandırma kaydedildikten sonra Cihaz yeniden başlatılacaktır.",
-		"longName": "Uzun Ad",
-		"shortName": "Kısa Ad",
-		"title": "Cihazın Adını Değiştir",
-		"validation": {
-			"longNameMax": "Long name must not be more than 40 characters",
-			"shortNameMax": "Short name must not be more than 4 characters",
-			"longNameMin": "Long name must have at least 1 character",
-			"shortNameMin": "Short name must have at least 1 character"
-		}
-	},
-	"import": {
-		"description": "The current LoRa configuration will be overridden.",
-		"error": {
-			"invalidUrl": "Invalid Meshtastic URL"
-		},
-		"channelPrefix": "Channel: ",
-		"channelSetUrl": "Channel Set/QR Code URL",
-		"channels": "Channels:",
-		"usePreset": "Use Preset?",
-		"title": "Import Channel Set"
-	},
-	"locationResponse": {
-		"title": "Location: {{identifier}}",
-		"altitude": "Altitude: ",
-		"coordinates": "Coordinates: ",
-		"noCoordinates": "No Coordinates"
-	},
-	"pkiRegenerateDialog": {
-		"title": "Regenerate Pre-Shared Key?",
-		"description": "Are you sure you want to regenerate the pre-shared key?",
-		"regenerate": "Regenerate"
-	},
-	"newDeviceDialog": {
-		"title": "Connect New Device",
-		"https": "https",
-		"http": "http",
-		"tabHttp": "HTTP",
-		"tabBluetooth": "Bluetooth",
-		"tabSerial": "Seri",
-		"useHttps": "Use HTTPS",
-		"connecting": "Connecting...",
-		"connect": "Bağlan",
-		"connectionFailedAlert": {
-			"title": "Connection Failed",
-			"descriptionPrefix": "Could not connect to the device. ",
-			"httpsHint": "If using HTTPS, you may need to accept a self-signed certificate first. ",
-			"openLinkPrefix": "Please open ",
-			"openLinkSuffix": " in a new tab",
-			"acceptTlsWarningSuffix": ", accept any TLS warnings if prompted, then try again",
-			"learnMoreLink": "Learn more"
-		},
-		"httpConnection": {
-			"label": "IP Address/Hostname",
-			"placeholder": "000.000.000.000 / meshtastic.local"
-		},
-		"serialConnection": {
-			"noDevicesPaired": "No devices paired yet.",
-			"newDeviceButton": "New device",
-			"deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
-		},
-		"bluetoothConnection": {
-			"noDevicesPaired": "No devices paired yet.",
-			"newDeviceButton": "New device",
-			"connectionFailed": "Connection failed",
-			"deviceDisconnected": "Device disconnected",
-			"unknownDevice": "Bilinmeyen Cihaz",
-			"errorLoadingDevices": "Cihazları yüklerken hata oluştu",
-			"unknownErrorLoadingDevices": "Cihazları yüklerken bilinmeyen hata oluştu"
-		},
-		"validation": {
-			"requiresWebBluetooth": "Bu bağlantı tipi <0>Web Bluetooth</0> gerektirir. Lütfen desteklenen bir tarayıcı kullan, Chrome yada Edge gibi.",
-			"requiresWebSerial": "Bu bağlantı tipi <0>Web Serial</0> gerektirir. Lütfen desteklenen bir tarayıcı kullan, Chrome yada Edge gibi.",
-			"requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
-			"additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
-		}
-	},
-	"nodeDetails": {
-		"message": "Mesaj",
-		"requestPosition": "Request Position",
-		"traceRoute": "Trace Route",
-		"airTxUtilization": "Air TX utilization",
-		"allRawMetrics": "All Raw Metrics:",
-		"batteryLevel": "Battery level",
-		"channelUtilization": "Channel utilization",
-		"details": "Details:",
-		"deviceMetrics": "Device Metrics:",
-		"hardware": "Donanım: ",
-		"lastHeard": "Last Heard: ",
-		"nodeHexPrefix": "Node Hex: ",
-		"nodeNumber": "Node Number: ",
-		"position": "Position:",
-		"role": "Rol: ",
-		"uptime": "Çalışma süresi: ",
-		"voltage": "Voltaj",
-		"title": "{{identifier}} Node Detayları",
-		"ignoreNode": "Node yoksay",
-		"removeNode": "Node sil",
-		"unignoreNode": "Node yoksaymayı bırak",
-		"security": "Security:",
-		"publicKey": "Public Key: ",
-		"messageable": "Messageable: ",
-		"KeyManuallyVerifiedTrue": "Public Key has been manually verified",
-		"KeyManuallyVerifiedFalse": "Public Key is not manually verified"
-	},
-	"pkiBackup": {
-		"loseKeysWarning": "Eğer anahtarınızı kaybederseniz cihazınızı sıfırlamalısınız.",
-		"secureBackup": "Açık ve gizli anahtarınızı yedekleyin ve güvenli bir şekilde depolayın!",
-		"footer": "=== ANAHTAR SONU ===",
-		"header": "=== MESHTASTIC ANAHTARI {{longName}} ({{shortName}}) İÇİN ===",
-		"privateKey": "Gizli Anahtar:",
-		"publicKey": "Açık Anahtar:",
-		"fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-		"title": "Anahtarları Yedekle"
-	},
-	"pkiBackupReminder": {
-		"description": "We recommend backing up your key data regularly. Would you like to back up now?",
-		"title": "Backup Reminder",
-		"remindLaterPrefix": "Remind me in",
-		"remindNever": "Never remind me",
-		"backupNow": "Back up now"
-	},
-	"pkiRegenerate": {
-		"description": "Are you sure you want to regenerate key pair?",
-		"title": "Regenerate Key Pair"
-	},
-	"qr": {
-		"addChannels": "Kanal Ekle",
-		"replaceChannels": "Kanalları Değiştir",
-		"description": "Mevcut LoRa yapılandırması da paylaşılacak.",
-		"sharableUrl": "Paylaşılabilir URL",
-		"title": "QR kod oluştur"
-	},
-	"reboot": {
-		"title": "Reboot device",
-		"description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
-		"ota": "Reboot into OTA mode",
-		"enterDelay": "Enter delay",
-		"scheduled": "Reboot has been scheduled",
-		"schedule": "Schedule reboot",
-		"now": "Reboot now",
-		"cancel": "Cancel scheduled reboot"
-	},
-	"refreshKeys": {
-		"description": {
-			"acceptNewKeys": "This will remove the node from device and request new keys.",
-			"keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
-			"unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
-		},
-		"acceptNewKeys": "Accept New Keys",
-		"title": "Keys Mismatch - {{identifier}}"
-	},
-	"removeNode": {
-		"description": "Are you sure you want to remove this Node?",
-		"title": "Remove Node?"
-	},
-	"shutdown": {
-		"title": "Kapatmayı Planla",
-		"description": "Turn off the connected node after x minutes."
-	},
-	"traceRoute": {
-		"routeToDestination": "Route to destination:",
-		"routeBack": "Route back:"
-	},
-	"tracerouteResponse": {
-		"title": "Traceroute: {{identifier}}"
-	},
-	"unsafeRoles": {
-		"confirmUnderstanding": "Evet, ne yaptığımı biliyorum",
-		"conjunction": " and the blog post about ",
-		"postamble": " and understand the implications of changing the role.",
-		"preamble": "Okudum ",
-		"choosingRightDeviceRole": "Doğru Cihaz Rolünü Seç",
-		"deviceRoleDocumentation": "Cihaz Rolü Dökümanları",
-		"title": "Emin misiniz?"
-	},
-	"managedMode": {
-		"confirmUnderstanding": "Evet, ne yaptığımı biliyorum",
-		"title": "Emin misiniz?",
-		"description": "Yönetilen Modun etkinleştirilmesi, istemci uygulamalarının (web istemcisi dahil) bir radyoya yapılandırma yazmasını engeller. Etkinleştirildikten sonra, radyo yapılandırmaları yalnızca Uzak Yönetici mesajları aracılığıyla değiştirilebilir. Bu ayar, uzak düğüm yönetimi için gerekli değildir."
-	},
-	"clientNotification": {
-		"title": "Client Notification",
-		"TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
-		"Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
-	}
+  "deleteMessages": {
+    "description": "Bu işlem tüm mesaj geçmişini temizleyecektir. Bu işlem geri alınamaz. Devam etmek istediğinizden emin misiniz?",
+    "title": "Tüm Mesajları Sil"
+  },
+  "deviceName": {
+    "description": "Yapılandırma kaydedildikten sonra Cihaz yeniden başlatılacaktır.",
+    "longName": "Uzun Ad",
+    "shortName": "Kısa Ad",
+    "title": "Cihazın Adını Değiştir",
+    "validation": {
+      "longNameMax": "Long name must not be more than 40 characters",
+      "shortNameMax": "Short name must not be more than 4 characters",
+      "longNameMin": "Long name must have at least 1 character",
+      "shortNameMin": "Short name must have at least 1 character"
+    }
+  },
+  "import": {
+    "description": "The current LoRa configuration will be overridden.",
+    "error": {
+      "invalidUrl": "Invalid Meshtastic URL"
+    },
+    "channelPrefix": "Channel: ",
+    "primary": "Primary ",
+    "doNotImport": "No not import",
+    "channelName": "İsmi",
+    "channelSlot": "Yuva",
+    "channelSetUrl": "Channel Set/QR Code URL",
+    "useLoraConfig": "Import LoRa Config",
+    "presetDescription": "The current LoRa Config will be replaced.",
+    "title": "Import Channel Set"
+  },
+  "locationResponse": {
+    "title": "Location: {{identifier}}",
+    "altitude": "Altitude: ",
+    "coordinates": "Coordinates: ",
+    "noCoordinates": "No Coordinates"
+  },
+  "pkiRegenerateDialog": {
+    "title": "Regenerate Pre-Shared Key?",
+    "description": "Are you sure you want to regenerate the pre-shared key?",
+    "regenerate": "Regenerate"
+  },
+  "newDeviceDialog": {
+    "title": "Connect New Device",
+    "https": "https",
+    "http": "http",
+    "tabHttp": "HTTP",
+    "tabBluetooth": "Bluetooth",
+    "tabSerial": "Seri",
+    "useHttps": "Use HTTPS",
+    "connecting": "Connecting...",
+    "connect": "Bağlan",
+    "connectionFailedAlert": {
+      "title": "Connection Failed",
+      "descriptionPrefix": "Could not connect to the device. ",
+      "httpsHint": "If using HTTPS, you may need to accept a self-signed certificate first. ",
+      "openLinkPrefix": "Please open ",
+      "openLinkSuffix": " in a new tab",
+      "acceptTlsWarningSuffix": ", accept any TLS warnings if prompted, then try again",
+      "learnMoreLink": "Learn more"
+    },
+    "httpConnection": {
+      "label": "IP Address/Hostname",
+      "placeholder": "000.000.000.000 / meshtastic.local"
+    },
+    "serialConnection": {
+      "noDevicesPaired": "No devices paired yet.",
+      "newDeviceButton": "New device",
+      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
+    },
+    "bluetoothConnection": {
+      "noDevicesPaired": "No devices paired yet.",
+      "newDeviceButton": "New device",
+      "connectionFailed": "Connection failed",
+      "deviceDisconnected": "Device disconnected",
+      "unknownDevice": "Bilinmeyen Cihaz",
+      "errorLoadingDevices": "Cihazları yüklerken hata oluştu",
+      "unknownErrorLoadingDevices": "Cihazları yüklerken bilinmeyen hata oluştu"
+    },
+    "validation": {
+      "requiresWebBluetooth": "Bu bağlantı tipi <0>Web Bluetooth</0> gerektirir. Lütfen desteklenen bir tarayıcı kullan, Chrome yada Edge gibi.",
+      "requiresWebSerial": "Bu bağlantı tipi <0>Web Serial</0> gerektirir. Lütfen desteklenen bir tarayıcı kullan, Chrome yada Edge gibi.",
+      "requiresSecureContext": "This application requires a <0>secure context</0>. Please connect using HTTPS or localhost.",
+      "additionallyRequiresSecureContext": "Additionally, it requires a <0>secure context</0>. Please connect using HTTPS or localhost."
+    }
+  },
+  "nodeDetails": {
+    "message": "Mesaj",
+    "requestPosition": "Request Position",
+    "traceRoute": "Trace Route",
+    "airTxUtilization": "Air TX utilization",
+    "allRawMetrics": "All Raw Metrics:",
+    "batteryLevel": "Battery level",
+    "channelUtilization": "Channel utilization",
+    "details": "Details:",
+    "deviceMetrics": "Device Metrics:",
+    "hardware": "Donanım: ",
+    "lastHeard": "Last Heard: ",
+    "nodeHexPrefix": "Node Hex: ",
+    "nodeNumber": "Node Number: ",
+    "position": "Position:",
+    "role": "Rol: ",
+    "uptime": "Çalışma süresi: ",
+    "voltage": "Voltaj",
+    "title": "{{identifier}} Node Detayları",
+    "ignoreNode": "Node yoksay",
+    "removeNode": "Node sil",
+    "unignoreNode": "Node yoksaymayı bırak",
+    "security": "Security:",
+    "publicKey": "Public Key: ",
+    "messageable": "Messageable: ",
+    "KeyManuallyVerifiedTrue": "Public Key has been manually verified",
+    "KeyManuallyVerifiedFalse": "Public Key is not manually verified"
+  },
+  "pkiBackup": {
+    "loseKeysWarning": "Eğer anahtarınızı kaybederseniz cihazınızı sıfırlamalısınız.",
+    "secureBackup": "Açık ve gizli anahtarınızı yedekleyin ve güvenli bir şekilde depolayın!",
+    "footer": "=== ANAHTAR SONU ===",
+    "header": "=== MESHTASTIC ANAHTARI {{longName}} ({{shortName}}) İÇİN ===",
+    "privateKey": "Gizli Anahtar:",
+    "publicKey": "Açık Anahtar:",
+    "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
+    "title": "Anahtarları Yedekle"
+  },
+  "pkiBackupReminder": {
+    "description": "We recommend backing up your key data regularly. Would you like to back up now?",
+    "title": "Backup Reminder",
+    "remindLaterPrefix": "Remind me in",
+    "remindNever": "Never remind me",
+    "backupNow": "Back up now"
+  },
+  "pkiRegenerate": {
+    "description": "Are you sure you want to regenerate key pair?",
+    "title": "Regenerate Key Pair"
+  },
+  "qr": {
+    "addChannels": "Kanal Ekle",
+    "replaceChannels": "Kanalları Değiştir",
+    "description": "Mevcut LoRa yapılandırması da paylaşılacak.",
+    "sharableUrl": "Paylaşılabilir URL",
+    "title": "QR kod oluştur"
+  },
+  "reboot": {
+    "title": "Reboot device",
+    "description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
+    "ota": "Reboot into OTA mode",
+    "enterDelay": "Enter delay",
+    "scheduled": "Reboot has been scheduled",
+    "schedule": "Schedule reboot",
+    "now": "Reboot now",
+    "cancel": "Cancel scheduled reboot"
+  },
+  "refreshKeys": {
+    "description": {
+      "acceptNewKeys": "This will remove the node from device and request new keys.",
+      "keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
+      "unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
+    },
+    "acceptNewKeys": "Accept New Keys",
+    "title": "Keys Mismatch - {{identifier}}"
+  },
+  "removeNode": {
+    "description": "Are you sure you want to remove this Node?",
+    "title": "Remove Node?"
+  },
+  "shutdown": {
+    "title": "Kapatmayı Planla",
+    "description": "Turn off the connected node after x minutes."
+  },
+  "traceRoute": {
+    "routeToDestination": "Route to destination:",
+    "routeBack": "Route back:"
+  },
+  "tracerouteResponse": {
+    "title": "Traceroute: {{identifier}}"
+  },
+  "unsafeRoles": {
+    "confirmUnderstanding": "Evet, ne yaptığımı biliyorum",
+    "conjunction": " and the blog post about ",
+    "postamble": " and understand the implications of changing the role.",
+    "preamble": "Okudum ",
+    "choosingRightDeviceRole": "Doğru Cihaz Rolünü Seç",
+    "deviceRoleDocumentation": "Cihaz Rolü Dökümanları",
+    "title": "Emin misiniz?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Evet, ne yaptığımı biliyorum",
+    "title": "Emin misiniz?",
+    "description": "Yönetilen Modun etkinleştirilmesi, istemci uygulamalarının (web istemcisi dahil) bir radyoya yapılandırma yazmasını engeller. Etkinleştirildikten sonra, radyo yapılandırmaları yalnızca Uzak Yönetici mesajları aracılığıyla değiştirilebilir. Bu ayar, uzak düğüm yönetimi için gerekli değildir."
+  },
+  "clientNotification": {
+    "title": "Client Notification",
+    "TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
+    "Compromised keys were detected and regenerated.": "Compromised keys were detected and regenerated."
+  },
+  "resetNodeDb": {
+    "title": "Reset Node Database",
+    "description": "This will clear all nodes from the connected device's node database and clear all message history in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Reset Node Database",
+    "failedTitle": "There was an error resetting the Node DB. Please try again."
+  },
+  "clearAllStores": {
+    "title": "Clear All Local Storage",
+    "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
+    "confirm": "Clear all local storage",
+    "failedTitle": "There was an error clearing local storage. Please try again."
+  },
+  "factoryResetDevice": {
+    "title": "Cihazı Fabrika Ayarlarına Sıfırlayın",
+    "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Cihazı Fabrika Ayarlarına Sıfırlayın",
+    "failedTitle": "There was an error performing the factory reset. Please try again."
+  },
+  "factoryResetConfig": {
+    "title": "Fabrika Ayarları Yapılandırması",
+    "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Fabrika Ayarları Yapılandırması",
+    "failedTitle": "There was an error performing the factory reset. Please try again."
+  }
 }
