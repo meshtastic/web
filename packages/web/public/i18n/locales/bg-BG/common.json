@@ -1,142 +1,157 @@
 {
-	"button": {
-		"apply": "Приложи",
-		"backupKey": "Резервно копие на ключа",
-		"cancel": "Отказ",
-		"clearMessages": "Изчистване на съобщенията",
-		"close": "Затвори",
-		"confirm": "Потвърждаване",
-		"delete": "Изтриване",
-		"dismiss": "Отхвърляне",
-		"download": "Изтегляне",
-		"export": "Експортиране",
-		"generate": "Генериране",
-		"regenerate": "Регенериране",
-		"import": "Импортиране",
-		"message": "Съобщение",
-		"now": "Сега",
-		"ok": "Добре",
-		"print": "Отпечатване",
-		"remove": "Изтрий",
-		"requestNewKeys": "Заявка за нови ключове",
-		"requestPosition": "Request Position",
-		"reset": "Нулиране",
-		"save": "Запис",
-		"scanQr": "Сканиране на QR кода",
-		"traceRoute": "Trace Route",
-		"submit": "Изпращане"
-	},
-	"app": {
-		"title": "Meshtastic",
-		"fullTitle": "Meshtastic Web клиент"
-	},
-	"loading": "Зареждане...",
-	"unit": {
-		"cps": "CPS",
-		"dbm": "dBm",
-		"hertz": "Hz",
-		"hop": {
-			"one": "Хоп",
-			"plural": "Хопа"
-		},
-		"hopsAway": {
-			"one": "{{count}} hop away",
-			"plural": "{{count}} hops away",
-			"unknown": "Unknown hops away"
-		},
-		"megahertz": "MHz",
-		"raw": "raw",
-		"meter": {
-			"one": "Метър",
-			"plural": "Метри",
-			"suffix": "m"
-		},
-		"minute": {
-			"one": "Минута",
-			"plural": "Минути"
-		},
-		"hour": {
-			"one": "Час",
-			"plural": "Часа"
-		},
-		"millisecond": {
-			"one": "Милисекунда",
-			"plural": "Милисекунди",
-			"suffix": "ms"
-		},
-		"second": {
-			"one": "Секунда",
-			"plural": "Секунди"
-		},
-		"day": {
-			"one": "Ден",
-			"plural": "Дни"
-		},
-		"month": {
-			"one": "Месец",
-			"plural": "Месеца"
-		},
-		"year": {
-			"one": "Година",
-			"plural": "Години"
-		},
-		"snr": "SNR",
-		"volt": {
-			"one": "Волт",
-			"plural": "Волта",
-			"suffix": "V"
-		},
-		"record": {
-			"one": "Записи",
-			"plural": "Записи"
-		}
-	},
-	"security": {
-		"0bit": "Празен",
-		"8bit": "8 bit",
-		"128bit": "128 bit",
-		"256bit": "256 bit"
-	},
-	"unknown": {
-		"longName": "Неизвестно",
-		"shortName": "НЕИЗВ.",
-		"notAvailable": "N/A",
-		"num": "??"
-	},
-	"nodeUnknownPrefix": "!",
-	"unset": "НЕЗАДАДЕН",
-	"fallbackName": "Meshtastic {{last4}}",
-	"node": "Възел",
-	"formValidation": {
-		"unsavedChanges": "Незапазени промени",
-		"tooBig": {
-			"string": "Твърде дълъг, очаква се по-малко или равно на {{maximum}} знака.",
-			"number": "Твърде голям, очаква се число по-малко или равно на {{maximum}}.",
-			"bytes": "Твърде голям, очаква се по-малък или равен на {{params.maximum}} байта."
-		},
-		"tooSmall": {
-			"string": "Твърде кратък, очаква се повече или равно на {{minimum}} знака.",
-			"number": "Твърде малък, очаква се число, по-голямо или равно на {{minimum}}."
-		},
-		"invalidFormat": {
-			"ipv4": "Невалиден формат, очаква се IPv4 адрес.",
-			"key": "Невалиден формат, очаква се предварително споделен ключ (PSK), кодиран с Base64."
-		},
-		"invalidType": {
-			"number": "Невалиден тип, очаква се число."
-		},
-		"pskLength": {
-			"0bit": "Ключът трябва да е празен.",
-			"8bit": "Ключът трябва да бъде 8-битов предварително споделен ключ (PSK).",
-			"128bit": "Ключът трябва да бъде 128-битов предварително споделен ключ (PSK).",
-			"256bit": "Ключът трябва да бъде 256-битов предварително споделен ключ (PSK)."
-		},
-		"required": {
-			"generic": "Това поле е задължително.",
-			"managed": "Изисква се поне един администраторски ключ, ако възелът е управляван.",
-			"key": "Ключът е задължителен."
-		}
-	},
-	"yes": "Да",
-	"no": "Не"
+  "button": {
+    "apply": "Приложи",
+    "backupKey": "Резервно копие на ключа",
+    "cancel": "Отказ",
+    "clearMessages": "Изчистване на съобщенията",
+    "close": "Затвори",
+    "confirm": "Потвърждаване",
+    "delete": "Изтриване",
+    "dismiss": "Отхвърляне",
+    "download": "Изтегляне",
+    "export": "Експортиране",
+    "generate": "Генериране",
+    "regenerate": "Регенериране",
+    "import": "Импортиране",
+    "message": "Съобщение",
+    "now": "Сега",
+    "ok": "Добре",
+    "print": "Отпечатване",
+    "remove": "Изтрий",
+    "requestNewKeys": "Заявка за нови ключове",
+    "requestPosition": "Request Position",
+    "reset": "Нулиране",
+    "save": "Запис",
+    "scanQr": "Сканиране на QR кода",
+    "traceRoute": "Trace Route",
+    "submit": "Изпращане"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "fullTitle": "Meshtastic Web клиент"
+  },
+  "loading": "Зареждане...",
+  "unit": {
+    "cps": "CPS",
+    "dbm": "dBm",
+    "hertz": "Hz",
+    "hop": {
+      "one": "Хоп",
+      "plural": "Хопа"
+    },
+    "hopsAway": {
+      "one": "{{count}} hop away",
+      "plural": "{{count}} hops away",
+      "unknown": "Unknown hops away"
+    },
+    "megahertz": "MHz",
+    "raw": "raw",
+    "meter": {
+      "one": "Метър",
+      "plural": "Метри",
+      "suffix": "m"
+    },
+    "kilometer": {
+      "one": "Kilometer",
+      "plural": "Kilometers",
+      "suffix": "km"
+    },
+    "minute": {
+      "one": "Минута",
+      "plural": "Минути"
+    },
+    "hour": {
+      "one": "Час",
+      "plural": "Часа"
+    },
+    "millisecond": {
+      "one": "Милисекунда",
+      "plural": "Милисекунди",
+      "suffix": "ms"
+    },
+    "second": {
+      "one": "Секунда",
+      "plural": "Секунди"
+    },
+    "day": {
+      "one": "Ден",
+      "plural": "Дни",
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "month": {
+      "one": "Месец",
+      "plural": "Месеца"
+    },
+    "year": {
+      "one": "Година",
+      "plural": "Години"
+    },
+    "snr": "SNR",
+    "volt": {
+      "one": "Волт",
+      "plural": "Волта",
+      "suffix": "V"
+    },
+    "record": {
+      "one": "Записи",
+      "plural": "Записи"
+    },
+    "degree": {
+      "one": "Degree",
+      "plural": "Degrees",
+      "suffix": "°"
+    }
+  },
+  "security": {
+    "0bit": "Празен",
+    "8bit": "8 bit",
+    "128bit": "128 bit",
+    "256bit": "256 bit"
+  },
+  "unknown": {
+    "longName": "Неизвестно",
+    "shortName": "НЕИЗВ.",
+    "notAvailable": "N/A",
+    "num": "??"
+  },
+  "nodeUnknownPrefix": "!",
+  "unset": "НЕЗАДАДЕН",
+  "fallbackName": "Meshtastic {{last4}}",
+  "node": "Възел",
+  "formValidation": {
+    "unsavedChanges": "Незапазени промени",
+    "tooBig": {
+      "string": "Твърде дълъг, очаква се по-малко или равно на {{maximum}} знака.",
+      "number": "Твърде голям, очаква се число по-малко или равно на {{maximum}}.",
+      "bytes": "Твърде голям, очаква се по-малък или равен на {{params.maximum}} байта."
+    },
+    "tooSmall": {
+      "string": "Твърде кратък, очаква се повече или равно на {{minimum}} знака.",
+      "number": "Твърде малък, очаква се число, по-голямо или равно на {{minimum}}."
+    },
+    "invalidFormat": {
+      "ipv4": "Невалиден формат, очаква се IPv4 адрес.",
+      "key": "Невалиден формат, очаква се предварително споделен ключ (PSK), кодиран с Base64."
+    },
+    "invalidType": {
+      "number": "Невалиден тип, очаква се число."
+    },
+    "pskLength": {
+      "0bit": "Ключът трябва да е празен.",
+      "8bit": "Ключът трябва да бъде 8-битов предварително споделен ключ (PSK).",
+      "128bit": "Ключът трябва да бъде 128-битов предварително споделен ключ (PSK).",
+      "256bit": "Ключът трябва да бъде 256-битов предварително споделен ключ (PSK)."
+    },
+    "required": {
+      "generic": "Това поле е задължително.",
+      "managed": "Изисква се поне един администраторски ключ, ако възелът е управляван.",
+      "key": "Ключът е задължителен."
+    },
+    "invalidOverrideFreq": {
+      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+    }
+  },
+  "yes": "Да",
+  "no": "Не"
 }
