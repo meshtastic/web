@@ -9,8 +9,9 @@ import Footer from "@components/UI/Footer.tsx";
 import { useTheme } from "@core/hooks/useTheme.ts";
 import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
-import { Outlet } from "@tanstack/react-router";
+import { Outlet, useNavigate } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { useEffect, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { MapProvider } from "react-map-gl/maplibre";
 
@@ -18,11 +19,27 @@ export function App() {
   const { getDevice } = useDeviceStore();
   const { selectedDeviceId, setConnectDialogOpen, connectDialogOpen } =
     useAppStore();
+  const navigate = useNavigate();
+  const previousDeviceRef = useRef(getDevice(selectedDeviceId));
 
   const device = getDevice(selectedDeviceId);
 
   // Sets up light/dark mode based on user preferences or system settings
   useTheme();
+
+  // Redirect to home when a device connects
+  useEffect(() => {
+    const previousDevice = previousDeviceRef.current;
+
+    // Check if device just became available (went from undefined to defined)
+    if (!previousDevice && device) {
+      console.log("Device connected, redirecting to home");
+      navigate({ to: "/", replace: true });
+    }
+
+    // Update the ref for next comparison
+    previousDeviceRef.current = device;
+  }, [device, navigate]);
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
