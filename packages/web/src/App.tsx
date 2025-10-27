@@ -11,8 +11,10 @@ import { SidebarProvider, useAppStore, useDeviceStore } from "@core/stores";
 import { Dashboard } from "@pages/Dashboard/index.tsx";
 import { Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { MapProvider } from "react-map-gl/maplibre";
+import { Types } from "@meshtastic/core";
 
 export function App() {
   const { getDevice } = useDeviceStore();
@@ -23,6 +25,24 @@ export function App() {
 
   // Sets up light/dark mode based on user preferences or system settings
   useTheme();
+
+  // Redirect to home when device disconnects
+  useEffect(() => {
+    if (!device?.connection) return;
+
+    const handleDisconnect = (status: Types.DeviceStatusEnum) => {
+      if (status === Types.DeviceStatusEnum.DeviceDisconnected) {
+        console.log("Device disconnected, redirecting to home");
+        window.location.href = "/";
+      }
+    };
+
+    device.connection.events.onDeviceStatus.subscribe(handleDisconnect);
+
+    return () => {
+      device.connection?.events.onDeviceStatus.unsubscribe(handleDisconnect);
+    };
+  }, [device]);
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
