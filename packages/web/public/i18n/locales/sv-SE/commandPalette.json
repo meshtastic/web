@@ -15,7 +15,6 @@
       "messages": "Meddelanden",
       "map": "Karta",
       "config": "Inställningar",
-      "channels": "Kanaler",
       "nodes": "Noder"
     }
   },
@@ -45,7 +44,8 @@
     "label": "Felsökning",
     "command": {
       "reconfigure": "Konfigurera om",
-      "clearAllStoredMessages": "Radera alla sparade meddelanden"
+      "clearAllStoredMessages": "Radera alla sparade meddelanden",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }

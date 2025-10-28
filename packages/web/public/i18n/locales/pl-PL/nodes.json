@@ -1,63 +1,59 @@
 {
-	"nodeDetail": {
-		"publicKeyEnabled": {
-			"label": "Publiczny klucz włączony"
-		},
-		"noPublicKey": {
-			"label": "Brak klucza publicznego"
-		},
-		"directMessage": {
-			"label": "Wiadomość bezpośrednia {{shortName}}"
-		},
-		"favorite": {
-			"label": "Ulubiony",
-			"tooltip": "Dodaj lub usuń ten węzeł z ulubionych"
-		},
-		"notFavorite": {
-			"label": "Nie ulubiony"
-		},
-		"error": {
-			"label": "Błąd",
-			"text": "Wystąpił błąd podczas pobierania danych węzła. Spróbuj ponownie później."
-		},
-		"status": {
-			"heard": "Usłyszano",
-			"mqtt": "MQTT"
-		},
-		"elevation": {
-			"label": "Elewacja"
-		},
-		"channelUtil": {
-			"label": "Użycie kanału"
-		},
-		"airtimeUtil": {
-			"label": "Użycie czasu ant"
-		}
-	},
-	"nodesTable": {
-		"headings": {
-			"longName": "Długa nazwa",
-			"connection": "Połączenie",
-			"lastHeard": "Ostatnio słyszany",
-			"encryption": "Szyfrowanie",
-			"model": "Model",
-			"macAddress": "Adres MAC"
-		},
-		"connectionStatus": {
-			"direct": "Bezpośrednio",
-			"away": "away",
-			"unknown": "-",
-			"viaMqtt": ", przez MQTT"
-		},
-		"lastHeardStatus": {
-			"never": "Nigdy"
-		}
-	},
-	"actions": {
-		"added": "Dodano",
-		"removed": "Usunięto",
-		"ignoreNode": "Ignoruj węzeł",
-		"unignoreNode": "Od-ignoruj węzeł",
-		"requestPosition": "Poproś o pozycję"
-	}
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Publiczny klucz włączony"
+    },
+    "noPublicKey": {
+      "label": "Brak klucza publicznego"
+    },
+    "directMessage": {
+      "label": "Wiadomość bezpośrednia {{shortName}}"
+    },
+    "favorite": {
+      "label": "Ulubiony",
+      "tooltip": "Dodaj lub usuń ten węzeł z ulubionych"
+    },
+    "notFavorite": {
+      "label": "Nie ulubiony"
+    },
+    "error": {
+      "label": "Błąd",
+      "text": "Wystąpił błąd podczas pobierania danych węzła. Spróbuj ponownie później."
+    },
+    "status": {
+      "heard": "Usłyszano",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Elewacja"
+    },
+    "channelUtil": {
+      "label": "Użycie kanału"
+    },
+    "airtimeUtil": {
+      "label": "Użycie czasu ant"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "Długa nazwa",
+      "connection": "Połączenie",
+      "lastHeard": "Ostatnio słyszany",
+      "encryption": "Szyfrowanie",
+      "model": "Model",
+      "macAddress": "Adres MAC"
+    },
+    "connectionStatus": {
+      "direct": "Bezpośrednio",
+      "away": "away",
+      "viaMqtt": ", przez MQTT"
+    }
+  },
+  "actions": {
+    "added": "Dodano",
+    "removed": "Usunięto",
+    "ignoreNode": "Ignoruj węzeł",
+    "unignoreNode": "Od-ignoruj węzeł",
+    "requestPosition": "Poproś o pozycję"
+  }
 }

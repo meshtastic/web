@@ -1,0 +1,458 @@
+{
+  "page": {
+    "title": "Réglages",
+    "tabUser": "Utilisateur",
+    "tabChannels": "Canaux",
+    "tabBluetooth": "Bluetooth",
+    "tabDevice": "Appareil",
+    "tabDisplay": "Écran",
+    "tabLora": "LoRa",
+    "tabNetwork": "Réseau",
+    "tabPosition": "Position",
+    "tabPower": "Alimentation",
+    "tabSecurity": "Sécurité"
+  },
+  "sidebar": {
+    "label": "Configuration"
+  },
+  "device": {
+    "title": "Paramètres de l'appareil",
+    "description": "Paramètres de l'appareil",
+    "buttonPin": {
+      "description": "Redéfinition de la broche du bouton",
+      "label": "Broche du bouton"
+    },
+    "buzzerPin": {
+      "description": "Redéfinition de la broche du buzzer",
+      "label": "Broche du buzzer"
+    },
+    "disableTripleClick": {
+      "description": "Désactiver le triple clic",
+      "label": "Désactiver le triple clic"
+    },
+    "doubleTapAsButtonPress": {
+      "description": "Considérer le double tapotement comme un appui sur le bouton",
+      "label": "Double tapotement comme appui bouton"
+    },
+    "ledHeartbeatDisabled": {
+      "description": "Désactiver le clignotement LED par défaut",
+      "label": "Clignotement LED désactivé"
+    },
+    "nodeInfoBroadcastInterval": {
+      "description": "Fréquence de diffusion des informations du nœud",
+      "label": "Intervalle de diffusion des infos nœud"
+    },
+    "posixTimezone": {
+      "description": "Chaîne de fuseau horaire POSIX pour l'appareil",
+      "label": "Zone horaire POSIX"
+    },
+    "rebroadcastMode": {
+      "description": "Mode de réémission des messages",
+      "label": "Mode de réémission"
+    },
+    "role": {
+      "description": "Rôle de l'appareil dans le réseau mesh",
+      "label": "Rôle"
+    }
+  },
+  "bluetooth": {
+    "title": "Paramètres Bluetooth",
+    "description": "Paramètres du module Bluetooth",
+    "note": "Note: Certains appareils (ESP32) ne peuvent pas utiliser à la fois Bluetooth et WiFi en même temps.",
+    "enabled": {
+      "description": "Activer ou désactiver le Bluetooth",
+      "label": "Activé"
+    },
+    "pairingMode": {
+      "description": "Titre en gras",
+      "label": "Mode d'appariement"
+    },
+    "pin": {
+      "description": "Broche utilisée pour l'appairage",
+      "label": "Broche"
+    }
+  },
+  "display": {
+    "description": "Paramètres d'affichage de l'appareil",
+    "title": "Paramètres d'affichage",
+    "headingBold": {
+      "description": "Mettre le titre en gras",
+      "label": "Titre en gras"
+    },
+    "carouselDelay": {
+      "description": "Vitesse de défilement des fenêtres",
+      "label": "Délai du carrousel"
+    },
+    "compassNorthTop": {
+      "description": "Fixer le nord en haut de la boussole",
+      "label": "Nord en haut de la boussole"
+    },
+    "displayMode": {
+      "description": "Variante de disposition d'affichage",
+      "label": "Mode d'affichage"
+    },
+    "displayUnits": {
+      "description": "Afficher en unités métriques ou impériales",
+      "label": "Unités affichées"
+    },
+    "flipScreen": {
+      "description": "Faire pivoter l'affichage de 180 degrés",
+      "label": "Faire pivoter l'écran"
+    },
+    "gpsDisplayUnits": {
+      "description": "Format d'affichage des coordonnées",
+      "label": "Unités GPS"
+    },
+    "oledType": {
+      "description": "Type d'écran OLED connecté à l'appareil",
+      "label": "Type d'OLED"
+    },
+    "screenTimeout": {
+      "description": "Temps avant extinction de l'écran",
+      "label": "Délai d'extinction de l'écran"
+    },
+    "twelveHourClock": {
+      "description": "Utiliser le format horaire 12 heures",
+      "label": "Horloge 12 h"
+    },
+    "wakeOnTapOrMotion": {
+      "description": "Réveiller l'appareil en cas de tapotement ou de mouvement",
+      "label": "Réveil par tapotement ou mouvement"
+    }
+  },
+  "lora": {
+    "title": "Paramètres maillage",
+    "description": "Paramètres du réseau maillé LoRa",
+    "bandwidth": {
+      "description": "Largeur de bande du canal en MHz",
+      "label": "Bande Passante"
+    },
+    "boostedRxGain": {
+      "description": "Gain de réception amplifié",
+      "label": "Gain RX amplifié"
+    },
+    "codingRate": {
+      "description": "Dénominateur du taux de codage",
+      "label": "Taux de codage"
+    },
+    "frequencyOffset": {
+      "description": "Décalage de fréquence pour corriger les erreurs d'étalonnage du cristal",
+      "label": "Décalage de fréquence"
+    },
+    "frequencySlot": {
+      "description": "Numéro du canal de fréquence LoRa",
+      "label": "Slot de fréquence"
+    },
+    "hopLimit": {
+      "description": "Nombre maximum de sauts",
+      "label": "Limite de sauts"
+    },
+    "ignoreMqtt": {
+      "description": "Ne pas transférer les messages MQTT sur le maillage",
+      "label": "Ignorer MQTT"
+    },
+    "modemPreset": {
+      "description": "Préréglage du modem à utiliser",
+      "label": "Préréglage du modem"
+    },
+    "okToMqtt": {
+      "description": "Si activé, permet la publication du paquet sur MQTT. Sinon, les nœuds distants ne doivent pas relayer les paquets vers MQTT.",
+      "label": "OK vers MQTT"
+    },
+    "overrideDutyCycle": {
+      "description": "Ne pas prendre en compte la limite d'utilisation",
+      "label": "Ne pas prendre en compte la limite d'utilisation"
+    },
+    "overrideFrequency": {
+      "description": "Remplacement de la fréquence",
+      "label": "Fréquence personnalisée"
+    },
+    "region": {
+      "description": "Définit la région pour votre nœud",
+      "label": "Région"
+    },
+    "spreadingFactor": {
+      "description": "Nombre de chirps par symbole",
+      "label": "Facteur d'étalement"
+    },
+    "transmitEnabled": {
+      "description": "Activer/désactiver l'émission (TX) depuis la radio LoRa",
+      "label": "Transmission activée"
+    },
+    "transmitPower": {
+      "description": "Puissance maximale d'émission",
+      "label": "Puissance d'émission"
+    },
+    "usePreset": {
+      "description": "Utiliser un des préréglages prédéfinis du modem",
+      "label": "Utiliser un préréglage"
+    },
+    "meshSettings": {
+      "description": "Paramètres du maillage LoRa",
+      "label": "Paramètres du maillage"
+    },
+    "waveformSettings": {
+      "description": "Paramètres de la forme d’onde LoRa",
+      "label": "Paramètres de l’onde"
+    },
+    "radioSettings": {
+      "label": "Paramètres radio",
+      "description": "Paramètres de la radio LoRa"
+    }
+  },
+  "network": {
+    "title": "Configuration WiFi",
+    "description": "Configuration de la radio WiFi",
+    "note": "Remarque : certains appareils (ESP32) ne peuvent pas utiliser simultanément Bluetooth et WiFi.",
+    "addressMode": {
+      "description": "Sélection du mode d’attribution d’adresse",
+      "label": "Mode d’adressage"
+    },
+    "dns": {
+      "description": "Serveur DNS",
+      "label": "DNS"
+    },
+    "ethernetEnabled": {
+      "description": "Activer ou désactiver le port Ethernet",
+      "label": "Activé"
+    },
+    "gateway": {
+      "description": "Passerelle par défaut",
+      "label": "Passerelle"
+    },
+    "ip": {
+      "description": "Adresse IP",
+      "label": "IP"
+    },
+    "psk": {
+      "description": "Mot de passe du réseau",
+      "label": "PSK"
+    },
+    "ssid": {
+      "description": "Nom du réseau",
+      "label": "SSID"
+    },
+    "subnet": {
+      "description": "Masque de sous-réseau",
+      "label": "Sous-réseau"
+    },
+    "wifiEnabled": {
+      "description": "Activer ou désactiver la radio WiFi",
+      "label": "Activé"
+    },
+    "meshViaUdp": {
+      "label": "Réseau maillé via UDP"
+    },
+    "ntpServer": {
+      "label": "Serveur NTP"
+    },
+    "rsyslogServer": {
+      "label": "Serveur Rsyslog"
+    },
+    "ethernetConfigSettings": {
+      "description": "Paramètres du port Ethernet",
+      "label": "Configuration Ethernet"
+    },
+    "ipConfigSettings": {
+      "description": "Paramètres IP",
+      "label": "Configuration IP"
+    },
+    "ntpConfigSettings": {
+      "description": "Configuration NTP",
+      "label": "Configuration NTP"
+    },
+    "rsyslogConfigSettings": {
+      "description": "Paramètres Rsyslog",
+      "label": "Configuration Rsyslog"
+    },
+    "udpConfigSettings": {
+      "description": "Configuration du réseau maillé via UDP",
+      "label": "Configuration UDP"
+    }
+  },
+  "position": {
+    "title": "Paramètres de position",
+    "description": "Paramètres du module de position",
+    "broadcastInterval": {
+      "description": "Fréquence d’envoi de votre position sur le réseau maillé",
+      "label": "Intervalle de diffusion"
+    },
+    "enablePin": {
+      "description": "Redéfinition de la broche d’activation du module GPS",
+      "label": "Broche d’activation"
+    },
+    "fixedPosition": {
+      "description": "Ne pas envoyer la position GPS mais une position saisie manuellement",
+      "label": "Position fixe"
+    },
+    "gpsMode": {
+      "description": "Configuration du GPS : activé, désactivé ou non présent",
+      "label": "Mode GPS"
+    },
+    "gpsUpdateInterval": {
+      "description": "Fréquence d’acquisition d’une position GPS",
+      "label": "Intervalle de mise à jour GPS"
+    },
+    "positionFlags": {
+      "description": "Champs optionnels à inclure dans les messages de position. Plus il y en a, plus le message est grand, augmentant le risque de perte.",
+      "label": "Champs de position"
+    },
+    "receivePin": {
+      "description": "Redéfinition de la broche RX du module GPS",
+      "label": "Broche de réception"
+    },
+    "smartPositionEnabled": {
+      "description": "N’envoyer la position qu’en cas de changement significatif",
+      "label": "Activer la position intelligente"
+    },
+    "smartPositionMinDistance": {
+      "description": "Distance minimale (en mètres) à parcourir avant envoi de la nouvelle position",
+      "label": "Distance minimale pour mise à jour"
+    },
+    "smartPositionMinInterval": {
+      "description": "Délai minimal (en secondes) entre deux envois de position",
+      "label": "Intervalle minimal de mise à jour"
+    },
+    "transmitPin": {
+      "description": "Redéfinition de la broche TX du module GPS",
+      "label": "Broche de transmission"
+    },
+    "intervalsSettings": {
+      "description": "Fréquence d’envoi des mises à jour de position",
+      "label": "Intervalles"
+    },
+    "flags": {
+      "placeholder": "Sélectionner les champs de position...",
+      "altitude": "Altitude",
+      "altitudeGeoidalSeparation": "Séparation géoïdale de l’altitude",
+      "altitudeMsl": "Altitude au-dessus du niveau moyen de la mer",
+      "dop": "DOP (Dilution de la précision), PDOP utilisé par défaut",
+      "hdopVdop": "Si DOP est activé, utiliser HDOP / VDOP au lieu de PDOP",
+      "numSatellites": "Nombre de satellites",
+      "sequenceNumber": "Numéro de séquence",
+      "timestamp": "Horodatage",
+      "unset": "Désactivé",
+      "vehicleHeading": "Cap du véhicule",
+      "vehicleSpeed": "Vitesse du véhicule"
+    }
+  },
+  "power": {
+    "adcMultiplierOverride": {
+      "description": "Utilisé pour ajuster la lecture de la tension batterie",
+      "label": "Coefficient de correction ADC"
+    },
+    "ina219Address": {
+      "description": "Adresse du moniteur de batterie INA219",
+      "label": "Adresse INA219"
+    },
+    "lightSleepDuration": {
+      "description": "Durée pendant laquelle l'appareil reste en veille légère",
+      "label": "Durée de veille légère"
+    },
+    "minimumWakeTime": {
+      "description": "Temps minimal pendant lequel l'appareil reste éveillé après réception d’un paquet",
+      "label": "Temps d’éveil minimal"
+    },
+    "noConnectionBluetoothDisabled": {
+      "description": "Si aucune connexion Bluetooth n’est reçue, la radio BLE sera désactivée après ce délai",
+      "label": "Bluetooth désactivé si non connecté"
+    },
+    "powerSavingEnabled": {
+      "description": "À activer si l’appareil est alimenté par une source à faible courant (ex. : panneau solaire)..",
+      "label": "Activer le mode économie d'énergie"
+    },
+    "shutdownOnBatteryDelay": {
+      "description": "Éteindre automatiquement le nœud après ce délai sur batterie, 0 pour indéfini",
+      "label": "Délai d’extinction sur batterie"
+    },
+    "superDeepSleepDuration": {
+      "description": "Durée pendant laquelle l’appareil reste en super veille",
+      "label": "Durée de veille profonde"
+    },
+    "powerConfigSettings": {
+      "description": "Paramètres du module d’alimentation",
+      "label": "Configuration de l'alimentation"
+    },
+    "sleepSettings": {
+      "description": "Paramètres de veille du module d’alimentation",
+      "label": "Paramètres de veille"
+    }
+  },
+  "security": {
+    "description": "Paramètres de configuration de la sécurité",
+    "title": "Paramètres de sécurité",
+    "button_backupKey": "Clé de sauvegarde",
+    "adminChannelEnabled": {
+      "description": "Autoriser le contrôle distant via le canal d’administration hérité non sécurisé",
+      "label": "Autoriser l’administration héritée"
+    },
+    "enableDebugLogApi": {
+      "description": "Afficher en direct les journaux de débogage via le port série, consulter/exporter les journaux sans position via Bluetooth",
+      "label": "Activer l’API des journaux de debug"
+    },
+    "managed": {
+      "description": "Si cette option est activée, les options de configuration de l'appareil ne peuvent être modifiées à distance que par un nœud d'administration distante via des messages d'administration. N'activez cette option que si au moins un nœud d'administration distant approprié a été configuré et que la clé publique est stockée dans l'un des champs ci-dessus.",
+      "label": "Géré"
+    },
+    "privateKey": {
+      "description": "Utilisée pour créer une clé partagée avec un appareil distant",
+      "label": "Clé privée"
+    },
+    "publicKey": {
+      "description": "Envoyée aux autres nœuds pour générer une clé secrète partagée",
+      "label": "Clé publique"
+    },
+    "primaryAdminKey": {
+      "description": "Clé publique principale autorisée à envoyer des messages d’administration",
+      "label": "Clé Admin principale"
+    },
+    "secondaryAdminKey": {
+      "description": "Clé publique secondaire autorisée à envoyer des messages d’administration",
+      "label": "Clé Admin secondaire"
+    },
+    "serialOutputEnabled": {
+      "description": "Console série via l’API de flux",
+      "label": "Sortie série activée"
+    },
+    "tertiaryAdminKey": {
+      "description": "Clé publique tertiaire autorisée à envoyer des messages d’administration",
+      "label": "Clé Admin tertiaire"
+    },
+    "adminSettings": {
+      "description": "Paramètres liés à l’administration",
+      "label": "Paramètres administrateur"
+    },
+    "loggingSettings": {
+      "description": "Paramètres liés aux journaux",
+      "label": "Paramètres de journalisation"
+    }
+  },
+  "user": {
+    "title": "User Settings",
+    "description": "Configure your device name and identity settings",
+    "longName": {
+      "label": "Nom long",
+      "description": "Your full display name (1-40 characters)",
+      "validation": {
+        "min": "Long name must be at least 1 character",
+        "max": "Long name must be at most 40 characters"
+      }
+    },
+    "shortName": {
+      "label": "Nom court",
+      "description": "Your abbreviated name (2-4 characters)",
+      "validation": {
+        "min": "Short name must be at least 2 characters",
+        "max": "Short name must be at most 4 characters"
+      }
+    },
+    "isUnmessageable": {
+      "label": "Non joignable par message",
+      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+    },
+    "isLicensed": {
+      "label": "Radioamateur licencié (HAM)",
+      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+    }
+  }
+}

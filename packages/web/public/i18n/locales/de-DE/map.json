@@ -1,0 +1,38 @@
+{
+  "maplibre": {
+    "GeolocateControl.FindMyLocation": "Meinen Standort ermitteln",
+    "NavigationControl.ZoomIn": "Vergrößern",
+    "NavigationControl.ZoomOut": "Verkleinern",
+    "CooperativeGesturesHandler.WindowsHelpText": "Verwenden Sie STRG + Scrollen zum Zoomen der Karte",
+    "CooperativeGesturesHandler.MacHelpText": "Verwenden Sie ⌘ + Scrollen zum Zoomen der Karte",
+    "CooperativeGesturesHandler.MobileHelpText": "Verwenden Sie zwei Finger, um die Karte zu bewegen."
+  },
+  "layerTool": {
+    "nodeMarkers": "Zeige Knoten",
+    "directNeighbors": "Direkte Verbindungen anzeigen",
+    "remoteNeighbors": "Entfernte Verbindungen anzeigen",
+    "positionPrecision": "Positionsgenauigkeit anzeigen",
+    "traceroutes": "Traceroutes anzeigen",
+    "waypoints": "Wegpunkte anzeigen"
+  },
+  "mapMenu": {
+    "locateAria": "Meinen Knoten suchen",
+    "layersAria": "Kartenformat ändern"
+  },
+  "waypointDetail": {
+    "edit": "Bearbeiten",
+    "description": "Beschreibung:",
+    "createdBy": "Bearbeitet:",
+    "createdDate": "Erstellt:",
+    "updated": "Aktualisiert:",
+    "expires": "Gültig bis:",
+    "distance": "Entfernung:",
+    "bearing": "Absolute Peilung:",
+    "lockedTo": "Gesperrt:",
+    "latitude": "Breitengrad:",
+    "longitude": "Längengrad:"
+  },
+  "myNode": {
+    "tooltip": "Dieses Gerät"
+  }
+}

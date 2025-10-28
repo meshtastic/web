@@ -1,193 +1,221 @@
 {
-	"deleteMessages": {
-		"description": "Tämä toiminto poistaa kaiken viestihistorian. Toimintoa ei voi perua. Haluatko varmasti jatkaa?",
-		"title": "Tyhjennä kaikki viestit"
-	},
-	"deviceName": {
-		"description": "Laite käynnistyy uudelleen, kun asetus on tallennettu.",
-		"longName": "Pitkä nimi",
-		"shortName": "Lyhytnimi",
-		"title": "Vaihda laitteen nimi",
-		"validation": {
-			"longNameMax": "Pitkässä nimessä saa olla enintään 40 merkkiä",
-			"shortNameMax": "Lyhytnimessä ei saa olla enempää kuin 4 merkkiä",
-			"longNameMin": "Pitkässä nimessä täytyy olla vähintään yksi merkki",
-			"shortNameMin": "Lyhytnimessä täytyy olla vähintään ykis merkki"
-		}
-	},
-	"import": {
-		"description": "Nykyinen LoRa-asetus ylikirjoitetaan.",
-		"error": {
-			"invalidUrl": "Virheellinen Meshtastic verkko-osoite"
-		},
-		"channelPrefix": "Kanava: ",
-		"channelSetUrl": "Kanavan asetus / QR-koodin URL-osoite",
-		"channels": "Kanavat:",
-		"usePreset": "Käytä esiasetusta?",
-		"title": "Tuo kanava-asetukset"
-	},
-	"locationResponse": {
-		"title": "Sijainti: {{identifier}}",
-		"altitude": "Korkeus: ",
-		"coordinates": "Koordinaatit: ",
-		"noCoordinates": "Ei koordinaatteja"
-	},
-	"pkiRegenerateDialog": {
-		"title": "Luodaanko ennalta jaettu avain uudelleen?",
-		"description": "Haluatko varmasti luoda ennalta jaetun avaimen uudelleen?",
-		"regenerate": "Luo uudelleen"
-	},
-	"newDeviceDialog": {
-		"title": "Yhdistä uuteen laitteeseen",
-		"https": "https",
-		"http": "http",
-		"tabHttp": "HTTP",
-		"tabBluetooth": "Bluetooth",
-		"tabSerial": "Sarjaliitäntä",
-		"useHttps": "Käytä HTTPS",
-		"connecting": "Yhdistetään...",
-		"connect": "Yhdistä",
-		"connectionFailedAlert": {
-			"title": "Yhteys epäonnistui",
-			"descriptionPrefix": "Laitteeseen ei saatu yhteyttä. ",
-			"httpsHint": "Jos käytät HTTPS:ää, sinun on ehkä ensin hyväksyttävä itse allekirjoitettu varmenne. ",
-			"openLinkPrefix": "Avaa ",
-			"openLinkSuffix": " uuteen välilehteen",
-			"acceptTlsWarningSuffix": ", hyväksy mahdolliset TLS-varoitukset, jos niitä ilmenee ja yritä sitten uudelleen.",
-			"learnMoreLink": "Lue lisää"
-		},
-		"httpConnection": {
-			"label": "IP-osoite / isäntänimi",
-			"placeholder": "000.000.000 / meshtastinen.paikallinen"
-		},
-		"serialConnection": {
-			"noDevicesPaired": "Yhtään laitetta ei ole vielä yhdistetty.",
-			"newDeviceButton": "Uusi laite",
-			"deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
-		},
-		"bluetoothConnection": {
-			"noDevicesPaired": "Yhtään laitetta ei ole vielä yhdistetty.",
-			"newDeviceButton": "Uusi laite",
-			"connectionFailed": "Yhdistäminen epäonnistui",
-			"deviceDisconnected": "Yhteys laitteeseen katkaistu",
-			"unknownDevice": "Tuntematon laite",
-			"errorLoadingDevices": "Virhe ladattaessa laitteita",
-			"unknownErrorLoadingDevices": "Tuntematon virhe laitteita ladattaessa"
-		},
-		"validation": {
-			"requiresWebBluetooth": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti bluetooth</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
-			"requiresWebSerial": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
-			"requiresSecureContext": "Tämä sovellus vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia.",
-			"additionallyRequiresSecureContext": "Lisäksi se vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia."
-		}
-	},
-	"nodeDetails": {
-		"message": "Viesti",
-		"requestPosition": "Pyydä sijaintia",
-		"traceRoute": "Reitinselvitys",
-		"airTxUtilization": "Ilmatien TX käyttöaste",
-		"allRawMetrics": "Kaikki raakatiedot:",
-		"batteryLevel": "Akun varaus",
-		"channelUtilization": "Kanavan käyttöaste",
-		"details": "Tiedot:",
-		"deviceMetrics": "Laitteen mittausloki:",
-		"hardware": "Laitteisto: ",
-		"lastHeard": "Viimeksi kuultu: ",
-		"nodeHexPrefix": "Laitteen Hex: ",
-		"nodeNumber": "Laitteen numero: ",
-		"position": "Sijainti:",
-		"role": "Rooli: ",
-		"uptime": "Käyttöaika: ",
-		"voltage": "Jännite",
-		"title": "Tiedot laitteelle {{identifier}}",
-		"ignoreNode": "Älä huomioi laitetta",
-		"removeNode": "Poista laite",
-		"unignoreNode": "Poista laitteen ohitus käytöstä",
-		"security": "Turvallisuus:",
-		"publicKey": "Julkinen avain: ",
-		"messageable": "Viestittävissä: ",
-		"KeyManuallyVerifiedTrue": "Julkinen avain on vahvistettu manuaalisesti",
-		"KeyManuallyVerifiedFalse": "Julkista avainta ei ole vahvistettu manuaalisesti"
-	},
-	"pkiBackup": {
-		"loseKeysWarning": "Jos menetät avaimesi, sinun täytyy palauttaa laite tehdasasetuksiin.",
-		"secureBackup": "On tärkeää varmuuskopioida julkiset ja yksityiset avaimet ja säilyttää niiden varmuuskopioita turvallisesti!",
-		"footer": "=== AVAIMIEN LOPPU ===",
-		"header": "=== MESHTASTIC AVAIMET  {{longName}} ({{shortName}}) LAITTEELLE ===",
-		"privateKey": "Yksityinen avain:",
-		"publicKey": "Julkinen avain:",
-		"fileName": "meshtastic_avaimet_{{longName}}_{{shortName}}.txt",
-		"title": "Varmuuskopioi avaimet"
-	},
-	"pkiBackupReminder": {
-		"description": "Suosittelemme avaintietojen säännöllistä varmuuskopiointia. Haluatko varmuuskopioida nyt?",
-		"title": "Varmuuskopion Muistutus",
-		"remindLaterPrefix": "Muistuta minua",
-		"remindNever": "Älä muistuta minua koskaan",
-		"backupNow": "Varmuuskopioi nyt"
-	},
-	"pkiRegenerate": {
-		"description": "Haluatko varmasti luoda avainparin uudelleen?",
-		"title": "Luo avainpari uudelleen"
-	},
-	"qr": {
-		"addChannels": "Lisää kanavia",
-		"replaceChannels": "Korvaa kanavia",
-		"description": "Nykyinen LoRa-kokoonpano tullaan myös jakamaan.",
-		"sharableUrl": "Jaettava URL",
-		"title": "Generoi QR-koodi"
-	},
-	"reboot": {
-		"title": "Käynnistä laite uudelleen",
-		"description": "Käynnistä laite uudelleen heti tai ajasta sen uudelleenkäynnistys. Halutessasi voit valita käynnistyksen OTA-tilaan (Over-the-Air ohjelmistopäivitystilaan).",
-		"ota": "Käynnistä uudelleen OTA-tilaan",
-		"enterDelay": "Aseta viive",
-		"scheduled": "Uudelleenkäynnistys on ajastettu",
-		"schedule": "Ajasta uudelleen käynnistys",
-		"now": "Uudelleen käynnistä nyt",
-		"cancel": "Peruuta ajastettu uudelleen käynnistys"
-	},
-	"refreshKeys": {
-		"description": {
-			"acceptNewKeys": "Tämä poistaa laitteen laitteesta ja pyytää uusia avaimia.",
-			"keyMismatchReasonSuffix": ". Tämä johtuu siitä, että etälaitteen nykyinen julkinen avain ei vastaa aiemmin tallennettua avainta tälle laitteelle.",
-			"unableToSendDmPrefix": "Laitteesi ei pysty lähettämään suoraa viestiä laitteelle: "
-		},
-		"acceptNewKeys": "Hyväksy uudet avaimet",
-		"title": "Avaimet eivät täsmää - {{identifier}}"
-	},
-	"removeNode": {
-		"description": "Haluatko varmasti poistaa tämän laitteen?",
-		"title": "Poista laite?"
-	},
-	"shutdown": {
-		"title": "Ajasta sammutus",
-		"description": "Sammuta yhdistetty laite x minuutin päästä."
-	},
-	"traceRoute": {
-		"routeToDestination": "Reitin määränpää:",
-		"routeBack": "Reitti takaisin:"
-	},
-	"tracerouteResponse": {
-		"title": "Reitinselvitys: {{identifier}}"
-	},
-	"unsafeRoles": {
-		"confirmUnderstanding": "Kyllä, tiedän mitä teen",
-		"conjunction": " ja blogikirjoitukset ",
-		"postamble": " ja ymmärrän roolin muuttamisen vaikutukset.",
-		"preamble": "Olen lukenut ",
-		"choosingRightDeviceRole": "Valitse laitteelle oikea rooli",
-		"deviceRoleDocumentation": "Roolien dokumentaatio laitteelle",
-		"title": "Oletko varma?"
-	},
-	"managedMode": {
-		"confirmUnderstanding": "Kyllä, tiedän mitä teen",
-		"title": "Oletko varma?",
-		"description": "Hallintatilan käyttöönotto estää asiakassovelluksia (mukaan lukien verkkoselain) tekemästä muutoksia laitteen asetuksiin. Kun hallintatila on käytössä, laitteen asetuksia voidaan muuttaa ainoastaan etähallintaviesteillä (Remote Admin). Tämä asetus ei ole pakollinen etähallintaan."
-	},
-	"clientNotification": {
-		"title": "Sovellusilmoitukset",
-		"TraceRoute can only be sent once every 30 seconds": "Reitinselvityksen voi tehdä kerran 30:ssä sekunnissa",
-		"Compromised keys were detected and regenerated.": "Turvallisuudeltaan vaarantuneet avaimet havaittiin ja ne generoitiin uudestaan."
-	}
+  "deleteMessages": {
+    "description": "Tämä toiminto poistaa kaiken viestihistorian. Toimintoa ei voi perua. Haluatko varmasti jatkaa?",
+    "title": "Tyhjennä kaikki viestit"
+  },
+  "deviceName": {
+    "description": "Laite käynnistyy uudelleen, kun asetus on tallennettu.",
+    "longName": "Pitkä nimi",
+    "shortName": "Lyhytnimi",
+    "title": "Vaihda laitteen nimi",
+    "validation": {
+      "longNameMax": "Pitkässä nimessä saa olla enintään 40 merkkiä",
+      "shortNameMax": "Lyhytnimessä ei saa olla enempää kuin 4 merkkiä",
+      "longNameMin": "Pitkässä nimessä täytyy olla vähintään yksi merkki",
+      "shortNameMin": "Lyhytnimessä täytyy olla vähintään ykis merkki"
+    }
+  },
+  "import": {
+    "description": "Nykyinen LoRa-asetus ylikirjoitetaan.",
+    "error": {
+      "invalidUrl": "Virheellinen Meshtastic verkko-osoite"
+    },
+    "channelPrefix": "Kanava: ",
+    "primary": "Ensisijainen ",
+    "doNotImport": "Tuonti ei onnistu",
+    "channelName": "Nimi",
+    "channelSlot": "Paikka",
+    "channelSetUrl": "Kanavan asetus / QR-koodin URL-osoite",
+    "useLoraConfig": "Tuo LoRa-asetukset",
+    "presetDescription": "Nykyiset LoRa-asetukset korvataan uusilla.",
+    "title": "Tuo kanava-asetukset"
+  },
+  "locationResponse": {
+    "title": "Sijainti: {{identifier}}",
+    "altitude": "Korkeus: ",
+    "coordinates": "Koordinaatit: ",
+    "noCoordinates": "Ei koordinaatteja"
+  },
+  "pkiRegenerateDialog": {
+    "title": "Luodaanko ennalta jaettu avain uudelleen?",
+    "description": "Haluatko varmasti luoda ennalta jaetun avaimen uudelleen?",
+    "regenerate": "Luo uudelleen"
+  },
+  "newDeviceDialog": {
+    "title": "Yhdistä uuteen laitteeseen",
+    "https": "https",
+    "http": "http",
+    "tabHttp": "HTTP",
+    "tabBluetooth": "Bluetooth",
+    "tabSerial": "Sarjaliitäntä",
+    "useHttps": "Käytä HTTPS",
+    "connecting": "Yhdistetään...",
+    "connect": "Yhdistä",
+    "connectionFailedAlert": {
+      "title": "Yhteys epäonnistui",
+      "descriptionPrefix": "Laitteeseen ei saatu yhteyttä. ",
+      "httpsHint": "Jos käytät HTTPS:ää, sinun on ehkä ensin hyväksyttävä itse allekirjoitettu varmenne. ",
+      "openLinkPrefix": "Avaa ",
+      "openLinkSuffix": " uuteen välilehteen",
+      "acceptTlsWarningSuffix": ", hyväksy mahdolliset TLS-varoitukset, jos niitä ilmenee ja yritä sitten uudelleen.",
+      "learnMoreLink": "Lue lisää"
+    },
+    "httpConnection": {
+      "label": "IP-osoite / isäntänimi",
+      "placeholder": "000.000.000 / meshtastinen.paikallinen"
+    },
+    "serialConnection": {
+      "noDevicesPaired": "Yhtään laitetta ei ole vielä yhdistetty.",
+      "newDeviceButton": "Uusi laite",
+      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
+    },
+    "bluetoothConnection": {
+      "noDevicesPaired": "Yhtään laitetta ei ole vielä yhdistetty.",
+      "newDeviceButton": "Uusi laite",
+      "connectionFailed": "Yhdistäminen epäonnistui",
+      "deviceDisconnected": "Yhteys laitteeseen katkaistu",
+      "unknownDevice": "Tuntematon laite",
+      "errorLoadingDevices": "Virhe ladattaessa laitteita",
+      "unknownErrorLoadingDevices": "Tuntematon virhe laitteita ladattaessa"
+    },
+    "validation": {
+      "requiresWebBluetooth": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti bluetooth</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
+      "requiresWebSerial": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
+      "requiresSecureContext": "Tämä sovellus vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia.",
+      "additionallyRequiresSecureContext": "Lisäksi se vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia."
+    }
+  },
+  "nodeDetails": {
+    "message": "Viesti",
+    "requestPosition": "Pyydä sijaintia",
+    "traceRoute": "Reitinselvitys",
+    "airTxUtilization": "Ilmatien TX käyttöaste",
+    "allRawMetrics": "Kaikki raakatiedot:",
+    "batteryLevel": "Akun varaus",
+    "channelUtilization": "Kanavan käyttöaste",
+    "details": "Tiedot:",
+    "deviceMetrics": "Laitteen mittausloki:",
+    "hardware": "Laitteisto: ",
+    "lastHeard": "Viimeksi kuultu: ",
+    "nodeHexPrefix": "Laitteen Hex: ",
+    "nodeNumber": "Laitteen numero: ",
+    "position": "Sijainti:",
+    "role": "Rooli: ",
+    "uptime": "Käyttöaika: ",
+    "voltage": "Jännite",
+    "title": "Tiedot laitteelle {{identifier}}",
+    "ignoreNode": "Älä huomioi laitetta",
+    "removeNode": "Poista laite",
+    "unignoreNode": "Poista laitteen ohitus käytöstä",
+    "security": "Turvallisuus:",
+    "publicKey": "Julkinen avain: ",
+    "messageable": "Viestittävissä: ",
+    "KeyManuallyVerifiedTrue": "Julkinen avain on vahvistettu manuaalisesti",
+    "KeyManuallyVerifiedFalse": "Julkista avainta ei ole vahvistettu manuaalisesti"
+  },
+  "pkiBackup": {
+    "loseKeysWarning": "Jos menetät avaimesi, sinun täytyy palauttaa laite tehdasasetuksiin.",
+    "secureBackup": "On tärkeää varmuuskopioida julkiset ja yksityiset avaimet ja säilyttää niiden varmuuskopioita turvallisesti!",
+    "footer": "=== AVAIMIEN LOPPU ===",
+    "header": "=== MESHTASTIC AVAIMET  {{longName}} ({{shortName}}) LAITTEELLE ===",
+    "privateKey": "Yksityinen avain:",
+    "publicKey": "Julkinen avain:",
+    "fileName": "meshtastic_avaimet_{{longName}}_{{shortName}}.txt",
+    "title": "Varmuuskopioi avaimet"
+  },
+  "pkiBackupReminder": {
+    "description": "Suosittelemme avaintietojen säännöllistä varmuuskopiointia. Haluatko varmuuskopioida nyt?",
+    "title": "Varmuuskopion Muistutus",
+    "remindLaterPrefix": "Muistuta minua",
+    "remindNever": "Älä muistuta minua koskaan",
+    "backupNow": "Varmuuskopioi nyt"
+  },
+  "pkiRegenerate": {
+    "description": "Haluatko varmasti luoda avainparin uudelleen?",
+    "title": "Luo avainpari uudelleen"
+  },
+  "qr": {
+    "addChannels": "Lisää kanavia",
+    "replaceChannels": "Korvaa kanavia",
+    "description": "Nykyinen LoRa-kokoonpano tullaan myös jakamaan.",
+    "sharableUrl": "Jaettava URL",
+    "title": "Generoi QR-koodi"
+  },
+  "reboot": {
+    "title": "Käynnistä laite uudelleen",
+    "description": "Käynnistä laite uudelleen heti tai ajasta sen uudelleenkäynnistys. Halutessasi voit valita käynnistyksen OTA-tilaan (Over-the-Air ohjelmistopäivitystilaan).",
+    "ota": "Käynnistä uudelleen OTA-tilaan",
+    "enterDelay": "Aseta viive",
+    "scheduled": "Uudelleenkäynnistys on ajastettu",
+    "schedule": "Ajasta uudelleen käynnistys",
+    "now": "Uudelleen käynnistä nyt",
+    "cancel": "Peruuta ajastettu uudelleen käynnistys"
+  },
+  "refreshKeys": {
+    "description": {
+      "acceptNewKeys": "Tämä poistaa laitteen laitteesta ja pyytää uusia avaimia.",
+      "keyMismatchReasonSuffix": ". Tämä johtuu siitä, että etälaitteen nykyinen julkinen avain ei vastaa aiemmin tallennettua avainta tälle laitteelle.",
+      "unableToSendDmPrefix": "Laitteesi ei pysty lähettämään suoraa viestiä laitteelle: "
+    },
+    "acceptNewKeys": "Hyväksy uudet avaimet",
+    "title": "Avaimet eivät täsmää - {{identifier}}"
+  },
+  "removeNode": {
+    "description": "Haluatko varmasti poistaa tämän laitteen?",
+    "title": "Poista laite?"
+  },
+  "shutdown": {
+    "title": "Ajasta sammutus",
+    "description": "Sammuta yhdistetty laite x minuutin päästä."
+  },
+  "traceRoute": {
+    "routeToDestination": "Reitin määränpää:",
+    "routeBack": "Reitti takaisin:"
+  },
+  "tracerouteResponse": {
+    "title": "Reitinselvitys: {{identifier}}"
+  },
+  "unsafeRoles": {
+    "confirmUnderstanding": "Kyllä, tiedän mitä teen",
+    "conjunction": " ja blogikirjoitukset ",
+    "postamble": " ja ymmärrän roolin muuttamisen vaikutukset.",
+    "preamble": "Olen lukenut ",
+    "choosingRightDeviceRole": "Valitse laitteelle oikea rooli",
+    "deviceRoleDocumentation": "Roolien dokumentaatio laitteelle",
+    "title": "Oletko varma?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Kyllä, tiedän mitä teen",
+    "title": "Oletko varma?",
+    "description": "Hallintatilan käyttöönotto estää asiakassovelluksia (mukaan lukien verkkoselain) tekemästä muutoksia laitteen asetuksiin. Kun hallintatila on käytössä, laitteen asetuksia voidaan muuttaa ainoastaan etähallintaviesteillä (Remote Admin). Tämä asetus ei ole pakollinen etähallintaan."
+  },
+  "clientNotification": {
+    "title": "Sovellusilmoitukset",
+    "TraceRoute can only be sent once every 30 seconds": "Reitinselvityksen voi tehdä kerran 30:ssä sekunnissa",
+    "Compromised keys were detected and regenerated.": "Turvallisuudeltaan vaarantuneet avaimet havaittiin ja ne generoitiin uudestaan."
+  },
+  "resetNodeDb": {
+    "title": "Nollaa laitteen tietokanta",
+    "description": "Tämä poistaa kaikki laitteet tietokannasta ja tyhjentää kaiken viestihistorian päätelaitteen sovelluksesta. Tätä toimintoa ei voi perua. Haluatko varmasti jatkaa?",
+    "confirm": "Nollaa laitteen tietokanta",
+    "failedTitle": "Tietokannan nollaamisessa tapahtui virhe. Yritä uudelleen."
+  },
+  "clearAllStores": {
+    "title": "Tyhjennä kaikki paikallisesta tallennustilasta",
+    "description": "Tämä poistaa kaiken paikallisesti tallennetun tiedon, mukaan lukien viestihistorian ja laitetietokannat kaikilta aiemmin yhdistetyiltä laitteilta. Toiminnon jälkeen sinun on muodostettava yhteys omaan laitteeseesi uudelleen. Tätä toimintoa ei voi perua. Haluatko varmasti jatkaa?",
+    "confirm": "Tyhjennä kaikki paikallisesta tallennustilasta",
+    "failedTitle": "Paikallisen tallennustilan tyhjentämisessä tapahtui virhe. Yritä uudelleen."
+  },
+  "factoryResetDevice": {
+    "title": "Palauta tehdasasetukset",
+    "description": "Tämä palauttaa yhdistetyn laitteen tehdasasetuksiin ja poistaa kaikki laitteen asetukset, tiedot, laitteet ja viestit, jotka on tallennettu asiakasohjelmaan. Tätä toimintoa ei voi perua. Haluatko varmasti jatkaa?",
+    "confirm": "Palauta tehdasasetukset",
+    "failedTitle": "Tehdasasetusten palauttamisessa tapahtui virhe. Yritä uudelleen."
+  },
+  "factoryResetConfig": {
+    "title": "Tehdasasetusten palautusasetukset",
+    "description": "Tämä palauttaa yhdistetyn laitteen asetukset tehdasasetuksiin ja poistaa kaikki laitteen nykyiset asetukset. Tätä toimintoa ei voi perua. Haluatko varmasti jatkaa?",
+    "confirm": "Tehdasasetusten palautusasetukset",
+    "failedTitle": "Tehdasasetusten palauttamisessa tapahtui virhe. Yritä uudelleen."
+  }
 }
