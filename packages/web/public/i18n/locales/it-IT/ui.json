@@ -1,228 +1,229 @@
 {
-	"navigation": {
-		"title": "Navigazione",
-		"messages": "Messaggi",
-		"map": "Mappa",
-		"config": "Configurazione",
-		"radioConfig": "Configurazione Radio",
-		"moduleConfig": "Configurazione Modulo",
-		"channels": "Canali",
-		"nodes": "Nodi"
-	},
-	"app": {
-		"title": "Meshtastic",
-		"logo": "Logo Meshtastic"
-	},
-	"sidebar": {
-		"collapseToggle": {
-			"button": {
-				"open": "Apri barra laterale",
-				"close": "Chiudi barra laterale"
-			}
-		},
-		"deviceInfo": {
-			"volts": "{{voltage}} volt",
-			"firmware": {
-				"title": "Firmware",
-				"version": "v{{version}}",
-				"buildDate": "Data di build: {{date}}"
-			},
-			"deviceName": {
-				"title": "Nome del dispositivo",
-				"changeName": "Cambia Nome Del Dispositivo",
-				"placeholder": "Inserisci il nome del dispositivo"
-			},
-			"editDeviceName": "Modifica il nome del dispositivo"
-		}
-	},
-	"batteryStatus": {
-		"charging": "{{level}}% in carica",
-		"pluggedIn": "Alimentato",
-		"title": "Batteria"
-	},
-	"search": {
-		"nodes": "Cerca nodi...",
-		"channels": "Cerca canali...",
-		"commandPalette": "Cerca comandi..."
-	},
-	"toast": {
-		"positionRequestSent": {
-			"title": "Richiesta di posizione inviata."
-		},
-		"requestingPosition": {
-			"title": "Richiesta di posizione, attendere prego..."
-		},
-		"sendingTraceroute": {
-			"title": "Invio di Traceroute, attendere prego..."
-		},
-		"tracerouteSent": {
-			"title": "Traceroute inviato."
-		},
-		"savedChannel": {
-			"title": "Canale Salvato: {{channelName}}"
-		},
-		"messages": {
-			"pkiEncryption": {
-				"title": "La chat sta usando la crittografia PKI."
-			},
-			"pskEncryption": {
-				"title": "La chat sta usando la crittografia PSK."
-			}
-		},
-		"configSaveError": {
-			"title": "Errore Salvataggio Configurazione",
-			"description": "Si è verificato un errore durante il salvataggio di questa configurazione."
-		},
-		"validationError": {
-			"title": "Esistono errori di configurazione",
-			"description": "Correggi gli errori di configurazione prima di salvare."
-		},
-		"saveSuccess": {
-			"title": "Salvataggio Configurazione",
-			"description": "La modifica di configurazione {{case}} è stata salvata."
-		},
-		"favoriteNode": {
-			"title": "{{action}} {{nodeName}} {{direction}} favorites.",
-			"action": {
-				"added": "Added",
-				"removed": "Removed",
-				"to": "to",
-				"from": "from"
-			}
-		},
-		"ignoreNode": {
-			"title": "{{action}} {{nodeName}} {{direction}} ignore list",
-			"action": {
-				"added": "Added",
-				"removed": "Removed",
-				"to": "to",
-				"from": "from"
-			}
-		}
-	},
-	"notifications": {
-		"copied": {
-			"label": "Copiato!"
-		},
-		"copyToClipboard": {
-			"label": "Copia negli appunti"
-		},
-		"hidePassword": {
-			"label": "Nascondi password"
-		},
-		"showPassword": {
-			"label": "Visualizza password"
-		},
-		"deliveryStatus": {
-			"delivered": "Consegnato",
-			"failed": "Consegna Fallita",
-			"waiting": "In attesa",
-			"unknown": "Sconosciuto"
-		}
-	},
-	"general": {
-		"label": "Generale"
-	},
-	"hardware": {
-		"label": "Hardware"
-	},
-	"metrics": {
-		"label": "Statistiche"
-	},
-	"role": {
-		"label": "Ruolo"
-	},
-	"filter": {
-		"label": "Filtro"
-	},
-	"advanced": {
-		"label": "Advanced"
-	},
-	"clearInput": {
-		"label": "Cancella input"
-	},
-	"resetFilters": {
-		"label": "Ripristina Filtri"
-	},
-	"nodeName": {
-		"label": "Nome/numero del nodo",
-		"placeholder": "Meshtastic 1234"
-	},
-	"airtimeUtilization": {
-		"label": "Tempo di Trasmissione Utilizzato (%)"
-	},
-	"batteryLevel": {
-		"label": "Livello batteria (%)",
-		"labelText": "Livello batteria (%): {{value}}"
-	},
-	"batteryVoltage": {
-		"label": "Tensione della Batteria (V)",
-		"title": "Tensione"
-	},
-	"channelUtilization": {
-		"label": "Utilizzo Canale (%)"
-	},
-	"hops": {
-		"direct": "Diretto",
-		"label": "Numero di hop",
-		"text": "Numero di hop: {{value}}"
-	},
-	"lastHeard": {
-		"label": "Ricevuto più di recente",
-		"labelText": "Ultimo contatto: {{value}}",
-		"nowLabel": "Adesso"
-	},
-	"snr": {
-		"label": "SNR (dB)"
-	},
-	"favorites": {
-		"label": "Preferiti"
-	},
-	"hide": {
-		"label": "Nascondi"
-	},
-	"showOnly": {
-		"label": "Mostra Solo"
-	},
-	"viaMqtt": {
-		"label": "Connesso tramite MQTT"
-	},
-	"hopsUnknown": {
-		"label": "Unknown number of hops"
-	},
-	"showUnheard": {
-		"label": "Never heard"
-	},
-	"language": {
-		"label": "Lingua",
-		"changeLanguage": "Cambia Lingua"
-	},
-	"theme": {
-		"dark": "Scuro",
-		"light": "Chiaro",
-		"system": "Automatico",
-		"changeTheme": "Modifica lo schema dei colori"
-	},
-	"errorPage": {
-		"title": "Questo è un po' imbarazzante...",
-		"description1": "Siamo davvero spiacenti, ma si è verificato un errore nel client web che ha causato il crash. <br /> Questo non dovrebbe accadere e stiamo lavorando duramente per risolverlo.",
-		"description2": "Il modo migliore per evitare che ciò accada di nuovo a voi o a chiunque altro è quello di riferire la questione a noi.",
-		"reportInstructions": "Per favore includi le seguenti informazioni nel tuo report:",
-		"reportSteps": {
-			"step1": "Cosa stavi facendo quando si è verificato l'errore",
-			"step2": "Cosa ti aspettavi succedesse",
-			"step3": "Quello che è successo realmente",
-			"step4": "Altre informazioni rilevanti"
-		},
-		"reportLink": "Puoi segnalare il problema al nostro <0>GitHub</0>",
-		"connectionsLink": "Ritorna alla <0>connections</0>",
-		"detailsSummary": "Dettagli Errore",
-		"errorMessageLabel": "Messaggio di errore:",
-		"stackTraceLabel": "Stack trace:",
-		"fallbackError": "{{error}}"
-	},
-	"footer": {
-		"text": "Powered by <0>▲ Vercel</0> | Meshtastic® è un marchio registrato di Meshtastic LLC. | <1>Informazioni Legali</1>",
-		"commitSha": "Commit SHA: {{sha}}"
-	}
+  "navigation": {
+    "title": "Navigazione",
+    "messages": "Messaggi",
+    "map": "Mappa",
+    "settings": "Impostazioni",
+    "channels": "Canali",
+    "radioConfig": "Configurazione Radio",
+    "deviceConfig": "Configurazione Dispositivo",
+    "moduleConfig": "Configurazione Modulo",
+    "nodes": "Nodi"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "logo": "Logo Meshtastic"
+  },
+  "sidebar": {
+    "collapseToggle": {
+      "button": {
+        "open": "Apri barra laterale",
+        "close": "Chiudi barra laterale"
+      }
+    },
+    "deviceInfo": {
+      "volts": "{{voltage}} volt",
+      "firmware": {
+        "title": "Firmware",
+        "version": "v{{version}}",
+        "buildDate": "Data di build: {{date}}"
+      }
+    }
+  },
+  "batteryStatus": {
+    "charging": "{{level}}% in carica",
+    "pluggedIn": "Alimentato",
+    "title": "Batteria"
+  },
+  "search": {
+    "nodes": "Cerca nodi...",
+    "channels": "Cerca canali...",
+    "commandPalette": "Cerca comandi..."
+  },
+  "toast": {
+    "positionRequestSent": {
+      "title": "Richiesta di posizione inviata."
+    },
+    "requestingPosition": {
+      "title": "Richiesta di posizione, attendere prego..."
+    },
+    "sendingTraceroute": {
+      "title": "Invio di Traceroute, attendere prego..."
+    },
+    "tracerouteSent": {
+      "title": "Traceroute inviato."
+    },
+    "savedChannel": {
+      "title": "Canale Salvato: {{channelName}}"
+    },
+    "messages": {
+      "pkiEncryption": {
+        "title": "La chat sta usando la crittografia PKI."
+      },
+      "pskEncryption": {
+        "title": "La chat sta usando la crittografia PSK."
+      }
+    },
+    "configSaveError": {
+      "title": "Errore Salvataggio Configurazione",
+      "description": "Si è verificato un errore durante il salvataggio di questa configurazione."
+    },
+    "validationError": {
+      "title": "Esistono errori di configurazione",
+      "description": "Correggi gli errori di configurazione prima di salvare."
+    },
+    "saveSuccess": {
+      "title": "Salvataggio Configurazione",
+      "description": "La modifica di configurazione {{case}} è stata salvata."
+    },
+    "saveAllSuccess": {
+      "title": "Saved",
+      "description": "All configuration changes have been saved."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "action": {
+        "added": "Added",
+        "removed": "Removed",
+        "to": "to",
+        "from": "from"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "action": {
+        "added": "Added",
+        "removed": "Removed",
+        "to": "to",
+        "from": "from"
+      }
+    }
+  },
+  "notifications": {
+    "copied": {
+      "label": "Copiato!"
+    },
+    "copyToClipboard": {
+      "label": "Copia negli appunti"
+    },
+    "hidePassword": {
+      "label": "Nascondi password"
+    },
+    "showPassword": {
+      "label": "Visualizza password"
+    },
+    "deliveryStatus": {
+      "delivered": "Consegnato",
+      "failed": "Consegna Fallita",
+      "waiting": "In attesa",
+      "unknown": "Sconosciuto"
+    }
+  },
+  "general": {
+    "label": "Generale"
+  },
+  "hardware": {
+    "label": "Hardware"
+  },
+  "metrics": {
+    "label": "Statistiche"
+  },
+  "role": {
+    "label": "Ruolo"
+  },
+  "filter": {
+    "label": "Filtro"
+  },
+  "advanced": {
+    "label": "Advanced"
+  },
+  "clearInput": {
+    "label": "Cancella input"
+  },
+  "resetFilters": {
+    "label": "Ripristina Filtri"
+  },
+  "nodeName": {
+    "label": "Nome/numero del nodo",
+    "placeholder": "Meshtastic 1234"
+  },
+  "airtimeUtilization": {
+    "label": "Tempo di Trasmissione Utilizzato (%)",
+    "short": "Airtime Util. (%)"
+  },
+  "batteryLevel": {
+    "label": "Livello batteria (%)",
+    "labelText": "Livello batteria (%): {{value}}"
+  },
+  "batteryVoltage": {
+    "label": "Tensione della Batteria (V)",
+    "title": "Tensione"
+  },
+  "channelUtilization": {
+    "label": "Utilizzo Canale (%)",
+    "short": "Channel Util. (%)"
+  },
+  "hops": {
+    "direct": "Diretto",
+    "label": "Numero di hop",
+    "text": "Numero di hop: {{value}}"
+  },
+  "lastHeard": {
+    "label": "Ricevuto più di recente",
+    "labelText": "Ultimo contatto: {{value}}",
+    "nowLabel": "Adesso"
+  },
+  "snr": {
+    "label": "SNR (dB)"
+  },
+  "favorites": {
+    "label": "Preferiti"
+  },
+  "hide": {
+    "label": "Nascondi"
+  },
+  "showOnly": {
+    "label": "Mostra Solo"
+  },
+  "viaMqtt": {
+    "label": "Connesso tramite MQTT"
+  },
+  "hopsUnknown": {
+    "label": "Unknown number of hops"
+  },
+  "showUnheard": {
+    "label": "Never heard"
+  },
+  "language": {
+    "label": "Lingua",
+    "changeLanguage": "Cambia Lingua"
+  },
+  "theme": {
+    "dark": "Scuro",
+    "light": "Chiaro",
+    "system": "Automatico",
+    "changeTheme": "Modifica lo schema dei colori"
+  },
+  "errorPage": {
+    "title": "Questo è un po' imbarazzante...",
+    "description1": "Siamo davvero spiacenti, ma si è verificato un errore nel client web che ha causato il crash. <br /> Questo non dovrebbe accadere e stiamo lavorando duramente per risolverlo.",
+    "description2": "Il modo migliore per evitare che ciò accada di nuovo a voi o a chiunque altro è quello di riferire la questione a noi.",
+    "reportInstructions": "Per favore includi le seguenti informazioni nel tuo report:",
+    "reportSteps": {
+      "step1": "Cosa stavi facendo quando si è verificato l'errore",
+      "step2": "Cosa ti aspettavi succedesse",
+      "step3": "Quello che è successo realmente",
+      "step4": "Altre informazioni rilevanti"
+    },
+    "reportLink": "Puoi segnalare il problema al nostro <0>GitHub</0>",
+    "dashboardLink": "Ritorna alla <0>dashboard</0>",
+    "detailsSummary": "Dettagli Errore",
+    "errorMessageLabel": "Messaggio di errore:",
+    "stackTraceLabel": "Stack trace:",
+    "fallbackError": "{{error}}"
+  },
+  "footer": {
+    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® è un marchio registrato di Meshtastic LLC. | <1>Informazioni Legali</1>",
+    "commitSha": "Commit SHA: {{sha}}"
+  }
 }

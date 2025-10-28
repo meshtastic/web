@@ -1,5 +1,4 @@
 {
-	"connections": {
 		"title": "Connected Devices",
 		"description": "Manage your connected Meshtastic devices.",
 		"connectionType_ble": "BLE",
@@ -8,5 +7,4 @@
 		"noDevicesTitle": "No devices connected",
 		"noDevicesDescription": "Connect a new device to get started.",
 		"button_newConnection": "New Connection"
-	}
 }

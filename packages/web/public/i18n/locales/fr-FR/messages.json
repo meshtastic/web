@@ -1,39 +1,39 @@
 {
-	"page": {
-		"title": "Messages: {{chatName}}",
-		"placeholder": "Saisir message"
-	},
-	"emptyState": {
-		"title": "Sélectionnez un chat",
-		"text": "Aucun message pour le moment."
-	},
-	"selectChatPrompt": {
-		"text": "Sélectionnez un canal ou un nœud pour commencer à envoyer des messages."
-	},
-	"sendMessage": {
-		"placeholder": "Entrez votre message ici...",
-		"sendButton": "Envoyer"
-	},
-	"actionsMenu": {
-		"addReactionLabel": "Ajouter une réaction",
-		"replyLabel": "Répondre"
-	},
-	"deliveryStatus": {
-		"delivered": {
-			"label": "Message délivré",
-			"displayText": "Message délivré"
-		},
-		"failed": {
-			"label": "La transmission du message a échoué",
-			"displayText": "Échec de l'envoi"
-		},
-		"unknown": {
-			"label": "Statut du message inconnu",
-			"displayText": "Statut inconnu"
-		},
-		"waiting": {
-			"label": "Envoi du message",
-			"displayText": "En attente de réception"
-		}
-	}
+  "page": {
+    "title": "Messages: {{chatName}}",
+    "placeholder": "Saisir message"
+  },
+  "emptyState": {
+    "title": "Sélectionnez un chat",
+    "text": "Aucun message pour le moment."
+  },
+  "selectChatPrompt": {
+    "text": "Sélectionnez un canal ou un nœud pour commencer à envoyer des messages."
+  },
+  "sendMessage": {
+    "placeholder": "Entrez votre message ici...",
+    "sendButton": "Envoyer"
+  },
+  "actionsMenu": {
+    "addReactionLabel": "Ajouter une réaction",
+    "replyLabel": "Répondre"
+  },
+  "deliveryStatus": {
+    "delivered": {
+      "label": "Message délivré",
+      "displayText": "Message délivré"
+    },
+    "failed": {
+      "label": "La transmission du message a échoué",
+      "displayText": "Échec de l'envoi"
+    },
+    "unknown": {
+      "label": "Statut du message inconnu",
+      "displayText": "Statut inconnu"
+    },
+    "waiting": {
+      "label": "Envoi du message",
+      "displayText": "En attente de réception"
+    }
+  }
 }

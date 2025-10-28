@@ -1,228 +1,229 @@
 {
-	"navigation": {
-		"title": "Navigointi",
-		"messages": "Viestit",
-		"map": "Kartta",
-		"config": "Asetukset",
-		"radioConfig": "Radion asetukset",
-		"moduleConfig": "Moduulin asetukset",
-		"channels": "Kanavat",
-		"nodes": "Laitteet"
-	},
-	"app": {
-		"title": "Meshtastic",
-		"logo": "Meshtastic Logo"
-	},
-	"sidebar": {
-		"collapseToggle": {
-			"button": {
-				"open": "Avaa sivupalkki",
-				"close": "Sulje sivupalkki"
-			}
-		},
-		"deviceInfo": {
-			"volts": "{{voltage}} volttia",
-			"firmware": {
-				"title": "Laiteohjelmisto",
-				"version": "v{{version}}",
-				"buildDate": "Koontipäivä: {{date}}"
-			},
-			"deviceName": {
-				"title": "Laitteen nimi",
-				"changeName": "Vaihda laitteen nimi",
-				"placeholder": "Anna laitteelle nimi"
-			},
-			"editDeviceName": "Muokkaa laitteen nimeä"
-		}
-	},
-	"batteryStatus": {
-		"charging": "{{level}} % latauksessa",
-		"pluggedIn": "Kytketty verkkovirtaan",
-		"title": "Akku"
-	},
-	"search": {
-		"nodes": "Etsi laitteita...",
-		"channels": "Etsi kanavia...",
-		"commandPalette": "Etsi komentoja..."
-	},
-	"toast": {
-		"positionRequestSent": {
-			"title": "Sijaintipyyntö lähetetty."
-		},
-		"requestingPosition": {
-			"title": "Pyydetään sijaintia, odota..."
-		},
-		"sendingTraceroute": {
-			"title": "Reitinselvitys lähetetty, odota..."
-		},
-		"tracerouteSent": {
-			"title": "Reitinselvitys lähetetty."
-		},
-		"savedChannel": {
-			"title": "Tallennettu Kanava: {{channelName}}"
-		},
-		"messages": {
-			"pkiEncryption": {
-				"title": "Keskustelu käyttää PKI-salausta."
-			},
-			"pskEncryption": {
-				"title": "Keskustelu käyttää PKI-salausta."
-			}
-		},
-		"configSaveError": {
-			"title": "Virhe asetusten tallentamisessa",
-			"description": "Asetusten tallennuksessa tapahtui virhe."
-		},
-		"validationError": {
-			"title": "Asetuksissa on virheitä",
-			"description": "Ole hyvä ja korjaa asetusvirheet ennen tallentamista."
-		},
-		"saveSuccess": {
-			"title": "Tallennetaan asetukset",
-			"description": "Asetuksien muutos {{case}} on tallennettu."
-		},
-		"favoriteNode": {
-			"title": "{{action}} {{nodeName}} {{direction}} suosikit.",
-			"action": {
-				"added": "Lisätty",
-				"removed": "Poistettu",
-				"to": "saakka",
-				"from": "alkaen"
-			}
-		},
-		"ignoreNode": {
-			"title": "{{action}} {{nodeName}} {{direction}} estolista",
-			"action": {
-				"added": "Lisätty",
-				"removed": "Poistettu",
-				"to": "saakka",
-				"from": "alkaen"
-			}
-		}
-	},
-	"notifications": {
-		"copied": {
-			"label": "Kopioitu!"
-		},
-		"copyToClipboard": {
-			"label": "Kopioi leikepöydälle"
-		},
-		"hidePassword": {
-			"label": "Piilota salasana"
-		},
-		"showPassword": {
-			"label": "Näytä salasana"
-		},
-		"deliveryStatus": {
-			"delivered": "Toimitettu",
-			"failed": "Toimitus epäonnistui",
-			"waiting": "Odottaa",
-			"unknown": "Tuntematon"
-		}
-	},
-	"general": {
-		"label": "Yleinen"
-	},
-	"hardware": {
-		"label": "Laite"
-	},
-	"metrics": {
-		"label": "Mittaustiedot"
-	},
-	"role": {
-		"label": "Rooli"
-	},
-	"filter": {
-		"label": "Suodatus"
-	},
-	"advanced": {
-		"label": "Lisäasetukset"
-	},
-	"clearInput": {
-		"label": "Tyhjennä kenttä"
-	},
-	"resetFilters": {
-		"label": "Tyhjennä suodattimet"
-	},
-	"nodeName": {
-		"label": "Laitteen nimi tai numero",
-		"placeholder": "Meshtastic 1234"
-	},
-	"airtimeUtilization": {
-		"label": "Ajan käyttöaste (%)"
-	},
-	"batteryLevel": {
-		"label": "Akun varaus (%)",
-		"labelText": "Akun varaus (%): {{value}}"
-	},
-	"batteryVoltage": {
-		"label": "Akun jännite (V)",
-		"title": "Jännite"
-	},
-	"channelUtilization": {
-		"label": "Kanavan käyttö (%)"
-	},
-	"hops": {
-		"direct": "Suora",
-		"label": "Hyppyjen määrä",
-		"text": "Hyppyjen määrä: {{value}}"
-	},
-	"lastHeard": {
-		"label": "Viimeksi kuultu",
-		"labelText": "Viimeksi kuultu: {{value}}",
-		"nowLabel": "Nyt"
-	},
-	"snr": {
-		"label": "SNR (db)"
-	},
-	"favorites": {
-		"label": "Suosikit"
-	},
-	"hide": {
-		"label": "Piilota"
-	},
-	"showOnly": {
-		"label": "Näytä pelkästään"
-	},
-	"viaMqtt": {
-		"label": "Yhdistetty MQTT-yhteydellä"
-	},
-	"hopsUnknown": {
-		"label": "Tuntematon määrä hyppyjä"
-	},
-	"showUnheard": {
-		"label": "Ei koskaan kuultu"
-	},
-	"language": {
-		"label": "Kieli",
-		"changeLanguage": "Vaihda kieli"
-	},
-	"theme": {
-		"dark": "Tumma",
-		"light": "Vaalea",
-		"system": "Automaattinen",
-		"changeTheme": "Vaihda väriteema"
-	},
-	"errorPage": {
-		"title": "Tämä on hieman noloa...",
-		"description1": "Pahoittelemme, mutta verkkosovelluksessa tapahtui virhe, joka aiheutti kaatumisen. <br /> \nTällaista ei pitäisi tapahtua ja me työskentelemme ahkerasti ongelman korjaamiseksi.",
-		"description2": "Paras tapa estää tämän tapahtuminen uudelleen sinulle tai kenellekään muulle, on ilmoittaa meille ongelmasta.",
-		"reportInstructions": "Lisääthän raporttiisi seuraavat tiedot:",
-		"reportSteps": {
-			"step1": "Mitä olit tekemässä virheen tapahtuessa",
-			"step2": "Mitä odotit tapahtuvan",
-			"step3": "Mitä todellisuudessa tapahtui",
-			"step4": "Muut mahdollisesti oleelliset tiedot"
-		},
-		"reportLink": "Voit raportoida ongelmasta <0>GitHubissa</0>",
-		"connectionsLink": "Palaa takaisin <0>hallintapaneeliin</0>",
-		"detailsSummary": "Virheen tiedot",
-		"errorMessageLabel": "Virheilmoitus:",
-		"stackTraceLabel": "Virheen jäljityslista:",
-		"fallbackError": "{{error}}"
-	},
-	"footer": {
-		"text": "Powered by <0>▲ Vercel</0> | Meshtastic® on Meshtastic LLC:n rekisteröity tavaramerkki. | <1>Oikeudelliset tiedot</1>",
-		"commitSha": "Ohjelmistokehitysversion SHA-tunniste: {{sha}}"
-	}
+  "navigation": {
+    "title": "Navigointi",
+    "messages": "Viestit",
+    "map": "Kartta",
+    "settings": "Asetukset",
+    "channels": "Kanavat",
+    "radioConfig": "Radion asetukset",
+    "deviceConfig": "Laitteen asetukset",
+    "moduleConfig": "Moduulin asetukset",
+    "nodes": "Laitteet"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "logo": "Meshtastic Logo"
+  },
+  "sidebar": {
+    "collapseToggle": {
+      "button": {
+        "open": "Avaa sivupalkki",
+        "close": "Sulje sivupalkki"
+      }
+    },
+    "deviceInfo": {
+      "volts": "{{voltage}} volttia",
+      "firmware": {
+        "title": "Laiteohjelmisto",
+        "version": "v{{version}}",
+        "buildDate": "Koontipäivä: {{date}}"
+      }
+    }
+  },
+  "batteryStatus": {
+    "charging": "{{level}} % latauksessa",
+    "pluggedIn": "Kytketty verkkovirtaan",
+    "title": "Akku"
+  },
+  "search": {
+    "nodes": "Etsi laitteita...",
+    "channels": "Etsi kanavia...",
+    "commandPalette": "Etsi komentoja..."
+  },
+  "toast": {
+    "positionRequestSent": {
+      "title": "Sijaintipyyntö lähetetty."
+    },
+    "requestingPosition": {
+      "title": "Pyydetään sijaintia, odota..."
+    },
+    "sendingTraceroute": {
+      "title": "Reitinselvitys lähetetty, odota..."
+    },
+    "tracerouteSent": {
+      "title": "Reitinselvitys lähetetty."
+    },
+    "savedChannel": {
+      "title": "Tallennettu Kanava: {{channelName}}"
+    },
+    "messages": {
+      "pkiEncryption": {
+        "title": "Keskustelu käyttää PKI-salausta."
+      },
+      "pskEncryption": {
+        "title": "Keskustelu käyttää PKI-salausta."
+      }
+    },
+    "configSaveError": {
+      "title": "Virhe asetusten tallentamisessa",
+      "description": "Asetusten tallennuksessa tapahtui virhe."
+    },
+    "validationError": {
+      "title": "Asetuksissa on virheitä",
+      "description": "Ole hyvä ja korjaa asetusvirheet ennen tallentamista."
+    },
+    "saveSuccess": {
+      "title": "Tallennetaan asetukset",
+      "description": "Asetuksien muutos {{case}} on tallennettu."
+    },
+    "saveAllSuccess": {
+      "title": "Tallennettu",
+      "description": "Kaikki asetukset on tallennettu."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} suosikit.",
+      "action": {
+        "added": "Lisätty",
+        "removed": "Poistettu",
+        "to": "saakka",
+        "from": "alkaen"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} estolista",
+      "action": {
+        "added": "Lisätty",
+        "removed": "Poistettu",
+        "to": "saakka",
+        "from": "alkaen"
+      }
+    }
+  },
+  "notifications": {
+    "copied": {
+      "label": "Kopioitu!"
+    },
+    "copyToClipboard": {
+      "label": "Kopioi leikepöydälle"
+    },
+    "hidePassword": {
+      "label": "Piilota salasana"
+    },
+    "showPassword": {
+      "label": "Näytä salasana"
+    },
+    "deliveryStatus": {
+      "delivered": "Toimitettu",
+      "failed": "Toimitus epäonnistui",
+      "waiting": "Odottaa",
+      "unknown": "Tuntematon"
+    }
+  },
+  "general": {
+    "label": "Yleinen"
+  },
+  "hardware": {
+    "label": "Laite"
+  },
+  "metrics": {
+    "label": "Mittaustiedot"
+  },
+  "role": {
+    "label": "Rooli"
+  },
+  "filter": {
+    "label": "Suodatus"
+  },
+  "advanced": {
+    "label": "Lisäasetukset"
+  },
+  "clearInput": {
+    "label": "Tyhjennä kenttä"
+  },
+  "resetFilters": {
+    "label": "Tyhjennä suodattimet"
+  },
+  "nodeName": {
+    "label": "Laitteen nimi tai numero",
+    "placeholder": "Meshtastic 1234"
+  },
+  "airtimeUtilization": {
+    "label": "Ajan käyttöaste (%)",
+    "short": "Lähetysaika­käyttö (%)"
+  },
+  "batteryLevel": {
+    "label": "Akun varaus (%)",
+    "labelText": "Akun varaus (%): {{value}}"
+  },
+  "batteryVoltage": {
+    "label": "Akun jännite (V)",
+    "title": "Jännite"
+  },
+  "channelUtilization": {
+    "label": "Kanavan käyttö (%)",
+    "short": "Kanavan käyttöaste (%)"
+  },
+  "hops": {
+    "direct": "Suora",
+    "label": "Hyppyjen määrä",
+    "text": "Hyppyjen määrä: {{value}}"
+  },
+  "lastHeard": {
+    "label": "Viimeksi kuultu",
+    "labelText": "Viimeksi kuultu: {{value}}",
+    "nowLabel": "Nyt"
+  },
+  "snr": {
+    "label": "SNR (db)"
+  },
+  "favorites": {
+    "label": "Suosikit"
+  },
+  "hide": {
+    "label": "Piilota"
+  },
+  "showOnly": {
+    "label": "Näytä pelkästään"
+  },
+  "viaMqtt": {
+    "label": "Yhdistetty MQTT-yhteydellä"
+  },
+  "hopsUnknown": {
+    "label": "Tuntematon määrä hyppyjä"
+  },
+  "showUnheard": {
+    "label": "Ei koskaan kuultu"
+  },
+  "language": {
+    "label": "Kieli",
+    "changeLanguage": "Vaihda kieli"
+  },
+  "theme": {
+    "dark": "Tumma",
+    "light": "Vaalea",
+    "system": "Automaattinen",
+    "changeTheme": "Vaihda väriteema"
+  },
+  "errorPage": {
+    "title": "Tämä on hieman noloa...",
+    "description1": "Pahoittelemme, mutta verkkosovelluksessa tapahtui virhe, joka aiheutti kaatumisen. <br /> \nTällaista ei pitäisi tapahtua ja me työskentelemme ahkerasti ongelman korjaamiseksi.",
+    "description2": "Paras tapa estää tämän tapahtuminen uudelleen sinulle tai kenellekään muulle, on ilmoittaa meille ongelmasta.",
+    "reportInstructions": "Lisääthän raporttiisi seuraavat tiedot:",
+    "reportSteps": {
+      "step1": "Mitä olit tekemässä virheen tapahtuessa",
+      "step2": "Mitä odotit tapahtuvan",
+      "step3": "Mitä todellisuudessa tapahtui",
+      "step4": "Muut mahdollisesti oleelliset tiedot"
+    },
+    "reportLink": "Voit raportoida ongelmasta <0>GitHubissa</0>",
+    "dashboardLink": "Palaa takaisin <0>hallintapaneeliin</0>",
+    "detailsSummary": "Virheen tiedot",
+    "errorMessageLabel": "Virheilmoitus:",
+    "stackTraceLabel": "Virheen jäljityslista:",
+    "fallbackError": "{{error}}"
+  },
+  "footer": {
+    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® on Meshtastic LLC:n rekisteröity tavaramerkki. | <1>Oikeudelliset tiedot</1>",
+    "commitSha": "Ohjelmistokehitysversion SHA-tunniste: {{sha}}"
+  }
 }

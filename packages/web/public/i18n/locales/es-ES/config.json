@@ -1,0 +1,458 @@
+{
+  "page": {
+    "title": "Ajustes",
+    "tabUser": "Usuario",
+    "tabChannels": "Canales",
+    "tabBluetooth": "Bluetooth",
+    "tabDevice": "Dispositivo",
+    "tabDisplay": "Pantalla",
+    "tabLora": "LoRa",
+    "tabNetwork": "Conexión Red",
+    "tabPosition": "Posición",
+    "tabPower": "Consumo",
+    "tabSecurity": "Seguridad"
+  },
+  "sidebar": {
+    "label": "Configuración"
+  },
+  "device": {
+    "title": "Ajustes del dispositivo",
+    "description": "Ajustes del dispositivo",
+    "buttonPin": {
+      "description": "Sobrescribir pin de botón",
+      "label": "Pin del botón"
+    },
+    "buzzerPin": {
+      "description": "Sobrescribir pin del zumbador",
+      "label": "Pin del zumbador"
+    },
+    "disableTripleClick": {
+      "description": "Deshabilitar clic triple",
+      "label": "Deshabilitar clic triple"
+    },
+    "doubleTapAsButtonPress": {
+      "description": "Tratar doble toque como botón presionado",
+      "label": "Doble toque como botón presionado"
+    },
+    "ledHeartbeatDisabled": {
+      "description": "Deshabilitar parpadeo del LED predeterminado",
+      "label": "Deshabilitar LED de estado"
+    },
+    "nodeInfoBroadcastInterval": {
+      "description": "Cada cuanto se transmite la información del nodo",
+      "label": "Intervalo de transmisión de información del nodo"
+    },
+    "posixTimezone": {
+      "description": "La zona horaria para el dispositivo en formato de cadena POSIX",
+      "label": "Zona horaria POSIX"
+    },
+    "rebroadcastMode": {
+      "description": "Cómo manejar la retransmisión",
+      "label": "Modo de retransmisión"
+    },
+    "role": {
+      "description": "Qué role realiza el dispositivo en la malla",
+      "label": "Rol"
+    }
+  },
+  "bluetooth": {
+    "title": "Ajustes de Bluetooth",
+    "description": "Ajustes del módulo de Bluetooth",
+    "note": "Nota: Algunos dispositivos (ESP32) no pueden usar Bluetooth y Wifi al mismo tiempo.",
+    "enabled": {
+      "description": "Habilitar o deshabilitar Bluetooth",
+      "label": "Habilitado"
+    },
+    "pairingMode": {
+      "description": "Selección del comportamiento del Pin.",
+      "label": "Modo de emparejamiento"
+    },
+    "pin": {
+      "description": "Pin a usar al emparejar",
+      "label": "Pin"
+    }
+  },
+  "display": {
+    "description": "Ajustes de la pantalla del dispositivo",
+    "title": "Ajustes de pantalla",
+    "headingBold": {
+      "description": "Negrita en el texto del encabezado",
+      "label": "Encabezado en negrita"
+    },
+    "carouselDelay": {
+      "description": "Que tan rápido cambiar entre pantallas",
+      "label": "Retraso del carrusel"
+    },
+    "compassNorthTop": {
+      "description": "Fijar el norte en la parte superior de la brújula",
+      "label": "Norte arriba de la brújula"
+    },
+    "displayMode": {
+      "description": "Variante del diseño de la pantalla",
+      "label": "Modo de visualización"
+    },
+    "displayUnits": {
+      "description": "Mostrar unidades de medidas métricas o imperiales",
+      "label": "Unidades de medidas"
+    },
+    "flipScreen": {
+      "description": "Rotar pantalla 180 grados",
+      "label": "Rotar pantalla"
+    },
+    "gpsDisplayUnits": {
+      "description": "Formato de visualización de las coordenadas",
+      "label": "Unidades de visualización del GPS"
+    },
+    "oledType": {
+      "description": "Tipo de pantalla OLED conectada al dispositivo",
+      "label": "Tipo de OLED"
+    },
+    "screenTimeout": {
+      "description": "Apagar la pantalla después de este tiempo",
+      "label": "Tiempo de espera de la pantalla"
+    },
+    "twelveHourClock": {
+      "description": "Usar reloj con formato de 12 horas",
+      "label": "Reloj de 12 horas"
+    },
+    "wakeOnTapOrMotion": {
+      "description": "Despertar dispositivo al tocar o mover",
+      "label": "Despertar al mover o tocar"
+    }
+  },
+  "lora": {
+    "title": "Ajustes de la Red",
+    "description": "Opciones de la malla LoRa",
+    "bandwidth": {
+      "description": "Ancho de banda de canal en MHz",
+      "label": "Ancho de Banda"
+    },
+    "boostedRxGain": {
+      "description": "Aumentada la ganancia RX",
+      "label": "Aumentada la ganancia RX"
+    },
+    "codingRate": {
+      "description": "El denominador de la tasa de codificación",
+      "label": "Tasa de codificación"
+    },
+    "frequencyOffset": {
+      "description": "Desplazamiento de frecuencia para corregir los errores de calibración del cristal",
+      "label": "Desplazamiento de la Frecuencia"
+    },
+    "frequencySlot": {
+      "description": "Número de canal de frecuencia LoRa",
+      "label": "Slot de frecuencia"
+    },
+    "hopLimit": {
+      "description": "Número máximo de saltos",
+      "label": "Límite de Saltos"
+    },
+    "ignoreMqtt": {
+      "description": "No reenviar mensajes MQTT sobre la malla",
+      "label": "Ignorar Paquetes MQTT"
+    },
+    "modemPreset": {
+      "description": "Modem predefinido para usar",
+      "label": "Modem predefinido"
+    },
+    "okToMqtt": {
+      "description": "Cuando se establece en true, esta configuración indica que el usuario aprueba el paquete para ser subido a MQTT. Si se establece a false, los nodos remotos son solicitados no reenviar paquetes a MQTT",
+      "label": "Permitir Subir Paquetes al MQTT"
+    },
+    "overrideDutyCycle": {
+      "description": "Sobreescribir el Tiempo de Trabajo",
+      "label": "Sobreescribir el Tiempo de Trabajo"
+    },
+    "overrideFrequency": {
+      "description": "Reemplazar frecuencia",
+      "label": "Reemplazar frecuencia"
+    },
+    "region": {
+      "description": "Establece la región para su nodo",
+      "label": "Región"
+    },
+    "spreadingFactor": {
+      "description": "Indica el número de chirps por símbolo",
+      "label": "Factor de dispersión"
+    },
+    "transmitEnabled": {
+      "description": "Activar/Desactivar transmisión (TX) desde la radio LoRa",
+      "label": "Transmisión Activa"
+    },
+    "transmitPower": {
+      "description": "Máxima potencia de transmisión",
+      "label": "Potencia de transmisión"
+    },
+    "usePreset": {
+      "description": "Utilice uno de los ajustes predefinidos del módem",
+      "label": "Usar predefinido"
+    },
+    "meshSettings": {
+      "description": "Opciones de la malla LoRa",
+      "label": "Ajustes de la Red"
+    },
+    "waveformSettings": {
+      "description": "Configuración de la forma de onda LoRa",
+      "label": "Ajustes de forma de onda"
+    },
+    "radioSettings": {
+      "label": "Ajustes de radio",
+      "description": "Configuración para LoRa radio"
+    }
+  },
+  "network": {
+    "title": "Configuración WiFi",
+    "description": "Configuración de radio WiFi",
+    "note": "Nota: Algunos dispositivos (ESP32) no pueden usar Bluetooth y Wifi al mismo tiempo.",
+    "addressMode": {
+      "description": "Selección de asignación de dirección",
+      "label": "Modo de dirección"
+    },
+    "dns": {
+      "description": "Servidor DNS",
+      "label": "DNS"
+    },
+    "ethernetEnabled": {
+      "description": "Activar o desactivar el puerto Ethernet",
+      "label": "Habilitado"
+    },
+    "gateway": {
+      "description": "Puerta de Entrada Predeterminada",
+      "label": "Puerta enlace"
+    },
+    "ip": {
+      "description": "Dirección IP",
+      "label": "IP"
+    },
+    "psk": {
+      "description": "Contraseña de red",
+      "label": "PSK (Contraseña)"
+    },
+    "ssid": {
+      "description": "Nombre de red",
+      "label": "SSID (Nombre la Red)"
+    },
+    "subnet": {
+      "description": "Máscara de subred",
+      "label": "Subred"
+    },
+    "wifiEnabled": {
+      "description": "Activar o desactivar la radio WiFi",
+      "label": "Habilitado"
+    },
+    "meshViaUdp": {
+      "label": "Malla via UDP"
+    },
+    "ntpServer": {
+      "label": "Servidor NTP"
+    },
+    "rsyslogServer": {
+      "label": "Servidor Rsyslog"
+    },
+    "ethernetConfigSettings": {
+      "description": "Configuración del puerto Ethernet",
+      "label": "Configuración Ethernet"
+    },
+    "ipConfigSettings": {
+      "description": "Configuración de IP",
+      "label": "Configuración de IP"
+    },
+    "ntpConfigSettings": {
+      "description": "Configuración NTP",
+      "label": "Configuración NTP"
+    },
+    "rsyslogConfigSettings": {
+      "description": "Configuración Rsyslog",
+      "label": "Configuración Rsyslog"
+    },
+    "udpConfigSettings": {
+      "description": "Configuración de UDP sobre Malla",
+      "label": "Configuración UDP"
+    }
+  },
+  "position": {
+    "title": "Ajustes de posición",
+    "description": "Configuración del módulo de posición",
+    "broadcastInterval": {
+      "description": "Con qué frecuencia se envía tu posición sobre la malla",
+      "label": "Intervalo de transmisión"
+    },
+    "enablePin": {
+      "description": "Módulo GPS activar anulación de pin",
+      "label": "Activar pin"
+    },
+    "fixedPosition": {
+      "description": "No informar de la posición del GPS, pero una especificada manualmente",
+      "label": "Posición Fijada"
+    },
+    "gpsMode": {
+      "description": "Configurar si el dispositivo GPS está activado, desactivado o no está presente",
+      "label": "Modo del GPS"
+    },
+    "gpsUpdateInterval": {
+      "description": "Con qué frecuencia debe adquirirse una posición GPS",
+      "label": "Intervalo de actualización GPS"
+    },
+    "positionFlags": {
+      "description": "Campos opcionales para incluir al ensamblar mensajes de posición. Cuantos más campos se seleccionen, más grande será el mensaje que llevará a un mayor uso del tiempo de aire y un mayor riesgo de pérdida de paquetes.",
+      "label": "Marcas de posición"
+    },
+    "receivePin": {
+      "description": "Módulo RX del GPS ignorar Pin",
+      "label": "Recibir Pin"
+    },
+    "smartPositionEnabled": {
+      "description": "Sólo enviar posición cuando haya habido un cambio significativo en la ubicación",
+      "label": "Habilitar posición inteligente"
+    },
+    "smartPositionMinDistance": {
+      "description": "Distancia mínima (en metros) que debe ser recorrida antes de que se envíe una actualización de posición",
+      "label": "Distancia mínima de posición inteligente"
+    },
+    "smartPositionMinInterval": {
+      "description": "Intervalo mínimo (en s.) que debe pasar antes de enviar una actualización de posición",
+      "label": "Intervalo Mínimo de Posición Inteligente"
+    },
+    "transmitPin": {
+      "description": "Módulo TX del GPS ignorar Pin",
+      "label": "Transmitir Pin"
+    },
+    "intervalsSettings": {
+      "description": "Con qué frecuencia enviar actualizaciones de posición",
+      "label": "Intervalos"
+    },
+    "flags": {
+      "placeholder": "Seleccionar marcadores de posición...",
+      "altitude": "Altitud",
+      "altitudeGeoidalSeparation": "Separación Geoidal de Altitud",
+      "altitudeMsl": "Altitud es Nivel Medio del Mar",
+      "dop": "Dilución de precisión (DOP) PDOP usada por defecto",
+      "hdopVdop": "Si DOP está definido, usar valores HDOP / VDOP en lugar de PDOP",
+      "numSatellites": "Cantidad de satélites",
+      "sequenceNumber": "Número de secuencia",
+      "timestamp": "Fecha",
+      "unset": "Sin configurar",
+      "vehicleHeading": "Rumbo del vehículo",
+      "vehicleSpeed": "Velocidad de vehículo"
+    }
+  },
+  "power": {
+    "adcMultiplierOverride": {
+      "description": "Utilizado para ajustar la lectura del voltaje de la batería",
+      "label": "Ratio de sobrescritura del multiplicador ADC"
+    },
+    "ina219Address": {
+      "description": "Dirección del monitor de la batería INA219",
+      "label": "Dirección INA219"
+    },
+    "lightSleepDuration": {
+      "description": "How long the device will be in light sleep for",
+      "label": "Duración de la "
+    },
+    "minimumWakeTime": {
+      "description": "Cantidad mínima de tiempo que el dispositivo permanecerá despierto después de recibir un paquete",
+      "label": "Tiempo mínimo activo"
+    },
+    "noConnectionBluetoothDisabled": {
+      "description": "Si el dispositivo no recibe una conexión Bluetooth, la radio BLE se desactivará después de este tiempo",
+      "label": "No hay conexión Bluetooth desactivado"
+    },
+    "powerSavingEnabled": {
+      "description": "Seleccione si está alimentado de una fuente de corriente de poca potencia (es decir, solar), para minimizar el consumo de energía tanto como sea posible.",
+      "label": "Activar el modo ahorro de energía"
+    },
+    "shutdownOnBatteryDelay": {
+      "description": "Apagar automáticamente el nodo después de este largo durante la batería, 0 para indefinido",
+      "label": "Apagado en retraso de batería"
+    },
+    "superDeepSleepDuration": {
+      "description": "Cuánto tiempo durará el dispositivo en suspensión profunda",
+      "label": "Duración de suspensión superprofunda"
+    },
+    "powerConfigSettings": {
+      "description": "Configuración del módulo de alimentación",
+      "label": "Configuración de elecenergía "
+    },
+    "sleepSettings": {
+      "description": "Configuración de suspensión para el módulo de alimentación",
+      "label": "Ajustes de suspensión"
+    }
+  },
+  "security": {
+    "description": "Ajustes para la configuración de seguridad",
+    "title": "Configuraciones de Seguridad",
+    "button_backupKey": "Clave de la copia de seguridad",
+    "adminChannelEnabled": {
+      "description": "Permitir el control del dispositivo entrante mediante el canal inseguro de administración legado",
+      "label": "Permitir Administrador Legado"
+    },
+    "enableDebugLogApi": {
+      "description": "Output live debug logging over serial, view and export position-redacted device logs over Bluetooth",
+      "label": "Habilitar API de registro de depuración"
+    },
+    "managed": {
+      "description": "If enabled, device configuration options are only able to be changed remotely by a Remote Admin node via admin messages. Do not enable this option unless at least one suitable Remote Admin node has been setup, and the public key is stored in one of the fields above.",
+      "label": "Administrado"
+    },
+    "privateKey": {
+      "description": "Utilizado para crear una clave compartida con un dispositivo remoto",
+      "label": "Clave privada"
+    },
+    "publicKey": {
+      "description": "Sent out to other nodes on the mesh to allow them to compute a shared secret key",
+      "label": "Clave Pública"
+    },
+    "primaryAdminKey": {
+      "description": "The primary public key authorized to send admin messages to this node",
+      "label": "Clave principal de administrador"
+    },
+    "secondaryAdminKey": {
+      "description": "The secondary public key authorized to send admin messages to this node",
+      "label": "Secondary Admin Key"
+    },
+    "serialOutputEnabled": {
+      "description": "Serial Console over the Stream API",
+      "label": "Salida Serial Activada"
+    },
+    "tertiaryAdminKey": {
+      "description": "The tertiary public key authorized to send admin messages to this node",
+      "label": "Tertiary Admin Key"
+    },
+    "adminSettings": {
+      "description": "Opciones para administradores",
+      "label": "Ajustes de administrador"
+    },
+    "loggingSettings": {
+      "description": "Settings for Logging",
+      "label": "Logging Settings"
+    }
+  },
+  "user": {
+    "title": "User Settings",
+    "description": "Configure your device name and identity settings",
+    "longName": {
+      "label": "Nombre largo",
+      "description": "Your full display name (1-40 characters)",
+      "validation": {
+        "min": "Long name must be at least 1 character",
+        "max": "Long name must be at most 40 characters"
+      }
+    },
+    "shortName": {
+      "label": "Nombre Corto",
+      "description": "Your abbreviated name (2-4 characters)",
+      "validation": {
+        "min": "Short name must be at least 2 characters",
+        "max": "Short name must be at most 4 characters"
+      }
+    },
+    "isUnmessageable": {
+      "label": "No se puede enviar mensajes",
+      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+    },
+    "isLicensed": {
+      "label": "Licencia de radioaficionado (no necesaria)",
+      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+    }
+  }
+}

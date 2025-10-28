@@ -1,69 +1,71 @@
 {
-	"page": {
-		"sectionLabel": "Csatornák",
-		"channelName": "Csatorna: {{channelName}}",
-		"broadcastLabel": "Elsődleges",
-		"channelIndex": "Csat. {{index}}"
-	},
-	"validation": {
-		"pskInvalid": "Adj meg egy érvényes {{bits}} bites PSK-t."
-	},
-	"settings": {
-		"label": "Csatorna beállítások",
-		"description": "Titkosítás, MQTT és egyéb beállítások"
-	},
-	"role": {
-		"label": "Szerepkör",
-		"description": "Az eszköz telemetriája az ELSŐDLEGES (PRIMARY) csatornán keresztül küldhető. Csak egy ELSŐDLEGES engedélyezett",
-		"options": {
-			"primary": "ELSŐDLEGES",
-			"disabled": "LETILTOTT",
-			"secondary": "MÁSODLAGOS"
-		}
-	},
-	"psk": {
-		"label": "Előre megosztott kulcs (PSK)",
-		"description": "Támogatott PSK hossz: 256 bit, 128 bit, 8 bit, üres (0 bit)",
-		"generate": "Generálás"
-	},
-	"name": {
-		"label": "Név",
-		"description": "Egyedi csatornanév (<12 bájt); hagyd üresen az alapértelmezett névhez"
-	},
-	"uplinkEnabled": {
-		"label": "Feltöltés engedélyezve",
-		"description": "Üzenetek küldése a helyi mesh hálózatból az MQTT felé"
-	},
-	"downlinkEnabled": {
-		"label": "Letöltés engedélyezve",
-		"description": "Üzenetek fogadása az MQTT-ről a helyi mesh hálózatba"
-	},
-	"positionPrecision": {
-		"label": "Helyzet",
-		"description": "A csatornával megosztott helyzet pontossága. Kikapcsolható.",
-		"options": {
-			"none": "Helyzet megosztásának letiltása",
-			"precise": "Pontos helyzet",
-			"metric_km23": "23 kilométeren belül",
-			"metric_km12": "12 kilométeren belül",
-			"metric_km5_8": "5.8 kilométeren belül",
-			"metric_km2_9": "2.9 kilométeren belül",
-			"metric_km1_5": "1.5 kilométeren belül",
-			"metric_m700": "700 méteren belül",
-			"metric_m350": "350 méteren belül",
-			"metric_m200": "200 méteren belül",
-			"metric_m90": "90 méteren belül",
-			"metric_m50": "50 méteren belül",
-			"imperial_mi15": "15 mérföldön belül",
-			"imperial_mi7_3": "7.3 mérföldön belül",
-			"imperial_mi3_6": "3.6 mérföldön belül",
-			"imperial_mi1_8": "1.8 mérföldön belül",
-			"imperial_mi0_9": "0.9 mérföldön belül",
-			"imperial_mi0_5": "0.5 mérföldön belül",
-			"imperial_mi0_2": "0.2 mérföldön belül",
-			"imperial_ft600": "600 lábon belül",
-			"imperial_ft300": "300 lábon belül",
-			"imperial_ft150": "150 lábon belül"
-		}
-	}
+  "page": {
+    "sectionLabel": "Csatornák",
+    "channelName": "Csatorna: {{channelName}}",
+    "broadcastLabel": "Elsődleges",
+    "channelIndex": "Csat. {{index}}",
+    "import": "Importálás",
+    "export": "Exportálás"
+  },
+  "validation": {
+    "pskInvalid": "Adj meg egy érvényes {{bits}} bites PSK-t."
+  },
+  "settings": {
+    "label": "Csatorna beállítások",
+    "description": "Titkosítás, MQTT és egyéb beállítások"
+  },
+  "role": {
+    "label": "Szerepkör",
+    "description": "Az eszköz telemetriája az ELSŐDLEGES (PRIMARY) csatornán keresztül küldhető. Csak egy ELSŐDLEGES engedélyezett",
+    "options": {
+      "primary": "ELSŐDLEGES",
+      "disabled": "LETILTOTT",
+      "secondary": "MÁSODLAGOS"
+    }
+  },
+  "psk": {
+    "label": "Előre megosztott kulcs (PSK)",
+    "description": "Támogatott PSK hossz: 256 bit, 128 bit, 8 bit, üres (0 bit)",
+    "generate": "Generálás"
+  },
+  "name": {
+    "label": "Név",
+    "description": "Egyedi csatornanév (<12 bájt); hagyd üresen az alapértelmezett névhez"
+  },
+  "uplinkEnabled": {
+    "label": "Feltöltés engedélyezve",
+    "description": "Üzenetek küldése a helyi mesh hálózatból az MQTT felé"
+  },
+  "downlinkEnabled": {
+    "label": "Letöltés engedélyezve",
+    "description": "Üzenetek fogadása az MQTT-ről a helyi mesh hálózatba"
+  },
+  "positionPrecision": {
+    "label": "Helyzet",
+    "description": "A csatornával megosztott helyzet pontossága. Kikapcsolható.",
+    "options": {
+      "none": "Helyzet megosztásának letiltása",
+      "precise": "Pontos helyzet",
+      "metric_km23": "23 kilométeren belül",
+      "metric_km12": "12 kilométeren belül",
+      "metric_km5_8": "5.8 kilométeren belül",
+      "metric_km2_9": "2.9 kilométeren belül",
+      "metric_km1_5": "1.5 kilométeren belül",
+      "metric_m700": "700 méteren belül",
+      "metric_m350": "350 méteren belül",
+      "metric_m200": "200 méteren belül",
+      "metric_m90": "90 méteren belül",
+      "metric_m50": "50 méteren belül",
+      "imperial_mi15": "15 mérföldön belül",
+      "imperial_mi7_3": "7.3 mérföldön belül",
+      "imperial_mi3_6": "3.6 mérföldön belül",
+      "imperial_mi1_8": "1.8 mérföldön belül",
+      "imperial_mi0_9": "0.9 mérföldön belül",
+      "imperial_mi0_5": "0.5 mérföldön belül",
+      "imperial_mi0_2": "0.2 mérföldön belül",
+      "imperial_ft600": "600 lábon belül",
+      "imperial_ft300": "300 lábon belül",
+      "imperial_ft150": "150 lábon belül"
+    }
+  }
 }

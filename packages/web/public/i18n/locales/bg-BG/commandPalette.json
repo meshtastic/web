@@ -15,7 +15,6 @@
       "messages": "Съобщения",
       "map": "Карта",
       "config": "Конфигурация",
-      "channels": "Канали",
       "nodes": "Възли"
     }
   },
@@ -45,7 +44,8 @@
     "label": "Отстраняване на грешки",
     "command": {
       "reconfigure": "Преконфигуриране",
-      "clearAllStoredMessages": "Изчистване на всички съхранени съобщения"
+      "clearAllStoredMessages": "Изчистване на всички съхранени съобщения",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }

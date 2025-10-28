@@ -1,193 +1,221 @@
 {
-	"deleteMessages": {
-		"description": "Това действие ще изчисти цялата история на съобщенията. Това не може да бъде отменено. Сигурни ли сте, че искате да продължите?",
-		"title": "Изчистване на всички съобщения"
-	},
-	"deviceName": {
-		"description": "Устройството ще се рестартира, след като конфигурацията бъде запазена.",
-		"longName": "Дълго име",
-		"shortName": "Кратко име",
-		"title": "Промяна на името на устройството",
-		"validation": {
-			"longNameMax": "Дългото име не трябва да е повече от 40 знака",
-			"shortNameMax": "Краткото име не трябва да е повече от 4 знака",
-			"longNameMin": "Дългото име трябва да съдържа поне 1 символ",
-			"shortNameMin": "Краткото име трябва да съдържа поне 1 символ"
-		}
-	},
-	"import": {
-		"description": "Текущата конфигурация на LoRa ще бъде презаписана.",
-		"error": {
-			"invalidUrl": "Невалиден Meshtastic URL"
-		},
-		"channelPrefix": "Канал: ",
-		"channelSetUrl": "Channel Set/QR Code URL",
-		"channels": "Канали:",
-		"usePreset": "Използване на предварително зададени настройки?",
-		"title": "Import Channel Set"
-	},
-	"locationResponse": {
-		"title": "Местоположение: {{identifier}}",
-		"altitude": "Надморска височина: ",
-		"coordinates": "Координати:",
-		"noCoordinates": "Няма координати"
-	},
-	"pkiRegenerateDialog": {
-		"title": "Регенериране на предварително споделения ключ?",
-		"description": "Сигурни ли сте, че искате да регенерирате предварително споделения ключ?",
-		"regenerate": "Регенериране"
-	},
-	"newDeviceDialog": {
-		"title": "Свързване на ново устройство",
-		"https": "https",
-		"http": "http",
-		"tabHttp": "HTTP",
-		"tabBluetooth": "Bluetooth",
-		"tabSerial": "Серийна",
-		"useHttps": "Използване на HTTPS",
-		"connecting": "Свързване...",
-		"connect": "Свързване",
-		"connectionFailedAlert": {
-			"title": "Връзката е неуспешна",
-			"descriptionPrefix": "Не може да се свърже с устройството.",
-			"httpsHint": "Ако използвате HTTPS, може да се наложи първо да приемете самоподписан сертификат. ",
-			"openLinkPrefix": "Моля, отворете",
-			"openLinkSuffix": "в нов раздел",
-			"acceptTlsWarningSuffix": ", accept any TLS warnings if prompted, then try again",
-			"learnMoreLink": "Научете повече"
-		},
-		"httpConnection": {
-			"label": "IP адрес/Име на хост",
-			"placeholder": "000.000.000.000 / meshtastic.local"
-		},
-		"serialConnection": {
-			"noDevicesPaired": "Все още няма сдвоени устройства.",
-			"newDeviceButton": "Ново устройство",
-			"deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
-		},
-		"bluetoothConnection": {
-			"noDevicesPaired": "Все още няма сдвоени устройства.",
-			"newDeviceButton": "Ново устройство",
-			"connectionFailed": "Връзката е неуспешна",
-			"deviceDisconnected": "Устройството не е свързано",
-			"unknownDevice": "Неизвестно устройство",
-			"errorLoadingDevices": "Грешка при зареждане на устройствата",
-			"unknownErrorLoadingDevices": "Неизвестна грешка при зареждане на устройствата"
-		},
-		"validation": {
-			"requiresWebBluetooth": "Този тип връзка изисква <0>Web Bluetooth</0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
-			"requiresWebSerial": "Този тип връзка изисква <0>Web Serial</0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
-			"requiresSecureContext": "Това приложение изисква <0>secure context</0>. Моля, свържете се чрез HTTPS или localhost.",
-			"additionallyRequiresSecureContext": "Освен това, изисква <0>secure context</0>. Моля, свържете се чрез HTTPS или localhost."
-		}
-	},
-	"nodeDetails": {
-		"message": "Съобщение",
-		"requestPosition": "Request Position",
-		"traceRoute": "Trace Route",
-		"airTxUtilization": "Air TX utilization",
-		"allRawMetrics": "All Raw Metrics:",
-		"batteryLevel": "Ниво на батерията",
-		"channelUtilization": "Използване на канала",
-		"details": "Подробности:",
-		"deviceMetrics": "Device Metrics:",
-		"hardware": "Хардуер: ",
-		"lastHeard": "Последно чут: ",
-		"nodeHexPrefix": "Node Hex: ",
-		"nodeNumber": "Номер на възела: ",
-		"position": "Позиция:",
-		"role": "Роля: ",
-		"uptime": "Време на работа: ",
-		"voltage": "Напрежение",
-		"title": "Подробности за възел за {{identifier}}",
-		"ignoreNode": "Игнориране на възела",
-		"removeNode": "Премахване на възела",
-		"unignoreNode": "Премахване на игнорирането на възела",
-		"security": "Сигурност:",
-		"publicKey": "Public Key: ",
-		"messageable": "Messageable: ",
-		"KeyManuallyVerifiedTrue": "Публичният ключ е проверен ръчно",
-		"KeyManuallyVerifiedFalse": "Публичният ключ не е проверен ръчно"
-	},
-	"pkiBackup": {
-		"loseKeysWarning": "Ако загубите ключовете си, ще трябва да нулирате устройството си.",
-		"secureBackup": "Важно е да направите резервно копие на публичните и частните си ключове и да съхранявате резервното си копие сигурно!",
-		"footer": "=== КРАЙ НА КЛЮЧОВЕТЕ ===",
-		"header": "=== MESHTASTIC КЛЮЧОВЕ ЗА {{longName}} ({{shortName}}) ===",
-		"privateKey": "Частен ключ:",
-		"publicKey": "Публичен ключ:",
-		"fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
-		"title": "Backup Keys"
-	},
-	"pkiBackupReminder": {
-		"description": "Препоръчваме редовно да правите резервни копия на данните с вашите ключове. Искате ли да направите резервно копие сега?",
-		"title": "Напомняне за резервно копие",
-		"remindLaterPrefix": "Напомни ми в",
-		"remindNever": "Никога не ми напомняй",
-		"backupNow": "Създаване на резервно копие сега"
-	},
-	"pkiRegenerate": {
-		"description": "Сигурни ли сте, че искате да регенерирате двойката ключове?",
-		"title": "Регенериране на двойката ключове"
-	},
-	"qr": {
-		"addChannels": "Добавяне на канали",
-		"replaceChannels": "Замяна на канали",
-		"description": "Текущата конфигурация на LoRa също ще бъде споделена.",
-		"sharableUrl": "Sharable URL",
-		"title": "Генериране на QR код"
-	},
-	"reboot": {
-		"title": "Рестартиране на устройството",
-		"description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
-		"ota": "Reboot into OTA mode",
-		"enterDelay": "Въведете забавяне",
-		"scheduled": "Насрочено е рестартиране",
-		"schedule": "Планиране на рестартиране",
-		"now": "Рестартиране сега",
-		"cancel": "Cancel scheduled reboot"
-	},
-	"refreshKeys": {
-		"description": {
-			"acceptNewKeys": "This will remove the node from device and request new keys.",
-			"keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
-			"unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
-		},
-		"acceptNewKeys": "риемане на нови ключове",
-		"title": "Keys Mismatch - {{identifier}}"
-	},
-	"removeNode": {
-		"description": "Сигурни ли сте, че искате да премахнете този възел?",
-		"title": "Премахване на възела?"
-	},
-	"shutdown": {
-		"title": "Планирано изключване",
-		"description": "Изключване на свързания възел след x минути."
-	},
-	"traceRoute": {
-		"routeToDestination": "Route to destination:",
-		"routeBack": "Route back:"
-	},
-	"tracerouteResponse": {
-		"title": "Traceroute: {{identifier}}"
-	},
-	"unsafeRoles": {
-		"confirmUnderstanding": "Да, знам какво правя",
-		"conjunction": "и публикацията в блога за ",
-		"postamble": " и разберам последиците от промяната на ролята.",
-		"preamble": "Аз прочетох ",
-		"choosingRightDeviceRole": "Избор на правилната роля на устройството",
-		"deviceRoleDocumentation": "Документация за ролите на устройството",
-		"title": "Сигурни ли сте?"
-	},
-	"managedMode": {
-		"confirmUnderstanding": "Да, знам какво правя",
-		"title": "Сигурни ли сте?",
-		"description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
-	},
-	"clientNotification": {
-		"title": "Client Notification",
-		"TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
-		"Compromised keys were detected and regenerated.": "Бяха открити и регенерирани компрометирани ключове."
-	}
+  "deleteMessages": {
+    "description": "Това действие ще изчисти цялата история на съобщенията. Това не може да бъде отменено. Сигурни ли сте, че искате да продължите?",
+    "title": "Изчистване на всички съобщения"
+  },
+  "deviceName": {
+    "description": "Устройството ще се рестартира, след като конфигурацията бъде запазена.",
+    "longName": "Дълго име",
+    "shortName": "Кратко име",
+    "title": "Промяна на името на устройството",
+    "validation": {
+      "longNameMax": "Дългото име не трябва да е повече от 40 знака",
+      "shortNameMax": "Краткото име не трябва да е повече от 4 знака",
+      "longNameMin": "Дългото име трябва да съдържа поне 1 символ",
+      "shortNameMin": "Краткото име трябва да съдържа поне 1 символ"
+    }
+  },
+  "import": {
+    "description": "Текущата конфигурация на LoRa ще бъде презаписана.",
+    "error": {
+      "invalidUrl": "Невалиден Meshtastic URL"
+    },
+    "channelPrefix": "Канал: ",
+    "primary": "Primary ",
+    "doNotImport": "No not import",
+    "channelName": "Име",
+    "channelSlot": "Слот",
+    "channelSetUrl": "Channel Set/QR Code URL",
+    "useLoraConfig": "Import LoRa Config",
+    "presetDescription": "The current LoRa Config will be replaced.",
+    "title": "Import Channel Set"
+  },
+  "locationResponse": {
+    "title": "Местоположение: {{identifier}}",
+    "altitude": "Надморска височина: ",
+    "coordinates": "Координати:",
+    "noCoordinates": "Няма координати"
+  },
+  "pkiRegenerateDialog": {
+    "title": "Регенериране на предварително споделения ключ?",
+    "description": "Сигурни ли сте, че искате да регенерирате предварително споделения ключ?",
+    "regenerate": "Регенериране"
+  },
+  "newDeviceDialog": {
+    "title": "Свързване на ново устройство",
+    "https": "https",
+    "http": "http",
+    "tabHttp": "HTTP",
+    "tabBluetooth": "Bluetooth",
+    "tabSerial": "Серийна",
+    "useHttps": "Използване на HTTPS",
+    "connecting": "Свързване...",
+    "connect": "Свързване",
+    "connectionFailedAlert": {
+      "title": "Връзката е неуспешна",
+      "descriptionPrefix": "Не може да се свърже с устройството.",
+      "httpsHint": "Ако използвате HTTPS, може да се наложи първо да приемете самоподписан сертификат. ",
+      "openLinkPrefix": "Моля, отворете",
+      "openLinkSuffix": "в нов раздел",
+      "acceptTlsWarningSuffix": ", accept any TLS warnings if prompted, then try again",
+      "learnMoreLink": "Научете повече"
+    },
+    "httpConnection": {
+      "label": "IP адрес/Име на хост",
+      "placeholder": "000.000.000.000 / meshtastic.local"
+    },
+    "serialConnection": {
+      "noDevicesPaired": "Все още няма сдвоени устройства.",
+      "newDeviceButton": "Ново устройство",
+      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
+    },
+    "bluetoothConnection": {
+      "noDevicesPaired": "Все още няма сдвоени устройства.",
+      "newDeviceButton": "Ново устройство",
+      "connectionFailed": "Връзката е неуспешна",
+      "deviceDisconnected": "Устройството не е свързано",
+      "unknownDevice": "Неизвестно устройство",
+      "errorLoadingDevices": "Грешка при зареждане на устройствата",
+      "unknownErrorLoadingDevices": "Неизвестна грешка при зареждане на устройствата"
+    },
+    "validation": {
+      "requiresWebBluetooth": "Този тип връзка изисква <0>Web Bluetooth</0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
+      "requiresWebSerial": "Този тип връзка изисква <0>Web Serial</0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
+      "requiresSecureContext": "Това приложение изисква <0>secure context</0>. Моля, свържете се чрез HTTPS или localhost.",
+      "additionallyRequiresSecureContext": "Освен това, изисква <0>secure context</0>. Моля, свържете се чрез HTTPS или localhost."
+    }
+  },
+  "nodeDetails": {
+    "message": "Съобщение",
+    "requestPosition": "Request Position",
+    "traceRoute": "Trace Route",
+    "airTxUtilization": "Air TX utilization",
+    "allRawMetrics": "All Raw Metrics:",
+    "batteryLevel": "Ниво на батерията",
+    "channelUtilization": "Използване на канала",
+    "details": "Подробности:",
+    "deviceMetrics": "Device Metrics:",
+    "hardware": "Хардуер: ",
+    "lastHeard": "Последно чут: ",
+    "nodeHexPrefix": "Node Hex: ",
+    "nodeNumber": "Номер на възела: ",
+    "position": "Позиция:",
+    "role": "Роля: ",
+    "uptime": "Време на работа: ",
+    "voltage": "Напрежение",
+    "title": "Подробности за възел за {{identifier}}",
+    "ignoreNode": "Игнориране на възела",
+    "removeNode": "Премахване на възела",
+    "unignoreNode": "Премахване на игнорирането на възела",
+    "security": "Сигурност:",
+    "publicKey": "Public Key: ",
+    "messageable": "Messageable: ",
+    "KeyManuallyVerifiedTrue": "Публичният ключ е проверен ръчно",
+    "KeyManuallyVerifiedFalse": "Публичният ключ не е проверен ръчно"
+  },
+  "pkiBackup": {
+    "loseKeysWarning": "Ако загубите ключовете си, ще трябва да нулирате устройството си.",
+    "secureBackup": "Важно е да направите резервно копие на публичните и частните си ключове и да съхранявате резервното си копие сигурно!",
+    "footer": "=== КРАЙ НА КЛЮЧОВЕТЕ ===",
+    "header": "=== MESHTASTIC КЛЮЧОВЕ ЗА {{longName}} ({{shortName}}) ===",
+    "privateKey": "Частен ключ:",
+    "publicKey": "Публичен ключ:",
+    "fileName": "meshtastic_keys_{{longName}}_{{shortName}}.txt",
+    "title": "Backup Keys"
+  },
+  "pkiBackupReminder": {
+    "description": "Препоръчваме редовно да правите резервни копия на данните с вашите ключове. Искате ли да направите резервно копие сега?",
+    "title": "Напомняне за резервно копие",
+    "remindLaterPrefix": "Напомни ми в",
+    "remindNever": "Никога не ми напомняй",
+    "backupNow": "Създаване на резервно копие сега"
+  },
+  "pkiRegenerate": {
+    "description": "Сигурни ли сте, че искате да регенерирате двойката ключове?",
+    "title": "Регенериране на двойката ключове"
+  },
+  "qr": {
+    "addChannels": "Добавяне на канали",
+    "replaceChannels": "Замяна на канали",
+    "description": "Текущата конфигурация на LoRa също ще бъде споделена.",
+    "sharableUrl": "Sharable URL",
+    "title": "Генериране на QR код"
+  },
+  "reboot": {
+    "title": "Рестартиране на устройството",
+    "description": "Reboot now or schedule a reboot of the connected node. Optionally, you can choose to reboot into OTA (Over-the-Air) mode.",
+    "ota": "Reboot into OTA mode",
+    "enterDelay": "Въведете забавяне",
+    "scheduled": "Насрочено е рестартиране",
+    "schedule": "Планиране на рестартиране",
+    "now": "Рестартиране сега",
+    "cancel": "Cancel scheduled reboot"
+  },
+  "refreshKeys": {
+    "description": {
+      "acceptNewKeys": "This will remove the node from device and request new keys.",
+      "keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
+      "unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
+    },
+    "acceptNewKeys": "риемане на нови ключове",
+    "title": "Keys Mismatch - {{identifier}}"
+  },
+  "removeNode": {
+    "description": "Сигурни ли сте, че искате да премахнете този възел?",
+    "title": "Премахване на възела?"
+  },
+  "shutdown": {
+    "title": "Планирано изключване",
+    "description": "Изключване на свързания възел след x минути."
+  },
+  "traceRoute": {
+    "routeToDestination": "Route to destination:",
+    "routeBack": "Route back:"
+  },
+  "tracerouteResponse": {
+    "title": "Traceroute: {{identifier}}"
+  },
+  "unsafeRoles": {
+    "confirmUnderstanding": "Да, знам какво правя",
+    "conjunction": "и публикацията в блога за ",
+    "postamble": " и разберам последиците от промяната на ролята.",
+    "preamble": "Аз прочетох ",
+    "choosingRightDeviceRole": "Избор на правилната роля на устройството",
+    "deviceRoleDocumentation": "Документация за ролите на устройството",
+    "title": "Сигурни ли сте?"
+  },
+  "managedMode": {
+    "confirmUnderstanding": "Да, знам какво правя",
+    "title": "Сигурни ли сте?",
+    "description": "Enabling Managed Mode blocks client applications (including the web client) from writing configurations to a radio. Once enabled, radio configurations can only be changed through Remote Admin messages. This setting is not required for remote node administration."
+  },
+  "clientNotification": {
+    "title": "Client Notification",
+    "TraceRoute can only be sent once every 30 seconds": "TraceRoute can only be sent once every 30 seconds",
+    "Compromised keys were detected and regenerated.": "Бяха открити и регенерирани компрометирани ключове."
+  },
+  "resetNodeDb": {
+    "title": "Reset Node Database",
+    "description": "This will clear all nodes from the connected device's node database and clear all message history in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Reset Node Database",
+    "failedTitle": "There was an error resetting the Node DB. Please try again."
+  },
+  "clearAllStores": {
+    "title": "Clear All Local Storage",
+    "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
+    "confirm": "Clear all local storage",
+    "failedTitle": "There was an error clearing local storage. Please try again."
+  },
+  "factoryResetDevice": {
+    "title": "Фабрично нулиране на устройството",
+    "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Фабрично нулиране на устройството",
+    "failedTitle": "There was an error performing the factory reset. Please try again."
+  },
+  "factoryResetConfig": {
+    "title": "Фабрично нулиране на конфигурацията",
+    "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
+    "confirm": "Фабрично нулиране на конфигурацията",
+    "failedTitle": "There was an error performing the factory reset. Please try again."
+  }
 }
