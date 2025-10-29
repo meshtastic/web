@@ -345,8 +345,10 @@ export function useConnections() {
   const addConnectionAndConnect = useCallback(
     async (input: NewConnection) => {
       const conn = addConnection(input);
-      const ok = await connect(conn.id, { allowPrompt: true });
-      return ok ? conn : conn; // return even if failed; UI handles toast
+      const ok = await connect(conn.id, { allowPrompt: true }).catch(
+        () => false,
+      );
+      return ok;
     },
     [addConnection, connect],
   );

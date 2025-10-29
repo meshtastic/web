@@ -1,4 +1,3 @@
-import type { Connection, ConnectionId } from "@app/pages/Connections/utils.ts";
 import { create, toBinary } from "@bufbuild/protobuf";
 import { featureFlags } from "@core/services/featureFlags";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
@@ -27,6 +26,8 @@ import {
   serializeKey,
 } from "./changeRegistry.ts";
 import type {
+  Connection,
+  ConnectionId,
   Dialogs,
   DialogVariant,
   ValidConfigType,

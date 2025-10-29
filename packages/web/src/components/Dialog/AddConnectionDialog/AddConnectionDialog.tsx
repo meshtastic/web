@@ -419,7 +419,7 @@ export default function AddConnectionDialog({
             <div className="flex items-center gap-2 mt-1">
               <Switch
                 value={state.protocol}
-                disabled={isURLHTTPS}
+                disabled={!!isURLHTTPS}
                 onCheckedChange={(value) => {
                   dispatch({
                     type: "SET_PROTOCOL",
