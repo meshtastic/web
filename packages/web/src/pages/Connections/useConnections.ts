@@ -345,10 +345,11 @@ export function useConnections() {
   const addConnectionAndConnect = useCallback(
     async (input: NewConnection) => {
       const conn = addConnection(input);
-      const ok = await connect(conn.id, { allowPrompt: true }).catch(
-        () => false,
-      );
-      return ok;
+      await connect(conn.id, { allowPrompt: true });
+      // Get updated connection from store after connect
+      if (conn.id) {
+        return conn;
+      }
     },
     [addConnection, connect],
   );
@@ -360,7 +361,10 @@ export function useConnections() {
 
     // HTTP connections: test reachability if not already connected
     const httpChecks = connections
-      .filter((c) => c.type === "http" && c.status !== "connected")
+      .filter(
+        (c): c is Connection & { type: "http"; url: string } =>
+          c.type === "http" && c.status !== "connected",
+      )
       .map(async (c) => {
         const ok = await testHttpReachable(c.url);
         updateSavedConnection(c.id, {
@@ -370,7 +374,10 @@ export function useConnections() {
 
     // Bluetooth connections: check permission grants
     const btChecks = connections
-      .filter((c) => c.type === "bluetooth" && c.status !== "connected")
+      .filter(
+        (c): c is Connection & { type: "bluetooth"; deviceId?: string } =>
+          c.type === "bluetooth" && c.status !== "connected",
+      )
       .map(async (c) => {
         if (!("bluetooth" in navigator)) {
           return;
@@ -395,7 +402,15 @@ export function useConnections() {
 
     // Serial connections: check permission grants
     const serialChecks = connections
-      .filter((c) => c.type === "serial" && c.status !== "connected")
+      .filter(
+        (
+          c,
+        ): c is Connection & {
+          type: "serial";
+          usbVendorId?: number;
+          usbProductId?: number;
+        } => c.type === "serial" && c.status !== "connected",
+      )
       .map(async (c) => {
         if (!("serial" in navigator)) {
           return;

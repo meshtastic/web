@@ -177,7 +177,7 @@ export const DeviceInfoPanel = ({
         >
           <span
             className={cn(
-              "h-2.5 w-2.5 rounded-full flex-shrink-0",
+              "h-2.5 w-2.5 ml-2 rounded-full flex-shrink-0",
               getStatusColor(connectionStatus),
             )}
             aria-hidden="true"

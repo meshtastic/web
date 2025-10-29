@@ -59,11 +59,13 @@ export const Connections = () => {
   const { toast } = useToast();
   const navigate = useNavigate({ from: "/" });
   const [addOpen, setAddOpen] = useState(false);
+  const isURLHTTPS = useMemo(() => location.protocol === "https:", []);
 
   // On first mount, try to refresh statuses
+  // biome-ignore lint/correctness/useExhaustiveDependencies: This can cause the icon to refresh too often
   useEffect(() => {
     refreshStatuses();
-  }, [refreshStatuses]);
+  }, []);
 
   const sorted = useMemo(() => {
     const copy = [...connections];
@@ -179,6 +181,7 @@ export const Connections = () => {
       <AddConnectionDialog
         open={addOpen}
         onOpenChange={setAddOpen}
+        isHTTPS={isURLHTTPS}
         onSave={async (partial) => {
           const created = await addConnectionAndConnect(partial);
           if (created) {

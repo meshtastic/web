@@ -1,10 +1,10 @@
+import { SupportBadge } from "@app/components/Badge/SupportedBadge.tsx";
 import { Switch } from "@app/components/UI/Switch.tsx";
 import type { NewConnection } from "@app/core/stores/deviceStore/types.ts";
 import {
   DEFAULT_MESHTASTIC_GATT_SERVICE,
   testHttpReachable,
 } from "@app/pages/Connections/utils";
-import { Badge } from "@components/UI/Badge.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
@@ -38,6 +38,44 @@ import { urlOrIpv4Schema } from "./validation.ts";
 
 type TabKey = "http" | "bluetooth" | "serial";
 type TestingStatus = "idle" | "testing" | "success" | "failure";
+type DialogState = {
+  tab: TabKey;
+  name: string;
+  protocol: "http" | "https";
+  url: string;
+  testStatus: TestingStatus;
+  btSelected: { id: string; name?: string } | undefined;
+  serialSelected: { vendorId?: number; productId?: number } | undefined;
+};
+
+type DialogAction =
+  | { type: "RESET"; payload?: { isHTTPS?: boolean } }
+  | { type: "SET_TAB"; payload: TabKey }
+  | { type: "SET_NAME"; payload: string }
+  | { type: "SET_PROTOCOL"; payload: "http" | "https" }
+  | { type: "SET_URL"; payload: string }
+  | { type: "SET_TEST_STATUS"; payload: TestingStatus }
+  | {
+      type: "SET_BT_SELECTED";
+      payload: { id: string; name?: string } | undefined;
+    }
+  | {
+      type: "SET_SERIAL_SELECTED";
+      payload: { vendorId?: number; productId?: number } | undefined;
+    }
+  | { type: "SET_URL_AND_RESET_TEST"; payload: string };
+
+interface FeatureErrorProps {
+  missingFeatures: BrowserFeature[];
+  tabId: "bluetooth" | "serial";
+}
+
+type Pane = {
+  children: () => React.ReactNode;
+  placeholder: string;
+  validate: () => boolean;
+  build: () => NewConnection | null;
+};
 
 const featureErrors: Record<BrowserFeature, { href: string; i18nKey: string }> =
   {
@@ -54,11 +92,6 @@ const featureErrors: Record<BrowserFeature, { href: string; i18nKey: string }> =
       i18nKey: "newDeviceDialog.validation.requiresSecureContext",
     },
   };
-
-interface FeatureErrorProps {
-  missingFeatures: BrowserFeature[];
-  tabId: "bluetooth" | "serial";
-}
 
 const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
   if (missingFeatures.length === 0) {
@@ -120,33 +153,6 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
   );
 };
 
-type DialogState = {
-  tab: TabKey;
-  name: string;
-  protocol: "http" | "https";
-  url: string;
-  testStatus: TestingStatus;
-  btSelected: { id: string; name?: string } | undefined;
-  serialSelected: { vendorId?: number; productId?: number } | undefined;
-};
-
-type DialogAction =
-  | { type: "RESET" }
-  | { type: "SET_TAB"; payload: TabKey }
-  | { type: "SET_NAME"; payload: string }
-  | { type: "SET_PROTOCOL"; payload: "http" | "https" }
-  | { type: "SET_URL"; payload: string }
-  | { type: "SET_TEST_STATUS"; payload: TestingStatus }
-  | {
-      type: "SET_BT_SELECTED";
-      payload: { id: string; name?: string } | undefined;
-    }
-  | {
-      type: "SET_SERIAL_SELECTED";
-      payload: { vendorId?: number; productId?: number } | undefined;
-    }
-  | { type: "SET_URL_AND_RESET_TEST"; payload: string };
-
 const initialState: DialogState = {
   tab: "http",
   name: "",
@@ -156,11 +162,22 @@ const initialState: DialogState = {
   btSelected: undefined,
   serialSelected: undefined,
 };
+export const createInitialDialogState = (
+  overrides?: Partial<DialogState>,
+): DialogState => {
+  return { ...initialState, ...(overrides ?? {}) };
+};
+
+export const dialogStateInitializer = (
+  overrides?: Partial<DialogState>,
+): DialogState => createInitialDialogState(overrides);
 
 function dialogReducer(state: DialogState, action: DialogAction): DialogState {
   switch (action.type) {
     case "RESET":
-      return initialState;
+      return createInitialDialogState(
+        action.payload?.isHTTPS ? { protocol: "https" } : {},
+      );
     case "SET_TAB":
       return { ...state, tab: action.payload };
     case "SET_NAME":
@@ -180,24 +197,6 @@ function dialogReducer(state: DialogState, action: DialogAction): DialogState {
     default:
       return state;
   }
-}
-
-function SupportBadge({
-  supported,
-  labelSupported,
-  labelUnsupported,
-}: {
-  supported: boolean;
-  labelSupported: string;
-  labelUnsupported: string;
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <Badge variant={supported ? "secondary" : "destructive"}>
-        {supported ? labelSupported : labelUnsupported}
-      </Badge>
-    </div>
-  );
 }
 
 function PickerRow({
@@ -239,13 +238,6 @@ function PickerRow({
   );
 }
 
-type Pane = {
-  children: () => React.ReactNode;
-  placeholder: string;
-  validate: () => boolean;
-  build: () => NewConnection | null;
-};
-
 const TAB_META: Array<{ key: TabKey; label: string; Icon: LucideIcon }> = [
   { key: "http", label: "HTTP", Icon: Globe },
   { key: "bluetooth", label: "Bluetooth", Icon: Bluetooth },
@@ -256,25 +248,28 @@ export default function AddConnectionDialog({
   open = false,
   onOpenChange = () => {},
   onSave = async () => {},
+  isHTTPS = false,
 }: {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   onSave?: (conn: NewConnection) => Promise<void>;
+  isHTTPS?: boolean;
 }) {
   const { toast } = useToast();
-  const [state, dispatch] = useReducer(dialogReducer, initialState);
+  const [state, dispatch] = useReducer(dialogReducer, initialState, () =>
+    dialogStateInitializer(isHTTPS ? { protocol: "https" } : {}),
+  );
   const { unsupported } = useBrowserFeatureDetection();
 
   const bluetoothSupported =
     typeof navigator !== "undefined" && "bluetooth" in navigator;
   const serialSupported =
     typeof navigator !== "undefined" && "serial" in navigator;
-  const isURLHTTPS = useMemo(() => location.protocol === "https:", []);
-  console.log(isURLHTTPS);
+  const isURLHTTPS = isHTTPS;
 
   const reset = useCallback(() => {
-    dispatch({ type: "RESET" });
-  }, []);
+    dispatch({ type: "RESET", payload: { isHTTPS } });
+  }, [isHTTPS]);
 
   useEffect(() => {
     if (!open) {
@@ -541,7 +536,6 @@ export default function AddConnectionDialog({
             <FeatureErrorMessage missingFeatures={unsupported} tabId="serial" />
           </>
         ),
-        // allow "create" if unsupported (you might want to disallow—keep your earlier rule if desired)
         validate: () =>
           state.name.trim().length > 0 &&
           (!!state.serialSelected || !serialSupported),
