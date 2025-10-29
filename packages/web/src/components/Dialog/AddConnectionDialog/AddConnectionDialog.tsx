@@ -270,6 +270,7 @@ export default function AddConnectionDialog({
   const serialSupported =
     typeof navigator !== "undefined" && "serial" in navigator;
   const isURLHTTPS = useMemo(() => location.protocol === "https:", []);
+  console.log(isURLHTTPS);
 
   const reset = useCallback(() => {
     dispatch({ type: "RESET" });
@@ -420,6 +421,7 @@ export default function AddConnectionDialog({
               <Switch
                 value={state.protocol}
                 disabled={!!isURLHTTPS}
+                checked={isURLHTTPS}
                 onCheckedChange={(value) => {
                   dispatch({
                     type: "SET_PROTOCOL",

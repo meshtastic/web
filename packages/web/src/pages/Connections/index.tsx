@@ -77,9 +77,6 @@ export const Connections = () => {
       if (a.status === "connected" && b.status !== "connected") {
         return -1;
       }
-      if (a.status !== "configured" && b.status === "configured") {
-        return 1;
-      }
       return a.name.localeCompare(b.name);
     });
   }, [connections]);
