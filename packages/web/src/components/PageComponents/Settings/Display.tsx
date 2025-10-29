@@ -61,7 +61,8 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
               description: t("display.gpsDisplayUnits.description"),
               properties: {
                 enumValue:
-                  Protobuf.Config.Config_DisplayConfig_DeprecatedGpsCoordinateFormat,
+                  Protobuf.Config
+                    .Config_DisplayConfig_DeprecatedGpsCoordinateFormat,
               },
             },
             {
