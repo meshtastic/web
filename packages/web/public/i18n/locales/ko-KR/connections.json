@@ -1,5 +1,5 @@
 {
-	"dashboard": {
+	"connections": {
 		"title": "연결된 장치",
 		"description": "연결된 Meshtastic 장치를 관리하세요.",
 		"connectionType_ble": "BLE",

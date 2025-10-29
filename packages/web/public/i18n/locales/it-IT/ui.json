@@ -215,7 +215,7 @@
 			"step4": "Altre informazioni rilevanti"
 		},
 		"reportLink": "Puoi segnalare il problema al nostro <0>GitHub</0>",
-		"dashboardLink": "Ritorna alla <0>dashboard</0>",
+		"connectionsLink": "Ritorna alla <0>connections</0>",
 		"detailsSummary": "Dettagli Errore",
 		"errorMessageLabel": "Messaggio di errore:",
 		"stackTraceLabel": "Stack trace:",

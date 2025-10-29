@@ -1,5 +1,8 @@
+import type { ConnectionStatus } from "@app/core/stores/deviceStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
+import { useNavigate } from "@tanstack/react-router";
 import {
+  ChevronRight,
   CpuIcon,
   Languages,
   type LucideIcon,
@@ -29,6 +32,8 @@ interface DeviceInfoPanelProps {
   setDialogOpen: () => void;
   setCommandPaletteOpen: () => void;
   disableHover?: boolean;
+  connectionStatus?: ConnectionStatus;
+  connectionName?: string;
 }
 
 interface InfoDisplayItem {
@@ -54,9 +59,37 @@ export const DeviceInfoPanel = ({
   isCollapsed,
   setCommandPaletteOpen,
   disableHover = false,
+  connectionStatus,
+  connectionName,
 }: DeviceInfoPanelProps) => {
   const { t } = useTranslation();
+  const navigate = useNavigate({ from: "/" });
   const { batteryLevel, voltage } = deviceMetrics;
+
+  const getStatusColor = (status?: ConnectionStatus): string => {
+    if (!status) {
+      return "bg-gray-400";
+    }
+    switch (status) {
+      case "connected":
+        return "bg-emerald-500";
+      case "connecting":
+        return "bg-amber-500";
+      case "error":
+        return "bg-red-500";
+      case "configured":
+      case "disconnected":
+      default:
+        return "bg-gray-400";
+    }
+  };
+
+  const getStatusLabel = (status?: ConnectionStatus): string => {
+    if (!status) {
+      return t("unknown.notAvailable", "N/A");
+    }
+    return status;
+  };
 
   const deviceInfoItems: InfoDisplayItem[] = [
     {
@@ -128,6 +161,45 @@ export const DeviceInfoPanel = ({
           </p>
         )}
       </div>
+
+      {connectionStatus && (
+        <button
+          type="button"
+          onClick={() => navigate({ to: "/connections" })}
+          aria-label={t("navigation.manageConnections", "Manage connections")}
+          className={cn(
+            "group flex items-center gap-2 px-1 py-2 flex-shrink-0 rounded-md w-full",
+            "transition-colors duration-150",
+            "hover:bg-gray-100 dark:hover:bg-gray-700",
+            "focus:outline-none focus:ring-2 focus:ring-accent",
+            isCollapsed && "justify-center",
+          )}
+        >
+          <span
+            className={cn(
+              "h-2.5 w-2.5 rounded-full flex-shrink-0",
+              getStatusColor(connectionStatus),
+            )}
+            aria-hidden="true"
+          />
+          {!isCollapsed && (
+            <>
+              <div className="flex flex-col min-w-0 flex-1 text-left">
+                <Subtle className="text-xs truncate transition-colors duration-150 group-hover:text-gray-800 dark:group-hover:text-gray-100">
+                  {connectionName || "Connection"}
+                </Subtle>
+                <Subtle className="text-xs capitalize text-gray-500 dark:text-gray-400 transition-colors duration-150">
+                  {getStatusLabel(connectionStatus)}
+                </Subtle>
+              </div>
+              <ChevronRight
+                size={14}
+                className="flex-shrink-0 text-gray-400 dark:text-gray-500 transition-colors duration-150 group-hover:text-gray-600 dark:group-hover:text-gray-300"
+              />
+            </>
+          )}
+        </button>
+      )}
 
       {!isCollapsed && (
         <div className="my-2 h-px bg-gray-200 dark:bg-gray-700 flex-shrink-0" />

@@ -54,7 +54,7 @@ i18next
       "common",
       "config",
       "moduleConfig",
-      "dashboard",
+      "connections",
       "dialog",
       "messages",
       "nodes",

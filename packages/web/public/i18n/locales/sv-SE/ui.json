@@ -215,7 +215,7 @@
 			"step4": "All annan relevant information"
 		},
 		"reportLink": "Du kan rapportera problemet på vår <0>GitHub</0>",
-		"dashboardLink": "Återvänd till <0>start</0>",
+		"connectionsLink": "Återvänd till <0>start</0>",
 		"detailsSummary": "Detaljer om felet",
 		"errorMessageLabel": "Felmeddelande:",
 		"stackTraceLabel": "Stackspårning:",

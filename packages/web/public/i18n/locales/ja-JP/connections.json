@@ -1,10 +1,10 @@
 {
-	"dashboard": {
+	"connections": {
 		"title": "Connected Devices",
 		"description": "Manage your connected Meshtastic devices.",
 		"connectionType_ble": "BLE",
-		"connectionType_serial": "Seryjny",
-		"connectionType_network": "Sieć",
+		"connectionType_serial": "シリアル",
+		"connectionType_network": "ネットワーク",
 		"noDevicesTitle": "No devices connected",
 		"noDevicesDescription": "Connect a new device to get started.",
 		"button_newConnection": "New Connection"

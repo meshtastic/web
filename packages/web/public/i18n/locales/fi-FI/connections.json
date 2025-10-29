@@ -1,5 +1,5 @@
 {
-	"dashboard": {
+	"connections": {
 		"title": "Yhdistetyt laitteet",
 		"description": "Hallitse yhdistettyjä Meshtastic laitteitasi.",
 		"connectionType_ble": "BLE",

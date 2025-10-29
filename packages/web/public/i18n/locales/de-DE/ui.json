@@ -215,7 +215,7 @@
 			"step4": "Sonstige relevante Informationen"
 		},
 		"reportLink": "Sie können das Problem auf unserem <0>GitHub</0> melden",
-		"dashboardLink": "Zurück zum <0>Dashboard</0>",
+		"connectionsLink": "Zurück zum <0>Dashboard</0>",
 		"detailsSummary": "Fehlerdetails",
 		"errorMessageLabel": "Fehlermeldungen:",
 		"stackTraceLabel": "Stapelabzug:",

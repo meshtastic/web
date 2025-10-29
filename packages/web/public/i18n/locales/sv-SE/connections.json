@@ -1,5 +1,5 @@
 {
-	"dashboard": {
+	"connections": {
 		"title": "Anslutna enheter",
 		"description": "Hantera dina anslutna Meshtastic-enheter.",
 		"connectionType_ble": "BLE",

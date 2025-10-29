@@ -1,5 +1,5 @@
 {
-	"dashboard": {
+	"connections": {
 		"title": "Bağlanan Cihazlar",
 		"description": "Bağlanan Meshtastic cihazlarını yönet.",
 		"connectionType_ble": "BLE",

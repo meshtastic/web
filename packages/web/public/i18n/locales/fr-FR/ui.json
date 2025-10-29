@@ -215,7 +215,7 @@
 			"step4": "Toute autre information pertinente"
 		},
 		"reportLink": "Vous pouvez signaler le problème à notre <0>GitHub</0>",
-		"dashboardLink": "Retourner au <0>tableau de bord</0>",
+		"connectionsLink": "Retourner au <0>tableau de bord</0>",
 		"detailsSummary": "Détails de l'erreur",
 		"errorMessageLabel": "Message d'erreur :",
 		"stackTraceLabel": "État de la pile :",

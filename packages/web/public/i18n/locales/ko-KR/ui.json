@@ -215,7 +215,7 @@
 			"step4": "기타 관련 정보"
 		},
 		"reportLink": "이 문제를 저희 <0>GitHub</0>에 보고해주세요",
-		"dashboardLink": "<0>메인</0>으로 돌아가기",
+		"connectionsLink": "<0>메인</0>으로 돌아가기",
 		"detailsSummary": "오류 세부 정보",
 		"errorMessageLabel": "오류 메시지:",
 		"stackTraceLabel": "스택 추적:",

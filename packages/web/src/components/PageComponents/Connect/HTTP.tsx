@@ -1,3 +1,4 @@
+import { useLRUList } from "@app/core/hooks/useLRUList.ts";
 import type { TabElementProps } from "@components/Dialog/NewDeviceDialog.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
@@ -15,7 +16,7 @@ import { randId } from "@core/utils/randId.ts";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { AlertTriangle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useController, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -23,6 +24,8 @@ interface FormData {
   ip: string;
   tls: boolean;
 }
+
+type ConnectionInfo = { ip: string; tls: boolean };
 
 export const HTTP = ({ closeDialog }: TabElementProps) => {
   const { t } = useTranslation("dialog");
@@ -33,8 +36,13 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
   const { addNodeDB } = useNodeDBStore();
   const { addMessageStore } = useMessageStore();
   const { setSelectedDevice } = useAppStore();
+  const recent = useLRUList<ConnectionInfo>({
+    key: "meshtastic-recent-connections",
+    capacity: 10,
+    eq: (a, b) => a.ip === b.ip && a.tls === b.tls,
+  });
 
-  const { control, handleSubmit, register } = useForm<FormData>({
+  const { control, handleSubmit, register, setValue } = useForm<FormData>({
     defaultValues: {
       ip: ["client.meshtastic.org", "localhost"].includes(
         globalThis.location.hostname,
@@ -49,10 +57,24 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
     field: { value: tlsValue, onChange: setTLS },
   } = useController({ name: "tls", control });
 
+  // Autofill with most recent connection
+  useEffect(() => {
+    const mostRecent = recent.items[0];
+    if (mostRecent) {
+      setValue("ip", mostRecent.ip);
+      setValue("tls", mostRecent.tls);
+    }
+  }, [recent.items[0]]);
+
   const [connectionError, setConnectionError] = useState<{
     host: string;
     secure: boolean;
   } | null>(null);
+
+  const selectRecentConnection = (connection: ConnectionInfo) => {
+    setValue("ip", connection.ip);
+    setValue("tls", connection.tls);
+  };
 
   const onSubmit = handleSubmit(async (data) => {
     setConnectionInProgress(true);
@@ -69,6 +91,7 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
       connection.configure();
       setSelectedDevice(id);
       device.addConnection(connection);
+      recent.add({ ip: data.ip, tls: data.tls });
       subscribeAll(device, connection, messageStore, nodeDB);
       closeDialog();
     } catch (error) {
@@ -101,6 +124,25 @@ export const HTTP = ({ closeDialog }: TabElementProps) => {
             {...register("ip")}
           />
         </div>
+        {recent.items.length > 0 && (
+          <div className="flex flex-col gap-1">
+            <Label className="text-xs text-slate-600 dark:text-slate-400">
+              Recent connections
+            </Label>
+            <div className="flex flex-wrap gap-1">
+              {recent.items.map((conn, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => selectRecentConnection(conn)}
+                  className="px-2 py-1 text-xs rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                >
+                  {conn.tls ? "https" : "http"}://{conn.ip}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="mt-2 flex items-center gap-2">
           <Switch
             onCheckedChange={setTLS}

@@ -1,5 +1,5 @@
 {
-	"dashboard": {
+	"connections": {
 		"title": "Dispositivos conectados",
 		"description": "Administra tus dispositivos Meshtastic conectados.",
 		"connectionType_ble": "BLE",
