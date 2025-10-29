@@ -50,6 +50,10 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
                 suffix: t("unit.second.plural"),
               },
             },
+            // TODO: This field is deprecated since protobufs 2.7.4 and only has UNUSED=0 value.
+            // GPS format has been moved to DeviceUIConfig.gps_format with proper enum values (DEC, DMS, UTM, MGRS, OLC, OSGR, MLS).
+            // This should be removed once DeviceUI settings are implemented.
+            // See: packages/protobufs/meshtastic/device_ui.proto
             {
               type: "select",
               name: "gpsFormat",
@@ -57,7 +61,7 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
               description: t("display.gpsDisplayUnits.description"),
               properties: {
                 enumValue:
-                  Protobuf.Config.Config_DisplayConfig_GpsCoordinateFormat,
+                  Protobuf.Config.Config_DisplayConfig_DeprecatedGpsCoordinateFormat,
               },
             },
             {
