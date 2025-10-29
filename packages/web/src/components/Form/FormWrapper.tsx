@@ -3,7 +3,7 @@ import { Label } from "@components/UI/Label.tsx";
 export interface FieldWrapperProps {
   label: string;
   fieldName: string;
-  description?: string;
+  description?: React.ReactNode;
   disabled?: boolean;
   children?: React.ReactNode;
   valid?: boolean;

@@ -33,7 +33,7 @@ export interface BaseFormBuilderProps<T> {
   disabled?: boolean;
   disabledBy?: DisabledBy<T>[];
   label: string;
-  description?: string;
+  description?: React.ReactNode;
   notes?: string;
   validationText?: string;
   properties?: Record<string, unknown>;

@@ -11,11 +11,12 @@ import {
   type FlagName,
   usePositionFlags,
 } from "@core/hooks/usePositionFlags.ts";
-import { useDevice } from "@core/stores";
+import { useDevice, useNodeDB } from "@core/stores";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { FixedPositionPicker } from "./FixedPositionPicker.tsx";
 
 interface PositionConfigProps {
   onFormInit: DynamicFormFormInit<PositionValidation>;
@@ -23,11 +24,24 @@ interface PositionConfigProps {
 export const Position = ({ onFormInit }: PositionConfigProps) => {
   useWaitForConfig({ configCase: "position" });
 
-  const { setChange, config, getEffectiveConfig, removeChange } = useDevice();
+  const { setChange, config, getEffectiveConfig, removeChange, sendAdminMessage } = useDevice();
+  const { getMyNode } = useNodeDB();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     getEffectiveConfig("position")?.positionFlags ?? 0,
   );
   const { t } = useTranslation("config");
+  
+  const myNode = getMyNode();
+  const currentPosition = myNode?.position;
+
+  const effectiveConfig = getEffectiveConfig("position");
+  
+  const formValues = useMemo(() => {
+    return {
+      ...config.position,
+      ...effectiveConfig,
+    } as PositionValidation;
+  }, [config.position, effectiveConfig]);
 
   const onSubmit = (data: PositionValidation) => {
     const payload = { ...data, positionFlags: flagsValue };
@@ -51,6 +65,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
   );
 
   return (
+    <>
     <DynamicForm<PositionValidation>
       onSubmit={(data) => {
         data.positionFlags = flagsValue;
@@ -59,7 +74,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       onFormInit={onFormInit}
       validationSchema={PositionValidationSchema}
       defaultValues={config.position}
-      values={getEffectiveConfig("position")}
+      values={formValues}
       fieldGroups={[
         {
           label: t("position.title"),
@@ -84,7 +99,19 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               type: "toggle",
               name: "fixedPosition",
               label: t("position.fixedPosition.label"),
-              description: t("position.fixedPosition.description"),
+              description: (
+                <>
+                  {t("position.fixedPosition.description")}
+                  {formValues.fixedPosition && (
+                    <FixedPositionPicker
+                      currentPosition={currentPosition}
+                      isEnabled={formValues.fixedPosition}
+                      onSetPosition={sendAdminMessage}
+                      onRequestUpdate={sendAdminMessage}
+                    />
+                  )}
+                </>
+              ),
             },
             {
               type: "multiSelect",
@@ -168,5 +195,6 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
         },
       ]}
     />
+    </>
   );
 };
