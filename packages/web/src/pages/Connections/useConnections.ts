@@ -30,6 +30,7 @@ type LiveRefs = {
 
 export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);
+
   const addSavedConnection = useDeviceStore((s) => s.addSavedConnection);
   const updateSavedConnection = useDeviceStore((s) => s.updateSavedConnection);
   const removeSavedConnectionFromStore = useDeviceStore(
@@ -161,9 +162,12 @@ export function useConnections() {
         if (conn.type === "http") {
           const ok = await testHttpReachable(conn.url);
           if (!ok) {
-            throw new Error(
-              "HTTP endpoint not reachable (may be blocked by CORS)",
-            );
+            const url = new URL(conn.url);
+            const isHTTPS = url.protocol === "https:";
+            const message = isHTTPS
+              ? `Cannot reach HTTPS endpoint. If using a self-signed certificate, open ${conn.url} in a new tab, accept the certificate warning, then try connecting again.`
+              : "HTTP endpoint not reachable (may be blocked by CORS)";
+            throw new Error(message);
           }
 
           const url = new URL(conn.url);

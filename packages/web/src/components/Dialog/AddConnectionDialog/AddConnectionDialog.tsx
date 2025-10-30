@@ -416,7 +416,7 @@ export default function AddConnectionDialog({
               <Switch
                 value={state.protocol}
                 disabled={!!isURLHTTPS}
-                checked={isURLHTTPS}
+                checked={state.protocol === "https"}
                 onCheckedChange={(value) => {
                   dispatch({
                     type: "SET_PROTOCOL",

@@ -23,7 +23,7 @@ export function createConnectionFromInput(input: NewConnection): Connection {
       type: "http",
       url: input.url,
       isDefault: false,
-      name: input.name.length === 0 ? `HTTP:${input.url}` : input.name,
+      name: input.name.length === 0 ? input.url : input.name,
     };
   }
   if (input.type === "bluetooth") {
