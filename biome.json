@@ -9,7 +9,8 @@
       "!**/.*",
       "!npm",
       "**/*.json",
-      "!**/locales/*-*/*.json"
+      "!**/locales/*-*/*.json",
+      "!**/packages/ui/"
     ],
     "ignoreUnknown": false
   },
