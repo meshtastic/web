@@ -15,6 +15,11 @@ interface MapProps {
   onMouseMove?: (event: MapLayerMouseEvent) => void;
   onClick?: (event: MapLayerMouseEvent) => void;
   interactiveLayerIds?: string[];
+  initialViewState?: {
+    latitude?: number;
+    longitude?: number;
+    zoom?: number;
+  };
 }
 
 export const BaseMap = ({
@@ -23,6 +28,7 @@ export const BaseMap = ({
   onClick,
   onMouseMove,
   interactiveLayerIds,
+  initialViewState,
 }: MapProps) => {
   const { theme } = useTheme();
   const { t } = useTranslation("map");
@@ -67,7 +73,7 @@ export const BaseMap = ({
       maxPitch={0}
       dragRotate={false}
       touchZoomRotate={false}
-      initialViewState={{
+      initialViewState={initialViewState ?? {
         zoom: 1.8,
         latitude: 35,
         longitude: 0,

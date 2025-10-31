@@ -194,7 +194,7 @@ export const decodePacket = (device: MeshDevice) =>
             case "queueStatus": {
               device.log.trace(
                 Types.Emitter[Types.Emitter.HandleFromRadio],
-                `🚧 Received Queue Status: ${decodedMessage.payloadVariant.value}`,
+                `🚧 Received Queue Status: ${JSON.stringify(decodedMessage.payloadVariant.value)}`,
               );
 
               device.events.onQueueStatus.dispatch(
