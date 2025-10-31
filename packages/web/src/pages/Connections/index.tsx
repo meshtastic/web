@@ -45,6 +45,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export const Connections = () => {
   const {
@@ -60,6 +61,7 @@ export const Connections = () => {
   const navigate = useNavigate({ from: "/" });
   const [addOpen, setAddOpen] = useState(false);
   const isURLHTTPS = useMemo(() => location.protocol === "https:", []);
+  const { t } = useTranslation("connections");
 
   // On first mount, try to refresh statuses
   // biome-ignore lint/correctness/useExhaustiveDependencies: This can cause the icon to refresh too often
@@ -88,17 +90,16 @@ export const Connections = () => {
       <header className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Connect to a Meshtastic device
+            {t("page.title")}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Add a device connection via HTTP, Bluetooth, or Serial. Your saved
-            connections will persist in your browser.
+            {t("page.description")}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={() => setAddOpen(true)} className="gap-2">
             <PlugZap className="size-4" />
-            Add connection
+            {t("addConnection")}
           </Button>
         </div>
       </header>
@@ -108,16 +109,17 @@ export const Connections = () => {
       {sorted.length === 0 ? (
         <Card className="border-dashed">
           <CardHeader>
-            <CardTitle className="text-lg">No connections yet</CardTitle>
+            <CardTitle className="text-lg">
+              {t("noConnections.title")}{" "}
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-slate-500 dark:text-slate-400">
-            Create your first connection. It will connect immediately and be
-            saved for later.
+            {t("noConnections.description")}
           </CardContent>
           <CardFooter>
             <Button onClick={() => setAddOpen(true)} className="gap-2">
               <PlugZap className="size-4" />
-              Add connection
+              {t("addConnection")}
             </Button>
           </CardFooter>
         </Card>
@@ -130,10 +132,10 @@ export const Connections = () => {
               onConnect={async () => {
                 const ok = await connect(c.id);
                 toast({
-                  title: ok ? "Connected" : "Failed to connect",
+                  title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok
-                    ? `${c.name} is now connected.`
-                    : `Check your device or settings and try again.`,
+                    ? t("toasts.nowConnected", { name: c.name })
+                    : t("toasts.checkConnetion"),
                 });
                 if (ok) {
                   navigate({ to: "/" });
@@ -142,32 +144,32 @@ export const Connections = () => {
               onDisconnect={async () => {
                 await disconnect(c.id);
                 toast({
-                  title: "Disconnected",
-                  description: `${c.name} has been disconnected.`,
+                  title: t("toasts.disconnected"),
+                  description: t("toasts.nowDisconnected", { name: c.name }),
                 });
               }}
               onSetDefault={() => {
                 setDefaultConnection(c.id);
                 toast({
-                  title: "Default set",
-                  description: `Default connection is now ${c.name}.`,
+                  title: t("toasts.defaultSet"),
+                  description: t("toasts.defaultConnection", { name: c.name }),
                 });
               }}
               onDelete={async () => {
                 await disconnect(c.id);
                 removeConnection(c.id);
                 toast({
-                  title: "Deleted",
-                  description: `${c.name} was removed.`,
+                  title: t("toasts.deleted"),
+                  description: t("toasts.deletedByName", { name: c.name }),
                 });
               }}
               onRetry={async () => {
                 const ok = await connect(c.id, { allowPrompt: true });
                 toast({
-                  title: ok ? "Connected" : "Failed to connect",
+                  title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok
-                    ? `${c.name} is now connected.`
-                    : `Could not connect. You may need to reselect the device/port.`,
+                    ? t("toasts.nowConnected", { name: c.name })
+                    : t("toasts.pickConnectionAgain"),
                 });
                 if (ok) {
                   navigate({ to: "/" });
@@ -187,8 +189,8 @@ export const Connections = () => {
           if (created) {
             setAddOpen(false);
             toast({
-              title: "Connection added",
-              description: `${created.name} saved.`,
+              title: t("toasts.added"),
+              description: t("toasts.savedByName", { name: created.name }),
             });
             if (created.status === "connected") {
               navigate({ to: "/" });
@@ -196,7 +198,7 @@ export const Connections = () => {
           } else {
             toast({
               title: "Unable to connect",
-              description: "The connection was saved but could not connect.",
+              description: "savedCantConnect",
             });
           }
         }}
@@ -232,6 +234,8 @@ function ConnectionCard({
   onDelete: () => void;
   onRetry: () => Promise<boolean> | Promise<void>;
 }) {
+  const { t } = useTranslation("connections");
+
   const Icon = connectionTypeIcon(connection.type);
   const isBusy = connection.status === "connecting";
   const isConnected = connection.status === "connected";
@@ -248,7 +252,7 @@ function ConnectionCard({
               {connection.isDefault ? (
                 <Badge variant="secondary" className="gap-1">
                   <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
-                  Default
+                  {t("default")}
                 </Badge>
               ) : null}
             </CardTitle>
@@ -276,7 +280,7 @@ function ConnectionCard({
                     onClick={() => onSetDefault()}
                   >
                     <StarOff className="size-4" />
-                    Unset default
+                    {t("button.unsetDefault")}
                   </DropdownMenuItem>
                 )}
                 {connection.type === "http" && !connection.isDefault && (
@@ -285,7 +289,7 @@ function ConnectionCard({
                     onClick={() => onSetDefault()}
                   >
                     <Star className="size-4" />
-                    Set as default
+                    {t("button.setDefault")}
                   </DropdownMenuItem>
                 )}
                 <AlertDialog>
@@ -295,24 +299,27 @@ function ConnectionCard({
                       onSelect={(e) => e.preventDefault()}
                     >
                       <Trash2 className="size-4" />
-                      Delete
+                      {t("button.delete")}
                     </DropdownMenuItem>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete connection</AlertDialogTitle>
+                      <AlertDialogTitle>
+                        {t("deleteConnetion")}
+                      </AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will remove {connection.name}. You cant undo this
-                        action.
+                        {t("areYouSure", { name: connection.name })}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>
+                        {t("button.cancel")}
+                      </AlertDialogCancel>
                       <AlertDialogAction
                         className="bg-red-600 hover:bg-red-700"
                         onClick={() => onDelete()}
                       >
-                        Delete
+                        {t("button.delete")}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -329,12 +336,14 @@ function ConnectionCard({
           </p>
         ) : connection.lastConnectedAt ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Last connected{" "}
-            {new Date(connection.lastConnectedAt).toLocaleString()}
+            {t("lastConnectedAt", {
+              date: new Date(connection.lastConnectedAt),
+            })}
+            :{new Date(connection.lastConnectedAt).toLocaleString()}
           </p>
         ) : (
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Never connected
+            {t("neverConnected")}
           </p>
         )}
       </CardContent>
@@ -346,7 +355,7 @@ function ConnectionCard({
             onClick={() => onDisconnect()}
             disabled={isBusy}
           >
-            Disconnect
+            {t("button.disconnect")}
           </Button>
         ) : (
           <Button
@@ -357,12 +366,12 @@ function ConnectionCard({
             {isError ? (
               <>
                 <RotateCw className="size-4" />
-                Retry
+                {t("button.retry")}
               </>
             ) : (
               <>
                 <LinkIcon className="size-4" />
-                Connect
+                {t("button.connect")}
               </>
             )}
           </Button>

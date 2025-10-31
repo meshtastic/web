@@ -32,7 +32,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
-import { Trans } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 import { urlOrIpv4Schema } from "./validation.ts";
 
@@ -81,15 +81,15 @@ const featureErrors: Record<BrowserFeature, { href: string; i18nKey: string }> =
   {
     "Web Bluetooth": {
       href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility",
-      i18nKey: "newDeviceDialog.validation.requiresWebBluetooth",
+      i18nKey: "addConnection.validation.requiresWebBluetooth",
     },
     "Web Serial": {
       href: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API#browser_compatibility",
-      i18nKey: "newDeviceDialog.validation.requiresWebSerial",
+      i18nKey: "addConnection.validation.requiresWebSerial",
     },
     "Secure Context": {
       href: "https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts",
-      i18nKey: "newDeviceDialog.validation.requiresSecureContext",
+      i18nKey: "addConnection.validation.requiresSecureContext",
     },
   };
 
@@ -133,8 +133,8 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
               <Trans
                 i18nKey={
                   browserFeatures.length > 0
-                    ? "newDeviceDialog.validation.additionallyRequiresSecureContext"
-                    : "newDeviceDialog.validation.requiresSecureContext"
+                    ? "addConnection.validation.additionallyRequiresSecureContext"
+                    : "addConnection.validation.requiresSecureContext"
                 }
                 components={{
                   "0": (
@@ -260,6 +260,7 @@ export default function AddConnectionDialog({
     dialogStateInitializer(isHTTPS ? { protocol: "https" } : {}),
   );
   const { unsupported } = useBrowserFeatureDetection();
+  const { t } = useTranslation();
 
   const bluetoothSupported =
     typeof navigator !== "undefined" && "bluetooth" in navigator;
@@ -292,8 +293,10 @@ export default function AddConnectionDialog({
   const handlePickBluetooth = useCallback(async () => {
     if (!bluetoothSupported) {
       toast({
-        title: "Bluetooth not supported",
-        description: "Your browser or device does not support Web Bluetooth.",
+        title: t("addConnection.bluetoothConnection.notSupported.title"),
+        description: t(
+          "addConnection.bluetoothConnection.notSupported.description",
+        ),
       });
       return;
     }
@@ -309,23 +312,27 @@ export default function AddConnectionDialog({
       if (!state.name || state.name === "") {
         dispatch({
           type: "SET_NAME",
-          payload: device.name ? `BT: ${device.name}` : "Bluetooth Device",
+          payload: device.name
+            ? t("addConnection.bluetoothConnection.short")
+            : t("addConnection.bluetoothConnection.long"),
         });
       }
       toast({
-        title: "Bluetooth device selected",
+        title: t("addConnection.bluetoothConnection.selected"),
         description: device.name || device.id,
       });
     } catch (err) {
       makeToastErrorHandler("Bluetooth")(err);
     }
-  }, [bluetoothSupported, state.name, toast, makeToastErrorHandler]);
+  }, [bluetoothSupported, state.name, toast, makeToastErrorHandler, t]);
 
   const handlePickSerial = useCallback(async () => {
     if (!serialSupported) {
       toast({
-        title: "Serial not supported",
-        description: "Your browser does not support Web Serial API.",
+        title: t("addConnection.serialConnection.notSupported.title"),
+        description: t(
+          "addConnection.serialConnection.notSupported.description",
+        ),
       });
       return;
     }
@@ -356,21 +363,23 @@ export default function AddConnectionDialog({
         dispatch({ type: "SET_NAME", payload: `Serial: ${v}:${p}` });
       }
       toast({
-        title: "Serial port selected",
-        description: "Port permission granted.",
+        title: t("addConnection.serialConnection.portSelected.title"),
+        description: t(
+          "addConnection.serialConnection.portSelected.description",
+        ),
       });
     } catch (err) {
       makeToastErrorHandler("Serial")(err);
     }
-  }, [serialSupported, state.name, toast, makeToastErrorHandler]);
+  }, [serialSupported, state.name, toast, makeToastErrorHandler, t]);
 
   const handleTestHttp = useCallback(async () => {
     const fullUrl = `${state.protocol}://${state.url}`;
     const validatedURL = urlOrIpv4Schema.safeParse(fullUrl);
     if (validatedURL.success === false) {
       toast({
-        title: "Invalid URL",
-        description: "Please enter a valid HTTP or HTTPS URL.",
+        title: t("addConnection.httpConnection.invalidUrl.title"),
+        description: t("addConnection.httpConnection.invalidUrl.description"),
       });
       return;
     }
@@ -379,30 +388,36 @@ export default function AddConnectionDialog({
     if (reachable) {
       dispatch({ type: "SET_TEST_STATUS", payload: "success" });
       toast({
-        title: "Connection test successful",
-        description: "The device appears to be reachable.",
+        title: t("addConnection.httpConnection.connectionTest.success.title"),
+        description: t(
+          "addConnection.httpConnection.connectionTest.success.description",
+        ),
       });
     } else {
       dispatch({ type: "SET_TEST_STATUS", payload: "failure" });
       toast({
-        title: "Connection test failed",
-        description: "Could not reach the device. Check the URL and try again.",
+        title: t("addConnection.httpConnection.connectionTest.failure.title"),
+        description: t(
+          "addConnection.httpConnection.connectionTest.failure.description",
+        ),
       });
     }
-  }, [state.protocol, state.url, toast]);
+  }, [state.protocol, state.url, toast, t]);
 
   const PANES: Record<TabKey, Pane> = useMemo(
     () => ({
       http: {
-        placeholder: "My HTTP Node",
+        placeholder: t("addConnection.httpConnection.namePlaceholder"),
         children: () => (
           <div className="flex flex-col gap-4">
-            <Label htmlFor="url">URL or IP</Label>
+            <Label htmlFor="url">
+              {t("addConnection.httpConnection.heading")}
+            </Label>
 
             <Input
               id={"url"}
               inputMode="url"
-              placeholder="192.168.1.10 or meshtastic.local"
+              placeholder={t("addConnection.httpConnection.inputPlaceholder")}
               prefix={`${state.protocol}://`}
               value={state.url}
               onChange={(e) => {
@@ -425,7 +440,7 @@ export default function AddConnectionDialog({
                   dispatch({ type: "SET_TEST_STATUS", payload: "idle" });
                 }}
               ></Switch>
-              <Label>Use HTTPS</Label>
+              <Label>{t("addConnetion.httpConnection.useHttps")}</Label>
             </div>
             <div className="flex items-center gap-2 mt-4">
               <Button
@@ -440,31 +455,36 @@ export default function AddConnectionDialog({
                 {state.testStatus === "testing" ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Testing...
+                    {t(
+                      "addConnection.httpConnection.connectionTest.button.loading",
+                    )}
                   </>
                 ) : (
                   <>
                     <MousePointerClick className="h-4 w-4" />
-                    Test connection
+                    {t(
+                      "addConnection.httpConnection.connectionTest.button.label",
+                    )}
                   </>
                 )}
               </Button>
               {state.testStatus === "success" && (
                 <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                   <CheckCircle2 className="h-4 w-4" />
-                  Reachable
+                  {t("addConnection.httpConnection.connectionTest.reachable")}
                 </div>
               )}
               {state.testStatus === "failure" && (
                 <div className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
                   <XCircle className="h-4 w-4" />
-                  Not reachable
+                  {t(
+                    "addConnection.httpConnection.connectionTest.notReachable",
+                  )}
                 </div>
               )}
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Test the connection before saving to verify the device is
-              reachable.
+              {t("addConnection.httpConnection.connectionTest.description")}
             </p>
           </div>
         ),
@@ -483,20 +503,24 @@ export default function AddConnectionDialog({
           <>
             <SupportBadge
               supported={bluetoothSupported}
-              labelSupported="Web Bluetooth supported"
-              labelUnsupported="Web Bluetooth not supported"
+              labelSupported={t(
+                "addConnection.bluetoothConnection.supported.title",
+              )}
+              labelUnsupported={t(
+                "addConnection.bluetoothConnection.notSupported.title",
+              )}
             />
             <PickerRow
-              label="Device"
-              buttonText="Select device"
+              label={t("addConnection.bluetoothConnection.device")}
+              buttonText={t("addConnection.bluetoothConnection.selectDevice")}
               onPick={handlePickBluetooth}
               disabled={!bluetoothSupported}
               display={
                 state.btSelected
                   ? state.btSelected.name || state.btSelected.id
-                  : "No device selected"
+                  : t("addConnection.bluetoothConnection.notSelected")
               }
-              helper="Uses the Meshtastic default GATT service for discovery."
+              helper={t("addConnection.bluetoothConnection.helperText")}
             />
             <FeatureErrorMessage
               missingFeatures={unsupported}
@@ -513,25 +537,34 @@ export default function AddConnectionDialog({
         }),
       },
       serial: {
-        placeholder: "My Serial Node",
+        placeholder: t("addConnection.serialConnection.namePlaceholder"),
         children: () => (
           <>
             <SupportBadge
               supported={serialSupported}
-              labelSupported="Web Serial supported"
-              labelUnsupported="Web Serial not supported"
+              labelSupported={t(
+                "addConnection.serialConnection.supported.title",
+              )}
+              labelUnsupported={t(
+                "addConnection.serialConnection.notSupported.title",
+              )}
             />
             <PickerRow
-              label="Port"
-              buttonText="Select port"
+              label={t("addConnection.serialConnection.port")}
+              buttonText={t("addConnection.serialConnection.selectPort")}
               onPick={handlePickSerial}
               disabled={!serialSupported}
               display={
                 state.serialSelected
-                  ? `USB ${state.serialSelected.vendorId?.toString(16) ?? "?"}:${state.serialSelected.productId?.toString(16) ?? "?"}`
-                  : "No port selected"
+                  ? t("addConnection.serialConnection.deviceName", {
+                      vendorId:
+                        state.serialSelected.vendorId?.toString(16) ?? "?",
+                      productId:
+                        state.serialSelected.productId?.toString(16) ?? "?",
+                    })
+                  : t("addConnection.serialConnection.notSelected")
               }
-              helper="Selecting a port grants permission so the app can open it to connect."
+              helper={t("addConnection.serialConnection.helperText")}
             />
             <FeatureErrorMessage missingFeatures={unsupported} tabId="serial" />
           </>
@@ -556,6 +589,7 @@ export default function AddConnectionDialog({
       handlePickSerial,
       handleTestHttp,
       unsupported,
+      t,
     ],
   );
 
@@ -578,9 +612,9 @@ export default function AddConnectionDialog({
     <DialogWrapper
       variant="default"
       type="custom"
-      title="Add connection"
-      description="Choose a connection type and fill in the details"
-      cancelText="Close"
+      title={t("addConnection.title")}
+      description={t("addConnection.description")}
+      cancelText={t("button.cancel")}
       open={open}
       onOpenChange={onOpenChange}
     >
@@ -622,7 +656,7 @@ export default function AddConnectionDialog({
                       disabled={!canCreate}
                       className="rounded-none"
                     >
-                      Save connection
+                      {t("button.saveConnection")}
                     </Button>
                   </div>
                 </div>
