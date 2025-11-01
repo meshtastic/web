@@ -50,11 +50,11 @@ i18next
     debug: import.meta.env.MODE === "development",
     ns: [
       "channels",
+      "connections",
       "commandPalette",
       "common",
       "config",
       "moduleConfig",
-      "connections",
       "dialog",
       "messages",
       "nodes",

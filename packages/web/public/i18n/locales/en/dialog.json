@@ -3,18 +3,6 @@
     "description": "This action will clear all message history. This cannot be undone. Are you sure you want to continue?",
     "title": "Clear All Messages"
   },
-  "deviceName": {
-    "description": "The Device will restart once the config is saved.",
-    "longName": "Long Name",
-    "shortName": "Short Name",
-    "title": "Change Device Name",
-    "validation": {
-      "longNameMax": "Long name must not be more than 40 characters",
-      "shortNameMax": "Short name must not be more than 4 characters",
-      "longNameMin": "Long name must have at least 1 character",
-      "shortNameMin": "Short name must have at least 1 character"
-    }
-  },
   "import": {
     "description": "Import a Channel Set from a Meshtastic URL. <br />Valid Meshtasic URLs start with \"<italic>https://meshtastic.org/e/...</italic>\"",
     "error": {

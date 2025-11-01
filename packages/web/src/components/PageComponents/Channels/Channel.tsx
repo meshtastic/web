@@ -47,7 +47,7 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
   };
 
   const workingChannel = getChange({
-    type: "channel",
+    type: "channels",
     index: channel.index,
   }) as Protobuf.Channel.Channel | undefined;
   const effectiveConfig = workingChannel ?? channel;
@@ -123,11 +123,11 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
     });
 
     if (deepCompareConfig(channel, payload, true)) {
-      removeChange({ type: "channel", index: channel.index });
+      removeChange({ type: "channels", index: channel.index });
       return;
     }
 
-    setChange({ type: "channel", index: channel.index }, payload, channel);
+    setChange({ type: "channels", index: channel.index }, payload, channel);
   };
 
   const preSharedKeyRegenerate = async () => {

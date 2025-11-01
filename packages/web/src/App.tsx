@@ -26,12 +26,12 @@ export function App() {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorPage}>
-      <NewDeviceDialog
+      {/* <NewDeviceDialog
         open={connectDialogOpen}
         onOpenChange={(open) => {
           setConnectDialogOpen(open);
         }}
-      />
+      /> */}
       <Toaster />
       <TanStackRouterDevtools position="bottom-right" />
       <DeviceWrapper deviceId={selectedDeviceId}>

@@ -47,12 +47,12 @@ export const DialogManager = () => {
           setDialogOpen("reboot", false);
         }}
       />
-      <DeviceNameDialog
+      {/* <DeviceNameDialog
         open={dialog.deviceName}
         onOpenChange={(open) => {
           setDialogOpen("deviceName", open);
         }}
-      />
+      /> */}
       <RemoveNodeDialog
         open={dialog.nodeRemoval}
         onOpenChange={(open) => {

@@ -7,9 +7,6 @@ import type {
 import { randId } from "@app/core/utils/randId";
 import { Bluetooth, Cable, Globe, type LucideIcon } from "lucide-react";
 
-export const DEFAULT_MESHTASTIC_GATT_SERVICE =
-  "6ba1d3f0-667b-11e4-9803-0800200c9a66";
-
 export function createConnectionFromInput(input: NewConnection): Connection {
   const base = {
     id: randId(),
@@ -32,7 +29,6 @@ export function createConnectionFromInput(input: NewConnection): Connection {
       type: "bluetooth",
       deviceId: input.deviceId,
       deviceName: input.deviceName,
-      gattServiceUUID: input.gattServiceUUID || DEFAULT_MESHTASTIC_GATT_SERVICE,
     };
   }
   return {

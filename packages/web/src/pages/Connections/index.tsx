@@ -99,7 +99,7 @@ export const Connections = () => {
         <div className="flex items-center gap-2">
           <Button onClick={() => setAddOpen(true)} className="gap-2">
             <PlugZap className="size-4" />
-            {t("addConnection")}
+            {t("button.addConnection")}
           </Button>
         </div>
       </header>
@@ -119,7 +119,7 @@ export const Connections = () => {
           <CardFooter>
             <Button onClick={() => setAddOpen(true)} className="gap-2">
               <PlugZap className="size-4" />
-              {t("addConnection")}
+              {t("button.addConnection")}
             </Button>
           </CardFooter>
         </Card>
@@ -134,7 +134,10 @@ export const Connections = () => {
                 toast({
                   title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok
-                    ? t("toasts.nowConnected", { name: c.name })
+                    ? t("toasts.nowConnected", {
+                        name: c.name,
+                        interpolation: { escapeValue: false },
+                      })
                     : t("toasts.checkConnetion"),
                 });
                 if (ok) {
@@ -145,14 +148,20 @@ export const Connections = () => {
                 await disconnect(c.id);
                 toast({
                   title: t("toasts.disconnected"),
-                  description: t("toasts.nowDisconnected", { name: c.name }),
+                  description: t("toasts.nowDisconnected", {
+                    name: c.name,
+                    interpolation: { escapeValue: false },
+                  }),
                 });
               }}
               onSetDefault={() => {
                 setDefaultConnection(c.id);
                 toast({
                   title: t("toasts.defaultSet"),
-                  description: t("toasts.defaultConnection", { name: c.name }),
+                  description: t("toasts.defaultConnection", {
+                    name: c.name,
+                    interpolation: { escapeValue: false },
+                  }),
                 });
               }}
               onDelete={async () => {
@@ -160,7 +169,10 @@ export const Connections = () => {
                 removeConnection(c.id);
                 toast({
                   title: t("toasts.deleted"),
-                  description: t("toasts.deletedByName", { name: c.name }),
+                  description: t("toasts.deletedByName", {
+                    name: c.name,
+                    interpolation: { escapeValue: false },
+                  }),
                 });
               }}
               onRetry={async () => {
@@ -168,7 +180,10 @@ export const Connections = () => {
                 toast({
                   title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok
-                    ? t("toasts.nowConnected", { name: c.name })
+                    ? t("toasts.nowConnected", {
+                        name: c.name,
+                        interpolation: { escapeValue: false },
+                      })
                     : t("toasts.pickConnectionAgain"),
                 });
                 if (ok) {
@@ -190,7 +205,10 @@ export const Connections = () => {
             setAddOpen(false);
             toast({
               title: t("toasts.added"),
-              description: t("toasts.savedByName", { name: created.name }),
+              description: t("toasts.savedByName", {
+                name: created.name,
+                interpolation: { escapeValue: false },
+              }),
             });
             if (created.status === "connected") {
               navigate({ to: "/" });
@@ -270,7 +288,7 @@ function ConnectionCard({
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
                   <MoreHorizontal className="size-4" />
-                  <span className="sr-only">More actions</span>
+                  <span className="sr-only">{t("moreActions")}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">

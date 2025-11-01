@@ -1,10 +1,7 @@
 import { SupportBadge } from "@app/components/Badge/SupportedBadge.tsx";
 import { Switch } from "@app/components/UI/Switch.tsx";
 import type { NewConnection } from "@app/core/stores/deviceStore/types.ts";
-import {
-  DEFAULT_MESHTASTIC_GATT_SERVICE,
-  testHttpReachable,
-} from "@app/pages/Connections/utils";
+import { testHttpReachable } from "@app/pages/Connections/utils";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { Label } from "@components/UI/Label.tsx";
@@ -20,6 +17,7 @@ import {
   useBrowserFeatureDetection,
 } from "@core/hooks/useBrowserFeatureDetection.ts";
 import { useToast } from "@core/hooks/useToast.ts";
+import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import {
   AlertCircle,
   Bluetooth,
@@ -302,8 +300,7 @@ export default function AddConnectionDialog({
     }
     try {
       const device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [DEFAULT_MESHTASTIC_GATT_SERVICE] }],
-        optionalServices: [DEFAULT_MESHTASTIC_GATT_SERVICE],
+        filters: [{ services: [TransportWebBluetooth.ServiceUuid] }],
       });
       dispatch({
         type: "SET_BT_SELECTED",
@@ -440,7 +437,7 @@ export default function AddConnectionDialog({
                   dispatch({ type: "SET_TEST_STATUS", payload: "idle" });
                 }}
               ></Switch>
-              <Label>{t("addConnetion.httpConnection.useHttps")}</Label>
+              <Label>{t("addConnection.httpConnection.useHttps")}</Label>
             </div>
             <div className="flex items-center gap-2 mt-4">
               <Button

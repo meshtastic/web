@@ -1025,26 +1025,11 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
           }
         }
         draft.devices = rebuilt;
-
-        // Reset connection statuses on rehydration
-        //   for (const connection of draft.savedConnections) {
-        //     connection.status = "disconnected";
-        //     connection.error = undefined;
-        //     connection.meshDeviceId = undefined;
-        //   }
       }),
     );
   },
 };
 
-// Add persist middleware on the store if the feature flag is enabled
-const persistDevices = featureFlags.get("persistDevices");
-console.debug(
-  `DeviceStore: Persisting devices is ${persistDevices ? "enabled" : "disabled"}`,
+export const useDeviceStore = createStore(
+  subscribeWithSelector(persist(deviceStoreInitializer, persistOptions)),
 );
-
-export const useDeviceStore = persistDevices
-  ? createStore(
-      subscribeWithSelector(persist(deviceStoreInitializer, persistOptions)),
-    )
-  : createStore(subscribeWithSelector(deviceStoreInitializer));
