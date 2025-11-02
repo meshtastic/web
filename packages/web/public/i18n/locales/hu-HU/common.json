@@ -1,9 +1,9 @@
 {
   "button": {
     "apply": "Alkalmaz",
-    "backupKey": "Backup Key",
+    "backupKey": "Kulcs biztonsági mentése",
     "cancel": "Megszakítani",
-    "clearMessages": "Clear Messages",
+    "clearMessages": "Üzenetek törlése",
     "close": "Bezárás",
     "confirm": "Megerősítés",
     "delete": "Törlés",
@@ -16,14 +16,14 @@
     "message": "Üzenet",
     "now": "Most",
     "ok": "OK",
-    "print": "Print",
+    "print": "Nyomtatás",
     "remove": "Törlés",
-    "requestNewKeys": "Request New Keys",
+    "requestNewKeys": "Új kulcsok kérése",
     "requestPosition": "Pozíció kérése",
     "reset": "Újraindítás",
     "save": "Mentés",
     "scanQr": "QR-kód beolvasása",
-    "traceRoute": "Trace Route",
+    "traceRoute": "Traceroute",
     "submit": "Mentés"
   },
   "app": {
@@ -40,9 +40,9 @@
       "plural": "Ugrások"
     },
     "hopsAway": {
-      "one": "{{count}} hop away",
-      "plural": "{{count}} hops away",
-      "unknown": "Unknown hops away"
+      "one": "{{count}} ugrásnyira",
+      "plural": "{{count}} ugrásnyira",
+      "unknown": "Ismeretlen ugrásszám távolság"
     },
     "megahertz": "MHz",
     "raw": "nyers",
@@ -52,8 +52,8 @@
       "suffix": "m"
     },
     "kilometer": {
-      "one": "Kilometer",
-      "plural": "Kilometers",
+      "one": "Kilométer",
+      "plural": "Kilométerek",
       "suffix": "km"
     },
     "minute": {
@@ -62,11 +62,11 @@
     },
     "hour": {
       "one": "Óra",
-      "plural": "Hours"
+      "plural": "Óra"
     },
     "millisecond": {
-      "one": "Millisecond",
-      "plural": "Milliseconds",
+      "one": "Milliszekundum",
+      "plural": "Milliszekundumok",
       "suffix": "ms"
     },
     "second": {
@@ -76,8 +76,8 @@
     "day": {
       "one": "Nap",
       "plural": "Napok",
-      "today": "Today",
-      "yesterday": "Yesterday"
+      "today": "Ma",
+      "yesterday": "Tegnap"
     },
     "month": {
       "one": "Hónap",
@@ -90,7 +90,7 @@
     "snr": "SNR",
     "volt": {
       "one": "Volt",
-      "plural": "Volts",
+      "plural": "Volt",
       "suffix": "V"
     },
     "record": {
@@ -98,8 +98,8 @@
       "plural": "Bejegyzések"
     },
     "degree": {
-      "one": "Degree",
-      "plural": "Degrees",
+      "one": "Fok",
+      "plural": "Fok",
       "suffix": "°"
     }
   },
@@ -122,34 +122,34 @@
   "formValidation": {
     "unsavedChanges": "Nem mentett módosítások",
     "tooBig": {
-      "string": "Too long, expected less than or equal to {{maximum}} characters.",
-      "number": "Too big, expected a number smaller than or equal to {{maximum}}.",
-      "bytes": "Too big, expected less than or equal to {{params.maximum}} bytes."
+      "string": "Túl hosszú, legfeljebb {{maximum}} karakter engedélyezett.",
+      "number": "Túl nagy, legfeljebb {{maximum}} értékű szám engedélyezett.",
+      "bytes": "Túl nagy, legfeljebb {{params.maximum}} bájt engedélyezett."
     },
     "tooSmall": {
-      "string": "Too short, expected more than or equal to {{minimum}} characters.",
-      "number": "Too small, expected a number larger than or equal to {{minimum}}."
+      "string": "Túl rövid, legalább {{minimum}} karakter szükséges.",
+      "number": "Túl kicsi, legalább {{minimum}} értékű szám szükséges."
     },
     "invalidFormat": {
-      "ipv4": "Invalid format, expected an IPv4 address.",
-      "key": "Invalid format, expected a Base64 encoded pre-shared key (PSK)."
+      "ipv4": "Érvénytelen formátum, IPv4-címet várunk.",
+      "key": "Érvénytelen formátum, Base64-kódolt előre megosztott kulcsot (PSK) várunk."
     },
     "invalidType": {
-      "number": "Invalid type, expected a number."
+      "number": "Érvénytelen típus, számot várunk."
     },
     "pskLength": {
-      "0bit": "Key is required to be empty.",
-      "8bit": "Key is required to be an 8 bit pre-shared key (PSK).",
-      "128bit": "Key is required to be a 128 bit pre-shared key (PSK).",
-      "256bit": "Key is required to be a 256 bit pre-shared key (PSK)."
+      "0bit": "A kulcsnak üresnek kell lennie.",
+      "8bit": "A kulcsnak 8 bites előre megosztott kulcsnak (PSK) kell lennie.",
+      "128bit": "A kulcsnak 128 bites előre megosztott kulcsnak (PSK) kell lennie.",
+      "256bit": "A kulcsnak 256 bites előre megosztott kulcsnak (PSK) kell lennie."
     },
     "required": {
       "generic": "A mező kitöltése kötelező.",
-      "managed": "At least one admin key is requred if the node is managed.",
+      "managed": "Legalább egy admin kulcs szükséges, ha a csomópont kezelt.",
       "key": "Kulcs megadása kötelező."
     },
     "invalidOverrideFreq": {
-      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+      "number": "Érvénytelen formátum, 410–930 MHz közötti értéket vagy 0-t (alapértelmezett) várunk."
     }
   },
   "yes": "Igen",

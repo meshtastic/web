@@ -1,0 +1,12 @@
+{
+  "dashboard": {
+    "title": "已連線的裝置",
+    "description": "管理已連線的 Meshtastic 裝置。",
+    "connectionType_ble": "低功耗藍牙",
+    "connectionType_serial": "序列埠",
+    "connectionType_network": "網路",
+    "noDevicesTitle": "沒有裝置連線",
+    "noDevicesDescription": "連接新設備以開始使用。",
+    "button_newConnection": "新增連線"
+  }
+}

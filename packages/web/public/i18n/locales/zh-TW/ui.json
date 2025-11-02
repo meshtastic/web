@@ -1,0 +1,229 @@
+{
+  "navigation": {
+    "title": "導航",
+    "messages": "訊息",
+    "map": "地圖",
+    "settings": "設定",
+    "channels": "頻道",
+    "radioConfig": "無線電設定",
+    "deviceConfig": "設備設置",
+    "moduleConfig": "模組設定",
+    "nodes": "節點"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "logo": "Meshtastic Logo"
+  },
+  "sidebar": {
+    "collapseToggle": {
+      "button": {
+        "open": "開啟側邊欄",
+        "close": "關閉側邊欄"
+      }
+    },
+    "deviceInfo": {
+      "volts": "{{voltage}} V",
+      "firmware": {
+        "title": "韌體",
+        "version": "v{{version}}",
+        "buildDate": "Build date: {{date}}"
+      }
+    }
+  },
+  "batteryStatus": {
+    "charging": "{{level}}% 充電中",
+    "pluggedIn": "已接上電源",
+    "title": "電池"
+  },
+  "search": {
+    "nodes": "搜尋節點……",
+    "channels": "搜尋頻道……",
+    "commandPalette": "搜尋指令……"
+  },
+  "toast": {
+    "positionRequestSent": {
+      "title": "位置請求已送出。"
+    },
+    "requestingPosition": {
+      "title": "正在請求位置，請稍候……"
+    },
+    "sendingTraceroute": {
+      "title": "正在執行追蹤路由，請稍候……"
+    },
+    "tracerouteSent": {
+      "title": "追蹤路由已送出。"
+    },
+    "savedChannel": {
+      "title": "已儲存頻道：{{channelName}}"
+    },
+    "messages": {
+      "pkiEncryption": {
+        "title": "對話正使用 PKI 加密。"
+      },
+      "pskEncryption": {
+        "title": "對話正使用 PSK 加密。"
+      }
+    },
+    "configSaveError": {
+      "title": "儲存失敗",
+      "description": "儲存設定時發生錯誤。"
+    },
+    "validationError": {
+      "title": "配置中存在錯誤",
+      "description": "儲存前請先修正設定錯誤。"
+    },
+    "saveSuccess": {
+      "title": "正在儲存設定",
+      "description": "{{case}} 設定已保存。"
+    },
+    "saveAllSuccess": {
+      "title": "已儲存",
+      "description": "所有設定已保存。"
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "action": {
+        "added": "已添加",
+        "removed": "已移除",
+        "to": "to",
+        "from": "from"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "action": {
+        "added": "已添加",
+        "removed": "已移除",
+        "to": "to",
+        "from": "from"
+      }
+    }
+  },
+  "notifications": {
+    "copied": {
+      "label": "已複製！"
+    },
+    "copyToClipboard": {
+      "label": "複製到剪貼簿"
+    },
+    "hidePassword": {
+      "label": "隱藏密碼"
+    },
+    "showPassword": {
+      "label": "顯示密碼"
+    },
+    "deliveryStatus": {
+      "delivered": "已送達",
+      "failed": "傳送失敗",
+      "waiting": "等待中",
+      "unknown": "不明"
+    }
+  },
+  "general": {
+    "label": "一般設定"
+  },
+  "hardware": {
+    "label": "硬體"
+  },
+  "metrics": {
+    "label": "Metrics"
+  },
+  "role": {
+    "label": "角色"
+  },
+  "filter": {
+    "label": "過濾器"
+  },
+  "advanced": {
+    "label": "進階"
+  },
+  "clearInput": {
+    "label": "清除輸入"
+  },
+  "resetFilters": {
+    "label": "重設篩選器"
+  },
+  "nodeName": {
+    "label": "節點名稱/編號",
+    "placeholder": "Meshtastic 1234"
+  },
+  "airtimeUtilization": {
+    "label": "空中時間利用率 (%)",
+    "short": "空中時間利用率 (%)"
+  },
+  "batteryLevel": {
+    "label": "電池電量 (%)",
+    "labelText": "電池電量 (%)：{{value}}"
+  },
+  "batteryVoltage": {
+    "label": "電池電壓 (V)",
+    "title": "電壓"
+  },
+  "channelUtilization": {
+    "label": "頻道利用率 (%)",
+    "short": "頻道利用率 (%)"
+  },
+  "hops": {
+    "direct": "直線",
+    "label": "跳數",
+    "text": "跳數：{{value}}"
+  },
+  "lastHeard": {
+    "label": "最近一次收到排序",
+    "labelText": "最後接收時間：{{value}}",
+    "nowLabel": "Now"
+  },
+  "snr": {
+    "label": "SNR (db)"
+  },
+  "favorites": {
+    "label": "Favorites"
+  },
+  "hide": {
+    "label": "隱藏"
+  },
+  "showOnly": {
+    "label": "僅顯示"
+  },
+  "viaMqtt": {
+    "label": "已透過 MQTT 連線"
+  },
+  "hopsUnknown": {
+    "label": "跳數未知"
+  },
+  "showUnheard": {
+    "label": "Unknown last heard"
+  },
+  "language": {
+    "label": "語言",
+    "changeLanguage": "變更語言"
+  },
+  "theme": {
+    "dark": "深色",
+    "light": "淺色",
+    "system": "自動",
+    "changeTheme": "更改顏色方案"
+  },
+  "errorPage": {
+    "title": "這有點尷尬……",
+    "description1": "我們深感抱歉，網頁客戶端發生錯誤並導致程式崩潰。 <br /> 這是不應該發生的情況，我們正積極努力修復此問題。",
+    "description2": "幫助我們防止此問題再次發生，請將問題回報給我們。",
+    "reportInstructions": "請在您的回報中附上下列資訊：",
+    "reportSteps": {
+      "step1": "發生錯誤時您正在執行的動作",
+      "step2": "您預期會發生什麼",
+      "step3": "實際發生的情況",
+      "step4": "其他相關資訊"
+    },
+    "reportLink": "您可以將此問題回報到我們的 <0>GitHub</0>",
+    "dashboardLink": "返回 <0>dashboard</0>",
+    "detailsSummary": "錯誤詳情",
+    "errorMessageLabel": "錯誤訊息：",
+    "stackTraceLabel": "Stack trace：",
+    "fallbackError": "{{error}}"
+  },
+  "footer": {
+    "text": "技術支援： <0>▲ Vercel</0> | Meshtastic® 是 Meshtastic LLC. 的註冊商標。| <1>法律資訊</1>",
+    "commitSha": "Commit SHA: {{sha}}"
+  }
+}

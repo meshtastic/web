@@ -1,0 +1,59 @@
+{
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "公鑰已啟用"
+    },
+    "noPublicKey": {
+      "label": "沒有公鑰"
+    },
+    "directMessage": {
+      "label": "私人訊息 {{shortName}}"
+    },
+    "favorite": {
+      "label": "收藏",
+      "tooltip": "將此節點加入/移除收藏"
+    },
+    "notFavorite": {
+      "label": "Not a Favorite"
+    },
+    "error": {
+      "label": "錯誤",
+      "text": "無法取得節點詳細資料，請稍後重試。"
+    },
+    "status": {
+      "heard": "Heard",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "海拔高度"
+    },
+    "channelUtil": {
+      "label": "頻道利用率"
+    },
+    "airtimeUtil": {
+      "label": "空中時間利用率"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "完整名稱",
+      "connection": "連線",
+      "lastHeard": "最後接收時間",
+      "encryption": "加密",
+      "model": "Model",
+      "macAddress": "MAC 地址"
+    },
+    "connectionStatus": {
+      "direct": "直線",
+      "away": "away",
+      "viaMqtt": "，透過 MQTT"
+    }
+  },
+  "actions": {
+    "added": "已添加",
+    "removed": "已移除",
+    "ignoreNode": "忽略節點",
+    "unignoreNode": "取消忽略節點",
+    "requestPosition": "請求位置"
+  }
+}

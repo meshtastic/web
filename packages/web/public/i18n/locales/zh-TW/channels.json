@@ -1,0 +1,71 @@
+{
+  "page": {
+    "sectionLabel": "頻道",
+    "channelName": "頻道 {{channelName}}",
+    "broadcastLabel": "主要",
+    "channelIndex": "頻道 {{index}}",
+    "import": "匯入",
+    "export": "匯出"
+  },
+  "validation": {
+    "pskInvalid": "23公里以內"
+  },
+  "settings": {
+    "label": "頻道設置",
+    "description": "加密、MQTT 和其他設置"
+  },
+  "role": {
+    "label": "角色",
+    "description": "設備遙測資料透過主要頻道發送。只允許一個主要頻道",
+    "options": {
+      "primary": "主要",
+      "disabled": "停用",
+      "secondary": "次要"
+    }
+  },
+  "psk": {
+    "label": "預分享金鑰",
+    "description": "支援PSK長度：256位元，128位元，8位元， 空（0 位元）",
+    "generate": "生成"
+  },
+  "name": {
+    "label": "名稱",
+    "description": "頻道名稱需<12字節，預設為空白"
+  },
+  "uplinkEnabled": {
+    "label": "已啓用上行",
+    "description": "將訊息從本地網狀網路發布至 MQTT"
+  },
+  "downlinkEnabled": {
+    "label": "已啓用下行",
+    "description": "將訊息從 MQTT 轉傳至本地網狀網路"
+  },
+  "positionPrecision": {
+    "label": "位置",
+    "description": "與頻道共享的位置精度。可以選不共享。",
+    "options": {
+      "none": "不共享位置",
+      "precise": "精確定位",
+      "metric_km23": "23公里以內",
+      "metric_km12": "12公里以內",
+      "metric_km5_8": "5.8公里以內",
+      "metric_km2_9": "2.9公里以內",
+      "metric_km1_5": "1.5公里以內",
+      "metric_m700": "700米以內",
+      "metric_m350": "350米以內",
+      "metric_m200": "200米以內",
+      "metric_m90": "90米以內",
+      "metric_m50": "50米以內",
+      "imperial_mi15": "15英里以內",
+      "imperial_mi7_3": "7.3英里以內",
+      "imperial_mi3_6": "3.6英里以內",
+      "imperial_mi1_8": "1.8英里以內",
+      "imperial_mi0_9": "0.9英里以內",
+      "imperial_mi0_5": "0.5英里以內",
+      "imperial_mi0_2": "0.2英里以內",
+      "imperial_ft600": "600英尺以內",
+      "imperial_ft300": "300英尺以內",
+      "imperial_ft150": "150英尺以內"
+    }
+  }
+}

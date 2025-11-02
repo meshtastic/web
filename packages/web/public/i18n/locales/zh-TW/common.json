@@ -1,0 +1,157 @@
+{
+  "button": {
+    "apply": "套用",
+    "backupKey": "備份金鑰",
+    "cancel": "取消",
+    "clearMessages": "清除訊息",
+    "close": "關閉",
+    "confirm": "確認",
+    "delete": "刪除",
+    "dismiss": "關閉",
+    "download": "下載",
+    "export": "匯出",
+    "generate": "生成",
+    "regenerate": "重新產生",
+    "import": "匯入",
+    "message": "訊息:",
+    "now": "Now",
+    "ok": "好的",
+    "print": "Print",
+    "remove": "移除",
+    "requestNewKeys": "請求新金鑰",
+    "requestPosition": "請求位置",
+    "reset": "重設",
+    "save": "儲存",
+    "scanQr": "掃描QR碼",
+    "traceRoute": "追蹤路由",
+    "submit": "套用"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "fullTitle": "Meshtastic 網頁版"
+  },
+  "loading": "載入中……",
+  "unit": {
+    "cps": "CPS",
+    "dbm": "dBm",
+    "hertz": "Hz",
+    "hop": {
+      "one": "Hop",
+      "plural": "跳數"
+    },
+    "hopsAway": {
+      "one": "相隔 {{count}} hop",
+      "plural": "相隔 {{count}} hop",
+      "unknown": "跳數未知"
+    },
+    "megahertz": "MHz",
+    "raw": "raw",
+    "meter": {
+      "one": "公尺",
+      "plural": "公尺",
+      "suffix": "m"
+    },
+    "kilometer": {
+      "one": "公里",
+      "plural": "公里",
+      "suffix": "km"
+    },
+    "minute": {
+      "one": "分鐘",
+      "plural": "分鐘"
+    },
+    "hour": {
+      "one": "小時",
+      "plural": "小時"
+    },
+    "millisecond": {
+      "one": "毫秒",
+      "plural": "毫秒",
+      "suffix": "ms"
+    },
+    "second": {
+      "one": "秒",
+      "plural": "秒"
+    },
+    "day": {
+      "one": "天",
+      "plural": "天",
+      "today": "今日",
+      "yesterday": "昨天"
+    },
+    "month": {
+      "one": "月",
+      "plural": "月"
+    },
+    "year": {
+      "one": "年",
+      "plural": "年"
+    },
+    "snr": "SNR",
+    "volt": {
+      "one": "伏特",
+      "plural": "伏特",
+      "suffix": "V"
+    },
+    "record": {
+      "one": "記錄",
+      "plural": "記錄"
+    },
+    "degree": {
+      "one": "度",
+      "plural": "度",
+      "suffix": "°"
+    }
+  },
+  "security": {
+    "0bit": "Empty",
+    "8bit": "8 bit",
+    "128bit": "128 bit",
+    "256bit": "256 bit"
+  },
+  "unknown": {
+    "longName": "不明",
+    "shortName": "UNK",
+    "notAvailable": "不適用",
+    "num": "??"
+  },
+  "nodeUnknownPrefix": "!",
+  "unset": "未設定",
+  "fallbackName": "Meshtastic {{last4}}",
+  "node": "節點",
+  "formValidation": {
+    "unsavedChanges": "未儲存的變更",
+    "tooBig": {
+      "string": "長度過長，最大限制為 {{maximum}} 個字元。",
+      "number": "數值過大，請勿超過 {{maximum}}。",
+      "bytes": "大小超過限制，必須小於或等於 {{params.maximum}} 位元組。"
+    },
+    "tooSmall": {
+      "string": "長度不足，至少須 {{minimum}} 個字元。",
+      "number": "數值過小，至少須 {{minimum}}。"
+    },
+    "invalidFormat": {
+      "ipv4": "格式無效，請輸入一個 IPv4 地址。",
+      "key": "格式錯誤，須為 Base64 編碼的預共享金鑰 (PSK)。"
+    },
+    "invalidType": {
+      "number": "Invalid type, expected a number."
+    },
+    "pskLength": {
+      "0bit": "此金鑰須留空。",
+      "8bit": "金鑰須為 8 bit 預共享金鑰 (PSK)。",
+      "128bit": "金鑰須為 128 bit 預共享金鑰 (PSK)。",
+      "256bit": "金鑰須為 256 bit 預共享金鑰 (PSK)。"
+    },
+    "required": {
+      "generic": "這是必填欄位。",
+      "managed": "若節點為受管理模式，則必須提供至少一個管理金鑰。",
+      "key": "須輸入金鑰。"
+    },
+    "invalidOverrideFreq": {
+      "number": "錯誤，數值須介於 410-930 MHz 之間，或輸入 0 (使用預設值)。"
+    }
+  },
+  "yes": "Yes",
+  "no": "No"
+}
