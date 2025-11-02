@@ -14,8 +14,10 @@ export function useBrowserFeatureDetection(): BrowserSupport {
       ["Web Serial", !!navigator.serial],
       [
         "Secure Context",
-        globalThis.location.protocol === "https:" ||
-          globalThis.location.hostname === "localhost",
+        true,
+        // globalThis.location.protocol === "https:" ||
+        //   globalThis.location.hostname === "localhost" ||
+        //   globalThis.location.hostname === "file:",
       ],
     ];
 

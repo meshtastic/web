@@ -87,21 +87,21 @@ export const CommandPalette = () => {
           label: t("goto.command.messages"),
           icon: MessageSquareIcon,
           action() {
-            navigate({ to: "/messages" });
+            navigate({ to: "./messages" });
           },
         },
         {
           label: t("goto.command.map"),
           icon: MapIcon,
           action() {
-            navigate({ to: "/map" });
+            navigate({ to: "./map" });
           },
         },
         {
           label: t("goto.command.config"),
           icon: SettingsIcon,
           action() {
-            navigate({ to: "/config" });
+            navigate({ to: "./config" });
           },
           tags: ["settings"],
         },
@@ -109,7 +109,7 @@ export const CommandPalette = () => {
           label: t("goto.command.nodes"),
           icon: UsersIcon,
           action() {
-            navigate({ to: "/nodes" });
+            navigate({ to: "./nodes" });
           },
         },
       ],

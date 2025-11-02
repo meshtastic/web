@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => {
   const isTest = env.VITE_IS_TEST;
 
   return {
+    base: "./",
     plugins: [
       react(),
       tailwindcss(),
