@@ -46,6 +46,7 @@
       "@serialport/bindings-cpp",
       "@tailwindcss/oxide",
       "core-js",
+      "electron",
       "esbuild",
       "simple-git-hooks"
     ]

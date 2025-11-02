@@ -33,7 +33,7 @@ const indexRoute = createRoute({
   component: Dashboard,
   loader: () => {
     // Redirect to the broadcast messages page on initial load
-    return redirect({ to: "/messages/broadcast/0", replace: true });
+    return redirect({ to: "./messages/broadcast/0", replace: true });
   },
 });
 

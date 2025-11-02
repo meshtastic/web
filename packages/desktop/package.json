@@ -1,0 +1,22 @@
+{
+  "name": "desktop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "cd ../web && pnpm run build && cd ../desktop/ && rm -rf dist && mkdir -p dist/ && cp -r ../web/dist ./dist/built-web-app && tsc && electron ./dist/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.11.1",
+  "dependencies": {
+    "electron": "^39.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
