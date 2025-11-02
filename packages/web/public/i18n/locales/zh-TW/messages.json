@@ -1,0 +1,39 @@
+{
+  "page": {
+    "title": "訊息：{{chatName}}",
+    "placeholder": "輸入訊息"
+  },
+  "emptyState": {
+    "title": "選擇一個對話",
+    "text": "尚未收到任何訊息。"
+  },
+  "selectChatPrompt": {
+    "text": "選擇一個頻道或節點來開始聊天。"
+  },
+  "sendMessage": {
+    "placeholder": "請在此輸入訊息……",
+    "sendButton": "傳送"
+  },
+  "actionsMenu": {
+    "addReactionLabel": "新增反應",
+    "replyLabel": "回覆"
+  },
+  "deliveryStatus": {
+    "delivered": {
+      "label": "訊息已送達",
+      "displayText": "訊息已送達"
+    },
+    "failed": {
+      "label": "訊息傳送失敗",
+      "displayText": "傳送失敗"
+    },
+    "unknown": {
+      "label": "訊息狀態未知",
+      "displayText": "不明狀態"
+    },
+    "waiting": {
+      "label": "訊息傳送中",
+      "displayText": "等待送達"
+    }
+  }
+}
