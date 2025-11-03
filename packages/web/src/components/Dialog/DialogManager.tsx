@@ -3,7 +3,6 @@ import { FactoryResetDeviceDialog } from "@app/components/Dialog/FactoryResetDev
 import { ClearAllStoresDialog } from "@components/Dialog/ClearAllStoresDialog/ClearAllStoresDialog.tsx";
 import { ClientNotificationDialog } from "@components/Dialog/ClientNotificationDialog/ClientNotificationDialog.tsx";
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
-import { DeviceNameDialog } from "@components/Dialog/DeviceNameDialog.tsx";
 import { ImportDialog } from "@components/Dialog/ImportDialog.tsx";
 import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog.tsx";
@@ -47,12 +46,6 @@ export const DialogManager = () => {
           setDialogOpen("reboot", false);
         }}
       />
-      {/* <DeviceNameDialog
-        open={dialog.deviceName}
-        onOpenChange={(open) => {
-          setDialogOpen("deviceName", open);
-        }}
-      /> */}
       <RemoveNodeDialog
         open={dialog.nodeRemoval}
         onOpenChange={(open) => {

@@ -1,5 +1,4 @@
 import { create, toBinary } from "@bufbuild/protobuf";
-import { featureFlags } from "@core/services/featureFlags";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { type MeshDevice, Protobuf, Types } from "@meshtastic/core";
