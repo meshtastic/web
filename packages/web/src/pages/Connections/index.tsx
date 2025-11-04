@@ -57,6 +57,7 @@ export const Connections = () => {
     removeConnection,
     setDefaultConnection,
     refreshStatuses,
+    syncConnectionStatuses,
   } = useConnections();
   const { toast } = useToast();
   const navigate = useNavigate({ from: "/" });
@@ -64,9 +65,10 @@ export const Connections = () => {
   const isURLHTTPS = useMemo(() => location.protocol === "https:", []);
   const { t } = useTranslation("connections");
 
-  // On first mount, try to refresh statuses
+  // On first mount, sync statuses and refresh
   // biome-ignore lint/correctness/useExhaustiveDependencies: This can cause the icon to refresh too often
   useEffect(() => {
+    syncConnectionStatuses();
     refreshStatuses();
   }, []);
 
