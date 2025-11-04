@@ -78,7 +78,7 @@ export function deserializeKey(keyStr: ConfigChangeKeyString): ConfigChangeKey {
         type: "moduleConfig",
         variant: variant as ValidModuleConfigType,
       };
-    case "channels":
+    case "channel":
       return {
         type: "channel",
         index: Number(variant) as Types.ChannelNumber,
@@ -126,7 +126,7 @@ export function hasChannelChange(
   registry: ChangeRegistry,
   index: Types.ChannelNumber,
 ): boolean {
-  return registry.changes.has(serializeKey({ type: "channels", index }));
+  return registry.changes.has(serializeKey({ type: "channel", index }));
 }
 
 /**

@@ -42,7 +42,9 @@ type DialogState = {
   protocol: "http" | "https";
   url: string;
   testStatus: TestingStatus;
-  btSelected: { id: string; name?: string; device?: BluetoothDevice } | undefined;
+  btSelected:
+    | { id: string; name?: string; device?: BluetoothDevice }
+    | undefined;
   serialSelected: { vendorId?: number; productId?: number } | undefined;
 };
 
@@ -55,7 +57,9 @@ type DialogAction =
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
   | {
       type: "SET_BT_SELECTED";
-      payload: { id: string; name?: string; device?: BluetoothDevice } | undefined;
+      payload:
+        | { id: string; name?: string; device?: BluetoothDevice }
+        | undefined;
     }
   | {
       type: "SET_SERIAL_SELECTED";
@@ -596,18 +600,21 @@ export default function AddConnectionDialog({
   const currentPane = PANES[state.tab];
   const canCreate = useMemo(() => currentPane.validate(), [currentPane]);
 
-  const submit = (fn: (p: NewConnection, device?: BluetoothDevice) => Promise<void>) => async () => {
-    if (!canCreate) {
-      return;
-    }
-    const payload = currentPane.build();
+  const submit =
+    (fn: (p: NewConnection, device?: BluetoothDevice) => Promise<void>) =>
+    async () => {
+      if (!canCreate) {
+        return;
+      }
+      const payload = currentPane.build();
 
-    if (!payload) {
-      return;
-    }
-    const btDevice = state.tab === "bluetooth" ? state.btSelected?.device : undefined;
-    await fn(payload, btDevice);
-  };
+      if (!payload) {
+        return;
+      }
+      const btDevice =
+        state.tab === "bluetooth" ? state.btSelected?.device : undefined;
+      await fn(payload, btDevice);
+    };
 
   return (
     <DialogWrapper
