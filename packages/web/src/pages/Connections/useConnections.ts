@@ -46,6 +46,7 @@ export function useConnections() {
   const { addNodeDB } = useNodeDBStore();
   const { addMessageStore } = useMessageStore();
   const { setSelectedDevice } = useAppStore();
+  const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
 
   const updateStatus = useCallback(
     (id: ConnectionId, status: ConnectionStatus, error?: string) => {
@@ -483,6 +484,25 @@ export function useConnections() {
     await Promise.all([...httpChecks, ...btChecks, ...serialChecks]);
   }, [connections, updateSavedConnection]);
 
+  const syncConnectionStatuses = useCallback(() => {
+    // Find which connection corresponds to the currently selected device
+    const activeConnection = connections.find(
+      (c) => c.meshDeviceId === selectedDeviceId,
+    );
+
+    // Update all connection statuses
+    connections.forEach((conn) => {
+      const shouldBeConnected = activeConnection?.id === conn.id;
+
+      // Update status if it doesn't match reality
+      if (shouldBeConnected && conn.status !== "connected") {
+        updateSavedConnection(conn.id, { status: "connected" });
+      } else if (!shouldBeConnected && conn.status === "connected") {
+        updateSavedConnection(conn.id, { status: "disconnected" });
+      }
+    });
+  }, [connections, selectedDeviceId, updateSavedConnection]);
+
   return {
     connections,
     addConnection,
@@ -492,5 +512,6 @@ export function useConnections() {
     removeConnection,
     setDefaultConnection,
     refreshStatuses,
+    syncConnectionStatuses,
   };
 }
