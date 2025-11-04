@@ -1,4 +1,5 @@
 import { Avatar } from "@components/UI/Avatar.tsx";
+import { Skeleton } from "@components/UI/Skeleton.tsx";
 import {
   Tooltip,
   TooltipArrow,
@@ -51,6 +52,26 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   const { getNode, getMyNode } = useNodeDB();
   const { t, i18n } = useTranslation("messages");
 
+  const myNodeNum = useMemo(() => getMyNode()?.num, [getMyNode]);
+
+  // Show loading state when myNodeNum is not yet available
+  if (myNodeNum === undefined) {
+    return (
+      <li className="group w-full py-2 relative list-none rounded-md">
+        <div className="grid grid-cols-[auto_1fr] gap-x-2">
+          <Skeleton className="size-8 rounded-full" />
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <div className="flex items-center gap-1.5">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-3 w-12" />
+            </div>
+            <Skeleton className="h-4 w-full" />
+          </div>
+        </div>
+      </li>
+    );
+  }
+
   const MESSAGE_STATUS_MAP = useMemo(
     (): Record<MessageState, MessageStatusInfo> => ({
       [MessageState.Ack]: {
@@ -95,8 +116,6 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   const messageUser: Protobuf.Mesh.NodeInfo | null | undefined = useMemo(() => {
     return message.from != null ? getNode(message.from) : null;
   }, [getNode, message.from]);
-
-  const myNodeNum = useMemo(() => getMyNode().num, [getMyNode]);
 
   const { displayName, shortName, isFavorite } = useMemo(() => {
     const userIdHex = message.from.toString(16).toUpperCase().padStart(2, "0");
