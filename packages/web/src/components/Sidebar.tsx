@@ -6,6 +6,7 @@ import {
   type Page,
   useAppStore,
   useDevice,
+  useDeviceStore,
   useNodeDB,
   useSidebar,
 } from "@core/stores";
@@ -70,10 +71,17 @@ export const Sidebar = ({ children }: SidebarProps) => {
   const { hardware, metadata, unreadCounts, setDialogOpen } = useDevice();
   const { getNode, getNodesLength } = useNodeDB();
   const { setCommandPaletteOpen } = useAppStore();
+  const savedConnections = useDeviceStore((s) => s.savedConnections);
   const myNode = getNode(hardware.myNodeNum);
   const { isCollapsed } = useSidebar();
   const { t } = useTranslation("ui");
   const navigate = useNavigate({ from: "/" });
+
+  // Get the active connection (connected > default > first)
+  const activeConnection =
+    savedConnections.find((c) => c.status === "connected") ||
+    savedConnections.find((c) => c.isDefault) ||
+    savedConnections[0];
 
   const pathname = useLocation({
     select: (location) => location.pathname.replace(/^\//, ""),
@@ -210,6 +218,8 @@ export const Sidebar = ({ children }: SidebarProps) => {
                   ? Math.abs(myNode.deviceMetrics?.voltage)
                   : undefined,
             }}
+            connectionStatus={activeConnection?.status}
+            connectionName={activeConnection?.name}
           />
         )}
       </div>

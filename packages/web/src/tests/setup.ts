@@ -15,7 +15,7 @@ import commonEN from "@public/i18n/locales/en/common.json" with {
 import configEN from "@public/i18n/locales/en/config.json" with {
   type: "json",
 };
-import dashboardEN from "@public/i18n/locales/en/dashboard.json" with {
+import connectionsEN from "@public/i18n/locales/en/connections.json" with {
   type: "json",
 };
 import dialogEN from "@public/i18n/locales/en/dialog.json" with {
@@ -55,7 +55,7 @@ const appNamespaces = [
   "common",
   "config",
   "moduleConfig",
-  "dashboard",
+  "connections",
   "dialog",
   "messages",
   "nodes",
@@ -78,7 +78,7 @@ i18n.use(initReactI18next).init({
       common: commonEN,
       config: configEN,
       moduleConfig: moduleConfigEN,
-      dashboard: dashboardEN,
+      connections: connectionsEN,
       dialog: dialogEN,
       messages: messagesEN,
       nodes: nodesEN,

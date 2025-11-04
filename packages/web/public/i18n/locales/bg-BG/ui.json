@@ -1,229 +1,228 @@
 {
-  "navigation": {
-    "title": "Навигация",
-    "messages": "Съобщения",
-    "map": "Карта",
-    "settings": "Настройки",
-    "channels": "Канали",
-    "radioConfig": "Конфигурация на радиото",
-    "deviceConfig": "Конфигуриране на устройството",
-    "moduleConfig": "Конфигурация на модула",
-    "nodes": "Възли"
-  },
-  "app": {
-    "title": "Meshtastic",
-    "logo": "Лого на Meshtastic"
-  },
-  "sidebar": {
-    "collapseToggle": {
-      "button": {
-        "open": "Отваряне на страничната лента",
-        "close": "Затваряне на страничната лента"
-      }
-    },
-    "deviceInfo": {
-      "volts": "{{voltage}} волта",
-      "firmware": {
-        "title": "Фърмуер",
-        "version": "v{{version}}",
-        "buildDate": "Дата на компилация: {{date}}"
-      }
-    }
-  },
-  "batteryStatus": {
-    "charging": "{{level}}% зареждане",
-    "pluggedIn": "Включен в ел. мрежа",
-    "title": "Батерия"
-  },
-  "search": {
-    "nodes": "Търсене на възли...",
-    "channels": "Търсене на канали...",
-    "commandPalette": "Търсене на команди..."
-  },
-  "toast": {
-    "positionRequestSent": {
-      "title": "Заявката за позиция е изпратена."
-    },
-    "requestingPosition": {
-      "title": "Запитване за позиция, моля изчакайте..."
-    },
-    "sendingTraceroute": {
-      "title": "Sending Traceroute, please wait..."
-    },
-    "tracerouteSent": {
-      "title": "Traceroute sent."
-    },
-    "savedChannel": {
-      "title": "Запазен канал: {{channelName}}"
-    },
-    "messages": {
-      "pkiEncryption": {
-        "title": "Чатът използва PKI криптиране."
-      },
-      "pskEncryption": {
-        "title": "Чатът използва PSK криптиране."
-      }
-    },
-    "configSaveError": {
-      "title": "Грешка при запазване на конфигурацията",
-      "description": "Възникна грешка при запазване на конфигурацията."
-    },
-    "validationError": {
-      "title": "Съществуват грешки в конфигурацията",
-      "description": "Моля, коригирайте грешките в конфигурацията, преди да я запазите."
-    },
-    "saveSuccess": {
-      "title": "Запазване на конфигурацията",
-      "description": "Промяната в конфигурацията {{case}} е запазена."
-    },
-    "saveAllSuccess": {
-      "title": "Saved",
-      "description": "All configuration changes have been saved."
-    },
-    "favoriteNode": {
-      "title": "{{action}} {{nodeName}} {{direction}} любими.",
-      "action": {
-        "added": "Добавен",
-        "removed": "Премахнат",
-        "to": "в",
-        "from": "от"
-      }
-    },
-    "ignoreNode": {
-      "title": "{{action}} {{nodeName}} {{direction}} списък с игнорирани",
-      "action": {
-        "added": "Добавен",
-        "removed": "Премахнат",
-        "to": "в",
-        "from": "от"
-      }
-    }
-  },
-  "notifications": {
-    "copied": {
-      "label": "Копирано!"
-    },
-    "copyToClipboard": {
-      "label": "Копиране в клипборда"
-    },
-    "hidePassword": {
-      "label": "Скриване на паролата"
-    },
-    "showPassword": {
-      "label": "Показване на паролата"
-    },
-    "deliveryStatus": {
-      "delivered": "Доставено",
-      "failed": "Неуспешна доставка",
-      "waiting": "Изчакване",
-      "unknown": "Неизвестно"
-    }
-  },
-  "general": {
-    "label": "General"
-  },
-  "hardware": {
-    "label": "Хардуер"
-  },
-  "metrics": {
-    "label": "Метрики"
-  },
-  "role": {
-    "label": "Роля"
-  },
-  "filter": {
-    "label": "Филтър"
-  },
-  "advanced": {
-    "label": "Разширени"
-  },
-  "clearInput": {
-    "label": "Clear input"
-  },
-  "resetFilters": {
-    "label": "Нулиране на филтрите"
-  },
-  "nodeName": {
-    "label": "Име/номер на възел",
-    "placeholder": "Meshtastic 1234"
-  },
-  "airtimeUtilization": {
-    "label": "Използване на ефира (%)",
-    "short": "Airtime Util. (%)"
-  },
-  "batteryLevel": {
-    "label": "Ниво на батерията (%)",
-    "labelText": "Ниво на батерията (%): {{value}}"
-  },
-  "batteryVoltage": {
-    "label": "Напрежение на батерията (V)",
-    "title": "Напрежение"
-  },
-  "channelUtilization": {
-    "label": "Използване на канала (%)",
-    "short": "Channel Util. (%)"
-  },
-  "hops": {
-    "direct": "Директно",
-    "label": "Брой хопове",
-    "text": "Брой хопове: {{value}}"
-  },
-  "lastHeard": {
-    "label": "Последно чут",
-    "labelText": "Последно чут: {{value}}",
-    "nowLabel": "Сега"
-  },
-  "snr": {
-    "label": "SNR (db)"
-  },
-  "favorites": {
-    "label": "Любими"
-  },
-  "hide": {
-    "label": "Скриване"
-  },
-  "showOnly": {
-    "label": "Показване само"
-  },
-  "viaMqtt": {
-    "label": "Свързан чрез MQTT"
-  },
-  "hopsUnknown": {
-    "label": "Неизвестен брой хопове"
-  },
-  "showUnheard": {
-    "label": "Никога не е чуван"
-  },
-  "language": {
-    "label": "Език",
-    "changeLanguage": "Промяна на езика"
-  },
-  "theme": {
-    "dark": "Тъмна",
-    "light": "Светла",
-    "system": "Автоматично",
-    "changeTheme": "Промяна на цветовата схема"
-  },
-  "errorPage": {
-    "title": "Това е малко смущаващо...",
-    "description1": "Наистина съжаляваме, но възникна грешка в web клиента, която доведе до срив. <br /> Това не би трябвало да се случва и работим усилено, за да го поправим.",
-    "description2": "Най-добрият начин да предотвратите това да се случи отново с вас или с някой друг е да ни съобщите за проблема.",
-    "reportInstructions": "Моля, включете следната информация в доклада си:",
-    "reportSteps": {
-      "step1": "Какво правехте, когато възникна грешката",
-      "step2": "Какво очаквахте да се случи",
-      "step3": "Какво всъщност се случи",
-      "step4": "Всяка друга подходяща информация"
-    },
-    "reportLink": "Можете да съобщите за проблема в нашия <0>GitHub</0>",
-    "dashboardLink": "Връщане към <0>таблото</0>",
-    "detailsSummary": "Подробности за грешката",
-    "errorMessageLabel": "Съобщение за грешка:",
-    "stackTraceLabel": "Stack trace:",
-    "fallbackError": "{{error}}"
-  },
-  "footer": {
-    "text": "Задвижвано от <0>▲ Vercel</0> | Meshtastic® е регистрирана търговска марка на Meshtastic LLC. | <1>Правна информация</1>",
-    "commitSha": "Commit SHA: {{sha}}"
-  }
+	"navigation": {
+		"title": "Навигация",
+		"messages": "Съобщения",
+		"map": "Карта",
+		"config": "Конфигурация",
+		"radioConfig": "Конфигурация на радиото",
+		"moduleConfig": "Конфигурация на модула",
+		"channels": "Канали",
+		"nodes": "Възли"
+	},
+	"app": {
+		"title": "Meshtastic",
+		"logo": "Лого на Meshtastic"
+	},
+	"sidebar": {
+		"collapseToggle": {
+			"button": {
+				"open": "Отваряне на страничната лента",
+				"close": "Затваряне на страничната лента"
+			}
+		},
+		"deviceInfo": {
+			"volts": "{{voltage}} волта",
+			"firmware": {
+				"title": "Фърмуер",
+				"version": "v{{version}}",
+				"buildDate": "Дата на компилация: {{date}}"
+			},
+			"deviceName": {
+				"title": "Име на устройството",
+				"changeName": "Промяна на името на устройството",
+				"placeholder": "Въвеждане на име на устройството"
+			},
+			"editDeviceName": "Редактиране на името на устройство"
+		}
+	},
+	"batteryStatus": {
+		"charging": "{{level}}% зареждане",
+		"pluggedIn": "Включен в ел. мрежа",
+		"title": "Батерия"
+	},
+	"search": {
+		"nodes": "Търсене на възли...",
+		"channels": "Търсене на канали...",
+		"commandPalette": "Търсене на команди..."
+	},
+	"toast": {
+		"positionRequestSent": {
+			"title": "Заявката за позиция е изпратена."
+		},
+		"requestingPosition": {
+			"title": "Запитване за позиция, моля изчакайте..."
+		},
+		"sendingTraceroute": {
+			"title": "Sending Traceroute, please wait..."
+		},
+		"tracerouteSent": {
+			"title": "Traceroute sent."
+		},
+		"savedChannel": {
+			"title": "Запазен канал: {{channelName}}"
+		},
+		"messages": {
+			"pkiEncryption": {
+				"title": "Чатът използва PKI криптиране."
+			},
+			"pskEncryption": {
+				"title": "Чатът използва PSK криптиране."
+			}
+		},
+		"configSaveError": {
+			"title": "Грешка при запазване на конфигурацията",
+			"description": "Възникна грешка при запазване на конфигурацията."
+		},
+		"validationError": {
+			"title": "Съществуват грешки в конфигурацията",
+			"description": "Моля, коригирайте грешките в конфигурацията, преди да я запазите."
+		},
+		"saveSuccess": {
+			"title": "Запазване на конфигурацията",
+			"description": "Промяната в конфигурацията {{case}} е запазена."
+		},
+		"favoriteNode": {
+			"title": "{{action}} {{nodeName}} {{direction}} любими.",
+			"action": {
+				"added": "Добавен",
+				"removed": "Премахнат",
+				"to": "в",
+				"from": "от"
+			}
+		},
+		"ignoreNode": {
+			"title": "{{action}} {{nodeName}} {{direction}} списък с игнорирани",
+			"action": {
+				"added": "Добавен",
+				"removed": "Премахнат",
+				"to": "в",
+				"from": "от"
+			}
+		}
+	},
+	"notifications": {
+		"copied": {
+			"label": "Копирано!"
+		},
+		"copyToClipboard": {
+			"label": "Копиране в клипборда"
+		},
+		"hidePassword": {
+			"label": "Скриване на паролата"
+		},
+		"showPassword": {
+			"label": "Показване на паролата"
+		},
+		"deliveryStatus": {
+			"delivered": "Доставено",
+			"failed": "Неуспешна доставка",
+			"waiting": "Изчакване",
+			"unknown": "Неизвестно"
+		}
+	},
+	"general": {
+		"label": "General"
+	},
+	"hardware": {
+		"label": "Хардуер"
+	},
+	"metrics": {
+		"label": "Метрики"
+	},
+	"role": {
+		"label": "Роля"
+	},
+	"filter": {
+		"label": "Филтър"
+	},
+	"advanced": {
+		"label": "Разширени"
+	},
+	"clearInput": {
+		"label": "Clear input"
+	},
+	"resetFilters": {
+		"label": "Нулиране на филтрите"
+	},
+	"nodeName": {
+		"label": "Име/номер на възел",
+		"placeholder": "Meshtastic 1234"
+	},
+	"airtimeUtilization": {
+		"label": "Използване на ефира (%)"
+	},
+	"batteryLevel": {
+		"label": "Ниво на батерията (%)",
+		"labelText": "Ниво на батерията (%): {{value}}"
+	},
+	"batteryVoltage": {
+		"label": "Напрежение на батерията (V)",
+		"title": "Напрежение"
+	},
+	"channelUtilization": {
+		"label": "Използване на канала (%)"
+	},
+	"hops": {
+		"direct": "Директно",
+		"label": "Брой хопове",
+		"text": "Брой хопове: {{value}}"
+	},
+	"lastHeard": {
+		"label": "Последно чут",
+		"labelText": "Последно чут: {{value}}",
+		"nowLabel": "Сега"
+	},
+	"snr": {
+		"label": "SNR (db)"
+	},
+	"favorites": {
+		"label": "Любими"
+	},
+	"hide": {
+		"label": "Скриване"
+	},
+	"showOnly": {
+		"label": "Показване само"
+	},
+	"viaMqtt": {
+		"label": "Свързан чрез MQTT"
+	},
+	"hopsUnknown": {
+		"label": "Неизвестен брой хопове"
+	},
+	"showUnheard": {
+		"label": "Никога не е чуван"
+	},
+	"language": {
+		"label": "Език",
+		"changeLanguage": "Промяна на езика"
+	},
+	"theme": {
+		"dark": "Тъмна",
+		"light": "Светла",
+		"system": "Автоматично",
+		"changeTheme": "Промяна на цветовата схема"
+	},
+	"errorPage": {
+		"title": "Това е малко смущаващо...",
+		"description1": "Наистина съжаляваме, но възникна грешка в web клиента, която доведе до срив. <br /> Това не би трябвало да се случва и работим усилено, за да го поправим.",
+		"description2": "Най-добрият начин да предотвратите това да се случи отново с вас или с някой друг е да ни съобщите за проблема.",
+		"reportInstructions": "Моля, включете следната информация в доклада си:",
+		"reportSteps": {
+			"step1": "Какво правехте, когато възникна грешката",
+			"step2": "Какво очаквахте да се случи",
+			"step3": "Какво всъщност се случи",
+			"step4": "Всяка друга подходяща информация"
+		},
+		"reportLink": "Можете да съобщите за проблема в нашия <0>GitHub</0>",
+		"connectionsLink": "Връщане към <0>таблото</0>",
+		"detailsSummary": "Подробности за грешката",
+		"errorMessageLabel": "Съобщение за грешка:",
+		"stackTraceLabel": "Stack trace:",
+		"fallbackError": "{{error}}"
+	},
+	"footer": {
+		"text": "Задвижвано от <0>▲ Vercel</0> | Meshtastic® е регистрирана търговска марка на Meshtastic LLC. | <1>Правна информация</1>",
+		"commitSha": "Commit SHA: {{sha}}"
+	}
 }

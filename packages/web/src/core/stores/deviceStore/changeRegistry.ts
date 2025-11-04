@@ -29,7 +29,7 @@ export type ValidModuleConfigType =
 export type ConfigChangeKey =
   | { type: "config"; variant: ValidConfigType }
   | { type: "moduleConfig"; variant: ValidModuleConfigType }
-  | { type: "channel"; index: Types.ChannelNumber }
+  | { type: "channels"; index: Types.ChannelNumber }
   | { type: "user" };
 
 // Serialized key for Map storage
@@ -57,7 +57,7 @@ export function serializeKey(key: ConfigChangeKey): ConfigChangeKeyString {
       return `config:${key.variant}`;
     case "moduleConfig":
       return `moduleConfig:${key.variant}`;
-    case "channel":
+    case "channels":
       return `channel:${key.index}`;
     case "user":
       return "user";
@@ -78,9 +78,9 @@ export function deserializeKey(keyStr: ConfigChangeKeyString): ConfigChangeKey {
         type: "moduleConfig",
         variant: variant as ValidModuleConfigType,
       };
-    case "channel":
+    case "channels":
       return {
-        type: "channel",
+        type: "channels",
         index: Number(variant) as Types.ChannelNumber,
       };
     case "user":
@@ -126,7 +126,7 @@ export function hasChannelChange(
   registry: ChangeRegistry,
   index: Types.ChannelNumber,
 ): boolean {
-  return registry.changes.has(serializeKey({ type: "channel", index }));
+  return registry.changes.has(serializeKey({ type: "channels", index }));
 }
 
 /**
@@ -171,7 +171,7 @@ export function getChannelChangeCount(registry: ChangeRegistry): number {
   let count = 0;
   for (const keyStr of registry.changes.keys()) {
     const key = deserializeKey(keyStr);
-    if (key.type === "channel") {
+    if (key.type === "channels") {
       count++;
     }
   }
@@ -212,7 +212,7 @@ export function getAllModuleConfigChanges(
 export function getAllChannelChanges(registry: ChangeRegistry): ChangeEntry[] {
   const changes: ChangeEntry[] = [];
   for (const entry of registry.changes.values()) {
-    if (entry.key.type === "channel") {
+    if (entry.key.type === "channels") {
       changes.push(entry);
     }
   }

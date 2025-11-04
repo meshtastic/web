@@ -1,0 +1,12 @@
+{
+	"connections": {
+		"title": "Свързани устройства",
+		"description": "Управлявайте свързаните си устройства Meshtastic.",
+		"connectionType_ble": "BLE",
+		"connectionType_serial": "Серийна",
+		"connectionType_network": "Мрежа",
+		"noDevicesTitle": "Няма свързани устройства",
+		"noDevicesDescription": "Свържете ново устройство, за да започнете.",
+		"button_newConnection": "Нова връзка"
+	}
+}

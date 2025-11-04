@@ -1,5 +1,4 @@
 import { create, toBinary } from "@bufbuild/protobuf";
-import { featureFlags } from "@core/services/featureFlags";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
 import { createStorage } from "@core/stores/utils/indexDB.ts";
 import { type MeshDevice, Protobuf, Types } from "@meshtastic/core";
@@ -26,6 +25,8 @@ import {
   serializeKey,
 } from "./changeRegistry.ts";
 import type {
+  Connection,
+  ConnectionId,
   Dialogs,
   DialogVariant,
   ValidConfigType,
@@ -142,6 +143,16 @@ export interface deviceState {
   removeDevice: (id: number) => void;
   getDevices: () => Device[];
   getDevice: (id: number) => Device | undefined;
+
+  // Saved connections management
+  savedConnections: Connection[];
+  addSavedConnection: (connection: Connection) => void;
+  updateSavedConnection: (
+    id: ConnectionId,
+    updates: Partial<Connection>,
+  ) => void;
+  removeSavedConnection: (id: ConnectionId) => void;
+  getSavedConnections: () => Connection[];
 }
 
 interface PrivateDeviceState extends deviceState {
@@ -150,6 +161,7 @@ interface PrivateDeviceState extends deviceState {
 
 type DevicePersisted = {
   devices: Map<number, DeviceData>;
+  savedConnections: Connection[];
 };
 
 function deviceFactory(
@@ -894,6 +906,7 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
   get,
 ) => ({
   devices: new Map(),
+  savedConnections: [],
 
   addDevice: (id) => {
     const existing = get().devices.get(id);
@@ -924,6 +937,41 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
   },
   getDevices: () => Array.from(get().devices.values()),
   getDevice: (id) => get().devices.get(id),
+
+  addSavedConnection: (connection) => {
+    set(
+      produce<PrivateDeviceState>((draft) => {
+        draft.savedConnections.push(connection);
+      }),
+    );
+  },
+  updateSavedConnection: (id, updates) => {
+    set(
+      produce<PrivateDeviceState>((draft) => {
+        const conn = draft.savedConnections.find(
+          (c: Connection) => c.id === id,
+        );
+        if (conn) {
+          for (const key in updates) {
+            if (Object.hasOwn(updates, key)) {
+              (conn as Record<string, unknown>)[key] =
+                updates[key as keyof typeof updates];
+            }
+          }
+        }
+      }),
+    );
+  },
+  removeSavedConnection: (id) => {
+    set(
+      produce<PrivateDeviceState>((draft) => {
+        draft.savedConnections = draft.savedConnections.filter(
+          (c: Connection) => c.id !== id,
+        );
+      }),
+    );
+  },
+  getSavedConnections: () => get().savedConnections,
 });
 
 const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
@@ -943,6 +991,7 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
         },
       ]),
     ),
+    savedConnections: s.savedConnections,
   }),
   onRehydrateStorage: () => (state) => {
     if (!state) {
@@ -980,14 +1029,6 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
   },
 };
 
-// Add persist middleware on the store if the feature flag is enabled
-const persistDevices = featureFlags.get("persistDevices");
-console.debug(
-  `DeviceStore: Persisting devices is ${persistDevices ? "enabled" : "disabled"}`,
+export const useDeviceStore = createStore(
+  subscribeWithSelector(persist(deviceStoreInitializer, persistOptions)),
 );
-
-export const useDeviceStore = persistDevices
-  ? createStore(
-      subscribeWithSelector(persist(deviceStoreInitializer, persistOptions)),
-    )
-  : createStore(subscribeWithSelector(deviceStoreInitializer));
