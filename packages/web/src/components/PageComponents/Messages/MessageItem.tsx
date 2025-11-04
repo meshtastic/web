@@ -1,5 +1,4 @@
 import { Avatar } from "@components/UI/Avatar.tsx";
-import { Skeleton } from "@components/UI/Skeleton.tsx";
 import {
   Tooltip,
   TooltipArrow,
@@ -7,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
-import { MessageState, useDevice, useNodeDB } from "@core/stores";
+import { MessageState, useAppStore, useDevice, useNodeDB } from "@core/stores";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
 import { type Protobuf, Types } from "@meshtastic/core";
@@ -15,6 +14,50 @@ import type { LucideIcon } from "lucide-react";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+
+// Cache for pending promises
+const myNodePromises = new Map<string, Promise<Protobuf.Mesh.NodeInfo>>();
+
+// Hook that suspends when myNode is not available
+function useSuspendingMyNode() {
+  const { getMyNode } = useNodeDB();
+  const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
+  const myNode = getMyNode();
+
+  if (!myNode) {
+    // Use the selected device ID to cache promises per device
+    const deviceKey = `device-${selectedDeviceId}`;
+
+    if (!myNodePromises.has(deviceKey)) {
+      const promise = new Promise<Protobuf.Mesh.NodeInfo>((resolve) => {
+        // Poll for myNode to become available
+        const checkInterval = setInterval(() => {
+          const node = getMyNode();
+          if (node) {
+            console.log(
+              "[MessageItem] myNode now available, resolving promise",
+            );
+            clearInterval(checkInterval);
+            myNodePromises.delete(deviceKey);
+            resolve(node);
+          }
+        }, 100);
+
+        setTimeout(() => {
+          clearInterval(checkInterval);
+          myNodePromises.delete(deviceKey);
+        }, 10000);
+      });
+
+      myNodePromises.set(deviceKey, promise);
+    }
+
+    // Throw the promise to trigger Suspense
+    throw myNodePromises.get(deviceKey);
+  }
+
+  return myNode;
+}
 
 // import { MessageActionsMenu } from "@components/PageComponents/Messages/MessageActionsMenu.tsx"; // TODO: Uncomment when actions menu is implemented
 
@@ -49,28 +92,12 @@ interface MessageItemProps {
 
 export const MessageItem = ({ message }: MessageItemProps) => {
   const { config } = useDevice();
-  const { getNode, getMyNode } = useNodeDB();
+  const { getNode } = useNodeDB();
   const { t, i18n } = useTranslation("messages");
 
-  const myNodeNum = useMemo(() => getMyNode()?.num, [getMyNode]);
-
-  // Show loading state when myNodeNum is not yet available
-  if (myNodeNum === undefined) {
-    return (
-      <li className="group w-full py-2 relative list-none rounded-md">
-        <div className="grid grid-cols-[auto_1fr] gap-x-2">
-          <Skeleton className="size-8 rounded-full" />
-          <div className="flex flex-col gap-1.5 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-3 w-12" />
-            </div>
-            <Skeleton className="h-4 w-full" />
-          </div>
-        </div>
-      </li>
-    );
-  }
+  // This will suspend if myNode is not available yet
+  const myNode = useSuspendingMyNode();
+  const myNodeNum = myNode.num;
 
   const MESSAGE_STATUS_MAP = useMemo(
     (): Record<MessageState, MessageStatusInfo> => ({

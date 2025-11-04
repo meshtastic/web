@@ -123,11 +123,11 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
     });
 
     if (deepCompareConfig(channel, payload, true)) {
-      removeChange({ type: "channels", index: channel.index });
+      removeChange({ type: "channel", index: channel.index });
       return;
     }
 
-    setChange({ type: "channels", index: channel.index }, payload, channel);
+    setChange({ type: "channel", index: channel.index }, payload, channel);
   };
 
   const preSharedKeyRegenerate = async () => {
