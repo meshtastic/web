@@ -107,7 +107,7 @@ export const Connections = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center ml-2 gap-2">
           <Button onClick={() => setAddOpen(true)} className="gap-2">
             <PlugZap className="size-4" />
             {t("button.addConnection")}
@@ -271,7 +271,7 @@ function ConnectionCard({
   const isError = connection.status === "error";
 
   return (
-    <Card>
+    <Card className="flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -334,7 +334,7 @@ function ConnectionCard({
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>
-                        {t("deleteConnetion")}
+                        {t("deleteConnection")}
                       </AlertDialogTitle>
                       <AlertDialogDescription>
                         {t("areYouSure", { name: connection.name })}
@@ -376,7 +376,7 @@ function ConnectionCard({
           </p>
         )}
       </CardContent>
-      <CardFooter className="flex items-center gap-2">
+      <CardFooter className="flex items-center gap-2 mt-auto">
         {isConnected ? (
           <Button
             variant="subtle"

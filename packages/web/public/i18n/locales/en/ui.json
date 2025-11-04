@@ -8,6 +8,7 @@
     "radioConfig": "Radio Config",
     "deviceConfig": "Device Config",
     "moduleConfig": "Module Config",
+    "manageConnections": "Manage Connections",
     "nodes": "Nodes"
   },
   "app": {

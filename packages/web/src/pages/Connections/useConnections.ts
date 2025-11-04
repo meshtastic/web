@@ -279,6 +279,22 @@ export function useConnections() {
           if (!port) {
             throw new Error("Serial port not available. Re-select the port.");
           }
+
+          // Ensure the port is closed before opening it
+          const portWithStreams = port as SerialPort & {
+            readable: ReadableStream | null;
+            writable: WritableStream | null;
+            close: () => Promise<void>;
+          };
+          if (portWithStreams.readable || portWithStreams.writable) {
+            try {
+              await portWithStreams.close();
+              await new Promise((resolve) => setTimeout(resolve, 100));
+            } catch (err) {
+              console.warn("Error closing port before reconnect:", err);
+            }
+          }
+
           live.current.serial.set(id, port);
 
           const transport = await TransportWebSerial.createFromPort(port);
@@ -314,24 +330,26 @@ export function useConnections() {
           live.current.meshDevices.delete(id);
         }
 
-        // Then disconnect the underlying transport
         if (conn.type === "bluetooth") {
           const dev = live.current.bt.get(id);
           if (dev?.gatt?.connected) {
             dev.gatt.disconnect();
           }
-          // Don't delete the device from live.current.bt - keep it for reconnection
-          // The device is still paired with the browser, so we can reuse it
         }
         if (conn.type === "serial") {
           const port = live.current.serial.get(id);
           if (port) {
             try {
-              await (
-                port as SerialPort & { close: () => Promise<void> }
-              ).close();
-            } catch {
-              // Ignore errors
+              const portWithClose = port as SerialPort & {
+                close: () => Promise<void>;
+                readable: ReadableStream | null;
+              };
+              // Only close if the port is open (has readable stream)
+              if (portWithClose.readable) {
+                await portWithClose.close();
+              }
+            } catch (err) {
+              console.warn("Error closing serial port:", err);
             }
             live.current.serial.delete(id);
           }
