@@ -42,7 +42,7 @@ type DialogState = {
   protocol: "http" | "https";
   url: string;
   testStatus: TestingStatus;
-  btSelected: { id: string; name?: string } | undefined;
+  btSelected: { id: string; name?: string; device?: BluetoothDevice } | undefined;
   serialSelected: { vendorId?: number; productId?: number } | undefined;
 };
 
@@ -55,7 +55,7 @@ type DialogAction =
   | { type: "SET_TEST_STATUS"; payload: TestingStatus }
   | {
       type: "SET_BT_SELECTED";
-      payload: { id: string; name?: string } | undefined;
+      payload: { id: string; name?: string; device?: BluetoothDevice } | undefined;
     }
   | {
       type: "SET_SERIAL_SELECTED";
@@ -250,7 +250,7 @@ export default function AddConnectionDialog({
 }: {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSave?: (conn: NewConnection) => Promise<void>;
+  onSave?: (conn: NewConnection, device?: BluetoothDevice) => Promise<void>;
   isHTTPS?: boolean;
 }) {
   const { toast } = useToast();
@@ -304,13 +304,15 @@ export default function AddConnectionDialog({
       });
       dispatch({
         type: "SET_BT_SELECTED",
-        payload: { id: device.id, name: device.name ?? undefined },
+        payload: { id: device.id, name: device.name ?? undefined, device },
       });
       if (!state.name || state.name === "") {
         dispatch({
           type: "SET_NAME",
           payload: device.name
-            ? t("addConnection.bluetoothConnection.short")
+            ? t("addConnection.bluetoothConnection.short", {
+                deviceName: device.name,
+              })
             : t("addConnection.bluetoothConnection.long"),
         });
       }
@@ -531,6 +533,7 @@ export default function AddConnectionDialog({
           name: state.name.trim(),
           deviceId: state.btSelected?.id,
           deviceName: state.btSelected?.name,
+          gattServiceUUID: TransportWebBluetooth.ServiceUuid,
         }),
       },
       serial: {
@@ -593,7 +596,7 @@ export default function AddConnectionDialog({
   const currentPane = PANES[state.tab];
   const canCreate = useMemo(() => currentPane.validate(), [currentPane]);
 
-  const submit = (fn: (p: NewConnection) => Promise<void>) => async () => {
+  const submit = (fn: (p: NewConnection, device?: BluetoothDevice) => Promise<void>) => async () => {
     if (!canCreate) {
       return;
     }
@@ -602,7 +605,8 @@ export default function AddConnectionDialog({
     if (!payload) {
       return;
     }
-    await fn(payload);
+    const btDevice = state.tab === "bluetooth" ? state.btSelected?.device : undefined;
+    await fn(payload, btDevice);
   };
 
   return (

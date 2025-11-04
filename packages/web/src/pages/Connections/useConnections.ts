@@ -185,15 +185,23 @@ export function useConnections() {
           let bleDevice = live.current.bt.get(id);
           if (!bleDevice) {
             // Try to recover permitted devices
-            const known = await (
+            const getDevices = (
               navigator.bluetooth as Navigator["bluetooth"] & {
                 getDevices?: () => Promise<BluetoothDevice[]>;
               }
-            ).getDevices?.();
-            if (known && conn.deviceId) {
-              bleDevice = known.find(
-                (d: BluetoothDevice) => d.id === conn.deviceId,
-              );
+            ).getDevices;
+
+            if (getDevices) {
+              const known = await getDevices();
+              if (known && known.length > 0 && conn.deviceId) {
+                bleDevice = known.find(
+                  (d: BluetoothDevice) => d.id === conn.deviceId,
+                );
+                // If found, store it for future use
+                if (bleDevice) {
+                  live.current.bt.set(id, bleDevice);
+                }
+              }
             }
           }
           if (!bleDevice && opts?.allowPrompt) {
@@ -312,7 +320,8 @@ export function useConnections() {
           if (dev?.gatt?.connected) {
             dev.gatt.disconnect();
           }
-          live.current.bt.delete(id);
+          // Don't delete the device from live.current.bt - keep it for reconnection
+          // The device is still paired with the browser, so we can reuse it
         }
         if (conn.type === "serial") {
           const port = live.current.serial.get(id);
@@ -347,8 +356,12 @@ export function useConnections() {
   );
 
   const addConnectionAndConnect = useCallback(
-    async (input: NewConnection) => {
+    async (input: NewConnection, btDevice?: BluetoothDevice) => {
       const conn = addConnection(input);
+      // If a Bluetooth device was provided, store it to avoid re-prompting
+      if (btDevice && conn.type === "bluetooth") {
+        live.current.bt.set(conn.id, btDevice);
+      }
       await connect(conn.id, { allowPrompt: true });
       // Get updated connection from store after connect
       if (conn.id) {

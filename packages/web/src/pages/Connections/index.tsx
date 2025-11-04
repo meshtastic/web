@@ -36,6 +36,7 @@ import { Separator } from "@components/UI/Separator.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useNavigate } from "@tanstack/react-router";
 import {
+  ArrowLeft,
   LinkIcon,
   MoreHorizontal,
   PlugZap,
@@ -88,13 +89,23 @@ export const Connections = () => {
   return (
     <div className="space-y-6 p-6">
       <header className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            {t("page.title")}
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
-            {t("page.description")}
-          </p>
+        <div className="flex items-stretch gap-3">
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/" })}
+            className="flex items-center justify-center w-9 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="size-5" />
+          </button>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+              {t("page.title")}
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">
+              {t("page.description")}
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={() => setAddOpen(true)} className="gap-2">
@@ -130,7 +141,7 @@ export const Connections = () => {
               key={c.id}
               connection={c}
               onConnect={async () => {
-                const ok = await connect(c.id);
+                const ok = await connect(c.id, { allowPrompt: true });
                 toast({
                   title: ok ? t("toasts.connected") : t("toasts.failed"),
                   description: ok
@@ -199,8 +210,8 @@ export const Connections = () => {
         open={addOpen}
         onOpenChange={setAddOpen}
         isHTTPS={isURLHTTPS}
-        onSave={async (partial) => {
-          const created = await addConnectionAndConnect(partial);
+        onSave={async (partial, btDevice) => {
+          const created = await addConnectionAndConnect(partial, btDevice);
           if (created) {
             setAddOpen(false);
             toast({

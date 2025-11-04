@@ -29,6 +29,7 @@ export function createConnectionFromInput(input: NewConnection): Connection {
       type: "bluetooth",
       deviceId: input.deviceId,
       deviceName: input.deviceName,
+      gattServiceUUID: input.gattServiceUUID,
     };
   }
   return {
