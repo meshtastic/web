@@ -204,10 +204,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
             isCollapsed={isCollapsed}
             setCommandPaletteOpen={() => setCommandPaletteOpen(true)}
             setDialogOpen={() => setDialogOpen("deviceName", true)}
-            user={{
-              longName: myNode?.user?.longName ?? t("unknown.longName"),
-              shortName: myNode?.user?.shortName ?? t("unknown.shortName"),
-            }}
+            user={myNode.user}
             firmwareVersion={
               myMetadata?.firmwareVersion ?? t("unknown.notAvailable")
             }

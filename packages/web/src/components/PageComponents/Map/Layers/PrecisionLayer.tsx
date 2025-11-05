@@ -1,7 +1,6 @@
-import { getColorFromText, isLightColor } from "@app/core/utils/color";
+import { getColorFromNodeNum, isLightColor } from "@app/core/utils/color";
 import { precisionBitsToMeters, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/core";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { circle } from "@turf/turf";
 import type { Feature, FeatureCollection, Polygon } from "geojson";
 import { Layer, Source } from "react-map-gl/maplibre";
@@ -46,10 +45,7 @@ export function generatePrecisionCircles(
     const [lng, lat] = toLngLat(node.position);
     const radiusM = precisionBitsToMeters(node.position?.precisionBits ?? 0);
 
-    const safeText =
-      node.user?.shortName ??
-      numberToHexUnpadded(node.num).slice(-4).toUpperCase();
-    const color = getColorFromText(safeText);
+    const color = getColorFromNodeNum(node.num);
     const isLight = isLightColor(color);
 
     const key = `${lat},${lng}:${radiusM}`;

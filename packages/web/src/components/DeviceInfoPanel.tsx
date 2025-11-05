@@ -1,5 +1,6 @@
 import type { ConnectionStatus } from "@app/core/stores/deviceStore/types.ts";
 import { cn } from "@core/utils/cn.ts";
+import type { Protobuf } from "@meshtastic/core";
 import { useNavigate } from "@tanstack/react-router";
 import {
   ChevronRight,
@@ -25,10 +26,7 @@ interface DeviceInfoPanelProps {
   isCollapsed: boolean;
   deviceMetrics: DeviceMetrics;
   firmwareVersion: string;
-  user: {
-    shortName: string;
-    longName: string;
-  };
+  user: Protobuf.Mesh.User;
   setDialogOpen: () => void;
   setCommandPaletteOpen: () => void;
   disableHover?: boolean;
@@ -144,7 +142,7 @@ export const DeviceInfoPanel = ({
         )}
       >
         <Avatar
-          text={user.shortName}
+          nodeNum={Number(user.id)}
           className={cn("flex-shrink-0", isCollapsed && "")}
           size="sm"
         />
