@@ -40,7 +40,7 @@ export const Avatar = ({
   };
 
   const shortName = node?.user?.shortName ?? "";
-  const longName = node.user?.longName ?? "";
+  const longName = node?.user?.longName ?? "";
   const displayName = shortName || longName;
 
   const bgColor = getColorFromNodeNum(nodeNum);
