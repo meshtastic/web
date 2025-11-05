@@ -142,7 +142,7 @@ export const DeviceInfoPanel = ({
         )}
       >
         <Avatar
-          nodeNum={Number(user.id)}
+          nodeNum={parseInt(user.id.slice(1), 16)}
           className={cn("flex-shrink-0", isCollapsed && "")}
           size="sm"
         />
