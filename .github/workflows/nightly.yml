@@ -97,7 +97,7 @@ jobs:
             ${{ steps.meta.outputs.moving_tag }}
             ${{ steps.meta.outputs.immutable_tag }}
           oci: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           labels: |
             org.opencontainers.image.source=${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
