@@ -151,6 +151,23 @@ export function getConfigChangeCount(registry: ChangeRegistry): number {
 }
 
 /**
+ * Get count of config changes for specific variants
+ */
+export function getConfigChangeCountForVariants(
+  registry: ChangeRegistry,
+  variants: ValidConfigType[],
+): number {
+  let count = 0;
+  for (const keyStr of registry.changes.keys()) {
+    const key = deserializeKey(keyStr);
+    if (key.type === "config" && variants.includes(key.variant)) {
+      count++;
+    }
+  }
+  return count;
+}
+
+/**
  * Get count of module config changes
  */
 export function getModuleConfigChangeCount(registry: ChangeRegistry): number {

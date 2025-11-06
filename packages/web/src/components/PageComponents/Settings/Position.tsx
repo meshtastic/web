@@ -8,6 +8,7 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import {
+  FLAGS_CONFIG,
   type FlagName,
   usePositionFlags,
 } from "@core/hooks/usePositionFlags.ts";
@@ -45,9 +46,25 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
 
   const onPositonFlagChange = useCallback(
     (name: string) => {
-      return toggleFlag(name as FlagName);
+      const newFlagsValue = flagsValue ^ FLAGS_CONFIG[name as FlagName].value;
+      toggleFlag(name as FlagName);
+
+      // Immediately register the change in the ChangeRegistry
+      const formData = getEffectiveConfig("position");
+      if (formData) {
+        const payload = { ...formData, positionFlags: newFlagsValue };
+        if (deepCompareConfig(config.position, payload, true)) {
+          removeChange({ type: "config", variant: "position" });
+        } else {
+          setChange(
+            { type: "config", variant: "position" },
+            payload,
+            config.position,
+          );
+        }
+      }
     },
-    [toggleFlag],
+    [toggleFlag, flagsValue, getEffectiveConfig, config.position, removeChange, setChange],
   );
 
   return (

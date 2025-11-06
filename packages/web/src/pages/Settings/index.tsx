@@ -33,8 +33,10 @@ const ConfigPage = () => {
     setModuleConfig,
     addChannel,
     getConfigChangeCount,
+    getConfigChangeCountForVariants,
     getModuleConfigChangeCount,
     getChannelChangeCount,
+    hasUserChange,
   } = useDevice();
 
   const [isSaving, setIsSaving] = useState(false);
@@ -46,7 +48,22 @@ const ConfigPage = () => {
   const routerState = useRouterState();
   const { t } = useTranslation("config");
 
-  const configChangeCount = getConfigChangeCount();
+  // Radio config: lora, security (channels tracked separately)
+  const radioConfigChangeCount = getConfigChangeCountForVariants([
+    "lora",
+    "security",
+  ]);
+  // Device config: device, position, power, network, display, bluetooth + user
+  const deviceConfigChangeCount =
+    getConfigChangeCountForVariants([
+      "device",
+      "position",
+      "power",
+      "network",
+      "display",
+      "bluetooth",
+    ]) + (hasUserChange() ? 1 : 0);
+
   const moduleConfigChangeCount = getModuleConfigChangeCount();
   const channelChangeCount = getChannelChangeCount();
 
@@ -57,7 +74,7 @@ const ConfigPage = () => {
         route: radioRoute,
         label: t("navigation.radioConfig"),
         icon: RadioTowerIcon,
-        changeCount: configChangeCount,
+        changeCount: radioConfigChangeCount + channelChangeCount,
         component: RadioConfig,
       },
       {
@@ -65,7 +82,7 @@ const ConfigPage = () => {
         route: deviceRoute,
         label: t("navigation.deviceConfig"),
         icon: RouterIcon,
-        changeCount: moduleConfigChangeCount,
+        changeCount: deviceConfigChangeCount,
         component: DeviceConfig,
       },
       {
@@ -73,11 +90,17 @@ const ConfigPage = () => {
         route: moduleRoute,
         label: t("navigation.moduleConfig"),
         icon: LayersIcon,
-        changeCount: channelChangeCount,
+        changeCount: moduleConfigChangeCount,
         component: ModuleConfig,
       },
     ],
-    [t, configChangeCount, moduleConfigChangeCount, channelChangeCount],
+    [
+      t,
+      radioConfigChangeCount,
+      deviceConfigChangeCount,
+      moduleConfigChangeCount,
+      channelChangeCount,
+    ],
   );
 
   const activeSection =
@@ -244,10 +267,11 @@ const ConfigPage = () => {
   const hasDrafts =
     getConfigChangeCount() > 0 ||
     getModuleConfigChangeCount() > 0 ||
-    getChannelChangeCount() > 0;
+    getChannelChangeCount() > 0 ||
+    hasUserChange();
   const hasPending = hasDrafts || rhfState.isDirty;
   const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
-  const saveDisabled = isSaving || !rhfState.isValid || !hasPending;
+  const saveDisabled = isSaving || !hasPending;
 
   const actions = useMemo(
     () => [
@@ -280,8 +304,8 @@ const ConfigPage = () => {
         disabled: saveDisabled,
         iconClasses:
           !rhfState.isValid && hasPending
-            ? "text-red-400 cursor-not-allowed"
-            : "cursor-pointer",
+            ? "cursor-pointer"
+            : "text-red-400 cursor-not-allowed",
         className: cn([
           "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
           "hover:dark:bg-slate-300 hover:dark:text-black",
