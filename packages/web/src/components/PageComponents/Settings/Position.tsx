@@ -64,7 +64,14 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
         }
       }
     },
-    [toggleFlag, flagsValue, getEffectiveConfig, config.position, removeChange, setChange],
+    [
+      toggleFlag,
+      flagsValue,
+      getEffectiveConfig,
+      config.position,
+      removeChange,
+      setChange,
+    ],
   );
 
   return (
