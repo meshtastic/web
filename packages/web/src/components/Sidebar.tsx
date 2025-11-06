@@ -2,6 +2,7 @@ import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { useDocumentTitle } from "@core/hooks/useDocumentTitle.ts";
 import {
   type Page,
   useAppStore,
@@ -83,6 +84,8 @@ export const Sidebar = ({ children }: SidebarProps) => {
     savedConnections.find((c) => c.isDefault) ||
     savedConnections[0];
 
+  useDocumentTitle(activeConnection?.name ?? "");
+
   const pathname = useLocation({
     select: (location) => location.pathname.replace(/^\//, ""),
   });
@@ -116,14 +119,14 @@ export const Sidebar = ({ children }: SidebarProps) => {
     },
     { name: t("navigation.map"), icon: MapIcon, page: "map" },
     {
-      name: t("navigation.settings"),
-      icon: SettingsIcon,
-      page: "settings",
-    },
-    {
       name: `${t("navigation.nodes")} (${displayedNodeCount})`,
       icon: UsersIcon,
       page: "nodes",
+    },
+    {
+      name: t("navigation.settings"),
+      icon: SettingsIcon,
+      page: "settings",
     },
   ];
 

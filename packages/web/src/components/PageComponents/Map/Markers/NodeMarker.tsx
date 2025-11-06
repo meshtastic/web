@@ -16,7 +16,6 @@ export const NodeMarker = memo(function NodeMarker({
   id,
   lng,
   lat,
-  label,
   longLabel,
   tooltipLabel,
   hasError,
@@ -29,7 +28,6 @@ export const NodeMarker = memo(function NodeMarker({
   id: number;
   lng: number;
   lat: number;
-  label: string;
   longLabel?: string;
   tooltipLabel?: string;
   hasError?: boolean;
