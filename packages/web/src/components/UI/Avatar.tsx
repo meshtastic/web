@@ -1,4 +1,5 @@
-import { getColorFromText, isLightColor } from "@app/core/utils/color";
+import { useNodeDB } from "@app/core/stores";
+import { getColorFromNodeNum, isLightColor } from "@app/core/utils/color";
 import {
   Tooltip,
   TooltipArrow,
@@ -11,7 +12,7 @@ import { LockKeyholeOpenIcon, StarIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface AvatarProps {
-  text: string | number;
+  nodeNum: number;
   size?: "sm" | "lg";
   className?: string;
   showError?: boolean;
@@ -19,24 +20,33 @@ interface AvatarProps {
 }
 
 export const Avatar = ({
-  text,
+  nodeNum,
   size = "sm",
   showError = false,
   showFavorite = false,
   className,
 }: AvatarProps) => {
   const { t } = useTranslation();
+  const { getNode } = useNodeDB();
+  const node = getNode(nodeNum);
+
+  if (!nodeNum) {
+    return null;
+  }
 
   const sizes = {
     sm: "size-10 text-xs font-light",
     lg: "size-16 text-lg",
   };
 
-  const safeText = text?.toString().toUpperCase();
-  const bgColor = getColorFromText(safeText);
+  const shortName = node?.user?.shortName ?? "";
+  const longName = node?.user?.longName ?? "";
+  const displayName = shortName || longName;
+
+  const bgColor = getColorFromNodeNum(nodeNum);
   const isLight = isLightColor(bgColor);
   const textColor = isLight ? "#000000" : "#FFFFFF";
-  const initials = safeText?.slice(0, 4) ?? t("unknown.shortName");
+  const initials = displayName.slice(0, 4) || t("unknown.shortName");
 
   return (
     <div

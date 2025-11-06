@@ -52,7 +52,7 @@ export const NodeDetail = ({ node }: NodeDetailProps) => {
     <div className="p-1 text-slate-900">
       <div className="flex gap-2">
         <div className="flex flex-col items-center gap-2 min-w-6 pt-1">
-          <Avatar text={shortName} size="sm" />
+          <Avatar nodeNum={node.num} size="sm" />
 
           <div
             onFocusCapture={(e) => {

@@ -144,7 +144,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     return message.from != null ? getNode(message.from) : null;
   }, [getNode, message.from]);
 
-  const { displayName, shortName, isFavorite } = useMemo(() => {
+  const { displayName, isFavorite, nodeNum } = useMemo(() => {
     const userIdHex = message.from.toString(16).toUpperCase().padStart(2, "0");
     const last4 = userIdHex.slice(-4);
     const fallbackName = t("fallbackName", { last4 });
@@ -157,6 +157,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
       displayName: derivedDisplayName,
       shortName: derivedShortName,
       isFavorite: isFavorite,
+      nodeNum: message.from,
     };
   }, [messageUser, message.from, t, myNodeNum]);
 
@@ -205,7 +206,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
       <div className="grid grid-cols-[auto_1fr] gap-x-2">
         <Avatar
           size="sm"
-          text={shortName}
+          nodeNum={nodeNum}
           className="pt-0.5"
           showFavorite={isFavorite}
         />
