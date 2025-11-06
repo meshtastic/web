@@ -1,8 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useLayoutEffect } from "react";
 
 export function useDocumentTitle(prefix: string) {
-  const originalTitleRef = useRef<string>(document.title);
+  const originalTitleRef = useRef<string>("");
 
+  useLayoutEffect(() => {
+    originalTitleRef.current = document.title;
+  }, [prefix]);
   useEffect(() => {
     const newTitle = prefix
       ? `${prefix} - ${originalTitleRef.current}`
