@@ -304,8 +304,8 @@ const ConfigPage = () => {
         disabled: saveDisabled,
         iconClasses:
           !rhfState.isValid && hasPending
-            ? "cursor-pointer"
-            : "text-red-400 cursor-not-allowed",
+            ? "text-red-400 cursor-not-allowed"
+            : "cursor-pointer",
         className: cn([
           "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
           "hover:dark:bg-slate-300 hover:dark:text-black",
