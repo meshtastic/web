@@ -1,3 +1,3 @@
 [submodule "packages/protobufs"]
 	path = packages/protobufs
-	url = https://github.com/meshtastic/protobufs
+	url = git@github.com:meshtastic/protobufs.git
