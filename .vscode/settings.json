@@ -6,5 +6,12 @@
   "search.exclude": {
     "**/i18n/locales/*-*/**": true
   },
-  "vitest.workspaceConfig": "vitest.config.ts"
+  "vitest.workspaceConfig": "vitest.config.ts",
+  // Biome formats JS/TS/JSX/TSX/JSON/JSONC/CSS
+  "[javascript][javascriptreact][typescript][typescriptreact][json][jsonc][css]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
 }

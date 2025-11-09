@@ -23,7 +23,8 @@ export type ValidModuleConfigType =
   | "neighborInfo"
   | "ambientLighting"
   | "detectionSensor"
-  | "paxcounter";
+  | "paxcounter"
+  | "scripting";
 
 // Unified config change key type
 export type ConfigChangeKey =

@@ -11,7 +11,8 @@
     "tabRangeTest": "Range Test",
     "tabSerial": "Serial",
     "tabStoreAndForward": "S&F",
-    "tabTelemetry": "Telemetry"
+    "tabTelemetry": "Telemetry",
+    "tabScripting": "Scripting"
   },
   "ambientLighting": {
     "title": "Ambient Lighting Settings",
@@ -375,6 +376,14 @@
     "overrideConsoleSerialPort": {
       "label": "Override Console Serial Port",
       "description": "If you have a serial port connected to the console, this will override it."
+    }
+  },
+  "scripting": {
+    "title": "Scripting Settings",
+    "description": "Enable or disable the Scripting module.",
+    "enabled": {
+      "label": "Module Enabled",
+      "description": "Turn the Scripting module on or off."
     }
   },
   "storeForward": {

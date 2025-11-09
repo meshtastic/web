@@ -314,6 +314,10 @@ function deviceFactory(
                 device.moduleConfig.paxcounter = config.payloadVariant.value;
                 break;
               }
+              case "scripting": {
+                device.moduleConfig.scripting = config.payloadVariant.value;
+                break;
+              }
             }
           }
         }),

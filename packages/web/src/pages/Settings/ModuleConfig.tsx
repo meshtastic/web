@@ -7,6 +7,7 @@ import { MQTT } from "@components/PageComponents/ModuleConfig/MQTT.tsx";
 import { NeighborInfo } from "@components/PageComponents/ModuleConfig/NeighborInfo.tsx";
 import { Paxcounter } from "@components/PageComponents/ModuleConfig/Paxcounter.tsx";
 import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.tsx";
+import { Scripting } from "@components/PageComponents/ModuleConfig/Scripting.tsx";
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.tsx";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
@@ -93,6 +94,7 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
       element: DetectionSensor,
     },
     { case: "paxcounter", label: t("page.tabPaxcounter"), element: Paxcounter },
+    { case: "scripting", label: t("page.tabScripting"), element: Scripting },
   ] as const;
 
   const flags = useMemo(
