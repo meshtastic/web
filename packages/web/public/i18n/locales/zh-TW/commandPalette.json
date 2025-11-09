@@ -1,0 +1,51 @@
+{
+  "emptyState": "未找到符合的結果。",
+  "page": {
+    "title": "命令選單"
+  },
+  "pinGroup": {
+    "label": "Pin command group"
+  },
+  "unpinGroup": {
+    "label": "Unpin command group"
+  },
+  "goto": {
+    "label": "前往",
+    "command": {
+      "messages": "訊息",
+      "map": "地圖",
+      "config": "設定",
+      "nodes": "節點"
+    }
+  },
+  "manage": {
+    "label": "管理",
+    "command": {
+      "switchNode": "切換節點",
+      "connectNewNode": "連接新節點"
+    }
+  },
+  "contextual": {
+    "label": "Contextual",
+    "command": {
+      "qrCode": "QR 代碼",
+      "qrGenerator": "Generator",
+      "qrImport": "匯入",
+      "scheduleShutdown": "排程關機",
+      "scheduleReboot": "重新啟動設備",
+      "resetNodeDb": "重設節點資料庫",
+      "dfuMode": "进入 DFU 模式",
+      "factoryResetDevice": "恢復設備原廠設定",
+      "factoryResetConfig": "恢復原廠設定",
+      "disconnect": "中斷連線"
+    }
+  },
+  "debug": {
+    "label": "调试",
+    "command": {
+      "reconfigure": "重新設定",
+      "clearAllStoredMessages": "清除所有已儲存訊息",
+      "clearAllStores": "清除所有本地儲存資料"
+    }
+  }
+}

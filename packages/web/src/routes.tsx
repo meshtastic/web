@@ -1,6 +1,6 @@
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import type { useAppStore, useMessageStore } from "@core/stores";
-import { Dashboard } from "@pages/Dashboard/index.tsx";
+import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
@@ -30,7 +30,7 @@ export const rootRoute = createRootRouteWithContext<AppContext>()({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: Dashboard,
+  component: Connections,
   loader: () => {
     // Redirect to the broadcast messages page on initial load
     return redirect({ to: "/messages/broadcast/0", replace: true });
@@ -151,6 +151,12 @@ const dialogWithParamsRoute = createRoute({
   component: DialogManager,
 });
 
+const connectionsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/connections",
+  component: Connections,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   messagesRoute,
@@ -160,6 +166,7 @@ const routeTree = rootRoute.addChildren([
   settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
   nodesRoute,
   dialogWithParamsRoute,
+  connectionsRoute,
 ]);
 
 const router = createRouter({

@@ -15,7 +15,6 @@
       "messages": "메시지기기",
       "map": "지도",
       "config": "설정",
-      "channels": "채널",
       "nodes": "노드"
     }
   },
@@ -45,7 +44,8 @@
     "label": "디버그",
     "command": {
       "reconfigure": "재설정",
-      "clearAllStoredMessages": "저장된 모든 메시지 삭제"
+      "clearAllStoredMessages": "저장된 모든 메시지 삭제",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }

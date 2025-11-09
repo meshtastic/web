@@ -2,6 +2,7 @@ import { execSync } from "node:child_process";
 import path from "node:path";
 import process from "node:process";
 import tailwindcss from "@tailwindcss/vite";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
 import { createHtmlPlugin } from "vite-plugin-html";
@@ -32,19 +33,21 @@ export default defineConfig(({ mode }) => {
 
   const isProd = mode === "production";
   const isTest = env.VITE_IS_TEST;
+  const useHTTPS = env.VITE_USE_HTTPS === "true";
 
   return {
     plugins: [
       react(),
       tailwindcss(),
-      // This is for GDPR/CCPA compliance
+      ...(useHTTPS ? [basicSsl()] : []),
       createHtmlPlugin({
         inject: {
           data: {
             title: isTest ? "Meshtastic Web (TEST)" : "Meshtastic Web",
             cookieYesScript:
               isProd && env.VITE_COOKIEYES_CLIENT_ID
-                ? `<script async src="https://cdn-cookieyes.com/client_data/${env.VITE_COOKIEYES_CLIENT_ID}/script.js"></script>`
+                ? // This is for GDPR/CCPA compliance
+                  `<script async src="https://cdn-cookieyes.com/client_data/${env.VITE_COOKIEYES_CLIENT_ID}/script.js"></script>`
                 : "",
           },
         },
@@ -76,7 +79,7 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       headers: {
-        "content-security-policy": CONTENT_SECURITY_POLICY,
+        "Content-Security-Policy": CONTENT_SECURITY_POLICY,
         "Cross-Origin-Opener-Policy": "same-origin",
         "Cross-Origin-Embedder-Policy": "credentialless",
         "X-Content-Type-Options": "nosniff",

@@ -1,0 +1,38 @@
+{
+  "maplibre": {
+    "GeolocateControl.FindMyLocation": "定位我的位置",
+    "NavigationControl.ZoomIn": "放大",
+    "NavigationControl.ZoomOut": "縮小",
+    "CooperativeGesturesHandler.WindowsHelpText": "按住 Ctrl + 滾動即可縮放地圖",
+    "CooperativeGesturesHandler.MacHelpText": "按住 ⌘ + 滾動即可縮放地圖",
+    "CooperativeGesturesHandler.MobileHelpText": "使用雙指移動地圖"
+  },
+  "layerTool": {
+    "nodeMarkers": "顯示節點",
+    "directNeighbors": "顯示直接連線",
+    "remoteNeighbors": "顯示遠端連線",
+    "positionPrecision": "顯示位置精度",
+    "traceroutes": "顯示追蹤路由",
+    "waypoints": "顯示途經點"
+  },
+  "mapMenu": {
+    "locateAria": "定位我的節點",
+    "layersAria": "更改地圖樣式"
+  },
+  "waypointDetail": {
+    "edit": "編輯",
+    "description": "説明：",
+    "createdBy": "編輯：",
+    "createdDate": "建立於：",
+    "updated": "更新於：",
+    "expires": "到期時間：",
+    "distance": "距離：",
+    "bearing": "絕對方位：",
+    "lockedTo": "Locked by:",
+    "latitude": "緯度：",
+    "longitude": "經度："
+  },
+  "myNode": {
+    "tooltip": "此裝置"
+  }
+}

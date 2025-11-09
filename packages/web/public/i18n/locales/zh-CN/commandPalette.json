@@ -15,7 +15,6 @@
       "messages": "消息",
       "map": "地图",
       "config": "配置",
-      "channels": "频道",
       "nodes": "节点"
     }
   },
@@ -45,7 +44,8 @@
     "label": "调试",
     "command": {
       "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "clearAllStoredMessages": "Clear All Stored Message",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }

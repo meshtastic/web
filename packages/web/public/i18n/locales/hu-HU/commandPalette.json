@@ -1,51 +1,51 @@
 {
-  "emptyState": "No results found.",
+  "emptyState": "Nincs találat.",
   "page": {
-    "title": "Command Menu"
+    "title": "Parancsmenü"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "label": "Parancscsoport rögzítése"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "label": "Parancscsoport feloldása"
   },
   "goto": {
-    "label": "Goto",
+    "label": "Ugrás",
     "command": {
       "messages": "Üzenetek",
       "map": "Térkép",
-      "config": "Config",
-      "channels": "Csatornák",
+      "config": "Konfiguráció",
       "nodes": "Csomópontok"
     }
   },
   "manage": {
-    "label": "Manage",
+    "label": "Kezelés",
     "command": {
-      "switchNode": "Switch Node",
-      "connectNewNode": "Connect New Node"
+      "switchNode": "Csomópont váltása",
+      "connectNewNode": "Új csomópont csatlakoztatása"
     }
   },
   "contextual": {
-    "label": "Contextual",
+    "label": "Kontextusos",
     "command": {
-      "qrCode": "QR Code",
-      "qrGenerator": "Generator",
+      "qrCode": "QR-kód",
+      "qrGenerator": "Generátor",
       "qrImport": "Importálás",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Reboot Device",
-      "resetNodeDb": "Reset Node DB",
-      "dfuMode": "Enter DFU Mode",
-      "factoryResetDevice": "Factory Reset Device",
-      "factoryResetConfig": "Factory Reset Config",
+      "scheduleShutdown": "Leállítás ütemezése",
+      "scheduleReboot": "Eszköz újraindítása",
+      "resetNodeDb": "Csomópont-adatbázis visszaállítása",
+      "dfuMode": "DFU módba lépés",
+      "factoryResetDevice": "Gyári visszaállítás (eszköz)",
+      "factoryResetConfig": "Gyári visszaállítás (konfiguráció)",
       "disconnect": "Leválasztás"
     }
   },
   "debug": {
-    "label": "Debug",
+    "label": "Hibakeresés",
     "command": {
-      "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "reconfigure": "Újrakonfigurálás",
+      "clearAllStoredMessages": "Összes tárolt üzenet törlése",
+      "clearAllStores": "Összes helyi tár törlése"
     }
   }
 }

@@ -1,0 +1,458 @@
+{
+  "page": {
+    "title": "Asetukset",
+    "tabUser": "Käyttäjä",
+    "tabChannels": "Kanavat",
+    "tabBluetooth": "Bluetooth",
+    "tabDevice": "Laite",
+    "tabDisplay": "Näyttö",
+    "tabLora": "LoRa",
+    "tabNetwork": "Verkko",
+    "tabPosition": "Sijainti",
+    "tabPower": "Virta",
+    "tabSecurity": "Turvallisuus"
+  },
+  "sidebar": {
+    "label": "Asetukset"
+  },
+  "device": {
+    "title": "Laitteen asetukset",
+    "description": "Laitteen asetukset",
+    "buttonPin": {
+      "description": "Painikkeen pinnin ohitus",
+      "label": "Painikkeen pinni"
+    },
+    "buzzerPin": {
+      "description": "Summerin pinnin ohitus",
+      "label": "Summerin pinni"
+    },
+    "disableTripleClick": {
+      "description": "Poista kolmoisklikkaus käytöstä",
+      "label": "Poista kolmoisklikkaus käytöstä"
+    },
+    "doubleTapAsButtonPress": {
+      "description": "Käsittele kaksoisnapautus painikkeen painalluksena",
+      "label": "Kaksoisnapautus painikkeen painalluksena"
+    },
+    "ledHeartbeatDisabled": {
+      "description": "Poista ledin vilkkuminen käytöstä",
+      "label": "Ledin vilkkuminen poistettu käytöstä"
+    },
+    "nodeInfoBroadcastInterval": {
+      "description": "Kuinka usein laitteen tiedot lähetetään verkkoon",
+      "label": "Laitteen tietojen lähetyksen aikaväli"
+    },
+    "posixTimezone": {
+      "description": "POSIX-aikavyöhykkeen merkkijono laitetta varten",
+      "label": "POSIX-aikavyöhyke"
+    },
+    "rebroadcastMode": {
+      "description": "Kuinka uudelleenlähetyksiä käsitellään",
+      "label": "Uudelleenlähetyksen tila"
+    },
+    "role": {
+      "description": "Mikä rooli laitteella on mesh-verkossa",
+      "label": "Rooli"
+    }
+  },
+  "bluetooth": {
+    "title": "Bluetooth asetukset",
+    "description": "Bluetooth moduulin asetukset",
+    "note": "Huomautus: Jotkin laitteet (ESP32) eivät voi käyttää bluetoothia sekä WiFiä samanaikaisesti.",
+    "enabled": {
+      "description": "Ota Bluetooth käyttöön tai poista käytöstä",
+      "label": "Käytössä"
+    },
+    "pairingMode": {
+      "description": "PIN-koodin valinnan käyttäytyminen.",
+      "label": "Paritustila"
+    },
+    "pin": {
+      "description": "Bluetooth PIN-koodi, jota käytetään pariliitettäessä",
+      "label": "PIN"
+    }
+  },
+  "display": {
+    "description": "Laitteen näytön asetukset",
+    "title": "Näyttöasetukset",
+    "headingBold": {
+      "description": "Lihavoi otsikkoteksti",
+      "label": "Lihavoitu otsikko"
+    },
+    "carouselDelay": {
+      "description": "Kuinka nopeasti ikkunat kulkevat",
+      "label": "Karusellin Viive"
+    },
+    "compassNorthTop": {
+      "description": "Kiinnitä pohjoinen kompassin yläreunaan",
+      "label": "Kompassin pohjoinen ylhäällä"
+    },
+    "displayMode": {
+      "description": "Näytön asettelun vaihtoehdot",
+      "label": "Näyttötila"
+    },
+    "displayUnits": {
+      "description": "Näytä metriset tai imperiaaliset yksiköt",
+      "label": "Näyttöyksiköt"
+    },
+    "flipScreen": {
+      "description": "Käännä näyttöä 180 astetta",
+      "label": "Käännä näyttö"
+    },
+    "gpsDisplayUnits": {
+      "description": "Koordinaattien näyttömuoto",
+      "label": "GPS näyttöyksiköt"
+    },
+    "oledType": {
+      "description": "Laitteeseen liitetyn OLED-näytön tyyppi",
+      "label": "OLED-tyyppi"
+    },
+    "screenTimeout": {
+      "description": "Sammuta näyttö tämän ajan jälkeen",
+      "label": "Näytön aikakatkaisu"
+    },
+    "twelveHourClock": {
+      "description": "Käytä 12 tunnin kelloa",
+      "label": "12 tunnin kello"
+    },
+    "wakeOnTapOrMotion": {
+      "description": "Herätä laite napauttamalla tai liikkeestä",
+      "label": "Herätä napauttamalla tai liikkeellä"
+    }
+  },
+  "lora": {
+    "title": "Mesh-verkon asetukset",
+    "description": "LoRa-verkon asetukset",
+    "bandwidth": {
+      "description": "Kanavan kaistanleveys MHz",
+      "label": "Kaistanleveys"
+    },
+    "boostedRxGain": {
+      "description": "RX tehostettu vahvistus",
+      "label": "RX tehostettu vahvistus"
+    },
+    "codingRate": {
+      "description": "Koodausnopeuden nimittäjä",
+      "label": "Koodausnopeus"
+    },
+    "frequencyOffset": {
+      "description": "Taajuuskorjaus kalibrointivirheiden korjaamiseksi",
+      "label": "Taajuuspoikkeama"
+    },
+    "frequencySlot": {
+      "description": "LoRa-taajuuden kanavanumero",
+      "label": "Taajuuspaikka"
+    },
+    "hopLimit": {
+      "description": "Maksimimäärä hyppyjä",
+      "label": "Hyppyraja"
+    },
+    "ignoreMqtt": {
+      "description": "Älä välitä MQTT-viestejä mesh-verkon yli",
+      "label": "Ohita MQTT"
+    },
+    "modemPreset": {
+      "description": "Käytössä olevan modeemin esiasetus",
+      "label": "Modeemin esiasetus"
+    },
+    "okToMqtt": {
+      "description": "Kun asetetaan arvoksi true, tämä asetus tarkoittaa, että käyttäjä hyväksyy paketin lähettämisen MQTT:lle. Jos asetetaan arvoksi false, etälaitteita pyydetään olemaan välittämättä paketteja MQTT:lle",
+      "label": "MQTT päällä"
+    },
+    "overrideDutyCycle": {
+      "description": "Ohita käyttöaste (Duty Cycle)",
+      "label": "Ohita käyttöaste (Duty Cycle)"
+    },
+    "overrideFrequency": {
+      "description": "Käytä mukautettua taajuutta",
+      "label": "Mukautettu taajuus"
+    },
+    "region": {
+      "description": "Asettaa alueen laitteelle",
+      "label": "Alue"
+    },
+    "spreadingFactor": {
+      "description": "Ilmaisee symbolia kohden lähetettävien taajuuksien määrän",
+      "label": "Levennyskerroin"
+    },
+    "transmitEnabled": {
+      "description": "LoRa-radion lähetyksen (TX) käyttöönotto tai poiskytkentä",
+      "label": "Lähetys käytössä"
+    },
+    "transmitPower": {
+      "description": "Suurin lähetysteho",
+      "label": "Lähetysteho"
+    },
+    "usePreset": {
+      "description": "Käytä ennalta määriteltyä modeemin esiasetusta",
+      "label": "Käytä esiasetusta"
+    },
+    "meshSettings": {
+      "description": "LoRa-verkon asetukset",
+      "label": "Mesh-verkon asetukset"
+    },
+    "waveformSettings": {
+      "description": "LoRa-aaltomuodon asetukset",
+      "label": "Signaalimuodon asetukset"
+    },
+    "radioSettings": {
+      "label": "Radioasetukset",
+      "description": "LoRa-laitteen asetukset"
+    }
+  },
+  "network": {
+    "title": "WiFi-asetukset",
+    "description": "WiFi-radion asetukset",
+    "note": "Huomautus: Jotkin laitteet (ESP32) eivät voi käyttää sekä Bluetoothia että WiFiä samanaikaisesti.",
+    "addressMode": {
+      "description": "Osoitteen määrityksen valinta",
+      "label": "Osoitetila"
+    },
+    "dns": {
+      "description": "DNS-palvelin",
+      "label": "DNS"
+    },
+    "ethernetEnabled": {
+      "description": "Ota käyttöön tai poista käytöstä ethernet-portti",
+      "label": "Käytössä"
+    },
+    "gateway": {
+      "description": "Oletusyhdyskäytävä",
+      "label": "Yhdyskäytävä"
+    },
+    "ip": {
+      "description": "IP-osoite",
+      "label": "IP"
+    },
+    "psk": {
+      "description": "Verkon salasana",
+      "label": "PSK"
+    },
+    "ssid": {
+      "description": "Verkon nimi",
+      "label": "SSID"
+    },
+    "subnet": {
+      "description": "Aliverkon peite",
+      "label": "Aliverkko"
+    },
+    "wifiEnabled": {
+      "description": "Ota WiFi käyttöön tai poista se käytöstä",
+      "label": "Käytössä"
+    },
+    "meshViaUdp": {
+      "label": "Mesh UDP:n kautta"
+    },
+    "ntpServer": {
+      "label": "NTP-palvelin"
+    },
+    "rsyslogServer": {
+      "label": "Rsyslog-palvelin"
+    },
+    "ethernetConfigSettings": {
+      "description": "Ethernet-portin asetukset",
+      "label": "Ethernet-asetukset"
+    },
+    "ipConfigSettings": {
+      "description": "IP-osoitteen asetukset",
+      "label": "IP-osoitteen asetukset"
+    },
+    "ntpConfigSettings": {
+      "description": "NTP-asetukset",
+      "label": "NTP-asetukset"
+    },
+    "rsyslogConfigSettings": {
+      "description": "Rsyslog määritykset",
+      "label": "Rsyslog määritykset"
+    },
+    "udpConfigSettings": {
+      "description": "UDP-yhdeyden asetukset",
+      "label": "UDP-asetukset"
+    }
+  },
+  "position": {
+    "title": "Sijainnin asetukset",
+    "description": "Sijaintimoduulin asetukset",
+    "broadcastInterval": {
+      "description": "Kuinka usein sijainti lähetetään mesh-verkon yli",
+      "label": "Lähetyksen aikaväli"
+    },
+    "enablePin": {
+      "description": "GPS-moduulin käyttöönottopinnin korvaus",
+      "label": "Ota pinni käytöön"
+    },
+    "fixedPosition": {
+      "description": "Älä raportoi GPS-sijaintia, vaan käytä manuaalisesti määritettyä sijaintia",
+      "label": "Kiinteä sijainti"
+    },
+    "gpsMode": {
+      "description": "Määritä, onko laitteen GPS käytössä, pois päältä vai puuttuuko se kokonaan",
+      "label": "GSP-tila"
+    },
+    "gpsUpdateInterval": {
+      "description": "Kuinka usein GPS-paikannus suoritetaan",
+      "label": "GPS-päivitysväli"
+    },
+    "positionFlags": {
+      "description": "Valinnaiset kentät, jotka voidaan sisällyttää sijaintiviesteihin. Mitä enemmän kenttiä valitaan, sitä suurempi viesti on, mikä johtaa pidempään lähetysaikaan ja suurempaan pakettihäviöriskiin.",
+      "label": "Sijaintimerkinnät"
+    },
+    "receivePin": {
+      "description": "GPS-moduulin käyttöönottopinnin korvaus",
+      "label": "Vastaanoton pinni"
+    },
+    "smartPositionEnabled": {
+      "description": "Lähetä sijainti vain, kun sijainnissa on tapahtunut merkittävä muutos",
+      "label": "Ota älykäs sijainti käyttöön"
+    },
+    "smartPositionMinDistance": {
+      "description": "Vähimmäisetäisyys (metreinä), joka on kuljettava ennen sijaintipäivityksen lähettämistä",
+      "label": "Älykkään sijainnin minimietäisyys"
+    },
+    "smartPositionMinInterval": {
+      "description": "Lyhin aikaväli (sekunteina), joka on kuluttava ennen sijaintipäivityksen lähettämistä",
+      "label": "Älykkään sijainnin vähimmäisetäisyys"
+    },
+    "transmitPin": {
+      "description": "GPS-moduulin käyttöönottopinnin korvaus",
+      "label": "Lähetyksen pinni"
+    },
+    "intervalsSettings": {
+      "description": "Kuinka usein sijaintipäivitykset lähetetään",
+      "label": "Aikaväli"
+    },
+    "flags": {
+      "placeholder": "Valitse sijaintiasetukset...",
+      "altitude": "Korkeus",
+      "altitudeGeoidalSeparation": "Korkeuden geoidinen erotus",
+      "altitudeMsl": "Korkeus on mitattu merenpinnan tasosta",
+      "dop": "Tarkkuuden heikkenemä (DOP), oletuksena käytetään PDOP-arvoa",
+      "hdopVdop": "Jos DOP on asetettu, käytä HDOP- ja VDOP-arvoja PDOP:n sijaan",
+      "numSatellites": "Satelliittien määrä",
+      "sequenceNumber": "Sekvenssinumero",
+      "timestamp": "Aikaleima",
+      "unset": "Ei yhdistetty",
+      "vehicleHeading": "Ajoneuvon suunta",
+      "vehicleSpeed": "Ajoneuvon nopeus"
+    }
+  },
+  "power": {
+    "adcMultiplierOverride": {
+      "description": "Käytetään akun jännitteen lukeman säätämiseen",
+      "label": "Korvaava AD-muuntimen kerroin"
+    },
+    "ina219Address": {
+      "description": "Akkunäytön INA219 osoite",
+      "label": "INA219 Osoite"
+    },
+    "lightSleepDuration": {
+      "description": "Kuinka kauan laite on kevyessä lepotilassa",
+      "label": "Kevyen lepotilan kesto"
+    },
+    "minimumWakeTime": {
+      "description": "Vähimmäisaika, jonka laite pysyy hereillä paketin vastaanoton jälkeen",
+      "label": "Minimi heräämisaika"
+    },
+    "noConnectionBluetoothDisabled": {
+      "description": "Jos laite ei saa Bluetooth-yhteyttä, BLE-radio poistetaan käytöstä tämän ajan kuluttua",
+      "label": "Ei yhteyttä. Bluetooth on pois käytöstä"
+    },
+    "powerSavingEnabled": {
+      "description": "Valitse, jos laite saa virtaa matalavirtalähteestä (esim. aurinkopaneeli), jolloin virrankulutusta minimoidaan mahdollisimman paljon.",
+      "label": "Ota virransäästötila käyttöön"
+    },
+    "shutdownOnBatteryDelay": {
+      "description": "Sammuta laite automaattisesti tämän ajan kuluttua akkukäytöllä, 0 tarkoittaa toistaiseksi päällä",
+      "label": "Viive laitteen sammuttamisessa akkukäytöllä"
+    },
+    "superDeepSleepDuration": {
+      "description": "Kuinka pitkään laite on supersyvässä lepotilassa",
+      "label": "Supersyvän lepotilan kesto"
+    },
+    "powerConfigSettings": {
+      "description": "Virtamoduulin asetukset",
+      "label": "Virran asetukset"
+    },
+    "sleepSettings": {
+      "description": "Virtamoduulin lepotila-asetukset",
+      "label": "Lepotilan asetukset"
+    }
+  },
+  "security": {
+    "description": "Turvallisuuskokoonpanon asetukset",
+    "title": "Turvallisuusasetukset",
+    "button_backupKey": "Varmuuskopioi avain",
+    "adminChannelEnabled": {
+      "description": "Salli saapuva laitteen ohjaus suojaamattoman vanhan admin-kanavan kautta",
+      "label": "Salli vanha admin ylläpitäjä"
+    },
+    "enableDebugLogApi": {
+      "description": "Lähetä reaaliaikainen debug-loki sarjaportin kautta, katso ja vie laitteen lokitiedostot, joista sijaintitiedot on poistettu, Bluetoothin kautta",
+      "label": "Ota käyttöön virheenkorjauslokin API-rajapinta"
+    },
+    "managed": {
+      "description": "Jos tämä on käytössä, laitteen asetuksia voi muuttaa vain etäadmin-laitteen hallintaviestien kautta. Älä ota tätä käyttöön, ellei vähintään yhtä sopivaa etäadmin-laitetta ole määritetty ja julkinen avain ei ole tallennettu johonkin yllä olevista kentistä.",
+      "label": "Hallinnoitu"
+    },
+    "privateKey": {
+      "description": "Käytetään jaetun avaimen luomiseen etälaitteen kanssa",
+      "label": "Yksityinen avain"
+    },
+    "publicKey": {
+      "description": "Lähetetään muille mesh-verkon laitteille, jotta ne voivat laskea jaetun salaisen avaimen",
+      "label": "Julkinen avain"
+    },
+    "primaryAdminKey": {
+      "description": "Ensisijainen julkinen avain, jolla on oikeus lähettää hallintaviestejä tälle laitteelle",
+      "label": "Ensisijainen järjestelmänvalvojan avain"
+    },
+    "secondaryAdminKey": {
+      "description": "Toissijainen julkinen avain, jolla on oikeus lähettää hallintaviestejä tälle laitteelle",
+      "label": "Toissijainen järjestelmänvalvojan avain"
+    },
+    "serialOutputEnabled": {
+      "description": "Sarjakonsoli Stream API:n yli",
+      "label": "Sarjaulostulo Käytössä"
+    },
+    "tertiaryAdminKey": {
+      "description": "Kolmas julkinen avain, jolla on oikeus lähettää hallintaviestejä tälle laitteelle",
+      "label": "Kolmas järjestelmänvalvojan hallinta-avain"
+    },
+    "adminSettings": {
+      "description": "Järjestelmänvalvojan asetukset",
+      "label": "Ylläpitäjän asetukset"
+    },
+    "loggingSettings": {
+      "description": "Kirjautumisen asetukset",
+      "label": "Kirjautumisen asetukset"
+    }
+  },
+  "user": {
+    "title": "Käyttäjäasetukset",
+    "description": "Aseta laitteen nimi ja tunnistetiedot",
+    "longName": {
+      "label": "Pitkä nimi",
+      "description": "Koko näyttönimi (1–40 merkkiä)",
+      "validation": {
+        "min": "Pitkässä nimessä on oltava vähintään 1 merkki",
+        "max": "Pitkässä nimessä saa olla enintään 40 merkkiä"
+      }
+    },
+    "shortName": {
+      "label": "Lyhytnimi",
+      "description": "Lyhytnimesi (2–4 merkkiä)",
+      "validation": {
+        "min": "Lyhytnimen on oltava vähintään 2 merkkiä pitkä",
+        "max": "Lyhytnimessä saa olla enintään 4 merkkiä"
+      }
+    },
+    "isUnmessageable": {
+      "label": "Ei vastaanota viestejä",
+      "description": "Käytetään tunnistamaan valvomattomat tai infrastruktuurilaitteet, jotta viestintä ei olisi käytettävissä laitteille, jotka eivät koskaan vastaa."
+    },
+    "isLicensed": {
+      "label": "Lisensoitu radioamatööri (HAM)",
+      "description": "Ota käyttöön, jos olet luvanvarainen radioamatööri. Tämän asetuksen käyttöönotto poistaa salauksen käytöstä, eikä se ole yhteensopiva oletusarvoisen Meshtastic-verkon kanssa."
+    }
+  }
+}

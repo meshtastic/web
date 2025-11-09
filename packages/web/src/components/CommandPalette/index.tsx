@@ -126,14 +126,7 @@ export const CommandPalette = () => {
             label:
               getNode(device.hardware.myNodeNum)?.user?.longName ??
               t("unknown.shortName"),
-            icon: (
-              <Avatar
-                text={
-                  getNode(device.hardware.myNodeNum)?.user?.shortName ??
-                  t("unknown.shortName")
-                }
-              />
-            ),
+            icon: <Avatar nodeNum={device.hardware.myNodeNum} />,
             action() {
               setSelectedDevice(device.id);
             },

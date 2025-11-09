@@ -1,0 +1,458 @@
+{
+  "page": {
+    "title": "Einstellungen",
+    "tabUser": "Benutzer",
+    "tabChannels": "Kanäle",
+    "tabBluetooth": "Bluetooth",
+    "tabDevice": "Gerät",
+    "tabDisplay": "Display",
+    "tabLora": "LoRa",
+    "tabNetwork": "Netzwerk",
+    "tabPosition": "Standort",
+    "tabPower": "Leistung",
+    "tabSecurity": "Sicherheit"
+  },
+  "sidebar": {
+    "label": "Einstellungen"
+  },
+  "device": {
+    "title": "Geräteeinstellungen",
+    "description": "Einstellungen für dieses Gerät",
+    "buttonPin": {
+      "description": "GPIO für Taste überschreiben",
+      "label": "GPIO Taste"
+    },
+    "buzzerPin": {
+      "description": "GPIO für Summer überschreiben",
+      "label": "GPIO Summer"
+    },
+    "disableTripleClick": {
+      "description": "Dreifachklick deaktivieren",
+      "label": "Dreifachklick deaktivieren"
+    },
+    "doubleTapAsButtonPress": {
+      "description": "Doppeltes Tippen als Taste verwenden",
+      "label": "Doppelklick als Tastendruck"
+    },
+    "ledHeartbeatDisabled": {
+      "description": "Puls LED deaktivieren",
+      "label": "Herzschlag LED deaktivieren"
+    },
+    "nodeInfoBroadcastInterval": {
+      "description": "Häufigkeit der Übertragung von Knoteninformationen",
+      "label": "Knoteninfo Übertragungsintervall"
+    },
+    "posixTimezone": {
+      "description": "Zeichenfolge der POSIX Zeitzone für dieses Gerät",
+      "label": "POSIX Zeitzone"
+    },
+    "rebroadcastMode": {
+      "description": "Wie Weiterleitungen behandelt werden",
+      "label": "Weiterleitungsmodus"
+    },
+    "role": {
+      "description": "In welcher Rolle das Gerät im Netz arbeitet",
+      "label": "Rolle"
+    }
+  },
+  "bluetooth": {
+    "title": "Bluetooth Einstellungen",
+    "description": "Einstellungen für das Bluetooth Modul",
+    "note": "Hinweis: Einige Geräte (ESP32) können nicht gleichzeitig Bluetooth und WLAN verwenden.",
+    "enabled": {
+      "description": "Bluetooth aktivieren oder deaktivieren",
+      "label": "Aktiviert"
+    },
+    "pairingMode": {
+      "description": "PIN Nummer Auswahlverhalten",
+      "label": "Kopplungsmodus"
+    },
+    "pin": {
+      "description": "PIN Nummer zum Verbinden verwenden",
+      "label": "PIN Nummer"
+    }
+  },
+  "display": {
+    "description": "Einstellungen für die Geräteanzeige",
+    "title": "Anzeigeeinstellungen",
+    "headingBold": {
+      "description": "Überschrifttext fett darstellen",
+      "label": "Fette Überschrift"
+    },
+    "carouselDelay": {
+      "description": "Bestimmt wie schnell die Fenster durch gewechselt werden",
+      "label": "Karussellintervall"
+    },
+    "compassNorthTop": {
+      "description": "Norden im Kompass immer oben anzeigen",
+      "label": "Kompass Norden oben"
+    },
+    "displayMode": {
+      "description": "Variante des Anzeigelayout",
+      "label": "Anzeigemodus"
+    },
+    "displayUnits": {
+      "description": "Zeige metrische oder imperiale Einheiten",
+      "label": "Anzeigeeinheiten"
+    },
+    "flipScreen": {
+      "description": "Anzeige um 180 Grad drehen",
+      "label": "Anzeige drehen"
+    },
+    "gpsDisplayUnits": {
+      "description": "Anzeigeformat der Koordinaten",
+      "label": "GPS Anzeigeformat"
+    },
+    "oledType": {
+      "description": "Art des OLED Anzeige, die an dem Gerät angeschlossen ist",
+      "label": "OLED Typ"
+    },
+    "screenTimeout": {
+      "description": "Anzeige nach dieser Zeit automatisch ausschalten",
+      "label": "Anzeigeabschaltung"
+    },
+    "twelveHourClock": {
+      "description": "12-Stunden Format benutzen",
+      "label": "12-Stunden Uhr"
+    },
+    "wakeOnTapOrMotion": {
+      "description": "Gerät durch Tippen oder Bewegung aufwecken",
+      "label": "Aufwachen durch Tippen oder Bewegung"
+    }
+  },
+  "lora": {
+    "title": "Netzeinstellungen",
+    "description": "Einstellungen für das LoRa Netz",
+    "bandwidth": {
+      "description": "Kanalbandbreite in MHz",
+      "label": "Bandbreite"
+    },
+    "boostedRxGain": {
+      "description": "Erhöhte Empfangsverstärkung",
+      "label": "Erhöhte Empfangsverstärkung"
+    },
+    "codingRate": {
+      "description": "Kodierrate",
+      "label": "Fehlerkorrektur"
+    },
+    "frequencyOffset": {
+      "description": "Frequenzversatz zur Kalibrierung von Oszillatorfehlern",
+      "label": "Frequenzversatz"
+    },
+    "frequencySlot": {
+      "description": "LoRa Frequenzschlitz",
+      "label": "Frequenzschlitz"
+    },
+    "hopLimit": {
+      "description": "Maximale Sprungweite",
+      "label": "Sprungweite"
+    },
+    "ignoreMqtt": {
+      "description": "MQTT Nachrichten nicht über das Netz weiterleiten",
+      "label": "MQTT ignorieren"
+    },
+    "modemPreset": {
+      "description": "Modem Voreinstellung die verwendet wird",
+      "label": "Modem Voreinstellungen"
+    },
+    "okToMqtt": {
+      "description": "Wenn auf aktiviert, zeigt diese Einstellung an, dass der Benutzer das Weiterleiten von Nachrichten über MQTT akzeptiert. Wenn deaktiviert, werden entfernte Knoten aufgefordert, Nachrichten nicht über MQTT weiterzuleiten",
+      "label": "OK für MQTT"
+    },
+    "overrideDutyCycle": {
+      "description": "Duty-Cycle überschreiben",
+      "label": "Duty-Cycle überschreiben"
+    },
+    "overrideFrequency": {
+      "description": "Sendefrequenz überschreiben (MHz)",
+      "label": "Sendefrequenz überschreiben"
+    },
+    "region": {
+      "description": "Legt die Region für Ihren Knoten fest",
+      "label": "Region"
+    },
+    "spreadingFactor": {
+      "description": "Anzahl der Symbole zur Kodierung der Nutzdaten",
+      "label": "Spreizfaktor"
+    },
+    "transmitEnabled": {
+      "description": "Sender (TX) des LoRa Funkgerätes aktivieren/deaktivieren",
+      "label": "Senden aktiviert"
+    },
+    "transmitPower": {
+      "description": "Maximale Sendeleistung",
+      "label": "Sendeleistung"
+    },
+    "usePreset": {
+      "description": "Eine der vordefinierten Modem Voreinstellungen verwenden",
+      "label": "Voreinstellung verwenden"
+    },
+    "meshSettings": {
+      "description": "Einstellungen für das LoRa Netz",
+      "label": "Netzeinstellungen"
+    },
+    "waveformSettings": {
+      "description": "Einstellungen für die LoRa Wellenform",
+      "label": "Einstellungen der Wellenform"
+    },
+    "radioSettings": {
+      "label": "Funkeinstellungen",
+      "description": "Einstellungen für das LoRa Funkgerät"
+    }
+  },
+  "network": {
+    "title": "WLAN Einstellungen",
+    "description": "WLAN Funkeinstellungen",
+    "note": "Hinweis: Einige Geräte (ESP32) können nicht gleichzeitig Bluetooth und WLAN verwenden.",
+    "addressMode": {
+      "description": "Auswahl der IP Adressenzuweisung",
+      "label": "IP Adressenmodus"
+    },
+    "dns": {
+      "description": "DNS Server",
+      "label": "DNS"
+    },
+    "ethernetEnabled": {
+      "description": "Aktivieren oder deaktivieren sie den Ethernet Anschluss",
+      "label": "Aktiviert"
+    },
+    "gateway": {
+      "description": "Standard Gateway",
+      "label": "Gateway"
+    },
+    "ip": {
+      "description": "IP Adresse",
+      "label": "IP"
+    },
+    "psk": {
+      "description": "Netzwerkpasswort",
+      "label": "PSK"
+    },
+    "ssid": {
+      "description": "Netzwerkname",
+      "label": "SSID"
+    },
+    "subnet": {
+      "description": "Subnetzmaske",
+      "label": "Subnetz"
+    },
+    "wifiEnabled": {
+      "description": "Aktivieren oder deaktivieren Sie die WLAN Übertragung",
+      "label": "Aktiviert"
+    },
+    "meshViaUdp": {
+      "label": "Netz über UDP"
+    },
+    "ntpServer": {
+      "label": "NTP Server"
+    },
+    "rsyslogServer": {
+      "label": "Rsyslog Server"
+    },
+    "ethernetConfigSettings": {
+      "description": "Einstellung des Ethernet Ports",
+      "label": "Ethernet Einstellung"
+    },
+    "ipConfigSettings": {
+      "description": "Einstellung der IP Adresse",
+      "label": "IP Adresseinstellungen"
+    },
+    "ntpConfigSettings": {
+      "description": "NTP Server Einstellungen",
+      "label": "NTP Einstellungen"
+    },
+    "rsyslogConfigSettings": {
+      "description": "Rsyslog Einstellung",
+      "label": "Rsyslog Einstellung"
+    },
+    "udpConfigSettings": {
+      "description": "UDP über Netz Einstellung",
+      "label": "UDP Konfiguration"
+    }
+  },
+  "position": {
+    "title": "Standorteinstellung",
+    "description": "Einstellungen für das Standortmodul",
+    "broadcastInterval": {
+      "description": "Wie oft Ihr Standort über das Netz gesendet wird",
+      "label": "Übertragungsintervall"
+    },
+    "enablePin": {
+      "description": "Überschreiben des GPIO der das GPS-Modul aktiviert",
+      "label": "GPIO GPS aktivieren"
+    },
+    "fixedPosition": {
+      "description": "GPS Standort nicht senden, sondern manuell angegeben",
+      "label": "Fester Standort"
+    },
+    "gpsMode": {
+      "description": "Einstellung, ob GPS des Geräts aktiviert, deaktiviert oder nicht vorhanden ist",
+      "label": "GPS Modus"
+    },
+    "gpsUpdateInterval": {
+      "description": "Wie oft ein GPS Standort ermittelt werden soll",
+      "label": "GPS Aktualisierungsintervall"
+    },
+    "positionFlags": {
+      "description": "Optionalen, die bei der Zusammenstellung von Standortnachrichten enthalten sein sollen. Je mehr Optionen ausgewählt werden, desto größer wird die Nachricht und die längere Übertragungszeit erhöht das Risiko für einen Nachrichtenverlust.",
+      "label": "Standort Optionen"
+    },
+    "receivePin": {
+      "description": "GPIO Pin für serielles Empfangen (RX) des GPS-Moduls überschreiben",
+      "label": "GPIO Empfangen"
+    },
+    "smartPositionEnabled": {
+      "description": "Standort nur verschicken, wenn eine sinnvolle Standortänderung stattgefunden hat",
+      "label": "Intelligenten Standort aktivieren"
+    },
+    "smartPositionMinDistance": {
+      "description": "Mindestabstand (in Meter), die vor dem Senden einer Standortaktualisierung zurückgelegt werden muss",
+      "label": "Minimale Entfernung für intelligenten Standort"
+    },
+    "smartPositionMinInterval": {
+      "description": "Minimales Intervall (in Sekunden), das vor dem Senden einer Standortaktualisierung vergangen sein muss",
+      "label": "Minimales Intervall für intelligenten Standort"
+    },
+    "transmitPin": {
+      "description": "GPIO Pin für serielles Senden (TX) des GPS-Moduls überschreiben",
+      "label": "GPIO Senden"
+    },
+    "intervalsSettings": {
+      "description": "Wie oft Standortaktualisierungen gesendet werden",
+      "label": "Intervalle"
+    },
+    "flags": {
+      "placeholder": "Standort Optionen auswählen",
+      "altitude": "Höhe",
+      "altitudeGeoidalSeparation": "Geoidale Höhentrennung",
+      "altitudeMsl": "Höhe in Bezug auf Meeresspiegel",
+      "dop": "Dilution of Präzision (DOP) PDOP standardmäßig verwenden",
+      "hdopVdop": "Wenn DOP gesetzt ist, wird HDOP / VDOP anstelle von PDOP verwendet",
+      "numSatellites": "Anzahl Satelliten",
+      "sequenceNumber": "Sequenznummer",
+      "timestamp": "Zeitstempel",
+      "unset": "Nicht konfiguriert",
+      "vehicleHeading": "Fahrzeugsteuerkurs",
+      "vehicleSpeed": "Fahrzeuggeschwindigkeit"
+    }
+  },
+  "power": {
+    "adcMultiplierOverride": {
+      "description": "Zur Optimierung der Genauigkeit bei der Akkuspannungsmessung",
+      "label": "ADC Multiplikationsfaktor"
+    },
+    "ina219Address": {
+      "description": "Adresse des INA219 Stromsensors",
+      "label": "INA219 Adresse"
+    },
+    "lightSleepDuration": {
+      "description": "Wie lange das Gerät im leichten Schlafmodus ist",
+      "label": "Dauer leichter Schlafmodus"
+    },
+    "minimumWakeTime": {
+      "description": "Minimale Zeitspanne für die das Gerät aktiv bleibt, nachdem es eine Nachricht empfangen hat",
+      "label": "Minimale Aufwachzeit"
+    },
+    "noConnectionBluetoothDisabled": {
+      "description": "Wenn das Gerät keine Bluetooth-Verbindung erhält, wird BLE nach dieser Zeit deaktiviert",
+      "label": "Keine Verbindung, Bluetooth deaktiviert"
+    },
+    "powerSavingEnabled": {
+      "description": "Auswählen, wenn aus einer Stromquelle mit niedriger Kapazität (z.B. Solar) betrieben wird, um den Stromverbrauch so weit wie möglich zu minimieren.",
+      "label": "Energiesparmodus aktivieren"
+    },
+    "shutdownOnBatteryDelay": {
+      "description": "Verzögerung bis zum Abschalten der Knoten sich im Akkubetrieb befindet. 0 für unbegrenzt",
+      "label": "Verzögerung Akkuabschaltung"
+    },
+    "superDeepSleepDuration": {
+      "description": "Wie lange das Gerät im supertiefen Schlafmodus ist",
+      "label": "Dauer Supertiefschlaf"
+    },
+    "powerConfigSettings": {
+      "description": "Einstellungen für das Energiemodul",
+      "label": "Energie Einstellungen"
+    },
+    "sleepSettings": {
+      "description": "Einstellungen Ruhezustand für das Energiemodul",
+      "label": "Einstellung Ruhezustand"
+    }
+  },
+  "security": {
+    "description": "Sicherheitseinstellungen",
+    "title": "Sicherheitseinstellungen",
+    "button_backupKey": "Schlüssel sichern",
+    "adminChannelEnabled": {
+      "description": "Erlaubt die Gerätesteuerung über den unsicheren, veralteten administrativen Kanal",
+      "label": "Veraltete Administrierung erlauben"
+    },
+    "enableDebugLogApi": {
+      "description": "Ausgabe von Fehlerprotokollen in Echtzeit über die serielle Schnittstelle, Anzeige und Export von Standort reduzierten Geräteprotokollen über Bluetooth",
+      "label": "Debug-Protokoll API aktivieren"
+    },
+    "managed": {
+      "description": "Wenn aktiviert, können die Geräteeinstellungen nur von einem entfernten Administratorknoten über administrative Nachrichten geändert werden. Aktivieren Sie diese Option nur, wenn mindestens ein geeigneter Administratorknoten eingerichtet wurde, und dessen öffentlicher Schlüssel in einem der obigen Felder gespeichert wurde.\n",
+      "label": "Verwaltet"
+    },
+    "privateKey": {
+      "description": "Wird verwendet, um einen gemeinsamen Schlüssel mit einem entfernten Gerät zu erstellen",
+      "label": "Privater Schlüssel"
+    },
+    "publicKey": {
+      "description": "Wird an andere Knoten im Netz gesendet, damit diese einen gemeinsamen geheimen Schlüssel berechnen können",
+      "label": "Öffentlicher Schlüssel"
+    },
+    "primaryAdminKey": {
+      "description": "Erster öffentlicher Schlüssel, der berechtigt ist, administrative Nachrichten an diesen Knoten zu senden",
+      "label": "Erster Admin-Schlüssel"
+    },
+    "secondaryAdminKey": {
+      "description": "Zweiter öffentlicher Schlüssel, der berechtigt ist, administrative Nachrichten an diesen Knoten zu senden",
+      "label": "Zweiter Admin-Schlüssel"
+    },
+    "serialOutputEnabled": {
+      "description": "Serielle Konsole über die Stream-API",
+      "label": "Serielle Ausgabe aktiviert"
+    },
+    "tertiaryAdminKey": {
+      "description": "Dritter öffentlicher Schlüssel, der berechtigt ist, administrative Nachrichten an diesen Knoten zu senden",
+      "label": "Dritter Admin-Schlüssel"
+    },
+    "adminSettings": {
+      "description": "Administrator Einstellungen",
+      "label": "Administrator Einstellungen"
+    },
+    "loggingSettings": {
+      "description": "Einstellungen für die Protokollierung",
+      "label": "Protokolleinstellungen"
+    }
+  },
+  "user": {
+    "title": "Benutzereinstellungen",
+    "description": "Konfigurieren Sie Ihren Gerätenamen und Identitätseinstellungen",
+    "longName": {
+      "label": "Langer Name",
+      "description": "Ihr vollständiger Anzeigename (1-40 Zeichen)",
+      "validation": {
+        "min": "Langer Name muss mindestens 1 Zeichen lang sein",
+        "max": "Langer Name muss mindestens 40 Zeichen lang sein"
+      }
+    },
+    "shortName": {
+      "label": "Kurzname",
+      "description": "Ihr abgekürzter Name (2-4 Zeichen)",
+      "validation": {
+        "min": "Kurzname muss mindestens 2 Zeichen lang sein",
+        "max": "Kurzname muss mindestens 4 Zeichen lang sein"
+      }
+    },
+    "isUnmessageable": {
+      "label": "Nicht erreichbar",
+      "description": "Wird verwendet, um nicht überwachte Knoten oder Infrastrukturknoten zu identifizieren, sodass Nachrichten nicht an Knoten gesendet werden können, die niemals antworten."
+    },
+    "isLicensed": {
+      "label": "Amateurfunk lizenziert",
+      "description": "Aktivieren Sie diese Option, wenn Sie ein lizenzierter Amateurfunker sind. Durch Aktivieren dieser Option wird die Verschlüsselung deaktiviert und sie ist nicht mit dem standardmäßigen Meshtastic Netzwerk kompatibel."
+    }
+  }
+}

@@ -1,228 +1,229 @@
 {
-	"navigation": {
-		"title": "Навігація",
-		"messages": "Повідомлення",
-		"map": "Мапа",
-		"config": "Config",
-		"radioConfig": "Налаштування радіо",
-		"moduleConfig": "Module Config",
-		"channels": "Канали",
-		"nodes": "Вузли"
-	},
-	"app": {
-		"title": "Meshtastic",
-		"logo": "Логотип Meshtastic"
-	},
-	"sidebar": {
-		"collapseToggle": {
-			"button": {
-				"open": "Відкрити бічну панель",
-				"close": "Закрити бічну панель"
-			}
-		},
-		"deviceInfo": {
-			"volts": "{{voltage}} Вольт",
-			"firmware": {
-				"title": "Прошивка",
-				"version": "v{{version}}",
-				"buildDate": "Дата збірки: {{date}}"
-			},
-			"deviceName": {
-				"title": "Назва пристрою",
-				"changeName": "Змінити назву пристрою",
-				"placeholder": "Уведіть назву пристрою"
-			},
-			"editDeviceName": "Змінити назву пристрою"
-		}
-	},
-	"batteryStatus": {
-		"charging": "{{level}}% charging",
-		"pluggedIn": "Plugged in",
-		"title": "Батарея"
-	},
-	"search": {
-		"nodes": "Пошук вузлів...",
-		"channels": "Пошук каналів...",
-		"commandPalette": "Пошук команд..."
-	},
-	"toast": {
-		"positionRequestSent": {
-			"title": "Запит на позицію надіслано."
-		},
-		"requestingPosition": {
-			"title": "Requesting position, please wait..."
-		},
-		"sendingTraceroute": {
-			"title": "Sending Traceroute, please wait..."
-		},
-		"tracerouteSent": {
-			"title": "Traceroute sent."
-		},
-		"savedChannel": {
-			"title": "Saved Channel: {{channelName}}"
-		},
-		"messages": {
-			"pkiEncryption": {
-				"title": "Чат використовує шифрування PKI."
-			},
-			"pskEncryption": {
-				"title": "Чат використовує PSK шифрування."
-			}
-		},
-		"configSaveError": {
-			"title": "Помилка збереження налаштувань",
-			"description": "An error occurred while saving the configuration."
-		},
-		"validationError": {
-			"title": "Config Errors Exist",
-			"description": "Please fix the configuration errors before saving."
-		},
-		"saveSuccess": {
-			"title": "Saving Config",
-			"description": "The configuration change {{case}} has been saved."
-		},
-		"favoriteNode": {
-			"title": "{{action}} {{nodeName}} {{direction}} favorites.",
-			"action": {
-				"added": "Додано",
-				"removed": "Видалено",
-				"to": "до",
-				"from": "від"
-			}
-		},
-		"ignoreNode": {
-			"title": "{{action}} {{nodeName}} {{direction}} ignore list",
-			"action": {
-				"added": "Додано",
-				"removed": "Видалено",
-				"to": "до",
-				"from": "від"
-			}
-		}
-	},
-	"notifications": {
-		"copied": {
-			"label": "Скопійовано!"
-		},
-		"copyToClipboard": {
-			"label": "Копіювати до буфера обміну"
-		},
-		"hidePassword": {
-			"label": "Приховати пароль"
-		},
-		"showPassword": {
-			"label": "Показати пароль"
-		},
-		"deliveryStatus": {
-			"delivered": "Доставлено",
-			"failed": "Delivery Failed",
-			"waiting": "Очікування",
-			"unknown": "Unknown"
-		}
-	},
-	"general": {
-		"label": "General"
-	},
-	"hardware": {
-		"label": "Hardware"
-	},
-	"metrics": {
-		"label": "Метрики"
-	},
-	"role": {
-		"label": "Роль"
-	},
-	"filter": {
-		"label": "Фільтри"
-	},
-	"advanced": {
-		"label": "Розширені"
-	},
-	"clearInput": {
-		"label": "Clear input"
-	},
-	"resetFilters": {
-		"label": "Скинути фільтри"
-	},
-	"nodeName": {
-		"label": "Node name/number",
-		"placeholder": "Meshtastic 1234"
-	},
-	"airtimeUtilization": {
-		"label": "Airtime Utilization (%)"
-	},
-	"batteryLevel": {
-		"label": "Рівень заряду батареї (%)",
-		"labelText": "Рівень заряду батареї (%): {{value}}"
-	},
-	"batteryVoltage": {
-		"label": "Напруга батареї (В)",
-		"title": "Напруга"
-	},
-	"channelUtilization": {
-		"label": "Channel Utilization (%)"
-	},
-	"hops": {
-		"direct": "Direct",
-		"label": "Number of hops",
-		"text": "Number of hops: {{value}}"
-	},
-	"lastHeard": {
-		"label": "Last heard",
-		"labelText": "Last heard: {{value}}",
-		"nowLabel": "Зараз"
-	},
-	"snr": {
-		"label": "SNR (дБ)"
-	},
-	"favorites": {
-		"label": "Обране"
-	},
-	"hide": {
-		"label": "Сховати"
-	},
-	"showOnly": {
-		"label": "Show Only"
-	},
-	"viaMqtt": {
-		"label": "Під'єднано за допомогою MQTT"
-	},
-	"hopsUnknown": {
-		"label": "Unknown number of hops"
-	},
-	"showUnheard": {
-		"label": "Never heard"
-	},
-	"language": {
-		"label": "Мова",
-		"changeLanguage": "Змінити мову"
-	},
-	"theme": {
-		"dark": "Темна",
-		"light": "Світла",
-		"system": "Automatic",
-		"changeTheme": "Змінити схему кольорів"
-	},
-	"errorPage": {
-		"title": "This is a little embarrassing...",
-		"description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
-		"description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
-		"reportInstructions": "Please include the following information in your report:",
-		"reportSteps": {
-			"step1": "What you were doing when the error occurred",
-			"step2": "What you expected to happen",
-			"step3": "What actually happened",
-			"step4": "Any other relevant information"
-		},
-		"reportLink": "Ви можете повідомити про проблему на нашому <0>GitHub</0>",
-		"dashboardLink": "Поверніться до <0>панелі</0>",
-		"detailsSummary": "Інформація про помилку",
-		"errorMessageLabel": "Помилка:",
-		"stackTraceLabel": "Stack trace:",
-		"fallbackError": "{{error}}"
-	},
-	"footer": {
-		"text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
-		"commitSha": "SHA коміту: {{sha}}"
-	}
+  "navigation": {
+    "title": "Навігація",
+    "messages": "Повідомлення",
+    "map": "Мапа",
+    "settings": "Налаштування",
+    "channels": "Канали",
+    "radioConfig": "Налаштування радіо",
+    "deviceConfig": "Налаштування пристрою",
+    "moduleConfig": "Module Config",
+    "nodes": "Вузли"
+  },
+  "app": {
+    "title": "Meshtastic",
+    "logo": "Логотип Meshtastic"
+  },
+  "sidebar": {
+    "collapseToggle": {
+      "button": {
+        "open": "Відкрити бічну панель",
+        "close": "Закрити бічну панель"
+      }
+    },
+    "deviceInfo": {
+      "volts": "{{voltage}} Вольт",
+      "firmware": {
+        "title": "Прошивка",
+        "version": "v{{version}}",
+        "buildDate": "Дата збірки: {{date}}"
+      }
+    }
+  },
+  "batteryStatus": {
+    "charging": "{{level}}% charging",
+    "pluggedIn": "Plugged in",
+    "title": "Батарея"
+  },
+  "search": {
+    "nodes": "Пошук вузлів...",
+    "channels": "Пошук каналів...",
+    "commandPalette": "Пошук команд..."
+  },
+  "toast": {
+    "positionRequestSent": {
+      "title": "Запит на позицію надіслано."
+    },
+    "requestingPosition": {
+      "title": "Requesting position, please wait..."
+    },
+    "sendingTraceroute": {
+      "title": "Sending Traceroute, please wait..."
+    },
+    "tracerouteSent": {
+      "title": "Traceroute sent."
+    },
+    "savedChannel": {
+      "title": "Saved Channel: {{channelName}}"
+    },
+    "messages": {
+      "pkiEncryption": {
+        "title": "Чат використовує шифрування PKI."
+      },
+      "pskEncryption": {
+        "title": "Чат використовує PSK шифрування."
+      }
+    },
+    "configSaveError": {
+      "title": "Помилка збереження налаштувань",
+      "description": "An error occurred while saving the configuration."
+    },
+    "validationError": {
+      "title": "Config Errors Exist",
+      "description": "Please fix the configuration errors before saving."
+    },
+    "saveSuccess": {
+      "title": "Saving Config",
+      "description": "The configuration change {{case}} has been saved."
+    },
+    "saveAllSuccess": {
+      "title": "Saved",
+      "description": "All configuration changes have been saved."
+    },
+    "favoriteNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} favorites.",
+      "action": {
+        "added": "Додано",
+        "removed": "Видалено",
+        "to": "до",
+        "from": "від"
+      }
+    },
+    "ignoreNode": {
+      "title": "{{action}} {{nodeName}} {{direction}} ignore list",
+      "action": {
+        "added": "Додано",
+        "removed": "Видалено",
+        "to": "до",
+        "from": "від"
+      }
+    }
+  },
+  "notifications": {
+    "copied": {
+      "label": "Скопійовано!"
+    },
+    "copyToClipboard": {
+      "label": "Копіювати до буфера обміну"
+    },
+    "hidePassword": {
+      "label": "Приховати пароль"
+    },
+    "showPassword": {
+      "label": "Показати пароль"
+    },
+    "deliveryStatus": {
+      "delivered": "Доставлено",
+      "failed": "Delivery Failed",
+      "waiting": "Очікування",
+      "unknown": "Unknown"
+    }
+  },
+  "general": {
+    "label": "General"
+  },
+  "hardware": {
+    "label": "Hardware"
+  },
+  "metrics": {
+    "label": "Метрики"
+  },
+  "role": {
+    "label": "Роль"
+  },
+  "filter": {
+    "label": "Фільтри"
+  },
+  "advanced": {
+    "label": "Розширені"
+  },
+  "clearInput": {
+    "label": "Clear input"
+  },
+  "resetFilters": {
+    "label": "Скинути фільтри"
+  },
+  "nodeName": {
+    "label": "Node name/number",
+    "placeholder": "Meshtastic 1234"
+  },
+  "airtimeUtilization": {
+    "label": "Airtime Utilization (%)",
+    "short": "Airtime Util. (%)"
+  },
+  "batteryLevel": {
+    "label": "Рівень заряду батареї (%)",
+    "labelText": "Рівень заряду батареї (%): {{value}}"
+  },
+  "batteryVoltage": {
+    "label": "Напруга батареї (В)",
+    "title": "Напруга"
+  },
+  "channelUtilization": {
+    "label": "Channel Utilization (%)",
+    "short": "Channel Util. (%)"
+  },
+  "hops": {
+    "direct": "Direct",
+    "label": "Number of hops",
+    "text": "Number of hops: {{value}}"
+  },
+  "lastHeard": {
+    "label": "Last heard",
+    "labelText": "Last heard: {{value}}",
+    "nowLabel": "Зараз"
+  },
+  "snr": {
+    "label": "SNR (дБ)"
+  },
+  "favorites": {
+    "label": "Обране"
+  },
+  "hide": {
+    "label": "Сховати"
+  },
+  "showOnly": {
+    "label": "Show Only"
+  },
+  "viaMqtt": {
+    "label": "Під'єднано за допомогою MQTT"
+  },
+  "hopsUnknown": {
+    "label": "Unknown number of hops"
+  },
+  "showUnheard": {
+    "label": "Never heard"
+  },
+  "language": {
+    "label": "Мова",
+    "changeLanguage": "Змінити мову"
+  },
+  "theme": {
+    "dark": "Темна",
+    "light": "Світла",
+    "system": "Automatic",
+    "changeTheme": "Змінити схему кольорів"
+  },
+  "errorPage": {
+    "title": "This is a little embarrassing...",
+    "description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
+    "description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
+    "reportInstructions": "Please include the following information in your report:",
+    "reportSteps": {
+      "step1": "What you were doing when the error occurred",
+      "step2": "What you expected to happen",
+      "step3": "What actually happened",
+      "step4": "Any other relevant information"
+    },
+    "reportLink": "Ви можете повідомити про проблему на нашому <0>GitHub</0>",
+    "dashboardLink": "Поверніться до <0>панелі</0>",
+    "detailsSummary": "Інформація про помилку",
+    "errorMessageLabel": "Помилка:",
+    "stackTraceLabel": "Stack trace:",
+    "fallbackError": "{{error}}"
+  },
+  "footer": {
+    "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
+    "commitSha": "SHA коміту: {{sha}}"
+  }
 }
