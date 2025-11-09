@@ -3,31 +3,19 @@
     "description": "Това действие ще изчисти цялата история на съобщенията. Това не може да бъде отменено. Сигурни ли сте, че искате да продължите?",
     "title": "Изчистване на всички съобщения"
   },
-  "deviceName": {
-    "description": "Устройството ще се рестартира, след като конфигурацията бъде запазена.",
-    "longName": "Дълго име",
-    "shortName": "Кратко име",
-    "title": "Промяна на името на устройството",
-    "validation": {
-      "longNameMax": "Дългото име не трябва да е повече от 40 знака",
-      "shortNameMax": "Краткото име не трябва да е повече от 4 знака",
-      "longNameMin": "Дългото име трябва да съдържа поне 1 символ",
-      "shortNameMin": "Краткото име трябва да съдържа поне 1 символ"
-    }
-  },
   "import": {
     "description": "Текущата конфигурация на LoRa ще бъде презаписана.",
     "error": {
       "invalidUrl": "Невалиден Meshtastic URL"
     },
     "channelPrefix": "Канал: ",
-    "primary": "Primary ",
+    "primary": "Първичен ",
     "doNotImport": "No not import",
     "channelName": "Име",
     "channelSlot": "Слот",
     "channelSetUrl": "Channel Set/QR Code URL",
-    "useLoraConfig": "Import LoRa Config",
-    "presetDescription": "The current LoRa Config will be replaced.",
+    "useLoraConfig": "Импортиране на конфигурация на LoRa",
+    "presetDescription": "Текущата конфигурация na LoRa ще бъде заменена.",
     "title": "Import Channel Set"
   },
   "locationResponse": {
@@ -41,48 +29,77 @@
     "description": "Сигурни ли сте, че искате да регенерирате предварително споделения ключ?",
     "regenerate": "Регенериране"
   },
-  "newDeviceDialog": {
-    "title": "Свързване на ново устройство",
-    "https": "https",
-    "http": "http",
-    "tabHttp": "HTTP",
-    "tabBluetooth": "Bluetooth",
-    "tabSerial": "Серийна",
-    "useHttps": "Използване на HTTPS",
-    "connecting": "Свързване...",
-    "connect": "Свързване",
-    "connectionFailedAlert": {
-      "title": "Връзката е неуспешна",
-      "descriptionPrefix": "Не може да се свърже с устройството.",
-      "httpsHint": "Ако използвате HTTPS, може да се наложи първо да приемете самоподписан сертификат. ",
-      "openLinkPrefix": "Моля, отворете",
-      "openLinkSuffix": "в нов раздел",
-      "acceptTlsWarningSuffix": ", accept any TLS warnings if prompted, then try again",
-      "learnMoreLink": "Научете повече"
-    },
-    "httpConnection": {
-      "label": "IP адрес/Име на хост",
-      "placeholder": "000.000.000.000 / meshtastic.local"
-    },
-    "serialConnection": {
-      "noDevicesPaired": "Все още няма сдвоени устройства.",
-      "newDeviceButton": "Ново устройство",
-      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
-    },
-    "bluetoothConnection": {
-      "noDevicesPaired": "Все още няма сдвоени устройства.",
-      "newDeviceButton": "Ново устройство",
-      "connectionFailed": "Връзката е неуспешна",
-      "deviceDisconnected": "Устройството не е свързано",
-      "unknownDevice": "Неизвестно устройство",
-      "errorLoadingDevices": "Грешка при зареждане на устройствата",
-      "unknownErrorLoadingDevices": "Неизвестна грешка при зареждане на устройствата"
-    },
+  "addConnection": {
+    "title": "Добавяне на връзка",
+    "description": "Изберете тип връзка и попълнете данните",
     "validation": {
       "requiresWebBluetooth": "Този тип връзка изисква <0>Web Bluetooth</0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
       "requiresWebSerial": "Този тип връзка изисква <0>Web Serial</0>. Моля, използвайте поддържан браузър, като Chrome или Edge.",
       "requiresSecureContext": "Това приложение изисква <0>secure context</0>. Моля, свържете се чрез HTTPS или localhost.",
       "additionallyRequiresSecureContext": "Освен това, изисква <0>secure context</0>. Моля, свържете се чрез HTTPS или localhost."
+    },
+    "bluetoothConnection": {
+      "namePlaceholder": "Моят Bluetooth възел",
+      "supported": {
+        "title": "Поддържа се Web Bluetooth"
+      },
+      "notSupported": {
+        "title": "Не се поддържа Web Bluetooth",
+        "description": "Вашият браузър или устройство не поддържа Web Bluetooth"
+      },
+      "short": "BT: {{deviceName}}",
+      "long": "Bluetooth устройство",
+      "device": "Устройство",
+      "selectDevice": "Изберете устройство",
+      "selected": "Избрано Bluetooth устройство",
+      "notSelected": "Няма избрано устройство",
+      "helperText": "Използва услугата Meshtastic Bluetooth за откриване."
+    },
+    "serialConnection": {
+      "namePlaceholder": "Моят сериен възел",
+      "helperText": "Selecting a port grants permission so the app can open it to connect.",
+      "supported": {
+        "title": "Web Serial supported"
+      },
+      "notSupported": {
+        "title": "Web Serial not supported",
+        "description": "Your browser or device does not support Web Serial"
+      },
+      "portSelected": {
+        "title": "Serial port selected",
+        "description": "Port permissions granted."
+      },
+      "port": "Порт",
+      "selectPort": "Изберете порт",
+      "deviceName": "USB {{vendorId}}:{{productId}}",
+      "notSelected": "Няма избран порт"
+    },
+    "httpConnection": {
+      "namePlaceholder": "Моят HTTP възел",
+      "inputPlaceholder": "192.168.1.10 или meshtastic.local",
+      "heading": "URL или IP",
+      "useHttps": "Използване на HTTPS",
+      "invalidUrl": {
+        "title": "Невалиден URL",
+        "description": "Моля, въведете валиден HTTP или HTTPS URL."
+      },
+      "connectionTest": {
+        "description": "Тествайте връзката, преди да я запазите, за да се уверите, че устройството е достъпно.",
+        "button": {
+          "loading": "Тестване...",
+          "label": "Тестване на връзката"
+        },
+        "reachable": "Достъпно",
+        "notReachable": "Не е достъпно",
+        "success": {
+          "title": "Тестът на връзката е успешен",
+          "description": "Устройството изглежда е достъпно."
+        },
+        "failure": {
+          "title": "Тестът на връзката не е успешен",
+          "description": "Не можа да се осъществи връзка с устройството. Проверете URL-а и опитайте отново."
+        }
+      }
     }
   },
   "nodeDetails": {
@@ -108,7 +125,7 @@
     "removeNode": "Премахване на възела",
     "unignoreNode": "Премахване на игнорирането на възела",
     "security": "Сигурност:",
-    "publicKey": "Public Key: ",
+    "publicKey": "Публичен ключ:",
     "messageable": "Messageable: ",
     "KeyManuallyVerifiedTrue": "Публичният ключ е проверен ръчно",
     "KeyManuallyVerifiedFalse": "Публичният ключ не е проверен ръчно"
@@ -155,7 +172,7 @@
     "description": {
       "acceptNewKeys": "This will remove the node from device and request new keys.",
       "keyMismatchReasonSuffix": ". This is due to the remote node's current public key does not match the previously stored key for this node.",
-      "unableToSendDmPrefix": "Your node is unable to send a direct message to node: "
+      "unableToSendDmPrefix": "Вашият възел не може да изпрати директно съобщение до възел:"
     },
     "acceptNewKeys": "риемане на нови ключове",
     "title": "Keys Mismatch - {{identifier}}"

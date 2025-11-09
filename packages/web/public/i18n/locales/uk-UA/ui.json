@@ -8,6 +8,7 @@
     "radioConfig": "Налаштування радіо",
     "deviceConfig": "Налаштування пристрою",
     "moduleConfig": "Module Config",
+    "manageConnections": "Manage Connections",
     "nodes": "Вузли"
   },
   "app": {
@@ -216,7 +217,7 @@
       "step4": "Any other relevant information"
     },
     "reportLink": "Ви можете повідомити про проблему на нашому <0>GitHub</0>",
-    "dashboardLink": "Поверніться до <0>панелі</0>",
+    "connectionsLink": "Return to the <0>connections</0>",
     "detailsSummary": "Інформація про помилку",
     "errorMessageLabel": "Помилка:",
     "stackTraceLabel": "Stack trace:",

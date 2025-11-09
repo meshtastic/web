@@ -8,6 +8,7 @@
     "radioConfig": "Funkgerätekonfiguration",
     "deviceConfig": "Geräteeinstellungen",
     "moduleConfig": "Moduleinstellungen",
+    "manageConnections": "Verbindungen verwalten",
     "nodes": "Knoten"
   },
   "app": {
@@ -216,7 +217,7 @@
       "step4": "Sonstige relevante Informationen"
     },
     "reportLink": "Sie können das Problem auf unserem <0>GitHub</0> melden",
-    "dashboardLink": "Zurück zum <0>Dashboard</0>",
+    "connectionsLink": "Zurück zu den <0>Verbindungen</0>",
     "detailsSummary": "Fehlerdetails",
     "errorMessageLabel": "Fehlermeldungen:",
     "stackTraceLabel": "Stapelabzug:",

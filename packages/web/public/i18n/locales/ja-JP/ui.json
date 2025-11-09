@@ -8,6 +8,7 @@
     "radioConfig": "Radio Config",
     "deviceConfig": "デバイスの設定",
     "moduleConfig": "Module Config",
+    "manageConnections": "Manage Connections",
     "nodes": "ノード"
   },
   "app": {
@@ -216,7 +217,7 @@
       "step4": "Any other relevant information"
     },
     "reportLink": "You can report the issue to our <0>GitHub</0>",
-    "dashboardLink": "Return to the <0>dashboard</0>",
+    "connectionsLink": "Return to the <0>connections</0>",
     "detailsSummary": "Error Details",
     "errorMessageLabel": "Error message:",
     "stackTraceLabel": "Stack trace:",

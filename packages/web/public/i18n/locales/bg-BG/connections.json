@@ -1,12 +1,34 @@
 {
-	"connections": {
-		"title": "Свързани устройства",
-		"description": "Управлявайте свързаните си устройства Meshtastic.",
-		"connectionType_ble": "BLE",
-		"connectionType_serial": "Серийна",
-		"connectionType_network": "Мрежа",
-		"noDevicesTitle": "Няма свързани устройства",
-		"noDevicesDescription": "Свържете ново устройство, за да започнете.",
-		"button_newConnection": "Нова връзка"
-	}
+  "page": {
+    "title": "Свързване с устройство Meshtastic",
+    "description": "Добавете връзка с устройството чрез HTTP, Bluetooth или сериен порт. Запазените ви връзки ще бъдат запазени във вашия браузър."
+  },
+  "connectionType_ble": "BLE",
+  "connectionType_serial": "Серийна",
+  "connectionType_network": "Мрежа",
+  "deleteConnection": "Изтриване на връзката",
+  "areYouSure": "Това ще премахне {{name}}. Не можете да отмените това действие.",
+  "moreActions": "Още действия",
+  "noConnections": {
+    "title": "Все още няма връзки.",
+    "description": "Създайте първата си връзка. Тя ще се свърже веднага и ще бъде запазена за по-късно."
+  },
+  "lastConnectedAt": "Последно свързване: {{date}}",
+  "neverConnected": "Никога не е бил свързан",
+  "toasts": {
+    "connected": "Свързано",
+    "nowConnected": "{{name}} е свързан сега",
+    "nowDisconnected": "{{name}} are now disconnecte",
+    "disconnected": "Прекъсната връзка",
+    "failed": "Свързването не е успешно",
+    "checkConnetion": "Проверете устройството или настройките си и опитайте отново",
+    "defaultSet": "Default set",
+    "defaultConnection": "Default connection is now {{nameisconnected}}",
+    "deleted": "Изтрит",
+    "deletedByName": "{{name}} беше премахнат",
+    "pickConnectionAgain": "Не можа да се свърже. Може да се наложи да изберете отново устройството/порта.",
+    "added": "Връзката е добавена",
+    "savedByName": "{{name}} е запазен.",
+    "savedCantConnect": "Връзката беше запазена, но не можа да се осъществи свързване."
+  }
 }

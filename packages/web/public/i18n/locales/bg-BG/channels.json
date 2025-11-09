@@ -3,7 +3,7 @@
     "sectionLabel": "Канали",
     "channelName": "Канал: {{channelName}}",
     "broadcastLabel": "Първичен",
-    "channelIndex": "Ch {{index}}",
+    "channelIndex": "К {{index}}",
     "import": "Импортиране",
     "export": "Експортиране"
   },
@@ -33,11 +33,11 @@
     "description": "Уникално име за канала <12 байта, оставете празно за подразбиране"
   },
   "uplinkEnabled": {
-    "label": "Uplink Enabled",
+    "label": "Uplink е активиран",
     "description": "Изпращане на съобщения от локалната mesh към MQTT"
   },
   "downlinkEnabled": {
-    "label": "Downlink Enabled",
+    "label": "Downlink е активиран",
     "description": "Изпращане на съобщения от MQTT към локалната mesh"
   },
   "positionPrecision": {

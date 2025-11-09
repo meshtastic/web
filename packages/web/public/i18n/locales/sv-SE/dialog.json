@@ -3,18 +3,6 @@
     "description": "Den här åtgärden kommer att rensa all meddelandehistorik. Detta kan inte ångras. Är du säker på att du vill fortsätta?",
     "title": "Rensa alla meddelanden"
   },
-  "deviceName": {
-    "description": "Enheten kommer att starta om när inställningarna har sparats.",
-    "longName": "Långt namn",
-    "shortName": "Kort namn",
-    "title": "Ändra enhetens namn",
-    "validation": {
-      "longNameMax": "Långt namn får inte vara längre än 40 tecken",
-      "shortNameMax": "Kort namn får inte vara längre än 4 tecken",
-      "longNameMin": "Långt namn måste ha minst 1 tecken",
-      "shortNameMin": "Kort namn måste ha minst 1 tecken"
-    }
-  },
   "import": {
     "description": "Den aktuella LoRa konfigurationen kommer att skrivas över.",
     "error": {
@@ -41,48 +29,77 @@
     "description": "Är du säker på att du vill förnya den fördelade nyckeln?",
     "regenerate": "Förnya"
   },
-  "newDeviceDialog": {
-    "title": "Anslut ny enhet",
-    "https": "https",
-    "http": "http",
-    "tabHttp": "HTTP",
-    "tabBluetooth": "Bluetooth",
-    "tabSerial": "Seriell kommunikation",
-    "useHttps": "Använd HTTPS",
-    "connecting": "Ansluter...",
-    "connect": "Anslut",
-    "connectionFailedAlert": {
-      "title": "Anslutningen misslyckades",
-      "descriptionPrefix": "Kunde inte ansluta till enheten. ",
-      "httpsHint": "Om du använder HTTPS kan du behöva godkänna ett självsignerat certifikat först. ",
-      "openLinkPrefix": "Vänligen öppna ",
-      "openLinkSuffix": " i en ny flik",
-      "acceptTlsWarningSuffix": ", acceptera eventuella TLS-varningar om du uppmanas och försök igen",
-      "learnMoreLink": "Läs mer"
-    },
-    "httpConnection": {
-      "label": "IP-adress/värdnamn",
-      "placeholder": "000.000.000.000 / meshtastic.lokal"
-    },
-    "serialConnection": {
-      "noDevicesPaired": "Inga enheter parkopplade ännu.",
-      "newDeviceButton": "Ny enhet",
-      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
-    },
-    "bluetoothConnection": {
-      "noDevicesPaired": "Inga enheter parkopplade ännu.",
-      "newDeviceButton": "Ny enhet",
-      "connectionFailed": "Anslutningen misslyckades",
-      "deviceDisconnected": "Enheten frånkopplad",
-      "unknownDevice": "Okänd enhet",
-      "errorLoadingDevices": "Fel vid inläsning av enheter",
-      "unknownErrorLoadingDevices": "Okänt fel vid inläsning av enheter"
-    },
+  "addConnection": {
+    "title": "Add connection",
+    "description": "Choose a connection type and fill in the details",
     "validation": {
       "requiresWebBluetooth": "Den här anslutningstypen kräver <0>Web Bluetooth</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
       "requiresWebSerial": "Den här anslutningstypen kräver <0>Web Serial</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
       "requiresSecureContext": "Denna applikation kräver en <0>säker kontext</0>. Anslut med HTTPS eller localhost.",
       "additionallyRequiresSecureContext": "Dessutom kräver den ett <0>säker kontext</0>. Vänligen anslut med HTTPS eller localhost."
+    },
+    "bluetoothConnection": {
+      "namePlaceholder": "My Bluetooth Node",
+      "supported": {
+        "title": "Web Bluetooth supported"
+      },
+      "notSupported": {
+        "title": "Web Bluetooth not supported",
+        "description": "Your browser or device does not support Web Bluetooth"
+      },
+      "short": "BT: {{deviceName}}",
+      "long": "Bluetooth Device",
+      "device": "Enhet",
+      "selectDevice": "Select device",
+      "selected": "Bluetooth device selected",
+      "notSelected": "No device selected",
+      "helperText": "Uses the Meshtastic Bluetooth service for discovery."
+    },
+    "serialConnection": {
+      "namePlaceholder": "My Serial Node",
+      "helperText": "Selecting a port grants permission so the app can open it to connect.",
+      "supported": {
+        "title": "Web Serial supported"
+      },
+      "notSupported": {
+        "title": "Web Serial not supported",
+        "description": "Your browser or device does not support Web Serial"
+      },
+      "portSelected": {
+        "title": "Serial port selected",
+        "description": "Port permissions granted."
+      },
+      "port": "Port",
+      "selectPort": "Select port",
+      "deviceName": "USB {{vendorId}}:{{productId}}",
+      "notSelected": "No port selected"
+    },
+    "httpConnection": {
+      "namePlaceholder": "My HTTP Node",
+      "inputPlaceholder": "192.168.1.10 or meshtastic.local",
+      "heading": "URL or IP",
+      "useHttps": "Use HTTTPS",
+      "invalidUrl": {
+        "title": "Invalid URL",
+        "description": "Please enter a valid HTTP or HTTPS URL."
+      },
+      "connectionTest": {
+        "description": "Test the connetion before saving to verify the device is reachable.",
+        "button": {
+          "loading": "Testing...",
+          "label": "Test connection"
+        },
+        "reachable": "Reachable",
+        "notReachable": "Not reachable",
+        "success": {
+          "title": "Connection test successful",
+          "description": "The device appears to be reachable."
+        },
+        "failure": {
+          "title": "Connection test failed",
+          "description": "Could not reach the device. Check the URL and try again."
+        }
+      }
     }
   },
   "nodeDetails": {
