@@ -15,7 +15,6 @@
       "messages": "メッセージ",
       "map": "地図",
       "config": "Config",
-      "channels": "チャンネル",
       "nodes": "ノード"
     }
   },
@@ -45,7 +44,8 @@
     "label": "Debug",
     "command": {
       "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Message"
+      "clearAllStoredMessages": "Clear All Stored Message",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }

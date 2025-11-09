@@ -4,12 +4,12 @@ import { z } from "zod/v4";
 export const UserValidationSchema = z.object({
   longName: z
     .string()
-    .min(1, t("deviceName.validation.longNameMin"))
-    .max(40, t("deviceName.validation.longNameMax")),
+    .min(1, t("user.longName.validation.min"))
+    .max(40, t("user.longName.validation.max")),
   shortName: z
     .string()
-    .min(2, t("deviceName.validation.shortNameMin"))
-    .max(4, t("deviceName.validation.shortNameMax")),
+    .min(2, t("user.shortName.validation.min"))
+    .max(4, t("user.shortName.validation.max")),
   isUnmessageable: z.boolean().default(false),
   isLicensed: z.boolean().default(false),
 });

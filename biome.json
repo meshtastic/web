@@ -4,10 +4,13 @@
       "**/*.ts",
       "**/*.tsx",
       "!npm_modules",
-      "!dist",
+      "!**/dist",
+      "!**/protobufs",
+      "!**/.*",
       "!npm",
       "**/*.json",
-      "!**/locales/*-*/*.json"
+      "!**/locales/*-*/*.json",
+      "!**/packages/ui/"
     ],
     "ignoreUnknown": false
   },
@@ -21,7 +24,7 @@
   },
   "linter": {
     "enabled": true,
-    "includes": ["**", "!test/**"],
+    "includes": ["**", "!test/**", "!**/dist/**"],
     "rules": {
       "recommended": true,
       "suspicious": {

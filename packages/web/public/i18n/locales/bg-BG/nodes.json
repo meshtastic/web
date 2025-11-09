@@ -1,63 +1,59 @@
 {
-	"nodeDetail": {
-		"publicKeyEnabled": {
-			"label": "Публичният ключ е активиран"
-		},
-		"noPublicKey": {
-			"label": "Няма публичен ключ"
-		},
-		"directMessage": {
-			"label": "Директно съобщение {{shortName}}"
-		},
-		"favorite": {
-			"label": "Любим",
-			"tooltip": "Добавяне или премахване на този възел от любимите ви"
-		},
-		"notFavorite": {
-			"label": "Не е любим"
-		},
-		"error": {
-			"label": "Грешка",
-			"text": "Възникна грешка при извличането на подробности за възела. Моля, опитайте отново по-късно."
-		},
-		"status": {
-			"heard": "Heard",
-			"mqtt": "MQTT"
-		},
-		"elevation": {
-			"label": "Височина"
-		},
-		"channelUtil": {
-			"label": "Използване на канала"
-		},
-		"airtimeUtil": {
-			"label": "Използване на ефирно време"
-		}
-	},
-	"nodesTable": {
-		"headings": {
-			"longName": "Дълго име",
-			"connection": "Connection",
-			"lastHeard": "Последно чут",
-			"encryption": "Криптиране",
-			"model": "Модел",
-			"macAddress": "MAC адрес"
-		},
-		"connectionStatus": {
-			"direct": "Директно",
-			"away": "away",
-			"unknown": "-",
-			"viaMqtt": ", чрез MQTT"
-		},
-		"lastHeardStatus": {
-			"never": "Никога"
-		}
-	},
-	"actions": {
-		"added": "Добавен",
-		"removed": "Премахнат",
-		"ignoreNode": "Игнориране на възела",
-		"unignoreNode": "Премахване на игнорирането на възела",
-		"requestPosition": "Request Position"
-	}
+  "nodeDetail": {
+    "publicKeyEnabled": {
+      "label": "Публичният ключ е активиран"
+    },
+    "noPublicKey": {
+      "label": "Няма публичен ключ"
+    },
+    "directMessage": {
+      "label": "Директно съобщение {{shortName}}"
+    },
+    "favorite": {
+      "label": "Любим",
+      "tooltip": "Добавяне или премахване на този възел от любимите ви"
+    },
+    "notFavorite": {
+      "label": "Не е любим"
+    },
+    "error": {
+      "label": "Грешка",
+      "text": "Възникна грешка при извличането на подробности за възела. Моля, опитайте отново по-късно."
+    },
+    "status": {
+      "heard": "Heard",
+      "mqtt": "MQTT"
+    },
+    "elevation": {
+      "label": "Височина"
+    },
+    "channelUtil": {
+      "label": "Използване на канала"
+    },
+    "airtimeUtil": {
+      "label": "Използване на ефирно време"
+    }
+  },
+  "nodesTable": {
+    "headings": {
+      "longName": "Дълго име",
+      "connection": "Connection",
+      "lastHeard": "Последно чут",
+      "encryption": "Криптиране",
+      "model": "Модел",
+      "macAddress": "MAC адрес"
+    },
+    "connectionStatus": {
+      "direct": "Директно",
+      "away": "away",
+      "viaMqtt": ", чрез MQTT"
+    }
+  },
+  "actions": {
+    "added": "Добавен",
+    "removed": "Премахнат",
+    "ignoreNode": "Игнориране на възела",
+    "unignoreNode": "Премахване на игнорирането на възела",
+    "requestPosition": "Request Position"
+  }
 }

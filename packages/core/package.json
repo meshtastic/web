@@ -12,6 +12,7 @@
   "license": "GPL-3.0-only",
   "tsdown": {
     "entry": "mod.ts",
+    "platform": "browser",
     "dts": true,
     "format": [
       "esm"

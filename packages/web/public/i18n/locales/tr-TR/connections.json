@@ -1,0 +1,12 @@
+{
+  "dashboard": {
+    "title": "Bağlanan Cihazlar",
+    "description": "Bağlanan Meshtastic cihazlarını yönet.",
+    "connectionType_ble": "BLE",
+    "connectionType_serial": "Seri",
+    "connectionType_network": "Ağ",
+    "noDevicesTitle": "Bağlı cihaz yok",
+    "noDevicesDescription": "Başlamak için yeni cihaz bağla.",
+    "button_newConnection": "Yeni Bağlantı"
+  }
+}

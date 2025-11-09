@@ -40,7 +40,7 @@ export interface DeleteNoteDialogProps {
 
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
-  const { currentLanguage } = useLang();
+  const { current } = useLang();
   const { hardware, connection, setDialogOpen } = useDevice();
 
   const { setNodeNumDetails } = useAppStore();
@@ -152,7 +152,7 @@ const NodesPage = (): JSX.Element => {
         {
           content: (
             <Avatar
-              text={shortName}
+              nodeNum={node.num}
               showFavorite={node.isFavorite}
               showError={hasNodeError(node.num)}
             />
@@ -200,7 +200,7 @@ const NodesPage = (): JSX.Element => {
               ) : (
                 <TimeAgo
                   timestamp={node.lastHeard * 1000}
-                  locale={currentLanguage?.code}
+                  locale={current?.code}
                 />
               )}
             </Mono>

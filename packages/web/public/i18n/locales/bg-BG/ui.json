@@ -215,7 +215,7 @@
 			"step4": "Всяка друга подходяща информация"
 		},
 		"reportLink": "Можете да съобщите за проблема в нашия <0>GitHub</0>",
-		"dashboardLink": "Връщане към <0>таблото</0>",
+		"connectionsLink": "Връщане към <0>таблото</0>",
 		"detailsSummary": "Подробности за грешката",
 		"errorMessageLabel": "Съобщение за грешка:",
 		"stackTraceLabel": "Stack trace:",

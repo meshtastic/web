@@ -1,69 +1,71 @@
 {
-	"page": {
-		"sectionLabel": "Канали",
-		"channelName": "Канал: {{channelName}}",
-		"broadcastLabel": "Основний",
-		"channelIndex": "Кн {{index}}"
-	},
-	"validation": {
-		"pskInvalid": "Please enter a valid {{bits}} bit PSK."
-	},
-	"settings": {
-		"label": "Channel Settings",
-		"description": "Crypto, MQTT & misc settings"
-	},
-	"role": {
-		"label": "Роль",
-		"description": "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
-		"options": {
-			"primary": "PRIMARY",
-			"disabled": "DISABLED",
-			"secondary": "SECONDARY"
-		}
-	},
-	"psk": {
-		"label": "Pre-Shared Key",
-		"description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
-		"generate": "Згенерувати"
-	},
-	"name": {
-		"label": "Ім'я",
-		"description": "A unique name for the channel <12 bytes, leave blank for default"
-	},
-	"uplinkEnabled": {
-		"label": "Uplink Enabled",
-		"description": "Send messages from the local mesh to MQTT"
-	},
-	"downlinkEnabled": {
-		"label": "Downlink Enabled",
-		"description": "Send messages from MQTT to the local mesh"
-	},
-	"positionPrecision": {
-		"label": "Місце розташування",
-		"description": "The precision of the location to share with the channel. Can be disabled.",
-		"options": {
-			"none": "Не повідомляти місце знаходження",
-			"precise": "Точне місце розташування",
-			"metric_km23": "У межах 23 км",
-			"metric_km12": "У межах 12 км",
-			"metric_km5_8": "У межах 5,8 км",
-			"metric_km2_9": "У межах 2,9 км",
-			"metric_km1_5": "У межах 1,5 км",
-			"metric_m700": "У межах 700 м",
-			"metric_m350": "У межах 350 м",
-			"metric_m200": "У межах 200 м",
-			"metric_m90": "У межах 90 м",
-			"metric_m50": "У межах 50 м",
-			"imperial_mi15": "У межах 15 миль",
-			"imperial_mi7_3": "У межах 7,3 милі",
-			"imperial_mi3_6": "У межах 3,6 милі",
-			"imperial_mi1_8": "У межах 1,8 милі",
-			"imperial_mi0_9": "У межах 0,9 милі",
-			"imperial_mi0_5": "У межах 0,5 милі",
-			"imperial_mi0_2": "У межах 0,2 милі",
-			"imperial_ft600": "У межах 600 фт",
-			"imperial_ft300": "У межах 300 фт",
-			"imperial_ft150": "У межах 150 фт"
-		}
-	}
+  "page": {
+    "sectionLabel": "Канали",
+    "channelName": "Канал: {{channelName}}",
+    "broadcastLabel": "Основний",
+    "channelIndex": "Кн {{index}}",
+    "import": "Імпортувати",
+    "export": "Export"
+  },
+  "validation": {
+    "pskInvalid": "Please enter a valid {{bits}} bit PSK."
+  },
+  "settings": {
+    "label": "Channel Settings",
+    "description": "Crypto, MQTT & misc settings"
+  },
+  "role": {
+    "label": "Роль",
+    "description": "Device telemetry is sent over PRIMARY. Only one PRIMARY allowed",
+    "options": {
+      "primary": "PRIMARY",
+      "disabled": "DISABLED",
+      "secondary": "SECONDARY"
+    }
+  },
+  "psk": {
+    "label": "Pre-Shared Key",
+    "description": "Supported PSK lengths: 256-bit, 128-bit, 8-bit, Empty (0-bit)",
+    "generate": "Згенерувати"
+  },
+  "name": {
+    "label": "Ім'я",
+    "description": "A unique name for the channel <12 bytes, leave blank for default"
+  },
+  "uplinkEnabled": {
+    "label": "Uplink Enabled",
+    "description": "Send messages from the local mesh to MQTT"
+  },
+  "downlinkEnabled": {
+    "label": "Downlink Enabled",
+    "description": "Send messages from MQTT to the local mesh"
+  },
+  "positionPrecision": {
+    "label": "Місце розташування",
+    "description": "The precision of the location to share with the channel. Can be disabled.",
+    "options": {
+      "none": "Не повідомляти місце знаходження",
+      "precise": "Точне місце розташування",
+      "metric_km23": "У межах 23 км",
+      "metric_km12": "У межах 12 км",
+      "metric_km5_8": "У межах 5,8 км",
+      "metric_km2_9": "У межах 2,9 км",
+      "metric_km1_5": "У межах 1,5 км",
+      "metric_m700": "У межах 700 м",
+      "metric_m350": "У межах 350 м",
+      "metric_m200": "У межах 200 м",
+      "metric_m90": "У межах 90 м",
+      "metric_m50": "У межах 50 м",
+      "imperial_mi15": "У межах 15 миль",
+      "imperial_mi7_3": "У межах 7,3 милі",
+      "imperial_mi3_6": "У межах 3,6 милі",
+      "imperial_mi1_8": "У межах 1,8 милі",
+      "imperial_mi0_9": "У межах 0,9 милі",
+      "imperial_mi0_5": "У межах 0,5 милі",
+      "imperial_mi0_2": "У межах 0,2 милі",
+      "imperial_ft600": "У межах 600 фт",
+      "imperial_ft300": "У межах 300 фт",
+      "imperial_ft150": "У межах 150 фт"
+    }
+  }
 }

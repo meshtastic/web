@@ -1,448 +1,448 @@
 {
-	"page": {
-		"tabAmbientLighting": "Umgebungslicht",
-		"tabAudio": "Audio",
-		"tabCannedMessage": "Vordefinierte Nachrichten",
-		"tabDetectionSensor": "Erkennungssensor",
-		"tabExternalNotification": "Externe Benachrichtigung",
-		"tabMqtt": "MQTT",
-		"tabNeighborInfo": "Nachbarinformation",
-		"tabPaxcounter": "Pax Zähler",
-		"tabRangeTest": "Reichweitentest",
-		"tabSerial": "Seriell",
-		"tabStoreAndForward": "Speichern&Weiterleiten",
-		"tabTelemetry": "Telemetrie"
-	},
-	"ambientLighting": {
-		"title": "Einstellung Umgebungsbeleuchtung",
-		"description": "Einstellungen für das Modul Umgebungsbeleuchtung",
-		"ledState": {
-			"label": "LED Status",
-			"description": "Setzt die LED auf ein oder aus"
-		},
-		"current": {
-			"label": "Stromstärke",
-			"description": "Legt den Strom für den LED Ausgang fest. Standard ist 10"
-		},
-		"red": {
-			"label": "Rot",
-			"description": "Legt den roten LED Wert fest. Bereich 0-255"
-		},
-		"green": {
-			"label": "Grün",
-			"description": "Legt den grünen LED Wert fest. Bereich 0-255"
-		},
-		"blue": {
-			"label": "Blau",
-			"description": "Legt den blauen LED Wert fest. Bereich 0-255"
-		}
-	},
-	"audio": {
-		"title": "Audioeinstellungen",
-		"description": "Einstellungen für das Audiomodul",
-		"codec2Enabled": {
-			"label": "Codec 2 aktiviert",
-			"description": "Codec 2 Audiokodierung aktivieren"
-		},
-		"pttPin": {
-			"label": "GPIO PTT",
-			"description": "Für PTT verwendeter GPIO Pin"
-		},
-		"bitrate": {
-			"label": "Bitrate",
-			"description": "Bitrate zur Audiokodierung"
-		},
-		"i2sWs": {
-			"label": "i2S WS",
-			"description": "GPIO Pin für i2S WS"
-		},
-		"i2sSd": {
-			"label": "i2S SD",
-			"description": "GPIO Pin für i2S SD"
-		},
-		"i2sDin": {
-			"label": "i2S DIN",
-			"description": "GPIO Pin für i2S DIN"
-		},
-		"i2sSck": {
-			"label": "i2S SCK",
-			"description": "GPIO Pin für i2S SCK"
-		}
-	},
-	"cannedMessage": {
-		"title": "Einstellungen für vordefinierte Nachrichten",
-		"description": "Einstellungen für das Modul vordefinierte Nachrichten",
-		"moduleEnabled": {
-			"label": "Modul aktiviert",
-			"description": "Vordefinierte Nachrichten aktivieren"
-		},
-		"rotary1Enabled": {
-			"label": "Drehgeber #1 aktiviert",
-			"description": "Drehgeber aktivieren"
-		},
-		"inputbrokerPinA": {
-			"label": "Drehgeber Pin A",
-			"description": "GPIO Pin Wert (1-39) für Drehgeber Pin A"
-		},
-		"inputbrokerPinB": {
-			"label": "Drehgeber Pin B",
-			"description": "GPIO Pin Wert (1-39) für Drehgeber Pin B"
-		},
-		"inputbrokerPinPress": {
-			"label": "Drehgeber Pin Taste",
-			"description": "GPIO Pin Wert (1-39) für Drehgeber Pin Taste"
-		},
-		"inputbrokerEventCw": {
-			"label": "Ereignis im Uhrzeigersinn",
-			"description": "Eingabeereignis auswählen."
-		},
-		"inputbrokerEventCcw": {
-			"label": "Ereignis gegen Uhrzeigersinn",
-			"description": "Eingabeereignis auswählen."
-		},
-		"inputbrokerEventPress": {
-			"label": "Ereignis Tastendruck",
-			"description": "Eingabeereignis auswählen."
-		},
-		"updown1Enabled": {
-			"label": "Geber Hoch/Runter aktiviert",
-			"description": "Aktiviere Geber Hoch/Runter"
-		},
-		"allowInputSource": {
-			"label": "Eingabequelle zulassen",
-			"description": "Wählen Sie aus: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
-		},
-		"sendBell": {
-			"label": "Sende Glocke",
-			"description": "Sendet ein Klingelzeichen (Glocke) mit jeder Nachricht"
-		}
-	},
-	"detectionSensor": {
-		"title": "Sensoreinstellungen für Erkennung",
-		"description": "Einstellungen für das Erkennungssensormodul",
-		"enabled": {
-			"label": "Aktiviert",
-			"description": "Erkennungssensormodul aktivieren oder deaktivieren"
-		},
-		"minimumBroadcastSecs": {
-			"label": "Minimale Übertragungszeit alle Sekunden",
-			"description": "Das Intervall in Sekunden, wie oft eine Nachricht an das Netz gesendet wird, wenn eine Statusänderung erkannt wurde"
-		},
-		"stateBroadcastSecs": {
-			"label": "Statusübertragung alle Sekunden",
-			"description": "Das Intervall in Sekunden, wie oft eine Nachricht mit dem aktuellen Status an das Netz gesendet wird, unabhängig von Änderungen"
-		},
-		"sendBell": {
-			"label": "Sende Glocke",
-			"description": "ASCII-Glocke mit Warnmeldung senden"
-		},
-		"name": {
-			"label": "Anzeigename",
-			"description": "Formatierte Nachricht die an das Netz gesendet wird, maximal 20 Zeichen"
-		},
-		"monitorPin": {
-			"label": "GPIO Pin überwachen",
-			"description": "Der GPIO Pin zur Überwachung von Statusänderungen"
-		},
-		"detectionTriggerType": {
-			"label": "Auslösetyp der Erkennung",
-			"description": "Die Art des zu verwendenden Auslöseereignisses"
-		},
-		"usePullup": {
-			"label": "Pullup verwenden",
-			"description": "Gibt an, ob der INPUT_PULLUP Modus für GPIO Pin verwendet wird oder nicht"
-		}
-	},
-	"externalNotification": {
-		"title": "Einstellungen für externe Benachrichtigungen",
-		"description": "Einstellung für das Modul externe Benachrichtigung",
-		"enabled": {
-			"label": "Modul aktiviert",
-			"description": "Externe Benachrichtigung aktivieren"
-		},
-		"outputMs": {
-			"label": "Ausgabe MS",
-			"description": "Ausgabe MS"
-		},
-		"output": {
-			"label": "Ausgabe",
-			"description": "Ausgabe"
-		},
-		"outputVibra": {
-			"label": "Ausgabe Vibration",
-			"description": "Ausgabe Vibration"
-		},
-		"outputBuzzer": {
-			"label": "Ausgabe Summer",
-			"description": "Ausgabe Summer"
-		},
-		"active": {
-			"label": "Aktiv",
-			"description": "Aktiv"
-		},
-		"alertMessage": {
-			"label": "Warnmeldung",
-			"description": "Warnmeldung"
-		},
-		"alertMessageVibra": {
-			"label": "Vibration bei Warnmeldung",
-			"description": "Vibration bei Warnmeldung"
-		},
-		"alertMessageBuzzer": {
-			"label": "Summer bei Warnmeldung",
-			"description": "Summer bei Warnmeldung"
-		},
-		"alertBell": {
-			"label": "Warnglocke",
-			"description": "Soll beim Empfang eines eingehenden Klingelzeichens (Glocke) eine Warnung ausgelöst werden?"
-		},
-		"alertBellVibra": {
-			"label": "Vibration bei Klingelzeichen",
-			"description": "Vibration bei Klingelzeichen"
-		},
-		"alertBellBuzzer": {
-			"label": "Summer bei Klingelzeichen",
-			"description": "Summer bei Klingelzeichen"
-		},
-		"usePwm": {
-			"label": "PWM verwenden",
-			"description": "PWM verwenden"
-		},
-		"nagTimeout": {
-			"label": "Nervige Verzögerung",
-			"description": "Nervige Verzögerung"
-		},
-		"useI2sAsBuzzer": {
-			"label": "I2S GPIO Pin als Summer verwenden",
-			"description": "I2S GPIO Pin als Summerausgang definieren"
-		}
-	},
-	"mqtt": {
-		"title": "MQTT Einstellungen",
-		"description": "Einstellungen für das MQTT Modul",
-		"enabled": {
-			"label": "Aktiviert",
-			"description": "MQTT aktivieren oder deaktivieren"
-		},
-		"address": {
-			"label": "MQTT Server Adresse",
-			"description": "MQTT Serveradresse für Standard/benutzerdefinierte Server"
-		},
-		"username": {
-			"label": "MQTT Benutzername",
-			"description": "MQTT Benutzername für Standard/benutzerdefinierte Server"
-		},
-		"password": {
-			"label": "MQTT Passwort",
-			"description": "MQTT Passwort für Standard/benutzerdefinierte Server"
-		},
-		"encryptionEnabled": {
-			"label": "Verschlüsselung aktiviert",
-			"description": "MQTT-Verschlüsselung aktivieren oder deaktivieren. Hinweis: Alle Nachrichten werden unverschlüsselt an den MQTT-Broker gesendet, wenn diese Option nicht aktiviert ist. Unabhängig von der eingestellten Kanalverschlüsselung. Einschließlich der Standortdaten."
-		},
-		"jsonEnabled": {
-			"label": "JSON aktiviert",
-			"description": "Gibt an, ob JSON Nachrichten über MQTT gesendet oder empfangen werden sollen"
-		},
-		"tlsEnabled": {
-			"label": "TLS aktiviert",
-			"description": "TLS aktivieren oder deaktivieren"
-		},
-		"root": {
-			"label": "Hauptthema",
-			"description": "MQTT Hauptthema für Standard/Benutzerdefinierte Server"
-		},
-		"proxyToClientEnabled": {
-			"label": "MQTT Client Proxy aktiviert",
-			"description": "Verwendet die Netzwerkverbindung zum Austausch von MQTT Nachrichten mit dem Client."
-		},
-		"mapReportingEnabled": {
-			"label": "Kartenberichte aktiviert",
-			"description": "Ihr Knoten sendet in regelmäßigen Abständen eine unverschlüsselte Nachricht mit Kartenbericht an den konfigurierten MQTT-Server. Einschließlich ID, langen und kurzen Namen, ungefährer Standort, Hardwaremodell, Geräterolle, Firmware-Version, LoRa Region, Modem-Voreinstellung und Name des Primärkanal."
-		},
-		"mapReportSettings": {
-			"publishIntervalSecs": {
-				"label": "Veröffentlichungsintervall Kartenbericht (s)",
-				"description": "Intervall in Sekunden, um Kartenberichte zu veröffentlichen"
-			},
-			"positionPrecision": {
-				"label": "Ungefährer Standort",
-				"description": "Der geteilte Standort mit einer Genauigkeit innerhalb dieser Entfernung",
-				"options": {
-					"metric_km23": "Innerhalb von 23 km",
-					"metric_km12": "Innerhalb von 12 km",
-					"metric_km5_8": "Innerhalb von 5,8 km",
-					"metric_km2_9": "Innerhalb von 2,9 km",
-					"metric_km1_5": "Innerhalb von 1,5 km",
-					"metric_m700": "Innerhalb von 700 m",
-					"metric_m350": "Innerhalb von 350 m",
-					"metric_m200": "Innerhalb von 200 m",
-					"metric_m90": "Innerhalb von 90 m",
-					"metric_m50": "Innerhalb von 50 m",
-					"imperial_mi15": "Innerhalb von 15 Meilen",
-					"imperial_mi7_3": "Innerhalb von 7,3 Meilen",
-					"imperial_mi3_6": "Innerhalb von 3,6 Meilen",
-					"imperial_mi1_8": "Innerhalb von 1,8 Meilen",
-					"imperial_mi0_9": "Innerhalb von 0,9 Meilen",
-					"imperial_mi0_5": "Innerhalb von 0,5 Meilen",
-					"imperial_mi0_2": "Innerhalb von 0,2 Meilen",
-					"imperial_ft600": "Innerhalb von 600 Fuß",
-					"imperial_ft300": "Innerhalb von 300 Fuß",
-					"imperial_ft150": "Innerhalb von 150 Fuß"
-				}
-			}
-		}
-	},
-	"neighborInfo": {
-		"title": "Einstellung Nachbarinformation",
-		"description": "Einstellungen für das Modul Nachbarinformation",
-		"enabled": {
-			"label": "Aktiviert",
-			"description": "Nachbarinformation Modul aktivieren oder deaktivieren"
-		},
-		"updateInterval": {
-			"label": "Aktualisierungsintervall",
-			"description": "Intervall in Sekunden, wie oft die Nachbarinformation an das Netz gesendet wird"
-		}
-	},
-	"paxcounter": {
-		"title": "Einstellung für Pax Zähler",
-		"description": "Einstellungen für das Modul Pax Zähler",
-		"enabled": {
-			"label": "Modul aktiviert",
-			"description": "Aktiviere Pax Zähler"
-		},
-		"paxcounterUpdateInterval": {
-			"label": "Aktualisierungsintervall (Sekunden)",
-			"description": "Wie lange soll zwischen dem Senden von Pax Zählernachrichten gewartet werden"
-		},
-		"wifiThreshold": {
-			"label": "WLAN RSSI Grenzwert",
-			"description": "Bei welchem WLAN RSSI Grenzwert sollte der Zähler erhöht werden. Standardwert -80"
-		},
-		"bleThreshold": {
-			"label": "BLE RSSI Grenzwert",
-			"description": "Bei welchem BLE RSSI Grenzwert sollte der Zähler erhöht werden. Standardwert -80"
-		}
-	},
-	"rangeTest": {
-		"title": "Einstellung Reichweitentest",
-		"description": "Einstellungen für das Modul Reichweitentest",
-		"enabled": {
-			"label": "Modul aktiviert",
-			"description": "Reichweitentest aktivieren"
-		},
-		"sender": {
-			"label": "Nachrichtenintervall",
-			"description": "Wie lange soll zwischen dem Senden von Testnachrichten gewartet werden"
-		},
-		"save": {
-			"label": "CSV im internen Speicher abspeichern",
-			"description": "Nur für ESP32"
-		}
-	},
-	"serial": {
-		"title": "Serielle Einstellungen",
-		"description": "Einstellungen für das serielle Modul",
-		"enabled": {
-			"label": "Modul aktiviert",
-			"description": "Serielle Ausgabe aktivieren"
-		},
-		"echo": {
-			"label": "Echo",
-			"description": "Wenn aktiviert, werden alle Nachrichten, die Sie senden, an Ihr Gerät zurückgesendet"
-		},
-		"rxd": {
-			"label": "GPIO Empfangen",
-			"description": "Setzen Sie den GPIO Pin, den Sie eingerichtet haben, als RXD Pin."
-		},
-		"txd": {
-			"label": "GPIO Senden",
-			"description": "Setzen Sie den GPIO Pin, den Sie eingerichtet haben, als TXD Pin."
-		},
-		"baud": {
-			"label": "Baudrate",
-			"description": "Serielle Baudrate"
-		},
-		"timeout": {
-			"label": "Zeitlimit erreicht",
-			"description": "Wartezeit in Sekunden bis eine Nachricht als gesendet angenommen wird"
-		},
-		"mode": {
-			"label": "Betriebsmodus",
-			"description": "Modus auswählen"
-		},
-		"overrideConsoleSerialPort": {
-			"label": "Seriellen Port der Konsole überschreiben",
-			"description": "Wenn Sie einen seriellen Port an die Konsole angeschlossen haben, wird diese überschrieben."
-		}
-	},
-	"storeForward": {
-		"title": "Speichern & Weiterleiten Einstellungen",
-		"description": "Einstellungen für das Modul Speichern & Weiterleiten",
-		"enabled": {
-			"label": "Modul aktiviert",
-			"description": "Speichern & Weiterleiten aktivieren"
-		},
-		"heartbeat": {
-			"label": "Herzschlag aktiviert",
-			"description": "Herzschlag für Speichern & Weiterleiten aktivieren"
-		},
-		"records": {
-			"label": "Anzahl Einträge",
-			"description": "Anzahl der zu speichernden Datensätze"
-		},
-		"historyReturnMax": {
-			"label": "Verlauf Rückgabewert maximal",
-			"description": "Maximale Anzahl an zurückzugebenden Datensätzen"
-		},
-		"historyReturnWindow": {
-			"label": "Zeitraum Rückgabewert",
-			"description": "Datensätze aus diesem Zeitfenster zurückgeben (Minuten)"
-		}
-	},
-	"telemetry": {
-		"title": "Telemetrieeinstellungen",
-		"description": "Einstellungen für das Telemetriemodul",
-		"deviceUpdateInterval": {
-			"label": "Gerätekennzahlen",
-			"description": "Aktualisierungsintervall für Gerätekennzahlen (Sekunden)"
-		},
-		"environmentUpdateInterval": {
-			"label": "Aktualisierungsintervall für Umweltdaten (Sekunden)",
-			"description": ""
-		},
-		"environmentMeasurementEnabled": {
-			"label": "Modul aktiviert",
-			"description": "Aktiviert die Telemetrie für Umweltdaten"
-		},
-		"environmentScreenEnabled": {
-			"label": "OLED Anzeige aktivieren",
-			"description": "Zeige das Telemetriemodul auf der OLED Anzeige"
-		},
-		"environmentDisplayFahrenheit": {
-			"label": "Temperatur in Fahrenheit",
-			"description": "Temperatur in Fahrenheit anzeigen"
-		},
-		"airQualityEnabled": {
-			"label": "Luftqualität aktiviert",
-			"description": "Telemetrie für Luftqualität aktivieren"
-		},
-		"airQualityInterval": {
-			"label": "Aktualisierungsintervall Luftqualität",
-			"description": "Wie oft werden Luftqualitätsdaten über das Netz gesendet"
-		},
-		"powerMeasurementEnabled": {
-			"label": "Energiemessung aktiviert",
-			"description": "Aktiviere die Telemetrie für die Energiemessung"
-		},
-		"powerUpdateInterval": {
-			"label": "Aktualisierungsintervall Energie",
-			"description": "Wie oft werden Energiedaten an das Netz gesendet"
-		},
-		"powerScreenEnabled": {
-			"label": "Energieanzeige aktiviert",
-			"description": "Aktiviere die Anzeige für Energietelemetrie"
-		}
-	}
+  "page": {
+    "tabAmbientLighting": "Umgebungslicht",
+    "tabAudio": "Audio",
+    "tabCannedMessage": "Vordefinierte Nachrichten",
+    "tabDetectionSensor": "Erkennungssensor",
+    "tabExternalNotification": "Externe Benachrichtigung",
+    "tabMqtt": "MQTT",
+    "tabNeighborInfo": "Nachbarinformation",
+    "tabPaxcounter": "Pax Zähler",
+    "tabRangeTest": "Reichweitentest",
+    "tabSerial": "Seriell",
+    "tabStoreAndForward": "Speichern&Weiterleiten",
+    "tabTelemetry": "Telemetrie"
+  },
+  "ambientLighting": {
+    "title": "Einstellung Umgebungsbeleuchtung",
+    "description": "Einstellungen für das Modul Umgebungsbeleuchtung",
+    "ledState": {
+      "label": "LED Status",
+      "description": "Setzt die LED auf ein oder aus"
+    },
+    "current": {
+      "label": "Stromstärke",
+      "description": "Legt den Strom für den LED Ausgang fest. Standard ist 10"
+    },
+    "red": {
+      "label": "Rot",
+      "description": "Legt den roten LED Wert fest. Bereich 0-255"
+    },
+    "green": {
+      "label": "Grün",
+      "description": "Legt den grünen LED Wert fest. Bereich 0-255"
+    },
+    "blue": {
+      "label": "Blau",
+      "description": "Legt den blauen LED Wert fest. Bereich 0-255"
+    }
+  },
+  "audio": {
+    "title": "Audioeinstellungen",
+    "description": "Einstellungen für das Audiomodul",
+    "codec2Enabled": {
+      "label": "Codec 2 aktiviert",
+      "description": "Codec 2 Audiokodierung aktivieren"
+    },
+    "pttPin": {
+      "label": "GPIO PTT",
+      "description": "Für PTT verwendeter GPIO Pin"
+    },
+    "bitrate": {
+      "label": "Bitrate",
+      "description": "Bitrate zur Audiokodierung"
+    },
+    "i2sWs": {
+      "label": "i2S WS",
+      "description": "GPIO Pin für i2S WS"
+    },
+    "i2sSd": {
+      "label": "i2S SD",
+      "description": "GPIO Pin für i2S SD"
+    },
+    "i2sDin": {
+      "label": "i2S DIN",
+      "description": "GPIO Pin für i2S DIN"
+    },
+    "i2sSck": {
+      "label": "i2S SCK",
+      "description": "GPIO Pin für i2S SCK"
+    }
+  },
+  "cannedMessage": {
+    "title": "Einstellungen für vordefinierte Nachrichten",
+    "description": "Einstellungen für das Modul vordefinierte Nachrichten",
+    "moduleEnabled": {
+      "label": "Modul aktiviert",
+      "description": "Vordefinierte Nachrichten aktivieren"
+    },
+    "rotary1Enabled": {
+      "label": "Drehgeber #1 aktiviert",
+      "description": "Drehgeber aktivieren"
+    },
+    "inputbrokerPinA": {
+      "label": "Drehgeber Pin A",
+      "description": "GPIO Pin Wert (1-39) für Drehgeber Pin A"
+    },
+    "inputbrokerPinB": {
+      "label": "Drehgeber Pin B",
+      "description": "GPIO Pin Wert (1-39) für Drehgeber Pin B"
+    },
+    "inputbrokerPinPress": {
+      "label": "Drehgeber Pin Taste",
+      "description": "GPIO Pin Wert (1-39) für Drehgeber Pin Taste"
+    },
+    "inputbrokerEventCw": {
+      "label": "Ereignis im Uhrzeigersinn",
+      "description": "Eingabeereignis auswählen."
+    },
+    "inputbrokerEventCcw": {
+      "label": "Ereignis gegen Uhrzeigersinn",
+      "description": "Eingabeereignis auswählen."
+    },
+    "inputbrokerEventPress": {
+      "label": "Ereignis Tastendruck",
+      "description": "Eingabeereignis auswählen."
+    },
+    "updown1Enabled": {
+      "label": "Geber Hoch/Runter aktiviert",
+      "description": "Aktiviere Geber Hoch/Runter"
+    },
+    "allowInputSource": {
+      "label": "Eingabequelle zulassen",
+      "description": "Wählen Sie aus: '_any', 'rotEnc1', 'upDownEnc1', 'cardkb'"
+    },
+    "sendBell": {
+      "label": "Sende Glocke",
+      "description": "Sendet ein Klingelzeichen (Glocke) mit jeder Nachricht"
+    }
+  },
+  "detectionSensor": {
+    "title": "Sensoreinstellungen für Erkennung",
+    "description": "Einstellungen für das Erkennungssensormodul",
+    "enabled": {
+      "label": "Aktiviert",
+      "description": "Erkennungssensormodul aktivieren oder deaktivieren"
+    },
+    "minimumBroadcastSecs": {
+      "label": "Minimale Übertragungszeit alle Sekunden",
+      "description": "Das Intervall in Sekunden, wie oft eine Nachricht an das Netz gesendet wird, wenn eine Statusänderung erkannt wurde"
+    },
+    "stateBroadcastSecs": {
+      "label": "Statusübertragung alle Sekunden",
+      "description": "Das Intervall in Sekunden, wie oft eine Nachricht mit dem aktuellen Status an das Netz gesendet wird, unabhängig von Änderungen"
+    },
+    "sendBell": {
+      "label": "Sende Glocke",
+      "description": "ASCII-Glocke mit Warnmeldung senden"
+    },
+    "name": {
+      "label": "Anzeigename",
+      "description": "Formatierte Nachricht die an das Netz gesendet wird, maximal 20 Zeichen"
+    },
+    "monitorPin": {
+      "label": "GPIO Pin überwachen",
+      "description": "Der GPIO Pin zur Überwachung von Statusänderungen"
+    },
+    "detectionTriggerType": {
+      "label": "Auslösetyp der Erkennung",
+      "description": "Die Art des zu verwendenden Auslöseereignisses"
+    },
+    "usePullup": {
+      "label": "Pullup verwenden",
+      "description": "Gibt an, ob der INPUT_PULLUP Modus für GPIO Pin verwendet wird oder nicht"
+    }
+  },
+  "externalNotification": {
+    "title": "Einstellungen für externe Benachrichtigungen",
+    "description": "Einstellung für das Modul externe Benachrichtigung",
+    "enabled": {
+      "label": "Modul aktiviert",
+      "description": "Externe Benachrichtigung aktivieren"
+    },
+    "outputMs": {
+      "label": "Ausgabe MS",
+      "description": "Ausgabe MS"
+    },
+    "output": {
+      "label": "Ausgabe",
+      "description": "Ausgabe"
+    },
+    "outputVibra": {
+      "label": "Ausgabe Vibration",
+      "description": "Ausgabe Vibration"
+    },
+    "outputBuzzer": {
+      "label": "Ausgabe Summer",
+      "description": "Ausgabe Summer"
+    },
+    "active": {
+      "label": "Aktiv",
+      "description": "Aktiv"
+    },
+    "alertMessage": {
+      "label": "Warnmeldung",
+      "description": "Warnmeldung"
+    },
+    "alertMessageVibra": {
+      "label": "Vibration bei Warnmeldung",
+      "description": "Vibration bei Warnmeldung"
+    },
+    "alertMessageBuzzer": {
+      "label": "Summer bei Warnmeldung",
+      "description": "Summer bei Warnmeldung"
+    },
+    "alertBell": {
+      "label": "Warnglocke",
+      "description": "Soll beim Empfang eines eingehenden Klingelzeichens (Glocke) eine Warnung ausgelöst werden?"
+    },
+    "alertBellVibra": {
+      "label": "Vibration bei Klingelzeichen",
+      "description": "Vibration bei Klingelzeichen"
+    },
+    "alertBellBuzzer": {
+      "label": "Summer bei Klingelzeichen",
+      "description": "Summer bei Klingelzeichen"
+    },
+    "usePwm": {
+      "label": "PWM verwenden",
+      "description": "PWM verwenden"
+    },
+    "nagTimeout": {
+      "label": "Nervige Verzögerung",
+      "description": "Nervige Verzögerung"
+    },
+    "useI2sAsBuzzer": {
+      "label": "I2S GPIO Pin als Summer verwenden",
+      "description": "I2S GPIO Pin als Summerausgang definieren"
+    }
+  },
+  "mqtt": {
+    "title": "MQTT Einstellungen",
+    "description": "Einstellungen für das MQTT Modul",
+    "enabled": {
+      "label": "Aktiviert",
+      "description": "MQTT aktivieren oder deaktivieren"
+    },
+    "address": {
+      "label": "MQTT Server Adresse",
+      "description": "MQTT Serveradresse für Standard/benutzerdefinierte Server"
+    },
+    "username": {
+      "label": "MQTT Benutzername",
+      "description": "MQTT Benutzername für Standard/benutzerdefinierte Server"
+    },
+    "password": {
+      "label": "MQTT Passwort",
+      "description": "MQTT Passwort für Standard/benutzerdefinierte Server"
+    },
+    "encryptionEnabled": {
+      "label": "Verschlüsselung aktiviert",
+      "description": "MQTT-Verschlüsselung aktivieren oder deaktivieren. Hinweis: Alle Nachrichten werden unverschlüsselt an den MQTT-Broker gesendet, wenn diese Option nicht aktiviert ist. Unabhängig von der eingestellten Kanalverschlüsselung. Einschließlich der Standortdaten."
+    },
+    "jsonEnabled": {
+      "label": "JSON aktiviert",
+      "description": "Gibt an, ob JSON Nachrichten über MQTT gesendet oder empfangen werden sollen"
+    },
+    "tlsEnabled": {
+      "label": "TLS aktiviert",
+      "description": "TLS aktivieren oder deaktivieren"
+    },
+    "root": {
+      "label": "Hauptthema",
+      "description": "MQTT Hauptthema für Standard/Benutzerdefinierte Server"
+    },
+    "proxyToClientEnabled": {
+      "label": "MQTT Client Proxy aktiviert",
+      "description": "Verwendet die Netzwerkverbindung zum Austausch von MQTT Nachrichten mit dem Client."
+    },
+    "mapReportingEnabled": {
+      "label": "Kartenberichte aktiviert",
+      "description": "Ihr Knoten sendet in regelmäßigen Abständen eine unverschlüsselte Nachricht mit Kartenbericht an den konfigurierten MQTT-Server. Einschließlich ID, langen und kurzen Namen, ungefährer Standort, Hardwaremodell, Geräterolle, Firmware-Version, LoRa Region, Modem-Voreinstellung und Name des Primärkanal."
+    },
+    "mapReportSettings": {
+      "publishIntervalSecs": {
+        "label": "Veröffentlichungsintervall Kartenbericht (s)",
+        "description": "Intervall in Sekunden, um Kartenberichte zu veröffentlichen"
+      },
+      "positionPrecision": {
+        "label": "Ungefährer Standort",
+        "description": "Der geteilte Standort mit einer Genauigkeit innerhalb dieser Entfernung",
+        "options": {
+          "metric_km23": "Innerhalb von 23 km",
+          "metric_km12": "Innerhalb von 12 km",
+          "metric_km5_8": "Innerhalb von 5,8 km",
+          "metric_km2_9": "Innerhalb von 2,9 km",
+          "metric_km1_5": "Innerhalb von 1,5 km",
+          "metric_m700": "Innerhalb von 700 m",
+          "metric_m350": "Innerhalb von 350 m",
+          "metric_m200": "Innerhalb von 200 m",
+          "metric_m90": "Innerhalb von 90 m",
+          "metric_m50": "Innerhalb von 50 m",
+          "imperial_mi15": "Innerhalb von 15 Meilen",
+          "imperial_mi7_3": "Innerhalb von 7,3 Meilen",
+          "imperial_mi3_6": "Innerhalb von 3,6 Meilen",
+          "imperial_mi1_8": "Innerhalb von 1,8 Meilen",
+          "imperial_mi0_9": "Innerhalb von 0,9 Meilen",
+          "imperial_mi0_5": "Innerhalb von 0,5 Meilen",
+          "imperial_mi0_2": "Innerhalb von 0,2 Meilen",
+          "imperial_ft600": "Innerhalb von 600 Fuß",
+          "imperial_ft300": "Innerhalb von 300 Fuß",
+          "imperial_ft150": "Innerhalb von 150 Fuß"
+        }
+      }
+    }
+  },
+  "neighborInfo": {
+    "title": "Einstellung Nachbarinformation",
+    "description": "Einstellungen für das Modul Nachbarinformation",
+    "enabled": {
+      "label": "Aktiviert",
+      "description": "Nachbarinformation Modul aktivieren oder deaktivieren"
+    },
+    "updateInterval": {
+      "label": "Aktualisierungsintervall",
+      "description": "Intervall in Sekunden, wie oft die Nachbarinformation an das Netz gesendet wird"
+    }
+  },
+  "paxcounter": {
+    "title": "Einstellung für Pax Zähler",
+    "description": "Einstellungen für das Modul Pax Zähler",
+    "enabled": {
+      "label": "Modul aktiviert",
+      "description": "Aktiviere Pax Zähler"
+    },
+    "paxcounterUpdateInterval": {
+      "label": "Aktualisierungsintervall (Sekunden)",
+      "description": "Wie lange soll zwischen dem Senden von Pax Zählernachrichten gewartet werden"
+    },
+    "wifiThreshold": {
+      "label": "WLAN RSSI Grenzwert",
+      "description": "Bei welchem WLAN RSSI Grenzwert sollte der Zähler erhöht werden. Standardwert -80"
+    },
+    "bleThreshold": {
+      "label": "BLE RSSI Grenzwert",
+      "description": "Bei welchem BLE RSSI Grenzwert sollte der Zähler erhöht werden. Standardwert -80"
+    }
+  },
+  "rangeTest": {
+    "title": "Einstellung Reichweitentest",
+    "description": "Einstellungen für das Modul Reichweitentest",
+    "enabled": {
+      "label": "Modul aktiviert",
+      "description": "Reichweitentest aktivieren"
+    },
+    "sender": {
+      "label": "Nachrichtenintervall",
+      "description": "Wie lange soll zwischen dem Senden von Testnachrichten gewartet werden"
+    },
+    "save": {
+      "label": "CSV im internen Speicher abspeichern",
+      "description": "Nur für ESP32"
+    }
+  },
+  "serial": {
+    "title": "Serielle Einstellungen",
+    "description": "Einstellungen für das serielle Modul",
+    "enabled": {
+      "label": "Modul aktiviert",
+      "description": "Serielle Ausgabe aktivieren"
+    },
+    "echo": {
+      "label": "Echo",
+      "description": "Wenn aktiviert, werden alle Nachrichten, die Sie senden, an Ihr Gerät zurückgesendet"
+    },
+    "rxd": {
+      "label": "GPIO Empfangen",
+      "description": "Setzen Sie den GPIO Pin, den Sie eingerichtet haben, als RXD Pin."
+    },
+    "txd": {
+      "label": "GPIO Senden",
+      "description": "Setzen Sie den GPIO Pin, den Sie eingerichtet haben, als TXD Pin."
+    },
+    "baud": {
+      "label": "Baudrate",
+      "description": "Serielle Baudrate"
+    },
+    "timeout": {
+      "label": "Zeitlimit erreicht",
+      "description": "Wartezeit in Sekunden bis eine Nachricht als gesendet angenommen wird"
+    },
+    "mode": {
+      "label": "Betriebsmodus",
+      "description": "Modus auswählen"
+    },
+    "overrideConsoleSerialPort": {
+      "label": "Seriellen Port der Konsole überschreiben",
+      "description": "Wenn Sie einen seriellen Port an die Konsole angeschlossen haben, wird diese überschrieben."
+    }
+  },
+  "storeForward": {
+    "title": "Speichern & Weiterleiten Einstellungen",
+    "description": "Einstellungen für das Modul Speichern & Weiterleiten",
+    "enabled": {
+      "label": "Modul aktiviert",
+      "description": "Speichern & Weiterleiten aktivieren"
+    },
+    "heartbeat": {
+      "label": "Herzschlag aktiviert",
+      "description": "Herzschlag für Speichern & Weiterleiten aktivieren"
+    },
+    "records": {
+      "label": "Anzahl Einträge",
+      "description": "Anzahl der zu speichernden Datensätze"
+    },
+    "historyReturnMax": {
+      "label": "Verlauf Rückgabewert maximal",
+      "description": "Maximale Anzahl an zurückzugebenden Datensätzen"
+    },
+    "historyReturnWindow": {
+      "label": "Zeitraum Rückgabewert",
+      "description": "Datensätze aus diesem Zeitfenster zurückgeben (Minuten)"
+    }
+  },
+  "telemetry": {
+    "title": "Telemetrieeinstellungen",
+    "description": "Einstellungen für das Telemetriemodul",
+    "deviceUpdateInterval": {
+      "label": "Gerätekennzahlen",
+      "description": "Aktualisierungsintervall für Gerätekennzahlen (Sekunden)"
+    },
+    "environmentUpdateInterval": {
+      "label": "Aktualisierungsintervall für Umweltdaten (Sekunden)",
+      "description": ""
+    },
+    "environmentMeasurementEnabled": {
+      "label": "Modul aktiviert",
+      "description": "Aktiviert die Telemetrie für Umweltdaten"
+    },
+    "environmentScreenEnabled": {
+      "label": "OLED Anzeige aktivieren",
+      "description": "Zeige das Telemetriemodul auf der OLED Anzeige"
+    },
+    "environmentDisplayFahrenheit": {
+      "label": "Temperatur in Fahrenheit",
+      "description": "Temperatur in Fahrenheit anzeigen"
+    },
+    "airQualityEnabled": {
+      "label": "Luftqualität aktiviert",
+      "description": "Telemetrie für Luftqualität aktivieren"
+    },
+    "airQualityInterval": {
+      "label": "Aktualisierungsintervall Luftqualität",
+      "description": "Wie oft werden Luftqualitätsdaten über das Netz gesendet"
+    },
+    "powerMeasurementEnabled": {
+      "label": "Energiemessung aktiviert",
+      "description": "Aktiviere die Telemetrie für die Energiemessung"
+    },
+    "powerUpdateInterval": {
+      "label": "Aktualisierungsintervall Energie",
+      "description": "Wie oft werden Energiedaten an das Netz gesendet"
+    },
+    "powerScreenEnabled": {
+      "label": "Energieanzeige aktiviert",
+      "description": "Aktiviere die Anzeige für Energietelemetrie"
+    }
+  }
 }

@@ -15,7 +15,6 @@
       "messages": "Mesajlar",
       "map": "Harita",
       "config": "Yapılandır",
-      "channels": "Kanallar",
       "nodes": "Düğümler"
     }
   },
@@ -45,7 +44,8 @@
     "label": "Hata Ayıklama",
     "command": {
       "reconfigure": "Yeniden yapılandır",
-      "clearAllStoredMessages": "Depolanan Tüm Mesajları Sil"
+      "clearAllStoredMessages": "Depolanan Tüm Mesajları Sil",
+      "clearAllStores": "Clear All Local Storage"
     }
   }
 }
