@@ -48,8 +48,8 @@ export function ErrorPage({ error }: { error: Error }) {
           </P>
           <P>
             <Trans
-              i18nKey="errorPage.dashboardLink"
-              components={[<Link key="dashboard" href="/" />]}
+              i18nKey="errorPage.connectionsLink"
+              components={[<Link key="connections" href="/" />]}
             />
           </P>
         </div>

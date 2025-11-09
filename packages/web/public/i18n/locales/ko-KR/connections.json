@@ -1,0 +1,12 @@
+{
+  "dashboard": {
+    "title": "연결된 장치",
+    "description": "연결된 Meshtastic 장치를 관리하세요.",
+    "connectionType_ble": "BLE",
+    "connectionType_serial": "시리얼",
+    "connectionType_network": "네트워크",
+    "noDevicesTitle": "연결된 장치 없음",
+    "noDevicesDescription": "새로운 장치를 연결하여 시작하세요.",
+    "button_newConnection": "새 연결"
+  }
+}

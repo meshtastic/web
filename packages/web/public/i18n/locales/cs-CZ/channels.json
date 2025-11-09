@@ -1,69 +1,71 @@
 {
-	"page": {
-		"sectionLabel": "Kanály",
-		"channelName": "Kanál: {{channelName}}",
-		"broadcastLabel": "Primární",
-		"channelIndex": "K {{index}}"
-	},
-	"validation": {
-		"pskInvalid": "Prosím zadejte platný {{bits}} bit PSK."
-	},
-	"settings": {
-		"label": "Nastavení kanálu",
-		"description": "Krypto, MQTT a další nastavení"
-	},
-	"role": {
-		"label": "Role",
-		"description": "Telemetrie zařízení je posílána přes PRIMÁRNÍ. Je povolena pouze jedna PRIMÁRNÍ",
-		"options": {
-			"primary": "PRIMÁRNÍ",
-			"disabled": "VYPNUTO",
-			"secondary": "SEKUNDÁRNÍ"
-		}
-	},
-	"psk": {
-		"label": "Sdílený klíč",
-		"description": "Podporované délky PSK: 256-bit, 128-bit, 8-bit, prázdné (0-bit)",
-		"generate": "Generovat"
-	},
-	"name": {
-		"label": "Jméno",
-		"description": "Jedinečný název kanálu <12 bytů, ponechte prázdné pro výchozí"
-	},
-	"uplinkEnabled": {
-		"label": "Odesílání povoleno",
-		"description": "Odesílat zprávy z místní sítě do MQTT"
-	},
-	"downlinkEnabled": {
-		"label": "Stahování povoleno",
-		"description": "Odesílat zprávy z MQTT do místní sítě"
-	},
-	"positionPrecision": {
-		"label": "Poloha",
-		"description": "Přesnost umístění, které chcete sdílet s kanálem. Může být vypnuto.",
-		"options": {
-			"none": "Nesdílet polohu",
-			"precise": "Přesná poloha",
-			"metric_km23": "Okruh 23 kilometrů",
-			"metric_km12": "Okruh 12 kilometrů",
-			"metric_km5_8": "Okruh 5,8 kilometrů",
-			"metric_km2_9": "Okruh 2,9 kilometrů",
-			"metric_km1_5": "Okruh 1,5 kilometru",
-			"metric_m700": "Okruh 700 metrů",
-			"metric_m350": "Okruh 350 metrů",
-			"metric_m200": "Okruh 200 metrů",
-			"metric_m90": "Okruh 90 metrů",
-			"metric_m50": "Okruh 50 metrů",
-			"imperial_mi15": "Okruh 15 mil",
-			"imperial_mi7_3": "Okruh 7,3 mil",
-			"imperial_mi3_6": "Okruh 3,6 mil",
-			"imperial_mi1_8": "Okruh 1,8 mil",
-			"imperial_mi0_9": "Okruh 0,9 míle",
-			"imperial_mi0_5": "Okruh 0,5 míle",
-			"imperial_mi0_2": "Okruh 0,2 míle",
-			"imperial_ft600": "Okruh 600 stop",
-			"imperial_ft300": "Okruh 300 stop",
-			"imperial_ft150": "Okruh 150 stop"
-		}
-	}
+  "page": {
+    "sectionLabel": "Kanály",
+    "channelName": "Kanál: {{channelName}}",
+    "broadcastLabel": "Primární",
+    "channelIndex": "K {{index}}",
+    "import": "Import",
+    "export": "Export"
+  },
+  "validation": {
+    "pskInvalid": "Prosím zadejte platný {{bits}} bit PSK."
+  },
+  "settings": {
+    "label": "Nastavení kanálu",
+    "description": "Krypto, MQTT a další nastavení"
+  },
+  "role": {
+    "label": "Role",
+    "description": "Telemetrie zařízení je posílána přes PRIMÁRNÍ. Je povolena pouze jedna PRIMÁRNÍ",
+    "options": {
+      "primary": "PRIMÁRNÍ",
+      "disabled": "VYPNUTO",
+      "secondary": "SEKUNDÁRNÍ"
+    }
+  },
+  "psk": {
+    "label": "Sdílený klíč",
+    "description": "Podporované délky PSK: 256-bit, 128-bit, 8-bit, prázdné (0-bit)",
+    "generate": "Generovat"
+  },
+  "name": {
+    "label": "Jméno",
+    "description": "Jedinečný název kanálu <12 bytů, ponechte prázdné pro výchozí"
+  },
+  "uplinkEnabled": {
+    "label": "Odesílání povoleno",
+    "description": "Odesílat zprávy z místní sítě do MQTT"
+  },
+  "downlinkEnabled": {
+    "label": "Stahování povoleno",
+    "description": "Odesílat zprávy z MQTT do místní sítě"
+  },
+  "positionPrecision": {
+    "label": "Poloha",
+    "description": "Přesnost umístění, které chcete sdílet s kanálem. Může být vypnuto.",
+    "options": {
+      "none": "Nesdílet polohu",
+      "precise": "Přesná poloha",
+      "metric_km23": "Okruh 23 kilometrů",
+      "metric_km12": "Okruh 12 kilometrů",
+      "metric_km5_8": "Okruh 5,8 kilometrů",
+      "metric_km2_9": "Okruh 2,9 kilometrů",
+      "metric_km1_5": "Okruh 1,5 kilometru",
+      "metric_m700": "Okruh 700 metrů",
+      "metric_m350": "Okruh 350 metrů",
+      "metric_m200": "Okruh 200 metrů",
+      "metric_m90": "Okruh 90 metrů",
+      "metric_m50": "Okruh 50 metrů",
+      "imperial_mi15": "Okruh 15 mil",
+      "imperial_mi7_3": "Okruh 7,3 mil",
+      "imperial_mi3_6": "Okruh 3,6 mil",
+      "imperial_mi1_8": "Okruh 1,8 mil",
+      "imperial_mi0_9": "Okruh 0,9 míle",
+      "imperial_mi0_5": "Okruh 0,5 míle",
+      "imperial_mi0_2": "Okruh 0,2 míle",
+      "imperial_ft600": "Okruh 600 stop",
+      "imperial_ft300": "Okruh 300 stop",
+      "imperial_ft150": "Okruh 150 stop"
+    }
+  }
 }

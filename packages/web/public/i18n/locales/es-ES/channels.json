@@ -1,69 +1,71 @@
 {
-	"page": {
-		"sectionLabel": "Canales",
-		"channelName": "Canal: {{channelName}}",
-		"broadcastLabel": "Primario",
-		"channelIndex": "Cnl {{index}}"
-	},
-	"validation": {
-		"pskInvalid": "Por favor, introduzca un PSK de {{bits}} bit válido."
-	},
-	"settings": {
-		"label": "Ajustes del canal",
-		"description": "Criptografía, MQTT y otros ajustes"
-	},
-	"role": {
-		"label": "Rol",
-		"description": "La telemetría del dispositivo se envía sobre PRIMARY. Solo se permite un PRIMARIO",
-		"options": {
-			"primary": "PRIMARIO",
-			"disabled": "DESHABILITADO",
-			"secondary": "SECUNDARIO"
-		}
-	},
-	"psk": {
-		"label": "Clave pre-compartida",
-		"description": "Longitudes PSK soportadas: 256-bit, 128-bit, 8-bit, Vacío (0-bit)",
-		"generate": "Generar Nombre"
-	},
-	"name": {
-		"label": "Nombre",
-		"description": "Un nombre único para el canal <12 bytes, dejar en blanco por defecto"
-	},
-	"uplinkEnabled": {
-		"label": "Subida de Paquetes Permitida",
-		"description": "Enviar mensajes de la malla local a MQTT"
-	},
-	"downlinkEnabled": {
-		"label": "Baja de Paquetes Permitida",
-		"description": "Enviar mensajes de MQTT a la malla local"
-	},
-	"positionPrecision": {
-		"label": "Ubicación",
-		"description": "La precisión de la ubicación a compartir con el canal. Se puede desactivar.",
-		"options": {
-			"none": "No compartir la ubicación",
-			"precise": "Ubicación precisa",
-			"metric_km23": "En 23 kilómetros",
-			"metric_km12": "En 12 kilómetros",
-			"metric_km5_8": "En 5,8 kilómetros",
-			"metric_km2_9": "En 2.9 kilómetros",
-			"metric_km1_5": "En 1,5 kilómetros",
-			"metric_m700": "En 700 metros",
-			"metric_m350": "En 350 metros",
-			"metric_m200": "En 200 metros",
-			"metric_m90": "En 90 metros",
-			"metric_m50": "En 50 metros",
-			"imperial_mi15": "En 15 millas",
-			"imperial_mi7_3": "En 7.3 millas",
-			"imperial_mi3_6": "En 3.6 millas",
-			"imperial_mi1_8": "En 1.8 millas",
-			"imperial_mi0_9": "En 0.9 millas",
-			"imperial_mi0_5": "En 0.5 millas",
-			"imperial_mi0_2": "En 0.2 millas",
-			"imperial_ft600": "En 600 pies",
-			"imperial_ft300": "En 300 pies",
-			"imperial_ft150": "En 150 pies"
-		}
-	}
+  "page": {
+    "sectionLabel": "Canales",
+    "channelName": "Canal: {{channelName}}",
+    "broadcastLabel": "Primario",
+    "channelIndex": "Cnl {{index}}",
+    "import": "Importar",
+    "export": "Exportar"
+  },
+  "validation": {
+    "pskInvalid": "Por favor, introduzca un PSK de {{bits}} bit válido."
+  },
+  "settings": {
+    "label": "Ajustes del canal",
+    "description": "Criptografía, MQTT y otros ajustes"
+  },
+  "role": {
+    "label": "Rol",
+    "description": "La telemetría del dispositivo se envía sobre PRIMARY. Solo se permite un PRIMARIO",
+    "options": {
+      "primary": "PRIMARIO",
+      "disabled": "DESHABILITADO",
+      "secondary": "SECUNDARIO"
+    }
+  },
+  "psk": {
+    "label": "Clave pre-compartida",
+    "description": "Longitudes PSK soportadas: 256-bit, 128-bit, 8-bit, Vacío (0-bit)",
+    "generate": "Generar Nombre"
+  },
+  "name": {
+    "label": "Nombre",
+    "description": "Un nombre único para el canal <12 bytes, dejar en blanco por defecto"
+  },
+  "uplinkEnabled": {
+    "label": "Subida de Paquetes Permitida",
+    "description": "Enviar mensajes de la malla local a MQTT"
+  },
+  "downlinkEnabled": {
+    "label": "Baja de Paquetes Permitida",
+    "description": "Enviar mensajes de MQTT a la malla local"
+  },
+  "positionPrecision": {
+    "label": "Ubicación",
+    "description": "La precisión de la ubicación a compartir con el canal. Se puede desactivar.",
+    "options": {
+      "none": "No compartir la ubicación",
+      "precise": "Ubicación precisa",
+      "metric_km23": "En 23 kilómetros",
+      "metric_km12": "En 12 kilómetros",
+      "metric_km5_8": "En 5,8 kilómetros",
+      "metric_km2_9": "En 2.9 kilómetros",
+      "metric_km1_5": "En 1,5 kilómetros",
+      "metric_m700": "En 700 metros",
+      "metric_m350": "En 350 metros",
+      "metric_m200": "En 200 metros",
+      "metric_m90": "En 90 metros",
+      "metric_m50": "En 50 metros",
+      "imperial_mi15": "En 15 millas",
+      "imperial_mi7_3": "En 7.3 millas",
+      "imperial_mi3_6": "En 3.6 millas",
+      "imperial_mi1_8": "En 1.8 millas",
+      "imperial_mi0_9": "En 0.9 millas",
+      "imperial_mi0_5": "En 0.5 millas",
+      "imperial_mi0_2": "En 0.2 millas",
+      "imperial_ft600": "En 600 pies",
+      "imperial_ft300": "En 300 pies",
+      "imperial_ft150": "En 150 pies"
+    }
+  }
 }

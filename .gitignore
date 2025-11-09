@@ -12,3 +12,8 @@ npm/
 .DS_Store
 
 packages/protobufs/packages/ts/dist
+
+# Local dev certs
+*.pem
+*.crt
+*.key

@@ -40,7 +40,7 @@ jobs:
           set -euo pipefail
 
           # List packages to exclude (full paths under repo root)
-          EXCLUDED_DIRS=("packages/protobufs" "packages/transport-deno")
+          EXCLUDED_DIRS=("packages/protobufs" "packages/transport-deno" "packages/ui")
 
           is_excluded() {
             local dir="$1"

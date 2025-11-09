@@ -46,6 +46,7 @@ export enum DeviceStatusEnum {
   DeviceConnected = 5,
   DeviceConfiguring = 6,
   DeviceConfigured = 7,
+  DeviceError = 8,
 }
 
 export type LogEventPacket = LogEvent & { date: Date };

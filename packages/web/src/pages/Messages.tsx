@@ -283,7 +283,7 @@ export const MessagesPage = () => {
             }}
           >
             <Avatar
-              text={node.user?.shortName ?? t("unknown.shortName")}
+              nodeNum={node.num}
               className={cn(hasNodeError(node.num) && "text-red-500")}
               showError={hasNodeError(node.num)}
               showFavorite={node.isFavorite}

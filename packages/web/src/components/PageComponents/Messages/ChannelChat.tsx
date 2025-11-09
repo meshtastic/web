@@ -1,9 +1,10 @@
 import { MessageItem } from "@components/PageComponents/Messages/MessageItem.tsx";
 import { Separator } from "@components/UI/Separator";
+import { Skeleton } from "@components/UI/Skeleton.tsx";
 import type { Message } from "@core/stores/messageStore/types.ts";
 import type { TFunction } from "i18next";
 import { InboxIcon } from "lucide-react";
-import { Fragment, useMemo } from "react";
+import { Fragment, Suspense, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 export interface ChannelChatProps {
@@ -75,6 +76,24 @@ const DateDelimiter = ({ label }: { label: string }) => (
   </li>
 );
 
+const MessageSkeleton = () => {
+  console.log("[ChannelChat] Showing MessageSkeleton (Suspense fallback)");
+  return (
+    <li className="group w-full py-2 relative list-none rounded-md">
+      <div className="grid grid-cols-[auto_1fr] gap-x-2">
+        <Skeleton className="size-8 rounded-full" />
+        <div className="flex flex-col gap-1.5 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-12" />
+          </div>
+          <Skeleton className="h-4 w-full" />
+        </div>
+      </div>
+    </li>
+  );
+};
+
 const EmptyState = () => {
   const { t } = useTranslation("messages");
   return (
@@ -130,10 +149,12 @@ export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
         <Fragment key={dayKey}>
           {/* Render messages first, then delimiter — with flex-col-reverse this shows the delimiter above that day's messages */}
           {items.map((message) => (
-            <MessageItem
+            <Suspense
               key={message.messageId ?? `${message.from}-${message.date}`}
-              message={message}
-            />
+              fallback={<MessageSkeleton />}
+            >
+              <MessageItem message={message} />
+            </Suspense>
           ))}
           <DateDelimiter label={label} />
         </Fragment>
