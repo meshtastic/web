@@ -70,11 +70,16 @@ export const DeviceInfoPanel = ({
     }
     switch (status) {
       case "connected":
+      case "configured":
+      case "online":
         return "bg-emerald-500";
       case "connecting":
+      case "configuring":
+      case "disconnecting":
         return "bg-amber-500";
       case "error":
         return "bg-red-500";
+      case "disconnected":
       default:
         return "bg-gray-400";
     }

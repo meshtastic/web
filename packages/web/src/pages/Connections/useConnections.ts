@@ -8,6 +8,8 @@ import {
   createConnectionFromInput,
   testHttpReachable,
 } from "@app/pages/Connections/utils";
+import { ensureDefaultUser } from "@core/dto/NodeNumToNodeInfoDTO";
+import { MeshService } from "@core/services/MeshService";
 import {
   useAppStore,
   useDeviceStore,
@@ -26,6 +28,7 @@ type LiveRefs = {
   bt: Map<ConnectionId, BluetoothDevice>;
   serial: Map<ConnectionId, SerialPort>;
   meshDevices: Map<ConnectionId, MeshDevice>;
+  meshServices: Map<ConnectionId, MeshService>;
 };
 
 export function useConnections() {
@@ -41,6 +44,7 @@ export function useConnections() {
     bt: new Map(),
     serial: new Map(),
     meshDevices: new Map(),
+    meshServices: new Map(),
   });
   const { addDevice } = useDeviceStore();
   const { addNodeDB } = useNodeDBStore();
@@ -62,7 +66,16 @@ export function useConnections() {
 
   const removeConnection = useCallback(
     (id: ConnectionId) => {
-      // Disconnect MeshDevice first
+      // Destroy MeshService first
+      const meshService = live.current.meshServices.get(id);
+      if (meshService) {
+        try {
+          meshService.destroy();
+        } catch {}
+        live.current.meshServices.delete(id);
+      }
+
+      // Disconnect MeshDevice
       const meshDevice = live.current.meshDevices.get(id);
       if (meshDevice) {
         try {
@@ -115,36 +128,86 @@ export function useConnections() {
         | Awaited<ReturnType<typeof TransportHTTP.create>>
         | Awaited<ReturnType<typeof TransportWebBluetooth.createFromDevice>>
         | Awaited<ReturnType<typeof TransportWebSerial.createFromPort>>,
-      options?: {
-        setHeartbeat?: boolean;
-        onDisconnect?: () => void;
-      },
     ): number => {
-      const deviceId = randId();
+      // Reuse existing meshDeviceId if available to prevent duplicate nodeDBs
+      const conn = connections.find((c) => c.id === id);
+      const deviceId = conn?.meshDeviceId ?? randId();
+
       const device = addDevice(deviceId);
       const nodeDB = addNodeDB(deviceId);
       const messageStore = addMessageStore(deviceId);
       const meshDevice = new MeshDevice(transport, deviceId);
-      meshDevice.configure();
+
       setSelectedDevice(deviceId);
       device.addConnection(meshDevice);
       subscribeAll(device, meshDevice, messageStore, nodeDB);
       live.current.meshDevices.set(id, meshDevice);
 
-      if (options?.setHeartbeat) {
-        const HEARTBEAT_INTERVAL = 5 * 60 * 1000;
-        meshDevice.setHeartbeatInterval(HEARTBEAT_INTERVAL);
-      }
+      // Create MeshService for connection management
+      const meshService = new MeshService(meshDevice);
+      live.current.meshServices.set(id, meshService);
+
+      // Set up MeshService event listeners
+      meshService.onStageStart.subscribe((data) => {
+        console.log(`[MeshService] Stage started: ${data.stage}`);
+      });
+
+      meshService.onStageComplete.subscribe((data) => {
+        console.log(`[MeshService] Stage complete:`, data);
+      });
+
+      meshService.onConfigured.subscribe(() => {
+        console.log(`[MeshService] Device fully configured`);
+        updateStatus(id, "configured");
+      });
+
+      meshService.onError.subscribe((error) => {
+        console.error(`[MeshService] MeshService error:`, error);
+        updateStatus(id, "error", error.message);
+      });
+
+      // Subscribe to connection state changes from MeshService
+      meshService.onConnectionStateChange.subscribe((state) => {
+        console.log(`[MeshService] Connection state changed: ${state}`);
+        const statusMap: Record<string, ConnectionStatus> = {
+          CONNECTED: "connected",
+          DISCONNECTED: "disconnected",
+          CONFIGURING: "configuring",
+          CONFIGURED: "configured",
+        };
+        const connectionStatus = statusMap[state] || "disconnected";
+        updateStatus(id, connectionStatus);
+      });
+
+      // Batch-add nodes when received
+      meshService.onNodesReceived.subscribe((nodes) => {
+        console.log(
+          `[useConnections] Batch-adding ${nodes.length} nodes to nodeDB`,
+        );
+        nodes.forEach((node) => {
+          const nodeWithUser = ensureDefaultUser(node);
+          // PKI sanity check is handled inside nodeDB.addNode
+          nodeDB.addNode(nodeWithUser);
+        });
+      });
+
+      // Start the connection and configuration flow
+      meshService.connect().catch((error) => {
+        console.error(`[useConnections] Failed to start connection:`, error);
+        updateStatus(id, "error", error.message);
+      });
 
       updateSavedConnection(id, { meshDeviceId: deviceId });
       return deviceId;
     },
     [
+      connections,
       addDevice,
       addNodeDB,
       addMessageStore,
       setSelectedDevice,
       updateSavedConnection,
+      updateStatus,
     ],
   );
 
@@ -226,7 +289,7 @@ export function useConnections() {
 
           const transport =
             await TransportWebBluetooth.createFromDevice(bleDevice);
-          setupMeshDevice(id, transport, { setHeartbeat: true });
+          setupMeshDevice(id, transport);
 
           bleDevice.addEventListener("gattserverdisconnected", () => {
             updateStatus(id, "disconnected");
@@ -299,7 +362,7 @@ export function useConnections() {
           live.current.serial.set(id, port);
 
           const transport = await TransportWebSerial.createFromPort(port);
-          setupMeshDevice(id, transport, { setHeartbeat: true });
+          setupMeshDevice(id, transport);
           updateStatus(id, "connected");
           return true;
         }
@@ -320,7 +383,19 @@ export function useConnections() {
         return;
       }
       try {
-        // Disconnect MeshDevice first
+        // Destroy MeshService first
+        const meshService = live.current.meshServices.get(id);
+        if (meshService) {
+          try {
+            meshService.disconnect();
+            meshService.destroy();
+          } catch {
+            // Ignore errors
+          }
+          live.current.meshServices.delete(id);
+        }
+
+        // Disconnect MeshDevice
         const meshDevice = live.current.meshDevices.get(id);
         if (meshDevice) {
           try {

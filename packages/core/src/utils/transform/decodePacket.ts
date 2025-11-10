@@ -135,21 +135,27 @@ export const decodePacket = (device: MeshDevice) =>
             }
 
             case "configCompleteId": {
-              if (decodedMessage.payloadVariant.value !== device.configId) {
-                device.log.error(
-                  Types.Emitter[Types.Emitter.HandleFromRadio],
-                  `❌ Invalid config id received from device, expected ${device.configId} but received ${decodedMessage.payloadVariant.value}`,
-                );
-              }
-
               device.log.info(
                 Types.Emitter[Types.Emitter.HandleFromRadio],
-                `⚙️ Valid config id received from device: ${device.configId}`,
+                `⚙️ Received config complete id: ${decodedMessage.payloadVariant.value}`,
               );
 
-              device.updateDeviceStatus(
-                Types.DeviceStatusEnum.DeviceConfigured,
+              // Emit the configCompleteId event for MeshService to handle two-stage flow
+              device.events.onConfigComplete.dispatch(
+                decodedMessage.payloadVariant.value,
               );
+
+              // For backward compatibility: if configId matches, update device status
+              // MeshService will override this behavior for two-stage flow
+              if (decodedMessage.payloadVariant.value === device.configId) {
+                device.log.info(
+                  Types.Emitter[Types.Emitter.HandleFromRadio],
+                  `⚙️ Config id matches device.configId: ${device.configId}`,
+                );
+                device.updateDeviceStatus(
+                  Types.DeviceStatusEnum.DeviceConfigured,
+                );
+              }
               break;
             }
 

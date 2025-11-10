@@ -1,4 +1,3 @@
-import { ensureDefaultUser } from "@core/dto/NodeNumToNodeInfoDTO.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
 import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
 import {
@@ -68,12 +67,11 @@ export const subscribeAll = (
     nodeDB.addPosition(position);
   });
 
-  connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-    const nodeWithUser = ensureDefaultUser(nodeInfo);
-
-    // PKI sanity check is handled inside nodeDB.addNode
-    nodeDB.addNode(nodeWithUser);
-  });
+  // NOTE: Node handling is now done by MeshService
+  // - During initial config, nodes are batched and added all at once
+  // - After config completes, nodes arrive individually for real-time updates
+  // This is handled in useConnections via meshService.onNodesReceived
+  // MeshService collects nodes during config for efficient batch processing
 
   connection.events.onChannelPacket.subscribe((channel) => {
     device.addChannel(channel);

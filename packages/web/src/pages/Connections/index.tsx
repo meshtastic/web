@@ -71,7 +71,6 @@ export const Connections = () => {
     syncConnectionStatuses();
     refreshStatuses();
   }, []);
-
   const sorted = useMemo(() => {
     const copy = [...connections];
     return copy.sort((a, b) => {
