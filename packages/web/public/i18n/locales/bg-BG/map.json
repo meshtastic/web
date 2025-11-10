@@ -1,38 +1,38 @@
 {
   "maplibre": {
-    "GeolocateControl.FindMyLocation": "Find my location",
-    "NavigationControl.ZoomIn": "Zoom in",
-    "NavigationControl.ZoomOut": "Zoom out",
+    "GeolocateControl.FindMyLocation": "Намиране на местоположението ми",
+    "NavigationControl.ZoomIn": "Увеличаване",
+    "NavigationControl.ZoomOut": "Намаляване",
     "CooperativeGesturesHandler.WindowsHelpText": "Use Ctrl + scroll to zoom the map",
     "CooperativeGesturesHandler.MacHelpText": "Use ⌘ + scroll to zoom the map",
-    "CooperativeGesturesHandler.MobileHelpText": "Use two fingers to move the map"
+    "CooperativeGesturesHandler.MobileHelpText": "Използвайте два пръста, за да местите картата"
   },
   "layerTool": {
-    "nodeMarkers": "Show nodes",
-    "directNeighbors": "Show direct connections",
-    "remoteNeighbors": "Show remote connections",
+    "nodeMarkers": "Показване на възли",
+    "directNeighbors": "Показване на директни връзки",
+    "remoteNeighbors": "Показване на отдалечени връзки",
     "positionPrecision": "Show position precision",
     "traceroutes": "Show traceroutes",
     "waypoints": "Show waypoints"
   },
   "mapMenu": {
     "locateAria": "Locate my node",
-    "layersAria": "Change map style"
+    "layersAria": "Промяна на стила на картата"
   },
   "waypointDetail": {
     "edit": "Редактирай",
-    "description": "Description:",
-    "createdBy": "Edited by:",
-    "createdDate": "Created:",
-    "updated": "Updated:",
-    "expires": "Expires:",
-    "distance": "Distance:",
+    "description": "Описание:",
+    "createdBy": "Редактирано от:",
+    "createdDate": "Създадено:",
+    "updated": "Актуализирано:",
+    "expires": "Изтича:",
+    "distance": "Разстояние:",
     "bearing": "Absolute bearing:",
-    "lockedTo": "Locked by:",
-    "latitude": "Latitude:",
-    "longitude": "Longitude:"
+    "lockedTo": "Заключено от:",
+    "latitude": "Географска ширина:",
+    "longitude": "Географска дължина:"
   },
   "myNode": {
-    "tooltip": "This device"
+    "tooltip": "Това устройство"
   }
 }

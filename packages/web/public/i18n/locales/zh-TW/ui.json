@@ -8,6 +8,7 @@
     "radioConfig": "無線電設定",
     "deviceConfig": "設備設置",
     "moduleConfig": "模組設定",
+    "manageConnections": "Manage Connections",
     "nodes": "節點"
   },
   "app": {
@@ -216,7 +217,7 @@
       "step4": "其他相關資訊"
     },
     "reportLink": "您可以將此問題回報到我們的 <0>GitHub</0>",
-    "dashboardLink": "返回 <0>dashboard</0>",
+    "connectionsLink": "Return to the <0>connections</0>",
     "detailsSummary": "錯誤詳情",
     "errorMessageLabel": "錯誤訊息：",
     "stackTraceLabel": "Stack trace：",

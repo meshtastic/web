@@ -3,18 +3,6 @@
     "description": "Diese Aktion wird den Nachrichtenverlauf löschen. Dies kann nicht rückgängig gemacht werden. Sind Sie sicher, dass Sie fortfahren möchten?",
     "title": "Alle Nachrichten löschen"
   },
-  "deviceName": {
-    "description": "Das Gerät wird neu gestartet, sobald die Einstellung gespeichert ist.",
-    "longName": "Langer Name",
-    "shortName": "Kurzname",
-    "title": "Gerätename ändern",
-    "validation": {
-      "longNameMax": "Lange Name darf nicht mehr als 40 Zeichen lang sein",
-      "shortNameMax": "Kurzname darf nicht mehr als 4 Zeichen lang sein",
-      "longNameMin": "Langer Name muss mindestens 1 Zeichen lang sein",
-      "shortNameMin": "Kurzname muss mindestens 1 Zeichen lang sein"
-    }
-  },
   "import": {
     "description": "Die aktuelle LoRa Einstellung wird überschrieben.",
     "error": {
@@ -41,48 +29,77 @@
     "description": "Sind Sie sicher, dass Sie den vorab verteilten Schlüssel neu erstellen möchten?",
     "regenerate": "Neu erstellen"
   },
-  "newDeviceDialog": {
-    "title": "Neues Gerät verbinden",
-    "https": "https",
-    "http": "http",
-    "tabHttp": "HTTP",
-    "tabBluetooth": "Bluetooth",
-    "tabSerial": "Seriell",
-    "useHttps": "HTTPS verwenden",
-    "connecting": "Wird verbunden...",
-    "connect": "Verbindung herstellen",
-    "connectionFailedAlert": {
-      "title": "Verbindung fehlgeschlagen",
-      "descriptionPrefix": "Verbindung zum Gerät fehlgeschlagen. ",
-      "httpsHint": "Wenn Sie HTTPS verwenden, müssen Sie möglicherweise zuerst ein selbstsigniertes Zertifikat akzeptieren. ",
-      "openLinkPrefix": "Öffnen Sie ",
-      "openLinkSuffix": "in einem neuen Tab",
-      "acceptTlsWarningSuffix": ", akzeptieren Sie alle TLS-Warnungen, wenn Sie dazu aufgefordert werden, dann versuchen Sie es erneut",
-      "learnMoreLink": "Mehr erfahren"
-    },
-    "httpConnection": {
-      "label": "IP Adresse/Hostname",
-      "placeholder": "000.000.000.000 / meshtastic.local"
-    },
-    "serialConnection": {
-      "noDevicesPaired": "Noch keine Geräte gekoppelt.",
-      "newDeviceButton": "Neues Gerät",
-      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
-    },
-    "bluetoothConnection": {
-      "noDevicesPaired": "Noch keine Geräte gekoppelt.",
-      "newDeviceButton": "Neues Gerät",
-      "connectionFailed": "Verbindung fehlgeschlagen",
-      "deviceDisconnected": "Verbindung getrennt",
-      "unknownDevice": "Unbekanntes Gerät",
-      "errorLoadingDevices": "Fehler beim Laden der Geräte",
-      "unknownErrorLoadingDevices": "Unbekannter Fehler beim Laden der Geräte"
-    },
+  "addConnection": {
+    "title": "Verbindung hinzufügen",
+    "description": "Wählen Sie einen Verbindungstyp aus und geben Sie die Details ein",
     "validation": {
       "requiresWebBluetooth": "Dieser Verbindungstyp erfordert <0>Bluetooth</0> im Browser. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
       "requiresWebSerial": "Dieser Verbindungstyp erfordert <0>Serielle Schnittstelle</0> im Browser. Bitte verwenden Sie einen unterstützten Browser, wie Chrome oder Edge.",
       "requiresSecureContext": "Diese Anwendung erfordert einen <0>sicheren Kontext</0>. Bitte verbinden Sie sich über HTTPS oder localhost.",
       "additionallyRequiresSecureContext": "Zusätzlich erfordert es einen <0>sicheren Kontext</0>. Bitte verbinden Sie sich über HTTPS oder localhost."
+    },
+    "bluetoothConnection": {
+      "namePlaceholder": "Mein Bluetooth Knoten",
+      "supported": {
+        "title": "Web Bluetooth wird unterstützt"
+      },
+      "notSupported": {
+        "title": "Web Bluetooth wird nicht unterstützt",
+        "description": "Ihr Browser oder Ihr Gerät unterstützt kein Bluetooth im Web"
+      },
+      "short": "BT: {{deviceName}}",
+      "long": "Bluetooth Gerät",
+      "device": "Gerät",
+      "selectDevice": "Gerät auswählen",
+      "selected": "Bluetooth Gerät ausgewählt",
+      "notSelected": "Kein Gerät ausgewählt",
+      "helperText": "Verwendet den Meshtastic Bluetooth Dienst zur Erkennung."
+    },
+    "serialConnection": {
+      "namePlaceholder": "Mein serieller Knoten",
+      "helperText": "Die Auswahl eines Anschlusses erteilt der App die Berechtigung, diesen zu öffnen und eine Verbindung herzustellen.",
+      "supported": {
+        "title": "Web Seriell unterstützt"
+      },
+      "notSupported": {
+        "title": "Web Seriell nicht unterstützt",
+        "description": "Ihr Browser oder Ihr Gerät unterstützt kein Web Seriell"
+      },
+      "portSelected": {
+        "title": "Serieller Anschluss ausgewählt",
+        "description": "Anschlussberechtigungen gewährt."
+      },
+      "port": "Anschluss",
+      "selectPort": "Anschluss auswählen",
+      "deviceName": "USB {{vendorId}}:{{productId}}",
+      "notSelected": "Kein Anschluss ausgewählt"
+    },
+    "httpConnection": {
+      "namePlaceholder": "Mein HTTP Knoten",
+      "inputPlaceholder": "192.168.1.10 oder meshtastic.local",
+      "heading": "URL oder IP",
+      "useHttps": "HTTPS verwenden",
+      "invalidUrl": {
+        "title": "Ungültige URL",
+        "description": "Bitte geben Sie eine gültige HTTP oder HTTPS URL ein."
+      },
+      "connectionTest": {
+        "description": "Testen Sie die Verbindung, bevor Sie speichern um zu überprüfen, dass das Gerät erreichbar ist.",
+        "button": {
+          "loading": "Wird getestet...",
+          "label": "Verbindung testen"
+        },
+        "reachable": "Erreichbar",
+        "notReachable": "Nicht erreichbar",
+        "success": {
+          "title": "Verbindungstest erfolgreich",
+          "description": "Das Gerät scheint erreichbar zu sein."
+        },
+        "failure": {
+          "title": "Verbindungstest fehlgeschlagen",
+          "description": "Das Gerät konnte nicht erreicht werden. Überprüfen Sie die URL und versuchen Sie es erneut."
+        }
+      }
     }
   },
   "nodeDetails": {

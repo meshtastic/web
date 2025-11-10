@@ -1,12 +1,34 @@
 {
-  "dashboard": {
-    "title": "Yhdistetyt laitteet",
-    "description": "Hallitse yhdistettyjä Meshtastic laitteitasi.",
-    "connectionType_ble": "BLE",
-    "connectionType_serial": "Sarjaliitäntä",
-    "connectionType_network": "Verkko",
-    "noDevicesTitle": "Ei laitteita yhdistettynä",
-    "noDevicesDescription": "Yhdistä uusi laite aloittaaksesi.",
-    "button_newConnection": "Uusi yhteys"
+  "page": {
+    "title": "Yhdistä Meshtastic-laitteeseen",
+    "description": "Lisää laiteyhteys HTTP:n, Bluetoothin tai sarjaportin kautta. Tallennetut yhteydet tallennetaan selaimeesi."
+  },
+  "connectionType_ble": "BLE",
+  "connectionType_serial": "Sarjaliitäntä",
+  "connectionType_network": "Verkko",
+  "deleteConnection": "Poista yhteys",
+  "areYouSure": "Tämä poistaa kohteen {{name}}. Tätä toimintoa ei voi perua.",
+  "moreActions": "Lisää toimintoja",
+  "noConnections": {
+    "title": "Ei yhteyksiä vielä.",
+    "description": "Luo ensimmäinen yhteytesi. Yhteys muodostetaan heti ja tallennetaan myöhempää käyttöä varten."
+  },
+  "lastConnectedAt": "Viimeksi yhdistetty: {{date}}",
+  "neverConnected": "Ei koskaan yhdistetty",
+  "toasts": {
+    "connected": "Yhdistetty",
+    "nowConnected": "{{name}} on nyt yhdistetty",
+    "nowDisconnected": "{{name}} ei ole enää yhteydessä",
+    "disconnected": "Ei yhdistetty",
+    "failed": "Yhteyden muodostaminen epäonnistui",
+    "checkConnetion": "Tarkista laitteesi tai asetukset ja yritä uudelleen",
+    "defaultSet": "Asetettu oletukseksi",
+    "defaultConnection": "Oletusyhteys on nyt {{nameisconnected}}",
+    "deleted": "Poistettu",
+    "deletedByName": "{{name}} poistettiin",
+    "pickConnectionAgain": "Yhteyttä ei voitu muodostaa. Saatat joutua valitsemaan laitteen tai portin uudelleen.",
+    "added": "Yhteys lisätty",
+    "savedByName": "{{name}} tallennettu.",
+    "savedCantConnect": "Yhteys tallennettiin, mutta siihen ei voitu yhdistää."
   }
 }

@@ -8,6 +8,7 @@
     "radioConfig": "Radion asetukset",
     "deviceConfig": "Laitteen asetukset",
     "moduleConfig": "Moduulin asetukset",
+    "manageConnections": "Hallinnoi yhteyksiä",
     "nodes": "Laitteet"
   },
   "app": {
@@ -216,7 +217,7 @@
       "step4": "Muut mahdollisesti oleelliset tiedot"
     },
     "reportLink": "Voit raportoida ongelmasta <0>GitHubissa</0>",
-    "dashboardLink": "Palaa takaisin <0>hallintapaneeliin</0>",
+    "connectionsLink": "Palaa <0>yhteyksiin</0>",
     "detailsSummary": "Virheen tiedot",
     "errorMessageLabel": "Virheilmoitus:",
     "stackTraceLabel": "Virheen jäljityslista:",

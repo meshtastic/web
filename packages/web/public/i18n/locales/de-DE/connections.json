@@ -1,12 +1,34 @@
 {
-  "dashboard": {
-    "title": "Verbundene Geräte",
-    "description": "Verwalten Sie Ihre verbundenen Meshtastic Geräte.",
-    "connectionType_ble": "BLE",
-    "connectionType_serial": "Seriell",
-    "connectionType_network": "Netzwerk",
-    "noDevicesTitle": "Keine Geräte verbunden",
-    "noDevicesDescription": "Verbinden Sie ein neues Gerät, um zu beginnen.",
-    "button_newConnection": "Neue Verbindung"
+  "page": {
+    "title": "Mit einem Meshtastic Gerät verbinden",
+    "description": "Fügen Sie eine Geräteverbindung über HTTP, Bluetooth oder serielle Schnittstelle hinzu. Ihre gespeicherten Verbindungen werden in Ihrem Browser gespeichert."
+  },
+  "connectionType_ble": "BLE",
+  "connectionType_serial": "Seriell",
+  "connectionType_network": "Netzwerk",
+  "deleteConnection": "Verbindung löschen",
+  "areYouSure": "Dies entfernt {{name}}. Sie können diese Aktion nicht rückgängig machen.",
+  "moreActions": "Weitere Aktionen",
+  "noConnections": {
+    "title": "Noch keine Verbindungen.",
+    "description": "Erstellen Sie Ihre erste Verbindung. Sie wird sofort verbunden und später gespeichert."
+  },
+  "lastConnectedAt": "Letzte Verbindung: {{date}}",
+  "neverConnected": "Nie verbunden",
+  "toasts": {
+    "connected": "Verbunden",
+    "nowConnected": "{{name}} ist jetzt verbunden",
+    "nowDisconnected": "{{name}} ist jetzt getrennt",
+    "disconnected": "Verbindung getrennt",
+    "failed": "Verbindung fehlgeschlagen",
+    "checkConnetion": "Überprüfen Sie Ihr Gerät oder Ihre Einstellungen und versuchen Sie es erneut",
+    "defaultSet": "Standard festgelegt",
+    "defaultConnection": "Standardverbindung ist jetzt {{nameisconnected}}",
+    "deleted": "Gelöscht",
+    "deletedByName": "{{name}} wurde entfernt",
+    "pickConnectionAgain": "Verbindung fehlgeschlagen. Eventuell müssen Sie das Gerät/den Anschluss neu wählen.",
+    "added": "Verbindung hinzugefügt",
+    "savedByName": "{{name}} gespeichert.",
+    "savedCantConnect": "Die Verbindung wurde gespeichert, konnte sich aber nicht verbinden."
   }
 }
