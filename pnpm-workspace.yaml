@@ -3,3 +3,4 @@ minimumReleaseAgeExclude:
 - '@meshtastic/*'
 packages:
   - "packages/*"
+  - "protobufs/build/ts"
