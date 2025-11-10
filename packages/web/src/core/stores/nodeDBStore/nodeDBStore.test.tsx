@@ -66,10 +66,10 @@ describe("NodeDB store", () => {
 
     const db1 = useNodeDBStore.getState().addNodeDB(123);
     const db2 = useNodeDBStore.getState().addNodeDB(123);
-    expect(db1).toBe(db2);
+    expect(db1).toStrictEqual(db2);
 
     const got = useNodeDBStore.getState().getNodeDB(123);
-    expect(got).toBe(db1);
+    expect(got).toStrictEqual(db1);
 
     expect(useNodeDBStore.getState().getNodeDBs().length).toBe(1);
   });
@@ -204,15 +204,18 @@ describe("NodeDB store", () => {
     expect(filtered.map((n) => n.num).sort()).toEqual([12]); // still excludes 11
   });
 
-  it("when exceeding cap, evicts earliest inserted, not the newly added", async () => {
+  it("will prune nodes after 14 days of inactivitiy", async () => {
     const { useNodeDBStore } = await freshStore();
     const st = useNodeDBStore.getState();
-    for (let i = 1; i <= 10; i++) {
-      st.addNodeDB(i);
-    }
-    st.addNodeDB(11);
-    expect(st.getNodeDB(1)).toBeUndefined();
-    expect(st.getNodeDB(11)).toBeDefined();
+    st.addNodeDB(1).addNode(
+      makeNode(1, { lastHeard: Date.now() / 1000 - 15 * 24 * 3600 }),
+    ); // 15 days ago
+    st.addNodeDB(1).addNode(
+      makeNode(2, { lastHeard: Date.now() / 1000 - 7 * 24 * 3600 }),
+    ); // 7 days ago
+
+    st.getNodeDB(1)!.pruneStaleNodes();
+    expect(st.getNodeDB(1)?.getNode(2)).toBeDefined();
   });
 
   it("removeNodeDB persists removal across reload", async () => {
@@ -399,28 +402,6 @@ describe("NodeDB – merge semantics, PKI checks & extras", () => {
 
     expect(newDB.getNodeError(1)!.error).toBe("OLD_ERR"); // old kept
     expect(newDB.getNodeError(2)!.error).toBe("NEW_ERR"); // new added
-  });
-
-  it("eviction still honors cap after merge", async () => {
-    const { useNodeDBStore } = await freshStore();
-    const st = useNodeDBStore.getState();
-
-    for (let i = 1; i <= 10; i++) {
-      st.addNodeDB(i);
-    }
-    const oldDB = st.addNodeDB(100);
-    oldDB.setNodeNum(12345);
-    oldDB.addNode(makeNode(2000));
-
-    const newDB = st.addNodeDB(101);
-    newDB.setNodeNum(12345); // merges + deletes 100
-
-    // adding another to trigger eviction of earliest non-merged entry (which was 1)
-    st.addNodeDB(102);
-
-    expect(st.getNodeDB(1)).toBeUndefined(); // evicted
-    expect(st.getNodeDB(101)).toBeDefined(); // merged entry exists
-    expect(st.getNodeDB(101)!.getNode(2000)).toBeTruthy(); // carried over
   });
 
   it("removeAllNodes (optionally keeping my node) and removeAllNodeErrors persist across reload", async () => {

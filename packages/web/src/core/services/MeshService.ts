@@ -82,7 +82,7 @@ export class MeshService {
     this.subscriptions.push(
       this.meshDevice.events.onDeviceStatus.subscribe((status) => {
         this.handleDeviceStatus(status);
-      })
+      }),
     );
 
     // Listen for config complete signals
@@ -92,7 +92,7 @@ export class MeshService {
           (configCompleteId: number) => {
             this.handleConfigComplete(configCompleteId);
           },
-        )
+        ),
       );
     }
 
@@ -104,7 +104,7 @@ export class MeshService {
           stage: "config",
           count: this.configState.configCount,
         });
-      })
+      }),
     );
 
     this.subscriptions.push(
@@ -114,7 +114,7 @@ export class MeshService {
           stage: "moduleConfig",
           count: this.configState.moduleConfigCount,
         });
-      })
+      }),
     );
 
     this.subscriptions.push(
@@ -124,7 +124,7 @@ export class MeshService {
           stage: "channel",
           count: this.configState.channelCount,
         });
-      })
+      }),
     );
 
     this.subscriptions.push(
@@ -143,22 +143,10 @@ export class MeshService {
           // Config complete: emit immediately for real-time updates
           this.onNodesReceived.dispatch([nodeInfo]);
         }
-      })
+      }),
     );
   }
 
-  public destroy(): void {
-    this.subscriptions.forEach(unsub => {
-      try {
-        unsub();
-      } catch (e) {
-        // Ignore errors during unsubscribe
-      }
-    });
-    this.subscriptions = [];
-  }
-
-  // Connection Lifecycle
   public async connect(): Promise<void> {
     console.log("[MeshService] Starting connection");
     this.setConnectionState(ConnectionState.CONFIGURING);
@@ -313,5 +301,9 @@ export class MeshService {
   public destroy(): void {
     console.log("[MeshService] Destroying service");
     this.stopHeartbeat();
+    this.subscriptions.forEach((unsub) => {
+      unsub();
+    });
+    this.subscriptions = [];
   }
 }

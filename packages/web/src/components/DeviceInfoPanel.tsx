@@ -79,7 +79,6 @@ export const DeviceInfoPanel = ({
         return "bg-amber-500";
       case "error":
         return "bg-red-500";
-      case "disconnected":
       default:
         return "bg-gray-400";
     }
