@@ -75,60 +75,87 @@ export class MeshService {
     };
   }
 
+  private subscriptions: Array<() => void> = [];
+
   private setupEventHandlers(): void {
     // Listen to device status changes
-    this.meshDevice.events.onDeviceStatus.subscribe((status) => {
-      this.handleDeviceStatus(status);
-    });
-
-    // Listen for config complete signals
-    this.meshDevice.events.onConfigComplete?.subscribe?.(
-      (configCompleteId: number) => {
-        this.handleConfigComplete(configCompleteId);
-      },
+    this.subscriptions.push(
+      this.meshDevice.events.onDeviceStatus.subscribe((status) => {
+        this.handleDeviceStatus(status);
+      })
     );
 
+    // Listen for config complete signals
+    if (this.meshDevice.events.onConfigComplete?.subscribe) {
+      this.subscriptions.push(
+        this.meshDevice.events.onConfigComplete.subscribe(
+          (configCompleteId: number) => {
+            this.handleConfigComplete(configCompleteId);
+          },
+        )
+      );
+    }
+
     // Track incoming data during configuration
-    this.meshDevice.events.onConfigPacket.subscribe(() => {
-      this.configState.configCount++;
-      this.onProgress.dispatch({
-        stage: "config",
-        count: this.configState.configCount,
-      });
-    });
-
-    this.meshDevice.events.onModuleConfigPacket.subscribe(() => {
-      this.configState.moduleConfigCount++;
-      this.onProgress.dispatch({
-        stage: "moduleConfig",
-        count: this.configState.moduleConfigCount,
-      });
-    });
-
-    this.meshDevice.events.onChannelPacket.subscribe(() => {
-      this.configState.channelCount++;
-      this.onProgress.dispatch({
-        stage: "channel",
-        count: this.configState.channelCount,
-      });
-    });
-
-    this.meshDevice.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-      // During initial config, batch nodes for efficient processing
-      // After config, emit immediately for real-time updates
-      if (this.configState.configuring) {
-        // Initial config in progress: collect for batch
-        this.configState.newNodes.push(nodeInfo);
-        this.configState.nodeCount++;
+    this.subscriptions.push(
+      this.meshDevice.events.onConfigPacket.subscribe(() => {
+        this.configState.configCount++;
         this.onProgress.dispatch({
-          stage: "nodeInfo",
-          count: this.configState.nodeCount,
+          stage: "config",
+          count: this.configState.configCount,
         });
-      } else {
-        // Config complete: emit immediately for real-time updates
-        this.onNodesReceived.dispatch([nodeInfo]);
+      })
+    );
+
+    this.subscriptions.push(
+      this.meshDevice.events.onModuleConfigPacket.subscribe(() => {
+        this.configState.moduleConfigCount++;
+        this.onProgress.dispatch({
+          stage: "moduleConfig",
+          count: this.configState.moduleConfigCount,
+        });
+      })
+    );
+
+    this.subscriptions.push(
+      this.meshDevice.events.onChannelPacket.subscribe(() => {
+        this.configState.channelCount++;
+        this.onProgress.dispatch({
+          stage: "channel",
+          count: this.configState.channelCount,
+        });
+      })
+    );
+
+    this.subscriptions.push(
+      this.meshDevice.events.onNodeInfoPacket.subscribe((nodeInfo) => {
+        // During initial config, batch nodes for efficient processing
+        // After config, emit immediately for real-time updates
+        if (this.configState.configuring) {
+          // Initial config in progress: collect for batch
+          this.configState.newNodes.push(nodeInfo);
+          this.configState.nodeCount++;
+          this.onProgress.dispatch({
+            stage: "nodeInfo",
+            count: this.configState.nodeCount,
+          });
+        } else {
+          // Config complete: emit immediately for real-time updates
+          this.onNodesReceived.dispatch([nodeInfo]);
+        }
+      })
+    );
+  }
+
+  public destroy(): void {
+    this.subscriptions.forEach(unsub => {
+      try {
+        unsub();
+      } catch (e) {
+        // Ignore errors during unsubscribe
       }
     });
+    this.subscriptions = [];
   }
 
   // Connection Lifecycle
