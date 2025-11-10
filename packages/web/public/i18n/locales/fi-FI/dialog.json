@@ -3,18 +3,6 @@
     "description": "Tämä toiminto poistaa kaiken viestihistorian. Toimintoa ei voi perua. Haluatko varmasti jatkaa?",
     "title": "Tyhjennä kaikki viestit"
   },
-  "deviceName": {
-    "description": "Laite käynnistyy uudelleen, kun asetus on tallennettu.",
-    "longName": "Pitkä nimi",
-    "shortName": "Lyhytnimi",
-    "title": "Vaihda laitteen nimi",
-    "validation": {
-      "longNameMax": "Pitkässä nimessä saa olla enintään 40 merkkiä",
-      "shortNameMax": "Lyhytnimessä ei saa olla enempää kuin 4 merkkiä",
-      "longNameMin": "Pitkässä nimessä täytyy olla vähintään yksi merkki",
-      "shortNameMin": "Lyhytnimessä täytyy olla vähintään ykis merkki"
-    }
-  },
   "import": {
     "description": "Nykyinen LoRa-asetus ylikirjoitetaan.",
     "error": {
@@ -41,48 +29,77 @@
     "description": "Haluatko varmasti luoda ennalta jaetun avaimen uudelleen?",
     "regenerate": "Luo uudelleen"
   },
-  "newDeviceDialog": {
-    "title": "Yhdistä uuteen laitteeseen",
-    "https": "https",
-    "http": "http",
-    "tabHttp": "HTTP",
-    "tabBluetooth": "Bluetooth",
-    "tabSerial": "Sarjaliitäntä",
-    "useHttps": "Käytä HTTPS",
-    "connecting": "Yhdistetään...",
-    "connect": "Yhdistä",
-    "connectionFailedAlert": {
-      "title": "Yhteys epäonnistui",
-      "descriptionPrefix": "Laitteeseen ei saatu yhteyttä. ",
-      "httpsHint": "Jos käytät HTTPS:ää, sinun on ehkä ensin hyväksyttävä itse allekirjoitettu varmenne. ",
-      "openLinkPrefix": "Avaa ",
-      "openLinkSuffix": " uuteen välilehteen",
-      "acceptTlsWarningSuffix": ", hyväksy mahdolliset TLS-varoitukset, jos niitä ilmenee ja yritä sitten uudelleen.",
-      "learnMoreLink": "Lue lisää"
-    },
-    "httpConnection": {
-      "label": "IP-osoite / isäntänimi",
-      "placeholder": "000.000.000 / meshtastinen.paikallinen"
-    },
-    "serialConnection": {
-      "noDevicesPaired": "Yhtään laitetta ei ole vielä yhdistetty.",
-      "newDeviceButton": "Uusi laite",
-      "deviceIdentifier": "# {{index}} - {{vendorId}} - {{productId}}"
-    },
-    "bluetoothConnection": {
-      "noDevicesPaired": "Yhtään laitetta ei ole vielä yhdistetty.",
-      "newDeviceButton": "Uusi laite",
-      "connectionFailed": "Yhdistäminen epäonnistui",
-      "deviceDisconnected": "Yhteys laitteeseen katkaistu",
-      "unknownDevice": "Tuntematon laite",
-      "errorLoadingDevices": "Virhe ladattaessa laitteita",
-      "unknownErrorLoadingDevices": "Tuntematon virhe laitteita ladattaessa"
-    },
+  "addConnection": {
+    "title": "Lisää yhteys",
+    "description": "Valitse yhteystyyppi ja täytä tiedot",
     "validation": {
       "requiresWebBluetooth": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti bluetooth</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
       "requiresWebSerial": "Tämä yhteystyyppi vaatii <0>Web-sarjaportti</0> -tuen. Käytä tuettua selainta, kuten Chromea tai Edgeä.",
       "requiresSecureContext": "Tämä sovellus vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia.",
       "additionallyRequiresSecureContext": "Lisäksi se vaatii <0>suojatun yhteyden</0>. Yhdistä käyttämällä HTTPS:ää tai localhostia."
+    },
+    "bluetoothConnection": {
+      "namePlaceholder": "Bluetoothilla yhdistetty laite",
+      "supported": {
+        "title": "Verkkoselaimen Bluetooth-tuettu"
+      },
+      "notSupported": {
+        "title": "Verkkoselaimen Bluetooth ei ole tuettu",
+        "description": "Selaimesi tai laitteesi ei tue Web Bluetooth -toimintoa"
+      },
+      "short": "BT: {{deviceName}}",
+      "long": "Bluetooth-laite",
+      "device": "Laite",
+      "selectDevice": "Valitse laite",
+      "selected": "Bluetooth-laite valittu",
+      "notSelected": "Ei laitetta valittuna",
+      "helperText": "Käyttää Meshtasticin Bluetooth-palvelua laitteiden etsintään."
+    },
+    "serialConnection": {
+      "namePlaceholder": "Sarjaliitännällä yhdistetty laite",
+      "helperText": "Portin valitseminen antaa sovellukselle luvan avata sen yhteyden muodostamista varten.",
+      "supported": {
+        "title": "Verkkoselaimen sarjaliitäntä tuettu"
+      },
+      "notSupported": {
+        "title": "Verkkoselaimen sarjaliitäntä ei ole tuettu",
+        "description": "Selaimesi tai laitteesi ei tue Web Serial -toimintoa"
+      },
+      "portSelected": {
+        "title": "Sarjaportti valittu",
+        "description": "Porttioikeudet myönnetty."
+      },
+      "port": "Portti",
+      "selectPort": "Valitse portti",
+      "deviceName": "USB {{vendorId}}:{{productId}}",
+      "notSelected": "Ei porttia valittuna"
+    },
+    "httpConnection": {
+      "namePlaceholder": "HTTP-yhteydellä toimiva laite",
+      "inputPlaceholder": "192.168.1.10 tai meshtastic.local",
+      "heading": "URL tai IP",
+      "useHttps": "Käytä HTTTPS",
+      "invalidUrl": {
+        "title": "Virheellinen URL-osoite",
+        "description": "Anna kelvollinen HTTP- tai HTTPS-osoite."
+      },
+      "connectionTest": {
+        "description": "Testaa yhteys ennen tallennusta varmistaaksesi, että laite on tavoitettavissa.",
+        "button": {
+          "loading": "Testataan...",
+          "label": "Testaa yhteys"
+        },
+        "reachable": "Yhteys toimii",
+        "notReachable": "Yhteys ei toimi",
+        "success": {
+          "title": "Yhteystesti onnistui",
+          "description": "Laite vaikuttaa olevan tavoitettavissa."
+        },
+        "failure": {
+          "title": "Yhteystesti epäonnistui",
+          "description": "Laitetta ei voitu tavoittaa. Tarkista URL-osoite ja yritä uudelleen."
+        }
+      }
     }
   },
   "nodeDetails": {

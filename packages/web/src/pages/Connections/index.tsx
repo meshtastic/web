@@ -151,7 +151,7 @@ export const Connections = () => {
                         name: c.name,
                         interpolation: { escapeValue: false },
                       })
-                    : t("toasts.checkConnetion"),
+                    : t("toasts.checkConnection"),
                 });
                 if (ok) {
                   navigate({ to: "/" });

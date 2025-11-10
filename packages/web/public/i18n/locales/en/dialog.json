@@ -84,7 +84,7 @@
         "description": "Please enter a valid HTTP or HTTPS URL."
       },
       "connectionTest": {
-        "description": "Test the connetion before saving to verify the device is reachable.",
+        "description": "Test the connection before saving to verify the device is reachable.",
         "button": {
           "loading": "Testing...",
           "label": "Test connection"

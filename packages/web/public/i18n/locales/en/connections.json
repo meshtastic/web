@@ -18,10 +18,10 @@
   "toasts": {
     "connected": "Connected",
     "nowConnected": "{{name}} is now connected",
-    "nowDisconnected": "{{name}} are now disconnecte",
+    "nowDisconnected": "{{name}} is now disconnected",
     "disconnected": "Disconnected",
     "failed": "Failed to connect",
-    "checkConnetion": "Check your device or settings and try again",
+    "checkConnection": "Check your device or settings and try again",
     "defaultSet": "Default set",
     "defaultConnection": "Default connection is now {{nameisconnected}}",
     "deleted": "Deleted",
