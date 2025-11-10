@@ -33,6 +33,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^2.10.0
+        version: 2.10.0
       '@meshtastic/protobufs':
         specifier: workspace:*
         version: link:../../protobufs/build/ts
@@ -1104,6 +1107,9 @@ packages:
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
+
+  '@bufbuild/protobuf@2.10.0':
+    resolution: {integrity: sha512-fdRs9PSrBF7QUntpZpq6BTw58fhgGJojgg39m9oFOJGZT+nip9b0so5cYY1oWl5pvemDLr0cPPsH46vwThEbpQ==}
 
   '@bufbuild/protobuf@2.9.0':
     resolution: {integrity: sha512-rnJenoStJ8nvmt9Gzye8nkYd6V22xUAnu4086ER7h1zJ508vStko4pMvDeQ446ilDTFpV5wnoc5YS7XvMwwMqA==}
@@ -6911,6 +6917,8 @@ snapshots:
 
   '@biomejs/cli-win32-x64@2.2.4':
     optional: true
+
+  '@bufbuild/protobuf@2.10.0': {}
 
   '@bufbuild/protobuf@2.9.0': {}
 
