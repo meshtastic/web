@@ -129,9 +129,14 @@ export function useConnections() {
         | Awaited<ReturnType<typeof TransportWebBluetooth.createFromDevice>>
         | Awaited<ReturnType<typeof TransportWebSerial.createFromPort>>,
     ): number => {
-      // Reuse existing meshDeviceId if available to prevent duplicate nodeDBs
+      // Reuse existing meshDeviceId if available to prevent duplicate nodeDBs,
+      // but only if the corresponding nodeDB still exists. Otherwise, generate a new ID.
       const conn = connections.find((c) => c.id === id);
-      const deviceId = conn?.meshDeviceId ?? randId();
+      let deviceId = conn?.meshDeviceId;
+      if (deviceId && !useNodeDBStore.getState().hasNodeDB(deviceId)) {
+        deviceId = undefined;
+      }
+      deviceId = deviceId ?? randId();
 
       const device = addDevice(deviceId);
       const nodeDB = addNodeDB(deviceId);
