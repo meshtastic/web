@@ -619,7 +619,7 @@ export class MeshDevice {
     const resetNodes = create(Protobuf.Admin.AdminMessageSchema, {
       payloadVariant: {
         case: "nodedbReset",
-        value: 1,
+        value: true,
       },
     });
 
