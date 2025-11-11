@@ -26,7 +26,7 @@ interface DeviceInfoPanelProps {
   isCollapsed: boolean;
   deviceMetrics: DeviceMetrics;
   firmwareVersion: string;
-  user: Protobuf.Mesh.User;
+  user?: Protobuf.Mesh.User;
   setDialogOpen: () => void;
   setCommandPaletteOpen: () => void;
   disableHover?: boolean;
@@ -139,28 +139,30 @@ export const DeviceInfoPanel = ({
 
   return (
     <>
-      <div
-        className={cn(
-          "flex items-center gap-3 p-1 flex-shrink-0",
-          isCollapsed && "justify-center",
-        )}
-      >
-        <Avatar
-          nodeNum={parseInt(user.id.slice(1), 16)}
-          className={cn("flex-shrink-0", isCollapsed && "")}
-          size="sm"
-        />
-        {!isCollapsed && (
-          <p
-            className={cn(
-              "text-sm font-medium text-gray-800 dark:text-gray-200",
-              "transition-opacity duration-300 ease-in-out truncate",
-            )}
-          >
-            {user.longName}
-          </p>
-        )}
-      </div>
+      {user && (
+        <div
+          className={cn(
+            "flex items-center gap-3 p-1 flex-shrink-0",
+            isCollapsed && "justify-center",
+          )}
+        >
+          <Avatar
+            nodeNum={parseInt(user.id.slice(1), 16)}
+            className={cn("flex-shrink-0", isCollapsed && "")}
+            size="sm"
+          />
+          {!isCollapsed && (
+            <p
+              className={cn(
+                "text-sm font-medium text-gray-800 dark:text-gray-200",
+                "transition-opacity duration-300 ease-in-out truncate",
+              )}
+            >
+              {user.longName}
+            </p>
+          )}
+        </div>
+      )}
 
       {connectionStatus && (
         <button

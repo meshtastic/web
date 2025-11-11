@@ -133,7 +133,7 @@ export function useConnections() {
       // but only if the corresponding nodeDB still exists. Otherwise, generate a new ID.
       const conn = connections.find((c) => c.id === id);
       let deviceId = conn?.meshDeviceId;
-      if (deviceId && !useNodeDBStore.getState().hasNodeDB(deviceId)) {
+      if (deviceId && !useNodeDBStore.getState().getNodeDB(deviceId)) {
         deviceId = undefined;
       }
       deviceId = deviceId ?? randId();
@@ -189,7 +189,22 @@ export function useConnections() {
         console.log(
           `[useConnections] Batch-adding ${nodes.length} nodes to nodeDB`,
         );
-        nodes.forEach((node) => {
+
+        // Deduplicate nodes by node number to prevent duplicates in the batch
+        const uniqueNodes = new Map<number, typeof nodes[0]>();
+        for (const node of nodes) {
+          // Keep the most recent version (last one in the array)
+          uniqueNodes.set(node.num, node);
+        }
+
+        const deduplicatedNodes = Array.from(uniqueNodes.values());
+        if (deduplicatedNodes.length < nodes.length) {
+          console.warn(
+            `[useConnections] Deduplicated ${nodes.length - deduplicatedNodes.length} duplicate nodes from batch`,
+          );
+        }
+
+        deduplicatedNodes.forEach((node) => {
           const nodeWithUser = ensureDefaultUser(node);
           // PKI sanity check is handled inside nodeDB.addNode
           nodeDB.addNode(nodeWithUser);

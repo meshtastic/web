@@ -105,7 +105,8 @@ function nodeDBFactory(
             return;
           }
 
-          nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(node.num, next);
+          // Use the validated node's num to ensure consistency
+          nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(next.num, next);
         }),
       ),
 
