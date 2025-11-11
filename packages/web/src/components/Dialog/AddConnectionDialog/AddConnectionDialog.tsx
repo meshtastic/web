@@ -393,12 +393,6 @@ export default function AddConnectionDialog({
     const reachable = await testHttpReachable(validatedURL.data);
     if (reachable) {
       dispatch({ type: "SET_TEST_STATUS", payload: "success" });
-      toast({
-        title: t("addConnection.httpConnection.connectionTest.success.title"),
-        description: t(
-          "addConnection.httpConnection.connectionTest.success.description",
-        ),
-      });
     } else {
       dispatch({ type: "SET_TEST_STATUS", payload: "failure" });
       toast({

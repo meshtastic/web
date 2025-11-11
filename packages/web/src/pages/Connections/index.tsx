@@ -136,7 +136,7 @@ export const Connections = () => {
           </CardFooter>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {sorted.map((c) => (
             <ConnectionCard
               key={c.id}
