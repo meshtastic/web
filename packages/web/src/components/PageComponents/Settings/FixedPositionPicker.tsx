@@ -3,7 +3,7 @@ import { Input } from "@components/UI/Input.tsx";
 import { BaseMap } from "@components/Map.tsx";
 import { Marker, type MapLayerMouseEvent } from "react-map-gl/maplibre";
 import { MapPin } from "lucide-react";
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useMemo, useId } from "react";
 import { useTranslation } from "react-i18next";
 import { create } from "@bufbuild/protobuf";
 import { Protobuf } from "@meshtastic/core";
@@ -30,6 +30,9 @@ export const FixedPositionPicker = ({
   const { t } = useTranslation("config");
   const { toast } = useToast();
   const { getEffectiveConfig } = useDevice();
+  const latitudeId = useId();
+  const longitudeId = useId();
+  const altitudeId = useId();
 
   // Get display units to show correct altitude unit
   const displayUnits = getEffectiveConfig("display")?.units;
@@ -75,9 +78,9 @@ export const FixedPositionPicker = ({
   const handleSetFixedPosition = useCallback(() => {
     const lat = parseFloat(latitude);
     const lon = parseFloat(longitude);
-    const alt = parseInt(altitude);
+    const alt = parseInt(altitude, 10);
 
-    if (isNaN(lat) || isNaN(lon)) {
+    if (Number.isNaN(lat) || Number.isNaN(lon)) {
       toast({
         title: t("position.fixedPosition.error.title"),
         description: t("position.fixedPosition.error.invalidCoordinates"),
@@ -103,7 +106,7 @@ export const FixedPositionPicker = ({
     console.log("Setting fixed position:", {
       latitude: lat,
       longitude: lon,
-      altitude: isNaN(alt) ? 0 : alt,
+      altitude: Number.isNaN(alt) ? 0 : alt,
       latitudeI,
       longitudeI,
     });
@@ -114,7 +117,7 @@ export const FixedPositionPicker = ({
         value: create(Protobuf.Mesh.PositionSchema, {
           latitudeI,
           longitudeI,
-          altitude: isNaN(alt) ? 0 : alt,
+          altitude: Number.isNaN(alt) ? 0 : alt,
           time: Math.floor(Date.now() / 1000),
         }),
       },
@@ -152,15 +155,13 @@ export const FixedPositionPicker = ({
           }}
         >
           {latitude && longitude && (
-            <>
-              <Marker
-                longitude={parseFloat(longitude)}
-                latitude={parseFloat(latitude)}
-                anchor="bottom"
-              >
-                <MapPin className="w-8 h-8 text-red-500 fill-red-500/20" />
-              </Marker>
-            </>
+            <Marker
+              longitude={parseFloat(longitude)}
+              latitude={parseFloat(latitude)}
+              anchor="bottom"
+            >
+              <MapPin className="w-8 h-8 text-red-500 fill-red-500/20" />
+            </Marker>
           )}
         </BaseMap>
       </div>
@@ -170,11 +171,11 @@ export const FixedPositionPicker = ({
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="space-y-1.5">
-          <label htmlFor="latitude" className="text-xs font-medium">
+          <label htmlFor={latitudeId} className="text-xs font-medium">
             {t("position.fixedPosition.latitude.label")}
           </label>
           <Input
-            id="latitude"
+            id={latitudeId}
             type="number"
             step="any"
             placeholder="37.7749"
@@ -185,11 +186,11 @@ export const FixedPositionPicker = ({
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="longitude" className="text-xs font-medium">
+          <label htmlFor={longitudeId} className="text-xs font-medium">
             {t("position.fixedPosition.longitude.label")}
           </label>
           <Input
-            id="longitude"
+            id={longitudeId}
             type="number"
             step="any"
             placeholder="-122.4194"
@@ -200,11 +201,11 @@ export const FixedPositionPicker = ({
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="altitude" className="text-xs font-medium">
+          <label htmlFor={altitudeId} className="text-xs font-medium">
             {t("position.fixedPosition.altitude.label")}
           </label>
           <Input
-            id="altitude"
+            id={altitudeId}
             type="number"
             placeholder="100"
             value={altitude}
