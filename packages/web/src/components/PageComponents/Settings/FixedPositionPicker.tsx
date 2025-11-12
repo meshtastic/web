@@ -1,14 +1,14 @@
+import { create } from "@bufbuild/protobuf";
+import { BaseMap } from "@components/Map.tsx";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
-import { BaseMap } from "@components/Map.tsx";
-import { Marker, type MapLayerMouseEvent } from "react-map-gl/maplibre";
-import { MapPin } from "lucide-react";
-import { useCallback, useState, useMemo, useId } from "react";
-import { useTranslation } from "react-i18next";
-import { create } from "@bufbuild/protobuf";
-import { Protobuf } from "@meshtastic/core";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
+import { Protobuf } from "@meshtastic/core";
+import { MapPin } from "lucide-react";
+import { useCallback, useId, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { type MapLayerMouseEvent, Marker } from "react-map-gl/maplibre";
 
 interface FixedPositionPickerProps {
   currentPosition?: {
@@ -37,20 +37,21 @@ export const FixedPositionPicker = ({
   // Get display units to show correct altitude unit
   const displayUnits = getEffectiveConfig("display")?.units;
   const altitudeUnit = useMemo(() => {
-    return displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
+    return displayUnits ===
+      Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
       ? "Feet"
       : "Meters";
   }, [displayUnits]);
 
   // State for fixed position inputs (in degrees, not integer format)
   const [latitude, setLatitude] = useState<string>(
-    currentPosition?.latitudeI ? String(currentPosition.latitudeI / 1e7) : ""
+    currentPosition?.latitudeI ? String(currentPosition.latitudeI / 1e7) : "",
   );
   const [longitude, setLongitude] = useState<string>(
-    currentPosition?.longitudeI ? String(currentPosition.longitudeI / 1e7) : ""
+    currentPosition?.longitudeI ? String(currentPosition.longitudeI / 1e7) : "",
   );
   const [altitude, setAltitude] = useState<string>(
-    currentPosition?.altitude ? String(currentPosition.altitude) : ""
+    currentPosition?.altitude ? String(currentPosition.altitude) : "",
   );
 
   const handleMapClick = useCallback((event: MapLayerMouseEvent) => {
@@ -151,7 +152,8 @@ export const FixedPositionPicker = ({
               : currentPosition?.longitudeI
                 ? currentPosition.longitudeI / 1e7
                 : 0,
-            zoom: (latitude && longitude) || currentPosition?.latitudeI ? 13 : 1.8,
+            zoom:
+              (latitude && longitude) || currentPosition?.latitudeI ? 13 : 1.8,
           }}
         >
           {latitude && longitude && (
@@ -213,7 +215,9 @@ export const FixedPositionPicker = ({
             className="h-8 text-sm"
           />
           <p className="text-xs text-muted-foreground">
-            {t("position.fixedPosition.altitude.description", { unit: altitudeUnit })}
+            {t("position.fixedPosition.altitude.description", {
+              unit: altitudeUnit,
+            })}
           </p>
         </div>
       </div>
