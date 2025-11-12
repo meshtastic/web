@@ -73,11 +73,13 @@ export const BaseMap = ({
       maxPitch={0}
       dragRotate={false}
       touchZoomRotate={false}
-      initialViewState={initialViewState ?? {
-        zoom: 1.8,
-        latitude: 35,
-        longitude: 0,
-      }}
+      initialViewState={
+        initialViewState ?? {
+          zoom: 1.8,
+          latitude: 35,
+          longitude: 0,
+        }
+      }
       style={{ filter: darkMode ? "brightness(0.9)" : undefined }}
       locale={locale}
       interactiveLayerIds={interactiveLayerIds}

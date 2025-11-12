@@ -24,18 +24,24 @@ interface PositionConfigProps {
 export const Position = ({ onFormInit }: PositionConfigProps) => {
   useWaitForConfig({ configCase: "position" });
 
-  const { setChange, config, getEffectiveConfig, removeChange, sendAdminMessage } = useDevice();
+  const {
+    setChange,
+    config,
+    getEffectiveConfig,
+    removeChange,
+    sendAdminMessage,
+  } = useDevice();
   const { getMyNode } = useNodeDB();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     getEffectiveConfig("position")?.positionFlags ?? 0,
   );
   const { t } = useTranslation("config");
-  
+
   const myNode = getMyNode();
   const currentPosition = myNode?.position;
 
   const effectiveConfig = getEffectiveConfig("position");
-  
+
   const formValues = useMemo(() => {
     return {
       ...config.position,
