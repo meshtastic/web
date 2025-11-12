@@ -7,12 +7,16 @@ export function ConnectionStatusBadge({
   status: Connection["status"];
 }) {
   let color = "";
+  let displayStatus = status;
 
   switch (status) {
     case "connected":
+    case "configured":
       color = "bg-emerald-500";
+      displayStatus = "connected";
       break;
     case "connecting":
+    case "configuring":
       color = "bg-amber-500";
       break;
     case "online":
@@ -31,7 +35,7 @@ export function ConnectionStatusBadge({
         aria-hidden="true"
       />
       <span className="text-xs capitalize text-slate-500 dark:text-slate-400">
-        {status}
+        {displayStatus}
       </span>
     </Button>
   );

@@ -14,6 +14,22 @@ export {
 } from "@core/hooks/useDeviceContext";
 export { useAppStore } from "@core/stores/appStore/index.ts";
 export { type Device, useDeviceStore } from "@core/stores/deviceStore/index.ts";
+export {
+  useActiveConnection,
+  useActiveConnectionId,
+  useAddSavedConnection,
+  useConnectionError,
+  useConnectionForDevice,
+  useConnectionStatus,
+  useDefaultConnection,
+  useDeviceForConnection,
+  useFirstSavedConnection,
+  useIsConnected,
+  useIsConnecting,
+  useRemoveSavedConnection,
+  useSavedConnections,
+  useUpdateSavedConnection,
+} from "@core/stores/deviceStore/selectors.ts";
 export type {
   Page,
   ValidConfigType,

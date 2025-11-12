@@ -1,6 +1,9 @@
 import { SupportBadge } from "@app/components/Badge/SupportedBadge.tsx";
 import { Switch } from "@app/components/UI/Switch.tsx";
-import type { NewConnection } from "@app/core/stores/deviceStore/types.ts";
+import type {
+  ConnectionType,
+  NewConnection,
+} from "@app/core/stores/deviceStore/types.ts";
 import { testHttpReachable } from "@app/pages/Connections/utils";
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
@@ -34,7 +37,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 import { urlOrIpv4Schema } from "./validation.ts";
 
-type TabKey = "http" | "bluetooth" | "serial";
+type TabKey = ConnectionType;
 type TestingStatus = "idle" | "testing" | "success" | "failure";
 type DialogState = {
   tab: TabKey;
@@ -390,12 +393,6 @@ export default function AddConnectionDialog({
     const reachable = await testHttpReachable(validatedURL.data);
     if (reachable) {
       dispatch({ type: "SET_TEST_STATUS", payload: "success" });
-      toast({
-        title: t("addConnection.httpConnection.connectionTest.success.title"),
-        description: t(
-          "addConnection.httpConnection.connectionTest.success.description",
-        ),
-      });
     } else {
       dispatch({ type: "SET_TEST_STATUS", payload: "failure" });
       toast({

@@ -1,4 +1,5 @@
 import AddConnectionDialog from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
+import { TimeAgo } from "@app/components/generic/TimeAgo";
 import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
 import type { Connection } from "@app/core/stores/deviceStore/types";
 import { useConnections } from "@app/pages/Connections/useConnections";
@@ -39,8 +40,8 @@ import {
   ArrowLeft,
   LinkIcon,
   MoreHorizontal,
-  PlugZap,
   RotateCw,
+  RouterIcon,
   Star,
   StarOff,
   Trash2,
@@ -71,7 +72,6 @@ export const Connections = () => {
     syncConnectionStatuses();
     refreshStatuses();
   }, []);
-
   const sorted = useMemo(() => {
     const copy = [...connections];
     return copy.sort((a, b) => {
@@ -81,7 +81,9 @@ export const Connections = () => {
       if (!a.isDefault && b.isDefault) {
         return 1;
       }
-      if (a.status === "connected" && b.status !== "connected") {
+      const aConnected = a.status === "connected" || a.status === "configured";
+      const bConnected = b.status === "connected" || b.status === "configured";
+      if (aConnected && !bConnected) {
         return -1;
       }
       return a.name.localeCompare(b.name);
@@ -111,7 +113,7 @@ export const Connections = () => {
         </div>
         <div className="flex items-center ml-2 gap-2">
           <Button onClick={() => setAddOpen(true)} className="gap-2">
-            <PlugZap className="size-4" />
+            <RouterIcon className="size-5" />
             {t("button.addConnection")}
           </Button>
         </div>
@@ -131,13 +133,13 @@ export const Connections = () => {
           </CardContent>
           <CardFooter>
             <Button onClick={() => setAddOpen(true)} className="gap-2">
-              <PlugZap className="size-4" />
+              <RouterIcon className="size-5" />
               {t("button.addConnection")}
             </Button>
           </CardFooter>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {sorted.map((c) => (
             <ConnectionCard
               key={c.id}
@@ -223,7 +225,10 @@ export const Connections = () => {
                 interpolation: { escapeValue: false },
               }),
             });
-            if (created.status === "connected") {
+            if (
+              created.status === "connected" ||
+              created.status === "configured"
+            ) {
               navigate({ to: "/" });
             }
           } else {
@@ -268,8 +273,10 @@ function ConnectionCard({
   const { t } = useTranslation("connections");
 
   const Icon = connectionTypeIcon(connection.type);
-  const isBusy = connection.status === "connecting";
-  const isConnected = connection.status === "connected";
+  const isBusy =
+    connection.status === "connecting" || connection.status === "configuring";
+  const isConnected =
+    connection.status === "connected" || connection.status === "configured";
   const isError = connection.status === "error";
 
   return (
@@ -367,10 +374,11 @@ function ConnectionCard({
           </p>
         ) : connection.lastConnectedAt ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            {t("lastConnectedAt", {
-              date: new Date(connection.lastConnectedAt),
-            })}
-            :{new Date(connection.lastConnectedAt).toLocaleString()}
+            {t("lastConnectedAt", { date: "" })}{" "}
+            <TimeAgo
+              timestamp={connection.lastConnectedAt}
+              className="text-sm text-slate-500 dark:text-slate-400"
+            />
           </p>
         ) : (
           <p className="text-sm text-slate-500 dark:text-slate-400">

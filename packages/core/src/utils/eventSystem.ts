@@ -387,4 +387,12 @@ export class EventSystem {
    */
   public readonly onQueueStatus: SimpleEventDispatcher<Protobuf.Mesh.QueueStatus> =
     new SimpleEventDispatcher<Protobuf.Mesh.QueueStatus>();
+
+  /**
+   * Fires when a configCompleteId message is received from the device
+   *
+   * @event onConfigComplete
+   */
+  public readonly onConfigComplete: SimpleEventDispatcher<number> =
+    new SimpleEventDispatcher<number>();
 }

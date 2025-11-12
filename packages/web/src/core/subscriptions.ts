@@ -1,4 +1,3 @@
-import { ensureDefaultUser } from "@core/dto/NodeNumToNodeInfoDTO.ts";
 import PacketToMessageDTO from "@core/dto/PacketToMessageDTO.ts";
 import { useNewNodeNum } from "@core/hooks/useNewNodeNum";
 import {
@@ -68,11 +67,11 @@ export const subscribeAll = (
     nodeDB.addPosition(position);
   });
 
+  // NOTE: Node handling is managed by the nodeDB
+  // Nodes are added via subscriptions.ts and stored in nodeDB
+  // Configuration is handled directly by meshDevice.configure() in useConnections
   connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
-    const nodeWithUser = ensureDefaultUser(nodeInfo);
-
-    // PKI sanity check is handled inside nodeDB.addNode
-    nodeDB.addNode(nodeWithUser);
+    nodeDB.addNode(nodeInfo);
   });
 
   connection.events.onChannelPacket.subscribe((channel) => {

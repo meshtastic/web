@@ -52,9 +52,17 @@ type DeviceData = {
   waypoints: WaypointWithMetadata[];
   neighborInfo: Map<number, Protobuf.Mesh.NeighborInfo>;
 };
+export type ConnectionPhase =
+  | "disconnected"
+  | "connecting"
+  | "configuring"
+  | "configured";
+
 export interface Device extends DeviceData {
   // Ephemeral state (not persisted)
   status: Types.DeviceStatusEnum;
+  connectionPhase: ConnectionPhase;
+  connectionId: ConnectionId | null;
   channels: Map<Types.ChannelNumber, Protobuf.Channel.Channel>;
   config: Protobuf.LocalOnly.LocalConfig;
   moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
@@ -70,6 +78,8 @@ export interface Device extends DeviceData {
   clientNotifications: Protobuf.Mesh.ClientNotification[];
 
   setStatus: (status: Types.DeviceStatusEnum) => void;
+  setConnectionPhase: (phase: ConnectionPhase) => void;
+  setConnectionId: (id: ConnectionId | null) => void;
   setConfig: (config: Protobuf.Config.Config) => void;
   setModuleConfig: (config: Protobuf.ModuleConfig.ModuleConfig) => void;
   getEffectiveConfig<K extends ValidConfigType>(
@@ -153,6 +163,16 @@ export interface deviceState {
   ) => void;
   removeSavedConnection: (id: ConnectionId) => void;
   getSavedConnections: () => Connection[];
+
+  // Active connection tracking
+  activeConnectionId: ConnectionId | null;
+  setActiveConnectionId: (id: ConnectionId | null) => void;
+  getActiveConnectionId: () => ConnectionId | null;
+
+  // Helper selectors for connection ↔ device relationships
+  getActiveConnection: () => Connection | undefined;
+  getDeviceForConnection: (id: ConnectionId) => Device | undefined;
+  getConnectionForDevice: (deviceId: number) => Connection | undefined;
 }
 
 interface PrivateDeviceState extends deviceState {
@@ -185,6 +205,8 @@ function deviceFactory(
     neighborInfo,
 
     status: Types.DeviceStatusEnum.DeviceDisconnected,
+    connectionPhase: "disconnected",
+    connectionId: null,
     channels: new Map(),
     config: create(Protobuf.LocalOnly.LocalConfigSchema),
     moduleConfig: create(Protobuf.LocalOnly.LocalModuleConfigSchema),
@@ -223,6 +245,26 @@ function deviceFactory(
           const device = draft.devices.get(id);
           if (device) {
             device.status = status;
+          }
+        }),
+      );
+    },
+    setConnectionPhase: (phase: ConnectionPhase) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (device) {
+            device.connectionPhase = phase;
+          }
+        }),
+      );
+    },
+    setConnectionId: (connectionId: ConnectionId | null) => {
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (device) {
+            device.connectionId = connectionId;
           }
         }),
       );
@@ -907,6 +949,7 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
 ) => ({
   devices: new Map(),
   savedConnections: [],
+  activeConnectionId: null,
 
   addDevice: (id) => {
     const existing = get().devices.get(id);
@@ -972,6 +1015,33 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
     );
   },
   getSavedConnections: () => get().savedConnections,
+
+  setActiveConnectionId: (id) => {
+    set(
+      produce<PrivateDeviceState>((draft) => {
+        draft.activeConnectionId = id;
+      }),
+    );
+  },
+  getActiveConnectionId: () => get().activeConnectionId,
+
+  getActiveConnection: () => {
+    const activeId = get().activeConnectionId;
+    if (!activeId) {
+      return undefined;
+    }
+    return get().savedConnections.find((c) => c.id === activeId);
+  },
+  getDeviceForConnection: (id) => {
+    const connection = get().savedConnections.find((c) => c.id === id);
+    if (!connection?.meshDeviceId) {
+      return undefined;
+    }
+    return get().devices.get(connection.meshDeviceId);
+  },
+  getConnectionForDevice: (deviceId) => {
+    return get().savedConnections.find((c) => c.meshDeviceId === deviceId);
+  },
 });
 
 const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
