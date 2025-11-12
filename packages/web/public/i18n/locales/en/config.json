@@ -298,7 +298,7 @@
       },
       "altitude": {
         "label": "Altitude",
-        "description": "Meters above sea level (optional)"
+        "description": "{{unit}} above sea level (optional)"
       },
       "map": {
         "hint": "Click on the map to set coordinates, or enter them manually below",
