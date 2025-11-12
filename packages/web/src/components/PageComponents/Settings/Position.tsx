@@ -16,6 +16,7 @@ import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { FixedPositionPicker } from "./FixedPositionPicker.tsx";
 
 interface PositionConfigProps {
   onFormInit: DynamicFormFormInit<PositionValidation>;
@@ -98,21 +99,15 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               name: "fixedPosition",
               label: t("position.fixedPosition.label"),
               description: t("position.fixedPosition.description"),
+              additionalContent: formValues.fixedPosition ? (
+                <FixedPositionPicker
+                  currentPosition={currentPosition}
+                  isEnabled={formValues.fixedPosition}
+                  onSetPosition={sendAdminMessage}
+                  onRequestUpdate={sendAdminMessage}
+                />
+              ) : null,
             },
-            ...(formValues.fixedPosition
-              ? [
-                  {
-                    type: "fixedPositionPicker" as const,
-                    name: "fixedPosition" as const,
-                    label: t("position.fixedPosition.coordinates.title"),
-                    description: t("position.fixedPosition.coordinates.description"),
-                    currentPosition,
-                    isEnabled: formValues.fixedPosition,
-                    onSetPosition: sendAdminMessage,
-                    onRequestUpdate: sendAdminMessage,
-                  },
-                ]
-              : []),
             {
               type: "multiSelect",
               name: "positionFlags",
