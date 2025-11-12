@@ -19,18 +19,13 @@ import {
   type MultiSelectFieldProps,
   MultiSelectInput,
 } from "./FormMultiSelect.tsx";
-import {
-  type FixedPositionPickerFieldProps,
-  FixedPositionPickerInput,
-} from "./FormFixedPositionPicker.tsx";
 
 export type FieldProps<T> =
   | InputFieldProps<T>
   | SelectFieldProps<T>
   | MultiSelectFieldProps<T>
   | ToggleFieldProps<T>
-  | PasswordGeneratorProps<T>
-  | FixedPositionPickerFieldProps<T>;
+  | PasswordGeneratorProps<T>;
 
 export interface DynamicFormFieldProps<T extends FieldValues> {
   field: FieldProps<T>;
@@ -93,16 +88,6 @@ export function DynamicFormField<T extends FieldValues>({
     case "multiSelect":
       return (
         <MultiSelectInput
-          field={field}
-          control={control}
-          disabled={disabled}
-          isDirty={isDirty}
-          invalid={invalid}
-        />
-      );
-    case "fixedPositionPicker":
-      return (
-        <FixedPositionPickerInput
           field={field}
           control={control}
           disabled={disabled}
