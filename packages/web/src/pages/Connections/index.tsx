@@ -1,6 +1,6 @@
 import AddConnectionDialog from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
-import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
 import { TimeAgo } from "@app/components/generic/TimeAgo";
+import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
 import type { Connection } from "@app/core/stores/deviceStore/types";
 import { useConnections } from "@app/pages/Connections/useConnections";
 import {
@@ -40,7 +40,6 @@ import {
   ArrowLeft,
   LinkIcon,
   MoreHorizontal,
-  PlugZap,
   RotateCw,
   RouterIcon,
   Star,
@@ -226,7 +225,10 @@ export const Connections = () => {
                 interpolation: { escapeValue: false },
               }),
             });
-            if (created.status === "connected" || created.status === "configured") {
+            if (
+              created.status === "connected" ||
+              created.status === "configured"
+            ) {
               navigate({ to: "/" });
             }
           } else {
@@ -271,8 +273,10 @@ function ConnectionCard({
   const { t } = useTranslation("connections");
 
   const Icon = connectionTypeIcon(connection.type);
-  const isBusy = connection.status === "connecting" || connection.status === "configuring";
-  const isConnected = connection.status === "connected" || connection.status === "configured";
+  const isBusy =
+    connection.status === "connecting" || connection.status === "configuring";
+  const isConnected =
+    connection.status === "connected" || connection.status === "configured";
   const isError = connection.status === "error";
 
   return (

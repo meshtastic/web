@@ -221,7 +221,10 @@ export function useConnections() {
               // Start fast heartbeat after first successful heartbeat
               const configHeartbeatId = setInterval(() => {
                 meshDevice.heartbeat().catch((error) => {
-                  console.warn("[useConnections] Config heartbeat failed:", error);
+                  console.warn(
+                    "[useConnections] Config heartbeat failed:",
+                    error,
+                  );
                 });
               }, CONFIG_HEARTBEAT_INTERVAL_MS);
               heartbeats.set(id, configHeartbeatId);
