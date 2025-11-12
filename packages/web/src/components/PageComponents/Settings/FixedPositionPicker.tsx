@@ -3,11 +3,12 @@ import { Input } from "@components/UI/Input.tsx";
 import { BaseMap } from "@components/Map.tsx";
 import { Marker } from "react-map-gl/maplibre";
 import { MapPin } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { create } from "@bufbuild/protobuf";
 import { Protobuf } from "@meshtastic/core";
 import { useToast } from "@core/hooks/useToast.ts";
+import { useDevice } from "@core/stores";
 
 interface FixedPositionPickerProps {
   currentPosition?: {
@@ -28,6 +29,15 @@ export const FixedPositionPicker = ({
 }: FixedPositionPickerProps) => {
   const { t } = useTranslation("config");
   const { toast } = useToast();
+  const { getEffectiveConfig } = useDevice();
+
+  // Get display units to show correct altitude unit
+  const displayUnits = getEffectiveConfig("display")?.units;
+  const altitudeUnit = useMemo(() => {
+    return displayUnits === Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
+      ? "Feet"
+      : "Meters";
+  }, [displayUnits]);
 
   // State for fixed position inputs (in degrees, not integer format)
   const [latitude, setLatitude] = useState<string>(
@@ -201,6 +211,9 @@ export const FixedPositionPicker = ({
             onChange={(e) => setAltitude(e.target.value)}
             className="h-8 text-sm"
           />
+          <p className="text-xs text-muted-foreground">
+            {t("position.fixedPosition.altitude.description", { unit: altitudeUnit })}
+          </p>
         </div>
       </div>
 
