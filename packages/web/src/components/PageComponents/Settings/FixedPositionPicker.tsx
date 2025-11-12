@@ -1,7 +1,7 @@
 import { Button } from "@components/UI/Button.tsx";
 import { Input } from "@components/UI/Input.tsx";
 import { BaseMap } from "@components/Map.tsx";
-import { Marker } from "react-map-gl/maplibre";
+import { Marker, type MapLayerMouseEvent } from "react-map-gl/maplibre";
 import { MapPin } from "lucide-react";
 import { useCallback, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -50,7 +50,7 @@ export const FixedPositionPicker = ({
     currentPosition?.altitude ? String(currentPosition.altitude) : ""
   );
 
-  const handleMapClick = useCallback((event: any) => {
+  const handleMapClick = useCallback((event: MapLayerMouseEvent) => {
     const { lng, lat } = event.lngLat;
     setLatitude(lat.toFixed(7));
     setLongitude(lng.toFixed(7));
