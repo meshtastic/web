@@ -67,11 +67,12 @@ export const subscribeAll = (
     nodeDB.addPosition(position);
   });
 
-  // NOTE: Node handling is now done by MeshService
-  // - During initial config, nodes are batched and added all at once
-  // - After config completes, nodes arrive individually for real-time updates
-  // This is handled in useConnections via meshService.onNodesReceived
-  // MeshService collects nodes during config for efficient batch processing
+  // NOTE: Node handling is managed by the nodeDB
+  // Nodes are added via subscriptions.ts and stored in nodeDB
+  // Configuration is handled directly by meshDevice.configure() in useConnections
+  connection.events.onNodeInfoPacket.subscribe((nodeInfo) => {
+    nodeDB.addNode(nodeInfo);
+  });
 
   connection.events.onChannelPacket.subscribe((channel) => {
     device.addChannel(channel);

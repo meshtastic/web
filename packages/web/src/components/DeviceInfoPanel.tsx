@@ -88,6 +88,10 @@ export const DeviceInfoPanel = ({
     if (!status) {
       return t("unknown.notAvailable", "N/A");
     }
+    // Show "connected" for configured state
+    if (status === "configured") {
+      return t("toasts.connected", { ns: "connections" });
+    }
     return status;
   };
 

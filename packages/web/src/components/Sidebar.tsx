@@ -1,12 +1,14 @@
+import { useFirstSavedConnection } from "@app/core/stores/deviceStore/selectors.ts";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
 import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { Spinner } from "@components/UI/Spinner.tsx";
 import { Subtle } from "@components/UI/Typography/Subtle.tsx";
 import {
   type Page,
+  useActiveConnection,
   useAppStore,
+  useDefaultConnection,
   useDevice,
-  useDeviceStore,
   useNodeDB,
   useSidebar,
 } from "@core/stores";
@@ -71,17 +73,18 @@ export const Sidebar = ({ children }: SidebarProps) => {
   const { hardware, metadata, unreadCounts, setDialogOpen } = useDevice();
   const { getNode, getNodesLength } = useNodeDB();
   const { setCommandPaletteOpen } = useAppStore();
-  const savedConnections = useDeviceStore((s) => s.savedConnections);
   const myNode = getNode(hardware.myNodeNum);
   const { isCollapsed } = useSidebar();
   const { t } = useTranslation("ui");
   const navigate = useNavigate({ from: "/" });
 
-  // Get the active connection (connected > default > first)
+  // Get the active connection from selector (connected > default > first)
   const activeConnection =
-    savedConnections.find((c) => c.status === "connected") ||
-    savedConnections.find((c) => c.isDefault) ||
-    savedConnections[0];
+    useActiveConnection() ||
+    // biome-ignore lint/correctness/useHookAtTopLevel: not a react hook
+    useDefaultConnection() ||
+    // biome-ignore lint/correctness/useHookAtTopLevel: not a hook
+    useFirstSavedConnection();
 
   const pathname = useLocation({
     select: (location) => location.pathname.replace(/^\//, ""),

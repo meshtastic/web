@@ -90,6 +90,11 @@ function nodeDBFactory(
           if (!nodeDB) {
             throw new Error(`No nodeDB found (id: ${id})`);
           }
+
+          // Check if node already exists
+          const existing = nodeDB.nodeMap.get(node.num);
+          const isNew = !existing;
+
           // Use validation to check the new node before adding
           const next = validateIncomingNode(
             node,
@@ -105,8 +110,30 @@ function nodeDBFactory(
             return;
           }
 
+          // Merge with existing node data if it exists
+          const merged = existing
+            ? {
+                ...existing,
+                ...next,
+                // Preserve existing fields if new node doesn't have them
+                user: next.user ?? existing.user,
+                position: next.position ?? existing.position,
+                deviceMetrics: next.deviceMetrics ?? existing.deviceMetrics,
+              }
+            : next;
+
           // Use the validated node's num to ensure consistency
-          nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(next.num, next);
+          nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(merged.num, merged);
+
+          if (isNew) {
+            console.log(
+              `[NodeDB] Adding new node from NodeInfo packet: ${merged.num} (${merged.user?.longName || "unknown"})`,
+            );
+          } else {
+            console.log(
+              `[NodeDB] Updating existing node from NodeInfo packet: ${merged.num} (${merged.user?.longName || "unknown"})`,
+            );
+          }
         }),
       ),
 
@@ -271,11 +298,20 @@ function nodeDBFactory(
           if (!nodeDB) {
             throw new Error(`No nodeDB found (id: ${id})`);
           }
-          const current =
-            nodeDB.nodeMap.get(user.from) ??
-            create(Protobuf.Mesh.NodeInfoSchema);
-          const updated = { ...current, user: user.data, num: user.from };
+          const current = nodeDB.nodeMap.get(user.from);
+          const isNew = !current;
+          const updated = {
+            ...(current ?? create(Protobuf.Mesh.NodeInfoSchema)),
+            user: user.data,
+            num: user.from,
+          };
           nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(user.from, updated);
+
+          if (isNew) {
+            console.log(
+              `[NodeDB] Adding new node from user packet: ${user.from} (${user.data.longName || "unknown"})`,
+            );
+          }
         }),
       ),
 
@@ -286,15 +322,20 @@ function nodeDBFactory(
           if (!nodeDB) {
             throw new Error(`No nodeDB found (id: ${id})`);
           }
-          const current =
-            nodeDB.nodeMap.get(position.from) ??
-            create(Protobuf.Mesh.NodeInfoSchema);
+          const current = nodeDB.nodeMap.get(position.from);
+          const isNew = !current;
           const updated = {
-            ...current,
+            ...(current ?? create(Protobuf.Mesh.NodeInfoSchema)),
             position: position.data,
             num: position.from,
           };
           nodeDB.nodeMap = new Map(nodeDB.nodeMap).set(position.from, updated);
+
+          if (isNew) {
+            console.log(
+              `[NodeDB] Adding new node from position packet: ${position.from}`,
+            );
+          }
         }),
       ),
 

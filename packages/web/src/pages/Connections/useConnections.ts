@@ -8,8 +8,6 @@ import {
   createConnectionFromInput,
   testHttpReachable,
 } from "@app/pages/Connections/utils";
-import { ensureDefaultUser } from "@core/dto/NodeNumToNodeInfoDTO";
-import { MeshService } from "@core/services/MeshService";
 import {
   useAppStore,
   useDeviceStore,
@@ -22,14 +20,15 @@ import { MeshDevice } from "@meshtastic/core";
 import { TransportHTTP } from "@meshtastic/transport-http";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import { TransportWebSerial } from "@meshtastic/transport-web-serial";
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 
-type LiveRefs = {
-  bt: Map<ConnectionId, BluetoothDevice>;
-  serial: Map<ConnectionId, SerialPort>;
-  meshDevices: Map<ConnectionId, MeshDevice>;
-  meshServices: Map<ConnectionId, MeshService>;
-};
+// Local storage for cleanup only (not in Zustand)
+const transports = new Map<ConnectionId, BluetoothDevice | SerialPort>();
+const heartbeats = new Map<ConnectionId, ReturnType<typeof setInterval>>();
+const configSubscriptions = new Map<ConnectionId, () => void>();
+
+const HEARTBEAT_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+const CONFIG_HEARTBEAT_INTERVAL_MS = 5000; // 5s during configuration
 
 export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);
@@ -40,12 +39,9 @@ export function useConnections() {
     (s) => s.removeSavedConnection,
   );
 
-  const live = useRef<LiveRefs>({
-    bt: new Map(),
-    serial: new Map(),
-    meshDevices: new Map(),
-    meshServices: new Map(),
-  });
+  // DeviceStore methods
+  const setActiveConnectionId = useDeviceStore((s) => s.setActiveConnectionId);
+
   const { addDevice } = useDeviceStore();
   const { addNodeDB } = useNodeDBStore();
   const { addMessageStore } = useMessageStore();
@@ -66,46 +62,67 @@ export function useConnections() {
 
   const removeConnection = useCallback(
     (id: ConnectionId) => {
-      // Destroy MeshService first
-      const meshService = live.current.meshServices.get(id);
-      if (meshService) {
-        try {
-          meshService.destroy();
-        } catch {}
-        live.current.meshServices.delete(id);
+      const conn = connections.find((c) => c.id === id);
+
+      // Stop heartbeat
+      const heartbeatId = heartbeats.get(id);
+      if (heartbeatId) {
+        clearInterval(heartbeatId);
+        heartbeats.delete(id);
+        console.log(`[useConnections] Heartbeat stopped for connection ${id}`);
       }
 
-      // Disconnect MeshDevice
-      const meshDevice = live.current.meshDevices.get(id);
-      if (meshDevice) {
-        try {
-          meshDevice.disconnect();
-        } catch {}
-        live.current.meshDevices.delete(id);
+      // Unsubscribe from config complete event
+      const unsubConfigComplete = configSubscriptions.get(id);
+      if (unsubConfigComplete) {
+        unsubConfigComplete();
+        configSubscriptions.delete(id);
+        console.log(
+          `[useConnections] Config subscription cleaned up for connection ${id}`,
+        );
       }
 
-      // Close live refs if open
-      const bt = live.current.bt.get(id);
-      if (bt?.gatt?.connected) {
-        try {
-          bt.gatt.disconnect();
-        } catch {
-          // Ignore errors
+      // Get device and MeshDevice from Device.connection
+      if (conn?.meshDeviceId) {
+        const { getDevice, removeDevice } = useDeviceStore.getState();
+        const device = getDevice(conn.meshDeviceId);
+
+        if (device?.connection) {
+          // Disconnect MeshDevice
+          try {
+            device.connection.disconnect();
+          } catch {}
         }
-      }
-      const sp = live.current.serial.get(id);
-      if (sp && "close" in sp) {
-        try {
-          (sp as SerialPort & { close: () => Promise<void> }).close();
-        } catch {
-          // Ignore errors
+
+        // Close transport if it's BT or Serial
+        const transport = transports.get(id);
+        if (transport) {
+          const bt = transport as BluetoothDevice;
+          if (bt.gatt?.connected) {
+            try {
+              bt.gatt.disconnect();
+            } catch {}
+          }
+
+          const sp = transport as SerialPort & { close?: () => Promise<void> };
+          if (sp.close) {
+            try {
+              sp.close();
+            } catch {}
+          }
+
+          transports.delete(id);
         }
+
+        // Clean up orphaned Device
+        try {
+          removeDevice(conn.meshDeviceId);
+        } catch {}
       }
-      live.current.bt.delete(id);
-      live.current.serial.delete(id);
+
       removeSavedConnectionFromStore(id);
     },
-    [removeSavedConnectionFromStore],
+    [connections, removeSavedConnectionFromStore],
   );
 
   const setDefaultConnection = useCallback(
@@ -128,6 +145,8 @@ export function useConnections() {
         | Awaited<ReturnType<typeof TransportHTTP.create>>
         | Awaited<ReturnType<typeof TransportWebBluetooth.createFromDevice>>
         | Awaited<ReturnType<typeof TransportWebSerial.createFromPort>>,
+      btDevice?: BluetoothDevice,
+      serialPort?: SerialPort,
     ): number => {
       // Reuse existing meshDeviceId if available to prevent duplicate nodeDBs,
       // but only if the corresponding nodeDB still exists. Otherwise, generate a new ID.
@@ -144,78 +163,80 @@ export function useConnections() {
       const meshDevice = new MeshDevice(transport, deviceId);
 
       setSelectedDevice(deviceId);
-      device.addConnection(meshDevice);
+      device.addConnection(meshDevice); // This stores meshDevice in Device.connection
       subscribeAll(device, meshDevice, messageStore, nodeDB);
-      live.current.meshDevices.set(id, meshDevice);
 
-      // Create MeshService for connection management
-      const meshService = new MeshService(meshDevice);
-      live.current.meshServices.set(id, meshService);
+      // Store transport locally for cleanup (BT/Serial only)
+      if (btDevice || serialPort) {
+        transports.set(id, btDevice || serialPort);
+      }
 
-      // Set up MeshService event listeners
-      meshService.onStageStart.subscribe((data) => {
-        console.log(`[MeshService] Stage started: ${data.stage}`);
-      });
+      // Set active connection and link device bidirectionally
+      setActiveConnectionId(id);
+      device.setConnectionId(id);
 
-      meshService.onStageComplete.subscribe((data) => {
-        console.log(`[MeshService] Stage complete:`, data);
-      });
-
-      meshService.onConfigured.subscribe(() => {
-        console.log(`[MeshService] Device fully configured`);
-        updateStatus(id, "configured");
-      });
-
-      meshService.onError.subscribe((error) => {
-        console.error(`[MeshService] MeshService error:`, error);
-        updateStatus(id, "error", error.message);
-      });
-
-      // Subscribe to connection state changes from MeshService
-      meshService.onConnectionStateChange.subscribe((state) => {
-        console.log(`[MeshService] Connection state changed: ${state}`);
-        const statusMap: Record<string, ConnectionStatus> = {
-          CONNECTED: "connected",
-          DISCONNECTED: "disconnected",
-          CONFIGURING: "configuring",
-          CONFIGURED: "configured",
-        };
-        const connectionStatus = statusMap[state] || "disconnected";
-        updateStatus(id, connectionStatus);
-      });
-
-      // Batch-add nodes when received
-      meshService.onNodesReceived.subscribe((nodes) => {
-        console.log(
-          `[useConnections] Batch-adding ${nodes.length} nodes to nodeDB`,
-        );
-
-        // Deduplicate nodes by node number to prevent duplicates in the batch
-        const uniqueNodes = new Map<number, typeof nodes[0]>();
-        for (const node of nodes) {
-          // Keep the most recent version (last one in the array)
-          uniqueNodes.set(node.num, node);
-        }
-
-        const deduplicatedNodes = Array.from(uniqueNodes.values());
-        if (deduplicatedNodes.length < nodes.length) {
-          console.warn(
-            `[useConnections] Deduplicated ${nodes.length - deduplicatedNodes.length} duplicate nodes from batch`,
+      // Listen for config complete event (with nonce/ID)
+      const unsubConfigComplete = meshDevice.events.onConfigComplete.subscribe(
+        (configCompleteId) => {
+          console.log(
+            `[useConnections] Configuration complete with ID: ${configCompleteId}`,
           );
-        }
+          device.setConnectionPhase("configured");
+          updateStatus(id, "configured");
 
-        deduplicatedNodes.forEach((node) => {
-          const nodeWithUser = ensureDefaultUser(node);
-          // PKI sanity check is handled inside nodeDB.addNode
-          nodeDB.addNode(nodeWithUser);
+          // Switch from fast config heartbeat to slow maintenance heartbeat
+          const oldHeartbeat = heartbeats.get(id);
+          if (oldHeartbeat) {
+            clearInterval(oldHeartbeat);
+            console.log(
+              `[useConnections] Switching to maintenance heartbeat (5 min interval)`,
+            );
+          }
+
+          const maintenanceHeartbeat = setInterval(() => {
+            meshDevice.heartbeat().catch((error) => {
+              console.warn("[useConnections] Heartbeat failed:", error);
+            });
+          }, HEARTBEAT_INTERVAL_MS);
+          heartbeats.set(id, maintenanceHeartbeat);
+        },
+      );
+      configSubscriptions.set(id, unsubConfigComplete);
+
+      // Start configuration
+      device.setConnectionPhase("configuring");
+      updateStatus(id, "configuring");
+      console.log("[useConnections] Starting configuration");
+
+      meshDevice
+        .configure()
+        .then(() => {
+          console.log(
+            "[useConnections] Configuration complete, starting heartbeat",
+          );
+          // Send initial heartbeat after configure completes
+          meshDevice
+            .heartbeat()
+            .then(() => {
+              // Start fast heartbeat after first successful heartbeat
+              const configHeartbeatId = setInterval(() => {
+                meshDevice.heartbeat().catch((error) => {
+                  console.warn("[useConnections] Config heartbeat failed:", error);
+                });
+              }, CONFIG_HEARTBEAT_INTERVAL_MS);
+              heartbeats.set(id, configHeartbeatId);
+              console.log(
+                `[useConnections] Heartbeat started for connection ${id} (5s interval during config)`,
+              );
+            })
+            .catch((error) => {
+              console.warn("[useConnections] Initial heartbeat failed:", error);
+            });
+        })
+        .catch((error) => {
+          console.error(`[useConnections] Failed to configure:`, error);
+          updateStatus(id, "error", error.message);
         });
-      });
-
-      // Start the connection and configuration flow
-      meshService.connect().catch((error) => {
-        console.error(`[useConnections] Failed to start connection:`, error);
-        updateStatus(id, "error", error.message);
-      });
 
       updateSavedConnection(id, { meshDeviceId: deviceId });
       return deviceId;
@@ -226,6 +247,7 @@ export function useConnections() {
       addNodeDB,
       addMessageStore,
       setSelectedDevice,
+      setActiveConnectionId,
       updateSavedConnection,
       updateStatus,
     ],
@@ -237,7 +259,7 @@ export function useConnections() {
       if (!conn) {
         return false;
       }
-      if (conn.status === "connected") {
+      if (conn.status === "configured" || conn.status === "connected") {
         return true;
       }
 
@@ -258,7 +280,7 @@ export function useConnections() {
           const isTLS = url.protocol === "https:";
           const transport = await TransportHTTP.create(url.host, isTLS);
           setupMeshDevice(id, transport);
-          updateStatus(id, "connected");
+          // Status will be set to "configured" by onConfigComplete event
           return true;
         }
 
@@ -266,7 +288,7 @@ export function useConnections() {
           if (!("bluetooth" in navigator)) {
             throw new Error("Web Bluetooth not supported");
           }
-          let bleDevice = live.current.bt.get(id);
+          let bleDevice = transports.get(id) as BluetoothDevice | undefined;
           if (!bleDevice) {
             // Try to recover permitted devices
             const getDevices = (
@@ -281,10 +303,6 @@ export function useConnections() {
                 bleDevice = known.find(
                   (d: BluetoothDevice) => d.id === conn.deviceId,
                 );
-                // If found, store it for future use
-                if (bleDevice) {
-                  live.current.bt.set(id, bleDevice);
-                }
               }
             }
           }
@@ -305,17 +323,16 @@ export function useConnections() {
               "Bluetooth device not available. Re-select the device.",
             );
           }
-          live.current.bt.set(id, bleDevice);
 
           const transport =
             await TransportWebBluetooth.createFromDevice(bleDevice);
-          setupMeshDevice(id, transport);
+          setupMeshDevice(id, transport, bleDevice);
 
           bleDevice.addEventListener("gattserverdisconnected", () => {
             updateStatus(id, "disconnected");
           });
 
-          updateStatus(id, "connected");
+          // Status will be set to "configured" by onConfigComplete event
           return true;
         }
 
@@ -323,7 +340,7 @@ export function useConnections() {
           if (!("serial" in navigator)) {
             throw new Error("Web Serial not supported");
           }
-          let port = live.current.serial.get(id);
+          let port = transports.get(id) as SerialPort | undefined;
           if (!port) {
             // Find a previously granted port by vendor/product
             const ports: SerialPort[] = await (
@@ -379,11 +396,9 @@ export function useConnections() {
             }
           }
 
-          live.current.serial.set(id, port);
-
           const transport = await TransportWebSerial.createFromPort(port);
-          setupMeshDevice(id, transport);
-          updateStatus(id, "connected");
+          setupMeshDevice(id, transport, undefined, port);
+          // Status will be set to "configured" by onConfigComplete event
           return true;
         }
       } catch (err: unknown) {
@@ -403,51 +418,68 @@ export function useConnections() {
         return;
       }
       try {
-        // Destroy MeshService first
-        const meshService = live.current.meshServices.get(id);
-        if (meshService) {
-          try {
-            meshService.disconnect();
-            meshService.destroy();
-          } catch {
-            // Ignore errors
-          }
-          live.current.meshServices.delete(id);
+        // Stop heartbeat
+        const heartbeatId = heartbeats.get(id);
+        if (heartbeatId) {
+          clearInterval(heartbeatId);
+          heartbeats.delete(id);
+          console.log(
+            `[useConnections] Heartbeat stopped for connection ${id}`,
+          );
         }
 
-        // Disconnect MeshDevice
-        const meshDevice = live.current.meshDevices.get(id);
-        if (meshDevice) {
-          try {
-            meshDevice.disconnect();
-          } catch {
-            // Ignore errors
-          }
-          live.current.meshDevices.delete(id);
+        // Unsubscribe from config complete event
+        const unsubConfigComplete = configSubscriptions.get(id);
+        if (unsubConfigComplete) {
+          unsubConfigComplete();
+          configSubscriptions.delete(id);
+          console.log(
+            `[useConnections] Config subscription cleaned up for connection ${id}`,
+          );
         }
 
-        if (conn.type === "bluetooth") {
-          const dev = live.current.bt.get(id);
-          if (dev?.gatt?.connected) {
-            dev.gatt.disconnect();
-          }
-        }
-        if (conn.type === "serial") {
-          const port = live.current.serial.get(id);
-          if (port) {
+        // Get device and meshDevice from Device.connection
+        if (conn.meshDeviceId) {
+          const { getDevice } = useDeviceStore.getState();
+          const device = getDevice(conn.meshDeviceId);
+
+          if (device?.connection) {
+            // Disconnect MeshDevice
             try {
-              const portWithClose = port as SerialPort & {
-                close: () => Promise<void>;
-                readable: ReadableStream | null;
-              };
-              // Only close if the port is open (has readable stream)
-              if (portWithClose.readable) {
-                await portWithClose.close();
-              }
-            } catch (err) {
-              console.warn("Error closing serial port:", err);
+              device.connection.disconnect();
+            } catch {
+              // Ignore errors
             }
-            live.current.serial.delete(id);
+          }
+
+          // Close transport connections
+          const transport = transports.get(id);
+          if (transport) {
+            if (conn.type === "bluetooth") {
+              const dev = transport as BluetoothDevice;
+              if (dev.gatt?.connected) {
+                dev.gatt.disconnect();
+              }
+            }
+            if (conn.type === "serial") {
+              const port = transport as SerialPort & {
+                close?: () => Promise<void>;
+                readable?: ReadableStream | null;
+              };
+              if (port.close && port.readable) {
+                try {
+                  await port.close();
+                } catch (err) {
+                  console.warn("Error closing serial port:", err);
+                }
+              }
+            }
+          }
+
+          // Clear the device's connectionId link
+          if (device) {
+            device.setConnectionId(null);
+            device.setConnectionPhase("disconnected");
           }
         }
       } finally {
@@ -474,7 +506,7 @@ export function useConnections() {
       const conn = addConnection(input);
       // If a Bluetooth device was provided, store it to avoid re-prompting
       if (btDevice && conn.type === "bluetooth") {
-        live.current.bt.set(conn.id, btDevice);
+        transports.set(conn.id, btDevice);
       }
       await connect(conn.id, { allowPrompt: true });
       // Get updated connection from store after connect
@@ -490,11 +522,14 @@ export function useConnections() {
     // HTTP: test endpoint reachability
     // Bluetooth/Serial: check permission grants
 
-    // HTTP connections: test reachability if not already connected
+    // HTTP connections: test reachability if not already connected/configured
     const httpChecks = connections
       .filter(
         (c): c is Connection & { type: "http"; url: string } =>
-          c.type === "http" && c.status !== "connected",
+          c.type === "http" &&
+          c.status !== "connected" &&
+          c.status !== "configured" &&
+          c.status !== "configuring",
       )
       .map(async (c) => {
         const ok = await testHttpReachable(c.url);
@@ -507,7 +542,10 @@ export function useConnections() {
     const btChecks = connections
       .filter(
         (c): c is Connection & { type: "bluetooth"; deviceId?: string } =>
-          c.type === "bluetooth" && c.status !== "connected",
+          c.type === "bluetooth" &&
+          c.status !== "connected" &&
+          c.status !== "configured" &&
+          c.status !== "configuring",
       )
       .map(async (c) => {
         if (!("bluetooth" in navigator)) {
@@ -540,7 +578,11 @@ export function useConnections() {
           type: "serial";
           usbVendorId?: number;
           usbProductId?: number;
-        } => c.type === "serial" && c.status !== "connected",
+        } =>
+          c.type === "serial" &&
+          c.status !== "connected" &&
+          c.status !== "configured" &&
+          c.status !== "configuring",
       )
       .map(async (c) => {
         if (!("serial" in navigator)) {
@@ -588,13 +630,16 @@ export function useConnections() {
     // Update all connection statuses
     connections.forEach((conn) => {
       const shouldBeConnected = activeConnection?.id === conn.id;
+      const isConnectedState =
+        conn.status === "connected" ||
+        conn.status === "configured" ||
+        conn.status === "configuring";
 
       // Update status if it doesn't match reality
-      if (shouldBeConnected && conn.status !== "connected") {
-        updateSavedConnection(conn.id, { status: "connected" });
-      } else if (!shouldBeConnected && conn.status === "connected") {
+      if (!shouldBeConnected && isConnectedState) {
         updateSavedConnection(conn.id, { status: "disconnected" });
       }
+      // Don't force status to "connected" if shouldBeConnected - let the connection flow set the proper status
     });
   }, [connections, selectedDeviceId, updateSavedConnection]);
 
