@@ -12,6 +12,7 @@ npm/
 .DS_Store
 
 packages/protobufs/packages/ts/dist
+.pnpm-store/
 
 # Local dev certs
 *.pem
