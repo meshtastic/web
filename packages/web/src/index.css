@@ -1,3 +1,19 @@
+@font-face {
+  font-family: 'Inter var';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/InterVariable.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'Inter var';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/InterVariable-Italic.woff2') format('woff2-variations');
+}
+
 @import "tailwindcss";
 /* @import '@meshtastic/ui/theme/default.css'; */
 /* @source "../node_modules/@meshtastic/ui";  */
@@ -11,7 +27,7 @@
 
 @theme {
   --font-mono:
-    Cascadia Code, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
   --font-sans:
     Inter var, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
