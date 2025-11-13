@@ -1,0 +1,13 @@
+{
+	"name": "meshtastic-web",
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+	"features": {
+		"ghcr.io/r3dpoint/devcontainer-features/tailwindcss-standalone-cli:1": {
+			"version": "latest"
+		},
+		"ghcr.io/devcontainers-extra/features/pnpm:2": {
+			"version": "latest"
+		}
+	}
+}
+
