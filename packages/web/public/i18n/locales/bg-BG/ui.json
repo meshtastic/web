@@ -195,7 +195,7 @@
   "showUnheard": {
     "label": "Никога не е чуван"
   },
-  "language": {
+  "languagePicker": {
     "label": "Език",
     "changeLanguage": "Промяна на езика"
   },
