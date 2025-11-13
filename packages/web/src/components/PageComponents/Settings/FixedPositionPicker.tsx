@@ -136,7 +136,7 @@ export const FixedPositionPicker = ({
   }, [latitude, longitude, altitude, isEnabled, onSetPosition, toast, t]);
 
   return (
-    <div className="mt-4 space-y-3 p-4 border rounded-md bg-muted/50">
+    <div className="mt-4 space-y-3">
       {/* Map Picker */}
       <div className="w-full h-64 rounded-md overflow-hidden border">
         <BaseMap
