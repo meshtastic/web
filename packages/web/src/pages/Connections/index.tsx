@@ -112,7 +112,7 @@ export const Connections = () => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col items-center ml-2 gap-2">
+        <div className="flex flex-col items-end ml-2 gap-2">
           <Button onClick={() => setAddOpen(true)} className="gap-2">
             <RouterIcon className="size-5" />
             {t("button.addConnection")}
