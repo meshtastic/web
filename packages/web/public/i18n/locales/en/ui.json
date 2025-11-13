@@ -182,7 +182,8 @@
     "label": "Unknown last heard"
   },
   "languagePicker": {
-    "label": "Language"
+    "label": "Language",
+    "changeLanguage": "Change Language"
   },
   "theme": {
     "dark": "Dark",
