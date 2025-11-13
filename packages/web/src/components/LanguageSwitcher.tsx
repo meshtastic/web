@@ -1,6 +1,7 @@
 import type { LangCode } from "@app/i18n-config.ts";
 import useLang from "@core/hooks/useLang.ts";
 import { cn } from "@core/utils/cn.ts";
+import { t } from "i18next";
 import { Check, Languages } from "lucide-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -56,7 +57,7 @@ export default function LanguageSwitcher({
                 "group-hover:text-gray-800 dark:group-hover:text-gray-100",
             )}
           >
-            {`${i18n.t("language.changeLanguage")}:`}
+            {`${t("languagePicker.label")}:`}
           </Subtle>
           <Subtle
             className={cn(

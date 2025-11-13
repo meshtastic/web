@@ -1,5 +1,6 @@
 import AddConnectionDialog from "@app/components/Dialog/AddConnectionDialog/AddConnectionDialog";
 import { TimeAgo } from "@app/components/generic/TimeAgo";
+import LanguageSwitcher from "@app/components/LanguageSwitcher";
 import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
 import type { Connection } from "@app/core/stores/deviceStore/types";
 import { useConnections } from "@app/pages/Connections/useConnections";
@@ -111,11 +112,12 @@ export const Connections = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center ml-2 gap-2">
+        <div className="flex flex-col items-center ml-2 gap-2">
           <Button onClick={() => setAddOpen(true)} className="gap-2">
             <RouterIcon className="size-5" />
             {t("button.addConnection")}
           </Button>
+          <LanguageSwitcher />
         </div>
       </header>
 

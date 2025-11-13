@@ -181,9 +181,8 @@
   "showUnheard": {
     "label": "Unknown last heard"
   },
-  "language": {
-    "label": "Language",
-    "changeLanguage": "Change Language"
+  "languagePicker": {
+    "label": "Language"
   },
   "theme": {
     "dark": "Dark",
