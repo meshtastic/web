@@ -105,6 +105,13 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               name: "fixedPosition",
               label: t("position.fixedPosition.label"),
               description: t("position.fixedPosition.description"),
+              disabledBy: [
+                {
+                  fieldName: "gpsMode",
+                  selector:
+                    Protobuf.Config.Config_PositionConfig_GpsMode.ENABLED,
+                },
+              ],
               additionalContent: formValues.fixedPosition ? (
                 <FixedPositionPicker
                   currentPosition={currentPosition}
