@@ -3,6 +3,7 @@ import {
   type PositionValidation,
   PositionValidationSchema,
 } from "@app/validation/config/position.ts";
+import { create } from "@bufbuild/protobuf";
 import {
   DynamicForm,
   type DynamicFormFormInit,
@@ -16,7 +17,6 @@ import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { FixedPositionPicker } from "./FixedPositionPicker.tsx";
 
 interface PositionConfigProps {
   onFormInit: DynamicFormFormInit<PositionValidation>;
@@ -41,16 +41,54 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
   const currentPosition = myNode?.position;
 
   const effectiveConfig = getEffectiveConfig("position");
+  const displayUnits = getEffectiveConfig("display")?.units;
 
   const formValues = useMemo(() => {
     return {
       ...config.position,
       ...effectiveConfig,
+      // Include current position coordinates if available
+      latitude: currentPosition?.latitudeI
+        ? currentPosition.latitudeI / 1e7
+        : undefined,
+      longitude: currentPosition?.longitudeI
+        ? currentPosition.longitudeI / 1e7
+        : undefined,
+      altitude: currentPosition?.altitude ?? 0,
     } as PositionValidation;
-  }, [config.position, effectiveConfig]);
+  }, [config.position, effectiveConfig, currentPosition]);
 
   const onSubmit = (data: PositionValidation) => {
-    const payload = { ...data, positionFlags: flagsValue };
+    // Handle position coordinates separately via admin message if fixedPosition is enabled
+    if (
+      data.fixedPosition &&
+      data.latitude !== undefined &&
+      data.longitude !== undefined
+    ) {
+      const message = create(Protobuf.Admin.AdminMessageSchema, {
+        payloadVariant: {
+          case: "setFixedPosition",
+          value: create(Protobuf.Mesh.PositionSchema, {
+            latitudeI: Math.round(data.latitude * 1e7),
+            longitudeI: Math.round(data.longitude * 1e7),
+            altitude: data.altitude || 0,
+            time: Math.floor(Date.now() / 1000),
+          }),
+        },
+      });
+
+      sendAdminMessage(message);
+    }
+
+    // Exclude position coordinates from config payload (they're handled via admin message)
+    const {
+      latitude: _latitude,
+      longitude: _longitude,
+      altitude: _altitude,
+      ...configData
+    } = data;
+    const payload = { ...configData, positionFlags: flagsValue };
+
     if (deepCompareConfig(config.position, payload, true)) {
       removeChange({ type: "config", variant: "position" });
       return;
@@ -112,14 +150,62 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
                     Protobuf.Config.Config_PositionConfig_GpsMode.ENABLED,
                 },
               ],
-              additionalContent: formValues.fixedPosition ? (
-                <FixedPositionPicker
-                  currentPosition={currentPosition}
-                  isEnabled={formValues.fixedPosition}
-                  onSetPosition={sendAdminMessage}
-                  onRequestUpdate={sendAdminMessage}
-                />
-              ) : null,
+            },
+            // Position coordinate fields (only shown when fixedPosition is enabled)
+            {
+              type: "number",
+              name: "latitude",
+              label: t("position.fixedPosition.latitude.label"),
+              description: `${t("position.fixedPosition.latitude.description")} (Max 7 decimal precision)`,
+              properties: {
+                step: 0.0000001,
+                suffix: "Degrees",
+              },
+              disabledBy: [
+                {
+                  fieldName: "fixedPosition",
+                },
+              ],
+            },
+            {
+              type: "number",
+              name: "longitude",
+              label: t("position.fixedPosition.longitude.label"),
+              description: `${t("position.fixedPosition.longitude.description")} (Max 7 decimal precision)`,
+              properties: {
+                step: 0.0000001,
+                suffix: "Degrees",
+              },
+              disabledBy: [
+                {
+                  fieldName: "fixedPosition",
+                },
+              ],
+            },
+            {
+              type: "number",
+              name: "altitude",
+              label: t("position.fixedPosition.altitude.label"),
+              description: t("position.fixedPosition.altitude.description", {
+                unit:
+                  displayUnits ===
+                  Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
+                    ? "Feet"
+                    : "Meters",
+              }),
+              properties: {
+                step: 0.0000001,
+                suffix:
+                  displayUnits ===
+                  Protobuf.Config.Config_DisplayConfig_DisplayUnits.IMPERIAL
+                    ? "Feet"
+                    : "Meters",
+              },
+              disabledBy: [
+                {
+                  fieldName: "fixedPosition",
+                },
+              ],
             },
             {
               type: "multiSelect",

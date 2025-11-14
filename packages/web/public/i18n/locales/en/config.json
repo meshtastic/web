@@ -290,34 +290,15 @@
       },
       "latitude": {
         "label": "Latitude",
-        "description": "Decimal degrees (e.g., 37.7749)"
+        "description": "Decimal degrees between -90 and 90 (e.g., 37.7749)"
       },
       "longitude": {
         "label": "Longitude",
-        "description": "Decimal degrees (e.g., -122.4194)"
+        "description": "Decimal degrees between -180 and 180 (e.g., -122.4194)"
       },
       "altitude": {
         "label": "Altitude",
-        "description": "{{unit}} above sea level (optional)"
-      },
-      "map": {
-        "hint": "Click on the map to set coordinates, or enter them manually below",
-        "accuracy": "Note: Device position may be slightly offset due to firmware rounding or GPS interference. For best accuracy, disable GPS mode."
-      },
-      "setButton": "Set Fixed Position",
-      "requestButton": "Request Position Update",
-      "requestSent": {
-        "title": "Position Update Requested",
-        "description": "The device will broadcast its current position shortly."
-      },
-      "error": {
-        "title": "Invalid Coordinates",
-        "invalidCoordinates": "Please enter valid latitude and longitude values.",
-        "notEnabled": "Please enable the 'Fixed Position' toggle first, then save the configuration before setting coordinates."
-      },
-      "success": {
-        "title": "Fixed Position Set",
-        "description": "Your fixed position coordinates have been sent to the device."
+        "description": "Optional — enter the altitude in {{unit}} above sea level (e.g., 100). Leave blank if unknown or add extra height for antennas/masts."
       }
     },
     "gpsMode": {
