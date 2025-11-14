@@ -284,10 +284,6 @@
     "fixedPosition": {
       "description": "Don't report GPS position, but a manually-specified one",
       "label": "Fixed Position",
-      "coordinates": {
-        "title": "Fixed Position Coordinates",
-        "description": "Manually specify the coordinates for your fixed position. These coordinates will be broadcast instead of GPS data."
-      },
       "latitude": {
         "label": "Latitude",
         "description": "Decimal degrees between -90 and 90 (e.g., 37.7749)"
