@@ -38,7 +38,6 @@ export class TransportNodeSerial implements Types.Transport {
       });
 
       const onError = (err: Error) => {
-        port.close();
         reject(err);
       };
 
