@@ -15,6 +15,9 @@ export const PositionValidationSchema = z.object({
   broadcastSmartMinimumIntervalSecs: z.coerce.number().int().min(0),
   gpsEnGpio: z.coerce.number().int().min(0),
   gpsMode: GpsModeEnum,
+  latitude: z.coerce.number().min(-90).max(90).optional(),
+  longitude: z.coerce.number().min(-180).max(180).optional(),
+  altitude: z.coerce.number().optional(),
 });
 
 export type PositionValidation = z.infer<typeof PositionValidationSchema>;
