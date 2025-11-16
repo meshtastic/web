@@ -195,7 +195,7 @@
   "showUnheard": {
     "label": "Jamais entendu"
   },
-  "languagePicker": {
+  "language": {
     "label": "Langue",
     "changeLanguage": "Changer la langue"
   },

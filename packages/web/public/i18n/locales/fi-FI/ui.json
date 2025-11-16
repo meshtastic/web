@@ -195,7 +195,7 @@
   "showUnheard": {
     "label": "Ei koskaan kuultu"
   },
-  "languagePicker": {
+  "language": {
     "label": "Kieli",
     "changeLanguage": "Vaihda kieli"
   },

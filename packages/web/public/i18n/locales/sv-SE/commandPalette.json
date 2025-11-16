@@ -45,7 +45,7 @@
     "command": {
       "reconfigure": "Konfigurera om",
       "clearAllStoredMessages": "Radera alla sparade meddelanden",
-      "clearAllStores": "Clear All Local Storage"
+      "clearAllStores": "Töm all lokal lagring"
     }
   }
 }

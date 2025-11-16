@@ -1,7 +1,7 @@
 {
   "page": {
-    "title": "Settings",
-    "tabUser": "User",
+    "title": "Inställningar",
+    "tabUser": "Användare",
     "tabChannels": "Kanaler",
     "tabBluetooth": "Bluetooth",
     "tabDevice": "Enhet",
@@ -428,31 +428,31 @@
     }
   },
   "user": {
-    "title": "User Settings",
-    "description": "Configure your device name and identity settings",
+    "title": "Användarinställningar",
+    "description": "Konfigurera enhetens namn och identitetsinställningar",
     "longName": {
       "label": "Långt namn",
-      "description": "Your full display name (1-40 characters)",
+      "description": "Ditt fullständiga visningsnamn (1-40 tecken)",
       "validation": {
-        "min": "Long name must be at least 1 character",
-        "max": "Long name must be at most 40 characters"
+        "min": "Långt namn måste vara minst 1 tecken",
+        "max": "Långt namn får inte vara längre än 40 tecken"
       }
     },
     "shortName": {
       "label": "Kort namn",
-      "description": "Your abbreviated name (2-4 characters)",
+      "description": "Ditt förkortade namn (2-4 tecken)",
       "validation": {
-        "min": "Short name must be at least 2 characters",
-        "max": "Short name must be at most 4 characters"
+        "min": "Kort namn måste ha minst 2 tecken",
+        "max": "Kort namn får inte vara längre än 4 tecken"
       }
     },
     "isUnmessageable": {
-      "label": "Unmessageable",
-      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+      "label": "Meddelanden läses ej",
+      "description": "Används för att identifiera oövervakade eller infrastrukturnoder så att meddelanden inte skickas till noder som inte kommer svara."
     },
     "isLicensed": {
-      "label": "Licensed amateur radio (HAM)",
-      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+      "label": "Licensierad radioamatör (HAM)",
+      "description": "Aktivera om du är en licensierad amatörradiooperatör. Att aktivera detta alternativ inaktiverar kryptering och är inte kompatibel med standard Meshtastic-nätverket."
     }
   }
 }

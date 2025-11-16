@@ -195,7 +195,7 @@
   "showUnheard": {
     "label": "Never heard"
   },
-  "languagePicker": {
+  "language": {
     "label": "言語設定",
     "changeLanguage": "Change Language"
   },

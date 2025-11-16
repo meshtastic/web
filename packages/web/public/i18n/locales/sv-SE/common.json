@@ -1,8 +1,8 @@
 {
   "button": {
     "apply": "Verkställ",
-    "addConnection": "Add Connection",
-    "saveConnection": "Save connection",
+    "addConnection": "Lägg till anslutning",
+    "saveConnection": "Spara anslutning",
     "backupKey": "Säkerhetskopiera nyckel",
     "cancel": "Avbryt",
     "connect": "Anslut",
@@ -25,10 +25,10 @@
     "requestNewKeys": "Begär nya nycklar",
     "requestPosition": "Begär position",
     "reset": "Nollställ",
-    "retry": "Retry",
+    "retry": "Försök igen",
     "save": "Spara",
-    "setDefault": "Set as default",
-    "unsetDefault": "Unset default",
+    "setDefault": "Sätt som standard",
+    "unsetDefault": "Ta bort som standard",
     "scanQr": "Skanna QR-kod",
     "traceRoute": "Spåra rutt",
     "submit": "Spara"
@@ -59,8 +59,8 @@
       "suffix": "m"
     },
     "kilometer": {
-      "one": "Kilometer",
-      "plural": "Kilometers",
+      "one": "kilometer",
+      "plural": "kilometer",
       "suffix": "km"
     },
     "minute": {
@@ -83,8 +83,8 @@
     "day": {
       "one": "Dag",
       "plural": "Dagar",
-      "today": "Today",
-      "yesterday": "Yesterday"
+      "today": "Idag",
+      "yesterday": "Igår"
     },
     "month": {
       "one": "Månad",
@@ -105,8 +105,8 @@
       "plural": "Poster"
     },
     "degree": {
-      "one": "Degree",
-      "plural": "Degrees",
+      "one": "grad",
+      "plural": "grader",
       "suffix": "°"
     }
   },
@@ -156,7 +156,7 @@
       "key": "En nyckel måste anges."
     },
     "invalidOverrideFreq": {
-      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+      "number": "Ogiltigt format, förväntat värde i intervallet 410-930 MHz eller 0 (använd standard)."
     }
   },
   "yes": "Ja",

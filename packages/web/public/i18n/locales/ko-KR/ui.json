@@ -195,7 +195,7 @@
   "showUnheard": {
     "label": "수신된 적 없음"
   },
-  "languagePicker": {
+  "language": {
     "label": "언어",
     "changeLanguage": "언어 선택"
   },
