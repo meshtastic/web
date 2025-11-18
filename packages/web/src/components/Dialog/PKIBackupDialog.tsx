@@ -94,7 +94,11 @@ export const PkiBackupDialog = ({
     const decodedPublicKey = decodeKeyData(publicKey);
 
     const formattedContent = [
-      `${t("pkiBackup.header")}\n\n`,
+      `${t("pkiBackup.header", {
+        interpolation: { escapeValue: false },
+        shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
+        longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+      })}\n\n`,
       `${t("pkiBackup.privateKey")}\n`,
       decodedPrivateKey,
       `\n\n${t("pkiBackup.publicKey")}\n`,
