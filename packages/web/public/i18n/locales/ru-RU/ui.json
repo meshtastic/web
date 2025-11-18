@@ -1,15 +1,15 @@
 {
   "navigation": {
     "title": "Navigation",
-    "messages": "Wiadomości",
-    "map": "Mapa",
-    "settings": "Ustawienia",
-    "channels": "Kanały",
+    "messages": "Сообщения",
+    "map": "Карта",
+    "settings": "Настройки",
+    "channels": "Каналы",
     "radioConfig": "Radio Config",
-    "deviceConfig": "Konfiguracja urządzenia",
+    "deviceConfig": "Настройки устройства",
     "moduleConfig": "Module Config",
     "manageConnections": "Manage Connections",
-    "nodes": "Nodes"
+    "nodes": "Узлы"
   },
   "app": {
     "title": "Meshtastic",
@@ -25,7 +25,7 @@
     "deviceInfo": {
       "volts": "{{voltage}} volts",
       "firmware": {
-        "title": "Oprogramowanie",
+        "title": "Прошивка",
         "version": "v{{version}}",
         "buildDate": "Build date: {{date}}"
       }
@@ -34,7 +34,7 @@
   "batteryStatus": {
     "charging": "{{level}}% charging",
     "pluggedIn": "Plugged in",
-    "title": "Bateria"
+    "title": "Батарея"
   },
   "search": {
     "nodes": "Search nodes...",
@@ -84,8 +84,8 @@
     "favoriteNode": {
       "title": "{{action}} {{nodeName}} {{direction}} favorites.",
       "action": {
-        "added": "Dodano",
-        "removed": "Usunięto",
+        "added": "Added",
+        "removed": "Removed",
         "to": "to",
         "from": "from"
       }
@@ -93,8 +93,8 @@
     "ignoreNode": {
       "title": "{{action}} {{nodeName}} {{direction}} ignore list",
       "action": {
-        "added": "Dodano",
-        "removed": "Usunięto",
+        "added": "Added",
+        "removed": "Removed",
         "to": "to",
         "from": "from"
       }
@@ -108,35 +108,35 @@
       "label": "Copy to clipboard"
     },
     "hidePassword": {
-      "label": "Ukryj hasło"
+      "label": "Скрыть пароль"
     },
     "showPassword": {
-      "label": "Pokaż hasło"
+      "label": "Показать пароль"
     },
     "deliveryStatus": {
       "delivered": "Delivered",
       "failed": "Delivery Failed",
-      "waiting": "Czekam. . .",
-      "unknown": "Nieznany"
+      "waiting": "Waiting",
+      "unknown": "Неизвестно"
     }
   },
   "general": {
     "label": "General"
   },
   "hardware": {
-    "label": "Hardware"
+    "label": "Оборудование"
   },
   "metrics": {
     "label": "Metrics"
   },
   "role": {
-    "label": "Rola"
+    "label": "Роль"
   },
   "filter": {
-    "label": "Filtr"
+    "label": "Фильтр"
   },
   "advanced": {
-    "label": "Advanced"
+    "label": "Расширенные"
   },
   "clearInput": {
     "label": "Clear input"
@@ -158,19 +158,19 @@
   },
   "batteryVoltage": {
     "label": "Battery voltage (V)",
-    "title": "Napięcie"
+    "title": "Напряжение"
   },
   "channelUtilization": {
     "label": "Channel Utilization (%)",
     "short": "Channel Util. (%)"
   },
   "hops": {
-    "direct": "Bezpośrednio",
+    "direct": "Прямой",
     "label": "Number of hops",
     "text": "Number of hops: {{value}}"
   },
   "lastHeard": {
-    "label": "Aktywność",
+    "label": "Последний раз слышен",
     "labelText": "Last heard: {{value}}",
     "nowLabel": "Now"
   },
@@ -193,15 +193,15 @@
     "label": "Unknown number of hops"
   },
   "showUnheard": {
-    "label": "Never heard"
+    "label": "Unknown last heard"
   },
   "language": {
-    "label": "Język",
+    "label": "Язык",
     "changeLanguage": "Change Language"
   },
   "theme": {
-    "dark": "Ciemny",
-    "light": "Jasny",
+    "dark": "Темная",
+    "light": "Светлая",
     "system": "Automatic",
     "changeTheme": "Change Color Scheme"
   },

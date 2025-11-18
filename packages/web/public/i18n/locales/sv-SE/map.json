@@ -1,38 +1,38 @@
 {
   "maplibre": {
-    "GeolocateControl.FindMyLocation": "Find my location",
-    "NavigationControl.ZoomIn": "Zoom in",
-    "NavigationControl.ZoomOut": "Zoom out",
-    "CooperativeGesturesHandler.WindowsHelpText": "Use Ctrl + scroll to zoom the map",
-    "CooperativeGesturesHandler.MacHelpText": "Use ⌘ + scroll to zoom the map",
-    "CooperativeGesturesHandler.MobileHelpText": "Use two fingers to move the map"
+    "GeolocateControl.FindMyLocation": "Hitta min plats",
+    "NavigationControl.ZoomIn": "Zooma in",
+    "NavigationControl.ZoomOut": "Zooma ut",
+    "CooperativeGesturesHandler.WindowsHelpText": "Använd ctrl + scroll för att zooma kartan",
+    "CooperativeGesturesHandler.MacHelpText": "Använd ⌘ + scroll för att zooma kartan",
+    "CooperativeGesturesHandler.MobileHelpText": "Använd två fingrar för att flytta kartan"
   },
   "layerTool": {
-    "nodeMarkers": "Show nodes",
-    "directNeighbors": "Show direct connections",
-    "remoteNeighbors": "Show remote connections",
-    "positionPrecision": "Show position precision",
-    "traceroutes": "Show traceroutes",
-    "waypoints": "Show waypoints"
+    "nodeMarkers": "Visa noder",
+    "directNeighbors": "Visa direktanslutningar",
+    "remoteNeighbors": "Visa fjärranslutningar",
+    "positionPrecision": "Visa positionens precision",
+    "traceroutes": "Visa traceroutes",
+    "waypoints": "Visa vägpunkter"
   },
   "mapMenu": {
-    "locateAria": "Locate my node",
-    "layersAria": "Change map style"
+    "locateAria": "Hitta min nod",
+    "layersAria": "Ändra kartstil"
   },
   "waypointDetail": {
     "edit": "Ändra",
-    "description": "Description:",
-    "createdBy": "Edited by:",
-    "createdDate": "Created:",
-    "updated": "Updated:",
-    "expires": "Expires:",
-    "distance": "Distance:",
-    "bearing": "Absolute bearing:",
-    "lockedTo": "Locked by:",
-    "latitude": "Latitude:",
-    "longitude": "Longitude:"
+    "description": "Beskrivning:",
+    "createdBy": "Ändrad av:",
+    "createdDate": "Skapad:",
+    "updated": "Uppdaterad:",
+    "expires": "Löper ut:",
+    "distance": "Avstånd:",
+    "bearing": "Absolut bäring:",
+    "lockedTo": "Låst av:",
+    "latitude": "Latitud:",
+    "longitude": "Longitud:"
   },
   "myNode": {
-    "tooltip": "This device"
+    "tooltip": "Den här enheten"
   }
 }

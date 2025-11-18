@@ -9,13 +9,13 @@
       "invalidUrl": "Ogiltig Meshtastic URL"
     },
     "channelPrefix": "Kanal: ",
-    "primary": "Primary ",
-    "doNotImport": "No not import",
+    "primary": "Primär ",
+    "doNotImport": "Importera inte",
     "channelName": "Namn",
-    "channelSlot": "Slot",
+    "channelSlot": "Plats",
     "channelSetUrl": "Kanalinställning/QR-kod URL",
-    "useLoraConfig": "Import LoRa Config",
-    "presetDescription": "The current LoRa Config will be replaced.",
+    "useLoraConfig": "Importera LoRa-konfiguration",
+    "presetDescription": "Den nuvarande LoRa-konfigurationen kommer att ersättas.",
     "title": "Importera kanaluppsättning"
   },
   "locationResponse": {
@@ -30,8 +30,8 @@
     "regenerate": "Förnya"
   },
   "addConnection": {
-    "title": "Add connection",
-    "description": "Choose a connection type and fill in the details",
+    "title": "Lägg till anslutning",
+    "description": "Välj en anslutningstyp och fyll i uppgifterna",
     "validation": {
       "requiresWebBluetooth": "Den här anslutningstypen kräver <0>Web Bluetooth</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
       "requiresWebSerial": "Den här anslutningstypen kräver <0>Web Serial</0>. Använd en webbläsare som stöds, till exempel Chrome eller Edge.",
@@ -39,65 +39,65 @@
       "additionallyRequiresSecureContext": "Dessutom kräver den ett <0>säker kontext</0>. Vänligen anslut med HTTPS eller localhost."
     },
     "bluetoothConnection": {
-      "namePlaceholder": "My Bluetooth Node",
+      "namePlaceholder": "Min Bluetooth-nod",
       "supported": {
-        "title": "Web Bluetooth supported"
+        "title": "Web Bluetooth stöds"
       },
       "notSupported": {
-        "title": "Web Bluetooth not supported",
-        "description": "Your browser or device does not support Web Bluetooth"
+        "title": "Web Bluetooth stöds inte",
+        "description": "Din webbläsare eller enhet har inte stöd för Web Bluetooth"
       },
       "short": "BT: {{deviceName}}",
-      "long": "Bluetooth Device",
+      "long": "Bluetooth-enhet",
       "device": "Enhet",
-      "selectDevice": "Select device",
-      "selected": "Bluetooth device selected",
-      "notSelected": "No device selected",
-      "helperText": "Uses the Meshtastic Bluetooth service for discovery."
+      "selectDevice": "Välj enhet",
+      "selected": "Bluetooth-enhet vald",
+      "notSelected": "Ingen enhet vald",
+      "helperText": "Använder Meshtastic Bluetooth-tjänsten för upptäckt."
     },
     "serialConnection": {
-      "namePlaceholder": "My Serial Node",
-      "helperText": "Selecting a port grants permission so the app can open it to connect.",
+      "namePlaceholder": "Min seriella nod",
+      "helperText": "Att välja en port ger behörighet så att appen kan öppna den för att ansluta.",
       "supported": {
-        "title": "Web Serial supported"
+        "title": "Web Serial stöds"
       },
       "notSupported": {
-        "title": "Web Serial not supported",
-        "description": "Your browser or device does not support Web Serial"
+        "title": "Web Serial stöds inte",
+        "description": "Din webbläsare eller enhet har inte stöd för Web Serial"
       },
       "portSelected": {
-        "title": "Serial port selected",
-        "description": "Port permissions granted."
+        "title": "Seriell port vald",
+        "description": "Portbehörigheter beviljade."
       },
       "port": "Port",
-      "selectPort": "Select port",
+      "selectPort": "Välj port",
       "deviceName": "USB {{vendorId}}:{{productId}}",
-      "notSelected": "No port selected"
+      "notSelected": "Ingen port vald"
     },
     "httpConnection": {
-      "namePlaceholder": "My HTTP Node",
-      "inputPlaceholder": "192.168.1.10 or meshtastic.local",
-      "heading": "URL or IP",
-      "useHttps": "Use HTTTPS",
+      "namePlaceholder": "Min HTTP-nod",
+      "inputPlaceholder": "192.168.1.10 eller meshtastic.local",
+      "heading": "URL eller IP",
+      "useHttps": "Använd HTTPS",
       "invalidUrl": {
-        "title": "Invalid URL",
-        "description": "Please enter a valid HTTP or HTTPS URL."
+        "title": "Ogiltig adress",
+        "description": "Ange en giltig HTTP- eller HTTPS-URL."
       },
       "connectionTest": {
-        "description": "Test the connetion before saving to verify the device is reachable.",
+        "description": "Testa konnetionen innan du sparar för att verifiera att enheten är nåbar.",
         "button": {
-          "loading": "Testing...",
-          "label": "Test connection"
+          "loading": "Testar...",
+          "label": "Testa anslutningen"
         },
-        "reachable": "Reachable",
-        "notReachable": "Not reachable",
+        "reachable": "Nåbar",
+        "notReachable": "Kan inte nås",
         "success": {
-          "title": "Connection test successful",
-          "description": "The device appears to be reachable."
+          "title": "Anslutningstest lyckades",
+          "description": "Enheten verkar vara nåbar."
         },
         "failure": {
-          "title": "Connection test failed",
-          "description": "Could not reach the device. Check the URL and try again."
+          "title": "Anslutningen misslyckades",
+          "description": "Kunde inte nå enheten. Kontrollera URL:en och försök igen."
         }
       }
     }
@@ -212,27 +212,27 @@
     "Compromised keys were detected and regenerated.": "Komprometterade nycklar upptäcktes på enheten och nya har genererats."
   },
   "resetNodeDb": {
-    "title": "Reset Node Database",
-    "description": "This will clear all nodes from the connected device's node database and clear all message history in the client. This cannot be undone. Are you sure you want to continue?",
-    "confirm": "Reset Node Database",
-    "failedTitle": "There was an error resetting the Node DB. Please try again."
+    "title": "Återställ noddatabas",
+    "description": "Detta kommer att rensa alla noder från den anslutna enhetens noddatabas och rensa all meddelandehistorik i klienten. Detta kan inte ångras. Är du säker på att du vill fortsätta?",
+    "confirm": "Återställ noddatabas",
+    "failedTitle": "Det gick inte att återställa noddatabasen. Försök igen."
   },
   "clearAllStores": {
-    "title": "Clear All Local Storage",
-    "description": "This will clear all locally stored data, including message history and node databases for all previously connected devices. This will require you to reconnect to your node once complete and cannot be undone. Are you sure you want to continue?",
-    "confirm": "Clear all local storage",
-    "failedTitle": "There was an error clearing local storage. Please try again."
+    "title": "Töm all lokal lagring",
+    "description": "Detta kommer att rensa all lokalt lagrad data, inklusive meddelandehistorik och noddatabaser för alla tidigare anslutna enheter. Detta kommer att kräva att du återansluter till din nod och kan inte ångras. Är du säker på att du vill fortsätta?",
+    "confirm": "Töm all lokal lagring",
+    "failedTitle": "Det gick inte att rensa lokal lagring. Försök igen."
   },
   "factoryResetDevice": {
     "title": "Fabriksåterställ enhet",
-    "description": "This will factory reset the connected device, erasing all configurations and data on the device as well as all nodes and messages saved in the client. This cannot be undone. Are you sure you want to continue?",
+    "description": "Detta kommer fabriksåterställa den anslutna enheten, radera alla konfigurationer och data på enheten samt alla noder och meddelanden som sparats i klienten. Detta kan inte ångras. Är du säker på att du vill fortsätta?",
     "confirm": "Fabriksåterställ enhet",
-    "failedTitle": "There was an error performing the factory reset. Please try again."
+    "failedTitle": "Det gick inte att utföra fabriksåterställningen. Försök igen."
   },
   "factoryResetConfig": {
     "title": "Fabriksåterställ konfigurationen",
-    "description": "This will factory reset the configuration on the connected device, erasing all configurations on the device. This cannot be undone. Are you sure you want to continue?",
+    "description": "Detta kommer fabriksåterställa konfigurationen på den anslutna enheten och radera alla inställningar på enheten. Detta kan inte ångras. Är du säker på att du vill fortsätta?",
     "confirm": "Fabriksåterställ konfigurationen",
-    "failedTitle": "There was an error performing the factory reset. Please try again."
+    "failedTitle": "Det gick inte att utföra fabriksåterställningen. Försök igen."
   }
 }
