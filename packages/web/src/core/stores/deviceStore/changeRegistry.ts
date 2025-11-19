@@ -25,12 +25,16 @@ export type ValidModuleConfigType =
   | "detectionSensor"
   | "paxcounter";
 
+// Admin message types that can be queued
+export type ValidAdminMessageType = "setFixedPosition" | "other";
+
 // Unified config change key type
 export type ConfigChangeKey =
   | { type: "config"; variant: ValidConfigType }
   | { type: "moduleConfig"; variant: ValidModuleConfigType }
   | { type: "channel"; index: Types.ChannelNumber }
-  | { type: "user" };
+  | { type: "user" }
+  | { type: "adminMessage"; variant: ValidAdminMessageType; id: string };
 
 // Serialized key for Map storage
 export type ConfigChangeKeyString = string;
@@ -61,6 +65,8 @@ export function serializeKey(key: ConfigChangeKey): ConfigChangeKeyString {
       return `channel:${key.index}`;
     case "user":
       return "user";
+    case "adminMessage":
+      return `adminMessage:${key.variant}:${key.id}`;
   }
 }
 
@@ -68,23 +74,30 @@ export function serializeKey(key: ConfigChangeKey): ConfigChangeKeyString {
  * Reverse operation for type-safe retrieval
  */
 export function deserializeKey(keyStr: ConfigChangeKeyString): ConfigChangeKey {
-  const [type, variant] = keyStr.split(":");
+  const parts = keyStr.split(":");
+  const type = parts[0];
 
   switch (type) {
     case "config":
-      return { type: "config", variant: variant as ValidConfigType };
+      return { type: "config", variant: parts[1] as ValidConfigType };
     case "moduleConfig":
       return {
         type: "moduleConfig",
-        variant: variant as ValidModuleConfigType,
+        variant: parts[1] as ValidModuleConfigType,
       };
     case "channel":
       return {
         type: "channel",
-        index: Number(variant) as Types.ChannelNumber,
+        index: Number(parts[1]) as Types.ChannelNumber,
       };
     case "user":
       return { type: "user" };
+    case "adminMessage":
+      return {
+        type: "adminMessage",
+        variant: parts[1] as ValidAdminMessageType,
+        id: parts[2] ?? "",
+      };
     default:
       throw new Error(`Unknown key type: ${type}`);
   }
@@ -217,4 +230,31 @@ export function getAllChannelChanges(registry: ChangeRegistry): ChangeEntry[] {
     }
   }
   return changes;
+}
+
+/**
+ * Get all admin message changes as an array
+ */
+export function getAllAdminMessages(registry: ChangeRegistry): ChangeEntry[] {
+  const changes: ChangeEntry[] = [];
+  for (const entry of registry.changes.values()) {
+    if (entry.key.type === "adminMessage") {
+      changes.push(entry);
+    }
+  }
+  return changes;
+}
+
+/**
+ * Get count of admin message changes
+ */
+export function getAdminMessageChangeCount(registry: ChangeRegistry): number {
+  let count = 0;
+  for (const keyStr of registry.changes.keys()) {
+    const key = deserializeKey(keyStr);
+    if (key.type === "adminMessage") {
+      count++;
+    }
+  }
+  return count;
 }

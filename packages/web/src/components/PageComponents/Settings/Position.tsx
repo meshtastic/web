@@ -29,7 +29,7 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
     config,
     getEffectiveConfig,
     removeChange,
-    sendAdminMessage,
+    queueAdminMessage,
   } = useDevice();
   const { getMyNode } = useNodeDB();
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
@@ -59,7 +59,29 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
   }, [config.position, effectiveConfig, currentPosition]);
 
   const onSubmit = (data: PositionValidation) => {
-    // Handle position coordinates separately via admin message if fixedPosition is enabled
+    // Exclude position coordinates from config payload (they're handled via admin message)
+    const {
+      latitude: _latitude,
+      longitude: _longitude,
+      altitude: _altitude,
+      ...configData
+    } = data;
+    const payload = { ...configData, positionFlags: flagsValue };
+
+    // Save config first
+    let configResult: ReturnType<typeof setChange> | undefined;
+    if (deepCompareConfig(config.position, payload, true)) {
+      removeChange({ type: "config", variant: "position" });
+      configResult = undefined;
+    } else {
+      configResult = setChange(
+        { type: "config", variant: "position" },
+        payload,
+        config.position,
+      );
+    }
+
+    // Then handle position coordinates via admin message if fixedPosition is enabled
     if (
       data.fixedPosition &&
       data.latitude !== undefined &&
@@ -77,28 +99,10 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
         },
       });
 
-      sendAdminMessage(message);
+      queueAdminMessage(message);
     }
 
-    // Exclude position coordinates from config payload (they're handled via admin message)
-    const {
-      latitude: _latitude,
-      longitude: _longitude,
-      altitude: _altitude,
-      ...configData
-    } = data;
-    const payload = { ...configData, positionFlags: flagsValue };
-
-    if (deepCompareConfig(config.position, payload, true)) {
-      removeChange({ type: "config", variant: "position" });
-      return;
-    }
-
-    return setChange(
-      { type: "config", variant: "position" },
-      payload,
-      config.position,
-    );
+    return configResult;
   };
 
   const onPositonFlagChange = useCallback(

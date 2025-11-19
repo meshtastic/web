@@ -12,6 +12,8 @@ import {
 import type { ChangeRegistry, ConfigChangeKey } from "./changeRegistry.ts";
 import {
   createChangeRegistry,
+  getAdminMessageChangeCount,
+  getAllAdminMessages,
   getAllChannelChanges,
   getAllConfigChanges,
   getAllModuleConfigChanges,
@@ -146,6 +148,9 @@ export interface Device extends DeviceData {
   getAllConfigChanges: () => Protobuf.Config.Config[];
   getAllModuleConfigChanges: () => Protobuf.ModuleConfig.ModuleConfig[];
   getAllChannelChanges: () => Protobuf.Channel.Channel[];
+  queueAdminMessage: (message: Protobuf.Admin.AdminMessage) => void;
+  getAllQueuedAdminMessages: () => Protobuf.Admin.AdminMessage[];
+  getAdminMessageChangeCount: () => number;
 }
 
 export interface deviceState {
@@ -939,6 +944,59 @@ function deviceFactory(
       return changes
         .map((entry) => entry.value as Protobuf.Channel.Channel)
         .filter((c): c is Protobuf.Channel.Channel => c !== undefined);
+    },
+
+    queueAdminMessage: (message: Protobuf.Admin.AdminMessage) => {
+      // Generate a unique ID for this admin message
+      const messageId = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+      // Determine the variant type
+      const variant =
+        message.payloadVariant.case === "setFixedPosition"
+          ? "setFixedPosition"
+          : "other";
+
+      set(
+        produce<PrivateDeviceState>((draft) => {
+          const device = draft.devices.get(id);
+          if (!device) {
+            return;
+          }
+
+          const keyStr = serializeKey({
+            type: "adminMessage",
+            variant,
+            id: messageId,
+          });
+
+          device.changeRegistry.changes.set(keyStr, {
+            key: { type: "adminMessage", variant, id: messageId },
+            value: message,
+            timestamp: Date.now(),
+          });
+        }),
+      );
+    },
+
+    getAllQueuedAdminMessages: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return [];
+      }
+
+      const changes = getAllAdminMessages(device.changeRegistry);
+      return changes
+        .map((entry) => entry.value as Protobuf.Admin.AdminMessage)
+        .filter((m): m is Protobuf.Admin.AdminMessage => m !== undefined);
+    },
+
+    getAdminMessageChangeCount: () => {
+      const device = get().devices.get(id);
+      if (!device) {
+        return 0;
+      }
+
+      return getAdminMessageChangeCount(device.changeRegistry);
     },
   };
 }
