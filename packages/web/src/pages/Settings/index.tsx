@@ -1,4 +1,5 @@
 import { deviceRoute, moduleRoute, radioRoute } from "@app/routes";
+import { toBinary } from "@bufbuild/protobuf";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
 import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
@@ -6,6 +7,7 @@ import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
+import { Protobuf } from "@meshtastic/core";
 import { DeviceConfig } from "@pages/Settings/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Settings/ModuleConfig.tsx";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
@@ -27,6 +29,7 @@ const ConfigPage = () => {
     getAllConfigChanges,
     getAllModuleConfigChanges,
     getAllChannelChanges,
+    getAllQueuedAdminMessages,
     connection,
     clearAllChanges,
     setConfig,
@@ -35,6 +38,7 @@ const ConfigPage = () => {
     getConfigChangeCount,
     getModuleConfigChangeCount,
     getChannelChangeCount,
+    getAdminMessageChangeCount,
   } = useDevice();
 
   const [isSaving, setIsSaving] = useState(false);
@@ -49,6 +53,7 @@ const ConfigPage = () => {
   const configChangeCount = getConfigChangeCount();
   const moduleConfigChangeCount = getModuleConfigChangeCount();
   const channelChangeCount = getChannelChangeCount();
+  const adminMessageChangeCount = getAdminMessageChangeCount();
 
   const sections = useMemo(
     () => [
@@ -121,6 +126,7 @@ const ConfigPage = () => {
       const channelChanges = getAllChannelChanges();
       const configChanges = getAllConfigChanges();
       const moduleConfigChanges = getAllModuleConfigChanges();
+      const adminMessages = getAllQueuedAdminMessages();
 
       await Promise.all(
         channelChanges.map((channel) =>
@@ -165,6 +171,19 @@ const ConfigPage = () => {
         await connection?.commitEditSettings();
       }
 
+      // Send queued admin messages after configs are committed
+      if (adminMessages.length > 0) {
+        await Promise.all(
+          adminMessages.map((message) =>
+            connection?.sendPacket(
+              toBinary(Protobuf.Admin.AdminMessageSchema, message),
+              Protobuf.Portnums.PortNum.ADMIN_APP,
+              "self",
+            ),
+          ),
+        );
+      }
+
       channelChanges.forEach((newChannel) => {
         addChannel(newChannel);
       });
@@ -206,6 +225,7 @@ const ConfigPage = () => {
     connection,
     getAllModuleConfigChanges,
     getAllChannelChanges,
+    getAllQueuedAdminMessages,
     formMethods,
     addChannel,
     setConfig,
@@ -244,7 +264,8 @@ const ConfigPage = () => {
   const hasDrafts =
     getConfigChangeCount() > 0 ||
     getModuleConfigChangeCount() > 0 ||
-    getChannelChangeCount() > 0;
+    getChannelChangeCount() > 0 ||
+    adminMessageChangeCount > 0;
   const hasPending = hasDrafts || rhfState.isDirty;
   const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
   const saveDisabled = isSaving || !rhfState.isValid || !hasPending;
@@ -312,7 +333,7 @@ const ConfigPage = () => {
       label={activeSection?.label ?? ""}
       actions={actions}
     >
-      <ActiveComponent onFormInit={onFormInit} />
+      {ActiveComponent && <ActiveComponent onFormInit={onFormInit} />}
     </PageLayout>
   );
 };
