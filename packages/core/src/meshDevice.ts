@@ -931,6 +931,10 @@ export class MeshDevice {
       from: meshPacket.from,
       to: meshPacket.to,
       channel: meshPacket.channel,
+      hops: meshPacket.hopStart - meshPacket.hopLimit,
+      rxRssi: meshPacket.rxRssi,
+      rxSnr: meshPacket.rxSnr,
+      viaMqtt: meshPacket.viaMqtt,
     };
 
     this.log.trace(
