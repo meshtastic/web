@@ -1,41 +1,41 @@
 {
-  "emptyState": "No results found.",
+  "emptyState": "Результаты не найдены..",
   "page": {
-    "title": "Command Menu"
+    "title": "Меню"
   },
   "pinGroup": {
-    "label": "Pin command group"
+    "label": "Закрепить меню"
   },
   "unpinGroup": {
-    "label": "Unpin command group"
+    "label": "Открепить меню"
   },
   "goto": {
-    "label": "Goto",
+    "label": "Перейти",
     "command": {
       "messages": "Сообщения",
       "map": "Карта",
-      "config": "Config",
+      "config": "Настройка",
       "nodes": "Узлы"
     }
   },
   "manage": {
-    "label": "Manage",
+    "label": "Управление",
     "command": {
-      "switchNode": "Switch Node",
-      "connectNewNode": "Connect New Node"
+      "switchNode": "Выбрать узел",
+      "connectNewNode": "Подключить новый узел"
     }
   },
   "contextual": {
-    "label": "Contextual",
+    "label": "Контекст",
     "command": {
-      "qrCode": "QR Code",
-      "qrGenerator": "Generator",
+      "qrCode": "QR Код",
+      "qrGenerator": "Генератор",
       "qrImport": "Импортировать",
-      "scheduleShutdown": "Schedule Shutdown",
-      "scheduleReboot": "Reboot Device",
-      "resetNodeDb": "Reset Node DB",
+      "scheduleShutdown": "Расписание выключения",
+      "scheduleReboot": "Перезагрузить устройство",
+      "resetNodeDb": "Стереть базу данных узлов",
       "dfuMode": "Войти в режим DFU",
-      "factoryResetDevice": "Factory Reset Device",
+      "factoryResetDevice": "Сброс устройства к заводским установкам",
       "factoryResetConfig": "Factory Reset Config",
       "disconnect": "Отключиться"
     }
@@ -43,9 +43,9 @@
   "debug": {
     "label": "Debug",
     "command": {
-      "reconfigure": "Reconfigure",
-      "clearAllStoredMessages": "Clear All Stored Messages",
-      "clearAllStores": "Clear All Local Storage"
+      "reconfigure": "Перенастроить",
+      "clearAllStoredMessages": "Удалить все сохранённые сообщения",
+      "clearAllStores": "Очистить всё локальное хранилище"
     }
   }
 }

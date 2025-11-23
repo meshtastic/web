@@ -1,94 +1,94 @@
 {
   "button": {
     "apply": "Применить",
-    "addConnection": "Add Connection",
-    "saveConnection": "Save connection",
-    "backupKey": "Backup Key",
+    "addConnection": "Добавить подключение",
+    "saveConnection": "Сохранить подключение",
+    "backupKey": "Бэкап ключа",
     "cancel": "Отмена",
     "connect": "Подключиться",
-    "clearMessages": "Clear Messages",
+    "clearMessages": "Очистить сообщения",
     "close": "Закрыть",
-    "confirm": "Confirm",
+    "confirm": "Подтвердить",
     "delete": "Удалить",
     "dismiss": "Отменить",
     "download": "Скачать",
     "disconnect": "Отключиться",
-    "export": "Export",
-    "generate": "Generate",
-    "regenerate": "Regenerate",
+    "export": "Экспорт",
+    "generate": "Создать",
+    "regenerate": "Создать снова",
     "import": "Импортировать",
     "message": "Сообщение",
-    "now": "Now",
+    "now": "Сейчас",
     "ok": "Лады",
-    "print": "Print",
+    "print": "Печать",
     "remove": "Удалить",
-    "requestNewKeys": "Request New Keys",
-    "requestPosition": "Request Position",
+    "requestNewKeys": "Запрос нового ключа",
+    "requestPosition": "Запрос позиции",
     "reset": "Сброс",
-    "retry": "Retry",
+    "retry": "Повторить",
     "save": "Сохранить",
-    "setDefault": "Set as default",
-    "unsetDefault": "Unset default",
+    "setDefault": "Установить по умолчанию",
+    "unsetDefault": "Убрать умолчание",
     "scanQr": "Сканировать QR код",
-    "traceRoute": "Trace Route",
-    "submit": "Submit"
+    "traceRoute": "Отследить маршрут",
+    "submit": "Отправить"
   },
   "app": {
     "title": "Meshtastic",
-    "fullTitle": "Meshtastic Web Client"
+    "fullTitle": "Веб клиент Meshtastic"
   },
-  "loading": "Loading...",
+  "loading": "Загрузка...",
   "unit": {
     "cps": "CPS",
     "dbm": "dBm",
-    "hertz": "Hz",
+    "hertz": "Гц",
     "hop": {
-      "one": "Hop",
-      "plural": "Hops"
+      "one": "Прыжок",
+      "plural": "Прыжков"
     },
     "hopsAway": {
-      "one": "{{count}} hop away",
-      "plural": "{{count}} hops away",
-      "unknown": "Unknown hops away"
+      "one": "{{count}} прыжок до",
+      "plural": "{{count}} прыжков",
+      "unknown": "? прыжков"
     },
-    "megahertz": "MHz",
+    "megahertz": "МГц",
     "raw": "raw",
     "meter": {
-      "one": "Meter",
-      "plural": "Meters",
-      "suffix": "m"
+      "one": "Метр",
+      "plural": "Метров",
+      "suffix": "м"
     },
     "kilometer": {
-      "one": "Kilometer",
-      "plural": "Kilometers",
-      "suffix": "km"
+      "one": "Километр",
+      "plural": "Километров",
+      "suffix": "км"
     },
     "minute": {
-      "one": "Minute",
-      "plural": "Minutes"
+      "one": "Минута",
+      "plural": "Минут"
     },
     "hour": {
-      "one": "Hour",
-      "plural": "Hours"
+      "one": "Час",
+      "plural": "Часов"
     },
     "millisecond": {
-      "one": "Millisecond",
-      "plural": "Milliseconds",
-      "suffix": "ms"
+      "one": "Миллисекунда",
+      "plural": "Миллисекунд",
+      "suffix": "мс"
     },
     "second": {
-      "one": "Second",
-      "plural": "Seconds"
+      "one": "Секунда",
+      "plural": "Секунд"
     },
     "day": {
-      "one": "Day",
-      "plural": "Days",
-      "today": "Today",
-      "yesterday": "Yesterday"
+      "one": "День",
+      "plural": "Дней",
+      "today": "Сегодня",
+      "yesterday": "Вчера"
     },
     "month": {
-      "one": "Month",
-      "plural": "Months"
+      "one": "Месяц",
+      "plural": "Месяцев"
     },
     "year": {
       "one": "Year",

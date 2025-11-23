@@ -39,7 +39,7 @@
       "longName": "Long Name",
       "connection": "Connection",
       "lastHeard": "Last Heard",
-      "encryption": "Encryption",
+      "encryption": "Cifrado",
       "model": "Model",
       "macAddress": "MAC Address"
     },
