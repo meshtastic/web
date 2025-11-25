@@ -164,6 +164,9 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               properties: {
                 step: 0.0000001,
                 suffix: "Degrees",
+                fieldLength: {
+                  max: 10,
+                },
               },
               disabledBy: [
                 {
@@ -179,6 +182,9 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
               properties: {
                 step: 0.0000001,
                 suffix: "Degrees",
+                fieldLength: {
+                  max: 10,
+                },
               },
               disabledBy: [
                 {
