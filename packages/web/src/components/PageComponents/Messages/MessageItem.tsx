@@ -216,6 +216,19 @@ export const MessageItem = ({ message }: MessageItemProps) => {
             <span className="font-medium text-sm text-slate-900 dark:text-slate-100 truncate mr-1">
               {displayName}
             </span>
+            {message.viaMqtt && (
+                <TooltipProvider delayDuration={300}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-lg text-slate-800 dark:text-slate-200 -mt-6 h-1">☁️</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
+                      MQTT
+                      <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+            )}
             {messageDate && (
               <time
                 dateTime={messageDate.toISOString()}
@@ -245,23 +258,10 @@ export const MessageItem = ({ message }: MessageItemProps) => {
               <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words">
                 {message.message}
               </div>
-              {message.viaMqtt && (
-              <TooltipProvider delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="text-lg text-slate-800 dark:text-slate-200 mt-[-3px] h-1">☁️</span>
-                  </TooltipTrigger>
-                  <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-                    MQTT
-                    <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              )}
               {message.hops && (
-              <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words">{t("hops.text", {value: message.hops})}</div>
+              <div className="text-sm text-slate-500 dark:text-slate-200 whitespace-pre-wrap break-words">{t("hops.text", {value: message.hops})}</div>
               ) || message.rxSnr && message.rxRssi && (
-              <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words">SNR: {message.rxSnr}, RSSI: {message.rxRssi}</div>
+              <div className="text-sm text-slate-500 dark:text-slate-200 whitespace-pre-wrap break-words">SNR: {message.rxSnr}, RSSI: {message.rxRssi}</div>
               ) || ""}
             </div>
           )}

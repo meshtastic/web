@@ -931,7 +931,7 @@ export class MeshDevice {
       from: meshPacket.from,
       to: meshPacket.to,
       channel: meshPacket.channel,
-      hops: meshPacket.hopStart - meshPacket.hopLimit,
+      hops: Math.min(meshPacket.hopStart - meshPacket.hopLimit, 0),
       rxRssi: meshPacket.rxRssi,
       rxSnr: meshPacket.rxSnr,
       viaMqtt: meshPacket.viaMqtt,
