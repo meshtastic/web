@@ -135,7 +135,7 @@ export const DeviceInfoPanel = ({
 
     {
       id: "language",
-      label: t("languagePickeer.label"),
+      label: t("languagePicker.label"),
       icon: Languages,
       render: () => <LanguageSwitcher />,
     },
