@@ -8,6 +8,7 @@ import {
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
 import { useDevice } from "@core/stores";
+import { Protobuf } from "@meshtastic/core";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";
 
@@ -18,8 +19,16 @@ interface RangeTestModuleConfigProps {
 export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "rangeTest" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
+  const { moduleConfig, channels, activeNode, setChange, getEffectiveModuleConfig, removeChange } =
     useDevice();
+  const primaryChannel = channels.get(0 as Protobuf.Types.ChannelNumber);
+  const isPrimaryChannelPublic = (() => {
+    if (!primaryChannel) return false;
+    const pskBytes = primaryChannel.settings?.psk;
+    const hexLen = pskBytes instanceof Uint8Array ? pskBytes.length : 0;
+    // Treat very short/absent keys as effectively "public"/unencrypted.
+    return hexLen === 0 || hexLen === 1;
+  })();
 
   const { t } = useTranslation("moduleConfig");
 
@@ -38,11 +47,24 @@ export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
 
   return (
     <DynamicForm<RangeTestValidation>
+      isDisabled={isPrimaryChannelPublic}
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={RangeTestValidationSchema}
-      defaultValues={moduleConfig.rangeTest}
-      values={getEffectiveModuleConfig("rangeTest")}
+      defaultValues={{
+        ...moduleConfig.rangeTest,
+        enabled:
+          isPrimaryChannelPublic
+            ? false
+            : moduleConfig.rangeTest?.enabled ?? false,
+      }}
+      values={{
+        ...getEffectiveModuleConfig("rangeTest"),
+        enabled:
+          isPrimaryChannelPublic
+            ? false
+            : getEffectiveModuleConfig("rangeTest")?.enabled ?? false,
+      }}
       fieldGroups={[
         {
           label: t("rangeTest.title"),
