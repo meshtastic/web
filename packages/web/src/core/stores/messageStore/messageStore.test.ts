@@ -56,7 +56,7 @@ const directMessageToOther1: Message = {
   rxSnr: 1,
   rxRssi: 2,
   viaMqtt: false,
-  hops: 3
+  hops: 3,
 };
 
 const directMessageFromOther1: Message = {
@@ -71,7 +71,7 @@ const directMessageFromOther1: Message = {
   rxSnr: 1,
   rxRssi: 2,
   viaMqtt: false,
-  hops: 3
+  hops: 3,
 };
 
 const directMessageToOther2: Message = {
@@ -86,7 +86,7 @@ const directMessageToOther2: Message = {
   rxSnr: 1,
   rxRssi: 2,
   viaMqtt: false,
-  hops: 3
+  hops: 3,
 };
 
 const broadcastMessage1: Message = {
@@ -101,7 +101,7 @@ const broadcastMessage1: Message = {
   rxSnr: 1,
   rxRssi: 2,
   viaMqtt: false,
-  hops: 3
+  hops: 3,
 };
 
 const broadcastMessage2: Message = {
@@ -116,7 +116,7 @@ const broadcastMessage2: Message = {
   rxSnr: 1,
   rxRssi: 2,
   viaMqtt: false,
-  hops: 3
+  hops: 3,
 };
 
 describe("MessageStore persistence & rehydrate", () => {
@@ -787,7 +787,7 @@ describe("MessageStore persistence & rehydrate", () => {
             rxSnr: 1,
             rxRssi: 2,
             viaMqtt: false,
-            hops: 3
+            hops: 3,
           });
         }
 
