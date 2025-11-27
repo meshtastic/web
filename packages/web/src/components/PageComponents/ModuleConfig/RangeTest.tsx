@@ -11,6 +11,7 @@ import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
 import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { useTranslation } from "react-i18next";
+import { useCallback } from "react";
 
 interface RangeTestModuleConfigProps {
   onFormInit: DynamicFormFormInit<RangeTestValidation>;
@@ -21,14 +22,23 @@ export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
 
   const { moduleConfig, channels, activeNode, setChange, getEffectiveModuleConfig, removeChange } =
     useDevice();
+
   const primaryChannel = channels.get(0 as Protobuf.Types.ChannelNumber);
-  const isPrimaryChannelPublic = (() => {
-    if (!primaryChannel) return false;
-    const pskBytes = primaryChannel.settings?.psk;
-    const hexLen = pskBytes instanceof Uint8Array ? pskBytes.length : 0;
-    // Treat very short/absent keys as effectively "public"/unencrypted.
-    return hexLen === 0 || hexLen === 1;
-  })();
+
+  const isChannelPublic = useCallback(
+    (channel?: Protobuf.Channel.Channel): boolean => {
+      if (!channel) return false;
+
+      const pskBytes = channel.settings?.psk;
+      const hexLen = pskBytes instanceof Uint8Array ? pskBytes.length : 0;
+
+      // Treat very short/absent keys as effectively "public"/unencrypted.
+      return hexLen === 0 || hexLen === 1;
+    },
+    [],
+  );
+
+  const isPrimaryChannelPublic = isChannelPublic(primaryChannel);
 
   const { t } = useTranslation("moduleConfig");
 
@@ -47,24 +57,11 @@ export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
 
   return (
     <DynamicForm<RangeTestValidation>
-      isDisabled={isPrimaryChannelPublic}
       onSubmit={onSubmit}
       onFormInit={onFormInit}
       validationSchema={RangeTestValidationSchema}
-      defaultValues={{
-        ...moduleConfig.rangeTest,
-        enabled:
-          isPrimaryChannelPublic
-            ? false
-            : moduleConfig.rangeTest?.enabled ?? false,
-      }}
-      values={{
-        ...getEffectiveModuleConfig("rangeTest"),
-        enabled:
-          isPrimaryChannelPublic
-            ? false
-            : getEffectiveModuleConfig("rangeTest")?.enabled ?? false,
-      }}
+      defaultValues={moduleConfig.rangeTest}
+      values={getEffectiveModuleConfig("rangeTest")}
       fieldGroups={[
         {
           label: t("rangeTest.title"),
@@ -104,6 +101,7 @@ export const RangeTest = ({ onFormInit }: RangeTestModuleConfigProps) => {
           ],
         },
       ]}
+      isDisabled={isPrimaryChannelPublic}
     />
   );
 };
