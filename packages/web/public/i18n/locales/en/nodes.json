@@ -47,6 +47,9 @@
       "direct": "Direct",
       "away": "away",
       "viaMqtt": ", via MQTT"
+    },
+    "lastHeardStatus": {
+      "never": "Never"
     }
   },
 

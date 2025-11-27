@@ -4,6 +4,7 @@ import {
   Tooltip,
   TooltipArrow,
   TooltipContent,
+  TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
 } from "@components/UI/Tooltip.tsx";
@@ -78,10 +79,12 @@ export const Avatar = ({
                 }}
               />
             </TooltipTrigger>
-            <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-              {t("nodeDetail.favorite.label", { ns: "nodes" })}
-              <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
-            </TooltipContent>
+            <TooltipPortal>
+              <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
+                {t("nodeDetail.favorite.label", { ns: "nodes" })}
+                <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
+              </TooltipContent>
+            </TooltipPortal>
           </Tooltip>
         </TooltipProvider>
       ) : null}
@@ -94,10 +97,12 @@ export const Avatar = ({
                 aria-hidden="true"
               />
             </TooltipTrigger>
-            <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
-              {t("nodeDetail.error.label", { ns: "nodes" })}
-              <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
-            </TooltipContent>
+            <TooltipPortal>
+              <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
+                {t("nodeDetail.error.label", { ns: "nodes" })}
+                <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
+              </TooltipContent>
+            </TooltipPortal>
           </Tooltip>
         </TooltipProvider>
       ) : null}
