@@ -86,6 +86,10 @@ export const decodePacket = (device: MeshDevice) =>
                   type: "direct",
                   channel: Types.ChannelNumber.Primary,
                   data: decodedMessage.payloadVariant.value.position,
+                  hops: 0,
+                  rxRssi: 0,
+                  rxSnr: 0,
+                  viaMqtt: false,
                 });
               }
 
@@ -99,6 +103,10 @@ export const decodePacket = (device: MeshDevice) =>
                   type: "direct",
                   channel: Types.ChannelNumber.Primary,
                   data: decodedMessage.payloadVariant.value.user,
+                  hops: 0,
+                  rxRssi: 0,
+                  rxSnr: 0,
+                  viaMqtt: false,
                 });
               }
               break;
@@ -238,6 +246,10 @@ export const decodePacket = (device: MeshDevice) =>
                 type: "direct",
                 channel: Types.ChannelNumber.Primary,
                 data: decodedMessage.payloadVariant.value,
+                hops: 0,
+                rxRssi: 0,
+                rxSnr: 0,
+                viaMqtt: false,
               });
               break;
             }

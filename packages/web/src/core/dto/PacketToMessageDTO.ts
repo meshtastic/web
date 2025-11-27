@@ -11,6 +11,10 @@ class PacketToMessageDTO {
   state: MessageState;
   message: string;
   type: MessageType;
+  hops: number;
+  rxRssi: number;
+  rxSnr: number;
+  viaMqtt: boolean;
 
   constructor(data: Types.PacketMetadata<string>, nodeNum: number) {
     this.channel = data.channel;
@@ -36,6 +40,10 @@ class PacketToMessageDTO {
       );
     }
     this.date = dateTimestamp;
+    this.hops = data.hops;
+    this.rxRssi = data.rxRssi;
+    this.rxSnr = data.rxSnr;
+    this.viaMqtt = data.viaMqtt;
   }
 
   toMessage(): Message {
@@ -48,6 +56,10 @@ class PacketToMessageDTO {
       state: this.state,
       message: this.message,
       type: this.type,
+      hops: this.hops,
+      rxRssi: this.rxRssi,
+      rxSnr: this.rxSnr,
+      viaMqtt: this.viaMqtt,
     };
   }
 }
