@@ -283,7 +283,19 @@
     },
     "fixedPosition": {
       "description": "Don't report GPS position, but a manually-specified one",
-      "label": "Fixed Position"
+      "label": "Fixed Position",
+      "latitude": {
+        "label": "Latitude",
+        "description": "Decimal degrees between -90 and 90 (e.g., 37.7749)"
+      },
+      "longitude": {
+        "label": "Longitude",
+        "description": "Decimal degrees between -180 and 180 (e.g., -122.4194)"
+      },
+      "altitude": {
+        "label": "Altitude",
+        "description": "Optional — enter the altitude in {{unit}} above sea level (e.g., 100). Leave blank if unknown or add extra height for antennas/masts."
+      }
     },
     "gpsMode": {
       "description": "Configure whether device GPS is Enabled, Disabled, or Not Present",
