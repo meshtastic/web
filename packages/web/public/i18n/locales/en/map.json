@@ -13,7 +13,9 @@
     "remoteNeighbors": "Show remote connections",
     "positionPrecision": "Show position precision",
     "traceroutes": "Show traceroutes",
-    "waypoints": "Show waypoints"
+    "waypoints": "Show waypoints",
+    "heatmap": "Show heatmap",
+    "density": "Density"
   },
   "mapMenu": {
     "locateAria": "Locate my node",
