@@ -10,19 +10,18 @@ export type HeatmapMode = "density" | "snr";
 export interface HeatmapLayerProps {
   id: string;
   filteredNodes: Protobuf.Mesh.NodeInfo[];
-  isVisible: boolean;
   mode: HeatmapMode;
 }
 
 export const HeatmapLayer = ({
   id,
   filteredNodes,
-  isVisible,
   mode,
 }: HeatmapLayerProps) => {
   const data: FeatureCollection = useMemo(() => {
     const features: Feature[] = filteredNodes
       .filter((node) => hasPos(node.position))
+      .filter((node) => mode !== "snr" || node.snr !== undefined)
       .map((node) => ({
         type: "Feature",
         geometry: {
@@ -30,7 +29,7 @@ export const HeatmapLayer = ({
           coordinates: toLngLat(node.position),
         },
         properties: {
-          snr: node.snr ?? -120,
+          snr: node.snr,
           name: node.user?.longName,
           shortName: node.user?.shortName,
           num: node.num,
@@ -41,11 +40,7 @@ export const HeatmapLayer = ({
       type: "FeatureCollection",
       features,
     };
-  }, [filteredNodes]);
-
-  if (!isVisible) {
-    return null;
-  }
+  }, [filteredNodes, mode]);
 
   const paintProps: HeatmapLayerSpecification["paint"] = useMemo(
     () => ({
@@ -88,7 +83,7 @@ export const HeatmapLayer = ({
       // Opacity 0.7 to be visible but not blocking
       "heatmap-opacity": 0.7,
     }),
-    [mode]
+    [mode],
   );
 
   return (

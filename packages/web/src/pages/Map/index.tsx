@@ -119,7 +119,12 @@ const MapPage = () => {
         mode={heatmapMode}
       />
     ),
-    [filteredNodes, visibilityState.heatmap, heatmapMode, heatmapLayerElementId],
+    [
+      filteredNodes,
+      visibilityState.heatmap,
+      heatmapMode,
+      heatmapLayerElementId,
+    ],
   );
 
   const onMouseMove = useCallback(
@@ -171,7 +176,7 @@ const MapPage = () => {
         setSnrHover(undefined);
       }
     },
-    [getNode, t],
+    [getNode, t, heatmapLayerElementId],
   );
 
   // Node markers & clusters
