@@ -54,7 +54,7 @@ export const HeatmapLayer = ({
         : ["interpolate", ["linear"], ["get", "snr"], -20, 0, 10, 1],
     "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 0, 1, 15, 3],
     // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
-    // Begin color ramp at 0-stop with a 0-transparancy color
+    // Begin color ramp at 0-stop with a 0-transparency color
     // to create a blur-like effect.
     "heatmap-color": [
       "interpolate",
