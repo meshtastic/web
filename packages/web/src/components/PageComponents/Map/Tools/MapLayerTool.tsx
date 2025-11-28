@@ -75,7 +75,7 @@ export function MapLayerTool({
 
   const handleCheckboxChange = (key: keyof VisibilityState) => {
     if (key === "heatmap" && !visibilityState.heatmap) {
-      // If turning heatmap off, turn everything else off so the layer is visible
+      // If turning heatmap on, turn everything else off so the layer is visible
       setVisibilityState({
         nodeMarkers: false,
         directNeighbors: false,
