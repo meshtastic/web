@@ -139,17 +139,15 @@ const MapPage = () => {
           hoveredFeature.layer.id === `${heatmapLayerElementId}-interaction` &&
           name !== undefined
         ) {
-          const displayName =
-            name ||
-            shortName ||
-            t("fallbackName", {
-              last4: numberToHexUnpadded(num).slice(-4).toUpperCase(),
-            });
-
           setSnrHover({
             pos: { x, y },
             snr: snr, // Single node SNR
-            from: displayName,
+            from:
+              name ||
+              shortName ||
+              t("fallbackName", {
+                last4: numberToHexUnpadded(num).slice(-4).toUpperCase(),
+              }),
             to: undefined, // Single node
           });
           return;
