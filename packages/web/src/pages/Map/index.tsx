@@ -136,7 +136,7 @@ const MapPage = () => {
 
         // Handle Heatmap Hover
         if (
-          hoveredFeature.layer.id.includes("interaction") &&
+          hoveredFeature.layer.id === `${heatmapLayerElementId}-interaction` &&
           name !== undefined
         ) {
           const displayName =
