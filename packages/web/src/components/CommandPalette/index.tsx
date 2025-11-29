@@ -1,4 +1,4 @@
-import { Avatar } from "@components/UI/Avatar.tsx";
+import { Avatar } from "@components/ui/avatar.tsx";
 import {
   CommandDialog,
   CommandEmpty,
@@ -6,7 +6,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@components/UI/Command.tsx";
+} from "@components/ui/command.tsx";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
 import {
   useAppStore,

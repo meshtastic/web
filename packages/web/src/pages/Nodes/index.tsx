@@ -14,8 +14,8 @@ import {
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
 import { Sidebar } from "@components/Sidebar.tsx";
-import { Avatar } from "@components/UI/Avatar.tsx";
-import { Input } from "@components/UI/Input.tsx";
+import { Avatar } from "@components/ui/avatar.tsx";
+import { Input } from "@components/ui/input.tsx";
 import useLang from "@core/hooks/useLang.ts";
 import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { Protobuf, type Types } from "@meshtastic/core";

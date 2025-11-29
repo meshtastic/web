@@ -1,5 +1,5 @@
 import { TimeAgo } from "@components/generic/TimeAgo";
-import { Separator } from "@components/UI/Separator.tsx";
+import { Separator } from "@components/ui/separator.tsx";
 import type { WaypointWithMetadata } from "@core/stores";
 import { useNodeDB } from "@core/stores";
 import {

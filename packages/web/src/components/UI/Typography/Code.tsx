@@ -1,9 +1,0 @@
-export interface CodeProps {
-  children: React.ReactNode;
-}
-
-export const Code = ({ children }: CodeProps) => (
-  <code className="relative rounded-sm bg-slate-100 px-[0.3rem] py-[0.2rem] text-sm font-semibold font-mono text-slate-900 dark:bg-slate-800 dark:text-slate-400">
-    {children}
-  </code>
-);

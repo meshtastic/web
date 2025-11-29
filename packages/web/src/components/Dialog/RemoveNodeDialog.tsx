@@ -1,4 +1,4 @@
-import { Label } from "@components/UI/Label.tsx";
+import { Label } from "@components/ui/label.tsx";
 import { useAppStore, useDevice, useNodeDB } from "@core/stores";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";

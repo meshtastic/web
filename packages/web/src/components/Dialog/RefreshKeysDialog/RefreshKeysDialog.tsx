@@ -1,11 +1,11 @@
-import { Button } from "@components/UI/Button.tsx";
+import { Button } from "@components/ui/button.tsx";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.tsx";
+} from "@components/ui/dialog.tsx";
 import { useMessages, useNodeDB } from "@core/stores";
 import { LockKeyholeOpenIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";

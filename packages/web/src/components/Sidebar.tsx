@@ -1,8 +1,8 @@
 import { useFirstSavedConnection } from "@app/core/stores/deviceStore/selectors.ts";
-import { SidebarButton } from "@components/UI/Sidebar/SidebarButton.tsx";
-import { SidebarSection } from "@components/UI/Sidebar/SidebarSection.tsx";
-import { Spinner } from "@components/UI/Spinner.tsx";
-import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { SidebarButton } from "@components/ui/sidebar/sidebar-button.tsx";
+import { SidebarSection } from "@components/ui/sidebar/sidebar-section.tsx";
+import { Spinner } from "@components/ui/spinner.tsx";
+import { Subtle } from "@components/ui/typography/subtle.tsx";
 import {
   type Page,
   useActiveConnection,

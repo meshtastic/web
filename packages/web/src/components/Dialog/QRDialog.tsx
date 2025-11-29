@@ -7,9 +7,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.tsx";
-import { Input } from "@components/UI/Input.tsx";
-import { Label } from "@components/UI/Label.tsx";
+} from "@components/ui/dialog.tsx";
+import { Input } from "@components/ui/input.tsx";
+import { Label } from "@components/ui/label.tsx";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { fromByteArray } from "base64-js";
 import { useEffect, useMemo, useState } from "react";

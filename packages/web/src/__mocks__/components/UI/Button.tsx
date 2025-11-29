@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 
-vi.mock("@components/UI/Button.tsx", () => ({
+vi.mock("@components/ui/button.tsx", () => ({
   Button: ({
     children,
     name,

@@ -1,5 +1,5 @@
-import { Button } from "@components/UI/Button.tsx";
-import { Checkbox } from "@components/UI/Checkbox/index.tsx";
+import { Button } from "@components/ui/button.tsx";
+import { Checkbox } from "@components/ui/checkbox.tsx";
 import {
   Dialog,
   DialogClose,
@@ -7,10 +7,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.tsx";
-import { Input } from "@components/UI/Input.tsx";
-import { Label } from "@components/UI/Label.tsx";
-import { Separator } from "@components/UI/Separator.tsx";
+} from "@components/ui/dialog.tsx";
+import { Input } from "@components/ui/input.tsx";
+import { Label } from "@components/ui/label.tsx";
+import { Separator } from "@components/ui/separator.tsx";
 import { useDevice } from "@core/stores";
 import { ClockIcon, OctagonXIcon, RefreshCwIcon } from "lucide-react";
 import { useState } from "react";

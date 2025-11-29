@@ -1,12 +1,12 @@
 import { Channel } from "@app/components/PageComponents/Channels/Channel";
-import { Button } from "@components/UI/Button.tsx";
-import { Spinner } from "@components/UI/Spinner.tsx";
+import { Button } from "@components/ui/button.tsx";
+import { Spinner } from "@components/ui/spinner.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@components/UI/Tabs.tsx";
+} from "@components/ui/tabs.tsx";
 import { useDevice } from "@core/stores";
 import type { Protobuf } from "@meshtastic/core";
 import i18next from "i18next";

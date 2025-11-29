@@ -1,4 +1,4 @@
-import { Button } from "@components/UI/Button.tsx";
+import { Button } from "@components/ui/button.tsx";
 import useLocalStorage from "@core/hooks/useLocalStorage.ts";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useCallback, useEffect, useRef } from "react";

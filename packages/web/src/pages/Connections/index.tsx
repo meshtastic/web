@@ -18,23 +18,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@components/UI/AlertDialog.tsx";
-import { Badge } from "@components/UI/Badge.tsx";
-import { Button } from "@components/UI/Button.tsx";
+} from "@components/ui/alert-dialog.tsx";
+import { Badge } from "@components/ui/badge.tsx";
+import { Button } from "@components/ui/button.tsx";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@components/UI/Card.tsx";
+} from "@components/ui/card.tsx";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@components/UI/DropdownMenu.tsx";
-import { Separator } from "@components/UI/Separator.tsx";
+} from "@components/ui/dropdown-menu.tsx";
+import { Separator } from "@components/ui/separator.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useNavigate } from "@tanstack/react-router";
 import {

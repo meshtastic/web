@@ -9,7 +9,7 @@ import {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MessageInput, type MessageInputProps } from "./MessageInput.tsx";
 
-vi.mock("@components/UI/Button.tsx", () => ({
+vi.mock("@components/ui/button.tsx", () => ({
   Button: vi.fn(({ type, className, children, onClick, onSubmit, ...rest }) => (
     <button
       type={type}
@@ -23,7 +23,7 @@ vi.mock("@components/UI/Button.tsx", () => ({
   )),
 }));
 
-vi.mock("@components/UI/Input.tsx", () => ({
+vi.mock("@components/ui/input.tsx", () => ({
   Input: vi.fn(({ minLength, name, placeholder, value, onChange }) => (
     <input
       minLength={minLength}

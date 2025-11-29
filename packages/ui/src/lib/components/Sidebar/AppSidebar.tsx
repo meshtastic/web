@@ -23,7 +23,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils.ts";
 
 export interface AppSidebarProps {
   children?: React.ReactNode;

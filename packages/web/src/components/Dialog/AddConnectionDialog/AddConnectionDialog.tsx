@@ -5,16 +5,16 @@ import type {
   NewConnection,
 } from "@app/core/stores/deviceStore/types.ts";
 import { testHttpReachable } from "@app/pages/Connections/utils";
-import { Button } from "@components/UI/Button.tsx";
-import { Input } from "@components/UI/Input.tsx";
-import { Label } from "@components/UI/Label.tsx";
+import { Button } from "@components/ui/button.tsx";
+import { Input } from "@components/ui/input.tsx";
+import { Label } from "@components/ui/label.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@components/UI/Tabs.tsx";
-import { Link } from "@components/UI/Typography/Link.tsx";
+} from "@components/ui/tabs.tsx";
+import { Link } from "@components/ui/typography/link.tsx";
 import {
   type BrowserFeature,
   useBrowserFeatureDetection,

@@ -4,9 +4,9 @@ import {
   type FieldProps,
 } from "@components/Form/DynamicFormField.tsx";
 import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
-import { Button } from "@components/UI/Button.tsx";
-import { Heading } from "@components/UI/Typography/Heading.tsx";
-import { Subtle } from "@components/UI/Typography/Subtle.tsx";
+import { Button } from "@components/ui/button.tsx";
+import { Heading } from "@components/ui/typography/heading.tsx";
+import { Subtle } from "@components/ui/typography/subtle.tsx";
 import { useEffect } from "react";
 import {
   type Control,

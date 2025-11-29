@@ -7,13 +7,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.tsx";
+} from "@components/ui/dialog.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@components/UI/Tabs.tsx";
+} from "@components/ui/tabs.tsx";
 import {
   type BrowserFeature,
   useBrowserFeatureDetection,

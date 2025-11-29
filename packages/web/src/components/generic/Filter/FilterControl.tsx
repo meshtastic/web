@@ -6,13 +6,13 @@ import {
 } from "@components/generic/Filter/FilterComponents.tsx";
 import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
-import { Accordion } from "@components/UI/Accordion.tsx";
-import { Input } from "@components/UI/Input.tsx";
+import { Accordion } from "@components/ui/accordion.tsx";
+import { Input } from "@components/ui/input.tsx";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@components/UI/Popover.tsx";
+} from "@components/ui/popover.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { debounce } from "@core/utils/debounce.ts";
 import { Protobuf } from "@meshtastic/core";

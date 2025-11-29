@@ -1,13 +1,13 @@
 import { Channels } from "@app/components/PageComponents/Channels/Channels";
 import { LoRa } from "@components/PageComponents/Settings/LoRa.tsx";
 import { Security } from "@components/PageComponents/Settings/Security/Security.tsx";
-import { Spinner } from "@components/UI/Spinner.tsx";
+import { Spinner } from "@components/ui/spinner.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@components/UI/Tabs.tsx";
+} from "@components/ui/tabs.tsx";
 import { useDevice, type ValidConfigType } from "@core/stores";
 import { type ComponentType, Suspense, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";

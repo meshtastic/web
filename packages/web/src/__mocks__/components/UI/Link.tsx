@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 
-vi.mock("@components/UI/Typography/Link.tsx", () => ({
+vi.mock("@components/ui/typography/link.tsx", () => ({
   Link: ({
     children,
     href,

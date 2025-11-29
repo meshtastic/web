@@ -6,8 +6,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@components/UI/Accordion.tsx";
-import { Button } from "@components/UI/Button.tsx";
+} from "@components/ui/accordion.tsx";
+import { Button } from "@components/ui/button.tsx";
 import {
   Dialog,
   DialogClose,
@@ -15,15 +15,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@components/UI/Dialog.tsx";
-import { Separator } from "@components/UI/Separator.tsx";
+} from "@components/ui/dialog.tsx";
+import { Separator } from "@components/ui/separator.tsx";
 import {
   Tooltip,
   TooltipArrow,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@components/UI/Tooltip.tsx";
+} from "@components/ui/tooltip.tsx";
 import { useFavoriteNode } from "@core/hooks/useFavoriteNode.ts";
 import { useIgnoreNode } from "@core/hooks/useIgnoreNode.ts";
 import { toast } from "@core/hooks/useToast.ts";

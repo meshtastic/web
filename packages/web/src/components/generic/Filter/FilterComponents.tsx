@@ -4,11 +4,11 @@ import {
   AccordionHeader,
   AccordionItem,
   AccordionTrigger,
-} from "@components/UI/Accordion.tsx";
-import { Checkbox } from "@components/UI/Checkbox/index.tsx";
-import { ScrollArea } from "@components/UI/ScrollArea.tsx";
-import { Slider } from "@components/UI/Slider.tsx";
-import { ToggleGroup, ToggleGroupItem } from "@components/UI/ToggleGroup.tsx";
+} from "@components/ui/accordion.tsx";
+import { Checkbox } from "@components/ui/checkbox.tsx";
+import { ScrollArea } from "@components/ui/scroll-area.tsx";
+import { Slider } from "@components/ui/slider.tsx";
+import { ToggleGroup, ToggleGroupItem } from "@components/ui/toggle-group.tsx";
 import { cn } from "@core/utils/cn.ts";
 import type { ReactNode } from "react";
 import { useId } from "react";

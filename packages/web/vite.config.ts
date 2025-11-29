@@ -74,6 +74,7 @@ export default defineConfig(({ mode }) => {
         "@components": path.resolve(process.cwd(), "./src/components"),
         "@core": path.resolve(process.cwd(), "./src/core"),
         "@layouts": path.resolve(process.cwd(), "./src/layouts"),
+        "@meshtastic/ui": path.resolve(process.cwd(), "../ui"),
       },
     },
     server: {

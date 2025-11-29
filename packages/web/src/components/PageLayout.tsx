@@ -1,6 +1,6 @@
-import { ErrorPage } from "@components/UI/ErrorPage.tsx";
-import Footer from "@components/UI/Footer.tsx";
-import { Spinner } from "@components/UI/Spinner.tsx";
+import { ErrorPage } from "@components/ui/error-page.tsx";
+import Footer from "@components/ui/footer.tsx";
+import { Spinner } from "@components/ui/spinner.tsx";
 import { cn } from "@core/utils/cn.ts";
 import type { LucideIcon } from "lucide-react";
 import type React from "react";

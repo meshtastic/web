@@ -10,13 +10,13 @@ import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.tsx
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.tsx";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
-import { Spinner } from "@components/UI/Spinner.tsx";
+import { Spinner } from "@components/ui/spinner.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@components/UI/Tabs.tsx";
+} from "@components/ui/tabs.tsx";
 import { useDevice, type ValidModuleConfigType } from "@core/stores";
 import { type ComponentType, Suspense, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";

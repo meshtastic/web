@@ -5,13 +5,13 @@ import { Network } from "@components/PageComponents/Settings/Network/index.tsx";
 import { Position } from "@components/PageComponents/Settings/Position.tsx";
 import { Power } from "@components/PageComponents/Settings/Power.tsx";
 import { User } from "@components/PageComponents/Settings/User.tsx";
-import { Spinner } from "@components/UI/Spinner.tsx";
+import { Spinner } from "@components/ui/spinner.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@components/UI/Tabs.tsx";
+} from "@components/ui/tabs.tsx";
 import { useDevice, type ValidConfigType } from "@core/stores";
 import { type ComponentType, Suspense, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";

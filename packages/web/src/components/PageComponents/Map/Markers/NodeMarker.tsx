@@ -1,6 +1,6 @@
 import { cn } from "@app/core/utils/cn";
 import type { PxOffset } from "@components/PageComponents/Map/cluster.ts";
-import { Avatar } from "@components/UI/Avatar.tsx";
+import { Avatar } from "@components/ui/avatar.tsx";
 import {
   Tooltip,
   TooltipArrow,
@@ -8,7 +8,7 @@ import {
   TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
-} from "@components/UI/Tooltip.tsx";
+} from "@components/ui/tooltip.tsx";
 import { memo } from "react";
 import { Marker } from "react-map-gl/maplibre";
 

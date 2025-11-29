@@ -8,7 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@components/UI/Select.tsx";
+} from "@components/ui/select.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { type FieldValues, useController } from "react-hook-form";
 

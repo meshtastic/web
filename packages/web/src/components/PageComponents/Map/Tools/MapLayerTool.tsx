@@ -1,9 +1,9 @@
-import { Checkbox } from "@components/UI/Checkbox/index.tsx";
+import { Checkbox } from "@components/ui/checkbox.tsx";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@components/UI/Popover.tsx";
+} from "@components/ui/popover.tsx";
 import { cn } from "@core/utils/cn.ts";
 import { LayersIcon } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
