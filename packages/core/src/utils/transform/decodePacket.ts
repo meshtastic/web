@@ -206,9 +206,11 @@ export const decodePacket = (device: MeshDevice) =>
             }
 
             case "queueStatus": {
+              // @ts-expect-error
+              delete decodedMessage.payloadVariant.value.$typeName;
               device.log.trace(
                 Types.Emitter[Types.Emitter.HandleFromRadio],
-                `🚧 Received Queue Status: ${decodedMessage.payloadVariant.value}`,
+                `🚧 Received Queue Status: ${JSON.stringify(decodedMessage.payloadVariant.value)}`,
               );
 
               device.events.onQueueStatus.dispatch(
@@ -266,6 +268,16 @@ export const decodePacket = (device: MeshDevice) =>
 
               device.events.onClientNotificationPacket.dispatch(
                 decodedMessage.payloadVariant.value,
+              );
+              break;
+            }
+
+            case "deviceuiConfig": {
+              // @ts-expect-error
+              delete decodedMessage.payloadVariant.value.$typeName;
+              device.log.trace(
+                Types.Emitter[Types.Emitter.HandleFromRadio],
+                `🔧 Received deviceuiConfig: ${JSON.stringify(decodedMessage.payloadVariant.value)}`,
               );
               break;
             }

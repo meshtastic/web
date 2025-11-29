@@ -1,4 +1,10 @@
-import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
+import {
+  create,
+  type DescMessage,
+  fromBinary,
+  type MessageShape,
+  toBinary,
+} from "@bufbuild/protobuf";
 import * as Protobuf from "@meshtastic/protobufs";
 import { Logger } from "tslog";
 
@@ -931,22 +937,17 @@ export class MeshDevice {
       from: meshPacket.from,
       to: meshPacket.to,
       channel: meshPacket.channel,
-      hops: Math.min(meshPacket.hopStart - meshPacket.hopLimit, 0),
+      hops: Math.max(meshPacket.hopStart - meshPacket.hopLimit, 0),
       rxRssi: meshPacket.rxRssi,
       rxSnr: meshPacket.rxSnr,
       viaMqtt: meshPacket.viaMqtt,
     };
 
-    this.log.trace(
-      Emitter[Emitter.HandleMeshPacket],
-      `📦 Received ${Protobuf.Portnums.PortNum[dataPacket.portnum]} packet`,
-    );
-
     switch (dataPacket.portnum) {
       case Protobuf.Portnums.PortNum.TEXT_MESSAGE_APP: {
         this.events.onMessagePacket.dispatch({
           ...packetMetadata,
-          data: new TextDecoder().decode(dataPacket.payload),
+          data: new TextDecoder().decode(this.getPayload(dataPacket)),
         });
         break;
       }
@@ -954,9 +955,9 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.REMOTE_HARDWARE_APP: {
         this.events.onRemoteHardwarePacket.dispatch({
           ...packetMetadata,
-          data: fromBinary(
+          data: this.getPayloadFromProto(
             Protobuf.RemoteHardware.HardwareMessageSchema,
-            dataPacket.payload,
+            dataPacket,
           ),
         });
         break;
@@ -965,7 +966,10 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.POSITION_APP: {
         this.events.onPositionPacket.dispatch({
           ...packetMetadata,
-          data: fromBinary(Protobuf.Mesh.PositionSchema, dataPacket.payload),
+          data: this.getPayloadFromProto(
+            Protobuf.Mesh.PositionSchema,
+            dataPacket,
+          ),
         });
         break;
       }
@@ -973,15 +977,15 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.NODEINFO_APP: {
         this.events.onUserPacket.dispatch({
           ...packetMetadata,
-          data: fromBinary(Protobuf.Mesh.UserSchema, dataPacket.payload),
+          data: this.getPayloadFromProto(Protobuf.Mesh.UserSchema, dataPacket),
         });
         break;
       }
 
       case Protobuf.Portnums.PortNum.ROUTING_APP: {
-        routingPacket = fromBinary(
+        routingPacket = this.getPayloadFromProto(
           Protobuf.Mesh.RoutingSchema,
-          dataPacket.payload,
+          dataPacket,
         );
 
         this.events.onRoutingPacket.dispatch({
@@ -1018,9 +1022,9 @@ export class MeshDevice {
       }
 
       case Protobuf.Portnums.PortNum.ADMIN_APP: {
-        adminMessage = fromBinary(
+        adminMessage = this.getPayloadFromProto(
           Protobuf.Admin.AdminMessageSchema,
-          dataPacket.payload,
+          dataPacket,
         );
         switch (adminMessage.payloadVariant.case) {
           case "getChannelResponse": {
@@ -1088,7 +1092,10 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.WAYPOINT_APP: {
         this.events.onWaypointPacket.dispatch({
           ...packetMetadata,
-          data: fromBinary(Protobuf.Mesh.WaypointSchema, dataPacket.payload),
+          data: this.getPayloadFromProto(
+            Protobuf.Mesh.WaypointSchema,
+            dataPacket,
+          ),
         });
         break;
       }
@@ -1096,7 +1103,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.AUDIO_APP: {
         this.events.onAudioPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1104,7 +1111,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.DETECTION_SENSOR_APP: {
         this.events.onDetectionSensorPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1112,7 +1119,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.REPLY_APP: {
         this.events.onPingPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload, //TODO: decode
+          data: this.getPayload(dataPacket), //TODO: decode
         });
         break;
       }
@@ -1120,7 +1127,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.IP_TUNNEL_APP: {
         this.events.onIpTunnelPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1128,9 +1135,9 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.PAXCOUNTER_APP: {
         this.events.onPaxcounterPacket.dispatch({
           ...packetMetadata,
-          data: fromBinary(
+          data: this.getPayloadFromProto(
             Protobuf.PaxCount.PaxcountSchema,
-            dataPacket.payload,
+            dataPacket,
           ),
         });
         break;
@@ -1139,7 +1146,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.SERIAL_APP: {
         this.events.onSerialPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1147,7 +1154,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.STORE_FORWARD_APP: {
         this.events.onStoreForwardPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1155,7 +1162,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.RANGE_TEST_APP: {
         this.events.onRangeTestPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1163,9 +1170,9 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.TELEMETRY_APP: {
         this.events.onTelemetryPacket.dispatch({
           ...packetMetadata,
-          data: fromBinary(
+          data: this.getPayloadFromProto(
             Protobuf.Telemetry.TelemetrySchema,
-            dataPacket.payload,
+            dataPacket,
           ),
         });
         break;
@@ -1174,7 +1181,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.ZPS_APP: {
         this.events.onZpsPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1182,7 +1189,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.SIMULATOR_APP: {
         this.events.onSimulatorPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1190,9 +1197,9 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.TRACEROUTE_APP: {
         this.events.onTraceRoutePacket.dispatch({
           ...packetMetadata,
-          data: fromBinary(
+          data: this.getPayloadFromProto(
             Protobuf.Mesh.RouteDiscoverySchema,
-            dataPacket.payload,
+            dataPacket,
           ),
         });
         break;
@@ -1201,9 +1208,9 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.NEIGHBORINFO_APP: {
         this.events.onNeighborInfoPacket.dispatch({
           ...packetMetadata,
-          data: fromBinary(
+          data: this.getPayloadFromProto(
             Protobuf.Mesh.NeighborInfoSchema,
-            dataPacket.payload,
+            dataPacket,
           ),
         });
         break;
@@ -1212,7 +1219,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.ATAK_PLUGIN: {
         this.events.onAtakPluginPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1220,7 +1227,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.MAP_REPORT_APP: {
         this.events.onMapReportPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1228,7 +1235,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.PRIVATE_APP: {
         this.events.onPrivatePacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1236,7 +1243,7 @@ export class MeshDevice {
       case Protobuf.Portnums.PortNum.ATAK_FORWARDER: {
         this.events.onAtakForwarderPacket.dispatch({
           ...packetMetadata,
-          data: dataPacket.payload,
+          data: this.getPayload(dataPacket),
         });
         break;
       }
@@ -1244,5 +1251,38 @@ export class MeshDevice {
       default:
         throw new Error(`Unhandled case ${dataPacket.portnum}`);
     }
+  }
+
+  private logPacket(portnum: Protobuf.Portnums.PortNum, str: string) {
+    const isDev = typeof import.meta !== "undefined" && import.meta.env?.DEV;
+    if (!isDev) {
+      str = "";
+    }
+    this.log.trace(
+      Emitter[Emitter.HandleMeshPacket],
+      `📦 Received ${Protobuf.Portnums.PortNum[portnum]} packet with payload:`,
+      str,
+    );
+  }
+
+  private getPayload(datapacket: Protobuf.Mesh.Data): Uint8Array {
+    const hexString = Array.from(datapacket.payload)
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+    this.logPacket(datapacket.portnum, "0x" + hexString);
+
+    return datapacket.payload;
+  }
+
+  private getPayloadFromProto<Desc extends DescMessage>(
+    schema: Desc,
+    datapacket: Protobuf.Mesh.Data,
+  ): MessageShape<Desc> {
+    const message: MessageShape<Desc> = fromBinary(schema, datapacket.payload);
+    // @ts-expect-error
+    delete message.$typeName;
+    this.logPacket(datapacket.portnum, JSON.stringify(message));
+
+    return message;
   }
 }
