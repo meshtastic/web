@@ -1,3 +1,4 @@
+import type { HeatmapMode } from "@components/PageComponents/Map/Layers/HeatmapLayer.tsx";
 import { Checkbox } from "@components/UI/Checkbox/index.tsx";
 import {
   Popover,
@@ -16,6 +17,7 @@ export interface VisibilityState {
   positionPrecision: boolean;
   traceroutes: boolean;
   waypoints: boolean;
+  heatmap: boolean;
 }
 
 export const defaultVisibilityState: VisibilityState = {
@@ -25,11 +27,14 @@ export const defaultVisibilityState: VisibilityState = {
   positionPrecision: false,
   traceroutes: false,
   waypoints: true,
+  heatmap: false,
 };
 
 interface MapLayerToolProps {
   visibilityState: VisibilityState;
   setVisibilityState: (state: VisibilityState) => void;
+  heatmapMode: HeatmapMode;
+  setHeatmapMode: (mode: HeatmapMode) => void;
 }
 
 interface CheckboxProps {
@@ -59,6 +64,8 @@ const CheckboxItem = ({
 export function MapLayerTool({
   visibilityState,
   setVisibilityState,
+  heatmapMode,
+  setHeatmapMode,
 }: MapLayerToolProps): ReactNode {
   const { t } = useTranslation("map");
 
@@ -67,10 +74,23 @@ export function MapLayerTool({
   }, [visibilityState]);
 
   const handleCheckboxChange = (key: keyof VisibilityState) => {
-    setVisibilityState({
-      ...visibilityState,
-      [key]: !visibilityState[key],
-    });
+    if (key === "heatmap" && !visibilityState.heatmap) {
+      // If turning heatmap on, turn everything else off so the layer is visible
+      setVisibilityState({
+        nodeMarkers: false,
+        directNeighbors: false,
+        remoteNeighbors: false,
+        positionPrecision: false,
+        traceroutes: false,
+        waypoints: false,
+        heatmap: true,
+      });
+    } else {
+      setVisibilityState({
+        ...visibilityState,
+        [key]: !visibilityState[key],
+      });
+    }
   };
 
   const layers = useMemo(
@@ -80,6 +100,7 @@ export function MapLayerTool({
       { key: "directNeighbors", label: t("layerTool.directNeighbors") },
       { key: "remoteNeighbors", label: t("layerTool.remoteNeighbors") },
       { key: "positionPrecision", label: t("layerTool.positionPrecision") },
+      { key: "heatmap", label: t("layerTool.heatmap") },
       // { key: "traceroutes", label: t("layerTool.traceroutes") },
     ],
     [t],
@@ -124,12 +145,39 @@ export function MapLayerTool({
         sideOffset={7}
       >
         {layers.map(({ key, label }) => (
-          <CheckboxItem
-            key={key}
-            label={label}
-            checked={visibilityState[key as keyof VisibilityState]}
-            onChange={() => handleCheckboxChange(key as keyof VisibilityState)}
-          />
+          <div key={key}>
+            <CheckboxItem
+              label={label}
+              checked={visibilityState[key as keyof VisibilityState]}
+              onChange={() =>
+                handleCheckboxChange(key as keyof VisibilityState)
+              }
+            />
+            {key === "heatmap" && visibilityState.heatmap && (
+              <div className="pl-6 pt-2 flex flex-col gap-1">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    className="accent-blue-500"
+                    checked={heatmapMode === "density"}
+                    onChange={() => setHeatmapMode("density")}
+                  />
+                  <span className="text-sm dark:text-slate-300">
+                    {t("layerTool.density")}
+                  </span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    className="accent-blue-500"
+                    checked={heatmapMode === "snr"}
+                    onChange={() => setHeatmapMode("snr")}
+                  />
+                  <span className="text-sm dark:text-slate-300">SNR</span>
+                </label>
+              </div>
+            )}
+          </div>
         ))}
         {/*<CheckboxItem
           key="traceroutes"

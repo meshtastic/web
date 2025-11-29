@@ -268,8 +268,12 @@ export const SNRTooltip = ({
     >
       <div>
         <strong className="font-bold">{from ?? ""}</strong>
-        <span className="mx-1">⭢</span>
-        <strong className="font-bold">{to ?? ""}</strong>
+        {to && (
+          <>
+            <span className="mx-1">⭢</span>
+            <strong className="font-bold">{to ?? ""}</strong>
+          </>
+        )}
       </div>
       <div>
         SNR: <Mono>{snr?.toFixed?.(2) ?? t("unknown.shortName")}</Mono> dB

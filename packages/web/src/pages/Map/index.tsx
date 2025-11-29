@@ -9,6 +9,10 @@ import {
   useFilterNode,
 } from "@components/generic/Filter/useFilterNode.ts";
 import { BaseMap } from "@components/Map.tsx";
+import {
+  HeatmapLayer,
+  type HeatmapMode,
+} from "@components/PageComponents/Map/Layers/HeatmapLayer.tsx";
 import { NodesLayer } from "@components/PageComponents/Map/Layers/NodesLayer.tsx";
 import { PrecisionLayer } from "@components/PageComponents/Map/Layers/PrecisionLayer.tsx";
 import {
@@ -69,6 +73,7 @@ const MapPage = () => {
   const [visibilityState, setVisibilityState] = useState<VisibilityState>(
     () => defaultVisibilityState,
   );
+  const [heatmapMode, setHeatmapMode] = useState<HeatmapMode>("density");
 
   // Filters
   const [filterState, setFilterState] = useState<FilterState>(
@@ -103,6 +108,25 @@ const MapPage = () => {
     [filteredNodes, myNode, visibilityState, snrLayerElementId],
   );
 
+  // Heatmap
+  const heatmapLayerElementId = useId();
+  const heatmapLayerElement = useMemo(
+    () => (
+      <HeatmapLayer
+        id={heatmapLayerElementId}
+        filteredNodes={filteredNodes}
+        isVisible={visibilityState.heatmap}
+        mode={heatmapMode}
+      />
+    ),
+    [
+      filteredNodes,
+      visibilityState.heatmap,
+      heatmapMode,
+      heatmapLayerElementId,
+    ],
+  );
+
   const onMouseMove = useCallback(
     (event: MapLayerMouseEvent) => {
       const {
@@ -112,8 +136,29 @@ const MapPage = () => {
       const hoveredFeature = features?.[0];
 
       if (hoveredFeature) {
-        const { from, to, snr } = hoveredFeature.properties;
+        const { from, to, snr, name, shortName, num } =
+          hoveredFeature.properties;
 
+        // Handle Heatmap Hover
+        if (
+          hoveredFeature.layer.id === `${heatmapLayerElementId}-interaction` &&
+          name !== undefined
+        ) {
+          setSnrHover({
+            pos: { x, y },
+            snr: snr, // Single node SNR
+            from:
+              name ||
+              shortName ||
+              t("fallbackName", {
+                last4: numberToHexUnpadded(num).slice(-4).toUpperCase(),
+              }),
+            to: undefined, // Single node
+          });
+          return;
+        }
+
+        // Handle SNR Line Hover
         const fromLong =
           getNode(from)?.user?.longName ??
           t("fallbackName", {
@@ -131,7 +176,7 @@ const MapPage = () => {
         setSnrHover(undefined);
       }
     },
-    [getNode, t],
+    [getNode, t, heatmapLayerElementId],
   );
 
   // Node markers & clusters
@@ -199,8 +244,12 @@ const MapPage = () => {
         onLoad={getMapBounds}
         onMouseMove={onMouseMove}
         onClick={onMapBackgroundClick}
-        interactiveLayerIds={[snrLayerElementId]}
+        interactiveLayerIds={[
+          snrLayerElementId,
+          `${heatmapLayerElementId}-interaction`,
+        ]}
       >
+        {heatmapLayerElement}
         {markerElements}
         {snrLayerElement}
         {precisionCirclesElement}
@@ -260,6 +309,8 @@ const MapPage = () => {
         <MapLayerTool
           visibilityState={visibilityState}
           setVisibilityState={setVisibilityState}
+          heatmapMode={heatmapMode}
+          setHeatmapMode={setHeatmapMode}
         />
       </div>
     </PageLayout>
