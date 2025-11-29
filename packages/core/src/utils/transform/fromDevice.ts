@@ -41,9 +41,8 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
                 packet[malformedDetectorIndex + 1] === 0xc3
               ) {
                 console.warn(
-                  `⚠️ Malformed packet found, discarding: ${byteBuffer
-                    .subarray(0, malformedDetectorIndex - 1)
-                    .toString()}`,
+                  `⚠️ Malformed packet found, discarding:`,
+                  toHexString(byteBuffer, malformedDetectorIndex),
                 );
 
                 byteBuffer = byteBuffer.subarray(malformedDetectorIndex);
@@ -67,3 +66,13 @@ export const fromDeviceStream: () => TransformStream<Uint8Array, DeviceOutput> =
       },
     });
   };
+
+function toHexString(byteBuffer: Uint8Array<ArrayBuffer>, index: number) {
+  try {
+    return Array.from(byteBuffer.subarray(0, index - 1))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  } catch (_e) {
+    return byteBuffer.subarray(0, index - 1).toString();
+  }
+}

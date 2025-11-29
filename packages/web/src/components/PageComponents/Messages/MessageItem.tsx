@@ -269,7 +269,8 @@ export const MessageItem = ({ message }: MessageItemProps) => {
               <div className="text-xs text-slate-500 dark:text-slate-200 whitespace-pre-wrap break-words">
                 SNR: {message.rxSnr}, RSSI: {message.rxRssi}
               </div>
-            ))}
+            )) ||
+            ""}
         </div>
       </div>
       {/* Actions Menu Placeholder */}
