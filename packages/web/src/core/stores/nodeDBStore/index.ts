@@ -46,7 +46,7 @@ export interface NodeDB extends NodeDBData {
     filter?: (node: Protobuf.Mesh.NodeInfo) => boolean,
     includeSelf?: boolean,
   ) => Protobuf.Mesh.NodeInfo[];
-  getMyNode: () => Protobuf.Mesh.NodeInfo | undefined;
+  getMyNode: () => Promise<Protobuf.Mesh.NodeInfo>;
 
   getNodeError: (nodeNum: number) => NodeError | undefined;
   hasNodeError: (nodeNum: number) => boolean;
@@ -463,17 +463,40 @@ function nodeDBFactory(
       return filter ? all.filter(filter) : all;
     },
 
-    getMyNode: () => {
+    getMyNode: async () => {
       const nodeDB = get().nodeDBs.get(id);
       if (!nodeDB) {
         throw new Error(`No nodeDB found (id: ${id})`);
       }
+
+      // If myNodeNum is already available, return immediately
       if (nodeDB.myNodeNum) {
         return (
           nodeDB.nodeMap.get(nodeDB.myNodeNum) ??
           create(Protobuf.Mesh.NodeInfoSchema)
         );
       }
+
+      return new Promise<Protobuf.Mesh.NodeInfo>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          unsubscribe();
+          reject(new Error(`Timeout waiting for myNodeNum (nodeDB id: ${id})`));
+        }, 3000); // 3 second timeout
+
+        const unsubscribe = useNodeDBStore.subscribe(
+          (state) => state.nodeDBs.get(id)?.myNodeNum,
+          (myNodeNum) => {
+            if (myNodeNum !== undefined) {
+              clearTimeout(timeout);
+              unsubscribe();
+              const currentNodeDB = get().nodeDBs.get(id);
+              const node = currentNodeDB?.nodeMap.get(myNodeNum);
+              resolve(node ?? create(Protobuf.Mesh.NodeInfoSchema));
+            }
+          },
+          { fireImmediately: true },
+        );
+      });
     },
 
     getNodeError: (nodeNum) => {

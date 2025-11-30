@@ -1,17 +1,10 @@
-import Link from "next/link";
-import { usePathname } from "@tanstack/react-router";
-import {
-  MessageSquare,
-  LayoutDashboard,
-  Settings,
-  SlidersHorizontal,
-  Radio,
-  Users,
-  Signal,
-} from "lucide-react";
+import { Link } from "@app/components/ui/link";
+import { NodeAvatar } from "@components/NodeAvatar";
+import { Badge } from "@components/ui/badge";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -19,17 +12,31 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarFooter,
-} from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar.tsx";
-import { Badge } from "@/components/ui/badge";
+} from "@components/ui/sidebar.tsx";
+import { useMessages, useNodeDB } from "@core/stores";
+import type { Protobuf } from "@meshtastic/core";
+import { useLocation } from "@tanstack/react-router";
+import {
+  LayoutDashboard,
+  MapIcon,
+  MessageSquare,
+  Settings,
+  SlidersHorizontal,
+  Users,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
-const mainNavItems = [
+const getMainNavItems = (unreadCount: number) => [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+  },
   {
     title: "Messages",
     url: "/messages",
     icon: MessageSquare,
-    badge: 3,
+    badge: unreadCount > 0 ? unreadCount : undefined,
   },
   {
     title: "Map",
@@ -37,9 +44,9 @@ const mainNavItems = [
     icon: MapIcon,
   },
   {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: LayoutDashboard,
+    title: "Nodes",
+    url: "/nodes",
+    icon: Users,
   },
 ];
 
@@ -57,20 +64,64 @@ const configNavItems = [
 ];
 
 export function AppSidebar() {
-  const pathname = usePathname();
+  const pathname = useLocation().pathname;
+  const nodeDB = useNodeDB();
+  const messages = useMessages();
+
+  const [myNode, setMyNode] = useState<Protobuf.Mesh.NodeInfo | undefined>();
+
+  useEffect(() => {
+    if (!nodeDB) {
+      return;
+    }
+
+    const fetchMyNode = async () => {
+      try {
+        const node = await nodeDB.getMyNode();
+        setMyNode(node);
+      } catch (error) {
+        console.error("Failed to get myNode:", error);
+        setMyNode(undefined);
+      }
+    };
+
+    fetchMyNode();
+  }, [nodeDB]);
+
+  // Calculate total unread messages
+  const totalUnread = useMemo(() => {
+    return messages.getTotalUnreadCount();
+  }, [messages]);
+
+  const mainNavItems = useMemo(
+    () => getMainNavItems(totalUnread),
+    [totalUnread],
+  );
+
+  const nodeStats = useMemo(() => {
+    const nodes = nodeDB.getNodes(undefined, true); // include self
+    const onlineThreshold = Date.now() / 1000 - 900; // 15 minutes
+    const onlineCount = nodes.filter(
+      (node) => (node.lastHeard || 0) > onlineThreshold,
+    ).length;
+    return {
+      total: nodes.length,
+      online: onlineCount,
+    };
+  }, [nodeDB]);
 
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <Radio className="h-5 w-5 text-primary-foreground" />
+          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg">
+            <img src="/icon.svg" alt="Meshtastic Logo" className="h-9 w-9" />
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-semibold text-sidebar-foreground">
               Meshtastic
             </span>
-            <span className="text-xs text-muted-foreground">Mesh Network</span>
+            <span className="text-xs text-muted-foreground">Web Client</span>
           </div>
         </Link>
       </SidebarHeader>
@@ -94,7 +145,7 @@ export function AppSidebar() {
                       </span>
                       {item.badge && (
                         <Badge
-                          variant="secondary"
+                          variant="rounded"
                           className="h-5 min-w-5 justify-center bg-primary text-primary-foreground"
                         >
                           {item.badge}
@@ -130,37 +181,47 @@ export function AppSidebar() {
           <SidebarGroupLabel>Network Status</SidebarGroupLabel>
           <SidebarGroupContent className="px-2">
             <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/50 p-3 space-y-3">
-              <div className="flex items-center justify-between">
+              {/* TODO: Re-add signal strength when we have a way to get it */}
+              {/* <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Signal className="h-4 w-4 text-chart-2" />
                   <span className="text-sm">Signal</span>
                 </div>
                 <span className="text-sm font-medium text-chart-2">Strong</span>
-              </div>
+              </div> */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-primary" />
                   <span className="text-sm">Nodes</span>
                 </div>
-                <span className="text-sm font-medium">12 Online</span>
+                <span className="text-sm font-medium">
+                  {nodeStats.online} of {nodeStats.total}
+                </span>
               </div>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
       <SidebarFooter className="border-t border-sidebar-border p-4">
         <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9">
-            <AvatarFallback className="bg-primary/20 text-primary">
-              ME
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">My Node</span>
-            <span className="text-xs text-muted-foreground">!abc123</span>
-          </div>
-          <div className="ml-auto h-2 w-2 rounded-full bg-chart-2" />
+          {myNode && (
+            <>
+              <NodeAvatar
+                nodeNum={myNode.num}
+                longName={myNode.user?.longName}
+                size="sm"
+              />
+              <div className="flex flex-col flex-1 min-w-0">
+                <span className="text-sm font-medium truncate">
+                  {myNode.user?.longName || myNode.user?.shortName || "My Node"}
+                </span>
+                <span className="text-xs text-muted-foreground font-mono">
+                  !{myNode.num.toString(16)}
+                </span>
+              </div>
+              <div className="ml-auto h-2 w-2 rounded-full bg-chart-2" />
+            </>
+          )}
         </div>
       </SidebarFooter>
     </Sidebar>

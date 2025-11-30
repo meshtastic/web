@@ -207,7 +207,7 @@
   },
   "errorPage": {
     "title": "Das ist ein wenig peinlich...",
-    "description1": "Es tut uns wirklich leid, aber im Webclient ist ein Fehler aufgetreten, der es zum Absturz gebracht hat. <br /> Das soll nicht passieren, und wir arbeiten hart daran, es zu beheben.",
+    "description1": "Es tut uns wirklich leid, aber im Webclient ist ein Fehler aufgetreten, der es zum Absturz gebracht hat.  Das soll nicht passieren, und wir arbeiten hart daran, es zu beheben.",
     "description2": "Der beste Weg, um zu verhindern, dass sich dies Ihnen oder irgendjemand anderem wiederholt, besteht darin, uns über dieses Problem zu berichten.",
     "reportInstructions": "Bitte fügen Sie folgende Informationen in Ihren Bericht ein:",
     "reportSteps": {

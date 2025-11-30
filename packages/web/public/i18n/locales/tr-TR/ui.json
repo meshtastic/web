@@ -207,7 +207,7 @@
   },
   "errorPage": {
     "title": "This is a little embarrassing...",
-    "description1": "We are really sorry but an error occurred in the web client that caused it to crash. <br /> This is not supposed to happen, and we are working hard to fix it.",
+    "description1": "We are really sorry but an error occurred in the web client that caused it to crash.  This is not supposed to happen, and we are working hard to fix it.",
     "description2": "The best way to prevent this from happening again to you or anyone else is to report the issue to us.",
     "reportInstructions": "Please include the following information in your report:",
     "reportSteps": {

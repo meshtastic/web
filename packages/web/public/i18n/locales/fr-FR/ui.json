@@ -207,7 +207,7 @@
   },
   "errorPage": {
     "title": "C'est un peu embarrassant...",
-    "description1": "Nous sommes vraiment désolés mais une erreur est survenue dans le client web qui l'a fait planter. <br /> Ce n'est pas censé se produire, et nous travaillons dur pour le corriger.",
+    "description1": "Nous sommes vraiment désolés mais une erreur est survenue dans le client web qui l'a fait planter.  Ce n'est pas censé se produire, et nous travaillons dur pour le corriger.",
     "description2": "La meilleure façon d'éviter que cela ne se reproduise à vous ou à qui que ce soit d'autre consiste à nous signaler le problème.",
     "reportInstructions": "Veuillez inclure les informations suivantes dans votre rapport :",
     "reportSteps": {

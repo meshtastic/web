@@ -1,3 +1,4 @@
+import { Link } from "@app/components/ui/link";
 import { Button } from "@components/ui/button.tsx";
 import { Checkbox } from "@components/ui/checkbox.tsx";
 import {
@@ -9,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/ui/dialog.tsx";
-import { Link } from "@components/ui/typography/link.tsx";
 import { useDevice } from "@core/stores";
 import { eventBus } from "@core/utils/eventBus.ts";
 import { useState } from "react";

@@ -51,6 +51,10 @@ type MessageStoreData = {
   myNodeNum: number | undefined;
   messages: MessageBuckets;
   drafts: Map<Types.Destination, string>;
+  lastRead: {
+    direct: LastReadMap;
+    broadcast: LastReadMap;
+  };
 };
 
 export interface MessageStore extends MessageStoreData {
@@ -70,6 +74,12 @@ export interface MessageStore extends MessageStoreData {
 
   deleteAllMessages: () => void;
   clearMessageByMessageId: (params: ClearMessageParams) => void;
+
+  // Unread tracking
+  getTotalUnreadCount: () => number;
+  getUnreadCount: (params: GetMessagesParams) => number;
+  markAsRead: (params: MarkAsReadParams) => void;
+  markConversationAsRead: (params: GetMessagesParams) => void;
 }
 
 export interface MessageStoreState {
@@ -97,6 +107,10 @@ function messageStoreFactory(
     broadcast: new Map<ChannelId, MessageLogMap>(),
   };
   const drafts = data?.drafts ?? new Map<Types.Destination, string>();
+  const lastRead = data?.lastRead ?? {
+    direct: new Map<ConversationId, MessageId>(),
+    broadcast: new Map<ChannelId, MessageId>(),
+  };
   const myNodeNum = data?.myNodeNum;
   const activeChat = 0;
   const chatType = MessageType.Broadcast;
@@ -106,6 +120,7 @@ function messageStoreFactory(
     myNodeNum,
     messages,
     drafts,
+    lastRead,
     activeChat,
     chatType,
 
@@ -347,6 +362,115 @@ function messageStoreFactory(
         }),
       );
     },
+
+    getTotalUnreadCount: (): number => {
+      const state = get().messageStores.get(id);
+      if (!state || !state.myNodeNum) return 0;
+
+      let totalUnread = 0;
+
+      // Count unread in direct messages
+      for (const [conversationId, messageLog] of state.messages.direct) {
+        const lastReadId = state.lastRead.direct.get(conversationId) || 0;
+        const messages = Array.from(messageLog.values());
+        const unreadMessages = messages.filter(
+          (msg) => msg.messageId > lastReadId && msg.from !== state.myNodeNum,
+        );
+        totalUnread += unreadMessages.length;
+      }
+
+      // Count unread in broadcast messages
+      for (const [channelId, messageLog] of state.messages.broadcast) {
+        const lastReadId = state.lastRead.broadcast.get(channelId) || 0;
+        const messages = Array.from(messageLog.values());
+        const unreadMessages = messages.filter(
+          (msg) => msg.messageId > lastReadId && msg.from !== state.myNodeNum,
+        );
+        totalUnread += unreadMessages.length;
+      }
+
+      return totalUnread;
+    },
+
+    getUnreadCount: (params: GetMessagesParams): number => {
+      const state = get().messageStores.get(id);
+      if (!state || !state.myNodeNum) return 0;
+
+      let messageLog: MessageLogMap | undefined;
+      let lastReadId: MessageId;
+
+      if (params.type === MessageType.Direct) {
+        const conversationId = getConversationId(params.nodeA, params.nodeB);
+        messageLog = state.messages.direct.get(conversationId);
+        lastReadId = state.lastRead.direct.get(conversationId) || 0;
+      } else {
+        // Broadcast
+        messageLog = state.messages.broadcast.get(params.channelId);
+        lastReadId = state.lastRead.broadcast.get(params.channelId) || 0;
+      }
+
+      if (!messageLog) return 0;
+
+      const messages = Array.from(messageLog.values());
+      const unreadMessages = messages.filter(
+        (msg) => msg.messageId > lastReadId && msg.from !== state.myNodeNum,
+      );
+
+      return unreadMessages.length;
+    },
+
+    markAsRead: (params: MarkAsReadParams) => {
+      set(
+        produce<PrivateMessageStoreState>((draft) => {
+          const state = draft.messageStores.get(id);
+          if (!state) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
+          if (params.type === MessageType.Direct) {
+            const conversationId = getConversationId(params.nodeA, params.nodeB);
+            state.lastRead.direct.set(conversationId, params.messageId);
+          } else {
+            // Broadcast
+            state.lastRead.broadcast.set(params.channelId, params.messageId);
+          }
+        }),
+      );
+    },
+
+    markConversationAsRead: (params: GetMessagesParams) => {
+      set(
+        produce<PrivateMessageStoreState>((draft) => {
+          const state = draft.messageStores.get(id);
+          if (!state) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
+          let messageLog: MessageLogMap | undefined;
+          let conversationKey: ConversationId | ChannelId;
+          let lastReadMap: LastReadMap;
+
+          if (params.type === MessageType.Direct) {
+            conversationKey = getConversationId(params.nodeA, params.nodeB);
+            messageLog = state.messages.direct.get(conversationKey);
+            lastReadMap = state.lastRead.direct;
+          } else {
+            // Broadcast
+            conversationKey = params.channelId;
+            messageLog = state.messages.broadcast.get(conversationKey);
+            lastReadMap = state.lastRead.broadcast;
+          }
+
+          if (!messageLog || messageLog.size === 0) return;
+
+          // Find the highest message ID in this conversation
+          const messageIds = Array.from(messageLog.keys());
+          const maxMessageId = Math.max(...messageIds);
+
+          lastReadMap.set(conversationKey, maxMessageId);
+        }),
+      );
+    },
   };
 }
 
@@ -401,6 +525,7 @@ const persistOptions: PersistOptions<
           myNodeNum: db.myNodeNum,
           messages: db.messages,
           drafts: db.drafts,
+          lastRead: db.lastRead,
         },
       ]),
     ),

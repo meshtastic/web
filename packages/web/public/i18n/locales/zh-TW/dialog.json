@@ -4,7 +4,7 @@
     "title": "Clear All Messages"
   },
   "import": {
-    "description": "Import a Channel Set from a Meshtastic URL. <br />Valid Meshtasic URLs start with \"<italic>https://meshtastic.org/e/...</italic>\"",
+    "description": "Import a Channel Set from a Meshtastic URL. Valid Meshtasic URLs start with \"<italic>https://meshtastic.org/e/...</italic>\"",
     "error": {
       "invalidUrl": "Invalid Meshtastic URL"
     },

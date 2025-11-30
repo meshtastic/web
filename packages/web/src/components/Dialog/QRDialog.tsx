@@ -1,4 +1,5 @@
 import { create, toBinary } from "@bufbuild/protobuf";
+import { Checkbox } from "@components/ui/checkbox.tsx";
 import {
   Dialog,
   DialogClose,
@@ -15,7 +16,6 @@ import { fromByteArray } from "base64-js";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { QRCode } from "react-qrcode-logo";
-import { Checkbox } from "../UI/Checkbox/index.tsx";
 
 export interface QRDialogProps {
   open: boolean;

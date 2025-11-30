@@ -1,5 +1,5 @@
 import { SupportBadge } from "@app/components/Badge/SupportedBadge.tsx";
-import { Switch } from "@app/components/UI/Switch.tsx";
+import { Link } from "@app/components/ui/link.tsx";
 import type {
   ConnectionType,
   NewConnection,
@@ -8,13 +8,14 @@ import { testHttpReachable } from "@app/pages/Connections/utils";
 import { Button } from "@components/ui/button.tsx";
 import { Input } from "@components/ui/input.tsx";
 import { Label } from "@components/ui/label.tsx";
+import { Switch } from "@components/ui/switch.tsx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@components/ui/tabs.tsx";
-import { Link } from "@components/ui/typography/link.tsx";
+
 import {
   type BrowserFeature,
   useBrowserFeatureDetection,

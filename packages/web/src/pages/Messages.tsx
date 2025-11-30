@@ -1,205 +1,37 @@
-import { Avatar, AvatarFallback } from "@components/ui/avatar";
+import { NodeAvatar } from "@components/NodeAvatar";
 import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { ScrollArea } from "@components/ui/scroll-area";
-import { cn } from "@core/utils/cn"; // Corrected import path
+import { MessageType, useDevice, useMessages, useNodeDB } from "@core/stores";
+import { getAvatarColors } from "@core/utils/avatarColors";
+import { cn } from "@core/utils/cn";
+import type { Types } from "@meshtastic/core";
 import {
+  ArrowUp,
   Hash,
   MoreVertical,
-  Paperclip,
   Phone,
   Plus,
   Search,
-  Send,
   Smile,
   Users,
   Video,
   X,
 } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 
-const contacts = [
-  {
-    id: 1,
-    name: "Alpha Node",
-    nodeId: "!aaa111",
-    lastMessage: "Check position update",
-    time: "2m",
-    unread: 2,
-    online: true,
-    type: "direct" as const,
-  },
-  {
-    id: 2,
-    name: "Bravo Node",
-    nodeId: "!bbb222",
-    lastMessage: "Signal strong here",
-    time: "15m",
-    unread: 0,
-    online: true,
-    type: "direct" as const,
-  },
-  {
-    id: 3,
-    name: "Charlie Node",
-    nodeId: "!ccc333",
-    lastMessage: "Weather update sent",
-    time: "1h",
-    unread: 1,
-    online: false,
-    type: "direct" as const,
-  },
-  {
-    id: 4,
-    name: "Delta Node",
-    nodeId: "!ddd444",
-    lastMessage: "Copy that",
-    time: "2h",
-    unread: 0,
-    online: true,
-    type: "direct" as const,
-  },
-  {
-    id: 5,
-    name: "Echo Node",
-    nodeId: "!eee555",
-    lastMessage: "Moving to waypoint",
-    time: "3h",
-    unread: 0,
-    online: false,
-    type: "direct" as const,
-  },
-  {
-    id: 6,
-    name: "Primary Channel",
-    nodeId: "#primary",
-    lastMessage: "Network test complete",
-    time: "5m",
-    unread: 5,
-    online: true,
-    type: "channel" as const,
-  },
-  {
-    id: 7,
-    name: "Emergency",
-    nodeId: "#emergency",
-    lastMessage: "All clear",
-    time: "1h",
-    unread: 0,
-    online: true,
-    type: "channel" as const,
-  },
-];
-
-const initialMessages: Record<
-  number,
-  Array<{
-    id: number;
-    sender: string;
-    content: string;
-    time: string;
-    isMine: boolean;
-  }>
-> = {
-  1: [
-    {
-      id: 1,
-      sender: "Alpha Node",
-      content: "Hey, can you confirm your position?",
-      time: "10:30 AM",
-      isMine: false,
-    },
-    {
-      id: 2,
-      sender: "Me",
-      content: "Confirmed. I'm at the northern checkpoint.",
-      time: "10:31 AM",
-      isMine: true,
-    },
-    {
-      id: 3,
-      sender: "Alpha Node",
-      content: "Great! Signal is strong from your location.",
-      time: "10:32 AM",
-      isMine: false,
-    },
-    {
-      id: 4,
-      sender: "Me",
-      content: "Copy that. Moving to secondary position in 10 minutes.",
-      time: "10:33 AM",
-      isMine: true,
-    },
-    {
-      id: 5,
-      sender: "Alpha Node",
-      content: "Check position update",
-      time: "10:35 AM",
-      isMine: false,
-    },
-  ],
-  2: [
-    {
-      id: 1,
-      sender: "Bravo Node",
-      content: "Testing signal strength from hill position",
-      time: "9:00 AM",
-      isMine: false,
-    },
-    {
-      id: 2,
-      sender: "Me",
-      content: "Receiving you loud and clear",
-      time: "9:01 AM",
-      isMine: true,
-    },
-    {
-      id: 3,
-      sender: "Bravo Node",
-      content: "Signal strong here",
-      time: "9:05 AM",
-      isMine: false,
-    },
-  ],
-  6: [
-    {
-      id: 1,
-      sender: "Alpha Node",
-      content: "Starting network test",
-      time: "8:00 AM",
-      isMine: false,
-    },
-    {
-      id: 2,
-      sender: "Bravo Node",
-      content: "Ready",
-      time: "8:01 AM",
-      isMine: false,
-    },
-    {
-      id: 3,
-      sender: "Me",
-      content: "Standing by",
-      time: "8:02 AM",
-      isMine: true,
-    },
-    {
-      id: 4,
-      sender: "Charlie Node",
-      content: "All nodes responding",
-      time: "8:05 AM",
-      isMine: false,
-    },
-    {
-      id: 5,
-      sender: "Alpha Node",
-      content: "Network test complete",
-      time: "8:10 AM",
-      isMine: false,
-    },
-  ],
+type Contact = {
+  id: number;
+  name: string;
+  nodeId: string;
+  lastMessage: string;
+  time: string;
+  unread: number;
+  online: boolean;
+  type: "direct" | "channel";
+  nodeNum?: number;
 };
 
 type Tab = {
@@ -207,20 +39,115 @@ type Tab = {
   contactId: number;
 };
 
+const MAX_MESSAGE_BYTES = 200;
+
 export default function MessagesPage() {
-  const [openTabs, setOpenTabs] = useState<Tab[]>([{ id: 1, contactId: 1 }]);
-  const [activeTabId, setActiveTabId] = useState(1);
-  const [messages, setMessages] = useState(initialMessages);
-  const [newMessage, setNewMessage] = useState("");
+  const device = useDevice();
+  const nodeDB = useNodeDB();
+  const messages = useMessages();
+
+  const [openTabs, setOpenTabs] = useState<Tab[]>([]);
+  const [activeTabId, setActiveTabId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [contactFilter, setContactFilter] = useState<
     "all" | "direct" | "channels"
   >("all");
 
+  // Message input state per tab
+  const [messageDrafts, setMessageDrafts] = useState<Record<number, string>>(
+    {},
+  );
+  const [messageBytes, setMessageBytes] = useState<Record<number, number>>({});
+
+  // Get contacts from nodeDB and channels
+  const contacts = useMemo<Contact[]>(() => {
+    const contactsList: Contact[] = [];
+
+    // Add nodes from nodeDB
+    const nodes = nodeDB.getNodes(undefined, true); // include self
+    nodes.forEach((node) => {
+      const name =
+        node.user?.longName || node.user?.shortName || `Node ${node.num}`;
+      contactsList.push({
+        id: node.num,
+        name,
+        nodeId: `!${node.num.toString(16)}`,
+        lastMessage: "",
+        time: "",
+        unread: 0,
+        online: (node.lastHeard || 0) > Date.now() / 1000 - 900, // Online if heard in last 15 min
+        type: "direct",
+        nodeNum: node.num,
+      });
+    });
+
+    // Add channels from device (at the top of the list)
+    if (device?.channels) {
+      const channels = Array.from(device.channels.values());
+      channels.forEach((channel) => {
+        // Only show channels that have a name or are the primary channel
+        if (
+          channel?.index !== undefined &&
+          (channel.settings?.name || channel.index === 0)
+        ) {
+          const name =
+            channel.settings?.name ||
+            (channel.index === 0 ? "Primary" : `Channel ${channel.index}`);
+          contactsList.unshift({
+            id: 1000000 + channel.index, // Offset to avoid ID collision
+            name,
+            nodeId: `#${channel.index}`,
+            lastMessage: "",
+            time: "",
+            unread: 0,
+            online: true,
+            type: "channel",
+          });
+        }
+      });
+    }
+
+    return contactsList;
+  }, [nodeDB, device.channels]);
+
+  // Open Primary channel when contacts are loaded
+  useEffect(() => {
+    if (openTabs.length === 0 && contacts.length > 0) {
+      const primaryChannel = contacts.find(
+        (c) => c.type === "channel" && c.nodeId === "#0",
+      );
+      if (primaryChannel) {
+        setOpenTabs([{ id: 1, contactId: primaryChannel.id }]);
+        setActiveTabId(1);
+      }
+    }
+  }, [contacts, openTabs.length]);
+
   const activeTab = openTabs.find((t) => t.id === activeTabId);
   const selectedContact = activeTab
     ? contacts.find((c) => c.id === activeTab.contactId)
     : null;
+
+  // Mark conversation as read when it becomes active
+  useEffect(() => {
+    if (!selectedContact || !device.myNodeNum) {
+      return;
+    }
+
+    if (selectedContact.type === "channel") {
+      const channelId = selectedContact.id - 1000000;
+      messages.markConversationAsRead({
+        type: MessageType.Broadcast,
+        channelId: channelId as Types.ChannelNumber,
+      });
+    } else if (selectedContact.nodeNum) {
+      messages.markConversationAsRead({
+        type: MessageType.Direct,
+        nodeA: device.myNodeNum,
+        nodeB: selectedContact.nodeNum,
+      });
+    }
+  }, [device.myNodeNum, messages.markConversationAsRead, selectedContact]);
 
   const filteredContacts = contacts.filter((contact) => {
     const matchesSearch =
@@ -241,9 +168,11 @@ export default function MessagesPage() {
       const newTabId = Math.max(...openTabs.map((t) => t.id), 0) + 1;
       setOpenTabs([...openTabs, { id: newTabId, contactId }]);
       setActiveTabId(newTabId);
-      // Initialize messages if not exists
-      if (!messages[contactId]) {
-        setMessages((prev) => ({ ...prev, [contactId]: [] }));
+
+      // Initialize draft for this contact if not exists
+      if (!messageDrafts[contactId]) {
+        setMessageDrafts((prev) => ({ ...prev, [contactId]: "" }));
+        setMessageBytes((prev) => ({ ...prev, [contactId]: 0 }));
       }
     }
   };
@@ -262,30 +191,74 @@ export default function MessagesPage() {
     }
   };
 
-  const sendMessage = () => {
-    if (!newMessage.trim() || !selectedContact) return;
-    setMessages((prev) => ({
-      ...prev,
-      [selectedContact.id]: [
-        ...(prev[selectedContact.id] || []),
-        {
-          id: (prev[selectedContact.id]?.length || 0) + 1,
-          sender: "Me",
-          content: newMessage,
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          isMine: true,
-        },
-      ],
-    }));
-    setNewMessage("");
+  const calculateBytes = (text: string) => new Blob([text]).size;
+
+  const handleMessageChange = (contactId: number, text: string) => {
+    const byteLength = calculateBytes(text);
+    if (byteLength <= MAX_MESSAGE_BYTES) {
+      setMessageDrafts((prev) => ({ ...prev, [contactId]: text }));
+      setMessageBytes((prev) => ({ ...prev, [contactId]: byteLength }));
+    }
   };
 
-  const currentMessages = selectedContact
-    ? messages[selectedContact.id] || []
-    : [];
+  const sendMessage = () => {
+    if (!selectedContact || !device.connection) {
+      return;
+    }
+
+    const draft = messageDrafts[selectedContact.id] || "";
+    const trimmedMessage = draft.trim();
+
+    if (!trimmedMessage) {
+      return;
+    }
+
+    startTransition(() => {
+      // Determine destination based on contact type
+      let destination: Types.Destination;
+      if (selectedContact.type === "channel") {
+        // For channels, use the channel index
+        const channelIndex = selectedContact.id - 1000000;
+        destination = channelIndex as Types.Destination;
+      } else {
+        // For direct messages, use the node number
+        destination = selectedContact.nodeNum as Types.Destination;
+      }
+
+      // Send the message via device connection
+      device.connection?.sendText(trimmedMessage, destination);
+
+      // Clear the draft
+      setMessageDrafts((prev) => ({ ...prev, [selectedContact.id]: "" }));
+      setMessageBytes((prev) => ({ ...prev, [selectedContact.id]: 0 }));
+    });
+  };
+
+  // Get messages for the selected contact
+  const currentMessages = useMemo(() => {
+    if (!selectedContact || !device.myNodeNum) {
+      return [];
+    }
+
+    if (selectedContact.type === "channel") {
+      const channelId = selectedContact.id - 1000000;
+      return messages.getMessages({
+        type: MessageType.Broadcast,
+        channelId: channelId as Types.ChannelNumber,
+      });
+    }
+
+    // For direct messages, check if nodeNum exists
+    if (!selectedContact.nodeNum) {
+      return [];
+    }
+
+    return messages.getMessages({
+      type: MessageType.Direct,
+      nodeA: device.myNodeNum,
+      nodeB: selectedContact.nodeNum,
+    });
+  }, [selectedContact, messages, device.myNodeNum]);
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)]">
@@ -297,6 +270,7 @@ export default function MessagesPage() {
             <Input
               placeholder="Search nodes..."
               className="pl-9"
+              type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -350,14 +324,11 @@ export default function MessagesPage() {
                       <Hash className="h-5 w-5 text-primary" />
                     </div>
                   ) : (
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-primary/20 text-primary text-sm">
-                        {contact.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
+                    <NodeAvatar
+                      nodeNum={contact.nodeNum || contact.id}
+                      longName={contact.name}
+                      size="sm"
+                    />
                   )}
                   {contact.online && contact.type === "direct" && (
                     <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-chart-2" />
@@ -365,13 +336,15 @@ export default function MessagesPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium truncate">{contact.name}</span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="font-sans font-medium truncate">
+                      {contact.name}
+                    </span>
+                    <span className="font-sans text-xs text-muted-foreground">
                       {contact.time}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground truncate">
+                    <span className="font-sans text-sm text-muted-foreground truncate">
                       {contact.lastMessage}
                     </span>
                     {contact.unread > 0 && (
@@ -413,13 +386,12 @@ export default function MessagesPage() {
                         <Hash className="h-4 w-4 text-primary shrink-0" />
                       ) : (
                         <div className="relative shrink-0">
-                          <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center">
-                            <span className="text-[10px] text-primary font-medium">
-                              {tabContact.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </span>
+                          <div className="h-5 w-5 rounded-full overflow-hidden">
+                            <NodeAvatar
+                              nodeNum={tabContact.nodeNum || tabContact.id}
+                              longName={tabContact.name}
+                              size="xs"
+                            />
                           </div>
                           {tabContact.online &&
                             tabContact.type === "direct" && (
@@ -427,13 +399,14 @@ export default function MessagesPage() {
                             )}
                         </div>
                       )}
-                      <span className="text-sm truncate flex-1">
+                      <span className="text-sm truncate flex-1 font-sans">
                         {tabContact.name}
                       </span>
                       {openTabs.length > 1 && (
                         <button
+                          type="button"
                           onClick={(e) => closeTab(tab.id, e)}
-                          className="opacity-0 group-hover:opacity-100 hover:bg-muted rounded p-0.5 transition-opacity"
+                          className="opacity-0 group-hover:opacity-900 hover:bg-muted rounded p-0.5 transition-opacity"
                         >
                           <X className="h-3 w-3 text-muted-foreground" />
                         </button>
@@ -473,14 +446,11 @@ export default function MessagesPage() {
                       <Hash className="h-5 w-5 text-primary" />
                     </div>
                   ) : (
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-primary/20 text-primary">
-                        {selectedContact.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
+                    <NodeAvatar
+                      nodeNum={selectedContact.nodeNum || selectedContact.id}
+                      longName={selectedContact.name}
+                      size="sm"
+                    />
                   )}
                   {selectedContact.online &&
                     selectedContact.type === "direct" && (
@@ -513,66 +483,101 @@ export default function MessagesPage() {
 
             {/* Messages */}
             <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                {currentMessages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={cn(
-                      "flex",
-                      message.isMine ? "justify-end" : "justify-start",
-                    )}
-                  >
+              <div className="space-y-3">
+                {currentMessages.map((msg) => {
+                  const isMine = msg.from === device.myNodeNum;
+                  const senderNode = nodeDB.getNode(msg.from);
+                  const senderName =
+                    senderNode?.user?.longName ||
+                    senderNode?.user?.shortName ||
+                    `Node ${msg.from}`;
+                  const avatarColors = getAvatarColors(msg.from);
+
+                  return (
                     <div
+                      key={msg.messageId}
                       className={cn(
-                        "max-w-[70%] rounded-2xl px-4 py-2",
-                        message.isMine
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted",
+                        "flex gap-2 items-center",
+                        isMine
+                          ? "justify-end flex-row-reverse"
+                          : "justify-start",
                       )}
                     >
-                      {selectedContact.type === "channel" &&
-                        !message.isMine && (
-                          <p className="text-xs font-medium text-primary mb-1">
-                            {message.sender}
-                          </p>
-                        )}
-                      <p className="text-sm">{message.content}</p>
-                      <p
+                      <NodeAvatar
+                        nodeNum={msg.from}
+                        longName={senderName}
+                        size="sm"
+                      />
+                      <div
                         className={cn(
-                          "text-xs mt-1",
-                          message.isMine
-                            ? "text-primary-foreground/70"
-                            : "text-muted-foreground",
+                          "max-w-[70%] rounded-2xl px-3 py-2",
+                          isMine
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-card",
                         )}
                       >
-                        {message.time}
-                      </p>
+                        {!isMine && (
+                          <p
+                            className="text-xs font-medium mb-0.5 font-sans"
+                            style={{ color: avatarColors.bgColor }}
+                          >
+                            {senderName}
+                          </p>
+                        )}
+                        <p className="text-sm leading-relaxed font-sans">
+                          {msg.message}
+                        </p>
+                        <p
+                          className={cn(
+                            "text-xs mt-1 font-sans",
+                            isMine
+                              ? "text-primary-foreground/60"
+                              : "text-muted-foreground",
+                          )}
+                        >
+                          {new Date(msg.date).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </ScrollArea>
 
             {/* Message Input */}
             <div className="border-t p-4">
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon">
+              <form className="flex items-center gap-2">
+                {/* <Button variant="ghost" size="icon">
                   <Paperclip className="h-4 w-4" />
-                </Button>
-                <Input
-                  placeholder={`Message ${selectedContact.name}...`}
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                  className="flex-1"
-                />
-                <Button variant="ghost" size="icon">
+                </Button> */}
+                <div className="flex-1 flex gap-2">
+                  <Input
+                    placeholder={`Message ${selectedContact.name}...`}
+                    // value={messageDrafts[selectedContact.id] || ""}
+                    onChange={(e) =>
+                      handleMessageChange(selectedContact.id, e.target.value)
+                    }
+                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                    className="flex-1"
+                  />
+                  <span className="flex items-center text-sm text-muted-foreground min-w-[60px] justify-end">
+                    {messageBytes[selectedContact.id] || 0}/{MAX_MESSAGE_BYTES}
+                  </span>
+                </div>
+                <Button variant="ghost" size="icon" type="submit">
                   <Smile className="h-4 w-4" />
                 </Button>
-                <Button size="icon" onClick={sendMessage}>
-                  <Send className="h-4 w-4" />
+                <Button
+                  size="icon"
+                  onClick={sendMessage}
+                  className="rounded-full"
+                >
+                  <ArrowUp className="h-5 w-5" />
                 </Button>
-              </div>
+              </form>
             </div>
           </>
         ) : (

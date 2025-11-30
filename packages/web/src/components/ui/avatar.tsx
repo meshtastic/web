@@ -34,14 +34,23 @@ AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
 const AvatarFallback = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Fallback>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback> & {
+    bgColor?: string;
+    textColor?: string;
+  }
+>(({ className, bgColor, textColor, style, ...props }, ref) => (
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted",
+      "flex h-full w-full items-center justify-center rounded-full",
+      !bgColor && "bg-muted",
       className
     )}
+    style={{
+      ...(bgColor && { backgroundColor: bgColor }),
+      ...(textColor && { color: textColor }),
+      ...style,
+    }}
     {...props}
   />
 ))

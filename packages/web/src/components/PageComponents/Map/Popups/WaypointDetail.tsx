@@ -73,13 +73,13 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
               <MapPinnedIcon size={14} aria-hidden className="mt-1" />
               <span className="truncate">
                 {t("waypointDetail.longitude")}
-                <br />
+
                 {t("waypointDetail.latitude")}
               </span>
             </dt>
             <dd className="ms-auto text-right">
               <data value={waypointLngLat[0]}>{waypointLngLat[0]}</data>
-              <br />
+
               <data value={waypointLngLat[1]}>{waypointLngLat[1]}</data>
             </dd>
           </div>

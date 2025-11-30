@@ -207,7 +207,7 @@
   },
   "errorPage": {
     "title": "Det här är lite pinsamt...",
-    "description1": "Vi är verkligen ledsna men ett fel inträffade i webbklienten som fick den att krascha. <br /> Detta var inte meningen, men vi arbetar hårt för att åtgärda det.",
+    "description1": "Vi är verkligen ledsna men ett fel inträffade i webbklienten som fick den att krascha.  Detta var inte meningen, men vi arbetar hårt för att åtgärda det.",
     "description2": "Det bästa sättet att förhindra att detta händer igen för dig eller någon annan är att rapportera problemet till oss.",
     "reportInstructions": "Vänligen inkludera följande information i din rapport:",
     "reportSteps": {

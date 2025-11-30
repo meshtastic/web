@@ -1,9 +1,3 @@
-import { useNodeDB } from "@core/stores";
-import type { Protobuf, Types } from "@meshtastic/core";
-import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
-import { useTranslation } from "react-i18next";
-
-import { TraceRoute } from "../PageComponents/Messages/TraceRoute.tsx";
 import {
   Dialog,
   DialogClose,
@@ -11,7 +5,12 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../UI/Dialog.tsx";
+} from "@components/ui/Dialog.tsx";
+import { useNodeDB } from "@core/stores";
+import type { Protobuf, Types } from "@meshtastic/core";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { useTranslation } from "react-i18next";
+import { TraceRoute } from "../PageComponents/Messages/TraceRoute.tsx";
 
 export interface TracerouteResponseDialogProps {
   traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery> | undefined;

@@ -6,6 +6,7 @@ type MessageId = number;
 type ChannelId = Types.ChannelNumber;
 type ConversationId = string;
 type MessageLogMap = Map<MessageId, Message>;
+type LastReadMap = Map<ConversationId | ChannelId, MessageId>;
 
 interface MessageBase {
   channel: Types.ChannelNumber;
@@ -61,11 +62,26 @@ type ClearMessageParams =
       messageId: MessageId;
     };
 
+type MarkAsReadParams =
+  | {
+      type: MessageType.Direct;
+      nodeA: NodeNum;
+      nodeB: NodeNum;
+      messageId: MessageId;
+    }
+  | {
+      type: MessageType.Broadcast;
+      channelId: ChannelId;
+      messageId: MessageId;
+    };
+
 export type {
   ChannelId,
   ClearMessageParams,
   ConversationId,
   GetMessagesParams,
+  LastReadMap,
+  MarkAsReadParams,
   Message,
   MessageId,
   MessageLogMap,

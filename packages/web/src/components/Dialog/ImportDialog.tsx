@@ -146,10 +146,7 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
         <DialogHeader>
           <DialogTitle>{t("import.title")}</DialogTitle>
           <DialogDescription>
-            <Trans
-              i18nKey={"import.description"}
-              components={{ italic: <i />, br: <br /> }}
-            />
+            <Trans i18nKey={"import.description"} />
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-3">

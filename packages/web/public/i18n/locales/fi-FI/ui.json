@@ -207,7 +207,7 @@
   },
   "errorPage": {
     "title": "Tämä on hieman noloa...",
-    "description1": "Pahoittelemme, mutta verkkosovelluksessa tapahtui virhe, joka aiheutti kaatumisen. <br /> \nTällaista ei pitäisi tapahtua ja me työskentelemme ahkerasti ongelman korjaamiseksi.",
+    "description1": "Pahoittelemme, mutta verkkosovelluksessa tapahtui virhe, joka aiheutti kaatumisen.  \nTällaista ei pitäisi tapahtua ja me työskentelemme ahkerasti ongelman korjaamiseksi.",
     "description2": "Paras tapa estää tämän tapahtuminen uudelleen sinulle tai kenellekään muulle, on ilmoittaa meille ongelmasta.",
     "reportInstructions": "Lisääthän raporttiisi seuraavat tiedot:",
     "reportSteps": {

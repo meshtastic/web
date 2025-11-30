@@ -141,10 +141,13 @@ describe("NodeDB store", () => {
     const db = useNodeDBStore.getState().addNodeDB(1);
     db.addNode(makeNode(123));
 
-    expect(db.getMyNode()).toBeUndefined();
+    // Before setNodeNum, getMyNode should timeout
+    await expect(db.getMyNode()).rejects.toThrow("Timeout waiting for myNodeNum");
+
     db.setNodeNum(123);
 
-    const me = db.getMyNode();
+    // After setNodeNum, getMyNode should resolve
+    const me = await db.getMyNode();
     expect(me?.num).toBe(123);
   });
 
@@ -437,7 +440,8 @@ describe("NodeDB – merge semantics, PKI checks & extras", () => {
     const newDB = st.addNodeDB(1101);
     newDB.setNodeNum(4242);
 
-    expect(newDB.getMyNode()?.num).toBe(4242);
+    const myNode = await newDB.getMyNode();
+    expect(myNode?.num).toBe(4242);
   });
 });
 

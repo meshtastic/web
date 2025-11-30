@@ -24,6 +24,7 @@ const TooltipContent = React.forwardRef<
 ));
 
 const TooltipArrow = TooltipPrimitive.Arrow;
+const TooltipPortal = TooltipPrimitive.Portal;
 
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 export {
@@ -32,4 +33,5 @@ export {
   TooltipContent,
   TooltipProvider,
   TooltipArrow,
+  TooltipPortal,
 };

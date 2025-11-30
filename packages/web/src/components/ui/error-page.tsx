@@ -1,5 +1,5 @@
+import { Link } from "@app/components/ui/link";
 import { Heading } from "@components/ui/typography/heading.tsx";
-import { Link } from "@components/ui/typography/link.tsx";
 import { P } from "@components/ui/typography/p.tsx";
 import newGithubIssueUrl from "@core/utils/github.ts";
 import { ExternalLink } from "lucide-react";
@@ -13,10 +13,10 @@ export function ErrorPage({ error }: { error: Error }) {
   }
 
   return (
-    <article className="w-full h-screen overflow-y-auto bg-background-primary text-text-primary">
-      <section className="flex shrink md:flex-row gap-16 mt-20 px-4 md:px-8 text-lg md:text-xl space-y-2 place-items-center dark:bg-background-primary text-slate-900 dark:text-text-primary">
+    <article className="w-full h-screen overflow-y-auto">
+      <section className="flex shrink md:flex-row gap-16 mt-20 px-4 md:px-8 text-lg md:text-xl space-y-2 place-items-center">
         <div>
-          <Heading as="h2" className="text-text-primary">
+          <Heading as="h2" className="text-primary">
             {t("errorPage.title")}
           </Heading>
           <P>{t("errorPage.description1")}</P>

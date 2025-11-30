@@ -44,10 +44,6 @@ export {
 } from "@core/stores/messageStore";
 export { type NodeDB, useNodeDBStore } from "@core/stores/nodeDBStore/index.ts";
 export type { NodeErrorType } from "@core/stores/nodeDBStore/types.ts";
-export {
-  SidebarProvider,
-  useSidebar, // TODO: Bring hook into this file
-} from "@core/stores/sidebarStore/index.tsx";
 
 // Re-export idb-keyval functions for clearing all stores, expand this if we add more local storage types
 export { clear as clearAllStores } from "idb-keyval";

@@ -1,18 +1,18 @@
 import type { LangCode } from "@app/i18n-config.ts";
+import { Button } from "@components/ui/button.tsx";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@components/ui/dropdown-menu.tsx";
+import { Subtle } from "@components/ui/typography/subtle.tsx";
 import useLang from "@core/hooks/useLang.ts";
 import { cn } from "@core/utils/cn.ts";
 import { t } from "i18next";
 import { Check, Languages } from "lucide-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "./UI/Button.tsx";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./UI/DropdownMenu.tsx";
-import { Subtle } from "./UI/Typography/Subtle.tsx";
 
 interface LanguageSwitcherProps {
   disableHover?: boolean;

@@ -20,7 +20,7 @@
       "@components/*": ["./src/components/*"],
       "@core/*": ["./src/core/*"],
       "@layouts/*": ["./src/layouts/*"],
-      "@meshtastic/ui/*": ["../ui/*"]
+      "@meshtastic/ui/*": ["@components/ui/*"]
     }
   },
   "include": ["src", ".d.ts"],

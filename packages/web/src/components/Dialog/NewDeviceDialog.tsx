@@ -1,3 +1,4 @@
+import { Link } from "@app/components/ui/typography/link";
 import { BLE } from "@components/PageComponents/Connect/BLE.tsx";
 import { HTTP } from "@components/PageComponents/Connect/HTTP.tsx";
 import { Serial } from "@components/PageComponents/Connect/Serial.tsx";
@@ -7,7 +8,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@components/ui/dialog.tsx";
+} from
+"@components/ui@app/components/ui/link
+
 import {
   Tabs,
   TabsContent,
@@ -20,7 +23,6 @@ import {
 } from "@core/hooks/useBrowserFeatureDetection.ts";
 import { AlertCircle } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
-import { Link } from "../UI/Typography/Link.tsx";
 
 export interface TabElementProps {
   closeDialog: () => void;

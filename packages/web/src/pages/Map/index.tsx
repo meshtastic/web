@@ -30,6 +30,7 @@ import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {
   useCallback,
   useDeferredValue,
+  useEffect,
   useId,
   useMemo,
   useRef,
@@ -43,20 +44,34 @@ const NODEDB_DEBOUNCE_MS = 250;
 const MapPage = () => {
   const { t } = useTranslation("map");
   const { getNode } = useNodeDB();
-  const { nodes: validNodes, myNode } = useNodeDB(
+  const nodeDB = useNodeDB();
+  const { nodes: validNodes, myNodeNum } = useNodeDB(
     (db) => ({
       // only nodes with a position
       nodes: db.getNodes((n): n is Protobuf.Mesh.NodeInfo =>
         Boolean(n.position?.latitudeI),
       ),
-      myNode: db.getMyNode(),
 
       // References to cause re-render on change
       _errorsRef: db.nodeErrors,
-      _nodeNumRef: db.myNodeNum,
+      myNodeNum: db.myNodeNum,
     }),
     { debounce: NODEDB_DEBOUNCE_MS },
   );
+
+  const [myNode, setMyNode] = useState<Protobuf.Mesh.NodeInfo | undefined>();
+
+  useEffect(() => {
+    if (!nodeDB || !myNodeNum) return;
+
+    nodeDB
+      .getMyNode()
+      .then((node) => setMyNode(node))
+      .catch((error) => {
+        console.error("Failed to get myNode:", error);
+        setMyNode(undefined);
+      });
+  }, [nodeDB, myNodeNum]);
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
   const { default: mapRef } = useMap();
   const { focusLngLat, fitToNodes } = useMapFitting(mapRef);

@@ -1,4 +1,4 @@
-import { Badge } from "../UI/Badge.tsx";
+import { Badge } from "@components/ui/Badge.tsx";
 
 export function SupportBadge({
   supported,

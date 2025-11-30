@@ -207,7 +207,7 @@
   },
   "errorPage": {
     "title": "Questo è un po' imbarazzante...",
-    "description1": "Siamo davvero spiacenti, ma si è verificato un errore nel client web che ha causato il crash. <br /> Questo non dovrebbe accadere e stiamo lavorando duramente per risolverlo.",
+    "description1": "Siamo davvero spiacenti, ma si è verificato un errore nel client web che ha causato il crash.  Questo non dovrebbe accadere e stiamo lavorando duramente per risolverlo.",
     "description2": "Il modo migliore per evitare che ciò accada di nuovo a voi o a chiunque altro è quello di riferire la questione a noi.",
     "reportInstructions": "Per favore includi le seguenti informazioni nel tuo report:",
     "reportSteps": {
