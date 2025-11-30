@@ -428,31 +428,31 @@
     }
   },
   "user": {
-    "title": "User Settings",
-    "description": "Configure your device name and identity settings",
+    "title": "Paramètres utilisateur",
+    "description": "Configurer le nom de votre appareil et ses réglages d'identité",
     "longName": {
       "label": "Nom long",
-      "description": "Your full display name (1-40 characters)",
+      "description": "Votre nom complet d'affichage (1-40 caractères)",
       "validation": {
-        "min": "Long name must be at least 1 character",
-        "max": "Long name must be at most 40 characters"
+        "min": "Le nom long doit faire au moins 1 caractère",
+        "max": "Le nom long doit faire au plus 40 caractères"
       }
     },
     "shortName": {
       "label": "Nom court",
-      "description": "Your abbreviated name (2-4 characters)",
+      "description": "Votre nom court (2-4 caractères)",
       "validation": {
-        "min": "Short name must be at least 2 characters",
-        "max": "Short name must be at most 4 characters"
+        "min": "Le nom court doit faire au moins 2 caractères",
+        "max": "Le nom court doit faire au plus 4 caractères"
       }
     },
     "isUnmessageable": {
       "label": "Non joignable par message",
-      "description": "Used to identify unmonitored or infrastructure nodes so that messaging is not available to nodes that will never respond."
+      "description": "Utilisé pour identifier les nœuds non surveillés ou infrastructure de telle manière qu'il ne soit pas possible d'écrire directement à des nœuds qui ne répondront jamais."
     },
     "isLicensed": {
       "label": "Radioamateur licencié (HAM)",
-      "description": "Enable if you are a licensed amateur radio operator, enabling this option disables encryption and is not compatible with the default Meshtastic network."
+      "description": "Activez si vous être radio amateur licencié, activer cette option désactive le chiffrement et n'est pas compatible avec le réseau Meshtastic par défaut."
     }
   }
 }

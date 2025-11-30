@@ -1,8 +1,8 @@
 {
   "button": {
     "apply": "Appliquer",
-    "addConnection": "Add Connection",
-    "saveConnection": "Save connection",
+    "addConnection": "Ajouter la connexion",
+    "saveConnection": "Enregistrer la connexion",
     "backupKey": "Clé de sauvegarde",
     "cancel": "Annuler",
     "connect": "Connecter",
@@ -25,10 +25,10 @@
     "requestNewKeys": "Demander de nouvelles clés",
     "requestPosition": "Demander la position",
     "reset": "Réinitialiser",
-    "retry": "Retry",
+    "retry": "Réessayer",
     "save": "Sauvegarder",
-    "setDefault": "Set as default",
-    "unsetDefault": "Unset default",
+    "setDefault": "Définir comme valeur par défaut",
+    "unsetDefault": "Annuler la valeur par défaut",
     "scanQr": "Scanner le code QR",
     "traceRoute": "Analyse du trajet réseau",
     "submit": "Envoyer"
@@ -59,8 +59,8 @@
       "suffix": "m"
     },
     "kilometer": {
-      "one": "Kilometer",
-      "plural": "Kilometers",
+      "one": "kilomètre",
+      "plural": "kilomètres",
       "suffix": "km"
     },
     "minute": {
@@ -83,8 +83,8 @@
     "day": {
       "one": "Jour",
       "plural": "Jours",
-      "today": "Today",
-      "yesterday": "Yesterday"
+      "today": "Aujourd'hui",
+      "yesterday": "Hier"
     },
     "month": {
       "one": "Mois",
@@ -105,8 +105,8 @@
       "plural": "Enregistrements"
     },
     "degree": {
-      "one": "Degree",
-      "plural": "Degrees",
+      "one": "Degré",
+      "plural": "Degrés",
       "suffix": "°"
     }
   },
@@ -156,7 +156,7 @@
       "key": "Clé requise."
     },
     "invalidOverrideFreq": {
-      "number": "Invalid format, expected a value in the range 410-930 MHz or 0 (use default)."
+      "number": "Format invalide, la valeur attendue est dans la zone 410-930 MHz ou 0 (utiliser la valeur par défaut)."
     }
   },
   "yes": "Oui",
