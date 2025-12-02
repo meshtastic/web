@@ -193,6 +193,24 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   const isOnPrimaryChannel = message.channel === Types.ChannelNumber.Primary; // Use the enum
   const shouldShowStatusIcon = isSender && isOnPrimaryChannel;
 
+  const messageMetadata = useMemo(() => {
+    if (message.hops != null) {
+      return (
+        <div className="text-xs text-slate-500 dark:text-slate-200 whitespace-pre-wrap break-words">
+          {t("hops.text", { value: message.hops })}
+        </div>
+      );
+    }
+    if (message.rxSnr != null && message.rxRssi != null) {
+      return (
+        <div className="text-xs text-slate-500 dark:text-slate-200 whitespace-pre-wrap break-words">
+          SNR: {message.rxSnr}, RSSI: {message.rxRssi}
+        </div>
+      );
+    }
+    return null;
+  }, [message.hops, message.rxSnr, message.rxRssi, t]);
+
   const messageItemWrapperClass = cn(
     "group w-full py-2 relative list-none",
     "rounded-md",
@@ -256,20 +274,11 @@ export const MessageItem = ({ message }: MessageItemProps) => {
           </div>
 
           {message?.message && (
-            <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words">
+            <div className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap wrap-break-words">
               {message.message}
             </div>
           )}
-          {(message.hops && (
-            <div className="text-xs text-slate-500 dark:text-slate-200 whitespace-pre-wrap break-words">
-              {t("hops.text", { value: message.hops })}
-            </div>
-          )) ||
-            (message.rxSnr && message.rxRssi && (
-              <div className="text-xs text-slate-500 dark:text-slate-200 whitespace-pre-wrap break-words">
-                SNR: {message.rxSnr}, RSSI: {message.rxRssi}
-              </div>
-            ))}
+          {messageMetadata}
         </div>
       </div>
       {/* Actions Menu Placeholder */}

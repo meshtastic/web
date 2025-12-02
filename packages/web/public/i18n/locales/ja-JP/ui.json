@@ -166,8 +166,8 @@
   },
   "hops": {
     "direct": "直接",
-    "label": "Number of hops",
-    "text": "Number of hops: {{value}}"
+    "label": "Hops Away",
+    "text": "Hops Away: {{value}}"
   },
   "lastHeard": {
     "label": "最後の通信",
