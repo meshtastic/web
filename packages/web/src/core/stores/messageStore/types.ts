@@ -15,10 +15,6 @@ interface MessageBase {
   messageId: number;
   state: MessageState;
   message: string;
-  rxSnr: number;
-  rxRssi: number;
-  viaMqtt: boolean;
-  hops: number;
 }
 
 interface GenericMessage<T extends MessageType> extends MessageBase {

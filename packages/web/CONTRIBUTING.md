@@ -134,10 +134,7 @@ fix: correct caching issue in storage service
 ## 💡 Tips for Contributors
 - Keep PRs **small, focused, and atomic**.  
 - Discuss larger changes with the team on [Discord](https://discord.gg/meshtastic) before starting work.  
-- If unsure, open a draft PR for early feedback.
-- Maintain cross-platform visual consistency: when implementing new UI components, it's important to maintain a consistent
-look and layout across platforms. Before introducing a new visual pattern, please reference the existing interfaces in other 
-client apps to ensure alignment.
+- If unsure, open a draft PR for early feedback.  
 
 ---
 
