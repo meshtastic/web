@@ -60,10 +60,6 @@ export interface PacketMetadata<T> {
   from: number;
   to: number;
   channel: ChannelNumber;
-  hops: number;
-  rxRssi: number;
-  rxSnr: number;
-  viaMqtt: boolean;
   data: T;
 }
 

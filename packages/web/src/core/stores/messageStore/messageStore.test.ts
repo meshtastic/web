@@ -53,10 +53,6 @@ const directMessageToOther1: Message = {
   messageId: 101,
   state: MessageState.Waiting,
   message: "Hello other 1 from me",
-  rxSnr: 1,
-  rxRssi: 2,
-  viaMqtt: false,
-  hops: 3,
 };
 
 const directMessageFromOther1: Message = {
@@ -68,10 +64,6 @@ const directMessageFromOther1: Message = {
   messageId: 102,
   state: MessageState.Waiting,
   message: "Hello me from other 1",
-  rxSnr: 1,
-  rxRssi: 2,
-  viaMqtt: false,
-  hops: 3,
 };
 
 const directMessageToOther2: Message = {
@@ -83,10 +75,6 @@ const directMessageToOther2: Message = {
   messageId: 103,
   state: MessageState.Waiting,
   message: "Hello other 2 from me",
-  rxSnr: 1,
-  rxRssi: 2,
-  viaMqtt: false,
-  hops: 3,
 };
 
 const broadcastMessage1: Message = {
@@ -98,10 +86,6 @@ const broadcastMessage1: Message = {
   messageId: 201,
   state: MessageState.Waiting,
   message: "Broadcast message 1",
-  rxSnr: 1,
-  rxRssi: 2,
-  viaMqtt: false,
-  hops: 3,
 };
 
 const broadcastMessage2: Message = {
@@ -113,10 +97,6 @@ const broadcastMessage2: Message = {
   messageId: 202,
   state: MessageState.Waiting,
   message: "Broadcast message 2",
-  rxSnr: 1,
-  rxRssi: 2,
-  viaMqtt: false,
-  hops: 3,
 };
 
 describe("MessageStore persistence & rehydrate", () => {
@@ -784,10 +764,6 @@ describe("MessageStore persistence & rehydrate", () => {
             messageId: i,
             state: MessageState.Waiting,
             message: `m${i}`,
-            rxSnr: 1,
-            rxRssi: 2,
-            viaMqtt: false,
-            hops: 3,
           });
         }
 
