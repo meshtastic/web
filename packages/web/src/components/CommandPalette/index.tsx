@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { NodeAvatar } from "../NodeAvatar.tsx";
 
 export interface Group {
   id: string;
@@ -126,7 +127,7 @@ export const CommandPalette = () => {
             label:
               getNode(device.hardware.myNodeNum)?.user?.longName ??
               t("unknown.shortName"),
-            icon: <Avatar nodeNum={device.hardware.myNodeNum} />,
+            icon: <NodeAvatar nodeNum={device.hardware.myNodeNum} />,
             action() {
               setSelectedDevice(device.id);
             },

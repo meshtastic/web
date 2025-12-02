@@ -27,8 +27,8 @@ const transports = new Map<ConnectionId, BluetoothDevice | SerialPort>();
 const heartbeats = new Map<ConnectionId, ReturnType<typeof setInterval>>();
 const configSubscriptions = new Map<ConnectionId, () => void>();
 
-const HEARTBEAT_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
-const CONFIG_HEARTBEAT_INTERVAL_MS = 5000; // 5s during configuration
+const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000; // 3 minutes
+const CONFIG_HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000; // 3 minutes during configuration
 
 export function useConnections() {
   const connections = useDeviceStore((s) => s.savedConnections);

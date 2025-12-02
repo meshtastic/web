@@ -470,33 +470,16 @@ function nodeDBFactory(
       }
 
       // If myNodeNum is already available, return immediately
-      if (nodeDB.myNodeNum) {
+      if (nodeDB.myNodeNum !== undefined) {
         return (
           nodeDB.nodeMap.get(nodeDB.myNodeNum) ??
           create(Protobuf.Mesh.NodeInfoSchema)
         );
       }
 
-      return new Promise<Protobuf.Mesh.NodeInfo>((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          unsubscribe();
-          reject(new Error(`Timeout waiting for myNodeNum (nodeDB id: ${id})`));
-        }, 3000); // 3 second timeout
-
-        const unsubscribe = useNodeDBStore.subscribe(
-          (state) => state.nodeDBs.get(id)?.myNodeNum,
-          (myNodeNum) => {
-            if (myNodeNum !== undefined) {
-              clearTimeout(timeout);
-              unsubscribe();
-              const currentNodeDB = get().nodeDBs.get(id);
-              const node = currentNodeDB?.nodeMap.get(myNodeNum);
-              resolve(node ?? create(Protobuf.Mesh.NodeInfoSchema));
-            }
-          },
-          { fireImmediately: true },
-        );
-      });
+      // Return undefined node if myNodeNum is not set yet
+      // This prevents the promise from hanging indefinitely
+      return create(Protobuf.Mesh.NodeInfoSchema);
     },
 
     getNodeError: (nodeNum) => {

@@ -19,7 +19,6 @@ import {
 import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
 import { useNodeDB } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
@@ -59,18 +58,12 @@ const MapPage = () => {
     { debounce: NODEDB_DEBOUNCE_MS },
   );
 
-  const [myNode, setMyNode] = useState<Protobuf.Mesh.NodeInfo | undefined>();
+  // Get myNode directly using getNodes - getMyNode now returns immediately
+  const myNode = useMemo(() => {
+    if (!nodeDB || !myNodeNum) return undefined;
 
-  useEffect(() => {
-    if (!nodeDB || !myNodeNum) return;
-
-    nodeDB
-      .getMyNode()
-      .then((node) => setMyNode(node))
-      .catch((error) => {
-        console.error("Failed to get myNode:", error);
-        setMyNode(undefined);
-      });
+    const nodes = nodeDB.getNodes(undefined, true);
+    return nodes.find((n) => n.num === myNodeNum);
   }, [nodeDB, myNodeNum]);
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
   const { default: mapRef } = useMap();
@@ -209,7 +202,7 @@ const MapPage = () => {
   );
 
   return (
-    <PageLayout label="Map" noPadding actions={[]} leftBar={<Sidebar />}>
+    <div>
       <BaseMap
         onLoad={getMapBounds}
         onMouseMove={onMouseMove}
@@ -277,7 +270,7 @@ const MapPage = () => {
           setVisibilityState={setVisibilityState}
         />
       </div>
-    </PageLayout>
+    </div>
   );
 };
 

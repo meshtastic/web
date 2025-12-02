@@ -237,27 +237,6 @@ const ConfigPage = () => {
     clearAllChanges();
   }, [formMethods, clearAllChanges]);
 
-  const leftSidebar = useMemo(
-    () => (
-      <Sidebar>
-        <SidebarSection label={t("sidebar.label")} className="py-2 px-0">
-          {sections.map((section) => (
-            <SidebarButton
-              key={section.key}
-              label={section.label}
-              active={activeSection?.key === section.key}
-              onClick={() => navigate({ to: section.route.to })}
-              Icon={section.icon}
-              isDirty={section.changeCount > 0}
-              count={section.changeCount}
-            />
-          ))}
-        </SidebarSection>
-      </Sidebar>
-    ),
-    [sections, activeSection?.key, navigate, t],
-  );
-
   const hasDrafts =
     getConfigChangeCount() > 0 ||
     getModuleConfigChangeCount() > 0 ||
@@ -267,72 +246,65 @@ const ConfigPage = () => {
   const buttonOpacity = hasPending ? "opacity-100" : "opacity-0";
   const saveDisabled = isSaving || !rhfState.isValid || !hasPending;
 
-  const actions = useMemo(
-    () => [
-      {
-        key: "unsavedChanges",
-        label: t("common:formValidation.unsavedChanges"),
-        onClick: () => {},
-        className: cn([
-          "bg-blue-500 text-slate-900 hover:bg-initial",
-          "transition-colors duration-200",
-          buttonOpacity,
-          "transition-opacity",
-        ]),
-      },
-      {
-        key: "reset",
-        icon: RefreshCwIcon,
-        label: t("common:button.reset"),
-        onClick: handleReset,
-        className: cn([
-          buttonOpacity,
-          "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
-          "hover:dark:bg-slate-300  hover:dark:text-black cursor-pointer",
-        ]),
-      },
-      {
-        key: "save",
-        icon: !hasPending ? SaveOff : SaveIcon,
-        isLoading: isSaving,
-        disabled: saveDisabled,
-        iconClasses:
-          !rhfState.isValid && hasPending
-            ? "text-red-400 cursor-not-allowed"
-            : "cursor-pointer",
-        className: cn([
-          "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
-          "hover:dark:bg-slate-300 hover:dark:text-black",
-          "disabled:hover:cursor-not-allowed cursor-pointer",
-        ]),
-        onClick: handleSave,
-        label: t("common:button.save"),
-      },
-    ],
-    [
-      isSaving,
-      hasPending,
-      rhfState.isValid,
-      saveDisabled,
-      buttonOpacity,
-      handleReset,
-      handleSave,
-      t,
-    ],
-  );
+  // const actions = useMemo(
+  //   () => [
+  //     {
+  //       key: "unsavedChanges",
+  //       label: t("common:formValidation.unsavedChanges"),
+  //       onClick: () => {},
+  //       className: cn([
+  //         "bg-blue-500 text-slate-900 hover:bg-initial",
+  //         "transition-colors duration-200",
+  //         buttonOpacity,
+  //         "transition-opacity",
+  //       ]),
+  //     },
+  //     {
+  //       key: "reset",
+  //       icon: RefreshCwIcon,
+  //       label: t("common:button.reset"),
+  //       onClick: handleReset,
+  //       className: cn([
+  //         buttonOpacity,
+  //         "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
+  //         "hover:dark:bg-slate-300  hover:dark:text-black cursor-pointer",
+  //       ]),
+  //     },
+  //     {
+  //       key: "save",
+  //       icon: !hasPending ? SaveOff : SaveIcon,
+  //       isLoading: isSaving,
+  //       disabled: saveDisabled,
+  //       iconClasses:
+  //         !rhfState.isValid && hasPending
+  //           ? "text-red-400 cursor-not-allowed"
+  //           : "cursor-pointer",
+  //       className: cn([
+  //         "transition-opacity hover:bg-slate-200 disabled:hover:bg-white",
+  //         "hover:dark:bg-slate-300 hover:dark:text-black",
+  //         "disabled:hover:cursor-not-allowed cursor-pointer",
+  //       ]),
+  //       onClick: handleSave,
+  //       label: t("common:button.save"),
+  //     },
+  //   ],
+  //   [
+  //     isSaving,
+  //     hasPending,
+  //     rhfState.isValid,
+  //     saveDisabled,
+  //     buttonOpacity,
+  //     handleReset,
+  //     handleSave,
+  //     t,
+  //   ],
+  // );
 
-  const ActiveComponent = activeSection?.component;
+  // const ActiveComponent = activeSection?.component;
 
-  return (
-    <PageLayout
-      contentClassName="overflow-auto"
-      leftBar={leftSidebar}
-      label={activeSection?.label ?? ""}
-      actions={actions}
-    >
-      {ActiveComponent && <ActiveComponent onFormInit={onFormInit} />}
-    </PageLayout>
-  );
+  // return (
+  //     {ActiveComponent && <ActiveComponent onFormInit={onFormInit} />}
+  // );
 };
 
 export default ConfigPage;

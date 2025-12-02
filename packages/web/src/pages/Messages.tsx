@@ -3,24 +3,33 @@ import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { ScrollArea } from "@components/ui/scroll-area";
-import { MessageType, useDevice, useMessages, useNodeDB } from "@core/stores";
+import {
+  MessageState,
+  MessageType,
+  useDevice,
+  useMessages,
+  useNodeDB,
+} from "@core/stores";
 import { getAvatarColors } from "@core/utils/avatarColors";
 import { cn } from "@core/utils/cn";
 import type { Types } from "@meshtastic/core";
 import {
+  DateDelimiter,
+  groupMessagesByDay,
+  toTimestamp,
+} from "@pages/Messages/MessageUtils";
+import {
   ArrowUp,
   Hash,
   MoreVertical,
-  Phone,
   Plus,
   Search,
-  Smile,
   Users,
-  Video,
   X,
 } from "lucide-react";
 import type React from "react";
-import { startTransition, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type Contact = {
   id: number;
@@ -45,6 +54,7 @@ export default function MessagesPage() {
   const device = useDevice();
   const nodeDB = useNodeDB();
   const messages = useMessages();
+  const { i18n, t } = useTranslation();
 
   const [openTabs, setOpenTabs] = useState<Tab[]>([]);
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
@@ -94,7 +104,7 @@ export default function MessagesPage() {
             channel.settings?.name ||
             (channel.index === 0 ? "Primary" : `Channel ${channel.index}`);
           contactsList.unshift({
-            id: 1000000 + channel.index, // Offset to avoid ID collision
+            id: channel.index, // Use channel index directly
             name,
             nodeId: `#${channel.index}`,
             lastMessage: "",
@@ -135,10 +145,9 @@ export default function MessagesPage() {
     }
 
     if (selectedContact.type === "channel") {
-      const channelId = selectedContact.id - 1000000;
       messages.markConversationAsRead({
         type: MessageType.Broadcast,
-        channelId: channelId as Types.ChannelNumber,
+        channelId: selectedContact.id as Types.ChannelNumber,
       });
     } else if (selectedContact.nodeNum) {
       messages.markConversationAsRead({
@@ -201,8 +210,9 @@ export default function MessagesPage() {
     }
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!selectedContact || !device.connection) {
+      console.log("[sendMessage] Missing selectedContact or device.connection");
       return;
     }
 
@@ -210,28 +220,71 @@ export default function MessagesPage() {
     const trimmedMessage = draft.trim();
 
     if (!trimmedMessage) {
+      console.log("[sendMessage] Empty message");
       return;
     }
 
-    startTransition(() => {
-      // Determine destination based on contact type
-      let destination: Types.Destination;
-      if (selectedContact.type === "channel") {
-        // For channels, use the channel index
-        const channelIndex = selectedContact.id - 1000000;
-        destination = channelIndex as Types.Destination;
-      } else {
-        // For direct messages, use the node number
-        destination = selectedContact.nodeNum as Types.Destination;
-      }
+    const isDirect = selectedContact.type === "direct";
+    const isBroadcast = selectedContact.type === "channel";
 
-      // Send the message via device connection
-      device.connection?.sendText(trimmedMessage, destination);
+    // Determine destination and channel based on contact type
+    // For broadcast: use "broadcast" string
+    // For direct: use the node number
+    const toValue = isDirect
+      ? (selectedContact.nodeNum as number)
+      : ("broadcast" as const);
 
-      // Clear the draft
-      setMessageDrafts((prev) => ({ ...prev, [selectedContact.id]: "" }));
-      setMessageBytes((prev) => ({ ...prev, [selectedContact.id]: 0 }));
+    // For channels, use  the contact ID
+    // For direct messages, don't specify a channel
+    const channelValue = isDirect
+      ? undefined
+      : (selectedContact.id as Types.ChannelNumber);
+
+    console.log("[sendMessage] Sending:", {
+      message: trimmedMessage,
+      isDirect,
+      isBroadcast,
+      toValue,
+      channelValue,
+      selectedContact: selectedContact.name,
+      nodeNum: selectedContact.nodeNum,
     });
+
+    setMessageDrafts((prev) => ({ ...prev, [selectedContact.id]: "" }));
+    setMessageBytes((prev) => ({ ...prev, [selectedContact.id]: 0 }));
+
+    try {
+      const messageId = await device.connection.sendText(
+        trimmedMessage,
+        toValue,
+        true,
+        channelValue,
+      );
+
+      console.log("[sendMessage] Message sent, ID:", messageId);
+
+      if (messageId !== undefined) {
+        if (isBroadcast) {
+          messages.setMessageState({
+            type: MessageType.Broadcast,
+            channelId: channelValue,
+            messageId,
+            newState: MessageState.Ack,
+          });
+        } else {
+          messages.setMessageState({
+            type: MessageType.Direct,
+            nodeA: device.myNodeNum as number,
+            nodeB: selectedContact.nodeNum as number,
+            messageId,
+            newState: MessageState.Ack,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      // TODO: Handle failed message state
+    }
   };
 
   // Get messages for the selected contact
@@ -241,10 +294,9 @@ export default function MessagesPage() {
     }
 
     if (selectedContact.type === "channel") {
-      const channelId = selectedContact.id - 1000000;
       return messages.getMessages({
         type: MessageType.Broadcast,
-        channelId: channelId as Types.ChannelNumber,
+        channelId: selectedContact.id as Types.ChannelNumber,
       });
     }
 
@@ -259,6 +311,38 @@ export default function MessagesPage() {
       nodeB: selectedContact.nodeNum,
     });
   }, [selectedContact, messages, device.myNodeNum]);
+
+  // Locale and date formatting for message grouping
+  const locale = useMemo(
+    () =>
+      i18n.language ||
+      (typeof navigator !== "undefined" ? navigator.language : "en-US"),
+    [i18n.language],
+  );
+
+  const dayLabelFmt = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    [locale],
+  );
+
+  // Sort messages by date and group by day
+  const sortedMessages = useMemo(
+    () =>
+      [...currentMessages].sort(
+        (a, b) => toTimestamp(b.date) - toTimestamp(a.date),
+      ),
+    [currentMessages],
+  );
+
+  const messageGroups = useMemo(
+    () => groupMessagesByDay(sortedMessages, t, dayLabelFmt),
+    [sortedMessages, t, dayLabelFmt],
+  );
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)]">
@@ -336,15 +420,15 @@ export default function MessagesPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <span className="font-sans font-medium truncate">
+                    <span className=" font-medium truncate">
                       {contact.name}
                     </span>
-                    <span className="font-sans text-xs text-muted-foreground">
+                    <span className=" text-xs text-muted-foreground">
                       {contact.time}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-sans text-sm text-muted-foreground truncate">
+                    <span className=" text-sm text-muted-foreground truncate">
                       {contact.lastMessage}
                     </span>
                     {contact.unread > 0 && (
@@ -399,7 +483,7 @@ export default function MessagesPage() {
                             )}
                         </div>
                       )}
-                      <span className="text-sm truncate flex-1 font-sans">
+                      <span className="text-sm truncate flex-1 ">
                         {tabContact.name}
                       </span>
                       {openTabs.length > 1 && (
@@ -465,16 +549,6 @@ export default function MessagesPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {selectedContact.type === "direct" && (
-                  <>
-                    <Button variant="ghost" size="icon">
-                      <Phone className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Video className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
                 <Button variant="ghost" size="icon">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
@@ -483,98 +557,108 @@ export default function MessagesPage() {
 
             {/* Messages */}
             <ScrollArea className="flex-1 p-4">
-              <div className="space-y-3">
-                {currentMessages.map((msg) => {
-                  const isMine = msg.from === device.myNodeNum;
-                  const senderNode = nodeDB.getNode(msg.from);
-                  const senderName =
-                    senderNode?.user?.longName ||
-                    senderNode?.user?.shortName ||
-                    `Node ${msg.from}`;
-                  const avatarColors = getAvatarColors(msg.from);
+              <div className="flex flex-col-reverse space-y-3 space-y-reverse">
+                {messageGroups.map(({ dayKey, label, items }) => (
+                  <Fragment key={dayKey}>
+                    {/* Render messages first, then delimiter — with flex-col-reverse this shows the delimiter above that day's messages */}
+                    {items.map((msg) => {
+                      const myNodeNum = device.myNodeNum ?? messages.myNodeNum;
+                      const isMine =
+                        myNodeNum !== undefined && msg.from === myNodeNum;
+                      const senderNode = nodeDB.getNode(msg.from);
+                      const senderName =
+                        senderNode?.user?.longName ||
+                        senderNode?.user?.shortName ||
+                        `Node ${msg.from}`;
+                      const avatarColors = getAvatarColors(msg.from);
 
-                  return (
-                    <div
-                      key={msg.messageId}
-                      className={cn(
-                        "flex gap-2 items-center",
-                        isMine
-                          ? "justify-end flex-row-reverse"
-                          : "justify-start",
-                      )}
-                    >
-                      <NodeAvatar
-                        nodeNum={msg.from}
-                        longName={senderName}
-                        size="sm"
-                      />
-                      <div
-                        className={cn(
-                          "max-w-[70%] rounded-2xl px-3 py-2",
-                          isMine
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-card",
-                        )}
-                      >
-                        {!isMine && (
-                          <p
-                            className="text-xs font-medium mb-0.5 font-sans"
-                            style={{ color: avatarColors.bgColor }}
-                          >
-                            {senderName}
-                          </p>
-                        )}
-                        <p className="text-sm leading-relaxed font-sans">
-                          {msg.message}
-                        </p>
-                        <p
+                      return (
+                        <div
+                          key={msg.messageId}
                           className={cn(
-                            "text-xs mt-1 font-sans",
+                            "flex gap-2 items-center",
                             isMine
-                              ? "text-primary-foreground/60"
-                              : "text-muted-foreground",
+                              ? "justify-end flex-row-reverse"
+                              : "justify-start",
                           )}
                         >
-                          {new Date(msg.date).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+                          <NodeAvatar
+                            nodeNum={msg.from}
+                            longName={senderName}
+                            size="sm"
+                          />
+                          <div
+                            className={cn(
+                              "max-w-[70%] rounded-2xl px-3 py-2",
+                              isMine
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-card",
+                            )}
+                          >
+                            {!isMine && (
+                              <p
+                                className="text-xs font-medium mb-0.5 "
+                                style={{ color: avatarColors.bgColor }}
+                              >
+                                {senderName}
+                              </p>
+                            )}
+                            <p className="text-sm leading-relaxed ">
+                              {msg.message}
+                            </p>
+                            <p
+                              className={cn(
+                                "text-xs mt-1 ",
+                                isMine
+                                  ? "text-primary-foreground/60"
+                                  : "text-muted-foreground",
+                              )}
+                            >
+                              {new Date(msg.date).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <DateDelimiter label={label} />
+                  </Fragment>
+                ))}
               </div>
             </ScrollArea>
 
             {/* Message Input */}
             <div className="border-t p-4">
-              <form className="flex items-center gap-2">
+              <form
+                className="flex items-center gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  sendMessage();
+                }}
+              >
                 {/* <Button variant="ghost" size="icon">
                   <Paperclip className="h-4 w-4" />
                 </Button> */}
                 <div className="flex-1 flex gap-2">
                   <Input
                     placeholder={`Message ${selectedContact.name}...`}
-                    // value={messageDrafts[selectedContact.id] || ""}
+                    value={messageDrafts[selectedContact.id] || ""}
                     onChange={(e) =>
                       handleMessageChange(selectedContact.id, e.target.value)
                     }
-                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                     className="flex-1"
                   />
                   <span className="flex items-center text-sm text-muted-foreground min-w-[60px] justify-end">
                     {messageBytes[selectedContact.id] || 0}/{MAX_MESSAGE_BYTES}
                   </span>
                 </div>
-                <Button variant="ghost" size="icon" type="submit">
+                {/* TODO: ******** uncomment this when emoji picker is added */}
+                {/* <Button variant="ghost" size="icon" type="button">
                   <Smile className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  onClick={sendMessage}
-                  className="rounded-full"
-                >
+                </Button> */}
+                <Button size="icon" type="submit" className="rounded-full">
                   <ArrowUp className="h-5 w-5" />
                 </Button>
               </form>

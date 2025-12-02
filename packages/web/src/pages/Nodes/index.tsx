@@ -1,5 +1,6 @@
 import { LocationResponseDialog } from "@app/components/Dialog/LocationResponseDialog.tsx";
 import { TracerouteResponseDialog } from "@app/components/Dialog/TracerouteResponseDialog.tsx";
+import { NodeAvatar } from "@app/components/NodeAvatar";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import {
   type FilterState,
@@ -13,7 +14,6 @@ import {
 } from "@components/generic/Table/index.tsx";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { PageLayout } from "@components/PageLayout.tsx";
-import { Sidebar } from "@components/Sidebar.tsx";
 import { Avatar } from "@components/ui/avatar.tsx";
 import { Input } from "@components/ui/input.tsx";
 import useLang from "@core/hooks/useLang.ts";
@@ -151,7 +151,7 @@ const NodesPage = (): JSX.Element => {
       cells: [
         {
           content: (
-            <Avatar
+            <NodeAvatar
               nodeNum={node.num}
               showFavorite={node.isFavorite}
               showError={hasNodeError(node.num)}
@@ -247,7 +247,7 @@ const NodesPage = (): JSX.Element => {
   });
 
   return (
-    <PageLayout label="" leftBar={<Sidebar />}>
+    <div>
       <div className="pl-2 pt-2 flex flex-row">
         <div className="flex-1 mr-2">
           <Input
@@ -294,7 +294,7 @@ const NodesPage = (): JSX.Element => {
           onOpenChange={() => setSelectedLocation(undefined)}
         />
       </div>
-    </PageLayout>
+    </div>
   );
 };
 

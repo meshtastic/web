@@ -14,7 +14,6 @@ import {
   SidebarMenuItem,
 } from "@components/ui/sidebar.tsx";
 import { useMessages, useNodeDB } from "@core/stores";
-import type { Protobuf } from "@meshtastic/core";
 import { useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -24,7 +23,7 @@ import {
   SlidersHorizontal,
   Users,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 const getMainNavItems = (unreadCount: number) => [
   {
@@ -68,24 +67,20 @@ export function AppSidebar() {
   const nodeDB = useNodeDB();
   const messages = useMessages();
 
-  const [myNode, setMyNode] = useState<Protobuf.Mesh.NodeInfo | undefined>();
-
-  useEffect(() => {
-    if (!nodeDB) {
-      return;
+  // Get myNode directly - getMyNode now returns immediately without promises
+  const myNode = useMemo(() => {
+    if (!nodeDB || typeof nodeDB.getNodes !== "function") {
+      return undefined;
     }
 
-    const fetchMyNode = async () => {
-      try {
-        const node = await nodeDB.getMyNode();
-        setMyNode(node);
-      } catch (error) {
-        console.error("Failed to get myNode:", error);
-        setMyNode(undefined);
-      }
-    };
+    const nodes = nodeDB.getNodes(undefined, true);
+    const myNodeNum = nodeDB.myNodeNum;
 
-    fetchMyNode();
+    if (myNodeNum === undefined) {
+      return undefined;
+    }
+
+    return nodes.find((n) => n.num === myNodeNum);
   }, [nodeDB]);
 
   // Calculate total unread messages
@@ -99,6 +94,10 @@ export function AppSidebar() {
   );
 
   const nodeStats = useMemo(() => {
+    if (!nodeDB || typeof nodeDB.getNodes !== "function") {
+      return { total: 0, online: 0 };
+    }
+
     const nodes = nodeDB.getNodes(undefined, true); // include self
     const onlineThreshold = Date.now() / 1000 - 900; // 15 minutes
     const onlineCount = nodes.filter(

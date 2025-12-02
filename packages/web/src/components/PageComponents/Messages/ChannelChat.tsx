@@ -11,7 +11,7 @@ export interface ChannelChatProps {
   messages?: Message[];
 }
 
-function toTs(d: Message["date"]): number {
+function toTimestamp(d: Message["date"]): number {
   return typeof d === "number" ? d : Date.parse(String(d));
 }
 
@@ -48,7 +48,7 @@ function groupMessagesByDay(
   const out: DayGroup[] = [];
 
   for (const msg of messages) {
-    const ts = toTs(msg.date);
+    const ts = toTimestamp(msg.date);
     const dayKey = startOfLocalDay(ts);
     const last = out[out.length - 1];
     if (last && last.dayKey === dayKey) {
@@ -126,7 +126,8 @@ export const ChannelChat = ({ messages = [] }: ChannelChatProps) => {
 
   // Sort messages by date in case they are stored out of order
   const sorted = useMemo(
-    () => [...messages].sort((a, b) => toTs(b.date) - toTs(a.date)),
+    () =>
+      [...messages].sort((a, b) => toTimestamp(b.date) - toTimestamp(a.date)),
     [messages],
   );
 

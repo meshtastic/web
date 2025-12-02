@@ -1,10 +1,11 @@
 import { DialogManager } from "@components/Dialog/DialogManager.tsx";
 import type { useAppStore, useMessageStore } from "@core/stores";
+import { ModuleConfig } from "@meshtastic/protobufs";
 import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
 import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
-import ConfigPage from "@pages/Settings/index.tsx";
+import SettingsPage from "@pages/settings.tsx";
 import {
   createRootRouteWithContext,
   createRoute,
@@ -14,6 +15,8 @@ import {
 import type { useTranslation } from "react-i18next";
 import { z } from "zod/v4";
 import { App } from "./App.tsx";
+import { DeviceConfig } from "./pages/Settings/DeviceConfig.tsx";
+import { RadioConfig } from "./pages/Settings/RadioConfig.tsx";
 
 interface AppContext {
   stores: {
@@ -112,31 +115,25 @@ export const mapWithParamsRoute = createRoute({
 export const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/settings",
-  component: ConfigPage,
-  // beforeLoad: () => {
-  //   throw redirect({
-  //     to: "/settings/radio",
-  //     replace: true,
-  //   });
-  // },
+  component: SettingsPage,
 });
 
 export const radioRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: "radio",
-  component: ConfigPage,
+  component: RadioConfig,
 });
 
 export const deviceRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: "device",
-  component: ConfigPage,
+  component: DeviceConfig,
 });
 
 export const moduleRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: "module",
-  component: ConfigPage,
+  component: ModuleConfig,
 });
 
 const nodesRoute = createRoute({
