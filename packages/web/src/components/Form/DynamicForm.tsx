@@ -3,17 +3,22 @@ import {
   DynamicFormField,
   type FieldProps,
 } from "@components/Form/DynamicFormField.tsx";
-import { FieldWrapper } from "@components/Form/FormWrapper.tsx";
 import { Button } from "@components/ui/button.tsx";
 import { Heading } from "@components/ui/typography/heading.tsx";
 import { Subtle } from "@components/ui/typography/subtle.tsx";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@components/ui/form.tsx";
 import { useEffect } from "react";
 import {
-  type Control,
   type DefaultValues,
   type FieldValues,
-  FormProvider,
-  get,
   type Path,
   type SubmitHandler,
   type UseFormReturn,
@@ -39,8 +44,7 @@ export interface BaseFormBuilderProps<T> {
   properties?: Record<string, unknown>;
 }
 
-export interface GenericFormElementProps<T extends FieldValues, Y> {
-  control: Control<T>;
+export interface GenericFormElementProps<Y> {
   disabled?: boolean;
   field: Y;
   isDirty?: boolean;
@@ -84,7 +88,7 @@ export function DynamicForm<T extends FieldValues>({
   const { t } = useTranslation();
 
   const internalMethods = useForm<T>({
-    mode: "onChange",
+    mode: "onSubmit",
     defaultValues: defaultValues,
     resolver: validationSchema
       ? createZodResolver(validationSchema)
@@ -96,8 +100,7 @@ export function DynamicForm<T extends FieldValues>({
 
   const methods = propMethods ?? internalMethods;
 
-  const { handleSubmit, control, getValues, formState, getFieldState } =
-    methods;
+  const { handleSubmit, getValues } = methods;
 
   useEffect(() => {
     if (!propMethods) {
@@ -134,7 +137,7 @@ export function DynamicForm<T extends FieldValues>({
   };
 
   return (
-    <FormProvider {...methods}>
+    <Form {...methods}>
       <form
         className="space-y-8"
         {...(submitType === "onSubmit"
@@ -151,44 +154,43 @@ export function DynamicForm<T extends FieldValues>({
               <Subtle className="font-semibold">{fieldGroup?.notes}</Subtle>
             </div>
 
-            {fieldGroup.fields.map((field) => {
-              const error = get(formState.errors, field.name as string);
-              return (
-                <FieldWrapper
-                  key={field.label}
-                  label={field.label}
-                  fieldName={field.name}
-                  description={field.description}
-                  valid={!error}
-                  validationText={
-                    error
-                      ? String(
-                          t([`formValidation.${error.type}`, error.message], {
-                            returnObjects: false,
-                            ...error.params,
-                          }),
-                        )
-                      : ""
-                  }
-                >
-                  <DynamicFormField
-                    field={field}
-                    control={control}
-                    disabled={isDisabled(field.disabledBy, field.disabled)}
-                    isDirty={getFieldState(field.name).isDirty}
-                    invalid={getFieldState(field.name).invalid}
-                  />
-                </FieldWrapper>
-              );
-            })}
+            {fieldGroup.fields.map((field) => (
+              <FormField
+                key={field.name}
+                control={methods.control}
+                name={field.name}
+                render={({ fieldState }) => (
+                  <FormItem>
+                    <FormLabel>{field.label}</FormLabel>
+                    {field.description && (
+                      <FormDescription>{field.description}</FormDescription>
+                    )}
+                    <FormControl>
+                      <DynamicFormField
+                        field={field as any}
+                        control={methods.control}
+                        disabled={isDisabled(field.disabledBy, field.disabled)}
+                        isDirty={fieldState.isDirty}
+                        invalid={fieldState.invalid}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
           </div>
         ))}
         {hasSubmitButton && (
-          <Button type="submit" variant="outline" disabled={!formState.isValid}>
+          <Button
+            type="submit"
+            variant="outline"
+            disabled={!methods.formState.isValid}
+          >
             {t("button.submit")}
           </Button>
         )}
       </form>
-    </FormProvider>
+    </Form>
   );
 }

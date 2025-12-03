@@ -1,21 +1,12 @@
 import { deviceRoute, moduleRoute, radioRoute } from "@app/routes";
 import { toBinary } from "@bufbuild/protobuf";
-import { PageLayout } from "@components/PageLayout.tsx";
 import { useToast } from "@core/hooks/useToast.ts";
 import { useDevice } from "@core/stores";
-import { cn } from "@core/utils/cn.ts";
 import { Protobuf } from "@meshtastic/core";
 import { DeviceConfig } from "@pages/Settings/DeviceConfig.tsx";
 import { ModuleConfig } from "@pages/Settings/ModuleConfig.tsx";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import {
-  LayersIcon,
-  RadioTowerIcon,
-  RefreshCwIcon,
-  RouterIcon,
-  SaveIcon,
-  SaveOff,
-} from "lucide-react";
+import { LayersIcon, RadioTowerIcon, RouterIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -43,7 +34,6 @@ const ConfigPage = () => {
   const unsubRef = useRef<(() => void) | null>(null);
   const [formMethods, setFormMethods] = useState<UseFormReturn | null>(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
   const routerState = useRouterState();
   const { t } = useTranslation("config");
 

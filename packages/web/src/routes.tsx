@@ -1,17 +1,17 @@
-import { DialogManager } from "@components/Dialog/DialogManager.tsx";
+import MessagesPage from "@app/pages/Messages/index.tsx";
 import type { useAppStore, useMessageStore } from "@core/stores";
 import { ModuleConfig } from "@meshtastic/protobufs";
 import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
-import MessagesPage from "@pages/Messages.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
-import SettingsPage from "@pages/settings.tsx";
 import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
   redirect,
 } from "@tanstack/react-router";
+import { Settings } from "lucide-react";
+import { Activity } from "react";
 import type { useTranslation } from "react-i18next";
 import { z } from "zod/v4";
 import { App } from "./App.tsx";
@@ -74,7 +74,11 @@ export const messagesWithParamsRoute = createRoute({
 const mapRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/map",
-  component: MapPage,
+  component: () => (
+    <Activity>
+      <MapPage />
+    </Activity>
+  ),
 });
 
 const coordParamsSchema = z.object({
@@ -102,7 +106,11 @@ const coordParamsSchema = z.object({
 export const mapWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/map/$long/$lat/$zoom",
-  component: MapPage,
+  component: () => (
+    <Activity>
+      <MapPage />
+    </Activity>
+  ),
   parseParams: (raw) => coordParamsSchema.parse(raw),
   // // This controls how params are serialized when you navigate/link
   // stringifyParams: (p) => ({
@@ -115,7 +123,11 @@ export const mapWithParamsRoute = createRoute({
 export const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/settings",
-  component: SettingsPage,
+  component: () => (
+    <Activity>
+      <Settings />
+    </Activity>
+  ),
 });
 
 export const radioRoute = createRoute({
@@ -139,13 +151,7 @@ export const moduleRoute = createRoute({
 const nodesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/nodes",
-  component: NodesPage,
-});
-
-const dialogWithParamsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/dialog/$dialogId",
-  component: DialogManager,
+  component: () => <NodesPage />,
 });
 
 const connectionsRoute = createRoute({
@@ -162,7 +168,6 @@ const routeTree = rootRoute.addChildren([
   mapWithParamsRoute,
   settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
   nodesRoute,
-  dialogWithParamsRoute,
   connectionsRoute,
 ]);
 

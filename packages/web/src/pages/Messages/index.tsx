@@ -220,7 +220,6 @@ export default function MessagesPage() {
     const trimmedMessage = draft.trim();
 
     if (!trimmedMessage) {
-      console.log("[sendMessage] Empty message");
       return;
     }
 

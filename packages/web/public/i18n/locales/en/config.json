@@ -10,7 +10,47 @@
     "tabNetwork": "Network",
     "tabPosition": "Position",
     "tabPower": "Power",
-    "tabSecurity": "Security"
+    "tabSecurity": "Security",
+    "lora": {
+      "title": "LoRa",
+      "description": "Configure LoRa radio settings"
+    },
+    "channels": {
+      "title": "Channels",
+      "description": "Manage mesh network channels"
+    },
+    "security": {
+      "title": "Security",
+      "description": "Configure security and encryption settings"
+    },
+    "user": {
+      "title": "User",
+      "description": "Configure user profile settings"
+    },
+    "device": {
+      "title": "Device",
+      "description": "Configure device hardware settings"
+    },
+    "position": {
+      "title": "Position",
+      "description": "Configure GPS and position settings"
+    },
+    "power": {
+      "title": "Power",
+      "description": "Configure power management settings"
+    },
+    "network": {
+      "title": "Network",
+      "description": "Configure network and WiFi settings"
+    },
+    "display": {
+      "title": "Display",
+      "description": "Configure display settings"
+    },
+    "bluetooth": {
+      "title": "Bluetooth",
+      "description": "Configure Bluetooth settings"
+    }
   },
   "sidebar": {
     "label": "Configuration"

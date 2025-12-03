@@ -10,7 +10,13 @@ import { RangeTest } from "@components/PageComponents/ModuleConfig/RangeTest.tsx
 import { Serial } from "@components/PageComponents/ModuleConfig/Serial.tsx";
 import { StoreForward } from "@components/PageComponents/ModuleConfig/StoreForward.tsx";
 import { Telemetry } from "@components/PageComponents/ModuleConfig/Telemetry.tsx";
-import { Spinner } from "@components/ui/spinner.tsx";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@components/ui/card";
 import {
   Tabs,
   TabsContent,
@@ -18,12 +24,13 @@ import {
   TabsTrigger,
 } from "@components/ui/tabs.tsx";
 import { useDevice, type ValidModuleConfigType } from "@core/stores";
-import { type ComponentType, Suspense, useMemo } from "react";
+import { type ComponentType, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 interface ConfigProps {
   onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
+  searchQuery?: string;
 }
 
 type TabItem = {
@@ -33,66 +40,66 @@ type TabItem = {
   count?: number;
 };
 
-export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
+export const ModuleConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
   const { hasModuleConfigChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
   const tabs: TabItem[] = [
     {
       case: "mqtt",
-      label: t("page.tabMqtt"),
+      label: t("page.mqtt"),
       element: MQTT,
     },
     {
       case: "serial",
-      label: t("page.tabSerial"),
+      label: t("page.serial"),
       element: Serial,
     },
     {
       case: "externalNotification",
-      label: t("page.tabExternalNotification"),
+      label: t("page.externalNotification"),
       element: ExternalNotification,
     },
     {
       case: "storeForward",
-      label: t("page.tabStoreAndForward"),
+      label: t("page.storeAndForward"),
       element: StoreForward,
     },
     {
       case: "rangeTest",
-      label: t("page.tabRangeTest"),
+      label: t("page.rangeTest"),
       element: RangeTest,
     },
     {
       case: "telemetry",
-      label: t("page.tabTelemetry"),
+      label: t("page.telemetry"),
       element: Telemetry,
     },
     {
       case: "cannedMessage",
-      label: t("page.tabCannedMessage"),
+      label: t("page.cannedMessage"),
       element: CannedMessage,
     },
     {
       case: "audio",
-      label: t("page.tabAudio"),
+      label: t("page.audio"),
       element: Audio,
     },
     {
       case: "neighborInfo",
-      label: t("page.tabNeighborInfo"),
+      label: t("page.neighborInfo"),
       element: NeighborInfo,
     },
     {
       case: "ambientLighting",
-      label: t("page.tabAmbientLighting"),
+      label: t("page.ambientLighting"),
       element: AmbientLighting,
     },
     {
       case: "detectionSensor",
-      label: t("page.tabDetectionSensor"),
+      label: t("page.detectionSensor"),
       element: DetectionSensor,
     },
-    { case: "paxcounter", label: t("page.tabPaxcounter"), element: Paxcounter },
+    { case: "paxcounter", label: t("page.paxcounter"), element: Paxcounter },
   ] as const;
 
   const flags = useMemo(
@@ -101,32 +108,75 @@ export const ModuleConfig = ({ onFormInit }: ConfigProps) => {
     [tabs, hasModuleConfigChange],
   );
 
+  const filteredTabs = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return tabs;
+    }
+
+    const query = searchQuery.toLowerCase();
+    return tabs.filter((tab) => tab.label.toLowerCase().includes(query));
+  }, [tabs, searchQuery]);
+
   return (
-    <Tabs defaultValue={t("page.tabMqtt")}>
-      <TabsList className="w-full dark:bg-slate-800">
-        {tabs.map((tab) => (
-          <TabsTrigger
-            key={tab.label}
-            value={tab.label}
-            className="dark:text-white relative"
-          >
-            {tab.label}
-            {flags.get(tab.case) && (
-              <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
-                <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
-              </span>
-            )}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-      {tabs.map((tab) => (
-        <TabsContent key={tab.label} value={tab.label}>
-          <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <tab.element onFormInit={onFormInit} />
-          </Suspense>
-        </TabsContent>
-      ))}
-    </Tabs>
+    <div className="space-y-6">
+      {filteredTabs.length === 0 ? (
+        <Card className="max-w-7xl">
+          <CardContent className="pt-6">
+            <p className="text-muted-foreground text-center">
+              No modules found matching "{searchQuery}"
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Tabs defaultValue={filteredTabs[0]?.case}>
+          <TabsList className="grid w-full grid-cols-12">
+            {filteredTabs.map((tab) => (
+              <TabsTrigger key={tab.case} value={tab.case} className="relative">
+                {tab.label}
+                {flags.get(tab.case) && (
+                  <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
+                    <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
+                  </span>
+                )}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {filteredTabs.map((tab) => (
+            <TabsContent key={tab.case} value={tab.case}>
+              <Card className="max-w-7xl">
+                <CardHeader>
+                  <CardTitle>{tab.label}</CardTitle>
+                  <CardDescription>
+                    {tab.case === "mqtt" && t("page.mqtt.description")}
+                    {tab.case === "serial" && t("page.serial.description")}
+                    {tab.case === "externalNotification" &&
+                      t("page.externalNotification.description")}
+                    {tab.case === "storeForward" &&
+                      t("page.storeForward.description")}
+                    {tab.case === "rangeTest" && t("page.rangeTest.description")}
+                    {tab.case === "telemetry" && t("page.telemetry.description")}
+                    {tab.case === "cannedMessage" &&
+                      t("page.cannedMessage.description")}
+                    {tab.case === "audio" && t("page.audio.description")}
+                    {tab.case === "neighborInfo" &&
+                      t("page.neighborInfo.description")}
+                    {tab.case === "ambientLighting" &&
+                      t("page.ambientLighting.description")}
+                    {tab.case === "detectionSensor" &&
+                      t("page.detectionSensor.description")}
+                    {tab.case === "paxcounter" &&
+                      t("page.paxcounter.description")}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <tab.element onFormInit={onFormInit} searchQuery={searchQuery} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          ))}
+        </Tabs>
+      )}
+    </div>
   );
 };
