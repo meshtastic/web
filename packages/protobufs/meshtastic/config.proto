@@ -978,6 +978,13 @@ message Config {
        * It is not legal to use in all regions due to this wider bandwidth.
        */
       SHORT_TURBO = 8;
+
+      /*
+       * Edge Fast Low
+       * Designed to work in very harsh conditions when a lot of radio interference is present
+       * Useful when the used LoRa frequency band is very congested and full of other traffic
+       */
+      EDGE_FAST_LOW = 9;
     }
 
     /*
