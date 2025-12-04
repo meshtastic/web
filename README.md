@@ -77,6 +77,9 @@ Follow the installation instructions on their home page.
    ```
    This command installs all necessary dependencies for all packages within the
    monorepo.
+3. **Install the Buf CLI**
+    Required for building `packages/protobufs`
+    https://buf.build/docs/cli/installation/
 
 ### Running Projects
 
