@@ -24,19 +24,23 @@ import {
 import { Separator } from "@components/ui/separator";
 import { Slider } from "@components/ui/slider";
 import { Switch } from "@components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@components/ui/tabs";
+  createFieldMetadata,
+  useFieldRegistry,
+} from "@core/services/fieldRegistry";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
-import { Hash, LockIcon, MapPinIcon, QrCodeIcon, UploadIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  Hash,
+  LockIcon,
+  MapPinIcon,
+  QrCodeIcon,
+  UploadIcon,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { type DefaultValues, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -53,13 +57,20 @@ interface ChannelFormProps {
 }
 
 const ChannelForm = ({ channel }: ChannelFormProps) => {
-  const { setChange, getChange, removeChange } = useDevice();
+  const {
+    registerFields,
+    trackChange,
+    removeChange: removeFieldChange,
+    getChange,
+  } = useFieldRegistry();
   const { t } = useTranslation(["channels", "config"]);
 
-  const workingChannel = getChange({
-    type: "channels",
-    index: channel.index,
-  }) as Protobuf.Channel.Channel | undefined;
+  const section = { type: "channel", variant: channel.index.toString() } as const;
+  const fieldName = `channel_${channel.index}`;
+
+  const workingChannel = getChange(section, fieldName)?.newValue as
+    | Protobuf.Channel.Channel
+    | undefined;
   const effectiveConfig = workingChannel ?? channel;
 
   const defaultValues = {
@@ -112,6 +123,25 @@ const ChannelForm = ({ channel }: ChannelFormProps) => {
 
   const { register, handleSubmit, watch, setValue, reset } = formMethods;
 
+  // Register fields on mount
+  useEffect(() => {
+    const metadata = createFieldMetadata(section, [
+      {
+        label: t("channel"),
+        description: t("channelDescription"),
+        fields: [
+          {
+            type: "text",
+            name: fieldName,
+            label: getChannelName(channel),
+            description: `Channel ${channel.index}`,
+          },
+        ],
+      },
+    ]);
+    registerFields(section, metadata);
+  }, [registerFields, section, fieldName, channel, t]);
+
   const onSubmit = (data: ChannelValidation) => {
     const payload = create(Protobuf.Channel.ChannelSchema, {
       ...data,
@@ -125,17 +155,16 @@ const ChannelForm = ({ channel }: ChannelFormProps) => {
       },
     });
 
-    if (deepCompareConfig(channel, payload, true)) {
-      removeChange({ type: "channel", index: channel.index });
-      return;
+    if (JSON.stringify(payload) !== JSON.stringify(channel)) {
+      trackChange(section, fieldName, payload, channel);
+    } else {
+      removeFieldChange(section, fieldName);
     }
-
-    setChange({ type: "channel", index: channel.index }, payload, channel);
   };
 
   const handleReset = () => {
     reset();
-    removeChange({ type: "channel", index: channel.index });
+    removeFieldChange(section, fieldName);
   };
 
   const generatePSK = () => {
@@ -188,7 +217,7 @@ const ChannelForm = ({ channel }: ChannelFormProps) => {
                 </SelectTrigger>
                 <SelectContent>
                   {Object.entries(Protobuf.Channel.Channel_Role)
-                    .filter(([key]) => isNaN(Number(key)))
+                    .filter(([key]) => Number.isNaN(Number(key)))
                     .map(([name, value]) => (
                       <SelectItem key={name} value={String(value)}>
                         {name}
@@ -338,19 +367,21 @@ const ChannelForm = ({ channel }: ChannelFormProps) => {
 };
 
 export const ChannelsConfig = () => {
-  const { channels, hasChannelChange, setDialogOpen } = useDevice();
+  const { channels, setDialogOpen } = useDevice();
+  const { hasChange } = useFieldRegistry();
   const { t } = useTranslation("channels");
 
   const allChannels = Array.from(channels.values());
   const flags = useMemo(
     () =>
       new Map(
-        allChannels.map((channel) => [
-          channel.index,
-          hasChannelChange(channel.index),
-        ]),
+        allChannels.map((channel) => {
+          const section = { type: "channel", variant: channel.index.toString() } as const;
+          const fieldName = `channel_${channel.index}`;
+          return [channel.index, hasChange(section, fieldName)];
+        }),
       ),
-    [allChannels, hasChannelChange],
+    [allChannels, hasChange],
   );
 
   return (

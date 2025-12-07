@@ -69,6 +69,7 @@
       "today": "Today",
       "yesterday": "Yesterday"
     },
+    "change": { "one": "change", "plural": "changes" },
     "month": { "one": "Month", "plural": "Months" },
     "year": { "one": "Year", "plural": "Years" },
     "snr": "SNR",

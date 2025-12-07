@@ -7,7 +7,7 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-export const SearchBar = ({
+export const SettingsSearchBar = ({
   onSearch,
   placeholder = "Search settings...",
 }: SearchBarProps) => {

@@ -7,8 +7,12 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import {
+  createFieldMetadata,
+  useFieldRegistry,
+} from "@core/services/fieldRegistry";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 interface StoreForwardModuleConfigProps {
@@ -18,22 +22,107 @@ interface StoreForwardModuleConfigProps {
 export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "storeForward" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const {
+    registerFields,
+    trackChange,
+    removeChange: removeFieldChange,
+  } = useFieldRegistry();
   const { t } = useTranslation("moduleConfig");
 
+  const section = { type: "moduleConfig", variant: "storeForward" } as const;
+
   const onSubmit = (data: StoreForwardValidation) => {
-    if (deepCompareConfig(moduleConfig.storeForward, data, true)) {
-      removeChange({ type: "moduleConfig", variant: "storeForward" });
+    // Track individual field changes
+    const originalData = moduleConfig.storeForward;
+    if (!originalData) {
       return;
     }
 
-    setChange(
-      { type: "moduleConfig", variant: "storeForward" },
-      data,
-      moduleConfig.storeForward,
+    (Object.keys(data) as Array<keyof StoreForwardValidation>).forEach(
+      (fieldName) => {
+        const newValue = data[fieldName];
+        const oldValue = originalData[fieldName];
+
+        if (newValue !== oldValue) {
+          trackChange(section, fieldName as string, newValue, oldValue);
+        } else {
+          removeFieldChange(section, fieldName as string);
+        }
+      },
     );
   };
+
+  const fieldGroups = useMemo(
+    () => [
+      {
+        label: t("storeForward.title"),
+        description: t("storeForward.description"),
+        fields: [
+          {
+            type: "toggle",
+            name: "enabled",
+            label: t("storeForward.enabled.label"),
+            description: t("storeForward.enabled.description"),
+          },
+          {
+            type: "toggle",
+            name: "heartbeat",
+            label: t("storeForward.heartbeat.label"),
+            description: t("storeForward.heartbeat.description"),
+            disabledBy: [
+              {
+                fieldName: "enabled",
+              },
+            ],
+          },
+          {
+            type: "number",
+            name: "records",
+            label: t("storeForward.records.label"),
+            description: t("storeForward.records.description"),
+            disabledBy: [
+              {
+                fieldName: "enabled",
+              },
+            ],
+            properties: {
+              suffix: t("unit.record.plural"),
+            },
+          },
+          {
+            type: "number",
+            name: "historyReturnMax",
+            label: t("storeForward.historyReturnMax.label"),
+            description: t("storeForward.historyReturnMax.description"),
+            disabledBy: [
+              {
+                fieldName: "enabled",
+              },
+            ],
+          },
+          {
+            type: "number",
+            name: "historyReturnWindow",
+            label: t("storeForward.historyReturnWindow.label"),
+            description: t("storeForward.historyReturnWindow.description"),
+            disabledBy: [
+              {
+                fieldName: "enabled",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    [t],
+  );
+
+  // Register fields on mount
+  useEffect(() => {
+    const metadata = createFieldMetadata(section, fieldGroups);
+    registerFields(section, metadata);
+  }, [registerFields, fieldGroups, section]);
 
   return (
     <DynamicForm<StoreForwardValidation>
@@ -42,67 +131,7 @@ export const StoreForward = ({ onFormInit }: StoreForwardModuleConfigProps) => {
       validationSchema={StoreForwardValidationSchema}
       defaultValues={moduleConfig.storeForward}
       values={getEffectiveModuleConfig("storeForward")}
-      fieldGroups={[
-        {
-          label: t("storeForward.title"),
-          description: t("storeForward.description"),
-          fields: [
-            {
-              type: "toggle",
-              name: "enabled",
-              label: t("storeForward.enabled.label"),
-              description: t("storeForward.enabled.description"),
-            },
-            {
-              type: "toggle",
-              name: "heartbeat",
-              label: t("storeForward.heartbeat.label"),
-              description: t("storeForward.heartbeat.description"),
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
-            },
-            {
-              type: "number",
-              name: "records",
-              label: t("storeForward.records.label"),
-              description: t("storeForward.records.description"),
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
-              properties: {
-                suffix: t("unit.record.plural"),
-              },
-            },
-            {
-              type: "number",
-              name: "historyReturnMax",
-              label: t("storeForward.historyReturnMax.label"),
-              description: t("storeForward.historyReturnMax.description"),
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
-            },
-            {
-              type: "number",
-              name: "historyReturnWindow",
-              label: t("storeForward.historyReturnWindow.label"),
-              description: t("storeForward.historyReturnWindow.description"),
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
-            },
-          ],
-        },
-      ]}
+      fieldGroups={fieldGroups}
     />
   );
 };

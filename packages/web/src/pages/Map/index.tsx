@@ -18,7 +18,6 @@ import {
 } from "@components/PageComponents/Map/Layers/SNRLayer.tsx";
 import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
-import { PageLayout } from "@components/PageLayout.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
 import { useNodeDB } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
@@ -29,7 +28,6 @@ import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {
   useCallback,
   useDeferredValue,
-  useEffect,
   useId,
   useMemo,
   useRef,
@@ -60,7 +58,9 @@ const MapPage = () => {
 
   // Get myNode directly using getNodes - getMyNode now returns immediately
   const myNode = useMemo(() => {
-    if (!nodeDB || !myNodeNum) return undefined;
+    if (!nodeDB || !myNodeNum) {
+      return undefined;
+    }
 
     const nodes = nodeDB.getNodes(undefined, true);
     return nodes.find((n) => n.num === myNodeNum);

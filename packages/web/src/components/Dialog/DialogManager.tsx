@@ -3,7 +3,6 @@ import { FactoryResetDeviceDialog } from "@app/components/Dialog/FactoryResetDev
 import { ClearAllStoresDialog } from "@components/Dialog/ClearAllStoresDialog/ClearAllStoresDialog.tsx";
 import { ClientNotificationDialog } from "@components/Dialog/ClientNotificationDialog/ClientNotificationDialog.tsx";
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
-import { ImportDialog } from "@components/Dialog/ImportDialog.tsx";
 import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
 import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog.tsx";
 import { QRDialog } from "@components/Dialog/QRDialog.tsx";
@@ -27,13 +26,13 @@ export const DialogManager = () => {
         channels={channels}
         loraConfig={config.lora}
       />
-      <ImportDialog
+      {/* <ImportDialog
         open={dialog.import}
         onOpenChange={(open) => {
           setDialogOpen("import", open);
         }}
         loraConfig={config.lora}
-      />
+      /> */}
       <ShutdownDialog
         open={dialog.shutdown}
         onOpenChange={() => {

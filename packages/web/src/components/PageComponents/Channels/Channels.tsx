@@ -48,12 +48,12 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
 
   return (
     <Tabs defaultValue="channel_0">
-      <TabsList className="w-full dark:bg-slate-700">
+      <TabsList className="w-full">
         {allChannels.map((channel) => (
           <TabsTrigger
             key={`channel_${channel.index}`}
             value={`channel_${channel.index}`}
-            className="dark:text-white relative"
+            className="relative text-white"
           >
             {getChannelName(channel)}
             {flags.get(channel.index) && (

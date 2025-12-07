@@ -8,8 +8,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from
-"@components/ui@app/components/ui/link
+} from "@components/ui/dialog.tsx";
 
 import {
   Tabs,

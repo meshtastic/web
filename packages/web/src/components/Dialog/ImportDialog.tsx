@@ -33,7 +33,7 @@ export interface ImportDialogProps {
 }
 
 export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
-  const { setChange, channels, config } = useDevice();
+  const { channels, config } = useDevice();
   const { t } = useTranslation("dialog");
   const [importDialogInput, setImportDialogInput] = useState<string>("");
   const [channelSet, setChannelSet] = useState<Protobuf.AppOnly.ChannelSet>();
@@ -88,40 +88,11 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
           return;
         }
 
-        const payload = create(Protobuf.Channel.ChannelSchema, {
-          index: importIndex[index],
-          role:
-            importIndex[index] === 0
-              ? Protobuf.Channel.Channel_Role.PRIMARY
-              : Protobuf.Channel.Channel_Role.SECONDARY,
-          settings: ch,
         });
-
-        if (
-          !deepCompareConfig(
-            channels.get(importIndex[index] ?? 0),
-            payload,
-            true,
-          )
-        ) {
-          setChange(
-            { type: "channels", index: importIndex[index] ?? 0 },
-            payload,
-            channels.get(importIndex[index] ?? 0),
-          );
-        }
       },
     );
 
     if (channelSet?.loraConfig && updateConfig) {
-      const payload = {
-        ...config.lora,
-        ...channelSet.loraConfig,
-      };
-
-      if (!deepCompareConfig(config.lora, payload, true)) {
-        setChange({ type: "config", variant: "lora" }, payload, config.lora);
-      }
     }
     // Reset state after import
     setImportDialogInput("");

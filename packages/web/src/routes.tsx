@@ -4,13 +4,14 @@ import { ModuleConfig } from "@meshtastic/protobufs";
 import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
+import SettingsPage from "@app/pages/Settings.tsx";
+import PreferencesPage from "@app/pages/Preferences.tsx";
 import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
   redirect,
 } from "@tanstack/react-router";
-import { Settings } from "lucide-react";
 import { Activity } from "react";
 import type { useTranslation } from "react-i18next";
 import { z } from "zod/v4";
@@ -123,11 +124,7 @@ export const mapWithParamsRoute = createRoute({
 export const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/settings",
-  component: () => (
-    <Activity>
-      <Settings />
-    </Activity>
-  ),
+  component: SettingsPage,
 });
 
 export const radioRoute = createRoute({
@@ -151,13 +148,23 @@ export const moduleRoute = createRoute({
 const nodesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/nodes",
-  component: () => <NodesPage />,
+  component: () => (
+    <Activity>
+      <NodesPage />
+    </Activity>
+  ),
 });
 
 const connectionsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/connections",
   component: Connections,
+});
+
+const preferencesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/preferences",
+  component: PreferencesPage,
 });
 
 const routeTree = rootRoute.addChildren([
@@ -169,6 +176,7 @@ const routeTree = rootRoute.addChildren([
   settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
   nodesRoute,
   connectionsRoute,
+  preferencesRoute,
 ]);
 
 const router = createRouter({

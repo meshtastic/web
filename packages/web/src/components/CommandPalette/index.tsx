@@ -1,4 +1,3 @@
-import { Avatar } from "@components/ui/avatar.tsx";
 import {
   CommandDialog,
   CommandEmpty,

@@ -129,7 +129,7 @@ export const ModuleConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
         </Card>
       ) : (
         <Tabs defaultValue={filteredTabs[0]?.case}>
-          <TabsList className="grid w-full grid-cols-12">
+          <TabsList className="flex w-full">
             {filteredTabs.map((tab) => (
               <TabsTrigger key={tab.case} value={tab.case} className="relative">
                 {tab.label}
@@ -148,29 +148,28 @@ export const ModuleConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
                 <CardHeader>
                   <CardTitle>{tab.label}</CardTitle>
                   <CardDescription>
-                    {tab.case === "mqtt" && t("page.mqtt.description")}
-                    {tab.case === "serial" && t("page.serial.description")}
+                    {tab.case === "mqtt" && t("mqtt.description")}
+                    {tab.case === "serial" && t("serial.description")}
                     {tab.case === "externalNotification" &&
-                      t("page.externalNotification.description")}
+                      t("externalNotification.description")}
                     {tab.case === "storeForward" &&
-                      t("page.storeForward.description")}
-                    {tab.case === "rangeTest" && t("page.rangeTest.description")}
-                    {tab.case === "telemetry" && t("page.telemetry.description")}
+                      t("storeForward.description")}
+                    {tab.case === "rangeTest" && t("rangeTest.description")}
+                    {tab.case === "telemetry" && t("telemetry.description")}
                     {tab.case === "cannedMessage" &&
-                      t("page.cannedMessage.description")}
-                    {tab.case === "audio" && t("page.audio.description")}
+                      t("cannedMessage.description")}
+                    {tab.case === "audio" && t("audio.description")}
                     {tab.case === "neighborInfo" &&
-                      t("page.neighborInfo.description")}
+                      t("neighborInfo.description")}
                     {tab.case === "ambientLighting" &&
-                      t("page.ambientLighting.description")}
+                      t("ambientLighting.description")}
                     {tab.case === "detectionSensor" &&
-                      t("page.detectionSensor.description")}
-                    {tab.case === "paxcounter" &&
-                      t("page.paxcounter.description")}
+                      t("detectionSensor.description")}
+                    {tab.case === "paxcounter" && t("paxcounter.description")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <tab.element onFormInit={onFormInit} searchQuery={searchQuery} />
+                  <tab.element onFormInit={onFormInit} />
                 </CardContent>
               </Card>
             </TabsContent>

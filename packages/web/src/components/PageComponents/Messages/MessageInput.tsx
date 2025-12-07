@@ -1,82 +1,146 @@
-import { Button } from "@components/ui/button.tsx";
-import { Input } from "@components/ui/input.tsx";
-import { useMessages } from "@core/stores";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import type { Device } from "@core/stores/deviceStore";
+import type { MessageStore } from "@core/stores/messageStore";
+import { MessageState, MessageType } from "@core/stores/messageStore";
+import type { Contact } from "@pages/Messages";
 import type { Types } from "@meshtastic/core";
-import { SendIcon } from "lucide-react";
-import { startTransition, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { ArrowUp } from "lucide-react";
+import { useState } from "react";
+
+const MAX_MESSAGE_BYTES = 200;
 
 export interface MessageInputProps {
-  onSend: (message: string) => void;
-  to: Types.Destination;
-  maxBytes: number;
+  selectedContact: Contact;
+  device: Device;
+  messages: MessageStore;
 }
 
-export const MessageInput = ({ onSend, to, maxBytes }: MessageInputProps) => {
-  const { setDraft, getDraft, clearDraft } = useMessages();
-  const { t } = useTranslation("messages");
+export const MessageInput = ({
+  selectedContact,
+  device,
+  messages,
+}: MessageInputProps) => {
+  const [messageDrafts, setMessageDrafts] = useState<Record<number, string>>(
+    {},
+  );
+  const [messageBytes, setMessageBytes] = useState<Record<number, number>>({});
 
   const calculateBytes = (text: string) => new Blob([text]).size;
 
-  const initialDraft = getDraft(to);
-  const [localDraft, setLocalDraft] = useState(initialDraft);
-  const [messageBytes, setMessageBytes] = useState(() =>
-    calculateBytes(initialDraft),
-  );
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    const byteLength = calculateBytes(newValue);
-
-    if (byteLength <= maxBytes) {
-      setLocalDraft(newValue);
-      setMessageBytes(byteLength);
-      setDraft(to, newValue);
+  const handleMessageChange = (contactId: number, text: string) => {
+    const byteLength = calculateBytes(text);
+    if (byteLength <= MAX_MESSAGE_BYTES) {
+      setMessageDrafts((prev) => ({ ...prev, [contactId]: text }));
+      setMessageBytes((prev) => ({ ...prev, [contactId]: byteLength }));
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!localDraft.trim()) {
+  const sendMessage = async () => {
+    if (!selectedContact || !device.connection) {
+      console.log("[sendMessage] Missing selectedContact or device.connection");
       return;
     }
-    // Reset bytes *before* sending (consider if onSend failure needs different handling)
-    setMessageBytes(0);
 
-    startTransition(() => {
-      onSend(localDraft.trim());
-      setLocalDraft("");
-      clearDraft(to);
+    const draft = messageDrafts[selectedContact.id] || "";
+    const trimmedMessage = draft.trim();
+
+    if (!trimmedMessage) {
+      return;
+    }
+
+    const isDirect = selectedContact.type === "direct";
+    const isBroadcast = selectedContact.type === "channel";
+
+    // Determine destination and channel based on contact type
+    const toValue = isDirect
+      ? (selectedContact.nodeNum as number)
+      : ("broadcast" as const);
+
+    const channelValue = isDirect
+      ? undefined
+      : (selectedContact.id as Types.ChannelNumber);
+
+    console.log("[sendMessage] Sending:", {
+      message: trimmedMessage,
+      isDirect,
+      isBroadcast,
+      toValue,
+      channelValue,
+      selectedContact: selectedContact.name,
+      nodeNum: selectedContact.nodeNum,
     });
+
+    setMessageDrafts((prev) => ({ ...prev, [selectedContact.id]: "" }));
+    setMessageBytes((prev) => ({ ...prev, [selectedContact.id]: 0 }));
+
+    try {
+      // Process message through pipeline before sending
+      await messages.processOutgoingMessage({
+        text: trimmedMessage,
+        to: toValue,
+        channelId: channelValue,
+        wantAck: true,
+      });
+
+      const messageId = await device.connection.sendText(
+        trimmedMessage,
+        toValue,
+        true,
+        channelValue,
+      );
+
+      console.log("[sendMessage] Message sent, ID:", messageId);
+
+      if (messageId !== undefined) {
+        if (isBroadcast) {
+          messages.setMessageState({
+            type: MessageType.Broadcast,
+            channelId: channelValue,
+            messageId,
+            newState: MessageState.Ack,
+          });
+        } else {
+          messages.setMessageState({
+            type: MessageType.Direct,
+            nodeA: device.myNodeNum as number,
+            nodeB: selectedContact.nodeNum as number,
+            messageId,
+            newState: MessageState.Ack,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      // TODO: Handle failed message state
+    }
   };
 
   return (
-    <div className="flex gap-2">
-      <form className="w-full" name="messageInput" onSubmit={handleSubmit}>
-        <div className="flex grow gap-1">
-          <label className="w-full" htmlFor="messageInput">
-            <Input
-              minLength={1}
-              name="messageInput"
-              placeholder={t("sendMessage.placeholder")}
-              autoComplete="off"
-              value={localDraft}
-              onChange={handleInputChange}
-            />
-          </label>
-
-          <label
-            data-testid="byte-counter"
-            htmlFor="messageInput"
-            className="flex items-center w-20 p-1 text-sm place-content-end"
-          >
-            {messageBytes}/{maxBytes}
-          </label>
-
-          <Button type="submit" variant="default">
-            <SendIcon size={16} />
-          </Button>
+    <div className="border-t p-4">
+      <form
+        className="flex items-center gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          sendMessage();
+        }}
+      >
+        <div className="flex-1 flex gap-2">
+          <Input
+            placeholder={`Message ${selectedContact.name}...`}
+            value={messageDrafts[selectedContact.id] || ""}
+            onChange={(e) =>
+              handleMessageChange(selectedContact.id, e.target.value)
+            }
+            className="flex-1"
+          />
+          <span className="flex items-center text-sm text-muted-foreground min-w-[60px] justify-end">
+            {messageBytes[selectedContact.id] || 0}/{MAX_MESSAGE_BYTES}
+          </span>
         </div>
+        <Button size="icon" type="submit" className="rounded-full">
+          <ArrowUp className="h-5 w-5" />
+        </Button>
       </form>
     </div>
   );

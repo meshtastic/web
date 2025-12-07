@@ -5,7 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/ui/tooltip";
-import { getAvatarColors } from "@core/utils/avatarColors";
+import { getAvatarColors } from "@core/utils/color";
 import { cn } from "@core/utils/cn";
 import { LockKeyholeOpenIcon, StarIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";

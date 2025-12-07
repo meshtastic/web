@@ -1,4 +1,13 @@
 {
+  "nodesPage": {
+    "title": "Nodes",
+    "description": "View and manage all nodes in your mesh network",
+    "tableTitle": "Network Nodes",
+    "nodeCount": "{{count}} nodes",
+    "nodeCount_one": "{{count}} node",
+    "nodeCount_other": "{{count}} nodes",
+    "noNodes": "No nodes found"
+  },
   "nodeDetail": {
     "publicKeyEnabled": {
       "label": "Public Key Enabled"
@@ -35,13 +44,20 @@
     }
   },
   "nodesTable": {
+    "columns": "Columns",
+    "toggleColumns": "Toggle Columns",
     "headings": {
-      "longName": "Long Name",
-      "connection": "Connection",
+      "longName": "Name",
+      "encryption": "Enc",
       "lastHeard": "Last Heard",
-      "encryption": "Encryption",
+      "battery": "Battery",
+      "altitude": "Altitude",
+      "hopsAway": "Hops",
+      "temp": "Temp",
+      "chUtil": "Ch/Air Util",
       "model": "Model",
-      "macAddress": "MAC Address"
+      "role": "Role",
+      "nodeId": "Node ID"
     },
     "connectionStatus": {
       "direct": "Direct",

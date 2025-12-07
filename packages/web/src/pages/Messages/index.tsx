@@ -1,16 +1,26 @@
 import { NodeAvatar } from "@components/NodeAvatar";
+import { MessageInput } from "@components/PageComponents/Messages/MessageInput";
 import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { ScrollArea } from "@components/ui/scroll-area";
+import { Spinner } from "@components/ui/spinner";
 import {
-  MessageState,
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@components/ui/tooltip";
+import { useMessagePipeline } from "@core/hooks/useMessagePipeline";
+import {
   MessageType,
   useDevice,
   useMessages,
+  useMessageStoreHydrated,
   useNodeDB,
 } from "@core/stores";
-import { getAvatarColors } from "@core/utils/avatarColors";
+import { getAvatarColors } from "@core/utils/color";
 import { cn } from "@core/utils/cn";
 import type { Types } from "@meshtastic/core";
 import {
@@ -19,7 +29,6 @@ import {
   toTimestamp,
 } from "@pages/Messages/MessageUtils";
 import {
-  ArrowUp,
   Hash,
   MoreVertical,
   Plus,
@@ -31,7 +40,7 @@ import type React from "react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-type Contact = {
+export type Contact = {
   id: number;
   name: string;
   nodeId: string;
@@ -48,13 +57,18 @@ type Tab = {
   contactId: number;
 };
 
-const MAX_MESSAGE_BYTES = 200;
-
 export default function MessagesPage() {
   const device = useDevice();
   const nodeDB = useNodeDB();
   const messages = useMessages();
   const { i18n, t } = useTranslation();
+  const hasHydrated = useMessageStoreHydrated();
+
+  // Set up message pipeline handlers
+  useMessagePipeline();
+
+  // Debug: Log hydration status
+  console.log("[MessagesPage] hasHydrated:", hasHydrated);
 
   const [openTabs, setOpenTabs] = useState<Tab[]>([]);
   const [activeTabId, setActiveTabId] = useState<number | null>(null);
@@ -62,12 +76,6 @@ export default function MessagesPage() {
   const [contactFilter, setContactFilter] = useState<
     "all" | "direct" | "channels"
   >("all");
-
-  // Message input state per tab
-  const [messageDrafts, setMessageDrafts] = useState<Record<number, string>>(
-    {},
-  );
-  const [messageBytes, setMessageBytes] = useState<Record<number, number>>({});
 
   // Get contacts from nodeDB and channels
   const contacts = useMemo<Contact[]>(() => {
@@ -177,12 +185,6 @@ export default function MessagesPage() {
       const newTabId = Math.max(...openTabs.map((t) => t.id), 0) + 1;
       setOpenTabs([...openTabs, { id: newTabId, contactId }]);
       setActiveTabId(newTabId);
-
-      // Initialize draft for this contact if not exists
-      if (!messageDrafts[contactId]) {
-        setMessageDrafts((prev) => ({ ...prev, [contactId]: "" }));
-        setMessageBytes((prev) => ({ ...prev, [contactId]: 0 }));
-      }
     }
   };
 
@@ -197,92 +199,6 @@ export default function MessagesPage() {
 
     if (activeTabId === tabId) {
       setActiveTabId(newTabs[newTabs.length - 1].id);
-    }
-  };
-
-  const calculateBytes = (text: string) => new Blob([text]).size;
-
-  const handleMessageChange = (contactId: number, text: string) => {
-    const byteLength = calculateBytes(text);
-    if (byteLength <= MAX_MESSAGE_BYTES) {
-      setMessageDrafts((prev) => ({ ...prev, [contactId]: text }));
-      setMessageBytes((prev) => ({ ...prev, [contactId]: byteLength }));
-    }
-  };
-
-  const sendMessage = async () => {
-    if (!selectedContact || !device.connection) {
-      console.log("[sendMessage] Missing selectedContact or device.connection");
-      return;
-    }
-
-    const draft = messageDrafts[selectedContact.id] || "";
-    const trimmedMessage = draft.trim();
-
-    if (!trimmedMessage) {
-      return;
-    }
-
-    const isDirect = selectedContact.type === "direct";
-    const isBroadcast = selectedContact.type === "channel";
-
-    // Determine destination and channel based on contact type
-    // For broadcast: use "broadcast" string
-    // For direct: use the node number
-    const toValue = isDirect
-      ? (selectedContact.nodeNum as number)
-      : ("broadcast" as const);
-
-    // For channels, use  the contact ID
-    // For direct messages, don't specify a channel
-    const channelValue = isDirect
-      ? undefined
-      : (selectedContact.id as Types.ChannelNumber);
-
-    console.log("[sendMessage] Sending:", {
-      message: trimmedMessage,
-      isDirect,
-      isBroadcast,
-      toValue,
-      channelValue,
-      selectedContact: selectedContact.name,
-      nodeNum: selectedContact.nodeNum,
-    });
-
-    setMessageDrafts((prev) => ({ ...prev, [selectedContact.id]: "" }));
-    setMessageBytes((prev) => ({ ...prev, [selectedContact.id]: 0 }));
-
-    try {
-      const messageId = await device.connection.sendText(
-        trimmedMessage,
-        toValue,
-        true,
-        channelValue,
-      );
-
-      console.log("[sendMessage] Message sent, ID:", messageId);
-
-      if (messageId !== undefined) {
-        if (isBroadcast) {
-          messages.setMessageState({
-            type: MessageType.Broadcast,
-            channelId: channelValue,
-            messageId,
-            newState: MessageState.Ack,
-          });
-        } else {
-          messages.setMessageState({
-            type: MessageType.Direct,
-            nodeA: device.myNodeNum as number,
-            nodeB: selectedContact.nodeNum as number,
-            messageId,
-            newState: MessageState.Ack,
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      // TODO: Handle failed message state
     }
   };
 
@@ -342,6 +258,15 @@ export default function MessagesPage() {
     () => groupMessagesByDay(sortedMessages, t, dayLabelFmt),
     [sortedMessages, t, dayLabelFmt],
   );
+
+  // Show loading spinner while Zustand is restoring from IndexedDB
+  if (!hasHydrated) {
+    return (
+      <div className="flex h-[calc(100vh-3.5rem)] items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)]">
@@ -453,7 +378,9 @@ export default function MessagesPage() {
                   const tabContact = contacts.find(
                     (c) => c.id === tab.contactId,
                   );
-                  if (!tabContact) return null;
+                  if (!tabContact) {
+                    return null;
+                  }
                   return (
                     <div
                       key={tab.id}
@@ -595,12 +522,27 @@ export default function MessagesPage() {
                             )}
                           >
                             {!isMine && (
-                              <p
-                                className="text-xs font-medium mb-0.5 "
-                                style={{ color: avatarColors.bgColor }}
-                              >
-                                {senderName}
-                              </p>
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                <p
+                                  className="text-xs font-medium"
+                                  style={{ color: avatarColors.bgColor }}
+                                >
+                                  {senderName}
+                                </p>
+                                {msg.viaMqtt && (
+                                  <TooltipProvider delayDuration={300}>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <span className="text-base">☁️</span>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-4 py-1 rounded text-xs">
+                                        MQTT
+                                        <TooltipArrow className="fill-slate-800 dark:fill-slate-600" />
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                )}
+                              </div>
                             )}
                             <p className="text-sm leading-relaxed ">
                               {msg.message}
@@ -629,39 +571,11 @@ export default function MessagesPage() {
             </ScrollArea>
 
             {/* Message Input */}
-            <div className="border-t p-4">
-              <form
-                className="flex items-center gap-2"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  sendMessage();
-                }}
-              >
-                {/* <Button variant="ghost" size="icon">
-                  <Paperclip className="h-4 w-4" />
-                </Button> */}
-                <div className="flex-1 flex gap-2">
-                  <Input
-                    placeholder={`Message ${selectedContact.name}...`}
-                    value={messageDrafts[selectedContact.id] || ""}
-                    onChange={(e) =>
-                      handleMessageChange(selectedContact.id, e.target.value)
-                    }
-                    className="flex-1"
-                  />
-                  <span className="flex items-center text-sm text-muted-foreground min-w-[60px] justify-end">
-                    {messageBytes[selectedContact.id] || 0}/{MAX_MESSAGE_BYTES}
-                  </span>
-                </div>
-                {/* TODO: ******** uncomment this when emoji picker is added */}
-                {/* <Button variant="ghost" size="icon" type="button">
-                  <Smile className="h-4 w-4" />
-                </Button> */}
-                <Button size="icon" type="submit" className="rounded-full">
-                  <ArrowUp className="h-5 w-5" />
-                </Button>
-              </form>
-            </div>
+            <MessageInput
+              selectedContact={selectedContact}
+              device={device}
+              messages={messages}
+            />
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">

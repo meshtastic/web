@@ -1,20 +1,24 @@
+import { SettingsSearchBar } from "@app/components/Settings/SettingsSearchBar";
+import { ActivityPanel } from "@components/Settings/Activity";
 import { ImportExport } from "@components/Settings/ImportExport";
-import { SearchBar } from "@components/Settings/SearchBar";
+import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
 import { ScrollArea } from "@components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@components/ui/sheet";
+import { useFieldRegistry } from "@core/services/fieldRegistry";
+import { cn } from "@core/utils/cn";
 import { DeviceConfig } from "@pages/Settings/DeviceConfig";
 import { ModuleConfig } from "@pages/Settings/ModuleConfig";
 import { RadioConfig } from "@pages/Settings/RadioConfig";
-import { useSettingsSave } from "@app/pages/Settings/useSaveSettings";
-import { cn } from "@core/utils/cn";
+import { useSettingsSave } from "@pages/Settings/useSaveSettings";
 import {
+  FileEdit,
   LayersIcon,
+  Menu,
   RadioTowerIcon,
   RotateCcw,
   RouterIcon,
   Save,
-  Menu,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -48,9 +52,14 @@ export default function SettingsPage() {
     saveDisabled,
   } = useSettingsSave();
 
+  const { getChangeCount } = useFieldRegistry();
+
   const [activeSection, setActiveSection] = useState<SettingsSection>("radio");
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
+
+  const totalChangeCount = getChangeCount();
 
   const handleSectionChange = (section: SettingsSection) => {
     setActiveSection(section);
@@ -67,9 +76,10 @@ export default function SettingsPage() {
           {configSections.map((section) => (
             <button
               key={section.key}
+              type="button"
               onClick={() => handleSectionChange(section.key)}
               className={cn(
-                "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
+                "flex items-center gap-3 rounded-lg p-3 text-left transition-colors",
                 activeSection === section.key
                   ? "bg-sidebar-accent"
                   : "hover:bg-sidebar-accent/50",
@@ -85,9 +95,9 @@ export default function SettingsPage() {
   );
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)]">
+    <div className="flex">
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:w-64 md:border-r md:flex-col">
+      <div className="hidden md:flex md:w-56 md:border-r md:flex-col">
         {sidebarContent}
       </div>
 
@@ -116,8 +126,25 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden sm:block">
-              <SearchBar onSearch={setSearchQuery} />
+              <SettingsSearchBar onSearch={setSearchQuery} />
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="relative hidden lg:flex"
+              onClick={() => setActivityOpen(true)}
+            >
+              <FileEdit className="h-4 w-4 mr-2" />
+              Activity
+              {totalChangeCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {totalChangeCount}
+                </Badge>
+              )}
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -160,11 +187,16 @@ export default function SettingsPage() {
             )}
             {activeSection === "module" && (
               <ModuleConfig
-                onFormInit={handleFormInit} searchQuery={searchQuery} />
+                onFormInit={handleFormInit}
+                searchQuery={searchQuery}
+              />
             )}
           </div>
         </div>
       </div>
+
+      {/* Activity Panel */}
+      <ActivityPanel open={activityOpen} onOpenChange={setActivityOpen} />
     </div>
   );
 }

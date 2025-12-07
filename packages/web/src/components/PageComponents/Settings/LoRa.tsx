@@ -7,9 +7,13 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import {
+  createFieldMetadata,
+  useFieldRegistry,
+} from "@core/services/fieldRegistry";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface LoRaConfigProps {
@@ -18,26 +22,17 @@ interface LoRaConfigProps {
 export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
   useWaitForConfig({ configCase: "lora" });
 
-  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
+  const { config, getEffectiveConfig } = useDevice();
+  const {
+    registerFields,
+    trackChange,
+    removeChange: removeFieldChange,
+  } = useFieldRegistry();
   const { t } = useTranslation("config");
 
-  const onSubmit = (data: LoRaValidation) => {
-    if (deepCompareConfig(config.lora, data, true)) {
-      removeChange({ type: "config", variant: "lora" });
-      return;
-    }
+  const section = { type: "config", variant: "lora" } as const;
 
-    setChange({ type: "config", variant: "lora" }, data, config.lora);
-  };
-
-  return (
-    <DynamicForm<LoRaValidation>
-      onSubmit={onSubmit}
-      onFormInit={onFormInit}
-      validationSchema={LoRaValidationSchema}
-      defaultValues={config.lora}
-      values={getEffectiveConfig("lora")}
-      fieldGroups={[
+  const fieldGroups = [
         {
           label: t("lora.title"),
           description: t("lora.description"),
@@ -202,7 +197,41 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
             },
           ],
         },
-      ]}
+      ];
+
+  // Register fields on mount
+  useEffect(() => {
+    const metadata = createFieldMetadata(section, fieldGroups);
+    registerFields(section, metadata);
+  }, [registerFields, fieldGroups, section]);
+
+  const onSubmit = (data: LoRaValidation) => {
+    // Track individual field changes
+    const originalData = config.lora;
+    if (!originalData) {
+      return;
+    }
+
+    (Object.keys(data) as Array<keyof LoRaValidation>).forEach((fieldName) => {
+      const newValue = data[fieldName];
+      const oldValue = originalData[fieldName];
+
+      if (newValue !== oldValue) {
+        trackChange(section, fieldName as string, newValue, oldValue);
+      } else {
+        removeFieldChange(section, fieldName as string);
+      }
+    });
+  };
+
+  return (
+    <DynamicForm<LoRaValidation>
+      onSubmit={onSubmit}
+      onFormInit={onFormInit}
+      validationSchema={LoRaValidationSchema}
+      defaultValues={config.lora}
+      values={getEffectiveConfig("lora")}
+      fieldGroups={fieldGroups}
     />
   );
 };

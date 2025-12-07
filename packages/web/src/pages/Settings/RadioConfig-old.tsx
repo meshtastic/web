@@ -13,7 +13,6 @@ import { useDevice, type ValidConfigType } from "@core/stores";
 import { type ComponentType, Suspense } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useConfigSearch } from "@components/Settings/useConfigSearch";
 
 interface ConfigProps {
   onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;

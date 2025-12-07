@@ -33,28 +33,25 @@ export function useSettingsSave() {
   const channelChangeCount = getChannelChangeCount();
   const adminMessageChangeCount = getAdminMessageChangeCount();
 
-  const handleFormInit = useCallback(
-    (methods: UseFormReturn) => {
-      setFormMethods(methods);
+  const handleFormInit = useCallback((methods: UseFormReturn) => {
+    setFormMethods(methods);
 
-      setRhfState({
-        isDirty: false,
-        isValid: true,
-      });
+    setRhfState({
+      isDirty: false,
+      isValid: true,
+    });
 
-      unsubRef.current?.();
-      unsubRef.current = methods.subscribe({
-        formState: { isDirty: true, isValid: true },
-        callback: ({ isValid, isDirty }) => {
-          setRhfState({
-            isDirty: isDirty ?? false,
-            isValid: isValid ?? true,
-          });
-        },
-      });
-    },
-    [],
-  );
+    unsubRef.current?.();
+    unsubRef.current = methods.subscribe({
+      formState: { isDirty: true, isValid: true },
+      callback: ({ isValid, isDirty }) => {
+        setRhfState({
+          isDirty: isDirty ?? false,
+          isValid: isValid ?? true,
+        });
+      },
+    });
+  }, []);
 
   useEffect(() => {
     return () => unsubRef.current?.();

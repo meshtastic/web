@@ -16,20 +16,23 @@
     "logo": "Meshtastic Logo"
   },
   "sidebar": {
-    "collapseToggle": {
-      "button": {
-        "open": "Open sidebar",
-        "close": "Close sidebar"
-      }
-    },
-    "deviceInfo": {
-      "volts": "{{voltage}} volts",
-      "firmware": {
-        "title": "Firmware",
-        "version": "v{{version}}",
-        "buildDate": "Build date: {{date}}"
-      }
+    "collapse": "Collapse"
+  },
+  "deviceInfo": {
+    "volts": "{{voltage}} volts",
+    "firmware": {
+      "title": "Firmware",
+      "version": "v{{version}}",
+      "buildDate": "Build date: {{date}}"
     }
+  },
+  "activityList": {
+    "noPendingChanges": "No pending changes",
+    "pendingChanges": "Pending Changes",
+    "emptyPage": "Changes will appear here as you modify settings",
+    "discardChanges": "Are you sure you want to discard all pending changes?",
+    "changesWaitingToSave": "{{num}} waiting to be saved",
+    "clearAllChanges": "Clear all changes"
   },
   "batteryStatus": {
     "charging": "{{level}}% charging",
@@ -212,5 +215,76 @@
   "footer": {
     "text": "Powered by <0>▲ Vercel</0> | Meshtastic® is a registered trademark of Meshtastic LLC. | <1>Legal Information</1>",
     "commitSha": "Commit SHA: {{sha}}"
+  },
+  "preferences": {
+    "title": "Preferences",
+    "description": "Customize your application experience",
+    "resetToDefaults": "Reset to Defaults",
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize how Meshtastic looks",
+      "theme": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "compactMode": {
+        "label": "Compact Mode",
+        "description": "Reduce spacing and padding for more content"
+      },
+      "showNodeAvatars": {
+        "label": "Show Node Avatars",
+        "description": "Display avatars in the node list"
+      }
+    },
+    "localization": {
+      "title": "Localization",
+      "description": "Language and regional settings",
+      "language": "Language",
+      "timeFormat": "Time Format",
+      "12hour": "12 Hour (AM/PM)",
+      "24hour": "24 Hour",
+      "distanceUnits": "Distance Units",
+      "imperial": "Imperial (mi, ft)",
+      "metric": "Metric (km, m)",
+      "coordinateFormat": "Coordinate Format",
+      "decimalDegrees": "Decimal Degrees",
+      "dms": "Degrees Minutes Seconds",
+      "utm": "UTM"
+    },
+    "map": {
+      "title": "Map Preferences",
+      "description": "Configure map display settings",
+      "mapStyle": "Map Style",
+      "dark": "Dark",
+      "light": "Light",
+      "satellite": "Satellite",
+      "terrain": "Terrain",
+      "streets": "Streets",
+      "showNodeLabels": {
+        "label": "Show Node Labels",
+        "description": "Display names on map markers"
+      },
+      "showConnectionLines": {
+        "label": "Show Connection Lines",
+        "description": "Draw lines between connected nodes"
+      },
+      "autoCenterOnPosition": {
+        "label": "Auto-center on Position",
+        "description": "Keep map centered on your location"
+      }
+    },
+    "audio": {
+      "title": "Audio",
+      "description": "Sound and audio settings",
+      "masterVolume": "Master Volume",
+      "messageSound": {
+        "label": "Message Sound",
+        "description": "Play sound for incoming messages"
+      },
+      "alertSound": {
+        "label": "Alert Sound",
+        "description": "Play sound for network alerts"
+      }
+    }
   }
 }

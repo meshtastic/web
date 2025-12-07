@@ -85,6 +85,9 @@ export function AppSidebar() {
 
   // Calculate total unread messages
   const totalUnread = useMemo(() => {
+    if (!messages || typeof messages.getTotalUnreadCount !== "function") {
+      return 0;
+    }
     return messages.getTotalUnreadCount();
   }, [messages]);
 
@@ -99,7 +102,8 @@ export function AppSidebar() {
     }
 
     const nodes = nodeDB.getNodes(undefined, true); // include self
-    const onlineThreshold = Date.now() / 1000 - 900; // 15 minutes
+    const onlineThreshold = Date.now() / 1000 - 60; // 1 minutes
+
     const onlineCount = nodes.filter(
       (node) => (node.lastHeard || 0) > onlineThreshold,
     ).length;

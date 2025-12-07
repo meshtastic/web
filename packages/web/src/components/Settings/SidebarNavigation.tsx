@@ -1,6 +1,6 @@
-import { Card } from "@components/ui/card";
-import { Button } from "@components/ui/button";
 import { Badge } from "@components/ui/badge";
+import { Button } from "@components/ui/button";
+import { Card } from "@components/ui/card";
 import { ScrollArea } from "@components/ui/scroll-area";
 import { cn } from "@core/utils/cn";
 
@@ -24,7 +24,7 @@ export const SidebarNavigation = ({ items }: SidebarNavigationProps) => {
         <h2 className="font-semibold">Configuration</h2>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-2 space-y-1">
+        <div className="p-2 space-y-1 w-16">
           {items.map((item) => (
             <Button
               key={item.key}

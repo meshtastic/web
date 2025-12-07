@@ -7,6 +7,7 @@ import {
 import type { FilterState } from "@components/generic/Filter/useFilterNode.ts";
 import { TimeAgo } from "@components/generic/TimeAgo.tsx";
 import { Accordion } from "@components/ui/accordion.tsx";
+import { Button } from "@components/ui/button.tsx";
 import { Input } from "@components/ui/input.tsx";
 import {
   Popover,
@@ -208,20 +209,18 @@ export function FilterControl({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button
-          type="button"
+        <Button
+          variant={isDirty ? "default" : "ghost"}
+          size="icon"
           className={cn(
-            "rounded",
-            "text-slate-600 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 active:bg-slate-300",
-            "dark:text-slate-400 hover:dark:text-slate-400 dark:bg-slate-700 hover:dark:bg-slate-800 dark:active:bg-slate-950",
             isDirty &&
-              "text-slate-100 dark:text-slate-300 bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 hover:text-slate-200 dark:hover:text-slate-300 active:bg-green-800 dark:active:bg-green-900",
+              "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700",
             parameters?.popoverTriggerClassName,
           )}
           aria-label={t("filter.label")}
         >
-          {parameters?.triggerIcon ?? <FunnelIcon />}
-        </button>
+          {parameters?.triggerIcon ?? <FunnelIcon className="h-4 w-4" />}
+        </Button>
       </PopoverTrigger>
       <PopoverContent
         {...parameters?.popoverContentProps}
@@ -400,13 +399,14 @@ export function FilterControl({
               />
             </FilterAccordionItem>
           </Accordion>
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={resetFilters}
-            className="w-full py-1 shadow-sm hover:shadow-md bg-slate-600 dark:bg-slate-900 text-white rounded text-sm hover:text-slate-100 hover:bg-slate-700 active:bg-slate-950"
+            className="w-full"
           >
             {t("button.reset")}
-          </button>
+          </Button>
           {children && <div className="mt-4 border-t pt-4">{children}</div>}
         </form>
       </PopoverContent>

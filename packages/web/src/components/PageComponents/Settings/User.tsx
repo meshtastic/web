@@ -7,8 +7,13 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import {
+  createFieldMetadata,
+  useFieldRegistry,
+} from "@core/services/fieldRegistry";
 import { useDevice, useNodeDB } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface UserConfigProps {
@@ -16,9 +21,16 @@ interface UserConfigProps {
 }
 
 export const User = ({ onFormInit }: UserConfigProps) => {
-  const { hardware, getChange, connection } = useDevice();
+  const { hardware, connection } = useDevice();
   const { getNode } = useNodeDB();
+  const {
+    registerFields,
+    trackChange,
+    removeChange: removeFieldChange,
+  } = useFieldRegistry();
   const { t } = useTranslation("config");
+
+  const section = { type: "config", variant: "user" } as const;
 
   const myNode = getNode(hardware.myNodeNum);
   const defaultUser = myNode?.user ?? {
@@ -28,39 +40,7 @@ export const User = ({ onFormInit }: UserConfigProps) => {
     isLicensed: false,
   };
 
-  // Get working copy from change registry
-  const workingUser = getChange({ type: "user" }) as
-    | Protobuf.Mesh.User
-    | undefined;
-
-  const effectiveUser = workingUser ?? defaultUser;
-
-  const onSubmit = (data: UserValidation) => {
-    connection?.setOwner(
-      create(Protobuf.Mesh.UserSchema, {
-        ...data,
-      }),
-    );
-  };
-
-  return (
-    <DynamicForm<UserValidation>
-      onSubmit={onSubmit}
-      onFormInit={onFormInit}
-      validationSchema={UserValidationSchema}
-      defaultValues={{
-        longName: defaultUser.longName,
-        shortName: defaultUser.shortName,
-        isLicensed: defaultUser.isLicensed,
-        isUnmessageable: false,
-      }}
-      values={{
-        longName: effectiveUser.longName,
-        shortName: effectiveUser.shortName,
-        isLicensed: effectiveUser.isLicensed,
-        isUnmessageable: false,
-      }}
-      fieldGroups={[
+  const fieldGroups = [
         {
           label: t("user.title"),
           description: t("user.description"),
@@ -105,7 +85,53 @@ export const User = ({ onFormInit }: UserConfigProps) => {
             },
           ],
         },
-      ]}
+      ];
+
+  // Register fields on mount
+  useEffect(() => {
+    const metadata = createFieldMetadata(section, fieldGroups);
+    registerFields(section, metadata);
+  }, [registerFields, fieldGroups, section]);
+
+  const onSubmit = (data: UserValidation) => {
+    const userData = create(Protobuf.Mesh.UserSchema, {
+      ...data,
+    });
+
+    // Track individual field changes
+    (Object.keys(data) as Array<keyof UserValidation>).forEach((fieldName) => {
+      const newValue = data[fieldName];
+      const oldValue = defaultUser[fieldName as keyof typeof defaultUser];
+
+      if (newValue !== oldValue) {
+        trackChange(section, fieldName as string, newValue, oldValue);
+      } else {
+        removeFieldChange(section, fieldName as string);
+      }
+    });
+
+    // Send to device
+    connection?.setOwner(userData);
+  };
+
+  return (
+    <DynamicForm<UserValidation>
+      onSubmit={onSubmit}
+      onFormInit={onFormInit}
+      validationSchema={UserValidationSchema}
+      defaultValues={{
+        longName: defaultUser.longName,
+        shortName: defaultUser.shortName,
+        isLicensed: defaultUser.isLicensed,
+        isUnmessageable: false,
+      }}
+      values={{
+        longName: defaultUser.longName,
+        shortName: defaultUser.shortName,
+        isLicensed: defaultUser.isLicensed,
+        isUnmessageable: false,
+      }}
+      fieldGroups={fieldGroups}
     />
   );
 };

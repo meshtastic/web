@@ -142,7 +142,9 @@ describe("NodeDB store", () => {
     db.addNode(makeNode(123));
 
     // Before setNodeNum, getMyNode should timeout
-    await expect(db.getMyNode()).rejects.toThrow("Timeout waiting for myNodeNum");
+    await expect(db.getMyNode()).rejects.toThrow(
+      "Timeout waiting for myNodeNum",
+    );
 
     db.setNodeNum(123);
 

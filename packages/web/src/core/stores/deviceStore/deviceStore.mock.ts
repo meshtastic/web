@@ -16,10 +16,13 @@ export const mockDeviceStore: Device = {
   id: 0,
   myNodeNum: 123456,
   status: 5 as const,
+  connectionPhase: "disconnected" as const,
+  connectionId: null,
   channels: new Map(),
   config: {} as Protobuf.LocalOnly.LocalConfig,
   moduleConfig: {} as Protobuf.LocalOnly.LocalModuleConfig,
-  changeRegistry: { changes: new Map() },
+  changes: new Map(),
+  queuedAdminMessages: [],
   hardware: {} as Protobuf.Mesh.MyNodeInfo,
   metadata: new Map(),
   traceroutes: new Map(),
@@ -52,6 +55,8 @@ export const mockDeviceStore: Device = {
   neighborInfo: new Map(),
 
   setStatus: vi.fn(),
+  setConnectionPhase: vi.fn(),
+  setConnectionId: vi.fn(),
   setConfig: vi.fn(),
   setModuleConfig: vi.fn(),
   getEffectiveConfig: vi.fn(),
@@ -80,11 +85,8 @@ export const mockDeviceStore: Device = {
   getNeighborInfo: vi.fn(),
   addNeighborInfo: vi.fn(),
 
-  // New unified change tracking methods
+  // Change tracking methods
   setChange: vi.fn(),
-  removeChange: vi.fn(),
-  hasChange: vi.fn().mockReturnValue(false),
-  getChange: vi.fn(),
   clearAllChanges: vi.fn(),
   hasConfigChange: vi.fn().mockReturnValue(false),
   hasModuleConfigChange: vi.fn().mockReturnValue(false),
@@ -96,4 +98,7 @@ export const mockDeviceStore: Device = {
   getAllConfigChanges: vi.fn().mockReturnValue([]),
   getAllModuleConfigChanges: vi.fn().mockReturnValue([]),
   getAllChannelChanges: vi.fn().mockReturnValue([]),
+  queueAdminMessage: vi.fn(),
+  getAllQueuedAdminMessages: vi.fn().mockReturnValue([]),
+  getAdminMessageChangeCount: vi.fn().mockReturnValue(0),
 };

@@ -7,8 +7,12 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import {
+  createFieldMetadata,
+  useFieldRegistry,
+} from "@core/services/fieldRegistry";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 interface NeighborInfoModuleConfigProps {
@@ -18,22 +22,73 @@ interface NeighborInfoModuleConfigProps {
 export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
   useWaitForConfig({ moduleConfigCase: "neighborInfo" });
 
-  const { moduleConfig, setChange, getEffectiveModuleConfig, removeChange } =
-    useDevice();
+  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
+  const {
+    registerFields,
+    trackChange,
+    removeChange: removeFieldChange,
+  } = useFieldRegistry();
   const { t } = useTranslation("moduleConfig");
+  const section = { type: "moduleConfig", variant: "neighborInfo" } as const;
 
   const onSubmit = (data: NeighborInfoValidation) => {
-    if (deepCompareConfig(moduleConfig.neighborInfo, data, true)) {
-      removeChange({ type: "moduleConfig", variant: "neighborInfo" });
+    // Track individual field changes
+    const originalData = moduleConfig.neighborInfo;
+    if (!originalData) {
       return;
     }
 
-    setChange(
-      { type: "moduleConfig", variant: "neighborInfo" },
-      data,
-      moduleConfig.neighborInfo,
+    (Object.keys(data) as Array<keyof NeighborInfoValidation>).forEach(
+      (fieldName) => {
+        const newValue = data[fieldName];
+        const oldValue = originalData[fieldName];
+
+        if (newValue !== oldValue) {
+          trackChange(section, fieldName as string, newValue, oldValue);
+        } else {
+          removeFieldChange(section, fieldName as string);
+        }
+      },
     );
   };
+
+  const fieldGroups = useMemo(
+    () => [
+      {
+        label: t("neighborInfo.title"),
+        description: t("neighborInfo.description"),
+        fields: [
+          {
+            type: "toggle",
+            name: "enabled",
+            label: t("neighborInfo.enabled.label"),
+            description: t("neighborInfo.enabled.description"),
+          },
+          {
+            type: "number",
+            name: "updateInterval",
+            label: t("neighborInfo.updateInterval.label"),
+            description: t("neighborInfo.updateInterval.description"),
+            properties: {
+              suffix: t("unit.second.plural"),
+            },
+            disabledBy: [
+              {
+                fieldName: "enabled",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    [t],
+  );
+
+  // Register fields on mount
+  useEffect(() => {
+    const metadata = createFieldMetadata(section, fieldGroups);
+    registerFields(section, metadata);
+  }, [registerFields, fieldGroups, section]);
 
   return (
     <DynamicForm<NeighborInfoValidation>
@@ -42,34 +97,7 @@ export const NeighborInfo = ({ onFormInit }: NeighborInfoModuleConfigProps) => {
       validationSchema={NeighborInfoValidationSchema}
       defaultValues={moduleConfig.neighborInfo}
       values={getEffectiveModuleConfig("neighborInfo")}
-      fieldGroups={[
-        {
-          label: t("neighborInfo.title"),
-          description: t("neighborInfo.description"),
-          fields: [
-            {
-              type: "toggle",
-              name: "enabled",
-              label: t("neighborInfo.enabled.label"),
-              description: t("neighborInfo.enabled.description"),
-            },
-            {
-              type: "number",
-              name: "updateInterval",
-              label: t("neighborInfo.updateInterval.label"),
-              description: t("neighborInfo.updateInterval.description"),
-              properties: {
-                suffix: t("unit.second.plural"),
-              },
-              disabledBy: [
-                {
-                  fieldName: "enabled",
-                },
-              ],
-            },
-          ],
-        },
-      ]}
+      fieldGroups={fieldGroups}
     />
   );
 };

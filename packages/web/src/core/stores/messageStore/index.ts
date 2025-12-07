@@ -8,6 +8,10 @@ import type {
   MessageId,
   MessageLogMap,
   NodeNum,
+  OutgoingMessage,
+  PipelineContext,
+  PipelineHandler,
+  PipelineHandlers,
   SetMessageStateParams,
 } from "@core/stores/messageStore/types.ts";
 import { evictOldestEntries } from "@core/stores/utils/evictOldestEntries.ts";
@@ -61,6 +65,7 @@ export interface MessageStore extends MessageStoreData {
   // Ephemeral state (not persisted)
   activeChat: number;
   chatType: MessageType;
+  pipelineHandlers: PipelineHandlers;
 
   setNodeNum: (nodeNum: number) => void;
   saveMessage: (message: Message) => void;
@@ -80,6 +85,11 @@ export interface MessageStore extends MessageStoreData {
   getUnreadCount: (params: GetMessagesParams) => number;
   markAsRead: (params: MarkAsReadParams) => void;
   markConversationAsRead: (params: GetMessagesParams) => void;
+
+  // Outgoing message pipeline
+  registerPipelineHandler: (name: string, handler: PipelineHandler) => void;
+  unregisterPipelineHandler: (name: string) => void;
+  processOutgoingMessage: (message: OutgoingMessage) => Promise<void>;
 }
 
 export interface MessageStoreState {
@@ -87,6 +97,7 @@ export interface MessageStoreState {
   removeMessageStore: (id: number) => void;
   getMessageStore: (id: number) => MessageStore | undefined;
   getMessageStores: () => MessageStore[];
+  _hasHydrated: boolean;
 }
 interface PrivateMessageStoreState extends MessageStoreState {
   messageStores: Map<number, MessageStore>;
@@ -114,6 +125,7 @@ function messageStoreFactory(
   const myNodeNum = data?.myNodeNum;
   const activeChat = 0;
   const chatType = MessageType.Broadcast;
+  const pipelineHandlers: PipelineHandlers = new Map();
 
   return {
     id,
@@ -123,6 +135,7 @@ function messageStoreFactory(
     lastRead,
     activeChat,
     chatType,
+    pipelineHandlers,
 
     setNodeNum: (nodeNum) => {
       set(
@@ -365,7 +378,9 @@ function messageStoreFactory(
 
     getTotalUnreadCount: (): number => {
       const state = get().messageStores.get(id);
-      if (!state || !state.myNodeNum) return 0;
+      if (!state || !state.myNodeNum) {
+        return 0;
+      }
 
       let totalUnread = 0;
 
@@ -394,7 +409,9 @@ function messageStoreFactory(
 
     getUnreadCount: (params: GetMessagesParams): number => {
       const state = get().messageStores.get(id);
-      if (!state || !state.myNodeNum) return 0;
+      if (!state || !state.myNodeNum) {
+        return 0;
+      }
 
       let messageLog: MessageLogMap | undefined;
       let lastReadId: MessageId;
@@ -409,7 +426,9 @@ function messageStoreFactory(
         lastReadId = state.lastRead.broadcast.get(params.channelId) || 0;
       }
 
-      if (!messageLog) return 0;
+      if (!messageLog) {
+        return 0;
+      }
 
       const messages = Array.from(messageLog.values());
       const unreadMessages = messages.filter(
@@ -428,7 +447,10 @@ function messageStoreFactory(
           }
 
           if (params.type === MessageType.Direct) {
-            const conversationId = getConversationId(params.nodeA, params.nodeB);
+            const conversationId = getConversationId(
+              params.nodeA,
+              params.nodeB,
+            );
             state.lastRead.direct.set(conversationId, params.messageId);
           } else {
             // Broadcast
@@ -461,7 +483,9 @@ function messageStoreFactory(
             lastReadMap = state.lastRead.broadcast;
           }
 
-          if (!messageLog || messageLog.size === 0) return;
+          if (!messageLog || messageLog.size === 0) {
+            return;
+          }
 
           // Find the highest message ID in this conversation
           const messageIds = Array.from(messageLog.keys());
@@ -471,6 +495,64 @@ function messageStoreFactory(
         }),
       );
     },
+
+    // Pipeline methods
+    registerPipelineHandler: (name: string, handler: PipelineHandler) => {
+      set(
+        produce<PrivateMessageStoreState>((draft) => {
+          const state = draft.messageStores.get(id);
+          if (!state) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
+          state.pipelineHandlers.set(name, handler);
+          console.log(`[MessageStore] Registered pipeline handler: ${name}`);
+        }),
+      );
+    },
+
+    unregisterPipelineHandler: (name: string) => {
+      set(
+        produce<PrivateMessageStoreState>((draft) => {
+          const state = draft.messageStores.get(id);
+          if (!state) {
+            throw new Error(`No MessageStore found for id: ${id}`);
+          }
+
+          const deleted = state.pipelineHandlers.delete(name);
+          if (deleted) {
+            console.log(`[MessageStore] Unregistered pipeline handler: ${name}`);
+          }
+        }),
+      );
+    },
+
+    processOutgoingMessage: async (message: OutgoingMessage) => {
+      const state = get().messageStores.get(id);
+      if (!state) {
+        throw new Error(`No MessageStore found for id: ${id}`);
+      }
+
+      const context: PipelineContext = {
+        deviceId: id,
+        myNodeNum: state.myNodeNum,
+      };
+
+      console.log(
+        `[MessageStore] Processing outgoing message through ${state.pipelineHandlers.size} handlers`,
+      );
+
+      // Execute all pipeline handlers in registration order
+      for (const [name, handler] of state.pipelineHandlers) {
+        try {
+          await handler(message, context);
+          console.log(`[MessageStore] Pipeline handler ${name} executed successfully`);
+        } catch (error) {
+          console.error(`[MessageStore] Pipeline handler ${name} failed:`, error);
+          // Continue processing other handlers even if one fails
+        }
+      }
+    },
   };
 }
 
@@ -479,6 +561,7 @@ export const messageStoreInitializer: StateCreator<PrivateMessageStoreState> = (
   get,
 ) => ({
   messageStores: new Map(),
+  _hasHydrated: false,
 
   addMessageStore: (id) => {
     const existing = get().messageStores.get(id);
@@ -530,51 +613,75 @@ const persistOptions: PersistOptions<
       ]),
     ),
   }),
-  onRehydrateStorage: () => (state) => {
-    if (!state) {
-      return;
-    }
-    console.debug(
-      "MessageStoreStore: Rehydrating state with ",
-      state.messageStores.size,
-      " MessageStores -",
-      state.messageStores,
-    );
+  onRehydrateStorage: () => {
+    console.log("[MessageStore] onRehydrateStorage: Starting rehydration");
+    return async (state) => {
+      // Add a small delay in dev mode to make the spinner visible
+      const isDev = import.meta.env?.DEV;
+      if (isDev) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
 
-    useMessageStore.setState(
-      produce<PrivateMessageStoreState>((draft) => {
-        const rebuilt = new Map<number, MessageStore>();
-        for (const [id, data] of (
-          draft.messageStores as unknown as Map<number, MessageStoreData>
-        ).entries()) {
-          if (data.myNodeNum !== undefined) {
-            // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
-            rebuilt.set(
-              id,
-              messageStoreFactory(
+      if (!state) {
+        console.log("[MessageStore] onRehydrateStorage: No state, setting hydrated to true");
+        useMessageStore.setState({ _hasHydrated: true });
+        return;
+      }
+      console.debug(
+        "MessageStoreStore: Rehydrating state with ",
+        state.messageStores.size,
+        " MessageStores -",
+        state.messageStores,
+      );
+
+      useMessageStore.setState(
+        produce<PrivateMessageStoreState>((draft) => {
+          const rebuilt = new Map<number, MessageStore>();
+          for (const [id, data] of (
+            draft.messageStores as unknown as Map<number, MessageStoreData>
+          ).entries()) {
+            if (data.myNodeNum !== undefined) {
+              // Only rebuild if there is a nodenum set otherwise orphan dbs will acumulate
+              rebuilt.set(
                 id,
-                useMessageStore.getState,
-                useMessageStore.setState,
-                data,
-              ),
-            );
+                messageStoreFactory(
+                  id,
+                  useMessageStore.getState,
+                  useMessageStore.setState,
+                  data,
+                ),
+              );
+            }
           }
-        }
-        draft.messageStores = rebuilt;
-      }),
-    );
+          draft.messageStores = rebuilt;
+          draft._hasHydrated = true;
+        }),
+      );
+      console.log("[MessageStore] onRehydrateStorage: Complete, hydrated set to true");
+    };
   },
 };
 
 // Add persist middleware on the store if the feature flag is enabled
-const persistMessages = featureFlags.get("persistMessages");
+const isPersistEnabled = () => featureFlags.get("persistMessages");
+
 console.debug(
-  `MessageStore: Persisting messages is ${persistMessages ? "enabled" : "disabled"}`,
+  `MessageStore: Persisting messages is ${isPersistEnabled() ? "enabled" : "disabled"}`,
 );
 
-export const useMessageStore = persistMessages
+export const useMessageStore = isPersistEnabled()
   ? createStore<
       PrivateMessageStoreState,
       [["zustand/persist", MessageStorePersisted]]
     >(persist(messageStoreInitializer, persistOptions))
   : createStore<PrivateMessageStoreState>()(messageStoreInitializer);
+
+// Hook to check if the message store has finished hydrating from IndexedDB
+export const useMessageStoreHydrated = (): boolean => {
+  // If persistence is disabled, we're always "hydrated"
+  if (!isPersistEnabled()) {
+    return true;
+  }
+
+  return useMessageStore((state) => state._hasHydrated);
+};

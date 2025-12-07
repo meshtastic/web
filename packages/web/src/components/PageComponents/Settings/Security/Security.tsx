@@ -11,11 +11,14 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import {
+  createFieldMetadata,
+  useFieldRegistry,
+} from "@core/services/fieldRegistry";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { fromByteArray, toByteArray } from "base64-js";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { type DefaultValues, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -25,10 +28,16 @@ interface SecurityConfigProps {
 export const Security = ({ onFormInit }: SecurityConfigProps) => {
   useWaitForConfig({ configCase: "security" });
 
-  const { config, setChange, setDialogOpen, getEffectiveConfig, removeChange } =
-    useDevice();
+  const { config, setDialogOpen, getEffectiveConfig } = useDevice();
+  const {
+    registerFields,
+    trackChange,
+    removeChange: removeFieldChange,
+  } = useFieldRegistry();
 
   const { t } = useTranslation("config");
+
+  const section = { type: "config", variant: "security" } as const;
 
   const defaultConfig = config.security;
   const defaultValues = {
@@ -95,16 +104,24 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
       ],
     };
 
-    if (deepCompareConfig(config.security, payload, true)) {
-      removeChange({ type: "config", variant: "security" });
+    // Track individual field changes
+    const originalData = config.security;
+    if (!originalData) {
       return;
     }
 
-    setChange(
-      { type: "config", variant: "security" },
-      payload,
-      config.security,
-    );
+    // Track each field change
+    Object.keys(payload).forEach((key) => {
+      const fieldName = key as keyof ParsedSecurity;
+      const newValue = payload[fieldName];
+      const oldValue = originalData[fieldName];
+
+      if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+        trackChange(section, fieldName as string, newValue, oldValue);
+      } else {
+        removeFieldChange(section, fieldName as string);
+      }
+    });
   };
 
   const pkiRegenerate = () => {
@@ -138,149 +155,154 @@ export const Security = ({ onFormInit }: SecurityConfigProps) => {
     },
   ];
 
+  const fieldGroups = useMemo(
+    () => [
+      {
+        label: t("security.title"),
+        description: t("security.description"),
+        fields: [
+          {
+            type: "passwordGenerator",
+            id: "pskInput",
+            name: "privateKey",
+            label: t("security.privateKey.label"),
+            description: t("security.privateKey.description"),
+            bits,
+            devicePSKBitCount: 32,
+            hide: true,
+            inputChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              updatePublicKey(e.target.value);
+            },
+            actionButtons: [
+              {
+                text: t("button.generate"),
+                onClick: () => setPrivateKeyDialogOpen(true),
+                variant: "success",
+              },
+              {
+                text: t("button.backupKey"),
+                onClick: () => setDialogOpen("pkiBackup", true),
+                variant: "subtle",
+              },
+            ],
+            properties: {
+              showCopyButton: true,
+              showPasswordToggle: true,
+            },
+          },
+          {
+            type: "text",
+            name: "publicKey",
+            label: t("security.publicKey.label"),
+            disabled: true,
+            description: t("security.publicKey.description"),
+            properties: {
+              showCopyButton: true,
+            },
+          },
+        ],
+      },
+      {
+        label: t("security.adminSettings.label"),
+        description: t("security.adminSettings.description"),
+        fields: [
+          {
+            type: "passwordGenerator",
+            name: "adminKey.0",
+            id: "adminKey0Input",
+            label: t("security.primaryAdminKey.label"),
+            description: t("security.primaryAdminKey.description"),
+            bits,
+            devicePSKBitCount: 32,
+            actionButtons: [],
+            disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
+            properties: {
+              showCopyButton: true,
+            },
+          },
+          {
+            type: "passwordGenerator",
+            name: "adminKey.1",
+            id: "adminKey1Input",
+            label: t("security.secondaryAdminKey.label"),
+            description: t("security.secondaryAdminKey.description"),
+            bits,
+            devicePSKBitCount: 32,
+            actionButtons: [],
+            disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
+            properties: {
+              showCopyButton: true,
+            },
+          },
+          {
+            type: "passwordGenerator",
+            name: "adminKey.2",
+            id: "adminKey2Input",
+            label: t("security.tertiaryAdminKey.label"),
+            description: t("security.tertiaryAdminKey.description"),
+            bits,
+            devicePSKBitCount: 32,
+            actionButtons: [],
+            disabledBy: [{ fieldName: "adminChannelEnabled", invert: true }],
+            properties: {
+              showCopyButton: true,
+            },
+          },
+          {
+            type: "toggle",
+            name: "isManaged",
+            label: t("security.managed.label"),
+            description: t("security.managed.description"),
+            inputChange: (checked) => {
+              if (checked) {
+                setManagedModeDialogOpen(true);
+              }
+
+              setValue("isManaged", false);
+            },
+          },
+          {
+            type: "toggle",
+            name: "adminChannelEnabled",
+            label: t("security.adminChannelEnabled.label"),
+            description: t("security.adminChannelEnabled.description"),
+          },
+        ],
+      },
+      {
+        label: t("security.loggingSettings.label"),
+        description: t("security.loggingSettings.description"),
+        fields: [
+          {
+            type: "toggle",
+            name: "debugLogApiEnabled",
+            label: t("security.enableDebugLogApi.label"),
+            description: t("security.enableDebugLogApi.description"),
+          },
+          {
+            type: "toggle",
+            name: "serialEnabled",
+            label: t("security.serialOutputEnabled.label"),
+            description: t("security.serialOutputEnabled.description"),
+          },
+        ],
+      },
+    ],
+    [t, bits, setDialogOpen, setValue, updatePublicKey],
+  );
+
+  // Register fields on mount
+  useEffect(() => {
+    const metadata = createFieldMetadata(section, fieldGroups);
+    registerFields(section, metadata);
+  }, [registerFields, fieldGroups, section]);
+
   return (
     <>
       <DynamicForm<RawSecurity>
         propMethods={formMethods}
         onSubmit={onSubmit}
-        fieldGroups={[
-          {
-            label: t("security.title"),
-            description: t("security.description"),
-            fields: [
-              {
-                type: "passwordGenerator",
-                id: "pskInput",
-                name: "privateKey",
-                label: t("security.privateKey.label"),
-                description: t("security.privateKey.description"),
-                bits,
-                devicePSKBitCount: 32,
-                hide: true,
-                inputChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                  updatePublicKey(e.target.value);
-                },
-                actionButtons: [
-                  {
-                    text: t("button.generate"),
-                    onClick: () => setPrivateKeyDialogOpen(true),
-                    variant: "success",
-                  },
-                  {
-                    text: t("button.backupKey"),
-                    onClick: () => setDialogOpen("pkiBackup", true),
-                    variant: "subtle",
-                  },
-                ],
-                properties: {
-                  showCopyButton: true,
-                  showPasswordToggle: true,
-                },
-              },
-              {
-                type: "text",
-                name: "publicKey",
-                label: t("security.publicKey.label"),
-                disabled: true,
-                description: t("security.publicKey.description"),
-                properties: {
-                  showCopyButton: true,
-                },
-              },
-            ],
-          },
-          {
-            label: t("security.adminSettings.label"),
-            description: t("security.adminSettings.description"),
-            fields: [
-              {
-                type: "passwordGenerator",
-                name: "adminKey.0",
-                id: "adminKey0Input",
-                label: t("security.primaryAdminKey.label"),
-                description: t("security.primaryAdminKey.description"),
-                bits,
-                devicePSKBitCount: 32,
-                actionButtons: [],
-                disabledBy: [
-                  { fieldName: "adminChannelEnabled", invert: true },
-                ],
-                properties: {
-                  showCopyButton: true,
-                },
-              },
-              {
-                type: "passwordGenerator",
-                name: "adminKey.1",
-                id: "adminKey1Input",
-                label: t("security.secondaryAdminKey.label"),
-                description: t("security.secondaryAdminKey.description"),
-                bits,
-                devicePSKBitCount: 32,
-                actionButtons: [],
-                disabledBy: [
-                  { fieldName: "adminChannelEnabled", invert: true },
-                ],
-                properties: {
-                  showCopyButton: true,
-                },
-              },
-              {
-                type: "passwordGenerator",
-                name: "adminKey.2",
-                id: "adminKey2Input",
-                label: t("security.tertiaryAdminKey.label"),
-                description: t("security.tertiaryAdminKey.description"),
-                bits,
-                devicePSKBitCount: 32,
-                actionButtons: [],
-                disabledBy: [
-                  { fieldName: "adminChannelEnabled", invert: true },
-                ],
-                properties: {
-                  showCopyButton: true,
-                },
-              },
-              {
-                type: "toggle",
-                name: "isManaged",
-                label: t("security.managed.label"),
-                description: t("security.managed.description"),
-                inputChange: (checked) => {
-                  if (checked) {
-                    setManagedModeDialogOpen(true);
-                  }
-
-                  setValue("isManaged", false);
-                },
-              },
-              {
-                type: "toggle",
-                name: "adminChannelEnabled",
-                label: t("security.adminChannelEnabled.label"),
-                description: t("security.adminChannelEnabled.description"),
-              },
-            ],
-          },
-          {
-            label: t("security.loggingSettings.label"),
-            description: t("security.loggingSettings.description"),
-            fields: [
-              {
-                type: "toggle",
-                name: "debugLogApiEnabled",
-                label: t("security.enableDebugLogApi.label"),
-                description: t("security.enableDebugLogApi.description"),
-              },
-              {
-                type: "toggle",
-                name: "serialEnabled",
-                label: t("security.serialOutputEnabled.label"),
-                description: t("security.serialOutputEnabled.description"),
-              },
-            ],
-          },
-        ]}
+        fieldGroups={fieldGroups}
       />
       <PkiRegenerateDialog
         text={{

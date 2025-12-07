@@ -1,8 +1,8 @@
 import { Button } from "@components/ui/button";
-import { Download, Upload } from "lucide-react";
 import { useToast } from "@core/hooks/useToast";
-import { useRef } from "react";
 import * as yaml from "js-yaml";
+import { Download, Upload } from "lucide-react";
+import { useRef } from "react";
 
 export const ImportExport = () => {
   const { toast } = useToast();
@@ -92,7 +92,9 @@ export const ImportExport = () => {
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) importConfig(file);
+          if (file) {
+            importConfig(file);
+          }
         }}
       />
     </div>

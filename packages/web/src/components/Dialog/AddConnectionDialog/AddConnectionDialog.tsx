@@ -117,11 +117,11 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
         : undefined;
 
   return (
-    <div className="flex flex-col items-start gap-2 bg-red-500 p-4 rounded-md text-sm mt-4">
+    <div className="flex flex-col items-start gap-2 bg-destructive p-4 rounded-md text-sm mt-4">
       <div className="flex items-center gap-2 w-full">
-        <AlertCircle size={40} className="mr-2 shrink-0 text-white" />
+        <AlertCircle size={40} className="mr-2 shrink-0 text-destructive-foreground" />
         <div className="flex flex-col gap-3">
-          <div className="text-sm text-white">
+          <div className="text-sm text-destructive-foreground">
             {needsFeature && (
               <Trans
                 i18nKey={featureErrors[needsFeature].i18nKey}
@@ -129,7 +129,7 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
                   <Link
                     key="0"
                     href={featureErrors[needsFeature].href}
-                    className="underline hover:text-slate-200 text-white dark:text-white dark:hover:text-slate-300"
+                    className="underline hover:opacity-80 text-destructive-foreground"
                   />,
                 ]}
               />
@@ -146,7 +146,7 @@ const FeatureErrorMessage = ({ missingFeatures, tabId }: FeatureErrorProps) => {
                   "0": (
                     <Link
                       href={featureErrors["Secure Context"].href}
-                      className="underline hover:text-slate-200 text-white dark:text-white dark:hover:text-slate-300"
+                      className="underline hover:opacity-80 text-destructive-foreground"
                     />
                   ),
                 }}
@@ -225,7 +225,7 @@ function PickerRow({
       <Label>{label}</Label>
       <div className="flex items-center gap-2">
         <Button
-          variant="subtle"
+          variant="outline"
           className="gap-2"
           onClick={onPick}
           disabled={disabled}
@@ -233,12 +233,12 @@ function PickerRow({
           <MousePointerClick className="h-4 w-4" />
           {buttonText}
         </Button>
-        <div className="text-sm text-slate-500 dark:text-slate-400 truncate">
+        <div className="text-sm text-muted-foreground truncate">
           {display}
         </div>
       </div>
       {helper ? (
-        <p className="text-xs text-slate-500 dark:text-slate-400">{helper}</p>
+        <p className="text-xs text-muted-foreground">{helper}</p>
       ) : null}
     </div>
   );
@@ -445,7 +445,7 @@ export default function AddConnectionDialog({
             </div>
             <div className="flex items-center gap-2 mt-4">
               <Button
-                variant="subtle"
+                variant="outline"
                 className="gap-2"
                 onClick={handleTestHttp}
                 disabled={
@@ -476,7 +476,7 @@ export default function AddConnectionDialog({
                 </div>
               )}
               {state.testStatus === "failure" && (
-                <div className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
+                <div className="flex items-center gap-1 text-sm text-destructive">
                   <XCircle className="h-4 w-4" />
                   {t(
                     "addConnection.httpConnection.connectionTest.notReachable",
@@ -484,7 +484,7 @@ export default function AddConnectionDialog({
                 </div>
               )}
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-muted-foreground">
               {t("addConnection.httpConnection.connectionTest.description")}
             </p>
           </div>
@@ -655,16 +655,19 @@ export default function AddConnectionDialog({
                   />
                 </div>
                 {PANES[key].children()}
-                <div className="flex justify-end">
-                  <div className="inline-flex rounded-md shadow-sm overflow-hidden border">
-                    <Button
-                      onClick={submit(onSave)}
-                      disabled={!canCreate}
-                      className="rounded-none"
-                    >
-                      {t("button.saveConnection")}
-                    </Button>
-                  </div>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => onOpenChange(false)}
+                  >
+                    {t("button.cancel")}
+                  </Button>
+                  <Button
+                    onClick={submit(onSave)}
+                    disabled={!canCreate}
+                  >
+                    {t("button.saveConnection")}
+                  </Button>
                 </div>
               </div>
             ) : null}

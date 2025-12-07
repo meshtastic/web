@@ -17,8 +17,8 @@ import { Input } from "@components/ui/input";
 import { Label } from "@components/ui/label";
 import { Separator } from "@components/ui/separator";
 import { Switch } from "@components/ui/switch";
+import { useFieldRegistry } from "@core/services/fieldRegistry";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { getX25519PrivateKey, getX25519PublicKey } from "@core/utils/x25519.ts";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
@@ -29,8 +29,11 @@ import { useTranslation } from "react-i18next";
 export const SecurityConfig = () => {
   useWaitForConfig({ configCase: "security" });
 
-  const { config, setChange, getEffectiveConfig, removeChange } = useDevice();
+  const { config, getEffectiveConfig } = useDevice();
+  const { trackChange, removeChange: removeFieldChange } = useFieldRegistry();
   const { t } = useTranslation("config");
+
+  const section = { type: "config", variant: "security" } as const;
 
   const defaultConfig = config.security;
   const defaultValues = {
@@ -47,9 +50,7 @@ export const SecurityConfig = () => {
   const effectiveConfig = getEffectiveConfig("security");
   const formValues = {
     ...effectiveConfig,
-    privateKey: fromByteArray(
-      effectiveConfig?.privateKey ?? new Uint8Array(0),
-    ),
+    privateKey: fromByteArray(effectiveConfig?.privateKey ?? new Uint8Array(0)),
     publicKey: fromByteArray(effectiveConfig?.publicKey ?? new Uint8Array(0)),
     adminKey: [
       fromByteArray(effectiveConfig?.adminKey?.at(0) ?? new Uint8Array(0)),
@@ -81,21 +82,34 @@ export const SecurityConfig = () => {
       ],
     };
 
-    if (deepCompareConfig(config.security, payload, true)) {
-      removeChange({ type: "config", variant: "security" });
+    // Track individual field changes
+    const originalData = config.security;
+    if (!originalData) {
       return;
     }
 
-    setChange(
-      { type: "config", variant: "security" },
-      payload,
-      config.security,
-    );
+    Object.keys(payload).forEach((key) => {
+      const fieldName = key as keyof ParsedSecurity;
+      const newValue = payload[fieldName];
+      const oldValue = originalData[fieldName];
+
+      if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+        trackChange(section, fieldName as string, newValue, oldValue);
+      } else {
+        removeFieldChange(section, fieldName as string);
+      }
+    });
   };
 
   const handleReset = () => {
     reset();
-    removeChange({ type: "config", variant: "security" });
+    // Clear all security field changes
+    const originalData = config.security;
+    if (originalData) {
+      Object.keys(originalData).forEach((fieldName) => {
+        removeFieldChange(section, fieldName);
+      });
+    }
   };
 
   const generatePrivateKey = () => {

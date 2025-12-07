@@ -75,6 +75,26 @@ type MarkAsReadParams =
       messageId: MessageId;
     };
 
+// Pipeline types for processing outgoing messages
+export interface OutgoingMessage {
+  text: string;
+  to: number | "broadcast";
+  channelId?: ChannelId;
+  wantAck?: boolean;
+}
+
+export interface PipelineContext {
+  deviceId: number;
+  myNodeNum?: number;
+}
+
+export type PipelineHandler = (
+  message: OutgoingMessage,
+  context: PipelineContext,
+) => void | Promise<void>;
+
+export type PipelineHandlers = Map<string, PipelineHandler>;
+
 export type {
   ChannelId,
   ClearMessageParams,

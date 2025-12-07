@@ -18,7 +18,9 @@ export function useWaitForConfig({
     ? config[configCase] !== undefined
     : moduleConfig[moduleConfigCase as ValidModuleConfigType] !== undefined;
 
-  if (!isDataDefined) {
+  // For module configs, don't suspend if data is undefined - let the form handle empty state
+  // This allows the form to render even when the module isn't configured on the device
+  if (!isDataDefined && !moduleConfigCase) {
     throw new Promise<void>(() => {});
   }
 }

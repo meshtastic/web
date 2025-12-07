@@ -9,8 +9,11 @@ import {
   DynamicForm,
   type DynamicFormFormInit,
 } from "@components/Form/DynamicForm.tsx";
+import {
+  createFieldMetadata,
+  useFieldRegistry,
+} from "@core/services/fieldRegistry";
 import { useDevice } from "@core/stores";
-import { deepCompareConfig } from "@core/utils/deepCompareConfig.ts";
 import { Protobuf } from "@meshtastic/core";
 import { fromByteArray, toByteArray } from "base64-js";
 import cryptoRandomString from "crypto-random-string";
@@ -24,8 +27,17 @@ export interface SettingsPanelProps {
 }
 
 export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
-  const { config, setChange, getChange, removeChange } = useDevice();
+  const { config } = useDevice();
+  const {
+    registerFields,
+    trackChange,
+    removeChange: removeFieldChange,
+    getChange,
+  } = useFieldRegistry();
   const { t } = useTranslation(["channels", "ui", "dialog"]);
+
+  const section = { type: "channel", variant: channel.index.toString() } as const;
+  const fieldName = `channel_${channel.index}`;
 
   const defaultConfig = channel;
   const defaultValues = {
@@ -46,10 +58,9 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
     },
   };
 
-  const workingChannel = getChange({
-    type: "channels",
-    index: channel.index,
-  }) as Protobuf.Channel.Channel | undefined;
+  const workingChannel = getChange(section, fieldName)?.newValue as
+    | Protobuf.Channel.Channel
+    | undefined;
   const effectiveConfig = workingChannel ?? channel;
   const formValues = {
     ...effectiveConfig,
@@ -105,6 +116,25 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
     }
   }, [effectiveByteCount, trigger]);
 
+  // Register fields on mount
+  useEffect(() => {
+    const metadata = createFieldMetadata(section, [
+      {
+        label: t("settings.label"),
+        description: t("settings.description"),
+        fields: [
+          {
+            type: "text",
+            name: fieldName,
+            label: channel.settings?.name || `Channel ${channel.index}`,
+            description: `Channel ${channel.index}`,
+          },
+        ],
+      },
+    ]);
+    registerFields(section, metadata);
+  }, [registerFields, section, fieldName, channel, t]);
+
   const onSubmit = (data: ChannelValidation) => {
     if (!formState.isReady) {
       return;
@@ -122,12 +152,12 @@ export const Channel = ({ onFormInit, channel }: SettingsPanelProps) => {
       },
     });
 
-    if (deepCompareConfig(channel, payload, true)) {
-      removeChange({ type: "channel", index: channel.index });
+    if (JSON.stringify(payload) === JSON.stringify(channel)) {
+      removeFieldChange(section, fieldName);
       return;
     }
 
-    setChange({ type: "channel", index: channel.index }, payload, channel);
+    trackChange(section, fieldName, payload, channel);
   };
 
   const preSharedKeyRegenerate = async () => {
