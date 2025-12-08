@@ -117,7 +117,7 @@ export const LoRa = ({ onFormInit }: LoRaConfigProps) => {
                 },
               ],
               properties: {
-                suffix: t("unit.megahertz"),
+                suffix: t("unit.kilohertz"),
               },
             },
             {

@@ -122,7 +122,7 @@
 		"title": "Paramètres maillage",
 		"description": "Paramètres du réseau maillé LoRa",
 		"bandwidth": {
-			"description": "Largeur de bande du canal en MHz",
+			"description": "Largeur de bande du canal en kHz",
 			"label": "Bande Passante"
 		},
 		"boostedRxGain": {

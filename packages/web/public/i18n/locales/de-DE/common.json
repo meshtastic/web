@@ -52,6 +52,7 @@
       "unknown": "Sprungweite unbekannt"
     },
     "megahertz": "MHz",
+    "kilohertz": "kHz",
     "raw": "Einheitslos",
     "meter": {
       "one": "Meter",

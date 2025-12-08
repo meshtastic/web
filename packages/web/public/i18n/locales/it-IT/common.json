@@ -52,6 +52,7 @@
       "unknown": "Hop sconosciuti"
     },
     "megahertz": "MHz",
+    "kilohertz": "kHz",
     "raw": "grezzo",
     "meter": {
       "one": "Metro",
