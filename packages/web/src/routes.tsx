@@ -1,11 +1,13 @@
 import MessagesPage from "@app/pages/Messages/index.tsx";
-import type { useAppStore, useMessageStore } from "@core/stores";
+import PreferencesPage from "@app/pages/Preferences.tsx";
+import SettingsPage from "@app/pages/Settings.tsx";
+import StatisticsPage from "@app/pages/Statistics/index.tsx";
+import { ErrorPage } from "@components/ui/error-page.tsx";
+import type { useDeviceStore } from "@core/stores";
 import { ModuleConfig } from "@meshtastic/protobufs";
 import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
 import NodesPage from "@pages/Nodes/index.tsx";
-import SettingsPage from "@app/pages/Settings.tsx";
-import PreferencesPage from "@app/pages/Preferences.tsx";
 import {
   createRootRouteWithContext,
   createRoute,
@@ -19,16 +21,33 @@ import { App } from "./App.tsx";
 import { DeviceConfig } from "./pages/Settings/DeviceConfig.tsx";
 import { RadioConfig } from "./pages/Settings/RadioConfig.tsx";
 
+type DeviceStore = ReturnType<typeof useDeviceStore>;
+
 interface AppContext {
   stores: {
-    app: ReturnType<typeof useAppStore>;
-    message: ReturnType<typeof useMessageStore>;
+    device: DeviceStore;
   };
-  i18n: ReturnType<typeof useTranslation>;
+}
+
+// Helper function to check if there's an active connection
+function requireActiveConnection(context: AppContext) {
+  const devices = context.stores.device.getDevices();
+
+  // Check if any device has an active connection
+  const hasActiveConnection = devices.some(
+    (device) =>
+      device.connectionPhase === "connected" ||
+      device.connectionPhase === "configured",
+  );
+
+  if (!hasActiveConnection) {
+    throw redirect({ to: "/connections", replace: true });
+  }
 }
 
 export const rootRoute = createRootRouteWithContext<AppContext>()({
   component: () => <App />,
+  errorComponent: ErrorPage,
 });
 
 const indexRoute = createRoute({
@@ -36,8 +55,8 @@ const indexRoute = createRoute({
   path: "/",
   component: Connections,
   loader: () => {
-    // Redirect to the broadcast messages page on initial load
-    return redirect({ to: "/messages/broadcast/0", replace: true });
+    // Redirect to longfast channel on first load
+    return redirect({ to: "/messages", search: { channel: 0 }, replace: true });
   },
 });
 
@@ -45,36 +64,25 @@ const messagesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/messages",
   component: MessagesPage,
-  beforeLoad: ({ params }) => {
-    const DEFAULT_CHANNEL = 0;
-
-    if (Object.values(params).length === 0) {
-      throw redirect({
-        to: `/messages/broadcast/${DEFAULT_CHANNEL}`,
-        replace: true,
-      });
-    }
-  },
-});
-
-export const messagesWithParamsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/messages/$type/$chatId",
-  component: MessagesPage,
-  parseParams: (params) => ({
-    type: z
-      .enum(["direct", "broadcast"])
-      .refine((val) => val === "direct" || val === "broadcast", {
-        message: 'Type must be "direct" or "broadcast".',
-      })
-      .parse(params.type),
-    chatId: z.coerce.number().int().min(0).max(4294967294).parse(params.chatId), // max is 0xffffffff - 1
+  errorComponent: ErrorPage,
+  validateSearch: z.object({
+    // For broadcast messages: ?channel=0 (channel index 0-7)
+    channel: z.coerce.number().int().min(0).max(7).optional(),
+    // For direct messages: ?node=123456789 (node number)
+    node: z.coerce.number().int().min(0).max(4294967294).optional(), // max is 0xffffffff - 1
   }),
+  beforeLoad: ({ context }) => {
+    requireActiveConnection(context);
+  },
 });
 
 const mapRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/map",
+  errorComponent: ErrorPage,
+  beforeLoad: ({ context }) => {
+    requireActiveConnection(context);
+  },
   component: () => (
     <Activity>
       <MapPage />
@@ -107,6 +115,10 @@ const coordParamsSchema = z.object({
 export const mapWithParamsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/map/$long/$lat/$zoom",
+  errorComponent: ErrorPage,
+  beforeLoad: ({ context }) => {
+    requireActiveConnection(context);
+  },
   component: () => (
     <Activity>
       <MapPage />
@@ -125,29 +137,40 @@ export const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/settings",
   component: SettingsPage,
+  errorComponent: ErrorPage,
+  beforeLoad: ({ context }) => {
+    requireActiveConnection(context);
+  },
 });
 
 export const radioRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: "radio",
   component: RadioConfig,
+  errorComponent: ErrorPage,
 });
 
 export const deviceRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: "device",
   component: DeviceConfig,
+  errorComponent: ErrorPage,
 });
 
 export const moduleRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: "module",
   component: ModuleConfig,
+  errorComponent: ErrorPage,
 });
 
 const nodesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/nodes",
+  errorComponent: ErrorPage,
+  beforeLoad: ({ context }) => {
+    requireActiveConnection(context);
+  },
   component: () => (
     <Activity>
       <NodesPage />
@@ -159,32 +182,50 @@ const connectionsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/connections",
   component: Connections,
+  errorComponent: ErrorPage,
 });
 
 const preferencesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/preferences",
   component: PreferencesPage,
+  errorComponent: ErrorPage,
+  beforeLoad: ({ context }) => {
+    requireActiveConnection(context);
+  },
+});
+
+const statisticsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/statistics",
+  errorComponent: ErrorPage,
+  beforeLoad: ({ context }) => {
+    requireActiveConnection(context);
+  },
+  component: () => (
+    <Activity>
+      <StatisticsPage />
+    </Activity>
+  ),
 });
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
   messagesRoute,
-  messagesWithParamsRoute,
   mapRoute,
   mapWithParamsRoute,
   settingsRoute.addChildren([radioRoute, deviceRoute, moduleRoute]),
   nodesRoute,
   connectionsRoute,
   preferencesRoute,
+  statisticsRoute,
 ]);
 
 const router = createRouter({
   routeTree,
   context: {
     stores: {
-      app: {} as ReturnType<typeof useAppStore>,
-      message: {} as ReturnType<typeof useMessageStore>,
+      device: {} as DeviceStore,
     },
     i18n: {} as ReturnType<typeof import("react-i18next").useTranslation>,
   },

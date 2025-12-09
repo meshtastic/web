@@ -5,7 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/ui/tooltip";
-import type { Message } from "@core/stores/messageStore/types";
+import type { Message } from "@db/schema";
 import { cn } from "@core/utils/cn";
 import { getAvatarColors } from "@core/utils/color";
 import { MessageStatusIndicator } from "./MessageStatusIndicator.tsx";
@@ -29,7 +29,7 @@ export const MessageBubble = ({
   showTimestamp = true,
   deviceId,
 }: MessageBubbleProps) => {
-  const avatarColors = getAvatarColors(message.from);
+  const avatarColors = getAvatarColors(message.fromNode);
 
   return (
     <div
@@ -40,7 +40,7 @@ export const MessageBubble = ({
     >
       {/* Avatar */}
       {showAvatar && !isMine && (
-        <NodeAvatar nodeNum={message.from} longName={senderName} size="sm" />
+        <NodeAvatar nodeNum={message.fromNode} longName={senderName} size="sm" />
       )}
 
       {/* Message Bubble */}

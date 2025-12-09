@@ -11,7 +11,8 @@ import {
   createFieldMetadata,
   useFieldRegistry,
 } from "@core/services/fieldRegistry";
-import { useDevice, useNodeDB } from "@core/stores";
+import { useNodes } from "@db/hooks";
+import { useDevice, useDeviceContext } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,7 +23,8 @@ interface UserConfigProps {
 
 export const User = ({ onFormInit }: UserConfigProps) => {
   const { hardware, connection } = useDevice();
-  const { getNode } = useNodeDB();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
   const {
     registerFields,
     trackChange,
@@ -32,12 +34,12 @@ export const User = ({ onFormInit }: UserConfigProps) => {
 
   const section = { type: "config", variant: "user" } as const;
 
-  const myNode = getNode(hardware.myNodeNum);
-  const defaultUser = myNode?.user ?? {
-    id: "",
-    longName: "",
-    shortName: "",
-    isLicensed: false,
+  const myNode = allNodes.find((n) => n.nodeNum === hardware.myNodeNum);
+  const defaultUser = {
+    id: myNode?.userId ?? "",
+    longName: myNode?.longName ?? "",
+    shortName: myNode?.shortName ?? "",
+    isLicensed: myNode?.isLicensed ?? false,
   };
 
   const fieldGroups = [

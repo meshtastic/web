@@ -1,4 +1,4 @@
-import { useDeviceStore, useMessageStore, useNodeDBStore } from "@core/stores";
+import { useDeviceStore } from "@core/stores";
 import type { Protobuf } from "@meshtastic/core";
 
 export function useNewNodeNum(
@@ -6,9 +6,5 @@ export function useNewNodeNum(
   nodeInfo: Protobuf.Mesh.MyNodeInfo,
 ): void {
   useDeviceStore.getState().getDevice(id)?.setHardware(nodeInfo);
-  useNodeDBStore.getState().getNodeDB(id)?.setNodeNum(nodeInfo.myNodeNum);
-  useMessageStore
-    .getState()
-    .getMessageStore(id)
-    ?.setNodeNum(nodeInfo.myNodeNum);
+  // Node number is now tracked via hardware.myNodeNum, no separate nodeDB tracking needed
 }

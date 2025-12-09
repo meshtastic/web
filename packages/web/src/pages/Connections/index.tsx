@@ -2,8 +2,8 @@ import AddConnectionDialog from "@app/components/Dialog/AddConnectionDialog/AddC
 import { TimeAgo } from "@app/components/generic/TimeAgo";
 import LanguageSwitcher from "@app/components/LanguageSwitcher";
 import { ConnectionStatusBadge } from "@app/components/PageComponents/Connections/ConnectionStatusBadge";
-import type { Connection } from "@app/core/stores/deviceStore/types";
-import { useConnections } from "@app/pages/Connections/useConnections";
+import { useConnections } from "@db/hooks";
+import type { Connection } from "@db/index";
 import {
   connectionTypeIcon,
   formatConnectionSubtext,
@@ -378,7 +378,7 @@ function ConnectionCard({
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {t("lastConnectedAt", { date: "" })}{" "}
             <TimeAgo
-              timestamp={connection.lastConnectedAt}
+              timestamp={connection.lastConnectedAt.getTime()}
               className="text-sm text-slate-500 dark:text-slate-400"
             />
           </p>

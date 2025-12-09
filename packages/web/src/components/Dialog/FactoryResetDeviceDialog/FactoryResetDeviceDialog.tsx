@@ -1,10 +1,6 @@
 import { toast } from "@core/hooks/useToast.ts";
-import {
-  useDevice,
-  useDeviceStore,
-  useMessageStore,
-  useNodeDBStore,
-} from "@core/stores";
+import { useDevice, useDeviceStore } from "@core/stores";
+import { MigrationService } from "@db";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 
@@ -20,7 +16,7 @@ export const FactoryResetDeviceDialog = ({
   const { t } = useTranslation("dialog");
   const { connection, id } = useDevice();
 
-  const handleFactoryResetDevice = () => {
+  const handleFactoryResetDevice = async () => {
     connection?.factoryResetDevice().catch((error) => {
       toast({
         title: t("factoryResetDevice.failedTitle"),
@@ -31,8 +27,7 @@ export const FactoryResetDeviceDialog = ({
     // The device will be wiped and disconnected without resolving the promise
     // so we proceed to clear all data associated with the device immediately
     useDeviceStore.getState().removeDevice(id);
-    useMessageStore.getState().removeMessageStore(id);
-    useNodeDBStore.getState().removeNodeDB(id);
+    await MigrationService.deleteDeviceData(id);
 
     // Reload the app to ensure all ephemeral state is cleared
     window.location.href = "/";

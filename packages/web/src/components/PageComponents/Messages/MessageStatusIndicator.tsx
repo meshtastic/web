@@ -4,8 +4,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/ui/tooltip";
-import { MessageState } from "@core/stores/messageStore";
-import type { Message } from "@core/stores/messageStore/types";
+import type { Message } from "@db/schema";
 import { cn } from "@core/utils/cn";
 import { Check, Clock, Cloud, Loader2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -33,16 +32,16 @@ export const MessageStatusIndicator = ({
 
   const getStatusIcon = () => {
     switch (message.state) {
-      case MessageState.Waiting:
+      case "waiting":
         return <Clock className="size-4 text-muted-foreground" />;
 
-      case MessageState.Sending:
+      case "sending":
         return <Loader2 className="size-4 text-blue-500 animate-spin" />;
 
-      case MessageState.Sent:
+      case "sent":
         return <Check className="size-4 text-muted-foreground" />;
 
-      case MessageState.Ack:
+      case "ack":
         if (message.realACK) {
           return (
             <div className="relative">
@@ -58,7 +57,7 @@ export const MessageStatusIndicator = ({
           </div>
         );
 
-      case MessageState.Failed:
+      case "failed":
         return <X className="size-3 text-red-500" />;
 
       default:
@@ -68,17 +67,17 @@ export const MessageStatusIndicator = ({
 
   const getStatusText = () => {
     switch (message.state) {
-      case MessageState.Waiting:
+      case "waiting":
         return t("deliveryStatus.waiting.text");
-      case MessageState.Sending:
+      case "sending":
         return t("deliveryStatus.sending.text");
-      case MessageState.Sent:
+      case "sent":
         return t("deliveryStatus.sent.text");
-      case MessageState.Ack:
+      case "ack":
         return message.realACK
           ? t("deliveryStatus.ack.delivered")
           : t("deliveryStatus.ack.acknowledged");
-      case MessageState.Failed:
+      case "failed":
         return message.ackError && message.ackError !== 0
           ? t("deliveryStatus.failed.text", {
               error: `Error ${message.ackError}`,
@@ -89,17 +88,7 @@ export const MessageStatusIndicator = ({
     }
   };
 
-  const shouldShow = () => {
-    // Don't show status for received messages (only for sent messages)
-    const isMine =
-      message.from === message.to || message.state !== MessageState.Ack;
-    return message.state !== MessageState.Waiting || isMine;
-  };
-
-  if (!shouldShow()) {
-    return null;
-  }
-
+  // Always show - the parent component (MessageBubble) already filters by isMine
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
@@ -108,7 +97,7 @@ export const MessageStatusIndicator = ({
             {getStatusIcon()}
 
             {/* Show retry count for failed messages ONLY */}
-            {message.state === MessageState.Failed &&
+            {message.state === "failed" &&
               message.retryCount !== undefined &&
               message.retryCount > 0 &&
               message.maxRetries !== undefined && (
@@ -118,7 +107,7 @@ export const MessageStatusIndicator = ({
               )}
 
             {/* Show SNR for acknowledged messages - only if SNR is meaningful */}
-            {message.state === MessageState.Ack &&
+            {message.state === "ack" &&
               message.ackSNR &&
               message.ackSNR > 0 && (
                 <span className="text-muted-foreground">

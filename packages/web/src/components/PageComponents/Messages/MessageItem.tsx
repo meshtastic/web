@@ -6,33 +6,43 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/ui/tooltip.tsx";
-import { MessageState, useAppStore, useDevice, useNodeDB } from "@core/stores";
-import type { Message } from "@core/stores/messageStore/types.ts";
+import { useNodes } from "@db/hooks";
+import { MessageState, useAppStore, useDevice, useDeviceContext } from "@core/stores";
+import type { Message, Node } from "@db/schema";
 import { cn } from "@core/utils/cn.ts";
-import { type Protobuf, Types } from "@meshtastic/core";
+import { Types } from "@meshtastic/core";
 import type { LucideIcon } from "lucide-react";
 import { AlertCircle, CheckCircle2, CircleEllipsis } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 // Cache for pending promises
-const myNodePromises = new Map<string, Promise<Protobuf.Mesh.NodeInfo>>();
+const myNodePromises = new Map<string, Promise<Node>>();
 
 // Hook that suspends when myNode is not available
 function useSuspendingMyNode() {
-  const { getMyNode } = useNodeDB();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
+  const { getDevices } = useAppStore();
   const selectedDeviceId = useAppStore((s) => s.selectedDeviceId);
-  const myNode = getMyNode();
+
+  const device = getDevices().find((d) => d.id === selectedDeviceId);
+  const myNodeNum = device?.hardware?.myNodeNum;
+
+  const myNode = useMemo(() => {
+    if (!myNodeNum) return undefined;
+    return allNodes.find((n) => n.nodeNum === myNodeNum);
+  }, [allNodes, myNodeNum]);
 
   if (!myNode) {
     // Use the selected device ID to cache promises per device
     const deviceKey = `device-${selectedDeviceId}`;
 
     if (!myNodePromises.has(deviceKey)) {
-      const promise = new Promise<Protobuf.Mesh.NodeInfo>((resolve) => {
+      const promise = new Promise<Node>((resolve) => {
         // Poll for myNode to become available
         const checkInterval = setInterval(() => {
-          const node = getMyNode();
+          const node = allNodes.find((n) => n.nodeNum === myNodeNum);
           if (node) {
             console.log(
               "[MessageItem] myNode now available, resolving promise",
@@ -92,12 +102,18 @@ interface MessageItemProps {
 
 export const MessageItem = ({ message }: MessageItemProps) => {
   const { config } = useDevice();
-  const { getNode } = useNodeDB();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
   const { t, i18n } = useTranslation("messages");
+
+  // Create getNode function from database nodes
+  const getNode = (nodeNum: number) => {
+    return allNodes.find((n) => n.nodeNum === nodeNum);
+  };
 
   // This will suspend if myNode is not available yet
   const myNode = useSuspendingMyNode();
-  const myNodeNum = myNode.num;
+  const myNodeNum = myNode.nodeNum;
 
   const MESSAGE_STATUS_MAP = useMemo(
     (): Record<MessageState, MessageStatusInfo> => ({
@@ -140,26 +156,26 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     [MESSAGE_STATUS_MAP, UNKNOWN_STATUS],
   );
 
-  const messageUser: Protobuf.Mesh.NodeInfo | null | undefined = useMemo(() => {
-    return message.from != null ? getNode(message.from) : null;
-  }, [getNode, message.from]);
+  const messageUser: Node | null | undefined = useMemo(() => {
+    return message.fromNode != null ? getNode(message.fromNode) : null;
+  }, [getNode, message.fromNode]);
 
   const { displayName, isFavorite, nodeNum } = useMemo(() => {
-    const userIdHex = message.from.toString(16).toUpperCase().padStart(2, "0");
+    const userIdHex = message.fromNode.toString(16).toUpperCase().padStart(2, "0");
     const last4 = userIdHex.slice(-4);
     const fallbackName = t("fallbackName", { last4 });
-    const longName = messageUser?.user?.longName;
-    const derivedShortName = messageUser?.user?.shortName || fallbackName;
+    const longName = messageUser?.longName;
+    const derivedShortName = messageUser?.shortName || fallbackName;
     const derivedDisplayName = longName || derivedShortName;
     const isFavorite =
-      messageUser?.num !== myNodeNum && messageUser?.isFavorite;
+      messageUser?.nodeNum !== myNodeNum && messageUser?.isFavorite;
     return {
       displayName: derivedDisplayName,
       shortName: derivedShortName,
       isFavorite: isFavorite,
-      nodeNum: message.from,
+      nodeNum: message.fromNode,
     };
-  }, [messageUser, message.from, t, myNodeNum]);
+  }, [messageUser, message.fromNode, t, myNodeNum]);
 
   const messageStatusInfo = getMessageStatusInfo(message.state);
   const StatusIconComponent = messageStatusInfo.icon;
@@ -189,8 +205,8 @@ export const MessageItem = ({ message }: MessageItemProps) => {
     [messageDate, locale],
   );
 
-  const isSender = myNodeNum !== undefined && message.from === myNodeNum;
-  const isOnPrimaryChannel = message.channel === Types.ChannelNumber.Primary; // Use the enum
+  const isSender = myNodeNum !== undefined && message.fromNode === myNodeNum;
+  const isOnPrimaryChannel = message.channelId === Types.ChannelNumber.Primary; // Use the enum
   const shouldShowStatusIcon = isSender && isOnPrimaryChannel;
 
   const messageItemWrapperClass = cn(

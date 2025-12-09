@@ -1,9 +1,5 @@
 import { SupportBadge } from "@app/components/Badge/SupportedBadge.tsx";
 import { Link } from "@app/components/ui/link.tsx";
-import type {
-  ConnectionType,
-  NewConnection,
-} from "@app/core/stores/deviceStore/types.ts";
 import { testHttpReachable } from "@app/pages/Connections/utils";
 import { Button } from "@components/ui/button.tsx";
 import { Input } from "@components/ui/input.tsx";
@@ -15,12 +11,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "@components/ui/tabs.tsx";
-
 import {
   type BrowserFeature,
   useBrowserFeatureDetection,
 } from "@core/hooks/useBrowserFeatureDetection.ts";
 import { useToast } from "@core/hooks/useToast.ts";
+import type { ConnectionType } from "@db/repositories/ConnectionRepository";
 import { TransportWebBluetooth } from "@meshtastic/transport-web-bluetooth";
 import {
   AlertCircle,
@@ -37,6 +33,22 @@ import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 import { urlOrIpv4Schema } from "./validation.ts";
+
+export type NewConnectionInput =
+  | { type: "http"; name: string; url: string }
+  | {
+      type: "bluetooth";
+      name: string;
+      deviceId?: string;
+      deviceName?: string;
+      gattServiceUUID?: string;
+    }
+  | {
+      type: "serial";
+      name: string;
+      usbVendorId?: number;
+      usbProductId?: number;
+    };
 
 type TabKey = ConnectionType;
 type TestingStatus = "idle" | "testing" | "success" | "failure";
@@ -80,7 +92,7 @@ type Pane = {
   children: () => React.ReactNode;
   placeholder: string;
   validate: () => boolean;
-  build: () => NewConnection | null;
+  build: () => NewConnectionInput | null;
 };
 
 const featureErrors: Record<BrowserFeature, { href: string; i18nKey: string }> =
@@ -258,7 +270,7 @@ export default function AddConnectionDialog({
 }: {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSave?: (conn: NewConnection, device?: BluetoothDevice) => Promise<void>;
+  onSave?: (conn: NewConnectionInput, device?: BluetoothDevice) => Promise<void>;
   isHTTPS?: boolean;
 }) {
   const { toast } = useToast();
@@ -599,7 +611,7 @@ export default function AddConnectionDialog({
   const canCreate = useMemo(() => currentPane.validate(), [currentPane]);
 
   const submit =
-    (fn: (p: NewConnection, device?: BluetoothDevice) => Promise<void>) =>
+    (fn: (p: NewConnectionInput, device?: BluetoothDevice) => Promise<void>) =>
     async () => {
       if (!canCreate) {
         return;

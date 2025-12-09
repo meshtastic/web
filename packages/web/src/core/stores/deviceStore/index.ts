@@ -16,12 +16,13 @@ import {
   subscribeWithSelector,
 } from "zustand/middleware";
 import type {
-  Connection,
-  ConnectionId,
   Dialogs,
   DialogVariant,
   WaypointWithMetadata,
 } from "./types.ts";
+
+// ConnectionId is now just a number (database ID)
+type ConnectionId = number;
 
 // Helper function to serialize change keys for Map storage
 function serializeKey(key: ConfigChangeKey): string {
@@ -62,14 +63,14 @@ export type ConnectionPhase =
   | "disconnected"
   | "connecting"
   | "configuring"
-  | "configured";
+  | "connected"    // Config-only stage complete, node-info still loading
+  | "configured";  // Full two-stage configuration complete
 
 export interface Device extends DeviceData {
   // Ephemeral state (not persisted)
   status: Types.DeviceStatusEnum;
   connectionPhase: ConnectionPhase;
   connectionId: ConnectionId | null;
-  channels: Map<Types.ChannelNumber, Protobuf.Channel.Channel>;
   config: Protobuf.LocalOnly.LocalConfig;
   moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
   changes: Map<string, ChangeEntry>; // Unified change tracking
@@ -159,25 +160,10 @@ export interface deviceState {
   getDevices: () => Device[];
   getDevice: (id: number) => Device | undefined;
 
-  // Saved connections management
-  savedConnections: Connection[];
-  addSavedConnection: (connection: Connection) => void;
-  updateSavedConnection: (
-    id: ConnectionId,
-    updates: Partial<Connection>,
-  ) => void;
-  removeSavedConnection: (id: ConnectionId) => void;
-  getSavedConnections: () => Connection[];
-
-  // Active connection tracking
+  // Active connection tracking (connections now stored in SQLite)
   activeConnectionId: ConnectionId | null;
   setActiveConnectionId: (id: ConnectionId | null) => void;
   getActiveConnectionId: () => ConnectionId | null;
-
-  // Helper selectors for connection ↔ device relationships
-  getActiveConnection: () => Connection | undefined;
-  getDeviceForConnection: (id: ConnectionId) => Device | undefined;
-  getConnectionForDevice: (deviceId: number) => Connection | undefined;
 }
 
 interface PrivateDeviceState extends deviceState {
@@ -186,7 +172,6 @@ interface PrivateDeviceState extends deviceState {
 
 type DevicePersisted = {
   devices: Map<number, DeviceData>;
-  savedConnections: Connection[];
 };
 
 function deviceFactory(
@@ -212,7 +197,6 @@ function deviceFactory(
     status: Types.DeviceStatusEnum.DeviceDisconnected,
     connectionPhase: "disconnected",
     connectionId: null,
-    channels: new Map(),
     config: create(Protobuf.LocalOnly.LocalConfigSchema),
     moduleConfig: create(Protobuf.LocalOnly.LocalModuleConfigSchema),
     changes: new Map(),
@@ -456,15 +440,23 @@ function deviceFactory(
         }),
       );
     },
-    addChannel: (channel: Protobuf.Channel.Channel) => {
-      set(
-        produce<PrivateDeviceState>((draft) => {
-          const device = draft.devices.get(id);
-          if (device) {
-            device.channels.set(channel.index, channel);
-          }
-        }),
-      );
+    addChannel: async (channel: Protobuf.Channel.Channel) => {
+      // Channels are now stored in the database
+      const { channelRepo } = await import("@db");
+      const { fromByteArray } = await import("base64-js");
+
+      await channelRepo.upsertChannel({
+        deviceId: id,
+        channelIndex: channel.index,
+        role: channel.role,
+        name: channel.settings?.name,
+        psk: channel.settings?.psk
+          ? fromByteArray(channel.settings.psk)
+          : undefined,
+        uplinkEnabled: channel.settings?.uplinkEnabled,
+        downlinkEnabled: channel.settings?.downlinkEnabled,
+        positionPrecision: channel.settings?.moduleSettings?.positionPrecision,
+      });
     },
     addWaypoint: (waypoint, channel, from, rxTime) => {
       set(
@@ -963,7 +955,6 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
   get,
 ) => ({
   devices: new Map(),
-  savedConnections: [],
   activeConnectionId: null,
 
   addDevice: (id) => {
@@ -996,41 +987,6 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
   getDevices: () => Array.from(get().devices.values()),
   getDevice: (id) => get().devices.get(id),
 
-  addSavedConnection: (connection) => {
-    set(
-      produce<PrivateDeviceState>((draft) => {
-        draft.savedConnections.push(connection);
-      }),
-    );
-  },
-  updateSavedConnection: (id, updates) => {
-    set(
-      produce<PrivateDeviceState>((draft) => {
-        const conn = draft.savedConnections.find(
-          (c: Connection) => c.id === id,
-        );
-        if (conn) {
-          for (const key in updates) {
-            if (Object.hasOwn(updates, key)) {
-              (conn as Record<string, unknown>)[key] =
-                updates[key as keyof typeof updates];
-            }
-          }
-        }
-      }),
-    );
-  },
-  removeSavedConnection: (id) => {
-    set(
-      produce<PrivateDeviceState>((draft) => {
-        draft.savedConnections = draft.savedConnections.filter(
-          (c: Connection) => c.id !== id,
-        );
-      }),
-    );
-  },
-  getSavedConnections: () => get().savedConnections,
-
   setActiveConnectionId: (id) => {
     set(
       produce<PrivateDeviceState>((draft) => {
@@ -1039,24 +995,6 @@ export const deviceStoreInitializer: StateCreator<PrivateDeviceState> = (
     );
   },
   getActiveConnectionId: () => get().activeConnectionId,
-
-  getActiveConnection: () => {
-    const activeId = get().activeConnectionId;
-    if (!activeId) {
-      return undefined;
-    }
-    return get().savedConnections.find((c) => c.id === activeId);
-  },
-  getDeviceForConnection: (id) => {
-    const connection = get().savedConnections.find((c) => c.id === id);
-    if (!connection?.meshDeviceId) {
-      return undefined;
-    }
-    return get().devices.get(connection.meshDeviceId);
-  },
-  getConnectionForDevice: (deviceId) => {
-    return get().savedConnections.find((c) => c.meshDeviceId === deviceId);
-  },
 });
 
 const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
@@ -1076,7 +1014,6 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
         },
       ]),
     ),
-    savedConnections: s.savedConnections,
   }),
   onRehydrateStorage: () => (state) => {
     if (!state) {

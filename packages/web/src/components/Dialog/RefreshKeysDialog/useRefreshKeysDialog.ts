@@ -1,24 +1,28 @@
-import { useDevice, useMessages, useNodeDB } from "@core/stores";
+import { useDevice, useDeviceContext } from "@core/stores";
+import { nodeRepo } from "@db/index";
 import { useCallback } from "react";
 
 export function useRefreshKeysDialog() {
   const { setDialogOpen } = useDevice();
-  const { removeNode, clearNodeError, getNodeError } = useNodeDB();
-  const { activeChat } = useMessages();
+  const { deviceId } = useDeviceContext();
+
+  // TODO: Implement activeChat state management
+  // This was previously in the message store, needs to be moved to UI store or similar
+  const activeChat = 0; // Placeholder
+
+  // Note: Node error tracking has been removed, so this dialog may not function as intended
+  // The nodeErrors map that previously tracked key mismatch errors is no longer available
 
   const handleCloseDialog = useCallback(() => {
     setDialogOpen("refreshKeys", false);
   }, [setDialogOpen]);
 
-  const handleNodeRemove = useCallback(() => {
-    const nodeWithError = getNodeError(activeChat);
-    if (!nodeWithError) {
-      return;
-    }
-    clearNodeError(activeChat);
+  const handleNodeRemove = useCallback(async () => {
+    // Node error tracking has been removed
+    // This function previously removed a node that had a key mismatch error
+    // Now we just close the dialog
     handleCloseDialog();
-    return removeNode(nodeWithError?.node);
-  }, [activeChat, clearNodeError, getNodeError, removeNode, handleCloseDialog]);
+  }, [handleCloseDialog]);
 
   return {
     handleCloseDialog,

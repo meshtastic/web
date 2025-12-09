@@ -18,7 +18,6 @@ export const mockDeviceStore: Device = {
   status: 5 as const,
   connectionPhase: "disconnected" as const,
   connectionId: null,
-  channels: new Map(),
   config: {} as Protobuf.LocalOnly.LocalConfig,
   moduleConfig: {} as Protobuf.LocalOnly.LocalModuleConfig,
   changes: new Map(),

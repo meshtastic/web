@@ -13,7 +13,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@components/ui/sidebar.tsx";
-import { useMessages, useNodeDB } from "@core/stores";
+import { useDevice, useDeviceContext } from "@core/stores";
+import { useNodes } from "@db/hooks";
 import { useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -64,54 +65,40 @@ const configNavItems = [
 
 export function AppSidebar() {
   const pathname = useLocation().pathname;
-  const nodeDB = useNodeDB();
-  const messages = useMessages();
+  const { deviceId } = useDeviceContext();
+  const device = useDevice();
+  const { nodes: allNodes } = useNodes(deviceId);
 
-  // Get myNode directly - getMyNode now returns immediately without promises
+  // Get myNode from database
   const myNode = useMemo(() => {
-    if (!nodeDB || typeof nodeDB.getNodes !== "function") {
+    const myNodeNum = device.hardware?.myNodeNum;
+    if (!myNodeNum) {
       return undefined;
     }
+    return allNodes.find((n) => n.nodeNum === myNodeNum);
+  }, [allNodes, device.hardware?.myNodeNum]);
 
-    const nodes = nodeDB.getNodes(undefined, true);
-    const myNodeNum = nodeDB.myNodeNum;
-
-    if (myNodeNum === undefined) {
-      return undefined;
-    }
-
-    return nodes.find((n) => n.num === myNodeNum);
-  }, [nodeDB]);
-
+  // TODO: Implement total unread count from database
   // Calculate total unread messages
-  const totalUnread = useMemo(() => {
-    if (!messages || typeof messages.getTotalUnreadCount !== "function") {
-      return 0;
-    }
-    return messages.getTotalUnreadCount();
-  }, [messages]);
+  const totalUnread = 0;
 
-  const mainNavItems = useMemo(
-    () => getMainNavItems(totalUnread),
-    [totalUnread],
-  );
+  const mainNavItems = useMemo(() => getMainNavItems(totalUnread), []);
 
   const nodeStats = useMemo(() => {
-    if (!nodeDB || typeof nodeDB.getNodes !== "function") {
-      return { total: 0, online: 0 };
-    }
+    const onlineThreshold = Date.now() / 1000 - 900; // heard in the last 15 minutes
 
-    const nodes = nodeDB.getNodes(undefined, true); // include self
-    const onlineThreshold = Date.now() / 1000 - 60; // 1 minutes
+    const onlineCount = allNodes.filter((node) => {
+      const lastHeardSec = node.lastHeard
+        ? Math.floor(node.lastHeard.getTime() / 1000)
+        : 0;
+      return lastHeardSec > onlineThreshold;
+    }).length;
 
-    const onlineCount = nodes.filter(
-      (node) => (node.lastHeard || 0) > onlineThreshold,
-    ).length;
     return {
-      total: nodes.length,
+      total: allNodes.length,
       online: onlineCount,
     };
-  }, [nodeDB]);
+  }, [allNodes]);
 
   return (
     <Sidebar>
@@ -210,16 +197,16 @@ export function AppSidebar() {
           {myNode && (
             <>
               <NodeAvatar
-                nodeNum={myNode.num}
-                longName={myNode.user?.longName}
+                nodeNum={myNode.nodeNum}
+                longName={myNode.longName ?? undefined}
                 size="sm"
               />
               <div className="flex flex-col flex-1 min-w-0">
                 <span className="text-sm font-medium truncate">
-                  {myNode.user?.longName || myNode.user?.shortName || "My Node"}
+                  {myNode.longName || myNode.shortName || "My Node"}
                 </span>
                 <span className="text-xs text-muted-foreground font-mono">
-                  !{myNode.num.toString(16)}
+                  !{myNode.nodeNum.toString(16)}
                 </span>
               </div>
               <div className="ml-auto h-2 w-2 rounded-full bg-chart-2" />

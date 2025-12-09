@@ -44,7 +44,6 @@ export default defineConfig({
         "tailwindcss",
         "class-variance-authority",
         "tailwind-merge",
-        "@radix-ui/react-slot",
       ],
     },
     sourcemap: true,

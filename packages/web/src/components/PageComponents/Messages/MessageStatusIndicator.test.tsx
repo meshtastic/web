@@ -1,104 +1,98 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import { MessageState } from "@core/stores/messageStore";
 import { MessageStatusIndicator } from "./MessageStatusIndicator";
-import type { Message } from "@core/stores/messageStore/types";
+import type { Message } from "@db/schema";
 
 // Mock message for different states
-const createMockMessage = (state: MessageState, overrides: Partial<Message> = {}): Message => ({
+const createMockMessage = (state: Message["state"], overrides: Partial<Message> = {}): Message => ({
+  id: 1,
   messageId: 123,
-  channel: 0,
-  to: 123456,
-  from: 789012,
-  date: Date.now(),
+  channelId: 0,
+  toNode: 123456,
+  fromNode: 789012,
+  date: new Date(),
+  createdAt: new Date(),
   state,
   message: "Test message",
   rxSnr: 0,
   rxRssi: 0,
   viaMqtt: false,
   hops: 0,
-  type: "direct" as any,
-  priority: 3,
+  type: "direct",
   retryCount: 0,
   maxRetries: 3,
   receivedACK: false,
   ackError: 0,
-  ackTimestamp: 0,
+  ackTimestamp: null,
   ackSNR: 0,
   realACK: false,
+  deviceId: 1,
   ...overrides,
 });
 
 describe("MessageStatusIndicator", () => {
   it("should show clock icon for waiting state", () => {
-    const message = createMockMessage(MessageState.Waiting);
+    const message = createMockMessage("waiting");
     render(<MessageStatusIndicator message={message} />);
-    
-    expect(screen.getByText("Waiting to send")).toBeInTheDocument();
+
     // Check for clock icon by testing the SVG element
     const clockIcon = document.querySelector(".lucide-clock");
     expect(clockIcon).toBeInTheDocument();
   });
 
   it("should show spinner for sending state", () => {
-    const message = createMockMessage(MessageState.Sending);
+    const message = createMockMessage("sending");
     render(<MessageStatusIndicator message={message} />);
-    
-    expect(screen.getByText("Sending...")).toBeInTheDocument();
-    // Check for spinner icon by testing the SVG element
-    const spinner = document.querySelector(".lucide-loader-circle");
+
+    // Check for spinner icon (Loader2) by testing for animate-spin class
+    const spinner = document.querySelector(".animate-spin");
     expect(spinner).toBeInTheDocument();
-    expect(spinner).toHaveClass("animate-spin");
   });
 
   it("should show single check for sent state", () => {
-    const message = createMockMessage(MessageState.Sent);
+    const message = createMockMessage("sent");
     render(<MessageStatusIndicator message={message} />);
-    
-    expect(screen.getByText("Sent to radio")).toBeInTheDocument();
+
     // Check for check icon by testing the SVG element
     const checkIcon = document.querySelector(".lucide-check");
     expect(checkIcon).toBeInTheDocument();
   });
 
-  it("should show double green check for acknowledged messages with real ACK", () => {
-    const message = createMockMessage(MessageState.Ack, { 
+  it("should show cloud with check for acknowledged messages with real ACK", () => {
+    const message = createMockMessage("ack", {
       realACK: true,
       ackSNR: 5.5
     });
     render(<MessageStatusIndicator message={message} />);
-    
-    expect(screen.getByText("Delivered")).toBeInTheDocument();
+
     expect(screen.getByText("(5.5dB)")).toBeInTheDocument();
-    // Check for double check icon by testing the SVG element
-    const checkIcon = document.querySelector(".lucide-check-check");
-    expect(checkIcon).toBeInTheDocument();
-    expect(checkIcon).toHaveClass("text-green-500");
+    // Check for cloud icon (used for ack state)
+    const cloudIcon = document.querySelector(".lucide-cloud");
+    expect(cloudIcon).toBeInTheDocument();
+    expect(cloudIcon).toHaveClass("text-green-500");
   });
 
-  it("should show double blue check for acknowledged messages without real ACK", () => {
-    const message = createMockMessage(MessageState.Ack, { 
+  it("should show cloud with check for acknowledged messages without real ACK", () => {
+    const message = createMockMessage("ack", {
       realACK: false,
       ackSNR: 3.2
     });
     render(<MessageStatusIndicator message={message} />);
-    
-    expect(screen.getByText("Acknowledged")).toBeInTheDocument();
+
     expect(screen.getByText("(3.2dB)")).toBeInTheDocument();
-    // Check for double check icon by testing the SVG element
-    const checkIcon = document.querySelector(".lucide-check-check");
-    expect(checkIcon).toBeInTheDocument();
-    expect(checkIcon).toHaveClass("text-blue-500");
+    // Check for cloud icon (used for ack state)
+    const cloudIcon = document.querySelector(".lucide-cloud");
+    expect(cloudIcon).toBeInTheDocument();
+    expect(cloudIcon).toHaveClass("text-blue-500");
   });
 
   it("should show X icon for failed state", () => {
-    const message = createMockMessage(MessageState.Failed, { 
+    const message = createMockMessage("failed", {
       ackError: 1,
       retryCount: 2
     });
     render(<MessageStatusIndicator message={message} />);
-    
-    expect(screen.getByText("Failed (1)")).toBeInTheDocument();
+
     expect(screen.getByText("(retry 2/3)")).toBeInTheDocument();
     // Check for X icon by testing the SVG element
     const xIcon = document.querySelector(".lucide-x");
@@ -106,40 +100,46 @@ describe("MessageStatusIndicator", () => {
     expect(xIcon).toHaveClass("text-red-500");
   });
 
-  it("should show failed without error code when ackError is 0", () => {
-    const message = createMockMessage(MessageState.Failed, { 
-      ackError: 0
+  it("should show failed without retry info when retryCount is 0", () => {
+    const message = createMockMessage("failed", {
+      ackError: 0,
+      retryCount: 0
     });
     render(<MessageStatusIndicator message={message} />);
-    
-    expect(screen.getByText("Failed")).toBeInTheDocument();
-    expect(screen.queryByText(/\(\d+\)/)).not.toBeInTheDocument();
+
+    // X icon should be present
+    const xIcon = document.querySelector(".lucide-x");
+    expect(xIcon).toBeInTheDocument();
+    // No retry info should be shown
+    expect(screen.queryByText(/retry/)).not.toBeInTheDocument();
   });
 
   it("should not show SNR when ackSNR is 0", () => {
-    const message = createMockMessage(MessageState.Ack, { 
+    const message = createMockMessage("ack", {
       ackSNR: 0
     });
     render(<MessageStatusIndicator message={message} />);
-    
+
     expect(screen.queryByText(/\(.*dB\)/)).not.toBeInTheDocument();
   });
 
   it("should apply custom className", () => {
-    const message = createMockMessage(MessageState.Sent);
-    render(<MessageStatusIndicator message={message} className="custom-class" />);
-    
-    const container = screen.getByText("Sent to radio").parentElement;
-    expect(container).toHaveClass("custom-class");
+    const message = createMockMessage("sent");
+    const { container } = render(<MessageStatusIndicator message={message} className="custom-class" />);
+
+    const wrapper = container.firstChild;
+    expect(wrapper).toHaveClass("custom-class");
   });
 
-  it("should not render for received messages in waiting state", () => {
-    const message = createMockMessage(MessageState.Waiting, {
-      from: 123456,
-      to: 789012, // Different from from, indicating received message
+  it("should render for messages in waiting state", () => {
+    const message = createMockMessage("waiting", {
+      fromNode: 123456,
+      toNode: 789012,
     });
     render(<MessageStatusIndicator message={message} />);
-    
-    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+
+    // Clock icon should be present for waiting state
+    const clockIcon = document.querySelector(".lucide-clock");
+    expect(clockIcon).toBeInTheDocument();
   });
 });

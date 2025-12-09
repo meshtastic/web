@@ -20,6 +20,7 @@
       "@components/*": ["./src/components/*"],
       "@core/*": ["./src/core/*"],
       "@layouts/*": ["./src/layouts/*"],
+      "@db/*": ["./src/db/*"],
       "@meshtastic/ui/*": ["@components/ui/*"]
     }
   },

@@ -8,7 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/ui/dialog.tsx";
-import { useDevice, useNodeDB } from "@core/stores";
+import { useNodes } from "@db/hooks";
+import { useDevice, useDeviceContext } from "@core/stores";
 import { fromByteArray } from "base64-js";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import React from "react";
@@ -24,10 +25,17 @@ export const PkiBackupDialog = ({
   onOpenChange,
 }: PkiBackupDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { config, setDialogOpen } = useDevice();
-  const { getMyNode } = useNodeDB();
+  const { config, setDialogOpen, hardware } = useDevice();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
   const privateKey = config.security?.privateKey;
   const publicKey = config.security?.publicKey;
+
+  const myNode = React.useMemo(() => {
+    const myNodeNum = hardware.myNodeNum;
+    if (!myNodeNum) return undefined;
+    return allNodes.find((n) => n.nodeNum === myNodeNum);
+  }, [allNodes, hardware.myNodeNum]);
 
   const decodeKeyData = React.useCallback(
     (key: Uint8Array<ArrayBufferLike>) => {
@@ -55,8 +63,8 @@ export const PkiBackupDialog = ({
           <head>
             <title>${t("pkiBackup.header", {
               interpolation: { escapeValue: false },
-              shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
-              longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+              shortName: myNode?.shortName ?? t("unknown.shortName"),
+              longName: myNode?.longName ?? t("unknown.longName"),
             })}</title>
             <style>
               body { font-family: Arial, sans-serif; padding: 20px; }
@@ -67,8 +75,8 @@ export const PkiBackupDialog = ({
           <body>
             <h1>${t("pkiBackup.header", {
               interpolation: { escapeValue: false },
-              shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
-              longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+              shortName: myNode?.shortName ?? t("unknown.shortName"),
+              longName: myNode?.longName ?? t("unknown.longName"),
             })}</h1>
             <h3>${t("pkiBackup.secureBackup")}</h3>
             <h3>${t("pkiBackup.publicKey")}</h3>
@@ -83,7 +91,7 @@ export const PkiBackupDialog = ({
       printWindow.print();
       closeDialog();
     }
-  }, [decodeKeyData, privateKey, publicKey, closeDialog, t, getMyNode]);
+  }, [decodeKeyData, privateKey, publicKey, closeDialog, t, myNode]);
 
   const createDownloadKeyFile = React.useCallback(() => {
     if (!privateKey || !publicKey) {
@@ -96,8 +104,8 @@ export const PkiBackupDialog = ({
     const formattedContent = [
       `${t("pkiBackup.header", {
         interpolation: { escapeValue: false },
-        shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
-        longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+        shortName: myNode?.shortName ?? t("unknown.shortName"),
+        longName: myNode?.longName ?? t("unknown.longName"),
       })}\n\n`,
       `${t("pkiBackup.privateKey")}\n`,
       decodedPrivateKey,
@@ -113,8 +121,8 @@ export const PkiBackupDialog = ({
     link.href = url;
     link.download = t("pkiBackup.fileName", {
       interpolation: { escapeValue: false },
-      shortName: getMyNode()?.user?.shortName ?? t("unknown.shortName"),
-      longName: getMyNode()?.user?.longName ?? t("unknown.longName"),
+      shortName: myNode?.shortName ?? t("unknown.shortName"),
+      longName: myNode?.longName ?? t("unknown.longName"),
     });
 
     link.style.display = "none";
@@ -123,7 +131,7 @@ export const PkiBackupDialog = ({
     document.body.removeChild(link);
     closeDialog();
     URL.revokeObjectURL(url);
-  }, [decodeKeyData, privateKey, publicKey, closeDialog, t, getMyNode]);
+  }, [decodeKeyData, privateKey, publicKey, closeDialog, t, myNode]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

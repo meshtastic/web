@@ -39,12 +39,16 @@ import {
   type NodeColumnKey,
   useAppStore,
   useDevice,
-  useNodeDB,
+  useDeviceContext,
   usePreferencesStore,
 } from "@core/stores";
+import { useNodes } from "@db/hooks";
+import { create } from "@bufbuild/protobuf";
 import { cn } from "@core/utils/cn.ts";
+import { sortNodes } from "@core/utils/nodeSort.ts";
 import { Protobuf, type Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { toByteArray } from "base64-js";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -63,8 +67,6 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { base16 } from "rfc4648";
-
-const NODEDB_DEBOUNCE_MS = 250;
 
 type SortColumn =
   | "longName"
@@ -100,10 +102,18 @@ const SortIcon = ({
   );
 };
 
+// Helper to convert hex string to Uint8Array
+function hexToUint8Array(hex: string): Uint8Array {
+  const matches = hex.match(/.{1,2}/g);
+  return matches ? new Uint8Array(matches.map(byte => parseInt(byte, 16))) : new Uint8Array();
+}
+
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
   const { current } = useLang();
   const { hardware, connection, setDialogOpen } = useDevice();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
 
   const { setNodeNumDetails } = useAppStore();
   const {
@@ -251,9 +261,9 @@ const NodesPage = (): JSX.Element => {
       temp: {
         label: t("nodesTable.headings.temp"),
         sortable: false,
-        render: (node) => {
-          const temp = node.environmentMetrics?.temperature;
-          const text = temp !== undefined ? `${temp.toFixed(1)}°C` : "—";
+        render: (_node) => {
+          // Environment metrics not stored in nodes table, available via telemetryLogs
+          const text = "—";
           return <Mono className="text-xs">{text}</Mono>;
         },
       },
@@ -302,21 +312,60 @@ const NodesPage = (): JSX.Element => {
     [t, current?.code],
   );
 
-  // stable predicate so the selector identity doesn't thrash
-  const predicate = useCallback(
-    (node: Protobuf.Mesh.NodeInfo) => nodeFilter(node, deferredFilterState),
-    [nodeFilter, deferredFilterState],
-  );
+  // Convert database nodes to protobuf format
+  const convertedNodes = useMemo(() => {
+    return allNodes.map((node): Protobuf.Mesh.NodeInfo => {
+      return {
+        $typeName: "meshtastic.NodeInfo",
+        num: node.nodeNum,
+        snr: node.snr ?? 0,
+        lastHeard: node.lastHeard ? Math.floor(node.lastHeard.getTime() / 1000) : 0,
+        channel: 0,
+        viaMqtt: false,
+        isFavorite: node.isFavorite ?? false,
+        isIgnored: node.isIgnored ?? false,
+        hopsAway: 0,
+        isKeyManuallyVerified: false,
+        user: {
+          $typeName: "meshtastic.User",
+          id: node.userId ?? "",
+          longName: node.longName ?? "",
+          shortName: node.shortName ?? "",
+          macaddr: node.macaddr ? hexToUint8Array(node.macaddr) : new Uint8Array(),
+          hwModel: node.hwModel ?? 0,
+          role: node.role ?? 0,
+          publicKey: node.publicKey ? toByteArray(node.publicKey) : new Uint8Array(),
+          isLicensed: node.isLicensed ?? false,
+        },
+        position: node.latitudeI ? create(Protobuf.Mesh.PositionSchema, {
+          latitudeI: node.latitudeI,
+          longitudeI: node.longitudeI ?? 0,
+          altitude: node.altitude ?? 0,
+          time: node.positionTime ? Math.floor(node.positionTime.getTime() / 1000) : 0,
+          precisionBits: node.positionPrecisionBits ?? 32,
+          groundSpeed: node.groundSpeed ?? 0,
+          groundTrack: node.groundTrack ?? 0,
+          satsInView: node.satsInView ?? 0,
+        }) : undefined,
+        deviceMetrics: {
+          $typeName: "meshtastic.DeviceMetrics",
+          batteryLevel: node.batteryLevel ?? 0,
+          voltage: node.voltage ?? 0,
+          channelUtilization: node.channelUtilization ?? 0,
+          airUtilTx: node.airUtilTx ?? 0,
+          uptimeSeconds: node.uptimeSeconds ?? 0,
+        },
+      };
+    });
+  }, [allNodes]);
 
-  // subscribe to actual data (nodes array) and to nodeErrors ref for badge updates
-  const { nodes: filteredNodes, hasNodeError } = useNodeDB(
-    (db) => ({
-      nodes: db.getNodes(predicate, true),
-      hasNodeError: db.hasNodeError,
-      _errorsRef: db.nodeErrors, // include the Map ref so UI also re-renders on error changes
-    }),
-    { debounce: NODEDB_DEBOUNCE_MS },
-  );
+  // Apply filter to converted nodes
+  const filteredNodes = useMemo(() => {
+    return convertedNodes.filter((node) => nodeFilter(node, deferredFilterState));
+  }, [convertedNodes, nodeFilter, deferredFilterState]);
+
+  // Stub for hasNodeError - no longer tracking node errors
+  const hasNodeError = useCallback((_nodeNum: number) => false, []);
 
   const handleTraceroute = useCallback(
     (traceroute: Types.PacketMetadata<Protobuf.Mesh.RouteDiscovery>) => {
@@ -375,13 +424,24 @@ const NodesPage = (): JSX.Element => {
     [sortColumn, sortOrder],
   );
 
+  const getName = useCallback(
+    (node: Protobuf.Mesh.NodeInfo) =>
+      node.user?.longName ?? numberToHexUnpadded(node.num).slice(-4).toUpperCase(),
+    [],
+  );
+
   const sortedNodes = useMemo(() => {
-    if (!sortColumn) {
-      return filteredNodes;
+    // Default sort: Favorites (A-Z) -> Recently heard (by lastHeard desc) -> Never heard (A-Z)
+    if (!sortColumn || sortColumn === "lastHeard") {
+      return sortNodes(filteredNodes, {
+        getName,
+        getLastHeard: (n) => n.lastHeard,
+        isFavorite: (n) => n.isFavorite,
+      });
     }
 
+    // Column-specific sorting (favorites still on top)
     return [...filteredNodes].sort((a, b) => {
-      // Favorites always on top
       if (a.isFavorite !== b.isFavorite) {
         return a.isFavorite ? -1 : 1;
       }
@@ -391,20 +451,12 @@ const NodesPage = (): JSX.Element => {
 
       switch (sortColumn) {
         case "longName":
-          aValue =
-            a.user?.longName ??
-            numberToHexUnpadded(a.num).slice(-4).toUpperCase();
-          bValue =
-            b.user?.longName ??
-            numberToHexUnpadded(b.num).slice(-4).toUpperCase();
+          aValue = getName(a);
+          bValue = getName(b);
           break;
         case "connection":
           aValue = a.hopsAway ?? Number.MAX_SAFE_INTEGER;
           bValue = b.hopsAway ?? Number.MAX_SAFE_INTEGER;
-          break;
-        case "lastHeard":
-          aValue = a.lastHeard;
-          bValue = b.lastHeard;
           break;
         case "snr":
           aValue = a.snr;
@@ -438,7 +490,7 @@ const NodesPage = (): JSX.Element => {
       }
       return 0;
     });
-  }, [filteredNodes, sortColumn, sortOrder]);
+  }, [filteredNodes, sortColumn, sortOrder, getName]);
 
   return (
     <div className="p-6 w-full space-y-6">
@@ -639,13 +691,10 @@ const NodesPage = (): JSX.Element => {
                   return (
                     <TableHead
                       key={columnKey}
-                      draggable
-                      onDragStart={() => handleDragStart(columnKey)}
                       onDragOver={handleDragOver}
                       onDrop={() => handleDrop(columnKey)}
                       className={cn(
                         column.sortable && "cursor-pointer select-none",
-                        "cursor-move",
                         draggedColumn === columnKey && "opacity-50",
                       )}
                       onClick={() =>
@@ -655,7 +704,17 @@ const NodesPage = (): JSX.Element => {
                       }
                     >
                       <div className="flex items-center gap-1">
-                        <GripVertical className="h-4 w-4 text-muted-foreground opacity-60 hover:opacity-100" />
+                        <div
+                          draggable
+                          onDragStart={(e) => {
+                            e.stopPropagation();
+                            handleDragStart(columnKey);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="cursor-grab active:cursor-grabbing p-1 -m-1 hover:bg-muted rounded"
+                        >
+                          <GripVertical className="h-5 w-5 text-muted-foreground" />
+                        </div>
                         <span>{column.label}</span>
                         {column.sortable && column.sortKey && (
                           <SortIcon

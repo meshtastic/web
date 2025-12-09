@@ -94,6 +94,7 @@ export default function PreferencesPage() {
               className="grid grid-cols-3 gap-4"
             >
               <div>
+                {/** biome-ignore lint/correctness/useUniqueElementIds: you're being too picky */}
                 <RadioGroupItem
                   value="light"
                   id="light"
@@ -108,6 +109,7 @@ export default function PreferencesPage() {
                 </Label>
               </div>
               <div>
+                {/** biome-ignore lint/correctness/useUniqueElementIds: you're being too picky */}
                 <RadioGroupItem
                   value="dark"
                   id="dark"
@@ -122,6 +124,7 @@ export default function PreferencesPage() {
                 </Label>
               </div>
               <div>
+                {/** biome-ignore lint/correctness/useUniqueElementIds: you're being too picky */}
                 <RadioGroupItem
                   value="system"
                   id="system"
@@ -179,7 +182,7 @@ export default function PreferencesPage() {
               <Label>{t("preferences.localization.language")}</Label>
               <Select
                 value={language}
-                onValueChange={(value) => setLanguage(value as any)}
+                onValueChange={(value) => setLanguage(value)}
               >
                 <SelectTrigger>
                   <SelectValue />

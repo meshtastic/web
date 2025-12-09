@@ -75,7 +75,7 @@ export const QRDialog = ({
               {allChannels.map((channel) => (
                 <div className="flex justify-between" key={channel.index}>
                   <Label>
-                    {channel.settings?.name.length
+                    {channel.settings?.name?.length
                       ? channel.settings.name
                       : channel.role === Protobuf.Channel.Channel_Role.PRIMARY
                         ? t("page.broadcastLabel", { ns: "channels" })

@@ -1,6 +1,7 @@
 import { create } from "@bufbuild/protobuf";
 import { useToast } from "@core/hooks/useToast.ts";
-import { useDevice, useNodeDB } from "@core/stores";
+import { useDevice, useDeviceContext } from "@core/stores";
+import { nodeRepo } from "@db/index";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,15 +13,16 @@ interface IgnoreNodeOptions {
 
 export function useIgnoreNode() {
   const { sendAdminMessage } = useDevice();
-  const { getNode, updateIgnore } = useNodeDB();
+  const { deviceId } = useDeviceContext();
 
   const { t } = useTranslation();
 
   const { toast } = useToast();
 
   const updateIgnoredCB = useCallback(
-    ({ nodeNum, isIgnored }: IgnoreNodeOptions) => {
-      const node = getNode(nodeNum);
+    async ({ nodeNum, isIgnored }: IgnoreNodeOptions) => {
+      // Get node from database
+      const node = await nodeRepo.getNode(deviceId, nodeNum);
       if (!node) {
         return;
       }
@@ -34,12 +36,12 @@ export function useIgnoreNode() {
         }),
       );
 
-      // TODO: Wait for response before changing the store
-      updateIgnore(nodeNum, isIgnored);
+      // Update ignored status in database
+      await nodeRepo.updateIgnored(deviceId, nodeNum, isIgnored);
 
       toast({
         title: t("toast.ignoreNode.title", {
-          nodeName: node?.user?.longName ?? "node",
+          nodeName: node?.longName ?? "node",
           action: isIgnored
             ? t("toast.ignoreNode.action.added")
             : t("toast.ignoreNode.action.removed"),
@@ -49,7 +51,7 @@ export function useIgnoreNode() {
         }),
       });
     },
-    [sendAdminMessage, updateIgnore, getNode, t, toast],
+    [sendAdminMessage, deviceId, t, toast],
   );
 
   return { updateIgnored: updateIgnoredCB };

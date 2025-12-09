@@ -759,7 +759,7 @@ export class MeshDevice {
   }
 
   /**
-   * Triggers the device configure process
+   * Triggers the device configure process (single-stage)
    */
   public configure(): Promise<number> {
     this.log.debug(
@@ -783,6 +783,127 @@ export class MeshDevice {
         throw e;
       },
     );
+  }
+
+  /**
+   * Triggers the device configure process with a specific nonce
+   */
+  private configureWithNonce(nonce: number): Promise<number> {
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      `⚙️ Requesting device configuration with nonce: ${nonce}`,
+    );
+
+    const toRadio = create(Protobuf.Mesh.ToRadioSchema, {
+      payloadVariant: {
+        case: "wantConfigId",
+        value: nonce,
+      },
+    });
+
+    return this.sendRaw(toBinary(Protobuf.Mesh.ToRadioSchema, toRadio)).catch(
+      (e) => {
+        if (this.deviceStatus === DeviceStatusEnum.DeviceDisconnected) {
+          throw new Error("Device connection lost");
+        }
+        throw e;
+      },
+    );
+  }
+
+  /**
+   * Two-stage config flow mirroring Android implementation
+   * Stage 1: Config-only (device config, module config, channels)
+   * Stage 2: Node-info only (node database)
+   */
+  public async configureTwoStage(): Promise<void> {
+    // Nonces from Android implementation
+    const CONFIG_ONLY_NONCE = 69420;
+    const NODE_INFO_NONCE = 69421;
+    const WANT_CONFIG_DELAY = 100; // ms
+
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      "⚙️ Starting two-stage configuration flow",
+    );
+    this.updateDeviceStatus(DeviceStatusEnum.DeviceConfiguring);
+
+    // Stage 1: Config-only
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      `⚙️ Stage 1: Requesting config-only (nonce: ${CONFIG_ONLY_NONCE})`,
+    );
+
+    // Wait for config-only complete
+    const configOnlyComplete = new Promise<number>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        unsubscribe();
+        reject(new Error("Config-only stage timeout"));
+      }, 30000); // 30 second timeout
+
+      const unsubscribe = this.events.onConfigComplete.subscribe(
+        (configCompleteId) => {
+          if (configCompleteId === CONFIG_ONLY_NONCE) {
+            clearTimeout(timeout);
+            unsubscribe();
+            this.log.debug(
+              Emitter[Emitter.Configure],
+              `✅ Config-only complete (nonce: ${configCompleteId})`,
+            );
+            resolve(configCompleteId);
+          }
+        },
+      );
+    });
+
+    await this.configureWithNonce(CONFIG_ONLY_NONCE);
+    await configOnlyComplete;
+
+    // Send heartbeat between stages
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      "❤️ Sending heartbeat between config stages",
+    );
+    await new Promise((resolve) => setTimeout(resolve, WANT_CONFIG_DELAY));
+    await this.heartbeat();
+    await new Promise((resolve) => setTimeout(resolve, WANT_CONFIG_DELAY));
+
+    // Stage 2: Node-info only
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      `⚙️ Stage 2: Requesting node-info (nonce: ${NODE_INFO_NONCE})`,
+    );
+
+    // Wait for node-info complete
+    const nodeInfoComplete = new Promise<number>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        unsubscribe();
+        reject(new Error("Node-info stage timeout"));
+      }, 30000); // 30 second timeout
+
+      const unsubscribe = this.events.onConfigComplete.subscribe(
+        (configCompleteId) => {
+          if (configCompleteId === NODE_INFO_NONCE) {
+            clearTimeout(timeout);
+            unsubscribe();
+            this.log.debug(
+              Emitter[Emitter.Configure],
+              `✅ Node-info complete (nonce: ${configCompleteId})`,
+            );
+            resolve(configCompleteId);
+          }
+        },
+      );
+    });
+
+    await this.configureWithNonce(NODE_INFO_NONCE);
+    await nodeInfoComplete;
+
+    this.log.debug(
+      Emitter[Emitter.Configure],
+      "✅ Two-stage configuration complete",
+    );
+    this.updateDeviceStatus(DeviceStatusEnum.DeviceConfigured);
   }
 
   /**

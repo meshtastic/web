@@ -4,6 +4,7 @@ import process from "node:process";
 import tailwindcss from "@tailwindcss/vite";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
+import sqlocal from "sqlocal/vite";
 import { defineConfig, loadEnv } from "vite";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { VitePWA } from "vite-plugin-pwa";
@@ -26,7 +27,7 @@ try {
 }
 
 const CONTENT_SECURITY_POLICY =
-  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn-cookieyes.com; style-src 'self' 'unsafe-inline' data: https://rsms.me https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data: https://rsms.me https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self';";
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn-cookieyes.com; style-src 'self' 'unsafe-inline' data:; img-src 'self' data:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'self';";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
@@ -55,6 +56,7 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         selfDestroying: true,
       }),
+      sqlocal(),
     ],
     optimizeDeps: {
       include: ["react/jsx-runtime"],
@@ -73,6 +75,7 @@ export default defineConfig(({ mode }) => {
         "@pages": path.resolve(process.cwd(), "./src/pages"),
         "@components": path.resolve(process.cwd(), "./src/components"),
         "@core": path.resolve(process.cwd(), "./src/core"),
+        "@db": path.resolve(process.cwd(), "./src/db"),
         "@layouts": path.resolve(process.cwd(), "./src/layouts"),
         "@meshtastic/ui": path.resolve(process.cwd(), "../ui"),
       },
@@ -82,7 +85,7 @@ export default defineConfig(({ mode }) => {
       headers: {
         "Content-Security-Policy": CONTENT_SECURITY_POLICY,
         "Cross-Origin-Opener-Policy": "same-origin",
-        "Cross-Origin-Embedder-Policy": "credentialless",
+        "Cross-Origin-Embedder-Policy": "require-corp",
         "X-Content-Type-Options": "nosniff",
         "Strict-Transport-Security":
           "max-age=63072000; includeSubDomains; preload",

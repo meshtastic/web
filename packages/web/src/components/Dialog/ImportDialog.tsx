@@ -87,12 +87,12 @@ export const ImportDialog = ({ open, onOpenChange }: ImportDialogProps) => {
         if (importIndex[index] === -1) {
           return;
         }
-
-        });
-      },
+        // TODO: Implement channel settings import logic
+      }
     );
 
     if (channelSet?.loraConfig && updateConfig) {
+      // TODO: Implement lora config update logic
     }
     // Reset state after import
     setImportDialogInput("");

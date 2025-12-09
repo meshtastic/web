@@ -1,5 +1,7 @@
 import { toast } from "@core/hooks/useToast.ts";
-import { useDevice, useMessages, useNodeDB } from "@core/stores";
+import { useDeleteMessages } from "@core/hooks/useDeleteMessages";
+import { useDevice, useDeviceContext } from "@core/stores";
+import { MigrationService } from "@db";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
 
@@ -13,17 +15,16 @@ export const ResetNodeDbDialog = ({
   onOpenChange,
 }: ResetNodeDbDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { connection } = useDevice();
-  const { removeAllNodeErrors, removeAllNodes } = useNodeDB();
-  const { deleteAllMessages } = useMessages();
+  const { connection, id: deviceId } = useDevice();
+  const { deleteAllMessages } = useDeleteMessages();
 
   const handleResetNodeDb = () => {
     connection
       ?.resetNodes()
-      .then(() => {
-        deleteAllMessages();
-        removeAllNodeErrors();
-        removeAllNodes(true);
+      .then(async () => {
+        // Delete all messages and nodes from the database for this device
+        await deleteAllMessages();
+        await MigrationService.deleteDeviceData(deviceId);
       })
       .catch((error) => {
         toast({

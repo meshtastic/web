@@ -1,5 +1,5 @@
 import { Separator } from "@components/ui/separator";
-import type { Message } from "@core/stores/messageStore/types";
+import type { Message } from "@db/schema";
 
 export type DayGroup = { dayKey: number; label: string; items: Message[] };
 

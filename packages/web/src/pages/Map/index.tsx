@@ -10,6 +10,7 @@ import {
 } from "@components/generic/Filter/useFilterNode.ts";
 import { BaseMap } from "@components/Map.tsx";
 import { NodesLayer } from "@components/PageComponents/Map/Layers/NodesLayer.tsx";
+import { PositionTrailsLayer } from "@components/PageComponents/Map/Layers/PositionTrailsLayer.tsx";
 import { PrecisionLayer } from "@components/PageComponents/Map/Layers/PrecisionLayer.tsx";
 import {
   SNRLayer,
@@ -19,11 +20,14 @@ import {
 import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
-import { useNodeDB } from "@core/stores";
+import { useNodes } from "@db/hooks";
+import { useDevice, useDeviceContext } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
-import type { Protobuf } from "@meshtastic/core";
+import { Protobuf } from "@meshtastic/core";
+import { create } from "@bufbuild/protobuf";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import { toByteArray } from "base64-js";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
 import {
   useCallback,
@@ -36,35 +40,78 @@ import {
 import { useTranslation } from "react-i18next";
 import { type MapLayerMouseEvent, useMap } from "react-map-gl/maplibre";
 
-const NODEDB_DEBOUNCE_MS = 250;
+// Helper to convert hex string to Uint8Array
+function hexToUint8Array(hex: string): Uint8Array {
+  const matches = hex.match(/.{1,2}/g);
+  return matches ? new Uint8Array(matches.map(byte => parseInt(byte, 16))) : new Uint8Array();
+}
 
 const MapPage = () => {
   const { t } = useTranslation("map");
-  const { getNode } = useNodeDB();
-  const nodeDB = useNodeDB();
-  const { nodes: validNodes, myNodeNum } = useNodeDB(
-    (db) => ({
-      // only nodes with a position
-      nodes: db.getNodes((n): n is Protobuf.Mesh.NodeInfo =>
-        Boolean(n.position?.latitudeI),
-      ),
+  const { deviceId } = useDeviceContext();
+  const device = useDevice();
+  const { nodes: allNodes } = useNodes(deviceId);
 
-      // References to cause re-render on change
-      _errorsRef: db.nodeErrors,
-      myNodeNum: db.myNodeNum,
-    }),
-    { debounce: NODEDB_DEBOUNCE_MS },
-  );
+  // Filter to only nodes with positions and convert to protobuf format
+  const validNodes = useMemo(() => {
+    return allNodes
+      .filter((node) => Boolean(node.latitudeI))
+      .map((node): Protobuf.Mesh.NodeInfo => {
+        return {
+          $typeName: "meshtastic.NodeInfo",
+          num: node.nodeNum,
+          snr: node.snr ?? 0,
+          lastHeard: node.lastHeard ? Math.floor(node.lastHeard.getTime() / 1000) : 0,
+          channel: 0,
+          viaMqtt: false,
+          isFavorite: node.isFavorite ?? false,
+          isIgnored: node.isIgnored ?? false,
+          hopsAway: 0,
+          isKeyManuallyVerified: false,
+          user: {
+            $typeName: "meshtastic.User",
+            id: node.userId ?? "",
+            longName: node.longName ?? "",
+            shortName: node.shortName ?? "",
+            macaddr: node.macaddr ? hexToUint8Array(node.macaddr) : new Uint8Array(),
+            hwModel: node.hwModel ?? 0,
+            role: node.role ?? 0,
+            publicKey: node.publicKey ? toByteArray(node.publicKey) : new Uint8Array(),
+            isLicensed: node.isLicensed ?? false,
+          },
+          position: create(Protobuf.Mesh.PositionSchema, {
+            latitudeI: node.latitudeI ?? 0,
+            longitudeI: node.longitudeI ?? 0,
+            altitude: node.altitude ?? 0,
+            time: node.positionTime ? Math.floor(node.positionTime.getTime() / 1000) : 0,
+            precisionBits: node.positionPrecisionBits ?? 32,
+            groundSpeed: node.groundSpeed ?? 0,
+            groundTrack: node.groundTrack ?? 0,
+            satsInView: node.satsInView ?? 0,
+          }),
+          deviceMetrics: {
+            $typeName: "meshtastic.DeviceMetrics",
+            batteryLevel: node.batteryLevel ?? 0,
+            voltage: node.voltage ?? 0,
+            channelUtilization: node.channelUtilization ?? 0,
+            airUtilTx: node.airUtilTx ?? 0,
+            uptimeSeconds: node.uptimeSeconds ?? 0,
+          },
+        };
+      });
+  }, [allNodes]);
 
-  // Get myNode directly using getNodes - getMyNode now returns immediately
+  const myNodeNum = device.hardware?.myNodeNum ?? 0;
+
+  // Get myNode
   const myNode = useMemo(() => {
-    if (!nodeDB || !myNodeNum) {
-      return undefined;
-    }
+    return validNodes.find((n) => n.num === myNodeNum);
+  }, [validNodes, myNodeNum]);
 
-    const nodes = nodeDB.getNodes(undefined, true);
-    return nodes.find((n) => n.num === myNodeNum);
-  }, [nodeDB, myNodeNum]);
+  // Create getNode helper
+  const getNode = useCallback((nodeNum: number) => {
+    return validNodes.find((n) => n.num === nodeNum);
+  }, [validNodes]);
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
   const { default: mapRef } = useMap();
   const { focusLngLat, fitToNodes } = useMapFitting(mapRef);
@@ -201,6 +248,20 @@ const MapPage = () => {
     [mapRef, myNode, visibilityState.waypoints, popupState],
   );
 
+  // Position trails
+  const positionTrailsElementId = useId();
+  const positionTrailsElement = useMemo(
+    () => (
+      <PositionTrailsLayer
+        id={positionTrailsElementId}
+        filteredNodes={filteredNodes}
+        isVisible={visibilityState.positionTrails}
+        trailDurationHours={24}
+      />
+    ),
+    [filteredNodes, visibilityState.positionTrails, positionTrailsElementId],
+  );
+
   return (
     <div>
       <BaseMap
@@ -210,6 +271,7 @@ const MapPage = () => {
         interactiveLayerIds={[snrLayerElementId]}
       >
         {markerElements}
+        {positionTrailsElement}
         {snrLayerElement}
         {precisionCirclesElement}
         {waypointLayerElement}

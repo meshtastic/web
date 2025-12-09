@@ -1,5 +1,5 @@
 import { Button } from "@app/components/UI/Button";
-import type { Connection } from "@app/core/stores/deviceStore/types";
+import type { Connection } from "@db/index";
 
 export function ConnectionStatusBadge({
   status,

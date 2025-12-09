@@ -1,5 +1,7 @@
 import { Label } from "@components/ui/label.tsx";
-import { useAppStore, useDevice, useNodeDB } from "@core/stores";
+import { useNodes } from "@db/hooks";
+import { useAppStore, useDevice, useDeviceContext } from "@core/stores";
+import { nodeRepo } from "@db/index";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "./DialogWrapper.tsx";
 
@@ -14,12 +16,18 @@ export const RemoveNodeDialog = ({
 }: RemoveNodeDialogProps) => {
   const { t } = useTranslation("dialog");
   const { connection } = useDevice();
-  const { getNode, removeNode } = useNodeDB();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
   const { nodeNumToBeRemoved } = useAppStore();
 
-  const handleConfirm = () => {
+  // Create getNode function from database nodes
+  const getNode = (nodeNum: number) => {
+    return allNodes.find((n) => n.nodeNum === nodeNum);
+  };
+
+  const handleConfirm = async () => {
     connection?.removeNodeByNum(nodeNumToBeRemoved);
-    removeNode(nodeNumToBeRemoved);
+    await nodeRepo.deleteNode(deviceId, nodeNumToBeRemoved);
   };
 
   return (
@@ -34,7 +42,7 @@ export const RemoveNodeDialog = ({
       onConfirm={handleConfirm}
     >
       <div className="gap-4">
-        <Label>{getNode(nodeNumToBeRemoved)?.user?.longName}</Label>
+        <Label>{getNode(nodeNumToBeRemoved)?.longName}</Label>
       </div>
     </DialogWrapper>
   );

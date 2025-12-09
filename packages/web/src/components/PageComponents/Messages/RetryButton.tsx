@@ -1,46 +1,92 @@
-import { useMessageStore } from "@core/stores/messageStore";
-import { MessageState } from "@core/stores/messageStore";
+import { messageRepo } from "@db/index";
+import type { Message } from "@db/schema";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@components/ui/button";
 import { cn } from "@core/utils/cn";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { dbEvents, DB_EVENTS } from "@db/events";
+import { useDevice } from "@core/stores";
 
 interface RetryButtonProps {
-  messageId: number;
-  deviceId: number;
+  message: Message;
   className?: string;
 }
 
 /**
  * RetryButton - Button to retry failed messages
  */
-export const RetryButton = ({ 
-  messageId, 
-  deviceId, 
-  className 
+export const RetryButton = ({
+  message,
+  className
 }: RetryButtonProps) => {
   const [isRetrying, setIsRetrying] = useState(false);
-  const messageStore = useMessageStore((state) => state.getMessageStore(deviceId));
+  const [currentMessage, setCurrentMessage] = useState(message);
+  const device = useDevice();
+
+  // Update message when database changes
+  useEffect(() => {
+    setCurrentMessage(message);
+  }, [message]);
 
   const handleRetry = async () => {
-    if (!messageStore || isRetrying) return;
+    if (isRetrying || !device.connection) return;
 
     setIsRetrying(true);
     try {
-      await messageStore.retryMessage(messageId);
-      console.log(`[RetryButton] Retried message ${messageId}`);
+      // Determine destination based on message type
+      const isDirect = currentMessage.type === "direct";
+      const toValue = isDirect ? currentMessage.toNode : ("broadcast" as const);
+      const channelValue = isDirect ? undefined : currentMessage.channelId;
+
+      console.log(`[RetryButton] Retrying message ${currentMessage.id}...`);
+
+      // Send message over radio
+      const newMessageId = await device.connection.sendText(
+        currentMessage.message,
+        toValue,
+        true,
+        channelValue,
+      );
+
+      if (newMessageId !== undefined) {
+        // Increment retry count and update state in database
+        await messageRepo.incrementRetryCount(
+          currentMessage.id,
+          currentMessage.deviceId
+        );
+        await messageRepo.updateMessageState(
+          currentMessage.id,
+          currentMessage.deviceId,
+          "sent"
+        );
+
+        // Emit event to trigger UI refresh
+        dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
+
+        console.log(`[RetryButton] Message ${currentMessage.id} retried successfully with new ID ${newMessageId}`);
+      }
     } catch (error) {
-      console.error(`[RetryButton] Failed to retry message ${messageId}:`, error);
+      console.error(`[RetryButton] Failed to retry message ${currentMessage.id}:`, error);
+
+      // Increment retry count and mark as failed again
+      await messageRepo.incrementRetryCount(
+        currentMessage.id,
+        currentMessage.deviceId
+      );
+      await messageRepo.updateMessageState(
+        currentMessage.id,
+        currentMessage.deviceId,
+        "failed"
+      );
+      dbEvents.emit(DB_EVENTS.MESSAGE_SAVED);
     } finally {
       setIsRetrying(false);
     }
   };
 
-  if (!messageStore) return null;
-
-  const message = messageStore.getMessage(messageId);
-  if (!message || message.state !== MessageState.Failed) return null;
-  if (message.retryCount >= message.maxRetries) return null;
+  // Only show retry button for failed messages that haven't exceeded max retries
+  if (currentMessage.state !== "failed") return null;
+  if (currentMessage.retryCount >= currentMessage.maxRetries) return null;
 
   return (
     <Button
@@ -49,7 +95,7 @@ export const RetryButton = ({
       onClick={handleRetry}
       disabled={isRetrying}
       className={className}
-      title={`Retry (attempt ${message.retryCount + 1}/${message.maxRetries})`}
+      title={`Retry (attempt ${currentMessage.retryCount + 1}/${currentMessage.maxRetries})`}
     >
       <RefreshCw className={cn("h-3 w-3", isRetrying && "animate-spin")} />
     </Button>

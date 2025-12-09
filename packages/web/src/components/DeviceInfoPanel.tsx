@@ -1,4 +1,4 @@
-import type { ConnectionStatus } from "@app/core/stores/deviceStore/types.ts";
+import type { ConnectionStatus } from "@db/repositories/ConnectionRepository";
 import { Avatar } from "@components/ui/avatar.tsx";
 import { Button } from "@components/ui/button.tsx";
 import { Subtle } from "@components/ui/typography/subtle.tsx";

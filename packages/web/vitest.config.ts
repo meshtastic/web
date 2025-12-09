@@ -22,6 +22,7 @@ export default defineProject({
       "@pages": path.resolve(srcDir, "pages"),
       "@components": path.resolve(srcDir, "components"),
       "@layouts": path.resolve(srcDir, "layouts"),
+      "@db": path.resolve(srcDir, "db"),
     },
   },
   test: {

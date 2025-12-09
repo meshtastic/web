@@ -1,4 +1,4 @@
-import { useMessages } from "@app/core/stores/index.ts";
+import { useDeleteMessages } from "@core/hooks/useDeleteMessages";
 import { AlertTriangleIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { DialogWrapper } from "../DialogWrapper.tsx";
@@ -13,10 +13,10 @@ export const DeleteMessagesDialog = ({
   onOpenChange,
 }: DeleteMessagesDialogProps) => {
   const { t } = useTranslation("dialog");
-  const messageStore = useMessages();
+  const { deleteAllMessages } = useDeleteMessages();
 
-  const handleConfirm = () => {
-    messageStore.deleteAllMessages();
+  const handleConfirm = async () => {
+    await deleteAllMessages();
     onOpenChange(false);
   };
 

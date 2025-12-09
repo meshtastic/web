@@ -12,6 +12,7 @@
     "directNeighbors": "Show direct connections",
     "remoteNeighbors": "Show remote connections",
     "positionPrecision": "Show position precision",
+    "positionTrails": "Show position trails",
     "traceroutes": "Show traceroutes",
     "waypoints": "Show waypoints"
   },

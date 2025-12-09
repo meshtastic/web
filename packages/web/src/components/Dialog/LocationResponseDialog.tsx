@@ -6,7 +6,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@components/ui/Dialog.tsx";
-import { useNodeDB } from "@core/stores";
+import { useNodes } from "@db/hooks";
+import { useDeviceContext } from "@core/stores";
 import type { Protobuf, Types } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
@@ -23,16 +24,17 @@ export const LocationResponseDialog = ({
   onOpenChange,
 }: LocationResponseDialogProps) => {
   const { t } = useTranslation("dialog");
-  const { getNode } = useNodeDB();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
 
-  const from = getNode(location?.from ?? 0);
+  const from = allNodes.find((n) => n.nodeNum === (location?.from ?? 0));
   const longName =
-    from?.user?.longName ??
-    (from ? `!${numberToHexUnpadded(from?.num)}` : t("unknown.shortName"));
+    from?.longName ??
+    (from ? `!${numberToHexUnpadded(from.nodeNum)}` : t("unknown.shortName"));
   const shortName =
-    from?.user?.shortName ??
+    from?.shortName ??
     (from
-      ? `${numberToHexUnpadded(from?.num).substring(0, 4)}`
+      ? `${numberToHexUnpadded(from.nodeNum).substring(0, 4)}`
       : t("unknown.shortName"));
 
   const position = location?.data;

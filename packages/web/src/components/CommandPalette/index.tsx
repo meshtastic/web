@@ -7,11 +7,12 @@ import {
   CommandList,
 } from "@components/ui/command.tsx";
 import { usePinnedItems } from "@core/hooks/usePinnedItems.ts";
+import { useNodes } from "@db/hooks";
 import {
   useAppStore,
   useDevice,
+  useDeviceContext,
   useDeviceStore,
-  useNodeDB,
 } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { useNavigate } from "@tanstack/react-router";
@@ -68,9 +69,16 @@ export const CommandPalette = () => {
     setConnectDialogOpen,
     setSelectedDevice,
   } = useAppStore();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
   const { getDevices } = useDeviceStore();
   const { setDialogOpen, connection } = useDevice();
-  const { getNode } = useNodeDB();
+
+  // Create getNode function from database nodes
+  const getNode = (nodeNum: number) => {
+    return allNodes.find((n) => n.nodeNum === nodeNum);
+  };
+
   const { pinnedItems, togglePinnedItem } = usePinnedItems({
     storageName: "pinnedCommandMenuGroups",
   });
@@ -124,7 +132,7 @@ export const CommandPalette = () => {
           icon: ArrowLeftRightIcon,
           subItems: getDevices().map((device) => ({
             label:
-              getNode(device.hardware.myNodeNum)?.user?.longName ??
+              getNode(device.hardware.myNodeNum)?.longName ??
               t("unknown.shortName"),
             icon: <NodeAvatar nodeNum={device.hardware.myNodeNum} />,
             action() {

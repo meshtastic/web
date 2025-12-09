@@ -12,7 +12,6 @@ import { StackBadge } from "@components/PageComponents/Map/Markers/StackBadge.ts
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { PopupWrapper } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting";
-import { useNodeDB } from "@core/stores";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
 import type { Protobuf } from "@meshtastic/core";
 import { useCallback, useMemo } from "react";
@@ -42,7 +41,8 @@ export const NodesLayer = ({
 }: NodeMarkerProps): React.ReactNode[] => {
   const { t } = useTranslation("map");
 
-  const { hasNodeError } = useNodeDB();
+  // Node error tracking has been removed from the node database
+  const hasNodeError = () => false;
   const { focusLngLat } = useMapFitting(mapRef);
 
   const selectedNode = useMemo(

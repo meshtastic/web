@@ -16,7 +16,8 @@ import {
   createFieldMetadata,
   useFieldRegistry,
 } from "@core/services/fieldRegistry";
-import { useDevice, useNodeDB } from "@core/stores";
+import { useNodes } from "@db/hooks";
+import { useDevice, useDeviceContext } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
 import { useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -27,13 +28,14 @@ interface PositionConfigProps {
 export const Position = ({ onFormInit }: PositionConfigProps) => {
   useWaitForConfig({ configCase: "position" });
 
-  const { config, getEffectiveConfig, queueAdminMessage } = useDevice();
+  const { config, getEffectiveConfig, queueAdminMessage, hardware } = useDevice();
   const {
     registerFields,
     trackChange,
     removeChange: removeFieldChange,
   } = useFieldRegistry();
-  const { getMyNode } = useNodeDB();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
   const { flagsValue, activeFlags, toggleFlag, getAllFlags } = usePositionFlags(
     getEffectiveConfig("position")?.positionFlags ?? 0,
   );
@@ -41,8 +43,11 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
 
   const section = { type: "config", variant: "position" } as const;
 
-  const myNode = getMyNode();
-  const currentPosition = myNode?.position;
+  const myNode = useMemo(() => {
+    const myNodeNum = hardware.myNodeNum;
+    if (!myNodeNum) return undefined;
+    return allNodes.find((n) => n.nodeNum === myNodeNum);
+  }, [allNodes, hardware.myNodeNum]);
 
   const effectiveConfig = getEffectiveConfig("position");
   const displayUnits = getEffectiveConfig("display")?.units;
@@ -52,15 +57,11 @@ export const Position = ({ onFormInit }: PositionConfigProps) => {
       ...config.position,
       ...effectiveConfig,
       // Include current position coordinates if available
-      latitude: currentPosition?.latitudeI
-        ? currentPosition.latitudeI / 1e7
-        : undefined,
-      longitude: currentPosition?.longitudeI
-        ? currentPosition.longitudeI / 1e7
-        : undefined,
-      altitude: currentPosition?.altitude ?? 0,
+      latitude: myNode?.latitudeI ? myNode.latitudeI / 1e7 : undefined,
+      longitude: myNode?.longitudeI ? myNode.longitudeI / 1e7 : undefined,
+      altitude: myNode?.altitude ?? 0,
     } as PositionValidation;
-  }, [config.position, effectiveConfig, currentPosition]);
+  }, [config.position, effectiveConfig, myNode]);
 
   const fieldGroups = useMemo(
     () => [

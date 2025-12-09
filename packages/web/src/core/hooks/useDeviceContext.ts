@@ -12,7 +12,7 @@ export function useDeviceContext(): DeviceContext {
   const ctx = useContext(CurrentDeviceContext);
   if (!ctx) {
     throw new Error(
-      "useDeviceContext must be used within CurrentDeviceContext provider",
+      "useDeviceContext must be used within DeviceContext provider",
     );
   }
   return ctx;

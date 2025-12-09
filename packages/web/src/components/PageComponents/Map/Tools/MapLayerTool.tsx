@@ -14,6 +14,7 @@ export interface VisibilityState {
   directNeighbors: boolean;
   remoteNeighbors: boolean;
   positionPrecision: boolean;
+  positionTrails: boolean;
   traceroutes: boolean;
   waypoints: boolean;
 }
@@ -23,6 +24,7 @@ export const defaultVisibilityState: VisibilityState = {
   directNeighbors: false,
   remoteNeighbors: false,
   positionPrecision: false,
+  positionTrails: false,
   traceroutes: false,
   waypoints: true,
 };
@@ -80,6 +82,7 @@ export function MapLayerTool({
       { key: "directNeighbors", label: t("layerTool.directNeighbors") },
       { key: "remoteNeighbors", label: t("layerTool.remoteNeighbors") },
       { key: "positionPrecision", label: t("layerTool.positionPrecision") },
+      { key: "positionTrails", label: t("layerTool.positionTrails") },
       // { key: "traceroutes", label: t("layerTool.traceroutes") },
     ],
     [t],

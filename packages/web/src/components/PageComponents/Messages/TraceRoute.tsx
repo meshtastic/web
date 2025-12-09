@@ -1,13 +1,17 @@
-import { useNodeDB } from "@core/stores";
-import type { Protobuf } from "@meshtastic/core";
+import { useNodes } from "@db/hooks";
+import { useDeviceContext } from "@core/stores";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { useTranslation } from "react-i18next";
 
-type NodeUser = Pick<Protobuf.Mesh.NodeInfo, "user">;
+interface NodeInfo {
+  longName: string | null;
+  shortName: string | null;
+  nodeNum: number;
+}
 
 export interface TraceRouteProps {
-  from: NodeUser;
-  to: NodeUser;
+  from: NodeInfo;
+  to: NodeInfo;
   route: Array<number>;
   routeBack?: Array<number>;
   snrTowards?: Array<number>;
@@ -16,15 +20,21 @@ export interface TraceRouteProps {
 
 interface RoutePathProps {
   title: string;
-  from: NodeUser;
-  to: NodeUser;
+  from: NodeInfo;
+  to: NodeInfo;
   path: number[];
   snr?: number[];
 }
 
 const RoutePath = ({ title, from, to, path, snr }: RoutePathProps) => {
-  const { getNode } = useNodeDB();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
   const { t } = useTranslation();
+
+  // Create getNode function from database nodes
+  const getNode = (nodeNum: number) => {
+    return allNodes.find((n) => n.nodeNum === nodeNum);
+  };
 
   return (
     <span
@@ -32,15 +42,15 @@ const RoutePath = ({ title, from, to, path, snr }: RoutePathProps) => {
       className="ml-4 border-l-2 pl-2 border-l-slate-900 text-slate-900 dark:text-slate-100 dark:border-l-slate-100"
     >
       <p className="font-semibold">{title}</p>
-      <p>{from?.user?.longName}</p>
+      <p>{from?.longName}</p>
       <p>
         ↓ {snr?.[0] ?? t("unknown.num")}
         {t("unit.dbm")}
       </p>
       {path.map((hop, i) => (
-        <span key={getNode(hop)?.num ?? hop}>
+        <span key={getNode(hop)?.nodeNum ?? hop}>
           <p>
-            {getNode(hop)?.user?.longName ??
+            {getNode(hop)?.longName ??
               `${t("unknown.longName")} (!${numberToHexUnpadded(hop)})`}
           </p>
           <p>
@@ -49,7 +59,7 @@ const RoutePath = ({ title, from, to, path, snr }: RoutePathProps) => {
           </p>
         </span>
       ))}
-      <p>{to?.user?.longName}</p>
+      <p>{to?.longName}</p>
     </span>
   );
 };

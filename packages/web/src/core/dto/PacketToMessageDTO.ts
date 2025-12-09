@@ -1,31 +1,28 @@
-import { MessageState, MessageType } from "@core/stores";
-import type { Message } from "@core/stores/messageStore/types.ts";
+import type { NewMessage } from "@db/schema";
 import type { Types } from "@meshtastic/core";
 
 class PacketToMessageDTO {
-  channel: Types.ChannelNumber;
-  to: number;
-  from: number;
-  date: number; // (timestamp ms)
+  channelId: Types.ChannelNumber;
+  toNode: number;
+  fromNode: number;
+  date: Date;
   messageId: number;
-  state: MessageState;
+  state: "waiting" | "sending" | "sent" | "ack" | "failed";
   message: string;
-  type: MessageType;
+  type: "direct" | "broadcast";
   hops: number;
   rxRssi: number;
   rxSnr: number;
   viaMqtt: boolean;
 
   constructor(data: Types.PacketMetadata<string>, nodeNum: number) {
-    this.channel = data.channel;
-    this.to = data.to;
-    this.from = data.from;
+    this.channelId = data.channel;
+    this.toNode = data.to;
+    this.fromNode = data.from;
     this.messageId = data.id;
-    this.state =
-      data.from !== nodeNum ? MessageState.Ack : MessageState.Waiting;
+    this.state = data.from !== nodeNum ? "ack" : "waiting";
     this.message = data.data;
-    this.type =
-      data.type === "direct" ? MessageType.Direct : MessageType.Broadcast;
+    this.type = data.type === "direct" ? "direct" : "broadcast";
 
     let dateTimestamp = Date.now();
     if (data.rxTime instanceof Date) {
@@ -39,18 +36,19 @@ class PacketToMessageDTO {
         `Received rxTime in PacketToMessageDTO was not a Date object as expected (type: ${typeof data.rxTime}, value: ${data.rxTime}). Using current time as fallback.`,
       );
     }
-    this.date = dateTimestamp;
+    this.date = new Date(dateTimestamp);
     this.hops = data.hops;
     this.rxRssi = data.rxRssi;
     this.rxSnr = data.rxSnr;
     this.viaMqtt = data.viaMqtt;
   }
 
-  toMessage(): Message {
+  toNewMessage(deviceId: number): NewMessage {
     return {
-      channel: this.channel,
-      to: this.to,
-      from: this.from,
+      deviceId,
+      channelId: this.channelId,
+      toNode: this.toNode,
+      fromNode: this.fromNode,
       date: this.date,
       messageId: this.messageId,
       state: this.state,

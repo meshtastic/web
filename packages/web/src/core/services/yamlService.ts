@@ -5,6 +5,7 @@ import type {
   ValidModuleConfigType,
 } from "@components/Settings/types.ts";
 import type { Device } from "@core/stores/deviceStore/index.ts";
+import { channelRepo } from "@db";
 
 export interface YAMLExportData {
   version: string;
@@ -30,7 +31,22 @@ export interface ParsedYAMLField {
 }
 
 export class YAMLService {
-  static exportToYAML(device: Device): string {
+  static async exportToYAML(device: Device): Promise<string> {
+    // Fetch channels from database
+    const dbChannels = await channelRepo.getChannels(device.id);
+
+    // Convert DB channels to protobuf Channel format
+    const protoChannels = dbChannels.map((ch) => ({
+      index: ch.channelIndex as Types.ChannelNumber,
+      settings: {
+        name: ch.name || undefined,
+        psk: ch.psk ? new Uint8Array(Buffer.from(ch.psk, "base64")) : undefined,
+        uplinkEnabled: ch.uplinkEnabled,
+        downlinkEnabled: ch.downlinkEnabled,
+      },
+      role: ch.role,
+    }));
+
     const exportData: YAMLExportData = {
       version: "1.0",
       metadata: {
@@ -44,7 +60,7 @@ export class YAMLService {
       },
       config: {},
       moduleConfig: {},
-      channels: Array.from(device.channels.values()),
+      channels: protoChannels,
     };
 
     // Export config sections
@@ -183,11 +199,11 @@ export class YAMLService {
     return fields;
   }
 
-  static applyToDevice(
+  static async applyToDevice(
     _parsedData: YAMLExportData,
     selectedFields: ParsedYAMLField[],
     device: Device,
-  ): void {
+  ): Promise<void> {
     // Group fields by type and section for efficient application
     const configUpdates = new Map<ValidConfigType, Record<string, any>>();
     const moduleConfigUpdates = new Map<
@@ -262,25 +278,43 @@ export class YAMLService {
     });
 
     // Apply channel updates
-    channelUpdates.forEach((updates, channelIndex) => {
-      const existingChannel = device.channels.get(
-        channelIndex as Types.ChannelNumber,
-      );
-      if (existingChannel?.settings) {
+    // Fetch channels from database
+    const dbChannels = await channelRepo.getChannels(device.id);
+    const channelsMap = new Map(
+      dbChannels.map((ch) => [ch.channelIndex, ch])
+    );
+
+    for (const [channelIndex, updates] of channelUpdates) {
+      const existingDbChannel = channelsMap.get(channelIndex);
+      if (existingDbChannel) {
+        // Convert DB channel to protobuf format for comparison
+        const existingChannel = {
+          index: channelIndex as Types.ChannelNumber,
+          role: existingDbChannel.role,
+          settings: {
+            name: existingDbChannel.name || undefined,
+            psk: existingDbChannel.psk
+              ? new Uint8Array(Buffer.from(existingDbChannel.psk, "base64"))
+              : undefined,
+            uplinkEnabled: existingDbChannel.uplinkEnabled,
+            downlinkEnabled: existingDbChannel.downlinkEnabled,
+          },
+        };
+
         const mergedSettings = { ...existingChannel.settings, ...updates };
         const updatedChannel = create(Protobuf.Channel.ChannelSchema, {
           ...existingChannel,
           settings: mergedSettings,
         });
 
-        device.addChannel(updatedChannel);
+        await device.addChannel(updatedChannel);
         device.setChange(
           { type: "channel", index: channelIndex as Types.ChannelNumber },
           updatedChannel,
           existingChannel,
         );
       }
-    });
+    }
   }
 
   static downloadYAML(content: string, filename: string): void {

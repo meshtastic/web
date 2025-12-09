@@ -1,12 +1,11 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { MessageState } from "@core/stores/messageStore";
 import { MessageBubble } from "./MessageBubble";
-import type { Message } from "@core/stores/messageStore/types";
+import type { Message } from "@db/schema";
 
 // Mock MessageStatusIndicator
 vi.mock("./MessageStatusIndicator", () => ({
-  MessageStatusIndicator: ({ message, className }: any) => (
+  MessageStatusIndicator: ({ message, className }: { message: Message; className?: string }) => (
     <div data-testid="message-status" className={className}>
       Status: {message.state}
     </div>
@@ -15,9 +14,9 @@ vi.mock("./MessageStatusIndicator", () => ({
 
 // Mock RetryButton
 vi.mock("./RetryButton", () => ({
-  RetryButton: ({ messageId, deviceId, className }: any) => (
-    <button 
-      data-testid="retry-button" 
+  RetryButton: ({ messageId, deviceId, className }: { messageId: number; deviceId: number; className?: string }) => (
+    <button
+      data-testid="retry-button"
       className={className}
       onClick={() => console.log(`Retry ${messageId} on device ${deviceId}`)}
     >
@@ -28,32 +27,34 @@ vi.mock("./RetryButton", () => ({
 
 // Mock NodeAvatar
 vi.mock("@components/NodeAvatar", () => ({
-  NodeAvatar: ({ longName, size }: any) => (
+  NodeAvatar: ({ longName, size }: { longName?: string; size?: string }) => (
     <div data-testid="node-avatar" data-size={size}>
       {longName}
     </div>
   ),
 }));
 
-const createMockMessage = (state: MessageState, overrides: Partial<Message> = {}): Message => ({
+const createMockMessage = (state: Message["state"], overrides: Partial<Message> = {}): Message => ({
+  id: 1,
+  deviceId: 1,
   messageId: 123,
-  channel: 0,
-  to: 123456,
-  from: 789012,
-  date: Date.now(),
+  channelId: 0,
+  toNode: 123456,
+  fromNode: 789012,
+  date: new Date(),
+  createdAt: new Date(),
   state,
   message: "Test message",
   rxSnr: 0,
   rxRssi: 0,
   viaMqtt: false,
   hops: 0,
-  type: "direct" as any,
-  priority: 3,
+  type: "direct",
   retryCount: 0,
   maxRetries: 3,
   receivedACK: false,
   ackError: 0,
-  ackTimestamp: 0,
+  ackTimestamp: null,
   ackSNR: 0,
   realACK: false,
   ...overrides,
@@ -63,8 +64,8 @@ describe("MessageBubble", () => {
   const mockSenderName = "Test Node";
 
   it("should render sent message correctly", () => {
-    const message = createMockMessage(MessageState.Sent, { from: 789012 });
-    
+    const message = createMockMessage("sent", { fromNode: 789012 });
+
     render(
       <MessageBubble
         message={message}
@@ -81,8 +82,8 @@ describe("MessageBubble", () => {
   });
 
   it("should render received message correctly", () => {
-    const message = createMockMessage(MessageState.Ack, { from: 123456 });
-    
+    const message = createMockMessage("ack", { fromNode: 123456 });
+
     render(
       <MessageBubble
         message={message}
@@ -100,12 +101,12 @@ describe("MessageBubble", () => {
   });
 
   it("should show retry button for failed messages", () => {
-    const message = createMockMessage(MessageState.Failed, { 
-      from: 789012,
+    const message = createMockMessage("failed", {
+      fromNode: 789012,
       retryCount: 1,
       maxRetries: 3
     });
-    
+
     render(
       <MessageBubble
         message={message}
@@ -120,8 +121,8 @@ describe("MessageBubble", () => {
   });
 
   it("should not show retry button for non-failed messages", () => {
-    const message = createMockMessage(MessageState.Sent, { from: 789012 });
-    
+    const message = createMockMessage("sent", { fromNode: 789012 });
+
     render(
       <MessageBubble
         message={message}
@@ -138,11 +139,11 @@ describe("MessageBubble", () => {
   });
 
   it("should show MQTT indicator for messages via MQTT", () => {
-    const message = createMockMessage(MessageState.Ack, { 
-      from: 123456,
+    const message = createMockMessage("ack", {
+      fromNode: 123456,
       viaMqtt: true
     });
-    
+
     render(
       <MessageBubble
         message={message}
@@ -157,8 +158,8 @@ describe("MessageBubble", () => {
   });
 
   it("should not show avatar when showAvatar is false", () => {
-    const message = createMockMessage(MessageState.Ack, { from: 123456 });
-    
+    const message = createMockMessage("ack", { fromNode: 123456 });
+
     render(
       <MessageBubble
         message={message}
@@ -174,8 +175,8 @@ describe("MessageBubble", () => {
   });
 
   it("should not show timestamp when showTimestamp is false", () => {
-    const message = createMockMessage(MessageState.Sent, { from: 789012 });
-    
+    const message = createMockMessage("sent", { fromNode: 789012 });
+
     render(
       <MessageBubble
         message={message}
@@ -192,8 +193,8 @@ describe("MessageBubble", () => {
   });
 
   it("should apply correct styling for sent messages", () => {
-    const message = createMockMessage(MessageState.Sent, { from: 789012 });
-    
+    const message = createMockMessage("sent", { fromNode: 789012 });
+
     render(
       <MessageBubble
         message={message}
@@ -209,8 +210,8 @@ describe("MessageBubble", () => {
   });
 
   it("should apply correct styling for received messages", () => {
-    const message = createMockMessage(MessageState.Ack, { from: 123456 });
-    
+    const message = createMockMessage("ack", { fromNode: 123456 });
+
     render(
       <MessageBubble
         message={message}
@@ -227,11 +228,11 @@ describe("MessageBubble", () => {
 
   it("should show timestamp in correct format", () => {
     const testDate = new Date(2023, 0, 1, 14, 30); // 2:30 PM
-    const message = createMockMessage(MessageState.Sent, { 
-      from: 789012,
-      date: testDate.getTime()
+    const message = createMockMessage("sent", {
+      fromNode: 789012,
+      date: testDate
     });
-    
+
     render(
       <MessageBubble
         message={message}

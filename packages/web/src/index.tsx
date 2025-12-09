@@ -9,9 +9,10 @@ import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
 import { router } from "@app/routes.tsx";
-import { useAppStore, useMessageStore } from "@core/stores";
+import { useDeviceStore } from "@core/stores";
 import { type createRouter, RouterProvider } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { initDatabase, resetConnectionStatuses } from "@db/index";
 
 declare module "@tanstack/react-router" {
   interface Register {
@@ -21,21 +22,26 @@ declare module "@tanstack/react-router" {
 const container = document.getElementById("root") as HTMLElement;
 const root = createRoot(container);
 
+// Initialize database before app starts
+initDatabase()
+  .then(() => resetConnectionStatuses())
+  .catch((error) => {
+    console.error("[App] Failed to initialize database:", error);
+  });
+
 function IndexPage() {
   enableMapSet();
-  const appStore = useAppStore();
-  const messageStore = useMessageStore();
+  const deviceStore = useDeviceStore();
   const translation = useTranslation();
 
   const context = React.useMemo(
     () => ({
       stores: {
-        app: appStore,
-        message: messageStore,
+        device: deviceStore,
       },
       i18n: translation,
     }),
-    [appStore, messageStore, translation],
+    [deviceStore, translation],
   );
 
   return (

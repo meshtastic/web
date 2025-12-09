@@ -14,7 +14,10 @@ import {
   SheetTitle,
 } from "@components/ui/sheet";
 import useLang from "@core/hooks/useLang";
-import { useAppStore, useDevice, useNodeDB } from "@core/stores";
+import { useFavoriteNode } from "@core/hooks/useFavoriteNode";
+import { useIgnoreNode } from "@core/hooks/useIgnoreNode";
+import { useAppStore, useDevice, useDeviceContext } from "@core/stores";
+import { useNodes } from "@db/hooks";
 import { Protobuf } from "@meshtastic/core";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import {
@@ -45,6 +48,7 @@ import { ActionItem } from "../../generic/ActionItem";
 import { ActionToggle } from "../../generic/ActionToggle";
 import { MetricCard } from "./MetricCard";
 import { SectionHeader } from "./SectionHeader";
+import { TelemetryChart } from "./TelemetryChart";
 
 export interface NodeDetailsDrawerProps {
   open: boolean;
@@ -58,28 +62,30 @@ export const NodeDetailsDrawer = ({
   const { nodeNumDetails } = useAppStore();
   const { hardware, setDialogOpen } = useDevice();
   const { current } = useLang();
-
-  const node = useNodeDB((db) => db.getNode(nodeNumDetails));
-  const nodeDB = useNodeDB((db) => db);
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
+  const { updateFavorite } = useFavoriteNode();
+  const { updateIgnored } = useIgnoreNode();
 
   const [noteText, setNoteText] = React.useState("");
+
+  const node = allNodes.find((n) => n.nodeNum === nodeNumDetails);
 
   if (!node) {
     return null;
   }
 
   const shortName =
-    node.user?.shortName ??
-    numberToHexUnpadded(node.num).slice(-4).toUpperCase();
-  const longName = node.user?.longName ?? `Meshtastic ${shortName}`;
-  const userId = node.user?.id ?? "";
+    node.shortName ?? numberToHexUnpadded(node.nodeNum).slice(-4).toUpperCase();
+  const longName = node.longName ?? `Meshtastic ${shortName}`;
+  const userId = node.userId ?? "";
 
   const handleToggleFavorite = () => {
-    nodeDB.updateFavorite(node.num, !node.isFavorite);
+    updateFavorite({ nodeNum: node.nodeNum, isFavorite: !node.isFavorite });
   };
 
   const handleToggleIgnore = () => {
-    nodeDB.updateIgnore(node.num, !node.isIgnored);
+    updateIgnored({ nodeNum: node.nodeNum, isIgnored: !node.isIgnored });
   };
 
   const handleRemoveNode = () => {
@@ -97,19 +103,17 @@ export const NodeDetailsDrawer = ({
     console.log("Save note:", noteText);
   };
 
-  const hasEnvironmentMetrics =
-    node.environmentMetrics &&
-    (node.environmentMetrics.temperature !== undefined ||
-      node.environmentMetrics.relativeHumidity !== undefined ||
-      node.environmentMetrics.barometricPressure !== undefined);
+  // Environment metrics are no longer stored on the node directly
+  // They would be in telemetry logs if needed
+  const hasEnvironmentMetrics = false;
 
   // Get device image based on hardware model
   const getDeviceImage = (): string => {
-    if (!node.user?.hwModel) {
+    if (!node.hwModel) {
       return "/devices/diy.svg";
     }
 
-    const hwModelName = Protobuf.Mesh.HardwareModel[node.user.hwModel]
+    const hwModelName = Protobuf.Mesh.HardwareModel[node.hwModel]
       .toLowerCase()
       .replace(/_/g, "-");
 
@@ -127,14 +131,14 @@ export const NodeDetailsDrawer = ({
             </SheetHeader>
 
             {/* Device Section */}
-            {node.user?.hwModel && (
+            {node.hwModel && (
               <div className="space-y-3">
                 <Card className="bg-muted/20">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center justify-center py-4">
                       <img
                         src={getDeviceImage()}
-                        alt={Protobuf.Mesh.HardwareModel[node.user.hwModel]}
+                        alt={Protobuf.Mesh.HardwareModel[node.hwModel]}
                         className="w-32 h-32 object-contain"
                       />
                     </div>
@@ -146,11 +150,11 @@ export const NodeDetailsDrawer = ({
                           Hardware
                         </div>
                         <Mono className="text-sm">
-                          {Protobuf.Mesh.HardwareModel[node.user.hwModel]}
+                          {Protobuf.Mesh.HardwareModel[node.hwModel]}
                         </Mono>
                       </div>
                     </div>
-                    {node.user.publicKey && node.user.publicKey.length > 0 && (
+                    {node.publicKey && node.publicKey.length > 0 && (
                       <div className="flex items-center gap-2">
                         <Badge
                           variant="outline"
@@ -196,7 +200,7 @@ export const NodeDetailsDrawer = ({
                       <div className="text-sm text-muted-foreground">
                         Node Number
                       </div>
-                      <Mono className="text-sm">{node.num}</Mono>
+                      <Mono className="text-sm">{node.nodeNum}</Mono>
                     </div>
                   </div>
                   {userId && (
@@ -210,7 +214,7 @@ export const NodeDetailsDrawer = ({
                       </div>
                     </div>
                   )}
-                  {node.user.role && (
+                  {node.role && (
                     <div className="p-4 flex items-center gap-3">
                       <SettingsIcon className="h-5 w-5 text-muted-foreground" />
                       <div>
@@ -220,14 +224,14 @@ export const NodeDetailsDrawer = ({
                         <Mono className="text-sm">
                           {
                             Protobuf.Config.Config_DeviceConfig_Role[
-                              "CLIENT_ROLE_" + node.user.role
+                              node.role
                             ]
                           }
                         </Mono>
                       </div>
                     </div>
                   )}
-                  {node.lastHeard > 0 ? (
+                  {node.lastHeard ? (
                     <div className="p-4 flex items-center gap-3">
                       <ClockIcon className="h-5 w-5 text-muted-foreground" />
                       <div>
@@ -236,7 +240,7 @@ export const NodeDetailsDrawer = ({
                         </div>
                         <Mono className="text-sm">
                           <TimeAgo
-                            timestamp={node.lastHeard * 1000}
+                            timestamp={node.lastHeard.getTime()}
                             locale={current?.code}
                           />
                         </Mono>
@@ -317,7 +321,7 @@ export const NodeDetailsDrawer = ({
             </div>
 
             {/* Position Section */}
-            {node.position && (
+            {(node.latitudeI || node.longitudeI) && (
               <div className="space-y-3">
                 <Card className="bg-muted/20">
                   <CardContent className="p-4">
@@ -329,17 +333,17 @@ export const NodeDetailsDrawer = ({
                             Last position update
                           </div>
                           <Mono className="text-sm text-muted-foreground">
-                            {node.lastHeard > 0 && (
+                            {node.lastHeard && (
                               <>
                                 <TimeAgo
-                                  timestamp={node.lastHeard * 1000}
+                                  timestamp={node.lastHeard.getTime()}
                                   locale={current?.code}
                                 />{" "}
                                 •{" "}
                               </>
                             )}
-                            {node.position.latitudeI && node.position.longitudeI
-                              ? `${(node.position.latitudeI / 1e7).toFixed(5)}, ${(node.position.longitudeI / 1e7).toFixed(5)}`
+                            {node.latitudeI && node.longitudeI
+                              ? `${(node.latitudeI / 1e7).toFixed(5)}, ${(node.longitudeI / 1e7).toFixed(5)}`
                               : "Unknown"}
                           </Mono>
                         </div>
@@ -355,6 +359,12 @@ export const NodeDetailsDrawer = ({
                 </Button>
               </div>
             )}
+
+            {/* Telemetry Charts Section */}
+            <div className="space-y-3">
+              <SectionHeader>Telemetry History</SectionHeader>
+              <TelemetryChart nodeNum={node.nodeNum} durationHours={24} />
+            </div>
 
             {/* Logs Section */}
             <div className="space-y-3">
@@ -391,7 +401,7 @@ export const NodeDetailsDrawer = ({
             </div>
 
             {/* Administration Section */}
-            {node.num !== hardware.myNodeNum && (
+            {node.nodeNum !== hardware.myNodeNum && (
               <div className="space-y-3">
                 <SectionHeader>Administration</SectionHeader>
                 <Card className="bg-muted/20">

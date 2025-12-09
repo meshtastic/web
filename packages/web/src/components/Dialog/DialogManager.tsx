@@ -12,10 +12,32 @@ import { RemoveNodeDialog } from "@components/Dialog/RemoveNodeDialog.tsx";
 import { ResetNodeDbDialog } from "@components/Dialog/ResetNodeDbDialog/ResetNodeDbDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
+import { useChannels } from "@db/hooks";
 import { useDevice } from "@core/stores";
+import { toByteArray } from "base64-js";
+import { useMemo } from "react";
 
 export const DialogManager = () => {
-  const { channels, config, dialog, setDialogOpen } = useDevice();
+  const { config, dialog, setDialogOpen, id: deviceId } = useDevice();
+  const { channels: dbChannels } = useChannels(deviceId);
+
+  // Convert DB channels to Map format for QRDialog
+  const channelsMap = useMemo(() => {
+    const map = new Map();
+    for (const ch of dbChannels) {
+      map.set(ch.channelIndex, {
+        index: ch.channelIndex,
+        role: ch.role,
+        settings: {
+          name: ch.name || undefined,
+          psk: ch.psk ? toByteArray(ch.psk) : undefined,
+          uplinkEnabled: ch.uplinkEnabled,
+          downlinkEnabled: ch.downlinkEnabled,
+        },
+      });
+    }
+    return map;
+  }, [dbChannels]);
   return (
     <>
       <QRDialog
@@ -23,7 +45,7 @@ export const DialogManager = () => {
         onOpenChange={(open) => {
           setDialogOpen("QR", open);
         }}
-        channels={channels}
+        channels={channelsMap}
         loraConfig={config.lora}
       />
       {/* <ImportDialog

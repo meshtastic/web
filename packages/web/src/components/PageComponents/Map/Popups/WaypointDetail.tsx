@@ -1,7 +1,8 @@
 import { TimeAgo } from "@components/generic/TimeAgo";
 import { Separator } from "@components/ui/separator.tsx";
+import { useNodes } from "@db/hooks";
 import type { WaypointWithMetadata } from "@core/stores";
-import { useNodeDB } from "@core/stores";
+import { useDeviceContext } from "@core/stores";
 import {
   bearingDegrees,
   distanceMeters,
@@ -29,7 +30,13 @@ interface WaypointDetailProps {
 
 export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
   const { t } = useTranslation("map");
-  const { getNode } = useNodeDB();
+  const { deviceId } = useDeviceContext();
+  const { nodes: allNodes } = useNodes(deviceId);
+
+  // Create getNode function from database nodes
+  const getNode = (nodeNum: number) => {
+    return allNodes.find((n) => n.nodeNum === nodeNum);
+  };
 
   const waypointLngLat = toLngLat({
     latitudeI: waypoint.latitudeI,
@@ -179,8 +186,7 @@ export const WaypointDetail = ({ waypoint, myNode }: WaypointDetailProps) => {
                 <span className="truncate">{t("waypointDetail.lockedTo")}</span>
               </dt>
               <dd className="ms-auto text-right">
-                {getNode(waypoint.lockedTo)?.user?.longName ??
-                  t("unknown.longName")}
+                {getNode(waypoint.lockedTo)?.longName ?? t("unknown.longName")}
               </dd>
             </div>
           )}
