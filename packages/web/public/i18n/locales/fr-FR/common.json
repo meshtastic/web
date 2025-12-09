@@ -52,6 +52,7 @@
       "unknown": "Nombre de sauts inconnu"
     },
     "megahertz": "MHz",
+    "kilohertz": "kHz",
     "raw": "brute",
     "meter": {
       "one": "Mètre",

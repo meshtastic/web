@@ -122,7 +122,7 @@
 		"title": "Netzeinstellungen",
 		"description": "Einstellungen für das LoRa Netz",
 		"bandwidth": {
-			"description": "Kanalbandbreite in MHz",
+			"description": "Kanalbandbreite in kHz",
 			"label": "Bandbreite"
 		},
 		"boostedRxGain": {

@@ -122,7 +122,7 @@
 		"title": "Ajustes de la Red",
 		"description": "Opciones de la malla LoRa",
 		"bandwidth": {
-			"description": "Ancho de banda de canal en MHz",
+			"description": "Ancho de banda de canal en kHz",
 			"label": "Ancho de Banda"
 		},
 		"boostedRxGain": {
