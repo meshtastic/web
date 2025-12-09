@@ -20,6 +20,14 @@ interface MessageBase {
   rxRssi: number;
   viaMqtt: boolean;
   hops: number;
+  // Delivery status fields
+  retryCount: number;
+  maxRetries: number;
+  receivedACK: boolean;
+  ackError: number;
+  ackTimestamp: number;
+  ackSNR: number;
+  realACK: boolean;
 }
 
 interface GenericMessage<T extends MessageType> extends MessageBase {

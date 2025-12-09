@@ -188,12 +188,6 @@
     "label": "Language",
     "changeLanguage": "Change Language"
   },
-  "theme": {
-    "dark": "Dark",
-    "light": "Light",
-    "system": "Automatic",
-    "changeTheme": "Change Color Scheme"
-  },
   "errorPage": {
     "title": "This is a little embarrassing...",
     "description1": "We are really sorry but an error occurred in the web client that caused it to crash.  This is not supposed to happen, and we are working hard to fix it.",

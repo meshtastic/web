@@ -3,7 +3,7 @@ import { FactoryResetDeviceDialog } from "@app/components/Dialog/FactoryResetDev
 import { ClearAllStoresDialog } from "@components/Dialog/ClearAllStoresDialog/ClearAllStoresDialog.tsx";
 import { ClientNotificationDialog } from "@components/Dialog/ClientNotificationDialog/ClientNotificationDialog.tsx";
 import { DeleteMessagesDialog } from "@components/Dialog/DeleteMessagesDialog/DeleteMessagesDialog.tsx";
-import { NodeDetailsDialog } from "@components/Dialog/NodeDetailsDialog/NodeDetailsDialog.tsx";
+import { NodeDetailsDrawer } from "@components/Dialog/NodeDetailsDrawer";
 import { PkiBackupDialog } from "@components/Dialog/PKIBackupDialog.tsx";
 import { QRDialog } from "@components/Dialog/QRDialog.tsx";
 import { RebootDialog } from "@components/Dialog/RebootDialog.tsx";
@@ -57,12 +57,6 @@ export const DialogManager = () => {
           setDialogOpen("pkiBackup", open);
         }}
       />
-      <NodeDetailsDialog
-        open={dialog.nodeDetails}
-        onOpenChange={(open) => {
-          setDialogOpen("nodeDetails", open);
-        }}
-      />
       <UnsafeRolesDialog
         open={dialog.unsafeRoles}
         onOpenChange={(open) => {
@@ -109,6 +103,12 @@ export const DialogManager = () => {
         open={dialog.factoryResetConfig}
         onOpenChange={(open) => {
           setDialogOpen("factoryResetConfig", open);
+        }}
+      />
+      <NodeDetailsDrawer
+        open={dialog.nodeDetails}
+        onOpenChange={(open) => {
+          setDialogOpen("nodeDetails", open);
         }}
       />
     </>

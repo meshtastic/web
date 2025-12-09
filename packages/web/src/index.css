@@ -99,14 +99,14 @@
 
 .dark {
   --background: oklch(0.18 0.01 260);
-  --foreground: oklch(0.98 0 0);
+  --foreground: oklch(0.99 0 0);
   --card: oklch(0.22 0.01 260);
   --card-foreground: oklch(0.98 0 0);
   --popover: oklch(0.20 0.01 260);
   --popover-foreground: oklch(0.98 0 0);
   --primary: oklch(0.75 0.15 180);
   --primary-foreground: oklch(0.12 0 0);
-  --secondary: oklch(0.28 0.01 260);
+  --secondary: oklch(0.5 0.01 260);
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.28 0.01 260);
   --muted-foreground: oklch(0.78 0 0);

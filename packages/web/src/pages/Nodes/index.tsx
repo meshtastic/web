@@ -81,6 +81,25 @@ export interface DeleteNoteDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const SortIcon = ({
+  column,
+  sortOrder,
+  sortColumn,
+}: {
+  column: SortColumn;
+  sortOrder: SortOrder;
+  sortColumn: SortColumn;
+}) => {
+  if (sortColumn !== column) {
+    return null;
+  }
+  return sortOrder === "asc" ? (
+    <ArrowUpIcon className="ml-2 h-4 w-4" />
+  ) : (
+    <ArrowDownIcon className="ml-2 h-4 w-4" />
+  );
+};
+
 const NodesPage = (): JSX.Element => {
   const { t } = useTranslation("nodes");
   const { current } = useLang();
@@ -421,15 +440,6 @@ const NodesPage = (): JSX.Element => {
     });
   }, [filteredNodes, sortColumn, sortOrder]);
 
-  const SortIcon = ({ column }: { column: SortColumn }) => {
-    if (sortColumn !== column) return null;
-    return sortOrder === "asc" ? (
-      <ArrowUpIcon className="ml-2 h-4 w-4" />
-    ) : (
-      <ArrowDownIcon className="ml-2 h-4 w-4" />
-    );
-  };
-
   return (
     <div className="p-6 w-full space-y-6">
       <div>
@@ -612,11 +622,18 @@ const NodesPage = (): JSX.Element => {
                 >
                   <div className="flex items-center">
                     {t("nodesTable.headings.longName")}
-                    <SortIcon column="longName" />
+                    <SortIcon
+                      column="longName"
+                      sortOrder={sortOrder}
+                      sortColumn={sortColumn}
+                    />
                   </div>
                 </TableHead>
                 {columnOrder.map((columnKey) => {
-                  if (!columnVisibility[columnKey]) return null;
+                  if (!columnVisibility[columnKey]) {
+                    return null;
+                  }
+
                   const column = columnConfig[columnKey];
 
                   return (
@@ -641,7 +658,11 @@ const NodesPage = (): JSX.Element => {
                         <GripVertical className="h-4 w-4 text-muted-foreground opacity-60 hover:opacity-100" />
                         <span>{column.label}</span>
                         {column.sortable && column.sortKey && (
-                          <SortIcon column={column.sortKey} />
+                          <SortIcon
+                            column={column.sortKey}
+                            sortOrder={sortOrder}
+                            sortColumn={sortColumn}
+                          />
                         )}
                       </div>
                     </TableHead>
@@ -699,7 +720,9 @@ const NodesPage = (): JSX.Element => {
                         </button>
                       </TableCell>
                       {columnOrder.map((columnKey) => {
-                        if (!columnVisibility[columnKey]) return null;
+                        if (!columnVisibility[columnKey]) {
+                          return null;
+                        }
                         const column = columnConfig[columnKey];
                         return (
                           <TableCell key={columnKey}>

@@ -12,24 +12,6 @@ export {
   type DeviceContext,
   useDeviceContext,
 } from "@core/hooks/useDeviceContext";
-export {
-  useAppStore,
-  useUIStore,
-  usePreferencesStore,
-} from "@core/stores/uiStore/index.ts";
-export type {
-  AppState,
-  UIState,
-  PreferencesState,
-  Theme,
-  Language,
-  TimeFormat,
-  DistanceUnits,
-  CoordinateFormat,
-  MapStyle,
-  RasterSource,
-  NodeColumnKey,
-} from "@core/stores/uiStore/index.ts";
 export { type Device, useDeviceStore } from "@core/stores/deviceStore/index.ts";
 export {
   useActiveConnection,
@@ -58,19 +40,36 @@ export {
   type MessageStore,
   MessageType,
   useMessageStore,
-  useMessageStoreHydrated,
 } from "@core/stores/messageStore";
+export {
+  autoFavoriteDMHandler,
+  loggingHandler,
+} from "@core/stores/messageStore/pipelineHandlers";
 export type {
   OutgoingMessage,
   PipelineContext,
   PipelineHandler,
 } from "@core/stores/messageStore/types";
-export {
-  autoFavoriteDMHandler,
-  loggingHandler,
-} from "@core/stores/messageStore/pipelineHandlers";
 export { type NodeDB, useNodeDBStore } from "@core/stores/nodeDBStore/index.ts";
 export type { NodeErrorType } from "@core/stores/nodeDBStore/types.ts";
+export type {
+  AppState,
+  CoordinateFormat,
+  DistanceUnits,
+  Language,
+  MapStyle,
+  NodeColumnKey,
+  PreferencesState,
+  RasterSource,
+  Theme,
+  TimeFormat,
+  UIState,
+} from "@core/stores/uiStore/index.ts";
+export {
+  useAppStore,
+  usePreferencesStore,
+  useUIStore,
+} from "@core/stores/uiStore/index.ts";
 
 // Re-export idb-keyval functions for clearing allstores, expand this if we add more local storage types
 export { clear as clearAllStores } from "idb-keyval";

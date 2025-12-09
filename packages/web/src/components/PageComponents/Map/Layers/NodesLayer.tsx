@@ -9,7 +9,6 @@ import {
 } from "@components/PageComponents/Map/Layers/PrecisionLayer.tsx";
 import { NodeMarker } from "@components/PageComponents/Map/Markers/NodeMarker.tsx";
 import { StackBadge } from "@components/PageComponents/Map/Markers/StackBadge.tsx";
-import { NodeDetail } from "@components/PageComponents/Map/Popups/NodeDetail.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { PopupWrapper } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting";
@@ -148,7 +147,7 @@ export const NodesLayer = ({
         offset={popupState?.type === "node" ? popupState.offset : [0, 0]}
         onClose={() => setPopupState(undefined)}
       >
-        <NodeDetail node={selectedNode} />
+        <span>TODO</span>
       </PopupWrapper>,
     );
   }

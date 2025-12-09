@@ -21,20 +21,26 @@
 
   "deliveryStatus": {
     "delivered": {
-      "label": "Message delivered",
-      "displayText": "Message delivered"
+      "text": "Delivered"
     },
-    "failed": {
-      "label": "Message delivery failed",
-      "displayText": "Delivery failed"
-    },
-    "unknown": {
-      "label": "Message status unknown",
-      "displayText": "Unknown state"
+    "ack": {
+      "delivered": "Delivered",
+      "acknowledged": "Acknowledged"
     },
     "waiting": {
-      "label": "Sending message",
-      "displayText": "Waiting for delivery"
+      "text": "Waiting"
+    },
+    "sending": {
+      "text": "Sending"
+    },
+    "sent": {
+      "text": "Sent"
+    },
+    "failed": {
+      "text": "Failed {{error}}"
+    },
+    "unknown": {
+      "text": "Unknown"
     }
   }
 }

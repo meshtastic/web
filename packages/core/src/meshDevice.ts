@@ -1001,6 +1001,15 @@ export class MeshDevice {
               });
             }
 
+            // Update message store with ACK information
+            this.updateMessageACK(dataPacket.requestId, {
+              receivedACK: true,
+              ackError: routingPacket.variant.value,
+              ackTimestamp: meshPacket.rxTime || Date.now(),
+              ackSNR: meshPacket.rxSnr || 0,
+              realACK: meshPacket.to === this.myNodeInfo.myNodeNum,
+            });
+
             break;
           }
           case "routeReply": {
@@ -1244,5 +1253,45 @@ export class MeshDevice {
       default:
         throw new Error(`Unhandled case ${dataPacket.portnum}`);
     }
+  }
+
+  /**
+   * Update message store with ACK information from routing packet
+   */
+  private updateMessageACK(
+    messageId: number,
+    ackInfo: {
+      receivedACK: boolean;
+      ackError: number;
+      ackTimestamp: number;
+      ackSNR: number;
+      realACK: boolean;
+    }
+  ): void {
+    // This will be handled by the web layer through event system
+    // For now, just log the ACK information
+    this.log.debug(
+      Emitter[Emitter.HandleMeshPacket],
+      `📨 ACK received for message ${messageId}:`,
+      ackInfo
+    );
+
+    // Dispatch event for web layer to handle
+    this.events.onRoutingPacket.dispatch({
+      id: messageId,
+      rxTime: new Date(ackInfo.ackTimestamp * 1000),
+      type: "direct",
+      from: 0, // Not applicable for ACK
+      to: this.myNodeInfo.myNodeNum,
+      channel: 0,
+      hops: 0,
+      rxRssi: 0,
+      rxSnr: ackInfo.ackSNR,
+      viaMqtt: false,
+      data: {
+        messageId,
+        ...ackInfo,
+      },
+    });
   }
 }

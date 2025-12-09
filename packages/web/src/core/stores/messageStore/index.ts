@@ -4,6 +4,8 @@ import type {
   ClearMessageParams,
   ConversationId,
   GetMessagesParams,
+  LastReadMap,
+  MarkAsReadParams,
   Message,
   MessageId,
   MessageLogMap,
@@ -27,8 +29,10 @@ const MESSAGESTORE_RETENTION_NUM = 10;
 const MESSAGELOG_RETENTION_NUM = 1000; // Max messages per conversation/channel
 
 export enum MessageState {
-  Ack = "ack",
   Waiting = "waiting",
+  Sending = "sending",
+  Sent = "sent",
+  Ack = "ack",
   Failed = "failed",
 }
 
@@ -71,6 +75,8 @@ export interface MessageStore extends MessageStoreData {
   saveMessage: (message: Message) => void;
   setMessageState: (params: SetMessageStateParams) => void;
   getMessages: (params: GetMessagesParams) => Message[];
+  getMessage: (messageId: MessageId) => Message | undefined;
+  retryMessage: (messageId: MessageId) => Promise<void>;
 
   getDraft: (key: Types.Destination) => string;
   setDraft: (key: Types.Destination, message: string) => void;
@@ -97,8 +103,8 @@ export interface MessageStoreState {
   removeMessageStore: (id: number) => void;
   getMessageStore: (id: number) => MessageStore | undefined;
   getMessageStores: () => MessageStore[];
-  _hasHydrated: boolean;
 }
+
 interface PrivateMessageStoreState extends MessageStoreState {
   messageStores: Map<number, MessageStore>;
 }
@@ -521,7 +527,9 @@ function messageStoreFactory(
 
           const deleted = state.pipelineHandlers.delete(name);
           if (deleted) {
-            console.log(`[MessageStore] Unregistered pipeline handler: ${name}`);
+            console.log(
+              `[MessageStore] Unregistered pipeline handler: ${name}`,
+            );
           }
         }),
       );
@@ -546,12 +554,103 @@ function messageStoreFactory(
       for (const [name, handler] of state.pipelineHandlers) {
         try {
           await handler(message, context);
-          console.log(`[MessageStore] Pipeline handler ${name} executed successfully`);
+          console.log(
+            `[MessageStore] Pipeline handler ${name} executed successfully`,
+          );
         } catch (error) {
-          console.error(`[MessageStore] Pipeline handler ${name} failed:`, error);
+          console.error(
+            `[MessageStore] Pipeline handler ${name} failed:`,
+            error,
+          );
           // Continue processing other handlers even if one fails
         }
       }
+    },
+
+    getMessage: (messageId: MessageId): Message | undefined => {
+      const state = get().messageStores.get(id);
+      if (!state) {
+        return undefined;
+      }
+
+      // Search through all message logs for this message ID
+      for (const messageLog of state.messages.direct.values()) {
+        const message = messageLog.get(messageId);
+        if (message) {
+          return message;
+        }
+      }
+      for (const messageLog of state.messages.broadcast.values()) {
+        const message = messageLog.get(messageId);
+        if (message) {
+          return message;
+        }
+      }
+      return undefined;
+    },
+
+    retryMessage: async (messageId: MessageId) => {
+      const state = get().messageStores.get(id);
+      if (!state) {
+        throw new Error(`No MessageStore found for id: ${id}`);
+      }
+
+      const message = state.getMessage(messageId);
+      if (!message) {
+        throw new Error(`Message ${messageId} not found`);
+      }
+
+      if (message.state !== MessageState.Failed) {
+        console.warn(
+          `[MessageStore] Cannot retry message ${messageId}: not in failed state`,
+        );
+        return;
+      }
+
+      if (message.retryCount >= message.maxRetries) {
+        console.warn(
+          `[MessageStore] Cannot retry message ${messageId}: max retries reached`,
+        );
+        return;
+      }
+
+      // Update retry count and reset state
+      set(
+        produce<PrivateMessageStoreState>((draft) => {
+          const store = draft.messageStores.get(id);
+          if (!store) {
+            return;
+          }
+
+          // Find and update the message
+          for (const messageLog of store.messages.direct.values()) {
+            const msg = messageLog.get(messageId);
+            if (msg) {
+              msg.retryCount += 1;
+              msg.state = MessageState.Waiting;
+              return;
+            }
+          }
+          for (const messageLog of store.messages.broadcast.values()) {
+            const msg = messageLog.get(messageId);
+            if (msg) {
+              msg.retryCount += 1;
+              msg.state = MessageState.Waiting;
+              return;
+            }
+          }
+        }),
+      );
+
+      // Reprocess the message through the pipeline
+      const outgoingMessage: OutgoingMessage = {
+        text: message.message,
+        to: message.to === 0 ? "broadcast" : message.to,
+        channelId: message.channel,
+        wantAck: true,
+      };
+
+      await state.processOutgoingMessage(outgoingMessage);
     },
   };
 }
@@ -561,7 +660,6 @@ export const messageStoreInitializer: StateCreator<PrivateMessageStoreState> = (
   get,
 ) => ({
   messageStores: new Map(),
-  _hasHydrated: false,
 
   addMessageStore: (id) => {
     const existing = get().messageStores.get(id);
@@ -615,24 +713,12 @@ const persistOptions: PersistOptions<
   }),
   onRehydrateStorage: () => {
     console.log("[MessageStore] onRehydrateStorage: Starting rehydration");
-    return async (state) => {
+    return async () => {
       // Add a small delay in dev mode to make the spinner visible
       const isDev = import.meta.env?.DEV;
       if (isDev) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
-
-      if (!state) {
-        console.log("[MessageStore] onRehydrateStorage: No state, setting hydrated to true");
-        useMessageStore.setState({ _hasHydrated: true });
-        return;
-      }
-      console.debug(
-        "MessageStoreStore: Rehydrating state with ",
-        state.messageStores.size,
-        " MessageStores -",
-        state.messageStores,
-      );
 
       useMessageStore.setState(
         produce<PrivateMessageStoreState>((draft) => {
@@ -654,10 +740,11 @@ const persistOptions: PersistOptions<
             }
           }
           draft.messageStores = rebuilt;
-          draft._hasHydrated = true;
         }),
       );
-      console.log("[MessageStore] onRehydrateStorage: Complete, hydrated set to true");
+      console.log(
+        "[MessageStore] onRehydrateStorage: Complete, hydrated set to true",
+      );
     };
   },
 };
@@ -675,13 +762,3 @@ export const useMessageStore = isPersistEnabled()
       [["zustand/persist", MessageStorePersisted]]
     >(persist(messageStoreInitializer, persistOptions))
   : createStore<PrivateMessageStoreState>()(messageStoreInitializer);
-
-// Hook to check if the message store has finished hydrating from IndexedDB
-export const useMessageStoreHydrated = (): boolean => {
-  // If persistence is disabled, we're always "hydrated"
-  if (!isPersistEnabled()) {
-    return true;
-  }
-
-  return useMessageStore((state) => state._hasHydrated);
-};

@@ -1,10 +1,17 @@
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@components/ui/tooltip";
 import type { Device } from "@core/stores/deviceStore";
 import type { MessageStore } from "@core/stores/messageStore";
 import { MessageState, MessageType } from "@core/stores/messageStore";
-import type { Contact } from "@pages/Messages";
 import type { Types } from "@meshtastic/core";
+import type { Contact } from "@pages/Messages";
+import { Label } from "@radix-ui/react-label";
 import { ArrowUp } from "lucide-react";
 import { useState } from "react";
 
@@ -96,7 +103,7 @@ export const MessageInput = ({
         if (isBroadcast) {
           messages.setMessageState({
             type: MessageType.Broadcast,
-            channelId: channelValue,
+            channelId: channelValue as Types.ChannelNumber,
             messageId,
             newState: MessageState.Ack,
           });
@@ -138,9 +145,27 @@ export const MessageInput = ({
             {messageBytes[selectedContact.id] || 0}/{MAX_MESSAGE_BYTES}
           </span>
         </div>
-        <Button size="icon" type="submit" className="rounded-full">
-          <ArrowUp className="h-5 w-5" />
-        </Button>
+        {/** biome-ignore lint/correctness/useUniqueElementIds: this improves the accessability of the element */}
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                type="submit"
+                className="rounded-full"
+                id="send-message"
+              >
+                <ArrowUp className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-slate-800 dark:bg-slate-600 text-white px-2 py-1 rounded text-xs">
+              Send message
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <Label htmlFor="send-message" className="sr-only">
+          Send
+        </Label>
       </form>
     </div>
   );

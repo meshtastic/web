@@ -3,6 +3,7 @@ import { Protobuf } from "@meshtastic/core";
 import { act, render, screen } from "@testing-library/react";
 import { toByteArray } from "base64-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NodeDB } from "./NodeDBImpl";
 
 const idbMem = new Map<string, string>();
 vi.mock("idb-keyval", () => ({
@@ -559,5 +560,94 @@ describe("NodeDB deviceContext & debounce", () => {
     expect(renders).toBe(2); // single coalesced re-render
 
     vi.useRealTimers();
+  });
+
+  describe("New interface methods - upsertNode and updateNode", () => {
+    let nodeDB: NodeDB;
+
+    beforeEach(() => {
+      nodeDB = new NodeDB();
+    });
+
+    it("should upsertNode create new node when none exists", () => {
+      const testNode = create(Protobuf.Mesh.NodeInfoSchema, {
+        num: 123,
+        user: create(Protobuf.Mesh.UserSchema, {
+          longName: "Test Node",
+          shortName: "TN",
+        }),
+      });
+
+      nodeDB.upsert(123, testNode);
+
+      const retrieved = nodeDB.get(123);
+      expect(retrieved).toBeDefined();
+      expect(retrieved?.num).toBe(123);
+      expect(retrieved?.user?.longName).toBe("Test Node");
+    });
+
+    it("should upsertNode merge with existing node", () => {
+      const originalNode = create(Protobuf.Mesh.NodeInfoSchema, {
+        num: 123,
+        user: create(Protobuf.Mesh.UserSchema, {
+          longName: "Original",
+          shortName: "ORIG",
+        }),
+        lastHeard: 1000,
+      });
+
+      const updatedNode = create(Protobuf.Mesh.NodeInfoSchema, {
+        num: 123,
+        user: create(Protobuf.Mesh.UserSchema, {
+          longName: "Updated",
+          // shortName missing - should preserve
+        }),
+        lastHeard: 2000,
+      });
+
+      nodeDB.upsert(123, originalNode);
+      nodeDB.upsert(123, updatedNode);
+
+      const retrieved = nodeDB.get(123);
+      expect(retrieved).toBeDefined();
+      expect(retrieved?.user?.longName).toBe("Updated"); // Updated
+      expect(retrieved?.user?.shortName).toBe("ORIG"); // Preserved
+      expect(retrieved?.lastHeard).toBe(2000); // Updated
+    });
+
+    it("should updateNode modify existing node", () => {
+      const testNode = create(Protobuf.Mesh.NodeInfoSchema, {
+        num: 123,
+        user: create(Protobuf.Mesh.UserSchema, {
+          longName: "Original",
+          shortName: "ORIG",
+        }),
+        lastHeard: 1000,
+      });
+
+      nodeDB.set(123, testNode);
+
+      nodeDB.updateNode(123, {
+        user: create(Protobuf.Mesh.UserSchema, {
+          longName: "Updated",
+          shortName: "UPD",
+        }),
+        lastHeard: 2000,
+      });
+
+      const retrieved = nodeDB.get(123);
+      expect(retrieved).toBeDefined();
+      expect(retrieved?.user?.longName).toBe("Updated");
+      expect(retrieved?.user?.shortName).toBe("UPD");
+      expect(retrieved?.lastHeard).toBe(2000);
+    });
+
+    it("should updateNode throw error for non-existent node", () => {
+      expect(() => {
+        nodeDB.updateNode(999, {
+          user: create(Protobuf.Mesh.UserSchema, { longName: "Test" }),
+        });
+      }).toThrow("Node 999 not found for update");
+    });
   });
 });

@@ -1,0 +1,493 @@
+import { NodeAvatar } from "@app/components/NodeAvatar";
+import { Mono } from "@components/generic/Mono";
+import { TimeAgo } from "@components/generic/TimeAgo";
+import { Badge } from "@components/ui/badge";
+import { Button } from "@components/ui/button";
+import { Card, CardContent } from "@components/ui/card";
+import { ScrollArea } from "@components/ui/scroll-area";
+import { Separator } from "@components/ui/separator";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@components/ui/sheet";
+import useLang from "@core/hooks/useLang";
+import { useAppStore, useDevice, useNodeDB } from "@core/stores";
+import { Protobuf } from "@meshtastic/core";
+import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
+import {
+  BatteryIcon,
+  ChevronRightIcon,
+  ClockIcon,
+  DropletIcon,
+  FlameIcon,
+  GaugeIcon,
+  LightbulbIcon,
+  MapPinIcon,
+  MessageSquareIcon,
+  QrCodeIcon,
+  RouteIcon,
+  SettingsIcon,
+  StarIcon,
+  ThermometerIcon,
+  TrashIcon,
+  UserIcon,
+  VolumeXIcon,
+  WindIcon,
+  ZapIcon,
+} from "lucide-react";
+import { ActionItem } from "../../generic/ActionItem";
+import { ActionToggle } from "../../generic/ActionToggle";
+import { MetricCard } from "./MetricCard";
+import { SectionHeader } from "./SectionHeader";
+
+export interface NodeDetailsDrawerProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export const NodeDetailsDrawer = ({
+  open,
+  onOpenChange,
+}: NodeDetailsDrawerProps) => {
+  const { nodeNumDetails } = useAppStore();
+  const { hardware, setDialogOpen } = useDevice();
+  const { current } = useLang();
+
+  const node = useNodeDB((db) => db.getNode(nodeNumDetails));
+  const nodeDB = useNodeDB((db) => db);
+
+  if (!node) {
+    return null;
+  }
+
+  const shortName =
+    node.user?.shortName ??
+    numberToHexUnpadded(node.num).slice(-4).toUpperCase();
+  const longName = node.user?.longName ?? `Meshtastic ${shortName}`;
+  const userId = node.user?.id ?? "";
+
+  const handleToggleFavorite = () => {
+    nodeDB.updateFavorite(node.num, !node.isFavorite);
+  };
+
+  const handleToggleIgnore = () => {
+    nodeDB.updateIgnore(node.num, !node.isIgnored);
+  };
+
+  const handleRemoveNode = () => {
+    setDialogOpen("nodeRemoval", true);
+    onOpenChange(false);
+  };
+
+  const handleDirectMessage = () => {
+    // Navigate to messages page with this node selected
+    // TODO: Implement navigation
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="w-full sm:max-w-xl p-0">
+        <ScrollArea className="h-full">
+          <div className="p-6 space-y-6">
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-3">
+                <NodeAvatar
+                  nodeNum={node.num}
+                  showFavorite={node.isFavorite}
+                  size="lg"
+                  clickable={false}
+                />
+                <div className="flex flex-col items-start">
+                  <span>{longName}</span>
+                  {node.user?.role && (
+                    <Badge variant="secondary" className="mt-1">
+                      {Protobuf.Config.Config_DeviceConfig_Role[node.user.role]}
+                    </Badge>
+                  )}
+                </div>
+              </SheetTitle>
+            </SheetHeader>
+
+            {/* Position Section */}
+            {node.position && (
+              <div className="space-y-3">
+                <Card className="bg-muted/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        <MapPinIcon className="h-5 w-5 text-muted-foreground mt-0.5" />
+                        <div>
+                          <div className="font-medium">
+                            Last position update
+                          </div>
+                          <Mono className="text-sm text-muted-foreground">
+                            {node.lastHeard > 0 && (
+                              <>
+                                <TimeAgo
+                                  timestamp={node.lastHeard * 1000}
+                                  locale={current?.code}
+                                />{" "}
+                                •{" "}
+                              </>
+                            )}
+                            {node.position.latitudeI && node.position.longitudeI
+                              ? `${(node.position.latitudeI / 1e7).toFixed(5)}, ${(node.position.longitudeI / 1e7).toFixed(5)}`
+                              : "Unknown"}
+                          </Mono>
+                        </div>
+                      </div>
+                      <ChevronRightIcon className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Button variant="outline" className="w-full" size="sm">
+                  <MapPinIcon className="mr-2 h-4 w-4" />
+                  Exchange position
+                </Button>
+              </div>
+            )}
+
+            {/* Last Heard Section */}
+            {node.lastHeard > 0 && (
+              <Card className="bg-muted/20">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <ClockIcon className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <div className="font-medium">Last heard</div>
+                      <Mono className="text-sm text-muted-foreground">
+                        <TimeAgo
+                          timestamp={node.lastHeard * 1000}
+                          locale={current?.code}
+                        />
+                      </Mono>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Environment Metrics */}
+            {node.user.deviceMetrics.&& (
+              <div className="space-y-3">
+                <SectionHeader>Environment</SectionHeader>
+                <div className="grid grid-cols-3 gap-3">
+                  {node.environmentMetrics.temperature !== undefined && (
+                    <MetricCard
+                      icon={ThermometerIcon}
+                      label="Temperature"
+                      value={`${node.environmentMetrics.temperature.toFixed(1)}°C`}
+                    />
+                  )}
+                  {node.environmentMetrics.relativeHumidity !== undefined && (
+                    <MetricCard
+                      icon={DropletIcon}
+                      label="Humidity"
+                      value={`${node.environmentMetrics.relativeHumidity.toFixed(0)}%`}
+                    />
+                  )}
+                  {node.environmentMetrics.barometricPressure !== undefined && (
+                    <MetricCard
+                      icon={GaugeIcon}
+                      label="Pressure"
+                      value={`${node.environmentMetrics.barometricPressure.toFixed(0)} hPa`}
+                    />
+                  )}
+                  {node.environmentMetrics.gasResistance !== undefined && (
+                    <MetricCard
+                      icon={WindIcon}
+                      label="Gas Resistance"
+                      value={`${node.environmentMetrics.gasResistance.toFixed(0)} MΩ`}
+                    />
+                  )}
+                  {node.environmentMetrics.iaq !== undefined && (
+                    <MetricCard
+                      icon={WindIcon}
+                      label="IAQ"
+                      value={`${node.environmentMetrics.iaq}`}
+                    />
+                  )}
+                  {node.environmentMetrics.lux !== undefined && (
+                    <MetricCard
+                      icon={LightbulbIcon}
+                      label="Lux"
+                      value={`${node.environmentMetrics.lux} lx`}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Power Metrics */}
+            {node.deviceMetrics && (
+              <div className="space-y-3">
+                <SectionHeader>Power</SectionHeader>
+                <div className="grid grid-cols-3 gap-3">
+                  {node.deviceMetrics.voltage !== undefined &&
+                    node.deviceMetrics.voltage > 0 && (
+                      <MetricCard
+                        icon={ZapIcon}
+                        label="Voltage"
+                        value={`${node.deviceMetrics.voltage.toFixed(2)}V`}
+                      />
+                    )}
+                  {node.deviceMetrics.current !== undefined &&
+                    node.deviceMetrics.current !== 0 && (
+                      <MetricCard
+                        icon={BatteryIcon}
+                        label="Current"
+                        value={`${node.deviceMetrics.current.toFixed(1)}mA`}
+                      />
+                    )}
+                  {node.deviceMetrics.batteryLevel !== undefined &&
+                    node.deviceMetrics.batteryLevel > 0 && (
+                      <MetricCard
+                        icon={BatteryIcon}
+                        label="Battery"
+                        value={`${node.deviceMetrics.batteryLevel}%`}
+                      />
+                    )}
+                </div>
+              </div>
+            )}
+
+            <Separator />
+
+            {/* Actions Section */}
+            <div className="space-y-3">
+              <SectionHeader>Actions</SectionHeader>
+              <Card className="bg-muted/20">
+                <CardContent className="p-0 divide-y">
+                  <ActionItem
+                    icon={QrCodeIcon}
+                    label="Share Contact"
+                    showChevron
+                  />
+                  <ActionItem
+                    icon={MessageSquareIcon}
+                    label="Direct Message"
+                    onClick={handleDirectMessage}
+                    showChevron
+                  />
+                  <ActionItem
+                    icon={UserIcon}
+                    label="Exchange user info"
+                    showChevron
+                  />
+                  <ActionItem icon={RouteIcon} label="Traceroute" showChevron />
+                  <ActionToggle
+                    icon={StarIcon}
+                    label="Favorite"
+                    checked={node.isFavorite ?? false}
+                    onCheckedChange={handleToggleFavorite}
+                  />
+                  <ActionToggle
+                    icon={VolumeXIcon}
+                    label="Ignore"
+                    checked={node.isIgnored ?? false}
+                    onCheckedChange={handleToggleIgnore}
+                  />
+                  <ActionItem
+                    icon={TrashIcon}
+                    label="Remove"
+                    onClick={handleRemoveNode}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Device Section */}
+            {node.user?.hwModel && (
+              <div className="space-y-3">
+                <SectionHeader>Device</SectionHeader>
+                <Card className="bg-muted/20">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center justify-center py-4">
+                      <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center">
+                        <NodeAvatar
+                          nodeNum={node.num}
+                          size="lg"
+                          clickable={false}
+                        />
+                      </div>
+                    </div>
+                    <Separator />
+                    <div className="flex items-center gap-3">
+                      <SettingsIcon className="h-5 w-5 text-muted-foreground" />
+                      <div className="flex-1">
+                        <div className="text-sm text-muted-foreground">
+                          Hardware
+                        </div>
+                        <Mono className="text-sm">
+                          {Protobuf.Mesh.HardwareModel[node.user.hwModel]}
+                        </Mono>
+                      </div>
+                    </div>
+                    {node.user.publicKey && node.user.publicKey.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className="text-green-600 border-green-600"
+                        >
+                          Supported
+                        </Badge>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Details Section */}
+            <div className="space-y-3">
+              <SectionHeader>Details</SectionHeader>
+              <Card className="bg-muted/20">
+                <CardContent className="p-0 divide-y">
+                  <div className="p-4 flex items-center gap-3">
+                    <UserIcon className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <div className="text-sm text-muted-foreground">
+                        Long Name
+                      </div>
+                      <Mono className="text-sm">{longName}</Mono>
+                    </div>
+                  </div>
+                  <div className="p-4 flex items-center gap-3">
+                    <UserIcon className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <div className="text-sm text-muted-foreground">
+                        Short Name
+                      </div>
+                      <Mono className="text-sm">{shortName}</Mono>
+                    </div>
+                  </div>
+                  <div className="p-4 flex items-center gap-3">
+                    <span className="h-5 w-5 flex items-center justify-center text-muted-foreground font-mono">
+                      #
+                    </span>
+                    <div>
+                      <div className="text-sm text-muted-foreground">
+                        Node Number
+                      </div>
+                      <Mono className="text-sm">{node.num}</Mono>
+                    </div>
+                  </div>
+                  {userId && (
+                    <div className="p-4 flex items-center gap-3">
+                      <UserIcon className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <div className="text-sm text-muted-foreground">
+                          User ID
+                        </div>
+                        <Mono className="text-sm">{userId}</Mono>
+                      </div>
+                    </div>
+                  )}
+                  {node.user?.role && (
+                    <div className="p-4 flex items-center gap-3">
+                      <SettingsIcon className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <div className="text-sm text-muted-foreground">
+                          Device Role
+                        </div>
+                        <Mono className="text-sm">
+                          {
+                            Protobuf.Config.Config_DeviceConfig_Role[
+                              node.user.role
+                            ]
+                          }
+                        </Mono>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Connection Info */}
+            <div className="space-y-3">
+              <SectionHeader>Connection</SectionHeader>
+              <Card className="bg-muted/20">
+                <CardContent className="p-0 divide-y">
+                  <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <RouteIcon className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <div className="text-sm text-muted-foreground">
+                          Hops Away
+                        </div>
+                        <Mono className="text-sm">
+                          {node.hopsAway !== undefined
+                            ? node.viaMqtt === false && node.hopsAway === 0
+                              ? "Direct"
+                              : `${node.hopsAway}`
+                            : "Unknown"}
+                        </Mono>
+                      </div>
+                    </div>
+                    {node.viaMqtt && <Badge variant="secondary">MQTT</Badge>}
+                  </div>
+                  {node.snr !== undefined && (
+                    <div className="p-4 flex items-center gap-3">
+                      <FlameIcon className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <div className="text-sm text-muted-foreground">SNR</div>
+                        <Mono className="text-sm">
+                          {node.snr.toFixed(2)} dB
+                        </Mono>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Logs Section */}
+            <div className="space-y-3">
+              <SectionHeader>Logs</SectionHeader>
+              <Card className="bg-muted/20">
+                <CardContent className="p-0 divide-y">
+                  <ActionItem
+                    icon={ZapIcon}
+                    label="Device Metrics Log"
+                    showChevron
+                  />
+                  <ActionItem
+                    icon={ThermometerIcon}
+                    label="Environment Metrics Log"
+                    showChevron
+                  />
+                  <ActionItem
+                    icon={BatteryIcon}
+                    label="Power Metrics Log"
+                    showChevron
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Administration Section */}
+            {node.num !== hardware.myNodeNum && (
+              <div className="space-y-3">
+                <SectionHeader>Administration</SectionHeader>
+                <Card className="bg-muted/20">
+                  <CardContent className="p-0 divide-y">
+                    <ActionItem icon={SettingsIcon} label="Request Metadata" />
+                    <ActionItem
+                      icon={SettingsIcon}
+                      label="Remote Administration"
+                      showChevron
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </SheetContent>
+    </Sheet>
+  );
+};
