@@ -8,6 +8,7 @@ const sizeClasses = {
   sm: "h-4 w-4",
   md: "h-8 w-8",
   lg: "h-12 w-12",
+  xl: "h-24 w-24",
 };
 
 export function Spinner({ className, size = "md", ...props }: SpinnerProps) {
@@ -20,7 +21,10 @@ export function Spinner({ className, size = "md", ...props }: SpinnerProps) {
       {...props}
     >
       <svg
-        className={cn("animate-spin-slow stroke-current", sizeClasses[size])}
+        className={cn(
+          "animate-spin [animation-duration:4s] stroke-current",
+          sizeClasses[size],
+        )}
         role="img"
         aria-label="Loading spinner"
         viewBox="0 0 256 256"

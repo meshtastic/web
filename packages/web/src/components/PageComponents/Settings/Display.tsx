@@ -1,37 +1,30 @@
-import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
+import { useConfigForm } from "@app/pages/Settings/hooks/useConfigForm";
 import {
   type DisplayValidation,
   DisplayValidationSchema,
-} from "@app/validation/config/display.ts";
+} from "@app/validation/config/display";
 import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
-import {
-  createFieldMetadata,
-  useFieldRegistry,
-} from "@core/services/fieldRegistry";
-import { useDevice } from "@core/stores";
+  ConfigFormFields,
+  type FieldGroup,
+} from "@components/Form/ConfigFormFields";
 import { Protobuf } from "@meshtastic/core";
-import { useEffect } from "react";
+import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useTranslation } from "react-i18next";
 
-interface DisplayConfigProps {
-  onFormInit: DynamicFormFormInit<DisplayValidation>;
-}
-export const Display = ({ onFormInit }: DisplayConfigProps) => {
-  useWaitForConfig({ configCase: "display" });
-  const { config, getEffectiveConfig } = useDevice();
-  const {
-    registerFields,
-    trackChange,
-    removeChange: removeFieldChange,
-  } = useFieldRegistry();
+export const Display = () => {
   const { t } = useTranslation("config");
+  const { form, isReady, isDisabledByField } = useConfigForm<DisplayValidation>(
+    {
+      configType: "display",
+      schema: DisplayValidationSchema,
+    },
+  );
 
-  const section = { type: "config", variant: "display" } as const;
+  if (!isReady) {
+    return <ConfigFormSkeleton />;
+  }
 
-  const fieldGroups = [
+  const fieldGroups: FieldGroup<DisplayValidation>[] = [
     {
       label: t("display.title"),
       description: t("display.description"),
@@ -45,10 +38,6 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
             suffix: t("unit.second.plural"),
           },
         },
-        // TODO: This field is deprecated since protobufs 2.7.4 and only has UNUSED=0 value.
-        // GPS format has been moved to DeviceUIConfig.gps_format with proper enum values (DEC, DMS, UTM, MGRS, OLC, OSGR, MLS).
-        // This should be removed once DeviceUI settings are implemented.
-        // See: packages/protobufs/meshtastic/device_ui.proto
         {
           type: "select",
           name: "gpsFormat",
@@ -132,41 +121,11 @@ export const Display = ({ onFormInit }: DisplayConfigProps) => {
     },
   ];
 
-  // Register fields on mount
-  useEffect(() => {
-    const metadata = createFieldMetadata(section, fieldGroups);
-    registerFields(section, metadata);
-  }, [registerFields, fieldGroups, section]);
-
-  const onSubmit = (data: DisplayValidation) => {
-    // Track individual field changes
-    const originalData = config.display;
-    if (!originalData) {
-      return;
-    }
-
-    (Object.keys(data) as Array<keyof DisplayValidation>).forEach(
-      (fieldName) => {
-        const newValue = data[fieldName];
-        const oldValue = originalData[fieldName];
-
-        if (newValue !== oldValue) {
-          trackChange(section, fieldName as string, newValue, oldValue);
-        } else {
-          removeFieldChange(section, fieldName as string);
-        }
-      },
-    );
-  };
-
   return (
-    <DynamicForm<DisplayValidation>
-      onSubmit={onSubmit}
-      onFormInit={onFormInit}
-      validationSchema={DisplayValidationSchema}
-      defaultValues={config.display}
-      values={getEffectiveConfig("display")}
+    <ConfigFormFields
+      form={form}
       fieldGroups={fieldGroups}
+      isDisabledByField={isDisabledByField}
     />
   );
 };

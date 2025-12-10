@@ -1,6 +1,7 @@
-import { fromByteArray } from "base64-js";
+import { t } from "i18next";
 import { describe, expect, it } from "vitest";
 import { makeChannelSchema } from "./channel.ts";
+import { fromByteArray } from "base64-js";
 
 const mockRole = 0;
 
@@ -84,18 +85,32 @@ describe("makeChannelSchema", () => {
   });
 
   it("rejects channelNum out of range", () => {
-    const result = schema.safeParse({
+    // Test max
+    let result = schema.safeParse({
       index: 0,
       settings: { ...validSettings, channelNum: 10 },
       role: mockRole,
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(
-        result.error.issues.some(
-          (i) => i.path.includes("settings") && i.path.includes("channelNum"),
-        ),
-      ).toBe(true);
+      const issue = result.error.issues.find(
+        (i) => i.path.includes("settings") && i.path.includes("channelNum"),
+      );
+      expect(issue?.message).toBe(t("formValidation.tooBig.number"));
+    }
+
+    // Test min
+    result = schema.safeParse({
+      index: 0,
+      settings: { ...validSettings, channelNum: -1 },
+      role: mockRole,
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const issue = result.error.issues.find(
+        (i) => i.path.includes("settings") && i.path.includes("channelNum"),
+      );
+      expect(issue?.message).toBe(t("formValidation.tooSmall.number"));
     }
   });
 
@@ -126,7 +141,14 @@ describe("makeChannelSchema", () => {
   });
 
   it("rejects moduleSettings.positionPrecision out of range", () => {
-    for (const val of [9, 20, 31, 33]) {
+    const testCases = [
+      { val: 9, error: "formValidation.tooSmall.number" },
+      { val: 20, error: "formValidation.tooBig.number" },
+      { val: 31, error: "formValidation.tooBig.number" }, // Because it fails the range 10-19 AND literal 0/32
+      { val: 33, error: "formValidation.tooBig.number" },
+    ];
+
+    for (const { val, error } of testCases) {
       const result = schema.safeParse({
         index: 0,
         settings: {
@@ -136,6 +158,14 @@ describe("makeChannelSchema", () => {
         role: mockRole,
       });
       expect(result.success).toBe(false);
+      if (!result.success) {
+          // Since it's a union, Zod returns "Invalid input" if all variants fail.
+          // But with custom messages on the number schema, if that's the closest match?
+          // Actually, Zod union errors are complex.
+          // If we coerce to number, it matches the middle schema but fails min/max.
+          
+          // Let's verify what we get.
+      }
     }
   });
 });

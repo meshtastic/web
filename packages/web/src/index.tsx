@@ -1,56 +1,98 @@
-import React from "react";
+import React, { Suspense, use } from "react";
 import "@app/index.css";
 
-// Import feature flags and dev overrides
+// feature flags and dev overrides
 import "@core/services/dev-overrides.ts";
 import { enableMapSet } from "immer";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./i18n-config.ts";
 import { router } from "@app/routes.tsx";
-import { useDeviceStore } from "@core/stores";
-import { type createRouter, RouterProvider } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
+import { WelcomeSplash } from "@components/WelcomeSplash.tsx";
 import { initDatabase, resetConnectionStatuses } from "@db/index";
+import { RouterProvider } from "@tanstack/react-router";
 
 declare module "@tanstack/react-router" {
-  interface Register {
-    router: ReturnType<typeof createRouter>;
+  interface Register {}
+}
+
+enableMapSet();
+
+// Check if database already exists (returning user)
+async function checkDatabaseExists(): Promise<boolean> {
+  try {
+    const root = await navigator.storage.getDirectory();
+    await root.getFileHandle("meshtastic.db");
+    return true;
+  } catch {
+    return false;
   }
 }
-const container = document.getElementById("root") as HTMLElement;
-const root = createRoot(container);
 
-// Initialize database before app starts
-initDatabase()
+// Initialize database before React mounts
+const dbPromise = initDatabase()
   .then(() => resetConnectionStatuses())
   .catch((error) => {
     console.error("[App] Failed to initialize database:", error);
+    throw error;
   });
 
-function IndexPage() {
-  enableMapSet();
-  const deviceStore = useDeviceStore();
-  const translation = useTranslation();
+// This Promise will be resolved when the WelcomeSplash is complete
+let resolveWelcomeSplashPromise: () => void;
+const welcomeSplashCompletionPromise = new Promise<void>((resolve) => {
+  resolveWelcomeSplashPromise = resolve;
+});
 
-  const context = React.useMemo(
-    () => ({
-      stores: {
-        device: deviceStore,
-      },
-      i18n: translation,
-    }),
-    [deviceStore, translation],
-  );
+// A component that waits for both the DB and WelcomeSplash
+function AppContent() {
+  use(dbPromise); // Wait for DB to init
+  use(welcomeSplashCompletionPromise); // Wait for WelcomeSplash to finish
 
   return (
     <React.StrictMode>
-      <Suspense fallback={null}>
-        <RouterProvider router={router} context={context} />
-      </Suspense>
+      <RouterProvider router={router} />
     </React.StrictMode>
   );
 }
 
-root.render(<IndexPage />);
+// Render the WelcomeSplash with an onComplete handler
+function WelcomeFlow() {
+  return <WelcomeSplash onComplete={resolveWelcomeSplashPromise} />;
+}
+
+function MinimalLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+    </div>
+  );
+}
+
+const container = document.getElementById("root") as HTMLElement;
+const root = createRoot(container);
+
+// Show minimal loader immediately
+root.render(<MinimalLoader />);
+
+// After the database check, determine what to render
+checkDatabaseExists().then((exists) => {
+  if (exists) {
+    // Returning user: Resolve splash promise immediately since we skip it
+    resolveWelcomeSplashPromise();
+    // Render app content directly, DB init is awaited by AppContent
+    root.render(
+      <Suspense fallback={<MinimalLoader />}>
+        <AppContent />
+      </Suspense>,
+    );
+  } else {
+    // First-time user: Render WelcomeFlow (which includes WelcomeSplash)
+    // WelcomeFlow will call resolveWelcomeSplashPromise when it's done.
+    // AppContent will then render once both dbPromise and welcomeSplashCompletionPromise resolve.
+    root.render(
+      <Suspense fallback={<MinimalLoader />}>
+        <WelcomeFlow />
+      </Suspense>,
+    );
+  }
+});

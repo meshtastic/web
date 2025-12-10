@@ -1,9 +1,10 @@
 import { useTheme } from "@core/hooks/useTheme.ts";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import MapGl, {
   AttributionControl,
   type MapLayerMouseEvent,
+  MapProvider,
   type MapRef,
   NavigationControl,
   ScaleControl,
@@ -35,13 +36,26 @@ export const BaseMap = ({
 
   const darkMode = theme === "dark";
   const mapRef = useRef<MapRef | null>(null);
+  const onLoadRef = useRef(onLoad);
+  onLoadRef.current = onLoad;
+  const onMouseMoveRef = useRef(onMouseMove);
+  onMouseMoveRef.current = onMouseMove;
+  const onClickRef = useRef(onClick);
+  onClickRef.current = onClick;
 
-  useEffect(() => {
-    const map = mapRef.current;
-    if (map && onLoad) {
-      onLoad(map);
+  const handleLoad = useCallback(() => {
+    if (mapRef.current && onLoadRef.current) {
+      onLoadRef.current(mapRef.current);
     }
-  }, [onLoad]);
+  }, []);
+
+  const handleMouseMove = useCallback((event: MapLayerMouseEvent) => {
+    onMouseMoveRef.current?.(event);
+  }, []);
+
+  const handleClick = useCallback((event: MapLayerMouseEvent) => {
+    onClickRef.current?.(event);
+  }, []);
 
   const locale = useMemo(() => {
     return {
@@ -65,43 +79,46 @@ export const BaseMap = ({
   }, [t]);
 
   return (
-    <MapGl
-      ref={mapRef}
-      mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
-      attributionControl={false}
-      renderWorldCopies={false}
-      maxPitch={0}
-      dragRotate={false}
-      touchZoomRotate={false}
-      initialViewState={
-        initialViewState ?? {
-          zoom: 1.8,
-          latitude: 35,
-          longitude: 0,
+    <MapProvider>
+      <MapGl
+        ref={mapRef}
+        mapStyle="https://raw.githubusercontent.com/hc-oss/maplibre-gl-styles/master/styles/osm-mapnik/v8/default.json"
+        attributionControl={false}
+        renderWorldCopies={false}
+        maxPitch={0}
+        dragRotate={false}
+        touchZoomRotate={false}
+        initialViewState={
+          initialViewState ?? {
+            zoom: 1.8,
+            latitude: 35,
+            longitude: 0,
+          }
         }
-      }
-      style={{ filter: darkMode ? "brightness(0.9)" : undefined }}
-      locale={locale}
-      interactiveLayerIds={interactiveLayerIds}
-      onMouseMove={onMouseMove}
-      onClick={onClick}
-    >
-      <AttributionControl
-        style={{
-          background: darkMode ? "#ffffff" : undefined,
-          color: darkMode ? "black" : undefined,
-        }}
-      />
-      {/* { Disabled for now until we can use i18n for the geolocate control} */}
-      {/* <GeolocateControl
-        position="top-right"
-        i18nIsDynamicList
-        positionOptions={{ enableHighAccuracy: true }}
-        trackUserLocation
-      />  */}
-      <NavigationControl position="top-right" showCompass={false} />
-      <ScaleControl />
-      {children}
-    </MapGl>
+        style={{ filter: darkMode ? "brightness(0.9)" : undefined }}
+        locale={locale}
+        interactiveLayerIds={interactiveLayerIds}
+        onMouseMove={handleMouseMove}
+        onClick={handleClick}
+        onLoad={handleLoad}
+      >
+        <AttributionControl
+          style={{
+            background: darkMode ? "#ffffff" : undefined,
+            color: darkMode ? "black" : undefined,
+          }}
+        />
+        {/* { Disabled for now until we can use i18n for the geolocate control} */}
+        {/* <GeolocateControl
+          position="top-right"
+          i18nIsDynamicList
+          positionOptions={{ enableHighAccuracy: true }}
+          trackUserLocation
+        />  */}
+        <NavigationControl position="top-right" showCompass={false} />
+        <ScaleControl />
+        {children}
+      </MapGl>
+    </MapProvider>
   );
 };

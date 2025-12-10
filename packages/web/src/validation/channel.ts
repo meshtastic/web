@@ -1,5 +1,6 @@
 import { validateMaxByteLength } from "@core/utils/string.ts";
 import { Protobuf } from "@meshtastic/core";
+import { t } from "i18next";
 import { z } from "zod/v4";
 import { makePskHelpers } from "./pskSchema.ts";
 
@@ -8,7 +9,15 @@ const RoleEnum = z.enum(Protobuf.Channel.Channel_Role);
 const moduleSettingsSchema = z.object({
   positionPrecision: z.union([
     z.literal(0),
-    z.coerce.number().int().min(10).max(19),
+    z.coerce
+      .number()
+      .int()
+      .min(10, {
+        message: t("formValidation.tooSmall.number"),
+      })
+      .max(19, {
+        message: t("formValidation.tooBig.number"),
+      }),
     z.literal(32),
   ]),
 });
@@ -17,10 +26,18 @@ export function makeChannelSchema(allowedBytes: number) {
   const { stringSchema } = makePskHelpers([allowedBytes]);
 
   const ChannelSettingsSchema = z.object({
-    channelNum: z.coerce.number().int().min(0).max(7),
+    channelNum: z.coerce
+      .number()
+      .int()
+      .min(0, {
+        message: t("formValidation.tooSmall.number"),
+      })
+      .max(7, {
+        message: t("formValidation.tooBig.number"),
+      }),
     psk: stringSchema(false),
     name: z.string().refine((s) => validateMaxByteLength(s, 12).isValid, {
-      message: "formValidation.tooBig.bytes",
+      message: t("formValidation.tooBig.bytes"),
       params: { maximum: 12 },
     }),
     id: z.coerce.number().int(),

@@ -28,6 +28,7 @@ class FeatureFlags {
   private base: Flags;
   private overrides: Partial<Flags> = {};
   private listeners = new Set<Listener>();
+  private cachedAll: Flags | null = null;
 
   constructor(base: Flags) {
     this.base = base;
@@ -39,7 +40,10 @@ class FeatureFlags {
 
   /** Get all flags */
   all(): Flags {
-    return { ...this.base, ...this.overrides };
+    if (!this.cachedAll) {
+      this.cachedAll = { ...this.base, ...this.overrides };
+    }
+    return this.cachedAll;
   }
 
   /** Optional dev/test override. Pass null to clear. */
@@ -49,6 +53,7 @@ class FeatureFlags {
     } else {
       this.overrides[key] = val;
     }
+    this.cachedAll = null;
     this.emit();
   }
 
@@ -62,6 +67,7 @@ class FeatureFlags {
         this.overrides[k as FlagKey] = v as boolean;
       }
     }
+    this.cachedAll = null;
     this.emit();
   }
 

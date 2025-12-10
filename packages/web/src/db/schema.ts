@@ -1,5 +1,13 @@
 import { sql } from "drizzle-orm";
-import { index, integer, primaryKey, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  primaryKey,
+  real,
+  sqliteTable,
+  text,
+  unique,
+} from "drizzle-orm/sqlite-core";
 
 /**
  * Messages table - stores all direct and broadcast messages
@@ -53,19 +61,13 @@ export const messages = sqliteTable(
     ackSNR: real("ack_snr").default(0),
     realACK: integer("real_ack", { mode: "boolean" }).notNull().default(false),
   },
-  (table) => ({
+  (table) => [
     // Indexes for common query patterns
-    deviceIdx: index("messages_device_idx").on(table.deviceId),
-    deviceDateIdx: index("messages_device_date_idx").on(
-      table.deviceId,
-      table.date,
-    ),
-    deviceTypeIdx: index("messages_device_type_idx").on(
-      table.deviceId,
-      table.type,
-    ),
+    index("messages_device_idx").on(table.deviceId),
+    index("messages_device_date_idx").on(table.deviceId, table.date),
+    index("messages_device_type_idx").on(table.deviceId, table.type),
     // Direct message queries: device + participants + date
-    directConvoIdx: index("messages_direct_convo_idx").on(
+    index("messages_direct_convo_idx").on(
       table.deviceId,
       table.type,
       table.fromNode,
@@ -73,15 +75,15 @@ export const messages = sqliteTable(
       table.date,
     ),
     // Broadcast queries: device + channel + date
-    broadcastChannelIdx: index("messages_broadcast_channel_idx").on(
+    index("messages_broadcast_channel_idx").on(
       table.deviceId,
       table.type,
       table.channelId,
       table.date,
     ),
     // For finding unacked messages
-    stateIdx: index("messages_state_idx").on(table.deviceId, table.state),
-  }),
+    index("messages_state_idx").on(table.deviceId, table.state),
+  ],
 );
 
 /**
@@ -139,27 +141,18 @@ export const nodes = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (table) => ({
+  (table) => [
     // Composite primary key - ensures deduplication
-    pk: primaryKey({ columns: [table.deviceId, table.nodeNum] }),
+    primaryKey({ columns: [table.deviceId, table.nodeNum] }),
     // Query by device
-    deviceIdx: index("nodes_device_idx").on(table.deviceId),
+    index("nodes_device_idx").on(table.deviceId),
     // Query recently heard nodes
-    lastHeardIdx: index("nodes_last_heard_idx").on(
-      table.deviceId,
-      table.lastHeard,
-    ),
+    index("nodes_last_heard_idx").on(table.deviceId, table.lastHeard),
     // Spatial queries (nodes in area)
-    spatialIdx: index("nodes_spatial_idx").on(
-      table.latitudeI,
-      table.longitudeI,
-    ),
+    index("nodes_spatial_idx").on(table.latitudeI, table.longitudeI),
     // Favorites
-    favoriteIdx: index("nodes_favorite_idx").on(
-      table.deviceId,
-      table.isFavorite,
-    ),
-  }),
+    index("nodes_favorite_idx").on(table.deviceId, table.isFavorite),
+  ],
 );
 
 /**
@@ -178,7 +171,9 @@ export const channels = sqliteTable(
     // Channel settings
     name: text("name"),
     psk: text("psk"), // Base64-encoded pre-shared key
-    uplinkEnabled: integer("uplink_enabled", { mode: "boolean" }).default(false),
+    uplinkEnabled: integer("uplink_enabled", { mode: "boolean" }).default(
+      false,
+    ),
     downlinkEnabled: integer("downlink_enabled", { mode: "boolean" }).default(
       false,
     ),
@@ -191,12 +186,12 @@ export const channels = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (table) => ({
+  (table) => [
     // Composite primary key
-    pk: index("channels_pk").on(table.deviceId, table.channelIndex),
+    primaryKey({ columns: [table.deviceId, table.channelIndex] }),
     // Query by device
-    deviceIdx: index("channels_device_idx").on(table.deviceId),
-  }),
+    index("channels_device_idx").on(table.deviceId),
+  ],
 );
 
 /**
@@ -227,24 +222,18 @@ export const positionLogs = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (table) => ({
+  (table) => [
     // Query position history for a node
-    nodeTimeIdx: index("position_logs_node_time_idx").on(
+    index("position_logs_node_time_idx").on(
       table.deviceId,
       table.nodeNum,
       table.time,
     ),
     // Query all positions in time range
-    deviceTimeIdx: index("position_logs_device_time_idx").on(
-      table.deviceId,
-      table.time,
-    ),
+    index("position_logs_device_time_idx").on(table.deviceId, table.time),
     // Spatial queries
-    spatialIdx: index("position_logs_spatial_idx").on(
-      table.latitudeI,
-      table.longitudeI,
-    ),
-  }),
+    index("position_logs_spatial_idx").on(table.latitudeI, table.longitudeI),
+  ],
 );
 
 /**
@@ -282,19 +271,16 @@ export const packetLogs = sqliteTable(
     // Optional: Store raw packet as JSON for deep debugging
     // rawPacket: text("raw_packet", { mode: "json" }),
   },
-  (table) => ({
+  (table) => [
     // Query packets from a node
-    fromNodeIdx: index("packet_logs_from_node_idx").on(
+    index("packet_logs_from_node_idx").on(
       table.deviceId,
       table.fromNode,
       table.rxTime,
     ),
     // Query packets by time
-    deviceTimeIdx: index("packet_logs_device_time_idx").on(
-      table.deviceId,
-      table.rxTime,
-    ),
-  }),
+    index("packet_logs_device_time_idx").on(table.deviceId, table.rxTime),
+  ],
 );
 
 /**
@@ -331,19 +317,16 @@ export const telemetryLogs = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (table) => ({
+  (table) => [
     // Query telemetry history for a node
-    nodeTimeIdx: index("telemetry_logs_node_time_idx").on(
+    index("telemetry_logs_node_time_idx").on(
       table.deviceId,
       table.nodeNum,
       table.time,
     ),
     // Query all telemetry in time range
-    deviceTimeIdx: index("telemetry_logs_device_time_idx").on(
-      table.deviceId,
-      table.time,
-    ),
-  }),
+    index("telemetry_logs_device_time_idx").on(table.deviceId, table.time),
+  ],
 );
 
 /**
@@ -369,14 +352,14 @@ export const messageDrafts = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (table) => ({
+  (table) => [
     // One draft per conversation
-    uniqueDraft: index("message_drafts_unique_idx").on(
+    unique("message_drafts_unique_idx").on(
       table.deviceId,
       table.type,
       table.targetId,
     ),
-  }),
+  ],
 );
 
 /**
@@ -439,32 +422,29 @@ export const connections = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (table) => ({
+  (table) => [
     // Index for finding default connection
-    defaultIdx: index("connections_default_idx").on(table.isDefault),
+    index("connections_default_idx").on(table.isDefault),
     // Index for type filtering
-    typeIdx: index("connections_type_idx").on(table.type),
-  }),
+    index("connections_type_idx").on(table.type),
+  ],
 );
 
 /**
  * Preferences table - stores user preferences (key-value store)
  */
-export const preferences = sqliteTable(
-  "preferences",
-  {
-    // Primary key - the preference key
-    key: text("key").primaryKey(),
+export const preferences = sqliteTable("preferences", {
+  // Primary key - the preference key
+  key: text("key").primaryKey(),
 
-    // Value stored as JSON string
-    value: text("value").notNull(),
+  // Value stored as JSON string
+  value: text("value").notNull(),
 
-    // Timestamps
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
-      .notNull()
-      .default(sql`(unixepoch() * 1000)`),
-  },
-);
+  // Timestamps
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+});
 
 /**
  * Last read tracking - track which message was last read per conversation
@@ -489,14 +469,14 @@ export const lastRead = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (table) => ({
+  (table) => [
     // One last-read marker per conversation
-    uniqueConvo: index("last_read_unique_idx").on(
+    unique("last_read_unique_idx").on(
       table.deviceId,
       table.type,
       table.conversationId,
     ),
-  }),
+  ],
 );
 
 /**

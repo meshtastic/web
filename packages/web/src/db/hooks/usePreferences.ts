@@ -1,83 +1,70 @@
-import { useCallback, useEffect, useState } from "react";
+import { use, useCallback, useMemo, useState } from "react";
 import { preferencesRepo } from "../repositories";
+
+// Cache for preference promises to ensure stable references
+const preferencePromiseCache = new Map<string, Promise<unknown>>();
+
+function getPreferencePromise<T>(key: string): Promise<T | undefined> {
+  if (!preferencePromiseCache.has(key)) {
+    preferencePromiseCache.set(key, preferencesRepo.get<T>(key));
+  }
+  return preferencePromiseCache.get(key) as Promise<T | undefined>;
+}
+
+function invalidatePreferenceCache(key: string): void {
+  preferencePromiseCache.delete(key);
+}
 
 /**
  * Hook to get and set a preference value
+ * Uses React's `use()` API for Suspense integration
  */
 export function usePreference<T>(
   key: string,
   defaultValue: T,
-): [T, (value: T) => Promise<void>, boolean] {
-  const [value, setValue] = useState<T>(defaultValue);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-
-    preferencesRepo.get<T>(key).then((stored) => {
-      if (mounted) {
-        if (stored !== undefined) {
-          setValue(stored);
-        }
-        setIsLoading(false);
-      }
-    });
-
-    return () => {
-      mounted = false;
-    };
-  }, [key]);
+): [T, (value: T) => void] {
+  const storedValue = use(getPreferencePromise<T>(key));
+  const [value, setValue] = useState<T>(storedValue ?? defaultValue);
 
   const setPreference = useCallback(
-    async (newValue: T) => {
+    (newValue: T) => {
       setValue(newValue);
-      await preferencesRepo.set(key, newValue);
+      invalidatePreferenceCache(key);
+      preferencesRepo.set(key, newValue);
     },
     [key],
   );
 
-  return [value, setPreference, isLoading];
+  return [value, setPreference];
 }
 
 /**
- * Hook specifically for panel sizes with debounced persistence
+ * Hook specifically for panel sizes with persistence
+ * Uses React's `use()` API for Suspense integration
  */
 export function usePanelSizes(
   panelGroupId: string,
   defaultSizes: number[],
 ): [number[], (sizes: number[]) => void] {
   const key = `panel-sizes:${panelGroupId}`;
-  const [sizes, setSizes] = useState<number[]>(defaultSizes);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const storedSizes = use(getPreferencePromise<number[]>(key));
 
-  // Load from database on mount
-  useEffect(() => {
-    let mounted = true;
+  const initialSizes = useMemo(() => {
+    if (storedSizes !== undefined && Array.isArray(storedSizes)) {
+      return storedSizes;
+    }
+    return defaultSizes;
+  }, [storedSizes, defaultSizes]);
 
-    preferencesRepo.get<number[]>(key).then((stored) => {
-      if (mounted) {
-        if (stored !== undefined && Array.isArray(stored)) {
-          setSizes(stored);
-        }
-        setIsInitialized(true);
-      }
-    });
+  const [sizes, setSizes] = useState<number[]>(initialSizes);
 
-    return () => {
-      mounted = false;
-    };
-  }, [key]);
-
-  // Persist on change (called on drag end)
   const persistSizes = useCallback(
     (newSizes: number[]) => {
       setSizes(newSizes);
-      // Only persist after initial load to avoid overwriting with defaults
-      if (isInitialized) {
-        preferencesRepo.set(key, newSizes);
-      }
+      invalidatePreferenceCache(key);
+      preferencesRepo.set(key, newSizes);
     },
-    [key, isInitialized],
+    [key],
   );
 
   return [sizes, persistSizes];

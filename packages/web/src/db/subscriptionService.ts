@@ -1,7 +1,14 @@
+/** biome-ignore-all lint/complexity/noStaticOnlyClass: <explanation> */
 import { fromByteArray } from "base64-js";
 import type { MeshDevice } from "@meshtastic/core";
-import { channelRepo, messageRepo, nodeRepo } from "./repositories";
-import type { NewMessage, NewNode, NewPositionLog, NewTelemetryLog } from "./schema";
+import { channelRepo, messageRepo, nodeRepo, packetLogRepo } from "./repositories";
+import type {
+  NewMessage,
+  NewNode,
+  NewPacketLog,
+  NewPositionLog,
+  NewTelemetryLog,
+} from "./schema";
 import { dbEvents, DB_EVENTS } from "./events";
 
 /**
@@ -31,7 +38,9 @@ export class SubscriptionService {
             longitudeI: position.data.longitudeI,
             altitude: position.data.altitude,
             // Convert Unix timestamp (seconds) to Date if present
-            positionTime: position.data.time ? new Date(position.data.time * 1000) : undefined,
+            positionTime: position.data.time
+              ? new Date(position.data.time * 1000)
+              : undefined,
             positionPrecisionBits: position.data.precisionBits,
             groundSpeed: position.data.groundSpeed,
             groundTrack: position.data.groundTrack,
@@ -46,7 +55,9 @@ export class SubscriptionService {
             longitudeI: position.data.longitudeI,
             altitude: position.data.altitude,
             // Convert Unix timestamp (seconds) to Date if present
-            time: position.data.time ? new Date(position.data.time * 1000) : undefined,
+            time: position.data.time
+              ? new Date(position.data.time * 1000)
+              : undefined,
             precisionBits: position.data.precisionBits,
             groundSpeed: position.data.groundSpeed,
             groundTrack: position.data.groundTrack,
@@ -54,6 +65,8 @@ export class SubscriptionService {
           };
 
           await nodeRepo.logPosition(positionLog);
+
+          dbEvents.emit(DB_EVENTS.POSITION_UPDATED);
         } catch (error) {
           console.error("[DB Subscriptions] Error saving position:", error);
         }
@@ -78,6 +91,8 @@ export class SubscriptionService {
               : undefined,
             isLicensed: user.data.isLicensed,
           });
+
+          dbEvents.emit(DB_EVENTS.NODE_UPDATED);
         } catch (error) {
           console.error("[DB Subscriptions] Error saving user:", error);
         }
@@ -152,7 +167,8 @@ export class SubscriptionService {
           await nodeRepo.updateMetrics(deviceId, telemetry.from, {
             batteryLevel: telemetry.data.deviceMetrics?.batteryLevel,
             voltage: telemetry.data.deviceMetrics?.voltage,
-            channelUtilization: telemetry.data.deviceMetrics?.channelUtilization,
+            channelUtilization:
+              telemetry.data.deviceMetrics?.channelUtilization,
             airUtilTx: telemetry.data.deviceMetrics?.airUtilTx,
             uptimeSeconds: telemetry.data.deviceMetrics?.uptimeSeconds,
           });
@@ -162,25 +178,32 @@ export class SubscriptionService {
             deviceId,
             nodeNum: telemetry.from,
             // Convert Unix timestamp (seconds) to Date if present
-            time: telemetry.data.time ? new Date(telemetry.data.time * 1000) : undefined,
+            time: telemetry.data.time
+              ? new Date(telemetry.data.time * 1000)
+              : undefined,
 
             // Device metrics
             batteryLevel: telemetry.data.deviceMetrics?.batteryLevel,
             voltage: telemetry.data.deviceMetrics?.voltage,
-            channelUtilization: telemetry.data.deviceMetrics?.channelUtilization,
+            channelUtilization:
+              telemetry.data.deviceMetrics?.channelUtilization,
             airUtilTx: telemetry.data.deviceMetrics?.airUtilTx,
             uptimeSeconds: telemetry.data.deviceMetrics?.uptimeSeconds,
 
             // Environmental metrics
             temperature: telemetry.data.environmentMetrics?.temperature,
-            relativeHumidity: telemetry.data.environmentMetrics?.relativeHumidity,
-            barometricPressure: telemetry.data.environmentMetrics?.barometricPressure,
+            relativeHumidity:
+              telemetry.data.environmentMetrics?.relativeHumidity,
+            barometricPressure:
+              telemetry.data.environmentMetrics?.barometricPressure,
 
             // Power metrics
             current: telemetry.data.powerMetrics?.ch1Current,
           };
 
           await nodeRepo.logTelemetry(telemetryLog);
+
+          dbEvents.emit(DB_EVENTS.TELEMETRY_UPDATED);
         } catch (error) {
           console.error("[DB Subscriptions] Error saving telemetry:", error);
         }
@@ -197,6 +220,8 @@ export class SubscriptionService {
             meshPacket.rxTime,
             meshPacket.rxSnr,
           );
+
+          dbEvents.emit(DB_EVENTS.NODE_UPDATED);
         } catch (error) {
           console.error("[DB Subscriptions] Error updating lastHeard:", error);
         }
@@ -207,10 +232,8 @@ export class SubscriptionService {
     unsubscribers.push(
       connection.events.onMessagePacket.subscribe(async (messagePacket) => {
         try {
-          // Decode message payload
-          const messageText = messagePacket.data.payload
-            ? new TextDecoder().decode(messagePacket.data.payload)
-            : "";
+          // messagePacket.data is already a decoded string from the core library
+          const messageText = messagePacket.data;
 
           // Skip empty messages (can happen with certain packet types)
           if (!messageText) {
@@ -218,8 +241,7 @@ export class SubscriptionService {
             return;
           }
 
-          const type =
-            messagePacket.to === 0xffffffff ? "broadcast" : "direct";
+          const type = messagePacket.to === 0xffffffff ? "broadcast" : "direct";
 
           // Calculate hops safely (both values must be defined)
           const hops =
@@ -290,6 +312,8 @@ export class SubscriptionService {
             positionPrecision:
               channel.settings?.moduleSettings?.positionPrecision,
           });
+
+          dbEvents.emit(DB_EVENTS.CHANNEL_UPDATED);
         } catch (error) {
           console.error("[DB Subscriptions] Error saving channel:", error);
         }
@@ -298,7 +322,9 @@ export class SubscriptionService {
 
     // Return unsubscribe function
     return () => {
-      console.log(`[DB Subscriptions] Unsubscribing from device ${deviceId}...`);
+      console.log(
+        `[DB Subscriptions] Unsubscribing from device ${deviceId}...`,
+      );
       for (const unsubscribe of unsubscribers) {
         unsubscribe();
       }

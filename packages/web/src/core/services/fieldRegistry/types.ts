@@ -1,5 +1,3 @@
-import type { FieldProps } from "@components/Form/DynamicFormField";
-
 // Discriminated union of all config sections
 export type ConfigSection =
   | { type: "config"; variant: "lora" }
@@ -23,15 +21,24 @@ export type ConfigSection =
   | { type: "moduleConfig"; variant: "ambientLighting" }
   | { type: "moduleConfig"; variant: "detectionSensor" }
   | { type: "moduleConfig"; variant: "paxcounter" }
-  | { type: "channel"; variant: "channel" };
+  | { type: "channel"; variant: string }
+  | { type: "config"; variant: "user" };
+
+// Field definition - simplified version of what was in DynamicFormField
+export interface FieldDefinition {
+  type: string;
+  name: string;
+  label: string;
+  description?: string;
+}
 
 // Field metadata stored in the registry
-export interface FieldMetadata<T = unknown> {
+export interface FieldMetadata {
   section: ConfigSection;
   fieldName: string;
   label: string;
   description?: string;
-  fieldDefinition: FieldProps<T>;
+  fieldDefinition: FieldDefinition;
   groupLabel?: string; // e.g., "Waveform Settings"
 }
 

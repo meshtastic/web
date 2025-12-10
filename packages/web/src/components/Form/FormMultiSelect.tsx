@@ -1,7 +1,7 @@
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
-} from "@components/Form/DynamicForm.tsx";
+} from "@components/Form/FormTypes";
 import { MultiSelect, MultiSelectItem } from "@components/ui/multi-select.tsx";
 import type { FLAGS_CONFIG } from "@core/hooks/usePositionFlags.ts";
 import { cn } from "@core/utils/cn.ts";

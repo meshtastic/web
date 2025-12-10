@@ -1,177 +1,105 @@
-import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
+import { useModuleConfigForm } from "@app/pages/Settings/hooks/useModuleConfigForm";
 import {
   type DetectionSensorValidation,
   DetectionSensorValidationSchema,
-} from "@app/validation/moduleConfig/detectionSensor.ts";
+} from "@app/validation/moduleConfig/detectionSensor";
 import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
-import {
-  createFieldMetadata,
-  useFieldRegistry,
-} from "@core/services/fieldRegistry";
-import { useDevice } from "@core/stores";
+  ConfigFormFields,
+  type FieldGroup,
+} from "@components/Form/ConfigFormFields";
 import { Protobuf } from "@meshtastic/core";
-import { useEffect, useMemo } from "react";
+import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useTranslation } from "react-i18next";
 
-interface DetectionSensorModuleConfigProps {
-  onFormInit: DynamicFormFormInit<DetectionSensorValidation>;
-}
-
-export const DetectionSensor = ({
-  onFormInit,
-}: DetectionSensorModuleConfigProps) => {
-  useWaitForConfig({ moduleConfigCase: "detectionSensor" });
-
-  const { moduleConfig, getEffectiveModuleConfig } = useDevice();
-  const {
-    registerFields,
-    trackChange,
-    removeChange: removeFieldChange,
-  } = useFieldRegistry();
+export const DetectionSensor = () => {
   const { t } = useTranslation("moduleConfig");
-  const section = { type: "moduleConfig", variant: "detectionSensor" } as const;
+  const { form, isReady, isDisabledByField } =
+    useModuleConfigForm<DetectionSensorValidation>({
+      moduleConfigType: "detectionSensor",
+      schema: DetectionSensorValidationSchema,
+    });
 
-  const onSubmit = (data: DetectionSensorValidation) => {
-    // Track individual field changes
-    const originalData = moduleConfig.detectionSensor;
-    if (!originalData) {
-      return;
-    }
+  if (!isReady) {
+    return <ConfigFormSkeleton />;
+  }
 
-    (Object.keys(data) as Array<keyof DetectionSensorValidation>).forEach(
-      (fieldName) => {
-        const newValue = data[fieldName];
-        const oldValue = originalData[fieldName];
-
-        if (newValue !== oldValue) {
-          trackChange(section, fieldName as string, newValue, oldValue);
-        } else {
-          removeFieldChange(section, fieldName as string);
-        }
-      },
-    );
-  };
-
-  const fieldGroups = useMemo(
-    () => [
-      {
-        label: t("detectionSensor.title"),
-        description: t("detectionSensor.description"),
-        fields: [
-          {
-            type: "toggle",
-            name: "enabled",
-            label: t("detectionSensor.enabled.label"),
-            description: t("detectionSensor.enabled.description"),
+  const fieldGroups: FieldGroup<DetectionSensorValidation>[] = [
+    {
+      label: t("detectionSensor.title"),
+      description: t("detectionSensor.description"),
+      fields: [
+        {
+          type: "toggle",
+          name: "enabled",
+          label: t("detectionSensor.enabled.label"),
+          description: t("detectionSensor.enabled.description"),
+        },
+        {
+          type: "number",
+          name: "minimumBroadcastSecs",
+          label: t("detectionSensor.minimumBroadcastSecs.label"),
+          description: t("detectionSensor.minimumBroadcastSecs.description"),
+          properties: {
+            suffix: t("unit.second.plural"),
           },
-          {
-            type: "number",
-            name: "minimumBroadcastSecs",
-            label: t("detectionSensor.minimumBroadcastSecs.label"),
-            description: t("detectionSensor.minimumBroadcastSecs.description"),
-            properties: {
-              suffix: t("unit.second.plural"),
-            },
-            disabledBy: [
-              {
-                fieldName: "enabled",
-              },
-            ],
+          disabledBy: [{ fieldName: "enabled" }],
+        },
+        {
+          type: "number",
+          name: "stateBroadcastSecs",
+          label: t("detectionSensor.stateBroadcastSecs.label"),
+          description: t("detectionSensor.stateBroadcastSecs.description"),
+          disabledBy: [{ fieldName: "enabled" }],
+        },
+        {
+          type: "toggle",
+          name: "sendBell",
+          label: t("detectionSensor.sendBell.label"),
+          description: t("detectionSensor.sendBell.description"),
+          disabledBy: [{ fieldName: "enabled" }],
+        },
+        {
+          type: "text",
+          name: "name",
+          label: t("detectionSensor.name.label"),
+          description: t("detectionSensor.name.description"),
+          disabledBy: [{ fieldName: "enabled" }],
+        },
+        {
+          type: "number",
+          name: "monitorPin",
+          label: t("detectionSensor.monitorPin.label"),
+          description: t("detectionSensor.monitorPin.description"),
+          disabledBy: [{ fieldName: "enabled" }],
+        },
+        {
+          type: "select",
+          name: "detectionTriggerType",
+          label: t("detectionSensor.detectionTriggerType.label"),
+          description: t("detectionSensor.detectionTriggerType.description"),
+          disabledBy: [{ fieldName: "enabled" }],
+          properties: {
+            enumValue:
+              Protobuf.ModuleConfig
+                .ModuleConfig_DetectionSensorConfig_TriggerType,
           },
-          {
-            type: "number",
-            name: "stateBroadcastSecs",
-            label: t("detectionSensor.stateBroadcastSecs.label"),
-            description: t("detectionSensor.stateBroadcastSecs.description"),
-            disabledBy: [
-              {
-                fieldName: "enabled",
-              },
-            ],
-          },
-          {
-            type: "toggle",
-            name: "sendBell",
-            label: t("detectionSensor.sendBell.label"),
-            description: t("detectionSensor.sendBell.description"),
-            disabledBy: [
-              {
-                fieldName: "enabled",
-              },
-            ],
-          },
-          {
-            type: "text",
-            name: "name",
-            label: t("detectionSensor.name.label"),
-            description: t("detectionSensor.name.description"),
-            disabledBy: [
-              {
-                fieldName: "enabled",
-              },
-            ],
-          },
-          {
-            type: "number",
-            name: "monitorPin",
-            label: t("detectionSensor.monitorPin.label"),
-            description: t("detectionSensor.monitorPin.description"),
-            disabledBy: [
-              {
-                fieldName: "enabled",
-              },
-            ],
-          },
-          {
-            type: "select",
-            name: "detectionTriggerType",
-            label: t("detectionSensor.detectionTriggerType.label"),
-            description: t("detectionSensor.detectionTriggerType.description"),
-            disabledBy: [
-              {
-                fieldName: "enabled",
-              },
-            ],
-            properties: {
-              enumValue:
-                Protobuf.ModuleConfig
-                  .ModuleConfig_DetectionSensorConfig_TriggerType,
-            },
-          },
-          {
-            type: "toggle",
-            name: "usePullup",
-            label: t("detectionSensor.usePullup.label"),
-            description: t("detectionSensor.usePullup.description"),
-            disabledBy: [
-              {
-                fieldName: "enabled",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    [t],
-  );
-
-  // Register fields on mount
-  useEffect(() => {
-    const metadata = createFieldMetadata(section, fieldGroups);
-    registerFields(section, metadata);
-  }, [registerFields, fieldGroups, section]);
+        },
+        {
+          type: "toggle",
+          name: "usePullup",
+          label: t("detectionSensor.usePullup.label"),
+          description: t("detectionSensor.usePullup.description"),
+          disabledBy: [{ fieldName: "enabled" }],
+        },
+      ],
+    },
+  ];
 
   return (
-    <DynamicForm<DetectionSensorValidation>
-      onSubmit={onSubmit}
-      onFormInit={onFormInit}
-      validationSchema={DetectionSensorValidationSchema}
-      defaultValues={moduleConfig.detectionSensor}
-      values={getEffectiveModuleConfig("detectionSensor")}
+    <ConfigFormFields
+      form={form}
       fieldGroups={fieldGroups}
+      isDisabledByField={isDisabledByField}
     />
   );
 };

@@ -25,22 +25,20 @@ import {
 } from "@components/ui/tabs.tsx";
 import { useDevice, type ValidModuleConfigType } from "@core/stores";
 import { type ComponentType, useMemo } from "react";
-import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-interface ConfigProps {
-  onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
+interface ConfigPageProps {
   searchQuery?: string;
 }
 
 type TabItem = {
   case: ValidModuleConfigType;
   label: string;
-  element: ComponentType<ConfigProps>;
+  element: ComponentType;
   count?: number;
 };
 
-export const ModuleConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
+export const ModuleConfig = ({ searchQuery = "" }: ConfigPageProps) => {
   const { hasModuleConfigChange } = useDevice();
   const { t } = useTranslation("moduleConfig");
   const tabs: TabItem[] = [
@@ -99,8 +97,12 @@ export const ModuleConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
       label: t("page.detectionSensor"),
       element: DetectionSensor,
     },
-    { case: "paxcounter", label: t("page.paxcounter"), element: Paxcounter },
-  ] as const;
+    {
+      case: "paxcounter",
+      label: t("page.paxcounter"),
+      element: Paxcounter,
+    },
+  ];
 
   const flags = useMemo(
     () =>
@@ -169,7 +171,7 @@ export const ModuleConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <tab.element onFormInit={onFormInit} />
+                  <tab.element />
                 </CardContent>
               </Card>
             </TabsContent>

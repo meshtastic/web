@@ -1,18 +1,21 @@
-import type { FieldProps } from "@components/Form/DynamicFormField";
-import type { ConfigSection, FieldMetadata } from "./types.ts";
+import type {
+  ConfigSection,
+  FieldDefinition,
+  FieldMetadata,
+} from "./types";
 
-interface FieldGroup<T> {
+interface FieldGroup {
   label: string;
   description: string;
-  fields: FieldProps<T>[];
+  fields: FieldDefinition[];
 }
 
 /**
- * Helper to convert DynamicForm field groups into FieldMetadata for registration
+ * Helper to convert field groups into FieldMetadata for registration
  */
-export function createFieldMetadata<T>(
+export function createFieldMetadata(
   section: ConfigSection,
-  fieldGroups: FieldGroup<T>[],
+  fieldGroups: FieldGroup[],
 ): FieldMetadata[] {
   const metadata: FieldMetadata[] = [];
 
@@ -20,10 +23,10 @@ export function createFieldMetadata<T>(
     for (const field of group.fields) {
       metadata.push({
         section,
-        fieldName: field.name as string,
+        fieldName: field.name,
         label: field.label,
         description: field.description,
-        fieldDefinition: field as FieldProps<unknown>,
+        fieldDefinition: field,
         groupLabel: group.label,
       });
     }

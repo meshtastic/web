@@ -270,7 +270,7 @@ export default function AddConnectionDialog({
 }: {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSave?: (conn: NewConnectionInput, device?: BluetoothDevice) => Promise<void>;
+  onSave?: (conn: NewConnectionInput) => Promise<void>;
   isHTTPS?: boolean;
 }) {
   const { toast } = useToast();
@@ -611,8 +611,7 @@ export default function AddConnectionDialog({
   const canCreate = useMemo(() => currentPane.validate(), [currentPane]);
 
   const submit =
-    (fn: (p: NewConnectionInput, device?: BluetoothDevice) => Promise<void>) =>
-    async () => {
+    (fn: (p: NewConnectionInput) => Promise<void>) => async () => {
       if (!canCreate) {
         return;
       }
@@ -621,9 +620,7 @@ export default function AddConnectionDialog({
       if (!payload) {
         return;
       }
-      const btDevice =
-        state.tab === "bluetooth" ? state.btSelected?.device : undefined;
-      await fn(payload, btDevice);
+      await fn(payload);
     };
 
   return (

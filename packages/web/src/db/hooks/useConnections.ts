@@ -243,6 +243,15 @@ export function useConnections() {
         console.log(`[DB] Subscribed to device ${deviceId} events`);
       });
 
+      // Subscribe to config events
+      meshDevice.events.onConfigPacket.subscribe((config) => {
+        device.setConfig(config);
+      });
+
+      meshDevice.events.onModuleConfigPacket.subscribe((config) => {
+        device.setModuleConfig(config);
+      });
+
       // Navigate to messages when config-only stage completes (nonce 69420)
       const configCompleteUnsub = meshDevice.events.onConfigComplete.subscribe(
         async (configCompleteId) => {

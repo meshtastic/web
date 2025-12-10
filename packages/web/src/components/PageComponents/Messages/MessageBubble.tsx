@@ -5,9 +5,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@components/ui/tooltip";
-import type { Message } from "@db/schema";
 import { cn } from "@core/utils/cn";
 import { getAvatarColors } from "@core/utils/color";
+import type { Message } from "@db/schema";
 import { MessageStatusIndicator } from "./MessageStatusIndicator.tsx";
 import { RetryButton } from "./RetryButton.tsx";
 
@@ -34,13 +34,17 @@ export const MessageBubble = ({
   return (
     <div
       className={cn(
-        "flex gap-2 items-start w-full",
+        "flex items-center gap-2 w-full",
         isMine ? "flex-row-reverse" : "flex-row",
       )}
     >
       {/* Avatar */}
       {showAvatar && !isMine && (
-        <NodeAvatar nodeNum={message.fromNode} longName={senderName} size="sm" />
+        <NodeAvatar
+          nodeNum={message.fromNode}
+          longName={senderName}
+          size="sm"
+        />
       )}
 
       {/* Message Bubble */}

@@ -13,6 +13,8 @@ npm/
 
 packages/protobufs/packages/ts/dist
 .pnpm-store/
+.claude
+.gemini
 
 # Local dev certs
 *.pem

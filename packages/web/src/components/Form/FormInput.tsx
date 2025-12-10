@@ -1,7 +1,7 @@
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
-} from "@components/Form/DynamicForm.tsx";
+} from "@components/Form/FormTypes";
 import { Input } from "@components/ui/input.tsx";
 import type { ChangeEventHandler } from "react";
 import { type FieldValues, useController } from "react-hook-form";

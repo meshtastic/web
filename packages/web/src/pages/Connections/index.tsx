@@ -53,7 +53,7 @@ import { useTranslation } from "react-i18next";
 export const Connections = () => {
   const {
     connections,
-    addConnectionAndConnect,
+    addConnection,
     connect,
     disconnect,
     removeConnection,
@@ -216,8 +216,8 @@ export const Connections = () => {
         open={addOpen}
         onOpenChange={setAddOpen}
         isHTTPS={isURLHTTPS}
-        onSave={async (partial, btDevice) => {
-          const created = await addConnectionAndConnect(partial, btDevice);
+        onSave={async (partial) => {
+          const created = await addConnection(partial);
           if (created) {
             setAddOpen(false);
             toast({
@@ -226,17 +226,6 @@ export const Connections = () => {
                 name: created.name,
                 interpolation: { escapeValue: false },
               }),
-            });
-            if (
-              created.status === "connected" ||
-              created.status === "configured"
-            ) {
-              navigate({ to: "/" });
-            }
-          } else {
-            toast({
-              title: "Unable to connect",
-              description: "savedCantConnect",
             });
           }
         }}

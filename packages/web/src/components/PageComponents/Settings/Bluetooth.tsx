@@ -1,38 +1,29 @@
-import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
+import { useConfigForm } from "@app/pages/Settings/hooks/useConfigForm";
 import {
   type BluetoothValidation,
   BluetoothValidationSchema,
-} from "@app/validation/config/bluetooth.ts";
+} from "@app/validation/config/bluetooth";
 import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
-import {
-  createFieldMetadata,
-  useFieldRegistry,
-} from "@core/services/fieldRegistry";
-import { useDevice } from "@core/stores";
+  ConfigFormFields,
+  type FieldGroup,
+} from "@components/Form/ConfigFormFields";
 import { Protobuf } from "@meshtastic/core";
-import { useEffect } from "react";
+import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useTranslation } from "react-i18next";
 
-interface BluetoothConfigProps {
-  onFormInit: DynamicFormFormInit<BluetoothValidation>;
-}
-export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
-  useWaitForConfig({ configCase: "bluetooth" });
-
-  const { config, getEffectiveConfig } = useDevice();
-  const {
-    registerFields,
-    trackChange,
-    removeChange: removeFieldChange,
-  } = useFieldRegistry();
+export const Bluetooth = () => {
   const { t } = useTranslation("config");
+  const { form, isReady, isDisabledByField } =
+    useConfigForm<BluetoothValidation>({
+      configType: "bluetooth",
+      schema: BluetoothValidationSchema,
+    });
 
-  const section = { type: "config", variant: "bluetooth" } as const;
+  if (!isReady) {
+    return <ConfigFormSkeleton />;
+  }
 
-  const fieldGroups = [
+  const fieldGroups: FieldGroup<BluetoothValidation>[] = [
     {
       label: t("bluetooth.title"),
       description: t("bluetooth.description"),
@@ -49,11 +40,7 @@ export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
           name: "mode",
           label: t("bluetooth.pairingMode.label"),
           description: t("bluetooth.pairingMode.description"),
-          disabledBy: [
-            {
-              fieldName: "enabled",
-            },
-          ],
+          disabledBy: [{ fieldName: "enabled" }],
           properties: {
             enumValue: Protobuf.Config.Config_BluetoothConfig_PairingMode,
             formatEnumName: true,
@@ -69,41 +56,11 @@ export const Bluetooth = ({ onFormInit }: BluetoothConfigProps) => {
     },
   ];
 
-  // Register fields on mount
-  useEffect(() => {
-    const metadata = createFieldMetadata(section, fieldGroups);
-    registerFields(section, metadata);
-  }, [registerFields, fieldGroups, section]);
-
-  const onSubmit = (data: BluetoothValidation) => {
-    // Track individual field changes
-    const originalData = config.bluetooth;
-    if (!originalData) {
-      return;
-    }
-
-    (Object.keys(data) as Array<keyof BluetoothValidation>).forEach(
-      (fieldName) => {
-        const newValue = data[fieldName];
-        const oldValue = originalData[fieldName];
-
-        if (newValue !== oldValue) {
-          trackChange(section, fieldName as string, newValue, oldValue);
-        } else {
-          removeFieldChange(section, fieldName as string);
-        }
-      },
-    );
-  };
-
   return (
-    <DynamicForm<BluetoothValidation>
-      onSubmit={onSubmit}
-      onFormInit={onFormInit}
-      validationSchema={BluetoothValidationSchema}
-      defaultValues={config.bluetooth}
-      values={getEffectiveConfig("bluetooth")}
+    <ConfigFormFields
+      form={form}
       fieldGroups={fieldGroups}
+      isDisabledByField={isDisabledByField}
     />
   );
 };

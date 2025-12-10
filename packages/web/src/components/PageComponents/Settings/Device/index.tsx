@@ -1,40 +1,24 @@
-import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
+import { useDeviceForm } from "@pages/Settings/hooks";
+import type { DeviceValidation } from "@app/validation/config/device";
 import {
-  type DeviceValidation,
-  DeviceValidationSchema,
-} from "@app/validation/config/device.ts";
-import { useUnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/useUnsafeRolesDialog.ts";
-import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
-import {
-  createFieldMetadata,
-  useFieldRegistry,
-} from "@core/services/fieldRegistry";
+  ConfigFormFields,
+  type FieldGroup,
+} from "@components/Form/ConfigFormFields";
+import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useDevice } from "@core/stores";
 import { Protobuf } from "@meshtastic/core";
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-interface DeviceConfigProps {
-  onFormInit: DynamicFormFormInit<DeviceValidation>;
-}
-export const Device = ({ onFormInit }: DeviceConfigProps) => {
-  useWaitForConfig({ configCase: "device" });
-
-  const { config, getEffectiveConfig } = useDevice();
-  const {
-    registerFields,
-    trackChange,
-    removeChange: removeFieldChange,
-  } = useFieldRegistry();
+export const Device = () => {
   const { t } = useTranslation("config");
-  const { validateRoleSelection } = useUnsafeRolesDialog();
+  const { getEffectiveConfig } = useDevice();
+  const { form, isReady, isDisabledByField } = useDeviceForm();
 
-  const section = { type: "config", variant: "device" } as const;
+  if (!isReady) {
+    return <ConfigFormSkeleton />;
+  }
 
-  const fieldGroups = [
+  const fieldGroups: FieldGroup<DeviceValidation>[] = [
     {
       label: t("device.title"),
       description: t("device.description"),
@@ -44,7 +28,6 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
           name: "role",
           label: t("device.role.label"),
           description: t("device.role.description"),
-          validate: validateRoleSelection,
           properties: {
             enumValue: Protobuf.Config.Config_DeviceConfig_Role,
             formatEnumName: true,
@@ -116,41 +99,11 @@ export const Device = ({ onFormInit }: DeviceConfigProps) => {
     },
   ];
 
-  // Register fields on mount
-  useEffect(() => {
-    const metadata = createFieldMetadata(section, fieldGroups);
-    registerFields(section, metadata);
-  }, [registerFields, fieldGroups, section]);
-
-  const onSubmit = (data: DeviceValidation) => {
-    // Track individual field changes
-    const originalData = config.device;
-    if (!originalData) {
-      return;
-    }
-
-    (Object.keys(data) as Array<keyof DeviceValidation>).forEach(
-      (fieldName) => {
-        const newValue = data[fieldName];
-        const oldValue = originalData[fieldName];
-
-        if (newValue !== oldValue) {
-          trackChange(section, fieldName as string, newValue, oldValue);
-        } else {
-          removeFieldChange(section, fieldName as string);
-        }
-      },
-    );
-  };
-
   return (
-    <DynamicForm<DeviceValidation>
-      onSubmit={onSubmit}
-      onFormInit={onFormInit}
-      validationSchema={DeviceValidationSchema}
-      defaultValues={config.device}
-      values={getEffectiveConfig("device")}
+    <ConfigFormFields
+      form={form}
       fieldGroups={fieldGroups}
+      isDisabledByField={isDisabledByField}
     />
   );
 };

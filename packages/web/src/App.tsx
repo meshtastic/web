@@ -7,7 +7,6 @@ import { Toaster } from "@components/Toaster.tsx";
 import { ThemeProvider } from "@components/theme-provider";
 import { useAppStore } from "@core/stores";
 import { Outlet } from "@tanstack/react-router";
-import { MapProvider } from "react-map-gl/maplibre";
 import { SidebarProvider } from "./components/ui/sidebar.tsx";
 
 export function App() {
@@ -23,9 +22,7 @@ export function App() {
             <DialogManager />
             <KeyBackupReminder />
             <CommandPalette />
-            <MapProvider>
-              <Outlet />
-            </MapProvider>
+            <Outlet />
           </AppLayout>
         </DeviceWrapper>
       </SidebarProvider>

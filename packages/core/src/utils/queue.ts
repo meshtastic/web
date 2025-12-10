@@ -40,20 +40,24 @@ export class Queue {
             reject(e);
           }
         });
+        // Check if this is a fire-and-forget packet type
+        const decoded = fromBinary(Protobuf.Mesh.ToRadioSchema, item.data);
+        if (
+          decoded.payloadVariant.case === "heartbeat" ||
+          decoded.payloadVariant.case === "wantConfigId"
+        ) {
+          // heartbeat and wantConfigId packets are not acknowledged by the device
+          // resolve immediately after sending (processQueue handles the actual send)
+          setTimeout(() => {
+            this.remove(item.id);
+            resolve(item.id);
+          }, 100);
+          return;
+        }
+
         setTimeout(() => {
           if (this.queue.findIndex((qi) => qi.id === item.id) !== -1) {
             this.remove(item.id);
-            const decoded = fromBinary(Protobuf.Mesh.ToRadioSchema, item.data);
-
-            if (
-              decoded.payloadVariant.case === "heartbeat" ||
-              decoded.payloadVariant.case === "wantConfigId"
-            ) {
-              // heartbeat and wantConfigId packets are not acknowledged by the device, assume success after timeout
-              resolve(item.id);
-              return;
-            }
-
             console.warn(
               `Packet ${item.id} of type ${decoded.payloadVariant.case} timed out`,
             );

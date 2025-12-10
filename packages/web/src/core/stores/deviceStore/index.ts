@@ -58,6 +58,8 @@ type DeviceData = {
   >;
   waypoints: WaypointWithMetadata[];
   neighborInfo: Map<number, Protobuf.Mesh.NeighborInfo>;
+  config: Protobuf.LocalOnly.LocalConfig;
+  moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
 };
 export type ConnectionPhase =
   | "disconnected"
@@ -71,8 +73,6 @@ export interface Device extends DeviceData {
   status: Types.DeviceStatusEnum;
   connectionPhase: ConnectionPhase;
   connectionId: ConnectionId | null;
-  config: Protobuf.LocalOnly.LocalConfig;
-  moduleConfig: Protobuf.LocalOnly.LocalModuleConfig;
   changes: Map<string, ChangeEntry>; // Unified change tracking
   queuedAdminMessages: Protobuf.Admin.AdminMessage[]; // Queued admin messages
   hardware: Protobuf.Mesh.MyNodeInfo;
@@ -197,8 +197,9 @@ function deviceFactory(
     status: Types.DeviceStatusEnum.DeviceDisconnected,
     connectionPhase: "disconnected",
     connectionId: null,
-    config: create(Protobuf.LocalOnly.LocalConfigSchema),
-    moduleConfig: create(Protobuf.LocalOnly.LocalModuleConfigSchema),
+    config: data?.config ?? create(Protobuf.LocalOnly.LocalConfigSchema),
+    moduleConfig:
+      data?.moduleConfig ?? create(Protobuf.LocalOnly.LocalModuleConfigSchema),
     changes: new Map(),
     queuedAdminMessages: [],
     hardware: create(Protobuf.Mesh.MyNodeInfoSchema),
@@ -1011,6 +1012,8 @@ const persistOptions: PersistOptions<PrivateDeviceState, DevicePersisted> = {
           traceroutes: db.traceroutes,
           waypoints: db.waypoints,
           neighborInfo: db.neighborInfo,
+          config: db.config,
+          moduleConfig: db.moduleConfig,
         },
       ]),
     ),

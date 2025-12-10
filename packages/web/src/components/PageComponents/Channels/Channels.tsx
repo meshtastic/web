@@ -1,46 +1,43 @@
 import { Channel } from "@app/components/PageComponents/Channels/Channel";
-import { Button } from "@components/ui/button.tsx";
-import { Spinner } from "@components/ui/spinner.tsx";
+import { type Channel as DbChannel, useChannels } from "@app/db";
+import { Button } from "@components/ui/button";
+import { Spinner } from "@components/ui/spinner";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@components/ui/tabs.tsx";
-import { useDevice } from "@core/stores";
-import type { Protobuf } from "@meshtastic/core";
+} from "@components/ui/tabs";
+import { useDevice, useDeviceContext } from "@core/stores";
 import i18next from "i18next";
 import { QrCodeIcon, UploadIcon } from "lucide-react";
 import { Suspense, useMemo } from "react";
-import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-interface ConfigProps {
-  onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
-}
-
-export const getChannelName = (channel: Protobuf.Channel.Channel) => {
-  return channel.settings?.name.length
-    ? channel.settings?.name
-    : channel.index === 0
-      ? i18next.t("page.broadcastLabel")
+export const getChannelName = (channel: DbChannel) => {
+  return channel.name?.length
+    ? channel.name
+    : channel.channelIndex === 0
+      ? i18next.t("page.broadcastLabel", { ns: "channels" })
       : i18next.t("page.channelIndex", {
           ns: "channels",
-          index: channel.index,
+          index: channel.channelIndex,
         });
 };
 
-export const Channels = ({ onFormInit }: ConfigProps) => {
-  const { channels, hasChannelChange, setDialogOpen } = useDevice();
+export const Channels = () => {
+  const { hasChannelChange, setDialogOpen } = useDevice();
+  const { deviceId } = useDeviceContext();
+  const { channels } = useChannels(deviceId);
   const { t } = useTranslation("channels");
 
-  const allChannels = Array.from(channels.values());
+  const allChannels = channels;
   const flags = useMemo(
     () =>
       new Map(
         allChannels.map((channel) => [
-          channel.index,
-          hasChannelChange(channel.index),
+          channel.channelIndex,
+          hasChannelChange(channel.channelIndex),
         ]),
       ),
     [allChannels, hasChannelChange],
@@ -51,12 +48,12 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
       <TabsList className="w-full">
         {allChannels.map((channel) => (
           <TabsTrigger
-            key={`channel_${channel.index}`}
-            value={`channel_${channel.index}`}
+            key={`channel_${channel.channelIndex}`}
+            value={`channel_${channel.channelIndex}`}
             className="relative text-white"
           >
             {getChannelName(channel)}
-            {flags.get(channel.index) && (
+            {flags.get(channel.channelIndex) && (
               <span className="absolute -top-0.5 -right-0.5 z-50 flex size-3">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-25" />
                 <span className="relative inline-flex size-3 rounded-full bg-sky-500" />
@@ -65,28 +62,29 @@ export const Channels = ({ onFormInit }: ConfigProps) => {
           </TabsTrigger>
         ))}
         <Button
+          variant={"outline"}
           className="ml-auto mr-1 h-8"
           onClick={() => setDialogOpen("import", true)}
         >
           <UploadIcon className="mr-2" size={14} />
           {t("page.import")}
         </Button>
-        <Button className=" h-8" onClick={() => setDialogOpen("QR", true)}>
+        <Button
+          variant={"outline"}
+          className=" h-8"
+          onClick={() => setDialogOpen("QR", true)}
+        >
           <QrCodeIcon className="mr-2" size={14} />
           {t("page.export")}
         </Button>
       </TabsList>
       {allChannels.map((channel) => (
         <TabsContent
-          key={`channel_${channel.index}`}
-          value={`channel_${channel.index}`}
+          key={`channel_${channel.channelIndex}`}
+          value={`channel_${channel.channelIndex}`}
         >
           <Suspense fallback={<Spinner size="lg" className="my-5" />}>
-            <Channel
-              key={channel.index}
-              onFormInit={onFormInit}
-              channel={channel}
-            />
+            <Channel key={channel.channelIndex} channel={channel} />
           </Suspense>
         </TabsContent>
       ))}

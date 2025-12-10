@@ -199,7 +199,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                   key={action.id}
                   type="button"
                   className={cn(
-                    "inline-flex h-full items-center justify-center px-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:ring-offset-0 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200 dark:focus:ring-slate-500 last:hover:rounded-r-md last:dark:hover:rounded-r-md",
+                    "inline-flex h-full items-center justify-center px-2.5 text-muted-foreground hover:bg-accent/20 hover:text-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-0 last:hover:rounded-r-md",
                     disabled && "text-slate-300 dark:text-slate-600",
                     action.id === "copy-value" &&
                       isCopied &&

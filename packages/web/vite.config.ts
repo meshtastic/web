@@ -27,7 +27,7 @@ try {
 }
 
 const CONTENT_SECURITY_POLICY =
-  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn-cookieyes.com; style-src 'self' 'unsafe-inline' data:; img-src 'self' data:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'self';";
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn-cookieyes.com; style-src 'self' 'unsafe-inline' data:; img-src 'self' data:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self' https://raw.githubusercontent.com https://*.tile.openstreetmap.org; object-src 'none'; base-uri 'self';";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());

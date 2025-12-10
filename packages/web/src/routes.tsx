@@ -1,37 +1,55 @@
 import MessagesPage from "@app/pages/Messages/index.tsx";
-import PreferencesPage from "@app/pages/Preferences.tsx";
-import SettingsPage from "@app/pages/Settings.tsx";
-import StatisticsPage from "@app/pages/Statistics/index.tsx";
 import { ErrorPage } from "@components/ui/error-page.tsx";
-import type { useDeviceStore } from "@core/stores";
-import { ModuleConfig } from "@meshtastic/protobufs";
+import { Spinner } from "@components/ui/spinner.tsx";
+import { useDeviceStore } from "@core/stores";
 import { Connections } from "@pages/Connections/index.tsx";
 import MapPage from "@pages/Map/index.tsx";
-import NodesPage from "@pages/Nodes/index.tsx";
 import {
+  createRootRoute,
   createRootRouteWithContext,
   createRoute,
   createRouter,
   redirect,
 } from "@tanstack/react-router";
-import { Activity } from "react";
+import { Activity, lazy, Suspense } from "react";
 import type { useTranslation } from "react-i18next";
 import { z } from "zod/v4";
 import { App } from "./App.tsx";
-import { DeviceConfig } from "./pages/Settings/DeviceConfig.tsx";
-import { RadioConfig } from "./pages/Settings/RadioConfig.tsx";
+
+// Lazy loaded routes
+const NodesPage = lazy(() => import("@pages/Nodes/index.tsx"));
+const PreferencesPage = lazy(() => import("@app/pages/Preferences.tsx"));
+const SettingsPage = lazy(() => import("@app/pages/Settings/index.tsx"));
+const StatisticsPage = lazy(() => import("@app/pages/Statistics/index.tsx"));
+const RadioConfig = lazy(() =>
+  import("./pages/Settings/RadioConfig.tsx").then((m) => ({
+    default: m.RadioConfig,
+  })),
+);
+const DeviceConfig = lazy(() =>
+  import("./pages/Settings/DeviceConfig.tsx").then((m) => ({
+    default: m.DeviceConfig,
+  })),
+);
+const ModuleConfig = lazy(() =>
+  import("./pages/Settings/ModuleConfig.tsx").then((m) => ({
+    default: m.ModuleConfig,
+  })),
+);
+
+function RouteLoader() {
+  return (
+    <div className="flex h-full items-center justify-center">
+      <Spinner size="lg" />
+    </div>
+  );
+}
 
 type DeviceStore = ReturnType<typeof useDeviceStore>;
 
-interface AppContext {
-  stores: {
-    device: DeviceStore;
-  };
-}
-
 // Helper function to check if there's an active connection
-function requireActiveConnection(context: AppContext) {
-  const devices = context.stores.device.getDevices();
+function requireActiveConnection() {
+  const devices = useDeviceStore.getState().getDevices();
 
   // Check if any device has an active connection
   const hasActiveConnection = devices.some(
@@ -45,7 +63,7 @@ function requireActiveConnection(context: AppContext) {
   }
 }
 
-export const rootRoute = createRootRouteWithContext<AppContext>()({
+export const rootRoute = createRootRoute({
   component: () => <App />,
   errorComponent: ErrorPage,
 });
@@ -136,7 +154,11 @@ export const mapWithParamsRoute = createRoute({
 export const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/settings",
-  component: SettingsPage,
+  component: () => (
+    <Suspense fallback={<RouteLoader />}>
+      <SettingsPage />
+    </Suspense>
+  ),
   errorComponent: ErrorPage,
   beforeLoad: ({ context }) => {
     requireActiveConnection(context);
@@ -146,21 +168,33 @@ export const settingsRoute = createRoute({
 export const radioRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: "radio",
-  component: RadioConfig,
+  component: () => (
+    <Suspense fallback={<RouteLoader />}>
+      <RadioConfig />
+    </Suspense>
+  ),
   errorComponent: ErrorPage,
 });
 
 export const deviceRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: "device",
-  component: DeviceConfig,
+  component: () => (
+    <Suspense fallback={<RouteLoader />}>
+      <DeviceConfig />
+    </Suspense>
+  ),
   errorComponent: ErrorPage,
 });
 
 export const moduleRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: "module",
-  component: ModuleConfig,
+  component: () => (
+    <Suspense fallback={<RouteLoader />}>
+      <ModuleConfig />
+    </Suspense>
+  ),
   errorComponent: ErrorPage,
 });
 
@@ -173,7 +207,9 @@ const nodesRoute = createRoute({
   },
   component: () => (
     <Activity>
-      <NodesPage />
+      <Suspense fallback={<RouteLoader />}>
+        <NodesPage />
+      </Suspense>
     </Activity>
   ),
 });
@@ -188,7 +224,11 @@ const connectionsRoute = createRoute({
 const preferencesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/preferences",
-  component: PreferencesPage,
+  component: () => (
+    <Suspense fallback={<RouteLoader />}>
+      <PreferencesPage />
+    </Suspense>
+  ),
   errorComponent: ErrorPage,
   beforeLoad: ({ context }) => {
     requireActiveConnection(context);
@@ -204,7 +244,9 @@ const statisticsRoute = createRoute({
   },
   component: () => (
     <Activity>
-      <StatisticsPage />
+      <Suspense fallback={<RouteLoader />}>
+        <StatisticsPage />
+      </Suspense>
     </Activity>
   ),
 });
@@ -227,7 +269,6 @@ const router = createRouter({
     stores: {
       device: {} as DeviceStore,
     },
-    i18n: {} as ReturnType<typeof import("react-i18next").useTranslation>,
   },
 });
 export { router };

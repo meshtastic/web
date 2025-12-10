@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { dbClient } from "../client";
-import { preferences } from "../schema";
+import { dbClient } from "../client.ts";
+import { preferences } from "../schema.ts";
 
 /**
  * Repository for user preferences (key-value store)

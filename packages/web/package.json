@@ -25,7 +25,9 @@
     "typecheck": "pnpm run tsc --noEmit",
     "preview": "vite preview",
     "docker:build": "docker build -t meshtastic-web:latest -f ./infra/Containerfile .",
-    "package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ ."
+    "package": "gzipper c -i html,js,css,png,ico,svg,json,webmanifest,txt dist dist/output && tar -cvf dist/build.tar -C ./dist/output/ .",
+    "db:generate": "drizzle-kit generate",
+    "db:check": "drizzle-kit check"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

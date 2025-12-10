@@ -1,37 +1,27 @@
-import { useWaitForConfig } from "@app/core/hooks/useWaitForConfig";
+import { useConfigForm } from "@app/pages/Settings/hooks/useConfigForm";
 import {
   type PowerValidation,
   PowerValidationSchema,
-} from "@app/validation/config/power.ts";
+} from "@app/validation/config/power";
 import {
-  DynamicForm,
-  type DynamicFormFormInit,
-} from "@components/Form/DynamicForm.tsx";
-import {
-  createFieldMetadata,
-  useFieldRegistry,
-} from "@core/services/fieldRegistry";
-import { useDevice } from "@core/stores";
-import { useEffect } from "react";
+  ConfigFormFields,
+  type FieldGroup,
+} from "@components/Form/ConfigFormFields";
+import { ConfigFormSkeleton } from "@pages/Settings/SettingsLoading";
 import { useTranslation } from "react-i18next";
 
-interface PowerConfigProps {
-  onFormInit: DynamicFormFormInit<PowerValidation>;
-}
-export const Power = ({ onFormInit }: PowerConfigProps) => {
-  useWaitForConfig({ configCase: "power" });
-
-  const { config, getEffectiveConfig } = useDevice();
-  const {
-    registerFields,
-    trackChange,
-    removeChange: removeFieldChange,
-  } = useFieldRegistry();
+export const Power = () => {
   const { t } = useTranslation("config");
+  const { form, isReady, isDisabledByField } = useConfigForm<PowerValidation>({
+    configType: "power",
+    schema: PowerValidationSchema,
+  });
 
-  const section = { type: "config", variant: "power" } as const;
+  if (!isReady) {
+    return <ConfigFormSkeleton />;
+  }
 
-  const fieldGroups = [
+  const fieldGroups: FieldGroup<PowerValidation>[] = [
     {
       label: t("power.powerConfigSettings.label"),
       description: t("power.powerConfigSettings.description"),
@@ -112,39 +102,11 @@ export const Power = ({ onFormInit }: PowerConfigProps) => {
     },
   ];
 
-  // Register fields on mount
-  useEffect(() => {
-    const metadata = createFieldMetadata(section, fieldGroups);
-    registerFields(section, metadata);
-  }, [registerFields, fieldGroups, section]);
-
-  const onSubmit = (data: PowerValidation) => {
-    // Track individual field changes
-    const originalData = config.power;
-    if (!originalData) {
-      return;
-    }
-
-    (Object.keys(data) as Array<keyof PowerValidation>).forEach((fieldName) => {
-      const newValue = data[fieldName];
-      const oldValue = originalData[fieldName];
-
-      if (newValue !== oldValue) {
-        trackChange(section, fieldName as string, newValue, oldValue);
-      } else {
-        removeFieldChange(section, fieldName as string);
-      }
-    });
-  };
-
   return (
-    <DynamicForm<PowerValidation>
-      onSubmit={onSubmit}
-      onFormInit={onFormInit}
-      validationSchema={PowerValidationSchema}
-      defaultValues={config.power}
-      values={getEffectiveConfig("power")}
+    <ConfigFormFields
+      form={form}
       fieldGroups={fieldGroups}
+      isDisabledByField={isDisabledByField}
     />
   );
 };

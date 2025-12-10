@@ -16,14 +16,17 @@ export function useActivityChanges() {
     let category = "Settings";
     if (change.section.variant) {
       // Convert camelCase to Title Case
-      const formatted = change.section.variant
-        .charAt(0).toUpperCase() +
-        change.section.variant.slice(1).replace(/([A-Z])/g, " $1").trim();
+      const formatted =
+        change.section.variant.charAt(0).toUpperCase() +
+        change.section.variant
+          .slice(1)
+          .replace(/([A-Z])/g, " $1")
+          .trim();
 
       // Handle common acronyms
       const acronymMap: Record<string, string> = {
-        "Mqtt": "MQTT",
-        "Lora": "LoRa",
+        Mqtt: "MQTT",
+        Lora: "Lora",
       };
       category = acronymMap[formatted] || formatted;
     }

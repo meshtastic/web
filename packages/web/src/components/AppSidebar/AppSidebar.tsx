@@ -105,7 +105,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <Link href="/" className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg">
-            <img src="/icon.svg" alt="Meshtastic Logo" className="h-9 w-9" />
+            <img src="/logo.svg" alt="Meshtastic Logo" className="h-9 w-9" />
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-semibold text-sidebar-foreground">

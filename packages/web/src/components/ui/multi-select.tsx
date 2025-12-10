@@ -39,10 +39,10 @@ const MultiSelectItem = ({
       className={cn(
         `
         inline-flex items-center rounded-md px-3 py-2 text-sm transition-colors
-        border border-slate-300 
-        hover:bg-slate-100 dark:hover:bg-slate-800
-        focus:outline-hidden focus:ring-2 focus:ring-slate-400 focus:ring-offset-2
-        data-[state=checked]:bg-slate-100 dark:data-[state=checked]:bg-slate-700`,
+        border border-border
+        hover:bg-accent/20
+        focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2
+        data-[state=checked]:bg-accent/30`,
         className,
       )}
     >

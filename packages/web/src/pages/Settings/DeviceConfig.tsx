@@ -15,11 +15,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
 import { useDevice, type ValidConfigType } from "@core/stores";
 import { type ComponentType, useMemo } from "react";
-import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-interface ConfigProps {
-  onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
+interface ConfigPageProps {
   searchQuery?: string;
 }
 
@@ -27,10 +25,10 @@ type ConfigSection = {
   case: ValidConfigType | "user";
   label: string;
   description: string;
-  element: ComponentType<ConfigProps>;
+  element: ComponentType<ConfigPageProps>;
 };
 
-export const DeviceConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
+export const DeviceConfig = ({ searchQuery = "" }: ConfigPageProps) => {
   const { hasConfigChange, hasUserChange } = useDevice();
   const { t } = useTranslation("config");
 
@@ -40,43 +38,43 @@ export const DeviceConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
         case: "user",
         label: t("page.user.title"),
         description: t("page.user.description"),
-        element: User,
+        element: User as ComponentType<ConfigPageProps>,
       },
       {
         case: "device",
         label: t("page.device.title"),
         description: t("page.device.description"),
-        element: Device,
+        element: Device as ComponentType<ConfigPageProps>,
       },
       {
         case: "position",
         label: t("page.position.title"),
         description: t("page.position.description"),
-        element: Position,
+        element: Position as ComponentType<ConfigPageProps>,
       },
       {
         case: "power",
         label: t("page.power.title"),
         description: t("page.power.description"),
-        element: Power,
+        element: Power as ComponentType<ConfigPageProps>,
       },
       {
         case: "network",
         label: t("page.network.title"),
         description: t("page.network.description"),
-        element: Network,
+        element: Network as ComponentType<ConfigPageProps>,
       },
       {
         case: "display",
         label: t("page.display.title"),
         description: t("page.display.description"),
-        element: Display,
+        element: Display as ComponentType<ConfigPageProps>,
       },
       {
         case: "bluetooth",
         label: t("page.bluetooth.title"),
         description: t("page.bluetooth.description"),
-        element: Bluetooth,
+        element: Bluetooth as ComponentType<ConfigPageProps>,
       },
     ],
     [t],
@@ -113,7 +111,7 @@ export const DeviceConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
         </Card>
       ) : (
         <Tabs defaultValue={filteredSections[0]?.case}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+          <TabsList className="flex flex-wrap">
             {filteredSections.map((section) => (
               <TabsTrigger
                 key={section.case}
@@ -138,10 +136,7 @@ export const DeviceConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
                   <CardDescription>{section.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <section.element
-                    onFormInit={onFormInit}
-                    searchQuery={searchQuery}
-                  />
+                  <section.element searchQuery={searchQuery} />
                 </CardContent>
               </Card>
             </TabsContent>

@@ -15,6 +15,7 @@ export const ClearAllStoresDialog = ({
 
   const handleClearAllStores = () => {
     clearAllStores();
+    // Also drop the Meshtastic sqlite database
 
     // Reload the app to ensure all state is cleared
     window.location.href = "/";

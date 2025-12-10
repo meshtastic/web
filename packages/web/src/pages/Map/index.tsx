@@ -3,6 +3,7 @@ import {
   MapLayerTool,
   type VisibilityState,
 } from "@app/components/PageComponents/Map/Tools/MapLayerTool.tsx";
+import { create } from "@bufbuild/protobuf";
 import { FilterControl } from "@components/generic/Filter/FilterControl.tsx";
 import {
   type FilterState,
@@ -20,12 +21,11 @@ import {
 import { WaypointLayer } from "@components/PageComponents/Map/Layers/WaypointLayer.tsx";
 import type { PopupState } from "@components/PageComponents/Map/Popups/PopupWrapper.tsx";
 import { useMapFitting } from "@core/hooks/useMapFitting.ts";
-import { useNodes } from "@db/hooks";
 import { useDevice, useDeviceContext } from "@core/stores";
 import { cn } from "@core/utils/cn.ts";
 import { hasPos, toLngLat } from "@core/utils/geo.ts";
+import { useNodes } from "@db/hooks";
 import { Protobuf } from "@meshtastic/core";
-import { create } from "@bufbuild/protobuf";
 import { numberToHexUnpadded } from "@noble/curves/abstract/utils";
 import { toByteArray } from "base64-js";
 import { FunnelIcon, LocateFixedIcon } from "lucide-react";
@@ -38,12 +38,14 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { type MapLayerMouseEvent, useMap } from "react-map-gl/maplibre";
+import type { MapLayerMouseEvent, MapRef } from "react-map-gl/maplibre";
 
 // Helper to convert hex string to Uint8Array
 function hexToUint8Array(hex: string): Uint8Array {
   const matches = hex.match(/.{1,2}/g);
-  return matches ? new Uint8Array(matches.map(byte => parseInt(byte, 16))) : new Uint8Array();
+  return matches
+    ? new Uint8Array(matches.map((byte) => parseInt(byte, 16)))
+    : new Uint8Array();
 }
 
 const MapPage = () => {
@@ -61,7 +63,9 @@ const MapPage = () => {
           $typeName: "meshtastic.NodeInfo",
           num: node.nodeNum,
           snr: node.snr ?? 0,
-          lastHeard: node.lastHeard ? Math.floor(node.lastHeard.getTime() / 1000) : 0,
+          lastHeard: node.lastHeard
+            ? Math.floor(node.lastHeard.getTime() / 1000)
+            : 0,
           channel: 0,
           viaMqtt: false,
           isFavorite: node.isFavorite ?? false,
@@ -73,17 +77,23 @@ const MapPage = () => {
             id: node.userId ?? "",
             longName: node.longName ?? "",
             shortName: node.shortName ?? "",
-            macaddr: node.macaddr ? hexToUint8Array(node.macaddr) : new Uint8Array(),
+            macaddr: node.macaddr
+              ? hexToUint8Array(node.macaddr)
+              : new Uint8Array(),
             hwModel: node.hwModel ?? 0,
             role: node.role ?? 0,
-            publicKey: node.publicKey ? toByteArray(node.publicKey) : new Uint8Array(),
+            publicKey: node.publicKey
+              ? toByteArray(node.publicKey)
+              : new Uint8Array(),
             isLicensed: node.isLicensed ?? false,
           },
           position: create(Protobuf.Mesh.PositionSchema, {
             latitudeI: node.latitudeI ?? 0,
             longitudeI: node.longitudeI ?? 0,
             altitude: node.altitude ?? 0,
-            time: node.positionTime ? Math.floor(node.positionTime.getTime() / 1000) : 0,
+            time: node.positionTime
+              ? Math.floor(node.positionTime.getTime() / 1000)
+              : 0,
             precisionBits: node.positionPrecisionBits ?? 32,
             groundSpeed: node.groundSpeed ?? 0,
             groundTrack: node.groundTrack ?? 0,
@@ -109,11 +119,14 @@ const MapPage = () => {
   }, [validNodes, myNodeNum]);
 
   // Create getNode helper
-  const getNode = useCallback((nodeNum: number) => {
-    return validNodes.find((n) => n.num === nodeNum);
-  }, [validNodes]);
+  const getNode = useCallback(
+    (nodeNum: number) => {
+      return validNodes.find((n) => n.num === nodeNum);
+    },
+    [validNodes],
+  );
   const { nodeFilter, defaultFilterValues, isFilterDirty } = useFilterNode();
-  const { default: mapRef } = useMap();
+  const [mapRef, setMapRef] = useState<MapRef | undefined>(undefined);
   const { focusLngLat, fitToNodes } = useMapFitting(mapRef);
 
   const hasFitBoundsOnce = useRef(false);
@@ -136,13 +149,17 @@ const MapPage = () => {
     [validNodes, deferredFilterState, nodeFilter],
   );
 
-  // Map fitting
-  const getMapBounds = useCallback(() => {
-    if (!hasFitBoundsOnce.current) {
-      fitToNodes(validNodes);
-      hasFitBoundsOnce.current = true;
-    }
-  }, [fitToNodes, validNodes]);
+  // Map load handler - stores map ref and fits bounds once
+  const handleMapLoad = useCallback(
+    (map: MapRef) => {
+      setMapRef(map);
+      if (!hasFitBoundsOnce.current) {
+        fitToNodes(validNodes);
+        hasFitBoundsOnce.current = true;
+      }
+    },
+    [fitToNodes, validNodes],
+  );
 
   // SNR lines
   const snrLayerElementId = useId();
@@ -250,6 +267,10 @@ const MapPage = () => {
 
   // Position trails
   const positionTrailsElementId = useId();
+  const interactiveLayerIds = useMemo(
+    () => [snrLayerElementId],
+    [snrLayerElementId],
+  );
   const positionTrailsElement = useMemo(
     () => (
       <PositionTrailsLayer
@@ -265,10 +286,10 @@ const MapPage = () => {
   return (
     <div>
       <BaseMap
-        onLoad={getMapBounds}
+        onLoad={handleMapLoad}
         onMouseMove={onMouseMove}
         onClick={onMapBackgroundClick}
-        interactiveLayerIds={[snrLayerElementId]}
+        interactiveLayerIds={interactiveLayerIds}
       >
         {markerElements}
         {positionTrailsElement}
@@ -291,7 +312,7 @@ const MapPage = () => {
             type="button"
             className={cn(
               "rounded align-center",
-              "w-[29px] px-1 py-1 shadow-l outline-[2px] outline-stone-600/20",
+              "w-[29px] px-1 py-1 shadow-l outline-2 outline-stone-600/20",
               "bg-stone-50 hover:bg-stone-200 dark:bg-stone-200 dark:hover:bg-stone-300 ",
               "text-slate-600 hover:text-slate-700",
               "dark:text-slate-600 hover:dark:text-slate-700",

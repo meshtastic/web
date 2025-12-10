@@ -1,5 +1,5 @@
-import { Channels } from "@app/components/PageComponents/Channels/Channels";
-import { LoRa } from "@components/PageComponents/Settings/LoRa.tsx";
+import { Channels } from "@app/components/PageComponents/Channels/Channels.tsx";
+import { Lora } from "@app/components/PageComponents/Settings/Lora.tsx";
 import { Security } from "@components/PageComponents/Settings/Security/Security.tsx";
 import {
   Card,
@@ -11,22 +11,20 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
 import { useDevice, type ValidConfigType } from "@core/stores";
 import type { ComponentType } from "react";
-import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-interface ConfigProps {
-  onFormInit: <T extends object>(methods: UseFormReturn<T>) => void;
+interface ConfigPageProps {
   searchQuery?: string;
 }
 
 type TabItem = {
   case: ValidConfigType | "channels";
   label: string;
-  element: ComponentType<ConfigProps>;
+  element: ComponentType<ConfigPageProps>;
   count?: number;
 };
 
-export const RadioConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
+export const RadioConfig = ({ searchQuery = "" }: ConfigPageProps) => {
   const { hasConfigChange } = useDevice();
   const { t } = useTranslation("config");
 
@@ -34,19 +32,19 @@ export const RadioConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
     {
       case: "lora",
       label: t("page.lora.title"),
-      element: LoRa,
+      element: Lora,
     },
     {
       case: "channels",
       label: t("page.channels.title"),
-      element: Channels,
+      element: Channels as ComponentType<ConfigPageProps>,
     },
     {
       case: "security",
       label: t("page.security.title"),
-      element: Security,
+      element: Security as ComponentType<ConfigPageProps>,
     },
-  ] as const;
+  ];
 
   const filteredTabs = tabs.filter((tab) => {
     if (!searchQuery.trim()) {
@@ -74,9 +72,13 @@ export const RadioConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
         </Card>
       ) : (
         <Tabs defaultValue={filteredTabs[0]?.case}>
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="flex">
             {filteredTabs.map((tab) => (
-              <TabsTrigger key={tab.case} value={tab.case} className="relative">
+              <TabsTrigger
+                key={tab.case}
+                value={tab.case}
+                className="relative text-foreground"
+              >
                 {tab.label}
                 {hasChanges(tab.case) && (
                   <span className="absolute top-1 right-1 flex size-2">
@@ -99,10 +101,7 @@ export const RadioConfig = ({ onFormInit, searchQuery = "" }: ConfigProps) => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <tab.element
-                    onFormInit={onFormInit}
-                    searchQuery={searchQuery}
-                  />
+                  <tab.element searchQuery={searchQuery} />
                 </CardContent>
               </Card>
             </TabsContent>

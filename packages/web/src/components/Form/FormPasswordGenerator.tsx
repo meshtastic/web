@@ -1,7 +1,7 @@
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
-} from "@components/Form/DynamicForm.tsx";
+} from "@components/Form/FormTypes";
 import type { ButtonVariant } from "@components/ui/Button.tsx";
 import { Generator } from "@components/ui/generator.tsx";
 import { usePasswordVisibilityToggle } from "@core/hooks/usePasswordVisibilityToggle.ts";

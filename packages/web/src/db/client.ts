@@ -1,6 +1,16 @@
 import { drizzle } from "drizzle-orm/sqlite-proxy";
 import { SQLocalDrizzle } from "sqlocal/drizzle";
-import * as schema from "./schema";
+import migration0000 from "./migrations/0000_fair_arclight.sql?raw";
+import migration0001 from "./migrations/0001_good_warbird.sql?raw";
+import * as schema from "./schema.ts";
+
+/**
+ * Migration definitions with their SQL content
+ */
+const migrations = [
+  { id: "0000_fair_arclight", sql: migration0000 },
+  { id: "0001_good_warbird", sql: migration0001 },
+];
 
 /**
  * Database client singleton
@@ -51,14 +61,15 @@ class DatabaseClient {
     // Create Drizzle instance with the SQLocalDrizzle driver
     this.drizzleDb = drizzle(driver, { schema });
 
-    // Run migrations (create tables)
+    // Run migrations
     await this.runMigrations();
 
     console.log("[DB] Database initialized successfully");
   }
 
   /**
-   * Run migrations to create tables
+   * Run migrations from drizzle-kit generated SQL files
+   * Tracks applied migrations in a __drizzle_migrations table
    */
   private async runMigrations(): Promise<void> {
     if (!this.sqlocalDrizzle) {
@@ -67,200 +78,72 @@ class DatabaseClient {
 
     console.log("[DB] Running migrations...");
 
-    // Get raw SQL access for migrations
     const { sql } = this.sqlocalDrizzle;
 
-    // Create all tables from schema
-    // This is a simplified approach - in production you'd use drizzle-kit migrations
-    const migrations = [
-      // Messages table
-      `CREATE TABLE IF NOT EXISTS messages (
+    // Create migrations tracking table if it doesn't exist
+    await sql(`
+      CREATE TABLE IF NOT EXISTS __drizzle_migrations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        device_id INTEGER NOT NULL,
-        message_id INTEGER NOT NULL,
-        type TEXT NOT NULL CHECK(type IN ('direct', 'broadcast')),
-        channel_id INTEGER NOT NULL,
-        from_node INTEGER NOT NULL,
-        to_node INTEGER NOT NULL,
-        message TEXT NOT NULL,
-        date INTEGER NOT NULL,
-        created_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000),
-        state TEXT NOT NULL CHECK(state IN ('waiting', 'sending', 'sent', 'ack', 'failed')),
-        rx_snr REAL NOT NULL DEFAULT 0,
-        rx_rssi REAL NOT NULL DEFAULT 0,
-        via_mqtt INTEGER NOT NULL DEFAULT 0,
-        hops INTEGER NOT NULL DEFAULT 0,
-        retry_count INTEGER NOT NULL DEFAULT 0,
-        max_retries INTEGER NOT NULL DEFAULT 3,
-        received_ack INTEGER NOT NULL DEFAULT 0,
-        ack_error INTEGER NOT NULL DEFAULT 0,
-        ack_timestamp INTEGER,
-        ack_snr REAL DEFAULT 0,
-        real_ack INTEGER NOT NULL DEFAULT 0
-      )`,
-      `CREATE INDEX IF NOT EXISTS messages_device_idx ON messages(device_id)`,
-      `CREATE INDEX IF NOT EXISTS messages_device_date_idx ON messages(device_id, date)`,
-      `CREATE INDEX IF NOT EXISTS messages_device_type_idx ON messages(device_id, type)`,
-      `CREATE INDEX IF NOT EXISTS messages_direct_convo_idx ON messages(device_id, type, from_node, to_node, date)`,
-      `CREATE INDEX IF NOT EXISTS messages_broadcast_channel_idx ON messages(device_id, type, channel_id, date)`,
-      `CREATE INDEX IF NOT EXISTS messages_state_idx ON messages(device_id, state)`,
+        migration_id TEXT NOT NULL UNIQUE,
+        applied_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
+      )
+    `);
 
-      // Nodes table
-      `CREATE TABLE IF NOT EXISTS nodes (
-        device_id INTEGER NOT NULL,
-        node_num INTEGER NOT NULL,
-        last_heard INTEGER,
-        snr REAL DEFAULT 0,
-        is_favorite INTEGER NOT NULL DEFAULT 0,
-        is_ignored INTEGER NOT NULL DEFAULT 0,
-        user_id TEXT,
-        long_name TEXT,
-        short_name TEXT,
-        macaddr TEXT,
-        hw_model INTEGER,
-        role INTEGER,
-        public_key TEXT,
-        is_licensed INTEGER DEFAULT 0,
-        latitude_i INTEGER,
-        longitude_i INTEGER,
-        altitude INTEGER,
-        position_time INTEGER,
-        position_precision_bits INTEGER,
-        ground_speed INTEGER,
-        ground_track INTEGER,
-        sats_in_view INTEGER,
-        battery_level INTEGER,
-        voltage REAL,
-        channel_utilization REAL,
-        air_util_tx REAL,
-        uptime_seconds INTEGER,
-        updated_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000),
-        PRIMARY KEY (device_id, node_num)
-      )`,
-      `CREATE INDEX IF NOT EXISTS nodes_device_idx ON nodes(device_id)`,
-      `CREATE INDEX IF NOT EXISTS nodes_last_heard_idx ON nodes(device_id, last_heard)`,
-      `CREATE INDEX IF NOT EXISTS nodes_spatial_idx ON nodes(latitude_i, longitude_i)`,
-      `CREATE INDEX IF NOT EXISTS nodes_favorite_idx ON nodes(device_id, is_favorite)`,
+    // Check if we have an existing database without migration tracking
+    // (database was created before we added migration tracking)
+    const existingTables = await sql<{ name: string }[]>(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name != '__drizzle_migrations'`,
+    );
+    const appliedMigrations = await sql<{ migration_id: string }[]>(
+      `SELECT migration_id FROM __drizzle_migrations`,
+    );
 
-      // Channels table
-      `CREATE TABLE IF NOT EXISTS channels (
-        device_id INTEGER NOT NULL,
-        channel_index INTEGER NOT NULL,
-        role INTEGER NOT NULL,
-        name TEXT,
-        psk TEXT,
-        uplink_enabled INTEGER DEFAULT 0,
-        downlink_enabled INTEGER DEFAULT 0,
-        position_precision INTEGER DEFAULT 32,
-        updated_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000),
-        PRIMARY KEY (device_id, channel_index)
-      )`,
-      `CREATE INDEX IF NOT EXISTS channels_device_idx ON channels(device_id)`,
+    // If tables exist but no migrations are recorded, we need to seed the migration table
+    // This handles databases created before we added migration tracking
+    if (existingTables.length > 0 && appliedMigrations.length === 0) {
+      console.log(
+        "[DB] Detected existing database without migration tracking, seeding migration history...",
+      );
 
-      // Position logs table
-      `CREATE TABLE IF NOT EXISTS position_logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        device_id INTEGER NOT NULL,
-        node_num INTEGER NOT NULL,
-        latitude_i INTEGER,
-        longitude_i INTEGER,
-        altitude INTEGER,
-        time INTEGER,
-        precision_bits INTEGER,
-        ground_speed INTEGER,
-        ground_track INTEGER,
-        sats_in_view INTEGER,
-        rx_time INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
-      )`,
-      `CREATE INDEX IF NOT EXISTS position_logs_node_time_idx ON position_logs(device_id, node_num, time)`,
-      `CREATE INDEX IF NOT EXISTS position_logs_device_time_idx ON position_logs(device_id, time)`,
-      `CREATE INDEX IF NOT EXISTS position_logs_spatial_idx ON position_logs(latitude_i, longitude_i)`,
+      // Mark all migrations as applied since the schema already exists
+      for (const migration of migrations) {
+        await sql(
+          `INSERT INTO __drizzle_migrations (migration_id) VALUES ('${migration.id}')`,
+        );
+      }
+      console.log("[DB] Migration history seeded");
+    }
 
-      // Packet logs table
-      `CREATE TABLE IF NOT EXISTS packet_logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        device_id INTEGER NOT NULL,
-        from_node INTEGER NOT NULL,
-        to_node INTEGER,
-        channel INTEGER,
-        packet_id INTEGER,
-        hop_limit INTEGER,
-        hop_start INTEGER,
-        want_ack INTEGER,
-        rx_snr REAL,
-        rx_rssi REAL,
-        rx_time INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
-      )`,
-      `CREATE INDEX IF NOT EXISTS packet_logs_from_node_idx ON packet_logs(device_id, from_node, rx_time)`,
-      `CREATE INDEX IF NOT EXISTS packet_logs_device_time_idx ON packet_logs(device_id, rx_time)`,
+    const appliedSet = new Set(
+      appliedMigrations.map((row) => row.migration_id),
+    );
 
-      // Telemetry logs table
-      `CREATE TABLE IF NOT EXISTS telemetry_logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        device_id INTEGER NOT NULL,
-        node_num INTEGER NOT NULL,
-        battery_level INTEGER,
-        voltage REAL,
-        channel_utilization REAL,
-        air_util_tx REAL,
-        uptime_seconds INTEGER,
-        temperature REAL,
-        relative_humidity REAL,
-        barometric_pressure REAL,
-        current REAL,
-        time INTEGER,
-        rx_time INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
-      )`,
-      `CREATE INDEX IF NOT EXISTS telemetry_logs_node_time_idx ON telemetry_logs(device_id, node_num, time)`,
-      `CREATE INDEX IF NOT EXISTS telemetry_logs_device_time_idx ON telemetry_logs(device_id, time)`,
-
-      // Message drafts table
-      `CREATE TABLE IF NOT EXISTS message_drafts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        device_id INTEGER NOT NULL,
-        type TEXT NOT NULL CHECK(type IN ('direct', 'broadcast')),
-        target_id INTEGER NOT NULL,
-        content TEXT NOT NULL,
-        updated_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000),
-        UNIQUE(device_id, type, target_id)
-      )`,
-
-      // Last read table
-      `CREATE TABLE IF NOT EXISTS last_read (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        device_id INTEGER NOT NULL,
-        type TEXT NOT NULL CHECK(type IN ('direct', 'broadcast')),
-        conversation_id TEXT NOT NULL,
-        message_id INTEGER NOT NULL,
-        updated_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000),
-        UNIQUE(device_id, type, conversation_id)
-      )`,
-
-      // Connections table
-      `CREATE TABLE IF NOT EXISTS connections (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        type TEXT NOT NULL CHECK(type IN ('http', 'bluetooth', 'serial')),
-        name TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'disconnected' CHECK(status IN ('connected', 'connecting', 'disconnected', 'disconnecting', 'configuring', 'configured', 'online', 'error')),
-        error TEXT,
-        mesh_device_id INTEGER,
-        url TEXT,
-        device_id TEXT,
-        device_name TEXT,
-        gatt_service_uuid TEXT,
-        usb_vendor_id INTEGER,
-        usb_product_id INTEGER,
-        is_default INTEGER NOT NULL DEFAULT 0,
-        created_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000),
-        last_connected_at INTEGER,
-        updated_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
-      )`,
-      `CREATE INDEX IF NOT EXISTS connections_default_idx ON connections(is_default)`,
-      `CREATE INDEX IF NOT EXISTS connections_type_idx ON connections(type)`,
-    ];
-
+    // Run each migration that hasn't been applied yet
     for (const migration of migrations) {
-      await sql(migration);
+      if (appliedSet.has(migration.id)) {
+        console.log(`[DB] Migration ${migration.id} already applied, skipping`);
+        continue;
+      }
+
+      console.log(`[DB] Applying migration ${migration.id}...`);
+
+      // Split by statement breakpoint and execute each statement
+      const statements = migration.sql
+        .split("--> statement-breakpoint")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      for (const statement of statements) {
+        await sql(statement);
+      }
+
+      // Record that this migration has been applied
+      await sql(
+        `INSERT INTO __drizzle_migrations (migration_id) VALUES ('${migration.id}')`,
+      );
+
+      console.log(`[DB] Migration ${migration.id} applied successfully`);
+      return;
     }
 
     console.log("[DB] Migrations completed");
@@ -280,9 +163,6 @@ class DatabaseClient {
    * Get raw SQL access for direct queries
    */
   get sql() {
-    if (!this.sqlocalDrizzle) {
-      throw new Error("Database not initialized. Call init() first.");
-    }
     return this.sqlocalDrizzle.sql;
   }
 

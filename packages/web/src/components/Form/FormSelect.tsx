@@ -1,7 +1,7 @@
 import type {
   BaseFormBuilderProps,
   GenericFormElementProps,
-} from "@components/Form/DynamicForm.tsx";
+} from "@components/Form/FormTypes";
 import {
   Select,
   SelectContent,

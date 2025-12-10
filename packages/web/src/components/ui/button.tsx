@@ -20,7 +20,7 @@ const buttonVariants = cva(
         subtle:
           "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-500 dark:text-white dark:hover:bg-slate-400",
         ghost:
-          "bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-100 dark:hover:text-slate-100 data-[state=open]:bg-transparent dark:data-[state=open]:bg-transparent",
+          "bg-transparent hover:bg-accent/20 dark:text-slate-100 dark:hover:text-slate-100 data-[state=open]:bg-transparent dark:data-[state=open]:bg-transparent",
         link: "bg-transparent underline-offset-4 hover:underline text-slate-900 dark:text-slate-100 hover:bg-transparent dark:hover:bg-transparent",
       },
       size: {

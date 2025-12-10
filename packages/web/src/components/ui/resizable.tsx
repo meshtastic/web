@@ -3,10 +3,10 @@ import { usePanelSizes } from "@db/hooks";
 import { GripVertical } from "lucide-react";
 import { useCallback, useEffectEvent, useRef } from "react";
 import {
+  type ImperativePanelGroupHandle,
   Panel,
   PanelGroup,
   PanelResizeHandle,
-  type ImperativePanelGroupHandle,
 } from "react-resizable-panels";
 
 type ResizablePanelGroupProps = React.ComponentProps<typeof PanelGroup> & {
@@ -31,7 +31,7 @@ function ResizablePanelGroup({
   const hasAppliedSizes = useRef(false);
 
   // Apply saved sizes when they load from database
-  const applySavedSizes = useEffectEvent(() => {
+  useEffectEvent(() => {
     if (
       persistId &&
       panelGroupRef.current &&
@@ -42,9 +42,6 @@ function ResizablePanelGroup({
       panelGroupRef.current.setLayout(savedSizes);
     }
   });
-
-  // Call on each render to check if sizes are ready
-  applySavedSizes();
 
   const handleLayout = useCallback(
     (sizes: number[]) => {

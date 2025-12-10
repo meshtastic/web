@@ -1,12 +1,15 @@
 import { toByteArray } from "base64-js";
+import { t } from "i18next";
 import { type ZodType, z } from "zod/v4";
 
 export function makePskHelpers(allowedByteLengths: readonly number[]) {
   const bitsLabel = allowedByteLengths.map((b) => b * 8).join(" | ");
   const msgs = {
-    format: "formValidation.invalidFormat.key",
-    required: "formValidation.required.key",
-    length: `formValidation.pskLength.${bitsLabel.replace(/ \| /g, "_")}bit`,
+    format: t("formValidation.invalidFormat.key"),
+    required: t("formValidation.required.key"),
+    length: t(
+      `formValidation.pskLength.${bitsLabel.replace(/ \| /g, "_")}bit`,
+    ),
   } as const;
 
   function tryParse(str: string): Uint8Array | null {

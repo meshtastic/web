@@ -12,8 +12,8 @@ import { RemoveNodeDialog } from "@components/Dialog/RemoveNodeDialog.tsx";
 import { ResetNodeDbDialog } from "@components/Dialog/ResetNodeDbDialog/ResetNodeDbDialog.tsx";
 import { ShutdownDialog } from "@components/Dialog/ShutdownDialog.tsx";
 import { UnsafeRolesDialog } from "@components/Dialog/UnsafeRolesDialog/UnsafeRolesDialog.tsx";
-import { useChannels } from "@db/hooks";
 import { useDevice } from "@core/stores";
+import { useChannels } from "@db/hooks";
 import { toByteArray } from "base64-js";
 import { useMemo } from "react";
 
@@ -40,14 +40,14 @@ export const DialogManager = () => {
   }, [dbChannels]);
   return (
     <>
-      <QRDialog
+      {/* <QRDialog
         open={dialog.QR}
         onOpenChange={(open) => {
           setDialogOpen("QR", open);
         }}
         channels={channelsMap}
         loraConfig={config.lora}
-      />
+      /> */}
       {/* <ImportDialog
         open={dialog.import}
         onOpenChange={(open) => {

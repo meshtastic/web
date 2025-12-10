@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 
 type Theme = "light" | "dark" | "system";
+type ActualTheme = "light" | "dark";
 
 export function useTheme() {
-  const getSystemTheme = () =>
+  const getSystemPreferredTheme = useCallback(() =>
     globalThis.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
-      : "light";
+      : "light",
+    [],
+  );
 
   const getStoredPreference = useCallback(
     (): Theme => (localStorage.getItem("theme") as Theme) || "system",
@@ -17,23 +20,26 @@ export function useTheme() {
     typeof window !== "undefined" ? getStoredPreference() : "light",
   );
 
-  const theme = preference === "system" ? getSystemTheme() : preference;
+  const [systemTheme, setSystemTheme] = useState<ActualTheme>(() =>
+    typeof window !== "undefined" ? getSystemPreferredTheme() : "light",
+  );
+
+  const theme: ActualTheme = preference === "system" ? systemTheme : preference;
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   useEffect(() => {
-    if (preference !== "system") {
-      return;
-    }
-
+    // Listen for system theme changes
     const media = globalThis.matchMedia("(prefers-color-scheme: dark)");
-    const updateTheme = () => setPreference(getStoredPreference());
+    const updateSystemTheme = (event: MediaQueryListEvent) => {
+      setSystemTheme(event.matches ? "dark" : "light");
+    };
 
-    media.addEventListener("change", updateTheme);
-    return () => media.removeEventListener("change", updateTheme);
-  }, [preference, getStoredPreference]);
+    media.addEventListener("change", updateSystemTheme);
+    return () => media.removeEventListener("change", updateSystemTheme);
+  }, []); // Empty dependency array, listener only needs to be set up once
 
   const setPreferenceValue = (newPreference: Theme) => {
     localStorage.setItem("theme", newPreference);
@@ -42,3 +48,4 @@ export function useTheme() {
 
   return { theme, preference, setPreference: setPreferenceValue };
 }
+

@@ -19,11 +19,11 @@ interface SidebarNavigationProps {
 
 export const SidebarNavigation = ({ items }: SidebarNavigationProps) => {
   return (
-    <Card className="h-full rounded-none border-0 border-r">
+    <Card className="h-full border-0 border-r ">
       <div className="p-4 border-b">
         <h2 className="font-semibold">Configuration</h2>
       </div>
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 rounded-full">
         <div className="p-2 space-y-1 w-16">
           {items.map((item) => (
             <Button

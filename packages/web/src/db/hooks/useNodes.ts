@@ -1,10 +1,10 @@
 import type { Result } from "neverthrow";
 import { ResultAsync } from "neverthrow";
-import { useCallback, useEffect, useState } from "react";
-import { NodeError } from "../errors";
-import { DB_EVENTS, dbEvents } from "../events";
-import { nodeRepo } from "../repositories";
-import type { Node, PositionLog, TelemetryLog } from "../schema";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { NodeError } from "../errors.ts";
+import { DB_EVENTS, dbEvents } from "../events.ts";
+import { nodeRepo } from "../repositories/index.ts";
+import type { Node, PositionLog, TelemetryLog } from "../schema.ts";
 
 /**
  * Hook to fetch all nodes for a device
@@ -31,7 +31,7 @@ export function useNodes(deviceId: number) {
     });
 
     return unsubscribe;
-  }, [deviceId, refresh]);
+  }, [refresh]);
 
   return { nodes, refresh };
 }
@@ -183,13 +183,18 @@ export function usePositionTrails(
 ) {
   const [trails, setTrails] = useState<Map<number, PositionLog[]>>(new Map());
 
+  // Stabilize the nodeNums array reference to prevent infinite loops
+  // when passing inline arrays (e.g. usePositionTrails(id, [123]))
+  const nodeNumsKey = JSON.stringify(nodeNums);
+  const stableNodeNums = useMemo(() => nodeNums, [nodeNumsKey]);
+
   const refresh = useCallback(async (): Promise<
     Result<Map<number, PositionLog[]>, NodeError>
   > => {
     const result = await ResultAsync.fromPromise(
       nodeRepo.getPositionHistoryForNodes(
         deviceId,
-        nodeNums,
+        stableNodeNums,
         since,
         limitPerNode,
       ),
@@ -199,15 +204,15 @@ export function usePositionTrails(
       setTrails(result.value);
     }
     return result;
-  }, [deviceId, nodeNums, since, limitPerNode]);
+  }, [deviceId, stableNodeNums, since, limitPerNode]);
 
   useEffect(() => {
-    if (nodeNums.length > 0) {
+    if (stableNodeNums.length > 0) {
       refresh();
     } else {
       setTrails(new Map());
     }
-  }, [deviceId, JSON.stringify(nodeNums), since, limitPerNode, refresh]);
+  }, [refresh, stableNodeNums]);
 
   return { trails, refresh };
 }
